@@ -6,12 +6,13 @@ import { TotalBpiHistorySkeleton } from "./skeleton";
 export const TotalBPIHistory = ({ userId }: { userId: string }) => {
   const { levels, diffs, version } = useStatsFilter();
 
-  const { history, isLoading } = useTotalBpiHistory(
+  const { history, isLoading, isError } = useTotalBpiHistory(
     userId,
     levels,
     diffs,
     version,
   );
-  if (isLoading) return <TotalBpiHistorySkeleton />;
+  console.log(history, isError);
+  if (isLoading || isError) return <TotalBpiHistorySkeleton />;
   return <TotalBpiHistoryChart data={history} />;
 };

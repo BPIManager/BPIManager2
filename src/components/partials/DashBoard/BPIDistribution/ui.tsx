@@ -12,5 +12,8 @@ export const BpiDistributionSection = ({ userId }: { userId?: string }) => {
     version,
   );
   if (isLoading) return <DistributionChartSkeleton count={13} />;
+  if (distribution?.every((item) => item.count === 0)) {
+    return null;
+  }
   return <BpiDistributionChart data={distribution} isLoading={isLoading} />;
 };

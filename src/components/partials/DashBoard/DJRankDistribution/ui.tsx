@@ -13,5 +13,8 @@ export const RankDistributionSection = ({ userId }: { userId?: string }) => {
   );
   if (isLoading)
     return <DistributionChartSkeleton count={9} hasButton={false} />;
+  if (distribution?.every((item) => item.count === 0)) {
+    return null;
+  }
   return <RankDistributionChart data={distribution} isLoading={isLoading} />;
 };

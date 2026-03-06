@@ -9,6 +9,7 @@ import {
   Image,
   Circle,
   Box,
+  Spinner,
 } from "@chakra-ui/react";
 import { Field } from "@/components/ui/field";
 import { FormSelect } from "@/components/ui/select";
@@ -30,6 +31,7 @@ import { User2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toaster } from "@/components/ui/toaster";
 import { ImageUploadModal } from "../ImageCrop/ui";
+import { LuCheck, LuX } from "react-icons/lu";
 
 interface Props {
   isOpen?: boolean;
@@ -46,6 +48,11 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
   const handleImageSuccess = (url: string) => {
     setFormData((prev) => ({ ...prev, profileImage: url }));
   };
+  const [nameStatus, setNameStatus] = useState<{
+    isChecking: boolean;
+    error: string | null;
+    available: boolean;
+  }>({ isChecking: false, error: null, available: true });
 
   const [formData, setFormData] = useState({
     userName: "",
@@ -72,6 +79,50 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
   }, [user]);
 
   useEffect(() => {
+    if (!formData.userName) {
+      setNameStatus({
+        isChecking: false,
+        error: "ユーザー名は必須です",
+        available: false,
+      });
+      return;
+    }
+
+    if (user && formData.userName === user.userName) {
+      setNameStatus({ isChecking: false, error: null, available: true });
+      return;
+    }
+
+    setNameStatus((prev) => ({ ...prev, isChecking: true, error: null }));
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `/api/users/checkUsername?name=${encodeURIComponent(formData.userName)}`,
+        );
+        const data = await res.json();
+
+        if (data.available) {
+          setNameStatus({ isChecking: false, error: null, available: true });
+        } else {
+          setNameStatus({
+            isChecking: false,
+            error: data.message || "利用できない名前です",
+            available: false,
+          });
+        }
+      } catch (e) {
+        setNameStatus({
+          isChecking: false,
+          error: "接続エラーが発生しました",
+          available: false,
+        });
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [formData.userName, user]);
+
+  useEffect(() => {
     return onAuthStateChanged(auth, (u) => {
       if (u) {
         setFbUid(u.uid);
@@ -81,7 +132,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
             userName: prev.userName || u.displayName || "",
             profileImage:
               prev.profileImage ||
-              u.photoURL ||
+              u.photoURL?.replace("_normal", "") ||
               `https://api.dicebear.com/9.x/identicon/svg?seed=${u.uid}`,
           }));
         }
@@ -235,23 +286,42 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                   </Box>
                 </HStack>
               </Field>
-
               <Field
                 label="表示名"
                 required
-                invalid={!formData.userName}
-                helperText="ユーザー名を設定"
-                errorText="ユーザー名は必須です"
+                invalid={!!nameStatus.error}
+                helperText={
+                  nameStatus.isChecking ? "重複を確認中..." : "ユーザー名を設定"
+                }
+                errorText={nameStatus.error}
               >
-                <Input
-                  variant="subtle"
-                  value={formData.userName}
-                  onChange={(e) =>
-                    setFormData({ ...formData, userName: e.target.value })
-                  }
-                  p={2}
-                  placeholder=""
-                />
+                <Box position="relative" w="full">
+                  <Input
+                    variant="subtle"
+                    value={formData.userName}
+                    onChange={(e) =>
+                      setFormData({ ...formData, userName: e.target.value })
+                    }
+                    p={2}
+                    pr="40px"
+                    placeholder="Player Name"
+                  />
+                  <Box
+                    position="absolute"
+                    right="12px"
+                    top="50%"
+                    transform="translateY(-50%)"
+                    zIndex={2}
+                  >
+                    {nameStatus.isChecking ? (
+                      <Spinner size="xs" color="blue.500" />
+                    ) : formData.userName && !nameStatus.error ? (
+                      <LuCheck color="var(--chakra-colors-green-500)" />
+                    ) : nameStatus.error ? (
+                      <LuX color="var(--chakra-colors-red-500)" />
+                    ) : null}
+                  </Box>
+                </Box>
               </Field>
 
               <Field
@@ -356,7 +426,12 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
               colorPalette="blue"
               loading={isSubmitting}
               onClick={handleSubmit}
-              disabled={!formData.userName || !validateIidxId(formData.iidxId)}
+              disabled={
+                !formData.userName ||
+                !validateIidxId(formData.iidxId) ||
+                !nameStatus.available ||
+                nameStatus.isChecking
+              }
             >
               保存
             </Button>

@@ -20,7 +20,6 @@ import {
   Rectangle,
   Brush,
 } from "recharts";
-import { TotalBpiHistorySkeleton } from "./skeleton";
 
 const renderCustomBar = (props: any) => {
   const { payload } = props;

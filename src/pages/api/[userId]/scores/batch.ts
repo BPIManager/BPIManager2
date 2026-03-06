@@ -7,7 +7,6 @@ import { v4 as uuidv4 } from "uuid";
 import { BpiRepository } from "@/lib/db/bpi";
 import { isImproved } from "@/lib/lamp";
 import { BpiCalculator } from "@/lib/bpi";
-import { checkUserAccess } from "@/middlewares/api/withApi";
 
 const repository = new BpiRepository();
 
@@ -23,13 +22,6 @@ const handler = async (
   const batchId = uuidv4();
 
   try {
-    const access = await checkUserAccess(req, userId as string);
-    if (!access.hasAccess) {
-      return res
-        .status(access.error!.status)
-        .json({ message: access.error!.message });
-    }
-
     const [songMaster, existingScores] = await Promise.all([
       repository.getSongMasterWithDef(),
       repository.getLatestScores(userId, version),

@@ -2,6 +2,7 @@ import { Box, Grid, Text, HStack, VStack } from "@chakra-ui/react";
 import { useEffect, useMemo, useRef } from "react";
 import dayjs from "dayjs";
 import { Tooltip } from "@/components/ui/tooltip";
+import { NoDataAlert } from "../NoData";
 
 interface ActivityData {
   date: string;
