@@ -2,7 +2,7 @@ import { Kysely, MysqlDialect } from "kysely";
 import { createPool } from "mysql2";
 import "dotenv/config";
 import { Database } from "@/types/sql";
-
+const globalForDb = global as unknown as { db: Kysely<Database> };
 const dialect = new MysqlDialect({
   pool: createPool({
     database: process.env.DB_DATABASE,
@@ -11,20 +11,23 @@ const dialect = new MysqlDialect({
     password: process.env.DB_PW,
     connectionLimit: 10,
     port: 3306,
+    waitForConnections: true,
+    maxIdle: 10,
+    idleTimeout: 60000,
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 0,
   }) as any,
 });
 
-export const db = new Kysely<Database>({
-  dialect,
-  log(event) {
-    console.log(event);
-    if (event.level === "query") {
-      console.log(`[SQL] ${event.query.sql}`);
-      console.log(`[Params] ${JSON.stringify(event.query.parameters)}`);
-      console.log(`[Duration] ${event.queryDurationMillis}ms`);
-    }
-    if (event.level === "error") {
-      console.error("[Kysely Error]", event.error);
-    }
-  },
-});
+export const db =
+  globalForDb.db ||
+  new Kysely<Database>({
+    dialect,
+    log(event) {
+      if (event.level === "error") {
+        console.error("[Kysely Error]", event.error);
+      }
+    },
+  });
+
+if (process.env.NODE_ENV !== "production") globalForDb.db = db;

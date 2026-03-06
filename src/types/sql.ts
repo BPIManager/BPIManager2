@@ -5,6 +5,8 @@ export interface Database {
   songDef: SongDefTable;
   users: UsersTable;
   scores: ScoresTable;
+  logs: LogsTable;
+  apiKeys: ApiKeysTable;
 }
 
 // --- [songs] ---
@@ -16,27 +18,26 @@ export interface SongsTable {
   difficulty: string | null;
   difficultyLevel: number | null;
   textage: string | null;
-  createdAt: Generated<Date>; // DEFAULT current_timestamp()
+  createdAt: Generated<Date>;
+  deletedAt: string | null;
+  releasedVersion: number | null;
 }
 
 export type Song = Selectable<SongsTable>;
-export type NewSong = Insertable<SongsTable>;
-export type SongUpdate = Updateable<SongsTable>;
 
 // --- [songDef] ---
 export interface SongDefTable {
   defId: Generated<number>;
   songId: number | null;
+  difficulty: string;
   wrScore: number;
   kaidenAvg: number;
-  coef: Generated<number | null>; // DEFAULT -1
-  isCurrent: Generated<number | null>; // TINYINT(1) DEFAULT '0'
-  updatedAt: Generated<Date>; // DEFAULT current_timestamp() ON UPDATE...
+  coef: Generated<number | null>;
+  isCurrent: Generated<number | null>;
+  updatedAt: Generated<Date>;
 }
 
 export type SongDef = Selectable<SongDefTable>;
-export type NewSongDef = Insertable<SongDefTable>;
-export type SongDefUpdate = Updateable<SongDefTable>;
 
 // --- [users] ---
 export interface UsersTable {
@@ -48,26 +49,53 @@ export interface UsersTable {
   iidxId: string | null;
   xId: string | null;
   arenaRank: string | null;
-  isPublic: Generated<number | null>; /** 0: Private, 1: Public */
+  isPublic: Generated<number>;
   createdAt: Generated<Date>;
   updatedAt: Generated<Date>;
 }
 
 export type User = Selectable<UsersTable>;
-export type NewUser = Insertable<UsersTable>;
-export type UserUpdate = Updateable<UsersTable>;
 
 // --- [scores] ---
 export interface ScoresTable {
   logId: Generated<number>;
-  userId: number | null;
+  userId: string | null;
   songId: number | null;
   definitionId: number | null;
   exScore: number;
   bpi: number;
+  clearState: string | null;
+  missCount: number | null;
+  version: string | null;
+  batchId: string | null;
   createdAt: Generated<Date | null>;
+  lastPlayed: Date | string;
 }
 
 export type Score = Selectable<ScoresTable>;
 export type NewScore = Insertable<ScoresTable>;
-export type ScoreUpdate = Updateable<ScoresTable>;
+
+// --- [logs] ---
+export interface LogsTable {
+  id: Generated<number>;
+  userId: string;
+  totalBpi: number;
+  version: string;
+  batchId: string;
+  createdAt: Generated<Date>;
+}
+
+export type TotalBPILog = Selectable<LogsTable>;
+export type NewTotalBPILog = Insertable<LogsTable>;
+
+// --- [apiKeys] ---
+export interface ApiKeysTable {
+  id: Generated<number>;
+  userId: string;
+  key: string;
+  createdAt: Generated<Date>;
+}
+
+export type ApiKey = Selectable<ApiKeysTable>;
+export type NewApiKey = Insertable<ApiKeysTable>;
+export type ApiKeyUpdate = Updateable<ApiKeysTable>;

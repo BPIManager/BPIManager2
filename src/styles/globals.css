@@ -40,3 +40,7 @@ a {
     color-scheme: dark;
   }
 }
+
+.recharts-wrapper *:focus:not(:focus-visible) {
+  outline: none !important;
+}

@@ -1,0 +1,33 @@
+import { fetcher } from "@/utils/common/fetch";
+import useSWR from "swr";
+
+export interface BpiHistoryItem {
+  date: string;
+  totalBpi: number;
+  count: number;
+  updatedSongs: string[];
+}
+
+export const useTotalBpiHistory = (
+  userId: string | undefined,
+  levels: string[],
+  difficulties: string[],
+) => {
+  const params = new URLSearchParams();
+  levels.forEach((l) => params.append("level", l));
+  difficulties.forEach((d) => params.append("difficulty", d));
+
+  const shouldFetch = userId && (levels.length > 0 || difficulties.length > 0);
+
+  const url = shouldFetch
+    ? `/api/${userId}/stats/totalBPIhistory?${params.toString()}`
+    : null;
+
+  const { data, error, isLoading } = useSWR<BpiHistoryItem[]>(url, fetcher);
+
+  return {
+    history: data,
+    isLoading,
+    isError: error,
+  };
+};

@@ -14,6 +14,7 @@ import {
 } from "@chakra-ui/react";
 import { Field } from "@/components/ui/field";
 import {
+  FormSelect,
   SelectContent,
   SelectItem,
   SelectRoot,
@@ -30,7 +31,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogBody,
-  DialogBackdrop,
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
@@ -38,7 +38,7 @@ import { User2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toaster } from "@/components/ui/toaster";
 
-export default function RegistrationFlow() {
+export default function AccountSettings() {
   const { user, fbUser, refresh, isLoading } = useUser();
   const { isSignedIn } = authActions;
   const [fbUid, setFbUid] = useState<string | null>(null);
@@ -97,7 +97,7 @@ export default function RegistrationFlow() {
     setIsSubmitting(true);
     try {
       const token = await fbUser.getIdToken();
-      const response = await fetch(`/api/users/${fbUid}`, {
+      const response = await fetch(`/api/${fbUid}/profile`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -247,24 +247,14 @@ export default function RegistrationFlow() {
               label="アリーナランク"
               helperText="現在のアリーナランクを選択してください(アリーナ平均との比較が可能になります)"
             >
-              <SelectRoot
+              <FormSelect
                 collection={arenaRanksCollection}
-                value={[formData.arenaRank]}
-                onValueChange={(details) =>
-                  setFormData({ ...formData, arenaRank: details.value[0] })
+                value={formData.arenaRank}
+                onValueChange={(val) =>
+                  setFormData({ ...formData, arenaRank: val })
                 }
-              >
-                <SelectTrigger>
-                  <SelectValueText p={2} placeholder="未設定" />
-                </SelectTrigger>
-                <SelectContent portalled={false}>
-                  {arenaRanksCollection.items.map((rank) => (
-                    <SelectItem p={2} item={rank} key={rank.value}>
-                      {rank.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </SelectRoot>
+                placeholder="未設定"
+              />
             </Field>
 
             <Field
