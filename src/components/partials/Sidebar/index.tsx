@@ -7,7 +7,14 @@ import {
   Spacer,
   Separator,
 } from "@chakra-ui/react";
-import { Home, FileUp, Settings, LogOut, ListIcon } from "lucide-react";
+import {
+  Home,
+  FileUp,
+  Settings,
+  LogOut,
+  ListIcon,
+  ChartNoAxesGantt,
+} from "lucide-react";
 import { useUser } from "@/contexts/users/UserContext";
 import { authActions } from "@/lib/firebase/auth";
 import Link from "next/link";
@@ -23,6 +30,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
     { label: "ダッシュボード", icon: LuLayoutDashboard, href: "/" },
     { label: "スコア一覧", icon: ListIcon, href: "/my" },
     { label: "インポート", icon: FileUp, href: "/import" },
+    { label: "タイムライン", icon: ChartNoAxesGantt, href: "/timeline" },
     { label: "設定", icon: Settings, href: "/settings" },
   ];
 
