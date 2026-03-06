@@ -3,7 +3,7 @@ import { Meta } from "@/components/partials/Head";
 import { DashboardLayout } from "@/components/partials/Main";
 import { useUser } from "@/contexts/users/UserContext";
 import LoginPage from "@/components/partials/LogIn/page";
-import AccountSettings from "@/components/partials/Modal/accountSettings";
+import AccountSettings from "@/components/partials/Modal/AccountSettings";
 import { SongsTable } from "@/components/partials/Table";
 
 export default function MyScores() {

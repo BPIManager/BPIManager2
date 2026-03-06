@@ -1,11 +1,14 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { IIDX_LEVELS, IIDX_DIFFICULTIES } from "@/constants/diffs";
+import { latestVersion } from "@/constants/latestVersion";
 
 interface FilterContextType {
   levels: string[];
   diffs: string[];
+  version: string;
   toggleLevel: (val: string) => void;
   toggleDiff: (val: string) => void;
+  setVersion: (val: string) => void;
   resetFilters: () => void;
 }
 
@@ -18,6 +21,7 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
   const [diffs, setDiffs] = useState<string[]>(
     IIDX_DIFFICULTIES as unknown as string[],
   );
+  const [version, setVersion] = useState<string>(latestVersion);
 
   const toggle = (
     curr: string[],
@@ -32,11 +36,14 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
   const value = {
     levels,
     diffs,
+    version,
     toggleLevel: (val: string) => toggle(levels, val, setLevels),
     toggleDiff: (val: string) => toggle(diffs, val, setDiffs),
+    setVersion,
     resetFilters: () => {
       setLevels(IIDX_LEVELS as unknown as string[]);
       setDiffs(IIDX_DIFFICULTIES as unknown as string[]);
+      setVersion(latestVersion);
     },
   };
 

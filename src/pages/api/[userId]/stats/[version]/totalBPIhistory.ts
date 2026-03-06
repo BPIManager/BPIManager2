@@ -33,7 +33,6 @@ export default async function handler(
       return res
         .status(access.error!.status)
         .json({ message: access.error!.message });
-
     const [allLogs, totalSongs] = await Promise.all([
       repository.getScoreHistory(
         userId as string,
@@ -64,10 +63,20 @@ export default async function handler(
       firstLogDate.getMonth(),
       firstLogDate.getDate(),
     );
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
 
-    for (let d = new Date(startDate); d <= today; d.setDate(d.getDate() + 1)) {
+    const lastLogRaw = allLogs[allLogs.length - 1].lastPlayed;
+    const lastLogDate = new Date(lastLogRaw);
+    const endDate = new Date(
+      lastLogDate.getFullYear(),
+      lastLogDate.getMonth(),
+      lastLogDate.getDate(),
+    );
+
+    for (
+      let d = new Date(startDate);
+      d <= endDate;
+      d.setDate(d.getDate() + 1)
+    ) {
       const dateStr = d.toISOString().split("T")[0];
 
       const updatedOnThisDay = logsByDate[dateStr] || [];

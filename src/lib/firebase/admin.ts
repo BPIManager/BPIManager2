@@ -1,7 +1,6 @@
 import * as admin from "firebase-admin";
 import adminsdk from "@/constants/adminsdk.json";
 
-console.log(adminsdk);
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert(adminsdk as admin.ServiceAccount),
@@ -10,3 +9,4 @@ if (!admin.apps.length) {
 }
 
 export const adminAuth = admin.auth();
+export const adminDb = admin.firestore();

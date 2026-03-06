@@ -10,6 +10,7 @@ export const useDjRankDistribution = (
   userId: string | undefined,
   levels: string[],
   difficulties: string[],
+  version: string,
 ) => {
   const params = new URLSearchParams();
   levels.forEach((l) => params.append("level", l));
@@ -17,7 +18,7 @@ export const useDjRankDistribution = (
 
   const shouldFetch = userId && (levels.length > 0 || difficulties.length > 0);
   const url = shouldFetch
-    ? `/api/${userId}/stats/djRankDistribution?${params.toString()}`
+    ? `/api/${userId}/stats/${version}/djRankDistribution?${params.toString()}`
     : null;
 
   const { data, error, isLoading } = useSWR<RankDistItem[]>(url, fetcher);

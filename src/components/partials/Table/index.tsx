@@ -49,7 +49,7 @@ export const SongsTable = ({ userId }: SongsTableProps) => {
     fetcher,
   );
   const displaySongs = useMemo(() => {
-    if (!data) return [];
+    if (!data || error) return [];
     const filtered = filterSongs(data, params);
     return sortSongs(filtered, params);
   }, [data, params]);

@@ -6,6 +6,7 @@ export interface Database {
   users: UsersTable;
   scores: ScoresTable;
   logs: LogsTable;
+  userStatusLogs: UserStatusLogsTable;
   apiKeys: ApiKeysTable;
 }
 
@@ -43,12 +44,10 @@ export type SongDef = Selectable<SongDefTable>;
 export interface UsersTable {
   userId: string;
   userName: string;
-  currentTotalBpi: Generated<number | null>;
   profileText: string | null;
   profileImage: string | null;
   iidxId: string | null;
   xId: string | null;
-  arenaRank: string | null;
   isPublic: Generated<number>;
   createdAt: Generated<Date>;
   updatedAt: Generated<Date>;
@@ -99,3 +98,18 @@ export interface ApiKeysTable {
 export type ApiKey = Selectable<ApiKeysTable>;
 export type NewApiKey = Insertable<ApiKeysTable>;
 export type ApiKeyUpdate = Updateable<ApiKeysTable>;
+
+// --- [userStatusLogs] ---
+export interface UserStatusLogsTable {
+  id: Generated<number>;
+  userId: string;
+  totalBpi: number;
+  arenaRank: string | null;
+  version: string;
+  batchId: string | null;
+  createdAt: Generated<Date>;
+  updatedAt: Generated<Date>;
+}
+
+export type UserStatusLog = Selectable<UserStatusLogsTable>;
+export type NewUserStatusLog = Insertable<UserStatusLogsTable>;

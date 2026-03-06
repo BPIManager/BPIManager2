@@ -2,9 +2,12 @@ import { Box, Stack, VStack, HStack, Text } from "@chakra-ui/react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { IIDX_LEVELS, IIDX_DIFFICULTIES } from "@/constants/diffs";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
+import { versionsNonDisabledCollection } from "@/constants/versions";
+import { FormSelect } from "@/components/ui/select";
 
 export const DashBoardFilter = () => {
-  const { levels, diffs, toggleLevel, toggleDiff } = useStatsFilter();
+  const { levels, diffs, version, toggleLevel, toggleDiff, setVersion } =
+    useStatsFilter();
 
   return (
     <Box
@@ -15,10 +18,27 @@ export const DashBoardFilter = () => {
       borderColor="whiteAlpha.100"
     >
       <Stack
-        direction={{ base: "column", md: "row" }}
-        gap={{ base: 6, md: 10 }}
+        direction={{ base: "column", lg: "row" }}
+        gap={{ base: 6, lg: 10 }}
         align="start"
       >
+        <VStack align="start" gap={2} minW={{ base: "full", lg: "240px" }}>
+          <Text
+            fontSize={{ base: "2xs", md: "xs" }}
+            fontWeight="bold"
+            color="gray.500"
+          >
+            VERSION
+          </Text>
+          <FormSelect
+            collection={versionsNonDisabledCollection}
+            value={version}
+            onValueChange={setVersion}
+            size="xs"
+            variant="subtle"
+          />
+        </VStack>
+
         <VStack align="start" gap={2} w="full">
           <Text
             fontSize={{ base: "2xs", md: "xs" }}

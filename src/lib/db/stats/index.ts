@@ -19,8 +19,7 @@ export class StatsRepository {
         sql<number>`COUNT(s.logId)`.as("count"),
       ])
       .where("s.userId", "=", userId)
-      .where("s.version", "=", version)
-      .where("s.lastPlayed", ">=", sql<Date>`DATE_SUB(NOW(), INTERVAL 1 YEAR)`);
+      .where("s.version", "=", version);
 
     if (levels && levels.length > 0) {
       query = query.where("m.difficultyLevel", "in", levels);

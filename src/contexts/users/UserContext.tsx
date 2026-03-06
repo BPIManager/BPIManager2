@@ -4,10 +4,10 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import useSWR, { KeyedMutator } from "swr";
 import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
 import { auth } from "@/lib/firebase";
-import { User } from "@/types/sql";
+import { Session } from "@/types/session";
 
 interface UserContextType {
-  user: User | null;
+  user: Session | null;
   isLoading: boolean;
   error: any;
   refresh: KeyedMutator<any>;

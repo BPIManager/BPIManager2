@@ -23,3 +23,10 @@ export const versionsCollection = createListCollection({
     disabled: v.disabled,
   })),
 });
+
+export const versionsNonDisabledCollection = createListCollection({
+  items: versionTitles.map((v) => ({
+    label: v.title,
+    value: v.num,
+  })),
+});

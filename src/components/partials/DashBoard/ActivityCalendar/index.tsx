@@ -20,14 +20,18 @@ export const ActivityCalendar = ({ data }: { data: ActivityData[] }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const calendarDays = useMemo(() => {
     const days = [];
-    const today = dayjs().startOf("day");
+
+    const lastDate =
+      data.length > 0 ? dayjs(data[data.length - 1].date) : dayjs();
+
+    const endOfCalendar = lastDate.endOf("week");
 
     const dataMap = new Map(
       data.map((d) => [dayjs(d.date).format("YYYY-MM-DD"), d.count]),
     );
 
     for (let i = 364; i >= 0; i--) {
-      const dateObj = today.subtract(i, "day");
+      const dateObj = endOfCalendar.subtract(i, "day");
       const dateStr = dateObj.format("YYYY-MM-DD");
       days.push({
         date: dateStr,

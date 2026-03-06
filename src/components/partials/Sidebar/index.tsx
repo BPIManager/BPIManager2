@@ -1,4 +1,12 @@
-import { VStack, HStack, Text, Box, Button, Spacer } from "@chakra-ui/react";
+import {
+  VStack,
+  HStack,
+  Text,
+  Box,
+  Button,
+  Spacer,
+  Separator,
+} from "@chakra-ui/react";
 import { Home, FileUp, Settings, LogOut, ListIcon } from "lucide-react";
 import { useUser } from "@/contexts/users/UserContext";
 import { authActions } from "@/lib/firebase/auth";
@@ -33,9 +41,47 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
               {user?.userName || fbUser?.displayName || "Guest"}
             </Text>
             <Text fontSize="xs" color="fg.muted" fontFamily="mono">
-              {user?.iidxId ? `ID: ${user.iidxId}` : "ID未設定"}
+              {user?.iidxId ? `IIDX ID: ${user.iidxId}` : "ID未設定"}
+            </Text>
+            <Text fontSize="xs" color="fg.muted" fontFamily="mono">
+              ☆12総合BPI:{user?.totalBpi ?? -15}
             </Text>
           </Box>
+          <Separator colorPalette="gray" opacity={0.5} />
+
+          <HStack gap={4} justify="start">
+            <Link href={`/profile/${user?.userId}/following`} onClick={onClose}>
+              <VStack
+                gap={0}
+                align="start"
+                _hover={{ color: "blue.400" }}
+                transition="color 0.2s"
+              >
+                <Text fontSize="xs" fontWeight="bold">
+                  {user?.followingCount ?? 0}
+                </Text>
+                <Text fontSize="2xs" color="fg.muted">
+                  フォロー中
+                </Text>
+              </VStack>
+            </Link>
+
+            <Link href={`/profile/${user?.userId}/followers`} onClick={onClose}>
+              <VStack
+                gap={0}
+                align="start"
+                _hover={{ color: "blue.400" }}
+                transition="color 0.2s"
+              >
+                <Text fontSize="xs" fontWeight="bold">
+                  {user?.followerCount ?? 0}
+                </Text>
+                <Text fontSize="2xs" color="fg.muted">
+                  フォロワー
+                </Text>
+              </VStack>
+            </Link>
+          </HStack>
         </VStack>
       </Box>
 

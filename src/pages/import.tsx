@@ -38,9 +38,10 @@ import {
 } from "@/components/ui/select";
 import { useUser } from "@/contexts/users/UserContext";
 import LoginPage from "@/components/partials/LogIn/page";
-import AccountSettings from "@/components/partials/Modal/accountSettings";
+import AccountSettings from "@/components/partials/Modal/AccountSettings";
 import { dummyCsv } from "@/constants/dummyCsv";
 import Papa from "papaparse";
+import { PageContainer, PageHeader } from "@/components/partials/Header";
 
 export default function ImportPage() {
   const { user, isLoading, fbUser, refresh } = useUser();
@@ -174,171 +175,80 @@ export default function ImportPage() {
       <DashboardLayout>
         <Container maxW="full">
           <Stack gap={8}>
-            <VStack align="start" gap={2}>
-              <HStack color="blue.500">
-                <FileUp size={28} />
-                <Heading size="2xl">インポート</Heading>
-              </HStack>
-              <Text color="fg.muted">
-                CSVデータをアップロードしてBPIを更新します。
-              </Text>
-            </VStack>
-
-            <Stack gap={4}>
-              <Field
-                label="CSVデータ"
-                helperText="データを改変しないですべて貼り付けてください"
-              >
-                <Textarea
-                  placeholder="バージョン,タイトル,ジャンル,アーティスト,プレー回数,..."
-                  minH="300px"
-                  variant="subtle"
-                  p={4}
-                  fontFamily="mono"
-                  fontSize="sm"
-                  value={csvData}
-                  onChange={(e) => setCsvData(e.target.value)}
-                  borderRadius="lg"
-                  _focus={{ borderColor: "blue.500" }}
-                />
-              </Field>
-              <Field
-                label="保存先バージョン"
-                helperText="データを反映させるバージョンを選択してください(旧作は読み取り専用です)"
-              >
-                <SelectRoot
-                  collection={versionsCollection}
-                  value={selectedVersion}
-                  onValueChange={(details) => setSelectedVersion(details.value)}
-                  variant="subtle"
+            <PageHeader
+              title="インポート"
+              description="CSVデータをアップロードしてBPIを更新します。"
+            />
+            <PageContainer>
+              <Stack gap={4}>
+                <Field
+                  label="CSVデータ"
+                  helperText="データを改変しないですべて貼り付けてください"
                 >
-                  <SelectTrigger>
-                    <SelectValueText px={4} placeholder="バージョンを選択" />
-                  </SelectTrigger>
-                  <SelectContent portalled={false}>
-                    {versionsCollection.items.map((version) => (
-                      <SelectItem p={2} item={version} key={version.value}>
-                        {version.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </SelectRoot>
-              </Field>
-
-              <HStack justify="space-between">
-                <Button
-                  variant="ghost"
-                  colorPalette="red"
-                  size="sm"
-                  onClick={() => setCsvData("")}
-                  disabled={!csvData || isProcessing}
+                  <Textarea
+                    placeholder="バージョン,タイトル,ジャンル,アーティスト,プレー回数,..."
+                    minH="100px"
+                    variant="subtle"
+                    p={4}
+                    fontFamily="mono"
+                    fontSize="sm"
+                    value={csvData}
+                    onChange={(e) => setCsvData(e.target.value)}
+                    borderRadius="lg"
+                    _focus={{ borderColor: "blue.500" }}
+                  />
+                </Field>
+                <Field
+                  label="保存先バージョン"
+                  helperText="データを反映させるバージョンを選択してください(旧作は読み取り専用です)"
                 >
-                  <Trash2 />
-                  入力をクリア
-                </Button>
-                <Button
-                  colorPalette="blue"
-                  size="lg"
-                  px={4}
-                  loading={isProcessing}
-                  loadingText={processStatus}
-                  onClick={handleUpload}
-                  disabled={!csvData || isProcessing}
-                >
-                  <Upload /> インポートを開始
-                </Button>
-              </HStack>
-            </Stack>
-            <HStack
-              gap={3}
-              p={4}
-              borderRadius="lg"
-              bg="whiteAlpha.50"
-              align="start"
-            >
-              <AlertCircle size={18} style={{ marginTop: "2px" }} />
-              <VStack align="start" gap={0}>
-                <Text fontSize="xs" fontWeight="bold">
-                  注意事項
-                </Text>
-                <Text fontSize="xs" color="fg.muted">
-                  最大1分程度、算出に時間を要します。
-                </Text>
-              </VStack>
-            </HStack>
+                  <SelectRoot
+                    collection={versionsCollection}
+                    value={selectedVersion}
+                    onValueChange={(details) =>
+                      setSelectedVersion(details.value)
+                    }
+                    variant="subtle"
+                  >
+                    <SelectTrigger>
+                      <SelectValueText px={4} placeholder="バージョンを選択" />
+                    </SelectTrigger>
+                    <SelectContent portalled={false}>
+                      {versionsCollection.items.map((version) => (
+                        <SelectItem p={2} item={version} key={version.value}>
+                          {version.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </SelectRoot>
+                </Field>
 
-            <Separator color="whiteAlpha.200" />
-            <Box
-              p={5}
-              borderRadius="xl"
-              bg="blue.900/10"
-              border="1px solid"
-              borderColor="blue.500/20"
-            >
-              <HStack gap={3} mb={3}>
-                <HelpCircle size={20} color="var(--chakra-colors-blue-500)" />
-                <Text fontWeight="bold" fontSize="lg">
-                  インポート方法
-                </Text>
-              </HStack>
-              <List.Root gap={2} fontSize="sm" variant="plain">
-                <List.Item>
-                  <HStack align="start">
-                    <Box
-                      bg="blue.500"
-                      color="white"
-                      borderRadius="full"
-                      px={2}
-                      fontSize="xs"
-                    >
-                      1
-                    </Box>
-                    <Text>
-                      <Link
-                        target="_blank"
-                        textDecoration={"underline"}
-                        href={iidxUrl}
-                      >
-                        IIDX公式サイト
-                      </Link>
-                      にアクセスしてCSVダウンロードページを表示します。
-                    </Text>
-                  </HStack>
-                </List.Item>
-                <List.Item>
-                  <HStack align="start">
-                    <Box
-                      bg="blue.500"
-                      color="white"
-                      borderRadius="full"
-                      px={2}
-                      fontSize="xs"
-                    >
-                      2
-                    </Box>
-                    <Text>入力エリアにCSVデータを直接貼り付けてください。</Text>
-                  </HStack>
-                </List.Item>
-                <List.Item>
-                  <HStack align="start">
-                    <Box
-                      bg="blue.500"
-                      color="white"
-                      borderRadius="full"
-                      px={2}
-                      fontSize="xs"
-                    >
-                      3
-                    </Box>
-                    <Text>
-                      「インポートを開始」ボタンを押して完了を待ちます。
-                    </Text>
-                  </HStack>
-                </List.Item>
-              </List.Root>
+                <HStack justify="space-between">
+                  <Button
+                    variant="ghost"
+                    colorPalette="red"
+                    size="sm"
+                    onClick={() => setCsvData("")}
+                    disabled={!csvData || isProcessing}
+                  >
+                    <Trash2 />
+                    入力をクリア
+                  </Button>
+                  <Button
+                    colorPalette="blue"
+                    size="lg"
+                    px={4}
+                    loading={isProcessing}
+                    loadingText={processStatus}
+                    onClick={handleUpload}
+                    disabled={!csvData || isProcessing}
+                  >
+                    <Upload /> インポートを開始
+                  </Button>
+                </HStack>
+              </Stack>
               <HStack
-                gap={3}
-                mt={4}
+                my={4}
                 p={4}
                 borderRadius="lg"
                 bg="whiteAlpha.50"
@@ -347,15 +257,106 @@ export default function ImportPage() {
                 <AlertCircle size={18} style={{ marginTop: "2px" }} />
                 <VStack align="start" gap={0}>
                   <Text fontSize="xs" fontWeight="bold">
-                    Note
+                    注意事項
                   </Text>
                   <Text fontSize="xs" color="fg.muted">
-                    ブックマークレットによるインポートおよび手入力による登録は現在サポートされていません。(後日対応するかも)
+                    最大1分程度、算出に時間を要します。
                   </Text>
                 </VStack>
               </HStack>
-            </Box>
-            <Separator color="whiteAlpha.200" />
+
+              <Separator color="whiteAlpha.200" />
+              <Box
+                p={5}
+                borderRadius="xl"
+                bg="blue.900/10"
+                border="1px solid"
+                borderColor="blue.500/20"
+              >
+                <HStack gap={3} mb={3}>
+                  <HelpCircle size={20} color="var(--chakra-colors-blue-500)" />
+                  <Text fontWeight="bold" fontSize="lg">
+                    インポート方法
+                  </Text>
+                </HStack>
+                <List.Root gap={2} fontSize="sm" variant="plain">
+                  <List.Item>
+                    <HStack align="start">
+                      <Box
+                        bg="blue.500"
+                        color="white"
+                        borderRadius="full"
+                        px={2}
+                        fontSize="xs"
+                      >
+                        1
+                      </Box>
+                      <Text>
+                        <Link
+                          target="_blank"
+                          textDecoration={"underline"}
+                          href={iidxUrl}
+                        >
+                          IIDX公式サイト
+                        </Link>
+                        にアクセスしてCSVダウンロードページを表示します。
+                      </Text>
+                    </HStack>
+                  </List.Item>
+                  <List.Item>
+                    <HStack align="start">
+                      <Box
+                        bg="blue.500"
+                        color="white"
+                        borderRadius="full"
+                        px={2}
+                        fontSize="xs"
+                      >
+                        2
+                      </Box>
+                      <Text>
+                        入力エリアにCSVデータを直接貼り付けてください。
+                      </Text>
+                    </HStack>
+                  </List.Item>
+                  <List.Item>
+                    <HStack align="start">
+                      <Box
+                        bg="blue.500"
+                        color="white"
+                        borderRadius="full"
+                        px={2}
+                        fontSize="xs"
+                      >
+                        3
+                      </Box>
+                      <Text>
+                        「インポートを開始」ボタンを押して完了を待ちます。
+                      </Text>
+                    </HStack>
+                  </List.Item>
+                </List.Root>
+                <HStack
+                  gap={3}
+                  mt={4}
+                  p={4}
+                  borderRadius="lg"
+                  bg="whiteAlpha.50"
+                  align="start"
+                >
+                  <AlertCircle size={18} style={{ marginTop: "2px" }} />
+                  <VStack align="start" gap={0}>
+                    <Text fontSize="xs" fontWeight="bold">
+                      Note
+                    </Text>
+                    <Text fontSize="xs" color="fg.muted">
+                      ブックマークレットによるインポートおよび手入力による登録は現在サポートされていません。(後日対応するかも)
+                    </Text>
+                  </VStack>
+                </HStack>
+              </Box>
+              <Separator color="whiteAlpha.200" />
+            </PageContainer>
           </Stack>
         </Container>
       </DashboardLayout>

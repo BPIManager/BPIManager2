@@ -10,6 +10,7 @@ export const useBPIDistribution = (
   userId: string | undefined,
   levels: string[],
   difficulties: string[],
+  version: string,
 ) => {
   const params = new URLSearchParams();
   levels.forEach((l) => params.append("level", l));
@@ -17,7 +18,7 @@ export const useBPIDistribution = (
 
   const shouldFetch = userId && (levels.length > 0 || difficulties.length > 0);
   const url = shouldFetch
-    ? `/api/${userId}/stats/singleBPIDistribution?${params.toString()}`
+    ? `/api/${userId}/stats/${version}/singleBPIDistribution?${params.toString()}`
     : null;
 
   const { data, error, isLoading } = useSWR<RankDistItem[]>(url, fetcher);

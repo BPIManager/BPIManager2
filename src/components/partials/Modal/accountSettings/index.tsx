@@ -9,18 +9,9 @@ import {
   Image,
   Circle,
   Box,
-  VStack,
-  DialogDescription,
 } from "@chakra-ui/react";
 import { Field } from "@/components/ui/field";
-import {
-  FormSelect,
-  SelectContent,
-  SelectItem,
-  SelectRoot,
-  SelectTrigger,
-  SelectValueText,
-} from "@/components/ui/select";
+import { FormSelect } from "@/components/ui/select";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { useUser } from "@/contexts/users/UserContext";
@@ -33,12 +24,18 @@ import {
   DialogBody,
   DialogTitle,
   DialogFooter,
+  DialogCloseTrigger,
 } from "@/components/ui/dialog";
 import { User2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toaster } from "@/components/ui/toaster";
 
-export default function AccountSettings() {
+interface Props {
+  isOpen?: boolean;
+  onClose?: () => void;
+}
+
+export default function AccountSettings({ isOpen, onClose }: Props) {
   const { user, fbUser, refresh, isLoading } = useUser();
   const { isSignedIn } = authActions;
   const [fbUid, setFbUid] = useState<string | null>(null);
@@ -55,16 +52,33 @@ export default function AccountSettings() {
   });
 
   useEffect(() => {
+    if (user) {
+      setFormData({
+        userName: user.userName || "",
+        iidxId: user.iidxId || "",
+        arenaRank: user.arenaRank || "-",
+        bio: user.profileText || "",
+        isPublic: !!user.isPublic,
+        xId: user.xId || "",
+        profileImage: user.profileImage || "",
+      });
+    }
+  }, [user]);
+
+  useEffect(() => {
     return onAuthStateChanged(auth, (u) => {
       if (u) {
         setFbUid(u.uid);
-        setFormData((prev) => ({
-          ...prev,
-          userName: u.displayName || "",
-          profileImage:
-            u.photoURL ||
-            `https://api.dicebear.com/9.x/identicon/svg?seed=${u.uid}`,
-        }));
+        if (!user) {
+          setFormData((prev) => ({
+            ...prev,
+            userName: prev.userName || u.displayName || "",
+            profileImage:
+              prev.profileImage ||
+              u.photoURL ||
+              `https://api.dicebear.com/9.x/identicon/svg?seed=${u.uid}`,
+          }));
+        }
       }
     });
   }, []);
@@ -118,6 +132,8 @@ export default function AccountSettings() {
       if (!response.ok) throw new Error("Registration failed");
 
       await refresh();
+      toaster.create({ title: "保存しました", type: "success" });
+      if (onClose) onClose();
     } catch (error) {
       toaster.create({
         title: "アカウント情報の反映に失敗しました",
@@ -133,16 +149,29 @@ export default function AccountSettings() {
       });
     }
   };
-
-  const showDialog = !isLoading && isSignedIn() && !user;
+  const isForcedOpen = !isLoading && isSignedIn() && !user;
+  const finalOpen = isOpen || isForcedOpen;
 
   return (
     <DialogRoot
-      open={showDialog}
-      closeOnInteractOutside={false}
+      open={finalOpen}
       placement={{ mdDown: "top", md: "center" }}
+      onOpenChange={(e) => {
+        if (!e.open && user && onClose) {
+          onClose();
+        }
+      }}
+      closeOnInteractOutside={!!user}
     >
       <DialogContent borderRadius="xl" boxShadow="2xl" bg="bg.panel" p={4}>
+        {user && (
+          <DialogCloseTrigger
+            position="absolute"
+            top="4"
+            right="4"
+            onClick={onClose}
+          />
+        )}
         <DialogHeader borderBottomWidth="1px" pb={4}>
           <HStack>
             <User2Icon color="var(--chakra-colors-blue-500)" />

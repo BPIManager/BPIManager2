@@ -1,11 +1,11 @@
 import { initializeApp } from "firebase/app";
-import "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 import { getFunctions, httpsCallable as H } from "firebase/functions";
 import { GoogleAuthProvider, TwitterAuthProvider } from "firebase/auth";
 import { getAuth } from "firebase/auth";
 import "firebase/functions";
+import { getFirestore } from "firebase/firestore";
 export const fb = initializeApp({
   apiKey: "AIzaSyAIlzzxI0kZtIe4vvjSIiRwfqSQVZtbluM",
   authDomain: "bpimv2.firebaseapp.com",
@@ -16,6 +16,7 @@ export const fb = initializeApp({
   measurementId: "G-4V5QE3YXF9",
 });
 
+export const db = getFirestore(fb);
 export const auth = getAuth();
 export const storage = getStorage(fb);
 export const twitter = new TwitterAuthProvider();

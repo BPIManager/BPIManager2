@@ -3,7 +3,7 @@ export interface SongWithScore {
   title: string;
   notes: number;
   bpm: string | null;
-  difficulty: string; // "HYPER", "ANOTHER", "LEGGENDARIA"
+  difficulty: string;
   difficultyLevel: number;
   releasedVersion: number | null;
 

@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { SongMaster } from "@/types/songs/songMaster";
+import { NewScore } from "@/types/sql";
 import { sql } from "kysely";
 
 export class BpiRepository {
@@ -59,27 +60,93 @@ export class BpiRepository {
     userId: string;
     version: string;
     batchId: string;
-    scoreUpdates: any[];
+    scoreUpdates: NewScore[];
     newTotalBpi: number;
   }) {
     return await db.transaction().execute(async (trx) => {
+      await this.executeSave(trx, params);
+    });
+  }
+
+  /**
+   * BPIManagerからの引き継ぎインポート
+   */
+  async importFromBPIM(params: {
+    userId: string;
+    scoreUpdates: any[];
+    statusLogs: any[];
+    finalTotalBpi: number;
+  }) {
+    return await db.transaction().execute(async (trx) => {
       await trx
-        .insertInto("logs")
-        .values({
-          userId: params.userId,
-          totalBpi: params.newTotalBpi,
-          version: params.version,
-          batchId: params.batchId,
-        })
-        .execute();
-      if (params.scoreUpdates.length > 0) {
-        await trx.insertInto("scores").values(params.scoreUpdates).execute();
-      }
-      await trx
-        .updateTable("users")
-        .set({ currentTotalBpi: params.newTotalBpi })
+        .deleteFrom("scores")
         .where("userId", "=", params.userId)
         .execute();
+      await trx
+        .deleteFrom("logs")
+        .where("userId", "=", params.userId)
+        .execute();
+      await trx
+        .deleteFrom("userStatusLogs")
+        .where("userId", "=", params.userId)
+        .execute();
+
+      if (params.statusLogs.length > 0) {
+        await trx
+          .insertInto("userStatusLogs")
+          .values(params.statusLogs)
+          .execute();
+        await trx.insertInto("logs").values(params.statusLogs).execute();
+      }
+
+      if (params.scoreUpdates.length > 0) {
+        const chunks = [];
+        for (let i = 0; i < params.scoreUpdates.length; i += 1000) {
+          chunks.push(params.scoreUpdates.slice(i, i + 1000));
+        }
+        for (const chunk of chunks) {
+          await trx.insertInto("scores").values(chunk).execute();
+        }
+      }
     });
+  }
+
+  /**
+   * 共通保存ロジック
+   */
+  private async executeSave(
+    trx: any,
+    params: {
+      userId: string;
+      version: string;
+      batchId: string;
+      scoreUpdates: NewScore[];
+      newTotalBpi: number;
+    },
+  ) {
+    await trx
+      .insertInto("logs")
+      .values({
+        userId: params.userId,
+        totalBpi: params.newTotalBpi,
+        version: params.version,
+        batchId: params.batchId,
+      })
+      .execute();
+
+    await trx
+      .insertInto("userStatusLogs")
+      .values({
+        userId: params.userId,
+        totalBpi: params.newTotalBpi,
+        arenaRank: null,
+        version: params.version,
+        batchId: params.batchId,
+      })
+      .execute();
+
+    if (params.scoreUpdates.length > 0) {
+      await trx.insertInto("scores").values(params.scoreUpdates).execute();
+    }
   }
 }

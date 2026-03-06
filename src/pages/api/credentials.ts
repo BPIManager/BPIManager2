@@ -16,9 +16,32 @@ const handler = async (
 
   try {
     const user = await db
-      .selectFrom("users")
-      .selectAll()
-      .where("userId", "=", req.authUid)
+      .selectFrom("users as u")
+      .leftJoin(
+        (qb) =>
+          qb
+            .selectFrom("userStatusLogs")
+            .select(["userId", "totalBpi", "arenaRank", "id"])
+            .where("userId", "=", req.authUid)
+            .orderBy("id", "desc")
+            .limit(1)
+            .as("latest"),
+        (join) => join.onRef("u.userId", "=", "latest.userId"),
+      )
+      .select([
+        "u.userId",
+        "u.userName",
+        "u.profileText",
+        "u.profileImage",
+        "u.iidxId",
+        "u.xId",
+        "u.isPublic",
+        "u.createdAt",
+        "u.updatedAt",
+        "latest.totalBpi",
+        "latest.arenaRank",
+      ])
+      .where("u.userId", "=", req.authUid)
       .executeTakeFirst();
 
     return res.status(200).json({

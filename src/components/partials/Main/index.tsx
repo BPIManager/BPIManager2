@@ -66,7 +66,7 @@ export const DashboardLayout = ({
           </HStack>
         </HStack>
 
-        <Box as="main" flex="1" overflowY="auto" p={2}>
+        <Box as="main" flex="1" overflowY="auto">
           <Container maxW="full">{children}</Container>
         </Box>
       </Flex>

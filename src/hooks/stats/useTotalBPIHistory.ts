@@ -12,6 +12,7 @@ export const useTotalBpiHistory = (
   userId: string | undefined,
   levels: string[],
   difficulties: string[],
+  version: string,
 ) => {
   const params = new URLSearchParams();
   levels.forEach((l) => params.append("level", l));
@@ -20,7 +21,7 @@ export const useTotalBpiHistory = (
   const shouldFetch = userId && (levels.length > 0 || difficulties.length > 0);
 
   const url = shouldFetch
-    ? `/api/${userId}/stats/totalBPIhistory?${params.toString()}`
+    ? `/api/${userId}/stats/${version}/totalBPIhistory?${params.toString()}`
     : null;
 
   const { data, error, isLoading } = useSWR<BpiHistoryItem[]>(url, fetcher);
