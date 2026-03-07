@@ -36,7 +36,7 @@ export const ArenaAverageFilter = ({
             color="gray.500"
             letterSpacing="wider"
           >
-            VERSION
+            バージョン
           </Text>
           <FormSelect
             collection={versionsNonDisabledCollection}
@@ -54,7 +54,7 @@ export const ArenaAverageFilter = ({
             color="gray.500"
             letterSpacing="wider"
           >
-            LEVEL
+            レベル
           </Text>
           <RadioGroup
             value={level}

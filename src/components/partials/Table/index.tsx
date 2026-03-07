@@ -28,6 +28,7 @@ import { FormSelect } from "@/components/ui/select";
 import { InputGroup } from "@/components/ui/input-group";
 import { latestVersion } from "@/constants/latestVersion";
 import { CustomPagination } from "../Pagination/ui";
+import { SongDetailView } from "../Modal/BPIChart/SongDetails/ui";
 
 export const PAGE_SIZE = 20;
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -38,6 +39,14 @@ interface SongsTableProps {
 }
 
 export const SongsTable = ({ userId }: SongsTableProps) => {
+  const [selectedSong, setSelectedSong] = useState<SongWithScore | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+
+  const handleSongSelect = (song: SongWithScore) => {
+    setSelectedSong(song);
+    setIsDetailOpen(true);
+  };
+
   const [params, setParams] = useState<FilterParams>({
     search: "",
     sortKey: "bpi",
@@ -123,7 +132,12 @@ export const SongsTable = ({ userId }: SongsTableProps) => {
         </VStack>
       </Box>
 
-      <SongList songs={visibleSongs} />
+      <SongList songs={visibleSongs} onSongSelect={handleSongSelect} />
+      <SongDetailView
+        song={selectedSong}
+        isOpen={isDetailOpen}
+        onClose={() => setIsDetailOpen(false)}
+      />
       <CustomPagination
         count={displaySongs.length}
         pageSize={PAGE_SIZE}

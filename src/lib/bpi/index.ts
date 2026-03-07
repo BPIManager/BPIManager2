@@ -1,5 +1,13 @@
 import { SongWithDef } from "@/types/songs/songMaster";
 
+export interface IBpiBasicSongData {
+  title?: string;
+  notes: number;
+  kaidenAvg: number | null;
+  wrScore: number | null;
+  coef?: number | null;
+}
+
 export class BpiCalculator {
   private static readonly DEFAULT_POW_COEF = 1.175;
   private static readonly TOTAL_KAIDENS = 2699;
@@ -12,14 +20,11 @@ export class BpiCalculator {
   /**
    * 単曲BPIの計算
    */
-  public static calc(s: number, song: SongWithDef): number | null {
+  public static calc(s: number, song: IBpiBasicSongData): number | null {
     const { notes, kaidenAvg: k, wrScore: z, coef } = song;
     const m = notes * 2;
 
-    if (s > m)
-      throw new Error(
-        `理論値を超えています: song:${song.title}, exScore:${s}, notes:${song.notes}`,
-      );
+    if (s > m) return null;
     if (s < 0) return -15;
 
     const _s = this.pgf(s, m);
@@ -37,17 +42,41 @@ export class BpiCalculator {
 
     if (Math.abs(logZ) < 0.00001) return 0;
 
-    const rawBPI = (p ? 100 : -100) * Math.pow(logS / logZ, powCoef);
-
+    const rawBPI = (p ? 100 : -100) * Math.pow(Math.abs(logS / logZ), powCoef);
     let res = Math.round(rawBPI * 100) / 100;
 
-    if (isNaN(res)) {
-      console.log("Calculation Error (NaN):", song.title, "Score:", s);
-      return null;
-    }
+    return isNaN(res) ? null : Math.max(-15, res);
+  }
 
-    // 下限値 -15 を適用
-    return Math.max(-15, res);
+  /**
+   * BPIから必要なスコアを逆算する
+   */
+  public static calcFromBPI(
+    targetBpi: number,
+    song: IBpiBasicSongData,
+    ceiled: boolean = true,
+  ): number {
+    const { notes, kaidenAvg, wrScore, coef } = song;
+    if (kaidenAvg === null || wrScore === null || notes === 0) return 0;
+    const m = notes * 2;
+    const powCoef = coef && coef > 0 ? coef : this.DEFAULT_POW_COEF;
+
+    const _k = this.pgf(kaidenAvg, m);
+    const _z = this.pgf(wrScore, m);
+    const logZ = Math.log(_z / _k);
+
+    const isPositive = targetBpi >= 0;
+    const absBpi = Math.abs(targetBpi);
+
+    const inner = Math.pow(absBpi / 100, 1 / powCoef) * logZ;
+    const _s = isPositive ? _k * Math.exp(inner) : _k * Math.exp(-inner);
+
+    const res = m * ((_s - 0.5) / _s);
+
+    if (res > m) return m;
+    if (res < 0) return 0;
+
+    return ceiled ? Math.ceil(res) : res;
   }
 
   /**
@@ -63,7 +92,6 @@ export class BpiCalculator {
     if (k === 0) k = 1;
 
     let sum = 0;
-
     for (let i = 0; i < totalSongCount; i++) {
       const bpi = i < allBpis.length ? allBpis[i] : -15;
       const m = Math.pow(Math.abs(bpi), k) / totalSongCount;

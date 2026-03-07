@@ -27,7 +27,7 @@ export const AAATableFilter = ({
 }: Props) => {
   const filterSections = [
     {
-      label: "VERSION",
+      label: "バージョン",
       minW: "160px",
       render: () => (
         <FormSelect
@@ -40,7 +40,7 @@ export const AAATableFilter = ({
       ),
     },
     {
-      label: "LEVEL",
+      label: "レベル",
       render: () => (
         <RadioGroup
           value={level.toString()}
@@ -54,7 +54,7 @@ export const AAATableFilter = ({
       ),
     },
     {
-      label: "TARGET GOAL",
+      label: "目標",
       render: () => (
         <RadioGroup
           value={goal}

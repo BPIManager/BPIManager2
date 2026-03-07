@@ -43,11 +43,21 @@ interface SongItemProps {
   song: SongWithScore;
 }
 
-const SongItem = ({ song }: SongItemProps) => {
+const SongItem = ({
+  _song,
+  onClick,
+}: {
+  _song: SongItemProps;
+  onClick: () => void;
+}) => {
+  const { song } = _song;
   const lampColor = getLampColor(song.clearState);
   const isFullCombo = song.clearState === "FULLCOMBO CLEAR";
   return (
     <Box
+      onClick={onClick}
+      _hover={{ bg: "whiteAlpha.300" }}
+      transition="background 0.2s"
       w="full"
       background="whiteAlpha.200"
       boxShadow="sm"
@@ -87,7 +97,7 @@ const SongItem = ({ song }: SongItemProps) => {
               {song.exScore && (
                 <>
                   {(["current", "next"] as const).map((item) => (
-                    <Text px={1} fontSize="9px">
+                    <Text px={1} fontSize="9px" key={item}>
                       {getDJRank(Number(song.exScore), song.notes * 2, {
                         mode: item,
                         output: "label",
@@ -147,14 +157,22 @@ const SongItem = ({ song }: SongItemProps) => {
   );
 };
 
-export const SongList = ({ songs }: { songs: SongWithScore[] }) => {
+export const SongList = ({
+  songs,
+  onSongSelect,
+}: {
+  songs: SongWithScore[];
+  onSongSelect: (s: SongWithScore) => void;
+}) => {
   return (
-    <Box w="full" maxW="full" mx="auto" p={2} minH="100vh">
-      <Stack gap={0}>
-        {songs.map((song) => (
-          <SongItem key={`${song.songId}-${song.difficulty}`} song={song} />
-        ))}
-      </Stack>
+    <Box w="full" p={2}>
+      {songs.map((song) => (
+        <SongItem
+          key={`${song.songId}-${song.difficulty}`}
+          _song={{ song: song }}
+          onClick={() => onSongSelect(song)}
+        />
+      ))}
     </Box>
   );
 };

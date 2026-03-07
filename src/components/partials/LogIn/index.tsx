@@ -10,8 +10,8 @@ export const LoginButtons = () => {
       gap={4}
       width="full"
       maxW="full"
-      my={16}
-      borderColor="green.800"
+      my={4}
+      borderColor="whiteAlpha.200"
       px={4}
       py={4}
       borderRadius="md"
