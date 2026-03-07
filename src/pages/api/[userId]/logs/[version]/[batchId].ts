@@ -77,7 +77,8 @@ export default async function handler(
               "difficulty as l_defDiff",
               (eb) => eb.fn.max("defId").as("maxDefId"),
             ])
-            .where("updatedAt", "<=", batchCreatedAt)
+            //.where("updatedAt", "<=", batchCreatedAt)
+            .where("isCurrent", "=", 1)
             .groupBy(["songId", "difficulty"])
             .as("latest_sd"),
         (join) =>

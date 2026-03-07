@@ -6,6 +6,7 @@ import {
   Button,
   Spacer,
   Separator,
+  Badge,
 } from "@chakra-ui/react";
 import {
   Home,
@@ -30,7 +31,6 @@ import { LuLayoutDashboard } from "react-icons/lu";
 export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
   const { user, fbUser } = useUser();
   const router = useRouter();
-
   const menuItems = [
     { label: "ダッシュボード", icon: LuLayoutDashboard, href: "/" },
     { label: "インポート", icon: FileUp, href: "/import" },
@@ -40,14 +40,19 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
       label: "フォロータイムライン",
       icon: ChartNoAxesGantt,
       href: "/timeline",
+      isComingSoon: true,
     },
-    { label: "ライバルを探す", icon: UsersIcon, href: "/find" },
-    { label: "分析", icon: ChartArea, href: "/analytics" },
+    {
+      label: "ライバルを探す",
+      icon: UsersIcon,
+      href: "/find",
+      isComingSoon: true,
+    },
+    { label: "分析", icon: ChartArea, href: "/analytics", isComingSoon: true },
+    { label: "メモ", icon: StickyNote, href: "/notes", isComingSoon: true },
     { label: "指標", icon: LandPlot, href: "/metrics" },
-    //{ label: "メモ", icon: StickyNote, href: "/notes" },
     { label: "設定", icon: Settings, href: "/settings" },
   ];
-
   return (
     <VStack align="stretch" h="full" p={4} gap={6}>
       <Box p={4} borderRadius="xl" bg="bg.muted">
@@ -117,9 +122,10 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
           return (
             <Link key={item.href} href={item.href} passHref legacyBehavior>
               <Button
-                as="a"
+                as={item.isComingSoon ? "button" : "a"}
                 variant={isActive ? "surface" : "ghost"}
                 colorPalette={isActive ? "blue" : "gray"}
+                disabled={item.isComingSoon}
                 justifyContent="start"
                 gap={3}
                 px={2}
@@ -129,6 +135,16 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
                 <Text fontWeight={isActive ? "bold" : "medium"}>
                   {item.label}
                 </Text>
+                {item.isComingSoon && (
+                  <Badge
+                    variant="subtle"
+                    colorPalette="gray"
+                    fontSize="2xs"
+                    ml="auto"
+                  >
+                    近日公開
+                  </Badge>
+                )}
               </Button>
             </Link>
           );

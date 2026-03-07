@@ -15,6 +15,7 @@ import { ActionConfirmDialog } from "../../Modal/Confirmation";
 import { useState } from "react";
 import { useFirestoreDataCheck } from "@/hooks/firestore/checkData";
 import { versionTitles } from "@/constants/versions";
+import { toaster } from "@/components/ui/toaster";
 
 export default function TransferUi() {
   const { fbUser } = useUser();
@@ -44,10 +45,23 @@ export default function TransferUi() {
       });
       if (!response.ok) throw new Error("転送失敗");
 
-      alert("同期が完了しました。");
+      toaster.create({
+        title: "完了",
+        description: "データの移行が完了しました。",
+        duration: 8000,
+        closable: true,
+        type: "success",
+      });
       setIsConfirmOpen(false);
     } catch (e) {
-      alert("エラーが発生しました。");
+      toaster.create({
+        title: "完了しませんでした",
+        description: "エラーが発生したため処理が完了しませんでした",
+        duration: 8000,
+        closable: true,
+        type: "error",
+      });
+      console.log(e);
     } finally {
       setIsSyncing(false);
     }
@@ -152,6 +166,12 @@ export default function TransferUi() {
               ※同期を実行すると現在のBPIM2のデータは削除されます。
               <br />
               BPIManagerのデータは引き続きご利用いただけます。
+            </Text>
+
+            <Text fontSize="xs" color="red.300">
+              処理は最大2~3分かかることがあります。
+              <br />
+              画面を閉じたり移動しないでそのままお待ち下さい。
             </Text>
           </VStack>
         }

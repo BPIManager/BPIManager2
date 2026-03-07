@@ -199,10 +199,6 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
       });
     } finally {
       setIsSubmitting(false);
-      toaster.create({
-        title: "Saved",
-        closable: true,
-      });
     }
   };
   const isForcedOpen = !isLoading && isSignedIn() && !user;

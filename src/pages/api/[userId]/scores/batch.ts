@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from "uuid";
 import { BpiRepository } from "@/lib/db/bpi";
 import { isImproved } from "@/lib/lamp";
 import { BpiCalculator } from "@/lib/bpi";
+import { NewScore } from "@/types/sql";
 
 const repository = new BpiRepository();
 
@@ -29,12 +30,17 @@ const handler = async (
 
     const existingScoreMap = new Map(existingScores.map((s) => [s.songId, s]));
     const scoreUpdates: any[] = [];
+    const notFound: any[] = [];
+    const noImprovement: any[] = [];
 
     for (const row of csvRows) {
       const song = songMaster.find(
         (s) => s.title === row.title && s.difficulty === row.difficulty,
       );
-      if (!song) continue;
+      if (!song) {
+        notFound.push({ title: row.title, difficulty: row.difficulty });
+        continue;
+      }
 
       const current = existingScoreMap.get(song.songId);
 
@@ -55,10 +61,11 @@ const handler = async (
 
       if (scoreBetter || lampBetter || missBetter) {
         const bpi = BpiCalculator.calc(row.exScore, song);
-        console.log(row, song, bpi);
 
+        if (!row.exScore || row.exScore <= 0) continue;
         scoreUpdates.push({
           userId,
+          title: song.title,
           songId: song.songId,
           definitionId: song.defId,
           exScore: row.exScore,
@@ -69,9 +76,10 @@ const handler = async (
           version,
           batchId,
         });
+      } else {
+        noImprovement.push({ title: song.title, difficulty: song.difficulty });
       }
     }
-
     const twelves = songMaster.filter((s) => s.difficultyLevel === 12);
     const updatedScoreMap = new Map(scoreUpdates.map((s) => [s.songId, s.bpi]));
 
@@ -87,11 +95,38 @@ const handler = async (
       twelves.length,
     );
 
+    if (scoreUpdates.length === 0) {
+      return res.status(200).json({
+        success: true,
+        batchId: null,
+        updatedCount: 0,
+        newTotalBpi: newTotalBpi,
+        message: "更新が必要な楽曲はありませんでした。",
+        details: {
+          updated: scoreUpdates.map((s) => ({
+            id: s.songId,
+            title: s.title,
+            diff: s.difficulty,
+          })),
+          notFound: notFound,
+          noImprovementCount: noImprovement.length,
+        },
+      });
+    }
+
+    const scoresToSave: NewScore[] = scoreUpdates.map(({ title, ...rest }) => ({
+      ...rest,
+      lastPlayed:
+        rest.lastPlayed instanceof Date
+          ? rest.lastPlayed.toISOString().slice(0, 19).replace("T", " ")
+          : rest.lastPlayed,
+    }));
+
     await repository.saveImportResults({
       userId,
       version,
       batchId,
-      scoreUpdates,
+      scoreUpdates: scoresToSave,
       newTotalBpi,
     });
 
@@ -100,6 +135,15 @@ const handler = async (
       batchId,
       updatedCount: scoreUpdates.length,
       newTotalBpi,
+      details: {
+        updated: scoreUpdates.map((s) => ({
+          id: s.songId,
+          title: s.title,
+          diff: s.difficulty,
+        })),
+        notFound: notFound,
+        noImprovementCount: noImprovement.length,
+      },
     });
   } catch (error: any) {
     console.error("Import Error:", error);

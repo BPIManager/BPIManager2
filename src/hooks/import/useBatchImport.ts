@@ -1,0 +1,86 @@
+import { useState } from "react";
+import { toaster } from "@/components/ui/toaster";
+import { parseCSV } from "@/utils/csv/parse";
+
+export const useBatchImport = (fbUser: any, refresh: () => Promise<void>) => {
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [processStatus, setProcessStatus] = useState("");
+  const [importResult, setImportResult] = useState<{
+    batchId: string;
+    updatedCount: number;
+  } | null>(null);
+
+  const runImport = async (csvData: string, version: string) => {
+    if (!fbUser) return;
+    setIsProcessing(true);
+    let targetData = csvData.trim();
+
+    try {
+      if (!targetData) {
+        setProcessStatus("クリップボードを確認中...");
+        const text = await navigator.clipboard.readText();
+        if (!text.trim()) throw new Error("データが空です。");
+        targetData = text;
+        toaster.create({
+          title: "クリップボードから読み込みました",
+          type: "info",
+        });
+      }
+
+      setProcessStatus("CSVを解析中...");
+      const formattedRows = parseCSV(targetData);
+
+      if (formattedRows.length === 0)
+        throw new Error("有効なデータがありません。");
+
+      setProcessStatus(`${formattedRows.length}件をアップロード中...`);
+      const idToken = await fbUser.getIdToken(true);
+
+      const response = await fetch(`/api/${fbUser.uid}/scores/batch`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${idToken}`,
+        },
+        body: JSON.stringify({ version, csvRows: formattedRows }),
+      });
+
+      if (!response.ok) throw new Error("サーバーエラーが発生しました。");
+
+      const result = await response.json();
+      if (result.updatedCount > 0) {
+        setImportResult({
+          batchId: result.batchId,
+          updatedCount: result.updatedCount,
+        });
+      } else {
+        toaster.create({
+          title: "更新なし",
+          description: "最新の状態です",
+          type: "info",
+        });
+      }
+
+      await refresh();
+      return true;
+    } catch (e: any) {
+      toaster.create({
+        title: "エラー",
+        description: e.message,
+        type: "error",
+      });
+      return false;
+    } finally {
+      setIsProcessing(false);
+      setProcessStatus("");
+    }
+  };
+
+  return {
+    runImport,
+    isProcessing,
+    processStatus,
+    importResult,
+    setImportResult,
+  };
+};

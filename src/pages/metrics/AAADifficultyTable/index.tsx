@@ -15,11 +15,10 @@ import { Meta } from "@/components/partials/Head";
 import { PageHeader, PageContainer } from "@/components/partials/Header";
 import { DashboardLayout } from "@/components/partials/Main";
 import { useUser } from "@/contexts/users/UserContext";
-import LoginPage from "@/components/partials/LogIn/page";
 import { LoginRequiredCard } from "@/components/partials/LoginRequired/ui";
 
 export const AAATableView = () => {
-  const { user, isLoading: isUserLoading, fbUser } = useUser();
+  const { isLoading: isUserLoading, fbUser } = useUser();
 
   const [version, setVersion] = useState("33");
   const [level, setLevel] = useState(12);

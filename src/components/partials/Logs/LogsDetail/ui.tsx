@@ -79,7 +79,7 @@ export const BatchDetailView = ({
         <Spinner />
       </Center>
     );
-  if (isError || !details) return <Text color="red.500">読み込みエラー</Text>;
+  if (isError || !details) return <Text color="red.500"></Text>;
   const bpiData = getBpiDistribution(details.songs);
   const rankData = getRankDistribution(details.songs);
 

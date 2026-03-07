@@ -3,6 +3,7 @@ import { Box, Link, Text } from "@chakra-ui/react";
 export const NoDataAlert = ({ data }: { data?: any[] }) => {
   return (
     <Box
+      my={4}
       p={5}
       bg="#0d1117"
       borderRadius="xl"
@@ -13,8 +14,7 @@ export const NoDataAlert = ({ data }: { data?: any[] }) => {
     >
       <b>おっと！まだデータが登録されていないようです...</b>
       <Text fontSize={"sm"} mt={2}>
-        これはあなたのプロファイルですか?
-        <br />「
+        「
         <Link textDecoration={"underline"} href="/import">
           インポート
         </Link>

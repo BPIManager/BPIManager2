@@ -1,82 +1,65 @@
-import { useState, useMemo } from "react";
 import {
   VStack,
   HStack,
   Text,
-  Badge,
   Button,
   Box,
   Separator,
   Icon,
   Center,
 } from "@chakra-ui/react";
-import { LuTrophy, LuChevronDown, LuTrendingUp } from "react-icons/lu";
+import { LuTrophy, LuTrendingUp } from "react-icons/lu";
 import { Switch } from "@/components/ui/switch";
+import { RankItem } from "./item";
+import { useLogRank } from "@/hooks/logs/useLogRank";
+import { useState } from "react";
+import { SongDetailView } from "../../Modal/BPIChart/SongDetails/ui";
 
-interface Props {
+const RANK_CONFIG = {
+  growth: {
+    title: "BPI伸び幅ランキング",
+    icon: LuTrendingUp,
+    accentColor: "green.400",
+  },
+  top: { title: "BPIランキング", icon: LuTrophy, accentColor: "yellow.400" },
+};
+
+export const LogRank = ({
+  details,
+  type,
+}: {
   details: any[];
   type: "growth" | "top";
-}
+}) => {
+  const [selectedSong, setSelectedSong] = useState<any | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState<boolean>(false);
 
-export const LogRank = ({ details, type }: Props) => {
-  const [displayLimit, setDisplayLimit] = useState(5);
-  const [hideNewRecords, setHideNewRecords] = useState(false);
+  const config = RANK_CONFIG[type];
+  const {
+    visibleSongs,
+    hasMore,
+    remainingCount,
+    loadMore,
+    hideNewRecords,
+    setHideNewRecords,
+    setDisplayLimit,
+  } = useLogRank(details, type);
 
-  // 設定の切り替え
-  const config = {
-    growth: {
-      title: "BPI伸び幅ランキング",
-      icon: LuTrendingUp,
-      accentColor: "green.400",
-    },
-    top: {
-      title: "BPIランキング",
-      icon: LuTrophy,
-      accentColor: "yellow.400",
-    },
-  }[type];
-
-  // バッジの色とラベルのロジック
-  const getBadgeData = (item: any) => {
-    if (type === "growth") {
-      const diff = item.diff.bpi;
-      let color = "cyan";
-      if (diff >= 10) color = "red";
-      else if (diff >= 5) color = "orange";
-      else if (diff >= 3) color = "yellow";
-      else if (diff >= 1) color = "green";
-      return { color, label: `+${diff.toFixed(2)}` };
-    } else {
-      const val = item.current.bpi;
-      let color = "gray";
-      if (val >= 100) color = "pink";
-      else if (val >= 70) color = "yellow";
-      else if (val >= 40) color = "green";
-      else if (val >= 0) color = "blue";
-      return { color, label: val.toFixed(2) };
-    }
+  const handleOpenDetail = (item: any) => {
+    const mappedSong = {
+      ...item,
+      exScore: item.current.exScore,
+      bpi: item.current.bpi,
+      clearState: item.current.clearState,
+      missCount: item.current.missCount,
+    };
+    setSelectedSong(mappedSong);
+    setIsDetailOpen(true);
   };
-
-  // ソート & フィルタ
-  const sortedSongs = useMemo(() => {
-    return [...details]
-      .filter((d) => {
-        if (type === "growth") return d.diff && d.diff.bpi > 0;
-        return d.current && d.current.bpi !== null;
-      })
-      .filter((d) => (hideNewRecords ? !!d.previous : true))
-      .sort((a, b) => {
-        if (type === "growth") return b.diff.bpi - a.diff.bpi;
-        return b.current.bpi - a.current.bpi;
-      });
-  }, [details, hideNewRecords, type]);
-
-  const visibleSongs = sortedSongs.slice(0, displayLimit);
-  const hasMore = sortedSongs.length > displayLimit;
 
   return (
     <VStack align="stretch" gap={4} w="full" mt={4}>
-      <HStack justify="space-between" align="center">
+      <HStack justify="space-between">
         <HStack gap={2}>
           <Icon as={config.icon} color={config.accentColor} />
           <Text
@@ -121,102 +104,33 @@ export const LogRank = ({ details, type }: Props) => {
             </Text>
           </Center>
         ) : (
-          visibleSongs.map((item, index) => {
-            const rank = index + 1;
-            const badge = getBadgeData(item);
-            return (
-              <Box key={item.songId}>
-                <HStack
-                  p={4}
-                  bg={rank <= 3 ? "whiteAlpha.50" : "transparent"}
-                  justify="space-between"
-                  _hover={{ bg: "whiteAlpha.100" }}
-                >
-                  <HStack gap={4} flex={1}>
-                    <Center w="24px">
-                      <Text
-                        fontSize="lg"
-                        fontWeight="black"
-                        fontFamily="mono"
-                        color={
-                          rank === 1
-                            ? "yellow.400"
-                            : rank === 2
-                              ? "gray.300"
-                              : rank === 3
-                                ? "orange.400"
-                                : "gray.600"
-                        }
-                      >
-                        {rank}
-                      </Text>
-                    </Center>
-                    <VStack align="start" gap={0}>
-                      <Text fontSize="sm" fontWeight="bold" lineClamp={1}>
-                        {item.title}
-                      </Text>
-                      <HStack gap={2}>
-                        <Badge size="xs" variant="subtle">
-                          {item.difficulty}
-                        </Badge>
-                        <Text fontSize="2xs" color="gray.500">
-                          LV{item.level}
-                        </Text>
-                        {!item.previous && (
-                          <Badge
-                            size="xs"
-                            colorPalette="purple"
-                            variant="outline"
-                            fontSize="8px"
-                            px={2}
-                          >
-                            新規
-                          </Badge>
-                        )}
-                      </HStack>
-                    </VStack>
-                  </HStack>
-
-                  <HStack gap={4}>
-                    <VStack align="end" gap={0}>
-                      <Text fontSize="xs" color="gray.500">
-                        EX
-                      </Text>
-                      <Text fontSize="md" fontWeight="black" fontFamily="mono">
-                        {item.current.exScore}
-                      </Text>
-                    </VStack>
-                    <Badge
-                      size="lg"
-                      colorPalette={badge.color}
-                      variant="solid"
-                      borderRadius="md"
-                      px={2}
-                      textAlign="center"
-                    >
-                      {badge.label}
-                    </Badge>
-                  </HStack>
-                </HStack>
-                {index !== visibleSongs.length - 1 && (
-                  <Separator borderColor="gray.900" />
-                )}
-              </Box>
-            );
-          })
+          visibleSongs.map((item, index) => (
+            <Box key={item.songId}>
+              <RankItem
+                item={item}
+                rank={index + 1}
+                type={type}
+                onClick={() => handleOpenDetail(item)}
+              />
+              {index !== visibleSongs.length - 1 && (
+                <Separator borderColor="gray.900" />
+              )}
+            </Box>
+          ))
         )}
       </VStack>
 
       {hasMore && (
-        <Button
-          variant="ghost"
-          size="sm"
-          color="gray.400"
-          onClick={() => setDisplayLimit((prev) => prev + 10)}
-        >
-          もっと表示（残り {sortedSongs.length - displayLimit} 件）
+        <Button variant="ghost" size="sm" color="gray.400" onClick={loadMore}>
+          もっと表示（残り {remainingCount} 件）
         </Button>
       )}
+
+      <SongDetailView
+        song={selectedSong}
+        isOpen={isDetailOpen}
+        onClose={() => setIsDetailOpen(false)}
+      />
     </VStack>
   );
 };
