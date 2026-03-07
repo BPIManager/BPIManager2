@@ -1,5 +1,5 @@
 import { Box, Grid, Text, HStack, VStack } from "@chakra-ui/react";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import dayjs from "dayjs";
 import { Tooltip } from "@/components/ui/tooltip";
 import { NoDataAlert } from "../NoData";
@@ -18,6 +18,7 @@ const getActivityColor = (count: number) => {
 };
 
 export const ActivityCalendar = ({ data }: { data: ActivityData[] }) => {
+  const [activeDate, setActiveDate] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const calendarDays = useMemo(() => {
     const days = [];
@@ -103,10 +104,16 @@ export const ActivityCalendar = ({ data }: { data: ActivityData[] }) => {
                 content={`${day.date}: ${day.count} 件`}
                 portalled
                 showArrow
+                open={activeDate === day.date}
               >
                 <Box
                   w="11px"
                   h="11px"
+                  onMouseEnter={() => setActiveDate(day.date)}
+                  onMouseLeave={() => setActiveDate(null)}
+                  onClick={() =>
+                    setActiveDate(activeDate === day.date ? null : day.date)
+                  }
                   bg={getActivityColor(day.count)}
                   borderRadius="2px"
                   transition="all 0.2s"

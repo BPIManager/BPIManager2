@@ -68,16 +68,19 @@ export const SongDetailView = ({
   const bpiInfo = useMemo(() => {
     if (song.bpi === null) return { next: "-", diff: 0 };
     const nextTargetBpi = Math.ceil((song.bpi + 0.01) / 10) * 10;
-    const targetScore = BpiCalculator.calcFromBPI(nextTargetBpi, song, true);
-    return { next: nextTargetBpi, diff: targetScore - currentEx };
-  }, [song, currentEx]);
 
+    const targetScore = BpiCalculator.calcFromBPI(nextTargetBpi, song, true);
+    return {
+      next: nextTargetBpi,
+      diff: targetScore - currentEx,
+    };
+  }, [song, currentEx]);
   return (
     <DialogRoot
       open={isOpen}
       onOpenChange={onClose}
       size="lg"
-      placement="center"
+      placement={{ mdDown: "top", md: "center" }}
     >
       <DialogContent
         bg="gray.950"
@@ -105,7 +108,7 @@ export const SongDetailView = ({
               <Text fontSize="xs" color="gray.500" fontWeight="bold">
                 EX SCORE
               </Text>
-              <Text fontSize="xl" fontWeight="black" color="white">
+              <Text fontSize="md" fontWeight="black" color="white">
                 {(song.exScore ?? 0).toLocaleString()}
               </Text>
               <Text fontSize="10px" color="gray.200" mt={1}>
@@ -120,18 +123,20 @@ export const SongDetailView = ({
               <Text fontSize="xs" color="gray.500" fontWeight="bold">
                 BPI
               </Text>
-              <Text fontSize="xl" fontWeight="black" color="blue.300">
+              <Text fontSize="md" fontWeight="black" color="blue.300">
                 {song.bpi !== null ? song.bpi.toFixed(2) : "-"}
               </Text>
               <Text fontSize="10px" color="gray.200" mt={1}>
-                {(((song.exScore ?? 0) / (song.notes * 2)) * 100).toFixed(2)}%
+                {song.bpi !== null
+                  ? `BPI${bpiInfo.next}まであと${bpiInfo.diff}点`
+                  : "-"}
               </Text>
             </GridItem>
             <GridItem>
               <Text fontSize="xs" color="gray.500" fontWeight="bold">
                 DJ RANK
               </Text>
-              <Text fontSize="xl" fontWeight="black" color="yellow.400">
+              <Text fontSize="md" fontWeight="black" color="yellow.400">
                 {rankInfo.label === "MAX-" ? (
                   <>MAX - {maxScore - currentEx}</>
                 ) : (

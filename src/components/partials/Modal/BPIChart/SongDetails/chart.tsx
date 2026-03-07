@@ -1,6 +1,7 @@
 import { Box, HStack, Text, VStack, Flex, Separator } from "@chakra-ui/react";
 import { keyframes } from "@emotion/react";
 import { Tooltip } from "@/components/ui/tooltip"; //
+import { useState } from "react";
 
 const bounceGrow = keyframes`
   0% { transform: scaleY(0); }
@@ -18,11 +19,13 @@ interface BPIAnimatedChartProps {
 }
 
 export const BPIChart = ({ data, maxScore }: BPIAnimatedChartProps) => {
-  const BPI_MIN = -15; //
-  const BPI_MAX = Math.max(...data.map((d) => d.bpi), 100); //
+  const [openTooltipIndex, setOpenTooltipIndex] = useState<number | null>(null);
+
+  const BPI_MIN = -15;
+  const BPI_MAX = Math.max(...data.map((d) => d.bpi), 100);
   const bpiRange = BPI_MAX - BPI_MIN;
 
-  const youScore = data.find((d) => d.label === "YOU")?.count ?? 0; //
+  const youScore = data.find((d) => d.label === "YOU")?.count ?? 0;
 
   const getBarColor = (label: string) =>
     label === "YOU" ? "#ECC94B" : "#3182CE";
@@ -64,7 +67,6 @@ export const BPIChart = ({ data, maxScore }: BPIAnimatedChartProps) => {
                 ]
               : []),
           ];
-
           return (
             <VStack
               key={item.label}
@@ -76,6 +78,10 @@ export const BPIChart = ({ data, maxScore }: BPIAnimatedChartProps) => {
               <Tooltip
                 showArrow
                 portalled
+                closeOnPointerDown={false}
+                openDelay={0}
+                closeDelay={500}
+                open={openTooltipIndex === i}
                 content={
                   <VStack gap={1} align="start" p={1}>
                     <Text fontSize="xs" fontWeight="bold" color="gray.800">
@@ -112,6 +118,17 @@ export const BPIChart = ({ data, maxScore }: BPIAnimatedChartProps) => {
                   w="full"
                   h="full"
                   cursor="help"
+                  tabIndex={0}
+                  outline="none"
+                  _focus={{
+                    filter: "brightness(1.3)",
+                    transform: "scaleX(1.1)",
+                  }}
+                  onMouseEnter={() => setOpenTooltipIndex(i)}
+                  onMouseLeave={() => setOpenTooltipIndex(null)}
+                  onClick={() =>
+                    setOpenTooltipIndex(openTooltipIndex === i ? null : i)
+                  }
                 >
                   <Text
                     fontSize="9px"
@@ -130,11 +147,7 @@ export const BPIChart = ({ data, maxScore }: BPIAnimatedChartProps) => {
                     transformOrigin="bottom"
                     animation={`${bounceGrow} 0.8s cubic-bezier(0.17, 0.67, 0.83, 0.67) both`}
                     animationDelay={`${i * 0.05}s`}
-                    _hover={{
-                      filter: "brightness(1.3)",
-                      transform: "scaleX(1.1)",
-                      transition: "0.2s",
-                    }}
+                    transition="height 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.2s"
                   />
                 </Flex>
               </Tooltip>
