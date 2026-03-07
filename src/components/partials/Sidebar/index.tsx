@@ -131,6 +131,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
               <Button
                 as={item.isComingSoon ? "button" : "a"}
                 variant={isActive ? "surface" : "ghost"}
+                color="#fff"
                 colorPalette={isActive ? "blue" : "gray"}
                 disabled={item.isComingSoon}
                 justifyContent="start"
@@ -159,17 +160,18 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
       </VStack>
 
       <Spacer />
-
-      <Button
-        variant="ghost"
-        colorPalette="red"
-        size="sm"
-        gap={2}
-        onClick={() => authActions.logout()}
-      >
-        <LogOut size={16} />
-        サインアウト
-      </Button>
+      {user?.userId && (
+        <Button
+          variant="ghost"
+          colorPalette="red"
+          size="sm"
+          gap={2}
+          onClick={() => authActions.logout()}
+        >
+          <LogOut size={16} />
+          サインアウト
+        </Button>
+      )}
     </VStack>
   );
 };
