@@ -1,5 +1,6 @@
-import { FilterParams, SongWithScore } from "@/types/songs/withScore";
+import { SongWithScore } from "@/types/songs/withScore";
 import { getMaxBpm } from "./getMaxBPM";
+import { FilterParams } from "./filter";
 
 export const sortSongs = (
   songs: SongWithScore[],
