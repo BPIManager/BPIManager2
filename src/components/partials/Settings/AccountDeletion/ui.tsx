@@ -10,7 +10,7 @@ import {
 import { useUser } from "@/contexts/users/UserContext";
 import { useState } from "react";
 import { Cog, Trash } from "lucide-react";
-import AccountSettings from "../../Modal/AccountSettings";
+import AccountSettings from "@/components/partials/Modal/AccountSettings";
 import { LuBadgeX } from "react-icons/lu";
 
 export default function AccountDeletionUi() {
