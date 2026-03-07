@@ -12,7 +12,6 @@ export const TotalBPIHistory = ({ userId }: { userId: string }) => {
     diffs,
     version,
   );
-  console.log(history, isError);
   if (isLoading || isError) return <TotalBpiHistorySkeleton />;
   return <TotalBpiHistoryChart data={history} />;
 };

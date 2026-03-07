@@ -14,6 +14,8 @@ import {
   LogOut,
   ListIcon,
   ChartNoAxesGantt,
+  LandPlot,
+  ChartArea,
 } from "lucide-react";
 import { useUser } from "@/contexts/users/UserContext";
 import { authActions } from "@/lib/firebase/auth";
@@ -31,6 +33,8 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
     { label: "スコア一覧", icon: ListIcon, href: "/my" },
     { label: "インポート", icon: FileUp, href: "/import" },
     { label: "タイムライン", icon: ChartNoAxesGantt, href: "/timeline" },
+    { label: "分析", icon: ChartArea, href: "/analytics" },
+    { label: "指標", icon: LandPlot, href: "/metrics" },
     { label: "設定", icon: Settings, href: "/settings" },
   ];
 

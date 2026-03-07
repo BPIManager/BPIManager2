@@ -8,7 +8,40 @@ export interface Database {
   logs: LogsTable;
   userStatusLogs: UserStatusLogsTable;
   apiKeys: ApiKeysTable;
+  // 追加: 暫定/バックアップ用テーブル
+  bkScores: BkScoresTable;
+  bkUsers: BkUsersTable;
 }
+
+// --- [bkScores] (新規追加) ---
+export interface BkScoresTable {
+  logId: Generated<number>;
+  userId: string;
+  title: string;
+  difficulty: string;
+  difficultyLevel: number | null;
+  exScore: number;
+  bpi: number | null;
+  clearState: number | null;
+  missCount: number | null;
+  version: string | null;
+  lastPlayed: Date | string | null;
+  createdAt: Generated<Date>;
+}
+
+export type BkScore = Selectable<BkScoresTable>;
+export type NewBkScore = Insertable<BkScoresTable>;
+
+// --- [bkUsers] (新規追加) ---
+export interface BkUsersTable {
+  userId: string;
+  userName: string;
+  arenarank: string | null; // SQLの定義に合わせて小文字のr
+  currentTotalBpi: number | null;
+}
+
+export type BkUser = Selectable<BkUsersTable>;
+export type NewBkUser = Insertable<BkUsersTable>;
 
 // --- [songs] ---
 export interface SongsTable {

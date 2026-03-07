@@ -27,6 +27,7 @@ import { sortOptions } from "@/constants/sort";
 import { FormSelect } from "@/components/ui/select";
 import { InputGroup } from "@/components/ui/input-group";
 import { latestVersion } from "@/constants/latestVersion";
+import { CustomPagination } from "../Pagination/ui";
 
 export const PAGE_SIZE = 20;
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -123,57 +124,12 @@ export const SongsTable = ({ userId }: SongsTableProps) => {
       </Box>
 
       <SongList songs={visibleSongs} />
-      {displaySongs.length > PAGE_SIZE && (
-        <Box
-          position="sticky"
-          bottom={0}
-          zIndex={20}
-          w="full"
-          h="70px"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          borderTopWidth="1px"
-          borderColor="gray.200"
-          backdropFilter="blur(12px)"
-          _dark={{
-            bg: "rgba(23, 23, 23, 0.6)",
-            borderColor: "whiteAlpha.200",
-          }}
-        >
-          <Pagination.Root
-            count={displaySongs.length}
-            pageSize={PAGE_SIZE}
-            page={page}
-            onPageChange={(e) => setPage(e.page)}
-          >
-            <ButtonGroup variant="ghost" gap="1">
-              <Pagination.PrevTrigger asChild>
-                <IconButton size="sm">
-                  <LuChevronLeft />
-                </IconButton>
-              </Pagination.PrevTrigger>
-
-              <Pagination.Items
-                render={(pageItem) => (
-                  <IconButton
-                    size="sm"
-                    variant={pageItem.value === page ? "outline" : "ghost"}
-                  >
-                    {pageItem.value}
-                  </IconButton>
-                )}
-              />
-
-              <Pagination.NextTrigger asChild>
-                <IconButton size="sm">
-                  <LuChevronRight />
-                </IconButton>
-              </Pagination.NextTrigger>
-            </ButtonGroup>
-          </Pagination.Root>
-        </Box>
-      )}
+      <CustomPagination
+        count={displaySongs.length}
+        pageSize={PAGE_SIZE}
+        page={page}
+        onPageChange={setPage}
+      />
     </Container>
   );
 };

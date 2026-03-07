@@ -6,6 +6,7 @@ import AccountSettingsUi from "@/components/partials/Settings/AccountSettings/ui
 import AccountDeletionUi from "@/components/partials/Settings/AccountDeletion/ui";
 import LoginPage from "@/components/partials/LogIn/page";
 import { Center, Spinner } from "@chakra-ui/react";
+import { Meta } from "@/components/partials/Head";
 
 export default function SettingsPage() {
   const { user, isLoading, fbUser } = useUser();
@@ -28,6 +29,8 @@ export default function SettingsPage() {
         title="設定"
         description="アカウントとデータの管理を行います。"
       />
+      <Meta noIndex title="設定" />
+
       <PageContainer>
         <AccountSettingsUi />
         <TransferUi />
