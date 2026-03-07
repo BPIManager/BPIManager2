@@ -3,6 +3,51 @@ import { sql } from "kysely";
 
 export class StatsRepository {
   /**
+   * AAA達成難易度表用：楽曲マスタ、BPI定義、ユーザーの最新スコアを取得
+   */
+  async getAAATableData(userId: string, version: string, level: number) {
+    return await db
+      .selectFrom("songs as m")
+      .innerJoin("songDef as d", (join) =>
+        join.onRef("d.songId", "=", "m.songId").on("d.isCurrent", "=", 1),
+      )
+      .leftJoin(
+        (qb) =>
+          qb
+            .selectFrom("scores as s1")
+            .select(["s1.songId as latest_songId", "s1.exScore", "s1.bpi"])
+            .innerJoin(
+              (sub) =>
+                sub
+                  .selectFrom("scores")
+                  .select(["songId", (eb) => eb.fn.max("logId").as("maxLogId")])
+                  .where("userId", "=", userId)
+                  .where("version", "=", version)
+                  .groupBy("songId")
+                  .as("max_scores"),
+              (join) => join.onRef("max_scores.maxLogId", "=", "s1.logId"),
+            )
+            .as("userScore"),
+        (join) => join.onRef("userScore.latest_songId", "=", "m.songId"),
+      )
+      .select([
+        "m.songId",
+        "m.title",
+        "m.notes",
+        "m.difficulty",
+        "m.difficultyLevel",
+        "d.wrScore",
+        "d.kaidenAvg",
+        "d.coef",
+        "userScore.exScore as userExScore",
+        "userScore.bpi as userBpi",
+      ])
+      .where("m.difficultyLevel", "=", level)
+      .orderBy("m.title", "asc")
+      .execute();
+  }
+
+  /**
    * 指定ユーザー・バージョンのアクティビティデータを取得
    */
   async getActivityData(
