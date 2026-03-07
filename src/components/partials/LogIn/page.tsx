@@ -1,82 +1,164 @@
 import { LoginButtons } from "@/components/partials/LogIn";
-import { Container, Heading, Separator, Text } from "@chakra-ui/react";
-import { Accordion, Span } from "@chakra-ui/react";
+import {
+  Container,
+  Heading,
+  Text,
+  VStack,
+  Box,
+  SimpleGrid,
+  Icon,
+  Badge,
+  HStack,
+  Stack,
+  Separator,
+} from "@chakra-ui/react";
+import {
+  Zap,
+  Database,
+  BarChart3,
+  ArrowRightLeft,
+  ShieldCheck,
+  Cpu,
+  UsersIcon,
+} from "lucide-react";
+import { Meta } from "../Head";
+import { DashboardLayout } from "../Main";
+import { PageContainer } from "../Header";
 
 export default function LoginPage() {
   return (
-    <Container maxW="4xl" mx="auto" px={4}>
-      <Heading fontSize={"2xl"} textAlign={"center"} my={4}>
-        BPIM2
-      </Heading>
-      <Text textAlign={"center"} fontSize={"sm"}>
-        BPIM2は、beatmaniaIIDX上級者向けのスコア管理ツールです。
-      </Text>
-      <LoginButtons />
-      <Separator color="whiteAlpha.400" my={4} />
-      <Heading fontSize={"2xl"} textAlign={"center"} my={4}>
-        What's BPM2
-      </Heading>
-      <WhatsBPIM2 />
-    </Container>
+    <DashboardLayout>
+      <Meta noIndex title="設定" />
+      <Box bg="black" minH="100vh" color="white" py={20}>
+        <PageContainer>
+          <VStack gap={6} textAlign="center" mb={16}>
+            <Heading
+              fontSize={{ base: "4xl", md: "6xl" }}
+              fontWeight="black"
+              letterSpacing="tighter"
+              lineHeight="1"
+              bgGradient="to-br"
+              gradientFrom="white"
+              gradientTo="gray.600"
+              bgClip="text"
+            >
+              BPIM2
+            </Heading>
+            <Text
+              color="fg.muted"
+              fontSize={{ base: "md", md: "md" }}
+              maxW="2xl"
+            >
+              beatmania IIDX
+              上級者のためのクラウドベース・スコアマネジメントプラットフォーム
+            </Text>
+          </VStack>
+
+          <Box
+            maxW="md"
+            mx="auto"
+            p={8}
+            borderRadius="2xl"
+            bg="gray.950"
+            border="1px solid"
+            borderColor="whiteAlpha.200"
+            boxShadow="0 0 40px rgba(0,0,0,0.5), 0 0 20px rgba(49, 130, 206, 0.1)"
+            mb={12}
+          >
+            <VStack gap={6}>
+              <VStack gap={1}>
+                <Text fontWeight="bold" fontSize="xl">
+                  Sign In
+                </Text>
+              </VStack>
+              <LoginButtons />
+              <Text fontSize="12px" color="gray.600" textAlign="center">
+                ログインすることで利用規約に同意したものとみなされます
+              </Text>
+            </VStack>
+          </Box>
+
+          <Separator mb={16} opacity={0.1} />
+
+          <Heading
+            size="lg"
+            mb={10}
+            textAlign="center"
+            letterSpacing="widest"
+            fontWeight="black"
+          >
+            BPIM2って？
+          </Heading>
+
+          <SimpleGrid columns={{ base: 1, md: 3 }} gap={8}>
+            <FeatureCard
+              icon={Database}
+              title="Cloud Storage"
+              description="スコアデータはすべてサーバーに保存されるため、旧BPIMで発生していた意図しない消失は完全に解消されました。"
+            />
+            <FeatureCard
+              icon={ArrowRightLeft}
+              title="BPIM Legacy Sync"
+              description="前作BPIManagerのアカウント情報をそのまま利用可能。Syncデータもスムーズに引き継げます。"
+            />
+            <FeatureCard
+              icon={Cpu}
+              title="Advanced Metrics"
+              description="アリーナランク別平均や横断指標など、設計を一新したことで、従来にない高度な分析を提供します。"
+            />
+            <FeatureCard
+              icon={BarChart3}
+              title="Developer API"
+              description="REST APIを公開しており、自分の、あるいは公開されているライバルのデータを自由に外部から解析できます。"
+            />
+            <FeatureCard
+              icon={ShieldCheck}
+              title="Privacy Control"
+              description="スコアの公開状態は完全に制御可能。安心して自身のデータに集中できます。"
+            />
+            <FeatureCard
+              icon={UsersIcon}
+              title="Rival Tracking"
+              description="実力が近いユーザーを見つけだし、スコアの更新状況をリアルタイムにタイムライン形式で追いかけられます。競い合うことで限界を突破しましょう。"
+            />
+          </SimpleGrid>
+        </PageContainer>
+      </Box>
+    </DashboardLayout>
   );
 }
 
-const WhatsBPIM2 = () => {
-  return (
-    <Accordion.Root collapsible defaultValue={["b"]}>
-      {items.map((item, index) => (
-        <Accordion.Item key={index} value={item.value}>
-          <Accordion.ItemTrigger py={2}>
-            <Span flex="1">{item.title}</Span>
-            <Accordion.ItemIndicator />
-          </Accordion.ItemTrigger>
-          <Accordion.ItemContent fontSize="xs">
-            <Accordion.ItemBody>{item.text}</Accordion.ItemBody>
-          </Accordion.ItemContent>
-        </Accordion.Item>
-      ))}
-    </Accordion.Root>
-  );
-};
-
-const items = [
-  {
-    value: "a",
-    title: "BPIManagerとの違いは?",
-    text: (
-      <>
-        BPIManagerではスコアを端末に保存していましたが、BPIM2ではサーバーにスコアを保存します。
-        <br />
-        そのため、ブラウザキャッシュの削除などのタイミングにおける意図しないデータ消失がなくなります。
-      </>
-    ),
-  },
-  {
-    value: "b",
-    title: "BPIManagerからの移行方法は?",
-    text: (
-      <>
-        BPIManagerとアカウント情報を共有しているため、BPIManagerでお使いの連携方法でサインインしてください。
-        <br />
-        BPIManagerでSyncを用いてデータ同期頂いていた場合、これらのデータをBPIM2に引き継ぐことができます。
-      </>
-    ),
-  },
-  {
-    value: "c",
-    title: "どんな機能が提供されますか?",
-    text: (
-      <>
-        BPIM2では、スコア管理に特化したクリティカルな機能を提供します。
-        <br />
-        REST
-        APIを提供しており、お好きな形でご自身またはスコアを公開している他のユーザーのスコアを分析いただくことができます。
-        <br />
-        (スコアを非公開に設定している場合は、他人にスコアを見られる心配はありません)
-        <br />
-        <br />
-        また、BPIManagerでは設計上計算コストの高かったアリーナランク別平均やBPIMユーザー間における横断指標などを提供予定です。
-      </>
-    ),
-  },
-];
+const FeatureCard = ({
+  icon,
+  title,
+  description,
+}: {
+  icon: any;
+  title: string;
+  description: string;
+}) => (
+  <VStack
+    align="start"
+    p={6}
+    bg="whiteAlpha.50"
+    borderRadius="xl"
+    border="1px solid"
+    borderColor="whiteAlpha.100"
+    transition="all 0.3s"
+    _hover={{
+      transform: "translateY(-5px)",
+      borderColor: "blue.500/50",
+      bg: "whiteAlpha.100",
+    }}
+  >
+    <Box p={3} bg="blue.500/10" borderRadius="lg" color="blue.400" mb={2}>
+      <Icon as={icon} size={"xl"} />
+    </Box>
+    <Text fontWeight="black" fontSize="md" color="white">
+      {title}
+    </Text>
+    <Text fontSize="xs" color="gray.500" lineHeight="tall">
+      {description}
+    </Text>
+  </VStack>
+);

@@ -75,40 +75,47 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
             </Text>
           </Box>
           <Separator colorPalette="gray" opacity={0.5} />
-
-          <HStack gap={4} justify="start">
-            <Link href={`/profile/${user?.userId}/following`} onClick={onClose}>
-              <VStack
-                gap={0}
-                align="start"
-                _hover={{ color: "blue.400" }}
-                transition="color 0.2s"
+          {user?.userId && (
+            <HStack gap={4} justify="start">
+              <Link
+                href={`/profile/${user?.userId}/following`}
+                onClick={onClose}
               >
-                <Text fontSize="xs" fontWeight="bold">
-                  {user?.followingCount ?? 0}
-                </Text>
-                <Text fontSize="2xs" color="fg.muted">
-                  フォロー中
-                </Text>
-              </VStack>
-            </Link>
+                <VStack
+                  gap={0}
+                  align="start"
+                  _hover={{ color: "blue.400" }}
+                  transition="color 0.2s"
+                >
+                  <Text fontSize="xs" fontWeight="bold">
+                    {user?.followingCount ?? 0}
+                  </Text>
+                  <Text fontSize="2xs" color="fg.muted">
+                    フォロー中
+                  </Text>
+                </VStack>
+              </Link>
 
-            <Link href={`/profile/${user?.userId}/followers`} onClick={onClose}>
-              <VStack
-                gap={0}
-                align="start"
-                _hover={{ color: "blue.400" }}
-                transition="color 0.2s"
+              <Link
+                href={`/profile/${user?.userId}/followers`}
+                onClick={onClose}
               >
-                <Text fontSize="xs" fontWeight="bold">
-                  {user?.followerCount ?? 0}
-                </Text>
-                <Text fontSize="2xs" color="fg.muted">
-                  フォロワー
-                </Text>
-              </VStack>
-            </Link>
-          </HStack>
+                <VStack
+                  gap={0}
+                  align="start"
+                  _hover={{ color: "blue.400" }}
+                  transition="color 0.2s"
+                >
+                  <Text fontSize="xs" fontWeight="bold">
+                    {user?.followerCount ?? 0}
+                  </Text>
+                  <Text fontSize="2xs" color="fg.muted">
+                    フォロワー
+                  </Text>
+                </VStack>
+              </Link>
+            </HStack>
+          )}
         </VStack>
       </Box>
 
