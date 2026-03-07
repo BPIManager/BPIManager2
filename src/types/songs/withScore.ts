@@ -19,19 +19,29 @@ export interface SongWithScore {
   coef: number | null;
 }
 
-export interface FilterParams {
-  difficulty?: "HYPER" | "ANOTHER" | "LEGGENDARIA";
-  level?: number;
-  clearState?: string;
+export interface FilterParamsFrontend {
+  difficulties?: Difficulties[];
+  levels?: number[];
+  clearStates?: string[];
+  versions?: number[];
+
   bpiMin?: number;
   bpiMax?: number;
-  version?: string;
   bpmMin?: number;
   bpmMax?: number;
   isSofran?: boolean;
   notesMin?: number;
   notesMax?: number;
   search?: string;
+  since?:
+    | "today"
+    | "yesterday"
+    | "thisWeek"
+    | "thisMonth"
+    | "past7"
+    | "past30"
+    | string;
+  until?: string | undefined;
   sortKey?:
     | "title"
     | "level"
@@ -42,3 +52,5 @@ export interface FilterParams {
     | "version";
   sortOrder?: "asc" | "desc";
 }
+
+export type Difficulties = "HYPER" | "ANOTHER" | "LEGGENDARIA";

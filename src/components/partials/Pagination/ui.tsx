@@ -28,7 +28,10 @@ export const CustomPagination = ({
       count={count}
       pageSize={pageSize}
       page={page}
-      onPageChange={(e) => onPageChange(e.page)}
+      onPageChange={(e) => {
+        onPageChange(e.page);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }}
     >
       <ButtonGroup variant="ghost" gap="1">
         <ChakraPagination.PrevTrigger asChild>
@@ -43,9 +46,11 @@ export const CustomPagination = ({
               key={pageItem.value}
               size="sm"
               variant={pageItem.value === page ? "outline" : "ghost"}
-              onClick={
-                pageItem.type === "page" ? undefined : (e) => e.preventDefault()
-              }
+              onClick={() => {
+                pageItem.type === "page"
+                  ? undefined
+                  : (e: any) => e.preventDefault();
+              }}
             >
               {pageItem.value}
             </IconButton>

@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { checkUserAccess } from "@/middlewares/api/withApi";
 import { SongWithScore } from "@/types/songs/withScore";
-import { filterSongs } from "@/utils/songs/filter";
+import { filterSongsServerSide } from "@/utils/songs/filter";
 import { sortSongs } from "@/utils/songs/sort";
 import type { NextApiRequest, NextApiResponse } from "next";
 
@@ -81,7 +81,7 @@ export default async function handler(
         "sc.bpi",
         "sc.clearState",
         "sc.missCount",
-        "sc.createdAt as scoreAt",
+        "sc.lastPlayed as scoreAt",
         "sd.wrScore",
         "sd.kaidenAvg",
         "sd.coef",
@@ -97,7 +97,10 @@ export default async function handler(
 
     const results = await query.execute();
     const processedData = sortSongs(
-      filterSongs(results as unknown as SongWithScore[], filterParams),
+      filterSongsServerSide(
+        results as unknown as SongWithScore[],
+        filterParams,
+      ),
       filterParams,
     );
 

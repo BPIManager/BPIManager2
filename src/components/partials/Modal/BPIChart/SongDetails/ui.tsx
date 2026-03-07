@@ -15,13 +15,15 @@ import {
   GridItem,
   Separator,
   Badge,
+  Tabs,
 } from "@chakra-ui/react";
 import { SongWithScore } from "@/types/songs/withScore";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { BpiCalculator } from "@/lib/bpi";
-import { getDJRank } from "@/utils/songs/djRank";
 import { BPIChart } from "./chart";
 import { getRankDetail } from "@/constants/djRank";
+import { LineChart, LucideHistory } from "lucide-react";
+import { SongHistoryTab } from "../History/ui";
 
 export const SongDetailView = ({
   song,
@@ -32,7 +34,8 @@ export const SongDetailView = ({
   isOpen: boolean;
   onClose: () => void;
 }) => {
-  if (!song) return null;
+  const [tab, setTab] = useState<string>("stats");
+
   const chartData = useMemo(() => {
     if (!song) return [];
     const data: { label: string; count: number; bpi: number }[] = [];
@@ -57,8 +60,8 @@ export const SongDetailView = ({
     return data.sort((a, b) => b.count - a.count);
   }, [song]);
 
-  const maxScore = song.notes * 2;
-  const currentEx = song.exScore ?? 0;
+  const maxScore = song ? song.notes * 2 : 0;
+  const currentEx = song ? song.exScore || 0 : 0;
 
   const rankInfo = useMemo(
     () => getRankDetail(currentEx, maxScore),
@@ -66,6 +69,7 @@ export const SongDetailView = ({
   );
 
   const bpiInfo = useMemo(() => {
+    if (!song) return { next: 0, diff: 0 };
     if (song.bpi === null) return { next: "-", diff: 0 };
     const nextTargetBpi = Math.ceil((song.bpi + 0.01) / 10) * 10;
 
@@ -75,6 +79,8 @@ export const SongDetailView = ({
       diff: targetScore - currentEx,
     };
   }, [song, currentEx]);
+
+  if (!song) return null;
   return (
     <DialogRoot
       open={isOpen}
@@ -153,47 +159,73 @@ export const SongDetailView = ({
               </VStack>
             </GridItem>
           </Grid>
-
-          <Separator opacity={0.1} />
-
-          <BPIChart data={chartData} maxScore={song.notes * 2} />
-
-          <Box
-            mt={6}
-            p={4}
-            bg="whiteAlpha.50"
-            rounded="md"
-            borderWidth="1px"
-            borderColor="whiteAlpha.100"
+          <Tabs.Root
+            value={tab}
+            onValueChange={(e) => setTab(e.value)}
+            variant="enclosed"
+            fitted
           >
-            <VStack align="stretch" gap={2}>
-              <HStack justify="space-between" fontSize="sm">
-                <Text color="gray.400">全1</Text>
-                <Text fontWeight="bold" color="white">
-                  {(song.wrScore ?? 0).toLocaleString()}
-                </Text>
-              </HStack>
-              <HStack justify="space-between" fontSize="sm">
-                <Text color="gray.400">皆伝平均</Text>
-                <Text fontWeight="bold" color="white">
-                  {(song.kaidenAvg ?? 0).toLocaleString()}
-                </Text>
-              </HStack>
-              <Separator opacity={0.1} my={1} />
-              <HStack justify="space-between" fontSize="sm">
-                <Text color="gray.400">ランプ状態</Text>
-                <Badge colorScheme="yellow">
-                  {song.clearState || "NO PLAY"}
-                </Badge>
-              </HStack>
-              <HStack justify="space-between" fontSize="sm">
-                <Text color="gray.400">ミスカウント</Text>
-                <Text fontWeight="bold" color="red.400">
-                  {song.missCount ?? "-"}
-                </Text>
-              </HStack>
-            </VStack>
-          </Box>
+            <Tabs.List
+              bg="whiteAlpha.50"
+              p={1}
+              rounded="md"
+              border="none"
+              mb={4}
+            >
+              <Tabs.Trigger value="stats" gap={2}>
+                <LineChart /> <Text fontSize="xs">STATISTICS</Text>
+              </Tabs.Trigger>
+              <Tabs.Trigger value="history" gap={2}>
+                <LucideHistory /> <Text fontSize="xs">HISTORY</Text>
+              </Tabs.Trigger>
+            </Tabs.List>
+            <Tabs.Content value="stats">
+              <BPIChart
+                data={chartData}
+                maxScore={song.notes * 2}
+                song={song}
+              />
+              <Box
+                mt={6}
+                p={4}
+                bg="whiteAlpha.50"
+                rounded="md"
+                borderWidth="1px"
+                borderColor="whiteAlpha.100"
+              >
+                <VStack align="stretch" gap={2}>
+                  <HStack justify="space-between" fontSize="sm">
+                    <Text color="gray.400">全1</Text>
+                    <Text fontWeight="bold" color="white">
+                      {(song.wrScore ?? 0).toLocaleString()}
+                    </Text>
+                  </HStack>
+                  <HStack justify="space-between" fontSize="sm">
+                    <Text color="gray.400">皆伝平均</Text>
+                    <Text fontWeight="bold" color="white">
+                      {(song.kaidenAvg ?? 0).toLocaleString()}
+                    </Text>
+                  </HStack>
+                  <Separator opacity={0.1} my={1} />
+                  <HStack justify="space-between" fontSize="sm">
+                    <Text color="gray.400">ランプ状態</Text>
+                    <Badge colorScheme="yellow">
+                      {song.clearState || "NO PLAY"}
+                    </Badge>
+                  </HStack>
+                  <HStack justify="space-between" fontSize="sm">
+                    <Text color="gray.400">ミスカウント</Text>
+                    <Text fontWeight="bold" color="red.400">
+                      {song.missCount ?? "-"}
+                    </Text>
+                  </HStack>
+                </VStack>
+              </Box>
+            </Tabs.Content>
+            <Tabs.Content value="history">
+              <SongHistoryTab songId={song.songId} />
+            </Tabs.Content>
+          </Tabs.Root>
         </DialogBody>
       </DialogContent>
     </DialogRoot>

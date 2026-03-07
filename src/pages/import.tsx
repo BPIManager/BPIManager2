@@ -42,6 +42,7 @@ import AccountSettings from "@/components/partials/Modal/AccountSettings";
 import { dummyCsv } from "@/constants/dummyCsv";
 import Papa from "papaparse";
 import { PageContainer, PageHeader } from "@/components/partials/Header";
+import { IIDX_DIFFICULTIES } from "@/constants/diffs";
 
 export default function ImportPage() {
   const { user, isLoading, fbUser, refresh } = useUser();
@@ -69,7 +70,7 @@ export default function ImportPage() {
         throw new Error("CSVの形式が正しくありません。");
       }
 
-      const targetDiffs = ["HYPER", "ANOTHER", "LEGGENDARIA"];
+      const targetDiffs = IIDX_DIFFICULTIES;
 
       const formattedRows = parsed.data.flatMap((row: any) => {
         const title = row["タイトル"];

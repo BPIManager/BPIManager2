@@ -18,6 +18,7 @@ import {
   ChartArea,
   StickyNote,
   UsersIcon,
+  ScrollText,
 } from "lucide-react";
 import { useUser } from "@/contexts/users/UserContext";
 import { authActions } from "@/lib/firebase/auth";
@@ -38,7 +39,8 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
     { label: "ライバルを探す", icon: UsersIcon, href: "/find" },
     { label: "分析", icon: ChartArea, href: "/analytics" },
     { label: "指標", icon: LandPlot, href: "/metrics" },
-    { label: "メモ", icon: StickyNote, href: "/notes" },
+    //{ label: "メモ", icon: StickyNote, href: "/notes" },
+    { label: "更新ログ", icon: ScrollText, href: "/logs" },
     { label: "設定", icon: Settings, href: "/settings" },
   ];
 
