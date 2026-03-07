@@ -7,6 +7,7 @@ import AccountDeletionUi from "@/components/partials/Settings/AccountDeletion/ui
 import LoginPage from "@/components/partials/LogIn/page";
 import { Center, Spinner } from "@chakra-ui/react";
 import { Meta } from "@/components/partials/Head";
+import ApiKeyUi from "@/components/partials/Settings/APIKey/ui";
 
 export default function SettingsPage() {
   const { user, isLoading, fbUser } = useUser();
@@ -34,6 +35,7 @@ export default function SettingsPage() {
       <PageContainer>
         <AccountSettingsUi />
         <TransferUi />
+        <ApiKeyUi />
         <AccountDeletionUi />
       </PageContainer>
     </DashboardLayout>
