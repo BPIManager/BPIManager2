@@ -1,6 +1,6 @@
 import { BaseDistributionChart, ChartData } from "../DistributionChart";
 
-const getBpiColor = (label: string) => {
+export const getBpiColor = (label: string) => {
   if (label === "100+") return "#ff00ff";
   const val = parseInt(label);
   if (val < 0) return "#4A5568";

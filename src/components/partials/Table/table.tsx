@@ -72,48 +72,75 @@ const SongItem = ({
       mb={2}
     >
       <Grid templateColumns="1fr auto" gap={1}>
-        <GridItem overflow="hidden" px={3} py={2}>
+        <GridItem
+          overflow="hidden"
+          px={3}
+          py={2}
+          display="flex"
+          alignItems={"center"}
+        >
           <VStack align="start" gap={0}>
             <HStack gap={2}>
               <Text fontWeight="bold" fontSize="sm" truncate>
                 {song.title}
               </Text>
             </HStack>
-
-            <HStack gap={3} mt={1} fontSize="10px" color="gray.200">
+            <Grid
+              templateColumns="32px 12px 70px 70px"
+              gap={2}
+              alignItems="center"
+            >
               <Badge
-                size="sm"
-                p={1}
+                w="32px"
+                h="18px"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                p={0}
                 variant="solid"
                 bg={diffColors[song.difficulty]}
                 color="white"
                 borderRadius="sm"
               >
-                {song.difficultyLevel}
+                <Text fontSize="11px" fontWeight="bold" lineHeight="1">
+                  {song.difficultyLevel}
+                </Text>
               </Badge>
-              <Text fontSize="xs" color="gray.500" fontWeight="bold">
+
+              <Text
+                fontSize="xs"
+                color="gray.500"
+                fontWeight="bold"
+                textAlign="center"
+                lineHeight="1"
+              >
                 {song.difficulty.charAt(0)}
               </Text>
+
               {song.exScore && (
                 <>
-                  {(["current", "next"] as const).map((item) => (
-                    <Text px={1} fontSize="9px" key={item}>
+                  {(["current", "next"] as const).map((mode) => (
+                    <Text
+                      key={mode}
+                      fontSize="10px"
+                      lineHeight="1"
+                      whiteSpace="nowrap"
+                    >
                       {getDJRank(Number(song.exScore), song.notes * 2, {
-                        mode: item,
+                        mode,
                         output: "label",
                       })}
                       {getDJRank(Number(song.exScore), song.notes * 2, {
-                        mode: item,
+                        mode,
                         output: "value",
                       })}
                     </Text>
                   ))}
                 </>
               )}
-            </HStack>
+            </Grid>
           </VStack>
         </GridItem>
-
         <GridItem
           textAlign="right"
           display={"flex"}
@@ -135,6 +162,11 @@ const SongItem = ({
                 >
                   {song.bpi !== null ? song.exScore : "---"}
                 </Text>
+                {song.exDiff && song.exDiff > 0 ? (
+                  <Text fontSize="10px" color="green.400" fontWeight="bold">
+                    +{song.exDiff}
+                  </Text>
+                ) : null}
               </VStack>
               <VStack ml={2} align="end" gap={0}>
                 <Text fontSize="xs" color="gray.400" lineHeight="1">
@@ -148,6 +180,11 @@ const SongItem = ({
                 >
                   {song.bpi !== null ? song.bpi.toFixed(2) : "---"}
                 </Text>
+                {song.bpiDiff && song.bpiDiff > 0 ? (
+                  <Text fontSize="10px" color="green.400" fontWeight="bold">
+                    +{song.bpiDiff}
+                  </Text>
+                ) : null}
               </VStack>
             </HStack>
           </VStack>

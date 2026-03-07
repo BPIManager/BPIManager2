@@ -33,14 +33,18 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
 
   const menuItems = [
     { label: "ダッシュボード", icon: LuLayoutDashboard, href: "/" },
-    { label: "スコア一覧", icon: ListIcon, href: "/my" },
     { label: "インポート", icon: FileUp, href: "/import" },
-    { label: "タイムライン", icon: ChartNoAxesGantt, href: "/timeline" },
+    { label: "スコア一覧", icon: ListIcon, href: "/my" },
+    { label: "スコア更新ログ", icon: ScrollText, href: "/logs" },
+    {
+      label: "フォロータイムライン",
+      icon: ChartNoAxesGantt,
+      href: "/timeline",
+    },
     { label: "ライバルを探す", icon: UsersIcon, href: "/find" },
     { label: "分析", icon: ChartArea, href: "/analytics" },
     { label: "指標", icon: LandPlot, href: "/metrics" },
     //{ label: "メモ", icon: StickyNote, href: "/notes" },
-    { label: "更新ログ", icon: ScrollText, href: "/logs" },
     { label: "設定", icon: Settings, href: "/settings" },
   ];
 
@@ -105,7 +109,10 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
 
       <VStack align="stretch" gap={1}>
         {menuItems.map((item) => {
-          const isActive = router.asPath === item.href;
+          const isActive =
+            item.href === "/"
+              ? router.asPath === "/"
+              : router.asPath.startsWith(item.href);
 
           return (
             <Link key={item.href} href={item.href} passHref legacyBehavior>

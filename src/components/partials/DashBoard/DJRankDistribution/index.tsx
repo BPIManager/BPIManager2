@@ -1,6 +1,6 @@
 import { BaseDistributionChart, ChartData } from "../DistributionChart";
 
-const RANK_COLORS: Record<string, string> = {
+export const RANK_COLORS: Record<string, string> = {
   F: "#4A5568",
   E: "#718096",
   D: "#A0AEC0",

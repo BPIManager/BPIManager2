@@ -17,6 +17,15 @@ export interface SongWithScore {
   wrScore: number | null;
   kaidenAvg: number | null;
   coef: number | null;
+
+  // ログビューア経由で表示したときだけ以下が必要
+  exDiff?: number;
+  bpiDiff?: number;
+  djRankDisplay?: {
+    current: string;
+    next: string;
+  };
+  isRankUp?: boolean;
 }
 
 export interface FilterParamsFrontend {
