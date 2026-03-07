@@ -9,9 +9,9 @@ export default function Document() {
       suppressHydrationWarning
     >
       <Head>
-        <meta name="theme-color" content="#000000" />
+        <meta name="theme-color" content="#080808" />
       </Head>
-      <body>
+      <body style={{ backgroundColor: "#080808" }}>
         <Main />
         <NextScript />
       </body>
