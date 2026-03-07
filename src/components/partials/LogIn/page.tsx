@@ -28,7 +28,10 @@ import { PageContainer } from "../Header";
 export default function LoginPage() {
   return (
     <DashboardLayout>
-      <Meta noIndex title="設定" />
+      <Meta
+        title=""
+        description="beatmania IIDX 上級者のためのクラウドベース・スコアマネジメントプラットフォーム"
+      />
       <Box bg="black" minH="100vh" color="white" py={20}>
         <PageContainer>
           <VStack gap={6} textAlign="center" mb={16}>

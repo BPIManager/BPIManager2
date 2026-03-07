@@ -1,4 +1,11 @@
-import { Box, VStack, Text, Button, Icon } from "@chakra-ui/react";
+import {
+  Box,
+  VStack,
+  Text,
+  Button,
+  Icon,
+  AbsoluteCenter,
+} from "@chakra-ui/react";
 import { LuLock } from "react-icons/lu";
 import { LoginButtons } from "../LogIn";
 
@@ -48,5 +55,22 @@ export const LoginRequiredCard = () => {
         <LoginButtons />
       </VStack>
     </Box>
+  );
+};
+
+export const LoginRequiredBox = () => {
+  return (
+    <>
+      <Box
+        position="absolute"
+        inset={0}
+        bg="blackAlpha.400"
+        backdropFilter="blur(10px)"
+        zIndex={10}
+      />
+      <AbsoluteCenter zIndex={20} w="full" maxW="full" px={4}>
+        <LoginRequiredCard />
+      </AbsoluteCenter>
+    </>
   );
 };

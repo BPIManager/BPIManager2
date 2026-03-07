@@ -21,7 +21,7 @@ export const SongsTable = ({
   userId,
   version,
 }: {
-  userId: string;
+  userId: string | undefined;
   version?: string;
 }) => {
   const [selectedSong, setSelectedSong] = useState<SongWithScore | null>(null);

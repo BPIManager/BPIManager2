@@ -36,7 +36,6 @@ export default function ImportPage() {
         <Spinner />
       </Center>
     );
-  if (!fbUser) return <LoginPage />;
 
   return (
     <>
@@ -44,6 +43,7 @@ export default function ImportPage() {
       <Meta title="データインポート" description="..." />
 
       <ImportView
+        isLoggedIn={!!user?.userId}
         csvData={csvData}
         setCsvData={setCsvData}
         selectedVersion={selectedVersion}

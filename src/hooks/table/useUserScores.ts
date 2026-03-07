@@ -4,7 +4,7 @@ import { latestVersion } from "@/constants/latestVersion";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-export const useUserScores = (userId: string, version?: string) => {
+export const useUserScores = (userId: string | undefined, version?: string) => {
   const targetVersion = version || latestVersion;
 
   const { data, error, isLoading, mutate } = useSWR<SongWithScore[]>(

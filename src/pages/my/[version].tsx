@@ -1,11 +1,15 @@
 import { useRouter } from "next/router";
-import { Container, Spinner, Center } from "@chakra-ui/react";
+import { Container, Spinner, Center, Box } from "@chakra-ui/react";
 import { Meta } from "@/components/partials/Head";
 import { DashboardLayout } from "@/components/partials/Main";
 import { useUser } from "@/contexts/users/UserContext";
-import LoginPage from "@/components/partials/LogIn/page";
 import AccountSettings from "@/components/partials/Modal/AccountSettings";
 import { SongsTable } from "@/components/partials/Table";
+import {
+  LoginRequiredBox,
+  LoginRequiredCard,
+} from "@/components/partials/LoginRequired/ui";
+import { PageContainer } from "@/components/partials/Header";
 
 export default function MyScoresByVersion() {
   const router = useRouter();
@@ -22,10 +26,6 @@ export default function MyScoresByVersion() {
     );
   }
 
-  if (!fbUser) {
-    return <LoginPage />;
-  }
-
   const targetVersion = typeof version === "string" ? version : undefined;
 
   return (
@@ -35,7 +35,13 @@ export default function MyScoresByVersion() {
       <Meta noIndex title={`マイスコア - Version ${targetVersion || ""}`} />
 
       <DashboardLayout>
-        <SongsTable userId={fbUser.uid} version={targetVersion} />
+        {!fbUser?.uid ? (
+          <PageContainer>
+            <LoginRequiredCard />
+          </PageContainer>
+        ) : (
+          <SongsTable userId={fbUser?.uid} version={targetVersion} />
+        )}
       </DashboardLayout>
     </>
   );
