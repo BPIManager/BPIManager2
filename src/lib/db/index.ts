@@ -9,7 +9,7 @@ const dialect = new MysqlDialect({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PW,
-    connectionLimit: 10,
+    connectionLimit: 1000,
     port: 3306,
     waitForConnections: true,
     maxIdle: 10,
