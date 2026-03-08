@@ -32,6 +32,7 @@ interface SongFilterBarProps {
   onParamsChange: (params: Partial<FilterParamsFrontend>) => void;
   onOpenAdvancedFilter: () => void;
   totalCount: number;
+  disableVersionSelect?: boolean;
 }
 
 export const SongFilterBar = ({
@@ -39,6 +40,7 @@ export const SongFilterBar = ({
   onParamsChange,
   onOpenAdvancedFilter,
   totalCount,
+  disableVersionSelect,
 }: SongFilterBarProps) => {
   const router = useRouter();
   const [isSticky, setIsSticky] = useState(true);
@@ -78,19 +80,21 @@ export const SongFilterBar = ({
       zIndex={10}
     >
       <HStack w="full" gap={2} mb={2}>
-        <FormSelect
-          width="full"
-          size="sm"
-          collection={versionsNonDisabledCollection}
-          value={String(currentStoreVersion ?? latestVersion)}
-          onValueChange={(details) => {
-            const newVersion = details;
-            router.push({
-              pathname: `/my/${newVersion}`,
-              query: { ...router.query },
-            });
-          }}
-        />
+        {!disableVersionSelect && (
+          <FormSelect
+            width="full"
+            size="sm"
+            collection={versionsNonDisabledCollection}
+            value={String(currentStoreVersion ?? latestVersion)}
+            onValueChange={(details) => {
+              const newVersion = details;
+              router.push({
+                pathname: `/my/${newVersion}`,
+                query: { ...router.query },
+              });
+            }}
+          />
+        )}
         <FormSelect
           width="full"
           size="sm"

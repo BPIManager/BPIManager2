@@ -26,6 +26,7 @@ export const BatchSongsTable = ({ songs }: { songs: any[] }) => {
   return (
     <Box>
       <SongFilterBar
+        disableVersionSelect
         params={params}
         onParamsChange={updateParams}
         totalCount={totalCount}

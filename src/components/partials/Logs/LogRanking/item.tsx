@@ -41,11 +41,11 @@ export const RankItem = ({
   const bpiStyle = getBpiStyle();
   const isNew = !item.previous;
   const prevEx = isNew ? 0 : item.current.exScore - item.diff.exScore;
-  const prevBpi = isNew ? 0 : item.current.bpi - item.diff.bpi;
+  const prevBpi = isNew ? -15 : item.current.bpi - item.diff.bpi;
 
   const wLabel = "25px";
-  const wValuePrev = "38px";
-  const wValueCurr = "45px";
+  const wValuePrev = "50px";
+  const wValueCurr = "50px";
   const wDiff = "65px";
   const ScoreRow = ({
     label,
@@ -110,7 +110,7 @@ export const RankItem = ({
           </>
         ) : (
           <Box
-            w={`${parseFloat(wValuePrev) + 8 + parseFloat(wValueCurr) + parseFloat(wDiff)}px`}
+            w={`${8 + parseFloat(wDiff)}px`}
             display="flex"
             justifyContent="flex-end"
             alignItems="baseline"
