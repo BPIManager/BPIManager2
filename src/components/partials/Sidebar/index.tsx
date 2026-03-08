@@ -57,7 +57,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
   ];
   return (
     <VStack align="stretch" h="full" p={4} gap={6}>
-      <Box p={4} borderRadius="xl" bg="bg.muted">
+      <Box p={4} borderRadius="xl" color="white">
         <VStack gap={3} align="start">
           <Avatar
             size="lg"
@@ -185,13 +185,11 @@ export const GitHubButton = () => {
       asChild
       variant="outline"
       size="sm"
-      colorPalette="gray"
       borderRadius="full"
       px={4}
-      bg="whiteAlpha.50"
+      color="white"
       _hover={{
         bg: "whiteAlpha.200",
-        transform: "translateY(-1px)",
         borderColor: "whiteAlpha.400",
       }}
       transition="all 0.2s"
