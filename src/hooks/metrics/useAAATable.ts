@@ -1,3 +1,4 @@
+import { useUser } from "@/contexts/users/UserContext";
 import { fetcher } from "@/utils/common/fetch";
 import { useMemo } from "react";
 import useSWR from "swr";
@@ -34,9 +35,11 @@ export const useAAATable = (
   goal: "aaa" | "maxMinus",
   mode: GroupingMode,
 ) => {
+  const { fbUser } = useUser();
+
   const { data, error, isLoading } = useSWR<AAATableItem[]>(
     userId && version && level
-      ? `/api/${userId}/stats/${version}/aaaDifficulty?level=${level}`
+      ? [`/api/${userId}/stats/${version}/aaaDifficulty?level=${level}`, fbUser]
       : null,
     fetcher,
   );

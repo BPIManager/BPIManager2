@@ -64,12 +64,14 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
     <VStack align="stretch" p={4} gap={6} h="full" minH="0" overflowY="auto">
       <Box p={4} borderRadius="xl" color="white">
         <VStack gap={3} align="start">
-          <Avatar
-            size="lg"
-            src={user?.profileImage || fbUser?.photoURL || ""}
-            name={user?.userName || fbUser?.displayName || "User"}
-            shape="rounded"
-          />
+          <Link href={"/user/" + fbUser?.uid}>
+            <Avatar
+              size="lg"
+              src={user?.profileImage || fbUser?.photoURL || ""}
+              name={user?.userName || fbUser?.displayName || "User"}
+              shape="rounded"
+            />
+          </Link>
           <Box>
             <Text fontWeight="bold" fontSize="md" lineClamp={1}>
               {user?.userName || fbUser?.displayName || "Guest"}

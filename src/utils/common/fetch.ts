@@ -1,5 +1,15 @@
-export const fetcher = async (url: string) => {
-  const res = await fetch(url);
+export const fetcher = async (args: string | [string, any]) => {
+  const url = typeof args === "string" ? args : args[0];
+  const user = typeof args === "string" ? null : args[1];
+
+  const headers: HeadersInit = {};
+
+  if (user && typeof user.getIdToken === "function") {
+    const token = await user.getIdToken();
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const res = await fetch(url, { headers });
 
   if (!res.ok) {
     const error = new Error("An error occurred while fetching the data.");

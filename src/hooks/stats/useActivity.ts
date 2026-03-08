@@ -1,3 +1,4 @@
+import { useUser } from "@/contexts/users/UserContext";
 import { fetcher } from "@/utils/common/fetch";
 import useSWR from "swr";
 
@@ -12,10 +13,14 @@ export const useActivity = (
   difficulties.forEach((d) => params.append("difficulty", d));
 
   const shouldFetch = userId && (levels.length > 0 || difficulties.length > 0);
+  const { fbUser } = useUser();
 
   const { data, isLoading } = useSWR(
     shouldFetch
-      ? `/api/${userId}/stats/${version}/activity?${params.toString()}`
+      ? [
+          `/api/${userId}/stats/${version}/activity?${params.toString()}`,
+          fbUser,
+        ]
       : null,
     fetcher,
   );

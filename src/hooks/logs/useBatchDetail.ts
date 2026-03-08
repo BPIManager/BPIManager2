@@ -1,3 +1,4 @@
+import { useUser } from "@/contexts/users/UserContext";
 import { BpiCalculator } from "@/lib/bpi";
 import { fetcher } from "@/utils/common/fetch";
 import useSWR from "swr";
@@ -75,10 +76,14 @@ export const useLogsDetail = (
     : date
       ? `/api/${userId}/logs/${version}/daily/${date}`
       : null;
+  const { fbUser } = useUser();
 
   const { data, error, isLoading } = useSWR<LogsDetailResponse>(
-    endpoint,
+    endpoint && fbUser ? [endpoint, fbUser] : null,
     fetcher,
+    {
+      revalidateOnFocus: false,
+    },
   );
 
   const summary = data

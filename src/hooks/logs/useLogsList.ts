@@ -1,3 +1,4 @@
+import { useUser } from "@/contexts/users/UserContext";
 import { fetcher } from "@/utils/common/fetch";
 import useSWR from "swr";
 
@@ -19,8 +20,9 @@ export interface UpdateLog {
 }
 
 export const useLogs = (userId: string | undefined, version: string) => {
+  const { fbUser } = useUser();
   const { data, error, isLoading } = useSWR<UpdateLog[]>(
-    userId && version ? `/api/${userId}/logs/${version}` : null,
+    userId ? [`/api/${userId}/logs/${version}`, fbUser] : null,
     fetcher,
   );
 

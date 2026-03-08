@@ -11,7 +11,18 @@ export interface Database {
   // 追加: 暫定/バックアップ用テーブル
   bkScores: BkScoresTable;
   bkUsers: BkUsersTable;
+  follows: FollowsTable;
 }
+
+export interface FollowsTable {
+  id: Generated<number>;
+  followerId: string;
+  followingId: string;
+  createdAt: Generated<Date>;
+}
+
+export type Follow = Selectable<FollowsTable>;
+export type NewFollow = Insertable<FollowsTable>;
 
 // --- [bkScores] (新規追加) ---
 export interface BkScoresTable {

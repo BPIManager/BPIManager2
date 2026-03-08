@@ -12,6 +12,7 @@ export interface AccessResult {
     status: number;
     message: string;
   };
+  viewerId?: string;
 }
 
 export async function checkUserAccess(

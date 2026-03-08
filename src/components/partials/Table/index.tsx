@@ -57,7 +57,7 @@ export const SongsTable = ({
         totalCount={totalCount}
         onOpenAdvancedFilter={onOpenAdvanced}
       />
-      {!songs || (songs.length === 0 && <NoDataAlert />)}
+      {!isLoading && songs && songs.length === 0 && <NoDataAlert />}
 
       {isLoading ? (
         <SongListSkeleton />

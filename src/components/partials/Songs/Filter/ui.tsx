@@ -69,7 +69,7 @@ export const SongFilterBar = ({
       : [...list, item];
   };
   const currentStoreVersion = router.query.version;
-
+  console.log(router);
   return (
     <Box
       p={4}
@@ -89,8 +89,8 @@ export const SongFilterBar = ({
             onValueChange={(details) => {
               const newVersion = details;
               router.push({
-                pathname: `/my/${newVersion}`,
-                query: { ...router.query },
+                pathname: router.pathname,
+                query: { ...router.query, version: newVersion },
               });
             }}
           />
