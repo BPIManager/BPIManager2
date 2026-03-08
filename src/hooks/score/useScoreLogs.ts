@@ -1,8 +1,7 @@
 import { useUser } from "@/contexts/users/UserContext";
 import { SongHistoryResponse } from "@/types/score/log";
+import { fetcher } from "@/utils/common/fetch";
 import useSWR from "swr";
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export const useScoreHistory = (userId: string | undefined, songId: number) => {
   const { fbUser } = useUser();
