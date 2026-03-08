@@ -14,6 +14,8 @@ import { LogsCard } from "../LogsCard/ui";
 import { LogsGroupSkeleton } from "../LogsCard/skeleton";
 import { NoDataAlert } from "../../DashBoard/NoData";
 import { CustomPagination } from "../../Pagination/ui";
+import Link from "next/link";
+import dayjs from "dayjs";
 
 interface Props {
   userId: string | undefined;
@@ -38,11 +40,7 @@ export const LogsList = ({ userId, version }: Props) => {
     const groups: Record<string, GroupedLog> = {};
 
     logs.forEach((log) => {
-      const date = new Date(log.createdAt).toLocaleDateString("ja-JP", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-      });
+      const date = dayjs(log.createdAt).format("YYYY-MM-DD");
 
       if (!groups[date]) {
         groups[date] = {
@@ -124,7 +122,7 @@ export const LogsList = ({ userId, version }: Props) => {
                     <HStack gap={6}>
                       <VStack align="start" gap={0}>
                         <Text fontSize="2xs" color="fg.muted">
-                          TOTAL UPDATES
+                          合計更新件数
                         </Text>
                         <Text fontWeight="bold" fontSize="lg">
                           {group.dayTotalUpdates} songs
@@ -132,7 +130,7 @@ export const LogsList = ({ userId, version }: Props) => {
                       </VStack>
                       <VStack align="start" gap={0}>
                         <Text fontSize="2xs" color="fg.muted">
-                          BPI GROWTH
+                          BPI上昇幅計
                         </Text>
                         <Text
                           fontWeight="bold"
@@ -148,15 +146,19 @@ export const LogsList = ({ userId, version }: Props) => {
                         </Text>
                       </VStack>
                     </HStack>
-
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      colorPalette="blue"
-                      px={2}
+                    <Link
+                      href={`/user/${userId}/logs/daily/${version}/${group.date}`}
+                      passHref
                     >
-                      詳細
-                    </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        colorPalette="blue"
+                        px={2}
+                      >
+                        詳細
+                      </Button>
+                    </Link>
                   </HStack>
                 </Box>
 
