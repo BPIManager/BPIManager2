@@ -12,12 +12,14 @@ import { LuTrendingUp, LuListMusic, LuCalendar } from "react-icons/lu";
 import dayjs from "dayjs";
 import Link from "next/link";
 import { UpdateLog } from "@/hooks/logs/useLogsList";
+import { useUser } from "@/contexts/users/UserContext";
 
 export const LogsCard = ({ log }: { log: UpdateLog }) => {
+  const { user } = useUser();
   const isPositive = log.diff >= 0;
 
   return (
-    <Link href={`/logs/${log.version}/${log.batchId}`}>
+    <Link href={`/user/${user?.userId}/logs/${log.version}/${log.batchId}`}>
       <Card.Root
         mb={4}
         variant="elevated"
@@ -41,7 +43,7 @@ export const LogsCard = ({ log }: { log: UpdateLog }) => {
                 </Text>
               </HStack>
               <HStack gap={2}>
-                <Text fontSize="xl" fontWeight="black" fontFamily="mono">
+                <Text fontSize="xl" fontWeight="bold" fontFamily="mono">
                   総合BPI {log.totalBpi.toFixed(2)}
                 </Text>
                 <Badge
@@ -73,7 +75,7 @@ export const LogsCard = ({ log }: { log: UpdateLog }) => {
           <VStack align="stretch" gap={1.5}>
             <Text
               fontSize="10px"
-              fontWeight="black"
+              fontWeight="bold"
               color="gray.600"
               letterSpacing="widest"
             >
@@ -93,7 +95,7 @@ export const LogsCard = ({ log }: { log: UpdateLog }) => {
                   </Text>
                   <Text
                     fontSize="xs"
-                    fontWeight="black"
+                    fontWeight="bold"
                     color="blue.400"
                     w="45px"
                     textAlign="right"

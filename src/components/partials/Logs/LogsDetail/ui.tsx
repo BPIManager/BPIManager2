@@ -1,48 +1,55 @@
-import { useBatchDetails } from "@/hooks/logs/useBatchDetail";
-import {
-  Tabs,
-  Box,
-  Heading,
-  Text,
-  Spinner,
-  Center,
-  SimpleGrid,
-  Stat,
-} from "@chakra-ui/react";
-import { BatchSummaryCards } from "../LogSummary/ui";
+import { useLogsDetail } from "@/hooks/logs/useBatchDetail";
 import {
   getBpiDistribution,
   getRankDistribution,
 } from "@/utils/logs/getDistribution";
-import { BaseDistributionChart } from "../../DashBoard/DistributionChart";
-import { getBpiColor } from "../../DashBoard/BPIDistribution";
-import { RANK_COLORS } from "../../DashBoard/DJRankDistribution";
-import { LogRank } from "../LogRanking/ui";
-import { BatchNavigator } from "../LogsNav";
-import { PageContainer, PageHeader } from "../../Header";
+import {
+  Box,
+  Center,
+  HStack,
+  Link,
+  SimpleGrid,
+  Spinner,
+  Tabs,
+  Text,
+} from "@chakra-ui/react";
 import dayjs from "dayjs";
-import { BatchSongsTable } from "../LogTable/ui";
 import { useRouter } from "next/router";
+import { PageContainer, PageHeader } from "../../Header";
+import { DailyBatchNotice } from "../DailyBatchNotice/ui";
+import { BatchSummaryCards } from "../LogSummary/ui";
+import { BaseDistributionChart } from "../../DashBoard/DistributionChart";
+import { LogRank } from "../LogRanking/ui";
+import { BatchSongsTable } from "../LogTable/ui";
+import { RANK_COLORS } from "../../DashBoard/DJRankDistribution";
+import { getBpiColor } from "../../DashBoard/BPIDistribution";
+import { LogNavigator } from "../LogsNav/ui";
+import { BatchTotalBpiCard } from "../TotalBPI/ui";
 
-export const BatchDetailView = ({
+interface Props {
+  userId: string | undefined;
+  version: string | undefined;
+  batchId?: string;
+  date?: string;
+  type: "batch" | "daily";
+}
+
+export const LogsDetailView = ({
   userId,
   version,
   batchId,
-}: {
-  userId: string | undefined;
-  version: string | undefined;
-  batchId: string | undefined;
-}) => {
+  date,
+  type,
+}: Props) => {
   const router = useRouter();
-  const { details, summary, isLoading, isError } = useBatchDetails(
+  const { details, summary, isLoading, isError } = useLogsDetail(
     userId,
     version,
-    batchId,
+    { batchId, date },
   );
 
   const activeTab =
     router.query.levels || router.query.difficulties ? "songs" : "summary";
-
   const handleTabChange = (details: { value: string }) => {
     const nextTab = details.value;
     const nextQuery = { ...router.query };
@@ -79,32 +86,51 @@ export const BatchDetailView = ({
         <Spinner />
       </Center>
     );
-  if (isError || !details) return <Text color="red.500"></Text>;
+  if (isError || !details)
+    return <Text color="red.500">データの取得に失敗しました</Text>;
+
   const bpiData = getBpiDistribution(details.songs);
   const rankData = getRankDistribution(details.songs);
+
+  const pageTitle =
+    type === "daily"
+      ? dayjs(date).format("YYYY年M月D日のまとめ")
+      : dayjs(details.pagination.current.createdAt).format(
+          "M月D日 HH:mmの更新",
+        );
 
   return (
     <Box>
       <PageHeader
-        title={dayjs(details.pagination.current.createdAt ?? new Date()).format(
-          "M月D日HH:mmの更新",
-        )}
-        description=""
+        title={pageTitle}
+        description={
+          type === "daily" ? "一日の成果を統合して表示しています" : ""
+        }
       />
+
       <PageContainer>
-        {details.pagination && (
-          <BatchNavigator
-            userId={userId}
-            version={version}
-            pagination={details.pagination}
+        <LogNavigator
+          userId={userId}
+          version={version}
+          pagination={details.pagination}
+          type={type}
+          date={date}
+        />
+
+        {type === "batch" && details.pagination.dailyBatchIds && (
+          <DailyBatchNotice
+            dailyBatchIds={details.pagination.dailyBatchIds}
+            currentBatchId={batchId as string}
+            createdAt={details.pagination.current.createdAt}
+            version={version as string}
           />
         )}
+
         <Tabs.Root
-          defaultValue="summary"
-          variant="enclosed"
-          colorPalette="blue"
           value={activeTab}
           onValueChange={handleTabChange}
+          variant="enclosed"
+          colorPalette="blue"
         >
           <Tabs.List p={1} borderRadius="md">
             <Tabs.Trigger value="summary" px={4}>
@@ -116,27 +142,28 @@ export const BatchDetailView = ({
           </Tabs.List>
 
           <Tabs.Content value="summary" py={6}>
-            {summary && <BatchSummaryCards summary={summary} />}
+            <BatchTotalBpiCard pagination={details.pagination} />
+            {summary && <BatchSummaryCards summary={{ ...summary }} />}
             <SimpleGrid columns={{ base: 1, lg: 2 }} gap={4} mt={4}>
               <BaseDistributionChart
                 title="BPI分布"
                 data={bpiData}
                 isLoading={isLoading}
                 getColor={getBpiColor}
-                isRotated={true}
+                isRotated
               />
               <BaseDistributionChart
                 title="ランク分布"
                 data={rankData}
                 isLoading={isLoading}
-                getColor={(label) => RANK_COLORS[label] || "gray.500"}
+                getColor={(l) => RANK_COLORS[l]}
               />
             </SimpleGrid>
             <LogRank details={details.songs} type="top" />
             <LogRank details={details.songs} type="growth" />
           </Tabs.Content>
 
-          <Tabs.Content value="songs" p={0}>
+          <Tabs.Content value="songs" p={0} mt={4}>
             <BatchSongsTable songs={details.songs} />
           </Tabs.Content>
         </Tabs.Root>

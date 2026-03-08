@@ -3,39 +3,76 @@ import {
   HStack,
   VStack,
   Skeleton,
+  SkeletonCircle,
   SimpleGrid,
   Box,
+  Badge,
 } from "@chakra-ui/react";
 
 export const LogsCardSkeleton = () => {
   return (
-    <Card.Root bg="gray.950" borderColor="gray.900" p={4} w="full" mb={4}>
+    <Card.Root bg="gray.950" borderColor="gray.900" p={4} w="full">
       <Card.Body p={0}>
-        <HStack justify="space-between" mb={3} align="start">
+        <HStack justify="space-between" mb={3}>
           <VStack align="start" gap={2}>
-            <Skeleton h="12px" w="100px" />
-            <HStack gap={2}>
-              <Skeleton h="24px" w="60px" />
-              <Skeleton h="20px" w="100px" borderRadius="full" />
-            </HStack>
+            <Skeleton h="12px" w="120px" />
+            <Skeleton h="20px" w="80px" />
           </VStack>
-          <Skeleton h="32px" w="80px" borderRadius="md" />
+          <Skeleton h="32px" w="100px" borderRadius="md" />
         </HStack>
-
-        <Skeleton h="1px" w="full" mb={3} />
-
         <VStack align="stretch" gap={2}>
-          <Skeleton h="10px" w="80px" />
           <SimpleGrid columns={{ base: 1, md: 2 }} gap={2}>
-            {[1, 2, 3, 4].map((i) => (
-              <HStack key={i} bg="whiteAlpha.50" p={2} borderRadius="sm">
-                <Skeleton h="12px" flex={1} />
-                <Skeleton h="12px" w="30px" />
-              </HStack>
+            {[1, 2].map((i) => (
+              <Skeleton key={i} h="32px" w="full" borderRadius="sm" />
             ))}
           </SimpleGrid>
         </VStack>
       </Card.Body>
     </Card.Root>
+  );
+};
+
+export const LogsGroupSkeleton = () => {
+  return (
+    <Box position="relative">
+      <HStack gap={4} mb={4} position="relative" zIndex={1}>
+        <SkeletonCircle size="12px" display={{ base: "none", md: "block" }} />
+        <Skeleton h="24px" w="180px" />
+        <Skeleton h="20px" w="60px" borderRadius="full" />
+      </HStack>
+
+      <Box
+        bg="bg.muted/50"
+        p={4}
+        borderRadius="lg"
+        mb={4}
+        ml={{ base: 0, md: 8 }}
+        borderWidth="1px"
+        borderColor="border/50"
+      >
+        <HStack justify="space-between">
+          <HStack gap={8}>
+            <VStack align="start" gap={2}>
+              <Skeleton h="10px" w="60px" />
+              <Skeleton h="20px" w="100px" />
+            </VStack>
+            <VStack align="start" gap={2}>
+              <Skeleton h="10px" w="60px" />
+              <Skeleton h="20px" w="80px" />
+            </VStack>
+          </HStack>
+          <Skeleton
+            h="32px"
+            w="120px"
+            display={{ base: "none", sm: "block" }}
+          />
+        </HStack>
+      </Box>
+
+      <VStack align="stretch" gap={3} ml={{ base: 0, md: 8 }}>
+        <LogsCardSkeleton />
+        <LogsCardSkeleton />
+      </VStack>
+    </Box>
   );
 };

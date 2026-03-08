@@ -16,7 +16,7 @@ export const PageHeader = ({ title, description }: PageHeaderProps) => (
 );
 
 export const PageContainer = ({ children }: { children: ReactNode }) => (
-  <Container maxW="6xl" mx="auto" px={2} py={4}>
+  <Container maxW="svw" mx="auto" px={{ base: 3, md: 8, lg: 16 }} py={4}>
     {children}
   </Container>
 );

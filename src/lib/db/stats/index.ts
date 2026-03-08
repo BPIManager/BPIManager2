@@ -2,6 +2,18 @@ import { db } from "@/lib/db";
 import { sql } from "kysely";
 
 export class StatsRepository {
+  async getLatestTotalBpi(userId: string, version: string): Promise<number> {
+    const result = await db
+      .selectFrom("logs")
+      .select("totalBpi")
+      .where("userId", "=", userId)
+      .where("version", "=", version)
+      .orderBy("createdAt", "desc")
+      .executeTakeFirst();
+
+    return result ? Number(result.totalBpi) : -15;
+  }
+
   /**
    * AAA達成難易度表用：楽曲マスタ、BPI定義、ユーザーの最新スコアを取得
    */
@@ -82,10 +94,19 @@ export class StatsRepository {
   /**
    * 指定ユーザー・バージョンの「各曲の最新スコア」を楽曲マスタ情報付きで取得
    */
-  async getLatestScoresWithMusicData(userId: string, version: string) {
-    return await db
+  async getLatestScoresWithMusicData(
+    userId: string,
+    version: string,
+    levels?: number[],
+    difficulties?: string[],
+  ) {
+    let query = db
       .selectFrom("scores as s")
       .innerJoin("songs as m", "s.songId", "m.songId")
+      // ★ songDef を結合してマスターデータを取得
+      .innerJoin("songDef as d", (join) =>
+        join.onRef("d.songId", "=", "m.songId").on("d.isCurrent", "=", 1),
+      )
       .innerJoin(
         (qb) =>
           qb
@@ -111,10 +132,25 @@ export class StatsRepository {
         "s.lastPlayed",
         "m.title",
         "m.notes",
+        "m.bpm",
         "m.difficulty",
         "m.difficultyLevel",
+        "m.releasedVersion",
+        "d.wrScore",
+        "d.kaidenAvg",
+        "d.coef",
       ])
-      .execute();
+      .where("s.userId", "=", userId)
+      .where("s.version", "=", version);
+
+    if (levels && levels.length > 0) {
+      query = query.where("m.difficultyLevel", "in", levels);
+    }
+    if (difficulties && difficulties.length > 0) {
+      query = query.where("m.difficulty", "in", difficulties);
+    }
+
+    return await query.execute();
   }
 
   async getScoreHistory(

@@ -104,7 +104,7 @@ export const AdvancedFilterModal = ({
         p={4}
       >
         <DialogHeader>
-          <DialogTitle fontSize="md" fontWeight="black">
+          <DialogTitle fontSize="md" fontWeight="bold">
             詳細フィルター
           </DialogTitle>
         </DialogHeader>
@@ -113,7 +113,7 @@ export const AdvancedFilterModal = ({
         <DialogBody py={2}>
           <Stack gap={6}>
             <VStack align="start" gap={3}>
-              <Text fontSize="xs" fontWeight="black" color="blue.500">
+              <Text fontSize="xs" fontWeight="bold" color="blue.500">
                 BPM範囲
               </Text>
               <HStack w="full" gap={4}>
@@ -158,7 +158,7 @@ export const AdvancedFilterModal = ({
             <Separator opacity={0.1} />
 
             <VStack align="start" gap={3}>
-              <Text fontSize="xs" fontWeight="black" color="blue.500">
+              <Text fontSize="xs" fontWeight="bold" color="blue.500">
                 ランプ状態
               </Text>
               <SimpleGrid columns={2} gap={3} w="full">
@@ -180,7 +180,7 @@ export const AdvancedFilterModal = ({
             <Separator opacity={0.1} />
 
             <VStack align="start" gap={3}>
-              <Text fontSize="xs" fontWeight="black" color="blue.500">
+              <Text fontSize="xs" fontWeight="bold" color="blue.500">
                 最終更新日
               </Text>
               <HStack wrap="wrap" gap={2}>
@@ -272,7 +272,7 @@ export const AdvancedFilterModal = ({
             <Separator opacity={0.1} />
 
             <VStack align="start" gap={3} w="full">
-              <Text fontSize="xs" fontWeight="black" color="blue.500">
+              <Text fontSize="xs" fontWeight="bold" color="blue.500">
                 楽曲バージョン
               </Text>
               <Box w="full" maxH="200px" overflowY="auto" pr={2}>

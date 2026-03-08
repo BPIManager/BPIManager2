@@ -136,7 +136,7 @@ export const SongHistoryTab = ({ songId }: SongHistoryTabProps) => {
                         <HStack align="baseline" gap={1.5}>
                           <Text
                             fontSize="md"
-                            fontWeight="black"
+                            fontWeight="bold"
                             color={isGlobalBest ? "yellow.200" : "white"}
                             letterSpacing="tight"
                           >
@@ -153,7 +153,7 @@ export const SongHistoryTab = ({ songId }: SongHistoryTabProps) => {
                       </VStack>
 
                       <VStack align="end" gap={0.5}>
-                        <Text fontSize="xs" fontWeight="black" color="gray.300">
+                        <Text fontSize="xs" fontWeight="bold" color="gray.300">
                           {record.clearState || "NO PLAY"}
                         </Text>
                         {record.missCount !== null && (

@@ -1,3 +1,4 @@
+import { BpiCalculator } from "@/lib/bpi";
 import { fetcher } from "@/utils/common/fetch";
 import useSWR from "swr";
 
@@ -14,6 +15,7 @@ export interface DJRankInfo {
 export interface BatchRef {
   batchId: string;
   createdAt: string;
+  totalBpi?: number;
 }
 
 export interface BatchDetailItem {
@@ -21,6 +23,7 @@ export interface BatchDetailItem {
   title: string;
   notes: number;
   difficulty: string;
+  difficultyLevel: number;
   level: number;
   current: {
     exScore: number;
@@ -50,26 +53,46 @@ export interface BatchDetailResponse {
     prev: BatchRef | null;
     next: BatchRef | null;
     current: BatchRef;
+    dailyBatchIds: string[];
+    dailyBatchCount: number;
   };
 }
 
-export const useBatchDetails = (
+export interface LogsDetailResponse extends BatchDetailResponse {
+  pagination: BatchDetailResponse["pagination"] & {
+    prevDate: string | null;
+    nextDate: string | null;
+  };
+}
+
+export const useLogsDetail = (
   userId: string | undefined,
   version: string | undefined,
-  batchId: string | undefined,
+  { batchId, date }: { batchId?: string; date?: string },
 ) => {
-  const { data, error, isLoading } = useSWR<BatchDetailResponse>(
-    userId && batchId ? `/api/${userId}/logs/${version}/${batchId}` : null,
+  const endpoint = batchId
+    ? `/api/${userId}/logs/${version}/${batchId}`
+    : date
+      ? `/api/${userId}/logs/${version}/daily/${date}`
+      : null;
+
+  const { data, error, isLoading } = useSWR<LogsDetailResponse>(
+    endpoint,
     fetcher,
   );
 
   const summary = data
     ? {
-        avgBpiDiff:
-          data.songs.length > 0
-            ? data.songs.reduce((acc, item) => acc + item.diff.bpi, 0) /
-              data.songs.length
-            : 0,
+        batchPerformance: (() => {
+          const lv12Bpis = data.songs
+            .filter((s) => s.difficultyLevel === 12)
+            .map((s) => s.current?.bpi)
+            .filter((b): b is number => typeof b === "number");
+
+          return lv12Bpis.length > 0
+            ? BpiCalculator.calculateTotalBPI(lv12Bpis, lv12Bpis.length)
+            : -15;
+        })(),
         newRecords: data.songs.filter((item) => !item.previous).length,
         updatedScores: data.songs.filter((item) => item.previous).length,
       }

@@ -29,6 +29,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { Avatar } from "@/components/ui/avatar";
 import { LuLayoutDashboard } from "react-icons/lu";
+import { latestVersion } from "@/constants/latestVersion";
 
 export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
   const { user, fbUser } = useUser();
@@ -37,7 +38,11 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
     { label: "ダッシュボード", icon: LuLayoutDashboard, href: "/" },
     { label: "インポート", icon: FileUp, href: "/import" },
     { label: "スコア一覧", icon: ListIcon, href: "/my" },
-    { label: "スコア更新ログ", icon: ScrollText, href: "/logs" },
+    {
+      label: "スコア更新ログ",
+      icon: ScrollText,
+      href: `/user/${user?.userId}/logs/${latestVersion}`,
+    },
     {
       label: "フォロータイムライン",
       icon: ChartNoAxesGantt,
@@ -78,44 +83,24 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
           </Box>
           <Separator colorPalette="gray" opacity={0.5} />
           {user?.userId && (
-            <HStack gap={4} justify="start">
-              <Link
-                href={`/profile/${user?.userId}/following`}
-                onClick={onClose}
-              >
-                <VStack
-                  gap={0}
-                  align="start"
-                  _hover={{ color: "blue.400" }}
-                  transition="color 0.2s"
-                >
-                  <Text fontSize="xs" fontWeight="bold">
-                    {user?.followingCount ?? 0}
-                  </Text>
-                  <Text fontSize="2xs" color="fg.muted">
-                    フォロー中
-                  </Text>
-                </VStack>
-              </Link>
+            <HStack gap={4} justify="start" opacity={0.6} cursor="default">
+              <VStack gap={0} align="start">
+                <Text fontSize="xs" fontWeight="bold">
+                  {user?.followingCount ?? 0}
+                </Text>
+                <Text fontSize="2xs" color="fg.muted">
+                  フォロー中
+                </Text>
+              </VStack>
 
-              <Link
-                href={`/profile/${user?.userId}/followers`}
-                onClick={onClose}
-              >
-                <VStack
-                  gap={0}
-                  align="start"
-                  _hover={{ color: "blue.400" }}
-                  transition="color 0.2s"
-                >
-                  <Text fontSize="xs" fontWeight="bold">
-                    {user?.followerCount ?? 0}
-                  </Text>
-                  <Text fontSize="2xs" color="fg.muted">
-                    フォロワー
-                  </Text>
-                </VStack>
-              </Link>
+              <VStack gap={0} align="start">
+                <Text fontSize="xs" fontWeight="bold">
+                  {user?.followerCount ?? 0}
+                </Text>
+                <Text fontSize="2xs" color="fg.muted">
+                  フォロワー
+                </Text>
+              </VStack>
             </HStack>
           )}
         </VStack>

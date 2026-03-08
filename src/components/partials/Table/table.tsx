@@ -9,7 +9,6 @@ import {
   GridItem,
 } from "@chakra-ui/react";
 import { SongWithScore } from "@/types/songs/withScore";
-import { clear } from "console";
 import { getDJRank } from "@/utils/songs/djRank";
 
 export const diffColors: Record<string, string> = {

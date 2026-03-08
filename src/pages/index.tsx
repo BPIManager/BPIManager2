@@ -5,6 +5,7 @@ import {
   VStack,
   Spinner,
   Center,
+  Box,
 } from "@chakra-ui/react";
 import { DashboardLayout } from "@/components/partials/Main";
 import { useUser } from "@/contexts/users/UserContext";
@@ -18,6 +19,7 @@ import { BpiDistributionSection } from "@/components/partials/DashBoard/BPIDistr
 import { FilterProvider } from "@/contexts/stats/FilterContext";
 import { TotalBPIHistory } from "@/components/partials/DashBoard/TotalBPIHistory/ui";
 import { PageContainer, PageHeader } from "@/components/partials/Header";
+import { RankingTabsCard } from "@/components/partials/DashBoard/RecommendedCard/ui";
 
 export default function DashboardPage() {
   const { user, isLoading: isUserLoading, fbUser } = useUser();
@@ -43,14 +45,26 @@ export default function DashboardPage() {
           <VStack align="stretch" gap={6}>
             <DashBoardFilter />
 
-            <ActivitySection userId={fbUser.uid} />
+            <SimpleGrid columns={{ base: 1, lg: 4 }} gap={6} alignItems="start">
+              <VStack align="stretch" gap={6} gridColumn={{ lg: "span 3" }}>
+                <ActivitySection userId={fbUser.uid} />
 
-            <SimpleGrid columns={{ base: 1, md: 2 }} gap={6}>
-              <RankDistributionSection userId={fbUser.uid} />
-              <BpiDistributionSection userId={fbUser.uid} />
+                <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
+                  <RankDistributionSection userId={fbUser.uid} />
+                  <BpiDistributionSection userId={fbUser.uid} />
+                </SimpleGrid>
+                <TotalBPIHistory userId={fbUser.uid} />
+              </VStack>
+
+              <Box
+                gridColumn={{ lg: "span 1" }}
+                position={{ lg: "sticky" }}
+                top={{ lg: "20px" }}
+                h="full"
+              >
+                <RankingTabsCard userId={fbUser.uid} />
+              </Box>
             </SimpleGrid>
-
-            <TotalBPIHistory userId={fbUser.uid} />
           </VStack>
         </PageContainer>
       </DashboardLayout>

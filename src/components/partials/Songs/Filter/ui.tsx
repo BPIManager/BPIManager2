@@ -130,7 +130,7 @@ export const SongFilterBar = ({
           <Text
             fontSize="10px"
             color="gray.500"
-            fontWeight="black"
+            fontWeight="bold"
             letterSpacing="widest"
           >
             LEVEL
@@ -158,7 +158,7 @@ export const SongFilterBar = ({
           <Text
             fontSize="10px"
             color="gray.500"
-            fontWeight="black"
+            fontWeight="bold"
             letterSpacing="widest"
           >
             DIFFICULTY
@@ -186,7 +186,7 @@ export const SongFilterBar = ({
       <Separator opacity={0.1} mt={3} />
 
       <HStack justify="space-between" align="center" mt={3}>
-        <Text fontSize="12px" fontWeight="black" color="blue.500">
+        <Text fontSize="12px" fontWeight="bold" color="blue.500">
           {totalCount.toLocaleString()} 曲見つかりました
         </Text>
         <HStack color="gray.400" gap={1}>

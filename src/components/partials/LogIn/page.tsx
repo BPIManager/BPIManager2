@@ -1,6 +1,5 @@
 import { LoginButtons } from "@/components/partials/LogIn";
 import {
-  Container,
   Heading,
   Text,
   VStack,
@@ -11,15 +10,16 @@ import {
   HStack,
   Stack,
   Separator,
+  Link,
 } from "@chakra-ui/react";
 import {
-  Zap,
   Database,
   BarChart3,
   ArrowRightLeft,
   ShieldCheck,
   Cpu,
   UsersIcon,
+  Wrench,
 } from "lucide-react";
 import { Meta } from "../Head";
 import { DashboardLayout } from "../Main";
@@ -30,14 +30,14 @@ export default function LoginPage() {
     <DashboardLayout>
       <Meta
         title=""
-        description="beatmania IIDX 上級者のためのクラウドベース・スコアマネジメントプラットフォーム"
+        description="beatmania IIDX 上級者のためのスコアマネジメントツール"
       />
       <Box bg="black" minH="100svh" color="white" py={20}>
         <PageContainer>
           <VStack gap={6} textAlign="center" mb={16}>
             <Heading
               fontSize={{ base: "4xl", md: "6xl" }}
-              fontWeight="black"
+              fontWeight="bold"
               letterSpacing="tighter"
               lineHeight="1"
               bgGradient="to-br"
@@ -52,8 +52,7 @@ export default function LoginPage() {
               fontSize={{ base: "md", md: "md" }}
               maxW="2xl"
             >
-              beatmania IIDX
-              上級者のためのクラウドベース・スコアマネジメントプラットフォーム
+              beatmania IIDX 上級者のためのスコアマネジメントツール
             </Text>
           </VStack>
 
@@ -75,8 +74,21 @@ export default function LoginPage() {
                 </Text>
               </VStack>
               <LoginButtons />
-              <Text fontSize="12px" color="gray.600" textAlign="center">
-                ログインすることで利用規約に同意したものとみなされます
+              <Text fontSize="12px" color="gray.200" textAlign="center">
+                本ツールは現在ベータ版提供です。
+                <br />
+                安定版としては
+                <Link
+                  href="https://bpi.poyashi.me"
+                  target="_blank"
+                  textDecoration={"underline"}
+                  fontWeight={"bold"}
+                >
+                  BPIM
+                </Link>
+                をご利用ください
+                <br />
+                (BPIM→BPIM2のデータ移行はいつでも可能です)
               </Text>
             </VStack>
           </Box>
@@ -88,10 +100,65 @@ export default function LoginPage() {
             mb={10}
             textAlign="center"
             letterSpacing="widest"
-            fontWeight="black"
+            fontWeight="bold"
           >
             BPIM2って？
           </Heading>
+          <Box
+            maxW="full"
+            mx="auto"
+            p={{ base: 6, md: 8 }}
+            borderRadius="2xl"
+            bg="gray.950"
+            border="1px solid"
+            borderColor="whiteAlpha.200"
+            mb={12}
+          >
+            <Stack
+              direction={{ base: "column", md: "row" }}
+              gap={{ base: 6, md: 8 }}
+              align="start"
+            >
+              <Box
+                p={4}
+                bg="blue.500/10"
+                borderRadius="xl"
+                color="blue.400"
+                flexShrink={0}
+              >
+                <Icon as={BarChart3} boxSize={8} />
+              </Box>
+
+              <VStack align="start" gap={4} flex={1}>
+                <Text fontWeight="bold" fontSize="lg" color="white">
+                  BPIとは
+                </Text>
+
+                <Text fontSize="sm" color="gray.300" lineHeight="tall">
+                  beatmania IIDXのスコアを統計的に算出し、
+                  皆伝平均を0、歴代全一を100として現在の実力を可視化する指標です。
+                  <br />
+                  詳細はnorimiso氏による「
+                  <Link
+                    href="http://norimiso.web.fc2.com/aboutBPI.html"
+                    target="_blank"
+                    color="blue.400"
+                    textDecoration="underline"
+                    display="inline"
+                  >
+                    BPIについて
+                  </Link>
+                  」をご参照ください。
+                </Text>
+
+                <Separator opacity={0.1} />
+
+                <Text fontSize="sm" color="gray.300" flex={1}>
+                  なお、BPIM及びBPIM2では、従来固定値(1.5)だった譜面係数を、実際のプレイデータに基づくユーザー分布から動的に算出しています。
+                </Text>
+              </VStack>
+            </Stack>
+          </Box>
 
           <SimpleGrid columns={{ base: 1, md: 3 }} gap={8}>
             <FeatureCard
@@ -110,7 +177,7 @@ export default function LoginPage() {
               description="アリーナランク別平均や横断指標など、設計を一新したことで、従来にない高度な分析を提供します。"
             />
             <FeatureCard
-              icon={BarChart3}
+              icon={Wrench}
               title="Developer API"
               description="REST APIを公開しており、自分の、あるいは公開されているライバルのデータを自由に外部から解析できます。"
             />
@@ -147,17 +214,11 @@ const FeatureCard = ({
     borderRadius="xl"
     border="1px solid"
     borderColor="whiteAlpha.100"
-    transition="all 0.3s"
-    _hover={{
-      transform: "translateY(-5px)",
-      borderColor: "blue.500/50",
-      bg: "whiteAlpha.100",
-    }}
   >
     <Box p={3} bg="blue.500/10" borderRadius="lg" color="blue.400" mb={2}>
       <Icon as={icon} size={"xl"} />
     </Box>
-    <Text fontWeight="black" fontSize="md" color="white">
+    <Text fontWeight="bold" fontSize="md" color="white">
       {title}
     </Text>
     <Text fontSize="xs" color="gray.500" lineHeight="tall">

@@ -64,7 +64,7 @@ export const LogRank = ({
           <Icon as={config.icon} color={config.accentColor} />
           <Text
             fontSize="sm"
-            fontWeight="black"
+            fontWeight="bold"
             color="gray.200"
             letterSpacing="widest"
           >

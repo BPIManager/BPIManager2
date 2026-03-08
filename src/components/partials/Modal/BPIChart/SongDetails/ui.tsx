@@ -114,7 +114,7 @@ export const SongDetailView = ({
               <Text fontSize="xs" color="gray.500" fontWeight="bold">
                 EX SCORE
               </Text>
-              <Text fontSize="md" fontWeight="black" color="white">
+              <Text fontSize="md" fontWeight="bold" color="white">
                 {(song.exScore ?? 0).toLocaleString()}
               </Text>
               <Text fontSize="10px" color="gray.200" mt={1}>
@@ -129,7 +129,7 @@ export const SongDetailView = ({
               <Text fontSize="xs" color="gray.500" fontWeight="bold">
                 BPI
               </Text>
-              <Text fontSize="md" fontWeight="black" color="blue.300">
+              <Text fontSize="md" fontWeight="bold" color="blue.300">
                 {song.bpi !== null ? song.bpi.toFixed(2) : "-"}
               </Text>
               <Text fontSize="10px" color="gray.200" mt={1}>
@@ -142,7 +142,7 @@ export const SongDetailView = ({
               <Text fontSize="xs" color="gray.500" fontWeight="bold">
                 DJ RANK
               </Text>
-              <Text fontSize="md" fontWeight="black" color="yellow.400">
+              <Text fontSize="md" fontWeight="bold" color="yellow.400">
                 {rankInfo.label === "MAX-" ? (
                   <>MAX - {maxScore - currentEx}</>
                 ) : (

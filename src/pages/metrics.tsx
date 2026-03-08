@@ -24,7 +24,7 @@ export default function SettingsPage() {
           title="AAA達成難易度表"
           subtitle={
             <>
-              BPIに基づくAAA達成難易度またはMAX-達成難易度を表敬式で表示します。
+              BPIに基づくAAA達成難易度・MAX-達成難易度表と達成状況を表示します。
             </>
           }
           iconColor="blue.400"

@@ -86,7 +86,7 @@ export const AAAGridItem = ({
               >
                 TARGET BPI
               </Text>
-              <Text fontSize="sm" fontWeight="black">
+              <Text fontSize="sm" fontWeight="bold">
                 {targetBpi.toFixed(2)}
               </Text>
             </VStack>
@@ -100,7 +100,7 @@ export const AAAGridItem = ({
               >
                 MY BPI
               </Text>
-              <Text fontSize="sm" fontWeight="black">
+              <Text fontSize="sm" fontWeight="bold">
                 {item.user.exScore > 0 ? userBpi.toFixed(2) : "-"}
               </Text>
             </VStack>

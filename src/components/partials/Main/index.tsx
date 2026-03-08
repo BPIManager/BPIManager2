@@ -55,7 +55,7 @@ export const DashboardLayout = ({
             >
               <Menu />
             </IconButton>
-            <Text fontWeight="black" fontSize="xl">
+            <Text fontWeight="bold" fontSize="xl">
               BPIM2
             </Text>
           </HStack>

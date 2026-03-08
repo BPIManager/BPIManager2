@@ -7,9 +7,9 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const { userId, version, batchId } = req.query;
+  const { userId, version, date } = req.query;
 
-  if (!userId || !version || !batchId) {
+  if (!userId || !version || !date) {
     return res.status(400).json({ message: "Parameters are missing." });
   }
 
@@ -21,44 +21,49 @@ export default async function handler(
         .json({ message: access.error!.message });
     }
 
-    const targetBatch = await db
+    const dailyBatches = await db
       .selectFrom("logs")
       .select(["batchId", "createdAt", "totalBpi"])
-      .where("batchId", "=", batchId as string)
-      .executeTakeFirst();
+      .where("userId", "=", userId as string)
+      .where("version", "=", version as string)
+      .where(sql`DATE(createdAt)`, "=", date as string)
+      .orderBy("createdAt", "asc")
+      .execute();
 
-    if (!targetBatch) {
-      return res.status(404).json({ message: "Batch not found." });
+    if (dailyBatches.length === 0) {
+      return res.status(404).json({ message: "No logs found for this date." });
     }
 
-    const batchCreatedAt = targetBatch.createdAt;
+    const firstBatchCreatedAt = dailyBatches[0].createdAt;
+    const lastBatch = dailyBatches[dailyBatches.length - 1];
+    const dailyBatchIds = dailyBatches.map((b) => b.batchId);
 
-    const [prevBatch, nextBatch, sameDayBatches] = await Promise.all([
-      db
-        .selectFrom("logs")
-        .select(["batchId", "createdAt", "totalBpi"])
-        .where("userId", "=", userId as string)
-        .where("version", "=", version as string)
-        .where("createdAt", "<", batchCreatedAt)
-        .orderBy("createdAt", "desc")
-        .executeTakeFirst(),
-      db
-        .selectFrom("logs")
-        .select(["batchId", "createdAt", "totalBpi"])
-        .where("userId", "=", userId as string)
-        .where("version", "=", version as string)
-        .where("createdAt", ">", batchCreatedAt)
-        .orderBy("createdAt", "asc")
-        .executeTakeFirst(),
-      db
-        .selectFrom("logs")
-        .select(["batchId", "createdAt"])
-        .where("userId", "=", userId as string)
-        .where("version", "=", version as string)
-        .where(sql`DATE(createdAt)`, "=", sql`DATE(${batchCreatedAt})`)
-        .orderBy("createdAt", "asc")
-        .execute(),
-    ]);
+    const prevBatch = await db
+      .selectFrom("logs")
+      .select(["batchId", "createdAt", "totalBpi"])
+      .where("userId", "=", userId as string)
+      .where("version", "=", version as string)
+      .where("createdAt", "<", firstBatchCreatedAt)
+      .orderBy("createdAt", "desc")
+      .executeTakeFirst();
+
+    const nextDayBatch = await db
+      .selectFrom("logs")
+      .select([sql`DATE(createdAt)`.as("nextDate")])
+      .where("userId", "=", userId as string)
+      .where("version", "=", version as string)
+      .where(sql`DATE(createdAt)`, ">", date as string)
+      .orderBy("createdAt", "asc")
+      .executeTakeFirst();
+
+    const prevDayBatch = await db
+      .selectFrom("logs")
+      .select([sql`DATE(createdAt)`.as("prevDate")])
+      .where("userId", "=", userId as string)
+      .where("version", "=", version as string)
+      .where(sql`DATE(createdAt)`, "<", date as string)
+      .orderBy("createdAt", "desc")
+      .executeTakeFirst();
 
     const results = await db
       .selectFrom("scores as current")
@@ -74,7 +79,7 @@ export default async function handler(
               .select((eb) => eb.fn.max("sub.logId").as("maxLogId"))
               .whereRef("sub.songId", "=", "current.songId")
               .where("sub.userId", "=", userId as string)
-              .where("sub.createdAt", "<", batchCreatedAt),
+              .where("sub.createdAt", "<", firstBatchCreatedAt),
           ),
       )
       .leftJoin(
@@ -86,7 +91,6 @@ export default async function handler(
               "difficulty as l_defDiff",
               (eb) => eb.fn.max("defId").as("maxDefId"),
             ])
-            //.where("updatedAt", "<=", batchCreatedAt)
             .where("isCurrent", "=", 1)
             .groupBy(["songId", "difficulty"])
             .as("latest_sd"),
@@ -117,8 +121,15 @@ export default async function handler(
         "sd.kaidenAvg",
         "sd.coef",
       ])
-      .where("current.batchId", "=", batchId as string)
+      .where("current.batchId", "in", dailyBatchIds)
       .where("current.userId", "=", userId as string)
+      .where("current.logId", "in", (qb) =>
+        qb
+          .selectFrom("scores")
+          .select((eb) => eb.fn.max("logId").as("logId"))
+          .where("batchId", "in", dailyBatchIds)
+          .groupBy("songId"),
+      )
       .orderBy("s.difficultyLevel", "desc")
       .orderBy("s.title", "asc")
       .execute();
@@ -163,7 +174,6 @@ export default async function handler(
               ? Math.round((currentBpi - prevBpi) * 100) / 100
               : Math.round((currentBpi + 15) * 100) / 100,
         },
-
         wrScore: row.wrScore,
         kaidenAvg: row.kaidenAvg,
         coef: row.coef,
@@ -174,14 +184,16 @@ export default async function handler(
       songs,
       pagination: {
         prev: prevBatch || null,
-        next: nextBatch || null,
-        current: targetBatch,
-        dailyBatchIds: sameDayBatches.map((b) => b.batchId),
-        dailyBatchCount: sameDayBatches.length,
+        next: null,
+        current: lastBatch,
+        dailyBatchIds: dailyBatchIds,
+        dailyBatchCount: dailyBatchIds.length,
+        prevDate: prevDayBatch?.prevDate || null,
+        nextDate: nextDayBatch?.nextDate || null,
       },
     });
   } catch (error: any) {
-    console.error("Batch details error:", error);
+    console.error("Daily details error:", error);
     return res.status(500).json({ message: error.message });
   }
 }
