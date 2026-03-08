@@ -1,3 +1,4 @@
+import { useUser } from "@/contexts/users/UserContext";
 import {
   Box,
   VStack,
@@ -17,6 +18,7 @@ interface Props {
 
 export const ImportSuccessModal = ({ result, version, onClose }: Props) => {
   const router = useRouter();
+  const { fbUser } = useUser();
   if (!result) return null;
 
   return (
@@ -58,7 +60,11 @@ export const ImportSuccessModal = ({ result, version, onClose }: Props) => {
             <Button
               colorPalette="blue"
               w="full"
-              onClick={() => router.push(`/logs/${version}/${result.batchId}`)}
+              onClick={() =>
+                router.push(
+                  `/user/${fbUser?.uid}/logs/${version}/${result.batchId}`,
+                )
+              }
             >
               今回の更新ログを確認する
             </Button>
