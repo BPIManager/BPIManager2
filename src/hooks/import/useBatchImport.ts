@@ -60,6 +60,7 @@ export const useBatchImport = (fbUser: any, refresh: () => Promise<void>) => {
           type: "info",
         });
       }
+      await navigator.clipboard.writeText("");
 
       await refresh();
       return true;

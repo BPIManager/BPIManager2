@@ -56,7 +56,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
     { label: "設定", icon: Settings, href: "/settings" },
   ];
   return (
-    <VStack align="stretch" h="full" p={4} gap={6}>
+    <VStack align="stretch" p={4} gap={6} h="full" minH="0" overflowY="auto">
       <Box p={4} borderRadius="xl" color="white">
         <VStack gap={3} align="start">
           <Avatar
