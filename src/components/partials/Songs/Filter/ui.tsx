@@ -10,7 +10,13 @@ import {
   Flex,
   Spinner, // 追加
 } from "@chakra-ui/react";
-import { LuSearch, LuSlidersHorizontal, LuClock } from "react-icons/lu";
+import {
+  LuSearch,
+  LuSlidersHorizontal,
+  LuClock,
+  LuPin,
+  LuPinOff,
+} from "react-icons/lu";
 import { InputGroup } from "@/components/ui/input-group";
 import { FormSelect } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -35,6 +41,7 @@ export const SongFilterBar = ({
   totalCount,
 }: SongFilterBarProps) => {
   const router = useRouter();
+  const [isSticky, setIsSticky] = useState(true);
 
   const [localSearch, setLocalSearch] = useState(params.search || "");
   const isTyping = localSearch !== (params.search || "");
@@ -66,7 +73,7 @@ export const SongFilterBar = ({
       p={4}
       borderBottomWidth="1px"
       bg="gray.950"
-      position="sticky"
+      position={isSticky ? "sticky" : "relative"}
       top={0}
       zIndex={10}
     >
@@ -185,6 +192,16 @@ export const SongFilterBar = ({
         <HStack color="gray.400" gap={1}>
           <LuClock size={12} />
           <Text fontSize="12px">最終更新: </Text>
+          <IconButton
+            variant="ghost"
+            size="xs"
+            color={isSticky ? "blue.400" : "gray.500"}
+            aria-label="Toggle Sticky"
+            onClick={() => setIsSticky(!isSticky)}
+            _hover={{ bg: "whiteAlpha.200" }}
+          >
+            {isSticky ? <LuPin size={14} /> : <LuPinOff size={14} />}
+          </IconButton>
         </HStack>
       </HStack>
     </Box>
