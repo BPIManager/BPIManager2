@@ -77,7 +77,9 @@ export default function UserPage({
     );
   }
 
-  const bpiValue = profile.current?.totalBpi?.toFixed(2) ?? "N/A";
+  const bpiValue = profile.current
+    ? Number(profile.current.totalBpi ?? -15).toFixed(2)
+    : "N/A";
   const arena = profile.current?.arenaRank ?? "N/A";
   const description = `IIDXID: ${profile.iidxId} / ${profile.userName}さんのプロフィール。総合BPI: ${bpiValue} / アリーナランク: ${arena} | ${profile.profileText || ""}`;
 

@@ -14,7 +14,7 @@ export const NoDataAlert = ({ data }: { data?: any[] }) => {
     >
       <b>おっと！まだデータが登録されていないようです...</b>
       <Text fontSize={"sm"} mt={2}>
-        「
+        これがあなたのプロフィールである場合は、「
         <Link textDecoration={"underline"} href="/import">
           インポート
         </Link>

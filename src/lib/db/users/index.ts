@@ -114,7 +114,7 @@ export class UsersRepository {
       } else {
         versionsMap.set(log.version, {
           version: log.version,
-          totalBpi: log.totalBpi,
+          totalBpi: Number(log.totalBpi),
           arenaRank: log.arenaRank ?? "N/A",
           updatedAt: log.updatedAt,
         });
