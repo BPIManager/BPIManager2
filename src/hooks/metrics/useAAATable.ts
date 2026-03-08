@@ -1,4 +1,5 @@
 import { fetcher } from "@/utils/common/fetch";
+import { useMemo } from "react";
 import useSWR from "swr";
 
 export type GroupingMode = "target" | "self";
@@ -40,25 +41,35 @@ export const useAAATable = (
     fetcher,
   );
 
-  const groupedData = data?.reduce(
-    (acc: Record<number, AAATableItem[]>, item) => {
-      let bpiValue: number;
+  const groupedData = useMemo(() => {
+    if (!data) return {};
 
-      if (mode === "self") {
-        bpiValue = item.user.bpi;
-      } else {
-        bpiValue = item.targets[goal].targetBpi ?? 0;
-      }
+    const sortedData = [...data].sort((a, b) => {
+      const bpiA = a.targets[goal].targetBpi ?? 0;
+      const bpiB = b.targets[goal].targetBpi ?? 0;
+      return bpiB - bpiA;
+    });
 
-      const bpiFloor = Math.floor(bpiValue / 10) * 10;
-      const key = Math.max(-10, Math.min(90, bpiFloor));
+    return sortedData.reduce(
+      (acc: Record<number, AAATableItem[]>, item) => {
+        let bpiValue: number;
 
-      if (!acc[key]) acc[key] = [];
-      acc[key].push(item);
-      return acc;
-    },
-    {} as Record<number, AAATableItem[]>,
-  );
+        if (mode === "self") {
+          bpiValue = item.user.bpi;
+        } else {
+          bpiValue = item.targets[goal].targetBpi ?? 0;
+        }
 
-  return { groupedData: groupedData || {}, isLoading, isError: error };
+        const bpiFloor = Math.floor(bpiValue / 10) * 10;
+        const key = Math.max(-10, Math.min(90, bpiFloor));
+
+        if (!acc[key]) acc[key] = [];
+        acc[key].push(item);
+        return acc;
+      },
+      {} as Record<number, AAATableItem[]>,
+    );
+  }, [data, goal, mode]);
+
+  return { groupedData, isLoading, isError: error };
 };
