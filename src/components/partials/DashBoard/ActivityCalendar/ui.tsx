@@ -9,7 +9,7 @@ export const ActivitySection = ({ userId }: { userId?: string }) => {
   const { activity, isLoading } = useActivity(userId, levels, diffs, version);
   if (isLoading) return <ActivityCalendarSkeleton />;
 
-  if (activity.length === 0) {
+  if (!activity || activity.length === 0) {
     return <NoDataAlert />;
   }
   return activity ? <ActivityCalendar data={activity} /> : null;

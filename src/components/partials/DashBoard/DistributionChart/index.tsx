@@ -56,6 +56,10 @@ export const BaseDistributionChart = ({
     );
   }
 
+  if (!data || data.length === 0) {
+    return null;
+  }
+
   return (
     <Box
       p={5}
