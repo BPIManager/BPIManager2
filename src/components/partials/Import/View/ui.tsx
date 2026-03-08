@@ -115,10 +115,7 @@ export const ImportView = (props: Props) => (
                       onClick={props.onStartImport}
                       disabled={props.isProcessing}
                     >
-                      <Upload />{" "}
-                      {props.csvData
-                        ? "インポートを開始"
-                        : "クリップボードから開始"}
+                      <Upload /> インポートを開始
                     </Button>
                   </HStack>
                 </Stack>
@@ -133,10 +130,12 @@ export const ImportView = (props: Props) => (
                   <AlertCircle size={18} style={{ marginTop: "2px" }} />
                   <VStack align="start" gap={0}>
                     <Text fontSize="xs" fontWeight="bold">
-                      注意事項
+                      Note
                     </Text>
                     <Text fontSize="xs" color="fg.muted">
-                      最大1分程度、算出に時間を要します。
+                      CSVデータはクリップボードから読み取ることもできます。
+                      <br />
+                      <b>データの更新には最大1分程度かかります。</b>
                     </Text>
                   </VStack>
                 </HStack>

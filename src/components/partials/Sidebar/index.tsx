@@ -7,6 +7,7 @@ import {
   Spacer,
   Separator,
   Badge,
+  Link as CLink,
 } from "@chakra-ui/react";
 import {
   Home,
@@ -20,6 +21,7 @@ import {
   StickyNote,
   UsersIcon,
   ScrollText,
+  Github,
 } from "lucide-react";
 import { useUser } from "@/contexts/users/UserContext";
 import { authActions } from "@/lib/firebase/auth";
@@ -160,6 +162,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
       </VStack>
 
       <Spacer />
+      <GitHubButton />
       {user?.userId && (
         <Button
           variant="ghost"
@@ -173,5 +176,40 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
         </Button>
       )}
     </VStack>
+  );
+};
+
+export const GitHubButton = () => {
+  return (
+    <Button
+      asChild
+      variant="outline"
+      size="sm"
+      colorPalette="gray"
+      borderRadius="full"
+      px={4}
+      bg="whiteAlpha.50"
+      _hover={{
+        bg: "whiteAlpha.200",
+        transform: "translateY(-1px)",
+        borderColor: "whiteAlpha.400",
+      }}
+      transition="all 0.2s"
+    >
+      <CLink
+        href="https://github.com/BPIManager/BPIManager2"
+        target="_blank"
+        rel="noopener noreferrer"
+        textDecoration="none"
+        display="flex"
+        alignItems="center"
+        gap={2}
+      >
+        <Github size={16} />
+        <Text fontSize="xs" fontWeight="bold">
+          Available on <Text as="span">GitHub</Text>
+        </Text>
+      </CLink>
+    </Button>
   );
 };

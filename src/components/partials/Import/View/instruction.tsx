@@ -22,7 +22,12 @@ export const InstructionSection = () => (
           step: 1,
           text: (
             <Text>
-              <Link target="_blank" textDecoration="underline" href={iidxUrl}>
+              <Link
+                target="_blank"
+                rel="noopener noreferrer"
+                textDecoration="underline"
+                href={iidxUrl}
+              >
                 IIDX公式サイト
               </Link>{" "}
               にアクセスしてCSVをダウンロードします。
