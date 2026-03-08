@@ -25,7 +25,7 @@ export const DashboardLayout = ({
   const [open, setOpen] = useState(false);
 
   return (
-    <Flex h="100vh" overflow="hidden" bg="bg.canvas">
+    <Flex h="100svh" overflow="hidden" bg="bg.canvas">
       <Box
         hideBelow="md"
         w="280px"

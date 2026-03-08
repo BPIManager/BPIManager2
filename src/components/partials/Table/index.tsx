@@ -50,7 +50,7 @@ export const SongsTable = ({
     );
 
   return (
-    <Container maxW="full" p={0} minH="100vh">
+    <Container maxW="full" p={0} minH="100svh">
       <SongFilterBar
         params={params}
         onParamsChange={updateParams}

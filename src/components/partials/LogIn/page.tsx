@@ -32,7 +32,7 @@ export default function LoginPage() {
         title=""
         description="beatmania IIDX 上級者のためのクラウドベース・スコアマネジメントプラットフォーム"
       />
-      <Box bg="black" minH="100vh" color="white" py={20}>
+      <Box bg="black" minH="100svh" color="white" py={20}>
         <PageContainer>
           <VStack gap={6} textAlign="center" mb={16}>
             <Heading
