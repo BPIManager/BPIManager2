@@ -92,7 +92,7 @@ export const SimpleRankItem = ({
             BPI
           </Text>
           <Text fontSize="sm" fontWeight="black" color="blue.300">
-            {item.current.bpi.toFixed(2)}
+            {(item.current.bpi ?? -15).toFixed(2)}
           </Text>
         </VStack>
       </HStack>
