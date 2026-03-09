@@ -10,6 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { SongWithScore } from "@/types/songs/withScore";
 import { getDJRank } from "@/utils/songs/djRank";
+import { RefObject } from "react";
 
 export const diffColors: Record<string, string> = {
   ANOTHER: "red.800",
@@ -61,13 +62,20 @@ const SongItem = ({
       background="whiteAlpha.200"
       boxShadow="sm"
       boxShadowColor={"whiteAlpha.400"}
-      borderLeftWidth="4px"
-      borderLeft="4px solid"
-      borderLeftColor={isFullCombo ? "transparent" : lampColor}
-      borderImageSource={
-        isFullCombo ? "linear-gradient(to bottom, #ff0000,  #8b00ff)" : "none"
-      }
-      borderImageSlice={isFullCombo ? 1 : "none"}
+      position="relative"
+      _before={{
+        content: '""',
+        position: "absolute",
+        left: 0,
+        top: 0,
+        bottom: 0,
+        width: "4px",
+
+        background: isFullCombo
+          ? "linear-gradient(to bottom, #ff0000, #8b00ff)"
+          : lampColor,
+        zIndex: 1,
+      }}
       mb={2}
     >
       <Grid templateColumns="1fr auto" gap={1}>
@@ -196,12 +204,14 @@ const SongItem = ({
 export const SongList = ({
   songs,
   onSongSelect,
+  listRef,
 }: {
   songs: SongWithScore[];
   onSongSelect: (s: SongWithScore) => void;
+  listRef?: RefObject<HTMLDivElement | null>;
 }) => {
   return (
-    <Box w="full" p={2}>
+    <Box w="full" p={2} ref={listRef ? listRef : null}>
       {songs.map((song) => (
         <SongItem
           key={`${song.songId}-${song.difficulty}`}

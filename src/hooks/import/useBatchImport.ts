@@ -8,6 +8,8 @@ export const useBatchImport = (fbUser: any, refresh: () => Promise<void>) => {
   const [importResult, setImportResult] = useState<{
     batchId: string;
     updatedCount: number;
+    newTotalBpi?: number;
+    previousTotalBpi?: number;
   } | null>(null);
 
   const runImport = async (csvData: string, version: string) => {
@@ -52,6 +54,8 @@ export const useBatchImport = (fbUser: any, refresh: () => Promise<void>) => {
         setImportResult({
           batchId: result.batchId,
           updatedCount: result.updatedCount,
+          previousTotalBpi: result.previousTotalBpi,
+          newTotalBpi: result.newTotalBpi,
         });
       } else {
         toaster.create({

@@ -56,6 +56,20 @@ export class BpiRepository {
       .execute();
   }
 
+  /**
+   * 指定したユーザー・バージョンの最新のバッチログを取得する
+   */
+  async getLatestTotalBpi(userId: string, version: string) {
+    return await db
+      .selectFrom("logs")
+      .select("totalBpi")
+      .where("userId", "=", userId)
+      .where("version", "=", version)
+      .orderBy("id", "desc")
+      .limit(1)
+      .executeTakeFirst();
+  }
+
   async saveImportResults(params: {
     userId: string;
     version: string;

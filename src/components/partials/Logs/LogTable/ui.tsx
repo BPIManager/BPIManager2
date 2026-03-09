@@ -1,14 +1,20 @@
 import { useSongFilter, PAGE_SIZE } from "@/hooks/table/useSongFilter";
 import { mapBatchToSongs } from "@/utils/logs/getSongTable";
 import { Box, useDisclosure } from "@chakra-ui/react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, RefObject } from "react";
 import { SongDetailView } from "../../Modal/BPIChart/SongDetails/ui";
 import { CustomPagination } from "../../Pagination/ui";
 import { AdvancedFilterModal } from "../../Songs/AdvancedFilter/ui";
 import { SongFilterBar } from "../../Songs/Filter/ui";
 import { SongList } from "../../Table/table";
 
-export const BatchSongsTable = ({ songs }: { songs: any[] }) => {
+export const BatchSongsTable = ({
+  songs,
+  listRef,
+}: {
+  songs: any[];
+  listRef?: RefObject<HTMLDivElement | null>;
+}) => {
   const [selectedSong, setSelectedSong] = useState<any>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
 
@@ -39,6 +45,7 @@ export const BatchSongsTable = ({ songs }: { songs: any[] }) => {
           setSelectedSong(song);
           setIsDetailOpen(true);
         }}
+        listRef={listRef}
       />
 
       <AdvancedFilterModal

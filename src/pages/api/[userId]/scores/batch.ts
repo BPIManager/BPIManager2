@@ -23,15 +23,17 @@ const handler = async (
   const batchId = uuidv4();
 
   try {
-    const [songMaster, existingScores] = await Promise.all([
+    const [songMaster, existingScores, lastLog] = await Promise.all([
       repository.getSongMasterWithDef(),
       repository.getLatestScores(userId, version),
+      repository.getLatestTotalBpi(userId, version),
     ]);
 
     const existingScoreMap = new Map(existingScores.map((s) => [s.songId, s]));
     const scoreUpdates: any[] = [];
     const notFound: any[] = [];
     const noImprovement: any[] = [];
+    const previousTotalBpi = lastLog?.totalBpi ?? -15;
 
     for (const row of csvRows) {
       const song = songMaster.find(
@@ -100,6 +102,7 @@ const handler = async (
         success: true,
         batchId: null,
         updatedCount: 0,
+        previousTotalBpi,
         newTotalBpi: newTotalBpi,
         message: "更新が必要な楽曲はありませんでした。",
         details: {
@@ -134,6 +137,7 @@ const handler = async (
       success: true,
       batchId,
       updatedCount: scoreUpdates.length,
+      previousTotalBpi,
       newTotalBpi,
       details: {
         updated: scoreUpdates.map((s) => ({

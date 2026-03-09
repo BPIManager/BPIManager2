@@ -40,7 +40,7 @@ export default function ImportPage() {
   return (
     <>
       {!user && <AccountSettings />}
-      <Meta title="データインポート" description="..." />
+      <Meta title="データインポート" description="..." noIndex />
 
       <ImportView
         isLoggedIn={!!user?.userId}
@@ -52,7 +52,6 @@ export default function ImportPage() {
         processStatus={processStatus}
         onStartImport={onStartImport}
       />
-
       <ImportSuccessModal
         result={importResult}
         version={selectedVersion[0]}

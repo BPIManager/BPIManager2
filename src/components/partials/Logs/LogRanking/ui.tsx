@@ -27,9 +27,11 @@ const RANK_CONFIG = {
 export const LogRank = ({
   details,
   type,
+  isSharing,
 }: {
   details: any[];
   type: "growth" | "top";
+  isSharing?: boolean;
 }) => {
   const [selectedSong, setSelectedSong] = useState<any | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState<boolean>(false);
@@ -71,7 +73,7 @@ export const LogRank = ({
             {config.title}
           </Text>
         </HStack>
-        {type === "growth" && (
+        {type === "growth" && !isSharing && (
           <Switch
             colorPalette="blue"
             size="sm"
@@ -107,6 +109,7 @@ export const LogRank = ({
           visibleSongs.map((item, index) => (
             <Box key={item.songId}>
               <RankItem
+                isSharing={isSharing}
                 item={item}
                 rank={index + 1}
                 type={type}

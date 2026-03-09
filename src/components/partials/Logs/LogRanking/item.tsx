@@ -14,11 +14,13 @@ export const RankItem = ({
   rank,
   type,
   onClick,
+  isSharing,
 }: {
   item: any;
   rank: number;
   type: "growth" | "top";
   onClick: () => void;
+  isSharing?: boolean;
 }) => {
   const isGrowth = type === "growth";
 
@@ -42,6 +44,123 @@ export const RankItem = ({
   const isNew = !item.previous;
   const prevEx = isNew ? 0 : item.current.exScore - item.diff.exScore;
   const prevBpi = isNew ? -15 : item.current.bpi - item.diff.bpi;
+
+  if (isSharing) {
+    const fullDiff = String(item.difficulty || "").toUpperCase();
+
+    const labelW = "30px";
+    const valW = "55px";
+    const diffW = "60px";
+
+    const ShareDataRow = ({
+      label,
+      prev,
+      current,
+      diff,
+      diffColor,
+      isBpi = false,
+    }: any) => (
+      <HStack
+        gap={2}
+        fontFamily="mono"
+        fontSize="sm"
+        w="full"
+        justify="space-between"
+      >
+        <Text w={labelW} color="gray.600" fontWeight="bold" fontSize="xs">
+          {label}
+        </Text>
+        <Text w={valW} color="gray.400" textAlign="right">
+          {isBpi ? prev.toFixed(2) : prev}
+        </Text>
+        <Center w="12px">
+          <Icon as={ChevronRight} boxSize={3} color="gray.200" />
+        </Center>
+        <Text w={valW} color="white" fontWeight="bold" textAlign="right">
+          {isBpi ? current.toFixed(2) : current}
+        </Text>
+        <Text w={diffW} color={diffColor} fontWeight="bold" textAlign="right">
+          +{isBpi ? diff.toFixed(2) : diff}
+        </Text>
+      </HStack>
+    );
+
+    return (
+      <Box
+        p={4}
+        bg="gray.950"
+        borderBottom="1px solid"
+        borderColor="whiteAlpha.100"
+        w="full"
+      >
+        <VStack align="start" gap={2}>
+          <HStack gap={3} w="full" align="baseline">
+            <Text
+              fontSize="lg"
+              fontWeight="bold"
+              fontFamily="mono"
+              color={
+                rank === 1
+                  ? "yellow.400"
+                  : rank === 2
+                    ? "gray.400"
+                    : rank === 3
+                      ? "orange.400"
+                      : "gray.700"
+              }
+            >
+              {rank}
+            </Text>
+            <Text fontSize="md" fontWeight="bold" color="white" lineClamp={2}>
+              {item.title}
+            </Text>
+          </HStack>
+
+          <HStack gap={2}>
+            <Text color="gray.400" fontWeight="bold" fontSize="11px">
+              ☆{item.level}
+            </Text>
+            <Badge
+              variant="solid"
+              colorPalette={
+                fullDiff === "LEGGENDARIA"
+                  ? "red"
+                  : fullDiff === "ANOTHER"
+                    ? "purple"
+                    : "blue"
+              }
+              px={2}
+            >
+              {fullDiff}
+            </Badge>
+            {isNew && (
+              <Badge colorScheme="purple" variant="solid" px={1}>
+                初プレイ
+              </Badge>
+            )}
+          </HStack>
+
+          <VStack align="start" gap={1} pt={1} w="full">
+            <ShareDataRow
+              label="EX"
+              prev={prevEx}
+              current={item.current.exScore}
+              diff={item.diff.exScore}
+              diffColor="blue.400"
+            />
+            <ShareDataRow
+              label="BPI"
+              prev={prevBpi}
+              current={item.current.bpi}
+              diff={item.diff.bpi}
+              diffColor={bpiStyle.color}
+              isBpi
+            />
+          </VStack>
+        </VStack>
+      </Box>
+    );
+  }
 
   const wLabel = "25px";
   const wValuePrev = "50px";
@@ -69,7 +188,7 @@ export const RankItem = ({
           w={wLabel}
           fontSize="9px"
           color="gray.600"
-          fontWeight="black"
+          fontWeight="bold"
           textAlign="left"
         >
           {label}
@@ -101,7 +220,7 @@ export const RankItem = ({
               w={wDiff}
               textAlign="right"
               fontSize={isBpi ? "lg" : "md"}
-              fontWeight="black"
+              fontWeight="bold"
               color={diffColor}
               lineHeight="1"
             >
@@ -145,7 +264,7 @@ export const RankItem = ({
         <Center w="20px" flexShrink={0}>
           <Text
             fontSize="lg"
-            fontWeight="black"
+            fontWeight="bold"
             fontFamily="mono"
             color={
               rank === 1
