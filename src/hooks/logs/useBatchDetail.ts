@@ -74,12 +74,12 @@ export const useLogsDetail = (
   const endpoint = batchId
     ? `/api/${userId}/logs/${version}/${batchId}`
     : date
-      ? `/api/${userId}/logs/${version}/daily/${date}`
+      ? `/api/${userId}/logs/${version}/summary/${date}`
       : null;
   const { fbUser } = useUser();
 
   const { data, error, isLoading, mutate } = useSWR<LogsDetailResponse>(
-    endpoint && fbUser ? [endpoint, fbUser] : null,
+    endpoint ? [endpoint, fbUser] : null,
     fetcher,
     {
       revalidateOnFocus: false,

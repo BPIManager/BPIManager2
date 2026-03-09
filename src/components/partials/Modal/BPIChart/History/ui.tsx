@@ -12,9 +12,9 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import { LuTrendingUp, LuCalendar, LuHistory, LuCrown } from "react-icons/lu";
-import dayjs from "dayjs";
 import { useMemo } from "react";
 import { versionTitles } from "@/constants/versions";
+import dayjs from "@/lib/dayjs";
 
 interface SongHistoryTabProps {
   songId: number;
@@ -96,7 +96,9 @@ export const SongHistoryTab = ({ songId }: SongHistoryTabProps) => {
                       <HStack gap={1.5} color="gray.500">
                         <LuCalendar size={12} />
                         <Text fontSize="10px" fontWeight="medium">
-                          {dayjs(record.lastPlayed).format("YYYY/MM/DD HH:mm")}
+                          {dayjs(record.lastPlayed)
+                            .tz()
+                            .format("YYYY/MM/DD HH:mm")}
                         </Text>
                       </HStack>
 

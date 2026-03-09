@@ -10,13 +10,13 @@ interface Props {
 
 export const LogVersionSelector = ({ version }: Props) => {
   const router = useRouter();
-  const { user } = useUser();
+  const { userId } = router.query;
 
   const handleVersionChange = (details: string) => {
     const nextVersion = details;
     if (!nextVersion) return;
 
-    router.push(`/user/${user?.userId}/logs/${nextVersion}`, undefined, {
+    router.push(`/user/${userId as string}/logs/${nextVersion}`, undefined, {
       shallow: true,
     });
   };

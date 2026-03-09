@@ -36,7 +36,13 @@ export const LogErrorState = ({
             {message}
           </Text>
           {status && (
-            <Code colorPalette="red" variant="subtle" fontSize="2xs" mt={2}>
+            <Code
+              colorPalette="red"
+              variant="subtle"
+              fontSize="2xs"
+              mt={2}
+              px={2}
+            >
               HTTP {status}
             </Code>
           )}

@@ -24,7 +24,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { FilterParamsFrontend } from "@/types/songs/withScore";
 import { verNameArr } from "@/constants/versions";
 import { CLEAR_STATES } from "@/constants/lampState";
-import dayjs from "dayjs";
+import dayjs from "@/lib/dayjs";
 
 interface Props {
   isOpen: boolean;
@@ -217,7 +217,7 @@ export const AdvancedFilterModal = ({
                     if (isCustomActive) {
                       updateLocal({ since: undefined, until: undefined });
                     } else {
-                      const today = dayjs().format("YYYY-MM-DD");
+                      const today = dayjs().tz().format("YYYY-MM-DD");
                       updateLocal({ since: today, until: today });
                     }
                   }}

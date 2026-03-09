@@ -78,7 +78,6 @@ export default async function handler(
       .orderBy("l_createdAt", "desc")
       .orderBy("ts_bpi", "desc")
       .execute();
-
     const processedLogs = rows.reduce((acc, row) => {
       let log = acc.find((l) => l.batchId === row.l_batchId);
 

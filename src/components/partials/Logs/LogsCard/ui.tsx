@@ -8,18 +8,19 @@ import {
   Separator,
   SimpleGrid,
 } from "@chakra-ui/react";
-import { LuTrendingUp, LuListMusic, LuCalendar } from "react-icons/lu";
-import dayjs from "dayjs";
+import { LuListMusic, LuCalendar } from "react-icons/lu";
 import Link from "next/link";
 import { UpdateLog } from "@/hooks/logs/useLogsList";
-import { useUser } from "@/contexts/users/UserContext";
+import dayjs from "@/lib/dayjs";
+import { useRouter } from "next/router";
 
 export const LogsCard = ({ log }: { log: UpdateLog }) => {
-  const { user } = useUser();
+  const router = useRouter();
+  const userId = router.query.userId as string;
   const isPositive = log.diff >= 0;
 
   return (
-    <Link href={`/user/${user?.userId}/logs/${log.version}/${log.batchId}`}>
+    <Link href={`/user/${userId}/logs/${log.version}/${log.batchId}`}>
       <Card.Root
         mb={4}
         variant="elevated"
@@ -39,7 +40,7 @@ export const LogsCard = ({ log }: { log: UpdateLog }) => {
               <HStack color="gray.500" gap={1} mb={1}>
                 <LuCalendar size={12} />
                 <Text fontSize="xs">
-                  {dayjs(log.createdAt).format("YYYY/MM/DD HH:mm")}
+                  {dayjs(log.createdAt).tz().format("YYYY/MM/DD HH:mm")}
                 </Text>
               </HStack>
               <HStack gap={2}>

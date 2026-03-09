@@ -16,6 +16,7 @@ const dialect = new MysqlDialect({
     idleTimeout: 60000,
     enableKeepAlive: true,
     keepAliveInitialDelay: 0,
+    timezone: "Z",
   }) as any,
 });
 

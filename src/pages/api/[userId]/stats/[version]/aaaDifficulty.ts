@@ -56,6 +56,7 @@ export default async function handler(
         title: song.title,
         difficulty: song.difficulty,
         notes: song.notes,
+        releasedVersion: song.releasedVersion,
         maxScore,
         targets: {
           aaa: {

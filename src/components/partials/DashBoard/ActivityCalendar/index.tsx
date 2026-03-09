@@ -1,8 +1,7 @@
 import { Box, Grid, Text, HStack, VStack } from "@chakra-ui/react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import dayjs from "dayjs";
 import { Tooltip } from "@/components/ui/tooltip";
-import { NoDataAlert } from "../NoData";
+import dayjs from "@/lib/dayjs";
 
 interface ActivityData {
   date: string;
@@ -24,17 +23,17 @@ export const ActivityCalendar = ({ data }: { data: ActivityData[] }) => {
     const days = [];
 
     const lastDate =
-      data.length > 0 ? dayjs(data[data.length - 1].date) : dayjs();
+      data.length > 0 ? dayjs(data[data.length - 1].date).tz() : dayjs().tz();
 
     const endOfCalendar = lastDate.endOf("week");
 
     const dataMap = new Map(
-      data.map((d) => [dayjs(d.date).format("YYYY-MM-DD"), d.count]),
+      data.map((d) => [dayjs(d.date).tz().format("YYYY-MM-DD"), d.count]),
     );
 
     for (let i = 364; i >= 0; i--) {
       const dateObj = endOfCalendar.subtract(i, "day");
-      const dateStr = dateObj.format("YYYY-MM-DD");
+      const dateStr = dateObj.tz().format("YYYY-MM-DD");
       days.push({
         date: dateStr,
         count: dataMap.get(dateStr) || 0,

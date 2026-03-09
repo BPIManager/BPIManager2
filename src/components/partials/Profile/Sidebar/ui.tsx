@@ -126,7 +126,6 @@ export const ProfileSideBar = ({
         <Separator borderColor="whiteAlpha.100" />
 
         <VStack align="stretch" w="full" gap={6}>
-          {/* ARENA/BPI表示エリア */}
           <HStack justify="space-between" align="flex-end">
             <Box>
               <Text fontSize="xs" color="gray.500" fontWeight="bold" mb={1}>
@@ -158,7 +157,6 @@ export const ProfileSideBar = ({
             </Box>
           </HStack>
 
-          {/* 履歴テーブル */}
           <Box>
             <VStack gap={1} align="stretch">
               <Grid
@@ -227,7 +225,6 @@ export const ProfileSideBar = ({
             </VStack>
           </Box>
 
-          {/* 自己紹介 */}
           {profile.profileText && (
             <Box
               bg="whiteAlpha.50"

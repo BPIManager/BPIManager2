@@ -6,11 +6,12 @@ import { useUser } from "@/contexts/users/UserContext";
 import { Box, Center, Spinner } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 
-export default function BatchLogsPage() {
+export default function SummaryLogsPage() {
   const { fbUser, isLoading: isUserLoading } = useUser();
   const router = useRouter();
-  const { userId, version, batchId } = router.query;
+  const { userId, version, date } = router.query;
   const isOwnProfile = fbUser?.uid === userId;
+
   const isInitialLoading = !router.isReady || isUserLoading;
 
   if (isInitialLoading) {
@@ -27,10 +28,10 @@ export default function BatchLogsPage() {
     return (
       <DashboardLayout>
         <LogsDetailView
-          type="batch"
-          userId={userId}
+          type="daily"
+          userId={userId as string}
           version={version as string}
-          batchId={batchId as string}
+          date={date as string}
         />
       </DashboardLayout>
     );
@@ -40,10 +41,10 @@ export default function BatchLogsPage() {
     <UserProfileLayout userId={userId as string} currentTab="logs">
       <Box p={4}>
         <LogsDetailContent
-          type="batch"
+          type="daily"
           userId={userId as string}
           version={version as string}
-          batchId={batchId as string}
+          date={date as string}
         />
       </Box>
     </UserProfileLayout>

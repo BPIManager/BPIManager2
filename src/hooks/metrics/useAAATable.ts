@@ -14,6 +14,7 @@ export interface AAATableItem {
   songId: number;
   title: string;
   difficulty: string;
+  releasedVersion: number;
   notes: number;
   maxScore: number;
   targets: {

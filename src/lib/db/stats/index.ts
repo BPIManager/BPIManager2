@@ -18,6 +18,8 @@ export class StatsRepository {
    * AAA達成難易度表用：楽曲マスタ、BPI定義、ユーザーの最新スコアを取得
    */
   async getAAATableData(userId: string, version: string, level: number) {
+    const versionNum = parseInt(version);
+
     return await db
       .selectFrom("songs as m")
       .innerJoin("songDef as d", (join) =>
@@ -48,6 +50,7 @@ export class StatsRepository {
         "m.notes",
         "m.difficulty",
         "m.difficultyLevel",
+        "m.releasedVersion",
         "d.wrScore",
         "d.kaidenAvg",
         "d.coef",
@@ -55,6 +58,8 @@ export class StatsRepository {
         "userScore.bpi as userBpi",
       ])
       .where("m.difficultyLevel", "=", level)
+      // ↓旧作のデータをクエリしたときに当時存在しなかった曲を含めない
+      .where("m.releasedVersion", "<=", versionNum)
       .orderBy("m.title", "asc")
       .execute();
   }

@@ -9,9 +9,9 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import { Info, LayoutGrid } from "lucide-react";
-import dayjs from "dayjs";
 import Link from "next/link";
 import { useUser } from "@/contexts/users/UserContext";
+import dayjs from "@/lib/dayjs";
 
 interface DailyBatchNoticeProps {
   dailyBatchIds: string[];
@@ -29,7 +29,7 @@ export const DailyBatchNotice = ({
   if (dailyBatchIds.length <= 1) return null;
   const { user } = useUser();
 
-  const dateStr = dayjs(createdAt).format("YYYY-MM-DD");
+  const dateStr = dayjs(createdAt).tz().format("YYYY-MM-DD");
   const currentIndex = dailyBatchIds.indexOf(currentBatchId) + 1;
 
   return (
@@ -102,7 +102,7 @@ export const DailyBatchNotice = ({
         </Flex>
 
         <Link
-          href={`/user/${user?.userId}/logs/daily/${version}/${dateStr}`}
+          href={`/user/${user?.userId}/logs/${version}/summary/${dateStr}`}
           passHref
         >
           <Button

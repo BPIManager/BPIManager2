@@ -4,7 +4,7 @@ import {
   SongWithScore,
 } from "@/types/songs/withScore";
 import { getMaxBpm } from "./getMaxBPM";
-import dayjs from "dayjs";
+import dayjs from "@/lib/dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 dayjs.extend(isBetween);
 

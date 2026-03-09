@@ -1,38 +1,58 @@
+// pages/user/[userId]/logs/[version].tsx
 import { useRouter } from "next/router";
 import { useUser } from "@/contexts/users/UserContext";
 import { LogsList } from "@/components/partials/Logs/LogsList/ui";
 import { LogVersionSelector } from "@/components/partials/Logs/VersionSelector.tsx/ui";
-import { Center, HStack, Spinner, VStack } from "@chakra-ui/react";
-import { Box, Heading } from "lucide-react";
+import { Box, VStack } from "@chakra-ui/react";
 import { Meta } from "@/components/partials/Head";
 import { PageHeader, PageContainer } from "@/components/partials/Header";
 import { DashboardLayout } from "@/components/partials/Main";
 import { latestVersion } from "@/constants/latestVersion";
-import { LoginRequiredCard } from "@/components/partials/LoginRequired/ui";
+import { UserProfileLayout } from "@/components/partials/Profile/Layout/layout";
 
 export default function LogsPage() {
   const router = useRouter();
-  const { isLoading: isUserLoading, fbUser } = useUser();
+  const { fbUser, isLoading: isUserLoading } = useUser();
 
-  const version = (router.query.version as string) || latestVersion;
+  const { userId, version } = router.query;
+  const uid = (userId as string) || "";
+  const v = (version as string) || latestVersion;
 
-  if (isUserLoading)
+  const isOwnedByFbId = fbUser?.uid === userId;
+
+  const logsContent = (
+    <VStack align="stretch" gap={4}>
+      <Box
+        bg={isOwnedByFbId ? "transparent" : "#0d1117"}
+        borderRadius="2xl"
+        border={isOwnedByFbId ? "none" : "1px solid"}
+        borderColor="whiteAlpha.100"
+        p={isOwnedByFbId ? 0 : 6}
+      >
+        <LogVersionSelector version={v} />
+        <Box mt={6}>
+          <LogsList userId={uid} version={v} />
+        </Box>
+      </Box>
+    </VStack>
+  );
+
+  if (isUserLoading) return null;
+
+  if (isOwnedByFbId) {
     return (
-      <Center h="90vh">
-        <Spinner />
-      </Center>
+      <DashboardLayout>
+        <Meta title="更新ログ" noIndex />
+        <PageHeader title="更新ログ" description="スコアの更新ログと詳細情報" />
+        <PageContainer>{logsContent}</PageContainer>
+      </DashboardLayout>
     );
+  }
+
   return (
-    <DashboardLayout>
-      <PageHeader title="更新ログ" description="スコアの更新ログと詳細情報" />
-      <Meta title="更新ログ" noIndex />
-
-      <PageContainer>
-        <LogVersionSelector version={version} />
-
-        <LogsList userId={fbUser?.uid} version={version} />
-        {!fbUser && <LoginRequiredCard />}
-      </PageContainer>
-    </DashboardLayout>
+    <UserProfileLayout userId={uid} currentTab="logs">
+      <Meta title="更新履歴" />
+      {logsContent}
+    </UserProfileLayout>
   );
 }

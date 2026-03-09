@@ -1,4 +1,5 @@
 import { BpiCalculator } from "../bpi";
+import dayjs from "../dayjs";
 import { BpiRepository } from "../db/bpi";
 import { SongLookup } from "./songLookup";
 import { v4 as uuidv4 } from "uuid";
@@ -105,7 +106,7 @@ export class BpiImportService {
                 : Number(meta?.missCount),
             version: version,
             batchId: batchId,
-            lastPlayed: new Date(item.updatedAt.replace(/-/g, "/")),
+            lastPlayed: dayjs.tz(item.updatedAt).toDate(),
           });
 
           currentProfileBpis.set(songDef.songId, bpi);
@@ -125,7 +126,7 @@ export class BpiImportService {
         totalBpi,
         version: entries[entries.length - 1].version,
         batchId,
-        createdAt: new Date(date.replace(/-/g, "/") + " 23:59:59"),
+        createdAt: dayjs.tz(`${date} 23:59:59`).toDate(),
       });
     }
 

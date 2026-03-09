@@ -1,4 +1,3 @@
-// types/sql.ts
 export type SongWithDef = {
   songId: number;
   title: string;

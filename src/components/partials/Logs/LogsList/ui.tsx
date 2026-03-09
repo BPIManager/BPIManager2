@@ -15,7 +15,7 @@ import { LogsGroupSkeleton } from "../LogsCard/skeleton";
 import { NoDataAlert } from "../../DashBoard/NoData";
 import { CustomPagination } from "../../Pagination/ui";
 import Link from "next/link";
-import dayjs from "dayjs";
+import dayjs from "@/lib/dayjs";
 
 interface Props {
   userId: string | undefined;
@@ -40,7 +40,7 @@ export const LogsList = ({ userId, version }: Props) => {
     const groups: Record<string, GroupedLog> = {};
 
     logs.forEach((log) => {
-      const date = dayjs(log.createdAt).format("YYYY-MM-DD");
+      const date = dayjs(log.createdAt).tz().format("YYYY-MM-DD");
 
       if (!groups[date]) {
         groups[date] = {
@@ -142,12 +142,12 @@ export const LogsList = ({ userId, version }: Props) => {
                           }
                         >
                           {group.dayTotalBpiDelta >= 0 ? "+" : ""}
-                          {group.dayTotalBpiDelta.toFixed(4)}
+                          {group.dayTotalBpiDelta.toFixed(2)}
                         </Text>
                       </VStack>
                     </HStack>
                     <Link
-                      href={`/user/${userId}/logs/daily/${version}/${group.date}`}
+                      href={`/user/${userId}/logs/${version}/summary/${group.date}`}
                       passHref
                     >
                       <Button

@@ -25,7 +25,6 @@ export const useLogs = (userId: string | undefined, version: string) => {
     userId ? [`/api/${userId}/logs/${version}`, fbUser] : null,
     fetcher,
   );
-
   return {
     logs: data || [],
     isLoading,
