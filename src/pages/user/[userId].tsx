@@ -10,6 +10,8 @@ import { latestVersion } from "@/constants/latestVersion";
 import { LogsList } from "@/components/partials/Logs/LogsList/ui";
 import { LogVersionSelector } from "@/components/partials/Logs/VersionSelector.tsx/ui";
 import { UserProfileLayout } from "@/components/partials/Profile/Layout/layout";
+import { ProfileMeta } from "@/components/partials/Profile/Meta/ui";
+import { getVersionNameFromNumber } from "@/constants/versions";
 
 export default function UserPage({
   defaultView = "overview",
@@ -24,6 +26,14 @@ export default function UserPage({
 
   return (
     <UserProfileLayout userId={userId} currentTab={defaultView}>
+      <ProfileMeta
+        title={defaultView === "overview" ? "プロフィール" : `スコア一覧`}
+        description={
+          defaultView === "overview"
+            ? `$userName$さん($iidxid$)のbeatmaniaIIDX ${getVersionNameFromNumber(Number(version))}のプレイログに関するプロフィールページです。 | $profileText$`
+            : `$userName$さん($iidxid$)がbeatmaniaIIDX ${getVersionNameFromNumber(Number(version))}で記録したスコア一覧を表示します。`
+        }
+      />
       <Tabs.Content value="overview" p={0}>
         <VStack align="stretch" gap={6}>
           <DashBoardFilter />

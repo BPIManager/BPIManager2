@@ -9,6 +9,8 @@ import { PageHeader, PageContainer } from "@/components/partials/Header";
 import { DashboardLayout } from "@/components/partials/Main";
 import { latestVersion } from "@/constants/latestVersion";
 import { UserProfileLayout } from "@/components/partials/Profile/Layout/layout";
+import { ProfileMeta } from "@/components/partials/Profile/Meta/ui";
+import { getVersionNameFromNumber, versionTitles } from "@/constants/versions";
 
 export default function LogsPage() {
   const router = useRouter();
@@ -51,7 +53,10 @@ export default function LogsPage() {
 
   return (
     <UserProfileLayout userId={uid} currentTab="logs">
-      <Meta title="更新履歴" />
+      <ProfileMeta
+        title={`スコア更新記録`}
+        description={`$userName$さん($iidxid$)がbeatmaniaIIDX ${getVersionNameFromNumber(Number(version))}でプレイしたスコアの記録を確認できます。`}
+      />
       {logsContent}
     </UserProfileLayout>
   );

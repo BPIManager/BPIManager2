@@ -10,6 +10,7 @@ import { ReactNode } from "react";
 import { FilterProvider } from "@/contexts/stats/FilterContext";
 import { latestVersion } from "@/constants/latestVersion";
 import NextLink from "next/link";
+import { ProfileProvider } from "@/contexts/profile/ProfileContext";
 
 interface UserProfileLayoutProps {
   userId: string;
@@ -54,92 +55,94 @@ export const UserProfileLayout = ({
 
   return (
     <FilterProvider>
-      <DashboardLayout>
-        <PageContainer>
-          <SimpleGrid columns={{ base: 1, lg: 4 }} gap={8}>
-            <Box gridColumn={{ lg: "span 1" }}>
-              <ProfileSideBar profile={profile} />
-            </Box>
-            <Box gridColumn={{ lg: "span 3" }}>
-              <Tabs.Root
-                value={currentTab}
-                variant="enclosed"
-                colorPalette="blue"
-              >
-                <Tabs.List
-                  bg="#0d1117"
-                  borderRadius="lg"
-                  p={1}
-                  mb={6}
-                  border="1px solid"
-                  borderColor="whiteAlpha.100"
-                  width="full"
-                  display="flex"
+      <ProfileProvider profile={profile}>
+        <DashboardLayout>
+          <PageContainer>
+            <SimpleGrid columns={{ base: 1, lg: 4 }} gap={8}>
+              <Box gridColumn={{ lg: "span 1" }}>
+                <ProfileSideBar profile={profile} />
+              </Box>
+              <Box gridColumn={{ lg: "span 3" }}>
+                <Tabs.Root
+                  value={currentTab}
+                  variant="enclosed"
+                  colorPalette="blue"
                 >
-                  <Tabs.Trigger
-                    value="overview"
-                    fontSize="xs"
-                    asChild
-                    gap={1}
-                    flex="1"
-                    py={3}
+                  <Tabs.List
+                    bg="#0d1117"
+                    borderRadius="lg"
+                    p={1}
+                    mb={6}
+                    border="1px solid"
+                    borderColor="whiteAlpha.100"
+                    width="full"
+                    display="flex"
                   >
-                    <NextLink href={`/user/${userId}`}>
-                      <LuLayoutDashboard />
-                      サマリ
-                    </NextLink>
-                  </Tabs.Trigger>
-
-                  <Tabs.Trigger
-                    value="songs"
-                    fontSize="xs"
-                    asChild
-                    gap={1}
-                    flex="1"
-                    py={3}
-                  >
-                    <NextLink
-                      href={`/user/${userId}/scores/${latestVersion}?${scoreParams}`}
+                    <Tabs.Trigger
+                      value="overview"
+                      fontSize="xs"
+                      asChild
+                      gap={1}
+                      flex="1"
+                      py={3}
                     >
-                      <LuMusic />
-                      スコア
-                    </NextLink>
-                  </Tabs.Trigger>
+                      <NextLink href={`/user/${userId}`}>
+                        <LuLayoutDashboard />
+                        サマリ
+                      </NextLink>
+                    </Tabs.Trigger>
 
-                  <Tabs.Trigger
-                    value="logs"
-                    fontSize="xs"
-                    asChild
-                    gap={1}
-                    flex="1"
-                    py={3}
-                  >
-                    <NextLink href={`/user/${userId}/logs/${version}`}>
-                      <LuHistory />
-                      更新履歴
-                    </NextLink>
-                  </Tabs.Trigger>
+                    <Tabs.Trigger
+                      value="songs"
+                      fontSize="xs"
+                      asChild
+                      gap={1}
+                      flex="1"
+                      py={3}
+                    >
+                      <NextLink
+                        href={`/user/${userId}/scores/${latestVersion}?${scoreParams}`}
+                      >
+                        <LuMusic />
+                        スコア
+                      </NextLink>
+                    </Tabs.Trigger>
 
-                  <Tabs.Trigger
-                    value="aaaTable"
-                    fontSize="xs"
-                    asChild
-                    gap={1}
-                    flex="1"
-                    py={3}
-                  >
-                    <NextLink href={`/user/${userId}/aaaTable/${version}`}>
-                      <LuTable />
-                      AAA達成表
-                    </NextLink>
-                  </Tabs.Trigger>
-                </Tabs.List>
-                {children}
-              </Tabs.Root>
-            </Box>
-          </SimpleGrid>
-        </PageContainer>
-      </DashboardLayout>
+                    <Tabs.Trigger
+                      value="logs"
+                      fontSize="xs"
+                      asChild
+                      gap={1}
+                      flex="1"
+                      py={3}
+                    >
+                      <NextLink href={`/user/${userId}/logs/${version}`}>
+                        <LuHistory />
+                        更新履歴
+                      </NextLink>
+                    </Tabs.Trigger>
+
+                    <Tabs.Trigger
+                      value="aaaTable"
+                      fontSize="xs"
+                      asChild
+                      gap={1}
+                      flex="1"
+                      py={3}
+                    >
+                      <NextLink href={`/user/${userId}/aaaTable/${version}`}>
+                        <LuTable />
+                        AAA達成表
+                      </NextLink>
+                    </Tabs.Trigger>
+                  </Tabs.List>
+                  {children}
+                </Tabs.Root>
+              </Box>
+            </SimpleGrid>
+          </PageContainer>
+        </DashboardLayout>
+      </ProfileProvider>
     </FilterProvider>
   );
 };

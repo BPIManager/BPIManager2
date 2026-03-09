@@ -16,6 +16,11 @@ export const versionTitles: {
   { num: "33", title: "33 Sparkle Shower", default: true },
 ];
 
+export const getVersionNameFromNumber = (v: number) => {
+  const version = versionTitles.find((item) => item.num === String(v));
+  return version ? version.title : "undefined";
+};
+
 export const versionsCollection = createListCollection({
   items: versionTitles.map((v) => ({
     label: v.title,

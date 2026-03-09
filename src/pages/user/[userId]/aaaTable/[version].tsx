@@ -7,6 +7,8 @@ import { Box } from "@chakra-ui/react";
 import { UserProfileLayout } from "@/components/partials/Profile/Layout/layout";
 import { AAATableContent } from "@/components/partials/Metrics/AAATable/content";
 import { latestVersion } from "@/constants/latestVersion";
+import { useStaticProfile } from "@/contexts/profile/ProfileContext";
+import { ProfileMeta } from "@/components/partials/Profile/Meta/ui";
 
 export default function UserAAATablePage() {
   const router = useRouter();
@@ -37,7 +39,7 @@ export default function UserAAATablePage() {
 
   return (
     <UserProfileLayout userId={uid} currentTab="aaaTable">
-      <Meta title="AAA達成難易度表" noIndex />
+      <ProfileMeta title="AAA達成難易度表" />
       <Box
         bg="#0d1117"
         borderRadius="2xl"
