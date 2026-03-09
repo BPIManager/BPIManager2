@@ -25,8 +25,9 @@ import { RANK_COLORS } from "../../DashBoard/DJRankDistribution";
 import { getBpiColor } from "../../DashBoard/BPIDistribution";
 import { LogNavigator } from "../LogsNav/ui";
 import { BatchTotalBpiCard } from "../TotalBPI/ui";
+import { LogsDetailViewSkeleton } from "./skeleton";
 
-interface Props {
+export interface LogsDetailViewProps {
   userId: string | undefined;
   version: string | undefined;
   batchId?: string;
@@ -40,14 +41,15 @@ export const LogsDetailView = ({
   batchId,
   date,
   type,
-}: Props) => {
+}: LogsDetailViewProps) => {
   const router = useRouter();
-  const { details, summary, isLoading, isError } = useLogsDetail(
-    userId,
-    version,
-    { batchId, date },
-  );
-
+  const {
+    details,
+    summary,
+    isLoading: isl,
+    isError,
+  } = useLogsDetail(userId, version, { batchId, date });
+  const isLoading = isl || (!details && !isError);
   const activeTab =
     router.query.levels || router.query.difficulties ? "songs" : "summary";
   const handleTabChange = (details: { value: string }) => {
@@ -80,12 +82,7 @@ export const LogsDetailView = ({
     router.push({ query: nextQuery }, undefined, { shallow: true });
   };
 
-  if (isLoading)
-    return (
-      <Center h="400px">
-        <Spinner />
-      </Center>
-    );
+  if (isLoading) return <LogsDetailViewSkeleton />;
   if (isError || !details)
     return <Text color="red.500">データの取得に失敗しました</Text>;
 
