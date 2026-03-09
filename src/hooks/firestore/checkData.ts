@@ -1,8 +1,9 @@
+import { IIDX_VERSIONS } from "@/constants/latestVersion";
 import { db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
-const TARGET_VERSIONS = ["33", "32", "31", "30", "29", "28", "27", "26"];
+const TARGET_VERSIONS = IIDX_VERSIONS;
 
 export const useFirestoreDataCheck = (uid: string | undefined) => {
   const [foundVersions, setFoundVersions] = useState<string[]>([]);

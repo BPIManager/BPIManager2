@@ -3,8 +3,9 @@ import { BpiRepository } from "@/lib/db/bpi";
 import { adminDb } from "@/lib/firebase/admin";
 import { BpiImportService } from "@/lib/transfer/importer";
 import { checkUserAccess } from "@/middlewares/api/withApi";
+import { IIDX_VERSIONS } from "@/constants/latestVersion";
 
-const VERSIONS = ["33", "32", "31", "30", "29", "28", "27", "26"];
+const VERSIONS = IIDX_VERSIONS;
 const SUFFIXES = ["1"];
 
 export default async function handler(
