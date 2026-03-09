@@ -8,6 +8,7 @@ export interface LogsDetailViewProps {
   batchId?: string;
   date?: string;
   type: "batch" | "daily" | "weekly" | "monthly";
+  isPublicPage?: boolean;
 }
 
 export const LogsDetailView = (props: LogsDetailViewProps) => {

@@ -42,6 +42,7 @@ export default function BatchLogsPage() {
       <ProfileMeta title={`プレイログ: ${batchId}`} noIndex />
       <Box p={4}>
         <LogsDetailContent
+          isPublicPage
           type="batch"
           userId={userId as string}
           version={version as string}

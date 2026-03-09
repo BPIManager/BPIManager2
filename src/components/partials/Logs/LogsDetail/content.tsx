@@ -30,6 +30,7 @@ export const LogsDetailContent = ({
   batchId,
   date,
   type,
+  isPublicPage,
 }: LogsDetailViewProps) => {
   const router = useRouter();
   const {
@@ -37,6 +38,7 @@ export const LogsDetailContent = ({
     summary,
     isLoading: isl,
     isError,
+
     mutate,
   } = useLogsDetail(userId, version, { batchId, date });
   const isLoading = isl || (!details && !isError);
@@ -144,22 +146,23 @@ export const LogsDetailContent = ({
               更新楽曲 ({details.songs.length})
             </Tabs.Trigger>
           </Tabs.List>
-
-          <Box flexShrink={0} ml={4} display="flex" justifyContent="flex-end">
-            <Button
-              size="sm"
-              variant="outline"
-              borderColor="whiteAlpha.200"
-              borderRadius="full"
-              _hover={{ bg: "whiteAlpha.100" }}
-              fontSize="xs"
-              px={4}
-              onClick={() => setIsModalOpen(true)}
-            >
-              <XIcon style={{ width: "20px" }} />
-              共有
-            </Button>
-          </Box>
+          {!isPublicPage && (
+            <Box flexShrink={0} ml={4} display="flex" justifyContent="flex-end">
+              <Button
+                size="sm"
+                variant="outline"
+                borderColor="whiteAlpha.200"
+                borderRadius="full"
+                _hover={{ bg: "whiteAlpha.100" }}
+                fontSize="xs"
+                px={4}
+                onClick={() => setIsModalOpen(true)}
+              >
+                <XIcon style={{ width: "20px" }} />
+                共有
+              </Button>
+            </Box>
+          )}
         </HStack>
 
         <Tabs.Content value="summary" py={6}>

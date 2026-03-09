@@ -47,6 +47,7 @@ export default function SummaryLogsPage() {
       />
       <Box p={4}>
         <LogsDetailContent
+          isPublicPage
           type="daily"
           userId={userId as string}
           version={version as string}

@@ -12,6 +12,7 @@ import { Info, LayoutGrid } from "lucide-react";
 import Link from "next/link";
 import { useUser } from "@/contexts/users/UserContext";
 import dayjs from "@/lib/dayjs";
+import { useRouter } from "next/router";
 
 interface DailyBatchNoticeProps {
   dailyBatchIds: string[];
@@ -28,6 +29,8 @@ export const DailyBatchNotice = ({
 }: DailyBatchNoticeProps) => {
   if (dailyBatchIds.length <= 1) return null;
   const { user } = useUser();
+  const router = useRouter();
+  const { userId } = router.query;
 
   const dateStr = dayjs(createdAt).tz().format("YYYY-MM-DD");
   const currentIndex = dailyBatchIds.indexOf(currentBatchId) + 1;
@@ -102,7 +105,7 @@ export const DailyBatchNotice = ({
         </Flex>
 
         <Link
-          href={`/user/${user?.userId}/logs/${version}/summary/${dateStr}`}
+          href={`/user/${userId as string}/logs/${version}/summary/${dateStr}`}
           passHref
         >
           <Button

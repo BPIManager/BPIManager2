@@ -8,8 +8,8 @@ export const LogsDetailContentSkeleton = () => {
 
       <VStack gap={6} align="stretch">
         <HStack gap={2} mb={4}>
-          <Skeleton height="40px" width="120px" borderRadius="md" />
-          <Skeleton height="40px" width="160px" borderRadius="md" />
+          <Skeleton height="40px" width="50%" borderRadius="md" />
+          <Skeleton height="40px" width="50%" borderRadius="md" />
         </HStack>
 
         <Skeleton height="80px" width="full" borderRadius="xl" />
