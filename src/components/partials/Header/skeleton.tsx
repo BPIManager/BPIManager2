@@ -1,10 +1,10 @@
-import { Center, Skeleton, Box } from "@chakra-ui/react";
+import { Center, Skeleton, Box, VStack } from "@chakra-ui/react";
 
 export const PageHeaderSkeleton = () => (
-  <Box bg="gray.800" height="100px">
-    <Center flexDirection="column" gap={2}>
-      <Skeleton height="32px" width="300px" />
-      <Skeleton height="16px" width="450px" />
-    </Center>
+  <Box bg="gray.800" py={8} px={4}>
+    <VStack gap={2} align="center">
+      <Skeleton height="32px" width="full" maxW="300px" />
+      <Skeleton height="16px" width="full" maxW="min(90%, 450px)" />
+    </VStack>
   </Box>
 );

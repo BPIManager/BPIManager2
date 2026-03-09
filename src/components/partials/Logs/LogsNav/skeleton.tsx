@@ -9,19 +9,27 @@ export const LogNavigatorSkeleton = () => (
     border="1px solid"
     borderColor="whiteAlpha.100"
     mb={6}
-    gap={0}
+    justify="space-between"
   >
     <Box flex="1">
-      <Skeleton height="40px" width="120px" borderRadius="md" />
+      <Skeleton
+        height="40px"
+        width={{ base: "60px", md: "120px" }}
+        borderRadius="md"
+      />
     </Box>
-    <Box px={4}>
+    <Box px={2}>
       <VStack gap={1}>
-        <Skeleton height="12px" width="60px" />
-        <Skeleton height="18px" width="140px" />
+        <Skeleton height="10px" width="40px" />
+        <Skeleton height="14px" width={{ base: "80px", md: "120px" }} />
       </VStack>
     </Box>
     <Box flex="1" display="flex" justifyContent="flex-end">
-      <Skeleton height="40px" width="120px" borderRadius="md" />
+      <Skeleton
+        height="40px"
+        width={{ base: "60px", md: "120px" }}
+        borderRadius="md"
+      />
     </Box>
   </HStack>
 );
