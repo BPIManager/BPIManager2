@@ -26,6 +26,7 @@ import { getBpiColor } from "../../DashBoard/BPIDistribution";
 import { LogNavigator } from "../LogsNav/ui";
 import { BatchTotalBpiCard } from "../TotalBPI/ui";
 import { LogsDetailViewSkeleton } from "./skeleton";
+import { LogErrorState } from "./error";
 
 export interface LogsDetailViewProps {
   userId: string | undefined;
@@ -48,6 +49,7 @@ export const LogsDetailView = ({
     summary,
     isLoading: isl,
     isError,
+    mutate,
   } = useLogsDetail(userId, version, { batchId, date });
   const isLoading = isl || (!details && !isError);
   const activeTab =
@@ -83,8 +85,9 @@ export const LogsDetailView = ({
   };
 
   if (isLoading) return <LogsDetailViewSkeleton />;
-  if (isError || !details)
-    return <Text color="red.500">データの取得に失敗しました</Text>;
+  if (isError || !details) {
+    return <LogErrorState error={isError} onRetry={() => mutate()} />;
+  }
 
   const bpiData = getBpiDistribution(details.songs);
   const rankData = getRankDistribution(details.songs);

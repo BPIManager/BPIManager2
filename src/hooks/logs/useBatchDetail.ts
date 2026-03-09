@@ -78,7 +78,7 @@ export const useLogsDetail = (
       : null;
   const { fbUser } = useUser();
 
-  const { data, error, isLoading } = useSWR<LogsDetailResponse>(
+  const { data, error, isLoading, mutate } = useSWR<LogsDetailResponse>(
     endpoint && fbUser ? [endpoint, fbUser] : null,
     fetcher,
     {
@@ -108,5 +108,6 @@ export const useLogsDetail = (
     summary,
     isLoading,
     isError: error,
+    mutate,
   };
 };
