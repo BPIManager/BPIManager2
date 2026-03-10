@@ -1,13 +1,29 @@
 import { BaseDistributionChart, ChartData } from "../DistributionChart";
 
 export const getBpiColor = (label: string) => {
-  if (label === "100+") return "#ff00ff";
-  const val = parseInt(label);
-  if (val < 0) return "#4A5568";
-  if (val < 40) return "#4299E1";
-  if (val < 70) return "#48BB78";
-  if (val < 100) return "#F6E05E";
-  return "#F56565";
+  const val = label === "100+" ? 100 : parseFloat(label);
+  if (isNaN(val)) return "#4A5568";
+
+  return getBpiColorStyle(val).bg;
+};
+
+export const getBpiColorStyle = (bpi: number) => {
+  let bg = "#F56565";
+  let color = "white";
+
+  if (bpi >= 100) {
+    bg = "#ff00ff";
+  } else if (bpi < 0) {
+    bg = "#4A5568";
+  } else if (bpi < 40) {
+    bg = "#4299E1";
+  } else if (bpi < 70) {
+    bg = "#48BB78";
+  } else if (bpi < 100) {
+    bg = "#F6E05E";
+  }
+
+  return { bg, color };
 };
 
 export const BpiDistributionChart = (props: {

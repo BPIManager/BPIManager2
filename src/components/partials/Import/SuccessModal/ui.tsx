@@ -131,7 +131,7 @@ export const ImportSuccessModal = ({ result, version, onClose }: Props) => {
             <VStack gap={4} w="full" py={2}>
               <Text
                 fontSize="xs"
-                fontWeight="black"
+                fontWeight="bold"
                 color="gray.500"
                 letterSpacing="widest"
               >
@@ -193,7 +193,7 @@ export const ImportSuccessModal = ({ result, version, onClose }: Props) => {
                 ) : (
                   <TrendingDown size={14} />
                 )}
-                <Text fontSize="xs" fontWeight="black" letterSpacing="widest">
+                <Text fontSize="xs" fontWeight="bold" letterSpacing="widest">
                   {isImproved ? "上昇" : isUnchanged ? "変動なし" : "低下"} :{" "}
                   {bpiDiff > 0 ? "+" : ""}
                   {bpiDiff.toFixed(2)}
@@ -210,7 +210,7 @@ export const ImportSuccessModal = ({ result, version, onClose }: Props) => {
               w="full"
               py={4}
               fontSize="md"
-              fontWeight="black"
+              fontWeight="bold"
               onClick={() =>
                 router.push(
                   `/user/${fbUser?.uid}/logs/${version}/${result.batchId}`,

@@ -12,6 +12,7 @@ import { LogVersionSelector } from "@/components/partials/Logs/VersionSelector.t
 import { UserProfileLayout } from "@/components/partials/Profile/Layout/layout";
 import { ProfileMeta } from "@/components/partials/Profile/Meta/ui";
 import { getVersionNameFromNumber } from "@/constants/versions";
+import { RadarSection } from "@/components/partials/DashBoard/Radar";
 
 export default function UserPage({
   defaultView = "overview",
@@ -45,6 +46,7 @@ export default function UserPage({
           </SimpleGrid>
 
           <TotalBPIHistory userId={userId} />
+          <RadarSection userId={userId} />
         </VStack>
       </Tabs.Content>
 

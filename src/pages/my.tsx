@@ -1,4 +1,3 @@
-// src/pages/my/index.tsx
 import { GetServerSideProps } from "next";
 import { latestVersion } from "@/constants/latestVersion";
 

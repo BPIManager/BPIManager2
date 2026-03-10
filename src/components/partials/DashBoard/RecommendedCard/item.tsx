@@ -42,7 +42,7 @@ export const SimpleRankItem = ({
         <Box w="14px" flexShrink={0}>
           <Text
             fontSize="10px"
-            fontWeight="black"
+            fontWeight="bold"
             color="gray.600"
             fontFamily="mono"
             textAlign="center"
@@ -91,7 +91,7 @@ export const SimpleRankItem = ({
           <Text fontSize="9px" color="gray.600" lineHeight="1">
             BPI
           </Text>
-          <Text fontSize="sm" fontWeight="black" color="blue.300">
+          <Text fontSize="sm" fontWeight="bold" color="blue.300">
             {(item.current.bpi ?? -15).toFixed(2)}
           </Text>
         </VStack>

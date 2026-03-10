@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"; // useEffectを追加
+import { useState, useEffect } from "react";
 import {
   Stack,
   Text,

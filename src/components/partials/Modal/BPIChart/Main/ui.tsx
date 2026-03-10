@@ -11,7 +11,6 @@ import {
 } from "recharts";
 import { Box, Text } from "@chakra-ui/react";
 import { SongWithScore } from "@/types/songs/withScore";
-import { BpiCalculator } from "@/lib/bpi";
 
 interface BPIChartProps {
   song: SongWithScore;

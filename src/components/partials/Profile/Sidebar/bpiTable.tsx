@@ -15,7 +15,7 @@ export const BpiHistoryTable = ({
       py={1}
       fontSize="9px"
       color="gray.600"
-      fontWeight="black"
+      fontWeight="bold"
     >
       <Text>Ver</Text>
       <Text textAlign="center">Arena</Text>

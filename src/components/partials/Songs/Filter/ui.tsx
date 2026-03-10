@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"; // 追加
+import { useState, useEffect } from "react";
 import {
   Box,
   VStack,
@@ -8,7 +8,7 @@ import {
   IconButton,
   Separator,
   Flex,
-  Spinner, // 追加
+  Spinner,
 } from "@chakra-ui/react";
 import {
   LuSearch,

@@ -96,7 +96,7 @@ export const ProfileSideBar = ({
               </Text>
               <Text
                 fontSize="2xl"
-                fontWeight="black"
+                fontWeight="bold"
                 color="blue.300"
                 fontFamily="mono"
                 lineHeight="1"

@@ -1,4 +1,3 @@
-// pages/user/[userId]/logs/[version].tsx
 import { useRouter } from "next/router";
 import { useUser } from "@/contexts/users/UserContext";
 import { LogsList } from "@/components/partials/Logs/LogsList/ui";
