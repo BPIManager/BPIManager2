@@ -2,16 +2,19 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { BpiRepository } from "@/lib/db/bpi";
 import { adminDb } from "@/lib/firebase/admin";
 import { BpiImportService } from "@/lib/transfer/importer";
-import { checkUserAccess } from "@/middlewares/api/withApi";
 import { IIDX_VERSIONS } from "@/constants/latestVersion";
+import {
+  AuthenticatedNextApiRequest,
+  withAuth,
+} from "@/middlewares/api/withAuth";
 
 const VERSIONS = IIDX_VERSIONS;
 const SUFFIXES = ["1"];
 
-export default async function handler(
-  req: NextApiRequest,
+const handler = async (
+  req: AuthenticatedNextApiRequest,
   res: NextApiResponse,
-) {
+) => {
   if (req.method !== "POST") {
     res.setHeader("Allow", ["POST"]);
     return res.status(405).json({ error: `Method ${req.method} Not Allowed` });
@@ -29,13 +32,6 @@ export default async function handler(
   const service = new BpiImportService(repo);
 
   try {
-    const access = await checkUserAccess(req, userId as string);
-    if (!access.hasAccess) {
-      return res
-        .status(access.error!.status)
-        .json({ message: access.error!.message });
-    }
-
     const allDataToImport: { version: string; data: any }[] = [];
 
     for (const v of VERSIONS) {
@@ -74,4 +70,6 @@ export default async function handler(
       details: error.message,
     });
   }
-}
+};
+
+export default withAuth(handler);
