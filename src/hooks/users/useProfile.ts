@@ -23,7 +23,7 @@ export interface UserProfileResponse {
 }
 
 export const useProfile = (userId: string | undefined) => {
-  const { fbUser } = useUser();
+  const { fbUser, refresh } = useUser();
   const [isUpdating, setIsUpdating] = useState(false);
 
   const { data, error, isLoading, mutate } = useSWR<UserProfileResponse>(
@@ -52,6 +52,7 @@ export const useProfile = (userId: string | undefined) => {
       if (!res.ok) throw new Error("Follow request failed");
 
       await mutate();
+      await refresh();
     } catch (e) {
       console.error("Follow error:", e);
     } finally {
