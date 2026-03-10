@@ -150,7 +150,7 @@ export const SongHistoryTab = ({ songId }: SongHistoryTabProps) => {
                           color="gray.200"
                           fontWeight="bold"
                         >
-                          BPI: {record.bpi.toFixed(2)}
+                          BPI: {(record.bpi || -15).toFixed(2)}
                         </Text>
                       </VStack>
 
