@@ -74,7 +74,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
           </Link>
           <Box>
             <Text fontWeight="bold" fontSize="md" lineClamp={1}>
-              {user?.userName || fbUser?.displayName || "Guest"}
+              {user?.userName || "Guest"}
             </Text>
             <Text fontSize="xs" color="fg.muted" fontFamily="mono">
               {user?.iidxId ? `IIDX ID: ${user.iidxId}` : "ID未設定"}
