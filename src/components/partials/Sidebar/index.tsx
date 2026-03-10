@@ -67,8 +67,8 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
           <Link href={"/user/" + fbUser?.uid}>
             <Avatar
               size="lg"
-              src={user?.profileImage || fbUser?.photoURL || ""}
-              name={user?.userName || fbUser?.displayName || "User"}
+              src={user?.profileImage || ""}
+              name={user?.userName || "User"}
               shape="rounded"
             />
           </Link>
