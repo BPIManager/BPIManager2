@@ -115,7 +115,7 @@ export const SongDetailView = ({
                 EX SCORE
               </Text>
               <Text fontSize="md" fontWeight="bold" color="white">
-                {(song.exScore ?? 0).toLocaleString()}
+                {song.exScore ?? 0}
               </Text>
               <Text fontSize="10px" color="gray.200" mt={1}>
                 {(((song.exScore ?? 0) / (song.notes * 2)) * 100).toFixed(2)}%
@@ -197,13 +197,13 @@ export const SongDetailView = ({
                   <HStack justify="space-between" fontSize="sm">
                     <Text color="gray.400">全1</Text>
                     <Text fontWeight="bold" color="white">
-                      {(song.wrScore ?? 0).toLocaleString()}
+                      {song.wrScore ?? 0}
                     </Text>
                   </HStack>
                   <HStack justify="space-between" fontSize="sm">
                     <Text color="gray.400">皆伝平均</Text>
                     <Text fontWeight="bold" color="white">
-                      {(song.kaidenAvg ?? 0).toLocaleString()}
+                      {song.kaidenAvg ?? 0}
                     </Text>
                   </HStack>
                   <Separator opacity={0.1} my={1} />

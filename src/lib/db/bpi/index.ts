@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { SongMaster } from "@/types/songs/songMaster";
-import { NewScore } from "@/types/sql";
-import { sql } from "kysely";
+import { Database, NewScore } from "@/types/sql";
+import { sql, Transaction } from "kysely";
 
 export class BpiRepository {
   async getSongMasterWithDef(): Promise<SongMaster> {
@@ -129,7 +129,7 @@ export class BpiRepository {
    * 共通保存ロジック
    */
   private async executeSave(
-    trx: any,
+    trx: Transaction<Database>,
     params: {
       userId: string;
       version: string;

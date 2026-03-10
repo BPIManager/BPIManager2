@@ -1,3 +1,4 @@
+import { Meta } from "@/components/partials/Head";
 import { LogsDetailContent } from "@/components/partials/Logs/LogsDetail/content";
 import { LogsDetailView } from "@/components/partials/Logs/LogsDetail/ui";
 import { DashboardLayout } from "@/components/partials/Main";
@@ -27,6 +28,7 @@ export default function BatchLogsPage() {
   if (isOwnProfile) {
     return (
       <DashboardLayout>
+        <Meta title={`プレイログ: ${batchId}`} noIndex />
         <LogsDetailView
           type="batch"
           userId={userId}

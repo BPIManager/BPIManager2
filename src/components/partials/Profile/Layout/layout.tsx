@@ -14,7 +14,7 @@ import { ProfileProvider } from "@/contexts/profile/ProfileContext";
 
 interface UserProfileLayoutProps {
   userId: string;
-  currentTab: "overview" | "songs" | "logs" | "aaaTable";
+  currentTab: "overview" | "songs" | "logs" | "aaaTable" | "";
   children: ReactNode;
 }
 
@@ -24,8 +24,15 @@ export const UserProfileLayout = ({
   children,
 }: UserProfileLayoutProps) => {
   const router = useRouter();
-  const { profile, isLoading, isError, isPrivate, isNotFound } =
-    useProfile(userId);
+  const {
+    profile,
+    isLoading,
+    isError,
+    isPrivate,
+    isNotFound,
+    toggleFollow,
+    isUpdating,
+  } = useProfile(userId);
   const version = (router.query.version as string) || latestVersion;
 
   const scoreParams = new URLSearchParams({
@@ -60,7 +67,11 @@ export const UserProfileLayout = ({
           <PageContainer>
             <SimpleGrid columns={{ base: 1, lg: 4 }} gap={8}>
               <Box gridColumn={{ lg: "span 1" }}>
-                <ProfileSideBar profile={profile} />
+                <ProfileSideBar
+                  profile={profile}
+                  onFollowToggle={toggleFollow}
+                  isUpdating={isUpdating}
+                />
               </Box>
               <Box gridColumn={{ lg: "span 3" }}>
                 <Tabs.Root

@@ -69,7 +69,6 @@ export const SongFilterBar = ({
       : [...list, item];
   };
   const currentStoreVersion = router.query.version;
-  console.log(router);
   return (
     <Box
       p={4}
