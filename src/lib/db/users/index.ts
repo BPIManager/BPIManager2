@@ -1,6 +1,51 @@
 import { db } from "@/lib/db";
+import { sql } from "kysely";
 
 export class UsersRepository {
+  async getRecommendedUsers(params: {
+    viewerId: string;
+    viewerTotalBpi: number;
+    version: string;
+    limit: number;
+    range: number;
+  }) {
+    const { viewerId, viewerTotalBpi, version, limit, range } = params;
+
+    const latestStatusSubquery = db
+      .selectFrom("userStatusLogs")
+      .select((eb) => ["userId", eb.fn.max("id").as("maxId")])
+      .where("version", "=", version)
+      .groupBy("userId");
+
+    return await db
+      .selectFrom("users as u")
+      .innerJoin("userRadarCache as r", "u.userId", "r.userId")
+      .leftJoin(latestStatusSubquery.as("ls"), "u.userId", "ls.userId")
+      .leftJoin("userStatusLogs as usl", "ls.maxId", "usl.id")
+      .select([
+        "u.userId",
+        "u.userName",
+        "u.profileImage",
+        "u.profileText",
+        "usl.arenaRank",
+        "r.totalBpi",
+        "r.notes",
+        "r.chord",
+        "r.peak",
+        "r.charge",
+        "r.scratch",
+        "r.soflan",
+      ])
+      .where("r.version", "=", version)
+      .where("u.isPublic", "=", 1)
+      .where("u.userId", "!=", viewerId)
+      .where("r.totalBpi", ">", (viewerTotalBpi - range).toString())
+      .where("r.totalBpi", "<", (viewerTotalBpi + range).toString())
+      .orderBy(sql`ABS(${viewerTotalBpi} - r.totalBpi)`, "asc")
+      .limit(limit)
+      .execute();
+  }
+
   async getUserProfileSummary(userId: string, myId?: string) {
     const user = await db
       .selectFrom("users")

@@ -40,13 +40,31 @@ const handler = async (
         "u.updatedAt",
         "latest.totalBpi",
         "latest.arenaRank",
+        (eb) =>
+          eb
+            .selectFrom("follows")
+            .select(eb.fn.count("id").as("count"))
+            .where("followerId", "=", req.authUid)
+            .as("followingCount"),
+        (eb) =>
+          eb
+            .selectFrom("follows")
+            .select(eb.fn.count("id").as("count"))
+            .where("followingId", "=", req.authUid)
+            .as("followerCount"),
       ])
       .where("u.userId", "=", req.authUid)
       .executeTakeFirst();
 
     return res.status(200).json({
       exists: !!user,
-      user: user || null,
+      user: user
+        ? {
+            ...user,
+            followingCount: Number(user.followingCount || 0),
+            followerCount: Number(user.followerCount || 0),
+          }
+        : null,
     });
   } catch (error) {
     console.error("Database error:", error);

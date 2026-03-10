@@ -13,10 +13,11 @@ export interface Database {
   logs: Logs;
   userStatusLogs: UserStatusLogs;
   apiKeys: ApiKeys;
+  follows: Follows;
+  userRadarCache: UserRadarCache;
   // 追加: 暫定/バックアップ用テーブル
   bkScores: BkScores;
   bkUsers: BkUsers;
-  follows: Follows;
 }
 
 export type Decimal = ColumnType<string, number | string>;
@@ -25,6 +26,19 @@ export type Generated<T> =
   T extends ColumnType<infer S, infer I, infer U>
     ? ColumnType<S, I | undefined, U>
     : ColumnType<T, T | undefined, T>;
+
+export interface UserRadarCache {
+  userId: string;
+  version: string;
+  notes: Generated<Decimal | null>;
+  chord: Generated<Decimal | null>;
+  peak: Generated<Decimal | null>;
+  charge: Generated<Decimal | null>;
+  scratch: Generated<Decimal | null>;
+  soflan: Generated<Decimal | null>;
+  totalBpi: Generated<Decimal | null>;
+  updatedAt: Generated<Date | null>;
+}
 
 export interface ApiKeys {
   createdAt: Generated<Date | null>;
@@ -63,9 +77,6 @@ export interface Follows {
 }
 
 export interface Logs {
-  /**
-   * 一括更新を識別するユニークなID
-   */
   batchId: string;
   createdAt: Generated<Date>;
   id: Generated<number>;

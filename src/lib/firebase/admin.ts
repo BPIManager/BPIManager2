@@ -1,10 +1,13 @@
 import * as admin from "firebase-admin";
-import adminsdk from "@/constants/adminsdk.json";
 
 if (!admin.apps.length) {
   admin.initializeApp({
-    credential: admin.credential.cert(adminsdk as admin.ServiceAccount),
-    projectId: adminsdk.project_id,
+    credential: admin.credential.cert({
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    }),
+    projectId: process.env.FIREBASE_PROJECT_ID,
   });
 }
 

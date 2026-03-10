@@ -52,8 +52,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
     {
       label: "ライバルを探す",
       icon: UsersIcon,
-      href: "/find",
-      isComingSoon: true,
+      href: "/users",
     },
     { label: "分析", icon: ChartArea, href: "/analytics", isComingSoon: true },
     { label: "メモ", icon: StickyNote, href: "/notes", isComingSoon: true },
@@ -85,24 +84,28 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
           </Box>
           <Separator colorPalette="gray" opacity={0.5} />
           {user?.userId && (
-            <HStack gap={4} justify="start" opacity={0.6} cursor="default">
-              <VStack gap={0} align="start">
-                <Text fontSize="xs" fontWeight="bold">
-                  {user?.followingCount ?? 0}
-                </Text>
-                <Text fontSize="2xs" color="fg.muted">
-                  フォロー中
-                </Text>
-              </VStack>
+            <HStack gap={4} justify="start" cursor="default">
+              <Link href={`/user/${user?.userId}/following`} passHref>
+                <VStack gap={0} align="start">
+                  <Text fontSize="xs" fontWeight="bold">
+                    {user?.followingCount ?? 0}
+                  </Text>
+                  <Text fontSize="2xs" color="fg.muted">
+                    フォロー中
+                  </Text>
+                </VStack>
+              </Link>
 
-              <VStack gap={0} align="start">
-                <Text fontSize="xs" fontWeight="bold">
-                  {user?.followerCount ?? 0}
-                </Text>
-                <Text fontSize="2xs" color="fg.muted">
-                  フォロワー
-                </Text>
-              </VStack>
+              <Link href={`/user/${user?.userId}/followers`} passHref>
+                <VStack gap={0} align="start">
+                  <Text fontSize="xs" fontWeight="bold">
+                    {user?.followerCount ?? 0}
+                  </Text>
+                  <Text fontSize="2xs" color="fg.muted">
+                    フォロワー
+                  </Text>
+                </VStack>
+              </Link>
             </HStack>
           )}
         </VStack>

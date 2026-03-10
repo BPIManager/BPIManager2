@@ -17,3 +17,7 @@ export interface RadarCategoryResult {
   totalBpi: number;
   songs: RadarSongEntry[];
 }
+
+export type RadarResponse = {
+  [K in RadarCategory]: RadarCategoryResult;
+};

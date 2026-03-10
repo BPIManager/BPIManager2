@@ -19,7 +19,6 @@ export const useFirestoreDataCheck = (uid: string | undefined) => {
         TARGET_VERSIONS.map(async (v) => {
           const docRef = doc(db, `${v}_1`, uid);
           const snap = await getDoc(docRef);
-          console.log(snap.data());
           if (snap.exists()) {
             found.push(v);
           }
