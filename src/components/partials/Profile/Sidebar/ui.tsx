@@ -13,6 +13,7 @@ import { SiX } from "react-icons/si";
 import { BpiHistoryTable } from "./bpiTable";
 import { FollowSection } from "./followStatus";
 import { FollowStats } from "./followCount";
+import { formatIIDXId } from "@/utils/common/formatIidxId";
 
 export const ProfileSideBar = ({
   profile,
@@ -51,7 +52,7 @@ export const ProfileSideBar = ({
             {profile.userName}
           </Heading>
           <Text fontSize="sm" color="gray.500" fontFamily="mono">
-            IIDX ID: {profile.iidxId}
+            IIDX ID: {formatIIDXId(profile.iidxId)}
           </Text>
         </VStack>
 

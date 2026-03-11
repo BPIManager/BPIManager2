@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { UsersRepository } from "@/lib/db/users";
 import { StatsRepository } from "@/lib/db/stats";
-import { BpiCalculator } from "@/lib/bpi";
 import { checkUserAccess } from "@/middlewares/api/withApi";
 import { latestVersion } from "@/constants/latestVersion";
 import { calculateRadar } from "@/lib/radar/calculator";
@@ -12,14 +11,16 @@ export default async function handler(
   res: NextApiResponse,
 ) {
   if (req.method !== "GET") return res.status(405).end();
-
-  const { userId } = req.query;
+  const { userId, q, p, s, o } = req.query;
+  const currentPage = Math.max(1, Number(p || 1));
+  const limit = 20;
+  const offset = (currentPage - 1) * limit;
+  const sortKey = (s as string) || "totalBpi";
+  const orderMode = (o as "distance" | "desc" | "newest") || "distance";
 
   const access = await checkUserAccess(req, userId as string);
   const viewerId = access.user?.userId;
-  if (!viewerId) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
+  if (!viewerId) return res.status(401).json({ message: "Unauthorized" });
 
   try {
     const statsRepo = new StatsRepository();
@@ -31,37 +32,44 @@ export default async function handler(
       viewerId,
       version,
     );
-    const latestTotalBpiRecord = await bpiRepo.getLatestTotalBpi(
-      viewerId,
-      version || latestVersion,
-    );
-    const latestTotalBpi = latestTotalBpiRecord
-      ? latestTotalBpiRecord.totalBpi
-      : -15;
-
     const viewerRadar = calculateRadar(viewerScores);
 
+    let viewerBaseValue: number;
+
+    if (sortKey === "totalBpi") {
+      const record = await bpiRepo.getLatestTotalBpi(viewerId, version);
+      viewerBaseValue = record ? record.totalBpi : -15;
+      console.log(record);
+    } else {
+      const category = sortKey.toUpperCase() as keyof typeof viewerRadar;
+      viewerBaseValue = viewerRadar[category]?.totalBpi ?? -15;
+    }
     const recommendedUsers = await usersRepo.getRecommendedUsers({
       viewerId,
-      viewerTotalBpi: latestTotalBpi,
+      viewerValue: viewerBaseValue,
       version,
-      limit: 20,
-      range: 5.0,
+      limit,
+      offset,
+      searchQuery: q as string,
+      sort: sortKey,
+      order: orderMode,
     });
 
     return res.status(200).json({
       viewer: {
         userId: viewerId,
-        totalBpi: latestTotalBpi,
+        totalBpi: viewerBaseValue,
         radar: viewerRadar,
       },
       users: recommendedUsers.map((user) => ({
         userId: user.userId,
+        iidxId: user.iidxId,
         userName: user.userName,
         profileImage: user.profileImage,
         profileText: user.profileText,
         arenaRank: user.arenaRank ?? "N/A",
         totalBpi: Number(user.totalBpi),
+        updatedAt: user.createdAt, //バッチidの作成時間が最終更新日時
         radar: {
           NOTES: Number(user.notes),
           CHORD: Number(user.chord),

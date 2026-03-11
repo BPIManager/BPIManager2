@@ -4,12 +4,35 @@ import { sql } from "kysely";
 export class UsersRepository {
   async getRecommendedUsers(params: {
     viewerId: string;
-    viewerTotalBpi: number;
+    viewerValue: number;
     version: string;
     limit: number;
-    range: number;
+    offset: number;
+    searchQuery?: string;
+    sort?: string;
+    order?: "distance" | "desc" | "newest";
   }) {
-    const { viewerId, viewerTotalBpi, version, limit, range } = params;
+    const {
+      viewerId,
+      viewerValue,
+      version,
+      limit,
+      offset,
+      searchQuery,
+      sort,
+      order,
+    } = params;
+    const columnMap: Record<string, string> = {
+      totalBpi: "usl.totalBpi",
+      notes: "r.notes",
+      chord: "r.chord",
+      peak: "r.peak",
+      charge: "r.charge",
+      scratch: "r.scratch",
+      soflan: "r.soflan",
+    };
+    const sortColumn =
+      sort && columnMap[sort] ? columnMap[sort] : "usl.totalBpi";
 
     const latestStatusSubquery = db
       .selectFrom("userStatusLogs")
@@ -17,7 +40,7 @@ export class UsersRepository {
       .where("version", "=", version)
       .groupBy("userId");
 
-    return await db
+    let query = db
       .selectFrom("users as u")
       .innerJoin("userRadarCache as r", "u.userId", "r.userId")
       .leftJoin(latestStatusSubquery.as("ls"), "u.userId", "ls.userId")
@@ -25,10 +48,12 @@ export class UsersRepository {
       .select([
         "u.userId",
         "u.userName",
+        "u.iidxId",
         "u.profileImage",
         "u.profileText",
         "usl.arenaRank",
-        "r.totalBpi",
+        "usl.totalBpi",
+        "usl.createdAt",
         "r.notes",
         "r.chord",
         "r.peak",
@@ -38,12 +63,30 @@ export class UsersRepository {
       ])
       .where("r.version", "=", version)
       .where("u.isPublic", "=", 1)
-      .where("u.userId", "!=", viewerId)
-      .where("r.totalBpi", ">", (viewerTotalBpi - range).toString())
-      .where("r.totalBpi", "<", (viewerTotalBpi + range).toString())
-      .orderBy(sql`ABS(${viewerTotalBpi} - r.totalBpi)`, "asc")
-      .limit(limit)
-      .execute();
+      .where("u.userId", "!=", viewerId);
+
+    if (searchQuery) {
+      const searchPattern = `%${searchQuery}%`;
+      query = query.where((eb) =>
+        eb.or([
+          eb("u.userName", "like", searchPattern),
+          eb("u.iidxId", "like", searchPattern),
+        ]),
+      );
+    }
+
+    if (order === "newest") {
+      query = query.orderBy("usl.createdAt", "desc");
+    } else if (order === "desc") {
+      query = query.orderBy(sql.ref(`${sortColumn}`), "desc");
+    } else {
+      query = query.orderBy(
+        sql`ABS(${viewerValue} - ${sql.raw(sortColumn as string)})`,
+        "asc",
+      );
+    }
+
+    return await query.limit(limit).offset(offset).execute();
   }
 
   async getUserProfileSummary(userId: string, myId?: string) {

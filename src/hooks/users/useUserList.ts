@@ -8,7 +8,9 @@ export interface RecommendedUser {
   profileImage: string | null;
   arenaRank: string;
   totalBpi: number;
+  iidxId: string;
   radar: Record<string, number>;
+  updatedAt: string;
 }
 
 interface UserListResponse {
@@ -20,16 +22,30 @@ interface UserListResponse {
   users: RecommendedUser[];
 }
 
-export const useUserList = () => {
+export const useUserList = (
+  q: string = "",
+  page: number = 1,
+  sort: string = "totalBpi",
+  order: string = "distance",
+) => {
   const { fbUser } = useUser();
-  const { data, error, isLoading } = useSWR<UserListResponse>(
-    fbUser ? [`/api/${fbUser?.uid}/rivals/recommended`, fbUser] : null,
+
+  const searchParams = new URLSearchParams();
+  if (q) searchParams.append("q", q);
+  searchParams.append("p", page.toString());
+  searchParams.append("s", sort);
+  searchParams.append("o", order);
+
+  const { data, error, isLoading, mutate } = useSWR<UserListResponse>(
+    fbUser
+      ? [
+          `/api/${fbUser?.uid}/rivals/recommended?${searchParams.toString()}`,
+          fbUser,
+        ]
+      : null,
     fetcher,
+    { revalidateOnFocus: false },
   );
 
-  return {
-    data,
-    isLoading,
-    isError: error,
-  };
+  return { data, isLoading, isError: error, mutate };
 };

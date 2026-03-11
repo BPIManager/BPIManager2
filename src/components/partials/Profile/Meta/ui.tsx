@@ -1,5 +1,6 @@
 import { useStaticProfile } from "@/contexts/profile/ProfileContext";
 import { Meta } from "../../Head";
+import { formatIIDXId } from "@/utils/common/formatIidxId";
 
 interface ProfileMetaProps {
   title: string;
@@ -19,10 +20,6 @@ export const ProfileMeta = ({
   const defaultDescription =
     profile.profileText ||
     `${profile.userName}さんのBPIM2プロフィールページです。`;
-
-  const formatIIDXId = (str: string) => {
-    return str.replace(/^(\d{4})(\d{4})$/, "$1-$2");
-  };
 
   return (
     <Meta
