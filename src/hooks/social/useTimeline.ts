@@ -76,7 +76,7 @@ export const useTimeline = (
     useSWRInfinite<TimelineResponse>(getKey, fetcher, {
       revalidateFirstPage: false,
       revalidateOnFocus: false,
-      keepPreviousData: true,
+      keepPreviousData: false,
     });
 
   const timeline = data ? data.flatMap((page) => page.timeline) : [];
