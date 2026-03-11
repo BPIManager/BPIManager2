@@ -88,7 +88,7 @@ export const UserRecommendationCard = ({
             </Avatar.Root>
             <VStack align="start" gap={0} minW={0}>
               <Text
-                fontWeight="black"
+                fontWeight="bold"
                 color="white"
                 fontSize={{ base: "xs", md: "md" }}
                 lineClamp={1}
@@ -127,7 +127,7 @@ export const UserRecommendationCard = ({
             <Text
               fontSize="9px"
               color={isTotalBpi ? "gray.500" : "blue.400"}
-              fontWeight="black"
+              fontWeight="bold"
               mb={0.5}
               letterSpacing="wider"
             >
@@ -166,7 +166,7 @@ export const UserRecommendationCard = ({
             <Text
               fontSize="9px"
               color="gray.500"
-              fontWeight="black"
+              fontWeight="bold"
               mb={0.5}
               letterSpacing="wider"
             >

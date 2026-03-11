@@ -44,10 +44,9 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
       href: `/user/${user?.userId}/logs/${latestVersion}`,
     },
     {
-      label: "フォロータイムライン",
+      label: "ライバルタイムライン",
       icon: ChartNoAxesGantt,
       href: "/timeline",
-      isComingSoon: true,
     },
     {
       label: "ライバルを探す",

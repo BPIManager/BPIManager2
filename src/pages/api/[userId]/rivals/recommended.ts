@@ -39,7 +39,6 @@ export default async function handler(
     if (sortKey === "totalBpi") {
       const record = await bpiRepo.getLatestTotalBpi(viewerId, version);
       viewerBaseValue = record ? record.totalBpi : -15;
-      console.log(record);
     } else {
       const category = sortKey.toUpperCase() as keyof typeof viewerRadar;
       viewerBaseValue = viewerRadar[category]?.totalBpi ?? -15;

@@ -26,6 +26,7 @@ import { versionsNonDisabledCollection } from "@/constants/versions";
 import { latestVersion } from "@/constants/latestVersion";
 import { useRouter } from "next/router";
 import { IIDX_DIFFICULTIES } from "@/constants/diffs";
+import { FilterCheckboxGroup, FilterStickyToggle } from "./part";
 
 interface SongFilterBarProps {
   params: FilterParamsFrontend;
@@ -129,83 +130,34 @@ export const SongFilterBar = ({
       </HStack>
 
       <Flex gap={6} wrap="wrap" mt={2}>
-        <VStack align="start" gap={2}>
-          <Text
-            fontSize="10px"
-            color="gray.500"
-            fontWeight="bold"
-            letterSpacing="widest"
-          >
-            LEVEL
-          </Text>
-          <HStack gap={4}>
-            {[11, 12].map((lv) => (
-              <Checkbox
-                key={lv}
-                checked={params.levels?.includes(lv)}
-                onCheckedChange={() =>
-                  onParamsChange({
-                    levels: toggleArrayItem(params.levels, lv),
-                  })
-                }
-              >
-                <Text fontSize="xs" fontWeight="bold">
-                  ☆{lv}
-                </Text>
-              </Checkbox>
-            ))}
-          </HStack>
-        </VStack>
-
-        <VStack align="start" gap={2}>
-          <Text
-            fontSize="10px"
-            color="gray.500"
-            fontWeight="bold"
-            letterSpacing="widest"
-          >
-            DIFFICULTY
-          </Text>
-          <HStack gap={4}>
-            {IIDX_DIFFICULTIES.map((diff) => (
-              <Checkbox
-                key={diff}
-                checked={params.difficulties?.includes(diff)}
-                onCheckedChange={() =>
-                  onParamsChange({
-                    difficulties: toggleArrayItem(params.difficulties, diff),
-                  })
-                }
-              >
-                <Text fontSize="xs" fontWeight="bold">
-                  {diff[0]}
-                </Text>
-              </Checkbox>
-            ))}
-          </HStack>
-        </VStack>
+        <FilterCheckboxGroup
+          label="LEVEL"
+          items={[11, 12]}
+          selected={params.levels}
+          onToggle={(v: any) =>
+            onParamsChange({ levels: toggleArrayItem(params.levels, v) })
+          }
+          getLabel={(v: any) => `☆${v}`}
+        />
+        <FilterCheckboxGroup
+          label="DIFFICULTY"
+          items={["HYPER", "ANOTHER", "LEGGENDARIA"]}
+          selected={params.difficulties}
+          onToggle={(v: any) =>
+            onParamsChange({
+              difficulties: toggleArrayItem(params.difficulties, v),
+            })
+          }
+          getLabel={(v: any) => v[0]}
+        />
       </Flex>
 
       <Separator opacity={0.1} mt={3} />
-
-      <HStack justify="space-between" align="center" mt={3}>
-        <Text fontSize="12px" fontWeight="bold" color="blue.500">
-          {totalCount.toLocaleString()} 曲見つかりました
+      <HStack justify="space-between">
+        <Text fontSize="xs" fontWeight="bold" color="blue.500">
+          {totalCount.toLocaleString()}曲
         </Text>
-        <HStack color="gray.400" gap={1}>
-          <LuClock size={12} />
-          <Text fontSize="12px">最終更新: </Text>
-          <IconButton
-            variant="ghost"
-            size="xs"
-            color={isSticky ? "blue.400" : "gray.500"}
-            aria-label="Toggle Sticky"
-            onClick={() => setIsSticky(!isSticky)}
-            _hover={{ bg: "whiteAlpha.200" }}
-          >
-            {isSticky ? <LuPin size={14} /> : <LuPinOff size={14} />}
-          </IconButton>
-        </HStack>
+        <FilterStickyToggle isSticky={isSticky} onToggle={setIsSticky} />
       </HStack>
     </Box>
   );
