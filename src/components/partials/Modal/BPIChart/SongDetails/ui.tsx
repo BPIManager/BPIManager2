@@ -22,8 +22,9 @@ import { useMemo, useState } from "react";
 import { BpiCalculator } from "@/lib/bpi";
 import { BPIChart } from "./chart";
 import { getRankDetail } from "@/constants/djRank";
-import { LineChart, LucideHistory } from "lucide-react";
+import { LineChart, LucideHistory, Users } from "lucide-react";
 import { SongHistoryTab } from "../History/ui";
+import RivalsRanking from "../Rivals";
 
 export const SongDetailView = ({
   song,
@@ -178,6 +179,9 @@ export const SongDetailView = ({
               <Tabs.Trigger value="history" gap={2}>
                 <LucideHistory /> <Text fontSize="xs">HISTORY</Text>
               </Tabs.Trigger>
+              <Tabs.Trigger value="rivals" gap={2}>
+                <Users /> <Text fontSize="xs">RIVALS</Text>
+              </Tabs.Trigger>
             </Tabs.List>
             <Tabs.Content value="stats">
               <BPIChart
@@ -224,6 +228,9 @@ export const SongDetailView = ({
             </Tabs.Content>
             <Tabs.Content value="history">
               <SongHistoryTab songId={song.songId} />
+            </Tabs.Content>
+            <Tabs.Content value="rivals">
+              <RivalsRanking song={song} />
             </Tabs.Content>
           </Tabs.Root>
         </DialogBody>

@@ -211,4 +211,55 @@ export class SocialRepository {
       .where("version", "=", version)
       .executeTakeFirst();
   }
+
+  /**
+   * 特定楽曲におけるフォロー中ユーザーの最新スコアリストを取得
+   */
+  async getRivalScoresForSong(params: {
+    viewerId: string;
+    songId: number;
+    version: string;
+  }) {
+    const { viewerId, songId, version } = params;
+
+    return await db
+      .selectFrom("follows as f")
+      .innerJoin("users as u", "f.followingId", "u.userId")
+      .innerJoin("scores as s", "u.userId", "s.userId")
+      .innerJoin("songs as m", "s.songId", "m.songId")
+      .innerJoin("songDef as d", (join) =>
+        join.onRef("d.songId", "=", "m.songId").on("d.isCurrent", "=", 1),
+      )
+      .select([
+        "u.userId",
+        "u.userName",
+        "u.profileImage",
+        "s.exScore",
+        "s.bpi",
+        "s.clearState",
+        "s.lastPlayed",
+        "s.logId",
+        "m.title",
+        "m.difficulty",
+        "m.notes",
+        "d.wrScore",
+        "d.kaidenAvg",
+      ])
+      .where("f.followerId", "=", viewerId)
+      .where("s.songId", "=", songId)
+      .where("s.version", "=", version)
+      .where("u.isPublic", "=", 1)
+      .where("s.logId", "in", (eb) =>
+        eb
+          .selectFrom("scores as s2")
+          .select((subEb) => subEb.fn.max("logId").as("logId"))
+          .where("s2.songId", "=", songId)
+          .where("s2.version", "=", version)
+          .groupBy("s2.userId"),
+      )
+      .orderBy("s.exScore", "desc")
+      .execute();
+  }
 }
+
+export const socialRepo = new SocialRepository();
