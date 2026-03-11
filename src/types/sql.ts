@@ -15,6 +15,7 @@ export interface Database {
   apiKeys: ApiKeys;
   follows: Follows;
   userRadarCache: UserRadarCache;
+  notifications: Notifications;
   // 追加: 暫定/バックアップ用テーブル
   bkScores: BkScores;
   bkUsers: BkUsers;
@@ -26,6 +27,16 @@ export type Generated<T> =
   T extends ColumnType<infer S, infer I, infer U>
     ? ColumnType<S, I | undefined, U>
     : ColumnType<T, T | undefined, T>;
+
+export interface Notifications {
+  id: Generated<number>;
+  recipientId: string;
+  senderId: string;
+  type: string;
+  targetId: Generated<string | null>;
+  isRead: Generated<boolean>;
+  createdAt: Generated<Date>;
+}
 
 export interface UserRadarCache {
   userId: string;
@@ -165,3 +176,6 @@ export type Song = Selectable<Songs>;
 export type User = Selectable<Users>;
 export type Score = Selectable<Scores>;
 export type NewScore = Insertable<Scores>;
+export type Notification = Selectable<Notifications>;
+export type NewNotification = Insertable<Notifications>;
+export type NotificationUpdate = Updateable<Notifications>;
