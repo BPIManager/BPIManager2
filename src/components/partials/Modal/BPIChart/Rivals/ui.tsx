@@ -83,7 +83,7 @@ export const RivalRankingBody = ({
                   </Text>
                 </Table.Cell>
                 <Table.Cell p={2}>
-                  <HStack gap="3" filter="blur(10px)">
+                  <HStack gap="3">
                     <Avatar.Root size="xs">
                       <Avatar.Image src={row.profileImage ?? ""} />
                       <Avatar.Fallback name={row.userName} />
