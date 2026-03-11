@@ -157,7 +157,7 @@ const ComparisonRow = ({
   color,
   isFloat = false,
 }: any) => {
-  const format = (v: number) => (isFloat ? v.toFixed(2) : v.toLocaleString());
+  const format = (v: number) => (isFloat ? v.toFixed(2) : v);
   const hasViewer = viewerValue !== undefined;
 
   return (

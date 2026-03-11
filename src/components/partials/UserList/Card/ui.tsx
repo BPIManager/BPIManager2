@@ -8,22 +8,23 @@ import {
   Icon,
 } from "@chakra-ui/react";
 import { getBpiColorStyle } from "../../DashBoard/BPIDistribution";
-import { RadarSectionChart } from "../../DashBoard/Radar/mutipleChart";
-import Link from "next/link";
 import { LuTrendingUp, LuTrendingDown } from "react-icons/lu";
 import { formatIIDXId } from "@/utils/common/formatIidxId";
 import dayjs from "@/lib/dayjs";
+import { RadarSectionChart } from "../../DashBoard/Radar/ui";
 
 export const UserRecommendationCard = ({
   user,
   viewerRadar,
   viewerTotalBpi,
   currentSort = "totalBpi",
+  onClick,
 }: {
   user: any;
   viewerRadar: any;
   viewerTotalBpi: number;
   currentSort?: string;
+  onClick: () => void;
 }) => {
   const timeAgo = user.updatedAt ? dayjs(user.updatedAt).fromNow() : "-";
   const isTotalBpi = currentSort === "totalBpi";
@@ -43,9 +44,11 @@ export const UserRecommendationCard = ({
   const diff = displayValue - viewerCompareValue;
   const isTarget = diff > 0;
   return (
-    <Link
-      href={"/user/" + user.userId}
-      passHref
+    <Box
+      as="button"
+      width="full"
+      onClick={onClick}
+      textAlign="left"
       style={{ textDecoration: "none" }}
     >
       <HStack
@@ -54,6 +57,7 @@ export const UserRecommendationCard = ({
         borderRadius="2xl"
         borderWidth="1px"
         borderColor="whiteAlpha.100"
+        cursor="pointer"
         gap={{ base: 3, md: 6 }}
         _hover={{
           borderColor: "whiteAlpha.400",
@@ -200,6 +204,6 @@ export const UserRecommendationCard = ({
           />
         </Box>
       </HStack>
-    </Link>
+    </Box>
   );
 };

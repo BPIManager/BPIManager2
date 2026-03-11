@@ -35,7 +35,7 @@ export const useProfile = (userId: string | undefined) => {
     },
   );
 
-  const toggleFollow = async () => {
+  const toggleFollow = async (onSuccess?: () => void) => {
     if (!userId || !fbUser || isUpdating) return;
 
     setIsUpdating(true);
@@ -52,7 +52,8 @@ export const useProfile = (userId: string | undefined) => {
       if (!res.ok) throw new Error("Follow request failed");
 
       await mutate();
-      await refresh();
+      if (refresh) await refresh();
+      if (onSuccess) onSuccess();
     } catch (e) {
       console.error("Follow error:", e);
     } finally {

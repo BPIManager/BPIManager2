@@ -76,7 +76,7 @@ export const useTimeline = (
     useSWRInfinite<TimelineResponse>(getKey, fetcher, {
       revalidateFirstPage: false,
       revalidateOnFocus: false,
-      keepPreviousData: false,
+      keepPreviousData: true,
     });
 
   const timeline = data ? data.flatMap((page) => page.timeline) : [];
@@ -86,9 +86,10 @@ export const useTimeline = (
 
   const isReachingEnd = data ? data[data.length - 1]?.nextId === null : false;
 
+  const loading = isLoading || isFetchingMore;
   return {
     timeline,
-    isLoading: isFetchingMore,
+    isLoading: loading,
     isValidating,
     isReachingEnd,
     size,

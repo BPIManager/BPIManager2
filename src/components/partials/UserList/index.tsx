@@ -1,10 +1,9 @@
 import {
   VStack,
   SimpleGrid,
-  Spinner,
-  Center,
   Box,
   HStack,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { useUserList } from "@/hooks/users/useUserList";
 import { UserRecommendationCard } from "./Card/ui";
@@ -14,9 +13,13 @@ import { SearchInput } from "./Filter/searchInput";
 import { Pagination } from "./pagination";
 import { UserRecommendationCardSkeleton } from "./Card/skeleton";
 import { UserRecommendationEmpty } from "./Card/empty";
+import { useState } from "react";
+import { RivalComparisonModal } from "./Modal";
 
 export const UserRecommendationList = () => {
   const router = useRouter();
+  const { open, onOpen, onClose } = useDisclosure();
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
   const q = (router.query.q as string) || "";
   const p = Number(router.query.p) || 1;
@@ -39,6 +42,10 @@ export const UserRecommendationList = () => {
   const { data, isLoading } = useUserList(q, p, s, o);
   const handleReset = () =>
     updateParams({ q: "", p: 1, s: "totalBpi", o: "distance" });
+  const handleCardClick = (userId: string) => {
+    setSelectedUserId(userId);
+    onOpen();
+  };
 
   return (
     <VStack align="stretch" gap={6} w="full">
@@ -82,11 +89,19 @@ export const UserRecommendationList = () => {
               viewerRadar={data.viewer.radar}
               viewerTotalBpi={data.viewer.totalBpi}
               currentSort={s}
+              onClick={() => handleCardClick(user.userId)}
             />
           ))}
         </SimpleGrid>
       )}
-
+      {selectedUserId && (
+        <RivalComparisonModal
+          rivalId={selectedUserId}
+          isOpen={open}
+          onClose={onClose}
+          viewerRadar={data?.viewer.radar}
+        />
+      )}
       {!isLoading && (
         <Pagination
           p={p}

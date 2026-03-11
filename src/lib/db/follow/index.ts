@@ -147,3 +147,5 @@ export class FollowRepository {
     };
   }
 }
+
+export const followsRepo = new FollowRepository();

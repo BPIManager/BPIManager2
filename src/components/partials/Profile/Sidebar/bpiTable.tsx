@@ -14,7 +14,7 @@ export const BpiHistoryTable = ({
       px={4}
       py={1}
       fontSize="9px"
-      color="gray.600"
+      color="gray.400"
       fontWeight="bold"
     >
       <Text>Ver</Text>

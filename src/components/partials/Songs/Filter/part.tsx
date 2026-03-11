@@ -56,7 +56,7 @@ export const FilterCheckboxGroup = ({
     <Text
       fontSize="10px"
       color="gray.500"
-      fontWeight="black"
+      fontWeight="bold"
       letterSpacing="widest"
     >
       {label}

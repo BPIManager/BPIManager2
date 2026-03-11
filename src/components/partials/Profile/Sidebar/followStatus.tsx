@@ -15,11 +15,13 @@ export const FollowSection = ({
   onToggle,
   isUpdating,
   userId,
+  w = "full",
 }: {
   relationship: any;
   onToggle?: () => void;
   isUpdating?: boolean;
   userId: string;
+  w: any;
 }) => {
   const { fbUser } = useUser();
   const isLoggedIn = !!fbUser?.uid;
@@ -36,10 +38,11 @@ export const FollowSection = ({
   );
 
   return (
-    <VStack w="full" gap={2}>
+    <>
       {isLoggedIn ? (
         <Button
-          width="full"
+          width={w}
+          px={4}
           size="sm"
           variant="solid"
           colorPalette={relationship.isFollowing ? "green" : "blue"}
@@ -86,6 +89,6 @@ export const FollowSection = ({
           </Badge>
         ) : null}
       </HStack>
-    </VStack>
+    </>
   );
 };

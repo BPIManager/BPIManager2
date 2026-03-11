@@ -140,7 +140,7 @@ const FilterHeader = ({ label }: { label: string }) => (
   <Text
     px={1}
     fontSize="10px"
-    fontWeight="black"
+    fontWeight="bold"
     color="gray.500"
     letterSpacing="widest"
     textTransform="uppercase"

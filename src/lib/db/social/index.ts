@@ -152,4 +152,63 @@ export class SocialRepository {
       .where("logId", "in", ids)
       .execute();
   }
+
+  async getWinLossStats(viewerId: string, rivalId: string, version: string) {
+    const getLatestLogIds = (uid: string) =>
+      db
+        .selectFrom("scores as s")
+        .innerJoin("songs as m", "s.songId", "m.songId")
+        .select(["s.songId", (eb) => eb.fn.max("s.logId").as("maxId")])
+        .where("s.userId", "=", uid)
+        .where("s.version", "=", version)
+        .where("m.difficultyLevel", "in", [11, 12])
+        .groupBy("s.songId");
+
+    const [vIds, rIds] = await Promise.all([
+      getLatestLogIds(viewerId).execute(),
+      getLatestLogIds(rivalId).execute(),
+    ]);
+
+    if (vIds.length === 0 || rIds.length === 0) return [];
+
+    const vLogIds = vIds.map((v) => v.maxId as number);
+    const rLogIds = rIds.map((r) => r.maxId as number);
+
+    const stats = await db
+      .selectFrom("scores as s1")
+      .innerJoin("scores as s2", "s1.songId", "s2.songId")
+      .innerJoin("songs as m", "s1.songId", "m.songId")
+      .select([
+        "m.difficultyLevel",
+        sql<number>`SUM(CASE WHEN s1.exScore > s2.exScore THEN 1 ELSE 0 END)`.as(
+          "win",
+        ),
+        sql<number>`SUM(CASE WHEN s1.exScore < s2.exScore THEN 1 ELSE 0 END)`.as(
+          "lose",
+        ),
+        sql<number>`SUM(CASE WHEN s1.exScore = s2.exScore THEN 1 ELSE 0 END)`.as(
+          "draw",
+        ),
+      ])
+      .where("s1.logId", "in", vLogIds)
+      .where("s2.logId", "in", rLogIds)
+      .groupBy("m.difficultyLevel")
+      .execute();
+
+    return stats.map((s) => ({
+      level: Number(s.difficultyLevel),
+      win: Number(s.win),
+      lose: Number(s.lose),
+      draw: Number(s.draw),
+    }));
+  }
+
+  async getUserRadar(userId: string, version: string) {
+    return await db
+      .selectFrom("userRadarCache")
+      .selectAll()
+      .where("userId", "=", userId)
+      .where("version", "=", version)
+      .executeTakeFirst();
+  }
 }

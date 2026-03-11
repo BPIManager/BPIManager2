@@ -1,8 +1,8 @@
 import {
+  Box,
   VStack,
   HStack,
   Text,
-  Box,
   Button,
   Spacer,
   Separator,
@@ -10,7 +10,6 @@ import {
   Link as CLink,
 } from "@chakra-ui/react";
 import {
-  Home,
   FileUp,
   Settings,
   LogOut,
@@ -22,6 +21,8 @@ import {
   UsersIcon,
   ScrollText,
   Github,
+  User,
+  ChevronRight,
 } from "lucide-react";
 import { useUser } from "@/contexts/users/UserContext";
 import { authActions } from "@/lib/firebase/auth";
@@ -34,6 +35,7 @@ import { latestVersion } from "@/constants/latestVersion";
 export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
   const { user, fbUser } = useUser();
   const router = useRouter();
+
   const menuItems = [
     { label: "ダッシュボード", icon: LuLayoutDashboard, href: "/" },
     { label: "インポート", icon: FileUp, href: "/import" },
@@ -58,45 +60,86 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
     { label: "指標", icon: LandPlot, href: "/metrics" },
     { label: "設定", icon: Settings, href: "/settings" },
   ];
+
   return (
     <VStack align="stretch" p={4} gap={6} h="full" minH="0" overflowY="auto">
-      <Box p={4} borderRadius="xl" color="white">
-        <VStack gap={3} align="start">
-          <Link href={"/user/" + fbUser?.uid}>
-            <Avatar
-              size="lg"
-              src={user?.profileImage || ""}
-              name={user?.userName || "User"}
-              shape="rounded"
-            />
-          </Link>
-          <Box>
-            <Text fontWeight="bold" fontSize="md" lineClamp={1}>
-              {user?.userName || "Guest"}
-            </Text>
-            <Text fontSize="xs" color="fg.muted" fontFamily="mono">
-              {user?.iidxId ? `IIDX ID: ${user.iidxId}` : "ID未設定"}
-            </Text>
-            <Text fontSize="xs" color="fg.muted" fontFamily="mono">
-              ☆12総合BPI:{user?.totalBpi ?? -15}
-            </Text>
-          </Box>
-          <Separator colorPalette="gray" opacity={0.5} />
+      <Box
+        p={4}
+        borderRadius="xl"
+        color="white"
+        bg="whiteAlpha.50"
+        borderWidth="1px"
+        borderColor="whiteAlpha.100"
+      >
+        <VStack gap={4} align="stretch">
+          <HStack gap={3}>
+            <Link href={"/user/" + user?.userId}>
+              <Avatar
+                size="lg"
+                src={user?.profileImage || ""}
+                name={user?.userName || "User"}
+                shape="rounded"
+              />
+            </Link>
+            <Box minW={0}>
+              <Text fontWeight="bold" fontSize="md" lineClamp={1}>
+                {user?.userName || "Guest"}
+              </Text>
+              <Text
+                fontSize="2xs"
+                color="fg.muted"
+                fontFamily="mono"
+                lineClamp={1}
+              >
+                {user?.iidxId ? `ID: ${user.iidxId}` : "ID未設定"}
+              </Text>
+              <Text
+                fontSize="2xs"
+                color="orange.300"
+                fontWeight="bold"
+                fontFamily="mono"
+              >
+                ☆12 BPI: {user?.totalBpi ?? -15}
+              </Text>
+            </Box>
+          </HStack>
+
           {user?.userId && (
-            <HStack gap={4} justify="start" cursor="default">
+            <Button
+              asChild
+              variant="outline"
+              size="xs"
+              width="full"
+              borderColor="gray.600"
+              justifyContent="space-between"
+              onClick={onClose}
+              px={2}
+            >
+              <Link href={`/user/${user?.userId}`}>
+                <HStack gap={1}>
+                  <User size={12} />
+                  <Text fontSize="2xs">プロフィールを表示</Text>
+                </HStack>
+                <ChevronRight size={12} />
+              </Link>
+            </Button>
+          )}
+
+          {user?.userId && (
+            <HStack gap={10} justify="center" cursor="default" px={1}>
               <Link href={`/user/${user?.userId}/following`} passHref>
-                <VStack gap={0} align="start">
+                <VStack gap={0} align="center">
                   <Text fontSize="xs" fontWeight="bold">
                     {user?.followingCount ?? 0}
                   </Text>
                   <Text fontSize="2xs" color="fg.muted">
-                    フォロー中
+                    フォロー
                   </Text>
                 </VStack>
               </Link>
 
               <Link href={`/user/${user?.userId}/followers`} passHref>
-                <VStack gap={0} align="start">
+                <VStack gap={0} align="center">
                   <Text fontSize="xs" fontWeight="bold">
                     {user?.followerCount ?? 0}
                   </Text>
