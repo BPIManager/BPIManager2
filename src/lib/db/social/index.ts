@@ -260,6 +260,113 @@ export class SocialRepository {
       .orderBy("s.exScore", "desc")
       .execute();
   }
+
+  async getFollowedWinLossSummary(params: {
+    viewerId: string;
+    version: string;
+    levels: number[];
+    difficulties: string[];
+  }) {
+    const { viewerId, version, levels, difficulties } = params;
+
+    const targetSongs = db
+      .selectFrom("songs as m")
+      .innerJoin("songDef as d", (join) =>
+        join.onRef("d.songId", "=", "m.songId").on("d.isCurrent", "=", 1),
+      )
+      .select(["m.songId"])
+      .$if(levels.length > 0, (qb) =>
+        qb.where("m.difficultyLevel", "in", levels),
+      )
+      .$if(difficulties.length > 0, (qb) =>
+        qb.where("m.difficulty", "in", difficulties),
+      );
+
+    const myLatest = db
+      .selectFrom("scores as s")
+      .innerJoin("songs as sm", "s.songId", "sm.songId")
+      .select(["s.songId", "s.exScore"])
+      .where("s.userId", "=", viewerId)
+      .where("s.version", "=", version)
+      .$if(levels.length > 0, (qb) =>
+        qb.where("sm.difficultyLevel", "in", levels),
+      )
+      .$if(difficulties.length > 0, (qb) =>
+        qb.where("sm.difficulty", "in", difficulties),
+      )
+      .where("s.logId", "in", (eb) =>
+        eb
+          .selectFrom("scores as s2")
+          .select((sub) => sub.fn.max("logId").as("max"))
+          .where("userId", "=", viewerId)
+          .where("version", "=", version)
+          .groupBy("songId"),
+      );
+    const rivalsLatest = db
+      .selectFrom("scores as s")
+      .innerJoin("songs as rm", "s.songId", "rm.songId")
+      .innerJoin("follows as f", "f.followingId", "s.userId")
+      .select(["s.userId", "s.songId", "s.exScore"])
+      .where("f.followerId", "=", viewerId)
+      .where("s.version", "=", version)
+      .$if(levels.length > 0, (qb) =>
+        qb.where("rm.difficultyLevel", "in", levels),
+      )
+      .$if(difficulties.length > 0, (qb) =>
+        qb.where("rm.difficulty", "in", difficulties),
+      )
+      .where("s.logId", "in", (eb) =>
+        eb
+          .selectFrom("scores as s3")
+          .select((sub) => sub.fn.max("logId").as("max"))
+          .where("version", "=", version)
+          .groupBy(["userId", "songId"]),
+      );
+
+    const results = await db
+      .selectFrom("follows as f")
+      .innerJoin("users as u", "f.followingId", "u.userId")
+      .innerJoin(targetSongs.as("m"), (join) => join.on(sql`1`, "=", sql`1`))
+      .leftJoin(myLatest.as("v"), "m.songId", "v.songId")
+      .leftJoin(rivalsLatest.as("r"), (join) =>
+        join
+          .onRef("m.songId", "=", "r.songId")
+          .onRef("f.followingId", "=", "r.userId"),
+      )
+      .select([
+        "u.userId",
+        "u.userName",
+        "u.profileImage",
+        sql<number>`SUM(CASE 
+          WHEN v.exScore IS NULL AND r.exScore IS NULL THEN 0
+          WHEN COALESCE(v.exScore, 0) > COALESCE(r.exScore, 0) THEN 1 
+          ELSE 0 END)`.as("win"),
+        sql<number>`SUM(CASE 
+          WHEN v.exScore IS NULL AND r.exScore IS NULL THEN 0
+          WHEN COALESCE(v.exScore, 0) < COALESCE(r.exScore, 0) THEN 1 
+          ELSE 0 END)`.as("lose"),
+        sql<number>`SUM(CASE 
+          WHEN v.exScore IS NULL AND r.exScore IS NULL THEN 0
+          WHEN COALESCE(v.exScore, 0) = COALESCE(r.exScore, 0) AND (v.exScore IS NOT NULL OR r.exScore IS NOT NULL) THEN 1 
+          ELSE 0 END)`.as("draw"),
+        sql<number>`SUM(CASE WHEN v.exScore IS NOT NULL OR r.exScore IS NOT NULL THEN 1 ELSE 0 END)`.as(
+          "totalCount",
+        ),
+      ])
+      .where("f.followerId", "=", viewerId)
+      .where("u.isPublic", "=", 1)
+      .groupBy(["u.userId", "u.userName", "u.profileImage"])
+      .orderBy("win", "desc")
+      .execute();
+
+    return results.map((r) => ({
+      ...r,
+      win: Number(r.win),
+      lose: Number(r.lose),
+      draw: Number(r.draw),
+      totalCount: Number(r.totalCount),
+    }));
+  }
 }
 
 export const socialRepo = new SocialRepository();

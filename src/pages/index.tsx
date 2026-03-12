@@ -21,6 +21,7 @@ import { TotalBPIHistory } from "@/components/partials/DashBoard/TotalBPIHistory
 import { PageContainer, PageHeader } from "@/components/partials/Header";
 import { RankingTabsCard } from "@/components/partials/DashBoard/RecommendedCard/ui";
 import { RadarSection } from "@/components/partials/DashBoard/Radar";
+import { RivalWinLossSummary } from "@/components/partials/DashBoard/Rivals/ui";
 
 export default function DashboardPage() {
   const { user, isLoading: isUserLoading, fbUser } = useUser();
@@ -55,6 +56,7 @@ export default function DashboardPage() {
                   <BpiDistributionSection userId={fbUser.uid} />
                 </SimpleGrid>
                 <TotalBPIHistory userId={fbUser.uid} />
+                <RivalWinLossSummary userId={fbUser.uid} />
                 <RadarSection userId={fbUser.uid} />
               </VStack>
 

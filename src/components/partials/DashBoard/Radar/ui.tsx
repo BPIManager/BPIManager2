@@ -98,7 +98,7 @@ const RadarCustomTooltip = ({ active, payload }: any) => {
               </Text>
             </HStack>
             <HStack gap={1}>
-              <Text color="white" fontSize="xs" fontWeight="black">
+              <Text color="white" fontSize="xs" fontWeight="bold">
                 {meVal.toFixed(2)}
               </Text>
               {data.isMeMax && (
@@ -124,7 +124,7 @@ const RadarCustomTooltip = ({ active, payload }: any) => {
                   </Text>
                 </HStack>
                 <HStack gap={1}>
-                  <Text color="white" fontSize="xs" fontWeight="black">
+                  <Text color="white" fontSize="xs" fontWeight="bold">
                     {rivalVal.toFixed(2)}
                   </Text>
                   {data.isRivalMax && (
@@ -147,7 +147,7 @@ const RadarCustomTooltip = ({ active, payload }: any) => {
                 borderRadius="sm"
                 py={0.5}
               >
-                <Text fontSize="9px" fontWeight="black" color="white">
+                <Text fontSize="9px" fontWeight="bold" color="white">
                   {meVal >= rivalVal
                     ? `WIN (+${(meVal - rivalVal).toFixed(2)})`
                     : `LOSE (${(meVal - rivalVal).toFixed(2)})`}
