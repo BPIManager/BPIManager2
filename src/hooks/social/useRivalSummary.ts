@@ -23,29 +23,26 @@ export const useRivalSummary = (params: {
   version: string;
 }) => {
   const { userId, levels, difficulties, version } = params;
+  const { fbUser } = useUser();
+  const query = new URLSearchParams();
+  levels.forEach((l) => query.append("levels", l));
+  difficulties.forEach((d) => query.append("difficulties", d));
+
+  const url = userId
+    ? `/api/${userId}/rivals/${version}/summary?${query.toString()}`
+    : null;
 
   const { data, error, isLoading, mutate } = useSWR<RivalSummaryResponse>(
-    userId
-      ? [
-          `/api/${userId}/rivals/${version}/summary`,
-          levels,
-          difficulties,
-          version,
-        ]
-      : null,
-    async ([url, lvls, diffs, ver]: [string, string[], string[], string]) => {
-      const query = new URLSearchParams();
-      lvls.forEach((l) => query.append("levels", l));
-      diffs.forEach((d) => query.append("difficulties", d));
-
-      const res = await fetch(`${url}?${query.toString()}`);
-      if (!res.ok) throw new Error("Failed to fetch");
-      return res.json();
+    url ? [url, fbUser] : null,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      shouldRetryOnError: false,
     },
   );
 
   return {
-    results: data?.results || [],
+    results: data || [],
     isLoading,
     isError: error,
     mutate,

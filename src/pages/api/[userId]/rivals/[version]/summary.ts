@@ -33,9 +33,7 @@ export default async function handler(
       difficulties: diffArray,
     });
 
-    return res.status(200).json({
-      results: summary,
-    });
+    return res.status(200).json(summary);
   } catch (error) {
     console.error("Followed Summary API Error:", error);
     return res.status(500).json({ message: "Internal Server Error" });

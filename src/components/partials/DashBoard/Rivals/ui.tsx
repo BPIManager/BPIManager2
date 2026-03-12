@@ -21,14 +21,6 @@ export const RivalWinLossSummary = ({
   });
   const [showAll, setShowAll] = useState(false);
 
-  if (isLoading) {
-    return <RivalWinLossSummarySkeleton />;
-  }
-
-  if (results.length === 0) {
-    return <RivalWinLossSummaryNotFound />;
-  }
-
   const displayCount = 5;
   const hasMore = results.length > displayCount;
   const visibleItems = showAll ? results : results.slice(0, displayCount);
@@ -46,11 +38,17 @@ export const RivalWinLossSummary = ({
         ライバル勝敗
       </Text>
 
-      <VStack gap={4} align="stretch">
-        {visibleItems.map((rival) => (
-          <RivalComparisonRow key={rival.userId} rival={rival} />
-        ))}
-      </VStack>
+      {isLoading ? (
+        <RivalWinLossSummarySkeleton />
+      ) : results.length === 0 ? (
+        <RivalWinLossSummaryNotFound />
+      ) : (
+        <VStack gap={4} align="stretch">
+          {visibleItems.map((rival) => (
+            <RivalComparisonRow key={rival.userId} rival={rival} />
+          ))}
+        </VStack>
+      )}
 
       {hasMore && (
         <Button
