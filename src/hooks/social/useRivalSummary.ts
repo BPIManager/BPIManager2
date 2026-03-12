@@ -12,10 +12,6 @@ interface RivalSummaryResult {
   totalCount: number;
 }
 
-interface RivalSummaryResponse {
-  results: RivalSummaryResult[];
-}
-
 export const useRivalSummary = (params: {
   userId?: string | boolean;
   levels: string[];
@@ -32,7 +28,7 @@ export const useRivalSummary = (params: {
     ? `/api/${userId}/rivals/${version}/summary?${query.toString()}`
     : null;
 
-  const { data, error, isLoading, mutate } = useSWR<RivalSummaryResponse>(
+  const { data, error, isLoading, mutate } = useSWR<RivalSummaryResult[]>(
     url ? [url, fbUser] : null,
     fetcher,
     {
