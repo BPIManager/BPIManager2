@@ -82,7 +82,7 @@ export class UsersRepository {
       query = query.orderBy(sql.ref(`${sortColumn}`), "desc");
     } else {
       query = query.orderBy(
-        sql`ABS(${viewerValue} - ${sql.raw(sortColumn as string)})`,
+        sql`ABS(${viewerValue} - ${sql.ref(sortColumn as string)})`,
         "asc",
       );
     }
