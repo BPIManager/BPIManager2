@@ -13,7 +13,7 @@ export class LogRepository {
     const currentEx = Number(row.exScore);
     const prevEx = row.p_exScore !== null ? Number(row.p_exScore) : null;
     const currentBpi = Number(row.bpi);
-    const prevBpi = row.p_pbi !== null ? Number(row.p_pbi) : null;
+    const prevBpi = row.p_bpi !== null ? Number(row.p_bpi) : null;
 
     return {
       songId: row.songId,
@@ -261,7 +261,7 @@ export class LogRepository {
         "current.missCount",
         "current.lastPlayed as scoreAt",
         "prev.exScore as p_exScore",
-        "prev.bpi as p_pbi",
+        "prev.bpi as p_bpi",
         "prev.clearState as p_clearState",
         "prev.missCount as p_missCount",
         "sd.wrScore",
@@ -491,7 +491,6 @@ export class LogRepository {
       ])
       .where(sql`r.exScore - v.exScore`, ">", 0);
 
-    console.log(levelArray, diffArray);
     if (levelArray && levelArray.length > 0) {
       query = query.where("s.difficultyLevel", "in", levelArray);
     }
