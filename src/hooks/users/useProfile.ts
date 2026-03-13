@@ -2,6 +2,7 @@ import useSWR from "swr";
 import { fetcher } from "@/utils/common/fetch";
 import { useUser } from "@/contexts/users/UserContext";
 import { useState } from "react";
+import { useFollow } from "./useFollow";
 
 export interface UserProfileHistory {
   version: string;
@@ -23,43 +24,14 @@ export interface UserProfileResponse {
 }
 
 export const useProfile = (userId: string | undefined) => {
-  const { fbUser, refresh } = useUser();
-  const [isUpdating, setIsUpdating] = useState(false);
+  const { fbUser } = useUser();
+  const { toggleFollow, isUpdating } = useFollow(userId);
 
   const { data, error, isLoading, mutate } = useSWR<UserProfileResponse>(
     userId ? [`/api/user/${userId}`, fbUser] : null,
     fetcher,
-    {
-      revalidateOnFocus: false,
-      shouldRetryOnError: false,
-    },
+    { revalidateOnFocus: false, shouldRetryOnError: false },
   );
-
-  const toggleFollow = async (onSuccess?: () => void) => {
-    if (!userId || !fbUser || isUpdating) return;
-
-    setIsUpdating(true);
-    try {
-      const token = await fbUser.getIdToken();
-      const res = await fetch(`/api/${userId}/toggleFollow`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!res.ok) throw new Error("Follow request failed");
-
-      await mutate();
-      if (refresh) await refresh();
-      if (onSuccess) onSuccess();
-    } catch (e) {
-      console.error("Follow error:", e);
-    } finally {
-      setIsUpdating(false);
-    }
-  };
 
   return {
     profile: data,
@@ -69,6 +41,10 @@ export const useProfile = (userId: string | undefined) => {
     isNotFound: error?.status === 404,
     isError: error,
     mutate,
-    toggleFollow,
+    toggleFollow: (onSuccess?: () => void) =>
+      toggleFollow(async () => {
+        await mutate();
+        if (onSuccess) onSuccess();
+      }),
   };
 };
