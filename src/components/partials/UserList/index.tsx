@@ -15,8 +15,11 @@ import { UserRecommendationCardSkeleton } from "./Card/skeleton";
 import { UserRecommendationEmpty } from "./Card/empty";
 import { useState } from "react";
 import { RivalComparisonModal } from "./Modal";
+import { LoginRequiredCard } from "../LoginRequired/ui";
+import { useUser } from "@/contexts/users/UserContext";
 
 export const UserRecommendationList = () => {
+  const { user, isLoading: isCredentialLoading } = useUser();
   const router = useRouter();
   const { open, onOpen, onClose } = useDisclosure();
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
@@ -46,6 +49,10 @@ export const UserRecommendationList = () => {
     setSelectedUserId(userId);
     onOpen();
   };
+
+  if (!user && !isCredentialLoading) {
+    return <LoginRequiredCard />;
+  }
 
   return (
     <VStack align="stretch" gap={6} w="full">

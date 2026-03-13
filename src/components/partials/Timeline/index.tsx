@@ -14,8 +14,11 @@ import { TimelineList } from "./ui";
 import { Difficulties, FilterParamsFrontend } from "@/types/songs/withScore";
 import { Activity, Swords, UserCheck } from "lucide-react";
 import { FilterCheckboxGroup, FilterSearchInput } from "../Songs/Filter/part";
+import { useUser } from "@/contexts/users/UserContext";
+import { LoginRequiredCard } from "../LoginRequired/ui";
 
 export const TimelineContainer = () => {
+  const { user, isLoading } = useUser();
   const [mode, setMode] = useState<"all" | "played" | "overtaken">("all");
 
   const [filterParams, setFilterParams] = useState<FilterParamsFrontend>({
@@ -34,6 +37,10 @@ export const TimelineContainer = () => {
       ? list.filter((i) => i !== item)
       : [...list, item];
   };
+
+  if (!user && !isLoading) {
+    return <LoginRequiredCard />;
+  }
 
   return (
     <Container maxW="container.xl" py={6}>

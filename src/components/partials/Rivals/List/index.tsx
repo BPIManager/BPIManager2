@@ -6,9 +6,10 @@ import { useRivalSummary } from "@/hooks/social/useRivalSummary";
 import { RivalFilter } from "./filter";
 import { RivalList } from "./container";
 import { useRouter } from "next/router";
+import { LoginRequiredCard } from "../../LoginRequired/ui";
 
 export const RivalListContainer = () => {
-  const { user } = useUser();
+  const { user, isLoading: isCredentialLoading } = useUser();
   const router = useRouter();
   const [levels, setLevels] = useState<string[]>(["11", "12"]);
   const [difficulties, setDifficulties] = useState<string[]>([
@@ -35,6 +36,10 @@ export const RivalListContainer = () => {
       prev.includes(diff) ? prev.filter((d) => d !== diff) : [...prev, diff],
     );
   };
+
+  if (!user && !isCredentialLoading) {
+    return <LoginRequiredCard />;
+  }
 
   return (
     <VStack align="stretch" gap={8} w="full">
