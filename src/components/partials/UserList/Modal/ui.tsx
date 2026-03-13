@@ -81,6 +81,7 @@ export const RivalHeader = ({ profile, isUpdating, onToggleFollow }: any) => (
 
       <Flex w={{ base: "full", md: "auto" }} justify="center">
         <FollowSection
+          onModal
           w={{ mdDown: "full", lg: "auto" }}
           userId={profile?.userId}
           isUpdating={isUpdating}

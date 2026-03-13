@@ -18,12 +18,14 @@ export const FollowSection = ({
   isUpdating,
   userId,
   w = "full",
+  onModal,
 }: {
   relationship: any;
   onToggle?: () => void;
   isUpdating?: boolean;
   userId: string;
   w: any;
+  onModal?: boolean;
 }) => {
   const { fbUser } = useUser();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -102,18 +104,19 @@ export const FollowSection = ({
           </DialogContent>
         </DialogRoot>
       )}
-
-      <HStack gap={1}>
-        {relationship.isMutual ? (
-          <Badge variant="subtle" colorPalette="blue" size="sm" px={2}>
-            相互フォロー
-          </Badge>
-        ) : relationship.isFollowedBy ? (
-          <Badge variant="subtle" colorPalette="blue" size="sm" px={2}>
-            フォローされています
-          </Badge>
-        ) : null}
-      </HStack>
+      {!onModal && (
+        <HStack gap={1} justifyContent={"center"} my={2}>
+          {relationship.isMutual ? (
+            <Badge variant="subtle" colorPalette="blue" size="sm" px={2}>
+              相互フォロー
+            </Badge>
+          ) : relationship.isFollowedBy ? (
+            <Badge variant="subtle" colorPalette="blue" size="sm" px={2}>
+              フォローされています
+            </Badge>
+          ) : null}
+        </HStack>
+      )}
     </>
   );
 };
