@@ -25,6 +25,7 @@ import {
   User,
   ChevronRight,
   ChevronDown,
+  Search,
 } from "lucide-react";
 import { useUser } from "@/contexts/users/UserContext";
 import { authActions } from "@/lib/firebase/auth";
@@ -53,9 +54,9 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
   ];
 
   const rivalMenuItems = [
-    { label: "ライバル一覧", icon: ChartNoAxesGantt, href: "/rivals" },
+    { label: "ライバル一覧", icon: UsersIcon, href: "/rivals" },
     { label: "タイムライン", icon: ChartNoAxesGantt, href: "/timeline" },
-    { label: "ライバルを探す", icon: UsersIcon, href: "/users" },
+    { label: "ライバルを探す", icon: Search, href: "/users" },
   ];
 
   const otherMenuItems = [

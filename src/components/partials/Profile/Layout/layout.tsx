@@ -32,6 +32,7 @@ export const UserProfileLayout = ({
     isNotFound,
     toggleFollow,
     isUpdating,
+    mutate,
   } = useProfile(userId);
   const version = (router.query.version as string) || latestVersion;
 
@@ -69,7 +70,7 @@ export const UserProfileLayout = ({
               <Box gridColumn={{ lg: "span 1" }}>
                 <ProfileSideBar
                   profile={profile}
-                  onFollowToggle={toggleFollow}
+                  onFollowToggle={() => toggleFollow(mutate)}
                   isUpdating={isUpdating}
                 />
               </Box>

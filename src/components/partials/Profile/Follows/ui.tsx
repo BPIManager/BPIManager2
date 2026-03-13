@@ -1,4 +1,3 @@
-import { useFollow } from "@/hooks/users/useFollow";
 import { FollowUser } from "@/hooks/users/useFollowList";
 import { HStack, VStack, Avatar, Text, Badge } from "@chakra-ui/react";
 import NextLink from "next/link";
@@ -8,22 +7,10 @@ export const UserFollowCard = ({ user }: { user: FollowUser }) => {
   const [isFollowing, setIsFollowing] = useState<boolean>(
     user.isViewerFollowing,
   );
-  const { toggleFollow, isUpdating } = useFollow(user.userId);
 
   useEffect(() => {
     setIsFollowing(user.isViewerFollowing);
   }, [user.isViewerFollowing]);
-
-  const handleFollowClick = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    const nextStatus = await toggleFollow();
-
-    if (nextStatus !== null) {
-      setIsFollowing(!user.isViewerFollowing);
-    }
-  };
 
   return (
     <HStack

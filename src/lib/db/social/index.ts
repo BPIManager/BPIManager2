@@ -268,7 +268,6 @@ export class SocialRepository {
     difficulties: string[];
   }) {
     const { viewerId, version, levels, difficulties } = params;
-
     const targetSongs = db
       .selectFrom("songs as m")
       .innerJoin("songDef as d", (join) =>
@@ -288,12 +287,6 @@ export class SocialRepository {
       .select(["s.songId", "s.exScore"])
       .where("s.userId", "=", viewerId)
       .where("s.version", "=", version)
-      .$if(levels.length > 0, (qb) =>
-        qb.where("sm.difficultyLevel", "in", levels),
-      )
-      .$if(difficulties.length > 0, (qb) =>
-        qb.where("sm.difficulty", "in", difficulties),
-      )
       .where("s.logId", "in", (eb) =>
         eb
           .selectFrom("scores as s2")
@@ -302,6 +295,7 @@ export class SocialRepository {
           .where("version", "=", version)
           .groupBy("songId"),
       );
+
     const rivalsLatest = db
       .selectFrom("scores as s")
       .innerJoin("songs as rm", "s.songId", "rm.songId")
@@ -309,12 +303,6 @@ export class SocialRepository {
       .select(["s.userId", "s.songId", "s.exScore"])
       .where("f.followerId", "=", viewerId)
       .where("s.version", "=", version)
-      .$if(levels.length > 0, (qb) =>
-        qb.where("rm.difficultyLevel", "in", levels),
-      )
-      .$if(difficulties.length > 0, (qb) =>
-        qb.where("rm.difficulty", "in", difficulties),
-      )
       .where("s.logId", "in", (eb) =>
         eb
           .selectFrom("scores as s3")
@@ -323,9 +311,25 @@ export class SocialRepository {
           .groupBy(["userId", "songId"]),
       );
 
+    const latestStatusIds = db
+      .selectFrom("userStatusLogs")
+      .select(["userId", (eb) => eb.fn.max("id").as("maxId")])
+      .where("version", "=", version)
+      .groupBy("userId");
+
     const results = await db
       .selectFrom("follows as f")
       .innerJoin("users as u", "f.followingId", "u.userId")
+      .leftJoin(latestStatusIds.as("ls"), "u.userId", "ls.userId")
+      .leftJoin("userStatusLogs as usl", "ls.maxId", "usl.id")
+      .leftJoin("userRadarCache as urc", (join) =>
+        join
+          .onRef("u.userId", "=", "urc.userId")
+          .on("urc.version", "=", version),
+      )
+      .leftJoin("userRadarCache as vrc", (join) =>
+        join.on("vrc.userId", "=", viewerId).on("vrc.version", "=", version),
+      )
       .innerJoin(targetSongs.as("m"), (join) => join.on(sql`1`, "=", sql`1`))
       .leftJoin(myLatest.as("v"), "m.songId", "v.songId")
       .leftJoin(rivalsLatest.as("r"), (join) =>
@@ -337,34 +341,88 @@ export class SocialRepository {
         "u.userId",
         "u.userName",
         "u.profileImage",
-        sql<number>`SUM(CASE 
-          WHEN v.exScore IS NULL AND r.exScore IS NULL THEN 0
-          WHEN COALESCE(v.exScore, 0) > COALESCE(r.exScore, 0) THEN 1 
-          ELSE 0 END)`.as("win"),
-        sql<number>`SUM(CASE 
-          WHEN v.exScore IS NULL AND r.exScore IS NULL THEN 0
-          WHEN COALESCE(v.exScore, 0) < COALESCE(r.exScore, 0) THEN 1 
-          ELSE 0 END)`.as("lose"),
-        sql<number>`SUM(CASE 
-          WHEN v.exScore IS NULL AND r.exScore IS NULL THEN 0
-          WHEN COALESCE(v.exScore, 0) = COALESCE(r.exScore, 0) AND (v.exScore IS NOT NULL OR r.exScore IS NOT NULL) THEN 1 
-          ELSE 0 END)`.as("draw"),
+        "u.iidxId",
+        "usl.arenaRank",
+        "usl.totalBpi",
+        "urc.notes as r_notes",
+        "urc.chord as r_chord",
+        "urc.peak as r_peak",
+        "urc.charge as r_charge",
+        "urc.scratch as r_scratch",
+        "urc.soflan as r_soflan",
+        "vrc.notes as v_notes",
+        "vrc.chord as v_chord",
+        "vrc.peak as v_peak",
+        "vrc.charge as v_charge",
+        "vrc.scratch as v_scratch",
+        "vrc.soflan as v_soflan",
+        sql<number>`SUM(CASE WHEN v.exScore IS NULL AND r.exScore IS NULL THEN 0 WHEN COALESCE(v.exScore, 0) > COALESCE(r.exScore, 0) THEN 1 ELSE 0 END)`.as(
+          "win",
+        ),
+        sql<number>`SUM(CASE WHEN v.exScore IS NULL AND r.exScore IS NULL THEN 0 WHEN COALESCE(v.exScore, 0) < COALESCE(r.exScore, 0) THEN 1 ELSE 0 END)`.as(
+          "lose",
+        ),
+        sql<number>`SUM(CASE WHEN v.exScore IS NULL AND r.exScore IS NULL THEN 0 WHEN COALESCE(v.exScore, 0) = COALESCE(r.exScore, 0) AND (v.exScore IS NOT NULL OR r.exScore IS NOT NULL) THEN 1 ELSE 0 END)`.as(
+          "draw",
+        ),
         sql<number>`SUM(CASE WHEN v.exScore IS NOT NULL OR r.exScore IS NOT NULL THEN 1 ELSE 0 END)`.as(
           "totalCount",
         ),
       ])
       .where("f.followerId", "=", viewerId)
       .where("u.isPublic", "=", 1)
-      .groupBy(["u.userId", "u.userName", "u.profileImage"])
+      .groupBy([
+        "u.userId",
+        "u.userName",
+        "u.profileImage",
+        "u.iidxId",
+        "usl.arenaRank",
+        "usl.totalBpi",
+        "urc.notes",
+        "urc.chord",
+        "urc.peak",
+        "urc.charge",
+        "urc.scratch",
+        "urc.soflan",
+        "vrc.notes",
+        "vrc.chord",
+        "vrc.peak",
+        "vrc.charge",
+        "vrc.scratch",
+        "vrc.soflan",
+      ])
       .orderBy("win", "desc")
       .execute();
 
     return results.map((r) => ({
-      ...r,
-      win: Number(r.win),
-      lose: Number(r.lose),
-      draw: Number(r.draw),
-      totalCount: Number(r.totalCount),
+      userId: r.userId,
+      userName: r.userName,
+      profileImage: r.profileImage,
+      iidxId: r.iidxId,
+      arenaRank: r.arenaRank,
+      totalBpi: r.totalBpi ? Number(r.totalBpi) : null,
+      radar: {
+        notes: Number(r.r_notes),
+        chord: Number(r.r_chord),
+        peak: Number(r.r_peak),
+        charge: Number(r.r_charge),
+        scratch: Number(r.r_scratch),
+        soflan: Number(r.r_soflan),
+      },
+      viewerRadar: {
+        notes: Number(r.v_notes),
+        chord: Number(r.v_chord),
+        peak: Number(r.v_peak),
+        charge: Number(r.v_charge),
+        scratch: Number(r.v_scratch),
+        soflan: Number(r.v_soflan),
+      },
+      stats: {
+        win: Number(r.win),
+        lose: Number(r.lose),
+        draw: Number(r.draw),
+        totalCount: Number(r.totalCount),
+      },
     }));
   }
 }

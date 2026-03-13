@@ -162,9 +162,13 @@ const RadarCustomTooltip = ({ active, payload }: any) => {
   return null;
 };
 
+type RadarValue = number | { totalBpi: number } | undefined;
+
+type RadarInput = Record<string, RadarValue>;
+
 interface RadarChartProps {
-  data: RadarResponse;
-  rivalData?: Record<string, number>;
+  data: RadarInput;
+  rivalData?: RadarInput;
   isMini?: boolean;
 }
 
@@ -174,15 +178,38 @@ export const RadarSectionChart = ({
   isMini = false,
 }: RadarChartProps) => {
   const chartData = useMemo(() => {
-    const raw = Object.entries(data).map(([key, value]) => ({
-      category: key,
-      value: Math.max(value.totalBpi, -15),
-      rivalValue: rivalData ? Math.max(rivalData[key] ?? -15, -15) : undefined,
+    const categories = [
+      "notes",
+      "chord",
+      "peak",
+      "charge",
+      "scratch",
+      "soflan",
+    ];
+
+    const getBpiValue = (obj: RadarInput, key: string): number => {
+      const val = obj[key] ?? obj[key.toUpperCase()];
+
+      if (typeof val === "number") {
+        return val;
+      }
+      if (val && typeof val === "object" && "totalBpi" in val) {
+        return val.totalBpi;
+      }
+      return -15;
+    };
+
+    const raw = categories.map((key) => ({
+      category: key.toUpperCase(),
+      value: Math.max(getBpiValue(data, key), -15),
+      rivalValue: rivalData
+        ? Math.max(getBpiValue(rivalData, key), -15)
+        : undefined,
     }));
 
     const meMax = Math.max(...raw.map((d) => d.value));
     const rivalMax = rivalData
-      ? Math.max(...raw.map((d) => d.rivalValue || -15))
+      ? Math.max(...raw.map((d) => d.rivalValue ?? -15))
       : -15;
 
     return raw.map((d) => ({

@@ -10,7 +10,8 @@ import {
 import Link from "next/link";
 
 export const RivalComparisonRow = ({ rival }: { rival: any }) => {
-  const { win, lose, draw, totalCount, userName, profileImage, userId } = rival;
+  const { userName, profileImage, userId } = rival;
+  const { win, lose, draw, totalCount } = rival.stats;
 
   const winPct = (win / totalCount) * 100;
   const drawPct = (draw / totalCount) * 100;

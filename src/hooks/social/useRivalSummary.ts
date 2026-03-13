@@ -1,15 +1,25 @@
 import useSWR from "swr";
 import { fetcher } from "@/utils/common/fetch";
 import { useUser } from "@/contexts/users/UserContext";
+import { RadarSummaryData } from "@/types/stats/radar";
 
-interface RivalSummaryResult {
-  userId: string;
-  userName: string;
-  profileImage: string | null;
+export interface RivalStats {
   win: number;
   lose: number;
   draw: number;
   totalCount: number;
+}
+
+export interface RivalSummaryResult {
+  userId: string;
+  userName: string;
+  profileImage: string | null;
+  iidxId: string | null;
+  arenaRank: string | null;
+  totalBpi: number | null;
+  radar: RadarSummaryData;
+  viewerRadar: RadarSummaryData;
+  stats: RivalStats;
 }
 
 export const useRivalSummary = (params: {
@@ -28,15 +38,17 @@ export const useRivalSummary = (params: {
     ? `/api/${userId}/rivals/${version}/summary?${query.toString()}`
     : null;
 
-  const { data, error, isLoading, mutate } = useSWR<RivalSummaryResult[]>(
-    url ? [url, fbUser] : null,
-    fetcher,
-    {
-      revalidateOnFocus: false,
-      shouldRetryOnError: false,
-    },
-  );
-
+  const {
+    data,
+    error,
+    isLoading: swrLoading,
+    mutate,
+  } = useSWR<RivalSummaryResult[]>(url ? [url, fbUser] : null, fetcher, {
+    revalidateOnFocus: false,
+    shouldRetryOnError: false,
+  });
+  const isLoading =
+    swrLoading || (userId !== false && !data && !error) || userId === false;
   return {
     results: data || [],
     isLoading,
