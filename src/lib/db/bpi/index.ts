@@ -138,6 +138,16 @@ export class BpiRepository {
       newTotalBpi: number;
     },
   ) {
+    const latestLog = await trx
+      .selectFrom("userStatusLogs")
+      .select("arenaRank")
+      .where("userId", "=", params.userId)
+      .orderBy("id", "desc")
+      .limit(1)
+      .executeTakeFirst();
+
+    const currentArenaRank = latestLog?.arenaRank ?? null;
+
     await trx
       .insertInto("logs")
       .values({
@@ -147,18 +157,13 @@ export class BpiRepository {
         batchId: params.batchId,
       })
       .execute();
+
     await trx
       .insertInto("userStatusLogs")
       .values({
         userId: params.userId,
         totalBpi: params.newTotalBpi,
-        arenaRank: (eb) =>
-          eb
-            .selectFrom("userStatusLogs")
-            .select("arenaRank")
-            .where("userId", "=", params.userId)
-            .orderBy("id", "desc")
-            .limit(1),
+        arenaRank: currentArenaRank,
         version: params.version,
         batchId: params.batchId,
       })
