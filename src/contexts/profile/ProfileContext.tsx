@@ -1,4 +1,4 @@
-import { UserProfileResponse } from "@/hooks/users/useProfile";
+import { UserProfileResponse } from "@/types/users/profile";
 import { createContext, useContext, ReactNode } from "react";
 
 interface ProfileContextValue {
