@@ -6,6 +6,7 @@ import { GoogleAuthProvider, TwitterAuthProvider } from "firebase/auth";
 import { getAuth } from "firebase/auth";
 import "firebase/functions";
 import { getFirestore } from "firebase/firestore";
+
 export const fb = initializeApp({
   apiKey: "AIzaSyAIlzzxI0kZtIe4vvjSIiRwfqSQVZtbluM",
   authDomain: "bpimv2.firebaseapp.com",

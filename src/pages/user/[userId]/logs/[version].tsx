@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { useUser } from "@/contexts/users/UserContext";
 import { LogsList } from "@/components/partials/Logs/LogsList/ui";
-import { LogVersionSelector } from "@/components/partials/Logs/VersionSelector.tsx/ui";
+import { LogVersionSelector } from "@/components/partials/Logs/VersionSelector/ui";
 import { Box, VStack } from "@chakra-ui/react";
 import { Meta } from "@/components/partials/Head";
 import { PageHeader, PageContainer } from "@/components/partials/Header";

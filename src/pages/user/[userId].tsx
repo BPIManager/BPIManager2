@@ -7,7 +7,7 @@ import { useRouter } from "next/router";
 import { SongsTable } from "@/components/partials/Table";
 import { latestVersion } from "@/constants/latestVersion";
 import { LogsList } from "@/components/partials/Logs/LogsList/ui";
-import { LogVersionSelector } from "@/components/partials/Logs/VersionSelector.tsx/ui";
+import { LogVersionSelector } from "@/components/partials/Logs/VersionSelector/ui";
 import { UserProfileLayout } from "@/components/partials/Profile/Layout/layout";
 import { ProfileMeta } from "@/components/partials/Profile/Meta/ui";
 import { getVersionNameFromNumber } from "@/constants/versions";

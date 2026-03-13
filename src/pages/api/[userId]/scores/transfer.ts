@@ -32,12 +32,13 @@ const handler = async (
   const service = new BpiImportService(repo);
 
   try {
+    const authUid = req.authUid;
     const allDataToImport: { version: string; data: any }[] = [];
 
     for (const v of VERSIONS) {
       for (const s of SUFFIXES) {
         const collectionName = `${v}_${s}`;
-        const docRef = adminDb.collection(collectionName).doc(userId);
+        const docRef = adminDb.collection(collectionName).doc(authUid);
         const snap = await docRef.get();
 
         if (snap.exists && snap.data()?.scoresHistory?.length > 0) {
@@ -54,7 +55,7 @@ const handler = async (
     }
 
     const result = await service.saveMultipleFirestoreData(
-      userId,
+      authUid,
       allDataToImport,
     );
 
