@@ -1,8 +1,8 @@
-import { UserProfileResponse } from "@/types/users/profile";
+import { UserProfileData } from "@/types/users/profile";
 import { createContext, useContext, ReactNode } from "react";
 
 interface ProfileContextValue {
-  profile: UserProfileResponse;
+  profile: UserProfileData;
 }
 
 const ProfileContext = createContext<ProfileContextValue | undefined>(
@@ -13,7 +13,7 @@ export const ProfileProvider = ({
   profile,
   children,
 }: {
-  profile: UserProfileResponse;
+  profile: UserProfileData;
   children: ReactNode;
 }) => {
   return (
