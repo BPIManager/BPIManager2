@@ -26,6 +26,7 @@ import {
   ChevronRight,
   ChevronDown,
   Search,
+  Code2,
 } from "lucide-react";
 import { useUser } from "@/contexts/users/UserContext";
 import { authActions } from "@/lib/firebase/auth";
@@ -234,6 +235,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
       </VStack>
 
       <Spacer />
+      <ApiDogButton />
       <GitHubButton />
       {user?.userId && (
         <Button
@@ -248,6 +250,27 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
         </Button>
       )}
     </VStack>
+  );
+};
+
+export const ApiDogButton = () => {
+  return (
+    <Box display="flex" justifyContent={"center"}>
+      <CLink
+        href="https://bpim2.apidog.io/"
+        target="_blank"
+        rel="noopener noreferrer"
+        textDecoration="underline"
+        display="flex"
+        alignItems="center"
+        gap={2}
+      >
+        <Code2 size={16} />
+        <Text fontSize="xs" fontWeight="bold">
+          APIs Now Available!
+        </Text>
+      </CLink>
+    </Box>
   );
 };
 
