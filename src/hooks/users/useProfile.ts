@@ -5,19 +5,21 @@ import { useFollow } from "./useFollow";
 import { UserProfileResponse } from "@/types/users/profile";
 
 export const useProfile = (userId: string | undefined) => {
-  const { fbUser } = useUser();
+  const { fbUser, isLoading: fbLoading } = useUser();
   const { toggleFollow, isUpdating } = useFollow(userId);
 
   const { data, error, isLoading, mutate } = useSWR<UserProfileResponse>(
-    fbUser && userId ? [`/api/${userId}/profile`, fbUser] : null,
+    !fbLoading && userId ? [`/api/${userId}/profile`, fbUser] : null,
     fetcher,
     { revalidateOnFocus: false, shouldRetryOnError: false },
   );
 
+  const combinedLoading = isLoading || fbLoading;
+
   return {
     profile: data?.profile,
     compare: data?.compare,
-    isLoading,
+    isLoading: combinedLoading,
     isUpdating,
     isPrivate: error?.status === 403,
     isNotFound: error?.status === 404,

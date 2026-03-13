@@ -8,7 +8,6 @@ export const useRivalScores = (
   version: string | null,
 ) => {
   const { fbUser } = useUser();
-  console.log(version);
   const { data, error, isLoading, mutate, isValidating } = useSWR(
     fbUser && songId
       ? `/api/${fbUser.uid}/rivals/${version || latestVersion}/song/${songId}`

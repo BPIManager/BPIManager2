@@ -18,9 +18,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           .json({ message: access.error!.message });
       }
       const viewerId = access.viewerId;
-      if (!viewerId) {
+      if (!viewerId && compare === "true") {
         return res
-          .status(404)
+          .status(403)
           .json({ message: "A viewerId must be specified" });
       }
 

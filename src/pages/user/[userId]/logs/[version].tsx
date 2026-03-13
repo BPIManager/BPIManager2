@@ -13,13 +13,12 @@ import { getVersionNameFromNumber, versionTitles } from "@/constants/versions";
 
 export default function LogsPage() {
   const router = useRouter();
-  const { fbUser, isLoading: isUserLoading } = useUser();
+  const { fbUser, user, isLoading: isUserLoading } = useUser();
 
   const { userId, version } = router.query;
   const uid = (userId as string) || "";
   const v = (version as string) || latestVersion;
-
-  const isOwnedByFbId = fbUser?.uid === userId;
+  const isOwnedByFbId = !isUserLoading && user?.userId === userId;
 
   const logsContent = (
     <VStack align="stretch" gap={4}>
@@ -40,7 +39,7 @@ export default function LogsPage() {
 
   if (isUserLoading) return null;
 
-  if (isOwnedByFbId) {
+  if (isOwnedByFbId && user?.userId !== undefined) {
     return (
       <DashboardLayout>
         <Meta title="更新ログ" noIndex />
