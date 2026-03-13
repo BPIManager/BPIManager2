@@ -1,15 +1,18 @@
 import { logsRepo } from "@/lib/db/logs";
-import { checkUserAccess } from "@/middlewares/api/withApi";
-import { NextApiRequest, NextApiResponse } from "next";
+import {
+  AuthenticatedNextApiRequest,
+  withAuth,
+} from "@/middlewares/api/withAuth";
+import { NextApiResponse } from "next";
 
-export default async function handler(
-  req: NextApiRequest,
+const handler = async (
+  req: AuthenticatedNextApiRequest,
   res: NextApiResponse,
-) {
-  if (req.method !== "GET") return res.status(405).end();
+): Promise<void> => {
+  if (req.method !== "GET")
+    return res.status(405).json({ message: "Method Not Allowed" });
 
   const {
-    userId,
     version,
     limit,
     lastDiff,
@@ -17,7 +20,11 @@ export default async function handler(
     lastRivalId,
     levels,
     difficulties,
+    minDiff,
+    maxDiff,
   } = req.query;
+
+  const userId = req.authUid;
 
   if (!userId || !version) {
     return res.status(400).json({ message: "userId and version are required" });
@@ -26,13 +33,6 @@ export default async function handler(
   const nLimit = limit ? Number(limit) : 10;
 
   try {
-    const access = await checkUserAccess(req, String(userId));
-    if (!access.hasAccess) {
-      return res
-        .status(access.error!.status)
-        .json({ message: access.error!.message });
-    }
-
     const normalize = (val: string | string[] | undefined): string[] => {
       if (!val) return [];
       return Array.isArray(val) ? val : [val];
@@ -40,6 +40,9 @@ export default async function handler(
 
     const levelArray = normalize(levels).map(Number);
     const diffArray = normalize(difficulties);
+    const nMin = minDiff !== undefined ? Number(minDiff) : 1;
+    const nMax = maxDiff !== undefined ? Number(maxDiff) : 30;
+    const nLimit = limit ? Number(limit) : 10;
 
     const cursor =
       lastDiff && lastSongId && lastRivalId
@@ -50,10 +53,12 @@ export default async function handler(
           }
         : undefined;
 
-    const rawResults = await logsRepo.getNearWinList({
+    const rawResults = await logsRepo.getScoreComparisonList({
       userId: String(userId),
       version: String(version),
       limit: nLimit,
+      minDiff: nMin,
+      maxDiff: nMax,
       cursor,
       levelArray,
       diffArray,
@@ -112,4 +117,6 @@ export default async function handler(
     console.error(error);
     return res.status(500).json({ message: error.message });
   }
-}
+};
+
+export default withAuth(handler);

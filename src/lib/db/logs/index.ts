@@ -349,17 +349,29 @@ class LogRepository {
   }
 
   /**
-   * 全ライバルの中から「もうすぐ抜かせそうな曲」を抽出
+   * スコア差分（ライバル - 自分）を指定した範囲で抽出
    */
-  async getNearWinList(params: {
+  async getScoreComparisonList(params: {
     userId: string;
     version: string;
     limit: number;
+    minDiff: number;
+    maxDiff: number;
     levelArray: number[];
     diffArray: string[];
     cursor?: { lastDiff: number; lastSongId: string; lastRivalId: string };
   }) {
-    const { userId, version, limit, cursor, levelArray, diffArray } = params;
+    const {
+      userId,
+      version,
+      limit,
+      cursor,
+      levelArray,
+      diffArray,
+      minDiff,
+      maxDiff,
+    } = params;
+    const diffExpr = sql<number>`r.exScore - v.exScore`;
 
     let query = db
       .selectFrom("songs as s")
@@ -421,7 +433,8 @@ class LogRepository {
         "r.userId as rivalId",
         sql<number>`r.exScore - v.exScore`.as("exDiff"),
       ])
-      .where(sql`r.exScore - v.exScore`, ">", 0);
+      .where(diffExpr, ">=", minDiff)
+      .where(diffExpr, "<=", maxDiff);
 
     if (levelArray && levelArray.length > 0) {
       query = query.where("s.difficultyLevel", "in", levelArray);

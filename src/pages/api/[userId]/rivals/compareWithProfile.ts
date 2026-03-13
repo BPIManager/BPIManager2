@@ -1,5 +1,4 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { checkUserAccess } from "@/middlewares/api/withApi";
 import { latestVersion } from "@/constants/latestVersion";
 import { usersRepo } from "@/lib/db/users";
 import { socialRepo } from "@/lib/db/social";

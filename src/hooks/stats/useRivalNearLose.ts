@@ -1,3 +1,4 @@
+import { useUser } from "@/contexts/users/UserContext";
 import { SongWithScore } from "@/types/songs/withScore";
 import { fetcher } from "@/utils/common/fetch";
 import useSWRInfinite from "swr/infinite";
@@ -26,21 +27,26 @@ export const useNearLoseInfinite = (
   version: string,
   levels: string[],
   diffs: string[],
+  threshold: { min: number; max: number } = { min: 1, max: 100 },
 ) => {
+  const { fbUser } = useUser();
   const PAGE_SIZE = 20;
 
   const getKey = (
     pageIndex: number,
     previousPageData: NearLoseResponse | null,
   ) => {
+    if (!userId || !version) return null;
     if (previousPageData && !previousPageData.nextCursor) return null;
 
     const params = new URLSearchParams({
       limit: PAGE_SIZE.toString(),
+      minDiff: threshold.min.toString(),
+      maxDiff: threshold.max.toString(),
     });
 
-    levels.forEach((l) => params.append("levels", l));
-    diffs.forEach((d) => params.append("difficulties", d));
+    levels.forEach((l) => params.append("levels[]", l));
+    diffs.forEach((d) => params.append("difficulties[]", d));
 
     if (pageIndex > 0 && previousPageData?.nextCursor) {
       const { lastDiff, lastSongId, lastRivalId } = previousPageData.nextCursor;
@@ -49,8 +55,9 @@ export const useNearLoseInfinite = (
       params.append("lastRivalId", lastRivalId);
     }
 
-    const url = `/api/${userId}/rivals/${version}/nearLose?${params.toString()}`;
-    return url;
+    const url = `/api/${userId}/rivals/${version}/comparison?${params.toString()}`;
+
+    return fbUser ? [url, fbUser] : null;
   };
 
   const { data, size, setSize, isValidating, isLoading, error } =

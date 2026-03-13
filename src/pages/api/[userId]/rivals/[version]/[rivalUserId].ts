@@ -1,5 +1,4 @@
 import { logsRepo } from "@/lib/db/logs";
-import { checkUserAccess } from "@/middlewares/api/withApi";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 import { sortSongs } from "@/utils/songs/sort";
 import { NextApiRequest, NextApiResponse } from "next";

@@ -7,7 +7,7 @@ export const useScoreHistory = (userId: string | undefined, songId: number) => {
   const { fbUser } = useUser();
 
   const { data, error, isLoading } = useSWR<SongHistoryResponse>(
-    userId && songId ? [`/api/${userId}/score/${songId}`, fbUser] : null,
+    userId && songId ? [`/api/${userId}/scores/song/${songId}`, fbUser] : null,
     fetcher,
   );
 
