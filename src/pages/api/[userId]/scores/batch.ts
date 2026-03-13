@@ -35,10 +35,6 @@ const handler = async (
     const noImprovement: any[] = [];
     const previousTotalBpi = lastLog?.totalBpi ?? -15;
 
-    if (csvRows.length > 10000) {
-      return res.status(413).json({ message: "Content Too Large" });
-    }
-
     for (const row of csvRows) {
       const song = songMaster.find(
         (s) => s.title === row.title && s.difficulty === row.difficulty,
