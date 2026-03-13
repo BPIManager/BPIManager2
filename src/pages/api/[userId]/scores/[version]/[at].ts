@@ -1,9 +1,9 @@
+import dayjs from "@/lib/dayjs";
 import { logsRepo } from "@/lib/db/logs";
 import { checkUserAccess } from "@/middlewares/api/withApi";
 import { mapToFlatSong } from "@/utils/logs/getMapFlatten";
 import { filterSongsServerSide } from "@/utils/songs/filter";
 import { sortSongs } from "@/utils/songs/sort";
-import dayjs from "dayjs";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
@@ -12,7 +12,12 @@ export default async function handler(
 ) {
   const { userId, version, at, ...filterParams } = req.query;
   const time =
-    at === "latest" ? dayjs().toDate() : dayjs.tz(at as string).toDate();
+    at === "latest"
+      ? dayjs.tz().utc().toDate()
+      : dayjs
+          .tz(at as string)
+          .utc()
+          .toDate();
 
   try {
     const access = await checkUserAccess(req, String(userId));

@@ -1,11 +1,12 @@
 import { db } from "@/lib/db";
+import {
+  AuthenticatedNextApiRequest,
+  withAuth,
+} from "@/middlewares/api/withAuth";
 import { validateUserName } from "@/utils/common/nameValidation";
-import type { NextApiRequest, NextApiResponse } from "next";
+import type { NextApiResponse } from "next";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
+async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
   const { name } = req.query;
   const userName = String(name);
 
@@ -31,3 +32,5 @@ export default async function handler(
     return res.status(500).json({ message: "Internal Server Error" });
   }
 }
+
+export default withAuth(handler);

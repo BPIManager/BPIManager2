@@ -1,40 +1,22 @@
 import useSWR from "swr";
 import { fetcher } from "@/utils/common/fetch";
 import { useUser } from "@/contexts/users/UserContext";
-import { useState } from "react";
 import { useFollow } from "./useFollow";
-
-export interface UserProfileHistory {
-  version: string;
-  totalBpi: number | null;
-  arenaRank: string;
-  updatedAt: string | Date;
-}
-
-export interface UserProfileResponse {
-  userId: string;
-  userName: string;
-  profileText: string | null;
-  profileImage: string | null;
-  iidxId: string | null;
-  xId: string | null;
-  isPublic: number;
-  history: UserProfileHistory[];
-  current: UserProfileHistory | null;
-}
+import { UserProfileResponse } from "@/types/users/profile";
 
 export const useProfile = (userId: string | undefined) => {
   const { fbUser } = useUser();
   const { toggleFollow, isUpdating } = useFollow(userId);
 
   const { data, error, isLoading, mutate } = useSWR<UserProfileResponse>(
-    userId ? [`/api/user/${userId}`, fbUser] : null,
+    fbUser && userId ? [`/api/${userId}/profile`, fbUser] : null,
     fetcher,
     { revalidateOnFocus: false, shouldRetryOnError: false },
   );
 
   return {
-    profile: data,
+    profile: data?.profile,
+    compare: data?.compare,
     isLoading,
     isUpdating,
     isPrivate: error?.status === 403,

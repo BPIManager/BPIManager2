@@ -98,8 +98,15 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
     setNameStatus((prev) => ({ ...prev, isChecking: true, error: null }));
     const timer = setTimeout(async () => {
       try {
+        if (!fbUser) throw new Error("Invalid Firebase Credential");
+        const token = await fbUser.getIdToken();
         const res = await fetch(
           `/api/users/checkUsername?name=${encodeURIComponent(formData.userName)}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
         );
         const data = await res.json();
 

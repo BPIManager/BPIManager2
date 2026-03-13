@@ -174,7 +174,13 @@ class UsersRepository {
     }));
 
     return {
-      ...userBase,
+      userId: userBase.userId,
+      userName: userBase.userName,
+      profileText: userBase.profileText,
+      profileImage: userBase.profileImage,
+      iidxId: userBase.iidxId,
+      xId: userBase.xId,
+      isPublic: userBase.isPublic,
       follows: {
         follower: Number(userBase.followerCount ?? 0),
         following: Number(userBase.followingCount ?? 0),
@@ -185,10 +191,92 @@ class UsersRepository {
         isMutual:
           Number(userBase.isFollowing ?? 0) > 0 &&
           Number(userBase.isFollowedBy ?? 0) > 0,
+        isSelf: userBase.userId === myId,
       },
       history: formattedHistory,
       current: formattedHistory[0] || null,
     };
+  }
+
+  async upsertUserProfile(params: {
+    userId: string;
+    userName: string;
+    iidxId: string | null;
+    profileText: string | null;
+    profileImage: string | null;
+    isPublic: number;
+    arenaRank: string | null;
+    version: string;
+    batchId: string;
+  }) {
+    const {
+      userId,
+      userName,
+      iidxId,
+      profileText,
+      profileImage,
+      isPublic,
+      arenaRank,
+      version,
+      batchId,
+    } = params;
+
+    return await db.transaction().execute(async (trx) => {
+      const existingUser = await trx
+        .selectFrom("users")
+        .select("userId")
+        .where("userName", "=", userName)
+        .where("userId", "!=", userId)
+        .executeTakeFirst();
+
+      if (existingUser) {
+        const error = new Error("UserName is already taken");
+        (error as any).status = 409;
+        throw error;
+      }
+
+      const lastStatus = await trx
+        .selectFrom("userStatusLogs")
+        .select(["totalBpi", "arenaRank"])
+        .where("userId", "=", userId)
+        .orderBy("id", "desc")
+        .limit(1)
+        .executeTakeFirst();
+
+      await trx
+        .insertInto("users")
+        .values({
+          userId,
+          userName,
+          iidxId,
+          profileText,
+          profileImage,
+          isPublic,
+          updatedAt: sql`NOW()`,
+        })
+        .onDuplicateKeyUpdate({
+          userName,
+          iidxId,
+          profileText,
+          profileImage,
+          isPublic,
+          updatedAt: sql`NOW()`,
+        })
+        .execute();
+
+      await trx
+        .insertInto("userStatusLogs")
+        .values({
+          userId,
+          totalBpi: lastStatus?.totalBpi ?? -15,
+          arenaRank: arenaRank || lastStatus?.arenaRank,
+          version,
+          batchId,
+        })
+        .execute();
+
+      return { success: true };
+    });
   }
 }
 

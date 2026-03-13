@@ -6,12 +6,7 @@ export const useRivalComparison = (rivalId: string | null) => {
   const { fbUser } = useUser();
 
   const { data, error, isLoading, mutate, isValidating } = useSWR(
-    fbUser && rivalId
-      ? [
-          `/api/${fbUser.uid}/rivals/compareWithProfile?rivalId=${rivalId}`,
-          fbUser,
-        ]
-      : null,
+    fbUser && rivalId ? [`/api/${rivalId}/profile?compare=true`, fbUser] : null,
     fetcher,
   );
 

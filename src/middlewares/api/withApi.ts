@@ -49,7 +49,7 @@ export async function checkUserAccess(
       const idToken = authHeader.split("Bearer ")[1];
       const decodedToken = await adminAuth.verifyIdToken(idToken);
       if (decodedToken.uid === targetUserId) {
-        return { hasAccess: true, user: userData };
+        return { hasAccess: true, user: userData, viewerId: decodedToken.uid };
       }
     } catch (e) {
       console.error("Access Control: Token verification failed");

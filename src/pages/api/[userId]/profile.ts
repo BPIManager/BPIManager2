@@ -1,105 +1,111 @@
+import { NextApiRequest, NextApiResponse } from "next";
+import { usersRepo } from "@/lib/db/users";
+import { socialRepo } from "@/lib/db/social";
 import { latestVersion } from "@/constants/latestVersion";
-import { db } from "@/lib/db";
-import {
-  AuthenticatedNextApiRequest,
-  withAuth,
-} from "@/middlewares/api/withAuth";
 import { validateUserName } from "@/utils/common/nameValidation";
-import { sql } from "kysely";
-import type { NextApiResponse } from "next";
+import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 import { v4 as uuidv4 } from "uuid";
 
-const handler = async (
-  req: AuthenticatedNextApiRequest,
-  res: NextApiResponse,
-) => {
-  if (req.method !== "POST") {
-    res.setHeader("Allow", ["POST"]);
-    return res.status(405).json({ message: "Method Not Allowed" });
-  }
+async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const { userId: targetUserId, compare } = req.query;
 
-  try {
-    const data = req.body;
-    const batchId = uuidv4();
-    const validation = validateUserName(data.userName);
-    if (!validation.isValid) {
-      const error = new Error(validation.message!);
-      (error as any).status = 400;
-      throw error;
-    }
-
-    const result = await db.transaction().execute(async (trx) => {
-      const existingUser = await trx
-        .selectFrom("users")
-        .select("userId")
-        .where("userName", "=", data.userName)
-        .where("userId", "!=", data.userId)
-        .executeTakeFirst();
-
-      if (existingUser) {
-        const error = new Error("UserName is already taken");
-        (error as any).status = 409;
-        throw error;
+  const access = await checkProfileAccess(req, targetUserId as string);
+  if (req.method === "GET") {
+    try {
+      if (!access.hasAccess) {
+        return res
+          .status(access.error!.status)
+          .json({ message: access.error!.message });
+      }
+      const viewerId = access.viewerId;
+      if (!viewerId) {
+        return res
+          .status(404)
+          .json({ message: "A viewerId must be specified" });
       }
 
-      const lastStatus = await trx
-        .selectFrom("userStatusLogs")
-        .select(["totalBpi", "arenaRank"])
-        .where("userId", "=", data.userId)
-        .orderBy("id", "desc")
-        .limit(1)
-        .executeTakeFirst();
+      const version = latestVersion;
 
-      const latestBpi = lastStatus?.totalBpi ?? -15;
+      const [profile, winLoss, radar] = await Promise.all([
+        usersRepo.getUserProfileSummary(targetUserId as string, viewerId),
+        compare === "true"
+          ? socialRepo.getWinLossStats(
+              viewerId!,
+              targetUserId as string,
+              version,
+            )
+          : null,
+        compare === "true"
+          ? socialRepo.getUserRadar(targetUserId as string, version)
+          : null,
+      ]);
 
-      await trx
-        .insertInto("users")
-        .values({
-          userId: data.userId,
-          userName: data.userName,
-          iidxId: data.iidxId,
-          xId: data.xId,
-          profileText: data.profileText,
-          profileImage: data.profileImage,
-          isPublic: data.isPublic,
-          createdAt: sql`NOW()`,
-          updatedAt: sql`NOW()`,
-        })
-        .onDuplicateKeyUpdate({
-          userName: data.userName,
-          iidxId: data.iidxId,
-          xId: data.xId,
-          profileText: data.profileText,
-          profileImage: data.profileImage,
-          isPublic: data.isPublic,
-          updatedAt: sql`NOW()`,
-        })
-        .execute();
+      if (!profile) return res.status(404).json({ message: "User not found" });
 
-      await trx
-        .insertInto("userStatusLogs")
-        .values({
-          userId: data.userId,
-          totalBpi: latestBpi,
-          arenaRank: data.arenaRank || lastStatus?.arenaRank,
-          version: data.version || latestVersion,
-          batchId: batchId,
-          createdAt: sql`NOW()`,
-          updatedAt: sql`NOW()`,
-        })
-        .execute();
+      if (
+        profile.isPublic !== 1 &&
+        viewerId !== targetUserId &&
+        !profile.relationship?.isFollowing
+      ) {
+        return res.status(403).json({ message: "This profile is private" });
+      }
 
-      return { success: true, userId: data.userId };
-    });
+      const response: any = { profile };
+      if (compare === "true") {
+        response.compare = {
+          winLoss,
+          radar: radar
+            ? {
+                NOTES: Number(radar.notes),
+                CHORD: Number(radar.chord),
+                PEAK: Number(radar.peak),
+                CHARGE: Number(radar.charge),
+                SCRATCH: Number(radar.scratch),
+                SOFLAN: Number(radar.soflan),
+              }
+            : null,
+        };
+      }
 
-    return res.status(200).json(result);
-  } catch (error: any) {
-    if (error.status === 409) {
-      return res.status(409).json({ message: error.message });
+      return res.status(200).json(response);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: "Internal Server Error" });
     }
-    console.error("Database error:", error);
-    return res.status(500).json({ message: "Internal Server Error" });
   }
-};
 
-export default withAuth(handler);
+  if (req.method === "POST") {
+    if (!access.hasAccess || access.viewerId !== targetUserId) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
+    const data = req.body;
+    const validation = validateUserName(data.userName);
+    if (!validation.isValid)
+      return res.status(400).json({ message: validation.message });
+
+    try {
+      const result = await usersRepo.upsertUserProfile({
+        userId: targetUserId as string,
+        userName: data.userName,
+        iidxId: data.iidxId,
+        profileText: data.profileText,
+        profileImage: data.profileImage,
+        isPublic: data.isPublic,
+        arenaRank: data.arenaRank,
+        version: latestVersion,
+        batchId: uuidv4(),
+      });
+
+      return res.status(200).json(result);
+    } catch (error: any) {
+      return res
+        .status(error.status || 500)
+        .json({ message: "Database Error" });
+    }
+  }
+
+  return res.status(405).json({ message: "Method Not Allowed" });
+}
+
+export default handler;
