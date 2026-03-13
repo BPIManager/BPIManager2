@@ -118,6 +118,7 @@ class FollowRepository {
         "u.userName",
         "u.profileImage",
         "u.profileText",
+        "u.isPublic",
         "latestStatus.totalBpi",
         "latestStatus.arenaRank",
         "f.createdAt as followedAt",
@@ -134,14 +135,26 @@ class FollowRepository {
       .limit(limit)
       .offset(offset)
       .execute();
-
     return {
-      users: users.map((u) => ({
-        ...u,
-        isSelf: u.userId === viewerId,
-        totalBpi: u.totalBpi ? Number(u.totalBpi) : null,
-        isViewerFollowing: Number(u.isViewerFollowing) > 0,
-      })),
+      users: users.map((u) => {
+        const isSelf = u.userId === viewerId;
+        const shouldMask = Number(u.isPublic) !== 1 && !isSelf;
+
+        return {
+          ...u,
+          userId: shouldMask ? "" : u.userId,
+          userName: shouldMask ? "非公開ユーザー" : u.userName,
+          profileImage: shouldMask ? null : u.profileImage,
+          profileText: shouldMask ? "" : u.profileText,
+          totalBpi: shouldMask ? null : u.totalBpi ? Number(u.totalBpi) : null,
+          arenaRank: shouldMask ? null : u.arenaRank,
+
+          isSelf,
+          isViewerFollowing: Number(u.isViewerFollowing) > 0,
+          isPublic: Number(u.isPublic) === 1,
+          isMasked: shouldMask,
+        };
+      }),
       totalCount,
       hasMore: offset + users.length < totalCount,
     };

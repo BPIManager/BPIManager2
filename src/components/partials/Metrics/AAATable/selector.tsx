@@ -93,8 +93,9 @@ export const AAATableFilter = ({
     >
       <Stack
         direction={{ base: "column", md: "row" }}
-        gap={{ base: 6, md: 10 }}
+        gap={{ base: 2, md: 4 }}
         align="start"
+        flexWrap="wrap"
       >
         {filterSections.map((section) => (
           <VStack

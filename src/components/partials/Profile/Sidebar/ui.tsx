@@ -95,7 +95,7 @@ export const ProfileStatsContent = ({ profile }: { profile: any }) => {
   const current = profile.current || {};
   return (
     <VStack align="stretch" w="full" gap={6}>
-      <HStack justify="space-between" align="flex-end">
+      <HStack justify="space-between" align="flex-end" mt={2}>
         <Box>
           <Text fontSize="10px" color="gray.400" fontWeight="bold" mb={1}>
             ARENA

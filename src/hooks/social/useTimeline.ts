@@ -68,8 +68,7 @@ export const useTimeline = (
     if (pageIndex > 0 && previousPageData?.nextId) {
       query.append("lastId", previousPageData.nextId);
     }
-
-    return `/api/${fbUser.uid}/timeline?${query.toString()}`;
+    return [`/api/${fbUser.uid}/timeline?${query.toString()}`, fbUser];
   };
 
   const { data, size, setSize, error, isLoading, isValidating } =

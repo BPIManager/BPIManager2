@@ -3,6 +3,7 @@ import { checkUserAccess } from "@/middlewares/api/withApi";
 import { latestVersion } from "@/constants/latestVersion";
 import { usersRepo } from "@/lib/db/users";
 import { socialRepo } from "@/lib/db/social";
+import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 
 export default async function handler(
   req: NextApiRequest,
@@ -10,14 +11,15 @@ export default async function handler(
 ) {
   if (req.method !== "GET") return res.status(405).end();
 
-  const { userId, rivalId } = req.query;
+  const { rivalId } = req.query;
   if (!rivalId || typeof rivalId !== "string") {
     return res.status(400).json({ message: "rivalId is required" });
   }
 
-  const access = await checkUserAccess(req, userId as string);
-  const viewerId = access.user?.userId;
-  if (!viewerId) return res.status(401).json({ message: "Unauthorized" });
+  const access = await checkProfileAccess(req, rivalId as string);
+  const viewerId = access.viewerId;
+  if (!access.hasAccess || !viewerId)
+    return res.status(401).json({ message: "Unauthorized" });
 
   try {
     const version = latestVersion;

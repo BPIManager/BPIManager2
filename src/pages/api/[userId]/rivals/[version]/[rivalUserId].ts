@@ -1,5 +1,6 @@
 import { logsRepo } from "@/lib/db/logs";
 import { checkUserAccess } from "@/middlewares/api/withApi";
+import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 import { sortSongs } from "@/utils/songs/sort";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -18,14 +19,15 @@ export default async function handler(
   }
 
   try {
-    const access = await checkUserAccess(req, String(userId));
+    const access = await checkProfileAccess(req, String(userId));
+    const viewerId = access.viewerId;
     if (!access.hasAccess) {
       return res
         .status(access.error!.status)
         .json({ message: access.error!.message });
     }
     const rawResults = await logsRepo.getRivalComparisonScores({
-      viewerId: String(userId),
+      viewerId: String(viewerId),
       rivalId: String(rivalUserId),
       version: String(version),
     });
