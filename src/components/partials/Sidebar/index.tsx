@@ -263,6 +263,7 @@ export const ApiDogButton = () => {
         textDecoration="underline"
         display="flex"
         alignItems="center"
+        color="white" 
         gap={2}
       >
         <Code2 size={16} />
