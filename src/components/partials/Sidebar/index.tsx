@@ -8,6 +8,7 @@ import {
   Separator,
   Badge,
   Link as CLink,
+  Collapsible,
 } from "@chakra-ui/react";
 import {
   FileUp,
@@ -23,6 +24,7 @@ import {
   Github,
   User,
   ChevronRight,
+  ChevronDown,
 } from "lucide-react";
 import { useUser } from "@/contexts/users/UserContext";
 import { authActions } from "@/lib/firebase/auth";
@@ -31,12 +33,15 @@ import { useRouter } from "next/router";
 import { Avatar } from "@/components/ui/avatar";
 import { LuLayoutDashboard } from "react-icons/lu";
 import { latestVersion } from "@/constants/latestVersion";
+import { useState } from "react";
 
 export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
   const { user, fbUser } = useUser();
   const router = useRouter();
 
-  const menuItems = [
+  const [isRivalOpen, setIsRivalOpen] = useState<boolean>(true);
+
+  const mainMenuItems = [
     { label: "ダッシュボード", icon: LuLayoutDashboard, href: "/" },
     { label: "インポート", icon: FileUp, href: "/import" },
     { label: "スコア一覧", icon: ListIcon, href: "/my" },
@@ -45,21 +50,59 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
       icon: ScrollText,
       href: `/user/${user?.userId}/logs/${latestVersion}`,
     },
-    {
-      label: "ライバルタイムライン",
-      icon: ChartNoAxesGantt,
-      href: "/timeline",
-    },
-    {
-      label: "ライバルを探す",
-      icon: UsersIcon,
-      href: "/users",
-    },
+  ];
+
+  const rivalMenuItems = [
+    { label: "ライバル一覧", icon: ChartNoAxesGantt, href: "/rivals" },
+    { label: "タイムライン", icon: ChartNoAxesGantt, href: "/timeline" },
+    { label: "ライバルを探す", icon: UsersIcon, href: "/users" },
+  ];
+
+  const otherMenuItems = [
     { label: "分析", icon: ChartArea, href: "/analytics", isComingSoon: true },
     { label: "メモ", icon: StickyNote, href: "/notes", isComingSoon: true },
     { label: "指標", icon: LandPlot, href: "/metrics" },
     { label: "設定", icon: Settings, href: "/settings" },
   ];
+
+  const renderMenuItem = (item: any, isNested = false) => {
+    const isActive =
+      item.href === "/"
+        ? router.asPath === "/"
+        : router.asPath.startsWith(item.href);
+
+    return (
+      <Link key={item.href} href={item.href} passHref legacyBehavior>
+        <Button
+          as={item.isComingSoon ? "button" : "a"}
+          variant={isActive ? "surface" : "ghost"}
+          color="#fff"
+          colorPalette={isActive ? "blue" : "gray"}
+          disabled={item.isComingSoon}
+          justifyContent="start"
+          gap={3}
+          px={2}
+          pl={isNested ? 8 : 2}
+          onClick={onClose}
+          size="sm"
+          width="full"
+        >
+          <item.icon size={18} />
+          <Text fontWeight={isActive ? "bold" : "medium"}>{item.label}</Text>
+          {item.isComingSoon && (
+            <Badge
+              variant="subtle"
+              colorPalette="gray"
+              fontSize="2xs"
+              ml="auto"
+            >
+              近日公開
+            </Badge>
+          )}
+        </Button>
+      </Link>
+    );
+  };
 
   return (
     <VStack align="stretch" p={4} gap={6} h="full" minH="0" overflowY="auto">
@@ -154,43 +197,39 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
       </Box>
 
       <VStack align="stretch" gap={1}>
-        {menuItems.map((item) => {
-          const isActive =
-            item.href === "/"
-              ? router.asPath === "/"
-              : router.asPath.startsWith(item.href);
+        {mainMenuItems.map((item) => renderMenuItem(item))}
 
-          return (
-            <Link key={item.href} href={item.href} passHref legacyBehavior>
-              <Button
-                as={item.isComingSoon ? "button" : "a"}
-                variant={isActive ? "surface" : "ghost"}
-                color="#fff"
-                colorPalette={isActive ? "blue" : "gray"}
-                disabled={item.isComingSoon}
-                justifyContent="start"
-                gap={3}
-                px={2}
-                onClick={onClose}
-              >
-                <item.icon size={18} />
-                <Text fontWeight={isActive ? "bold" : "medium"}>
-                  {item.label}
-                </Text>
-                {item.isComingSoon && (
-                  <Badge
-                    variant="subtle"
-                    colorPalette="gray"
-                    fontSize="2xs"
-                    ml="auto"
-                  >
-                    近日公開
-                  </Badge>
-                )}
-              </Button>
-            </Link>
-          );
-        })}
+        <Box>
+          <Button
+            variant="ghost"
+            width="full"
+            justifyContent="start"
+            px={2}
+            color="whiteAlpha.700"
+            _hover={{ bg: "whiteAlpha.100", color: "white" }}
+            onClick={() => setIsRivalOpen(!isRivalOpen)}
+            gap={3}
+          >
+            {isRivalOpen ? (
+              <ChevronDown size={18} />
+            ) : (
+              <ChevronRight size={18} />
+            )}
+            <Text fontSize="sm" fontWeight="bold" letterSpacing="wider">
+              ライバル
+            </Text>
+          </Button>
+
+          <Collapsible.Root open={isRivalOpen}>
+            <Collapsible.Content>
+              <VStack align="stretch" gap={1} mt={1}>
+                {rivalMenuItems.map((item) => renderMenuItem(item, true))}
+              </VStack>
+            </Collapsible.Content>
+          </Collapsible.Root>
+        </Box>
+
+        {otherMenuItems.map((item) => renderMenuItem(item))}
       </VStack>
 
       <Spacer />
