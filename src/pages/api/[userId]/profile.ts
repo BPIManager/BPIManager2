@@ -44,7 +44,7 @@ const handler = async (
 
       const lastStatus = await trx
         .selectFrom("userStatusLogs")
-        .select("totalBpi")
+        .select(["totalBpi", "arenaRank"])
         .where("userId", "=", data.userId)
         .orderBy("id", "desc")
         .limit(1)
@@ -81,7 +81,7 @@ const handler = async (
         .values({
           userId: data.userId,
           totalBpi: latestBpi,
-          arenaRank: data.arenaRank,
+          arenaRank: data.arenaRank || lastStatus?.arenaRank,
           version: data.version || latestVersion,
           batchId: batchId,
           createdAt: sql`NOW()`,

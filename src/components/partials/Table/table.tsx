@@ -18,10 +18,12 @@ export const diffColors: Record<string, string> = {
   HYPER: "yellow.800",
 };
 
-export const getLampColor = (clearState: string | null) => {
+export const getLampColor = (clearState: string | null | undefined) => {
+  if (!clearState || clearState === "NO PLAY") return "gray.600";
+
   switch (clearState) {
-    case "NO PLAY":
-      return "gray.400";
+    case "FAILED":
+      return "gray.300";
     case "ASSIST CLEAR":
       return "purple.500";
     case "EASY CLEAR":
@@ -35,7 +37,7 @@ export const getLampColor = (clearState: string | null) => {
     case "FULLCOMBO CLEAR":
       return "rainbow";
     default:
-      return "gray.400";
+      return "gray.600";
   }
 };
 

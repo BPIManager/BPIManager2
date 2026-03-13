@@ -1,5 +1,3 @@
-import { BaseDistributionChart, ChartData } from "../DistributionChart";
-
 export const getBpiColor = (label: string) => {
   const val = label === "100+" ? 100 : parseFloat(label);
   if (isNaN(val)) return "#4A5568";
@@ -25,15 +23,3 @@ export const getBpiColorStyle = (bpi: number) => {
 
   return { bg, color };
 };
-
-export const BpiDistributionChart = (props: {
-  data?: ChartData[];
-  isLoading: boolean;
-}) => (
-  <BaseDistributionChart
-    {...props}
-    title="BPI分布"
-    getColor={getBpiColor}
-    isRotated={true}
-  />
-);

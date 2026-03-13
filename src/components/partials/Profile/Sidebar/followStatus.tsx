@@ -1,6 +1,7 @@
 import { useUser } from "@/contexts/users/UserContext";
 import { VStack, Button, HStack, Badge } from "@chakra-ui/react";
-import { Check, Plus } from "lucide-react";
+import { Check, Plus, Settings2 } from "lucide-react";
+import { useState } from "react";
 import {
   DialogRoot,
   DialogTrigger,
@@ -9,6 +10,7 @@ import {
   DialogCloseTrigger,
 } from "@/components/ui/dialog";
 import { LoginRequiredCard } from "../../LoginRequired/ui";
+import AccountSettings from "../../Modal/AccountSettings";
 
 export const FollowSection = ({
   relationship,
@@ -24,10 +26,33 @@ export const FollowSection = ({
   w: any;
 }) => {
   const { fbUser } = useUser();
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const isLoggedIn = !!fbUser?.uid;
+  const isMe = isLoggedIn && fbUser?.uid === userId;
 
-  if (isLoggedIn && fbUser?.uid === userId) {
-    return null;
+  if (isMe) {
+    return (
+      <>
+        <Button
+          width={w}
+          px={4}
+          size="sm"
+          colorPalette={"green"}
+          color="black"
+          onClick={() => setIsSettingsOpen(true)}
+          borderRadius="full"
+          fontWeight="bold"
+        >
+          <Settings2 size={16} />
+          プロフィール編集
+        </Button>
+
+        <AccountSettings
+          isOpen={isSettingsOpen}
+          onClose={() => setIsSettingsOpen(false)}
+        />
+      </>
+    );
   }
 
   const renderButtonContent = () => (
@@ -58,7 +83,7 @@ export const FollowSection = ({
         <DialogRoot placement="center">
           <DialogTrigger asChild>
             <Button
-              width="full"
+              width={w}
               size="sm"
               variant="solid"
               colorPalette="blue"

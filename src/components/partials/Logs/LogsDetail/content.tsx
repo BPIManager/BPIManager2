@@ -7,11 +7,8 @@ import { Box, HStack, SimpleGrid, Tabs, VStack } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { DailyBatchNotice } from "../DailyBatchNotice/ui";
 import { BatchSummaryCards } from "../LogSummary/ui";
-import { BaseDistributionChart } from "../../DashBoard/DistributionChart";
 import { LogRank } from "../LogRanking/ui";
 import { BatchSongsTable } from "../LogTable/ui";
-import { RANK_COLORS } from "../../DashBoard/DJRankDistribution";
-import { getBpiColor } from "../../DashBoard/BPIDistribution";
 import { LogNavigator } from "../LogsNav/ui";
 import { BatchTotalBpiCard } from "../TotalBPI/ui";
 import { LogsDetailContentSkeleton } from "./skeleton";
@@ -23,6 +20,9 @@ import { useRef, useState } from "react";
 import { useShareResult } from "@/hooks/share/useShare";
 import { ShareResultModal } from "../../Modal/Share/ui";
 import { BpiCalculator } from "@/lib/bpi";
+import { DistributionChart } from "../../DashBoard/DistributionChart/ui";
+import { RANK_COLORS } from "@/constants/djRankColor";
+import { getBpiColor } from "@/constants/bpiColor";
 
 export const LogsDetailContent = ({
   userId,
@@ -172,16 +172,15 @@ export const LogsDetailContent = ({
               <BatchSummaryCards isSharing={isModalOpen} summary={summary} />
             )}
             <SimpleGrid columns={{ base: 1, lg: 2 }} gap={4} mt={4}>
-              <BaseDistributionChart
+              <DistributionChart
                 title="BPI分布"
-                data={bpiData}
+                myData={bpiData}
                 isLoading={isLoading}
                 getColor={getBpiColor}
-                isRotated
               />
-              <BaseDistributionChart
+              <DistributionChart
                 title="ランク分布"
-                data={rankData}
+                myData={rankData}
                 isLoading={isLoading}
                 getColor={(l) => RANK_COLORS[l]}
               />

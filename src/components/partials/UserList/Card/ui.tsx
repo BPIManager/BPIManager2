@@ -7,11 +7,11 @@ import {
   Badge,
   Icon,
 } from "@chakra-ui/react";
-import { getBpiColorStyle } from "../../DashBoard/BPIDistribution";
 import { LuTrendingUp, LuTrendingDown } from "react-icons/lu";
 import { formatIIDXId } from "@/utils/common/formatIidxId";
 import dayjs from "@/lib/dayjs";
 import { RadarSectionChart } from "../../DashBoard/Radar/ui";
+import { getBpiColorStyle } from "@/constants/bpiColor";
 
 export const UserRecommendationCard = ({
   user,
@@ -40,7 +40,6 @@ export const UserRecommendationCard = ({
     ? viewerTotalBpi
     : (viewerRadar[currentSort.toUpperCase()]?.totalBpi ?? -15);
 
-  const bpiStyle = getBpiColorStyle(displayValue);
   const diff = displayValue - viewerCompareValue;
   const isTarget = diff > 0;
   return (

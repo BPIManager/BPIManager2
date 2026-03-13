@@ -10,6 +10,8 @@ import {
   Circle,
   Box,
   Spinner,
+  Group,
+  InputAddon,
 } from "@chakra-ui/react";
 import { Field } from "@/components/ui/field";
 import { FormSelect } from "@/components/ui/select";
@@ -160,6 +162,11 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
   const validateIidxId = (id: string) => {
     if (!id) return false;
     return /^\d{8}$/.test(id.replace(/-/g, ""));
+  };
+
+  const handleXIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/[^A-Za-z0-9_]/g, "").slice(0, 15);
+    setFormData({ ...formData, xId: value });
   };
 
   const handleSubmit = async () => {
@@ -335,19 +342,23 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                   placeholder="00000000"
                 />
               </Field>
-
               <Field
                 label="Xユーザー名"
-                helperText="Xアカウントをプロフィールに設定できます(オプション)"
+                helperText="Xアカウントをプロフィールに表示できます(最大15文字)"
               >
-                <Input
-                  variant="subtle"
-                  value={formData.xId}
-                  onChange={(e) =>
-                    setFormData({ ...formData, xId: e.target.value })
-                  }
-                  p={2}
-                />
+                <Group attached w="full">
+                  <InputAddon bg="border.subtle" px={2}>
+                    @
+                  </InputAddon>
+                  <Input
+                    variant="subtle"
+                    value={formData.xId}
+                    onChange={handleXIdChange}
+                    placeholder="username"
+                    p={2}
+                    borderLeftRadius="0"
+                  />
+                </Group>
               </Field>
               <Field
                 label="アリーナランク"

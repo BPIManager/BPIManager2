@@ -8,10 +8,10 @@ import {
   Icon,
   Flex,
 } from "@chakra-ui/react";
-import { getBpiColorStyle } from "../../DashBoard/BPIDistribution";
 import { formatIIDXId } from "@/utils/common/formatIidxId";
 import { RadarSectionChart } from "../../DashBoard/Radar/ui";
 import { RivalSummaryResult } from "@/hooks/social/useRivalSummary";
+import { getBpiColorStyle } from "@/constants/bpiColor";
 
 export const RivalSummaryCard = ({
   rival,

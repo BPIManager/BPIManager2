@@ -9,8 +9,8 @@ import {
 import { VStack, HStack, Text, Box, Badge, Tabs } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 import { RadarSongEntry } from "@/types/stats/radar";
-import { getBpiColorStyle } from "../BPIDistribution";
 import { LuArrowDownWideNarrow, LuArrowUpNarrowWide } from "react-icons/lu";
+import { getBpiColorStyle } from "@/constants/bpiColor";
 
 export const RadarCategorySongsDialog = ({
   categoryName,

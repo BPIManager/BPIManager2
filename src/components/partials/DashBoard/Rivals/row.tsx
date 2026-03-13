@@ -32,7 +32,7 @@ export const RivalComparisonRow = ({ rival }: { rival: any }) => {
             color="white"
             lineClamp={1}
           >
-            <Link href={`/user/${userId}`}>{userName}</Link>
+            <Link href={`/rivals/${userId}`}>{userName}</Link>
           </ChakraLink>
         </HStack>
         <Text fontSize="10px" color="gray.500" fontWeight="bold">

@@ -307,4 +307,76 @@ export class LogRepository {
       .orderBy("s.title", "asc")
       .execute();
   }
+
+  /**
+   * 楽曲マスタをベースに、自分とライバルのスコアを並列で取得する
+   */
+  async getRivalComparisonScores(params: {
+    viewerId: string;
+    rivalId: string;
+    version: string;
+  }) {
+    const { viewerId, rivalId, version } = params;
+
+    return await db
+      .selectFrom("songs as s")
+      .innerJoin("songDef as sd", (join) =>
+        join.onRef("sd.songId", "=", "s.songId").on("sd.isCurrent", "=", 1),
+      )
+      .leftJoin("scores as v", (join) =>
+        join
+          .onRef("v.songId", "=", "s.songId")
+          .on("v.userId", "=", viewerId)
+          .on("v.version", "=", version)
+          .on("v.logId", "=", (eb) =>
+            eb
+              .selectFrom("scores as v2")
+              .select((sub) => sub.fn.max("logId").as("maxId"))
+              .where("v2.userId", "=", viewerId)
+              .where("v2.version", "=", version)
+              .whereRef("v2.songId", "=", "s.songId"),
+          ),
+      )
+      .leftJoin("scores as r", (join) =>
+        join
+          .onRef("r.songId", "=", "s.songId")
+          .on("r.userId", "=", rivalId)
+          .on("r.version", "=", version)
+          .on("r.logId", "=", (eb) =>
+            eb
+              .selectFrom("scores as r2")
+              .select((sub) => sub.fn.max("logId").as("maxId"))
+              .where("r2.userId", "=", rivalId)
+              .where("r2.version", "=", version)
+              .whereRef("r2.songId", "=", "s.songId"),
+          ),
+      )
+      .select([
+        "s.songId",
+        "s.title",
+        "s.notes",
+        "s.bpm",
+        "s.difficultyLevel",
+        "s.difficulty",
+        "s.releasedVersion",
+        "sd.wrScore",
+        "sd.kaidenAvg",
+        "sd.coef",
+        "v.logId as myLogId",
+        "v.exScore as myExScore",
+        "v.bpi as myBpi",
+        "v.clearState as myClearState",
+        "v.missCount as myMissCount",
+        "v.lastPlayed as myLastPlayed",
+        "r.exScore as rivalExScore",
+        "r.bpi as rivalBpi",
+        "r.clearState as rivalClearState",
+        "r.missCount as rivalMissCount",
+        "r.lastPlayed as rivalLastPlayed",
+      ])
+      .where((eb) =>
+        eb.or([eb("s.deletedAt", "is", null), eb("s.deletedAt", ">", version)]),
+      )
+      .execute();
+  }
 }

@@ -3,7 +3,6 @@ import { DashBoardFilter } from "@/components/partials/DashBoard/Filter";
 import { ActivitySection } from "@/components/partials/DashBoard/ActivityCalendar/ui";
 import { RankDistributionSection } from "@/components/partials/DashBoard/DJRankDistribution/ui";
 import { BpiDistributionSection } from "@/components/partials/DashBoard/BPIDistribution/ui";
-import { TotalBPIHistory } from "@/components/partials/DashBoard/TotalBPIHistory/ui";
 import { useRouter } from "next/router";
 import { SongsTable } from "@/components/partials/Table";
 import { latestVersion } from "@/constants/latestVersion";
@@ -13,6 +12,7 @@ import { UserProfileLayout } from "@/components/partials/Profile/Layout/layout";
 import { ProfileMeta } from "@/components/partials/Profile/Meta/ui";
 import { getVersionNameFromNumber } from "@/constants/versions";
 import { RadarSection } from "@/components/partials/DashBoard/Radar";
+import { BpiHistorySection } from "@/components/partials/DashBoard/TotalBPIHistory/ui";
 
 export default function UserPage({
   defaultView = "overview",
@@ -41,11 +41,10 @@ export default function UserPage({
           <ActivitySection userId={userId} />
 
           <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
-            <RankDistributionSection userId={userId} />
-            <BpiDistributionSection userId={userId} />
+            <RankDistributionSection myUserId={userId} />
+            <BpiDistributionSection myUserId={userId} />
           </SimpleGrid>
-
-          <TotalBPIHistory userId={userId} />
+          <BpiHistorySection myUserId={userId} />
           <RadarSection userId={userId} />
         </VStack>
       </Tabs.Content>

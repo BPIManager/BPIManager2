@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Box,
   VStack,
@@ -9,6 +9,7 @@ import {
   Separator,
   Flex,
   Spinner,
+  createListCollection,
 } from "@chakra-ui/react";
 import {
   LuSearch,
@@ -20,7 +21,11 @@ import {
 import { InputGroup } from "@/components/ui/input-group";
 import { FormSelect } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { sortOptions } from "@/constants/sort";
+import {
+  rivalSortOptions,
+  soleSortOptions,
+  sortOptions,
+} from "@/constants/sort";
 import { FilterParamsFrontend } from "@/types/songs/withScore";
 import { versionsNonDisabledCollection } from "@/constants/versions";
 import { latestVersion } from "@/constants/latestVersion";
@@ -34,6 +39,7 @@ interface SongFilterBarProps {
   onOpenAdvancedFilter: () => void;
   totalCount: number;
   disableVersionSelect?: boolean;
+  withRivals?: boolean;
 }
 
 export const SongFilterBar = ({
@@ -42,6 +48,7 @@ export const SongFilterBar = ({
   onOpenAdvancedFilter,
   totalCount,
   disableVersionSelect,
+  withRivals,
 }: SongFilterBarProps) => {
   const router = useRouter();
   const [isSticky, setIsSticky] = useState(true);
@@ -70,6 +77,15 @@ export const SongFilterBar = ({
       : [...list, item];
   };
   const currentStoreVersion = router.query.version;
+  const combinedSortOptions = useMemo(() => {
+    const isRivalPage = router.pathname.includes("/rivals/");
+
+    const items = isRivalPage
+      ? [...sortOptions, ...rivalSortOptions]
+      : [...soleSortOptions, ...sortOptions];
+
+    return createListCollection({ items });
+  }, [router.pathname]);
   return (
     <Box
       p={4}
@@ -98,7 +114,7 @@ export const SongFilterBar = ({
         <FormSelect
           width="full"
           size="sm"
-          collection={sortOptions}
+          collection={combinedSortOptions}
           value={params.sortKey || "bpi"}
           onValueChange={(details) =>
             onParamsChange({
@@ -151,6 +167,44 @@ export const SongFilterBar = ({
           getLabel={(v: any) => v[0]}
         />
       </Flex>
+      {withRivals && (
+        <Flex gap={6} wrap="wrap" mt={2}>
+          <VStack align="start" gap={1.5}>
+            <Text
+              fontSize="10px"
+              color="gray.500"
+              fontWeight="bold"
+              letterSpacing="widest"
+            >
+              プレイ状態
+            </Text>
+            <HStack gap={4}>
+              <Checkbox
+                size="sm"
+                checked={params.isMyPlayed}
+                onCheckedChange={(e) =>
+                  onParamsChange({ isMyPlayed: !!e.checked })
+                }
+              >
+                <Text fontSize="xs" fontWeight="bold">
+                  自分プレイ済
+                </Text>
+              </Checkbox>
+              <Checkbox
+                size="sm"
+                checked={params.isRivalPlayed}
+                onCheckedChange={(e) =>
+                  onParamsChange({ isRivalPlayed: !!e.checked })
+                }
+              >
+                <Text fontSize="xs" fontWeight="bold">
+                  ライバルプレイ済
+                </Text>
+              </Checkbox>
+            </HStack>
+          </VStack>
+        </Flex>
+      )}
 
       <Separator opacity={0.1} mt={3} />
       <HStack justify="space-between">

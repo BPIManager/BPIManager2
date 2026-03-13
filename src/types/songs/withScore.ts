@@ -41,6 +41,10 @@ export interface FilterParamsFrontend {
   isSofran?: boolean;
   notesMin?: number;
   notesMax?: number;
+
+  isMyPlayed?: boolean;
+  isRivalPlayed?: boolean;
+
   search?: string;
   since?:
     | "today"
@@ -58,7 +62,17 @@ export interface FilterParamsFrontend {
     | "notes"
     | "bpm"
     | "updatedAt"
-    | "version";
+    | "version"
+    | "rivalBpi"
+    | "myBpi"
+    | "rivalRate"
+    | "myRate"
+    | "winGapAsc"
+    | "winGapDesc"
+    | "loseGapAsc"
+    | "loseGapDesc"
+    | "rivalUpdated"
+    | "myUpdated";
   sortOrder?: "asc" | "desc";
 }
 

@@ -1,12 +1,4 @@
-import {
-  Box,
-  Text,
-  VStack,
-  Spinner,
-  Center,
-  HStack,
-  Separator,
-} from "@chakra-ui/react";
+import { Box, Text, HStack, VStack, Separator } from "@chakra-ui/react";
 import { useMemo } from "react";
 import {
   ComposedChart,
@@ -17,108 +9,190 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Rectangle,
   Brush,
+  Rectangle,
 } from "recharts";
+import { BpiHistoryItem } from "@/hooks/stats/useTotalBPIHistory";
+import { TotalBpiHistorySkeleton } from "@/components/partials/DashBoard/TotalBPIHistory/skeleton";
 
-const renderCustomBar = (props: any) => {
+// --- Sub Components ---
+
+/**
+ * 更新件数を示すカスタムバー
+ */
+const UpdateBar = (props: any) => {
   const { payload } = props;
-  const fill = payload.updateCount > 0 ? "#3182ce" : "#1A202C";
-
+  if (payload.rivalBpi !== undefined) return null; // ライバル比較時は表示しない
+  const fill = payload.updateCount > 0 ? "#3182ce" : "transparent";
   return (
-    <Rectangle {...props} fill={fill} opacity={0.4} radius={[2, 2, 0, 0]} />
+    <Rectangle {...props} fill={fill} opacity={0.3} radius={[2, 2, 0, 0]} />
   );
 };
 
-const CustomTooltip = ({ active, payload, label }: any) => {
-  if (active && payload && payload.length) {
-    const data = payload[0].payload;
-    const updateCount = data.updatedSongs?.length || 0;
+/**
+ * 統合ツールチップ
+ */
+const HistoryTooltip = ({ active, payload, label, myName, rivalName }: any) => {
+  if (!active || !payload || !payload.length) return null;
 
-    return (
-      <Box
-        bg="gray.900"
-        p={3}
-        border="1px solid"
-        borderColor="whiteAlpha.300"
-        borderRadius="md"
-        boxShadow="xl"
-        maxW="300px"
-      >
-        <VStack align="start" gap={1}>
-          <Text color="gray.400" fontSize="xs" fontWeight="bold">
-            {label}
-          </Text>
-          <HStack justify="space-between" w="full">
-            <Text color="blue.300" fontSize="sm" fontWeight="bold">
-              総合BPI: {data.totalBpi.toFixed(2)}
-            </Text>
-            <Text color="gray.500" fontSize="xs">
-              累計: {data.count}曲
-            </Text>
-          </HStack>
+  const data = payload[0].payload;
+  const isComparison = data.rivalBpi !== undefined;
 
-          {updateCount > 0 && (
-            <>
-              <Separator my={2} borderColor="whiteAlpha.200" />
-              <Text color="green.300" fontSize="xs" fontWeight="bold" mb={1}>
-                UPDATED: {updateCount} items
+  return (
+    <Box
+      bg="gray.900"
+      p={3}
+      border="1px solid"
+      borderColor="whiteAlpha.300"
+      borderRadius="md"
+      boxShadow="xl"
+      minW="200px"
+      maxW="300px"
+    >
+      <VStack align="start" gap={1}>
+        <Text color="gray.400" fontSize="xs" fontWeight="bold">
+          {label}
+        </Text>
+
+        {isComparison ? (
+          /* 比較モード表示 */
+          <>
+            <HStack justify="space-between" w="full">
+              <Text color="blue.300" fontSize="xs" fontWeight="bold">
+                {myName}
               </Text>
-              <Box maxH="150px" overflowY="auto" w="full" pr={1}>
-                {data.updatedSongs.map((song: string, idx: number) => (
-                  <Text key={idx} color="whiteAlpha.800" fontSize="10px">
-                    • {song}
-                  </Text>
-                ))}
-              </Box>
-            </>
-          )}
-        </VStack>
-      </Box>
-    );
-  }
-  return null;
+              <Text color="blue.300" fontSize="sm" fontWeight="bold">
+                {data.myBpi?.toFixed(2)}
+              </Text>
+            </HStack>
+            <HStack justify="space-between" w="full">
+              <Text color="orange.300" fontSize="xs" fontWeight="bold">
+                {rivalName}
+              </Text>
+              <Text color="orange.300" fontSize="sm" fontWeight="bold">
+                {data.rivalBpi?.toFixed(2)}
+              </Text>
+            </HStack>
+            <Separator borderColor="whiteAlpha.200" my={1} />
+            <HStack justify="space-between" w="full">
+              <Text color="gray.400" fontSize="xs">
+                差分
+              </Text>
+              <Text
+                fontSize="xs"
+                fontWeight="bold"
+                color={data.myBpi - data.rivalBpi > 0 ? "green.400" : "red.400"}
+              >
+                {data.myBpi - data.rivalBpi > 0 ? "+" : ""}
+                {(data.myBpi - data.rivalBpi).toFixed(2)}
+              </Text>
+            </HStack>
+          </>
+        ) : (
+          /* 単体モード表示（更新曲リスト付き） */
+          <>
+            <HStack justify="space-between" w="full">
+              <Text color="blue.300" fontSize="sm" fontWeight="bold">
+                総合BPI: {data.myBpi?.toFixed(2)}
+              </Text>
+              <Text color="gray.500" fontSize="xs">
+                累計: {data.count}曲
+              </Text>
+            </HStack>
+            {data.updateCount > 0 && (
+              <>
+                <Separator my={2} borderColor="whiteAlpha.200" />
+                <Text color="green.300" fontSize="xs" fontWeight="bold">
+                  UPDATED: {data.updateCount} items
+                </Text>
+                <Box maxH="120px" overflowY="auto" w="full" pr={1}>
+                  {data.updatedSongs?.map((song: string, idx: number) => (
+                    <Text key={idx} color="whiteAlpha.800" fontSize="10px">
+                      • {song}
+                    </Text>
+                  ))}
+                </Box>
+              </>
+            )}
+          </>
+        )}
+      </VStack>
+    </Box>
+  );
 };
 
-export const TotalBpiHistoryChart = ({ data }: { data?: any[] }) => {
+// --- Main Component ---
+
+interface UnifiedBpiHistoryChartProps {
+  myData?: BpiHistoryItem[];
+  rivalData?: BpiHistoryItem[];
+  isLoading: boolean;
+  myName?: string;
+  rivalName?: string;
+}
+
+export const TotalBpiHistoryChart = ({
+  myData,
+  rivalData,
+  isLoading,
+  myName = "自分",
+  rivalName = "ライバル",
+}: UnifiedBpiHistoryChartProps) => {
   const { chartData, ticks, startIndex } = useMemo(() => {
-    if (!data || data.length === 0)
+    if (!myData && !rivalData)
       return { chartData: [], ticks: [], startIndex: 0 };
 
-    const formatted = data.map((d) => ({
-      ...d,
-      updateCount: d.updatedSongs?.length || 0,
-    }));
+    const dateSet = new Set<string>();
+    myData?.forEach((d) => dateSet.add(d.date));
+    rivalData?.forEach((d) => dateSet.add(d.date));
+    const allDates = Array.from(dateSet).sort();
 
-    const tickCount = 10;
-    const interval = Math.max(1, Math.floor(formatted.length / tickCount));
-    const calculatedTicks = formatted
-      .filter((_, i) => i % interval === 0 || i === formatted.length - 1)
+    const myMap = new Map(myData?.map((d) => [d.date, d]));
+    const rivalMap = new Map(rivalData?.map((d) => [d.date, d]));
+
+    let lastMy: any = null;
+    let lastRival: any = null;
+
+    const merged = allDates.map((date) => {
+      const myEntry = myMap.get(date);
+      const rivalEntry = rivalMap.get(date);
+
+      if (myEntry) lastMy = myEntry;
+      if (rivalEntry) lastRival = rivalEntry;
+
+      return {
+        date,
+        myBpi: myEntry?.totalBpi ?? lastMy?.totalBpi,
+        rivalBpi: rivalData
+          ? (rivalEntry?.totalBpi ?? lastRival?.totalBpi)
+          : undefined,
+        updateCount: myEntry?.updatedSongs?.length || 0,
+        updatedSongs: myEntry?.updatedSongs || [],
+        count: myEntry?.count || lastMy?.count,
+      };
+    });
+
+    const interval = Math.max(1, Math.floor(merged.length / 10));
+    const calculatedTicks = merged
+      .filter((_, i) => i % interval === 0 || i === merged.length - 1)
       .map((d) => d.date);
 
     return {
-      chartData: formatted,
+      chartData: merged,
       ticks: calculatedTicks,
-      startIndex: Math.max(0, formatted.length - 30),
+      startIndex: Math.max(0, merged.length - 30),
     };
-  }, [data]);
+  }, [myData, rivalData]);
 
+  if (isLoading) return <TotalBpiHistorySkeleton />;
   if (chartData.length === 0) return null;
 
   const formatDate = (value: string, index: number) => {
     const date = new Date(value);
-    const y = date.getFullYear();
-    const m = date.getMonth() + 1;
-    const d = date.getDate();
-
-    if (index === 0) return `${y}/${m}/${d}`;
-
-    const prevTickDate = new Date(ticks[index - 1]);
-    if (y !== prevTickDate.getFullYear()) {
-      return `${y}/${m}/${d}`;
-    }
-
-    return `${m}/${d}`;
+    return index === 0 ||
+      date.getFullYear() !== new Date(ticks[index - 1]).getFullYear()
+      ? `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`
+      : `${date.getMonth() + 1}/${date.getDate()}`;
   };
 
   return (
@@ -129,35 +203,45 @@ export const TotalBpiHistoryChart = ({ data }: { data?: any[] }) => {
       borderWidth="1px"
       borderColor="whiteAlpha.100"
       w="full"
-      h="400px"
-      _focus={{ outline: "none" }}
+      h="420px"
     >
-      <Text
-        fontSize="sm"
-        fontWeight="bold"
-        mb={6}
-        color="gray.400"
-        textTransform="uppercase"
-      >
-        総合BPI推移
-      </Text>
+      <HStack justify="space-between" mb={6}>
+        <Text
+          fontSize="sm"
+          fontWeight="bold"
+          color="gray.400"
+          textTransform="uppercase"
+        >
+          総合BPI推移
+        </Text>
+        {rivalData && (
+          <HStack gap={4}>
+            <HStack gap={1}>
+              <Box w="12px" h="2px" bg="blue.400" />
+              <Text fontSize="xs" color="blue.300">
+                {myName}
+              </Text>
+            </HStack>
+            <HStack gap={1}>
+              <Box w="12px" h="2px" bg="orange.400" strokeDasharray="5 3" />
+              <Text fontSize="xs" color="orange.300">
+                {rivalName}
+              </Text>
+            </HStack>
+          </HStack>
+        )}
+      </HStack>
 
-      <ResponsiveContainer
-        width="100%"
-        height="80%"
-        style={{ outline: "none" }}
-      >
+      <ResponsiveContainer width="100%" height="80%">
         <ComposedChart
           data={chartData}
-          margin={{ top: 10, right: 10, bottom: 0, left: 0 }}
-          style={{ outline: "none" }}
+          margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
         >
           <CartesianGrid
             strokeDasharray="3 3"
             stroke="#2D3748"
             vertical={false}
           />
-
           <XAxis
             dataKey="date"
             ticks={ticks}
@@ -166,11 +250,8 @@ export const TotalBpiHistoryChart = ({ data }: { data?: any[] }) => {
             fontSize={10}
             tickLine={false}
             axisLine={false}
-            interval={0}
           />
-
           <YAxis
-            yAxisId="left"
             domain={["dataMin - 1", "dataMax + 1"]}
             stroke="#4A5568"
             fontSize={10}
@@ -178,32 +259,53 @@ export const TotalBpiHistoryChart = ({ data }: { data?: any[] }) => {
             axisLine={false}
             tickLine={false}
           />
-          <YAxis yAxisId="right" hide={true} />
+          <YAxis yAxisId="right" hide />
 
-          <Tooltip content={<CustomTooltip />} cursor={{ stroke: "#2D3748" }} />
-
-          <Bar
-            yAxisId="right"
-            dataKey="updateCount"
-            barSize={4}
-            shape={renderCustomBar}
+          <Tooltip
+            content={<HistoryTooltip myName={myName} rivalName={rivalName} />}
+            cursor={{ stroke: "#2D3748" }}
           />
 
+          {/* 単体時のみ表示される更新バー */}
+          {!rivalData && (
+            <Bar
+              yAxisId="right"
+              dataKey="updateCount"
+              barSize={4}
+              shape={<UpdateBar />}
+            />
+          )}
+
+          {/* 自分ライン */}
           <Line
-            yAxisId="left"
             type="monotone"
-            dataKey="totalBpi"
+            dataKey="myBpi"
             stroke="#63B3ED"
             strokeWidth={2}
             dot={false}
             activeDot={{
               r: 4,
+              fill: "#0d1117",
               stroke: "#63B3ED",
               strokeWidth: 2,
-              fill: "#0d1117",
             }}
-            animationDuration={1500}
+            connectNulls
+            animationDuration={1000}
           />
+
+          {/* ライバルライン（存在時のみ） */}
+          {rivalData && (
+            <Line
+              type="monotone"
+              dataKey="rivalBpi"
+              stroke="#F6AD55"
+              strokeWidth={2}
+              dot={false}
+              strokeDasharray="5 5"
+              connectNulls
+              animationDuration={1200}
+            />
+          )}
 
           <Brush
             dataKey="date"
@@ -211,7 +313,6 @@ export const TotalBpiHistoryChart = ({ data }: { data?: any[] }) => {
             stroke="#2D3748"
             fill="#0d1117"
             startIndex={startIndex}
-            travellerWidth={10}
             tickFormatter={() => ""}
           />
         </ComposedChart>

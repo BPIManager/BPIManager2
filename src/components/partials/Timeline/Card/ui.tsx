@@ -52,7 +52,7 @@ export const TimelineItem = ({ entry }: { entry: TimelineEntry }) => {
     >
       <Grid templateColumns="auto 1fr" gap={3}>
         <GridItem>
-          <Link href={`/user/${entry.userId}`}>
+          <Link href={`/rivals/${entry.userId}`}>
             <Avatar.Root size="sm">
               <Avatar.Fallback name={entry.userName} />
               <Avatar.Image src={entry.profileImage ?? ""} />
@@ -65,7 +65,7 @@ export const TimelineItem = ({ entry }: { entry: TimelineEntry }) => {
             <HStack justify="space-between" align="center">
               <HStack fontSize="xs" gap={2}>
                 <Text fontWeight="bold" color="white" truncate>
-                  <Link href={`/user/${entry.userId}`}>{entry.userName}</Link>
+                  <Link href={`/rivals/${entry.userId}`}>{entry.userName}</Link>
                 </Text>
 
                 {isCurrentlyLosing && (

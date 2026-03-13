@@ -147,13 +147,18 @@ export class BpiRepository {
         batchId: params.batchId,
       })
       .execute();
-
     await trx
       .insertInto("userStatusLogs")
       .values({
         userId: params.userId,
         totalBpi: params.newTotalBpi,
-        arenaRank: null,
+        arenaRank: (eb) =>
+          eb
+            .selectFrom("userStatusLogs")
+            .select("arenaRank")
+            .where("userId", "=", params.userId)
+            .orderBy("id", "desc")
+            .limit(1),
         version: params.version,
         batchId: params.batchId,
       })

@@ -17,11 +17,11 @@ import { ActivitySection } from "@/components/partials/DashBoard/ActivityCalenda
 import { RankDistributionSection } from "@/components/partials/DashBoard/DJRankDistribution/ui";
 import { BpiDistributionSection } from "@/components/partials/DashBoard/BPIDistribution/ui";
 import { FilterProvider } from "@/contexts/stats/FilterContext";
-import { TotalBPIHistory } from "@/components/partials/DashBoard/TotalBPIHistory/ui";
 import { PageContainer, PageHeader } from "@/components/partials/Header";
 import { RankingTabsCard } from "@/components/partials/DashBoard/RecommendedCard/ui";
 import { RadarSection } from "@/components/partials/DashBoard/Radar";
 import { RivalWinLossSummary } from "@/components/partials/DashBoard/Rivals/ui";
+import { BpiHistorySection } from "@/components/partials/DashBoard/TotalBPIHistory/ui";
 
 export default function DashboardPage() {
   const { user, isLoading: isUserLoading, fbUser } = useUser();
@@ -52,10 +52,10 @@ export default function DashboardPage() {
                 <ActivitySection userId={fbUser.uid} />
 
                 <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
-                  <RankDistributionSection userId={fbUser.uid} />
-                  <BpiDistributionSection userId={fbUser.uid} />
+                  <RankDistributionSection myUserId={fbUser.uid} />
+                  <BpiDistributionSection myUserId={fbUser.uid} />
                 </SimpleGrid>
-                <TotalBPIHistory userId={fbUser.uid} />
+                <BpiHistorySection myUserId={fbUser.uid} />
                 <RivalWinLossSummary userId={fbUser.uid} />
                 <RadarSection userId={fbUser.uid} />
               </VStack>

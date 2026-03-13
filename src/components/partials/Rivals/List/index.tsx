@@ -5,9 +5,11 @@ import { useUser } from "@/contexts/users/UserContext";
 import { useRivalSummary } from "@/hooks/social/useRivalSummary";
 import { RivalFilter } from "./filter";
 import { RivalList } from "./container";
+import { useRouter } from "next/router";
 
 export const RivalListContainer = () => {
   const { user } = useUser();
+  const router = useRouter();
   const [levels, setLevels] = useState<string[]>(["11", "12"]);
   const [difficulties, setDifficulties] = useState<string[]>([
     "HYPER",
@@ -46,7 +48,7 @@ export const RivalListContainer = () => {
         results={results || []}
         isLoading={isLoading}
         isError={isError}
-        onCardClick={(id) => (window.location.href = `/rivals/${id}`)}
+        onCardClick={(id) => router.push(`/rivals/${id}`)}
       />
     </VStack>
   );

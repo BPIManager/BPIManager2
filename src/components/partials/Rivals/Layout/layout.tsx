@@ -1,30 +1,46 @@
-import { Box, SimpleGrid, Tabs, Spinner, Center } from "@chakra-ui/react";
+import {
+  Box,
+  SimpleGrid,
+  Tabs,
+  Spinner,
+  Center,
+  HStack,
+  Text,
+  Badge,
+} from "@chakra-ui/react";
 import { DashboardLayout } from "@/components/partials/Main";
 import { PageContainer } from "@/components/partials/Header";
 import { ProfileSideBar } from "@/components/partials/Profile/Sidebar/ui";
 import { ProfileErrorState } from "@/components/partials/Profile/Errors/ui";
 import { useProfile } from "@/hooks/users/useProfile";
-import { LuHistory, LuLayoutDashboard, LuMusic, LuTable } from "react-icons/lu";
+import { useUser } from "@/contexts/users/UserContext";
+import {
+  LuChevronRight,
+  LuLayoutDashboard,
+  LuMusic,
+  LuSwords,
+  LuUser,
+} from "react-icons/lu";
 import { useRouter } from "next/router";
 import { ReactNode } from "react";
 import { FilterProvider } from "@/contexts/stats/FilterContext";
+import { ProfileProvider } from "@/contexts/profile/ProfileContext";
 import { latestVersion } from "@/constants/latestVersion";
 import NextLink from "next/link";
-import { ProfileProvider } from "@/contexts/profile/ProfileContext";
-import { ModeSwitchBanner } from "../../Rivals/ModeSwitch/ui";
-import { useUser } from "@/contexts/users/UserContext";
+import { Button } from "@/components/ui/button";
+import { ModeSwitchBanner } from "../ModeSwitch/ui";
 
-interface UserProfileLayoutProps {
-  userId: string;
-  currentTab: "overview" | "songs" | "logs" | "aaaTable" | "";
+interface RivalProfileLayoutProps {
+  rivalUserId: string;
+  currentTab: "overview" | "scores";
   children: ReactNode;
 }
 
-export const UserProfileLayout = ({
-  userId,
+export const RivalProfileLayout = ({
+  rivalUserId,
   currentTab,
   children,
-}: UserProfileLayoutProps) => {
+}: RivalProfileLayoutProps) => {
   const router = useRouter();
   const { user } = useUser();
   const {
@@ -36,12 +52,14 @@ export const UserProfileLayout = ({
     toggleFollow,
     isUpdating,
     mutate,
-  } = useProfile(userId);
+  } = useProfile(rivalUserId);
   const version = (router.query.version as string) || latestVersion;
 
   const scoreParams = new URLSearchParams({
     difficulties: "LEGGENDARIA,HYPER,ANOTHER",
     levels: "12,11",
+    isMyPlayed: "true",
+    isRivalPlayed: "true",
   }).toString();
 
   if (isLoading)
@@ -71,11 +89,12 @@ export const UserProfileLayout = ({
           <PageContainer>
             {user && (
               <ModeSwitchBanner
-                type="user"
+                type="rival"
                 targetUserId={profile.userId}
                 isMe={user.userId === profile.userId}
               />
             )}
+
             <SimpleGrid columns={{ base: 1, lg: 4 }} gap={8}>
               <Box gridColumn={{ lg: "span 1" }}>
                 <ProfileSideBar
@@ -108,14 +127,14 @@ export const UserProfileLayout = ({
                       flex="1"
                       py={3}
                     >
-                      <NextLink href={`/user/${userId}`}>
+                      <NextLink href={`/rivals/${rivalUserId}`}>
                         <LuLayoutDashboard />
                         サマリ
                       </NextLink>
                     </Tabs.Trigger>
 
                     <Tabs.Trigger
-                      value="songs"
+                      value="scores"
                       fontSize="xs"
                       asChild
                       gap={1}
@@ -123,38 +142,10 @@ export const UserProfileLayout = ({
                       py={3}
                     >
                       <NextLink
-                        href={`/user/${userId}/scores/${latestVersion}?${scoreParams}`}
+                        href={`/rivals/${rivalUserId}/scores/${version}?${scoreParams}`}
                       >
                         <LuMusic />
-                        スコア
-                      </NextLink>
-                    </Tabs.Trigger>
-
-                    <Tabs.Trigger
-                      value="logs"
-                      fontSize="xs"
-                      asChild
-                      gap={1}
-                      flex="1"
-                      py={3}
-                    >
-                      <NextLink href={`/user/${userId}/logs/${version}`}>
-                        <LuHistory />
-                        更新履歴
-                      </NextLink>
-                    </Tabs.Trigger>
-
-                    <Tabs.Trigger
-                      value="aaaTable"
-                      fontSize="xs"
-                      asChild
-                      gap={1}
-                      flex="1"
-                      py={3}
-                    >
-                      <NextLink href={`/user/${userId}/aaaTable/${version}`}>
-                        <LuTable />
-                        AAA達成表
+                        スコア比較
                       </NextLink>
                     </Tabs.Trigger>
                   </Tabs.List>

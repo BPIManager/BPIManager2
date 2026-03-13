@@ -45,13 +45,21 @@ export const FilterSearchInput = ({
   );
 };
 
-export const FilterCheckboxGroup = ({
+interface FilterCheckboxGroupProps<T> {
+  label: string;
+  items: T[];
+  selected: T[] | undefined;
+  onToggle: (item: T) => void;
+  getLabel?: (item: T) => string | number;
+}
+
+export const FilterCheckboxGroup = <T extends string | number>({
   label,
   items,
   selected,
   onToggle,
   getLabel,
-}: any) => (
+}: FilterCheckboxGroupProps<T>) => (
   <VStack align="start" gap={1.5}>
     <Text
       fontSize="10px"

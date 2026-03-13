@@ -38,9 +38,16 @@ export const useSongFilter = (data: SongWithScore[] | undefined) => {
       clearStates: query.clearStates
         ? (query.clearStates as string).split(",")
         : [],
+      isMyPlayed:
+        query.isMyPlayed === undefined
+          ? undefined
+          : query.isMyPlayed === "true",
+      isRivalPlayed:
+        query.isRivalPlayed === undefined
+          ? undefined
+          : query.isRivalPlayed === "true",
     };
   }, [query, isReady]);
-
   const page = useMemo(() => Number(query.page) || 1, [query.page]);
 
   const displaySongs = useMemo(() => {
@@ -59,7 +66,22 @@ export const useSongFilter = (data: SongWithScore[] | undefined) => {
     if (!hasFilter) {
       return [];
     }
-    const filtered = filterSongsFrontend(data, params);
+    let filtered = filterSongsFrontend(data, params);
+    if (params.isMyPlayed !== undefined) {
+      filtered = filtered.filter((s) =>
+        params.isMyPlayed ? s.exScore !== null : s.exScore === null,
+      );
+    }
+
+    if (params.isRivalPlayed !== undefined) {
+      filtered = filtered.filter((s) => {
+        const rs = s as any;
+        return params.isRivalPlayed
+          ? rs.rival?.exScore !== null
+          : rs.rival?.exScore === null;
+      });
+    }
+
     return sortSongs(filtered, params);
   }, [data, params]);
 
