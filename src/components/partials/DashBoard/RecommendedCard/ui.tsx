@@ -9,10 +9,11 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useRecommendedInfinite } from "@/hooks/stats/useRecommended";
-import { SimpleRankItem } from "./item";
+import { SimpleRankItem } from "./Common/SimpleRankItem";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { SongWithScore } from "@/types/songs/withScore";
 import { SongDetailView } from "../../Modal/BPIChart/SongDetails/ui";
+import { NearLoseList } from "./NearLose";
 
 const InfiniteList = ({
   userId,
@@ -73,6 +74,7 @@ const InfiniteList = ({
 export const RankingTabsCard = ({ userId }: { userId: string }) => {
   const [selectedSong, setSelectedSong] = useState<SongWithScore | null>(null);
   const { open, onOpen, onClose } = useDisclosure();
+  const [tab, setTab] = useState<string>("weapons");
 
   const handleSongSelect = (item: any) => {
     setSelectedSong(item);
@@ -88,7 +90,13 @@ export const RankingTabsCard = ({ userId }: { userId: string }) => {
       overflow="hidden"
       display="flex"
     >
-      <Tabs.Root defaultValue="weapons" variant="plain" size="sm" flex="1">
+      <Tabs.Root
+        value={tab}
+        onValueChange={(e) => setTab(e.value)}
+        variant="plain"
+        size="sm"
+        flex="1"
+      >
         <Tabs.List bg="whiteAlpha.50" p={1} borderRadius="lg" w="full">
           <Tabs.Trigger
             value="weapons"
@@ -116,6 +124,19 @@ export const RankingTabsCard = ({ userId }: { userId: string }) => {
           >
             伸びるかも?
           </Tabs.Trigger>
+          <Tabs.Trigger
+            value="nearLose"
+            flex={1}
+            _selected={{ bg: "#0d1117", color: "white" }}
+            py={2}
+            borderRadius="md"
+            fontSize="xs"
+            fontWeight="bold"
+            display={"flex"}
+            justifyContent={"center"}
+          >
+            ライバル僅差
+          </Tabs.Trigger>
         </Tabs.List>
 
         <Tabs.Content value="weapons" p={0} flex="1" minH="0" height="100%">
@@ -132,9 +153,17 @@ export const RankingTabsCard = ({ userId }: { userId: string }) => {
             onSelect={handleSongSelect}
           />
         </Tabs.Content>
+        <Tabs.Content value="nearLose" p={0}>
+          <NearLoseList userId={userId} onSelect={handleSongSelect} />
+        </Tabs.Content>
       </Tabs.Root>
       {open && selectedSong && (
-        <SongDetailView song={selectedSong} isOpen={open} onClose={onClose} />
+        <SongDetailView
+          song={selectedSong}
+          isOpen={open}
+          onClose={onClose}
+          defaultTab={tab === "nearLose" ? "rivals" : "stats"}
+        />
       )}
     </Box>
   );

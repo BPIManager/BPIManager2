@@ -6,6 +6,7 @@ import {
   Spinner,
   Center,
   Box,
+  GridItem,
 } from "@chakra-ui/react";
 import { DashboardLayout } from "@/components/partials/Main";
 import { useUser } from "@/contexts/users/UserContext";
@@ -47,27 +48,31 @@ export default function DashboardPage() {
           <VStack align="stretch" gap={6}>
             <DashBoardFilter />
 
-            <SimpleGrid columns={{ base: 1, lg: 4 }} gap={6} alignItems="start">
-              <VStack align="stretch" gap={6} gridColumn={{ lg: "span 3" }}>
-                <ActivitySection userId={fbUser.uid} />
+            <SimpleGrid
+              columns={{ base: 1, lg: 2, "2xl": 3 }}
+              gap={6}
+              alignItems="start"
+            >
+              <GridItem colSpan={{ base: 1, lg: 1, "2xl": 2 }}>
+                <VStack align="stretch" gap={6}>
+                  <ActivitySection userId={fbUser.uid} />
 
-                <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
-                  <RankDistributionSection myUserId={fbUser.uid} />
-                  <BpiDistributionSection myUserId={fbUser.uid} />
-                </SimpleGrid>
-                <BpiHistorySection myUserId={fbUser.uid} />
-                <RivalWinLossSummary userId={fbUser.uid} />
-                <RadarSection userId={fbUser.uid} />
-              </VStack>
-
-              <Box
-                gridColumn={{ lg: "span 1" }}
+                  <SimpleGrid columns={{ base: 1, sm: 2, md: 2 }} gap={4}>
+                    <RankDistributionSection myUserId={fbUser.uid} />
+                    <BpiDistributionSection myUserId={fbUser.uid} />
+                  </SimpleGrid>
+                  <BpiHistorySection myUserId={fbUser.uid} />
+                  <RivalWinLossSummary userId={fbUser.uid} />
+                  <RadarSection userId={fbUser.uid} />
+                </VStack>
+              </GridItem>
+              <GridItem
+                colSpan={{ base: 1, lg: 1, "2xl": 1 }}
                 position={{ lg: "sticky" }}
-                top={{ lg: "20px" }}
                 h="full"
               >
                 <RankingTabsCard userId={fbUser.uid} />
-              </Box>
+              </GridItem>
             </SimpleGrid>
           </VStack>
         </PageContainer>

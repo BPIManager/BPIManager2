@@ -14,6 +14,7 @@ import { Swords } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
 import { formatIIDXId } from "@/utils/common/formatIidxId";
 import { FollowSection } from "../../Profile/Sidebar/followStatus";
+import { keyframes } from "@emotion/react";
 export const RivalHeader = ({ profile, isUpdating, onToggleFollow }: any) => (
   <VStack align="stretch" gap={4} w="full">
     <Stack
@@ -98,6 +99,13 @@ export const RivalHeader = ({ profile, isUpdating, onToggleFollow }: any) => (
   </VStack>
 );
 
+const extendBounce = keyframes`
+  0% { transform: scaleX(0); }
+  60% { transform: scaleX(1.05); }
+  80% { transform: scaleX(0.98); }
+  100% { transform: scaleX(1); }
+`;
+
 export const WinLossStats = ({ winLossData }: { winLossData: any[] }) => (
   <VStack align="stretch" gap={3}>
     <SectionTitle icon={Swords} label="WIN / LOSS STATS" />
@@ -142,7 +150,16 @@ export const WinLossStats = ({ winLossData }: { winLossData: any[] }) => (
               borderRadius="full"
               overflow="hidden"
             >
-              <Box w={`${winRate}%`} h="full" bg="green.400" />
+              <Box
+                w={`${winRate}%`}
+                h="full"
+                bg="green.400"
+                transformOrigin="left"
+                animation={`${extendBounce} 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both`}
+                style={{
+                  transition: "width 0.5s ease-in-out",
+                }}
+              />
             </Box>
           </GridItem>
         );

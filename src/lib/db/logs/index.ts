@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { BatchDetailItem } from "@/types/logs/logByBatchId";
 import { SongWithScore } from "@/types/songs/withScore";
 import { Dayjs } from "dayjs";
+import { sql } from "kysely";
 
 /**
  * ログおよびスコア履歴に関するデータ操作を担当するリポジトリ
@@ -313,12 +314,14 @@ export class LogRepository {
    */
   async getRivalComparisonScores(params: {
     viewerId: string;
-    rivalId: string;
+    rivalId?: string | null;
     version: string;
+    limit?: number;
+    offset?: number;
   }) {
-    const { viewerId, rivalId, version } = params;
+    const { viewerId, rivalId, version, limit, offset } = params;
 
-    return await db
+    let query = db
       .selectFrom("songs as s")
       .innerJoin("songDef as sd", (join) =>
         join.onRef("sd.songId", "=", "s.songId").on("sd.isCurrent", "=", 1),
@@ -337,20 +340,23 @@ export class LogRepository {
               .whereRef("v2.songId", "=", "s.songId"),
           ),
       )
-      .leftJoin("scores as r", (join) =>
-        join
+      .leftJoin("scores as r", (join) => {
+        let base = join
           .onRef("r.songId", "=", "s.songId")
-          .on("r.userId", "=", rivalId)
-          .on("r.version", "=", version)
-          .on("r.logId", "=", (eb) =>
-            eb
-              .selectFrom("scores as r2")
-              .select((sub) => sub.fn.max("logId").as("maxId"))
-              .where("r2.userId", "=", rivalId)
-              .where("r2.version", "=", version)
-              .whereRef("r2.songId", "=", "s.songId"),
-          ),
-      )
+          .on("r.version", "=", version);
+
+        if (rivalId) {
+          return base.on("r.userId", "=", rivalId);
+        } else {
+          return base.on("r.userId", "in", (qb) =>
+            qb
+              .selectFrom("follows")
+              .select("followingId")
+              .where("followerId", "=", viewerId),
+          );
+        }
+      })
+      .leftJoin("users as ru", "ru.userId", "r.userId")
       .select([
         "s.songId",
         "s.title",
@@ -368,6 +374,8 @@ export class LogRepository {
         "v.clearState as myClearState",
         "v.missCount as myMissCount",
         "v.lastPlayed as myLastPlayed",
+        "r.userId as rivalUserId",
+        "ru.userName as rivalUserName",
         "r.exScore as rivalExScore",
         "r.bpi as rivalBpi",
         "r.clearState as rivalClearState",
@@ -377,6 +385,125 @@ export class LogRepository {
       .where((eb) =>
         eb.or([eb("s.deletedAt", "is", null), eb("s.deletedAt", ">", version)]),
       )
+      .where((eb) =>
+        eb.or([
+          eb("v.exScore", "is not", null),
+          eb("r.exScore", "is not", null),
+        ]),
+      );
+
+    if (limit !== undefined) query = query.limit(limit);
+    if (offset !== undefined) query = query.offset(offset);
+
+    return await query.execute();
+  }
+
+  /**
+   * 全ライバルの中から「もうすぐ抜かせそうな曲」を抽出
+   */
+  async getNearWinList(params: {
+    userId: string;
+    version: string;
+    limit: number;
+    levelArray: number[];
+    diffArray: string[];
+    cursor?: { lastDiff: number; lastSongId: string; lastRivalId: string };
+  }) {
+    const { userId, version, limit, cursor, levelArray, diffArray } = params;
+
+    let query = db
+      .selectFrom("songs as s")
+      .innerJoin("songDef as sd", (join) =>
+        join.onRef("sd.songId", "=", "s.songId").on("sd.isCurrent", "=", 1),
+      )
+      .innerJoin("scores as v", (join) =>
+        join
+          .onRef("v.songId", "=", "s.songId")
+          .on("v.userId", "=", userId)
+          .on("v.version", "=", version)
+          .on("v.logId", "=", (eb) =>
+            eb
+              .selectFrom("scores as v2")
+              .select((s) => s.fn.max("logId").as("m"))
+              .where("v2.userId", "=", userId)
+              .whereRef("v2.songId", "=", "s.songId"),
+          ),
+      )
+      .innerJoin("scores as r", (join) =>
+        join
+          .onRef("r.songId", "=", "s.songId")
+          .on("r.version", "=", version)
+          .on("r.userId", "in", (qb) =>
+            qb
+              .selectFrom("follows")
+              .select("followingId")
+              .where("followerId", "=", userId),
+          )
+          .on("r.logId", "=", (eb) =>
+            eb
+              .selectFrom("scores as r2")
+              .select((s) => s.fn.max("logId").as("m"))
+              .whereRef("r2.userId", "=", "r.userId")
+              .whereRef("r2.songId", "=", "s.songId"),
+          ),
+      )
+      .innerJoin("users as ru", "ru.userId", "r.userId")
+      .select([
+        "s.songId",
+        "s.title",
+        "s.notes",
+        "s.bpm",
+        "s.difficulty",
+        "s.difficultyLevel",
+        "s.releasedVersion",
+        "v.logId",
+        "v.exScore",
+        "v.bpi",
+        "v.clearState",
+        "v.missCount",
+        "v.lastPlayed as scoreAt",
+        "sd.wrScore",
+        "sd.kaidenAvg",
+        "sd.coef",
+        "r.exScore as rivalEx",
+        "ru.userName as rivalName",
+        "ru.profileImage as rivalImage",
+        "r.userId as rivalId",
+        sql<number>`r.exScore - v.exScore`.as("exDiff"),
+      ])
+      .where(sql`r.exScore - v.exScore`, ">", 0);
+
+    console.log(levelArray, diffArray);
+    if (levelArray && levelArray.length > 0) {
+      query = query.where("s.difficultyLevel", "in", levelArray);
+    }
+    if (diffArray && diffArray.length > 0) {
+      query = query.where("s.difficulty", "in", diffArray);
+    }
+
+    if (cursor) {
+      query = query.where((eb) =>
+        eb.or([
+          eb(sql`r.exScore - v.exScore`, ">", cursor.lastDiff),
+          eb.and([
+            eb(sql`r.exScore - v.exScore`, "=", cursor.lastDiff),
+            eb.or([
+              eb("s.songId", ">", Number(cursor.lastSongId)),
+              eb.and([
+                eb("s.songId", ">=", Number(cursor.lastSongId)),
+                eb("r.userId", ">", cursor.lastRivalId),
+              ]),
+            ]),
+          ]),
+        ]),
+      );
+    }
+
+    return await query
+      .orderBy("exDiff", "asc")
+      .orderBy("s.songId", "asc")
+      .orderBy("r.userId", "asc")
+      .limit(limit)
       .execute();
   }
 }

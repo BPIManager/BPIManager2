@@ -167,7 +167,7 @@ const ScoreBox = ({ label, ex, bpi, clearState, color, isRival }: any) => {
             : lamp,
       }}
     >
-      <Text fontSize="9px" color={color} fontWeight="black" mb={1}>
+      <Text fontSize="9px" color={color} fontWeight="bold" mb={1}>
         {label}
       </Text>
       <HStack gap={4} align="baseline">
@@ -196,12 +196,12 @@ const DiffBox = ({ exDiff, bpiDiff, isMobile }: any) => {
   const hasDiff = exDiff !== null && Number.isFinite(exDiff);
   return (
     <VStack justify="center" gap={0} opacity={hasDiff ? 1 : 0.1}>
-      <Text fontSize="8px" color="gray.600" fontWeight="black">
+      <Text fontSize="8px" color="gray.600" fontWeight="bold">
         DIFF
       </Text>
       <Text
         fontSize={isMobile ? "11px" : "12px"}
-        fontWeight="black"
+        fontWeight="bold"
         color={exDiff > 0 ? "green.400" : exDiff < 0 ? "red.400" : "gray.500"}
         lineHeight="1.1"
       >
@@ -234,7 +234,7 @@ const MobileScoreView = ({ label, ex, bpi, clearState, align }: any) => {
         <Text
           fontSize="10px"
           color={label === "YOU" ? "blue.300" : "orange.300"}
-          fontWeight="black"
+          fontWeight="bold"
         >
           {label}
         </Text>

@@ -1,5 +1,5 @@
 import { HStack, VStack, Text, Badge, Box } from "@chakra-ui/react";
-import { diffColors, getLampColor } from "../../Table/table";
+import { diffColors, getLampColor } from "../../../Table/table";
 
 export const SimpleRankItem = ({
   item,

@@ -13,9 +13,9 @@ export const RivalComparisonRow = ({ rival }: { rival: any }) => {
   const { userName, profileImage, userId } = rival;
   const { win, lose, draw, totalCount } = rival.stats;
 
-  const winPct = (win / totalCount) * 100;
-  const drawPct = (draw / totalCount) * 100;
-  const losePct = (lose / totalCount) * 100;
+  const winRate = (win / totalCount) * 100;
+  const drawRate = (draw / totalCount) * 100;
+  const loseRate = (lose / totalCount) * 100;
 
   return (
     <VStack align="stretch" gap={1}>
@@ -50,15 +50,15 @@ export const RivalComparisonRow = ({ rival }: { rival: any }) => {
       >
         <HStack gap={0} w="full" h="full">
           <Box
-            w={`${winPct}%`}
+            w={`${winRate}%`}
             h="full"
-            bg="yellow.400"
+            bg="blue.500"
             transition="width 1s ease-out"
             position="relative"
           >
-            {winPct > 10 && (
+            {winRate > 10 && (
               <Center position="absolute" inset={0}>
-                <Text fontSize="10px" fontWeight="bold" color="black">
+                <Text fontSize="10px" fontWeight="bold" color="white">
                   {win}
                 </Text>
               </Center>
@@ -66,15 +66,15 @@ export const RivalComparisonRow = ({ rival }: { rival: any }) => {
           </Box>
 
           <Box
-            w={`${drawPct}%`}
+            w={`${drawRate}%`}
             h="full"
-            bg="gray.600"
+            bg="gray.500"
             transition="width 1s ease-out"
             position="relative"
           >
-            {drawPct > 15 && (
+            {drawRate > 15 && (
               <Center position="absolute" inset={0}>
-                <Text fontSize="10px" fontWeight="bold" color="whiteAlpha.800">
+                <Text fontSize="10px" fontWeight="bold" color="white">
                   {draw}
                 </Text>
               </Center>
@@ -82,13 +82,13 @@ export const RivalComparisonRow = ({ rival }: { rival: any }) => {
           </Box>
 
           <Box
-            w={`${losePct}%`}
+            w={`${loseRate}%`}
             h="full"
-            bg="blue.500"
+            bg="red.500"
             transition="width 1s ease-out"
             position="relative"
           >
-            {losePct > 10 && (
+            {loseRate > 10 && (
               <Center position="absolute" inset={0}>
                 <Text fontSize="10px" fontWeight="bold" color="white">
                   {lose}
@@ -98,7 +98,7 @@ export const RivalComparisonRow = ({ rival }: { rival: any }) => {
           </Box>
         </HStack>
 
-        {winPct <= 10 && win > 0 && (
+        {winRate <= 10 && win > 0 && (
           <Text
             position="absolute"
             left="2px"
@@ -112,7 +112,7 @@ export const RivalComparisonRow = ({ rival }: { rival: any }) => {
             {win}
           </Text>
         )}
-        {losePct <= 10 && lose > 0 && (
+        {loseRate <= 10 && lose > 0 && (
           <Text
             position="absolute"
             right="2px"

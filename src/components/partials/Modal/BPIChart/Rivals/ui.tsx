@@ -12,6 +12,7 @@ import {
   Stack,
   Center,
 } from "@chakra-ui/react";
+import { useRouter } from "next/router";
 import { useMemo } from "react";
 
 interface RivalRankingProps {
@@ -26,6 +27,7 @@ export const RivalRankingBody = ({
   myScore,
 }: RivalRankingProps) => {
   const { fbUser } = useUser();
+  const router = useRouter();
   const { data, isLoading } = useRivalScores(songId, version);
 
   const ranking = useMemo(() => {
@@ -69,9 +71,14 @@ export const RivalRankingBody = ({
         <Table.Body>
           {ranking.map((row, index) => {
             const diff = myScore ? row.exScore - (myScore.exScore || 0) : 0;
+            const handleRowClick = (userId: string, isSelf: boolean) => {
+              if (isSelf) return;
+              router.push(`/rivals/${userId}`);
+            };
             return (
               <Table.Row
                 key={row.userId}
+                onClick={() => handleRowClick(row.userId, !!row.isSelf)}
                 bg={row.isSelf ? "blue.900" : "transparent"}
               >
                 <Table.Cell p={2}>

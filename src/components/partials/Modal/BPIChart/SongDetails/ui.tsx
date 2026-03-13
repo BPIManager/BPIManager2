@@ -30,12 +30,14 @@ export const SongDetailView = ({
   song,
   isOpen,
   onClose,
+  defaultTab,
 }: {
   song: SongWithScore | null;
   isOpen: boolean;
   onClose: () => void;
+  defaultTab?: "stats" | "history" | "rivals";
 }) => {
-  const [tab, setTab] = useState<string>("stats");
+  const [tab, setTab] = useState<string>(defaultTab || "stats");
 
   const chartData = useMemo(() => {
     if (!song) return [];

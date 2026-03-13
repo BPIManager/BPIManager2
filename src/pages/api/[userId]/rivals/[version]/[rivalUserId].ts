@@ -68,6 +68,8 @@ export default async function handler(
           scoreAt: row.myLastPlayed || null,
 
           rival: {
+            userId: row.rivalUserId,
+            userName: row.rivalUserName,
             exScore: rivalEx,
             bpi: rivalBpi,
             clearState: row.rivalClearState || "NO PLAY",

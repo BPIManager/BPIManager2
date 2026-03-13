@@ -44,7 +44,7 @@ export const useRecommendedInfinite = (
     setSize,
     isReachingEnd,
     isLoading: isLoading,
-    isLoadingMore: isValidating && size > 1,
+    isLoadingMore: isLoading || (isValidating && size > 1),
     isError: error,
   };
 };
