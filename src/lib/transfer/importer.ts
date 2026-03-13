@@ -1,12 +1,10 @@
 import { BpiCalculator } from "../bpi";
 import dayjs from "../dayjs";
-import { BpiRepository } from "../db/bpi";
+import { bpiRepo } from "../db/bpi";
 import { SongLookup } from "./songLookup";
 import { v4 as uuidv4 } from "uuid";
 
 export class BpiImportService {
-  constructor(private repo: BpiRepository) {}
-
   mapClearState = (state: number | string | undefined): string => {
     if (state === undefined) return "NO PLAY";
     const s = Number(state);
@@ -34,7 +32,7 @@ export class BpiImportService {
     userId: string,
     payloads: { version: string; data: any }[],
   ) {
-    const songMaster = await this.repo.getSongMasterWithDef();
+    const songMaster = await bpiRepo.getSongMasterWithDef();
     const lookup = new SongLookup(songMaster);
 
     const allScoreUpdates: any[] = [];
@@ -130,7 +128,7 @@ export class BpiImportService {
       });
     }
 
-    await this.repo.importFromBPIM({
+    await bpiRepo.importFromBPIM({
       userId,
       scoreUpdates: allScoreUpdates,
       statusLogs: allStatusLogs,

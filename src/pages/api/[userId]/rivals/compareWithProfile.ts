@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { UsersRepository } from "@/lib/db/users";
 import { checkUserAccess } from "@/middlewares/api/withApi";
 import { latestVersion } from "@/constants/latestVersion";
-import { SocialRepository } from "@/lib/db/social";
+import { usersRepo } from "@/lib/db/users";
+import { socialRepo } from "@/lib/db/social";
 
 export default async function handler(
   req: NextApiRequest,
@@ -20,8 +20,6 @@ export default async function handler(
   if (!viewerId) return res.status(401).json({ message: "Unauthorized" });
 
   try {
-    const usersRepo = new UsersRepository();
-    const socialRepo = new SocialRepository();
     const version = latestVersion;
 
     const [profile, winLoss, radar] = await Promise.all([

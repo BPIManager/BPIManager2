@@ -1,7 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
-import { MetricsRepository } from "@/lib/db/metrics";
 import { latestVersion } from "@/constants/latestVersion";
+import { metricsRepo } from "@/lib/db/metrics";
 
 const START_VERSION = 26;
 const LEVELS = [11, 12];
@@ -14,12 +14,11 @@ const getVersions = () => {
 };
 
 export async function generateArenaJson() {
-  const repo = new MetricsRepository();
   const versions = getVersions();
 
   console.log(`Starting JSON Generation for versions: ${versions.join(", ")}`);
 
-  const songs = await repo.getAllSongs();
+  const songs = await metricsRepo.getAllSongs();
   const songMap = new Map(
     songs.map((s) => [`${s.title}[${s.difficulty}]`, s.notes]),
   );
@@ -30,7 +29,7 @@ export async function generateArenaJson() {
     for (const level of LEVELS) {
       console.log(`Processing: Ver.${v} Level.${level}`);
 
-      const arenaData = await repo.getArenaAverageScores(v, level);
+      const arenaData = await metricsRepo.getArenaAverageScores(v, level);
 
       const grouped = arenaData.reduce((acc: any, row) => {
         const key = `${row.title}[${row.difficulty}]`;

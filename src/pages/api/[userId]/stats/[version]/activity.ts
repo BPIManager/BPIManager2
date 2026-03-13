@@ -1,10 +1,8 @@
 import { latestVersion } from "@/constants/latestVersion";
 import { checkUserAccess } from "@/middlewares/api/withApi";
-import { StatsRepository } from "@/lib/db/stats";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { parseArray } from "@/utils/common/parseArray";
-
-const repository = new StatsRepository();
+import { statsRepo } from "@/lib/db/stats";
 
 export default async function handler(
   req: NextApiRequest,
@@ -29,7 +27,7 @@ export default async function handler(
         });
       }
 
-      const activity = await repository.getActivityData(
+      const activity = await statsRepo.getActivityData(
         userId as string,
         version as string,
         targetLevels,

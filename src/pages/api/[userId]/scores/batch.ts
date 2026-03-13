@@ -4,12 +4,10 @@ import {
   AuthenticatedNextApiRequest,
 } from "@/middlewares/api/withAuth";
 import { v4 as uuidv4 } from "uuid";
-import { BpiRepository } from "@/lib/db/bpi";
 import { isImproved } from "@/lib/lamp";
 import { BpiCalculator } from "@/lib/bpi";
 import { NewScore } from "@/types/sql";
-
-const repository = new BpiRepository();
+import { bpiRepo } from "@/lib/db/bpi";
 
 const handler = async (
   req: AuthenticatedNextApiRequest,
@@ -24,9 +22,9 @@ const handler = async (
 
   try {
     const [songMaster, existingScores, lastLog] = await Promise.all([
-      repository.getSongMasterWithDef(),
-      repository.getLatestScores(userId, version),
-      repository.getLatestTotalBpi(userId, version),
+      bpiRepo.getSongMasterWithDef(),
+      bpiRepo.getLatestScores(userId, version),
+      bpiRepo.getLatestTotalBpi(userId, version),
     ]);
 
     const existingScoreMap = new Map(existingScores.map((s) => [s.songId, s]));
@@ -125,7 +123,7 @@ const handler = async (
           : rest.lastPlayed,
     }));
 
-    await repository.saveImportResults({
+    await bpiRepo.saveImportResults({
       userId,
       version,
       batchId,

@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { UsersRepository } from "@/lib/db/users";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
+import { usersRepo } from "@/lib/db/users";
 
 export default async function handler(
   req: NextApiRequest,
@@ -21,8 +21,7 @@ export default async function handler(
     }
     const authenticatedViewerId = access.viewerId;
 
-    const repo = new UsersRepository();
-    const profile = await repo.getUserProfileSummary(
+    const profile = await usersRepo.getUserProfileSummary(
       userId as string,
       authenticatedViewerId as string,
     );

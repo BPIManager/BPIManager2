@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { FollowRepository } from "@/lib/db/follow";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
+import { followsRepo } from "@/lib/db/follow";
 
 export default async function handler(
   req: NextApiRequest,
@@ -29,8 +29,7 @@ export default async function handler(
       return res.status(400).json({ error: "You cannot follow yourself" });
     }
 
-    const followRepo = new FollowRepository();
-    const isFollowed = await followRepo.toggleFollow(myId, targetUserId);
+    const isFollowed = await followsRepo.toggleFollow(myId, targetUserId);
 
     return res.status(200).json({
       success: true,

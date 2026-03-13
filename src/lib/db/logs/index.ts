@@ -1,79 +1,11 @@
 import dayjs from "@/lib/dayjs";
 import { db } from "@/lib/db";
-import { BatchDetailItem } from "@/types/logs/logByBatchId";
-import { SongWithScore } from "@/types/songs/withScore";
-import { Dayjs } from "dayjs";
 import { sql } from "kysely";
 
 /**
  * ログおよびスコア履歴に関するデータ操作を担当するリポジトリ
  */
-export class LogRepository {
-  static mapToLogNested(row: any): BatchDetailItem {
-    const currentEx = Number(row.exScore);
-    const prevEx = row.p_exScore !== null ? Number(row.p_exScore) : null;
-    const currentBpi = Number(row.bpi);
-    const prevBpi = row.p_bpi !== null ? Number(row.p_bpi) : null;
-
-    return {
-      songId: row.songId,
-      title: row.title,
-      difficulty: row.difficulty,
-      difficultyLevel: row.difficultyLevel,
-      level: row.difficultyLevel,
-      notes: Number(row.notes || 0),
-      bpm: row.bpm,
-      releasedVersion: row.releasedVersion,
-      current: {
-        exScore: currentEx,
-        bpi: currentBpi,
-        clearState: row.clearState,
-        missCount: row.missCount,
-        lastPlayedAt: row.scoreAt,
-      },
-      previous:
-        prevEx !== null
-          ? {
-              exScore: prevEx,
-              bpi: prevBpi,
-              clearState: row.p_clearState,
-              missCount: row.p_missCount,
-            }
-          : null,
-      diff: {
-        exScore: prevEx !== null ? currentEx - prevEx : currentEx,
-        bpi:
-          prevBpi !== null
-            ? Math.round((currentBpi - prevBpi) * 100) / 100
-            : Math.round((currentBpi + 15) * 100) / 100,
-      },
-      wrScore: row.wrScore,
-      kaidenAvg: row.kaidenAvg,
-      coef: row.coef,
-    };
-  }
-
-  static mapToFlatSong(row: any): SongWithScore {
-    return {
-      songId: row.songId,
-      title: row.title,
-      notes: Number(row.notes || 0),
-      bpm: row.bpm,
-      difficulty: row.difficulty,
-      difficultyLevel: row.difficultyLevel,
-      releasedVersion: row.releasedVersion,
-      logId: row.logId ? Number(row.logId) : null,
-      exScore: row.exScore !== null ? Number(row.exScore) : null,
-      bpi: row.bpi !== null ? Number(row.bpi) : null,
-      clearState: row.clearState,
-      missCount: row.missCount,
-      scoreAt: row.scoreAt,
-      wrScore: row.wrScore,
-      kaidenAvg: row.kaidenAvg,
-      coef: row.coef,
-    };
-  }
-
+class LogRepository {
   getJstRange(dateString: string, unit: "day" | "week" | "month" = "day") {
     const baseDate = dayjs.tz(dateString);
 
@@ -524,3 +456,5 @@ export class LogRepository {
       .execute();
   }
 }
+
+export const logsRepo = new LogRepository();

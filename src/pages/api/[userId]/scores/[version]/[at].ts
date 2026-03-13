@@ -1,5 +1,6 @@
-import { LogRepository } from "@/lib/db/logs";
+import { logsRepo } from "@/lib/db/logs";
 import { checkUserAccess } from "@/middlewares/api/withApi";
+import { mapToFlatSong } from "@/utils/logs/getMapFlatten";
 import { filterSongsServerSide } from "@/utils/songs/filter";
 import { sortSongs } from "@/utils/songs/sort";
 import dayjs from "dayjs";
@@ -10,7 +11,6 @@ export default async function handler(
   res: NextApiResponse,
 ) {
   const { userId, version, at, ...filterParams } = req.query;
-  const repo = new LogRepository();
   const time =
     at === "latest" ? dayjs().toDate() : dayjs.tz(at as string).toDate();
 
@@ -21,13 +21,13 @@ export default async function handler(
         .status(access.error!.status)
         .json({ message: access.error!.message });
 
-    const results = await repo.getScoresWithDetails(
+    const results = await logsRepo.getScoresWithDetails(
       String(userId),
       String(version),
       { targetTime: time },
     );
 
-    const songs = results.map(LogRepository.mapToFlatSong);
+    const songs = results.map(mapToFlatSong);
     const processed = sortSongs(
       filterSongsServerSide(songs, filterParams),
       filterParams,

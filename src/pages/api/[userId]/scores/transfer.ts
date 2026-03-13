@@ -1,5 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import { BpiRepository } from "@/lib/db/bpi";
+import type { NextApiResponse } from "next";
 import { adminDb } from "@/lib/firebase/admin";
 import { BpiImportService } from "@/lib/transfer/importer";
 import { IIDX_VERSIONS } from "@/constants/latestVersion";
@@ -28,8 +27,7 @@ const handler = async (
       .json({ error: "User ID is required and must be a string" });
   }
 
-  const repo = new BpiRepository();
-  const service = new BpiImportService(repo);
+  const service = new BpiImportService();
 
   try {
     const authUid = req.authUid;

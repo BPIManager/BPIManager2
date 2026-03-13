@@ -1,10 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { RANK_TABLE } from "@/constants/djRank";
-import { StatsRepository } from "@/lib/db/stats";
 import { latestVersion } from "@/constants/latestVersion";
 import { checkUserAccess } from "@/middlewares/api/withApi";
-
-const repository = new StatsRepository();
+import { statsRepo } from "@/lib/db/stats";
 
 export default async function handler(
   req: NextApiRequest,
@@ -24,7 +22,7 @@ export default async function handler(
         .json({ message: access.error!.message });
     }
 
-    const scores = await repository.getLatestScoresWithMusicData(
+    const scores = await statsRepo.getLatestScoresWithMusicData(
       userId as string,
       version as string,
     );

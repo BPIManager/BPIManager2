@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { sql } from "kysely";
 
-export class StatsRepository {
+class StatsRepository {
   async getLatestTotalBpi(userId: string, version: string): Promise<number> {
     const result = await db
       .selectFrom("logs")
@@ -205,3 +205,5 @@ export class StatsRepository {
     return Number(result?.count || 0);
   }
 }
+
+export const statsRepo = new StatsRepository();

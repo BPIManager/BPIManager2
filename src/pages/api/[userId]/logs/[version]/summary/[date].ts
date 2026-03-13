@@ -1,5 +1,6 @@
-import { LogRepository } from "@/lib/db/logs";
+import { logsRepo } from "@/lib/db/logs";
 import { checkUserAccess } from "@/middlewares/api/withApi";
+import { mapToLogNested } from "@/utils/logs/getMapNested";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
@@ -7,9 +8,8 @@ export default async function handler(
   res: NextApiResponse,
 ) {
   const { userId, version, date, type } = req.query;
-  const repo = new LogRepository();
 
-  const range = repo.getJstRange(date as string, type as any);
+  const range = logsRepo.getJstRange(date as string, type as any);
 
   try {
     const access = await checkUserAccess(req, String(userId));
@@ -18,7 +18,7 @@ export default async function handler(
         .status(access.error!.status)
         .json({ message: access.error!.message });
 
-    const batches = await repo.findBatchesInRange(
+    const batches = await logsRepo.findBatchesInRange(
       String(userId),
       String(version),
       range.start,
@@ -30,15 +30,15 @@ export default async function handler(
     const firstBatchCreatedAt = batches[0].createdAt;
 
     const [nav, results] = await Promise.all([
-      repo.getRangeNavigation(String(userId), String(version), range),
-      repo.getScoresWithDetails(String(userId), String(version), {
+      logsRepo.getRangeNavigation(String(userId), String(version), range),
+      logsRepo.getScoresWithDetails(String(userId), String(version), {
         batchIds: batches.map((b) => b.batchId),
         comparisonTime: firstBatchCreatedAt,
       }),
     ]);
 
     return res.status(200).json({
-      songs: results.map(LogRepository.mapToLogNested),
+      songs: results.map(mapToLogNested),
       pagination: {
         ...nav,
         current: batches[batches.length - 1],

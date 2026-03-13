@@ -1,11 +1,10 @@
 import { db } from "@/lib/db";
-import { StatsRepository } from "@/lib/db/stats";
 import { calculateRadar } from "@/lib/radar/calculator";
 import { latestVersion } from "@/constants/latestVersion";
 import { BpiCalculator } from "@/lib/bpi";
+import { statsRepo } from "@/lib/db/stats";
 
 export async function updateAllUserRadarCache() {
-  const statsRepo = new StatsRepository();
   const version = latestVersion;
 
   console.log(`Starting radar cache update for version: ${version}`);

@@ -1,5 +1,5 @@
 import { BpiCalculator } from "@/lib/bpi";
-import { StatsRepository } from "@/lib/db/stats";
+import { statsRepo } from "@/lib/db/stats";
 import { checkUserAccess } from "@/middlewares/api/withApi";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -21,8 +21,7 @@ export default async function handler(
         .json({ message: access.error!.message });
     }
 
-    const repo = new StatsRepository();
-    const rawData = await repo.getAAATableData(
+    const rawData = await statsRepo.getAAATableData(
       userId as string,
       version as string,
       parseInt(level as string),

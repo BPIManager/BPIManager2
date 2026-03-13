@@ -1,10 +1,8 @@
 import { latestVersion } from "@/constants/latestVersion";
 import { BpiCalculator } from "@/lib/bpi";
-import { StatsRepository } from "@/lib/db/stats";
+import { statsRepo } from "@/lib/db/stats";
 import { checkUserAccess } from "@/middlewares/api/withApi";
 import type { NextApiRequest, NextApiResponse } from "next";
-
-const repository = new StatsRepository();
 
 const DIFFICULTY_LABELS: Record<string, string> = {
   HYPER: "[H]",
@@ -34,13 +32,13 @@ export default async function handler(
         .status(access.error!.status)
         .json({ message: access.error!.message });
     const [allLogs, totalSongs] = await Promise.all([
-      repository.getScoreHistory(
+      statsRepo.getScoreHistory(
         userId as string,
         version as string,
         targetLevels,
         targetDiffs,
       ),
-      repository.getTotalSongCount(targetLevels, targetDiffs),
+      statsRepo.getTotalSongCount(targetLevels, targetDiffs),
     ]);
 
     if (allLogs.length === 0) return res.status(200).json([]);

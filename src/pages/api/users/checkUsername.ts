@@ -1,5 +1,3 @@
-// pages/api/users/checkUsername.ts
-
 import { db } from "@/lib/db";
 import { validateUserName } from "@/utils/common/nameValidation";
 import type { NextApiRequest, NextApiResponse } from "next";

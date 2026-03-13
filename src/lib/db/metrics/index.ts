@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { sql } from "kysely";
 
-export class MetricsRepository {
+class MetricsRepository {
   async getAllSongs() {
     return await db
       .selectFrom("songs")
@@ -49,3 +49,5 @@ export class MetricsRepository {
       .groupBy(["s.title", "s.difficulty", "u.arenarank"]);
   }
 }
+
+export const metricsRepo = new MetricsRepository();

@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { checkUserAccess } from "@/middlewares/api/withApi";
 import { latestVersion } from "@/constants/latestVersion";
-import { SocialRepository } from "@/lib/db/social";
+import { socialRepo } from "@/lib/db/social";
 
 export default async function handler(
   req: NextApiRequest,
@@ -34,8 +34,6 @@ export default async function handler(
   if (!viewerId) return res.status(401).json({ message: "Unauthorized" });
 
   try {
-    const socialRepo = new SocialRepository();
-
     const timeline = await socialRepo.getFollowedTimeline({
       viewerId,
       version,

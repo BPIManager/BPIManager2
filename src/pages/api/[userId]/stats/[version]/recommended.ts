@@ -1,9 +1,7 @@
 import { latestVersion } from "@/constants/latestVersion";
-import { StatsRepository } from "@/lib/db/stats";
+import { statsRepo } from "@/lib/db/stats";
 import { checkUserAccess } from "@/middlewares/api/withApi";
 import { NextApiRequest, NextApiResponse } from "next";
-
-const repository = new StatsRepository();
 
 export default async function handler(
   req: NextApiRequest,
@@ -32,12 +30,12 @@ export default async function handler(
         : [difficulty]
       : [];
 
-    const totalBpi = await repository.getLatestTotalBpi(
+    const totalBpi = await statsRepo.getLatestTotalBpi(
       userId as string,
       version as string,
     );
 
-    const allScores = await repository.getLatestScoresWithMusicData(
+    const allScores = await statsRepo.getLatestScoresWithMusicData(
       userId as string,
       version as string,
       targetLevels,

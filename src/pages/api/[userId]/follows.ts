@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { FollowRepository } from "@/lib/db/follow";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
+import { followsRepo } from "@/lib/db/follow";
 
 export default async function handler(
   req: NextApiRequest,
@@ -26,8 +26,7 @@ export default async function handler(
         .json({ message: access.error!.message });
     }
 
-    const repo = new FollowRepository();
-    const result = await repo.getFollowList({
+    const result = await followsRepo.getFollowList({
       targetUserId: userId,
       viewerId: access.viewerId,
       type,

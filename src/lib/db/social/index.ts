@@ -4,7 +4,7 @@ import { sql } from "kysely";
 import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
 
-export class SocialRepository {
+class SocialRepository {
   /**
    * フォローしているユーザーのスコア更新履歴を取得
    */

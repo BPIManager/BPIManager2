@@ -1,8 +1,6 @@
-import { LogRepository } from "@/lib/db/logs";
+import { logsRepo } from "@/lib/db/logs";
 import { checkUserAccess } from "@/middlewares/api/withApi";
-import { filterSongsServerSide } from "@/utils/songs/filter";
 import { sortSongs } from "@/utils/songs/sort";
-import dayjs from "dayjs";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
@@ -19,9 +17,6 @@ export default async function handler(
       .json({ message: "userId, rivalUserId and version are required" });
   }
 
-  const repo = new LogRepository();
-  const time = dayjs().toDate();
-
   try {
     const access = await checkUserAccess(req, String(userId));
     if (!access.hasAccess) {
@@ -29,8 +24,7 @@ export default async function handler(
         .status(access.error!.status)
         .json({ message: access.error!.message });
     }
-    const repo = new LogRepository();
-    const rawResults = await repo.getRivalComparisonScores({
+    const rawResults = await logsRepo.getRivalComparisonScores({
       viewerId: String(userId),
       rivalId: String(rivalUserId),
       version: String(version),

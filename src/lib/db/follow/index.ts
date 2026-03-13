@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { sql } from "kysely";
 
-export class FollowRepository {
+class FollowRepository {
   /**
    * フォロー状態を確認する
    */

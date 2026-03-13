@@ -3,7 +3,7 @@ import { SongMaster } from "@/types/songs/songMaster";
 import { Database, NewScore } from "@/types/sql";
 import { sql, Transaction } from "kysely";
 
-export class BpiRepository {
+class BpiRepository {
   async getSongMasterWithDef(): Promise<SongMaster> {
     const result = await db
       .selectFrom("songs as s")
@@ -174,3 +174,5 @@ export class BpiRepository {
     }
   }
 }
+
+export const bpiRepo = new BpiRepository();

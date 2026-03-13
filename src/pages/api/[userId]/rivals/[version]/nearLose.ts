@@ -1,4 +1,4 @@
-import { LogRepository } from "@/lib/db/logs";
+import { logsRepo } from "@/lib/db/logs";
 import { checkUserAccess } from "@/middlewares/api/withApi";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -23,7 +23,6 @@ export default async function handler(
     return res.status(400).json({ message: "userId and version are required" });
   }
 
-  const repo = new LogRepository();
   const nLimit = limit ? Number(limit) : 10;
 
   try {
@@ -51,7 +50,7 @@ export default async function handler(
           }
         : undefined;
 
-    const rawResults = await repo.getNearWinList({
+    const rawResults = await logsRepo.getNearWinList({
       userId: String(userId),
       version: String(version),
       limit: nLimit,

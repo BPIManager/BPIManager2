@@ -1,8 +1,7 @@
 import { db } from "@/lib/db";
 import { sql } from "kysely";
-import { FollowRepository, followsRepo } from "../follow";
 
-export class UsersRepository {
+class UsersRepository {
   async getRecommendedUsers(params: {
     viewerId: string;
     viewerValue: number;
@@ -192,3 +191,5 @@ export class UsersRepository {
     };
   }
 }
+
+export const usersRepo = new UsersRepository();

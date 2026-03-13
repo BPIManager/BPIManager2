@@ -1,7 +1,7 @@
-import { StatsRepository } from "@/lib/db/stats";
 import { checkUserAccess } from "@/middlewares/api/withApi";
 import { NextApiRequest, NextApiResponse } from "next";
 import { calculateRadar } from "@/lib/radar/calculator";
+import { statsRepo } from "@/lib/db/stats";
 
 const ensureArray = (query: string | string[] | undefined): string[] => {
   if (!query) return [];
@@ -26,9 +26,7 @@ export default async function handler(
         .json({ message: access.error!.message });
     }
 
-    const repo = new StatsRepository();
-
-    const scores = await repo.getLatestScoresWithMusicData(
+    const scores = await statsRepo.getLatestScoresWithMusicData(
       String(userId),
       String(version),
       levels,

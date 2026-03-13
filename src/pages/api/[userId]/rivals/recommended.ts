@@ -1,10 +1,10 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { UsersRepository } from "@/lib/db/users";
-import { StatsRepository } from "@/lib/db/stats";
 import { checkUserAccess } from "@/middlewares/api/withApi";
 import { latestVersion } from "@/constants/latestVersion";
 import { calculateRadar } from "@/lib/radar/calculator";
-import { BpiRepository } from "@/lib/db/bpi";
+import { statsRepo } from "@/lib/db/stats";
+import { bpiRepo } from "@/lib/db/bpi";
+import { usersRepo } from "@/lib/db/users";
 
 export default async function handler(
   req: NextApiRequest,
@@ -23,9 +23,6 @@ export default async function handler(
   if (!viewerId) return res.status(401).json({ message: "Unauthorized" });
 
   try {
-    const statsRepo = new StatsRepository();
-    const usersRepo = new UsersRepository();
-    const bpiRepo = new BpiRepository();
     const version = latestVersion;
 
     const viewerScores = await statsRepo.getLatestScoresWithMusicData(
