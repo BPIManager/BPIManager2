@@ -77,7 +77,6 @@ export const RivalSongsTable = ({
     }
     return map;
   }, [songs]);
-
   return (
     <Container maxW="full" p={0} minH="100svh">
       <SongFilterBar

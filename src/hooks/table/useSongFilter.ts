@@ -81,7 +81,6 @@ export const useSongFilter = (data: SongWithScore[] | undefined) => {
           : rs.rival?.exScore === null;
       });
     }
-
     return sortSongs(filtered, params);
   }, [data, params]);
 

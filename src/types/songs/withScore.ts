@@ -71,6 +71,10 @@ export interface FilterParamsFrontend {
     | "winGapDesc"
     | "loseGapAsc"
     | "loseGapDesc"
+    | "winBpiGapAsc"
+    | "winBpiGapDesc"
+    | "loseBpiGapAsc"
+    | "loseBpiGapDesc"
     | "rivalUpdated"
     | "myUpdated";
   sortOrder?: "asc" | "desc";

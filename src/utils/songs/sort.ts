@@ -10,7 +10,6 @@ type SongForSort = SongWithScore & {
   } | null;
   lastPlayedMax?: Date | string | null;
 };
-
 export const sortSongs = (
   songs: SongWithScore[],
   p: FilterParamsFrontend,
@@ -23,13 +22,16 @@ export const sortSongs = (
     return ex / (notes * 2);
   };
 
-  const getWinStatus = (s: SongForSort) => {
+  const getWinStatus = (s: SongForSort, type: "rate" | "bpi" = "rate") => {
+    if (type === "bpi") {
+      if (s.bpi === null || s.rival?.bpi === null) return 0;
+      if (!s.rival) return 0;
+      return s.bpi > s.rival.bpi ? 1 : -1;
+    }
     const myRate = getRate(s.exScore, s.notes);
     const rivalRate = getRate(s.rival?.exScore, s.notes);
     if (myRate === -1 || rivalRate === -1) return 0;
-    if (myRate > rivalRate) return 1;
-    if (myRate < rivalRate) return -1;
-    return 0;
+    return myRate > rivalRate ? 1 : -1;
   };
 
   return [...songs].sort((a: SongForSort, b: SongForSort) => {
@@ -53,6 +55,7 @@ export const sortSongs = (
         vB = b.rival?.bpi ?? -15;
         break;
       case "myBpi":
+      case "bpi":
         vA = a.bpi ?? -15;
         vB = b.bpi ?? -15;
         break;
@@ -64,37 +67,38 @@ export const sortSongs = (
         vA = getRate(a.exScore, a.notes);
         vB = getRate(b.exScore, b.notes);
         break;
-
       case "winGapAsc":
-      case "winGapDesc": {
-        const statusA = getWinStatus(a);
-        const statusB = getWinStatus(b);
-        if (statusA !== statusB) return statusB - statusA;
-        const gapA = Math.abs(
-          getRate(a.exScore, a.notes) - getRate(a.rival?.exScore, a.notes),
-        );
-        const gapB = Math.abs(
-          getRate(b.exScore, b.notes) - getRate(b.rival?.exScore, b.notes),
-        );
-        const res = sortKey === "winGapAsc" ? gapA - gapB : gapB - gapA;
-        if (res !== 0) return res;
-        break;
-      }
-
+      case "winGapDesc":
       case "loseGapAsc":
       case "loseGapDesc": {
-        const statusA = getWinStatus(a);
-        const statusB = getWinStatus(b);
-        if (statusA !== statusB) return statusA - statusB;
-        const gapA = Math.abs(
-          getRate(a.exScore, a.notes) - getRate(a.rival?.exScore, a.notes),
-        );
-        const gapB = Math.abs(
-          getRate(b.exScore, b.notes) - getRate(b.rival?.exScore, b.notes),
-        );
-        const res = sortKey === "loseGapAsc" ? gapA - gapB : gapB - gapA;
-        if (res !== 0) return res;
-        break;
+        const isWinSort = sortKey.startsWith("win");
+        vA = a.exDiff ?? -9999;
+        vB = b.exDiff ?? -9999;
+
+        if (isWinSort) {
+          if (vA > 0 !== vB > 0) return vA > 0 ? -1 : 1;
+          return sortKey.endsWith("Asc") ? vA - vB : vB - vA;
+        } else {
+          if (vA < 0 !== vB < 0) return vA < 0 ? -1 : 1;
+          return sortKey.endsWith("Asc") ? vB - vA : vA - vB;
+        }
+      }
+
+      case "winBpiGapAsc":
+      case "winBpiGapDesc":
+      case "loseBpiGapAsc":
+      case "loseBpiGapDesc": {
+        const isWinSort = sortKey.startsWith("winBpi");
+        vA = a.bpiDiff ?? -999;
+        vB = b.bpiDiff ?? -999;
+
+        if (isWinSort) {
+          if (vA > 0 !== vB > 0) return vA > 0 ? -1 : 1;
+          return sortKey.endsWith("Asc") ? vA - vB : vB - vA;
+        } else {
+          if (vA < 0 !== vB < 0) return vA < 0 ? -1 : 1;
+          return sortKey.endsWith("Asc") ? vB - vA : vA - vB;
+        }
       }
 
       case "rivalUpdated":
@@ -108,11 +112,6 @@ export const sortSongs = (
       case "updatedAt":
         vA = new Date(a.lastPlayedMax || a.scoreAt || 0).getTime();
         vB = new Date(b.lastPlayedMax || b.scoreAt || 0).getTime();
-        break;
-
-      case "bpi":
-        vA = a.bpi ?? -15;
-        vB = b.bpi ?? -15;
         break;
       case "bpm":
         vA = getMaxBpm(a.bpm);

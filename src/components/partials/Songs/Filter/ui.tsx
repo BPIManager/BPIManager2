@@ -11,13 +11,7 @@ import {
   Spinner,
   createListCollection,
 } from "@chakra-ui/react";
-import {
-  LuSearch,
-  LuSlidersHorizontal,
-  LuClock,
-  LuPin,
-  LuPinOff,
-} from "react-icons/lu";
+import { LuSearch, LuSlidersHorizontal } from "react-icons/lu";
 import { InputGroup } from "@/components/ui/input-group";
 import { FormSelect } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";

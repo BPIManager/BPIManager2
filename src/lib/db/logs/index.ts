@@ -343,7 +343,25 @@ export class LogRepository {
       .leftJoin("scores as r", (join) => {
         let base = join
           .onRef("r.songId", "=", "s.songId")
-          .on("r.version", "=", version);
+          .on("r.version", "=", version)
+          .on("r.logId", "=", (eb) => {
+            let sub = eb
+              .selectFrom("scores as r2")
+              .select((s) => s.fn.max("logId").as("m"))
+              .where("r2.version", "=", version)
+              .whereRef("r2.songId", "=", "s.songId");
+
+            if (rivalId) {
+              return sub.where("r2.userId", "=", rivalId);
+            } else {
+              return sub.where("r2.userId", "in", (qb) =>
+                qb
+                  .selectFrom("follows")
+                  .select("followingId")
+                  .where("followerId", "=", viewerId),
+              );
+            }
+          });
 
         if (rivalId) {
           return base.on("r.userId", "=", rivalId);

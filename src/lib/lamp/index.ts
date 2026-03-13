@@ -6,7 +6,7 @@ export const LAMP_RANK: Record<string, number> = {
   CLEAR: 4,
   "HARD CLEAR": 5,
   "EX HARD CLEAR": 6,
-  "FULL COMBO": 7,
+  "FULLCOMBO CLEAR": 7,
 };
 
 export const isImproved = (
