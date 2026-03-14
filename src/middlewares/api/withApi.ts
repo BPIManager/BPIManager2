@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { adminAuth } from "@/lib/firebase/admin";
 import type { NextApiRequest } from "next";
+import { timingSafeEqual } from "@/utils/common/timingSafeEqual";
 
 export interface AccessResult {
   hasAccess: boolean;
@@ -21,8 +22,7 @@ export async function checkUserAccess(
 ): Promise<AccessResult> {
   const userData = await db
     .selectFrom("users as u")
-    .leftJoin("apiKeys as ak", "u.userId", "ak.userId")
-    .select(["u.userId", "u.isPublic", "ak.key as apiKey"])
+    .select(["u.userId", "u.isPublic"])
     .where("u.userId", "=", targetUserId)
     .executeTakeFirst();
 
@@ -38,11 +38,6 @@ export async function checkUserAccess(
   }
 
   const authHeader = req.headers.authorization;
-  const xApiKey = req.headers["x-api-key"];
-
-  if (xApiKey && userData.apiKey && xApiKey === userData.apiKey) {
-    return { hasAccess: true, user: userData };
-  }
 
   if (authHeader?.startsWith("Bearer ")) {
     try {

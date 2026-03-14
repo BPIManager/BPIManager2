@@ -46,7 +46,7 @@ export const ActionConfirmDialog = ({
       placement="center"
       role={isDestructive ? "alertdialog" : "dialog"}
     >
-      <DialogContent bg="bg.panel" borderRadius="xl" boxShadow="2xl" p={4}>
+      <DialogContent bg="bg.panel" borderRadius="xl" p={4}>
         <DialogHeader borderBottomWidth="1px" pb={4}>
           <DialogTitle display="flex" alignItems="center" gap={2}>
             {isDestructive && (

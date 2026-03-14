@@ -48,17 +48,7 @@ export async function checkProfileAccess(
 export async function authenticateViewer(
   req: NextApiRequest,
 ): Promise<string | undefined> {
-  const xApiKey = req.headers["x-api-key"];
   const authHeader = req.headers.authorization;
-
-  if (xApiKey) {
-    const keyOwner = await db
-      .selectFrom("apiKeys")
-      .select("userId")
-      .where("key", "=", xApiKey as string)
-      .executeTakeFirst();
-    if (keyOwner) return keyOwner.userId;
-  }
 
   if (authHeader?.startsWith("Bearer ")) {
     try {

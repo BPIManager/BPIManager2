@@ -27,7 +27,6 @@ export default async function handler(
         );
 
       case "POST":
-        console.log(access);
         if (!access.hasAccess || access.viewerId !== uid)
           return res.status(403).json({ message: "Forbidden" });
         return await handleCreateProfile(req, res, uid);
