@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Input,
   Textarea,
@@ -6,8 +6,6 @@ import {
   Switch,
   HStack,
   Text,
-  Image,
-  Circle,
   Box,
   Spinner,
   Group,
@@ -15,8 +13,6 @@ import {
 } from "@chakra-ui/react";
 import { Field } from "@/components/ui/field";
 import { FormSelect } from "@/components/ui/select";
-import { auth } from "@/lib/firebase";
-import { onAuthStateChanged } from "firebase/auth";
 import { useUser } from "@/contexts/users/UserContext";
 import { authActions } from "@/lib/firebase/auth";
 import { arenaRanksCollection } from "@/constants/arenaRank";
@@ -31,9 +27,10 @@ import {
 } from "@/components/ui/dialog";
 import { User2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { toaster } from "@/components/ui/toaster";
 import { ImageUploadModal } from "../ImageCrop/ui";
 import { LuCheck, LuX } from "react-icons/lu";
+import { useEditProfile } from "@/hooks/users/useEditProfile";
+import { AvatarSection } from "./avatar";
 
 interface Props {
   isOpen?: boolean;
@@ -41,130 +38,19 @@ interface Props {
 }
 
 export default function AccountSettings({ isOpen, onClose }: Props) {
-  const { user, fbUser, refresh, isLoading } = useUser();
+  const { user, isLoading } = useUser();
   const { isSignedIn } = authActions;
-  const [fbUid, setFbUid] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const {
+    formData,
+    setFormData,
+    nameStatus,
+    fbUid,
+    isSubmitting,
+    handleSubmit,
+    isValid,
+  } = useEditProfile(onClose);
+
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
-
-  const handleImageSuccess = (url: string) => {
-    setFormData((prev) => ({ ...prev, profileImage: url }));
-  };
-  const [nameStatus, setNameStatus] = useState<{
-    isChecking: boolean;
-    error: string | null;
-    available: boolean;
-  }>({ isChecking: false, error: null, available: true });
-
-  const [formData, setFormData] = useState({
-    userName: "",
-    iidxId: "",
-    arenaRank: "-",
-    bio: "",
-    isPublic: true,
-    xId: "",
-    profileImage: "",
-  });
-
-  useEffect(() => {
-    if (user) {
-      setFormData({
-        userName: user.userName || "",
-        iidxId: user.iidxId || "",
-        arenaRank: user.arenaRank || "-",
-        bio: user.profileText || "",
-        isPublic: !!user.isPublic,
-        xId: user.xId || "",
-        profileImage: user.profileImage || "",
-      });
-    }
-  }, [user]);
-
-  useEffect(() => {
-    if (!formData.userName) {
-      setNameStatus({
-        isChecking: false,
-        error: "ユーザー名は必須です",
-        available: false,
-      });
-      return;
-    }
-
-    if (user && formData.userName === user.userName) {
-      setNameStatus({ isChecking: false, error: null, available: true });
-      return;
-    }
-
-    setNameStatus((prev) => ({ ...prev, isChecking: true, error: null }));
-    const timer = setTimeout(async () => {
-      try {
-        if (!fbUser) throw new Error("Invalid Firebase Credential");
-        const token = await fbUser.getIdToken();
-        const res = await fetch(
-          `/api/usernames/${encodeURIComponent(formData.userName)}/availability`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
-        const data = await res.json();
-
-        if (data.available) {
-          setNameStatus({ isChecking: false, error: null, available: true });
-        } else {
-          setNameStatus({
-            isChecking: false,
-            error: data.message || "利用できない名前です",
-            available: false,
-          });
-        }
-      } catch (e) {
-        setNameStatus({
-          isChecking: false,
-          error: "接続エラーが発生しました",
-          available: false,
-        });
-      }
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [formData.userName, user]);
-
-  useEffect(() => {
-    return onAuthStateChanged(auth, (u) => {
-      if (u) {
-        setFbUid(u.uid);
-        if (!user) {
-          setFormData((prev) => ({
-            ...prev,
-            userName: prev.userName || u.displayName || "",
-            profileImage:
-              prev.profileImage ||
-              u.photoURL?.replace("_normal", "") ||
-              `https://api.dicebear.com/9.x/identicon/svg?seed=${u.uid}`,
-          }));
-        }
-      }
-    });
-  }, []);
-
-  const useServiceIcon = () => {
-    const providerPhoto = auth.currentUser?.photoURL;
-    setFormData({
-      ...formData,
-      profileImage:
-        providerPhoto ||
-        `https://api.dicebear.com/9.x/identicon/svg?seed=${Math.random()}`,
-    });
-  };
-
-  const useDiceBearIcon = () => {
-    setFormData({
-      ...formData,
-      profileImage: `https://api.dicebear.com/9.x/identicon/svg?seed=${Math.random()}`,
-    });
-  };
 
   const validateIidxId = (id: string) => {
     if (!id) return false;
@@ -176,47 +62,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
     setFormData({ ...formData, xId: value });
   };
 
-  const handleSubmit = async () => {
-    if (!fbUid || !fbUser) return;
-
-    setIsSubmitting(true);
-    try {
-      const token = await fbUser.getIdToken();
-      const response = await fetch(`/api/${fbUid}/profile`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          userId: fbUid,
-          userName: formData.userName,
-          iidxId: formData.iidxId.replace(/-/g, ""),
-          xId: formData.xId,
-          arenaRank: formData.arenaRank === "-" ? null : formData.arenaRank,
-          profileText: formData.bio || null,
-          profileImage: formData.profileImage,
-          isPublic: formData.isPublic ? 1 : 0,
-        }),
-      });
-
-      if (!response.ok) throw new Error("Registration failed");
-
-      await refresh();
-      toaster.create({ title: "保存しました", type: "success" });
-      if (onClose) onClose();
-    } catch (error) {
-      toaster.create({
-        title: "アカウント情報の反映に失敗しました",
-        type: "error",
-        closable: true,
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-  const isForcedOpen = !isLoading && isSignedIn() && !user;
-  const finalOpen = isOpen || isForcedOpen;
+  const finalOpen = isOpen || (!isLoading && isSignedIn() && !user);
 
   return (
     <>
@@ -248,53 +94,29 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
 
           <DialogBody py={3}>
             <Stack gap={6}>
+              {/* アイコン設定 */}
               <Field
                 label="アイコンを設定"
                 required
-                invalid={!formData.userName}
                 helperText="公序良俗に反しないアイコンを設定してください"
               >
-                <HStack gap={4}>
-                  <Circle
-                    size="72px"
-                    overflow="hidden"
-                    border="2px solid"
-                    borderColor="blue.500"
-                  >
-                    <Image src={formData.profileImage} alt="Preview" />
-                  </Circle>
-                  <Box
-                    display="flex"
-                    flexDirection={"column"}
-                    justifyContent={"start"}
-                  >
-                    <Button
-                      size="xs"
-                      variant="outline"
-                      p={2}
-                      onClick={useServiceIcon}
-                    >
-                      連携サービスのアイコンを使用
-                    </Button>
-                    <Button
-                      size="xs"
-                      variant="outline"
-                      p={2}
-                      onClick={() => setIsImageModalOpen(true)}
-                    >
-                      アイコンをアップロード
-                    </Button>
-                    <Button
-                      size="xs"
-                      variant="outline"
-                      p={2}
-                      onClick={useDiceBearIcon}
-                    >
-                      ランダムに設定
-                    </Button>
-                  </Box>
-                </HStack>
+                <AvatarSection
+                  image={formData.profileImage}
+                  onChange={(url) =>
+                    setFormData({ ...formData, profileImage: url })
+                  }
+                />
+                <Button
+                  size="xs"
+                  variant="outline"
+                  mt={2}
+                  onClick={() => setIsImageModalOpen(true)}
+                >
+                  アイコンをアップロード
+                </Button>
               </Field>
+
+              {/* 表示名 */}
               <Field
                 label="表示名"
                 required
@@ -349,6 +171,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                   placeholder="00000000"
                 />
               </Field>
+
               <Field
                 label="Xユーザー名"
                 helperText="Xアカウントをプロフィールに表示できます(最大15文字)"
@@ -367,6 +190,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                   />
                 </Group>
               </Field>
+
               <Field
                 label="アリーナランク"
                 helperText="現在のアリーナランクを選択してください(アリーナ平均との比較が可能になります)"
@@ -439,24 +263,20 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
               colorPalette="blue"
               loading={isSubmitting}
               onClick={handleSubmit}
-              disabled={
-                !formData.userName ||
-                !validateIidxId(formData.iidxId) ||
-                !nameStatus.available ||
-                nameStatus.isChecking
-              }
+              disabled={!isValid}
             >
               保存
             </Button>
           </DialogFooter>
         </DialogContent>
       </DialogRoot>
+
       {fbUid && (
         <ImageUploadModal
           uid={fbUid}
           isOpen={isImageModalOpen}
           onClose={() => setIsImageModalOpen(false)}
-          onSuccess={handleImageSuccess}
+          onSuccess={(url) => setFormData({ ...formData, profileImage: url })}
         />
       )}
     </>

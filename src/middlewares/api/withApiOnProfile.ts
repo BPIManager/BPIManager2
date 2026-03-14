@@ -7,11 +7,22 @@ export async function checkProfileAccess(
   req: NextApiRequest,
   targetUserId: string,
 ): Promise<AccessResult> {
+  const viewerId = await authenticateViewer(req);
+  const isOwner = viewerId === targetUserId;
+
   const userData = await db
     .selectFrom("users")
     .select(["userId", "isPublic"])
     .where("userId", "=", targetUserId)
     .executeTakeFirst();
+
+  if (isOwner) {
+    return {
+      hasAccess: true,
+      user: userData,
+      viewerId,
+    };
+  }
 
   if (!userData) {
     return {
@@ -20,12 +31,7 @@ export async function checkProfileAccess(
     };
   }
 
-  const viewerId = await authenticateViewer(req);
-
-  const isOwner = viewerId === targetUserId;
-  const canAccess = userData.isPublic === 1 || isOwner;
-
-  if (canAccess) {
+  if (userData.isPublic === 1) {
     return {
       hasAccess: true,
       user: userData,
