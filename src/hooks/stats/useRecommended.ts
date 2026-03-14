@@ -20,11 +20,12 @@ export const useRecommendedInfinite = (
         const params = new URLSearchParams({
           limit: PAGE_SIZE.toString(),
           offset: (index * PAGE_SIZE).toString(),
+          version: version,
         });
         levels.forEach((l) => params.append("level", l));
         diffs.forEach((d) => params.append("difficulty", d));
 
-        const url = `/api/${userId}/stats/${version}/recommended?${params.toString()}`;
+        const url = `/api/${userId}/stats//recommended?${params.toString()}`;
 
         return [url, fbUser];
       },

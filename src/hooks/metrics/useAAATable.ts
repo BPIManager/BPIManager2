@@ -40,7 +40,10 @@ export const useAAATable = (
 
   const { data, error, isLoading } = useSWR<AAATableItem[]>(
     userId && version && level
-      ? [`/api/${userId}/stats/${version}/aaaDifficulty?level=${level}`, fbUser]
+      ? [
+          `/api/${userId}/stats/aaaDifficulty?level=${level}&version=${version}`,
+          fbUser,
+        ]
       : null,
     fetcher,
   );

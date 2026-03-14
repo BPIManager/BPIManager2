@@ -9,6 +9,7 @@ export const useActivity = (
   version: string,
 ) => {
   const params = new URLSearchParams();
+  params.append("version", version);
   levels.forEach((l) => params.append("level", l));
   difficulties.forEach((d) => params.append("difficulty", d));
 
@@ -17,10 +18,7 @@ export const useActivity = (
 
   const { data, isLoading } = useSWR(
     shouldFetch
-      ? [
-          `/api/${userId}/stats/${version}/activity?${params.toString()}`,
-          fbUser,
-        ]
+      ? [`/api/${userId}/stats/activity?${params.toString()}`, fbUser]
       : null,
     fetcher,
   );

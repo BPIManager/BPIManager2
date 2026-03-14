@@ -14,6 +14,7 @@ export const useRadar = (
   const { fbUser } = useUser();
 
   const params = new URLSearchParams();
+  params.append("version", version);
   levels.forEach((l) => params.append("level", l));
   difficulties.forEach((d) => params.append("difficulty", d));
 
@@ -21,7 +22,7 @@ export const useRadar = (
 
   const { data, error, isLoading, mutate } = useSWR<RadarResponse>(
     shouldFetch
-      ? [`/api/${userId}/stats/${version}/radar?${params.toString()}`, fbUser]
+      ? [`/api/${userId}/stats/radar?${params.toString()}`, fbUser]
       : null,
     fetcher,
     {
