@@ -30,7 +30,7 @@ export const RivalWinLossSummaryNotFound = () => {
         mt={2}
         px={2}
       >
-        <Link href="/users">実力が近いユーザーを見る</Link>
+        <Link href="/rivals/search">実力が近いユーザーを見る</Link>
       </Button>
     </VStack>
   );

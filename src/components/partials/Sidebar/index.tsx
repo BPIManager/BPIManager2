@@ -55,9 +55,9 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
   ];
 
   const rivalMenuItems = [
-    { label: "ライバル一覧", icon: UsersIcon, href: "/rivals" },
+    { label: "ライバル一覧", icon: UsersIcon, href: "/rivals", exact: true },
     { label: "タイムライン", icon: ChartNoAxesGantt, href: "/timeline" },
-    { label: "ライバルを探す", icon: Search, href: "/users" },
+    { label: "ライバルを探す", icon: Search, href: "/rivals/search" },
   ];
 
   const otherMenuItems = [
@@ -69,9 +69,11 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
 
   const renderMenuItem = (item: any, isNested = false) => {
     const isActive =
-      item.href === "/"
-        ? router.asPath === "/"
-        : router.asPath.startsWith(item.href);
+      item.href === "/" || item.exact
+        ? router.asPath === item.href
+        : router.asPath === item.href ||
+          router.asPath.startsWith(item.href + "/") ||
+          router.asPath.startsWith(item.href + "?");
 
     return (
       <Link key={item.href} href={item.href} passHref legacyBehavior>
