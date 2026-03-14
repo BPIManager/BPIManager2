@@ -1,11 +1,11 @@
 import { API_PREFIX } from "@/constants/apiEndpoints";
 import { useUser } from "@/contexts/users/UserContext";
-import { SongWithScore } from "@/types/songs/withScore";
+import { SongWithScore, RivalScore } from "@/types/songs/withScore";
 import { fetcher } from "@/utils/common/fetch";
 import useSWRInfinite from "swr/infinite";
 
 export interface NearLoseSongItem extends SongWithScore {
-  rival: {
+  rival: RivalScore & {
     userId: string;
     userName: string;
     profileImage: string | null;
@@ -18,7 +18,7 @@ interface NearLoseResponse {
   items: NearLoseSongItem[];
   nextCursor: {
     lastDiff: number;
-    lastSongId: string;
+    lastSongId: number;
     lastRivalId: string;
   } | null;
 }
@@ -37,7 +37,7 @@ export const useNearLoseInfinite = (
     pageIndex: number,
     previousPageData: NearLoseResponse | null,
   ) => {
-    if (!userId || !version) return null;
+    if (!userId || !version || !fbUser) return null;
     if (previousPageData && !previousPageData.nextCursor) return null;
 
     const params = new URLSearchParams({
@@ -53,13 +53,12 @@ export const useNearLoseInfinite = (
     if (pageIndex > 0 && previousPageData?.nextCursor) {
       const { lastDiff, lastSongId, lastRivalId } = previousPageData.nextCursor;
       params.append("lastDiff", String(lastDiff));
-      params.append("lastSongId", lastSongId);
+      params.append("lastSongId", String(lastSongId));
       params.append("lastRivalId", lastRivalId);
     }
 
     const url = `${API_PREFIX}/users/${userId}/rivals/following/scores?${params.toString()}`;
-
-    return fbUser ? [url, fbUser] : null;
+    return [url, fbUser];
   };
 
   const { data, size, setSize, isValidating, isLoading, error } =
@@ -70,9 +69,17 @@ export const useNearLoseInfinite = (
   const items = data
     ? data.filter(Boolean).flatMap((page) => page.items || [])
     : [];
+
   const isLoadingMore = isLoading || (isValidating && size > 1);
   const isReachingEnd =
     data && data[data.length - 1] && !data[data.length - 1].nextCursor;
 
-  return { items, size, setSize, isLoadingMore, isReachingEnd, isError: error };
+  return {
+    items,
+    size,
+    setSize,
+    isLoadingMore,
+    isReachingEnd,
+    isError: error,
+  };
 };

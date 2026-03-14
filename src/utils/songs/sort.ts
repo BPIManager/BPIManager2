@@ -1,15 +1,10 @@
-import { FilterParamsFrontend, SongWithScore } from "@/types/songs/withScore";
+import {
+  FilterParamsFrontend,
+  SongForSort,
+  SongWithScore,
+} from "@/types/songs/withScore";
 import { getMaxBpm } from "./getMaxBPM";
 
-type SongForSort = SongWithScore & {
-  logId?: number | null;
-  rival?: {
-    exScore: number | null;
-    bpi: number | null;
-    lastPlayed: Date | string | null;
-  } | null;
-  lastPlayedMax?: Date | string | null;
-};
 export const sortSongs = (
   songs: SongWithScore[],
   p: FilterParamsFrontend,
@@ -20,18 +15,6 @@ export const sortSongs = (
   const getRate = (ex: number | null | undefined, notes: number) => {
     if (ex === null || ex === undefined || !notes) return -1;
     return ex / (notes * 2);
-  };
-
-  const getWinStatus = (s: SongForSort, type: "rate" | "bpi" = "rate") => {
-    if (type === "bpi") {
-      if (s.bpi === null || s.rival?.bpi === null) return 0;
-      if (!s.rival) return 0;
-      return s.bpi > s.rival.bpi ? 1 : -1;
-    }
-    const myRate = getRate(s.exScore, s.notes);
-    const rivalRate = getRate(s.rival?.exScore, s.notes);
-    if (myRate === -1 || rivalRate === -1) return 0;
-    return myRate > rivalRate ? 1 : -1;
   };
 
   return [...songs].sort((a: SongForSort, b: SongForSort) => {

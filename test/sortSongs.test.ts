@@ -1,48 +1,92 @@
+import { SongWithScore } from "@/types/songs/withScore";
 import { sortSongs } from "@/utils/songs/sort";
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 
-// テスト用データセット
-const mockSongs: any[] = [
+const mockSongs: SongWithScore[] = [
   {
     songId: 1,
     title: "Friction",
     difficultyLevel: 12,
     notes: 1000,
-    exScore: 800, // 80%
+    exScore: 800,
+    exDiff: 100,
     bpi: 30,
+    bpiDiff: 10,
     releasedVersion: 27,
     bpm: "150",
     scoreAt: "2024-01-01T00:00:00Z",
-    rival: { exScore: 700, bpi: 20, lastPlayed: "2024-01-10T00:00:00Z" }, // 勝ち
+    clearState: "CLEAR",
+    missCount: 10,
+    rival: {
+      exScore: 700,
+      bpi: 20,
+      lastPlayed: "2024-01-10T00:00:00Z",
+      clearState: "CLEAR",
+      missCount: 20,
+    },
+    difficulty: "ANOTHER",
+    kaidenAvg: 700,
+    wrScore: 900,
+    coef: 1.175,
+    logId: 101,
   },
   {
     songId: 2,
     title: "Beat",
     difficultyLevel: 12,
     notes: 1000,
-    exScore: 600, // 60%
+    exScore: 600,
+    exDiff: -300,
     bpi: 10,
+    bpiDiff: -40,
     releasedVersion: 30,
     bpm: "160",
     scoreAt: "2024-01-05T00:00:00Z",
-    rival: { exScore: 900, bpi: 50, lastPlayed: "2024-01-02T00:00:00Z" }, // 負け
+    clearState: "EASY CLEAR",
+    missCount: 30,
+    rival: {
+      exScore: 900,
+      bpi: 50,
+      lastPlayed: "2024-01-02T00:00:00Z",
+      clearState: "HARD CLEAR",
+      missCount: 5,
+    },
+    difficulty: "ANOTHER",
+    kaidenAvg: 700,
+    wrScore: 900,
+    coef: 1.175,
+    logId: 102,
   },
   {
     songId: 3,
     title: "Absolute",
     difficultyLevel: 11,
     notes: 1000,
-    exScore: 900, // 90%
+    exScore: 900,
+    exDiff: 50,
     bpi: 80,
+    bpiDiff: 5,
     releasedVersion: 20,
     bpm: "140",
     scoreAt: "2024-01-03T00:00:00Z",
-    rival: { exScore: 850, bpi: 75, lastPlayed: "2024-01-03T00:00:00Z" }, // 勝ち（僅差）
+    clearState: "FULL COMBO",
+    missCount: 0,
+    rival: {
+      exScore: 850,
+      bpi: 75,
+      lastPlayed: "2024-01-03T00:00:00Z",
+      clearState: "FULL COMBO",
+      missCount: 0,
+    },
+    difficulty: "ANOTHER",
+    kaidenAvg: 700,
+    wrScore: 950,
+    coef: 1.175,
+    logId: 103,
   },
 ];
 
 describe("sortSongs - Comprehensive Test", () => {
-  // --- 基本情報 ---
   it("level: レベル降順でソートされること", () => {
     const res = sortSongs(mockSongs, { sortKey: "level", sortOrder: "desc" });
     expect(res[0].difficultyLevel).toBe(12);
@@ -56,7 +100,6 @@ describe("sortSongs - Comprehensive Test", () => {
   });
 
   it("notes: ノーツ数降順でソートされること", () => {
-    // 今回は全部1000なので、第二ソートのレベル順になるか確認
     const res = sortSongs(mockSongs, { sortKey: "notes", sortOrder: "desc" });
     expect(res[0].difficultyLevel).toBe(12);
   });
@@ -74,7 +117,7 @@ describe("sortSongs - Comprehensive Test", () => {
   // --- スコア / BPI ---
   it("myBpi: 自分のBPI降順でソートされること", () => {
     const res = sortSongs(mockSongs, { sortKey: "myBpi", sortOrder: "desc" });
-    expect(res[0].songId).toBe(3); // BPI 80
+    expect(res[0].songId).toBe(3);
   });
 
   it("rivalBpi: ライバルのBPI降順でソートされること", () => {
@@ -82,19 +125,17 @@ describe("sortSongs - Comprehensive Test", () => {
       sortKey: "rivalBpi",
       sortOrder: "desc",
     });
-    expect(res[0].songId).toBe(3); // Rival BPI 75
+    expect(res[0].songId).toBe(3);
   });
 
   it("myRate: 自分のスコアレート降順でソートされること", () => {
     const res = sortSongs(mockSongs, { sortKey: "myRate", sortOrder: "desc" });
-    expect(res[0].songId).toBe(3); // 90%
+    expect(res[0].songId).toBe(3);
   });
 
   // --- 比較 (Gap) 系 ---
   it("winGapAsc: 自分勝ちの中で、EX差が小さい順（接戦）が上に来ること", () => {
     const res = sortSongs(mockSongs, { sortKey: "winGapAsc" });
-    // 勝ち: ID 3 (5%差), ID 1 (10%差)
-    // 負け: ID 2
     expect(res[0].songId).toBe(3);
     expect(res[1].songId).toBe(1);
     expect(res[2].songId).toBe(2);
@@ -102,14 +143,11 @@ describe("sortSongs - Comprehensive Test", () => {
 
   it("loseGapDesc: ライバル勝ちの中で、EX差が大きい順（完敗）が上に来ること", () => {
     const res = sortSongs(mockSongs, { sortKey: "loseGapDesc" });
-    // 負け: ID 2 (30%差) が最優先
     expect(res[0].songId).toBe(2);
   });
 
   it("winBpiGapDesc: 自分勝ちの中で、BPIの差が大きい順（格下撃破）が上に来ること", () => {
     const res = sortSongs(mockSongs, { sortKey: "winBpiGapDesc" });
-    // ID 1: 30-20=10差で勝ち
-    // ID 3: 80-75=5差で勝ち
     expect(res[0].songId).toBe(1);
     expect(res[1].songId).toBe(3);
   });
@@ -135,7 +173,6 @@ describe("sortSongs - Comprehensive Test", () => {
   // --- 検索ロジック ---
   it("search: 検索語句への完全一致が最優先されること", () => {
     const res = sortSongs(mockSongs, { search: "Friction", sortKey: "level" });
-    // 本来ID2がレベル等で上かもしれないが、完全一致のFrictionが1位になる
     expect(res[0].title).toBe("Friction");
   });
 
@@ -146,10 +183,20 @@ describe("sortSongs - Comprehensive Test", () => {
 
   // --- 特殊ケース ---
   it("rivalデータが不在でもクラッシュせず、一番下に配置されること", () => {
-    const noRivalData = [
-      { songId: 9, title: "None", notes: 1000, rival: null },
-    ];
-    const combined = [...mockSongs, ...noRivalData];
+    const noRivalData: any = {
+      songId: 9,
+      title: "None",
+      notes: 1000,
+      rival: null,
+      difficultyLevel: 12,
+      difficulty: "ANOTHER",
+      clearState: "NO PLAY",
+      missCount: null,
+      exScore: null,
+      bpi: null,
+      scoreAt: null,
+    };
+    const combined = [...mockSongs, noRivalData];
     const res = sortSongs(combined, { sortKey: "rivalBpi", sortOrder: "desc" });
     expect(res[res.length - 1].songId).toBe(9);
   });

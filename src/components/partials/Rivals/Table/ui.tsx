@@ -8,8 +8,8 @@ import {
   GridItem,
   Flex,
 } from "@chakra-ui/react";
-import { SongWithRival } from "@/hooks/social/useRivalAllScores";
 import { getLampColor } from "@/components/partials/Table/table";
+import { SongWithRival } from "@/types/songs/withScore";
 
 const f = (val: number | null | undefined, p?: number) => {
   if (val === null || val === undefined || !Number.isFinite(val)) return "---";

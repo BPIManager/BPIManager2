@@ -6,27 +6,16 @@ import { AdvancedFilterModal } from "@/components/partials/Songs/AdvancedFilter/
 import { SongFilterBar } from "@/components/partials/Songs/Filter/ui";
 import { SongListSkeleton } from "@/components/partials/Table/skeleton";
 import { useUser } from "@/contexts/users/UserContext";
-import {
-  useRivalBothScores,
-  SongWithRival,
-} from "@/hooks/social/useRivalAllScores";
 import { useSongFilter, PAGE_SIZE } from "@/hooks/table/useSongFilter";
-import { SongWithScore } from "@/types/songs/withScore";
-import {
-  useDisclosure,
-  Center,
-  HStack,
-  Container,
-  Text,
-  Box,
-} from "@chakra-ui/react";
+import { SongWithRival, SongWithScore } from "@/types/songs/withScore";
+import { useDisclosure, Center, Container, Text, Box } from "@chakra-ui/react";
 import { useState, useMemo } from "react";
 import { RivalSongItem } from "./ui";
+import { useRivalBothScores } from "@/hooks/social/useRivalAllScores";
 
 export const RivalSongsTable = ({
   myUserId,
   rivalUserId,
-  rivalName,
   version,
 }: {
   myUserId: string | undefined;
@@ -37,6 +26,7 @@ export const RivalSongsTable = ({
   const { fbUser } = useUser();
   const [selectedSong, setSelectedSong] = useState<SongWithScore | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+
   const { songs, error, isLoading } = useRivalBothScores(
     myUserId,
     rivalUserId,
@@ -44,7 +34,7 @@ export const RivalSongsTable = ({
   );
 
   const { params, updateParams, page, setPage, visibleSongs, totalCount } =
-    useSongFilter(songs as SongWithScore[] | undefined);
+    useSongFilter(songs);
 
   const {
     open: isAdvancedOpen,
@@ -62,7 +52,7 @@ export const RivalSongsTable = ({
         <Text color="red.500" fontWeight="bold">
           楽曲データの取得に失敗しました
         </Text>
-        <Text fontSize="xs" color="gray.500">
+        <Text fontSize="xs" color="fg.muted">
           {error?.message}
         </Text>
       </Center>
@@ -70,13 +60,14 @@ export const RivalSongsTable = ({
   }
 
   const rivalSongMap = useMemo(() => {
-    if (!songs) return new Map<string, SongWithRival>();
     const map = new Map<string, SongWithRival>();
+    if (!songs) return map;
     for (const s of songs) {
-      map.set(`${s.songId}-${s.difficulty}`, s as SongWithRival);
+      map.set(`${s.songId}-${s.difficulty}`, s);
     }
     return map;
   }, [songs]);
+
   return (
     <Container maxW="full" p={0} minH="100svh">
       <SongFilterBar
@@ -94,15 +85,13 @@ export const RivalSongsTable = ({
       ) : (
         <Box w="full" p={2}>
           {visibleSongs.map((song) => {
-            const rivalSong = rivalSongMap.get(
-              `${song.songId}-${song.difficulty}`,
-            );
+            const s = song as SongWithRival;
             return (
               <RivalSongItem
-                key={`${song.songId}-${song.difficulty}`}
-                song={rivalSong ?? (song as SongWithRival)}
+                key={`${s.songId}-${s.difficulty}`}
+                song={s}
                 onClick={() => {
-                  setSelectedSong(song);
+                  setSelectedSong(s);
                   setIsDetailOpen(true);
                 }}
               />
