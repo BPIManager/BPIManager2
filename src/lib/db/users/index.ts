@@ -2,6 +2,14 @@ import { db } from "@/lib/db";
 import { sql } from "kysely";
 
 class UsersRepository {
+  async checkUserNameAvailability(userName: string) {
+    return await db
+      .selectFrom("users")
+      .select("userId")
+      .where("userName", "=", userName)
+      .executeTakeFirst();
+  }
+
   async getRecommendedUsers(params: {
     viewerId: string;
     viewerValue: number;

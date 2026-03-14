@@ -99,7 +99,7 @@ export const RivalProfileLayout = ({
               <Box gridColumn={{ lg: "span 1" }}>
                 <ProfileSideBar
                   profile={profile}
-                  onFollowToggle={() => toggleFollow(mutate)}
+                  onFollowToggle={toggleFollow}
                   isUpdating={isUpdating}
                 />
               </Box>

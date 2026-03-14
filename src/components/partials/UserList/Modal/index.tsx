@@ -30,7 +30,6 @@ export const RivalComparisonModal = ({
   const {
     data,
     isLoading: isRivalLoading,
-    mutate,
     isValidating,
   } = useRivalComparison(rivalId);
   const {
@@ -45,10 +44,6 @@ export const RivalComparisonModal = ({
   const profile = data?.profile || profileData;
   const compare = data?.compare;
   const isLoading = isRivalLoading || isProfileLoading;
-
-  const handleFollowToggle = () => {
-    toggleFollow(() => mutate());
-  };
 
   return (
     <DialogRoot
@@ -72,7 +67,7 @@ export const RivalComparisonModal = ({
             <RivalHeader
               profile={profile}
               isUpdating={isUpdating || isValidating}
-              onToggleFollow={handleFollowToggle}
+              onToggleFollow={toggleFollow}
             />
           )}
         </DialogHeader>

@@ -1,42 +1,49 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import {
+  handleGetFollows,
+  handlePutFollow,
+  handleDeleteFollow,
+} from "@/lib/subhandlers/userId-follow";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
-import { followsRepo } from "@/lib/db/follow";
+import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  if (req.method !== "GET") return res.status(405).end();
+  const { userId: targetUserId } = req.query;
 
-  const { userId, type, page, limit } = req.query;
-
-  if (!userId || typeof userId !== "string")
-    return res.status(400).json({ error: "Invalid userId" });
-  if (type !== "following" && type !== "followers")
-    return res.status(400).json({ error: "Invalid type" });
-
-  const pageNum = Math.max(1, Number(page || 1));
-  const limitNum = Math.min(100, Math.max(1, Number(limit || 20)));
+  if (!targetUserId || typeof targetUserId !== "string") {
+    return res.status(400).json({ error: "Invalid or missing userId" });
+  }
 
   try {
-    const access = await checkProfileAccess(req, userId);
+    const access = await checkProfileAccess(req, targetUserId);
     if (!access.hasAccess) {
       return res
         .status(access.error!.status)
         .json({ message: access.error!.message });
     }
 
-    const result = await followsRepo.getFollowList({
-      targetUserId: userId,
-      viewerId: access.viewerId,
-      type,
-      page: pageNum,
-      limit: limitNum,
-    });
+    const { viewerId } = access;
 
-    return res.status(200).json(result);
+    switch (req.method) {
+      case "GET":
+        return await handleGetFollows(req, res, targetUserId, viewerId);
+
+      case "PUT":
+        if (!viewerId) return res.status(401).json({ error: "Unauthorized" });
+        return await handlePutFollow(res, targetUserId, viewerId);
+
+      case "DELETE":
+        if (!viewerId) return res.status(401).json({ error: "Unauthorized" });
+        return await handleDeleteFollow(res, targetUserId, viewerId);
+
+      default:
+        res.setHeader("Allow", ["GET", "PUT", "DELETE"]);
+        return res.status(405).end(`Method ${req.method} Not Allowed`);
+    }
   } catch (error) {
-    console.error(`Follow List API Error (${type}):`, error);
+    console.error(`Follow API Error (${req.method}):`, error);
     return res.status(500).json({ error: "Internal Server Error" });
   }
 }

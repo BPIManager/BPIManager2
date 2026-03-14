@@ -101,7 +101,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
         if (!fbUser) throw new Error("Invalid Firebase Credential");
         const token = await fbUser.getIdToken();
         const res = await fetch(
-          `/api/users/checkUsername?name=${encodeURIComponent(formData.userName)}`,
+          `/api/usernames/${encodeURIComponent(formData.userName)}/availability`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

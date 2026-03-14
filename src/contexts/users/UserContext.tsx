@@ -53,7 +53,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     error,
     isLoading: isSwrLoading,
     mutate,
-  } = useSWR(fbUser ? "/api/credentials" : null, authenticatedFetcher, {
+  } = useSWR(fbUser ? "/api/me" : null, authenticatedFetcher, {
     revalidateOnFocus: false,
     shouldRetryOnError: false,
   });
