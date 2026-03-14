@@ -39,7 +39,7 @@ export const useUserList = (
   const { data, error, isLoading, mutate } = useSWR<UserListResponse>(
     fbUser
       ? [
-          `/api/${fbUser?.uid}/rivals/recommended?${searchParams.toString()}`,
+          `/api/${fbUser?.uid}/rivals/suggestions?${searchParams.toString()}`,
           fbUser,
         ]
       : null,

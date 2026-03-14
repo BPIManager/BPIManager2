@@ -43,6 +43,7 @@ export const useNearLoseInfinite = (
       limit: PAGE_SIZE.toString(),
       minDiff: threshold.min.toString(),
       maxDiff: threshold.max.toString(),
+      version,
     });
 
     levels.forEach((l) => params.append("levels[]", l));
@@ -55,7 +56,7 @@ export const useNearLoseInfinite = (
       params.append("lastRivalId", lastRivalId);
     }
 
-    const url = `/api/${userId}/rivals/${version}/comparison?${params.toString()}`;
+    const url = `/api/${userId}/rivals/following/scores?${params.toString()}`;
 
     return fbUser ? [url, fbUser] : null;
   };

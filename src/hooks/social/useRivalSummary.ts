@@ -30,12 +30,12 @@ export const useRivalSummary = (params: {
 }) => {
   const { userId, levels, difficulties, version } = params;
   const { fbUser } = useUser();
-  const query = new URLSearchParams();
+  const query = new URLSearchParams({ version });
   levels.forEach((l) => query.append("levels", l));
   difficulties.forEach((d) => query.append("difficulties", d));
 
   const url = userId
-    ? `/api/${userId}/rivals/${version}/summary?${query.toString()}`
+    ? `/api/${userId}/rivals/following/summary?${query.toString()}`
     : null;
 
   const {

@@ -9,9 +9,9 @@ export default async function handler(
 ) {
   if (req.method !== "GET") return res.status(405).end();
 
-  const { userId, rivalUserId, version, ...filterParams } = req.query;
+  const { userId, rivalId, version, ...filterParams } = req.query;
 
-  if (!userId || !rivalUserId || !version) {
+  if (!userId || !rivalId || !version) {
     return res
       .status(400)
       .json({ message: "userId, rivalUserId and version are required" });
@@ -27,7 +27,7 @@ export default async function handler(
     }
     const rawResults = await logsRepo.getRivalComparisonScores({
       viewerId: String(viewerId),
-      rivalId: String(rivalUserId),
+      rivalId: String(rivalId),
       version: String(version),
     });
 

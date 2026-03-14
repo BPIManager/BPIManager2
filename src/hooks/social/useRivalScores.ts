@@ -10,7 +10,7 @@ export const useRivalScores = (
   const { fbUser } = useUser();
   const { data, error, isLoading, mutate, isValidating } = useSWR(
     fbUser && songId
-      ? `/api/${fbUser.uid}/rivals/${version || latestVersion}/song/${songId}`
+      ? `/api/${fbUser.uid}/rivals/following/scores/${songId}?version=${version}`
       : null,
     fetcher,
   );

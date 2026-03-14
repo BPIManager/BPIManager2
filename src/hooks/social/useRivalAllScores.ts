@@ -23,7 +23,10 @@ export const useRivalBothScores = (
 
   const { data, error, isLoading, mutate } = useSWR<SongWithRival[]>(
     myUserId && rivalUserId && fbUser
-      ? [`/api/${myUserId}/rivals/${targetVersion}/${rivalUserId}`, fbUser]
+      ? [
+          `/api/${myUserId}/rivals/${rivalUserId}/scores?version=${version}`,
+          fbUser,
+        ]
       : null,
     fetcher,
     {
