@@ -16,7 +16,7 @@ export const LogVersionSelector = ({ version }: Props) => {
     const nextVersion = details;
     if (!nextVersion) return;
 
-    router.push(`/user/${userId as string}/logs/${nextVersion}`, undefined, {
+    router.push(`/users/${userId as string}/logs/${nextVersion}`, undefined, {
       shallow: true,
     });
   };

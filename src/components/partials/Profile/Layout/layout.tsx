@@ -107,7 +107,7 @@ export const UserProfileLayout = ({
                       flex="1"
                       py={3}
                     >
-                      <NextLink href={`/user/${userId}`}>
+                      <NextLink href={`/users/${userId}`}>
                         <LuLayoutDashboard />
                         サマリ
                       </NextLink>
@@ -122,7 +122,7 @@ export const UserProfileLayout = ({
                       py={3}
                     >
                       <NextLink
-                        href={`/user/${userId}/scores/${latestVersion}?${scoreParams}`}
+                        href={`/users/${userId}/scores/${latestVersion}?${scoreParams}`}
                       >
                         <LuMusic />
                         スコア
@@ -137,7 +137,7 @@ export const UserProfileLayout = ({
                       flex="1"
                       py={3}
                     >
-                      <NextLink href={`/user/${userId}/logs/${version}`}>
+                      <NextLink href={`/users/${userId}/logs/${version}`}>
                         <LuHistory />
                         更新履歴
                       </NextLink>
@@ -151,7 +151,7 @@ export const UserProfileLayout = ({
                       flex="1"
                       py={3}
                     >
-                      <NextLink href={`/user/${userId}/aaaTable/${version}`}>
+                      <NextLink href={`/users/${userId}/aaaTable/${version}`}>
                         <LuTable />
                         AAA達成表
                       </NextLink>

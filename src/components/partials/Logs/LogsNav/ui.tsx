@@ -49,7 +49,7 @@ export const LogNavigator = ({
         { shallow: true },
       );
     } else {
-      router.push(`/user/${userId}/logs/${version}/summary/${target}`);
+      router.push(`/users/${userId}/logs/${version}/summary/${target}`);
     }
   };
 

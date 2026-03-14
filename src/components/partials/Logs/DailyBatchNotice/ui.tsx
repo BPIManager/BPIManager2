@@ -10,7 +10,6 @@ import {
 } from "@chakra-ui/react";
 import { Info, LayoutGrid } from "lucide-react";
 import Link from "next/link";
-import { useUser } from "@/contexts/users/UserContext";
 import dayjs from "@/lib/dayjs";
 import { useRouter } from "next/router";
 
@@ -28,7 +27,6 @@ export const DailyBatchNotice = ({
   version,
 }: DailyBatchNoticeProps) => {
   if (dailyBatchIds.length <= 1) return null;
-  const { user } = useUser();
   const router = useRouter();
   const { userId } = router.query;
 
@@ -105,7 +103,7 @@ export const DailyBatchNotice = ({
         </Flex>
 
         <Link
-          href={`/user/${userId as string}/logs/${version}/summary/${dateStr}`}
+          href={`/users/${userId as string}/logs/${version}/summary/${dateStr}`}
           passHref
         >
           <Button

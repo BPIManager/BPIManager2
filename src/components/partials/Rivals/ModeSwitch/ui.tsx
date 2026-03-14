@@ -51,7 +51,7 @@ export const ModeSwitchBanner = ({
       >
         <NextLink
           href={
-            isRivalMode ? `/user/${targetUserId}` : `/rivals/${targetUserId}`
+            isRivalMode ? `/users/${targetUserId}` : `/rivals/${targetUserId}`
           }
         >
           {isRivalMode ? <LuUser size={14} /> : <LuSwords size={14} />}

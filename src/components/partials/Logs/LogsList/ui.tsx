@@ -147,7 +147,7 @@ export const LogsList = ({ userId, version }: Props) => {
                       </VStack>
                     </HStack>
                     <Link
-                      href={`/user/${userId}/logs/${version}/summary/${group.date}`}
+                      href={`/users/${userId}/logs/${version}/summary/${group.date}`}
                       passHref
                     >
                       <Button

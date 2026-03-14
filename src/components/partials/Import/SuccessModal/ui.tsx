@@ -213,7 +213,7 @@ export const ImportSuccessModal = ({ result, version, onClose }: Props) => {
               fontWeight="bold"
               onClick={() =>
                 router.push(
-                  `/user/${fbUser?.uid}/logs/${version}/${result.batchId}`,
+                  `/users/${fbUser?.uid}/logs/${version}/${result.batchId}`,
                 )
               }
             >

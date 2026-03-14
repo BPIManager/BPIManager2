@@ -10,7 +10,7 @@ export const FollowStats = ({
 }) => (
   <HStack gap={6} justify="center" w="full" py={2}>
     <Link asChild>
-      <NextLink href={`/user/${userId}/following`}>
+      <NextLink href={`/users/${userId}/following`}>
         <VStack gap={0}>
           <Text fontWeight="bold" fontSize="md" color="white" fontFamily="mono">
             {follows.following}
@@ -22,7 +22,7 @@ export const FollowStats = ({
       </NextLink>
     </Link>
     <Link asChild>
-      <NextLink href={`/user/${userId}/followers`}>
+      <NextLink href={`/users/${userId}/followers`}>
         <VStack gap={0}>
           <Text fontWeight="bold" fontSize="md" color="white" fontFamily="mono">
             {follows.follower}

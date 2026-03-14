@@ -20,7 +20,7 @@ export const LogsCard = ({ log }: { log: UpdateLog }) => {
   const isPositive = log.diff >= 0;
 
   return (
-    <Link href={`/user/${userId}/logs/${log.version}/${log.batchId}`}>
+    <Link href={`/users/${userId}/logs/${log.version}/${log.batchId}`}>
       <Card.Root
         mb={4}
         variant="elevated"

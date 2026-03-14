@@ -50,7 +50,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
     {
       label: "スコア更新ログ",
       icon: ScrollText,
-      href: `/user/${user?.userId}/logs/${latestVersion}`,
+      href: `/users/${user?.userId}/logs/${latestVersion}`,
     },
   ];
 
@@ -118,7 +118,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
       >
         <VStack gap={4} align="stretch">
           <HStack gap={3}>
-            <Link href={"/user/" + user?.userId}>
+            <Link href={"/users/" + user?.userId}>
               <Avatar
                 size="lg"
                 src={user?.profileImage || ""}
@@ -160,7 +160,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
               onClick={onClose}
               px={2}
             >
-              <Link href={`/user/${user?.userId}`}>
+              <Link href={`/users/${user?.userId}`}>
                 <HStack gap={1}>
                   <User size={12} />
                   <Text fontSize="2xs">プロフィールを表示</Text>
@@ -172,7 +172,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
 
           {user?.userId && (
             <HStack gap={10} justify="center" cursor="default" px={1}>
-              <Link href={`/user/${user?.userId}/following`} passHref>
+              <Link href={`/users/${user?.userId}/following`} passHref>
                 <VStack gap={0} align="center">
                   <Text fontSize="xs" fontWeight="bold">
                     {user?.followingCount ?? 0}
@@ -183,7 +183,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
                 </VStack>
               </Link>
 
-              <Link href={`/user/${user?.userId}/followers`} passHref>
+              <Link href={`/users/${user?.userId}/followers`} passHref>
                 <VStack gap={0} align="center">
                   <Text fontSize="xs" fontWeight="bold">
                     {user?.followerCount ?? 0}
@@ -263,7 +263,7 @@ export const ApiDogButton = () => {
         textDecoration="underline"
         display="flex"
         alignItems="center"
-        color="white" 
+        color="white"
         gap={2}
       >
         <Code2 size={16} />

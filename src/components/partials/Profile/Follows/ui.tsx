@@ -56,7 +56,10 @@ export const UserFollowCard = ({ user }: { user: FollowUser }) => {
       {isMasked ? (
         UserInfo
       ) : (
-        <NextLink href={`/user/${user.userId}`} style={{ display: "contents" }}>
+        <NextLink
+          href={`/users/${user.userId}`}
+          style={{ display: "contents" }}
+        >
           {UserInfo}
         </NextLink>
       )}

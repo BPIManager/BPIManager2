@@ -112,7 +112,7 @@ export const RivalComparisonModal = ({
                   height="50px"
                   mt={4}
                 >
-                  <Link href={`/user/${rivalId}`}>
+                  <Link href={`/users/${rivalId}`}>
                     <HStack justify="center" gap={2}>
                       <User size={18} />
                       <Text fontSize="sm" fontWeight="bold">

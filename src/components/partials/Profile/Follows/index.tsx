@@ -27,7 +27,7 @@ export default function FollowPage({
   if (!userId) return null;
 
   const handleTabChange = (details: { value: string }) => {
-    router.push(`/user/${userId}/${details.value}`, undefined, {
+    router.push(`/users/${userId}/${details.value}`, undefined, {
       shallow: true,
     });
   };

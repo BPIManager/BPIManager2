@@ -3,7 +3,7 @@ import fs from "fs/promises";
 import path from "path";
 
 const OUTPUT_DIR = path.join(process.cwd(), "public/data/sitemaps");
-const BASE_URL = process.env.BASEURL + "user";
+const BASE_URL = process.env.BASEURL + "users";
 
 export async function generateUserSitemap() {
   console.log("Starting sitemap generation for users...");

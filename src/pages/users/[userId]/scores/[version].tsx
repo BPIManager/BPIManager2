@@ -1,4 +1,4 @@
-import UserPage from "@/pages/user/[userId]";
+import UserPage from "../../[userId]";
 
 export default function UserScorePage() {
   return <UserPage defaultView="songs" />;
