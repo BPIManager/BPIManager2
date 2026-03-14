@@ -8,42 +8,60 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const { userId, version, batchId } = req.query;
-  if (!userId || !version || !batchId)
-    return res.status(400).json({ message: "Parameters are missing." });
+  if (req.method !== "GET") {
+    res.setHeader("Allow", ["GET"]);
+    return res
+      .status(405)
+      .json({ message: `Method ${req.method} Not Allowed` });
+  }
+
+  const { userId, batchId, version } = req.query;
+
+  if (!userId || !batchId || !version) {
+    return res
+      .status(400)
+      .json({ message: "userId, batchId, and version are required." });
+  }
 
   const uid = String(userId);
+  const bid = String(batchId);
   const v = String(version);
 
   try {
     const access = await checkUserAccess(req, uid);
-    if (!access.hasAccess)
+    if (!access.hasAccess) {
       return res
         .status(access.error!.status)
         .json({ message: access.error!.message });
+    }
 
-    const target = await logsRepo.findBatchById(String(batchId));
-    if (!target) return res.status(404).json({ message: "Batch not found." });
+    const targetBatch = await logsRepo.findBatchById(bid);
+    if (!targetBatch) {
+      return res.status(404).json({ message: "Batch not found." });
+    }
 
-    const jstDate = dayjs.utc(target.createdAt).tz().format("YYYY-MM-DD");
+    const jstDate = dayjs.utc(targetBatch.createdAt).tz().format("YYYY-MM-DD");
     const dayRange = logsRepo.getJstRange(jstDate, "day");
 
     const [nav, sameDay, results] = await Promise.all([
-      logsRepo.getBatchNavigation(uid, v, target.createdAt, dayRange),
+      logsRepo.getBatchNavigation(uid, v, targetBatch.createdAt, dayRange),
       logsRepo.findBatchesInRange(uid, v, dayRange.start, dayRange.end),
-      logsRepo.getScoresWithDetails(uid, v, { batchIds: [String(batchId)] }),
+      logsRepo.getScoresWithDetails(uid, v, { batchIds: [bid] }),
     ]);
 
     return res.status(200).json({
       songs: results.map(mapToLogNested),
       pagination: {
         ...nav,
-        current: target,
+        current: targetBatch,
         dailyBatchIds: sameDay.map((b) => b.batchId),
         dailyBatchCount: sameDay.length,
       },
     });
   } catch (error: any) {
-    return res.status(500).json({ message: error.message });
+    console.error(`Batch Scores API Error:`, error);
+    return res
+      .status(500)
+      .json({ message: error.message || "Internal Server Error" });
   }
 }

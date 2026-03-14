@@ -72,9 +72,9 @@ export const useLogsDetail = (
   { batchId, date }: { batchId?: string; date?: string },
 ) => {
   const endpoint = batchId
-    ? `/api/${userId}/logs/${version}/${batchId}`
+    ? `/api/${userId}/batches/${batchId}?version=${version}`
     : date
-      ? `/api/${userId}/logs/${version}/summary/${date}`
+      ? `/api/${userId}/batches/${date}/scores?version=${version}`
       : null;
   const { fbUser } = useUser();
 

@@ -11,7 +11,7 @@ import {
 import { LuTrophy, LuTrendingUp } from "react-icons/lu";
 import { Switch } from "@/components/ui/switch";
 import { RankItem } from "./item";
-import { useLogRank } from "@/hooks/logs/useLogRank";
+import { useLogRank } from "@/hooks/batches/useLogRank";
 import { useState } from "react";
 import { SongDetailView } from "../../Modal/BPIChart/SongDetails/ui";
 

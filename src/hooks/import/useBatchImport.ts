@@ -38,7 +38,7 @@ export const useBatchImport = (fbUser: any, refresh: () => Promise<void>) => {
       setProcessStatus(`${formattedRows.length}件をアップロード中...`);
       const idToken = await fbUser.getIdToken(true);
 
-      const response = await fetch(`/api/${fbUser.uid}/scores/batch`, {
+      const response = await fetch(`/api/${fbUser.uid}/scores/bulk`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

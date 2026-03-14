@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { UpdateLog, useLogs } from "@/hooks/logs/useLogsList";
+import { UpdateLog, useBatchesList } from "@/hooks/batches/useBatchesList";
 import {
   Box,
   Center,
@@ -32,7 +32,7 @@ const PAGE_SIZE = 10;
 
 export const LogsList = ({ userId, version }: Props) => {
   const [page, setPage] = useState(1);
-  const { logs, isLoading, isError } = useLogs(userId, version);
+  const { logs, isLoading, isError } = useBatchesList(userId, version);
 
   const groupedLogs = useMemo(() => {
     if (!logs) return [];

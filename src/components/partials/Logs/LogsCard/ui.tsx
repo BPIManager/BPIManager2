@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { LuListMusic, LuCalendar } from "react-icons/lu";
 import Link from "next/link";
-import { UpdateLog } from "@/hooks/logs/useLogsList";
+import { UpdateLog } from "@/hooks/batches/useBatchesList";
 import dayjs from "@/lib/dayjs";
 import { useRouter } from "next/router";
 

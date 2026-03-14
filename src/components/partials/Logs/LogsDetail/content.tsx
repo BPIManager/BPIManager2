@@ -1,4 +1,4 @@
-import { useLogsDetail } from "@/hooks/logs/useBatchDetail";
+import { useLogsDetail } from "@/hooks/batches/useBatchDetail";
 import {
   getBpiDistribution,
   getRankDistribution,

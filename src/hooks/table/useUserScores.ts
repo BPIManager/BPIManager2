@@ -9,7 +9,9 @@ export const useUserScores = (userId: string | undefined, version?: string) => {
   const { fbUser } = useUser();
 
   const { data, error, isLoading, mutate } = useSWR<SongWithScore[]>(
-    userId ? [`/api/${userId}/scores/${targetVersion}/latest`, fbUser] : null,
+    userId
+      ? [`/api/${userId}/scores?version=${targetVersion}&asOf=latest`, fbUser]
+      : null,
     fetcher,
     {
       revalidateOnFocus: false,
