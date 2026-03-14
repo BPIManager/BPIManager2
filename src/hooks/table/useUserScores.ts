@@ -3,6 +3,7 @@ import { SongWithScore } from "@/types/songs/withScore";
 import { latestVersion } from "@/constants/latestVersion";
 import { useUser } from "@/contexts/users/UserContext";
 import { fetcher } from "@/utils/common/fetch";
+import { API_PREFIX } from "@/constants/apiEndpoints";
 
 export const useUserScores = (userId: string | undefined, version?: string) => {
   const targetVersion = version || latestVersion;
@@ -10,7 +11,10 @@ export const useUserScores = (userId: string | undefined, version?: string) => {
 
   const { data, error, isLoading, mutate } = useSWR<SongWithScore[]>(
     userId
-      ? [`/api/${userId}/scores?version=${targetVersion}&asOf=latest`, fbUser]
+      ? [
+          `${API_PREFIX}/users/${userId}/scores?version=${targetVersion}&asOf=latest`,
+          fbUser,
+        ]
       : null,
     fetcher,
     {

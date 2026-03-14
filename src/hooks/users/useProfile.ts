@@ -4,13 +4,16 @@ import { useUser } from "@/contexts/users/UserContext";
 import { useFollow } from "./useFollow";
 import { UserProfileResponse } from "@/types/users/profile";
 import { toaster } from "@/components/ui/toaster";
+import { API_PREFIX } from "@/constants/apiEndpoints";
 
 export const useProfile = (userId: string | undefined) => {
   const { fbUser, isLoading: fbLoading } = useUser();
   const { requestFollow, isUpdating } = useFollow(userId);
 
   const { data, error, isLoading, mutate } = useSWR<UserProfileResponse>(
-    !fbLoading && userId ? [`/api/${userId}/profile`, fbUser] : null,
+    !fbLoading && userId
+      ? [`${API_PREFIX}/users/${userId}/profile`, fbUser]
+      : null,
     fetcher,
     { revalidateOnFocus: false, shouldRetryOnError: false },
   );

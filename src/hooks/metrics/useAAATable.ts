@@ -1,3 +1,4 @@
+import { API_PREFIX } from "@/constants/apiEndpoints";
 import { useUser } from "@/contexts/users/UserContext";
 import { fetcher } from "@/utils/common/fetch";
 import { useMemo } from "react";
@@ -41,7 +42,7 @@ export const useAAATable = (
   const { data, error, isLoading } = useSWR<AAATableItem[]>(
     userId && version && level
       ? [
-          `/api/${userId}/stats/aaaDifficulty?level=${level}&version=${version}`,
+          `${API_PREFIX}/users/${userId}/stats/aaaDifficulty?level=${level}&version=${version}`,
           fbUser,
         ]
       : null,

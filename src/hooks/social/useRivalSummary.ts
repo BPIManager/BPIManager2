@@ -2,6 +2,7 @@ import useSWR from "swr";
 import { fetcher } from "@/utils/common/fetch";
 import { useUser } from "@/contexts/users/UserContext";
 import { RadarSummaryData } from "@/types/stats/radar";
+import { API_PREFIX } from "@/constants/apiEndpoints";
 
 export interface RivalStats {
   win: number;
@@ -35,7 +36,7 @@ export const useRivalSummary = (params: {
   difficulties.forEach((d) => query.append("difficulties", d));
 
   const url = userId
-    ? `/api/${userId}/rivals/following/summary?${query.toString()}`
+    ? `${API_PREFIX}/users/${userId}/rivals/following/summary?${query.toString()}`
     : null;
 
   const {

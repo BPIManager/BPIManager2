@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useUser } from "@/contexts/users/UserContext";
+import { API_PREFIX } from "@/constants/apiEndpoints";
 
 export const useFollow = (targetUserId: string | undefined) => {
   const { fbUser, refresh } = useUser();
@@ -13,7 +14,7 @@ export const useFollow = (targetUserId: string | undefined) => {
       const token = await fbUser.getIdToken();
       const method = isFollowing ? "DELETE" : "PUT";
 
-      const res = await fetch(`/api/${targetUserId}/follows`, {
+      const res = await fetch(`${API_PREFIX}/users/${targetUserId}/follows`, {
         method,
         headers: {
           Authorization: `Bearer ${token}`,

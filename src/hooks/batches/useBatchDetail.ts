@@ -1,3 +1,4 @@
+import { API_PREFIX } from "@/constants/apiEndpoints";
 import { useUser } from "@/contexts/users/UserContext";
 import { BpiCalculator } from "@/lib/bpi";
 import { fetcher } from "@/utils/common/fetch";
@@ -72,9 +73,9 @@ export const useLogsDetail = (
   { batchId, date }: { batchId?: string; date?: string },
 ) => {
   const endpoint = batchId
-    ? `/api/${userId}/batches/${batchId}?version=${version}`
+    ? `${API_PREFIX}/users/${userId}/batches/${batchId}?version=${version}`
     : date
-      ? `/api/${userId}/batches/${date}/scores?version=${version}`
+      ? `${API_PREFIX}/users/${userId}/batches/${date}/scores?version=${version}`
       : null;
   const { fbUser } = useUser();
 

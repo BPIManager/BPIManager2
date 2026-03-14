@@ -1,3 +1,4 @@
+import { API_PREFIX } from "@/constants/apiEndpoints";
 import { useUser } from "@/contexts/users/UserContext";
 import { SongWithScore } from "@/types/songs/withScore";
 import { fetcher } from "@/utils/common/fetch";
@@ -56,7 +57,7 @@ export const useNearLoseInfinite = (
       params.append("lastRivalId", lastRivalId);
     }
 
-    const url = `/api/${userId}/rivals/following/scores?${params.toString()}`;
+    const url = `${API_PREFIX}/users/${userId}/rivals/following/scores?${params.toString()}`;
 
     return fbUser ? [url, fbUser] : null;
   };

@@ -1,3 +1,4 @@
+import { API_PREFIX } from "@/constants/apiEndpoints";
 import { useUser } from "@/contexts/users/UserContext";
 import { SongHistoryResponse } from "@/types/score/log";
 import { fetcher } from "@/utils/common/fetch";
@@ -8,7 +9,7 @@ export const useScoreHistory = (userId: string | undefined, songId: number) => {
 
   const { data, error, isLoading } = useSWR<SongHistoryResponse>(
     userId && songId
-      ? [`/api/${userId}/scores/${songId}/history`, fbUser]
+      ? [`${API_PREFIX}/users/${userId}/scores/${songId}/history`, fbUser]
       : null,
     fetcher,
   );

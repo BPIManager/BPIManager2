@@ -16,6 +16,7 @@ import { useState } from "react";
 import { useFirestoreDataCheck } from "@/hooks/firestore/checkData";
 import { versionTitles } from "@/constants/versions";
 import { toaster } from "@/components/ui/toaster";
+import { API_PREFIX } from "@/constants/apiEndpoints";
 
 export default function TransferUi() {
   const { fbUser } = useUser();
@@ -36,13 +37,16 @@ export default function TransferUi() {
     setIsSyncing(true);
     try {
       const idToken = await fbUser.getIdToken(true);
-      const response = await fetch(`/api/${fbUser.uid}/scores/transfer`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${idToken}`,
+      const response = await fetch(
+        `${API_PREFIX}/users/${fbUser.uid}/scores/transfer`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${idToken}`,
+          },
         },
-      });
+      );
       if (!response.ok) throw new Error("転送失敗");
 
       toaster.create({

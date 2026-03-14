@@ -2,6 +2,7 @@ import useSWR from "swr";
 import { fetcher } from "@/utils/common/fetch";
 import { useUser } from "@/contexts/users/UserContext";
 import { latestVersion } from "@/constants/latestVersion";
+import { API_PREFIX } from "@/constants/apiEndpoints";
 
 export const useRivalScores = (
   songId: number | null,
@@ -10,7 +11,7 @@ export const useRivalScores = (
   const { fbUser } = useUser();
   const { data, error, isLoading, mutate, isValidating } = useSWR(
     fbUser && songId
-      ? `/api/${fbUser.uid}/rivals/following/scores/${songId}?version=${version}`
+      ? `${API_PREFIX}/users/${fbUser.uid}/rivals/following/scores/${songId}?version=${version || latestVersion}`
       : null,
     fetcher,
   );

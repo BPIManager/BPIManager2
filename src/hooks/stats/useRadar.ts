@@ -2,6 +2,7 @@ import useSWR from "swr";
 import { fetcher } from "@/utils/common/fetch";
 import { useUser } from "@/contexts/users/UserContext";
 import { RadarCategory, RadarCategoryResult } from "@/types/stats/radar";
+import { API_PREFIX } from "@/constants/apiEndpoints";
 
 export type RadarResponse = Record<RadarCategory, RadarCategoryResult>;
 
@@ -22,7 +23,10 @@ export const useRadar = (
 
   const { data, error, isLoading, mutate } = useSWR<RadarResponse>(
     shouldFetch
-      ? [`/api/${userId}/stats/radar?${params.toString()}`, fbUser]
+      ? [
+          `${API_PREFIX}/users/${userId}/stats/radar?${params.toString()}`,
+          fbUser,
+        ]
       : null,
     fetcher,
     {

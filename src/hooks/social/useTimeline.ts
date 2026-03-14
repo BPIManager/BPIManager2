@@ -2,6 +2,7 @@ import useSWRInfinite from "swr/infinite";
 import { fetcher } from "@/utils/common/fetch";
 import { useUser } from "@/contexts/users/UserContext";
 import { FilterParamsFrontend } from "@/types/songs/withScore";
+import { API_PREFIX } from "@/constants/apiEndpoints";
 
 export interface TimelineEntry {
   logId: number;
@@ -68,7 +69,10 @@ export const useTimeline = (
     if (pageIndex > 0 && previousPageData?.nextId) {
       query.append("lastId", previousPageData.nextId);
     }
-    return [`/api/${fbUser.uid}/timeline?${query.toString()}`, fbUser];
+    return [
+      `${API_PREFIX}/users/${fbUser.uid}/timeline?${query.toString()}`,
+      fbUser,
+    ];
   };
 
   const { data, size, setSize, error, isLoading, isValidating } =

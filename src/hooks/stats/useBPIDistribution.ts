@@ -1,3 +1,4 @@
+import { API_PREFIX } from "@/constants/apiEndpoints";
 import { useUser } from "@/contexts/users/UserContext";
 import { fetcher } from "@/utils/common/fetch";
 import useSWR from "swr";
@@ -22,7 +23,7 @@ export const useBPIDistribution = (
   const shouldFetch = userId && (levels.length > 0 || difficulties.length > 0);
   const url = shouldFetch
     ? [
-        `/api/${userId}/stats/singleBPIDistribution?${params.toString()}`,
+        `${API_PREFIX}/users/${userId}/stats/singleBPIDistribution?${params.toString()}`,
         fbUser,
       ]
     : null;

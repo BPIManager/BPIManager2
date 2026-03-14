@@ -1,3 +1,4 @@
+import { API_PREFIX } from "@/constants/apiEndpoints";
 import { useUser } from "@/contexts/users/UserContext";
 import { fetcher } from "@/utils/common/fetch";
 import useSWRInfinite from "swr/infinite";
@@ -25,7 +26,7 @@ export const useRecommendedInfinite = (
         levels.forEach((l) => params.append("level", l));
         diffs.forEach((d) => params.append("difficulty", d));
 
-        const url = `/api/${userId}/stats//recommended?${params.toString()}`;
+        const url = `${API_PREFIX}/users/${userId}/stats//recommended?${params.toString()}`;
 
         return [url, fbUser];
       },

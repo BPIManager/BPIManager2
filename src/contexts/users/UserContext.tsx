@@ -5,6 +5,7 @@ import useSWR, { KeyedMutator } from "swr";
 import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { Session } from "@/types/session";
+import { API_PREFIX } from "@/constants/apiEndpoints";
 
 interface UserContextType {
   user: Session | null;
@@ -53,7 +54,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     error,
     isLoading: isSwrLoading,
     mutate,
-  } = useSWR(fbUser ? "/api/me" : null, authenticatedFetcher, {
+  } = useSWR(fbUser ? `${API_PREFIX}/me` : null, authenticatedFetcher, {
     revalidateOnFocus: false,
     shouldRetryOnError: false,
   });

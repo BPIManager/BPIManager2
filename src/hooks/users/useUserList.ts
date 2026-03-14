@@ -1,6 +1,7 @@
 import useSWR from "swr";
 import { fetcher } from "@/utils/common/fetch";
 import { useUser } from "@/contexts/users/UserContext";
+import { API_PREFIX } from "@/constants/apiEndpoints";
 
 export interface RecommendedUser {
   userId: string;
@@ -39,7 +40,7 @@ export const useUserList = (
   const { data, error, isLoading, mutate } = useSWR<UserListResponse>(
     fbUser
       ? [
-          `/api/${fbUser?.uid}/rivals/suggestions?${searchParams.toString()}`,
+          `${API_PREFIX}/users/${fbUser?.uid}/rivals/suggestions?${searchParams.toString()}`,
           fbUser,
         ]
       : null,

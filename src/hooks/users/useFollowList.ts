@@ -1,6 +1,7 @@
 import useSWRInfinite from "swr/infinite";
 import { fetcher } from "@/utils/common/fetch";
 import { useUser } from "@/contexts/users/UserContext";
+import { API_PREFIX } from "@/constants/apiEndpoints";
 
 export interface FollowUser {
   userId: string;
@@ -30,7 +31,7 @@ export const useFollowList = (
       (index) =>
         userId
           ? [
-              `/api/${userId}/follows?type=${type}&page=${index + 1}&limit=20`,
+              `${API_PREFIX}/users/${userId}/follows?type=${type}&page=${index + 1}&limit=20`,
               fbUser,
             ]
           : null,

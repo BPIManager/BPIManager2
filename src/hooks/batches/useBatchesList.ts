@@ -1,3 +1,4 @@
+import { API_PREFIX } from "@/constants/apiEndpoints";
 import { useUser } from "@/contexts/users/UserContext";
 import { fetcher } from "@/utils/common/fetch";
 import useSWR from "swr";
@@ -22,7 +23,9 @@ export interface UpdateLog {
 export const useBatchesList = (userId: string | undefined, version: string) => {
   const { fbUser } = useUser();
   const { data, error, isLoading } = useSWR<UpdateLog[]>(
-    userId ? [`/api/${userId}/batches?version=${version}`, fbUser] : null,
+    userId
+      ? [`${API_PREFIX}/users/${userId}/batches?version=${version}`, fbUser]
+      : null,
     fetcher,
   );
   return {

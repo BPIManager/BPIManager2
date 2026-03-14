@@ -3,6 +3,7 @@ import { useUser } from "@/contexts/users/UserContext";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { toaster } from "@/components/ui/toaster";
+import { API_PREFIX } from "@/constants/apiEndpoints";
 
 export const useEditProfile = (onClose?: () => void) => {
   const { user, fbUser, refresh } = useUser();
@@ -76,7 +77,7 @@ export const useEditProfile = (onClose?: () => void) => {
       try {
         const token = await fbUser?.getIdToken();
         const res = await fetch(
-          `/api/usernames/${encodeURIComponent(formData.userName)}/availability`,
+          `${API_PREFIX}/usernames/${encodeURIComponent(formData.userName)}/availability`,
           {
             headers: { Authorization: `Bearer ${token}` },
           },
@@ -104,7 +105,7 @@ export const useEditProfile = (onClose?: () => void) => {
     try {
       const token = await fbUser.getIdToken();
       const method = user ? "PATCH" : "POST";
-      const res = await fetch(`/api/${fbUid}/profile`, {
+      const res = await fetch(`${API_PREFIX}/users/${fbUid}/profile`, {
         method,
         headers: {
           "Content-Type": "application/json",

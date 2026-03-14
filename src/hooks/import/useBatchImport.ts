@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { toaster } from "@/components/ui/toaster";
 import { parseCSV } from "@/utils/csv/parse";
+import { API_PREFIX } from "@/constants/apiEndpoints";
 
 export const useBatchImport = (fbUser: any, refresh: () => Promise<void>) => {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -38,14 +39,17 @@ export const useBatchImport = (fbUser: any, refresh: () => Promise<void>) => {
       setProcessStatus(`${formattedRows.length}件をアップロード中...`);
       const idToken = await fbUser.getIdToken(true);
 
-      const response = await fetch(`/api/${fbUser.uid}/scores/bulk`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${idToken}`,
+      const response = await fetch(
+        `${API_PREFIX}/users/${fbUser.uid}/scores/bulk`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${idToken}`,
+          },
+          body: JSON.stringify({ version, csvRows: formattedRows }),
         },
-        body: JSON.stringify({ version, csvRows: formattedRows }),
-      });
+      );
 
       if (!response.ok) throw new Error("サーバーエラーが発生しました。");
 

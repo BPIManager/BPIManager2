@@ -1,3 +1,4 @@
+import { API_PREFIX } from "@/constants/apiEndpoints";
 import { useUser } from "@/contexts/users/UserContext";
 import { fetcher } from "@/utils/common/fetch";
 import useSWR from "swr";
@@ -18,7 +19,10 @@ export const useActivity = (
 
   const { data, isLoading } = useSWR(
     shouldFetch
-      ? [`/api/${userId}/stats/activity?${params.toString()}`, fbUser]
+      ? [
+          `${API_PREFIX}/users/${userId}/stats/activity?${params.toString()}`,
+          fbUser,
+        ]
       : null,
     fetcher,
   );

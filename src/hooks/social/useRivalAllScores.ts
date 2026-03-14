@@ -3,6 +3,7 @@ import { useUser } from "@/contexts/users/UserContext";
 import { fetcher } from "@/utils/common/fetch";
 import { latestVersion } from "@/constants/latestVersion";
 import { SongWithScore } from "@/types/songs/withScore";
+import { API_PREFIX } from "@/constants/apiEndpoints";
 
 export interface SongWithRival extends SongWithScore {
   rival: {
@@ -24,7 +25,7 @@ export const useRivalBothScores = (
   const { data, error, isLoading, mutate } = useSWR<SongWithRival[]>(
     myUserId && rivalUserId && fbUser
       ? [
-          `/api/${myUserId}/rivals/${rivalUserId}/scores?version=${version}`,
+          `${API_PREFIX}/users/${myUserId}/rivals/${rivalUserId}/scores?version=${version}`,
           fbUser,
         ]
       : null,
