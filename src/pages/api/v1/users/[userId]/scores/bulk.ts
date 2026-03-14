@@ -8,6 +8,7 @@ import { isImproved } from "@/lib/lamp";
 import { BpiCalculator } from "@/lib/bpi";
 import { NewScore } from "@/types/sql";
 import { bpiRepo } from "@/lib/db/bpi";
+import dayjs from "@/lib/dayjs";
 
 const handler = async (
   req: AuthenticatedNextApiRequest,
@@ -72,7 +73,10 @@ const handler = async (
           bpi: bpi,
           clearState: row.clearState,
           missCount: row.missCount ?? null,
-          lastPlayed: row.lastPlayed ? new Date(row.lastPlayed) : null,
+          lastPlayed:
+            row.lastPlayed && dayjs(row.lastPlayed).isValid()
+              ? dayjs.tz(row.lastPlayed).utc().toDate()
+              : null,
           version,
           batchId,
         });
