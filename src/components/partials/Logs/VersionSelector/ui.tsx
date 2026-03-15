@@ -74,8 +74,8 @@ export const LogFilterSection = ({ version, groupedBy }: Props) => {
         </Text>
         <SegmentedControl
           items={[
-            { value: "createdAt", label: "インポート日単位" },
             { value: "lastPlayed", label: "プレイ日単位" },
+            { value: "createdAt", label: "インポート日単位" },
           ]}
           value={groupedBy}
           onValueChange={(e) => handleGroupChange(e.value as string)}

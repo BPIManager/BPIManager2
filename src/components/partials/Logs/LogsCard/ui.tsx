@@ -18,7 +18,7 @@ import { useMemo } from "react";
 export const LogsCard = ({ log }: { log: UpdateLog }) => {
   const router = useRouter();
   const userId = router.query.userId as string;
-  const groupedBy = (router.query.groupedBy as string) || "createdAt";
+  const groupedBy = (router.query.groupedBy as string) || "lastPlayed";
   const isPositive = log.diff >= 0;
 
   const linkHref = useMemo(() => {

@@ -22,7 +22,7 @@ export default function UserPage({
   const router = useRouter();
   const userId = router.query.userId as string;
   const version = (router.query.version as string) || latestVersion;
-  const groupedBy = (router.query.groupedBy as string) || "createdAt";
+  const groupedBy = (router.query.groupedBy as string) || "lastPlayed";
 
   if (!userId) return null;
 

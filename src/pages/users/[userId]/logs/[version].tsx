@@ -18,7 +18,7 @@ export default function LogsPage() {
   const { userId, version, groupedBy } = router.query;
   const uid = (userId as string) || "";
   const v = (version as string) || latestVersion;
-  const g = (groupedBy as string) || "createdAt";
+  const g = (groupedBy as string) || "lastPlayed";
   const isOwnedByFbId = !isUserLoading && user?.userId === userId;
 
   const logsContent = (
