@@ -102,7 +102,7 @@ export const OvertakeRankItem = ({ item, onClick }: RankItemProps) => {
               {overtaken
                 .sort(
                   (a, b) =>
-                    b.myNewScore - b.rivalScore - (a.myNewScore - a.rivalScore),
+                    a.myNewScore - a.rivalScore - (b.myNewScore - b.rivalScore),
                 )
                 .map((rival: OvertakenRivalInfo) => (
                   <HStack
