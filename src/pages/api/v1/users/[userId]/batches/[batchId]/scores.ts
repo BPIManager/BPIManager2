@@ -96,7 +96,7 @@ async function handleLastPlayedBase(
 
   const currentIndex = timeline.findIndex((t) => t.id === range.label);
   const prevSnapshot = timeline[currentIndex + 1];
-  console.log(prevSnapshot);
+  const nextSnapshot = timeline[currentIndex - 1];
   return {
     songs: dailyScores.map(mapToLogNested),
     pagination: {
@@ -111,8 +111,11 @@ async function handleLastPlayedBase(
         totalBpi: currentSnapshot?.totalBpi || -15,
         label: `${range.label} のプレイ履歴`,
       },
-      prevDate: nav.prevDate?.createdAt || null,
-      nextDate: nav.nextDate?.createdAt || null,
+      next: {
+        batchId: nav.nextDate || "next",
+        createdAt: nextSnapshot?.createdAt || null,
+        totalBpi: nextSnapshot?.totalBpi || -15,
+      },
       groupedBy: "lastPlayed",
     },
   };
@@ -146,13 +149,12 @@ async function handleCreatedAtBase(
   return {
     songs: scores.map(mapToLogNested),
     pagination: {
-      prev: batchNav.prev,
+      prev: nav.prevDate,
       current: {
         ...batches[batches.length - 1],
         count: batches.length,
       },
-      prevDate: nav.prevDate,
-      nextDate: nav.nextDate,
+      next: nav.nextDate,
       groupedBy: "createdAt",
     },
   };

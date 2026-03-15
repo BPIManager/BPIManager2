@@ -49,40 +49,40 @@ export const LogNavigator = ({
         { shallow: true },
       );
     } else {
-      router.push(`/users/${userId}/logs/${version}/summary/${target}`);
+      router.push(
+        {
+          pathname: router.pathname,
+          query: { ...router.query, date: target, groupedBy: "lastPlayed" },
+        },
+        undefined,
+        { shallow: true },
+      );
     }
   };
 
-  const hasPrev = type === "batch" ? !!pagination.prev : !!pagination.prevDate;
-  const hasNext = type === "batch" ? !!pagination.next : !!pagination.nextDate;
+  const hasPrev = !!pagination.prev;
+  const hasNext = !!pagination.next;
 
   const prevVal =
-    type === "batch" ? pagination.prev?.batchId : pagination.prevDate;
+    type === "batch"
+      ? pagination.prev?.batchId
+      : dayjs(pagination.prev?.createdAt).format("YYYY-MM-DD");
   const nextVal =
-    type === "batch" ? pagination.next?.batchId : pagination.nextDate;
-
-  const prevLabel =
     type === "batch"
-      ? pagination.prev
-        ? formatDateLabel(pagination.prev.createdAt)
-        : "---"
-      : pagination.prevDate
-        ? formatDateLabel(pagination.prevDate)
-        : "---";
+      ? pagination.next?.batchId
+      : dayjs(pagination.next?.createdAt).format("YYYY-MM-DD");
 
-  const nextLabel =
-    type === "batch"
-      ? pagination.next
-        ? formatDateLabel(pagination.next.createdAt)
-        : "---"
-      : pagination.nextDate
-        ? formatDateLabel(pagination.nextDate)
-        : "---";
+  const prevLabel = pagination.prev
+    ? formatDateLabel(pagination.prev.createdAt)
+    : "---";
 
-  const currentLabel =
-    type === "batch"
-      ? dayjs(pagination.current.createdAt).tz().format("M月D日 HH:mm")
-      : dayjs(date).tz().format("YYYY/MM/DD");
+  const nextLabel = pagination.next
+    ? formatDateLabel(pagination.next?.createdAt)
+    : "---";
+
+  const currentLabel = dayjs(pagination.current.createdAt)
+    .tz()
+    .format("M月D日 HH:mm");
 
   return (
     <HStack

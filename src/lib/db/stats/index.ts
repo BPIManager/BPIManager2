@@ -111,7 +111,6 @@ class StatsRepository {
     let query = db
       .selectFrom("scores as s")
       .innerJoin("songs as m", "s.songId", "m.songId")
-      // ★ songDef を結合してマスターデータを取得
       .innerJoin("songDef as d", (join) =>
         join.onRef("d.songId", "=", "m.songId").on("d.isCurrent", "=", 1),
       )
