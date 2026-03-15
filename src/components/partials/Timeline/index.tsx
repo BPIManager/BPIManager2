@@ -86,8 +86,6 @@ export const TimelineContainer = () => {
               />
             </VStack>
 
-            <Separator opacity={0.1} />
-
             <FilterCheckboxGroup
               label="LEVEL"
               items={[11, 12]}
@@ -99,8 +97,6 @@ export const TimelineContainer = () => {
               }
               getLabel={(lv: number) => `☆${lv}`}
             />
-
-            <Separator opacity={0.1} />
 
             <FilterCheckboxGroup
               label="DIFFICULTY"

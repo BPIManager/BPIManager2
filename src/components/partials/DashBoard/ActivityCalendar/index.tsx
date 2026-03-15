@@ -1,14 +1,30 @@
-import { Box, Grid, Text, HStack, VStack } from "@chakra-ui/react";
+import {
+  Box,
+  Grid,
+  Text,
+  HStack,
+  VStack,
+  Link as ChakraLink,
+  Button,
+} from "@chakra-ui/react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Tooltip } from "@/components/ui/tooltip";
 import dayjs from "@/lib/dayjs";
+import NextLink from "next/link";
+import {
+  PopoverArrow,
+  PopoverBody,
+  PopoverContent,
+  PopoverRoot,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 interface ActivityData {
   date: string;
   count: number;
 }
 
-const getActivityColor = (count: number) => {
+const getActivityColor = (count: number, isFuture: boolean) => {
+  if (isFuture) return "transparent";
   if (count === 0) return "#161b22";
   if (count <= 5) return "#0e4429";
   if (count <= 15) return "#006d32";
@@ -16,28 +32,38 @@ const getActivityColor = (count: number) => {
   return "#39d353";
 };
 
-export const ActivityCalendar = ({ data }: { data: ActivityData[] }) => {
-  const [activeDate, setActiveDate] = useState<string | null>(null);
+interface Props {
+  data: ActivityData[];
+  userId: string;
+  version: string;
+}
+
+export const ActivityCalendar = ({ data, userId, version }: Props) => {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [hoveredDate, setHoveredDate] = useState<string | null>(null);
+  const isTouchDevice =
+    typeof window !== "undefined" &&
+    window.matchMedia("(pointer: coarse)").matches;
+
   const calendarDays = useMemo(() => {
     const days = [];
-
-    const lastDate =
-      data.length > 0 ? dayjs(data[data.length - 1].date).tz() : dayjs().tz();
-
-    const endOfCalendar = lastDate.endOf("week");
+    const today = dayjs().tz().startOf("day");
+    const endOfCalendar = dayjs().tz().endOf("week");
 
     const dataMap = new Map(
       data.map((d) => [dayjs(d.date).tz().format("YYYY-MM-DD"), d.count]),
     );
 
-    for (let i = 364; i >= 0; i--) {
+    for (let i = 370; i >= 0; i--) {
       const dateObj = endOfCalendar.subtract(i, "day");
-      const dateStr = dateObj.tz().format("YYYY-MM-DD");
+      const dateStr = dateObj.format("YYYY-MM-DD");
+      const isFuture = dateObj.isAfter(today, "day");
+
       days.push({
         date: dateStr,
         count: dataMap.get(dateStr) || 0,
         dayOfWeek: dateObj.day(),
+        isFuture: isFuture,
       });
     }
     return days;
@@ -77,19 +103,13 @@ export const ActivityCalendar = ({ data }: { data: ActivityData[] }) => {
       >
         <HStack align="start" gap={3} minW="720px">
           <VStack gap={0} pt={6} fontSize="10px" color="gray.500" align="start">
-            <Box h="12px">
-              <Text transform="scale(0.8)">Mon</Text>
-            </Box>
-            <Box h="12px" />
-            <Box h="12px">
-              <Text transform="scale(0.8)">Wed</Text>
-            </Box>
-            <Box h="12px" />
-            <Box h="12px">
-              <Text transform="scale(0.8)">Fri</Text>
-            </Box>
-            <Box h="12px" />
+            {["Mon", "Wed", "Fri"].map((day, idx) => (
+              <Box key={day} h="24px" display="flex" alignItems="center">
+                <Text transform="scale(0.8)">{day}</Text>
+              </Box>
+            ))}
           </VStack>
+
           <Grid
             templateRows="repeat(7, 1fr)"
             templateColumns="repeat(53, 1fr)"
@@ -97,33 +117,90 @@ export const ActivityCalendar = ({ data }: { data: ActivityData[] }) => {
             gap="3px"
             flex="1"
           >
-            {calendarDays.map((day) => (
-              <Tooltip
-                key={day.date}
-                content={`${day.date}: ${day.count} 件`}
-                portalled
-                showArrow
-                open={activeDate === day.date}
-              >
-                <Box
-                  w="11px"
-                  h="11px"
-                  onMouseEnter={() => setActiveDate(day.date)}
-                  onMouseLeave={() => setActiveDate(null)}
-                  onClick={() =>
-                    setActiveDate(activeDate === day.date ? null : day.date)
-                  }
-                  bg={getActivityColor(day.count)}
-                  borderRadius="2px"
-                  transition="all 0.2s"
-                  _hover={{
-                    transform: "scale(1.2)",
-                    zIndex: 1,
-                    boxShadow: "0 0 8px rgba(57, 211, 83, 0.4)",
+            {calendarDays.map((day) => {
+              const isOpen = hoveredDate === day.date;
+
+              return (
+                <PopoverRoot
+                  key={day.date}
+                  open={isOpen}
+                  onOpenChange={(e) => {
+                    if (!e.open) setHoveredDate(null);
                   }}
-                />
-              </Tooltip>
-            ))}
+                  positioning={{ placement: "top" }}
+                  portalled
+                >
+                  <PopoverTrigger asChild>
+                    <Box
+                      w="11px"
+                      h="11px"
+                      bg={getActivityColor(day.count, day.isFuture)}
+                      borderRadius="2px"
+                      cursor={day.isFuture ? "default" : "pointer"}
+                      onMouseEnter={() => {
+                        if (!isTouchDevice && !day.isFuture)
+                          setHoveredDate(day.date);
+                      }}
+                      onMouseLeave={() => {
+                        if (!isTouchDevice) setHoveredDate(null);
+                      }}
+                      onClick={(e) => {
+                        if (day.isFuture) return;
+                        e.stopPropagation();
+                        setHoveredDate(isOpen ? null : day.date);
+                      }}
+                      transition="all 0.2s"
+                      _hover={
+                        !day.isFuture
+                          ? {
+                              transform: "scale(1.2)",
+                              zIndex: 1,
+                              boxShadow: "0 0 8px rgba(57, 211, 83, 0.4)",
+                            }
+                          : {}
+                      }
+                    />
+                  </PopoverTrigger>
+
+                  <PopoverContent
+                    bg="gray.800"
+                    color="white"
+                    borderColor="whiteAlpha.200"
+                    p={2}
+                    w="auto"
+                    onMouseEnter={() => setHoveredDate(day.date)}
+                    onMouseLeave={() => setHoveredDate(null)}
+                  >
+                    <PopoverArrow bg="gray.800" />
+                    <PopoverBody>
+                      <VStack align="stretch" gap={2}>
+                        <Text
+                          fontSize="xs"
+                          fontWeight="bold"
+                          whiteSpace="nowrap"
+                          color="white"
+                        >
+                          {day.date}: {day.count} 件
+                        </Text>
+                        <Button
+                          asChild
+                          size="xs"
+                          colorPalette="blue"
+                          h="24px"
+                          fontSize="10px"
+                        >
+                          <NextLink
+                            href={`/users/${userId}/logs/${version}/summary/${day.date}`}
+                          >
+                            サマリを表示
+                          </NextLink>
+                        </Button>
+                      </VStack>
+                    </PopoverBody>
+                  </PopoverContent>
+                </PopoverRoot>
+              );
+            })}
           </Grid>
         </HStack>
       </Box>
@@ -135,7 +212,7 @@ export const ActivityCalendar = ({ data }: { data: ActivityData[] }) => {
             key={v}
             w="10px"
             h="10px"
-            bg={getActivityColor(v)}
+            bg={getActivityColor(v, false)}
             borderRadius="2px"
           />
         ))}

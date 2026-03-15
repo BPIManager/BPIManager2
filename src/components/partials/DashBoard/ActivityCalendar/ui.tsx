@@ -12,5 +12,11 @@ export const ActivitySection = ({ userId }: { userId?: string }) => {
   if (!activity || activity.length === 0) {
     return <NoDataAlert />;
   }
-  return activity ? <ActivityCalendar data={activity} /> : null;
+  return activity ? (
+    <ActivityCalendar
+      data={activity}
+      userId={userId as string}
+      version={version}
+    />
+  ) : null;
 };
