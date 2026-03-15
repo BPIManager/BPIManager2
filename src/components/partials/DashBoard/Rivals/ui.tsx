@@ -6,6 +6,7 @@ import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { RivalComparisonRow } from "./row";
 import { RivalWinLossSummarySkeleton } from "./skeleton";
 import { RivalWinLossSummaryNotFound } from "./nodata";
+import { DashCard } from "@/components/ui/dashcard";
 
 export const RivalWinLossSummary = ({
   userId,
@@ -26,14 +27,7 @@ export const RivalWinLossSummary = ({
   const visibleItems = showAll ? results : results.slice(0, displayCount);
 
   return (
-    <Box
-      p={5}
-      bg="#0d1117"
-      borderRadius="xl"
-      borderWidth="1px"
-      borderColor="whiteAlpha.100"
-      w="full"
-    >
+    <DashCard>
       <Text fontSize="sm" fontWeight="bold" mb={4} color="gray.400">
         ライバル勝敗
       </Text>
@@ -72,6 +66,6 @@ export const RivalWinLossSummary = ({
           )}
         </Button>
       )}
-    </Box>
+    </DashCard>
   );
 };

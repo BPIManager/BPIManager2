@@ -30,8 +30,6 @@ const handler = async (
     return res.status(400).json({ message: "userId and version are required" });
   }
 
-  const nLimit = limit ? Number(limit) : 10;
-
   try {
     const normalize = (val: string | string[] | undefined): string[] => {
       if (!val) return [];

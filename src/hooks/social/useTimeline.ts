@@ -1,8 +1,7 @@
-import useSWRInfinite from "swr/infinite";
-import { fetcher } from "@/utils/common/fetch";
 import { useUser } from "@/contexts/users/UserContext";
 import { FilterParamsFrontend } from "@/types/songs/withScore";
 import { API_PREFIX } from "@/constants/apiEndpoints";
+import { useInfiniteList } from "@/services/swr/useInfinite";
 
 export interface TimelineEntry {
   logId: number;
@@ -45,58 +44,42 @@ export const useTimeline = (
 ) => {
   const { fbUser } = useUser();
 
-  const getKey = (
-    pageIndex: number,
-    previousPageData: TimelineResponse | null,
-  ) => {
-    if (!fbUser) return null;
+  const { items, size, setSize, isLoading, isReachingEnd, isError } =
+    useInfiniteList<TimelineResponse, TimelineEntry>(
+      (pageIndex, previousPageData: TimelineResponse | null) => {
+        if (!fbUser) return null;
+        if (previousPageData && !previousPageData.nextId) return null;
 
-    if (previousPageData && !previousPageData.nextId) return null;
+        const query = new URLSearchParams();
+        query.append("mode", mode);
+        if (params.search) query.append("search", params.search);
+        if (params.levels?.length) {
+          params.levels.forEach((lv) =>
+            query.append("levels[]", lv.toString()),
+          );
+        }
+        if (params.difficulties?.length) {
+          params.difficulties.forEach((df) =>
+            query.append("difficulties[]", df),
+          );
+        }
+        if (pageIndex > 0 && previousPageData?.nextId) {
+          query.append("lastId", previousPageData.nextId);
+        }
 
-    const query = new URLSearchParams();
-    query.append("mode", mode);
+        return [
+          `${API_PREFIX}/users/${fbUser.uid}/timeline?${query.toString()}`,
+          fbUser,
+        ];
+      },
+      {
+        getItems: (page) => page.timeline,
+        isLastPage: (page) => page?.nextId === null,
+        revalidateFirstPage: false,
+        revalidateOnFocus: false,
+        keepPreviousData: false,
+      },
+    );
 
-    if (params.search) {
-      query.append("search", params.search);
-    }
-    if (params.levels && params.levels.length > 0) {
-      params.levels.forEach((lv) => query.append("levels[]", lv.toString()));
-    }
-    if (params.difficulties && params.difficulties.length > 0) {
-      params.difficulties.forEach((df) => query.append("difficulties[]", df));
-    }
-
-    if (pageIndex > 0 && previousPageData?.nextId) {
-      query.append("lastId", previousPageData.nextId);
-    }
-    return [
-      `${API_PREFIX}/users/${fbUser.uid}/timeline?${query.toString()}`,
-      fbUser,
-    ];
-  };
-
-  const { data, size, setSize, error, isLoading, isValidating } =
-    useSWRInfinite<TimelineResponse>(getKey, fetcher, {
-      revalidateFirstPage: false,
-      revalidateOnFocus: false,
-      keepPreviousData: false,
-    });
-
-  const timeline = data ? data.flatMap((page) => page.timeline) : [];
-
-  const isFetchingMore =
-    isLoading || (size > 0 && data && typeof data[size - 1] === "undefined");
-
-  const isReachingEnd = data ? data[data.length - 1]?.nextId === null : false;
-
-  const loading = isLoading || isFetchingMore;
-  return {
-    timeline,
-    isLoading: loading,
-    isValidating,
-    isReachingEnd,
-    size,
-    setSize,
-    error,
-  };
+  return { timeline: items, isLoading, isReachingEnd, isError, size, setSize };
 };

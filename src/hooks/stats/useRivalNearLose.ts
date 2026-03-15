@@ -1,8 +1,7 @@
 import { API_PREFIX } from "@/constants/apiEndpoints";
 import { useUser } from "@/contexts/users/UserContext";
+import { useInfiniteList } from "@/services/swr/useInfinite";
 import { SongWithScore, RivalScore } from "@/types/songs/withScore";
-import { fetcher } from "@/utils/common/fetch";
-import useSWRInfinite from "swr/infinite";
 
 export interface NearLoseSongItem extends SongWithScore {
   rival: RivalScore & {
@@ -33,53 +32,41 @@ export const useNearLoseInfinite = (
   const { fbUser } = useUser();
   const PAGE_SIZE = 20;
 
-  const getKey = (
-    pageIndex: number,
-    previousPageData: NearLoseResponse | null,
-  ) => {
-    if (!userId || !version || !fbUser) return null;
-    if (previousPageData && !previousPageData.nextCursor) return null;
+  const { items, size, setSize, isLoadingMore, isReachingEnd, isError } =
+    useInfiniteList<NearLoseResponse, NearLoseSongItem>(
+      (pageIndex, previousPageData: NearLoseResponse | null) => {
+        if (!userId || !version || !fbUser) return null;
+        if (previousPageData && !previousPageData.nextCursor) return null;
 
-    const params = new URLSearchParams({
-      limit: PAGE_SIZE.toString(),
-      minDiff: threshold.min.toString(),
-      maxDiff: threshold.max.toString(),
-      version,
-    });
+        const params = new URLSearchParams({
+          limit: PAGE_SIZE.toString(),
+          minDiff: threshold.min.toString(),
+          maxDiff: threshold.max.toString(),
+          version,
+        });
 
-    levels.forEach((l) => params.append("levels[]", l));
-    diffs.forEach((d) => params.append("difficulties[]", d));
+        levels.forEach((l) => params.append("levels", l));
+        diffs.forEach((d) => params.append("difficulties", d));
 
-    if (pageIndex > 0 && previousPageData?.nextCursor) {
-      const { lastDiff, lastSongId, lastRivalId } = previousPageData.nextCursor;
-      params.append("lastDiff", String(lastDiff));
-      params.append("lastSongId", String(lastSongId));
-      params.append("lastRivalId", lastRivalId);
-    }
+        if (pageIndex > 0 && previousPageData?.nextCursor) {
+          const { lastDiff, lastSongId, lastRivalId } =
+            previousPageData.nextCursor;
+          params.append("lastDiff", String(lastDiff));
+          params.append("lastSongId", String(lastSongId));
+          params.append("lastRivalId", lastRivalId);
+        }
 
-    const url = `${API_PREFIX}/users/${userId}/rivals/following/scores?${params.toString()}`;
-    return [url, fbUser];
-  };
+        return [
+          `${API_PREFIX}/users/${userId}/rivals/following/scores?${params.toString()}`,
+          fbUser,
+        ];
+      },
+      {
+        getItems: (page) => page?.items ?? [],
+        isLastPage: (page) => !page?.nextCursor,
+        revalidateOnFocus: false,
+      },
+    );
 
-  const { data, size, setSize, isValidating, isLoading, error } =
-    useSWRInfinite<NearLoseResponse>(getKey, fetcher, {
-      revalidateOnFocus: false,
-    });
-
-  const items = data
-    ? data.filter(Boolean).flatMap((page) => page.items || [])
-    : [];
-
-  const isLoadingMore = isLoading || (isValidating && size > 1);
-  const isReachingEnd =
-    data && data[data.length - 1] && !data[data.length - 1].nextCursor;
-
-  return {
-    items,
-    size,
-    setSize,
-    isLoadingMore,
-    isReachingEnd,
-    isError: error,
-  };
+  return { items, size, setSize, isLoadingMore, isReachingEnd, isError };
 };

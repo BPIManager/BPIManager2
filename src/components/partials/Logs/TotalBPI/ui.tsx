@@ -1,3 +1,4 @@
+import { DashCard } from "@/components/ui/dashcard";
 import { BpiCalculator } from "@/lib/bpi";
 import {
   Box,
@@ -28,15 +29,7 @@ export const BatchTotalBpiCard = ({ pagination }: { pagination: any }) => {
   const rankColor =
     rankDiff > 0 ? "orange.300" : rankDiff < 0 ? "gray.500" : "gray.500";
   return (
-    <Box
-      p={{ base: 4, md: 6 }}
-      bg="#0d1117"
-      borderRadius="2xl"
-      borderWidth="1px"
-      borderColor="whiteAlpha.200"
-      mb={4}
-      boxShadow="0 4px 24px rgba(0,0,0,0.5)"
-    >
+    <DashCard p={{ base: 4, md: 6 }} mb={4}>
       <Stack
         direction={{ base: "column", md: "row" }}
         gap={{ base: 4, md: 10 }}
@@ -149,6 +142,6 @@ export const BatchTotalBpiCard = ({ pagination }: { pagination: any }) => {
           </HStack>
         </VStack>
       </Stack>
-    </Box>
+    </DashCard>
   );
 };

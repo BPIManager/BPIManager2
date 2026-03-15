@@ -1,49 +1,29 @@
-import { latestVersion } from "@/constants/latestVersion";
 import { statsRepo } from "@/lib/db/stats";
-import { checkUserAccess } from "@/middlewares/api/withApi";
+import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
+import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const {
-    userId,
-    version = latestVersion,
-    level,
-    difficulty,
-    limit = "10",
-    offset = "0",
-  } = req.query;
+  const { userId, version, levels, difficulties } = parseStatsQuery(req.query);
+  const limit = parseInt(String(req.query.limit ?? "10"), 10);
+  const offset = parseInt(String(req.query.offset ?? "0"), 10);
 
   try {
-    const access = await checkUserAccess(req, userId as string);
-    if (!access.hasAccess)
-      return res.status(403).json({ message: "Access Denied" });
+    const access = await checkUserAccess(req, userId);
+    if (!access.hasAccess) return rejectAccess(res, access);
 
-    const targetLevels = level
-      ? (Array.isArray(level) ? level : [level]).map((v) => parseInt(v, 10))
-      : [];
-    const targetDiffs = difficulty
-      ? Array.isArray(difficulty)
-        ? difficulty
-        : [difficulty]
-      : [];
-
-    const totalBpi = await statsRepo.getLatestTotalBpi(
-      userId as string,
-      version as string,
-    );
+    const totalBpi = await statsRepo.getLatestTotalBpi(userId, version);
 
     const allScores = await statsRepo.getLatestScoresWithMusicData(
-      userId as string,
-      version as string,
-      targetLevels,
-      targetDiffs,
+      userId,
+      version,
+      levels,
+      difficulties,
     );
 
-    const L = parseInt(limit as string, 10);
-    const O = parseInt(offset as string, 10);
     const processed = allScores.map((s) => ({
       songId: s.songId,
       title: s.title,
@@ -67,6 +47,7 @@ export default async function handler(
       bpiDiff: Number(s.bpi) - totalBpi,
       previous: true,
     }));
+
     const sortedWeapons = [...processed].sort(
       (a, b) => b.diff.bpi - a.diff.bpi,
     );
@@ -76,11 +57,11 @@ export default async function handler(
 
     return res.status(200).json({
       weapons: {
-        data: sortedWeapons.slice(O, O + L),
+        data: sortedWeapons.slice(offset, offset + limit),
         total: sortedWeapons.length,
       },
       potential: {
-        data: sortedPotential.slice(O, O + L),
+        data: sortedPotential.slice(offset, offset + limit),
         total: sortedPotential.length,
       },
     });

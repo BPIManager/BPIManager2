@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { checkUserAccess } from "@/middlewares/api/withApi";
+import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
@@ -18,11 +18,8 @@ export default async function handler(
 
   try {
     const access = await checkUserAccess(req, userId as string);
-    if (!access.hasAccess) {
-      return res
-        .status(access.error!.status)
-        .json({ message: access.error!.message });
-    }
+    if (!access.hasAccess) return rejectAccess(res, access);
+
     const history = await db
       .selectFrom("scores")
       .selectAll()

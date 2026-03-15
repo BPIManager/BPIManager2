@@ -1,7 +1,6 @@
-import useSWRInfinite from "swr/infinite";
-import { fetcher } from "@/utils/common/fetch";
 import { useUser } from "@/contexts/users/UserContext";
 import { API_PREFIX } from "@/constants/apiEndpoints";
+import { useInfiniteList } from "@/services/swr/useInfinite";
 
 export interface FollowUser {
   userId: string;
@@ -26,8 +25,8 @@ export const useFollowList = (
 ) => {
   const { fbUser } = useUser();
 
-  const { data, error, size, setSize, isValidating, mutate } =
-    useSWRInfinite<FollowListResponse>(
+  const { items, size, setSize, isLoading, isReachingEnd, mutate } =
+    useInfiniteList<FollowListResponse, FollowUser>(
       (index) =>
         userId
           ? [
@@ -35,17 +34,16 @@ export const useFollowList = (
               fbUser,
             ]
           : null,
-      fetcher,
-      { revalidateFirstPage: false },
+      {
+        getItems: (page) => page.users,
+        isLastPage: (page) => !page?.hasMore,
+        revalidateFirstPage: false,
+      },
     );
 
-  const users = data ? data.flatMap((page) => page.users) : [];
-  const isLoading = (!data && !error) || isValidating;
-  const isReachingEnd = data && !data[data.length - 1]?.hasMore;
-
   return {
-    users,
-    totalCount: data?.[0]?.totalCount ?? 0,
+    users: items,
+    totalCount: 0,
     isLoading,
     isReachingEnd,
     loadMore: () => setSize(size + 1),

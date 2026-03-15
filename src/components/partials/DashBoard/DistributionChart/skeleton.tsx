@@ -1,3 +1,4 @@
+import { DashCard } from "@/components/ui/dashcard";
 import { Box, Skeleton, VStack, HStack, Flex } from "@chakra-ui/react";
 
 interface BaseSkeletonProps {
@@ -10,14 +11,7 @@ export const DistributionChartSkeleton = ({
   hasButton = false,
 }: BaseSkeletonProps) => {
   return (
-    <Box
-      p={5}
-      bg="#0d1117"
-      borderRadius="xl"
-      borderWidth="1px"
-      borderColor="whiteAlpha.100"
-      w="full"
-    >
+    <DashCard>
       <HStack justify="space-between" mb={6}>
         <Skeleton h="16px" w="140px" />
         {hasButton && <Skeleton h="28px" w="100px" borderRadius="md" />}
@@ -68,6 +62,6 @@ export const DistributionChartSkeleton = ({
           );
         })}
       </HStack>
-    </Box>
+    </DashCard>
   );
 };

@@ -41,7 +41,7 @@ export default function BatchLogsPage() {
 
   return (
     <UserProfileLayout userId={userId as string} currentTab="logs">
-      <ProfileMeta title={`プレイログ: ${batchId}`} noIndex />
+      <ProfileMeta title={`プレイログ: ${batchId}`} />
       <Box p={4}>
         <LogsDetailContent
           isPublicPage

@@ -13,7 +13,6 @@ export default function UsersPage() {
       <Meta
         title="タイムライン"
         description="アリーナ平均やAAA達成難易度表など、IIDXスコアに関する指標データを閲覧できます。"
-        noIndex
       />
 
       <PageContainer>

@@ -15,6 +15,7 @@ import { BpiHistoryTable } from "./bpiTable";
 import { FollowSection } from "./followStatus";
 import { FollowStats } from "./followCount";
 import { formatIIDXId } from "@/utils/common/formatIidxId";
+import { DashCard } from "@/components/ui/dashcard";
 
 export const ProfileSideBar = ({
   profile,
@@ -25,18 +26,8 @@ export const ProfileSideBar = ({
   onFollowToggle?: () => void;
   isUpdating?: boolean;
 }) => {
-  const current = profile.current || {};
-
   return (
-    <Box
-      bg="#0d1117"
-      p={6}
-      borderRadius="2xl"
-      borderWidth="1px"
-      borderColor="whiteAlpha.200"
-      position={{ lg: "sticky" }}
-      top="20px"
-    >
+    <DashCard p={4} position={{ lg: "sticky" }} top="20px">
       <ProfileHeaderBase profile={profile} />
 
       <FollowStats userId={profile.userId} follows={profile.follows} />
@@ -64,7 +55,7 @@ export const ProfileSideBar = ({
       <Separator borderColor="whiteAlpha.100" />
 
       <ProfileStatsContent profile={profile} />
-    </Box>
+    </DashCard>
   );
 };
 

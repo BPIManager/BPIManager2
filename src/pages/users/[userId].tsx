@@ -13,6 +13,7 @@ import { getVersionNameFromNumber } from "@/constants/versions";
 import { RadarSection } from "@/components/partials/DashBoard/Radar";
 import { BpiHistorySection } from "@/components/partials/DashBoard/TotalBPIHistory/ui";
 import { LogFilterSection } from "@/components/partials/Logs/VersionSelector/ui";
+import { DashCard } from "@/components/ui/dashcard";
 
 export default function UserPage({
   defaultView = "overview",
@@ -54,27 +55,15 @@ export default function UserPage({
 
       <Tabs.Content value="songs" p={0}>
         {defaultView === "songs" && (
-          <Box
-            bg="#0d1117"
-            borderRadius="2xl"
-            border="1px solid"
-            borderColor="whiteAlpha.100"
-            p={4}
-          >
+          <DashCard>
             <SongsTable userId={userId} version={version} />
-          </Box>
+          </DashCard>
         )}
       </Tabs.Content>
 
       <Tabs.Content value="logs" p={0}>
         {defaultView === "logs" && (
-          <Box
-            bg="#0d1117"
-            borderRadius="2xl"
-            border="1px solid"
-            borderColor="whiteAlpha.100"
-            p={6}
-          >
+          <DashCard>
             <LogFilterSection version={version} groupedBy={groupedBy as any} />
             <Box mt={6}>
               <LogsList
@@ -83,7 +72,7 @@ export default function UserPage({
                 groupedBy={groupedBy as any}
               />
             </Box>
-          </Box>
+          </DashCard>
         )}
       </Tabs.Content>
     </UserProfileLayout>

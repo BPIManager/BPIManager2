@@ -14,24 +14,17 @@ import {
 } from "recharts";
 import { BpiHistoryItem } from "@/hooks/stats/useTotalBPIHistory";
 import { TotalBpiHistorySkeleton } from "@/components/partials/DashBoard/TotalBPIHistory/skeleton";
+import { DashCard } from "@/components/ui/dashcard";
 
-// --- Sub Components ---
-
-/**
- * 更新件数を示すカスタムバー
- */
 const UpdateBar = (props: any) => {
   const { payload } = props;
-  if (payload.rivalBpi !== undefined) return null; // ライバル比較時は表示しない
+  if (payload.rivalBpi !== undefined) return null;
   const fill = payload.updateCount > 0 ? "#3182ce" : "transparent";
   return (
     <Rectangle {...props} fill={fill} opacity={0.3} radius={[2, 2, 0, 0]} />
   );
 };
 
-/**
- * 統合ツールチップ
- */
 const HistoryTooltip = ({ active, payload, label, myName, rivalName }: any) => {
   if (!active || !payload || !payload.length) return null;
 
@@ -55,7 +48,6 @@ const HistoryTooltip = ({ active, payload, label, myName, rivalName }: any) => {
         </Text>
 
         {isComparison ? (
-          /* 比較モード表示 */
           <>
             <HStack justify="space-between" w="full">
               <Text color="blue.300" fontSize="xs" fontWeight="bold">
@@ -89,7 +81,6 @@ const HistoryTooltip = ({ active, payload, label, myName, rivalName }: any) => {
             </HStack>
           </>
         ) : (
-          /* 単体モード表示（更新曲リスト付き） */
           <>
             <HStack justify="space-between" w="full">
               <Text color="blue.300" fontSize="sm" fontWeight="bold">
@@ -120,8 +111,6 @@ const HistoryTooltip = ({ active, payload, label, myName, rivalName }: any) => {
     </Box>
   );
 };
-
-// --- Main Component ---
 
 interface UnifiedBpiHistoryChartProps {
   myData?: BpiHistoryItem[];
@@ -196,15 +185,7 @@ export const TotalBpiHistoryChart = ({
   };
 
   return (
-    <Box
-      p={5}
-      bg="#0d1117"
-      borderRadius="xl"
-      borderWidth="1px"
-      borderColor="whiteAlpha.100"
-      w="full"
-      h="420px"
-    >
+    <DashCard h="420px">
       <HStack justify="space-between" mb={6}>
         <Text
           fontSize="sm"
@@ -266,7 +247,6 @@ export const TotalBpiHistoryChart = ({
             cursor={{ stroke: "#2D3748" }}
           />
 
-          {/* 単体時のみ表示される更新バー */}
           {!rivalData && (
             <Bar
               yAxisId="right"
@@ -276,7 +256,6 @@ export const TotalBpiHistoryChart = ({
             />
           )}
 
-          {/* 自分ライン */}
           <Line
             type="monotone"
             dataKey="myBpi"
@@ -293,7 +272,6 @@ export const TotalBpiHistoryChart = ({
             animationDuration={1000}
           />
 
-          {/* ライバルライン（存在時のみ） */}
           {rivalData && (
             <Line
               type="monotone"
@@ -317,6 +295,6 @@ export const TotalBpiHistoryChart = ({
           />
         </ComposedChart>
       </ResponsiveContainer>
-    </Box>
+    </DashCard>
   );
 };

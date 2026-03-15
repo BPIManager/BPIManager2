@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { checkUserAccess } from "@/middlewares/api/withApi";
+import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { logsRepo } from "@/lib/db/logs";
 import { formatRivalScore } from "../../following/scores/[songId]";
 
@@ -17,10 +17,7 @@ export default async function handler(
 
   try {
     const access = await checkUserAccess(req, String(userId));
-    if (!access.hasAccess)
-      return res
-        .status(access.error!.status)
-        .json({ message: access.error!.message });
+    if (!access.hasAccess) return rejectAccess(res, access);
 
     const result = await logsRepo.getRivalComparisonScores({
       viewerId: String(userId),

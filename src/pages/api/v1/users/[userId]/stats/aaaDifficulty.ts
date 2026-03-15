@@ -1,35 +1,28 @@
 import { BpiCalculator } from "@/lib/bpi";
 import { statsRepo } from "@/lib/db/stats";
-import { checkUserAccess } from "@/middlewares/api/withApi";
+import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
+import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const { userId, level, version } = req.query;
+  const { userId, version } = parseStatsQuery(req.query);
+  const level = parseInt(String(req.query.level ?? ""), 10);
 
-  if (!userId || !version || !level) {
-    return res.status(400).json({ error: "Missing parameters" });
+  if (!userId || !version || isNaN(level)) {
+    return res.status(400).json({ message: "Missing parameters" });
   }
 
   try {
-    const access = await checkUserAccess(req, userId as string);
-    if (!access.hasAccess) {
-      return res
-        .status(access.error!.status)
-        .json({ message: access.error!.message });
-    }
+    const access = await checkUserAccess(req, userId);
+    if (!access.hasAccess) return rejectAccess(res, access);
 
-    const rawData = await statsRepo.getAAATableData(
-      userId as string,
-      version as string,
-      parseInt(level as string),
-    );
+    const rawData = await statsRepo.getAAATableData(userId, version, level);
 
     const result = rawData.map((song) => {
       const maxScore = song.notes * 2;
-
       const aaaTarget = Math.ceil(maxScore * (8 / 9));
       const maxMinusTarget = Math.ceil(maxScore * (17 / 18));
 
@@ -39,12 +32,11 @@ export default async function handler(
         kaidenAvg: song.kaidenAvg,
         wrScore: song.wrScore,
         coef: song.coef as number,
-      } as any;
+      };
 
       const aaaTargetBpi = BpiCalculator.calc(aaaTarget, songParams) ?? -15;
       const maxMinusTargetBpi =
         BpiCalculator.calc(maxMinusTarget, songParams) ?? -15;
-
       const currentExScore = song.userExScore ?? 0;
       const currentBpi = song.userExScore
         ? BpiCalculator.calc(song.userExScore, songParams)
@@ -81,6 +73,6 @@ export default async function handler(
     return res.status(200).json(result);
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 }

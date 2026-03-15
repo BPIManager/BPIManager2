@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import dayjs from "@/lib/dayjs";
 import { logsRepo } from "@/lib/db/logs";
-import { checkUserAccess } from "@/middlewares/api/withApi";
+import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { mapToFlatSong } from "@/utils/logs/getMapFlatten";
 import { filterSongsServerSide } from "@/utils/songs/filter";
 import { sortSongs } from "@/utils/songs/sort";
@@ -52,11 +52,7 @@ export default async function handler(
 
   try {
     const access = await checkUserAccess(req, userId);
-    if (!access.hasAccess) {
-      return res
-        .status(access.error!.status)
-        .json({ message: access.error!.message });
-    }
+    if (!access.hasAccess) return rejectAccess(res, access);
 
     switch (req.method) {
       case "GET":

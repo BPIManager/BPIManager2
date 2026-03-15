@@ -1,7 +1,25 @@
-import { API_PREFIX } from "@/constants/apiEndpoints";
 import { useUser } from "@/contexts/users/UserContext";
-import { fetcher } from "@/utils/common/fetch";
-import useSWRInfinite from "swr/infinite";
+import { API_PREFIX } from "@/constants/apiEndpoints";
+import { useInfiniteList } from "@/services/swr/useInfinite";
+import { SongWithScore } from "@/types/songs/withScore";
+
+const PAGE_SIZE = 20;
+
+export interface RecommendedItem extends SongWithScore {
+  current: {
+    exScore: number | null;
+    bpi: number | null;
+    clearState: string | null;
+  };
+  diff: { exScore: number; bpi: number };
+  exDiff: number;
+  bpiDiff: number;
+}
+
+interface RecommendedPage {
+  weapons: { data: RecommendedItem[]; total: number };
+  potential: { data: RecommendedItem[]; total: number };
+}
 
 export const useRecommendedInfinite = (
   userId: string,
@@ -10,43 +28,51 @@ export const useRecommendedInfinite = (
   diffs: string[],
   type: "weapons" | "potential",
 ) => {
-  const PAGE_SIZE = 20;
   const { fbUser } = useUser();
 
-  const { data, size, setSize, isValidating, isLoading, error } =
-    useSWRInfinite(
-      (index) => {
-        if (!fbUser || !userId) return null;
+  const {
+    items,
+    size,
+    setSize,
+    isLoading,
+    isLoadingMore,
+    isReachingEnd,
+    isError,
+  } = useInfiniteList<RecommendedPage, RecommendedItem>(
+    (index) => {
+      if (!fbUser || !userId) return null;
 
-        const params = new URLSearchParams({
-          limit: PAGE_SIZE.toString(),
-          offset: (index * PAGE_SIZE).toString(),
-          version: version,
-        });
-        levels.forEach((l) => params.append("level", l));
-        diffs.forEach((d) => params.append("difficulty", d));
+      const params = new URLSearchParams({
+        limit: PAGE_SIZE.toString(),
+        offset: (index * PAGE_SIZE).toString(),
+        version,
+      });
+      levels.forEach((l) => params.append("level", l));
+      diffs.forEach((d) => params.append("difficulty", d));
 
-        const url = `${API_PREFIX}/users/${userId}/stats/recommended?${params.toString()}`;
-
-        return [url, fbUser];
+      return [
+        `${API_PREFIX}/users/${userId}/stats/recommended?${params.toString()}`,
+        fbUser,
+      ];
+    },
+    {
+      getItems: (page) => page?.[type]?.data ?? [],
+      isLastPage: (page) => {
+        const section = page?.[type];
+        if (!section) return true;
+        return section.data.length >= section.total;
       },
-      fetcher,
-      {
-        revalidateOnFocus: false,
-      },
-    );
-
-  const items = data ? data.flatMap((page) => page[type]?.data || []) : [];
-  const total = data?.[0]?.[type]?.total || 0;
-  const isReachingEnd = items.length >= total;
+      revalidateOnFocus: false,
+    },
+  );
 
   return {
     items,
     size,
     setSize,
     isReachingEnd,
-    isLoading: isLoading,
-    isLoadingMore: isLoading || (isValidating && size > 1),
-    isError: error,
+    isLoading,
+    isLoadingMore,
+    isError,
   };
 };

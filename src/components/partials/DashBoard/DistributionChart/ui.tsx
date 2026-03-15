@@ -1,6 +1,7 @@
 import { Box, Text, HStack, VStack, Center, Spinner } from "@chakra-ui/react";
 import { keyframes } from "@emotion/react";
 import { DistributionChartSkeleton } from "@/components/partials/DashBoard/DistributionChart/skeleton";
+import { DashCard } from "@/components/ui/dashcard";
 
 const bounceGrow = keyframes`
   0% { transform: scaleY(0); }
@@ -193,14 +194,7 @@ export const DistributionChart = ({
   );
 
   return (
-    <Box
-      p={5}
-      bg="#0d1117"
-      borderRadius="xl"
-      borderWidth="1px"
-      borderColor="whiteAlpha.100"
-      w="full"
-    >
+    <DashCard>
       <HStack justify="space-between" mb={6}>
         <Text
           fontSize="sm"
@@ -248,6 +242,6 @@ export const DistributionChart = ({
           />
         ))}
       </HStack>
-    </Box>
+    </DashCard>
   );
 };

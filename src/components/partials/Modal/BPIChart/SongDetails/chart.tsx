@@ -13,6 +13,7 @@ import {
   LabelList,
 } from "recharts";
 import { SongWithScore } from "@/types/songs/withScore";
+import { DashCard } from "@/components/ui/dashcard";
 
 interface BPIAnimatedChartProps {
   data: { label: string; count: number; bpi: number }[];
@@ -91,16 +92,7 @@ export const BPIChart = ({ data, maxScore }: BPIAnimatedChartProps) => {
   }, [maxScore, yMin]);
 
   return (
-    <Box
-      p={4}
-      h="400px"
-      bg="#0d1117"
-      borderWidth="1px"
-      borderColor="whiteAlpha.100"
-      borderLeft="none"
-      borderRight="none"
-      w="full"
-    >
+    <DashCard h="400px">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={chartData}>
           <XAxis
@@ -144,6 +136,6 @@ export const BPIChart = ({ data, maxScore }: BPIAnimatedChartProps) => {
           </Bar>
         </BarChart>
       </ResponsiveContainer>
-    </Box>
+    </DashCard>
   );
 };

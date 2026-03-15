@@ -13,6 +13,7 @@ import NextLink from "next/link";
 import { ProfileProvider } from "@/contexts/profile/ProfileContext";
 import { ModeSwitchBanner } from "../../Rivals/ModeSwitch/ui";
 import { useUser } from "@/contexts/users/UserContext";
+import { DashCard } from "@/components/ui/dashcard";
 
 interface UserProfileLayoutProps {
   userId: string;
@@ -89,16 +90,7 @@ export const UserProfileLayout = ({
                   variant="enclosed"
                   colorPalette="blue"
                 >
-                  <Tabs.List
-                    bg="#0d1117"
-                    borderRadius="lg"
-                    p={1}
-                    mb={6}
-                    border="1px solid"
-                    borderColor="whiteAlpha.100"
-                    width="full"
-                    display="flex"
-                  >
+                  <DashCard as={Tabs.List} p={1} mb={6}>
                     <Tabs.Trigger
                       value="overview"
                       fontSize="xs"
@@ -156,7 +148,7 @@ export const UserProfileLayout = ({
                         AAA達成表
                       </NextLink>
                     </Tabs.Trigger>
-                  </Tabs.List>
+                  </DashCard>
                   {children}
                 </Tabs.Root>
               </Box>

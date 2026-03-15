@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { checkUserAccess } from "@/middlewares/api/withApi";
+import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { latestVersion } from "@/constants/latestVersion";
 import { socialRepo } from "@/lib/db/social";
 
@@ -32,6 +32,7 @@ export default async function handler(
   const access = await checkUserAccess(req, userId as string);
   const viewerId = access.user?.userId;
   if (!viewerId) return res.status(401).json({ message: "Unauthorized" });
+  if (!access.hasAccess) return rejectAccess(res, access);
 
   try {
     const timeline = await socialRepo.getFollowedTimeline({

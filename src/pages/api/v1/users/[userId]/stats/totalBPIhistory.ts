@@ -1,7 +1,7 @@
-import { latestVersion } from "@/constants/latestVersion";
 import { BpiCalculator } from "@/lib/bpi";
 import { statsRepo } from "@/lib/db/stats";
-import { checkUserAccess } from "@/middlewares/api/withApi";
+import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
+import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 const DIFFICULTY_LABELS: Record<string, string> = {
@@ -14,37 +14,20 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const { userId, version = latestVersion, level, difficulty } = req.query;
-
-  const targetLevels = (
-    Array.isArray(level) ? level : level ? [level] : []
-  ).map((v) => parseInt(v, 10));
-  const targetDiffs = Array.isArray(difficulty)
-    ? difficulty
-    : difficulty
-      ? [difficulty]
-      : [];
+  const { userId, version, levels, difficulties } = parseStatsQuery(req.query);
 
   try {
-    const access = await checkUserAccess(req, userId as string);
-    if (!access.hasAccess)
-      return res
-        .status(access.error!.status)
-        .json({ message: access.error!.message });
+    const access = await checkUserAccess(req, userId);
+    if (!access.hasAccess) return rejectAccess(res, access);
+
     const [allLogs, totalSongs] = await Promise.all([
-      statsRepo.getScoreHistory(
-        userId as string,
-        version as string,
-        targetLevels,
-        targetDiffs,
-      ),
-      statsRepo.getTotalSongCount(targetLevels, targetDiffs),
+      statsRepo.getScoreHistory(userId, version, levels, difficulties),
+      statsRepo.getTotalSongCount(levels, difficulties),
     ]);
 
     if (allLogs.length === 0) return res.status(200).json([]);
 
     const logsByDate: Record<string, typeof allLogs> = {};
-
     allLogs.forEach((log) => {
       if (!log.songId || !log.lastPlayed) return;
       const date = new Date(log.lastPlayed).toISOString().split("T")[0];
@@ -62,8 +45,7 @@ export default async function handler(
       firstLogDate.getDate(),
     );
 
-    const lastLogRaw = allLogs[allLogs.length - 1].lastPlayed;
-    const lastLogDate = new Date(lastLogRaw);
+    const lastLogDate = new Date(allLogs[allLogs.length - 1].lastPlayed);
     const endDate = new Date(
       lastLogDate.getFullYear(),
       lastLogDate.getMonth(),
@@ -76,8 +58,8 @@ export default async function handler(
       d.setDate(d.getDate() + 1)
     ) {
       const dateStr = d.toISOString().split("T")[0];
-
       const updatedOnThisDay = logsByDate[dateStr] || [];
+
       updatedOnThisDay.forEach((log) => {
         if (log.songId == null) return;
         latestBpisBySong.set(log.songId, log.bpi ?? -15);

@@ -1,7 +1,6 @@
 import { db } from "@/lib/db";
 import { adminAuth } from "@/lib/firebase/admin";
-import type { NextApiRequest } from "next";
-import { timingSafeEqual } from "@/utils/common/timingSafeEqual";
+import type { NextApiRequest, NextApiResponse } from "next";
 
 export interface AccessResult {
   hasAccess: boolean;
@@ -58,4 +57,10 @@ export async function checkUserAccess(
       message: "You don't have enough permission to access this resource.",
     },
   };
+}
+
+export function rejectAccess(res: NextApiResponse, access: AccessResult) {
+  return res
+    .status(access.error!.status)
+    .json({ message: access.error!.message });
 }

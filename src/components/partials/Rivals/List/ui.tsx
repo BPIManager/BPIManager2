@@ -12,6 +12,7 @@ import { formatIIDXId } from "@/utils/common/formatIidxId";
 import { RadarSectionChart } from "../../DashBoard/Radar/ui";
 import { RivalSummaryResult } from "@/hooks/social/useRivalSummary";
 import { getBpiColorStyle } from "@/constants/bpiColor";
+import { DashCard } from "@/components/ui/dashcard";
 
 export const RivalSummaryCard = ({
   rival,
@@ -48,16 +49,12 @@ export const RivalSummaryCard = ({
       textAlign="left"
       style={{ textDecoration: "none" }}
     >
-      <HStack
+      <DashCard
         p={{ base: 3, md: 5 }}
-        bg="rgba(13, 17, 23, 0.8)"
-        borderRadius="2xl"
-        borderWidth="1px"
-        borderColor="whiteAlpha.100"
         cursor="pointer"
         gap={{ base: 3, md: 6 }}
         _hover={{
-          borderColor: "whiteAlpha.400",
+          borderColor: "whiteAlpha.200",
           bg: "rgba(20, 25, 35, 0.9)",
           transform: "translateY(-2px)",
         }}
@@ -65,7 +62,7 @@ export const RivalSummaryCard = ({
         justifyContent="space-between"
         position="relative"
         overflow="hidden"
-        align="stretch"
+        as={HStack}
       >
         <Box
           position="absolute"
@@ -175,7 +172,7 @@ export const RivalSummaryCard = ({
             isMini={true}
           />
         </Box>
-      </HStack>
+      </DashCard>
     </Box>
   );
 };

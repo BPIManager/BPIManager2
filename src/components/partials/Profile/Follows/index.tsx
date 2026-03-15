@@ -13,6 +13,7 @@ import { useFollowList } from "@/hooks/users/useFollowList";
 import { useRouter } from "next/router";
 import { LuUsers, LuUserCheck } from "react-icons/lu";
 import { UserFollowCard } from "./ui";
+import { DashCard } from "@/components/ui/dashcard";
 
 export default function FollowPage({
   type,
@@ -34,13 +35,7 @@ export default function FollowPage({
 
   return (
     <UserProfileLayout userId={userId} currentTab="">
-      <Box
-        bg="#0d1117"
-        borderRadius="2xl"
-        border="1px solid"
-        borderColor="whiteAlpha.100"
-        p={6}
-      >
+      <DashCard>
         <Tabs.Root
           value={type}
           onValueChange={handleTabChange}
@@ -110,7 +105,7 @@ export default function FollowPage({
             )}
           </Tabs.Content>
         </Tabs.Root>
-      </Box>
+      </DashCard>
     </UserProfileLayout>
   );
 }

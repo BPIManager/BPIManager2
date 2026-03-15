@@ -1,4 +1,5 @@
 import { logsRepo } from "@/lib/db/logs";
+import { rejectAccess } from "@/middlewares/api/withApi";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 import { sortSongs } from "@/utils/songs/sort";
 import { NextApiRequest, NextApiResponse } from "next";
@@ -20,11 +21,9 @@ export default async function handler(
   try {
     const access = await checkProfileAccess(req, String(userId));
     const viewerId = access.viewerId;
-    if (!access.hasAccess) {
-      return res
-        .status(access.error!.status)
-        .json({ message: access.error!.message });
-    }
+
+    if (!access.hasAccess) return rejectAccess(res, access);
+
     const rawResults = await logsRepo.getRivalComparisonScores({
       viewerId: String(viewerId),
       rivalId: String(rivalId),

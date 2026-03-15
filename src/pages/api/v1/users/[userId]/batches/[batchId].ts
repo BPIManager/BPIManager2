@@ -4,6 +4,7 @@ import { mapToLogNested } from "@/utils/logs/getMapNested";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createOvertakenMap } from "./[batchId]/scores";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
+import { rejectAccess } from "@/middlewares/api/withApi";
 
 export default async function handler(
   req: NextApiRequest,
@@ -30,11 +31,7 @@ export default async function handler(
 
   try {
     const access = await checkProfileAccess(req, uid);
-    if (!access.hasAccess) {
-      return res
-        .status(access.error!.status)
-        .json({ message: access.error!.message });
-    }
+    if (!access.hasAccess) return rejectAccess(res, access);
 
     const targetBatch = await logsRepo.findBatchById(bid);
     if (!targetBatch) {

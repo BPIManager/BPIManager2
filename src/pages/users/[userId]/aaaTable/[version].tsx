@@ -9,6 +9,7 @@ import { AAATableContent } from "@/components/partials/Metrics/AAATable/content"
 import { latestVersion } from "@/constants/latestVersion";
 import { useStaticProfile } from "@/contexts/profile/ProfileContext";
 import { ProfileMeta } from "@/components/partials/Profile/Meta/ui";
+import { DashCard } from "@/components/ui/dashcard";
 
 export default function UserAAATablePage() {
   const router = useRouter();
@@ -40,15 +41,9 @@ export default function UserAAATablePage() {
   return (
     <UserProfileLayout userId={uid} currentTab="aaaTable">
       <ProfileMeta title="AAA達成難易度表" />
-      <Box
-        bg="#0d1117"
-        borderRadius="2xl"
-        border="1px solid"
-        borderColor="whiteAlpha.100"
-        p={6}
-      >
+      <DashCard>
         <AAATableContent userId={uid} defaultVersion={v} />
-      </Box>
+      </DashCard>
     </UserProfileLayout>
   );
 }

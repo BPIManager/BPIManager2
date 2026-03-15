@@ -2,6 +2,7 @@ import { useState } from "react";
 import { SimpleGrid, Box, Text, Icon, VStack, Flex } from "@chakra-ui/react";
 import { PlusCircle, HelpCircle, MusicIcon } from "lucide-react";
 import { Tooltip } from "@/components/ui/tooltip";
+import { DashCard } from "@/components/ui/dashcard";
 
 export const LabelWithTooltip = ({
   label,
@@ -90,15 +91,7 @@ export const BatchSummaryCards = ({
   return (
     <SimpleGrid columns={{ base: 3, md: 3 }} gap={2}>
       {stats.map((stat, i) => (
-        <Box
-          p={{ base: 3, md: 5 }}
-          bg="#0d1117"
-          borderRadius="xl"
-          borderWidth="1px"
-          borderColor="whiteAlpha.100"
-          w="full"
-          key={i}
-        >
+        <DashCard p={{ base: 3, md: 5 }} key={i}>
           <VStack align="start" gap={1}>
             <LabelWithTooltip
               isSharing={isSharing}
@@ -114,7 +107,7 @@ export const BatchSummaryCards = ({
               {stat.value}
             </Text>
           </VStack>
-        </Box>
+        </DashCard>
       ))}
     </SimpleGrid>
   );

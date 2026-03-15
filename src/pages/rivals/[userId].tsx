@@ -13,6 +13,7 @@ import { DistributionSection } from "@/components/partials/DashBoard/Distributio
 import { RankDistributionSection } from "@/components/partials/DashBoard/DJRankDistribution/ui";
 import { BpiDistributionSection } from "@/components/partials/DashBoard/BPIDistribution/ui";
 import { BpiHistorySection } from "@/components/partials/DashBoard/TotalBPIHistory/ui";
+import { DashCard } from "@/components/ui/dashcard";
 
 function RivalOverviewTab({
   myUserId,
@@ -103,20 +104,14 @@ export default function RivalsUserPage({
       </Tabs.Content>
 
       <Tabs.Content value="scores" p={0}>
-        <Box
-          bg="#0d1117"
-          borderRadius="2xl"
-          border="1px solid"
-          borderColor="whiteAlpha.100"
-          p={4}
-        >
+        <DashCard>
           <RivalSongsTable
             myUserId={myUserId}
             rivalUserId={rivalUserId}
             rivalName={rivalName}
             version={version}
           />
-        </Box>
+        </DashCard>
       </Tabs.Content>
     </RivalProfileLayout>
   );

@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { checkUserAccess } from "@/middlewares/api/withApi";
+import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { latestVersion } from "@/constants/latestVersion";
 import { calculateRadar } from "@/lib/radar/calculator";
 import { statsRepo } from "@/lib/db/stats";

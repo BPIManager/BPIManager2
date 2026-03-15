@@ -1,3 +1,4 @@
+import { DashCard } from "@/components/ui/dashcard";
 import {
   Box,
   SimpleGrid,
@@ -9,14 +10,7 @@ import {
 
 export const RadarSkeleton = () => {
   return (
-    <Box
-      p={5}
-      bg="#0d1117"
-      borderRadius="xl"
-      borderWidth="1px"
-      borderColor="whiteAlpha.100"
-      w="full"
-    >
+    <DashCard>
       <Skeleton width="100px" height="14px" mb={4} />
 
       <SimpleGrid columns={{ base: 1, md: 2 }} gap={8} alignItems="center">
@@ -63,6 +57,6 @@ export const RadarSkeleton = () => {
           ))}
         </VStack>
       </SimpleGrid>
-    </Box>
+    </DashCard>
   );
 };

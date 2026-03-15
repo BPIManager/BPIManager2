@@ -7,6 +7,7 @@ import { RadarCategory } from "@/types/stats/radar";
 import { useMemo, useState } from "react";
 import { RadarCategorySongsDialog } from "./dialog";
 import { getBpiColorStyle } from "@/constants/bpiColor";
+import { DashCard } from "@/components/ui/dashcard";
 
 interface RadarSectionProps {
   userId?: string;
@@ -48,14 +49,7 @@ export const RadarSection = ({
     : undefined;
 
   return (
-    <Box
-      p={5}
-      bg="#0d1117"
-      borderRadius="xl"
-      borderWidth="1px"
-      borderColor="whiteAlpha.100"
-      w="full"
-    >
+    <DashCard>
       <HStack justify="space-between" mb={4}>
         <Text fontSize="sm" fontWeight="bold" color="gray.400">
           BPIレーダー
@@ -141,6 +135,6 @@ export const RadarSection = ({
           onClose={() => setSelectedCat(null)}
         />
       )}
-    </Box>
+    </DashCard>
   );
 };

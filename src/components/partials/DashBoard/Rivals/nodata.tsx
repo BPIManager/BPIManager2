@@ -1,18 +1,11 @@
+import { DashCard } from "@/components/ui/dashcard";
 import { VStack, Text, Button, Icon } from "@chakra-ui/react";
 import { UserPlus } from "lucide-react";
 import Link from "next/link";
 
 export const RivalWinLossSummaryNotFound = () => {
   return (
-    <VStack
-      p={8}
-      gap={4}
-      bg="#0d1117"
-      borderRadius="xl"
-      borderWidth="1px"
-      borderColor="whiteAlpha.100"
-      textAlign="center"
-    >
+    <DashCard as={VStack} p={8}>
       <Icon as={UserPlus} boxSize={10} color="gray.500" />
       <VStack gap={1}>
         <Text fontWeight="bold" color="white">
@@ -32,6 +25,6 @@ export const RivalWinLossSummaryNotFound = () => {
       >
         <Link href="/rivals/search">実力が近いユーザーを見る</Link>
       </Button>
-    </VStack>
+    </DashCard>
   );
 };

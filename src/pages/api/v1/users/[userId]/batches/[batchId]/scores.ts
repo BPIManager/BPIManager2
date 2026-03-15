@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { logsRepo } from "@/lib/db/logs";
 import { statsRepo } from "@/lib/db/stats";
-import { checkUserAccess } from "@/middlewares/api/withApi";
+import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { mapToLogNested } from "@/utils/logs/getMapNested";
 import { calculateTotalBpi } from "@/services/logs/calculateTotalBpi";
 import { OvertakenMap } from "@/types/logs/overtaken";
@@ -36,11 +36,7 @@ export default async function handler(
 
   try {
     const access = await checkProfileAccess(req, uid);
-    if (!access.hasAccess) {
-      return res
-        .status(access.error!.status)
-        .json({ message: access.error!.message });
-    }
+    if (!access.hasAccess) return rejectAccess(res, access);
 
     const basis: "lastPlayed" | "createdAt" =
       groupedBy === "lastPlayed" ? "lastPlayed" : "createdAt";

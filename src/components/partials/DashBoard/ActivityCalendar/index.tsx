@@ -17,6 +17,7 @@ import {
   PopoverRoot,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { DashCard } from "@/components/ui/dashcard";
 
 interface ActivityData {
   date: string;
@@ -77,14 +78,7 @@ export const ActivityCalendar = ({ data, userId, version }: Props) => {
   }, [calendarDays]);
 
   return (
-    <Box
-      p={5}
-      bg="#0d1117"
-      borderRadius="xl"
-      borderWidth="1px"
-      borderColor="whiteAlpha.100"
-      w="full"
-    >
+    <DashCard>
       <Text fontSize="sm" fontWeight="bold" mb={4} color="gray.400">
         最近の更新
       </Text>
@@ -218,6 +212,6 @@ export const ActivityCalendar = ({ data, userId, version }: Props) => {
         ))}
         <Text>More</Text>
       </HStack>
-    </Box>
+    </DashCard>
   );
 };

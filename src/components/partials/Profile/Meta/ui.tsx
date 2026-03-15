@@ -31,7 +31,6 @@ export const ProfileMeta = ({
           .replace("$iidxid$", formatIIDXId(profile.iidxId || "")) ||
         defaultDescription
       }
-      noIndex={noIndex}
       ogImage={ogImage}
       ogType="article"
     />

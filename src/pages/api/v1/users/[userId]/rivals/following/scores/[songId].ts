@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { checkUserAccess } from "@/middlewares/api/withApi";
+import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { socialRepo } from "@/lib/db/social";
 
 export default async function handler(
@@ -16,10 +16,7 @@ export default async function handler(
 
   try {
     const access = await checkUserAccess(req, String(userId));
-    if (!access.hasAccess)
-      return res
-        .status(access.error!.status)
-        .json({ message: access.error!.message });
+    if (!access.hasAccess) return rejectAccess(res, access);
 
     const rivalsScores = await socialRepo.getRivalScoresForSong({
       viewerId: String(userId),

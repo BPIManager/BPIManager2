@@ -14,6 +14,7 @@ import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { SongWithScore } from "@/types/songs/withScore";
 import { SongDetailView } from "../../Modal/BPIChart/SongDetails/ui";
 import { NearLoseList } from "./NearLose";
+import { DashCard } from "@/components/ui/dashcard";
 
 const InfiniteList = ({
   userId,
@@ -82,14 +83,7 @@ export const RankingTabsCard = ({ userId }: { userId: string }) => {
   };
 
   return (
-    <Box
-      bg="#0d1117"
-      borderRadius="xl"
-      borderWidth="1px"
-      borderColor="whiteAlpha.100"
-      overflow="hidden"
-      display="flex"
-    >
+    <DashCard overflow="hidden" display="flex">
       <Tabs.Root
         value={tab}
         onValueChange={(e) => setTab(e.value)}
@@ -165,6 +159,6 @@ export const RankingTabsCard = ({ userId }: { userId: string }) => {
           defaultTab={tab === "nearLose" ? "rivals" : "stats"}
         />
       )}
-    </Box>
+    </DashCard>
   );
 };
