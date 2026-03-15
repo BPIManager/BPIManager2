@@ -1,8 +1,5 @@
-import useSWR from "swr";
-import { fetcher } from "@/utils/common/fetch";
-import { useUser } from "@/contexts/users/UserContext";
+import { useStatsData } from "@/services/swr/fetchStats";
 import { RadarCategory, RadarCategoryResult } from "@/types/stats/radar";
-import { API_PREFIX } from "@/constants/apiEndpoints";
 
 export type RadarResponse = Record<RadarCategory, RadarCategoryResult>;
 
@@ -12,33 +9,15 @@ export const useRadar = (
   difficulties: string[],
   version: string,
 ) => {
-  const { fbUser } = useUser();
-
-  const params = new URLSearchParams();
-  params.append("version", version);
-  levels.forEach((l) => params.append("level", l));
-  difficulties.forEach((d) => params.append("difficulty", d));
-
-  const shouldFetch = userId && version;
-
-  const { data, error, isLoading, mutate } = useSWR<RadarResponse>(
-    shouldFetch
-      ? [
-          `${API_PREFIX}/users/${userId}/stats/radar?${params.toString()}`,
-          fbUser,
-        ]
-      : null,
-    fetcher,
+  const { data, error, isLoading, mutate } = useStatsData<RadarResponse>(
+    "radar",
+    { userId, version, levels, difficulties },
     {
+      requireLevels: false,
       revalidateOnFocus: false,
       shouldRetryOnError: false,
     },
   );
 
-  return {
-    radar: data,
-    isLoading,
-    isError: error,
-    mutate,
-  };
+  return { radar: data, isLoading, isError: error, mutate };
 };

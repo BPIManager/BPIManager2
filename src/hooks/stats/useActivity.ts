@@ -1,7 +1,4 @@
-import { API_PREFIX } from "@/constants/apiEndpoints";
-import { useUser } from "@/contexts/users/UserContext";
-import { fetcher } from "@/utils/common/fetch";
-import useSWR from "swr";
+import { useStatsData } from "@/services/swr/fetchStats";
 
 export const useActivity = (
   userId: string | undefined,
@@ -9,22 +6,9 @@ export const useActivity = (
   difficulties: string[],
   version: string,
 ) => {
-  const params = new URLSearchParams();
-  params.append("version", version);
-  levels.forEach((l) => params.append("level", l));
-  difficulties.forEach((d) => params.append("difficulty", d));
-
-  const shouldFetch = userId && (levels.length > 0 || difficulties.length > 0);
-  const { fbUser } = useUser();
-
-  const { data, isLoading } = useSWR(
-    shouldFetch
-      ? [
-          `${API_PREFIX}/users/${userId}/stats/activity?${params.toString()}`,
-          fbUser,
-        ]
-      : null,
-    fetcher,
+  const { data, isLoading } = useStatsData<{ date: string; count: number }[]>(
+    "activity",
+    { userId, version, levels, difficulties },
   );
 
   return { activity: data, isLoading };

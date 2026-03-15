@@ -26,7 +26,7 @@ export const useRecommendedInfinite = (
         levels.forEach((l) => params.append("level", l));
         diffs.forEach((d) => params.append("difficulty", d));
 
-        const url = `${API_PREFIX}/users/${userId}/stats//recommended?${params.toString()}`;
+        const url = `${API_PREFIX}/users/${userId}/stats/recommended?${params.toString()}`;
 
         return [url, fbUser];
       },
