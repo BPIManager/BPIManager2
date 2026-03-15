@@ -190,7 +190,7 @@ export const ActivityCalendar = ({ data, userId, version }: Props) => {
                           fontSize="10px"
                         >
                           <NextLink
-                            href={`/users/${userId}/logs/${version}/summary/${day.date}`}
+                            href={`/users/${userId}/logs/${version}/summary/${day.date}?groupedBy=lastPlayed`}
                           >
                             サマリを表示
                           </NextLink>

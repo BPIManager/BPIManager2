@@ -33,6 +33,7 @@ export const LogsDetailContent = ({
   isPublicPage,
 }: LogsDetailViewProps) => {
   const router = useRouter();
+  const groupedBy = (router.query.groupedBy as string) || "createdAt";
   const {
     details,
     summary,
@@ -40,7 +41,7 @@ export const LogsDetailContent = ({
     isError,
 
     mutate,
-  } = useLogsDetail(userId, version, { batchId, date });
+  } = useLogsDetail(userId, version, { batchId, date, groupedBy });
   const isLoading = isl || (!details && !isError);
 
   let summaryRef = useRef<HTMLDivElement>(null);

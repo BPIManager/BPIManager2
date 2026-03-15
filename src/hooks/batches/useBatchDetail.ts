@@ -70,21 +70,26 @@ export interface LogsDetailResponse extends BatchDetailResponse {
 export const useLogsDetail = (
   userId: string | undefined,
   version: string | undefined,
-  { batchId, date }: { batchId?: string; date?: string },
+  {
+    batchId,
+    date,
+    groupedBy,
+  }: { batchId?: string; date?: string; groupedBy?: string },
 ) => {
+  const groupParam = groupedBy ? `&groupedBy=${groupedBy}` : "";
+
   const endpoint = batchId
-    ? `${API_PREFIX}/users/${userId}/batches/${batchId}?version=${version}`
+    ? `${API_PREFIX}/users/${userId}/batches/${batchId}?version=${version}${groupParam}`
     : date
-      ? `${API_PREFIX}/users/${userId}/batches/${date}/scores?version=${version}`
+      ? `${API_PREFIX}/users/${userId}/batches/${date}/scores?version=${version}${groupParam}`
       : null;
+
   const { fbUser } = useUser();
 
   const { data, error, isLoading, mutate } = useSWR<LogsDetailResponse>(
     endpoint ? [endpoint, fbUser] : null,
     fetcher,
-    {
-      revalidateOnFocus: false,
-    },
+    { revalidateOnFocus: false },
   );
 
   const summary = data

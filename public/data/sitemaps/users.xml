@@ -161,11 +161,6 @@
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://bpi2.poyashi.me/users/J6y1mlJFOAeKDkZa9DasKNKmvAp2</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  <url>
     <loc>https://bpi2.poyashi.me/users/JGSGyg9XGKZ8dbQSGs4cuSDkpkr1</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -481,6 +476,11 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://bpi2.poyashi.me/users/6tVOGpwxTaXx1RANWlqy1djv3JI2</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://bpi2.poyashi.me/users/74oc1ArvRugzojydVAxYJHRnrt12</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -691,6 +691,11 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://bpi2.poyashi.me/users/c9vj7XuA1JZBHNEbXeLvvsxx0bh1</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://bpi2.poyashi.me/users/CcK8llatQnRPBI11GjN8qkaJC4m2</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -812,6 +817,11 @@
   </url>
   <url>
     <loc>https://bpi2.poyashi.me/users/EgU67EvHniQK7U36w0KvUIrKZBz2</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://bpi2.poyashi.me/users/eH5QmQhW1ePfHkAXpuH9aKdVQCG2</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -1017,6 +1027,11 @@
   </url>
   <url>
     <loc>https://bpi2.poyashi.me/users/J2svz46mclTRsvx4VlOhC6xFuYj2</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://bpi2.poyashi.me/users/J6y1mlJFOAeKDkZa9DasKNKmvAp2</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>

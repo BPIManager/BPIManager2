@@ -1,3 +1,4 @@
+import { BpiCalculator } from "@/lib/bpi";
 import dayjs from "@/lib/dayjs";
 import { db } from "@/lib/db";
 import { sql } from "kysely";
@@ -20,37 +21,52 @@ class LogRepository {
   async getRangeNavigation(
     userId: string,
     version: string,
-    range: { start: Date; end: Date; unit: "day" | "week" | "month" },
+    range: { start: Date; end: Date; unit: string },
+    groupedBy: "createdAt" | "lastPlayed" = "createdAt",
   ) {
-    const { start, end, unit } = range;
+    const { start, end } = range;
+    const isLastPlayed = groupedBy === "lastPlayed";
+    const dateColumn = isLastPlayed ? "lastPlayed" : "createdAt";
+    const table = isLastPlayed ? "scores" : "logs";
 
-    const [prevRangeLog, nextRangeLog] = await Promise.all([
+    const [prevRow, nextRow] = await Promise.all([
       db
-        .selectFrom("logs")
-        .select(["createdAt"])
+        .selectFrom(table as any)
+        .select([dateColumn as any])
         .where("userId", "=", userId)
         .where("version", "=", version)
-        .where("createdAt", "<", start)
-        .orderBy("createdAt", "desc")
+        .where(dateColumn as any, "<", start)
+        .orderBy(dateColumn as any, "desc")
         .executeTakeFirst(),
       db
-        .selectFrom("logs")
-        .select(["createdAt"])
+        .selectFrom(table as any)
+        .select([dateColumn as any])
         .where("userId", "=", userId)
         .where("version", "=", version)
-        .where("createdAt", ">", end)
-        .orderBy("createdAt", "asc")
+        .where(dateColumn as any, ">", end)
+        .orderBy(dateColumn as any, "asc")
         .executeTakeFirst(),
     ]);
 
+    const format = (d: any) =>
+      d ? dayjs.utc(d[dateColumn]).tz().format("YYYY-MM-DD") : null;
+
     return {
-      prevDate: prevRangeLog
-        ? dayjs.utc(prevRangeLog.createdAt).tz().format("YYYY-MM-DD")
-        : null,
-      nextDate: nextRangeLog
-        ? dayjs.utc(nextRangeLog.createdAt).tz().format("YYYY-MM-DD")
-        : null,
+      prevDate: format(prevRow),
+      nextDate: format(nextRow),
     };
+  }
+
+  async getScoresByLastPlayedRange(
+    userId: string,
+    version: string,
+    range: { start: Date; end: Date },
+  ) {
+    return await this.getScoresWithDetails(userId, version, {
+      targetTime: range.end,
+      comparisonTime: range.start,
+      onlyLastPlayedInRange: range,
+    });
   }
 
   async getBatchNavigation(
@@ -121,8 +137,12 @@ class LogRepository {
 
   /**
    * スコア情報を取得します。比較対象（過去スコア）や最新定義（SongDef）を結合します。
+   * @param userId ユーザーID
+   * @param version バージョン
    * @param options.batchIds 指定したバッチに含まれるスコアのみ取得する場合
    * @param options.targetTime 特定時点（スナップショット）のスコアを取得する場合
+   * @param options.comparisonTime 比較対象とする過去時点（この時刻より前の最新スコアを prev として取得）
+   * @param options.onlyLastPlayedInRange 最終プレイ日時（lastPlayed）が指定範囲内のスコアを取得する場合
    */
   async getScoresWithDetails(
     userId: string,
@@ -131,9 +151,11 @@ class LogRepository {
       batchIds?: string[];
       targetTime?: Date;
       comparisonTime?: Date;
+      onlyLastPlayedInRange?: { start: Date; end: Date };
     },
   ) {
-    const { batchIds, targetTime, comparisonTime } = options;
+    const { batchIds, targetTime, comparisonTime, onlyLastPlayedInRange } =
+      options;
 
     let query = db
       .selectFrom("scores as current")
@@ -166,6 +188,7 @@ class LogRepository {
               "difficulty as l_defDiff",
               (eb) => eb.fn.max("defId").as("maxDefId"),
             ]);
+
           if (targetTime) {
             sub = sub.where("updatedAt", "<=", targetTime);
           } else {
@@ -201,7 +224,7 @@ class LogRepository {
         "sd.coef",
       ]);
 
-    if (batchIds) {
+    if (batchIds && batchIds.length > 0) {
       query = query
         .where("current.batchId", "in", batchIds)
         .where("current.logId", "in", (qb) =>
@@ -210,6 +233,22 @@ class LogRepository {
             .select((eb) => eb.fn.max("logId").as("logId"))
             .where("batchId", "in", batchIds)
             .groupBy("songId"),
+        );
+    } else if (onlyLastPlayedInRange) {
+      query = query
+        .where("current.userId", "=", userId)
+        .where("current.version", "=", version)
+        .where("current.lastPlayed", ">=", onlyLastPlayedInRange.start)
+        .where("current.lastPlayed", "<=", onlyLastPlayedInRange.end)
+        .where("current.logId", "in", (qb) =>
+          qb
+            .selectFrom("scores as inner_sc")
+            .select((eb) => eb.fn.max("inner_sc.logId").as("maxId"))
+            .where("inner_sc.userId", "=", userId)
+            .where("inner_sc.version", "=", version)
+            .where("inner_sc.lastPlayed", ">=", onlyLastPlayedInRange.start)
+            .where("inner_sc.lastPlayed", "<=", onlyLastPlayedInRange.end)
+            .groupBy("inner_sc.songId"),
         );
     } else if (targetTime) {
       query = query
@@ -231,11 +270,10 @@ class LogRepository {
         .whereRef("current.logId", "=", "latest_sc.maxLogId");
     }
 
-    query = query.where((eb) =>
-      eb.or([eb("s.deletedAt", "is", null), eb("s.deletedAt", ">", version)]),
-    );
-
     return await query
+      .where((eb) =>
+        eb.or([eb("s.deletedAt", "is", null), eb("s.deletedAt", ">", version)]),
+      )
       .orderBy("s.difficultyLevel", "desc")
       .orderBy("s.title", "asc")
       .execute();
@@ -469,10 +507,40 @@ class LogRepository {
       .execute();
   }
 
+  async getScoreHistory(
+    userId: string,
+    version: string,
+    levels: number[],
+    difficulties: string[],
+  ) {
+    let query = db
+      .selectFrom("scores as s")
+      .innerJoin("songs as m", "s.songId", "m.songId")
+      .select([
+        "s.logId",
+        "s.songId",
+        "s.bpi",
+        "s.lastPlayed",
+        "m.title",
+        "m.difficulty",
+        "m.difficultyLevel",
+      ])
+      .where("s.userId", "=", userId)
+      .where("s.version", "=", version)
+      .where("s.songId", "is not", null);
+
+    if (levels.length > 0)
+      query = query.where("m.difficultyLevel", "in", levels);
+    if (difficulties.length > 0)
+      query = query.where("m.difficulty", "in", difficulties);
+
+    return await query.orderBy("s.lastPlayed", "asc").execute();
+  }
+
   /**
-   * ユーザーのタイムラインログ（BPI推移 + 各バッチのTOPnスコア）を取得
+   * ユーザーのタイムラインログ（BPI推移 + 各バッチのTOPnスコア）を取得 / バッチID基準
    */
-  async getTimelineLogs(params: {
+  async getTimelineByBatches(params: {
     userId: string;
     version: string;
     topN?: number;
@@ -480,6 +548,7 @@ class LogRepository {
     until?: Date;
   }) {
     const { userId, version, topN = 5, since, until } = params;
+
     const rows = await db
       .selectFrom((qb) => {
         let base = qb

@@ -13,14 +13,30 @@ import Link from "next/link";
 import { UpdateLog } from "@/hooks/batches/useBatchesList";
 import dayjs from "@/lib/dayjs";
 import { useRouter } from "next/router";
+import { useMemo } from "react";
 
 export const LogsCard = ({ log }: { log: UpdateLog }) => {
   const router = useRouter();
   const userId = router.query.userId as string;
+  const groupedBy = (router.query.groupedBy as string) || "createdAt";
   const isPositive = log.diff >= 0;
 
+  const linkHref = useMemo(() => {
+    const basePath = `/users/${userId}/logs/${log.version}`;
+
+    const targetPath =
+      groupedBy === "lastPlayed"
+        ? `${basePath}/summary/${log.batchId}`
+        : `${basePath}/${log.batchId}`;
+
+    return {
+      pathname: targetPath,
+      query: { groupedBy },
+    };
+  }, [userId, log.version, log.batchId, groupedBy]);
+
   return (
-    <Link href={`/users/${userId}/logs/${log.version}/${log.batchId}`}>
+    <Link href={linkHref}>
       <Card.Root
         mb={4}
         variant="elevated"

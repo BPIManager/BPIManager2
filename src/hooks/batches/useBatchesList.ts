@@ -20,17 +20,20 @@ export interface UpdateLog {
   topScores: TopScore[];
 }
 
-export const useBatchesList = (userId: string | undefined, version: string) => {
+export const useBatchesList = (
+  userId: string | undefined,
+  version: string,
+  groupedBy: string,
+) => {
   const { fbUser } = useUser();
   const { data, error, isLoading } = useSWR<UpdateLog[]>(
     userId
-      ? [`${API_PREFIX}/users/${userId}/batches?version=${version}`, fbUser]
+      ? [
+          `${API_PREFIX}/users/${userId}/batches?version=${version}&groupedBy=${groupedBy}`,
+          fbUser,
+        ]
       : null,
     fetcher,
   );
-  return {
-    logs: data || [],
-    isLoading,
-    isError: error,
-  };
+  return { logs: data || [], isLoading, isError: error };
 };

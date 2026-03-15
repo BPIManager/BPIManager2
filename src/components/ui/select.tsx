@@ -175,11 +175,11 @@ export const FormSelect = ({
       variant={variant}
     >
       <SelectTrigger>
-        <SelectValueText p={2} placeholder={placeholder} />
+        <SelectValueText placeholder={placeholder} px={2} />
       </SelectTrigger>
       <SelectContent portalled={false} zIndex="popover">
         {collection.items.map((item) => (
-          <SelectItem p={2} item={item} key={item.value}>
+          <SelectItem item={item} key={item.value} p={2}>
             {item.label}
           </SelectItem>
         ))}

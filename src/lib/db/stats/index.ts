@@ -64,9 +64,6 @@ class StatsRepository {
       .execute();
   }
 
-  /**
-   * 指定ユーザー・バージョンのアクティビティデータを取得
-   */
   async getActivityData(
     userId: string,
     version: string,
@@ -77,11 +74,17 @@ class StatsRepository {
       .selectFrom("scores as s")
       .innerJoin("songs as m", "s.songId", "m.songId")
       .select([
-        sql<string>`DATE(s.lastPlayed)`.as("date"),
-        sql<number>`COUNT(s.logId)`.as("count"),
+        sql<string>`DATE(CONVERT_TZ(s.lastPlayed, '+00:00', '+09:00'))`.as(
+          "date",
+        ),
+        sql<number>`COUNT(DISTINCT s.songId)`.as("count"),
       ])
       .where("s.userId", "=", userId)
       .where("s.version", "=", version);
+
+    query = query.where((eb) =>
+      eb.or([eb("m.deletedAt", "is", null), eb("m.deletedAt", ">", version)]),
+    );
 
     if (levels && levels.length > 0) {
       query = query.where("m.difficultyLevel", "in", levels);
@@ -91,7 +94,7 @@ class StatsRepository {
     }
 
     return await query
-      .groupBy(sql`DATE(s.lastPlayed)`)
+      .groupBy(sql`date`)
       .orderBy("date", "asc")
       .execute();
   }
@@ -174,6 +177,7 @@ class StatsRepository {
         "s.lastPlayed",
         "m.title",
         "m.difficulty",
+        "m.difficultyLevel",
       ])
       .where("s.userId", "=", userId)
       .where("s.version", "=", version)

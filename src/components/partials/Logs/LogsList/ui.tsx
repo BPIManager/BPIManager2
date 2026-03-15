@@ -20,6 +20,7 @@ import dayjs from "@/lib/dayjs";
 interface Props {
   userId: string | undefined;
   version: string;
+  groupedBy: string;
 }
 interface GroupedLog {
   date: string;
@@ -30,9 +31,13 @@ interface GroupedLog {
 
 const PAGE_SIZE = 10;
 
-export const LogsList = ({ userId, version }: Props) => {
+export const LogsList = ({ userId, version, groupedBy }: Props) => {
   const [page, setPage] = useState(1);
-  const { logs, isLoading, isError } = useBatchesList(userId, version);
+  const { logs, isLoading, isError } = useBatchesList(
+    userId,
+    version,
+    groupedBy,
+  );
 
   const groupedLogs = useMemo(() => {
     if (!logs) return [];
@@ -147,7 +152,10 @@ export const LogsList = ({ userId, version }: Props) => {
                       </VStack>
                     </HStack>
                     <Link
-                      href={`/users/${userId}/logs/${version}/summary/${group.date}`}
+                      href={{
+                        pathname: `/users/${userId}/logs/${version}/summary/${group.date}`,
+                        query: { groupedBy },
+                      }}
                       passHref
                     >
                       <Button

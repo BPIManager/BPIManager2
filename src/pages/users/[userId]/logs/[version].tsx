@@ -1,7 +1,6 @@
 import { useRouter } from "next/router";
 import { useUser } from "@/contexts/users/UserContext";
 import { LogsList } from "@/components/partials/Logs/LogsList/ui";
-import { LogVersionSelector } from "@/components/partials/Logs/VersionSelector/ui";
 import { Box, VStack } from "@chakra-ui/react";
 import { Meta } from "@/components/partials/Head";
 import { PageHeader, PageContainer } from "@/components/partials/Header";
@@ -10,14 +9,16 @@ import { latestVersion } from "@/constants/latestVersion";
 import { UserProfileLayout } from "@/components/partials/Profile/Layout/layout";
 import { ProfileMeta } from "@/components/partials/Profile/Meta/ui";
 import { getVersionNameFromNumber, versionTitles } from "@/constants/versions";
+import { LogFilterSection } from "@/components/partials/Logs/VersionSelector/ui";
 
 export default function LogsPage() {
   const router = useRouter();
-  const { fbUser, user, isLoading: isUserLoading } = useUser();
+  const { user, isLoading: isUserLoading } = useUser();
 
-  const { userId, version } = router.query;
+  const { userId, version, groupedBy } = router.query;
   const uid = (userId as string) || "";
   const v = (version as string) || latestVersion;
+  const g = (groupedBy as string) || "createdAt";
   const isOwnedByFbId = !isUserLoading && user?.userId === userId;
 
   const logsContent = (
@@ -29,9 +30,9 @@ export default function LogsPage() {
         borderColor="whiteAlpha.100"
         p={isOwnedByFbId ? 0 : 6}
       >
-        <LogVersionSelector version={v} />
+        <LogFilterSection version={v} groupedBy={g} />
         <Box mt={6}>
-          <LogsList userId={uid} version={v} />
+          <LogsList userId={uid} version={v} groupedBy={g} />
         </Box>
       </Box>
     </VStack>
