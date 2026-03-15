@@ -39,7 +39,7 @@ export const LogsDetailContent = ({
     summary,
     isLoading: isl,
     isError,
-
+    overtakenSongs,
     mutate,
   } = useLogsDetail(userId, version, { batchId, date, groupedBy });
   const isLoading = isl || (!details && !isError);
@@ -195,6 +195,13 @@ export const LogsDetailContent = ({
               type="growth"
             />
           </Box>
+          {overtakenSongs && overtakenSongs.length > 0 && (
+            <LogRank
+              isSharing={isModalOpen}
+              details={details.songs}
+              type="overtake"
+            />
+          )}
         </Tabs.Content>
 
         <Tabs.Content value="songs" p={0} mt={4}>

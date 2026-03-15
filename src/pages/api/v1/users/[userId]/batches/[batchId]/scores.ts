@@ -4,6 +4,8 @@ import { statsRepo } from "@/lib/db/stats";
 import { checkUserAccess } from "@/middlewares/api/withApi";
 import { mapToLogNested } from "@/utils/logs/getMapNested";
 import { calculateTotalBpi } from "@/services/logs/calculateTotalBpi";
+import { OvertakenMap } from "@/types/logs/overtaken";
+import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 
 export default async function handler(
   req: NextApiRequest,
@@ -33,7 +35,7 @@ export default async function handler(
   const ver = String(version);
 
   try {
-    const access = await checkUserAccess(req, uid);
+    const access = await checkProfileAccess(req, uid);
     if (!access.hasAccess) {
       return res
         .status(access.error!.status)
@@ -49,11 +51,12 @@ export default async function handler(
     );
 
     let responseData: any;
+    const isOwnLog = access.viewerId === userId;
 
     if (groupedBy === "lastPlayed") {
-      responseData = await handleLastPlayedBase(uid, ver, range, nav);
+      responseData = await handleLastPlayedBase(uid, ver, range, nav, isOwnLog);
     } else {
-      responseData = await handleCreatedAtBase(uid, ver, range, nav);
+      responseData = await handleCreatedAtBase(uid, ver, range, nav, isOwnLog);
     }
 
     return res.status(200).json({
@@ -80,16 +83,24 @@ async function handleLastPlayedBase(
   ver: string,
   range: any,
   nav: any,
+  isOwnLog: boolean,
 ) {
-  const [history, totalSongs, dailyScores] = await Promise.all([
+  const [history, totalSongs, dailyScores, overtaken] = await Promise.all([
     statsRepo.getScoreHistory(uid, ver, [], []),
     statsRepo.getTotalSongCount([12], []),
     logsRepo.getScoresByLastPlayedRange(uid, ver, range),
+    isOwnLog
+      ? logsRepo.getOvertakenRivals(uid, ver, {
+          range: { ...range, basis: "lastPlayed" },
+        })
+      : [],
   ]);
 
   if (dailyScores.length === 0) {
     throw new Error("No activity found for this period.");
   }
+
+  const overtakenMap = createOvertakenMap(overtaken);
 
   const timeline = calculateTotalBpi(history, totalSongs, ver, 0);
   const currentSnapshot = timeline.find((t) => t.id === range.label);
@@ -98,7 +109,13 @@ async function handleLastPlayedBase(
   const prevSnapshot = timeline[currentIndex + 1];
   const nextSnapshot = timeline[currentIndex - 1];
   return {
-    songs: dailyScores.map(mapToLogNested),
+    songs: dailyScores.map((s) => {
+      const mapped = mapToLogNested(s);
+      return {
+        ...mapped,
+        overtaken: overtakenMap[s.songId] || [],
+      };
+    }),
     pagination: {
       prev: {
         batchId: nav.prevDate || "previous",
@@ -129,6 +146,7 @@ async function handleCreatedAtBase(
   ver: string,
   range: any,
   nav: any,
+  isOwnLog: boolean,
 ) {
   const batches = await logsRepo.findBatchesInRange(
     uid,
@@ -138,16 +156,27 @@ async function handleCreatedAtBase(
   );
   if (batches.length === 0) throw new Error("No logs found.");
 
-  const [scores, batchNav] = await Promise.all([
+  const [scores, overtaken] = await Promise.all([
     logsRepo.getScoresWithDetails(uid, ver, {
       batchIds: batches.map((b) => b.batchId),
       comparisonTime: batches[0].createdAt,
     }),
-    logsRepo.getBatchNavigation(uid, ver, batches[0].createdAt),
+    isOwnLog
+      ? logsRepo.getOvertakenRivals(uid, ver, {
+          range: { ...range, basis: "createdAt" },
+        })
+      : [],
   ]);
+  const overtakenMap = createOvertakenMap(overtaken);
 
   return {
-    songs: scores.map(mapToLogNested),
+    songs: scores.map((s) => {
+      const mapped = mapToLogNested(s);
+      return {
+        ...mapped,
+        overtaken: s.songId ? overtakenMap[s.songId] || [] : [],
+      };
+    }),
     pagination: {
       prev: nav.prevDate,
       current: {
@@ -158,4 +187,22 @@ async function handleCreatedAtBase(
       groupedBy: "createdAt",
     },
   };
+}
+
+export function createOvertakenMap(
+  overtakenList: Awaited<ReturnType<typeof logsRepo.getOvertakenRivals>>,
+): OvertakenMap {
+  return overtakenList.reduce<OvertakenMap>((acc, curr) => {
+    if (!curr.songId) return acc;
+    if (!acc[curr.songId]) acc[curr.songId] = [];
+    acc[curr.songId].push({
+      rivalUserId: curr.rivalUserId,
+      rivalName: curr.rivalName,
+      rivalProfileImage: curr.rivalProfileImage,
+      rivalScore: curr.rivalScore,
+      myNewScore: curr.myNewScore,
+      myOldScore: curr.myOldScore,
+    });
+    return acc;
+  }, {});
 }

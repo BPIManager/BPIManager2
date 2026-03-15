@@ -7,12 +7,13 @@ import { CustomPagination } from "../../Pagination/ui";
 import { AdvancedFilterModal } from "../../Songs/AdvancedFilter/ui";
 import { SongFilterBar } from "../../Songs/Filter/ui";
 import { SongList } from "../../Table/table";
+import { BatchDetailItem } from "@/hooks/batches/useBatchDetail";
 
 export const BatchSongsTable = ({
   songs,
   listRef,
 }: {
-  songs: any[];
+  songs: BatchDetailItem[];
   listRef?: RefObject<HTMLDivElement | null>;
 }) => {
   const [selectedSong, setSelectedSong] = useState<any>(null);

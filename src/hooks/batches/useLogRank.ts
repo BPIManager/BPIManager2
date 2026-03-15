@@ -1,6 +1,10 @@
 import { useState, useMemo } from "react";
+import { BatchDetailItem } from "./useBatchDetail";
 
-export const useLogRank = (details: any[], type: "growth" | "top") => {
+export const useLogRank = (
+  details: BatchDetailItem[],
+  type: "growth" | "top" | "overtake",
+) => {
   const [displayLimit, setDisplayLimit] = useState(5);
   const [hideNewRecords, setHideNewRecords] = useState(false);
 

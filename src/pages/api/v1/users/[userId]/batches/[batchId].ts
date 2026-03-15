@@ -1,8 +1,9 @@
 import dayjs from "@/lib/dayjs";
 import { logsRepo } from "@/lib/db/logs";
-import { checkUserAccess } from "@/middlewares/api/withApi";
 import { mapToLogNested } from "@/utils/logs/getMapNested";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { createOvertakenMap } from "./[batchId]/scores";
+import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 
 export default async function handler(
   req: NextApiRequest,
@@ -28,7 +29,7 @@ export default async function handler(
   const v = String(version);
 
   try {
-    const access = await checkUserAccess(req, uid);
+    const access = await checkProfileAccess(req, uid);
     if (!access.hasAccess) {
       return res
         .status(access.error!.status)
@@ -42,15 +43,30 @@ export default async function handler(
 
     const jstDate = dayjs.utc(targetBatch.createdAt).tz().format("YYYY-MM-DD");
     const dayRange = logsRepo.getJstRange(jstDate, "day");
+    const isOwnLog = access.viewerId === userId;
 
-    const [nav, sameDay, results] = await Promise.all([
+    const [nav, sameDay, scores, overtaken] = await Promise.all([
       logsRepo.getBatchNavigation(uid, v, targetBatch.createdAt, dayRange),
       logsRepo.findBatchesInRange(uid, v, dayRange.start, dayRange.end),
       logsRepo.getScoresWithDetails(uid, v, { batchIds: [bid] }),
+      isOwnLog
+        ? logsRepo.getOvertakenRivals(uid, v, {
+            batchId: bid,
+            range: { ...dayRange, basis: "createdAt" },
+          })
+        : [],
     ]);
 
+    const overtakenMap = createOvertakenMap(overtaken);
+
     return res.status(200).json({
-      songs: results.map(mapToLogNested),
+      songs: scores.map((s) => {
+        const mapped = mapToLogNested(s);
+        return {
+          ...mapped,
+          overtaken: s.songId ? overtakenMap[s.songId] || [] : [],
+        };
+      }),
       pagination: {
         ...nav,
         current: targetBatch,

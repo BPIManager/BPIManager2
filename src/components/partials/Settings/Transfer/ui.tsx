@@ -65,7 +65,6 @@ export default function TransferUi() {
         closable: true,
         type: "error",
       });
-      console.log(e);
     } finally {
       setIsSyncing(false);
     }

@@ -7,13 +7,18 @@ import {
   Separator,
   Icon,
   Center,
+  Badge,
 } from "@chakra-ui/react";
-import { LuTrophy, LuTrendingUp } from "react-icons/lu";
+import { LuTrophy, LuTrendingUp, LuSwords } from "react-icons/lu";
 import { Switch } from "@/components/ui/switch";
 import { RankItem } from "./item";
 import { useLogRank } from "@/hooks/batches/useLogRank";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { SongDetailView } from "../../Modal/BPIChart/SongDetails/ui";
+import { OvertakeRankItem } from "../LogOvertaken/item";
+import { BatchDetailItem } from "@/hooks/batches/useBatchDetail";
+import { SongWithScore } from "@/types/songs/withScore";
+import { LabelWithTooltip } from "../LogSummary/ui";
 
 const RANK_CONFIG = {
   growth: {
@@ -21,7 +26,22 @@ const RANK_CONFIG = {
     icon: LuTrendingUp,
     accentColor: "green.400",
   },
-  top: { title: "BPIランキング", icon: LuTrophy, accentColor: "yellow.400" },
+  top: {
+    title: "BPIランキング",
+    icon: LuTrophy,
+    accentColor: "yellow.400",
+  },
+  overtake: {
+    title: (
+      <LabelWithTooltip
+        label="ライバルに勝利"
+        isSharing={false}
+        tooltipText="このスコアを出した瞬間に、ライバルを上回っていたものを表示しています。（その後にライバルに抜き返されても、この時の更新結果は変わりません）"
+      />
+    ),
+    icon: LuSwords,
+    accentColor: "orange.400",
+  },
 };
 
 export const LogRank = ({
@@ -29,11 +49,11 @@ export const LogRank = ({
   type,
   isSharing,
 }: {
-  details: any[];
-  type: "growth" | "top";
+  details: BatchDetailItem[];
+  type: "growth" | "top" | "overtake";
   isSharing?: boolean;
 }) => {
-  const [selectedSong, setSelectedSong] = useState<any | null>(null);
+  const [selectedSong, setSelectedSong] = useState<SongWithScore | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState<boolean>(false);
 
   const config = RANK_CONFIG[type];
@@ -73,7 +93,8 @@ export const LogRank = ({
             {config.title}
           </Text>
         </HStack>
-        {type === "growth" && !isSharing && (
+
+        {type !== "top" && !isSharing && (
           <Switch
             colorPalette="blue"
             size="sm"
@@ -108,13 +129,20 @@ export const LogRank = ({
         ) : (
           visibleSongs.map((item, index) => (
             <Box key={item.songId}>
-              <RankItem
-                isSharing={isSharing}
-                item={item}
-                rank={index + 1}
-                type={type}
-                onClick={() => handleOpenDetail(item)}
-              />
+              {type === "overtake" ? (
+                <OvertakeRankItem
+                  item={item}
+                  onClick={() => handleOpenDetail(item)}
+                />
+              ) : (
+                <RankItem
+                  isSharing={isSharing}
+                  item={item}
+                  rank={index + 1}
+                  type={type}
+                  onClick={() => handleOpenDetail(item)}
+                />
+              )}
               {index !== visibleSongs.length - 1 && (
                 <Separator borderColor="gray.900" />
               )}
@@ -124,7 +152,13 @@ export const LogRank = ({
       </VStack>
 
       {hasMore && (
-        <Button variant="ghost" size="sm" color="gray.400" onClick={loadMore}>
+        <Button
+          variant="ghost"
+          size="sm"
+          color="gray.400"
+          onClick={loadMore}
+          _hover={{ bg: "whiteAlpha.50" }}
+        >
           もっと表示（残り {remainingCount} 件）
         </Button>
       )}

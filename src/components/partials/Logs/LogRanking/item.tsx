@@ -1,3 +1,4 @@
+import { BatchDetailItem } from "@/hooks/batches/useBatchDetail";
 import {
   HStack,
   VStack,
@@ -16,7 +17,7 @@ export const RankItem = ({
   onClick,
   isSharing,
 }: {
-  item: any;
+  item: BatchDetailItem;
   rank: number;
   type: "growth" | "top";
   onClick: () => void;

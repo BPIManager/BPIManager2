@@ -170,10 +170,14 @@ class LogRepository {
               .selectFrom("scores as sub")
               .select((eb) => eb.fn.max("sub.logId").as("maxLogId"))
               .whereRef("sub.songId", "=", "current.songId")
-              .where("sub.userId", "=", userId);
+              .where("sub.userId", "=", userId)
+              .where("sub.version", "=", version);
 
             if (comparisonTime) {
-              return sub.where("sub.createdAt", "<", comparisonTime);
+              const timeColumn = onlyLastPlayedInRange
+                ? "sub.lastPlayed"
+                : "sub.createdAt";
+              return sub.where(timeColumn, "<", comparisonTime);
             } else {
               return sub.whereRef("sub.logId", "<", "current.logId");
             }
@@ -269,7 +273,6 @@ class LogRepository {
         )
         .whereRef("current.logId", "=", "latest_sc.maxLogId");
     }
-
     return await query
       .where((eb) =>
         eb.or([eb("s.deletedAt", "is", null), eb("s.deletedAt", ">", version)]),
@@ -639,6 +642,86 @@ class LogRepository {
       }
       return acc;
     }, [] as any[]);
+  }
+
+  async getOvertakenRivals(
+    userId: string,
+    version: string,
+    options: {
+      range?: { start: Date; end: Date; basis: "lastPlayed" | "createdAt" };
+      batchId?: string;
+    },
+  ) {
+    const { range, batchId } = options;
+
+    const timeCol = range?.basis ?? "lastPlayed";
+
+    let query = db
+      .selectFrom("scores as current")
+      .innerJoin("songs as s", "s.songId", "current.songId")
+      .innerJoin("scores as r", (join) =>
+        join
+          .onRef("r.songId", "=", "current.songId")
+          .on("r.version", "=", version)
+          .on("r.userId", "in", (qb) =>
+            qb
+              .selectFrom("follows")
+              .select("followingId")
+              .where("followerId", "=", userId),
+          )
+          .on("r.logId", "=", (eb) =>
+            eb
+              .selectFrom("scores as r2")
+              .select((s) => s.fn.max("logId").as("m"))
+              .whereRef("r2.userId", "=", "r.userId")
+              .whereRef("r2.songId", "=", "current.songId")
+              .whereRef(`r2.${timeCol}`, "<", `current.${timeCol}`),
+          ),
+      )
+      .innerJoin("users as ru", "ru.userId", "r.userId")
+      .leftJoin("scores as prevBest", (join) =>
+        join
+          .onRef("prevBest.songId", "=", "current.songId")
+          .on("prevBest.userId", "=", userId)
+          .on("prevBest.version", "=", version)
+          .on("prevBest.logId", "=", (eb) =>
+            eb
+              .selectFrom("scores as pb")
+              .select((s) => s.fn.max("logId").as("m"))
+              .where("pb.userId", "=", userId)
+              .whereRef("pb.songId", "=", "current.songId")
+              .whereRef(`pb.${timeCol}`, "<", `current.${timeCol}`),
+          ),
+      )
+      .select([
+        "current.songId",
+        "ru.userId as rivalUserId",
+        "ru.userName as rivalName",
+        "ru.profileImage as rivalProfileImage",
+        "r.exScore as rivalScore",
+        "current.exScore as myNewScore",
+        "prevBest.exScore as myOldScore",
+      ])
+      .where("current.userId", "=", userId)
+      .where("current.version", "=", version);
+
+    if (batchId) {
+      query = query.where("current.batchId", "=", batchId);
+    } else if (range) {
+      query = query
+        .where(`current.${timeCol}`, ">=", range.start)
+        .where(`current.${timeCol}`, "<=", range.end);
+    }
+
+    return await query
+      .whereRef("current.exScore", ">", "r.exScore")
+      .where((eb) =>
+        eb.or([
+          eb("prevBest.exScore", "is", null),
+          eb("r.exScore", ">", eb.ref("prevBest.exScore")),
+        ]),
+      )
+      .execute();
   }
 }
 

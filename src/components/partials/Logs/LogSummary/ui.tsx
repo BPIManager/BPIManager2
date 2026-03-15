@@ -3,7 +3,7 @@ import { SimpleGrid, Box, Text, Icon, VStack, Flex } from "@chakra-ui/react";
 import { PlusCircle, HelpCircle, MusicIcon } from "lucide-react";
 import { Tooltip } from "@/components/ui/tooltip";
 
-const LabelWithTooltip = ({
+export const LabelWithTooltip = ({
   label,
   tooltipText,
   isSharing,

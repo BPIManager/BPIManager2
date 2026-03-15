@@ -1,7 +1,9 @@
 import { API_PREFIX } from "@/constants/apiEndpoints";
 import { useUser } from "@/contexts/users/UserContext";
 import { BpiCalculator } from "@/lib/bpi";
+import { OvertakenRivalInfo } from "@/types/logs/overtaken";
 import { fetcher } from "@/utils/common/fetch";
+import { useMemo } from "react";
 import useSWR from "swr";
 
 export interface RankData {
@@ -47,6 +49,7 @@ export interface BatchDetailItem {
     bpi: number;
     isRankUp?: boolean;
   };
+  overtaken: OvertakenRivalInfo[];
 }
 
 export interface BatchDetailResponse {
@@ -109,8 +112,14 @@ export const useLogsDetail = (
       }
     : null;
 
+  const overtakenSongs = useMemo(() => {
+    if (!data?.songs) return [];
+    return data.songs.filter((s) => s.overtaken && s.overtaken.length > 0);
+  }, [data]);
+
   return {
     details: data || null,
+    overtakenSongs,
     summary,
     isLoading,
     isError: error,
