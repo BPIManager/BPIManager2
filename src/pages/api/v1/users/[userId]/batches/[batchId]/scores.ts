@@ -96,7 +96,7 @@ async function handleLastPlayedBase(
 
   const currentIndex = timeline.findIndex((t) => t.id === range.label);
   const prevSnapshot = timeline[currentIndex + 1];
-
+  console.log(prevSnapshot);
   return {
     songs: dailyScores.map(mapToLogNested),
     pagination: {
@@ -111,8 +111,8 @@ async function handleLastPlayedBase(
         totalBpi: currentSnapshot?.totalBpi || -15,
         label: `${range.label} のプレイ履歴`,
       },
-      prevDate: nav.prevDate,
-      nextDate: nav.nextDate,
+      prevDate: nav.prevDate?.createdAt || null,
+      nextDate: nav.nextDate?.createdAt || null,
       groupedBy: "lastPlayed",
     },
   };

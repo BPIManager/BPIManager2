@@ -26,34 +26,34 @@ class LogRepository {
   ) {
     const { start, end } = range;
     const isLastPlayed = groupedBy === "lastPlayed";
-    const dateColumn = isLastPlayed ? "lastPlayed" : "createdAt";
+    const dateCol = isLastPlayed ? "lastPlayed" : "createdAt";
+    const columns: ("lastPlayed" | "createdAt" | "totalBpi")[] = isLastPlayed
+      ? [dateCol]
+      : [dateCol, "totalBpi"];
     const table = isLastPlayed ? "scores" : "logs";
 
     const [prevRow, nextRow] = await Promise.all([
       db
-        .selectFrom(table as any)
-        .select([dateColumn as any])
+        .selectFrom(table)
+        .select(columns)
         .where("userId", "=", userId)
         .where("version", "=", version)
-        .where(dateColumn as any, "<", start)
-        .orderBy(dateColumn as any, "desc")
+        .where(dateCol, "<", start)
+        .orderBy(dateCol, "desc")
         .executeTakeFirst(),
       db
-        .selectFrom(table as any)
-        .select([dateColumn as any])
+        .selectFrom(table)
+        .select(columns)
         .where("userId", "=", userId)
         .where("version", "=", version)
-        .where(dateColumn as any, ">", end)
-        .orderBy(dateColumn as any, "asc")
+        .where(dateCol, ">", end)
+        .orderBy(dateCol, "asc")
         .executeTakeFirst(),
     ]);
 
-    const format = (d: any) =>
-      d ? dayjs.utc(d[dateColumn]).tz().format("YYYY-MM-DD") : null;
-
     return {
-      prevDate: format(prevRow),
-      nextDate: format(nextRow),
+      prevDate: prevRow,
+      nextDate: nextRow,
     };
   }
 
