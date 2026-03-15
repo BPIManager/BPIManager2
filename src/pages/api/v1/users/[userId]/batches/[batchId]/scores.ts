@@ -42,13 +42,11 @@ export default async function handler(
         .json({ message: access.error!.message });
     }
 
+    const basis: "lastPlayed" | "createdAt" =
+      groupedBy === "lastPlayed" ? "lastPlayed" : "createdAt";
+
     const range = logsRepo.getJstRange(dateStr, type as any);
-    const nav = await logsRepo.getRangeNavigation(
-      uid,
-      ver,
-      range,
-      groupedBy as any,
-    );
+    const nav = await logsRepo.getRangeNavigation(uid, ver, range, basis);
 
     let responseData: any;
     const isOwnLog = access.viewerId === userId;
