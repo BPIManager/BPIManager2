@@ -1,5 +1,5 @@
 import { DashCard } from "@/components/ui/dashcard";
-import { Box, Skeleton, VStack, HStack, Flex } from "@chakra-ui/react";
+import { Box, Skeleton, VStack, HStack } from "@chakra-ui/react";
 
 interface BaseSkeletonProps {
   count?: number;

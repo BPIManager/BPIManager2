@@ -1,6 +1,5 @@
 import {
   SimpleGrid,
-  Box,
   Tabs,
   Spinner,
   Center,

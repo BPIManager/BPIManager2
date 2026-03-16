@@ -16,7 +16,6 @@ import {
   PolarRadiusAxis,
   Tooltip,
 } from "recharts";
-import { RadarResponse } from "@/hooks/stats/useRadar";
 import { useMemo } from "react";
 
 const RadarDefs = () => (

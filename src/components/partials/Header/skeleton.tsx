@@ -1,4 +1,4 @@
-import { Center, Skeleton, Box, VStack } from "@chakra-ui/react";
+import { Skeleton, Box, VStack } from "@chakra-ui/react";
 
 export const PageHeaderSkeleton = () => (
   <Box bg="gray.800" py={8} px={4}>

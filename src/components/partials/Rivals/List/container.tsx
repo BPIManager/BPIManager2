@@ -1,4 +1,4 @@
-import { SimpleGrid, VStack, Text, Center } from "@chakra-ui/react";
+import { SimpleGrid, Text, Center } from "@chakra-ui/react";
 import { RivalSummaryResult } from "@/hooks/social/useRivalSummary";
 import { RivalSummaryCard } from "./ui";
 import { RivalSummarySkeleton } from "./skeleton";

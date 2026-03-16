@@ -1,10 +1,4 @@
-import {
-  Container,
-  Center,
-  Spinner,
-  Text,
-  useDisclosure,
-} from "@chakra-ui/react";
+import { Container, Center, Text, useDisclosure } from "@chakra-ui/react";
 import { useState } from "react";
 import { SongWithScore } from "@/types/songs/withScore";
 import { useSongFilter, PAGE_SIZE } from "@/hooks/table/useSongFilter";

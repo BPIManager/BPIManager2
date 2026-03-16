@@ -24,7 +24,6 @@ import { FilterParamsFrontend } from "@/types/songs/withScore";
 import { versionsNonDisabledCollection } from "@/constants/versions";
 import { latestVersion } from "@/constants/latestVersion";
 import { useRouter } from "next/router";
-import { IIDX_DIFFICULTIES } from "@/constants/diffs";
 import { FilterCheckboxGroup, FilterStickyToggle } from "./part";
 
 interface SongFilterBarProps {

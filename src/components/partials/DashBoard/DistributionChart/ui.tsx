@@ -1,4 +1,4 @@
-import { Box, Text, HStack, VStack, Center, Spinner } from "@chakra-ui/react";
+import { Box, Text, HStack, VStack } from "@chakra-ui/react";
 import { keyframes } from "@emotion/react";
 import { DistributionChartSkeleton } from "@/components/partials/DashBoard/DistributionChart/skeleton";
 import { DashCard } from "@/components/ui/dashcard";

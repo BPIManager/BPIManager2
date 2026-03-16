@@ -1,33 +1,17 @@
-import {
-  Box,
-  SimpleGrid,
-  Tabs,
-  Spinner,
-  Center,
-  HStack,
-  Text,
-  Badge,
-} from "@chakra-ui/react";
+import { Box, SimpleGrid, Tabs, Spinner, Center } from "@chakra-ui/react";
 import { DashboardLayout } from "@/components/partials/Main";
 import { PageContainer } from "@/components/partials/Header";
 import { ProfileSideBar } from "@/components/partials/Profile/Sidebar/ui";
 import { ProfileErrorState } from "@/components/partials/Profile/Errors/ui";
 import { useProfile } from "@/hooks/users/useProfile";
 import { useUser } from "@/contexts/users/UserContext";
-import {
-  LuChevronRight,
-  LuLayoutDashboard,
-  LuMusic,
-  LuSwords,
-  LuUser,
-} from "react-icons/lu";
+import { LuLayoutDashboard, LuMusic } from "react-icons/lu";
 import { useRouter } from "next/router";
 import { ReactNode } from "react";
 import { FilterProvider } from "@/contexts/stats/FilterContext";
 import { ProfileProvider } from "@/contexts/profile/ProfileContext";
 import { latestVersion } from "@/constants/latestVersion";
 import NextLink from "next/link";
-import { Button } from "@/components/ui/button";
 import { ModeSwitchBanner } from "../ModeSwitch/ui";
 import { DashCard } from "@/components/ui/dashcard";
 

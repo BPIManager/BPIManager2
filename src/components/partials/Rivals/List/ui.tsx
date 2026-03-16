@@ -5,7 +5,6 @@ import {
   VStack,
   Avatar,
   Badge,
-  Icon,
   Flex,
 } from "@chakra-ui/react";
 import { formatIIDXId } from "@/utils/common/formatIidxId";

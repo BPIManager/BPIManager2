@@ -5,12 +5,10 @@ import {
   Bar,
   XAxis,
   YAxis,
-  CartesianGrid,
   Tooltip,
   ReferenceLine,
   ResponsiveContainer,
   Cell,
-  LabelList,
 } from "recharts";
 import { SongWithScore } from "@/types/songs/withScore";
 import { DashCard } from "@/components/ui/dashcard";

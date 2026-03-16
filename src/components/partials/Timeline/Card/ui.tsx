@@ -6,12 +6,11 @@ import {
   Avatar,
   Badge,
   Icon,
-  IconButton,
   Grid,
   GridItem,
   Flex,
 } from "@chakra-ui/react";
-import { SmilePlus, Swords, TrendingUp, Crown, Minus } from "lucide-react";
+import { Swords, Crown } from "lucide-react";
 import dayjs from "@/lib/dayjs";
 import { TimelineEntry } from "@/hooks/social/useTimeline";
 import Link from "next/link";

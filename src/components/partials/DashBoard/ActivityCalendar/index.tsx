@@ -1,12 +1,4 @@
-import {
-  Box,
-  Grid,
-  Text,
-  HStack,
-  VStack,
-  Link as ChakraLink,
-  Button,
-} from "@chakra-ui/react";
+import { Box, Grid, Text, HStack, VStack, Button } from "@chakra-ui/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import dayjs from "@/lib/dayjs";
 import NextLink from "next/link";
