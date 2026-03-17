@@ -13,7 +13,7 @@ interface UseInfiniteListOptions<
 }
 
 export function useInfiniteList<TPage, TItem>(
-  getKey: SWRInfiniteKeyLoader,
+  getKey: SWRInfiniteKeyLoader<TPage>,
   { getItems, isLastPage, ...swrOptions }: UseInfiniteListOptions<TPage, TItem>,
 ) {
   const { data, size, setSize, isLoading, isValidating, error, mutate } =

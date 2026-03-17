@@ -110,6 +110,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                   size="xs"
                   variant="outline"
                   mt={2}
+                  px={2}
                   onClick={() => setIsImageModalOpen(true)}
                 >
                   アイコンをアップロード

@@ -1,13 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import {
-  Box,
-  Tabs,
-  VStack,
-  Spinner,
-  Center,
-  Text,
-  useDisclosure,
-} from "@chakra-ui/react";
+import { useState } from "react";
+import { Tabs, useDisclosure } from "@chakra-ui/react";
 import { useRecommendedInfinite } from "@/hooks/stats/useRecommended";
 import { SimpleRankItem } from "./Common/SimpleRankItem";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
@@ -15,60 +7,24 @@ import { SongWithScore } from "@/types/songs/withScore";
 import { SongDetailView } from "../../Modal/BPIChart/SongDetails/ui";
 import { NearLoseList } from "./NearLose";
 import { DashCard } from "@/components/ui/dashcard";
+import { InfiniteScrollContainer } from "../../InfiniteScroll/ui";
 
-const InfiniteList = ({
-  userId,
-  type,
-  onSelect,
-}: {
-  userId: string;
-  type: "weapons" | "potential";
-  onSelect: (item: any) => void;
-}) => {
+const InfiniteList = ({ userId, type, onSelect }: any) => {
   const { levels, diffs, version } = useStatsFilter();
-  const { items, setSize, size, isLoadingMore, isReachingEnd } =
-    useRecommendedInfinite(userId, version, levels, diffs, type);
-  const observerTarget = useRef(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !isReachingEnd && !isLoadingMore) {
-          setSize(size + 1);
-        }
-      },
-      { threshold: 1.0 },
-    );
-
-    if (observerTarget.current) observer.observe(observerTarget.current);
-    return () => observer.disconnect();
-  }, [setSize, size, isReachingEnd, isLoadingMore]);
+  const res = useRecommendedInfinite(userId, version, levels, diffs, type);
 
   return (
-    <VStack align="stretch" gap={0} maxH="500px" overflowY="auto">
-      {items.map((item, i) => (
+    <InfiniteScrollContainer
+      {...res}
+      renderItem={(item, i) => (
         <SimpleRankItem
-          onClick={() => onSelect(item)}
           key={`${item.songId}-${i}`}
           item={item}
           rank={i + 1}
+          onClick={() => onSelect(item)}
         />
-      ))}
-      <Box ref={observerTarget} py={4}>
-        {isLoadingMore && (
-          <Center>
-            <Spinner size="sm" />
-          </Center>
-        )}
-        {items.length > 0 && isReachingEnd && (
-          <Center>
-            <Text fontSize="xs" color="gray.600">
-              全てのデータを読み込みました
-            </Text>
-          </Center>
-        )}
-      </Box>
-    </VStack>
+      )}
+    />
   );
 };
 
@@ -83,7 +39,7 @@ export const RankingTabsCard = ({ userId }: { userId: string }) => {
   };
 
   return (
-    <DashCard overflow="hidden" display="flex">
+    <DashCard overflow="hidden" display="flex" p={0}>
       <Tabs.Root
         value={tab}
         onValueChange={(e) => setTab(e.value)}
@@ -92,55 +48,35 @@ export const RankingTabsCard = ({ userId }: { userId: string }) => {
         flex="1"
       >
         <Tabs.List bg="whiteAlpha.50" p={1} borderRadius="lg" w="full">
-          <Tabs.Trigger
-            value="weapons"
-            flex={1}
-            _selected={{ bg: "#0d1117", color: "white" }}
-            py={2}
-            borderRadius="md"
-            fontSize="xs"
-            fontWeight="bold"
-            display={"flex"}
-            justifyContent={"center"}
-          >
-            武器曲かも?
-          </Tabs.Trigger>
-          <Tabs.Trigger
-            value="potential"
-            flex={1}
-            _selected={{ bg: "#0d1117", color: "white" }}
-            py={2}
-            borderRadius="md"
-            fontSize="xs"
-            fontWeight="bold"
-            display={"flex"}
-            justifyContent={"center"}
-          >
-            伸びるかも?
-          </Tabs.Trigger>
-          <Tabs.Trigger
-            value="nearLose"
-            flex={1}
-            _selected={{ bg: "#0d1117", color: "white" }}
-            py={2}
-            borderRadius="md"
-            fontSize="xs"
-            fontWeight="bold"
-            display={"flex"}
-            justifyContent={"center"}
-          >
-            ライバル僅差
-          </Tabs.Trigger>
+          {[
+            { value: "weapons", label: "武器曲かも?" },
+            { value: "potential", label: "伸びるかも?" },
+            { value: "nearLose", label: "ライバル僅差" },
+          ].map((t) => (
+            <Tabs.Trigger
+              key={t.value}
+              value={t.value}
+              flex={1}
+              py={2}
+              borderRadius="md"
+              fontSize="xs"
+              fontWeight="bold"
+              justifyContent="center"
+              _selected={{ bg: "#0d1117", color: "white" }}
+            >
+              {t.label}
+            </Tabs.Trigger>
+          ))}
         </Tabs.List>
 
-        <Tabs.Content value="weapons" p={0} flex="1" minH="0" height="100%">
+        <Tabs.Content value="weapons" p={0}>
           <InfiniteList
             userId={userId}
             type="weapons"
             onSelect={handleSongSelect}
           />
         </Tabs.Content>
-        <Tabs.Content value="potential" p={0} flex="1" minH="0" height="100%">
+        <Tabs.Content value="potential" p={0}>
           <InfiniteList
             userId={userId}
             type="potential"
@@ -151,6 +87,7 @@ export const RankingTabsCard = ({ userId }: { userId: string }) => {
           <NearLoseList userId={userId} onSelect={handleSongSelect} />
         </Tabs.Content>
       </Tabs.Root>
+
       {open && selectedSong && (
         <SongDetailView
           song={selectedSong}

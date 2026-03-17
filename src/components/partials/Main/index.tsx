@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/drawer";
 import { useState } from "react";
 import { SidebarContent } from "../Sidebar";
+import { NotificationBell } from "../Notifications";
 
 export const DashboardLayout = ({
   children,
@@ -58,6 +59,9 @@ export const DashboardLayout = ({
             <Text fontWeight="bold" fontSize="xl">
               BPIM2
             </Text>
+          </HStack>
+          <HStack gap={2}>
+            <NotificationBell />
           </HStack>
         </HStack>
 

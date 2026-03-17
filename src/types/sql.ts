@@ -29,13 +29,8 @@ export type Generated<T> =
     : ColumnType<T, T | undefined, T>;
 
 export interface Notifications {
-  id: Generated<number>;
-  recipientId: string;
-  senderId: string;
-  type: string;
-  targetId: Generated<string | null>;
-  isRead: Generated<boolean>;
-  createdAt: Generated<Date>;
+  userId: string;
+  lastReadAt: Generated<Date>;
 }
 
 export interface UserRadarCache {

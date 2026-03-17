@@ -44,42 +44,53 @@ export const useTimeline = (
 ) => {
   const { fbUser } = useUser();
 
-  const { items, size, setSize, isLoading, isReachingEnd, isError } =
-    useInfiniteList<TimelineResponse, TimelineEntry>(
-      (pageIndex, previousPageData: TimelineResponse | null) => {
-        if (!fbUser) return null;
-        if (previousPageData && !previousPageData.nextId) return null;
+  const {
+    items,
+    size,
+    setSize,
+    isLoading,
+    isLoadingMore,
+    isReachingEnd,
+    isError,
+  } = useInfiniteList<TimelineResponse, TimelineEntry>(
+    (pageIndex, previousPageData: TimelineResponse | null) => {
+      if (!fbUser) return null;
+      if (previousPageData && !previousPageData.nextId) return null;
 
-        const query = new URLSearchParams();
-        query.append("mode", mode);
-        if (params.search) query.append("search", params.search);
-        if (params.levels?.length) {
-          params.levels.forEach((lv) =>
-            query.append("levels[]", lv.toString()),
-          );
-        }
-        if (params.difficulties?.length) {
-          params.difficulties.forEach((df) =>
-            query.append("difficulties[]", df),
-          );
-        }
-        if (pageIndex > 0 && previousPageData?.nextId) {
-          query.append("lastId", previousPageData.nextId);
-        }
+      const query = new URLSearchParams();
+      query.append("mode", mode);
+      if (params.search) query.append("search", params.search);
+      if (params.levels?.length) {
+        params.levels.forEach((lv) => query.append("levels[]", lv.toString()));
+      }
+      if (params.difficulties?.length) {
+        params.difficulties.forEach((df) => query.append("difficulties[]", df));
+      }
+      if (pageIndex > 0 && previousPageData?.nextId) {
+        query.append("lastId", previousPageData.nextId);
+      }
 
-        return [
-          `${API_PREFIX}/users/${fbUser.uid}/timeline?${query.toString()}`,
-          fbUser,
-        ];
-      },
-      {
-        getItems: (page) => page.timeline,
-        isLastPage: (page) => page?.nextId === null,
-        revalidateFirstPage: false,
-        revalidateOnFocus: false,
-        keepPreviousData: false,
-      },
-    );
+      return [
+        `${API_PREFIX}/users/${fbUser.uid}/timeline?${query.toString()}`,
+        fbUser,
+      ];
+    },
+    {
+      getItems: (page) => page.timeline,
+      isLastPage: (page) => page?.nextId === null,
+      revalidateFirstPage: false,
+      revalidateOnFocus: false,
+      keepPreviousData: false,
+    },
+  );
 
-  return { timeline: items, isLoading, isReachingEnd, isError, size, setSize };
+  return {
+    timeline: items,
+    isLoading,
+    isLoadingMore,
+    isReachingEnd,
+    isError,
+    size,
+    setSize,
+  };
 };

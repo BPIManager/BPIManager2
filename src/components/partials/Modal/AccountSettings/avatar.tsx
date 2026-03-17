@@ -25,10 +25,10 @@ export const AvatarSection = ({
         <Image src={image} alt="Preview" />
       </Circle>
       <Box display="flex" flexDirection="column" gap={1}>
-        <Button size="xs" variant="outline" onClick={useServiceIcon}>
+        <Button px={2} size="xs" variant="outline" onClick={useServiceIcon}>
           連携サービスを使用
         </Button>
-        <Button size="xs" variant="outline" onClick={useDiceBearIcon}>
+        <Button px={2} size="xs" variant="outline" onClick={useDiceBearIcon}>
           ランダムに設定
         </Button>
       </Box>
