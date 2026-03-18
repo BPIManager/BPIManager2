@@ -39,14 +39,10 @@ export const RankingTabsCard = ({ userId }: { userId: string }) => {
   };
 
   return (
-    <DashCard className="flex p-0 overflow-hidden">
-      <Tabs
-        value={tab}
-        onValueChange={setTab}
-        className="flex flex-1 flex-col w-full"
-      >
-        <div className="p-1">
-          <TabsList className="grid h-auto w-full grid-cols-3 rounded-lg bg-white/5 p-1">
+    <DashCard className="flex flex-col p-0 overflow-hidden border border-bpim-border">
+      <Tabs value={tab} onValueChange={setTab} className="flex flex-col w-full">
+        <div className="p-2 border-b border-bpim-border bg-white/[0.02]">
+          <TabsList className="grid h-9 w-full grid-cols-3 rounded-md bg-white/5 p-1">
             {[
               { value: "weapons", label: "武器曲かも?" },
               { value: "potential", label: "伸びるかも?" },
@@ -55,7 +51,7 @@ export const RankingTabsCard = ({ userId }: { userId: string }) => {
               <TabsTrigger
                 key={t.value}
                 value={t.value}
-                className="py-2 text-xs font-bold transition-all data-[state=active]:bg-[#0d1117] data-[state=active]:text-white"
+                className="text-[11px] font-bold transition-all data-[state=active]:bg-[#0d1117] data-[state=active]:text-white data-[state=active]:shadow-sm"
               >
                 {t.label}
               </TabsTrigger>
@@ -63,32 +59,34 @@ export const RankingTabsCard = ({ userId }: { userId: string }) => {
           </TabsList>
         </div>
 
-        <TabsContent
-          value="weapons"
-          className="m-0 p-0 focus-visible:outline-none"
-        >
-          <InfiniteList
-            userId={userId}
-            type="weapons"
-            onSelect={handleSongSelect}
-          />
-        </TabsContent>
-        <TabsContent
-          value="potential"
-          className="m-0 p-0 focus-visible:outline-none"
-        >
-          <InfiniteList
-            userId={userId}
-            type="potential"
-            onSelect={handleSongSelect}
-          />
-        </TabsContent>
-        <TabsContent
-          value="nearLose"
-          className="m-0 p-0 focus-visible:outline-none"
-        >
-          <NearLoseList userId={userId} onSelect={handleSongSelect} />
-        </TabsContent>
+        <div className="flex-1 overflow-y-auto custom-scrollbar h-[450px]">
+          <TabsContent
+            value="weapons"
+            className="m-0 p-0 focus-visible:outline-none"
+          >
+            <InfiniteList
+              userId={userId}
+              type="weapons"
+              onSelect={handleSongSelect}
+            />
+          </TabsContent>
+          <TabsContent
+            value="potential"
+            className="m-0 p-0 focus-visible:outline-none"
+          >
+            <InfiniteList
+              userId={userId}
+              type="potential"
+              onSelect={handleSongSelect}
+            />
+          </TabsContent>
+          <TabsContent
+            value="nearLose"
+            className="m-0 p-0 focus-visible:outline-none"
+          >
+            <NearLoseList userId={userId} onSelect={handleSongSelect} />
+          </TabsContent>
+        </div>
       </Tabs>
 
       {isDetailOpen && selectedSong && (

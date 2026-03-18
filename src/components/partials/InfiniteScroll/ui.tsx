@@ -55,7 +55,7 @@ export function InfiniteScrollContainer<T>({
         className="flex min-h-[40px] items-center justify-center py-4"
       >
         {isLoadingMore && (
-          <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
+          <Loader2 className="h-5 w-5 animate-spin text-gray-200" />
         )}
         {!isLoadingMore && isReachingEnd && items.length > 0 && (
           <span className="text-[10px] font-medium text-gray-600 uppercase tracking-wider">

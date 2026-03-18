@@ -4,7 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const SongItemSkeleton = () => {
   return (
-    <div className="mb-2 w-full border-l-4 border-white/10 bg-white/5">
+    <div className="mb-2 w-full border-l-4 border-bpim-border bg-white/5">
       <div className="grid grid-cols-[1fr_auto] gap-1">
         <div className="flex flex-col gap-2 px-3 py-2">
           <Skeleton className="h-3.5 w-[60%]" />
@@ -15,7 +15,7 @@ const SongItemSkeleton = () => {
           </div>
         </div>
 
-        <div className="flex items-center bg-black/20 p-2 lg:p-4">
+        <div className="flex items-center bg-bpim-bg/20 p-2 lg:p-4">
           <div className="flex items-center gap-4">
             <div className="flex flex-col items-end gap-1">
               <Skeleton className="h-2 w-4" />

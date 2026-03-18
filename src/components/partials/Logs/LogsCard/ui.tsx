@@ -31,8 +31,8 @@ export const LogsCard = ({ log }: { log: UpdateLog }) => {
     <Link href={linkHref} className="block mb-4 group">
       <div
         className={cn(
-          "relative overflow-hidden rounded-xl border border-slate-800 bg-slate-950 p-4 transition-all duration-200",
-          "hover:-translate-y-0.5 hover:border-blue-500 hover:bg-slate-900 hover:shadow-lg hover:shadow-blue-500/10",
+          "relative overflow-hidden rounded-xl border border-bpim-border bg-bpim-bg p-4 transition-all duration-200",
+          "hover:-translate-y-0.5 hover:border-blue-500 hover:bg-bpim-bg hover:shadow-lg hover:shadow-blue-500/10",
           "cursor-pointer",
         )}
       >
@@ -62,7 +62,7 @@ export const LogsCard = ({ log }: { log: UpdateLog }) => {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 px-3 py-1 rounded-md bg-slate-900 border border-slate-800">
+          <div className="flex items-center gap-2 px-3 py-1 rounded-md bg-bpim-bg border border-bpim-border">
             <LuListMusic className="w-3.5 h-3.5 text-slate-500" />
             <span className="text-sm font-bold text-white leading-none">
               {log.songCount}
@@ -83,13 +83,13 @@ export const LogsCard = ({ log }: { log: UpdateLog }) => {
             {log.topScores.map((score, i) => (
               <div
                 key={i}
-                className="flex items-center justify-between gap-3 p-2 rounded-sm bg-white/[0.03] border border-white/[0.02]"
+                className="flex items-center justify-between gap-3 p-2 rounded-sm bg-bpim-card/50 border border-white/[0.02]"
               >
                 <span className="flex-1 text-xs font-bold text-slate-200 truncate leading-tight">
                   {score.title}
                 </span>
                 <div className="w-[45px] shrink-0 text-right font-mono leading-none">
-                  <div className="text-[8px] font-bold text-blue-500/60 uppercase">
+                  <div className="text-[8px] font-bold text-gray-200/60 uppercase">
                     BPI
                   </div>
                   <div className="text-xs font-bold text-blue-400">

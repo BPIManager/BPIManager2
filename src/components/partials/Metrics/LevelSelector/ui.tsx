@@ -25,17 +25,17 @@ export const ArenaAverageFilter = ({
   onLevelChange,
 }: ArenaAverageFilterProps) => {
   return (
-    <div className="rounded-xl border border-white/10 bg-slate-900/80 p-4 shadow-sm backdrop-blur-md">
+    <div className="rounded-xl border border-bpim-border bg-bpim-bg/80 p-4 shadow-sm backdrop-blur-md">
       <div className="flex flex-col gap-6 md:flex-row md:items-start md:gap-10">
         <div className="flex flex-col gap-2 min-w-full md:min-w-[240px]">
           <span className="text-[10px] font-black tracking-widest text-slate-500 uppercase px-1">
             Version
           </span>
           <Select value={version} onValueChange={onVersionChange}>
-            <SelectTrigger className="h-9 border-white/10 bg-white/5 text-xs text-slate-200 focus:ring-blue-500">
+            <SelectTrigger className="h-9 border-bpim-border bg-white/5 text-xs text-slate-200 focus:ring-blue-500">
               <SelectValue placeholder="バージョンを選択" />
             </SelectTrigger>
-            <SelectContent className="border-white/10 bg-slate-900">
+            <SelectContent className="border-bpim-border bg-bpim-bg">
               {versionsNonDisabledCollection.map((v) => (
                 <SelectItem key={v.value} value={v.value} className="text-xs">
                   {v.label}
@@ -59,7 +59,7 @@ export const ArenaAverageFilter = ({
                 <RadioGroupItem
                   value={lv}
                   id={`lv-${lv}`}
-                  className="border-blue-500 text-blue-500"
+                  className="border-blue-500 text-gray-200"
                 />
                 <Label
                   htmlFor={`lv-${lv}`}

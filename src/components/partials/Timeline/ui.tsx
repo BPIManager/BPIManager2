@@ -19,7 +19,7 @@ export const TimelineList = ({ mode, params }: TimelineListProps) => {
     <div
       className={cn(
         "flex w-full flex-col gap-0 overflow-hidden",
-        "rounded-xl border border-white/10 bg-slate-900/30",
+        "rounded-xl border border-bpim-border bg-bpim-bg/30",
         "transition-all duration-300 shadow-xl",
       )}
     >

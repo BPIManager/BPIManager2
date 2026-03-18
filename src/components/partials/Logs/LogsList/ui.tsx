@@ -104,7 +104,7 @@ export const LogsList = ({ userId, version, groupedBy }: Props) => {
 
                 <div
                   className={cn(
-                    "mb-4 rounded-xl border border-white/5 bg-white/[0.02] p-4",
+                    "mb-4 rounded-xl border border-bpim-border bg-white/[0.02] p-4",
                     "md:ml-12",
                   )}
                 >
@@ -143,7 +143,7 @@ export const LogsList = ({ userId, version, groupedBy }: Props) => {
                       asChild
                       variant="outline"
                       size="sm"
-                      className="rounded-full border-white/10 hover:bg-white/5"
+                      className="rounded-full border-bpim-border hover:bg-white/5"
                     >
                       <Link
                         href={{

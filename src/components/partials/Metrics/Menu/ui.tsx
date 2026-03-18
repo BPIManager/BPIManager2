@@ -18,7 +18,7 @@ export const ReusableMenuItem = ({
   icon: IconComponent,
   title,
   subtitle,
-  iconColor = "text-blue-500",
+  iconColor = "text-gray-200",
   href,
   isExternal,
   className,
@@ -33,7 +33,7 @@ export const ReusableMenuItem = ({
       target={isExternal ? "_blank" : undefined}
       rel={isExternal ? "noopener noreferrer" : undefined}
       className={cn(
-        "group block w-full rounded-xl border border-white/5 bg-slate-900/40 p-4 transition-all duration-200",
+        "group block w-full rounded-xl border border-bpim-border bg-bpim-bg/40 p-4 transition-all duration-200",
         "hover:border-white/20 hover:bg-slate-800/60 hover:no-underline",
         className,
       )}

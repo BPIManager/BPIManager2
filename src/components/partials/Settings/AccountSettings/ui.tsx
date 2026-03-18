@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 export default function AccountSettingsUi() {
   const [isOpen, setIsOpen] = useState(false);
   return (
-    <div className="mt-4 flex flex-col gap-6 rounded-xl border border-white/10 bg-slate-900 p-6 md:flex-row md:items-center md:justify-between">
+    <div className="mt-4 flex flex-col gap-6 rounded-xl border border-bpim-border bg-bpim-bg p-6 md:flex-row md:items-center md:justify-between">
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-2 text-blue-400">
           <LuUser className="h-4 w-4" />

@@ -54,8 +54,8 @@ export const ShareResultModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-sm border-white/10 bg-slate-900 text-white shadow-2xl rounded-2xl">
-        <DialogHeader className="border-b border-white/5 pb-4">
+      <DialogContent className="max-w-sm border-bpim-border bg-bpim-bg text-white shadow-2xl rounded-2xl">
+        <DialogHeader className="border-b border-bpim-border pb-4">
           <DialogTitle className="text-lg font-bold">画像をシェア</DialogTitle>
         </DialogHeader>
 
@@ -91,12 +91,12 @@ export const ShareResultModal = ({
             ].map((opt) => (
               <div
                 key={opt.id}
-                className="flex items-start gap-3 space-x-2 rounded-lg border border-white/5 bg-white/5 p-3 transition-colors hover:bg-white/10"
+                className="flex items-start gap-3 space-x-2 rounded-lg border border-bpim-border bg-white/5 p-3 transition-colors hover:bg-white/10"
               >
                 <RadioGroupItem
                   value={opt.id}
                   id={opt.id}
-                  className="mt-1 border-blue-500 text-blue-500"
+                  className="mt-1 border-blue-500 text-gray-200"
                 />
                 <Label
                   htmlFor={opt.id}

@@ -18,6 +18,7 @@ import { BPIChart } from "./chart";
 import { getRankDetail } from "@/constants/djRank";
 import { SongHistoryTab } from "../History/ui";
 import RivalsRanking from "../Rivals";
+import { cn } from "@/lib/utils";
 
 interface SongDetailViewProps {
   song: SongWithScore | null;
@@ -33,6 +34,11 @@ export const SongDetailView = ({
   defaultTab,
 }: SongDetailViewProps) => {
   const [tab, setTab] = useState<string>(defaultTab || "stats");
+  const tabs = [
+    { value: "stats", label: "Statistics", icon: LineChart },
+    { value: "history", label: "History", icon: LucideHistory },
+    { value: "rivals", label: "Rivals", icon: Users },
+  ];
 
   const chartData = useMemo(() => {
     if (!song) return [];
@@ -81,8 +87,14 @@ export const SongDetailView = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-2xl gap-0 border-white/10 bg-slate-950 p-0 shadow-2xl overflow-hidden rounded-2xl">
-        <DialogHeader className="border-b border-white/10 p-4 flex flex-row items-center justify-between space-y-0">
+      <DialogContent
+        className={cn(
+          "w-full max-w-full md:max-w-2xl",
+          "h-full md:h-auto md:rounded-2xl",
+          "border-bpim-border bg-black p-0 shadow-2xl overflow-hidden gap-0",
+        )}
+      >
+        <DialogHeader className="border-b border-bpim-border p-4 flex flex-row items-center justify-between space-y-0">
           <DialogTitle className="text-lg font-black tracking-tight text-white">
             {song.title}
             <span className="ml-2 text-slate-500 font-mono">
@@ -98,14 +110,14 @@ export const SongDetailView = ({
                 EX Score
               </span>
               <span className="font-mono text-lg font-black text-white leading-none">
-                {song.exScore?.toLocaleString() ?? 0}
+                {song.exScore ?? 0}
               </span>
               <span className="text-[10px] font-bold text-slate-400 mt-1 font-mono">
                 {(((song.exScore ?? 0) / maxScore) * 100).toFixed(2)}%
               </span>
             </div>
 
-            <div className="flex flex-col gap-1 border-x border-white/5">
+            <div className="flex flex-col gap-1 border-x border-bpim-border">
               <span className="text-[10px] font-bold tracking-widest text-slate-500 uppercase">
                 BPI
               </span>
@@ -136,38 +148,35 @@ export const SongDetailView = ({
           </div>
 
           <Tabs value={tab} onValueChange={setTab} className="w-full">
-            <TabsList className="mb-6 grid w-full grid-cols-3 rounded-xl border border-white/5 bg-slate-900/50 p-1">
-              <TabsTrigger
-                value="stats"
-                className="flex items-center gap-2 py-2 text-[10px] font-black uppercase data-[state=active]:bg-blue-600"
-              >
-                <LineChart className="h-3.5 w-3.5" /> STATISTICS
-              </TabsTrigger>
-              <TabsTrigger
-                value="history"
-                className="flex items-center gap-2 py-2 text-[10px] font-black uppercase data-[state=active]:bg-blue-600"
-              >
-                <LucideHistory className="h-3.5 w-3.5" /> HISTORY
-              </TabsTrigger>
-              <TabsTrigger
-                value="rivals"
-                className="flex items-center gap-2 py-2 text-[10px] font-black uppercase data-[state=active]:bg-blue-600"
-              >
-                <Users className="h-3.5 w-3.5" /> RIVALS
-              </TabsTrigger>
+            <TabsList className="mb-6 grid w-full grid-cols-3 rounded-xl border border-bpim-border bg-bpim-card/50 p-1.5 h-12 items-stretch">
+              {tabs.map((t) => {
+                const Icon = t.icon;
+                return (
+                  <TabsTrigger
+                    key={t.value}
+                    value={t.value}
+                    className="flex h-full items-center justify-center gap-2.5 py-0 text-[14px] leading-none transition-all rounded-lg data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg"
+                  >
+                    <Icon className="h-4 w-4 shrink-0" />
+                    <span className="hidden sm:inline tracking-tighter">
+                      {t.label}
+                    </span>
+                  </TabsTrigger>
+                );
+              })}
             </TabsList>
 
             <TabsContent value="stats" className="mt-0 outline-none">
               <BPIChart data={chartData} maxScore={maxScore} song={song} />
 
-              <div className="mt-6 rounded-xl border border-white/5 bg-white/5 p-4">
+              <div className="mt-6 rounded-xl border border-bpim-border bg-white/5 p-4">
                 <div className="flex flex-col gap-3">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-500 uppercase">
                       World Record
                     </span>
                     <span className="font-mono text-sm font-black text-white">
-                      {song.wrScore?.toLocaleString() ?? 0}
+                      {song.wrScore ?? 0}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
@@ -175,7 +184,7 @@ export const SongDetailView = ({
                       Kaiden Average
                     </span>
                     <span className="font-mono text-sm font-black text-white">
-                      {song.kaidenAvg?.toLocaleString() ?? 0}
+                      {song.kaidenAvg ?? 0}
                     </span>
                   </div>
                   <Separator className="bg-white/5 my-1" />
@@ -183,9 +192,9 @@ export const SongDetailView = ({
                     <span className="text-xs font-bold text-slate-500 uppercase">
                       Clear Lamp
                     </span>
-                    <Badge className="bg-yellow-600 hover:bg-yellow-600 text-black font-black text-[10px] border-none px-2 h-5">
+                    <span className="font-mono text-sm font-black">
                       {song.clearState || "NO PLAY"}
-                    </Badge>
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-500 uppercase">

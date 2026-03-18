@@ -21,7 +21,7 @@ export default function LoginPage() {
         title=""
         description="beatmania IIDX 上級者のためのスコアマネジメントツール"
       />
-      <div className="min-h-screen bg-black py-20 text-white">
+      <div className="min-h-screen bg-bpim-bg py-20 text-white">
         <PageContainer>
           <div className="mb-16 flex flex-col items-center gap-6 text-center">
             <h1 className="bg-gradient-to-br from-white to-gray-600 bg-clip-text text-6xl font-bold tracking-tighter text-transparent leading-none md:text-8xl">
@@ -32,7 +32,7 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <div className="mx-auto mb-12 max-w-md rounded-2xl border border-white/10 bg-slate-950 p-8 shadow-[0_0_40px_rgba(0,0,0,0.5),0_0_20px_rgba(59,130,246,0.1)]">
+          <div className="mx-auto mb-12 max-w-md rounded-2xl border border-bpim-border bg-bpim-bg p-8 shadow-[0_0_40px_rgba(0,0,0,0.5),0_0_20px_rgba(59,130,246,0.1)]">
             <div className="flex flex-col items-center gap-6 text-center">
               <h2 className="text-xl font-bold">Sign In</h2>
               <LoginButtons />
@@ -64,7 +64,7 @@ export default function LoginPage() {
               BPIM2って？
             </h3>
 
-            <div className="mb-12 w-full rounded-2xl border border-white/10 bg-slate-950 p-6 md:p-8">
+            <div className="mb-12 w-full rounded-2xl border border-bpim-border bg-bpim-bg p-6 md:p-8">
               <div className="flex flex-col items-start gap-6 md:flex-row md:gap-8">
                 <div className="flex shrink-0 items-center justify-center rounded-xl bg-blue-500/10 p-4 text-blue-400">
                   <BarChart3 className="h-8 w-8" />
@@ -145,7 +145,7 @@ const FeatureCard = ({
   title: string;
   description: string;
 }) => (
-  <div className="flex flex-col items-start rounded-xl border border-white/10 bg-white/5 p-6 transition-colors hover:border-white/20">
+  <div className="flex flex-col items-start rounded-xl border border-bpim-border bg-white/5 p-6 transition-colors hover:border-white/20">
     <div className="mb-4 flex items-center justify-center rounded-lg bg-blue-500/10 p-3 text-blue-400">
       <Icon className="h-6 w-6" />
     </div>

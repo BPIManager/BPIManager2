@@ -8,7 +8,7 @@ export const UserFollowCard = ({ user }: { user: any }) => {
 
   const UserInfo = (
     <div className="flex flex-1 items-center gap-4">
-      <Avatar className="h-12 w-12 border border-white/10">
+      <Avatar className="h-12 w-12 border border-bpim-border">
         <AvatarImage src={user.profileImage ?? ""} />
         <AvatarFallback>{user.userName?.slice(0, 2)}</AvatarFallback>
       </Avatar>
@@ -27,7 +27,7 @@ export const UserFollowCard = ({ user }: { user: any }) => {
   );
 
   const containerClass = cn(
-    "flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/5 p-4 transition-colors duration-200",
+    "flex w-full items-center justify-between rounded-xl border border-bpim-border bg-white/5 p-4 transition-colors duration-200",
     isMasked ? "cursor-default" : "cursor-pointer hover:bg-white/10",
   );
 

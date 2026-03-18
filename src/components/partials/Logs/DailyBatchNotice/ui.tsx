@@ -29,7 +29,7 @@ export const DailyBatchNotice = ({
   return (
     <div className="relative mb-6 overflow-hidden rounded-2xl border border-blue-800/50 bg-blue-950/30 p-4 md:p-5">
       <div
-        className="pointer-events-none absolute -right-5 -top-5 text-blue-500/10"
+        className="pointer-events-none absolute -right-5 -top-5 text-gray-200/10"
         aria-hidden="true"
       >
         <LayoutGrid size={120} />

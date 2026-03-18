@@ -86,7 +86,7 @@ export const AdvancedFilterModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-md border-white/10 bg-slate-950 p-6 text-white">
+      <DialogContent className="max-w-2xl border-bpim-border p-6 text-white">
         <DialogHeader>
           <DialogTitle className="text-base font-bold">
             詳細フィルター
@@ -95,14 +95,14 @@ export const AdvancedFilterModal = ({
 
         <div className="flex flex-col gap-6 py-4 overflow-y-auto max-h-[70vh] pr-2 scrollbar-thin">
           <section className="flex flex-col gap-3">
-            <h3 className="text-[10px] font-bold tracking-widest text-blue-500 uppercase">
+            <h3 className="text-[10px] font-bold tracking-widest text-gray-200 uppercase">
               BPM範囲
             </h3>
             <div className="flex items-center gap-3">
               <Input
                 placeholder="Min"
                 type="number"
-                className="h-9 border-white/10 bg-white/5"
+                className="h-9 border-bpim-border bg-white/5"
                 value={localParams.bpmMin ?? ""}
                 onChange={(e) =>
                   updateLocal({
@@ -114,7 +114,7 @@ export const AdvancedFilterModal = ({
               <Input
                 placeholder="Max"
                 type="number"
-                className="h-9 border-white/10 bg-white/5"
+                className="h-9 border-bpim-border bg-white/5"
                 value={localParams.bpmMax ?? ""}
                 onChange={(e) =>
                   updateLocal({
@@ -140,7 +140,7 @@ export const AdvancedFilterModal = ({
           <Separator className="bg-white/5" />
 
           <section className="flex flex-col gap-3">
-            <h3 className="text-[10px] font-bold tracking-widest text-blue-500 uppercase">
+            <h3 className="text-[10px] font-bold tracking-widest text-gray-200 uppercase">
               ランプ状態
             </h3>
             <div className="grid grid-cols-2 gap-3">
@@ -166,7 +166,7 @@ export const AdvancedFilterModal = ({
           <Separator className="bg-white/5" />
 
           <section className="flex flex-col gap-3">
-            <h3 className="text-[10px] font-bold tracking-widest text-blue-500 uppercase">
+            <h3 className="text-[10px] font-bold tracking-widest text-gray-200 uppercase">
               最終更新日
             </h3>
             <div className="flex flex-wrap gap-2">
@@ -178,7 +178,7 @@ export const AdvancedFilterModal = ({
                     localParams.since === opt.value ? "default" : "outline"
                   }
                   className={cn(
-                    "h-7 px-2 rounded-full border-white/10",
+                    "h-7 px-2 rounded-full border-bpim-border",
                     localParams.since === opt.value
                       ? "bg-blue-600"
                       : "bg-transparent text-slate-400",
@@ -200,7 +200,7 @@ export const AdvancedFilterModal = ({
                 size="xs"
                 variant={isCustomActive ? "default" : "outline"}
                 className={cn(
-                  "h-7 px-2 rounded-full border-white/10",
+                  "h-7 px-2 rounded-full border-bpim-border",
                   isCustomActive
                     ? "bg-blue-600"
                     : "bg-transparent text-slate-400",
@@ -225,7 +225,7 @@ export const AdvancedFilterModal = ({
                     <Label className="text-[10px] text-slate-500">開始日</Label>
                     <Input
                       type="date"
-                      className="h-8 border-white/10 bg-slate-900 text-xs [color-scheme:dark]"
+                      className="h-8 border-bpim-border bg-bpim-bg text-xs [color-scheme:dark]"
                       value={localParams.since || ""}
                       onChange={(e) => updateLocal({ since: e.target.value })}
                     />
@@ -235,7 +235,7 @@ export const AdvancedFilterModal = ({
                     <Label className="text-[10px] text-slate-500">終了日</Label>
                     <Input
                       type="date"
-                      className="h-8 border-white/10 bg-slate-900 text-xs [color-scheme:dark]"
+                      className="h-8 border-bpim-border bg-bpim-bg text-xs [color-scheme:dark]"
                       value={localParams.until || ""}
                       onChange={(e) => updateLocal({ until: e.target.value })}
                     />
@@ -248,7 +248,7 @@ export const AdvancedFilterModal = ({
           <Separator className="bg-white/5" />
 
           <section className="flex flex-col gap-3">
-            <h3 className="text-[10px] font-bold tracking-widest text-blue-500 uppercase">
+            <h3 className="text-[10px] font-bold tracking-widest text-gray-200 uppercase">
               楽曲バージョン
             </h3>
             <ScrollArea className="h-[200px] w-full pr-4">

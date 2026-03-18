@@ -1,7 +1,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
 export const PageHeaderSkeleton = () => (
-  <header className="relative mb-6 overflow-hidden border-b border-white/10 bg-slate-950 px-4 pt-8 pb-6 md:pt-12 md:pb-8">
+  <header className="relative mb-6 overflow-hidden border-b border-bpim-border bg-bpim-bg px-4 pt-8 pb-6 md:pt-12 md:pb-8">
     <div
       className="pointer-events-none absolute -top-[20%] -left-[10%] h-[150%] w-[40%] bg-blue-900/5 blur-[120px]"
       aria-hidden="true"

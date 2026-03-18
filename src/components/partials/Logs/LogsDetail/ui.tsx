@@ -21,7 +21,7 @@ export const LogsDetailView = (props: LogsDetailViewProps) => {
     props.type === "daily" ? "一日の成果を統合して表示しています" : "";
 
   return (
-    <div className="flex flex-col w-full min-h-screen bg-black">
+    <div className="flex flex-col w-full min-h-screen bg-bpim-bg">
       <PageHeader title={pageTitle} description={pageDescription} />
 
       <PageContainer>

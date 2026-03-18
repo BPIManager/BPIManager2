@@ -26,6 +26,7 @@ import { versionsNonDisabledCollection } from "@/constants/versions";
 import { latestVersion } from "@/constants/latestVersion";
 import { FilterCheckboxGroup, FilterStickyToggle } from "./part";
 import { cn } from "@/lib/utils";
+import { FilterSelect } from "./select";
 
 interface SongFilterBarProps {
   params: FilterParamsFrontend;
@@ -82,14 +83,18 @@ export const SongFilterBar = ({
   return (
     <div
       className={cn(
-        "p-4 border-b border-white/10 bg-slate-950 transition-all duration-200",
-        isSticky ? "sticky top-0 z-20 shadow-md" : "relative",
+        "p-4 border-b border-bpim-border transition-all duration-200 w-full",
+        // bg-bpim-bg を確実に指定。
+        // shadow-2xl をつけることで、重なっている境界をはっきりさせます。
+        isSticky
+          ? "sticky top-0 z-50 bg-bpim-bg shadow-2xl"
+          : "relative bg-bpim-bg",
       )}
     >
-      <div className="flex w-full gap-2 mb-3 items-center">
+      <div className="flex flex-col sm:flex-row w-full gap-2 mb-3 items-center">
         {!disableVersionSelect && (
-          <div className="flex-1 min-w-0">
-            <Select
+          <div className="w-full sm:flex-1">
+            <FilterSelect
               value={String(currentStoreVersion ?? latestVersion)}
               onValueChange={(newVersion) => {
                 router.push({
@@ -97,44 +102,22 @@ export const SongFilterBar = ({
                   query: { ...router.query, version: newVersion },
                 });
               }}
-            >
-              <SelectTrigger className="h-9 text-xs border-white/10 bg-white/5">
-                <SelectValue placeholder="Version" />
-              </SelectTrigger>
-              <SelectContent>
-                {versionsNonDisabledCollection.map((v) => (
-                  <SelectItem key={v.value} value={v.value} className="text-xs">
-                    {v.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              options={versionsNonDisabledCollection}
+              placeholder="Version"
+            />
           </div>
         )}
-        <div className="flex-1 min-w-0">
-          <Select
+        <div className="w-full sm:flex-1">
+          <FilterSelect
             value={params.sortKey || "bpi"}
             onValueChange={(val) =>
               onParamsChange({
                 sortKey: val as FilterParamsFrontend["sortKey"],
               })
             }
-          >
-            <SelectTrigger className="h-9 text-xs border-white/10 bg-white/5">
-              <SelectValue placeholder="Sort by" />
-            </SelectTrigger>
-            <SelectContent>
-              {combinedSortOptions.map((opt) => (
-                <SelectItem
-                  key={opt.value}
-                  value={opt.value}
-                  className="text-xs"
-                >
-                  {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            options={combinedSortOptions}
+            placeholder="Sort by"
+          />
         </div>
       </div>
 
@@ -145,20 +128,20 @@ export const SongFilterBar = ({
           </div>
           <Input
             placeholder="曲名で検索..."
-            className="h-9 pl-10 pr-10 border-white/10 bg-white/5 focus-visible:ring-blue-500 text-sm"
+            className="h-9 pl-10 pr-10 border-bpim-border bg-white/5 focus-visible:ring-gray-500 text-sm"
             value={localSearch}
             onChange={(e) => setLocalSearch(e.target.value)}
           />
           {isTyping && (
             <div className="absolute right-3 top-1/2 -translate-y-1/2">
-              <LuLoader className="animate-spin text-blue-500" size={14} />
+              <LuLoader className="animate-spin text-gray-200" size={14} />
             </div>
           )}
         </div>
         <Button
           variant="outline"
           size="icon"
-          className="h-9 w-9 border-white/10 hover:bg-white/10"
+          className="h-9 w-9 border-bpim-border hover:bg-white/10"
           onClick={onOpenAdvancedFilter}
         >
           <LuSlidersHorizontal size={18} />
@@ -189,7 +172,7 @@ export const SongFilterBar = ({
       </div>
 
       {withRivals && (
-        <div className="flex gap-6 flex-wrap mt-3 pt-3 border-t border-white/5">
+        <div className="flex gap-6 flex-wrap mt-3 pt-3 border-t border-bpim-border">
           <div className="flex flex-col gap-1.5">
             <span className="text-[10px] font-bold tracking-widest text-slate-500 uppercase">
               プレイ状態
@@ -225,7 +208,7 @@ export const SongFilterBar = ({
       <Separator className="bg-white/10 mt-3 mb-2" />
 
       <div className="flex items-center justify-between">
-        <span className="text-xs font-bold text-blue-500">
+        <span className="text-xs font-bold text-gray-200">
           {totalCount.toLocaleString()}曲
         </span>
         <FilterStickyToggle isSticky={isSticky} onToggle={setIsSticky} />

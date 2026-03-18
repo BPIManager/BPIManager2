@@ -43,8 +43,8 @@ export const ActionConfirmDialog = ({
       open={isOpen}
       onOpenChange={(open) => !open && !isLoading && onClose()}
     >
-      <DialogContent className="max-w-[90vw] sm:max-w-md border-white/10 bg-[#161b22] p-0 overflow-hidden shadow-2xl rounded-2xl">
-        <DialogHeader className="p-6 pb-4 border-b border-white/5">
+      <DialogContent className="max-w-[90vw] sm:max-w-md border-bpim-border bg-bpim-bg p-0 overflow-hidden shadow-2xl rounded-2xl">
+        <DialogHeader className="p-6 pb-4 border-b border-bpim-border">
           <DialogTitle className="flex items-center gap-3 text-lg font-bold text-white">
             {isDestructive && (
               <AlertTriangle className="h-5 w-5 text-red-500 shrink-0" />
@@ -63,7 +63,7 @@ export const ActionConfirmDialog = ({
           )}
         </div>
 
-        <DialogFooter className="flex flex-row items-center justify-end gap-3 p-4 bg-black/20 border-t border-white/5 sm:flex-row">
+        <DialogFooter className="flex flex-row items-center justify-end gap-3 p-8 bg-bpim-bg/20 border-t border-bpim-border sm:flex-row">
           <Button
             variant="ghost"
             onClick={onClose}

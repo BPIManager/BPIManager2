@@ -52,10 +52,10 @@ export const RivalRankingBody = ({
   }
 
   return (
-    <div className="w-full overflow-hidden rounded-md border border-white/10 bg-black/20">
+    <div className="w-full overflow-hidden rounded-md border border-bpim-border bg-bpim-bg/20">
       <Table>
         <TableHeader className="bg-white/5">
-          <TableRow className="hover:bg-transparent border-white/10">
+          <TableRow className="hover:bg-transparent border-bpim-border">
             <TableHead className="w-[60px] text-[10px] font-bold uppercase tracking-wider">
               Rank
             </TableHead>
@@ -85,7 +85,7 @@ export const RivalRankingBody = ({
                 key={row.userId}
                 onClick={() => !isSelf && router.push(`/rivals/${row.userId}`)}
                 className={cn(
-                  "border-white/5 transition-colors cursor-pointer",
+                  "border-bpim-border transition-colors cursor-pointer",
                   isSelf
                     ? "bg-blue-900/30 hover:bg-blue-900/40"
                     : "hover:bg-white/5",
@@ -103,7 +103,7 @@ export const RivalRankingBody = ({
                 </TableCell>
                 <TableCell className="py-3">
                   <div className="flex items-center gap-3">
-                    <Avatar className="h-7 w-7 border border-white/10">
+                    <Avatar className="h-7 w-7 border border-bpim-border">
                       <AvatarImage src={row.profileImage ?? ""} />
                       <AvatarFallback className="text-[10px]">
                         {row.userName?.slice(0, 2)}

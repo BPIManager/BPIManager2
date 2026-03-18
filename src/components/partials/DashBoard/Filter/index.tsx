@@ -16,17 +16,17 @@ export const DashBoardFilter = () => {
     useStatsFilter();
 
   return (
-    <div className="rounded-lg border border-white/10 bg-[#0d1117] p-4">
-      <div className="flex flex-col items-start gap-6 lg:flex-row lg:gap-10">
+    <div className="rounded-lg border border-bpim-border bg-[#0d1117] p-4">
+      <div className="flex flex-col items-start gap-6 lg:flex-row lg:items-center lg:gap-10">
         <div className="flex w-full flex-col gap-2 lg:min-w-[240px] lg:w-auto">
           <span className="text-[10px] font-bold uppercase text-gray-500 md:text-xs">
             VERSION
           </span>
           <Select value={version} onValueChange={(val) => setVersion(val)}>
-            <SelectTrigger className="h-8 w-full border-white/10 bg-white/5 text-xs hover:bg-white/10 focus:ring-0">
+            <SelectTrigger className="h-8 w-full border-bpim-border bg-white/5 text-xs hover:bg-white/10 focus:ring-0">
               <SelectValue placeholder="Select version" />
             </SelectTrigger>
-            <SelectContent className="border-white/10 bg-gray-900 text-white">
+            <SelectContent className="border-bpim-border bg-bpim-bg text-white">
               {versionsNonDisabledCollection.map((v) => (
                 <SelectItem key={v.value} value={v.value} className="text-xs">
                   {v.label}
@@ -40,7 +40,7 @@ export const DashBoardFilter = () => {
           <span className="text-[10px] font-bold uppercase text-gray-500 md:text-xs">
             LEVEL
           </span>
-          <div className="flex flex-wrap gap-x-4 gap-y-2">
+          <div className="flex h-8 items-center flex-wrap gap-x-4 gap-y-2">
             {IIDX_LEVELS.map((l) => (
               <div key={l} className="flex items-center gap-2">
                 <Checkbox
@@ -51,7 +51,7 @@ export const DashBoardFilter = () => {
                 />
                 <Label
                   htmlFor={`level-${l}`}
-                  className="cursor-pointer text-xs font-medium md:text-sm"
+                  className="cursor-pointer text-xs font-medium leading-none md:text-sm"
                 >
                   ☆{l}
                 </Label>
@@ -64,7 +64,7 @@ export const DashBoardFilter = () => {
           <span className="text-[10px] font-bold uppercase text-gray-500 md:text-xs">
             DIFFICULTY
           </span>
-          <div className="flex flex-wrap gap-x-4 gap-y-2">
+          <div className="flex h-8 items-center flex-wrap gap-x-4 gap-y-2">
             {IIDX_DIFFICULTIES.map((d) => (
               <div key={d} className="flex items-center gap-2">
                 <Checkbox
@@ -75,7 +75,7 @@ export const DashBoardFilter = () => {
                 />
                 <Label
                   htmlFor={`diff-${d}`}
-                  className="cursor-pointer text-xs font-medium md:text-sm"
+                  className="cursor-pointer text-xs font-medium leading-none md:text-sm"
                 >
                   {d}
                 </Label>

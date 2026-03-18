@@ -120,7 +120,7 @@ export const ImageUploadModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <DialogContent className="sm:max-w-md border-white/10 bg-slate-900 p-4">
+      <DialogContent className="sm:max-w-md border-bpim-border bg-bpim-bg p-4">
         <DialogHeader>
           <DialogTitle className="text-white">画像を選択</DialogTitle>
         </DialogHeader>
@@ -129,7 +129,7 @@ export const ImageUploadModal = ({
           {!imgSrc ? (
             <div
               onClick={() => document.getElementById("file-input")?.click()}
-              className="flex w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-white/10 bg-white/5 p-12 transition-colors hover:bg-white/10"
+              className="flex w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-bpim-border bg-white/5 p-12 transition-colors hover:bg-white/10"
             >
               <Upload className="h-8 w-8 text-slate-500" />
               <p className="text-sm text-slate-400 font-medium">
@@ -144,7 +144,7 @@ export const ImageUploadModal = ({
               />
             </div>
           ) : (
-            <div className="relative max-h-[400px] w-full overflow-hidden rounded-lg bg-black/50 border border-white/10">
+            <div className="relative max-h-[400px] w-full overflow-hidden rounded-lg bg-bpim-bg/50 border border-bpim-border">
               <ReactCrop
                 crop={crop}
                 onChange={(c) => setCrop(c)}

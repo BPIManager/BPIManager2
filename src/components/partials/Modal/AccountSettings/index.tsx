@@ -72,10 +72,10 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
           }
         }}
       >
-        <DialogContent className="max-w-md overflow-y-auto max-h-[90vh] rounded-2xl border-white/10 bg-slate-950 p-6 shadow-2xl">
-          <DialogHeader className="border-b border-white/5 pb-4">
+        <DialogContent className="max-w-md overflow-y-auto max-h-[90vh] rounded-2xl border-bpim-border bg-bpim-bg p-6 shadow-2xl">
+          <DialogHeader className="border-b border-bpim-border pb-4">
             <div className="flex items-center gap-3">
-              <User2 className="h-5 w-5 text-blue-500" />
+              <User2 className="h-5 w-5 text-gray-200" />
               <DialogTitle className="text-xl font-bold tracking-tight text-white">
                 プロフィール設定
               </DialogTitle>
@@ -98,7 +98,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                   variant="outline"
                   size="sm"
                   onClick={() => setIsImageModalOpen(true)}
-                  className="h-8 border-white/10 text-xs font-bold hover:bg-white/5"
+                  className="h-8 border-bpim-border text-xs font-bold hover:bg-white/5"
                 >
                   アイコンをアップロード
                 </Button>
@@ -119,7 +119,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                 <Input
                   id="userName"
                   className={cn(
-                    "h-10 bg-white/5 border-white/10 pr-10 focus-visible:ring-blue-500",
+                    "h-10 bg-white/5 border-bpim-border pr-10 focus-visible:ring-blue-500",
                     nameStatus.error &&
                       "border-red-500 focus-visible:ring-red-500",
                   )}
@@ -131,7 +131,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                 />
                 <div className="absolute right-3 top-1/2 -translate-y-1/2 z-10">
                   {nameStatus.isChecking ? (
-                    <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
+                    <Loader2 className="h-4 w-4 animate-spin text-gray-200" />
                   ) : formData.userName && !nameStatus.error ? (
                     <Check className="h-4 w-4 text-green-500" />
                   ) : nameStatus.error ? (
@@ -162,7 +162,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
               <Input
                 id="iidxId"
                 className={cn(
-                  "h-10 bg-white/5 border-white/10 font-mono focus-visible:ring-blue-500",
+                  "h-10 bg-white/5 border-bpim-border font-mono focus-visible:ring-blue-500",
                   !validateIidxId(formData.iidxId) &&
                     "border-red-500 focus-visible:ring-red-500",
                 )}
@@ -186,8 +186,8 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
               >
                 Xユーザー名
               </Label>
-              <div className="flex h-10 w-full overflow-hidden rounded-md border border-white/10 bg-white/5 focus-within:ring-2 focus-within:ring-blue-500">
-                <div className="flex items-center justify-center bg-white/5 px-3 text-sm text-slate-400 border-r border-white/10">
+              <div className="flex h-10 w-full overflow-hidden rounded-md border border-bpim-border bg-white/5 focus-within:ring-2 focus-within:ring-blue-500">
+                <div className="flex items-center justify-center bg-white/5 px-3 text-sm text-slate-400 border-r border-bpim-border">
                   @
                 </div>
                 <input
@@ -213,10 +213,10 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                   setFormData({ ...formData, arenaRank: val })
                 }
               >
-                <SelectTrigger className="h-10 border-white/10 bg-white/5 focus:ring-blue-500">
+                <SelectTrigger className="h-10 border-bpim-border bg-white/5 focus:ring-blue-500">
                   <SelectValue placeholder="未設定" />
                 </SelectTrigger>
-                <SelectContent className="border-white/10 bg-slate-900">
+                <SelectContent className="border-bpim-border bg-bpim-bg">
                   {arenaRanksCollection.map((item) => (
                     <SelectItem
                       key={item.value}
@@ -243,7 +243,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
               <Textarea
                 id="bio"
                 className={cn(
-                  "min-h-[100px] bg-white/5 border-white/10 focus-visible:ring-blue-500",
+                  "min-h-[100px] bg-white/5 border-bpim-border focus-visible:ring-blue-500",
                   formData.bio.length > 1000 && "border-red-500",
                 )}
                 value={formData.bio}
@@ -287,7 +287,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
             </div>
           </div>
 
-          <DialogFooter className="border-t border-white/5 pt-6">
+          <DialogFooter className="border-t border-bpim-border pt-6">
             <Button
               className="w-full h-12 rounded-xl bg-blue-600 text-base font-black hover:bg-blue-500 transition-all active:scale-95 disabled:opacity-50"
               disabled={!isValid || isSubmitting}

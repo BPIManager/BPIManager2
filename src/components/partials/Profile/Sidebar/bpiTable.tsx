@@ -18,7 +18,7 @@ export const BpiHistoryTable = ({ history }: { history: any[] }) => (
       {history.map((hist) => (
         <div
           key={hist.version}
-          className="grid grid-cols-[1fr_2fr_2fr] items-center gap-3 rounded-lg border border-white/5 bg-white/5 p-2 px-4 transition-colors hover:bg-white/10"
+          className="grid grid-cols-[1fr_2fr_2fr] items-center gap-3 rounded-lg border border-bpim-border bg-white/5 p-2 px-4 transition-colors hover:bg-white/10"
         >
           <span className="font-mono text-xs font-bold text-slate-400">
             {hist.version}

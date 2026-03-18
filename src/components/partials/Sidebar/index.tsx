@@ -83,9 +83,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
         className={cn(
           "w-full justify-start gap-3 px-3 transition-all",
           isNested ? "pl-9" : "pl-3",
-          isActive
-            ? "bg-white/10 font-bold text-blue-400"
-            : "font-medium text-slate-300",
+          isActive ? "bg-white/10 font-bold" : "font-medium text-slate-300",
           item.isComingSoon && "opacity-50 cursor-not-allowed",
         )}
         onClick={item.isComingSoon ? undefined : onClose}
@@ -96,7 +94,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
             <span>{item.label}</span>
             <Badge
               variant="outline"
-              className="ml-auto text-[10px] py-0 border-white/10 text-slate-500"
+              className="ml-auto text-[10px] py-0 border-bpim-border text-slate-500"
             >
               近日公開
             </Badge>
@@ -113,10 +111,10 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
 
   return (
     <div className="flex h-full flex-col gap-6 p-4 overflow-y-auto scrollbar-hide">
-      <div className="rounded-xl border border-white/10 bg-white/5 p-4 flex flex-col gap-4">
+      <div className="rounded-xl border border-bpim-border bg-white/5 p-4 flex flex-col gap-4">
         <div className="flex items-center gap-3">
           <Link href={`/users/${user?.userId}`} onClick={onClose}>
-            <Avatar className="h-12 w-12 rounded-lg border border-white/10">
+            <Avatar className="h-12 w-12 rounded-lg border border-bpim-border">
               <AvatarImage
                 src={user?.profileImage || ""}
                 alt={user?.userName || "User"}
@@ -206,9 +204,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
               ) : (
                 <ChevronRight className="h-4.5 w-4.5" />
               )}
-              <span className="text-xs font-bold uppercase tracking-wider">
-                ライバル
-              </span>
+              <span className="text-xs font-bold tracking-wider">ライバル</span>
             </Button>
           </CollapsibleTrigger>
           <CollapsibleContent className="flex flex-col gap-1 mt-1">
@@ -260,7 +256,7 @@ const GitHubButton = () => (
     asChild
     variant="outline"
     size="sm"
-    className="w-full rounded-full border-white/10 bg-transparent text-white hover:bg-white/10"
+    className="w-full rounded-full border-bpim-border bg-transparent text-white hover:bg-white/10"
   >
     <a
       href="https://github.com/BPIManager/BPIManager2"

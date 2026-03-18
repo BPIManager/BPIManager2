@@ -26,7 +26,7 @@ const CustomTooltip = ({ active, payload, maxScore }: any) => {
     const isYou = data.name === "YOU";
 
     return (
-      <div className="rounded-lg border border-white/20 bg-slate-900 p-3 shadow-2xl backdrop-blur-md">
+      <div className="rounded-lg border border-white/20 bg-bpim-bg p-3 shadow-2xl backdrop-blur-md">
         <div className="flex flex-col gap-1">
           <p
             className={cn(

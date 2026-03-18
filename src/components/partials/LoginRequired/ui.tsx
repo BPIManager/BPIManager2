@@ -6,7 +6,7 @@ export const LoginRequiredCard = ({ className }: { className?: string }) => {
   return (
     <div
       className={cn(
-        "relative flex flex-col items-center overflow-hidden rounded-xl border border-white/10 bg-slate-900 p-8 text-center",
+        "relative flex flex-col items-center overflow-hidden rounded-xl border border-bpim-border bg-bpim-bg p-8 text-center",
         className,
       )}
     >
@@ -39,7 +39,7 @@ export const LoginRequiredBox = () => {
   return (
     <div className="absolute inset-0 z-50 flex items-center justify-center px-4">
       <div
-        className="absolute inset-0 bg-black/40 backdrop-blur-md"
+        className="absolute inset-0 bg-bpim-bg/40 backdrop-blur-md"
         aria-hidden="true"
       />
 

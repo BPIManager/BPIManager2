@@ -31,7 +31,7 @@ export default function LogsPage() {
           "rounded-2xl transition-all",
           isOwnedByMe
             ? "bg-transparent p-0"
-            : "border border-white/10 bg-slate-900/40 p-4 md:p-6 shadow-xl backdrop-blur-md",
+            : "border border-bpim-border bg-bpim-bg/40 p-4 md:p-6 shadow-xl backdrop-blur-md",
         )}
       >
         <LogFilterSection version={v} groupedBy={g} />

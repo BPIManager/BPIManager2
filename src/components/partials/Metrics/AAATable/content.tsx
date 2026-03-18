@@ -60,7 +60,7 @@ export const AAATableContent = ({
 
       {isLoading ? (
         <div className="flex h-64 items-center justify-center">
-          <Loader2 className="h-10 w-10 animate-spin text-blue-500" />
+          <Loader2 className="h-10 w-10 animate-spin text-gray-200" />
         </div>
       ) : (
         <div className="flex flex-col gap-12">
@@ -68,7 +68,7 @@ export const AAATableContent = ({
             .sort((a, b) => Number(b) - Number(a))
             .map((bpiKey) => (
               <section key={bpiKey} className="flex flex-col gap-4">
-                <div className="border-b border-white/10 pb-1">
+                <div className="border-b border-bpim-border pb-1">
                   <h3 className="text-[10px] font-black tracking-[0.2em] text-slate-500 uppercase">
                     BPI {bpiKey} ~ {Number(bpiKey) + 10}
                   </h3>

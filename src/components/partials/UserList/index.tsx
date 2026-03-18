@@ -53,7 +53,7 @@ export const UserRecommendationList = () => {
 
   return (
     <div className="flex w-full flex-col gap-6">
-      <div className="rounded-xl border border-white/10 bg-slate-900/40 p-4 shadow-sm">
+      <div className="rounded-xl border border-bpim-border bg-bpim-bg/40 p-4 shadow-sm">
         <SortSelector
           sort={s}
           order={o}

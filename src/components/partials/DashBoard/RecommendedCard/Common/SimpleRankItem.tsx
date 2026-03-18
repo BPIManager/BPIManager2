@@ -25,7 +25,7 @@ export const SimpleRankItem = ({
       onClick={onClick}
       className={cn(
         "group relative flex items-center justify-between gap-3 p-3 pl-4 transition-colors duration-200",
-        "border-b border-white/10 cursor-pointer hover:bg-white/5",
+        "border-b border-bpim-border cursor-pointer hover:bg-white/5",
       )}
     >
       <div

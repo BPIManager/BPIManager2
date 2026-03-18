@@ -15,7 +15,7 @@ export const ProfileSideBar = ({
   isUpdating = false,
 }: any) => {
   return (
-    <div className="lg:sticky lg:top-20 flex flex-col gap-6 rounded-2xl border border-white/10 bg-slate-900/60 p-5 backdrop-blur-md shadow-xl">
+    <div className="lg:sticky lg:top-20 flex flex-col gap-6 rounded-2xl border border-bpim-border bg-bpim-bg/60 p-5 backdrop-blur-md shadow-xl">
       <ProfileHeaderBase profile={profile} />
 
       <FollowStats userId={profile.userId} follows={profile.follows} />
@@ -96,7 +96,7 @@ export const ProfileStatsContent = ({ profile }: { profile: any }) => {
       <BpiHistoryTable history={profile.history} />
 
       {profile.profileText && (
-        <div className="rounded-xl border border-white/5 bg-white/5 p-3">
+        <div className="rounded-xl border border-bpim-border bg-white/5 p-3">
           <span className="mb-2 block text-[10px] font-bold tracking-widest text-slate-500 uppercase">
             Bio
           </span>

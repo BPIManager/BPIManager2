@@ -99,7 +99,7 @@ export const LogRank = ({
         )}
       </div>
 
-      <div className="flex flex-col overflow-hidden rounded-xl border border-slate-800 bg-slate-950">
+      <div className="flex flex-col overflow-hidden rounded-xl border border-bpim-border bg-bpim-bg">
         {visibleSongs.length === 0 ? (
           <div className="flex items-center justify-center p-8 bg-white/5">
             <span className="text-xs text-slate-500">データがありません</span>
@@ -122,7 +122,7 @@ export const LogRank = ({
                 />
               )}
               {index !== visibleSongs.length - 1 && (
-                <Separator className="bg-slate-900" />
+                <Separator className="bg-bpim-bg" />
               )}
             </div>
           ))

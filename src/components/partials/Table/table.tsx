@@ -50,10 +50,7 @@ const SongItem = ({
       onClick={onClick}
       className={cn(
         "relative w-full mb-2 cursor-pointer transition-colors duration-200 overflow-hidden",
-        "bg-white/10 hover:bg-white/20 border-l-4",
-        song.clearState === "FULLCOMBO CLEAR"
-          ? "border-transparent"
-          : `border-l-0`,
+        "bg-white/10 hover:bg-white/20",
       )}
     >
       <div
@@ -61,7 +58,7 @@ const SongItem = ({
       />
 
       <div className="grid grid-cols-[1fr_auto] gap-1">
-        <div className="flex items-center px-3 py-2 min-w-0">
+        <div className="flex items-center pl-4 pr-3 py-2 min-w-0">
           <div className="flex flex-col gap-0.5 w-full">
             <h3 className="text-sm font-bold text-white truncate leading-tight">
               {song.title}
@@ -108,7 +105,7 @@ const SongItem = ({
           </div>
         </div>
 
-        <div className="flex items-center bg-black/30 p-2 lg:p-4 shrink-0">
+        <div className="flex items-center bg-bpim-bg/30 p-2 lg:p-4 shrink-0">
           <div className="flex items-end gap-3 font-mono">
             <div className="flex flex-col items-end">
               <span className="text-[10px] text-slate-500 leading-none mb-0.5 uppercase">

@@ -1,7 +1,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
 export const RivalSummarySkeleton = () => (
-  <div className="flex min-h-[140px] w-full items-stretch justify-between gap-3 rounded-2xl border border-white/10 bg-slate-900/40 p-3 md:gap-6 md:p-5">
+  <div className="flex min-h-[140px] w-full items-stretch justify-between gap-3 rounded-2xl border border-bpim-border bg-bpim-bg/40 p-3 md:gap-6 md:p-5">
     <div className="flex flex-1 flex-col gap-4 py-1">
       <div className="flex w-full items-center gap-3">
         <Skeleton className="h-10 w-10 rounded-full md:h-12 md:w-12" />

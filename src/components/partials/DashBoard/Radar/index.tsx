@@ -85,8 +85,8 @@ export const RadarSection = ({
                 onClick={() => setSelectedCat(key)}
                 className={cn(
                   "flex items-center justify-between p-2.5 rounded-md",
-                  "bg-white/5 border border-white/5 cursor-pointer transition-all duration-200",
-                  "hover:bg-white/10 hover:translate-x-1 hover:border-white/10",
+                  "bg-white/5 border border-bpim-border cursor-pointer transition-all duration-200",
+                  "hover:bg-white/10 hover:translate-x-1 hover:border-bpim-border",
                 )}
               >
                 <span className="text-xs font-bold text-gray-300">{key}</span>

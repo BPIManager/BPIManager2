@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 export const LogsCardSkeleton = () => {
   return (
-    <div className="w-full rounded-xl border border-slate-800 bg-slate-950 p-4">
+    <div className="w-full rounded-xl border border-bpim-border bg-bpim-bg p-4">
       <div className="flex items-start justify-between mb-4">
         <div className="flex flex-col gap-2">
           <Skeleton className="h-3 w-32" />
@@ -34,7 +34,7 @@ export const LogsGroupSkeleton = () => {
 
       <div
         className={cn(
-          "rounded-lg border border-white/5 bg-white/[0.02] p-4 mb-4",
+          "rounded-lg border border-bpim-border bg-white/[0.02] p-4 mb-4",
           "md:ml-8",
         )}
       >

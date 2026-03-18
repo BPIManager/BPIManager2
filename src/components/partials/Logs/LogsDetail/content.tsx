@@ -153,7 +153,7 @@ export const LogsDetailContent = ({
               <Button
                 variant="outline"
                 size="sm"
-                className="rounded-full border-white/10 bg-transparent px-4 text-xs font-bold hover:bg-white/5"
+                className="rounded-full border-bpim-border bg-transparent px-4 text-xs font-bold hover:bg-white/5"
                 onClick={() => setIsModalOpen(true)}
               >
                 <XIcon className="mr-2 h-4 w-4" />

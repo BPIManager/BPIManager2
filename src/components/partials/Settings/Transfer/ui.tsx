@@ -50,7 +50,7 @@ export default function TransferUi() {
   };
 
   return (
-    <div className="mt-4 flex flex-col gap-6 rounded-xl border border-white/10 bg-slate-900 p-6 md:flex-row md:items-center md:justify-between">
+    <div className="mt-4 flex flex-col gap-6 rounded-xl border border-bpim-border bg-bpim-bg p-6 md:flex-row md:items-center md:justify-between">
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-2 text-blue-400">
           <LuDatabase className="h-4 w-4" />
@@ -91,7 +91,7 @@ export default function TransferUi() {
               BPIManagerで保存されたデータをBPIM2へ移行します。
             </p>
 
-            <div className="rounded-md border border-white/10 bg-white/5 p-3">
+            <div className="rounded-md border border-bpim-border bg-white/5 p-3">
               <span className="mb-2 block text-xs font-bold text-slate-400">
                 移行可能なデータ:
               </span>

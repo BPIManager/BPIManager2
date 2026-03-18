@@ -63,7 +63,7 @@ export const RivalComparisonModal = ({
 
                 <div className="flex flex-col gap-3">
                   <SectionTitle icon={Activity} label="RADAR COMPARISON" />
-                  <div className="flex h-[250px] w-full items-center justify-center rounded-xl border border-white/5 bg-black/20 p-4 md:h-[300px]">
+                  <div className="flex h-[250px] w-full items-center justify-center rounded-xl border border-bpim-border bg-bpim-bg/20 p-4 md:h-[300px]">
                     <RadarSectionChart
                       data={viewerRadar}
                       rivalData={compare.radar}

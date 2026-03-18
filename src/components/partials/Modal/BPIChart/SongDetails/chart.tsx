@@ -29,7 +29,7 @@ const ChartTooltip = ({ active, payload, youScore, maxScore }: any) => {
   const diff = data.count - youScore;
 
   return (
-    <div className="rounded-lg border border-white/20 bg-slate-900 p-3 shadow-2xl backdrop-blur-md">
+    <div className="rounded-lg border border-white/20 bg-bpim-bg p-3 shadow-2xl backdrop-blur-md">
       <div className="flex flex-col gap-1.5">
         <p className="text-xs font-bold text-blue-400 uppercase tracking-wider">
           BPI: {isYou ? data.bpi.toFixed(2) : data.label}
@@ -39,7 +39,7 @@ const ChartTooltip = ({ active, payload, youScore, maxScore }: any) => {
 
         <div className="flex flex-col gap-0.5">
           <p className="text-sm font-bold text-white font-mono">
-            Score: {data.count.toLocaleString()}
+            Score: {data.count}
           </p>
           <p className="text-[10px] text-slate-400 font-mono">Rate: {rate}%</p>
         </div>
@@ -91,17 +91,18 @@ export const BPIChart = ({ data, maxScore }: BPIAnimatedChartProps) => {
   }, [maxScore, yMin]);
 
   return (
-    <div className="h-[400px] w-full rounded-xl border border-white/5 bg-black/20 p-2">
+    <div className="h-[320px] md:h-[400px] w-full rounded-xl border border-bpim-border bg-bpim-bg/40 p-4">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
           data={chartData}
-          margin={{ top: 20, right: 10, left: -20, bottom: 0 }}
+          margin={{ top: 20, right: 10, left: 10, bottom: 20 }}
         >
           <XAxis
             dataKey="label"
             axisLine={false}
             tickLine={false}
             tick={{ fill: "#64748b", fontSize: 10, fontWeight: "bold" }}
+            interval={0}
           />
           <YAxis domain={[yMin, maxScore]} hide />
           <Tooltip
@@ -116,12 +117,11 @@ export const BPIChart = ({ data, maxScore }: BPIAnimatedChartProps) => {
               stroke="#334155"
               strokeDasharray="4 4"
               label={{
-                value: b.label,
                 position: "insideBottomRight",
+                value: b.label,
                 fill: "#475569",
                 fontSize: 9,
                 fontWeight: "black",
-                dy: 12,
               }}
             />
           ))}

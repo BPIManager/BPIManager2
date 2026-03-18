@@ -46,14 +46,14 @@ export const NotificationBell = () => {
       </PopoverTrigger>
       <PopoverContent
         align="end"
-        className="w-[350px] overflow-hidden border-white/10 bg-slate-900 p-0 shadow-2xl"
+        className="w-[350px] overflow-hidden border-bpim-border bg-gray-800 p-0 shadow-2xl"
       >
         <Tabs
           value={activeTab}
           onValueChange={(v) => setActiveTab(v as any)}
           className="w-full"
         >
-          <TabsList className="grid w-full grid-cols-3 rounded-none border-b border-white/5 bg-slate-950/50 p-1">
+          <TabsList className="grid w-full grid-cols-3 rounded-none border-b border-bpim-border bg-bpim-bg/50 p-1">
             <TabsTrigger
               value="all"
               className="text-xs font-bold data-[state=active]:bg-blue-600"

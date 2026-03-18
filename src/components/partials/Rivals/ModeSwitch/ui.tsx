@@ -31,7 +31,7 @@ export const ModeSwitchBanner = ({
         <Swords
           className={cn(
             "h-4 w-4",
-            isRivalMode ? "text-orange-500" : "text-blue-500",
+            isRivalMode ? "text-orange-500" : "text-gray-200",
           )}
         />
         <span

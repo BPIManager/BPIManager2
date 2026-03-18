@@ -40,7 +40,7 @@ export const UserRecommendationCard = ({
   return (
     <button
       onClick={onClick}
-      className="group relative flex w-full flex-row items-stretch justify-between gap-3 overflow-hidden rounded-2xl border border-white/10 bg-slate-900/80 p-3 text-left transition-all duration-300 hover:-translate-y-1 hover:border-white/30 hover:bg-slate-800/90 md:gap-6 md:p-5"
+      className="group relative flex w-full flex-row items-stretch justify-between gap-3 overflow-hidden rounded-2xl border border-bpim-border bg-bpim-bg/80 p-3 text-left transition-all duration-300 hover:-translate-y-1 hover:border-white/30 hover:bg-slate-800/90 md:gap-6 md:p-5"
     >
       <div
         className="absolute left-0 top-0 bottom-0 w-1 opacity-80"
@@ -49,7 +49,7 @@ export const UserRecommendationCard = ({
 
       <div className="flex flex-1 flex-col gap-2 py-1 min-w-0 md:gap-4">
         <div className="flex w-full items-center gap-2 md:gap-3">
-          <Avatar className="h-8 w-8 border-2 border-white/10 md:h-12 md:w-12">
+          <Avatar className="h-8 w-8 border-2 border-bpim-border md:h-12 md:w-12">
             <AvatarImage src={user.profileImage ?? ""} />
             <AvatarFallback>{user.userName.slice(0, 2)}</AvatarFallback>
           </Avatar>
@@ -114,7 +114,7 @@ export const UserRecommendationCard = ({
         </div>
       </div>
 
-      <div className="flex h-[100px] w-[100px] shrink-0 self-center items-center justify-center rounded-xl border border-white/5 bg-black/40 p-1 sm:h-[120px] sm:w-[120px] md:h-[140px] md:w-[140px]">
+      <div className="flex h-[100px] w-[100px] shrink-0 self-center items-center justify-center rounded-xl border border-bpim-border bg-bpim-bg/40 p-1 sm:h-[120px] sm:w-[120px] md:h-[140px] md:w-[140px]">
         <RadarSectionChart
           data={viewerRadar}
           rivalData={user.radar}

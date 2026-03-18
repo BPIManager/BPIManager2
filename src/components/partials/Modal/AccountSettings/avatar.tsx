@@ -38,7 +38,7 @@ export const AvatarSection = ({ image, onChange }: AvatarSectionProps) => {
           variant="outline"
           size="xs"
           onClick={useServiceIcon}
-          className="h-7 border-white/10 px-3 text-[10px] font-bold hover:bg-white/5 hover:text-blue-400"
+          className="h-7 border-bpim-border px-3 text-[10px] font-bold hover:bg-white/5 hover:text-blue-400"
         >
           連携サービスを使用
         </Button>
@@ -46,7 +46,7 @@ export const AvatarSection = ({ image, onChange }: AvatarSectionProps) => {
           variant="outline"
           size="xs"
           onClick={useDiceBearIcon}
-          className="h-7 border-white/10 px-3 text-[10px] font-bold hover:bg-white/5 hover:text-blue-400"
+          className="h-7 border-bpim-border px-3 text-[10px] font-bold hover:bg-white/5 hover:text-blue-400"
         >
           ランダムに設定
         </Button>

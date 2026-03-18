@@ -44,7 +44,7 @@ export const CustomPagination = ({
       className={cn(
         "flex w-full items-center justify-center transition-all",
         isSticky
-          ? "sticky bottom-0 z-30 h-16 border-t border-white/10 bg-slate-950/60 backdrop-blur-xl"
+          ? "sticky bottom-0 z-30 h-16 border-t border-bpim-border bg-bpim-bg/60 backdrop-blur-xl"
           : "py-4",
       )}
     >

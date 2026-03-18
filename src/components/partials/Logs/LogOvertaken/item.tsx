@@ -71,7 +71,7 @@ export const OvertakeRankItem = ({ item, onClick }: RankItemProps) => {
                   className="flex items-center justify-between pr-2"
                 >
                   <div className="flex items-center gap-2">
-                    <Avatar className="h-5 w-5 border border-white/10">
+                    <Avatar className="h-5 w-5 border border-bpim-border">
                       <AvatarImage src={rival.rivalProfileImage ?? undefined} />
                       <AvatarFallback className="text-[8px]">
                         {rival.rivalName.slice(0, 2)}

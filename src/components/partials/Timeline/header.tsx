@@ -5,7 +5,7 @@ export const TimelineHeader = () => {
     <div
       className={cn(
         "sticky top-0 z-20 flex w-full flex-col",
-        "border-b border-white/10 bg-slate-950/80 backdrop-blur-md",
+        "border-b border-bpim-border bg-bpim-bg/80 backdrop-blur-md",
         "px-3 py-2",
       )}
     >

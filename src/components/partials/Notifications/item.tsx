@@ -15,11 +15,11 @@ export const NotificationItem = ({ n }: { n: NotificationItemType }) => {
     <Link href={`/users/${n.senderId}`} className="block">
       <div
         className={cn(
-          "flex items-center gap-3 p-3 transition-colors border-b border-white/10",
+          "flex items-center gap-3 p-3 transition-colors border-b border-bpim-border",
           "hover:bg-white/5 last:border-b-0",
         )}
       >
-        <Avatar className="h-9 w-9 border border-white/10">
+        <Avatar className="h-9 w-9 border border-bpim-border">
           <AvatarImage src={n.senderImage ?? ""} alt={n.senderName} />
           <AvatarFallback>{n.senderName.slice(0, 2)}</AvatarFallback>
         </Avatar>

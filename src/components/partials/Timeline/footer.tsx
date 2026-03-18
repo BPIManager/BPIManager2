@@ -22,7 +22,7 @@ export const TimelineStatusFooter = ({
 
   if (isEnd) {
     return (
-      <div className="flex items-center justify-center border-t border-white/5 py-8">
+      <div className="flex items-center justify-center border-t border-bpim-border py-8">
         <span className="text-[10px] font-bold uppercase tracking-widest text-white/20">
           End of Activities
         </span>

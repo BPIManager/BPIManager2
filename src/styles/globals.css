@@ -8,6 +8,22 @@
 @plugin "tailwindcss-animate";
 @custom-variant dark (&:is(.dark *));
 
+@layer base {
+  :root {
+    --bpim-bg: 222 47% 4%;
+    --bpim-card: 222 47% 7%;
+    --bpim-primary: 217 91% 60%;
+    --bpim-border: 217 20% 15%;
+  }
+
+  .theme-pitch-black {
+    --bpim-bg: 0 0% 7%;
+    --bpim-card: 0 0% 13%;
+    --bpim-primary: 0 0% 98%;
+    --bpim-border: 0 0% 22%;
+  }
+}
+
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);

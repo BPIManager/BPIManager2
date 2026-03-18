@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 export const RivalHeader = ({ profile, isUpdating, onToggleFollow }: any) => (
   <div className="flex w-full flex-col gap-4">
     <div className="flex flex-col items-center gap-4 text-center md:flex-row md:gap-6 md:text-left">
-      <Avatar className="h-24 w-24 border-2 border-white/10">
+      <Avatar className="h-24 w-24 border-2 border-bpim-border">
         <AvatarImage src={profile?.profileImage} />
         <AvatarFallback>{profile?.userName?.slice(0, 2)}</AvatarFallback>
       </Avatar>
@@ -81,7 +81,7 @@ export const WinLossStats = ({ winLossData }: { winLossData: any[] }) => (
         return (
           <div
             key={lv}
-            className="rounded-xl border border-white/10 bg-linear-to-b from-white/5 to-white/[0.02] p-4"
+            className="rounded-xl border border-bpim-border bg-linear-to-b from-white/5 to-white/[0.02] p-4"
           >
             <div className="mb-3 flex justify-between items-center">
               <span className="text-xs font-bold text-blue-400">

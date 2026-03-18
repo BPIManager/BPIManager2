@@ -35,13 +35,13 @@ export const FilterSearchInput = ({
 
       <Input
         placeholder={placeholder}
-        className="h-9 pl-9 pr-9 border-white/10 bg-white/5 focus-visible:ring-blue-500"
+        className="h-9 pl-9 pr-9 border-bpim-border bg-white/5 focus-visible:ring-blue-500"
         value={local}
         onChange={(e) => setLocal(e.target.value)}
       />
 
       {isTyping && (
-        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-500">
+        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-200">
           <Loader2 size={14} className="animate-spin" />
         </div>
       )}

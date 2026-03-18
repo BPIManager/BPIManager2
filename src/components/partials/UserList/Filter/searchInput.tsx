@@ -31,7 +31,7 @@ export const SearchInput = ({
       </div>
       <Input
         placeholder="ユーザー名またはIIDX IDで検索"
-        className="h-10 pl-10 border-none bg-black/40 text-slate-200 focus-visible:ring-blue-500"
+        className="h-10 pl-10 border-none bg-bpim-bg/40 text-slate-200 focus-visible:ring-blue-500"
         value={value}
         onChange={(e) => setValue(e.target.value)}
       />

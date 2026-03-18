@@ -16,7 +16,7 @@ export const RivalFilter = ({
   onToggleDifficulty,
 }: RivalFilterProps) => {
   return (
-    <div className="flex flex-col gap-6 rounded-xl border border-white/10 bg-slate-900/40 p-4 lg:flex-row lg:items-start lg:gap-10">
+    <div className="flex flex-col gap-6 rounded-xl border border-bpim-border bg-bpim-bg/40 p-4 lg:flex-row lg:items-start lg:gap-10">
       <div className="flex flex-col gap-2.5">
         <span className="text-[10px] font-bold tracking-widest text-slate-500 uppercase">
           Level

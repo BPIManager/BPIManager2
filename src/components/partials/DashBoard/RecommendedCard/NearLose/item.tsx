@@ -18,7 +18,7 @@ export const NearLoseRankItem = ({
     <div
       onClick={onClick}
       className={cn(
-        "group relative flex items-center justify-between gap-3 border-b border-white/10 p-3 pl-4 transition-colors",
+        "group relative flex items-center justify-between gap-3 border-b border-bpim-border p-3 pl-4 transition-colors",
         "cursor-pointer hover:bg-white/5",
         "before:absolute before:inset-y-0 before:left-0 before:z-10 before:w-1 before:bg-orange-400 before:content-['']",
       )}

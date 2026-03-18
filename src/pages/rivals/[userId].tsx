@@ -105,7 +105,7 @@ export default function RivalsUserPage({
       </TabsContent>
 
       <TabsContent value="scores" className="mt-0 outline-none">
-        <div className="rounded-2xl border border-white/10 bg-slate-900/40 p-1 shadow-xl backdrop-blur-md overflow-hidden">
+        <div className="rounded-2xl border border-bpim-border bg-bpim-bg/40 p-1 shadow-xl backdrop-blur-md overflow-hidden">
           <RivalSongsTable
             myUserId={myUserId}
             rivalUserId={rivalUserId}

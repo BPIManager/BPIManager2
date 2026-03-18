@@ -28,13 +28,13 @@ export const TimelineItem = ({ entry }: { entry: TimelineEntry }) => {
             ? "bg-red-500/5 border-red-900/30"
             : isCurrentlyWinning
               ? "bg-green-500/5 border-green-900/30"
-              : "bg-slate-900/60 border-white/10",
+              : "bg-bpim-bg/60 border-bpim-border",
       )}
     >
       <div className="grid grid-cols-[auto_1fr] gap-3">
         <div>
           <Link href={`/rivals/${entry.userId}`}>
-            <Avatar className="h-8 w-8 border border-white/10">
+            <Avatar className="h-8 w-8 border border-bpim-border">
               <AvatarImage src={entry.profileImage ?? ""} />
               <AvatarFallback>{entry.userName.slice(0, 2)}</AvatarFallback>
             </Avatar>
@@ -71,7 +71,7 @@ export const TimelineItem = ({ entry }: { entry: TimelineEntry }) => {
               </span>
             </div>
 
-            <div className="flex flex-col gap-2 rounded-md border border-white/5 bg-black/40 p-2">
+            <div className="flex flex-col gap-2 rounded-md border border-bpim-border bg-bpim-bg/40 p-2">
               <div className="flex items-center justify-between">
                 <span className="truncate text-xs font-bold text-white">
                   {entry.title}

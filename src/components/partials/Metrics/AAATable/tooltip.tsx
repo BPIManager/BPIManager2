@@ -93,7 +93,7 @@ export const AAATableTooltip = ({ item }: Props) => {
               {item.user.exScore}
             </span>
           </div>
-          <div className="flex flex-col border-x border-white/5">
+          <div className="flex flex-col border-x border-bpim-border">
             <span className="text-[9px] font-bold text-slate-500 uppercase">
               Rate
             </span>

@@ -34,7 +34,7 @@ export const RadarCategorySongsDialog = ({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-h-[80svh] overflow-hidden border-white/20 bg-gray-950 p-0 sm:max-w-md">
-        <DialogHeader className="border-b border-white/10 p-4">
+        <DialogHeader className="border-b border-bpim-border p-4">
           <DialogTitle className="text-base font-bold text-white">
             {categoryName} - 楽曲リスト ({songs.length})
           </DialogTitle>
@@ -69,7 +69,7 @@ export const RadarCategorySongsDialog = ({
                 return (
                   <div
                     key={`${song.title}-${song.difficulty}`}
-                    className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 p-3"
+                    className="flex items-center justify-between rounded-lg border border-bpim-border bg-white/5 p-3"
                   >
                     <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                       <span className="truncate text-xs font-bold text-white">

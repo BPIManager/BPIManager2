@@ -3,7 +3,7 @@ import { LuBadgeX, LuTrash2 } from "react-icons/lu";
 
 export default function AccountDeletionUi() {
   return (
-    <div className="mt-4 flex flex-col gap-6 rounded-xl border border-red-900/30 bg-slate-900 p-6 md:flex-row md:items-center md:justify-between">
+    <div className="mt-4 flex flex-col gap-6 rounded-xl border border-red-900/30 bg-bpim-bg p-6 md:flex-row md:items-center md:justify-between">
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-2 text-red-400">
           <LuBadgeX className="h-4 w-4" />

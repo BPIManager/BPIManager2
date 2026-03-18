@@ -32,7 +32,7 @@ const HistoryTooltip = ({ active, payload, label, myName, rivalName }: any) => {
   const isComparison = data.rivalBpi !== undefined;
 
   return (
-    <div className="min-w-[200px] max-w-[300px] rounded-md border border-white/20 bg-slate-950 p-3 shadow-xl">
+    <div className="min-w-[200px] max-w-[300px] rounded-md border border-white/20 bg-bpim-bg p-3 shadow-xl">
       <div className="flex flex-col gap-1">
         <p className="text-[10px] font-bold text-gray-500">{label}</p>
 

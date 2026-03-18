@@ -57,7 +57,7 @@ export const AAAGridItem = ({
               useWhiteText ? "text-white" : "text-slate-950",
               open
                 ? "border-white scale-105 z-10 shadow-2xl"
-                : "border-white/10 hover:scale-[1.04] hover:shadow-xl",
+                : "border-bpim-border hover:scale-[1.04] hover:shadow-xl",
             )}
             style={{ touchAction: "manipulation" }}
           >
@@ -90,7 +90,7 @@ export const AAAGridItem = ({
 
         <TooltipContent
           side="top"
-          className="border-white/20 bg-slate-950/95 p-3 shadow-2xl backdrop-blur-md"
+          className="border-white/20 bg-bpim-bg/95 p-3 shadow-2xl backdrop-blur-md"
         >
           <AAATableTooltip item={item} />
         </TooltipContent>

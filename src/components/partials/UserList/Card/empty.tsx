@@ -7,7 +7,7 @@ interface Props {
 
 export const UserRecommendationEmpty = ({ onReset }: Props) => {
   return (
-    <div className="flex w-full flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-white/20 bg-slate-900/20 py-10">
+    <div className="flex w-full flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-white/20 bg-bpim-bg/20 py-10">
       <SearchX className="h-12 w-12 text-slate-600" />
       <div className="flex flex-col items-center gap-1 text-center">
         <p className="text-lg font-bold text-white tracking-tight">

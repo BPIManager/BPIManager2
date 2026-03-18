@@ -38,7 +38,7 @@ export const LogErrorState = ({ error, onRetry }: LogErrorStateProps) => {
             <label className="ml-1 mb-1 block text-[10px] font-bold text-gray-600 uppercase tracking-wider">
               Error Details:
             </label>
-            <pre className="w-full max-h-[200px] overflow-y-auto rounded-md border border-white/10 bg-black/40 p-4 font-mono text-[10px] text-gray-400 whitespace-pre-wrap break-all scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+            <pre className="w-full max-h-[200px] overflow-y-auto rounded-md border border-bpim-border bg-bpim-bg/40 p-4 font-mono text-[10px] text-gray-400 whitespace-pre-wrap break-all scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
               {errorDetail}
             </pre>
           </div>
@@ -48,7 +48,7 @@ export const LogErrorState = ({ error, onRetry }: LogErrorStateProps) => {
           onClick={onRetry}
           variant="outline"
           size="sm"
-          className="group flex items-center gap-2 rounded-full border-white/10 px-6 transition-colors hover:bg-white/5 hover:text-blue-400"
+          className="group flex items-center gap-2 rounded-full border-bpim-border px-6 transition-colors hover:bg-white/5 hover:text-blue-400"
         >
           <LuRefreshCcw
             size={14}

@@ -62,7 +62,7 @@ export default function UserPage({ defaultView = "overview" }: UserPageProps) {
 
       <TabsContent value="songs" className="mt-0 border-none p-0 outline-none">
         {defaultView === "songs" && (
-          <div className="rounded-2xl border border-white/10 bg-slate-900/40 p-1 shadow-xl backdrop-blur-md overflow-hidden">
+          <div className="rounded-2xl border border-bpim-border bg-bpim-bg/40 p-1 shadow-xl backdrop-blur-md overflow-hidden">
             <SongsTable userId={userId} version={version} />
           </div>
         )}
@@ -70,7 +70,7 @@ export default function UserPage({ defaultView = "overview" }: UserPageProps) {
 
       <TabsContent value="logs" className="mt-0 border-none p-0 outline-none">
         {defaultView === "logs" && (
-          <div className="rounded-2xl border border-white/10 bg-slate-900/40 p-4 md:p-6 shadow-xl backdrop-blur-md">
+          <div className="rounded-2xl border border-bpim-border bg-bpim-bg/40 p-4 md:p-6 shadow-xl backdrop-blur-md">
             <LogFilterSection version={version} groupedBy={groupedBy as any} />
             <div className="mt-6">
               <LogsList

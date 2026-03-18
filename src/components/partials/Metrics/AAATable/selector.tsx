@@ -40,10 +40,10 @@ export const AAATableFilter = ({
       className: "min-w-full md:min-w-[160px]",
       render: () => (
         <Select value={version} onValueChange={onVersionChange}>
-          <SelectTrigger className="h-8 border-white/10 bg-black/20 text-xs text-slate-200 focus:ring-blue-500">
+          <SelectTrigger className="h-8 border-bpim-border bg-bpim-bg/20 text-xs text-slate-200 focus:ring-blue-500">
             <SelectValue placeholder="Version" />
           </SelectTrigger>
-          <SelectContent className="border-white/10 bg-slate-900">
+          <SelectContent className="border-bpim-border bg-bpim-bg">
             {versionsNonDisabledCollection.map((v) => (
               <SelectItem key={v.value} value={v.value} className="text-xs">
                 {v.label}
@@ -66,7 +66,7 @@ export const AAATableFilter = ({
               <RadioGroupItem
                 value={lv.toString()}
                 id={`level-${lv}`}
-                className="border-blue-500 text-blue-500"
+                className="border-blue-500 text-gray-200"
               />
               <Label
                 htmlFor={`level-${lv}`}
@@ -95,7 +95,7 @@ export const AAATableFilter = ({
               <RadioGroupItem
                 value={g.id}
                 id={`goal-${g.id}`}
-                className="border-blue-500 text-blue-500"
+                className="border-blue-500 text-gray-200"
               />
               <Label
                 htmlFor={`goal-${g.id}`}
@@ -124,7 +124,7 @@ export const AAATableFilter = ({
               <RadioGroupItem
                 value={m.id}
                 id={`mode-${m.id}`}
-                className="border-blue-500 text-blue-500"
+                className="border-blue-500 text-gray-200"
               />
               <Label
                 htmlFor={`mode-${m.id}`}
@@ -140,7 +140,7 @@ export const AAATableFilter = ({
   ];
 
   return (
-    <div className="rounded-xl border border-white/10 bg-slate-900/40 p-4 shadow-sm backdrop-blur-md">
+    <div className="rounded-xl border border-bpim-border bg-bpim-bg/40 p-4 shadow-sm backdrop-blur-md">
       <div className="flex flex-col flex-wrap gap-4 md:flex-row md:items-start md:gap-x-10 md:gap-y-6">
         {sections.map((section) => (
           <div

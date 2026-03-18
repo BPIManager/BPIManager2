@@ -87,7 +87,7 @@ const ScoreBox = ({ label, ex, bpi, clearState, colorClass, isRival }: any) => {
     <div
       className={cn(
         "relative flex flex-col justify-center px-5",
-        isRival ? "bg-black/40 items-start" : "items-end",
+        isRival ? "bg-bpim-bg/40 items-start" : "items-end",
       )}
     >
       <div
@@ -172,7 +172,7 @@ export const RivalSongItem = ({
   return (
     <div
       onClick={onClick}
-      className="group relative w-full cursor-pointer border-b border-white/5 bg-white/[0.02] transition-colors hover:bg-white/5"
+      className="group relative w-full cursor-pointer border-b border-bpim-border bg-white/[0.02] transition-colors hover:bg-white/5"
     >
       <div className="hidden lg:grid h-[68px] grid-cols-[1fr_140px_100px_140px] items-stretch">
         <div className="flex items-center px-4 min-w-0">

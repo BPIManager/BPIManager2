@@ -40,7 +40,7 @@ export const SongHistoryTab = ({ songId }: SongHistoryTabProps) => {
   if (isLoading) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <LuLoader className="h-8 w-8 animate-spin text-blue-500" />
+        <LuLoader className="h-8 w-8 animate-spin text-gray-200" />
       </div>
     );
   }

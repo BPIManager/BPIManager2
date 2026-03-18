@@ -35,7 +35,7 @@ export const TimelineContainer = () => {
   if (isLoading) {
     return (
       <div className="flex h-64 w-full items-center justify-center">
-        <LuLoader className="h-8 w-8 animate-spin text-blue-500" />
+        <LuLoader className="h-8 w-8 animate-spin text-gray-200" />
       </div>
     );
   }
@@ -48,7 +48,7 @@ export const TimelineContainer = () => {
     <div className="mx-auto w-full max-w-7xl px-4 py-6">
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[260px_1fr] items-start">
         <aside className="lg:sticky lg:top-20 z-10">
-          <div className="flex flex-col gap-6 rounded-xl border border-white/10 bg-slate-900/40 p-4 backdrop-blur-sm">
+          <div className="flex flex-col gap-6 rounded-xl border border-bpim-border bg-bpim-bg/40 p-4 backdrop-blur-sm">
             <div className="flex flex-col gap-1">
               <FilterHeader label="表示モード" />
               <MenuButton
@@ -102,7 +102,7 @@ export const TimelineContainer = () => {
         </aside>
 
         <div className="flex flex-col gap-4 min-w-0">
-          <div className="rounded-xl border border-white/10 bg-slate-950 p-2">
+          <div className="rounded-xl border border-bpim-border bg-bpim-bg p-2">
             <FilterSearchInput
               value={filterParams.search || ""}
               onChange={(search: string) => updateParams({ search })}

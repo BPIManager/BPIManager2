@@ -30,7 +30,7 @@ export const RANK_THRESHOLDS = [
   { label: "C", ratio: 4 / 9, bg: "bg-slate-600", text: "text-white" },
   { label: "D", ratio: 3 / 9, bg: "bg-slate-700", text: "text-white" },
   { label: "E", ratio: 2 / 9, bg: "bg-slate-800", text: "text-white" },
-  { label: "F", ratio: 0, bg: "bg-slate-900", text: "text-slate-400" },
+  { label: "F", ratio: 0, bg: "bg-bpim-bg", text: "text-slate-400" },
 ] as const;
 
 type SortKey = "title" | (typeof RANKS)[number];
@@ -93,8 +93,8 @@ export const ArenaAverageTable = ({ data }: { data: ArenaAverageData[] }) => {
   };
 
   const ArenaRow = memo(({ item }: { item: ArenaAverageData }) => (
-    <TableRow className="group border-white/5 hover:bg-white/5">
-      <TableCell className="sticky left-0 z-10 min-w-[200px] max-w-[250px] bg-slate-950 p-3 shadow-[2px_0_5px_rgba(0,0,0,0.3)] group-hover:bg-slate-900 transition-colors">
+    <TableRow className="group border-bpim-border hover:bg-white/5">
+      <TableCell className="sticky left-0 z-10 min-w-[200px] max-w-[250px] bg-bpim-bg p-3 shadow-[2px_0_5px_rgba(0,0,0,0.3)] group-hover:bg-bpim-bg transition-colors">
         <div className="flex flex-col gap-0.5">
           <span className="truncate text-xs font-bold text-white">
             {item.title}
@@ -140,14 +140,14 @@ export const ArenaAverageTable = ({ data }: { data: ArenaAverageData[] }) => {
 
   return (
     <div className="flex w-full flex-col gap-4">
-      <div className="relative overflow-hidden rounded-xl border border-white/10 bg-slate-950 shadow-2xl">
+      <div className="relative overflow-hidden rounded-xl border border-bpim-border bg-bpim-bg shadow-2xl">
         <div className="overflow-x-auto custom-scrollbar">
           <Table className="border-collapse">
-            <TableHeader className="bg-slate-900/80 sticky top-0 z-20 backdrop-blur-md">
-              <TableRow className="hover:bg-transparent border-white/10">
+            <TableHeader className="bg-bpim-bg/80 sticky top-0 z-20 backdrop-blur-md">
+              <TableRow className="hover:bg-transparent border-bpim-border">
                 <TableHead
                   onClick={() => handleSort("title")}
-                  className="sticky left-0 z-30 cursor-pointer bg-slate-900 px-3 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-white"
+                  className="sticky left-0 z-30 cursor-pointer bg-bpim-bg px-3 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-white"
                 >
                   <div className="flex items-center">
                     楽曲名 <SortIcon k="title" />

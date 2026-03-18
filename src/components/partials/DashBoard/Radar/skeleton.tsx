@@ -9,9 +9,9 @@ export const RadarSkeleton = () => {
       <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-2">
         <div className="flex h-[300px] items-center justify-center">
           <div className="relative h-[200px] w-[200px]">
-            <div className="absolute inset-0 rounded-full border border-white/10" />
-            <div className="absolute inset-[30px] rounded-full border border-white/10" />
-            <div className="absolute inset-[60px] rounded-full border border-white/10" />
+            <div className="absolute inset-0 rounded-full border border-bpim-border" />
+            <div className="absolute inset-[30px] rounded-full border border-bpim-border" />
+            <div className="absolute inset-[60px] rounded-full border border-bpim-border" />
             <div
               className="h-full w-full bg-blue-500/10"
               style={{

@@ -50,10 +50,10 @@ export const LogFilterSection = ({ version, groupedBy }: Props) => {
           Version
         </label>
         <Select value={version} onValueChange={handleVersionChange}>
-          <SelectTrigger className="h-9 border-white/10 bg-slate-900 text-slate-200 focus:ring-blue-500">
+          <SelectTrigger className="h-9 border-bpim-border bg-bpim-bg text-slate-200 focus:ring-blue-500">
             <SelectValue placeholder="バージョンを選択" />
           </SelectTrigger>
-          <SelectContent className="border-white/10 bg-slate-900 text-slate-200">
+          <SelectContent className="border-bpim-border bg-bpim-bg text-slate-200">
             {versionsNonDisabledCollection.map((v) => (
               <SelectItem key={v.value} value={v.value}>
                 {v.label}
@@ -72,7 +72,7 @@ export const LogFilterSection = ({ version, groupedBy }: Props) => {
           onValueChange={handleGroupChange}
           className="w-full"
         >
-          <TabsList className="grid h-9 w-full grid-cols-2 border border-white/10 bg-slate-900 p-1">
+          <TabsList className="grid h-9 w-full grid-cols-2 border border-bpim-border bg-bpim-bg p-1">
             <TabsTrigger
               value="lastPlayed"
               className="text-xs font-bold transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white"

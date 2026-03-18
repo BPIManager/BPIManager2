@@ -31,22 +31,23 @@ export default function FollowPage({
 
   return (
     <UserProfileLayout userId={userId} currentTab="">
-      <div className="rounded-2xl border border-white/10 bg-slate-900/40 p-4 md:p-6 shadow-xl backdrop-blur-md">
+      <div className="rounded-2xl border border-bpim-border bg-bpim-bg/40 p-4 md:p-6 shadow-xl backdrop-blur-md">
         <Tabs value={type} onValueChange={handleTabChange} className="w-full">
-          <TabsList className="mb-6 grid h-auto w-full grid-cols-2 rounded-xl border border-white/5 bg-white/5 p-1">
+          <TabsList className="mb-6 grid h-11 w-full grid-cols-2 items-stretch rounded-full border border-bpim-border bg-bpim-card/50 p-1.5 transition-all">
             <TabsTrigger
               value="following"
-              className="flex items-center justify-center gap-2 py-3 text-xs font-bold transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+              className="flex h-full items-center justify-center gap-2 rounded-full text-xs font-bold transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg"
             >
               <LuUserCheck className="h-4 w-4" />
-              フォロー
+              <span>フォロー</span>
             </TabsTrigger>
+
             <TabsTrigger
               value="followers"
-              className="flex items-center justify-center gap-2 py-3 text-xs font-bold transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+              className="flex h-full items-center justify-center gap-2 rounded-full text-xs font-bold transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg"
             >
               <LuUsers className="h-4 w-4" />
-              フォロワー
+              <span>フォロワー</span>
             </TabsTrigger>
           </TabsList>
 
@@ -84,7 +85,7 @@ export default function FollowPage({
 
                 {isLoading && users.length === 0 && (
                   <div className="flex justify-center py-10">
-                    <LuLoader className="h-8 w-8 animate-spin text-blue-500" />
+                    <LuLoader className="h-8 w-8 animate-spin text-gray-200" />
                   </div>
                 )}
               </div>

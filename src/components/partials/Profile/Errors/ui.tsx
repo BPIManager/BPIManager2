@@ -48,7 +48,7 @@ export const ProfileErrorState = ({
         asChild
         variant="outline"
         size="sm"
-        className="mt-4 px-6 border-white/10 hover:bg-white/5"
+        className="mt-4 px-6 border-bpim-border hover:bg-white/5"
       >
         <Link href="/">トップページへ戻る</Link>
       </Button>

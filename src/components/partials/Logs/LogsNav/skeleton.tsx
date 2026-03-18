@@ -1,7 +1,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
 export const LogNavigatorSkeleton = () => (
-  <div className="mb-6 flex w-full items-center justify-between rounded-xl border border-white/10 bg-slate-950 p-2">
+  <div className="mb-6 flex w-full items-center justify-between rounded-xl border border-bpim-border bg-bpim-bg p-2">
     <div className="flex-1">
       <Skeleton className="h-10 w-[60px] rounded-md md:w-[120px]" />
     </div>

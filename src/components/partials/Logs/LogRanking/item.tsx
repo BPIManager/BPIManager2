@@ -77,7 +77,7 @@ export const RankItem = ({
     );
 
     return (
-      <div className="w-full border-b border-white/5 bg-slate-950 p-4">
+      <div className="w-full border-b border-bpim-border bg-bpim-bg p-4">
         <div className="flex flex-col gap-2">
           <div className="flex items-baseline gap-3">
             <span
@@ -199,8 +199,8 @@ export const RankItem = ({
     <div
       onClick={onClick}
       className={cn(
-        "flex items-center justify-between gap-2 border-b border-white/5 p-3 transition-colors cursor-pointer md:p-4",
-        rank <= 3 ? "bg-white/[0.03]" : "bg-transparent",
+        "flex items-center justify-between gap-2 border-b border-bpim-border p-3 transition-colors cursor-pointer md:p-4",
+        rank <= 3 ? "bg-bpim-card/50" : "bg-transparent",
         "hover:bg-white/10",
       )}
     >

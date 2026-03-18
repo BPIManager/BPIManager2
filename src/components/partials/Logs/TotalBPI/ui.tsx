@@ -1,6 +1,5 @@
 import { BpiCalculator } from "@/lib/bpi";
 import { TrendingUp, TrendingDown, ChevronRight, Minus } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { DashCard } from "@/components/ui/dashcard";
 
@@ -69,8 +68,6 @@ export const BatchTotalBpiCard = ({ pagination }: { pagination: any }) => {
             </div>
           </div>
         </div>
-
-        <Separator className="h-px w-full opacity-10 md:h-10 md:w-px" />
 
         <div className="flex flex-1 flex-col items-start gap-1 w-full">
           <span className="text-[10px] font-bold tracking-widest text-slate-500 uppercase">
