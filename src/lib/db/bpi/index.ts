@@ -15,7 +15,6 @@ class BpiRepository {
         "s.difficulty",
         "s.difficultyLevel",
         "sd.defId",
-        "sd.difficulty",
         "sd.wrScore",
         "sd.kaidenAvg",
         "sd.coef",

@@ -189,7 +189,6 @@ class LogRepository {
             .selectFrom("songDef")
             .select([
               "songId as l_defSongId",
-              "difficulty as l_defDiff",
               (eb) => eb.fn.max("defId").as("maxDefId"),
             ]);
 
@@ -198,12 +197,9 @@ class LogRepository {
           } else {
             sub = sub.where("isCurrent", "=", 1);
           }
-          return sub.groupBy(["songId", "difficulty"]).as("latest_sd");
+          return sub.groupBy("songId").as("latest_sd");
         },
-        (join) =>
-          join
-            .onRef("latest_sd.l_defSongId", "=", "s.songId")
-            .onRef("latest_sd.l_defDiff", "=", "s.difficulty"),
+        (join) => join.onRef("latest_sd.l_defSongId", "=", "s.songId"),
       )
       .leftJoin("songDef as sd", "sd.defId", "latest_sd.maxDefId")
       .select([
