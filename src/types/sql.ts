@@ -28,26 +28,8 @@ export type Generated<T> =
     ? ColumnType<S, I | undefined, U>
     : ColumnType<T, T | undefined, T>;
 
-export interface Notifications {
-  userId: string;
-  lastReadAt: Generated<Date>;
-}
-
-export interface UserRadarCache {
-  userId: string;
-  version: string;
-  notes: Generated<Decimal | null>;
-  chord: Generated<Decimal | null>;
-  peak: Generated<Decimal | null>;
-  charge: Generated<Decimal | null>;
-  scratch: Generated<Decimal | null>;
-  soflan: Generated<Decimal | null>;
-  totalBpi: Generated<Decimal | null>;
-  updatedAt: Generated<Date | null>;
-}
-
 export interface ApiKeys {
-  createdAt: Generated<Date | null>;
+  createdAt: Generated<Date>;
   id: Generated<number>;
   key: string;
   userId: string;
@@ -76,13 +58,16 @@ export interface BkUsers {
 }
 
 export interface Follows {
-  createdAt: Generated<Date | null>;
+  createdAt: Generated<Date>;
   followerId: string;
   followingId: string;
   id: Generated<number>;
 }
 
 export interface Logs {
+  /**
+   * 一括更新を識別するユニークなID
+   */
   batchId: string;
   createdAt: Generated<Date>;
   id: Generated<number>;
@@ -91,19 +76,24 @@ export interface Logs {
   version: string;
 }
 
+export interface Notifications {
+  lastReadAt: Generated<Date>;
+  userId: string;
+}
+
 export interface Scores {
   batchId: Generated<string | null>;
   bpi: Generated<number | null>;
   clearState: Generated<string | null>;
-  createdAt: Generated<Date | null>;
-  definitionId: Generated<number | null>;
+  createdAt: Generated<Date>;
+  definitionId: number;
   exScore: number;
   lastPlayed: Generated<Date>;
   logId: Generated<number>;
   missCount: Generated<number | null>;
-  songId: Generated<number | null>;
-  userId: Generated<string | null>;
-  version: Generated<string | null>;
+  songId: number;
+  userId: string;
+  version: string;
 }
 
 export interface SongDef {
@@ -111,25 +101,38 @@ export interface SongDef {
   defId: Generated<number>;
   isCurrent: Generated<number | null>;
   kaidenAvg: number;
-  songId: Generated<number | null>;
-  updatedAt: Generated<Date | null>;
+  songId: number;
+  updatedAt: Generated<Date>;
   wrScore: number;
 }
 
 export interface Songs {
-  bpm: Generated<string | null>;
-  createdAt: Generated<Date | null>;
+  bpm: string;
+  createdAt: Generated<Date>;
   /**
    * 楽曲が削除されたバージョンを指定(このバージョン以降では投入しない)
    */
   deletedAt: Generated<string | null>;
-  difficulty: Generated<string | null>;
-  difficultyLevel: Generated<number | null>;
+  difficulty: string;
+  difficultyLevel: number;
   notes: number;
   releasedVersion: Generated<number | null>;
   songId: Generated<number>;
-  textage: Generated<string | null>;
+  textage: string;
   title: string;
+}
+
+export interface UserRadarCache {
+  charge: Generated<Decimal | null>;
+  chord: Generated<Decimal | null>;
+  notes: Generated<Decimal | null>;
+  peak: Generated<Decimal | null>;
+  scratch: Generated<Decimal | null>;
+  soflan: Generated<Decimal | null>;
+  totalBpi: Generated<Decimal | null>;
+  updatedAt: Generated<Date | null>;
+  userId: string;
+  version: string;
 }
 
 export interface Users {
@@ -139,7 +142,7 @@ export interface Users {
   profileImage: Generated<string | null>;
   profileText: Generated<string | null>;
   updatedAt: Generated<Date | null>;
-  userId: Generated<string>;
+  userId: string;
   userName: string;
   xId: Generated<string | null>;
 }
@@ -147,12 +150,27 @@ export interface Users {
 export interface UserStatusLogs {
   arenaRank: Generated<string | null>;
   batchId: Generated<string | null>;
-  createdAt: Generated<Date | null>;
+  createdAt: Generated<Date>;
   id: Generated<number>;
   totalBpi: Decimal;
-  updatedAt: Generated<Date | null>;
+  updatedAt: Generated<Date>;
   userId: string;
   version: string;
+}
+
+export interface DB {
+  apiKeys: ApiKeys;
+  bkScores: BkScores;
+  bkUsers: BkUsers;
+  follows: Follows;
+  logs: Logs;
+  notifications: Notifications;
+  scores: Scores;
+  songDef: SongDef;
+  songs: Songs;
+  userRadarCache: UserRadarCache;
+  users: Users;
+  userStatusLogs: UserStatusLogs;
 }
 
 export type UserStatusLog = Selectable<UserStatusLogs>;

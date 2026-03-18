@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS `apiKeys` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `userId` varchar(128) NOT NULL,
   `key` varchar(128) NOT NULL,
-  `createdAt` timestamp NULL DEFAULT current_timestamp(),
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `key` (`key`) USING BTREE,
   UNIQUE KEY `userId` (`userId`) USING BTREE,
@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS `follows` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `followerId` varchar(128) NOT NULL,
   `followingId` varchar(128) NOT NULL,
-  `createdAt` timestamp NULL DEFAULT current_timestamp(),
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_follower_following` (`followerId`,`followingId`),
   KEY `idx_following` (`followingId`),
@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS `logs` (
   KEY `idx_user_version` (`userId`,`version`) USING BTREE,
   KEY `createdAt` (`createdAt`),
   CONSTRAINT `fk_log_userId` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=105913 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=105963 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `notifications` (
   `userId` varchar(128) NOT NULL,
@@ -86,16 +86,16 @@ CREATE TABLE IF NOT EXISTS `notifications` (
 
 CREATE TABLE IF NOT EXISTS `scores` (
   `logId` bigint(20) NOT NULL AUTO_INCREMENT,
-  `userId` varchar(128) DEFAULT NULL,
-  `songId` int(11) DEFAULT NULL,
-  `definitionId` int(11) DEFAULT NULL,
+  `userId` varchar(128) NOT NULL,
+  `songId` int(11) NOT NULL,
+  `definitionId` int(11) NOT NULL,
   `exScore` int(11) NOT NULL,
   `bpi` float DEFAULT NULL,
   `clearState` varchar(50) DEFAULT NULL,
   `missCount` int(11) DEFAULT NULL,
-  `createdAt` timestamp NULL DEFAULT current_timestamp(),
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
   `lastPlayed` timestamp NOT NULL DEFAULT current_timestamp(),
-  `version` varchar(50) DEFAULT NULL,
+  `version` varchar(50) NOT NULL,
   `batchId` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`logId`) USING BTREE,
   KEY `fk_score_def` (`definitionId`),
@@ -111,16 +111,16 @@ CREATE TABLE IF NOT EXISTS `scores` (
   CONSTRAINT `fk_score_song` FOREIGN KEY (`songId`) REFERENCES `songs` (`songId`) ON DELETE CASCADE,
   CONSTRAINT `fk_score_userId` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE,
   CONSTRAINT `fk_scores_batchId` FOREIGN KEY (`batchId`) REFERENCES `logs` (`batchId`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=1386553 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1387381 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `songDef` (
   `defId` int(11) NOT NULL AUTO_INCREMENT,
-  `songId` int(11) DEFAULT NULL,
+  `songId` int(11) NOT NULL,
   `wrScore` int(11) NOT NULL,
   `kaidenAvg` int(11) NOT NULL,
   `coef` float DEFAULT -1,
   `isCurrent` tinyint(1) DEFAULT 0,
-  `updatedAt` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`defId`),
   KEY `isCurrent` (`isCurrent`),
   KEY `updatedAt` (`updatedAt`),
@@ -132,11 +132,11 @@ CREATE TABLE IF NOT EXISTS `songs` (
   `songId` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL,
   `notes` int(11) NOT NULL,
-  `bpm` varchar(50) DEFAULT NULL,
-  `difficulty` varchar(24) DEFAULT NULL,
-  `difficultyLevel` int(11) DEFAULT NULL,
-  `textage` varchar(255) DEFAULT NULL,
-  `createdAt` timestamp NULL DEFAULT current_timestamp(),
+  `bpm` varchar(50) NOT NULL,
+  `difficulty` varchar(24) NOT NULL,
+  `difficultyLevel` int(11) NOT NULL,
+  `textage` varchar(255) NOT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
   `deletedAt` varchar(50) DEFAULT NULL COMMENT '楽曲が削除されたバージョンを指定(このバージョン以降では投入しない)',
   `releasedVersion` int(11) DEFAULT NULL,
   PRIMARY KEY (`songId`),
@@ -193,14 +193,14 @@ CREATE TABLE IF NOT EXISTS `userStatusLogs` (
   `arenaRank` varchar(20) DEFAULT NULL,
   `version` varchar(10) NOT NULL,
   `batchId` varchar(255) DEFAULT NULL,
-  `createdAt` timestamp NULL DEFAULT current_timestamp(),
-  `updatedAt` timestamp NULL DEFAULT current_timestamp(),
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   KEY `idx_user_status_logs_createdAt` (`createdAt`),
   KEY `idx_usl_user_id_desc` (`userId`,`id` DESC),
   KEY `idx_usl_user_version_id_desc` (`userId`,`version`,`id` DESC),
   CONSTRAINT `userStatusLogs_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=106471 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=106524 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
