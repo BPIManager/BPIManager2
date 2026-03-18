@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS `apiKeys` (
   UNIQUE KEY `key` (`key`) USING BTREE,
   UNIQUE KEY `userId` (`userId`) USING BTREE,
   CONSTRAINT `fk_apikeys_userid` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `bkScores` (
   `logId` int(11) NOT NULL AUTO_INCREMENT,
@@ -58,9 +58,10 @@ CREATE TABLE IF NOT EXISTS `follows` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_follower_following` (`followerId`,`followingId`),
   KEY `idx_following` (`followingId`),
+  KEY `idx_following_follower` (`followingId`,`followerId`),
   CONSTRAINT `fk_follows_follower` FOREIGN KEY (`followerId`) REFERENCES `users` (`userId`) ON DELETE CASCADE,
   CONSTRAINT `fk_follows_following` FOREIGN KEY (`followingId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=201 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=233 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `logs` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -74,7 +75,7 @@ CREATE TABLE IF NOT EXISTS `logs` (
   KEY `idx_user_version` (`userId`,`version`) USING BTREE,
   KEY `createdAt` (`createdAt`),
   CONSTRAINT `fk_log_userId` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=103693 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=105913 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `notifications` (
   `userId` varchar(128) NOT NULL,
@@ -104,16 +105,17 @@ CREATE TABLE IF NOT EXISTS `scores` (
   KEY `idx_scores_song_version_user_log` (`songId`,`version`,`userId`,`logId` DESC),
   KEY `idx_scores_version_user_song_log` (`version`,`userId`,`songId`,`logId` DESC),
   KEY `idx_scores_with_winloss` (`userId`,`version`,`songId`,`logId` DESC,`exScore`),
+  KEY `idx_scores_lastPlayed_version` (`lastPlayed` DESC,`version`),
+  KEY `idx_scores_lookup_v2` (`userId`,`songId`,`version`,`exScore`,`logId`),
   CONSTRAINT `fk_score_def` FOREIGN KEY (`definitionId`) REFERENCES `songDef` (`defId`),
   CONSTRAINT `fk_score_song` FOREIGN KEY (`songId`) REFERENCES `songs` (`songId`) ON DELETE CASCADE,
   CONSTRAINT `fk_score_userId` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE,
   CONSTRAINT `fk_scores_batchId` FOREIGN KEY (`batchId`) REFERENCES `logs` (`batchId`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=1362789 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1386553 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `songDef` (
   `defId` int(11) NOT NULL AUTO_INCREMENT,
   `songId` int(11) DEFAULT NULL,
-  `difficulty` varchar(50) NOT NULL,
   `wrScore` int(11) NOT NULL,
   `kaidenAvg` int(11) NOT NULL,
   `coef` float DEFAULT -1,
@@ -122,7 +124,7 @@ CREATE TABLE IF NOT EXISTS `songDef` (
   PRIMARY KEY (`defId`),
   KEY `isCurrent` (`isCurrent`),
   KEY `updatedAt` (`updatedAt`),
-  KEY `songId_difficulty` (`songId`,`difficulty`),
+  KEY `songId_difficulty` (`songId`),
   CONSTRAINT `fk_def_song` FOREIGN KEY (`songId`) REFERENCES `songs` (`songId`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=1226 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -198,7 +200,7 @@ CREATE TABLE IF NOT EXISTS `userStatusLogs` (
   KEY `idx_usl_user_id_desc` (`userId`,`id` DESC),
   KEY `idx_usl_user_version_id_desc` (`userId`,`version`,`id` DESC),
   CONSTRAINT `userStatusLogs_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=104242 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=106471 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
