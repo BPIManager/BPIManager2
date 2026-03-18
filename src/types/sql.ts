@@ -158,21 +158,6 @@ export interface UserStatusLogs {
   version: string;
 }
 
-export interface DB {
-  apiKeys: ApiKeys;
-  bkScores: BkScores;
-  bkUsers: BkUsers;
-  follows: Follows;
-  logs: Logs;
-  notifications: Notifications;
-  scores: Scores;
-  songDef: SongDef;
-  songs: Songs;
-  userRadarCache: UserRadarCache;
-  users: Users;
-  userStatusLogs: UserStatusLogs;
-}
-
 export type UserStatusLog = Selectable<UserStatusLogs>;
 export type NewUserStatusLog = Insertable<UserStatusLogs>;
 export type TotalBPILog = Selectable<Logs>;
