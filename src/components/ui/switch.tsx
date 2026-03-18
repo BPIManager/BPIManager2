@@ -1,39 +1,49 @@
-import { Switch as ChakraSwitch } from "@chakra-ui/react"
-import * as React from "react"
+"use client";
 
-export interface SwitchProps extends ChakraSwitch.RootProps {
-  inputProps?: React.InputHTMLAttributes<HTMLInputElement>
-  rootRef?: React.RefObject<HTMLLabelElement | null>
-  trackLabel?: { on: React.ReactNode; off: React.ReactNode }
-  thumbLabel?: { on: React.ReactNode; off: React.ReactNode }
+import * as React from "react";
+import { Switch as SwitchPrimitive } from "radix-ui";
+import { cn } from "@/lib/utils";
+
+function Switch({
+  className,
+  size = "default",
+  ...props
+}: React.ComponentProps<typeof SwitchPrimitive.Root> & {
+  size?: "sm" | "default";
+}) {
+  return (
+    <SwitchPrimitive.Root
+      data-slot="switch"
+      data-size={size}
+      className={cn(
+        "peer group/switch relative inline-flex shrink-0 items-center rounded-full",
+        "border border-transparent transition-all outline-none",
+        "after:absolute after:-inset-x-3 after:-inset-y-2",
+        "focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
+        "aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20",
+        "data-[size=default]:h-[18.4px] data-[size=default]:w-[32px]",
+        "data-[size=sm]:h-[14px] data-[size=sm]:w-[24px]",
+        "data-checked:bg-bpim-primary data-unchecked:bg-bpim-overlay",
+        "data-disabled:cursor-not-allowed data-disabled:opacity-50",
+        className,
+      )}
+      {...props}
+    >
+      <SwitchPrimitive.Thumb
+        data-slot="switch-thumb"
+        className={cn(
+          "pointer-events-none block rounded-full ring-0 transition-transform",
+          "bg-bpim-text",
+          "group-data-[size=default]/switch:size-4 group-data-[size=sm]/switch:size-3",
+          "group-data-[size=default]/switch:data-checked:translate-x-[calc(100%-2px)]",
+          "group-data-[size=sm]/switch:data-checked:translate-x-[calc(100%-2px)]",
+          "group-data-[size=default]/switch:data-unchecked:translate-x-0",
+          "group-data-[size=sm]/switch:data-unchecked:translate-x-0",
+          "data-checked:bg-bpim-bg",
+        )}
+      />
+    </SwitchPrimitive.Root>
+  );
 }
 
-export const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
-  function Switch(props, ref) {
-    const { inputProps, children, rootRef, trackLabel, thumbLabel, ...rest } =
-      props
-
-    return (
-      <ChakraSwitch.Root ref={rootRef} {...rest}>
-        <ChakraSwitch.HiddenInput ref={ref} {...inputProps} />
-        <ChakraSwitch.Control>
-          <ChakraSwitch.Thumb>
-            {thumbLabel && (
-              <ChakraSwitch.ThumbIndicator fallback={thumbLabel?.off}>
-                {thumbLabel?.on}
-              </ChakraSwitch.ThumbIndicator>
-            )}
-          </ChakraSwitch.Thumb>
-          {trackLabel && (
-            <ChakraSwitch.Indicator fallback={trackLabel.off}>
-              {trackLabel.on}
-            </ChakraSwitch.Indicator>
-          )}
-        </ChakraSwitch.Control>
-        {children != null && (
-          <ChakraSwitch.Label>{children}</ChakraSwitch.Label>
-        )}
-      </ChakraSwitch.Root>
-    )
-  },
-)
+export { Switch };

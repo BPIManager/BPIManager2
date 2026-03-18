@@ -1,53 +1,29 @@
-import {
-  Box,
-  HStack,
-  VStack,
-  Skeleton,
-  SkeletonCircle,
-} from "@chakra-ui/react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const UserRecommendationCardSkeleton = () => {
   return (
-    <HStack
-      p={{ base: 3, md: 5 }}
-      bg="rgba(13, 17, 23, 0.4)"
-      borderRadius="2xl"
-      borderWidth="1px"
-      borderColor="whiteAlpha.100"
-      gap={{ base: 3, md: 6 }}
-      justifyContent={"space-between"}
-      align="stretch"
-      minH={{ base: "140px", md: "180px" }}
-    >
-      <VStack align="start" flex="1" gap={{ base: 2, md: 4 }} py={1}>
-        <HStack gap={3} w="full">
-          <SkeletonCircle size={{ base: "10", md: "12" }} />
-          <VStack align="start" gap={2} flex="1">
-            <Skeleton h="14px" w="60%" />
-            <Skeleton h="10px" w="40%" />
-          </VStack>
-        </HStack>
-
-        <Box w="full">
-          <Skeleton h="8px" w="30px" mb={2} />
-          <HStack align="flex-end">
-            <Skeleton h="24px" w="60px" />
-            <Skeleton h="12px" w="30px" />
-          </HStack>
-        </Box>
-
-        <Box w="full">
-          <Skeleton h="8px" w="40px" mb={2} />
-          <Skeleton h="10px" w="full" />
-        </Box>
-      </VStack>
-
-      <Skeleton
-        w={{ base: "100px", sm: "120px", md: "140px" }}
-        h={{ base: "100px", sm: "120px", md: "140px" }}
-        borderRadius="xl"
-        alignSelf="center"
-      />
-    </HStack>
+    <div className="flex min-h-[140px] w-full items-stretch justify-between gap-3 rounded-2xl border border-bpim-border bg-bpim-bg/40 p-3 md:min-h-[180px] md:gap-6 md:p-5">
+      <div className="flex flex-1 flex-col justify-start gap-3 py-1 md:gap-4">
+        <div className="flex w-full items-center gap-3">
+          <Skeleton className="h-10 w-10 rounded-full md:h-12 md:w-12" />
+          <div className="flex flex-1 flex-col gap-2">
+            <Skeleton className="h-3.5 w-[60%]" />
+            <Skeleton className="h-2.5 w-[40%]" />
+          </div>
+        </div>
+        <div className="w-full">
+          <Skeleton className="mb-2 h-2 w-[30px]" />
+          <div className="flex items-end gap-2">
+            <Skeleton className="h-6 w-[60px]" />
+            <Skeleton className="h-3 w-[30px]" />
+          </div>
+        </div>
+        <div className="w-full">
+          <Skeleton className="mb-2 h-2 w-[40px]" />
+          <Skeleton className="h-2.5 w-full" />
+        </div>
+      </div>
+      <Skeleton className="h-[100px] w-[100px] self-center rounded-xl sm:h-[120px] sm:w-[120px] md:h-[140px] md:w-[140px]" />
+    </div>
   );
 };

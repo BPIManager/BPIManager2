@@ -1,99 +1,62 @@
-import {
-  Center,
-  VStack,
-  Box,
-  Heading,
-  Text,
-  Button,
-  Code,
-} from "@chakra-ui/react";
-import { AlertCircle } from "lucide-react";
+﻿import { AlertCircle } from "lucide-react";
 import { LuRefreshCcw } from "react-icons/lu";
+import { Button } from "@/components/ui/button";
 
-export const LogErrorState = ({
-  error,
-  onRetry,
-}: {
+interface LogErrorStateProps {
   error: any;
   onRetry: () => void;
-}) => {
+}
+
+export const LogErrorState = ({ error, onRetry }: LogErrorStateProps) => {
   const status = error?.status;
   const message =
     error?.info?.message || error?.message || "通信エラーが発生しました";
 
-  return (
-    <Center h="500px">
-      <VStack gap={6} textAlign="center">
-        <Box color="red.500" bg="red.500/10" p={6} borderRadius="full">
-          <AlertCircle size={48} />
-        </Box>
+  const errorDetail =
+    typeof error === "object" ? JSON.stringify(error, null, 2) : String(error);
 
-        <VStack gap={2}>
-          <Heading size="md" color="white">
+  return (
+    <div className="flex h-[500px] w-full items-center justify-center">
+      <div className="flex flex-col items-center gap-6 text-center">
+        <div className="rounded-full bg-bpim-danger/10 p-6 text-bpim-danger">
+          <AlertCircle size={48} />
+        </div>
+
+        <div className="flex flex-col items-center gap-2">
+          <h2 className="text-xl font-bold text-bpim-text">
             データの取得に失敗しました
-          </Heading>
-          <Text color="gray.500" fontSize="sm" maxW="400px">
-            {message}
-          </Text>
+          </h2>
+          <p className="max-w-[400px] text-sm text-bpim-muted">{message}</p>
+
           {status && (
-            <Code
-              colorPalette="red"
-              variant="subtle"
-              fontSize="2xs"
-              mt={2}
-              px={2}
-            >
+            <code className="mt-2 rounded bg-bpim-danger/10 px-2 py-0.5 font-mono text-[10px] font-bold text-bpim-danger">
               HTTP {status}
-            </Code>
+            </code>
           )}
-          <Box mt={4} w="full" textAlign="left">
-            <Text
-              fontSize="10px"
-              color="gray.600"
-              mb={1}
-              fontWeight="bold"
-              ml={1}
-            >
-              Error:
-            </Text>
-            <Code
-              display="block"
-              p={4}
-              bg="blackAlpha.400"
-              color="gray.300"
-              fontSize="10px"
-              borderRadius="md"
-              whiteSpace="pre-wrap"
-              overflowY="auto"
-              maxH="200px"
-              w="full"
-              border="1px solid"
-              borderColor="whiteAlpha.100"
-            >
-              {typeof error === "object"
-                ? JSON.stringify(error, null, 2)
-                : String(error)}
-            </Code>
-          </Box>
-        </VStack>
+
+          <div className="mt-4 w-full text-left">
+            <label className="ml-1 mb-1 block text-[10px] font-bold text-bpim-subtle uppercase tracking-wider">
+              Error Details:
+            </label>
+            <pre className="w-full max-h-[200px] overflow-y-auto rounded-md border border-bpim-border bg-bpim-bg/40 p-4 font-mono text-[10px] text-bpim-muted whitespace-pre-wrap break-all scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+              {errorDetail}
+            </pre>
+          </div>
+        </div>
 
         <Button
           onClick={onRetry}
           variant="outline"
-          colorPalette="gray"
           size="sm"
-          borderRadius="full"
-          gap={2}
-          _hover={{
-            bg: "whiteAlpha.100",
-            color: "blue.400",
-          }}
-          px={2}
+          className="group flex items-center gap-2 rounded-full border-bpim-border px-6 transition-colors hover:bg-bpim-overlay/50 hover:text-bpim-primary"
         >
-          <LuRefreshCcw size={14} />
+          <LuRefreshCcw
+            size={14}
+            className="transition-transform group-hover:rotate-180 duration-500"
+          />
           再試行する
         </Button>
-      </VStack>
-    </Center>
+      </div>
+    </div>
   );
 };

@@ -1,63 +1,35 @@
-import {
-  Box,
-  HStack,
-  VStack,
-  Flex,
-  Skeleton,
-  SkeletonCircle,
-} from "@chakra-ui/react";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export const RivalSummarySkeleton = () => {
-  return (
-    <HStack
-      p={{ base: 3, md: 5 }}
-      bg="rgba(13, 17, 23, 0.8)"
-      borderRadius="2xl"
-      borderWidth="1px"
-      borderColor="whiteAlpha.100"
-      justifyContent="space-between"
-      align="stretch"
-      width="full"
-      gap={{ base: 3, md: 6 }}
-    >
-      <VStack align="start" flex="1" gap={{ base: 3, md: 4 }} minW={0}>
-        <HStack gap={{ base: 2, md: 3 }} w="full">
-          <SkeletonCircle size={{ base: "10", md: "12" }} />
-          <VStack align="start" gap={1.5} flex="1">
-            <Skeleton h="14px" w="100px" />
-            <HStack gap={2}>
-              <Skeleton h="16px" w="40px" borderRadius="full" />
-              <Skeleton h="12px" w="60px" />
-            </HStack>
-          </VStack>
-          <VStack align="end" gap={1}>
-            <Skeleton h="9px" w="40px" />
-            <Skeleton h="24px" w="60px" />
-          </VStack>
-        </HStack>
+export const RivalSummarySkeleton = () => (
+  <div className="flex min-h-[140px] w-full items-stretch justify-between gap-3 rounded-2xl border border-bpim-border bg-bpim-bg/40 p-3 md:gap-6 md:p-5">
+    <div className="flex flex-1 flex-col gap-4 py-1">
+      <div className="flex w-full items-center gap-3">
+        <Skeleton className="h-10 w-10 rounded-full md:h-12 md:w-12" />
+        <div className="flex flex-1 flex-col gap-2">
+          <Skeleton className="h-4 w-[100px]" />
+          <div className="flex gap-2">
+            <Skeleton className="h-4 w-10 rounded-full" />
+            <Skeleton className="h-3 w-16" />
+          </div>
+        </div>
+        <div className="flex flex-col items-end gap-1">
+          <Skeleton className="h-2.5 w-10" />
+          <Skeleton className="h-6 w-14" />
+        </div>
+      </div>
 
-        <VStack w="full" align="start" gap={2}>
-          <HStack w="full" justify="space-between">
-            <Skeleton h="12px" w="60px" />
-            <Skeleton h="12px" w="60px" />
-          </HStack>
-          <Skeleton h="6px" w="full" borderRadius="full" />
-          <HStack w="full" justify="space-between">
-            <Skeleton h="12px" w="50px" />
-            <Skeleton h="12px" w="70px" />
-          </HStack>
-        </VStack>
-      </VStack>
-
-      <Box
-        w={{ base: "90px", sm: "110px", md: "130px" }}
-        h={{ base: "90px", sm: "110px", md: "130px" }}
-        bg="whiteAlpha.50"
-        borderRadius="xl"
-        alignSelf="center"
-      >
-        <Skeleton h="full" w="full" borderRadius="xl" />
-      </Box>
-    </HStack>
-  );
-};
+      <div className="flex flex-col gap-2">
+        <div className="flex justify-between">
+          <Skeleton className="h-3 w-12" />
+          <Skeleton className="h-3 w-12" />
+        </div>
+        <Skeleton className="h-1.5 w-full rounded-full" />
+        <div className="flex justify-between">
+          <Skeleton className="h-2.5 w-10" />
+          <Skeleton className="h-2.5 w-14" />
+        </div>
+      </div>
+    </div>
+    <Skeleton className="h-[90px] w-[90px] self-center rounded-xl sm:h-[110px] sm:w-[110px] md:h-[130px] md:w-[130px]" />
+  </div>
+);

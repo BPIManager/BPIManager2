@@ -1,30 +1,25 @@
+﻿"use client";
+
 import { useState, useEffect } from "react";
-import {
-  Stack,
-  Text,
-  Input,
-  HStack,
-  VStack,
-  Button,
-  Field,
-  Separator,
-  SimpleGrid,
-  Box,
-} from "@chakra-ui/react";
-import {
-  DialogBody,
-  DialogCloseTrigger,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogRoot,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Checkbox } from "@/components/ui/checkbox";
 import { FilterParamsFrontend } from "@/types/songs/withScore";
 import { verNameArr } from "@/constants/versions";
 import { CLEAR_STATES } from "@/constants/lampState";
 import dayjs from "@/lib/dayjs";
+import { cn } from "@/lib/utils";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Props {
   isOpen: boolean;
@@ -90,200 +85,185 @@ export const AdvancedFilterModal = ({
   };
 
   return (
-    <DialogRoot
-      open={isOpen}
-      onOpenChange={onClose}
-      scrollBehavior="inside"
-      size="md"
-      placement={{ mdDown: "top", md: "center" }}
-    >
-      <DialogContent
-        bg="gray.950"
-        border="1px solid"
-        borderColor="gray.800"
-        p={4}
-      >
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-2xl border-bpim-border p-6 text-bpim-text">
         <DialogHeader>
-          <DialogTitle fontSize="md" fontWeight="bold">
+          <DialogTitle className="text-base font-bold">
             詳細フィルター
           </DialogTitle>
         </DialogHeader>
-        <DialogCloseTrigger />
 
-        <DialogBody py={2}>
-          <Stack gap={6}>
-            <VStack align="start" gap={3}>
-              <Text fontSize="xs" fontWeight="bold" color="blue.500">
-                BPM範囲
-              </Text>
-              <HStack w="full" gap={4}>
-                <Input
-                  placeholder="Min"
-                  type="number"
-                  size="sm"
-                  variant="subtle"
-                  value={localParams.bpmMin ?? ""}
-                  onChange={(e) =>
-                    updateLocal({
-                      bpmMin: e.target.value
-                        ? Number(e.target.value)
-                        : undefined,
-                    })
-                  }
-                />
-                <Text color="gray.600">~</Text>
-                <Input
-                  placeholder="Max"
-                  type="number"
-                  size="sm"
-                  variant="subtle"
-                  value={localParams.bpmMax ?? ""}
-                  onChange={(e) =>
-                    updateLocal({
-                      bpmMax: e.target.value
-                        ? Number(e.target.value)
-                        : undefined,
-                    })
-                  }
-                />
-              </HStack>
+        <div className="flex flex-col gap-6 py-4 overflow-y-auto max-h-[70vh] pr-2 scrollbar-thin">
+          <section className="flex flex-col gap-3">
+            <h3 className="text-[10px] font-bold tracking-widest text-bpim-text uppercase">
+              BPM範囲
+            </h3>
+            <div className="flex items-center gap-3">
+              <Input
+                placeholder="Min"
+                type="number"
+                className="h-9 border-bpim-border bg-bpim-surface-2/60"
+                value={localParams.bpmMin ?? ""}
+                onChange={(e) =>
+                  updateLocal({
+                    bpmMin: e.target.value ? Number(e.target.value) : undefined,
+                  })
+                }
+              />
+              <span className="text-bpim-subtle">~</span>
+              <Input
+                placeholder="Max"
+                type="number"
+                className="h-9 border-bpim-border bg-bpim-surface-2/60"
+                value={localParams.bpmMax ?? ""}
+                onChange={(e) =>
+                  updateLocal({
+                    bpmMax: e.target.value ? Number(e.target.value) : undefined,
+                  })
+                }
+              />
+            </div>
+            <div className="flex items-center gap-2">
               <Checkbox
-                checked={localParams.isSofran}
-                onCheckedChange={(e) => updateLocal({ isSofran: !!e.checked })}
-              >
-                <Text fontSize="sm">ソフラン曲のみ表示</Text>
-              </Checkbox>
-            </VStack>
+                id="isSofran"
+                checked={!!localParams.isSofran}
+                onCheckedChange={(checked) =>
+                  updateLocal({ isSofran: !!checked })
+                }
+              />
+              <Label htmlFor="isSofran" className="text-sm font-medium">
+                ソフラン曲のみ表示
+              </Label>
+            </div>
+          </section>
 
-            <Separator opacity={0.1} />
+          <Separator className="bg-bpim-surface-2/60" />
 
-            <VStack align="start" gap={3}>
-              <Text fontSize="xs" fontWeight="bold" color="blue.500">
-                ランプ状態
-              </Text>
-              <SimpleGrid columns={2} gap={3} w="full">
-                {CLEAR_STATES.map((state) => (
+          <section className="flex flex-col gap-3">
+            <h3 className="text-[10px] font-bold tracking-widest text-bpim-text uppercase">
+              ランプ状態
+            </h3>
+            <div className="grid grid-cols-2 gap-3">
+              {CLEAR_STATES.map((state) => (
+                <div key={state.value} className="flex items-center gap-2">
                   <Checkbox
-                    key={state.value}
+                    id={`state-${state.value}`}
                     checked={localParams.clearStates?.includes(state.value)}
                     onCheckedChange={() => toggleState(state.value)}
-                    colorPalette="blue"
+                  />
+                  <Label
+                    htmlFor={`state-${state.value}`}
+                    className="text-xs font-bold"
+                    style={{ color: state.color }}
                   >
-                    <Text fontSize="xs" fontWeight="bold" color={state.color}>
-                      {state.label}
-                    </Text>
-                  </Checkbox>
-                ))}
-              </SimpleGrid>
-            </VStack>
+                    {state.label}
+                  </Label>
+                </div>
+              ))}
+            </div>
+          </section>
 
-            <Separator opacity={0.1} />
+          <Separator className="bg-bpim-surface-2/60" />
 
-            <VStack align="start" gap={3}>
-              <Text fontSize="xs" fontWeight="bold" color="blue.500">
-                最終更新日
-              </Text>
-              <HStack wrap="wrap" gap={2}>
-                {periodOptions.map((opt) => (
-                  <Button
-                    px={2}
-                    key={opt.value}
-                    size="xs"
-                    variant={
-                      localParams.since === opt.value ? "solid" : "outline"
-                    }
-                    colorPalette={
-                      localParams.since === opt.value ? "blue" : "gray"
-                    }
-                    onClick={() =>
-                      updateLocal({
-                        since:
-                          localParams.since === opt.value
-                            ? undefined
-                            : (opt.value as any),
-                        until: undefined,
-                      })
-                    }
-                  >
-                    {opt.label}
-                  </Button>
-                ))}
+          <section className="flex flex-col gap-3">
+            <h3 className="text-[10px] font-bold tracking-widest text-bpim-text uppercase">
+              最終更新日
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {periodOptions.map((opt) => (
                 <Button
+                  key={opt.value}
                   size="xs"
-                  px={2}
-                  variant={isCustomActive ? "solid" : "outline"}
-                  colorPalette={isCustomActive ? "blue" : "gray"}
-                  onClick={() => {
-                    if (isCustomActive) {
-                      updateLocal({ since: undefined, until: undefined });
-                    } else {
-                      const today = dayjs().tz().format("YYYY-MM-DD");
-                      updateLocal({ since: today, until: today });
-                    }
-                  }}
+                  variant={
+                    localParams.since === opt.value ? "default" : "outline"
+                  }
+                  className={cn(
+                    "h-7 px-2 rounded-full border-bpim-border",
+                    localParams.since === opt.value
+                      ? "bg-bpim-primary"
+                      : "bg-transparent text-bpim-muted",
+                  )}
+                  onClick={() =>
+                    updateLocal({
+                      since:
+                        localParams.since === opt.value
+                          ? undefined
+                          : (opt.value as any),
+                      until: undefined,
+                    })
+                  }
                 >
-                  カスタム
+                  {opt.label}
                 </Button>
-              </HStack>
+              ))}
+              <Button
+                size="xs"
+                variant={isCustomActive ? "default" : "outline"}
+                className={cn(
+                  "h-7 px-2 rounded-full border-bpim-border",
+                  isCustomActive
+                    ? "bg-bpim-primary"
+                    : "bg-transparent text-bpim-muted",
+                )}
+                onClick={() => {
+                  if (isCustomActive) {
+                    updateLocal({ since: undefined, until: undefined });
+                  } else {
+                    const today = dayjs().tz().format("YYYY-MM-DD");
+                    updateLocal({ since: today, until: today });
+                  }
+                }}
+              >
+                カスタム
+              </Button>
+            </div>
 
-              {isCustomActive && (
-                <VStack w="full" gap={2} p={3} bg="gray.900" borderRadius="md">
-                  <HStack w="full" gap={2}>
-                    <Field.Root>
-                      <Text fontSize="10px" color="gray.500" mb={1}>
-                        開始日
-                      </Text>
-                      <Input
-                        type="date"
-                        size="sm"
-                        value={localParams.since || ""}
-                        onChange={(e) => updateLocal({ since: e.target.value })}
-                        css={{
-                          "&::-webkit-calendar-picker-indicator": {
-                            filter: "invert(1)",
-                          },
-                        }}
-                      />
-                    </Field.Root>
-                    <Box mt={6} color="gray.600">
-                      ~
-                    </Box>
-                    <Field.Root>
-                      <Text fontSize="10px" color="gray.500" mb={1}>
-                        終了日
-                      </Text>
-                      <Input
-                        type="date"
-                        size="sm"
-                        value={localParams.until || ""}
-                        onChange={(e) => updateLocal({ until: e.target.value })}
-                        css={{
-                          "&::-webkit-calendar-picker-indicator": {
-                            filter: "invert(1)",
-                          },
-                        }}
-                      />
-                    </Field.Root>
-                  </HStack>
-                </VStack>
-              )}
-            </VStack>
+            {isCustomActive && (
+              <div className="flex flex-col gap-3 rounded-lg bg-bpim-surface-2/60 p-3">
+                <div className="grid grid-cols-[1fr_auto_1fr] items-end gap-2">
+                  <div className="flex flex-col gap-1.5">
+                    <Label className="text-[10px] text-bpim-muted">
+                      開始日
+                    </Label>
+                    <Input
+                      type="date"
+                      className="h-8 border-bpim-border bg-bpim-bg text-xs [color-scheme:dark]"
+                      value={localParams.since || ""}
+                      onChange={(e) => updateLocal({ since: e.target.value })}
+                    />
+                  </div>
+                  <span className="mb-2 text-bpim-subtle text-xs">~</span>
+                  <div className="flex flex-col gap-1.5">
+                    <Label className="text-[10px] text-bpim-muted">
+                      終了日
+                    </Label>
+                    <Input
+                      type="date"
+                      className="h-8 border-bpim-border bg-bpim-bg text-xs [color-scheme:dark]"
+                      value={localParams.until || ""}
+                      onChange={(e) => updateLocal({ until: e.target.value })}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+          </section>
 
-            <Separator opacity={0.1} />
+          <Separator className="bg-bpim-surface-2/60" />
 
-            <VStack align="start" gap={3} w="full">
-              <Text fontSize="xs" fontWeight="bold" color="blue.500">
-                楽曲バージョン
-              </Text>
-              <Box w="full" maxH="200px" overflowY="auto" pr={2}>
-                <SimpleGrid columns={2} gap={2}>
-                  {verNameArr.map((name, index) => {
-                    if (!name) return null;
-                    const isChecked = localParams.versions?.includes(index);
-                    return (
+          <section className="flex flex-col gap-3">
+            <h3 className="text-[10px] font-bold tracking-widest text-bpim-text uppercase">
+              楽曲バージョン
+            </h3>
+            <ScrollArea className="h-[200px] w-full pr-4">
+              <div className="grid grid-cols-2 gap-2">
+                {verNameArr.map((name, index) => {
+                  if (!name) return null;
+                  const isChecked = localParams.versions?.includes(index);
+                  return (
+                    <div key={index} className="flex items-center gap-2">
                       <Checkbox
-                        key={index}
-                        size="sm"
+                        id={`ver-${index}`}
                         checked={isChecked}
                         onCheckedChange={() => {
                           const current = localParams.versions || [];
@@ -292,26 +272,39 @@ export const AdvancedFilterModal = ({
                             : [...current, index];
                           updateLocal({ versions: next });
                         }}
+                      />
+                      <Label
+                        htmlFor={`ver-${index}`}
+                        className="text-xs truncate"
                       >
-                        <Text whiteSpace="nowrap">{name}</Text>
-                      </Checkbox>
-                    );
-                  })}
-                </SimpleGrid>
-              </Box>
-            </VStack>
-          </Stack>
-        </DialogBody>
+                        {name}
+                      </Label>
+                    </div>
+                  );
+                })}
+              </div>
+            </ScrollArea>
+          </section>
+        </div>
 
-        <DialogFooter pt={4}>
-          <Button variant="ghost" size="sm" onClick={handleReset}>
+        <DialogFooter className="gap-2 sm:gap-0">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleReset}
+            className="text-bpim-muted"
+          >
             リセット
           </Button>
-          <Button colorPalette="blue" px={2} size="sm" onClick={handleApply}>
+          <Button
+            className="bg-bpim-primary font-bold hover:bg-bpim-primary"
+            size="sm"
+            onClick={handleApply}
+          >
             適用して閉じる
           </Button>
         </DialogFooter>
       </DialogContent>
-    </DialogRoot>
+    </Dialog>
   );
 };

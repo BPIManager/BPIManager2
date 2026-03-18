@@ -1,9 +1,10 @@
-import { SimpleGrid, VStack, Box, Tabs } from "@chakra-ui/react";
+"use client";
+
+import { useRouter } from "next/router";
 import { DashBoardFilter } from "@/components/partials/DashBoard/Filter";
 import { ActivitySection } from "@/components/partials/DashBoard/ActivityCalendar/ui";
 import { RankDistributionSection } from "@/components/partials/DashBoard/DJRankDistribution/ui";
 import { BpiDistributionSection } from "@/components/partials/DashBoard/BPIDistribution/ui";
-import { useRouter } from "next/router";
 import { SongsTable } from "@/components/partials/Table";
 import { latestVersion } from "@/constants/latestVersion";
 import { LogsList } from "@/components/partials/Logs/LogsList/ui";
@@ -13,13 +14,13 @@ import { getVersionNameFromNumber } from "@/constants/versions";
 import { RadarSection } from "@/components/partials/DashBoard/Radar";
 import { BpiHistorySection } from "@/components/partials/DashBoard/TotalBPIHistory/ui";
 import { LogFilterSection } from "@/components/partials/Logs/VersionSelector/ui";
-import { DashCard } from "@/components/ui/dashcard";
+import { TabsContent } from "@/components/ui/tabs";
 
-export default function UserPage({
-  defaultView = "overview",
-}: {
-  defaultView: "overview" | "songs" | "logs";
-}) {
+interface UserPageProps {
+  defaultView?: "overview" | "songs" | "logs";
+}
+
+export default function UserPage({ defaultView = "overview" }: UserPageProps) {
   const router = useRouter();
   const userId = router.query.userId as string;
   const version = (router.query.version as string) || latestVersion;
@@ -33,48 +34,54 @@ export default function UserPage({
         title={defaultView === "overview" ? "プロフィール" : `スコア一覧`}
         description={
           defaultView === "overview"
-            ? `$userName$さん($iidxid$)のbeatmaniaIIDX ${getVersionNameFromNumber(Number(version))}のプレイログに関するプロフィールページです。 | $profileText$`
-            : `$userName$さん($iidxid$)がbeatmaniaIIDX ${getVersionNameFromNumber(Number(version))}で記録したスコア一覧を表示します。`
+            ? `$userName$さん($iidxid$)のbeatmaniaIIDX ${getVersionNameFromNumber(version)}のプレイログに関するプロフィールページです。 | $profileText$`
+            : `$userName$さん($iidxid$)がbeatmaniaIIDX ${getVersionNameFromNumber(version)}で記録したスコア一覧を表示します。`
         }
       />
-      <Tabs.Content value="overview" p={0}>
+
+      <TabsContent
+        value="overview"
+        className="mt-0 border-none p-0 outline-none"
+      >
         {defaultView === "overview" && (
-          <VStack align="stretch" gap={6}>
+          <div className="flex flex-col gap-6">
             <DashBoardFilter />
+
             <ActivitySection userId={userId} />
 
-            <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <RankDistributionSection myUserId={userId} />
               <BpiDistributionSection myUserId={userId} />
-            </SimpleGrid>
+            </div>
+
             <BpiHistorySection myUserId={userId} />
             <RadarSection userId={userId} />
-          </VStack>
+          </div>
         )}
-      </Tabs.Content>
+      </TabsContent>
 
-      <Tabs.Content value="songs" p={0}>
+      <TabsContent value="songs" className="mt-0 border-none p-0 outline-none">
         {defaultView === "songs" && (
-          <DashCard>
+          <div className="rounded-2xl border border-bpim-border bg-bpim-bg/40 p-1 shadow-xl backdrop-blur-md overflow-hidden">
             <SongsTable userId={userId} version={version} />
-          </DashCard>
+          </div>
         )}
-      </Tabs.Content>
+      </TabsContent>
 
-      <Tabs.Content value="logs" p={0}>
+      <TabsContent value="logs" className="mt-0 border-none p-0 outline-none">
         {defaultView === "logs" && (
-          <DashCard>
+          <div className="rounded-2xl border border-bpim-border bg-bpim-bg/40 p-4 md:p-6 shadow-xl backdrop-blur-md">
             <LogFilterSection version={version} groupedBy={groupedBy as any} />
-            <Box mt={6}>
+            <div className="mt-6">
               <LogsList
                 userId={userId}
                 version={version}
                 groupedBy={groupedBy as any}
               />
-            </Box>
-          </DashCard>
+            </div>
+          </div>
         )}
-      </Tabs.Content>
+      </TabsContent>
     </UserProfileLayout>
   );
 }

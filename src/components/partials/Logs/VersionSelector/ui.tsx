@@ -1,10 +1,15 @@
-"use client";
+﻿"use client";
 
 import { useRouter } from "next/router";
-import { VStack, Text, Stack, SegmentGroup } from "@chakra-ui/react";
-import { FormSelect } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { versionsNonDisabledCollection } from "@/constants/versions";
-import { SegmentedControl } from "@/components/ui/segmented-control";
 
 interface Props {
   version: string;
@@ -39,53 +44,50 @@ export const LogFilterSection = ({ version, groupedBy }: Props) => {
   };
 
   return (
-    <Stack
-      direction={{ base: "column", md: "row" }}
-      gap={{ base: 4, md: 6 }}
-      align={{ base: "stretch", md: "flex-end" }}
-      w="full"
-    >
-      <VStack align="start" gap={1.5} minW={{ base: "full", md: "240px" }}>
-        <Text
-          fontSize="2xs"
-          fontWeight="bold"
-          color="gray.500"
-          letterSpacing="widest"
-        >
-          VERSION
-        </Text>
-        <FormSelect
-          collection={versionsNonDisabledCollection}
-          value={version}
-          onValueChange={(details) => handleVersionChange(details)}
-          size="sm"
-          variant="subtle"
-        />
-      </VStack>
+    <div className="flex w-full flex-col items-stretch gap-4 md:flex-row md:items-end md:gap-6">
+      <div className="flex flex-col gap-1.5 min-w-full md:min-w-[240px]">
+        <label className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
+          Version
+        </label>
+        <Select value={version} onValueChange={handleVersionChange}>
+          <SelectTrigger className="h-9 border-bpim-border bg-bpim-bg text-bpim-text focus:ring-blue-500">
+            <SelectValue placeholder="バージョンを選択" />
+          </SelectTrigger>
+          <SelectContent className="border-bpim-border bg-bpim-bg text-bpim-text">
+            {versionsNonDisabledCollection.map((v) => (
+              <SelectItem key={v.value} value={v.value}>
+                {v.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
-      <VStack align="start" gap={1.5} flex={{ md: "1" }} maxW={{ md: "400px" }}>
-        <Text
-          fontSize="2xs"
-          fontWeight="bold"
-          color="gray.500"
-          letterSpacing="widest"
-        >
-          GROUP BY
-        </Text>
-        <SegmentedControl
-          items={[
-            { value: "lastPlayed", label: "プレイ日単位" },
-            { value: "createdAt", label: "インポート日単位" },
-          ]}
+      <div className="flex flex-1 flex-col gap-1.5 max-w-full md:max-w-[400px]">
+        <label className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
+          Group By
+        </label>
+        <Tabs
           value={groupedBy}
-          onValueChange={(e) => handleGroupChange(e.value as string)}
-          size="sm"
-          h="8"
-          w="full"
-          bg="bg.subtle"
-          borderRadius="md"
-        />
-      </VStack>
-    </Stack>
+          onValueChange={handleGroupChange}
+          className="w-full"
+        >
+          <TabsList className="grid h-9 w-full grid-cols-2 border border-bpim-border bg-bpim-bg p-1">
+            <TabsTrigger
+              value="lastPlayed"
+              className="text-xs font-bold transition-all data-[state=active]:bg-bpim-primary data-[state=active]:text-bpim-text"
+            >
+              プレイ日単位
+            </TabsTrigger>
+            <TabsTrigger
+              value="createdAt"
+              className="text-xs font-bold transition-all data-[state=active]:bg-bpim-primary data-[state=active]:text-bpim-text"
+            >
+              インポート日単位
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
+    </div>
   );
 };

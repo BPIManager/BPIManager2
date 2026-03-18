@@ -1,189 +1,222 @@
-"use client";
-
-import type { CollectionItem, ListCollection } from "@chakra-ui/react";
-import { Select as ChakraSelect, Portal } from "@chakra-ui/react";
-import { CloseButton } from "./close-button";
 import * as React from "react";
+import { Select as SelectPrimitive } from "radix-ui";
+import { cn } from "@/lib/utils";
+import { ChevronDownIcon, CheckIcon, ChevronUpIcon } from "lucide-react";
 
-interface SelectTriggerProps extends ChakraSelect.ControlProps {
-  clearable?: boolean;
+function Select({
+  ...props
+}: React.ComponentProps<typeof SelectPrimitive.Root>) {
+  return <SelectPrimitive.Root data-slot="select" {...props} />;
 }
 
-export const SelectTrigger = React.forwardRef<
-  HTMLButtonElement,
-  SelectTriggerProps
->(function SelectTrigger(props, ref) {
-  const { children, clearable, ...rest } = props;
+function SelectGroup({
+  className,
+  ...props
+}: React.ComponentProps<typeof SelectPrimitive.Group>) {
   return (
-    <ChakraSelect.Control {...rest}>
-      <ChakraSelect.Trigger ref={ref}>{children}</ChakraSelect.Trigger>
-      <ChakraSelect.IndicatorGroup mr={2}>
-        {clearable && <SelectClearTrigger />}
-        <ChakraSelect.Indicator />
-      </ChakraSelect.IndicatorGroup>
-    </ChakraSelect.Control>
-  );
-});
-
-const SelectClearTrigger = React.forwardRef<
-  HTMLButtonElement,
-  ChakraSelect.ClearTriggerProps
->(function SelectClearTrigger(props, ref) {
-  return (
-    <ChakraSelect.ClearTrigger asChild {...props} ref={ref}>
-      <CloseButton
-        size="xs"
-        variant="plain"
-        focusVisibleRing="inside"
-        focusRingWidth="2px"
-        pointerEvents="auto"
-      />
-    </ChakraSelect.ClearTrigger>
-  );
-});
-
-interface SelectContentProps extends ChakraSelect.ContentProps {
-  portalled?: boolean;
-  portalRef?: React.RefObject<HTMLElement | null>;
-}
-
-export const SelectContent = React.forwardRef<
-  HTMLDivElement,
-  SelectContentProps
->(function SelectContent(props, ref) {
-  const { portalled = true, portalRef, ...rest } = props;
-  return (
-    <Portal disabled={!portalled} container={portalRef}>
-      <ChakraSelect.Positioner>
-        <ChakraSelect.Content {...rest} ref={ref} />
-      </ChakraSelect.Positioner>
-    </Portal>
-  );
-});
-
-export const SelectItem = React.forwardRef<
-  HTMLDivElement,
-  ChakraSelect.ItemProps
->(function SelectItem(props, ref) {
-  const { item, children, ...rest } = props;
-  return (
-    <ChakraSelect.Item key={item.value} item={item} {...rest} ref={ref}>
-      {children}
-      <ChakraSelect.ItemIndicator mr={2} />
-    </ChakraSelect.Item>
-  );
-});
-
-interface SelectValueTextProps extends Omit<
-  ChakraSelect.ValueTextProps,
-  "children"
-> {
-  children?(items: CollectionItem[]): React.ReactNode;
-}
-
-export const SelectValueText = React.forwardRef<
-  HTMLSpanElement,
-  SelectValueTextProps
->(function SelectValueText(props, ref) {
-  const { children, ...rest } = props;
-  return (
-    <ChakraSelect.ValueText {...rest} ref={ref}>
-      <ChakraSelect.Context>
-        {(select) => {
-          const items = select.selectedItems;
-          if (items.length === 0) return props.placeholder;
-          if (children) return children(items);
-          if (items.length === 1)
-            return select.collection.stringifyItem(items[0]);
-          return `${items.length} selected`;
-        }}
-      </ChakraSelect.Context>
-    </ChakraSelect.ValueText>
-  );
-});
-
-export const SelectRoot = React.forwardRef<
-  HTMLDivElement,
-  ChakraSelect.RootProps
->(function SelectRoot(props, ref) {
-  return (
-    <ChakraSelect.Root
+    <SelectPrimitive.Group
+      data-slot="select-group"
+      className={cn("scroll-my-1 p-1", className)}
       {...props}
-      ref={ref}
-      positioning={{ sameWidth: true, ...props.positioning }}
-    >
-      {props.asChild ? (
-        props.children
-      ) : (
-        <>
-          <ChakraSelect.HiddenSelect />
-          {props.children}
-        </>
+    />
+  );
+}
+
+function SelectValue({
+  ...props
+}: React.ComponentProps<typeof SelectPrimitive.Value>) {
+  return <SelectPrimitive.Value data-slot="select-value" {...props} />;
+}
+
+function SelectTrigger({
+  className,
+  size = "default",
+  children,
+  ...props
+}: React.ComponentProps<typeof SelectPrimitive.Trigger> & {
+  size?: "sm" | "default";
+}) {
+  return (
+    <SelectPrimitive.Trigger
+      data-slot="select-trigger"
+      data-size={size}
+      className={cn(
+        "flex w-fit items-center justify-between gap-1.5 rounded-lg",
+        "border border-bpim-border bg-bpim-surface-2/60",
+        "py-2 pr-2 pl-2.5 text-sm text-bpim-text",
+        "whitespace-nowrap transition-colors outline-none select-none",
+        "hover:bg-bpim-overlay/50",
+        "focus-visible:border-bpim-primary focus-visible:ring-3 focus-visible:ring-bpim-primary/30",
+        "disabled:cursor-not-allowed disabled:opacity-50",
+        "aria-invalid:border-bpim-danger aria-invalid:ring-3 aria-invalid:ring-bpim-danger/20",
+        "data-placeholder:text-bpim-subtle",
+        "data-[size=default]:h-8 data-[size=sm]:h-7",
+        "data-[size=sm]:rounded-[min(var(--radius-md),10px)]",
+        "*:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex",
+        "*:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-1.5",
+        "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        className,
       )}
-    </ChakraSelect.Root>
-  );
-}) as ChakraSelect.RootComponent;
-
-interface SelectItemGroupProps extends ChakraSelect.ItemGroupProps {
-  label: React.ReactNode;
-}
-
-export const SelectItemGroup = React.forwardRef<
-  HTMLDivElement,
-  SelectItemGroupProps
->(function SelectItemGroup(props, ref) {
-  const { children, label, ...rest } = props;
-  return (
-    <ChakraSelect.ItemGroup {...rest} ref={ref}>
-      <ChakraSelect.ItemGroupLabel>{label}</ChakraSelect.ItemGroupLabel>
-      {children}
-    </ChakraSelect.ItemGroup>
-  );
-});
-
-export const SelectLabel = ChakraSelect.Label;
-export const SelectItemText = ChakraSelect.ItemText;
-
-interface FormSelectProps {
-  collection: ListCollection<any>;
-  value?: string;
-  onValueChange: (value: string) => void;
-  placeholder?: string;
-  label?: string;
-  width?: string | number;
-  size?: "xs" | "sm" | "md" | "lg";
-  variant?: "outline" | "subtle" | "ghost";
-  children?: React.ReactNode;
-}
-
-export const FormSelect = ({
-  collection,
-  value,
-  onValueChange,
-  placeholder = "選択してください",
-  width = "full",
-  size = "md",
-  variant = "outline",
-}: FormSelectProps) => {
-  return (
-    <SelectRoot
-      collection={collection}
-      value={value ? [value] : []}
-      onValueChange={(details) => onValueChange(details.value[0])}
-      width={width}
-      size={size}
-      variant={variant}
+      {...props}
     >
-      <SelectTrigger>
-        <SelectValueText placeholder={placeholder} px={2} />
-      </SelectTrigger>
-      <SelectContent portalled={false} zIndex="popover">
-        {collection.items.map((item) => (
-          <SelectItem item={item} key={item.value} p={2}>
-            {item.label}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </SelectRoot>
+      {children}
+      <SelectPrimitive.Icon asChild>
+        <ChevronDownIcon className="pointer-events-none size-4 text-bpim-muted" />
+      </SelectPrimitive.Icon>
+    </SelectPrimitive.Trigger>
   );
+}
+
+function SelectContent({
+  className,
+  children,
+  position = "item-aligned",
+  align = "center",
+  ...props
+}: React.ComponentProps<typeof SelectPrimitive.Content>) {
+  return (
+    <SelectPrimitive.Portal>
+      <SelectPrimitive.Content
+        data-slot="select-content"
+        data-align-trigger={position === "item-aligned"}
+        className={cn(
+          "relative z-50 max-h-(--radix-select-content-available-height) min-w-36",
+          "origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto",
+          "rounded-lg bg-bpim-surface-2 text-bpim-text",
+          "shadow-md ring-1 ring-bpim-border duration-100",
+          "data-[align-trigger=true]:animate-none",
+          "data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2",
+          "data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+          "data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95",
+          "data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+          position === "popper" &&
+            "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
+          className,
+        )}
+        position={position}
+        align={align}
+        {...props}
+      >
+        <SelectScrollUpButton />
+        <SelectPrimitive.Viewport
+          data-position={position}
+          className="data-[position=popper]:h-(--radix-select-trigger-height) data-[position=popper]:w-full data-[position=popper]:min-w-(--radix-select-trigger-width)"
+        >
+          {children}
+        </SelectPrimitive.Viewport>
+        <SelectScrollDownButton />
+      </SelectPrimitive.Content>
+    </SelectPrimitive.Portal>
+  );
+}
+
+function SelectLabel({
+  className,
+  ...props
+}: React.ComponentProps<typeof SelectPrimitive.Label>) {
+  return (
+    <SelectPrimitive.Label
+      data-slot="select-label"
+      className={cn("px-1.5 py-1 text-xs text-bpim-subtle", className)}
+      {...props}
+    />
+  );
+}
+
+function SelectItem({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<typeof SelectPrimitive.Item>) {
+  return (
+    <SelectPrimitive.Item
+      data-slot="select-item"
+      className={cn(
+        "relative flex w-full cursor-default items-center gap-1.5 rounded-md",
+        "py-1 pr-8 pl-1.5 text-sm text-bpim-text outline-hidden select-none",
+        "focus:bg-bpim-overlay focus:text-bpim-text",
+        "data-disabled:pointer-events-none data-disabled:opacity-50",
+        "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "*:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
+        className,
+      )}
+      {...props}
+    >
+      <span className="pointer-events-none absolute right-2 flex size-4 items-center justify-center text-bpim-primary">
+        <SelectPrimitive.ItemIndicator>
+          <CheckIcon className="pointer-events-none" />
+        </SelectPrimitive.ItemIndicator>
+      </span>
+      <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+    </SelectPrimitive.Item>
+  );
+}
+
+function SelectSeparator({
+  className,
+  ...props
+}: React.ComponentProps<typeof SelectPrimitive.Separator>) {
+  return (
+    <SelectPrimitive.Separator
+      data-slot="select-separator"
+      className={cn(
+        "pointer-events-none -mx-1 my-1 h-px bg-bpim-border",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+function SelectScrollUpButton({
+  className,
+  ...props
+}: React.ComponentProps<typeof SelectPrimitive.ScrollUpButton>) {
+  return (
+    <SelectPrimitive.ScrollUpButton
+      data-slot="select-scroll-up-button"
+      className={cn(
+        "z-10 flex cursor-default items-center justify-center",
+        "bg-bpim-surface-2 text-bpim-muted py-1",
+        "[&_svg:not([class*='size-'])]:size-4",
+        className,
+      )}
+      {...props}
+    >
+      <ChevronUpIcon />
+    </SelectPrimitive.ScrollUpButton>
+  );
+}
+
+function SelectScrollDownButton({
+  className,
+  ...props
+}: React.ComponentProps<typeof SelectPrimitive.ScrollDownButton>) {
+  return (
+    <SelectPrimitive.ScrollDownButton
+      data-slot="select-scroll-down-button"
+      className={cn(
+        "z-10 flex cursor-default items-center justify-center",
+        "bg-bpim-surface-2 text-bpim-muted py-1",
+        "[&_svg:not([class*='size-'])]:size-4",
+        className,
+      )}
+      {...props}
+    >
+      <ChevronDownIcon />
+    </SelectPrimitive.ScrollDownButton>
+  );
+}
+
+export {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectScrollDownButton,
+  SelectScrollUpButton,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
 };

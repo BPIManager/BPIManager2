@@ -1,61 +1,43 @@
-import {
-  Box,
-  Grid,
-  GridItem,
-  VStack,
-  HStack,
-  Skeleton,
-} from "@chakra-ui/react";
+﻿"use client";
+
+import { Skeleton } from "@/components/ui/skeleton";
 
 const SongItemSkeleton = () => {
   return (
-    <Box
-      w="full"
-      background="whiteAlpha.100"
-      borderLeft="4px solid"
-      borderLeftColor="whiteAlpha.200"
-      mb={2}
-    >
-      <Grid templateColumns="1fr auto" gap={1}>
-        <GridItem px={3} py={2}>
-          <VStack align="start" gap={2}>
-            <Skeleton height="14px" width="60%" />
+    <div className="mb-2 w-full border-l-4 border-bpim-border bg-bpim-surface-2/60">
+      <div className="grid grid-cols-[1fr_auto] gap-1">
+        <div className="flex flex-col gap-2 px-3 py-2">
+          <Skeleton className="h-3.5 w-[60%]" />
 
-            <HStack gap={3} mt={1}>
-              <Skeleton height="18px" width="24px" borderRadius="sm" />
-              <Skeleton height="12px" width="100px" />
-            </HStack>
-          </VStack>
-        </GridItem>
+          <div className="mt-1 flex items-center gap-3">
+            <Skeleton className="h-[18px] w-6 rounded-sm" />
+            <Skeleton className="h-3 w-[100px]" />
+          </div>
+        </div>
 
-        <GridItem
-          display="flex"
-          alignItems="center"
-          background="blackAlpha.200"
-          p={{ mdDown: 2, lg: 4 }}
-        >
-          <HStack gap={4}>
-            <VStack align="end" gap={1}>
-              <Skeleton height="8px" width="15px" />
-              <Skeleton height="20px" width="40px" />
-            </VStack>
-            <VStack align="end" gap={1}>
-              <Skeleton height="8px" width="15px" />
-              <Skeleton height="20px" width="45px" />
-            </VStack>
-          </HStack>
-        </GridItem>
-      </Grid>
-    </Box>
+        <div className="flex items-center bg-bpim-bg/20 p-2 lg:p-4">
+          <div className="flex items-center gap-4">
+            <div className="flex flex-col items-end gap-1">
+              <Skeleton className="h-2 w-4" />
+              <Skeleton className="h-5 w-10" />
+            </div>
+            <div className="flex flex-col items-end gap-1">
+              <Skeleton className="h-2 w-4" />
+              <Skeleton className="h-5 w-11" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
 export const SongListSkeleton = () => {
   return (
-    <Box w="full" p={2}>
+    <div className="w-full p-2">
       {Array.from({ length: 15 }).map((_, i) => (
         <SongItemSkeleton key={i} />
       ))}
-    </Box>
+    </div>
   );
 };

@@ -1,6 +1,5 @@
-import { SimpleGrid, VStack, Box, Tabs } from "@chakra-ui/react";
-import { DashBoardFilter } from "@/components/partials/DashBoard/Filter";
-import { RadarSection } from "@/components/partials/DashBoard/Radar";
+"use client";
+
 import { useRouter } from "next/router";
 import { useUser } from "@/contexts/users/UserContext";
 import { latestVersion } from "@/constants/latestVersion";
@@ -9,11 +8,12 @@ import { LoginRequiredCard } from "@/components/partials/LoginRequired/ui";
 import { RivalProfileLayout } from "@/components/partials/Rivals/Layout/layout";
 import { RivalSongsTable } from "@/components/partials/Rivals/Table";
 import { Meta } from "@/components/partials/Head";
-import { DistributionSection } from "@/components/partials/DashBoard/DistributionChart";
+import { DashBoardFilter } from "@/components/partials/DashBoard/Filter";
+import { RadarSection } from "@/components/partials/DashBoard/Radar";
 import { RankDistributionSection } from "@/components/partials/DashBoard/DJRankDistribution/ui";
 import { BpiDistributionSection } from "@/components/partials/DashBoard/BPIDistribution/ui";
 import { BpiHistorySection } from "@/components/partials/DashBoard/TotalBPIHistory/ui";
-import { DashCard } from "@/components/ui/dashcard";
+import { TabsContent } from "@/components/ui/tabs";
 
 function RivalOverviewTab({
   myUserId,
@@ -25,10 +25,10 @@ function RivalOverviewTab({
   rivalName?: string;
 }) {
   return (
-    <VStack align="stretch" gap={6}>
+    <div className="flex flex-col gap-6">
       <DashBoardFilter />
 
-      <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <RankDistributionSection
           myUserId={myUserId}
           rivalUserId={rivalUserId}
@@ -41,7 +41,8 @@ function RivalOverviewTab({
           myName="自分"
           rivalName={rivalName}
         />
-      </SimpleGrid>
+      </div>
+
       <BpiHistorySection
         myUserId={myUserId}
         rivalUserId={rivalUserId}
@@ -54,7 +55,7 @@ function RivalOverviewTab({
         rivalUserId={rivalUserId}
         rivalName={rivalName}
       />
-    </VStack>
+    </div>
   );
 }
 
@@ -76,12 +77,12 @@ export default function RivalsUserPage({
   if (!user) {
     return (
       <RivalProfileLayout rivalUserId={rivalUserId} currentTab={defaultView}>
-        <Tabs.Content value="overview" p={0}>
+        <TabsContent value="overview" className="mt-0 outline-none">
           <LoginRequiredCard />
-        </Tabs.Content>
-        <Tabs.Content value="scores" p={0}>
+        </TabsContent>
+        <TabsContent value="scores" className="mt-0 outline-none">
           <LoginRequiredCard />
-        </Tabs.Content>
+        </TabsContent>
       </RivalProfileLayout>
     );
   }
@@ -95,24 +96,23 @@ export default function RivalsUserPage({
         noIndex
       />
 
-      <Tabs.Content value="overview" p={0}>
+      <TabsContent value="overview" className="mt-0 outline-none">
         <RivalOverviewTab
           myUserId={myUserId}
           rivalUserId={rivalUserId}
           rivalName={rivalName}
         />
-      </Tabs.Content>
+      </TabsContent>
 
-      <Tabs.Content value="scores" p={0}>
-        <DashCard>
+      <TabsContent value="scores" className="mt-0 outline-none">
+        <div className="rounded-2xl border border-bpim-border bg-bpim-bg/40 p-1 shadow-xl backdrop-blur-md overflow-hidden">
           <RivalSongsTable
             myUserId={myUserId}
             rivalUserId={rivalUserId}
-            rivalName={rivalName}
             version={version}
           />
-        </DashCard>
-      </Tabs.Content>
+        </div>
+      </TabsContent>
     </RivalProfileLayout>
   );
 }

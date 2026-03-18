@@ -1,5 +1,3 @@
-import { createListCollection } from "@chakra-ui/react";
-
 export const rivalSortOptions = [
   { label: "ライバルのBPIが高い順", value: "rivalBpi" },
   { label: "自分のBPIが高い順", value: "myBpi" },
@@ -22,9 +20,7 @@ export const soleSortOptions = [
   { label: "最近更新", value: "updatedAt" },
 ];
 
-export const sortOptions = createListCollection({
-  items: [
-    { label: "レベル", value: "level" },
-    { label: "楽曲名", value: "title" },
-  ],
-});
+export const sortOptions = [
+  { label: "レベル", value: "level" },
+  { label: "楽曲名", value: "title" },
+];

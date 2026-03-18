@@ -4,9 +4,6 @@ const nextConfig: NextConfig = {
   /* config options here */
   reactStrictMode: true,
 
-  experimental: {
-    optimizePackageImports: ["@chakra-ui/react"],
-  },
   async redirects() {
     return [
       {

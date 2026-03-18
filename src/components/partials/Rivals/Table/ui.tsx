@@ -1,19 +1,163 @@
-import {
-  Box,
-  Text,
-  Badge,
-  VStack,
-  HStack,
-  Grid,
-  GridItem,
-  Flex,
-} from "@chakra-ui/react";
-import { getLampColor } from "@/components/partials/Table/table";
+﻿"use client";
+
 import { SongWithRival } from "@/types/songs/withScore";
+import { cn } from "@/lib/utils";
+import { getLampClass } from "../../Table/table";
 
 const f = (val: number | null | undefined, p?: number) => {
   if (val === null || val === undefined || !Number.isFinite(val)) return "---";
   return p !== undefined ? val.toFixed(p) : val.toString();
+};
+
+const diffColors: Record<string, string> = {
+  ANOTHER: "bg-red-900",
+  LEGGENDARIA: "bg-purple-900",
+  HYPER: "bg-yellow-700",
+};
+
+const SongInfo = ({ song }: { song: SongWithRival }) => (
+  <div className="flex flex-col items-start gap-1 min-w-0 w-full">
+    <h3 className="text-sm font-bold text-bpim-text truncate leading-tight">
+      {song.title}
+    </h3>
+    <div className="flex items-center gap-2">
+      <div
+        className={cn(
+          "w-8 h-[18px] flex items-center justify-center rounded-sm",
+          diffColors[song.difficulty] || "bg-bpim-surface-2",
+        )}
+      >
+        <span className="text-[11px] font-bold text-bpim-text leading-none">
+          {song.difficultyLevel}
+        </span>
+      </div>
+      <span className="text-xs font-bold text-bpim-muted leading-none">
+        {song.difficulty.charAt(0)}
+      </span>
+    </div>
+  </div>
+);
+
+const DiffBox = ({ exDiff, bpiDiff, isMobile }: any) => {
+  const hasDiff = exDiff !== null && Number.isFinite(exDiff);
+  return (
+    <div
+      className={cn(
+        "flex flex-col items-center justify-center gap-0 transition-opacity",
+        !hasDiff && "opacity-10",
+      )}
+    >
+      <span className="text-[8px] font-bold text-bpim-subtle uppercase tracking-tighter">
+        DIFF
+      </span>
+      <span
+        className={cn(
+          "font-bold leading-none",
+          isMobile ? "text-[11px]" : "text-xs",
+          exDiff > 0
+            ? "text-bpim-success"
+            : exDiff < 0
+              ? "text-bpim-danger"
+              : "text-bpim-muted",
+        )}
+      >
+        {exDiff > 0 ? `+${exDiff}` : (exDiff ?? "---")}
+      </span>
+      <span
+        className={cn(
+          "text-[10px] font-bold leading-none mt-0.5",
+          bpiDiff > 0
+            ? "text-green-300"
+            : bpiDiff < 0
+              ? "text-red-300"
+              : "text-bpim-subtle",
+        )}
+      >
+        {bpiDiff > 0
+          ? `+${bpiDiff.toFixed(2)}`
+          : (bpiDiff?.toFixed(2) ?? "---")}
+      </span>
+    </div>
+  );
+};
+
+const ScoreBox = ({ label, ex, bpi, clearState, colorClass, isRival }: any) => {
+  const lampClass = getLampClass(clearState);
+  return (
+    <div
+      className={cn(
+        "relative flex flex-col justify-center px-5",
+        isRival ? "bg-bpim-bg/40 items-start" : "items-end",
+      )}
+    >
+      <div
+        className={cn(
+          "absolute top-0 bottom-0 w-[3px]",
+          isRival ? "left-0" : "right-0",
+          lampClass,
+        )}
+      />
+
+      <span className={cn("text-[9px] font-bold mb-1", colorClass)}>
+        {label}
+      </span>
+      <div className="flex items-baseline gap-4 font-mono">
+        <div
+          className={cn("flex flex-col", isRival ? "items-start" : "items-end")}
+        >
+          <span className="text-[8px] text-bpim-muted uppercase">EX</span>
+          <span className="text-sm font-bold text-bpim-text leading-none">
+            {f(ex)}
+          </span>
+        </div>
+        <div
+          className={cn("flex flex-col", isRival ? "items-start" : "items-end")}
+        >
+          <span className="text-[8px] text-bpim-muted uppercase">BPI</span>
+          <span className="text-sm font-bold text-bpim-text leading-none">
+            {f(bpi, 2)}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const MobileScoreView = ({ label, ex, bpi, clearState, align }: any) => {
+  const lampClass = getLampClass(clearState);
+  return (
+    <div
+      className={cn(
+        "flex flex-col gap-1 flex-1 min-w-0",
+        align === "end" ? "items-end" : "items-start",
+      )}
+    >
+      <div className="flex items-center gap-2">
+        <div className={cn("w-[3px] h-2.5 rounded-full", lampClass)} />
+        <span
+          className={cn(
+            "text-[10px] font-bold",
+            label === "YOU" ? "text-bpim-primary" : "text-bpim-warning",
+          )}
+        >
+          {label}
+        </span>
+      </div>
+      <div
+        className={cn(
+          "flex flex-col",
+          align === "end" ? "items-end" : "items-start",
+        )}
+      >
+        <span className="text-sm font-bold text-bpim-text leading-none font-mono">
+          {f(ex)}
+        </span>
+        <span className="text-[10px] text-bpim-muted font-mono mt-0.5">
+          {f(bpi, 1)}
+        </span>
+      </div>
+    </div>
+  );
 };
 
 export const RivalSongItem = ({
@@ -26,59 +170,37 @@ export const RivalSongItem = ({
   const { exDiff, bpiDiff } = song;
 
   return (
-    <Box
+    <div
       onClick={onClick}
-      _hover={{ bg: "whiteAlpha.100" }}
-      transition="all 0.15s"
-      w="full"
-      bg="rgba(255, 255, 255, 0.02)"
-      borderBottom="1px solid"
-      borderColor="whiteAlpha.50"
-      cursor="pointer"
-      position="relative"
+      className="group relative w-full cursor-pointer border-b border-bpim-border bg-white/[0.02] transition-colors hover:bg-bpim-overlay/50"
     >
-      <Grid
-        display={{ base: "none", lg: "grid" }}
-        templateColumns="1fr 140px 100px 140px"
-        alignItems="stretch"
-        h="68px"
-      >
-        <GridItem px={4} display="flex" alignItems="center" minW={0}>
+      <div className="hidden lg:grid h-[68px] grid-cols-[1fr_140px_100px_140px] items-stretch">
+        <div className="flex items-center px-4 min-w-0">
           <SongInfo song={song} />
-        </GridItem>
-
+        </div>
         <ScoreBox
           label="YOU"
           ex={song.exScore}
           bpi={song.bpi}
           clearState={song.clearState}
-          color="blue.300"
+          colorClass="text-bpim-primary"
         />
-
         <DiffBox exDiff={exDiff} bpiDiff={bpiDiff} />
-
         <ScoreBox
           label="RIVAL"
           ex={song.rival?.exScore}
           bpi={song.rival?.bpi}
           clearState={song.rival?.clearState}
-          color="orange.300"
+          colorClass="text-bpim-warning"
           isRival
         />
-      </Grid>
+      </div>
 
-      <VStack
-        display={{ base: "flex", lg: "none" }}
-        gap={0}
-        align="stretch"
-        py={4}
-        px={3}
-      >
-        <Box mb={3}>
+      <div className="flex flex-col gap-0 py-4 px-3 lg:hidden">
+        <div className="mb-3">
           <SongInfo song={song} />
-        </Box>
-
-        <Grid templateColumns="1fr 80px 1fr" gap={2} alignItems="center">
+        </div>
+        <div className="grid grid-cols-[1fr_80px_1fr] items-center gap-2">
           <MobileScoreView
             label="YOU"
             ex={song.exScore}
@@ -94,159 +216,8 @@ export const RivalSongItem = ({
             clearState={song.rival?.clearState}
             align="end"
           />
-        </Grid>
-      </VStack>
-    </Box>
-  );
-};
-
-const SongInfo = ({ song }: { song: SongWithRival }) => {
-  const diffColors: Record<string, string> = {
-    ANOTHER: "red.800",
-    LEGGENDARIA: "purple.800",
-    HYPER: "yellow.800",
-  };
-  return (
-    <VStack align="start" gap={1} minW={0} w="full">
-      <Text fontWeight="bold" fontSize="sm" color="white">
-        {song.title}
-      </Text>
-      <HStack gap={2}>
-        <Badge
-          w="32px"
-          h="18px"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          p={0}
-          variant="solid"
-          bg={diffColors[song.difficulty]}
-          color="white"
-          borderRadius="sm"
-        >
-          <Text fontSize="11px" fontWeight="bold" lineHeight="1">
-            {song.difficultyLevel}
-          </Text>
-        </Badge>
-
-        <Text
-          fontSize="xs"
-          color="gray.500"
-          fontWeight="bold"
-          textAlign="center"
-          lineHeight="1"
-        >
-          {song.difficulty.charAt(0)}
-        </Text>
-      </HStack>
-    </VStack>
-  );
-};
-
-const ScoreBox = ({ label, ex, bpi, clearState, color, isRival }: any) => {
-  const lamp = getLampColor(clearState);
-  return (
-    <Flex
-      direction="column"
-      justify="center"
-      align={isRival ? "start" : "end"}
-      px={5}
-      bg={isRival ? "blackAlpha.400" : "transparent"}
-      position="relative"
-      _before={{
-        content: '""',
-        position: "absolute",
-        left: isRival ? 0 : "auto",
-        right: isRival ? "auto" : 0,
-        top: 0,
-        bottom: 0,
-        width: "3px",
-        background:
-          lamp === "rainbow"
-            ? "linear-gradient(to bottom, #ff0000, #8b00ff)"
-            : lamp,
-      }}
-    >
-      <Text fontSize="9px" color={color} fontWeight="bold" mb={1}>
-        {label}
-      </Text>
-      <HStack gap={4} align="baseline">
-        <VStack align={isRival ? "start" : "end"} gap={0}>
-          <Text fontSize="8px" color="whiteAlpha.400">
-            EX
-          </Text>
-          <Text fontSize="md" fontWeight="bold" color="white" lineHeight="1">
-            {f(ex)}
-          </Text>
-        </VStack>
-        <VStack align={isRival ? "start" : "end"} gap={0}>
-          <Text fontSize="8px" color="whiteAlpha.400">
-            BPI
-          </Text>
-          <Text fontSize="md" fontWeight="bold" color="white" lineHeight="1">
-            {f(bpi, 2)}
-          </Text>
-        </VStack>
-      </HStack>
-    </Flex>
-  );
-};
-
-const DiffBox = ({ exDiff, bpiDiff, isMobile }: any) => {
-  const hasDiff = exDiff !== null && Number.isFinite(exDiff);
-  return (
-    <VStack justify="center" gap={0} opacity={hasDiff ? 1 : 0.1}>
-      <Text fontSize="8px" color="gray.600" fontWeight="bold">
-        DIFF
-      </Text>
-      <Text
-        fontSize={isMobile ? "11px" : "12px"}
-        fontWeight="bold"
-        color={exDiff > 0 ? "green.400" : exDiff < 0 ? "red.400" : "gray.500"}
-        lineHeight="1.1"
-      >
-        {exDiff > 0 ? `+${exDiff}` : (exDiff ?? "---")}
-      </Text>
-      <Text
-        fontSize="10px"
-        fontWeight="bold"
-        color={bpiDiff > 0 ? "green.300" : bpiDiff < 0 ? "red.300" : "gray.600"}
-        lineHeight="1"
-      >
-        {bpiDiff > 0
-          ? `+${bpiDiff.toFixed(2)}`
-          : (bpiDiff?.toFixed(2) ?? "---")}
-      </Text>
-    </VStack>
-  );
-};
-
-const MobileScoreView = ({ label, ex, bpi, clearState, align }: any) => {
-  const lamp = getLampColor(clearState);
-  return (
-    <VStack align={align} gap={1} flex={1} minW={0} position="relative">
-      <HStack gap={2}>
-        <Box
-          w="3px"
-          h="10px"
-          bg={lamp === "rainbow" ? "linear-gradient(#f00, #80f)" : lamp}
-        />
-        <Text
-          fontSize="10px"
-          color={label === "YOU" ? "blue.300" : "orange.300"}
-          fontWeight="bold"
-        >
-          {label}
-        </Text>
-      </HStack>
-      <VStack align={align} gap={0}>
-        <Text fontSize="sm" fontWeight="bold" color="white" lineHeight="1">
-          {f(ex)}
-        </Text>
-        <Text fontSize="10px" color="whiteAlpha.500" fontFamily="mono">
-          {f(bpi, 1)}
-        </Text>
-      </VStack>
-    </VStack>
+        </div>
+      </div>
+    </div>
   );
 };

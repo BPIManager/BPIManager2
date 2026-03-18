@@ -2,8 +2,9 @@ import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { useDjRankDistribution } from "@/hooks/stats/useDJRankDistribution";
 import { useBPIDistribution } from "@/hooks/stats/useBPIDistribution";
 import { ChartData, DistributionChart } from "./ui";
-import { RANK_COLORS } from "@/constants/djRankColor";
-import { getBpiColor } from "@/constants/bpiColor";
+import { getRankColorFromTheme } from "@/constants/djRankColor";
+import { getBpiColorFromTheme } from "@/constants/bpiColor";
+import { useChartColors } from "@/hooks/common/useChartColors";
 
 type DistType = "rank" | "bpi";
 
@@ -23,6 +24,7 @@ export const DistributionSection = ({
   rivalName = "ライバル",
 }: DistributionSectionProps) => {
   const { levels, diffs, version } = useStatsFilter();
+  const c = useChartColors();
 
   const useDistHook =
     type === "rank" ? useDjRankDistribution : useBPIDistribution;
@@ -33,7 +35,6 @@ export const DistributionSection = ({
     diffs,
     version,
   );
-
   const { distribution: rivalDist, isLoading: rivalLoading } = useDistHook(
     rivalUserId,
     levels,
@@ -44,12 +45,12 @@ export const DistributionSection = ({
   const config = {
     rank: {
       title: "DJRANK 分布",
-      getColor: (label: string) => RANK_COLORS[label] || "#4A5568",
+      getColor: (label: string) => getRankColorFromTheme(label, c),
       skeletonCount: 9,
     },
     bpi: {
       title: "BPI分布",
-      getColor: getBpiColor,
+      getColor: (label: string) => getBpiColorFromTheme(label, c),
       skeletonCount: 13,
     },
   }[type];
@@ -68,9 +69,7 @@ export const DistributionSection = ({
   }
 
   const hasData = (d?: ChartData[]) => d && d.some((item) => item.count > 0);
-  if (!hasData(myDist) && !hasData(rivalDist)) {
-    return null;
-  }
+  if (!hasData(myDist) && !hasData(rivalDist)) return null;
 
   return (
     <DistributionChart

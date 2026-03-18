@@ -1,64 +1,62 @@
-import { Box, HStack, VStack, Text, Avatar, Badge } from "@chakra-ui/react";
+﻿"use client";
+
 import Link from "next/link";
 import dayjs from "@/lib/dayjs";
 import { NotificationItem as NotificationItemType } from "@/hooks/users/useNotifications";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 export const NotificationItem = ({ n }: { n: NotificationItemType }) => {
   const isOvertaken = n.type === "overtaken";
   const diff = (n.rivalScore || 0) - (n.myScore || 0);
 
   return (
-    <Link href={`/users/${n.senderId}`} passHref>
-      <HStack
-        p={3}
-        gap={3}
-        borderBottomWidth="1px"
-        borderColor="whiteAlpha.100"
-        _hover={{ bg: "whiteAlpha.50" }}
-        _last={{ borderBottomWidth: 0 }}
+    <Link href={`/users/${n.senderId}`} className="block">
+      <div
+        className={cn(
+          "flex items-center gap-3 p-3 transition-colors border-b border-bpim-border",
+          "hover:bg-bpim-overlay/50 last:border-b-0",
+        )}
       >
-        <Avatar.Root size="sm">
-          <Avatar.Image src={n.senderImage ?? ""} />
-          <Avatar.Fallback name={n.senderName} />
-        </Avatar.Root>
+        <Avatar className="h-9 w-9 border border-bpim-border">
+          <AvatarImage src={n.senderImage ?? ""} alt={n.senderName} />
+          <AvatarFallback>{n.senderName.slice(0, 2)}</AvatarFallback>
+        </Avatar>
 
-        <VStack align="start" gap={0} flex="1">
-          <Text fontSize="xs" color="gray.500">
+        <div className="flex flex-1 flex-col gap-0.5 min-w-0">
+          <span className="text-[10px] text-bpim-muted">
             {dayjs(n.timestamp).fromNow()}
-          </Text>
+          </span>
 
-          <Box fontSize="sm" color="white">
-            <Box as="span" fontWeight="bold">
-              {n.senderName}
-            </Box>
+          <div className="text-sm text-bpim-text leading-snug">
+            <span className="font-bold text-bpim-text">{n.senderName}</span>
             {isOvertaken ? (
               <>
                 {" "}
                 さんが{" "}
-                <Box as="span" fontWeight="bold">
+                <span className="font-bold text-bpim-primary">
                   {n.songTitle}[
-                  {(n.songDifficulty || "").slice(0, 1).toUpperCase()}]
-                </Box>{" "}
+                  {(n.songDifficulty || "").charAt(0).toUpperCase()}]
+                </span>{" "}
                 であなたを上回りました
-                <Box color="blue.300" mt={1}>
-                  あなた:{n.myScore || 0} ライバル:{n.rivalScore || 0}
+                <div className="mt-1 flex items-center gap-2 text-xs text-bpim-primary/80">
+                  <span>あなた:{n.myScore || 0}</span>
+                  <span>ライバル:{n.rivalScore || 0}</span>
                   <Badge
-                    bgColor="red.600"
-                    color="white"
-                    px={2}
-                    ml={2}
-                    variant="solid"
+                    variant="destructive"
+                    className="h-4 px-1.5 text-[10px] font-bold"
                   >
                     -{diff}
                   </Badge>
-                </Box>
+                </div>
               </>
             ) : (
               " さんにフォローされました"
             )}
-          </Box>
-        </VStack>
-      </HStack>
+          </div>
+        </div>
+      </div>
     </Link>
   );
 };

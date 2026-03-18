@@ -1,94 +1,77 @@
-import { diffColors } from "@/components/partials/Table/table";
-import { Avatar } from "@/components/ui/avatar";
+﻿import { diffColors } from "@/components/partials/Table/table";
 import { NearLoseSongItem } from "@/hooks/stats/useRivalNearLose";
-import { HStack, VStack, Text, Badge } from "@chakra-ui/react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
+
+interface NearLoseRankItemProps {
+  item: NearLoseSongItem;
+  rank: number;
+  onClick: () => void;
+}
 
 export const NearLoseRankItem = ({
   item,
   rank,
   onClick,
-}: {
-  item: NearLoseSongItem;
-  rank: number;
-  onClick: () => void;
-}) => {
+}: NearLoseRankItemProps) => {
   return (
-    <HStack
-      p={3}
-      pl={4}
-      justify="space-between"
-      borderBottom="1px solid"
-      borderColor="whiteAlpha.100"
-      gap={3}
-      position="relative"
-      _hover={{ bg: "whiteAlpha.50", cursor: "pointer" }}
+    <div
       onClick={onClick}
-      _before={{
-        content: '""',
-        position: "absolute",
-        left: 0,
-        top: 0,
-        bottom: 0,
-        width: "4px",
-        background: "orange.400",
-        zIndex: 1,
-      }}
+      className={cn(
+        "group relative flex items-center justify-between gap-3 border-b border-bpim-border p-3 pl-4 transition-colors",
+        "cursor-pointer hover:bg-bpim-overlay/50",
+        "before:absolute before:inset-y-0 before:left-0 before:z-10 before:w-1 before:bg-orange-400 before:content-['']",
+      )}
     >
-      <HStack flex={1} minW={0} gap={3}>
-        <Avatar
-          size="sm"
-          name={item.rival.userName}
-          src={String(item.rival.profileImage || "")}
-          borderRadius="full"
-          bg="gray.600"
-        />
+      <div className="flex min-w-0 flex-1 items-center gap-3">
+        <Avatar className="h-8 w-8 rounded-full bg-bpim-overlay">
+          <AvatarImage
+            src={String(item.rival.profileImage || "")}
+            alt={item.rival.userName}
+          />
+          <AvatarFallback className="text-[10px]">
+            {item.rival.userName.slice(0, 2).toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
 
-        <VStack align="start" gap={0} minW={0}>
-          <Text
-            fontSize="sm"
-            fontWeight="bold"
-            color="white"
-            textOverflow={"ellipsis"}
-            lineClamp={1}
-          >
+        <div className="flex min-w-0 flex-col gap-0">
+          <span className="truncate text-sm font-bold text-bpim-text">
             {item.title}
-          </Text>
-          <HStack gap={1}>
-            <Badge
-              variant="solid"
-              color="white"
-              bg={diffColors[item.difficulty]}
-              fontSize="9px"
-              px={2}
-              h="14px"
+          </span>
+          <div className="flex items-center gap-1">
+            <span
+              className="flex h-[14px] items-center rounded-sm px-2 text-[9px] font-bold text-bpim-text uppercase"
+              style={{
+                backgroundColor: diffColors[item.difficulty] || "#1f2937",
+              }}
             >
-              {String(item.difficulty).charAt(0).toUpperCase()}
-            </Badge>
-            <Text fontSize="12px" color="gray.500">
+              {String(item.difficulty).charAt(0)}
+            </span>
+            <span className="text-xs text-bpim-muted">
               {item.rival.userName}
-            </Text>
-          </HStack>
-        </VStack>
-      </HStack>
+            </span>
+          </div>
+        </div>
+      </div>
 
-      <HStack gap={4} flexShrink={0} fontFamily="mono">
-        <VStack align="end" gap={0}>
-          <Text fontSize="12px" color="gray.200">
+      <div className="flex flex-shrink-0 items-center gap-4 font-mono">
+        <div className="flex flex-col items-end gap-0">
+          <span className="text-[12px] leading-none text-bpim-muted">
             My EX
-          </Text>
-          <Text fontSize="sm" fontWeight="bold" color="gray.200">
+          </span>
+          <span className="text-sm font-bold text-bpim-text">
             {item.exScore}
-          </Text>
-        </VStack>
-        <VStack align="end" gap={0}>
-          <Text fontSize="12px" color="orange.500" fontWeight="bold">
+          </span>
+        </div>
+        <div className="flex flex-col items-end gap-0">
+          <span className="text-[12px] font-bold leading-none text-bpim-warning">
             あと
-          </Text>
-          <Text fontSize="sm" fontWeight="bold" color="orange.300">
+          </span>
+          <span className="text-sm font-bold text-bpim-warning">
             {item.exDiff}点
-          </Text>
-        </VStack>
-      </HStack>
-    </HStack>
+          </span>
+        </div>
+      </div>
+    </div>
   );
 };

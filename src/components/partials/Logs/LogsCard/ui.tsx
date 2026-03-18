@@ -1,19 +1,12 @@
-import {
-  Card,
-  HStack,
-  VStack,
-  Text,
-  Badge,
-  Box,
-  Separator,
-  SimpleGrid,
-} from "@chakra-ui/react";
-import { LuListMusic, LuCalendar } from "react-icons/lu";
+﻿import { LuListMusic, LuCalendar } from "react-icons/lu";
 import Link from "next/link";
 import { UpdateLog } from "@/hooks/batches/useBatchesList";
 import dayjs from "@/lib/dayjs";
 import { useRouter } from "next/router";
 import { useMemo } from "react";
+import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 
 export const LogsCard = ({ log }: { log: UpdateLog }) => {
   const router = useRouter();
@@ -23,7 +16,6 @@ export const LogsCard = ({ log }: { log: UpdateLog }) => {
 
   const linkHref = useMemo(() => {
     const basePath = `/users/${userId}/logs/${log.version}`;
-
     const targetPath =
       groupedBy === "lastPlayed"
         ? `${basePath}/summary/${log.batchId}`
@@ -36,97 +28,79 @@ export const LogsCard = ({ log }: { log: UpdateLog }) => {
   }, [userId, log.version, log.batchId, groupedBy]);
 
   return (
-    <Link href={linkHref}>
-      <Card.Root
-        mb={4}
-        variant="elevated"
-        bg="gray.950"
-        borderColor="gray.800"
-        transition="all 0.2s"
-        _hover={{
-          borderColor: "blue.500",
-          bg: "gray.900",
-          transform: "translateY(-2px)",
-        }}
-        cursor="pointer"
+    <Link href={linkHref} className="block mb-4 group">
+      <div
+        className={cn(
+          "relative overflow-hidden rounded-xl border border-bpim-border bg-bpim-bg p-4 transition-all duration-200",
+          "hover:-translate-y-0.5 hover:border-bpim-primary hover:bg-bpim-bg hover:shadow-lg hover:shadow-bpim-primary/10",
+          "cursor-pointer",
+        )}
       >
-        <Card.Body p={4}>
-          <HStack justify="space-between" mb={3} align="start">
-            <VStack align="start" gap={0}>
-              <HStack color="gray.500" gap={1} mb={1}>
-                <LuCalendar size={12} />
-                <Text fontSize="xs">
-                  {dayjs(log.createdAt).tz().format("YYYY/MM/DD HH:mm")}
-                </Text>
-              </HStack>
-              <HStack gap={2}>
-                <Text fontSize="xl" fontWeight="bold" fontFamily="mono">
-                  総合BPI {log.totalBpi.toFixed(2)}
-                </Text>
-                <Badge
-                  variant="subtle"
-                  colorPalette={isPositive ? "blue" : "red"}
-                  fontSize="xs"
-                  fontWeight="bold"
-                  px={2}
-                >
-                  {isPositive ? "+" : ""}
-                  {log.diff.toFixed(2)}
-                </Badge>
-              </HStack>
-            </VStack>
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex flex-col gap-0">
+            <div className="flex items-center gap-1 mb-1 text-bpim-muted">
+              <LuCalendar className="w-3 h-3" />
+              <span className="text-[10px] font-medium md:text-xs">
+                {dayjs(log.createdAt).tz().format("YYYY/MM/DD HH:mm")}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-lg font-bold text-bpim-text md:text-xl">
+                総合BPI {log.totalBpi.toFixed(2)}
+              </span>
+              <Badge
+                className={cn(
+                  "px-2 py-0 font-bold border-none",
+                  isPositive
+                    ? "bg-bpim-primary/10 text-bpim-primary"
+                    : "bg-bpim-danger/10 text-bpim-danger",
+                )}
+              >
+                {isPositive ? "+" : ""}
+                {log.diff.toFixed(2)}
+              </Badge>
+            </div>
+          </div>
 
-            <HStack bg="gray.900" px={3} py={1} borderRadius="md" gap={2}>
-              <LuListMusic size={14} color="gray" />
-              <Text fontSize="sm" fontWeight="bold">
-                {log.songCount}
-              </Text>
-              <Text fontSize="10px" color="gray.500">
-                SONGS
-              </Text>
-            </HStack>
-          </HStack>
+          <div className="flex items-center gap-2 px-3 py-1 rounded-md bg-bpim-bg border border-bpim-border">
+            <LuListMusic className="w-3.5 h-3.5 text-bpim-muted" />
+            <span className="text-sm font-bold text-bpim-text leading-none">
+              {log.songCount}
+            </span>
+            <span className="text-[10px] font-bold text-bpim-subtle tracking-tighter">
+              SONGS
+            </span>
+          </div>
+        </div>
 
-          <Separator opacity={0.1} mb={3} />
+        <Separator className="bg-bpim-surface-2/60 mb-3" />
 
-          <VStack align="stretch" gap={1.5}>
-            <Text
-              fontSize="10px"
-              fontWeight="bold"
-              color="gray.600"
-              letterSpacing="widest"
-            >
-              TOP UPDATES
-            </Text>
-            <SimpleGrid columns={{ base: 1, md: 2 }} gap={2}>
-              {log.topScores.map((score, i) => (
-                <HStack
-                  key={i}
-                  justify="space-between"
-                  bg="whiteAlpha.50"
-                  p={2}
-                  borderRadius="sm"
-                >
-                  <Text fontSize="xs" fontWeight="bold" lineClamp={1} flex={1}>
-                    {score.title}
-                  </Text>
-                  <Text
-                    fontSize="xs"
-                    fontWeight="bold"
-                    color="blue.400"
-                    w="45px"
-                    textAlign="right"
-                  >
+        <div className="flex flex-col gap-1.5">
+          <span className="text-[10px] font-bold tracking-[0.15em] text-bpim-subtle uppercase">
+            Top Updates
+          </span>
+          <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+            {log.topScores.map((score, i) => (
+              <div
+                key={i}
+                className="flex items-center justify-between gap-3 p-2 rounded-sm bg-bpim-card/50 border border-white/[0.02]"
+              >
+                <span className="flex-1 text-xs font-bold text-bpim-text truncate leading-tight">
+                  {score.title}
+                </span>
+                <div className="w-[45px] shrink-0 text-right font-mono leading-none">
+                  <div className="text-[8px] font-bold text-bpim-text/60 uppercase">
                     BPI
-                    <br />
+                  </div>
+                  <div className="text-xs font-bold text-bpim-primary">
                     {score.bpi.toFixed(1)}
-                  </Text>
-                </HStack>
-              ))}
-            </SimpleGrid>
-          </VStack>
-        </Card.Body>
-      </Card.Root>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </Link>
   );
 };

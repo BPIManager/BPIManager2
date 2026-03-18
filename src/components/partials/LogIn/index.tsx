@@ -1,53 +1,50 @@
-"use client";
+﻿"use client";
 
 import { authActions } from "@/lib/firebase/auth";
-import { Button, VStack, Text, Group } from "@chakra-ui/react";
+import { Button } from "@/components/ui/button";
 import { FaGoogle, FaTwitter, FaLine } from "react-icons/fa";
 
 export const LoginButtons = () => {
   return (
-    <VStack
-      gap={4}
-      width="full"
-      maxW="full"
-      my={4}
-      borderColor="whiteAlpha.200"
-      px={4}
-      py={4}
-      borderRadius="md"
-      borderWidth="1px"
-    >
-      <Text fontSize="sm" color="gray.500">
+    <div className="my-4 flex w-full flex-col items-center gap-4 rounded-xl border border-bpim-border bg-bpim-surface-2/60 p-6">
+      <span className="text-[10px] font-bold tracking-wider text-bpim-muted uppercase">
         ログインして開始
-      </Text>
+      </span>
 
-      <Group attached orientation="vertical" width="full">
+      <div className="flex w-full flex-col -space-y-px">
         <Button
           variant="outline"
-          width="full"
+          className="relative flex h-12 w-full items-center justify-center gap-3 rounded-b-none border-bpim-border bg-transparent transition-all hover:z-10 hover:bg-bpim-overlay/50 active:scale-[0.98]"
           onClick={() => authActions.signInWithGoogle()}
         >
-          <FaGoogle />
-          Googleでログイン
+          <FaGoogle className="text-bpim-danger" />
+          <span className="text-sm font-bold text-bpim-text">
+            Googleでログイン
+          </span>
         </Button>
 
         <Button
           variant="outline"
-          width="full"
+          className="relative flex h-12 w-full items-center justify-center gap-3 rounded-none border-bpim-border bg-transparent transition-all hover:z-10 hover:bg-bpim-overlay/50 active:scale-[0.98]"
           onClick={() => authActions.signInWithTwitter()}
         >
-          <FaTwitter />X (Twitter) でログイン
+          <FaTwitter className="text-bpim-info" />
+          <span className="text-sm font-bold text-bpim-text">
+            X (Twitter) でログイン
+          </span>
         </Button>
 
         <Button
           variant="outline"
-          width="full"
+          className="relative flex h-12 w-full items-center justify-center gap-3 rounded-t-none border-bpim-border bg-transparent transition-all hover:z-10 hover:bg-bpim-overlay/50 active:scale-[0.98]"
           onClick={() => authActions.signInWithLINE()}
         >
-          <FaLine />
-          LINEでログイン
+          <FaLine className="text-bpim-success" />
+          <span className="text-sm font-bold text-bpim-text">
+            LINEでログイン
+          </span>
         </Button>
-      </Group>
-    </VStack>
+      </div>
+    </div>
   );
 };

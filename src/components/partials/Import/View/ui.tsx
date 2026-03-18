@@ -1,28 +1,20 @@
-import {
-  Container,
-  Stack,
-  Box,
-  Textarea,
-  HStack,
-  VStack,
-  Button,
-  Separator,
-  Text,
-} from "@chakra-ui/react";
-import { Trash2, Upload, AlertCircle, HelpCircle } from "lucide-react";
-import { Field } from "@/components/ui/field";
-import {
-  SelectRoot,
-  SelectTrigger,
-  SelectValueText,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
+﻿import { Trash2, Upload, AlertCircle } from "lucide-react";
 import { PageContainer, PageHeader } from "@/components/partials/Header";
 import { DashboardLayout } from "@/components/partials/Main";
-import { versionsCollection } from "@/constants/versions";
 import { InstructionSection } from "./instruction";
 import { LoginRequiredCard } from "../../LoginRequired/ui";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { versionsOptions } from "@/constants/versions";
 
 interface Props {
   csvData: string;
@@ -37,116 +29,109 @@ interface Props {
 
 export const ImportView = (props: Props) => (
   <DashboardLayout>
-    <Container maxW="full">
-      <Stack gap={8}>
-        <PageHeader
-          title="インポート"
-          description="CSVデータをアップロードしてBPIを更新します。"
-        />
-        <PageContainer>
-          <Box position="relative">
-            {!props.isLoggedIn ? (
-              <LoginRequiredCard />
-            ) : (
-              <>
-                <Stack gap={4}>
-                  <Field
-                    label="CSVデータ"
-                    helperText="データを改変しないですべて貼り付けてください"
-                  >
-                    <Textarea
-                      placeholder="バージョン,タイトル,ジャンル,アーティスト,プレー回数,..."
-                      minH="100px"
-                      variant="subtle"
-                      p={4}
-                      fontFamily="mono"
-                      fontSize="sm"
-                      value={props.csvData}
-                      onChange={(e) => props.setCsvData(e.target.value)}
-                      borderRadius="lg"
-                      _focus={{ borderColor: "blue.500" }}
-                    />
-                  </Field>
+    <div className="flex flex-col gap-8">
+      <PageHeader
+        title="インポート"
+        description="CSVデータをアップロードしてBPIを更新します。"
+      />
 
-                  <Field
-                    label="保存先バージョン"
-                    helperText="データを反映させるバージョンを選択してください"
-                  >
-                    <SelectRoot
-                      collection={versionsCollection}
-                      value={props.selectedVersion}
-                      onValueChange={(details) =>
-                        props.setSelectedVersion(details.value)
-                      }
-                      variant="subtle"
-                    >
-                      <SelectTrigger>
-                        <SelectValueText
-                          px={4}
-                          placeholder="バージョンを選択"
-                        />
-                      </SelectTrigger>
-                      <SelectContent portalled={false}>
-                        {versionsCollection.items.map((v) => (
-                          <SelectItem p={2} item={v} key={v.value}>
-                            {v.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </SelectRoot>
-                  </Field>
-
-                  <HStack justify="space-between">
-                    <Button
-                      variant="ghost"
-                      colorPalette="red"
-                      size="sm"
-                      onClick={() => props.setCsvData("")}
-                      disabled={!props.csvData || props.isProcessing}
-                    >
-                      <Trash2 /> 入力をクリア
-                    </Button>
-                    <Button
-                      colorPalette="blue"
-                      size="lg"
-                      px={4}
-                      loading={props.isProcessing}
-                      loadingText={props.processStatus}
-                      onClick={props.onStartImport}
-                      disabled={props.isProcessing}
-                    >
-                      <Upload /> インポートを開始
-                    </Button>
-                  </HStack>
-                </Stack>
-
-                <HStack
-                  my={4}
-                  p={4}
-                  borderRadius="lg"
-                  bg="whiteAlpha.50"
-                  align="start"
+      <PageContainer>
+        <div className="relative">
+          {!props.isLoggedIn ? (
+            <LoginRequiredCard />
+          ) : (
+            <div className="flex flex-col gap-6">
+              <div className="space-y-2">
+                <Label
+                  htmlFor="csv-data"
+                  className="text-sm font-bold text-bpim-text"
                 >
-                  <AlertCircle size={18} style={{ marginTop: "2px" }} />
-                  <VStack align="start" gap={0}>
-                    <Text fontSize="xs" fontWeight="bold">
-                      Note
-                    </Text>
-                    <Text fontSize="xs" color="fg.muted">
-                      CSVデータはクリップボードから読み取ることもできます。
-                      <br />
-                      <b>データの更新には最大1分程度かかります。</b>
-                    </Text>
-                  </VStack>
-                </HStack>
+                  CSVデータ
+                </Label>
+                <Textarea
+                  id="csv-data"
+                  placeholder="バージョン,タイトル,ジャンル,アーティスト,プレー回数,..."
+                  className="min-h-[200px] border-bpim-border bg-bpim-surface-2/60 p-4 font-mono text-sm transition-colors focus:border-bpim-primary focus:ring-0"
+                  value={props.csvData}
+                  onChange={(e) => props.setCsvData(e.target.value)}
+                />
+                <p className="text-[10px] text-bpim-muted">
+                  データを改変しないですべて貼り付けてください
+                </p>
+              </div>
 
-                <Separator color="whiteAlpha.200" />
-                <InstructionSection />
-              </>
-            )}
-          </Box>
-        </PageContainer>
-      </Stack>
-    </Container>
+              <div className="space-y-2">
+                <Label className="text-sm font-bold text-bpim-text">
+                  保存先バージョン
+                </Label>
+                <Select
+                  value={props.selectedVersion[0]}
+                  onValueChange={(value) => props.setSelectedVersion([value])}
+                >
+                  <SelectTrigger className="w-full border-bpim-border bg-bpim-surface-2/60 text-sm md:w-[300px]">
+                    <SelectValue placeholder="バージョンを選択" />
+                  </SelectTrigger>
+                  <SelectContent className="border-bpim-border bg-bpim-bg text-bpim-text">
+                    {versionsOptions.map((v) => (
+                      <SelectItem key={v.value} value={v.value}>
+                        {v.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-[10px] text-bpim-muted">
+                  データを反映させるバージョンを選択してください
+                </p>
+              </div>
+
+              <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
+                <Button
+                  variant="ghost"
+                  className="w-full text-bpim-danger hover:bg-bpim-danger/10 hover:text-bpim-danger sm:w-auto"
+                  onClick={() => props.setCsvData("")}
+                  disabled={!props.csvData || props.isProcessing}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" /> 入力をクリア
+                </Button>
+                <Button
+                  className="w-full bg-bpim-primary px-8 font-bold text-bpim-text hover:bg-bpim-primary sm:w-auto"
+                  size="lg"
+                  disabled={props.isProcessing || !props.csvData}
+                  onClick={props.onStartImport}
+                >
+                  {props.isProcessing ? (
+                    <>
+                      <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-bpim-border border-t-white" />
+                      {props.processStatus}
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="mr-2 h-4 w-4" /> インポートを開始
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              <div className="flex items-start gap-3 rounded-lg bg-bpim-surface-2/60 p-4">
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-bpim-primary" />
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs font-bold text-bpim-text">Note</span>
+                  <p className="text-xs leading-relaxed text-bpim-muted">
+                    CSVデータはクリップボードから読み取ることもできます。
+                    <br />
+                    <strong className="text-bpim-text">
+                      データの更新には最大1分程度かかります。
+                    </strong>
+                  </p>
+                </div>
+              </div>
+
+              <Separator className="bg-bpim-overlay/60" />
+              <InstructionSection />
+            </div>
+          )}
+        </div>
+      </PageContainer>
+    </div>
   </DashboardLayout>
 );

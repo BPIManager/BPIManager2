@@ -1,49 +1,50 @@
-import { Box, HStack, IconButton, Button, Text } from "@chakra-ui/react";
-import { LuChevronsLeft, LuChevronLeft, LuChevronRight } from "react-icons/lu";
+﻿import { LuChevronsLeft, LuChevronLeft, LuChevronRight } from "react-icons/lu";
+import { Button } from "@/components/ui/button";
 
-export const Pagination = ({
-  p,
-  hasMore,
-  onPageChange,
-}: {
+interface Props {
   p: number;
   hasMore: boolean;
   onPageChange: (v: number) => void;
-}) => (
-  <HStack justify="center" gap={2} py={4}>
+}
+
+export const Pagination = ({ p, hasMore, onPageChange }: Props) => (
+  <div className="flex items-center justify-center gap-2 py-4">
     {p !== 1 && (
-      <IconButton
-        aria-label="First"
+      <Button
         variant="ghost"
+        size="icon"
         onClick={() => onPageChange(1)}
+        className="h-9 w-9"
       >
-        <LuChevronsLeft />
-      </IconButton>
+        <LuChevronsLeft className="h-4 w-4" />
+      </Button>
     )}
     <Button
       variant="outline"
       size="sm"
       disabled={p <= 1}
       onClick={() => onPageChange(p - 1)}
-      px={2}
+      className="gap-1 px-3"
     >
-      <LuChevronLeft />
+      <LuChevronLeft className="h-4 w-4" />
       前へ
     </Button>
-    <Box px={4}>
-      <Text fontSize="sm" fontWeight="bold" fontFamily="mono">
+
+    <div className="px-4">
+      <span className="font-mono text-sm font-bold text-bpim-text">
         PAGE {p}
-      </Text>
-    </Box>
+      </span>
+    </div>
+
     <Button
       variant="outline"
       size="sm"
       disabled={!hasMore}
       onClick={() => onPageChange(p + 1)}
-      px={2}
+      className="gap-1 px-3"
     >
       次へ
-      <LuChevronRight />
+      <LuChevronRight className="h-4 w-4" />
     </Button>
-  </HStack>
+  </div>
 );

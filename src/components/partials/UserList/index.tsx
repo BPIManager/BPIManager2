@@ -1,28 +1,23 @@
-import {
-  VStack,
-  SimpleGrid,
-  Box,
-  HStack,
-  useDisclosure,
-} from "@chakra-ui/react";
-import { useUserList } from "@/hooks/users/useUserList";
-import { UserRecommendationCard } from "./Card/ui";
+"use client";
+
+import { useState } from "react";
 import { useRouter } from "next/router";
+import { UserRecommendationCard } from "./Card/ui";
 import { SortSelector } from "./Filter/sortInput";
 import { SearchInput } from "./Filter/searchInput";
 import { Pagination } from "./pagination";
 import { UserRecommendationCardSkeleton } from "./Card/skeleton";
 import { UserRecommendationEmpty } from "./Card/empty";
-import { useState } from "react";
 import { RivalComparisonModal } from "./Modal";
 import { LoginRequiredCard } from "../LoginRequired/ui";
 import { useUser } from "@/contexts/users/UserContext";
+import { useUserList } from "@/hooks/users/useUserList";
 
 export const UserRecommendationList = () => {
   const { user, isLoading: isCredentialLoading } = useUser();
   const router = useRouter();
-  const { open, onOpen, onClose } = useDisclosure();
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const q = (router.query.q as string) || "";
   const p = Number(router.query.p) || 1;
@@ -43,11 +38,13 @@ export const UserRecommendationList = () => {
   };
 
   const { data, isLoading } = useUserList(q, p, s, o);
+
   const handleReset = () =>
     updateParams({ q: "", p: 1, s: "totalBpi", o: "distance" });
+
   const handleCardClick = (userId: string) => {
     setSelectedUserId(userId);
-    onOpen();
+    setIsModalOpen(true);
   };
 
   if (!user && !isCredentialLoading) {
@@ -55,14 +52,8 @@ export const UserRecommendationList = () => {
   }
 
   return (
-    <VStack align="stretch" gap={6} w="full">
-      <Box
-        p={4}
-        bg="rgba(13, 17, 23, 0.4)"
-        borderRadius="xl"
-        borderWidth="1px"
-        borderColor="whiteAlpha.100"
-      >
+    <div className="flex w-full flex-col gap-6">
+      <div className="rounded-xl border border-bpim-border bg-bpim-bg/40 p-4 shadow-sm">
         <SortSelector
           sort={s}
           order={o}
@@ -71,51 +62,55 @@ export const UserRecommendationList = () => {
             updateParams({ s: sort, o: order, p: 1 });
           }}
         />
-        <HStack gap={4}>
+        <div className="flex gap-4">
           <SearchInput
             initialValue={q}
             onSearch={(val) => updateParams({ q: val, p: 1 })}
           />
-        </HStack>
-      </Box>
+        </div>
+      </div>
 
       {isLoading ? (
-        <SimpleGrid columns={{ base: 1, lg: 2 }} gap={4} w="full">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           {Array.from({ length: 10 }).map((_, i) => (
             <UserRecommendationCardSkeleton key={i} />
           ))}
-        </SimpleGrid>
+        </div>
       ) : data?.users.length === 0 ? (
         <UserRecommendationEmpty onReset={handleReset} />
       ) : (
-        <SimpleGrid columns={{ base: 1, lg: 2 }} gap={4} w="full">
-          {data?.users.map((user) => (
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          {data?.users.map((u) => (
             <UserRecommendationCard
-              key={user.userId}
-              user={user}
+              key={u.userId}
+              user={u}
               viewerRadar={data.viewer.radar}
               viewerTotalBpi={data.viewer.totalBpi}
               currentSort={s}
-              onClick={() => handleCardClick(user.userId)}
+              onClick={() => handleCardClick(u.userId)}
             />
           ))}
-        </SimpleGrid>
+        </div>
       )}
+
       {selectedUserId && (
         <RivalComparisonModal
           rivalId={selectedUserId}
-          isOpen={open}
-          onClose={onClose}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
           viewerRadar={data?.viewer.radar}
         />
       )}
-      {!isLoading && (
-        <Pagination
-          p={p}
-          hasMore={!!data && data.users.length === 20}
-          onPageChange={(next) => updateParams({ p: next })}
-        />
+
+      {!isLoading && data && (
+        <div className="mt-4 flex justify-center">
+          <Pagination
+            p={p}
+            hasMore={data.users.length === 20}
+            onPageChange={(next) => updateParams({ p: next })}
+          />
+        </div>
       )}
-    </VStack>
+    </div>
   );
 };

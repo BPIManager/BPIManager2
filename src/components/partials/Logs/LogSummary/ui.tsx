@@ -1,7 +1,11 @@
-import { useState } from "react";
-import { SimpleGrid, Box, Text, Icon, VStack, Flex } from "@chakra-ui/react";
-import { PlusCircle, HelpCircle, MusicIcon } from "lucide-react";
-import { Tooltip } from "@/components/ui/tooltip";
+﻿import { PlusCircle, HelpCircle, MusicIcon } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 import { DashCard } from "@/components/ui/dashcard";
 
 export const LabelWithTooltip = ({
@@ -13,49 +17,34 @@ export const LabelWithTooltip = ({
   tooltipText?: string;
   isSharing: boolean;
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  if (!tooltipText)
+  if (!tooltipText) {
     return (
-      <Text
-        fontSize="sm"
-        fontWeight="bold"
-        color="gray.200"
-        lineHeight="1.2"
-        letterSpacing="tighter"
-        whiteSpace="nowrap"
-      >
+      <span className="text-sm font-bold text-bpim-text leading-[1.2] tracking-tighter whitespace-nowrap">
         {label}
-      </Text>
+      </span>
     );
+  }
 
   return (
-    <Flex align="center" gap={1}>
-      <Text
-        fontSize="sm"
-        fontWeight="bold"
-        color="gray.200"
-        letterSpacing="tighter"
-        whiteSpace="nowrap"
-      >
+    <div className="flex items-center gap-1">
+      <span className="text-sm font-bold text-bpim-text tracking-tighter whitespace-nowrap">
         {label}
-      </Text>
+      </span>
       {!isSharing && (
-        <Tooltip content={tooltipText} open={isOpen} showArrow>
-          <Box
-            display="flex"
-            alignItems="center"
-            as="button"
-            onMouseEnter={() => setIsOpen(true)}
-            onMouseLeave={() => setIsOpen(false)}
-            onClick={() => setIsOpen(!isOpen)}
-            cursor="help"
-          >
-            <Icon as={HelpCircle} size={"sm"} color="gray.400" />
-          </Box>
-        </Tooltip>
+        <TooltipProvider delayDuration={200}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button className="flex items-center justify-center cursor-help text-bpim-muted hover:text-bpim-muted outline-none">
+                <HelpCircle className="h-3.5 w-3.5" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent className="bg-bpim-surface-2 text-bpim-text border-slate-700">
+              <p className="text-xs">{tooltipText}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       )}
-    </Flex>
+    </div>
   );
 };
 
@@ -71,44 +60,45 @@ export const BatchSummaryCards = ({
       label: "今日のBPI",
       value: summary.batchPerformance,
       icon: PlusCircle,
-      color: "blue.200",
+      color: "text-bpim-primary",
       tooltip: "今回更新した☆12のみを対象とした総合BPI",
     },
     {
       label: "更新",
       value: summary.updatedScores,
       icon: PlusCircle,
-      color: "orange.200",
+      color: "text-bpim-warning",
     },
     {
       label: "新規",
       value: summary.newRecords,
       icon: MusicIcon,
-      color: "purple.200",
+      color: "text-purple-300",
     },
   ];
 
   return (
-    <SimpleGrid columns={{ base: 3, md: 3 }} gap={2}>
+    <div className="grid grid-cols-3 gap-2">
       {stats.map((stat, i) => (
-        <DashCard p={{ base: 3, md: 5 }} key={i}>
-          <VStack align="start" gap={1}>
-            <LabelWithTooltip
-              isSharing={isSharing}
-              label={stat.label}
-              tooltipText={stat.tooltip}
-            />
-            <Text
-              fontSize="2xl"
-              fontWeight="bold"
-              color={stat.color}
-              fontFamily="mono"
-            >
-              {stat.value}
-            </Text>
-          </VStack>
+        <DashCard
+          key={i}
+          className="p-3 md:p-5 flex flex-col items-start justify-center gap-1"
+        >
+          <LabelWithTooltip
+            isSharing={isSharing}
+            label={stat.label}
+            tooltipText={stat.tooltip}
+          />
+          <div
+            className={cn(
+              "text-2xl font-bold font-mono leading-tight",
+              stat.color,
+            )}
+          >
+            {stat.value}
+          </div>
         </DashCard>
       ))}
-    </SimpleGrid>
+    </div>
   );
 };

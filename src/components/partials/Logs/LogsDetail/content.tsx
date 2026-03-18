@@ -1,9 +1,8 @@
-import { useLogsDetail } from "@/hooks/batches/useBatchDetail";
+﻿import { useLogsDetail } from "@/hooks/batches/useBatchDetail";
 import {
   getBpiDistribution,
   getRankDistribution,
 } from "@/utils/logs/getDistribution";
-import { Box, HStack, SimpleGrid, Tabs, VStack } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { DailyBatchNotice } from "../DailyBatchNotice/ui";
 import { BatchSummaryCards } from "../LogSummary/ui";
@@ -23,6 +22,8 @@ import { BpiCalculator } from "@/lib/bpi";
 import { DistributionChart } from "../../DashBoard/DistributionChart/ui";
 import { RANK_COLORS } from "@/constants/djRankColor";
 import { getBpiColor } from "@/constants/bpiColor";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { cn } from "@/lib/utils";
 
 export const LogsDetailContent = ({
   userId,
@@ -44,9 +45,9 @@ export const LogsDetailContent = ({
   } = useLogsDetail(userId, version, { batchId, date, groupedBy });
   const isLoading = isl || (!details && !isError);
 
-  let summaryRef = useRef<HTMLDivElement>(null);
-  let rankRef = useRef<HTMLDivElement>(null);
-  let listRef = useRef<HTMLDivElement>(null);
+  const summaryRef = useRef<HTMLDivElement>(null);
+  const rankRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const { share, isSharing } = useShareResult();
@@ -54,8 +55,7 @@ export const LogsDetailContent = ({
   const activeTab =
     router.query.levels || router.query.difficulties ? "songs" : "summary";
 
-  const handleTabChange = (details: { value: string }) => {
-    const nextTab = details.value;
+  const handleTabChange = (nextTab: string) => {
     const nextQuery = { ...router.query };
 
     if (nextTab === "songs") {
@@ -88,22 +88,16 @@ export const LogsDetailContent = ({
   if (isError || !details)
     return <LogErrorState error={isError} onRetry={() => mutate()} />;
 
-  const prevBpi = details.pagination.prev?.totalBpi ?? -15;
   const currentBpi = details.pagination.current?.totalBpi ?? -15;
+  const prevBpi = details.pagination.prev?.totalBpi ?? -15;
   const bpiDiff = currentBpi - prevBpi;
   const currentRank = BpiCalculator.estimateRank(currentBpi);
   const bpiData = getBpiDistribution(details.songs);
   const rankData = getRankDistribution(details.songs);
 
   return (
-    <VStack align="stretch" gap={6} w="full">
-      <LogNavigator
-        userId={userId}
-        version={version}
-        pagination={details.pagination}
-        type={type}
-        date={date}
-      />
+    <div className="flex flex-col gap-6 w-full">
+      <LogNavigator pagination={details.pagination} type={type} />
 
       {type === "batch" && details.pagination.dailyBatchIds && (
         <DailyBatchNotice
@@ -113,8 +107,9 @@ export const LogsDetailContent = ({
           version={version as string}
         />
       )}
+
       <ShareResultModal
-        handleTabChange={handleTabChange}
+        handleTabChange={(d) => handleTabChange(d.value)}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         elements={{
@@ -132,47 +127,52 @@ export const LogsDetailContent = ({
         isSharing={isSharing}
       />
 
-      <Tabs.Root
+      <Tabs
         value={activeTab}
         onValueChange={handleTabChange}
-        variant="enclosed"
-        colorPalette="blue"
+        className="w-full"
       >
-        <HStack w="full" gap={4} align="center" mb={4} justify="space-between">
-          <Tabs.List flex="1" minW="0" p={1} borderRadius="md" display="flex">
-            <Tabs.Trigger value="summary" px={4} flex="1" whiteSpace="nowrap">
+        <div className="flex w-full items-center justify-between gap-4 mb-4">
+          <TabsList className="grid h-auto w-full max-w-md grid-cols-2 rounded-lg bg-bpim-surface-2/60 p-1">
+            <TabsTrigger
+              value="summary"
+              className="py-2 text-xs font-bold transition-all data-[state=active]:bg-bpim-surface data-[state=active]:text-bpim-text"
+            >
               サマリー
-            </Tabs.Trigger>
-            <Tabs.Trigger value="songs" px={4} flex="1" whiteSpace="nowrap">
+            </TabsTrigger>
+            <TabsTrigger
+              value="songs"
+              className="py-2 text-xs font-bold transition-all data-[state=active]:bg-bpim-surface data-[state=active]:text-bpim-text"
+            >
               更新楽曲 ({details.songs.length})
-            </Tabs.Trigger>
-          </Tabs.List>
+            </TabsTrigger>
+          </TabsList>
+
           {!isPublicPage && (
-            <Box flexShrink={0} ml={4} display="flex" justifyContent="flex-end">
+            <div className="shrink-0">
               <Button
-                size="sm"
                 variant="outline"
-                borderColor="whiteAlpha.200"
-                borderRadius="full"
-                _hover={{ bg: "whiteAlpha.100" }}
-                fontSize="xs"
-                px={4}
+                size="sm"
+                className="rounded-full border-bpim-border bg-transparent px-4 text-xs font-bold hover:bg-bpim-overlay/50"
                 onClick={() => setIsModalOpen(true)}
               >
-                <XIcon style={{ width: "20px" }} />
+                <XIcon className="mr-2 h-4 w-4" />
                 共有
               </Button>
-            </Box>
+            </div>
           )}
-        </HStack>
+        </div>
 
-        <Tabs.Content value="summary" py={6}>
-          <Box ref={summaryRef} p={isModalOpen ? 4 : 0}>
+        <TabsContent
+          value="summary"
+          className="mt-0 py-6 focus-visible:outline-none"
+        >
+          <div ref={summaryRef} className={cn(isModalOpen ? "p-4" : "p-0")}>
             <BatchTotalBpiCard pagination={details.pagination} />
             {summary && (
               <BatchSummaryCards isSharing={isModalOpen} summary={summary} />
             )}
-            <SimpleGrid columns={{ base: 1, lg: 2 }} gap={4} mt={4}>
+            <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
               <DistributionChart
                 title="BPI分布"
                 myData={bpiData}
@@ -185,29 +185,40 @@ export const LogsDetailContent = ({
                 isLoading={isLoading}
                 getColor={(l) => RANK_COLORS[l]}
               />
-            </SimpleGrid>
-          </Box>
-          <Box ref={rankRef} p={isModalOpen ? 4 : 0}>
+            </div>
+          </div>
+          <div
+            ref={rankRef}
+            className={cn(
+              "mt-4 flex flex-col gap-4",
+              isModalOpen ? "p-4" : "p-0",
+            )}
+          >
             <LogRank details={details.songs} type="top" />
             <LogRank
               isSharing={isModalOpen}
               details={details.songs}
               type="growth"
             />
-          </Box>
+          </div>
           {overtakenSongs && overtakenSongs.length > 0 && (
-            <LogRank
-              isSharing={isModalOpen}
-              details={details.songs}
-              type="overtake"
-            />
+            <div className={cn("mt-4", isModalOpen ? "p-4" : "p-0")}>
+              <LogRank
+                isSharing={isModalOpen}
+                details={details.songs}
+                type="overtake"
+              />
+            </div>
           )}
-        </Tabs.Content>
+        </TabsContent>
 
-        <Tabs.Content value="songs" p={0} mt={4}>
+        <TabsContent
+          value="songs"
+          className="mt-4 p-0 focus-visible:outline-none"
+        >
           <BatchSongsTable songs={details.songs} listRef={listRef} />
-        </Tabs.Content>
-      </Tabs.Root>
-    </VStack>
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 };

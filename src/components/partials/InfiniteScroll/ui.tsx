@@ -1,7 +1,7 @@
-import { Box, VStack, Center, Spinner, Text } from "@chakra-ui/react";
-import { ReactNode } from "react";
+﻿import { useCallback, ReactNode } from "react";
 import { useInfiniteScroll } from "@/hooks/common/useInfiniteScroll";
-import { useCallback } from "react";
+import { cn } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
 
 interface InfiniteScrollContainerProps<T> {
   items: T[];
@@ -12,6 +12,7 @@ interface InfiniteScrollContainerProps<T> {
   maxH?: string;
   emptyMessage?: string;
   header?: React.ReactNode;
+  className?: string;
 }
 
 export function InfiniteScrollContainer<T>({
@@ -23,9 +24,10 @@ export function InfiniteScrollContainer<T>({
   maxH = "500px",
   emptyMessage = "データが見つかりませんでした",
   header,
+  className,
 }: InfiniteScrollContainerProps<T>) {
   const handleIntersect = useCallback(() => {
-    setSize((prev) => prev + 1);
+    setSize((prev) => (typeof prev === "number" ? prev + 1 : 1));
   }, [setSize]);
 
   const observerTarget = useInfiniteScroll({
@@ -35,32 +37,38 @@ export function InfiniteScrollContainer<T>({
   });
 
   return (
-    <VStack align="stretch" gap={0} maxH={maxH} overflowY="auto">
-      {header}
-      {items.map((item, i) => renderItem(item, i))}
+    <div
+      className={cn(
+        "flex flex-col overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent",
+        className,
+      )}
+      style={{ maxHeight: maxH }}
+    >
+      {header && <div className="sticky top-0 z-10 bg-bpim-surface">{header}</div>}
 
-      <Box
+      <div className="flex flex-col">
+        {items.map((item, i) => renderItem(item, i))}
+      </div>
+
+      <div
         ref={observerTarget}
-        py={4}
-        minH="40px"
-        display="flex"
-        justifyContent="center"
+        className="flex min-h-[40px] items-center justify-center py-4"
       >
-        {isLoadingMore && <Spinner size="sm" color="blue.500" />}
-        {!isLoadingMore && isReachingEnd && items.length > 0 && (
-          <Text fontSize="xs" color="gray.600">
-            全てのデータを読み込みました
-          </Text>
+        {isLoadingMore && (
+          <Loader2 className="h-5 w-5 animate-spin text-bpim-text" />
         )}
-      </Box>
+        {!isLoadingMore && isReachingEnd && items.length > 0 && (
+          <span className="text-[10px] font-medium text-bpim-subtle uppercase tracking-wider">
+            全てのデータを読み込みました
+          </span>
+        )}
+      </div>
 
       {!isLoadingMore && items.length === 0 && (
-        <Center py={10}>
-          <Text color="fg.muted" fontSize="sm">
-            {emptyMessage}
-          </Text>
-        </Center>
+        <div className="flex flex-col items-center justify-center py-10 text-center">
+          <p className="text-sm text-bpim-muted">{emptyMessage}</p>
+        </div>
       )}
-    </VStack>
+    </div>
   );
 }

@@ -1,20 +1,15 @@
-import {
-  Box,
-  Container,
-  Grid,
-  GridItem,
-  VStack,
-  Text,
-  Button,
-  Icon,
-} from "@chakra-ui/react";
+﻿"use client";
+
 import { useState } from "react";
+import { Activity, Swords, UserCheck } from "lucide-react";
 import { TimelineList } from "./ui";
 import { Difficulties, FilterParamsFrontend } from "@/types/songs/withScore";
-import { Activity, Swords, UserCheck } from "lucide-react";
 import { FilterCheckboxGroup, FilterSearchInput } from "../Songs/Filter/part";
 import { useUser } from "@/contexts/users/UserContext";
 import { LoginRequiredCard } from "../LoginRequired/ui";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { LuLoader } from "react-icons/lu";
 
 export const TimelineContainer = () => {
   const { user, isLoading } = useUser();
@@ -37,32 +32,24 @@ export const TimelineContainer = () => {
       : [...list, item];
   };
 
-  if (!user && !isLoading) {
+  if (isLoading) {
+    return (
+      <div className="flex h-64 w-full items-center justify-center">
+        <LuLoader className="h-8 w-8 animate-spin text-bpim-text" />
+      </div>
+    );
+  }
+
+  if (!user) {
     return <LoginRequiredCard />;
   }
 
   return (
-    <Container maxW="container.xl" py={6}>
-      <Grid
-        templateColumns={{ base: "1fr", lg: "260px 1fr" }}
-        gap={8}
-        alignItems="start"
-      >
-        <GridItem
-          position={{ base: "static", lg: "sticky" }}
-          top="80px"
-          zIndex={10}
-        >
-          <VStack
-            align="stretch"
-            gap={6}
-            bg="rgba(13, 17, 23, 0.4)"
-            p={4}
-            borderRadius="xl"
-            borderWidth="1px"
-            borderColor="whiteAlpha.100"
-          >
-            <VStack align="stretch" gap={1}>
+    <div className="mx-auto w-full max-w-7xl px-4 py-6">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[260px_1fr] items-start">
+        <aside className="lg:sticky lg:top-20 z-10">
+          <div className="flex flex-col gap-6 rounded-xl border border-bpim-border bg-bpim-bg/40 p-4 backdrop-blur-sm">
+            <div className="flex flex-col gap-1">
               <FilterHeader label="表示モード" />
               <MenuButton
                 isActive={mode === "all"}
@@ -80,10 +67,10 @@ export const TimelineContainer = () => {
                 isActive={mode === "overtaken"}
                 icon={Swords}
                 label="逆転された曲"
-                colorScheme="red"
+                activeVariant="destructive"
                 onClick={() => setMode("overtaken")}
               />
-            </VStack>
+            </div>
 
             <FilterCheckboxGroup
               label="LEVEL"
@@ -111,67 +98,56 @@ export const TimelineContainer = () => {
               }
               getLabel={(diff: string) => diff[0]}
             />
-          </VStack>
-        </GridItem>
+          </div>
+        </aside>
 
-        <GridItem minW={0}>
-          <VStack align="stretch" gap={4}>
-            <Box
-              bg="gray.950"
-              p={2}
-              borderRadius="xl"
-              borderWidth="1px"
-              borderColor="whiteAlpha.100"
-            >
-              <FilterSearchInput
-                value={filterParams.search || ""}
-                onChange={(search: string) => updateParams({ search })}
-                placeholder="プレイヤー名または楽曲名で絞り込み..."
-              />
-            </Box>
+        <div className="flex flex-col gap-4 min-w-0">
+          <div className="rounded-xl border border-bpim-border bg-bpim-bg p-2">
+            <FilterSearchInput
+              value={filterParams.search || ""}
+              onChange={(search: string) => updateParams({ search })}
+              placeholder="プレイヤー名または楽曲名で絞り込み..."
+            />
+          </div>
 
-            <TimelineList mode={mode} params={filterParams} />
-          </VStack>
-        </GridItem>
-      </Grid>
-    </Container>
+          <TimelineList mode={mode} params={filterParams} />
+        </div>
+      </div>
+    </div>
   );
 };
 
 const FilterHeader = ({ label }: { label: string }) => (
-  <Text
-    px={1}
-    fontSize="10px"
-    fontWeight="bold"
-    color="gray.500"
-    letterSpacing="widest"
-    textTransform="uppercase"
-    mb={1}
-  >
+  <span className="mb-1 px-1 text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
     {label}
-  </Text>
+  </span>
 );
 
 const MenuButton = ({
   isActive,
-  icon,
+  icon: Icon,
   label,
   onClick,
-  colorScheme = "blue",
-}: any) => (
+  activeVariant = "secondary",
+}: {
+  isActive: boolean;
+  icon: any;
+  label: string;
+  onClick: () => void;
+  activeVariant?: "secondary" | "destructive";
+}) => (
   <Button
-    variant={isActive ? "subtle" : "ghost"}
-    colorPalette={isActive ? colorScheme : "gray"}
-    justifyContent="flex-start"
+    variant={isActive ? activeVariant : "ghost"}
     size="sm"
-    gap={3}
     onClick={onClick}
-    px={3}
-    _hover={{ bg: "whiteAlpha.100" }}
+    className={cn(
+      "w-full justify-start gap-3 px-3 transition-all",
+      isActive
+        ? "font-bold shadow-sm"
+        : "font-medium text-bpim-muted hover:bg-bpim-overlay/50 hover:text-bpim-text",
+    )}
   >
-    <Icon as={icon} size="md" />
-    <Text fontSize="xs" fontWeight="bold">
-      {label}
-    </Text>
+    <Icon className={cn("h-4 w-4", isActive ? "" : "opacity-70")} />
+    <span className="text-xs">{label}</span>
   </Button>
 );

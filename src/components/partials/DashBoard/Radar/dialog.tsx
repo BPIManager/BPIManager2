@@ -1,159 +1,119 @@
-import {
-  DialogRoot,
+﻿import {
+  Dialog,
   DialogContent,
   DialogHeader,
-  DialogBody,
-  DialogCloseTrigger,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { VStack, HStack, Text, Box, Badge, Tabs } from "@chakra-ui/react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useMemo, useState } from "react";
 import { RadarSongEntry } from "@/types/stats/radar";
 import { LuArrowDownWideNarrow, LuArrowUpNarrowWide } from "react-icons/lu";
 import { getBpiColorStyle } from "@/constants/bpiColor";
+
+interface Props {
+  categoryName: string;
+  songs: RadarSongEntry[];
+  isOpen: boolean;
+  onClose: () => void;
+}
 
 export const RadarCategorySongsDialog = ({
   categoryName,
   songs,
   isOpen,
   onClose,
-}: {
-  categoryName: string;
-  songs: RadarSongEntry[];
-  isOpen: boolean;
-  onClose: () => void;
-}) => {
+}: Props) => {
   const [sortOrder, setSortOrder] = useState<string>("desc");
 
   const sortedSongs = useMemo(() => {
-    return [...songs].sort((a, b) => {
-      return sortOrder === "desc" ? b.bpi - a.bpi : a.bpi - b.bpi;
-    });
+    return [...songs].sort((a, b) =>
+      sortOrder === "desc" ? b.bpi - a.bpi : a.bpi - b.bpi,
+    );
   }, [songs, sortOrder]);
 
   return (
-    <DialogRoot
-      open={isOpen}
-      onOpenChange={onClose}
-      size="md"
-      scrollBehavior="inside"
-      placement={"center"}
-    >
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent
-        bg="gray.950"
-        border="1px solid"
-        borderColor="whiteAlpha.200"
-        maxHeight={"80svh"}
+        placement="bottom-sheet"
+        disableScrollWrapper
+        className="flex flex-col p-0 overflow-hidden"
+        showCloseButton={false}
       >
-        <DialogHeader
-          p={4}
-          borderBottomWidth="1px"
-          borderColor="whiteAlpha.100"
-        >
-          <DialogTitle fontSize="md" color="white">
+        <DialogHeader className="shrink-0 border-b border-bpim-border px-4 pt-4 pb-3">
+          <DialogTitle className="text-base font-bold text-bpim-text">
             {categoryName} - 楽曲リスト ({songs.length})
           </DialogTitle>
-          <DialogCloseTrigger color="white" />
         </DialogHeader>
 
-        <DialogBody py={4}>
-          <Tabs.Root
+        <div className="shrink-0 px-4 pt-3">
+          <Tabs
             value={sortOrder}
-            onValueChange={(e) => setSortOrder(e.value)}
-            variant="subtle"
-            colorPalette="blue"
+            onValueChange={setSortOrder}
+            className="w-full"
           >
-            <Tabs.List
-              bg="whiteAlpha.50"
-              p={1}
-              rounded="md"
-              mb={4}
-              width="full"
-            >
-              <Tabs.Trigger
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger
                 value="desc"
-                flex="1"
-                gap={2}
-                fontSize="xs"
-                justifyContent={"center"}
+                className="flex items-center gap-2 text-xs data-[state=active]:bg-bpim-primary"
               >
-                <LuArrowDownWideNarrow size={14} /> BPIが高い順
-              </Tabs.Trigger>
-              <Tabs.Trigger
+                <LuArrowDownWideNarrow className="h-3.5 w-3.5" />
+                BPIが高い順
+              </TabsTrigger>
+              <TabsTrigger
                 value="asc"
-                flex="1"
-                gap={2}
-                fontSize="xs"
-                justifyContent={"center"}
+                className="flex items-center gap-2 text-xs data-[state=active]:bg-bpim-primary"
               >
-                <LuArrowUpNarrowWide size={14} /> BPIが低い順
-              </Tabs.Trigger>
-            </Tabs.List>
+                <LuArrowUpNarrowWide className="h-3.5 w-3.5" />
+                BPIが低い順
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
 
-            <VStack align="stretch" gap={2}>
-              {sortedSongs.map((song, i) => {
-                const style = getBpiColorStyle(song.bpi);
-                return (
-                  <Box
-                    key={`${song.title}-${song.difficulty}`}
-                    p={3}
-                    bg="whiteAlpha.50"
-                    rounded="lg"
-                    borderWidth="1px"
-                    borderColor="whiteAlpha.100"
-                  >
-                    <HStack justify="space-between" align="center">
-                      <VStack align="start" gap={0} flex="1">
-                        <Text
-                          fontSize="xs"
-                          fontWeight="bold"
-                          color="white"
-                          lineClamp={1}
-                        >
-                          {song.title}
-                        </Text>
-                        <Text fontSize="10px" color="gray.500">
-                          {song.difficulty}
-                        </Text>
-                      </VStack>
-                      <HStack gap={3}>
-                        <VStack align="end" gap={0}>
-                          <Text fontSize="10px" color="gray.500">
-                            EX SCORE
-                          </Text>
-                          <Text
-                            fontSize="xs"
-                            fontWeight="bold"
-                            color="gray.200"
-                            fontFamily="mono"
-                          >
-                            {song.exScore}
-                          </Text>
-                        </VStack>
-                        <Badge
-                          variant="outline"
-                          borderColor={style.bg}
-                          color={style.color}
-                          fontFamily="mono"
-                          fontSize="xs"
-                          display="inline-flex"
-                          alignItems="center"
-                          justifyContent="center"
-                          minW="80px"
-                          textAlign="center"
-                          rounded="sm"
-                        >
-                          {song.bpi.toFixed(2)}
-                        </Badge>
-                      </HStack>
-                    </HStack>
-                  </Box>
-                );
-              })}
-            </VStack>
-          </Tabs.Root>
-        </DialogBody>
+        <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-3">
+          <div className="flex flex-col gap-2">
+            {sortedSongs.map((song) => {
+              const style = getBpiColorStyle(song.bpi);
+              return (
+                <div
+                  key={`${song.title}-${song.difficulty}`}
+                  className="flex items-center justify-between rounded-lg border border-bpim-border bg-bpim-surface-2/60 p-3"
+                >
+                  <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                    <span className="truncate text-xs font-bold text-bpim-text">
+                      {song.title}
+                    </span>
+                    <span className="text-[10px] text-bpim-muted">
+                      {song.difficulty}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="flex flex-col items-end gap-0">
+                      <span className="text-[10px] text-bpim-muted">
+                        EX SCORE
+                      </span>
+                      <span className="font-mono text-xs font-bold text-bpim-text">
+                        {song.exScore}
+                      </span>
+                    </div>
+
+                    <div
+                      className="inline-flex min-w-[80px] items-center justify-center rounded-sm border px-2 py-0.5 font-mono text-xs font-bold"
+                      style={{
+                        borderColor: style.bg,
+                        backgroundColor: `${style.bg}22`,
+                      }}
+                    >
+                      {song.bpi.toFixed(2)}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </DialogContent>
-    </DialogRoot>
+    </Dialog>
   );
 };

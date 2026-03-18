@@ -1,35 +1,35 @@
-import { Box, VStack, HStack, Skeleton, SimpleGrid } from "@chakra-ui/react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { LogNavigatorSkeleton } from "../LogsNav/skeleton";
 
 export const LogsDetailContentSkeleton = () => {
   return (
-    <VStack gap={6} align="stretch" w="full">
+    <div className="flex flex-col gap-6 w-full">
       <LogNavigatorSkeleton />
 
-      <VStack gap={6} align="stretch">
-        <HStack gap={2} mb={4}>
-          <Skeleton height="40px" width="50%" borderRadius="md" />
-          <Skeleton height="40px" width="50%" borderRadius="md" />
-        </HStack>
+      <div className="flex flex-col gap-6">
+        <div className="flex gap-2 mb-4">
+          <Skeleton className="h-10 w-1/2 rounded-md" />
+          <Skeleton className="h-10 w-1/2 rounded-md" />
+        </div>
 
-        <Skeleton height="80px" width="full" borderRadius="xl" />
+        <Skeleton className="h-20 w-full rounded-xl" />
 
-        <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
-          <Skeleton height="100px" borderRadius="xl" />
-          <Skeleton height="100px" borderRadius="xl" />
-          <Skeleton height="100px" borderRadius="xl" />
-        </SimpleGrid>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Skeleton className="h-[100px] rounded-xl" />
+          <Skeleton className="h-[100px] rounded-xl" />
+          <Skeleton className="h-[100px] rounded-xl" />
+        </div>
 
-        <SimpleGrid columns={{ base: 1, lg: 2 }} gap={4}>
-          <Skeleton height="300px" borderRadius="xl" />
-          <Skeleton height="300px" borderRadius="xl" />
-        </SimpleGrid>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <Skeleton className="h-[300px] rounded-xl" />
+          <Skeleton className="h-[300px] rounded-xl" />
+        </div>
 
-        <VStack gap={4} align="stretch">
-          <Skeleton height="200px" width="full" borderRadius="xl" />
-          <Skeleton height="200px" width="full" borderRadius="xl" />
-        </VStack>
-      </VStack>
-    </VStack>
+        <div className="flex flex-col gap-4">
+          <Skeleton className="h-[200px] w-full rounded-xl" />
+          <Skeleton className="h-[200px] w-full rounded-xl" />
+        </div>
+      </div>
+    </div>
   );
 };

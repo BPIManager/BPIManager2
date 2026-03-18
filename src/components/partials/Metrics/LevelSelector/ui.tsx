@@ -1,6 +1,14 @@
-import { Box, Stack, VStack, HStack, Text } from "@chakra-ui/react";
-import { Radio, RadioGroup } from "@/components/ui/radio";
-import { FormSelect } from "@/components/ui/select";
+﻿"use client";
+
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { versionsNonDisabledCollection } from "@/constants/versions";
 
 interface ArenaAverageFilterProps {
@@ -17,65 +25,53 @@ export const ArenaAverageFilter = ({
   onLevelChange,
 }: ArenaAverageFilterProps) => {
   return (
-    <Box
-      p={4}
-      bg="gray.900"
-      borderRadius="lg"
-      borderWidth="1px"
-      borderColor="whiteAlpha.100"
-    >
-      <Stack
-        direction={{ base: "column", md: "row" }}
-        gap={{ base: 6, md: 10 }}
-        align="start"
-      >
-        <VStack align="start" gap={2} minW={{ base: "full", md: "240px" }}>
-          <Text
-            fontSize="xs"
-            fontWeight="bold"
-            color="gray.500"
-            letterSpacing="wider"
-          >
-            バージョン
-          </Text>
-          <FormSelect
-            collection={versionsNonDisabledCollection}
-            value={version}
-            onValueChange={(e) => onVersionChange(e as string)}
-            size="xs"
-            variant="subtle"
-          />
-        </VStack>
+    <div className="rounded-xl border border-bpim-border bg-bpim-bg/80 p-4 shadow-sm backdrop-blur-md">
+      <div className="flex flex-col gap-6 md:flex-row md:items-start md:gap-10">
+        <div className="flex flex-col gap-2 min-w-full md:min-w-[240px]">
+          <span className="text-[10px] font-black tracking-widest text-bpim-muted uppercase px-1">
+            Version
+          </span>
+          <Select value={version} onValueChange={onVersionChange}>
+            <SelectTrigger className="h-9 border-bpim-border bg-bpim-surface-2/60 text-xs text-bpim-text focus:ring-blue-500">
+              <SelectValue placeholder="バージョンを選択" />
+            </SelectTrigger>
+            <SelectContent className="border-bpim-border bg-bpim-bg">
+              {versionsNonDisabledCollection.map((v) => (
+                <SelectItem key={v.value} value={v.value} className="text-xs">
+                  {v.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-        <VStack align="start" gap={2}>
-          <Text
-            fontSize="xs"
-            fontWeight="bold"
-            color="gray.500"
-            letterSpacing="wider"
-          >
-            レベル
-          </Text>
+        <div className="flex flex-col gap-2">
+          <span className="text-[10px] font-black tracking-widest text-bpim-muted uppercase px-1">
+            Level
+          </span>
           <RadioGroup
             value={level}
-            onValueChange={(e) => onLevelChange(e.value as string)}
-            colorPalette="blue"
+            onValueChange={onLevelChange}
+            className="flex h-9 items-center gap-8"
           >
-            <HStack gap={8} h="32px">
-              <Radio value="11">
-                <Text fontSize="sm" fontWeight="medium">
-                  ☆11
-                </Text>
-              </Radio>
-              <Radio value="12">
-                <Text fontSize="sm" fontWeight="medium">
-                  ☆12
-                </Text>
-              </Radio>
-            </HStack>
+            {["11", "12"].map((lv) => (
+              <div key={lv} className="flex items-center gap-2">
+                <RadioGroupItem
+                  value={lv}
+                  id={`lv-${lv}`}
+                  className="border-bpim-primary text-bpim-text"
+                />
+                <Label
+                  htmlFor={`lv-${lv}`}
+                  className="text-sm font-bold text-bpim-text cursor-pointer"
+                >
+                  ☆{lv}
+                </Label>
+              </div>
+            ))}
           </RadioGroup>
-        </VStack>
-      </Stack>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 };

@@ -1,14 +1,15 @@
-import { Box, Grid, Text, HStack, VStack, Button } from "@chakra-ui/react";
+﻿"use client";
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import dayjs from "@/lib/dayjs";
 import NextLink from "next/link";
 import {
-  PopoverArrow,
-  PopoverBody,
+  Popover,
   PopoverContent,
-  PopoverRoot,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { DashCard } from "@/components/ui/dashcard";
 
 interface ActivityData {
@@ -16,20 +17,28 @@ interface ActivityData {
   count: number;
 }
 
-const getActivityColor = (count: number, isFuture: boolean) => {
-  if (isFuture) return "transparent";
-  if (count === 0) return "#161b22";
-  if (count <= 5) return "#0e4429";
-  if (count <= 15) return "#006d32";
-  if (count <= 30) return "#26a641";
-  return "#39d353";
-};
-
 interface Props {
   data: ActivityData[];
   userId: string;
   version: string;
 }
+
+const ACTIVITY_VARS = [
+  "var(--activity-0)",
+  "var(--activity-1)",
+  "var(--activity-2)",
+  "var(--activity-3)",
+  "var(--activity-4)",
+] as const;
+
+const getActivityColor = (count: number, isFuture: boolean): string => {
+  if (isFuture) return "transparent";
+  if (count === 0) return ACTIVITY_VARS[0];
+  if (count <= 5) return ACTIVITY_VARS[1];
+  if (count <= 15) return ACTIVITY_VARS[2];
+  if (count <= 30) return ACTIVITY_VARS[3];
+  return ACTIVITY_VARS[4];
+};
 
 export const ActivityCalendar = ({ data, userId, version }: Props) => {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -42,87 +51,84 @@ export const ActivityCalendar = ({ data, userId, version }: Props) => {
     const days = [];
     const today = dayjs().tz().startOf("day");
     const endOfCalendar = dayjs().tz().endOf("week");
-
     const dataMap = new Map(
       data.map((d) => [dayjs(d.date).tz().format("YYYY-MM-DD"), d.count]),
     );
-
     for (let i = 370; i >= 0; i--) {
       const dateObj = endOfCalendar.subtract(i, "day");
       const dateStr = dateObj.format("YYYY-MM-DD");
       const isFuture = dateObj.isAfter(today, "day");
-
-      days.push({
-        date: dateStr,
-        count: dataMap.get(dateStr) || 0,
-        dayOfWeek: dateObj.day(),
-        isFuture: isFuture,
-      });
+      days.push({ date: dateStr, count: dataMap.get(dateStr) ?? 0, isFuture });
     }
     return days;
   }, [data]);
 
   useEffect(() => {
     if (scrollRef.current) {
-      const container = scrollRef.current;
-      container.scrollLeft = container.scrollWidth;
+      scrollRef.current.scrollLeft = scrollRef.current.scrollWidth;
     }
   }, [calendarDays]);
 
   return (
     <DashCard>
-      <Text fontSize="sm" fontWeight="bold" mb={4} color="gray.400">
-        最近の更新
-      </Text>
+      <p className="mb-4 text-sm font-bold text-bpim-muted">最近の更新</p>
 
-      <Box
+      <div
         ref={scrollRef}
-        overflowX="auto"
-        pb={2}
-        css={{
-          "&::-webkit-scrollbar": { height: "4px" },
-          "&::-webkit-scrollbar-thumb": {
-            background: "rgba(255,255,255,0.1)",
-            borderRadius: "10px",
-          },
-        }}
+        className="overflow-x-auto pb-2 [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-bpim-overlay"
       >
-        <HStack align="start" gap={3} minW="720px">
-          <VStack gap={0} pt={6} fontSize="10px" color="gray.500" align="start">
-            {["Mon", "Wed", "Fri"].map((day, idx) => (
-              <Box key={day} h="24px" display="flex" alignItems="center">
-                <Text transform="scale(0.8)">{day}</Text>
-              </Box>
-            ))}
-          </VStack>
+        <div className="flex items-start gap-3" style={{ minWidth: "720px" }}>
+          <div
+            className="grid text-[10px] text-bpim-subtle"
+            style={{
+              gridTemplateRows: "repeat(7, 11px)",
+              gap: "3px",
+              marginTop: "2px",
+            }}
+          >
+            <div className="h-[11px]" />
+            <div className="flex items-center h-[11px]">Mon</div>
+            <div className="h-[11px]" />
+            <div className="flex items-center h-[11px]">Wed</div>
+            <div className="h-[11px]" />
+            <div className="flex items-center h-[11px]">Fri</div>
+            <div className="h-[11px]" />
+          </div>
 
-          <Grid
-            templateRows="repeat(7, 1fr)"
-            templateColumns="repeat(53, 1fr)"
-            autoFlow="column"
-            gap="3px"
-            flex="1"
+          <div
+            className="flex-1"
+            style={{
+              display: "grid",
+              gridTemplateRows: "repeat(7, 1fr)",
+              gridTemplateColumns: "repeat(53, 1fr)",
+              gridAutoFlow: "column",
+              gap: "3px",
+            }}
           >
             {calendarDays.map((day) => {
               const isOpen = hoveredDate === day.date;
-
               return (
-                <PopoverRoot
+                <Popover
                   key={day.date}
                   open={isOpen}
-                  onOpenChange={(e) => {
-                    if (!e.open) setHoveredDate(null);
+                  onOpenChange={(open) => {
+                    if (!open) setHoveredDate(null);
                   }}
-                  positioning={{ placement: "top" }}
-                  portalled
                 >
                   <PopoverTrigger asChild>
-                    <Box
-                      w="11px"
-                      h="11px"
-                      bg={getActivityColor(day.count, day.isFuture)}
-                      borderRadius="2px"
-                      cursor={day.isFuture ? "default" : "pointer"}
+                    <div
+                      className={cn(
+                        "h-[11px] w-[11px] rounded-[2px] transition-all duration-200",
+                        !day.isFuture &&
+                          "cursor-pointer hover:scale-125 hover:brightness-125",
+                        day.isFuture && "cursor-default",
+                      )}
+                      style={{
+                        backgroundColor: getActivityColor(
+                          day.count,
+                          day.isFuture,
+                        ),
+                      }}
                       onMouseEnter={() => {
                         if (!isTouchDevice && !day.isFuture)
                           setHoveredDate(day.date);
@@ -135,75 +141,50 @@ export const ActivityCalendar = ({ data, userId, version }: Props) => {
                         e.stopPropagation();
                         setHoveredDate(isOpen ? null : day.date);
                       }}
-                      transition="all 0.2s"
-                      _hover={
-                        !day.isFuture
-                          ? {
-                              transform: "scale(1.2)",
-                              zIndex: 1,
-                              boxShadow: "0 0 8px rgba(57, 211, 83, 0.4)",
-                            }
-                          : {}
-                      }
                     />
                   </PopoverTrigger>
-
                   <PopoverContent
-                    bg="gray.800"
-                    color="white"
-                    borderColor="whiteAlpha.200"
-                    p={2}
-                    w="auto"
+                    side="top"
+                    className="w-auto border-bpim-border bg-bpim-surface-2 p-2"
                     onMouseEnter={() => setHoveredDate(day.date)}
                     onMouseLeave={() => setHoveredDate(null)}
                   >
-                    <PopoverArrow bg="gray.800" />
-                    <PopoverBody>
-                      <VStack align="stretch" gap={2}>
-                        <Text
-                          fontSize="xs"
-                          fontWeight="bold"
-                          whiteSpace="nowrap"
-                          color="white"
+                    <div className="flex flex-col gap-2">
+                      <p className="whitespace-nowrap text-xs font-bold text-bpim-text">
+                        {day.date}: {day.count} 件
+                      </p>
+                      <Button
+                        asChild
+                        size="sm"
+                        variant="secondary"
+                        className="h-6 text-[10px]"
+                      >
+                        <NextLink
+                          href={`/users/${userId}/logs/${version}/summary/${day.date}?groupedBy=lastPlayed`}
                         >
-                          {day.date}: {day.count} 件
-                        </Text>
-                        <Button
-                          asChild
-                          size="xs"
-                          colorPalette="blue"
-                          h="24px"
-                          fontSize="10px"
-                        >
-                          <NextLink
-                            href={`/users/${userId}/logs/${version}/summary/${day.date}?groupedBy=lastPlayed`}
-                          >
-                            サマリを表示
-                          </NextLink>
-                        </Button>
-                      </VStack>
-                    </PopoverBody>
+                          サマリを表示
+                        </NextLink>
+                      </Button>
+                    </div>
                   </PopoverContent>
-                </PopoverRoot>
+                </Popover>
               );
             })}
-          </Grid>
-        </HStack>
-      </Box>
+          </div>
+        </div>
+      </div>
 
-      <HStack justify="end" mt={3} gap={1} fontSize="10px" color="gray.500">
-        <Text>Less</Text>
+      <div className="mt-3 flex items-center justify-end gap-1 text-[10px] text-bpim-muted">
+        <span>Less</span>
         {[0, 5, 15, 30, 50].map((v) => (
-          <Box
+          <div
             key={v}
-            w="10px"
-            h="10px"
-            bg={getActivityColor(v, false)}
-            borderRadius="2px"
+            className="h-[10px] w-[10px] rounded-[2px]"
+            style={{ backgroundColor: getActivityColor(v, false) }}
           />
         ))}
-        <Text>More</Text>
-      </HStack>
+        <span>More</span>
+      </div>
     </DashCard>
   );
 };

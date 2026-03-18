@@ -1,38 +1,42 @@
-import { Box, Grid, Text } from "@chakra-ui/react";
+﻿import { cn } from "@/lib/utils";
 
-export const TimelineHeader = () => (
-  <Grid
-    templateColumns="auto 1fr"
-    gap={3}
-    px={3}
-    py={2}
-    borderBottom="1px solid"
-    borderColor="whiteAlpha.100"
-    bg="whiteAlpha.50"
-    backdropFilter={"blur(10px)"}
-    position="sticky"
-    top="0"
-    zIndex={1}
-  >
-    <Box w="32px" />
-    <Grid templateColumns="28px 1.5fr 1fr 1fr 1.2fr" gap={1}>
-      <HeaderText></HeaderText>
-      <HeaderText textAlign="right">RIVAL</HeaderText>
-      <HeaderText textAlign="right">GROWTH</HeaderText>
-      <HeaderText textAlign="right">YOU</HeaderText>
-      <HeaderText textAlign="right">DIFF</HeaderText>
-    </Grid>
-  </Grid>
-);
+export const TimelineHeader = () => {
+  return (
+    <div
+      className={cn(
+        "sticky top-0 z-20 flex w-full flex-col",
+        "border-b border-bpim-border bg-bpim-bg/80 backdrop-blur-md",
+        "px-3 py-2",
+      )}
+    >
+      <div className="grid grid-cols-[32px_1fr] gap-3">
+        <div className="w-8" />
 
-const HeaderText = ({ children, ...props }: any) => (
-  <Text
-    fontSize="9px"
-    fontWeight="bold"
-    color="gray.500"
-    letterSpacing="wider"
-    {...props}
+        <div className="grid grid-cols-[28px_1.5fr_1fr_1fr_1.2fr] gap-1">
+          <HeaderText />
+          <HeaderText className="text-right">RIVAL</HeaderText>
+          <HeaderText className="text-right">GROWTH</HeaderText>
+          <HeaderText className="text-right">YOU</HeaderText>
+          <HeaderText className="text-right">DIFF</HeaderText>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const HeaderText = ({
+  children,
+  className,
+}: {
+  children?: React.ReactNode;
+  className?: string;
+}) => (
+  <span
+    className={cn(
+      "text-[9px] font-bold tracking-wider text-bpim-muted uppercase",
+      className,
+    )}
   >
     {children}
-  </Text>
+  </span>
 );

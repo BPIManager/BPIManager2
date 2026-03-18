@@ -1,27 +1,23 @@
-import { DashCard } from "@/components/ui/dashcard";
-import { VStack, Text, Button, Icon } from "@chakra-ui/react";
+﻿import { DashCard } from "@/components/ui/dashcard";
 import { UserPlus } from "lucide-react";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export const RivalWinLossSummaryNotFound = () => {
   return (
-    <DashCard as={VStack} p={8}>
-      <Icon as={UserPlus} boxSize={10} color="gray.500" />
-      <VStack gap={1}>
-        <Text fontWeight="bold" color="white">
-          比較対象のライバルがいません
-        </Text>
-        <Text fontSize="xs" color="gray.500">
+    <DashCard className="flex flex-col items-center justify-center gap-4 p-8">
+      <UserPlus className="h-10 w-10 text-bpim-muted" />
+      <div className="flex flex-col items-center gap-1 text-center">
+        <p className="font-bold text-bpim-text">比較対象のライバルがいません</p>
+        <p className="text-xs text-bpim-muted">
           実力が近いユーザーをライバルに登録してスコアを比較できます！
-        </Text>
-      </VStack>
+        </p>
+      </div>
       <Button
         asChild
-        colorPalette="yellow"
-        variant="surface"
+        variant="outline"
         size="sm"
-        mt={2}
-        px={2}
+        className="mt-2 border-yellow-500/50 bg-yellow-500/10 px-4 text-yellow-500 transition-colors hover:bg-yellow-500/20 hover:text-yellow-400"
       >
         <Link href="/rivals/search">実力が近いユーザーを見る</Link>
       </Button>

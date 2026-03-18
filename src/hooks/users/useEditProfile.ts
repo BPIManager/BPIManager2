@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { useUser } from "@/contexts/users/UserContext";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
-import { toaster } from "@/components/ui/toaster";
 import { API_PREFIX } from "@/constants/apiEndpoints";
+import { toast } from "sonner";
 
 export const useEditProfile = (onClose?: () => void) => {
   const { user, fbUser, refresh } = useUser();
@@ -122,10 +122,10 @@ export const useEditProfile = (onClose?: () => void) => {
 
       if (!res.ok) throw new Error();
       await refresh?.();
-      toaster.create({ title: "保存しました", type: "success" });
+      toast.success("保存しました");
       onClose?.();
     } catch {
-      toaster.create({ title: "保存に失敗しました", type: "error" });
+      toast.error("保存に失敗しました");
     } finally {
       setIsSubmitting(false);
     }

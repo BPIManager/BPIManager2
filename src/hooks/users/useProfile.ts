@@ -1,19 +1,23 @@
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import { fetcher } from "@/utils/common/fetch";
 import { useUser } from "@/contexts/users/UserContext";
 import { useFollow } from "./useFollow";
 import { UserProfileResponse } from "@/types/users/profile";
-import { toaster } from "@/components/ui/toaster";
 import { API_PREFIX } from "@/constants/apiEndpoints";
+import { toast } from "sonner";
 
 export const useProfile = (userId: string | undefined) => {
   const { fbUser, isLoading: fbLoading } = useUser();
   const { requestFollow, isUpdating } = useFollow(userId);
+  const { mutate: globalMutate } = useSWRConfig();
 
-  const { data, error, isLoading, mutate } = useSWR<UserProfileResponse>(
+  const swrKey =
     !fbLoading && userId
       ? [`${API_PREFIX}/users/${userId}/profile`, fbUser]
-      : null,
+      : null;
+
+  const { data, error, isLoading, mutate } = useSWR<UserProfileResponse>(
+    swrKey,
     fetcher,
     { revalidateOnFocus: false, shouldRetryOnError: false },
   );
@@ -23,6 +27,12 @@ export const useProfile = (userId: string | undefined) => {
 
     const currentStatus = data.profile.relationship.isFollowing;
 
+    const updatedRelationship = {
+      ...data.profile.relationship,
+      isFollowing: !currentStatus,
+      isMutual: !currentStatus && data.profile.relationship.isFollowedBy,
+    };
+
     const optimisticData: UserProfileResponse = {
       ...data,
       profile: {
@@ -31,16 +41,15 @@ export const useProfile = (userId: string | undefined) => {
           ...data.profile.follows,
           followers: data.profile.follows.followers + (currentStatus ? -1 : 1),
         },
-        relationship: {
-          ...data.profile.relationship,
-          isFollowing: !currentStatus,
-        },
+        relationship: updatedRelationship,
       },
     };
 
     try {
+      const followPromise = requestFollow(currentStatus);
+
       await mutate(
-        requestFollow(currentStatus).then(() => optimisticData),
+        followPromise.then(() => optimisticData),
         {
           optimisticData,
           rollbackOnError: true,
@@ -48,12 +57,35 @@ export const useProfile = (userId: string | undefined) => {
           revalidate: true,
         },
       );
+
+      if (fbUser && userId) {
+        const compareKey = [
+          `${API_PREFIX}/users/${userId}/profile?compare=true`,
+          fbUser,
+        ];
+        await globalMutate(
+          compareKey,
+          (current: UserProfileResponse | undefined) => {
+            if (!current) return current;
+            return {
+              ...current,
+              profile: {
+                ...current.profile,
+                follows: {
+                  ...current.profile.follows,
+                  followers:
+                    current.profile.follows.followers +
+                    (currentStatus ? -1 : 1),
+                },
+                relationship: updatedRelationship,
+              },
+            };
+          },
+          { revalidate: true },
+        );
+      }
     } catch (e) {
-      toaster.create({
-        title: "リクエストが失敗しました",
-        description: "操作が完了しませんでした",
-        type: "error",
-      });
+      toast.error("操作が完了しませんでした");
     }
   };
 

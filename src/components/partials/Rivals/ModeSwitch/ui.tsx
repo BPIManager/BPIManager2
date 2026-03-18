@@ -1,6 +1,7 @@
-import { HStack, Text, Badge, Button } from "@chakra-ui/react";
-import { LuSwords, LuUser, LuChevronRight } from "react-icons/lu";
-import NextLink from "next/link";
+﻿import { Swords, User, ChevronRight } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface ModeSwitchBannerProps {
   type: "user" | "rival";
@@ -18,49 +19,56 @@ export const ModeSwitchBanner = ({
   const isRivalMode = type === "rival";
 
   return (
-    <HStack
-      mb={4}
-      p={3}
-      bg={isRivalMode ? "orange.900/20" : "blue.900/20"}
-      border="1px solid"
-      borderColor={isRivalMode ? "orange.700/40" : "blue.700/40"}
-      borderRadius="lg"
-      gap={2}
-      wrap="wrap"
+    <div
+      className={cn(
+        "mb-4 flex flex-wrap items-center gap-4 rounded-lg border p-3",
+        isRivalMode
+          ? "border-orange-500/30 bg-orange-500/10"
+          : "border-blue-500/30 bg-bpim-primary/10",
+      )}
     >
-      <HStack gap={2} flex="1" minW="fit-content">
-        <LuSwords size={16} color={isRivalMode ? "#f97316" : "#3b82f6"} />
-        <Text
-          fontSize="xs"
-          color={isRivalMode ? "orange.300" : "blue.300"}
-          fontWeight="bold"
-          whiteSpace="nowrap"
+      <div className="flex flex-1 items-center gap-2 min-w-fit">
+        <Swords
+          className={cn(
+            "h-4 w-4",
+            isRivalMode ? "text-bpim-warning" : "text-bpim-text",
+          )}
+        />
+        <span
+          className={cn(
+            "text-xs font-bold whitespace-nowrap",
+            isRivalMode ? "text-bpim-warning" : "text-bpim-primary",
+          )}
         >
           {isRivalMode ? "ライバル比較モード" : "スコアを比較しますか?"}
-        </Text>
-      </HStack>
+        </span>
+      </div>
 
       <Button
         asChild
-        size="xs"
         variant="outline"
-        colorPalette={isRivalMode ? "orange" : "blue"}
-        ml={{ base: 0, sm: "auto" }}
-        flexShrink={0}
-        px={2}
+        size="xs"
+        className={cn(
+          "h-7 px-2 font-bold transition-all",
+          isRivalMode
+            ? "border-orange-500/50 text-bpim-warning hover:bg-orange-500/20"
+            : "border-blue-500/50 text-bpim-primary hover:bg-bpim-primary/20",
+        )}
       >
-        <NextLink
+        <Link
           href={
             isRivalMode ? `/users/${targetUserId}` : `/rivals/${targetUserId}`
           }
         >
-          {isRivalMode ? <LuUser size={14} /> : <LuSwords size={14} />}
-          <Text as="span" ml={1}>
-            {isRivalMode ? "プロフィールを表示" : "スコア比較モード"}
-          </Text>
-          <LuChevronRight size={14} />
-        </NextLink>
+          {isRivalMode ? (
+            <User className="mr-1 h-3.5 w-3.5" />
+          ) : (
+            <Swords className="mr-1 h-3.5 w-3.5" />
+          )}
+          <span>{isRivalMode ? "プロフィールを表示" : "スコア比較モード"}</span>
+          <ChevronRight className="ml-1 h-3.5 w-3.5" />
+        </Link>
       </Button>
-    </HStack>
+    </div>
   );
 };

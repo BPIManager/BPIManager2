@@ -1,13 +1,15 @@
-import { Box, Text, HStack, VStack } from "@chakra-ui/react";
-import { keyframes } from "@emotion/react";
-import { DistributionChartSkeleton } from "@/components/partials/DashBoard/DistributionChart/skeleton";
+﻿import { DistributionChartSkeleton } from "@/components/partials/DashBoard/DistributionChart/skeleton";
 import { DashCard } from "@/components/ui/dashcard";
+import { cn } from "@/lib/utils";
+import { useChartColors } from "@/hooks/common/useChartColors";
 
-const bounceGrow = keyframes`
-  0% { transform: scaleY(0); }
-  60% { transform: scaleY(1.1); }
-  80% { transform: scaleY(0.95); }
-  100% { transform: scaleY(1); }
+const animationStyles = `
+  @keyframes bounceGrow {
+    0%   { transform: scaleY(0); }
+    60%  { transform: scaleY(1.1); }
+    80%  { transform: scaleY(0.95); }
+    100% { transform: scaleY(1); }
+  }
 `;
 
 export interface ChartData {
@@ -33,137 +35,88 @@ const ChartBarUnit = ({
   maxCount,
   color,
   index,
+  primaryColor,
+  warningColor,
 }: {
   label: string;
   myCount: number;
   rivalCount?: number;
   maxCount: number;
   color: string;
-  isRotated?: boolean;
   index: number;
+  primaryColor: string;
+  warningColor: string;
 }) => {
   const hasRival = rivalCount !== undefined;
   const myHeight = `${(myCount / maxCount) * 100}%`;
-  const rivalHeight = hasRival ? `${(rivalCount / maxCount) * 100}%` : "0%";
+  const rivalHeight = hasRival ? `${(rivalCount! / maxCount) * 100}%` : "0%";
 
   return (
-    <VStack
-      key={label}
-      flex="1 1 0%"
-      minW="0"
-      maxW="60px"
-      gap={0}
-      align="stretch"
-      h="180px"
-    >
-      <Box h="150px" position="relative" w="full">
-        <HStack
-          position="absolute"
-          bottom="25px"
-          left="0"
-          right="0"
-          h="100px"
-          align="flex-end"
-          justify="center"
-          gap={hasRival ? "2px" : "0"}
+    <div className="flex h-[180px] min-w-0 max-w-[60px] flex-1 flex-col items-stretch gap-0">
+      <div className="relative h-[150px] w-full">
+        <div
+          className={cn(
+            "absolute bottom-[25px] left-0 right-0 flex h-[100px] items-end justify-center",
+            hasRival ? "gap-[2px]" : "gap-0",
+          )}
         >
-          <VStack
-            h="full"
-            justify="flex-end"
-            flex="1"
-            minW="0"
-            position="relative"
-          >
-            <Text
-              fontSize="10px"
-              color="blue.300"
-              fontWeight="bold"
-              whiteSpace="nowrap"
-              visibility={myCount > 0 ? "visible" : "hidden"}
-              {...(hasRival
-                ? {
-                    position: "absolute",
-                    bottom: "calc(100% + 2px)",
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                  }
-                : {
-                    position: "relative",
-                    w: "full",
-                    textAlign: "center",
-                    mb: "2px",
-                  })}
+          <div className="relative flex h-full flex-1 min-w-0 flex-col justify-end">
+            <span
+              className={cn(
+                "whitespace-nowrap text-[10px] font-bold text-bpim-primary",
+                myCount > 0 ? "visible" : "hidden",
+                hasRival
+                  ? "absolute bottom-[calc(100%+2px)] left-1/2 -translate-x-1/2"
+                  : "relative mb-[2px] w-full text-center",
+              )}
             >
               {myCount}
-            </Text>
-            <Box
-              w="full"
-              h={myHeight}
-              bg={color}
-              borderRadius="t-xs"
-              transformOrigin="bottom"
-              animation={`${bounceGrow} 0.6s ease-out both`}
-              animationDelay={`${index * 0.04}s`}
-              opacity={0.9}
-              borderTop="2px solid"
-              borderColor="blue.300"
+            </span>
+            <div
+              className="w-full origin-bottom rounded-t-[2px] opacity-90 animate-[bounceGrow_0.6s_ease-out_both]"
+              style={{
+                height: myHeight,
+                backgroundColor: color,
+                borderTop: `2px solid ${primaryColor}`,
+                animationDelay: `${index * 0.04}s`,
+              }}
             />
-          </VStack>
+          </div>
 
           {hasRival && (
-            <VStack
-              h="full"
-              justify="flex-end"
-              flex="1"
-              minW="0"
-              position="relative"
-            >
-              <Box
-                w="full"
-                h={rivalHeight}
-                bg={color}
-                borderRadius="t-xs"
-                transformOrigin="bottom"
-                animation={`${bounceGrow} 0.6s ease-out both`}
-                animationDelay={`${index * 0.04 + 0.02}s`}
-                opacity={0.45}
-                borderTop="2px solid"
-                borderColor="orange.300"
+            <div className="relative flex h-full flex-1 min-w-0 flex-col justify-end">
+              <div
+                className="w-full origin-bottom rounded-t-[2px] opacity-45 animate-[bounceGrow_0.6s_ease-out_both]"
+                style={{
+                  height: rivalHeight,
+                  backgroundColor: color,
+                  borderTop: `2px solid ${warningColor}`,
+                  animationDelay: `${index * 0.04 + 0.02}s`,
+                }}
               />
-            </VStack>
+            </div>
           )}
-        </HStack>
+        </div>
 
         {hasRival && (
-          <Text
-            position="absolute"
-            bottom="5px"
-            left="50%"
-            transform="translateX(-50%)"
-            fontSize="10px"
-            color="orange.300"
-            fontWeight="bold"
-            visibility={rivalCount > 0 ? "visible" : "hidden"}
+          <span
+            className={cn(
+              "absolute bottom-[5px] left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] font-bold text-bpim-warning",
+              rivalCount! > 0 ? "visible" : "hidden",
+            )}
           >
             {rivalCount}
-          </Text>
+          </span>
         )}
-      </Box>
+      </div>
 
-      <Box h="1px" bg="whiteAlpha.200" w="full" />
-
-      <Box h="30px" display="flex" justifyContent="center">
-        <Text
-          fontSize="10px"
-          fontWeight="bold"
-          color="gray.400"
-          mt={2}
-          whiteSpace="nowrap"
-        >
+      <div className="h-[1px] w-full bg-bpim-overlay/60" />
+      <div className="flex h-[30px] justify-center">
+        <span className="mt-2 whitespace-nowrap text-[10px] font-bold text-bpim-muted">
           {label}
-        </Text>
-      </Box>
-    </VStack>
+        </span>
+      </div>
+    </div>
   );
 };
 
@@ -177,10 +130,9 @@ export const DistributionChart = ({
   rivalName = "ライバル",
   skeletonCount = 10,
 }: DistributionChartProps) => {
-  if (isLoading) {
-    return <DistributionChartSkeleton count={skeletonCount} />;
-  }
+  const c = useChartColors();
 
+  if (isLoading) return <DistributionChartSkeleton count={skeletonCount} />;
   if (!myData || myData.length === 0) return null;
 
   const rivalMap = rivalData
@@ -189,47 +141,31 @@ export const DistributionChart = ({
 
   const maxCount = Math.max(
     ...myData.map((d) => d.count),
-    ...(rivalData?.map((d) => d.count) || []),
+    ...(rivalData?.map((d) => d.count) ?? []),
     1,
   );
 
   return (
     <DashCard>
-      <HStack justify="space-between" mb={6}>
-        <Text
-          fontSize="sm"
-          fontWeight="bold"
-          color="gray.400"
-          textTransform="uppercase"
-        >
-          {title}
-        </Text>
+      <style dangerouslySetInnerHTML={{ __html: animationStyles }} />
 
+      <div className="mb-6 flex items-center justify-between">
+        <h3 className="text-sm font-bold uppercase text-bpim-muted">{title}</h3>
         {rivalData && (
-          <HStack gap={3}>
-            <HStack gap={1}>
-              <Box w="8px" h="8px" borderRadius="full" bg="blue.400" />
-              <Text fontSize="xs" color="blue.300">
-                {myName}
-              </Text>
-            </HStack>
-            <HStack gap={1}>
-              <Box
-                w="8px"
-                h="8px"
-                borderRadius="full"
-                bg="orange.400"
-                opacity={0.6}
-              />
-              <Text fontSize="xs" color="orange.300">
-                {rivalName}
-              </Text>
-            </HStack>
-          </HStack>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1">
+              <div className="h-2 w-2 rounded-full bg-bpim-primary" />
+              <span className="text-xs text-bpim-primary">{myName}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="h-2 w-2 rounded-full bg-bpim-warning opacity-60" />
+              <span className="text-xs text-bpim-warning">{rivalName}</span>
+            </div>
+          </div>
         )}
-      </HStack>
+      </div>
 
-      <HStack align="flex-start" justify="space-between" gap={1} px={1}>
+      <div className="flex items-start justify-between gap-1 px-1">
         {myData.map((item, i) => (
           <ChartBarUnit
             key={item.label}
@@ -239,9 +175,11 @@ export const DistributionChart = ({
             maxCount={maxCount}
             color={getColor(item.label)}
             index={i}
+            primaryColor={c.primary}
+            warningColor={c.warning}
           />
         ))}
-      </HStack>
+      </div>
     </DashCard>
   );
 };

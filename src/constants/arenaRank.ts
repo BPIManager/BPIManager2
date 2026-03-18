@@ -1,7 +1,5 @@
-import { createListCollection } from "@chakra-ui/react/collection";
-
 /** List collection for Arena Ranks */
-export const arenaRanks = [
+export const arenaRanks: { label: string; value: string }[] = [
   { label: "-", value: "-" },
   { label: "A1", value: "A1" },
   { label: "A2", value: "A2" },
@@ -15,6 +13,4 @@ export const arenaRanks = [
   { label: "B5", value: "B5" },
 ];
 
-export const arenaRanksCollection = createListCollection({
-  items: arenaRanks,
-});
+export const arenaRanksCollection = arenaRanks;

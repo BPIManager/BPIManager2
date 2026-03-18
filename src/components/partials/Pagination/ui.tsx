@@ -1,18 +1,6 @@
-import {
-  ButtonGroup,
-  Center,
-  IconButton,
-  Pagination as ChakraPagination,
-} from "@chakra-ui/react";
-import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
-
-interface CustomPaginationProps {
-  count: number;
-  pageSize: number;
-  page: number;
-  onPageChange: (page: number) => void;
-  isSticky?: boolean;
-}
+﻿import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export const CustomPagination = ({
   count,
@@ -20,73 +8,47 @@ export const CustomPagination = ({
   page,
   onPageChange,
   isSticky = true,
-}: CustomPaginationProps) => {
+}: any) => {
   if (count <= pageSize) return null;
+  const totalPages = Math.ceil(count / pageSize);
 
   const content = (
-    <ChakraPagination.Root
-      count={count}
-      pageSize={pageSize}
-      page={page}
-      onPageChange={(e) => {
-        onPageChange(e.page);
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      }}
-    >
-      <ButtonGroup variant="ghost" gap="1">
-        <ChakraPagination.PrevTrigger asChild>
-          <IconButton size="sm" aria-label="Previous Page">
-            <LuChevronLeft />
-          </IconButton>
-        </ChakraPagination.PrevTrigger>
-
-        <ChakraPagination.Items
-          render={(pageItem) => (
-            <IconButton
-              key={pageItem.value}
-              size="sm"
-              variant={pageItem.value === page ? "outline" : "ghost"}
-              onClick={() => {
-                pageItem.type === "page"
-                  ? undefined
-                  : (e: any) => e.preventDefault();
-              }}
-            >
-              {pageItem.value}
-            </IconButton>
-          )}
-        />
-
-        <ChakraPagination.NextTrigger asChild>
-          <IconButton size="sm" aria-label="Next Page">
-            <LuChevronRight />
-          </IconButton>
-        </ChakraPagination.NextTrigger>
-      </ButtonGroup>
-    </ChakraPagination.Root>
+    <div className="flex items-center gap-1">
+      <Button
+        variant="ghost"
+        size="icon"
+        disabled={page <= 1}
+        onClick={() => onPageChange(page - 1)}
+      >
+        <ChevronLeft className="h-4 w-4" />
+      </Button>
+      <div className="flex items-center gap-1 px-2">
+        <span className="font-mono text-sm font-bold text-bpim-text">
+          PAGE {page}
+        </span>
+        <span className="text-xs text-bpim-muted">/ {totalPages}</span>
+      </div>
+      <Button
+        variant="ghost"
+        size="icon"
+        disabled={page >= totalPages}
+        onClick={() => onPageChange(page + 1)}
+      >
+        <ChevronRight className="h-4 w-4" />
+      </Button>
+    </div>
   );
 
-  if (!isSticky) {
-    return <Center py={4}>{content}</Center>;
-  }
-
   return (
-    <Center
-      position="sticky"
-      bottom={0}
-      zIndex={20}
-      w="full"
-      h="70px"
-      borderTopWidth="1px"
-      borderColor="border"
-      backdropFilter="blur(12px)"
-      bg="bg/60"
-      _dark={{
-        bg: "black/60",
-        borderColor: "whiteAlpha.200",
-      }}
+    <div
+      className={cn(
+        "flex w-full items-center justify-center transition-all",
+        isSticky
+          ? "sticky bottom-0 z-30 h-16 border-t border-bpim-border bg-bpim-bg/60 backdrop-blur-xl"
+          : "py-4",
+      )}
     >
       {content}
-    </Center>
+    </div>
   );
 };

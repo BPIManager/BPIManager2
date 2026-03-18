@@ -1,9 +1,11 @@
-import { VStack } from "@chakra-ui/react";
+"use client";
+
 import { useTimeline } from "@/hooks/social/useTimeline";
 import { TimelineItem } from "./Card/ui";
 import { FilterParamsFrontend } from "@/types/songs/withScore";
 import { TimelineHeader } from "./header";
 import { InfiniteScrollContainer } from "../InfiniteScroll/ui";
+import { cn } from "@/lib/utils";
 
 interface TimelineListProps {
   mode: "all" | "played" | "overtaken";
@@ -14,15 +16,12 @@ export const TimelineList = ({ mode, params }: TimelineListProps) => {
   const res = useTimeline(mode, params);
 
   return (
-    <VStack
-      align="stretch"
-      gap={0}
-      w="full"
-      bg="blackAlpha.300"
-      borderRadius="xl"
-      overflow="hidden"
-      borderWidth="1px"
-      borderColor="whiteAlpha.100"
+    <div
+      className={cn(
+        "flex w-full flex-col gap-0 overflow-hidden",
+        "rounded-xl border border-bpim-border bg-bpim-bg/30",
+        "transition-all duration-300 shadow-xl",
+      )}
     >
       <InfiniteScrollContainer
         items={res.timeline}
@@ -34,6 +33,6 @@ export const TimelineList = ({ mode, params }: TimelineListProps) => {
         renderItem={(entry) => <TimelineItem key={entry.logId} entry={entry} />}
         maxH="full"
       />
-    </VStack>
+    </div>
   );
 };

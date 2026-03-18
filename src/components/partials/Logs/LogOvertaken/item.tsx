@@ -1,16 +1,7 @@
-import {
-  Box,
-  HStack,
-  VStack,
-  Text,
-  Badge,
-  Icon,
-  Stack,
-} from "@chakra-ui/react";
-import { Avatar } from "@/components/ui/avatar";
-import { LuChevronRight } from "react-icons/lu";
+﻿import { LuChevronRight } from "react-icons/lu";
 import { OvertakenRivalInfo } from "@/types/logs/overtaken";
 import { BatchDetailItem } from "@/hooks/batches/useBatchDetail";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface RankItemProps {
   item: BatchDetailItem;
@@ -28,124 +19,83 @@ export const OvertakeRankItem = ({ item, onClick }: RankItemProps) => {
   const isNew = !previous;
 
   return (
-    <Box
-      w="full"
-      p={4}
-      cursor="pointer"
-      _hover={{ bg: "whiteAlpha.50" }}
-      transition="background 0.2s"
+    <div
       onClick={onClick}
+      className="w-full p-4 cursor-pointer hover:bg-bpim-overlay/50 transition-colors flex flex-col gap-3 group"
     >
-      <VStack align="stretch" gap={3}>
-        <HStack justify="space-between" align="center" w="full">
-          <VStack align="flex-start" gap={1} flex={1}>
-            <Text fontSize="sm" fontWeight="bold" color="white" lineClamp={1}>
-              {item.title}
-            </Text>
-            <HStack gap={2}>
-              <Badge fontSize="9px" variant="subtle" colorScheme="gray" px={1}>
-                {String(item.difficulty || "")
-                  .slice(0, 1)
-                  .toUpperCase()}
-              </Badge>
-              <Text fontSize="10px" color="gray.600" fontWeight="bold">
-                ☆{item.level}
-              </Text>
-              {isNew && (
-                <Badge
-                  colorScheme="purple"
-                  variant="solid"
-                  fontSize="8px"
-                  px={1}
-                  lineHeight="1.4"
+      <div className="flex items-center justify-between w-full">
+        <div className="flex flex-col items-start gap-1 flex-1 min-w-0">
+          <span className="text-sm font-bold text-bpim-text truncate w-full">
+            {item.title}
+          </span>
+          <div className="flex items-center gap-2">
+            <span className="px-1 text-[9px] font-bold bg-bpim-overlay/60 text-bpim-muted rounded-sm uppercase">
+              {String(item.difficulty || "").slice(0, 1)}
+            </span>
+            <span className="text-[10px] text-bpim-subtle font-bold font-mono">
+              ☆{item.level}
+            </span>
+            {isNew && (
+              <span className="px-1 text-[8px] font-bold bg-purple-600 text-white rounded-sm leading-tight">
+                NEW
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-4 shrink-0">
+          <div className="flex items-center gap-1.5 text-xs text-bpim-muted font-mono">
+            <span className="font-medium">{previous?.exScore || 0}</span>
+            <LuChevronRight className="w-3 h-3" />
+            <span className="font-black text-bpim-text text-base">
+              {current.exScore}
+            </span>
+          </div>
+          <div className="flex h-6 min-w-[50px] items-center justify-center rounded-sm bg-bpim-primary px-2 text-xs font-bold text-bpim-text">
+            +{scoreDiff}
+          </div>
+        </div>
+      </div>
+
+      {hasOvertaken && (
+        <div className="flex flex-col gap-2 pl-3 py-2 border-l-2 border-yellow-600/50 bg-yellow-950/10 rounded-r-sm">
+          <div className="flex flex-col gap-1">
+            {overtaken
+              .sort(
+                (a, b) =>
+                  a.myNewScore - a.rivalScore - (b.myNewScore - b.rivalScore),
+              )
+              .map((rival: OvertakenRivalInfo) => (
+                <div
+                  key={rival.rivalUserId}
+                  className="flex items-center justify-between pr-2"
                 >
-                  NEW
-                </Badge>
-              )}
-            </HStack>
-          </VStack>
+                  <div className="flex items-center gap-2">
+                    <Avatar className="h-5 w-5 border border-bpim-border">
+                      <AvatarImage src={rival.rivalProfileImage ?? undefined} />
+                      <AvatarFallback className="text-[8px]">
+                        {rival.rivalName.slice(0, 2)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-xs font-medium text-bpim-text">
+                      {rival.rivalName}
+                    </span>
+                  </div>
 
-          <HStack gap={4}>
-            <HStack gap={1.5} fontSize="xs" color="gray.400">
-              <Text fontWeight="medium">{previous?.exScore || 0}</Text>
-              <Icon as={LuChevronRight} size="xs" />
-              <Text fontWeight="black" color="white" fontSize="md">
-                {current.exScore}
-              </Text>
-            </HStack>
-            <Badge
-              colorPalette="blue"
-              variant="solid"
-              size="md"
-              borderRadius="sm"
-              minW="50px"
-              display={"flex"}
-              justifyContent={"center"}
-            >
-              +{scoreDiff}
-            </Badge>
-          </HStack>
-        </HStack>
-
-        {hasOvertaken && (
-          <VStack
-            align="stretch"
-            gap={2}
-            pl={3}
-            py={2}
-            borderLeft="2px solid"
-            borderColor="yellow.600/50"
-            bg="yellow.950/10"
-            borderRadius="xs"
-          >
-            <Stack gap={1}>
-              {overtaken
-                .sort(
-                  (a, b) =>
-                    a.myNewScore - a.rivalScore - (b.myNewScore - b.rivalScore),
-                )
-                .map((rival: OvertakenRivalInfo) => (
-                  <HStack
-                    key={rival.rivalUserId}
-                    justify="space-between"
-                    pr={2}
-                  >
-                    <HStack gap={2}>
-                      <Avatar
-                        src={rival.rivalProfileImage ?? undefined}
-                        name={rival.rivalName}
-                        size="xs"
-                        border="1px solid"
-                        borderColor="whiteAlpha.100"
-                      />
-                      <Text fontSize="xs" color="gray.300" fontWeight="medium">
-                        {rival.rivalName}
-                      </Text>
-                    </HStack>
-
-                    <HStack gap={3}>
-                      <Text fontSize="xs" color="gray.500" fontWeight="mono">
-                        {rival.rivalScore}
-                      </Text>
-                      <Text
-                        fontSize="xs"
-                        fontWeight="bold"
-                        color="yellow.400"
-                        minW="40px"
-                        textAlign="right"
-                      >
-                        <Text as="span" fontSize="2xs" mr={0.5}>
-                          +
-                        </Text>
-                        {current.exScore - rival.rivalScore}
-                      </Text>
-                    </HStack>
-                  </HStack>
-                ))}
-            </Stack>
-          </VStack>
-        )}
-      </VStack>
-    </Box>
+                  <div className="flex items-center gap-3 font-mono">
+                    <span className="text-xs text-bpim-muted">
+                      {rival.rivalScore}
+                    </span>
+                    <div className="text-xs font-bold text-yellow-400 min-w-[40px] text-right">
+                      <span className="text-[10px] mr-0.5 opacity-80">+</span>
+                      {current.exScore - rival.rivalScore}
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+      )}
+    </div>
   );
 };

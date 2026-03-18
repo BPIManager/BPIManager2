@@ -1,6 +1,8 @@
-import { Box, Center, Input } from "@chakra-ui/react";
+﻿"use client";
+
 import { useState, useEffect } from "react";
 import { LuSearch } from "react-icons/lu";
+import { Input } from "@/components/ui/input";
 
 export const SearchInput = ({
   initialValue,
@@ -23,25 +25,16 @@ export const SearchInput = ({
   }, [value, initialValue, onSearch]);
 
   return (
-    <Box position="relative" flex="1">
-      <Center
-        position="absolute"
-        left={3}
-        top="0"
-        h="full"
-        color="gray.500"
-        zIndex={1}
-      >
-        <LuSearch />
-      </Center>
+    <div className="relative flex-1">
+      <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-bpim-muted">
+        <LuSearch className="h-4 w-4" />
+      </div>
       <Input
         placeholder="ユーザー名またはIIDX IDで検索"
-        pl={10}
-        bg="blackAlpha.400"
-        border="none"
+        className="h-10 pl-10 border-none bg-bpim-bg/40 text-bpim-text focus-visible:ring-blue-500"
         value={value}
         onChange={(e) => setValue(e.target.value)}
       />
-    </Box>
+    </div>
   );
 };

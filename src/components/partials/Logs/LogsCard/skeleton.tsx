@@ -1,78 +1,63 @@
-import {
-  Card,
-  HStack,
-  VStack,
-  Skeleton,
-  SkeletonCircle,
-  SimpleGrid,
-  Box,
-  Badge,
-} from "@chakra-ui/react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 export const LogsCardSkeleton = () => {
   return (
-    <Card.Root bg="gray.950" borderColor="gray.900" p={4} w="full">
-      <Card.Body p={0}>
-        <HStack justify="space-between" mb={3}>
-          <VStack align="start" gap={2}>
-            <Skeleton h="12px" w="120px" />
-            <Skeleton h="20px" w="80px" />
-          </VStack>
-          <Skeleton h="32px" w="100px" borderRadius="md" />
-        </HStack>
-        <VStack align="stretch" gap={2}>
-          <SimpleGrid columns={{ base: 1, md: 2 }} gap={2}>
-            {[1, 2].map((i) => (
-              <Skeleton key={i} h="32px" w="full" borderRadius="sm" />
-            ))}
-          </SimpleGrid>
-        </VStack>
-      </Card.Body>
-    </Card.Root>
+    <div className="w-full rounded-xl border border-bpim-border bg-bpim-bg p-4">
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex flex-col gap-2">
+          <Skeleton className="h-3 w-32" />
+          <Skeleton className="h-6 w-40" />
+        </div>
+        <Skeleton className="h-8 w-24 rounded-md" />
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Skeleton className="h-2.5 w-20 mb-1" />
+        <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+          <Skeleton className="h-10 w-full rounded-sm" />
+          <Skeleton className="h-10 w-full rounded-sm" />
+        </div>
+      </div>
+    </div>
   );
 };
 
 export const LogsGroupSkeleton = () => {
   return (
-    <Box position="relative">
-      <HStack gap={4} mb={4} position="relative" zIndex={1}>
-        <SkeletonCircle size="12px" display={{ base: "none", md: "block" }} />
-        <Skeleton h="24px" w="180px" />
-        <Skeleton h="20px" w="60px" borderRadius="full" />
-      </HStack>
+    <div className="relative">
+      <div className="flex items-center gap-4 mb-4 relative z-10">
+        <Skeleton className="hidden h-3 w-3 rounded-full md:block shrink-0" />
+        <Skeleton className="h-7 w-48" />
+        <Skeleton className="h-5 w-16 rounded-full" />
+      </div>
 
-      <Box
-        bg="bg.muted/50"
-        p={4}
-        borderRadius="lg"
-        mb={4}
-        ml={{ base: 0, md: 8 }}
-        borderWidth="1px"
-        borderColor="border/50"
+      <div
+        className={cn(
+          "rounded-lg border border-bpim-border bg-white/[0.02] p-4 mb-4",
+          "md:ml-8",
+        )}
       >
-        <HStack justify="space-between">
-          <HStack gap={8}>
-            <VStack align="start" gap={2}>
-              <Skeleton h="10px" w="60px" />
-              <Skeleton h="20px" w="100px" />
-            </VStack>
-            <VStack align="start" gap={2}>
-              <Skeleton h="10px" w="60px" />
-              <Skeleton h="20px" w="80px" />
-            </VStack>
-          </HStack>
-          <Skeleton
-            h="32px"
-            w="120px"
-            display={{ base: "none", sm: "block" }}
-          />
-        </HStack>
-      </Box>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex gap-8">
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-2.5 w-12" />
+              <Skeleton className="h-5 w-24" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-2.5 w-12" />
+              <Skeleton className="h-5 w-20" />
+            </div>
+          </div>
+          <Skeleton className="hidden h-9 w-32 rounded-md sm:block" />
+        </div>
+      </div>
 
-      <VStack align="stretch" gap={3} ml={{ base: 0, md: 8 }}>
+      {/* カードリスト */}
+      <div className="flex flex-col gap-3 md:ml-8">
         <LogsCardSkeleton />
         <LogsCardSkeleton />
-      </VStack>
-    </Box>
+      </div>
+    </div>
   );
 };

@@ -1,7 +1,8 @@
-import { HStack, Button, Text, Box, VStack } from "@chakra-ui/react";
-import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
+﻿import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
 import { useRouter } from "next/router";
 import dayjs from "@/lib/dayjs";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface BatchRef {
   batchId: string;
@@ -10,9 +11,6 @@ interface BatchRef {
 
 interface LogNavigatorProps {
   type: "batch" | "daily" | "weekly" | "monthly";
-  userId: string | undefined;
-  version: string | undefined;
-  date?: string;
   pagination: {
     prev: BatchRef | null;
     next: BatchRef | null;
@@ -22,13 +20,7 @@ interface LogNavigatorProps {
   };
 }
 
-export const LogNavigator = ({
-  type,
-  userId,
-  version,
-  date,
-  pagination,
-}: LogNavigatorProps) => {
+export const LogNavigator = ({ type, pagination }: LogNavigatorProps) => {
   const router = useRouter();
 
   const formatDateLabel = (dateString: string) => {
@@ -39,25 +31,17 @@ export const LogNavigator = ({
   };
 
   const navigateTo = (target: string) => {
+    const query = { ...router.query };
     if (type === "batch") {
-      router.push(
-        {
-          pathname: router.pathname,
-          query: { ...router.query, batchId: target },
-        },
-        undefined,
-        { shallow: true },
-      );
+      query.batchId = target;
     } else {
-      router.push(
-        {
-          pathname: router.pathname,
-          query: { ...router.query, date: target, groupedBy: "lastPlayed" },
-        },
-        undefined,
-        { shallow: true },
-      );
+      query.date = target;
+      query.groupedBy = "lastPlayed";
     }
+
+    router.push({ pathname: router.pathname, query }, undefined, {
+      shallow: true,
+    });
   };
 
   const hasPrev = !!pagination.prev;
@@ -85,91 +69,57 @@ export const LogNavigator = ({
     .format("M月D日 HH:mm");
 
   return (
-    <HStack
-      w="full"
-      bg="gray.950"
-      p={2}
-      borderRadius="xl"
-      border="1px solid"
-      borderColor="whiteAlpha.100"
-      mb={6}
-      gap={0}
-    >
-      <Box flex="1" display="flex" justifyContent="flex-start">
+    <nav className="mb-6 flex w-full items-center justify-between gap-0 rounded-xl border border-bpim-border bg-bpim-bg p-2">
+      <div className="flex flex-1 justify-start">
         <Button
           variant="ghost"
           size="sm"
-          px={2}
+          className={cn(
+            "group flex h-auto items-center px-2 text-bpim-muted hover:bg-bpim-overlay/50 hover:text-bpim-primary",
+            !hasPrev && "opacity-30",
+          )}
           disabled={!hasPrev}
           onClick={() => prevVal && navigateTo(prevVal)}
-          color="gray.400"
-          _hover={{ color: "blue.400", bg: "whiteAlpha.50" }}
         >
-          <LuChevronLeft />
-          <VStack
-            align="start"
-            gap={0}
-            ml={2}
-            display={{ base: "none", md: "flex" }}
-          >
-            <Text fontSize="10px" color="gray.600" letterSpacing="tighter">
+          <LuChevronLeft className="h-5 w-5 shrink-0" />
+          <div className="ml-2 hidden flex-col items-start gap-0 md:flex">
+            <span className="text-[10px] tracking-tighter text-bpim-subtle uppercase">
               {type === "batch" ? "PREVIOUS BATCH" : "PREVIOUS DAY"}
-            </Text>
-            <Text fontSize="xs" fontWeight="bold">
-              {prevLabel}
-            </Text>
-          </VStack>
+            </span>
+            <span className="text-xs font-bold leading-tight">{prevLabel}</span>
+          </div>
         </Button>
-      </Box>
+      </div>
 
-      <Box px={4} textAlign="center">
-        <VStack gap={0}>
-          <Text
-            fontSize="2xs"
-            fontWeight="bold"
-            color="gray.500"
-            letterSpacing="widest"
-          >
-            {type === "batch" ? "更新日時" : "対象日"}
-          </Text>
-          <Text
-            fontSize="sm"
-            fontWeight="bold"
-            color="white"
-            fontFamily="mono"
-            whiteSpace="nowrap"
-          >
-            {currentLabel}
-          </Text>
-        </VStack>
-      </Box>
+      <div className="flex flex-col items-center gap-0 px-4 text-center shrink-0">
+        <span className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
+          {type === "batch" ? "更新日時" : "対象日"}
+        </span>
+        <span className="font-mono text-sm font-bold text-bpim-text whitespace-nowrap">
+          {currentLabel}
+        </span>
+      </div>
 
-      <Box flex="1" display="flex" justifyContent="flex-end">
+      <div className="flex flex-1 justify-end">
         <Button
           variant="ghost"
           size="sm"
-          px={2}
+          className={cn(
+            "group flex h-auto items-center px-2 text-bpim-muted hover:bg-bpim-overlay/50 hover:text-bpim-primary",
+            !hasNext && "opacity-30",
+          )}
           disabled={!hasNext}
           onClick={() => nextVal && navigateTo(nextVal)}
-          color="gray.400"
-          _hover={{ color: "blue.400", bg: "whiteAlpha.50" }}
         >
-          <VStack
-            align="end"
-            gap={0}
-            mr={2}
-            display={{ base: "none", md: "flex" }}
-          >
-            <Text fontSize="10px" color="gray.600" letterSpacing="tighter">
+          <div className="mr-2 hidden flex-col items-end gap-0 md:flex">
+            <span className="text-[10px] tracking-tighter text-bpim-subtle uppercase">
               {type === "batch" ? "NEXT BATCH" : "NEXT DAY"}
-            </Text>
-            <Text fontSize="xs" fontWeight="bold">
-              {nextLabel}
-            </Text>
-          </VStack>
-          <LuChevronRight />
+            </span>
+            <span className="text-xs font-bold leading-tight">{nextLabel}</span>
+          </div>
+          <LuChevronRight className="h-5 w-5 shrink-0" />
         </Button>
-      </Box>
-    </HStack>
+      </div>
+    </nav>
   );
 };

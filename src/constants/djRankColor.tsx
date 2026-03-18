@@ -1,3 +1,5 @@
+import { ChartColors } from "@/hooks/common/useChartColors";
+
 export const RANK_COLORS: Record<string, string> = {
   F: "#4A5568",
   E: "#718096",
@@ -8,4 +10,26 @@ export const RANK_COLORS: Record<string, string> = {
   AA: "#4299E1",
   AAA: "#F6E05E",
   "MAX-": "#E2E8F0",
+};
+
+const RANK_ORDER: Record<string, number> = {
+  F: 0,
+  E: 1,
+  D: 2,
+  C: 3,
+  B: 4,
+  A: 5,
+  AA: 6,
+  AAA: 7,
+  "MAX-": 8,
+};
+
+export const getRankColorFromTheme = (
+  label: string,
+  colors: ChartColors,
+): string => {
+  const rank = RANK_ORDER[label] ?? 0;
+  const total = 8;
+  const opacity = 0.15 + (rank / total) * 0.85;
+  return colors.primaryRgba(opacity);
 };

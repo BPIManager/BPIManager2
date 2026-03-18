@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { toaster } from "@/components/ui/toaster";
 import { parseCSV } from "@/utils/csv/parse";
 import { API_PREFIX } from "@/constants/apiEndpoints";
+import { toast } from "sonner";
 
 export const useBatchImport = (fbUser: any, refresh: () => Promise<void>) => {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -24,10 +24,7 @@ export const useBatchImport = (fbUser: any, refresh: () => Promise<void>) => {
         const text = await navigator.clipboard.readText();
         if (!text.trim()) throw new Error("データが空です。");
         targetData = text;
-        toaster.create({
-          title: "クリップボードから読み込みました",
-          type: "info",
-        });
+        toast.info("クリップボードから読み込みました");
       }
 
       setProcessStatus("CSVを解析中...");
@@ -62,22 +59,14 @@ export const useBatchImport = (fbUser: any, refresh: () => Promise<void>) => {
           newTotalBpi: result.newTotalBpi,
         });
       } else {
-        toaster.create({
-          title: "更新なし",
-          description: "最新の状態です",
-          type: "info",
-        });
+        toast.info("すでに最新の状態です");
       }
       await navigator.clipboard.writeText("");
 
       await refresh();
       return true;
     } catch (e: any) {
-      toaster.create({
-        title: "エラー",
-        description: e.message,
-        type: "error",
-      });
+      toast.error(e.message);
       return false;
     } finally {
       setIsProcessing(false);

@@ -1,14 +1,16 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { Stack, Skeleton } from "@chakra-ui/react";
 import { useArenaAverages } from "@/hooks/metrics/useArenaAverage";
 import { ArenaAverageTable } from "@/components/partials/Metrics/ArenaAverage/ui";
 import { PageContainer, PageHeader } from "@/components/partials/Header";
 import { Meta } from "@/components/partials/Head";
 import { DashboardLayout } from "@/components/partials/Main";
 import { ArenaAverageFilter } from "@/components/partials/Metrics/LevelSelector/ui";
-import { latestVersion } from "@/constants/latestVersion";
-import { useEffect, useState } from "react";
 import { ArenaAverageFilterSkeleton } from "@/components/partials/Metrics/LevelSelector/skeleton";
+import { latestVersion } from "@/constants/latestVersion";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const ArenaMetricsView = ({
   version: initialVersion,
@@ -17,12 +19,14 @@ export const ArenaMetricsView = ({
 }) => {
   const router = useRouter();
   const [isNavigating, setIsNavigating] = useState<boolean>(false);
+
   const v = router.isReady
     ? (router.query.version as string) || initialVersion || latestVersion
     : initialVersion || latestVersion;
   const level = (router.query.difficultyLevel as string) || "12";
 
   const { averages, isLoading } = useArenaAverages(v, parseInt(level));
+
   useEffect(() => {
     const handleStart = (url: string) => {
       if (url !== router.asPath) setIsNavigating(true);
@@ -50,42 +54,49 @@ export const ArenaMetricsView = ({
       { shallow: false },
     );
   };
+
   const isInitialLoading = !router.isReady || isLoading;
   const showLoading = !router.isReady || isLoading || isNavigating;
 
   return (
     <DashboardLayout>
-      <PageHeader
-        title="アリーナランク別平均"
-        description={`アリーナランク別平均スコアを確認できます`}
-      />
       <Meta
         title={`アリーナ平均 (Ver.${v} ☆${level})`}
-        description={`アリーナランク別平均スコアを確認できます`}
+        description="アリーナランク別平均スコアを確認できます"
+        noIndex
+      />
+
+      <PageHeader
+        title="アリーナランク別平均"
+        description="アリーナランク別平均スコアを確認できます"
       />
 
       <PageContainer>
-        <Stack gap="6">
+        <div className="flex flex-col gap-6">
           {isInitialLoading ? (
             <ArenaAverageFilterSkeleton />
           ) : (
             <ArenaAverageFilter
               version={v}
-              onVersionChange={(newV) => handleFilterChange(newV, level)}
+              onVersionChange={(newV: string) =>
+                handleFilterChange(newV, level)
+              }
               level={level}
-              onLevelChange={(newL) => handleFilterChange(v, newL)}
+              onLevelChange={(newL: string) => handleFilterChange(v, newL)}
             />
           )}
 
           {showLoading ? (
-            <Stack>
-              <Skeleton height="40px" width="full" />
-              <Skeleton height="300px" width="full" />
-            </Stack>
+            <div className="flex flex-col gap-4">
+              <Skeleton className="h-10 w-full rounded-md" />
+              <Skeleton className="h-[400px] w-full rounded-xl" />
+            </div>
           ) : (
-            <ArenaAverageTable data={averages} />
+            <div className="w-full animate-in fade-in duration-500">
+              <ArenaAverageTable data={averages} />
+            </div>
           )}
-        </Stack>
+        </div>
       </PageContainer>
     </DashboardLayout>
   );

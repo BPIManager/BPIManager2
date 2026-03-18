@@ -1,63 +1,30 @@
-import {
-  Box,
-  VStack,
-  Text,
-  Button,
-  Stack,
-  Icon,
-  HStack,
-  Spinner,
-  Badge,
-} from "@chakra-ui/react";
-import { LuRefreshCw, LuDatabase, LuUser } from "react-icons/lu";
-import { useUser } from "@/contexts/users/UserContext";
+﻿import { LuUser, LuSettings2 } from "react-icons/lu";
 import { useState } from "react";
-import { Cog } from "lucide-react";
 import AccountSettings from "../../Modal/AccountSettings";
+import { Button } from "@/components/ui/button";
 
 export default function AccountSettingsUi() {
-  const { fbUser } = useUser();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-
+  const [isOpen, setIsOpen] = useState(false);
   return (
-    <Box
-      p={6}
-      bg="gray.900"
-      borderRadius="xl"
-      borderWidth="1px"
-      borderColor="whiteAlpha.100"
-    >
-      <Stack
-        direction={{ base: "column", md: "row" }}
-        justify="space-between"
-        align={{ base: "start", md: "center" }}
-        gap={6}
+    <div className="mt-4 flex flex-col gap-6 rounded-xl border border-bpim-border bg-bpim-bg p-6 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-1">
+        <div className="flex items-center gap-2 text-bpim-primary">
+          <LuUser className="h-4 w-4" />
+          <span className="font-bold">プロフィール設定</span>
+        </div>
+        <p className="text-sm text-bpim-muted">
+          BPIM2のユーザープロフィールを設定します。
+        </p>
+      </div>
+      <Button
+        variant="outline"
+        onClick={() => setIsOpen(true)}
+        className="w-full md:w-auto gap-2"
       >
-        <VStack align="start" gap={1}>
-          <HStack color="blue.400">
-            <Icon as={LuUser} />
-            <Text fontWeight="bold">プロフィール設定</Text>
-          </HStack>
-          <Text fontSize="sm" color="gray.400">
-            BPIM2のユーザープロフィールを設定します。
-          </Text>
-        </VStack>
-
-        <Button
-          px={2}
-          size="md"
-          onClick={() => setIsDialogOpen(true)}
-          w={{ base: "full", md: "auto" }}
-          variant="outline"
-        >
-          <Cog />
-          開く
-        </Button>
-      </Stack>
-      <AccountSettings
-        isOpen={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
-      />
-    </Box>
+        <LuSettings2 className="h-4 w-4" />
+        開く
+      </Button>
+      <AccountSettings isOpen={isOpen} onClose={() => setIsOpen(false)} />
+    </div>
   );
 }

@@ -1,11 +1,11 @@
-import { createListCollection } from "@chakra-ui/react/collection";
-
-export const versionTitles: {
+export interface VersionTitle {
   num: string;
   title: string;
   default?: boolean;
   disabled?: boolean;
-}[] = [
+}
+
+export const versionTitles: VersionTitle[] = [
   { num: "26", title: "26 Rootage", disabled: true },
   { num: "27", title: "27 HEROIC VERSE", disabled: true },
   { num: "28", title: "28 BISTROVER", disabled: true },
@@ -16,27 +16,30 @@ export const versionTitles: {
   { num: "33", title: "33 Sparkle Shower", default: true },
 ];
 
-export const getVersionNameFromNumber = (v: number) => {
+export const getVersionNameFromNumber = (v: number | string): string => {
   const version = versionTitles.find((item) => item.num === String(v));
-  return version ? version.title : "undefined";
+  return version ? version.title : "Unknown Version";
 };
 
-export const versionsCollection = createListCollection({
-  items: versionTitles.map((v) => ({
+export const versionsOptions = versionTitles.map((v) => ({
+  label: v.title,
+  value: v.num,
+  disabled: v.disabled,
+}));
+
+export const activeVersionsOptions = versionTitles
+  .filter((v) => !v.disabled)
+  .map((v) => ({
     label: v.title,
     value: v.num,
-    disabled: v.disabled,
-  })),
-});
+  }));
 
-export const versionsNonDisabledCollection = createListCollection({
-  items: versionTitles.map((v) => ({
-    label: v.title,
-    value: v.num,
-  })),
-});
+export const versionsNonDisabledCollection = versionTitles.map((v) => ({
+  label: v.title,
+  value: v.num,
+}));
 
-export const verNameArr = [
+export const verNameArr: string[] = [
   "",
   "",
   "",

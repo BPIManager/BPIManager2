@@ -1,101 +1,89 @@
-import { HStack, VStack, Text, Badge, Box } from "@chakra-ui/react";
-import { diffColors, getLampColor } from "../../../Table/table";
+﻿"use client";
+
+import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { diffColors, getLampClass } from "../../../Table/table";
+
+interface SimpleRankItemProps {
+  item: any;
+  rank: number;
+  onClick: () => void;
+}
 
 export const SimpleRankItem = ({
   item,
   rank,
   onClick,
-}: {
-  item: any;
-  rank: number;
-  onClick: () => void;
-}) => {
-  const lampColor = getLampColor(item.clearState);
+}: SimpleRankItemProps) => {
+  const lampClass = getLampClass(item.clearState);
   const isFullCombo = item.clearState === "FULLCOMBO CLEAR";
 
+  const difficultyBg = diffColors[item.difficulty] || "bg-bpim-surface-2";
+
   return (
-    <HStack
-      p={3}
-      pl={4}
-      justify="space-between"
-      borderBottom="1px solid"
-      borderColor="whiteAlpha.100"
-      gap={3}
-      position="relative"
-      _hover={{ bg: "whiteAlpha.50", cursor: "pointer" }}
+    <div
       onClick={onClick}
-      _before={{
-        content: '""',
-        position: "absolute",
-        left: 0,
-        top: 0,
-        bottom: 0,
-        width: "4px",
-
-        background: isFullCombo
-          ? "linear-gradient(to bottom, #ff0000, #8b00ff)"
-          : lampColor,
-        zIndex: 1,
-      }}
+      className={cn(
+        "group relative flex items-center justify-between gap-3 p-3 pl-4 transition-colors duration-200",
+        "border-b border-bpim-border cursor-pointer hover:bg-bpim-overlay/50",
+      )}
     >
-      <HStack flex={1} minW={0} gap={2}>
-        <Box w="14px" flexShrink={0}>
-          <Text
-            fontSize="10px"
-            fontWeight="bold"
-            color="gray.600"
-            fontFamily="mono"
-            textAlign="center"
-          >
-            {rank}
-          </Text>
-        </Box>
+      <div
+        className={cn(
+          "absolute inset-y-0 left-0 w-1 z-10",
+          isFullCombo
+            ? "bg-gradient-to-b from-yellow-300 to-yellow-500"
+            : lampClass,
+        )}
+      />
 
-        <VStack align="start" gap={0} minW={0}>
-          <Text fontSize="sm" fontWeight="bold" color="white" lineClamp={1}>
+      <div className="flex flex-1 items-center gap-3 min-w-0">
+        <div className="w-4 shrink-0">
+          <span className="font-mono text-[10px] font-bold text-bpim-subtle block text-center">
+            {rank}
+          </span>
+        </div>
+
+        <div className="flex flex-col gap-0.5 min-w-0">
+          <span className="truncate text-sm font-bold text-bpim-text tracking-tight">
             {item.title}
-          </Text>
-          <HStack gap={1}>
+          </span>
+          <div className="flex items-center gap-1.5">
             <Badge
-              variant="solid"
-              bg={diffColors[item.difficulty] || "gray.800"}
-              color="white"
-              fontSize="9px"
-              px={1}
-              borderRadius="sm"
-              h="14px"
-              display="flex"
-              alignItems="center"
+              className={cn(
+                "h-3.5 px-1 text-[9px] border-none rounded-sm text-white flex items-center",
+                difficultyBg,
+              )}
             >
               {String(item.difficulty || "")
                 .charAt(0)
                 .toUpperCase()}
             </Badge>
-            <Text fontSize="10px" color="gray.500" fontWeight="bold">
+            <span className="text-[10px] font-bold text-bpim-muted">
               ☆{item.difficultyLevel}
-            </Text>
-          </HStack>
-        </VStack>
-      </HStack>
+            </span>
+          </div>
+        </div>
+      </div>
 
-      <HStack gap={4} flexShrink={0} fontFamily="mono">
-        <VStack align="end" gap={0}>
-          <Text fontSize="9px" color="gray.600" lineHeight="1">
+      <div className="flex shrink-0 items-center gap-4 font-mono">
+        <div className="flex flex-col items-end gap-0">
+          <span className="text-[9px] font-bold text-bpim-subtle leading-none">
             EX
-          </Text>
-          <Text fontSize="sm" fontWeight="bold" color="gray.200">
+          </span>
+          <span className="text-sm font-bold text-bpim-text leading-tight">
             {item.current.exScore}
-          </Text>
-        </VStack>
-        <VStack align="end" gap={0}>
-          <Text fontSize="9px" color="gray.600" lineHeight="1">
+          </span>
+        </div>
+        <div className="flex flex-col items-end gap-0">
+          <span className="text-[9px] font-bold text-bpim-subtle leading-none">
             BPI
-          </Text>
-          <Text fontSize="sm" fontWeight="bold" color="blue.300">
+          </span>
+          <span className="text-sm font-bold text-bpim-primary leading-tight">
             {(item.current.bpi ?? -15).toFixed(2)}
-          </Text>
-        </VStack>
-      </HStack>
-    </HStack>
+          </span>
+        </div>
+      </div>
+    </div>
   );
 };

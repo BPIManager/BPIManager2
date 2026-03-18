@@ -1,16 +1,14 @@
-"use client";
-
-import { Provider } from "@/components/ui/provider";
-import { Toaster } from "@/components/ui/toaster";
-import { UserProvider } from "@/contexts/users/UserContext";
 import "@/styles/globals.css";
+
+import { UserProvider } from "@/contexts/users/UserContext";
 import type { AppProps } from "next/app";
 import { PagesProgressBar as ProgressBar } from "next-nprogress-bar";
-import { DarkMode } from "@/components/ui/color-mode";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "sonner";
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <Provider>
+    <>
       <ProgressBar
         height="3px"
         color="#3182ce"
@@ -18,11 +16,11 @@ export default function App({ Component, pageProps }: AppProps) {
         shallowRouting
       />
       <UserProvider>
-        <DarkMode>
+        <TooltipProvider>
           <Toaster />
           <Component {...pageProps} />
-        </DarkMode>
+        </TooltipProvider>
       </UserProvider>
-    </Provider>
+    </>
   );
 }

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { toBlob } from "html-to-image";
 import { v4 as uuidv4 } from "uuid";
-import { toaster } from "@/components/ui/toaster";
+import { toast } from "sonner";
 
 export const useShareResult = () => {
   const [isSharing, setIsSharing] = useState(false);
@@ -43,11 +43,7 @@ export const useShareResult = () => {
       }
     } catch (error) {
       console.log(error);
-      toaster.create({
-        title: "Error",
-        description: "Failed to generate a image",
-        type: "error",
-      });
+      toast.error("Failed to generate a image");
       return false;
     } finally {
       setIsSharing(false);

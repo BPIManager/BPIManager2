@@ -30,7 +30,6 @@ export default function SettingsPage() {
           iconColor="blue.400"
         />
         <ReusableMenuItem
-          mt={4}
           href={
             "/metrics/arenaAverage/" +
             String(Number(latestVersion) - 1) +

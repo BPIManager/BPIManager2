@@ -1,11 +1,11 @@
-import { Meta } from "@/components/partials/Head";
+﻿import { Meta } from "@/components/partials/Head";
 import { LogsDetailContent } from "@/components/partials/Logs/LogsDetail/content";
 import { LogsDetailView } from "@/components/partials/Logs/LogsDetail/ui";
 import { DashboardLayout } from "@/components/partials/Main";
 import { UserProfileLayout } from "@/components/partials/Profile/Layout/layout";
 import { ProfileMeta } from "@/components/partials/Profile/Meta/ui";
 import { useUser } from "@/contexts/users/UserContext";
-import { Box, Center, Spinner } from "@chakra-ui/react";
+import { Loader2 } from "lucide-react";
 import { useRouter } from "next/router";
 
 export default function BatchLogsPage() {
@@ -17,11 +17,9 @@ export default function BatchLogsPage() {
 
   if (isInitialLoading) {
     return (
-      <DashboardLayout>
-        <Center>
-          <Spinner size="sm" />
-        </Center>
-      </DashboardLayout>
+      <div className="flex h-[90vh] w-full items-center justify-center">
+        <Loader2 className="h-10 w-10 animate-spin text-bpim-text" />
+      </div>
     );
   }
 
@@ -42,7 +40,7 @@ export default function BatchLogsPage() {
   return (
     <UserProfileLayout userId={userId as string} currentTab="logs">
       <ProfileMeta title={`プレイログ: ${batchId}`} />
-      <Box p={4}>
+      <div className="p-4">
         <LogsDetailContent
           isPublicPage
           type="batch"
@@ -50,7 +48,7 @@ export default function BatchLogsPage() {
           version={version as string}
           batchId={batchId as string}
         />
-      </Box>
+      </div>
     </UserProfileLayout>
   );
 }

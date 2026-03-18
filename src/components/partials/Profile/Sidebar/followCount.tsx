@@ -1,5 +1,4 @@
-import { HStack, Link, VStack, Text } from "@chakra-ui/react";
-import NextLink from "next/link";
+﻿import Link from "next/link";
 
 export const FollowStats = ({
   userId,
@@ -8,30 +7,28 @@ export const FollowStats = ({
   userId: string;
   follows: any;
 }) => (
-  <HStack gap={6} justify="center" w="full" py={2}>
-    <Link asChild>
-      <NextLink href={`/users/${userId}/following`}>
-        <VStack gap={0}>
-          <Text fontWeight="bold" fontSize="md" color="white" fontFamily="mono">
-            {follows.following}
-          </Text>
-          <Text fontSize="xs" color="gray.500">
-            フォロー
-          </Text>
-        </VStack>
-      </NextLink>
+  <div className="flex w-full items-center justify-center gap-8 py-2">
+    <Link
+      href={`/users/${userId}/following`}
+      className="group flex flex-col items-center"
+    >
+      <span className="font-mono text-lg font-bold text-bpim-text group-hover:text-bpim-primary transition-colors">
+        {follows.following}
+      </span>
+      <span className="text-[10px] font-bold uppercase tracking-widest text-bpim-muted">
+        フォロー
+      </span>
     </Link>
-    <Link asChild>
-      <NextLink href={`/users/${userId}/followers`}>
-        <VStack gap={0}>
-          <Text fontWeight="bold" fontSize="md" color="white" fontFamily="mono">
-            {follows.follower}
-          </Text>
-          <Text fontSize="xs" color="gray.500">
-            フォロワー
-          </Text>
-        </VStack>
-      </NextLink>
+    <Link
+      href={`/users/${userId}/followers`}
+      className="group flex flex-col items-center"
+    >
+      <span className="font-mono text-lg font-bold text-bpim-text group-hover:text-bpim-primary transition-colors">
+        {follows.follower}
+      </span>
+      <span className="text-[10px] font-bold uppercase tracking-widest text-bpim-muted">
+        フォロワー
+      </span>
     </Link>
-  </HStack>
+  </div>
 );

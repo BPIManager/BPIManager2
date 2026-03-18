@@ -1,5 +1,5 @@
-import { Box, Stack, VStack, HStack, Text } from "@chakra-ui/react";
-import { Checkbox } from "@/components/ui/checkbox";
+﻿import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { IIDX_LEVELS, IIDX_DIFFICULTIES } from "@/constants/diffs";
 
 interface RivalFilterProps {
@@ -16,68 +16,54 @@ export const RivalFilter = ({
   onToggleDifficulty,
 }: RivalFilterProps) => {
   return (
-    <Box
-      p={4}
-      bg="gray.900"
-      borderRadius="lg"
-      borderWidth="1px"
-      borderColor="whiteAlpha.100"
-    >
-      <Stack
-        direction={{ base: "column", lg: "row" }}
-        gap={{ base: 6, lg: 10 }}
-        align="start"
-      >
-        <VStack align="start" gap={2} w="full">
-          <Text
-            fontSize={{ base: "2xs", md: "xs" }}
-            fontWeight="bold"
-            color="gray.500"
-            letterSpacing="wider"
-          >
-            LEVEL
-          </Text>
-          <HStack gap={4} wrap="wrap">
-            {IIDX_LEVELS.map((l) => (
+    <div className="flex flex-col gap-6 rounded-xl border border-bpim-border bg-bpim-bg/40 p-4 lg:flex-row lg:items-start lg:gap-10">
+      <div className="flex flex-col gap-2.5">
+        <span className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
+          Level
+        </span>
+        <div className="flex flex-wrap gap-4">
+          {IIDX_LEVELS.map((l) => (
+            <div key={l} className="flex items-center gap-2">
               <Checkbox
-                key={l}
-                size={{ base: "sm", md: "md" }}
+                id={`lv-${l}`}
                 checked={levels.includes(l)}
                 onCheckedChange={() => onToggleLevel(l)}
+                className="h-4 w-4 border-bpim-border data-[state=checked]:bg-bpim-primary"
+              />
+              <Label
+                htmlFor={`lv-${l}`}
+                className="text-xs font-bold text-bpim-text cursor-pointer"
               >
-                <Text fontSize={{ base: "xs", md: "sm" }} color="white">
-                  ☆{l}
-                </Text>
-              </Checkbox>
-            ))}
-          </HStack>
-        </VStack>
+                ☆{l}
+              </Label>
+            </div>
+          ))}
+        </div>
+      </div>
 
-        <VStack align="start" gap={2} w="full">
-          <Text
-            fontSize={{ base: "2xs", md: "xs" }}
-            fontWeight="bold"
-            color="gray.500"
-            letterSpacing="wider"
-          >
-            DIFFICULTY
-          </Text>
-          <HStack gap={4} wrap="wrap">
-            {IIDX_DIFFICULTIES.map((d) => (
+      <div className="flex flex-col gap-2.5">
+        <span className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
+          Difficulty
+        </span>
+        <div className="flex flex-wrap gap-4">
+          {IIDX_DIFFICULTIES.map((d) => (
+            <div key={d} className="flex items-center gap-2">
               <Checkbox
-                key={d}
-                size={{ base: "sm", md: "md" }}
+                id={`diff-${d}`}
                 checked={difficulties.includes(d)}
                 onCheckedChange={() => onToggleDifficulty(d)}
+                className="h-4 w-4 border-bpim-border data-[state=checked]:bg-bpim-primary"
+              />
+              <Label
+                htmlFor={`diff-${d}`}
+                className="text-xs font-bold text-bpim-text cursor-pointer uppercase"
               >
-                <Text fontSize={{ base: "xs", md: "sm" }} color="white">
-                  {d}
-                </Text>
-              </Checkbox>
-            ))}
-          </HStack>
-        </VStack>
-      </Stack>
-    </Box>
+                {d}
+              </Label>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 };

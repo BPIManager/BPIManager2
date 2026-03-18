@@ -1,18 +1,12 @@
+﻿"use client";
+
 import { useState } from "react";
-import {
-  Box,
-  VStack,
-  Text,
-  Button,
-  Stack,
-  Icon,
-  HStack,
-  Input,
-} from "@chakra-ui/react";
-import { LuKey, LuCopy, LuRefreshCw } from "react-icons/lu";
-import { toaster } from "@/components/ui/toaster";
+import { LuKey, LuCopy, LuRefreshCw, LuLoader } from "react-icons/lu";
 import { useApiKey } from "@/hooks/users/useAPIKey";
 import { ActionConfirmDialog } from "../../Modal/Confirmation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 
 export default function ApiKeyUi() {
   const { keyInfo, generate, isLoading } = useApiKey();
@@ -23,104 +17,78 @@ export default function ApiKeyUi() {
     try {
       const key = await generate();
       setRawKey(key);
-      toaster.create({
-        title:
-          "APIキーを発行しました。この画面を閉じると二度と表示されません。",
-        type: "success",
+      toast.success("APIキーを発行しました。必ず控えてください。", {
+        duration: 10000,
       });
       setIsConfirmOpen(false);
     } catch (e) {
-      toaster.create({
-        title: "発行に失敗しました",
-        type: "error",
-      });
+      toast.error("発行に失敗しました");
     }
   };
 
   const handleGenerateClick = () => {
-    if (keyInfo?.exists) {
-      setIsConfirmOpen(true);
-    } else {
-      executeGenerate();
-    }
+    keyInfo?.exists ? setIsConfirmOpen(true) : executeGenerate();
   };
 
   const copyToClipboard = () => {
     const text = rawKey || keyInfo?.key;
     if (text) {
       navigator.clipboard.writeText(text);
-      toaster.create({ title: "コピーしました", type: "success" });
+      toast.success("コピーしました");
     }
   };
 
   return (
-    <Box
-      mt={4}
-      p={6}
-      bg="gray.900"
-      borderRadius="xl"
-      borderWidth="1px"
-      borderColor="whiteAlpha.100"
-    >
-      <Stack
-        direction={{ base: "column", md: "row" }}
-        justify="space-between"
-        align={{ base: "start", md: "center" }}
-        gap={6}
-      >
-        <VStack align="start" gap={1}>
-          <HStack color="blue.400">
-            <Icon as={LuKey} />
-            <Text fontWeight="bold">APIキー</Text>
-          </HStack>
-          <Text fontSize="sm" color="gray.400">
-            API経由でBPIM2のデータを取得・更新します。
-          </Text>
-        </VStack>
+    <div className="mt-4 flex flex-col gap-6 rounded-xl border border-bpim-border bg-bpim-bg p-6 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-1">
+        <div className="flex items-center gap-2 text-bpim-primary">
+          <LuKey className="h-4 w-4" />
+          <span className="font-bold">APIキー</span>
+        </div>
+        <p className="text-sm text-bpim-muted">
+          API経由でBPIM2のデータを取得・更新します。
+        </p>
+      </div>
 
-        <HStack w={{ base: "full", md: "400px" }} gap={0}>
+      <div className="flex w-full flex-col gap-2 md:w-auto">
+        <div className="flex w-full items-center md:w-[450px]">
           <Input
-            px={3}
             value={rawKey || keyInfo?.key || ""}
             placeholder={isLoading ? "Loading..." : "未発行"}
             readOnly
-            borderRightRadius={0}
-            variant="subtle"
-            fontSize="xs"
-            fontFamily="mono"
-            bg="blackAlpha.400"
-            borderColor="whiteAlpha.200"
+            className="h-9 flex-1 rounded-r-none border-bpim-border bg-bpim-bg/40 font-mono text-xs focus-visible:ring-0"
           />
           {(rawKey || keyInfo?.exists) && (
             <Button
-              variant="ghost"
-              borderRadius={0}
-              borderYWidth="1px"
-              borderColor="whiteAlpha.200"
+              variant="secondary"
+              className="h-9 rounded-none border-y border-bpim-border px-3 hover:bg-bpim-overlay"
               onClick={copyToClipboard}
-              px={3}
             >
-              <LuCopy />
+              <LuCopy className="h-4 w-4" />
             </Button>
           )}
           <Button
-            borderLeftRadius={0}
-            colorPalette="blue"
-            loading={isLoading}
+            className="h-9 rounded-l-none px-6 font-bold"
+            disabled={isLoading}
             onClick={handleGenerateClick}
-            variant="solid"
-            px={6}
-            flexShrink={0}
           >
-            {keyInfo?.exists ? <LuRefreshCw /> : "発行"}
+            {isLoading ? (
+              <LuLoader className="animate-spin" />
+            ) : keyInfo?.exists ? (
+              <LuRefreshCw className="mr-1 h-3 w-3" />
+            ) : (
+              "発行"
+            )}
+            {keyInfo?.exists && "再発行"}
           </Button>
-        </HStack>
-      </Stack>
-      {rawKey && (
-        <Text mt={2} fontSize="xs" color="orange.400" fontWeight="bold">
-          ⚠️ 注意: このキーは今だけ表示されています。必ず控えてください。
-        </Text>
-      )}
+        </div>
+        {rawKey && (
+          <p className="text-[10px] font-bold text-bpim-warning">
+            ⚠️ 注意:
+            キーは今だけ表示されています。この画面を閉じると二度と表示されません。
+          </p>
+        )}
+      </div>
 
       <ActionConfirmDialog
         isOpen={isConfirmOpen}
@@ -128,11 +96,10 @@ export default function ApiKeyUi() {
         onConfirm={executeGenerate}
         isLoading={isLoading}
         title="APIキーの再発行"
-        description="新しいキーを発行しますか？古いキーは即座に無効化され、以前のキーを使用したアプリケーションは動作しなくなります。"
+        description="新しいキーを発行しますか？古いキーは即座に無効化されます。"
         confirmLabel="再発行する"
-        cancelLabel="キャンセル"
         isDestructive
       />
-    </Box>
+    </div>
   );
 }

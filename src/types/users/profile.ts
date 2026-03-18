@@ -5,6 +5,14 @@ export interface UserProfileHistory {
   updatedAt: string | Date;
 }
 
+export interface UserRelationship {
+  isFollowing: boolean;
+  isFollowed: boolean;
+  isSelf: boolean;
+  isMutual: boolean;
+  isFollowedBy: boolean;
+}
+
 export interface UserProfileData {
   userId: string;
   userName: string;
@@ -19,12 +27,9 @@ export interface UserProfileData {
     following: number;
     followers: number;
   };
-  relationship: {
-    isFollowing: boolean;
-    isFollowed: boolean;
-    isSelf: boolean;
-  };
+  relationship: UserRelationship;
 }
+
 export interface UserProfileCompare {
   winLoss: {
     win: number;

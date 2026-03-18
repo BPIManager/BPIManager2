@@ -1,19 +1,10 @@
-import {
-  Box,
-  HStack,
-  VStack,
-  Text,
-  Avatar,
-  Badge,
-  Icon,
-  Grid,
-  GridItem,
-  Flex,
-} from "@chakra-ui/react";
-import { Swords, Crown } from "lucide-react";
+﻿import { Swords, Crown } from "lucide-react";
 import dayjs from "@/lib/dayjs";
 import { TimelineEntry } from "@/hooks/social/useTimeline";
 import Link from "next/link";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 import { diffColors } from "../../Table/table";
 
 export const TimelineItem = ({ entry }: { entry: TimelineEntry }) => {
@@ -28,96 +19,72 @@ export const TimelineItem = ({ entry }: { entry: TimelineEntry }) => {
   const isCurrentlyLosing = hasViewerScore && vsEx < 0;
 
   return (
-    <Box
-      p={3}
-      bg={
+    <div
+      className={cn(
+        "p-3 border-b transition-all duration-200",
         isOvertaken
-          ? "rgba(255, 0, 0, 0.08)"
+          ? "bg-bpim-danger/10 border-red-900/50"
           : isCurrentlyLosing
-            ? "rgba(255, 0, 0, 0.03)"
+            ? "bg-bpim-danger/5 border-red-900/30"
             : isCurrentlyWinning
-              ? "rgba(0, 255, 0, 0.02)"
-              : "rgba(13, 17, 23, 0.6)"
-      }
-      borderBottom="1px solid"
-      borderColor={
-        isOvertaken || isCurrentlyLosing
-          ? "red.900"
-          : isCurrentlyWinning
-            ? "green.900"
-            : "whiteAlpha.100"
-      }
-      transition="all 0.2s"
+              ? "bg-green-500/5 border-green-900/30"
+              : "bg-bpim-bg/60 border-bpim-border",
+      )}
     >
-      <Grid templateColumns="auto 1fr" gap={3}>
-        <GridItem>
+      <div className="grid grid-cols-[auto_1fr] gap-3">
+        <div>
           <Link href={`/rivals/${entry.userId}`}>
-            <Avatar.Root size="sm">
-              <Avatar.Fallback name={entry.userName} />
-              <Avatar.Image src={entry.profileImage ?? ""} />
-            </Avatar.Root>
+            <Avatar className="h-8 w-8 border border-bpim-border">
+              <AvatarImage src={entry.profileImage ?? ""} />
+              <AvatarFallback>{entry.userName.slice(0, 2)}</AvatarFallback>
+            </Avatar>
           </Link>
-        </GridItem>
+        </div>
 
-        <GridItem minW={0}>
-          <VStack align="stretch" gap={1.5}>
-            <HStack justify="space-between" align="center">
-              <HStack fontSize="xs" gap={2}>
-                <Text fontWeight="bold" color="white" truncate>
-                  <Link href={`/rivals/${entry.userId}`}>{entry.userName}</Link>
-                </Text>
+        <div className="min-w-0">
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-xs">
+                <Link
+                  href={`/rivals/${entry.userId}`}
+                  className="font-bold text-bpim-text hover:underline truncate max-w-[120px]"
+                >
+                  {entry.userName}
+                </Link>
 
                 {isCurrentlyLosing && (
                   <Badge
-                    colorPalette="red"
-                    variant="solid"
-                    size="xs"
-                    px={2}
-                    borderRadius="full"
+                    variant="destructive"
+                    className="h-4 px-1.5 text-[9px] rounded-full gap-1"
                   >
-                    <Icon as={Swords} size="xs" mr={1} /> 敗北
+                    <Swords className="h-2.5 w-2.5" /> 敗北
                   </Badge>
                 )}
                 {isCurrentlyWinning && (
-                  <Badge
-                    colorPalette="green"
-                    variant="solid"
-                    size="xs"
-                    px={2}
-                    borderRadius="full"
-                  >
-                    <Icon as={Crown} size="xs" mr={1} /> 勝利
+                  <Badge className="h-4 px-1.5 text-[9px] rounded-full gap-1 bg-green-600 hover:bg-green-600 text-bpim-text border-none">
+                    <Crown className="h-2.5 w-2.5" /> 勝利
                   </Badge>
                 )}
-              </HStack>
-              <Text fontSize="10px" color="whiteAlpha.400">
+              </div>
+              <span className="text-[10px] text-bpim-muted">
                 {dayjs(entry.lastPlayed).fromNow()}
-              </Text>
-            </HStack>
+              </span>
+            </div>
 
-            <VStack
-              align="stretch"
-              bg="blackAlpha.400"
-              p={2}
-              borderRadius="md"
-              gap={2}
-              borderWidth="1px"
-              borderColor="whiteAlpha.50"
-            >
-              <HStack justify="space-between">
-                <Text fontSize="xs" fontWeight="bold" color="white" truncate>
+            <div className="flex flex-col gap-2 rounded-md border border-bpim-border bg-bpim-bg/40 p-2">
+              <div className="flex items-center justify-between">
+                <span className="truncate text-xs font-bold text-bpim-text">
                   {entry.title}
-                </Text>
-                <Badge
-                  size="xs"
-                  bg={diffColors[entry.difficulty]}
-                  variant="subtle"
-                  fontSize="9px"
-                  px={2}
+                </span>
+                <span
+                  className={cn(
+                    "px-1.5 py-0.5 rounded-sm text-[9px] font-bold text-bpim-text uppercase",
+                    diffColors[entry.difficulty] || "bg-slate-700",
+                  )}
                 >
                   {entry.difficulty}
-                </Badge>
-              </HStack>
+                </span>
+              </div>
 
               <ComparisonRow
                 label="BPI"
@@ -125,7 +92,7 @@ export const TimelineItem = ({ entry }: { entry: TimelineEntry }) => {
                 oppGrowth={opp.diffBpi}
                 viewerValue={viewer?.bpi}
                 diff={vsBpi}
-                color="orange.300"
+                color="text-bpim-warning"
                 isFloat
               />
 
@@ -135,15 +102,13 @@ export const TimelineItem = ({ entry }: { entry: TimelineEntry }) => {
                 oppGrowth={opp.diffEx}
                 viewerValue={viewer?.exScore}
                 diff={vsEx}
-                color="white"
+                color="text-bpim-text"
               />
-            </VStack>
-
-            {/* <EmojiReactions /> */}
-          </VStack>
-        </GridItem>
-      </Grid>
-    </Box>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
@@ -160,64 +125,47 @@ const ComparisonRow = ({
   const hasViewer = viewerValue !== undefined;
 
   return (
-    <Grid
-      templateColumns="28px 1.5fr 1fr 1fr 1.2fr"
-      gap={1}
-      alignItems="center"
-      w="full"
-    >
-      <Text fontSize="9px" fontWeight="bold" color="gray.600">
-        {label}
-      </Text>
+    <div className="grid grid-cols-[28px_1.5fr_1fr_1fr_1.2fr] gap-1 items-center w-full font-mono">
+      <span className="text-[9px] font-bold text-bpim-muted">{label}</span>
 
-      <Text fontSize="xs" fontWeight="bold" color={color} textAlign="right">
+      <span className={cn("text-[11px] font-bold text-right", color)}>
         {format(oppValue)}
-      </Text>
+      </span>
 
-      <HStack justify="flex-end" gap={0} color="green.400">
+      <div className="flex justify-end text-bpim-success">
         {oppGrowth && oppGrowth > 0 ? (
-          <Text fontSize="9px" fontWeight="bold">
-            +{format(oppGrowth)}
-          </Text>
+          <span className="text-[9px] font-bold">+{format(oppGrowth)}</span>
         ) : (
-          <Text fontSize="9px" color="whiteAlpha.200">
-            -
-          </Text>
+          <span className="text-[9px] opacity-20">-</span>
         )}
-      </HStack>
+      </div>
 
-      <Text
-        fontSize="xs"
-        fontWeight="bold"
-        color={hasViewer ? "whiteAlpha.600" : "whiteAlpha.200"}
-        textAlign="right"
+      <span
+        className={cn(
+          "text-[11px] font-bold text-right",
+          hasViewer ? "text-bpim-muted" : "text-bpim-subtle",
+        )}
       >
         {hasViewer ? format(viewerValue) : "---"}
-      </Text>
+      </span>
 
-      <Flex justify="flex-end">
+      <div className="flex justify-end">
         {hasViewer ? (
-          <Badge
-            variant="outline"
-            colorPalette={diff >= 0 ? "green" : "red"}
-            fontSize="12px"
-            fontWeight="bold"
-            px={1}
-            h="14px"
-            minW="38px"
-            textAlign="center"
-            lineHeight="14px"
-            borderRadius="sm"
-            display="inline-flex"
-            justifyContent={"center"}
+          <span
+            className={cn(
+              "inline-flex items-center justify-center h-3.5 min-w-[38px] px-1 rounded-sm text-[10px] font-bold border",
+              diff >= 0
+                ? "border-green-900 text-bpim-success bg-green-500/5"
+                : "border-red-900 text-bpim-danger bg-bpim-danger/5",
+            )}
           >
             {diff >= 0 ? "+" : ""}
             {format(diff)}
-          </Badge>
+          </span>
         ) : (
-          <Box w="38px" />
+          <div className="w-[38px]" />
         )}
-      </Flex>
-    </Grid>
+      </div>
+    </div>
   );
 };

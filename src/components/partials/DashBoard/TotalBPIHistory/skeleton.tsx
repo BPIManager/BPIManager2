@@ -1,43 +1,35 @@
 import { DashCard } from "@/components/ui/dashcard";
-import { Box, Skeleton, VStack, HStack, Flex } from "@chakra-ui/react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const TotalBpiHistorySkeleton = () => {
   return (
-    <DashCard h="420px">
-      <Skeleton h="16px" w="140px" mb={8} />
+    <DashCard className="h-[420px]">
+      <Skeleton className="mb-8 h-4 w-[140px]" />
 
-      <Flex
-        h="240px"
-        w="full"
-        align="end"
-        justify="space-between"
-        mb={6}
-        px={2}
-      >
+      <div className="relative mb-6 flex h-[240px] w-full items-end justify-between px-2">
         {[...Array(12)].map((_, i) => (
-          <VStack key={i} flex={1} gap={2}>
+          <div key={i} className="flex flex-1 flex-col items-center">
             <Skeleton
-              h={`${Math.random() * 40 + 10}%`}
-              w="4px"
-              borderRadius="t-xs"
-              opacity={0.3}
+              className="w-1 rounded-t-sm opacity-30"
+              style={{ height: `${Math.random() * 40 + 10}%` }}
             />
-          </VStack>
+          </div>
         ))}
-        <Box position="absolute" top="120px" left="40px" right="40px">
-          <Skeleton h="2px" w="full" opacity={0.2} />
-        </Box>
-      </Flex>
 
-      <HStack justify="space-between" px={10} mb={6}>
-        <Skeleton h="10px" w="40px" />
-        <Skeleton h="10px" w="40px" />
-        <Skeleton h="10px" w="40px" />
-      </HStack>
+        <div className="absolute left-10 right-10 top-[120px]">
+          <Skeleton className="h-[2px] w-full opacity-20" />
+        </div>
+      </div>
 
-      <Box px={2}>
-        <Skeleton h="30px" w="full" borderRadius="md" />
-      </Box>
+      <div className="mb-6 flex justify-between px-10">
+        <Skeleton className="h-2.5 w-10" />
+        <Skeleton className="h-2.5 w-10" />
+        <Skeleton className="h-2.5 w-10" />
+      </div>
+
+      <div className="px-2">
+        <Skeleton className="h-[30px] w-full rounded-md" />
+      </div>
     </DashCard>
   );
 };

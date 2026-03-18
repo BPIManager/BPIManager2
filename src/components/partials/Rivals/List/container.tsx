@@ -1,53 +1,42 @@
-import { SimpleGrid, Text, Center } from "@chakra-ui/react";
-import { RivalSummaryResult } from "@/hooks/social/useRivalSummary";
-import { RivalSummaryCard } from "./ui";
+﻿import { RivalSummaryCard } from "./ui";
 import { RivalSummarySkeleton } from "./skeleton";
 import { RivalWinLossSummaryNotFound } from "../../DashBoard/Rivals/nodata";
-
-interface RivalListProps {
-  results: RivalSummaryResult[];
-  isLoading: boolean;
-  isError: boolean;
-  onCardClick: (userId: string) => void;
-}
 
 export const RivalList = ({
   results,
   isLoading,
   isError,
   onCardClick,
-}: RivalListProps) => {
+}: any) => {
   if (isError) {
     return (
-      <Center py={20}>
-        <Text color="red.400">データの取得に失敗しました。</Text>
-      </Center>
+      <div className="flex h-64 items-center justify-center text-bpim-danger font-bold">
+        データの取得に失敗しました。
+      </div>
     );
   }
 
   if (isLoading) {
     return (
-      <SimpleGrid columns={{ base: 1, xl: 2 }} gap={4} w="full">
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
         {Array.from({ length: 6 }).map((_, i) => (
           <RivalSummarySkeleton key={i} />
         ))}
-      </SimpleGrid>
+      </div>
     );
   }
 
-  if (!isLoading && results.length === 0) {
-    return <RivalWinLossSummaryNotFound />;
-  }
+  if (results.length === 0) return <RivalWinLossSummaryNotFound />;
 
   return (
-    <SimpleGrid columns={{ base: 1, xl: 2 }} gap={4} w="full">
-      {results.map((rival) => (
+    <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+      {results.map((rival: any) => (
         <RivalSummaryCard
           key={rival.userId}
           rival={rival}
           onClick={() => onCardClick(rival.userId)}
         />
       ))}
-    </SimpleGrid>
+    </div>
   );
 };

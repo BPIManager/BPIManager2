@@ -1,16 +1,17 @@
+﻿"use client";
+
+import React from "react";
 import {
-  DialogRoot,
+  Dialog,
   DialogContent,
   DialogHeader,
-  DialogBody,
-  DialogFooter,
   DialogTitle,
-  DialogActionTrigger,
+  DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Text, VStack } from "@chakra-ui/react";
-import { useState } from "react";
-import { AlertTriangleIcon } from "lucide-react";
+import { AlertTriangle, Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface Props {
   isOpen: boolean;
@@ -37,55 +38,58 @@ export const ActionConfirmDialog = ({
   isConfirmDisabled = false,
   isLoading = false,
 }: Props) => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
   return (
-    <DialogRoot
+    <Dialog
       open={isOpen}
-      onOpenChange={(e) => !e.open && !isLoading && onClose()}
-      placement="center"
-      role={isDestructive ? "alertdialog" : "dialog"}
+      onOpenChange={(open) => !open && !isLoading && onClose()}
     >
-      <DialogContent bg="bg.panel" borderRadius="xl" p={4}>
-        <DialogHeader borderBottomWidth="1px" pb={4}>
-          <DialogTitle display="flex" alignItems="center" gap={2}>
+      <DialogContent className="max-w-[90vw] sm:max-w-md border-bpim-border bg-bpim-bg p-0 overflow-hidden shadow-2xl rounded-2xl">
+        <DialogHeader className="p-6 pb-4 border-b border-bpim-border">
+          <DialogTitle className="flex items-center gap-3 text-lg font-bold text-bpim-text">
             {isDestructive && (
-              <AlertTriangleIcon
-                color="var(--chakra-colors-red-500)"
-                size={20}
-              />
+              <AlertTriangle className="h-5 w-5 text-bpim-danger shrink-0" />
             )}
             {title}
           </DialogTitle>
         </DialogHeader>
 
-        <DialogBody py={6}>
+        <div className="p-6 py-8">
           {typeof description === "string" ? (
-            <Text color="fg.muted" textStyle="sm">
+            <DialogDescription className="text-sm leading-relaxed text-bpim-muted">
               {description}
-            </Text>
+            </DialogDescription>
           ) : (
-            description
+            <div className="text-sm text-bpim-text">{description}</div>
           )}
-        </DialogBody>
+        </div>
 
-        <DialogFooter borderTopWidth="1px" pt={4} gap={3}>
-          <DialogActionTrigger asChild>
-            <Button px={2} variant="outline" disabled={isSubmitting}>
-              {cancelLabel}
-            </Button>
-          </DialogActionTrigger>
+        <DialogFooter className="flex flex-row items-center justify-end gap-3 p-8 bg-bpim-bg/20 border-t border-bpim-border sm:flex-row">
           <Button
-            px={2}
-            colorPalette={isDestructive ? "red" : "blue"}
-            loading={isLoading}
-            onClick={onConfirm}
-            disabled={isConfirmDisabled || isSubmitting}
+            variant="ghost"
+            onClick={onClose}
+            disabled={isLoading}
+            className="h-9 px-4 text-bpim-muted hover:text-bpim-text hover:bg-bpim-overlay/50"
           >
-            {confirmLabel}
+            {cancelLabel}
+          </Button>
+          <Button
+            onClick={onConfirm}
+            disabled={isConfirmDisabled || isLoading}
+            className={cn(
+              "h-9 px-6 font-bold transition-all min-w-[100px]",
+              isDestructive
+                ? "bg-bpim-danger hover:bg-bpim-danger text-bpim-text"
+                : "bg-bpim-primary hover:bg-bpim-primary text-bpim-text",
+            )}
+          >
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              confirmLabel
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>
-    </DialogRoot>
+    </Dialog>
   );
 };
