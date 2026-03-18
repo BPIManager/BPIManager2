@@ -109,7 +109,6 @@ export interface Scores {
 export interface SongDef {
   coef: Generated<number | null>;
   defId: Generated<number>;
-  difficulty: string;
   isCurrent: Generated<number | null>;
   kaidenAvg: number;
   songId: Generated<number | null>;
