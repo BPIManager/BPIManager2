@@ -32,20 +32,20 @@ export const LogsCard = ({ log }: { log: UpdateLog }) => {
       <div
         className={cn(
           "relative overflow-hidden rounded-xl border border-bpim-border bg-bpim-bg p-4 transition-all duration-200",
-          "hover:-translate-y-0.5 hover:border-blue-500 hover:bg-bpim-bg hover:shadow-lg hover:shadow-blue-500/10",
+          "hover:-translate-y-0.5 hover:border-bpim-primary hover:bg-bpim-bg hover:shadow-lg hover:shadow-bpim-primary/10",
           "cursor-pointer",
         )}
       >
         <div className="flex items-start justify-between mb-3">
           <div className="flex flex-col gap-0">
-            <div className="flex items-center gap-1 mb-1 text-slate-500">
+            <div className="flex items-center gap-1 mb-1 text-bpim-muted">
               <LuCalendar className="w-3 h-3" />
               <span className="text-[10px] font-medium md:text-xs">
                 {dayjs(log.createdAt).tz().format("YYYY/MM/DD HH:mm")}
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-mono text-lg font-bold text-white md:text-xl">
+              <span className="font-mono text-lg font-bold text-bpim-text md:text-xl">
                 総合BPI {log.totalBpi.toFixed(2)}
               </span>
               <Badge
@@ -63,11 +63,11 @@ export const LogsCard = ({ log }: { log: UpdateLog }) => {
           </div>
 
           <div className="flex items-center gap-2 px-3 py-1 rounded-md bg-bpim-bg border border-bpim-border">
-            <LuListMusic className="w-3.5 h-3.5 text-slate-500" />
-            <span className="text-sm font-bold text-white leading-none">
+            <LuListMusic className="w-3.5 h-3.5 text-bpim-muted" />
+            <span className="text-sm font-bold text-bpim-text leading-none">
               {log.songCount}
             </span>
-            <span className="text-[10px] font-bold text-slate-600 tracking-tighter">
+            <span className="text-[10px] font-bold text-bpim-subtle tracking-tighter">
               SONGS
             </span>
           </div>
@@ -76,7 +76,7 @@ export const LogsCard = ({ log }: { log: UpdateLog }) => {
         <Separator className="bg-white/5 mb-3" />
 
         <div className="flex flex-col gap-1.5">
-          <span className="text-[10px] font-bold tracking-[0.15em] text-slate-600 uppercase">
+          <span className="text-[10px] font-bold tracking-[0.15em] text-bpim-subtle uppercase">
             Top Updates
           </span>
           <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
@@ -85,7 +85,7 @@ export const LogsCard = ({ log }: { log: UpdateLog }) => {
                 key={i}
                 className="flex items-center justify-between gap-3 p-2 rounded-sm bg-bpim-card/50 border border-white/[0.02]"
               >
-                <span className="flex-1 text-xs font-bold text-slate-200 truncate leading-tight">
+                <span className="flex-1 text-xs font-bold text-bpim-text truncate leading-tight">
                   {score.title}
                 </span>
                 <div className="w-[45px] shrink-0 text-right font-mono leading-none">

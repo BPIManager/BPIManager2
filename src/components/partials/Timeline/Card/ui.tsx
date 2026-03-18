@@ -47,7 +47,7 @@ export const TimelineItem = ({ entry }: { entry: TimelineEntry }) => {
               <div className="flex items-center gap-2 text-xs">
                 <Link
                   href={`/rivals/${entry.userId}`}
-                  className="font-bold text-white hover:underline truncate max-w-[120px]"
+                  className="font-bold text-bpim-text hover:underline truncate max-w-[120px]"
                 >
                   {entry.userName}
                 </Link>
@@ -61,24 +61,24 @@ export const TimelineItem = ({ entry }: { entry: TimelineEntry }) => {
                   </Badge>
                 )}
                 {isCurrentlyWinning && (
-                  <Badge className="h-4 px-1.5 text-[9px] rounded-full gap-1 bg-green-600 hover:bg-green-600 text-white border-none">
+                  <Badge className="h-4 px-1.5 text-[9px] rounded-full gap-1 bg-green-600 hover:bg-green-600 text-bpim-text border-none">
                     <Crown className="h-2.5 w-2.5" /> 勝利
                   </Badge>
                 )}
               </div>
-              <span className="text-[10px] text-slate-500">
+              <span className="text-[10px] text-bpim-muted">
                 {dayjs(entry.lastPlayed).fromNow()}
               </span>
             </div>
 
             <div className="flex flex-col gap-2 rounded-md border border-bpim-border bg-bpim-bg/40 p-2">
               <div className="flex items-center justify-between">
-                <span className="truncate text-xs font-bold text-white">
+                <span className="truncate text-xs font-bold text-bpim-text">
                   {entry.title}
                 </span>
                 <span
                   className={cn(
-                    "px-1.5 py-0.5 rounded-sm text-[9px] font-bold text-white uppercase",
+                    "px-1.5 py-0.5 rounded-sm text-[9px] font-bold text-bpim-text uppercase",
                     diffColors[entry.difficulty] || "bg-slate-700",
                   )}
                 >
@@ -102,7 +102,7 @@ export const TimelineItem = ({ entry }: { entry: TimelineEntry }) => {
                 oppGrowth={opp.diffEx}
                 viewerValue={viewer?.exScore}
                 diff={vsEx}
-                color="text-white"
+                color="text-bpim-text"
               />
             </div>
           </div>
@@ -126,7 +126,7 @@ const ComparisonRow = ({
 
   return (
     <div className="grid grid-cols-[28px_1.5fr_1fr_1fr_1.2fr] gap-1 items-center w-full font-mono">
-      <span className="text-[9px] font-bold text-slate-500">{label}</span>
+      <span className="text-[9px] font-bold text-bpim-muted">{label}</span>
 
       <span className={cn("text-[11px] font-bold text-right", color)}>
         {format(oppValue)}
@@ -143,7 +143,7 @@ const ComparisonRow = ({
       <span
         className={cn(
           "text-[11px] font-bold text-right",
-          hasViewer ? "text-slate-400" : "text-slate-800",
+          hasViewer ? "text-bpim-muted" : "text-bpim-subtle",
         )}
       >
         {hasViewer ? format(viewerValue) : "---"}

@@ -123,7 +123,7 @@ export const SongFilterBar = ({
 
       <div className="flex w-full gap-2 items-center mb-3">
         <div className="relative flex-1">
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-bpim-muted">
             <LuSearch size={16} />
           </div>
           <Input
@@ -141,7 +141,7 @@ export const SongFilterBar = ({
         <Button
           variant="outline"
           size="icon"
-          className="h-9 w-9 border-bpim-border hover:bg-white/10"
+          className="h-9 w-9 border-bpim-border hover:bg-bpim-overlay"
           onClick={onOpenAdvancedFilter}
         >
           <LuSlidersHorizontal size={18} />
@@ -174,7 +174,7 @@ export const SongFilterBar = ({
       {withRivals && (
         <div className="flex gap-6 flex-wrap mt-3 pt-3 border-t border-bpim-border">
           <div className="flex flex-col gap-1.5">
-            <span className="text-[10px] font-bold tracking-widest text-slate-500 uppercase">
+            <span className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
               プレイ状態
             </span>
             <div className="flex items-center gap-4">
@@ -185,7 +185,7 @@ export const SongFilterBar = ({
                     onParamsChange({ isMyPlayed: !!checked })
                   }
                 />
-                <span className="text-xs font-bold text-slate-300 group-hover:text-white transition-colors">
+                <span className="text-xs font-bold text-bpim-text group-hover:text-bpim-text transition-colors">
                   自分プレイ済
                 </span>
               </label>
@@ -196,7 +196,7 @@ export const SongFilterBar = ({
                     onParamsChange({ isRivalPlayed: !!checked })
                   }
                 />
-                <span className="text-xs font-bold text-slate-300 group-hover:text-white transition-colors">
+                <span className="text-xs font-bold text-bpim-text group-hover:text-bpim-text transition-colors">
                   ライバルプレイ済
                 </span>
               </label>

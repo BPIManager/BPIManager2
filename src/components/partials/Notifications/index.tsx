@@ -33,12 +33,12 @@ export const NotificationBell = () => {
           <Button
             variant="ghost"
             size="icon"
-            className="h-9 w-9 text-slate-400 hover:text-white"
+            className="h-9 w-9 text-bpim-muted hover:text-bpim-text"
           >
             <Bell size={20} />
           </Button>
           {unreadCount > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-bpim-danger px-1 font-mono text-[10px] font-bold text-white ring-2 ring-slate-950">
+            <span className="absolute -top-0.5 -right-0.5 flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-bpim-danger px-1 font-mono text-[10px] font-bold text-bpim-text ring-2 ring-bpim-bg">
               {unreadCount > 99 ? "99+" : unreadCount}
             </span>
           )}

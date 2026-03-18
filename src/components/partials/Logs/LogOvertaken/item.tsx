@@ -21,11 +21,11 @@ export const OvertakeRankItem = ({ item, onClick }: RankItemProps) => {
   return (
     <div
       onClick={onClick}
-      className="w-full p-4 cursor-pointer hover:bg-white/5 transition-colors flex flex-col gap-3 group"
+      className="w-full p-4 cursor-pointer hover:bg-bpim-overlay/50 transition-colors flex flex-col gap-3 group"
     >
       <div className="flex items-center justify-between w-full">
         <div className="flex flex-col items-start gap-1 flex-1 min-w-0">
-          <span className="text-sm font-bold text-white truncate w-full">
+          <span className="text-sm font-bold text-bpim-text truncate w-full">
             {item.title}
           </span>
           <div className="flex items-center gap-2">
@@ -36,7 +36,7 @@ export const OvertakeRankItem = ({ item, onClick }: RankItemProps) => {
               ☆{item.level}
             </span>
             {isNew && (
-              <span className="px-1 text-[8px] font-bold bg-purple-600 text-white rounded-sm leading-tight">
+              <span className="px-1 text-[8px] font-bold bg-purple-600 text-bpim-text rounded-sm leading-tight">
                 NEW
               </span>
             )}
@@ -47,11 +47,11 @@ export const OvertakeRankItem = ({ item, onClick }: RankItemProps) => {
           <div className="flex items-center gap-1.5 text-xs text-bpim-muted font-mono">
             <span className="font-medium">{previous?.exScore || 0}</span>
             <LuChevronRight className="w-3 h-3" />
-            <span className="font-black text-white text-base">
+            <span className="font-black text-bpim-text text-base">
               {current.exScore}
             </span>
           </div>
-          <div className="flex h-6 min-w-[50px] items-center justify-center rounded-sm bg-bpim-primary px-2 text-xs font-bold text-white">
+          <div className="flex h-6 min-w-[50px] items-center justify-center rounded-sm bg-bpim-primary px-2 text-xs font-bold text-bpim-text">
             +{scoreDiff}
           </div>
         </div>

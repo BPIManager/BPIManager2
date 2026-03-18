@@ -118,7 +118,7 @@ export const TimelineContainer = () => {
 };
 
 const FilterHeader = ({ label }: { label: string }) => (
-  <span className="mb-1 px-1 text-[10px] font-bold tracking-widest text-slate-500 uppercase">
+  <span className="mb-1 px-1 text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
     {label}
   </span>
 );
@@ -144,7 +144,7 @@ const MenuButton = ({
       "w-full justify-start gap-3 px-3 transition-all",
       isActive
         ? "font-bold shadow-sm"
-        : "font-medium text-slate-400 hover:bg-white/5 hover:text-slate-200",
+        : "font-medium text-bpim-muted hover:bg-bpim-overlay/50 hover:text-bpim-text",
     )}
   >
     <Icon className={cn("h-4 w-4", isActive ? "" : "opacity-70")} />

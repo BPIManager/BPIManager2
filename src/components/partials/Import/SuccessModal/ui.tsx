@@ -93,30 +93,30 @@ export const ImportSuccessModal = ({ result, version, onClose }: Props) => {
         </div>
 
         <div className="flex flex-col gap-1">
-          <h2 className="text-xl font-black tracking-tight text-white uppercase">
+          <h2 className="text-xl font-black tracking-tight text-bpim-text uppercase">
             Import Completed
           </h2>
-          <p className="text-sm font-medium text-slate-400">
+          <p className="text-sm font-medium text-bpim-muted">
             {result.updatedCount} 件のスコアを更新しました
           </p>
         </div>
 
         {result.newTotalBpi !== undefined && (
           <div className="flex w-full flex-col gap-4 py-2">
-            <span className="text-[10px] font-black tracking-[0.2em] text-slate-500 uppercase">
+            <span className="text-[10px] font-black tracking-[0.2em] text-bpim-muted uppercase">
               Total BPI Change (☆12)
             </span>
 
             <div className="flex items-center justify-center gap-6">
               {result.previousTotalBpi !== undefined && (
-                <span className="font-mono text-xl font-bold text-slate-600">
+                <span className="font-mono text-xl font-bold text-bpim-subtle">
                   {result.previousTotalBpi.toFixed(2)}
                 </span>
               )}
 
-              <ChevronRight size={20} className="text-slate-800" />
+              <ChevronRight size={20} className="text-bpim-subtle" />
 
-              <span className="font-mono text-4xl font-black text-white tabular-nums leading-none">
+              <span className="font-mono text-4xl font-black text-bpim-text tabular-nums leading-none">
                 {displayBpi.toFixed(2)}
               </span>
             </div>
@@ -127,8 +127,10 @@ export const ImportSuccessModal = ({ result, version, onClose }: Props) => {
                 className={cn(
                   "flex items-center gap-1.5 rounded-full px-4 py-1 border-none font-black text-xs tracking-widest",
                   isImproved && "bg-green-500/10 text-bpim-success",
-                  isUnchanged && "bg-slate-500/10 text-slate-400",
-                  !isImproved && !isUnchanged && "bg-bpim-danger/10 text-bpim-danger",
+                  isUnchanged && "bg-slate-500/10 text-bpim-muted",
+                  !isImproved &&
+                    !isUnchanged &&
+                    "bg-bpim-danger/10 text-bpim-danger",
                 )}
               >
                 {isImproved ? (
@@ -151,7 +153,7 @@ export const ImportSuccessModal = ({ result, version, onClose }: Props) => {
         <div className="flex w-full flex-col gap-3">
           <Button
             size="lg"
-            className="w-full bg-bpim-primary font-black text-white hover:bg-bpim-primary active:scale-95 transition-all"
+            className="w-full bg-bpim-primary font-black text-bpim-text hover:bg-bpim-primary active:scale-95 transition-all"
             onClick={() =>
               router.push(
                 `/users/${fbUser?.uid}/logs/${version}/${result.batchId}`,
@@ -164,7 +166,7 @@ export const ImportSuccessModal = ({ result, version, onClose }: Props) => {
           <Button
             variant="outline"
             size="lg"
-            className="w-full border-bpim-border text-slate-400 font-bold hover:bg-white/5 hover:text-white"
+            className="w-full border-bpim-border text-bpim-muted font-bold hover:bg-bpim-overlay/50 hover:text-bpim-text"
             onClick={() => router.push("/my")}
           >
             全スコア一覧を表示
@@ -172,7 +174,7 @@ export const ImportSuccessModal = ({ result, version, onClose }: Props) => {
 
           <Button
             variant="ghost"
-            className="text-slate-500 hover:text-slate-300"
+            className="text-bpim-muted hover:text-bpim-text"
             onClick={onClose}
           >
             閉じる

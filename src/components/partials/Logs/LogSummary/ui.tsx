@@ -19,7 +19,7 @@ export const LabelWithTooltip = ({
 }) => {
   if (!tooltipText) {
     return (
-      <span className="text-sm font-bold text-slate-200 leading-[1.2] tracking-tighter whitespace-nowrap">
+      <span className="text-sm font-bold text-bpim-text leading-[1.2] tracking-tighter whitespace-nowrap">
         {label}
       </span>
     );
@@ -27,18 +27,18 @@ export const LabelWithTooltip = ({
 
   return (
     <div className="flex items-center gap-1">
-      <span className="text-sm font-bold text-slate-200 tracking-tighter whitespace-nowrap">
+      <span className="text-sm font-bold text-bpim-text tracking-tighter whitespace-nowrap">
         {label}
       </span>
       {!isSharing && (
         <TooltipProvider delayDuration={200}>
           <Tooltip>
             <TooltipTrigger asChild>
-              <button className="flex items-center justify-center cursor-help text-slate-500 hover:text-slate-400 outline-none">
+              <button className="flex items-center justify-center cursor-help text-bpim-muted hover:text-bpim-muted outline-none">
                 <HelpCircle className="h-3.5 w-3.5" />
               </button>
             </TooltipTrigger>
-            <TooltipContent className="bg-slate-800 text-white border-slate-700">
+            <TooltipContent className="bg-bpim-surface-2 text-bpim-text border-slate-700">
               <p className="text-xs">{tooltipText}</p>
             </TooltipContent>
           </Tooltip>

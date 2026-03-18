@@ -46,14 +46,14 @@ export const LogFilterSection = ({ version, groupedBy }: Props) => {
   return (
     <div className="flex w-full flex-col items-stretch gap-4 md:flex-row md:items-end md:gap-6">
       <div className="flex flex-col gap-1.5 min-w-full md:min-w-[240px]">
-        <label className="text-[10px] font-bold tracking-widest text-slate-500 uppercase">
+        <label className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
           Version
         </label>
         <Select value={version} onValueChange={handleVersionChange}>
-          <SelectTrigger className="h-9 border-bpim-border bg-bpim-bg text-slate-200 focus:ring-blue-500">
+          <SelectTrigger className="h-9 border-bpim-border bg-bpim-bg text-bpim-text focus:ring-blue-500">
             <SelectValue placeholder="バージョンを選択" />
           </SelectTrigger>
-          <SelectContent className="border-bpim-border bg-bpim-bg text-slate-200">
+          <SelectContent className="border-bpim-border bg-bpim-bg text-bpim-text">
             {versionsNonDisabledCollection.map((v) => (
               <SelectItem key={v.value} value={v.value}>
                 {v.label}
@@ -64,7 +64,7 @@ export const LogFilterSection = ({ version, groupedBy }: Props) => {
       </div>
 
       <div className="flex flex-1 flex-col gap-1.5 max-w-full md:max-w-[400px]">
-        <label className="text-[10px] font-bold tracking-widest text-slate-500 uppercase">
+        <label className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
           Group By
         </label>
         <Tabs
@@ -75,13 +75,13 @@ export const LogFilterSection = ({ version, groupedBy }: Props) => {
           <TabsList className="grid h-9 w-full grid-cols-2 border border-bpim-border bg-bpim-bg p-1">
             <TabsTrigger
               value="lastPlayed"
-              className="text-xs font-bold transition-all data-[state=active]:bg-bpim-primary data-[state=active]:text-white"
+              className="text-xs font-bold transition-all data-[state=active]:bg-bpim-primary data-[state=active]:text-bpim-text"
             >
               プレイ日単位
             </TabsTrigger>
             <TabsTrigger
               value="createdAt"
-              className="text-xs font-bold transition-all data-[state=active]:bg-bpim-primary data-[state=active]:text-white"
+              className="text-xs font-bold transition-all data-[state=active]:bg-bpim-primary data-[state=active]:text-bpim-text"
             >
               インポート日単位
             </TabsTrigger>

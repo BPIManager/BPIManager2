@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+﻿import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -23,10 +23,10 @@ export const CustomPagination = ({
         <ChevronLeft className="h-4 w-4" />
       </Button>
       <div className="flex items-center gap-1 px-2">
-        <span className="font-mono text-sm font-bold text-white">
+        <span className="font-mono text-sm font-bold text-bpim-text">
           PAGE {page}
         </span>
-        <span className="text-xs text-slate-500">/ {totalPages}</span>
+        <span className="text-xs text-bpim-muted">/ {totalPages}</span>
       </div>
       <Button
         variant="ghost"

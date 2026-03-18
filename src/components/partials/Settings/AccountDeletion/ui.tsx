@@ -9,10 +9,10 @@ export default function AccountDeletionUi() {
           <LuBadgeX className="h-4 w-4" />
           <span className="font-bold">アカウント削除</span>
         </div>
-        <p className="text-sm text-slate-400">
+        <p className="text-sm text-bpim-muted">
           BPIM2およびBPIMのアカウントを完全に削除します。
         </p>
-        <p className="text-[10px] text-slate-500 italic">
+        <p className="text-[10px] text-bpim-muted italic">
           ※ 現在開発中のため、しばらくお待ちください
         </p>
       </div>

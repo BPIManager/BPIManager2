@@ -45,7 +45,7 @@ export default function ApiKeyUi() {
           <LuKey className="h-4 w-4" />
           <span className="font-bold">APIキー</span>
         </div>
-        <p className="text-sm text-slate-400">
+        <p className="text-sm text-bpim-muted">
           API経由でBPIM2のデータを取得・更新します。
         </p>
       </div>
@@ -61,7 +61,7 @@ export default function ApiKeyUi() {
           {(rawKey || keyInfo?.exists) && (
             <Button
               variant="secondary"
-              className="h-9 rounded-none border-y border-white/20 px-3 hover:bg-white/10"
+              className="h-9 rounded-none border-y border-white/20 px-3 hover:bg-bpim-overlay"
               onClick={copyToClipboard}
             >
               <LuCopy className="h-4 w-4" />

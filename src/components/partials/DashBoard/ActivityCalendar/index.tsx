@@ -144,12 +144,12 @@ export const ActivityCalendar = ({ data, userId, version }: Props) => {
 
                   <PopoverContent
                     side="top"
-                    className="w-auto border-white/20 bg-bpim-surface-2 p-2 text-white"
+                    className="w-auto border-white/20 bg-bpim-surface-2 p-2 text-bpim-text"
                     onMouseEnter={() => setHoveredDate(day.date)}
                     onMouseLeave={() => setHoveredDate(null)}
                   >
                     <div className="flex flex-col gap-2">
-                      <p className="whitespace-nowrap text-xs font-bold text-white">
+                      <p className="whitespace-nowrap text-xs font-bold text-bpim-text">
                         {day.date}: {day.count} 件
                       </p>
                       <Button

@@ -75,7 +75,7 @@ export const LogNavigator = ({ type, pagination }: LogNavigatorProps) => {
           variant="ghost"
           size="sm"
           className={cn(
-            "group flex h-auto items-center px-2 text-slate-400 hover:bg-white/5 hover:text-bpim-primary",
+            "group flex h-auto items-center px-2 text-bpim-muted hover:bg-bpim-overlay/50 hover:text-bpim-primary",
             !hasPrev && "opacity-30",
           )}
           disabled={!hasPrev}
@@ -83,7 +83,7 @@ export const LogNavigator = ({ type, pagination }: LogNavigatorProps) => {
         >
           <LuChevronLeft className="h-5 w-5 shrink-0" />
           <div className="ml-2 hidden flex-col items-start gap-0 md:flex">
-            <span className="text-[10px] tracking-tighter text-slate-600 uppercase">
+            <span className="text-[10px] tracking-tighter text-bpim-subtle uppercase">
               {type === "batch" ? "PREVIOUS BATCH" : "PREVIOUS DAY"}
             </span>
             <span className="text-xs font-bold leading-tight">{prevLabel}</span>
@@ -92,10 +92,10 @@ export const LogNavigator = ({ type, pagination }: LogNavigatorProps) => {
       </div>
 
       <div className="flex flex-col items-center gap-0 px-4 text-center shrink-0">
-        <span className="text-[10px] font-bold tracking-widest text-slate-500 uppercase">
+        <span className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
           {type === "batch" ? "更新日時" : "対象日"}
         </span>
-        <span className="font-mono text-sm font-bold text-white whitespace-nowrap">
+        <span className="font-mono text-sm font-bold text-bpim-text whitespace-nowrap">
           {currentLabel}
         </span>
       </div>
@@ -105,14 +105,14 @@ export const LogNavigator = ({ type, pagination }: LogNavigatorProps) => {
           variant="ghost"
           size="sm"
           className={cn(
-            "group flex h-auto items-center px-2 text-slate-400 hover:bg-white/5 hover:text-bpim-primary",
+            "group flex h-auto items-center px-2 text-bpim-muted hover:bg-bpim-overlay/50 hover:text-bpim-primary",
             !hasNext && "opacity-30",
           )}
           disabled={!hasNext}
           onClick={() => nextVal && navigateTo(nextVal)}
         >
           <div className="mr-2 hidden flex-col items-end gap-0 md:flex">
-            <span className="text-[10px] tracking-tighter text-slate-600 uppercase">
+            <span className="text-[10px] tracking-tighter text-bpim-subtle uppercase">
               {type === "batch" ? "NEXT BATCH" : "NEXT DAY"}
             </span>
             <span className="text-xs font-bold leading-tight">{nextLabel}</span>

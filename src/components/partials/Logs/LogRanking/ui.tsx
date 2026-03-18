@@ -78,14 +78,14 @@ export const LogRank = ({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Icon className={cn("h-4 w-4", config.accentColor)} />
-          <div className="text-sm font-bold tracking-widest text-slate-200 uppercase">
+          <div className="text-sm font-bold tracking-widest text-bpim-text uppercase">
             {config.title}
           </div>
         </div>
 
         {type !== "top" && !isSharing && (
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-bold text-slate-500">
+            <span className="text-[10px] font-bold text-bpim-muted">
               新規除外
             </span>
             <Switch
@@ -102,7 +102,7 @@ export const LogRank = ({
       <div className="flex flex-col overflow-hidden rounded-xl border border-bpim-border bg-bpim-bg">
         {visibleSongs.length === 0 ? (
           <div className="flex items-center justify-center p-8 bg-white/5">
-            <span className="text-xs text-slate-500">データがありません</span>
+            <span className="text-xs text-bpim-muted">データがありません</span>
           </div>
         ) : (
           visibleSongs.map((item, index) => (
@@ -133,7 +133,7 @@ export const LogRank = ({
         <Button
           variant="ghost"
           size="sm"
-          className="text-slate-500 hover:bg-white/5 hover:text-slate-300"
+          className="text-bpim-muted hover:bg-bpim-overlay/50 hover:text-bpim-text"
           onClick={loadMore}
         >
           もっと表示（残り {remainingCount} 件）

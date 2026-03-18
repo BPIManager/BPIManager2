@@ -45,7 +45,7 @@ export const ActionConfirmDialog = ({
     >
       <DialogContent className="max-w-[90vw] sm:max-w-md border-bpim-border bg-bpim-bg p-0 overflow-hidden shadow-2xl rounded-2xl">
         <DialogHeader className="p-6 pb-4 border-b border-bpim-border">
-          <DialogTitle className="flex items-center gap-3 text-lg font-bold text-white">
+          <DialogTitle className="flex items-center gap-3 text-lg font-bold text-bpim-text">
             {isDestructive && (
               <AlertTriangle className="h-5 w-5 text-bpim-danger shrink-0" />
             )}
@@ -55,11 +55,11 @@ export const ActionConfirmDialog = ({
 
         <div className="p-6 py-8">
           {typeof description === "string" ? (
-            <DialogDescription className="text-sm leading-relaxed text-slate-400">
+            <DialogDescription className="text-sm leading-relaxed text-bpim-muted">
               {description}
             </DialogDescription>
           ) : (
-            <div className="text-sm text-slate-300">{description}</div>
+            <div className="text-sm text-bpim-text">{description}</div>
           )}
         </div>
 
@@ -68,7 +68,7 @@ export const ActionConfirmDialog = ({
             variant="ghost"
             onClick={onClose}
             disabled={isLoading}
-            className="h-9 px-4 text-slate-400 hover:text-white hover:bg-white/5"
+            className="h-9 px-4 text-bpim-muted hover:text-bpim-text hover:bg-bpim-overlay/50"
           >
             {cancelLabel}
           </Button>
@@ -78,8 +78,8 @@ export const ActionConfirmDialog = ({
             className={cn(
               "h-9 px-6 font-bold transition-all min-w-[100px]",
               isDestructive
-                ? "bg-bpim-danger hover:bg-bpim-danger text-white"
-                : "bg-bpim-primary hover:bg-bpim-primary text-white",
+                ? "bg-bpim-danger hover:bg-bpim-danger text-bpim-text"
+                : "bg-bpim-primary hover:bg-bpim-primary text-bpim-text",
             )}
           >
             {isLoading ? (

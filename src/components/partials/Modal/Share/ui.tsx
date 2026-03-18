@@ -54,13 +54,13 @@ export const ShareResultModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-sm border-bpim-border bg-bpim-bg text-white shadow-2xl rounded-2xl">
+      <DialogContent className="max-w-sm border-bpim-border bg-bpim-bg text-bpim-text shadow-2xl rounded-2xl">
         <DialogHeader className="border-b border-bpim-border pb-4">
           <DialogTitle className="text-lg font-bold">画像をシェア</DialogTitle>
         </DialogHeader>
 
         <div className="py-4 flex flex-col gap-4">
-          <p className="text-[11px] leading-relaxed text-slate-400">
+          <p className="text-[11px] leading-relaxed text-bpim-muted">
             出力対象を選択してください。Twitter用の画像として書き出し、クリップボードにコピーまたは共有ダイアログを開きます。
           </p>
 
@@ -91,21 +91,21 @@ export const ShareResultModal = ({
             ].map((opt) => (
               <div
                 key={opt.id}
-                className="flex items-start gap-3 space-x-2 rounded-lg border border-bpim-border bg-white/5 p-3 transition-colors hover:bg-white/10"
+                className="flex items-start gap-3 space-x-2 rounded-lg border border-bpim-border bg-white/5 p-3 transition-colors hover:bg-bpim-overlay"
               >
                 <RadioGroupItem
                   value={opt.id}
                   id={opt.id}
-                  className="mt-1 border-blue-500 text-bpim-text"
+                  className="mt-1 border-bpim-primary text-bpim-text"
                 />
                 <Label
                   htmlFor={opt.id}
                   className="flex flex-col gap-1 cursor-pointer"
                 >
-                  <span className="text-sm font-bold text-white">
+                  <span className="text-sm font-bold text-bpim-text">
                     {opt.label}
                   </span>
-                  <span className="text-[10px] text-slate-500 leading-tight">
+                  <span className="text-[10px] text-bpim-muted leading-tight">
                     {opt.desc}
                   </span>
                 </Label>
@@ -119,7 +119,7 @@ export const ShareResultModal = ({
             variant="ghost"
             onClick={onClose}
             disabled={isSharing}
-            className="flex-1 text-slate-400"
+            className="flex-1 text-bpim-muted"
           >
             キャンセル
           </Button>

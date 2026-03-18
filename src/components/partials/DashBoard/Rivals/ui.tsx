@@ -47,7 +47,7 @@ export const RivalWinLossSummary = ({
       {hasMore && (
         <Button
           variant="ghost"
-          className="mt-4 flex w-full items-center justify-center gap-2 text-xs text-bpim-muted transition-colors hover:bg-white/5 hover:text-white"
+          className="mt-4 flex w-full items-center justify-center gap-2 text-xs text-bpim-muted transition-colors hover:bg-bpim-overlay/50 hover:text-bpim-text"
           onClick={() => setShowAll(!showAll)}
         >
           {showAll ? (

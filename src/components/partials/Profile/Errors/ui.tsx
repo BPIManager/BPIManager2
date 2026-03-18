@@ -20,7 +20,7 @@ export const ProfileErrorState = ({
       title: "ユーザーが見つかりません",
       desc: "指定されたIDのユーザーは存在しないか、退会した可能性があります。",
       icon: <LuUserMinus size={48} />,
-      color: "text-slate-500",
+      color: "text-bpim-muted",
     },
     error: {
       title: "エラーが発生しました",
@@ -37,10 +37,10 @@ export const ProfileErrorState = ({
         {current.icon}
       </div>
       <div className="flex flex-col gap-2">
-        <h2 className="text-2xl font-bold text-white tracking-tight">
+        <h2 className="text-2xl font-bold text-bpim-text tracking-tight">
           {current.title}
         </h2>
-        <p className="max-w-[320px] text-sm text-slate-500 leading-relaxed">
+        <p className="max-w-[320px] text-sm text-bpim-muted leading-relaxed">
           {current.desc}
         </p>
       </div>
@@ -48,7 +48,7 @@ export const ProfileErrorState = ({
         asChild
         variant="outline"
         size="sm"
-        className="mt-4 px-6 border-bpim-border hover:bg-white/5"
+        className="mt-4 px-6 border-bpim-border hover:bg-bpim-overlay/50"
       >
         <Link href="/">トップページへ戻る</Link>
       </Button>

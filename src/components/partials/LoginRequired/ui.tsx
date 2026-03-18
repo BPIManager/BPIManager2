@@ -11,7 +11,7 @@ export const LoginRequiredCard = ({ className }: { className?: string }) => {
       )}
     >
       <LuLock
-        className="pointer-events-none absolute -right-2 -top-2 rotate-12 text-[120px] text-white/5"
+        className="pointer-events-none absolute -right-2 -top-2 rotate-12 text-[120px] text-bpim-text/5"
         aria-hidden="true"
       />
 
@@ -21,7 +21,9 @@ export const LoginRequiredCard = ({ className }: { className?: string }) => {
         </div>
 
         <div className="flex flex-col gap-1">
-          <h3 className="text-lg font-bold text-white">ログインが必要です</h3>
+          <h3 className="text-lg font-bold text-bpim-text">
+            ログインが必要です
+          </h3>
           <p className="max-w-[280px] text-sm text-bpim-muted">
             このコンテンツの利用には、BPIMアカウントへのログインが必要です。
           </p>

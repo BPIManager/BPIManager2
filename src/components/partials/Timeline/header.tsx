@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+﻿import { cn } from "@/lib/utils";
 
 export const TimelineHeader = () => {
   return (
@@ -33,7 +33,7 @@ const HeaderText = ({
 }) => (
   <span
     className={cn(
-      "text-[9px] font-bold tracking-wider text-slate-500 uppercase",
+      "text-[9px] font-bold tracking-wider text-bpim-muted uppercase",
       className,
     )}
   >

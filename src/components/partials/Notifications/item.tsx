@@ -16,7 +16,7 @@ export const NotificationItem = ({ n }: { n: NotificationItemType }) => {
       <div
         className={cn(
           "flex items-center gap-3 p-3 transition-colors border-b border-bpim-border",
-          "hover:bg-white/5 last:border-b-0",
+          "hover:bg-bpim-overlay/50 last:border-b-0",
         )}
       >
         <Avatar className="h-9 w-9 border border-bpim-border">
@@ -25,12 +25,12 @@ export const NotificationItem = ({ n }: { n: NotificationItemType }) => {
         </Avatar>
 
         <div className="flex flex-1 flex-col gap-0.5 min-w-0">
-          <span className="text-[10px] text-slate-500">
+          <span className="text-[10px] text-bpim-muted">
             {dayjs(n.timestamp).fromNow()}
           </span>
 
-          <div className="text-sm text-slate-200 leading-snug">
-            <span className="font-bold text-white">{n.senderName}</span>
+          <div className="text-sm text-bpim-text leading-snug">
+            <span className="font-bold text-bpim-text">{n.senderName}</span>
             {isOvertaken ? (
               <>
                 {" "}

@@ -39,7 +39,9 @@ const HistoryTooltip = ({ active, payload, label, myName, rivalName }: any) => {
         {isComparison ? (
           <>
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-bpim-primary">{myName}</span>
+              <span className="text-xs font-bold text-bpim-primary">
+                {myName}
+              </span>
               <span className="font-mono text-sm font-bold text-bpim-primary">
                 {data.myBpi?.toFixed(2)}
               </span>
@@ -86,7 +88,7 @@ const HistoryTooltip = ({ active, payload, label, myName, rivalName }: any) => {
                 </p>
                 <div className="max-h-[120px] w-full overflow-y-auto pr-1">
                   {data.updatedSongs?.map((song: string, idx: number) => (
-                    <p key={idx} className="text-[10px] text-white/70">
+                    <p key={idx} className="text-[10px] text-bpim-text/70">
                       • {song}
                     </p>
                   ))}

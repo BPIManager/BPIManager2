@@ -51,7 +51,7 @@ export const RankingTabsCard = ({ userId }: { userId: string }) => {
               <TabsTrigger
                 key={t.value}
                 value={t.value}
-                className="text-[11px] font-bold transition-all data-[state=active]:bg-bpim-surface data-[state=active]:text-white data-[state=active]:shadow-sm"
+                className="text-[11px] font-bold transition-all data-[state=active]:bg-bpim-surface data-[state=active]:text-bpim-text data-[state=active]:shadow-sm"
               >
                 {t.label}
               </TabsTrigger>

@@ -21,10 +21,10 @@ export default function LoginPage() {
         title=""
         description="beatmania IIDX 上級者のためのスコアマネジメントツール"
       />
-      <div className="min-h-screen bg-bpim-bg py-20 text-white">
+      <div className="min-h-screen bg-bpim-bg py-20 text-bpim-text">
         <PageContainer>
           <div className="mb-16 flex flex-col items-center gap-6 text-center">
-            <h1 className="bg-gradient-to-br from-white to-gray-600 bg-clip-text text-6xl font-bold tracking-tighter text-transparent leading-none md:text-8xl">
+            <h1 className="bg-gradient-to-br from-bpim-text to-gray-600 bg-clip-text text-6xl font-bold tracking-tighter text-transparent leading-none md:text-8xl">
               BPIM2
             </h1>
             <p className="max-w-2xl text-base text-bpim-muted md:text-lg">
@@ -44,7 +44,7 @@ export default function LoginPage() {
                   <a
                     href="https://bpi.poyashi.me"
                     target="_blank"
-                    className="font-bold text-white underline decoration-white/20 underline-offset-4 transition-colors hover:text-bpim-primary hover:decoration-blue-400/50"
+                    className="font-bold text-bpim-text underline decoration-white/20 underline-offset-4 transition-colors hover:text-bpim-primary hover:decoration-blue-400/50"
                   >
                     BPIM
                   </a>{" "}
@@ -71,7 +71,7 @@ export default function LoginPage() {
                 </div>
 
                 <div className="flex flex-1 flex-col gap-4">
-                  <h4 className="text-lg font-bold text-white">BPIとは</h4>
+                  <h4 className="text-lg font-bold text-bpim-text">BPIとは</h4>
                   <div className="text-sm leading-relaxed text-bpim-muted">
                     <p>
                       beatmania IIDXのスコアを統計的に算出し、
@@ -149,7 +149,7 @@ const FeatureCard = ({
     <div className="mb-4 flex items-center justify-center rounded-lg bg-bpim-primary/10 p-3 text-bpim-primary">
       <Icon className="h-6 w-6" />
     </div>
-    <h5 className="mb-2 text-base font-bold text-white">{title}</h5>
+    <h5 className="mb-2 text-base font-bold text-bpim-text">{title}</h5>
     <p className="text-xs leading-relaxed text-bpim-muted">{description}</p>
   </div>
 );

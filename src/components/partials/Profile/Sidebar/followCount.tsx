@@ -12,10 +12,10 @@ export const FollowStats = ({
       href={`/users/${userId}/following`}
       className="group flex flex-col items-center"
     >
-      <span className="font-mono text-lg font-bold text-white group-hover:text-bpim-primary transition-colors">
+      <span className="font-mono text-lg font-bold text-bpim-text group-hover:text-bpim-primary transition-colors">
         {follows.following}
       </span>
-      <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+      <span className="text-[10px] font-bold uppercase tracking-widest text-bpim-muted">
         フォロー
       </span>
     </Link>
@@ -23,10 +23,10 @@ export const FollowStats = ({
       href={`/users/${userId}/followers`}
       className="group flex flex-col items-center"
     >
-      <span className="font-mono text-lg font-bold text-white group-hover:text-bpim-primary transition-colors">
+      <span className="font-mono text-lg font-bold text-bpim-text group-hover:text-bpim-primary transition-colors">
         {follows.follower}
       </span>
-      <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+      <span className="text-[10px] font-bold uppercase tracking-widest text-bpim-muted">
         フォロワー
       </span>
     </Link>

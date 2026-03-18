@@ -18,14 +18,14 @@ export const SimpleRankItem = ({
   const lampClass = getLampClass(item.clearState);
   const isFullCombo = item.clearState === "FULLCOMBO CLEAR";
 
-  const difficultyBg = diffColors[item.difficulty] || "bg-slate-800";
+  const difficultyBg = diffColors[item.difficulty] || "bg-bpim-surface-2";
 
   return (
     <div
       onClick={onClick}
       className={cn(
         "group relative flex items-center justify-between gap-3 p-3 pl-4 transition-colors duration-200",
-        "border-b border-bpim-border cursor-pointer hover:bg-white/5",
+        "border-b border-bpim-border cursor-pointer hover:bg-bpim-overlay/50",
       )}
     >
       <div
@@ -39,19 +39,19 @@ export const SimpleRankItem = ({
 
       <div className="flex flex-1 items-center gap-3 min-w-0">
         <div className="w-4 shrink-0">
-          <span className="font-mono text-[10px] font-bold text-slate-600 block text-center">
+          <span className="font-mono text-[10px] font-bold text-bpim-subtle block text-center">
             {rank}
           </span>
         </div>
 
         <div className="flex flex-col gap-0.5 min-w-0">
-          <span className="truncate text-sm font-bold text-white tracking-tight">
+          <span className="truncate text-sm font-bold text-bpim-text tracking-tight">
             {item.title}
           </span>
           <div className="flex items-center gap-1.5">
             <Badge
               className={cn(
-                "h-3.5 px-1 text-[9px] font-black border-none rounded-sm text-white flex items-center",
+                "h-3.5 px-1 text-[9px] font-black border-none rounded-sm text-bpim-text flex items-center",
                 difficultyBg,
               )}
             >
@@ -59,7 +59,7 @@ export const SimpleRankItem = ({
                 .charAt(0)
                 .toUpperCase()}
             </Badge>
-            <span className="text-[10px] font-bold text-slate-500">
+            <span className="text-[10px] font-bold text-bpim-muted">
               ☆{item.difficultyLevel}
             </span>
           </div>
@@ -68,15 +68,15 @@ export const SimpleRankItem = ({
 
       <div className="flex shrink-0 items-center gap-4 font-mono">
         <div className="flex flex-col items-end gap-0">
-          <span className="text-[9px] font-bold text-slate-600 leading-none">
+          <span className="text-[9px] font-bold text-bpim-subtle leading-none">
             EX
           </span>
-          <span className="text-sm font-bold text-slate-200 leading-tight">
+          <span className="text-sm font-bold text-bpim-text leading-tight">
             {item.current.exScore}
           </span>
         </div>
         <div className="flex flex-col items-end gap-0">
-          <span className="text-[9px] font-bold text-slate-600 leading-none">
+          <span className="text-[9px] font-bold text-bpim-subtle leading-none">
             BPI
           </span>
           <span className="text-sm font-bold text-bpim-primary leading-tight">

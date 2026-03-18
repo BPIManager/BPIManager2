@@ -36,7 +36,7 @@ export default function FollowPage({
           <TabsList className="mb-6 grid h-11 w-full grid-cols-2 items-stretch rounded-full border border-bpim-border bg-bpim-card/50 p-1.5 transition-all">
             <TabsTrigger
               value="following"
-              className="flex h-full items-center justify-center gap-2 rounded-full text-xs font-bold transition-all data-[state=active]:bg-bpim-primary data-[state=active]:text-white data-[state=active]:shadow-lg"
+              className="flex h-full items-center justify-center gap-2 rounded-full text-xs font-bold transition-all data-[state=active]:bg-bpim-primary data-[state=active]:text-bpim-text data-[state=active]:shadow-lg"
             >
               <LuUserCheck className="h-4 w-4" />
               <span>フォロー</span>
@@ -44,7 +44,7 @@ export default function FollowPage({
 
             <TabsTrigger
               value="followers"
-              className="flex h-full items-center justify-center gap-2 rounded-full text-xs font-bold transition-all data-[state=active]:bg-bpim-primary data-[state=active]:text-white data-[state=active]:shadow-lg"
+              className="flex h-full items-center justify-center gap-2 rounded-full text-xs font-bold transition-all data-[state=active]:bg-bpim-primary data-[state=active]:text-bpim-text data-[state=active]:shadow-lg"
             >
               <LuUsers className="h-4 w-4" />
               <span>フォロワー</span>
@@ -54,7 +54,7 @@ export default function FollowPage({
           <TabsContent value={type} className="mt-0 outline-none">
             {users.length === 0 && !isLoading ? (
               <div className="flex flex-col items-center justify-center py-16 gap-2">
-                <p className="text-sm font-medium text-slate-500">
+                <p className="text-sm font-medium text-bpim-muted">
                   まだ誰もいません
                 </p>
               </div>
@@ -73,7 +73,7 @@ export default function FollowPage({
                       size="sm"
                       onClick={loadMore}
                       disabled={isLoading}
-                      className="text-slate-400 hover:bg-white/5 hover:text-white"
+                      className="text-bpim-muted hover:bg-bpim-overlay/50 hover:text-bpim-text"
                     >
                       {isLoading ? (
                         <LuLoader className="mr-2 h-4 w-4 animate-spin" />

@@ -34,7 +34,7 @@ export const ReusableMenuItem = ({
       rel={isExternal ? "noopener noreferrer" : undefined}
       className={cn(
         "group block w-full rounded-xl border border-bpim-border bg-bpim-bg/40 p-4 transition-all duration-200",
-        "hover:border-white/20 hover:bg-slate-800/60 hover:no-underline",
+        "hover:border-white/20 hover:bg-bpim-surface-2/60 hover:no-underline",
         className,
       )}
       {...props}
@@ -45,15 +45,15 @@ export const ReusableMenuItem = ({
         </div>
 
         <div className="flex flex-1 flex-col items-start gap-0 text-left">
-          <span className="text-base font-bold tracking-tight text-white">
+          <span className="text-base font-bold tracking-tight text-bpim-text">
             {title}
           </span>
           {subtitle && (
-            <span className="text-xs text-slate-500">{subtitle}</span>
+            <span className="text-xs text-bpim-muted">{subtitle}</span>
           )}
         </div>
 
-        <div className="text-slate-600 transition-transform duration-300 ease-out group-hover:translate-x-1 group-hover:text-slate-300">
+        <div className="text-bpim-subtle transition-transform duration-300 ease-out group-hover:translate-x-1 group-hover:text-bpim-text">
           <ChevronRight size={20} />
         </div>
       </div>

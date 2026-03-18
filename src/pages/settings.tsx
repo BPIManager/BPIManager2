@@ -10,6 +10,7 @@ import ApiKeyUi from "@/components/partials/Settings/APIKey/ui";
 import LoginPage from "@/components/partials/LogIn/page";
 import { Meta } from "@/components/partials/Head";
 import { Loader2 } from "lucide-react";
+import ThemeSettingsUi from "@/components/partials/Settings/ThemeSettings/ui";
 
 export default function SettingsPage() {
   const { user, isLoading, fbUser } = useUser();
@@ -41,6 +42,7 @@ export default function SettingsPage() {
         <div className="flex flex-col gap-6">
           <AccountSettingsUi />
 
+          <ThemeSettingsUi />
           <TransferUi />
 
           <ApiKeyUi />

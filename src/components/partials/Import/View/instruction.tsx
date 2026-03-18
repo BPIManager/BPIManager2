@@ -27,7 +27,7 @@ export const InstructionSection = () => {
     <div className="rounded-xl border border-blue-500/20 bg-bpim-primary/10 p-5">
       <div className="mb-4 flex items-center gap-3">
         <HelpCircle className="h-5 w-5 text-bpim-text" />
-        <h3 className="text-lg font-bold text-white">インポート方法</h3>
+        <h3 className="text-lg font-bold text-bpim-text">インポート方法</h3>
       </div>
       <ul className="flex flex-col gap-3">
         {steps.map((item) => (
@@ -35,7 +35,7 @@ export const InstructionSection = () => {
             key={item.step}
             className="flex items-start gap-3 text-sm leading-relaxed text-bpim-text"
           >
-            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-bpim-primary text-[10px] font-bold text-white">
+            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-bpim-primary text-[10px] font-bold text-bpim-text">
               {item.step}
             </span>
             <div className="pt-0.5">{item.text}</div>

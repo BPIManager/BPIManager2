@@ -18,7 +18,7 @@ export const BatchTotalBpiCard = ({ pagination }: { pagination: any }) => {
       ? "text-bpim-primary"
       : bpiDiff < 0
         ? "text-bpim-danger"
-        : "text-slate-500";
+        : "text-bpim-muted";
   const bpiBgClass =
     bpiDiff > 0
       ? "bg-bpim-primary/10"
@@ -28,7 +28,7 @@ export const BatchTotalBpiCard = ({ pagination }: { pagination: any }) => {
 
   const RankIcon =
     rankDiff > 0 ? TrendingUp : rankDiff < 0 ? TrendingDown : Minus;
-  const rankColorClass = rankDiff > 0 ? "text-bpim-warning" : "text-slate-500";
+  const rankColorClass = rankDiff > 0 ? "text-bpim-warning" : "text-bpim-muted";
 
   return (
     <DashCard className="mb-4 p-4 md:p-6">
@@ -42,15 +42,15 @@ export const BatchTotalBpiCard = ({ pagination }: { pagination: any }) => {
         </div>
 
         <div className="flex flex-1 flex-col items-start gap-1 w-full">
-          <span className="text-[10px] font-bold tracking-widest text-slate-500 uppercase">
+          <span className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
             総合BPI (☆12)
           </span>
           <div className="flex flex-wrap items-baseline gap-2 md:gap-3">
-            <span className="font-mono text-lg font-bold text-slate-500 md:text-2xl">
+            <span className="font-mono text-lg font-bold text-bpim-muted md:text-2xl">
               {prevBpi.toFixed(2)}
             </span>
-            <ChevronRight className="h-3 w-3 text-slate-800" />
-            <span className="font-mono text-3xl font-bold text-white leading-none md:text-4xl">
+            <ChevronRight className="h-3 w-3 text-bpim-subtle" />
+            <span className="font-mono text-3xl font-bold text-bpim-text leading-none md:text-4xl">
               {currentBpi.toFixed(2)}
             </span>
             <div
@@ -70,16 +70,16 @@ export const BatchTotalBpiCard = ({ pagination }: { pagination: any }) => {
         </div>
 
         <div className="flex flex-1 flex-col items-start gap-1 w-full">
-          <span className="text-[10px] font-bold tracking-widest text-slate-500 uppercase">
+          <span className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
             推定順位
           </span>
           <div className="flex flex-wrap items-baseline gap-2 md:gap-3">
-            <div className="font-mono text-md font-bold text-slate-500 md:text-xl">
+            <div className="font-mono text-md font-bold text-bpim-muted md:text-xl">
               {prevRank.toLocaleString()}
               <span className="ml-0.5 text-[10px]">位</span>
             </div>
-            <ChevronRight className="h-3 w-3 text-slate-800" />
-            <div className="font-mono text-2xl font-bold text-orange-200 leading-none md:text-3xl">
+            <ChevronRight className="h-3 w-3 text-bpim-subtle" />
+            <div className="font-mono text-2xl font-bold text-bpim-warning leading-none md:text-3xl">
               {currentRank.toLocaleString()}
               <span className="ml-0.5 text-xs">位</span>
             </div>

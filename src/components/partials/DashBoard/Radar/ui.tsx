@@ -68,7 +68,7 @@ const RadarCustomTooltip = ({ active, payload }: any) => {
     return (
       <div className="min-w-[160px] rounded-md border border-white/20 bg-bpim-bg p-3 shadow-xl">
         <div className="flex flex-col gap-1">
-          <p className="text-xs font-bold text-white uppercase">
+          <p className="text-xs font-bold text-bpim-text uppercase">
             {data.category}
           </p>
           <div className="my-1 h-px w-full bg-white/10" />
@@ -79,11 +79,11 @@ const RadarCustomTooltip = ({ active, payload }: any) => {
               <span className="text-xs font-bold text-bpim-primary">YOU</span>
             </div>
             <div className="flex items-center gap-1">
-              <span className="font-mono text-xs font-bold text-white">
+              <span className="font-mono text-xs font-bold text-bpim-text">
                 {meVal.toFixed(2)}
               </span>
               {data.isMeMax && (
-                <span className="rounded bg-bpim-primary px-1 py-0.5 text-[8px] font-bold text-white">
+                <span className="rounded bg-bpim-primary px-1 py-0.5 text-[8px] font-bold text-bpim-text">
                   BEST
                 </span>
               )}
@@ -100,11 +100,11 @@ const RadarCustomTooltip = ({ active, payload }: any) => {
                   </span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <span className="font-mono text-xs font-bold text-white">
+                  <span className="font-mono text-xs font-bold text-bpim-text">
                     {rivalVal.toFixed(2)}
                   </span>
                   {data.isRivalMax && (
-                    <span className="rounded bg-orange-600 px-1 py-0.5 text-[8px] font-bold text-white">
+                    <span className="rounded bg-orange-600 px-1 py-0.5 text-[8px] font-bold text-bpim-text">
                       BEST
                     </span>
                   )}
@@ -117,7 +117,7 @@ const RadarCustomTooltip = ({ active, payload }: any) => {
                   meVal >= rivalVal ? "bg-green-900/50" : "bg-red-900/50",
                 )}
               >
-                <p className="text-[9px] font-bold text-white">
+                <p className="text-[9px] font-bold text-bpim-text">
                   {meVal >= rivalVal
                     ? `WIN (+${(meVal - rivalVal).toFixed(2)})`
                     : `LOSE (${(meVal - rivalVal).toFixed(2)})`}

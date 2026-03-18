@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { AAATableItem } from "@/hooks/metrics/useAAATable";
@@ -37,7 +37,7 @@ export const AAAGridItem = ({
   };
 
   const bgColorClass =
-    item.user.exScore > 0 ? getBgColor(bpiGap, isHighBpi) : "bg-slate-800";
+    item.user.exScore > 0 ? getBgColor(bpiGap, isHighBpi) : "bg-bpim-surface-2";
 
   const useWhiteText = isHighBpi || bpiGap > 5 || item.user.exScore === 0;
   const diffChar = item.difficulty.slice(0, 1).toUpperCase();
@@ -54,7 +54,7 @@ export const AAAGridItem = ({
             className={cn(
               "group relative flex cursor-help flex-col gap-2 rounded-md p-3 transition-all duration-150 ease-out border select-none",
               bgColorClass,
-              useWhiteText ? "text-white" : "text-slate-950",
+              useWhiteText ? "text-bpim-text" : "text-slate-950",
               open
                 ? "border-white scale-105 z-10 shadow-2xl"
                 : "border-bpim-border hover:scale-[1.04] hover:shadow-xl",

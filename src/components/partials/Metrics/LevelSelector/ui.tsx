@@ -28,11 +28,11 @@ export const ArenaAverageFilter = ({
     <div className="rounded-xl border border-bpim-border bg-bpim-bg/80 p-4 shadow-sm backdrop-blur-md">
       <div className="flex flex-col gap-6 md:flex-row md:items-start md:gap-10">
         <div className="flex flex-col gap-2 min-w-full md:min-w-[240px]">
-          <span className="text-[10px] font-black tracking-widest text-slate-500 uppercase px-1">
+          <span className="text-[10px] font-black tracking-widest text-bpim-muted uppercase px-1">
             Version
           </span>
           <Select value={version} onValueChange={onVersionChange}>
-            <SelectTrigger className="h-9 border-bpim-border bg-white/5 text-xs text-slate-200 focus:ring-blue-500">
+            <SelectTrigger className="h-9 border-bpim-border bg-white/5 text-xs text-bpim-text focus:ring-blue-500">
               <SelectValue placeholder="バージョンを選択" />
             </SelectTrigger>
             <SelectContent className="border-bpim-border bg-bpim-bg">
@@ -46,7 +46,7 @@ export const ArenaAverageFilter = ({
         </div>
 
         <div className="flex flex-col gap-2">
-          <span className="text-[10px] font-black tracking-widest text-slate-500 uppercase px-1">
+          <span className="text-[10px] font-black tracking-widest text-bpim-muted uppercase px-1">
             Level
           </span>
           <RadioGroup
@@ -59,11 +59,11 @@ export const ArenaAverageFilter = ({
                 <RadioGroupItem
                   value={lv}
                   id={`lv-${lv}`}
-                  className="border-blue-500 text-bpim-text"
+                  className="border-bpim-primary text-bpim-text"
                 />
                 <Label
                   htmlFor={`lv-${lv}`}
-                  className="text-sm font-bold text-slate-200 cursor-pointer"
+                  className="text-sm font-bold text-bpim-text cursor-pointer"
                 >
                   ☆{lv}
                 </Label>

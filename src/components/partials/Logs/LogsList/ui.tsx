@@ -78,7 +78,7 @@ export const LogsList = ({ userId, version, groupedBy }: Props) => {
     <div className="relative min-h-[50vh] pb-24">
       <div className="relative flex flex-col gap-10 p-4">
         <div
-          className="absolute left-10 top-10 bottom-24 w-0.5 bg-slate-800 hidden md:block"
+          className="absolute left-10 top-10 bottom-24 w-0.5 bg-bpim-surface-2 hidden md:block"
           aria-hidden="true"
         />
 
@@ -91,7 +91,7 @@ export const LogsList = ({ userId, version, groupedBy }: Props) => {
                     className="hidden md:block h-3 w-3 shrink-0 rounded-full border-2 border-slate-950 bg-bpim-primary ml-[21px]"
                     aria-hidden="true"
                   />
-                  <h2 className="text-xl font-bold tracking-tight text-white">
+                  <h2 className="text-xl font-bold tracking-tight text-bpim-text">
                     {group.date}
                   </h2>
                   <Badge
@@ -111,18 +111,18 @@ export const LogsList = ({ userId, version, groupedBy }: Props) => {
                   <div className="flex flex-wrap items-center justify-between gap-4">
                     <div className="flex gap-8">
                       <div className="flex flex-col">
-                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                        <span className="text-[10px] font-bold text-bpim-muted uppercase tracking-wider">
                           合計更新件数
                         </span>
-                        <span className="text-lg font-bold text-slate-200">
+                        <span className="text-lg font-bold text-bpim-text">
                           {group.dayTotalUpdates}{" "}
-                          <span className="text-xs font-normal text-slate-500">
+                          <span className="text-xs font-normal text-bpim-muted">
                             songs
                           </span>
                         </span>
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                        <span className="text-[10px] font-bold text-bpim-muted uppercase tracking-wider">
                           BPI上昇幅計
                         </span>
                         <span
@@ -143,7 +143,7 @@ export const LogsList = ({ userId, version, groupedBy }: Props) => {
                       asChild
                       variant="outline"
                       size="sm"
-                      className="rounded-full border-bpim-border hover:bg-white/5"
+                      className="rounded-full border-bpim-border hover:bg-bpim-overlay/50"
                     >
                       <Link
                         href={{

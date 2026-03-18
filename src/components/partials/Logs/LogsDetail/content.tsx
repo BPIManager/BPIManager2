@@ -136,13 +136,13 @@ export const LogsDetailContent = ({
           <TabsList className="grid h-auto w-full max-w-md grid-cols-2 rounded-lg bg-white/5 p-1">
             <TabsTrigger
               value="summary"
-              className="py-2 text-xs font-bold transition-all data-[state=active]:bg-bpim-surface data-[state=active]:text-white"
+              className="py-2 text-xs font-bold transition-all data-[state=active]:bg-bpim-surface data-[state=active]:text-bpim-text"
             >
               サマリー
             </TabsTrigger>
             <TabsTrigger
               value="songs"
-              className="py-2 text-xs font-bold transition-all data-[state=active]:bg-bpim-surface data-[state=active]:text-white"
+              className="py-2 text-xs font-bold transition-all data-[state=active]:bg-bpim-surface data-[state=active]:text-bpim-text"
             >
               更新楽曲 ({details.songs.length})
             </TabsTrigger>
@@ -153,7 +153,7 @@ export const LogsDetailContent = ({
               <Button
                 variant="outline"
                 size="sm"
-                className="rounded-full border-bpim-border bg-transparent px-4 text-xs font-bold hover:bg-white/5"
+                className="rounded-full border-bpim-border bg-transparent px-4 text-xs font-bold hover:bg-bpim-overlay/50"
                 onClick={() => setIsModalOpen(true)}
               >
                 <XIcon className="mr-2 h-4 w-4" />

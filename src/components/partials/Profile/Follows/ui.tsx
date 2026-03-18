@@ -13,7 +13,9 @@ export const UserFollowCard = ({ user }: { user: any }) => {
         <AvatarFallback>{user.userName?.slice(0, 2)}</AvatarFallback>
       </Avatar>
       <div className="flex flex-col items-start gap-0">
-        <span className="text-sm font-bold text-white">{user.userName}</span>
+        <span className="text-sm font-bold text-bpim-text">
+          {user.userName}
+        </span>
         <div className="flex items-center gap-2">
           <Badge className="bg-orange-600 px-1 py-0 text-[10px] font-bold border-none h-4">
             {user.arenaRank || "N/A"}
@@ -28,7 +30,7 @@ export const UserFollowCard = ({ user }: { user: any }) => {
 
   const containerClass = cn(
     "flex w-full items-center justify-between rounded-xl border border-bpim-border bg-white/5 p-4 transition-colors duration-200",
-    isMasked ? "cursor-default" : "cursor-pointer hover:bg-white/10",
+    isMasked ? "cursor-default" : "cursor-pointer hover:bg-bpim-overlay",
   );
 
   return isMasked ? (

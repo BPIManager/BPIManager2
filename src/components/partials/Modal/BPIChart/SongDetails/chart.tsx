@@ -38,10 +38,10 @@ const ChartTooltip = ({ active, payload, youScore, maxScore }: any) => {
         <Separator className="bg-white/10" />
 
         <div className="flex flex-col gap-0.5">
-          <p className="text-sm font-bold text-white font-mono">
+          <p className="text-sm font-bold text-bpim-text font-mono">
             Score: {data.count}
           </p>
-          <p className="text-[10px] text-slate-400 font-mono">Rate: {rate}%</p>
+          <p className="text-[10px] text-bpim-muted font-mono">Rate: {rate}%</p>
         </div>
 
         {!isYou && (

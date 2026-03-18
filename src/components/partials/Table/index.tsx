@@ -31,14 +31,16 @@ export const SongsTable = ({
   if (!isLoading && (error || !songs)) {
     return (
       <div className="flex h-[200px] flex-col items-center justify-center gap-2">
-        <p className="font-bold text-bpim-danger">楽曲データの取得に失敗しました</p>
-        <p className="text-xs text-slate-500">{error?.message}</p>
+        <p className="font-bold text-bpim-danger">
+          楽曲データの取得に失敗しました
+        </p>
+        <p className="text-xs text-bpim-muted">{error?.message}</p>
       </div>
     );
   }
 
   return (
-    <div className="flex w-full min-h-[100svh] flex-col p-0 bg-background">
+    <div className="flex w-full min-h-[100svh] flex-col p-0">
       <SongFilterBar
         params={params}
         onParamsChange={updateParams}

@@ -2,56 +2,91 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @plugin "tailwindcss-animate";
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:is([data-theme="dark-blue"] *), &:is([data-theme="dark-green"] *));
 
 @layer base {
-  :root {
+  :root,
+  [data-theme="dark-blue"] {
     --bpim-bg: 222 47% 4%;
     --bpim-surface: 222 40% 7%;
     --bpim-surface-2: 222 35% 10%;
     --bpim-overlay: 222 30% 14%;
-
     --bpim-primary: 217 91% 60%;
     --bpim-primary-dim: 217 60% 40%;
-    --bpim-primary-glow: 217 91% 60%;
-
     --bpim-border: 217 20% 15%;
     --bpim-border-dim: 217 15% 10%;
-
     --bpim-text: 220 20% 95%;
     --bpim-text-muted: 220 10% 55%;
     --bpim-text-subtle: 220 10% 35%;
-
     --bpim-success: 142 70% 45%;
     --bpim-danger: 0 72% 55%;
     --bpim-warning: 38 92% 55%;
     --bpim-info: 199 89% 48%;
-
-    --bpim-chart-primary: #3b82f6;
-    --bpim-chart-secondary: #475569;
-    --bpim-chart-grid: #334155;
-    --bpim-chart-warning: #f97316;
-    --bpim-chart-gold: #fbbf24;
   }
 
-  .theme-pitch-black {
-    --bpim-bg: 0 0% 4%;
-    --bpim-surface: 0 0% 8%;
-    --bpim-surface-2: 0 0% 12%;
-    --bpim-overlay: 0 0% 17%;
-    --bpim-primary: 0 0% 90%;
-    --bpim-primary-dim: 0 0% 60%;
-    --bpim-primary-glow: 0 0% 90%;
-    --bpim-border: 0 0% 18%;
-    --bpim-border-dim: 0 0% 12%;
-    --bpim-text: 0 0% 95%;
-    --bpim-text-muted: 0 0% 50%;
-    --bpim-text-subtle: 0 0% 32%;
-    --bpim-success: 142 55% 42%;
-    --bpim-danger: 0 65% 52%;
-    --bpim-warning: 38 85% 52%;
-    --bpim-info: 199 80% 45%;
+  [data-theme="dark-green"] {
+    --bpim-bg: 150 47% 4%;
+    --bpim-surface: 150 35% 7%;
+    --bpim-surface-2: 150 30% 10%;
+    --bpim-overlay: 150 25% 14%;
+    --bpim-primary: 142 70% 45%;
+    --bpim-primary-dim: 142 50% 28%;
+    --bpim-border: 142 20% 15%;
+    --bpim-border-dim: 142 15% 10%;
+    --bpim-text: 140 20% 95%;
+    --bpim-text-muted: 140 10% 55%;
+    --bpim-text-subtle: 140 10% 35%;
+    --bpim-success: 142 70% 45%;
+    --bpim-danger: 0 72% 55%;
+    --bpim-warning: 38 92% 55%;
+    --bpim-info: 199 89% 48%;
   }
+
+  [data-theme="light-blue"] {
+    --bpim-bg: 220 40% 96%;
+    --bpim-surface: 220 30% 100%;
+    --bpim-surface-2: 220 25% 94%;
+    --bpim-overlay: 220 20% 90%;
+    --bpim-primary: 217 91% 50%;
+    --bpim-primary-dim: 217 70% 65%;
+    --bpim-border: 217 20% 82%;
+    --bpim-border-dim: 217 15% 88%;
+    --bpim-text: 222 40% 8%;
+    --bpim-text-muted: 222 15% 40%;
+    --bpim-text-subtle: 222 10% 58%;
+    --bpim-success: 142 60% 35%;
+    --bpim-danger: 0 65% 48%;
+    --bpim-warning: 38 85% 45%;
+    --bpim-info: 199 80% 40%;
+  }
+
+  [data-theme="light-green"] {
+    --bpim-bg: 138 40% 95%;
+    --bpim-surface: 138 20% 100%;
+    --bpim-surface-2: 138 25% 93%;
+    --bpim-overlay: 138 20% 88%;
+    --bpim-primary: 142 60% 35%;
+    --bpim-primary-dim: 142 45% 50%;
+    --bpim-border: 142 20% 78%;
+    --bpim-border-dim: 142 15% 86%;
+    --bpim-text: 150 40% 8%;
+    --bpim-text-muted: 150 15% 38%;
+    --bpim-text-subtle: 150 10% 55%;
+    --bpim-success: 142 60% 32%;
+    --bpim-danger: 0 65% 48%;
+    --bpim-warning: 38 85% 42%;
+    --bpim-info: 199 80% 38%;
+  }
+}
+
+[data-theme="light-blue"],
+[data-theme="light-green"] {
+  color-scheme: light;
+}
+
+[data-theme="dark-blue"],
+[data-theme="dark-green"] {
+  color-scheme: dark;
 }
 
 :root {

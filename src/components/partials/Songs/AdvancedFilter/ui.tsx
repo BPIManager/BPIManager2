@@ -86,7 +86,7 @@ export const AdvancedFilterModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-2xl border-bpim-border p-6 text-white">
+      <DialogContent className="max-w-2xl border-bpim-border p-6 text-bpim-text">
         <DialogHeader>
           <DialogTitle className="text-base font-bold">
             詳細フィルター
@@ -110,7 +110,7 @@ export const AdvancedFilterModal = ({
                   })
                 }
               />
-              <span className="text-slate-600">~</span>
+              <span className="text-bpim-subtle">~</span>
               <Input
                 placeholder="Max"
                 type="number"
@@ -181,7 +181,7 @@ export const AdvancedFilterModal = ({
                     "h-7 px-2 rounded-full border-bpim-border",
                     localParams.since === opt.value
                       ? "bg-bpim-primary"
-                      : "bg-transparent text-slate-400",
+                      : "bg-transparent text-bpim-muted",
                   )}
                   onClick={() =>
                     updateLocal({
@@ -203,7 +203,7 @@ export const AdvancedFilterModal = ({
                   "h-7 px-2 rounded-full border-bpim-border",
                   isCustomActive
                     ? "bg-bpim-primary"
-                    : "bg-transparent text-slate-400",
+                    : "bg-transparent text-bpim-muted",
                 )}
                 onClick={() => {
                   if (isCustomActive) {
@@ -222,7 +222,9 @@ export const AdvancedFilterModal = ({
               <div className="flex flex-col gap-3 rounded-lg bg-white/5 p-3">
                 <div className="grid grid-cols-[1fr_auto_1fr] items-end gap-2">
                   <div className="flex flex-col gap-1.5">
-                    <Label className="text-[10px] text-slate-500">開始日</Label>
+                    <Label className="text-[10px] text-bpim-muted">
+                      開始日
+                    </Label>
                     <Input
                       type="date"
                       className="h-8 border-bpim-border bg-bpim-bg text-xs [color-scheme:dark]"
@@ -230,9 +232,11 @@ export const AdvancedFilterModal = ({
                       onChange={(e) => updateLocal({ since: e.target.value })}
                     />
                   </div>
-                  <span className="mb-2 text-slate-600 text-xs">~</span>
+                  <span className="mb-2 text-bpim-subtle text-xs">~</span>
                   <div className="flex flex-col gap-1.5">
-                    <Label className="text-[10px] text-slate-500">終了日</Label>
+                    <Label className="text-[10px] text-bpim-muted">
+                      終了日
+                    </Label>
                     <Input
                       type="date"
                       className="h-8 border-bpim-border bg-bpim-bg text-xs [color-scheme:dark]"
@@ -288,7 +292,7 @@ export const AdvancedFilterModal = ({
             variant="ghost"
             size="sm"
             onClick={handleReset}
-            className="text-slate-400"
+            className="text-bpim-muted"
           >
             リセット
           </Button>

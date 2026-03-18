@@ -29,7 +29,7 @@ export const FilterSearchInput = ({
 
   return (
     <div className="relative flex-1 w-full group">
-      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none">
+      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-bpim-muted pointer-events-none">
         <Search size={14} />
       </div>
 
@@ -65,7 +65,7 @@ export const FilterCheckboxGroup = <T extends string | number>({
   getLabel,
 }: FilterCheckboxGroupProps<T>) => (
   <div className="flex flex-col gap-1.5">
-    <span className="text-[10px] font-bold tracking-widest text-slate-500 uppercase">
+    <span className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
       {label}
     </span>
     <div className="flex flex-row items-center gap-4">
@@ -81,7 +81,7 @@ export const FilterCheckboxGroup = <T extends string | number>({
             />
             <Label
               htmlFor={id}
-              className="text-xs font-bold text-slate-300 cursor-pointer select-none"
+              className="text-xs font-bold text-bpim-text cursor-pointer select-none"
             >
               {getLabel ? getLabel(item) : item}
             </Label>
@@ -106,7 +106,7 @@ export const FilterStickyToggle = ({
       "h-8 w-8 rounded-md transition-colors",
       isSticky
         ? "text-bpim-primary bg-bpim-primary/10"
-        : "text-slate-500 hover:text-slate-300 hover:bg-white/5",
+        : "text-bpim-muted hover:text-bpim-text hover:bg-bpim-overlay/50",
     )}
     onClick={() => onToggle(!isSticky)}
   >

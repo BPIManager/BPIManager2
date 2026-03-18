@@ -46,7 +46,7 @@ export const RivalRankingBody = ({
   if (isLoading) {
     return (
       <div className="flex justify-center py-8">
-        <LuLoader className="h-8 w-8 animate-spin text-teal-500" />
+        <LuLoader className="h-8 w-8 animate-spin text-bpim-info" />
       </div>
     );
   }
@@ -88,14 +88,14 @@ export const RivalRankingBody = ({
                   "border-bpim-border transition-colors cursor-pointer",
                   isSelf
                     ? "bg-bpim-primary-dim/30 hover:bg-bpim-primary-dim/40"
-                    : "hover:bg-white/5",
+                    : "hover:bg-bpim-overlay/50",
                 )}
               >
                 <TableCell className="py-3">
                   <span
                     className={cn(
                       "font-mono font-bold text-sm",
-                      index < 3 ? "text-yellow-500" : "text-slate-500",
+                      index < 3 ? "text-yellow-500" : "text-bpim-muted",
                     )}
                   >
                     #{index + 1}
@@ -114,8 +114,8 @@ export const RivalRankingBody = ({
                         className={cn(
                           "text-sm tracking-tight",
                           isSelf
-                            ? "font-bold text-white"
-                            : "font-medium text-slate-300",
+                            ? "font-bold text-bpim-text"
+                            : "font-medium text-bpim-text",
                         )}
                       >
                         {row.userName}
@@ -128,10 +128,10 @@ export const RivalRankingBody = ({
                     </div>
                   </div>
                 </TableCell>
-                <TableCell className="text-right font-mono font-bold text-white py-3">
+                <TableCell className="text-right font-mono font-bold text-bpim-text py-3">
                   {row.exScore?.toLocaleString() ?? 0}
                 </TableCell>
-                <TableCell className="text-right font-mono text-xs text-slate-400 py-3">
+                <TableCell className="text-right font-mono text-xs text-bpim-muted py-3">
                   {row.bpi?.toFixed(2) ?? "-"}
                 </TableCell>
                 <TableCell
@@ -141,7 +141,7 @@ export const RivalRankingBody = ({
                       ? "text-bpim-danger"
                       : diff < 0
                         ? "text-bpim-success"
-                        : "text-slate-600",
+                        : "text-bpim-subtle",
                   )}
                 >
                   {diff > 0 ? `+${diff}` : diff === 0 ? "-" : diff}

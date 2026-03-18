@@ -43,7 +43,7 @@ export const DailyBatchNotice = ({
 
           <div className="flex-1">
             <div className="mb-1 flex flex-wrap items-center gap-3">
-              <span className="text-base font-bold tracking-tight text-white md:text-lg">
+              <span className="text-base font-bold tracking-tight text-bpim-text md:text-lg">
                 {dateStr}
               </span>
               <Badge className="rounded-full bg-bpim-primary-dim px-3 py-0.5 text-xs font-semibold text-bpim-primary hover:bg-bpim-primary-dim">
@@ -59,7 +59,7 @@ export const DailyBatchNotice = ({
         <Button
           asChild
           size="lg"
-          className="group w-full bg-bpim-primary font-bold text-white shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-bpim-primary hover:shadow-lg md:w-auto md:px-6"
+          className="group w-full bg-bpim-primary font-bold text-bpim-text shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-bpim-primary hover:shadow-lg md:w-auto md:px-6"
         >
           <Link
             href={`/users/${userId as string}/logs/${version}/summary/${dateStr}`}

@@ -26,11 +26,11 @@ export const RANK_THRESHOLDS = [
   { label: "AAA", ratio: 8 / 9, bg: "bg-yellow-400", text: "text-black" },
   { label: "AA", ratio: 7 / 9, bg: "bg-green-400", text: "text-slate-900" },
   { label: "A", ratio: 6 / 9, bg: "bg-bpim-primary", text: "text-slate-900" },
-  { label: "B", ratio: 5 / 9, bg: "bg-slate-500", text: "text-white" },
-  { label: "C", ratio: 4 / 9, bg: "bg-slate-600", text: "text-white" },
-  { label: "D", ratio: 3 / 9, bg: "bg-slate-700", text: "text-white" },
-  { label: "E", ratio: 2 / 9, bg: "bg-slate-800", text: "text-white" },
-  { label: "F", ratio: 0, bg: "bg-bpim-bg", text: "text-slate-400" },
+  { label: "B", ratio: 5 / 9, bg: "bg-slate-500", text: "text-bpim-text" },
+  { label: "C", ratio: 4 / 9, bg: "bg-bpim-overlay", text: "text-bpim-text" },
+  { label: "D", ratio: 3 / 9, bg: "bg-slate-700", text: "text-bpim-text" },
+  { label: "E", ratio: 2 / 9, bg: "bg-bpim-surface-2", text: "text-bpim-text" },
+  { label: "F", ratio: 0, bg: "bg-bpim-bg", text: "text-bpim-muted" },
 ] as const;
 
 type SortKey = "title" | (typeof RANKS)[number];
@@ -93,13 +93,13 @@ export const ArenaAverageTable = ({ data }: { data: ArenaAverageData[] }) => {
   };
 
   const ArenaRow = memo(({ item }: { item: ArenaAverageData }) => (
-    <TableRow className="group border-bpim-border hover:bg-white/5">
+    <TableRow className="group border-bpim-border hover:bg-bpim-overlay/50">
       <TableCell className="sticky left-0 z-10 min-w-[200px] max-w-[250px] bg-bpim-bg p-3 shadow-[2px_0_5px_rgba(0,0,0,0.3)] group-hover:bg-bpim-bg transition-colors">
         <div className="flex flex-col gap-0.5">
-          <span className="truncate text-xs font-bold text-white">
+          <span className="truncate text-xs font-bold text-bpim-text">
             {item.title}
           </span>
-          <span className="text-[10px] font-medium text-slate-500 uppercase tracking-tighter">
+          <span className="text-[10px] font-medium text-bpim-muted uppercase tracking-tighter">
             {item.difficulty}
           </span>
         </div>
@@ -109,7 +109,7 @@ export const ArenaAverageTable = ({ data }: { data: ArenaAverageData[] }) => {
         const stats = item.averages[rankName];
         if (!stats) {
           return (
-            <TableCell key={rankName} className="text-center text-slate-700">
+            <TableCell key={rankName} className="text-center text-bpim-subtle">
               -
             </TableCell>
           );
@@ -147,7 +147,7 @@ export const ArenaAverageTable = ({ data }: { data: ArenaAverageData[] }) => {
               <TableRow className="hover:bg-transparent border-bpim-border">
                 <TableHead
                   onClick={() => handleSort("title")}
-                  className="sticky left-0 z-30 cursor-pointer bg-bpim-bg px-3 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-white"
+                  className="sticky left-0 z-30 cursor-pointer bg-bpim-bg px-3 text-[10px] font-black uppercase tracking-widest text-bpim-muted hover:text-bpim-text"
                 >
                   <div className="flex items-center">
                     楽曲名 <SortIcon k="title" />
@@ -158,7 +158,7 @@ export const ArenaAverageTable = ({ data }: { data: ArenaAverageData[] }) => {
                   <TableHead
                     key={rank}
                     onClick={() => handleSort(rank)}
-                    className="min-w-[85px] cursor-pointer text-center px-2 py-3 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-white transition-colors"
+                    className="min-w-[85px] cursor-pointer text-center px-2 py-3 text-[10px] font-black uppercase tracking-widest text-bpim-muted hover:text-bpim-text transition-colors"
                   >
                     <div className="flex flex-col items-center justify-center">
                       <span>{rank}</span>

@@ -48,8 +48,8 @@ export const SongHistoryTab = ({ songId }: SongHistoryTabProps) => {
   if (isError || !historyGroups || Object.keys(historyGroups).length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-20">
-        <LuHistory className="h-10 w-10 text-slate-600" />
-        <p className="text-sm font-medium text-slate-500">
+        <LuHistory className="h-10 w-10 text-bpim-subtle" />
+        <p className="text-sm font-medium text-bpim-muted">
           履歴データが見つかりません
         </p>
       </div>
@@ -69,7 +69,7 @@ export const SongHistoryTab = ({ songId }: SongHistoryTabProps) => {
         return (
           <div key={version} className="flex flex-col">
             <div className="mb-3 flex items-center gap-4 px-1">
-              <span className="text-[10px] font-black tracking-widest text-slate-500 uppercase">
+              <span className="text-[10px] font-black tracking-widest text-bpim-muted uppercase">
                 {displayTitle}
               </span>
               <Separator className="flex-1 bg-white/10" />
@@ -89,14 +89,14 @@ export const SongHistoryTab = ({ songId }: SongHistoryTabProps) => {
                   <div
                     key={record.logId}
                     className={cn(
-                      "group relative flex flex-col gap-2 rounded-lg border-l-3 bg-white/5 p-3 transition-colors hover:bg-white/10",
+                      "group relative flex flex-col gap-2 rounded-lg border-l-3 bg-white/5 p-3 transition-colors hover:bg-bpim-overlay",
                       isGlobalBest
                         ? "border-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.1)]"
                         : "border-white/20",
                     )}
                   >
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1.5 text-slate-500">
+                      <div className="flex items-center gap-1.5 text-bpim-muted">
                         <LuCalendar className="h-3 w-3" />
                         <span className="font-mono text-[10px] font-medium">
                           {dayjs(record.lastPlayed)
@@ -130,18 +130,18 @@ export const SongHistoryTab = ({ songId }: SongHistoryTabProps) => {
                         <span
                           className={cn(
                             "font-mono text-lg font-black leading-none tracking-tighter",
-                            isGlobalBest ? "text-yellow-200" : "text-white",
+                            isGlobalBest ? "text-yellow-200" : "text-bpim-text",
                           )}
                         >
                           {record.exScore.toLocaleString()}
                         </span>
-                        <span className="font-mono text-[10px] font-bold text-slate-400">
+                        <span className="font-mono text-[10px] font-bold text-bpim-muted">
                           BPI: {(record.bpi || -15).toFixed(2)}
                         </span>
                       </div>
 
                       <div className="flex flex-col items-end gap-0.5">
-                        <span className="text-[10px] font-black uppercase text-slate-300">
+                        <span className="text-[10px] font-black uppercase text-bpim-text">
                           {record.clearState || "NO PLAY"}
                         </span>
                         {record.missCount !== null && (

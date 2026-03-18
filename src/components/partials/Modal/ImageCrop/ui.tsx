@@ -122,17 +122,17 @@ export const ImageUploadModal = ({
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent className="sm:max-w-md border-bpim-border bg-bpim-bg p-4">
         <DialogHeader>
-          <DialogTitle className="text-white">画像を選択</DialogTitle>
+          <DialogTitle className="text-bpim-text">画像を選択</DialogTitle>
         </DialogHeader>
 
         <div className="flex flex-col items-center justify-center gap-4 py-4">
           {!imgSrc ? (
             <div
               onClick={() => document.getElementById("file-input")?.click()}
-              className="flex w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-bpim-border bg-white/5 p-12 transition-colors hover:bg-white/10"
+              className="flex w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-bpim-border bg-white/5 p-12 transition-colors hover:bg-bpim-overlay"
             >
-              <Upload className="h-8 w-8 text-slate-500" />
-              <p className="text-sm text-slate-400 font-medium">
+              <Upload className="h-8 w-8 text-bpim-muted" />
+              <p className="text-sm text-bpim-muted font-medium">
                 クリックして画像を選択
               </p>
               <input
@@ -178,7 +178,7 @@ export const ImageUploadModal = ({
             variant="ghost"
             onClick={handleClose}
             disabled={isUploading}
-            className="h-9 text-slate-400"
+            className="h-9 text-bpim-muted"
           >
             キャンセル
           </Button>

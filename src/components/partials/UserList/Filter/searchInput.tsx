@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { LuSearch } from "react-icons/lu";
@@ -26,12 +26,12 @@ export const SearchInput = ({
 
   return (
     <div className="relative flex-1">
-      <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-500">
+      <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-bpim-muted">
         <LuSearch className="h-4 w-4" />
       </div>
       <Input
         placeholder="ユーザー名またはIIDX IDで検索"
-        className="h-10 pl-10 border-none bg-bpim-bg/40 text-slate-200 focus-visible:ring-blue-500"
+        className="h-10 pl-10 border-none bg-bpim-bg/40 text-bpim-text focus-visible:ring-blue-500"
         value={value}
         onChange={(e) => setValue(e.target.value)}
       />

@@ -34,7 +34,7 @@ export const RivalSummaryCard = ({
   return (
     <button
       onClick={onClick}
-      className="group relative flex w-full flex-row items-stretch justify-between gap-3 overflow-hidden rounded-2xl border border-bpim-border bg-bpim-bg/80 p-3 text-left transition-all duration-300 hover:-translate-y-1 hover:border-white/30 hover:bg-slate-800/90 md:gap-6 md:p-5"
+      className="group relative flex w-full flex-row items-stretch justify-between gap-3 overflow-hidden rounded-2xl border border-bpim-border bg-bpim-bg/80 p-3 text-left transition-all duration-300 hover:-translate-y-1 hover:border-white/30 hover:bg-bpim-surface-2/90 md:gap-6 md:p-5"
     >
       <div
         className="absolute left-0 top-0 bottom-0 w-1 opacity-80 transition-transform group-hover:scale-y-110"
@@ -48,20 +48,20 @@ export const RivalSummaryCard = ({
             <AvatarFallback>{userName.slice(0, 2)}</AvatarFallback>
           </Avatar>
           <div className="flex flex-1 flex-col min-w-0">
-            <span className="truncate text-sm font-bold text-white md:text-base tracking-tight">
+            <span className="truncate text-sm font-bold text-bpim-text md:text-base tracking-tight">
               {userName}
             </span>
             <div className="flex items-center gap-2">
               <Badge className="bg-orange-600 h-4 px-1.5 text-[10px] font-bold border-none">
                 {arenaRank || "N/A"}
               </Badge>
-              <span className="font-mono text-[10px] text-slate-500">
+              <span className="font-mono text-[10px] text-bpim-muted">
                 {formatIIDXId(iidxId || "")}
               </span>
             </div>
           </div>
           <div className="ml-auto text-right">
-            <span className="block text-[9px] font-bold tracking-widest text-slate-500 uppercase">
+            <span className="block text-[9px] font-bold tracking-widest text-bpim-muted uppercase">
               Total BPI
             </span>
             <span
@@ -76,7 +76,9 @@ export const RivalSummaryCard = ({
         <div className="flex flex-col gap-1.5">
           <div className="flex justify-between text-[11px] font-bold tracking-tight">
             <span className="text-bpim-primary">WIN: {stats.win}</span>
-            <span className="text-slate-500 uppercase">LOSE: {stats.lose}</span>
+            <span className="text-bpim-muted uppercase">
+              LOSE: {stats.lose}
+            </span>
           </div>
 
           <div className="flex h-1.5 w-full overflow-hidden rounded-full bg-white/5">
@@ -85,7 +87,7 @@ export const RivalSummaryCard = ({
               style={{ width: `${winRate}%` }}
             />
             <div
-              className="h-full bg-slate-600 transition-all duration-500"
+              className="h-full bg-bpim-overlay transition-all duration-500"
               style={{ width: `${drawRate}%` }}
             />
             <div
@@ -94,7 +96,7 @@ export const RivalSummaryCard = ({
             />
           </div>
 
-          <div className="flex justify-between text-[10px] font-medium text-slate-500">
+          <div className="flex justify-between text-[10px] font-medium text-bpim-muted">
             <span>{winRate.toFixed(1)}% Win</span>
             <span>{stats.totalCount} Songs</span>
           </div>

@@ -19,7 +19,7 @@ export const NearLoseRankItem = ({
       onClick={onClick}
       className={cn(
         "group relative flex items-center justify-between gap-3 border-b border-bpim-border p-3 pl-4 transition-colors",
-        "cursor-pointer hover:bg-white/5",
+        "cursor-pointer hover:bg-bpim-overlay/50",
         "before:absolute before:inset-y-0 before:left-0 before:z-10 before:w-1 before:bg-orange-400 before:content-['']",
       )}
     >
@@ -35,26 +35,30 @@ export const NearLoseRankItem = ({
         </Avatar>
 
         <div className="flex min-w-0 flex-col gap-0">
-          <span className="truncate text-sm font-bold text-white">
+          <span className="truncate text-sm font-bold text-bpim-text">
             {item.title}
           </span>
           <div className="flex items-center gap-1">
             <span
-              className="flex h-[14px] items-center rounded-sm px-2 text-[9px] font-bold text-white uppercase"
+              className="flex h-[14px] items-center rounded-sm px-2 text-[9px] font-bold text-bpim-text uppercase"
               style={{
                 backgroundColor: diffColors[item.difficulty] || "#1f2937",
               }}
             >
               {String(item.difficulty).charAt(0)}
             </span>
-            <span className="text-xs text-bpim-muted">{item.rival.userName}</span>
+            <span className="text-xs text-bpim-muted">
+              {item.rival.userName}
+            </span>
           </div>
         </div>
       </div>
 
       <div className="flex flex-shrink-0 items-center gap-4 font-mono">
         <div className="flex flex-col items-end gap-0">
-          <span className="text-[12px] leading-none text-bpim-muted">My EX</span>
+          <span className="text-[12px] leading-none text-bpim-muted">
+            My EX
+          </span>
           <span className="text-sm font-bold text-bpim-text">
             {item.exScore}
           </span>

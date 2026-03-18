@@ -83,7 +83,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
         className={cn(
           "w-full justify-start gap-3 px-3 transition-all",
           isNested ? "pl-9" : "pl-3",
-          isActive ? "bg-white/10 font-bold" : "font-medium text-slate-300",
+          isActive ? "bg-white/10 font-bold" : "font-medium text-bpim-text",
           item.isComingSoon && "opacity-50 cursor-not-allowed",
         )}
         onClick={item.isComingSoon ? undefined : onClose}
@@ -94,7 +94,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
             <span>{item.label}</span>
             <Badge
               variant="outline"
-              className="ml-auto text-[10px] py-0 border-bpim-border text-slate-500"
+              className="ml-auto text-[10px] py-0 border-bpim-border text-bpim-muted"
             >
               近日公開
             </Badge>
@@ -119,16 +119,16 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
                 src={user?.profileImage || ""}
                 alt={user?.userName || "User"}
               />
-              <AvatarFallback className="bg-slate-800 text-slate-400">
+              <AvatarFallback className="bg-bpim-surface-2 text-bpim-muted">
                 {user?.userName?.slice(0, 2) || "U"}
               </AvatarFallback>
             </Avatar>
           </Link>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-bold text-white">
+            <p className="truncate text-sm font-bold text-bpim-text">
               {user?.userName || "Guest"}
             </p>
-            <p className="truncate font-mono text-[10px] text-slate-500">
+            <p className="truncate font-mono text-[10px] text-bpim-muted">
               {user?.iidxId ? `ID: ${user.iidxId}` : "ID未設定"}
             </p>
             <p className="font-mono text-[10px] font-bold text-bpim-warning">
@@ -143,7 +143,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
               asChild
               variant="outline"
               size="xs"
-              className="w-full justify-between border-slate-700 h-7 px-2 hover:bg-white/5"
+              className="w-full justify-between border-slate-700 h-7 px-2 hover:bg-bpim-overlay/50"
               onClick={onClose}
             >
               <Link href={`/users/${user?.userId}`}>
@@ -161,10 +161,10 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
                 onClick={onClose}
                 className="text-center group"
               >
-                <p className="text-xs font-bold text-white">
+                <p className="text-xs font-bold text-bpim-text">
                   {user?.followingCount ?? 0}
                 </p>
-                <p className="text-[10px] text-slate-500 group-hover:text-slate-300">
+                <p className="text-[10px] text-bpim-muted group-hover:text-bpim-text">
                   フォロー
                 </p>
               </Link>
@@ -173,10 +173,10 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
                 onClick={onClose}
                 className="text-center group"
               >
-                <p className="text-xs font-bold text-white">
+                <p className="text-xs font-bold text-bpim-text">
                   {user?.followerCount ?? 0}
                 </p>
-                <p className="text-[10px] text-slate-500 group-hover:text-slate-300">
+                <p className="text-[10px] text-bpim-muted group-hover:text-bpim-text">
                   フォロワー
                 </p>
               </Link>
@@ -197,7 +197,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
             <Button
               variant="ghost"
               size="sm"
-              className="w-full justify-start gap-3 px-3 text-slate-400 hover:bg-white/5 hover:text-white"
+              className="w-full justify-start gap-3 px-3 text-bpim-muted hover:bg-bpim-overlay/50 hover:text-bpim-text"
             >
               {isRivalOpen ? (
                 <ChevronDown className="h-4.5 w-4.5" />
@@ -223,7 +223,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
           <Button
             variant="ghost"
             size="sm"
-            className="w-full justify-center gap-2 text-bpim-danger hover:bg-bpim-danger/10 hover:text-red-300"
+            className="w-full justify-center gap-2 text-bpim-danger hover:bg-bpim-danger/10 hover:text-bpim-danger"
             onClick={() => authActions.logout()}
           >
             <LogOut className="h-4 w-4" />
@@ -241,7 +241,7 @@ const ApiDogButton = () => (
       href="https://bpim2.apidog.io/"
       target="_blank"
       rel="noopener noreferrer"
-      className="flex items-center gap-2 text-white hover:opacity-80 transition-opacity"
+      className="flex items-center gap-2 text-bpim-text hover:opacity-80 transition-opacity"
     >
       <Code2 className="h-4 w-4 text-bpim-primary" />
       <span className="text-[10px] font-bold underline underline-offset-4">
@@ -256,7 +256,7 @@ const GitHubButton = () => (
     asChild
     variant="outline"
     size="sm"
-    className="w-full rounded-full border-bpim-border bg-transparent text-white hover:bg-white/10"
+    className="w-full rounded-full border-bpim-border bg-transparent text-bpim-text hover:bg-bpim-overlay"
   >
     <a
       href="https://github.com/BPIManager/BPIManager2"

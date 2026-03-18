@@ -44,14 +44,14 @@ export const ImportView = (props: Props) => (
               <div className="space-y-2">
                 <Label
                   htmlFor="csv-data"
-                  className="text-sm font-bold text-white"
+                  className="text-sm font-bold text-bpim-text"
                 >
                   CSVデータ
                 </Label>
                 <Textarea
                   id="csv-data"
                   placeholder="バージョン,タイトル,ジャンル,アーティスト,プレー回数,..."
-                  className="min-h-[200px] border-bpim-border bg-white/5 p-4 font-mono text-sm transition-colors focus:border-blue-500 focus:ring-0"
+                  className="min-h-[200px] border-bpim-border bg-white/5 p-4 font-mono text-sm transition-colors focus:border-bpim-primary focus:ring-0"
                   value={props.csvData}
                   onChange={(e) => props.setCsvData(e.target.value)}
                 />
@@ -61,7 +61,7 @@ export const ImportView = (props: Props) => (
               </div>
 
               <div className="space-y-2">
-                <Label className="text-sm font-bold text-white">
+                <Label className="text-sm font-bold text-bpim-text">
                   保存先バージョン
                 </Label>
                 <Select
@@ -71,7 +71,7 @@ export const ImportView = (props: Props) => (
                   <SelectTrigger className="w-full border-bpim-border bg-white/5 text-sm md:w-[300px]">
                     <SelectValue placeholder="バージョンを選択" />
                   </SelectTrigger>
-                  <SelectContent className="border-bpim-border bg-bpim-bg text-white">
+                  <SelectContent className="border-bpim-border bg-bpim-bg text-bpim-text">
                     {versionsOptions.map((v) => (
                       <SelectItem key={v.value} value={v.value}>
                         {v.label}
@@ -87,14 +87,14 @@ export const ImportView = (props: Props) => (
               <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
                 <Button
                   variant="ghost"
-                  className="w-full text-bpim-danger hover:bg-bpim-danger/10 hover:text-red-300 sm:w-auto"
+                  className="w-full text-bpim-danger hover:bg-bpim-danger/10 hover:text-bpim-danger sm:w-auto"
                   onClick={() => props.setCsvData("")}
                   disabled={!props.csvData || props.isProcessing}
                 >
                   <Trash2 className="mr-2 h-4 w-4" /> 入力をクリア
                 </Button>
                 <Button
-                  className="w-full bg-bpim-primary px-8 font-bold text-white hover:bg-bpim-primary sm:w-auto"
+                  className="w-full bg-bpim-primary px-8 font-bold text-bpim-text hover:bg-bpim-primary sm:w-auto"
                   size="lg"
                   disabled={props.isProcessing || !props.csvData}
                   onClick={props.onStartImport}
@@ -115,7 +115,7 @@ export const ImportView = (props: Props) => (
               <div className="flex items-start gap-3 rounded-lg bg-white/5 p-4">
                 <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-bpim-primary" />
                 <div className="flex flex-col gap-1">
-                  <span className="text-xs font-bold text-white">Note</span>
+                  <span className="text-xs font-bold text-bpim-text">Note</span>
                   <p className="text-xs leading-relaxed text-bpim-muted">
                     CSVデータはクリップボードから読み取ることもできます。
                     <br />

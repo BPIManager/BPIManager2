@@ -40,7 +40,7 @@ export const AAATableFilter = ({
       className: "min-w-full md:min-w-[160px]",
       render: () => (
         <Select value={version} onValueChange={onVersionChange}>
-          <SelectTrigger className="h-8 border-bpim-border bg-bpim-bg/20 text-xs text-slate-200 focus:ring-blue-500">
+          <SelectTrigger className="h-8 border-bpim-border bg-bpim-bg/20 text-xs text-bpim-text focus:ring-blue-500">
             <SelectValue placeholder="Version" />
           </SelectTrigger>
           <SelectContent className="border-bpim-border bg-bpim-bg">
@@ -66,11 +66,11 @@ export const AAATableFilter = ({
               <RadioGroupItem
                 value={lv.toString()}
                 id={`level-${lv}`}
-                className="border-blue-500 text-bpim-text"
+                className="border-bpim-primary text-bpim-text"
               />
               <Label
                 htmlFor={`level-${lv}`}
-                className="text-xs font-bold text-slate-200 cursor-pointer"
+                className="text-xs font-bold text-bpim-text cursor-pointer"
               >
                 ☆{lv}
               </Label>
@@ -95,11 +95,11 @@ export const AAATableFilter = ({
               <RadioGroupItem
                 value={g.id}
                 id={`goal-${g.id}`}
-                className="border-blue-500 text-bpim-text"
+                className="border-bpim-primary text-bpim-text"
               />
               <Label
                 htmlFor={`goal-${g.id}`}
-                className="text-xs font-bold text-slate-200 cursor-pointer"
+                className="text-xs font-bold text-bpim-text cursor-pointer"
               >
                 {g.label}
               </Label>
@@ -124,11 +124,11 @@ export const AAATableFilter = ({
               <RadioGroupItem
                 value={m.id}
                 id={`mode-${m.id}`}
-                className="border-blue-500 text-bpim-text"
+                className="border-bpim-primary text-bpim-text"
               />
               <Label
                 htmlFor={`mode-${m.id}`}
-                className="text-xs font-bold text-slate-200 cursor-pointer"
+                className="text-xs font-bold text-bpim-text cursor-pointer"
               >
                 {m.label}
               </Label>
@@ -147,7 +147,7 @@ export const AAATableFilter = ({
             key={section.label}
             className={cn("flex flex-col gap-2", section.className)}
           >
-            <span className="px-1 text-[10px] font-black tracking-widest text-slate-500 uppercase">
+            <span className="px-1 text-[10px] font-black tracking-widest text-bpim-muted uppercase">
               {section.label}
             </span>
             <div className="flex items-center">{section.render()}</div>

@@ -39,10 +39,10 @@ export const RankItem = ({
     rank === 1
       ? "text-yellow-400"
       : rank === 2
-        ? "text-slate-400"
+        ? "text-bpim-muted"
         : rank === 3
           ? "text-bpim-warning"
-          : "text-slate-700";
+          : "text-bpim-subtle";
 
   const diffBpiColor = getBpiColor(isGrowth ? item.diff.bpi : item.current.bpi);
   const prevEx = isNew ? 0 : item.current.exScore - item.diff.exScore;
@@ -67,7 +67,7 @@ export const RankItem = ({
           {isBpi ? prev.toFixed(2) : prev}
         </span>
         <ChevronRight className="mx-1 h-3 w-3 text-bpim-subtle" />
-        <span className="w-[55px] text-right font-bold text-white">
+        <span className="w-[55px] text-right font-bold text-bpim-text">
           {isBpi ? current.toFixed(2) : current}
         </span>
         <span className={cn("w-[60px] text-right font-bold", diffColor)}>
@@ -88,7 +88,7 @@ export const RankItem = ({
             >
               {rank}
             </span>
-            <span className="line-clamp-2 text-md font-bold text-white">
+            <span className="line-clamp-2 text-md font-bold text-bpim-text">
               {item.title}
             </span>
           </div>
@@ -99,7 +99,7 @@ export const RankItem = ({
             </span>
             <span
               className={cn(
-                "rounded-sm px-1.5 py-0.5 text-[9px] font-bold text-white uppercase",
+                "rounded-sm px-1.5 py-0.5 text-[9px] font-bold text-bpim-text uppercase",
                 fullDiff === "LEGGENDARIA"
                   ? "bg-bpim-danger"
                   : fullDiff === "ANOTHER"
@@ -110,7 +110,7 @@ export const RankItem = ({
               {fullDiff}
             </span>
             {isNew && (
-              <span className="rounded-sm bg-purple-600 px-1.5 py-0.5 text-[9px] font-bold text-white">
+              <span className="rounded-sm bg-purple-600 px-1.5 py-0.5 text-[9px] font-bold text-bpim-text">
                 初プレイ
               </span>
             )}
@@ -162,7 +162,7 @@ export const RankItem = ({
             <span className="w-[45px] text-right text-xs text-bpim-muted">
               {isBpi ? prev.toFixed(2) : prev}
             </span>
-            <ChevronRight className="h-2 w-2 text-gray-800" />
+            <ChevronRight className="h-2 w-2 text-bpim-subtle" />
             <span className="w-[45px] text-right text-xs font-bold text-bpim-muted">
               {isBpi ? current.toFixed(2) : current}
             </span>
@@ -183,8 +183,8 @@ export const RankItem = ({
                 "text-right font-mono",
                 isTopBpi
                   ? "text-lg font-black"
-                  : "text-xs font-bold text-white",
-                isTopBpi ? diffColor : "text-white",
+                  : "text-xs font-bold text-bpim-text",
+                isTopBpi ? diffColor : "text-bpim-text",
               )}
             >
               {isBpi ? current.toFixed(2) : current}
@@ -201,7 +201,7 @@ export const RankItem = ({
       className={cn(
         "flex items-center justify-between gap-2 border-b border-bpim-border p-3 transition-colors cursor-pointer md:p-4",
         rank <= 3 ? "bg-bpim-card/50" : "bg-transparent",
-        "hover:bg-white/10",
+        "hover:bg-bpim-overlay",
       )}
     >
       <div className="flex min-w-0 flex-1 items-center gap-3">
@@ -216,7 +216,7 @@ export const RankItem = ({
           </span>
         </div>
         <div className="flex min-w-0 flex-col">
-          <span className="truncate text-sm font-bold text-white leading-tight">
+          <span className="truncate text-sm font-bold text-bpim-text leading-tight">
             {item.title}
           </span>
           <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
@@ -227,7 +227,7 @@ export const RankItem = ({
               ☆{item.level}
             </span>
             {isNew && (
-              <span className="rounded-sm bg-purple-600 px-1 text-[8px] font-bold text-white leading-none py-0.5">
+              <span className="rounded-sm bg-purple-600 px-1 text-[8px] font-bold text-bpim-text leading-none py-0.5">
                 NEW
               </span>
             )}

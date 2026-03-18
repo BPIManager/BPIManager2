@@ -1,4 +1,4 @@
-import { LuChevronsLeft, LuChevronLeft, LuChevronRight } from "react-icons/lu";
+﻿import { LuChevronsLeft, LuChevronLeft, LuChevronRight } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 
 interface Props {
@@ -31,7 +31,7 @@ export const Pagination = ({ p, hasMore, onPageChange }: Props) => (
     </Button>
 
     <div className="px-4">
-      <span className="font-mono text-sm font-bold text-slate-200">
+      <span className="font-mono text-sm font-bold text-bpim-text">
         PAGE {p}
       </span>
     </div>

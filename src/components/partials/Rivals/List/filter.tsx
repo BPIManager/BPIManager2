@@ -18,7 +18,7 @@ export const RivalFilter = ({
   return (
     <div className="flex flex-col gap-6 rounded-xl border border-bpim-border bg-bpim-bg/40 p-4 lg:flex-row lg:items-start lg:gap-10">
       <div className="flex flex-col gap-2.5">
-        <span className="text-[10px] font-bold tracking-widest text-slate-500 uppercase">
+        <span className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
           Level
         </span>
         <div className="flex flex-wrap gap-4">
@@ -32,7 +32,7 @@ export const RivalFilter = ({
               />
               <Label
                 htmlFor={`lv-${l}`}
-                className="text-xs font-bold text-slate-200 cursor-pointer"
+                className="text-xs font-bold text-bpim-text cursor-pointer"
               >
                 ☆{l}
               </Label>
@@ -42,7 +42,7 @@ export const RivalFilter = ({
       </div>
 
       <div className="flex flex-col gap-2.5">
-        <span className="text-[10px] font-bold tracking-widest text-slate-500 uppercase">
+        <span className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
           Difficulty
         </span>
         <div className="flex flex-wrap gap-4">
@@ -56,7 +56,7 @@ export const RivalFilter = ({
               />
               <Label
                 htmlFor={`diff-${d}`}
-                className="text-xs font-bold text-slate-200 cursor-pointer uppercase"
+                className="text-xs font-bold text-bpim-text cursor-pointer uppercase"
               >
                 {d}
               </Label>

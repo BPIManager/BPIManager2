@@ -37,10 +37,10 @@ const CustomTooltip = ({ active, payload, maxScore }: any) => {
             {isYou ? "Your Score" : `BPI Target: ${data.name}`}
           </p>
           <div className="h-[1px] w-full bg-white/10 my-1" />
-          <p className="font-mono text-sm font-bold text-white">
+          <p className="font-mono text-sm font-bold text-bpim-text">
             EX: {data.score.toLocaleString()}
           </p>
-          <p className="font-mono text-[10px] text-slate-400">RATE: {rate}%</p>
+          <p className="font-mono text-[10px] text-bpim-muted">RATE: {rate}%</p>
         </div>
       </div>
     );

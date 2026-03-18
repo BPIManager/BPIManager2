@@ -56,7 +56,7 @@ export default function TransferUi() {
           <LuDatabase className="h-4 w-4" />
           <span className="font-bold">データ移行</span>
         </div>
-        <p className="text-sm text-slate-400">
+        <p className="text-sm text-bpim-muted">
           BPIManagerで保存されたスコアをBPIM2へ引き継ぎます。
         </p>
         <div className="mt-1 flex flex-col gap-0.5 text-[10px] text-bpim-warning leading-relaxed">
@@ -87,16 +87,16 @@ export default function TransferUi() {
         isLoading={isSyncing}
         description={
           <div className="flex flex-col gap-4 text-left">
-            <p className="text-sm text-slate-300">
+            <p className="text-sm text-bpim-text">
               BPIManagerで保存されたデータをBPIM2へ移行します。
             </p>
 
             <div className="rounded-md border border-bpim-border bg-white/5 p-3">
-              <span className="mb-2 block text-xs font-bold text-slate-400">
+              <span className="mb-2 block text-xs font-bold text-bpim-muted">
                 移行可能なデータ:
               </span>
               {isChecking ? (
-                <div className="flex items-center gap-2 text-xs text-slate-300">
+                <div className="flex items-center gap-2 text-xs text-bpim-text">
                   <LuLoader className="h-3 w-3 animate-spin" />
                   <span>スキャン中...</span>
                 </div>

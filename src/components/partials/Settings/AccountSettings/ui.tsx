@@ -12,7 +12,7 @@ export default function AccountSettingsUi() {
           <LuUser className="h-4 w-4" />
           <span className="font-bold">プロフィール設定</span>
         </div>
-        <p className="text-sm text-slate-400">
+        <p className="text-sm text-bpim-muted">
           BPIM2のユーザープロフィールを設定します。
         </p>
       </div>

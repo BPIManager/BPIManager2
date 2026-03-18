@@ -32,7 +32,7 @@ export const FilterSelect = ({
       >
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
-      <SelectContent className="border-bpim-border text-white">
+      <SelectContent className="border-bpim-border text-bpim-text">
         {options.map((opt) => (
           <SelectItem
             key={opt.value}

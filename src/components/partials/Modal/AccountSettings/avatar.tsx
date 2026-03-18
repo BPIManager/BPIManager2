@@ -22,13 +22,13 @@ export const AvatarSection = ({ image, onChange }: AvatarSectionProps) => {
 
   return (
     <div className="flex items-center gap-6 py-2">
-      <Avatar className="h-[72px] w-[72px] border-2 border-blue-500 shadow-lg shadow-blue-500/20">
+      <Avatar className="h-[72px] w-[72px] border-2 border-bpim-primary shadow-lg shadow-bpim-primary/20">
         <AvatarImage
           src={image}
           alt="Avatar Preview"
           className="object-cover"
         />
-        <AvatarFallback className="bg-slate-800 text-slate-400 text-xs">
+        <AvatarFallback className="bg-bpim-surface-2 text-bpim-muted text-xs">
           Preview
         </AvatarFallback>
       </Avatar>
@@ -38,7 +38,7 @@ export const AvatarSection = ({ image, onChange }: AvatarSectionProps) => {
           variant="outline"
           size="xs"
           onClick={useServiceIcon}
-          className="h-7 border-bpim-border px-3 text-[10px] font-bold hover:bg-white/5 hover:text-bpim-primary"
+          className="h-7 border-bpim-border px-3 text-[10px] font-bold hover:bg-bpim-overlay/50 hover:text-bpim-primary"
         >
           連携サービスを使用
         </Button>
@@ -46,7 +46,7 @@ export const AvatarSection = ({ image, onChange }: AvatarSectionProps) => {
           variant="outline"
           size="xs"
           onClick={useDiceBearIcon}
-          className="h-7 border-bpim-border px-3 text-[10px] font-bold hover:bg-white/5 hover:text-bpim-primary"
+          className="h-7 border-bpim-border px-3 text-[10px] font-bold hover:bg-bpim-overlay/50 hover:text-bpim-primary"
         >
           ランダムに設定
         </Button>

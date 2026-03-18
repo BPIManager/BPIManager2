@@ -23,10 +23,10 @@ export const DashBoardFilter = () => {
             VERSION
           </span>
           <Select value={version} onValueChange={(val) => setVersion(val)}>
-            <SelectTrigger className="h-8 w-full border-bpim-border bg-white/5 text-xs hover:bg-white/10 focus:ring-0">
+            <SelectTrigger className="h-8 w-full border-bpim-border bg-white/5 text-xs hover:bg-bpim-overlay focus:ring-0">
               <SelectValue placeholder="Select version" />
             </SelectTrigger>
-            <SelectContent className="border-bpim-border bg-bpim-bg text-white">
+            <SelectContent className="border-bpim-border bg-bpim-bg text-bpim-text">
               {versionsNonDisabledCollection.map((v) => (
                 <SelectItem key={v.value} value={v.value} className="text-xs">
                   {v.label}

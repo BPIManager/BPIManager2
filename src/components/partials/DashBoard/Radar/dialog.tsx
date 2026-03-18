@@ -35,7 +35,7 @@ export const RadarCategorySongsDialog = ({
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-h-[80svh] overflow-hidden border-white/20 bg-bpim-bg p-0 sm:max-w-md">
         <DialogHeader className="border-b border-bpim-border p-4">
-          <DialogTitle className="text-base font-bold text-white">
+          <DialogTitle className="text-base font-bold text-bpim-text">
             {categoryName} - 楽曲リスト ({songs.length})
           </DialogTitle>
         </DialogHeader>
@@ -49,14 +49,14 @@ export const RadarCategorySongsDialog = ({
             <TabsList className="mb-4 grid w-full grid-cols-2 rounded-md bg-white/5 p-1 text-bpim-muted">
               <TabsTrigger
                 value="desc"
-                className="flex items-center gap-2 text-xs data-[state=active]:bg-bpim-primary data-[state=active]:text-white"
+                className="flex items-center gap-2 text-xs data-[state=active]:bg-bpim-primary data-[state=active]:text-bpim-text"
               >
                 <LuArrowDownWideNarrow className="h-3.5 w-3.5" />
                 BPIが高い順
               </TabsTrigger>
               <TabsTrigger
                 value="asc"
-                className="flex items-center gap-2 text-xs data-[state=active]:bg-bpim-primary data-[state=active]:text-white"
+                className="flex items-center gap-2 text-xs data-[state=active]:bg-bpim-primary data-[state=active]:text-bpim-text"
               >
                 <LuArrowUpNarrowWide className="h-3.5 w-3.5" />
                 BPIが低い順
@@ -72,7 +72,7 @@ export const RadarCategorySongsDialog = ({
                     className="flex items-center justify-between rounded-lg border border-bpim-border bg-white/5 p-3"
                   >
                     <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                      <span className="truncate text-xs font-bold text-white">
+                      <span className="truncate text-xs font-bold text-bpim-text">
                         {song.title}
                       </span>
                       <span className="text-[10px] text-bpim-muted">

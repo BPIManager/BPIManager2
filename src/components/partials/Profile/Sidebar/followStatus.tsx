@@ -74,7 +74,7 @@ export const FollowSection = ({
             "w-full rounded-full font-bold h-9 transition-all",
             relationship.isFollowing
               ? "bg-green-500 text-black hover:bg-green-400"
-              : "bg-bpim-primary text-white hover:bg-bpim-primary",
+              : "bg-bpim-primary text-bpim-text hover:bg-bpim-primary",
             className,
           )}
         >
@@ -85,7 +85,7 @@ export const FollowSection = ({
           <DialogTrigger asChild>
             <Button
               className={cn(
-                "w-full rounded-full bg-bpim-primary font-bold text-white h-9",
+                "w-full rounded-full bg-bpim-primary font-bold text-bpim-text h-9",
                 className,
               )}
             >

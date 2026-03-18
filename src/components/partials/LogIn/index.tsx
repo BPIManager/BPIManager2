@@ -14,7 +14,7 @@ export const LoginButtons = () => {
       <div className="flex w-full flex-col -space-y-px">
         <Button
           variant="outline"
-          className="relative flex h-12 w-full items-center justify-center gap-3 rounded-b-none border-bpim-border bg-transparent transition-all hover:z-10 hover:bg-white/5 active:scale-[0.98]"
+          className="relative flex h-12 w-full items-center justify-center gap-3 rounded-b-none border-bpim-border bg-transparent transition-all hover:z-10 hover:bg-bpim-overlay/50 active:scale-[0.98]"
           onClick={() => authActions.signInWithGoogle()}
         >
           <FaGoogle className="text-bpim-danger" />
@@ -25,10 +25,10 @@ export const LoginButtons = () => {
 
         <Button
           variant="outline"
-          className="relative flex h-12 w-full items-center justify-center gap-3 rounded-none border-bpim-border bg-transparent transition-all hover:z-10 hover:bg-white/5 active:scale-[0.98]"
+          className="relative flex h-12 w-full items-center justify-center gap-3 rounded-none border-bpim-border bg-transparent transition-all hover:z-10 hover:bg-bpim-overlay/50 active:scale-[0.98]"
           onClick={() => authActions.signInWithTwitter()}
         >
-          <FaTwitter className="text-sky-400" />
+          <FaTwitter className="text-bpim-info" />
           <span className="text-sm font-bold text-bpim-text">
             X (Twitter) でログイン
           </span>
@@ -36,7 +36,7 @@ export const LoginButtons = () => {
 
         <Button
           variant="outline"
-          className="relative flex h-12 w-full items-center justify-center gap-3 rounded-t-none border-bpim-border bg-transparent transition-all hover:z-10 hover:bg-white/5 active:scale-[0.98]"
+          className="relative flex h-12 w-full items-center justify-center gap-3 rounded-t-none border-bpim-border bg-transparent transition-all hover:z-10 hover:bg-bpim-overlay/50 active:scale-[0.98]"
           onClick={() => authActions.signInWithLINE()}
         >
           <FaLine className="text-bpim-success" />

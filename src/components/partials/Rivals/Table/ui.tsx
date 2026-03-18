@@ -17,21 +17,21 @@ const diffColors: Record<string, string> = {
 
 const SongInfo = ({ song }: { song: SongWithRival }) => (
   <div className="flex flex-col items-start gap-1 min-w-0 w-full">
-    <h3 className="text-sm font-bold text-white truncate leading-tight">
+    <h3 className="text-sm font-bold text-bpim-text truncate leading-tight">
       {song.title}
     </h3>
     <div className="flex items-center gap-2">
       <div
         className={cn(
           "w-8 h-[18px] flex items-center justify-center rounded-sm",
-          diffColors[song.difficulty] || "bg-slate-800",
+          diffColors[song.difficulty] || "bg-bpim-surface-2",
         )}
       >
-        <span className="text-[11px] font-bold text-white leading-none">
+        <span className="text-[11px] font-bold text-bpim-text leading-none">
           {song.difficultyLevel}
         </span>
       </div>
-      <span className="text-xs font-bold text-slate-500 leading-none">
+      <span className="text-xs font-bold text-bpim-muted leading-none">
         {song.difficulty.charAt(0)}
       </span>
     </div>
@@ -47,7 +47,7 @@ const DiffBox = ({ exDiff, bpiDiff, isMobile }: any) => {
         !hasDiff && "opacity-10",
       )}
     >
-      <span className="text-[8px] font-bold text-slate-600 uppercase tracking-tighter">
+      <span className="text-[8px] font-bold text-bpim-subtle uppercase tracking-tighter">
         DIFF
       </span>
       <span
@@ -58,7 +58,7 @@ const DiffBox = ({ exDiff, bpiDiff, isMobile }: any) => {
             ? "text-bpim-success"
             : exDiff < 0
               ? "text-bpim-danger"
-              : "text-slate-500",
+              : "text-bpim-muted",
         )}
       >
         {exDiff > 0 ? `+${exDiff}` : (exDiff ?? "---")}
@@ -70,7 +70,7 @@ const DiffBox = ({ exDiff, bpiDiff, isMobile }: any) => {
             ? "text-green-300"
             : bpiDiff < 0
               ? "text-red-300"
-              : "text-slate-600",
+              : "text-bpim-subtle",
         )}
       >
         {bpiDiff > 0
@@ -105,16 +105,16 @@ const ScoreBox = ({ label, ex, bpi, clearState, colorClass, isRival }: any) => {
         <div
           className={cn("flex flex-col", isRival ? "items-start" : "items-end")}
         >
-          <span className="text-[8px] text-slate-500 uppercase">EX</span>
-          <span className="text-sm font-bold text-white leading-none">
+          <span className="text-[8px] text-bpim-muted uppercase">EX</span>
+          <span className="text-sm font-bold text-bpim-text leading-none">
             {f(ex)}
           </span>
         </div>
         <div
           className={cn("flex flex-col", isRival ? "items-start" : "items-end")}
         >
-          <span className="text-[8px] text-slate-500 uppercase">BPI</span>
-          <span className="text-sm font-bold text-white leading-none">
+          <span className="text-[8px] text-bpim-muted uppercase">BPI</span>
+          <span className="text-sm font-bold text-bpim-text leading-none">
             {f(bpi, 2)}
           </span>
         </div>
@@ -149,10 +149,10 @@ const MobileScoreView = ({ label, ex, bpi, clearState, align }: any) => {
           align === "end" ? "items-end" : "items-start",
         )}
       >
-        <span className="text-sm font-bold text-white leading-none font-mono">
+        <span className="text-sm font-bold text-bpim-text leading-none font-mono">
           {f(ex)}
         </span>
-        <span className="text-[10px] text-slate-500 font-mono mt-0.5">
+        <span className="text-[10px] text-bpim-muted font-mono mt-0.5">
           {f(bpi, 1)}
         </span>
       </div>
@@ -172,7 +172,7 @@ export const RivalSongItem = ({
   return (
     <div
       onClick={onClick}
-      className="group relative w-full cursor-pointer border-b border-bpim-border bg-white/[0.02] transition-colors hover:bg-white/5"
+      className="group relative w-full cursor-pointer border-b border-bpim-border bg-white/[0.02] transition-colors hover:bg-bpim-overlay/50"
     >
       <div className="hidden lg:grid h-[68px] grid-cols-[1fr_140px_100px_140px] items-stretch">
         <div className="flex items-center px-4 min-w-0">

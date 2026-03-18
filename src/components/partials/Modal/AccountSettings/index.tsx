@@ -76,7 +76,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
           <DialogHeader className="border-b border-bpim-border pb-4">
             <div className="flex items-center gap-3">
               <User2 className="h-5 w-5 text-bpim-text" />
-              <DialogTitle className="text-xl font-bold tracking-tight text-white">
+              <DialogTitle className="text-xl font-bold tracking-tight text-bpim-text">
                 プロフィール設定
               </DialogTitle>
             </div>
@@ -84,7 +84,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
 
           <div className="flex flex-col gap-8 py-6">
             <div className="flex flex-col gap-3">
-              <Label className="text-xs font-bold tracking-widest text-slate-500 uppercase">
+              <Label className="text-xs font-bold tracking-widest text-bpim-muted uppercase">
                 アイコンを設定 <span className="text-bpim-danger">*</span>
               </Label>
               <div className="flex flex-col items-start gap-4">
@@ -98,12 +98,12 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                   variant="outline"
                   size="sm"
                   onClick={() => setIsImageModalOpen(true)}
-                  className="h-8 border-bpim-border text-xs font-bold hover:bg-white/5"
+                  className="h-8 border-bpim-border text-xs font-bold hover:bg-bpim-overlay/50"
                 >
                   アイコンをアップロード
                 </Button>
               </div>
-              <p className="text-[10px] text-slate-500">
+              <p className="text-[10px] text-bpim-muted">
                 公序良俗に反しないアイコンを設定してください
               </p>
             </div>
@@ -111,7 +111,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
             <div className="flex flex-col gap-2">
               <Label
                 htmlFor="userName"
-                className="text-xs font-bold tracking-widest text-slate-500 uppercase"
+                className="text-xs font-bold tracking-widest text-bpim-muted uppercase"
               >
                 表示名 <span className="text-bpim-danger">*</span>
               </Label>
@@ -144,7 +144,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                   {nameStatus.error}
                 </p>
               ) : (
-                <p className="text-[10px] text-slate-500">
+                <p className="text-[10px] text-bpim-muted">
                   {nameStatus.isChecking
                     ? "重複を確認中..."
                     : "ユーザー名を設定"}
@@ -155,7 +155,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
             <div className="flex flex-col gap-2">
               <Label
                 htmlFor="iidxId"
-                className="text-xs font-bold tracking-widest text-slate-500 uppercase"
+                className="text-xs font-bold tracking-widest text-bpim-muted uppercase"
               >
                 IIDX ID <span className="text-bpim-danger">*</span>
               </Label>
@@ -182,29 +182,29 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
             <div className="flex flex-col gap-2">
               <Label
                 htmlFor="xId"
-                className="text-xs font-bold tracking-widest text-slate-500 uppercase"
+                className="text-xs font-bold tracking-widest text-bpim-muted uppercase"
               >
                 Xユーザー名
               </Label>
               <div className="flex h-10 w-full overflow-hidden rounded-md border border-bpim-border bg-white/5 focus-within:ring-2 focus-within:ring-blue-500">
-                <div className="flex items-center justify-center bg-white/5 px-3 text-sm text-slate-400 border-r border-bpim-border">
+                <div className="flex items-center justify-center bg-white/5 px-3 text-sm text-bpim-muted border-r border-bpim-border">
                   @
                 </div>
                 <input
                   id="xId"
-                  className="flex-1 bg-transparent px-3 py-2 text-sm outline-none placeholder:text-slate-600"
+                  className="flex-1 bg-transparent px-3 py-2 text-sm outline-none placeholder:text-bpim-subtle"
                   value={formData.xId}
                   onChange={handleXIdChange}
                   placeholder="username"
                 />
               </div>
-              <p className="text-[10px] text-slate-500">
+              <p className="text-[10px] text-bpim-muted">
                 Xアカウントをプロフィールに表示できます(最大15文字)
               </p>
             </div>
 
             <div className="flex flex-col gap-2">
-              <Label className="text-xs font-bold tracking-widest text-slate-500 uppercase">
+              <Label className="text-xs font-bold tracking-widest text-bpim-muted uppercase">
                 アリーナランク
               </Label>
               <Select
@@ -228,7 +228,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                   ))}
                 </SelectContent>
               </Select>
-              <p className="text-[10px] text-slate-500">
+              <p className="text-[10px] text-bpim-muted">
                 現在のアリーナランクを選択してください(アリーナ平均との比較が可能になります)
               </p>
             </div>
@@ -236,7 +236,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
             <div className="flex flex-col gap-2">
               <Label
                 htmlFor="bio"
-                className="text-xs font-bold tracking-widest text-slate-500 uppercase"
+                className="text-xs font-bold tracking-widest text-bpim-muted uppercase"
               >
                 自己紹介
               </Label>
@@ -256,7 +256,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                   "text-[10px] text-right",
                   formData.bio.length > 1000
                     ? "text-bpim-danger font-bold"
-                    : "text-slate-500",
+                    : "text-bpim-muted",
                 )}
               >
                 {formData.bio.length} / 1000
@@ -265,10 +265,10 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
 
             <div className="flex flex-row items-center justify-between gap-4 rounded-xl border border-blue-500/20 bg-bpim-primary/5 p-4">
               <div className="flex flex-col gap-0.5">
-                <span className="text-sm font-bold text-white leading-none">
+                <span className="text-sm font-bold text-bpim-text leading-none">
                   プロフィールを公開
                 </span>
-                <span className="text-[10px] text-slate-400">
+                <span className="text-[10px] text-bpim-muted">
                   他のユーザーがあなたを見つけられるようになります
                 </span>
                 {!formData.isPublic && (

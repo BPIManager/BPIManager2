@@ -8,7 +8,7 @@ export const RivalWinLossSummaryNotFound = () => {
     <DashCard className="flex flex-col items-center justify-center gap-4 p-8">
       <UserPlus className="h-10 w-10 text-bpim-muted" />
       <div className="flex flex-col items-center gap-1 text-center">
-        <p className="font-bold text-white">比較対象のライバルがいません</p>
+        <p className="font-bold text-bpim-text">比較対象のライバルがいません</p>
         <p className="text-xs text-bpim-muted">
           実力が近いユーザーをライバルに登録してスコアを比較できます！
         </p>

@@ -31,7 +31,7 @@ export const AAATableContent = ({
 
   if (!userId) {
     return (
-      <div className="flex h-40 items-center justify-center text-slate-500">
+      <div className="flex h-40 items-center justify-center text-bpim-muted">
         ユーザーIDが見つかりません
       </div>
     );
@@ -69,7 +69,7 @@ export const AAATableContent = ({
             .map((bpiKey) => (
               <section key={bpiKey} className="flex flex-col gap-4">
                 <div className="border-b border-bpim-border pb-1">
-                  <h3 className="text-[10px] font-black tracking-[0.2em] text-slate-500 uppercase">
+                  <h3 className="text-[10px] font-black tracking-[0.2em] text-bpim-muted uppercase">
                     BPI {bpiKey} ~ {Number(bpiKey) + 10}
                   </h3>
                 </div>

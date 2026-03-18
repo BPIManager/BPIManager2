@@ -4,7 +4,7 @@ import NextLink from "next/link";
 export const NoDataAlert = () => {
   return (
     <DashCard className="my-4 focus:outline-none">
-      <b className="text-white">
+      <b className="text-bpim-text">
         おっと！まだデータが登録されていないようです...
       </b>
       <p className="mt-2 text-sm text-bpim-muted">

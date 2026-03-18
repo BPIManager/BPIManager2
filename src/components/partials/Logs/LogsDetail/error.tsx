@@ -23,7 +23,7 @@ export const LogErrorState = ({ error, onRetry }: LogErrorStateProps) => {
         </div>
 
         <div className="flex flex-col items-center gap-2">
-          <h2 className="text-xl font-bold text-white">
+          <h2 className="text-xl font-bold text-bpim-text">
             データの取得に失敗しました
           </h2>
           <p className="max-w-[400px] text-sm text-bpim-muted">{message}</p>
@@ -48,7 +48,7 @@ export const LogErrorState = ({ error, onRetry }: LogErrorStateProps) => {
           onClick={onRetry}
           variant="outline"
           size="sm"
-          className="group flex items-center gap-2 rounded-full border-bpim-border px-6 transition-colors hover:bg-white/5 hover:text-bpim-primary"
+          className="group flex items-center gap-2 rounded-full border-bpim-border px-6 transition-colors hover:bg-bpim-overlay/50 hover:text-bpim-primary"
         >
           <LuRefreshCcw
             size={14}

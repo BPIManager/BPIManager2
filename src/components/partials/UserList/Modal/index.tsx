@@ -74,7 +74,7 @@ export const RivalComparisonModal = ({
 
                 <Button
                   asChild
-                  className="h-[50px] w-full rounded-xl bg-bpim-primary font-bold text-white hover:bg-bpim-primary transition-all active:scale-95"
+                  className="h-[50px] w-full rounded-xl bg-bpim-primary font-bold text-bpim-text hover:bg-bpim-primary transition-all active:scale-95"
                 >
                   <Link href={`/users/${rivalId}`}>
                     <div className="flex items-center justify-center gap-2">

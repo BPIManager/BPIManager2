@@ -97,7 +97,7 @@ export const SongDetailView = ({
         <DialogHeader className="border-b border-bpim-border p-4 flex flex-row items-center justify-between space-y-0">
           <DialogTitle className="text-lg font-black tracking-tight text-white">
             {song.title}
-            <span className="ml-2 text-slate-500 font-mono">
+            <span className="ml-2 text-bpim-muted font-mono">
               [{song.difficulty.charAt(0)}]
             </span>
           </DialogTitle>
@@ -106,19 +106,19 @@ export const SongDetailView = ({
         <div className="p-6">
           <div className="mb-8 grid grid-cols-3 gap-4 text-center">
             <div className="flex flex-col gap-1">
-              <span className="text-[10px] font-bold tracking-widest text-slate-500 uppercase">
+              <span className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
                 EX Score
               </span>
               <span className="font-mono text-lg font-black text-white leading-none">
                 {song.exScore ?? 0}
               </span>
-              <span className="text-[10px] font-bold text-slate-400 mt-1 font-mono">
+              <span className="text-[10px] font-bold text-bpim-muted mt-1 font-mono">
                 {(((song.exScore ?? 0) / maxScore) * 100).toFixed(2)}%
               </span>
             </div>
 
             <div className="flex flex-col gap-1 border-x border-bpim-border">
-              <span className="text-[10px] font-bold tracking-widest text-slate-500 uppercase">
+              <span className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
                 BPI
               </span>
               <span className="font-mono text-lg font-black text-bpim-primary leading-none">
@@ -132,7 +132,7 @@ export const SongDetailView = ({
             </div>
 
             <div className="flex flex-col gap-1">
-              <span className="text-[10px] font-bold tracking-widest text-slate-500 uppercase">
+              <span className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
                 DJ Rank
               </span>
               <span className="font-mono text-lg font-black text-yellow-500 leading-none">
@@ -172,7 +172,7 @@ export const SongDetailView = ({
               <div className="mt-6 rounded-xl border border-bpim-border bg-white/5 p-4">
                 <div className="flex flex-col gap-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-500 uppercase">
+                    <span className="text-xs font-bold text-bpim-muted uppercase">
                       World Record
                     </span>
                     <span className="font-mono text-sm font-black text-white">
@@ -180,7 +180,7 @@ export const SongDetailView = ({
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-500 uppercase">
+                    <span className="text-xs font-bold text-bpim-muted uppercase">
                       Kaiden Average
                     </span>
                     <span className="font-mono text-sm font-black text-white">
@@ -189,7 +189,7 @@ export const SongDetailView = ({
                   </div>
                   <Separator className="bg-white/5 my-1" />
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-500 uppercase">
+                    <span className="text-xs font-bold text-bpim-muted uppercase">
                       Clear Lamp
                     </span>
                     <span className="font-mono text-sm font-black">
@@ -197,7 +197,7 @@ export const SongDetailView = ({
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-500 uppercase">
+                    <span className="text-xs font-bold text-bpim-muted uppercase">
                       Miss Count
                     </span>
                     <span className="font-mono text-sm font-black text-bpim-danger">

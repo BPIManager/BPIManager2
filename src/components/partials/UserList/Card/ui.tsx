@@ -40,7 +40,7 @@ export const UserRecommendationCard = ({
   return (
     <button
       onClick={onClick}
-      className="group relative flex w-full flex-row items-stretch justify-between gap-3 overflow-hidden rounded-2xl border border-bpim-border bg-bpim-bg/80 p-3 text-left transition-all duration-300 hover:-translate-y-1 hover:border-white/30 hover:bg-slate-800/90 md:gap-6 md:p-5"
+      className="group relative flex w-full flex-row items-stretch justify-between gap-3 overflow-hidden rounded-2xl border border-bpim-border bg-bpim-bg/80 p-3 text-left transition-all duration-300 hover:-translate-y-1 hover:border-white/30 hover:bg-bpim-surface-2/90 md:gap-6 md:p-5"
     >
       <div
         className="absolute left-0 top-0 bottom-0 w-1 opacity-80"
@@ -55,18 +55,18 @@ export const UserRecommendationCard = ({
           </Avatar>
 
           <div className="flex flex-1 flex-col gap-0 min-w-0">
-            <span className="truncate text-xs font-bold text-white tracking-tight md:text-base">
+            <span className="truncate text-xs font-bold text-bpim-text tracking-tight md:text-base">
               {user.userName}
             </span>
             <div className="flex items-center gap-1.5 flex-wrap">
-              <Badge className="bg-orange-600 h-4 px-1.5 text-[10px] md:text-[11px] font-bold text-white">
+              <Badge className="bg-orange-600 h-4 px-1.5 text-[10px] md:text-[11px] font-bold text-bpim-text">
                 {user.arenaRank || "N/A"}
               </Badge>
-              <span className="font-mono text-[10px] text-slate-500 md:text-[12px]">
+              <span className="font-mono text-[10px] text-bpim-muted md:text-[12px]">
                 ID: {formatIIDXId(user.iidxId)}
               </span>
             </div>
-            <span className="text-[10px] text-slate-500 md:text-[12px]">
+            <span className="text-[10px] text-bpim-muted md:text-[12px]">
               最終更新: {timeAgo}
             </span>
           </div>
@@ -76,13 +76,13 @@ export const UserRecommendationCard = ({
           <span
             className={cn(
               "block text-[9px] font-bold tracking-wider mb-0.5",
-              isTotalBpi ? "text-slate-500" : "text-bpim-primary",
+              isTotalBpi ? "text-bpim-muted" : "text-bpim-primary",
             )}
           >
             {displayLabel}
           </span>
           <div className="flex items-baseline gap-1.5">
-            <span className="font-mono text-lg font-bold text-white md:text-2xl leading-none">
+            <span className="font-mono text-lg font-bold text-bpim-text md:text-2xl leading-none">
               {displayValue.toFixed(2)}
             </span>
             <div
@@ -105,10 +105,10 @@ export const UserRecommendationCard = ({
         </div>
 
         <div className="w-full">
-          <span className="block text-[9px] font-bold tracking-wider text-slate-500 mb-0.5">
+          <span className="block text-[9px] font-bold tracking-wider text-bpim-muted mb-0.5">
             COMMENT
           </span>
-          <p className="line-clamp-1 text-[10px] leading-relaxed text-slate-400 md:line-clamp-2 md:text-[11px]">
+          <p className="line-clamp-1 text-[10px] leading-relaxed text-bpim-muted md:line-clamp-2 md:text-[11px]">
             {user.profileText || "-"}
           </p>
         </div>

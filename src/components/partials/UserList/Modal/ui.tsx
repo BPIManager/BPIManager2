@@ -15,23 +15,23 @@ export const RivalHeader = ({ profile, isUpdating, onToggleFollow }: any) => (
 
       <div className="flex min-w-0 flex-1 flex-col items-center gap-1 md:items-start">
         <div className="flex flex-wrap justify-center gap-2 md:justify-start">
-          <h2 className="text-xl font-bold tracking-tight text-white">
+          <h2 className="text-xl font-bold tracking-tight text-bpim-text">
             {profile?.userName}
           </h2>
           {profile?.relationship?.isMutual && (
             <Badge
               variant="secondary"
-              className="bg-purple-500/10 text-purple-400 border-purple-500/20 px-2 py-0 text-[10px]"
+              className="bg-purple-500/10 text-bpim-primary border-purple-500/20 px-2 py-0 text-[10px]"
             >
               相互フォロー
             </Badge>
           )}
         </div>
-        <p className="font-mono text-xs tracking-wider text-slate-500">
+        <p className="font-mono text-xs tracking-wider text-bpim-muted">
           ID: {formatIIDXId(profile?.iidxId)}
         </p>
         <div className="mt-1 flex justify-center gap-2 md:justify-start">
-          <Badge className="bg-orange-600 text-white border-none rounded-sm px-2">
+          <Badge className="bg-orange-600 text-bpim-text border-none rounded-sm px-2">
             {profile?.current?.arenaRank || "N/A"}
           </Badge>
           <Badge
@@ -56,7 +56,7 @@ export const RivalHeader = ({ profile, isUpdating, onToggleFollow }: any) => (
 
     {profile?.profileText && (
       <div className="w-full rounded-lg bg-white/5 p-3">
-        <p className="whitespace-pre-wrap text-xs text-slate-300 leading-relaxed">
+        <p className="whitespace-pre-wrap text-xs text-bpim-text leading-relaxed">
           {profile?.profileText}
         </p>
       </div>
@@ -81,7 +81,7 @@ export const WinLossStats = ({ winLossData }: { winLossData: any[] }) => (
         return (
           <div
             key={lv}
-            className="rounded-xl border border-bpim-border bg-linear-to-b from-white/5 to-white/[0.02] p-4"
+            className="rounded-xl border border-bpim-border bg-linear-to-b from-bpim-text/5 to-white/[0.02] p-4"
           >
             <div className="mb-3 flex justify-between items-center">
               <span className="text-xs font-bold text-bpim-primary">
@@ -93,9 +93,21 @@ export const WinLossStats = ({ winLossData }: { winLossData: any[] }) => (
             </div>
 
             <div className="flex justify-around items-center">
-              <StatBox label="WIN" value={stats.win} color="text-bpim-success" />
-              <StatBox label="DRAW" value={stats.draw} color="text-slate-500" />
-              <StatBox label="LOSE" value={stats.lose} color="text-bpim-danger" />
+              <StatBox
+                label="WIN"
+                value={stats.win}
+                color="text-bpim-success"
+              />
+              <StatBox
+                label="DRAW"
+                value={stats.draw}
+                color="text-bpim-muted"
+              />
+              <StatBox
+                label="LOSE"
+                value={stats.lose}
+                color="text-bpim-danger"
+              />
             </div>
 
             <div className="mt-3 h-0.5 w-full overflow-hidden rounded-full bg-white/10">
@@ -115,8 +127,8 @@ export const WinLossStats = ({ winLossData }: { winLossData: any[] }) => (
 
 export const SectionTitle = ({ icon: Icon, label }: any) => (
   <div className="flex items-center gap-2">
-    <Icon className="h-3 w-3 text-slate-500" />
-    <span className="text-[10px] font-bold tracking-widest text-slate-500 uppercase">
+    <Icon className="h-3 w-3 text-bpim-muted" />
+    <span className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
       {label}
     </span>
   </div>
@@ -127,7 +139,7 @@ const StatBox = ({ label, value, color }: any) => (
     <span className={cn("text-xl font-black leading-none", color)}>
       {value}
     </span>
-    <span className="text-[8px] font-bold tracking-tighter text-slate-600 uppercase">
+    <span className="text-[8px] font-bold tracking-tighter text-bpim-subtle uppercase">
       {label}
     </span>
   </div>

@@ -26,11 +26,11 @@ export const PageHeader = ({
         <div className="flex flex-1 flex-col gap-2">
           <div className="flex items-center gap-3">
             {Icon && (
-              <div className="flex items-center justify-center rounded-lg border border-blue-800 bg-bpim-primary-dim p-2">
+              <div className="flex items-center justify-center rounded-lg border border-bpim-border bg-bpim-primary-dim p-2">
                 <Icon className="h-6 w-6 text-bpim-primary" />
               </div>
             )}
-            <h1 className="text-3xl font-bold tracking-tight text-white leading-[1.1] md:text-4xl">
+            <h1 className="text-3xl font-bold tracking-tight text-bpim-text leading-[1.1] md:text-4xl">
               {title}
             </h1>
           </div>
@@ -38,7 +38,7 @@ export const PageHeader = ({
           {description && (
             <p
               className={cn(
-                "hidden text-base font-medium text-white/60 sm:block max-w-2xl",
+                "hidden text-base font-medium text-bpim-text/60 sm:block max-w-2xl",
                 Icon ? "sm:pl-[52px]" : "pl-0",
               )}
             >
@@ -54,7 +54,7 @@ export const PageHeader = ({
 );
 
 export const PageContainer = ({ children }: { children: ReactNode }) => (
-  <main className="mx-auto w-full max-w-[1920px] px-3 py-4 md:px-8 lg:px-16">
+  <div className="mx-auto w-full max-w-[1920px] px-3 py-4 md:px-8 lg:px-16">
     {children}
-  </main>
+  </div>
 );

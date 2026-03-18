@@ -35,7 +35,7 @@ export const RivalComparisonRow = ({ rival }: RivalComparisonRowProps) => {
           </Avatar>
           <Link
             href={`/rivals/${userId}`}
-            className="truncate text-xs font-bold text-white transition-colors hover:text-bpim-primary"
+            className="truncate text-xs font-bold text-bpim-text transition-colors hover:text-bpim-primary"
           >
             {userName}
           </Link>
@@ -53,7 +53,9 @@ export const RivalComparisonRow = ({ rival }: RivalComparisonRowProps) => {
           >
             {winRate > 10 && (
               <div className="flex h-full items-center justify-center">
-                <span className="text-[10px] font-bold text-white">{win}</span>
+                <span className="text-[10px] font-bold text-bpim-text">
+                  {win}
+                </span>
               </div>
             )}
           </div>
@@ -64,7 +66,9 @@ export const RivalComparisonRow = ({ rival }: RivalComparisonRowProps) => {
           >
             {drawRate > 15 && (
               <div className="flex h-full items-center justify-center">
-                <span className="text-[10px] font-bold text-white">{draw}</span>
+                <span className="text-[10px] font-bold text-bpim-text">
+                  {draw}
+                </span>
               </div>
             )}
           </div>
@@ -75,7 +79,9 @@ export const RivalComparisonRow = ({ rival }: RivalComparisonRowProps) => {
           >
             {loseRate > 10 && (
               <div className="flex h-full items-center justify-center">
-                <span className="text-[10px] font-bold text-white">{lose}</span>
+                <span className="text-[10px] font-bold text-bpim-text">
+                  {lose}
+                </span>
               </div>
             )}
           </div>
