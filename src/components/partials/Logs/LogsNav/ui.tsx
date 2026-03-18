@@ -1,4 +1,4 @@
-import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
+﻿import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
 import { useRouter } from "next/router";
 import dayjs from "@/lib/dayjs";
 import { Button } from "@/components/ui/button";
@@ -75,7 +75,7 @@ export const LogNavigator = ({ type, pagination }: LogNavigatorProps) => {
           variant="ghost"
           size="sm"
           className={cn(
-            "group flex h-auto items-center px-2 text-slate-400 hover:bg-white/5 hover:text-blue-400",
+            "group flex h-auto items-center px-2 text-slate-400 hover:bg-white/5 hover:text-bpim-primary",
             !hasPrev && "opacity-30",
           )}
           disabled={!hasPrev}
@@ -105,7 +105,7 @@ export const LogNavigator = ({ type, pagination }: LogNavigatorProps) => {
           variant="ghost"
           size="sm"
           className={cn(
-            "group flex h-auto items-center px-2 text-slate-400 hover:bg-white/5 hover:text-blue-400",
+            "group flex h-auto items-center px-2 text-slate-400 hover:bg-white/5 hover:text-bpim-primary",
             !hasNext && "opacity-30",
           )}
           disabled={!hasNext}

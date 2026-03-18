@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { LuRefreshCw, LuDatabase, LuLoader } from "react-icons/lu";
@@ -52,14 +52,14 @@ export default function TransferUi() {
   return (
     <div className="mt-4 flex flex-col gap-6 rounded-xl border border-bpim-border bg-bpim-bg p-6 md:flex-row md:items-center md:justify-between">
       <div className="flex flex-col gap-1">
-        <div className="flex items-center gap-2 text-blue-400">
+        <div className="flex items-center gap-2 text-bpim-primary">
           <LuDatabase className="h-4 w-4" />
           <span className="font-bold">データ移行</span>
         </div>
         <p className="text-sm text-slate-400">
           BPIManagerで保存されたスコアをBPIM2へ引き継ぎます。
         </p>
-        <div className="mt-1 flex flex-col gap-0.5 text-[10px] text-orange-300 leading-relaxed">
+        <div className="mt-1 flex flex-col gap-0.5 text-[10px] text-bpim-warning leading-relaxed">
           <span>
             ※
             BPIM2で登録されたデータをすべて削除し、BPIManagerのスコアに置き換えます。
@@ -106,7 +106,7 @@ export default function TransferUi() {
                     <Badge
                       key={v}
                       variant="secondary"
-                      className="bg-blue-500/10 text-blue-400 hover:bg-blue-500/20"
+                      className="bg-bpim-primary/10 text-bpim-primary hover:bg-bpim-primary/20"
                     >
                       {versionTitles.find((item) => item.num === String(v))
                         ?.title || `Ver.${v}`}
@@ -114,16 +114,16 @@ export default function TransferUi() {
                   ))}
                 </div>
               ) : (
-                <p className="text-xs text-red-400 font-bold">
+                <p className="text-xs text-bpim-danger font-bold">
                   同期可能なデータが見つかりません。
                 </p>
               )}
             </div>
 
-            <p className="text-[11px] text-orange-400 font-bold leading-tight">
+            <p className="text-[11px] text-bpim-warning font-bold leading-tight">
               ※ 同期を実行すると現在のBPIM2のデータは上書き削除されます。
             </p>
-            <p className="text-[11px] text-red-400 leading-tight">
+            <p className="text-[11px] text-bpim-danger leading-tight">
               ※
               処理には最大2~3分かかることがあります。画面を閉じずにお待ちください。
             </p>

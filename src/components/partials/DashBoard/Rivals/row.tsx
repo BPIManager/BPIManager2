@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+﻿import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
 
 interface RivalComparisonRowProps {
@@ -35,12 +35,12 @@ export const RivalComparisonRow = ({ rival }: RivalComparisonRowProps) => {
           </Avatar>
           <Link
             href={`/rivals/${userId}`}
-            className="truncate text-xs font-bold text-white transition-colors hover:text-blue-400"
+            className="truncate text-xs font-bold text-white transition-colors hover:text-bpim-primary"
           >
             {userName}
           </Link>
         </div>
-        <span className="text-[10px] font-bold text-gray-500 whitespace-nowrap">
+        <span className="text-[10px] font-bold text-bpim-muted whitespace-nowrap">
           {totalCount}曲
         </span>
       </div>
@@ -48,7 +48,7 @@ export const RivalComparisonRow = ({ rival }: RivalComparisonRowProps) => {
       <div className="relative h-[18px] w-full overflow-hidden rounded-sm bg-white/5">
         <div className="flex h-full w-full items-center gap-0">
           <div
-            className="relative h-full bg-blue-500 transition-all duration-1000 ease-out"
+            className="relative h-full bg-bpim-primary transition-all duration-1000 ease-out"
             style={{ width: `${winRate}%` }}
           >
             {winRate > 10 && (
@@ -59,7 +59,7 @@ export const RivalComparisonRow = ({ rival }: RivalComparisonRowProps) => {
           </div>
 
           <div
-            className="relative h-full bg-gray-500 transition-all duration-1000 ease-out"
+            className="relative h-full bg-bpim-overlay transition-all duration-1000 ease-out"
             style={{ width: `${drawRate}%` }}
           >
             {drawRate > 15 && (
@@ -70,7 +70,7 @@ export const RivalComparisonRow = ({ rival }: RivalComparisonRowProps) => {
           </div>
 
           <div
-            className="relative h-full bg-red-500 transition-all duration-1000 ease-out"
+            className="relative h-full bg-bpim-danger transition-all duration-1000 ease-out"
             style={{ width: `${loseRate}%` }}
           >
             {loseRate > 10 && (
@@ -87,7 +87,7 @@ export const RivalComparisonRow = ({ rival }: RivalComparisonRowProps) => {
           </span>
         )}
         {loseRate <= 10 && lose > 0 && (
-          <span className="pointer-events-none absolute right-0.5 top-1/2 -translate-y-1/2 text-[10px] font-bold text-blue-300">
+          <span className="pointer-events-none absolute right-0.5 top-1/2 -translate-y-1/2 text-[10px] font-bold text-bpim-primary">
             {lose}
           </span>
         )}

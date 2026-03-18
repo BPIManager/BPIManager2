@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { ReactNode } from "react";
 import NextLink from "next/link";
@@ -49,7 +49,7 @@ export const RivalProfileLayout = ({
     return (
       <DashboardLayout>
         <div className="flex h-[90vh] items-center justify-center">
-          <LuLoader className="h-10 w-10 animate-spin text-gray-200" />
+          <LuLoader className="h-10 w-10 animate-spin text-bpim-text" />
         </div>
       </DashboardLayout>
     );
@@ -94,7 +94,7 @@ export const RivalProfileLayout = ({
                     <TabsTrigger
                       value="overview"
                       asChild
-                      className="flex items-center gap-2 py-3 text-xs font-bold data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+                      className="flex items-center gap-2 py-3 text-xs font-bold data-[state=active]:bg-bpim-primary data-[state=active]:text-white"
                     >
                       <NextLink href={`/rivals/${rivalUserId}`}>
                         <LuLayoutDashboard className="h-4 w-4" />
@@ -104,7 +104,7 @@ export const RivalProfileLayout = ({
                     <TabsTrigger
                       value="scores"
                       asChild
-                      className="flex items-center gap-2 py-3 text-xs font-bold data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+                      className="flex items-center gap-2 py-3 text-xs font-bold data-[state=active]:bg-bpim-primary data-[state=active]:text-white"
                     >
                       <NextLink
                         href={`/rivals/${rivalUserId}/scores/${version}?${scoreParams}`}

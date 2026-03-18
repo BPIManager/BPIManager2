@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import {
   BarChart,
@@ -31,7 +31,7 @@ const CustomTooltip = ({ active, payload, maxScore }: any) => {
           <p
             className={cn(
               "text-[10px] font-black uppercase tracking-wider",
-              isYou ? "text-yellow-400" : "text-blue-400",
+              isYou ? "text-yellow-400" : "text-bpim-primary",
             )}
           >
             {isYou ? "Your Score" : `BPI Target: ${data.name}`}

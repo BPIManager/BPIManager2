@@ -1,4 +1,4 @@
-import { Checkbox } from "@/components/ui/checkbox";
+﻿import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { IIDX_LEVELS, IIDX_DIFFICULTIES } from "@/constants/diffs";
 
@@ -28,7 +28,7 @@ export const RivalFilter = ({
                 id={`lv-${l}`}
                 checked={levels.includes(l)}
                 onCheckedChange={() => onToggleLevel(l)}
-                className="h-4 w-4 border-white/20 data-[state=checked]:bg-blue-600"
+                className="h-4 w-4 border-white/20 data-[state=checked]:bg-bpim-primary"
               />
               <Label
                 htmlFor={`lv-${l}`}
@@ -52,7 +52,7 @@ export const RivalFilter = ({
                 id={`diff-${d}`}
                 checked={difficulties.includes(d)}
                 onCheckedChange={() => onToggleDifficulty(d)}
-                className="h-4 w-4 border-white/20 data-[state=checked]:bg-blue-600"
+                className="h-4 w-4 border-white/20 data-[state=checked]:bg-bpim-primary"
               />
               <Label
                 htmlFor={`diff-${d}`}

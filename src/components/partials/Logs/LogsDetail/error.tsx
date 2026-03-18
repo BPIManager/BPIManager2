@@ -1,4 +1,4 @@
-import { AlertCircle } from "lucide-react";
+﻿import { AlertCircle } from "lucide-react";
 import { LuRefreshCcw } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 
@@ -18,7 +18,7 @@ export const LogErrorState = ({ error, onRetry }: LogErrorStateProps) => {
   return (
     <div className="flex h-[500px] w-full items-center justify-center">
       <div className="flex flex-col items-center gap-6 text-center">
-        <div className="rounded-full bg-red-500/10 p-6 text-red-500">
+        <div className="rounded-full bg-bpim-danger/10 p-6 text-bpim-danger">
           <AlertCircle size={48} />
         </div>
 
@@ -26,19 +26,19 @@ export const LogErrorState = ({ error, onRetry }: LogErrorStateProps) => {
           <h2 className="text-xl font-bold text-white">
             データの取得に失敗しました
           </h2>
-          <p className="max-w-[400px] text-sm text-gray-500">{message}</p>
+          <p className="max-w-[400px] text-sm text-bpim-muted">{message}</p>
 
           {status && (
-            <code className="mt-2 rounded bg-red-500/10 px-2 py-0.5 font-mono text-[10px] font-bold text-red-400">
+            <code className="mt-2 rounded bg-bpim-danger/10 px-2 py-0.5 font-mono text-[10px] font-bold text-bpim-danger">
               HTTP {status}
             </code>
           )}
 
           <div className="mt-4 w-full text-left">
-            <label className="ml-1 mb-1 block text-[10px] font-bold text-gray-600 uppercase tracking-wider">
+            <label className="ml-1 mb-1 block text-[10px] font-bold text-bpim-subtle uppercase tracking-wider">
               Error Details:
             </label>
-            <pre className="w-full max-h-[200px] overflow-y-auto rounded-md border border-bpim-border bg-bpim-bg/40 p-4 font-mono text-[10px] text-gray-400 whitespace-pre-wrap break-all scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+            <pre className="w-full max-h-[200px] overflow-y-auto rounded-md border border-bpim-border bg-bpim-bg/40 p-4 font-mono text-[10px] text-bpim-muted whitespace-pre-wrap break-all scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
               {errorDetail}
             </pre>
           </div>
@@ -48,7 +48,7 @@ export const LogErrorState = ({ error, onRetry }: LogErrorStateProps) => {
           onClick={onRetry}
           variant="outline"
           size="sm"
-          className="group flex items-center gap-2 rounded-full border-bpim-border px-6 transition-colors hover:bg-white/5 hover:text-blue-400"
+          className="group flex items-center gap-2 rounded-full border-bpim-border px-6 transition-colors hover:bg-white/5 hover:text-bpim-primary"
         >
           <LuRefreshCcw
             size={14}

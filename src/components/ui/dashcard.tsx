@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+﻿import { cn } from "@/lib/utils";
 
 export const DashCard = ({
   children,
@@ -9,7 +9,7 @@ export const DashCard = ({
 }) => (
   <div
     className={cn(
-      "w-full rounded-xl border border-bpim-border bg-[#0d1117] p-5",
+      "w-full rounded-xl border border-bpim-border bg-bpim-surface p-5",
       className,
     )}
   >

@@ -1,4 +1,4 @@
-import { LuChevronRight } from "react-icons/lu";
+﻿import { LuChevronRight } from "react-icons/lu";
 import { OvertakenRivalInfo } from "@/types/logs/overtaken";
 import { BatchDetailItem } from "@/hooks/batches/useBatchDetail";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -29,10 +29,10 @@ export const OvertakeRankItem = ({ item, onClick }: RankItemProps) => {
             {item.title}
           </span>
           <div className="flex items-center gap-2">
-            <span className="px-1 text-[9px] font-bold bg-white/10 text-gray-400 rounded-sm uppercase">
+            <span className="px-1 text-[9px] font-bold bg-white/10 text-bpim-muted rounded-sm uppercase">
               {String(item.difficulty || "").slice(0, 1)}
             </span>
-            <span className="text-[10px] text-gray-600 font-bold font-mono">
+            <span className="text-[10px] text-bpim-subtle font-bold font-mono">
               ☆{item.level}
             </span>
             {isNew && (
@@ -44,14 +44,14 @@ export const OvertakeRankItem = ({ item, onClick }: RankItemProps) => {
         </div>
 
         <div className="flex items-center gap-4 shrink-0">
-          <div className="flex items-center gap-1.5 text-xs text-gray-400 font-mono">
+          <div className="flex items-center gap-1.5 text-xs text-bpim-muted font-mono">
             <span className="font-medium">{previous?.exScore || 0}</span>
             <LuChevronRight className="w-3 h-3" />
             <span className="font-black text-white text-base">
               {current.exScore}
             </span>
           </div>
-          <div className="flex h-6 min-w-[50px] items-center justify-center rounded-sm bg-blue-600 px-2 text-xs font-bold text-white">
+          <div className="flex h-6 min-w-[50px] items-center justify-center rounded-sm bg-bpim-primary px-2 text-xs font-bold text-white">
             +{scoreDiff}
           </div>
         </div>
@@ -77,13 +77,13 @@ export const OvertakeRankItem = ({ item, onClick }: RankItemProps) => {
                         {rival.rivalName.slice(0, 2)}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="text-xs font-medium text-gray-300">
+                    <span className="text-xs font-medium text-bpim-text">
                       {rival.rivalName}
                     </span>
                   </div>
 
                   <div className="flex items-center gap-3 font-mono">
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-bpim-muted">
                       {rival.rivalScore}
                     </span>
                     <div className="text-xs font-bold text-yellow-400 min-w-[40px] text-right">

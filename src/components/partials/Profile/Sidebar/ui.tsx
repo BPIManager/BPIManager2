@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { SiX } from "react-icons/si";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -35,7 +35,7 @@ export const ProfileSideBar = ({
             href={`https://x.com/${profile.xId}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 text-slate-400 transition-colors hover:text-blue-400"
+            className="flex items-center gap-2 text-slate-400 transition-colors hover:text-bpim-primary"
           >
             <SiX className="h-3.5 w-3.5" />
             <span className="text-xs">@{profile.xId}</span>
@@ -87,7 +87,7 @@ export const ProfileStatsContent = ({ profile }: { profile: any }) => {
           <span className="text-[10px] font-bold tracking-widest text-slate-500 uppercase">
             Total BPI
           </span>
-          <span className="font-mono text-2xl font-black leading-none text-blue-400">
+          <span className="font-mono text-2xl font-black leading-none text-bpim-primary">
             {current.totalBpi?.toFixed(2) ?? "N/A"}
           </span>
         </div>

@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+﻿import { useState, useMemo } from "react";
 import { UpdateLog, useBatchesList } from "@/hooks/batches/useBatchesList";
 import { LogsCard } from "../LogsCard/ui";
 import { LogsGroupSkeleton } from "../LogsCard/skeleton";
@@ -66,7 +66,7 @@ export const LogsList = ({ userId, version, groupedBy }: Props) => {
   if (isError)
     return (
       <div className="flex h-[200px] items-center justify-center">
-        <p className="text-red-500 font-bold">読み込みに失敗しました</p>
+        <p className="text-bpim-danger font-bold">読み込みに失敗しました</p>
       </div>
     );
 
@@ -88,7 +88,7 @@ export const LogsList = ({ userId, version, groupedBy }: Props) => {
               <div key={group.date} className="relative">
                 <div className="relative z-10 mb-4 flex items-center gap-4">
                   <div
-                    className="hidden md:block h-3 w-3 shrink-0 rounded-full border-2 border-slate-950 bg-blue-500 ml-[21px]"
+                    className="hidden md:block h-3 w-3 shrink-0 rounded-full border-2 border-slate-950 bg-bpim-primary ml-[21px]"
                     aria-hidden="true"
                   />
                   <h2 className="text-xl font-bold tracking-tight text-white">
@@ -129,8 +129,8 @@ export const LogsList = ({ userId, version, groupedBy }: Props) => {
                           className={cn(
                             "text-lg font-bold",
                             group.dayTotalBpiDelta >= 0
-                              ? "text-green-400"
-                              : "text-red-400",
+                              ? "text-bpim-success"
+                              : "text-bpim-danger",
                           )}
                         >
                           {group.dayTotalBpiDelta >= 0 ? "+" : ""}

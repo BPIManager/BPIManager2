@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
@@ -134,7 +134,7 @@ export const SongFilterBar = ({
           />
           {isTyping && (
             <div className="absolute right-3 top-1/2 -translate-y-1/2">
-              <LuLoader className="animate-spin text-gray-200" size={14} />
+              <LuLoader className="animate-spin text-bpim-text" size={14} />
             </div>
           )}
         </div>
@@ -208,7 +208,7 @@ export const SongFilterBar = ({
       <Separator className="bg-white/10 mt-3 mb-2" />
 
       <div className="flex items-center justify-between">
-        <span className="text-xs font-bold text-gray-200">
+        <span className="text-xs font-bold text-bpim-text">
           {totalCount.toLocaleString()}曲
         </span>
         <FilterStickyToggle isSticky={isSticky} onToggle={setIsSticky} />

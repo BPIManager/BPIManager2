@@ -1,4 +1,4 @@
-import { DistributionChartSkeleton } from "@/components/partials/DashBoard/DistributionChart/skeleton";
+﻿import { DistributionChartSkeleton } from "@/components/partials/DashBoard/DistributionChart/skeleton";
 import { DashCard } from "@/components/ui/dashcard";
 import { cn } from "@/lib/utils";
 
@@ -58,7 +58,7 @@ const ChartBarUnit = ({
           <div className="relative flex h-full flex-1 min-w-0 flex-col justify-end">
             <span
               className={cn(
-                "whitespace-nowrap text-[10px] font-bold text-blue-400",
+                "whitespace-nowrap text-[10px] font-bold text-bpim-primary",
                 myCount > 0 ? "visible" : "hidden",
                 hasRival
                   ? "absolute bottom-[calc(100%+2px)] left-1/2 -translate-x-1/2"
@@ -94,7 +94,7 @@ const ChartBarUnit = ({
         {hasRival && (
           <span
             className={cn(
-              "absolute bottom-[5px] left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] font-bold text-orange-400",
+              "absolute bottom-[5px] left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] font-bold text-bpim-warning",
               rivalCount > 0 ? "visible" : "hidden",
             )}
           >
@@ -106,7 +106,7 @@ const ChartBarUnit = ({
       <div className="h-[1px] w-full bg-white/10" />
 
       <div className="flex h-[30px] justify-center">
-        <span className="mt-2 whitespace-nowrap text-[10px] font-bold text-gray-500">
+        <span className="mt-2 whitespace-nowrap text-[10px] font-bold text-bpim-muted">
           {label}
         </span>
       </div>
@@ -145,17 +145,17 @@ export const DistributionChart = ({
       <style dangerouslySetInnerHTML={{ __html: animationStyles }} />
 
       <div className="mb-6 flex items-center justify-between">
-        <h3 className="text-sm font-bold uppercase text-gray-500">{title}</h3>
+        <h3 className="text-sm font-bold uppercase text-bpim-muted">{title}</h3>
 
         {rivalData && (
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1">
-              <div className="h-2 w-2 rounded-full bg-blue-500" />
-              <span className="text-xs text-blue-400">{myName}</span>
+              <div className="h-2 w-2 rounded-full bg-bpim-primary" />
+              <span className="text-xs text-bpim-primary">{myName}</span>
             </div>
             <div className="flex items-center gap-1">
               <div className="h-2 w-2 rounded-full bg-orange-500 opacity-60" />
-              <span className="text-xs text-orange-400">{rivalName}</span>
+              <span className="text-xs text-bpim-warning">{rivalName}</span>
             </div>
           </div>
         )}

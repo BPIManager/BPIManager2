@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from "react";
 import NextLink from "next/link";
@@ -18,7 +18,7 @@ export const ReusableMenuItem = ({
   icon: IconComponent,
   title,
   subtitle,
-  iconColor = "text-gray-200",
+  iconColor = "text-bpim-text",
   href,
   isExternal,
   className,

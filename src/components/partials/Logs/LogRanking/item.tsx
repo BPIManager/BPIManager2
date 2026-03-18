@@ -1,4 +1,4 @@
-import { ChevronRight } from "lucide-react";
+﻿import { ChevronRight } from "lucide-react";
 import { BatchDetailItem } from "@/hooks/batches/useBatchDetail";
 import { cn } from "@/lib/utils";
 
@@ -22,17 +22,17 @@ export const RankItem = ({
 
   const getBpiColor = (val: number) => {
     if (isGrowth) {
-      if (val >= 10) return "text-red-400";
-      if (val >= 5) return "text-orange-400";
+      if (val >= 10) return "text-bpim-danger";
+      if (val >= 5) return "text-bpim-warning";
       if (val >= 3) return "text-yellow-300";
-      if (val >= 1) return "text-green-400";
+      if (val >= 1) return "text-bpim-success";
       return "text-cyan-400";
     }
     if (val >= 100) return "text-pink-400";
     if (val >= 70) return "text-yellow-300";
-    if (val >= 40) return "text-green-400";
-    if (val >= 0) return "text-blue-400";
-    return "text-gray-500";
+    if (val >= 40) return "text-bpim-success";
+    if (val >= 0) return "text-bpim-primary";
+    return "text-bpim-muted";
   };
 
   const rankColor =
@@ -41,7 +41,7 @@ export const RankItem = ({
       : rank === 2
         ? "text-slate-400"
         : rank === 3
-          ? "text-orange-400"
+          ? "text-bpim-warning"
           : "text-slate-700";
 
   const diffBpiColor = getBpiColor(isGrowth ? item.diff.bpi : item.current.bpi);
@@ -60,13 +60,13 @@ export const RankItem = ({
       isBpi = false,
     }: any) => (
       <div className="flex w-full items-center justify-between font-mono text-sm leading-none">
-        <span className="w-[30px] text-[10px] font-bold text-gray-600">
+        <span className="w-[30px] text-[10px] font-bold text-bpim-subtle">
           {label}
         </span>
-        <span className="w-[55px] text-right text-gray-400">
+        <span className="w-[55px] text-right text-bpim-muted">
           {isBpi ? prev.toFixed(2) : prev}
         </span>
-        <ChevronRight className="mx-1 h-3 w-3 text-gray-700" />
+        <ChevronRight className="mx-1 h-3 w-3 text-bpim-subtle" />
         <span className="w-[55px] text-right font-bold text-white">
           {isBpi ? current.toFixed(2) : current}
         </span>
@@ -94,17 +94,17 @@ export const RankItem = ({
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-bold text-gray-500">
+            <span className="text-[11px] font-bold text-bpim-muted">
               ☆{item.level}
             </span>
             <span
               className={cn(
                 "rounded-sm px-1.5 py-0.5 text-[9px] font-bold text-white uppercase",
                 fullDiff === "LEGGENDARIA"
-                  ? "bg-red-600"
+                  ? "bg-bpim-danger"
                   : fullDiff === "ANOTHER"
                     ? "bg-purple-600"
-                    : "bg-blue-600",
+                    : "bg-bpim-primary",
               )}
             >
               {fullDiff}
@@ -122,7 +122,7 @@ export const RankItem = ({
               prev={prevEx}
               current={item.current.exScore}
               diff={item.diff.exScore}
-              diffColor="text-blue-400"
+              diffColor="text-bpim-primary"
             />
             <ShareDataRow
               label="BPI"
@@ -154,16 +154,16 @@ export const RankItem = ({
           isGrowth || isTopBpi ? "h-[26px]" : "h-[20px]",
         )}
       >
-        <span className="w-[25px] text-left text-[9px] font-bold text-gray-600">
+        <span className="w-[25px] text-left text-[9px] font-bold text-bpim-subtle">
           {label}
         </span>
         {isGrowth ? (
           <>
-            <span className="w-[45px] text-right text-xs text-gray-400">
+            <span className="w-[45px] text-right text-xs text-bpim-muted">
               {isBpi ? prev.toFixed(2) : prev}
             </span>
             <ChevronRight className="h-2 w-2 text-gray-800" />
-            <span className="w-[45px] text-right text-xs font-bold text-gray-500">
+            <span className="w-[45px] text-right text-xs font-bold text-bpim-muted">
               {isBpi ? current.toFixed(2) : current}
             </span>
             <span
@@ -220,10 +220,10 @@ export const RankItem = ({
             {item.title}
           </span>
           <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
-            <span className="rounded-sm bg-gray-800 px-1 text-[9px] font-bold text-gray-400 uppercase">
+            <span className="rounded-sm bg-bpim-surface-2 px-1 text-[9px] font-bold text-bpim-muted uppercase">
               {String(item.difficulty || "").slice(0, 1)}
             </span>
-            <span className="text-[10px] font-bold text-gray-600 font-mono">
+            <span className="text-[10px] font-bold text-bpim-subtle font-mono">
               ☆{item.level}
             </span>
             {isNew && (
@@ -241,7 +241,7 @@ export const RankItem = ({
           prev={prevEx}
           current={item.current.exScore}
           diff={item.diff.exScore}
-          diffColor="text-blue-400"
+          diffColor="text-bpim-primary"
         />
         <ScoreRow
           label="BPI"

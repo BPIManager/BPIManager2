@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { authActions } from "@/lib/firebase/auth";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,7 @@ import { FaGoogle, FaTwitter, FaLine } from "react-icons/fa";
 export const LoginButtons = () => {
   return (
     <div className="my-4 flex w-full flex-col items-center gap-4 rounded-xl border border-bpim-border bg-white/5 p-6">
-      <span className="text-[10px] font-bold tracking-wider text-gray-500 uppercase">
+      <span className="text-[10px] font-bold tracking-wider text-bpim-muted uppercase">
         ログインして開始
       </span>
 
@@ -17,8 +17,8 @@ export const LoginButtons = () => {
           className="relative flex h-12 w-full items-center justify-center gap-3 rounded-b-none border-bpim-border bg-transparent transition-all hover:z-10 hover:bg-white/5 active:scale-[0.98]"
           onClick={() => authActions.signInWithGoogle()}
         >
-          <FaGoogle className="text-red-500" />
-          <span className="text-sm font-bold text-gray-200">
+          <FaGoogle className="text-bpim-danger" />
+          <span className="text-sm font-bold text-bpim-text">
             Googleでログイン
           </span>
         </Button>
@@ -29,7 +29,7 @@ export const LoginButtons = () => {
           onClick={() => authActions.signInWithTwitter()}
         >
           <FaTwitter className="text-sky-400" />
-          <span className="text-sm font-bold text-gray-200">
+          <span className="text-sm font-bold text-bpim-text">
             X (Twitter) でログイン
           </span>
         </Button>
@@ -39,8 +39,8 @@ export const LoginButtons = () => {
           className="relative flex h-12 w-full items-center justify-center gap-3 rounded-t-none border-bpim-border bg-transparent transition-all hover:z-10 hover:bg-white/5 active:scale-[0.98]"
           onClick={() => authActions.signInWithLINE()}
         >
-          <FaLine className="text-green-500" />
-          <span className="text-sm font-bold text-gray-200">
+          <FaLine className="text-bpim-success" />
+          <span className="text-sm font-bold text-bpim-text">
             LINEでログイン
           </span>
         </Button>

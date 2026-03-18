@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { AAATableItem } from "@/hooks/metrics/useAAATable";
 import { Badge } from "@/components/ui/badge";
@@ -36,7 +36,7 @@ export const AAATableTooltip = ({ item }: Props) => {
         <Badge
           className={cn(
             "h-4 px-1 text-[10px] font-bold border-none",
-            data.diff >= 0 ? "bg-blue-600 text-white" : "bg-red-600 text-white",
+            data.diff >= 0 ? "bg-bpim-primary text-white" : "bg-bpim-danger text-white",
           )}
         >
           {data.diff >= 0 ? `+${data.diff}` : data.diff}
@@ -81,7 +81,7 @@ export const AAATableTooltip = ({ item }: Props) => {
       <Separator className="bg-white/10" />
 
       <div className="flex flex-col gap-2">
-        <span className="text-[10px] font-black tracking-widest text-blue-400 uppercase">
+        <span className="text-[10px] font-black tracking-widest text-bpim-primary uppercase">
           Your Status
         </span>
         <div className="grid grid-cols-3 gap-2 text-center">
@@ -105,7 +105,7 @@ export const AAATableTooltip = ({ item }: Props) => {
             <span className="text-[9px] font-bold text-slate-500 uppercase">
               BPI
             </span>
-            <span className="font-mono text-xs font-black text-blue-300">
+            <span className="font-mono text-xs font-black text-bpim-primary">
               {item.user.bpi.toFixed(2)}
             </span>
           </div>
@@ -123,7 +123,7 @@ export const AAATableTooltip = ({ item }: Props) => {
         <TargetSection
           label="MAX-"
           data={item.targets.maxMinus}
-          colorClass="text-orange-400"
+          colorClass="text-bpim-warning"
         />
       </div>
     </div>

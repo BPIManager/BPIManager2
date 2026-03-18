@@ -1,4 +1,4 @@
-import { formatIIDXId } from "@/utils/common/formatIidxId";
+﻿import { formatIIDXId } from "@/utils/common/formatIidxId";
 import { RadarSectionChart } from "../../DashBoard/Radar/ui";
 import { RivalSummaryResult } from "@/hooks/social/useRivalSummary";
 import { getBpiColorStyle } from "@/constants/bpiColor";
@@ -75,13 +75,13 @@ export const RivalSummaryCard = ({
 
         <div className="flex flex-col gap-1.5">
           <div className="flex justify-between text-[11px] font-bold tracking-tight">
-            <span className="text-blue-400">WIN: {stats.win}</span>
+            <span className="text-bpim-primary">WIN: {stats.win}</span>
             <span className="text-slate-500 uppercase">LOSE: {stats.lose}</span>
           </div>
 
           <div className="flex h-1.5 w-full overflow-hidden rounded-full bg-white/5">
             <div
-              className="h-full bg-blue-500 transition-all duration-500"
+              className="h-full bg-bpim-primary transition-all duration-500"
               style={{ width: `${winRate}%` }}
             />
             <div
@@ -89,7 +89,7 @@ export const RivalSummaryCard = ({
               style={{ width: `${drawRate}%` }}
             />
             <div
-              className="h-full bg-red-500 transition-all duration-500"
+              className="h-full bg-bpim-danger transition-all duration-500"
               style={{ width: `${loseRate}%` }}
             />
           </div>

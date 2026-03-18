@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useMemo, memo } from "react";
 import { LuArrowUpDown, LuChevronUp, LuChevronDown } from "react-icons/lu";
@@ -25,7 +25,7 @@ export const RANK_THRESHOLDS = [
   },
   { label: "AAA", ratio: 8 / 9, bg: "bg-yellow-400", text: "text-black" },
   { label: "AA", ratio: 7 / 9, bg: "bg-green-400", text: "text-slate-900" },
-  { label: "A", ratio: 6 / 9, bg: "bg-blue-400", text: "text-slate-900" },
+  { label: "A", ratio: 6 / 9, bg: "bg-bpim-primary", text: "text-slate-900" },
   { label: "B", ratio: 5 / 9, bg: "bg-slate-500", text: "text-white" },
   { label: "C", ratio: 4 / 9, bg: "bg-slate-600", text: "text-white" },
   { label: "D", ratio: 3 / 9, bg: "bg-slate-700", text: "text-white" },
@@ -86,9 +86,9 @@ export const ArenaAverageTable = ({ data }: { data: ArenaAverageData[] }) => {
     if (sortKey !== k)
       return <LuArrowUpDown className="ml-1 h-3 w-3 opacity-30" />;
     return sortOrder === "asc" ? (
-      <LuChevronUp className="ml-1 h-3 w-3 text-blue-400" />
+      <LuChevronUp className="ml-1 h-3 w-3 text-bpim-primary" />
     ) : (
-      <LuChevronDown className="ml-1 h-3 w-3 text-blue-400" />
+      <LuChevronDown className="ml-1 h-3 w-3 text-bpim-primary" />
     );
   };
 

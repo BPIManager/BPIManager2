@@ -1,4 +1,4 @@
-import { LucideIcon } from "lucide-react";
+﻿import { LucideIcon } from "lucide-react";
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
@@ -17,7 +17,7 @@ export const PageHeader = ({
 }: PageHeaderProps) => (
   <header className="relative mb-6 overflow-hidden border-b border-bpim-border bg-bpim-bg px-4 pt-8 pb-6 md:pt-12 md:pb-8">
     <div
-      className="pointer-events-none absolute -top-[20%] -left-[10%] h-[150%] w-[40%] bg-blue-900/15 blur-[120px]"
+      className="pointer-events-none absolute -top-[20%] -left-[10%] h-[150%] w-[40%] bg-bpim-primary-dim/15 blur-[120px]"
       aria-hidden="true"
     />
 
@@ -26,8 +26,8 @@ export const PageHeader = ({
         <div className="flex flex-1 flex-col gap-2">
           <div className="flex items-center gap-3">
             {Icon && (
-              <div className="flex items-center justify-center rounded-lg border border-blue-800 bg-blue-950 p-2">
-                <Icon className="h-6 w-6 text-blue-400" />
+              <div className="flex items-center justify-center rounded-lg border border-blue-800 bg-bpim-primary-dim p-2">
+                <Icon className="h-6 w-6 text-bpim-primary" />
               </div>
             )}
             <h1 className="text-3xl font-bold tracking-tight text-white leading-[1.1] md:text-4xl">

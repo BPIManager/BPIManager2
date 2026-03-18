@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { useRecommendedInfinite } from "@/hooks/stats/useRecommended";
 import { SimpleRankItem } from "./Common/SimpleRankItem";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
@@ -51,7 +51,7 @@ export const RankingTabsCard = ({ userId }: { userId: string }) => {
               <TabsTrigger
                 key={t.value}
                 value={t.value}
-                className="text-[11px] font-bold transition-all data-[state=active]:bg-[#0d1117] data-[state=active]:text-white data-[state=active]:shadow-sm"
+                className="text-[11px] font-bold transition-all data-[state=active]:bg-bpim-surface data-[state=active]:text-white data-[state=active]:shadow-sm"
               >
                 {t.label}
               </TabsTrigger>

@@ -1,4 +1,4 @@
-import { Swords, Crown } from "lucide-react";
+﻿import { Swords, Crown } from "lucide-react";
 import dayjs from "@/lib/dayjs";
 import { TimelineEntry } from "@/hooks/social/useTimeline";
 import Link from "next/link";
@@ -23,9 +23,9 @@ export const TimelineItem = ({ entry }: { entry: TimelineEntry }) => {
       className={cn(
         "p-3 border-b transition-all duration-200",
         isOvertaken
-          ? "bg-red-500/10 border-red-900/50"
+          ? "bg-bpim-danger/10 border-red-900/50"
           : isCurrentlyLosing
-            ? "bg-red-500/5 border-red-900/30"
+            ? "bg-bpim-danger/5 border-red-900/30"
             : isCurrentlyWinning
               ? "bg-green-500/5 border-green-900/30"
               : "bg-bpim-bg/60 border-bpim-border",
@@ -92,7 +92,7 @@ export const TimelineItem = ({ entry }: { entry: TimelineEntry }) => {
                 oppGrowth={opp.diffBpi}
                 viewerValue={viewer?.bpi}
                 diff={vsBpi}
-                color="text-orange-300"
+                color="text-bpim-warning"
                 isFloat
               />
 
@@ -132,7 +132,7 @@ const ComparisonRow = ({
         {format(oppValue)}
       </span>
 
-      <div className="flex justify-end text-green-400">
+      <div className="flex justify-end text-bpim-success">
         {oppGrowth && oppGrowth > 0 ? (
           <span className="text-[9px] font-bold">+{format(oppGrowth)}</span>
         ) : (
@@ -155,8 +155,8 @@ const ComparisonRow = ({
             className={cn(
               "inline-flex items-center justify-center h-3.5 min-w-[38px] px-1 rounded-sm text-[10px] font-bold border",
               diff >= 0
-                ? "border-green-900 text-green-400 bg-green-500/5"
-                : "border-red-900 text-red-400 bg-red-500/5",
+                ? "border-green-900 text-bpim-success bg-green-500/5"
+                : "border-red-900 text-bpim-danger bg-bpim-danger/5",
             )}
           >
             {diff >= 0 ? "+" : ""}

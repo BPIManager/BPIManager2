@@ -1,4 +1,4 @@
-import { LogsDetailContent } from "@/components/partials/Logs/LogsDetail/content";
+﻿import { LogsDetailContent } from "@/components/partials/Logs/LogsDetail/content";
 import { LogsDetailView } from "@/components/partials/Logs/LogsDetail/ui";
 import { DashboardLayout } from "@/components/partials/Main";
 import { UserProfileLayout } from "@/components/partials/Profile/Layout/layout";
@@ -20,7 +20,7 @@ export default function SummaryLogsPage() {
     return (
       <DashboardLayout>
         <div className="flex h-[90vh] w-full items-center justify-center">
-          <Loader2 className="h-10 w-10 animate-spin text-gray-200" />
+          <Loader2 className="h-10 w-10 animate-spin text-bpim-text" />
         </div>
       </DashboardLayout>
     );

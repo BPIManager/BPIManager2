@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useRef } from "react";
 import {
@@ -186,7 +186,7 @@ export const ImageUploadModal = ({
             <Button
               onClick={handleUpload}
               disabled={isUploading}
-              className="h-9 min-w-[80px] bg-blue-600 hover:bg-blue-500"
+              className="h-9 min-w-[80px] bg-bpim-primary hover:bg-bpim-primary"
             >
               {isUploading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />

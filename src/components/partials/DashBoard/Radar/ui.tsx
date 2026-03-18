@@ -1,4 +1,4 @@
-import {
+﻿import {
   Radar,
   RadarChart,
   PolarGrid,
@@ -75,15 +75,15 @@ const RadarCustomTooltip = ({ active, payload }: any) => {
 
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-blue-500" />
-              <span className="text-xs font-bold text-blue-400">YOU</span>
+              <div className="h-2 w-2 rounded-full bg-bpim-primary" />
+              <span className="text-xs font-bold text-bpim-primary">YOU</span>
             </div>
             <div className="flex items-center gap-1">
               <span className="font-mono text-xs font-bold text-white">
                 {meVal.toFixed(2)}
               </span>
               {data.isMeMax && (
-                <span className="rounded bg-blue-600 px-1 py-0.5 text-[8px] font-bold text-white">
+                <span className="rounded bg-bpim-primary px-1 py-0.5 text-[8px] font-bold text-white">
                   BEST
                 </span>
               )}
@@ -95,7 +95,7 @@ const RadarCustomTooltip = ({ active, payload }: any) => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="h-2 w-2 rounded-full bg-orange-500" />
-                  <span className="text-xs font-bold text-orange-400">
+                  <span className="text-xs font-bold text-bpim-warning">
                     RIVAL
                   </span>
                 </div>

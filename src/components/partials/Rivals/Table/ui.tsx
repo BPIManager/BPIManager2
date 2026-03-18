@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { SongWithRival } from "@/types/songs/withScore";
 import { cn } from "@/lib/utils";
@@ -55,9 +55,9 @@ const DiffBox = ({ exDiff, bpiDiff, isMobile }: any) => {
           "font-bold leading-none",
           isMobile ? "text-[11px]" : "text-xs",
           exDiff > 0
-            ? "text-green-400"
+            ? "text-bpim-success"
             : exDiff < 0
-              ? "text-red-400"
+              ? "text-bpim-danger"
               : "text-slate-500",
         )}
       >
@@ -137,7 +137,7 @@ const MobileScoreView = ({ label, ex, bpi, clearState, align }: any) => {
         <span
           className={cn(
             "text-[10px] font-bold",
-            label === "YOU" ? "text-blue-300" : "text-orange-300",
+            label === "YOU" ? "text-bpim-primary" : "text-bpim-warning",
           )}
         >
           {label}
@@ -183,7 +183,7 @@ export const RivalSongItem = ({
           ex={song.exScore}
           bpi={song.bpi}
           clearState={song.clearState}
-          colorClass="text-blue-300"
+          colorClass="text-bpim-primary"
         />
         <DiffBox exDiff={exDiff} bpiDiff={bpiDiff} />
         <ScoreBox
@@ -191,7 +191,7 @@ export const RivalSongItem = ({
           ex={song.rival?.exScore}
           bpi={song.rival?.bpi}
           clearState={song.rival?.clearState}
-          colorClass="text-orange-300"
+          colorClass="text-bpim-warning"
           isRival
         />
       </div>

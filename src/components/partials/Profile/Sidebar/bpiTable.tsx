@@ -1,4 +1,4 @@
-import { Badge } from "@/components/ui/badge";
+﻿import { Badge } from "@/components/ui/badge";
 
 export const BpiHistoryTable = ({ history }: { history: any[] }) => (
   <div className="flex flex-col gap-1 w-full">
@@ -35,7 +35,7 @@ export const BpiHistoryTable = ({ history }: { history: any[] }) => (
               <span className="text-slate-700 text-xs">-</span>
             )}
           </div>
-          <span className="text-right font-mono text-xs font-black text-blue-300">
+          <span className="text-right font-mono text-xs font-black text-bpim-primary">
             {hist.totalBpi?.toFixed(2)}
           </span>
         </div>

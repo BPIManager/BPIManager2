@@ -1,4 +1,4 @@
-import { RivalSummaryCard } from "./ui";
+﻿import { RivalSummaryCard } from "./ui";
 import { RivalSummarySkeleton } from "./skeleton";
 import { RivalWinLossSummaryNotFound } from "../../DashBoard/Rivals/nodata";
 
@@ -10,7 +10,7 @@ export const RivalList = ({
 }: any) => {
   if (isError) {
     return (
-      <div className="flex h-64 items-center justify-center text-red-400 font-bold">
+      <div className="flex h-64 items-center justify-center text-bpim-danger font-bold">
         データの取得に失敗しました。
       </div>
     );

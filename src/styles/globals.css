@@ -1,8 +1,4 @@
 @import "tailwindcss";
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @plugin "tailwindcss-animate";
@@ -11,86 +7,86 @@
 @layer base {
   :root {
     --bpim-bg: 222 47% 4%;
-    --bpim-card: 222 47% 7%;
+    --bpim-surface: 222 40% 7%;
+    --bpim-surface-2: 222 35% 10%;
+    --bpim-overlay: 222 30% 14%;
+
     --bpim-primary: 217 91% 60%;
+    --bpim-primary-dim: 217 60% 40%;
+    --bpim-primary-glow: 217 91% 60%;
+
     --bpim-border: 217 20% 15%;
+    --bpim-border-dim: 217 15% 10%;
+
+    --bpim-text: 220 20% 95%;
+    --bpim-text-muted: 220 10% 55%;
+    --bpim-text-subtle: 220 10% 35%;
+
+    --bpim-success: 142 70% 45%;
+    --bpim-danger: 0 72% 55%;
+    --bpim-warning: 38 92% 55%;
+    --bpim-info: 199 89% 48%;
+
+    --bpim-chart-primary: #3b82f6;
+    --bpim-chart-secondary: #475569;
+    --bpim-chart-grid: #334155;
+    --bpim-chart-warning: #f97316;
+    --bpim-chart-gold: #fbbf24;
   }
 
   .theme-pitch-black {
-    --bpim-bg: 0 0% 7%;
-    --bpim-card: 0 0% 13%;
-    --bpim-primary: 0 0% 98%;
-    --bpim-border: 0 0% 22%;
+    --bpim-bg: 0 0% 4%;
+    --bpim-surface: 0 0% 8%;
+    --bpim-surface-2: 0 0% 12%;
+    --bpim-overlay: 0 0% 17%;
+    --bpim-primary: 0 0% 90%;
+    --bpim-primary-dim: 0 0% 60%;
+    --bpim-primary-glow: 0 0% 90%;
+    --bpim-border: 0 0% 18%;
+    --bpim-border-dim: 0 0% 12%;
+    --bpim-text: 0 0% 95%;
+    --bpim-text-muted: 0 0% 50%;
+    --bpim-text-subtle: 0 0% 32%;
+    --bpim-success: 142 55% 42%;
+    --bpim-danger: 0 65% 52%;
+    --bpim-warning: 38 85% 52%;
+    --bpim-info: 199 80% 45%;
   }
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+  --background: oklch(0.1 0.01 250);
+  --foreground: oklch(0.97 0 0);
+  --card: oklch(0.13 0.01 250);
+  --card-foreground: oklch(0.97 0 0);
+  --popover: oklch(0.13 0.01 250);
+  --popover-foreground: oklch(0.97 0 0);
+  --primary: oklch(0.65 0.19 258);
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --radius: 0.625rem;
-  --chart-1: oklch(0.809 0.105 251.813);
-  --chart-2: oklch(0.623 0.214 259.815);
-  --chart-3: oklch(0.546 0.245 262.881);
-  --chart-4: oklch(0.488 0.243 264.376);
-  --chart-5: oklch(0.424 0.199 265.638);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
-
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
+  --secondary: oklch(0.18 0.01 250);
+  --secondary-foreground: oklch(0.97 0 0);
+  --muted: oklch(0.18 0.01 250);
+  --muted-foreground: oklch(0.56 0 0);
+  --accent: oklch(0.18 0.01 250);
+  --accent-foreground: oklch(0.97 0 0);
+  --destructive: oklch(0.65 0.22 25);
   --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.809 0.105 251.813);
-  --chart-2: oklch(0.623 0.214 259.815);
-  --chart-3: oklch(0.546 0.245 262.881);
-  --chart-4: oklch(0.488 0.243 264.376);
-  --chart-5: oklch(0.424 0.199 265.638);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --input: oklch(1 0 0 / 12%);
+  --ring: oklch(0.65 0.19 258);
+  --radius: 0.625rem;
+  --chart-1: oklch(0.65 0.19 258);
+  --chart-2: oklch(0.72 0.17 162);
+  --chart-3: oklch(0.78 0.17 80);
+  --chart-4: oklch(0.69 0.2 25);
+  --chart-5: oklch(0.73 0.16 300);
+  --sidebar: oklch(0.13 0.01 250);
+  --sidebar-foreground: oklch(0.97 0 0);
+  --sidebar-primary: oklch(0.65 0.19 258);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.18 0.01 250);
+  --sidebar-accent-foreground: oklch(0.97 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --sidebar-ring: oklch(0.65 0.19 258);
 }
 
 @theme inline {
@@ -112,27 +108,47 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) * 1.4);
-  --font-sans: var(--font-sans);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+  --font-sans: var(--font-sans);
+
+  --color-bpim-bg: hsl(var(--bpim-bg));
+  --color-bpim-surface: hsl(var(--bpim-surface));
+  --color-bpim-surface-2: hsl(var(--bpim-surface-2));
+  --color-bpim-overlay: hsl(var(--bpim-overlay));
+
+  --color-bpim-primary: hsl(var(--bpim-primary));
+  --color-bpim-primary-dim: hsl(var(--bpim-primary-dim));
+
+  --color-bpim-border: hsl(var(--bpim-border));
+  --color-bpim-border-dim: hsl(var(--bpim-border-dim));
+
+  --color-bpim-text: hsl(var(--bpim-text));
+  --color-bpim-muted: hsl(var(--bpim-text-muted));
+  --color-bpim-subtle: hsl(var(--bpim-text-subtle));
+
+  --color-bpim-success: hsl(var(--bpim-success));
+  --color-bpim-danger: hsl(var(--bpim-danger));
+  --color-bpim-warning: hsl(var(--bpim-warning));
+  --color-bpim-info: hsl(var(--bpim-info));
 }
 
 html,
@@ -141,91 +157,16 @@ body {
   overflow-x: hidden;
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
 html {
   color-scheme: dark;
 }
 
-.recharts-wrapper *:focus:not(:focus-visible) {
-  outline: none !important;
-}
-
-.chakra-dialog__content {
-    color: #fff;
-}
-
-.nprogress {
-  pointer-events: none;
-  z-index: 99999;
-}
-
-.nprogress .bar {
-  background: #29d;
-
-  position: fixed;
-  z-index: 99999;
-  top: 0;
-  left: 0;
-
-  width: 100%;
-  height: 2px;
-}
-
-/* Fancy blur effect */
-.nprogress .peg {
-  display: block;
-  position: absolute;
-  right: 0px;
-  width: 100px;
-  height: 100%;
-  box-shadow: 0 0 10px #29d, 0 0 5px #29d;
-  opacity: 1.0;
-
-  transform: rotate(3deg) translate(0px, -4px);
-}
-
-/* Remove these to get rid of the spinner */
-.nprogress .spinner {
-  display: block;
-  position: fixed;
-  z-index: 1031;
-  top: 15px;
-  right: 15px;
-}
-
-.nprogress .spinner-icon {
-  width: 18px;
-  height: 18px;
-  box-sizing: border-box;
-
-  border: solid 2px transparent;
-  border-top-color: #29d;
-  border-left-color: #29d;
-  border-radius: 50%;
-
-  animation: nprogress-spinner 400ms linear infinite;
-}
-
-.nprogress-custom-parent {
-  overflow: hidden;
-  position: relative;
-}
-
-.nprogress-custom-parent .nprogress .spinner,
-.nprogress-custom-parent .nprogress .bar {
-  position: absolute;
-}
-
-@keyframes nprogress-spinner {
-  0%   { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+body {
+  color: var(--foreground);
+  background: hsl(var(--bpim-bg));
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 @layer base {
@@ -233,9 +174,73 @@ html {
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-bpim-bg text-bpim-text;
   }
   html {
     @apply font-sans;
+  }
+}
+
+.recharts-wrapper *:focus:not(:focus-visible) {
+  outline: none !important;
+}
+
+.nprogress {
+  pointer-events: none;
+  z-index: 99999;
+}
+.nprogress .bar {
+  background: hsl(var(--bpim-primary));
+  position: fixed;
+  z-index: 99999;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+}
+.nprogress .peg {
+  display: block;
+  position: absolute;
+  right: 0;
+  width: 100px;
+  height: 100%;
+  box-shadow:
+    0 0 10px hsl(var(--bpim-primary)),
+    0 0 5px hsl(var(--bpim-primary));
+  opacity: 1;
+  transform: rotate(3deg) translate(0, -4px);
+}
+.nprogress .spinner {
+  display: block;
+  position: fixed;
+  z-index: 1031;
+  top: 15px;
+  right: 15px;
+}
+.nprogress .spinner-icon {
+  width: 18px;
+  height: 18px;
+  box-sizing: border-box;
+  border: solid 2px transparent;
+  border-top-color: hsl(var(--bpim-primary));
+  border-left-color: hsl(var(--bpim-primary));
+  border-radius: 50%;
+  animation: nprogress-spinner 400ms linear infinite;
+}
+.nprogress-custom-parent {
+  overflow: hidden;
+  position: relative;
+}
+.nprogress-custom-parent .nprogress .spinner,
+.nprogress-custom-parent .nprogress .bar {
+  position: absolute;
+}
+
+@keyframes nprogress-spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
   }
 }

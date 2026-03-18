@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+﻿import { useMemo } from "react";
 import {
   ComposedChart,
   Line,
@@ -34,33 +34,33 @@ const HistoryTooltip = ({ active, payload, label, myName, rivalName }: any) => {
   return (
     <div className="min-w-[200px] max-w-[300px] rounded-md border border-white/20 bg-bpim-bg p-3 shadow-xl">
       <div className="flex flex-col gap-1">
-        <p className="text-[10px] font-bold text-gray-500">{label}</p>
+        <p className="text-[10px] font-bold text-bpim-muted">{label}</p>
 
         {isComparison ? (
           <>
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-blue-400">{myName}</span>
-              <span className="font-mono text-sm font-bold text-blue-400">
+              <span className="text-xs font-bold text-bpim-primary">{myName}</span>
+              <span className="font-mono text-sm font-bold text-bpim-primary">
                 {data.myBpi?.toFixed(2)}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-orange-400">
+              <span className="text-xs font-bold text-bpim-warning">
                 {rivalName}
               </span>
-              <span className="font-mono text-sm font-bold text-orange-400">
+              <span className="font-mono text-sm font-bold text-bpim-warning">
                 {data.rivalBpi?.toFixed(2)}
               </span>
             </div>
             <div className="my-1 h-px w-full bg-white/10" />
             <div className="flex items-center justify-between">
-              <span className="text-[10px] text-gray-500">差分</span>
+              <span className="text-[10px] text-bpim-muted">差分</span>
               <span
                 className={cn(
                   "font-mono text-xs font-bold",
                   data.myBpi - data.rivalBpi > 0
-                    ? "text-green-400"
-                    : "text-red-400",
+                    ? "text-bpim-success"
+                    : "text-bpim-danger",
                 )}
               >
                 {data.myBpi - data.rivalBpi > 0 ? "+" : ""}
@@ -71,17 +71,17 @@ const HistoryTooltip = ({ active, payload, label, myName, rivalName }: any) => {
         ) : (
           <>
             <div className="flex items-center justify-between gap-4">
-              <p className="text-sm font-bold text-blue-400">
+              <p className="text-sm font-bold text-bpim-primary">
                 総合BPI: {data.myBpi?.toFixed(2)}
               </p>
-              <span className="text-[10px] text-gray-500">
+              <span className="text-[10px] text-bpim-muted">
                 累計: {data.count}曲
               </span>
             </div>
             {data.updateCount > 0 && (
               <>
                 <div className="my-2 h-px w-full bg-white/10" />
-                <p className="text-[10px] font-bold text-green-400">
+                <p className="text-[10px] font-bold text-bpim-success">
                   UPDATED: {data.updateCount} items
                 </p>
                 <div className="max-h-[120px] w-full overflow-y-auto pr-1">
@@ -174,14 +174,14 @@ export const TotalBpiHistoryChart = ({
   return (
     <DashCard className="h-[420px]">
       <div className="mb-6 flex items-center justify-between">
-        <h3 className="text-sm font-bold uppercase text-gray-500">
+        <h3 className="text-sm font-bold uppercase text-bpim-muted">
           総合BPI推移
         </h3>
         {rivalData && (
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5">
-              <div className="h-[2px] w-3 bg-blue-500" />
-              <span className="text-xs text-blue-400 font-medium">
+              <div className="h-[2px] w-3 bg-bpim-primary" />
+              <span className="text-xs text-bpim-primary font-medium">
                 {myName}
               </span>
             </div>
@@ -190,7 +190,7 @@ export const TotalBpiHistoryChart = ({
                 className="h-[2px] w-3 border-t border-dashed border-orange-500 bg-transparent"
                 style={{ borderTopWidth: "2px", borderStyle: "dashed" }}
               />
-              <span className="text-xs text-orange-400 font-medium">
+              <span className="text-xs text-bpim-warning font-medium">
                 {rivalName}
               </span>
             </div>

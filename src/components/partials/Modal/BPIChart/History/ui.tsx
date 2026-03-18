@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useMemo } from "react";
 import {
@@ -40,7 +40,7 @@ export const SongHistoryTab = ({ songId }: SongHistoryTabProps) => {
   if (isLoading) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <LuLoader className="h-8 w-8 animate-spin text-gray-200" />
+        <LuLoader className="h-8 w-8 animate-spin text-bpim-text" />
       </div>
     );
   }
@@ -109,7 +109,7 @@ export const SongHistoryTab = ({ songId }: SongHistoryTabProps) => {
                         {scoreDiff !== null && scoreDiff > 0 && (
                           <Badge
                             variant="secondary"
-                            className="h-4 bg-green-500/10 text-green-400 border-green-500/20 px-1.5 text-[9px] font-bold"
+                            className="h-4 bg-green-500/10 text-bpim-success border-green-500/20 px-1.5 text-[9px] font-bold"
                           >
                             <LuTrendingUp className="mr-0.5 h-2.5 w-2.5" />+
                             {scoreDiff}
@@ -145,7 +145,7 @@ export const SongHistoryTab = ({ songId }: SongHistoryTabProps) => {
                           {record.clearState || "NO PLAY"}
                         </span>
                         {record.missCount !== null && (
-                          <span className="font-mono text-[9px] font-bold text-red-400/80">
+                          <span className="font-mono text-[9px] font-bold text-bpim-danger/80">
                             MISS: {record.missCount}
                           </span>
                         )}

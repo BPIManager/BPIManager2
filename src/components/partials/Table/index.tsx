@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { SongWithScore } from "@/types/songs/withScore";
@@ -31,7 +31,7 @@ export const SongsTable = ({
   if (!isLoading && (error || !songs)) {
     return (
       <div className="flex h-[200px] flex-col items-center justify-center gap-2">
-        <p className="font-bold text-red-500">楽曲データの取得に失敗しました</p>
+        <p className="font-bold text-bpim-danger">楽曲データの取得に失敗しました</p>
         <p className="text-xs text-slate-500">{error?.message}</p>
       </div>
     );

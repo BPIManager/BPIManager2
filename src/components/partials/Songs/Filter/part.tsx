@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { Search, Pin, PinOff, Loader2 } from "lucide-react";
@@ -41,7 +41,7 @@ export const FilterSearchInput = ({
       />
 
       {isTyping && (
-        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-200">
+        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-bpim-text">
           <Loader2 size={14} className="animate-spin" />
         </div>
       )}
@@ -77,7 +77,7 @@ export const FilterCheckboxGroup = <T extends string | number>({
               id={id}
               checked={selected?.includes(item)}
               onCheckedChange={() => onToggle(item)}
-              className="h-4 w-4 border-white/20 data-[state=checked]:bg-blue-600"
+              className="h-4 w-4 border-white/20 data-[state=checked]:bg-bpim-primary"
             />
             <Label
               htmlFor={id}
@@ -105,7 +105,7 @@ export const FilterStickyToggle = ({
     className={cn(
       "h-8 w-8 rounded-md transition-colors",
       isSticky
-        ? "text-blue-400 bg-blue-500/10"
+        ? "text-bpim-primary bg-bpim-primary/10"
         : "text-slate-500 hover:text-slate-300 hover:bg-white/5",
     )}
     onClick={() => onToggle(!isSticky)}

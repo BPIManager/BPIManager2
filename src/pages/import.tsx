@@ -1,4 +1,4 @@
-import { Meta } from "@/components/partials/Head";
+﻿import { Meta } from "@/components/partials/Head";
 import { ImportSuccessModal } from "@/components/partials/Import/SuccessModal/ui";
 import { ImportView } from "@/components/partials/Import/View/ui";
 import AccountSettings from "@/components/partials/Modal/AccountSettings";
@@ -32,7 +32,7 @@ export default function ImportPage() {
   if (isLoading)
     return (
       <div className="flex h-[90vh] w-full items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin text-gray-200" />
+        <Loader2 className="h-10 w-10 animate-spin text-bpim-text" />
       </div>
     );
 

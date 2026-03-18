@@ -1,4 +1,4 @@
-import { diffColors } from "@/components/partials/Table/table";
+﻿import { diffColors } from "@/components/partials/Table/table";
 import { NearLoseSongItem } from "@/hooks/stats/useRivalNearLose";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
@@ -24,7 +24,7 @@ export const NearLoseRankItem = ({
       )}
     >
       <div className="flex min-w-0 flex-1 items-center gap-3">
-        <Avatar className="h-8 w-8 rounded-full bg-gray-700">
+        <Avatar className="h-8 w-8 rounded-full bg-bpim-overlay">
           <AvatarImage
             src={String(item.rival.profileImage || "")}
             alt={item.rival.userName}
@@ -47,23 +47,23 @@ export const NearLoseRankItem = ({
             >
               {String(item.difficulty).charAt(0)}
             </span>
-            <span className="text-xs text-gray-500">{item.rival.userName}</span>
+            <span className="text-xs text-bpim-muted">{item.rival.userName}</span>
           </div>
         </div>
       </div>
 
       <div className="flex flex-shrink-0 items-center gap-4 font-mono">
         <div className="flex flex-col items-end gap-0">
-          <span className="text-[12px] leading-none text-gray-400">My EX</span>
-          <span className="text-sm font-bold text-gray-200">
+          <span className="text-[12px] leading-none text-bpim-muted">My EX</span>
+          <span className="text-sm font-bold text-bpim-text">
             {item.exScore}
           </span>
         </div>
         <div className="flex flex-col items-end gap-0">
-          <span className="text-[12px] font-bold leading-none text-orange-500">
+          <span className="text-[12px] font-bold leading-none text-bpim-warning">
             あと
           </span>
-          <span className="text-sm font-bold text-orange-300">
+          <span className="text-sm font-bold text-bpim-warning">
             {item.exDiff}点
           </span>
         </div>

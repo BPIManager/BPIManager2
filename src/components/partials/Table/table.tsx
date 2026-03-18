@@ -1,4 +1,4 @@
-import { SongWithScore } from "@/types/songs/withScore";
+﻿import { SongWithScore } from "@/types/songs/withScore";
 import { getDJRank } from "@/utils/songs/djRank";
 import { RefObject } from "react";
 import { cn } from "@/lib/utils";
@@ -20,9 +20,9 @@ export const getLampClass = (clearState: string | null | undefined) => {
     case "EASY CLEAR":
       return "bg-green-500";
     case "CLEAR":
-      return "bg-blue-500";
+      return "bg-bpim-primary";
     case "HARD CLEAR":
-      return "bg-red-500";
+      return "bg-bpim-danger";
     case "EX HARD CLEAR":
       return "bg-yellow-500";
     case "FULLCOMBO CLEAR":
@@ -115,7 +115,7 @@ const SongItem = ({
                 {song.exScore !== null ? song.exScore : "---"}
               </span>
               {song.exDiff !== undefined && song.exDiff > 0 && (
-                <span className="text-[10px] font-bold text-green-400 mt-0.5">
+                <span className="text-[10px] font-bold text-bpim-success mt-0.5">
                   +{song.exDiff}
                 </span>
               )}
@@ -129,7 +129,7 @@ const SongItem = ({
                 {song.bpi !== null ? song.bpi.toFixed(2) : "---"}
               </span>
               {song.bpiDiff !== undefined && song.bpiDiff > 0 && (
-                <span className="text-[10px] font-bold text-green-400 mt-0.5">
+                <span className="text-[10px] font-bold text-bpim-success mt-0.5">
                   +{song.bpiDiff.toFixed(2)}
                 </span>
               )}

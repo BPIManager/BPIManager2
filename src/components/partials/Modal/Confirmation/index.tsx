@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from "react";
 import {
@@ -47,7 +47,7 @@ export const ActionConfirmDialog = ({
         <DialogHeader className="p-6 pb-4 border-b border-bpim-border">
           <DialogTitle className="flex items-center gap-3 text-lg font-bold text-white">
             {isDestructive && (
-              <AlertTriangle className="h-5 w-5 text-red-500 shrink-0" />
+              <AlertTriangle className="h-5 w-5 text-bpim-danger shrink-0" />
             )}
             {title}
           </DialogTitle>
@@ -78,8 +78,8 @@ export const ActionConfirmDialog = ({
             className={cn(
               "h-9 px-6 font-bold transition-all min-w-[100px]",
               isDestructive
-                ? "bg-red-600 hover:bg-red-500 text-white"
-                : "bg-blue-600 hover:bg-blue-500 text-white",
+                ? "bg-bpim-danger hover:bg-bpim-danger text-white"
+                : "bg-bpim-primary hover:bg-bpim-primary text-white",
             )}
           >
             {isLoading ? (

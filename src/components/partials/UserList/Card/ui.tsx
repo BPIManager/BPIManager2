@@ -1,4 +1,4 @@
-import { TrendingUp, TrendingDown } from "lucide-react";
+﻿import { TrendingUp, TrendingDown } from "lucide-react";
 import { formatIIDXId } from "@/utils/common/formatIidxId";
 import dayjs from "@/lib/dayjs";
 import { RadarSectionChart } from "../../DashBoard/Radar/ui";
@@ -76,7 +76,7 @@ export const UserRecommendationCard = ({
           <span
             className={cn(
               "block text-[9px] font-bold tracking-wider mb-0.5",
-              isTotalBpi ? "text-slate-500" : "text-blue-400",
+              isTotalBpi ? "text-slate-500" : "text-bpim-primary",
             )}
           >
             {displayLabel}
@@ -88,7 +88,7 @@ export const UserRecommendationCard = ({
             <div
               className={cn(
                 "flex items-center gap-0.5 pb-0.5",
-                isTarget ? "text-orange-400" : "text-blue-400",
+                isTarget ? "text-bpim-warning" : "text-bpim-primary",
               )}
             >
               {isTarget ? (

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useMemo } from "react";
 import {
@@ -31,7 +31,7 @@ const ChartTooltip = ({ active, payload, youScore, maxScore }: any) => {
   return (
     <div className="rounded-lg border border-white/20 bg-bpim-bg p-3 shadow-2xl backdrop-blur-md">
       <div className="flex flex-col gap-1.5">
-        <p className="text-xs font-bold text-blue-400 uppercase tracking-wider">
+        <p className="text-xs font-bold text-bpim-primary uppercase tracking-wider">
           BPI: {isYou ? data.bpi.toFixed(2) : data.label}
         </p>
 
@@ -48,7 +48,7 @@ const ChartTooltip = ({ active, payload, youScore, maxScore }: any) => {
           <p
             className={cn(
               "text-[11px] font-black mt-1",
-              diff > 0 ? "text-red-400" : "text-green-400",
+              diff > 0 ? "text-bpim-danger" : "text-bpim-success",
             )}
           >
             {diff > 0 ? `あと ${diff} 点` : `${Math.abs(diff)} 点超過`}

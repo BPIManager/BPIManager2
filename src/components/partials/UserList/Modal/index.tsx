@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { User, ChevronRight, Activity } from "lucide-react";
@@ -38,7 +38,7 @@ export const RivalComparisonModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-md gap-0 rounded-2xl border-white/20 bg-[#0a0c10] p-0 shadow-2xl shadow-black/50 overflow-hidden">
+      <DialogContent className="max-w-md gap-0 rounded-2xl border-white/20 bg-bpim-bg p-0 shadow-2xl shadow-black/50 overflow-hidden">
         <DialogHeader className="p-6 pb-2">
           {isLoading ? (
             <RivalHeaderSkeleton />
@@ -74,7 +74,7 @@ export const RivalComparisonModal = ({
 
                 <Button
                   asChild
-                  className="h-[50px] w-full rounded-xl bg-blue-600 font-bold text-white hover:bg-blue-500 transition-all active:scale-95"
+                  className="h-[50px] w-full rounded-xl bg-bpim-primary font-bold text-white hover:bg-bpim-primary transition-all active:scale-95"
                 >
                   <Link href={`/users/${rivalId}`}>
                     <div className="flex items-center justify-center gap-2">

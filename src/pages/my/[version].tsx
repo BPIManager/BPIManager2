@@ -1,4 +1,4 @@
-import { useRouter } from "next/router";
+﻿import { useRouter } from "next/router";
 import { Meta } from "@/components/partials/Head";
 import { DashboardLayout } from "@/components/partials/Main";
 import { useUser } from "@/contexts/users/UserContext";
@@ -21,7 +21,7 @@ export default function MyScoresByVersion() {
   if (!isReady) {
     return (
       <div className="flex h-[90vh] w-full items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin text-gray-200" />
+        <Loader2 className="h-10 w-10 animate-spin text-bpim-text" />
       </div>
     );
   }

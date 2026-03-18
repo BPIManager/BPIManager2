@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { Check, Plus, Settings2, Loader } from "lucide-react";
@@ -74,7 +74,7 @@ export const FollowSection = ({
             "w-full rounded-full font-bold h-9 transition-all",
             relationship.isFollowing
               ? "bg-green-500 text-black hover:bg-green-400"
-              : "bg-blue-600 text-white hover:bg-blue-500",
+              : "bg-bpim-primary text-white hover:bg-bpim-primary",
             className,
           )}
         >
@@ -85,7 +85,7 @@ export const FollowSection = ({
           <DialogTrigger asChild>
             <Button
               className={cn(
-                "w-full rounded-full bg-blue-600 font-bold text-white h-9",
+                "w-full rounded-full bg-bpim-primary font-bold text-white h-9",
                 className,
               )}
             >
@@ -103,14 +103,14 @@ export const FollowSection = ({
           {relationship.isMutual ? (
             <Badge
               variant="secondary"
-              className="bg-blue-500/10 text-blue-400 border-blue-500/20 px-2 py-0 text-[10px]"
+              className="bg-bpim-primary/10 text-bpim-primary border-blue-500/20 px-2 py-0 text-[10px]"
             >
               相互フォロー
             </Badge>
           ) : relationship.isFollowedBy ? (
             <Badge
               variant="secondary"
-              className="bg-blue-500/10 text-blue-400 border-blue-500/20 px-2 py-0 text-[10px]"
+              className="bg-bpim-primary/10 text-bpim-primary border-blue-500/20 px-2 py-0 text-[10px]"
             >
               フォローされています
             </Badge>

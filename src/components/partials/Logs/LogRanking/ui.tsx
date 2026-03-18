@@ -1,4 +1,4 @@
-import { LuTrophy, LuTrendingUp, LuSwords } from "react-icons/lu";
+﻿import { LuTrophy, LuTrendingUp, LuSwords } from "react-icons/lu";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -16,7 +16,7 @@ const RANK_CONFIG = {
   growth: {
     title: "BPI伸び幅ランキング",
     icon: LuTrendingUp,
-    accentColor: "text-green-400",
+    accentColor: "text-bpim-success",
   },
   top: {
     title: "BPIランキング",
@@ -32,7 +32,7 @@ const RANK_CONFIG = {
       />
     ),
     icon: LuSwords,
-    accentColor: "text-orange-400",
+    accentColor: "text-bpim-warning",
   },
 };
 

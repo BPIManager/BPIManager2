@@ -1,4 +1,4 @@
-import { useLogsDetail } from "@/hooks/batches/useBatchDetail";
+﻿import { useLogsDetail } from "@/hooks/batches/useBatchDetail";
 import {
   getBpiDistribution,
   getRankDistribution,
@@ -136,13 +136,13 @@ export const LogsDetailContent = ({
           <TabsList className="grid h-auto w-full max-w-md grid-cols-2 rounded-lg bg-white/5 p-1">
             <TabsTrigger
               value="summary"
-              className="py-2 text-xs font-bold transition-all data-[state=active]:bg-[#0d1117] data-[state=active]:text-white"
+              className="py-2 text-xs font-bold transition-all data-[state=active]:bg-bpim-surface data-[state=active]:text-white"
             >
               サマリー
             </TabsTrigger>
             <TabsTrigger
               value="songs"
-              className="py-2 text-xs font-bold transition-all data-[state=active]:bg-[#0d1117] data-[state=active]:text-white"
+              className="py-2 text-xs font-bold transition-all data-[state=active]:bg-bpim-surface data-[state=active]:text-white"
             >
               更新楽曲 ({details.songs.length})
             </TabsTrigger>

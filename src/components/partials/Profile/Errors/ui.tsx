@@ -1,4 +1,4 @@
-import { LuLock, LuUserMinus } from "react-icons/lu";
+﻿import { LuLock, LuUserMinus } from "react-icons/lu";
 import Link from "next/link";
 import { AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,7 @@ export const ProfileErrorState = ({
       title: "非公開のプロフィール",
       desc: "このユーザーはプロフィールを非公開に設定しています。",
       icon: <LuLock size={48} />,
-      color: "text-orange-500",
+      color: "text-bpim-warning",
     },
     notfound: {
       title: "ユーザーが見つかりません",
@@ -26,7 +26,7 @@ export const ProfileErrorState = ({
       title: "エラーが発生しました",
       desc: "データの取得中に問題が発生しました。再度お試しください。",
       icon: <AlertTriangle size={48} />,
-      color: "text-red-500",
+      color: "text-bpim-danger",
     },
   };
   const current = configs[type];

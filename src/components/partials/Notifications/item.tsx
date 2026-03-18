@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import dayjs from "@/lib/dayjs";
@@ -35,12 +35,12 @@ export const NotificationItem = ({ n }: { n: NotificationItemType }) => {
               <>
                 {" "}
                 さんが{" "}
-                <span className="font-bold text-blue-400">
+                <span className="font-bold text-bpim-primary">
                   {n.songTitle}[
                   {(n.songDifficulty || "").charAt(0).toUpperCase()}]
                 </span>{" "}
                 であなたを上回りました
-                <div className="mt-1 flex items-center gap-2 text-xs text-blue-300/80">
+                <div className="mt-1 flex items-center gap-2 text-xs text-bpim-primary/80">
                   <span>あなた:{n.myScore || 0}</span>
                   <span>ライバル:{n.rivalScore || 0}</span>
                   <Badge

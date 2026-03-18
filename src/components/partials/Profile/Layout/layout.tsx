@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { ReactNode } from "react";
 import NextLink from "next/link";
@@ -50,7 +50,7 @@ export const UserProfileLayout = ({
     return (
       <DashboardLayout>
         <div className="flex h-[90vh] items-center justify-center">
-          <Loader className="h-10 w-10 animate-spin text-gray-200" />
+          <Loader className="h-10 w-10 animate-spin text-bpim-text" />
         </div>
       </DashboardLayout>
     );
@@ -142,7 +142,7 @@ const TabLinkItem = ({
   <TabsTrigger
     value={value}
     asChild
-    className="flex h-full items-center justify-center gap-2 rounded-lg text-xs font-bold transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg"
+    className="flex h-full items-center justify-center gap-2 rounded-lg text-xs font-bold transition-all data-[state=active]:bg-bpim-primary data-[state=active]:text-white data-[state=active]:shadow-lg"
   >
     <NextLink href={href}>
       {icon}

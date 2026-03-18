@@ -1,4 +1,4 @@
-import { Trash2, Upload, AlertCircle } from "lucide-react";
+﻿import { Trash2, Upload, AlertCircle } from "lucide-react";
 import { PageContainer, PageHeader } from "@/components/partials/Header";
 import { DashboardLayout } from "@/components/partials/Main";
 import { InstructionSection } from "./instruction";
@@ -55,7 +55,7 @@ export const ImportView = (props: Props) => (
                   value={props.csvData}
                   onChange={(e) => props.setCsvData(e.target.value)}
                 />
-                <p className="text-[10px] text-gray-500">
+                <p className="text-[10px] text-bpim-muted">
                   データを改変しないですべて貼り付けてください
                 </p>
               </div>
@@ -79,7 +79,7 @@ export const ImportView = (props: Props) => (
                     ))}
                   </SelectContent>
                 </Select>
-                <p className="text-[10px] text-gray-500">
+                <p className="text-[10px] text-bpim-muted">
                   データを反映させるバージョンを選択してください
                 </p>
               </div>
@@ -87,14 +87,14 @@ export const ImportView = (props: Props) => (
               <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
                 <Button
                   variant="ghost"
-                  className="w-full text-red-400 hover:bg-red-400/10 hover:text-red-300 sm:w-auto"
+                  className="w-full text-bpim-danger hover:bg-bpim-danger/10 hover:text-red-300 sm:w-auto"
                   onClick={() => props.setCsvData("")}
                   disabled={!props.csvData || props.isProcessing}
                 >
                   <Trash2 className="mr-2 h-4 w-4" /> 入力をクリア
                 </Button>
                 <Button
-                  className="w-full bg-blue-600 px-8 font-bold text-white hover:bg-blue-500 sm:w-auto"
+                  className="w-full bg-bpim-primary px-8 font-bold text-white hover:bg-bpim-primary sm:w-auto"
                   size="lg"
                   disabled={props.isProcessing || !props.csvData}
                   onClick={props.onStartImport}
@@ -113,13 +113,13 @@ export const ImportView = (props: Props) => (
               </div>
 
               <div className="flex items-start gap-3 rounded-lg bg-white/5 p-4">
-                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-blue-400" />
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-bpim-primary" />
                 <div className="flex flex-col gap-1">
                   <span className="text-xs font-bold text-white">Note</span>
-                  <p className="text-xs leading-relaxed text-gray-400">
+                  <p className="text-xs leading-relaxed text-bpim-muted">
                     CSVデータはクリップボードから読み取ることもできます。
                     <br />
-                    <strong className="text-gray-300">
+                    <strong className="text-bpim-text">
                       データの更新には最大1分程度かかります。
                     </strong>
                   </p>

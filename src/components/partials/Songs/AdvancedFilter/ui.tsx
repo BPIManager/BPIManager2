@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { FilterParamsFrontend } from "@/types/songs/withScore";
@@ -95,7 +95,7 @@ export const AdvancedFilterModal = ({
 
         <div className="flex flex-col gap-6 py-4 overflow-y-auto max-h-[70vh] pr-2 scrollbar-thin">
           <section className="flex flex-col gap-3">
-            <h3 className="text-[10px] font-bold tracking-widest text-gray-200 uppercase">
+            <h3 className="text-[10px] font-bold tracking-widest text-bpim-text uppercase">
               BPM範囲
             </h3>
             <div className="flex items-center gap-3">
@@ -140,7 +140,7 @@ export const AdvancedFilterModal = ({
           <Separator className="bg-white/5" />
 
           <section className="flex flex-col gap-3">
-            <h3 className="text-[10px] font-bold tracking-widest text-gray-200 uppercase">
+            <h3 className="text-[10px] font-bold tracking-widest text-bpim-text uppercase">
               ランプ状態
             </h3>
             <div className="grid grid-cols-2 gap-3">
@@ -166,7 +166,7 @@ export const AdvancedFilterModal = ({
           <Separator className="bg-white/5" />
 
           <section className="flex flex-col gap-3">
-            <h3 className="text-[10px] font-bold tracking-widest text-gray-200 uppercase">
+            <h3 className="text-[10px] font-bold tracking-widest text-bpim-text uppercase">
               最終更新日
             </h3>
             <div className="flex flex-wrap gap-2">
@@ -180,7 +180,7 @@ export const AdvancedFilterModal = ({
                   className={cn(
                     "h-7 px-2 rounded-full border-bpim-border",
                     localParams.since === opt.value
-                      ? "bg-blue-600"
+                      ? "bg-bpim-primary"
                       : "bg-transparent text-slate-400",
                   )}
                   onClick={() =>
@@ -202,7 +202,7 @@ export const AdvancedFilterModal = ({
                 className={cn(
                   "h-7 px-2 rounded-full border-bpim-border",
                   isCustomActive
-                    ? "bg-blue-600"
+                    ? "bg-bpim-primary"
                     : "bg-transparent text-slate-400",
                 )}
                 onClick={() => {
@@ -248,7 +248,7 @@ export const AdvancedFilterModal = ({
           <Separator className="bg-white/5" />
 
           <section className="flex flex-col gap-3">
-            <h3 className="text-[10px] font-bold tracking-widest text-gray-200 uppercase">
+            <h3 className="text-[10px] font-bold tracking-widest text-bpim-text uppercase">
               楽曲バージョン
             </h3>
             <ScrollArea className="h-[200px] w-full pr-4">
@@ -293,7 +293,7 @@ export const AdvancedFilterModal = ({
             リセット
           </Button>
           <Button
-            className="bg-blue-600 font-bold hover:bg-blue-500"
+            className="bg-bpim-primary font-bold hover:bg-bpim-primary"
             size="sm"
             onClick={handleApply}
           >

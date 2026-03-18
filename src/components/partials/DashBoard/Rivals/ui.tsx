@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useRivalSummary } from "@/hooks/social/useRivalSummary";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
@@ -28,7 +28,7 @@ export const RivalWinLossSummary = ({
 
   return (
     <DashCard>
-      <h3 className="mb-4 text-sm font-bold uppercase text-gray-500">
+      <h3 className="mb-4 text-sm font-bold uppercase text-bpim-muted">
         ライバル勝敗
       </h3>
 
@@ -47,7 +47,7 @@ export const RivalWinLossSummary = ({
       {hasMore && (
         <Button
           variant="ghost"
-          className="mt-4 flex w-full items-center justify-center gap-2 text-xs text-gray-400 transition-colors hover:bg-white/5 hover:text-white"
+          className="mt-4 flex w-full items-center justify-center gap-2 text-xs text-bpim-muted transition-colors hover:bg-white/5 hover:text-white"
           onClick={() => setShowAll(!showAll)}
         >
           {showAll ? (

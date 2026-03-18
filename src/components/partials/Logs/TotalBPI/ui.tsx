@@ -1,4 +1,4 @@
-import { BpiCalculator } from "@/lib/bpi";
+﻿import { BpiCalculator } from "@/lib/bpi";
 import { TrendingUp, TrendingDown, ChevronRight, Minus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DashCard } from "@/components/ui/dashcard";
@@ -15,20 +15,20 @@ export const BatchTotalBpiCard = ({ pagination }: { pagination: any }) => {
   const BpiIcon = bpiDiff > 0 ? TrendingUp : bpiDiff < 0 ? TrendingDown : Minus;
   const bpiColorClass =
     bpiDiff > 0
-      ? "text-blue-400"
+      ? "text-bpim-primary"
       : bpiDiff < 0
-        ? "text-red-400"
+        ? "text-bpim-danger"
         : "text-slate-500";
   const bpiBgClass =
     bpiDiff > 0
-      ? "bg-blue-500/10"
+      ? "bg-bpim-primary/10"
       : bpiDiff < 0
-        ? "bg-red-500/10"
+        ? "bg-bpim-danger/10"
         : "bg-slate-500/10";
 
   const RankIcon =
     rankDiff > 0 ? TrendingUp : rankDiff < 0 ? TrendingDown : Minus;
-  const rankColorClass = rankDiff > 0 ? "text-orange-400" : "text-slate-500";
+  const rankColorClass = rankDiff > 0 ? "text-bpim-warning" : "text-slate-500";
 
   return (
     <DashCard className="mb-4 p-4 md:p-6">

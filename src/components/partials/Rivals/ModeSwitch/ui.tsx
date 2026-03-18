@@ -1,4 +1,4 @@
-import { Swords, User, ChevronRight } from "lucide-react";
+﻿import { Swords, User, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -24,20 +24,20 @@ export const ModeSwitchBanner = ({
         "mb-4 flex flex-wrap items-center gap-4 rounded-lg border p-3",
         isRivalMode
           ? "border-orange-500/30 bg-orange-500/10"
-          : "border-blue-500/30 bg-blue-500/10",
+          : "border-blue-500/30 bg-bpim-primary/10",
       )}
     >
       <div className="flex flex-1 items-center gap-2 min-w-fit">
         <Swords
           className={cn(
             "h-4 w-4",
-            isRivalMode ? "text-orange-500" : "text-gray-200",
+            isRivalMode ? "text-bpim-warning" : "text-bpim-text",
           )}
         />
         <span
           className={cn(
             "text-xs font-bold whitespace-nowrap",
-            isRivalMode ? "text-orange-300" : "text-blue-300",
+            isRivalMode ? "text-bpim-warning" : "text-bpim-primary",
           )}
         >
           {isRivalMode ? "ライバル比較モード" : "スコアを比較しますか?"}
@@ -51,8 +51,8 @@ export const ModeSwitchBanner = ({
         className={cn(
           "h-7 px-2 font-bold transition-all",
           isRivalMode
-            ? "border-orange-500/50 text-orange-400 hover:bg-orange-500/20"
-            : "border-blue-500/50 text-blue-400 hover:bg-blue-500/20",
+            ? "border-orange-500/50 text-bpim-warning hover:bg-orange-500/20"
+            : "border-blue-500/50 text-bpim-primary hover:bg-bpim-primary/20",
         )}
       >
         <Link

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { LuKey, LuCopy, LuRefreshCw, LuLoader } from "react-icons/lu";
@@ -41,7 +41,7 @@ export default function ApiKeyUi() {
   return (
     <div className="mt-4 flex flex-col gap-6 rounded-xl border border-bpim-border bg-bpim-bg p-6 md:flex-row md:items-center md:justify-between">
       <div className="flex flex-col gap-1">
-        <div className="flex items-center gap-2 text-blue-400">
+        <div className="flex items-center gap-2 text-bpim-primary">
           <LuKey className="h-4 w-4" />
           <span className="font-bold">APIキー</span>
         </div>
@@ -83,7 +83,7 @@ export default function ApiKeyUi() {
           </Button>
         </div>
         {rawKey && (
-          <p className="text-[10px] font-bold text-orange-400">
+          <p className="text-[10px] font-bold text-bpim-warning">
             ⚠️ 注意:
             キーは今だけ表示されています。この画面を閉じると二度と表示されません。
           </p>

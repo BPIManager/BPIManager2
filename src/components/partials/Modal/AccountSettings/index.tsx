@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { User2, Check, X, Loader2 } from "lucide-react";
@@ -75,7 +75,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
         <DialogContent className="max-w-md overflow-y-auto max-h-[90vh] rounded-2xl border-bpim-border bg-bpim-bg p-6 shadow-2xl">
           <DialogHeader className="border-b border-bpim-border pb-4">
             <div className="flex items-center gap-3">
-              <User2 className="h-5 w-5 text-gray-200" />
+              <User2 className="h-5 w-5 text-bpim-text" />
               <DialogTitle className="text-xl font-bold tracking-tight text-white">
                 プロフィール設定
               </DialogTitle>
@@ -85,7 +85,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
           <div className="flex flex-col gap-8 py-6">
             <div className="flex flex-col gap-3">
               <Label className="text-xs font-bold tracking-widest text-slate-500 uppercase">
-                アイコンを設定 <span className="text-red-500">*</span>
+                アイコンを設定 <span className="text-bpim-danger">*</span>
               </Label>
               <div className="flex flex-col items-start gap-4">
                 <AvatarSection
@@ -113,7 +113,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                 htmlFor="userName"
                 className="text-xs font-bold tracking-widest text-slate-500 uppercase"
               >
-                表示名 <span className="text-red-500">*</span>
+                表示名 <span className="text-bpim-danger">*</span>
               </Label>
               <div className="relative">
                 <Input
@@ -131,16 +131,16 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                 />
                 <div className="absolute right-3 top-1/2 -translate-y-1/2 z-10">
                   {nameStatus.isChecking ? (
-                    <Loader2 className="h-4 w-4 animate-spin text-gray-200" />
+                    <Loader2 className="h-4 w-4 animate-spin text-bpim-text" />
                   ) : formData.userName && !nameStatus.error ? (
-                    <Check className="h-4 w-4 text-green-500" />
+                    <Check className="h-4 w-4 text-bpim-success" />
                   ) : nameStatus.error ? (
-                    <X className="h-4 w-4 text-red-500" />
+                    <X className="h-4 w-4 text-bpim-danger" />
                   ) : null}
                 </div>
               </div>
               {nameStatus.error ? (
-                <p className="text-[10px] font-bold text-red-400">
+                <p className="text-[10px] font-bold text-bpim-danger">
                   {nameStatus.error}
                 </p>
               ) : (
@@ -157,7 +157,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                 htmlFor="iidxId"
                 className="text-xs font-bold tracking-widest text-slate-500 uppercase"
               >
-                IIDX ID <span className="text-red-500">*</span>
+                IIDX ID <span className="text-bpim-danger">*</span>
               </Label>
               <Input
                 id="iidxId"
@@ -173,7 +173,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                 placeholder="00000000"
               />
               {!validateIidxId(formData.iidxId) && (
-                <p className="text-[10px] font-bold text-red-400">
+                <p className="text-[10px] font-bold text-bpim-danger">
                   8桁のIIDXIDを入力してください
                 </p>
               )}
@@ -255,7 +255,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                 className={cn(
                   "text-[10px] text-right",
                   formData.bio.length > 1000
-                    ? "text-red-400 font-bold"
+                    ? "text-bpim-danger font-bold"
                     : "text-slate-500",
                 )}
               >
@@ -263,7 +263,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
               </p>
             </div>
 
-            <div className="flex flex-row items-center justify-between gap-4 rounded-xl border border-blue-500/20 bg-blue-500/5 p-4">
+            <div className="flex flex-row items-center justify-between gap-4 rounded-xl border border-blue-500/20 bg-bpim-primary/5 p-4">
               <div className="flex flex-col gap-0.5">
                 <span className="text-sm font-bold text-white leading-none">
                   プロフィールを公開
@@ -272,7 +272,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                   他のユーザーがあなたを見つけられるようになります
                 </span>
                 {!formData.isPublic && (
-                  <span className="text-[10px] font-bold text-red-400 mt-1">
+                  <span className="text-[10px] font-bold text-bpim-danger mt-1">
                     BPIM2の機能を最大限利用するため、プロフィールの公開を推奨します
                   </span>
                 )}
@@ -282,14 +282,14 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                 onCheckedChange={(checked) =>
                   setFormData({ ...formData, isPublic: checked })
                 }
-                className="data-[state=checked]:bg-blue-600"
+                className="data-[state=checked]:bg-bpim-primary"
               />
             </div>
           </div>
 
           <DialogFooter className="border-t border-bpim-border pt-6">
             <Button
-              className="w-full h-12 rounded-xl bg-blue-600 text-base font-black hover:bg-blue-500 transition-all active:scale-95 disabled:opacity-50"
+              className="w-full h-12 rounded-xl bg-bpim-primary text-base font-black hover:bg-bpim-primary transition-all active:scale-95 disabled:opacity-50"
               disabled={!isValid || isSubmitting}
               onClick={handleSubmit}
             >

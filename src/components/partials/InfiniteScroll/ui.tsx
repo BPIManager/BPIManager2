@@ -1,4 +1,4 @@
-import { useCallback, ReactNode } from "react";
+﻿import { useCallback, ReactNode } from "react";
 import { useInfiniteScroll } from "@/hooks/common/useInfiniteScroll";
 import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
@@ -44,7 +44,7 @@ export function InfiniteScrollContainer<T>({
       )}
       style={{ maxHeight: maxH }}
     >
-      {header && <div className="sticky top-0 z-10 bg-[#0d1117]">{header}</div>}
+      {header && <div className="sticky top-0 z-10 bg-bpim-surface">{header}</div>}
 
       <div className="flex flex-col">
         {items.map((item, i) => renderItem(item, i))}
@@ -55,10 +55,10 @@ export function InfiniteScrollContainer<T>({
         className="flex min-h-[40px] items-center justify-center py-4"
       >
         {isLoadingMore && (
-          <Loader2 className="h-5 w-5 animate-spin text-gray-200" />
+          <Loader2 className="h-5 w-5 animate-spin text-bpim-text" />
         )}
         {!isLoadingMore && isReachingEnd && items.length > 0 && (
-          <span className="text-[10px] font-medium text-gray-600 uppercase tracking-wider">
+          <span className="text-[10px] font-medium text-bpim-subtle uppercase tracking-wider">
             全てのデータを読み込みました
           </span>
         )}
@@ -66,7 +66,7 @@ export function InfiniteScrollContainer<T>({
 
       {!isLoadingMore && items.length === 0 && (
         <div className="flex flex-col items-center justify-center py-10 text-center">
-          <p className="text-sm text-gray-500">{emptyMessage}</p>
+          <p className="text-sm text-bpim-muted">{emptyMessage}</p>
         </div>
       )}
     </div>

@@ -1,4 +1,4 @@
-import {
+﻿import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -33,7 +33,7 @@ export const RadarCategorySongsDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-h-[80svh] overflow-hidden border-white/20 bg-gray-950 p-0 sm:max-w-md">
+      <DialogContent className="max-h-[80svh] overflow-hidden border-white/20 bg-bpim-bg p-0 sm:max-w-md">
         <DialogHeader className="border-b border-bpim-border p-4">
           <DialogTitle className="text-base font-bold text-white">
             {categoryName} - 楽曲リスト ({songs.length})
@@ -46,17 +46,17 @@ export const RadarCategorySongsDialog = ({
             onValueChange={setSortOrder}
             className="w-full"
           >
-            <TabsList className="mb-4 grid w-full grid-cols-2 rounded-md bg-white/5 p-1 text-gray-400">
+            <TabsList className="mb-4 grid w-full grid-cols-2 rounded-md bg-white/5 p-1 text-bpim-muted">
               <TabsTrigger
                 value="desc"
-                className="flex items-center gap-2 text-xs data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+                className="flex items-center gap-2 text-xs data-[state=active]:bg-bpim-primary data-[state=active]:text-white"
               >
                 <LuArrowDownWideNarrow className="h-3.5 w-3.5" />
                 BPIが高い順
               </TabsTrigger>
               <TabsTrigger
                 value="asc"
-                className="flex items-center gap-2 text-xs data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+                className="flex items-center gap-2 text-xs data-[state=active]:bg-bpim-primary data-[state=active]:text-white"
               >
                 <LuArrowUpNarrowWide className="h-3.5 w-3.5" />
                 BPIが低い順
@@ -75,17 +75,17 @@ export const RadarCategorySongsDialog = ({
                       <span className="truncate text-xs font-bold text-white">
                         {song.title}
                       </span>
-                      <span className="text-[10px] text-gray-500">
+                      <span className="text-[10px] text-bpim-muted">
                         {song.difficulty}
                       </span>
                     </div>
 
                     <div className="flex items-center gap-3">
                       <div className="flex flex-col items-end gap-0">
-                        <span className="text-[10px] text-gray-500">
+                        <span className="text-[10px] text-bpim-muted">
                           EX SCORE
                         </span>
-                        <span className="font-mono text-xs font-bold text-gray-200">
+                        <span className="font-mono text-xs font-bold text-bpim-text">
                           {song.exScore}
                         </span>
                       </div>

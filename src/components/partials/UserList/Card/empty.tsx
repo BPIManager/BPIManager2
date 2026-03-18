@@ -1,4 +1,4 @@
-import { SearchX, RefreshCcw } from "lucide-react";
+﻿import { SearchX, RefreshCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface Props {
@@ -21,7 +21,7 @@ export const UserRecommendationEmpty = ({ onReset }: Props) => {
         variant="ghost"
         size="sm"
         onClick={onReset}
-        className="text-blue-400 hover:bg-blue-400/10 hover:text-blue-300"
+        className="text-bpim-primary hover:bg-bpim-primary/10 hover:text-bpim-primary"
       >
         <RefreshCcw className="mr-2 h-4 w-4" />
         条件をリセット

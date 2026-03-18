@@ -1,4 +1,4 @@
-import { Swords, Crown } from "lucide-react";
+﻿import { Swords, Crown } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { formatIIDXId } from "@/utils/common/formatIidxId";
@@ -36,7 +36,7 @@ export const RivalHeader = ({ profile, isUpdating, onToggleFollow }: any) => (
           </Badge>
           <Badge
             variant="secondary"
-            className="bg-blue-500/10 text-blue-400 border-blue-500/20 rounded-sm px-2"
+            className="bg-bpim-primary/10 text-bpim-primary border-blue-500/20 rounded-sm px-2"
           >
             ☆12 BPI: {profile?.current?.totalBpi?.toFixed(2) || "N/A"}
           </Badge>
@@ -84,18 +84,18 @@ export const WinLossStats = ({ winLossData }: { winLossData: any[] }) => (
             className="rounded-xl border border-bpim-border bg-linear-to-b from-white/5 to-white/[0.02] p-4"
           >
             <div className="mb-3 flex justify-between items-center">
-              <span className="text-xs font-bold text-blue-400">
+              <span className="text-xs font-bold text-bpim-primary">
                 LEVEL {lv}
               </span>
-              <span className="text-[10px] font-bold text-green-400">
+              <span className="text-[10px] font-bold text-bpim-success">
                 {winRate}%
               </span>
             </div>
 
             <div className="flex justify-around items-center">
-              <StatBox label="WIN" value={stats.win} color="text-green-400" />
+              <StatBox label="WIN" value={stats.win} color="text-bpim-success" />
               <StatBox label="DRAW" value={stats.draw} color="text-slate-500" />
-              <StatBox label="LOSE" value={stats.lose} color="text-red-400" />
+              <StatBox label="LOSE" value={stats.lose} color="text-bpim-danger" />
             </div>
 
             <div className="mt-3 h-0.5 w-full overflow-hidden rounded-full bg-white/10">

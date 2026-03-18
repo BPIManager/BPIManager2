@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useMemo, useState } from "react";
 import { LineChart, LucideHistory, Users, X } from "lucide-react";
@@ -121,10 +121,10 @@ export const SongDetailView = ({
               <span className="text-[10px] font-bold tracking-widest text-slate-500 uppercase">
                 BPI
               </span>
-              <span className="font-mono text-lg font-black text-blue-400 leading-none">
+              <span className="font-mono text-lg font-black text-bpim-primary leading-none">
                 {song.bpi !== null ? song.bpi.toFixed(2) : "-"}
               </span>
-              <span className="text-[10px] font-bold text-blue-300/60 mt-1">
+              <span className="text-[10px] font-bold text-bpim-primary/60 mt-1">
                 {song.bpi !== null
                   ? `BPI${bpiInfo.next}まで +${bpiInfo.diff}`
                   : "-"}
@@ -140,7 +140,7 @@ export const SongDetailView = ({
                   ? `MAX - ${maxScore - currentEx}`
                   : `${rankInfo.label} + ${rankInfo.surplus}`}
               </span>
-              <span className="text-[10px] font-bold text-red-400/80 mt-1">
+              <span className="text-[10px] font-bold text-bpim-danger/80 mt-1">
                 {rankInfo.label === "MAX-" ? "MAX" : rankInfo.nextLabel}まで{" "}
                 {rankInfo.shortage}
               </span>
@@ -155,7 +155,7 @@ export const SongDetailView = ({
                   <TabsTrigger
                     key={t.value}
                     value={t.value}
-                    className="flex h-full items-center justify-center gap-2.5 py-0 text-[14px] leading-none transition-all rounded-lg data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg"
+                    className="flex h-full items-center justify-center gap-2.5 py-0 text-[14px] leading-none transition-all rounded-lg data-[state=active]:bg-bpim-primary data-[state=active]:text-white data-[state=active]:shadow-lg"
                   >
                     <Icon className="h-4 w-4 shrink-0" />
                     <span className="hidden sm:inline tracking-tighter">
@@ -200,7 +200,7 @@ export const SongDetailView = ({
                     <span className="text-xs font-bold text-slate-500 uppercase">
                       Miss Count
                     </span>
-                    <span className="font-mono text-sm font-black text-red-500">
+                    <span className="font-mono text-sm font-black text-bpim-danger">
                       {song.missCount ?? "-"}
                     </span>
                   </div>

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useMemo } from "react";
 import { useRouter } from "next/router";
@@ -87,7 +87,7 @@ export const RivalRankingBody = ({
                 className={cn(
                   "border-bpim-border transition-colors cursor-pointer",
                   isSelf
-                    ? "bg-blue-900/30 hover:bg-blue-900/40"
+                    ? "bg-bpim-primary-dim/30 hover:bg-bpim-primary-dim/40"
                     : "hover:bg-white/5",
                 )}
               >
@@ -120,7 +120,7 @@ export const RivalRankingBody = ({
                       >
                         {row.userName}
                         {isSelf && (
-                          <span className="ml-1 text-[10px] text-blue-400">
+                          <span className="ml-1 text-[10px] text-bpim-primary">
                             (あなた)
                           </span>
                         )}
@@ -138,9 +138,9 @@ export const RivalRankingBody = ({
                   className={cn(
                     "text-right font-mono text-xs font-bold py-3",
                     diff > 0
-                      ? "text-red-400"
+                      ? "text-bpim-danger"
                       : diff < 0
-                        ? "text-green-400"
+                        ? "text-bpim-success"
                         : "text-slate-600",
                   )}
                 >

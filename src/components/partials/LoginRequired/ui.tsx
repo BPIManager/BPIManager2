@@ -1,4 +1,4 @@
-import { LuLock } from "react-icons/lu";
+﻿import { LuLock } from "react-icons/lu";
 import { LoginButtons } from "../LogIn";
 import { cn } from "@/lib/utils";
 
@@ -16,13 +16,13 @@ export const LoginRequiredCard = ({ className }: { className?: string }) => {
       />
 
       <div className="relative z-10 flex flex-col items-center gap-6">
-        <div className="flex h-16 w-16 items-center justify-center rounded-full border border-blue-500/20 bg-blue-500/10 text-blue-400">
+        <div className="flex h-16 w-16 items-center justify-center rounded-full border border-blue-500/20 bg-bpim-primary/10 text-bpim-primary">
           <LuLock size={32} />
         </div>
 
         <div className="flex flex-col gap-1">
           <h3 className="text-lg font-bold text-white">ログインが必要です</h3>
-          <p className="max-w-[280px] text-sm text-gray-400">
+          <p className="max-w-[280px] text-sm text-bpim-muted">
             このコンテンツの利用には、BPIMアカウントへのログインが必要です。
           </p>
         </div>

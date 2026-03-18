@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
@@ -78,8 +78,8 @@ export const ImportSuccessModal = ({ result, version, onClose }: Props) => {
         />
       )}
 
-      <div className="relative z-[1002] flex w-full max-w-[400px] flex-col items-center gap-7 rounded-2xl border border-bpim-border bg-[#16181c] p-8 text-center shadow-2xl">
-        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-blue-500/10 text-blue-400">
+      <div className="relative z-[1002] flex w-full max-w-[400px] flex-col items-center gap-7 rounded-2xl border border-bpim-border bg-bpim-surface-2 p-8 text-center shadow-2xl">
+        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-bpim-primary/10 text-bpim-primary">
           {isImproved ? (
             <Lottie
               animationData={trendingUpAnimation}
@@ -126,9 +126,9 @@ export const ImportSuccessModal = ({ result, version, onClose }: Props) => {
                 variant="outline"
                 className={cn(
                   "flex items-center gap-1.5 rounded-full px-4 py-1 border-none font-black text-xs tracking-widest",
-                  isImproved && "bg-green-500/10 text-green-400",
+                  isImproved && "bg-green-500/10 text-bpim-success",
                   isUnchanged && "bg-slate-500/10 text-slate-400",
-                  !isImproved && !isUnchanged && "bg-red-500/10 text-red-400",
+                  !isImproved && !isUnchanged && "bg-bpim-danger/10 text-bpim-danger",
                 )}
               >
                 {isImproved ? (
@@ -151,7 +151,7 @@ export const ImportSuccessModal = ({ result, version, onClose }: Props) => {
         <div className="flex w-full flex-col gap-3">
           <Button
             size="lg"
-            className="w-full bg-blue-600 font-black text-white hover:bg-blue-500 active:scale-95 transition-all"
+            className="w-full bg-bpim-primary font-black text-white hover:bg-bpim-primary active:scale-95 transition-all"
             onClick={() =>
               router.push(
                 `/users/${fbUser?.uid}/logs/${version}/${result.batchId}`,

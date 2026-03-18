@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -59,7 +59,7 @@ export const ArenaAverageFilter = ({
                 <RadioGroupItem
                   value={lv}
                   id={`lv-${lv}`}
-                  className="border-blue-500 text-gray-200"
+                  className="border-blue-500 text-bpim-text"
                 />
                 <Label
                   htmlFor={`lv-${lv}`}

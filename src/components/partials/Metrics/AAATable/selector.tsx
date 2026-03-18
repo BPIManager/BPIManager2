@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { GroupingMode } from "@/hooks/metrics/useAAATable";
 import { versionsNonDisabledCollection } from "@/constants/versions";
@@ -66,7 +66,7 @@ export const AAATableFilter = ({
               <RadioGroupItem
                 value={lv.toString()}
                 id={`level-${lv}`}
-                className="border-blue-500 text-gray-200"
+                className="border-blue-500 text-bpim-text"
               />
               <Label
                 htmlFor={`level-${lv}`}
@@ -95,7 +95,7 @@ export const AAATableFilter = ({
               <RadioGroupItem
                 value={g.id}
                 id={`goal-${g.id}`}
-                className="border-blue-500 text-gray-200"
+                className="border-blue-500 text-bpim-text"
               />
               <Label
                 htmlFor={`goal-${g.id}`}
@@ -124,7 +124,7 @@ export const AAATableFilter = ({
               <RadioGroupItem
                 value={m.id}
                 id={`mode-${m.id}`}
-                className="border-blue-500 text-gray-200"
+                className="border-blue-500 text-bpim-text"
               />
               <Label
                 htmlFor={`mode-${m.id}`}

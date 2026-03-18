@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+﻿import { useEffect, useMemo, useRef, useState } from "react";
 import dayjs from "@/lib/dayjs";
 import NextLink from "next/link";
 import {
@@ -68,7 +68,7 @@ export const ActivityCalendar = ({ data, userId, version }: Props) => {
 
   return (
     <DashCard>
-      <p className="mb-4 text-sm font-bold text-gray-400">最近の更新</p>
+      <p className="mb-4 text-sm font-bold text-bpim-muted">最近の更新</p>
 
       <div
         ref={scrollRef}
@@ -76,7 +76,7 @@ export const ActivityCalendar = ({ data, userId, version }: Props) => {
       >
         <div className="flex items-start gap-3" style={{ minWidth: "720px" }}>
           <div
-            className="grid text-[10px] text-gray-500"
+            className="grid text-[10px] text-bpim-muted"
             style={{
               gridTemplateRows: "repeat(7, 11px)",
               gap: "3px",
@@ -144,7 +144,7 @@ export const ActivityCalendar = ({ data, userId, version }: Props) => {
 
                   <PopoverContent
                     side="top"
-                    className="w-auto border-white/20 bg-gray-800 p-2 text-white"
+                    className="w-auto border-white/20 bg-bpim-surface-2 p-2 text-white"
                     onMouseEnter={() => setHoveredDate(day.date)}
                     onMouseLeave={() => setHoveredDate(null)}
                   >
@@ -172,7 +172,7 @@ export const ActivityCalendar = ({ data, userId, version }: Props) => {
           </div>
         </div>
       </div>
-      <div className="mt-3 flex items-center justify-end gap-1 text-[10px] text-gray-500">
+      <div className="mt-3 flex items-center justify-end gap-1 text-[10px] text-bpim-muted">
         <span>Less</span>
         {[0, 5, 15, 30, 50].map((v) => (
           <div

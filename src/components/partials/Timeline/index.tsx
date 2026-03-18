@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { Activity, Swords, UserCheck } from "lucide-react";
@@ -35,7 +35,7 @@ export const TimelineContainer = () => {
   if (isLoading) {
     return (
       <div className="flex h-64 w-full items-center justify-center">
-        <LuLoader className="h-8 w-8 animate-spin text-gray-200" />
+        <LuLoader className="h-8 w-8 animate-spin text-bpim-text" />
       </div>
     );
   }

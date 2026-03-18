@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
@@ -39,7 +39,7 @@ export const AAATableContent = ({
 
   if (isError) {
     return (
-      <div className="flex h-40 items-center justify-center font-bold text-red-500">
+      <div className="flex h-40 items-center justify-center font-bold text-bpim-danger">
         データの読み込みに失敗しました
       </div>
     );
@@ -60,7 +60,7 @@ export const AAATableContent = ({
 
       {isLoading ? (
         <div className="flex h-64 items-center justify-center">
-          <Loader2 className="h-10 w-10 animate-spin text-gray-200" />
+          <Loader2 className="h-10 w-10 animate-spin text-bpim-text" />
         </div>
       ) : (
         <div className="flex flex-col gap-12">

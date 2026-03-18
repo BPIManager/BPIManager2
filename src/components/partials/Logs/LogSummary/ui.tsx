@@ -1,4 +1,4 @@
-import { PlusCircle, HelpCircle, MusicIcon } from "lucide-react";
+﻿import { PlusCircle, HelpCircle, MusicIcon } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -60,14 +60,14 @@ export const BatchSummaryCards = ({
       label: "今日のBPI",
       value: summary.batchPerformance,
       icon: PlusCircle,
-      color: "text-blue-300",
+      color: "text-bpim-primary",
       tooltip: "今回更新した☆12のみを対象とした総合BPI",
     },
     {
       label: "更新",
       value: summary.updatedScores,
       icon: PlusCircle,
-      color: "text-orange-300",
+      color: "text-bpim-warning",
     },
     {
       label: "新規",

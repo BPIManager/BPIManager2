@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -79,7 +79,7 @@ export const SimpleRankItem = ({
           <span className="text-[9px] font-bold text-slate-600 leading-none">
             BPI
           </span>
-          <span className="text-sm font-bold text-blue-400 leading-tight">
+          <span className="text-sm font-bold text-bpim-primary leading-tight">
             {(item.current.bpi ?? -15).toFixed(2)}
           </span>
         </div>

@@ -1,4 +1,4 @@
-import {
+﻿import {
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -38,7 +38,7 @@ export const NotificationBell = () => {
             <Bell size={20} />
           </Button>
           {unreadCount > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-red-600 px-1 font-mono text-[10px] font-bold text-white ring-2 ring-slate-950">
+            <span className="absolute -top-0.5 -right-0.5 flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-bpim-danger px-1 font-mono text-[10px] font-bold text-white ring-2 ring-slate-950">
               {unreadCount > 99 ? "99+" : unreadCount}
             </span>
           )}
@@ -46,7 +46,7 @@ export const NotificationBell = () => {
       </PopoverTrigger>
       <PopoverContent
         align="end"
-        className="w-[350px] overflow-hidden border-bpim-border bg-gray-800 p-0 shadow-2xl"
+        className="w-[350px] overflow-hidden border-bpim-border bg-bpim-surface-2 p-0 shadow-2xl"
       >
         <Tabs
           value={activeTab}
@@ -56,19 +56,19 @@ export const NotificationBell = () => {
           <TabsList className="grid w-full grid-cols-3 rounded-none border-b border-bpim-border bg-bpim-bg/50 p-1">
             <TabsTrigger
               value="all"
-              className="text-xs font-bold data-[state=active]:bg-blue-600"
+              className="text-xs font-bold data-[state=active]:bg-bpim-primary"
             >
               すべて
             </TabsTrigger>
             <TabsTrigger
               value="follow"
-              className="text-xs font-bold data-[state=active]:bg-blue-600"
+              className="text-xs font-bold data-[state=active]:bg-bpim-primary"
             >
               フォロー
             </TabsTrigger>
             <TabsTrigger
               value="overtaken"
-              className="text-xs font-bold data-[state=active]:bg-blue-600"
+              className="text-xs font-bold data-[state=active]:bg-bpim-primary"
             >
               更新
             </TabsTrigger>

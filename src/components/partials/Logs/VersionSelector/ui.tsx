@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRouter } from "next/router";
 import {
@@ -75,13 +75,13 @@ export const LogFilterSection = ({ version, groupedBy }: Props) => {
           <TabsList className="grid h-9 w-full grid-cols-2 border border-bpim-border bg-bpim-bg p-1">
             <TabsTrigger
               value="lastPlayed"
-              className="text-xs font-bold transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+              className="text-xs font-bold transition-all data-[state=active]:bg-bpim-primary data-[state=active]:text-white"
             >
               プレイ日単位
             </TabsTrigger>
             <TabsTrigger
               value="createdAt"
-              className="text-xs font-bold transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+              className="text-xs font-bold transition-all data-[state=active]:bg-bpim-primary data-[state=active]:text-white"
             >
               インポート日単位
             </TabsTrigger>

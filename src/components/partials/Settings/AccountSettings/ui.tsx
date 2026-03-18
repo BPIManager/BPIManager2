@@ -1,4 +1,4 @@
-import { LuUser, LuSettings2 } from "react-icons/lu";
+﻿import { LuUser, LuSettings2 } from "react-icons/lu";
 import { useState } from "react";
 import AccountSettings from "../../Modal/AccountSettings";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ export default function AccountSettingsUi() {
   return (
     <div className="mt-4 flex flex-col gap-6 rounded-xl border border-bpim-border bg-bpim-bg p-6 md:flex-row md:items-center md:justify-between">
       <div className="flex flex-col gap-1">
-        <div className="flex items-center gap-2 text-blue-400">
+        <div className="flex items-center gap-2 text-bpim-primary">
           <LuUser className="h-4 w-4" />
           <span className="font-bold">プロフィール設定</span>
         </div>

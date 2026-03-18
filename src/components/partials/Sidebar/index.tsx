@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -131,7 +131,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
             <p className="truncate font-mono text-[10px] text-slate-500">
               {user?.iidxId ? `ID: ${user.iidxId}` : "ID未設定"}
             </p>
-            <p className="font-mono text-[10px] font-bold text-orange-400">
+            <p className="font-mono text-[10px] font-bold text-bpim-warning">
               ☆12 BPI: {user?.totalBpi ?? -15}
             </p>
           </div>
@@ -223,7 +223,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
           <Button
             variant="ghost"
             size="sm"
-            className="w-full justify-center gap-2 text-red-400 hover:bg-red-400/10 hover:text-red-300"
+            className="w-full justify-center gap-2 text-bpim-danger hover:bg-bpim-danger/10 hover:text-red-300"
             onClick={() => authActions.logout()}
           >
             <LogOut className="h-4 w-4" />
@@ -243,7 +243,7 @@ const ApiDogButton = () => (
       rel="noopener noreferrer"
       className="flex items-center gap-2 text-white hover:opacity-80 transition-opacity"
     >
-      <Code2 className="h-4 w-4 text-blue-400" />
+      <Code2 className="h-4 w-4 text-bpim-primary" />
       <span className="text-[10px] font-bold underline underline-offset-4">
         APIs Now Available!
       </span>
@@ -266,7 +266,7 @@ const GitHubButton = () => (
     >
       <Github className="h-4 w-4" />
       <span className="text-[10px] font-bold">
-        Available on <span className="text-blue-400">GitHub</span>
+        Available on <span className="text-bpim-primary">GitHub</span>
       </span>
     </a>
   </Button>

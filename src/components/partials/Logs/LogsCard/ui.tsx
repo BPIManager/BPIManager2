@@ -1,4 +1,4 @@
-import { LuListMusic, LuCalendar } from "react-icons/lu";
+﻿import { LuListMusic, LuCalendar } from "react-icons/lu";
 import Link from "next/link";
 import { UpdateLog } from "@/hooks/batches/useBatchesList";
 import dayjs from "@/lib/dayjs";
@@ -52,8 +52,8 @@ export const LogsCard = ({ log }: { log: UpdateLog }) => {
                 className={cn(
                   "px-2 py-0 font-bold border-none",
                   isPositive
-                    ? "bg-blue-500/10 text-blue-400"
-                    : "bg-red-500/10 text-red-400",
+                    ? "bg-bpim-primary/10 text-bpim-primary"
+                    : "bg-bpim-danger/10 text-bpim-danger",
                 )}
               >
                 {isPositive ? "+" : ""}
@@ -89,10 +89,10 @@ export const LogsCard = ({ log }: { log: UpdateLog }) => {
                   {score.title}
                 </span>
                 <div className="w-[45px] shrink-0 text-right font-mono leading-none">
-                  <div className="text-[8px] font-bold text-gray-200/60 uppercase">
+                  <div className="text-[8px] font-bold text-bpim-text/60 uppercase">
                     BPI
                   </div>
-                  <div className="text-xs font-bold text-blue-400">
+                  <div className="text-xs font-bold text-bpim-primary">
                     {score.bpi.toFixed(1)}
                   </div>
                 </div>

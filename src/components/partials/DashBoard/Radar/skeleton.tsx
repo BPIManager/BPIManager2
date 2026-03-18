@@ -1,4 +1,4 @@
-import { DashCard } from "@/components/ui/dashcard";
+﻿import { DashCard } from "@/components/ui/dashcard";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export const RadarSkeleton = () => {
@@ -13,7 +13,7 @@ export const RadarSkeleton = () => {
             <div className="absolute inset-[30px] rounded-full border border-bpim-border" />
             <div className="absolute inset-[60px] rounded-full border border-bpim-border" />
             <div
-              className="h-full w-full bg-blue-500/10"
+              className="h-full w-full bg-bpim-primary/10"
               style={{
                 clipPath:
                   "polygon(50% 10%, 90% 40%, 80% 80%, 30% 90%, 10% 50%)",

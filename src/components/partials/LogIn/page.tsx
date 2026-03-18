@@ -1,4 +1,4 @@
-import { LoginButtons } from "@/components/partials/LogIn";
+﻿import { LoginButtons } from "@/components/partials/LogIn";
 import {
   Database,
   BarChart3,
@@ -27,7 +27,7 @@ export default function LoginPage() {
             <h1 className="bg-gradient-to-br from-white to-gray-600 bg-clip-text text-6xl font-bold tracking-tighter text-transparent leading-none md:text-8xl">
               BPIM2
             </h1>
-            <p className="max-w-2xl text-base text-gray-400 md:text-lg">
+            <p className="max-w-2xl text-base text-bpim-muted md:text-lg">
               beatmania IIDX 上級者のためのスコアマネジメントツール
             </p>
           </div>
@@ -36,7 +36,7 @@ export default function LoginPage() {
             <div className="flex flex-col items-center gap-6 text-center">
               <h2 className="text-xl font-bold">Sign In</h2>
               <LoginButtons />
-              <div className="flex flex-col gap-2 text-[12px] leading-relaxed text-gray-400">
+              <div className="flex flex-col gap-2 text-[12px] leading-relaxed text-bpim-muted">
                 <p>
                   本ツールは現在ベータ版提供です。
                   <br />
@@ -44,7 +44,7 @@ export default function LoginPage() {
                   <a
                     href="https://bpi.poyashi.me"
                     target="_blank"
-                    className="font-bold text-white underline decoration-white/20 underline-offset-4 transition-colors hover:text-blue-400 hover:decoration-blue-400/50"
+                    className="font-bold text-white underline decoration-white/20 underline-offset-4 transition-colors hover:text-bpim-primary hover:decoration-blue-400/50"
                   >
                     BPIM
                   </a>{" "}
@@ -60,19 +60,19 @@ export default function LoginPage() {
           <Separator className="mb-16 bg-white/10" />
 
           <div className="flex flex-col items-center">
-            <h3 className="mb-10 text-center text-lg font-bold tracking-[0.2em] uppercase text-gray-300">
+            <h3 className="mb-10 text-center text-lg font-bold tracking-[0.2em] uppercase text-bpim-text">
               BPIM2って？
             </h3>
 
             <div className="mb-12 w-full rounded-2xl border border-bpim-border bg-bpim-bg p-6 md:p-8">
               <div className="flex flex-col items-start gap-6 md:flex-row md:gap-8">
-                <div className="flex shrink-0 items-center justify-center rounded-xl bg-blue-500/10 p-4 text-blue-400">
+                <div className="flex shrink-0 items-center justify-center rounded-xl bg-bpim-primary/10 p-4 text-bpim-primary">
                   <BarChart3 className="h-8 w-8" />
                 </div>
 
                 <div className="flex flex-1 flex-col gap-4">
                   <h4 className="text-lg font-bold text-white">BPIとは</h4>
-                  <div className="text-sm leading-relaxed text-gray-400">
+                  <div className="text-sm leading-relaxed text-bpim-muted">
                     <p>
                       beatmania IIDXのスコアを統計的に算出し、
                       皆伝平均を0、歴代全一を100として現在の実力を可視化する指標です。
@@ -82,7 +82,7 @@ export default function LoginPage() {
                       <a
                         href="http://norimiso.web.fc2.com/aboutBPI.html"
                         target="_blank"
-                        className="text-blue-400 underline decoration-blue-400/30 underline-offset-4 hover:text-blue-300"
+                        className="text-bpim-primary underline decoration-blue-400/30 underline-offset-4 hover:text-bpim-primary"
                       >
                         BPIについて
                       </a>
@@ -90,7 +90,7 @@ export default function LoginPage() {
                     </p>
                   </div>
                   <Separator className="bg-white/5" />
-                  <p className="text-sm text-gray-400 italic">
+                  <p className="text-sm text-bpim-muted italic">
                     なお、BPIM及びBPIM2では、従来固定値(1.5)だった譜面係数を、実際のプレイデータに基づくユーザー分布から動的に算出しています。
                   </p>
                 </div>
@@ -146,10 +146,10 @@ const FeatureCard = ({
   description: string;
 }) => (
   <div className="flex flex-col items-start rounded-xl border border-bpim-border bg-white/5 p-6 transition-colors hover:border-white/20">
-    <div className="mb-4 flex items-center justify-center rounded-lg bg-blue-500/10 p-3 text-blue-400">
+    <div className="mb-4 flex items-center justify-center rounded-lg bg-bpim-primary/10 p-3 text-bpim-primary">
       <Icon className="h-6 w-6" />
     </div>
     <h5 className="mb-2 text-base font-bold text-white">{title}</h5>
-    <p className="text-xs leading-relaxed text-gray-500">{description}</p>
+    <p className="text-xs leading-relaxed text-bpim-muted">{description}</p>
   </div>
 );

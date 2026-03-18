@@ -1,4 +1,4 @@
-import { useRadar } from "@/hooks/stats/useRadar";
+﻿import { useRadar } from "@/hooks/stats/useRadar";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { RadarSkeleton } from "./skeleton";
 import { RadarSectionChart } from "./ui";
@@ -51,18 +51,18 @@ export const RadarSection = ({
   return (
     <DashCard>
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-sm font-bold text-gray-500 uppercase">
+        <h3 className="text-sm font-bold text-bpim-muted uppercase">
           BPIレーダー
         </h3>
         {isRivalMode && (
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5">
-              <div className="h-2.5 w-2.5 rounded-full bg-blue-400" />
-              <span className="text-xs text-blue-300 font-medium">自分</span>
+              <div className="h-2.5 w-2.5 rounded-full bg-bpim-primary" />
+              <span className="text-xs text-bpim-primary font-medium">自分</span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="h-2.5 w-2.5 rounded-full bg-orange-400" />
-              <span className="text-xs text-orange-300 font-medium">
+              <span className="text-xs text-bpim-warning font-medium">
                 {rivalName ?? "ライバル"}
               </span>
             </div>
@@ -89,11 +89,11 @@ export const RadarSection = ({
                   "hover:bg-white/10 hover:translate-x-1 hover:border-bpim-border",
                 )}
               >
-                <span className="text-xs font-bold text-gray-300">{key}</span>
+                <span className="text-xs font-bold text-bpim-text">{key}</span>
 
                 <div className="flex items-center gap-2">
                   {isRivalMode && rivalBpi !== undefined && (
-                    <div className="inline-flex min-w-[64px] items-center justify-center rounded-sm border border-orange-500/50 bg-orange-500/10 px-2 py-0.5 font-mono text-sm font-bold text-orange-400">
+                    <div className="inline-flex min-w-[64px] items-center justify-center rounded-sm border border-orange-500/50 bg-orange-500/10 px-2 py-0.5 font-mono text-sm font-bold text-bpim-warning">
                       {rivalBpi.toFixed(2)}
                     </div>
                   )}

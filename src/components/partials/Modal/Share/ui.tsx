@@ -1,4 +1,4 @@
-import {
+﻿import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -96,7 +96,7 @@ export const ShareResultModal = ({
                 <RadioGroupItem
                   value={opt.id}
                   id={opt.id}
-                  className="mt-1 border-blue-500 text-gray-200"
+                  className="mt-1 border-blue-500 text-bpim-text"
                 />
                 <Label
                   htmlFor={opt.id}
@@ -126,7 +126,7 @@ export const ShareResultModal = ({
           <Button
             disabled={isSharing}
             onClick={handleExecute}
-            className="flex-1 bg-blue-600 font-bold hover:bg-blue-500"
+            className="flex-1 bg-bpim-primary font-bold hover:bg-bpim-primary"
           >
             {isSharing ? (
               <Loader className="mr-2 h-4 w-4 animate-spin" />

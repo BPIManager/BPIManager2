@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useUser } from "@/contexts/users/UserContext";
 import { DashboardLayout } from "@/components/partials/Main";
@@ -23,7 +23,7 @@ export default function DashboardPage() {
   if (isUserLoading) {
     return (
       <div className="flex h-[90vh] w-full items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-gray-200" />
+        <Loader2 className="h-8 w-8 animate-spin text-bpim-text" />
       </div>
     );
   }

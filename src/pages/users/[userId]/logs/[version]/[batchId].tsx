@@ -1,4 +1,4 @@
-import { Meta } from "@/components/partials/Head";
+﻿import { Meta } from "@/components/partials/Head";
 import { LogsDetailContent } from "@/components/partials/Logs/LogsDetail/content";
 import { LogsDetailView } from "@/components/partials/Logs/LogsDetail/ui";
 import { DashboardLayout } from "@/components/partials/Main";
@@ -18,7 +18,7 @@ export default function BatchLogsPage() {
   if (isInitialLoading) {
     return (
       <div className="flex h-[90vh] w-full items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin text-gray-200" />
+        <Loader2 className="h-10 w-10 animate-spin text-bpim-text" />
       </div>
     );
   }

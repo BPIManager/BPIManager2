@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+﻿import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -18,7 +18,7 @@ export const UserFollowCard = ({ user }: { user: any }) => {
           <Badge className="bg-orange-600 px-1 py-0 text-[10px] font-bold border-none h-4">
             {user.arenaRank || "N/A"}
           </Badge>
-          <span className="font-mono text-xs font-bold text-blue-300 uppercase">
+          <span className="font-mono text-xs font-bold text-bpim-primary uppercase">
             総合BPI: {user.totalBpi?.toFixed(2) ?? "N/A"}
           </span>
         </div>
