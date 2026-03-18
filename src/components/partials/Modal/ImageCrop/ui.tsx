@@ -1,14 +1,14 @@
+"use client";
+
 import React, { useState, useRef } from "react";
-import { Box, VStack, Text, Image as ChakraImage } from "@chakra-ui/react";
 import {
-  DialogRoot,
+  Dialog,
   DialogContent,
   DialogHeader,
-  DialogBody,
-  DialogFooter,
   DialogTitle,
-} from "@/components/ui/chakra/dialog";
-import { Button } from "@/components/ui/chakra/button";
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import {
   ReactCrop,
   type Crop,
@@ -18,7 +18,8 @@ import {
 import "react-image-crop/dist/ReactCrop.css";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "@/lib/firebase";
-import { toaster } from "@/components/ui/chakra/toaster";
+import { toast } from "sonner";
+import { Loader2, Upload } from "lucide-react";
 
 interface Props {
   uid: string;
@@ -108,99 +109,94 @@ export const ImageUploadModal = ({
 
       onSuccess(downloadURL);
       handleClose();
-      toaster.create({ title: "画像をアップロードしました", type: "success" });
+      toast.success("画像をアップロードしました");
     } catch (error) {
       console.error(error);
-      toaster.create({ title: "アップロードに失敗しました", type: "error" });
+      toast.error("アップロードに失敗しました");
     } finally {
       setIsUploading(false);
     }
   };
 
   return (
-    <DialogRoot
-      open={isOpen}
-      placement={{ mdDown: "top", md: "center" }}
-      onOpenChange={(e) => {
-        if (!e.open && !isUploading && onClose) {
-          onClose();
-        }
-      }}
-      closeOnInteractOutside={!isUploading}
-    >
-      <DialogContent bg="bg.panel" borderRadius="xl" p={2}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
+      <DialogContent className="sm:max-w-md border-white/10 bg-slate-900 p-4">
         <DialogHeader>
-          <DialogTitle>画像を選択</DialogTitle>
+          <DialogTitle className="text-white">画像を選択</DialogTitle>
         </DialogHeader>
-        <DialogBody>
-          <VStack gap={4}>
-            {!imgSrc ? (
-              <Box
-                border="2px dashed"
-                borderColor="border.muted"
-                p={10}
-                textAlign="center"
-                borderRadius="md"
-                w="full"
-                cursor="pointer"
-                _hover={{ bg: "whiteAlpha.50" }}
-                onClick={() => document.getElementById("file-input")?.click()}
+
+        <div className="flex flex-col items-center justify-center gap-4 py-4">
+          {!imgSrc ? (
+            <div
+              onClick={() => document.getElementById("file-input")?.click()}
+              className="flex w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-white/10 bg-white/5 p-12 transition-colors hover:bg-white/10"
+            >
+              <Upload className="h-8 w-8 text-slate-500" />
+              <p className="text-sm text-slate-400 font-medium">
+                クリックして画像を選択
+              </p>
+              <input
+                id="file-input"
+                type="file"
+                accept="image/*"
+                onChange={onSelectFile}
+                className="hidden"
+              />
+            </div>
+          ) : (
+            <div className="relative max-h-[400px] w-full overflow-hidden rounded-lg bg-black/50 border border-white/10">
+              <ReactCrop
+                crop={crop}
+                onChange={(c) => setCrop(c)}
+                aspect={1}
+                circularCrop
+                className="mx-auto"
               >
-                <Text color="fg.muted">クリックして画像を選択</Text>
-                <input
-                  id="file-input"
-                  type="file"
-                  accept="image/*"
-                  onChange={onSelectFile}
-                  style={{ display: "none" }}
+                <img
+                  ref={imgRef}
+                  alt="Crop preview"
+                  src={imgSrc}
+                  onLoad={onImageLoad}
+                  className="max-h-[400px] object-contain"
                 />
-              </Box>
-            ) : (
-              <Box maxH="400px" overflow="hidden" borderRadius="md">
-                <ReactCrop
-                  crop={crop}
-                  onChange={(c) => setCrop(c)}
-                  aspect={1}
-                  circularCrop
-                >
-                  <ChakraImage
-                    ref={imgRef}
-                    alt="Crop me"
-                    src={imgSrc}
-                    onLoad={onImageLoad}
-                    maxH="400px"
-                  />
-                </ReactCrop>
-              </Box>
-            )}
-          </VStack>
-        </DialogBody>
-        <DialogFooter gap={3}>
+              </ReactCrop>
+            </div>
+          )}
+        </div>
+
+        <DialogFooter className="flex flex-row justify-end gap-2 sm:gap-2">
           {imgSrc && !isUploading && (
             <Button
-              variant="subtle"
-              colorPalette="gray"
+              variant="secondary"
               onClick={clearSelection}
+              className="h-9"
             >
               再選択
             </Button>
           )}
-
-          <Button variant="ghost" onClick={handleClose} disabled={isUploading}>
+          <Button
+            variant="ghost"
+            onClick={handleClose}
+            disabled={isUploading}
+            className="h-9 text-slate-400"
+          >
             キャンセル
           </Button>
-
           {imgSrc && (
             <Button
-              colorPalette="blue"
               onClick={handleUpload}
-              loading={isUploading}
+              disabled={isUploading}
+              className="h-9 min-w-[80px] bg-blue-600 hover:bg-blue-500"
             >
-              保存
+              {isUploading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                "保存"
+              )}
             </Button>
           )}
         </DialogFooter>
       </DialogContent>
-    </DialogRoot>
+    </Dialog>
   );
 };

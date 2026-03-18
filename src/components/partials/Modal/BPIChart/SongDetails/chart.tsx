@@ -1,4 +1,5 @@
-import { Box, Separator, Text, VStack } from "@chakra-ui/react";
+"use client";
+
 import { useMemo } from "react";
 import {
   BarChart,
@@ -11,7 +12,8 @@ import {
   Cell,
 } from "recharts";
 import { SongWithScore } from "@/types/songs/withScore";
-import { DashCard } from "@/components/ui/chakra/dashcard";
+import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 
 interface BPIAnimatedChartProps {
   data: { label: string; count: number; bpi: number }[];
@@ -27,36 +29,33 @@ const ChartTooltip = ({ active, payload, youScore, maxScore }: any) => {
   const diff = data.count - youScore;
 
   return (
-    <Box
-      bg="gray.900"
-      p={3}
-      border="1px solid"
-      borderColor="whiteAlpha.300"
-      borderRadius="md"
-      boxShadow="xl"
-    >
-      <VStack align="start" gap={1}>
-        <Text color="blue.300" fontSize="xs" fontWeight="bold">
+    <div className="rounded-lg border border-white/20 bg-slate-900 p-3 shadow-2xl backdrop-blur-md">
+      <div className="flex flex-col gap-1.5">
+        <p className="text-xs font-bold text-blue-400 uppercase tracking-wider">
           BPI: {isYou ? data.bpi.toFixed(2) : data.label}
-        </Text>
+        </p>
 
-        <Separator opacity={0.2} />
+        <Separator className="bg-white/10" />
 
-        <Text color="white" fontSize="sm" fontWeight="bold">
-          Score: {data.count.toLocaleString()} ({rate}%)
-        </Text>
+        <div className="flex flex-col gap-0.5">
+          <p className="text-sm font-bold text-white font-mono">
+            Score: {data.count.toLocaleString()}
+          </p>
+          <p className="text-[10px] text-slate-400 font-mono">Rate: {rate}%</p>
+        </div>
 
         {!isYou && (
-          <Text
-            fontSize="xs"
-            fontWeight="bold"
-            color={diff > 0 ? "red.400" : "green.400"}
+          <p
+            className={cn(
+              "text-[11px] font-black mt-1",
+              diff > 0 ? "text-red-400" : "text-green-400",
+            )}
           >
             {diff > 0 ? `あと ${diff} 点` : `${Math.abs(diff)} 点超過`}
-          </Text>
+          </p>
         )}
-      </VStack>
-    </Box>
+      </div>
+    </div>
   );
 };
 
@@ -68,10 +67,12 @@ export const BPIChart = ({ data, maxScore }: BPIAnimatedChartProps) => {
       return getVal(b) - getVal(a);
     });
   }, [data]);
+
   const youScore = data.find((d) => d.label === "YOU")?.count ?? 0;
+
   const yMin = useMemo(() => {
     const kaidenAvg = data.find((d) => d.label === "0")?.count ?? 0;
-    return Math.floor(kaidenAvg - maxScore * 0.05);
+    return Math.max(0, Math.floor(kaidenAvg - maxScore * 0.05));
   }, [data, maxScore]);
 
   const borders = useMemo(() => {
@@ -90,50 +91,52 @@ export const BPIChart = ({ data, maxScore }: BPIAnimatedChartProps) => {
   }, [maxScore, yMin]);
 
   return (
-    <DashCard h="400px">
+    <div className="h-[400px] w-full rounded-xl border border-white/5 bg-black/20 p-2">
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={chartData}>
+        <BarChart
+          data={chartData}
+          margin={{ top: 20, right: 10, left: -20, bottom: 0 }}
+        >
           <XAxis
             dataKey="label"
             axisLine={false}
             tickLine={false}
-            padding={{ left: 10, right: 10 }}
-            tick={{ fill: "#a0aec0", fontSize: 11, fontWeight: "bold" }}
+            tick={{ fill: "#64748b", fontSize: 10, fontWeight: "bold" }}
           />
-
           <YAxis domain={[yMin, maxScore]} hide />
           <Tooltip
             content={<ChartTooltip youScore={youScore} maxScore={maxScore} />}
-            cursor={{ fill: "rgba(255,255,255,0.05)" }}
+            cursor={{ fill: "rgba(255,255,255,0.03)" }}
+            animationDuration={200}
           />
           {borders.map((b) => (
             <ReferenceLine
               key={b.label}
               y={b.score}
-              stroke="#4A5568"
+              stroke="#334155"
               strokeDasharray="4 4"
               label={{
                 value: b.label,
                 position: "insideBottomRight",
-                fill: "#718096",
-                fontSize: 10,
-                fontWeight: "bold",
+                fill: "#475569",
+                fontSize: 9,
+                fontWeight: "black",
                 dy: 12,
-                dx: 0,
               }}
             />
           ))}
 
-          <Bar dataKey="count" animationDuration={800} radius={[4, 4, 0, 0]}>
+          <Bar dataKey="count" animationDuration={1000} radius={[4, 4, 0, 0]}>
             {chartData.map((entry, index) => (
               <Cell
                 key={`cell-${index}`}
-                fill={entry.label === "YOU" ? "#ECC94B" : "#3182CE"}
+                fill={entry.label === "YOU" ? "#fbbf24" : "#3b82f6"}
+                fillOpacity={entry.label === "YOU" ? 1 : 0.6}
               />
             ))}
           </Bar>
         </BarChart>
       </ResponsiveContainer>
-    </DashCard>
+    </div>
   );
 };

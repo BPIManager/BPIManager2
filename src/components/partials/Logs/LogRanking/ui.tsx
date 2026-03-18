@@ -1,35 +1,27 @@
-import {
-  VStack,
-  HStack,
-  Text,
-  Button,
-  Box,
-  Separator,
-  Icon,
-  Center,
-  Badge,
-} from "@chakra-ui/react";
 import { LuTrophy, LuTrendingUp, LuSwords } from "react-icons/lu";
-import { Switch } from "@/components/ui/chakra/switch";
+import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import { RankItem } from "./item";
 import { useLogRank } from "@/hooks/batches/useLogRank";
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { SongDetailView } from "../../Modal/BPIChart/SongDetails/ui";
 import { OvertakeRankItem } from "../LogOvertaken/item";
 import { BatchDetailItem } from "@/hooks/batches/useBatchDetail";
 import { SongWithScore } from "@/types/songs/withScore";
 import { LabelWithTooltip } from "../LogSummary/ui";
+import { cn } from "@/lib/utils";
 
 const RANK_CONFIG = {
   growth: {
     title: "BPI伸び幅ランキング",
     icon: LuTrendingUp,
-    accentColor: "green.400",
+    accentColor: "text-green-400",
   },
   top: {
     title: "BPIランキング",
     icon: LuTrophy,
-    accentColor: "yellow.400",
+    accentColor: "text-yellow-400",
   },
   overtake: {
     title: (
@@ -40,7 +32,7 @@ const RANK_CONFIG = {
       />
     ),
     icon: LuSwords,
-    accentColor: "orange.400",
+    accentColor: "text-orange-400",
   },
 };
 
@@ -79,56 +71,42 @@ export const LogRank = ({
     setIsDetailOpen(true);
   };
 
+  const Icon = config.icon;
+
   return (
-    <VStack align="stretch" gap={4} w="full" mt={4}>
-      <HStack justify="space-between">
-        <HStack gap={2}>
-          <Icon as={config.icon} color={config.accentColor} />
-          <Text
-            fontSize="sm"
-            fontWeight="bold"
-            color="gray.200"
-            letterSpacing="widest"
-          >
+    <div className="flex w-full flex-col gap-4 mt-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Icon className={cn("h-4 w-4", config.accentColor)} />
+          <div className="text-sm font-bold tracking-widest text-slate-200 uppercase">
             {config.title}
-          </Text>
-        </HStack>
+          </div>
+        </div>
 
         {type !== "top" && !isSharing && (
-          <Switch
-            colorPalette="blue"
-            size="sm"
-            checked={hideNewRecords}
-            onCheckedChange={(e) => {
-              setHideNewRecords(e.checked);
-              setDisplayLimit(5);
-            }}
-          >
-            <Text fontSize="2xs" fontWeight="bold" color="gray.400">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-bold text-slate-500">
               新規除外
-            </Text>
-          </Switch>
+            </span>
+            <Switch
+              checked={hideNewRecords}
+              onCheckedChange={(checked) => {
+                setHideNewRecords(checked);
+                setDisplayLimit(5);
+              }}
+            />
+          </div>
         )}
-      </HStack>
+      </div>
 
-      <VStack
-        align="stretch"
-        gap={0}
-        border="1px solid"
-        borderColor="gray.800"
-        borderRadius="xl"
-        overflow="hidden"
-        bg="gray.950"
-      >
+      <div className="flex flex-col overflow-hidden rounded-xl border border-slate-800 bg-slate-950">
         {visibleSongs.length === 0 ? (
-          <Center p={8} bg="whiteAlpha.50">
-            <Text fontSize="xs" color="gray.500">
-              データがありません
-            </Text>
-          </Center>
+          <div className="flex items-center justify-center p-8 bg-white/5">
+            <span className="text-xs text-slate-500">データがありません</span>
+          </div>
         ) : (
           visibleSongs.map((item, index) => (
-            <Box key={item.songId}>
+            <div key={item.songId}>
               {type === "overtake" ? (
                 <OvertakeRankItem
                   item={item}
@@ -144,30 +122,31 @@ export const LogRank = ({
                 />
               )}
               {index !== visibleSongs.length - 1 && (
-                <Separator borderColor="gray.900" />
+                <Separator className="bg-slate-900" />
               )}
-            </Box>
+            </div>
           ))
         )}
-      </VStack>
+      </div>
 
       {hasMore && (
         <Button
           variant="ghost"
           size="sm"
-          color="gray.400"
+          className="text-slate-500 hover:bg-white/5 hover:text-slate-300"
           onClick={loadMore}
-          _hover={{ bg: "whiteAlpha.50" }}
         >
           もっと表示（残り {remainingCount} 件）
         </Button>
       )}
 
-      <SongDetailView
-        song={selectedSong}
-        isOpen={isDetailOpen}
-        onClose={() => setIsDetailOpen(false)}
-      />
-    </VStack>
+      {selectedSong && (
+        <SongDetailView
+          song={selectedSong}
+          isOpen={isDetailOpen}
+          onClose={() => setIsDetailOpen(false)}
+        />
+      )}
+    </div>
   );
 };

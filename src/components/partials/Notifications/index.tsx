@@ -1,16 +1,15 @@
-import { Box, IconButton, Badge, Tabs } from "@chakra-ui/react";
-import { Bell } from "lucide-react";
 import {
-  PopoverArrow,
-  PopoverBody,
+  Popover,
   PopoverContent,
-  PopoverRoot,
   PopoverTrigger,
-} from "@/components/ui/chakra/popover";
-import { useState } from "react";
+} from "@/components/ui/popover";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNotifications } from "@/hooks/users/useNotifications";
-import { NotificationItem } from "./item";
+import { Bell } from "lucide-react";
+import { useState } from "react";
 import { InfiniteScrollContainer } from "../InfiniteScroll/ui";
+import { NotificationItem } from "./item";
+import { Button } from "@/components/ui/button";
 
 export const NotificationBell = () => {
   const [activeTab, setActiveTab] = useState<"all" | "follow" | "overtaken">(
@@ -18,80 +17,77 @@ export const NotificationBell = () => {
   );
 
   const notificationRes = useNotifications(activeTab);
-  const { unreadCount, markAsRead } = notificationRes;
+  const {
+    unreadCount,
+    markAsRead,
+    notifications,
+    setSize,
+    isLoadingMore,
+    isReachingEnd,
+  } = notificationRes;
 
   return (
-    <PopoverRoot portalled onOpenChange={(e) => e.open && markAsRead()}>
+    <Popover onOpenChange={(open) => open && markAsRead()}>
       <PopoverTrigger asChild>
-        <Box position="relative" cursor="pointer">
-          <IconButton variant="ghost" aria-label="Notifications">
-            <Bell size={20} />
-          </IconButton>
-          {unreadCount > 0 && (
-            <Badge
-              position="absolute"
-              top="0"
-              right="0"
-              transform="translate(30%, -30%)"
-              colorPalette="red"
-              variant="solid"
-              borderRadius="full"
-              minW="18px"
-              height="18px"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              fontSize="10px"
-              px={1}
-              zIndex="docked"
-              pointerEvents="none"
-            >
-              {unreadCount > 99 ? "99+" : unreadCount}
-            </Badge>
-          )}
-        </Box>
-      </PopoverTrigger>
-
-      <PopoverContent w="350px" maxH="500px" overflow="hidden">
-        <PopoverArrow />
-        <PopoverBody p={0}>
-          <Tabs.Root
-            value={activeTab}
-            onValueChange={(e) => setActiveTab(e.value as any)}
+        <div className="relative cursor-pointer">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-9 w-9 text-slate-400 hover:text-white"
           >
-            <Tabs.List w="full">
-              {["all", "follow", "overtaken"].map((tab) => (
-                <Tabs.Trigger
-                  key={tab}
-                  value={tab}
-                  flex="1"
-                  justifyContent="center"
-                >
-                  {tab === "all"
-                    ? "すべて"
-                    : tab === "follow"
-                      ? "フォロー"
-                      : "スコア更新"}
-                </Tabs.Trigger>
-              ))}
-            </Tabs.List>
-
-            <Box p={2}>
-              <InfiniteScrollContainer
-                items={notificationRes.notifications}
-                setSize={notificationRes.setSize}
-                isLoadingMore={notificationRes.isLoadingMore}
-                isReachingEnd={notificationRes.isReachingEnd}
-                maxH="400px"
-                emptyMessage="通知はありません"
-                renderItem={(n, i) => (
-                  <NotificationItem key={`${n.timestamp}-${i}`} n={n} />
-                )}
-              />
-            </Box>
-          </Tabs.Root>
-        </PopoverBody>
+            <Bell size={20} />
+          </Button>
+          {unreadCount > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-red-600 px-1 font-mono text-[10px] font-bold text-white ring-2 ring-slate-950">
+              {unreadCount > 99 ? "99+" : unreadCount}
+            </span>
+          )}
+        </div>
+      </PopoverTrigger>
+      <PopoverContent
+        align="end"
+        className="w-[350px] overflow-hidden border-white/10 bg-slate-900 p-0 shadow-2xl"
+      >
+        <Tabs
+          value={activeTab}
+          onValueChange={(v) => setActiveTab(v as any)}
+          className="w-full"
+        >
+          <TabsList className="grid w-full grid-cols-3 rounded-none border-b border-white/5 bg-slate-950/50 p-1">
+            <TabsTrigger
+              value="all"
+              className="text-xs font-bold data-[state=active]:bg-blue-600"
+            >
+              すべて
+            </TabsTrigger>
+            <TabsTrigger
+              value="follow"
+              className="text-xs font-bold data-[state=active]:bg-blue-600"
+            >
+              フォロー
+            </TabsTrigger>
+            <TabsTrigger
+              value="overtaken"
+              className="text-xs font-bold data-[state=active]:bg-blue-600"
+            >
+              更新
+            </TabsTrigger>
+          </TabsList>
+          <div className="max-h-[400px] overflow-y-auto p-2">
+            <InfiniteScrollContainer
+              items={notifications}
+              setSize={setSize}
+              isLoadingMore={isLoadingMore}
+              isReachingEnd={isReachingEnd}
+              maxH="400px"
+              emptyMessage="通知はありません"
+              renderItem={(n, i) => (
+                <NotificationItem key={`${n.timestamp}-${i}`} n={n} />
+              )}
+            />
+          </div>
+        </Tabs>
       </PopoverContent>
-    </PopoverRoot>
+    </Popover>
   );
 };

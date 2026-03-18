@@ -1,17 +1,19 @@
-import { NoDataAlert } from "@/components/partials/DashBoard/NoData";
-import { LoginRequiredCard } from "@/components/partials/LoginRequired/ui";
-import { SongDetailView } from "@/components/partials/Modal/BPIChart/SongDetails/ui";
-import { CustomPagination } from "@/components/partials/Pagination/ui";
-import { AdvancedFilterModal } from "@/components/partials/Songs/AdvancedFilter/ui";
-import { SongFilterBar } from "@/components/partials/Songs/Filter/ui";
-import { SongListSkeleton } from "@/components/partials/Table/skeleton";
+"use client";
+
+import { useState } from "react";
 import { useUser } from "@/contexts/users/UserContext";
 import { useSongFilter, PAGE_SIZE } from "@/hooks/table/useSongFilter";
-import { SongWithRival, SongWithScore } from "@/types/songs/withScore";
-import { useDisclosure, Center, Container, Text, Box } from "@chakra-ui/react";
-import { useState, useMemo } from "react";
-import { RivalSongItem } from "./ui";
 import { useRivalBothScores } from "@/hooks/social/useRivalAllScores";
+import { SongWithRival, SongWithScore } from "@/types/songs/withScore";
+
+import { SongFilterBar } from "@/components/partials/Songs/Filter/ui";
+import { SongListSkeleton } from "@/components/partials/Table/skeleton";
+import { NoDataAlert } from "@/components/partials/DashBoard/NoData";
+import { LoginRequiredCard } from "@/components/partials/LoginRequired/ui";
+import { CustomPagination } from "@/components/partials/Pagination/ui";
+import { AdvancedFilterModal } from "@/components/partials/Songs/AdvancedFilter/ui";
+import { SongDetailView } from "@/components/partials/Modal/BPIChart/SongDetails/ui";
+import { RivalSongItem } from "./ui";
 
 export const RivalSongsTable = ({
   myUserId,
@@ -20,12 +22,12 @@ export const RivalSongsTable = ({
 }: {
   myUserId: string | undefined;
   rivalUserId: string | undefined;
-  rivalName?: string;
   version?: string;
 }) => {
   const { fbUser } = useUser();
   const [selectedSong, setSelectedSong] = useState<SongWithScore | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
 
   const { songs, error, isLoading } = useRivalBothScores(
     myUserId,
@@ -36,78 +38,63 @@ export const RivalSongsTable = ({
   const { params, updateParams, page, setPage, visibleSongs, totalCount } =
     useSongFilter(songs);
 
-  const {
-    open: isAdvancedOpen,
-    onOpen: onOpenAdvanced,
-    onClose: onCloseAdvanced,
-  } = useDisclosure();
-
-  if (!fbUser) {
-    return <LoginRequiredCard />;
-  }
+  if (!fbUser) return <LoginRequiredCard />;
 
   if (!isLoading && (error || !songs)) {
     return (
-      <Center h="200px" flexDirection="column">
-        <Text color="red.500" fontWeight="bold">
-          楽曲データの取得に失敗しました
-        </Text>
-        <Text fontSize="xs" color="fg.muted">
-          {error?.message}
-        </Text>
-      </Center>
+      <div className="flex h-[200px] flex-col items-center justify-center gap-2">
+        <p className="font-bold text-red-500">楽曲データの取得に失敗しました</p>
+        <p className="text-xs text-slate-500">{error?.message}</p>
+      </div>
     );
   }
 
-  const rivalSongMap = useMemo(() => {
-    const map = new Map<string, SongWithRival>();
-    if (!songs) return map;
-    for (const s of songs) {
-      map.set(`${s.songId}-${s.difficulty}`, s);
-    }
-    return map;
-  }, [songs]);
-
   return (
-    <Container maxW="full" p={0} minH="100svh">
+    <div className="mx-auto w-full min-h-[100svh] flex flex-col bg-background">
       <SongFilterBar
         withRivals
         params={params}
         onParamsChange={updateParams}
         totalCount={totalCount}
-        onOpenAdvancedFilter={onOpenAdvanced}
+        onOpenAdvancedFilter={() => setIsAdvancedOpen(true)}
       />
 
-      {!isLoading && songs && songs.length === 0 && <NoDataAlert />}
-
-      {isLoading ? (
-        <SongListSkeleton />
-      ) : (
-        <Box w="full" p={2}>
-          {visibleSongs.map((song) => {
-            const s = song as SongWithRival;
-            return (
-              <RivalSongItem
-                key={`${s.songId}-${s.difficulty}`}
-                song={s}
-                onClick={() => {
-                  setSelectedSong(s);
-                  setIsDetailOpen(true);
-                }}
-              />
-            );
-          })}
-        </Box>
+      {!isLoading && songs && songs.length === 0 && (
+        <div className="p-4">
+          <NoDataAlert />
+        </div>
       )}
+
+      <main className="flex-1">
+        {isLoading ? (
+          <SongListSkeleton />
+        ) : (
+          <div className="w-full p-2 flex flex-col">
+            {visibleSongs.map((song) => {
+              const s = song as SongWithRival;
+              return (
+                <RivalSongItem
+                  key={`${s.songId}-${s.difficulty}`}
+                  song={s}
+                  onClick={() => {
+                    setSelectedSong(s);
+                    setIsDetailOpen(true);
+                  }}
+                />
+              );
+            })}
+          </div>
+        )}
+      </main>
 
       <AdvancedFilterModal
         isOpen={isAdvancedOpen}
-        onClose={onCloseAdvanced}
+        onClose={() => setIsAdvancedOpen(false)}
         params={params}
         onParamsChange={updateParams}
       />
 
-      {isDetailOpen && (
+      {isDetailOpen && selectedSong && (
         <SongDetailView
           song={selectedSong}
           isOpen={isDetailOpen}
@@ -115,12 +102,14 @@ export const RivalSongsTable = ({
         />
       )}
 
-      <CustomPagination
-        count={totalCount}
-        pageSize={PAGE_SIZE}
-        page={page}
-        onPageChange={setPage}
-      />
-    </Container>
+      <footer className="py-8 flex justify-center">
+        <CustomPagination
+          count={totalCount}
+          pageSize={PAGE_SIZE}
+          page={page}
+          onPageChange={setPage}
+        />
+      </footer>
+    </div>
   );
 };

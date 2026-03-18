@@ -1,16 +1,17 @@
+"use client";
+
+import React from "react";
 import {
-  DialogRoot,
+  Dialog,
   DialogContent,
   DialogHeader,
-  DialogBody,
-  DialogFooter,
   DialogTitle,
-  DialogActionTrigger,
-} from "@/components/ui/chakra/dialog";
-import { Button } from "@/components/ui/chakra/button";
-import { Text, VStack } from "@chakra-ui/react";
-import { useState } from "react";
-import { AlertTriangleIcon } from "lucide-react";
+  DialogFooter,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { AlertTriangle, Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface Props {
   isOpen: boolean;
@@ -37,55 +38,58 @@ export const ActionConfirmDialog = ({
   isConfirmDisabled = false,
   isLoading = false,
 }: Props) => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
   return (
-    <DialogRoot
+    <Dialog
       open={isOpen}
-      onOpenChange={(e) => !e.open && !isLoading && onClose()}
-      placement="center"
-      role={isDestructive ? "alertdialog" : "dialog"}
+      onOpenChange={(open) => !open && !isLoading && onClose()}
     >
-      <DialogContent bg="bg.panel" borderRadius="xl" p={4}>
-        <DialogHeader borderBottomWidth="1px" pb={4}>
-          <DialogTitle display="flex" alignItems="center" gap={2}>
+      <DialogContent className="max-w-[90vw] sm:max-w-md border-white/10 bg-[#161b22] p-0 overflow-hidden shadow-2xl rounded-2xl">
+        <DialogHeader className="p-6 pb-4 border-b border-white/5">
+          <DialogTitle className="flex items-center gap-3 text-lg font-bold text-white">
             {isDestructive && (
-              <AlertTriangleIcon
-                color="var(--chakra-colors-red-500)"
-                size={20}
-              />
+              <AlertTriangle className="h-5 w-5 text-red-500 shrink-0" />
             )}
             {title}
           </DialogTitle>
         </DialogHeader>
 
-        <DialogBody py={6}>
+        <div className="p-6 py-8">
           {typeof description === "string" ? (
-            <Text color="fg.muted" textStyle="sm">
+            <DialogDescription className="text-sm leading-relaxed text-slate-400">
               {description}
-            </Text>
+            </DialogDescription>
           ) : (
-            description
+            <div className="text-sm text-slate-300">{description}</div>
           )}
-        </DialogBody>
+        </div>
 
-        <DialogFooter borderTopWidth="1px" pt={4} gap={3}>
-          <DialogActionTrigger asChild>
-            <Button px={2} variant="outline" disabled={isSubmitting}>
-              {cancelLabel}
-            </Button>
-          </DialogActionTrigger>
+        <DialogFooter className="flex flex-row items-center justify-end gap-3 p-4 bg-black/20 border-t border-white/5 sm:flex-row">
           <Button
-            px={2}
-            colorPalette={isDestructive ? "red" : "blue"}
-            loading={isLoading}
-            onClick={onConfirm}
-            disabled={isConfirmDisabled || isSubmitting}
+            variant="ghost"
+            onClick={onClose}
+            disabled={isLoading}
+            className="h-9 px-4 text-slate-400 hover:text-white hover:bg-white/5"
           >
-            {confirmLabel}
+            {cancelLabel}
+          </Button>
+          <Button
+            onClick={onConfirm}
+            disabled={isConfirmDisabled || isLoading}
+            className={cn(
+              "h-9 px-6 font-bold transition-all min-w-[100px]",
+              isDestructive
+                ? "bg-red-600 hover:bg-red-500 text-white"
+                : "bg-blue-600 hover:bg-blue-500 text-white",
+            )}
+          >
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              confirmLabel
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>
-    </DialogRoot>
+    </Dialog>
   );
 };

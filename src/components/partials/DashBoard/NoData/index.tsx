@@ -1,4 +1,4 @@
-import { DashCard } from "@/components/ui/chakra/dashcard";
+import { DashCard } from "@/components/ui/dashcard";
 import NextLink from "next/link";
 
 export const NoDataAlert = () => {

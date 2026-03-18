@@ -1,20 +1,36 @@
-import { ArenaAverageData } from "@/hooks/metrics/useArenaAverage";
-import { Table, Box, Text, VStack, HStack } from "@chakra-ui/react";
-import { useState, useMemo, memo } from "react";
-import { CustomPagination } from "../../Pagination/ui";
+"use client";
 
-const RANKS = ["A1", "A2", "A3", "A4", "A5"];
+import { useState, useMemo, memo } from "react";
+import { LuArrowUpDown, LuChevronUp, LuChevronDown } from "react-icons/lu";
+import { ArenaAverageData } from "@/hooks/metrics/useArenaAverage";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { CustomPagination } from "../../Pagination/ui";
+import { cn } from "@/lib/utils";
+
+const RANKS = ["A1", "A2", "A3", "A4", "A5"] as const;
 
 export const RANK_THRESHOLDS = [
-  { label: "MAX-", ratio: 17 / 18, color: "orange.500", textColor: "gray.900" },
-  { label: "AAA", ratio: 8 / 9, color: "yellow.400", textColor: "black" },
-  { label: "AA", ratio: 7 / 9, color: "green.400", textColor: "gray.800" },
-  { label: "A", ratio: 6 / 9, color: "blue.400", textColor: "gray.800" },
-  { label: "B", ratio: 5 / 9, color: "gray.400", textColor: "black" },
-  { label: "C", ratio: 4 / 9, color: "gray.400", textColor: "black" },
-  { label: "D", ratio: 3 / 9, color: "gray.400", textColor: "black" },
-  { label: "E", ratio: 2 / 9, color: "gray.400", textColor: "black" },
-  { label: "F", ratio: 0, color: "gray.400", textColor: "black" },
+  {
+    label: "MAX-",
+    ratio: 17 / 18,
+    bg: "bg-orange-500",
+    text: "text-slate-950",
+  },
+  { label: "AAA", ratio: 8 / 9, bg: "bg-yellow-400", text: "text-black" },
+  { label: "AA", ratio: 7 / 9, bg: "bg-green-400", text: "text-slate-900" },
+  { label: "A", ratio: 6 / 9, bg: "bg-blue-400", text: "text-slate-900" },
+  { label: "B", ratio: 5 / 9, bg: "bg-slate-500", text: "text-white" },
+  { label: "C", ratio: 4 / 9, bg: "bg-slate-600", text: "text-white" },
+  { label: "D", ratio: 3 / 9, bg: "bg-slate-700", text: "text-white" },
+  { label: "E", ratio: 2 / 9, bg: "bg-slate-800", text: "text-white" },
+  { label: "F", ratio: 0, bg: "bg-slate-900", text: "text-slate-400" },
 ] as const;
 
 type SortKey = "title" | (typeof RANKS)[number];
@@ -22,9 +38,7 @@ type SortOrder = "asc" | "desc";
 
 export const getRankInfo = (rate: number) => {
   const ratio = rate / 100;
-
   const rank = RANK_THRESHOLDS.find((t) => ratio >= t.ratio);
-
   return rank || RANK_THRESHOLDS[RANK_THRESHOLDS.length - 1];
 };
 
@@ -70,139 +84,115 @@ export const ArenaAverageTable = ({ data }: { data: ArenaAverageData[] }) => {
 
   const SortIcon = ({ k }: { k: SortKey }) => {
     if (sortKey !== k)
-      return (
-        <Text color="gray.600" fontSize="10px">
-          ↕
-        </Text>
-      );
-    return (
-      <Text color="blue.400" fontSize="10px">
-        {sortOrder === "asc" ? "▲" : "▼"}
-      </Text>
+      return <LuArrowUpDown className="ml-1 h-3 w-3 opacity-30" />;
+    return sortOrder === "asc" ? (
+      <LuChevronUp className="ml-1 h-3 w-3 text-blue-400" />
+    ) : (
+      <LuChevronDown className="ml-1 h-3 w-3 text-blue-400" />
     );
   };
 
   const ArenaRow = memo(({ item }: { item: ArenaAverageData }) => (
-    <Table.Row>
-      <Table.Cell data-sticky="start" p={2}>
-        <Box>
-          <Text fontWeight="bold" fontSize="xs" truncate maxW="250px">
+    <TableRow className="group border-white/5 hover:bg-white/5">
+      <TableCell className="sticky left-0 z-10 min-w-[200px] max-w-[250px] bg-slate-950 p-3 shadow-[2px_0_5px_rgba(0,0,0,0.3)] group-hover:bg-slate-900 transition-colors">
+        <div className="flex flex-col gap-0.5">
+          <span className="truncate text-xs font-bold text-white">
             {item.title}
-          </Text>
-          <Text fontSize="10px" color="fg.muted">
+          </span>
+          <span className="text-[10px] font-medium text-slate-500 uppercase tracking-tighter">
             {item.difficulty}
-          </Text>
-        </Box>
-      </Table.Cell>
+          </span>
+        </div>
+      </TableCell>
+
       {RANKS.map((rankName) => {
         const stats = item.averages[rankName];
-        if (!stats)
+        if (!stats) {
           return (
-            <Table.Cell key={rankName} textAlign="center">
+            <TableCell key={rankName} className="text-center text-slate-700">
               -
-            </Table.Cell>
+            </TableCell>
           );
+        }
         const rankInfo = getRankInfo(stats.rate);
         return (
-          <Table.Cell
+          <TableCell
             key={rankName}
-            textAlign="center"
-            bg={rankInfo.color}
-            color={rankInfo.textColor}
-            px={1}
-            py={2}
+            className={cn(
+              "text-center py-2 px-1 transition-opacity hover:opacity-80",
+              rankInfo.bg,
+              rankInfo.text,
+            )}
           >
-            <VStack gap={0}>
-              <Text fontSize="xs" fontWeight="bold">
+            <div className="flex flex-col items-center gap-0">
+              <span className="font-mono text-xs font-black leading-tight">
                 {Math.round(stats.avgExScore)}
-              </Text>
-              <Text fontSize="10px" opacity={0.7}>
+              </span>
+              <span className="font-mono text-[9px] font-bold opacity-70">
                 {stats.rate.toFixed(1)}%
-              </Text>
-            </VStack>
-          </Table.Cell>
+              </span>
+            </div>
+          </TableCell>
         );
       })}
-    </Table.Row>
+    </TableRow>
   ));
 
   return (
-    <VStack w="full" maxW="full">
-      <Table.ScrollArea borderWidth="1px" rounded="md" w="full" maxW="full">
-        <Table.Root
-          size="sm"
-          striped
-          stickyHeader
-          css={{
-            "& [data-sticky]": {
-              position: "sticky",
-              zIndex: 1,
-              bg: "bg",
-              _after: {
-                content: '""',
-                position: "absolute",
-                top: "0",
-                bottom: "-1px",
-                width: "1px",
-                bg: "border",
-                insetInlineEnd: "0",
-              },
-            },
-            "& [data-sticky=start]": {
-              left: "0",
-              shadow: "2px 0 4px rgba(0,0,0,0.05)",
-            },
-            "& thead tr": { zIndex: 2 },
-          }}
-        >
-          <Table.Header>
-            <Table.Row bg="bg.subtle">
-              <Table.ColumnHeader
-                data-sticky="start"
-                minW="200px"
-                p={2}
-                cursor="pointer"
-                onClick={() => handleSort("title")}
-                _hover={{ bg: "whiteAlpha.100" }}
-              >
-                <HStack gap={2}>
-                  <Text>楽曲名</Text>
-                  <SortIcon k="title" />
-                </HStack>
-              </Table.ColumnHeader>
-              {RANKS.map((rank) => (
-                <Table.ColumnHeader
-                  key={rank}
-                  textAlign="center"
-                  minW="80px"
-                  p={2}
-                  cursor="pointer"
-                  onClick={() => handleSort(rank)}
-                  _hover={{ bg: "whiteAlpha.100" }}
+    <div className="flex w-full flex-col gap-4">
+      <div className="relative overflow-hidden rounded-xl border border-white/10 bg-slate-950 shadow-2xl">
+        <div className="overflow-x-auto custom-scrollbar">
+          <Table className="border-collapse">
+            <TableHeader className="bg-slate-900/80 sticky top-0 z-20 backdrop-blur-md">
+              <TableRow className="hover:bg-transparent border-white/10">
+                <TableHead
+                  onClick={() => handleSort("title")}
+                  className="sticky left-0 z-30 cursor-pointer bg-slate-900 px-3 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-white"
                 >
-                  <VStack gap={0}>
-                    <Text>{rank}</Text>
-                    <SortIcon k={rank} />
-                  </VStack>
-                </Table.ColumnHeader>
-              ))}
-            </Table.Row>
-          </Table.Header>
+                  <div className="flex items-center">
+                    楽曲名 <SortIcon k="title" />
+                  </div>
+                </TableHead>
 
-          <Table.Body>
-            {visibleData.map((item) => (
-              <ArenaRow key={`${item.title}-${item.difficulty}`} item={item} />
-            ))}
-          </Table.Body>
-        </Table.Root>
-      </Table.ScrollArea>
-      <CustomPagination
-        count={sortedData.length}
-        pageSize={PAGE_SIZE}
-        page={page}
-        onPageChange={setPage}
-        isSticky={true}
-      />
-    </VStack>
+                {RANKS.map((rank) => (
+                  <TableHead
+                    key={rank}
+                    onClick={() => handleSort(rank)}
+                    className="min-w-[85px] cursor-pointer text-center px-2 py-3 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-white transition-colors"
+                  >
+                    <div className="flex flex-col items-center justify-center">
+                      <span>{rank}</span>
+                      <SortIcon k={rank} />
+                    </div>
+                  </TableHead>
+                ))}
+              </TableRow>
+            </TableHeader>
+
+            <TableBody>
+              {visibleData.map((item) => (
+                <ArenaRow
+                  key={`${item.title}-${item.difficulty}`}
+                  item={item}
+                />
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+
+      <div className="flex justify-center py-4">
+        <CustomPagination
+          count={sortedData.length}
+          pageSize={PAGE_SIZE}
+          page={page}
+          onPageChange={(p: number) => {
+            setPage(p);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
+          isSticky={true}
+        />
+      </div>
+    </div>
   );
 };

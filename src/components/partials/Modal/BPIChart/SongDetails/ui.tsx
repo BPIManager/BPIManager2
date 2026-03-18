@@ -1,42 +1,37 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import { LineChart, LucideHistory, Users, X } from "lucide-react";
 import {
-  DialogRoot,
+  Dialog,
   DialogContent,
   DialogHeader,
-  DialogBody,
-  DialogCloseTrigger,
   DialogTitle,
-} from "@/components/ui/chakra/dialog";
-import {
-  Box,
-  VStack,
-  HStack,
-  Text,
-  Grid,
-  GridItem,
-  Separator,
-  Badge,
-  Tabs,
-} from "@chakra-ui/react";
+} from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+
 import { SongWithScore } from "@/types/songs/withScore";
-import { useMemo, useState } from "react";
 import { BpiCalculator } from "@/lib/bpi";
 import { BPIChart } from "./chart";
 import { getRankDetail } from "@/constants/djRank";
-import { LineChart, LucideHistory, Users } from "lucide-react";
 import { SongHistoryTab } from "../History/ui";
 import RivalsRanking from "../Rivals";
+
+interface SongDetailViewProps {
+  song: SongWithScore | null;
+  isOpen: boolean;
+  onClose: () => void;
+  defaultTab?: "stats" | "history" | "rivals";
+}
 
 export const SongDetailView = ({
   song,
   isOpen,
   onClose,
   defaultTab,
-}: {
-  song: SongWithScore | null;
-  isOpen: boolean;
-  onClose: () => void;
-  defaultTab?: "stats" | "history" | "rivals";
-}) => {
+}: SongDetailViewProps) => {
   const [tab, setTab] = useState<string>(defaultTab || "stats");
 
   const chartData = useMemo(() => {
@@ -75,7 +70,6 @@ export const SongDetailView = ({
     if (!song) return { next: 0, diff: 0 };
     if (song.bpi === null) return { next: "-", diff: 0 };
     const nextTargetBpi = Math.ceil((song.bpi + 0.01) / 10) * 10;
-
     const targetScore = BpiCalculator.calcFromBPI(nextTargetBpi, song, true);
     return {
       next: nextTargetBpi,
@@ -84,159 +78,137 @@ export const SongDetailView = ({
   }, [song, currentEx]);
 
   if (!song) return null;
+
   return (
-    <DialogRoot
-      open={isOpen}
-      onOpenChange={onClose}
-      size="lg"
-      placement={{ mdDown: "top", md: "center" }}
-    >
-      <DialogContent
-        bg="gray.950"
-        border="1px solid"
-        borderColor="whiteAlpha.200"
-      >
-        <DialogHeader
-          borderBottomWidth="1px"
-          borderColor="whiteAlpha.100"
-          p={4}
-        >
-          <DialogTitle fontSize="md" color="white">
-            {song.title}&nbsp;[{song.difficulty.charAt(0)}]
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-2xl gap-0 border-white/10 bg-slate-950 p-0 shadow-2xl overflow-hidden rounded-2xl">
+        <DialogHeader className="border-b border-white/10 p-4 flex flex-row items-center justify-between space-y-0">
+          <DialogTitle className="text-lg font-black tracking-tight text-white">
+            {song.title}
+            <span className="ml-2 text-slate-500 font-mono">
+              [{song.difficulty.charAt(0)}]
+            </span>
           </DialogTitle>
-          <DialogCloseTrigger color="white" />
         </DialogHeader>
-        <DialogBody py={6}>
-          <Grid
-            templateColumns="repeat(3, 1fr)"
-            gap={4}
-            textAlign="center"
-            mb={6}
-          >
-            <GridItem>
-              <Text fontSize="xs" color="gray.500" fontWeight="bold">
-                EX SCORE
-              </Text>
-              <Text fontSize="md" fontWeight="bold" color="white">
-                {song.exScore ?? 0}
-              </Text>
-              <Text fontSize="10px" color="gray.200" mt={1}>
-                {(((song.exScore ?? 0) / (song.notes * 2)) * 100).toFixed(2)}%
-              </Text>
-            </GridItem>
-            <GridItem
-              borderLeftWidth="1px"
-              borderRightWidth="1px"
-              borderColor="whiteAlpha.100"
-            >
-              <Text fontSize="xs" color="gray.500" fontWeight="bold">
+
+        <div className="p-6">
+          <div className="mb-8 grid grid-cols-3 gap-4 text-center">
+            <div className="flex flex-col gap-1">
+              <span className="text-[10px] font-bold tracking-widest text-slate-500 uppercase">
+                EX Score
+              </span>
+              <span className="font-mono text-lg font-black text-white leading-none">
+                {song.exScore?.toLocaleString() ?? 0}
+              </span>
+              <span className="text-[10px] font-bold text-slate-400 mt-1 font-mono">
+                {(((song.exScore ?? 0) / maxScore) * 100).toFixed(2)}%
+              </span>
+            </div>
+
+            <div className="flex flex-col gap-1 border-x border-white/5">
+              <span className="text-[10px] font-bold tracking-widest text-slate-500 uppercase">
                 BPI
-              </Text>
-              <Text fontSize="md" fontWeight="bold" color="blue.300">
+              </span>
+              <span className="font-mono text-lg font-black text-blue-400 leading-none">
                 {song.bpi !== null ? song.bpi.toFixed(2) : "-"}
-              </Text>
-              <Text fontSize="10px" color="gray.200" mt={1}>
+              </span>
+              <span className="text-[10px] font-bold text-blue-300/60 mt-1">
                 {song.bpi !== null
-                  ? `BPI${bpiInfo.next}まであと${bpiInfo.diff}点`
+                  ? `BPI${bpiInfo.next}まで +${bpiInfo.diff}`
                   : "-"}
-              </Text>
-            </GridItem>
-            <GridItem>
-              <Text fontSize="xs" color="gray.500" fontWeight="bold">
-                DJ RANK
-              </Text>
-              <Text fontSize="md" fontWeight="bold" color="yellow.400">
-                {rankInfo.label === "MAX-" ? (
-                  <>MAX - {maxScore - currentEx}</>
-                ) : (
-                  <>
-                    {rankInfo.label} + {rankInfo.surplus}
-                  </>
-                )}
-              </Text>
-              <VStack gap={0} mt={1}>
-                <Text fontSize="9px" color="red.300">
-                  {rankInfo.label === "MAX-" ? "MAX" : rankInfo.nextLabel}まで{" "}
-                  {rankInfo.shortage}
-                </Text>
-              </VStack>
-            </GridItem>
-          </Grid>
-          <Tabs.Root
-            value={tab}
-            onValueChange={(e) => setTab(e.value)}
-            variant="enclosed"
-            fitted
-          >
-            <Tabs.List
-              bg="whiteAlpha.50"
-              p={1}
-              rounded="md"
-              border="none"
-              mb={4}
-            >
-              <Tabs.Trigger value="stats" gap={2}>
-                <LineChart /> <Text fontSize="xs">STATISTICS</Text>
-              </Tabs.Trigger>
-              <Tabs.Trigger value="history" gap={2}>
-                <LucideHistory /> <Text fontSize="xs">HISTORY</Text>
-              </Tabs.Trigger>
-              <Tabs.Trigger value="rivals" gap={2}>
-                <Users /> <Text fontSize="xs">RIVALS</Text>
-              </Tabs.Trigger>
-            </Tabs.List>
-            <Tabs.Content value="stats">
-              <BPIChart
-                data={chartData}
-                maxScore={song.notes * 2}
-                song={song}
-              />
-              <Box
-                mt={6}
-                p={4}
-                bg="whiteAlpha.50"
-                rounded="md"
-                borderWidth="1px"
-                borderColor="whiteAlpha.100"
+              </span>
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <span className="text-[10px] font-bold tracking-widest text-slate-500 uppercase">
+                DJ Rank
+              </span>
+              <span className="font-mono text-lg font-black text-yellow-500 leading-none">
+                {rankInfo.label === "MAX-"
+                  ? `MAX - ${maxScore - currentEx}`
+                  : `${rankInfo.label} + ${rankInfo.surplus}`}
+              </span>
+              <span className="text-[10px] font-bold text-red-400/80 mt-1">
+                {rankInfo.label === "MAX-" ? "MAX" : rankInfo.nextLabel}まで{" "}
+                {rankInfo.shortage}
+              </span>
+            </div>
+          </div>
+
+          <Tabs value={tab} onValueChange={setTab} className="w-full">
+            <TabsList className="mb-6 grid w-full grid-cols-3 rounded-xl border border-white/5 bg-slate-900/50 p-1">
+              <TabsTrigger
+                value="stats"
+                className="flex items-center gap-2 py-2 text-[10px] font-black uppercase data-[state=active]:bg-blue-600"
               >
-                <VStack align="stretch" gap={2}>
-                  <HStack justify="space-between" fontSize="sm">
-                    <Text color="gray.400">全1</Text>
-                    <Text fontWeight="bold" color="white">
-                      {song.wrScore ?? 0}
-                    </Text>
-                  </HStack>
-                  <HStack justify="space-between" fontSize="sm">
-                    <Text color="gray.400">皆伝平均</Text>
-                    <Text fontWeight="bold" color="white">
-                      {song.kaidenAvg ?? 0}
-                    </Text>
-                  </HStack>
-                  <Separator opacity={0.1} my={1} />
-                  <HStack justify="space-between" fontSize="sm">
-                    <Text color="gray.400">ランプ状態</Text>
-                    <Badge colorScheme="yellow">
+                <LineChart className="h-3.5 w-3.5" /> STATISTICS
+              </TabsTrigger>
+              <TabsTrigger
+                value="history"
+                className="flex items-center gap-2 py-2 text-[10px] font-black uppercase data-[state=active]:bg-blue-600"
+              >
+                <LucideHistory className="h-3.5 w-3.5" /> HISTORY
+              </TabsTrigger>
+              <TabsTrigger
+                value="rivals"
+                className="flex items-center gap-2 py-2 text-[10px] font-black uppercase data-[state=active]:bg-blue-600"
+              >
+                <Users className="h-3.5 w-3.5" /> RIVALS
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="stats" className="mt-0 outline-none">
+              <BPIChart data={chartData} maxScore={maxScore} song={song} />
+
+              <div className="mt-6 rounded-xl border border-white/5 bg-white/5 p-4">
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-500 uppercase">
+                      World Record
+                    </span>
+                    <span className="font-mono text-sm font-black text-white">
+                      {song.wrScore?.toLocaleString() ?? 0}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-500 uppercase">
+                      Kaiden Average
+                    </span>
+                    <span className="font-mono text-sm font-black text-white">
+                      {song.kaidenAvg?.toLocaleString() ?? 0}
+                    </span>
+                  </div>
+                  <Separator className="bg-white/5 my-1" />
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-500 uppercase">
+                      Clear Lamp
+                    </span>
+                    <Badge className="bg-yellow-600 hover:bg-yellow-600 text-black font-black text-[10px] border-none px-2 h-5">
                       {song.clearState || "NO PLAY"}
                     </Badge>
-                  </HStack>
-                  <HStack justify="space-between" fontSize="sm">
-                    <Text color="gray.400">ミスカウント</Text>
-                    <Text fontWeight="bold" color="red.400">
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-500 uppercase">
+                      Miss Count
+                    </span>
+                    <span className="font-mono text-sm font-black text-red-500">
                       {song.missCount ?? "-"}
-                    </Text>
-                  </HStack>
-                </VStack>
-              </Box>
-            </Tabs.Content>
-            <Tabs.Content value="history">
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="history" className="mt-0 outline-none">
               <SongHistoryTab songId={song.songId} />
-            </Tabs.Content>
-            <Tabs.Content value="rivals">
+            </TabsContent>
+
+            <TabsContent value="rivals" className="mt-0 outline-none">
               <RivalsRanking song={song} />
-            </Tabs.Content>
-          </Tabs.Root>
-        </DialogBody>
+            </TabsContent>
+          </Tabs>
+        </div>
       </DialogContent>
-    </DialogRoot>
+    </Dialog>
   );
 };

@@ -3,13 +3,11 @@ import { useUser } from "@/contexts/users/UserContext";
 import { DashboardLayout } from "@/components/partials/Main";
 import { PageHeader, PageContainer } from "@/components/partials/Header";
 import { Meta } from "@/components/partials/Head";
-import { Box } from "@chakra-ui/react";
 import { UserProfileLayout } from "@/components/partials/Profile/Layout/layout";
 import { AAATableContent } from "@/components/partials/Metrics/AAATable/content";
 import { latestVersion } from "@/constants/latestVersion";
-import { useStaticProfile } from "@/contexts/profile/ProfileContext";
 import { ProfileMeta } from "@/components/partials/Profile/Meta/ui";
-import { DashCard } from "@/components/ui/chakra/dashcard";
+import { DashCard } from "@/components/ui/dashcard";
 
 export default function UserAAATablePage() {
   const router = useRouter();

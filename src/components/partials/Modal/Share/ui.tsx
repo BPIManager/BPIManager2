@@ -1,18 +1,15 @@
-import { useState } from "react";
-import { Button, VStack, Stack, Text, Box, Badge } from "@chakra-ui/react";
-import { Radio, RadioGroup } from "@/components/ui/chakra/radio";
 import {
-  DialogRoot,
+  Dialog,
   DialogContent,
   DialogHeader,
-  DialogBody,
   DialogTitle,
   DialogFooter,
-  DialogCloseTrigger,
-  DialogActionTrigger,
-  DialogBackdrop,
-} from "@/components/ui/chakra/dialog";
-import { toaster } from "@/components/ui/chakra/toaster";
+} from "@/components/ui/dialog";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Loader } from "lucide-react";
 
 interface ShareModalProps {
   isOpen: boolean;
@@ -35,13 +32,13 @@ interface ShareModalProps {
 export const ShareResultModal = ({
   isOpen,
   onClose,
-  elements,
   shareData,
   onShare,
   isSharing,
   handleTabChange,
+  elements,
 }: ShareModalProps) => {
-  const [shareType, setShareType] = useState<string>("summary");
+  const [shareType, setShareType] = useState("summary");
 
   const handleExecute = async () => {
     const target =
@@ -50,111 +47,94 @@ export const ShareResultModal = ({
         : shareType === "ranking"
           ? elements.ranking
           : elements.list;
-
-    if (!target) return null;
-
-    const text = `BPIM2に新しいスコアを記録しました!\n更新件数:${shareData.updateCount}件\n\n総合BPI: ${shareData.bpi.toFixed(2)} (${shareData.diff >= 0 ? "+" : ""}${shareData.diff.toFixed(2)})\n推定順位: ${shareData.rank.toLocaleString()}位 #BPIM2 #IIDX\n${window.location.href}`;
-
-    const captureWidth = shareType === "summary" ? 600 : 500;
-
-    const success = await onShare(target, text, captureWidth);
-    if (success) onClose();
+    if (!target) return;
+    const text = `BPIM2にスコアを記録!\n総合BPI: ${shareData.bpi.toFixed(2)} (#BPIM2)\n${window.location.href}`;
+    if (await onShare(target, text)) onClose();
   };
 
   return (
-    <DialogRoot
-      open={isOpen}
-      onOpenChange={(e) => !e.open && onClose()}
-      placement={"center"}
-      size="sm"
-    >
-      <DialogBackdrop backdropFilter={"blur(10px)"} />
-      <DialogContent
-        bg="#161b22"
-        color="white"
-        borderRadius="2xl"
-        mt={{ mdDown: 2, md: 0 }}
-        mx={2}
-        p={4}
-      >
-        <DialogHeader
-          fontWeight="bold"
-          pb={4}
-          borderBottomWidth="1px"
-          borderColor="whiteAlpha.100"
-        >
-          画像をシェア
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-sm border-white/10 bg-slate-900 text-white shadow-2xl rounded-2xl">
+        <DialogHeader className="border-b border-white/5 pb-4">
+          <DialogTitle className="text-lg font-bold">画像をシェア</DialogTitle>
         </DialogHeader>
-        <DialogBody>
-          <Text color="gray.200" pb={4} fontSize={"xs"}>
-            Twitterでシェア出来る形で画像を書き出します。(他の人があなたのスコアログを閲覧できるURLが添付されます)
-            <br />
-            画像として出力する対象を選択してください。
-          </Text>
-          <VStack align="start" gap={6}>
-            <RadioGroup
-              value={shareType}
-              onValueChange={(e) => {
-                setShareType(e.value ?? "summary");
-                if (e.value === "list") {
-                  handleTabChange({ value: "songs" });
-                } else {
-                  handleTabChange({ value: "summary" });
-                }
-              }}
-              colorPalette="blue"
-            >
-              <Stack gap={4}>
-                <Radio value="summary">
-                  <VStack align="start" gap={0}>
-                    <Text fontSize="sm">サマリー (総合BPI・順位・分布)</Text>
-                    <Text fontSize="xs" color="gray.400">
-                      含まれる情報
-                      <br />
-                      統計情報(総合BPI・推定順位・DJRANK分布・BPI分布)
-                    </Text>
-                  </VStack>
-                </Radio>
-                <Radio value="ranking">
-                  <VStack align="start" gap={0}>
-                    <Text fontSize="sm">ランキング</Text>
-                    <Text fontSize="xs" color="gray.400">
-                      含まれる情報
-                      <br />
-                      今回BPIが伸びた曲/トップBPIランキング
-                    </Text>
-                  </VStack>
-                </Radio>
-                <Radio value="list">
-                  <VStack align="start" gap={0}>
-                    <Text fontSize="sm">楽曲リスト</Text>
-                    <Text fontSize="xs" color="gray.400">
-                      含まれる情報
-                      <br />
-                      更新した楽曲リスト
-                    </Text>
-                  </VStack>
-                </Radio>
-              </Stack>
-            </RadioGroup>
-          </VStack>
-        </DialogBody>
-        <DialogFooter gap={3} mt={4}>
-          <DialogActionTrigger asChild>
-            <Button variant="ghost" disabled={isSharing}>
-              キャンセル
-            </Button>
-          </DialogActionTrigger>
-          <Button
-            colorPalette="blue"
-            loading={isSharing}
-            onClick={handleExecute}
-            px={8}
+
+        <div className="py-4 flex flex-col gap-4">
+          <p className="text-[11px] leading-relaxed text-slate-400">
+            出力対象を選択してください。Twitter用の画像として書き出し、クリップボードにコピーまたは共有ダイアログを開きます。
+          </p>
+
+          <RadioGroup
+            value={shareType}
+            onValueChange={(val) => {
+              setShareType(val);
+              handleTabChange({ value: val === "list" ? "songs" : "summary" });
+            }}
+            className="flex flex-col gap-4"
           >
-            {isSharing ? "画像生成中..." : "シェアする"}
+            {[
+              {
+                id: "summary",
+                label: "サマリー",
+                desc: "総合BPI・順位・各種分布グラフ",
+              },
+              {
+                id: "ranking",
+                label: "ランキング",
+                desc: "BPIが伸びた曲 / TOP BPIリスト",
+              },
+              {
+                id: "list",
+                label: "楽曲リスト",
+                desc: "今回更新した全楽曲のリスト",
+              },
+            ].map((opt) => (
+              <div
+                key={opt.id}
+                className="flex items-start gap-3 space-x-2 rounded-lg border border-white/5 bg-white/5 p-3 transition-colors hover:bg-white/10"
+              >
+                <RadioGroupItem
+                  value={opt.id}
+                  id={opt.id}
+                  className="mt-1 border-blue-500 text-blue-500"
+                />
+                <Label
+                  htmlFor={opt.id}
+                  className="flex flex-col gap-1 cursor-pointer"
+                >
+                  <span className="text-sm font-bold text-white">
+                    {opt.label}
+                  </span>
+                  <span className="text-[10px] text-slate-500 leading-tight">
+                    {opt.desc}
+                  </span>
+                </Label>
+              </div>
+            ))}
+          </RadioGroup>
+        </div>
+
+        <DialogFooter className="flex gap-2">
+          <Button
+            variant="ghost"
+            onClick={onClose}
+            disabled={isSharing}
+            className="flex-1 text-slate-400"
+          >
+            キャンセル
+          </Button>
+          <Button
+            disabled={isSharing}
+            onClick={handleExecute}
+            className="flex-1 bg-blue-600 font-bold hover:bg-blue-500"
+          >
+            {isSharing ? (
+              <Loader className="mr-2 h-4 w-4 animate-spin" />
+            ) : null}
+            {isSharing ? "生成中..." : "シェアする"}
           </Button>
         </DialogFooter>
       </DialogContent>
-    </DialogRoot>
+    </Dialog>
   );
 };

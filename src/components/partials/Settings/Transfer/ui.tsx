@@ -1,27 +1,20 @@
-import {
-  Box,
-  VStack,
-  Text,
-  Button,
-  Stack,
-  Icon,
-  HStack,
-  Spinner,
-  Badge,
-} from "@chakra-ui/react";
-import { LuRefreshCw, LuDatabase } from "react-icons/lu";
-import { useUser } from "@/contexts/users/UserContext";
-import { ActionConfirmDialog } from "../../Modal/Confirmation";
+"use client";
+
 import { useState } from "react";
+import { LuRefreshCw, LuDatabase, LuLoader } from "react-icons/lu";
+import { useUser } from "@/contexts/users/UserContext";
 import { useFirestoreDataCheck } from "@/hooks/firestore/checkData";
 import { versionTitles } from "@/constants/versions";
-import { toaster } from "@/components/ui/chakra/toaster";
 import { API_PREFIX } from "@/constants/apiEndpoints";
+import { ActionConfirmDialog } from "../../Modal/Confirmation";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 
 export default function TransferUi() {
   const { fbUser } = useUser();
-  const [isConfirmOpen, setIsConfirmOpen] = useState<boolean>(false);
-  const [isSyncing, setIsSyncing] = useState<boolean>(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
   const { checkData, foundVersions, isChecking } = useFirestoreDataCheck(
     fbUser?.uid,
   );
@@ -33,7 +26,6 @@ export default function TransferUi() {
 
   const handleSyncFirestore = async () => {
     if (!fbUser?.uid) return;
-
     setIsSyncing(true);
     try {
       const idToken = await fbUser.getIdToken(true);
@@ -48,138 +40,97 @@ export default function TransferUi() {
         },
       );
       if (!response.ok) throw new Error("転送失敗");
-
-      toaster.create({
-        title: "完了",
-        description: "データの移行が完了しました。",
-        duration: 8000,
-        closable: true,
-        type: "success",
-      });
+      toast.success("データの移行が完了しました。");
       setIsConfirmOpen(false);
     } catch (e) {
-      toaster.create({
-        title: "完了しませんでした",
-        description: "エラーが発生したため処理が完了しませんでした",
-        duration: 8000,
-        closable: true,
-        type: "error",
-      });
+      toast.error("エラーが発生したため処理が完了しませんでした");
     } finally {
       setIsSyncing(false);
     }
   };
 
   return (
-    <Box
-      mt={4}
-      p={6}
-      bg="gray.900"
-      borderRadius="xl"
-      borderWidth="1px"
-      borderColor="whiteAlpha.100"
-    >
-      <Stack
-        direction={{ base: "column", md: "row" }}
-        justify="space-between"
-        align={{ base: "start", md: "center" }}
-        gap={6}
-      >
-        <VStack align="start" gap={1}>
-          <HStack color="blue.400">
-            <Icon as={LuDatabase} />
-            <Text fontWeight="bold">データ移行</Text>
-          </HStack>
-          <Text fontSize="sm" color="gray.400">
-            BPIManagerで保存されたスコアをBPIM2へ引き継ぎます。
-          </Text>
-          <Text fontSize="2xs" color="orange.300">
+    <div className="mt-4 flex flex-col gap-6 rounded-xl border border-white/10 bg-slate-900 p-6 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-1">
+        <div className="flex items-center gap-2 text-blue-400">
+          <LuDatabase className="h-4 w-4" />
+          <span className="font-bold">データ移行</span>
+        </div>
+        <p className="text-sm text-slate-400">
+          BPIManagerで保存されたスコアをBPIM2へ引き継ぎます。
+        </p>
+        <div className="mt-1 flex flex-col gap-0.5 text-[10px] text-orange-300 leading-relaxed">
+          <span>
+            ※
             BPIM2で登録されたデータをすべて削除し、BPIManagerのスコアに置き換えます。
-            <br />
-            操作を取り消すことはできません。
-          </Text>
-        </VStack>
+          </span>
+          <span>※ 操作を取り消すことはできません。</span>
+        </div>
+      </div>
 
-        <Button
-          px={2}
-          onClick={() => handleOpenConfirm()}
-          loading={isSyncing}
-          loadingText="同期中..."
-          size="md"
-          w={{ base: "full", md: "auto" }}
-          variant="outline"
-        >
-          <LuRefreshCw />
-          同期
-        </Button>
-      </Stack>
+      <Button
+        variant="outline"
+        onClick={handleOpenConfirm}
+        disabled={isSyncing}
+        className="w-full md:w-auto min-w-[100px] gap-2"
+      >
+        {isSyncing ? <LuLoader className="animate-spin" /> : <LuRefreshCw />}
+        {isSyncing ? "同期中..." : "同期"}
+      </Button>
 
       <ActionConfirmDialog
         isOpen={isConfirmOpen}
         onClose={() => setIsConfirmOpen(false)}
         onConfirm={handleSyncFirestore}
         title="データの同期と置き換え"
-        isDestructive={true}
+        isDestructive
         isLoading={isSyncing}
         description={
-          <VStack align="stretch" gap={4}>
-            <Text fontSize="sm">
+          <div className="flex flex-col gap-4 text-left">
+            <p className="text-sm text-slate-300">
               BPIManagerで保存されたデータをBPIM2へ移行します。
-            </Text>
+            </p>
 
-            <Box
-              p={3}
-              bg="whiteAlpha.50"
-              borderRadius="md"
-              borderWidth="1px"
-              borderColor="whiteAlpha.100"
-            >
-              <Text fontSize="xs" fontWeight="bold" mb={2} color="gray.400">
+            <div className="rounded-md border border-white/10 bg-white/5 p-3">
+              <span className="mb-2 block text-xs font-bold text-slate-400">
                 移行可能なデータ:
-              </Text>
-
+              </span>
               {isChecking ? (
-                <HStack gap={2}>
-                  <Spinner size="xs" />
-                  <Text fontSize="xs">スキャン中...</Text>
-                </HStack>
+                <div className="flex items-center gap-2 text-xs text-slate-300">
+                  <LuLoader className="h-3 w-3 animate-spin" />
+                  <span>スキャン中...</span>
+                </div>
               ) : foundVersions.length > 0 ? (
-                <HStack gap={2} wrap="wrap">
+                <div className="flex flex-wrap gap-2">
                   {foundVersions.map((v) => (
                     <Badge
                       key={v}
-                      colorPalette="blue"
-                      variant="subtle"
-                      px={2}
-                      py={0.5}
+                      variant="secondary"
+                      className="bg-blue-500/10 text-blue-400 hover:bg-blue-500/20"
                     >
                       {versionTitles.find((item) => item.num === String(v))
                         ?.title || `Ver.${v}`}
                     </Badge>
                   ))}
-                </HStack>
+                </div>
               ) : (
-                <Text fontSize="xs" color="red.400">
-                  同期可能なデータが見つからないため、続行できません。
-                </Text>
+                <p className="text-xs text-red-400 font-bold">
+                  同期可能なデータが見つかりません。
+                </p>
               )}
-            </Box>
+            </div>
 
-            <Text fontSize="xs" color="orange.300">
-              ※同期を実行すると現在のBPIM2のデータは削除されます。
-              <br />
-              BPIManagerのデータは引き続きご利用いただけます。
-            </Text>
-
-            <Text fontSize="xs" color="red.300">
-              処理は最大2~3分かかることがあります。
-              <br />
-              画面を閉じたり移動しないでそのままお待ち下さい。
-            </Text>
-          </VStack>
+            <p className="text-[11px] text-orange-400 font-bold leading-tight">
+              ※ 同期を実行すると現在のBPIM2のデータは上書き削除されます。
+            </p>
+            <p className="text-[11px] text-red-400 leading-tight">
+              ※
+              処理には最大2~3分かかることがあります。画面を閉じずにお待ちください。
+            </p>
+          </div>
         }
         confirmLabel={foundVersions.length > 0 ? "同期" : "続行できません"}
       />
-    </Box>
+    </div>
   );
 }

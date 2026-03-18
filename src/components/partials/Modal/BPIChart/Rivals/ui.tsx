@@ -1,19 +1,21 @@
+"use client";
+
+import { useMemo } from "react";
+import { useRouter } from "next/router";
+import { LuLoader } from "react-icons/lu";
 import { useUser } from "@/contexts/users/UserContext";
 import { useRivalScores } from "@/hooks/social/useRivalScores";
 import { SongWithScore } from "@/types/songs/withScore";
 import {
   Table,
-  Badge,
-  Avatar,
-  HStack,
-  Text,
-  Box,
-  Spinner,
-  Stack,
-  Center,
-} from "@chakra-ui/react";
-import { useRouter } from "next/router";
-import { useMemo } from "react";
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
 
 interface RivalRankingProps {
   version: string;
@@ -31,113 +33,124 @@ export const RivalRankingBody = ({
   const { data, isLoading } = useRivalScores(songId, version);
 
   const ranking = useMemo(() => {
-    if (!data?.rivals) return myScore ? [myScore] : [];
+    if (!data?.rivals) return myScore ? [{ ...myScore, isSelf: true }] : [];
 
     const combined = [...data.rivals];
     if (myScore && !combined.some((r) => r.userId === fbUser?.uid)) {
       combined.push({ ...myScore, isSelf: true });
     }
 
-    return combined.sort((a, b) => b.exScore - a.exScore);
+    return combined.sort((a, b) => (b.exScore || 0) - (a.exScore || 0));
   }, [data, myScore, fbUser?.uid]);
 
-  if (isLoading)
+  if (isLoading) {
     return (
-      <Center my={4}>
-        <Spinner color="teal.500" />
-      </Center>
+      <div className="flex justify-center py-8">
+        <LuLoader className="h-8 w-8 animate-spin text-teal-500" />
+      </div>
     );
+  }
 
   return (
-    <Box p={4}>
-      <Table.Root size="sm" variant="line">
-        <Table.Header bg="bg.muted">
-          <Table.Row>
-            <Table.ColumnHeader p={4} w="50px">
+    <div className="w-full overflow-hidden rounded-md border border-white/10 bg-black/20">
+      <Table>
+        <TableHeader className="bg-white/5">
+          <TableRow className="hover:bg-transparent border-white/10">
+            <TableHead className="w-[60px] text-[10px] font-bold uppercase tracking-wider">
               Rank
-            </Table.ColumnHeader>
-            <Table.ColumnHeader p={4}>Player</Table.ColumnHeader>
-            <Table.ColumnHeader p={4} textAlign="end">
+            </TableHead>
+            <TableHead className="text-[10px] font-bold uppercase tracking-wider">
+              Player
+            </TableHead>
+            <TableHead className="text-right text-[10px] font-bold uppercase tracking-wider">
               EX Score
-            </Table.ColumnHeader>
-            <Table.ColumnHeader p={4} textAlign="end">
+            </TableHead>
+            <TableHead className="text-right text-[10px] font-bold uppercase tracking-wider">
               BPI
-            </Table.ColumnHeader>
-            <Table.ColumnHeader p={4} textAlign="end">
+            </TableHead>
+            <TableHead className="text-right text-[10px] font-bold uppercase tracking-wider">
               Diff
-            </Table.ColumnHeader>
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {ranking.map((row, index) => {
-            const diff = myScore ? row.exScore - (myScore.exScore || 0) : 0;
-            const handleRowClick = (userId: string, isSelf: boolean) => {
-              if (isSelf) return;
-              router.push(`/rivals/${userId}`);
-            };
+            const isSelf = !!row.isSelf;
+            const diff = myScore
+              ? (row.exScore || 0) - (myScore.exScore || 0)
+              : 0;
+
             return (
-              <Table.Row
+              <TableRow
                 key={row.userId}
-                onClick={() => handleRowClick(row.userId, !!row.isSelf)}
-                bg={row.isSelf ? "blue.900" : "transparent"}
+                onClick={() => !isSelf && router.push(`/rivals/${row.userId}`)}
+                className={cn(
+                  "border-white/5 transition-colors cursor-pointer",
+                  isSelf
+                    ? "bg-blue-900/30 hover:bg-blue-900/40"
+                    : "hover:bg-white/5",
+                )}
               >
-                <Table.Cell p={2}>
-                  <Text
-                    fontWeight="bold"
-                    color={index < 3 ? "yellow.500" : "fg.muted"}
+                <TableCell className="py-3">
+                  <span
+                    className={cn(
+                      "font-mono font-bold text-sm",
+                      index < 3 ? "text-yellow-500" : "text-slate-500",
+                    )}
                   >
                     #{index + 1}
-                  </Text>
-                </Table.Cell>
-                <Table.Cell p={2}>
-                  <HStack gap="3">
-                    <Avatar.Root size="xs">
-                      <Avatar.Image src={row.profileImage ?? ""} />
-                      <Avatar.Fallback name={row.userName} />
-                    </Avatar.Root>
-                    <Stack gap="0">
-                      <Text
-                        fontWeight={row.isSelf ? "bold" : "medium"}
-                        fontSize="sm"
+                  </span>
+                </TableCell>
+                <TableCell className="py-3">
+                  <div className="flex items-center gap-3">
+                    <Avatar className="h-7 w-7 border border-white/10">
+                      <AvatarImage src={row.profileImage ?? ""} />
+                      <AvatarFallback className="text-[10px]">
+                        {row.userName?.slice(0, 2)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col">
+                      <span
+                        className={cn(
+                          "text-sm tracking-tight",
+                          isSelf
+                            ? "font-bold text-white"
+                            : "font-medium text-slate-300",
+                        )}
                       >
                         {row.userName}
-                        {row.isSelf && <>あなた</>}
-                      </Text>
-                    </Stack>
-                  </HStack>
-                </Table.Cell>
-                <Table.Cell
-                  p={2}
-                  textAlign="end"
-                  fontFamily="mono"
-                  fontWeight="bold"
-                >
-                  {row.exScore}
-                </Table.Cell>
-                <Table.Cell
-                  p={2}
-                  textAlign="end"
-                  fontFamily="mono"
-                  fontSize="xs"
-                >
-                  {row.bpi.toFixed(2)}
-                </Table.Cell>
-                <Table.Cell
-                  p={2}
-                  textAlign="end"
-                  fontFamily="mono"
-                  fontSize="xs"
-                  color={
-                    diff > 0 ? "red.500" : diff < 0 ? "green.500" : "fg.muted"
-                  }
+                        {isSelf && (
+                          <span className="ml-1 text-[10px] text-blue-400">
+                            (あなた)
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell className="text-right font-mono font-bold text-white py-3">
+                  {row.exScore?.toLocaleString() ?? 0}
+                </TableCell>
+                <TableCell className="text-right font-mono text-xs text-slate-400 py-3">
+                  {row.bpi?.toFixed(2) ?? "-"}
+                </TableCell>
+                <TableCell
+                  className={cn(
+                    "text-right font-mono text-xs font-bold py-3",
+                    diff > 0
+                      ? "text-red-400"
+                      : diff < 0
+                        ? "text-green-400"
+                        : "text-slate-600",
+                  )}
                 >
                   {diff > 0 ? `+${diff}` : diff === 0 ? "-" : diff}
-                </Table.Cell>
-              </Table.Row>
+                </TableCell>
+              </TableRow>
             );
           })}
-        </Table.Body>
-      </Table.Root>
-    </Box>
+        </TableBody>
+      </Table>
+    </div>
   );
 };

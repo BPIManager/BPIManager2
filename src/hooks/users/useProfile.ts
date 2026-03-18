@@ -3,8 +3,8 @@ import { fetcher } from "@/utils/common/fetch";
 import { useUser } from "@/contexts/users/UserContext";
 import { useFollow } from "./useFollow";
 import { UserProfileResponse } from "@/types/users/profile";
-import { toaster } from "@/components/ui/chakra/toaster";
 import { API_PREFIX } from "@/constants/apiEndpoints";
+import { toast } from "sonner";
 
 export const useProfile = (userId: string | undefined) => {
   const { fbUser, isLoading: fbLoading } = useUser();
@@ -49,11 +49,7 @@ export const useProfile = (userId: string | undefined) => {
         },
       );
     } catch (e) {
-      toaster.create({
-        title: "リクエストが失敗しました",
-        description: "操作が完了しませんでした",
-        type: "error",
-      });
+      toast.error("操作が完了しませんでした");
     }
   };
 

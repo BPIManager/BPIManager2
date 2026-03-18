@@ -1,17 +1,11 @@
-import {
-  Box,
-  HStack,
-  Stack,
-  Text,
-  BoxProps,
-  HTMLChakraProps,
-  Link,
-} from "@chakra-ui/react";
-import { ChevronRight, LucideIcon } from "lucide-react";
+"use client";
+
 import React from "react";
 import NextLink from "next/link";
+import { ChevronRight, type LucideIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-interface MenuItemProps extends HTMLChakraProps<"a"> {
+interface MenuItemProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
   icon: LucideIcon;
   title: string;
   subtitle?: string | React.ReactNode;
@@ -24,52 +18,45 @@ export const ReusableMenuItem = ({
   icon: IconComponent,
   title,
   subtitle,
-  iconColor = "blue.500",
+  iconColor = "text-blue-500",
   href,
   isExternal,
+  className,
   ...props
 }: MenuItemProps) => {
+  const Container = href ? (isExternal ? "a" : NextLink) : "button";
+
   return (
-    <Link
-      width="full"
-      p="4"
-      as={!isExternal ? NextLink : href ? "a" : "button"}
-      href={href}
+    // @ts-ignore
+    <Container
+      href={href || "#"}
       target={isExternal ? "_blank" : undefined}
       rel={isExternal ? "noopener noreferrer" : undefined}
-      display="block"
-      borderRadius="lg"
-      transition="all 0.2s"
-      borderColor="gray.800"
-      borderWidth="thin"
-      _hover={{ bg: "gray.800", cursor: "pointer", textDecoration: "none" }}
-      data-group
+      className={cn(
+        "group block w-full rounded-xl border border-white/5 bg-slate-900/40 p-4 transition-all duration-200",
+        "hover:border-white/20 hover:bg-slate-800/60 hover:no-underline",
+        className,
+      )}
       {...props}
     >
-      <HStack gap="4" width="full">
-        <Box color={iconColor}>
+      <div className="flex w-full items-center gap-4">
+        <div className={cn("shrink-0", iconColor)}>
           <IconComponent size={24} />
-        </Box>
+        </div>
 
-        <Stack gap="0" flex="1" textAlign="left">
-          <Text fontWeight="semibold" fontSize="md" color="fg">
+        <div className="flex flex-1 flex-col items-start gap-0 text-left">
+          <span className="text-base font-bold tracking-tight text-white">
             {title}
-          </Text>
+          </span>
           {subtitle && (
-            <Text fontSize="xs" color="fg.muted">
-              {subtitle}
-            </Text>
+            <span className="text-xs text-slate-500">{subtitle}</span>
           )}
-        </Stack>
+        </div>
 
-        <Box
-          transition="transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
-          _groupHover={{ transform: "translateX(4px)" }}
-          color="fg.subtle"
-        >
+        <div className="text-slate-600 transition-transform duration-300 ease-out group-hover:translate-x-1 group-hover:text-slate-300">
           <ChevronRight size={20} />
-        </Box>
-      </HStack>
-    </Link>
+        </div>
+      </div>
+    </Container>
   );
 };

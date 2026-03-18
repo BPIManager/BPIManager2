@@ -6,7 +6,7 @@ import { RadarCategory } from "@/types/stats/radar";
 import { useMemo, useState } from "react";
 import { RadarCategorySongsDialog } from "./dialog";
 import { getBpiColorStyle } from "@/constants/bpiColor";
-import { DashCard } from "@/components/ui/chakra/dashcard";
+import { DashCard } from "@/components/ui/dashcard";
 import { cn } from "@/lib/utils";
 
 interface RadarSectionProps {

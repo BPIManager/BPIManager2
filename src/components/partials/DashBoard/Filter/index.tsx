@@ -27,7 +27,7 @@ export const DashBoardFilter = () => {
               <SelectValue placeholder="Select version" />
             </SelectTrigger>
             <SelectContent className="border-white/10 bg-gray-900 text-white">
-              {versionsNonDisabledCollection.items.map((v) => (
+              {versionsNonDisabledCollection.map((v) => (
                 <SelectItem key={v.value} value={v.value} className="text-xs">
                   {v.label}
                 </SelectItem>

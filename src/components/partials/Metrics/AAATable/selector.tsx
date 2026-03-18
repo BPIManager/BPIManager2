@@ -1,8 +1,17 @@
-import { Box, Stack, VStack, HStack, Text } from "@chakra-ui/react";
-import { Radio, RadioGroup } from "@/components/ui/chakra/radio";
-import { FormSelect } from "@/components/ui/chakra/select";
-import { versionsNonDisabledCollection } from "@/constants/versions";
+"use client";
+
 import { GroupingMode } from "@/hooks/metrics/useAAATable";
+import { versionsNonDisabledCollection } from "@/constants/versions";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 
 interface Props {
   version: string;
@@ -25,18 +34,23 @@ export const AAATableFilter = ({
   groupingMode,
   onGroupingModeChange,
 }: Props) => {
-  const filterSections = [
+  const sections = [
     {
       label: "バージョン",
-      minW: "160px",
+      className: "min-w-full md:min-w-[160px]",
       render: () => (
-        <FormSelect
-          collection={versionsNonDisabledCollection}
-          value={version}
-          onValueChange={(v) => onVersionChange(v as string)}
-          size="xs"
-          variant="subtle"
-        />
+        <Select value={version} onValueChange={onVersionChange}>
+          <SelectTrigger className="h-8 border-white/10 bg-black/20 text-xs text-slate-200 focus:ring-blue-500">
+            <SelectValue placeholder="Version" />
+          </SelectTrigger>
+          <SelectContent className="border-white/10 bg-slate-900">
+            {versionsNonDisabledCollection.map((v) => (
+              <SelectItem key={v.value} value={v.value} className="text-xs">
+                {v.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       ),
     },
     {
@@ -44,12 +58,24 @@ export const AAATableFilter = ({
       render: () => (
         <RadioGroup
           value={level.toString()}
-          onValueChange={(e) => onLevelChange(Number(e.value))}
+          onValueChange={(v) => onLevelChange(Number(v))}
+          className="flex h-8 items-center gap-4"
         >
-          <HStack gap={4}>
-            <Radio value="11">☆11</Radio>
-            <Radio value="12">☆12</Radio>
-          </HStack>
+          {[11, 12].map((lv) => (
+            <div key={lv} className="flex items-center gap-1.5">
+              <RadioGroupItem
+                value={lv.toString()}
+                id={`level-${lv}`}
+                className="border-blue-500 text-blue-500"
+              />
+              <Label
+                htmlFor={`level-${lv}`}
+                className="text-xs font-bold text-slate-200 cursor-pointer"
+              >
+                ☆{lv}
+              </Label>
+            </div>
+          ))}
         </RadioGroup>
       ),
     },
@@ -58,12 +84,27 @@ export const AAATableFilter = ({
       render: () => (
         <RadioGroup
           value={goal}
-          onValueChange={(e) => onGoalChange(e.value as any)}
+          onValueChange={(v) => onGoalChange(v as any)}
+          className="flex h-8 items-center gap-4"
         >
-          <HStack gap={4}>
-            <Radio value="aaa">AAA</Radio>
-            <Radio value="maxMinus">MAX-</Radio>
-          </HStack>
+          {[
+            { id: "aaa", label: "AAA" },
+            { id: "maxMinus", label: "MAX-" },
+          ].map((g) => (
+            <div key={g.id} className="flex items-center gap-1.5">
+              <RadioGroupItem
+                value={g.id}
+                id={`goal-${g.id}`}
+                className="border-blue-500 text-blue-500"
+              />
+              <Label
+                htmlFor={`goal-${g.id}`}
+                className="text-xs font-bold text-slate-200 cursor-pointer"
+              >
+                {g.label}
+              </Label>
+            </div>
+          ))}
         </RadioGroup>
       ),
     },
@@ -72,50 +113,47 @@ export const AAATableFilter = ({
       render: () => (
         <RadioGroup
           value={groupingMode}
-          onValueChange={(e) => onGroupingModeChange(e.value as any)}
+          onValueChange={(v) => onGroupingModeChange(v as any)}
+          className="flex h-8 items-center gap-4"
         >
-          <HStack gap={4}>
-            <Radio value="target">目標</Radio>
-            <Radio value="self">マイスコア</Radio>
-          </HStack>
+          {[
+            { id: "target", label: "目標" },
+            { id: "self", label: "マイスコア" },
+          ].map((m) => (
+            <div key={m.id} className="flex items-center gap-1.5">
+              <RadioGroupItem
+                value={m.id}
+                id={`mode-${m.id}`}
+                className="border-blue-500 text-blue-500"
+              />
+              <Label
+                htmlFor={`mode-${m.id}`}
+                className="text-xs font-bold text-slate-200 cursor-pointer"
+              >
+                {m.label}
+              </Label>
+            </div>
+          ))}
         </RadioGroup>
       ),
     },
   ];
 
   return (
-    <Box
-      p={4}
-      bg="gray.900"
-      borderRadius="lg"
-      borderWidth="1px"
-      borderColor="whiteAlpha.100"
-    >
-      <Stack
-        direction={{ base: "column", md: "row" }}
-        gap={{ base: 2, md: 4 }}
-        align="start"
-        flexWrap="wrap"
-      >
-        {filterSections.map((section) => (
-          <VStack
+    <div className="rounded-xl border border-white/10 bg-slate-900/40 p-4 shadow-sm backdrop-blur-md">
+      <div className="flex flex-col flex-wrap gap-4 md:flex-row md:items-start md:gap-x-10 md:gap-y-6">
+        {sections.map((section) => (
+          <div
             key={section.label}
-            align="start"
-            gap={1.5}
-            minW={section.minW || "auto"}
+            className={cn("flex flex-col gap-2", section.className)}
           >
-            <Text
-              fontSize="xs"
-              fontWeight="bold"
-              color="gray.500"
-              letterSpacing="wider"
-            >
+            <span className="px-1 text-[10px] font-black tracking-widest text-slate-500 uppercase">
               {section.label}
-            </Text>
-            {section.render()}
-          </VStack>
+            </span>
+            <div className="flex items-center">{section.render()}</div>
+          </div>
         ))}
-      </Stack>
-    </Box>
+      </div>
+    </div>
   );
 };

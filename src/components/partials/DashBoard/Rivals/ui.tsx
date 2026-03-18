@@ -5,7 +5,7 @@ import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { RivalComparisonRow } from "./row";
 import { RivalWinLossSummarySkeleton } from "./skeleton";
 import { RivalWinLossSummaryNotFound } from "./nodata";
-import { DashCard } from "@/components/ui/chakra/dashcard";
+import { DashCard } from "@/components/ui/dashcard";
 import { Button } from "@/components/ui/button";
 
 export const RivalWinLossSummary = ({

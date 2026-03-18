@@ -1,18 +1,12 @@
-import {
-  SimpleGrid,
-  Tabs,
-  Spinner,
-  Center,
-  Text,
-  Button,
-  VStack,
-} from "@chakra-ui/react";
+"use client";
+
+import { useRouter } from "next/router";
+import { LuUsers, LuUserCheck, LuLoader } from "react-icons/lu";
 import { UserProfileLayout } from "@/components/partials/Profile/Layout/layout";
 import { useFollowList } from "@/hooks/users/useFollowList";
-import { useRouter } from "next/router";
-import { LuUsers, LuUserCheck } from "react-icons/lu";
 import { UserFollowCard } from "./ui";
-import { DashCard } from "@/components/ui/chakra/dashcard";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 
 export default function FollowPage({
   type,
@@ -21,90 +15,83 @@ export default function FollowPage({
 }) {
   const router = useRouter();
   const userId = router.query.userId as string;
-  const { users, isLoading, isReachingEnd, loadMore, totalCount } =
-    useFollowList(userId, type);
+
+  const { users, isLoading, isReachingEnd, loadMore } = useFollowList(
+    userId,
+    type,
+  );
 
   if (!userId) return null;
 
-  const handleTabChange = (details: { value: string }) => {
-    router.push(`/users/${userId}/${details.value}`, undefined, {
+  const handleTabChange = (value: string) => {
+    router.push(`/users/${userId}/${value}`, undefined, {
       shallow: true,
     });
   };
 
   return (
     <UserProfileLayout userId={userId} currentTab="">
-      <DashCard>
-        <Tabs.Root
-          value={type}
-          onValueChange={handleTabChange}
-          colorPalette="blue"
-          variant="plain"
-        >
-          <Tabs.List
-            bg="whiteAlpha.50"
-            p={1}
-            borderRadius="xl"
-            mb={6}
-            width="full"
-          >
-            <Tabs.Trigger
+      <div className="rounded-2xl border border-white/10 bg-slate-900/40 p-4 md:p-6 shadow-xl backdrop-blur-md">
+        <Tabs value={type} onValueChange={handleTabChange} className="w-full">
+          <TabsList className="mb-6 grid h-auto w-full grid-cols-2 rounded-xl border border-white/5 bg-white/5 p-1">
+            <TabsTrigger
               value="following"
-              gap={2}
-              borderRadius="lg"
-              flex={1}
-              justifyContent={"center"}
+              className="flex items-center justify-center gap-2 py-3 text-xs font-bold transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white"
             >
-              <LuUserCheck size={14} />
+              <LuUserCheck className="h-4 w-4" />
               フォロー
-            </Tabs.Trigger>
-            <Tabs.Trigger
+            </TabsTrigger>
+            <TabsTrigger
               value="followers"
-              gap={2}
-              borderRadius="lg"
-              flex={1}
-              justifyContent={"center"}
+              className="flex items-center justify-center gap-2 py-3 text-xs font-bold transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white"
             >
-              <LuUsers size={14} />
+              <LuUsers className="h-4 w-4" />
               フォロワー
-            </Tabs.Trigger>
-          </Tabs.List>
+            </TabsTrigger>
+          </TabsList>
 
-          <Tabs.Content value={type} p={0}>
+          <TabsContent value={type} className="mt-0 outline-none">
             {users.length === 0 && !isLoading ? (
-              <Center py={10} flexDirection="column" gap={2}>
-                <Text color="gray.500">まだ誰もいません</Text>
-              </Center>
+              <div className="flex flex-col items-center justify-center py-16 gap-2">
+                <p className="text-sm font-medium text-slate-500">
+                  まだ誰もいません
+                </p>
+              </div>
             ) : (
-              <VStack gap={3} align="stretch">
-                <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
+              <div className="flex flex-col gap-6">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   {users.map((user) => (
                     <UserFollowCard key={user.userId} user={user} />
                   ))}
-                </SimpleGrid>
+                </div>
 
                 {!isReachingEnd && (
-                  <Button
-                    onClick={loadMore}
-                    loading={isLoading}
-                    variant="ghost"
-                    color="gray.400"
-                    size="sm"
-                    mt={4}
-                  >
-                    さらに読み込む
-                  </Button>
+                  <div className="flex justify-center pt-4">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={loadMore}
+                      disabled={isLoading}
+                      className="text-slate-400 hover:bg-white/5 hover:text-white"
+                    >
+                      {isLoading ? (
+                        <LuLoader className="mr-2 h-4 w-4 animate-spin" />
+                      ) : null}
+                      さらに読み込む
+                    </Button>
+                  </div>
                 )}
+
                 {isLoading && users.length === 0 && (
-                  <Center py={10}>
-                    <Spinner color="blue.500" />
-                  </Center>
+                  <div className="flex justify-center py-10">
+                    <LuLoader className="h-8 w-8 animate-spin text-blue-500" />
+                  </div>
                 )}
-              </VStack>
+              </div>
             )}
-          </Tabs.Content>
-        </Tabs.Root>
-      </DashCard>
+          </TabsContent>
+        </Tabs>
+      </div>
     </UserProfileLayout>
   );
 }

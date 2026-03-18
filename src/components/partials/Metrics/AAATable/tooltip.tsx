@@ -1,14 +1,9 @@
+"use client";
+
 import { AAATableItem } from "@/hooks/metrics/useAAATable";
-import {
-  Box,
-  Text,
-  VStack,
-  HStack,
-  Separator,
-  Badge,
-  Grid,
-  GridItem,
-} from "@chakra-ui/react";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 
 interface Props {
   item: AAATableItem;
@@ -22,104 +17,115 @@ export const AAATableTooltip = ({ item }: Props) => {
   const TargetSection = ({
     label,
     data,
-    color,
+    colorClass,
   }: {
     label: string;
     data: { exScore: number; targetBpi: number; diff: number };
-    color: string;
+    colorClass: string;
   }) => (
-    <Box>
-      <HStack justify="space-between" mb={1}>
-        <Text fontSize="10px" fontWeight="bold" color={color}>
+    <div className="flex flex-col gap-1">
+      <div className="flex items-center justify-between">
+        <span
+          className={cn(
+            "text-[10px] font-black uppercase tracking-wider",
+            colorClass,
+          )}
+        >
           TARGET: {label}
-        </Text>
+        </span>
         <Badge
-          size="sm"
-          variant="solid"
-          px={1}
-          colorPalette={data.diff >= 0 ? "blue" : "red"}
+          className={cn(
+            "h-4 px-1 text-[10px] font-bold border-none",
+            data.diff >= 0 ? "bg-blue-600 text-white" : "bg-red-600 text-white",
+          )}
         >
           {data.diff >= 0 ? `+${data.diff}` : data.diff}
         </Badge>
-      </HStack>
-      <Grid templateColumns="repeat(2, 1fr)" gap={2} fontSize="xs">
-        <GridItem>
-          <Text color="fg.muted" fontSize="9px">
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        <div className="flex flex-col">
+          <span className="text-[9px] font-bold text-slate-500 uppercase">
             Score
-          </Text>
-          <Text fontWeight="medium">{data.exScore}</Text>
-        </GridItem>
-        <GridItem textAlign="right">
-          <Text color="fg.muted" fontSize="9px">
+          </span>
+          <span className="font-mono text-xs font-bold text-white">
+            {data.exScore}
+          </span>
+        </div>
+        <div className="flex flex-col text-right">
+          <span className="text-[9px] font-bold text-slate-500 uppercase">
             Target BPI
-          </Text>
-          <Text fontWeight="medium">{data.targetBpi.toFixed(2)}</Text>
-        </GridItem>
-      </Grid>
-    </Box>
+          </span>
+          <span className="font-mono text-xs font-bold text-white">
+            {data.targetBpi.toFixed(2)}
+          </span>
+        </div>
+      </div>
+    </div>
   );
 
   return (
-    <VStack align="stretch" gap={3} p={1} minW="240px" color="white">
-      <Box>
-        <Text fontWeight="bold" fontSize="sm" lineHeight="tight">
-          {item.title}[{diffChar}]
-        </Text>
+    <div className="flex min-w-[240px] flex-col gap-3 p-1 text-white">
+      <div>
+        <h4 className="text-sm font-black leading-tight tracking-tight">
+          {item.title}{" "}
+          <span className="text-slate-500 font-mono">[{diffChar}]</span>
+        </h4>
         <Badge
-          size="xs"
           variant="outline"
-          mt={1}
-          color="white"
-          borderColor="whiteAlpha.400"
+          className="mt-1.5 h-4 border-white/20 text-[9px] font-bold text-slate-400"
         >
           Notes: {item.notes}
         </Badge>
-      </Box>
+      </div>
 
-      <Separator borderColor="whiteAlpha.300" />
+      <Separator className="bg-white/10" />
 
-      <Box>
-        <Text fontSize="10px" fontWeight="bold" color="blue.300" mb={2}>
-          YOUR STATUS
-        </Text>
-        <Grid templateColumns="repeat(3, 1fr)" gap={2} textAlign="center">
-          <GridItem>
-            <Text color="fg.muted" fontSize="9px">
+      <div className="flex flex-col gap-2">
+        <span className="text-[10px] font-black tracking-widest text-blue-400 uppercase">
+          Your Status
+        </span>
+        <div className="grid grid-cols-3 gap-2 text-center">
+          <div className="flex flex-col">
+            <span className="text-[9px] font-bold text-slate-500 uppercase">
               Score
-            </Text>
-            <Text fontSize="xs" fontWeight="bold">
+            </span>
+            <span className="font-mono text-xs font-black text-white">
               {item.user.exScore}
-            </Text>
-          </GridItem>
-          <GridItem>
-            <Text color="fg.muted" fontSize="9px">
+            </span>
+          </div>
+          <div className="flex flex-col border-x border-white/5">
+            <span className="text-[9px] font-bold text-slate-500 uppercase">
               Rate
-            </Text>
-            <Text fontSize="xs" fontWeight="bold">
+            </span>
+            <span className="font-mono text-xs font-black text-white">
               {scoreRate}%
-            </Text>
-          </GridItem>
-          <GridItem>
-            <Text color="fg.muted" fontSize="9px">
+            </span>
+          </div>
+          <div className="flex flex-col">
+            <span className="text-[9px] font-bold text-slate-500 uppercase">
               BPI
-            </Text>
-            <Text fontSize="xs" fontWeight="bold" color="blue.200">
+            </span>
+            <span className="font-mono text-xs font-black text-blue-300">
               {item.user.bpi.toFixed(2)}
-            </Text>
-          </GridItem>
-        </Grid>
-      </Box>
+            </span>
+          </div>
+        </div>
+      </div>
 
-      <Separator borderColor="whiteAlpha.200" />
+      <Separator className="bg-white/10" />
 
-      <VStack gap={3} align="stretch">
-        <TargetSection label="AAA" data={item.targets.aaa} color="yellow.400" />
+      <div className="flex flex-col gap-4">
+        <TargetSection
+          label="AAA"
+          data={item.targets.aaa}
+          colorClass="text-yellow-400"
+        />
         <TargetSection
           label="MAX-"
           data={item.targets.maxMinus}
-          color="orange.400"
+          colorClass="text-orange-400"
         />
-      </VStack>
-    </VStack>
+      </div>
+    </div>
   );
 };

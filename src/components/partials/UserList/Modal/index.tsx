@@ -1,25 +1,15 @@
-import {
-  VStack,
-  HStack,
-  Text,
-  Button,
-  Separator,
-  Center,
-} from "@chakra-ui/react";
-import {
-  DialogRoot,
-  DialogContent,
-  DialogHeader,
-  DialogBody,
-  DialogCloseTrigger,
-} from "@/components/ui/chakra/dialog";
+"use client";
+
+import Link from "next/link";
 import { User, ChevronRight, Activity } from "lucide-react";
 import { useRivalComparison } from "@/hooks/social/useRivalComparison";
-import Link from "next/link";
 import { useProfile } from "@/hooks/users/useProfile";
 import { RivalBodySkeleton, RivalHeaderSkeleton } from "./skeleton";
 import { RivalHeader, SectionTitle, WinLossStats } from "./ui";
 import { RadarSectionChart } from "../../DashBoard/Radar/ui";
+import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 
 export const RivalComparisonModal = ({
   rivalId,
@@ -32,6 +22,7 @@ export const RivalComparisonModal = ({
     isLoading: isRivalLoading,
     isValidating,
   } = useRivalComparison(rivalId);
+
   const {
     toggleFollow,
     isUpdating,
@@ -46,21 +37,9 @@ export const RivalComparisonModal = ({
   const isLoading = isRivalLoading || isProfileLoading;
 
   return (
-    <DialogRoot
-      open={isOpen}
-      onOpenChange={onClose}
-      size="md"
-      placement={{ mdDown: "top", md: "center" }}
-      motionPreset="slide-in-bottom"
-    >
-      <DialogContent
-        bg="#0a0c10"
-        borderRadius="2xl"
-        border="1px solid"
-        borderColor="whiteAlpha.200"
-        boxShadow="0 20px 50px rgba(0,0,0,0.5)"
-      >
-        <DialogHeader p={6} pb={2}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-md gap-0 rounded-2xl border-white/20 bg-[#0a0c10] p-0 shadow-2xl shadow-black/50 overflow-hidden">
+        <DialogHeader className="p-6 pb-2">
           {isLoading ? (
             <RivalHeaderSkeleton />
           ) : (
@@ -72,62 +51,44 @@ export const RivalComparisonModal = ({
           )}
         </DialogHeader>
 
-        <DialogBody p={6} pt={0}>
+        <div className="p-6 pt-0">
           {isLoading ? (
             <RivalBodySkeleton />
           ) : (
             compare && (
-              <VStack gap={6} align="stretch">
-                <Separator opacity={0.1} />
+              <div className="flex flex-col gap-6">
+                <Separator className="bg-white/5" />
 
                 <WinLossStats winLossData={compare.winLoss} />
 
-                <VStack align="stretch" gap={3}>
+                <div className="flex flex-col gap-3">
                   <SectionTitle icon={Activity} label="RADAR COMPARISON" />
-                  <Center
-                    bg="rgba(0,0,0,0.2)"
-                    borderRadius="xl"
-                    p={4}
-                    h={{ base: "250px", md: "300px" }}
-                    w="full"
-                    border="1px solid"
-                    borderColor="whiteAlpha.50"
-                  >
+                  <div className="flex h-[250px] w-full items-center justify-center rounded-xl border border-white/5 bg-black/20 p-4 md:h-[300px]">
                     <RadarSectionChart
                       data={viewerRadar}
                       rivalData={compare.radar}
                       isMini={false}
                     />
-                  </Center>
-                </VStack>
+                  </div>
+                </div>
 
                 <Button
                   asChild
-                  variant="solid"
-                  bg="blue.600"
-                  _hover={{ bg: "blue.500" }}
-                  width="full"
-                  size="md"
-                  borderRadius="xl"
-                  height="50px"
-                  mt={4}
+                  className="h-[50px] w-full rounded-xl bg-blue-600 font-bold text-white hover:bg-blue-500 transition-all active:scale-95"
                 >
                   <Link href={`/users/${rivalId}`}>
-                    <HStack justify="center" gap={2}>
-                      <User size={18} />
-                      <Text fontSize="sm" fontWeight="bold">
-                        詳細プロフィールを見る
-                      </Text>
-                      <ChevronRight size={18} />
-                    </HStack>
+                    <div className="flex items-center justify-center gap-2">
+                      <User className="h-[18px] w-[18px]" />
+                      <span className="text-sm">詳細プロフィールを見る</span>
+                      <ChevronRight className="h-[18px] w-[18px]" />
+                    </div>
                   </Link>
                 </Button>
-              </VStack>
+              </div>
             )
           )}
-        </DialogBody>
-        <DialogCloseTrigger color="white" />
+        </div>
       </DialogContent>
-    </DialogRoot>
+    </Dialog>
   );
 };

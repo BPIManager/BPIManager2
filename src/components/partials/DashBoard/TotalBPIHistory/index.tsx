@@ -13,7 +13,7 @@ import {
 } from "recharts";
 import { BpiHistoryItem } from "@/hooks/stats/useTotalBPIHistory";
 import { TotalBpiHistorySkeleton } from "@/components/partials/DashBoard/TotalBPIHistory/skeleton";
-import { DashCard } from "@/components/ui/chakra/dashcard";
+import { DashCard } from "@/components/ui/dashcard";
 import { cn } from "@/lib/utils";
 
 const UpdateBar = (props: any) => {

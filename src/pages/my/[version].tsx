@@ -1,5 +1,4 @@
 import { useRouter } from "next/router";
-import { Container, Spinner, Center, Box } from "@chakra-ui/react";
 import { Meta } from "@/components/partials/Head";
 import { DashboardLayout } from "@/components/partials/Main";
 import { useUser } from "@/contexts/users/UserContext";
@@ -10,6 +9,7 @@ import {
   LoginRequiredCard,
 } from "@/components/partials/LoginRequired/ui";
 import { PageContainer } from "@/components/partials/Header";
+import { Loader2 } from "lucide-react";
 
 export default function MyScoresByVersion() {
   const router = useRouter();
@@ -20,9 +20,9 @@ export default function MyScoresByVersion() {
 
   if (!isReady) {
     return (
-      <Center h="90vh">
-        <Spinner size="xl" />
-      </Center>
+      <div className="flex h-[90vh] w-full items-center justify-center">
+        <Loader2 className="h-10 w-10 animate-spin text-blue-500" />
+      </div>
     );
   }
 

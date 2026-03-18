@@ -5,7 +5,7 @@ import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { SongWithScore } from "@/types/songs/withScore";
 import { SongDetailView } from "../../Modal/BPIChart/SongDetails/ui";
 import { NearLoseList } from "./NearLose";
-import { DashCard } from "@/components/ui/chakra/dashcard";
+import { DashCard } from "@/components/ui/dashcard";
 import { InfiniteScrollContainer } from "../../InfiniteScroll/ui";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"; // shadcn/ui
 

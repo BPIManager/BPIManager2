@@ -1,15 +1,17 @@
+"use client";
+
 import { useRouter } from "next/router";
 import { useUser } from "@/contexts/users/UserContext";
 import { LogsList } from "@/components/partials/Logs/LogsList/ui";
-import { Box, VStack } from "@chakra-ui/react";
 import { Meta } from "@/components/partials/Head";
 import { PageHeader, PageContainer } from "@/components/partials/Header";
 import { DashboardLayout } from "@/components/partials/Main";
 import { latestVersion } from "@/constants/latestVersion";
 import { UserProfileLayout } from "@/components/partials/Profile/Layout/layout";
 import { ProfileMeta } from "@/components/partials/Profile/Meta/ui";
-import { getVersionNameFromNumber, versionTitles } from "@/constants/versions";
+import { getVersionNameFromNumber } from "@/constants/versions";
 import { LogFilterSection } from "@/components/partials/Logs/VersionSelector/ui";
+import { cn } from "@/lib/utils";
 
 export default function LogsPage() {
   const router = useRouter();
@@ -19,28 +21,31 @@ export default function LogsPage() {
   const uid = (userId as string) || "";
   const v = (version as string) || latestVersion;
   const g = (groupedBy as string) || "lastPlayed";
-  const isOwnedByFbId = !isUserLoading && user?.userId === userId;
+
+  const isOwnedByMe = !isUserLoading && user?.userId === userId;
 
   const logsContent = (
-    <VStack align="stretch" gap={4}>
-      <Box
-        bg={isOwnedByFbId ? "transparent" : "#0d1117"}
-        borderRadius="2xl"
-        border={isOwnedByFbId ? "none" : "1px solid"}
-        borderColor="whiteAlpha.100"
-        p={isOwnedByFbId ? 0 : 6}
+    <div className="flex flex-col gap-4">
+      <div
+        className={cn(
+          "rounded-2xl transition-all",
+          isOwnedByMe
+            ? "bg-transparent p-0"
+            : "border border-white/10 bg-slate-900/40 p-4 md:p-6 shadow-xl backdrop-blur-md",
+        )}
       >
         <LogFilterSection version={v} groupedBy={g} />
-        <Box mt={6}>
+
+        <div className="mt-6">
           <LogsList userId={uid} version={v} groupedBy={g} />
-        </Box>
-      </Box>
-    </VStack>
+        </div>
+      </div>
+    </div>
   );
 
   if (isUserLoading) return null;
 
-  if (isOwnedByFbId && user?.userId !== undefined) {
+  if (isOwnedByMe && user?.userId !== undefined) {
     return (
       <DashboardLayout>
         <Meta title="更新ログ" noIndex />
@@ -54,7 +59,7 @@ export default function LogsPage() {
     <UserProfileLayout userId={uid} currentTab="logs">
       <ProfileMeta
         title={`スコア更新記録`}
-        description={`$userName$さん($iidxid$)がbeatmaniaIIDX ${getVersionNameFromNumber(Number(version))}でプレイしたスコアの記録を確認できます。`}
+        description={`$userName$さん($iidxid$)がbeatmaniaIIDX ${getVersionNameFromNumber(v)}でプレイしたスコアの記録を確認できます。`}
       />
       {logsContent}
     </UserProfileLayout>

@@ -1,17 +1,9 @@
-import {
-  Box,
-  Text,
-  HStack,
-  VStack,
-  Avatar,
-  Badge,
-  Flex,
-} from "@chakra-ui/react";
 import { formatIIDXId } from "@/utils/common/formatIidxId";
 import { RadarSectionChart } from "../../DashBoard/Radar/ui";
 import { RivalSummaryResult } from "@/hooks/social/useRivalSummary";
 import { getBpiColorStyle } from "@/constants/bpiColor";
-import { DashCard } from "@/components/ui/chakra/dashcard";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 
 export const RivalSummaryCard = ({
   rival,
@@ -37,141 +29,81 @@ export const RivalSummaryCard = ({
     stats.totalCount > 0 ? (stats.lose / stats.totalCount) * 100 : 0;
   const drawRate =
     stats.totalCount > 0 ? (stats.draw / stats.totalCount) * 100 : 0;
-
   const bpiStyle = getBpiColorStyle(totalBpi ?? -15);
 
   return (
-    <Box
-      as="button"
-      width="full"
+    <button
       onClick={onClick}
-      textAlign="left"
-      style={{ textDecoration: "none" }}
+      className="group relative flex w-full flex-row items-stretch justify-between gap-3 overflow-hidden rounded-2xl border border-white/10 bg-slate-900/80 p-3 text-left transition-all duration-300 hover:-translate-y-1 hover:border-white/30 hover:bg-slate-800/90 md:gap-6 md:p-5"
     >
-      <DashCard
-        p={{ base: 3, md: 5 }}
-        cursor="pointer"
-        gap={{ base: 3, md: 6 }}
-        _hover={{
-          borderColor: "whiteAlpha.200",
-          bg: "rgba(20, 25, 35, 0.9)",
-          transform: "translateY(-2px)",
-        }}
-        transition="all 0.3s cubic-bezier(.4,0,.2,1)"
-        justifyContent="space-between"
-        position="relative"
-        overflow="hidden"
-        as={HStack}
-      >
-        <Box
-          position="absolute"
-          top={0}
-          left={0}
-          w="4px"
-          h="full"
-          bg={bpiStyle.bg}
-          opacity={0.8}
-        />
+      <div
+        className="absolute left-0 top-0 bottom-0 w-1 opacity-80 transition-transform group-hover:scale-y-110"
+        style={{ backgroundColor: bpiStyle.bg }}
+      />
 
-        <VStack align="start" flex="1" gap={{ base: 3, md: 4 }} minW={0}>
-          <HStack gap={{ base: 2, md: 3 }} w="full">
-            <Avatar.Root size={{ base: "sm", md: "lg" }}>
-              <Avatar.Fallback name={userName} />
-              <Avatar.Image src={profileImage ?? ""} />
-            </Avatar.Root>
-            <VStack align="start" gap={0} minW={0}>
-              <Text
-                fontWeight="bold"
-                color="white"
-                fontSize={{ base: "sm", md: "md" }}
-                lineClamp={1}
-              >
-                {userName}
-              </Text>
-              <HStack gap={2}>
-                <Badge
-                  colorPalette="orange"
-                  variant="solid"
-                  size="xs"
-                  px={1.5}
-                  borderRadius="full"
-                >
-                  {arenaRank || "N/A"}
-                </Badge>
-                <Text fontSize="xs" color="whiteAlpha.400" fontFamily="mono">
-                  {formatIIDXId(iidxId || "")}
-                </Text>
-              </HStack>
-            </VStack>
-            <Box ml="auto" textAlign="right">
-              <Text fontSize="9px" color="whiteAlpha.400" fontWeight="bold">
-                TOTAL BPI
-              </Text>
-              <Text
-                fontSize="lg"
-                fontWeight="bold"
-                color={bpiStyle.color}
-                fontFamily="mono"
-              >
-                {totalBpi?.toFixed(2) ?? "-15.00"}
-              </Text>
-            </Box>
-          </HStack>
-
-          <VStack w="full" align="start" gap={1.5}>
-            <HStack
-              w="full"
-              justify="space-between"
-              fontSize="12px"
-              fontWeight="bold"
+      <div className="flex flex-1 flex-col gap-3 min-w-0">
+        <div className="flex w-full items-center gap-3">
+          <Avatar className="h-8 w-8 border border-white/10 md:h-12 md:w-12">
+            <AvatarImage src={profileImage ?? ""} />
+            <AvatarFallback>{userName.slice(0, 2)}</AvatarFallback>
+          </Avatar>
+          <div className="flex flex-1 flex-col min-w-0">
+            <span className="truncate text-sm font-bold text-white md:text-base tracking-tight">
+              {userName}
+            </span>
+            <div className="flex items-center gap-2">
+              <Badge className="bg-orange-600 h-4 px-1.5 text-[10px] font-bold border-none">
+                {arenaRank || "N/A"}
+              </Badge>
+              <span className="font-mono text-[10px] text-slate-500">
+                {formatIIDXId(iidxId || "")}
+              </span>
+            </div>
+          </div>
+          <div className="ml-auto text-right">
+            <span className="block text-[9px] font-bold tracking-widest text-slate-500 uppercase">
+              Total BPI
+            </span>
+            <span
+              className="font-mono text-base font-bold md:text-xl"
+              style={{ color: bpiStyle.color }}
             >
-              <HStack gap={1} color="blue.400">
-                <Text>WIN: {stats.win}</Text>
-              </HStack>
-              <Text color="whiteAlpha.600">LOSE: {stats.lose}</Text>
-            </HStack>
+              {totalBpi?.toFixed(2) ?? "-15.00"}
+            </span>
+          </div>
+        </div>
 
-            <Flex
-              w="full"
-              h="6px"
-              borderRadius="full"
-              overflow="hidden"
-              bg="whiteAlpha.100"
-            >
-              <Box w={`${winRate}%`} bg="blue.500" transition="width 0.5s" />
-              <Box w={`${drawRate}%`} bg="gray.500" transition="width 0.5s" />
-              <Box w={`${loseRate}%`} bg="red.500" transition="width 0.5s" />
-            </Flex>
+        <div className="flex flex-col gap-1.5">
+          <div className="flex justify-between text-[11px] font-bold tracking-tight">
+            <span className="text-blue-400">WIN: {stats.win}</span>
+            <span className="text-slate-500 uppercase">LOSE: {stats.lose}</span>
+          </div>
 
-            <HStack
-              w="full"
-              justify="space-between"
-              fontSize="12px"
-              color="whiteAlpha.600"
-            >
-              <Text>{winRate.toFixed(1)}% Win</Text>
-              <Text>{stats.totalCount} Songs</Text>
-            </HStack>
-          </VStack>
-        </VStack>
+          <div className="flex h-1.5 w-full overflow-hidden rounded-full bg-white/5">
+            <div
+              className="h-full bg-blue-500 transition-all duration-500"
+              style={{ width: `${winRate}%` }}
+            />
+            <div
+              className="h-full bg-slate-600 transition-all duration-500"
+              style={{ width: `${drawRate}%` }}
+            />
+            <div
+              className="h-full bg-red-500 transition-all duration-500"
+              style={{ width: `${loseRate}%` }}
+            />
+          </div>
 
-        <Box
-          w={{ base: "90px", sm: "110px", md: "130px" }}
-          h={{ base: "90px", sm: "110px", md: "130px" }}
-          bg="blackAlpha.400"
-          borderRadius="xl"
-          p={1}
-          borderWidth="1px"
-          borderColor="whiteAlpha.50"
-          alignSelf="center"
-        >
-          <RadarSectionChart
-            data={viewerRadar}
-            rivalData={radar}
-            isMini={true}
-          />
-        </Box>
-      </DashCard>
-    </Box>
+          <div className="flex justify-between text-[10px] font-medium text-slate-500">
+            <span>{winRate.toFixed(1)}% Win</span>
+            <span>{stats.totalCount} Songs</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex h-[90px] w-[90px] shrink-0 self-center items-center justify-center rounded-xl border border-white/5 bg-black/40 p-1 sm:h-[110px] sm:w-[110px] md:h-[130px] md:w-[130px]">
+        <RadarSectionChart data={viewerRadar} rivalData={radar} isMini={true} />
+      </div>
+    </button>
   );
 };

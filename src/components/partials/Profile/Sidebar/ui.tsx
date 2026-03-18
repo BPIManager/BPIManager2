@@ -1,140 +1,110 @@
-import {
-  Box,
-  VStack,
-  Avatar,
-  Text,
-  Heading,
-  Badge,
-  Link,
-  HStack,
-  Separator,
-  Flex,
-} from "@chakra-ui/react";
+"use client";
+
 import { SiX } from "react-icons/si";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { BpiHistoryTable } from "./bpiTable";
 import { FollowSection } from "./followStatus";
 import { FollowStats } from "./followCount";
 import { formatIIDXId } from "@/utils/common/formatIidxId";
-import { DashCard } from "@/components/ui/chakra/dashcard";
 
 export const ProfileSideBar = ({
   profile,
   onFollowToggle,
   isUpdating = false,
-}: {
-  profile: any;
-  onFollowToggle?: () => void;
-  isUpdating?: boolean;
-}) => {
+}: any) => {
   return (
-    <DashCard p={4} position={{ lg: "sticky" }} top="20px">
+    <div className="lg:sticky lg:top-20 flex flex-col gap-6 rounded-2xl border border-white/10 bg-slate-900/60 p-5 backdrop-blur-md shadow-xl">
       <ProfileHeaderBase profile={profile} />
 
       <FollowStats userId={profile.userId} follows={profile.follows} />
-      <Box my={4}>
+
+      <div className="my-2">
         <FollowSection
-          w="full"
           userId={profile.userId}
           isUpdating={isUpdating}
           relationship={profile.relationship}
           onToggle={onFollowToggle}
         />
-      </Box>
+      </div>
 
       {profile.xId && (
-        <Flex justify={"center"} my={4}>
-          <Link href={`https://x.com/${profile.xId}`} target="_blank">
-            <HStack color="gray.400" _hover={{ color: "blue.400" }} gap={2}>
-              <SiX size={14} />
-              <Text fontSize="xs">@{profile.xId}</Text>
-            </HStack>
-          </Link>
-        </Flex>
+        <div className="flex justify-center">
+          <a
+            href={`https://x.com/${profile.xId}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-slate-400 transition-colors hover:text-blue-400"
+          >
+            <SiX className="h-3.5 w-3.5" />
+            <span className="text-xs">@{profile.xId}</span>
+          </a>
+        </div>
       )}
 
-      <Separator borderColor="whiteAlpha.100" />
+      <Separator className="bg-white/5" />
 
       <ProfileStatsContent profile={profile} />
-    </DashCard>
+    </div>
   );
 };
 
 export const ProfileHeaderBase = ({ profile }: { profile: any }) => (
-  <VStack gap={4} textAlign="center" w="full">
-    <Avatar.Root
-      border="2px solid"
-      borderColor="blue.500"
-      width="110px"
-      height="110px"
-    >
-      <Avatar.Fallback name={profile.userName} />
-      <Avatar.Image src={profile.profileImage} />
-    </Avatar.Root>
+  <div className="flex flex-col items-center gap-4 text-center">
+    <Avatar className="h-28 w-28 border-2 border-blue-500 shadow-lg shadow-blue-500/20">
+      <AvatarImage src={profile.profileImage} />
+      <AvatarFallback className="text-2xl">
+        {profile.userName?.slice(0, 2)}
+      </AvatarFallback>
+    </Avatar>
 
-    <VStack gap={1}>
-      <Heading size="md" color="white" letterSpacing="tight">
+    <div className="flex flex-col gap-1">
+      <h2 className="text-xl font-bold tracking-tight text-white">
         {profile.userName}
-      </Heading>
-      <Text fontSize="xs" color="gray.500" fontFamily="mono">
+      </h2>
+      <p className="font-mono text-xs tracking-widest text-slate-500 uppercase">
         ID: {formatIIDXId(profile.iidxId)}
-      </Text>
-    </VStack>
-  </VStack>
+      </p>
+    </div>
+  </div>
 );
 
 export const ProfileStatsContent = ({ profile }: { profile: any }) => {
   const current = profile.current || {};
   return (
-    <VStack align="stretch" w="full" gap={6}>
-      <HStack justify="space-between" align="flex-end" mt={2}>
-        <Box>
-          <Text fontSize="10px" color="gray.400" fontWeight="bold" mb={1}>
-            ARENA
-          </Text>
-          <Badge
-            colorPalette="orange"
-            variant="solid"
-            fontSize="md"
-            px={3}
-            borderRadius="full"
-          >
+    <div className="flex w-full flex-col gap-6">
+      <div className="flex items-end justify-between px-1">
+        <div className="flex flex-col gap-1.5">
+          <span className="text-[10px] font-bold tracking-widest text-slate-500 uppercase">
+            Arena
+          </span>
+          <Badge className="bg-orange-600 px-3 py-0.5 text-sm font-bold text-white shadow-md border-none">
             {current.arenaRank || "N/A"}
           </Badge>
-        </Box>
-        <Box textAlign="right">
-          <Text fontSize="10px" color="gray.400" fontWeight="bold" mb={1}>
-            TOTAL BPI
-          </Text>
-          <Text
-            fontSize="2xl"
-            fontWeight="bold"
-            color="blue.300"
-            fontFamily="mono"
-            lineHeight="1"
-          >
+        </div>
+        <div className="flex flex-col items-end gap-0">
+          <span className="text-[10px] font-bold tracking-widest text-slate-500 uppercase">
+            Total BPI
+          </span>
+          <span className="font-mono text-2xl font-black leading-none text-blue-400">
             {current.totalBpi?.toFixed(2) ?? "N/A"}
-          </Text>
-        </Box>
-      </HStack>
+          </span>
+        </div>
+      </div>
 
-      <BpiHistoryTable history={profile.history} totalSongCount={606} />
+      <BpiHistoryTable history={profile.history} />
 
       {profile.profileText && (
-        <Box
-          bg="whiteAlpha.50"
-          p={3}
-          borderRadius="lg"
-          borderWidth="1px"
-          borderColor="whiteAlpha.50"
-        >
-          <Text fontSize="10px" color="gray.400" fontWeight="bold" mb={2}>
-            BIO
-          </Text>
-          <Text fontSize="xs" color="gray.300" whiteSpace="pre-wrap">
+        <div className="rounded-xl border border-white/5 bg-white/5 p-3">
+          <span className="mb-2 block text-[10px] font-bold tracking-widest text-slate-500 uppercase">
+            Bio
+          </span>
+          <p className="whitespace-pre-wrap text-xs leading-relaxed text-slate-300">
             {profile.profileText}
-          </Text>
-        </Box>
+          </p>
+        </div>
       )}
-    </VStack>
+    </div>
   );
 };

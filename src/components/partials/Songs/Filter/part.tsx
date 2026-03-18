@@ -1,21 +1,22 @@
+"use client";
+
 import { useState, useEffect } from "react";
-import {
-  VStack,
-  HStack,
-  Text,
-  Input,
-  Spinner,
-  IconButton,
-} from "@chakra-ui/react";
-import { Search, Pin, PinOff } from "lucide-react";
-import { InputGroup } from "@/components/ui/chakra/input-group";
-import { Checkbox } from "@/components/ui/chakra/checkbox";
+import { Search, Pin, PinOff, Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 
 export const FilterSearchInput = ({
   value,
   onChange,
   placeholder = "曲名で検索...",
-}: any) => {
+}: {
+  value: string;
+  onChange: (val: string) => void;
+  placeholder?: string;
+}) => {
   const [local, setLocal] = useState(value || "");
   const isTyping = local !== (value || "");
 
@@ -27,20 +28,24 @@ export const FilterSearchInput = ({
   }, [local, onChange, value]);
 
   return (
-    <InputGroup
-      flex={1}
-      startElement={<Search size={14} />}
-      endElement={isTyping ? <Spinner size="xs" color="blue.500" /> : null}
-      width="full"
-    >
+    <div className="relative flex-1 w-full group">
+      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none">
+        <Search size={14} />
+      </div>
+
       <Input
         placeholder={placeholder}
-        variant="subtle"
-        size="sm"
+        className="h-9 pl-9 pr-9 border-white/10 bg-white/5 focus-visible:ring-blue-500"
         value={local}
         onChange={(e) => setLocal(e.target.value)}
       />
-    </InputGroup>
+
+      {isTyping && (
+        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-500">
+          <Loader2 size={14} className="animate-spin" />
+        </div>
+      )}
+    </div>
   );
 };
 
@@ -59,39 +64,52 @@ export const FilterCheckboxGroup = <T extends string | number>({
   onToggle,
   getLabel,
 }: FilterCheckboxGroupProps<T>) => (
-  <VStack align="start" gap={1.5}>
-    <Text
-      fontSize="10px"
-      color="gray.500"
-      fontWeight="bold"
-      letterSpacing="widest"
-    >
+  <div className="flex flex-col gap-1.5">
+    <span className="text-[10px] font-bold tracking-widest text-slate-500 uppercase">
       {label}
-    </Text>
-    <HStack gap={4}>
-      {items.map((item: any) => (
-        <Checkbox
-          key={String(item)}
-          checked={selected?.includes(item)}
-          onCheckedChange={() => onToggle(item)}
-          size="sm"
-        >
-          <Text fontSize="xs" fontWeight="bold">
-            {getLabel ? getLabel(item) : item}
-          </Text>
-        </Checkbox>
-      ))}
-    </HStack>
-  </VStack>
+    </span>
+    <div className="flex flex-row items-center gap-4">
+      {items.map((item) => {
+        const id = `filter-${label}-${item}`;
+        return (
+          <div key={String(item)} className="flex items-center gap-2">
+            <Checkbox
+              id={id}
+              checked={selected?.includes(item)}
+              onCheckedChange={() => onToggle(item)}
+              className="h-4 w-4 border-white/20 data-[state=checked]:bg-blue-600"
+            />
+            <Label
+              htmlFor={id}
+              className="text-xs font-bold text-slate-300 cursor-pointer select-none"
+            >
+              {getLabel ? getLabel(item) : item}
+            </Label>
+          </div>
+        );
+      })}
+    </div>
+  </div>
 );
 
-export const FilterStickyToggle = ({ isSticky, onToggle }: any) => (
-  <IconButton
+export const FilterStickyToggle = ({
+  isSticky,
+  onToggle,
+}: {
+  isSticky: boolean;
+  onToggle: (val: boolean) => void;
+}) => (
+  <Button
     variant="ghost"
-    size="xs"
-    color={isSticky ? "blue.400" : "gray.500"}
+    size="icon"
+    className={cn(
+      "h-8 w-8 rounded-md transition-colors",
+      isSticky
+        ? "text-blue-400 bg-blue-500/10"
+        : "text-slate-500 hover:text-slate-300 hover:bg-white/5",
+    )}
     onClick={() => onToggle(!isSticky)}
   >
     {isSticky ? <Pin size={14} /> : <PinOff size={14} />}
-  </IconButton>
+  </Button>
 );

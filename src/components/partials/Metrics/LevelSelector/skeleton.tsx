@@ -1,45 +1,25 @@
-import {
-  Box,
-  Stack,
-  VStack,
-  HStack,
-  Skeleton,
-  SkeletonCircle,
-} from "@chakra-ui/react";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export const ArenaAverageFilterSkeleton = () => {
-  return (
-    <Box
-      p={4}
-      bg="gray.900"
-      borderRadius="lg"
-      borderWidth="1px"
-      borderColor="whiteAlpha.100"
-    >
-      <Stack
-        direction={{ base: "column", md: "row" }}
-        gap={{ base: 6, md: 10 }}
-        align="start"
-      >
-        <VStack align="start" gap={2} minW={{ base: "full", md: "240px" }}>
-          <Skeleton height="14px" width="60px" borderRadius="sm" />
-          <Skeleton height="32px" width="full" borderRadius="md" />
-        </VStack>
-
-        <VStack align="start" gap={2}>
-          <Skeleton height="14px" width="60px" borderRadius="sm" />
-          <HStack gap={8} h="32px">
-            <HStack gap={2}>
-              <SkeletonCircle size="16px" />
-              <Skeleton height="16px" width="40px" borderRadius="sm" />
-            </HStack>
-            <HStack gap={2}>
-              <SkeletonCircle size="16px" />
-              <Skeleton height="16px" width="40px" borderRadius="sm" />
-            </HStack>
-          </HStack>
-        </VStack>
-      </Stack>
-    </Box>
-  );
-};
+export const ArenaAverageFilterSkeleton = () => (
+  <div className="rounded-xl border border-white/10 bg-slate-900/80 p-4">
+    <div className="flex flex-col gap-6 md:flex-row md:items-start md:gap-10">
+      <div className="flex flex-col gap-2 min-w-full md:min-w-[240px]">
+        <Skeleton className="h-3 w-16" />
+        <Skeleton className="h-9 w-full rounded-md" />
+      </div>
+      <div className="flex flex-col gap-2">
+        <Skeleton className="h-3 w-12" />
+        <div className="flex h-9 items-center gap-8">
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-4 w-4 rounded-full" />
+            <Skeleton className="h-4 w-8" />
+          </div>
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-4 w-4 rounded-full" />
+            <Skeleton className="h-4 w-8" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);

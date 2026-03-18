@@ -5,7 +5,7 @@ import { UserProfileLayout } from "@/components/partials/Profile/Layout/layout";
 import { ProfileMeta } from "@/components/partials/Profile/Meta/ui";
 import { getVersionNameFromNumber } from "@/constants/versions";
 import { useUser } from "@/contexts/users/UserContext";
-import { Box, Center, Spinner } from "@chakra-ui/react";
+import { Loader2 } from "lucide-react";
 import { useRouter } from "next/router";
 
 export default function SummaryLogsPage() {
@@ -19,9 +19,9 @@ export default function SummaryLogsPage() {
   if (isInitialLoading) {
     return (
       <DashboardLayout>
-        <Center>
-          <Spinner size="sm" />
-        </Center>
+        <div className="flex h-[90vh] w-full items-center justify-center">
+          <Loader2 className="h-10 w-10 animate-spin text-blue-500" />
+        </div>
       </DashboardLayout>
     );
   }
@@ -45,7 +45,7 @@ export default function SummaryLogsPage() {
         title={`${date as string}のプレイ記録まとめ`}
         description={`$userName$さん($iidxid$)が${date as string}にbeatmaniaIIDX ${getVersionNameFromNumber(Number(version))}でプレイしたスコアの記録を確認できます。`}
       />
-      <Box p={4}>
+      <div className="p-4">
         <LogsDetailContent
           isPublicPage
           type="daily"
@@ -53,7 +53,7 @@ export default function SummaryLogsPage() {
           version={version as string}
           date={date as string}
         />
-      </Box>
+      </div>
     </UserProfileLayout>
   );
 }

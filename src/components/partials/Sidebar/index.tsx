@@ -1,15 +1,8 @@
-import {
-  Box,
-  VStack,
-  HStack,
-  Text,
-  Button,
-  Spacer,
-  Separator,
-  Badge,
-  Link as CLink,
-  Collapsible,
-} from "@chakra-ui/react";
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/router";
 import {
   FileUp,
   Settings,
@@ -28,19 +21,25 @@ import {
   Search,
   Code2,
 } from "lucide-react";
+import { LuLayoutDashboard } from "react-icons/lu";
+
 import { useUser } from "@/contexts/users/UserContext";
 import { authActions } from "@/lib/firebase/auth";
-import Link from "next/link";
-import { useRouter } from "next/router";
-import { Avatar } from "@/components/ui/chakra/avatar";
-import { LuLayoutDashboard } from "react-icons/lu";
 import { latestVersion } from "@/constants/latestVersion";
-import { useState } from "react";
+import { cn } from "@/lib/utils";
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
-  const { user, fbUser } = useUser();
+  const { user } = useUser();
   const router = useRouter();
-
   const [isRivalOpen, setIsRivalOpen] = useState<boolean>(true);
 
   const mainMenuItems = [
@@ -76,236 +75,203 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
           router.asPath.startsWith(item.href + "?");
 
     return (
-      <Link key={item.href} href={item.href} passHref legacyBehavior>
-        <Button
-          as={item.isComingSoon ? "button" : "a"}
-          variant={isActive ? "surface" : "ghost"}
-          color="#fff"
-          colorPalette={isActive ? "blue" : "gray"}
-          disabled={item.isComingSoon}
-          justifyContent="start"
-          gap={3}
-          px={2}
-          pl={isNested ? 8 : 2}
-          onClick={onClose}
-          size="sm"
-          width="full"
-        >
-          <item.icon size={18} />
-          <Text fontWeight={isActive ? "bold" : "medium"}>{item.label}</Text>
-          {item.isComingSoon && (
+      <Button
+        key={item.href}
+        asChild
+        variant={isActive ? "secondary" : "ghost"}
+        size="sm"
+        className={cn(
+          "w-full justify-start gap-3 px-3 transition-all",
+          isNested ? "pl-9" : "pl-3",
+          isActive
+            ? "bg-white/10 font-bold text-blue-400"
+            : "font-medium text-slate-300",
+          item.isComingSoon && "opacity-50 cursor-not-allowed",
+        )}
+        onClick={item.isComingSoon ? undefined : onClose}
+      >
+        {item.isComingSoon ? (
+          <div className="flex w-full items-center gap-3">
+            <item.icon className="h-4.5 w-4.5" />
+            <span>{item.label}</span>
             <Badge
-              variant="subtle"
-              colorPalette="gray"
-              fontSize="2xs"
-              ml="auto"
+              variant="outline"
+              className="ml-auto text-[10px] py-0 border-white/10 text-slate-500"
             >
               近日公開
             </Badge>
-          )}
-        </Button>
-      </Link>
+          </div>
+        ) : (
+          <Link href={item.href}>
+            <item.icon className="h-4.5 w-4.5" />
+            <span>{item.label}</span>
+          </Link>
+        )}
+      </Button>
     );
   };
 
   return (
-    <VStack align="stretch" p={4} gap={6} h="full" minH="0" overflowY="auto">
-      <Box
-        p={4}
-        borderRadius="xl"
-        color="white"
-        bg="whiteAlpha.50"
-        borderWidth="1px"
-        borderColor="whiteAlpha.100"
-      >
-        <VStack gap={4} align="stretch">
-          <HStack gap={3}>
-            <Link href={"/users/" + user?.userId}>
-              <Avatar
-                size="lg"
+    <div className="flex h-full flex-col gap-6 p-4 overflow-y-auto scrollbar-hide">
+      <div className="rounded-xl border border-white/10 bg-white/5 p-4 flex flex-col gap-4">
+        <div className="flex items-center gap-3">
+          <Link href={`/users/${user?.userId}`} onClick={onClose}>
+            <Avatar className="h-12 w-12 rounded-lg border border-white/10">
+              <AvatarImage
                 src={user?.profileImage || ""}
-                name={user?.userName || "User"}
-                shape="rounded"
+                alt={user?.userName || "User"}
               />
-            </Link>
-            <Box minW={0}>
-              <Text fontWeight="bold" fontSize="md" lineClamp={1}>
-                {user?.userName || "Guest"}
-              </Text>
-              <Text
-                fontSize="2xs"
-                color="fg.muted"
-                fontFamily="mono"
-                lineClamp={1}
-              >
-                {user?.iidxId ? `ID: ${user.iidxId}` : "ID未設定"}
-              </Text>
-              <Text
-                fontSize="2xs"
-                color="orange.300"
-                fontWeight="bold"
-                fontFamily="mono"
-              >
-                ☆12 BPI: {user?.totalBpi ?? -15}
-              </Text>
-            </Box>
-          </HStack>
+              <AvatarFallback className="bg-slate-800 text-slate-400">
+                {user?.userName?.slice(0, 2) || "U"}
+              </AvatarFallback>
+            </Avatar>
+          </Link>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-bold text-white">
+              {user?.userName || "Guest"}
+            </p>
+            <p className="truncate font-mono text-[10px] text-slate-500">
+              {user?.iidxId ? `ID: ${user.iidxId}` : "ID未設定"}
+            </p>
+            <p className="font-mono text-[10px] font-bold text-orange-400">
+              ☆12 BPI: {user?.totalBpi ?? -15}
+            </p>
+          </div>
+        </div>
 
-          {user?.userId && (
+        {user?.userId && (
+          <div className="flex flex-col gap-3">
             <Button
               asChild
               variant="outline"
               size="xs"
-              width="full"
-              borderColor="gray.600"
-              justifyContent="space-between"
+              className="w-full justify-between border-slate-700 h-7 px-2 hover:bg-white/5"
               onClick={onClose}
-              px={2}
             >
               <Link href={`/users/${user?.userId}`}>
-                <HStack gap={1}>
-                  <User size={12} />
-                  <Text fontSize="2xs">プロフィールを表示</Text>
-                </HStack>
-                <ChevronRight size={12} />
+                <div className="flex items-center gap-1.5">
+                  <User className="h-3 w-3" />
+                  <span className="text-[10px]">プロフィールを表示</span>
+                </div>
+                <ChevronRight className="h-3 w-3" />
               </Link>
             </Button>
-          )}
 
-          {user?.userId && (
-            <HStack gap={10} justify="center" cursor="default" px={1}>
-              <Link href={`/users/${user?.userId}/following`} passHref>
-                <VStack gap={0} align="center">
-                  <Text fontSize="xs" fontWeight="bold">
-                    {user?.followingCount ?? 0}
-                  </Text>
-                  <Text fontSize="2xs" color="fg.muted">
-                    フォロー
-                  </Text>
-                </VStack>
+            <div className="flex justify-center gap-8 px-1">
+              <Link
+                href={`/users/${user?.userId}/following`}
+                onClick={onClose}
+                className="text-center group"
+              >
+                <p className="text-xs font-bold text-white">
+                  {user?.followingCount ?? 0}
+                </p>
+                <p className="text-[10px] text-slate-500 group-hover:text-slate-300">
+                  フォロー
+                </p>
               </Link>
-
-              <Link href={`/users/${user?.userId}/followers`} passHref>
-                <VStack gap={0} align="center">
-                  <Text fontSize="xs" fontWeight="bold">
-                    {user?.followerCount ?? 0}
-                  </Text>
-                  <Text fontSize="2xs" color="fg.muted">
-                    フォロワー
-                  </Text>
-                </VStack>
+              <Link
+                href={`/users/${user?.userId}/followers`}
+                onClick={onClose}
+                className="text-center group"
+              >
+                <p className="text-xs font-bold text-white">
+                  {user?.followerCount ?? 0}
+                </p>
+                <p className="text-[10px] text-slate-500 group-hover:text-slate-300">
+                  フォロワー
+                </p>
               </Link>
-            </HStack>
-          )}
-        </VStack>
-      </Box>
+            </div>
+          </div>
+        )}
+      </div>
 
-      <VStack align="stretch" gap={1}>
+      <nav className="flex flex-col gap-1 flex-1">
         {mainMenuItems.map((item) => renderMenuItem(item))}
 
-        <Box>
-          <Button
-            variant="ghost"
-            width="full"
-            justifyContent="start"
-            px={2}
-            color="whiteAlpha.700"
-            _hover={{ bg: "whiteAlpha.100", color: "white" }}
-            onClick={() => setIsRivalOpen(!isRivalOpen)}
-            gap={3}
-          >
-            {isRivalOpen ? (
-              <ChevronDown size={18} />
-            ) : (
-              <ChevronRight size={18} />
-            )}
-            <Text fontSize="sm" fontWeight="bold" letterSpacing="wider">
-              ライバル
-            </Text>
-          </Button>
-
-          <Collapsible.Root open={isRivalOpen}>
-            <Collapsible.Content>
-              <VStack align="stretch" gap={1} mt={1}>
-                {rivalMenuItems.map((item) => renderMenuItem(item, true))}
-              </VStack>
-            </Collapsible.Content>
-          </Collapsible.Root>
-        </Box>
+        <Collapsible
+          open={isRivalOpen}
+          onOpenChange={setIsRivalOpen}
+          className="w-full"
+        >
+          <CollapsibleTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start gap-3 px-3 text-slate-400 hover:bg-white/5 hover:text-white"
+            >
+              {isRivalOpen ? (
+                <ChevronDown className="h-4.5 w-4.5" />
+              ) : (
+                <ChevronRight className="h-4.5 w-4.5" />
+              )}
+              <span className="text-xs font-bold uppercase tracking-wider">
+                ライバル
+              </span>
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="flex flex-col gap-1 mt-1">
+            {rivalMenuItems.map((item) => renderMenuItem(item, true))}
+          </CollapsibleContent>
+        </Collapsible>
 
         {otherMenuItems.map((item) => renderMenuItem(item))}
-      </VStack>
+      </nav>
 
-      <Spacer />
-      <ApiDogButton />
-      <GitHubButton />
-      {user?.userId && (
-        <Button
-          variant="ghost"
-          colorPalette="red"
-          size="sm"
-          gap={2}
-          onClick={() => authActions.logout()}
-        >
-          <LogOut size={16} />
-          サインアウト
-        </Button>
-      )}
-    </VStack>
+      <div className="flex flex-col gap-4 pt-4 mt-auto">
+        <ApiDogButton />
+        <GitHubButton />
+
+        {user?.userId && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full justify-center gap-2 text-red-400 hover:bg-red-400/10 hover:text-red-300"
+            onClick={() => authActions.logout()}
+          >
+            <LogOut className="h-4 w-4" />
+            <span className="font-bold text-xs">サインアウト</span>
+          </Button>
+        )}
+      </div>
+    </div>
   );
 };
 
-export const ApiDogButton = () => {
-  return (
-    <Box display="flex" justifyContent={"center"}>
-      <CLink
-        href="https://bpim2.apidog.io/"
-        target="_blank"
-        rel="noopener noreferrer"
-        textDecoration="underline"
-        display="flex"
-        alignItems="center"
-        color="white"
-        gap={2}
-      >
-        <Code2 size={16} />
-        <Text fontSize="xs" fontWeight="bold">
-          APIs Now Available!
-        </Text>
-      </CLink>
-    </Box>
-  );
-};
-
-export const GitHubButton = () => {
-  return (
-    <Button
-      asChild
-      variant="outline"
-      size="sm"
-      borderRadius="full"
-      px={4}
-      color="white"
-      _hover={{
-        bg: "whiteAlpha.200",
-        borderColor: "whiteAlpha.400",
-      }}
-      transition="all 0.2s"
+const ApiDogButton = () => (
+  <div className="flex justify-center">
+    <a
+      href="https://bpim2.apidog.io/"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-center gap-2 text-white hover:opacity-80 transition-opacity"
     >
-      <CLink
-        href="https://github.com/BPIManager/BPIManager2"
-        target="_blank"
-        rel="noopener noreferrer"
-        textDecoration="none"
-        display="flex"
-        alignItems="center"
-        gap={2}
-      >
-        <Github size={16} />
-        <Text fontSize="xs" fontWeight="bold">
-          Available on <Text as="span">GitHub</Text>
-        </Text>
-      </CLink>
-    </Button>
-  );
-};
+      <Code2 className="h-4 w-4 text-blue-400" />
+      <span className="text-[10px] font-bold underline underline-offset-4">
+        APIs Now Available!
+      </span>
+    </a>
+  </div>
+);
+
+const GitHubButton = () => (
+  <Button
+    asChild
+    variant="outline"
+    size="sm"
+    className="w-full rounded-full border-white/10 bg-transparent text-white hover:bg-white/10"
+  >
+    <a
+      href="https://github.com/BPIManager/BPIManager2"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-center gap-2"
+    >
+      <Github className="h-4 w-4" />
+      <span className="text-[10px] font-bold">
+        Available on <span className="text-blue-400">GitHub</span>
+      </span>
+    </a>
+  </Button>
+);

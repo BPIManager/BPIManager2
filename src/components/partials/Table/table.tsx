@@ -1,43 +1,34 @@
-import {
-  Box,
-  Text,
-  Badge,
-  VStack,
-  HStack,
-  Stack,
-  Grid,
-  GridItem,
-} from "@chakra-ui/react";
 import { SongWithScore } from "@/types/songs/withScore";
 import { getDJRank } from "@/utils/songs/djRank";
 import { RefObject } from "react";
+import { cn } from "@/lib/utils";
 
 export const diffColors: Record<string, string> = {
-  ANOTHER: "red.800",
-  LEGGENDARIA: "purple.800",
-  HYPER: "yellow.800",
+  ANOTHER: "bg-red-900",
+  LEGGENDARIA: "bg-purple-900",
+  HYPER: "bg-yellow-700",
 };
 
-export const getLampColor = (clearState: string | null | undefined) => {
-  if (!clearState || clearState === "NO PLAY") return "gray.600";
+export const getLampClass = (clearState: string | null | undefined) => {
+  if (!clearState || clearState === "NO PLAY") return "bg-slate-600";
 
   switch (clearState) {
     case "FAILED":
-      return "gray.300";
+      return "bg-slate-300";
     case "ASSIST CLEAR":
-      return "purple.500";
+      return "bg-purple-500";
     case "EASY CLEAR":
-      return "green.500";
+      return "bg-green-500";
     case "CLEAR":
-      return "blue.500";
+      return "bg-blue-500";
     case "HARD CLEAR":
-      return "red.500";
+      return "bg-red-500";
     case "EX HARD CLEAR":
-      return "yellow.500";
+      return "bg-yellow-500";
     case "FULLCOMBO CLEAR":
-      return "rainbow";
+      return "bg-linear-to-b from-red-500 via-yellow-400 via-green-400 via-blue-400 to-purple-500";
     default:
-      return "gray.600";
+      return "bg-slate-600";
   }
 };
 
@@ -46,160 +37,110 @@ interface SongItemProps {
 }
 
 const SongItem = ({
-  _song,
+  song,
   onClick,
 }: {
-  _song: SongItemProps;
+  song: SongWithScore;
   onClick: () => void;
 }) => {
-  const { song } = _song;
-  const lampColor = getLampColor(song.clearState);
-  const isFullCombo = song.clearState === "FULLCOMBO CLEAR";
+  const lampClass = getLampClass(song.clearState);
+
   return (
-    <Box
+    <div
       onClick={onClick}
-      _hover={{ bg: "whiteAlpha.300" }}
-      transition="background 0.2s"
-      w="full"
-      background="whiteAlpha.200"
-      boxShadow="sm"
-      boxShadowColor={"whiteAlpha.400"}
-      position="relative"
-      _before={{
-        content: '""',
-        position: "absolute",
-        left: 0,
-        top: 0,
-        bottom: 0,
-        width: "4px",
-
-        background: isFullCombo
-          ? "linear-gradient(to bottom, #ff0000, #8b00ff)"
-          : lampColor,
-        zIndex: 1,
-      }}
-      mb={2}
+      className={cn(
+        "relative w-full mb-2 cursor-pointer transition-colors duration-200 overflow-hidden",
+        "bg-white/10 hover:bg-white/20 border-l-4",
+        song.clearState === "FULLCOMBO CLEAR"
+          ? "border-transparent"
+          : `border-l-0`,
+      )}
     >
-      <Grid templateColumns="1fr auto" gap={1}>
-        <GridItem
-          overflow="hidden"
-          px={3}
-          py={2}
-          display="flex"
-          alignItems={"center"}
-        >
-          <VStack align="start" gap={0}>
-            <HStack gap={2}>
-              <Text fontWeight="bold" fontSize="sm" truncate>
-                {song.title}
-              </Text>
-            </HStack>
-            <Grid
-              templateColumns="32px 12px 70px 70px"
-              gap={2}
-              alignItems="center"
-            >
-              <Badge
-                w="32px"
-                h="18px"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                p={0}
-                variant="solid"
-                bg={diffColors[song.difficulty]}
-                color="white"
-                borderRadius="sm"
+      <div
+        className={cn("absolute left-0 top-0 bottom-0 w-1 z-10", lampClass)}
+      />
+
+      <div className="grid grid-cols-[1fr_auto] gap-1">
+        <div className="flex items-center px-3 py-2 min-w-0">
+          <div className="flex flex-col gap-0.5 w-full">
+            <h3 className="text-sm font-bold text-white truncate leading-tight">
+              {song.title}
+            </h3>
+
+            <div className="grid grid-cols-[32px_12px_70px_70px] gap-2 items-center">
+              <div
+                className={cn(
+                  "w-8 h-[18px] flex items-center justify-center rounded-sm",
+                  diffColors[song.difficulty] || "bg-slate-800",
+                )}
               >
-                <Text fontSize="11px" fontWeight="bold" lineHeight="1">
+                <span className="text-[11px] font-bold text-white leading-none">
                   {song.difficultyLevel}
-                </Text>
-              </Badge>
+                </span>
+              </div>
 
-              <Text
-                fontSize="xs"
-                color="gray.500"
-                fontWeight="bold"
-                textAlign="center"
-                lineHeight="1"
-              >
+              <span className="text-xs font-bold text-slate-500 text-center leading-none">
                 {song.difficulty.charAt(0)}
-              </Text>
+              </span>
 
-              {song.exScore && (
+              {song.exScore !== null && (
                 <>
                   {(["current", "next"] as const).map((mode) => (
-                    <Text
+                    <span
                       key={mode}
-                      fontSize="10px"
-                      lineHeight="1"
-                      whiteSpace="nowrap"
+                      className="text-[10px] text-slate-300 whitespace-nowrap leading-none font-mono"
                     >
                       {getDJRank(Number(song.exScore), song.notes * 2, {
                         mode,
                         output: "label",
                       })}
-                      {getDJRank(Number(song.exScore), song.notes * 2, {
-                        mode,
-                        output: "value",
-                      })}
-                    </Text>
+                      <span className="ml-0.5 text-slate-500">
+                        {getDJRank(Number(song.exScore), song.notes * 2, {
+                          mode,
+                          output: "value",
+                        })}
+                      </span>
+                    </span>
                   ))}
                 </>
               )}
-            </Grid>
-          </VStack>
-        </GridItem>
-        <GridItem
-          textAlign="right"
-          display={"flex"}
-          alignItems={"center"}
-          background="blackAlpha.400"
-          p={{ mdDown: 2, lg: 4 }}
-        >
-          <VStack align="end" gap={0}>
-            <HStack>
-              <VStack align="end" gap={0}>
-                <Text fontSize="xs" color="gray.400" lineHeight="1">
-                  EX
-                </Text>
-                <Text
-                  fontSize={{ mdDown: "sm", lg: "xl" }}
-                  fontWeight={"bold"}
-                  color="gray.300"
-                  lineHeight="1.1"
-                >
-                  {song.bpi !== null ? song.exScore : "---"}
-                </Text>
-                {song.exDiff && song.exDiff > 0 ? (
-                  <Text fontSize="10px" color="green.400" fontWeight="bold">
-                    +{song.exDiff}
-                  </Text>
-                ) : null}
-              </VStack>
-              <VStack ml={2} align="end" gap={0}>
-                <Text fontSize="xs" color="gray.400" lineHeight="1">
-                  BPI
-                </Text>
-                <Text
-                  fontSize={{ mdDown: "sm", lg: "xl" }}
-                  fontWeight={"bold"}
-                  color="gray.300"
-                  lineHeight="1.1"
-                >
-                  {song.bpi !== null ? song.bpi.toFixed(2) : "---"}
-                </Text>
-                {song.bpiDiff && song.bpiDiff > 0 ? (
-                  <Text fontSize="10px" color="green.400" fontWeight="bold">
-                    +{song.bpiDiff}
-                  </Text>
-                ) : null}
-              </VStack>
-            </HStack>
-          </VStack>
-        </GridItem>
-      </Grid>
-    </Box>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center bg-black/30 p-2 lg:p-4 shrink-0">
+          <div className="flex items-end gap-3 font-mono">
+            <div className="flex flex-col items-end">
+              <span className="text-[10px] text-slate-500 leading-none mb-0.5 uppercase">
+                EX
+              </span>
+              <span className="text-sm lg:text-xl font-bold text-slate-200 leading-none">
+                {song.exScore !== null ? song.exScore : "---"}
+              </span>
+              {song.exDiff !== undefined && song.exDiff > 0 && (
+                <span className="text-[10px] font-bold text-green-400 mt-0.5">
+                  +{song.exDiff}
+                </span>
+              )}
+            </div>
+
+            <div className="flex flex-col items-end">
+              <span className="text-[10px] text-slate-500 leading-none mb-0.5 uppercase">
+                BPI
+              </span>
+              <span className="text-sm lg:text-xl font-bold text-slate-200 leading-none">
+                {song.bpi !== null ? song.bpi.toFixed(2) : "---"}
+              </span>
+              {song.bpiDiff !== undefined && song.bpiDiff > 0 && (
+                <span className="text-[10px] font-bold text-green-400 mt-0.5">
+                  +{song.bpiDiff.toFixed(2)}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
@@ -213,14 +154,14 @@ export const SongList = ({
   listRef?: RefObject<HTMLDivElement | null>;
 }) => {
   return (
-    <Box w="full" p={2} ref={listRef ? listRef : null}>
+    <div className="w-full p-2 flex flex-col" ref={listRef}>
       {songs.map((song) => (
         <SongItem
           key={`${song.songId}-${song.difficulty}`}
-          _song={{ song: song }}
+          song={song}
           onClick={() => onSongSelect(song)}
         />
       ))}
-    </Box>
+    </div>
   );
 };

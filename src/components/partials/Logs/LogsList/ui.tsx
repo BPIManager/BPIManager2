@@ -1,27 +1,21 @@
 import { useState, useMemo } from "react";
 import { UpdateLog, useBatchesList } from "@/hooks/batches/useBatchesList";
-import {
-  Box,
-  Center,
-  Text,
-  HStack,
-  Heading,
-  Badge,
-  VStack,
-  Button,
-} from "@chakra-ui/react";
 import { LogsCard } from "../LogsCard/ui";
 import { LogsGroupSkeleton } from "../LogsCard/skeleton";
 import { NoDataAlert } from "../../DashBoard/NoData";
 import { CustomPagination } from "../../Pagination/ui";
 import Link from "next/link";
 import dayjs from "@/lib/dayjs";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface Props {
   userId: string | undefined;
   version: string;
   groupedBy: string;
 }
+
 interface GroupedLog {
   date: string;
   logs: UpdateLog[];
@@ -71,122 +65,117 @@ export const LogsList = ({ userId, version, groupedBy }: Props) => {
 
   if (isError)
     return (
-      <Center h="200px">
-        <Text color="red.500">読み込みに失敗しました</Text>
-      </Center>
+      <div className="flex h-[200px] items-center justify-center">
+        <p className="text-red-500 font-bold">読み込みに失敗しました</p>
+      </div>
     );
 
   if (!isLoading && logs?.length === 0) {
     return <NoDataAlert />;
   }
+
   return (
-    <Box position="relative" minH="50vh" pb="100px">
-      <VStack align="stretch" gap={8} p={4} position="relative">
-        <Box
-          position="absolute"
-          left="24px"
-          top="40px"
-          bottom="100px"
-          w="2px"
-          bg="border"
-          display={{ base: "none", md: "block" }}
+    <div className="relative min-h-[50vh] pb-24">
+      <div className="relative flex flex-col gap-10 p-4">
+        <div
+          className="absolute left-10 top-10 bottom-24 w-0.5 bg-slate-800 hidden md:block"
+          aria-hidden="true"
         />
 
         {isLoading
           ? [...new Array(3)].map((_, i) => <LogsGroupSkeleton key={i} />)
           : displayGroups.map((group) => (
-              <Box key={group.date} position="relative">
-                <HStack gap={4} mb={4} position="relative" zIndex={1}>
-                  <Box
-                    bg="blue.500"
-                    boxSize="12px"
-                    borderRadius="full"
-                    border="4px solid"
-                    borderColor="bg"
-                    display={{ base: "none", md: "block" }}
-                    ml="1px"
+              <div key={group.date} className="relative">
+                <div className="relative z-10 mb-4 flex items-center gap-4">
+                  <div
+                    className="hidden md:block h-3 w-3 shrink-0 rounded-full border-2 border-slate-950 bg-blue-500 ml-[21px]"
+                    aria-hidden="true"
                   />
-                  <Heading size="md" fontWeight="bold">
+                  <h2 className="text-xl font-bold tracking-tight text-white">
                     {group.date}
-                  </Heading>
-                  <Badge variant="subtle" px={2}>
+                  </h2>
+                  <Badge
+                    variant="secondary"
+                    className="px-2 py-0 font-mono text-[10px]"
+                  >
                     {group.logs.length} logs
                   </Badge>
-                </HStack>
+                </div>
 
-                <Box
-                  bg="bg.muted"
-                  p={4}
-                  borderRadius="lg"
-                  mb={4}
-                  ml={{ base: 0, md: 8 }}
-                  borderWidth="1px"
-                  borderColor="border"
+                <div
+                  className={cn(
+                    "mb-4 rounded-xl border border-white/5 bg-white/[0.02] p-4",
+                    "md:ml-12",
+                  )}
                 >
-                  <HStack justify="space-between" wrap="wrap">
-                    <HStack gap={6}>
-                      <VStack align="start" gap={0}>
-                        <Text fontSize="2xs" color="fg.muted">
+                  <div className="flex flex-wrap items-center justify-between gap-4">
+                    <div className="flex gap-8">
+                      <div className="flex flex-col">
+                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
                           合計更新件数
-                        </Text>
-                        <Text fontWeight="bold" fontSize="lg">
-                          {group.dayTotalUpdates} songs
-                        </Text>
-                      </VStack>
-                      <VStack align="start" gap={0}>
-                        <Text fontSize="2xs" color="fg.muted">
+                        </span>
+                        <span className="text-lg font-bold text-slate-200">
+                          {group.dayTotalUpdates}{" "}
+                          <span className="text-xs font-normal text-slate-500">
+                            songs
+                          </span>
+                        </span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
                           BPI上昇幅計
-                        </Text>
-                        <Text
-                          fontWeight="bold"
-                          fontSize="lg"
-                          color={
+                        </span>
+                        <span
+                          className={cn(
+                            "text-lg font-bold",
                             group.dayTotalBpiDelta >= 0
-                              ? "green.400"
-                              : "red.400"
-                          }
+                              ? "text-green-400"
+                              : "text-red-400",
+                          )}
                         >
                           {group.dayTotalBpiDelta >= 0 ? "+" : ""}
                           {group.dayTotalBpiDelta.toFixed(2)}
-                        </Text>
-                      </VStack>
-                    </HStack>
-                    <Link
-                      href={{
-                        pathname: `/users/${userId}/logs/${version}/summary/${group.date}`,
-                        query: { groupedBy },
-                      }}
-                      passHref
-                    >
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        colorPalette="blue"
-                        px={2}
-                      >
-                        詳細
-                      </Button>
-                    </Link>
-                  </HStack>
-                </Box>
+                        </span>
+                      </div>
+                    </div>
 
-                <VStack align="stretch" gap={3} ml={{ base: 0, md: 8 }}>
+                    <Button
+                      asChild
+                      variant="outline"
+                      size="sm"
+                      className="rounded-full border-white/10 hover:bg-white/5"
+                    >
+                      <Link
+                        href={{
+                          pathname: `/users/${userId}/logs/${version}/summary/${group.date}`,
+                          query: { groupedBy },
+                        }}
+                      >
+                        詳細を見る
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-3 md:ml-12">
                   {group.logs.map((log) => (
                     <LogsCard key={log.batchId} log={log} />
                   ))}
-                </VStack>
-              </Box>
+                </div>
+              </div>
             ))}
-      </VStack>
+      </div>
 
       {!isLoading && groupedLogs.length > PAGE_SIZE && (
-        <CustomPagination
-          count={groupedLogs.length}
-          pageSize={PAGE_SIZE}
-          page={page}
-          onPageChange={setPage}
-        />
+        <div className="mt-8">
+          <CustomPagination
+            count={groupedLogs.length}
+            pageSize={PAGE_SIZE}
+            page={page}
+            onPageChange={setPage}
+          />
+        </div>
       )}
-    </Box>
+    </div>
   );
 };

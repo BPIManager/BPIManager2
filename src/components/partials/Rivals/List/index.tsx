@@ -1,11 +1,12 @@
+"use client";
+
 import { useState } from "react";
-import { VStack } from "@chakra-ui/react";
+import { useRouter } from "next/router";
 import { latestVersion } from "@/constants/latestVersion";
 import { useUser } from "@/contexts/users/UserContext";
 import { useRivalSummary } from "@/hooks/social/useRivalSummary";
 import { RivalFilter } from "./filter";
 import { RivalList } from "./container";
-import { useRouter } from "next/router";
 import { LoginRequiredCard } from "../../LoginRequired/ui";
 
 export const RivalListContainer = () => {
@@ -37,12 +38,10 @@ export const RivalListContainer = () => {
     );
   };
 
-  if (!user && !isCredentialLoading) {
-    return <LoginRequiredCard />;
-  }
+  if (!user && !isCredentialLoading) return <LoginRequiredCard />;
 
   return (
-    <VStack align="stretch" gap={8} w="full">
+    <div className="flex w-full flex-col gap-8">
       <RivalFilter
         levels={levels}
         difficulties={difficulties}
@@ -53,10 +52,8 @@ export const RivalListContainer = () => {
         results={results || []}
         isLoading={isLoading}
         isError={isError}
-        onCardClick={(id) => router.push(`/rivals/${id}`)}
+        onCardClick={(id: string) => router.push(`/rivals/${id}`)}
       />
-    </VStack>
+    </div>
   );
 };
-
-export default RivalListContainer;

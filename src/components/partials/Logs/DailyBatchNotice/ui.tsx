@@ -1,17 +1,9 @@
-import {
-  Box,
-  HStack,
-  Text,
-  Button,
-  Badge,
-  Circle,
-  Stack,
-  Flex,
-} from "@chakra-ui/react";
 import { Info, LayoutGrid } from "lucide-react";
 import Link from "next/link";
 import dayjs from "@/lib/dayjs";
 import { useRouter } from "next/router";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 interface DailyBatchNoticeProps {
   dailyBatchIds: string[];
@@ -27,6 +19,7 @@ export const DailyBatchNotice = ({
   version,
 }: DailyBatchNoticeProps) => {
   if (dailyBatchIds.length <= 1) return null;
+
   const router = useRouter();
   const { userId } = router.query;
 
@@ -34,94 +27,48 @@ export const DailyBatchNotice = ({
   const currentIndex = dailyBatchIds.indexOf(currentBatchId) + 1;
 
   return (
-    <Box
-      bg="blue.950/30"
-      borderWidth="1px"
-      borderColor="blue.800/50"
-      borderRadius="2xl"
-      p={{ base: 4, md: 5 }}
-      mb={6}
-      position="relative"
-      overflow="hidden"
-    >
-      <Box
-        position="absolute"
-        right="-20px"
-        top="-20px"
-        color="blue.500/10"
-        pointerEvents="none"
+    <div className="relative mb-6 overflow-hidden rounded-2xl border border-blue-800/50 bg-blue-950/30 p-4 md:p-5">
+      <div
+        className="pointer-events-none absolute -right-5 -top-5 text-blue-500/10"
+        aria-hidden="true"
       >
         <LayoutGrid size={120} />
-      </Box>
+      </div>
 
-      <Stack
-        direction={{ base: "column", md: "row" }}
-        justify="space-between"
-        align={{ base: "stretch", md: "center" }}
-        gap={{ base: 4, md: 8 }}
-      >
-        <Flex gap={4} align="center" flex="1">
-          <Circle
-            size={{ base: "40px", md: "48px" }}
-            bg="blue.900/60"
-            color="blue.300"
-            flexShrink={0}
-            borderWidth="1px"
-            borderColor="blue.700/50"
-          >
-            <Info size={22} />
-          </Circle>
+      <div className="relative z-10 flex flex-col items-stretch justify-between gap-4 md:flex-row md:items-center md:gap-8">
+        <div className="flex flex-1 items-center gap-4">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-blue-700/50 bg-blue-900/60 text-blue-300 md:h-12 md:w-12">
+            <Info className="h-5 w-5 md:h-6 md:w-6" />
+          </div>
 
-          <Box flex="1">
-            <HStack gap={3} mb={1} wrap="wrap">
-              <Text
-                fontWeight="bold"
-                fontSize={{ base: "md", md: "lg" }}
-                letterSpacing="tight"
-              >
+          <div className="flex-1">
+            <div className="mb-1 flex flex-wrap items-center gap-3">
+              <span className="text-base font-bold tracking-tight text-white md:text-lg">
                 {dateStr}
-              </Text>
-              <Badge
-                variant="solid"
-                bg="blue.800"
-                color="blue.100"
-                size="md"
-                borderRadius="full"
-                px={3}
-              >
+              </span>
+              <Badge className="rounded-full bg-blue-800 px-3 py-0.5 text-xs font-semibold text-blue-100 hover:bg-blue-700">
                 {currentIndex} / {dailyBatchIds.length} 回目の更新
               </Badge>
-            </HStack>
-            <Text
-              fontSize={{ base: "xs", md: "sm" }}
-              color="fg.muted"
-              whiteSpace={{ md: "nowrap" }}
-            >
+            </div>
+            <p className="text-xs text-gray-400 md:whitespace-nowrap md:text-sm">
               合計{dailyBatchIds.length}回のスコア更新が記録されています。
-            </Text>
-          </Box>
-        </Flex>
+            </p>
+          </div>
+        </div>
 
-        <Link
-          href={`/users/${userId as string}/logs/${version}/summary/${dateStr}`}
-          passHref
+        <Button
+          asChild
+          size="lg"
+          className="group w-full bg-blue-600 font-bold text-white shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-blue-500 hover:shadow-lg md:w-auto md:px-6"
         >
-          <Button
-            size={{ base: "md", md: "lg" }}
-            colorPalette="blue"
-            variant="solid"
-            gap={2}
-            px={6}
-            w={{ base: "full", md: "auto" }}
-            shadow="md"
-            _hover={{ transform: "translateY(-1px)", shadow: "lg" }}
-            transition="all 0.2s"
+          <Link
+            href={`/users/${userId as string}/logs/${version}/summary/${dateStr}`}
           >
-            <LayoutGrid size={18} />
+            <LayoutGrid className="mr-2 h-4.5 w-4.5" />
             一日のまとめを見る
-          </Button>
-        </Link>
-      </Stack>
-    </Box>
+          </Link>
+        </Button>
+      </div>
+    </div>
   );
 };

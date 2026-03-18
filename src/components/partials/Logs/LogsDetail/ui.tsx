@@ -17,17 +17,16 @@ export const LogsDetailView = (props: LogsDetailViewProps) => {
       ? dayjs(props.date).tz().format("YYYY年M月D日のまとめ")
       : "更新の詳細";
 
+  const pageDescription =
+    props.type === "daily" ? "一日の成果を統合して表示しています" : "";
+
   return (
-    <>
-      <PageHeader
-        title={pageTitle}
-        description={
-          props.type === "daily" ? "一日の成果を統合して表示しています" : ""
-        }
-      />
+    <div className="flex flex-col w-full min-h-screen bg-black">
+      <PageHeader title={pageTitle} description={pageDescription} />
+
       <PageContainer>
         <LogsDetailContent {...props} />
       </PageContainer>
-    </>
+    </div>
   );
 };

@@ -1,4 +1,4 @@
-import { DashCard } from "@/components/ui/chakra/dashcard";
+import { DashCard } from "@/components/ui/dashcard";
 import { UserPlus } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";

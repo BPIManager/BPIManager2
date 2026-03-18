@@ -1,5 +1,5 @@
 import { DistributionChartSkeleton } from "@/components/partials/DashBoard/DistributionChart/skeleton";
-import { DashCard } from "@/components/ui/chakra/dashcard";
+import { DashCard } from "@/components/ui/dashcard";
 import { cn } from "@/lib/utils";
 
 const animationStyles = `

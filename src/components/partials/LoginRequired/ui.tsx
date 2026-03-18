@@ -1,76 +1,51 @@
-import {
-  Box,
-  VStack,
-  Text,
-  Button,
-  Icon,
-  AbsoluteCenter,
-} from "@chakra-ui/react";
 import { LuLock } from "react-icons/lu";
 import { LoginButtons } from "../LogIn";
+import { cn } from "@/lib/utils";
 
-export const LoginRequiredCard = () => {
+export const LoginRequiredCard = ({ className }: { className?: string }) => {
   return (
-    <Box
-      p={4}
-      bg="gray.900"
-      borderRadius="xl"
-      borderWidth="1px"
-      borderColor="whiteAlpha.100"
-      textAlign="center"
-      position="relative"
-      overflow="hidden"
+    <div
+      className={cn(
+        "relative flex flex-col items-center overflow-hidden rounded-xl border border-white/10 bg-slate-900 p-8 text-center",
+        className,
+      )}
     >
-      <Icon
-        as={LuLock}
-        position="absolute"
-        top="-10px"
-        right="-10px"
-        fontSize="100px"
-        color="whiteAlpha.50"
-        transform="rotate(15deg)"
+      <LuLock
+        className="pointer-events-none absolute -right-2 -top-2 rotate-12 text-[120px] text-white/5"
+        aria-hidden="true"
       />
 
-      <VStack gap={4} position="relative" zIndex={1}>
-        <Box
-          p={3}
-          bg="blue.500/10"
-          color="blue.400"
-          borderRadius="full"
-          borderWidth="1px"
-          borderColor="blue.500/20"
-        >
+      <div className="relative z-10 flex flex-col items-center gap-6">
+        <div className="flex h-16 w-16 items-center justify-center rounded-full border border-blue-500/20 bg-blue-500/10 text-blue-400">
           <LuLock size={32} />
-        </Box>
+        </div>
 
-        <VStack gap={1} width="full">
-          <Text fontWeight="bold" fontSize="lg" color="white">
-            ログインが必要です
-          </Text>
-          <Text fontSize="sm" color="gray.400">
+        <div className="flex flex-col gap-1">
+          <h3 className="text-lg font-bold text-white">ログインが必要です</h3>
+          <p className="max-w-[280px] text-sm text-gray-400">
             このコンテンツの利用には、BPIMアカウントへのログインが必要です。
-          </Text>
-        </VStack>
+          </p>
+        </div>
 
-        <LoginButtons />
-      </VStack>
-    </Box>
+        <div className="w-full min-w-[280px]">
+          <LoginButtons />
+        </div>
+      </div>
+    </div>
   );
 };
 
 export const LoginRequiredBox = () => {
   return (
-    <>
-      <Box
-        position="absolute"
-        inset={0}
-        bg="blackAlpha.400"
-        backdropFilter="blur(10px)"
-        zIndex={10}
+    <div className="absolute inset-0 z-50 flex items-center justify-center px-4">
+      <div
+        className="absolute inset-0 bg-black/40 backdrop-blur-md"
+        aria-hidden="true"
       />
-      <AbsoluteCenter zIndex={20} w="full" maxW="full" px={4}>
+
+      <div className="relative z-20 w-full max-w-md">
         <LoginRequiredCard />
-      </AbsoluteCenter>
-    </>
+      </div>
+    </div>
   );
 };

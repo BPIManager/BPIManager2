@@ -1,30 +1,28 @@
-import { useUser } from "@/contexts/users/UserContext";
-import { VStack, Button, HStack, Badge } from "@chakra-ui/react";
-import { Check, Plus, Settings2 } from "lucide-react";
+"use client";
+
 import { useState } from "react";
-import {
-  DialogRoot,
-  DialogTrigger,
-  DialogContent,
-  DialogBody,
-  DialogCloseTrigger,
-} from "@/components/ui/chakra/dialog";
+import { Check, Plus, Settings2, Loader } from "lucide-react";
+import { useUser } from "@/contexts/users/UserContext";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { LoginRequiredCard } from "../../LoginRequired/ui";
 import AccountSettings from "../../Modal/AccountSettings";
+import { cn } from "@/lib/utils";
 
 export const FollowSection = ({
   relationship,
   onToggle,
   isUpdating,
   userId,
-  w = "full",
+  className,
   onModal,
 }: {
   relationship: any;
   onToggle?: () => void;
   isUpdating?: boolean;
   userId: string;
-  w: any;
+  className?: string;
   onModal?: boolean;
 }) => {
   const { fbUser } = useUser();
@@ -36,19 +34,15 @@ export const FollowSection = ({
     return (
       <>
         <Button
-          width={w}
-          px={4}
-          size="sm"
-          colorPalette={"green"}
-          color="black"
           onClick={() => setIsSettingsOpen(true)}
-          borderRadius="full"
-          fontWeight="bold"
+          className={cn(
+            "w-full rounded-full bg-green-500 font-bold text-black hover:bg-green-400 h-9",
+            className,
+          )}
         >
-          <Settings2 size={16} />
+          <Settings2 className="mr-2 h-4 w-4" />
           プロフィール編集
         </Button>
-
         <AccountSettings
           isOpen={isSettingsOpen}
           onClose={() => setIsSettingsOpen(false)}
@@ -59,64 +53,70 @@ export const FollowSection = ({
 
   const renderButtonContent = () => (
     <>
-      {relationship.isFollowing ? <Check size={16} /> : <Plus size={16} />}
+      {isUpdating ? (
+        <Loader className="mr-2 h-4 w-4 animate-spin" />
+      ) : relationship.isFollowing ? (
+        <Check className="mr-2 h-4 w-4" />
+      ) : (
+        <Plus className="mr-2 h-4 w-4" />
+      )}
       {relationship.isFollowing ? "フォロー中" : "フォローする"}
     </>
   );
 
   return (
-    <>
+    <div className="flex flex-col items-center gap-2 w-full">
       {isLoggedIn ? (
         <Button
-          width={w}
-          px={4}
-          size="sm"
-          variant="solid"
-          colorPalette={relationship.isFollowing ? "green" : "blue"}
-          color={relationship.isFollowing ? "black" : "white"}
           onClick={onToggle}
-          borderRadius="full"
-          fontWeight="bold"
-          loading={isUpdating}
+          disabled={isUpdating}
+          className={cn(
+            "w-full rounded-full font-bold h-9 transition-all",
+            relationship.isFollowing
+              ? "bg-green-500 text-black hover:bg-green-400"
+              : "bg-blue-600 text-white hover:bg-blue-500",
+            className,
+          )}
         >
           {renderButtonContent()}
         </Button>
       ) : (
-        <DialogRoot placement="center">
+        <Dialog>
           <DialogTrigger asChild>
             <Button
-              width={w}
-              size="sm"
-              variant="solid"
-              colorPalette="blue"
-              color="white"
-              borderRadius="full"
-              fontWeight="bold"
+              className={cn(
+                "w-full rounded-full bg-blue-600 font-bold text-white h-9",
+                className,
+              )}
             >
               {renderButtonContent()}
             </Button>
           </DialogTrigger>
-          <DialogContent bg="transparent" border="none" boxShadow="none">
-            <DialogBody p={0}>
-              <LoginRequiredCard />
-            </DialogBody>
-            <DialogCloseTrigger color="white" />
+          <DialogContent className="max-w-md border-none bg-transparent p-0 shadow-none outline-none">
+            <LoginRequiredCard />
           </DialogContent>
-        </DialogRoot>
+        </Dialog>
       )}
+
       {!onModal && (
-        <HStack gap={1} justifyContent={"center"} my={2}>
+        <div className="flex justify-center h-5">
           {relationship.isMutual ? (
-            <Badge variant="subtle" colorPalette="blue" size="sm" px={2}>
+            <Badge
+              variant="secondary"
+              className="bg-blue-500/10 text-blue-400 border-blue-500/20 px-2 py-0 text-[10px]"
+            >
               相互フォロー
             </Badge>
           ) : relationship.isFollowedBy ? (
-            <Badge variant="subtle" colorPalette="blue" size="sm" px={2}>
+            <Badge
+              variant="secondary"
+              className="bg-blue-500/10 text-blue-400 border-blue-500/20 px-2 py-0 text-[10px]"
+            >
               フォローされています
             </Badge>
           ) : null}
-        </HStack>
+        </div>
       )}
-    </>
+    </div>
   );
 };

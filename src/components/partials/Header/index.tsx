@@ -1,14 +1,6 @@
-import {
-  Box,
-  Container,
-  Heading,
-  Text,
-  VStack,
-  HStack,
-  Icon,
-} from "@chakra-ui/react";
 import { LucideIcon } from "lucide-react";
 import { ReactNode } from "react";
+import { cn } from "@/lib/utils";
 
 interface PageHeaderProps {
   title: string;
@@ -20,83 +12,49 @@ interface PageHeaderProps {
 export const PageHeader = ({
   title,
   description,
-  icon,
+  icon: Icon,
   rightElement,
 }: PageHeaderProps) => (
-  <Box
-    position="relative"
-    overflow="hidden"
-    bg="gray.950"
-    borderBottom="1px solid"
-    borderColor="whiteAlpha.100"
-    pt={{ base: 8, md: 12 }}
-    pb={{ base: 6, md: 8 }}
-    px={4}
-    mb={6}
-  >
-    <Box
-      position="absolute"
-      top="-20%"
-      left="-10%"
-      w="40%"
-      h="150%"
-      bg="blue.900"
-      filter="blur(120px)"
-      opacity="0.15"
-      pointerEvents="none"
+  <header className="relative mb-6 overflow-hidden border-b border-white/10 bg-slate-950 px-4 pt-8 pb-6 md:pt-12 md:pb-8">
+    <div
+      className="pointer-events-none absolute -top-[20%] -left-[10%] h-[150%] w-[40%] bg-blue-900/15 blur-[120px]"
+      aria-hidden="true"
     />
 
-    <Container maxW="container.xl">
-      <HStack justify="space-between" align="flex-end" gap={4}>
-        <VStack align="start" gap={2} flex={1}>
-          <HStack gap={3}>
-            {icon && (
-              <Box
-                p={2}
-                bg="blue.950"
-                borderRadius="lg"
-                borderWidth="1px"
-                borderColor="blue.800"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-              >
-                <Icon as={icon} size="md" color="blue.400" />
-              </Box>
+    <div className="mx-auto max-w-7xl">
+      <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
+        <div className="flex flex-1 flex-col gap-2">
+          <div className="flex items-center gap-3">
+            {Icon && (
+              <div className="flex items-center justify-center rounded-lg border border-blue-800 bg-blue-950 p-2">
+                <Icon className="h-6 w-6 text-blue-400" />
+              </div>
             )}
-            <Heading
-              size="2xl"
-              fontWeight="bold"
-              letterSpacing="tight"
-              color="white"
-              lineHeight="1.1"
-            >
+            <h1 className="text-3xl font-bold tracking-tight text-white leading-[1.1] md:text-4xl">
               {title}
-            </Heading>
-          </HStack>
+            </h1>
+          </div>
 
           {description && (
-            <Text
-              fontSize="md"
-              color="whiteAlpha.600"
-              maxW="2xl"
-              fontWeight="medium"
-              pl={icon ? "52px" : "0"}
-              display={{ base: "none", sm: "block" }}
+            <p
+              className={cn(
+                "hidden text-base font-medium text-white/60 sm:block max-w-2xl",
+                Icon ? "sm:pl-[52px]" : "pl-0",
+              )}
             >
               {description}
-            </Text>
+            </p>
           )}
-        </VStack>
+        </div>
 
-        {rightElement && <Box pb={1}>{rightElement}</Box>}
-      </HStack>
-    </Container>
-  </Box>
+        {rightElement && <div className="pb-1">{rightElement}</div>}
+      </div>
+    </div>
+  </header>
 );
 
 export const PageContainer = ({ children }: { children: ReactNode }) => (
-  <Container maxW="svw" mx="auto" px={{ base: 3, md: 8, lg: 16 }} py={4}>
+  <main className="mx-auto w-full max-w-[1920px] px-3 py-4 md:px-8 lg:px-16">
     {children}
-  </Container>
+  </main>
 );

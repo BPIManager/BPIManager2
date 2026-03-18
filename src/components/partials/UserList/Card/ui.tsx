@@ -1,17 +1,11 @@
-import {
-  Box,
-  Text,
-  HStack,
-  VStack,
-  Avatar,
-  Badge,
-  Icon,
-} from "@chakra-ui/react";
-import { LuTrendingUp, LuTrendingDown } from "react-icons/lu";
+import { TrendingUp, TrendingDown } from "lucide-react";
 import { formatIIDXId } from "@/utils/common/formatIidxId";
 import dayjs from "@/lib/dayjs";
 import { RadarSectionChart } from "../../DashBoard/Radar/ui";
 import { getBpiColorStyle } from "@/constants/bpiColor";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 export const UserRecommendationCard = ({
   user,
@@ -42,167 +36,91 @@ export const UserRecommendationCard = ({
 
   const diff = displayValue - viewerCompareValue;
   const isTarget = diff > 0;
+
   return (
-    <Box
-      as="button"
-      width="full"
+    <button
       onClick={onClick}
-      textAlign="left"
-      style={{ textDecoration: "none" }}
+      className="group relative flex w-full flex-row items-stretch justify-between gap-3 overflow-hidden rounded-2xl border border-white/10 bg-slate-900/80 p-3 text-left transition-all duration-300 hover:-translate-y-1 hover:border-white/30 hover:bg-slate-800/90 md:gap-6 md:p-5"
     >
-      <HStack
-        p={{ base: 3, md: 5 }}
-        bg="rgba(13, 17, 23, 0.8)"
-        borderRadius="2xl"
-        borderWidth="1px"
-        borderColor="whiteAlpha.100"
-        cursor="pointer"
-        gap={{ base: 3, md: 6 }}
-        _hover={{
-          borderColor: "whiteAlpha.400",
-          bg: "rgba(20, 25, 35, 0.9)",
-          transform: "translateY(-2px)",
-        }}
-        transition="all 0.3s cubic-bezier(.4,0,.2,1)"
-        justifyContent={"space-between"}
-        position="relative"
-        overflow="hidden"
-        align="stretch"
-      >
-        <Box
-          position="absolute"
-          top={0}
-          left={0}
-          w="4px"
-          h="full"
-          bg={getBpiColorStyle(user.totalBpi).bg}
-          opacity={0.8}
+      <div
+        className="absolute left-0 top-0 bottom-0 w-1 opacity-80"
+        style={{ backgroundColor: getBpiColorStyle(user.totalBpi).bg }}
+      />
+
+      <div className="flex flex-1 flex-col gap-2 py-1 min-w-0 md:gap-4">
+        <div className="flex w-full items-center gap-2 md:gap-3">
+          <Avatar className="h-8 w-8 border-2 border-white/10 md:h-12 md:w-12">
+            <AvatarImage src={user.profileImage ?? ""} />
+            <AvatarFallback>{user.userName.slice(0, 2)}</AvatarFallback>
+          </Avatar>
+
+          <div className="flex flex-1 flex-col gap-0 min-w-0">
+            <span className="truncate text-xs font-bold text-white tracking-tight md:text-base">
+              {user.userName}
+            </span>
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <Badge className="bg-orange-600 h-4 px-1.5 text-[10px] md:text-[11px] font-bold text-white">
+                {user.arenaRank || "N/A"}
+              </Badge>
+              <span className="font-mono text-[10px] text-slate-500 md:text-[12px]">
+                ID: {formatIIDXId(user.iidxId)}
+              </span>
+            </div>
+            <span className="text-[10px] text-slate-500 md:text-[12px]">
+              最終更新: {timeAgo}
+            </span>
+          </div>
+        </div>
+
+        <div>
+          <span
+            className={cn(
+              "block text-[9px] font-bold tracking-wider mb-0.5",
+              isTotalBpi ? "text-slate-500" : "text-blue-400",
+            )}
+          >
+            {displayLabel}
+          </span>
+          <div className="flex items-baseline gap-1.5">
+            <span className="font-mono text-lg font-bold text-white md:text-2xl leading-none">
+              {displayValue.toFixed(2)}
+            </span>
+            <div
+              className={cn(
+                "flex items-center gap-0.5 pb-0.5",
+                isTarget ? "text-orange-400" : "text-blue-400",
+              )}
+            >
+              {isTarget ? (
+                <TrendingUp className="h-2.5 w-2.5" />
+              ) : (
+                <TrendingDown className="h-2.5 w-2.5" />
+              )}
+              <span className="font-mono text-[10px] font-bold md:text-[12px]">
+                {isTarget ? "+" : ""}
+                {diff.toFixed(2)}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="w-full">
+          <span className="block text-[9px] font-bold tracking-wider text-slate-500 mb-0.5">
+            COMMENT
+          </span>
+          <p className="line-clamp-1 text-[10px] leading-relaxed text-slate-400 md:line-clamp-2 md:text-[11px]">
+            {user.profileText || "-"}
+          </p>
+        </div>
+      </div>
+
+      <div className="flex h-[100px] w-[100px] shrink-0 self-center items-center justify-center rounded-xl border border-white/5 bg-black/40 p-1 sm:h-[120px] sm:w-[120px] md:h-[140px] md:w-[140px]">
+        <RadarSectionChart
+          data={viewerRadar}
+          rivalData={user.radar}
+          isMini={true}
         />
-
-        <VStack align="start" flex="1" gap={{ base: 2, md: 4 }} minW={0} py={1}>
-          <HStack gap={{ base: 2, md: 3 }} w="full">
-            <Avatar.Root
-              size={{ base: "sm", md: "lg" }}
-              border="2px solid"
-              borderColor="whiteAlpha.200"
-            >
-              <Avatar.Fallback name={user.userName} />
-              <Avatar.Image src={user.profileImage ?? ""} />
-            </Avatar.Root>
-            <VStack align="start" gap={0} minW={0}>
-              <Text
-                fontWeight="bold"
-                color="white"
-                fontSize={{ base: "xs", md: "md" }}
-                lineClamp={1}
-                letterSpacing="tight"
-              >
-                {user.userName}
-              </Text>
-              <HStack>
-                <Badge
-                  colorPalette="orange"
-                  variant="solid"
-                  size="xs"
-                  px={1.5}
-                  borderRadius="full"
-                  fontSize="12px"
-                >
-                  {user.arenaRank || "N/A"}
-                </Badge>
-                <Text fontSize="12px" color="whiteAlpha.400">
-                  <span>ID:</span>
-                  <Text as="span">{formatIIDXId(user.iidxId)}</Text>
-                </Text>
-              </HStack>
-              <Text
-                fontSize="12px"
-                color="whiteAlpha.400"
-                fontWeight="normal"
-                whiteSpace="nowrap"
-              >
-                最終更新: {timeAgo}
-              </Text>
-            </VStack>
-          </HStack>
-
-          <Box>
-            <Text
-              fontSize="9px"
-              color={isTotalBpi ? "gray.500" : "blue.400"}
-              fontWeight="bold"
-              mb={0.5}
-              letterSpacing="wider"
-            >
-              {displayLabel}
-            </Text>
-            <HStack align="flex-end" gap={1.5}>
-              <Text
-                color="white"
-                fontFamily="mono"
-                fontWeight="bold"
-                fontSize={{ base: "lg", md: "2xl" }}
-                lineHeight="1"
-              >
-                {displayValue.toFixed(2)}
-              </Text>
-              <HStack gap={0} pb={0.5}>
-                <Icon
-                  as={isTarget ? LuTrendingUp : LuTrendingDown}
-                  color={isTarget ? "orange.400" : "blue.400"}
-                  boxSize={2.5}
-                />
-                <Text
-                  fontSize="10px"
-                  fontWeight="bold"
-                  fontFamily="mono"
-                  color={isTarget ? "orange.400" : "blue.400"}
-                >
-                  {isTarget ? "+" : ""}
-                  {diff.toFixed(2)}
-                </Text>
-              </HStack>
-            </HStack>
-          </Box>
-
-          <Box w="full">
-            <Text
-              fontSize="9px"
-              color="gray.500"
-              fontWeight="bold"
-              mb={0.5}
-              letterSpacing="wider"
-            >
-              COMMENT
-            </Text>
-            <Text
-              fontSize="10px"
-              color="gray.400"
-              lineClamp={{ base: 1, md: 2 }}
-              lineHeight="1.4"
-            >
-              {user.profileText || "-"}
-            </Text>
-          </Box>
-        </VStack>
-
-        <Box
-          w={{ base: "100px", sm: "120px", md: "140px" }}
-          h={{ base: "100px", sm: "120px", md: "140px" }}
-          bg="blackAlpha.400"
-          borderRadius="xl"
-          p={1}
-          borderWidth="1px"
-          borderColor="whiteAlpha.50"
-          alignSelf="center"
-        >
-          <RadarSectionChart
-            data={viewerRadar}
-            rivalData={user.radar}
-            isMini={true}
-          />
-        </Box>
-      </HStack>
-    </Box>
+      </div>
+    </button>
   );
 };

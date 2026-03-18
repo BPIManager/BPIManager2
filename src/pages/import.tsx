@@ -1,14 +1,13 @@
 import { Meta } from "@/components/partials/Head";
 import { ImportSuccessModal } from "@/components/partials/Import/SuccessModal/ui";
 import { ImportView } from "@/components/partials/Import/View/ui";
-import LoginPage from "@/components/partials/LogIn/page";
 import AccountSettings from "@/components/partials/Modal/AccountSettings";
 import { dummyCsv } from "@/constants/dummyCsv";
 import { latestVersion } from "@/constants/latestVersion";
 import { useUser } from "@/contexts/users/UserContext";
 import { useBatchImport } from "@/hooks/import/useBatchImport";
-import { Center, Spinner } from "@chakra-ui/react";
 import { useState } from "react";
+import { Loader2 } from "lucide-react";
 
 export default function ImportPage() {
   const { user, isLoading, fbUser, refresh } = useUser();
@@ -32,9 +31,9 @@ export default function ImportPage() {
 
   if (isLoading)
     return (
-      <Center h="90vh">
-        <Spinner />
-      </Center>
+      <div className="flex h-[90vh] w-full items-center justify-center">
+        <Loader2 className="h-10 w-10 animate-spin text-blue-500" />
+      </div>
     );
 
   return (

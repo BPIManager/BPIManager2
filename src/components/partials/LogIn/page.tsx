@@ -1,18 +1,5 @@
 import { LoginButtons } from "@/components/partials/LogIn";
 import {
-  Heading,
-  Text,
-  VStack,
-  Box,
-  SimpleGrid,
-  Icon,
-  Badge,
-  HStack,
-  Stack,
-  Separator,
-  Link,
-} from "@chakra-ui/react";
-import {
   Database,
   BarChart3,
   ArrowRightLeft,
@@ -20,10 +7,12 @@ import {
   Cpu,
   UsersIcon,
   Wrench,
+  LucideIcon,
 } from "lucide-react";
 import { Meta } from "../Head";
 import { DashboardLayout } from "../Main";
 import { PageContainer } from "../Header";
+import { Separator } from "@/components/ui/separator";
 
 export default function LoginPage() {
   return (
@@ -32,135 +21,84 @@ export default function LoginPage() {
         title=""
         description="beatmania IIDX 上級者のためのスコアマネジメントツール"
       />
-      <Box bg="black" minH="100svh" color="white" py={20}>
+      <div className="min-h-screen bg-black py-20 text-white">
         <PageContainer>
-          <VStack gap={6} textAlign="center" mb={16}>
-            <Heading
-              fontSize={{ base: "4xl", md: "6xl" }}
-              fontWeight="bold"
-              letterSpacing="tighter"
-              lineHeight="1"
-              bgGradient="to-br"
-              gradientFrom="white"
-              gradientTo="gray.600"
-              bgClip="text"
-            >
+          <div className="mb-16 flex flex-col items-center gap-6 text-center">
+            <h1 className="bg-gradient-to-br from-white to-gray-600 bg-clip-text text-6xl font-bold tracking-tighter text-transparent leading-none md:text-8xl">
               BPIM2
-            </Heading>
-            <Text
-              color="fg.muted"
-              fontSize={{ base: "md", md: "md" }}
-              maxW="2xl"
-            >
+            </h1>
+            <p className="max-w-2xl text-base text-gray-400 md:text-lg">
               beatmania IIDX 上級者のためのスコアマネジメントツール
-            </Text>
-          </VStack>
+            </p>
+          </div>
 
-          <Box
-            maxW="md"
-            mx="auto"
-            p={8}
-            borderRadius="2xl"
-            bg="gray.950"
-            border="1px solid"
-            borderColor="whiteAlpha.200"
-            boxShadow="0 0 40px rgba(0,0,0,0.5), 0 0 20px rgba(49, 130, 206, 0.1)"
-            mb={12}
-          >
-            <VStack gap={6}>
-              <VStack gap={1}>
-                <Text fontWeight="bold" fontSize="xl">
-                  Sign In
-                </Text>
-              </VStack>
+          <div className="mx-auto mb-12 max-w-md rounded-2xl border border-white/10 bg-slate-950 p-8 shadow-[0_0_40px_rgba(0,0,0,0.5),0_0_20px_rgba(59,130,246,0.1)]">
+            <div className="flex flex-col items-center gap-6 text-center">
+              <h2 className="text-xl font-bold">Sign In</h2>
               <LoginButtons />
-              <Text fontSize="12px" color="gray.200" textAlign="center">
-                本ツールは現在ベータ版提供です。
-                <br />
-                安定版としては
-                <Link
-                  href="https://bpi.poyashi.me"
-                  target="_blank"
-                  textDecoration={"underline"}
-                  fontWeight={"bold"}
-                >
-                  BPIM
-                </Link>
-                をご利用ください
-                <br />
-                (BPIM→BPIM2のデータ移行はいつでも可能です)
-              </Text>
-            </VStack>
-          </Box>
-
-          <Separator mb={16} opacity={0.1} />
-
-          <Heading
-            size="lg"
-            mb={10}
-            textAlign="center"
-            letterSpacing="widest"
-            fontWeight="bold"
-          >
-            BPIM2って？
-          </Heading>
-          <Box
-            maxW="full"
-            mx="auto"
-            p={{ base: 6, md: 8 }}
-            borderRadius="2xl"
-            bg="gray.950"
-            border="1px solid"
-            borderColor="whiteAlpha.200"
-            mb={12}
-          >
-            <Stack
-              direction={{ base: "column", md: "row" }}
-              gap={{ base: 6, md: 8 }}
-              align="start"
-            >
-              <Box
-                p={4}
-                bg="blue.500/10"
-                borderRadius="xl"
-                color="blue.400"
-                flexShrink={0}
-              >
-                <Icon as={BarChart3} boxSize={8} />
-              </Box>
-
-              <VStack align="start" gap={4} flex={1}>
-                <Text fontWeight="bold" fontSize="lg" color="white">
-                  BPIとは
-                </Text>
-
-                <Text fontSize="sm" color="gray.300" lineHeight="tall">
-                  beatmania IIDXのスコアを統計的に算出し、
-                  皆伝平均を0、歴代全一を100として現在の実力を可視化する指標です。
+              <div className="flex flex-col gap-2 text-[12px] leading-relaxed text-gray-400">
+                <p>
+                  本ツールは現在ベータ版提供です。
                   <br />
-                  詳細はnorimiso氏による「
-                  <Link
-                    href="http://norimiso.web.fc2.com/aboutBPI.html"
+                  安定版としては{" "}
+                  <a
+                    href="https://bpi.poyashi.me"
                     target="_blank"
-                    color="blue.400"
-                    textDecoration="underline"
-                    display="inline"
+                    className="font-bold text-white underline decoration-white/20 underline-offset-4 transition-colors hover:text-blue-400 hover:decoration-blue-400/50"
                   >
-                    BPIについて
-                  </Link>
-                  」をご参照ください。
-                </Text>
+                    BPIM
+                  </a>{" "}
+                  をご利用ください。
+                </p>
+                <p className="text-[10px] opacity-60">
+                  (BPIM→BPIM2のデータ移行はいつでも可能です)
+                </p>
+              </div>
+            </div>
+          </div>
 
-                <Separator opacity={0.1} />
+          <Separator className="mb-16 bg-white/10" />
 
-                <Text fontSize="sm" color="gray.300" flex={1}>
-                  なお、BPIM及びBPIM2では、従来固定値(1.5)だった譜面係数を、実際のプレイデータに基づくユーザー分布から動的に算出しています。
-                </Text>
-              </VStack>
-            </Stack>
-          </Box>
+          <div className="flex flex-col items-center">
+            <h3 className="mb-10 text-center text-lg font-bold tracking-[0.2em] uppercase text-gray-300">
+              BPIM2って？
+            </h3>
 
-          <SimpleGrid columns={{ base: 1, md: 3 }} gap={8}>
+            <div className="mb-12 w-full rounded-2xl border border-white/10 bg-slate-950 p-6 md:p-8">
+              <div className="flex flex-col items-start gap-6 md:flex-row md:gap-8">
+                <div className="flex shrink-0 items-center justify-center rounded-xl bg-blue-500/10 p-4 text-blue-400">
+                  <BarChart3 className="h-8 w-8" />
+                </div>
+
+                <div className="flex flex-1 flex-col gap-4">
+                  <h4 className="text-lg font-bold text-white">BPIとは</h4>
+                  <div className="text-sm leading-relaxed text-gray-400">
+                    <p>
+                      beatmania IIDXのスコアを統計的に算出し、
+                      皆伝平均を0、歴代全一を100として現在の実力を可視化する指標です。
+                    </p>
+                    <p className="mt-2">
+                      詳細はnorimiso氏による「
+                      <a
+                        href="http://norimiso.web.fc2.com/aboutBPI.html"
+                        target="_blank"
+                        className="text-blue-400 underline decoration-blue-400/30 underline-offset-4 hover:text-blue-300"
+                      >
+                        BPIについて
+                      </a>
+                      」をご参照ください。
+                    </p>
+                  </div>
+                  <Separator className="bg-white/5" />
+                  <p className="text-sm text-gray-400 italic">
+                    なお、BPIM及びBPIM2では、従来固定値(1.5)だった譜面係数を、実際のプレイデータに基づくユーザー分布から動的に算出しています。
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
             <FeatureCard
               icon={Database}
               title="Cloud Storage"
@@ -191,38 +129,27 @@ export default function LoginPage() {
               title="Rival Tracking"
               description="実力が近いユーザーを見つけだし、スコアの更新状況をリアルタイムにタイムライン形式で追いかけられます。競い合うことで限界を突破しましょう。"
             />
-          </SimpleGrid>
+          </div>
         </PageContainer>
-      </Box>
+      </div>
     </DashboardLayout>
   );
 }
 
 const FeatureCard = ({
-  icon,
+  icon: Icon,
   title,
   description,
 }: {
-  icon: any;
+  icon: LucideIcon;
   title: string;
   description: string;
 }) => (
-  <VStack
-    align="start"
-    p={6}
-    bg="whiteAlpha.50"
-    borderRadius="xl"
-    border="1px solid"
-    borderColor="whiteAlpha.100"
-  >
-    <Box p={3} bg="blue.500/10" borderRadius="lg" color="blue.400" mb={2}>
-      <Icon as={icon} size={"xl"} />
-    </Box>
-    <Text fontWeight="bold" fontSize="md" color="white">
-      {title}
-    </Text>
-    <Text fontSize="xs" color="gray.500" lineHeight="tall">
-      {description}
-    </Text>
-  </VStack>
+  <div className="flex flex-col items-start rounded-xl border border-white/10 bg-white/5 p-6 transition-colors hover:border-white/20">
+    <div className="mb-4 flex items-center justify-center rounded-lg bg-blue-500/10 p-3 text-blue-400">
+      <Icon className="h-6 w-6" />
+    </div>
+    <h5 className="mb-2 text-base font-bold text-white">{title}</h5>
+    <p className="text-xs leading-relaxed text-gray-500">{description}</p>
+  </div>
 );

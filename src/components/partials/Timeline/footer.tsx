@@ -1,32 +1,34 @@
-import { Center, Text } from "@chakra-ui/react";
+interface TimelineStatusFooterProps {
+  isEmpty: boolean;
+  isEnd: boolean;
+}
 
 export const TimelineStatusFooter = ({
   isEmpty,
   isEnd,
-}: {
-  isEmpty: boolean;
-  isEnd: boolean;
-}) => {
+}: TimelineStatusFooterProps) => {
   if (isEmpty) {
     return (
-      <Center py={10} flexDirection="column" gap={2}>
-        <Text color="gray.500" fontSize="sm">
+      <div className="flex flex-col items-center justify-center gap-2 py-10 text-center">
+        <p className="text-sm text-slate-500">
           アクティビティが見つかりませんでした。
-        </Text>
-        <Text color="gray.600" fontSize="xs">
+        </p>
+        <p className="text-xs text-slate-600">
           フィルター条件を変えてみてください
-        </Text>
-      </Center>
+        </p>
+      </div>
     );
   }
+
   if (isEnd) {
     return (
-      <Center py={8} borderTop="1px solid" borderColor="whiteAlpha.50">
-        <Text fontSize="xs" color="whiteAlpha.400" fontWeight="bold">
-          これ以上のアクティビティはありません
-        </Text>
-      </Center>
+      <div className="flex items-center justify-center border-t border-white/5 py-8">
+        <span className="text-[10px] font-bold uppercase tracking-widest text-white/20">
+          End of Activities
+        </span>
+      </div>
     );
   }
+
   return null;
 };
