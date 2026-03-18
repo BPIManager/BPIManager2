@@ -62,7 +62,7 @@ export const SortSelector = ({
 
             return (
               <React.Fragment key={group.id}>
-                {index > 0 && <SelectSeparator className="bg-white/5" />}
+                {index > 0 && <SelectSeparator className="bg-bpim-surface-2/60" />}
                 <SelectGroup>
                   <SelectLabel className="px-2 py-1.5 text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
                     {group.label}

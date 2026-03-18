@@ -45,7 +45,7 @@ export const RivalComparisonRow = ({ rival }: RivalComparisonRowProps) => {
         </span>
       </div>
 
-      <div className="relative h-[18px] w-full overflow-hidden rounded-sm bg-white/5">
+      <div className="relative h-[18px] w-full overflow-hidden rounded-sm bg-bpim-surface-2/60">
         <div className="flex h-full w-full items-center gap-0">
           <div
             className="relative h-full bg-bpim-primary transition-all duration-1000 ease-out"

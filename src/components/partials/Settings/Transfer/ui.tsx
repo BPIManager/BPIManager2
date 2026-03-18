@@ -91,7 +91,7 @@ export default function TransferUi() {
               BPIManagerで保存されたデータをBPIM2へ移行します。
             </p>
 
-            <div className="rounded-md border border-bpim-border bg-white/5 p-3">
+            <div className="rounded-md border border-bpim-border bg-bpim-surface-2/60 p-3">
               <span className="mb-2 block text-xs font-bold text-bpim-muted">
                 移行可能なデータ:
               </span>

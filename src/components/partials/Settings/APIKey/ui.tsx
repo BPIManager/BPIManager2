@@ -56,12 +56,12 @@ export default function ApiKeyUi() {
             value={rawKey || keyInfo?.key || ""}
             placeholder={isLoading ? "Loading..." : "未発行"}
             readOnly
-            className="h-9 flex-1 rounded-r-none border-white/20 bg-bpim-bg/40 font-mono text-xs focus-visible:ring-0"
+            className="h-9 flex-1 rounded-r-none border-bpim-border bg-bpim-bg/40 font-mono text-xs focus-visible:ring-0"
           />
           {(rawKey || keyInfo?.exists) && (
             <Button
               variant="secondary"
-              className="h-9 rounded-none border-y border-white/20 px-3 hover:bg-bpim-overlay"
+              className="h-9 rounded-none border-y border-bpim-border px-3 hover:bg-bpim-overlay"
               onClick={copyToClipboard}
             >
               <LuCopy className="h-4 w-4" />

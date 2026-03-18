@@ -28,7 +28,7 @@ export const RivalFilter = ({
                 id={`lv-${l}`}
                 checked={levels.includes(l)}
                 onCheckedChange={() => onToggleLevel(l)}
-                className="h-4 w-4 border-white/20 data-[state=checked]:bg-bpim-primary"
+                className="h-4 w-4 border-bpim-border data-[state=checked]:bg-bpim-primary"
               />
               <Label
                 htmlFor={`lv-${l}`}
@@ -52,7 +52,7 @@ export const RivalFilter = ({
                 id={`diff-${d}`}
                 checked={difficulties.includes(d)}
                 onCheckedChange={() => onToggleDifficulty(d)}
-                className="h-4 w-4 border-white/20 data-[state=checked]:bg-bpim-primary"
+                className="h-4 w-4 border-bpim-border data-[state=checked]:bg-bpim-primary"
               />
               <Label
                 htmlFor={`diff-${d}`}

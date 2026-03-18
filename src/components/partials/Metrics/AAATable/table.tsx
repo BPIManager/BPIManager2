@@ -90,7 +90,7 @@ export const AAAGridItem = ({
 
         <TooltipContent
           side="top"
-          className="border-white/20 bg-bpim-bg/95 p-3 shadow-2xl backdrop-blur-md"
+          className="border-bpim-border bg-bpim-bg/95 p-3 shadow-2xl backdrop-blur-md"
         >
           <AAATableTooltip item={item} />
         </TooltipContent>

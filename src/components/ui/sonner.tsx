@@ -1,4 +1,6 @@
-import { useTheme } from "next-themes";
+"use client";
+
+import { useEffect, useState } from "react";
 import { Toaster as Sonner, type ToasterProps } from "sonner";
 import {
   CircleCheckIcon,
@@ -7,13 +9,29 @@ import {
   OctagonXIcon,
   Loader2Icon,
 } from "lucide-react";
+import { getStoredTheme } from "@/hooks/common/useTheme";
 
 const Toaster = ({ ...props }: ToasterProps) => {
-  const { theme = "system" } = useTheme();
+  const [mode, setMode] = useState<"light" | "dark">("dark");
+
+  useEffect(() => {
+    const id = getStoredTheme();
+    setMode(id.startsWith("light") ? "light" : "dark");
+
+    const observer = new MutationObserver(() => {
+      const theme = document.documentElement.getAttribute("data-theme") ?? "";
+      setMode(theme.startsWith("light") ? "light" : "dark");
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <Sonner
-      theme={theme as ToasterProps["theme"]}
+      theme={mode}
       className="toaster group"
       icons={{
         success: <CircleCheckIcon className="size-4" />,
@@ -24,17 +42,12 @@ const Toaster = ({ ...props }: ToasterProps) => {
       }}
       style={
         {
-          "--normal-bg": "var(--popover)",
-          "--normal-text": "var(--popover-foreground)",
-          "--normal-border": "var(--border)",
+          "--normal-bg": "hsl(var(--bpim-surface-2))",
+          "--normal-text": "hsl(var(--bpim-text))",
+          "--normal-border": "hsl(var(--bpim-border))",
           "--border-radius": "var(--radius)",
         } as React.CSSProperties
       }
-      toastOptions={{
-        classNames: {
-          toast: "cn-toast",
-        },
-      }}
       {...props}
     />
   );

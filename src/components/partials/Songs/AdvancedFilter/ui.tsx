@@ -102,7 +102,7 @@ export const AdvancedFilterModal = ({
               <Input
                 placeholder="Min"
                 type="number"
-                className="h-9 border-bpim-border bg-white/5"
+                className="h-9 border-bpim-border bg-bpim-surface-2/60"
                 value={localParams.bpmMin ?? ""}
                 onChange={(e) =>
                   updateLocal({
@@ -114,7 +114,7 @@ export const AdvancedFilterModal = ({
               <Input
                 placeholder="Max"
                 type="number"
-                className="h-9 border-bpim-border bg-white/5"
+                className="h-9 border-bpim-border bg-bpim-surface-2/60"
                 value={localParams.bpmMax ?? ""}
                 onChange={(e) =>
                   updateLocal({
@@ -137,7 +137,7 @@ export const AdvancedFilterModal = ({
             </div>
           </section>
 
-          <Separator className="bg-white/5" />
+          <Separator className="bg-bpim-surface-2/60" />
 
           <section className="flex flex-col gap-3">
             <h3 className="text-[10px] font-bold tracking-widest text-bpim-text uppercase">
@@ -163,7 +163,7 @@ export const AdvancedFilterModal = ({
             </div>
           </section>
 
-          <Separator className="bg-white/5" />
+          <Separator className="bg-bpim-surface-2/60" />
 
           <section className="flex flex-col gap-3">
             <h3 className="text-[10px] font-bold tracking-widest text-bpim-text uppercase">
@@ -219,7 +219,7 @@ export const AdvancedFilterModal = ({
             </div>
 
             {isCustomActive && (
-              <div className="flex flex-col gap-3 rounded-lg bg-white/5 p-3">
+              <div className="flex flex-col gap-3 rounded-lg bg-bpim-surface-2/60 p-3">
                 <div className="grid grid-cols-[1fr_auto_1fr] items-end gap-2">
                   <div className="flex flex-col gap-1.5">
                     <Label className="text-[10px] text-bpim-muted">
@@ -249,7 +249,7 @@ export const AdvancedFilterModal = ({
             )}
           </section>
 
-          <Separator className="bg-white/5" />
+          <Separator className="bg-bpim-surface-2/60" />
 
           <section className="flex flex-col gap-3">
             <h3 className="text-[10px] font-bold tracking-widest text-bpim-text uppercase">

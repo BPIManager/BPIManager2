@@ -51,7 +51,7 @@ export const ImportView = (props: Props) => (
                 <Textarea
                   id="csv-data"
                   placeholder="バージョン,タイトル,ジャンル,アーティスト,プレー回数,..."
-                  className="min-h-[200px] border-bpim-border bg-white/5 p-4 font-mono text-sm transition-colors focus:border-bpim-primary focus:ring-0"
+                  className="min-h-[200px] border-bpim-border bg-bpim-surface-2/60 p-4 font-mono text-sm transition-colors focus:border-bpim-primary focus:ring-0"
                   value={props.csvData}
                   onChange={(e) => props.setCsvData(e.target.value)}
                 />
@@ -68,7 +68,7 @@ export const ImportView = (props: Props) => (
                   value={props.selectedVersion[0]}
                   onValueChange={(value) => props.setSelectedVersion([value])}
                 >
-                  <SelectTrigger className="w-full border-bpim-border bg-white/5 text-sm md:w-[300px]">
+                  <SelectTrigger className="w-full border-bpim-border bg-bpim-surface-2/60 text-sm md:w-[300px]">
                     <SelectValue placeholder="バージョンを選択" />
                   </SelectTrigger>
                   <SelectContent className="border-bpim-border bg-bpim-bg text-bpim-text">
@@ -101,7 +101,7 @@ export const ImportView = (props: Props) => (
                 >
                   {props.isProcessing ? (
                     <>
-                      <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-white" />
+                      <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-bpim-border border-t-white" />
                       {props.processStatus}
                     </>
                   ) : (
@@ -112,7 +112,7 @@ export const ImportView = (props: Props) => (
                 </Button>
               </div>
 
-              <div className="flex items-start gap-3 rounded-lg bg-white/5 p-4">
+              <div className="flex items-start gap-3 rounded-lg bg-bpim-surface-2/60 p-4">
                 <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-bpim-primary" />
                 <div className="flex flex-col gap-1">
                   <span className="text-xs font-bold text-bpim-text">Note</span>
@@ -126,7 +126,7 @@ export const ImportView = (props: Props) => (
                 </div>
               </div>
 
-              <Separator className="bg-white/10" />
+              <Separator className="bg-bpim-overlay/60" />
               <InstructionSection />
             </div>
           )}

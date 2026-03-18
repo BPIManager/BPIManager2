@@ -23,10 +23,10 @@ export const DashBoardFilter = () => {
             VERSION
           </span>
           <Select value={version} onValueChange={(val) => setVersion(val)}>
-            <SelectTrigger className="h-8 w-full border-bpim-border bg-white/5 text-xs hover:bg-bpim-overlay focus:ring-0">
+            <SelectTrigger className="h-8 w-full border-bpim-border bg-bpim-surface-2/60 text-xs hover:bg-bpim-overlay focus:ring-0">
               <SelectValue placeholder="Select version" />
             </SelectTrigger>
-            <SelectContent className="border-bpim-border bg-bpim-bg text-bpim-text">
+            <SelectContent className="border-bpim-border bg-bpim-bg">
               {versionsNonDisabledCollection.map((v) => (
                 <SelectItem key={v.value} value={v.value} className="text-xs">
                   {v.label}
@@ -47,11 +47,11 @@ export const DashBoardFilter = () => {
                   id={`level-${l}`}
                   checked={levels.includes(l)}
                   onCheckedChange={() => toggleLevel(l)}
-                  className="h-4 w-4 border-white/20 data-[state=checked]:bg-bpim-primary"
+                  className="h-4 w-4 border-bpim-border data-[state=checked]:bg-bpim-primary"
                 />
                 <Label
                   htmlFor={`level-${l}`}
-                  className="cursor-pointer text-xs font-medium leading-none md:text-sm"
+                  className="cursor-pointer text-xs font-medium leading-none md:text-sm text-bpim-text"
                 >
                   ☆{l}
                 </Label>
@@ -71,11 +71,11 @@ export const DashBoardFilter = () => {
                   id={`diff-${d}`}
                   checked={diffs.includes(d)}
                   onCheckedChange={() => toggleDiff(d)}
-                  className="h-4 w-4 border-white/20 data-[state=checked]:bg-bpim-primary"
+                  className="h-4 w-4 border-bpim-border data-[state=checked]:bg-bpim-primary"
                 />
                 <Label
                   htmlFor={`diff-${d}`}
-                  className="cursor-pointer text-xs font-medium leading-none md:text-sm"
+                  className="cursor-pointer text-xs font-medium leading-none md:text-sm text-bpim-text"
                 >
                   {d}
                 </Label>

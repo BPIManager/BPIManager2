@@ -35,7 +35,7 @@ export const FilterSearchInput = ({
 
       <Input
         placeholder={placeholder}
-        className="h-9 pl-9 pr-9 border-bpim-border bg-white/5 focus-visible:ring-blue-500"
+        className="h-9 pl-9 pr-9 border-bpim-border bg-bpim-surface-2/60 focus-visible:ring-blue-500"
         value={local}
         onChange={(e) => setLocal(e.target.value)}
       />
@@ -77,7 +77,7 @@ export const FilterCheckboxGroup = <T extends string | number>({
               id={id}
               checked={selected?.includes(item)}
               onCheckedChange={() => onToggle(item)}
-              className="h-4 w-4 border-white/20 data-[state=checked]:bg-bpim-primary"
+              className="h-4 w-4 border-bpim-border data-[state=checked]:bg-bpim-primary"
             />
             <Label
               htmlFor={id}

@@ -34,7 +34,7 @@ export const RivalSummaryCard = ({
   return (
     <button
       onClick={onClick}
-      className="group relative flex w-full flex-row items-stretch justify-between gap-3 overflow-hidden rounded-2xl border border-bpim-border bg-bpim-bg/80 p-3 text-left transition-all duration-300 hover:-translate-y-1 hover:border-white/30 hover:bg-bpim-surface-2/90 md:gap-6 md:p-5"
+      className="group relative flex w-full flex-row items-stretch justify-between gap-3 overflow-hidden rounded-2xl border border-bpim-border bg-bpim-bg/80 p-3 text-left transition-all duration-300 hover:-translate-y-1 hover:border-bpim-border hover:bg-bpim-surface-2/90 md:gap-6 md:p-5"
     >
       <div
         className="absolute left-0 top-0 bottom-0 w-1 opacity-80 transition-transform group-hover:scale-y-110"
@@ -81,7 +81,7 @@ export const RivalSummaryCard = ({
             </span>
           </div>
 
-          <div className="flex h-1.5 w-full overflow-hidden rounded-full bg-white/5">
+          <div className="flex h-1.5 w-full overflow-hidden rounded-full bg-bpim-surface-2/60">
             <div
               className="h-full bg-bpim-primary transition-all duration-500"
               style={{ width: `${winRate}%` }}

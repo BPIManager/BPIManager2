@@ -32,7 +32,7 @@ export const ArenaAverageFilter = ({
             Version
           </span>
           <Select value={version} onValueChange={onVersionChange}>
-            <SelectTrigger className="h-9 border-bpim-border bg-white/5 text-xs text-bpim-text focus:ring-blue-500">
+            <SelectTrigger className="h-9 border-bpim-border bg-bpim-surface-2/60 text-xs text-bpim-text focus:ring-blue-500">
               <SelectValue placeholder="バージョンを選択" />
             </SelectTrigger>
             <SelectContent className="border-bpim-border bg-bpim-bg">

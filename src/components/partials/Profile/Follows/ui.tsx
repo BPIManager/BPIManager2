@@ -29,7 +29,7 @@ export const UserFollowCard = ({ user }: { user: any }) => {
   );
 
   const containerClass = cn(
-    "flex w-full items-center justify-between rounded-xl border border-bpim-border bg-white/5 p-4 transition-colors duration-200",
+    "flex w-full items-center justify-between rounded-xl border border-bpim-border bg-bpim-surface-2/60 p-4 transition-colors duration-200",
     isMasked ? "cursor-default" : "cursor-pointer hover:bg-bpim-overlay",
   );
 

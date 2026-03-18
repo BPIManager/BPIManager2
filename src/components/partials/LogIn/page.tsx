@@ -57,7 +57,7 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <Separator className="mb-16 bg-white/10" />
+          <Separator className="mb-16 bg-bpim-overlay/60" />
 
           <div className="flex flex-col items-center">
             <h3 className="mb-10 text-center text-lg font-bold tracking-[0.2em] uppercase text-bpim-text">
@@ -89,7 +89,7 @@ export default function LoginPage() {
                       」をご参照ください。
                     </p>
                   </div>
-                  <Separator className="bg-white/5" />
+                  <Separator className="bg-bpim-surface-2/60" />
                   <p className="text-sm text-bpim-muted italic">
                     なお、BPIM及びBPIM2では、従来固定値(1.5)だった譜面係数を、実際のプレイデータに基づくユーザー分布から動的に算出しています。
                   </p>
@@ -145,7 +145,7 @@ const FeatureCard = ({
   title: string;
   description: string;
 }) => (
-  <div className="flex flex-col items-start rounded-xl border border-bpim-border bg-white/5 p-6 transition-colors hover:border-white/20">
+  <div className="flex flex-col items-start rounded-xl border border-bpim-border bg-bpim-surface-2/60 p-6 transition-colors hover:border-bpim-border">
     <div className="mb-4 flex items-center justify-center rounded-lg bg-bpim-primary/10 p-3 text-bpim-primary">
       <Icon className="h-6 w-6" />
     </div>

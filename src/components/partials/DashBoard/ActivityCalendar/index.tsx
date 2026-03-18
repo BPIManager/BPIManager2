@@ -1,4 +1,6 @@
-﻿import { useEffect, useMemo, useRef, useState } from "react";
+﻿"use client";
+
+import { useEffect, useMemo, useRef, useState } from "react";
 import dayjs from "@/lib/dayjs";
 import NextLink from "next/link";
 import {
@@ -21,13 +23,21 @@ interface Props {
   version: string;
 }
 
+const ACTIVITY_VARS = [
+  "var(--activity-0)",
+  "var(--activity-1)",
+  "var(--activity-2)",
+  "var(--activity-3)",
+  "var(--activity-4)",
+] as const;
+
 const getActivityColor = (count: number, isFuture: boolean): string => {
   if (isFuture) return "transparent";
-  if (count === 0) return "#161b22";
-  if (count <= 5) return "#0e4429";
-  if (count <= 15) return "#006d32";
-  if (count <= 30) return "#26a641";
-  return "#39d353";
+  if (count === 0) return ACTIVITY_VARS[0];
+  if (count <= 5) return ACTIVITY_VARS[1];
+  if (count <= 15) return ACTIVITY_VARS[2];
+  if (count <= 30) return ACTIVITY_VARS[3];
+  return ACTIVITY_VARS[4];
 };
 
 export const ActivityCalendar = ({ data, userId, version }: Props) => {
@@ -44,18 +54,11 @@ export const ActivityCalendar = ({ data, userId, version }: Props) => {
     const dataMap = new Map(
       data.map((d) => [dayjs(d.date).tz().format("YYYY-MM-DD"), d.count]),
     );
-
     for (let i = 370; i >= 0; i--) {
       const dateObj = endOfCalendar.subtract(i, "day");
       const dateStr = dateObj.format("YYYY-MM-DD");
       const isFuture = dateObj.isAfter(today, "day");
-
-      days.push({
-        date: dateStr,
-        count: dataMap.get(dateStr) ?? 0,
-        dayOfWeek: dateObj.day(),
-        isFuture,
-      });
+      days.push({ date: dateStr, count: dataMap.get(dateStr) ?? 0, isFuture });
     }
     return days;
   }, [data]);
@@ -72,24 +75,24 @@ export const ActivityCalendar = ({ data, userId, version }: Props) => {
 
       <div
         ref={scrollRef}
-        className="overflow-x-auto pb-2 [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/10"
+        className="overflow-x-auto pb-2 [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-bpim-overlay"
       >
         <div className="flex items-start gap-3" style={{ minWidth: "720px" }}>
           <div
-            className="grid text-[10px] text-bpim-muted"
+            className="grid text-[10px] text-bpim-subtle"
             style={{
               gridTemplateRows: "repeat(7, 11px)",
               gap: "3px",
               marginTop: "2px",
             }}
           >
-            <div className="flex items-center h-[11px]"></div>
+            <div className="h-[11px]" />
             <div className="flex items-center h-[11px]">Mon</div>
-            <div className="flex items-center h-[11px]"></div>
+            <div className="h-[11px]" />
             <div className="flex items-center h-[11px]">Wed</div>
-            <div className="flex items-center h-[11px]"></div>
+            <div className="h-[11px]" />
             <div className="flex items-center h-[11px]">Fri</div>
-            <div className="flex items-center h-[11px]"></div>
+            <div className="h-[11px]" />
           </div>
 
           <div
@@ -104,7 +107,6 @@ export const ActivityCalendar = ({ data, userId, version }: Props) => {
           >
             {calendarDays.map((day) => {
               const isOpen = hoveredDate === day.date;
-
               return (
                 <Popover
                   key={day.date}
@@ -118,7 +120,7 @@ export const ActivityCalendar = ({ data, userId, version }: Props) => {
                       className={cn(
                         "h-[11px] w-[11px] rounded-[2px] transition-all duration-200",
                         !day.isFuture &&
-                          "cursor-pointer hover:scale-125 hover:shadow-[0_0_8px_rgba(57,211,83,0.4)]",
+                          "cursor-pointer hover:scale-125 hover:brightness-125",
                         day.isFuture && "cursor-default",
                       )}
                       style={{
@@ -141,10 +143,9 @@ export const ActivityCalendar = ({ data, userId, version }: Props) => {
                       }}
                     />
                   </PopoverTrigger>
-
                   <PopoverContent
                     side="top"
-                    className="w-auto border-white/20 bg-bpim-surface-2 p-2 text-bpim-text"
+                    className="w-auto border-bpim-border bg-bpim-surface-2 p-2"
                     onMouseEnter={() => setHoveredDate(day.date)}
                     onMouseLeave={() => setHoveredDate(null)}
                   >
@@ -172,6 +173,7 @@ export const ActivityCalendar = ({ data, userId, version }: Props) => {
           </div>
         </div>
       </div>
+
       <div className="mt-3 flex items-center justify-end gap-1 text-[10px] text-bpim-muted">
         <span>Less</span>
         {[0, 5, 15, 30, 50].map((v) => (

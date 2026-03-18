@@ -11,10 +11,9 @@ export const diffColors: Record<string, string> = {
 
 export const getLampClass = (clearState: string | null | undefined) => {
   if (!clearState || clearState === "NO PLAY") return "bg-bpim-overlay";
-
   switch (clearState) {
     case "FAILED":
-      return "bg-slate-300";
+      return "bg-bpim-subtle";
     case "ASSIST CLEAR":
       return "bg-purple-500";
     case "EASY CLEAR":
@@ -32,10 +31,6 @@ export const getLampClass = (clearState: string | null | undefined) => {
   }
 };
 
-interface SongItemProps {
-  song: SongWithScore;
-}
-
 const SongItem = ({
   song,
   onClick,
@@ -49,8 +44,8 @@ const SongItem = ({
     <div
       onClick={onClick}
       className={cn(
-        "relative w-full mb-2 cursor-pointer transition-colors duration-200 overflow-hidden",
-        "bg-white/10 hover:bg-white/20",
+        "relative w-full mb-2 cursor-pointer transition-colors duration-200 overflow-hidden rounded-sm",
+        "bg-bpim-surface hover:bg-bpim-overlay",
       )}
     >
       <div
@@ -120,7 +115,6 @@ const SongItem = ({
                 </span>
               )}
             </div>
-
             <div className="flex flex-col items-end">
               <span className="text-[10px] text-bpim-muted leading-none mb-0.5 uppercase">
                 BPI

@@ -29,7 +29,7 @@ export const OvertakeRankItem = ({ item, onClick }: RankItemProps) => {
             {item.title}
           </span>
           <div className="flex items-center gap-2">
-            <span className="px-1 text-[9px] font-bold bg-white/10 text-bpim-muted rounded-sm uppercase">
+            <span className="px-1 text-[9px] font-bold bg-bpim-overlay/60 text-bpim-muted rounded-sm uppercase">
               {String(item.difficulty || "").slice(0, 1)}
             </span>
             <span className="text-[10px] text-bpim-subtle font-bold font-mono">

@@ -133,7 +133,7 @@ export const LogsDetailContent = ({
         className="w-full"
       >
         <div className="flex w-full items-center justify-between gap-4 mb-4">
-          <TabsList className="grid h-auto w-full max-w-md grid-cols-2 rounded-lg bg-white/5 p-1">
+          <TabsList className="grid h-auto w-full max-w-md grid-cols-2 rounded-lg bg-bpim-surface-2/60 p-1">
             <TabsTrigger
               value="summary"
               className="py-2 text-xs font-bold transition-all data-[state=active]:bg-bpim-surface data-[state=active]:text-bpim-text"

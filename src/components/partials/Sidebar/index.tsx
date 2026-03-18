@@ -83,7 +83,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
         className={cn(
           "w-full justify-start gap-3 px-3 transition-all",
           isNested ? "pl-9" : "pl-3",
-          isActive ? "bg-white/10 font-bold" : "font-medium text-bpim-text",
+          isActive ? "bg-bpim-overlay/60 font-bold" : "font-medium text-bpim-text",
           item.isComingSoon && "opacity-50 cursor-not-allowed",
         )}
         onClick={item.isComingSoon ? undefined : onClose}
@@ -111,7 +111,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
 
   return (
     <div className="flex h-full flex-col gap-6 p-4 overflow-y-auto scrollbar-hide">
-      <div className="rounded-xl border border-bpim-border bg-white/5 p-4 flex flex-col gap-4">
+      <div className="rounded-xl border border-bpim-border bg-bpim-surface-2/60 p-4 flex flex-col gap-4">
         <div className="flex items-center gap-3">
           <Link href={`/users/${user?.userId}`} onClick={onClose}>
             <Avatar className="h-12 w-12 rounded-lg border border-bpim-border">

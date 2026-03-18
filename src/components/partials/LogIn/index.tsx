@@ -6,7 +6,7 @@ import { FaGoogle, FaTwitter, FaLine } from "react-icons/fa";
 
 export const LoginButtons = () => {
   return (
-    <div className="my-4 flex w-full flex-col items-center gap-4 rounded-xl border border-bpim-border bg-white/5 p-6">
+    <div className="my-4 flex w-full flex-col items-center gap-4 rounded-xl border border-bpim-border bg-bpim-surface-2/60 p-6">
       <span className="text-[10px] font-bold tracking-wider text-bpim-muted uppercase">
         ログインして開始
       </span>

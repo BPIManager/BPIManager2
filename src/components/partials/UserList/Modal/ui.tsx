@@ -5,7 +5,7 @@ import { formatIIDXId } from "@/utils/common/formatIidxId";
 import { FollowSection } from "../../Profile/Sidebar/followStatus";
 import { cn } from "@/lib/utils";
 
-export const RivalHeader = ({ profile, isUpdating, onToggleFollow }: any) => (
+export const RivalHeader = ({ profile, isUpdating, onFollowToggle }: any) => (
   <div className="flex w-full flex-col gap-4">
     <div className="flex flex-col items-center gap-4 text-center md:flex-row md:gap-6 md:text-left">
       <Avatar className="h-24 w-24 border-2 border-bpim-border">
@@ -49,13 +49,13 @@ export const RivalHeader = ({ profile, isUpdating, onToggleFollow }: any) => (
           userId={profile?.userId}
           isUpdating={isUpdating}
           relationship={profile?.relationship}
-          onToggle={onToggleFollow}
+          onToggle={onFollowToggle}
         />
       </div>
     </div>
 
     {profile?.profileText && (
-      <div className="w-full rounded-lg bg-white/5 p-3">
+      <div className="w-full rounded-lg bg-bpim-surface-2/60 p-3">
         <p className="whitespace-pre-wrap text-xs text-bpim-text leading-relaxed">
           {profile?.profileText}
         </p>
@@ -110,7 +110,7 @@ export const WinLossStats = ({ winLossData }: { winLossData: any[] }) => (
               />
             </div>
 
-            <div className="mt-3 h-0.5 w-full overflow-hidden rounded-full bg-white/10">
+            <div className="mt-3 h-0.5 w-full overflow-hidden rounded-full bg-bpim-overlay/60">
               <div
                 className="h-full bg-green-400 transition-all duration-700 ease-in-out"
                 style={{

@@ -129,7 +129,7 @@ export const ImageUploadModal = ({
           {!imgSrc ? (
             <div
               onClick={() => document.getElementById("file-input")?.click()}
-              className="flex w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-bpim-border bg-white/5 p-12 transition-colors hover:bg-bpim-overlay"
+              className="flex w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-bpim-border bg-bpim-surface-2/60 p-12 transition-colors hover:bg-bpim-overlay"
             >
               <Upload className="h-8 w-8 text-bpim-muted" />
               <p className="text-sm text-bpim-muted font-medium">

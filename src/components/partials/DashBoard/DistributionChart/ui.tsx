@@ -103,7 +103,7 @@ const ChartBarUnit = ({
         )}
       </div>
 
-      <div className="h-[1px] w-full bg-white/10" />
+      <div className="h-[1px] w-full bg-bpim-overlay/60" />
 
       <div className="flex h-[30px] justify-center">
         <span className="mt-2 whitespace-nowrap text-[10px] font-bold text-bpim-muted">

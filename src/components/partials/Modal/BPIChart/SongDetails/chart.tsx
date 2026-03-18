@@ -29,13 +29,13 @@ const ChartTooltip = ({ active, payload, youScore, maxScore }: any) => {
   const diff = data.count - youScore;
 
   return (
-    <div className="rounded-lg border border-white/20 bg-bpim-bg p-3 shadow-2xl backdrop-blur-md">
+    <div className="rounded-lg border border-bpim-border bg-bpim-bg p-3 shadow-2xl backdrop-blur-md">
       <div className="flex flex-col gap-1.5">
         <p className="text-xs font-bold text-bpim-primary uppercase tracking-wider">
           BPI: {isYou ? data.bpi.toFixed(2) : data.label}
         </p>
 
-        <Separator className="bg-white/10" />
+        <Separator className="bg-bpim-overlay/60" />
 
         <div className="flex flex-col gap-0.5">
           <p className="text-sm font-bold text-bpim-text font-mono">

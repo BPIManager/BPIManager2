@@ -1,4 +1,4 @@
-import { Skeleton } from "@/components/ui/skeleton";
+﻿import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 
 export const RivalHeaderSkeleton = () => (
@@ -21,7 +21,7 @@ export const RivalHeaderSkeleton = () => (
 
 export const RivalBodySkeleton = () => (
   <div className="flex flex-col gap-6">
-    <Separator className="bg-white/5" />
+    <Separator className="bg-bpim-surface-2/60" />
     <div className="flex flex-col gap-3">
       <Skeleton className="h-3 w-24" />
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

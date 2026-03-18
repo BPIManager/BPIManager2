@@ -91,7 +91,7 @@ export const ShareResultModal = ({
             ].map((opt) => (
               <div
                 key={opt.id}
-                className="flex items-start gap-3 space-x-2 rounded-lg border border-bpim-border bg-white/5 p-3 transition-colors hover:bg-bpim-overlay"
+                className="flex items-start gap-3 space-x-2 rounded-lg border border-bpim-border bg-bpim-surface-2/60 p-3 transition-colors hover:bg-bpim-overlay"
               >
                 <RadioGroupItem
                   value={opt.id}

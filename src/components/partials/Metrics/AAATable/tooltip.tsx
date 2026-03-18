@@ -74,13 +74,13 @@ export const AAATableTooltip = ({ item }: Props) => {
         </h4>
         <Badge
           variant="outline"
-          className="mt-1.5 h-4 border-white/20 text-[9px] font-bold text-bpim-muted"
+          className="mt-1.5 h-4 border-bpim-border text-[9px] font-bold text-bpim-muted"
         >
           Notes: {item.notes}
         </Badge>
       </div>
 
-      <Separator className="bg-white/10" />
+      <Separator className="bg-bpim-overlay/60" />
 
       <div className="flex flex-col gap-2">
         <span className="text-[10px] font-black tracking-widest text-bpim-primary uppercase">
@@ -114,7 +114,7 @@ export const AAATableTooltip = ({ item }: Props) => {
         </div>
       </div>
 
-      <Separator className="bg-white/10" />
+      <Separator className="bg-bpim-overlay/60" />
 
       <div className="flex flex-col gap-4">
         <TargetSection

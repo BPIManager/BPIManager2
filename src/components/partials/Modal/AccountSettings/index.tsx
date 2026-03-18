@@ -119,7 +119,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                 <Input
                   id="userName"
                   className={cn(
-                    "h-10 bg-white/5 border-bpim-border pr-10 focus-visible:ring-blue-500",
+                    "h-10 bg-bpim-surface-2/60 border-bpim-border pr-10 focus-visible:ring-blue-500",
                     nameStatus.error &&
                       "border-red-500 focus-visible:ring-red-500",
                   )}
@@ -162,7 +162,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
               <Input
                 id="iidxId"
                 className={cn(
-                  "h-10 bg-white/5 border-bpim-border font-mono focus-visible:ring-blue-500",
+                  "h-10 bg-bpim-surface-2/60 border-bpim-border font-mono focus-visible:ring-blue-500",
                   !validateIidxId(formData.iidxId) &&
                     "border-red-500 focus-visible:ring-red-500",
                 )}
@@ -186,8 +186,8 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
               >
                 Xユーザー名
               </Label>
-              <div className="flex h-10 w-full overflow-hidden rounded-md border border-bpim-border bg-white/5 focus-within:ring-2 focus-within:ring-blue-500">
-                <div className="flex items-center justify-center bg-white/5 px-3 text-sm text-bpim-muted border-r border-bpim-border">
+              <div className="flex h-10 w-full overflow-hidden rounded-md border border-bpim-border bg-bpim-surface-2/60 focus-within:ring-2 focus-within:ring-blue-500">
+                <div className="flex items-center justify-center bg-bpim-surface-2/60 px-3 text-sm text-bpim-muted border-r border-bpim-border">
                   @
                 </div>
                 <input
@@ -213,7 +213,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                   setFormData({ ...formData, arenaRank: val })
                 }
               >
-                <SelectTrigger className="h-10 border-bpim-border bg-white/5 focus:ring-blue-500">
+                <SelectTrigger className="h-10 border-bpim-border bg-bpim-surface-2/60 focus:ring-blue-500">
                   <SelectValue placeholder="未設定" />
                 </SelectTrigger>
                 <SelectContent className="border-bpim-border bg-bpim-bg">
@@ -243,7 +243,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
               <Textarea
                 id="bio"
                 className={cn(
-                  "min-h-[100px] bg-white/5 border-bpim-border focus-visible:ring-blue-500",
+                  "min-h-[100px] bg-bpim-surface-2/60 border-bpim-border focus-visible:ring-blue-500",
                   formData.bio.length > 1000 && "border-red-500",
                 )}
                 value={formData.bio}

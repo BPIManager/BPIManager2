@@ -32,7 +32,7 @@ const HistoryTooltip = ({ active, payload, label, myName, rivalName }: any) => {
   const isComparison = data.rivalBpi !== undefined;
 
   return (
-    <div className="min-w-[200px] max-w-[300px] rounded-md border border-white/20 bg-bpim-bg p-3 shadow-xl">
+    <div className="min-w-[200px] max-w-[300px] rounded-md border border-bpim-border bg-bpim-bg p-3 shadow-xl">
       <div className="flex flex-col gap-1">
         <p className="text-[10px] font-bold text-bpim-muted">{label}</p>
 
@@ -54,7 +54,7 @@ const HistoryTooltip = ({ active, payload, label, myName, rivalName }: any) => {
                 {data.rivalBpi?.toFixed(2)}
               </span>
             </div>
-            <div className="my-1 h-px w-full bg-white/10" />
+            <div className="my-1 h-px w-full bg-bpim-overlay/60" />
             <div className="flex items-center justify-between">
               <span className="text-[10px] text-bpim-muted">差分</span>
               <span
@@ -82,7 +82,7 @@ const HistoryTooltip = ({ active, payload, label, myName, rivalName }: any) => {
             </div>
             {data.updateCount > 0 && (
               <>
-                <div className="my-2 h-px w-full bg-white/10" />
+                <div className="my-2 h-px w-full bg-bpim-overlay/60" />
                 <p className="text-[10px] font-bold text-bpim-success">
                   UPDATED: {data.updateCount} items
                 </p>

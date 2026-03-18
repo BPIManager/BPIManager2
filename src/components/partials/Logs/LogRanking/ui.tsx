@@ -101,7 +101,7 @@ export const LogRank = ({
 
       <div className="flex flex-col overflow-hidden rounded-xl border border-bpim-border bg-bpim-bg">
         {visibleSongs.length === 0 ? (
-          <div className="flex items-center justify-center p-8 bg-white/5">
+          <div className="flex items-center justify-center p-8 bg-bpim-surface-2/60">
             <span className="text-xs text-bpim-muted">データがありません</span>
           </div>
         ) : (

@@ -128,7 +128,7 @@ export const SongFilterBar = ({
           </div>
           <Input
             placeholder="曲名で検索..."
-            className="h-9 pl-10 pr-10 border-bpim-border bg-white/5 focus-visible:ring-gray-500 text-sm"
+            className="h-9 pl-10 pr-10 border-bpim-border bg-bpim-surface-2/60 focus-visible:ring-gray-500 text-sm"
             value={localSearch}
             onChange={(e) => setLocalSearch(e.target.value)}
           />
@@ -205,7 +205,7 @@ export const SongFilterBar = ({
         </div>
       )}
 
-      <Separator className="bg-white/10 mt-3 mb-2" />
+      <Separator className="bg-bpim-overlay/60 mt-3 mb-2" />
 
       <div className="flex items-center justify-between">
         <span className="text-xs font-bold text-bpim-text">

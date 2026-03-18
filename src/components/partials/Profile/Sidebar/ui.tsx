@@ -13,7 +13,11 @@ export const ProfileSideBar = ({
   profile,
   onFollowToggle,
   isUpdating = false,
-}: any) => {
+}: {
+  profile: any;
+  onFollowToggle?: () => void;
+  isUpdating?: boolean;
+}) => {
   return (
     <div className="lg:sticky lg:top-20 flex flex-col gap-6 rounded-2xl border border-bpim-border bg-bpim-bg/60 p-5 backdrop-blur-md shadow-xl">
       <ProfileHeaderBase profile={profile} />
@@ -43,7 +47,7 @@ export const ProfileSideBar = ({
         </div>
       )}
 
-      <Separator className="bg-white/5" />
+      <Separator className="bg-bpim-surface-2/60" />
 
       <ProfileStatsContent profile={profile} />
     </div>
@@ -96,7 +100,7 @@ export const ProfileStatsContent = ({ profile }: { profile: any }) => {
       <BpiHistoryTable history={profile.history} />
 
       {profile.profileText && (
-        <div className="rounded-xl border border-bpim-border bg-white/5 p-3">
+        <div className="rounded-xl border border-bpim-border bg-bpim-surface-2/60 p-3">
           <span className="mb-2 block text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
             Bio
           </span>

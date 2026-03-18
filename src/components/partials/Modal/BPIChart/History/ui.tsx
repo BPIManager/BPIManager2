@@ -72,7 +72,7 @@ export const SongHistoryTab = ({ songId }: SongHistoryTabProps) => {
               <span className="text-[10px] font-black tracking-widest text-bpim-muted uppercase">
                 {displayTitle}
               </span>
-              <Separator className="flex-1 bg-white/10" />
+              <Separator className="flex-1 bg-bpim-overlay/60" />
             </div>
 
             <div className="flex flex-col gap-2.5">
@@ -89,10 +89,10 @@ export const SongHistoryTab = ({ songId }: SongHistoryTabProps) => {
                   <div
                     key={record.logId}
                     className={cn(
-                      "group relative flex flex-col gap-2 rounded-lg border-l-3 bg-white/5 p-3 transition-colors hover:bg-bpim-overlay",
+                      "group relative flex flex-col gap-2 rounded-lg border-l-3 bg-bpim-surface-2/60 p-3 transition-colors hover:bg-bpim-overlay",
                       isGlobalBest
                         ? "border-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.1)]"
-                        : "border-white/20",
+                        : "border-bpim-border",
                     )}
                   >
                     <div className="flex items-center justify-between">

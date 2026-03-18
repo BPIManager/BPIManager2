@@ -33,7 +33,7 @@ export const RadarCategorySongsDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-h-[80svh] overflow-hidden border-white/20 bg-bpim-bg p-0 sm:max-w-md">
+      <DialogContent className="overflow-hidden border-white/20 bg-bpim-bg p-0 sm:max-w-md">
         <DialogHeader className="border-b border-bpim-border p-4">
           <DialogTitle className="text-base font-bold text-bpim-text">
             {categoryName} - 楽曲リスト ({songs.length})

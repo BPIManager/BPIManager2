@@ -1,10 +1,10 @@
-"use client";
+﻿"use client";
 
 import { Skeleton } from "@/components/ui/skeleton";
 
 const SongItemSkeleton = () => {
   return (
-    <div className="mb-2 w-full border-l-4 border-bpim-border bg-white/5">
+    <div className="mb-2 w-full border-l-4 border-bpim-border bg-bpim-surface-2/60">
       <div className="grid grid-cols-[1fr_auto] gap-1">
         <div className="flex flex-col gap-2 px-3 py-2">
           <Skeleton className="h-3.5 w-[60%]" />

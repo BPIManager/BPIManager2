@@ -42,7 +42,7 @@ export const RankingTabsCard = ({ userId }: { userId: string }) => {
     <DashCard className="flex flex-col p-0 overflow-hidden border border-bpim-border">
       <Tabs value={tab} onValueChange={setTab} className="flex flex-col w-full">
         <div className="p-2 border-b border-bpim-border bg-white/[0.02]">
-          <TabsList className="grid h-9 w-full grid-cols-3 rounded-md bg-white/5 p-1">
+          <TabsList className="grid h-9 w-full grid-cols-3 rounded-md bg-bpim-surface-2/60 p-1">
             {[
               { value: "weapons", label: "武器曲かも?" },
               { value: "potential", label: "伸びるかも?" },

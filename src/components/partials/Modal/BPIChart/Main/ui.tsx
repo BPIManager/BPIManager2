@@ -26,7 +26,7 @@ const CustomTooltip = ({ active, payload, maxScore }: any) => {
     const isYou = data.name === "YOU";
 
     return (
-      <div className="rounded-lg border border-white/20 bg-bpim-bg p-3 shadow-2xl backdrop-blur-md">
+      <div className="rounded-lg border border-bpim-border bg-bpim-bg p-3 shadow-2xl backdrop-blur-md">
         <div className="flex flex-col gap-1">
           <p
             className={cn(
@@ -36,7 +36,7 @@ const CustomTooltip = ({ active, payload, maxScore }: any) => {
           >
             {isYou ? "Your Score" : `BPI Target: ${data.name}`}
           </p>
-          <div className="h-[1px] w-full bg-white/10 my-1" />
+          <div className="h-[1px] w-full bg-bpim-overlay/60 my-1" />
           <p className="font-mono text-sm font-bold text-bpim-text">
             EX: {data.score.toLocaleString()}
           </p>

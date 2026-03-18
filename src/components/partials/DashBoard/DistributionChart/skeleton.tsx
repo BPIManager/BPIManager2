@@ -1,4 +1,4 @@
-import { DashCard } from "@/components/ui/dashcard";
+﻿import { DashCard } from "@/components/ui/dashcard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
@@ -34,7 +34,7 @@ export const DistributionChartSkeleton = ({
               />
             </div>
 
-            <div className="h-[1px] w-full bg-white/10" />
+            <div className="h-[1px] w-full bg-bpim-overlay/60" />
 
             <div className="flex h-[30px] items-center justify-center">
               <Skeleton className="h-[10px] w-[70%]" />

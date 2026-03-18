@@ -35,10 +35,8 @@ export const FollowSection = ({
       <>
         <Button
           onClick={() => setIsSettingsOpen(true)}
-          className={cn(
-            "w-full rounded-full bg-green-500 font-bold text-black hover:bg-green-400 h-9",
-            className,
-          )}
+          variant="outline"
+          className={cn("w-full rounded-full font-bold h-9", className)}
         >
           <Settings2 className="mr-2 h-4 w-4" />
           プロフィール編集
@@ -73,8 +71,8 @@ export const FollowSection = ({
           className={cn(
             "w-full rounded-full font-bold h-9 transition-all",
             relationship.isFollowing
-              ? "bg-green-500 text-black hover:bg-green-400"
-              : "bg-bpim-primary text-bpim-text hover:bg-bpim-primary",
+              ? "bg-bpim-success text-bpim-bg hover:bg-bpim-success/80"
+              : "bg-bpim-primary text-bpim-bg hover:bg-bpim-primary/80",
             className,
           )}
         >
@@ -85,7 +83,8 @@ export const FollowSection = ({
           <DialogTrigger asChild>
             <Button
               className={cn(
-                "w-full rounded-full bg-bpim-primary font-bold text-bpim-text h-9",
+                "w-full rounded-full font-bold h-9",
+                "bg-bpim-primary text-bpim-bg hover:bg-bpim-primary/80",
                 className,
               )}
             >
@@ -103,14 +102,14 @@ export const FollowSection = ({
           {relationship.isMutual ? (
             <Badge
               variant="secondary"
-              className="bg-bpim-primary/10 text-bpim-primary border-blue-500/20 px-2 py-0 text-[10px]"
+              className="bg-bpim-primary/10 text-bpim-primary border-bpim-border px-2 py-0 text-[10px]"
             >
               相互フォロー
             </Badge>
           ) : relationship.isFollowedBy ? (
             <Badge
               variant="secondary"
-              className="bg-bpim-primary/10 text-bpim-primary border-blue-500/20 px-2 py-0 text-[10px]"
+              className="bg-bpim-primary/10 text-bpim-primary border-bpim-border px-2 py-0 text-[10px]"
             >
               フォローされています
             </Badge>

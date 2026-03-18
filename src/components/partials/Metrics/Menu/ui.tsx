@@ -34,7 +34,7 @@ export const ReusableMenuItem = ({
       rel={isExternal ? "noopener noreferrer" : undefined}
       className={cn(
         "group block w-full rounded-xl border border-bpim-border bg-bpim-bg/40 p-4 transition-all duration-200",
-        "hover:border-white/20 hover:bg-bpim-surface-2/60 hover:no-underline",
+        "hover:border-bpim-border hover:bg-bpim-surface-2/60 hover:no-underline",
         className,
       )}
       {...props}

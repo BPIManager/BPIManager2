@@ -73,7 +73,7 @@ export const LogsCard = ({ log }: { log: UpdateLog }) => {
           </div>
         </div>
 
-        <Separator className="bg-white/5 mb-3" />
+        <Separator className="bg-bpim-surface-2/60 mb-3" />
 
         <div className="flex flex-col gap-1.5">
           <span className="text-[10px] font-bold tracking-[0.15em] text-bpim-subtle uppercase">

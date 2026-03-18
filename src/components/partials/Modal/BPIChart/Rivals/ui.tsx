@@ -54,7 +54,7 @@ export const RivalRankingBody = ({
   return (
     <div className="w-full overflow-hidden rounded-md border border-bpim-border bg-bpim-bg/20">
       <Table>
-        <TableHeader className="bg-white/5">
+        <TableHeader className="bg-bpim-surface-2/60">
           <TableRow className="hover:bg-transparent border-bpim-border">
             <TableHead className="w-[60px] text-[10px] font-bold uppercase tracking-wider">
               Rank

@@ -33,7 +33,7 @@ export const ProfileErrorState = ({
 
   return (
     <div className="flex h-[60vh] flex-col items-center justify-center gap-6 text-center">
-      <div className={cn("rounded-full bg-white/5 p-6", current.color)}>
+      <div className={cn("rounded-full bg-bpim-surface-2/60 p-6", current.color)}>
         {current.icon}
       </div>
       <div className="flex flex-col gap-2">

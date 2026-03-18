@@ -38,7 +38,10 @@ export const RivalComparisonModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-md gap-0 rounded-2xl border-white/20 bg-bpim-bg p-0 shadow-2xl shadow-black/50 overflow-hidden">
+      <DialogContent
+        placement="bottom-sheet"
+        className="gap-0 p-0 shadow-2xl overflow-hidden"
+      >
         <DialogHeader className="p-6 pb-2">
           {isLoading ? (
             <RivalHeaderSkeleton />
@@ -57,13 +60,13 @@ export const RivalComparisonModal = ({
           ) : (
             compare && (
               <div className="flex flex-col gap-6">
-                <Separator className="bg-white/5" />
+                <Separator />
 
                 <WinLossStats winLossData={compare.winLoss} />
 
                 <div className="flex flex-col gap-3">
                   <SectionTitle icon={Activity} label="RADAR COMPARISON" />
-                  <div className="flex h-[250px] w-full items-center justify-center rounded-xl border border-bpim-border bg-bpim-bg/20 p-4 md:h-[300px]">
+                  <div className="flex h-[250px] w-full items-center justify-center rounded-xl border bg-bpim-surface-2/40 p-4 md:h-[300px]">
                     <RadarSectionChart
                       data={viewerRadar}
                       rivalData={compare.radar}
@@ -74,7 +77,7 @@ export const RivalComparisonModal = ({
 
                 <Button
                   asChild
-                  className="h-[50px] w-full rounded-xl bg-bpim-primary font-bold text-bpim-text hover:bg-bpim-primary transition-all active:scale-95"
+                  className="h-[50px] w-full rounded-xl font-bold active:scale-95"
                 >
                   <Link href={`/users/${rivalId}`}>
                     <div className="flex items-center justify-center gap-2">

@@ -73,7 +73,7 @@ export const NotificationBell = () => {
               更新
             </TabsTrigger>
           </TabsList>
-          <div className="max-h-[400px] overflow-y-auto p-2">
+          <div className="max-h-[400px] p-2">
             <InfiniteScrollContainer
               items={notifications}
               setSize={setSize}
