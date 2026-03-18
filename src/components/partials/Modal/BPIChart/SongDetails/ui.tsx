@@ -76,11 +76,9 @@ export const SongDetailView = ({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent
-        className={cn(
-          "w-full max-w-full md:max-w-2xl",
-          "h-full md:h-auto md:rounded-2xl",
-          "p-0 shadow-2xl overflow-hidden gap-0",
-        )}
+        placement="bottom-sheet"
+        disableScrollWrapper
+        className="flex flex-col p-0 overflow-hidden"
       >
         <DialogHeader className="border-b p-4 flex flex-row items-center justify-between space-y-0">
           <DialogTitle className="text-lg font-black tracking-tight">

@@ -25,7 +25,7 @@ export const getLampClass = (clearState: string | null | undefined) => {
     case "EX HARD CLEAR":
       return "bg-yellow-500";
     case "FULLCOMBO CLEAR":
-      return "bg-linear-to-b from-red-500 via-yellow-400 via-green-400 via-blue-400 to-purple-500";
+      return "bg-gradient-to-b from-white to-yellow-400";
     default:
       return "bg-bpim-overlay";
   }
@@ -66,7 +66,7 @@ const SongItem = ({
                   diffColors[song.difficulty] || "bg-bpim-surface-2",
                 )}
               >
-                <span className="text-[11px] font-bold text-bpim-text leading-none">
+                <span className="text-[11px] font-bold text-white leading-none">
                   {song.difficultyLevel}
                 </span>
               </div>

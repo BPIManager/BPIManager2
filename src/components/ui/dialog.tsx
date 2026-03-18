@@ -53,10 +53,12 @@ function DialogContent({
   children,
   showCloseButton = true,
   placement = "center",
+  disableScrollWrapper = false,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean;
   placement?: "center" | "bottom-sheet";
+  disableScrollWrapper?: boolean;
 }) {
   return (
     <DialogPortal>
@@ -64,14 +66,12 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          // 共通
           "fixed z-50 grid gap-4 bg-bpim-surface text-bpim-text",
           "text-sm ring-1 ring-bpim-border duration-100 outline-none",
           "data-open:animate-in data-open:fade-in-0",
           "data-closed:animate-out data-closed:fade-out-0",
 
           placement === "center" && [
-            // 中央配置（デフォルト）
             "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
             "w-full max-w-[calc(100%-2rem)] rounded-xl p-4 sm:max-w-sm",
             "data-open:zoom-in-95 data-closed:zoom-out-95",
@@ -95,9 +95,13 @@ function DialogContent({
         {placement === "bottom-sheet" ? (
           <>
             <div className="mx-auto mt-3 mb-1 h-1 w-10 shrink-0 rounded-full bg-bpim-border md:hidden" />
-            <div className="overflow-y-auto overscroll-contain flex-1">
-              {children}
-            </div>
+            {disableScrollWrapper ? (
+              <>{children}</>
+            ) : (
+              <div className="overflow-y-auto overscroll-contain flex-1">
+                {children}
+              </div>
+            )}
           </>
         ) : (
           children

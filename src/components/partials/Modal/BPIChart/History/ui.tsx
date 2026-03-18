@@ -117,7 +117,7 @@ export const SongHistoryTab = ({ songId }: SongHistoryTabProps) => {
                         )}
 
                         {isGlobalBest && (
-                          <Badge className="h-4 bg-yellow-500 text-black px-1.5 text-[9px] font-black border-none">
+                          <Badge className="h-4 bg-bpim-warning px-1.5 text-[9px] font-black border-none">
                             <LuCrown className="mr-0.5 h-2.5 w-2.5" />
                             BEST
                           </Badge>
@@ -130,10 +130,12 @@ export const SongHistoryTab = ({ songId }: SongHistoryTabProps) => {
                         <span
                           className={cn(
                             "font-mono text-lg font-black leading-none tracking-tighter",
-                            isGlobalBest ? "text-yellow-200" : "text-bpim-text",
+                            isGlobalBest
+                              ? "text-bpim-warning"
+                              : "text-bpim-text",
                           )}
                         >
-                          {record.exScore.toLocaleString()}
+                          {record.exScore}
                         </span>
                         <span className="font-mono text-[10px] font-bold text-bpim-muted">
                           BPI: {(record.bpi || -15).toFixed(2)}

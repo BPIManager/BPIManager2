@@ -84,11 +84,7 @@ export const SongFilterBar = ({
     <div
       className={cn(
         "p-4 border-b border-bpim-border transition-all duration-200 w-full",
-        // bg-bpim-bg を確実に指定。
-        // shadow-2xl をつけることで、重なっている境界をはっきりさせます。
-        isSticky
-          ? "sticky top-0 z-50 bg-bpim-bg shadow-2xl"
-          : "relative bg-bpim-bg",
+        isSticky ? "sticky top-0 z-50 bg-bpim-bg" : "relative bg-bpim-bg",
       )}
     >
       <div className="flex flex-col sm:flex-row w-full gap-2 mb-3 items-center">

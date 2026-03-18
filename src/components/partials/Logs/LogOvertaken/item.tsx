@@ -36,7 +36,7 @@ export const OvertakeRankItem = ({ item, onClick }: RankItemProps) => {
               ☆{item.level}
             </span>
             {isNew && (
-              <span className="px-1 text-[8px] font-bold bg-purple-600 text-bpim-text rounded-sm leading-tight">
+              <span className="px-1 text-[8px] font-bold bg-purple-600 text-white rounded-sm leading-tight">
                 NEW
               </span>
             )}

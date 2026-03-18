@@ -64,10 +64,7 @@ export const RivalSummaryCard = ({
             <span className="block text-[9px] font-bold tracking-widest text-bpim-muted uppercase">
               Total BPI
             </span>
-            <span
-              className="font-mono text-base font-bold md:text-xl"
-              style={{ color: bpiStyle.color }}
-            >
+            <span className="font-mono text-base font-bold md:text-xl text-bpim-text">
               {totalBpi?.toFixed(2) ?? "-15.00"}
             </span>
           </div>

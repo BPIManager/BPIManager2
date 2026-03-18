@@ -94,7 +94,7 @@ export const RivalProfileLayout = ({
                     <TabsTrigger
                       value="overview"
                       asChild
-                      className="flex items-center gap-2 py-3 text-xs font-bold data-[state=active]:bg-bpim-primary data-[state=active]:text-bpim-text"
+                      className="flex items-center gap-2 text-xs font-bold data-[state=active]:bg-bpim-primary data-[state=active]:text-bpim-text"
                     >
                       <NextLink href={`/rivals/${rivalUserId}`}>
                         <LuLayoutDashboard className="h-4 w-4" />
@@ -104,7 +104,7 @@ export const RivalProfileLayout = ({
                     <TabsTrigger
                       value="scores"
                       asChild
-                      className="flex items-center gap-2 py-3 text-xs font-bold data-[state=active]:bg-bpim-primary data-[state=active]:text-bpim-text"
+                      className="flex items-center gap-2 text-xs font-bold data-[state=active]:bg-bpim-primary data-[state=active]:text-bpim-text"
                     >
                       <NextLink
                         href={`/rivals/${rivalUserId}/scores/${version}?${scoreParams}`}

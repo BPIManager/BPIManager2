@@ -33,7 +33,7 @@ export const ReusableMenuItem = ({
       target={isExternal ? "_blank" : undefined}
       rel={isExternal ? "noopener noreferrer" : undefined}
       className={cn(
-        "group block w-full rounded-xl border border-bpim-border bg-bpim-bg/40 p-4 transition-all duration-200",
+        "group block w-full rounded-xl border border-bpim-border bg-bpim-bg/40 p-4 transition-all duration-200 mt-4",
         "hover:border-bpim-border hover:bg-bpim-surface-2/60 hover:no-underline",
         className,
       )}

@@ -227,7 +227,7 @@ export const RankItem = ({
               ☆{item.level}
             </span>
             {isNew && (
-              <span className="rounded-sm bg-purple-600 px-1 text-[8px] font-bold text-bpim-text leading-none py-0.5">
+              <span className="rounded-sm bg-purple-600 px-1 text-[8px] font-bold text-white leading-none py-0.5">
                 NEW
               </span>
             )}

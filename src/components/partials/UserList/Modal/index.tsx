@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import Link from "next/link";
-import { User, ChevronRight, Activity } from "lucide-react";
+import { User, ChevronRight, Activity, LucideIcon } from "lucide-react";
 import { useRivalComparison } from "@/hooks/social/useRivalComparison";
 import { useProfile } from "@/hooks/users/useProfile";
 import { RivalBodySkeleton, RivalHeaderSkeleton } from "./skeleton";
@@ -10,6 +10,7 @@ import { RadarSectionChart } from "../../DashBoard/Radar/ui";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { UserProfileData } from "@/types/users/profile";
 
 export const RivalComparisonModal = ({
   rivalId,

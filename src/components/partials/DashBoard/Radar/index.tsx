@@ -58,7 +58,9 @@ export const RadarSection = ({
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5">
               <div className="h-2.5 w-2.5 rounded-full bg-bpim-primary" />
-              <span className="text-xs text-bpim-primary font-medium">自分</span>
+              <span className="text-xs text-bpim-primary font-medium">
+                自分
+              </span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="h-2.5 w-2.5 rounded-full bg-orange-400" />
@@ -98,10 +100,9 @@ export const RadarSection = ({
                     </div>
                   )}
                   <div
-                    className="inline-flex min-w-[64px] items-center justify-center rounded-sm border px-2 py-0.5 font-mono text-sm font-bold"
+                    className="inline-flex min-w-[64px] items-center justify-center rounded-sm border px-2 py-0.5 font-mono text-sm font-bold text-bpim-text"
                     style={{
                       borderColor: style.bg,
-                      color: style.color,
                       backgroundColor: `${style.bg}15`,
                     }}
                   >

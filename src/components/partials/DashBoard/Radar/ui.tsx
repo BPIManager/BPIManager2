@@ -9,35 +9,42 @@
 } from "recharts";
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
+import { useChartColors } from "@/hooks/common/useChartColors";
 
-const RadarDefs = () => (
+const RadarDefs = ({
+  primaryColor,
+  warningColor,
+}: {
+  primaryColor: string;
+  warningColor: string;
+}) => (
   <svg style={{ height: 0, width: 0, position: "absolute" }} aria-hidden="true">
     <defs>
       <radialGradient id="radarMeGradient" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.1} />
-        <stop offset="100%" stopColor="#3b82f6" stopOpacity={0.5} />
+        <stop offset="0%" stopColor={primaryColor} stopOpacity={0.1} />
+        <stop offset="100%" stopColor={primaryColor} stopOpacity={0.5} />
       </radialGradient>
       <radialGradient id="radarRivalGradient" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stopColor="#f97316" stopOpacity={0.1} />
-        <stop offset="100%" stopColor="#f97316" stopOpacity={0.5} />
+        <stop offset="0%" stopColor={warningColor} stopOpacity={0.1} />
+        <stop offset="100%" stopColor={warningColor} stopOpacity={0.5} />
       </radialGradient>
       <radialGradient id="dotMeMax" cx="50%" cy="50%" r="50%">
         <stop offset="0%" stopColor="white" stopOpacity={1} />
-        <stop offset="100%" stopColor="#3b82f6" stopOpacity={1} />
+        <stop offset="100%" stopColor={primaryColor} stopOpacity={1} />
       </radialGradient>
       <radialGradient id="dotRivalMax" cx="50%" cy="50%" r="50%">
         <stop offset="0%" stopColor="white" stopOpacity={1} />
-        <stop offset="100%" stopColor="#f97316" stopOpacity={1} />
+        <stop offset="100%" stopColor={warningColor} stopOpacity={1} />
       </radialGradient>
     </defs>
   </svg>
 );
 
 const CustomDot = (props: any) => {
-  const { cx, cy, payload, dataKey, r } = props;
+  const { cx, cy, payload, dataKey, r, primaryColor, warningColor } = props;
   const isMe = dataKey === "value";
   const isMax = isMe ? payload.isMeMax : payload.isRivalMax;
-  const color = isMe ? "#3b82f6" : "#f97316";
+  const color = isMe ? primaryColor : warningColor;
   const grad = isMe ? "url(#dotMeMax)" : "url(#dotRivalMax)";
 
   if (isMax) {
@@ -59,77 +66,80 @@ const CustomDot = (props: any) => {
 };
 
 const RadarCustomTooltip = ({ active, payload }: any) => {
-  if (active && payload && payload.length) {
-    const data = payload[0].payload;
-    const meVal = data.value;
-    const rivalVal = data.rivalValue;
-    const hasRival = rivalVal !== undefined;
+  if (!active || !payload?.length) return null;
+  const data = payload[0].payload;
+  const meVal = data.value;
+  const rivalVal = data.rivalValue;
+  const hasRival = rivalVal !== undefined;
 
-    return (
-      <div className="min-w-[160px] rounded-md border border-bpim-border bg-bpim-bg p-3 shadow-xl">
-        <div className="flex flex-col gap-1">
-          <p className="text-xs font-bold text-bpim-text uppercase">
-            {data.category}
-          </p>
-          <div className="my-1 h-px w-full bg-bpim-overlay/60" />
+  return (
+    <div className="min-w-[160px] rounded-md border border-bpim-border bg-bpim-surface p-3 shadow-xl">
+      <div className="flex flex-col gap-1">
+        <p className="text-xs font-bold text-bpim-text uppercase">
+          {data.category}
+        </p>
+        <div className="my-1 h-px w-full bg-bpim-overlay/60" />
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-bpim-primary" />
-              <span className="text-xs font-bold text-bpim-primary">YOU</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <span className="font-mono text-xs font-bold text-bpim-text">
-                {meVal.toFixed(2)}
-              </span>
-              {data.isMeMax && (
-                <span className="rounded bg-bpim-primary px-1 py-0.5 text-[8px] font-bold text-bpim-text">
-                  BEST
-                </span>
-              )}
-            </div>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="h-2 w-2 rounded-full bg-bpim-primary" />
+            <span className="text-xs font-bold text-bpim-primary">YOU</span>
           </div>
+          <div className="flex items-center gap-1">
+            <span className="font-mono text-xs font-bold text-bpim-text">
+              {meVal.toFixed(2)}
+            </span>
+            {data.isMeMax && (
+              <span className="rounded bg-bpim-primary px-1 py-0.5 text-[8px] font-bold text-bpim-bg">
+                BEST
+              </span>
+            )}
+          </div>
+        </div>
 
-          {hasRival && (
-            <>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-orange-500" />
-                  <span className="text-xs font-bold text-bpim-warning">
-                    RIVAL
-                  </span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span className="font-mono text-xs font-bold text-bpim-text">
-                    {rivalVal.toFixed(2)}
-                  </span>
-                  {data.isRivalMax && (
-                    <span className="rounded bg-orange-600 px-1 py-0.5 text-[8px] font-bold text-bpim-text">
-                      BEST
-                    </span>
-                  )}
-                </div>
+        {hasRival && (
+          <>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-bpim-warning" />
+                <span className="text-xs font-bold text-bpim-warning">
+                  RIVAL
+                </span>
               </div>
+              <div className="flex items-center gap-1">
+                <span className="font-mono text-xs font-bold text-bpim-text">
+                  {rivalVal.toFixed(2)}
+                </span>
+                {data.isRivalMax && (
+                  <span className="rounded bg-bpim-warning px-1 py-0.5 text-[8px] font-bold text-bpim-bg">
+                    BEST
+                  </span>
+                )}
+              </div>
+            </div>
 
-              <div
+            <div
+              className={cn(
+                "mt-1 flex w-full justify-center rounded-sm py-0.5",
+                meVal >= rivalVal ? "bg-bpim-success/20" : "bg-bpim-danger/20",
+              )}
+            >
+              <p
                 className={cn(
-                  "mt-1 flex w-full justify-center rounded-sm py-0.5",
-                  meVal >= rivalVal ? "bg-green-900/50" : "bg-red-900/50",
+                  "text-[9px] font-bold",
+                  meVal >= rivalVal ? "text-bpim-success" : "text-bpim-danger",
                 )}
               >
-                <p className="text-[9px] font-bold text-bpim-text">
-                  {meVal >= rivalVal
-                    ? `WIN (+${(meVal - rivalVal).toFixed(2)})`
-                    : `LOSE (${(meVal - rivalVal).toFixed(2)})`}
-                </p>
-              </div>
-            </>
-          )}
-        </div>
+                {meVal >= rivalVal
+                  ? `WIN (+${(meVal - rivalVal).toFixed(2)})`
+                  : `LOSE (${(meVal - rivalVal).toFixed(2)})`}
+              </p>
+            </div>
+          </>
+        )}
       </div>
-    );
-  }
-  return null;
+    </div>
+  );
 };
 
 type RadarValue = number | { totalBpi: number } | undefined;
@@ -146,6 +156,8 @@ export const RadarSectionChart = ({
   rivalData,
   isMini = false,
 }: RadarChartProps) => {
+  const c = useChartColors();
+
   const chartData = useMemo(() => {
     const categories = [
       "notes",
@@ -197,14 +209,14 @@ export const RadarSectionChart = ({
 
   return (
     <div className={cn("relative w-full", isMini ? "h-[150px]" : "h-[330px]")}>
-      <RadarDefs />
+      <RadarDefs primaryColor={c.primary} warningColor={c.warning} />
       <ResponsiveContainer width="100%" height="100%">
         <RadarChart cx="50%" cy="50%" outerRadius="80%" data={chartData}>
-          <PolarGrid stroke="rgba(255,255,255,0.08)" />
+          <PolarGrid stroke={`${c.grid}`} strokeOpacity={0.3} />
           {!isMini && (
             <PolarAngleAxis
               dataKey="category"
-              tick={{ fill: "#9ca3af", fontSize: 10, fontWeight: "bold" }}
+              tick={{ fill: c.muted, fontSize: 10, fontWeight: "bold" }}
             />
           )}
           <PolarRadiusAxis domain={domain} tick={false} axisLine={false} />
@@ -216,11 +228,13 @@ export const RadarSectionChart = ({
           <Radar
             name="YOU"
             dataKey="value"
-            stroke="#3b82f6"
+            stroke={c.primary}
             strokeWidth={1.5}
             fill="url(#radarMeGradient)"
             fillOpacity={1}
-            dot={<CustomDot />}
+            dot={
+              <CustomDot primaryColor={c.primary} warningColor={c.warning} />
+            }
             isAnimationActive={!isMini}
           />
 
@@ -228,11 +242,13 @@ export const RadarSectionChart = ({
             <Radar
               name="RIVAL"
               dataKey="rivalValue"
-              stroke="#f97316"
+              stroke={c.warning}
               strokeWidth={1.5}
               fill="url(#radarRivalGradient)"
               fillOpacity={0.6}
-              dot={<CustomDot />}
+              dot={
+                <CustomDot primaryColor={c.primary} warningColor={c.warning} />
+              }
               isAnimationActive={!isMini}
             />
           )}

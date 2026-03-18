@@ -32,7 +32,7 @@ export const SimpleRankItem = ({
         className={cn(
           "absolute inset-y-0 left-0 w-1 z-10",
           isFullCombo
-            ? "bg-linear-to-b from-[#ff0000] to-[#8b00ff]"
+            ? "bg-gradient-to-b from-yellow-300 to-yellow-500"
             : lampClass,
         )}
       />
@@ -51,7 +51,7 @@ export const SimpleRankItem = ({
           <div className="flex items-center gap-1.5">
             <Badge
               className={cn(
-                "h-3.5 px-1 text-[9px] font-black border-none rounded-sm text-bpim-text flex items-center",
+                "h-3.5 px-1 text-[9px] border-none rounded-sm text-white flex items-center",
                 difficultyBg,
               )}
             >

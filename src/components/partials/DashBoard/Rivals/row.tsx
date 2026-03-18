@@ -28,7 +28,7 @@ export const RivalComparisonRow = ({ rival }: RivalComparisonRowProps) => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 min-w-0">
           <Avatar className="h-5 w-5">
-            <AvatarImage src={profileImage} alt={userName} />
+            <AvatarImage src={profileImage || ""} alt={userName} />
             <AvatarFallback className="text-[8px]">
               {userName.slice(0, 2)}
             </AvatarFallback>
@@ -53,9 +53,7 @@ export const RivalComparisonRow = ({ rival }: RivalComparisonRowProps) => {
           >
             {winRate > 10 && (
               <div className="flex h-full items-center justify-center">
-                <span className="text-[10px] font-bold text-bpim-text">
-                  {win}
-                </span>
+                <span className="text-[10px] font-bold text-white">{win}</span>
               </div>
             )}
           </div>
@@ -66,9 +64,7 @@ export const RivalComparisonRow = ({ rival }: RivalComparisonRowProps) => {
           >
             {drawRate > 15 && (
               <div className="flex h-full items-center justify-center">
-                <span className="text-[10px] font-bold text-bpim-text">
-                  {draw}
-                </span>
+                <span className="text-[10px] font-bold text-white">{draw}</span>
               </div>
             )}
           </div>
@@ -79,9 +75,7 @@ export const RivalComparisonRow = ({ rival }: RivalComparisonRowProps) => {
           >
             {loseRate > 10 && (
               <div className="flex h-full items-center justify-center">
-                <span className="text-[10px] font-bold text-bpim-text">
-                  {lose}
-                </span>
+                <span className="text-[10px] font-bold text-white">{lose}</span>
               </div>
             )}
           </div>

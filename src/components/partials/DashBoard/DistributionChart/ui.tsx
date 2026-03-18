@@ -1,12 +1,13 @@
 ﻿import { DistributionChartSkeleton } from "@/components/partials/DashBoard/DistributionChart/skeleton";
 import { DashCard } from "@/components/ui/dashcard";
 import { cn } from "@/lib/utils";
+import { useChartColors } from "@/hooks/common/useChartColors";
 
 const animationStyles = `
   @keyframes bounceGrow {
-    0% { transform: scaleY(0); }
-    60% { transform: scaleY(1.1); }
-    80% { transform: scaleY(0.95); }
+    0%   { transform: scaleY(0); }
+    60%  { transform: scaleY(1.1); }
+    80%  { transform: scaleY(0.95); }
     100% { transform: scaleY(1); }
   }
 `;
@@ -34,6 +35,8 @@ const ChartBarUnit = ({
   maxCount,
   color,
   index,
+  primaryColor,
+  warningColor,
 }: {
   label: string;
   myCount: number;
@@ -41,10 +44,12 @@ const ChartBarUnit = ({
   maxCount: number;
   color: string;
   index: number;
+  primaryColor: string;
+  warningColor: string;
 }) => {
   const hasRival = rivalCount !== undefined;
   const myHeight = `${(myCount / maxCount) * 100}%`;
-  const rivalHeight = hasRival ? `${(rivalCount / maxCount) * 100}%` : "0%";
+  const rivalHeight = hasRival ? `${(rivalCount! / maxCount) * 100}%` : "0%";
 
   return (
     <div className="flex h-[180px] min-w-0 max-w-[60px] flex-1 flex-col items-stretch gap-0">
@@ -68,10 +73,11 @@ const ChartBarUnit = ({
               {myCount}
             </span>
             <div
-              className="w-full origin-bottom rounded-t-[2px] border-t-2 border-blue-400 opacity-90 animate-[bounceGrow_0.6s_ease-out_both]"
+              className="w-full origin-bottom rounded-t-[2px] opacity-90 animate-[bounceGrow_0.6s_ease-out_both]"
               style={{
                 height: myHeight,
                 backgroundColor: color,
+                borderTop: `2px solid ${primaryColor}`,
                 animationDelay: `${index * 0.04}s`,
               }}
             />
@@ -80,10 +86,11 @@ const ChartBarUnit = ({
           {hasRival && (
             <div className="relative flex h-full flex-1 min-w-0 flex-col justify-end">
               <div
-                className="w-full origin-bottom rounded-t-[2px] border-t-2 border-orange-400 opacity-45 animate-[bounceGrow_0.6s_ease-out_both]"
+                className="w-full origin-bottom rounded-t-[2px] opacity-45 animate-[bounceGrow_0.6s_ease-out_both]"
                 style={{
                   height: rivalHeight,
                   backgroundColor: color,
+                  borderTop: `2px solid ${warningColor}`,
                   animationDelay: `${index * 0.04 + 0.02}s`,
                 }}
               />
@@ -95,7 +102,7 @@ const ChartBarUnit = ({
           <span
             className={cn(
               "absolute bottom-[5px] left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] font-bold text-bpim-warning",
-              rivalCount > 0 ? "visible" : "hidden",
+              rivalCount! > 0 ? "visible" : "hidden",
             )}
           >
             {rivalCount}
@@ -104,7 +111,6 @@ const ChartBarUnit = ({
       </div>
 
       <div className="h-[1px] w-full bg-bpim-overlay/60" />
-
       <div className="flex h-[30px] justify-center">
         <span className="mt-2 whitespace-nowrap text-[10px] font-bold text-bpim-muted">
           {label}
@@ -124,10 +130,9 @@ export const DistributionChart = ({
   rivalName = "ライバル",
   skeletonCount = 10,
 }: DistributionChartProps) => {
-  if (isLoading) {
-    return <DistributionChartSkeleton count={skeletonCount} />;
-  }
+  const c = useChartColors();
 
+  if (isLoading) return <DistributionChartSkeleton count={skeletonCount} />;
   if (!myData || myData.length === 0) return null;
 
   const rivalMap = rivalData
@@ -136,7 +141,7 @@ export const DistributionChart = ({
 
   const maxCount = Math.max(
     ...myData.map((d) => d.count),
-    ...(rivalData?.map((d) => d.count) || []),
+    ...(rivalData?.map((d) => d.count) ?? []),
     1,
   );
 
@@ -146,7 +151,6 @@ export const DistributionChart = ({
 
       <div className="mb-6 flex items-center justify-between">
         <h3 className="text-sm font-bold uppercase text-bpim-muted">{title}</h3>
-
         {rivalData && (
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1">
@@ -154,7 +158,7 @@ export const DistributionChart = ({
               <span className="text-xs text-bpim-primary">{myName}</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="h-2 w-2 rounded-full bg-orange-500 opacity-60" />
+              <div className="h-2 w-2 rounded-full bg-bpim-warning opacity-60" />
               <span className="text-xs text-bpim-warning">{rivalName}</span>
             </div>
           </div>
@@ -171,6 +175,8 @@ export const DistributionChart = ({
             maxCount={maxCount}
             color={getColor(item.label)}
             index={i}
+            primaryColor={c.primary}
+            warningColor={c.warning}
           />
         ))}
       </div>

@@ -14,6 +14,7 @@ import {
 import { SongWithScore } from "@/types/songs/withScore";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import { useChartColors } from "@/hooks/common/useChartColors";
 
 interface BPIAnimatedChartProps {
   data: { label: string; count: number; bpi: number }[];
@@ -29,7 +30,7 @@ const ChartTooltip = ({ active, payload, youScore, maxScore }: any) => {
   const diff = data.count - youScore;
 
   return (
-    <div className="rounded-lg border border-bpim-border bg-bpim-bg p-3 shadow-2xl backdrop-blur-md">
+    <div className="rounded-lg border border-bpim-border bg-bpim-surface p-3 shadow-2xl">
       <div className="flex flex-col gap-1.5">
         <p className="text-xs font-bold text-bpim-primary uppercase tracking-wider">
           BPI: {isYou ? data.bpi.toFixed(2) : data.label}
@@ -38,16 +39,16 @@ const ChartTooltip = ({ active, payload, youScore, maxScore }: any) => {
         <Separator className="bg-bpim-overlay/60" />
 
         <div className="flex flex-col gap-0.5">
-          <p className="text-sm font-bold text-bpim-text font-mono">
+          <p className="font-mono text-sm font-bold text-bpim-text">
             Score: {data.count}
           </p>
-          <p className="text-[10px] text-bpim-muted font-mono">Rate: {rate}%</p>
+          <p className="font-mono text-[10px] text-bpim-muted">Rate: {rate}%</p>
         </div>
 
         {!isYou && (
           <p
             className={cn(
-              "text-[11px] font-black mt-1",
+              "mt-1 text-[11px] font-black",
               diff > 0 ? "text-bpim-danger" : "text-bpim-success",
             )}
           >
@@ -60,9 +61,11 @@ const ChartTooltip = ({ active, payload, youScore, maxScore }: any) => {
 };
 
 export const BPIChart = ({ data, maxScore }: BPIAnimatedChartProps) => {
+  const c = useChartColors();
+
   const chartData = useMemo(() => {
     return [...data].sort((a, b) => {
-      const getVal = (d: any) =>
+      const getVal = (d: typeof a) =>
         d.label === "YOU" ? d.bpi : parseFloat(d.label);
       return getVal(b) - getVal(a);
     });
@@ -83,15 +86,12 @@ export const BPIChart = ({ data, maxScore }: BPIAnimatedChartProps) => {
       { label: "A", ratio: 6 / 9 },
     ];
     return ranks
-      .map((r) => ({
-        ...r,
-        score: Math.ceil(maxScore * r.ratio),
-      }))
+      .map((r) => ({ ...r, score: Math.ceil(maxScore * r.ratio) }))
       .filter((b) => b.score > yMin);
   }, [maxScore, yMin]);
 
   return (
-    <div className="h-[320px] md:h-[400px] w-full rounded-xl border border-bpim-border bg-bpim-bg/40 p-4">
+    <div className="h-[320px] w-full rounded-xl border border-bpim-border bg-bpim-surface-2/40 p-4 md:h-[400px]">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
           data={chartData}
@@ -101,27 +101,30 @@ export const BPIChart = ({ data, maxScore }: BPIAnimatedChartProps) => {
             dataKey="label"
             axisLine={false}
             tickLine={false}
-            tick={{ fill: "#64748b", fontSize: 10, fontWeight: "bold" }}
+            tick={{ fill: c.muted, fontSize: 10, fontWeight: "bold" }}
             interval={0}
           />
           <YAxis domain={[yMin, maxScore]} hide />
+
           <Tooltip
             content={<ChartTooltip youScore={youScore} maxScore={maxScore} />}
-            cursor={{ fill: "rgba(255,255,255,0.03)" }}
+            cursor={{ fill: c.primaryRgba(0.04) }}
             animationDuration={200}
           />
+
           {borders.map((b) => (
             <ReferenceLine
               key={b.label}
               y={b.score}
-              stroke="#334155"
+              stroke={c.warning}
+              strokeOpacity={0.5}
               strokeDasharray="4 4"
               label={{
                 position: "insideBottomRight",
                 value: b.label,
-                fill: "#475569",
-                fontSize: 9,
-                fontWeight: "black",
+                fill: c.warning,
+                fontSize: 10,
+                fontWeight: "bold",
               }}
             />
           ))}
@@ -130,7 +133,7 @@ export const BPIChart = ({ data, maxScore }: BPIAnimatedChartProps) => {
             {chartData.map((entry, index) => (
               <Cell
                 key={`cell-${index}`}
-                fill={entry.label === "YOU" ? "#fbbf24" : "#3b82f6"}
+                fill={entry.label === "YOU" ? c.warning : c.primary}
                 fillOpacity={entry.label === "YOU" ? 1 : 0.6}
               />
             ))}

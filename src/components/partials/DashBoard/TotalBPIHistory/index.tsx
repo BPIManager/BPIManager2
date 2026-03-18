@@ -15,24 +15,24 @@ import { BpiHistoryItem } from "@/hooks/stats/useTotalBPIHistory";
 import { TotalBpiHistorySkeleton } from "@/components/partials/DashBoard/TotalBPIHistory/skeleton";
 import { DashCard } from "@/components/ui/dashcard";
 import { cn } from "@/lib/utils";
+import { useChartColors } from "@/hooks/common/useChartColors";
 
 const UpdateBar = (props: any) => {
-  const { payload } = props;
+  const { payload, primaryColor } = props;
   if (payload.rivalBpi !== undefined) return null;
-  const fill = payload.updateCount > 0 ? "#3b82f6" : "transparent";
+  const fill = payload.updateCount > 0 ? primaryColor : "transparent";
   return (
     <Rectangle {...props} fill={fill} opacity={0.3} radius={[2, 2, 0, 0]} />
   );
 };
 
 const HistoryTooltip = ({ active, payload, label, myName, rivalName }: any) => {
-  if (!active || !payload || !payload.length) return null;
-
+  if (!active || !payload?.length) return null;
   const data = payload[0].payload;
   const isComparison = data.rivalBpi !== undefined;
 
   return (
-    <div className="min-w-[200px] max-w-[300px] rounded-md border border-bpim-border bg-bpim-bg p-3 shadow-xl">
+    <div className="min-w-[200px] max-w-[300px] rounded-md border border-bpim-border bg-bpim-surface p-3 shadow-xl">
       <div className="flex flex-col gap-1">
         <p className="text-[10px] font-bold text-bpim-muted">{label}</p>
 
@@ -117,6 +117,8 @@ export const TotalBpiHistoryChart = ({
   myName = "自分",
   rivalName = "ライバル",
 }: UnifiedBpiHistoryChartProps) => {
+  const c = useChartColors();
+
   const { chartData, ticks, startIndex } = useMemo(() => {
     if (!myData && !rivalData)
       return { chartData: [], ticks: [], startIndex: 0 };
@@ -183,16 +185,13 @@ export const TotalBpiHistoryChart = ({
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5">
               <div className="h-[2px] w-3 bg-bpim-primary" />
-              <span className="text-xs text-bpim-primary font-medium">
+              <span className="text-xs font-medium text-bpim-primary">
                 {myName}
               </span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div
-                className="h-[2px] w-3 border-t border-dashed border-orange-500 bg-transparent"
-                style={{ borderTopWidth: "2px", borderStyle: "dashed" }}
-              />
-              <span className="text-xs text-bpim-warning font-medium">
+              <div className="h-[2px] w-3 border-t-2 border-dashed border-bpim-warning bg-transparent" />
+              <span className="text-xs font-medium text-bpim-warning">
                 {rivalName}
               </span>
             </div>
@@ -208,21 +207,22 @@ export const TotalBpiHistoryChart = ({
           >
             <CartesianGrid
               strokeDasharray="3 3"
-              stroke="#1e293b"
+              stroke={c.grid}
+              strokeOpacity={0.3}
               vertical={false}
             />
             <XAxis
               dataKey="date"
               ticks={ticks}
               tickFormatter={formatDate}
-              stroke="#475569"
+              stroke={c.muted}
               fontSize={10}
               tickLine={false}
               axisLine={false}
             />
             <YAxis
               domain={["dataMin - 1", "dataMax + 1"]}
-              stroke="#475569"
+              stroke={c.muted}
               fontSize={10}
               tickFormatter={(v) => v.toFixed(1)}
               axisLine={false}
@@ -232,7 +232,7 @@ export const TotalBpiHistoryChart = ({
 
             <Tooltip
               content={<HistoryTooltip myName={myName} rivalName={rivalName} />}
-              cursor={{ stroke: "#334155" }}
+              cursor={{ stroke: c.grid }}
             />
 
             {!rivalData && (
@@ -240,20 +240,20 @@ export const TotalBpiHistoryChart = ({
                 yAxisId="right"
                 dataKey="updateCount"
                 barSize={4}
-                shape={<UpdateBar />}
+                shape={<UpdateBar primaryColor={c.primary} />}
               />
             )}
 
             <Line
               type="monotone"
               dataKey="myBpi"
-              stroke="#3b82f6"
+              stroke={c.primary}
               strokeWidth={2}
               dot={false}
               activeDot={{
                 r: 4,
-                fill: "#0d1117",
-                stroke: "#3b82f6",
+                fill: c.surface,
+                stroke: c.primary,
                 strokeWidth: 2,
               }}
               connectNulls
@@ -264,7 +264,7 @@ export const TotalBpiHistoryChart = ({
               <Line
                 type="monotone"
                 dataKey="rivalBpi"
-                stroke="#f97316"
+                stroke={c.warning}
                 strokeWidth={2}
                 dot={false}
                 strokeDasharray="5 5"
@@ -276,8 +276,8 @@ export const TotalBpiHistoryChart = ({
             <Brush
               dataKey="date"
               height={30}
-              stroke="#334155"
-              fill="#0d1117"
+              stroke={c.grid}
+              fill={c.surface}
               startIndex={startIndex}
               tickFormatter={() => ""}
             />
