@@ -61,7 +61,7 @@ function TabsTrigger({
       data-slot="tabs-trigger"
       className={cn(
         "relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5",
-        "rounded-md border border-transparent px-1.5 py-0.5 text-sm font-medium whitespace-nowrap",
+        "rounded-md border border-transparent px-1.5 text-sm font-medium whitespace-nowrap",
         "text-bpim-muted transition-all",
         "group-data-vertical/tabs:w-full group-data-vertical/tabs:justify-start",
         "hover:text-bpim-text",

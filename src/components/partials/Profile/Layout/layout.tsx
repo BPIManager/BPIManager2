@@ -16,6 +16,7 @@ import { latestVersion } from "@/constants/latestVersion";
 import { ProfileProvider } from "@/contexts/profile/ProfileContext";
 import { FilterProvider } from "@/contexts/stats/FilterContext";
 import { Loader } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface UserProfileLayoutProps {
   userId: string;
@@ -91,30 +92,30 @@ export const UserProfileLayout = ({
 
               <div className="lg:col-span-3">
                 <Tabs value={currentTab} className="w-full">
-                  <TabsList className="mb-6 grid h-12 w-full grid-cols-2 items-stretch rounded-xl border border-bpim-border bg-bpim-card/50 p-1.5 md:grid-cols-4">
+                  <TabsList className="mb-6 grid h-12 w-full grid-cols-4 items-stretch rounded-xl border border-bpim-border bg-bpim-surface-2 p-1.5">
                     <TabLinkItem
                       value="overview"
                       href={`/users/${userId}`}
                       label="サマリ"
-                      icon={<LuLayoutDashboard className="h-4 w-4" />}
+                      icon={<LuLayoutDashboard className="h-4 w-4 shrink-0" />}
                     />
                     <TabLinkItem
                       value="songs"
                       href={`/users/${userId}/scores/${latestVersion}?${scoreParams}`}
                       label="スコア"
-                      icon={<LuMusic className="h-4 w-4" />}
+                      icon={<LuMusic className="h-4 w-4 shrink-0" />}
                     />
                     <TabLinkItem
                       value="logs"
                       href={`/users/${userId}/logs/${version}`}
                       label="更新履歴"
-                      icon={<LuHistory className="h-4 w-4" />}
+                      icon={<LuHistory className="h-4 w-4 shrink-0" />}
                     />
                     <TabLinkItem
                       value="aaaTable"
                       href={`/users/${userId}/aaaTable/${version}`}
                       label="AAA達成表"
-                      icon={<LuTable className="h-4 w-4" />}
+                      icon={<LuTable className="h-4 w-4 shrink-0" />}
                     />
                   </TabsList>
                   {children}
@@ -142,11 +143,16 @@ const TabLinkItem = ({
   <TabsTrigger
     value={value}
     asChild
-    className="flex h-full items-center justify-center gap-2 rounded-lg text-xs font-bold transition-all data-[state=active]:bg-bpim-primary data-[state=active]:text-bpim-text data-[state=active]:shadow-lg"
+    className={cn(
+      "flex h-full items-center justify-center rounded-lg",
+      "text-xs font-bold transition-all",
+      "gap-0 sm:gap-2",
+      "data-[state=active]:shadow-lg",
+    )}
   >
     <NextLink href={href}>
       {icon}
-      <span>{label}</span>
+      <span className="hidden sm:inline">{label}</span>
     </NextLink>
   </TabsTrigger>
 );
