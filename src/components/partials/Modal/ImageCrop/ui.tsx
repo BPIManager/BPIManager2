@@ -7,8 +7,8 @@ import {
   DialogBody,
   DialogFooter,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+} from "@/components/ui/chakra/dialog";
+import { Button } from "@/components/ui/chakra/button";
 import {
   ReactCrop,
   type Crop,
@@ -18,7 +18,7 @@ import {
 import "react-image-crop/dist/ReactCrop.css";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "@/lib/firebase";
-import { toaster } from "@/components/ui/toaster";
+import { toaster } from "@/components/ui/chakra/toaster";
 
 interface Props {
   uid: string;

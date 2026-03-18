@@ -1,62 +1,33 @@
-import { DashCard } from "@/components/ui/dashcard";
-import {
-  Box,
-  SimpleGrid,
-  VStack,
-  Skeleton,
-  Center,
-  Circle,
-} from "@chakra-ui/react";
+import { DashCard } from "@/components/ui/chakra/dashcard";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const RadarSkeleton = () => {
   return (
     <DashCard>
-      <Skeleton width="100px" height="14px" mb={4} />
+      <Skeleton className="mb-4 h-[14px] w-[100px]" />
 
-      <SimpleGrid columns={{ base: 1, md: 2 }} gap={8} alignItems="center">
-        <Center h="300px">
-          <Box position="relative" w="200px" h="200px">
-            <Circle
-              size="200px"
-              borderWidth="1px"
-              borderColor="whiteAlpha.100"
-              position="absolute"
-            />
-            <Circle
-              size="140px"
-              borderWidth="1px"
-              borderColor="whiteAlpha.100"
-              position="absolute"
-              top="30px"
-              left="30px"
-            />
-            <Circle
-              size="80px"
-              borderWidth="1px"
-              borderColor="whiteAlpha.100"
-              position="absolute"
-              top="60px"
-              left="60px"
-            />
-            <Box
-              w="100%"
-              h="100%"
-              bg="blue.500"
-              opacity={0.1}
+      <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-2">
+        <div className="flex h-[300px] items-center justify-center">
+          <div className="relative h-[200px] w-[200px]">
+            <div className="absolute inset-0 rounded-full border border-white/10" />
+            <div className="absolute inset-[30px] rounded-full border border-white/10" />
+            <div className="absolute inset-[60px] rounded-full border border-white/10" />
+            <div
+              className="h-full w-full bg-blue-500/10"
               style={{
                 clipPath:
                   "polygon(50% 10%, 90% 40%, 80% 80%, 30% 90%, 10% 50%)",
               }}
             />
-          </Box>
-        </Center>
+          </div>
+        </div>
 
-        <VStack align="stretch" gap={2}>
+        <div className="flex flex-col gap-2">
           {[...Array(6)].map((_, i) => (
-            <Skeleton key={i} height="36px" borderRadius="md" />
+            <Skeleton key={i} className="h-[36px] w-full rounded-md" />
           ))}
-        </VStack>
-      </SimpleGrid>
+        </div>
+      </div>
     </DashCard>
   );
 };

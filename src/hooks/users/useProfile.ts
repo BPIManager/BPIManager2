@@ -3,7 +3,7 @@ import { fetcher } from "@/utils/common/fetch";
 import { useUser } from "@/contexts/users/UserContext";
 import { useFollow } from "./useFollow";
 import { UserProfileResponse } from "@/types/users/profile";
-import { toaster } from "@/components/ui/toaster";
+import { toaster } from "@/components/ui/chakra/toaster";
 import { API_PREFIX } from "@/constants/apiEndpoints";
 
 export const useProfile = (userId: string | undefined) => {

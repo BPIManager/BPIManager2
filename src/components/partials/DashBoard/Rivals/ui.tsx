@@ -1,4 +1,3 @@
-import { Box, VStack, Text, Button } from "@chakra-ui/react";
 import { useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useRivalSummary } from "@/hooks/social/useRivalSummary";
@@ -6,7 +5,8 @@ import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { RivalComparisonRow } from "./row";
 import { RivalWinLossSummarySkeleton } from "./skeleton";
 import { RivalWinLossSummaryNotFound } from "./nodata";
-import { DashCard } from "@/components/ui/dashcard";
+import { DashCard } from "@/components/ui/chakra/dashcard";
+import { Button } from "@/components/ui/button";
 
 export const RivalWinLossSummary = ({
   userId,
@@ -28,40 +28,36 @@ export const RivalWinLossSummary = ({
 
   return (
     <DashCard>
-      <Text fontSize="sm" fontWeight="bold" mb={4} color="gray.400">
+      <h3 className="mb-4 text-sm font-bold uppercase text-gray-500">
         ライバル勝敗
-      </Text>
+      </h3>
 
       {isLoading ? (
         <RivalWinLossSummarySkeleton />
       ) : results.length === 0 ? (
         <RivalWinLossSummaryNotFound />
       ) : (
-        <VStack gap={4} align="stretch">
+        <div className="flex flex-col gap-4">
           {visibleItems.map((rival) => (
             <RivalComparisonRow key={rival.userId} rival={rival} />
           ))}
-        </VStack>
+        </div>
       )}
 
       {hasMore && (
         <Button
           variant="ghost"
-          width="full"
-          mt={4}
-          size="sm"
-          color="gray.400"
+          className="mt-4 flex w-full items-center justify-center gap-2 text-xs text-gray-400 transition-colors hover:bg-white/5 hover:text-white"
           onClick={() => setShowAll(!showAll)}
-          _hover={{ bg: "whiteAlpha.50", color: "white" }}
         >
           {showAll ? (
             <>
-              <ChevronUp size={16} /> 閉じる
+              <ChevronUp className="h-4 w-4" /> 閉じる
             </>
           ) : (
             <>
-              <ChevronDown size={16} /> 残り {results.length - displayCount}{" "}
-              人を表示
+              <ChevronDown className="h-4 w-4" /> 残り{" "}
+              {results.length - displayCount} 人を表示
             </>
           )}
         </Button>

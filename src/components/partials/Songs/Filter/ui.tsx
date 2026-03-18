@@ -12,9 +12,9 @@ import {
   createListCollection,
 } from "@chakra-ui/react";
 import { LuSearch, LuSlidersHorizontal } from "react-icons/lu";
-import { InputGroup } from "@/components/ui/input-group";
-import { FormSelect } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
+import { InputGroup } from "@/components/ui/chakra/input-group";
+import { FormSelect } from "@/components/ui/chakra/select";
+import { Checkbox } from "@/components/ui/chakra/checkbox";
 import {
   rivalSortOptions,
   soleSortOptions,

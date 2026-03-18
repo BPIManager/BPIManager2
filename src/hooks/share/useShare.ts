@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { toBlob } from "html-to-image";
 import { v4 as uuidv4 } from "uuid";
-import { toaster } from "@/components/ui/toaster";
+import { toaster } from "@/components/ui/chakra/toaster";
 
 export const useShareResult = () => {
   const [isSharing, setIsSharing] = useState(false);

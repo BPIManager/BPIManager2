@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useUser } from "@/contexts/users/UserContext";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
-import { toaster } from "@/components/ui/toaster";
+import { toaster } from "@/components/ui/chakra/toaster";
 import { API_PREFIX } from "@/constants/apiEndpoints";
 
 export const useEditProfile = (onClose?: () => void) => {

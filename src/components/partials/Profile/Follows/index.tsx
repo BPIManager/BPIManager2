@@ -12,7 +12,7 @@ import { useFollowList } from "@/hooks/users/useFollowList";
 import { useRouter } from "next/router";
 import { LuUsers, LuUserCheck } from "react-icons/lu";
 import { UserFollowCard } from "./ui";
-import { DashCard } from "@/components/ui/dashcard";
+import { DashCard } from "@/components/ui/chakra/dashcard";
 
 export default function FollowPage({
   type,

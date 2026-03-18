@@ -1,5 +1,5 @@
 import { Box, Stack, VStack, HStack, Text } from "@chakra-ui/react";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Checkbox } from "@/components/ui/chakra/checkbox";
 import { IIDX_LEVELS, IIDX_DIFFICULTIES } from "@/constants/diffs";
 
 interface RivalFilterProps {

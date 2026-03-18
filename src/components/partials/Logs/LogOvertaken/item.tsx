@@ -7,7 +7,7 @@ import {
   Icon,
   Stack,
 } from "@chakra-ui/react";
-import { Avatar } from "@/components/ui/avatar";
+import { Avatar } from "@/components/ui/chakra/avatar";
 import { LuChevronRight } from "react-icons/lu";
 import { OvertakenRivalInfo } from "@/types/logs/overtaken";
 import { BatchDetailItem } from "@/hooks/batches/useBatchDetail";

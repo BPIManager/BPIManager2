@@ -6,7 +6,7 @@ import {
   PopoverContent,
   PopoverRoot,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from "@/components/ui/chakra/popover";
 import { useState } from "react";
 import { useNotifications } from "@/hooks/users/useNotifications";
 import { NotificationItem } from "./item";

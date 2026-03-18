@@ -5,7 +5,7 @@ import {
   DialogBody,
   DialogCloseTrigger,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@/components/ui/chakra/dialog";
 import {
   Box,
   VStack,

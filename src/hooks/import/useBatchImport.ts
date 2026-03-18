@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { toaster } from "@/components/ui/toaster";
+import { toaster } from "@/components/ui/chakra/toaster";
 import { parseCSV } from "@/utils/csv/parse";
 import { API_PREFIX } from "@/constants/apiEndpoints";
 

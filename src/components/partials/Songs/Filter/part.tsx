@@ -8,8 +8,8 @@ import {
   IconButton,
 } from "@chakra-ui/react";
 import { Search, Pin, PinOff } from "lucide-react";
-import { InputGroup } from "@/components/ui/input-group";
-import { Checkbox } from "@/components/ui/checkbox";
+import { InputGroup } from "@/components/ui/chakra/input-group";
+import { Checkbox } from "@/components/ui/chakra/checkbox";
 
 export const FilterSearchInput = ({
   value,

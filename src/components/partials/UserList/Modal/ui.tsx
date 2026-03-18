@@ -11,7 +11,7 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import { Swords } from "lucide-react";
-import { Avatar } from "@/components/ui/avatar";
+import { Avatar } from "@/components/ui/chakra/avatar";
 import { formatIIDXId } from "@/utils/common/formatIidxId";
 import { FollowSection } from "../../Profile/Sidebar/followStatus";
 import { keyframes } from "@emotion/react";

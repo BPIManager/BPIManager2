@@ -9,7 +9,7 @@ import { AAATableContent } from "@/components/partials/Metrics/AAATable/content"
 import { latestVersion } from "@/constants/latestVersion";
 import { useStaticProfile } from "@/contexts/profile/ProfileContext";
 import { ProfileMeta } from "@/components/partials/Profile/Meta/ui";
-import { DashCard } from "@/components/ui/dashcard";
+import { DashCard } from "@/components/ui/chakra/dashcard";
 
 export default function UserAAATablePage() {
   const router = useRouter();

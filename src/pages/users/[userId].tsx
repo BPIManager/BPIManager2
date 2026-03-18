@@ -13,7 +13,7 @@ import { getVersionNameFromNumber } from "@/constants/versions";
 import { RadarSection } from "@/components/partials/DashBoard/Radar";
 import { BpiHistorySection } from "@/components/partials/DashBoard/TotalBPIHistory/ui";
 import { LogFilterSection } from "@/components/partials/Logs/VersionSelector/ui";
-import { DashCard } from "@/components/ui/dashcard";
+import { DashCard } from "@/components/ui/chakra/dashcard";
 
 export default function UserPage({
   defaultView = "overview",

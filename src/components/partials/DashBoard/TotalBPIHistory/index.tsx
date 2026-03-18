@@ -1,4 +1,3 @@
-import { Box, Text, HStack, VStack, Separator } from "@chakra-ui/react";
 import { useMemo } from "react";
 import {
   ComposedChart,
@@ -14,12 +13,13 @@ import {
 } from "recharts";
 import { BpiHistoryItem } from "@/hooks/stats/useTotalBPIHistory";
 import { TotalBpiHistorySkeleton } from "@/components/partials/DashBoard/TotalBPIHistory/skeleton";
-import { DashCard } from "@/components/ui/dashcard";
+import { DashCard } from "@/components/ui/chakra/dashcard";
+import { cn } from "@/lib/utils";
 
 const UpdateBar = (props: any) => {
   const { payload } = props;
   if (payload.rivalBpi !== undefined) return null;
-  const fill = payload.updateCount > 0 ? "#3182ce" : "transparent";
+  const fill = payload.updateCount > 0 ? "#3b82f6" : "transparent";
   return (
     <Rectangle {...props} fill={fill} opacity={0.3} radius={[2, 2, 0, 0]} />
   );
@@ -32,83 +32,71 @@ const HistoryTooltip = ({ active, payload, label, myName, rivalName }: any) => {
   const isComparison = data.rivalBpi !== undefined;
 
   return (
-    <Box
-      bg="gray.900"
-      p={3}
-      border="1px solid"
-      borderColor="whiteAlpha.300"
-      borderRadius="md"
-      boxShadow="xl"
-      minW="200px"
-      maxW="300px"
-    >
-      <VStack align="start" gap={1}>
-        <Text color="gray.400" fontSize="xs" fontWeight="bold">
-          {label}
-        </Text>
+    <div className="min-w-[200px] max-w-[300px] rounded-md border border-white/20 bg-slate-950 p-3 shadow-xl">
+      <div className="flex flex-col gap-1">
+        <p className="text-[10px] font-bold text-gray-500">{label}</p>
 
         {isComparison ? (
           <>
-            <HStack justify="space-between" w="full">
-              <Text color="blue.300" fontSize="xs" fontWeight="bold">
-                {myName}
-              </Text>
-              <Text color="blue.300" fontSize="sm" fontWeight="bold">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-blue-400">{myName}</span>
+              <span className="font-mono text-sm font-bold text-blue-400">
                 {data.myBpi?.toFixed(2)}
-              </Text>
-            </HStack>
-            <HStack justify="space-between" w="full">
-              <Text color="orange.300" fontSize="xs" fontWeight="bold">
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-orange-400">
                 {rivalName}
-              </Text>
-              <Text color="orange.300" fontSize="sm" fontWeight="bold">
+              </span>
+              <span className="font-mono text-sm font-bold text-orange-400">
                 {data.rivalBpi?.toFixed(2)}
-              </Text>
-            </HStack>
-            <Separator borderColor="whiteAlpha.200" my={1} />
-            <HStack justify="space-between" w="full">
-              <Text color="gray.400" fontSize="xs">
-                差分
-              </Text>
-              <Text
-                fontSize="xs"
-                fontWeight="bold"
-                color={data.myBpi - data.rivalBpi > 0 ? "green.400" : "red.400"}
+              </span>
+            </div>
+            <div className="my-1 h-px w-full bg-white/10" />
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] text-gray-500">差分</span>
+              <span
+                className={cn(
+                  "font-mono text-xs font-bold",
+                  data.myBpi - data.rivalBpi > 0
+                    ? "text-green-400"
+                    : "text-red-400",
+                )}
               >
                 {data.myBpi - data.rivalBpi > 0 ? "+" : ""}
                 {(data.myBpi - data.rivalBpi).toFixed(2)}
-              </Text>
-            </HStack>
+              </span>
+            </div>
           </>
         ) : (
           <>
-            <HStack justify="space-between" w="full">
-              <Text color="blue.300" fontSize="sm" fontWeight="bold">
+            <div className="flex items-center justify-between gap-4">
+              <p className="text-sm font-bold text-blue-400">
                 総合BPI: {data.myBpi?.toFixed(2)}
-              </Text>
-              <Text color="gray.500" fontSize="xs">
+              </p>
+              <span className="text-[10px] text-gray-500">
                 累計: {data.count}曲
-              </Text>
-            </HStack>
+              </span>
+            </div>
             {data.updateCount > 0 && (
               <>
-                <Separator my={2} borderColor="whiteAlpha.200" />
-                <Text color="green.300" fontSize="xs" fontWeight="bold">
+                <div className="my-2 h-px w-full bg-white/10" />
+                <p className="text-[10px] font-bold text-green-400">
                   UPDATED: {data.updateCount} items
-                </Text>
-                <Box maxH="120px" overflowY="auto" w="full" pr={1}>
+                </p>
+                <div className="max-h-[120px] w-full overflow-y-auto pr-1">
                   {data.updatedSongs?.map((song: string, idx: number) => (
-                    <Text key={idx} color="whiteAlpha.800" fontSize="10px">
+                    <p key={idx} className="text-[10px] text-white/70">
                       • {song}
-                    </Text>
+                    </p>
                   ))}
-                </Box>
+                </div>
               </>
             )}
           </>
         )}
-      </VStack>
-    </Box>
+      </div>
+    </div>
   );
 };
 
@@ -145,7 +133,6 @@ export const TotalBpiHistoryChart = ({
     const merged = allDates.map((date) => {
       const myEntry = myMap.get(date);
       const rivalEntry = rivalMap.get(date);
-
       if (myEntry) lastMy = myEntry;
       if (rivalEntry) lastRival = rivalEntry;
 
@@ -185,116 +172,116 @@ export const TotalBpiHistoryChart = ({
   };
 
   return (
-    <DashCard h="420px">
-      <HStack justify="space-between" mb={6}>
-        <Text
-          fontSize="sm"
-          fontWeight="bold"
-          color="gray.400"
-          textTransform="uppercase"
-        >
+    <DashCard className="h-[420px]">
+      <div className="mb-6 flex items-center justify-between">
+        <h3 className="text-sm font-bold uppercase text-gray-500">
           総合BPI推移
-        </Text>
+        </h3>
         {rivalData && (
-          <HStack gap={4}>
-            <HStack gap={1}>
-              <Box w="12px" h="2px" bg="blue.400" />
-              <Text fontSize="xs" color="blue.300">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1.5">
+              <div className="h-[2px] w-3 bg-blue-500" />
+              <span className="text-xs text-blue-400 font-medium">
                 {myName}
-              </Text>
-            </HStack>
-            <HStack gap={1}>
-              <Box w="12px" h="2px" bg="orange.400" strokeDasharray="5 3" />
-              <Text fontSize="xs" color="orange.300">
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div
+                className="h-[2px] w-3 border-t border-dashed border-orange-500 bg-transparent"
+                style={{ borderTopWidth: "2px", borderStyle: "dashed" }}
+              />
+              <span className="text-xs text-orange-400 font-medium">
                 {rivalName}
-              </Text>
-            </HStack>
-          </HStack>
+              </span>
+            </div>
+          </div>
         )}
-      </HStack>
+      </div>
 
-      <ResponsiveContainer width="100%" height="80%">
-        <ComposedChart
-          data={chartData}
-          margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-        >
-          <CartesianGrid
-            strokeDasharray="3 3"
-            stroke="#2D3748"
-            vertical={false}
-          />
-          <XAxis
-            dataKey="date"
-            ticks={ticks}
-            tickFormatter={formatDate}
-            stroke="#4A5568"
-            fontSize={10}
-            tickLine={false}
-            axisLine={false}
-          />
-          <YAxis
-            domain={["dataMin - 1", "dataMax + 1"]}
-            stroke="#4A5568"
-            fontSize={10}
-            tickFormatter={(v) => v.toFixed(1)}
-            axisLine={false}
-            tickLine={false}
-          />
-          <YAxis yAxisId="right" hide />
-
-          <Tooltip
-            content={<HistoryTooltip myName={myName} rivalName={rivalName} />}
-            cursor={{ stroke: "#2D3748" }}
-          />
-
-          {!rivalData && (
-            <Bar
-              yAxisId="right"
-              dataKey="updateCount"
-              barSize={4}
-              shape={<UpdateBar />}
+      <div className="h-[80%] w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <ComposedChart
+            data={chartData}
+            margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+          >
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke="#1e293b"
+              vertical={false}
             />
-          )}
+            <XAxis
+              dataKey="date"
+              ticks={ticks}
+              tickFormatter={formatDate}
+              stroke="#475569"
+              fontSize={10}
+              tickLine={false}
+              axisLine={false}
+            />
+            <YAxis
+              domain={["dataMin - 1", "dataMax + 1"]}
+              stroke="#475569"
+              fontSize={10}
+              tickFormatter={(v) => v.toFixed(1)}
+              axisLine={false}
+              tickLine={false}
+            />
+            <YAxis yAxisId="right" hide />
 
-          <Line
-            type="monotone"
-            dataKey="myBpi"
-            stroke="#63B3ED"
-            strokeWidth={2}
-            dot={false}
-            activeDot={{
-              r: 4,
-              fill: "#0d1117",
-              stroke: "#63B3ED",
-              strokeWidth: 2,
-            }}
-            connectNulls
-            animationDuration={1000}
-          />
+            <Tooltip
+              content={<HistoryTooltip myName={myName} rivalName={rivalName} />}
+              cursor={{ stroke: "#334155" }}
+            />
 
-          {rivalData && (
+            {!rivalData && (
+              <Bar
+                yAxisId="right"
+                dataKey="updateCount"
+                barSize={4}
+                shape={<UpdateBar />}
+              />
+            )}
+
             <Line
               type="monotone"
-              dataKey="rivalBpi"
-              stroke="#F6AD55"
+              dataKey="myBpi"
+              stroke="#3b82f6"
               strokeWidth={2}
               dot={false}
-              strokeDasharray="5 5"
+              activeDot={{
+                r: 4,
+                fill: "#0d1117",
+                stroke: "#3b82f6",
+                strokeWidth: 2,
+              }}
               connectNulls
-              animationDuration={1200}
+              animationDuration={1000}
             />
-          )}
 
-          <Brush
-            dataKey="date"
-            height={30}
-            stroke="#2D3748"
-            fill="#0d1117"
-            startIndex={startIndex}
-            tickFormatter={() => ""}
-          />
-        </ComposedChart>
-      </ResponsiveContainer>
+            {rivalData && (
+              <Line
+                type="monotone"
+                dataKey="rivalBpi"
+                stroke="#f97316"
+                strokeWidth={2}
+                dot={false}
+                strokeDasharray="5 5"
+                connectNulls
+                animationDuration={1200}
+              />
+            )}
+
+            <Brush
+              dataKey="date"
+              height={30}
+              stroke="#334155"
+              fill="#0d1117"
+              startIndex={startIndex}
+              tickFormatter={() => ""}
+            />
+          </ComposedChart>
+        </ResponsiveContainer>
+      </div>
     </DashCard>
   );
 };

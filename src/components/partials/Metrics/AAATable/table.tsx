@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { AAATableItem } from "@/hooks/metrics/useAAATable";
 import { Box, Text, VStack, HStack } from "@chakra-ui/react";
-import { Tooltip } from "@/components/ui/tooltip";
+import { Tooltip } from "@/components/ui/chakra/tooltip";
 import { AAATableTooltip } from "./tooltip";
 
 export const AAAGridItem = ({

@@ -12,7 +12,7 @@ import {
   DialogHeader,
   DialogBody,
   DialogCloseTrigger,
-} from "@/components/ui/dialog";
+} from "@/components/ui/chakra/dialog";
 import { User, ChevronRight, Activity } from "lucide-react";
 import { useRivalComparison } from "@/hooks/social/useRivalComparison";
 import Link from "next/link";

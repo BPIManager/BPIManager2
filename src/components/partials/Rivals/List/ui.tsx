@@ -11,7 +11,7 @@ import { formatIIDXId } from "@/utils/common/formatIidxId";
 import { RadarSectionChart } from "../../DashBoard/Radar/ui";
 import { RivalSummaryResult } from "@/hooks/social/useRivalSummary";
 import { getBpiColorStyle } from "@/constants/bpiColor";
-import { DashCard } from "@/components/ui/dashcard";
+import { DashCard } from "@/components/ui/chakra/dashcard";
 
 export const RivalSummaryCard = ({
   rival,

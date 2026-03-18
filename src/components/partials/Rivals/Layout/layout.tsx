@@ -13,7 +13,7 @@ import { ProfileProvider } from "@/contexts/profile/ProfileContext";
 import { latestVersion } from "@/constants/latestVersion";
 import NextLink from "next/link";
 import { ModeSwitchBanner } from "../ModeSwitch/ui";
-import { DashCard } from "@/components/ui/dashcard";
+import { DashCard } from "@/components/ui/chakra/dashcard";
 
 interface RivalProfileLayoutProps {
   rivalUserId: string;

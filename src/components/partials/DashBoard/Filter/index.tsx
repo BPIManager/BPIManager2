@@ -1,88 +1,89 @@
-import { Box, Stack, VStack, HStack, Text } from "@chakra-ui/react";
-import { Checkbox } from "@/components/ui/checkbox";
 import { IIDX_LEVELS, IIDX_DIFFICULTIES } from "@/constants/diffs";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { versionsNonDisabledCollection } from "@/constants/versions";
-import { FormSelect } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 export const DashBoardFilter = () => {
   const { levels, diffs, version, toggleLevel, toggleDiff, setVersion } =
     useStatsFilter();
 
   return (
-    <Box
-      p={4}
-      bg="gray.900"
-      borderRadius="lg"
-      borderWidth="1px"
-      borderColor="whiteAlpha.100"
-    >
-      <Stack
-        direction={{ base: "column", lg: "row" }}
-        gap={{ base: 6, lg: 10 }}
-        align="start"
-      >
-        <VStack align="start" gap={2} minW={{ base: "full", lg: "240px" }}>
-          <Text
-            fontSize={{ base: "2xs", md: "xs" }}
-            fontWeight="bold"
-            color="gray.500"
-          >
+    <div className="rounded-lg border border-white/10 bg-[#0d1117] p-4">
+      <div className="flex flex-col items-start gap-6 lg:flex-row lg:gap-10">
+        <div className="flex w-full flex-col gap-2 lg:min-w-[240px] lg:w-auto">
+          <span className="text-[10px] font-bold uppercase text-gray-500 md:text-xs">
             VERSION
-          </Text>
-          <FormSelect
-            collection={versionsNonDisabledCollection}
-            value={version}
-            onValueChange={setVersion}
-            size="xs"
-            variant="subtle"
-          />
-        </VStack>
+          </span>
+          <Select value={version} onValueChange={(val) => setVersion(val)}>
+            <SelectTrigger className="h-8 w-full border-white/10 bg-white/5 text-xs hover:bg-white/10 focus:ring-0">
+              <SelectValue placeholder="Select version" />
+            </SelectTrigger>
+            <SelectContent className="border-white/10 bg-gray-900 text-white">
+              {versionsNonDisabledCollection.items.map((v) => (
+                <SelectItem key={v.value} value={v.value} className="text-xs">
+                  {v.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-        <VStack align="start" gap={2} w="full">
-          <Text
-            fontSize={{ base: "2xs", md: "xs" }}
-            fontWeight="bold"
-            color="gray.500"
-          >
+        <div className="flex w-full flex-col gap-2">
+          <span className="text-[10px] font-bold uppercase text-gray-500 md:text-xs">
             LEVEL
-          </Text>
-          <HStack gap={4} wrap="wrap">
+          </span>
+          <div className="flex flex-wrap gap-x-4 gap-y-2">
             {IIDX_LEVELS.map((l) => (
-              <Checkbox
-                key={l}
-                size={{ base: "sm", md: "md" }}
-                checked={levels.includes(l)}
-                onCheckedChange={() => toggleLevel(l)}
-              >
-                <Text fontSize={{ base: "xs", md: "sm" }}>☆{l}</Text>
-              </Checkbox>
+              <div key={l} className="flex items-center gap-2">
+                <Checkbox
+                  id={`level-${l}`}
+                  checked={levels.includes(l)}
+                  onCheckedChange={() => toggleLevel(l)}
+                  className="h-4 w-4 border-white/20 data-[state=checked]:bg-blue-500"
+                />
+                <Label
+                  htmlFor={`level-${l}`}
+                  className="cursor-pointer text-xs font-medium md:text-sm"
+                >
+                  ☆{l}
+                </Label>
+              </div>
             ))}
-          </HStack>
-        </VStack>
+          </div>
+        </div>
 
-        <VStack align="start" gap={2} w="full">
-          <Text
-            fontSize={{ base: "2xs", md: "xs" }}
-            fontWeight="bold"
-            color="gray.500"
-          >
+        <div className="flex w-full flex-col gap-2">
+          <span className="text-[10px] font-bold uppercase text-gray-500 md:text-xs">
             DIFFICULTY
-          </Text>
-          <HStack gap={4} wrap="wrap">
+          </span>
+          <div className="flex flex-wrap gap-x-4 gap-y-2">
             {IIDX_DIFFICULTIES.map((d) => (
-              <Checkbox
-                key={d}
-                size={{ base: "sm", md: "md" }}
-                checked={diffs.includes(d)}
-                onCheckedChange={() => toggleDiff(d)}
-              >
-                <Text fontSize={{ base: "xs", md: "sm" }}>{d}</Text>
-              </Checkbox>
+              <div key={d} className="flex items-center gap-2">
+                <Checkbox
+                  id={`diff-${d}`}
+                  checked={diffs.includes(d)}
+                  onCheckedChange={() => toggleDiff(d)}
+                  className="h-4 w-4 border-white/20 data-[state=checked]:bg-blue-500"
+                />
+                <Label
+                  htmlFor={`diff-${d}`}
+                  className="cursor-pointer text-xs font-medium md:text-sm"
+                >
+                  {d}
+                </Label>
+              </div>
             ))}
-          </HStack>
-        </VStack>
-      </Stack>
-    </Box>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };

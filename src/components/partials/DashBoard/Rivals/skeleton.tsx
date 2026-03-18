@@ -1,26 +1,20 @@
-import {
-  Box,
-  HStack,
-  Skeleton,
-  SkeletonCircle,
-  VStack,
-} from "@chakra-ui/react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const RivalWinLossSummarySkeleton = () => {
   return (
-    <VStack gap={4} align="stretch">
+    <div className="flex flex-col gap-4">
       {[...Array(5)].map((_, i) => (
-        <VStack key={i} align="stretch" gap={1}>
-          <HStack justify="space-between">
-            <HStack gap={2}>
-              <SkeletonCircle size="32px" />
-              <Skeleton h="12px" w="100px" />
-            </HStack>
-            <Skeleton h="10px" w="40px" />
-          </HStack>
-          <Skeleton h="18px" w="full" borderRadius="sm" />
-        </VStack>
+        <div key={i} className="flex flex-col gap-1">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-5 w-5 rounded-full" />
+              <Skeleton className="h-3 w-[100px]" />
+            </div>
+            <Skeleton className="h-2.5 w-[40px]" />
+          </div>
+          <Skeleton className="h-[18px] w-full rounded-sm" />
+        </div>
       ))}
-    </VStack>
+    </div>
   );
 };

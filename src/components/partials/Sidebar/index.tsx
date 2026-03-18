@@ -32,7 +32,7 @@ import { useUser } from "@/contexts/users/UserContext";
 import { authActions } from "@/lib/firebase/auth";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { Avatar } from "@/components/ui/avatar";
+import { Avatar } from "@/components/ui/chakra/avatar";
 import { LuLayoutDashboard } from "react-icons/lu";
 import { latestVersion } from "@/constants/latestVersion";
 import { useState } from "react";

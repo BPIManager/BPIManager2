@@ -2,9 +2,9 @@
 
 import { useRouter } from "next/router";
 import { VStack, Text, Stack, SegmentGroup } from "@chakra-ui/react";
-import { FormSelect } from "@/components/ui/select";
+import { FormSelect } from "@/components/ui/chakra/select";
 import { versionsNonDisabledCollection } from "@/constants/versions";
-import { SegmentedControl } from "@/components/ui/segmented-control";
+import { SegmentedControl } from "@/components/ui/chakra/segmented-control";
 
 interface Props {
   version: string;

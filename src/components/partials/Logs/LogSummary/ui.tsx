@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { SimpleGrid, Box, Text, Icon, VStack, Flex } from "@chakra-ui/react";
 import { PlusCircle, HelpCircle, MusicIcon } from "lucide-react";
-import { Tooltip } from "@/components/ui/tooltip";
-import { DashCard } from "@/components/ui/dashcard";
+import { Tooltip } from "@/components/ui/chakra/tooltip";
+import { DashCard } from "@/components/ui/chakra/dashcard";
 
 export const LabelWithTooltip = ({
   label,

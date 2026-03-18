@@ -11,8 +11,8 @@ import {
   Group,
   InputAddon,
 } from "@chakra-ui/react";
-import { Field } from "@/components/ui/field";
-import { FormSelect } from "@/components/ui/select";
+import { Field } from "@/components/ui/chakra/field";
+import { FormSelect } from "@/components/ui/chakra/select";
 import { useUser } from "@/contexts/users/UserContext";
 import { authActions } from "@/lib/firebase/auth";
 import { arenaRanksCollection } from "@/constants/arenaRank";
@@ -24,9 +24,9 @@ import {
   DialogTitle,
   DialogFooter,
   DialogCloseTrigger,
-} from "@/components/ui/dialog";
+} from "@/components/ui/chakra/dialog";
 import { User2Icon } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/chakra/button";
 import { ImageUploadModal } from "../ImageCrop/ui";
 import { LuCheck, LuX } from "react-icons/lu";
 import { useEditProfile } from "@/hooks/users/useEditProfile";

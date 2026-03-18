@@ -8,7 +8,7 @@ import {
   DialogContent,
   DialogBody,
   DialogCloseTrigger,
-} from "@/components/ui/dialog";
+} from "@/components/ui/chakra/dialog";
 import { LoginRequiredCard } from "../../LoginRequired/ui";
 import AccountSettings from "../../Modal/AccountSettings";
 

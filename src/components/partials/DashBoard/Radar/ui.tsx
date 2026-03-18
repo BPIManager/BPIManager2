@@ -1,13 +1,4 @@
 import {
-  Box,
-  VStack,
-  HStack,
-  Text,
-  Separator,
-  Badge,
-  Flex,
-} from "@chakra-ui/react";
-import {
   Radar,
   RadarChart,
   PolarGrid,
@@ -17,6 +8,7 @@ import {
   Tooltip,
 } from "recharts";
 import { useMemo } from "react";
+import { cn } from "@/lib/utils";
 
 const RadarDefs = () => (
   <svg style={{ height: 0, width: 0, position: "absolute" }} aria-hidden="true">
@@ -74,95 +66,73 @@ const RadarCustomTooltip = ({ active, payload }: any) => {
     const hasRival = rivalVal !== undefined;
 
     return (
-      <Box
-        bg="gray.900"
-        p={3}
-        border="1px solid"
-        borderColor="whiteAlpha.300"
-        borderRadius="md"
-        boxShadow="dark-lg"
-        minW="160px"
-      >
-        <VStack align="start" gap={1}>
-          <Text color="white" fontSize="xs" fontWeight="bold">
-            {data.category.toUpperCase()}
-          </Text>
-          <Separator my={1} borderColor="whiteAlpha.200" />
+      <div className="min-w-[160px] rounded-md border border-white/20 bg-slate-950 p-3 shadow-xl">
+        <div className="flex flex-col gap-1">
+          <p className="text-xs font-bold text-white uppercase">
+            {data.category}
+          </p>
+          <div className="my-1 h-px w-full bg-white/10" />
 
-          <HStack justify="space-between" w="full">
-            <HStack gap={2}>
-              <Box w="2" h="2" borderRadius="full" bg="blue.400" />
-              <Text color="blue.300" fontSize="xs" fontWeight="bold">
-                YOU
-              </Text>
-            </HStack>
-            <HStack gap={1}>
-              <Text color="white" fontSize="xs" fontWeight="bold">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-blue-500" />
+              <span className="text-xs font-bold text-blue-400">YOU</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="font-mono text-xs font-bold text-white">
                 {meVal.toFixed(2)}
-              </Text>
+              </span>
               {data.isMeMax && (
-                <Badge
-                  size="xs"
-                  colorPalette="blue"
-                  variant="solid"
-                  fontSize="8px"
-                >
+                <span className="rounded bg-blue-600 px-1 py-0.5 text-[8px] font-bold text-white">
                   BEST
-                </Badge>
+                </span>
               )}
-            </HStack>
-          </HStack>
+            </div>
+          </div>
 
           {hasRival && (
             <>
-              <HStack justify="space-between" w="full">
-                <HStack gap={2}>
-                  <Box w="2" h="2" borderRadius="full" bg="orange.400" />
-                  <Text color="orange.300" fontSize="xs" fontWeight="bold">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-orange-500" />
+                  <span className="text-xs font-bold text-orange-400">
                     RIVAL
-                  </Text>
-                </HStack>
-                <HStack gap={1}>
-                  <Text color="white" fontSize="xs" fontWeight="bold">
+                  </span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="font-mono text-xs font-bold text-white">
                     {rivalVal.toFixed(2)}
-                  </Text>
+                  </span>
                   {data.isRivalMax && (
-                    <Badge
-                      size="xs"
-                      colorPalette="orange"
-                      variant="solid"
-                      fontSize="8px"
-                    >
+                    <span className="rounded bg-orange-600 px-1 py-0.5 text-[8px] font-bold text-white">
                       BEST
-                    </Badge>
+                    </span>
                   )}
-                </HStack>
-              </HStack>
-              <Flex
-                w="full"
-                mt={1}
-                justify="center"
-                bg={meVal >= rivalVal ? "green.900" : "red.900"}
-                borderRadius="sm"
-                py={0.5}
+                </div>
+              </div>
+
+              <div
+                className={cn(
+                  "mt-1 flex w-full justify-center rounded-sm py-0.5",
+                  meVal >= rivalVal ? "bg-green-900/50" : "bg-red-900/50",
+                )}
               >
-                <Text fontSize="9px" fontWeight="bold" color="white">
+                <p className="text-[9px] font-bold text-white">
                   {meVal >= rivalVal
                     ? `WIN (+${(meVal - rivalVal).toFixed(2)})`
                     : `LOSE (${(meVal - rivalVal).toFixed(2)})`}
-                </Text>
-              </Flex>
+                </p>
+              </div>
             </>
           )}
-        </VStack>
-      </Box>
+        </div>
+      </div>
     );
   }
   return null;
 };
 
 type RadarValue = number | { totalBpi: number } | undefined;
-
 type RadarInput = Record<string, RadarValue>;
 
 interface RadarChartProps {
@@ -188,13 +158,9 @@ export const RadarSectionChart = ({
 
     const getBpiValue = (obj: RadarInput, key: string): number => {
       const val = obj[key] ?? obj[key.toUpperCase()];
-
-      if (typeof val === "number") {
-        return val;
-      }
-      if (val && typeof val === "object" && "totalBpi" in val) {
+      if (typeof val === "number") return val;
+      if (val && typeof val === "object" && "totalBpi" in val)
         return val.totalBpi;
-      }
       return -15;
     };
 
@@ -219,9 +185,9 @@ export const RadarSectionChart = ({
   }, [data, rivalData]);
 
   const domain = useMemo(() => {
-    const allValues = chartData.flatMap(
-      (d) => [d.value, d.rivalValue].filter((v) => v !== undefined) as number[],
-    );
+    const allValues = chartData.flatMap((d) =>
+      [d.value, d.rivalValue].filter((v) => v !== undefined),
+    ) as number[];
     const min = Math.min(...allValues);
     const max = Math.max(...allValues);
     const range = Math.max(max - min, 10);
@@ -230,7 +196,7 @@ export const RadarSectionChart = ({
   }, [chartData]);
 
   return (
-    <Box w="full" h={isMini ? "150px" : "330px"} position="relative">
+    <div className={cn("relative w-full", isMini ? "h-[150px]" : "h-[330px]")}>
       <RadarDefs />
       <ResponsiveContainer width="100%" height="100%">
         <RadarChart cx="50%" cy="50%" outerRadius="80%" data={chartData}>
@@ -272,6 +238,6 @@ export const RadarSectionChart = ({
           )}
         </RadarChart>
       </ResponsiveContainer>
-    </Box>
+    </div>
   );
 };

@@ -19,8 +19,8 @@ import {
   DialogHeader,
   DialogRoot,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Checkbox } from "@/components/ui/checkbox";
+} from "@/components/ui/chakra/dialog";
+import { Checkbox } from "@/components/ui/chakra/checkbox";
 import { FilterParamsFrontend } from "@/types/songs/withScore";
 import { verNameArr } from "@/constants/versions";
 import { CLEAR_STATES } from "@/constants/lampState";

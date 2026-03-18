@@ -1,132 +1,97 @@
-import {
-  Box,
-  VStack,
-  HStack,
-  Avatar,
-  Center,
-  Text,
-  Link as ChakraLink,
-} from "@chakra-ui/react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
 
-export const RivalComparisonRow = ({ rival }: { rival: any }) => {
+interface RivalComparisonRowProps {
+  rival: {
+    userId: string;
+    userName: string;
+    profileImage?: string | null;
+    stats: {
+      win: number;
+      lose: number;
+      draw: number;
+      totalCount: number;
+    };
+  };
+}
+
+export const RivalComparisonRow = ({ rival }: RivalComparisonRowProps) => {
   const { userName, profileImage, userId } = rival;
   const { win, lose, draw, totalCount } = rival.stats;
 
-  const winRate = (win / totalCount) * 100;
-  const drawRate = (draw / totalCount) * 100;
-  const loseRate = (lose / totalCount) * 100;
+  const winRate = totalCount > 0 ? (win / totalCount) * 100 : 0;
+  const drawRate = totalCount > 0 ? (draw / totalCount) * 100 : 0;
+  const loseRate = totalCount > 0 ? (lose / totalCount) * 100 : 0;
 
   return (
-    <VStack align="stretch" gap={1}>
-      <HStack justify="space-between">
-        <HStack gap={2}>
-          <Avatar.Root size="xs">
-            <Avatar.Image src={profileImage} />
-            <Avatar.Fallback name={userName} />
-          </Avatar.Root>
-          <ChakraLink
-            asChild
-            fontSize="xs"
-            fontWeight="bold"
-            color="white"
-            lineClamp={1}
+    <div className="flex flex-col gap-1">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 min-w-0">
+          <Avatar className="h-5 w-5">
+            <AvatarImage src={profileImage} alt={userName} />
+            <AvatarFallback className="text-[8px]">
+              {userName.slice(0, 2)}
+            </AvatarFallback>
+          </Avatar>
+          <Link
+            href={`/rivals/${userId}`}
+            className="truncate text-xs font-bold text-white transition-colors hover:text-blue-400"
           >
-            <Link href={`/rivals/${userId}`}>{userName}</Link>
-          </ChakraLink>
-        </HStack>
-        <Text fontSize="10px" color="gray.500" fontWeight="bold">
+            {userName}
+          </Link>
+        </div>
+        <span className="text-[10px] font-bold text-gray-500 whitespace-nowrap">
           {totalCount}曲
-        </Text>
-      </HStack>
+        </span>
+      </div>
 
-      <Box
-        position="relative"
-        w="full"
-        h="18px"
-        borderRadius="sm"
-        overflow="hidden"
-        bg="whiteAlpha.50"
-      >
-        <HStack gap={0} w="full" h="full">
-          <Box
-            w={`${winRate}%`}
-            h="full"
-            bg="blue.500"
-            transition="width 1s ease-out"
-            position="relative"
+      <div className="relative h-[18px] w-full overflow-hidden rounded-sm bg-white/5">
+        <div className="flex h-full w-full items-center gap-0">
+          <div
+            className="relative h-full bg-blue-500 transition-all duration-1000 ease-out"
+            style={{ width: `${winRate}%` }}
           >
             {winRate > 10 && (
-              <Center position="absolute" inset={0}>
-                <Text fontSize="10px" fontWeight="bold" color="white">
-                  {win}
-                </Text>
-              </Center>
+              <div className="flex h-full items-center justify-center">
+                <span className="text-[10px] font-bold text-white">{win}</span>
+              </div>
             )}
-          </Box>
+          </div>
 
-          <Box
-            w={`${drawRate}%`}
-            h="full"
-            bg="gray.500"
-            transition="width 1s ease-out"
-            position="relative"
+          <div
+            className="relative h-full bg-gray-500 transition-all duration-1000 ease-out"
+            style={{ width: `${drawRate}%` }}
           >
             {drawRate > 15 && (
-              <Center position="absolute" inset={0}>
-                <Text fontSize="10px" fontWeight="bold" color="white">
-                  {draw}
-                </Text>
-              </Center>
+              <div className="flex h-full items-center justify-center">
+                <span className="text-[10px] font-bold text-white">{draw}</span>
+              </div>
             )}
-          </Box>
+          </div>
 
-          <Box
-            w={`${loseRate}%`}
-            h="full"
-            bg="red.500"
-            transition="width 1s ease-out"
-            position="relative"
+          <div
+            className="relative h-full bg-red-500 transition-all duration-1000 ease-out"
+            style={{ width: `${loseRate}%` }}
           >
             {loseRate > 10 && (
-              <Center position="absolute" inset={0}>
-                <Text fontSize="10px" fontWeight="bold" color="white">
-                  {lose}
-                </Text>
-              </Center>
+              <div className="flex h-full items-center justify-center">
+                <span className="text-[10px] font-bold text-white">{lose}</span>
+              </div>
             )}
-          </Box>
-        </HStack>
+          </div>
+        </div>
 
         {winRate <= 10 && win > 0 && (
-          <Text
-            position="absolute"
-            left="2px"
-            top="50%"
-            transform="translateY(-50%)"
-            fontSize="10px"
-            fontWeight="bold"
-            color="yellow.400"
-            pointerEvents="none"
-          >
+          <span className="pointer-events-none absolute left-0.5 top-1/2 -translate-y-1/2 text-[10px] font-bold text-yellow-400">
             {win}
-          </Text>
+          </span>
         )}
         {loseRate <= 10 && lose > 0 && (
-          <Text
-            position="absolute"
-            right="2px"
-            top="50%"
-            transform="translateY(-50%)"
-            fontSize="10px"
-            fontWeight="bold"
-            color="blue.300"
-            pointerEvents="none"
-          >
+          <span className="pointer-events-none absolute right-0.5 top-1/2 -translate-y-1/2 text-[10px] font-bold text-blue-300">
             {lose}
-          </Text>
+          </span>
         )}
-      </Box>
-    </VStack>
+      </div>
+    </div>
   );
 };

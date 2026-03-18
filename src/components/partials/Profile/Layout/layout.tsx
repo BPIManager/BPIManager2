@@ -13,7 +13,7 @@ import NextLink from "next/link";
 import { ProfileProvider } from "@/contexts/profile/ProfileContext";
 import { ModeSwitchBanner } from "../../Rivals/ModeSwitch/ui";
 import { useUser } from "@/contexts/users/UserContext";
-import { DashCard } from "@/components/ui/dashcard";
+import { DashCard } from "@/components/ui/chakra/dashcard";
 
 interface UserProfileLayoutProps {
   userId: string;

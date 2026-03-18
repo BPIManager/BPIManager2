@@ -10,7 +10,7 @@ import {
   Input,
 } from "@chakra-ui/react";
 import { LuKey, LuCopy, LuRefreshCw } from "react-icons/lu";
-import { toaster } from "@/components/ui/toaster";
+import { toaster } from "@/components/ui/chakra/toaster";
 import { useApiKey } from "@/hooks/users/useAPIKey";
 import { ActionConfirmDialog } from "../../Modal/Confirmation";
 

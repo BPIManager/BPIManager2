@@ -1,4 +1,3 @@
-import { Box, Text, SimpleGrid, VStack, Badge, HStack } from "@chakra-ui/react";
 import { useRadar } from "@/hooks/stats/useRadar";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { RadarSkeleton } from "./skeleton";
@@ -7,7 +6,8 @@ import { RadarCategory } from "@/types/stats/radar";
 import { useMemo, useState } from "react";
 import { RadarCategorySongsDialog } from "./dialog";
 import { getBpiColorStyle } from "@/constants/bpiColor";
-import { DashCard } from "@/components/ui/dashcard";
+import { DashCard } from "@/components/ui/chakra/dashcard";
+import { cn } from "@/lib/utils";
 
 interface RadarSectionProps {
   userId?: string;
@@ -50,83 +50,70 @@ export const RadarSection = ({
 
   return (
     <DashCard>
-      <HStack justify="space-between" mb={4}>
-        <Text fontSize="sm" fontWeight="bold" color="gray.400">
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="text-sm font-bold text-gray-500 uppercase">
           BPIレーダー
-        </Text>
+        </h3>
         {isRivalMode && (
-          <HStack gap={4}>
-            <HStack gap={1}>
-              <Box w="10px" h="10px" borderRadius="full" bg="blue.400" />
-              <Text fontSize="xs" color="blue.300">
-                自分
-              </Text>
-            </HStack>
-            <HStack gap={1}>
-              <Box w="10px" h="10px" borderRadius="full" bg="orange.400" />
-              <Text fontSize="xs" color="orange.300">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1.5">
+              <div className="h-2.5 w-2.5 rounded-full bg-blue-400" />
+              <span className="text-xs text-blue-300 font-medium">自分</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="h-2.5 w-2.5 rounded-full bg-orange-400" />
+              <span className="text-xs text-orange-300 font-medium">
                 {rivalName ?? "ライバル"}
-              </Text>
-            </HStack>
-          </HStack>
+              </span>
+            </div>
+          </div>
         )}
-      </HStack>
+      </div>
 
-      <SimpleGrid columns={{ base: 1, md: 2 }} gap={8} alignItems="center">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
         <RadarSectionChart data={radar} rivalData={rivalDataFlat} />
 
-        <VStack align="stretch" gap={2}>
+        <div className="flex flex-col gap-2">
           {sortedData.map((key) => {
             const bpi = radar[key].totalBpi;
             const rivalBpi = rivalRadar ? rivalRadar[key]?.totalBpi : undefined;
             const style = getBpiColorStyle(bpi);
+
             return (
-              <HStack
+              <div
                 key={key}
-                justify="space-between"
-                p={2}
-                bg="whiteAlpha.50"
-                borderRadius="md"
-                cursor="pointer"
-                _hover={{ bg: "whiteAlpha.200", transform: "translateX(4px)" }}
                 onClick={() => setSelectedCat(key)}
-                transition={".2s"}
+                className={cn(
+                  "flex items-center justify-between p-2.5 rounded-md",
+                  "bg-white/5 border border-white/5 cursor-pointer transition-all duration-200",
+                  "hover:bg-white/10 hover:translate-x-1 hover:border-white/10",
+                )}
               >
-                <Text fontSize="xs" color="gray.300" fontWeight="bold">
-                  {key}
-                </Text>
-                <HStack gap={2}>
+                <span className="text-xs font-bold text-gray-300">{key}</span>
+
+                <div className="flex items-center gap-2">
                   {isRivalMode && rivalBpi !== undefined && (
-                    <Badge
-                      variant="subtle"
-                      borderColor="#f97316"
-                      borderWidth="1px"
-                      fontFamily="mono"
-                      px={2}
-                      borderRadius="sm"
-                      fontSize="sm"
-                      color="orange.300"
-                    >
+                    <div className="inline-flex min-w-[64px] items-center justify-center rounded-sm border border-orange-500/50 bg-orange-500/10 px-2 py-0.5 font-mono text-sm font-bold text-orange-400">
                       {rivalBpi.toFixed(2)}
-                    </Badge>
+                    </div>
                   )}
-                  <Badge
-                    variant="subtle"
-                    borderColor={style.bg}
-                    borderWidth={"1px"}
-                    fontFamily="mono"
-                    px={2}
-                    borderRadius="sm"
-                    fontSize="sm"
+                  <div
+                    className="inline-flex min-w-[64px] items-center justify-center rounded-sm border px-2 py-0.5 font-mono text-sm font-bold"
+                    style={{
+                      borderColor: style.bg,
+                      color: style.color,
+                      backgroundColor: `${style.bg}15`,
+                    }}
                   >
                     {bpi.toFixed(2)}
-                  </Badge>
-                </HStack>
-              </HStack>
+                  </div>
+                </div>
+              </div>
             );
           })}
-        </VStack>
-      </SimpleGrid>
+        </div>
+      </div>
+
       {selectedCat && (
         <RadarCategorySongsDialog
           categoryName={selectedCat}

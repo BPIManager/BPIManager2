@@ -11,7 +11,7 @@ import {
   Cell,
 } from "recharts";
 import { SongWithScore } from "@/types/songs/withScore";
-import { DashCard } from "@/components/ui/dashcard";
+import { DashCard } from "@/components/ui/chakra/dashcard";
 
 interface BPIAnimatedChartProps {
   data: { label: string; count: number; bpi: number }[];

@@ -6,8 +6,8 @@ import {
   DialogFooter,
   DialogTitle,
   DialogActionTrigger,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+} from "@/components/ui/chakra/dialog";
+import { Button } from "@/components/ui/chakra/button";
 import { Text, VStack } from "@chakra-ui/react";
 import { useState } from "react";
 import { AlertTriangleIcon } from "lucide-react";

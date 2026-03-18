@@ -1,4 +1,4 @@
-import { DashCard } from "@/components/ui/dashcard";
+import { DashCard } from "@/components/ui/chakra/dashcard";
 import { BpiCalculator } from "@/lib/bpi";
 import {
   Box,

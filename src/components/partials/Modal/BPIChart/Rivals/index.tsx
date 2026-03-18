@@ -1,4 +1,4 @@
-import { FormSelect } from "@/components/ui/select";
+import { FormSelect } from "@/components/ui/chakra/select";
 import { versionsNonDisabledCollection } from "@/constants/versions";
 import {
   Container,

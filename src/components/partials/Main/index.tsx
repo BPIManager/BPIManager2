@@ -13,7 +13,7 @@ import {
   DrawerBody,
   DrawerActionTrigger,
   DrawerBackdrop,
-} from "@/components/ui/drawer";
+} from "@/components/ui/chakra/drawer";
 import { useState } from "react";
 import { SidebarContent } from "../Sidebar";
 import { NotificationBell } from "../Notifications";

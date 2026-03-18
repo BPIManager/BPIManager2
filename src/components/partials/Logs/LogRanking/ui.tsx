@@ -10,7 +10,7 @@ import {
   Badge,
 } from "@chakra-ui/react";
 import { LuTrophy, LuTrendingUp, LuSwords } from "react-icons/lu";
-import { Switch } from "@/components/ui/switch";
+import { Switch } from "@/components/ui/chakra/switch";
 import { RankItem } from "./item";
 import { useLogRank } from "@/hooks/batches/useLogRank";
 import { useState, useMemo } from "react";

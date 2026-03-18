@@ -1,28 +1,28 @@
 import {
-  DialogRoot,
+  Dialog,
   DialogContent,
   DialogHeader,
-  DialogBody,
-  DialogCloseTrigger,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { VStack, HStack, Text, Box, Badge, Tabs } from "@chakra-ui/react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useMemo, useState } from "react";
 import { RadarSongEntry } from "@/types/stats/radar";
 import { LuArrowDownWideNarrow, LuArrowUpNarrowWide } from "react-icons/lu";
 import { getBpiColorStyle } from "@/constants/bpiColor";
+
+interface Props {
+  categoryName: string;
+  songs: RadarSongEntry[];
+  isOpen: boolean;
+  onClose: () => void;
+}
 
 export const RadarCategorySongsDialog = ({
   categoryName,
   songs,
   isOpen,
   onClose,
-}: {
-  categoryName: string;
-  songs: RadarSongEntry[];
-  isOpen: boolean;
-  onClose: () => void;
-}) => {
+}: Props) => {
   const [sortOrder, setSortOrder] = useState<string>("desc");
 
   const sortedSongs = useMemo(() => {
@@ -32,128 +32,81 @@ export const RadarCategorySongsDialog = ({
   }, [songs, sortOrder]);
 
   return (
-    <DialogRoot
-      open={isOpen}
-      onOpenChange={onClose}
-      size="md"
-      scrollBehavior="inside"
-      placement={"center"}
-    >
-      <DialogContent
-        bg="gray.950"
-        border="1px solid"
-        borderColor="whiteAlpha.200"
-        maxHeight={"80svh"}
-      >
-        <DialogHeader
-          p={4}
-          borderBottomWidth="1px"
-          borderColor="whiteAlpha.100"
-        >
-          <DialogTitle fontSize="md" color="white">
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-h-[80svh] overflow-hidden border-white/20 bg-gray-950 p-0 sm:max-w-md">
+        <DialogHeader className="border-b border-white/10 p-4">
+          <DialogTitle className="text-base font-bold text-white">
             {categoryName} - 楽曲リスト ({songs.length})
           </DialogTitle>
-          <DialogCloseTrigger color="white" />
         </DialogHeader>
 
-        <DialogBody py={4}>
-          <Tabs.Root
+        <div className="overflow-y-auto p-4">
+          <Tabs
             value={sortOrder}
-            onValueChange={(e) => setSortOrder(e.value)}
-            variant="subtle"
-            colorPalette="blue"
+            onValueChange={setSortOrder}
+            className="w-full"
           >
-            <Tabs.List
-              bg="whiteAlpha.50"
-              p={1}
-              rounded="md"
-              mb={4}
-              width="full"
-            >
-              <Tabs.Trigger
+            <TabsList className="mb-4 grid w-full grid-cols-2 rounded-md bg-white/5 p-1 text-gray-400">
+              <TabsTrigger
                 value="desc"
-                flex="1"
-                gap={2}
-                fontSize="xs"
-                justifyContent={"center"}
+                className="flex items-center gap-2 text-xs data-[state=active]:bg-blue-600 data-[state=active]:text-white"
               >
-                <LuArrowDownWideNarrow size={14} /> BPIが高い順
-              </Tabs.Trigger>
-              <Tabs.Trigger
+                <LuArrowDownWideNarrow className="h-3.5 w-3.5" />
+                BPIが高い順
+              </TabsTrigger>
+              <TabsTrigger
                 value="asc"
-                flex="1"
-                gap={2}
-                fontSize="xs"
-                justifyContent={"center"}
+                className="flex items-center gap-2 text-xs data-[state=active]:bg-blue-600 data-[state=active]:text-white"
               >
-                <LuArrowUpNarrowWide size={14} /> BPIが低い順
-              </Tabs.Trigger>
-            </Tabs.List>
+                <LuArrowUpNarrowWide className="h-3.5 w-3.5" />
+                BPIが低い順
+              </TabsTrigger>
+            </TabsList>
 
-            <VStack align="stretch" gap={2}>
-              {sortedSongs.map((song, i) => {
+            <div className="flex flex-col gap-2">
+              {sortedSongs.map((song) => {
                 const style = getBpiColorStyle(song.bpi);
                 return (
-                  <Box
+                  <div
                     key={`${song.title}-${song.difficulty}`}
-                    p={3}
-                    bg="whiteAlpha.50"
-                    rounded="lg"
-                    borderWidth="1px"
-                    borderColor="whiteAlpha.100"
+                    className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 p-3"
                   >
-                    <HStack justify="space-between" align="center">
-                      <VStack align="start" gap={0} flex="1">
-                        <Text
-                          fontSize="xs"
-                          fontWeight="bold"
-                          color="white"
-                          lineClamp={1}
-                        >
-                          {song.title}
-                        </Text>
-                        <Text fontSize="10px" color="gray.500">
-                          {song.difficulty}
-                        </Text>
-                      </VStack>
-                      <HStack gap={3}>
-                        <VStack align="end" gap={0}>
-                          <Text fontSize="10px" color="gray.500">
-                            EX SCORE
-                          </Text>
-                          <Text
-                            fontSize="xs"
-                            fontWeight="bold"
-                            color="gray.200"
-                            fontFamily="mono"
-                          >
-                            {song.exScore}
-                          </Text>
-                        </VStack>
-                        <Badge
-                          variant="outline"
-                          borderColor={style.bg}
-                          color={style.color}
-                          fontFamily="mono"
-                          fontSize="xs"
-                          display="inline-flex"
-                          alignItems="center"
-                          justifyContent="center"
-                          minW="80px"
-                          textAlign="center"
-                          rounded="sm"
-                        >
-                          {song.bpi.toFixed(2)}
-                        </Badge>
-                      </HStack>
-                    </HStack>
-                  </Box>
+                    <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                      <span className="truncate text-xs font-bold text-white">
+                        {song.title}
+                      </span>
+                      <span className="text-[10px] text-gray-500">
+                        {song.difficulty}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <div className="flex flex-col items-end gap-0">
+                        <span className="text-[10px] text-gray-500">
+                          EX SCORE
+                        </span>
+                        <span className="font-mono text-xs font-bold text-gray-200">
+                          {song.exScore}
+                        </span>
+                      </div>
+
+                      <div
+                        className="inline-flex min-w-[80px] items-center justify-center rounded-sm border px-2 py-0.5 font-mono text-xs font-bold transition-colors"
+                        style={{
+                          borderColor: style.bg,
+                          color: style.color,
+                        }}
+                      >
+                        {song.bpi.toFixed(2)}
+                      </div>
+                    </div>
+                  </div>
                 );
               })}
-            </VStack>
-          </Tabs.Root>
-        </DialogBody>
+            </div>
+          </Tabs>
+        </div>
       </DialogContent>
-    </DialogRoot>
+    </Dialog>
   );
 };

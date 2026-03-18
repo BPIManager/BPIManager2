@@ -10,14 +10,14 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { Trash2, Upload, AlertCircle, HelpCircle } from "lucide-react";
-import { Field } from "@/components/ui/field";
+import { Field } from "@/components/ui/chakra/field";
 import {
   SelectRoot,
   SelectTrigger,
   SelectValueText,
   SelectContent,
   SelectItem,
-} from "@/components/ui/select";
+} from "@/components/ui/chakra/select";
 import { PageContainer, PageHeader } from "@/components/partials/Header";
 import { DashboardLayout } from "@/components/partials/Main";
 import { versionsCollection } from "@/constants/versions";

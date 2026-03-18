@@ -15,7 +15,7 @@ import { LogsDetailContentSkeleton } from "./skeleton";
 import { LogErrorState } from "./error";
 import { LogsDetailViewProps } from "./ui";
 import { XIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/chakra/button";
 import { useRef, useState } from "react";
 import { useShareResult } from "@/hooks/share/useShare";
 import { ShareResultModal } from "../../Modal/Share/ui";

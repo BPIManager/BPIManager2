@@ -15,7 +15,7 @@ import { ActionConfirmDialog } from "../../Modal/Confirmation";
 import { useState } from "react";
 import { useFirestoreDataCheck } from "@/hooks/firestore/checkData";
 import { versionTitles } from "@/constants/versions";
-import { toaster } from "@/components/ui/toaster";
+import { toaster } from "@/components/ui/chakra/toaster";
 import { API_PREFIX } from "@/constants/apiEndpoints";
 
 export default function TransferUi() {

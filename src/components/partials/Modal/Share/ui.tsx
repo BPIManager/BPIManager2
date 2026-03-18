@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button, VStack, Stack, Text, Box, Badge } from "@chakra-ui/react";
-import { Radio, RadioGroup } from "@/components/ui/radio";
+import { Radio, RadioGroup } from "@/components/ui/chakra/radio";
 import {
   DialogRoot,
   DialogContent,
@@ -11,8 +11,8 @@ import {
   DialogCloseTrigger,
   DialogActionTrigger,
   DialogBackdrop,
-} from "@/components/ui/dialog";
-import { toaster } from "@/components/ui/toaster";
+} from "@/components/ui/chakra/dialog";
+import { toaster } from "@/components/ui/chakra/toaster";
 
 interface ShareModalProps {
   isOpen: boolean;

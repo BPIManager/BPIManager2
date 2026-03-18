@@ -1,6 +1,6 @@
 import { Box, Stack, VStack, HStack, Text } from "@chakra-ui/react";
-import { Radio, RadioGroup } from "@/components/ui/radio";
-import { FormSelect } from "@/components/ui/select";
+import { Radio, RadioGroup } from "@/components/ui/chakra/radio";
+import { FormSelect } from "@/components/ui/chakra/select";
 import { versionsNonDisabledCollection } from "@/constants/versions";
 import { GroupingMode } from "@/hooks/metrics/useAAATable";
 

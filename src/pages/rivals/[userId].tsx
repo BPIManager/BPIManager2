@@ -13,7 +13,7 @@ import { DistributionSection } from "@/components/partials/DashBoard/Distributio
 import { RankDistributionSection } from "@/components/partials/DashBoard/DJRankDistribution/ui";
 import { BpiDistributionSection } from "@/components/partials/DashBoard/BPIDistribution/ui";
 import { BpiHistorySection } from "@/components/partials/DashBoard/TotalBPIHistory/ui";
-import { DashCard } from "@/components/ui/dashcard";
+import { DashCard } from "@/components/ui/chakra/dashcard";
 
 function RivalOverviewTab({
   myUserId,
