@@ -32,7 +32,7 @@ export const BatchTotalBpiCard = ({ pagination }: { pagination: any }) => {
 
   return (
     <DashCard className="mb-4 p-4 md:p-6">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:gap-10">
+      <div className="flex flex-col gap-4 md:flex-row md:items-start md:gap-10">
         <div className="flex w-full items-center gap-4 md:w-auto">
           <div
             className={cn("rounded-xl p-3 shrink-0", bpiBgClass, bpiColorClass)}

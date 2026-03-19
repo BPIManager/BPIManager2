@@ -17,7 +17,7 @@ export const DashBoardFilter = () => {
 
   return (
     <div className="rounded-lg border border-bpim-border bg-bpim-surface p-4">
-      <div className="flex flex-col items-start gap-6 lg:flex-row lg:items-center lg:gap-10">
+      <div className="flex flex-col items-start gap-2 lg:flex-row lg:items-center">
         <div className="flex w-full flex-col gap-2 lg:min-w-[240px] lg:w-auto">
           <span className="text-[10px] font-bold uppercase text-bpim-muted md:text-xs">
             VERSION
@@ -36,7 +36,7 @@ export const DashBoardFilter = () => {
           </Select>
         </div>
 
-        <div className="flex w-full flex-col gap-2">
+        <div className="flex w-full flex-col">
           <span className="text-[10px] font-bold uppercase text-bpim-muted md:text-xs">
             LEVEL
           </span>
@@ -60,7 +60,7 @@ export const DashBoardFilter = () => {
           </div>
         </div>
 
-        <div className="flex w-full flex-col gap-2">
+        <div className="flex w-full flex-col">
           <span className="text-[10px] font-bold uppercase text-bpim-muted md:text-xs">
             DIFFICULTY
           </span>

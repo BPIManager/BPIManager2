@@ -73,6 +73,7 @@ const ChartBarUnit = ({
               {myCount}
             </span>
             <div
+              data-capture-no-anim=""
               className="w-full origin-bottom rounded-t-[2px] opacity-90 animate-[bounceGrow_0.6s_ease-out_both]"
               style={{
                 height: myHeight,
@@ -86,6 +87,7 @@ const ChartBarUnit = ({
           {hasRival && (
             <div className="relative flex h-full flex-1 min-w-0 flex-col justify-end">
               <div
+                data-capture-no-anim=""
                 className="w-full origin-bottom rounded-t-[2px] opacity-45 animate-[bounceGrow_0.6s_ease-out_both]"
                 style={{
                   height: rivalHeight,

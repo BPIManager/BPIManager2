@@ -48,7 +48,7 @@ export const ShareResultModal = ({
           ? elements.ranking
           : elements.list;
     if (!target) return;
-    const text = `BPIM2にスコアを記録!\n総合BPI: ${shareData.bpi.toFixed(2)} (#BPIM2)\n${window.location.href}`;
+    const text = `BPIM2に新しいスコアを記録しました!\n更新件数:${shareData.updateCount}件\n\n総合BPI: ${shareData.bpi.toFixed(2)} (${shareData.diff >= 0 ? "+" : ""}${shareData.diff.toFixed(2)})\n推定順位: ${shareData.rank.toLocaleString()}位 #BPIM2 #IIDX\n${window.location.href}`;
     if (await onShare(target, text)) onClose();
   };
 
@@ -100,7 +100,7 @@ export const ShareResultModal = ({
                 />
                 <Label
                   htmlFor={opt.id}
-                  className="flex flex-col gap-1 cursor-pointer"
+                  className="flex flex-col gap-1 cursor-pointer items-start"
                 >
                   <span className="text-sm font-bold text-bpim-text">
                     {opt.label}
