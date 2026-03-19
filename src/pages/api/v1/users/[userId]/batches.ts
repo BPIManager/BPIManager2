@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { logsRepo } from "@/lib/db/logs";
-import { checkUserAccess } from "@/middlewares/api/withApi";
+import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { statsRepo } from "@/lib/db/stats";
 import { calculateTotalBpi } from "@/services/logs/calculateTotalBpi";
 
@@ -9,6 +9,9 @@ export default async function handler(
   res: NextApiResponse,
 ) {
   const { userId, version, groupedBy, topN = 5 } = req.query;
+
+  const access = await checkUserAccess(req, userId as string);
+  if (!access.hasAccess) return rejectAccess(res, access);
 
   if (groupedBy === "lastPlayed") {
     const [history, totalSongs12] = await Promise.all([
