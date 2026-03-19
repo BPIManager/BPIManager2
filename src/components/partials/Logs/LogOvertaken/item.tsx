@@ -1,7 +1,7 @@
-﻿import { LuChevronRight } from "react-icons/lu";
-import { OvertakenRivalInfo } from "@/types/logs/overtaken";
+﻿import { OvertakenRivalInfo } from "@/types/logs/overtaken";
 import { BatchDetailItem } from "@/hooks/batches/useBatchDetail";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ChevronRight } from "lucide-react";
 
 interface RankItemProps {
   item: BatchDetailItem;
@@ -46,7 +46,7 @@ export const OvertakeRankItem = ({ item, onClick }: RankItemProps) => {
         <div className="flex items-center gap-4 shrink-0">
           <div className="flex items-center gap-1.5 text-xs text-bpim-muted font-mono">
             <span className="font-medium">{previous?.exScore || 0}</span>
-            <LuChevronRight className="w-3 h-3" />
+            <ChevronRight className="w-3 h-3" />
             <span className="font-black text-bpim-text text-base">
               {current.exScore}
             </span>

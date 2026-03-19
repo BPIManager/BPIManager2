@@ -1,7 +1,6 @@
 ﻿"use client";
 
 import { useState } from "react";
-import { LuRefreshCw, LuDatabase, LuLoader } from "react-icons/lu";
 import { useUser } from "@/contexts/users/UserContext";
 import { useFirestoreDataCheck } from "@/hooks/firestore/checkData";
 import { versionTitles } from "@/constants/versions";
@@ -10,6 +9,7 @@ import { ActionConfirmDialog } from "../../Modal/Confirmation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { Database, Loader, RefreshCw } from "lucide-react";
 
 export default function TransferUi() {
   const { fbUser } = useUser();
@@ -53,7 +53,7 @@ export default function TransferUi() {
     <div className="mt-4 flex flex-col gap-6 rounded-xl border border-bpim-border bg-bpim-bg p-6 md:flex-row md:items-center md:justify-between">
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-2 text-bpim-primary">
-          <LuDatabase className="h-4 w-4" />
+          <Database className="h-4 w-4" />
           <span className="font-bold">データ移行</span>
         </div>
         <p className="text-sm text-bpim-muted">
@@ -74,7 +74,7 @@ export default function TransferUi() {
         disabled={isSyncing}
         className="w-full md:w-auto min-w-[100px] gap-2"
       >
-        {isSyncing ? <LuLoader className="animate-spin" /> : <LuRefreshCw />}
+        {isSyncing ? <Loader className="animate-spin" /> : <RefreshCw />}
         {isSyncing ? "同期中..." : "同期"}
       </Button>
 
@@ -97,7 +97,7 @@ export default function TransferUi() {
               </span>
               {isChecking ? (
                 <div className="flex items-center gap-2 text-xs text-bpim-text">
-                  <LuLoader className="h-3 w-3 animate-spin" />
+                  <Loader className="h-3 w-3 animate-spin" />
                   <span>スキャン中...</span>
                 </div>
               ) : foundVersions.length > 0 ? (

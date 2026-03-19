@@ -1,5 +1,4 @@
-﻿import { LuListMusic, LuCalendar } from "react-icons/lu";
-import Link from "next/link";
+﻿import Link from "next/link";
 import { UpdateLog } from "@/hooks/batches/useBatchesList";
 import dayjs from "@/lib/dayjs";
 import { useRouter } from "next/router";
@@ -7,6 +6,7 @@ import { useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Calendar, ListMusic } from "lucide-react";
 
 export const LogsCard = ({ log }: { log: UpdateLog }) => {
   const router = useRouter();
@@ -39,7 +39,7 @@ export const LogsCard = ({ log }: { log: UpdateLog }) => {
         <div className="flex items-start justify-between mb-3">
           <div className="flex flex-col gap-0">
             <div className="flex items-center gap-1 mb-1 text-bpim-muted">
-              <LuCalendar className="w-3 h-3" />
+              <Calendar className="w-3 h-3" />
               <span className="text-[10px] font-medium md:text-xs">
                 {dayjs(log.createdAt).tz().format("YYYY/MM/DD HH:mm")}
               </span>
@@ -63,7 +63,7 @@ export const LogsCard = ({ log }: { log: UpdateLog }) => {
           </div>
 
           <div className="flex items-center gap-2 px-3 py-1 rounded-md bg-bpim-bg border border-bpim-border">
-            <LuListMusic className="w-3.5 h-3.5 text-bpim-muted" />
+            <ListMusic className="w-3.5 h-3.5 text-bpim-muted" />
             <span className="text-sm font-bold text-bpim-text leading-none">
               {log.songCount}
             </span>

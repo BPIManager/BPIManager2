@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { useState } from "react";
-import { Activity, Swords, UserCheck } from "lucide-react";
+import { Activity, Loader, Swords, UserCheck } from "lucide-react";
 import { TimelineList } from "./ui";
 import { Difficulties, FilterParamsFrontend } from "@/types/songs/withScore";
 import { FilterCheckboxGroup, FilterSearchInput } from "../Songs/Filter/part";
@@ -9,7 +9,6 @@ import { useUser } from "@/contexts/users/UserContext";
 import { LoginRequiredCard } from "../LoginRequired/ui";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { LuLoader } from "react-icons/lu";
 
 export const TimelineContainer = () => {
   const { user, isLoading } = useUser();
@@ -35,7 +34,7 @@ export const TimelineContainer = () => {
   if (isLoading) {
     return (
       <div className="flex h-64 w-full items-center justify-center">
-        <LuLoader className="h-8 w-8 animate-spin text-bpim-text" />
+        <Loader className="h-8 w-8 animate-spin text-bpim-text" />
       </div>
     );
   }

@@ -1,6 +1,5 @@
-﻿import { LuLock, LuUserMinus } from "react-icons/lu";
-import Link from "next/link";
-import { AlertTriangle } from "lucide-react";
+﻿import Link from "next/link";
+import { AlertTriangle, UserMinus, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -13,13 +12,13 @@ export const ProfileErrorState = ({
     private: {
       title: "非公開のプロフィール",
       desc: "このユーザーはプロフィールを非公開に設定しています。",
-      icon: <LuLock size={48} />,
+      icon: <Lock size={48} />,
       color: "text-bpim-warning",
     },
     notfound: {
       title: "ユーザーが見つかりません",
       desc: "指定されたIDのユーザーは存在しないか、退会した可能性があります。",
-      icon: <LuUserMinus size={48} />,
+      icon: <UserMinus size={48} />,
       color: "text-bpim-muted",
     },
     error: {
@@ -33,7 +32,9 @@ export const ProfileErrorState = ({
 
   return (
     <div className="flex h-[60vh] flex-col items-center justify-center gap-6 text-center">
-      <div className={cn("rounded-full bg-bpim-surface-2/60 p-6", current.color)}>
+      <div
+        className={cn("rounded-full bg-bpim-surface-2/60 p-6", current.color)}
+      >
         {current.icon}
       </div>
       <div className="flex flex-col gap-2">

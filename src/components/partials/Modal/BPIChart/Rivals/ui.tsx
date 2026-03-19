@@ -2,12 +2,12 @@
 
 import { useMemo } from "react";
 import { useRouter } from "next/router";
-import { LuLoader } from "react-icons/lu";
 import { useUser } from "@/contexts/users/UserContext";
 import { useRivalScores } from "@/hooks/social/useRivalScores";
 import { SongWithScore } from "@/types/songs/withScore";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { Loader } from "lucide-react";
 
 interface RivalRankingProps {
   version: string;
@@ -37,7 +37,7 @@ export const RivalRankingBody = ({
   if (isLoading) {
     return (
       <div className="flex justify-center py-8">
-        <LuLoader className="h-8 w-8 animate-spin text-bpim-info" />
+        <Loader className="h-8 w-8 animate-spin text-bpim-info" />
       </div>
     );
   }

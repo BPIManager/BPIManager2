@@ -3,7 +3,6 @@
 import { ReactNode } from "react";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
-import { LuLayoutDashboard, LuMusic, LuLoader } from "react-icons/lu";
 import { useProfile } from "@/hooks/users/useProfile";
 import { useUser } from "@/contexts/users/UserContext";
 import { DashboardLayout } from "@/components/partials/Main";
@@ -15,6 +14,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { latestVersion } from "@/constants/latestVersion";
 import { ProfileProvider } from "@/contexts/profile/ProfileContext";
 import { FilterProvider } from "@/contexts/stats/FilterContext";
+import { Loader, LayoutDashboard, Music } from "lucide-react";
 
 export const RivalProfileLayout = ({
   rivalUserId,
@@ -49,7 +49,7 @@ export const RivalProfileLayout = ({
     return (
       <DashboardLayout>
         <div className="flex h-[90vh] items-center justify-center">
-          <LuLoader className="h-10 w-10 animate-spin text-bpim-text" />
+          <Loader className="h-10 w-10 animate-spin text-bpim-text" />
         </div>
       </DashboardLayout>
     );
@@ -97,7 +97,7 @@ export const RivalProfileLayout = ({
                       className="flex items-center gap-2 text-xs font-bold data-[state=active]:bg-bpim-primary data-[state=active]:text-bpim-text"
                     >
                       <NextLink href={`/rivals/${rivalUserId}`}>
-                        <LuLayoutDashboard className="h-4 w-4" />
+                        <LayoutDashboard className="h-4 w-4" />
                         サマリ
                       </NextLink>
                     </TabsTrigger>
@@ -109,7 +109,7 @@ export const RivalProfileLayout = ({
                       <NextLink
                         href={`/rivals/${rivalUserId}/scores/${version}?${scoreParams}`}
                       >
-                        <LuMusic className="h-4 w-4" />
+                        <Music className="h-4 w-4" />
                         スコア比較
                       </NextLink>
                     </TabsTrigger>

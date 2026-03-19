@@ -1,8 +1,8 @@
 ﻿"use client";
 
 import { useState, useEffect } from "react";
-import { LuSearch } from "react-icons/lu";
 import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
 export const SearchInput = ({
   initialValue,
@@ -27,7 +27,7 @@ export const SearchInput = ({
   return (
     <div className="relative flex-1">
       <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-bpim-muted">
-        <LuSearch className="h-4 w-4" />
+        <Search className="h-4 w-4" />
       </div>
       <Input
         placeholder="ユーザー名またはIIDX IDで検索"

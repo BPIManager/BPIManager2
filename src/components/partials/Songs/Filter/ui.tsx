@@ -2,15 +2,6 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
-import { LuLoader, LuSearch, LuSlidersHorizontal } from "react-icons/lu";
-
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -27,6 +18,7 @@ import { latestVersion } from "@/constants/latestVersion";
 import { FilterCheckboxGroup, FilterStickyToggle } from "./part";
 import { cn } from "@/lib/utils";
 import { FilterSelect } from "./select";
+import { Search, Loader, SlidersHorizontal } from "lucide-react";
 
 interface SongFilterBarProps {
   params: FilterParamsFrontend;
@@ -120,7 +112,7 @@ export const SongFilterBar = ({
       <div className="flex w-full gap-2 items-center mb-3">
         <div className="relative flex-1">
           <div className="absolute left-3 top-1/2 -translate-y-1/2 text-bpim-muted">
-            <LuSearch size={16} />
+            <Search size={16} />
           </div>
           <Input
             placeholder="曲名で検索..."
@@ -130,7 +122,7 @@ export const SongFilterBar = ({
           />
           {isTyping && (
             <div className="absolute right-3 top-1/2 -translate-y-1/2">
-              <LuLoader className="animate-spin text-bpim-text" size={14} />
+              <Loader className="animate-spin text-bpim-text" size={14} />
             </div>
           )}
         </div>
@@ -140,7 +132,7 @@ export const SongFilterBar = ({
           className="h-9 w-9 border-bpim-border hover:bg-bpim-overlay"
           onClick={onOpenAdvancedFilter}
         >
-          <LuSlidersHorizontal size={18} />
+          <SlidersHorizontal size={18} />
         </Button>
       </div>
 

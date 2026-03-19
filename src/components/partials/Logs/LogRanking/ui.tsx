@@ -1,5 +1,4 @@
-﻿import { LuTrophy, LuTrendingUp, LuSwords } from "react-icons/lu";
-import { Switch } from "@/components/ui/switch";
+﻿import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { RankItem } from "./item";
@@ -11,16 +10,17 @@ import { BatchDetailItem } from "@/hooks/batches/useBatchDetail";
 import { SongWithScore } from "@/types/songs/withScore";
 import { LabelWithTooltip } from "../LogSummary/ui";
 import { cn } from "@/lib/utils";
+import { Swords, TrendingUp, Trophy } from "lucide-react";
 
 const RANK_CONFIG = {
   growth: {
     title: "BPI伸び幅ランキング",
-    icon: LuTrendingUp,
+    icon: TrendingUp,
     accentColor: "text-bpim-success",
   },
   top: {
     title: "BPIランキング",
-    icon: LuTrophy,
+    icon: Trophy,
     accentColor: "text-yellow-400",
   },
   overtake: {
@@ -31,7 +31,7 @@ const RANK_CONFIG = {
         tooltipText="このスコアを出した瞬間に、ライバルを上回っていたものを表示しています。（その後にライバルに抜き返されても、この時の更新結果は変わりません）"
       />
     ),
-    icon: LuSwords,
+    icon: Swords,
     accentColor: "text-bpim-warning",
   },
 };

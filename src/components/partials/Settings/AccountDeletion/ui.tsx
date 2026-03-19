@@ -1,12 +1,12 @@
 ﻿import { Button } from "@/components/ui/button";
-import { LuBadgeX, LuTrash2 } from "react-icons/lu";
+import { BadgeX, Trash2 } from "lucide-react";
 
 export default function AccountDeletionUi() {
   return (
     <div className="mt-4 flex flex-col gap-6 rounded-xl border border-red-900/30 bg-bpim-bg p-6 md:flex-row md:items-center md:justify-between">
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-2 text-bpim-danger">
-          <LuBadgeX className="h-4 w-4" />
+          <BadgeX className="h-4 w-4" />
           <span className="font-bold">アカウント削除</span>
         </div>
         <p className="text-sm text-bpim-muted">
@@ -17,7 +17,7 @@ export default function AccountDeletionUi() {
         </p>
       </div>
       <Button variant="destructive" disabled className="w-full md:w-auto gap-2">
-        <LuTrash2 className="h-4 w-4" />
+        <Trash2 className="h-4 w-4" />
         確認
       </Button>
     </div>

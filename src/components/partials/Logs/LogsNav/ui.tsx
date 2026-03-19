@@ -1,8 +1,8 @@
-﻿import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
-import { useRouter } from "next/router";
+﻿import { useRouter } from "next/router";
 import dayjs from "@/lib/dayjs";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface BatchRef {
   batchId: string;
@@ -81,7 +81,7 @@ export const LogNavigator = ({ type, pagination }: LogNavigatorProps) => {
           disabled={!hasPrev}
           onClick={() => prevVal && navigateTo(prevVal)}
         >
-          <LuChevronLeft className="h-5 w-5 shrink-0" />
+          <ChevronLeft className="h-5 w-5 shrink-0" />
           <div className="ml-2 hidden flex-col items-start gap-0 md:flex">
             <span className="text-[10px] tracking-tighter text-bpim-subtle uppercase">
               {type === "batch" ? "PREVIOUS BATCH" : "PREVIOUS DAY"}
@@ -117,7 +117,7 @@ export const LogNavigator = ({ type, pagination }: LogNavigatorProps) => {
             </span>
             <span className="text-xs font-bold leading-tight">{nextLabel}</span>
           </div>
-          <LuChevronRight className="h-5 w-5 shrink-0" />
+          <ChevronRight className="h-5 w-5 shrink-0" />
         </Button>
       </div>
     </nav>

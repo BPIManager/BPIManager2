@@ -1,5 +1,5 @@
-﻿import { LuLock } from "react-icons/lu";
-import { LoginButtons } from "../LogIn";
+﻿import { LoginButtons } from "../LogIn";
+import { Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const LoginRequiredCard = ({ className }: { className?: string }) => {
@@ -10,14 +10,14 @@ export const LoginRequiredCard = ({ className }: { className?: string }) => {
         className,
       )}
     >
-      <LuLock
+      <Lock
         className="pointer-events-none absolute -right-2 -top-2 rotate-12 text-[120px] text-bpim-text/5"
         aria-hidden="true"
       />
 
       <div className="relative z-10 flex flex-col items-center gap-6">
         <div className="flex h-16 w-16 items-center justify-center rounded-full border border-blue-500/20 bg-bpim-primary/10 text-bpim-primary">
-          <LuLock size={32} />
+          <Lock size={32} />
         </div>
 
         <div className="flex flex-col gap-1">

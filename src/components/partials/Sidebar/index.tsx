@@ -155,7 +155,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
       <div className="rounded-xl border border-bpim-border bg-bpim-surface-2/60 p-4 flex flex-col gap-4">
         <div className="flex items-center gap-3">
           <Link href={`/users/${user?.userId}`} onClick={onClose}>
-            <Avatar className="h-12 w-12 rounded-lg border border-bpim-border">
+            <Avatar className="h-12 w-12">
               <AvatarImage
                 src={user?.profileImage || ""}
                 alt={user?.userName || "User"}

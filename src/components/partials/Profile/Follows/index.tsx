@@ -1,12 +1,12 @@
 ﻿"use client";
 
 import { useRouter } from "next/router";
-import { LuUsers, LuUserCheck, LuLoader } from "react-icons/lu";
 import { UserProfileLayout } from "@/components/partials/Profile/Layout/layout";
 import { useFollowList } from "@/hooks/users/useFollowList";
 import { UserFollowCard } from "./ui";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { UserCheck, Users, Loader } from "lucide-react";
 
 export default function FollowPage({
   type,
@@ -38,7 +38,7 @@ export default function FollowPage({
               value="following"
               className="flex h-full items-center justify-center gap-2 rounded-full text-xs font-bold transition-all data-[state=active]:bg-bpim-primary data-[state=active]:text-bpim-text data-[state=active]:shadow-lg"
             >
-              <LuUserCheck className="h-4 w-4" />
+              <UserCheck className="h-4 w-4" />
               <span>フォロー</span>
             </TabsTrigger>
 
@@ -46,7 +46,7 @@ export default function FollowPage({
               value="followers"
               className="flex h-full items-center justify-center gap-2 rounded-full text-xs font-bold transition-all data-[state=active]:bg-bpim-primary data-[state=active]:text-bpim-text data-[state=active]:shadow-lg"
             >
-              <LuUsers className="h-4 w-4" />
+              <Users className="h-4 w-4" />
               <span>フォロワー</span>
             </TabsTrigger>
           </TabsList>
@@ -76,7 +76,7 @@ export default function FollowPage({
                       className="text-bpim-muted hover:bg-bpim-overlay/50 hover:text-bpim-text"
                     >
                       {isLoading ? (
-                        <LuLoader className="mr-2 h-4 w-4 animate-spin" />
+                        <Loader className="mr-2 h-4 w-4 animate-spin" />
                       ) : null}
                       さらに読み込む
                     </Button>
@@ -85,7 +85,7 @@ export default function FollowPage({
 
                 {isLoading && users.length === 0 && (
                   <div className="flex justify-center py-10">
-                    <LuLoader className="h-8 w-8 animate-spin text-bpim-text" />
+                    <Loader className="h-8 w-8 animate-spin text-bpim-text" />
                   </div>
                 )}
               </div>

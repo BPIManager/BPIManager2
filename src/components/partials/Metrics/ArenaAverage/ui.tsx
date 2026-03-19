@@ -1,7 +1,6 @@
 ﻿"use client";
 
 import { useState, useMemo, memo } from "react";
-import { LuArrowUpDown, LuChevronUp, LuChevronDown } from "react-icons/lu";
 import { ArenaAverageData } from "@/hooks/metrics/useArenaAverage";
 import {
   Table,
@@ -13,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import { CustomPagination } from "../../Pagination/ui";
 import { cn } from "@/lib/utils";
+import { ArrowUpDown, ChevronUp, ChevronDown } from "lucide-react";
 
 const RANKS = ["A1", "A2", "A3", "A4", "A5"] as const;
 
@@ -84,11 +84,11 @@ export const ArenaAverageTable = ({ data }: { data: ArenaAverageData[] }) => {
 
   const SortIcon = ({ k }: { k: SortKey }) => {
     if (sortKey !== k)
-      return <LuArrowUpDown className="ml-1 h-3 w-3 opacity-30" />;
+      return <ArrowUpDown className="ml-1 h-3 w-3 opacity-30" />;
     return sortOrder === "asc" ? (
-      <LuChevronUp className="ml-1 h-3 w-3 text-bpim-primary" />
+      <ChevronUp className="ml-1 h-3 w-3 text-bpim-primary" />
     ) : (
-      <LuChevronDown className="ml-1 h-3 w-3 text-bpim-primary" />
+      <ChevronDown className="ml-1 h-3 w-3 text-bpim-primary" />
     );
   };
 

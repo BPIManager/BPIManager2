@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { LuPalette, LuCheck } from "react-icons/lu";
 import { cn } from "@/lib/utils";
 import {
   THEMES,
@@ -9,6 +8,7 @@ import {
   applyTheme,
   getStoredTheme,
 } from "@/hooks/common/useTheme";
+import { Palette, Check } from "lucide-react";
 
 export default function ThemeSettingsUi() {
   const [current, setCurrent] = useState<ThemeId>("dark-blue");
@@ -48,7 +48,7 @@ export default function ThemeSettingsUi() {
     <div className="flex flex-col gap-6 rounded-xl border border-bpim-border bg-bpim-bg p-6">
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-2 text-bpim-primary">
-          <LuPalette className="h-4 w-4" />
+          <Palette className="h-4 w-4" />
           <span className="font-bold">テーマ設定</span>
         </div>
         <p className="text-sm text-bpim-muted">
@@ -170,7 +170,7 @@ function ThemeCard({
             className="flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full"
             style={{ background: preview.primary }}
           >
-            <LuCheck className="h-2 w-2 text-white" />
+            <Check className="h-2 w-2 text-white" />
           </span>
         )}
       </div>

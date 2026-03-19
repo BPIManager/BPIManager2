@@ -3,7 +3,6 @@
 import { ReactNode } from "react";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
-import { LuHistory, LuLayoutDashboard, LuMusic, LuTable } from "react-icons/lu";
 import { useProfile } from "@/hooks/users/useProfile";
 import { useUser } from "@/contexts/users/UserContext";
 import { DashboardLayout } from "@/components/partials/Main";
@@ -15,7 +14,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { latestVersion } from "@/constants/latestVersion";
 import { ProfileProvider } from "@/contexts/profile/ProfileContext";
 import { FilterProvider } from "@/contexts/stats/FilterContext";
-import { Loader } from "lucide-react";
+import { LayoutDashboard, Loader, Music, Table, History } from "lucide-react";
 
 interface UserProfileLayoutProps {
   userId: string;
@@ -96,25 +95,25 @@ export const UserProfileLayout = ({
                       value="overview"
                       href={`/users/${userId}`}
                       label="サマリ"
-                      icon={<LuLayoutDashboard className="h-4 w-4" />}
+                      icon={<LayoutDashboard className="h-4 w-4" />}
                     />
                     <TabLinkItem
                       value="songs"
                       href={`/users/${userId}/scores/${latestVersion}?${scoreParams}`}
                       label="スコア"
-                      icon={<LuMusic className="h-4 w-4" />}
+                      icon={<Music className="h-4 w-4" />}
                     />
                     <TabLinkItem
                       value="logs"
                       href={`/users/${userId}/logs/${version}`}
                       label="更新履歴"
-                      icon={<LuHistory className="h-4 w-4" />}
+                      icon={<History className="h-4 w-4" />}
                     />
                     <TabLinkItem
                       value="aaaTable"
                       href={`/users/${userId}/aaaTable/${version}`}
                       label="AAA達成表"
-                      icon={<LuTable className="h-4 w-4" />}
+                      icon={<Table className="h-4 w-4" />}
                     />
                   </TabsList>
                   {children}

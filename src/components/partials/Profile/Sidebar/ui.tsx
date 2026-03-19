@@ -1,6 +1,5 @@
 ﻿"use client";
 
-import { SiX } from "react-icons/si";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -8,6 +7,7 @@ import { BpiHistoryTable } from "./bpiTable";
 import { FollowSection } from "./followStatus";
 import { FollowStats } from "./followCount";
 import { formatIIDXId } from "@/utils/common/formatIidxId";
+import { XIcon } from "../../LogIn";
 
 export const ProfileSideBar = ({
   profile,
@@ -41,7 +41,7 @@ export const ProfileSideBar = ({
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-bpim-muted transition-colors hover:text-bpim-primary"
           >
-            <SiX className="h-3.5 w-3.5" />
+            <XIcon className="h-3.5 w-3.5" />
             <span className="text-xs">@{profile.xId}</span>
           </a>
         </div>

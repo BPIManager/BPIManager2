@@ -1,5 +1,5 @@
-﻿import { LuChevronsLeft, LuChevronLeft, LuChevronRight } from "react-icons/lu";
-import { Button } from "@/components/ui/button";
+﻿import { Button } from "@/components/ui/button";
+import { ChevronsLeft, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface Props {
   p: number;
@@ -16,7 +16,7 @@ export const Pagination = ({ p, hasMore, onPageChange }: Props) => (
         onClick={() => onPageChange(1)}
         className="h-9 w-9"
       >
-        <LuChevronsLeft className="h-4 w-4" />
+        <ChevronsLeft className="h-4 w-4" />
       </Button>
     )}
     <Button
@@ -26,7 +26,7 @@ export const Pagination = ({ p, hasMore, onPageChange }: Props) => (
       onClick={() => onPageChange(p - 1)}
       className="gap-1 px-3"
     >
-      <LuChevronLeft className="h-4 w-4" />
+      <ChevronLeft className="h-4 w-4" />
       前へ
     </Button>
 
@@ -44,7 +44,7 @@ export const Pagination = ({ p, hasMore, onPageChange }: Props) => (
       className="gap-1 px-3"
     >
       次へ
-      <LuChevronRight className="h-4 w-4" />
+      <ChevronRight className="h-4 w-4" />
     </Button>
   </div>
 );

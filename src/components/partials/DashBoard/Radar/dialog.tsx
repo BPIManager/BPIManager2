@@ -7,8 +7,8 @@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useMemo, useState } from "react";
 import { RadarSongEntry } from "@/types/stats/radar";
-import { LuArrowDownWideNarrow, LuArrowUpNarrowWide } from "react-icons/lu";
 import { getBpiColorStyle } from "@/constants/bpiColor";
+import { ArrowDownWideNarrow, ArrowUpNarrowWide } from "lucide-react";
 
 interface Props {
   categoryName: string;
@@ -56,14 +56,14 @@ export const RadarCategorySongsDialog = ({
                 value="desc"
                 className="flex items-center gap-2 text-xs data-[state=active]:bg-bpim-primary"
               >
-                <LuArrowDownWideNarrow className="h-3.5 w-3.5" />
+                <ArrowDownWideNarrow className="h-3.5 w-3.5" />
                 BPIが高い順
               </TabsTrigger>
               <TabsTrigger
                 value="asc"
                 className="flex items-center gap-2 text-xs data-[state=active]:bg-bpim-primary"
               >
-                <LuArrowUpNarrowWide className="h-3.5 w-3.5" />
+                <ArrowUpNarrowWide className="h-3.5 w-3.5" />
                 BPIが低い順
               </TabsTrigger>
             </TabsList>

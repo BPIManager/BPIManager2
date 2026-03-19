@@ -1,5 +1,4 @@
-﻿import { AlertCircle } from "lucide-react";
-import { LuRefreshCcw } from "react-icons/lu";
+﻿import { AlertCircle, RefreshCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface LogErrorStateProps {
@@ -50,7 +49,7 @@ export const LogErrorState = ({ error, onRetry }: LogErrorStateProps) => {
           size="sm"
           className="group flex items-center gap-2 rounded-full border-bpim-border px-6 transition-colors hover:bg-bpim-overlay/50 hover:text-bpim-primary"
         >
-          <LuRefreshCcw
+          <RefreshCcw
             size={14}
             className="transition-transform group-hover:rotate-180 duration-500"
           />

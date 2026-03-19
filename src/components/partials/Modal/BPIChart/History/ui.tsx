@@ -1,13 +1,6 @@
 ﻿"use client";
 
 import { useMemo } from "react";
-import {
-  LuTrendingUp,
-  LuCalendar,
-  LuHistory,
-  LuCrown,
-  LuLoader,
-} from "react-icons/lu";
 import dayjs from "@/lib/dayjs";
 import { useUser } from "@/contexts/users/UserContext";
 import { useScoreHistory } from "@/hooks/score/useScoreLogs";
@@ -16,6 +9,7 @@ import { versionTitles } from "@/constants/versions";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import { Crown, TrendingUp, History, Loader, Calendar } from "lucide-react";
 
 interface SongHistoryTabProps {
   songId: number;
@@ -40,7 +34,7 @@ export const SongHistoryTab = ({ songId }: SongHistoryTabProps) => {
   if (isLoading) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <LuLoader className="h-8 w-8 animate-spin text-bpim-text" />
+        <Loader className="h-8 w-8 animate-spin text-bpim-text" />
       </div>
     );
   }
@@ -48,7 +42,7 @@ export const SongHistoryTab = ({ songId }: SongHistoryTabProps) => {
   if (isError || !historyGroups || Object.keys(historyGroups).length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-20">
-        <LuHistory className="h-10 w-10 text-bpim-subtle" />
+        <History className="h-10 w-10 text-bpim-subtle" />
         <p className="text-sm font-medium text-bpim-muted">
           履歴データが見つかりません
         </p>
@@ -97,7 +91,7 @@ export const SongHistoryTab = ({ songId }: SongHistoryTabProps) => {
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5 text-bpim-muted">
-                        <LuCalendar className="h-3 w-3" />
+                        <Calendar className="h-3 w-3" />
                         <span className="font-mono text-[10px] font-medium">
                           {dayjs(record.lastPlayed)
                             .tz()
@@ -111,14 +105,14 @@ export const SongHistoryTab = ({ songId }: SongHistoryTabProps) => {
                             variant="secondary"
                             className="h-4 bg-green-500/10 text-bpim-success border-green-500/20 px-1.5 text-[9px] font-bold"
                           >
-                            <LuTrendingUp className="mr-0.5 h-2.5 w-2.5" />+
+                            <TrendingUp className="mr-0.5 h-2.5 w-2.5" />+
                             {scoreDiff}
                           </Badge>
                         )}
 
                         {isGlobalBest && (
                           <Badge className="h-4 bg-bpim-warning px-1.5 text-[9px] font-black border-none">
-                            <LuCrown className="mr-0.5 h-2.5 w-2.5" />
+                            <Crown className="mr-0.5 h-2.5 w-2.5" />
                             BEST
                           </Badge>
                         )}
