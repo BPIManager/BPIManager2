@@ -4,25 +4,29 @@ A web application for tracking and analyzing **BPI (Beat Power Indicator)** scor
 
 ## Tech Stack
 
-| Layer            | Technology                                              |
-| ---------------- | ------------------------------------------------------- |
-| Framework        | Next.js 16 (Pages Router)                               |
-| Language         | TypeScript                                              |
-| UI               | Chakra UI v3, Recharts, Lucide React                    |
-| Database         | MySQL (via [Kysely](https://kysely.dev/) query builder) |
-| Auth             | Firebase Authentication                                 |
-| Backend Services | Firebase Admin SDK                                      |
-| Cron Jobs        | node-cron (Arena metrics & Radar cache)                 |
-| Testing          | Vitest                                                  |
+| Layer            | Technology                                                            |
+| ---------------- | --------------------------------------------------------------------- |
+| Framework        | Next.js 16 (Pages Router)                                             |
+| Language         | TypeScript                                                            |
+| UI               | shadcn/ui (Radix UI), Tailwind CSS v4, Recharts, Lucide React, Sonner |
+| Database         | MySQL (via [Kysely](https://kysely.dev/) query builder)               |
+| Auth             | Firebase Authentication                                               |
+| Backend Services | Firebase Admin SDK                                                    |
+| Data Fetching    | SWR                                                                   |
+| Cron Jobs        | node-cron (Sitemap generation, Arena metrics & Radar cache)           |
+| Testing          | Vitest                                                                |
 
 ## Features
 
-- **Score Import** — Import play data via CSV and batch processing
-- **Dashboard** — BPI distribution, activity calendar, DJRank distribution, rival comparison
-- **Song Analytics** — Per-song BPI charts, AAA difficulty table, Arena average metrics
+- **Score Import** — Import play data via CSV with batch processing
+- **Dashboard** — BPI distribution, activity calendar, DJRank distribution, rival comparison, radar chart, recommended songs
+- **Score Logs** — Per-version score history with ranking, overtaken log, daily batch notice, and BPI trend
+- **Song Analytics** — Per-song BPI charts, AAA difficulty table, Arena average metrics, level selector
 - **Social** — Follow/unfollow players, timeline, rival score comparison
 - **Profile** — Public user profiles with BPI history and radar charts
-- **Automated Jobs** — Daily Arena JSON generation and 12-hour Radar cache refresh via cron
+- **Settings** — Account settings, theme settings, API key management, data transfer, account deletion
+- **Notifications** — In-app notifications
+- **Automated Jobs** — Daily sitemap generation (02:00 UTC), daily Arena JSON generation (04:00 UTC), and 12-hour Radar cache refresh via cron
 
 ## Prerequisites
 
@@ -36,7 +40,7 @@ A web application for tracking and analyzing **BPI (Beat Power Indicator)** scor
 
 ```bash
 git clone <repository-url>
-cd BPIManager2-master
+cd BPIManager2
 ```
 
 ### 2. Install dependencies
@@ -79,7 +83,7 @@ Apply the schema to your MySQL instance:
 mysql -u <user> -p < migrations/schema.sql
 ```
 
-This creates the `beatmaniaBpi` database and all required tables (`users`, `scores`, `bkScores`, `follows`, `apiKeys`, etc.).
+This creates the `beatmaniaBpi` database and all required tables (`users`, `scores`, `bkScores`, `songs`, `songDef`, `follows`, `logs`, `notifications`, `userRadarCache`, `userStatusLogs`, `apiKeys`, etc.).
 
 ### 5. Run the development server
 
@@ -118,30 +122,69 @@ npx kysely-codegen --url "$DATABASE_URL" --out-file src/types/sql.d.ts
 
 ```
 src/
+├── assets/                # Static assets (images, etc.)
 ├── components/partials/   # Feature-level UI components
+│   ├── DashBoard/         # BPI distribution, activity calendar, radar, rivals, etc.
+│   ├── Import/            # CSV import flow and success modal
+│   ├── Logs/              # Score log views, ranking, overtaken log, BPI trend
+│   ├── Metrics/           # AAA difficulty table, Arena average, level selector
+│   ├── Notifications/     # In-app notification components
+│   ├── Profile/           # Public profile layout and follows
+│   ├── Rivals/            # Rival comparison list, table, mode switch
+│   ├── Settings/          # Account, theme, API key, data transfer, deletion
+│   ├── Songs/             # Per-song filters and advanced filter
+│   ├── Timeline/          # Social timeline card and header
+│   └── ...                # Shared UI (Header, Sidebar, Modal, Pagination, etc.)
+├── contexts/              # React context providers
 ├── hooks/                 # Data-fetching hooks (SWR)
 ├── lib/
+│   ├── bpi/               # BPI calculation logic
+│   ├── cron/              # Scheduled jobs (sitemap, Arena metrics, Radar cache)
 │   ├── db/                # Kysely query modules per domain
+│   │   ├── bpi/
+│   │   ├── follow/
+│   │   ├── logs/
+│   │   ├── metrics/
+│   │   ├── notifications/
+│   │   ├── social/
+│   │   ├── stats/
+│   │   └── users/
 │   ├── firebase/          # Firebase Admin & Auth helpers
-│   ├── cron/              # Scheduled jobs (Arena metrics, Radar cache)
-│   └── bpi/               # BPI calculation logic
+│   ├── lamp/              # LAMP score import utilities
+│   ├── radar/             # Radar chart cache calculation
+│   ├── subhandlers/       # API sub-handlers
+│   ├── transfer/          # Data transfer / migration utilities
+│   └── utils.ts           # Shared utilities
+├── middlewares/           # Next.js middleware (API auth, etc.)
 ├── pages/
-│   ├── api/               # API routes
-│   └── ...                # Page routes
+│   ├── api/v1/            # REST API routes
+│   ├── import.tsx         # Score import page
+│   ├── index.tsx          # Home / Dashboard
+│   ├── logs.tsx           # Score logs page
+│   ├── metrics/           # Metrics pages (AAA table, Arena average)
+│   ├── my/[version].tsx   # My scores per version
+│   ├── rivals/            # Rival pages
+│   ├── settings.tsx       # Settings page
+│   ├── timeline.tsx       # Social timeline page
+│   └── users/             # Public user profile pages
+├── services/              # Client-side service helpers
+├── styles/                # Global styles
 ├── types/                 # TypeScript types including generated DB types
 └── utils/                 # Shared utility functions
 public/
 └── data/metrics/arena/    # Auto-generated Arena metric JSON files
 migrations/
 └── schema.sql             # Full database schema
+test/                      # Vitest test files
 ```
 
 ## Background Jobs
 
-On server startup, two cron jobs are registered automatically via `src/instrumentation.ts`:
+On server startup, three cron jobs are registered automatically via `src/instrumentation.ts`:
 
-- **Arena JSON generation** — Runs daily at 04:00 UTC. Generates aggregated Arena rank metric files under `public/data/metrics/arena/`. Also runs once on startup if the output directory is empty.
-- **Radar cache update** — Runs every 12 hours. Pre-computes radar chart data for all users.
+- **Sitemap generation** — Runs once on startup and daily at **02:00 UTC**. Generates the user sitemap under `public/`.
+- **Arena JSON generation** — Runs daily at **04:00 UTC**. Generates aggregated Arena rank metric files under `public/data/metrics/arena/`. Also runs once on startup if the output directory is empty.
+- **Radar cache update** — Runs every **12 hours**. Pre-computes radar chart data for all users. Also runs once on startup.
 
 ## Firebase Setup
 
