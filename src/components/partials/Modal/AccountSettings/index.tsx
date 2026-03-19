@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { useState } from "react";
-import { User2, Check, X, Loader2 } from "lucide-react";
+import { User2, Check, X, Loader } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -122,7 +122,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                     />
                     <div className="absolute right-3 top-1/2 -translate-y-1/2">
                       {nameStatus.isChecking ? (
-                        <Loader2 className="h-4 w-4 animate-spin text-bpim-muted" />
+                        <Loader className="h-4 w-4 animate-spin text-bpim-muted" />
                       ) : formData.userName && !nameStatus.error ? (
                         <Check className="h-4 w-4 text-bpim-success" />
                       ) : nameStatus.error ? (
@@ -276,7 +276,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader className="mr-2 h-4 w-4 animate-spin" />
                   保存中...
                 </>
               ) : (

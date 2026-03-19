@@ -5,7 +5,7 @@ import { DashboardLayout } from "@/components/partials/Main";
 import { UserProfileLayout } from "@/components/partials/Profile/Layout/layout";
 import { ProfileMeta } from "@/components/partials/Profile/Meta/ui";
 import { useUser } from "@/contexts/users/UserContext";
-import { Loader2 } from "lucide-react";
+import { Loader } from "lucide-react";
 import { useRouter } from "next/router";
 
 export default function BatchLogsPage() {
@@ -18,7 +18,7 @@ export default function BatchLogsPage() {
   if (isInitialLoading) {
     return (
       <div className="flex h-[90vh] w-full items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin text-bpim-text" />
+        <Loader className="h-10 w-10 animate-spin text-bpim-text" />
       </div>
     );
   }

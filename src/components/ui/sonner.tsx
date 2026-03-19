@@ -7,7 +7,7 @@ import {
   InfoIcon,
   TriangleAlertIcon,
   OctagonXIcon,
-  Loader2Icon,
+  LoaderIcon,
 } from "lucide-react";
 import { getStoredTheme } from "@/hooks/common/useTheme";
 
@@ -38,7 +38,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
         info: <InfoIcon className="size-4" />,
         warning: <TriangleAlertIcon className="size-4" />,
         error: <OctagonXIcon className="size-4" />,
-        loading: <Loader2Icon className="size-4 animate-spin" />,
+        loading: <LoaderIcon className="size-4 animate-spin" />,
       }}
       style={
         {

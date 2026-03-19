@@ -7,7 +7,7 @@ import { latestVersion } from "@/constants/latestVersion";
 import { useUser } from "@/contexts/users/UserContext";
 import { useBatchImport } from "@/hooks/import/useBatchImport";
 import { useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader } from "lucide-react";
 
 export default function ImportPage() {
   const { user, isLoading, fbUser, refresh } = useUser();
@@ -32,7 +32,7 @@ export default function ImportPage() {
   if (isLoading)
     return (
       <div className="flex h-[90vh] w-full items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin text-bpim-text" />
+        <Loader className="h-10 w-10 animate-spin text-bpim-text" />
       </div>
     );
 

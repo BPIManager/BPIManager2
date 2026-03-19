@@ -10,7 +10,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, Loader2 } from "lucide-react";
+import { AlertTriangle, Loader } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -83,7 +83,7 @@ export const ActionConfirmDialog = ({
             )}
           >
             {isLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader className="h-4 w-4 animate-spin" />
             ) : (
               confirmLabel
             )}

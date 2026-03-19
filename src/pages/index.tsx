@@ -15,7 +15,7 @@ import { RankingTabsCard } from "@/components/partials/DashBoard/RecommendedCard
 import { RadarSection } from "@/components/partials/DashBoard/Radar/ui";
 import { RivalWinLossSummary } from "@/components/partials/DashBoard/Rivals";
 import { BpiHistorySection } from "@/components/partials/DashBoard/TotalBPIHistory";
-import { Loader2 } from "lucide-react";
+import { Loader } from "lucide-react";
 
 export default function DashboardPage() {
   const { user, isLoading: isUserLoading, fbUser } = useUser();
@@ -23,7 +23,7 @@ export default function DashboardPage() {
   if (isUserLoading) {
     return (
       <div className="flex h-[90vh] w-full items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-bpim-text" />
+        <Loader className="h-8 w-8 animate-spin text-bpim-text" />
       </div>
     );
   }

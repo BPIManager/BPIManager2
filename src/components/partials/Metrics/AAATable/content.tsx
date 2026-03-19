@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader } from "lucide-react";
 import { GroupingMode, useAAATable } from "@/hooks/metrics/useAAATable";
 import { latestVersion } from "@/constants/latestVersion";
 import { AAATableFilter } from "@/components/partials/Metrics/AAATable/selector";
@@ -60,7 +60,7 @@ export const AAATableContent = ({
 
       {isLoading ? (
         <div className="flex h-64 items-center justify-center">
-          <Loader2 className="h-10 w-10 animate-spin text-bpim-text" />
+          <Loader className="h-10 w-10 animate-spin text-bpim-text" />
         </div>
       ) : (
         <div className="flex flex-col gap-12">

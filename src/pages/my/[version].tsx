@@ -9,7 +9,7 @@ import {
   LoginRequiredCard,
 } from "@/components/partials/LoginRequired/ui";
 import { PageContainer } from "@/components/partials/Header";
-import { Loader2 } from "lucide-react";
+import { Loader } from "lucide-react";
 
 export default function MyScoresByVersion() {
   const router = useRouter();
@@ -21,7 +21,7 @@ export default function MyScoresByVersion() {
   if (!isReady) {
     return (
       <div className="flex h-[90vh] w-full items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin text-bpim-text" />
+        <Loader className="h-10 w-10 animate-spin text-bpim-text" />
       </div>
     );
   }

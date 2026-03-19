@@ -1,7 +1,7 @@
 ﻿import { useCallback, ReactNode } from "react";
 import { useInfiniteScroll } from "@/hooks/common/useInfiniteScroll";
 import { cn } from "@/lib/utils";
-import { Loader2 } from "lucide-react";
+import { Loader } from "lucide-react";
 
 interface InfiniteScrollContainerProps<T> {
   items: T[];
@@ -44,7 +44,9 @@ export function InfiniteScrollContainer<T>({
       )}
       style={{ maxHeight: maxH }}
     >
-      {header && <div className="sticky top-0 z-10 bg-bpim-surface">{header}</div>}
+      {header && (
+        <div className="sticky top-0 z-10 bg-bpim-surface">{header}</div>
+      )}
 
       <div className="flex flex-col">
         {items.map((item, i) => renderItem(item, i))}
@@ -55,7 +57,7 @@ export function InfiniteScrollContainer<T>({
         className="flex min-h-[40px] items-center justify-center py-4"
       >
         {isLoadingMore && (
-          <Loader2 className="h-5 w-5 animate-spin text-bpim-text" />
+          <Loader className="h-5 w-5 animate-spin text-bpim-text" />
         )}
         {!isLoadingMore && isReachingEnd && items.length > 0 && (
           <span className="text-[10px] font-medium text-bpim-subtle uppercase tracking-wider">
