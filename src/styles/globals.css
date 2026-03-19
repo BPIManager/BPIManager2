@@ -14,7 +14,8 @@
   &:is([data-theme="dark-abyss"] *),
   &:is([data-theme="dark-midnight"] *),
   &:is([data-theme="dark-forest"] *),
-  &:is([data-theme="dark-ember"] *)
+  &:is([data-theme="dark-ember"] *),
+  &:is([data-theme="dark-onsen"] *)
 );
 
 @layer base {
@@ -335,6 +336,41 @@
     --activity-4: #ff6420;
   }
 
+  [data-theme="dark-onsen"] {
+    --bpim-bg: 185 45% 4%;
+    --bpim-bg-gradient: linear-gradient(
+      160deg,
+      #030c0d 0%,
+      #061416 30%,
+      #091c1e 55%,
+      #041010 80%,
+      #030c0d 100%
+    );
+    --bpim-surface: 183 40% 8%;
+    --bpim-surface-2: 183 36% 12%;
+    --bpim-overlay: 183 32% 17%;
+
+    --bpim-primary: 138 55% 68%;
+    --bpim-primary-dim: 138 45% 44%;
+    --bpim-border: 180 25% 18%;
+    --bpim-border-dim: 180 20% 12%;
+    --bpim-chart-grid: 180 25% 24%;
+
+    --bpim-text: 170 30% 93%;
+    --bpim-text-muted: 170 15% 56%;
+    --bpim-text-subtle: 170 10% 36%;
+    --bpim-success: 138 55% 55%;
+    --bpim-danger: 0 65% 55%;
+    --bpim-warning: 42 80% 52%;
+    --bpim-info: 192 70% 50%;
+
+    --activity-0: #040e10;
+    --activity-1: #0a2e28;
+    --activity-2: #105840;
+    --activity-3: #1a8c58;
+    --activity-4: #a8e6a3;
+  }
+
   [data-theme="light-blue"] {
     --bpim-bg: 220 40% 96%;
     --bpim-surface: 220 30% 100%;
@@ -449,7 +485,8 @@
 [data-theme="dark-abyss"] input[type="date"],
 [data-theme="dark-midnight"] input[type="date"],
 [data-theme="dark-forest"] input[type="date"],
-[data-theme="dark-ember"] input[type="date"] {
+[data-theme="dark-ember"] input[type="date"],
+[data-theme="dark-onsen"] input[type="date"] {
   color-scheme: dark;
 }
 

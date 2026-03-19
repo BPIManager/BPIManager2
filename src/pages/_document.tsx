@@ -8,7 +8,7 @@ const themeScript = `
   var valid = [
     'dark-blue','dark-green','dark-red','dark-orange','dark-yellow',
     'dark-purple','dark-pink','dark-cyan',
-    'dark-abyss','dark-midnight','dark-forest','dark-ember',
+    'dark-abyss','dark-midnight','dark-forest','dark-ember','dark-onsen',
     'light-blue','light-green','light-rose','light-purple'
   ];
   var stored = localStorage.getItem(STORAGE_KEY);

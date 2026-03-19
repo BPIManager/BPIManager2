@@ -25,12 +25,22 @@ export default function ThemeSettingsUi() {
   const darkStandard = THEMES.filter(
     (t) =>
       t.mode === "dark" &&
-      !["dark-abyss", "dark-midnight", "dark-forest", "dark-ember"].includes(
-        t.id,
-      ),
+      ![
+        "dark-abyss",
+        "dark-midnight",
+        "dark-forest",
+        "dark-ember",
+        "dark-onsen",
+      ].includes(t.id),
   );
   const darkVivid = THEMES.filter((t) =>
-    ["dark-abyss", "dark-midnight", "dark-forest", "dark-ember"].includes(t.id),
+    [
+      "dark-abyss",
+      "dark-midnight",
+      "dark-forest",
+      "dark-ember",
+      "dark-onsen",
+    ].includes(t.id),
   );
   const lightThemes = THEMES.filter((t) => t.mode === "light");
 

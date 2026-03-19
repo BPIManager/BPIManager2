@@ -11,6 +11,7 @@ export type ThemeId =
   | "dark-midnight"
   | "dark-forest"
   | "dark-ember"
+  | "dark-onsen"
   | "light-blue"
   | "light-green"
   | "light-rose"
@@ -132,34 +133,34 @@ export const THEMES: ThemeDef[] = [
     mode: "dark",
     accent: "indigo",
     preview: {
-      bg: "linear-gradient(135deg, #04041a 0%, #0a0628 50%, #120a3e 100%)",
-      surface: "#0e0e2a",
-      primary: "#6d6dff",
-      text: "#e8eaff",
+      bg: "linear-gradient(135deg, #000010 0%, #05003a 50%, #0a0060 100%)",
+      surface: "#08004a",
+      primary: "#6644ff",
+      text: "#eef0ff",
     },
   },
   {
     id: "dark-midnight",
-    label: "Midnight",
+    label: "RGB Midnight",
     mode: "dark",
     accent: "violet",
     preview: {
-      bg: "linear-gradient(135deg, #0e0118 0%, #1a0330 50%, #280540 100%)",
-      surface: "#1c0535",
-      primary: "#d060ff",
-      text: "#f0d8ff",
+      bg: "linear-gradient(135deg, #0a0010 0%, #200040 50%, #0d003a 100%)",
+      surface: "#1a0038",
+      primary: "#ee00ff",
+      text: "#f5e0ff",
     },
   },
   {
     id: "dark-forest",
-    label: "Forest",
+    label: "Dark Forest",
     mode: "dark",
     accent: "emerald",
     preview: {
-      bg: "linear-gradient(135deg, #011a0a 0%, #011e10 50%, #032a18 100%)",
-      surface: "#052414",
-      primary: "#00ff88",
-      text: "#d0ffe8",
+      bg: "linear-gradient(135deg, #000a04 0%, #001a08 50%, #002e10 100%)",
+      surface: "#002010",
+      primary: "#00ff70",
+      text: "#ccffe0",
     },
   },
   {
@@ -168,10 +169,22 @@ export const THEMES: ThemeDef[] = [
     mode: "dark",
     accent: "orange-red",
     preview: {
-      bg: "linear-gradient(135deg, #1a0304 0%, #280608 50%, #1e0a02 100%)",
-      surface: "#2a0a06",
-      primary: "#ff6420",
-      text: "#ffe8d8",
+      bg: "linear-gradient(135deg, #120000 0%, #2a0400 50%, #180800 100%)",
+      surface: "#2a0600",
+      primary: "#ff5500",
+      text: "#ffe0cc",
+    },
+  },
+  {
+    id: "dark-onsen",
+    label: "Onsen",
+    mode: "dark",
+    accent: "onsen",
+    preview: {
+      bg: "linear-gradient(135deg, #040d0e 0%, #071618 50%, #0a1e20 100%)",
+      surface: "#0c2022",
+      primary: "#a8e6a3",
+      text: "#e8f5e4",
     },
   },
   {
