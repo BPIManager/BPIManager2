@@ -89,8 +89,8 @@ export const SongDetailView = ({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="p-6">
-          <div className="mb-8 grid grid-cols-3 gap-4 text-center">
+        <div className="flex min-h-0 flex-col overflow-y-auto p-2 custom-scrollbar">
+          <div className="mb-4 grid grid-cols-3 gap-4 text-center">
             <div className="flex flex-col gap-1">
               <span className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
                 EX Score

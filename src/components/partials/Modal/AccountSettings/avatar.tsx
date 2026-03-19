@@ -3,13 +3,19 @@
 import { auth } from "@/lib/firebase";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Dispatch, SetStateAction } from "react";
 
 interface AvatarSectionProps {
   image: string;
   onChange: (url: string) => void;
+  setIsImageModalOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-export const AvatarSection = ({ image, onChange }: AvatarSectionProps) => {
+export const AvatarSection = ({
+  image,
+  onChange,
+  setIsImageModalOpen,
+}: AvatarSectionProps) => {
   const useServiceIcon = () => {
     const photoURL = auth.currentUser?.photoURL;
     if (photoURL) onChange(photoURL);
@@ -49,6 +55,14 @@ export const AvatarSection = ({ image, onChange }: AvatarSectionProps) => {
           className="h-7 border-bpim-border px-3 text-[10px] font-bold hover:bg-bpim-overlay/50 hover:text-bpim-primary"
         >
           ランダムに設定
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setIsImageModalOpen(true)}
+          className="ml-auto h-7 shrink-0 border-bpim-border text-[10px] font-bold hover:bg-bpim-overlay/50"
+        >
+          画像をアップロード
         </Button>
       </div>
     </div>

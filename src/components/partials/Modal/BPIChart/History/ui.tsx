@@ -61,7 +61,7 @@ export const SongHistoryTab = ({ songId }: SongHistoryTabProps) => {
   );
 
   return (
-    <div className="flex flex-col gap-6 max-h-[450px] overflow-y-auto pr-2 custom-scrollbar">
+    <div className="flex flex-col gap-6 max-h-[45svh] overflow-y-auto pr-2 custom-scrollbar">
       {sortedVersions.map((version) => {
         const vInfo = versionTitles.find((v) => v.num === version);
         const displayTitle = vInfo ? vInfo.title : `Ver.${version}`;

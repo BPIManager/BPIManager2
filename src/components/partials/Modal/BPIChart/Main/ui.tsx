@@ -38,7 +38,7 @@ const CustomTooltip = ({ active, payload, maxScore }: any) => {
           </p>
           <div className="h-[1px] w-full bg-bpim-overlay/60 my-1" />
           <p className="font-mono text-sm font-bold text-bpim-text">
-            EX: {data.score.toLocaleString()}
+            EX: {data.score}
           </p>
           <p className="font-mono text-[10px] text-bpim-muted">RATE: {rate}%</p>
         </div>
@@ -80,7 +80,6 @@ export const BPIChart = ({ song, chartData }: BPIChartProps) => {
             ))}
           </Bar>
 
-          {/* Rank Border Lines (AAA, AA, A) */}
           {[
             { y: Math.ceil(max * (8 / 9)), label: "AAA" },
             { y: Math.ceil(max * (7 / 9)), label: "AA" },
