@@ -9,10 +9,10 @@ import { RivalProfileLayout } from "@/components/partials/Rivals/Layout/layout";
 import { RivalSongsTable } from "@/components/partials/Rivals/Table";
 import { Meta } from "@/components/partials/Head";
 import { DashBoardFilter } from "@/components/partials/DashBoard/Filter";
-import { RadarSection } from "@/components/partials/DashBoard/Radar";
+import { RadarSection } from "@/components/partials/DashBoard/Radar/ui";
 import { RankDistributionSection } from "@/components/partials/DashBoard/DJRankDistribution/ui";
 import { BpiDistributionSection } from "@/components/partials/DashBoard/BPIDistribution/ui";
-import { BpiHistorySection } from "@/components/partials/DashBoard/TotalBPIHistory/ui";
+import { BpiHistorySection } from "@/components/partials/DashBoard/TotalBPIHistory";
 import { TabsContent } from "@/components/ui/tabs";
 
 function RivalOverviewTab({

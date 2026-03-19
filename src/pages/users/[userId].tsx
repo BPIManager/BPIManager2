@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/router";
 import { DashBoardFilter } from "@/components/partials/DashBoard/Filter";
-import { ActivitySection } from "@/components/partials/DashBoard/ActivityCalendar/ui";
+import { ActivitySection } from "@/components/partials/DashBoard/ActivityCalendar";
 import { RankDistributionSection } from "@/components/partials/DashBoard/DJRankDistribution/ui";
 import { BpiDistributionSection } from "@/components/partials/DashBoard/BPIDistribution/ui";
 import { SongsTable } from "@/components/partials/Table";
@@ -11,8 +11,8 @@ import { LogsList } from "@/components/partials/Logs/LogsList/ui";
 import { UserProfileLayout } from "@/components/partials/Profile/Layout/layout";
 import { ProfileMeta } from "@/components/partials/Profile/Meta/ui";
 import { getVersionNameFromNumber } from "@/constants/versions";
-import { RadarSection } from "@/components/partials/DashBoard/Radar";
-import { BpiHistorySection } from "@/components/partials/DashBoard/TotalBPIHistory/ui";
+import { RadarSection } from "@/components/partials/DashBoard/Radar/ui";
+import { BpiHistorySection } from "@/components/partials/DashBoard/TotalBPIHistory";
 import { LogFilterSection } from "@/components/partials/Logs/VersionSelector/ui";
 import { TabsContent } from "@/components/ui/tabs";
 

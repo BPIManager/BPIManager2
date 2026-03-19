@@ -6,15 +6,15 @@ import { Meta } from "@/components/partials/Head";
 import LoginPage from "@/components/partials/LogIn/page";
 import AccountSettings from "@/components/partials/Modal/AccountSettings";
 import { DashBoardFilter } from "@/components/partials/DashBoard/Filter";
-import { ActivitySection } from "@/components/partials/DashBoard/ActivityCalendar/ui";
+import { ActivitySection } from "@/components/partials/DashBoard/ActivityCalendar";
 import { RankDistributionSection } from "@/components/partials/DashBoard/DJRankDistribution/ui";
 import { BpiDistributionSection } from "@/components/partials/DashBoard/BPIDistribution/ui";
 import { FilterProvider } from "@/contexts/stats/FilterContext";
 import { PageContainer, PageHeader } from "@/components/partials/Header";
 import { RankingTabsCard } from "@/components/partials/DashBoard/RecommendedCard/ui";
-import { RadarSection } from "@/components/partials/DashBoard/Radar";
-import { RivalWinLossSummary } from "@/components/partials/DashBoard/Rivals/ui";
-import { BpiHistorySection } from "@/components/partials/DashBoard/TotalBPIHistory/ui";
+import { RadarSection } from "@/components/partials/DashBoard/Radar/ui";
+import { RivalWinLossSummary } from "@/components/partials/DashBoard/Rivals";
+import { BpiHistorySection } from "@/components/partials/DashBoard/TotalBPIHistory";
 import { Loader2 } from "lucide-react";
 
 export default function DashboardPage() {

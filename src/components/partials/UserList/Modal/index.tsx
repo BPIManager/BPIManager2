@@ -6,7 +6,7 @@ import { useRivalComparison } from "@/hooks/social/useRivalComparison";
 import { useProfile } from "@/hooks/users/useProfile";
 import { RivalBodySkeleton, RivalHeaderSkeleton } from "./skeleton";
 import { RivalHeader, SectionTitle, WinLossStats } from "./ui";
-import { RadarSectionChart } from "../../DashBoard/Radar/ui";
+import { RadarSectionChart } from "../../DashBoard/Radar";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";

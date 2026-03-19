@@ -1,67 +1,97 @@
-﻿import { useState } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
-import { useRivalSummary } from "@/hooks/social/useRivalSummary";
-import { useStatsFilter } from "@/contexts/stats/FilterContext";
-import { RivalComparisonRow } from "./row";
-import { RivalWinLossSummarySkeleton } from "./skeleton";
-import { RivalWinLossSummaryNotFound } from "./nodata";
-import { DashCard } from "@/components/ui/dashcard";
-import { Button } from "@/components/ui/button";
+﻿import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Link from "next/link";
 
-export const RivalWinLossSummary = ({
-  userId,
-}: {
-  userId?: string | undefined;
-}) => {
-  const { levels, diffs, version } = useStatsFilter();
-  const { results, isLoading } = useRivalSummary({
-    userId,
-    version,
-    levels,
-    difficulties: diffs,
-  });
-  const [showAll, setShowAll] = useState(false);
+interface RivalComparisonRowProps {
+  rival: {
+    userId: string;
+    userName: string;
+    profileImage?: string | null;
+    stats: {
+      win: number;
+      lose: number;
+      draw: number;
+      totalCount: number;
+    };
+  };
+}
 
-  const displayCount = 5;
-  const hasMore = results.length > displayCount;
-  const visibleItems = showAll ? results : results.slice(0, displayCount);
+export const RivalComparisonRow = ({ rival }: RivalComparisonRowProps) => {
+  const { userName, profileImage, userId } = rival;
+  const { win, lose, draw, totalCount } = rival.stats;
+
+  const winRate = totalCount > 0 ? (win / totalCount) * 100 : 0;
+  const drawRate = totalCount > 0 ? (draw / totalCount) * 100 : 0;
+  const loseRate = totalCount > 0 ? (lose / totalCount) * 100 : 0;
 
   return (
-    <DashCard>
-      <h3 className="mb-4 text-sm font-bold uppercase text-bpim-muted">
-        ライバル勝敗
-      </h3>
-
-      {isLoading ? (
-        <RivalWinLossSummarySkeleton />
-      ) : results.length === 0 ? (
-        <RivalWinLossSummaryNotFound />
-      ) : (
-        <div className="flex flex-col gap-4">
-          {visibleItems.map((rival) => (
-            <RivalComparisonRow key={rival.userId} rival={rival} />
-          ))}
+    <div className="flex flex-col gap-1">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 min-w-0">
+          <Avatar className="h-5 w-5">
+            <AvatarImage src={profileImage || ""} alt={userName} />
+            <AvatarFallback className="text-[8px]">
+              {userName.slice(0, 2)}
+            </AvatarFallback>
+          </Avatar>
+          <Link
+            href={`/rivals/${userId}`}
+            className="truncate text-xs font-bold text-bpim-text transition-colors hover:text-bpim-primary"
+          >
+            {userName}
+          </Link>
         </div>
-      )}
+        <span className="text-[10px] font-bold text-bpim-muted whitespace-nowrap">
+          {totalCount}曲
+        </span>
+      </div>
 
-      {hasMore && (
-        <Button
-          variant="ghost"
-          className="mt-4 flex w-full items-center justify-center gap-2 text-xs text-bpim-muted transition-colors hover:bg-bpim-overlay/50 hover:text-bpim-text"
-          onClick={() => setShowAll(!showAll)}
-        >
-          {showAll ? (
-            <>
-              <ChevronUp className="h-4 w-4" /> 閉じる
-            </>
-          ) : (
-            <>
-              <ChevronDown className="h-4 w-4" /> 残り{" "}
-              {results.length - displayCount} 人を表示
-            </>
-          )}
-        </Button>
-      )}
-    </DashCard>
+      <div className="relative h-[18px] w-full overflow-hidden rounded-sm bg-bpim-surface-2/60">
+        <div className="flex h-full w-full items-center gap-0">
+          <div
+            className="relative h-full bg-bpim-primary transition-all duration-1000 ease-out"
+            style={{ width: `${winRate}%` }}
+          >
+            {winRate > 10 && (
+              <div className="flex h-full items-center justify-center">
+                <span className="text-[10px] font-bold text-white">{win}</span>
+              </div>
+            )}
+          </div>
+
+          <div
+            className="relative h-full bg-bpim-overlay transition-all duration-1000 ease-out"
+            style={{ width: `${drawRate}%` }}
+          >
+            {drawRate > 15 && (
+              <div className="flex h-full items-center justify-center">
+                <span className="text-[10px] font-bold text-white">{draw}</span>
+              </div>
+            )}
+          </div>
+
+          <div
+            className="relative h-full bg-bpim-danger transition-all duration-1000 ease-out"
+            style={{ width: `${loseRate}%` }}
+          >
+            {loseRate > 10 && (
+              <div className="flex h-full items-center justify-center">
+                <span className="text-[10px] font-bold text-white">{lose}</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {winRate <= 10 && win > 0 && (
+          <span className="pointer-events-none absolute left-0.5 top-1/2 -translate-y-1/2 text-[10px] font-bold text-yellow-400">
+            {win}
+          </span>
+        )}
+        {loseRate <= 10 && lose > 0 && (
+          <span className="pointer-events-none absolute right-0.5 top-1/2 -translate-y-1/2 text-[10px] font-bold text-bpim-primary">
+            {lose}
+          </span>
+        )}
+      </div>
+    </div>
   );
 };

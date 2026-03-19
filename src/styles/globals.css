@@ -5,7 +5,6 @@
 @custom-variant dark (&:is([data-theme="dark-blue"] *), &:is([data-theme="dark-green"] *));
 
 @layer base {
-  /* ── dark-blue ── */
   :root,
   [data-theme="dark-blue"] {
     --bpim-bg: 222 47% 4%;
@@ -16,6 +15,7 @@
     --bpim-primary-dim: 217 60% 40%;
     --bpim-border: 217 20% 15%;
     --bpim-border-dim: 217 15% 10%;
+    --bpim-chart-grid: 217 20% 25%;
     --bpim-text: 220 20% 95%;
     --bpim-text-muted: 220 10% 55%;
     --bpim-text-subtle: 220 10% 35%;
@@ -23,6 +23,7 @@
     --bpim-danger: 0 72% 55%;
     --bpim-warning: 38 92% 55%;
     --bpim-info: 199 89% 48%;
+
     --activity-0: #161b22;
     --activity-1: #0e4429;
     --activity-2: #006d32;
@@ -30,7 +31,6 @@
     --activity-4: #39d353;
   }
 
-  /* ── dark-green ── */
   [data-theme="dark-green"] {
     --bpim-bg: 150 47% 4%;
     --bpim-surface: 150 35% 7%;
@@ -40,6 +40,7 @@
     --bpim-primary-dim: 142 50% 28%;
     --bpim-border: 142 20% 15%;
     --bpim-border-dim: 142 15% 10%;
+    --bpim-chart-grid: 142 20% 25%;
     --bpim-text: 140 20% 95%;
     --bpim-text-muted: 140 10% 55%;
     --bpim-text-subtle: 140 10% 35%;
@@ -47,6 +48,7 @@
     --bpim-danger: 0 72% 55%;
     --bpim-warning: 38 92% 55%;
     --bpim-info: 199 89% 48%;
+
     --activity-0: #0a160c;
     --activity-1: #0e3318;
     --activity-2: #145e28;
@@ -54,7 +56,6 @@
     --activity-4: #22c55e;
   }
 
-  /* ── light-blue ── */
   [data-theme="light-blue"] {
     --bpim-bg: 220 40% 96%;
     --bpim-surface: 220 30% 100%;
@@ -64,6 +65,7 @@
     --bpim-primary-dim: 217 70% 65%;
     --bpim-border: 217 20% 82%;
     --bpim-border-dim: 217 15% 88%;
+    --bpim-chart-grid: 217 20% 75%;
     --bpim-text: 222 40% 8%;
     --bpim-text-muted: 222 15% 40%;
     --bpim-text-subtle: 222 10% 58%;
@@ -71,6 +73,7 @@
     --bpim-danger: 0 65% 48%;
     --bpim-warning: 38 85% 45%;
     --bpim-info: 199 80% 40%;
+
     --activity-0: #ebedf0;
     --activity-1: #bfdbfe;
     --activity-2: #60a5fa;
@@ -78,7 +81,6 @@
     --activity-4: #1d4ed8;
   }
 
-  /* ── light-green ── */
   [data-theme="light-green"] {
     --bpim-bg: 138 40% 95%;
     --bpim-surface: 138 20% 100%;
@@ -88,6 +90,7 @@
     --bpim-primary-dim: 142 45% 50%;
     --bpim-border: 142 20% 78%;
     --bpim-border-dim: 142 15% 86%;
+    --bpim-chart-grid: 142 20% 72%;
     --bpim-text: 150 40% 8%;
     --bpim-text-muted: 150 15% 38%;
     --bpim-text-subtle: 150 10% 55%;
@@ -95,6 +98,7 @@
     --bpim-danger: 0 65% 48%;
     --bpim-warning: 38 85% 42%;
     --bpim-info: 199 80% 38%;
+
     --activity-0: #dcfce7;
     --activity-1: #86efac;
     --activity-2: #22c55e;
@@ -196,6 +200,7 @@
   --color-bpim-primary-dim: hsl(var(--bpim-primary-dim));
   --color-bpim-border: hsl(var(--bpim-border));
   --color-bpim-border-dim: hsl(var(--bpim-border-dim));
+  --color-bpim-chart-grid: hsl(var(--bpim-chart-grid));
   --color-bpim-text: hsl(var(--bpim-text));
   --color-bpim-muted: hsl(var(--bpim-text-muted));
   --color-bpim-subtle: hsl(var(--bpim-text-subtle));

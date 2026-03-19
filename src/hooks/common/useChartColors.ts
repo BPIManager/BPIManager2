@@ -62,7 +62,7 @@ export const useChartColors = (): ChartColors => {
       success: toHsl(getCssVar("--bpim-success")),
       danger: toHsl(getCssVar("--bpim-danger")),
       muted,
-      grid: toHsl(getCssVar("--bpim-border")),
+      grid: toHsl(getCssVar("--bpim-chart-grid")),
       surface: toHsl(getCssVar("--bpim-bg")),
       overlay: toHsl(getCssVar("--bpim-overlay")),
       primaryRgba: (op) => toRgba(primary, op),

@@ -1,7 +1,7 @@
 ﻿import { TrendingUp, TrendingDown } from "lucide-react";
 import { formatIIDXId } from "@/utils/common/formatIidxId";
 import dayjs from "@/lib/dayjs";
-import { RadarSectionChart } from "../../DashBoard/Radar/ui";
+import { RadarSectionChart } from "../../DashBoard/Radar";
 import { getBpiColorStyle } from "@/constants/bpiColor";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
