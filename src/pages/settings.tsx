@@ -41,11 +41,11 @@ export default function SettingsPage() {
       <PageContainer>
         <div className="flex flex-col gap-6">
           <AccountSettingsUi />
-
-          <ThemeSettingsUi />
           <TransferUi />
 
           <ApiKeyUi />
+
+          <ThemeSettingsUi />
 
           <AccountDeletionUi />
         </div>

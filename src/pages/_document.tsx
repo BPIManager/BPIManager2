@@ -5,12 +5,17 @@ const themeScript = `
 (function() {
   var STORAGE_KEY = 'bpim2-theme';
   var DEFAULT = 'dark-blue';
-  var valid = ['dark-blue','dark-green','light-blue','light-green'];
+  var valid = [
+    'dark-blue','dark-green','dark-red','dark-orange','dark-yellow',
+    'dark-purple','dark-pink','dark-cyan',
+    'dark-abyss','dark-midnight','dark-forest','dark-ember',
+    'light-blue','light-green','light-rose','light-purple'
+  ];
   var stored = localStorage.getItem(STORAGE_KEY);
   var theme = valid.indexOf(stored) !== -1 ? stored : DEFAULT;
   var html = document.documentElement;
   html.setAttribute('data-theme', theme);
-  if (theme === 'light-blue' || theme === 'light-green') {
+  if (theme.startsWith('light')) {
     html.classList.remove('dark');
     html.classList.add('light');
     html.style.colorScheme = 'light';

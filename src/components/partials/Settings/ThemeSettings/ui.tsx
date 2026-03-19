@@ -22,7 +22,16 @@ export default function ThemeSettingsUi() {
     applyTheme(id);
   };
 
-  const darkThemes = THEMES.filter((t) => t.mode === "dark");
+  const darkStandard = THEMES.filter(
+    (t) =>
+      t.mode === "dark" &&
+      !["dark-abyss", "dark-midnight", "dark-forest", "dark-ember"].includes(
+        t.id,
+      ),
+  );
+  const darkVivid = THEMES.filter((t) =>
+    ["dark-abyss", "dark-midnight", "dark-forest", "dark-ember"].includes(t.id),
+  );
   const lightThemes = THEMES.filter((t) => t.mode === "light");
 
   return (
@@ -39,7 +48,7 @@ export default function ThemeSettingsUi() {
 
       <ThemeGroup
         label="ダーク"
-        themes={darkThemes}
+        themes={darkStandard}
         current={current}
         onSelect={handleSelect}
       />
@@ -47,6 +56,13 @@ export default function ThemeSettingsUi() {
       <ThemeGroup
         label="ライト"
         themes={lightThemes}
+        current={current}
+        onSelect={handleSelect}
+      />
+
+      <ThemeGroup
+        label="ゲーミング"
+        themes={darkVivid}
         current={current}
         onSelect={handleSelect}
       />
@@ -66,11 +82,11 @@ function ThemeGroup({
   onSelect: (id: ThemeId) => void;
 }) {
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-2">
       <p className="text-xs font-bold uppercase tracking-widest text-bpim-subtle">
         {label}
       </p>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="flex gap-2 overflow-x-auto pb-1 sm:grid sm:grid-cols-4 sm:overflow-visible sm:pb-0 md:grid-cols-6 lg:grid-cols-8">
         {themes.map((theme) => (
           <ThemeCard
             key={theme.id}
@@ -99,8 +115,9 @@ function ThemeCard({
     <button
       onClick={() => onSelect(theme.id)}
       className={cn(
-        "group relative flex flex-col gap-2 rounded-xl border-2 p-3 text-left",
-        "transition-all duration-200 hover:scale-[1.02]",
+        "group relative flex flex-col gap-1.5 rounded-xl border-2 p-2 text-left",
+        "w-[72px] shrink-0 sm:w-auto sm:shrink",
+        "transition-all duration-200 hover:scale-[1.03]",
         selected
           ? "border-bpim-primary shadow-[0_0_0_3px] shadow-bpim-primary/20"
           : "border-bpim-border hover:border-bpim-primary/50",
@@ -108,45 +125,42 @@ function ThemeCard({
       style={{ background: preview.bg }}
     >
       <div
-        className="flex h-16 w-full flex-col gap-1.5 overflow-hidden rounded-lg p-2"
+        className="flex h-10 w-full flex-col gap-1 overflow-hidden rounded-lg p-1.5"
         style={{ background: preview.surface }}
       >
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1">
           <div
-            className="h-2 w-2 rounded-full"
+            className="h-1.5 w-1.5 shrink-0 rounded-full"
             style={{ background: preview.primary }}
           />
           <div
-            className="h-1.5 w-12 rounded-full opacity-40"
-            style={{ background: preview.text }}
-          />
-        </div>
-        <div className="flex flex-col gap-1">
-          <div
-            className="h-1.5 w-full rounded-full opacity-20"
-            style={{ background: preview.text }}
-          />
-          <div
-            className="h-1.5 w-3/4 rounded-full opacity-20"
+            className="h-1 w-8 rounded-full opacity-40"
             style={{ background: preview.text }}
           />
         </div>
         <div
-          className="mt-auto h-4 w-12 rounded-md"
+          className="h-1 w-full rounded-full opacity-15"
+          style={{ background: preview.text }}
+        />
+        <div
+          className="mt-auto h-2.5 w-8 rounded"
           style={{ background: preview.primary, opacity: 0.85 }}
         />
       </div>
 
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-bold" style={{ color: preview.text }}>
+      <div className="flex items-center justify-between gap-1">
+        <span
+          className="truncate text-[10px] font-bold leading-tight"
+          style={{ color: preview.text }}
+        >
           {theme.label}
         </span>
         {selected && (
           <span
-            className="flex h-4 w-4 items-center justify-center rounded-full"
+            className="flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full"
             style={{ background: preview.primary }}
           >
-            <LuCheck className="h-2.5 w-2.5 text-bpim-text" />
+            <LuCheck className="h-2 w-2 text-white" />
           </span>
         )}
       </div>
