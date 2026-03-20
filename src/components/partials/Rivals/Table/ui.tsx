@@ -27,7 +27,7 @@ const SongInfo = ({ song }: { song: SongWithRival }) => (
           diffColors[song.difficulty] || "bg-bpim-surface-2",
         )}
       >
-        <span className="text-[11px] font-bold text-bpim-text leading-none">
+        <span className="text-[11px] font-bold text-white leading-none">
           {song.difficultyLevel}
         </span>
       </div>
