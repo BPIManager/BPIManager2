@@ -4,9 +4,10 @@ import { useRouter } from "next/router";
 import { UserProfileLayout } from "@/components/partials/Profile/Layout/layout";
 import { useFollowList } from "@/hooks/users/useFollowList";
 import { UserFollowCard } from "./ui";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { UserCheck, Users, Loader } from "lucide-react";
+import { AppTabsGroup } from "@/components/ui/complex/tabs";
 
 export default function FollowPage({
   type,
@@ -33,23 +34,15 @@ export default function FollowPage({
     <UserProfileLayout userId={userId} currentTab="">
       <div className="rounded-2xl border border-bpim-border bg-bpim-bg/40 p-4 md:p-6 shadow-xl backdrop-blur-md">
         <Tabs value={type} onValueChange={handleTabChange} className="w-full">
-          <TabsList className="mb-6 grid h-11 w-full grid-cols-2 items-stretch rounded-full border border-bpim-border bg-bpim-card/50 p-1.5 transition-all">
-            <TabsTrigger
-              value="following"
-              className="flex h-full items-center justify-center gap-2 rounded-full text-xs font-bold transition-all data-[state=active]:bg-bpim-primary data-[state=active]:text-bpim-text data-[state=active]:shadow-lg"
-            >
-              <UserCheck className="h-4 w-4" />
-              <span>フォロー</span>
-            </TabsTrigger>
-
-            <TabsTrigger
-              value="followers"
-              className="flex h-full items-center justify-center gap-2 rounded-full text-xs font-bold transition-all data-[state=active]:bg-bpim-primary data-[state=active]:text-bpim-text data-[state=active]:shadow-lg"
-            >
-              <Users className="h-4 w-4" />
-              <span>フォロワー</span>
-            </TabsTrigger>
-          </TabsList>
+          <AppTabsGroup
+            visual="pill"
+            iconOnly
+            listClassName="mb-6"
+            tabs={[
+              { value: "following", label: "フォロー", icon: UserCheck },
+              { value: "followers", label: "フォロワー", icon: Users },
+            ]}
+          />
 
           <TabsContent value={type} className="mt-0 outline-none">
             {users.length === 0 && !isLoading ? (

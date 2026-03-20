@@ -1,7 +1,6 @@
 ﻿"use client";
 
 import { ReactNode } from "react";
-import NextLink from "next/link";
 import { useRouter } from "next/router";
 import { useProfile } from "@/hooks/users/useProfile";
 import { useUser } from "@/contexts/users/UserContext";
@@ -10,11 +9,12 @@ import { PageContainer } from "@/components/partials/Header";
 import { ProfileSideBar } from "@/components/partials/Profile/Sidebar/ui";
 import { ProfileErrorState } from "@/components/partials/Profile/Errors/ui";
 import { ModeSwitchBanner } from "../../Rivals/ModeSwitch/ui";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs } from "@/components/ui/tabs";
 import { latestVersion } from "@/constants/latestVersion";
 import { ProfileProvider } from "@/contexts/profile/ProfileContext";
 import { FilterProvider } from "@/contexts/stats/FilterContext";
 import { LayoutDashboard, Loader, Music, Table, History } from "lucide-react";
+import { AppTabsList, AppTabsTrigger } from "@/components/ui/complex/tabs";
 
 interface UserProfileLayoutProps {
   userId: string;
@@ -90,32 +90,45 @@ export const UserProfileLayout = ({
 
               <div className="lg:col-span-3">
                 <Tabs value={currentTab} className="w-full">
-                  <TabsList className="mb-8 grid h-12 w-full mx-auto grid-cols-4 items-stretch rounded-xl border border-bpim-border bg-bpim-card/50 shadow-inner">
-                    <TabLinkItem
-                      value="overview"
-                      href={`/users/${userId}`}
-                      label="サマリ"
-                      icon={<LayoutDashboard className="h-4 w-4" />}
-                    />
-                    <TabLinkItem
-                      value="songs"
-                      href={`/users/${userId}/scores/${latestVersion}?${scoreParams}`}
-                      label="スコア"
-                      icon={<Music className="h-4 w-4" />}
-                    />
-                    <TabLinkItem
-                      value="logs"
-                      href={`/users/${userId}/logs/${version}`}
-                      label="更新履歴"
-                      icon={<History className="h-4 w-4" />}
-                    />
-                    <TabLinkItem
-                      value="aaaTable"
-                      href={`/users/${userId}/aaaTable/${version}`}
-                      label="AAA達成表"
-                      icon={<Table className="h-4 w-4" />}
-                    />
-                  </TabsList>
+                  <AppTabsList visual="card" cols={4} className="mb-8 mx-auto">
+                    {[
+                      {
+                        value: "overview",
+                        href: `/users/${userId}`,
+                        label: "サマリ",
+                        icon: LayoutDashboard,
+                      },
+                      {
+                        value: "songs",
+                        href: `/users/${userId}/scores/${latestVersion}?...`,
+                        label: "スコア",
+                        icon: Music,
+                      },
+                      {
+                        value: "logs",
+                        href: `/users/${userId}/logs/${version}`,
+                        label: "更新履歴",
+                        icon: History,
+                      },
+                      {
+                        value: "aaaTable",
+                        href: `/users/${userId}/aaaTable/${version}`,
+                        label: "AAA達成表",
+                        icon: Table,
+                      },
+                    ].map((t) => (
+                      <AppTabsTrigger
+                        key={t.value}
+                        value={t.value}
+                        visual="card"
+                        icon={t.icon}
+                        href={t.href}
+                        iconOnly
+                      >
+                        {t.label}
+                      </AppTabsTrigger>
+                    ))}
+                  </AppTabsList>
                   {children}
                 </Tabs>
               </div>
@@ -126,26 +139,3 @@ export const UserProfileLayout = ({
     </FilterProvider>
   );
 };
-
-const TabLinkItem = ({
-  value,
-  href,
-  label,
-  icon,
-}: {
-  value: string;
-  href: string;
-  label: string;
-  icon: React.ReactNode;
-}) => (
-  <TabsTrigger
-    value={value}
-    asChild
-    className="flex h-full items-center justify-center gap-2 rounded-lg text-xs font-bold transition-all data-[state=active]:bg-bpim-primary data-[state=active]:text-bpim-text data-[state=active]:shadow-lg"
-  >
-    <NextLink href={href}>
-      {icon}
-      <span className="hidden md:inline text-xs font-bold tracking-tighter leading-none">{label}</span>
-    </NextLink>
-  </TabsTrigger>
-);

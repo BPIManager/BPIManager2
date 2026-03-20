@@ -4,11 +4,12 @@
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs } from "@/components/ui/tabs";
 import { useMemo, useState } from "react";
 import { RadarSongEntry } from "@/types/stats/radar";
 import { getBpiColorStyle } from "@/constants/bpiColor";
 import { ArrowDownWideNarrow, ArrowUpNarrowWide } from "lucide-react";
+import { AppTabsGroup } from "@/components/ui/complex/tabs";
 
 interface Props {
   categoryName: string;
@@ -51,22 +52,18 @@ export const RadarCategorySongsDialog = ({
             onValueChange={setSortOrder}
             className="w-full"
           >
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger
-                value="desc"
-                className="flex items-center gap-2 text-xs data-[state=active]:bg-bpim-primary"
-              >
-                <ArrowDownWideNarrow className="h-3.5 w-3.5" />
-                BPIが高い順
-              </TabsTrigger>
-              <TabsTrigger
-                value="asc"
-                className="flex items-center gap-2 text-xs data-[state=active]:bg-bpim-primary"
-              >
-                <ArrowUpNarrowWide className="h-3.5 w-3.5" />
-                BPIが低い順
-              </TabsTrigger>
-            </TabsList>
+            <AppTabsGroup
+              visual="minimal"
+              iconOnly
+              tabs={[
+                {
+                  value: "desc",
+                  label: "BPIが高い順",
+                  icon: ArrowDownWideNarrow,
+                },
+                { value: "asc", label: "BPIが低い順", icon: ArrowUpNarrowWide },
+              ]}
+            />
           </Tabs>
         </div>
 

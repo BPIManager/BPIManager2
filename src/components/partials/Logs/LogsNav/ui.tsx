@@ -69,7 +69,7 @@ export const LogNavigator = ({ type, pagination }: LogNavigatorProps) => {
     .format("M月D日 HH:mm");
 
   return (
-    <nav className="mb-6 flex w-full items-center justify-between gap-0 rounded-xl border border-bpim-border bg-bpim-bg p-2">
+    <nav className="mb-4 flex w-full items-center justify-between gap-0 rounded-xl border border-bpim-border bg-bpim-bg p-2">
       <div className="flex flex-1 justify-start">
         <Button
           variant="ghost"

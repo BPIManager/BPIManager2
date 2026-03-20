@@ -8,8 +8,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs } from "@/components/ui/tabs";
 import { versionsNonDisabledCollection } from "@/constants/versions";
+import { AppTabsGroup } from "@/components/ui/complex/tabs";
 
 interface Props {
   version: string;
@@ -45,7 +46,7 @@ export const LogFilterSection = ({ version, groupedBy }: Props) => {
 
   return (
     <div className="flex w-full flex-col items-stretch gap-4 md:flex-row md:items-end md:gap-6">
-      <div className="flex flex-col gap-1.5 min-w-full md:min-w-[240px]">
+      <div className="flex flex-col gap-1.5 min-w-full md:min-w-60">
         <label className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
           Version
         </label>
@@ -72,20 +73,13 @@ export const LogFilterSection = ({ version, groupedBy }: Props) => {
           onValueChange={handleGroupChange}
           className="w-full"
         >
-          <TabsList className="grid h-9 w-full grid-cols-2 border border-bpim-border bg-bpim-bg p-1">
-            <TabsTrigger
-              value="lastPlayed"
-              className="text-xs font-bold transition-all data-[state=active]:bg-bpim-primary data-[state=active]:text-bpim-text"
-            >
-              プレイ日単位
-            </TabsTrigger>
-            <TabsTrigger
-              value="createdAt"
-              className="text-xs font-bold transition-all data-[state=active]:bg-bpim-primary data-[state=active]:text-bpim-text"
-            >
-              インポート日単位
-            </TabsTrigger>
-          </TabsList>
+            <AppTabsGroup
+              visual="flat"
+              tabs={[
+                { value: "lastPlayed", label: "プレイ日単位" },
+                { value: "createdAt", label: "インポート日単位" },
+              ]}
+            />
         </Tabs>
       </div>
     </div>

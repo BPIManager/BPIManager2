@@ -8,6 +8,7 @@ import { NearLoseList } from "./NearLose";
 import { DashCard } from "@/components/ui/dashcard";
 import { InfiniteScrollContainer } from "../../InfiniteScroll/ui";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"; // shadcn/ui
+import { AppTabsGroup } from "@/components/ui/complex/tabs";
 
 const InfiniteList = ({ userId, type, onSelect }: any) => {
   const { levels, diffs, version } = useStatsFilter();
@@ -41,25 +42,16 @@ export const RankingTabsCard = ({ userId }: { userId: string }) => {
   return (
     <DashCard className="flex flex-col p-0 overflow-hidden border border-bpim-border">
       <Tabs value={tab} onValueChange={setTab} className="flex flex-col w-full">
-        <div className="p-2 border-b border-bpim-border bg-white/[0.02]">
-          <TabsList className="grid h-9 w-full grid-cols-3 rounded-md bg-bpim-surface-2/60 p-1">
-            {[
-              { value: "weapons", label: "武器曲かも?" },
-              { value: "potential", label: "伸びるかも?" },
-              { value: "nearLose", label: "ライバル僅差" },
-            ].map((t) => (
-              <TabsTrigger
-                key={t.value}
-                value={t.value}
-                className="text-[11px] font-bold transition-all data-[state=active]:bg-bpim-surface data-[state=active]:text-bpim-text data-[state=active]:shadow-sm"
-              >
-                {t.label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </div>
+        <AppTabsGroup
+          visual="minimal"
+          tabs={[
+            { value: "weapons", label: "武器曲かも?" },
+            { value: "potential", label: "伸びるかも?" },
+            { value: "nearLose", label: "ライバル僅差" },
+          ]}
+        />
 
-        <div className="flex-1 overflow-y-auto custom-scrollbar h-[450px]">
+        <div className="flex-1 overflow-y-auto custom-scrollbar h-112.5">
           <TabsContent
             value="weapons"
             className="m-0 p-0 focus-visible:outline-none"

@@ -24,6 +24,7 @@ import { RANK_COLORS } from "@/constants/djRankColor";
 import { getBpiColor } from "@/constants/bpiColor";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
+import { AppTabsList, AppTabsTrigger } from "@/components/ui/complex/tabs";
 
 export const LogsDetailContent = ({
   userId,
@@ -132,21 +133,15 @@ export const LogsDetailContent = ({
         onValueChange={handleTabChange}
         className="w-full"
       >
-        <div className="flex w-full items-center justify-between gap-4 mb-4">
-          <TabsList className="grid h-auto w-full max-w-md grid-cols-2 rounded-lg bg-bpim-surface-2/60 p-1">
-            <TabsTrigger
-              value="summary"
-              className="text-xs font-bold transition-all data-[state=active]:bg-bpim-surface data-[state=active]:text-bpim-text"
-            >
+        <div className="flex w-full items-center justify-between gap-4">
+          <AppTabsList visual="minimal" cols={2} className="max-w-md">
+            <AppTabsTrigger visual="minimal" value="summary">
               サマリー
-            </TabsTrigger>
-            <TabsTrigger
-              value="songs"
-              className="text-xs font-bold transition-all data-[state=active]:bg-bpim-surface data-[state=active]:text-bpim-text"
-            >
+            </AppTabsTrigger>
+            <AppTabsTrigger visual="minimal" value="songs">
               更新楽曲 ({details.songs.length})
-            </TabsTrigger>
-          </TabsList>
+            </AppTabsTrigger>
+          </AppTabsList>
 
           {!isPublicPage && (
             <div className="shrink-0">

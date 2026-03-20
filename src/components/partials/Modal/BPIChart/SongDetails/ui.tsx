@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 
 import { SongWithScore } from "@/types/songs/withScore";
@@ -17,7 +17,7 @@ import { BPIChart } from "./chart";
 import { getRankDetail } from "@/constants/djRank";
 import { SongHistoryTab } from "../History/ui";
 import RivalsRanking from "../Rivals";
-import { cn } from "@/lib/utils";
+import { AppTabsList, AppTabsTrigger } from "@/components/ui/complex/tabs";
 
 interface SongDetailViewProps {
   song: SongWithScore | null;
@@ -134,33 +134,19 @@ export const SongDetailView = ({
           </div>
 
           <Tabs value={tab} onValueChange={setTab} className="w-full">
-            <TabsList
-              className={cn(
-                "grid w-full grid-cols-3 rounded-xl p-1.5 h-12 items-stretch",
-                "border",
-              )}
-            >
-              {tabs.map((t) => {
-                const Icon = t.icon;
-                return (
-                  <TabsTrigger
-                    key={t.value}
-                    value={t.value}
-                    className={cn(
-                      "flex h-full items-center justify-center gap-2.5 py-0",
-                      "text-[14px] leading-none transition-all rounded-lg",
-                      "data-[state=active]:bg-bpim-primary",
-                      "data-[state=active]:shadow-lg",
-                    )}
-                  >
-                    <Icon className="h-4 w-4 shrink-0" />
-                    <span className="hidden sm:inline tracking-tighter">
-                      {t.label}
-                    </span>
-                  </TabsTrigger>
-                );
-              })}
-            </TabsList>
+            <AppTabsList visual="card" cols={3}>
+              {tabs.map((t) => (
+                <AppTabsTrigger
+                  key={t.value}
+                  value={t.value}
+                  visual="card"
+                  icon={t.icon}
+                  iconOnly
+                >
+                  {t.label}
+                </AppTabsTrigger>
+              ))}
+            </AppTabsList>
 
             <TabsContent value="stats" className="mt-0 outline-none">
               <BPIChart data={chartData} maxScore={maxScore} song={song} />

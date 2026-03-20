@@ -3,13 +3,14 @@
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs } from "@/components/ui/tabs";
 import { useNotifications } from "@/hooks/users/useNotifications";
 import { Bell } from "lucide-react";
 import { useState } from "react";
 import { InfiniteScrollContainer } from "../InfiniteScroll/ui";
 import { NotificationItem } from "./item";
 import { Button } from "@/components/ui/button";
+import { AppTabsGroup } from "@/components/ui/complex/tabs";
 
 export const NotificationBell = () => {
   const [activeTab, setActiveTab] = useState<"all" | "follow" | "overtaken">(
@@ -53,27 +54,16 @@ export const NotificationBell = () => {
           onValueChange={(v) => setActiveTab(v as any)}
           className="w-full"
         >
-          <TabsList className="grid w-full grid-cols-3 rounded-none border-b border-bpim-border bg-bpim-bg/50 p-1">
-            <TabsTrigger
-              value="all"
-              className="text-xs font-bold data-[state=active]:bg-bpim-primary"
-            >
-              すべて
-            </TabsTrigger>
-            <TabsTrigger
-              value="follow"
-              className="text-xs font-bold data-[state=active]:bg-bpim-primary"
-            >
-              フォロー
-            </TabsTrigger>
-            <TabsTrigger
-              value="overtaken"
-              className="text-xs font-bold data-[state=active]:bg-bpim-primary"
-            >
-              更新
-            </TabsTrigger>
-          </TabsList>
-          <div className="max-h-[400px] p-2">
+          <AppTabsGroup
+            visual="minimal"
+            listClassName="rounded-none border-b border-bpim-border bg-bpim-bg/50"
+            tabs={[
+              { value: "all", label: "すべて" },
+              { value: "follow", label: "フォロー" },
+              { value: "overtaken", label: "更新" },
+            ]}
+          />
+          <div className="max-h-100 p-2">
             <InfiniteScrollContainer
               items={notifications}
               setSize={setSize}

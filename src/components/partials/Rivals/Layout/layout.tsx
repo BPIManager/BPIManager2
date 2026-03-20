@@ -15,6 +15,7 @@ import { latestVersion } from "@/constants/latestVersion";
 import { ProfileProvider } from "@/contexts/profile/ProfileContext";
 import { FilterProvider } from "@/contexts/stats/FilterContext";
 import { Loader, LayoutDashboard, Music } from "lucide-react";
+import { AppTabsList, AppTabsTrigger } from "@/components/ui/complex/tabs";
 
 export const RivalProfileLayout = ({
   rivalUserId,
@@ -90,30 +91,26 @@ export const RivalProfileLayout = ({
 
               <div className="lg:col-span-3">
                 <Tabs value={currentTab} className="w-full">
-                  <TabsList className="mb-6 grid h-auto w-full grid-cols-2 rounded-xl border border-bpim-border bg-bpim-bg/50 p-1">
-                    <TabsTrigger
+                  <AppTabsList visual="card" cols={2} className="mb-6">
+                    <AppTabsTrigger
                       value="overview"
-                      asChild
-                      className="flex items-center gap-2 text-xs font-bold data-[state=active]:bg-bpim-primary data-[state=active]:text-bpim-text"
+                      visual="card"
+                      icon={LayoutDashboard}
+                      href={`/rivals/${rivalUserId}`}
+                      iconOnly
                     >
-                      <NextLink href={`/rivals/${rivalUserId}`}>
-                        <LayoutDashboard className="h-4 w-4" />
-                        サマリ
-                      </NextLink>
-                    </TabsTrigger>
-                    <TabsTrigger
+                      サマリ
+                    </AppTabsTrigger>
+                    <AppTabsTrigger
                       value="scores"
-                      asChild
-                      className="flex items-center gap-2 text-xs font-bold data-[state=active]:bg-bpim-primary data-[state=active]:text-bpim-text"
+                      visual="card"
+                      icon={Music}
+                      href={`/rivals/${rivalUserId}/scores/${version}?${scoreParams}`}
+                      iconOnly
                     >
-                      <NextLink
-                        href={`/rivals/${rivalUserId}/scores/${version}?${scoreParams}`}
-                      >
-                        <Music className="h-4 w-4" />
-                        スコア比較
-                      </NextLink>
-                    </TabsTrigger>
-                  </TabsList>
+                      スコア比較
+                    </AppTabsTrigger>
+                  </AppTabsList>
                   {children}
                 </Tabs>
               </div>
