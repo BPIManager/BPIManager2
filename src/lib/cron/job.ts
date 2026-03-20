@@ -7,13 +7,9 @@ import { generateUserSitemap } from "./sitemaps";
 
 const OUTPUT_DIR = path.join(process.cwd(), "public/data/metrics/arena");
 
-/**
- * 1日に1回および起動時に実行したい独自の処理
- */
 async function performDailyTask() {
   console.log("--- Executing Daily Task (Database sync, etc.) ---");
   try {
-    // ここに実行したいロジックを記述
     await generateUserSitemap();
     console.log("--- Daily Task completed successfully. ---");
   } catch (err) {
@@ -22,14 +18,7 @@ async function performDailyTask() {
 }
 
 export async function setupArenaService() {
-  // ==========================================
-  // 1. プロセス起動時の実行
-  // ==========================================
-
-  // 新規追加タスク
   performDailyTask();
-
-  // 既存の Arena 生成 (ファイルがない場合のみ)
   let isArenaMissing = false;
   try {
     const files = await fs.readdir(OUTPUT_DIR);
@@ -47,7 +36,6 @@ export async function setupArenaService() {
       );
   }
 
-  // 既存の Radar キャッシュ更新
   console.log("--- Initial Radar Cache update starting... ---");
   updateAllUserRadarCache()
     .then(() => console.log("--- Initial Radar Cache update success. ---"))
@@ -55,17 +43,11 @@ export async function setupArenaService() {
       console.error("--- Initial Radar Cache update failed! ---", err),
     );
 
-  // ==========================================
-  // 2. 定期実行（Cron）の登録
-  // ==========================================
-
-  // 新規追加タスク: 毎日 午前2:00 に実行
   cron.schedule("0 2 * * *", async () => {
     console.log("[Cron] Running Task: performDailyTask");
     await performDailyTask();
   });
 
-  // 既存: 毎日 午前4:00 に実行
   cron.schedule("0 4 * * *", async () => {
     console.log("[Cron] Running Task: generateArenaJson");
     try {
@@ -75,7 +57,6 @@ export async function setupArenaService() {
     }
   });
 
-  // 既存: 12時間ごとに実行
   cron.schedule("0 */12 * * *", async () => {
     console.log("[Cron] Running Task: updateAllUserRadarCache");
     try {

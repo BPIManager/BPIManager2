@@ -26,7 +26,7 @@ interface SongFilterBarProps {
   onOpenAdvancedFilter: () => void;
   totalCount: number;
   disableVersionSelect?: boolean;
-  withRivals?: boolean;
+  withRivals?: "full" | "score-only" | false;
 }
 
 export const SongFilterBar = ({
@@ -66,11 +66,10 @@ export const SongFilterBar = ({
   const currentStoreVersion = router.query.version;
 
   const combinedSortOptions = useMemo(() => {
-    const isRivalPage = router.pathname.includes("/rivals/");
-    return isRivalPage
+    return withRivals
       ? [...sortOptions, ...rivalSortOptions]
       : [...soleSortOptions, ...sortOptions];
-  }, [router.pathname]);
+  }, [withRivals]);
 
   return (
     <div
@@ -157,7 +156,7 @@ export const SongFilterBar = ({
         />
       </div>
 
-      {withRivals && (
+      {withRivals === "full" && (
         <div className="flex gap-6 flex-wrap mt-3 pt-3 border-t border-bpim-border">
           <div className="flex flex-col gap-1.5">
             <span className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">

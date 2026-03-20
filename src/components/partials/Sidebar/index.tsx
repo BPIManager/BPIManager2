@@ -63,7 +63,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
   ];
 
   const otherMenuItems = [
-    { label: "分析", icon: ChartArea, href: "/analytics", isComingSoon: true },
+    { label: "比較", icon: ChartArea, href: "/analytics" },
     { label: "メモ", icon: StickyNote, href: "/notes", isComingSoon: true },
     { label: "指標", icon: LandPlot, href: "/metrics" },
     { label: "設定", icon: Settings, href: "/settings" },

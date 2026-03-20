@@ -2,6 +2,7 @@ import fs from "fs/promises";
 import path from "path";
 import { latestVersion } from "@/constants/latestVersion";
 import { metricsRepo } from "@/lib/db/metrics";
+import { BpiCalculator } from "@/lib/bpi";
 
 const START_VERSION = 26;
 const LEVELS = [11, 12];
@@ -23,6 +24,11 @@ export async function generateArenaJson() {
     songs.map((s) => [`${s.title}[${s.difficulty}]`, s.notes]),
   );
 
+  const songDefs = await metricsRepo.getSongDefs();
+  const defMap = new Map(
+    songDefs.map((d) => [`${d.title}[${d.difficulty}]`, d]),
+  );
+
   await fs.mkdir(OUTPUT_DIR, { recursive: true });
 
   for (const v of versions) {
@@ -38,6 +44,17 @@ export async function generateArenaJson() {
         const avgExScore = Number(row.avgExScore);
         const rate = maxScore > 0 ? (avgExScore / maxScore) * 100 : 0;
 
+        const def = defMap.get(key);
+        const avgBpi =
+          def && notes > 0
+            ? BpiCalculator.calc(Math.round(avgExScore), {
+                notes: def.notes,
+                kaidenAvg: def.kaidenAvg,
+                wrScore: def.wrScore,
+                coef: def.coef,
+              })
+            : null;
+
         if (!acc[key]) {
           acc[key] = {
             title: row.title,
@@ -51,6 +68,7 @@ export async function generateArenaJson() {
           avgExScore: Math.round(avgExScore * 100) / 100,
           rate: parseFloat(rate.toFixed(2)),
           count: row.sampleSize,
+          ...(avgBpi !== null && { avgBpi: Math.round(avgBpi * 100) / 100 }),
         };
         return acc;
       }, {});

@@ -2,6 +2,22 @@ import { db } from "@/lib/db";
 import { sql } from "kysely";
 
 class MetricsRepository {
+  async getSongDefs() {
+    return await db
+      .selectFrom("songDef as sd")
+      .innerJoin("songs as s", "s.songId", "sd.songId")
+      .select([
+        "s.title",
+        "s.difficulty",
+        "s.notes",
+        "sd.kaidenAvg",
+        "sd.wrScore",
+        "sd.coef",
+      ])
+      .where("sd.isCurrent", "=", 1)
+      .execute();
+  }
+
   async getAllSongs() {
     return await db
       .selectFrom("songs")

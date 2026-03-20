@@ -425,6 +425,7 @@ class SocialRepository {
       },
     }));
   }
+  
 }
 
 export const socialRepo = new SocialRepository();

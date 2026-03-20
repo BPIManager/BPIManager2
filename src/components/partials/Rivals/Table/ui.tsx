@@ -17,13 +17,13 @@ const diffColors: Record<string, string> = {
 
 const SongInfo = ({ song }: { song: SongWithRival }) => (
   <div className="flex flex-col items-start gap-1 min-w-0 w-full">
-    <h3 className="text-sm font-bold text-bpim-text truncate leading-tight">
+    <h3 className="text-sm font-bold text-bpim-text truncate leading-tight w-full">
       {song.title}
     </h3>
     <div className="flex items-center gap-2">
       <div
         className={cn(
-          "w-8 h-[18px] flex items-center justify-center rounded-sm",
+          "w-8 h-4.5 flex items-center justify-center rounded-sm",
           diffColors[song.difficulty] || "bg-bpim-surface-2",
         )}
       >
@@ -172,9 +172,9 @@ export const RivalSongItem = ({
   return (
     <div
       onClick={onClick}
-      className="group relative w-full cursor-pointer border-b border-bpim-border bg-white/[0.02] transition-colors hover:bg-bpim-overlay/50"
+      className="group relative w-full cursor-pointer border-b border-bpim-border bg-white/2 transition-colors hover:bg-bpim-overlay/50"
     >
-      <div className="hidden lg:grid h-[68px] grid-cols-[1fr_140px_100px_140px] items-stretch">
+      <div className="hidden lg:grid h-17 grid-cols-[1fr_140px_100px_140px] items-stretch">
         <div className="flex items-center px-4 min-w-0">
           <SongInfo song={song} />
         </div>
