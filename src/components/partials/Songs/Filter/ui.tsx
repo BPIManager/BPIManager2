@@ -75,38 +75,36 @@ export const SongFilterBar = ({
   return (
     <div
       className={cn(
-        "p-4 border-b border-bpim-border transition-all duration-200 w-full",
+        "px-4 py-2 border-b border-bpim-border transition-all duration-200 w-full",
         isSticky ? "sticky top-0 z-50 bg-bpim-bg" : "relative bg-bpim-bg",
       )}
     >
-      <div className="flex flex-col sm:flex-row w-full gap-2 mb-3 items-center">
+      <div className="flex w-full gap-2 mb-3">
         {!disableVersionSelect && (
-          <div className="w-full sm:flex-1">
-            <FilterSelect
-              value={String(currentStoreVersion ?? latestVersion)}
-              onValueChange={(newVersion) => {
-                router.push({
-                  pathname: router.pathname,
-                  query: { ...router.query, version: newVersion },
-                });
-              }}
-              options={versionsNonDisabledCollection}
-              placeholder="Version"
-            />
-          </div>
-        )}
-        <div className="w-full sm:flex-1">
           <FilterSelect
-            value={params.sortKey || "bpi"}
-            onValueChange={(val) =>
-              onParamsChange({
-                sortKey: val as FilterParamsFrontend["sortKey"],
-              })
-            }
-            options={combinedSortOptions}
-            placeholder="Sort by"
+            value={String(currentStoreVersion ?? latestVersion)}
+            onValueChange={(newVersion) => {
+              router.push({
+                pathname: router.pathname,
+                query: { ...router.query, version: newVersion },
+              });
+            }}
+            options={versionsNonDisabledCollection}
+            placeholder="Version"
+            className="flex-1"
           />
-        </div>
+        )}
+        <FilterSelect
+          value={params.sortKey || "bpi"}
+          onValueChange={(val) =>
+            onParamsChange({
+              sortKey: val as FilterParamsFrontend["sortKey"],
+            })
+          }
+          options={combinedSortOptions}
+          placeholder="Sort by"
+          className="flex-1"
+        />
       </div>
 
       <div className="flex w-full gap-2 items-center mb-3">
@@ -129,7 +127,7 @@ export const SongFilterBar = ({
         <Button
           variant="outline"
           size="icon"
-          className="h-9 w-9 border-bpim-border hover:bg-bpim-overlay"
+          className="h-9 w-9 shrink-0 border-bpim-border hover:bg-bpim-overlay"
           onClick={onOpenAdvancedFilter}
         >
           <SlidersHorizontal size={18} />
@@ -193,10 +191,8 @@ export const SongFilterBar = ({
         </div>
       )}
 
-      <Separator className="bg-bpim-overlay/60 mt-3 mb-2" />
-
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-bold text-bpim-text">
+      <div className="flex items-center justify-between h-6 mt-2">
+        <span className="text-xs font-bold text-bpim-text leading-none">
           {totalCount.toLocaleString()}曲
         </span>
         <FilterStickyToggle isSticky={isSticky} onToggle={setIsSticky} />

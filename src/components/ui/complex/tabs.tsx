@@ -54,7 +54,7 @@ const appTabsTriggerVariants = cva(
   [
     "flex h-full items-center justify-center gap-2",
     "text-xs font-bold transition-all",
-    "data-[state=active]:shadow-lg",
+    "data-[state=active]:shadow-lg data-[state=active]:text-white",
   ],
   {
     variants: {
