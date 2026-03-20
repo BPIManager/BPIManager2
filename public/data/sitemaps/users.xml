@@ -111,6 +111,11 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://bpi2.poyashi.me/users/e6ZltMQIAfcq5WT7M4B7FUazg2f1</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://bpi2.poyashi.me/users/eZy54QRtcvhkotu7cfSbzkQOoYD3</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -862,11 +867,6 @@
   </url>
   <url>
     <loc>https://bpi2.poyashi.me/users/e6NFrUKO2pSnZb6HBeydcwP2iKq2</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  <url>
-    <loc>https://bpi2.poyashi.me/users/e6ZltMQIAfcq5WT7M4B7FUazg2f1</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -1652,6 +1652,11 @@
   </url>
   <url>
     <loc>https://bpi2.poyashi.me/users/S9gJaAQgE7NtYp7RtXh4FxtCvTJ3</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://bpi2.poyashi.me/users/sbOHAz3yUuSEiNOi8c17hoa4xp13</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>

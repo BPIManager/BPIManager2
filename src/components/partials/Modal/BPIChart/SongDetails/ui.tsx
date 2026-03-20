@@ -136,7 +136,7 @@ export const SongDetailView = ({
           <Tabs value={tab} onValueChange={setTab} className="w-full">
             <TabsList
               className={cn(
-                "mb-6 grid w-full grid-cols-3 rounded-xl p-1.5 h-12 items-stretch",
+                "grid w-full grid-cols-3 rounded-xl p-1.5 h-12 items-stretch",
                 "border",
               )}
             >
@@ -165,7 +165,7 @@ export const SongDetailView = ({
             <TabsContent value="stats" className="mt-0 outline-none">
               <BPIChart data={chartData} maxScore={maxScore} song={song} />
 
-              <div className="mt-6 rounded-xl border border-bpim-border bg-bpim-surface-2/60 p-4">
+              <div className="mt-4 rounded-xl border border-bpim-border bg-bpim-surface-2/60 p-4">
                 <div className="flex flex-col gap-3">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-bpim-muted uppercase">

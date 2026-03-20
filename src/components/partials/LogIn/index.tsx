@@ -2,51 +2,9 @@
 
 import { authActions } from "@/lib/firebase/auth";
 import { Button } from "@/components/ui/button";
+import { ChevronRightIcon } from "lucide-react";
+import Link from "next/link";
 
-export const LoginButtons = () => {
-  return (
-    <div className="my-4 flex w-full flex-col items-center gap-4 rounded-xl border border-bpim-border bg-bpim-surface-2/60 p-6">
-      <span className="text-[10px] font-bold tracking-wider text-bpim-muted uppercase">
-        ログインして開始
-      </span>
-
-      <div className="flex w-full flex-col -space-y-px">
-        <Button
-          variant="outline"
-          className="relative flex h-12 w-full items-center justify-center gap-3 rounded-b-none border-bpim-border bg-transparent transition-all hover:z-10 hover:bg-bpim-overlay/50 active:scale-[0.98]"
-          onClick={() => authActions.signInWithGoogle()}
-        >
-          <GoogleIcon className="h-4.5 w-4.5" />
-          <span className="text-sm font-bold text-bpim-text">
-            Googleでログイン
-          </span>
-        </Button>
-
-        <Button
-          variant="outline"
-          className="relative flex h-12 w-full items-center justify-center gap-3 rounded-none border-bpim-border bg-transparent transition-all hover:z-10 hover:bg-bpim-overlay/50 active:scale-[0.98]"
-          onClick={() => authActions.signInWithTwitter()}
-        >
-          <XIcon className="h-4.5 w-4.5" />
-          <span className="text-sm font-bold text-bpim-text">
-            X (Twitter) でログイン
-          </span>
-        </Button>
-
-        <Button
-          variant="outline"
-          className="relative flex h-12 w-full items-center justify-center gap-3 rounded-t-none border-bpim-border bg-transparent transition-all hover:z-10 hover:bg-bpim-overlay/50 active:scale-[0.98]"
-          onClick={() => authActions.signInWithLINE()}
-        >
-          <LineIcon className="h-4.5 w-4.5" />
-          <span className="text-sm font-bold text-bpim-text">
-            LINEでログイン
-          </span>
-        </Button>
-      </div>
-    </div>
-  );
-};
 
 const GoogleIcon = ({ className }: { className?: string }) => (
   <svg
@@ -86,3 +44,69 @@ export const XIcon = ({ className }: { className?: string }) => (
     <path d="M14.234 10.162 22.977 0h-2.072l-7.591 8.824L7.251 0H.258l9.168 13.343L.258 24H2.33l8.016-9.318L16.749 24h6.993zm-2.837 3.299-.929-1.329L3.076 1.56h3.182l5.965 8.532.929 1.329 7.754 11.09h-3.182z" />
   </svg>
 );
+
+
+const LOGIN_PROVIDERS = [
+  {
+    label: "Googleでログイン",
+    icon: GoogleIcon,
+    onClick: () => authActions.signInWithGoogle(),
+  },
+  {
+    label: "X (Twitter) でログイン",
+    icon: XIcon,
+    onClick: () => authActions.signInWithTwitter(),
+  },
+  {
+    label: "LINEでログイン",
+    icon: LineIcon,
+    onClick: () => authActions.signInWithLINE(),
+  },
+] as const;
+
+export const LoginButtons = () => {
+  return (
+    <div className="mx-auto w-full max-w-2xl overflow-hidden rounded-2xl border border-bpim-border bg-bpim-surface-2/40 backdrop-blur-sm">
+      <div className="flex flex-col items-center gap-6 p-8">
+        <header className="flex flex-col items-center gap-2">
+          <h2 className="text-sm font-medium text-bpim-text/80">
+            ログインして開始
+          </h2>
+        </header>
+
+        <div className="flex w-full flex-col -space-y-px shadow-sm">
+          {LOGIN_PROVIDERS.map((provider, index) => {
+            const Icon = provider.icon;
+            return (
+              <Button
+                key={index}
+                variant="outline"
+                onClick={provider.onClick}
+                className={`
+                  group relative flex h-13 w-full items-center justify-start gap-4 px-6 
+                  border-bpim-border bg-transparent transition-all duration-200
+                  hover:z-10 hover:bg-bpim-overlay/40
+                  active:scale-[0.98]
+                  ${index === 0 ? "rounded-t-xl rounded-b-none" : ""}
+                  ${index === LOGIN_PROVIDERS.length - 1 ? "rounded-b-xl rounded-t-none" : "rounded-none"}
+                `}
+              >
+                <Icon className="h-5 w-5 shrink-0 transition-transform group-hover:scale-110" />
+                <span className="flex-1 text-left text-sm font-semibold text-bpim-text">
+                  {provider.label}
+                </span>
+                <div className="opacity-0 transition-opacity group-hover:opacity-100">
+                  <ChevronRightIcon className="h-4 w-4 text-bpim-muted" />
+                </div>
+              </Button>
+            );
+          })}
+        </div>
+
+        <p className="px-4 text-center text-sm leading-relaxed text-bpim-muted">
+          続行することで、<Link target="_blank" className="underline" href="https://www.notion.so/BPIM2-3239989ca87a809f8058dc9736f0e197">利用規約・プライバシーポリシー・データポリシー</Link>に同意したものとみなされます。
+        </p>
+      </div>
+    </div>
+  );
+};

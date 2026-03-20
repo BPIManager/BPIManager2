@@ -32,29 +32,8 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <div className="mx-auto mb-12 max-w-md rounded-2xl border border-bpim-border bg-bpim-bg p-8 shadow-[0_0_40px_rgba(0,0,0,0.5),0_0_20px_rgba(59,130,246,0.1)]">
-            <div className="flex flex-col items-center gap-6 text-center">
-              <h2 className="text-xl font-bold">Sign In</h2>
-              <LoginButtons />
-              <div className="flex flex-col gap-2 text-[12px] leading-relaxed text-bpim-muted">
-                <p>
-                  本ツールは現在ベータ版提供です。
-                  <br />
-                  安定版としては{" "}
-                  <a
-                    href="https://bpi.poyashi.me"
-                    target="_blank"
-                    className="font-bold text-bpim-text underline decoration-white/20 underline-offset-4 transition-colors hover:text-bpim-primary hover:decoration-blue-400/50"
-                  >
-                    BPIM
-                  </a>{" "}
-                  をご利用ください。
-                </p>
-                <p className="text-[10px] opacity-60">
-                  (BPIM→BPIM2のデータ移行はいつでも可能です)
-                </p>
-              </div>
-            </div>
+          <div className="mx-auto mb-12 max-w-md">
+            <LoginButtons />  
           </div>
 
           <Separator className="mb-16 bg-bpim-overlay/60" />
@@ -91,7 +70,7 @@ export default function LoginPage() {
                   </div>
                   <Separator className="bg-bpim-surface-2/60" />
                   <p className="text-sm text-bpim-muted italic">
-                    なお、BPIM及びBPIM2では、従来固定値(1.5)だった譜面係数を、実際のプレイデータに基づくユーザー分布から動的に算出しています。
+                    BPIM及びBPIM2では、従来固定値(1.5)だった譜面係数を、実際のプレイデータに基づくユーザー分布から動的に算出しています。
                   </p>
                 </div>
               </div>
@@ -150,6 +129,6 @@ const FeatureCard = ({
       <Icon className="h-6 w-6" />
     </div>
     <h5 className="mb-2 text-base font-bold text-bpim-text">{title}</h5>
-    <p className="text-xs leading-relaxed text-bpim-muted">{description}</p>
+    <p className="leading-relaxed text-sm text-bpim-muted">{description}</p>
   </div>
 );
