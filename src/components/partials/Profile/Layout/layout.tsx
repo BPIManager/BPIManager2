@@ -90,7 +90,7 @@ export const UserProfileLayout = ({
 
               <div className="lg:col-span-3">
                 <Tabs value={currentTab} className="w-full">
-                  <TabsList className="mb-6 grid h-12 w-full grid-cols-2 items-stretch rounded-xl border border-bpim-border bg-bpim-card/50 p-1.5 md:grid-cols-4">
+                  <TabsList className="mb-8 grid h-12 w-full mx-auto grid-cols-4 items-stretch rounded-xl border border-bpim-border bg-bpim-card/50 shadow-inner">
                     <TabLinkItem
                       value="overview"
                       href={`/users/${userId}`}
@@ -145,7 +145,7 @@ const TabLinkItem = ({
   >
     <NextLink href={href}>
       {icon}
-      <span>{label}</span>
+      <span className="hidden md:inline text-xs font-bold tracking-tighter leading-none">{label}</span>
     </NextLink>
   </TabsTrigger>
 );
