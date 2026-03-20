@@ -90,7 +90,7 @@ export const UserProfileLayout = ({
 
               <div className="lg:col-span-3">
                 <Tabs value={currentTab} className="w-full">
-                  <AppTabsList visual="card" cols={4} className="mb-8 mx-auto">
+                  <AppTabsList visual="card" cols={4} className="mb-4 mx-auto">
                     {[
                       {
                         value: "overview",

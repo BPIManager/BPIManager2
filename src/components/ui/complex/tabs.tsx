@@ -39,12 +39,12 @@ export const AppTabsList = React.forwardRef<
 >(({ visual, cols, className, style, ...props }, ref) => (
   <TabsList
     ref={ref}
-    className={cn(
-      appTabsListVariants({ visual }),
-      cols && `grid-cols-${cols}`,
-      className,
-    )}
-    style={style}
+    className={cn(appTabsListVariants({ visual }), className)}
+    style={
+      cols
+        ? { gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, ...style }
+        : style
+    }
     {...props}
   />
 ));
@@ -115,7 +115,9 @@ export const AppTabsTrigger = React.forwardRef<
     const inner = (
       <>
         {Icon && <Icon className="h-4 w-4 shrink-0" />}
-        <span className={cn(iconOnly && "hidden sm:inline")}>{children}</span>
+        <span className={cn(iconOnly ? "hidden sm:inline" : undefined)}>
+          {children}
+        </span>
       </>
     );
 
