@@ -100,7 +100,7 @@ export const UserProfileLayout = ({
                       },
                       {
                         value: "songs",
-                        href: `/users/${userId}/scores/${latestVersion}?...`,
+                        href: `/users/${userId}/scores/${latestVersion}?${scoreParams}`,
                         label: "スコア",
                         icon: Music,
                       },
