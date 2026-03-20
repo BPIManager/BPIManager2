@@ -8,18 +8,31 @@ import {
   applyTheme,
   getStoredTheme,
 } from "@/hooks/common/useTheme";
-import { Palette, Check } from "lucide-react";
+import {
+  FONTS,
+  type FontId,
+  applyFont,
+  getStoredFont,
+} from "@/hooks/common/useFont";
+import { Palette, Type, Check } from "lucide-react";
 
 export default function ThemeSettingsUi() {
   const [current, setCurrent] = useState<ThemeId>("dark-blue");
+  const [currentFont, setCurrentFont] = useState<FontId>("default");
 
   useEffect(() => {
     setCurrent(getStoredTheme());
+    setCurrentFont(getStoredFont());
   }, []);
 
   const handleSelect = (id: ThemeId) => {
     setCurrent(id);
     applyTheme(id);
+  };
+
+  const handleFontSelect = (id: FontId) => {
+    setCurrentFont(id);
+    applyFont(id);
   };
 
   const darkStandard = THEMES.filter(
@@ -76,6 +89,29 @@ export default function ThemeSettingsUi() {
         current={current}
         onSelect={handleSelect}
       />
+
+      <div className="mt-2 border-t border-bpim-border pt-6 flex flex-col gap-4">
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2 text-bpim-primary">
+            <Type className="h-4 w-4" />
+            <span className="font-bold">フォント設定</span>
+          </div>
+          <p className="text-sm text-bpim-muted">
+            アプリ全体のフォントを選択します。設定はブラウザに保存されます。
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          {FONTS.map((font) => (
+            <FontCard
+              key={font.id}
+              font={font}
+              selected={currentFont === font.id}
+              onSelect={handleFontSelect}
+            />
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
@@ -174,6 +210,55 @@ function ThemeCard({
           </span>
         )}
       </div>
+    </button>
+  );
+}
+
+function FontCard({
+  font,
+  selected,
+  onSelect,
+}: {
+  font: (typeof FONTS)[number];
+  selected: boolean;
+  onSelect: (id: FontId) => void;
+}) {
+  return (
+    <button
+      onClick={() => onSelect(font.id)}
+      className={cn(
+        "flex items-center justify-between rounded-xl border-2 px-4 py-3 text-left",
+        "transition-all duration-200 hover:scale-[1.01]",
+        selected
+          ? "border-bpim-primary bg-bpim-surface shadow-[0_0_0_3px] shadow-bpim-primary/20"
+          : "border-bpim-border bg-bpim-surface hover:border-bpim-primary/50",
+      )}
+    >
+      <div className="flex flex-col gap-0.5">
+        <span
+          className="text-sm font-bold text-bpim-text"
+          style={
+            font.id !== "default" ? { fontFamily: font.cssFamily } : undefined
+          }
+        >
+          {font.label}
+        </span>
+        <span
+          className="text-xs text-bpim-muted"
+          style={
+            font.id !== "default" ? { fontFamily: font.cssFamily } : undefined
+          }
+        >
+          {font.id === "default"
+            ? "ABCabc あいうえお アイウエオ 漢字"
+            : "ABCabc あいうえお アイウエオ 漢字"}
+        </span>
+      </div>
+      {selected && (
+        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-bpim-primary">
+          <Check className="h-3 w-3 text-white" />
+        </span>
+      )}
     </button>
   );
 }
