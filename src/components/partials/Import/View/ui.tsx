@@ -94,9 +94,9 @@ export const ImportView = (props: Props) => (
                   <Trash2 className="mr-2 h-4 w-4" /> 入力をクリア
                 </Button>
                 <Button
-                  className="w-full bg-bpim-primary px-8 font-bold text-bpim-text hover:bg-bpim-primary sm:w-auto"
+                  className="w-full bg-bpim-primary px-8 font-bold text-white hover:bg-bpim-primary sm:w-auto"
                   size="lg"
-                  disabled={props.isProcessing || !props.csvData}
+                  disabled={props.isProcessing}
                   onClick={props.onStartImport}
                 >
                   {props.isProcessing ? (
