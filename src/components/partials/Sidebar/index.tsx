@@ -23,6 +23,7 @@ import {
   FileClock,
   ExternalLink,
   LayoutDashboard,
+  Mail,
 } from "lucide-react";
 
 import { useUser } from "@/contexts/users/UserContext";
@@ -94,6 +95,12 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
       href: "https://www.notion.so/BPIM2-3289989ca87a80d08bf7f916b97285e3",
       isExternal: true,
     },
+    {
+      label:"不具合・要望の報告",
+      icon:Mail,
+      href:"https://forms.gle/VfMJpFrKfSJqRYLA8",
+      isExternal:true,
+    }
   ];
 
   const renderMenuItem = (item: any, isNested = false) => {
