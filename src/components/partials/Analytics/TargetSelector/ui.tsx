@@ -22,6 +22,8 @@ import {
   ChevronRight,
   Check,
   AlertCircle,
+  History,
+  Star,
 } from "lucide-react";
 import { useUser } from "@/contexts/users/UserContext";
 import { useRivalSummary } from "@/hooks/social/useRivalSummary";
@@ -32,6 +34,7 @@ import {
 } from "@/hooks/analytics/useAnalyticsComparison";
 import { getBpiColorStyle } from "@/constants/bpiColor";
 import { formatIIDXId } from "@/utils/common/formatIidxId";
+import { versionTitles } from "@/constants/versions";
 
 const ARENA_RANKS = [
   { id: "A1", label: "A1" },
@@ -205,6 +208,49 @@ const ArenaRankStep = ({
   </div>
 );
 
+const PAST_VERSIONS = versionTitles
+  .filter((v) => v.num !== latestVersion)
+  .reverse();
+
+const SelfVersionPickStep = ({
+  selected,
+  onSelect,
+}: {
+  selected: string;
+  onSelect: (version: string, label: string) => void;
+}) => (
+  <div className="flex max-h-80 flex-col gap-2 overflow-y-auto pr-1">
+    {PAST_VERSIONS.length === 0 ? (
+      <div className="flex h-24 items-center justify-center text-sm text-bpim-muted">
+        比較できる過去バージョンがありません
+      </div>
+    ) : (
+      PAST_VERSIONS.map((v) => (
+        <button
+          key={v.num}
+          onClick={() => onSelect(v.num, v.title)}
+          className={cn(
+            "flex items-center justify-between rounded-xl border-2 px-4 py-3 text-left transition-all hover:scale-[1.01]",
+            selected === v.num
+              ? "border-bpim-primary bg-bpim-surface shadow-[0_0_0_3px] shadow-bpim-primary/20"
+              : "border-bpim-border bg-bpim-surface hover:border-bpim-primary/50",
+          )}
+        >
+          <div>
+            <span className="font-bold text-sm text-bpim-text">{v.title}</span>
+            <span className="ml-2 text-[10px] font-mono text-bpim-muted">
+              ver.{v.num}
+            </span>
+          </div>
+          {selected === v.num && (
+            <Check className="h-4 w-4 text-bpim-primary shrink-0" />
+          )}
+        </button>
+      ))
+    )}
+  </div>
+);
+
 interface TargetSelectorModalProps {
   isOpen: boolean;
   current: AnalyticsTarget | null;
@@ -212,7 +258,7 @@ interface TargetSelectorModalProps {
   onClose: () => void;
 }
 
-type Step = "kind" | "rival-pick" | "arena-rank";
+type Step = "kind" | "rival-pick" | "arena-rank" | "self-version-pick";
 
 const KIND_OPTIONS: {
   kind: AnalyticsTargetKind;
@@ -241,6 +287,27 @@ const KIND_OPTIONS: {
     label: "アリーナ平均",
     description: "指定したアリーナランク帯の平均スコアと比較します",
     nextStep: "arena-rank",
+  },
+  {
+    kind: "self-version",
+    icon: History,
+    label: "過去バージョン（自分）",
+    description: "自分の特定バージョンのスコアと比較します",
+    nextStep: "self-version-pick",
+  },
+  {
+    kind: "self-best",
+    icon: Star,
+    label: "自己歴代",
+    description: "今作を含む全バージョン中の自己最高スコアと比較します",
+    nextStep: "kind",
+  },
+  {
+    kind: "self-best-excl",
+    icon: Star,
+    label: "自己歴代（今作除く）",
+    description: "今作を除く全バージョン中の自己最高スコアと比較します",
+    nextStep: "kind",
   },
   {
     kind: "aaa",
@@ -279,6 +346,9 @@ export const TargetSelectorModal = ({
   const [selectedArenaRank, setSelectedArenaRank] = useState<string>(
     current?.kind === "arena" ? (current.param ?? "A1") : "A1",
   );
+  const [selectedSelfVersion, setSelectedSelfVersion] = useState<string>(
+    current?.kind === "self-version" ? (current.param ?? "") : "",
+  );
 
   useEffect(() => {
     if (isOpen) {
@@ -286,6 +356,9 @@ export const TargetSelectorModal = ({
       setSelectedKind(current?.kind ?? null);
       setSelectedArenaRank(
         current?.kind === "arena" ? (current.param ?? "A1") : "A1",
+      );
+      setSelectedSelfVersion(
+        current?.kind === "self-version" ? (current.param ?? "") : "",
       );
     }
   }, [isOpen, current]);
@@ -301,6 +374,10 @@ export const TargetSelectorModal = ({
     const labelMap: Record<string, string> = {
       "rival-avg": "ライバル平均",
       aaa: "AAA達成スコア",
+      "max-": "MAX-達成スコア",
+      wr: "WR達成スコア",
+      "self-best": "自己歴代",
+      "self-best-excl": "自己歴代（今作除く）",
     };
     onSelect({ kind: opt.kind, label: labelMap[opt.kind] ?? opt.label });
     onClose();
@@ -323,78 +400,113 @@ export const TargetSelectorModal = ({
     onClose();
   };
 
+  const handleSelfVersionPick = (versionNum: string, versionTitle: string) => {
+    setSelectedSelfVersion(versionNum);
+    onSelect({
+      kind: "self-version",
+      param: versionNum,
+      label: `${versionTitle}（自分）`,
+    });
+    onClose();
+  };
+
   const stepTitle: Record<Step, string> = {
     kind: "比較対象を選択",
     "rival-pick": "ライバルを選択",
     "arena-rank": "アリーナランクを選択",
+    "self-version-pick": "比較するバージョンを選択",
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-md border-bpim-border bg-bpim-bg sm:rounded-2xl">
-        <DialogHeader>
+      <DialogContent
+        placement="bottom-sheet"
+        disableScrollWrapper
+        className="flex flex-col p-0 overflow-hidden"
+      >
+        <DialogHeader className="border-b p-4 flex flex-row items-center justify-between space-y-0">
           <DialogTitle className="flex items-center gap-2 text-bpim-text">
             {stepTitle[step]}
           </DialogTitle>
         </DialogHeader>
+        <div className="flex min-h-0 flex-col overflow-y-auto p-2 custom-scrollbar">
+          <div className="mt-2 flex flex-col gap-3">
+            {step === "kind" && (
+              <>
+                {KIND_OPTIONS.map((opt) => (
+                  <KindCard
+                    key={opt.kind}
+                    icon={opt.icon}
+                    label={opt.label}
+                    description={opt.description}
+                    selected={selectedKind === opt.kind}
+                    onClick={() => handleKindClick(opt)}
+                  />
+                ))}
+              </>
+            )}
 
-        <div className="mt-2 flex flex-col gap-3">
-          {step === "kind" && (
-            <>
-              {KIND_OPTIONS.map((opt) => (
-                <KindCard
-                  key={opt.kind}
-                  icon={opt.icon}
-                  label={opt.label}
-                  description={opt.description}
-                  selected={selectedKind === opt.kind}
-                  onClick={() => handleKindClick(opt)}
+            {step === "rival-pick" && (
+              <>
+                <button
+                  onClick={() => setStep("kind")}
+                  className="self-start text-xs text-bpim-muted hover:text-bpim-text flex items-center gap-1"
+                >
+                  戻る
+                </button>
+                <RivalPickStep onSelect={handleRivalPick} />
+              </>
+            )}
+
+            {step === "arena-rank" && (
+              <>
+                <button
+                  onClick={() => setStep("kind")}
+                  className="self-start text-xs text-bpim-muted hover:text-bpim-text flex items-center gap-1"
+                >
+                  戻る
+                </button>
+                <ArenaRankStep
+                  selected={selectedArenaRank}
+                  onSelect={setSelectedArenaRank}
                 />
-              ))}
-            </>
-          )}
+                <div className="flex gap-3 rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-4">
+                  <AlertCircle className="h-5 w-5 shrink-0 text-yellow-500/80" />
+                  <p className="text-[11px] leading-relaxed text-bpim-muted">
+                    <strong className="block mb-0.5 text-yellow-500/90 font-bold">
+                      注意
+                    </strong>
+                    BPIMに登録・アリーナランクを申告したユーザー内における平均値のため、実際のアリーナ平均とは乖離があります。
+                  </p>
+                </div>
+                <Button
+                  onClick={handleArenaConfirm}
+                  className="mt-2 w-full bg-bpim-primary font-bold text-white hover:bg-bpim-primary/80"
+                >
+                  この設定で比較する
+                </Button>
+              </>
+            )}
 
-          {step === "rival-pick" && (
-            <>
-              <button
-                onClick={() => setStep("kind")}
-                className="self-start text-xs text-bpim-muted hover:text-bpim-text flex items-center gap-1"
-              >
-                戻る
-              </button>
-              <RivalPickStep onSelect={handleRivalPick} />
-            </>
-          )}
-
-          {step === "arena-rank" && (
-            <>
-              <button
-                onClick={() => setStep("kind")}
-                className="self-start text-xs text-bpim-muted hover:text-bpim-text flex items-center gap-1"
-              >
-                戻る
-              </button>
-              <ArenaRankStep
-                selected={selectedArenaRank}
-                onSelect={setSelectedArenaRank}
-              />
-              <div className="flex gap-3 rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-4">
-                <AlertCircle className="h-5 w-5 shrink-0 text-yellow-500/80" />
-                <p className="text-[11px] leading-relaxed text-bpim-muted">
-                  <strong className="block mb-0.5 text-yellow-500/90 font-bold">
-                    注意
-                  </strong>
-                  BPIMに登録・アリーナランクを申告したユーザー内における平均値のため、実際のアリーナ平均とは乖離があります。
+            {step === "self-version-pick" && (
+              <>
+                <button
+                  onClick={() => setStep("kind")}
+                  className="self-start text-xs text-bpim-muted hover:text-bpim-text flex items-center gap-1"
+                >
+                  戻る
+                </button>
+                <p className="text-xs text-bpim-muted">
+                  今作のスコアと比較したい過去バージョンを選択してください。
+                  スコアが存在しない楽曲は比較対象外になります。
                 </p>
-              </div>
-              <Button
-                onClick={handleArenaConfirm}
-                className="mt-2 w-full bg-bpim-primary font-bold text-white hover:bg-bpim-primary/80"
-              >
-                この設定で比較する
-              </Button>
-            </>
-          )}
+                <SelfVersionPickStep
+                  selected={selectedSelfVersion}
+                  onSelect={handleSelfVersionPick}
+                />
+              </>
+            )}
+          </div>
         </div>
       </DialogContent>
     </Dialog>

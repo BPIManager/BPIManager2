@@ -16,7 +16,10 @@ export type AnalyticsTargetKind =
   | "arena"
   | "aaa"
   | "max-"
-  | "wr";
+  | "wr"
+  | "self-version"
+  | "self-best"
+  | "self-best-excl";
 
 export interface AnalyticsTarget {
   kind: AnalyticsTargetKind;
@@ -62,6 +65,23 @@ interface RivalAvgRow {
   difficultyLevel: number;
   avgExScore: number | null;
   avgBpi: number | null;
+}
+
+/** best-ever API が返す行の型 */
+interface BestEverRow {
+  songId: number;
+  title: string;
+  difficulty: string;
+  difficultyLevel: number;
+  notes: number;
+  bpm: string | null;
+  releasedVersion: number | null;
+  bestExScore: number | null;
+  bestBpi: number | null;
+  bestVersion: string | null;
+  wrScore: number | null;
+  kaidenAvg: number | null;
+  coef: number | null;
 }
 
 function toBpiParams(s: SongWithScore): IBpiBasicSongData {
@@ -162,12 +182,47 @@ export const useAnalyticsComparison = (
     { revalidateOnFocus: false, dedupingInterval: 10000 },
   );
 
+  const {
+    data: selfVersionData,
+    error: selfVersionError,
+    isLoading: selfVersionLoading,
+  } = useSWR<SongWithRival[]>(
+    target?.kind === "self-version" && myUserId && target.param && fbUser
+      ? [
+          `${API_PREFIX}/users/${myUserId}/scores/self-version?currentVersion=${targetVersion}&targetVersion=${target.param}`,
+          fbUser,
+        ]
+      : null,
+    fetcher,
+    { revalidateOnFocus: false, dedupingInterval: 10000 },
+  );
+
+  const needsBestEver =
+    target?.kind === "self-best" || target?.kind === "self-best-excl";
+  const excludeCurrent = target?.kind === "self-best-excl";
+
+  const {
+    data: bestEverData,
+    error: bestEverError,
+    isLoading: bestEverLoading,
+  } = useSWR<BestEverRow[]>(
+    needsBestEver && myUserId && fbUser
+      ? [
+          `${API_PREFIX}/users/${myUserId}/scores/best-ever?currentVersion=${targetVersion}&excludeCurrent=${excludeCurrent}`,
+          fbUser,
+        ]
+      : null,
+    fetcher,
+    { revalidateOnFocus: false, dedupingInterval: 10000 },
+  );
+
   const needsMyScores =
     target?.kind === "arena" ||
     target?.kind === "aaa" ||
     target?.kind === "max-" ||
     target?.kind === "wr" ||
-    target?.kind === "rival-avg";
+    target?.kind === "rival-avg" ||
+    needsBestEver;
 
   const {
     data: myScores,
@@ -200,12 +255,7 @@ export const useAnalyticsComparison = (
   );
 
   if (!target) {
-    return {
-      songs: undefined,
-      isLoading: false,
-      error: undefined,
-      rivalLabel: "",
-    };
+    return { songs: undefined, isLoading: false, error: undefined, rivalLabel: "" };
   }
 
   if (target.kind === "rival") {
@@ -217,21 +267,47 @@ export const useAnalyticsComparison = (
     };
   }
 
-  if (myLoading || (target.kind === "arena" && arenaLoading)) {
+  if (target.kind === "self-version") {
     return {
-      songs: undefined,
-      isLoading: true,
-      error: undefined,
+      songs: selfVersionData,
+      isLoading: selfVersionLoading,
+      error: selfVersionError,
       rivalLabel: target.label,
     };
   }
-  if (!myScores) {
+
+  if (target.kind === "self-best" || target.kind === "self-best-excl") {
+    if (bestEverLoading || myLoading) {
+      return { songs: undefined, isLoading: true, error: undefined, rivalLabel: target.label };
+    }
+
+    const bestMap = new Map<string, BestEverRow>();
+    for (const row of bestEverData ?? []) {
+      bestMap.set(`${row.songId}__${row.difficulty}`, row);
+    }
+
+    const songs = (myScores ?? []).map((s) => {
+      const best = bestMap.get(`${s.songId}__${s.difficulty}`);
+      return mergeFixedTarget(
+        s,
+        best?.bestExScore ?? null,
+        best?.bestBpi ?? null,
+      );
+    });
+
     return {
-      songs: undefined,
+      songs,
       isLoading: false,
-      error: myError,
+      error: bestEverError ?? myError,
       rivalLabel: target.label,
     };
+  }
+
+  if (myLoading || (target.kind === "arena" && arenaLoading)) {
+    return { songs: undefined, isLoading: true, error: undefined, rivalLabel: target.label };
+  }
+  if (!myScores) {
+    return { songs: undefined, isLoading: false, error: myError, rivalLabel: target.label };
   }
 
   if (target.kind === "arena") {
@@ -251,29 +327,15 @@ export const useAnalyticsComparison = (
 
     const songs = myScores.map((s) => {
       const arena = arenaMap.get(`${s.title}__${s.difficulty}`) ?? null;
-      return mergeFixedTarget(
-        s,
-        arena?.avgExScore ?? null,
-        arena?.avgBpi ?? null,
-      );
+      return mergeFixedTarget(s, arena?.avgExScore ?? null, arena?.avgBpi ?? null);
     });
 
-    return {
-      songs,
-      isLoading: false,
-      error: undefined,
-      rivalLabel: target.label,
-    };
+    return { songs, isLoading: false, error: undefined, rivalLabel: target.label };
   }
 
   if (target.kind === "rival-avg") {
     if (rivalAvgLoading) {
-      return {
-        songs: undefined,
-        isLoading: true,
-        error: undefined,
-        rivalLabel: target.label,
-      };
+      return { songs: undefined, isLoading: true, error: undefined, rivalLabel: target.label };
     }
 
     const avgMap = new Map<string, RivalAvgRow>();
@@ -288,12 +350,7 @@ export const useAnalyticsComparison = (
       return mergeFixedTarget(s, avgEx, avgBpi);
     });
 
-    return {
-      songs,
-      isLoading: false,
-      error: rivalAvgError,
-      rivalLabel: target.label,
-    };
+    return { songs, isLoading: false, error: rivalAvgError, rivalLabel: target.label };
   }
 
   if (target.kind === "aaa" || target.kind === "max-" || target.kind === "wr") {
@@ -316,18 +373,8 @@ export const useAnalyticsComparison = (
       return mergeFixedTarget(s, targetEx, targetBpi);
     });
 
-    return {
-      songs,
-      isLoading: false,
-      error: undefined,
-      rivalLabel: target.label,
-    };
+    return { songs, isLoading: false, error: undefined, rivalLabel: target.label };
   }
 
-  return {
-    songs: undefined,
-    isLoading: false,
-    error: undefined,
-    rivalLabel: "",
-  };
+  return { songs: undefined, isLoading: false, error: undefined, rivalLabel: "" };
 };
