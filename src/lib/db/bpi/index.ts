@@ -7,7 +7,9 @@ class BpiRepository {
   async getSongMasterWithDef(): Promise<SongMaster> {
     const result = await db
       .selectFrom("songs as s")
-      .innerJoin("songDef as sd", "s.songId", "sd.songId")
+      .innerJoin("songDef as sd", (join) =>
+        join.onRef("sd.songId", "=", "s.songId").on("sd.isCurrent", "=", 1),
+      )
       .select([
         "s.songId",
         "s.title",
@@ -19,19 +21,8 @@ class BpiRepository {
         "sd.kaidenAvg",
         "sd.coef",
       ])
-      .where((eb) =>
-        eb.or([
-          eb("sd.isCurrent", "=", 1),
-          eb("sd.updatedAt", "=", (qb) =>
-            qb
-              .selectFrom("songDef")
-              .select(sql<Date>`MAX(updatedAt)`.as("max_date"))
-              .whereRef("songId", "=", "s.songId"),
-          ),
-        ]),
-      )
       .execute();
-    return result as unknown as SongMaster;
+    return result as SongMaster;
   }
 
   async getLatestScores(userId: string, version: string) {
