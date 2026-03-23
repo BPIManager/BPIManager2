@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { useMemo, useState } from "react";
-import { LineChart, LucideHistory, Users } from "lucide-react";
+import { LineChart, LucideHistory, Users, DatabaseSearch } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -18,12 +18,13 @@ import { getRankDetail } from "@/constants/djRank";
 import { SongHistoryTab } from "../History/ui";
 import RivalsRanking from "../Rivals";
 import { AppTabsList, AppTabsTrigger } from "@/components/ui/complex/tabs";
+import { DefinitionsTab } from "../Definitions/ui";
 
 interface SongDetailViewProps {
   song: SongWithScore | null;
   isOpen: boolean;
   onClose: () => void;
-  defaultTab?: "stats" | "history" | "rivals";
+  defaultTab?: "stats" | "history" | "rivals" | "definitions";
 }
 
 export const SongDetailView = ({
@@ -37,6 +38,7 @@ export const SongDetailView = ({
     { value: "stats", label: "Statistics", icon: LineChart },
     { value: "history", label: "History", icon: LucideHistory },
     { value: "rivals", label: "Rivals", icon: Users },
+    { value: "definitions", label: "Definitions", icon: DatabaseSearch },
   ];
 
   const chartData = useMemo(() => {
@@ -134,7 +136,7 @@ export const SongDetailView = ({
           </div>
 
           <Tabs value={tab} onValueChange={setTab} className="w-full">
-            <AppTabsList visual="card" cols={3}>
+            <AppTabsList visual="card" cols={4}>
               {tabs.map((t) => (
                 <AppTabsTrigger
                   key={t.value}
@@ -169,6 +171,14 @@ export const SongDetailView = ({
                       {song.kaidenAvg ?? 0}
                     </span>
                   </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-bpim-muted uppercase">
+                      Current Coef
+                    </span>
+                    <span className="font-mono text-sm font-black text-bpim-text">
+                      {song.coef ?? -1}
+                    </span>
+                  </div>
                   <Separator className="my-1 bg-bpim-border" />
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-bpim-muted uppercase">
@@ -196,6 +206,10 @@ export const SongDetailView = ({
 
             <TabsContent value="rivals" className="mt-0 outline-none">
               <RivalsRanking song={song} />
+            </TabsContent>
+
+            <TabsContent value="definitions" className="mt-0 outline-none">
+              <DefinitionsTab song={song} />
             </TabsContent>
           </Tabs>
         </div>
