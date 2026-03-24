@@ -6,7 +6,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { isImproved } from "@/lib/lamp";
 import { BpiCalculator } from "@/lib/bpi";
-import { NewScore } from "@/types/sql";
+import { NewScore, NewAllScores } from "@/types/sql";
 import { bpiRepo } from "@/lib/db/bpi";
 import dayjs from "@/lib/dayjs";
 
@@ -22,16 +22,20 @@ const handler = async (
   const batchId = uuidv4();
 
   try {
-    const [songMaster, existingScores, lastLog] = await Promise.all([
-      bpiRepo.getSongMasterWithDef(),
-      bpiRepo.getLatestScores(userId, version),
-      bpiRepo.getLatestTotalBpi(userId, version),
-    ]);
+    const [songMaster, existingBpiScores, existingAllScores, lastLog] =
+      await Promise.all([
+        bpiRepo.getSongMasterWithDef(),
+        bpiRepo.getLatestScores(userId, version),
+        bpiRepo.getLatestAllScores(userId, version),
+        bpiRepo.getLatestTotalBpi(userId, version),
+      ]);
 
-    const existingScoreMap = new Map(existingScores.map((s) => [s.songId, s]));
-    const scoreUpdates: any[] = [];
+    const bpiScoreMap = new Map(existingBpiScores.map((s) => [s.songId, s]));
+    const allScoreMap = new Map(existingAllScores.map((s) => [s.songId, s]));
+
+    const scoreUpdates: NewScore[] = [];
+    const allScoreUpdates: NewAllScores[] = [];
     const notFound: any[] = [];
-    const noImprovement: any[] = [];
     const previousTotalBpi = lastLog?.totalBpi ?? -15;
 
     for (const row of csvRows) {
@@ -43,55 +47,56 @@ const handler = async (
         continue;
       }
 
-      const current = existingScoreMap.get(song.songId);
+      const checkImprovement = (current: any) => {
+        const scoreBetter = row.exScore > (current?.exScore ?? 0);
+        const lampBetter = isImproved(
+          row.clearState,
+          current?.clearState ?? null,
+        );
+        const currentMiss = current?.missCount ?? Infinity;
+        const missBetter =
+          row.missCount !== null && row.missCount < currentMiss;
+        return scoreBetter || lampBetter || missBetter;
+      };
 
-      const scoreBetter = row.exScore > (current?.exScore ?? 0);
-      const lampBetter = isImproved(
-        row.clearState,
-        current?.clearState ?? null,
-      );
-      const currentMiss = current?.missCount;
-      const newMiss = row.missCount;
+      if (!row.exScore || row.exScore <= 0) continue;
 
-      const missBetter =
-        newMiss !== null &&
-        newMiss !== undefined &&
-        (currentMiss === null ||
-          currentMiss === undefined ||
-          newMiss < currentMiss);
+      const lastPlayedDate =
+        row.lastPlayed && dayjs(row.lastPlayed).isValid()
+          ? dayjs.tz(row.lastPlayed).utc().toDate()
+          : new Date();
 
-      if (scoreBetter || lampBetter || missBetter) {
-        const bpi = BpiCalculator.calc(row.exScore, song);
+      const baseUpdate = {
+        userId,
+        songId: song.songId,
+        definitionId: song.defId,
+        exScore: row.exScore,
+        bpi: BpiCalculator.calc(row.exScore, song),
+        clearState: row.clearState,
+        missCount: row.missCount ?? null,
+        lastPlayed: lastPlayedDate as any,
+        version,
+        batchId,
+      };
 
-        if (!row.exScore || row.exScore <= 0) continue;
-        scoreUpdates.push({
-          userId,
-          title: song.title,
-          songId: song.songId,
-          definitionId: song.defId,
-          exScore: row.exScore,
-          bpi: bpi,
-          clearState: row.clearState,
-          missCount: row.missCount ?? null,
-          lastPlayed:
-            row.lastPlayed && dayjs(row.lastPlayed).isValid()
-              ? dayjs.tz(row.lastPlayed).utc().toDate()
-              : null,
-          version,
-          batchId,
-        });
-      } else {
-        noImprovement.push({ title: song.title, difficulty: song.difficulty });
+      if (checkImprovement(allScoreMap.get(song.songId))) {
+        allScoreUpdates.push({ ...baseUpdate } as NewAllScores);
+      }
+
+      if (song.difficultyLevel && song.difficultyLevel >= 11) {
+        if (checkImprovement(bpiScoreMap.get(song.songId))) {
+          scoreUpdates.push({ ...baseUpdate } as NewScore);
+        }
       }
     }
+
     const twelves = songMaster.filter((s) => s.difficultyLevel === 12);
-    const updatedScoreMap = new Map(scoreUpdates.map((s) => [s.songId, s.bpi]));
+    const updatedBpiMap = new Map(scoreUpdates.map((s) => [s.songId, s.bpi]));
 
     const allBpisForTotal = twelves.map((song) => {
-      if (updatedScoreMap.has(song.songId)) {
-        return updatedScoreMap.get(song.songId)!;
-      }
-      return existingScoreMap.get(song.songId)?.bpi ?? -15;
+      if (updatedBpiMap.has(song.songId))
+        return updatedBpiMap.get(song.songId)!;
+      return bpiScoreMap.get(song.songId)?.bpi ?? -15;
     });
 
     const newTotalBpi = BpiCalculator.calculateTotalBPI(
@@ -99,57 +104,23 @@ const handler = async (
       twelves.length,
     );
 
-    if (scoreUpdates.length === 0) {
-      return res.status(200).json({
-        success: true,
-        batchId: null,
-        updatedCount: 0,
-        previousTotalBpi,
-        newTotalBpi: newTotalBpi,
-        message: "更新が必要な楽曲はありませんでした。",
-        details: {
-          updated: scoreUpdates.map((s) => ({
-            id: s.songId,
-            title: s.title,
-            diff: s.difficulty,
-          })),
-          notFound: notFound,
-          noImprovementCount: noImprovement.length,
-        },
-      });
-    }
-
-    const scoresToSave: NewScore[] = scoreUpdates.map(({ title, ...rest }) => ({
-      ...rest,
-      lastPlayed:
-        rest.lastPlayed instanceof Date
-          ? rest.lastPlayed.toISOString().slice(0, 19).replace("T", " ")
-          : rest.lastPlayed,
-    }));
-
     await bpiRepo.saveImportResults({
       userId,
       version,
       batchId,
-      scoreUpdates: scoresToSave,
+      scoreUpdates,
+      allScoreUpdates,
       newTotalBpi,
     });
 
     return res.status(200).json({
       success: true,
       batchId,
-      updatedCount: scoreUpdates.length,
+      updatedAllCount: allScoreUpdates.length,
+      updatedBpiCount: scoreUpdates.length,
       previousTotalBpi,
       newTotalBpi,
-      details: {
-        updated: scoreUpdates.map((s) => ({
-          id: s.songId,
-          title: s.title,
-          diff: s.difficulty,
-        })),
-        notFound: notFound,
-        noImprovementCount: noImprovement.length,
-      },
+      details: { notFound },
     });
   } catch (error: any) {
     console.error("Import Error:", error);

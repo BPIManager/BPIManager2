@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { SongMaster } from "@/types/songs/songMaster";
-import { Database, NewScore } from "@/types/sql";
-import { sql, Transaction } from "kysely";
+import { Database, NewAllScores, NewScore, NewTotalBPILog } from "@/types/sql";
+import { Transaction } from "kysely";
 
 class BpiRepository {
   async getSongMasterWithDef(): Promise<SongMaster> {
@@ -25,13 +25,17 @@ class BpiRepository {
     return result as SongMaster;
   }
 
-  async getLatestScores(userId: string, version: string) {
+  private async getLatestFromTable(
+    userId: string,
+    version: string,
+    tableName: "scores" | "allScores",
+  ) {
     return await db
-      .selectFrom("scores as s")
+      .selectFrom(tableName as any)
       .innerJoin(
         (qb) =>
           qb
-            .selectFrom("scores")
+            .selectFrom(tableName as any)
             .select([
               "songId as l_songId",
               (eb) => eb.fn.max("logId").as("maxLogId"),
@@ -40,10 +44,19 @@ class BpiRepository {
             .where("version", "=", version)
             .groupBy("songId")
             .as("latest"),
-        (join) => join.onRef("latest.maxLogId", "=", "s.logId"),
+        (join) =>
+          join.onRef("latest.maxLogId", "=", `${tableName}.logId` as any),
       )
-      .selectAll("s")
+      .selectAll(tableName as any)
       .execute();
+  }
+
+  async getLatestScores(userId: string, version: string) {
+    return await this.getLatestFromTable(userId, version, "scores");
+  }
+
+  async getLatestAllScores(userId: string, version: string) {
+    return await this.getLatestFromTable(userId, version, "allScores");
   }
 
   /**
@@ -65,10 +78,12 @@ class BpiRepository {
     version: string;
     batchId: string;
     scoreUpdates: NewScore[];
+    allScoreUpdates: NewAllScores[];
     newTotalBpi: number;
   }) {
     return await db.transaction().execute(async (trx) => {
-      await this.executeSave(trx, params);
+      await this.executeSaveBpiSystem(trx, params);
+      await this.executeSaveAllLevelHistory(trx, params);
     });
   }
 
@@ -77,8 +92,8 @@ class BpiRepository {
    */
   async importFromBPIM(params: {
     userId: string;
-    scoreUpdates: any[];
-    statusLogs: any[];
+    scoreUpdates: NewScore[];
+    statusLogs: NewTotalBPILog[];
     finalTotalBpi: number;
   }) {
     return await db.transaction().execute(async (trx) => {
@@ -118,7 +133,7 @@ class BpiRepository {
   /**
    * 共通保存ロジック
    */
-  private async executeSave(
+  private async executeSaveBpiSystem(
     trx: Transaction<Database>,
     params: {
       userId: string;
@@ -161,6 +176,21 @@ class BpiRepository {
 
     if (params.scoreUpdates.length > 0) {
       await trx.insertInto("scores").values(params.scoreUpdates).execute();
+    }
+  }
+
+  private async executeSaveAllLevelHistory(
+    trx: Transaction<Database>,
+    params: { allScoreUpdates: NewAllScores[] },
+  ) {
+    if (params.allScoreUpdates.length === 0) return;
+
+    const chunks = [];
+    for (let i = 0; i < params.allScoreUpdates.length; i += 1000) {
+      chunks.push(params.allScoreUpdates.slice(i, i + 1000));
+    }
+    for (const chunk of chunks) {
+      await trx.insertInto("allScores").values(chunk).execute();
     }
   }
 }

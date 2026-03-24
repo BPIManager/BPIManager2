@@ -16,6 +16,8 @@ export interface Database {
   follows: Follows;
   userRadarCache: UserRadarCache;
   notifications: Notifications;
+  allSongs: AllSongsTable;
+  allScores: AllScoresTable;
   // 追加: 暫定/バックアップ用テーブル
   bkScores: BkScores;
   bkUsers: BkUsers;
@@ -158,6 +160,34 @@ export interface UserStatusLogs {
   version: string;
 }
 
+export interface AllSongsTable {
+  songId: Generated<number>;
+  title: string;
+  notes: number;
+  bpm: string;
+  difficulty: "BEGINNER" | "NORMAL" | "HYPER" | "ANOTHER" | "LEGGENDARIA";
+  difficultyLevel: number;
+  textage: string;
+  createdAt: Generated<Date>;
+  deletedAt: string | null;
+  releasedVersion: number | null;
+}
+
+export interface AllScoresTable {
+  logId: Generated<number>;
+  userId: string;
+  songId: number;
+  definitionId: number;
+  exScore: number;
+  bpi: number | null;
+  clearState: string | null;
+  missCount: number | null;
+  createdAt: Generated<Date>;
+  lastPlayed: Generated<Date>;
+  version: string;
+  batchId: string | null;
+}
+
 export type UserStatusLog = Selectable<UserStatusLogs>;
 export type NewUserStatusLog = Insertable<UserStatusLogs>;
 export type TotalBPILog = Selectable<Logs>;
@@ -176,3 +206,9 @@ export type NewScore = Insertable<Scores>;
 export type Notification = Selectable<Notifications>;
 export type NewNotification = Insertable<Notifications>;
 export type NotificationUpdate = Updateable<Notifications>;
+export type AllSongs = Selectable<AllSongsTable>;
+export type NewAllSongs = Insertable<AllSongsTable>;
+export type AllSongsUpdate = Updateable<AllSongsTable>;
+export type AllScores = Selectable<AllScoresTable>;
+export type NewAllScores = Insertable<AllScoresTable>;
+export type AllScoresUpdate = Updateable<AllScoresTable>;
