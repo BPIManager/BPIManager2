@@ -28,6 +28,7 @@ export class BpiImportService {
         return "NO PLAY";
     }
   };
+
   async saveMultipleFirestoreData(
     userId: string,
     payloads: { version: string; data: any }[],
@@ -55,7 +56,10 @@ export class BpiImportService {
       });
 
       for (const item of scoresHistory) {
-        const dateKey = item.updatedAt.substring(0, 10);
+        const d = dayjs(item.updatedAt);
+        if (!d.isValid()) continue;
+        const dateKey = d.format("YYYY-MM-DD");
+
         const songKey = `${item.title}_${item.difficulty.toLowerCase()}`;
 
         if (!dailyGroups.has(dateKey)) {
