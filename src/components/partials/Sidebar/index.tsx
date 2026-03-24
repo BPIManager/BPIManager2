@@ -344,6 +344,12 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
 
         {otherMenuItems.map((item) => renderMenuItem(item))}
 
+        {renderMenuItem({
+          label: "全曲（☆10以下含む）",
+          icon: ListIcon,
+          href: `/my/all/${latestVersion}`,
+        })}
+
         <Collapsible
           open={isInfoOpen}
           onOpenChange={setIsInfoOpen}

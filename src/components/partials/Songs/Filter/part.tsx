@@ -68,7 +68,7 @@ export const FilterCheckboxGroup = <T extends string | number>({
     <span className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
       {label}
     </span>
-    <div className="flex flex-row items-center gap-4">
+    <div className="flex flex-row flex-wrap items-center gap-4">
       {items.map((item) => {
         const id = `filter-${label}-${item}`;
         return (

@@ -25,6 +25,21 @@ class BpiRepository {
     return result as SongMaster;
   }
 
+  async getAllLevelMaster(): Promise<any[]> {
+    return await db
+      .selectFrom("allSongs")
+      .select([
+        "songId",
+        "title",
+        "notes",
+        "difficulty",
+        "difficultyLevel",
+        "bpm",
+        "textage",
+      ])
+      .execute();
+  }
+
   private async getLatestFromTable(
     userId: string,
     version: string,

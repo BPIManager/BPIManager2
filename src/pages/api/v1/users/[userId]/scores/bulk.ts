@@ -22,13 +22,26 @@ const handler = async (
   const batchId = uuidv4();
 
   try {
-    const [songMaster, existingBpiScores, existingAllScores, lastLog] =
-      await Promise.all([
-        bpiRepo.getSongMasterWithDef(),
-        bpiRepo.getLatestScores(userId, version),
-        bpiRepo.getLatestAllScores(userId, version),
-        bpiRepo.getLatestTotalBpi(userId, version),
-      ]);
+    const [
+      bpiSongMaster,
+      allLevelMaster,
+      existingBpiScores,
+      existingAllScores,
+      lastLog,
+    ] = await Promise.all([
+      bpiRepo.getSongMasterWithDef(),
+      bpiRepo.getAllLevelMaster(),
+      bpiRepo.getLatestScores(userId, version),
+      bpiRepo.getLatestAllScores(userId, version),
+      bpiRepo.getLatestTotalBpi(userId, version),
+    ]);
+
+    const bpiMasterMap = new Map(
+      bpiSongMaster.map((s) => [`${s.title}_${s.difficulty}`, s]),
+    );
+    const allMasterMap = new Map(
+      allLevelMaster.map((s) => [`${s.title}_${s.difficulty}`, s]),
+    );
 
     const bpiScoreMap = new Map(existingBpiScores.map((s) => [s.songId, s]));
     const allScoreMap = new Map(existingAllScores.map((s) => [s.songId, s]));
@@ -38,59 +51,77 @@ const handler = async (
     const notFound: any[] = [];
     const previousTotalBpi = lastLog?.totalBpi ?? -15;
 
-    for (const row of csvRows) {
-      const song = songMaster.find(
-        (s) => s.title === row.title && s.difficulty === row.difficulty,
+    const checkImprovement = (row: any, current: any) => {
+      if (!row.exScore || row.exScore <= 0) return false;
+      const scoreBetter = row.exScore > (current?.exScore ?? 0);
+      const lampBetter = isImproved(
+        row.clearState,
+        current?.clearState ?? null,
       );
+      const currentMiss = current?.missCount ?? Infinity;
+      const missBetter = row.missCount !== null && row.missCount < currentMiss;
+      return scoreBetter || lampBetter || missBetter;
+    };
+
+    const lastPlayedDate = (dateStr: string) =>
+      dateStr && dayjs(dateStr).isValid()
+        ? dayjs.tz(dateStr).utc().toDate()
+        : new Date();
+
+    //全データ
+    for (const row of csvRows) {
+      const song = allMasterMap.get(`${row.title}_${row.difficulty}`);
+
       if (!song) {
         notFound.push({ title: row.title, difficulty: row.difficulty });
         continue;
       }
 
-      const checkImprovement = (current: any) => {
-        const scoreBetter = row.exScore > (current?.exScore ?? 0);
-        const lampBetter = isImproved(
-          row.clearState,
-          current?.clearState ?? null,
-        );
-        const currentMiss = current?.missCount ?? Infinity;
-        const missBetter =
-          row.missCount !== null && row.missCount < currentMiss;
-        return scoreBetter || lampBetter || missBetter;
-      };
+      const current = allScoreMap.get(song.songId);
+      if (checkImprovement(row, current)) {
+        const bpiTarget = bpiMasterMap.get(`${row.title}_${row.difficulty}`);
+        const bpiValue = bpiTarget
+          ? BpiCalculator.calc(row.exScore, bpiTarget)
+          : null;
 
-      if (!row.exScore || row.exScore <= 0) continue;
-
-      const lastPlayedDate =
-        row.lastPlayed && dayjs(row.lastPlayed).isValid()
-          ? dayjs.tz(row.lastPlayed).utc().toDate()
-          : new Date();
-
-      const baseUpdate = {
-        userId,
-        songId: song.songId,
-        definitionId: song.defId,
-        exScore: row.exScore,
-        bpi: BpiCalculator.calc(row.exScore, song),
-        clearState: row.clearState,
-        missCount: row.missCount ?? null,
-        lastPlayed: lastPlayedDate as any,
-        version,
-        batchId,
-      };
-
-      if (checkImprovement(allScoreMap.get(song.songId))) {
-        allScoreUpdates.push({ ...baseUpdate } as NewAllScores);
-      }
-
-      if (song.difficultyLevel && song.difficultyLevel >= 11) {
-        if (checkImprovement(bpiScoreMap.get(song.songId))) {
-          scoreUpdates.push({ ...baseUpdate } as NewScore);
-        }
+        allScoreUpdates.push({
+          userId,
+          songId: song.songId,
+          definitionId: song.defId || null,
+          exScore: row.exScore,
+          bpi: bpiValue,
+          clearState: row.clearState,
+          missCount: row.missCount ?? null,
+          lastPlayed: lastPlayedDate(row.lastPlayed) as any,
+          version,
+          batchId,
+        } as NewAllScores);
       }
     }
 
-    const twelves = songMaster.filter((s) => s.difficultyLevel === 12);
+    // 11,12のみ
+    for (const row of csvRows) {
+      const song = bpiMasterMap.get(`${row.title}_${row.difficulty}`);
+      if (!song) continue;
+
+      const current = bpiScoreMap.get(song.songId);
+      if (checkImprovement(row, current)) {
+        scoreUpdates.push({
+          userId,
+          songId: song.songId,
+          definitionId: song.defId,
+          exScore: row.exScore,
+          bpi: BpiCalculator.calc(row.exScore, song),
+          clearState: row.clearState,
+          missCount: row.missCount ?? null,
+          lastPlayed: lastPlayedDate(row.lastPlayed) as any,
+          version,
+          batchId,
+        } as NewScore);
+      }
+    }
+
+    const twelves = bpiSongMaster.filter((s) => s.difficultyLevel === 12);
     const updatedBpiMap = new Map(scoreUpdates.map((s) => [s.songId, s.bpi]));
 
     const allBpisForTotal = twelves.map((song) => {
