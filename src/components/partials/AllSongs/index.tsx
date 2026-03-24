@@ -54,6 +54,11 @@ const sortLocal = (
         const bt = b.lastPlayed ? new Date(b.lastPlayed).getTime() : 0;
         return (at - bt) * order;
       }
+      case "scoreRate": {
+        const at = ((a.exScore ?? 0) / a.notes) * 2;
+        const bt = ((b.exScore ?? 0) / b.notes) * 2;
+        return (at - bt) * order;
+      }
       case "level":
       default:
         return (

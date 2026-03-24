@@ -16,6 +16,7 @@ const SORT_OPTIONS = [
   { label: "レベル", value: "level" },
   { label: "タイトル", value: "title" },
   { label: "EXスコア", value: "exScore" },
+  { label: "スコアレート", value: "scoreRate" },
   { label: "最終プレイ", value: "updatedAt" },
 ];
 const SORT_ORDER_OPTIONS = [

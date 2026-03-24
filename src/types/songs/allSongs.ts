@@ -26,6 +26,12 @@ export interface AllScoreFilterParams {
   levels?: number[];
   difficulties?: AllDifficulties[];
   clearStates?: string[];
-  sortKey?: "title" | "level" | "exScore" | "updatedAt" | "clearState";
+  sortKey?:
+    | "title"
+    | "level"
+    | "exScore"
+    | "updatedAt"
+    | "clearState"
+    | "scoreRate";
   sortOrder?: "asc" | "desc";
 }
