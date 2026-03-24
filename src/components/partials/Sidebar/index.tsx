@@ -59,6 +59,11 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
     { label: "比較", icon: ChartArea, href: "/analytics" },
     { label: "メモ", icon: StickyNote, href: "/notes", isComingSoon: true },
     { label: "指標", icon: LandPlot, href: "/metrics" },
+    {
+      label: "全曲（☆10以下含む）",
+      icon: ListIcon,
+      href: `/my/all/${latestVersion}`,
+    },
     { label: "設定", icon: Settings, href: "/settings" },
   ];
 
@@ -343,12 +348,6 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
         </Collapsible>
 
         {otherMenuItems.map((item) => renderMenuItem(item))}
-
-        {renderMenuItem({
-          label: "全曲（☆10以下含む）",
-          icon: ListIcon,
-          href: `/my/all/${latestVersion}`,
-        })}
 
         <Collapsible
           open={isInfoOpen}
