@@ -24,6 +24,8 @@ import {
   ExternalLink,
   LayoutDashboard,
   Mail,
+  CircleCheck,
+  CircleDashed,
 } from "lucide-react";
 
 import { useUser } from "@/contexts/users/UserContext";
@@ -45,17 +47,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
   const router = useRouter();
   const [isRivalOpen, setIsRivalOpen] = useState<boolean>(true);
   const [isInfoOpen, setIsInfoOpen] = useState<boolean>(true);
-
-  const mainMenuItems = [
-    { label: "ダッシュボード", icon: LayoutDashboard, href: "/" },
-    { label: "インポート", icon: FileUp, href: "/import" },
-    { label: "スコア一覧", icon: ListIcon, href: "/my" },
-    {
-      label: "スコア更新ログ",
-      icon: ScrollText,
-      href: `/users/${user?.userId}/logs/${latestVersion}`,
-    },
-  ];
+  const [isScoreOpen, setIsScoreOpen] = useState<boolean>(true);
 
   const rivalMenuItems = [
     { label: "ライバル一覧", icon: UsersIcon, href: "/rivals", exact: true },
@@ -96,11 +88,11 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
       isExternal: true,
     },
     {
-      label:"不具合・要望の報告",
-      icon:Mail,
-      href:"https://forms.gle/VfMJpFrKfSJqRYLA8",
-      isExternal:true,
-    }
+      label: "不具合・要望の報告",
+      icon: Mail,
+      href: "https://forms.gle/VfMJpFrKfSJqRYLA8",
+      isExternal: true,
+    },
   ];
 
   const renderMenuItem = (item: any, isNested = false) => {
@@ -156,6 +148,59 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
       </Button>
     );
   };
+
+  const renderScoreSubItem = (item: {
+    label: string;
+    icon: any;
+    href: string;
+  }) => {
+    const isActive =
+      router.asPath === item.href ||
+      router.asPath.startsWith(item.href + "/") ||
+      router.asPath.startsWith(item.href + "?");
+
+    return (
+      <Button
+        key={item.href}
+        asChild
+        variant={isActive ? "secondary" : "ghost"}
+        size="sm"
+        className={cn(
+          "w-full justify-start pl-9 transition-all",
+          isActive
+            ? "bg-bpim-overlay/60 font-bold"
+            : "font-medium text-bpim-text",
+        )}
+        onClick={onClose}
+      >
+        <Link href={item.href}>
+          <div className="flex w-full items-center gap-3">
+            <item.icon className="h-4 w-4" />
+            <span className="flex-1 text-left">{item.label}</span>
+          </div>
+        </Link>
+      </Button>
+    );
+  };
+
+  const scoreSubItems = [
+    {
+      label: "プレイ済み",
+      icon: CircleCheck,
+      href: `/my/${latestVersion}?levels=12%2C11&difficulties=LEGGENDARIA%2CHYPER%2CANOTHER`,
+    },
+    {
+      label: "未プレイ",
+      icon: CircleDashed,
+      href: `/my/unplayed/${latestVersion}?levels=12%2C11&difficulties=LEGGENDARIA%2CHYPER%2CANOTHER`,
+    },
+  ];
+
+  const isScoreActive =
+    router.asPath.startsWith("/my/") &&
+    !router.asPath.startsWith("/my/unplayed");
+  const isUnplayedActive = router.asPath.startsWith("/my/unplayed");
+  const isAnyScoreActive = isScoreActive || isUnplayedActive;
 
   return (
     <div className="flex h-full flex-col gap-6 p-4 overflow-y-auto scrollbar-hide">
@@ -234,7 +279,44 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
       </div>
 
       <nav className="flex flex-col gap-1 flex-1">
-        {mainMenuItems.map((item) => renderMenuItem(item))}
+        {renderMenuItem({
+          label: "ダッシュボード",
+          icon: LayoutDashboard,
+          href: "/",
+        })}
+        {renderMenuItem({ label: "インポート", icon: FileUp, href: "/import" })}
+
+        <Collapsible
+          open={isScoreOpen}
+          onOpenChange={setIsScoreOpen}
+          className="w-full"
+        >
+          <CollapsibleTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start gap-3 px-3 text-bpim-muted hover:bg-bpim-overlay/50 hover:text-bpim-text data-[state=open]:bg-transparent"
+            >
+              {isInfoOpen ? (
+                <ChevronDown className="h-4.5 w-4.5" />
+              ) : (
+                <ChevronRight className="h-4.5 w-4.5" />
+              )}
+              <span className="text-xs font-bold tracking-wider">
+                スコア一覧
+              </span>
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="flex flex-col gap-1 mt-1">
+            {scoreSubItems.map((item) => renderScoreSubItem(item))}
+          </CollapsibleContent>
+        </Collapsible>
+
+        {renderMenuItem({
+          label: "スコア更新ログ",
+          icon: ScrollText,
+          href: `/users/${user?.userId}/logs/${latestVersion}`,
+        })}
 
         <Collapsible
           open={isRivalOpen}

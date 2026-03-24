@@ -5,12 +5,11 @@ import { useRouter } from "next/router";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Separator } from "@/components/ui/separator";
-
 import {
   rivalSortOptions,
   soleSortOptions,
   sortOptions,
+  sortOrderOptions,
 } from "@/constants/sort";
 import { FilterParamsFrontend } from "@/types/songs/withScore";
 import { versionsNonDisabledCollection } from "@/constants/versions";
@@ -27,6 +26,8 @@ interface SongFilterBarProps {
   totalCount: number;
   disableVersionSelect?: boolean;
   withRivals?: "full" | "score-only" | false;
+  withSelfCompare?: boolean;
+  currentVersion?: string;
 }
 
 export const SongFilterBar = ({
@@ -36,6 +37,8 @@ export const SongFilterBar = ({
   totalCount,
   disableVersionSelect,
   withRivals,
+  withSelfCompare = false,
+  currentVersion,
 }: SongFilterBarProps) => {
   const router = useRouter();
   const [isSticky, setIsSticky] = useState(true);
@@ -65,20 +68,33 @@ export const SongFilterBar = ({
 
   const currentStoreVersion = router.query.version;
 
+  const compareVersionOptions = useMemo(() => {
+    const base = versionsNonDisabledCollection.filter(
+      (v) =>
+        v.value !==
+        (currentVersion ?? String(currentStoreVersion ?? latestVersion)),
+    );
+    return [{ label: "比較なし", value: "none" }, ...base];
+  }, [currentVersion, currentStoreVersion]);
+
+  const hasCompare = params.compareVersion && params.compareVersion !== "none";
+
   const combinedSortOptions = useMemo(() => {
-    return withRivals
+    const base = withRivals
       ? [...sortOptions, ...rivalSortOptions]
       : [...soleSortOptions, ...sortOptions];
-  }, [withRivals]);
+    if (hasCompare) return [...base];
+    return base;
+  }, [withRivals, hasCompare]);
 
   return (
     <div
       className={cn(
-        "px-4 py-2 border-b border-bpim-border transition-all duration-200 w-full",
+        "px-4 pt-4 pb-2 border-b border-bpim-border transition-all duration-200 w-full",
         isSticky ? "sticky top-0 z-50 bg-bpim-bg" : "relative bg-bpim-bg",
       )}
     >
-      <div className="flex w-full gap-2 mb-3">
+      <div className="flex w-full gap-2 mb-3 flex-wrap">
         {!disableVersionSelect && (
           <FilterSelect
             value={String(currentStoreVersion ?? latestVersion)}
@@ -90,7 +106,7 @@ export const SongFilterBar = ({
             }}
             options={versionsNonDisabledCollection}
             placeholder="Version"
-            className="flex-1"
+            className="flex-1 min-w-[110px]"
           />
         )}
         <FilterSelect
@@ -101,19 +117,27 @@ export const SongFilterBar = ({
             })
           }
           options={combinedSortOptions}
-          placeholder="Sort by"
-          className="flex-1"
+          placeholder="ソート"
+          className="flex-1 min-w-[110px]"
+        />
+        <FilterSelect
+          value={params.sortOrder || "desc"}
+          onValueChange={(val) =>
+            onParamsChange({ sortOrder: val as "asc" | "desc" })
+          }
+          options={sortOrderOptions}
+          placeholder="順序"
+          className="w-[90px] shrink-0"
         />
       </div>
-
       <div className="flex w-full gap-2 items-center mb-3">
-        <div className="relative flex-1">
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-bpim-muted">
+        <div className="relative flex-1 h-9">
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-bpim-muted pointer-events-none">
             <Search size={16} />
           </div>
           <Input
             placeholder="曲名で検索..."
-            className="h-9 pl-10 pr-10 border-bpim-border bg-bpim-surface-2/60 focus-visible:ring-gray-500 text-sm"
+            className="h-9 pl-10 pr-10 border-bpim-border bg-bpim-surface-2/60 text-xs focus-visible:ring-gray-500"
             value={localSearch}
             onChange={(e) => setLocalSearch(e.target.value)}
           />
@@ -123,6 +147,22 @@ export const SongFilterBar = ({
             </div>
           )}
         </div>
+
+        {withSelfCompare && (
+          <div className="relative flex-1 h-9">
+            <FilterSelect
+              value={params.compareVersion || ""}
+              onValueChange={(val) =>
+                onParamsChange({
+                  compareVersion: val === "none" ? undefined : val,
+                })
+              }
+              options={compareVersionOptions}
+              placeholder="比較表示"
+              className="h-9"
+            />
+          </div>
+        )}
         <Button
           variant="outline"
           size="icon"

@@ -50,6 +50,10 @@ export const sortSongs = (
         vA = getRate(a.exScore, a.notes);
         vB = getRate(b.exScore, b.notes);
         break;
+      case "exScore":
+        vA = a.exScore ?? -1;
+        vB = b.exScore ?? -1;
+        break;
       case "winGapAsc":
       case "winGapDesc":
       case "loseGapAsc":

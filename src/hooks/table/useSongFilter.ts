@@ -1,4 +1,4 @@
-import { useMemo, useEffect } from "react";
+import { useMemo, useRef, useEffect } from "react";
 import { useRouter } from "next/router";
 import {
   Difficulties,
@@ -9,6 +9,11 @@ import { filterSongsFrontend } from "@/utils/songs/filter";
 import { sortSongs } from "@/utils/songs/sort";
 
 export const PAGE_SIZE = 20;
+
+const toFilterKey = (q: Record<string, any>) => {
+  const { page: _page, ...rest } = q;
+  return JSON.stringify(rest);
+};
 
 export const useSongFilter = (data: SongWithScore[] | undefined) => {
   const router = useRouter();
@@ -21,6 +26,7 @@ export const useSongFilter = (data: SongWithScore[] | undefined) => {
       search: (query.search as string) || "",
       sortKey: (query.sortKey as any) || "bpi",
       sortOrder: (query.sortOrder as any) || "desc",
+      compareVersion: (query.compareVersion as string) || undefined,
       levels: query.levels
         ? (query.levels as string).split(",").map(Number)
         : [],
@@ -48,6 +54,24 @@ export const useSongFilter = (data: SongWithScore[] | undefined) => {
           : query.isRivalPlayed === "true",
     };
   }, [query, isReady]);
+
+  const prevFilterKey = useRef<string | null>(null);
+  useEffect(() => {
+    if (!isReady) return;
+    const key = toFilterKey(query);
+    if (prevFilterKey.current === null) {
+      prevFilterKey.current = key;
+      return;
+    }
+    if (prevFilterKey.current !== key && query.page !== undefined) {
+      prevFilterKey.current = key;
+      const { page: _page, ...rest } = query;
+      router.replace({ query: rest }, undefined, { shallow: true });
+    } else {
+      prevFilterKey.current = key;
+    }
+  }, [isReady, query]);
+
   const page = useMemo(() => Number(query.page) || 1, [query.page]);
 
   const displaySongs = useMemo(() => {
@@ -84,8 +108,21 @@ export const useSongFilter = (data: SongWithScore[] | undefined) => {
     return sortSongs(filtered, params);
   }, [data, params]);
 
+  const totalCount = displaySongs.length;
+
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+  useEffect(() => {
+    if (!isReady || totalCount === 0) return;
+    if (page > totalPages) {
+      router.replace({ query: { ...query, page: totalPages } }, undefined, {
+        shallow: true,
+      });
+    }
+  }, [totalPages, page, isReady]);
+
   const updateParams = (newParams: Partial<FilterParamsFrontend>) => {
     const nextQuery = { ...router.query };
+    delete nextQuery.page;
     Object.entries(newParams).forEach(([key, value]) => {
       if (Array.isArray(value)) {
         if (value.length > 0) nextQuery[key] = value.join(",");
@@ -118,6 +155,7 @@ export const useSongFilter = (data: SongWithScore[] | undefined) => {
     setPage,
     displaySongs,
     visibleSongs,
-    totalCount: displaySongs.length,
+    totalCount,
+    totalPages,
   };
 };

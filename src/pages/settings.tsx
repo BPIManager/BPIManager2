@@ -11,6 +11,7 @@ import LoginPage from "@/components/partials/LogIn/page";
 import { Meta } from "@/components/partials/Head";
 import { Loader } from "lucide-react";
 import ThemeSettingsUi from "@/components/partials/Settings/ThemeSettings/ui";
+import DataExportUi from "@/components/partials/Settings/DataExport";
 
 export default function SettingsPage() {
   const { user, isLoading, fbUser } = useUser();
@@ -46,7 +47,7 @@ export default function SettingsPage() {
           <ApiKeyUi />
 
           <ThemeSettingsUi />
-
+          <DataExportUi />
           <AccountDeletionUi />
         </div>
       </PageContainer>

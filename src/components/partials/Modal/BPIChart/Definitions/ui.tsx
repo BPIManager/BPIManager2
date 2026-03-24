@@ -215,7 +215,7 @@ export const DefinitionsTab = ({ song }: DefinitionsTabProps) => {
         <div className="flex items-center gap-3">
           <div className="flex flex-col gap-1 flex-1">
             <label className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
-              EX Score（対象スコア）
+              EXスコア
             </label>
             <Input
               type="number"

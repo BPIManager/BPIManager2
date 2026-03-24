@@ -16,11 +16,20 @@ export const rivalSortOptions = [
 ];
 
 export const soleSortOptions = [
-  { label: "BPIが高い順", value: "bpi" },
-  { label: "最近更新", value: "updatedAt" },
+  { label: "BPI", value: "bpi" },
+  { label: "EXスコア", value: "exScore" },
+  { label: "最終更新", value: "updatedAt" },
 ];
 
 export const sortOptions = [
   { label: "レベル", value: "level" },
   { label: "楽曲名", value: "title" },
+  { label: "BPM", value: "bpm" },
+  { label: "ノーツ数", value: "notes" },
+  { label: "収録バージョン", value: "version" },
+];
+
+export const sortOrderOptions = [
+  { label: "降順", value: "desc" },
+  { label: "昇順", value: "asc" },
 ];

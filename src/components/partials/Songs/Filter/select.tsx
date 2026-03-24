@@ -26,7 +26,7 @@ export const FilterSelect = ({
     <Select value={value} onValueChange={onValueChange}>
       <SelectTrigger
         className={cn(
-          "h-9 text-xs w-full border-bpim-border bg-bpim-surface-2/60",
+          "!h-9 text-xs w-full border-bpim-border bg-bpim-surface-2/60 py-0",
           className,
         )}
       >

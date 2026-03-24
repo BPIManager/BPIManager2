@@ -44,10 +44,6 @@ export interface SongWithScore {
   isRankUp?: boolean;
 }
 
-/**
- * ライバル比較が前提となる場合の型定義
- * SongWithScore を継承し、rival プロパティにデータが含まれることを明示
- */
 export interface SongWithRival extends SongWithScore {
   rival: RivalScore;
 }
@@ -85,6 +81,7 @@ export interface FilterParamsFrontend {
     | "title"
     | "level"
     | "bpi"
+    | "exScore"
     | "notes"
     | "bpm"
     | "updatedAt"
@@ -104,6 +101,7 @@ export interface FilterParamsFrontend {
     | "rivalUpdated"
     | "myUpdated";
   sortOrder?: "asc" | "desc";
+  compareVersion?: string;
 }
 
 export type Difficulties = "HYPER" | "ANOTHER" | "LEGGENDARIA";
