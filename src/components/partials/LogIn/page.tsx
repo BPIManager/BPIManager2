@@ -21,9 +21,9 @@ export default function LoginPage() {
         title=""
         description="beatmania IIDX 上級者のためのスコアマネジメントツール"
       />
-      <div className="min-h-screen bg-bpim-bg py-20 text-bpim-text">
+      <div className="min-h-screen bg-bpim-bg py-16 text-bpim-text">
         <PageContainer>
-          <div className="mb-16 flex flex-col items-center gap-6 text-center">
+          <div className="flex flex-col items-center gap-6 text-center">
             <h1 className="bg-gradient-to-br from-bpim-text to-gray-600 bg-clip-text text-6xl font-bold tracking-tighter text-transparent leading-none md:text-8xl">
               BPIM2
             </h1>
@@ -32,8 +32,8 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <div className="mx-auto mb-12 max-w-md">
-            <LoginButtons />  
+          <div className="mx-auto my-8 max-w-md">
+            <LoginButtons />
           </div>
 
           <Separator className="mb-16 bg-bpim-overlay/60" />

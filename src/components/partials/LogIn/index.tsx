@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { ChevronRightIcon } from "lucide-react";
 import Link from "next/link";
 
-
 const GoogleIcon = ({ className }: { className?: string }) => (
   <svg
     role="img"
@@ -45,7 +44,6 @@ export const XIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-
 const LOGIN_PROVIDERS = [
   {
     label: "Googleでログイン",
@@ -66,14 +64,8 @@ const LOGIN_PROVIDERS = [
 
 export const LoginButtons = () => {
   return (
-    <div className="mx-auto w-full max-w-2xl overflow-hidden rounded-2xl border border-bpim-border bg-bpim-surface-2/40 backdrop-blur-sm">
-      <div className="flex flex-col items-center gap-6 p-8">
-        <header className="flex flex-col items-center gap-2">
-          <h2 className="text-sm font-medium text-bpim-text/80">
-            ログインして開始
-          </h2>
-        </header>
-
+    <div className="mx-auto w-full max-w-2xl overflow-hidden rounded-2xl">
+      <div className="flex flex-col items-center gap-6 p-4">
         <div className="flex w-full flex-col -space-y-px shadow-sm">
           {LOGIN_PROVIDERS.map((provider, index) => {
             const Icon = provider.icon;
@@ -87,7 +79,7 @@ export const LoginButtons = () => {
                   border-bpim-border bg-transparent transition-all duration-200
                   hover:z-10 hover:bg-bpim-overlay/40
                   active:scale-[0.98]
-                  ${index === 0 ? "rounded-t-xl rounded-b-none" : ""}
+                  ${index === 0 ? "!rounded-t-xl rounded-b-none" : ""}
                   ${index === LOGIN_PROVIDERS.length - 1 ? "rounded-b-xl rounded-t-none" : "rounded-none"}
                 `}
               >
@@ -103,8 +95,16 @@ export const LoginButtons = () => {
           })}
         </div>
 
-        <p className="px-4 text-center text-sm leading-relaxed text-bpim-muted">
-          続行することで、<Link target="_blank" className="underline" href="https://www.notion.so/BPIM2-3239989ca87a809f8058dc9736f0e197">利用規約・プライバシーポリシー・データポリシー</Link>に同意したものとみなされます。
+        <p className="px-4 text-center text-xs leading-relaxed text-bpim-muted">
+          続行することで、
+          <Link
+            target="_blank"
+            className="underline"
+            href="https://www.notion.so/BPIM2-3239989ca87a809f8058dc9736f0e197"
+          >
+            利用規約・プライバシーポリシー・データポリシー
+          </Link>
+          に同意したものとみなされます。
         </p>
       </div>
     </div>
