@@ -57,8 +57,7 @@ function songsToCSV(songs: SongWithScore[], version: string): string {
       s.kaidenAvg ?? "",
     ].join(","),
   );
-
-  return [header, ...rows].join("\n");
+  return [header, ...rows].join("\r\n");
 }
 
 async function fetchScoresForVersion(
@@ -144,7 +143,11 @@ export default function DataExportUi() {
         try {
           const songs = await fetchScoresForVersion(fbUser.uid, v, token);
           const csv = songsToCSV(songs, v);
-          files.push({ name: `bpim2_scores_v${v}_${name}.csv`, content: csv });
+          const withBom = "\uFEFF" + csv;
+          files.push({
+            name: `bpim2_scores_v${v}_${name}.csv`,
+            content: withBom,
+          });
         } catch (e: any) {
           toast.warning(`v${v} のデータ取得をスキップしました: ${e.message}`);
         }
@@ -159,7 +162,7 @@ export default function DataExportUi() {
       const today = new Date().toISOString().slice(0, 10);
       if (files.length === 1) {
         const { name, content } = files[0];
-        const blob = new Blob(["\uFEFF" + content], {
+        const blob = new Blob([content], {
           type: "text/csv;charset=utf-8;",
         });
         const url = URL.createObjectURL(blob);
