@@ -768,6 +768,53 @@ class LogRepository {
   }
 
   /**
+   * フォロー中ライバルの楽曲ごとトップスコアを取得する
+   */
+  async getRivalTopScores(params: { userId: string; version: string }) {
+    const { userId, version } = params;
+
+    const latestPerRival = db
+      .selectFrom("scores as sc")
+      .select([
+        "sc.songId",
+        "sc.userId",
+        (eb) => eb.fn.max("sc.logId").as("latestLogId"),
+      ])
+      .where("sc.version", "=", version)
+      .where("sc.userId", "in", (qb) =>
+        qb
+          .selectFrom("follows")
+          .select("followingId")
+          .where("followerId", "=", userId),
+      )
+      .groupBy(["sc.songId", "sc.userId"])
+      .as("latest");
+
+    const rows = await db
+      .selectFrom("scores as s")
+      .innerJoin(latestPerRival, (join) =>
+        join
+          .onRef("s.logId", "=", "latest.latestLogId")
+          .onRef("s.userId", "=", "latest.userId")
+          .onRef("s.songId", "=", "latest.songId"),
+      )
+      .innerJoin("songs as sg", "sg.songId", "s.songId")
+      .select([
+        "sg.songId",
+        "sg.difficulty",
+        "sg.difficultyLevel",
+        "sg.title",
+        (eb) => eb.fn.max("s.exScore").as("topExScore"),
+        (eb) => eb.fn.max("s.bpi").as("topBpi"),
+        (eb) => eb.fn.count("s.logId").as("rivalCount"),
+      ])
+      .groupBy(["sg.songId", "sg.difficulty"])
+      .execute();
+
+    return rows;
+  }
+
+  /**
    * 自己歴代ベストスコアを全バージョン（または今作を除く全バージョン）から取得する。
    * @param userId ユーザーID
    * @param currentVersion 今作のバージョン番号 (excludeCurrent=true のとき除外対象)

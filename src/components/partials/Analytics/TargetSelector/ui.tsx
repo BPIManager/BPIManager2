@@ -24,6 +24,7 @@ import {
   AlertCircle,
   History,
   Star,
+  UserStar,
 } from "lucide-react";
 import { useUser } from "@/contexts/users/UserContext";
 import { useRivalSummary } from "@/hooks/social/useRivalSummary";
@@ -279,6 +280,13 @@ const KIND_OPTIONS: {
     icon: Users,
     label: "ライバル平均",
     description: "フォロー中のライバル全員の平均スコアと比較します",
+    nextStep: "kind",
+  },
+  {
+    kind: "rival-top",
+    icon: UserStar,
+    label: "ライバルTOP",
+    description: "フォロー中のライバルので最も高いスコアと比較します",
     nextStep: "kind",
   },
   {
