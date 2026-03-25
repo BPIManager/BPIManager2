@@ -167,29 +167,28 @@ class BpiRepository {
       .executeTakeFirst();
 
     const currentArenaRank = latestLog?.arenaRank ?? null;
-
-    await trx
-      .insertInto("logs")
-      .values({
-        userId: params.userId,
-        totalBpi: params.newTotalBpi,
-        version: params.version,
-        batchId: params.batchId,
-      })
-      .execute();
-
-    await trx
-      .insertInto("userStatusLogs")
-      .values({
-        userId: params.userId,
-        totalBpi: params.newTotalBpi,
-        arenaRank: currentArenaRank,
-        version: params.version,
-        batchId: params.batchId,
-      })
-      .execute();
-
     if (params.scoreUpdates.length > 0) {
+      await trx
+        .insertInto("logs")
+        .values({
+          userId: params.userId,
+          totalBpi: params.newTotalBpi,
+          version: params.version,
+          batchId: params.batchId,
+        })
+        .execute();
+
+      await trx
+        .insertInto("userStatusLogs")
+        .values({
+          userId: params.userId,
+          totalBpi: params.newTotalBpi,
+          arenaRank: currentArenaRank,
+          version: params.version,
+          batchId: params.batchId,
+        })
+        .execute();
+
       await trx.insertInto("scores").values(params.scoreUpdates).execute();
     }
   }

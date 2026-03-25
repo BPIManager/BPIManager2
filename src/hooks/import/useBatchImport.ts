@@ -54,7 +54,7 @@ export const useBatchImport = (fbUser: any, refresh: () => Promise<void>) => {
       if (result.updatedCount > 0) {
         setImportResult({
           batchId: result.batchId,
-          updatedCount: result.updatedCount,
+          updatedCount: result.updatedBpiCount,
           previousTotalBpi: result.previousTotalBpi,
           newTotalBpi: result.newTotalBpi,
         });
