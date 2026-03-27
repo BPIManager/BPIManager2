@@ -10,7 +10,7 @@ export interface IBpiBasicSongData {
 
 export class BpiCalculator {
   private static readonly DEFAULT_POW_COEF = 1.175;
-  private static readonly TOTAL_KAIDENS = 2699;
+  private static readonly AVERAGE_OF_ALL_KAIDENS = 2699;
 
   private static pgf(j: number, m: number): number {
     if (j === m) return m * 0.8;
@@ -108,6 +108,6 @@ export class BpiCalculator {
    */
   public static estimateRank(totalBpi: number): number {
     const p = 100;
-    return Math.ceil(Math.pow(this.TOTAL_KAIDENS, (p - totalBpi) / p));
+    return Math.ceil(Math.pow(this.AVERAGE_OF_ALL_KAIDENS, (p - totalBpi) / p));
   }
 }
