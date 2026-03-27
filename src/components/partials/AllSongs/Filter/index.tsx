@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Search, Loader, SlidersHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -11,6 +11,8 @@ import {
   FilterStickyToggle,
 } from "../../Songs/Filter/part";
 import { ALL_DIFFICULTIES, ALL_LEVELS } from "@/constants/levels";
+import { useDebouncedSearch } from "@/hooks/common/useDebouncedSearch";
+import { toggleArrayItem } from "@/hooks/common/useToggleArray";
 
 const SORT_OPTIONS = [
   { label: "レベル", value: "level" },
@@ -36,23 +38,10 @@ export const AllSongFilterBar = ({
   totalCount,
 }: AllSongFilterBarProps) => {
   const [isSticky, setIsSticky] = useState(true);
-  const [localSearch, setLocalSearch] = useState(params.search || "");
-  const isTyping = localSearch !== (params.search || "");
-
-  useEffect(() => {
-    const t = setTimeout(() => {
-      if (localSearch !== (params.search || ""))
-        onParamsChange({ search: localSearch });
-    }, 500);
-    return () => clearTimeout(t);
-  }, [localSearch, onParamsChange, params.search]);
-
-  const toggleArrayItem = <T,>(current: T[] | undefined, item: T): T[] => {
-    const list = current || [];
-    return list.includes(item)
-      ? list.filter((i) => i !== item)
-      : [...list, item];
-  };
+  const { localSearch, setLocalSearch, isTyping } = useDebouncedSearch(
+    params.search || "",
+    (val) => onParamsChange({ search: val }),
+  );
 
   return (
     <div

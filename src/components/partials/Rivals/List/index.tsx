@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/router";
 import { latestVersion } from "@/constants/latestVersion";
 import { useUser } from "@/contexts/users/UserContext";
@@ -8,16 +7,13 @@ import { useRivalSummary } from "@/hooks/social/useRivalSummary";
 import { RivalFilter } from "./filter";
 import { RivalList } from "./container";
 import { LoginRequiredCard } from "../../LoginRequired/ui";
+import { useRivalListFilter } from "@/hooks/social/useRivalListFilter";
 
 export const RivalListContainer = () => {
   const { user, isLoading: isCredentialLoading } = useUser();
   const router = useRouter();
-  const [levels, setLevels] = useState<string[]>(["11", "12"]);
-  const [difficulties, setDifficulties] = useState<string[]>([
-    "HYPER",
-    "ANOTHER",
-    "LEGGENDARIA",
-  ]);
+  const { levels, difficulties, handleToggleLevel, handleToggleDifficulty } =
+    useRivalListFilter();
 
   const { results, isLoading, isError } = useRivalSummary({
     userId: user?.userId || false,
@@ -25,18 +21,6 @@ export const RivalListContainer = () => {
     difficulties,
     version: latestVersion,
   });
-
-  const handleToggleLevel = (lv: string) => {
-    setLevels((prev) =>
-      prev.includes(lv) ? prev.filter((l) => l !== lv) : [...prev, lv],
-    );
-  };
-
-  const handleToggleDifficulty = (diff: string) => {
-    setDifficulties((prev) =>
-      prev.includes(diff) ? prev.filter((d) => d !== diff) : [...prev, diff],
-    );
-  };
 
   if (!user && !isCredentialLoading) return <LoginRequiredCard />;
 

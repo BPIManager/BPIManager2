@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/router";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,8 @@ import { FilterCheckboxGroup, FilterStickyToggle } from "./part";
 import { cn } from "@/lib/utils";
 import { FilterSelect } from "./select";
 import { Search, Loader, SlidersHorizontal } from "lucide-react";
+import { useDebouncedSearch } from "@/hooks/common/useDebouncedSearch";
+import { toggleArrayItem } from "@/hooks/common/useToggleArray";
 
 interface SongFilterBarProps {
   params: FilterParamsFrontend;
@@ -42,29 +44,10 @@ export const SongFilterBar = ({
 }: SongFilterBarProps) => {
   const router = useRouter();
   const [isSticky, setIsSticky] = useState(true);
-
-  const [localSearch, setLocalSearch] = useState(params.search || "");
-  const isTyping = localSearch !== (params.search || "");
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (localSearch !== (params.search || "")) {
-        onParamsChange({ search: localSearch });
-      }
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [localSearch, onParamsChange, params.search]);
-
-  useEffect(() => {
-    setLocalSearch(params.search || "");
-  }, [params.search]);
-
-  const toggleArrayItem = <T,>(current: T[] | undefined, item: T) => {
-    const list = current || [];
-    return list.includes(item)
-      ? list.filter((i) => i !== item)
-      : [...list, item];
-  };
+  const { localSearch, setLocalSearch, isTyping } = useDebouncedSearch(
+    params.search || "",
+    (val) => onParamsChange({ search: val }),
+  );
 
   const currentStoreVersion = router.query.version;
 
