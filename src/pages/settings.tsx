@@ -7,7 +7,7 @@ import TransferUi from "@/components/partials/Settings/Transfer/ui";
 import AccountSettingsUi from "@/components/partials/Settings/AccountSettings/ui";
 import AccountDeletionUi from "@/components/partials/Settings/AccountDeletion/ui";
 import ApiKeyUi from "@/components/partials/Settings/APIKey/ui";
-import LoginPage from "@/components/partials/LogIn/page";
+import LoginPage from "@/components/partials/LogIn/ui";
 import { Meta } from "@/components/partials/Head";
 import { Loader } from "lucide-react";
 import ThemeSettingsUi from "@/components/partials/Settings/ThemeSettings/ui";

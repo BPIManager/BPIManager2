@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { diffColors } from "../../Table/table";
+import { diffColors } from "../../Table/ui";
 
 export const TimelineItem = ({ entry }: { entry: TimelineEntry }) => {
   const { opponentScore: opp, viewerScore: viewer, isOvertaken } = entry;

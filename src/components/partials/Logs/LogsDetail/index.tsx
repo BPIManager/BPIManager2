@@ -1,15 +1,8 @@
 import { PageContainer, PageHeader } from "../../Header";
 import dayjs from "@/lib/dayjs";
-import { LogsDetailContent } from "./content";
+import { LogsDetailContent, LogsDetailViewProps } from "./content";
 
-export interface LogsDetailViewProps {
-  userId: string | undefined;
-  version: string | undefined;
-  batchId?: string;
-  date?: string;
-  type: "batch" | "daily" | "weekly" | "monthly";
-  isPublicPage?: boolean;
-}
+export type { LogsDetailViewProps };
 
 export const LogsDetailView = (props: LogsDetailViewProps) => {
   const pageTitle =

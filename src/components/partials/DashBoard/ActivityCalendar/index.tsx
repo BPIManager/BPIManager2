@@ -2,7 +2,7 @@ import { useActivity } from "@/hooks/stats/useActivity";
 import { ActivityCalendar } from "./ui";
 import { ActivityCalendarSkeleton } from "./skeleton";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
-import { NoDataAlert } from "../NoData";
+import { NoDataAlert } from "../NoData/ui";
 
 export const ActivitySection = ({ userId }: { userId?: string }) => {
   const { levels, diffs, version } = useStatsFilter();

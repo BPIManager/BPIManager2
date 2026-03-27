@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/router";
-import { DashBoardFilter } from "@/components/partials/DashBoard/Filter";
+import { DashBoardFilter } from "@/components/partials/DashBoard/Filter/ui";
 import { ActivitySection } from "@/components/partials/DashBoard/ActivityCalendar";
 import { RankDistributionSection } from "@/components/partials/DashBoard/DJRankDistribution/ui";
 import { BpiDistributionSection } from "@/components/partials/DashBoard/BPIDistribution/ui";

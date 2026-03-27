@@ -8,7 +8,7 @@ import { LoginRequiredCard } from "@/components/partials/LoginRequired/ui";
 import { RivalProfileLayout } from "@/components/partials/Rivals/Layout/layout";
 import { RivalSongsTable } from "@/components/partials/Rivals/Table";
 import { Meta } from "@/components/partials/Head";
-import { DashBoardFilter } from "@/components/partials/DashBoard/Filter";
+import { DashBoardFilter } from "@/components/partials/DashBoard/Filter/ui";
 import { RadarSection } from "@/components/partials/DashBoard/Radar/ui";
 import { RankDistributionSection } from "@/components/partials/DashBoard/DJRankDistribution/ui";
 import { BpiDistributionSection } from "@/components/partials/DashBoard/BPIDistribution/ui";
