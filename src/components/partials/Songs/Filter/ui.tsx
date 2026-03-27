@@ -1,8 +1,7 @@
-﻿"use client";
+"use client";
 
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import { useRouter } from "next/router";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -14,11 +13,13 @@ import {
 import { FilterParamsFrontend } from "@/types/songs/withScore";
 import { versionsNonDisabledCollection } from "@/constants/versions";
 import { latestVersion } from "@/constants/latestVersion";
-import { FilterCheckboxGroup, FilterStickyToggle } from "./part";
-import { cn } from "@/lib/utils";
+import {
+  FilterBarContainer,
+  FilterCheckboxGroup,
+  FilterSearchInput,
+} from "./part";
 import { FilterSelect } from "./select";
-import { Search, Loader, SlidersHorizontal } from "lucide-react";
-import { useDebouncedSearch } from "@/hooks/common/useDebouncedSearch";
+import { SlidersHorizontal } from "lucide-react";
 import { toggleArrayItem } from "@/hooks/common/useToggleArray";
 
 interface SongFilterBarProps {
@@ -43,12 +44,6 @@ export const SongFilterBar = ({
   currentVersion,
 }: SongFilterBarProps) => {
   const router = useRouter();
-  const [isSticky, setIsSticky] = useState(true);
-  const { localSearch, setLocalSearch, isTyping } = useDebouncedSearch(
-    params.search || "",
-    (val) => onParamsChange({ search: val }),
-  );
-
   const currentStoreVersion = router.query.version;
 
   const compareVersionOptions = useMemo(() => {
@@ -71,12 +66,7 @@ export const SongFilterBar = ({
   }, [withRivals, hasCompare]);
 
   return (
-    <div
-      className={cn(
-        "px-4 pt-4 pb-2 border-b border-bpim-border transition-all duration-200 w-full",
-        isSticky ? "sticky top-0 z-50 bg-bpim-bg" : "relative bg-bpim-bg",
-      )}
-    >
+    <FilterBarContainer totalCount={totalCount}>
       <div className="flex w-full gap-2 mb-3 flex-wrap">
         {!disableVersionSelect && (
           <FilterSelect
@@ -113,24 +103,12 @@ export const SongFilterBar = ({
           className="w-[90px] shrink-0"
         />
       </div>
-      <div className="flex w-full gap-2 items-center mb-3">
-        <div className="relative flex-1 h-9">
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-bpim-muted pointer-events-none">
-            <Search size={16} />
-          </div>
-          <Input
-            placeholder="曲名で検索..."
-            className="h-9 pl-10 pr-10 border-bpim-border bg-bpim-surface-2/60 text-xs focus-visible:ring-gray-500"
-            value={localSearch}
-            onChange={(e) => setLocalSearch(e.target.value)}
-          />
-          {isTyping && (
-            <div className="absolute right-3 top-1/2 -translate-y-1/2">
-              <Loader className="animate-spin text-bpim-text" size={14} />
-            </div>
-          )}
-        </div>
 
+      <div className="flex w-full gap-2 items-center mb-3">
+        <FilterSearchInput
+          value={params.search || ""}
+          onChange={(val) => onParamsChange({ search: val })}
+        />
         {withSelfCompare && (
           <div className="relative flex-1 h-9">
             <FilterSelect
@@ -212,13 +190,6 @@ export const SongFilterBar = ({
           </div>
         </div>
       )}
-
-      <div className="flex items-center justify-between h-6 mt-2">
-        <span className="text-xs font-bold text-bpim-text leading-none">
-          {totalCount.toLocaleString()}曲
-        </span>
-        <FilterStickyToggle isSticky={isSticky} onToggle={setIsSticky} />
-      </div>
-    </div>
+    </FilterBarContainer>
   );
 };

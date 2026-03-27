@@ -5,7 +5,8 @@ import { AllScoreFilterParams, AllSongWithScore } from "@/types/songs/allSongs";
 import { useAllScores } from "./useAllScores";
 import { ALL_DIFFICULTIES, ALL_LEVELS } from "@/constants/levels";
 
-export const PAGE_SIZE = 20;
+import { PAGE_SIZE } from "@/constants/pagination";
+export { PAGE_SIZE };
 
 function filterLocal(
   songs: AllSongWithScore[],
