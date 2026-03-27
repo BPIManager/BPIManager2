@@ -8,7 +8,8 @@ import {
 import { filterSongsFrontend } from "@/utils/songs/filter";
 import { sortSongs } from "@/utils/songs/sort";
 
-export const PAGE_SIZE = 20;
+import { PAGE_SIZE } from "@/constants/pagination";
+export { PAGE_SIZE };
 
 const toFilterKey = (q: Record<string, any>) => {
   const { page: _page, ...rest } = q;

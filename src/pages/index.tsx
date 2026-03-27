@@ -3,9 +3,9 @@
 import { useUser } from "@/contexts/users/UserContext";
 import { DashboardLayout } from "@/components/partials/Main";
 import { Meta } from "@/components/partials/Head";
-import LoginPage from "@/components/partials/LogIn/page";
+import LoginPage from "@/components/partials/LogIn/ui";
 import AccountSettings from "@/components/partials/Modal/AccountSettings";
-import { DashBoardFilter } from "@/components/partials/DashBoard/Filter";
+import { DashBoardFilter } from "@/components/partials/DashBoard/Filter/ui";
 import { ActivitySection } from "@/components/partials/DashBoard/ActivityCalendar";
 import { RankDistributionSection } from "@/components/partials/DashBoard/DJRankDistribution/ui";
 import { BpiDistributionSection } from "@/components/partials/DashBoard/BPIDistribution/ui";

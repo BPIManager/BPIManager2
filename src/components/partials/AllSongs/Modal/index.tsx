@@ -11,7 +11,7 @@ import {
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { AppTabsList, AppTabsTrigger } from "@/components/ui/complex/tabs";
 import { cn } from "@/lib/utils";
-import { getLampClass } from "@/components/partials/Table/table";
+import { getLampClass } from "@/components/partials/Table/ui";
 
 const diffLabel: Record<string, string> = {
   BEGINNER: "B",

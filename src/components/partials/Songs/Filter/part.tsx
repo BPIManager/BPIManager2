@@ -1,12 +1,13 @@
-﻿"use client";
+"use client";
 
-import { useState, useEffect } from "react";
+import { useState, ReactNode } from "react";
 import { Search, Pin, PinOff, Loader } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { useDebouncedSearch } from "@/hooks/common/useDebouncedSearch";
 
 export const FilterSearchInput = ({
   value,
@@ -17,32 +18,25 @@ export const FilterSearchInput = ({
   onChange: (val: string) => void;
   placeholder?: string;
 }) => {
-  const [local, setLocal] = useState(value || "");
-  const isTyping = local !== (value || "");
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (local !== value) onChange(local);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [local, onChange, value]);
+  const { localSearch, setLocalSearch, isTyping } = useDebouncedSearch(
+    value,
+    onChange,
+  );
 
   return (
-    <div className="relative flex-1 w-full group">
+    <div className="relative flex-1 h-9">
       <div className="absolute left-3 top-1/2 -translate-y-1/2 text-bpim-muted pointer-events-none">
-        <Search size={14} />
+        <Search size={16} />
       </div>
-
       <Input
         placeholder={placeholder}
-        className="h-9 pl-9 pr-9 border-bpim-border bg-bpim-surface-2/60 focus-visible:ring-blue-500"
-        value={local}
-        onChange={(e) => setLocal(e.target.value)}
+        className="h-9 pl-10 pr-10 border-bpim-border bg-bpim-surface-2/60 text-xs focus-visible:ring-gray-500"
+        value={localSearch}
+        onChange={(e) => setLocalSearch(e.target.value)}
       />
-
       {isTyping && (
-        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-bpim-text">
-          <Loader size={14} className="animate-spin" />
+        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+          <Loader className="animate-spin text-bpim-text" size={14} />
         </div>
       )}
     </div>
@@ -113,3 +107,29 @@ export const FilterStickyToggle = ({
     {isSticky ? <Pin size={14} /> : <PinOff size={14} />}
   </Button>
 );
+
+export const FilterBarContainer = ({
+  totalCount,
+  children,
+}: {
+  totalCount: number;
+  children: ReactNode;
+}) => {
+  const [isSticky, setIsSticky] = useState(true);
+  return (
+    <div
+      className={cn(
+        "px-4 pt-4 pb-2 border-b border-bpim-border transition-all duration-200 w-full",
+        isSticky ? "sticky top-0 z-50 bg-bpim-bg" : "relative bg-bpim-bg",
+      )}
+    >
+      {children}
+      <div className="flex items-center justify-between h-6 mt-2">
+        <span className="text-xs font-bold text-bpim-text leading-none">
+          {totalCount.toLocaleString()}曲
+        </span>
+        <FilterStickyToggle isSticky={isSticky} onToggle={setIsSticky} />
+      </div>
+    </div>
+  );
+};

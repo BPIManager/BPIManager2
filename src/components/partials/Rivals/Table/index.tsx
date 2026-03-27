@@ -8,7 +8,7 @@ import { SongWithRival, SongWithScore } from "@/types/songs/withScore";
 
 import { SongFilterBar } from "@/components/partials/Songs/Filter/ui";
 import { SongListSkeleton } from "@/components/partials/Table/skeleton";
-import { NoDataAlert } from "@/components/partials/DashBoard/NoData";
+import { NoDataAlert } from "@/components/partials/DashBoard/NoData/ui";
 import { LoginRequiredCard } from "@/components/partials/LoginRequired/ui";
 import { CustomPagination } from "@/components/partials/Pagination/ui";
 import { AdvancedFilterModal } from "@/components/partials/Songs/AdvancedFilter/ui";

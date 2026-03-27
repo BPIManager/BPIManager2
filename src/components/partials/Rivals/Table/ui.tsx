@@ -2,7 +2,7 @@
 
 import { SongWithRival } from "@/types/songs/withScore";
 import { cn } from "@/lib/utils";
-import { getLampClass } from "../../Table/table";
+import { getLampClass } from "../../Table/ui";
 
 const f = (val: number | null | undefined, p?: number) => {
   if (val === null || val === undefined || !Number.isFinite(val)) return "---";

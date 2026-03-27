@@ -4,13 +4,13 @@ import { useState } from "react";
 import { SongWithScore } from "@/types/songs/withScore";
 import { useSongFilter, PAGE_SIZE } from "@/hooks/table/useSongFilter";
 import { useUnplayedScores } from "@/hooks/table/useUnplayedScores";
-import { NoDataAlert } from "../DashBoard/NoData";
+import { NoDataAlert } from "../DashBoard/NoData/ui";
 import { SongDetailView } from "../Modal/BPIChart/SongDetails/ui";
 import { CustomPagination } from "../Pagination/ui";
 import { AdvancedFilterModal } from "../Songs/AdvancedFilter/ui";
 import { SongFilterBar } from "../Songs/Filter/ui";
 import { SongListSkeleton } from "../Table/skeleton";
-import { SongList } from "../Table/table";
+import { SongList } from "../Table/ui";
 
 export const UnplayedSongsTable = ({
   userId,

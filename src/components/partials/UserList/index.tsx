@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/router";
 import { UserRecommendationCard } from "./Card/ui";
 import { SortSelector } from "./Filter/sortInput";
 import { SearchInput } from "./Filter/searchInput";
@@ -12,35 +11,15 @@ import { RivalComparisonModal } from "./Modal";
 import { LoginRequiredCard } from "../LoginRequired/ui";
 import { useUser } from "@/contexts/users/UserContext";
 import { useUserList } from "@/hooks/users/useUserList";
+import { useUserListParams } from "@/hooks/users/useUserListParams";
 
 export const UserRecommendationList = () => {
   const { user, isLoading: isCredentialLoading } = useUser();
-  const router = useRouter();
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const q = (router.query.q as string) || "";
-  const p = Number(router.query.p) || 1;
-  const s = (router.query.s as string) || "totalBpi";
-  const o = (router.query.o as string) || "distance";
-
-  const updateParams = (newParams: {
-    q?: string;
-    p?: number;
-    s?: string;
-    o?: string;
-  }) => {
-    router.push(
-      { pathname: router.pathname, query: { ...router.query, ...newParams } },
-      undefined,
-      { shallow: true },
-    );
-  };
-
+  const { q, p, s, o, updateParams, handleReset } = useUserListParams();
   const { data, isLoading } = useUserList(q, p, s, o);
-
-  const handleReset = () =>
-    updateParams({ q: "", p: 1, s: "totalBpi", o: "distance" });
 
   const handleCardClick = (userId: string) => {
     setSelectedUserId(userId);

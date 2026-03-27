@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { diffColors, getLampClass } from "../../../Table/table";
+import { diffColors, getLampClass } from "../../../Table/ui";
 
 interface SimpleRankItemProps {
   item: any;

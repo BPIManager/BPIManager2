@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { getLampClass, diffColors } from "@/components/partials/Table/table";
+import { getLampClass, diffColors } from "@/components/partials/Table/ui";
 import dayjs from "@/lib/dayjs";
 import { AllSongWithScore } from "@/types/songs/allSongs";
 

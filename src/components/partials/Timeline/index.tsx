@@ -1,35 +1,18 @@
-﻿"use client";
+"use client";
 
-import { useState } from "react";
 import { Activity, Loader, Swords, UserCheck } from "lucide-react";
 import { TimelineList } from "./ui";
-import { Difficulties, FilterParamsFrontend } from "@/types/songs/withScore";
 import { FilterCheckboxGroup, FilterSearchInput } from "../Songs/Filter/part";
 import { useUser } from "@/contexts/users/UserContext";
 import { LoginRequiredCard } from "../LoginRequired/ui";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useTimelineFilter } from "@/hooks/social/useTimelineFilter";
 
 export const TimelineContainer = () => {
   const { user, isLoading } = useUser();
-  const [mode, setMode] = useState<"all" | "played" | "overtaken">("all");
-
-  const [filterParams, setFilterParams] = useState<FilterParamsFrontend>({
-    levels: [11, 12],
-    difficulties: ["HYPER", "ANOTHER", "LEGGENDARIA"],
-    search: "",
-  });
-
-  const updateParams = (newParams: Partial<FilterParamsFrontend>) => {
-    setFilterParams((prev) => ({ ...prev, ...newParams }));
-  };
-
-  const toggleArrayItem = <T,>(current: T[] | undefined, item: T) => {
-    const list = current || [];
-    return list.includes(item)
-      ? list.filter((i) => i !== item)
-      : [...list, item];
-  };
+  const { mode, setMode, filterParams, updateParams, toggleLevel, toggleDifficulty } =
+    useTimelineFilter();
 
   if (isLoading) {
     return (
@@ -75,11 +58,7 @@ export const TimelineContainer = () => {
               label="LEVEL"
               items={[11, 12]}
               selected={filterParams.levels || []}
-              onToggle={(lv: number) =>
-                updateParams({
-                  levels: toggleArrayItem(filterParams.levels, lv),
-                })
-              }
+              onToggle={(lv: number) => toggleLevel(lv)}
               getLabel={(lv: number) => `☆${lv}`}
             />
 
@@ -87,14 +66,7 @@ export const TimelineContainer = () => {
               label="DIFFICULTY"
               items={["HYPER", "ANOTHER", "LEGGENDARIA"]}
               selected={filterParams.difficulties || []}
-              onToggle={(diff: Difficulties) =>
-                updateParams({
-                  difficulties: toggleArrayItem(
-                    filterParams.difficulties,
-                    diff,
-                  ),
-                })
-              }
+              onToggle={(diff: any) => toggleDifficulty(diff)}
               getLabel={(diff: string) => diff[0]}
             />
           </div>

@@ -1,6 +1,6 @@
 ﻿import { Meta } from "@/components/partials/Head";
 import { LogsDetailContent } from "@/components/partials/Logs/LogsDetail/content";
-import { LogsDetailView } from "@/components/partials/Logs/LogsDetail/ui";
+import { LogsDetailView } from "@/components/partials/Logs/LogsDetail";
 import { DashboardLayout } from "@/components/partials/Main";
 import { UserProfileLayout } from "@/components/partials/Profile/Layout/layout";
 import { ProfileMeta } from "@/components/partials/Profile/Meta/ui";
