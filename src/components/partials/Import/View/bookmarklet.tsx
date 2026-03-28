@@ -5,7 +5,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Bookmark, Copy } from "lucide-react";
+import { AlertTriangle, Bookmark, Copy } from "lucide-react";
 import { iidxUrl } from "@/constants/iidxUrl";
 import { toast } from "sonner";
 
@@ -67,6 +67,24 @@ export const BookmarkletAccordion = () => {
         </AccordionTrigger>
         <AccordionContent className="px-4">
           <div className="flex flex-col text-xs text-bpim-muted">
+            <div className="mb-3 flex gap-2 rounded-lg border border-yellow-500/40 bg-yellow-500/10 p-3 text-yellow-300">
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+              <p className="leading-relaxed">
+                このブックマークレットはログイン中の e-AMUSEMENT GATE
+                上で実行されます。ブックマークレットはページ上で任意の
+                JavaScript
+                を実行できるため、悪意あるコードであればセッション情報（Cookie・トークン等）を第三者に送信するなどの個人情報の窃取が理論上可能です。本ブックマークレットはソースコードを{" "}
+                <a
+                  href="https://github.com/BPIManager/IIDX-Scraping-Bookmarklet"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline underline-offset-2 hover:text-yellow-200"
+                >
+                  GitHub で公開
+                </a>
+                しているため、内容を確認の上、自己責任でご使用ください。
+              </p>
+            </div>
             <p className="leading-relaxed">
               以下の手順でブックマークレット経由でスコアデータをインポートすることができます。
             </p>
