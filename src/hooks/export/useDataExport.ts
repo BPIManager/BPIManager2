@@ -46,8 +46,6 @@ function songsToCSV(songs: SongWithScore[], version: string): string {
       escape(s.clearState),
       s.missCount ?? "",
       s.scoreAt ? new Date(s.scoreAt).toISOString() : "",
-      s.wrScore ?? "",
-      s.kaidenAvg ?? "",
     ].join(","),
   );
   return [header, ...rows].join("\r\n");
