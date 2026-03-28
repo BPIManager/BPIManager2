@@ -1,4 +1,4 @@
-import { SongWithScore } from "@/types/songs/withScore";
+import { SongWithScore } from "@/types/songs/score";
 import { sortSongs } from "@/utils/songs/sort";
 import { describe, it, expect } from "vitest";
 
@@ -183,18 +183,24 @@ describe("sortSongs - Comprehensive Test", () => {
 
   // --- 特殊ケース ---
   it("rivalデータが不在でもクラッシュせず、一番下に配置されること", () => {
-    const noRivalData: any = {
+    const noRivalData: SongWithScore = {
       songId: 9,
       title: "None",
       notes: 1000,
+      bpm: null,
       rival: null,
       difficultyLevel: 12,
       difficulty: "ANOTHER",
+      releasedVersion: null,
+      logId: null,
       clearState: "NO PLAY",
       missCount: null,
       exScore: null,
       bpi: null,
       scoreAt: null,
+      wrScore: null,
+      kaidenAvg: null,
+      coef: null,
     };
     const combined = [...mockSongs, noRivalData];
     const res = sortSongs(combined, { sortKey: "rivalBpi", sortOrder: "desc" });
