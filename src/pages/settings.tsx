@@ -9,7 +9,7 @@ import AccountDeletionUi from "@/components/partials/Settings/AccountDeletion/ui
 import ApiKeyUi from "@/components/partials/Settings/APIKey/ui";
 import LoginPage from "@/components/partials/LogIn/ui";
 import { Meta } from "@/components/partials/Head";
-import { Loader } from "lucide-react";
+import { PageLoader } from "@/components/ui/loading-spinner";
 import ThemeSettingsUi from "@/components/partials/Settings/ThemeSettings/ui";
 import DataExportUi from "@/components/partials/Settings/DataExport";
 
@@ -19,9 +19,7 @@ export default function SettingsPage() {
   if (isLoading) {
     return (
       <DashboardLayout>
-        <div className="flex h-[90vh] w-full items-center justify-center">
-          <Loader className="h-10 w-10 animate-spin text-bpim-text" />
-        </div>
+        <PageLoader />
       </DashboardLayout>
     );
   }

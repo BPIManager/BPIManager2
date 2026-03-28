@@ -14,7 +14,8 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { latestVersion } from "@/constants/latestVersion";
 import { ProfileProvider } from "@/contexts/profile/ProfileContext";
 import { FilterProvider } from "@/contexts/stats/FilterContext";
-import { Loader, LayoutDashboard, Music } from "lucide-react";
+import { LayoutDashboard, Music } from "lucide-react";
+import { PageLoader } from "@/components/ui/loading-spinner";
 import { AppTabsList, AppTabsTrigger } from "@/components/ui/complex/tabs";
 
 export const RivalProfileLayout = ({
@@ -49,9 +50,7 @@ export const RivalProfileLayout = ({
   if (isLoading) {
     return (
       <DashboardLayout>
-        <div className="flex h-[90vh] items-center justify-center">
-          <Loader className="h-10 w-10 animate-spin text-bpim-text" />
-        </div>
+        <PageLoader />
       </DashboardLayout>
     );
   }

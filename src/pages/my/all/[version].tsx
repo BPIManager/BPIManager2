@@ -5,7 +5,7 @@ import { useUser } from "@/contexts/users/UserContext";
 import AccountSettings from "@/components/partials/Modal/AccountSettings";
 import { LoginRequiredCard } from "@/components/partials/LoginRequired/ui";
 import { PageContainer } from "@/components/partials/Header";
-import { Loader } from "lucide-react";
+import { PageLoader } from "@/components/ui/loading-spinner";
 import { AllSongsTable } from "@/components/partials/AllSongs";
 
 export default function MyScoresByVersion() {
@@ -17,9 +17,7 @@ export default function MyScoresByVersion() {
 
   if (!isReady) {
     return (
-      <div className="flex h-[90vh] w-full items-center justify-center">
-        <Loader className="h-10 w-10 animate-spin text-bpim-text" />
-      </div>
+      <PageLoader />
     );
   }
 

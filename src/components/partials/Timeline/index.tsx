@@ -1,6 +1,7 @@
 "use client";
 
-import { Activity, Loader, LucideIcon, Swords, UserCheck } from "lucide-react";
+import { Activity, LucideIcon, Swords, UserCheck } from "lucide-react";
+import { SectionLoader } from "@/components/ui/loading-spinner";
 import { TimelineList } from "./ui";
 import { FilterCheckboxGroup, FilterSearchInput } from "../Songs/Filter/part";
 import { useUser } from "@/contexts/users/UserContext";
@@ -22,9 +23,7 @@ export const TimelineContainer = () => {
 
   if (isLoading) {
     return (
-      <div className="flex h-64 w-full items-center justify-center">
-        <Loader className="h-8 w-8 animate-spin text-bpim-text" />
-      </div>
+      <SectionLoader className="h-64 w-full" />
     );
   }
 
@@ -72,7 +71,11 @@ export const TimelineContainer = () => {
               label="DIFFICULTY"
               items={["HYPER", "ANOTHER", "LEGGENDARIA"]}
               selected={filterParams.difficulties || []}
-              onToggle={(diff: string) => toggleDifficulty(diff as import("@/types/songs/withScore").Difficulties)}
+              onToggle={(diff: string) =>
+                toggleDifficulty(
+                  diff as import("@/types/songs/withScore").Difficulties,
+                )
+              }
               getLabel={(diff: string) => diff[0]}
             />
           </div>

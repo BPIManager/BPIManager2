@@ -11,10 +11,10 @@ import {
   Crown,
   TrendingUp,
   History,
-  Loader,
   Calendar,
   AlertCircle,
 } from "lucide-react";
+import { SectionLoader } from "@/components/ui/loading-spinner";
 import { useAllScoreHistory } from "@/hooks/allScores/useAllScoresHistory";
 
 export const AllSongHistoryTab = ({ songId }: { songId: number }) => {
@@ -35,9 +35,7 @@ export const AllSongHistoryTab = ({ songId }: { songId: number }) => {
 
   if (isLoading)
     return (
-      <div className="flex h-64 items-center justify-center">
-        <Loader className="h-8 w-8 animate-spin text-bpim-text" />
-      </div>
+      <SectionLoader className="h-64" />
     );
 
   if (isError || !historyGroups || Object.keys(historyGroups).length === 0)

@@ -19,7 +19,8 @@ import "react-image-crop/dist/ReactCrop.css";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "@/lib/firebase";
 import { toast } from "sonner";
-import { Loader, Upload } from "lucide-react";
+import { Upload } from "lucide-react";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 interface Props {
   uid: string;
@@ -189,7 +190,7 @@ export const ImageUploadModal = ({
               className="h-9 min-w-[80px] bg-bpim-primary hover:bg-bpim-primary"
             >
               {isUploading ? (
-                <Loader className="h-4 w-4 animate-spin" />
+                <LoadingSpinner size="sm" />
               ) : (
                 "保存"
               )}

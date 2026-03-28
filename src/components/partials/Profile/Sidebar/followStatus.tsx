@@ -1,7 +1,8 @@
 ﻿"use client";
 
 import { useState } from "react";
-import { Check, Plus, Settings2, Loader } from "lucide-react";
+import { Check, Plus, Settings2 } from "lucide-react";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useUser } from "@/contexts/users/UserContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -53,7 +54,7 @@ export const FollowSection = ({
   const renderButtonContent = () => (
     <>
       {isUpdating ? (
-        <Loader className="mr-2 h-4 w-4 animate-spin" />
+        <LoadingSpinner size="sm" className="mr-2" />
       ) : relationship.isFollowing ? (
         <Check className="mr-2 h-4 w-4" />
       ) : (

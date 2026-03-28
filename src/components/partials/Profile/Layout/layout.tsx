@@ -13,7 +13,8 @@ import { Tabs } from "@/components/ui/tabs";
 import { latestVersion } from "@/constants/latestVersion";
 import { ProfileProvider } from "@/contexts/profile/ProfileContext";
 import { FilterProvider } from "@/contexts/stats/FilterContext";
-import { LayoutDashboard, Loader, Music, Table, History } from "lucide-react";
+import { LayoutDashboard, Music, Table, History } from "lucide-react";
+import { PageLoader } from "@/components/ui/loading-spinner";
 import { AppTabsList, AppTabsTrigger } from "@/components/ui/complex/tabs";
 
 interface UserProfileLayoutProps {
@@ -48,9 +49,7 @@ export const UserProfileLayout = ({
   if (isLoading) {
     return (
       <DashboardLayout>
-        <div className="flex h-[90vh] items-center justify-center">
-          <Loader className="h-10 w-10 animate-spin text-bpim-text" />
-        </div>
+        <PageLoader />
       </DashboardLayout>
     );
   }

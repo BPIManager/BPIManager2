@@ -1,7 +1,8 @@
 ﻿"use client";
 
 import { useState } from "react";
-import { User2, Check, X, Loader } from "lucide-react";
+import { User2, Check, X } from "lucide-react";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import {
   Dialog,
   DialogContent,
@@ -122,7 +123,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                     />
                     <div className="absolute right-3 top-1/2 -translate-y-1/2">
                       {nameStatus.isChecking ? (
-                        <Loader className="h-4 w-4 animate-spin text-bpim-muted" />
+                        <LoadingSpinner size="sm" className="text-bpim-muted" />
                       ) : formData.userName && !nameStatus.error ? (
                         <Check className="h-4 w-4 text-bpim-success" />
                       ) : nameStatus.error ? (
@@ -276,7 +277,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
             >
               {isSubmitting ? (
                 <>
-                  <Loader className="mr-2 h-4 w-4 animate-spin" />
+                  <LoadingSpinner size="sm" className="mr-2" />
                   保存中...
                 </>
               ) : (

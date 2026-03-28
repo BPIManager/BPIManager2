@@ -7,7 +7,7 @@ import { useRivalScores } from "@/hooks/social/useRivalScores";
 import { SongWithScore } from "@/types/songs/withScore";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import { Loader } from "lucide-react";
+import { SectionLoader } from "@/components/ui/loading-spinner";
 
 interface RivalRankingProps {
   version: string;
@@ -36,9 +36,7 @@ export const RivalRankingBody = ({
 
   if (isLoading) {
     return (
-      <div className="flex justify-center py-8">
-        <Loader className="h-8 w-8 animate-spin text-bpim-info" />
-      </div>
+      <SectionLoader className="py-8" color="text-bpim-info" />
     );
   }
 

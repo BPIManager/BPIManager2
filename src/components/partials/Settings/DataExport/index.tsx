@@ -4,7 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Download, Loader, FileArchive } from "lucide-react";
+import { Download, FileArchive } from "lucide-react";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { IIDX_VERSIONS } from "@/constants/latestVersion";
 import { getVersionNameFromNumber } from "@/constants/versions";
 import { useDataExport } from "@/hooks/export/useDataExport";
@@ -116,7 +117,7 @@ export default function DataExportUi() {
           className="gap-2 min-w-[160px]"
         >
           {isExporting ? (
-            <Loader className="h-4 w-4 animate-spin" />
+            <LoadingSpinner size="sm" />
           ) : (
             <Download className="h-4 w-4" />
           )}

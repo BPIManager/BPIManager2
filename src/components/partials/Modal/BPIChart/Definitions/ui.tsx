@@ -15,11 +15,11 @@ import {
 } from "recharts";
 import {
   BookOpen,
-  Loader,
   TrendingDown,
   TrendingUp,
   Minus,
 } from "lucide-react";
+import { SectionLoader } from "@/components/ui/loading-spinner";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -199,9 +199,7 @@ export const DefinitionsTab = ({ song }: DefinitionsTabProps) => {
 
   if (isLoading) {
     return (
-      <div className="flex h-64 items-center justify-center">
-        <Loader className="h-8 w-8 animate-spin text-bpim-text" />
-      </div>
+      <SectionLoader className="h-64" />
     );
   }
 

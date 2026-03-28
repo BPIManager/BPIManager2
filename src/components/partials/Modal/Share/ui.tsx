@@ -9,7 +9,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Loader } from "lucide-react";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 interface ShareModalProps {
   isOpen: boolean;
@@ -129,7 +129,7 @@ export const ShareResultModal = ({
             className="flex-1 bg-bpim-primary font-bold hover:bg-bpim-primary"
           >
             {isSharing ? (
-              <Loader className="mr-2 h-4 w-4 animate-spin" />
+              <LoadingSpinner size="sm" className="mr-2" />
             ) : null}
             {isSharing ? "生成中..." : "シェアする"}
           </Button>

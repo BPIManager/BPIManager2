@@ -1,7 +1,7 @@
 ﻿import { useCallback, ReactNode } from "react";
 import { useInfiniteScroll } from "@/hooks/common/useInfiniteScroll";
 import { cn } from "@/lib/utils";
-import { Loader } from "lucide-react";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 interface InfiniteScrollContainerProps<T> {
   items: T[];
@@ -57,7 +57,7 @@ export function InfiniteScrollContainer<T>({
         className="flex min-h-[40px] items-center justify-center py-4"
       >
         {isLoadingMore && (
-          <Loader className="h-5 w-5 animate-spin text-bpim-text" />
+          <LoadingSpinner size="md" className="text-bpim-text" />
         )}
         {!isLoadingMore && isReachingEnd && items.length > 0 && (
           <span className="text-[10px] font-medium text-bpim-subtle uppercase tracking-wider">

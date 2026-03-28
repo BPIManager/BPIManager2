@@ -15,16 +15,14 @@ import { RankingTabsCard } from "@/components/partials/DashBoard/RecommendedCard
 import { RadarSection } from "@/components/partials/DashBoard/Radar/ui";
 import { RivalWinLossSummary } from "@/components/partials/DashBoard/Rivals";
 import { BpiHistorySection } from "@/components/partials/DashBoard/TotalBPIHistory";
-import { Loader } from "lucide-react";
+import { PageLoader } from "@/components/ui/loading-spinner";
 
 export default function DashboardPage() {
   const { user, isLoading: isUserLoading, fbUser } = useUser();
 
   if (isUserLoading) {
     return (
-      <div className="flex h-[90vh] w-full items-center justify-center">
-        <Loader className="h-8 w-8 animate-spin text-bpim-text" />
-      </div>
+      <PageLoader size="lg" />
     );
   }
 

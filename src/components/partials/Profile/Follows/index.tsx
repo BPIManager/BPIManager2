@@ -6,7 +6,8 @@ import { useFollowList } from "@/hooks/users/useFollowList";
 import { UserFollowCard } from "./ui";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { UserCheck, Users, Loader } from "lucide-react";
+import { UserCheck, Users } from "lucide-react";
+import { SectionLoader } from "@/components/ui/loading-spinner";
 import { AppTabsGroup } from "@/components/ui/complex/tabs";
 
 export default function FollowPage({
@@ -69,7 +70,7 @@ export default function FollowPage({
                       className="text-bpim-muted hover:bg-bpim-overlay/50 hover:text-bpim-text"
                     >
                       {isLoading ? (
-                        <Loader className="mr-2 h-4 w-4 animate-spin" />
+                        <LoadingSpinner size="sm" className="mr-2" />
                       ) : null}
                       さらに読み込む
                     </Button>
@@ -77,9 +78,7 @@ export default function FollowPage({
                 )}
 
                 {isLoading && users.length === 0 && (
-                  <div className="flex justify-center py-10">
-                    <Loader className="h-8 w-8 animate-spin text-bpim-text" />
-                  </div>
+                  <SectionLoader className="py-10" />
                 )}
               </div>
             )}

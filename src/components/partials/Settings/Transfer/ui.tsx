@@ -9,7 +9,8 @@ import { ActionConfirmDialog } from "../../Modal/Confirmation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Database, Loader, RefreshCw } from "lucide-react";
+import { Database, RefreshCw } from "lucide-react";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 export default function TransferUi() {
   const { fbUser } = useUser();
@@ -74,7 +75,7 @@ export default function TransferUi() {
         disabled={isSyncing}
         className="w-full md:w-auto min-w-[100px] gap-2"
       >
-        {isSyncing ? <Loader className="animate-spin" /> : <RefreshCw />}
+        {isSyncing ? <LoadingSpinner size="sm" /> : <RefreshCw />}
         {isSyncing ? "同期中..." : "同期"}
       </Button>
 
@@ -97,7 +98,7 @@ export default function TransferUi() {
               </span>
               {isChecking ? (
                 <div className="flex items-center gap-2 text-xs text-bpim-text">
-                  <Loader className="h-3 w-3 animate-spin" />
+                  <LoadingSpinner size="xs" />
                   <span>スキャン中...</span>
                 </div>
               ) : foundVersions.length > 0 ? (

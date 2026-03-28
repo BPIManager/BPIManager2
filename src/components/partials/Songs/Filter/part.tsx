@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, ReactNode } from "react";
-import { Search, Pin, PinOff, Loader } from "lucide-react";
+import { Search, Pin, PinOff } from "lucide-react";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
@@ -36,7 +37,7 @@ export const FilterSearchInput = ({
       />
       {isTyping && (
         <div className="absolute right-3 top-1/2 -translate-y-1/2">
-          <Loader className="animate-spin text-bpim-text" size={14} />
+          <LoadingSpinner size="sm" className="text-bpim-text" />
         </div>
       )}
     </div>

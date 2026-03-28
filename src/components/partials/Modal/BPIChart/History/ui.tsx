@@ -9,7 +9,8 @@ import { versionTitles } from "@/constants/versions";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import { Crown, TrendingUp, History, Loader, Calendar } from "lucide-react";
+import { Crown, TrendingUp, History, Calendar } from "lucide-react";
+import { SectionLoader } from "@/components/ui/loading-spinner";
 
 interface SongHistoryTabProps {
   songId: number;
@@ -33,9 +34,7 @@ export const SongHistoryTab = ({ songId }: SongHistoryTabProps) => {
 
   if (isLoading) {
     return (
-      <div className="flex h-64 items-center justify-center">
-        <Loader className="h-8 w-8 animate-spin text-bpim-text" />
-      </div>
+      <SectionLoader className="h-64" />
     );
   }
 

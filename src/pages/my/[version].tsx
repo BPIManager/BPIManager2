@@ -9,7 +9,7 @@ import {
   LoginRequiredCard,
 } from "@/components/partials/LoginRequired/ui";
 import { PageContainer } from "@/components/partials/Header";
-import { Loader } from "lucide-react";
+import { PageLoader } from "@/components/ui/loading-spinner";
 
 export default function MyScoresByVersion() {
   const router = useRouter();
@@ -20,9 +20,7 @@ export default function MyScoresByVersion() {
 
   if (!isReady) {
     return (
-      <div className="flex h-[90vh] w-full items-center justify-center">
-        <Loader className="h-10 w-10 animate-spin text-bpim-text" />
-      </div>
+      <PageLoader />
     );
   }
 

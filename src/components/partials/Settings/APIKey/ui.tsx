@@ -6,7 +6,8 @@ import { ActionConfirmDialog } from "../../Modal/Confirmation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Key, Copy, Loader, RefreshCw } from "lucide-react";
+import { Key, Copy, RefreshCw } from "lucide-react";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 export default function ApiKeyUi() {
   const { keyInfo, generate, isLoading } = useApiKey();
@@ -73,7 +74,7 @@ export default function ApiKeyUi() {
             onClick={handleGenerateClick}
           >
             {isLoading ? (
-              <Loader className="animate-spin" />
+              <LoadingSpinner size="sm" />
             ) : keyInfo?.exists ? (
               <RefreshCw className="mr-1 h-3 w-3" />
             ) : (

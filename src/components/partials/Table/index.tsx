@@ -12,7 +12,7 @@ import { useCompareScores } from "@/hooks/table/useCompareScores";
 import { NoDataAlert } from "../DashBoard/NoData/ui";
 import { SongListSkeleton } from "./skeleton";
 import { AdvancedFilterModal } from "../Songs/AdvancedFilter/ui";
-import { Loader } from "lucide-react";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 export const SongsTable = ({
   userId,
@@ -124,7 +124,7 @@ export const SongsTable = ({
 
       {showCompareLoading && (
         <div className="flex items-center justify-center gap-2 py-2 text-xs text-bpim-muted border-b border-bpim-border">
-          <Loader className="h-3 w-3 animate-spin" />
+          <LoadingSpinner size="xs" />
           前作データを読み込み中...
         </div>
       )}
