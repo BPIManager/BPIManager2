@@ -30,7 +30,7 @@ export const FilterSearchInput = ({
       </div>
       <Input
         placeholder={placeholder}
-        className="h-9 pl-10 pr-10 border-bpim-border bg-bpim-surface-2/60 text-xs focus-visible:ring-gray-500"
+        className="h-9 pl-10 pr-10 border-bpim-border bg-bpim-surface-2/60 text-[16px] md:text-xs placeholder:text-xs focus-visible:ring-gray-500"
         value={localSearch}
         onChange={(e) => setLocalSearch(e.target.value)}
       />
