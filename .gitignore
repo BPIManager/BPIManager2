@@ -44,3 +44,5 @@ next-env.d.ts
 
 certificates
 public/data/
+.claude/
+.claude/settings.local.json
