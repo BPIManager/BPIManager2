@@ -2,7 +2,15 @@ import { followsRepo } from "@/lib/db/follow";
 import { NextApiRequest, NextApiResponse } from "next";
 
 /**
- * フォロー・フォロワー一覧の取得
+ * フォロー・フォロワー一覧を取得する API サブハンドラー。
+ *
+ * クエリパラメータ `type`（`"following"` | `"followers"`）、`page`、`limit` を受け取り、
+ * ページネーションされた結果を返す。
+ *
+ * @param req - Next.js API リクエスト
+ * @param res - Next.js API レスポンス
+ * @param targetUserId - 一覧を取得する対象ユーザーの ID
+ * @param viewerId - 閲覧者のユーザー ID（未認証の場合は省略）
  */
 export async function handleGetFollows(
   req: NextApiRequest,
@@ -33,7 +41,13 @@ export async function handleGetFollows(
 }
 
 /**
- * フォローの実行
+ * フォローを実行する API サブハンドラー。
+ *
+ * 既にフォロー済みの場合や自分自身へのフォローはエラーを返す。
+ *
+ * @param res - Next.js API レスポンス
+ * @param targetUserId - フォロー対象ユーザーの ID
+ * @param viewerId - フォローを行うユーザーの ID
  */
 export async function handlePutFollow(
   res: NextApiResponse,
@@ -61,7 +75,13 @@ export async function handlePutFollow(
 }
 
 /**
- * フォロー解除の実行
+ * フォロー解除を実行する API サブハンドラー。
+ *
+ * 既にフォロー解除済みの場合はそのまま成功レスポンスを返す。
+ *
+ * @param res - Next.js API レスポンス
+ * @param targetUserId - フォロー解除対象ユーザーの ID
+ * @param viewerId - フォロー解除を行うユーザーの ID
  */
 export async function handleDeleteFollow(
   res: NextApiResponse,

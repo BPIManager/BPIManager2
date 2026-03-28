@@ -3,6 +3,7 @@ import { fetcher } from "@/utils/common/fetch";
 import { useUser } from "@/contexts/users/UserContext";
 import { API_PREFIX } from "@/constants/apiEndpoints";
 
+/** フォロー候補ユーザーの1件分 */
 export interface RecommendedUser {
   userId: string;
   userName: string;
@@ -10,6 +11,7 @@ export interface RecommendedUser {
   arenaRank: string;
   totalBpi: number;
   iidxId: string;
+  /** レーダーカテゴリ別スコアマップ */
   radar: Record<string, number>;
   updatedAt: string;
 }
@@ -23,6 +25,15 @@ interface UserListResponse {
   users: RecommendedUser[];
 }
 
+/**
+ * フォロー候補ユーザー一覧を取得する。
+ *
+ * @param q - 検索クエリ文字列（デフォルト: `""`）
+ * @param page - ページ番号（デフォルト: `1`）
+ * @param sort - ソートキー（デフォルト: `"totalBpi"`）
+ * @param order - 並び順（デフォルト: `"distance"` = レーダー距離順）
+ * @returns ユーザーリストデータ・ローディング状態・エラー・更新関数
+ */
 export const useUserList = (
   q: string = "",
   page: number = 1,

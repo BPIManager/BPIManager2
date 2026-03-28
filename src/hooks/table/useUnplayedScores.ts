@@ -5,6 +5,13 @@ import { useUser } from "@/contexts/users/UserContext";
 import { fetcher } from "@/utils/common/fetch";
 import { API_PREFIX } from "@/constants/apiEndpoints";
 
+/**
+ * 指定ユーザーがまだプレイしていない楽曲の一覧を取得する。
+ *
+ * @param userId - 対象ユーザー ID（未定義の場合はフェッチしない）
+ * @param version - IIDX バージョン（省略時は最新バージョン）
+ * @returns 未プレイ楽曲配列・ローディング状態・エラー・更新関数・取得バージョン
+ */
 export const useUnplayedScores = (
   userId: string | undefined,
   version?: string,

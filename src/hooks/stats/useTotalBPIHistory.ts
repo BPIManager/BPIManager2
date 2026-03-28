@@ -1,12 +1,26 @@
 import { useStatsData } from "@/services/swr/fetchStats";
 
+/** 合計 BPI 履歴の1日分 */
 export interface BpiHistoryItem {
+  /** 日付（ISO 8601 形式） */
   date: string;
+  /** 該当日の合計 BPI */
   totalBpi: number;
+  /** 更新楽曲数 */
   count: number;
+  /** 更新された楽曲タイトル一覧 */
   updatedSongs: string[];
 }
 
+/**
+ * 合計 BPI の推移履歴を取得する。
+ *
+ * @param userId - 対象ユーザー ID（未定義の場合はフェッチしない）
+ * @param levels - フィルタリングするレベル配列
+ * @param difficulties - フィルタリングする難易度配列
+ * @param version - IIDX バージョン文字列
+ * @returns 合計 BPI 履歴配列・ローディング状態・エラー情報
+ */
 export const useTotalBpiHistory = (
   userId: string | undefined,
   levels: string[],

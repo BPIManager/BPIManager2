@@ -9,7 +9,10 @@ import { rivalRepo } from "./rival";
 import { timelineRepo } from "./timeline";
 
 /**
- * 後方互換性のため、全サブリポジトリのメソッドを集約したオブジェクト
+ * ログ機能の各サブリポジトリのメソッドを集約したファサードオブジェクト。
+ *
+ * 後方互換性維持のために `navigationRepo`・`scoreDetailRepo`・`rivalRepo`・`timelineRepo` を統合している。
+ * 新規コードでは個別のリポジトリを直接使用することを推奨する。
  */
 export const logsRepo = {
   // ナビゲーション系（バッチ・日付）

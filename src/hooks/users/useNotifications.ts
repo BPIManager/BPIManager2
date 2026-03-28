@@ -4,12 +4,15 @@ import { useUser } from "@/contexts/users/UserContext";
 import { API_PREFIX } from "@/constants/apiEndpoints";
 import { useInfiniteList } from "@/services/swr/useInfinite";
 
+/** 通知の1件分 */
 export interface NotificationItem {
+  /** 通知種別。`"follow"` フォロー通知、`"overtaken"` 抜かれ通知 */
   type: "follow" | "overtaken";
   timestamp: string;
   senderId: string;
   senderName: string;
   senderImage: string | null;
+  /** 抜かれ通知の対象楽曲 ID */
   songId?: number;
   songTitle?: string;
   songDifficulty?: string;
@@ -17,10 +20,17 @@ export interface NotificationItem {
   myScore?: number;
 }
 
+/** 未読通知件数レスポンス */
 export interface NotificationCountResponse {
   total: number;
 }
 
+/**
+ * ページネーション付き通知一覧と未読件数を管理するフック。
+ *
+ * @param type - 取得する通知種別（デフォルト: `"all"`）
+ * @returns 通知配列・未読件数・ローディング状態・既読化関数・ページング操作
+ */
 export const useNotifications = (
   type: "all" | "follow" | "overtaken" = "all",
 ) => {

@@ -1,6 +1,13 @@
 import { useState, useMemo } from "react";
 import { BatchDetailItem } from "./useBatchDetail";
 
+/**
+ * バッチ詳細の楽曲一覧をソート・ページングして返す。
+ *
+ * @param details - バッチ詳細アイテム配列
+ * @param type - 並び替え種別。`"growth"` は BPI 成長順、`"top"` は BPI 上位順、`"overtake"` は抜かれた楽曲
+ * @returns 表示対象の楽曲・ページング操作関数・新記録非表示フラグ
+ */
 export const useLogRank = (
   details: BatchDetailItem[],
   type: "growth" | "top" | "overtake",

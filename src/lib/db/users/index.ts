@@ -1,7 +1,16 @@
 import { db } from "@/lib/db";
 import { sql } from "kysely";
 
+/**
+ * ユーザープロフィールの参照・作成・更新を担当するリポジトリクラス。
+ */
 class UsersRepository {
+  /**
+   * 指定ユーザー名が既に使用されているか確認する。
+   *
+   * @param userName - チェックするユーザー名
+   * @returns 同名ユーザーのレコード（存在しない場合は `undefined`）
+   */
   async checkUserNameAvailability(userName: string) {
     return await db
       .selectFrom("users")
@@ -10,6 +19,23 @@ class UsersRepository {
       .executeTakeFirst();
   }
 
+  /**
+   * おすすめユーザーの一覧をページネーション付きで取得する。
+   *
+   * `order` によりソート方法を制御できる:
+   * - `"distance"`: 閲覧者の BPI との差が小さい順
+   * - `"desc"`: `sortColumn` 降順
+   * - `"newest"`: 最新スコア登録順
+   *
+   * @param params.viewerId - 閲覧者のユーザー ID（自分自身は除外）
+   * @param params.viewerValue - 閲覧者の基準値（"distance" ソート時に使用）
+   * @param params.version - バージョン番号
+   * @param params.limit - 取得件数
+   * @param params.offset - オフセット
+   * @param params.searchQuery - ユーザー名または IIDX ID の部分一致検索文字列
+   * @param params.sort - ソート列名（`"totalBpi"` | `"notes"` | ... レーダーカテゴリ）
+   * @param params.order - ソート方向
+   */
   async getRecommendedUsers(params: {
     viewerId: string;
     viewerValue: number;
@@ -117,6 +143,15 @@ class UsersRepository {
     };
   }
 
+  /**
+   * ユーザープロフィールの全情報を取得する。
+   *
+   * フォロワー数・フォロー中数・フォロー関係・バージョン別ステータス履歴を含む。
+   *
+   * @param userId - 取得対象のユーザー ID
+   * @param myId - 閲覧者のユーザー ID（フォロー関係の判定に使用、省略時はゲスト扱い）
+   * @returns プロフィールオブジェクト、ユーザーが存在しない場合は `null`
+   */
   async getUserProfileSummary(userId: string, myId?: string) {
     const userBase = await db
       .selectFrom("users as u")
@@ -206,6 +241,24 @@ class UsersRepository {
     };
   }
 
+  /**
+   * ユーザープロフィールを作成または更新する（UPSERT）。
+   *
+   * トランザクション内でユーザー名の重複チェックを行い、
+   * `users` テーブルを UPSERT した後に `userStatusLogs` にもレコードを追加する。
+   *
+   * @param params.userId - ユーザー ID
+   * @param params.userName - ユーザー名（他ユーザーと重複不可）
+   * @param params.iidxId - IIDX プレイヤー ID
+   * @param params.profileText - プロフィールテキスト
+   * @param params.profileImage - プロフィール画像 URL
+   * @param params.isPublic - 公開設定（`1`: 公開、`0`: 非公開）
+   * @param params.arenaRank - アリーナランク
+   * @param params.version - バージョン番号
+   * @param params.batchId - バッチ ID
+   * @returns `{ success: true }`
+   * @throws ユーザー名が重複する場合は `status: 409` を持つエラー
+   */
   async upsertUserProfile(params: {
     userId: string;
     userName: string;

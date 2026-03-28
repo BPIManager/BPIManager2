@@ -6,6 +6,13 @@ import { UserProfileResponse } from "@/types/users/profile";
 import { API_PREFIX } from "@/constants/apiEndpoints";
 import { toast } from "sonner";
 
+/**
+ * ユーザープロフィールを取得し、フォロー状態のオプティミスティック更新を提供するフック。
+ * フォロートグル時はローカルキャッシュと `compare=true` キャッシュを同期更新する。
+ *
+ * @param userId - 対象ユーザー ID（未定義の場合はフェッチしない）
+ * @returns プロフィール・比較データ・ローディング状態・フォロートグル関数・各種エラーフラグ
+ */
 export const useProfile = (userId: string | undefined) => {
   const { fbUser, isLoading: fbLoading } = useUser();
   const { requestFollow, isUpdating } = useFollow(userId);

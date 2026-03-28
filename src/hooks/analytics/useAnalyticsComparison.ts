@@ -16,10 +16,22 @@ import {
 
 export type { AnalyticsTargetKind, AnalyticsTarget };
 
+/**
+ * {@link AnalyticsTarget} を URL クエリに埋め込める文字列にエンコードする。
+ *
+ * @param t - エンコード対象のターゲット
+ * @returns `encodeURIComponent` 済みの文字列
+ */
 export function encodeTarget(t: AnalyticsTarget): string {
   return encodeURIComponent(`${t.kind}:${t.param ?? ""}:${t.label}`);
 }
 
+/**
+ * {@link encodeTarget} でエンコードされた文字列を {@link AnalyticsTarget} にデコードする。
+ *
+ * @param raw - エンコード済み文字列
+ * @returns デコード結果。パースに失敗した場合は `null`
+ */
 export function decodeTarget(raw: string): AnalyticsTarget | null {
   try {
     const decoded = decodeURIComponent(raw);
@@ -165,6 +177,15 @@ const useArenaJson = (version: string, levels: number[]) => {
   };
 };
 
+/**
+ * アナリティクス比較ターゲット（ライバル / 旧バージョン自己 / アリーナ / AAA 目標など）に
+ * 対応したスコア比較データを返すフック。
+ * ターゲット種別に応じて必要な API を選択的にフェッチし、自スコアと合成して返す。
+ *
+ * @param target - 比較ターゲット（null の場合は何もフェッチしない）
+ * @param version - IIDX バージョン（省略時は最新バージョン）
+ * @returns 合成済み楽曲スコア配列・ローディング状態・エラー・ラベル文字列
+ */
 export const useAnalyticsComparison = (
   target: AnalyticsTarget | null,
   version?: string,

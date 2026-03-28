@@ -95,6 +95,12 @@ async function downloadAsZip(
   }
 }
 
+/**
+ * 選択バージョンのスコアを CSV ファイルとしてエクスポートするフック。
+ * 複数バージョン選択時は ZIP にまとめてダウンロードし、ZIP 生成失敗時は個別ダウンロードにフォールバックする。
+ *
+ * @returns バージョン選択状態・トグル関数・全選択/全解除・エクスポート実行関数・進捗テキスト
+ */
 export function useDataExport() {
   const { fbUser } = useUser();
   const [selectedVersions, setSelectedVersions] = useState<Set<IIDXVersion>>(

@@ -4,6 +4,13 @@ import { fetcher } from "@/utils/common/fetch";
 import { API_PREFIX } from "@/constants/apiEndpoints";
 import { AllScoreFilterParams, AllSongWithScore } from "@/types/songs/allSongs";
 
+/**
+ * 全バージョンのスコア一覧を取得する。
+ *
+ * @param userId - 対象ユーザー ID（未定義の場合はフェッチしない）
+ * @param params - フィルタリングパラメータ（省略時は全件取得）
+ * @returns 楽曲スコア配列・ローディング状態・エラー・更新関数
+ */
 export const useAllScores = (
   userId: string | undefined,
   params?: AllScoreFilterParams,

@@ -5,7 +5,10 @@ import { socialTimelineRepo } from "./timeline";
 import { socialComparisonRepo } from "./comparison";
 
 /**
- * 後方互換性のため、全サブリポジトリのメソッドを集約したオブジェクト
+ * ソーシャル機能の各サブリポジトリのメソッドを集約したファサードオブジェクト。
+ *
+ * 後方互換性維持のために `socialTimelineRepo` と `socialComparisonRepo` を統合している。
+ * 新規コードでは個別のリポジトリを直接使用することを推奨する。
  */
 export const socialRepo = {
   // タイムライン・フィード系

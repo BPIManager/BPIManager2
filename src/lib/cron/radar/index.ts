@@ -4,6 +4,13 @@ import { latestVersion } from "@/constants/latestVersion";
 import { BpiCalculator } from "@/lib/bpi";
 import { statsRepo } from "@/lib/db/stats";
 
+/**
+ * 全ユーザーのレーダーキャッシュ（`userRadarCache` テーブル）を最新スコアで更新する。
+ *
+ * 各ユーザーの最新スコアから `calculateRadar` でカテゴリ別 BPI を算出し、
+ * 総合 BPI とともに `userRadarCache` に UPSERT する。
+ * スコアが存在しないユーザーはスキップされる。
+ */
 export async function updateAllUserRadarCache() {
   const version = latestVersion;
 

@@ -4,6 +4,7 @@ import { bpiRepo } from "../db/bpi";
 import { SongLookup } from "./songLookup";
 import { v4 as uuidv4 } from "uuid";
 
+/** BPIManager（旧アプリ）のスコア履歴エントリ */
 interface BpimScoreHistoryItem {
   title: string;
   difficulty: string;
@@ -11,6 +12,7 @@ interface BpimScoreHistoryItem {
   updatedAt: string;
 }
 
+/** BPIManager（旧アプリ）のスコアメタ情報（クリア種別・ミスカウント） */
 interface BpimScoreMeta {
   title: string;
   difficulty: string;
@@ -18,6 +20,10 @@ interface BpimScoreMeta {
   missCount: number | null | undefined;
 }
 
+/**
+ * BPIManager（旧アプリ）からエクスポートされるスコアデータの形式。
+ * `scoresHistory` に全履歴、`scores` に最新メタ情報を持つ。
+ */
 export interface BpimScoreData {
   scoresHistory: BpimScoreHistoryItem[];
   scores: Record<string, BpimScoreMeta>;
@@ -44,7 +50,16 @@ interface StatusLog {
   createdAt: Date;
 }
 
+/**
+ * BPIManager（旧アプリ）のデータを BPIManager2 の DB へ移行するサービスクラス。
+ */
 export class BpiImportService {
+  /**
+   * BPIManager のクリア状態数値を BPIManager2 の文字列形式に変換する。
+   *
+   * @param state - BPIManager のクリア状態（0〜7 の数値または文字列）
+   * @returns クリア状態文字列（例: `"CLEAR"`, `"HARD CLEAR"` など）
+   */
   mapClearState = (state: number | string | undefined): string => {
     if (state === undefined) return "NO PLAY";
     const s = Number(state);
@@ -69,6 +84,16 @@ export class BpiImportService {
     }
   };
 
+  /**
+   * 複数バージョンの BPIManager スコアデータを BPIManager2 の DB にインポートする。
+   *
+   * 日付ごとに最新スコアを集約してバッチを生成し、トランザクション内で一括保存する。
+   * 既存データはすべて削除してから再インポートされる。
+   *
+   * @param userId - インポート先のユーザー ID
+   * @param payloads - バージョンと BPIManager スコアデータのペア配列
+   * @returns インポートされたスコアの総件数
+   */
   async saveMultipleFirestoreData(
     userId: string,
     payloads: { version: string; data: BpimScoreData }[],

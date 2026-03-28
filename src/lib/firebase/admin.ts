@@ -11,5 +11,14 @@ if (!admin.apps.length) {
   });
 }
 
+/**
+ * Firebase Admin Authentication インスタンス。
+ * API Route でのIDトークン検証やユーザー管理に使用する。
+ */
 export const adminAuth = admin.auth();
+
+/**
+ * Firebase Admin Firestore インスタンス。
+ * サーバーサイドからの Firestore 操作に使用する。
+ */
 export const adminDb = admin.firestore();

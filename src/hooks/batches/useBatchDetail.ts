@@ -18,6 +18,16 @@ export type {
   LogsDetailResponse,
 };
 
+/**
+ * バッチ詳細または日付別スコア詳細を取得し、サマリーと抜いた楽曲を付加して返す。
+ *
+ * @param userId - 対象ユーザー ID（未定義の場合はフェッチしない）
+ * @param version - IIDX バージョン文字列
+ * @param options.batchId - 特定バッチの ID（指定時はバッチ単位で取得）
+ * @param options.date - 日付文字列（batchId 未指定かつ date 指定時は日付単位で取得）
+ * @param options.groupedBy - グループ化単位
+ * @returns 楽曲詳細・サマリー・抜いた楽曲一覧・ローディング状態
+ */
 export const useLogsDetail = (
   userId: string | undefined,
   version: string | undefined,

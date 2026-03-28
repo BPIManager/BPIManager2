@@ -1,7 +1,20 @@
 import { db } from "@/lib/db";
 import { sql } from "kysely";
 
+/**
+ * ソーシャル比較機能（勝敗統計・レーダー・楽曲別スコア）を担当するリポジトリクラス。
+ */
 class SocialComparisonRepository {
+  /**
+   * 閲覧者とライバルの難易度レベル別勝敗統計を取得する。
+   *
+   * レベル 11・12 の最新スコアを比較し、勝ち・負け・引き分けの件数を集計する。
+   *
+   * @param viewerId - 閲覧者のユーザー ID
+   * @param rivalId - 比較対象ライバルのユーザー ID
+   * @param version - バージョン番号
+   * @returns `{ level, win, lose, draw }[]`
+   */
   async getWinLossStats(viewerId: string, rivalId: string, version: string) {
     const getLatestLogIds = (uid: string) =>
       db
@@ -52,6 +65,13 @@ class SocialComparisonRepository {
     }));
   }
 
+  /**
+   * 指定ユーザーのレーダーキャッシュを取得する。
+   *
+   * @param userId - ユーザー ID
+   * @param version - バージョン番号
+   * @returns `userRadarCache` のレコード、存在しない場合は `undefined`
+   */
   async getUserRadar(userId: string, version: string) {
     return await db
       .selectFrom("userRadarCache")
@@ -110,6 +130,17 @@ class SocialComparisonRepository {
       .execute();
   }
 
+  /**
+   * フォロー中の全ユーザーに対する勝敗サマリーを一括取得する。
+   *
+   * 各フォローユーザーとの勝ち・負け・引き分け件数、レーダーデータ（自分・相手）、
+   * アリーナランク・総合 BPI を含む。
+   *
+   * @param params.viewerId - 閲覧者のユーザー ID
+   * @param params.version - バージョン番号
+   * @param params.levels - 対象難易度レベルの配列（空の場合は全レベル）
+   * @param params.difficulties - 対象難易度文字列の配列（空の場合は全難易度）
+   */
   async getFollowedWinLossSummary(params: {
     viewerId: string;
     version: string;

@@ -1,9 +1,16 @@
 import { db } from "@/lib/db";
 import { sql } from "kysely";
 
+/**
+ * フォロー関係（`follows` テーブル）の参照・更新を担当するリポジトリクラス。
+ */
 class FollowRepository {
   /**
-   * フォロー状態を確認する
+   * 指定ユーザーが別のユーザーをフォローしているか確認する。
+   *
+   * @param followerId - フォローする側のユーザー ID
+   * @param followingId - フォローされる側のユーザー ID
+   * @returns フォロー済みであれば `true`
    */
   async isFollowing(followerId: string, followingId: string): Promise<boolean> {
     const result = await db
@@ -17,8 +24,11 @@ class FollowRepository {
   }
 
   /**
-   * フォロー状態をトグルする
-   * @returns true: フォローした, false: 解除した
+   * フォロー状態をトグルする。存在すれば削除し、なければ追加する。
+   *
+   * @param followerId - フォローする側のユーザー ID
+   * @param followingId - フォローされる側のユーザー ID
+   * @returns フォローした場合は `true`、解除した場合は `false`
    */
   async toggleFollow(
     followerId: string,
@@ -50,7 +60,10 @@ class FollowRepository {
   }
 
   /**
-   * フォロワー数を取得する
+   * 指定ユーザーのフォロワー数とフォロー中数を取得する。
+   *
+   * @param userId - ユーザー ID
+   * @returns `{ followersCount, followingCount }`
    */
   async getFollowCounts(userId: string) {
     const [followers, following] = await Promise.all([
@@ -73,7 +86,16 @@ class FollowRepository {
   }
 
   /**
-   * フォロー・フォロワー取得
+   * フォロー中またはフォロワーのユーザー一覧をページネーション付きで取得する。
+   *
+   * 非公開ユーザーは情報をマスクして返す。
+   *
+   * @param params.targetUserId - 一覧を取得する対象ユーザーの ID
+   * @param params.viewerId - 閲覧者の ID（フォロー状態の判定に使用）
+   * @param params.type - `"following"`: フォロー中、`"followers"`: フォロワー
+   * @param params.page - ページ番号（1 始まり）
+   * @param params.limit - 1 ページあたりの件数
+   * @returns ユーザーリスト・総件数・続きがあるかどうか
    */
   async getFollowList(params: {
     targetUserId: string;

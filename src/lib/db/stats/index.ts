@@ -1,7 +1,17 @@
 import { db } from "@/lib/db";
 import { sql } from "kysely";
 
+/**
+ * 統計ダッシュボード・分析画面向けのデータ取得を担当するリポジトリクラス。
+ */
 class StatsRepository {
+  /**
+   * 指定ユーザー・バージョンの最新総合 BPI を取得する。
+   *
+   * @param userId - ユーザー ID
+   * @param version - バージョン番号
+   * @returns 総合 BPI 値（記録がない場合は `-15`）
+   */
   async getLatestTotalBpi(userId: string, version: string): Promise<number> {
     const result = await db
       .selectFrom("logs")
@@ -64,6 +74,15 @@ class StatsRepository {
       .execute();
   }
 
+  /**
+   * 日別のプレイ楽曲数（アクティビティ）を取得する。
+   *
+   * @param userId - ユーザー ID
+   * @param version - バージョン番号
+   * @param levels - 対象難易度レベルの配列（省略時は全レベル）
+   * @param difficulties - 対象難易度文字列の配列（省略時は全難易度）
+   * @returns `{ date: string, count: number }[]`（date は JST 日付文字列）
+   */
   async getActivityData(
     userId: string,
     version: string,
@@ -160,6 +179,15 @@ class StatsRepository {
     return await query.execute();
   }
 
+  /**
+   * 指定ユーザーのスコア履歴（BPI 推移）を取得する。
+   *
+   * @param userId - ユーザー ID
+   * @param version - バージョン番号
+   * @param levels - 対象難易度レベルの配列（空の場合は全レベル）
+   * @param difficulties - 対象難易度文字列の配列（空の場合は全難易度）
+   * @returns lastPlayed 昇順のスコア・楽曲情報配列
+   */
   async getScoreHistory(
     userId: string,
     version: string,
@@ -192,6 +220,13 @@ class StatsRepository {
     return await query.orderBy("s.lastPlayed", "asc").execute();
   }
 
+  /**
+   * 条件に一致する楽曲の総数を取得する。
+   *
+   * @param levels - 対象難易度レベルの配列（空の場合は全レベル）
+   * @param difficulties - 対象難易度文字列の配列（空の場合は全難易度）
+   * @returns 楽曲総数
+   */
   async getTotalSongCount(
     levels: number[],
     difficulties: string[],

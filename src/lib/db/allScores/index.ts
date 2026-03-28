@@ -2,7 +2,25 @@ import { ALL_DIFFICULTIES } from "@/constants/levels";
 import { db } from "@/lib/db";
 import { AllDifficulties, AllSongWithScore } from "@/types/songs/allSongs";
 
+/**
+ * 全難易度スコア（`allScores` テーブル）の参照を担当するリポジトリクラス。
+ */
 class allScoresRepository {
+  /**
+   * 全難易度の楽曲一覧を、ユーザーの最新スコアと結合して取得する。
+   *
+   * 検索・レベル・難易度・クリア状態でフィルタリングでき、
+   * `sortKey` と `sortOrder` によるソートに対応する。
+   *
+   * @param userId - ユーザー ID
+   * @param params.search - タイトルの部分一致検索文字列
+   * @param params.levels - カンマ区切りの難易度レベル番号（例: `"11,12"`）
+   * @param params.difficulties - カンマ区切りの難易度文字列（例: `"ANOTHER,HYPER"`）
+   * @param params.clearStates - カンマ区切りのクリア種別（例: `"CLEAR,HARD CLEAR"`）
+   * @param params.sortKey - ソートキー（`"level"` | `"title"` | `"exScore"` | `"updatedAt"` | `"clearState"`）
+   * @param params.sortOrder - ソート方向（`"asc"` | `"desc"`）
+   * @returns スコア情報付きの楽曲リスト
+   */
   async getAllScoresList(
     userId: string,
     params: {
@@ -131,6 +149,13 @@ class allScoresRepository {
     return results;
   }
 
+  /**
+   * 指定楽曲のスコア履歴をバージョンごとにグループ化して取得する。
+   *
+   * @param userId - ユーザー ID
+   * @param songId - 楽曲 ID
+   * @returns バージョン文字列をキー、スコアレコード配列を値とするオブジェクト
+   */
   async getScoreHistory(userId: string, songId: string) {
     const history = await db
       .selectFrom("allScores")

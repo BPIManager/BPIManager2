@@ -3,6 +3,7 @@ import { FilterParamsFrontend } from "@/types/songs/withScore";
 import { API_PREFIX } from "@/constants/apiEndpoints";
 import { useInfiniteList } from "@/services/swr/useInfinite";
 
+/** タイムラインの1エントリ */
 export interface TimelineEntry {
   logId: number;
   userId: string;
@@ -13,9 +14,13 @@ export interface TimelineEntry {
   difficulty: string;
   difficultyLevel: number;
   lastPlayed: string;
+  /** WR スコア */
   wrScore: number;
+  /** 皆伝平均 */
   kaidenAvg: number;
+  /** 閲覧者が抜かれているか */
   isOvertaken: boolean;
+  /** ライバルのスコア変化情報 */
   opponentScore: {
     currentEx: number;
     prevEx: number | null;
@@ -24,6 +29,7 @@ export interface TimelineEntry {
     prevBpi: number | null;
     diffBpi: number | null;
   };
+  /** 閲覧者のスコアとライバルとの差分（未プレイの場合 null） */
   viewerScore: {
     exScore: number;
     bpi: number;
@@ -38,6 +44,13 @@ interface TimelineResponse {
   nextId: string | null;
 }
 
+/**
+ * フォロー中ライバルのアクティビティタイムラインを無限スクロールで取得する。
+ *
+ * @param mode - 表示モード。`"all"` 全件、`"played"` 閲覧者もプレイ済み、`"overtaken"` 抜かれた楽曲
+ * @param params - レベル・難易度・検索キーワードなどのフィルター条件
+ * @returns タイムライン配列・ローディング状態・ページング操作
+ */
 export const useTimeline = (
   mode: "all" | "played" | "overtaken",
   params: FilterParamsFrontend,

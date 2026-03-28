@@ -1,3 +1,4 @@
+/** アプリで利用可能なテーマ ID の Union 型 */
 export type ThemeId =
   | "dark-blue"
   | "dark-green"
@@ -17,11 +18,17 @@ export type ThemeId =
   | "light-rose"
   | "light-purple";
 
+/** テーマの定義情報 */
 export interface ThemeDef {
+  /** テーマ識別子 */
   id: ThemeId;
+  /** 表示名 */
   label: string;
+  /** ダーク / ライトモード */
   mode: "dark" | "light";
+  /** アクセントカラー名称 */
   accent: string;
+  /** テーマ選択 UI 用のプレビューカラー */
   preview: {
     bg: string;
     surface: string;
@@ -240,6 +247,12 @@ export const THEMES: ThemeDef[] = [
 export const STORAGE_KEY = "bpim2-theme";
 export const DEFAULT_THEME: ThemeId = "dark-blue";
 
+/**
+ * localStorage に保存されたテーマ ID を返す。
+ * 未保存または無効な値の場合は {@link DEFAULT_THEME} を返す。
+ *
+ * @returns 保存済みテーマ ID
+ */
 export function getStoredTheme(): ThemeId {
   if (typeof window === "undefined") return DEFAULT_THEME;
   const v = localStorage.getItem(STORAGE_KEY);
@@ -247,6 +260,11 @@ export function getStoredTheme(): ThemeId {
   return DEFAULT_THEME;
 }
 
+/**
+ * 指定テーマを `<html>` 要素に適用し、localStorage に保存する。
+ *
+ * @param id - 適用するテーマ ID
+ */
 export function applyTheme(id: ThemeId) {
   const html = document.documentElement;
   const def = THEMES.find((t) => t.id === id)!;

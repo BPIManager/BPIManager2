@@ -1,6 +1,9 @@
 import { db } from "@/lib/db";
 import { sql } from "kysely";
 
+/**
+ * ライバル比較・フォロー中ユーザーとのスコア比較を担当するリポジトリクラス。
+ */
 class RivalRepository {
   /**
    * 楽曲マスタをベースに、自分とライバルのスコアを並列で取得する
@@ -230,6 +233,17 @@ class RivalRepository {
       .execute();
   }
 
+  /**
+   * 指定バッチまたは期間内に追い抜いたライバルとその楽曲を取得する。
+   *
+   * 「追い抜き」とは、今回のスコアがライバルの直前スコアを上回り、
+   * かつ自分の直前スコアはライバルを下回っていた楽曲を指す。
+   *
+   * @param userId - ユーザー ID
+   * @param version - バージョン番号
+   * @param options.range - 期間指定（`start`, `end`, 基準列 `basis`）
+   * @param options.batchId - バッチ ID（`range` と排他）
+   */
   async getOvertakenRivals(
     userId: string,
     version: string,

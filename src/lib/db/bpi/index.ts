@@ -3,7 +3,15 @@ import { SongMaster } from "@/types/songs/songMaster";
 import { Database, NewAllScores, NewScore, NewTotalBPILog } from "@/types/sql";
 import { Transaction } from "kysely";
 
+/**
+ * BPI スコアのインポートおよびスコアマスタ参照を担当するリポジトリクラス。
+ */
 class BpiRepository {
+  /**
+   * 現在有効な曲定義（`songDef.isCurrent = 1`）を結合した楽曲マスタを取得する。
+   *
+   * @returns 楽曲 ID・タイトル・ノーツ数・難易度・皆伝平均・WR スコア・補正係数を含む配列
+   */
   async getSongMasterWithDef(): Promise<SongMaster> {
     const result = await db
       .selectFrom("songs as s")
@@ -25,6 +33,11 @@ class BpiRepository {
     return result as SongMaster;
   }
 
+  /**
+   * 全難易度の楽曲マスタ（`allSongs` テーブル）を取得する。
+   *
+   * @returns 楽曲 ID・タイトル・ノーツ数・難易度・BPM・textage を含む配列
+   */
   async getAllLevelMaster(): Promise<
     {
       songId: number;
@@ -76,10 +89,22 @@ class BpiRepository {
       .execute();
   }
 
+  /**
+   * 指定ユーザー・バージョンの `scores` テーブルから、曲ごとの最新スコアを取得する。
+   *
+   * @param userId - ユーザー ID
+   * @param version - バージョン番号
+   */
   async getLatestScores(userId: string, version: string) {
     return await this.getLatestFromTable(userId, version, "scores");
   }
 
+  /**
+   * 指定ユーザー・バージョンの `allScores` テーブルから、曲ごとの最新スコアを取得する。
+   *
+   * @param userId - ユーザー ID
+   * @param version - バージョン番号
+   */
   async getLatestAllScores(userId: string, version: string) {
     return await this.getLatestFromTable(userId, version, "allScores");
   }
@@ -98,6 +123,18 @@ class BpiRepository {
       .executeTakeFirst();
   }
 
+  /**
+   * スコアインポート結果をトランザクション内で保存する。
+   *
+   * `scores`・`logs`・`userStatusLogs` の更新と、`allScores` の追記を一括で行う。
+   *
+   * @param params.userId - ユーザー ID
+   * @param params.version - バージョン番号
+   * @param params.batchId - バッチ ID（インポートのひとまとまりを識別する UUID）
+   * @param params.scoreUpdates - 保存する BPI スコアの配列
+   * @param params.allScoreUpdates - 保存する全難易度スコアの配列
+   * @param params.newTotalBpi - 今回算出した総合 BPI
+   */
   async saveImportResults(params: {
     userId: string;
     version: string;

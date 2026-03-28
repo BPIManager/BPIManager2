@@ -5,6 +5,14 @@ import { latestVersion } from "@/constants/latestVersion";
 import { SongWithRival } from "@/types/songs/withScore";
 import { API_PREFIX } from "@/constants/apiEndpoints";
 
+/**
+ * 自分とライバルの全楽曲スコアを並べて取得する。
+ *
+ * @param myUserId - 自分のユーザー ID
+ * @param rivalUserId - ライバルのユーザー ID
+ * @param version - IIDX バージョン（省略時は最新バージョン）
+ * @returns 楽曲スコア配列・ローディング状態・エラー・更新関数・取得バージョン
+ */
 export const useRivalBothScores = (
   myUserId: string | undefined,
   rivalUserId: string | undefined,

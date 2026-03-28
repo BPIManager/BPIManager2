@@ -17,6 +17,13 @@ const toFilterKey = (q: ParsedUrlQuery) => {
   return JSON.stringify(rest);
 };
 
+/**
+ * URL クエリパラメータと連動した楽曲フィルター・ソート・ページングを管理するフック。
+ * フィルター条件変更時はページを 1 に自動リセットする。
+ *
+ * @param data - フィルタリング対象の全楽曲スコア配列
+ * @returns フィルターパラメータ・更新関数・ページング情報・表示楽曲配列
+ */
 export const useSongFilter = (data: SongWithScore[] | undefined) => {
   const router = useRouter();
   const { query, isReady } = router;

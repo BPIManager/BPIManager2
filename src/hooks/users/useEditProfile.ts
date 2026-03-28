@@ -5,6 +5,13 @@ import { onAuthStateChanged } from "firebase/auth";
 import { API_PREFIX } from "@/constants/apiEndpoints";
 import { toast } from "sonner";
 
+/**
+ * プロフィール編集フォームの状態管理・バリデーション・保存処理を行うフック。
+ * ユーザー名の重複チェックはデバウンスして非同期実行する。
+ *
+ * @param onClose - 保存成功時に呼び出されるコールバック（省略可）
+ * @returns フォームデータ・更新関数・名前チェック状態・送信処理・バリデーション結果
+ */
 export const useEditProfile = (onClose?: () => void) => {
   const { user, fbUser, refresh } = useUser();
   const [fbUid, setFbUid] = useState<string | null>(null);

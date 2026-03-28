@@ -4,11 +4,23 @@ import { latestVersion } from "@/constants/latestVersion";
 import { metricsRepo } from "@/lib/db/metrics";
 import { BpiCalculator } from "@/lib/bpi";
 
+/**
+ * Arena JSON の 1 楽曲エントリ。
+ * アリーナランク別の平均スコア・達成率・サンプル数・平均 BPI を保持する。
+ */
 interface ArenaGroupEntry {
+  /** 曲名 */
   title: string;
+  /** 難易度（例: "ANOTHER"） */
   difficulty: string;
+  /** ノーツ数 */
   notes: number;
+  /** 最大スコア（ノーツ数 × 2） */
   maxScore: number;
+  /**
+   * アリーナランク（A1〜A5）をキーとする統計データ。
+   * `avgExScore`: 平均 EX スコア、`rate`: 達成率 (%)、`count`: サンプル数、`avgBpi`: 平均 BPI
+   */
   averages: Record<
     string,
     { avgExScore: number; rate: number; count: number; avgBpi?: number }
@@ -25,6 +37,13 @@ const getVersions = () => {
   return Array.from({ length: count }, (_, i) => String(latest - i));
 };
 
+/**
+ * アリーナランク別の平均スコアを集計し、バージョン・レベルごとの JSON ファイルを生成する。
+ *
+ * 出力先: `public/data/metrics/arena/<version>_<level>.json`
+ * 対象バージョン: v26 〜 最新バージョン
+ * 対象レベル: 11・12
+ */
 export async function generateArenaJson() {
   const versions = getVersions();
 
