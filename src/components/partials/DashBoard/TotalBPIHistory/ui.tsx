@@ -11,7 +11,7 @@ import {
   Brush,
   Rectangle,
 } from "recharts";
-import { BpiHistoryItem } from "@/hooks/stats/useTotalBPIHistory";
+import { BpiHistoryItem } from "@/types/stats/bpiHistory";
 import { TotalBpiHistorySkeleton } from "@/components/partials/DashBoard/TotalBPIHistory/skeleton";
 import { DashCard } from "@/components/ui/dashcard";
 import { cn } from "@/lib/utils";

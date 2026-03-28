@@ -1,34 +1,4 @@
-export type ThemeId =
-  | "dark-blue"
-  | "dark-green"
-  | "dark-red"
-  | "dark-orange"
-  | "dark-yellow"
-  | "dark-purple"
-  | "dark-pink"
-  | "dark-cyan"
-  | "dark-abyss"
-  | "dark-midnight"
-  | "dark-forest"
-  | "dark-ember"
-  | "dark-onsen"
-  | "light-blue"
-  | "light-green"
-  | "light-rose"
-  | "light-purple";
-
-export interface ThemeDef {
-  id: ThemeId;
-  label: string;
-  mode: "dark" | "light";
-  accent: string;
-  preview: {
-    bg: string;
-    surface: string;
-    primary: string;
-    text: string;
-  };
-}
+import type { ThemeId, ThemeDef } from "@/types/ui/theme";
 
 export const THEMES: ThemeDef[] = [
   {
@@ -240,6 +210,12 @@ export const THEMES: ThemeDef[] = [
 export const STORAGE_KEY = "bpim2-theme";
 export const DEFAULT_THEME: ThemeId = "dark-blue";
 
+/**
+ * localStorage に保存されたテーマ ID を返す。
+ * 未保存または無効な値の場合は {@link DEFAULT_THEME} を返す。
+ *
+ * @returns 保存済みテーマ ID
+ */
 export function getStoredTheme(): ThemeId {
   if (typeof window === "undefined") return DEFAULT_THEME;
   const v = localStorage.getItem(STORAGE_KEY);
@@ -247,6 +223,11 @@ export function getStoredTheme(): ThemeId {
   return DEFAULT_THEME;
 }
 
+/**
+ * 指定テーマを `<html>` 要素に適用し、localStorage に保存する。
+ *
+ * @param id - 適用するテーマ ID
+ */
 export function applyTheme(id: ThemeId) {
   const html = document.documentElement;
   const def = THEMES.find((t) => t.id === id)!;

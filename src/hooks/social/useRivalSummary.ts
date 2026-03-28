@@ -1,28 +1,19 @@
 import useSWR from "swr";
 import { fetcher } from "@/utils/common/fetch";
 import { useUser } from "@/contexts/users/UserContext";
-import { RadarSummaryData } from "@/types/stats/radar";
 import { API_PREFIX } from "@/constants/apiEndpoints";
 
-export interface RivalStats {
-  win: number;
-  lose: number;
-  draw: number;
-  totalCount: number;
-}
+import type { RivalSummaryResult } from "@/types/social/rival";
 
-export interface RivalSummaryResult {
-  userId: string;
-  userName: string;
-  profileImage: string | null;
-  iidxId: string | null;
-  arenaRank: string | null;
-  totalBpi: number | null;
-  radar: RadarSummaryData;
-  viewerRadar: RadarSummaryData;
-  stats: RivalStats;
-}
-
+/**
+ * フォロー中ライバルのサマリー（勝敗・レーダー）を取得する。
+ *
+ * @param params.userId - 自分のユーザー ID（false の場合はローディング扱い）
+ * @param params.levels - フィルタリングするレベル配列
+ * @param params.difficulties - フィルタリングする難易度配列
+ * @param params.version - IIDX バージョン文字列
+ * @returns ライバルサマリー配列・ローディング状態・エラー・更新関数
+ */
 export const useRivalSummary = (params: {
   userId?: string | boolean;
   levels: string[];

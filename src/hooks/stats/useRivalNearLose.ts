@@ -1,17 +1,8 @@
 import { API_PREFIX } from "@/constants/apiEndpoints";
 import { useUser } from "@/contexts/users/UserContext";
 import { useInfiniteList } from "@/services/swr/useInfinite";
-import { SongWithScore, RivalScore } from "@/types/songs/withScore";
 
-export interface NearLoseSongItem extends SongWithScore {
-  rival: RivalScore & {
-    userId: string;
-    userName: string;
-    profileImage: string | null;
-    exScore: number;
-  };
-  exDiff: number;
-}
+import type { NearLoseSongItem } from "@/types/stats/nearLose";
 
 interface NearLoseResponse {
   items: NearLoseSongItem[];
@@ -22,6 +13,16 @@ interface NearLoseResponse {
   } | null;
 }
 
+/**
+ * ライバルにギリギリ負けている楽曲を無限スクロールで取得する。
+ *
+ * @param userId - 対象ユーザー ID
+ * @param version - IIDX バージョン文字列
+ * @param levels - フィルタリングするレベル配列
+ * @param diffs - フィルタリングする難易度配列
+ * @param threshold - スコア差分の最小/最大閾値（デフォルト: 1〜100）
+ * @returns 楽曲配列・ページング操作・ローディング状態
+ */
 export const useNearLoseInfinite = (
   userId: string,
   version: string,

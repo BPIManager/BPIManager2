@@ -17,6 +17,17 @@ async function performDailyTask() {
   }
 }
 
+/**
+ * サーバー起動時に呼び出す Cron ジョブのセットアップ関数。
+ *
+ * 以下のタスクを登録する:
+ * - 起動時に `performDailyTask`（ユーザーサイトマップ生成）を即時実行
+ * - Arena JSON が存在しない場合は起動時に即時生成
+ * - 起動時にレーダーキャッシュを即時更新
+ * - 毎日 02:00 UTC に `performDailyTask` を実行
+ * - 毎日 04:00 UTC に `generateArenaJson` を実行
+ * - 12 時間ごとに `updateAllUserRadarCache` を実行
+ */
 export async function setupArenaService() {
   performDailyTask();
   let isArenaMissing = false;

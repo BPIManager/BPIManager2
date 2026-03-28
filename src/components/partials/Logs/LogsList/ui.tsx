@@ -1,5 +1,6 @@
 ﻿import { useState, useMemo } from "react";
-import { UpdateLog, useBatchesList } from "@/hooks/batches/useBatchesList";
+import { useBatchesList } from "@/hooks/batches/useBatchesList";
+import type { UpdateLog } from "@/types/logs/batches";
 import { LogsCard } from "../LogsCard/ui";
 import { LogsGroupSkeleton } from "../LogsCard/skeleton";
 import { NoDataAlert } from "../../DashBoard/NoData/ui";

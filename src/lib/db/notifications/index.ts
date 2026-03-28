@@ -1,8 +1,20 @@
 import { db } from "@/lib/db";
-import { NotificationOvertakenRow } from "@/types/notifications/overtakenRow";
+import { NotificationOvertakenRow } from "@/types/users/notifications";
 import { sql } from "kysely";
 
+/**
+ * 通知（フォロー・追い抜き）の参照・既読管理を担当するリポジトリクラス。
+ */
 export class NotificationsRepository {
+  /**
+   * 未読通知数（フォロー通知 + 追い抜き通知）を取得する。
+   *
+   * `notifications` テーブルの `lastReadAt` を基準に、それ以降の件数を集計する。
+   *
+   * @param userId - ユーザー ID
+   * @param latestVersion - 追い抜き通知の対象バージョン
+   * @returns `{ total }` 未読件数の合計
+   */
   async getUnreadCount(userId: string, latestVersion: string) {
     const meta = await db
       .selectFrom("notifications")
@@ -46,6 +58,11 @@ export class NotificationsRepository {
     };
   }
 
+  /**
+   * 通知の既読日時を現在時刻で更新する（UPSERT）。
+   *
+   * @param userId - ユーザー ID
+   */
   async updateLastRead(userId: string) {
     await db
       .insertInto("notifications")
@@ -59,6 +76,18 @@ export class NotificationsRepository {
       .execute();
   }
 
+  /**
+   * フォロー通知・追い抜き通知をページネーション付きで取得する。
+   *
+   * `type` が `"all"` の場合は両種別を UNION ALL して返す。
+   *
+   * @param params.userId - ユーザー ID
+   * @param params.type - 取得する通知種別（`"all"` | `"follow"` | `"overtaken"`）
+   * @param params.latestVersion - 追い抜き通知の対象バージョン
+   * @param params.limit - 1 ページあたりの件数
+   * @param params.offset - オフセット
+   * @returns `NotificationOvertakenRow` の配列（timestamp 降順）
+   */
   async getNotifications(params: {
     userId: string;
     type: "all" | "follow" | "overtaken";

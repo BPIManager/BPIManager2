@@ -1,5 +1,5 @@
 ﻿import { OvertakenRivalInfo } from "@/types/logs/overtaken";
-import { BatchDetailItem } from "@/hooks/batches/useBatchDetail";
+import type { BatchDetailItem } from "@/types/logs/batchDetail";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChevronRight } from "lucide-react";
 

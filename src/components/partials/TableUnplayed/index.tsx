@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { SongWithScore } from "@/types/songs/withScore";
+import { SongWithScore } from "@/types/songs/score";
 import { useSongFilter, PAGE_SIZE } from "@/hooks/table/useSongFilter";
 import { useUnplayedScores } from "@/hooks/table/useUnplayedScores";
 import { NoDataAlert } from "../DashBoard/NoData/ui";

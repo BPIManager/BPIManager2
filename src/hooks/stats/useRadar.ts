@@ -1,8 +1,16 @@
 import { useStatsData } from "@/services/swr/fetchStats";
-import { RadarCategory, RadarCategoryResult } from "@/types/stats/radar";
+import { RadarResponse } from "@/types/stats/radar";
 
-export type RadarResponse = Record<RadarCategory, RadarCategoryResult>;
 
+/**
+ * レーダーチャートデータ（スキルカテゴリ別スコア）を取得する。
+ *
+ * @param userId - 対象ユーザー ID（未定義の場合はフェッチしない）
+ * @param levels - フィルタリングするレベル配列
+ * @param difficulties - フィルタリングする難易度配列
+ * @param version - IIDX バージョン文字列
+ * @returns レーダーデータ・ローディング状態・エラー・更新関数
+ */
 export const useRadar = (
   userId: string | undefined,
   levels: string[],

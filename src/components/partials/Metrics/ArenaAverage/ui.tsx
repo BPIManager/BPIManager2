@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { useState, useMemo, memo } from "react";
-import { ArenaAverageData } from "@/hooks/metrics/useArenaAverage";
+import { ArenaAverageData } from "@/types/metrics/arena";
 import {
   Table,
   TableBody,

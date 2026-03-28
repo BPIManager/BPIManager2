@@ -5,6 +5,14 @@ import path from "path";
 const OUTPUT_DIR = path.join(process.cwd(), "public/data/sitemaps");
 const BASE_URL = process.env.BASEURL + "users";
 
+/**
+ * 全ユーザープロフィールページの XML サイトマップを生成し、ファイルに書き出す。
+ *
+ * 出力先: `public/data/sitemaps/users.xml`
+ * ベース URL は環境変数 `BASEURL` + `"users"` を使用する。
+ *
+ * @throws ファイル書き出しや DB アクセスに失敗した場合はエラーを再スロー
+ */
 export async function generateUserSitemap() {
   console.log("Starting sitemap generation for users...");
 

@@ -4,9 +4,27 @@ import { sql } from "kysely";
 import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
 
+/**
+ * ソーシャルフィード（フォロー中ユーザーのスコア更新タイムライン）を担当するリポジトリクラス。
+ */
 class SocialTimelineRepository {
   /**
-   * フォローしているユーザーのスコア更新履歴を取得
+   * フォロー中ユーザーのスコア更新フィードを取得する。
+   *
+   * `mode` で絞り込みができる:
+   * - `"played"`: 自分もプレイしている楽曲のみ
+   * - `"overtaken"`: 自分のベストを超えているスコアのみ
+   *
+   * カーソルページネーション（`lastId` = lastPlayed の ISO 文字列）に対応する。
+   *
+   * @param params.viewerId - 閲覧者のユーザー ID
+   * @param params.version - バージョン番号
+   * @param params.limit - 取得件数
+   * @param params.lastId - カーソル（lastPlayed ISO 文字列）
+   * @param params.mode - フィルターモード
+   * @param params.search - ユーザー名または曲名の部分一致検索
+   * @param params.levels - 対象難易度レベルの配列
+   * @param params.difficulties - 対象難易度文字列の配列
    */
   async getFollowedTimeline(params: {
     viewerId: string;
@@ -125,7 +143,14 @@ class SocialTimelineRepository {
   }
 
   /**
-   * タイムライン上の楽曲群に対して、joinするために閲覧者自身の最新スコアを取得
+   * 指定楽曲群に対して、閲覧者の最新スコアを取得する。
+   *
+   * タイムライン表示時に自分のスコアを並べて表示するために使用する。
+   *
+   * @param viewerId - 閲覧者のユーザー ID
+   * @param version - バージョン番号
+   * @param songIds - 対象楽曲 ID の配列
+   * @returns `{ songId, exScore, bpi, clearState }[]`
    */
   async getViewerScoresForSongs(
     viewerId: string,

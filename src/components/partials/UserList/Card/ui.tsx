@@ -6,6 +6,7 @@ import { getBpiColorStyle } from "@/constants/bpiColor";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import type { RecommendedUser } from "@/types/users/list";
 
 export const UserRecommendationCard = ({
   user,
@@ -14,7 +15,7 @@ export const UserRecommendationCard = ({
   currentSort = "totalBpi",
   onClick,
 }: {
-  user: import("@/hooks/users/useUserList").RecommendedUser & { radar: Record<string, number>; profileText?: string | null };
+  user: RecommendedUser & { radar: Record<string, number>; profileText?: string | null };
   viewerRadar: Record<string, number | { totalBpi: number }>;
   viewerTotalBpi: number;
   currentSort?: string;

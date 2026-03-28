@@ -14,7 +14,7 @@ import {
   Label as RechartsLabel,
   TooltipProps,
 } from "recharts";
-import { SongWithScore } from "@/types/songs/withScore";
+import { SongWithScore } from "@/types/songs/score";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { useChartColors } from "@/hooks/common/useChartColors";

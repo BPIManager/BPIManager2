@@ -2,7 +2,12 @@
   "permissions": {
     "allow": [
       "Bash(grep -r :s*anyb d:GitHubbpim2/src)",
-      "Bash(xargs wc:*)"
+      "Bash(xargs wc:*)",
+      "Bash(grep -E \"^jsdom$|^happy-dom$|^@testing-library$\")",
+      "Bash(xargs cat:*)",
+      "Bash(npm install:*)",
+      "Bash(npm test:*)",
+      "Bash(grep -r from.*@/types/songs c:/Users/note/Documents/GitHub/BPIManager2/src --include=*.ts --include=*.tsx)"
     ]
   }
 }

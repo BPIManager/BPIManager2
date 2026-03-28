@@ -11,7 +11,7 @@ import {
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 
-import { SongWithScore } from "@/types/songs/withScore";
+import { SongWithScore } from "@/types/songs/score";
 import { BpiCalculator } from "@/lib/bpi";
 import { BPIChart } from "./chart";
 import { getRankDetail } from "@/constants/djRank";

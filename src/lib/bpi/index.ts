@@ -1,13 +1,13 @@
-import { SongWithDef } from "@/types/songs/songMaster";
+import type { IBpiBasicSongData } from "@/types/songs/bpi";
 
-export interface IBpiBasicSongData {
-  title?: string;
-  notes: number;
-  kaidenAvg: number | null;
-  wrScore: number | null;
-  coef?: number | null;
-}
-
+/**
+ * BPI（Beat Power Indicator）計算ロジックを提供する静的クラス。
+ *
+ * - 単曲 BPI の計算（`calc`）
+ * - BPI からスコアの逆算（`calcFromBPI`）
+ * - 総合 BPI のべき乗平均計算（`calculateTotalBPI`）
+ * - 順位推定（`estimateRank`）
+ */
 export class BpiCalculator {
   private static readonly DEFAULT_POW_COEF = 1.175;
   private static readonly AVERAGE_OF_ALL_KAIDENS = 2699;
@@ -18,7 +18,11 @@ export class BpiCalculator {
   }
 
   /**
-   * 単曲BPIの計算
+   * 単曲 BPI を計算する。
+   *
+   * @param s - プレイヤーの EX スコア
+   * @param song - 楽曲データ（ノーツ数・皆伝平均・WR スコア・補正係数）
+   * @returns BPI 値（-15 〜 理論上限）。スコアが最大値を超える場合は `null`
    */
   public static calc(s: number, song: IBpiBasicSongData): number | null {
     const { notes, kaidenAvg: k, wrScore: z, coef } = song;
@@ -50,7 +54,12 @@ export class BpiCalculator {
   }
 
   /**
-   * BPIから必要なスコアを逆算する
+   * 目標 BPI を達成するために必要な EX スコアを逆算する。
+   *
+   * @param targetBpi - 目標とする BPI 値
+   * @param song - 楽曲データ
+   * @param ceiled - `true` の場合は切り上げ、`false` の場合は小数のまま返す（デフォルト: `true`）
+   * @returns 目標 BPI を達成するための EX スコア（0 〜 最大スコア）
    */
   public static calcFromBPI(
     targetBpi: number,
@@ -81,7 +90,13 @@ export class BpiCalculator {
   }
 
   /**
-   * 総合BPIの計算 (べき乗平均)
+   * 総合 BPI をべき乗平均で計算する。
+   *
+   * 全楽曲数に対してプレイしていない楽曲は BPI `-15` として扱う。
+   *
+   * @param allBpis - 各楽曲の BPI 配列（降順ソート推奨）
+   * @param totalSongCount - 対象楽曲の総数
+   * @returns 総合 BPI 値
    */
   public static calculateTotalBPI(
     allBpis: number[],
@@ -104,7 +119,10 @@ export class BpiCalculator {
   }
 
   /**
-   * 順位推定
+   * 総合 BPI から皆伝内おおよその順位を推定する。
+   *
+   * @param totalBpi - 総合 BPI 値
+   * @returns 推定順位（整数）
    */
   public static estimateRank(totalBpi: number): number {
     const p = 100;

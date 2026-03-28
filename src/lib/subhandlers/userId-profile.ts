@@ -6,6 +6,10 @@ import { usersRepo } from "../db/users";
 import { v4 as uuidv4 } from "uuid";
 import { AccessResult } from "@/middlewares/api/withApi";
 
+/**
+ * プロフィール取得 API のレスポンス型。
+ * `isCompare` が `true` の場合は `compare` フィールドに勝敗統計とレーダーデータを含む。
+ */
 interface ProfileResponse {
   profile: Awaited<ReturnType<typeof usersRepo.getUserProfileSummary>>;
   compare?: {
@@ -14,6 +18,18 @@ interface ProfileResponse {
   };
 }
 
+/**
+ * ユーザープロフィールを取得する API サブハンドラー。
+ *
+ * 非公開プロフィールへのアクセス制御、フォロー関係の確認を行う。
+ * `isCompare` が `true` の場合は勝敗統計とレーダーデータも返す。
+ *
+ * @param req - Next.js API リクエスト
+ * @param res - Next.js API レスポンス
+ * @param uid - 取得対象ユーザーの ID
+ * @param access - 認証・アクセス検証結果
+ * @param isCompare - 比較データ（勝敗・レーダー）を含めるかどうか
+ */
 export async function handleGetProfile(
   req: NextApiRequest,
   res: NextApiResponse,
@@ -66,6 +82,15 @@ export async function handleGetProfile(
   return res.status(200).json(response);
 }
 
+/**
+ * 新規ユーザープロフィールを作成する API サブハンドラー（POST）。
+ *
+ * 既にプロフィールが存在する場合は 409 エラーを返す。
+ *
+ * @param req - Next.js API リクエスト
+ * @param res - Next.js API レスポンス
+ * @param uid - 作成対象ユーザーの ID
+ */
 export async function handleCreateProfile(
   req: NextApiRequest,
   res: NextApiResponse,
@@ -80,6 +105,15 @@ export async function handleCreateProfile(
   return await upsert(req, res, uid);
 }
 
+/**
+ * 既存ユーザープロフィールを更新する API サブハンドラー（PATCH）。
+ *
+ * プロフィールが存在しない場合は 404 エラーを返す。
+ *
+ * @param req - Next.js API リクエスト
+ * @param res - Next.js API レスポンス
+ * @param uid - 更新対象ユーザーの ID
+ */
 export async function handleUpdateProfile(
   req: NextApiRequest,
   res: NextApiResponse,
@@ -94,6 +128,15 @@ export async function handleUpdateProfile(
   return await upsert(req, res, uid);
 }
 
+/**
+ * プロフィールの作成・更新共通ロジック。
+ *
+ * ユーザー名のバリデーションを行った後、`usersRepo.upsertUserProfile` を呼び出す。
+ *
+ * @param req - Next.js API リクエスト（ボディにプロフィールデータを含む）
+ * @param res - Next.js API レスポンス
+ * @param uid - 対象ユーザーの ID
+ */
 export async function upsert(
   req: NextApiRequest,
   res: NextApiResponse,

@@ -4,32 +4,18 @@ import { fetcher } from "@/utils/common/fetch";
 import { useMemo } from "react";
 import useSWR from "swr";
 
-export type GroupingMode = "target" | "self";
-export interface AAATableTarget {
-  exScore: number;
-  targetBpi: number;
-  diff: number;
-}
+import type { GroupingMode, AAATableItem } from "@/types/metrics/aaa";
 
-export interface AAATableItem {
-  songId: number;
-  title: string;
-  difficulty: string;
-  releasedVersion: number;
-  notes: number;
-  maxScore: number;
-  targets: {
-    aaa: AAATableTarget;
-    maxMinus: AAATableTarget;
-  };
-  user: {
-    exScore: number;
-    bpi: number;
-    isAaa: boolean;
-    isMaxMinus: boolean;
-  };
-}
-
+/**
+ * 指定レベルの AAA / Max- 達成テーブルデータを取得し、BPI 帯でグループ化して返す。
+ *
+ * @param userId - 対象ユーザー ID（未定義の場合はフェッチしない）
+ * @param version - IIDX バージョン文字列
+ * @param level - 難易度レベル（例: `12`）
+ * @param goal - 達成目標（`"aaa"` または `"maxMinus"`）
+ * @param mode - グループ化基準（{@link GroupingMode}）
+ * @returns BPI 帯をキーとしたグループデータ・ローディング状態・エラー情報
+ */
 export const useAAATable = (
   userId: string | undefined,
   version: string,

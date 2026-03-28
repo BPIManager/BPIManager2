@@ -6,6 +6,12 @@ import { toast } from "sonner";
 const getCssVar = (name: string): string =>
   getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
+/**
+ * HTML 要素を PNG 画像に変換し、Web Share API で共有するフック。
+ * 共有前にグリッドレイアウトをシングルカラムに縮小し、共有後に元のスタイルを復元する。
+ *
+ * @returns share 関数（成功時 true を返す）・共有処理中フラグ
+ */
 export const useShareResult = () => {
   const [isSharing, setIsSharing] = useState(false);
 

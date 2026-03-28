@@ -25,8 +25,3 @@ export type RadarResponse = {
 export type RadarSummaryData = {
   [K in Lowercase<RadarCategory>]: number;
 };
-
-export interface RadarCategoryResult {
-  totalBpi: number;
-  songs: RadarSongEntry[];
-}

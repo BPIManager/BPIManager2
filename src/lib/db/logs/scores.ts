@@ -1,6 +1,18 @@
 import { db } from "@/lib/db";
 
+/**
+ * スコア詳細情報（比較・曲定義結合）の参照を担当するリポジトリクラス。
+ */
 class LogScoreRepository {
+  /**
+   * 最終プレイ日時が指定範囲内のスコアを、比較情報付きで取得する。
+   *
+   * 内部で {@link getScoresWithDetails} を呼び出す。
+   *
+   * @param userId - ユーザー ID
+   * @param version - バージョン番号
+   * @param range - 取得対象の lastPlayed UTC 範囲
+   */
   async getScoresByLastPlayedRange(
     userId: string,
     version: string,
@@ -156,6 +168,15 @@ class LogScoreRepository {
       .execute();
   }
 
+  /**
+   * 指定ユーザーのスコア履歴（BPI 推移）を取得する。
+   *
+   * @param userId - ユーザー ID
+   * @param version - バージョン番号
+   * @param levels - 対象難易度レベルの配列（空の場合は全レベル）
+   * @param difficulties - 対象難易度文字列の配列（空の場合は全難易度）
+   * @returns lastPlayed 昇順のスコア・楽曲情報配列
+   */
   async getScoreHistory(
     userId: string,
     version: string,

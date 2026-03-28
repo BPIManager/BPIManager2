@@ -1,5 +1,5 @@
 ﻿import Link from "next/link";
-import { UpdateLog } from "@/hooks/batches/useBatchesList";
+import type { UpdateLog } from "@/types/logs/batches";
 import dayjs from "@/lib/dayjs";
 import { useRouter } from "next/router";
 import { useMemo } from "react";

@@ -10,6 +10,11 @@ interface UserListQueryParams {
   o?: string;
 }
 
+/**
+ * ユーザー一覧ページの URL クエリパラメータ（検索・ページ・ソート・順序）を管理するフック。
+ *
+ * @returns q・p・s・o の現在値、更新関数、リセット関数
+ */
 export function useUserListParams() {
   const router = useRouter();
 

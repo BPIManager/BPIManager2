@@ -1,8 +1,9 @@
 ﻿import { useState } from "react";
-import { useRecommendedInfinite, RecommendedItem } from "@/hooks/stats/useRecommended";
+import { useRecommendedInfinite } from "@/hooks/stats/useRecommended";
+import { RecommendedItem } from "@/types/stats/recommended";
 import { SimpleRankItem } from "./Common/SimpleRankItem";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
-import { SongWithScore } from "@/types/songs/withScore";
+import { SongWithScore } from "@/types/songs/score";
 import { SongDetailView } from "../../Modal/BPIChart/SongDetails/ui";
 import { NearLoseList } from "./NearLose";
 import { DashCard } from "@/components/ui/dashcard";

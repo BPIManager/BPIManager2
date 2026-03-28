@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { diffColors, getLampClass } from "../../../Table/ui";
-import { RecommendedItem } from "@/hooks/stats/useRecommended";
+import { RecommendedItem } from "@/types/stats/recommended";
 
 interface SimpleRankItemProps {
   item: RecommendedItem;

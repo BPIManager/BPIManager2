@@ -4,17 +4,17 @@ import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import {
   THEMES,
-  type ThemeId,
   applyTheme,
   getStoredTheme,
 } from "@/hooks/common/useTheme";
 import {
   FONTS,
-  type FontId,
   applyFont,
   getStoredFont,
 } from "@/hooks/common/useFont";
 import { Palette, Type, Check } from "lucide-react";
+import { ThemeId } from "@/types/ui/theme";
+import { FontId } from "@/types/ui/font";
 
 export default function ThemeSettingsUi() {
   const [current, setCurrent] = useState<ThemeId>("dark-blue");

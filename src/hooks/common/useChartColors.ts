@@ -1,3 +1,4 @@
+import type { ChartColors } from "@/types/ui/chart";
 import { useEffect, useState } from "react";
 
 const getCssVar = (name: string): string => {
@@ -37,20 +38,12 @@ const toRgba = (hsl: string, opacity: number): string => {
   return `rgba(${r},${g},${b},${opacity})`;
 };
 
-export interface ChartColors {
-  primary: string;
-  warning: string;
-  success: string;
-  danger: string;
-  muted: string;
-  grid: string;
-  surface: string;
-  overlay: string;
-  primaryRgba: (opacity: number) => string;
-  warningRgba: (opacity: number) => string;
-  mutedRgba: (opacity: number) => string;
-}
-
+/**
+ * CSS カスタムプロパティからチャート用カラーパレットを読み取り、
+ * テーマ変更を監視して自動更新するフック。
+ *
+ * @returns 現在のテーマに対応した {@link ChartColors} オブジェクト
+ */
 export const useChartColors = (): ChartColors => {
   const read = (): ChartColors => {
     const primary = toHsl(getCssVar("--bpim-primary"));

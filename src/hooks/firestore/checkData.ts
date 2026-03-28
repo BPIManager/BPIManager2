@@ -5,6 +5,12 @@ import { useState } from "react";
 
 const TARGET_VERSIONS = IIDX_VERSIONS;
 
+/**
+ * Firestore 上の各 IIDX バージョンにデータが存在するか確認するフック。
+ *
+ * @param uid - Firebase UID（未定義の場合は何もしない）
+ * @returns チェック実行関数・データが存在するバージョン一覧・チェック中フラグ
+ */
 export const useFirestoreDataCheck = (uid: string | undefined) => {
   const [foundVersions, setFoundVersions] = useState<string[]>([]);
   const [isChecking, setIsChecking] = useState(false);

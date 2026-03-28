@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { useState, useEffect } from "react";
-import { FilterParamsFrontend } from "@/types/songs/withScore";
+import { FilterParamsFrontend } from "@/types/songs/score";
 import { verNameArr } from "@/constants/versions";
 import { CLEAR_STATES } from "@/constants/lampState";
 import dayjs from "@/lib/dayjs";

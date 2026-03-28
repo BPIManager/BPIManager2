@@ -2,24 +2,16 @@ import { API_PREFIX } from "@/constants/apiEndpoints";
 import { useUser } from "@/contexts/users/UserContext";
 import { fetcher } from "@/utils/common/fetch";
 import useSWR from "swr";
+import type { UpdateLog } from "@/types/logs/batches";
 
-export interface TopScore {
-  title: string;
-  bpi: number;
-  clearState: string;
-}
-
-export interface UpdateLog {
-  id: number;
-  batchId: string;
-  version: number;
-  totalBpi: number;
-  songCount: number;
-  diff: number;
-  createdAt: string;
-  topScores: TopScore[];
-}
-
+/**
+ * ユーザーのスコア更新ログ一覧を取得する。
+ *
+ * @param userId - 対象ユーザー ID（未定義の場合はフェッチしない）
+ * @param version - IIDX バージョン文字列
+ * @param groupedBy - グループ化単位（`"batch"` | `"date"` など）
+ * @returns ログ配列・ローディング状態・エラー情報
+ */
 export const useBatchesList = (
   userId: string | undefined,
   version: string,

@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { SongWithRival } from "@/types/songs/withScore";
+import { SongWithRival } from "@/types/songs/score";
 import { cn } from "@/lib/utils";
 import { getLampClass } from "../../Table/ui";
 

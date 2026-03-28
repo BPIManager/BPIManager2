@@ -6,7 +6,7 @@ import { CustomPagination } from "../../Pagination/ui";
 import { AdvancedFilterModal } from "../../Songs/AdvancedFilter/ui";
 import { SongFilterBar } from "../../Songs/Filter/ui";
 import { SongList } from "../../Table/ui";
-import { BatchDetailItem } from "@/hooks/batches/useBatchDetail";
+import type { BatchDetailItem } from "@/types/logs/batchDetail";
 
 export const BatchSongsTable = ({
   songs,

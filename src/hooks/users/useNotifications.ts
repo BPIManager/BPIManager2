@@ -3,24 +3,17 @@ import { fetcher } from "@/utils/common/fetch";
 import { useUser } from "@/contexts/users/UserContext";
 import { API_PREFIX } from "@/constants/apiEndpoints";
 import { useInfiniteList } from "@/services/swr/useInfinite";
+import type {
+  NotificationItem,
+  NotificationCountResponse,
+} from "@/types/users/notifications";
 
-export interface NotificationItem {
-  type: "follow" | "overtaken";
-  timestamp: string;
-  senderId: string;
-  senderName: string;
-  senderImage: string | null;
-  songId?: number;
-  songTitle?: string;
-  songDifficulty?: string;
-  rivalScore?: number;
-  myScore?: number;
-}
-
-export interface NotificationCountResponse {
-  total: number;
-}
-
+/**
+ * ページネーション付き通知一覧と未読件数を管理するフック。
+ *
+ * @param type - 取得する通知種別（デフォルト: `"all"`）
+ * @returns 通知配列・未読件数・ローディング状態・既読化関数・ページング操作
+ */
 export const useNotifications = (
   type: "all" | "follow" | "overtaken" = "all",
 ) => {

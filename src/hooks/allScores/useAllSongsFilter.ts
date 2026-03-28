@@ -65,6 +65,13 @@ function sortLocal(
   });
 }
 
+/**
+ * 全バージョン楽曲一覧のローカルフィルター・ソート・ページングを管理するフック。
+ * フィルター条件変更時はページを 1 に自動リセットする。
+ *
+ * @param userId - 対象ユーザー ID（未定義の場合はデータ取得しない）
+ * @returns フィルターパラメータ・更新関数・ページング情報・表示楽曲配列
+ */
 export function useAllSongsFilter(userId: string | undefined) {
   const [params, setParams] = useState<AllScoreFilterParams>({
     sortKey: "level",

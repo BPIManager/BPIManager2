@@ -12,11 +12,11 @@ import { LoginRequiredCard } from "@/components/partials/LoginRequired/ui";
 import { useUser } from "@/contexts/users/UserContext";
 
 import {
-  AnalyticsTarget,
   decodeTarget,
   encodeTarget,
   useAnalyticsComparison,
 } from "@/hooks/analytics/useAnalyticsComparison";
+import type { AnalyticsTarget } from "@/types/analytics";
 import { TargetSelectorModal } from "@/components/partials/Analytics/TargetSelector/ui";
 import { AnalyticsComparisonTable } from "@/components/partials/Analytics/Table";
 import { latestVersion } from "@/constants/latestVersion";

@@ -4,6 +4,14 @@ import { API_PREFIX } from "@/constants/apiEndpoints";
 import { toast } from "sonner";
 import { User as FirebaseUser } from "firebase/auth";
 
+/**
+ * CSV データのバッチインポート処理を管理するフック。
+ * `csvData` が空の場合はクリップボードから自動読み取りを試みる。
+ *
+ * @param fbUser - Firebase 認証済みユーザー（null の場合はインポートしない）
+ * @param refresh - インポート成功後に呼び出すデータ再取得関数
+ * @returns インポート実行関数・処理中フラグ・進捗テキスト・インポート結果
+ */
 export const useBatchImport = (
   fbUser: FirebaseUser | null,
   refresh: () => Promise<unknown>,

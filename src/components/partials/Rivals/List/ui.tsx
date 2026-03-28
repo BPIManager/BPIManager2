@@ -1,6 +1,6 @@
 ﻿import { formatIIDXId } from "@/utils/common/formatIidxId";
 import { RadarSectionChart } from "../../DashBoard/Radar";
-import { RivalSummaryResult } from "@/hooks/social/useRivalSummary";
+import { RivalSummaryResult } from "@/types/social/rival";
 import { getBpiColorStyle } from "@/constants/bpiColor";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";

@@ -1,7 +1,15 @@
+/**
+ * Kysely を使用した MySQL データベース接続のシングルトンインスタンスを提供するモジュール。
+ *
+ * 開発環境では HMR による接続の多重生成を防ぐため、グローバル変数を介してインスタンスを共有する。
+ * 接続設定は環境変数（`DB_HOST`, `DB_USER`, `DB_PW`, `DB_DATABASE`）から読み込む。
+ *
+ * @module
+ */
 import { Kysely, MysqlDialect, MysqlPool } from "kysely";
 import { createPool } from "mysql2";
 import "dotenv/config";
-import { Database } from "@/types/sql";
+import { Database } from "@/types/db";
 const globalForDb = global as unknown as { db: Kysely<Database> };
 const dialect = new MysqlDialect({
   pool: createPool({
@@ -20,6 +28,10 @@ const dialect = new MysqlDialect({
   }) as unknown as MysqlPool,
 });
 
+/**
+ * アプリ全体で共有される Kysely データベースインスタンス。
+ * 開発時は `global` を利用してシングルトンを維持する。
+ */
 export const db =
   globalForDb.db ||
   new Kysely<Database>({

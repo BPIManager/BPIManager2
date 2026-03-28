@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { SectionLoader } from "@/components/ui/loading-spinner";
-import { GroupingMode, useAAATable } from "@/hooks/metrics/useAAATable";
+import { useAAATable } from "@/hooks/metrics/useAAATable";
+import { GroupingMode } from "@/types/metrics/aaa";
 import { latestVersion } from "@/constants/latestVersion";
 import { AAATableFilter } from "@/components/partials/Metrics/AAATable/selector";
 import { AAAGridItem } from "@/components/partials/Metrics/AAATable/table";

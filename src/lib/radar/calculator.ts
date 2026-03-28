@@ -6,6 +6,10 @@ import {
   RadarSongEntry,
 } from "@/types/stats/radar";
 
+/**
+ * レーダーチャートで使用する全カテゴリの一覧。
+ * 各楽曲は `topElements.json` によっていずれか 1 つのカテゴリに分類される。
+ */
 export const ALL_CATEGORIES: RadarCategory[] = [
   "NOTES",
   "CHORD",
@@ -35,6 +39,15 @@ const topElementMap = new Map<string, RadarCategory>(
   ]),
 );
 
+/**
+ * スコアリストからレーダーチャートデータを計算する。
+ *
+ * `topElements.json` を参照して各楽曲をカテゴリに分類し、
+ * カテゴリごとに {@link BpiCalculator.calculateTotalBPI} を適用した総合 BPI を算出する。
+ *
+ * @param scores - 計算対象のスコア配列（タイトル・難易度・EX スコア・BPI）
+ * @returns 6 カテゴリそれぞれの総合 BPI と楽曲リストを含むレーダーデータ
+ */
 export function calculateRadar(scores: RadarScoreInput[]): RadarResponse {
   const categoryGroup = new Map<RadarCategory, RadarScoreInput[]>();
   ALL_CATEGORIES.forEach((cat) => categoryGroup.set(cat, []));

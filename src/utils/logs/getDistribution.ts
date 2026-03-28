@@ -1,4 +1,4 @@
-import { ChartData } from "@/components/partials/DashBoard/DistributionChart/ui";
+import type { ChartData } from "@/types/ui/chart";
 import { getDJRank } from "../songs/djRank";
 import { RANK_THRESHOLDS } from "@/components/partials/Metrics/ArenaAverage/ui";
 import { BatchDetailItem } from "@/types/logs/batchDetail";

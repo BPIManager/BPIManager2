@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useUser } from "@/contexts/users/UserContext";
 import { useSongFilter, PAGE_SIZE } from "@/hooks/table/useSongFilter";
 import { useRivalBothScores } from "@/hooks/social/useRivalAllScores";
-import { SongWithRival, SongWithScore } from "@/types/songs/withScore";
+import { SongWithRival, SongWithScore } from "@/types/songs/score";
 
 import { SongFilterBar } from "@/components/partials/Songs/Filter/ui";
 import { SongListSkeleton } from "@/components/partials/Table/skeleton";

@@ -1,6 +1,7 @@
 import type { NextApiResponse } from "next";
 import { adminDb } from "@/lib/firebase/admin";
-import { BpiImportService, BpimScoreData } from "@/lib/transfer/importer";
+import { BpiImportService } from "@/lib/transfer/importer";
+import type { BpimScoreData } from "@/types/transfer";
 import { IIDX_VERSIONS } from "@/constants/latestVersion";
 import {
   AuthenticatedNextApiRequest,

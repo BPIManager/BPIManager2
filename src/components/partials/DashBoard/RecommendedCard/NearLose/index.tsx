@@ -1,6 +1,7 @@
 import { InfiniteScrollContainer } from "@/components/partials/InfiniteScroll/ui";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
-import { useNearLoseInfinite, NearLoseSongItem } from "@/hooks/stats/useRivalNearLose";
+import { useNearLoseInfinite } from "@/hooks/stats/useRivalNearLose";
+import { NearLoseSongItem } from "@/types/stats/nearLose";
 import { NearLoseRankItem } from "./item";
 
 interface NearLoseListProps {

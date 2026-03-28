@@ -1,26 +1,26 @@
 import { useUser } from "@/contexts/users/UserContext";
 import { API_PREFIX } from "@/constants/apiEndpoints";
 import { useInfiniteList } from "@/services/swr/useInfinite";
-import { SongWithScore } from "@/types/songs/withScore";
 
 const PAGE_SIZE = 20;
 
-export interface RecommendedItem extends SongWithScore {
-  current: {
-    exScore: number | null;
-    bpi: number | null;
-    clearState: string | null;
-  };
-  diff: { exScore: number; bpi: number };
-  exDiff: number;
-  bpiDiff: number;
-}
+import type { RecommendedItem } from "@/types/stats/recommended";
 
 interface RecommendedPage {
   weapons: { data: RecommendedItem[]; total: number };
   potential: { data: RecommendedItem[]; total: number };
 }
 
+/**
+ * おすすめ楽曲（武器曲 / ポテンシャル）を無限スクロールで取得する。
+ *
+ * @param userId - 対象ユーザー ID
+ * @param version - IIDX バージョン文字列
+ * @param levels - フィルタリングするレベル配列
+ * @param diffs - フィルタリングする難易度配列
+ * @param type - `"weapons"` は伸び代大の楽曲、`"potential"` はポテンシャルの高い楽曲
+ * @returns 楽曲配列・ページング操作・ローディング状態
+ */
 export const useRecommendedInfinite = (
   userId: string,
   version: string,

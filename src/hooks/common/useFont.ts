@@ -1,16 +1,4 @@
-export type FontId =
-  | "default"
-  | "mplus"
-  | "sawarabi-mincho"
-  | "sawarabi-gothic"
-  | "noto-sans-jp";
-
-export interface FontDef {
-  id: FontId;
-  label: string;
-  googleParam: string | null;
-  cssFamily: string;
-}
+import type { FontId, FontDef } from "@/types/ui/font";
 
 export const FONTS: FontDef[] = [
   {
@@ -49,6 +37,12 @@ export const FONTS: FontDef[] = [
 export const FONT_STORAGE_KEY = "bpim2-font";
 export const DEFAULT_FONT: FontId = "default";
 
+/**
+ * localStorage に保存されたフォント ID を返す。
+ * 未保存または無効な値の場合は {@link DEFAULT_FONT} を返す。
+ *
+ * @returns 保存済みフォント ID
+ */
 export function getStoredFont(): FontId {
   if (typeof window === "undefined") return DEFAULT_FONT;
   const v = localStorage.getItem(FONT_STORAGE_KEY);
@@ -72,6 +66,12 @@ function loadGoogleFont(def: FontDef) {
   document.head.appendChild(link);
 }
 
+/**
+ * 指定フォントを `--bpim-font-family` CSS カスタムプロパティに適用し、
+ * 必要に応じて Google Fonts を動的にロードして localStorage に保存する。
+ *
+ * @param id - 適用するフォント ID
+ */
 export function applyFont(id: FontId) {
   const def = FONTS.find((f) => f.id === id)!;
   loadGoogleFont(def);

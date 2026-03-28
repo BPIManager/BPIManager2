@@ -2,6 +2,12 @@ import { useState } from "react";
 import { useUser } from "@/contexts/users/UserContext";
 import { API_PREFIX } from "@/constants/apiEndpoints";
 
+/**
+ * 指定ユーザーへのフォロー / アンフォロー操作を行うフック。
+ *
+ * @param targetUserId - フォロー対象ユーザー ID
+ * @returns フォロー操作関数（現在フォロー中なら解除、そうでなければフォロー）・処理中フラグ
+ */
 export const useFollow = (targetUserId: string | undefined) => {
   const { fbUser, refresh } = useUser();
   const [isUpdating, setIsUpdating] = useState(false);

@@ -9,6 +9,7 @@ import { LoginRequiredCard } from "../LoginRequired/ui";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useTimelineFilter } from "@/hooks/social/useTimelineFilter";
+import { IidxDifficulty } from "@/types/iidx/difficulty";
 
 export const TimelineContainer = () => {
   const { user, isLoading } = useUser();
@@ -73,7 +74,7 @@ export const TimelineContainer = () => {
               selected={filterParams.difficulties || []}
               onToggle={(diff: string) =>
                 toggleDifficulty(
-                  diff as import("@/types/songs/withScore").Difficulties,
+                  diff as IidxDifficulty,
                 )
               }
               getLabel={(diff: string) => diff[0]}

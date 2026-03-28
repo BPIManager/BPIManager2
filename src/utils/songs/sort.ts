@@ -2,7 +2,7 @@ import {
   FilterParamsFrontend,
   SongForSort,
   SongWithScore,
-} from "@/types/songs/withScore";
+} from "@/types/songs/score";
 import { getMaxBpm } from "./getMaxBPM";
 
 export const sortSongs = (

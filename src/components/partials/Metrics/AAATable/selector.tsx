@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { GroupingMode } from "@/hooks/metrics/useAAATable";
+import { GroupingMode } from "@/types/metrics/aaa";
 import { versionsNonDisabledCollection } from "@/constants/versions";
 import {
   Select,

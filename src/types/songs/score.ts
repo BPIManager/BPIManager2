@@ -1,3 +1,6 @@
+import { IidxDifficulty } from "../iidx/difficulty";
+import { Score } from "@/types/db";
+
 export interface RivalScore {
   userId?: string | null;
   userName?: string | null;
@@ -51,7 +54,7 @@ export interface SongWithRival extends SongWithScore {
 export type SongForSort = SongWithScore;
 
 export interface FilterParamsFrontend {
-  difficulties?: Difficulties[];
+  difficulties?: IidxDifficulty[];
   levels?: number[];
   clearStates?: string[];
   versions?: number[];
@@ -104,4 +107,6 @@ export interface FilterParamsFrontend {
   compareVersion?: string;
 }
 
-export type Difficulties = "HYPER" | "ANOTHER" | "LEGGENDARIA";
+export type SongHistoryResponse = {
+  [version: string]: Score[];
+};

@@ -1,3 +1,7 @@
+/**
+ * クリアランプ種別を数値ランクにマッピングする定数。
+ * 値が大きいほど上位のクリア種別を示す。
+ */
 export const LAMP_RANK: Record<string, number> = {
   "NO PLAY": 0,
   FAILED: 1,
@@ -9,6 +13,13 @@ export const LAMP_RANK: Record<string, number> = {
   "FULLCOMBO CLEAR": 7,
 };
 
+/**
+ * 新しいランプ種別が旧ランプより上位かどうかを返す。
+ *
+ * @param newLamp - 新しいクリアランプ種別
+ * @param oldLamp - 旧クリアランプ種別（未プレイの場合は `null`）
+ * @returns 新しいランプが旧ランプより上位であれば `true`
+ */
 export const isImproved = (
   newLamp: string,
   oldLamp: string | null,

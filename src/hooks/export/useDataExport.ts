@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import JSZip from "jszip";
-import { IIDX_VERSIONS, IIDXVersion } from "@/constants/latestVersion";
+import { IIDX_VERSIONS } from "@/constants/latestVersion";
+import type { IIDXVersion } from "@/types/iidx/version";
 import { getVersionNameFromNumber } from "@/constants/versions";
 import { API_PREFIX } from "@/constants/apiEndpoints";
-import { SongWithScore } from "@/types/songs/withScore";
+import { SongWithScore } from "@/types/songs/score";
 import { useUser } from "@/contexts/users/UserContext";
 
 function songsToCSV(songs: SongWithScore[], version: string): string {
@@ -95,6 +96,12 @@ async function downloadAsZip(
   }
 }
 
+/**
+ * 選択バージョンのスコアを CSV ファイルとしてエクスポートするフック。
+ * 複数バージョン選択時は ZIP にまとめてダウンロードし、ZIP 生成失敗時は個別ダウンロードにフォールバックする。
+ *
+ * @returns バージョン選択状態・トグル関数・全選択/全解除・エクスポート実行関数・進捗テキスト
+ */
 export function useDataExport() {
   const { fbUser } = useUser();
   const [selectedVersions, setSelectedVersions] = useState<Set<IIDXVersion>>(

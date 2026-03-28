@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import definitions from "./resources/definitions.json";
-import { IBpiBasicSongData, BpiCalculator } from "@/lib/bpi";
+import { BpiCalculator } from "@/lib/bpi";
+import type { IBpiBasicSongData } from "@/types/bpi";
 
 describe("BpiCalculator ロジックテスト", () => {
   const songs = definitions.rows;

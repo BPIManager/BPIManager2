@@ -2,14 +2,14 @@ import { useMemo, useRef, useEffect } from "react";
 import { useRouter } from "next/router";
 import type { ParsedUrlQuery } from "querystring";
 import {
-  Difficulties,
   FilterParamsFrontend,
   SongWithScore,
-} from "@/types/songs/withScore";
+} from "@/types/songs/score";
 import { filterSongsFrontend } from "@/utils/songs/filter";
 import { sortSongs } from "@/utils/songs/sort";
 
 import { PAGE_SIZE } from "@/constants/pagination";
+import { IidxDifficulty } from "@/types/iidx/difficulty";
 export { PAGE_SIZE };
 
 const toFilterKey = (q: ParsedUrlQuery) => {
@@ -17,6 +17,13 @@ const toFilterKey = (q: ParsedUrlQuery) => {
   return JSON.stringify(rest);
 };
 
+/**
+ * URL クエリパラメータと連動した楽曲フィルター・ソート・ページングを管理するフック。
+ * フィルター条件変更時はページを 1 に自動リセットする。
+ *
+ * @param data - フィルタリング対象の全楽曲スコア配列
+ * @returns フィルターパラメータ・更新関数・ページング情報・表示楽曲配列
+ */
 export const useSongFilter = (data: SongWithScore[] | undefined) => {
   const router = useRouter();
   const { query, isReady } = router;
@@ -32,7 +39,7 @@ export const useSongFilter = (data: SongWithScore[] | undefined) => {
       compareVersion: q.compareVersion || undefined,
       levels: q.levels ? q.levels.split(",").map(Number) : [],
       difficulties: q.difficulties
-        ? (q.difficulties.split(",") as Difficulties[])
+        ? (q.difficulties.split(",") as IidxDifficulty[])
         : [],
       bpmMin: q.bpmMin ? Number(q.bpmMin) : undefined,
       bpmMax: q.bpmMax ? Number(q.bpmMax) : undefined,

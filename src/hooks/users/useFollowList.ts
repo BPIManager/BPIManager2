@@ -2,16 +2,7 @@ import { useUser } from "@/contexts/users/UserContext";
 import { API_PREFIX } from "@/constants/apiEndpoints";
 import { useInfiniteList } from "@/services/swr/useInfinite";
 
-export interface FollowUser {
-  userId: string;
-  userName: string;
-  profileImage: string | null;
-  profileText: string | null;
-  totalBpi: number | null;
-  arenaRank: string | null;
-  isViewerFollowing: boolean;
-  isSelf: boolean;
-}
+import type { FollowUser } from "@/types/users/follow";
 
 interface FollowListResponse {
   users: FollowUser[];
@@ -19,6 +10,13 @@ interface FollowListResponse {
   hasMore: boolean;
 }
 
+/**
+ * ユーザーのフォロー / フォロワー一覧を無限スクロールで取得する。
+ *
+ * @param userId - 対象ユーザー ID
+ * @param type - `"following"` フォロー中一覧、`"followers"` フォロワー一覧
+ * @returns ユーザー配列・ローディング状態・次ページ読み込み関数・更新関数
+ */
 export const useFollowList = (
   userId: string,
   type: "following" | "followers",

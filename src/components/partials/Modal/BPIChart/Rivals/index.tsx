@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { useState } from "react";
-import { SongWithScore } from "@/types/songs/withScore";
+import { SongWithScore } from "@/types/songs/score";
 import { RivalRankingBody } from "./ui";
 import { latestVersion } from "@/constants/latestVersion";
 import { versionsNonDisabledCollection } from "@/constants/versions";

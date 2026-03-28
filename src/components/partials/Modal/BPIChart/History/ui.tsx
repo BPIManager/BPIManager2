@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import dayjs from "@/lib/dayjs";
 import { useUser } from "@/contexts/users/UserContext";
 import { useScoreHistory } from "@/hooks/score/useScoreLogs";
-import { Score } from "@/types/sql";
+import { Score } from "@/types/db";
 import { versionTitles } from "@/constants/versions";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
