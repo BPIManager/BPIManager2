@@ -7,7 +7,7 @@ import { UserFollowCard } from "./ui";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { UserCheck, Users } from "lucide-react";
-import { SectionLoader } from "@/components/ui/loading-spinner";
+import { LoadingSpinner, SectionLoader } from "@/components/ui/loading-spinner";
 import { AppTabsGroup } from "@/components/ui/complex/tabs";
 
 export default function FollowPage({
