@@ -51,7 +51,7 @@ export const useBatchImport = (fbUser: any, refresh: () => Promise<void>) => {
       if (!response.ok) throw new Error("サーバーエラーが発生しました。");
 
       const result = await response.json();
-      if (result.updatedCount > 0) {
+      if (result.updatedBpiCount > 0) {
         setImportResult({
           batchId: result.batchId,
           updatedCount: result.updatedBpiCount,
