@@ -96,8 +96,6 @@ export default function DataExportUi() {
             "clearState",
             "missCount",
             "scoreAt",
-            "wrScore",
-            "kaidenAvg",
           ].map((f) => (
             <Badge
               key={f}

@@ -22,8 +22,6 @@ function songsToCSV(songs: SongWithScore[], version: string): string {
     "clearState",
     "missCount",
     "scoreAt",
-    "wrScore",
-    "kaidenAvg",
   ].join(",");
 
   const escape = (v: string | number | null | undefined) => {
