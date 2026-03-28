@@ -190,7 +190,7 @@ class UsersRepository {
       xId: userBase.xId,
       isPublic: userBase.isPublic,
       follows: {
-        follower: Number(userBase.followerCount ?? 0),
+        followers: Number(userBase.followerCount ?? 0),
         following: Number(userBase.followingCount ?? 0),
       },
       relationship: {
