@@ -3,7 +3,7 @@ import { TrendingUp, TrendingDown, ChevronRight, Minus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DashCard } from "@/components/ui/dashcard";
 
-export const BatchTotalBpiCard = ({ pagination }: { pagination: any }) => {
+export const BatchTotalBpiCard = ({ pagination }: { pagination: { prev?: { totalBpi?: number } | null; current?: { totalBpi?: number } | null } }) => {
   const prevBpi = pagination.prev?.totalBpi ?? -15;
   const currentBpi = pagination.current?.totalBpi ?? -15;
   const bpiDiff = currentBpi - prevBpi;

@@ -16,7 +16,7 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
 
     const items = await notificationsRepo.getNotifications({
       userId,
-      type: type as any,
+      type: type as "all" | "follow" | "overtaken",
       limit: Number(limit),
       latestVersion,
       offset,

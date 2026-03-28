@@ -15,12 +15,28 @@ export const ALL_CATEGORIES: RadarCategory[] = [
   "SOFLAN",
 ];
 
+interface TopElement {
+  title: string;
+  difficulty: string;
+  top: RadarCategory;
+}
+
+interface RadarScoreInput {
+  title: string;
+  difficulty: string | null;
+  exScore: number;
+  bpi: number | string | null;
+}
+
 const topElementMap = new Map<string, RadarCategory>(
-  (topElements as any[]).map((e) => [`${e.title}___${e.difficulty}`, e.top]),
+  (topElements as TopElement[]).map((e) => [
+    `${e.title}___${e.difficulty}`,
+    e.top,
+  ]),
 );
 
-export function calculateRadar(scores: any[]): RadarResponse {
-  const categoryGroup = new Map<RadarCategory, any[]>();
+export function calculateRadar(scores: RadarScoreInput[]): RadarResponse {
+  const categoryGroup = new Map<RadarCategory, RadarScoreInput[]>();
   ALL_CATEGORIES.forEach((cat) => categoryGroup.set(cat, []));
 
   for (const score of scores) {
@@ -36,7 +52,7 @@ export function calculateRadar(scores: any[]): RadarResponse {
   for (const category of ALL_CATEGORIES) {
     const categoryScores = categoryGroup.get(category)!;
 
-    const totalCountInMaster = (topElements as any[]).filter(
+    const totalCountInMaster = (topElements as TopElement[]).filter(
       (e) => e.top === category,
     ).length;
 

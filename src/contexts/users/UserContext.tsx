@@ -10,8 +10,8 @@ import { API_PREFIX } from "@/constants/apiEndpoints";
 interface UserContextType {
   user: Session | null;
   isLoading: boolean;
-  error: any;
-  refresh: KeyedMutator<any>;
+  error: Error | undefined;
+  refresh: KeyedMutator<{ user: Session }>;
   fbUser: FirebaseUser | null;
 }
 
@@ -54,10 +54,14 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     error,
     isLoading: isSwrLoading,
     mutate,
-  } = useSWR(fbUser ? `${API_PREFIX}/me` : null, authenticatedFetcher, {
-    revalidateOnFocus: false,
-    shouldRetryOnError: false,
-  });
+  } = useSWR<{ user: Session }>(
+    fbUser ? `${API_PREFIX}/me` : null,
+    authenticatedFetcher,
+    {
+      revalidateOnFocus: false,
+      shouldRetryOnError: false,
+    },
+  );
 
   const combinedLoading =
     isInitializing || (!!fbUser && isSwrLoading && !data && !error);

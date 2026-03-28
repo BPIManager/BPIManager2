@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 
 interface LogErrorStateProps {
-  error: any;
+  error: { status?: number; info?: { message?: string }; message?: string } | null | undefined;
   onRetry: () => void;
 }
 

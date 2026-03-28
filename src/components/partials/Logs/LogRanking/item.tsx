@@ -58,7 +58,14 @@ export const RankItem = ({
       diff,
       diffColor,
       isBpi = false,
-    }: any) => (
+    }: {
+      label: string;
+      prev: number;
+      current: number;
+      diff: number;
+      diffColor: string;
+      isBpi?: boolean;
+    }) => (
       <div className="flex w-full items-center justify-between font-mono text-sm leading-none">
         <span className="w-[30px] text-[10px] font-bold text-bpim-subtle">
           {label}
@@ -145,7 +152,14 @@ export const RankItem = ({
     diff,
     diffColor,
     isBpi = false,
-  }: any) => {
+  }: {
+    label: string;
+    prev: number;
+    current: number;
+    diff: number;
+    diffColor: string;
+    isBpi?: boolean;
+  }) => {
     const isTopBpi = !isGrowth && isBpi;
     return (
       <div

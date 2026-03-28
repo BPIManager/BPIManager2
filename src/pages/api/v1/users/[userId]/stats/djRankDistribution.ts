@@ -49,8 +49,9 @@ export default async function handler(
     });
 
     return res.status(200).json(distribution);
-  } catch (error: any) {
-    console.error("DJ Rank Distribution Error:", error);
-    return res.status(500).json({ message: error.message });
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Internal Server Error";
+    return res.status(500).json({ message: errorMessage });
   }
 }

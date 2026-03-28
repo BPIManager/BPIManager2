@@ -120,7 +120,15 @@ const ComparisonRow = ({
   diff,
   color,
   isFloat = false,
-}: any) => {
+}: {
+  label: string;
+  oppValue: number;
+  oppGrowth?: number | null;
+  viewerValue?: number;
+  diff?: number | null;
+  color: string;
+  isFloat?: boolean;
+}) => {
   const format = (v: number) => (isFloat ? v.toFixed(2) : v);
   const hasViewer = viewerValue !== undefined;
 
@@ -154,13 +162,13 @@ const ComparisonRow = ({
           <span
             className={cn(
               "inline-flex items-center justify-center h-3.5 min-w-[38px] px-1 rounded-sm text-[10px] font-bold border",
-              diff >= 0
+              (diff ?? 0) >= 0
                 ? "border-green-900 text-bpim-success bg-green-500/5"
                 : "border-red-900 text-bpim-danger bg-bpim-danger/5",
             )}
           >
-            {diff >= 0 ? "+" : ""}
-            {format(diff)}
+            {(diff ?? 0) >= 0 ? "+" : ""}
+            {format(diff ?? 0)}
           </span>
         ) : (
           <div className="w-[38px]" />

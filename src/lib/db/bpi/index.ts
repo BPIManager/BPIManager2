@@ -25,7 +25,7 @@ class BpiRepository {
     return result as SongMaster;
   }
 
-  async getAllLevelMaster(): Promise<any[]> {
+  async getAllLevelMaster(): Promise<{ songId: number; title: string; notes: number; difficulty: string; difficultyLevel: number; bpm: string; textage: string }[]> {
     return await db
       .selectFrom("allSongs")
       .select([
@@ -46,11 +46,11 @@ class BpiRepository {
     tableName: "scores" | "allScores",
   ) {
     return await db
-      .selectFrom(tableName as any)
+      .selectFrom(tableName as "scores" | "allScores")
       .innerJoin(
         (qb) =>
           qb
-            .selectFrom(tableName as any)
+            .selectFrom(tableName as "scores" | "allScores")
             .select([
               "songId as l_songId",
               (eb) => eb.fn.max("logId").as("maxLogId"),
@@ -60,9 +60,9 @@ class BpiRepository {
             .groupBy("songId")
             .as("latest"),
         (join) =>
-          join.onRef("latest.maxLogId", "=", `${tableName}.logId` as any),
+          join.onRef("latest.maxLogId", "=", `${tableName}.logId` as never),
       )
-      .selectAll(tableName as any)
+      .selectAll(tableName as "scores" | "allScores")
       .execute();
   }
 

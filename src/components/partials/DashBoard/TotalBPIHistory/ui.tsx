@@ -17,8 +17,15 @@ import { DashCard } from "@/components/ui/dashcard";
 import { cn } from "@/lib/utils";
 import { useChartColors } from "@/hooks/common/useChartColors";
 
-const UpdateBar = (props: any) => {
+interface UpdateBarProps {
+  payload?: { rivalBpi?: number; updateCount: number };
+  primaryColor: string;
+  [key: string]: unknown;
+}
+
+const UpdateBar = (props: UpdateBarProps) => {
   const { payload, primaryColor } = props;
+  if (!payload) return null;
   if (payload.rivalBpi !== undefined) return null;
   const fill = payload.updateCount > 0 ? primaryColor : "transparent";
   return (
@@ -26,7 +33,30 @@ const UpdateBar = (props: any) => {
   );
 };
 
-const HistoryTooltip = ({ active, payload, label, myName, rivalName }: any) => {
+interface ChartDataPoint {
+  date: string;
+  myBpi?: number;
+  rivalBpi?: number;
+  updateCount: number;
+  updatedSongs?: string[];
+  count?: number;
+}
+
+interface HistoryTooltipProps {
+  active?: boolean;
+  payload?: ReadonlyArray<{ payload: ChartDataPoint }>;
+  label?: string | number;
+  myName?: string;
+  rivalName?: string;
+}
+
+const HistoryTooltip = ({
+  active,
+  payload,
+  label,
+  myName,
+  rivalName,
+}: HistoryTooltipProps) => {
   if (!active || !payload?.length) return null;
   const data = payload[0].payload;
   const isComparison = data.rivalBpi !== undefined;
@@ -60,13 +90,13 @@ const HistoryTooltip = ({ active, payload, label, myName, rivalName }: any) => {
               <span
                 className={cn(
                   "font-mono text-xs font-bold",
-                  data.myBpi - data.rivalBpi > 0
+                  (data.myBpi ?? 0) - (data.rivalBpi ?? 0) > 0
                     ? "text-bpim-success"
                     : "text-bpim-danger",
                 )}
               >
-                {data.myBpi - data.rivalBpi > 0 ? "+" : ""}
-                {(data.myBpi - data.rivalBpi).toFixed(2)}
+                {(data.myBpi ?? 0) - (data.rivalBpi ?? 0) > 0 ? "+" : ""}
+                {((data.myBpi ?? 0) - (data.rivalBpi ?? 0)).toFixed(2)}
               </span>
             </div>
           </>
@@ -131,8 +161,8 @@ export const TotalBpiHistoryChart = ({
     const myMap = new Map(myData?.map((d) => [d.date, d]));
     const rivalMap = new Map(rivalData?.map((d) => [d.date, d]));
 
-    let lastMy: any = null;
-    let lastRival: any = null;
+    let lastMy: BpiHistoryItem | null = null;
+    let lastRival: BpiHistoryItem | null = null;
 
     const merged = allDates.map((date) => {
       const myEntry = myMap.get(date);
@@ -230,7 +260,19 @@ export const TotalBpiHistoryChart = ({
             <YAxis yAxisId="right" hide />
 
             <Tooltip
-              content={<HistoryTooltip myName={myName} rivalName={rivalName} />}
+              content={(props) => (
+                <HistoryTooltip
+                  active={props.active}
+                  payload={
+                    props.payload as
+                      | ReadonlyArray<{ payload: ChartDataPoint }>
+                      | undefined
+                  }
+                  label={props.label}
+                  myName={myName}
+                  rivalName={rivalName}
+                />
+              )}
               cursor={{ stroke: c.grid }}
             />
 

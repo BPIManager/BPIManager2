@@ -38,7 +38,13 @@ const SongInfo = ({ song }: { song: SongWithRival }) => (
   </div>
 );
 
-const DiffBox = ({ exDiff, bpiDiff, isMobile }: any) => {
+interface DiffBoxProps {
+  exDiff: number | null;
+  bpiDiff: number | null;
+  isMobile?: boolean;
+}
+
+const DiffBox = ({ exDiff, bpiDiff, isMobile }: DiffBoxProps) => {
   const hasDiff = exDiff !== null && Number.isFinite(exDiff);
   return (
     <div
@@ -54,34 +60,43 @@ const DiffBox = ({ exDiff, bpiDiff, isMobile }: any) => {
         className={cn(
           "font-bold leading-none",
           isMobile ? "text-[11px]" : "text-xs",
-          exDiff > 0
+          (exDiff ?? 0) > 0
             ? "text-bpim-success"
-            : exDiff < 0
+            : (exDiff ?? 0) < 0
               ? "text-bpim-danger"
               : "text-bpim-muted",
         )}
       >
-        {exDiff > 0 ? `+${exDiff}` : (exDiff ?? "---")}
+        {(exDiff ?? 0) > 0 ? `+${exDiff}` : (exDiff ?? "---")}
       </span>
       <span
         className={cn(
           "text-[10px] font-bold leading-none mt-0.5",
-          bpiDiff > 0
+          (bpiDiff ?? 0) > 0
             ? "text-green-300"
-            : bpiDiff < 0
+            : (bpiDiff ?? 0) < 0
               ? "text-red-300"
               : "text-bpim-subtle",
         )}
       >
-        {bpiDiff > 0
-          ? `+${bpiDiff.toFixed(2)}`
+        {(bpiDiff ?? 0) > 0
+          ? `+${bpiDiff!.toFixed(2)}`
           : (bpiDiff?.toFixed(2) ?? "---")}
       </span>
     </div>
   );
 };
 
-const ScoreBox = ({ label, ex, bpi, clearState, colorClass, isRival }: any) => {
+interface ScoreBoxProps {
+  label: string;
+  ex: number | null;
+  bpi: number | null;
+  clearState: string | null;
+  colorClass?: string;
+  isRival?: boolean;
+}
+
+const ScoreBox = ({ label, ex, bpi, clearState, colorClass, isRival }: ScoreBoxProps) => {
   const lampClass = getLampClass(clearState);
   return (
     <div
@@ -123,7 +138,15 @@ const ScoreBox = ({ label, ex, bpi, clearState, colorClass, isRival }: any) => {
   );
 };
 
-const MobileScoreView = ({ label, ex, bpi, clearState, align }: any) => {
+interface MobileScoreViewProps {
+  label: string;
+  ex: number | null;
+  bpi: number | null;
+  clearState: string | null;
+  align?: string;
+}
+
+const MobileScoreView = ({ label, ex, bpi, clearState, align }: MobileScoreViewProps) => {
   const lampClass = getLampClass(clearState);
   return (
     <div
@@ -185,11 +208,11 @@ export const RivalSongItem = ({
           clearState={song.clearState}
           colorClass="text-bpim-primary"
         />
-        <DiffBox exDiff={exDiff} bpiDiff={bpiDiff} />
+        <DiffBox exDiff={exDiff ?? null} bpiDiff={bpiDiff ?? null} />
         <ScoreBox
           label="RIVAL"
-          ex={song.rival?.exScore}
-          bpi={song.rival?.bpi}
+          ex={song.rival?.exScore ?? null}
+          bpi={song.rival?.bpi ?? null}
           clearState={song.rival?.clearState}
           colorClass="text-bpim-warning"
           isRival
@@ -208,11 +231,11 @@ export const RivalSongItem = ({
             clearState={song.clearState}
             align="start"
           />
-          <DiffBox exDiff={exDiff} bpiDiff={bpiDiff} isMobile />
+          <DiffBox exDiff={exDiff ?? null} bpiDiff={bpiDiff ?? null} isMobile />
           <MobileScoreView
             label="RIVAL"
-            ex={song.rival?.exScore}
-            bpi={song.rival?.bpi}
+            ex={song.rival?.exScore ?? null}
+            bpi={song.rival?.bpi ?? null}
             clearState={song.rival?.clearState}
             align="end"
           />

@@ -11,7 +11,7 @@ export const parseCSV = (csvData: string) => {
     throw new Error("CSVの形式が正しくありません。");
   }
 
-  return parsed.data.flatMap((row: any) => {
+  return (parsed.data as Record<string, string>[]).flatMap((row) => {
     const title = row["タイトル"];
     const lastPlayed = row["最終プレー日時"];
     if (!title) return [];

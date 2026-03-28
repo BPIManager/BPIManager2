@@ -26,7 +26,7 @@ function songsToCSV(songs: SongWithScore[], version: string): string {
     "kaidenAvg",
   ].join(",");
 
-  const escape = (v: any) => {
+  const escape = (v: string | number | null | undefined) => {
     if (v === null || v === undefined) return "";
     const s = String(v);
     if (s.includes(",") || s.includes('"') || s.includes("\n")) {
@@ -47,7 +47,7 @@ function songsToCSV(songs: SongWithScore[], version: string): string {
       s.bpi ?? "",
       escape(s.clearState),
       s.missCount ?? "",
-      s.scoreAt ? new Date(s.scoreAt as any).toISOString() : "",
+      s.scoreAt ? new Date(s.scoreAt).toISOString() : "",
       s.wrScore ?? "",
       s.kaidenAvg ?? "",
     ].join(","),
@@ -146,8 +146,10 @@ export function useDataExport() {
             name: `bpim2_scores_v${v}_${name}.csv`,
             content: withBom,
           });
-        } catch (e: any) {
-          toast.warning(`v${v} のデータ取得をスキップしました: ${e.message}`);
+        } catch (e) {
+          toast.warning(
+            `v${v} のデータ取得をスキップしました: ${e instanceof Error ? e.message : String(e)}`,
+          );
         }
       }
 
@@ -174,8 +176,11 @@ export function useDataExport() {
       }
 
       toast.success(`${files.length} バージョンのデータをエクスポートしました`);
-    } catch (e: any) {
-      toast.error("エクスポートに失敗しました: " + e.message);
+    } catch (e) {
+      toast.error(
+        "エクスポートに失敗しました: " +
+          (e instanceof Error ? e.message : String(e)),
+      );
     } finally {
       setIsExporting(false);
       setProgress("");

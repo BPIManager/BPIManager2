@@ -71,10 +71,9 @@ export default async function handler(
         dailyBatchCount: sameDay.length,
       },
     });
-  } catch (error: any) {
-    console.error(`Batch Scores API Error:`, error);
-    return res
-      .status(500)
-      .json({ message: error.message || "Internal Server Error" });
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Internal Server Error";
+    return res.status(500).json({ message: errorMessage });
   }
 }

@@ -35,7 +35,7 @@ export default async function handler(
   }
 }
 
-export const formatRivalScore = (r: any) => ({
+export const formatRivalScore = (r: Awaited<ReturnType<typeof socialRepo.getRivalScoresForSong>>[number]) => ({
   userId: r.userId,
   userName: r.userName,
   profileImage: r.profileImage,

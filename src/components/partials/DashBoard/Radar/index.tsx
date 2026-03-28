@@ -40,8 +40,19 @@ const RadarDefs = ({
   </svg>
 );
 
-const CustomDot = (props: any) => {
-  const { cx, cy, payload, dataKey, r, primaryColor, warningColor } = props;
+interface CustomDotProps {
+  cx?: number;
+  cy?: number;
+  payload?: { isMeMax?: boolean; isRivalMax?: boolean };
+  dataKey?: string;
+  r?: number;
+  primaryColor: string;
+  warningColor: string;
+}
+
+const CustomDot = (props: CustomDotProps) => {
+  const { cx, cy, payload, dataKey, r = 2, primaryColor, warningColor } = props;
+  if (!payload) return null;
   const isMe = dataKey === "value";
   const isMax = isMe ? payload.isMeMax : payload.isRivalMax;
   const color = isMe ? primaryColor : warningColor;
@@ -65,7 +76,22 @@ const CustomDot = (props: any) => {
   return <circle cx={cx} cy={cy} r={2} fill={color} fillOpacity={0.6} />;
 };
 
-const RadarCustomTooltip = ({ active, payload }: any) => {
+interface RadarTooltipPayloadEntry {
+  payload: {
+    category: string;
+    value: number;
+    rivalValue?: number;
+    isMeMax?: boolean;
+    isRivalMax?: boolean;
+  };
+}
+
+interface RadarCustomTooltipProps {
+  active?: boolean;
+  payload?: RadarTooltipPayloadEntry[];
+}
+
+const RadarCustomTooltip = ({ active, payload }: RadarCustomTooltipProps) => {
   if (!active || !payload?.length) return null;
   const data = payload[0].payload;
   const meVal = data.value;

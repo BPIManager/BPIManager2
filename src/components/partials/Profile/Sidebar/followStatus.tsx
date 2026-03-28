@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { LoginRequiredCard } from "../../LoginRequired/ui";
 import AccountSettings from "../../Modal/AccountSettings";
 import { cn } from "@/lib/utils";
+import { UserRelationship } from "@/types/users/profile";
 
 export const FollowSection = ({
   relationship,
@@ -18,7 +19,7 @@ export const FollowSection = ({
   className,
   onModal,
 }: {
-  relationship: any;
+  relationship: UserRelationship;
   onToggle?: () => void;
   isUpdating?: boolean;
   userId: string;

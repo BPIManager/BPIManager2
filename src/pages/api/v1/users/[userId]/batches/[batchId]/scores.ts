@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { logsRepo } from "@/lib/db/logs";
 import { statsRepo } from "@/lib/db/stats";
-import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
+import { rejectAccess } from "@/middlewares/api/withApi";
 import { mapToLogNested } from "@/utils/logs/getMapNested";
 import { calculateTotalBpi } from "@/services/logs/calculateTotalBpi";
 import { OvertakenMap } from "@/types/logs/overtaken";
@@ -41,10 +41,15 @@ export default async function handler(
     const basis: "lastPlayed" | "createdAt" =
       groupedBy === "lastPlayed" ? "lastPlayed" : "createdAt";
 
-    const range = logsRepo.getJstRange(dateStr, type as any);
+    const range = logsRepo.getJstRange(
+      dateStr,
+      type as "day" | "week" | "month",
+    );
     const nav = await logsRepo.getRangeNavigation(uid, ver, range, basis);
 
-    let responseData: any;
+    let responseData:
+      | Awaited<ReturnType<typeof handleLastPlayedBase>>
+      | Awaited<ReturnType<typeof handleCreatedAtBase>>;
     const isOwnLog = access.viewerId === userId;
 
     if (groupedBy === "lastPlayed") {
@@ -61,11 +66,14 @@ export default async function handler(
         unit: type,
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(`Fetch Detail Error:`, error);
     return res
       .status(500)
-      .json({ message: error.message || "Internal Server Error" });
+      .json({
+        message:
+          error instanceof Error ? error.message : "Internal Server Error",
+      });
   }
 }
 
@@ -75,8 +83,8 @@ export default async function handler(
 async function handleLastPlayedBase(
   uid: string,
   ver: string,
-  range: any,
-  nav: any,
+  range: ReturnType<typeof logsRepo.getJstRange>,
+  nav: Awaited<ReturnType<typeof logsRepo.getRangeNavigation>>,
   isOwnLog: boolean,
 ) {
   const [history, totalSongs, dailyScores, overtaken] = await Promise.all([
@@ -138,8 +146,8 @@ async function handleLastPlayedBase(
 async function handleCreatedAtBase(
   uid: string,
   ver: string,
-  range: any,
-  nav: any,
+  range: ReturnType<typeof logsRepo.getJstRange>,
+  nav: Awaited<ReturnType<typeof logsRepo.getRangeNavigation>>,
   isOwnLog: boolean,
 ) {
   const batches = await logsRepo.findBatchesInRange(

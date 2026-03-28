@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { logsRepo } from "@/lib/db/logs";
-import { formatRivalScore } from "../../following/scores/[songId]";
 
 export default async function handler(
   req: NextApiRequest,
@@ -34,10 +33,23 @@ export default async function handler(
     return res.status(200).json({
       songId: Number(songId),
       version: String(version),
-      rival: formatRivalScore(rivalData),
+      rival: {
+        userId: rivalData.rivalUserId ?? null,
+        userName: rivalData.rivalUserName ?? null,
+        profileImage: null,
+        exScore: rivalData.rivalExScore,
+        bpi: rivalData.rivalBpi !== null ? Number(rivalData.rivalBpi) : -15.0,
+        clearState: rivalData.rivalClearState,
+        lastPlayed: rivalData.rivalLastPlayed,
+        metadata: {
+          wrScore: rivalData.wrScore,
+          kaidenAvg: rivalData.kaidenAvg,
+        },
+      },
     });
-  } catch (error: any) {
-    console.error("Single Rival API Error:", error);
-    return res.status(500).json({ message: error.message });
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Internal Server Error";
+    return res.status(500).json({ message: errorMessage });
   }
 }

@@ -9,24 +9,12 @@ import {
   RivalScore,
 } from "@/types/songs/withScore";
 import { BpiCalculator, IBpiBasicSongData } from "@/lib/bpi";
+import {
+  AnalyticsTargetKind,
+  AnalyticsTarget,
+} from "@/types/analytics";
 
-export type AnalyticsTargetKind =
-  | "rival"
-  | "rival-avg"
-  | "rival-top"
-  | "arena"
-  | "aaa"
-  | "max-"
-  | "wr"
-  | "self-version"
-  | "self-best"
-  | "self-best-excl";
-
-export interface AnalyticsTarget {
-  kind: AnalyticsTargetKind;
-  param?: string;
-  label: string;
-}
+export type { AnalyticsTargetKind, AnalyticsTarget };
 
 export function encodeTarget(t: AnalyticsTarget): string {
   return encodeURIComponent(`${t.kind}:${t.param ?? ""}:${t.label}`);

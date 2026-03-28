@@ -1,5 +1,6 @@
+import { ALL_DIFFICULTIES } from "@/constants/levels";
 import { db } from "@/lib/db";
-import { AllSongWithScore } from "@/types/songs/allSongs";
+import { AllDifficulties, AllSongWithScore } from "@/types/songs/allSongs";
 
 class allScoresRepository {
   async getAllScoresList(
@@ -71,9 +72,13 @@ class allScoresRepository {
     }
 
     if (difficulties && typeof difficulties === "string") {
-      const diffArray = difficulties.split(",").filter(Boolean);
-      if (diffArray.length > 0) {
-        query = query.where("s.difficulty", "in", diffArray as any);
+      const typedDiffArray = difficulties
+        .split(",")
+        .filter((d): d is AllDifficulties =>
+          ALL_DIFFICULTIES.includes(d as AllDifficulties),
+        );
+      if (typedDiffArray.length > 0) {
+        query = query.where("s.difficulty", "in", typedDiffArray);
       }
     }
 

@@ -5,7 +5,7 @@ export const FollowStats = ({
   follows,
 }: {
   userId: string;
-  follows: any;
+  follows: { following: number; followers: number };
 }) => (
   <div className="flex w-full items-center justify-center gap-8 py-2">
     <Link
@@ -24,7 +24,7 @@ export const FollowStats = ({
       className="group flex flex-col items-center"
     >
       <span className="font-mono text-lg font-bold text-bpim-text group-hover:text-bpim-primary transition-colors">
-        {follows.follower}
+        {follows.followers}
       </span>
       <span className="text-[10px] font-bold uppercase tracking-widest text-bpim-muted">
         フォロワー

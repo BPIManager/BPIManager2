@@ -4,6 +4,17 @@ import { latestVersion } from "@/constants/latestVersion";
 import { metricsRepo } from "@/lib/db/metrics";
 import { BpiCalculator } from "@/lib/bpi";
 
+interface ArenaGroupEntry {
+  title: string;
+  difficulty: string;
+  notes: number;
+  maxScore: number;
+  averages: Record<
+    string,
+    { avgExScore: number; rate: number; count: number; avgBpi?: number }
+  >;
+}
+
 const START_VERSION = 26;
 const LEVELS = [11, 12];
 const OUTPUT_DIR = path.join(process.cwd(), "public/data/metrics/arena");
@@ -37,7 +48,7 @@ export async function generateArenaJson() {
 
       const arenaData = await metricsRepo.getArenaAverageScores(v, level);
 
-      const grouped = arenaData.reduce((acc: any, row) => {
+      const grouped = arenaData.reduce((acc: Record<string, ArenaGroupEntry>, row) => {
         const key = `${row.title}[${row.difficulty}]`;
         const notes = songMap.get(key) || 0;
         const maxScore = notes * 2;

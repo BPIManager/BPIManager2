@@ -4,6 +4,7 @@
  */
 
 import type { ColumnType, Insertable, Selectable, Updateable } from "kysely";
+import { AllDifficulties } from "./songs/allSongs";
 
 export interface Database {
   songs: Songs;
@@ -165,7 +166,7 @@ export interface AllSongsTable {
   title: string;
   notes: number;
   bpm: string;
-  difficulty: "BEGINNER" | "NORMAL" | "HYPER" | "ANOTHER" | "LEGGENDARIA";
+  difficulty: AllDifficulties;
   difficultyLevel: number;
   textage: string;
   createdAt: Generated<Date>;

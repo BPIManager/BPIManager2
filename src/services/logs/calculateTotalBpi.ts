@@ -1,17 +1,38 @@
 import { BpiCalculator } from "@/lib/bpi";
 import dayjs from "@/lib/dayjs";
 
+interface ScoreEntry {
+  songId: number;
+  bpi: number | null;
+  difficultyLevel: number;
+  title: string;
+  clearState?: string | null;
+  playDay?: string | null;
+  lastPlayed?: string | Date | null;
+}
+
+interface TimelineEntry {
+  id: string;
+  batchId: string;
+  version: number;
+  totalBpi: number;
+  songCount: number;
+  createdAt: string | Date | null | undefined;
+  topScores: { title: string; bpi: number; clearState: string | null | undefined }[];
+  diff: number;
+}
+
 export const calculateTotalBpi = (
-  allScores: any[],
+  allScores: ScoreEntry[],
   totalSongs: number,
   version: string,
   topN: number,
-) => {
+): TimelineEntry[] => {
   if (allScores.length === 0) return [];
 
-  const timeline: any[] = [];
+  const timeline: TimelineEntry[] = [];
   const currentPBs = new Map<number, { bpi: number; level: number }>();
-  const dailyGroups = new Map<string, any[]>();
+  const dailyGroups = new Map<string, ScoreEntry[]>();
 
   allScores.forEach((score) => {
     const dayKey = dayjs(score.playDay || score.lastPlayed).format(

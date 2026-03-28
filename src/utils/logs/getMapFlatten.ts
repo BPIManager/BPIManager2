@@ -1,6 +1,25 @@
 import { SongWithScore } from "@/types/songs/withScore";
 
-export const mapToFlatSong = (row: any): SongWithScore => {
+interface RawSongScoreRow {
+  songId: number;
+  title: string;
+  notes: number | string | null;
+  bpm: string | null;
+  difficulty: string;
+  difficultyLevel: number;
+  releasedVersion: number | null;
+  logId?: number | string | null;
+  exScore: number | string | null;
+  bpi: number | null;
+  clearState: string | null;
+  missCount: number | null;
+  scoreAt: string | Date | null;
+  wrScore: number | null;
+  kaidenAvg: number | null;
+  coef: number | null;
+}
+
+export const mapToFlatSong = (row: RawSongScoreRow): SongWithScore => {
   return {
     songId: row.songId,
     title: row.title,

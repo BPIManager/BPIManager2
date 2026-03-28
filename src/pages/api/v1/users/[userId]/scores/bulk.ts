@@ -48,10 +48,13 @@ const handler = async (
 
     const scoreUpdates: NewScore[] = [];
     const allScoreUpdates: NewAllScores[] = [];
-    const notFound: any[] = [];
+    const notFound: { title: string; difficulty: string }[] = [];
     const previousTotalBpi = lastLog?.totalBpi ?? -15;
 
-    const checkImprovement = (row: any, current: any) => {
+    type CsvRow = { title: string; difficulty: string; exScore: number; clearState: string; missCount: number | null; lastPlayed: string | null };
+    type CurrentScore = { exScore: number; clearState: string | null; missCount: number | null } | undefined;
+
+    const checkImprovement = (row: CsvRow, current: CurrentScore) => {
       if (!row.exScore || row.exScore <= 0) return false;
       const scoreBetter = row.exScore > (current?.exScore ?? 0);
       const lampBetter = isImproved(
@@ -63,7 +66,7 @@ const handler = async (
       return scoreBetter || lampBetter || missBetter;
     };
 
-    const lastPlayedDate = (dateStr: string) =>
+    const lastPlayedDate = (dateStr: string | null) =>
       dateStr && dayjs(dateStr).isValid()
         ? dayjs.tz(dateStr).utc().toDate()
         : new Date();
@@ -87,12 +90,12 @@ const handler = async (
         allScoreUpdates.push({
           userId,
           songId: song.songId,
-          definitionId: song.defId || null,
+          definitionId: null,
           exScore: row.exScore,
           bpi: bpiValue,
           clearState: row.clearState,
           missCount: row.missCount ?? null,
-          lastPlayed: lastPlayedDate(row.lastPlayed) as any,
+          lastPlayed: lastPlayedDate(row.lastPlayed),
           version,
           batchId,
         } as NewAllScores);
@@ -114,7 +117,7 @@ const handler = async (
           bpi: BpiCalculator.calc(row.exScore, song),
           clearState: row.clearState,
           missCount: row.missCount ?? null,
-          lastPlayed: lastPlayedDate(row.lastPlayed) as any,
+          lastPlayed: lastPlayedDate(row.lastPlayed),
           version,
           batchId,
         } as NewScore);
@@ -153,11 +156,10 @@ const handler = async (
       newTotalBpi,
       details: { notFound },
     });
-  } catch (error: any) {
-    console.error("Import Error:", error);
-    return res
-      .status(500)
-      .json({ message: error.message || "Internal Server Error" });
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Internal Server Error";
+    return res.status(500).json({ message: errorMessage });
   }
 };
 

@@ -40,8 +40,10 @@ export default async function handler(
       .execute();
 
     return res.status(200).json(definitions);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Fetch song definitions error:", error);
-    return res.status(500).json({ message: error.message });
+    const errorMessage =
+      error instanceof Error ? error.message : "Internal Server Error";
+    return res.status(500).json({ message: errorMessage });
   }
 }

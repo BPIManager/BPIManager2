@@ -30,7 +30,7 @@ export const sortSongs = (
       if (diff !== 0) return diff;
     }
 
-    let vA: any, vB: any;
+    let vA: number | string, vB: number | string;
 
     switch (sortKey) {
       case "rivalBpi":

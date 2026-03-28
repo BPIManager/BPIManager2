@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { NotificationOvertakenRow } from "@/types/notifications/overtakenRow";
 import { sql } from "kysely";
 
 export class NotificationsRepository {
@@ -82,7 +83,8 @@ export class NotificationsRepository {
         sql<number | null>`0`.as("myScore"),
         sql<number | null>`NULL`.as("songId"),
       ])
-      .where("f.followingId", "=", userId);
+      .where("f.followingId", "=", userId)
+      .$castTo<NotificationOvertakenRow>();
 
     const overtakenQuery = db
       .selectFrom("scores as s2")
@@ -122,7 +124,8 @@ export class NotificationsRepository {
               .whereRef("s1.exScore", ">=", "s2.exScore"),
           ),
         ),
-      );
+      )
+      .$castTo<NotificationOvertakenRow>();
 
     let baseUnionQuery;
     if (type === "follow") {
@@ -130,7 +133,7 @@ export class NotificationsRepository {
     } else if (type === "overtaken") {
       baseUnionQuery = overtakenQuery;
     } else {
-      baseUnionQuery = followQuery.unionAll(overtakenQuery as any);
+      baseUnionQuery = followQuery.unionAll(overtakenQuery);
     }
 
     return await db

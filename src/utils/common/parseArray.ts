@@ -1,2 +1,2 @@
-export const parseArray = (val: any) =>
+export const parseArray = (val: unknown) =>
   Array.isArray(val) ? val : val ? [val] : [];

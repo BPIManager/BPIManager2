@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useState } from "react";
+import { JSX, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import {
@@ -26,6 +26,7 @@ import {
   Mail,
   CircleCheck,
   CircleDashed,
+  LucideIcon,
 } from "lucide-react";
 
 import { useUser } from "@/contexts/users/UserContext";
@@ -100,7 +101,17 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
     },
   ];
 
-  const renderMenuItem = (item: any, isNested = false) => {
+  const renderMenuItem = (
+    item: {
+      label: string;
+      icon: LucideIcon | ((props: { className?: string }) => JSX.Element);
+      href: string;
+      exact?: boolean;
+      isExternal?: boolean;
+      isComingSoon?: boolean;
+    },
+    isNested = false,
+  ) => {
     const isActive =
       !item.isExternal &&
       (item.href === "/" || item.exact
@@ -156,7 +167,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
 
   const renderScoreSubItem = (item: {
     label: string;
-    icon: any;
+    icon: LucideIcon;
     href: string;
   }) => {
     const isActive =

@@ -8,13 +8,14 @@ import { FollowSection } from "./followStatus";
 import { FollowStats } from "./followCount";
 import { formatIIDXId } from "@/utils/common/formatIidxId";
 import { XIcon } from "../../LogIn";
+import { UserProfileData } from "@/types/users/profile";
 
 export const ProfileSideBar = ({
   profile,
   onFollowToggle,
   isUpdating = false,
 }: {
-  profile: any;
+  profile: UserProfileData;
   onFollowToggle?: () => void;
   isUpdating?: boolean;
 }) => {
@@ -54,10 +55,10 @@ export const ProfileSideBar = ({
   );
 };
 
-export const ProfileHeaderBase = ({ profile }: { profile: any }) => (
+export const ProfileHeaderBase = ({ profile }: { profile: UserProfileData }) => (
   <div className="flex flex-col items-center gap-4 text-center">
     <Avatar className="h-28 w-28 border-2 border-bpim-primary shadow-lg shadow-bpim-primary/20">
-      <AvatarImage src={profile.profileImage} />
+      <AvatarImage src={profile.profileImage ?? undefined} />
       <AvatarFallback className="text-2xl">
         {profile.userName?.slice(0, 2)}
       </AvatarFallback>
@@ -68,14 +69,13 @@ export const ProfileHeaderBase = ({ profile }: { profile: any }) => (
         {profile.userName}
       </h2>
       <p className="font-mono text-xs tracking-widest text-bpim-muted uppercase">
-        ID: {formatIIDXId(profile.iidxId)}
+        ID: {formatIIDXId(profile.iidxId ?? undefined)}
       </p>
     </div>
   </div>
 );
 
-export const ProfileStatsContent = ({ profile }: { profile: any }) => {
-  const current = profile.current || {};
+export const ProfileStatsContent = ({ profile }: { profile: UserProfileData }) => {
   return (
     <div className="flex w-full flex-col gap-6">
       <div className="flex items-end justify-between px-1">
@@ -84,7 +84,7 @@ export const ProfileStatsContent = ({ profile }: { profile: any }) => {
             Arena
           </span>
           <Badge className="bg-orange-600 px-3 py-0.5 text-sm font-bold text-bpim-text shadow-md border-none">
-            {current.arenaRank || "N/A"}
+            {profile.current?.arenaRank || "N/A"}
           </Badge>
         </div>
         <div className="flex flex-col items-end gap-0">
@@ -92,7 +92,7 @@ export const ProfileStatsContent = ({ profile }: { profile: any }) => {
             Total BPI
           </span>
           <span className="font-mono text-2xl font-black leading-none text-bpim-primary">
-            {current.totalBpi?.toFixed(2) ?? "N/A"}
+            {profile.current?.totalBpi?.toFixed(2) ?? "N/A"}
           </span>
         </div>
       </div>
