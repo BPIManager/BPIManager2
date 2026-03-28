@@ -14,8 +14,8 @@ export const UserRecommendationCard = ({
   currentSort = "totalBpi",
   onClick,
 }: {
-  user: any;
-  viewerRadar: any;
+  user: import("@/hooks/users/useUserList").RecommendedUser & { radar: Record<string, number>; profileText?: string | null };
+  viewerRadar: Record<string, number | { totalBpi: number }>;
   viewerTotalBpi: number;
   currentSort?: string;
   onClick: () => void;
@@ -30,9 +30,10 @@ export const UserRecommendationCard = ({
     ? user.totalBpi
     : (user.radar[currentSort.toUpperCase()] ?? -15);
 
+  const radarVal = viewerRadar[currentSort.toUpperCase()];
   const viewerCompareValue = isTotalBpi
     ? viewerTotalBpi
-    : (viewerRadar[currentSort.toUpperCase()]?.totalBpi ?? -15);
+    : ((typeof radarVal === "object" && radarVal !== null ? radarVal.totalBpi : radarVal) ?? -15);
 
   const diff = displayValue - viewerCompareValue;
   const isTarget = diff > 0;

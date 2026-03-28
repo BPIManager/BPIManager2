@@ -79,7 +79,7 @@ async function handleGetUnplayed(
     .orderBy("s.title", "asc")
     .execute();
 
-  const songs = rows.map((row: any) => ({
+  const songs = rows.map((row) => ({
     songId: Number(row.songId),
     title: row.title,
     notes: Number(row.notes || 0),
@@ -129,10 +129,9 @@ export default async function handler(
           .status(405)
           .json({ message: `Method ${req.method} Not Allowed` });
     }
-  } catch (error: any) {
-    console.error("Unplayed Scores API Error:", error);
-    return res
-      .status(500)
-      .json({ message: error.message || "Internal Server Error" });
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Internal Server Error";
+    return res.status(500).json({ message: errorMessage });
   }
 }

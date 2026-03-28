@@ -86,6 +86,8 @@ export const RivalHeader = ({
               isFollowing: false,
               isFollowed: false,
               isSelf: false,
+              isMutual: false,
+              isFollowedBy: false,
             }
           }
           onToggle={onToggleFollow}

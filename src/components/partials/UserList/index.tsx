@@ -77,7 +77,7 @@ export const UserRecommendationList = () => {
           rivalId={selectedUserId}
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          viewerRadar={data?.viewer.radar}
+          viewerRadar={data?.viewer.radar ?? {}}
         />
       )}
 

@@ -3,9 +3,10 @@
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { diffColors, getLampClass } from "../../../Table/ui";
+import { RecommendedItem } from "@/hooks/stats/useRecommended";
 
 interface SimpleRankItemProps {
-  item: any;
+  item: RecommendedItem;
   rank: number;
   onClick: () => void;
 }

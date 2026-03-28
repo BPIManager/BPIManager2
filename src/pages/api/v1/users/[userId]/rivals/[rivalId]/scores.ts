@@ -87,7 +87,9 @@ export default async function handler(
     const sorted = sortSongs(compared, filterParams);
 
     return res.status(200).json(sorted);
-  } catch (error: any) {
-    return res.status(500).json({ message: error.message });
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Internal Server Error";
+    return res.status(500).json({ message: errorMessage });
   }
 }

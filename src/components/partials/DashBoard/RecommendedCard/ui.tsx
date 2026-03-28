@@ -1,5 +1,5 @@
 ﻿import { useState } from "react";
-import { useRecommendedInfinite } from "@/hooks/stats/useRecommended";
+import { useRecommendedInfinite, RecommendedItem } from "@/hooks/stats/useRecommended";
 import { SimpleRankItem } from "./Common/SimpleRankItem";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { SongWithScore } from "@/types/songs/withScore";
@@ -10,14 +10,20 @@ import { InfiniteScrollContainer } from "../../InfiniteScroll/ui";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"; // shadcn/ui
 import { AppTabsGroup } from "@/components/ui/complex/tabs";
 
-const InfiniteList = ({ userId, type, onSelect }: any) => {
+interface InfiniteListProps {
+  userId: string;
+  type: "weapons" | "potential";
+  onSelect: (item: RecommendedItem) => void;
+}
+
+const InfiniteList = ({ userId, type, onSelect }: InfiniteListProps) => {
   const { levels, diffs, version } = useStatsFilter();
   const res = useRecommendedInfinite(userId, version, levels, diffs, type);
 
   return (
     <InfiniteScrollContainer
       {...res}
-      renderItem={(item: any, i: number) => (
+      renderItem={(item: RecommendedItem, i: number) => (
         <SimpleRankItem
           key={`${item.songId}-${i}`}
           item={item}
@@ -34,7 +40,7 @@ export const RankingTabsCard = ({ userId }: { userId: string }) => {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [tab, setTab] = useState<string>("weapons");
 
-  const handleSongSelect = (item: any) => {
+  const handleSongSelect = (item: SongWithScore) => {
     setSelectedSong(item);
     setIsDetailOpen(true);
   };

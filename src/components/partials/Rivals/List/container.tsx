@@ -1,13 +1,21 @@
 ﻿import { RivalSummaryCard } from "./ui";
 import { RivalSummarySkeleton } from "./skeleton";
 import { RivalWinLossSummaryNotFound } from "../../DashBoard/Rivals/nodata";
+import { RivalSummaryResult } from "@/hooks/social/useRivalSummary";
+
+interface RivalListProps {
+  results: RivalSummaryResult[];
+  isLoading: boolean;
+  isError: boolean;
+  onCardClick: (userId: string) => void;
+}
 
 export const RivalList = ({
   results,
   isLoading,
   isError,
   onCardClick,
-}: any) => {
+}: RivalListProps) => {
   if (isError) {
     return (
       <div className="flex h-64 items-center justify-center text-bpim-danger font-bold">
@@ -30,7 +38,7 @@ export const RivalList = ({
 
   return (
     <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-      {results.map((rival: any) => (
+      {results.map((rival) => (
         <RivalSummaryCard
           key={rival.userId}
           rival={rival}

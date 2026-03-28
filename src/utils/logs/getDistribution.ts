@@ -1,8 +1,9 @@
 import { ChartData } from "@/components/partials/DashBoard/DistributionChart/ui";
 import { getDJRank } from "../songs/djRank";
 import { RANK_THRESHOLDS } from "@/components/partials/Metrics/ArenaAverage/ui";
+import { BatchDetailItem } from "@/types/logs/batchDetail";
 
-export const getBpiDistribution = (details: any[]): ChartData[] => {
+export const getBpiDistribution = (details: BatchDetailItem[]): ChartData[] => {
   const bins = [
     "<0",
     "0",
@@ -32,7 +33,7 @@ export const getBpiDistribution = (details: any[]): ChartData[] => {
   return bins.map((label, i) => ({ label, count: counts[i] }));
 };
 
-export const getRankDistribution = (details: any[]): ChartData[] => {
+export const getRankDistribution = (details: BatchDetailItem[]): ChartData[] => {
   const targetLabels = RANK_THRESHOLDS.map((item) => item.label).reverse();
 
   const counts: Record<string, number> = {};

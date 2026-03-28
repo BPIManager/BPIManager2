@@ -17,7 +17,12 @@ export const RivalComparisonModal = ({
   isOpen,
   onClose,
   viewerRadar,
-}: any) => {
+}: {
+  rivalId: string | null;
+  isOpen: boolean;
+  onClose: () => void;
+  viewerRadar: Record<string, number | { totalBpi: number }>;
+}) => {
   const {
     data,
     isLoading: isRivalLoading,
@@ -29,7 +34,7 @@ export const RivalComparisonModal = ({
     isUpdating,
     profile: profileData,
     isLoading: isProfileLoading,
-  } = useProfile(rivalId);
+  } = useProfile(rivalId ?? undefined);
 
   if (!rivalId) return null;
 

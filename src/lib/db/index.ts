@@ -1,4 +1,4 @@
-import { Kysely, MysqlDialect } from "kysely";
+import { Kysely, MysqlDialect, MysqlPool } from "kysely";
 import { createPool } from "mysql2";
 import "dotenv/config";
 import { Database } from "@/types/sql";
@@ -17,7 +17,7 @@ const dialect = new MysqlDialect({
     enableKeepAlive: true,
     keepAliveInitialDelay: 0,
     timezone: "Z",
-  }) as any,
+  }) as unknown as MysqlPool,
 });
 
 export const db =

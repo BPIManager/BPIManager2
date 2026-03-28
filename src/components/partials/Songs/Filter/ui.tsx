@@ -139,21 +139,21 @@ export const SongFilterBar = ({
           label="LEVEL"
           items={[11, 12]}
           selected={params.levels}
-          onToggle={(v: any) =>
+          onToggle={(v) =>
             onParamsChange({ levels: toggleArrayItem(params.levels, v) })
           }
-          getLabel={(v: any) => `☆${v}`}
+          getLabel={(v) => `☆${v}`}
         />
         <FilterCheckboxGroup
           label="DIFFICULTY"
           items={["HYPER", "ANOTHER", "LEGGENDARIA"]}
           selected={params.difficulties}
-          onToggle={(v: any) =>
+          onToggle={(v) =>
             onParamsChange({
               difficulties: toggleArrayItem(params.difficulties, v),
             })
           }
-          getLabel={(v: any) => v[0]}
+          getLabel={(v) => v[0]}
         />
       </div>
 

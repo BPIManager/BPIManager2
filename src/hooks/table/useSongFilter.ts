@@ -1,5 +1,6 @@
 import { useMemo, useRef, useEffect } from "react";
 import { useRouter } from "next/router";
+import type { ParsedUrlQuery } from "querystring";
 import {
   Difficulties,
   FilterParamsFrontend,
@@ -11,7 +12,7 @@ import { sortSongs } from "@/utils/songs/sort";
 import { PAGE_SIZE } from "@/constants/pagination";
 export { PAGE_SIZE };
 
-const toFilterKey = (q: Record<string, any>) => {
+const toFilterKey = (q: ParsedUrlQuery) => {
   const { page: _page, ...rest } = q;
   return JSON.stringify(rest);
 };
@@ -23,36 +24,27 @@ export const useSongFilter = (data: SongWithScore[] | undefined) => {
   const params = useMemo((): FilterParamsFrontend => {
     if (!isReady) return { search: "", sortKey: "bpi", sortOrder: "desc" };
 
+    const q = query as Record<string, string | undefined>;
     return {
-      search: (query.search as string) || "",
-      sortKey: (query.sortKey as any) || "bpi",
-      sortOrder: (query.sortOrder as any) || "desc",
-      compareVersion: (query.compareVersion as string) || undefined,
-      levels: query.levels
-        ? (query.levels as string).split(",").map(Number)
+      search: q.search || "",
+      sortKey: (q.sortKey as FilterParamsFrontend["sortKey"]) || "bpi",
+      sortOrder: (q.sortOrder as FilterParamsFrontend["sortOrder"]) || "desc",
+      compareVersion: q.compareVersion || undefined,
+      levels: q.levels ? q.levels.split(",").map(Number) : [],
+      difficulties: q.difficulties
+        ? (q.difficulties.split(",") as Difficulties[])
         : [],
-      difficulties: query.difficulties
-        ? ((query.difficulties as string).split(",") as Difficulties[])
-        : [],
-      bpmMin: query.bpmMin ? Number(query.bpmMin) : undefined,
-      bpmMax: query.bpmMax ? Number(query.bpmMax) : undefined,
-      isSofran: query.isSofran === "true",
-      since: query.since as FilterParamsFrontend["since"],
-      until: query.until as string,
-      versions: query.versions
-        ? (query.versions as string).split(",").map(Number)
-        : [],
-      clearStates: query.clearStates
-        ? (query.clearStates as string).split(",")
-        : [],
+      bpmMin: q.bpmMin ? Number(q.bpmMin) : undefined,
+      bpmMax: q.bpmMax ? Number(q.bpmMax) : undefined,
+      isSofran: q.isSofran === "true",
+      since: q.since,
+      until: q.until,
+      versions: q.versions ? q.versions.split(",").map(Number) : [],
+      clearStates: q.clearStates ? q.clearStates.split(",") : [],
       isMyPlayed:
-        query.isMyPlayed === undefined
-          ? undefined
-          : query.isMyPlayed === "true",
+        q.isMyPlayed === undefined ? undefined : q.isMyPlayed === "true",
       isRivalPlayed:
-        query.isRivalPlayed === undefined
-          ? undefined
-          : query.isRivalPlayed === "true",
+        q.isRivalPlayed === undefined ? undefined : q.isRivalPlayed === "true",
     };
   }, [query, isReady]);
 
@@ -100,10 +92,9 @@ export const useSongFilter = (data: SongWithScore[] | undefined) => {
 
     if (params.isRivalPlayed !== undefined) {
       filtered = filtered.filter((s) => {
-        const rs = s as any;
         return params.isRivalPlayed
-          ? rs.rival?.exScore !== null
-          : rs.rival?.exScore === null;
+          ? s.rival?.exScore !== null
+          : s.rival?.exScore === null;
       });
     }
     return sortSongs(filtered, params);

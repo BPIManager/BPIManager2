@@ -36,12 +36,20 @@ export const withAuth = (handler: ApiHandler) => {
       (req as AuthenticatedNextApiRequest).authUid = authUid;
 
       return handler(req as AuthenticatedNextApiRequest, res);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Auth Middleware Error:", error);
-      const status = error.code === "auth/id-token-expired" ? 401 : 500;
+      const isExpired =
+        typeof error === "object" &&
+        error !== null &&
+        (error as { code?: string }).code === "auth/id-token-expired";
+      const message =
+        typeof error === "object" &&
+        error !== null &&
+        (error as { message?: string }).message;
+      const status = isExpired ? 401 : 500;
       return res
         .status(status)
-        .json({ message: error.message || "Internal Server Error" });
+        .json({ message: message || "Internal Server Error" });
     }
   };
 };

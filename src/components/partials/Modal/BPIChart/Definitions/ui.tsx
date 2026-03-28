@@ -109,7 +109,14 @@ const DefTooltip = ({
   );
 };
 
-const CustomDot = (props: any) => {
+interface CustomDotProps {
+  cx?: number;
+  cy?: number;
+  payload?: { isCurrent?: number };
+  c: { warning: string; primary: string };
+}
+
+const CustomDot = (props: CustomDotProps) => {
   const { cx, cy, payload, c } = props;
   if (!payload) return null;
   const isCurrent = payload.isCurrent === 1;

@@ -51,7 +51,7 @@ export const NotificationBell = () => {
       >
         <Tabs
           value={activeTab}
-          onValueChange={(v) => setActiveTab(v as any)}
+          onValueChange={(v) => setActiveTab(v as "all" | "follow" | "overtaken")}
           className="w-full"
         >
           <AppTabsGroup

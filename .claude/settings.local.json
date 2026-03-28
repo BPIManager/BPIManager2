@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -r :s*anyb d:GitHubbpim2/src)",
+      "Bash(xargs wc:*)"
+    ]
+  }
+}

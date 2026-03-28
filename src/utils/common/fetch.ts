@@ -1,4 +1,4 @@
-export const fetcher = async (args: string | [string, any]) => {
+export const fetcher = async (args: string | [string, { getIdToken: () => Promise<string> } | null]) => {
   const url = typeof args === "string" ? args : args[0];
   const user = typeof args === "string" ? null : args[1];
 
@@ -13,8 +13,8 @@ export const fetcher = async (args: string | [string, any]) => {
 
   if (!res.ok) {
     const error = new Error("An error occurred while fetching the data.");
-    (error as any).info = await res.json().catch(() => ({}));
-    (error as any).status = res.status;
+    (error as Error & { info?: unknown; status?: number }).info = await res.json().catch(() => ({}));
+    (error as Error & { info?: unknown; status?: number }).status = res.status;
     throw error;
   }
 

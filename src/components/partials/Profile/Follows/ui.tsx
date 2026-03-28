@@ -3,7 +3,15 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
-export const UserFollowCard = ({ user }: { user: any }) => {
+interface FollowUser {
+  userId: string;
+  profileImage: string | null;
+  userName: string | null;
+  arenaRank: string | null;
+  totalBpi: number | null;
+}
+
+export const UserFollowCard = ({ user }: { user: FollowUser }) => {
   const isMasked = user.userId === "";
 
   const UserInfo = (

@@ -27,7 +27,7 @@ export const AllSongHistoryTab = ({ songId }: { songId: number }) => {
   const globalMaxScore = useMemo(() => {
     if (!historyGroups) return 0;
     return Math.max(
-      ...Object.values(historyGroups as Record<string, any[]>)
+      ...Object.values(historyGroups)
         .flat()
         .map((s) => s.exScore ?? 0),
     );
@@ -50,16 +50,16 @@ export const AllSongHistoryTab = ({ songId }: { songId: number }) => {
       </div>
     );
 
-  const sortedVersions = Object.keys(
-    historyGroups as Record<string, any[]>,
-  ).sort((a, b) => Number(b) - Number(a));
+  const sortedVersions = Object.keys(historyGroups).sort(
+    (a, b) => Number(b) - Number(a),
+  );
 
   return (
     <div className="flex flex-col gap-6 max-h-[45svh] overflow-y-auto pr-2 custom-scrollbar">
       {sortedVersions.map((version) => {
         const vInfo = versionTitles.find((v) => v.num === version);
         const displayTitle = vInfo ? vInfo.title : `Ver.${version}`;
-        const records = (historyGroups as Record<string, any[]>)[version];
+        const records = historyGroups[version];
 
         return (
           <div key={version} className="flex flex-col">
@@ -71,7 +71,7 @@ export const AllSongHistoryTab = ({ songId }: { songId: number }) => {
             </div>
 
             <div className="flex flex-col gap-2.5">
-              {records.map((record: any, idx: number) => {
+              {records.map((record, idx) => {
                 const prev = records[idx + 1];
                 const scoreDiff = prev ? record.exScore - prev.exScore : null;
                 const isGlobalBest =

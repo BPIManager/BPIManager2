@@ -1,6 +1,6 @@
 "use client";
 
-import { Activity, Loader, Swords, UserCheck } from "lucide-react";
+import { Activity, Loader, LucideIcon, Swords, UserCheck } from "lucide-react";
 import { TimelineList } from "./ui";
 import { FilterCheckboxGroup, FilterSearchInput } from "../Songs/Filter/part";
 import { useUser } from "@/contexts/users/UserContext";
@@ -11,8 +11,14 @@ import { useTimelineFilter } from "@/hooks/social/useTimelineFilter";
 
 export const TimelineContainer = () => {
   const { user, isLoading } = useUser();
-  const { mode, setMode, filterParams, updateParams, toggleLevel, toggleDifficulty } =
-    useTimelineFilter();
+  const {
+    mode,
+    setMode,
+    filterParams,
+    updateParams,
+    toggleLevel,
+    toggleDifficulty,
+  } = useTimelineFilter();
 
   if (isLoading) {
     return (
@@ -66,7 +72,7 @@ export const TimelineContainer = () => {
               label="DIFFICULTY"
               items={["HYPER", "ANOTHER", "LEGGENDARIA"]}
               selected={filterParams.difficulties || []}
-              onToggle={(diff: any) => toggleDifficulty(diff)}
+              onToggle={(diff: string) => toggleDifficulty(diff as import("@/types/songs/withScore").Difficulties)}
               getLabel={(diff: string) => diff[0]}
             />
           </div>
@@ -102,7 +108,7 @@ const MenuButton = ({
   activeVariant = "secondary",
 }: {
   isActive: boolean;
-  icon: any;
+  icon: LucideIcon;
   label: string;
   onClick: () => void;
   activeVariant?: "secondary" | "destructive";

@@ -4,6 +4,46 @@ import { bpiRepo } from "../db/bpi";
 import { SongLookup } from "./songLookup";
 import { v4 as uuidv4 } from "uuid";
 
+interface BpimScoreHistoryItem {
+  title: string;
+  difficulty: string;
+  exScore: number;
+  updatedAt: string;
+}
+
+interface BpimScoreMeta {
+  title: string;
+  difficulty: string;
+  clearState: number | string | undefined;
+  missCount: number | null | undefined;
+}
+
+export interface BpimScoreData {
+  scoresHistory: BpimScoreHistoryItem[];
+  scores: Record<string, BpimScoreMeta>;
+}
+
+interface ScoreUpdate {
+  userId: string;
+  songId: number;
+  definitionId: number;
+  exScore: number;
+  bpi: number;
+  clearState: string;
+  missCount: number | null;
+  version: string;
+  batchId: string;
+  lastPlayed: Date;
+}
+
+interface StatusLog {
+  userId: string;
+  totalBpi: number;
+  version: string;
+  batchId: string;
+  createdAt: Date;
+}
+
 export class BpiImportService {
   mapClearState = (state: number | string | undefined): string => {
     if (state === undefined) return "NO PLAY";
@@ -31,26 +71,26 @@ export class BpiImportService {
 
   async saveMultipleFirestoreData(
     userId: string,
-    payloads: { version: string; data: any }[],
+    payloads: { version: string; data: BpimScoreData }[],
   ) {
     const songMaster = await bpiRepo.getSongMasterWithDef();
     const lookup = new SongLookup(songMaster);
 
-    const allScoreUpdates: any[] = [];
-    const allStatusLogs: any[] = [];
+    const allScoreUpdates: ScoreUpdate[] = [];
+    const allStatusLogs: StatusLog[] = [];
     let latestBpi = -15;
 
     const dailyGroups = new Map<
       string,
-      Map<string, { item: any; version: string; meta: any }>
+      Map<string, { item: BpimScoreHistoryItem; version: string; meta: BpimScoreMeta | null }>
     >();
 
     for (const { version, data } of payloads) {
-      const scoresHistory = data.scoresHistory || [];
-      const scores = data.scores || {};
+      const scoresHistory: BpimScoreHistoryItem[] = data.scoresHistory || [];
+      const scores: Record<string, BpimScoreMeta> = data.scores || {};
 
-      const scoreMetaMap = new Map<string, any>();
-      Object.values(scores).forEach((s: any) => {
+      const scoreMetaMap = new Map<string, BpimScoreMeta>();
+      Object.values(scores).forEach((s) => {
         const key = `${s.title}_${s.difficulty.toLowerCase()}`;
         scoreMetaMap.set(key, s);
       });
@@ -103,9 +143,9 @@ export class BpiImportService {
             bpi: bpi,
             clearState: this.mapClearState(meta?.clearState),
             missCount:
-              meta?.missCount === null || isNaN(meta?.missCount)
+              meta?.missCount == null || isNaN(Number(meta.missCount))
                 ? null
-                : Number(meta?.missCount),
+                : Number(meta.missCount),
             version: version,
             batchId: batchId,
             lastPlayed: dayjs.tz(item.updatedAt).toDate(),

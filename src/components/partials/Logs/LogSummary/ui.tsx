@@ -52,7 +52,7 @@ export const BatchSummaryCards = ({
   summary,
   isSharing,
 }: {
-  summary: any;
+  summary: { batchPerformance: number; newRecords: number; updatedScores: number };
   isSharing: boolean;
 }) => {
   const stats = [

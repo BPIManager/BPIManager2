@@ -1,6 +1,6 @@
 import type { NextApiResponse } from "next";
 import { adminDb } from "@/lib/firebase/admin";
-import { BpiImportService } from "@/lib/transfer/importer";
+import { BpiImportService, BpimScoreData } from "@/lib/transfer/importer";
 import { IIDX_VERSIONS } from "@/constants/latestVersion";
 import {
   AuthenticatedNextApiRequest,
@@ -31,7 +31,7 @@ const handler = async (
 
   try {
     const authUid = req.authUid;
-    const allDataToImport: { version: string; data: any }[] = [];
+    const allDataToImport: { version: string; data: BpimScoreData }[] = [];
 
     for (const v of VERSIONS) {
       for (const s of SUFFIXES) {
@@ -40,7 +40,7 @@ const handler = async (
         const snap = await docRef.get();
 
         if (snap.exists && snap.data()?.scoresHistory?.length > 0) {
-          allDataToImport.push({ version: v, data: snap.data() });
+          allDataToImport.push({ version: v, data: snap.data() as BpimScoreData });
           break;
         }
       }
@@ -62,12 +62,10 @@ const handler = async (
       importedVersions: allDataToImport.map((d) => d.version),
       totalProcessed: result.totalProcessed,
     });
-  } catch (error: any) {
-    console.error("Transfer API Error:", error);
-    return res.status(500).json({
-      error: "Internal Server Error",
-      details: error.message,
-    });
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Internal Server Error";
+    return res.status(500).json({ message: errorMessage });
   }
 };
 

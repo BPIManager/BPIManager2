@@ -24,8 +24,10 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
 
     const count = await notificationsRepo.getUnreadCount(uid, latestVersion);
     return res.status(200).json(count);
-  } catch (error: any) {
-    return res.status(500).json({ message: error.message });
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Internal Server Error";
+    return res.status(500).json({ message: errorMessage });
   }
 }
 

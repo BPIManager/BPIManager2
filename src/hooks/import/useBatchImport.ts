@@ -2,8 +2,12 @@ import { useState } from "react";
 import { parseCSV } from "@/utils/csv/parse";
 import { API_PREFIX } from "@/constants/apiEndpoints";
 import { toast } from "sonner";
+import { User as FirebaseUser } from "firebase/auth";
 
-export const useBatchImport = (fbUser: any, refresh: () => Promise<void>) => {
+export const useBatchImport = (
+  fbUser: FirebaseUser | null,
+  refresh: () => Promise<unknown>,
+) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [processStatus, setProcessStatus] = useState("");
   const [importResult, setImportResult] = useState<{
@@ -65,8 +69,8 @@ export const useBatchImport = (fbUser: any, refresh: () => Promise<void>) => {
 
       await refresh();
       return true;
-    } catch (e: any) {
-      toast.error(e.message);
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : "エラーが発生しました");
       return false;
     } finally {
       setIsProcessing(false);

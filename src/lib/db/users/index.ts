@@ -239,7 +239,7 @@ class UsersRepository {
 
       if (existingUser) {
         const error = new Error("UserName is already taken");
-        (error as any).status = 409;
+        Object.assign(error, { status: 409 });
         throw error;
       }
 

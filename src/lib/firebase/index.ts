@@ -28,7 +28,7 @@ const f = getFunctions(fb, "asia-northeast1");
 
 export const functions = f;
 
-export const httpsCallable = (_cat: string, endpoint: string, data: any) => {
+export const httpsCallable = (_cat: string, endpoint: string, data: unknown) => {
   return H(f, endpoint)(data);
 };
 

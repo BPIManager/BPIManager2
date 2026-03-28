@@ -2,6 +2,7 @@ import useSWR from "swr";
 import { useUser } from "@/contexts/users/UserContext";
 import { fetcher } from "@/utils/common/fetch";
 import { API_PREFIX } from "@/constants/apiEndpoints";
+import { SongHistoryResponse } from "@/types/score/log";
 
 export const useAllScoreHistory = (
   userId: string | undefined,
@@ -9,7 +10,7 @@ export const useAllScoreHistory = (
 ) => {
   const { fbUser } = useUser();
 
-  const { data, error, isLoading } = useSWR(
+  const { data, error, isLoading } = useSWR<SongHistoryResponse>(
     userId && songId
       ? [`${API_PREFIX}/users/${userId}/all-scores/${songId}/history`, fbUser]
       : null,

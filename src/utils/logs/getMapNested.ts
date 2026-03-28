@@ -1,6 +1,28 @@
 import { BatchDetailItem } from "@/types/logs/logByBatchId";
 
-export const mapToLogNested = (row: any): BatchDetailItem => {
+interface RawScoreRow {
+  songId: number;
+  title: string;
+  difficulty: string;
+  difficultyLevel: number;
+  notes: number | null;
+  bpm: string | null;
+  releasedVersion: number | null;
+  exScore: number | string;
+  bpi: number | null;
+  clearState: string | null;
+  missCount: number | null;
+  scoreAt: string | Date | null;
+  p_exScore: number | string | null;
+  p_bpi: number | null;
+  p_clearState: string | null;
+  p_missCount: number | null;
+  wrScore: number | null;
+  kaidenAvg: number | null;
+  coef: number | null;
+}
+
+export const mapToLogNested = (row: RawScoreRow): BatchDetailItem => {
   const currentEx = Number(row.exScore);
   const prevEx = row.p_exScore !== null ? Number(row.p_exScore) : null;
   const currentBpi = Number(row.bpi);

@@ -110,8 +110,9 @@ export default async function handler(
           ? timeline[timeline.length - 1].lastPlayed
           : null,
     });
-  } catch (error: any) {
-    console.error("Timeline API Error:", error);
-    return res.status(500).json({ message: "Internal Server Error" });
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Internal Server Error";
+    return res.status(500).json({ message: errorMessage });
   }
 }

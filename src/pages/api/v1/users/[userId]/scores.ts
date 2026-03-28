@@ -64,10 +64,10 @@ export default async function handler(
           .status(405)
           .json({ message: `Method ${req.method} Not Allowed` });
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Scores API Error:", error);
-    return res
-      .status(500)
-      .json({ message: error.message || "Internal Server Error" });
+    const errorMessage =
+      error instanceof Error ? error.message : "Internal Server Error";
+    return res.status(500).json({ message: errorMessage });
   }
 }

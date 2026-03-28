@@ -4,12 +4,21 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { socialRepo } from "../db/social";
 import { usersRepo } from "../db/users";
 import { v4 as uuidv4 } from "uuid";
+import { AccessResult } from "@/middlewares/api/withApi";
+
+interface ProfileResponse {
+  profile: Awaited<ReturnType<typeof usersRepo.getUserProfileSummary>>;
+  compare?: {
+    winLoss: Awaited<ReturnType<typeof socialRepo.getWinLossStats>> | null;
+    radar: Record<string, number> | null;
+  };
+}
 
 export async function handleGetProfile(
   req: NextApiRequest,
   res: NextApiResponse,
   uid: string,
-  access: any,
+  access: AccessResult,
   isCompare: boolean,
 ) {
   if (!access.hasAccess)
@@ -38,7 +47,7 @@ export async function handleGetProfile(
     return res.status(403).json({ message: "This profile is private" });
   }
 
-  const response: any = { profile };
+  const response: ProfileResponse = { profile };
   if (isCompare) {
     response.compare = {
       winLoss,

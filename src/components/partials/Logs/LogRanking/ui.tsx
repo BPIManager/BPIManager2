@@ -59,9 +59,16 @@ export const LogRank = ({
     setDisplayLimit,
   } = useLogRank(details, type);
 
-  const handleOpenDetail = (item: any) => {
+  const handleOpenDetail = (item: BatchDetailItem) => {
     const mappedSong = {
       ...item,
+      logId: null,
+      scoreAt: null,
+      bpm: item.bpm ?? null,
+      releasedVersion: item.releasedVersion ?? null,
+      wrScore: item.wrScore ?? null,
+      kaidenAvg: item.kaidenAvg ?? null,
+      coef: item.coef ?? null,
       exScore: item.current.exScore,
       bpi: item.current.bpi,
       clearState: item.current.clearState,

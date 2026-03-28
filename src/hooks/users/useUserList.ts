@@ -18,7 +18,7 @@ interface UserListResponse {
   viewer: {
     userId: string;
     totalBpi: number;
-    radar: any;
+    radar: Record<string, number>;
   };
   users: RecommendedUser[];
 }

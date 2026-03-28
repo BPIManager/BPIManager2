@@ -76,8 +76,9 @@ export default async function handler(
         },
       })),
     });
-  } catch (error: any) {
-    console.error("User list API Error:", error);
-    return res.status(500).json({ message: "Internal Server Error" });
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Internal Server Error";
+    return res.status(500).json({ message: errorMessage });
   }
 }
