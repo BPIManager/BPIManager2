@@ -42,6 +42,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { XIcon } from "../LogIn";
 
 export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
   const { user } = useUser();
@@ -97,6 +98,12 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
       label: "不具合・要望の報告",
       icon: Mail,
       href: "https://forms.gle/VfMJpFrKfSJqRYLA8",
+      isExternal: true,
+    },
+    {
+      label: "Xでフォロー",
+      icon: XIcon,
+      href: "https://x.com/BPIManager",
       isExternal: true,
     },
   ];

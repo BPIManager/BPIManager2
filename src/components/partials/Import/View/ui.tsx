@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { versionsOptions } from "@/constants/versions";
 import { iidxUrl } from "@/constants/iidxUrl";
+import { BookmarkletAccordion } from "./bookmarklet";
 
 interface Props {
   csvData: string;
@@ -58,6 +59,9 @@ export const ImportView = (props: Props) => (
                   </a>
                   )
                 </Label>
+                <p className="text-[10px] text-bpim-muted">
+                  データを改変しないですべて貼り付けてください
+                </p>
                 <Textarea
                   id="csv-data"
                   placeholder="バージョン,タイトル,ジャンル,アーティスト,プレー回数,..."
@@ -65,9 +69,7 @@ export const ImportView = (props: Props) => (
                   value={props.csvData}
                   onChange={(e) => props.setCsvData(e.target.value)}
                 />
-                <p className="text-[10px] text-bpim-muted">
-                  データを改変しないですべて貼り付けてください
-                </p>
+                <BookmarkletAccordion />
               </div>
 
               <div className="space-y-2">
