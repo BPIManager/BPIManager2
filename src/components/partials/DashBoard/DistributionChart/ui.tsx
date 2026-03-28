@@ -2,6 +2,7 @@
 import { DashCard } from "@/components/ui/dashcard";
 import { cn } from "@/lib/utils";
 import { useChartColors } from "@/hooks/common/useChartColors";
+import type { ChartData } from "@/types/ui/chart";
 
 const animationStyles = `
   @keyframes bounceGrow {
@@ -11,11 +12,6 @@ const animationStyles = `
     100% { transform: scaleY(1); }
   }
 `;
-
-export interface ChartData {
-  label: string;
-  count: number;
-}
 
 interface DistributionChartProps {
   title: string;

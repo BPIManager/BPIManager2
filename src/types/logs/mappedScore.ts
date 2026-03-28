@@ -9,7 +9,7 @@ export interface CurrentScoreData extends ScoreData {
   lastPlayedAt: string | Date | null;
 }
 
-export interface BatchDetailItem {
+export interface MappedBatchScore {
   songId: number;
   title: string;
   difficulty: string;

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useSongFilter, PAGE_SIZE } from "@/hooks/table/useSongFilter";
-import { SongWithRival, SongWithScore } from "@/types/songs/withScore";
+import { SongWithRival, SongWithScore } from "@/types/songs/score";
 
 import { SongFilterBar } from "@/components/partials/Songs/Filter/ui";
 import { SongListSkeleton } from "@/components/partials/Table/skeleton";
@@ -13,7 +13,7 @@ import { AdvancedFilterModal } from "@/components/partials/Songs/AdvancedFilter/
 import { SongDetailView } from "@/components/partials/Modal/BPIChart/SongDetails/ui";
 import { RivalSongItem } from "@/components/partials/Rivals/Table/ui";
 import { useUser } from "@/contexts/users/UserContext";
-import { AnalyticsTarget } from "@/hooks/analytics/useAnalyticsComparison";
+import type { AnalyticsTarget } from "@/types/analytics";
 
 interface AnalyticsComparisonTableProps {
   songs: SongWithRival[] | undefined;

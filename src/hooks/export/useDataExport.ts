@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import JSZip from "jszip";
-import { IIDX_VERSIONS, IIDXVersion } from "@/constants/latestVersion";
+import { IIDX_VERSIONS } from "@/constants/latestVersion";
+import type { IIDXVersion } from "@/types/iidx/version";
 import { getVersionNameFromNumber } from "@/constants/versions";
 import { API_PREFIX } from "@/constants/apiEndpoints";
-import { SongWithScore } from "@/types/songs/withScore";
+import { SongWithScore } from "@/types/songs/score";
 import { useUser } from "@/contexts/users/UserContext";
 
 function songsToCSV(songs: SongWithScore[], version: string): string {

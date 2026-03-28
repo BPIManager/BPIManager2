@@ -1,9 +1,4 @@
-export interface VersionTitle {
-  num: string;
-  title: string;
-  default?: boolean;
-  disabled?: boolean;
-}
+import type { VersionTitle } from "@/types/iidx/version";
 
 export const versionTitles: VersionTitle[] = [
   { num: "26", title: "26 Rootage", disabled: true },

@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Difficulties, FilterParamsFrontend } from "@/types/songs/withScore";
+import { FilterParamsFrontend } from "@/types/songs/score";
 import { toggleArrayItem } from "@/hooks/common/useToggleArray";
 
-/** タイムラインの表示モード。`"all"` 全件、`"played"` 自分もプレイ済み、`"overtaken"` 抜かれた楽曲 */
-export type TimelineMode = "all" | "played" | "overtaken";
+import type { TimelineMode } from "@/types/social/timeline";
+import { IidxDifficulty } from "@/types/iidx/difficulty";
 
 /**
  * タイムラインのモード・フィルター状態を管理するフック。
@@ -27,7 +27,7 @@ export function useTimelineFilter() {
   const toggleLevel = (lv: number) =>
     updateParams({ levels: toggleArrayItem(filterParams.levels, lv) });
 
-  const toggleDifficulty = (diff: Difficulties) =>
+  const toggleDifficulty = (diff: IidxDifficulty) =>
     updateParams({
       difficulties: toggleArrayItem(filterParams.difficulties, diff),
     });

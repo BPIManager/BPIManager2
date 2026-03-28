@@ -4,30 +4,11 @@ import { bpiRepo } from "../db/bpi";
 import { SongLookup } from "./songLookup";
 import { v4 as uuidv4 } from "uuid";
 
-/** BPIManager（旧アプリ）のスコア履歴エントリ */
-interface BpimScoreHistoryItem {
-  title: string;
-  difficulty: string;
-  exScore: number;
-  updatedAt: string;
-}
-
-/** BPIManager（旧アプリ）のスコアメタ情報（クリア種別・ミスカウント） */
-interface BpimScoreMeta {
-  title: string;
-  difficulty: string;
-  clearState: number | string | undefined;
-  missCount: number | null | undefined;
-}
-
-/**
- * BPIManager（旧アプリ）からエクスポートされるスコアデータの形式。
- * `scoresHistory` に全履歴、`scores` に最新メタ情報を持つ。
- */
-export interface BpimScoreData {
-  scoresHistory: BpimScoreHistoryItem[];
-  scores: Record<string, BpimScoreMeta>;
-}
+import type {
+  BpimScoreData,
+  BpimScoreHistoryItem,
+  BpimScoreMeta,
+} from "@/types/transfer";
 
 interface ScoreUpdate {
   userId: string;

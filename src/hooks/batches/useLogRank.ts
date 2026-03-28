@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { BatchDetailItem } from "./useBatchDetail";
+import type { BatchDetailItem } from "@/types/logs/batchDetail";
 
 /**
  * バッチ詳細の楽曲一覧をソート・ページングして返す。

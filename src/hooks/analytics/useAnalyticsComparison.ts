@@ -7,14 +7,13 @@ import {
   SongWithRival,
   SongWithScore,
   RivalScore,
-} from "@/types/songs/withScore";
-import { BpiCalculator, IBpiBasicSongData } from "@/lib/bpi";
+} from "@/types/songs/score";
+import { BpiCalculator } from "@/lib/bpi";
+import type { IBpiBasicSongData } from "@/types/songs/bpi";
 import {
   AnalyticsTargetKind,
   AnalyticsTarget,
 } from "@/types/analytics";
-
-export type { AnalyticsTargetKind, AnalyticsTarget };
 
 /**
  * {@link AnalyticsTarget} を URL クエリに埋め込める文字列にエンコードする。

@@ -29,10 +29,10 @@ import {
 import { useUser } from "@/contexts/users/UserContext";
 import { useRivalSummary } from "@/hooks/social/useRivalSummary";
 import { latestVersion } from "@/constants/latestVersion";
-import {
+import type {
   AnalyticsTarget,
   AnalyticsTargetKind,
-} from "@/hooks/analytics/useAnalyticsComparison";
+} from "@/types/analytics";
 import { getBpiColorStyle } from "@/constants/bpiColor";
 import { formatIIDXId } from "@/utils/common/formatIidxId";
 import { versionTitles } from "@/constants/versions";

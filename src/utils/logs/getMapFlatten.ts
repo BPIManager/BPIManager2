@@ -1,4 +1,4 @@
-import { SongWithScore } from "@/types/songs/withScore";
+import { SongWithScore } from "@/types/songs/score";
 
 interface RawSongScoreRow {
   songId: number;

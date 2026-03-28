@@ -2,11 +2,12 @@
 
 import * as React from "react";
 import NextLink from "next/link";
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 import { Tabs, TabsList, TabsContent, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
+import type { AppTabsListProps, AppTabsTriggerProps, AppTabsGroupProps } from "@/types/ui/tabs";
 
-const appTabsListVariants = cva("grid w-full items-stretch transition-all", {
+export const appTabsListVariants = cva("grid w-full items-stretch transition-all", {
   variants: {
     visual: {
       card: [
@@ -26,12 +27,6 @@ const appTabsListVariants = cva("grid w-full items-stretch transition-all", {
   defaultVariants: { visual: "card" },
 });
 
-export interface AppTabsListProps
-  extends
-    Omit<React.ComponentProps<typeof TabsList>, "variant">,
-    VariantProps<typeof appTabsListVariants> {
-  cols?: number;
-}
 
 export const AppTabsList = React.forwardRef<
   React.ElementRef<typeof TabsList>,
@@ -50,7 +45,7 @@ export const AppTabsList = React.forwardRef<
 ));
 AppTabsList.displayName = "AppTabsList";
 
-const appTabsTriggerVariants = cva(
+export const appTabsTriggerVariants = cva(
   [
     "flex h-full items-center justify-center gap-2",
     "text-xs font-bold transition-all",
@@ -77,24 +72,6 @@ const appTabsTriggerVariants = cva(
     defaultVariants: { visual: "card" },
   },
 );
-
-export interface AppTabsTriggerItem {
-  value: string;
-  label: string;
-  icon?: React.ComponentType<{ className?: string }>;
-  href?: string;
-}
-
-export interface AppTabsTriggerProps
-  extends
-    Omit<React.ComponentProps<typeof TabsTrigger>, "value">,
-    VariantProps<typeof appTabsTriggerVariants> {
-  value: string;
-  icon?: React.ComponentType<{ className?: string }>;
-  href?: string;
-  iconOnly?: boolean;
-  children: React.ReactNode;
-}
 
 export const AppTabsTrigger = React.forwardRef<
   React.ElementRef<typeof TabsTrigger>,
@@ -146,16 +123,6 @@ export const AppTabsTrigger = React.forwardRef<
   },
 );
 AppTabsTrigger.displayName = "AppTabsTrigger";
-
-export interface AppTabsGroupProps extends Omit<
-  AppTabsListProps,
-  "cols" | "children"
-> {
-  tabs: AppTabsTriggerItem[];
-  iconOnly?: boolean;
-  listClassName?: string;
-  triggerClassName?: string;
-}
 
 export const AppTabsGroup = ({
   tabs,

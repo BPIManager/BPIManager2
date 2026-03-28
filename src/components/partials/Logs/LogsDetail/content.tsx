@@ -12,14 +12,7 @@ import { LogNavigator } from "../LogsNav/ui";
 import { BatchTotalBpiCard } from "../TotalBPI/ui";
 import { LogsDetailContentSkeleton } from "./skeleton";
 import { LogErrorState } from "./error";
-export interface LogsDetailViewProps {
-  userId: string | undefined;
-  version: string | undefined;
-  batchId?: string;
-  date?: string;
-  type: "batch" | "daily" | "weekly" | "monthly";
-  isPublicPage?: boolean;
-}
+import type { LogsDetailViewProps } from "@/types/logs/detail";
 import { XIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRef, useState } from "react";

@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { useRouter } from "next/router";
 import { useUser } from "@/contexts/users/UserContext";
 import { useRivalScores } from "@/hooks/social/useRivalScores";
-import { SongWithScore } from "@/types/songs/withScore";
+import { SongWithScore } from "@/types/songs/score";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { SectionLoader } from "@/components/ui/loading-spinner";

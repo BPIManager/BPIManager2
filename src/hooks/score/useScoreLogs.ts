@@ -1,6 +1,6 @@
 import { API_PREFIX } from "@/constants/apiEndpoints";
 import { useUser } from "@/contexts/users/UserContext";
-import { SongHistoryResponse } from "@/types/score/log";
+import { SongHistoryResponse } from "@/types/songs/score";
 import { fetcher } from "@/utils/common/fetch";
 import useSWR from "swr";
 

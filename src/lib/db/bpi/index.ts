@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
-import { SongMaster } from "@/types/songs/songMaster";
-import { Database, NewAllScores, NewScore, NewTotalBPILog } from "@/types/sql";
+import { SongMaster } from "@/types/songs/master";
+import { Database, NewAllScores, NewScore, NewTotalBPILog } from "@/types/db";
 import { Transaction } from "kysely";
 
 /**

@@ -1,25 +1,10 @@
 import { useUser } from "@/contexts/users/UserContext";
 import { API_PREFIX } from "@/constants/apiEndpoints";
 import { useInfiniteList } from "@/services/swr/useInfinite";
-import { SongWithScore } from "@/types/songs/withScore";
 
 const PAGE_SIZE = 20;
 
-/** おすすめ楽曲の1件分（伸びしろ・ポテンシャル情報を含む） */
-export interface RecommendedItem extends SongWithScore {
-  /** 現在スコア */
-  current: {
-    exScore: number | null;
-    bpi: number | null;
-    clearState: string | null;
-  };
-  /** 前回からの差分 */
-  diff: { exScore: number; bpi: number };
-  /** EXスコア差分 */
-  exDiff: number;
-  /** BPI 差分 */
-  bpiDiff: number;
-}
+import type { RecommendedItem } from "@/types/stats/recommended";
 
 interface RecommendedPage {
   weapons: { data: RecommendedItem[]; total: number };

@@ -1,4 +1,4 @@
-import { ChartColors } from "@/hooks/common/useChartColors";
+import { ChartColors } from "@/types/ui/chart";
 
 export const getBpiColorFromTheme = (
   label: string,

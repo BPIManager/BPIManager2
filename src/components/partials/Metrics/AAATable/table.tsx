@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { useState } from "react";
-import { AAATableItem } from "@/hooks/metrics/useAAATable";
+import { AAATableItem } from "@/types/metrics/aaa";
 import {
   Tooltip,
   TooltipContent,

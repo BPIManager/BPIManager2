@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { useState, useMemo } from "react";
-import { SongWithScore } from "@/types/songs/withScore";
+import { SongWithScore } from "@/types/songs/score";
 import { useSongFilter, PAGE_SIZE } from "@/hooks/table/useSongFilter";
 import { SongFilterBar } from "../Songs/Filter/ui";
 import { SongList } from "./ui";

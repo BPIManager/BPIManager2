@@ -10,7 +10,7 @@ import {
   sortOptions,
   sortOrderOptions,
 } from "@/constants/sort";
-import { FilterParamsFrontend } from "@/types/songs/withScore";
+import { FilterParamsFrontend } from "@/types/songs/score";
 import { versionsNonDisabledCollection } from "@/constants/versions";
 import { latestVersion } from "@/constants/latestVersion";
 import {

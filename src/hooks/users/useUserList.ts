@@ -2,19 +2,7 @@ import useSWR from "swr";
 import { fetcher } from "@/utils/common/fetch";
 import { useUser } from "@/contexts/users/UserContext";
 import { API_PREFIX } from "@/constants/apiEndpoints";
-
-/** フォロー候補ユーザーの1件分 */
-export interface RecommendedUser {
-  userId: string;
-  userName: string;
-  profileImage: string | null;
-  arenaRank: string;
-  totalBpi: number;
-  iidxId: string;
-  /** レーダーカテゴリ別スコアマップ */
-  radar: Record<string, number>;
-  updatedAt: string;
-}
+import type { RecommendedUser } from "@/types/users/list";
 
 interface UserListResponse {
   viewer: {

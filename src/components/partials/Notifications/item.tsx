@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import dayjs from "@/lib/dayjs";
-import { NotificationItem as NotificationItemType } from "@/hooks/users/useNotifications";
+import { NotificationItem as NotificationItemType } from "@/types/users/notifications";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";

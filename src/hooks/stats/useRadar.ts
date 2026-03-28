@@ -1,8 +1,6 @@
 import { useStatsData } from "@/services/swr/fetchStats";
-import { RadarCategory, RadarCategoryResult } from "@/types/stats/radar";
+import { RadarResponse } from "@/types/stats/radar";
 
-/** レーダーチャートのカテゴリ別結果マップ */
-export type RadarResponse = Record<RadarCategory, RadarCategoryResult>;
 
 /**
  * レーダーチャートデータ（スキルカテゴリ別スコア）を取得する。

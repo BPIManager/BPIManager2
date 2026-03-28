@@ -1,43 +1,9 @@
 import { useUser } from "@/contexts/users/UserContext";
-import { FilterParamsFrontend } from "@/types/songs/withScore";
+import { FilterParamsFrontend } from "@/types/songs/score";
 import { API_PREFIX } from "@/constants/apiEndpoints";
 import { useInfiniteList } from "@/services/swr/useInfinite";
 
-/** タイムラインの1エントリ */
-export interface TimelineEntry {
-  logId: number;
-  userId: string;
-  userName: string;
-  profileImage: string | null;
-  songId: number;
-  title: string;
-  difficulty: string;
-  difficultyLevel: number;
-  lastPlayed: string;
-  /** WR スコア */
-  wrScore: number;
-  /** 皆伝平均 */
-  kaidenAvg: number;
-  /** 閲覧者が抜かれているか */
-  isOvertaken: boolean;
-  /** ライバルのスコア変化情報 */
-  opponentScore: {
-    currentEx: number;
-    prevEx: number | null;
-    diffEx: number | null;
-    currentBpi: number;
-    prevBpi: number | null;
-    diffBpi: number | null;
-  };
-  /** 閲覧者のスコアとライバルとの差分（未プレイの場合 null） */
-  viewerScore: {
-    exScore: number;
-    bpi: number;
-    clearState: string | null;
-    diffFromOpponentEx: number;
-    diffFromOpponentBpi: number;
-  } | null;
-}
+import type { TimelineEntry } from "@/types/social/timeline";
 
 interface TimelineResponse {
   timeline: TimelineEntry[];

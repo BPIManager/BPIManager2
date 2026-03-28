@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { NotificationOvertakenRow } from "@/types/notifications/overtakenRow";
+import { NotificationOvertakenRow } from "@/types/users/notifications";
 import { sql } from "kysely";
 
 /**

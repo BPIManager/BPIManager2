@@ -1,3 +1,5 @@
+import type { IIDXVersion } from "@/types/iidx/version";
+
 export const IIDX_VERSIONS = [
   "26",
   "27",
@@ -8,7 +10,5 @@ export const IIDX_VERSIONS = [
   "32",
   "33",
 ] as const;
-
-export type IIDXVersion = (typeof IIDX_VERSIONS)[number];
 
 export const latestVersion: IIDXVersion = "33";

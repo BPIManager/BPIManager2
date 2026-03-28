@@ -1,5 +1,5 @@
 ﻿import { ChevronRight } from "lucide-react";
-import { BatchDetailItem } from "@/hooks/batches/useBatchDetail";
+import type { BatchDetailItem } from "@/types/logs/batchDetail";
 import { cn } from "@/lib/utils";
 
 interface RankItemProps {

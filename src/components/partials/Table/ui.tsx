@@ -1,4 +1,4 @@
-﻿import { SongWithScore } from "@/types/songs/withScore";
+﻿import { SongWithScore } from "@/types/songs/score";
 import { getDJRank } from "@/utils/songs/djRank";
 import { RefObject } from "react";
 import { cn } from "@/lib/utils";

@@ -1,8 +1,7 @@
 import { PageContainer, PageHeader } from "../../Header";
 import dayjs from "@/lib/dayjs";
-import { LogsDetailContent, LogsDetailViewProps } from "./content";
-
-export type { LogsDetailViewProps };
+import { LogsDetailContent } from "./content";
+import type { LogsDetailViewProps } from "@/types/logs/detail";
 
 export const LogsDetailView = (props: LogsDetailViewProps) => {
   const pageTitle =

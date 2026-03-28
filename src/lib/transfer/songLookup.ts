@@ -1,4 +1,4 @@
-import { SongMaster, SongWithDef } from "@/types/songs/songMaster";
+import { SongMaster, SongWithDef } from "@/types/songs/master";
 
 /**
  * 楽曲マスタを「タイトル + 難易度」のキーで高速検索するためのルックアップクラス。

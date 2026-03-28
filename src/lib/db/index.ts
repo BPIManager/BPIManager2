@@ -9,7 +9,7 @@
 import { Kysely, MysqlDialect, MysqlPool } from "kysely";
 import { createPool } from "mysql2";
 import "dotenv/config";
-import { Database } from "@/types/sql";
+import { Database } from "@/types/db";
 const globalForDb = global as unknown as { db: Kysely<Database> };
 const dialect = new MysqlDialect({
   pool: createPool({

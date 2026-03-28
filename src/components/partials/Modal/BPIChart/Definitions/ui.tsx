@@ -26,7 +26,7 @@ import { cn } from "@/lib/utils";
 import { BpiCalculator } from "@/lib/bpi";
 import { useChartColors } from "@/hooks/common/useChartColors";
 import { useSongDefinitions } from "@/hooks/score/useSongDefinitions";
-import { SongWithScore } from "@/types/songs/withScore";
+import { SongWithScore } from "@/types/songs/score";
 import dayjs from "@/lib/dayjs";
 
 interface DefinitionsTabProps {

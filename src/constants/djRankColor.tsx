@@ -1,4 +1,5 @@
-import { ChartColors } from "@/hooks/common/useChartColors";
+import { ChartColors } from "@/types/ui/chart";
+
 
 export const RANK_COLORS: Record<string, string> = {
   F: "#4A5568",

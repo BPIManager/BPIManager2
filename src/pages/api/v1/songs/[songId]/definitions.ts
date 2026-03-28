@@ -1,15 +1,6 @@
 import { db } from "@/lib/db";
 import type { NextApiRequest, NextApiResponse } from "next";
 
-export type SongDefinitionRecord = {
-  defId: number;
-  wrScore: number;
-  kaidenAvg: number;
-  coef: number | null;
-  isCurrent: number | null;
-  updatedAt: string;
-};
-
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,

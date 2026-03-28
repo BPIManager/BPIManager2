@@ -1,20 +1,12 @@
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { useDjRankDistribution } from "@/hooks/stats/useDJRankDistribution";
 import { useBPIDistribution } from "@/hooks/stats/useBPIDistribution";
-import { ChartData, DistributionChart } from "./ui";
+import { DistributionChart } from "./ui";
 import { getRankColorFromTheme } from "@/constants/djRankColor";
 import { getBpiColorFromTheme } from "@/constants/bpiColor";
 import { useChartColors } from "@/hooks/common/useChartColors";
-
-type DistType = "rank" | "bpi";
-
-export interface DistributionSectionProps {
-  type: DistType;
-  myUserId?: string;
-  rivalUserId?: string;
-  myName?: string;
-  rivalName?: string;
-}
+import type { DistributionSectionProps } from "@/types/ui/distribution";
+import { ChartData } from "@/types/ui/chart";
 
 export const DistributionSection = ({
   type,

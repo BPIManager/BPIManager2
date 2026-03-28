@@ -6,7 +6,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { isImproved } from "@/lib/lamp";
 import { BpiCalculator } from "@/lib/bpi";
-import { NewScore, NewAllScores } from "@/types/sql";
+import { NewScore, NewAllScores } from "@/types/db";
 import { bpiRepo } from "@/lib/db/bpi";
 import dayjs from "@/lib/dayjs";
 

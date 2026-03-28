@@ -1,4 +1,4 @@
-import { BatchDetailItem } from "@/types/logs/logByBatchId";
+import { MappedBatchScore } from "@/types/logs/mappedScore";
 
 interface RawScoreRow {
   songId: number;
@@ -22,7 +22,7 @@ interface RawScoreRow {
   coef: number | null;
 }
 
-export const mapToLogNested = (row: RawScoreRow): BatchDetailItem => {
+export const mapToLogNested = (row: RawScoreRow): MappedBatchScore => {
   const currentEx = Number(row.exScore);
   const prevEx = row.p_exScore !== null ? Number(row.p_exScore) : null;
   const currentBpi = Number(row.bpi);

@@ -1,29 +1,13 @@
 import {
-  Difficulties,
   FilterParamsFrontend,
   SongWithScore,
-} from "@/types/songs/withScore";
+} from "@/types/songs/score";
 import { getMaxBpm } from "./getMaxBPM";
 import dayjs from "@/lib/dayjs";
+import type { FilterParams } from "@/types/songs/filter";
 import isBetween from "dayjs/plugin/isBetween";
+import { IidxDifficulty } from "@/types/iidx/difficulty";
 dayjs.extend(isBetween);
-
-export interface FilterParams {
-  difficulty?: string;
-  level?: number;
-  clearState?: string;
-  bpiMin?: number;
-  bpiMax?: number;
-  version?: string;
-  bpmMin?: number;
-  bpmMax?: number;
-  isSofran?: boolean;
-  notesMin?: number;
-  notesMax?: number;
-  search?: string;
-  sortKey?: string;
-  sortOrder?: "asc" | "desc";
-}
 
 export const filterSongsServerSide = (
   songs: SongWithScore[],
@@ -75,7 +59,7 @@ export const filterSongsFrontend = (
     }
 
     if (params.difficulties && params.difficulties.length > 0) {
-      if (!params.difficulties.includes(song.difficulty as Difficulties))
+      if (!params.difficulties.includes(song.difficulty as IidxDifficulty))
         return false;
     }
 

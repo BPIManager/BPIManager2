@@ -1,7 +1,7 @@
 import { API_PREFIX } from "@/constants/apiEndpoints";
 import { fetcher } from "@/utils/common/fetch";
 import useSWR from "swr";
-import type { SongDefinitionRecord } from "@/pages/api/v1/songs/[songId]/definitions";
+import type { SongDefinitionRecord } from "@/types/songs/definition";
 
 /**
  * 指定楽曲の定義レコード（バージョン別スコア基準値など）を取得する。

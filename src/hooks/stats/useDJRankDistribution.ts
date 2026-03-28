@@ -1,12 +1,6 @@
 import { useStatsData } from "@/services/swr/fetchStats";
 
-/** ランク分布の1区間 */
-export interface RankDistItem {
-  /** 区間ラベル（例: `"AAA"`, `"AA"` など） */
-  label: string;
-  /** 該当楽曲数 */
-  count: number;
-}
+import type { RankDistItem } from "@/types/stats/distribution";
 
 /**
  * DJ ランク分布データを取得する。

@@ -2,7 +2,7 @@ import useSWR from "swr";
 import { useUser } from "@/contexts/users/UserContext";
 import { fetcher } from "@/utils/common/fetch";
 import { latestVersion } from "@/constants/latestVersion";
-import { SongWithRival } from "@/types/songs/withScore";
+import { SongWithRival } from "@/types/songs/score";
 import { API_PREFIX } from "@/constants/apiEndpoints";
 
 /**

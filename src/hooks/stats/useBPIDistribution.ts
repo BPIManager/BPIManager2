@@ -1,12 +1,6 @@
 import { useStatsData } from "@/services/swr/fetchStats";
 
-/** ランク分布の1区間 */
-export interface RankDistItem {
-  /** 区間ラベル（例: `"0〜10"`, `"AAA"` など） */
-  label: string;
-  /** 該当楽曲数 */
-  count: number;
-}
+import type { RankDistItem } from "@/types/stats/distribution";
 
 /**
  * 単曲 BPI の分布データを取得する。

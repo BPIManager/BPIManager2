@@ -2,7 +2,7 @@
 
 import { useTimeline } from "@/hooks/social/useTimeline";
 import { TimelineItem } from "./Card/ui";
-import { FilterParamsFrontend } from "@/types/songs/withScore";
+import { FilterParamsFrontend } from "@/types/songs/score";
 import { TimelineHeader } from "./header";
 import { InfiniteScrollContainer } from "../InfiniteScroll/ui";
 import { cn } from "@/lib/utils";

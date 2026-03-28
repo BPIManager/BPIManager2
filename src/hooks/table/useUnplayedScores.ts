@@ -1,5 +1,5 @@
 import useSWR from "swr";
-import { SongWithScore } from "@/types/songs/withScore";
+import { SongWithScore } from "@/types/songs/score";
 import { latestVersion } from "@/constants/latestVersion";
 import { useUser } from "@/contexts/users/UserContext";
 import { fetcher } from "@/utils/common/fetch";
