@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { versionsOptions } from "@/constants/versions";
+import { iidxUrl } from "@/constants/iidxUrl";
 
 interface Props {
   csvData: string;
@@ -46,12 +47,21 @@ export const ImportView = (props: Props) => (
                   htmlFor="csv-data"
                   className="text-sm font-bold text-bpim-text"
                 >
-                  CSVデータ
+                  CSVデータ(
+                  <a
+                    href={iidxUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-bpim-primary underline decoration-blue-400/30 underline-offset-4 transition-colors hover:text-bpim-primary hover:decoration-blue-300"
+                  >
+                    ダウンロードはこちら
+                  </a>
+                  )
                 </Label>
                 <Textarea
                   id="csv-data"
                   placeholder="バージョン,タイトル,ジャンル,アーティスト,プレー回数,..."
-                  className="min-h-[200px] border-bpim-border bg-bpim-surface-2/60 p-4 font-mono text-sm transition-colors focus:border-bpim-primary focus:ring-0"
+                  className="max-h-[50px] border-bpim-border bg-bpim-surface-2/60 p-4 font-mono text-sm transition-colors focus:border-bpim-primary focus:ring-0"
                   value={props.csvData}
                   onChange={(e) => props.setCsvData(e.target.value)}
                 />
