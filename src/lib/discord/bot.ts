@@ -1,17 +1,20 @@
-import {
-  Client,
-  GatewayIntentBits,
-  Partials,
-} from "discord.js";
+import { Client, GatewayIntentBits, Partials } from "discord.js";
 import { handleGuildMemberAdd } from "./events/guildMemberAdd";
 import { handleGuildMemberUpdate } from "./events/guildMemberUpdate";
 import { handleGuildMemberRemove } from "./events/guildMemberRemove";
 import { handleMessageCreate } from "./events/messageCreate";
 
 export function startDiscordBot() {
+  if (process.env.NODE_ENV === "development") {
+    console.warn("[Discord Bot] 開発環境のため起動をスキップします");
+    return;
+  }
+
   const token = process.env.DISCORD_BOT_TOKEN;
   if (!token) {
-    console.warn("[Discord Bot] DISCORD_BOT_TOKEN が未設定のため起動をスキップします");
+    console.warn(
+      "[Discord Bot] DISCORD_BOT_TOKEN が未設定のため起動をスキップします",
+    );
     return;
   }
 
