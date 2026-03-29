@@ -1,4 +1,5 @@
 import { RadarSummaryData } from "@/types/stats/radar";
+import type { UserRoleInfo } from "@/types/users/profile";
 
 /** ライバルとの勝敗集計 */
 export interface RivalStats {
@@ -25,4 +26,5 @@ export interface RivalSummaryResult {
   /** 閲覧者のレーダーチャートデータ */
   viewerRadar: RadarSummaryData;
   stats: RivalStats;
+  role: UserRoleInfo | null;
 }

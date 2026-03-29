@@ -28,6 +28,7 @@ const handler = async (
             .as("latest"),
         (join) => join.onRef("u.userId", "=", "latest.userId"),
       )
+      .leftJoin("userRoles as ur", "ur.userId", "u.userId")
       .select([
         "u.userId",
         "u.userName",
@@ -40,6 +41,9 @@ const handler = async (
         "u.updatedAt",
         "latest.totalBpi",
         "latest.arenaRank",
+        "ur.role",
+        "ur.description",
+        "ur.grantedAt",
         (eb) =>
           eb
             .selectFrom("follows")
@@ -63,6 +67,9 @@ const handler = async (
             ...user,
             followingCount: Number(user.followingCount || 0),
             followerCount: Number(user.followerCount || 0),
+            role: user.role
+              ? { role: user.role, description: user.description ?? "", grantedAt: user.grantedAt }
+              : null,
           }
         : null,
     });

@@ -1,3 +1,9 @@
+export interface UserRoleInfo {
+  role: string;
+  description: string;
+  grantedAt: string | Date;
+}
+
 export interface UserProfileHistory {
   version: string;
   totalBpi: number | null;
@@ -21,6 +27,7 @@ export interface UserProfileData {
   iidxId: string | null;
   xId: string | null;
   isPublic: number;
+  role: UserRoleInfo | null;
   history: UserProfileHistory[];
   current: UserProfileHistory | null;
   follows: {

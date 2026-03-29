@@ -3,10 +3,13 @@ import { formatIIDXId } from "@/utils/common/formatIidxId";
 import dayjs from "@/lib/dayjs";
 import { RadarSectionChart } from "../../DashBoard/Radar";
 import { getBpiColorStyle } from "@/constants/bpiColor";
+import { getRoleCardStyle } from "@/constants/roleCardStyle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import type { RecommendedUser } from "@/types/users/list";
+import { RoleBadge } from "../../UserRole/badge";
+import { ROLE_ICON } from "../../Rivals/List/ui";
 
 export const UserRecommendationCard = ({
   user,
@@ -15,7 +18,10 @@ export const UserRecommendationCard = ({
   currentSort = "totalBpi",
   onClick,
 }: {
-  user: RecommendedUser & { radar: Record<string, number>; profileText?: string | null };
+  user: RecommendedUser & {
+    radar: Record<string, number>;
+    profileText?: string | null;
+  };
   viewerRadar: Record<string, number | { totalBpi: number }>;
   viewerTotalBpi: number;
   currentSort?: string;
@@ -34,20 +40,40 @@ export const UserRecommendationCard = ({
   const radarVal = viewerRadar[currentSort.toUpperCase()];
   const viewerCompareValue = isTotalBpi
     ? viewerTotalBpi
-    : ((typeof radarVal === "object" && radarVal !== null ? radarVal.totalBpi : radarVal) ?? -15);
+    : ((typeof radarVal === "object" && radarVal !== null
+        ? radarVal.totalBpi
+        : radarVal) ?? -15);
 
   const diff = displayValue - viewerCompareValue;
   const isTarget = diff > 0;
+  const roleIcon = user.role ? ROLE_ICON[user.role.role] : null;
+  const RoleIcon = roleIcon?.icon ?? null;
 
   return (
     <button
       onClick={onClick}
-      className="group relative flex w-full flex-row items-stretch justify-between gap-3 overflow-hidden rounded-2xl border border-bpim-border bg-bpim-bg/80 p-3 text-left transition-all duration-300 hover:-translate-y-1 hover:border-bpim-border hover:bg-bpim-surface-2/90 md:gap-6 md:p-5"
+      className={cn(
+        "group relative flex w-full flex-row items-stretch justify-between gap-3 overflow-hidden rounded-2xl border p-3 text-left transition-all duration-300 hover:-translate-y-1 md:gap-6 md:p-5",
+        user.role
+          ? cn(
+              "bg-bpim-bg/80 hover:bg-bpim-surface-2/90",
+              getRoleCardStyle(user.role),
+            )
+          : "border-bpim-border bg-bpim-bg/80 hover:border-bpim-border hover:bg-bpim-surface-2/90",
+      )}
     >
       <div
         className="absolute left-0 top-0 bottom-0 w-1 opacity-80"
         style={{ backgroundColor: getBpiColorStyle(user.totalBpi).bg }}
       />
+      {RoleIcon && (
+        <RoleIcon
+          className={cn(
+            "absolute bottom-2 right-2 h-16 w-16 opacity-[0.07] pointer-events-none",
+            roleIcon!.color,
+          )}
+        />
+      )}
 
       <div className="flex flex-1 flex-col gap-2 py-1 min-w-0 md:gap-4">
         <div className="flex w-full items-center gap-2 md:gap-3">
@@ -57,9 +83,12 @@ export const UserRecommendationCard = ({
           </Avatar>
 
           <div className="flex flex-1 flex-col gap-0 min-w-0">
-            <span className="truncate text-xs font-bold text-bpim-text tracking-tight md:text-base">
-              {user.userName}
-            </span>
+            <div className="flex items-center gap-1.5 min-w-0">
+              <span className="truncate text-xs font-bold text-bpim-text tracking-tight md:text-base">
+                {user.userName}
+              </span>
+              {user.role && <RoleBadge {...user.role} />}
+            </div>
             <div className="flex items-center gap-1.5 flex-wrap">
               <Badge className="bg-orange-600 h-4 px-1.5 text-[10px] md:text-[11px] font-bold text-bpim-text">
                 {user.arenaRank || "N/A"}

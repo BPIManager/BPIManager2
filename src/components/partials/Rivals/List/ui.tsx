@@ -1,9 +1,22 @@
-﻿import { formatIIDXId } from "@/utils/common/formatIidxId";
+﻿import { Coffee, Fish, Sparkle, Code2, Trophy } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { formatIIDXId } from "@/utils/common/formatIidxId";
 import { RadarSectionChart } from "../../DashBoard/Radar";
 import { RivalSummaryResult } from "@/types/social/rival";
 import { getBpiColorStyle } from "@/constants/bpiColor";
+import { getRoleCardStyle } from "@/constants/roleCardStyle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import { RoleBadge } from "../../UserRole/badge";
+
+export const ROLE_ICON: Record<string, { icon: LucideIcon; color: string }> = {
+  coffee: { icon: Coffee, color: "text-amber-400" },
+  saba: { icon: Fish, color: "text-cyan-400" },
+  iidx: { icon: Sparkle, color: "text-violet-300" },
+  developer: { icon: Code2, color: "text-emerald-400" },
+  pro: { icon: Trophy, color: "text-yellow-400" },
+};
 
 export const RivalSummaryCard = ({
   rival,
@@ -30,16 +43,34 @@ export const RivalSummaryCard = ({
   const drawRate =
     stats.totalCount > 0 ? (stats.draw / stats.totalCount) * 100 : 0;
   const bpiStyle = getBpiColorStyle(totalBpi ?? -15);
+  const roleIcon = rival.role ? ROLE_ICON[rival.role.role] : null;
+  const RoleIcon = roleIcon?.icon ?? null;
 
   return (
     <button
       onClick={onClick}
-      className="group relative flex w-full flex-row items-stretch justify-between gap-3 overflow-hidden rounded-2xl border border-bpim-border bg-bpim-bg/80 p-3 text-left transition-all duration-300 hover:-translate-y-1 hover:border-bpim-border hover:bg-bpim-surface-2/90 md:gap-6 md:p-5"
+      className={cn(
+        "group relative flex w-full flex-row items-stretch justify-between gap-3 overflow-hidden rounded-2xl border p-3 text-left transition-all duration-300 hover:-translate-y-1 md:gap-6 md:p-5",
+        rival.role
+          ? cn(
+              "bg-bpim-bg/80 hover:bg-bpim-surface-2/90",
+              getRoleCardStyle(rival.role),
+            )
+          : "border-bpim-border bg-bpim-bg/80 hover:border-bpim-border hover:bg-bpim-surface-2/90",
+      )}
     >
       <div
         className="absolute left-0 top-0 bottom-0 w-1 opacity-80 transition-transform group-hover:scale-y-110"
         style={{ backgroundColor: bpiStyle.bg }}
       />
+      {RoleIcon && (
+        <RoleIcon
+          className={cn(
+            "absolute bottom-2 right-2 h-16 w-16 opacity-[0.07] pointer-events-none",
+            roleIcon!.color,
+          )}
+        />
+      )}
 
       <div className="flex flex-1 flex-col gap-3 min-w-0">
         <div className="flex w-full items-center gap-3">
@@ -48,9 +79,12 @@ export const RivalSummaryCard = ({
             <AvatarFallback>{userName.slice(0, 2)}</AvatarFallback>
           </Avatar>
           <div className="flex flex-1 flex-col min-w-0">
-            <span className="truncate text-sm font-bold text-bpim-text md:text-base tracking-tight">
-              {userName}
-            </span>
+            <div className="flex items-center gap-1.5 min-w-0">
+              <span className="truncate text-sm font-bold text-bpim-text md:text-base tracking-tight">
+                {userName}
+              </span>
+              {rival.role && <RoleBadge {...rival.role} />}
+            </div>
             <div className="flex items-center gap-2">
               <Badge className="bg-orange-600 h-4 px-1.5 text-[10px] font-bold border-none">
                 {arenaRank || "N/A"}

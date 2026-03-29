@@ -235,6 +235,24 @@ CREATE TABLE IF NOT EXISTS `users` (
   KEY `idx_users_public_id` (`userId`,`isPublic`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `userRoles` (
+  `userId` varchar(128) NOT NULL,
+  `role` enum('coffee','saba','iidx','developer','pro') NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `grantedAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`userId`),
+  CONSTRAINT `fk_userroles_user` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `discordLinks` (
+  `discordUserId` varchar(64) NOT NULL,
+  `userId` varchar(128) NOT NULL,
+  `linkedAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`discordUserId`),
+  UNIQUE KEY `userId` (`userId`),
+  CONSTRAINT `fk_discordlinks_user` FOREIGN KEY (`bpiUserId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `userStatusLogs` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `userId` varchar(128) NOT NULL,

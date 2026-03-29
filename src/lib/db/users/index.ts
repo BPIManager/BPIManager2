@@ -79,6 +79,7 @@ class UsersRepository {
       .innerJoin("userRadarCache as r", "u.userId", "r.userId")
       .leftJoin(latestStatusSubquery.as("ls"), "u.userId", "ls.userId")
       .leftJoin("userStatusLogs as usl", "ls.maxId", "usl.id")
+      .leftJoin("userRoles as ur", "ur.userId", "u.userId")
       .select([
         "u.userId",
         "u.userName",
@@ -94,6 +95,9 @@ class UsersRepository {
         "r.charge",
         "r.scratch",
         "r.soflan",
+        "ur.role",
+        "ur.description",
+        "ur.grantedAt",
       ])
       .where("r.version", "=", version)
       .where("u.isPublic", "=", 1)
@@ -155,6 +159,7 @@ class UsersRepository {
   async getUserProfileSummary(userId: string, myId?: string) {
     const userBase = await db
       .selectFrom("users as u")
+      .leftJoin("userRoles as ur", "ur.userId", "u.userId")
       .select([
         "u.userId",
         "u.userName",
@@ -163,6 +168,9 @@ class UsersRepository {
         "u.iidxId",
         "u.xId",
         "u.isPublic",
+        "ur.role",
+        "ur.description",
+        "ur.grantedAt",
         (eb) =>
           eb
             .selectFrom("follows")
@@ -236,6 +244,9 @@ class UsersRepository {
           Number(userBase.isFollowedBy ?? 0) > 0,
         isSelf: userBase.userId === myId,
       },
+      role: userBase.role
+        ? { role: userBase.role, description: userBase.description ?? "", grantedAt: userBase.grantedAt }
+        : null,
       history: formattedHistory,
       current: formattedHistory[0] || null,
     };

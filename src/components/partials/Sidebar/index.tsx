@@ -27,6 +27,7 @@ import {
   CircleCheck,
   CircleDashed,
   LucideIcon,
+  HeartHandshake,
 } from "lucide-react";
 
 import { useUser } from "@/contexts/users/UserContext";
@@ -43,6 +44,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { XIcon } from "../LogIn";
+import { RoleBadge } from "../UserRole/badge";
 
 export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
   const { user } = useUser();
@@ -70,6 +72,12 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
   ];
 
   const infoMenuItems = [
+    {
+      label: "ご寄付のお願い",
+      icon: HeartHandshake,
+      href: "https://ci-en.net/creator/36005",
+      isExternal: true,
+    },
     {
       label: "APIリファレンス",
       icon: Code2,
@@ -219,12 +227,6 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
     },
   ];
 
-  const isScoreActive =
-    router.asPath.startsWith("/my/") &&
-    !router.asPath.startsWith("/my/unplayed");
-  const isUnplayedActive = router.asPath.startsWith("/my/unplayed");
-  const isAnyScoreActive = isScoreActive || isUnplayedActive;
-
   return (
     <div className="flex h-full flex-col gap-6 p-4 overflow-y-auto scrollbar-hide">
       <div className="rounded-xl border border-bpim-border bg-bpim-surface-2/60 p-4 flex flex-col gap-4">
@@ -250,6 +252,9 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
             <p className="font-mono text-[10px] font-bold text-bpim-warning">
               ☆12 BPI: {user?.totalBpi ?? -15}
             </p>
+            {user?.role && (
+              <RoleBadge {...user.role} variant="full" size="small" />
+            )}
           </div>
         </div>
 

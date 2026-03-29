@@ -17,8 +17,10 @@ export interface Database {
   follows: Follows;
   userRadarCache: UserRadarCache;
   notifications: Notifications;
+  userRoles: UserRoles;
   allSongs: AllSongsTable;
   allScores: AllScoresTable;
+  discordLinks: DiscordLinks;
   // 追加: 暫定/バックアップ用テーブル
   bkScores: BkScores;
   bkUsers: BkUsers;
@@ -138,6 +140,21 @@ export interface UserRadarCache {
   version: string;
 }
 
+export type UserRole = "coffee" | "saba" | "iidx" | "developer" | "pro";
+
+export interface DiscordLinks {
+  discordUserId: string;
+  userId: string;
+  linkedAt: Generated<Date>;
+}
+
+export interface UserRoles {
+  userId: string;
+  role: UserRole;
+  description: string | null;
+  grantedAt: Generated<Date>;
+}
+
 export interface Users {
   createdAt: Generated<Date | null>;
   iidxId: Generated<string | null>;
@@ -213,3 +230,6 @@ export type AllSongsUpdate = Updateable<AllSongsTable>;
 export type AllScores = Selectable<AllScoresTable>;
 export type NewAllScores = Insertable<AllScoresTable>;
 export type AllScoresUpdate = Updateable<AllScoresTable>;
+export type UserRoleRecord = Selectable<UserRoles>;
+export type NewUserRole = Insertable<UserRoles>;
+export type UserRoleUpdate = Updateable<UserRoles>;

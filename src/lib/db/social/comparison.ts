@@ -210,6 +210,7 @@ class SocialComparisonRepository {
       .leftJoin("userRadarCache as vrc", (join) =>
         join.on("vrc.userId", "=", viewerId).on("vrc.version", "=", version),
       )
+      .leftJoin("userRoles as ur", "u.userId", "ur.userId")
       .innerJoin(targetSongs.as("m"), (join) => join.on(sql`1`, "=", sql`1`))
       .leftJoin(myLatest.as("v"), "m.songId", "v.songId")
       .leftJoin(rivalsLatest.as("r"), (join) =>
@@ -236,6 +237,9 @@ class SocialComparisonRepository {
         "vrc.charge as v_charge",
         "vrc.scratch as v_scratch",
         "vrc.soflan as v_soflan",
+        "ur.role as ur_role",
+        "ur.description as ur_description",
+        "ur.grantedAt as ur_grantedAt",
         sql<number>`SUM(CASE WHEN v.exScore IS NULL AND r.exScore IS NULL THEN 0 WHEN COALESCE(v.exScore, 0) > COALESCE(r.exScore, 0) THEN 1 ELSE 0 END)`.as(
           "win",
         ),
@@ -270,6 +274,9 @@ class SocialComparisonRepository {
         "vrc.charge",
         "vrc.scratch",
         "vrc.soflan",
+        "ur.role",
+        "ur.description",
+        "ur.grantedAt",
       ])
       .orderBy("win", "desc")
       .execute();
@@ -303,6 +310,13 @@ class SocialComparisonRepository {
         draw: Number(r.draw),
         totalCount: Number(r.totalCount),
       },
+      role: r.ur_role
+        ? {
+            role: r.ur_role,
+            description: r.ur_description ?? "",
+            grantedAt: r.ur_grantedAt as string | Date,
+          }
+        : null,
     }));
   }
 }

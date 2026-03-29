@@ -4,6 +4,13 @@ const nextConfig: NextConfig = {
   /* config options here */
   reactStrictMode: true,
 
+  serverExternalPackages: [
+    "discord.js",
+    "@discordjs/ws",
+    "@discordjs/rest",
+    "zlib-sync",
+  ],
+
   async redirects() {
     return [
       {

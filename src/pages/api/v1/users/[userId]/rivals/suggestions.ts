@@ -66,6 +66,9 @@ export default async function handler(
         arenaRank: user.arenaRank ?? "N/A",
         totalBpi: Number(user.totalBpi),
         updatedAt: user.createdAt, //バッチidの作成時間が最終更新日時
+        role: user.role
+          ? { role: user.role, description: user.description ?? "", grantedAt: user.grantedAt }
+          : null,
         radar: {
           NOTES: Number(user.notes),
           CHORD: Number(user.chord),

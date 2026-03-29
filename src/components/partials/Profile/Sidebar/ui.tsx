@@ -9,6 +9,7 @@ import { FollowStats } from "./followCount";
 import { formatIIDXId } from "@/utils/common/formatIidxId";
 import { XIcon } from "../../LogIn";
 import { UserProfileData } from "@/types/users/profile";
+import { RoleBadge } from "../../UserRole/badge";
 
 export const ProfileSideBar = ({
   profile,
@@ -64,10 +65,11 @@ export const ProfileHeaderBase = ({ profile }: { profile: UserProfileData }) => 
       </AvatarFallback>
     </Avatar>
 
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col items-center gap-1">
       <h2 className="text-xl font-bold tracking-tight text-bpim-text">
         {profile.userName}
       </h2>
+      {profile.role && <RoleBadge {...profile.role} variant="full" />}
       <p className="font-mono text-xs tracking-widest text-bpim-muted uppercase">
         ID: {formatIIDXId(profile.iidxId ?? undefined)}
       </p>

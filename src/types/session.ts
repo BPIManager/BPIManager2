@@ -1,3 +1,5 @@
+import { UserRoleInfo } from "./users/profile";
+
 export interface Session {
   userId: string;
   userName: string;
@@ -12,4 +14,5 @@ export interface Session {
   updatedAt: Date;
   followingCount: number;
   followerCount: number;
+  role: UserRoleInfo | null;
 }

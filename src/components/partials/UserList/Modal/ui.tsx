@@ -5,6 +5,7 @@ import { formatIIDXId } from "@/utils/common/formatIidxId";
 import { FollowSection } from "../../Profile/Sidebar/followStatus";
 import { cn } from "@/lib/utils";
 import { UserProfileData, UserProfileCompare } from "@/types/users/profile";
+import { RoleBadge } from "../../UserRole/badge";
 
 interface RivalHeaderProps {
   profile: UserProfileData | null | undefined;
@@ -47,10 +48,11 @@ export const RivalHeader = ({
       </Avatar>
 
       <div className="flex min-w-0 flex-1 flex-col items-center gap-1 md:items-start">
-        <div className="flex flex-wrap justify-center gap-2 md:justify-start">
+        <div className="flex flex-wrap items-center justify-center gap-2 md:justify-start">
           <h2 className="text-xl font-bold tracking-tight text-bpim-text">
             {profile?.userName}
           </h2>
+          {profile?.role && <RoleBadge {...profile.role} />}
           {profile?.relationship?.isMutual && (
             <Badge
               variant="secondary"
