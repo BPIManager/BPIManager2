@@ -14,8 +14,8 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
       .json({ message: `Method ${req.method} Not Allowed` });
   }
 
-  const { name } = req.query;
-  const userName = String(name);
+  const { username } = req.query;
+  const userName = String(username);
 
   const validation = validateUserName(userName);
   if (!validation.isValid) {
