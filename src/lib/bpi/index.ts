@@ -109,6 +109,7 @@ export class BpiCalculator {
 
     let sum = 0;
     for (let i = 0; i < totalSongCount; i++) {
+      //未プレイ楽曲がある（totalSongCountにallBpisが満たない場合）は、-15で埋める
       const bpi = i < allBpis.length ? allBpis[i] : -15;
       const m = Math.pow(Math.abs(bpi), k) / totalSongCount;
       sum += bpi > 0 ? m : -m;
