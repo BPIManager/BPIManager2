@@ -88,7 +88,14 @@ export class BpiImportService {
 
     const dailyGroups = new Map<
       string,
-      Map<string, { item: BpimScoreHistoryItem; version: string; meta: BpimScoreMeta | null }>
+      Map<
+        string,
+        {
+          item: BpimScoreHistoryItem;
+          version: string;
+          meta: BpimScoreMeta | null;
+        }
+      >
     >();
 
     for (const { version, data } of payloads) {
@@ -130,6 +137,9 @@ export class BpiImportService {
 
     const sortedDates = Array.from(dailyGroups.keys()).sort();
     const currentProfileBpis = new Map<number, number>();
+    const totalLevel12Count = songMaster.filter(
+      (s) => s.difficultyLevel === 12,
+    ).length;
 
     for (const date of sortedDates) {
       const batchId = uuidv4();
@@ -157,14 +167,16 @@ export class BpiImportService {
             lastPlayed: dayjs.tz(item.updatedAt).toDate(),
           });
 
-          currentProfileBpis.set(songDef.songId, bpi);
+          if (songDef.difficultyLevel === 12) {
+            currentProfileBpis.set(songDef.songId, bpi);
+          }
         }
       }
 
       const allCurrentBpis = Array.from(currentProfileBpis.values());
       const totalBpi = BpiCalculator.calculateTotalBPI(
-        allCurrentBpis.sort((a, b) => b - a),
-        allCurrentBpis.length,
+        allCurrentBpis,
+        totalLevel12Count,
       );
 
       latestBpi = totalBpi;
