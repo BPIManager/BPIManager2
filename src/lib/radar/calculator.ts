@@ -73,12 +73,10 @@ export function calculateRadar(scores: RadarScoreInput[]): RadarResponse {
       .map((s) => Number(s.bpi ?? -15))
       .sort((a, b) => b - a);
 
-    const effectiveTotalCount = Math.max(totalCountInMaster, bpiList.length);
-
     result[category] = {
       totalBpi:
-        effectiveTotalCount > 0
-          ? BpiCalculator.calculateTotalBPI(bpiList, effectiveTotalCount)
+        bpiList.length > 0
+          ? BpiCalculator.calculateTotalBPI(bpiList, bpiList.length)
           : -15,
       songs: categoryScores
         .map(
