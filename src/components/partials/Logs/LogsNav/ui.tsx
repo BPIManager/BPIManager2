@@ -6,7 +6,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface BatchRef {
   batchId: string;
-  createdAt: string;
+  createdAt: string | null;
 }
 
 interface LogNavigatorProps {
@@ -44,25 +44,26 @@ export const LogNavigator = ({ type, pagination }: LogNavigatorProps) => {
     });
   };
 
-  const hasPrev = !!pagination.prev;
-  const hasNext = !!pagination.next;
-
   const prevVal =
     type === "batch"
-      ? pagination.prev?.batchId
-      : dayjs(pagination.prev?.createdAt).format("YYYY-MM-DD");
+      ? pagination.prev?.createdAt && pagination.prev.batchId
+      : pagination.prev?.createdAt &&
+        dayjs(pagination.prev.createdAt).format("YYYY-MM-DD");
   const nextVal =
     type === "batch"
-      ? pagination.next?.batchId
-      : dayjs(pagination.next?.createdAt).format("YYYY-MM-DD");
+      ? pagination.next?.createdAt && pagination.next.batchId
+      : pagination.next?.createdAt &&
+        dayjs(pagination.next.createdAt).format("YYYY-MM-DD");
 
-  const prevLabel = pagination.prev
+  const hasPrev = !!prevVal;
+  const hasNext = !!nextVal;
+
+  const prevLabel = pagination.prev?.createdAt
     ? formatDateLabel(pagination.prev.createdAt)
-    : "---";
-
-  const nextLabel = pagination.next
-    ? formatDateLabel(pagination.next?.createdAt)
-    : "---";
+    : "-";
+  const nextLabel = pagination.next?.createdAt
+    ? formatDateLabel(pagination.next.createdAt)
+    : "-";
 
   const currentLabel = dayjs(pagination.current.createdAt)
     .tz()
