@@ -1,8 +1,12 @@
-﻿import { DistributionChartSkeleton } from "@/components/partials/DashBoard/DistributionChart/skeleton";
+import { useState } from "react";
+import { DistributionChartSkeleton } from "@/components/partials/DashBoard/DistributionChart/skeleton";
 import { DashCard } from "@/components/ui/dashcard";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useChartColors } from "@/hooks/common/useChartColors";
 import type { ChartData } from "@/types/ui/chart";
+import { PieChart, Pie, Tooltip, ResponsiveContainer } from "recharts";
+import { BarChart2, PieChartIcon } from "lucide-react";
 
 const animationStyles = `
   @keyframes bounceGrow {
@@ -118,6 +122,70 @@ const ChartBarUnit = ({
   );
 };
 
+const PieTooltipContent = ({
+  active,
+  payload,
+  total,
+}: {
+  active?: boolean;
+  payload?: { name: string; value: number }[];
+  total: number;
+}) => {
+  if (!active || !payload?.length) return null;
+  const { name, value } = payload[0];
+  const percent = total > 0 ? (value / total) * 100 : 0;
+  return (
+    <div className="rounded-md border border-bpim-border bg-bpim-surface px-2 py-1 text-xs shadow">
+      <span className="font-bold">{name}</span>
+      <span className="ml-2 text-bpim-muted">
+        {value} ({percent.toFixed(1)}%)
+      </span>
+    </div>
+  );
+};
+
+const DistributionPie = ({
+  data,
+  getColor,
+  label,
+  labelColor,
+}: {
+  data: ChartData[];
+  getColor: (label: string) => string;
+  label: string;
+  labelColor: string;
+}) => {
+  const total = data.reduce((sum, d) => sum + d.count, 0);
+  const filtered = [...data]
+    .reverse()
+    .filter((d) => d.count > 0)
+    .map((d) => ({ ...d, fill: getColor(d.label) }));
+  return (
+    <div className="flex flex-1 flex-col items-center gap-1">
+      <ResponsiveContainer width="100%" height={150}>
+        <PieChart>
+          <Pie
+            data={filtered}
+            dataKey="count"
+            nameKey="label"
+            cx="50%"
+            cy="50%"
+            innerRadius="40%"
+            outerRadius="100%"
+            paddingAngle={2}
+            startAngle={90}
+            endAngle={-270}
+          />
+          <Tooltip content={<PieTooltipContent total={total} />} />
+        </PieChart>
+      </ResponsiveContainer>
+      <span className="text-xs font-bold" style={{ color: labelColor }}>
+        {label}
+      </span>
+    </div>
+  );
+};
+
 export const DistributionChart = ({
   title,
   myData,
@@ -129,6 +197,7 @@ export const DistributionChart = ({
   skeletonCount = 10,
 }: DistributionChartProps) => {
   const c = useChartColors();
+  const [chartType, setChartType] = useState<"bar" | "pie">("bar");
 
   if (isLoading) return <DistributionChartSkeleton count={skeletonCount} />;
   if (!myData || myData.length === 0) return null;
@@ -149,35 +218,82 @@ export const DistributionChart = ({
 
       <div className="mb-6 flex items-center justify-between">
         <h3 className="text-sm font-bold uppercase text-bpim-muted">{title}</h3>
-        {rivalData && (
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1">
-              <div className="h-2 w-2 rounded-full bg-bpim-primary" />
-              <span className="text-xs text-bpim-primary">{myName}</span>
+        <div className="flex items-center gap-3">
+          {rivalData && chartType === "bar" && (
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1">
+                <div className="h-2 w-2 rounded-full bg-bpim-primary" />
+                <span className="text-xs text-bpim-primary">{myName}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="h-2 w-2 rounded-full bg-bpim-warning opacity-60" />
+                <span className="text-xs text-bpim-warning">{rivalName}</span>
+              </div>
             </div>
-            <div className="flex items-center gap-1">
-              <div className="h-2 w-2 rounded-full bg-bpim-warning opacity-60" />
-              <span className="text-xs text-bpim-warning">{rivalName}</span>
-            </div>
+          )}
+          <div className="flex items-center rounded-md border border-bpim-border">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={() => setChartType("bar")}
+              className={cn(
+                "rounded-r-none border-r border-bpim-border",
+                chartType === "bar" && "bg-bpim-overlay",
+              )}
+              aria-pressed={chartType === "bar"}
+            >
+              <BarChart2 />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={() => setChartType("pie")}
+              className={cn(
+                "rounded-l-none",
+                chartType === "pie" && "bg-bpim-overlay",
+              )}
+              aria-pressed={chartType === "pie"}
+            >
+              <PieChartIcon />
+            </Button>
           </div>
-        )}
+        </div>
       </div>
 
-      <div className="flex items-start justify-between gap-1 px-1">
-        {myData.map((item, i) => (
-          <ChartBarUnit
-            key={item.label}
-            label={item.label}
-            myCount={item.count}
-            rivalCount={rivalMap?.get(item.label)}
-            maxCount={maxCount}
-            color={getColor(item.label)}
-            index={i}
-            primaryColor={c.primary}
-            warningColor={c.warning}
+      {chartType === "bar" ? (
+        <div className="flex items-start justify-between gap-1 px-1">
+          {myData.map((item, i) => (
+            <ChartBarUnit
+              key={item.label}
+              label={item.label}
+              myCount={item.count}
+              rivalCount={rivalMap?.get(item.label)}
+              maxCount={maxCount}
+              color={getColor(item.label)}
+              index={i}
+              primaryColor={c.primary}
+              warningColor={c.warning}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="flex items-start justify-center gap-2">
+          <DistributionPie
+            data={myData}
+            getColor={getColor}
+            label={rivalData ? myName : ""}
+            labelColor={c.primary}
           />
-        ))}
-      </div>
+          {rivalData && (
+            <DistributionPie
+              data={rivalData}
+              getColor={getColor}
+              label={rivalName}
+              labelColor={c.warning}
+            />
+          )}
+        </div>
+      )}
     </DashCard>
   );
 };

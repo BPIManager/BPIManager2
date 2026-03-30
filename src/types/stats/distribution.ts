@@ -5,3 +5,11 @@ export interface RankDistItem {
   /** 該当楽曲数 */
   count: number;
 }
+
+/** BPM帯別総合BPIの1区間 */
+export interface BpmBandBpiItem {
+  /** BPM帯ラベル（例: `"200~"`, `"180~200"`, `"Soflan"` など） */
+  label: string;
+  /** 総合 BPI */
+  totalBpi: number;
+}

@@ -12,6 +12,7 @@ import { DashBoardFilter } from "@/components/partials/DashBoard/Filter/ui";
 import { RadarSection } from "@/components/partials/DashBoard/Radar/ui";
 import { RankDistributionSection } from "@/components/partials/DashBoard/DJRankDistribution/ui";
 import { BpiDistributionSection } from "@/components/partials/DashBoard/BPIDistribution/ui";
+import { BpmBpiDistributionSection } from "@/components/partials/DashBoard/BpmBpiDistribution";
 import { BpiHistorySection } from "@/components/partials/DashBoard/TotalBPIHistory";
 import { TabsContent } from "@/components/ui/tabs";
 
@@ -36,6 +37,14 @@ function RivalOverviewTab({
           rivalName={rivalName}
         />
         <BpiDistributionSection
+          myUserId={myUserId}
+          rivalUserId={rivalUserId}
+          myName="自分"
+          rivalName={rivalName}
+        />
+      </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-1">
+        <BpmBpiDistributionSection
           myUserId={myUserId}
           rivalUserId={rivalUserId}
           myName="自分"

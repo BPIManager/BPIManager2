@@ -27,10 +27,7 @@ const RANK_ORDER: Record<string, number> = {
 
 export const getRankColorFromTheme = (
   label: string,
-  colors: ChartColors,
+  _colors: ChartColors,
 ): string => {
-  const rank = RANK_ORDER[label] ?? 0;
-  const total = 8;
-  const opacity = 0.15 + (rank / total) * 0.85;
-  return colors.primaryRgba(opacity);
+  return RANK_COLORS[label] ?? "#718096";
 };

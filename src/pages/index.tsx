@@ -9,6 +9,7 @@ import { DashBoardFilter } from "@/components/partials/DashBoard/Filter/ui";
 import { ActivitySection } from "@/components/partials/DashBoard/ActivityCalendar";
 import { RankDistributionSection } from "@/components/partials/DashBoard/DJRankDistribution/ui";
 import { BpiDistributionSection } from "@/components/partials/DashBoard/BPIDistribution/ui";
+import { BpmBpiDistributionSection } from "@/components/partials/DashBoard/BpmBpiDistribution";
 import { FilterProvider } from "@/contexts/stats/FilterContext";
 import { PageContainer, PageHeader } from "@/components/partials/Header";
 import { RankingTabsCard } from "@/components/partials/DashBoard/RecommendedCard/ui";
@@ -21,9 +22,7 @@ export default function DashboardPage() {
   const { user, isLoading: isUserLoading, fbUser } = useUser();
 
   if (isUserLoading) {
-    return (
-      <PageLoader size="lg" />
-    );
+    return <PageLoader size="lg" />;
   }
 
   if (!fbUser) return <LoginPage />;
@@ -50,6 +49,10 @@ export default function DashboardPage() {
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <RankDistributionSection myUserId={fbUser.uid} />
                   <BpiDistributionSection myUserId={fbUser.uid} />
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-1">
+                  <BpmBpiDistributionSection myUserId={fbUser.uid} />
                 </div>
 
                 <div className="flex flex-col gap-6">

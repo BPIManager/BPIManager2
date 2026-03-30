@@ -221,6 +221,63 @@ class StatsRepository {
   }
 
   /**
+   * BPM帯別総合BPI計算用：全楽曲とユーザーの最新BPIを取得
+   *
+   * @param userId - ユーザー ID
+   * @param version - バージョン番号
+   * @param levels - 対象難易度レベルの配列（省略時は全レベル）
+   * @param difficulties - 対象難易度文字列の配列（省略時は全難易度）
+   * @returns 楽曲ごとの bpm, bpi（未プレイは null）
+   */
+  async getSongsWithUserBpiForBpmDistribution(
+    userId: string,
+    version: string,
+    levels?: number[],
+    difficulties?: string[],
+  ) {
+    const versionNum = parseInt(version);
+
+    let query = db
+      .selectFrom("songs as m")
+      .leftJoin(
+        (qb) =>
+          qb
+            .selectFrom(
+              db
+                .selectFrom("scores")
+                .select([
+                  "songId",
+                  "bpi",
+                  sql<number>`ROW_NUMBER() OVER (PARTITION BY songId ORDER BY logId DESC)`.as(
+                    "rn",
+                  ),
+                ])
+                .where("userId", "=", userId)
+                .where("version", "=", version)
+                .as("ranked"),
+            )
+            .select(["songId", "bpi"])
+            .where(sql`rn`, "=", 1)
+            .as("latest"),
+        (join) => join.onRef("latest.songId", "=", "m.songId"),
+      )
+      .select(["m.bpm", "latest.bpi"])
+      .where("m.releasedVersion", "<=", versionNum)
+      .where((eb) =>
+        eb.or([eb("m.deletedAt", "is", null), eb("m.deletedAt", ">", version)]),
+      );
+
+    if (levels && levels.length > 0) {
+      query = query.where("m.difficultyLevel", "in", levels);
+    }
+    if (difficulties && difficulties.length > 0) {
+      query = query.where("m.difficulty", "in", difficulties);
+    }
+
+    return await query.execute();
+  }
+
+  /**
    * 条件に一致する楽曲の総数を取得する。
    *
    * @param levels - 対象難易度レベルの配列（空の場合は全レベル）
