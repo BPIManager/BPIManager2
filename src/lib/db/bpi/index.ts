@@ -209,6 +209,7 @@ class BpiRepository {
       .selectFrom("userStatusLogs")
       .select("arenaRank")
       .where("userId", "=", params.userId)
+      .where("version", "=", params.version)
       .orderBy("id", "desc")
       .limit(1)
       .executeTakeFirst();
