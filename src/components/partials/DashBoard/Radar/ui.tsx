@@ -8,6 +8,7 @@ import { RadarCategorySongsDialog } from "./dialog";
 import { getBpiColorStyle } from "@/constants/bpiColor";
 import { DashCard } from "@/components/ui/dashcard";
 import { cn } from "@/lib/utils";
+import { getVersionNameFromNumber } from "@/constants/versions";
 
 interface RadarSectionProps {
   userId?: string;
@@ -20,17 +21,25 @@ export const RadarSection = ({
   rivalUserId,
   rivalName,
 }: RadarSectionProps) => {
-  const { version, levels, diffs } = useStatsFilter();
+  const { version, levels, diffs, compareVersion } = useStatsFilter();
+
+  const isCompareMode = !rivalUserId && !!compareVersion;
+  const effectiveRivalUserId = rivalUserId ?? (isCompareMode ? userId : undefined);
+  const effectiveRivalVersion = rivalUserId ? version : compareVersion;
+  const effectiveRivalName = rivalUserId
+    ? (rivalName ?? "ライバル")
+    : getVersionNameFromNumber(compareVersion);
+
   const { radar, isLoading } = useRadar(userId, levels, diffs, version);
   const { radar: rivalRadar, isLoading: rivalLoading } = useRadar(
-    rivalUserId,
+    effectiveRivalUserId,
     levels,
     diffs,
-    version,
+    effectiveRivalVersion,
   );
   const [selectedCat, setSelectedCat] = useState<RadarCategory | null>(null);
 
-  const isRivalMode = !!rivalUserId;
+  const isRivalMode = !!effectiveRivalUserId;
 
   const sortedData = useMemo(() => {
     if (!radar) return [];
@@ -65,7 +74,7 @@ export const RadarSection = ({
             <div className="flex items-center gap-1.5">
               <div className="h-2.5 w-2.5 rounded-full bg-orange-400" />
               <span className="text-xs text-bpim-warning font-medium">
-                {rivalName ?? "ライバル"}
+                {effectiveRivalName}
               </span>
             </div>
           </div>

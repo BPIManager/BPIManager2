@@ -7,6 +7,7 @@ import { getBpiColorFromTheme } from "@/constants/bpiColor";
 import { useChartColors } from "@/hooks/common/useChartColors";
 import type { DistributionSectionProps } from "@/types/ui/distribution";
 import { ChartData } from "@/types/ui/chart";
+import { getVersionNameFromNumber } from "@/constants/versions";
 
 export const DistributionSection = ({
   type,
@@ -15,8 +16,15 @@ export const DistributionSection = ({
   myName = "自分",
   rivalName = "ライバル",
 }: DistributionSectionProps) => {
-  const { levels, diffs, version } = useStatsFilter();
+  const { levels, diffs, version, compareVersion } = useStatsFilter();
   const c = useChartColors();
+
+  const isCompareMode = !rivalUserId && !!compareVersion;
+  const effectiveRivalUserId = rivalUserId ?? (isCompareMode ? myUserId : undefined);
+  const effectiveRivalVersion = rivalUserId ? version : compareVersion;
+  const effectiveRivalName = rivalUserId
+    ? rivalName
+    : getVersionNameFromNumber(compareVersion);
 
   const useDistHook =
     type === "rank" ? useDjRankDistribution : useBPIDistribution;
@@ -28,10 +36,10 @@ export const DistributionSection = ({
     version,
   );
   const { distribution: rivalDist, isLoading: rivalLoading } = useDistHook(
-    rivalUserId,
+    effectiveRivalUserId,
     levels,
     diffs,
-    version,
+    effectiveRivalVersion,
   );
 
   const config = {
@@ -47,7 +55,7 @@ export const DistributionSection = ({
     },
   }[type];
 
-  const isLoading = myLoading || (!!rivalUserId && rivalLoading);
+  const isLoading = myLoading || (!!effectiveRivalUserId && rivalLoading);
   if (isLoading) {
     return (
       <DistributionChart
@@ -67,11 +75,11 @@ export const DistributionSection = ({
     <DistributionChart
       title={config.title}
       myData={myDist || []}
-      rivalData={rivalUserId ? rivalDist : undefined}
+      rivalData={effectiveRivalUserId ? rivalDist : undefined}
       isLoading={false}
       getColor={config.getColor}
       myName={myName}
-      rivalName={rivalName}
+      rivalName={effectiveRivalName}
     />
   );
 };

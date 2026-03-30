@@ -11,9 +11,17 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 
-export const DashBoardFilter = () => {
-  const { levels, diffs, version, toggleLevel, toggleDiff, setVersion } =
-    useStatsFilter();
+export const DashBoardFilter = ({ withCompare }: { withCompare?: boolean }) => {
+  const {
+    levels,
+    diffs,
+    version,
+    compareVersion,
+    toggleLevel,
+    toggleDiff,
+    setVersion,
+    setCompareVersion,
+  } = useStatsFilter();
 
   return (
     <div className="rounded-lg border border-bpim-border bg-bpim-surface p-4">
@@ -36,7 +44,41 @@ export const DashBoardFilter = () => {
           </Select>
         </div>
 
-        <div className="flex w-full flex-col">
+        {withCompare && (
+          <div className="flex w-full flex-col gap-2 lg:min-w-[240px] lg:w-auto">
+            <span className="text-[10px] font-bold uppercase text-bpim-muted md:text-xs">
+              COMPARE
+            </span>
+            <Select
+              value={compareVersion}
+              onValueChange={(val) =>
+                setCompareVersion(val === "_none" ? "" : val)
+              }
+            >
+              <SelectTrigger className="h-8 w-full border-bpim-border bg-bpim-surface-2/60 text-xs hover:bg-bpim-overlay focus:ring-0">
+                <SelectValue placeholder="比較なし" />
+              </SelectTrigger>
+              <SelectContent className="border-bpim-border bg-bpim-bg">
+                <SelectItem value="_none" className="text-xs text-bpim-muted">
+                  比較なし
+                </SelectItem>
+                {versionsNonDisabledCollection
+                  .filter((v) => v.value !== version)
+                  .map((v) => (
+                    <SelectItem
+                      key={v.value}
+                      value={v.value}
+                      className="text-xs"
+                    >
+                      {v.label}
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+
+        <div className="flex w-full flex-col gap-2">
           <span className="text-[10px] font-bold uppercase text-bpim-muted md:text-xs">
             LEVEL
           </span>
@@ -60,7 +102,7 @@ export const DashBoardFilter = () => {
           </div>
         </div>
 
-        <div className="flex w-full flex-col">
+        <div className="flex w-full flex-col gap-2">
           <span className="text-[10px] font-bold uppercase text-bpim-muted md:text-xs">
             DIFFICULTY
           </span>
@@ -77,7 +119,7 @@ export const DashBoardFilter = () => {
                   htmlFor={`diff-${d}`}
                   className="cursor-pointer text-xs font-medium leading-none md:text-sm text-bpim-text"
                 >
-                  {d}
+                  {d.slice(0, 1).toUpperCase()}
                 </Label>
               </div>
             ))}

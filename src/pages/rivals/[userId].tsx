@@ -15,6 +15,8 @@ import { BpiDistributionSection } from "@/components/partials/DashBoard/BPIDistr
 import { BpmBpiDistributionSection } from "@/components/partials/DashBoard/BpmBpiDistribution";
 import { BpiHistorySection } from "@/components/partials/DashBoard/TotalBPIHistory";
 import { TabsContent } from "@/components/ui/tabs";
+import { useRivalComparison } from "@/hooks/social/useRivalComparison";
+import { WinLossStats } from "@/components/partials/UserList/Modal/ui";
 
 function RivalOverviewTab({
   myUserId,
@@ -25,9 +27,18 @@ function RivalOverviewTab({
   rivalUserId: string;
   rivalName?: string;
 }) {
+  const { data } = useRivalComparison(rivalUserId);
+  const winLoss = data?.compare?.winLoss;
+
   return (
     <div className="flex flex-col gap-6">
       <DashBoardFilter />
+
+      {winLoss && winLoss.length > 0 && (
+        <div className="rounded-2xl border border-bpim-border bg-bpim-bg/40 p-4 shadow-xl backdrop-blur-md">
+          <WinLossStats winLossData={winLoss} />
+        </div>
+      )}
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <RankDistributionSection

@@ -6,9 +6,11 @@ interface FilterContextType {
   levels: string[];
   diffs: string[];
   version: string;
+  compareVersion: string;
   toggleLevel: (val: string) => void;
   toggleDiff: (val: string) => void;
   setVersion: (val: string) => void;
+  setCompareVersion: (val: string) => void;
   resetFilters: () => void;
 }
 
@@ -22,6 +24,7 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
     IIDX_DIFFICULTIES as unknown as string[],
   );
   const [version, setVersion] = useState<string>(latestVersion);
+  const [compareVersion, setCompareVersion] = useState<string>("");
 
   const toggle = (
     curr: string[],
@@ -37,13 +40,16 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
     levels,
     diffs,
     version,
+    compareVersion,
     toggleLevel: (val: string) => toggle(levels, val, setLevels),
     toggleDiff: (val: string) => toggle(diffs, val, setDiffs),
     setVersion,
+    setCompareVersion,
     resetFilters: () => {
       setLevels(IIDX_LEVELS as unknown as string[]);
       setDiffs(IIDX_DIFFICULTIES as unknown as string[]);
       setVersion(latestVersion);
+      setCompareVersion("");
     },
   };
 

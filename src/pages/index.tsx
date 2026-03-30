@@ -41,7 +41,7 @@ export default function DashboardPage() {
 
         <PageContainer>
           <div className="flex flex-col gap-6">
-            <DashBoardFilter />
+            <DashBoardFilter withCompare />
             <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2 2xl:grid-cols-3">
               <div className="flex flex-col gap-6 2xl:col-span-2">
                 <ActivitySection userId={fbUser.uid} />

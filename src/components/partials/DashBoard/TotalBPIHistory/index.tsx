@@ -1,6 +1,7 @@
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { useTotalBpiHistory } from "@/hooks/stats/useTotalBPIHistory";
 import { TotalBpiHistoryChart } from "./ui";
+import { getVersionNameFromNumber } from "@/constants/versions";
 
 export const BpiHistorySection = ({
   myUserId,
@@ -13,7 +14,14 @@ export const BpiHistorySection = ({
   myName?: string;
   rivalName?: string;
 }) => {
-  const { levels, diffs, version } = useStatsFilter();
+  const { levels, diffs, version, compareVersion } = useStatsFilter();
+
+  const isCompareMode = !rivalUserId && !!compareVersion;
+  const effectiveRivalUserId = rivalUserId ?? (isCompareMode ? myUserId : undefined);
+  const effectiveRivalVersion = rivalUserId ? version : compareVersion;
+  const effectiveRivalName = rivalUserId
+    ? rivalName
+    : getVersionNameFromNumber(compareVersion);
 
   const { history: myHistory, isLoading: myLoading } = useTotalBpiHistory(
     myUserId,
@@ -22,19 +30,19 @@ export const BpiHistorySection = ({
     version,
   );
   const { history: rivalHistory, isLoading: rivalLoading } = useTotalBpiHistory(
-    rivalUserId,
+    effectiveRivalUserId,
     levels,
     diffs,
-    version,
+    effectiveRivalVersion,
   );
 
   return (
     <TotalBpiHistoryChart
       myData={myHistory}
-      rivalData={rivalUserId ? rivalHistory : undefined}
-      isLoading={myLoading || (!!rivalUserId && rivalLoading)}
+      rivalData={effectiveRivalUserId ? rivalHistory : undefined}
+      isLoading={myLoading || (!!effectiveRivalUserId && rivalLoading)}
       myName={myName}
-      rivalName={rivalName}
+      rivalName={effectiveRivalName}
     />
   );
 };

@@ -57,22 +57,14 @@ describe("useInfiniteScroll", () => {
 
   it("isReachingEnd が true のとき IntersectionObserver が登録されない", () => {
     render(
-      <Sentinel
-        onIntersect={vi.fn()}
-        isLoading={false}
-        isReachingEnd={true}
-      />,
+      <Sentinel onIntersect={vi.fn()} isLoading={false} isReachingEnd={true} />,
     );
     expect(mockObserve).not.toHaveBeenCalled();
   });
 
   it("isLoading が true のとき IntersectionObserver が登録されない", () => {
     render(
-      <Sentinel
-        onIntersect={vi.fn()}
-        isLoading={true}
-        isReachingEnd={false}
-      />,
+      <Sentinel onIntersect={vi.fn()} isLoading={true} isReachingEnd={false} />,
     );
     expect(mockObserve).not.toHaveBeenCalled();
   });
@@ -89,7 +81,12 @@ describe("useInfiniteScroll", () => {
 
     const sentinel = screen.getByTestId("sentinel");
     capturedCallback?.(
-      [{ isIntersecting: true, target: sentinel } as IntersectionObserverEntry],
+      [
+        {
+          isIntersecting: true,
+          target: sentinel,
+        } as unknown as IntersectionObserverEntry,
+      ],
       {} as IntersectionObserver,
     );
 
@@ -107,7 +104,7 @@ describe("useInfiniteScroll", () => {
     );
 
     capturedCallback?.(
-      [{ isIntersecting: false } as IntersectionObserverEntry],
+      [{ isIntersecting: false } as unknown as IntersectionObserverEntry],
       {} as IntersectionObserver,
     );
 

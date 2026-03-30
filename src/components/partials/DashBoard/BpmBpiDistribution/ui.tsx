@@ -124,7 +124,6 @@ export const BpmBpiChart = ({ myData, rivalData }: BpmBpiChartProps) => {
         <div className="mt-1 flex justify-between px-[68px]">
           <span className="text-[10px] text-bpim-muted">{BPI_MIN}</span>
           <span className="text-[10px] text-bpim-muted">0</span>
-          <span className="text-[10px] text-bpim-muted">50</span>
           <span className="text-[10px] text-bpim-muted">{scaleMax}</span>
         </div>
       </div>
