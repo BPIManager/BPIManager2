@@ -17,6 +17,7 @@ import {
 import { versionsOptions } from "@/constants/versions";
 import { iidxUrl } from "@/constants/iidxUrl";
 import { BookmarkletAccordion } from "./bookmarklet";
+import { AndroidAppAccordion } from "./android";
 
 interface Props {
   csvData: string;
@@ -70,6 +71,7 @@ export const ImportView = (props: Props) => (
                   onChange={(e) => props.setCsvData(e.target.value)}
                 />
                 <BookmarkletAccordion />
+                <AndroidAppAccordion />
               </div>
 
               <div className="space-y-2">
