@@ -245,7 +245,11 @@ class UsersRepository {
         isSelf: userBase.userId === myId,
       },
       role: userBase.role
-        ? { role: userBase.role, description: userBase.description ?? "", grantedAt: userBase.grantedAt }
+        ? {
+            role: userBase.role,
+            description: userBase.description ?? "",
+            grantedAt: userBase.grantedAt,
+          }
         : null,
       history: formattedHistory,
       current: formattedHistory[0] || null,
@@ -311,6 +315,7 @@ class UsersRepository {
         .selectFrom("userStatusLogs")
         .select(["totalBpi", "arenaRank"])
         .where("userId", "=", userId)
+        .where("version", "=", version)
         .orderBy("id", "desc")
         .limit(1)
         .executeTakeFirst();
