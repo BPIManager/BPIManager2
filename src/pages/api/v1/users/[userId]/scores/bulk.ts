@@ -51,8 +51,17 @@ const handler = async (
     const notFound: { title: string; difficulty: string }[] = [];
     const previousTotalBpi = lastLog?.totalBpi ?? -15;
 
-    type CsvRow = { title: string; difficulty: string; exScore: number; clearState: string; missCount: number | null; lastPlayed: string | null };
-    type CurrentScore = { exScore: number; clearState: string | null; missCount: number | null } | undefined;
+    type CsvRow = {
+      title: string;
+      difficulty: string;
+      exScore: number;
+      clearState: string;
+      missCount: number | null;
+      lastPlayed: string | null;
+    };
+    type CurrentScore =
+      | { exScore: number; clearState: string | null; missCount: number | null }
+      | undefined;
 
     const checkImprovement = (row: CsvRow, current: CurrentScore) => {
       if (!row.exScore || row.exScore <= 0) return false;
