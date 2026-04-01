@@ -100,14 +100,14 @@ const RivalPickStep = ({
   const { user } = useUser();
   const [search, setSearch] = useState("");
 
-  const { results, isLoading } = useRivalSummary({
+  const { rivals, isLoading } = useRivalSummary({
     userId: user?.userId || false,
     levels: ["11", "12"],
     difficulties: ["HYPER", "ANOTHER", "LEGGENDARIA"],
     version: latestVersion,
   });
 
-  const filtered = results.filter((r) =>
+  const filtered = rivals.filter((r) =>
     r.userName.toLowerCase().includes(search.toLowerCase()),
   );
 

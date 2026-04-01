@@ -14,7 +14,7 @@ export const RivalWinLossSummary = ({
   userId?: string | undefined;
 }) => {
   const { levels, diffs, version } = useStatsFilter();
-  const { results, isLoading } = useRivalSummary({
+  const { rivals, isLoading } = useRivalSummary({
     userId,
     version,
     levels,
@@ -23,8 +23,8 @@ export const RivalWinLossSummary = ({
   const [showAll, setShowAll] = useState(false);
 
   const displayCount = 5;
-  const hasMore = results.length > displayCount;
-  const visibleItems = showAll ? results : results.slice(0, displayCount);
+  const hasMore = rivals.length > displayCount;
+  const visibleItems = showAll ? rivals : rivals.slice(0, displayCount);
 
   return (
     <DashCard>
@@ -34,7 +34,7 @@ export const RivalWinLossSummary = ({
 
       {isLoading ? (
         <RivalWinLossSummarySkeleton />
-      ) : results.length === 0 ? (
+      ) : rivals.length === 0 ? (
         <RivalWinLossSummaryNotFound />
       ) : (
         <div className="flex flex-col gap-4">
@@ -57,7 +57,7 @@ export const RivalWinLossSummary = ({
           ) : (
             <>
               <ChevronDown className="h-4 w-4" /> 残り{" "}
-              {results.length - displayCount} 人を表示
+              {rivals.length - displayCount} 人を表示
             </>
           )}
         </Button>

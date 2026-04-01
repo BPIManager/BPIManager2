@@ -127,6 +127,90 @@ class UsersRepository {
     return await query.limit(limit).offset(offset).execute();
   }
 
+  /**
+   * 全ユーザーの BPI ランキングデータを取得する。
+   *
+   * `category` が radar カテゴリ（notes/chord/peak/charge/scratch/soflan）の場合は
+   * `userRadarCache` を INNER JOIN してそのカテゴリ値で降順ソートする（最新バージョンのみ）。
+   * それ以外は `userStatusLogs.totalBpi` で降順ソートする。
+   *
+   * @param version - バージョン番号
+   * @param category - ソート対象カテゴリ（デフォルト: "totalBpi"）
+   */
+  async getGlobalRanking(version: string, category: string = "totalBpi") {
+    const RADAR_COLUMNS = [
+      "notes",
+      "chord",
+      "peak",
+      "charge",
+      "scratch",
+      "soflan",
+    ] as const;
+    const radarColRefMap: Record<string, ReturnType<typeof sql>> = {
+      notes: sql`r.notes`,
+      chord: sql`r.chord`,
+      peak: sql`r.peak`,
+      charge: sql`r.charge`,
+      scratch: sql`r.scratch`,
+      soflan: sql`r.soflan`,
+    };
+    const isRadarCategory = (RADAR_COLUMNS as readonly string[]).includes(
+      category,
+    );
+
+    const latestStatusSubquery = db
+      .selectFrom("userStatusLogs")
+      .select(["userId", (eb) => eb.fn.max("id").as("maxId")])
+      .where("version", "=", version)
+      .groupBy("userId");
+
+    if (isRadarCategory) {
+      return await db
+        .selectFrom("users as u")
+        .innerJoin("userRadarCache as r", (join) =>
+          join
+            .onRef("u.userId", "=", "r.userId")
+            .on("r.version", "=", version),
+        )
+        .leftJoin(latestStatusSubquery.as("ls"), "u.userId", "ls.userId")
+        .leftJoin("userStatusLogs as usl", "ls.maxId", "usl.id")
+        .select([
+          "u.userId",
+          "u.userName",
+          "u.profileImage",
+          "u.isPublic",
+          "u.iidxId",
+          "usl.totalBpi",
+          "usl.arenaRank",
+          "r.notes",
+          "r.chord",
+          "r.peak",
+          "r.charge",
+          "r.scratch",
+          "r.soflan",
+        ])
+        .orderBy(radarColRefMap[category], "desc")
+        .execute();
+    }
+
+    return await db
+      .selectFrom("users as u")
+      .leftJoin(latestStatusSubquery.as("ls"), "u.userId", "ls.userId")
+      .leftJoin("userStatusLogs as usl", "ls.maxId", "usl.id")
+      .select([
+        "u.userId",
+        "u.userName",
+        "u.profileImage",
+        "u.isPublic",
+        "u.iidxId",
+        "usl.totalBpi",
+        "usl.arenaRank",
+      ])
+      .where("usl.id", "is not", null)
+      .orderBy(sql`COALESCE(usl.totalBpi, -15)`, "desc")
+      .execute();
+  }
+
   private async getRelationship(myId: string, targetId: string) {
     const follow = await db
       .selectFrom("follows")

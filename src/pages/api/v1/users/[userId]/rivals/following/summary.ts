@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { checkUserAccess } from "@/middlewares/api/withApi";
 import { socialRepo } from "@/lib/db/social";
+import { bpiRepo } from "@/lib/db/bpi";
 
 export default async function handler(
   req: NextApiRequest,
@@ -26,14 +27,20 @@ export default async function handler(
     const levelArray = normalize(levels).map(Number);
     const diffArray = normalize(difficulties);
 
-    const summary = await socialRepo.getFollowedWinLossSummary({
-      viewerId,
-      version: version as string,
-      levels: levelArray,
-      difficulties: diffArray,
-    });
+    const [summary, viewerBpiRecord] = await Promise.all([
+      socialRepo.getFollowedWinLossSummary({
+        viewerId,
+        version: version as string,
+        levels: levelArray,
+        difficulties: diffArray,
+      }),
+      bpiRepo.getLatestTotalBpi(viewerId, version as string),
+    ]);
 
-    return res.status(200).json(summary);
+    return res.status(200).json({
+      rivals: summary,
+      viewerBpi: viewerBpiRecord ? Number(viewerBpiRecord.totalBpi) : -15,
+    });
   } catch (error) {
     console.error("Followed Summary API Error:", error);
     return res.status(500).json({ message: "Internal Server Error" });

@@ -1,18 +1,17 @@
+"use client";
+
 import { DashboardLayout } from "@/components/partials/Main";
 import { PageContainer, PageHeader } from "@/components/partials/Header";
 import { Meta } from "@/components/partials/Head";
 import { RivalListContainer } from "@/components/partials/Rivals/List";
 
-export default function UsersPage() {
+export default function RivalsPage() {
   return (
     <DashboardLayout>
-      <PageHeader
-        title="ライバル一覧"
-        description="フォローしているライバル一覧"
-      />
+      <PageHeader title="ライバル" description="ライバル一覧・全体ランキング" />
       <Meta
-        title="ライバル一覧"
-        description="フォローしているライバル一覧"
+        title="ライバル"
+        description="ライバル一覧・全体ランキング"
         noIndex
       />
 

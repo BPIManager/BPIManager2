@@ -10,7 +10,6 @@ import { RadarSectionChart } from "../../DashBoard/Radar";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { UserProfileData } from "@/types/users/profile";
 
 export const RivalComparisonModal = ({
   rivalId,

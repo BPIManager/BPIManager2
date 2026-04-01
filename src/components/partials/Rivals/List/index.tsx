@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/router";
+import { useMemo } from "react";
 import { latestVersion } from "@/constants/latestVersion";
 import { useUser } from "@/contexts/users/UserContext";
 import { useRivalSummary } from "@/hooks/social/useRivalSummary";
@@ -8,14 +8,19 @@ import { RivalFilter } from "./filter";
 import { RivalList } from "./container";
 import { LoginRequiredCard } from "../../LoginRequired/ui";
 import { useRivalListFilter } from "@/hooks/social/useRivalListFilter";
+import { useRouter } from "next/router";
 
-export const RivalListContainer = () => {
+export const RivalListContainer = ({
+  viewerRadar,
+}: {
+  viewerRadar?: Record<string, number | { totalBpi: number }>;
+}) => {
   const { user, isLoading: isCredentialLoading } = useUser();
   const router = useRouter();
   const { levels, difficulties, handleToggleLevel, handleToggleDifficulty } =
     useRivalListFilter();
 
-  const { results, isLoading, isError } = useRivalSummary({
+  const { rivals, isLoading, isError } = useRivalSummary({
     userId: user?.userId || false,
     levels,
     difficulties,
@@ -33,7 +38,7 @@ export const RivalListContainer = () => {
         onToggleDifficulty={handleToggleDifficulty}
       />
       <RivalList
-        results={results || []}
+        results={rivals}
         isLoading={isLoading}
         isError={isError}
         onCardClick={(id: string) => router.push(`/rivals/${id}`)}

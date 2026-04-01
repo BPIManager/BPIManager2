@@ -5,6 +5,11 @@ import { API_PREFIX } from "@/constants/apiEndpoints";
 
 import type { RivalSummaryResult } from "@/types/social/rival";
 
+interface RivalSummaryResponse {
+  rivals: RivalSummaryResult[];
+  viewerBpi: number;
+}
+
 /**
  * フォロー中ライバルのサマリー（勝敗・レーダー）を取得する。
  *
@@ -12,7 +17,7 @@ import type { RivalSummaryResult } from "@/types/social/rival";
  * @param params.levels - フィルタリングするレベル配列
  * @param params.difficulties - フィルタリングする難易度配列
  * @param params.version - IIDX バージョン文字列
- * @returns ライバルサマリー配列・ローディング状態・エラー・更新関数
+ * @returns ライバルサマリー配列・閲覧者BPI・ローディング状態・エラー・更新関数
  */
 export const useRivalSummary = (params: {
   userId?: string | boolean;
@@ -35,14 +40,15 @@ export const useRivalSummary = (params: {
     error,
     isLoading: swrLoading,
     mutate,
-  } = useSWR<RivalSummaryResult[]>(url ? [url, fbUser] : null, fetcher, {
+  } = useSWR<RivalSummaryResponse>(url ? [url, fbUser] : null, fetcher, {
     revalidateOnFocus: false,
     shouldRetryOnError: false,
   });
   const isLoading =
     swrLoading || (userId !== false && !data && !error) || userId === false;
   return {
-    results: data || [],
+    rivals: data?.rivals || [],
+    viewerBpi: data?.viewerBpi ?? -15,
     isLoading,
     isError: error,
     mutate,

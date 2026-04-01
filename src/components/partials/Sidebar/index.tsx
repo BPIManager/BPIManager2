@@ -28,6 +28,7 @@ import {
   CircleDashed,
   LucideIcon,
   HeartHandshake,
+  Trophy,
 } from "lucide-react";
 
 import { useUser } from "@/contexts/users/UserContext";
@@ -57,6 +58,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
     { label: "ライバル一覧", icon: UsersIcon, href: "/rivals", exact: true },
     { label: "タイムライン", icon: ChartNoAxesGantt, href: "/timeline" },
     { label: "ライバルを探す", icon: Search, href: "/rivals/search" },
+    { label: "全体ランキング", icon: Trophy, href: "/ranking/global" },
   ];
 
   const otherMenuItems = [
