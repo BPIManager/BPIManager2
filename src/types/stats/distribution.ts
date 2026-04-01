@@ -6,10 +6,21 @@ export interface RankDistItem {
   count: number;
 }
 
+/** BPM帯別一覧に含まれる楽曲エントリ */
+export interface BpmBandSongEntry {
+  title: string;
+  difficulty: string;
+  bpi: number;
+  exScore: number | null;
+  notes: number | null;
+}
+
 /** BPM帯別総合BPIの1区間 */
 export interface BpmBandBpiItem {
   /** BPM帯ラベル（例: `"200~"`, `"180~200"`, `"Soflan"` など） */
   label: string;
   /** 総合 BPI */
   totalBpi: number;
+  /** BPM帯に含まれる楽曲リスト */
+  songs?: BpmBandSongEntry[];
 }

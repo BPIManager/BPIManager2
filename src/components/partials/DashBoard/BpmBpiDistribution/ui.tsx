@@ -1,9 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { getBpiColorStyle } from "@/constants/bpiColor";
 import { BPM_CONST } from "@/constants/bpm";
 import { useChartColors } from "@/hooks/common/useChartColors";
 import type { BpmBandBpiItem } from "@/types/stats/distribution";
+import { BpmBandSongsDialog } from "./dialog";
+import { cn } from "@/lib/utils";
 
 interface BpmBpiChartProps {
   myData: BpmBandBpiItem[];
@@ -48,6 +51,8 @@ export const BpmBpiChart = ({ myData, rivalData }: BpmBpiChartProps) => {
     ? new Map(rivalData.map((d) => [d.label, d.totalBpi]))
     : null;
 
+  const [selectedLabel, setSelectedLabel] = useState<string | null>(null);
+
   const allBpiValues = [
     ...myData.map((d) => d.totalBpi),
     ...(rivalData?.map((d) => d.totalBpi) ?? []),
@@ -58,8 +63,11 @@ export const BpmBpiChart = ({ myData, rivalData }: BpmBpiChartProps) => {
   const ordered = BPM_BAND_ORDER.map((label) => ({
     label,
     myBpi: myData.find((d) => d.label === label)?.totalBpi ?? null,
+    songs: myData.find((d) => d.label === label)?.songs ?? [],
     rivalBpi: rivalMap?.get(label) ?? null,
   })).filter((row) => row.myBpi !== null || row.rivalBpi !== null);
+
+  const selectedRow = ordered.find((r) => r.label === selectedLabel);
 
   return (
     <>
@@ -74,7 +82,14 @@ export const BpmBpiChart = ({ myData, rivalData }: BpmBpiChartProps) => {
               : "transparent";
 
           return (
-            <div key={row.label} className="flex items-center gap-2">
+            <div
+              key={row.label}
+              className={cn(
+                "flex items-center gap-2 rounded-md px-1 py-0.5 cursor-pointer transition-colors duration-150",
+                "hover:bg-bpim-overlay",
+              )}
+              onClick={() => setSelectedLabel(row.label)}
+            >
               <span className="w-[64px] shrink-0 text-right text-[11px] font-bold text-bpim-muted">
                 {row.label}
               </span>
@@ -127,6 +142,15 @@ export const BpmBpiChart = ({ myData, rivalData }: BpmBpiChartProps) => {
           <span className="text-[10px] text-bpim-muted">{scaleMax}</span>
         </div>
       </div>
+
+      {selectedRow && (
+        <BpmBandSongsDialog
+          bandLabel={selectedRow.label}
+          songs={selectedRow.songs}
+          isOpen={!!selectedLabel}
+          onClose={() => setSelectedLabel(null)}
+        />
+      )}
     </>
   );
 };

@@ -1,22 +1,22 @@
-import type { RadarSongEntry } from "@/types/stats/radar";
+import type { BpmBandSongEntry } from "@/types/stats/distribution";
 import { SongListDialog } from "../Dialogs/songListDialog";
 
 interface Props {
-  categoryName: string;
-  songs: RadarSongEntry[];
+  bandLabel: string;
+  songs: BpmBandSongEntry[];
   isOpen: boolean;
   onClose: () => void;
 }
 
-export const RadarCategorySongsDialog = ({
-  categoryName,
+export const BpmBandSongsDialog = ({
+  bandLabel,
   songs,
   isOpen,
   onClose,
 }: Props) => {
   return (
     <SongListDialog
-      dialogTitle={`${categoryName} - 楽曲リスト`}
+      dialogTitle={`BPM ${bandLabel} - 楽曲リスト (${songs.length})`}
       songs={songs}
       isOpen={isOpen}
       onClose={onClose}

@@ -248,6 +248,7 @@ class StatsRepository {
                 .select([
                   "songId",
                   "bpi",
+                  "exScore",
                   sql<number>`ROW_NUMBER() OVER (PARTITION BY songId ORDER BY logId DESC)`.as(
                     "rn",
                   ),
@@ -256,12 +257,12 @@ class StatsRepository {
                 .where("version", "=", version)
                 .as("ranked"),
             )
-            .select(["songId", "bpi"])
+            .select(["songId", "bpi", "exScore"])
             .where(sql`rn`, "=", 1)
             .as("latest"),
         (join) => join.onRef("latest.songId", "=", "m.songId"),
       )
-      .select(["m.bpm", "latest.bpi"])
+      .select(["m.title", "m.difficulty", "m.bpm", "m.notes", "latest.bpi", "latest.exScore"])
       .where("m.releasedVersion", "<=", versionNum)
       .where((eb) =>
         eb.or([eb("m.deletedAt", "is", null), eb("m.deletedAt", ">", version)]),

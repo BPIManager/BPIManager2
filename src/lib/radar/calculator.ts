@@ -29,6 +29,7 @@ interface RadarScoreInput {
   title: string;
   difficulty: string | null;
   exScore: number;
+  notes: number | null;
   bpi: number | string | null;
 }
 
@@ -52,6 +53,10 @@ export function calculateRadar(scores: RadarScoreInput[]): RadarResponse {
   const categoryGroup = new Map<RadarCategory, RadarScoreInput[]>();
   ALL_CATEGORIES.forEach((cat) => categoryGroup.set(cat, []));
 
+  const playedKeys = new Set(
+    scores.map((s) => `${s.title}___${s.difficulty}`),
+  );
+
   for (const score of scores) {
     const key = `${score.title}___${score.difficulty}`;
     const category = topElementMap.get(key);
@@ -65,29 +70,39 @@ export function calculateRadar(scores: RadarScoreInput[]): RadarResponse {
   for (const category of ALL_CATEGORIES) {
     const categoryScores = categoryGroup.get(category)!;
 
-    const totalCountInMaster = (topElements as TopElement[]).filter(
-      (e) => e.top === category,
-    ).length;
-
     const bpiList = categoryScores
       .map((s) => Number(s.bpi ?? -15))
       .sort((a, b) => b - a);
+
+    const unplayedSongs = (topElements as TopElement[]).filter(
+      (e) => e.top === category && !playedKeys.has(`${e.title}___${e.difficulty}`),
+    );
 
     result[category] = {
       totalBpi:
         bpiList.length > 0
           ? BpiCalculator.calculateTotalBPI(bpiList, bpiList.length)
           : -15,
-      songs: categoryScores
-        .map(
+      songs: [
+        ...categoryScores.map(
           (s): RadarSongEntry => ({
             title: s.title,
             difficulty: s.difficulty ?? "",
             exScore: s.exScore,
+            notes: s.notes,
             bpi: Number(s.bpi ?? -15),
           }),
-        )
-        .sort((a, b) => b.bpi - a.bpi),
+        ),
+        ...unplayedSongs.map(
+          (e): RadarSongEntry => ({
+            title: e.title,
+            difficulty: e.difficulty,
+            exScore: null,
+            notes: null,
+            bpi: -15,
+          }),
+        ),
+      ].sort((a, b) => b.bpi - a.bpi),
     };
   }
 

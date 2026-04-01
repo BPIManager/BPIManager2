@@ -9,7 +9,8 @@ export type RadarCategory =
 export interface RadarSongEntry {
   title: string;
   difficulty: string;
-  exScore: number;
+  exScore: number | null;
+  notes: number | null;
   bpi: number;
 }
 
