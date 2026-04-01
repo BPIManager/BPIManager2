@@ -1,7 +1,6 @@
 "use client";
 
-import { memo, useEffect, useMemo, useRef } from "react";
-import { useRouter } from "next/router";
+import { useEffect, useMemo, useRef } from "react";
 import { useUser } from "@/contexts/users/UserContext";
 import { useRivalScores } from "@/hooks/social/useRivalScores";
 import { useSongRanking } from "@/hooks/stats/useSongRanking";
@@ -16,15 +15,16 @@ interface RivalRankingProps {
   version: string;
   songId: number;
   myScore?: SongWithScore;
+  onNavigate: (userId: string) => void;
 }
 
 export const RivalRankingBody = ({
   version,
   songId,
   myScore,
+  onNavigate,
 }: RivalRankingProps) => {
   const { fbUser } = useUser();
-  const router = useRouter();
   const { data, isLoading } = useRivalScores(songId, version);
 
   const ranking = useMemo(() => {
@@ -68,7 +68,7 @@ export const RivalRankingBody = ({
           return (
             <div
               key={row.userId}
-              onClick={() => !isSelf && router.push(`/rivals/${row.userId}`)}
+              onClick={() => !isSelf && onNavigate(row.userId)}
               className={cn(
                 "grid grid-cols-[40px_1fr_auto_52px] items-center border-b border-bpim-border px-3 py-2.5 transition-colors last:border-b-0",
                 isSelf
@@ -240,8 +240,8 @@ export const GlobalRankingBody = ({
   version,
   songId,
   myScore,
+  onNavigate,
 }: RivalRankingProps) => {
-  const router = useRouter();
   const { data, isLoading } = useSongRanking(songId, version);
   const listRef = useRef<ListImperativeAPI>(null);
 
@@ -262,10 +262,6 @@ export const GlobalRankingBody = ({
   if (!data) return null;
 
   const { rankings, totalCount, selfRank } = data;
-
-  const handleNavigate = (userId: string) => {
-    router.push(`/rivals/${userId}`);
-  };
 
   return (
     <div className="flex flex-col gap-4">
@@ -307,7 +303,7 @@ export const GlobalRankingBody = ({
           rowCount={rankings.length}
           rowHeight={ITEM_HEIGHT}
           rowComponent={GlobalRow}
-          rowProps={{ rankings, myScore, onNavigate: handleNavigate }}
+          rowProps={{ rankings, myScore, onNavigate }}
           style={{ height: "40svh" }}
           className="overscroll-contain custom-scrollbar"
         />

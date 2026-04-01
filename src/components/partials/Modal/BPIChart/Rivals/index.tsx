@@ -14,20 +14,32 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { AppTabsGroup } from "@/components/ui/complex/tabs";
+import { RivalComparisonModal } from "@/components/partials/UserList/Modal";
+import { useRadar } from "@/hooks/stats/useRadar";
+import { useUser } from "@/contexts/users/UserContext";
 
 export default function RivalsRanking({ song }: { song: SongWithScore }) {
+  const { fbUser } = useUser();
   const [version, setVersion] = useState<string>(latestVersion);
   const [tab, setTab] = useState<"rivals" | "global">("rivals");
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { radar: viewerRadar } = useRadar(fbUser?.uid, [], [], version);
+
+  const handleNavigate = (userId: string) => {
+    setSelectedUserId(userId);
+    setIsModalOpen(true);
+  };
 
   return (
     <div className="flex flex-col gap-4">
       <div className="rounded-xl border border-bpim-border bg-bpim-bg/40 p-4">
-        <div className="flex flex-col gap-2 max-w-[240px]">
+        <div className="flex flex-col gap-2">
           <label className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
             Version
           </label>
           <Select value={version} onValueChange={setVersion}>
-            <SelectTrigger className="h-8 border-bpim-border bg-bpim-bg/20 text-xs text-bpim-text focus:ring-blue-500">
+            <SelectTrigger className="w-full h-8 border-bpim-border bg-bpim-bg/20 text-xs text-bpim-text focus:ring-blue-500">
               <SelectValue placeholder="Select version" />
             </SelectTrigger>
             <SelectContent className="border-bpim-border bg-bpim-bg">
@@ -55,6 +67,7 @@ export default function RivalsRanking({ song }: { song: SongWithScore }) {
             songId={song.songId}
             version={version}
             myScore={song}
+            onNavigate={handleNavigate}
           />
         </TabsContent>
 
@@ -63,9 +76,19 @@ export default function RivalsRanking({ song }: { song: SongWithScore }) {
             songId={song.songId}
             version={version}
             myScore={song}
+            onNavigate={handleNavigate}
           />
         </TabsContent>
       </Tabs>
+
+      {selectedUserId && (
+        <RivalComparisonModal
+          rivalId={selectedUserId}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          viewerRadar={viewerRadar ?? {}}
+        />
+      )}
     </div>
   );
 }
