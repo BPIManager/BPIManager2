@@ -16,3 +16,19 @@ export interface GlobalRankingResponse {
   selfRank: number;
   viewerRadar: Record<string, { totalBpi: number; songs: unknown[] }>;
 }
+
+export interface SongRankingEntry {
+  rank: number;
+  userId: string;
+  userName: string;
+  profileImage: string | null;
+  exScore: number | null;
+  bpi: number | null;
+  isSelf: boolean;
+}
+
+export interface SongRankingResponse {
+  rankings: SongRankingEntry[];
+  totalCount: number;
+  selfRank: number;
+}

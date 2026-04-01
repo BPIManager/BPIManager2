@@ -85,7 +85,9 @@ export const GlobalRankingContainer = () => {
       if (selfIndex >= 0) {
         hasScrolled.current = true;
         requestAnimationFrame(() => {
-          listRef.current?.scrollToRow({ index: selfIndex, align: "center" });
+          requestAnimationFrame(() => {
+            listRef.current?.scrollToRow({ index: selfIndex, align: "center" });
+          });
         });
       }
     }
@@ -143,7 +145,7 @@ export const GlobalRankingContainer = () => {
             Version
           </label>
           <Select value={version} onValueChange={handleVersionChange}>
-            <SelectTrigger className="h-9 border-bpim-border bg-bpim-bg text-bpim-text focus:ring-blue-500">
+            <SelectTrigger className="w-full h-9 border-bpim-border bg-bpim-bg text-bpim-text focus:ring-blue-500">
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="border-bpim-border bg-bpim-bg text-bpim-text">
@@ -165,7 +167,7 @@ export const GlobalRankingContainer = () => {
             onValueChange={handleCategoryChange}
             disabled={!isLatestVersion}
           >
-            <SelectTrigger className="h-9 border-bpim-border bg-bpim-bg text-bpim-text focus:ring-blue-500">
+            <SelectTrigger className="w-full h-9 border-bpim-border bg-bpim-bg text-bpim-text focus:ring-blue-500">
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="border-bpim-border bg-bpim-bg text-bpim-text">

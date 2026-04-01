@@ -1,8 +1,8 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { SongWithScore } from "@/types/songs/score";
-import { RivalRankingBody } from "./ui";
+import { RivalRankingBody, GlobalRankingBody } from "./ui";
 import { latestVersion } from "@/constants/latestVersion";
 import { versionsNonDisabledCollection } from "@/constants/versions";
 import {
@@ -12,9 +12,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { AppTabsGroup } from "@/components/ui/complex/tabs";
 
 export default function RivalsRanking({ song }: { song: SongWithScore }) {
   const [version, setVersion] = useState<string>(latestVersion);
+  const [tab, setTab] = useState<"rivals" | "global">("rivals");
 
   return (
     <div className="flex flex-col gap-4">
@@ -38,7 +41,31 @@ export default function RivalsRanking({ song }: { song: SongWithScore }) {
         </div>
       </div>
 
-      <RivalRankingBody songId={song.songId} version={version} myScore={song} />
+      <Tabs value={tab} onValueChange={(v) => setTab(v as "rivals" | "global")}>
+        <AppTabsGroup
+          visual="flat"
+          tabs={[
+            { value: "rivals", label: "ライバル内" },
+            { value: "global", label: "グローバル" },
+          ]}
+        />
+
+        <TabsContent value="rivals" className="mt-4">
+          <RivalRankingBody
+            songId={song.songId}
+            version={version}
+            myScore={song}
+          />
+        </TabsContent>
+
+        <TabsContent value="global" className="mt-4">
+          <GlobalRankingBody
+            songId={song.songId}
+            version={version}
+            myScore={song}
+          />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

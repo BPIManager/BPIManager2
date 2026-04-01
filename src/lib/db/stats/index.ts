@@ -279,6 +279,65 @@ class StatsRepository {
   }
 
   /**
+   * 指定楽曲のグローバルランキングデータを取得する。
+   *
+   * 各ユーザーの最新スコア（最大 logId）を取得し、exScore 降順でランキングする。
+   * 非公開ユーザーは匿名化して含める。
+   *
+   * @param songId - 楽曲 ID
+   * @param version - バージョン番号
+   * @param viewerId - 閲覧者のユーザー ID（自分自身の判定に使用）
+   */
+  async getSongRanking(songId: number, version: string, viewerId: string) {
+    const rows = await db
+      .selectFrom("scores as s")
+      .innerJoin("users as u", "s.userId", "u.userId")
+      .innerJoin(
+        (qb) =>
+          qb
+            .selectFrom("scores")
+            .select([
+              "userId",
+              (eb) => eb.fn.max("logId").as("maxLogId"),
+            ])
+            .where("songId", "=", songId)
+            .where("version", "=", version)
+            .groupBy("userId")
+            .as("latest"),
+        (join) => join.onRef("latest.maxLogId", "=", "s.logId"),
+      )
+      .select([
+        "s.userId",
+        "u.userName",
+        "u.profileImage",
+        "u.isPublic",
+        "s.exScore",
+        "s.bpi",
+      ])
+      .where("s.songId", "=", songId)
+      .orderBy("s.exScore", "desc")
+      .execute();
+
+    const rankings = rows.map((r, i) => ({
+      rank: i + 1,
+      userId: r.isPublic ? r.userId : `anon-${i}`,
+      userName: r.isPublic ? r.userName : "-",
+      profileImage: r.isPublic ? r.profileImage : null,
+      exScore: r.exScore,
+      bpi: r.bpi !== null && r.bpi !== undefined ? Number(r.bpi) : null,
+      isSelf: r.userId === viewerId,
+    }));
+
+    const selfEntry = rankings.find((r) => r.isSelf);
+
+    return {
+      rankings,
+      totalCount: rankings.length,
+      selfRank: selfEntry?.rank ?? 0,
+    };
+  }
+
+  /**
    * 条件に一致する楽曲の総数を取得する。
    *
    * @param levels - 対象難易度レベルの配列（空の場合は全レベル）
