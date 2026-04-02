@@ -13,7 +13,6 @@ const handler = async (
     res.setHeader("Allow", ["GET"]);
     return res.status(405).json({ message: "Method Not Allowed" });
   }
-
   try {
     const user = await db
       .selectFrom("users as u")
@@ -68,7 +67,11 @@ const handler = async (
             followingCount: Number(user.followingCount || 0),
             followerCount: Number(user.followerCount || 0),
             role: user.role
-              ? { role: user.role, description: user.description ?? "", grantedAt: user.grantedAt }
+              ? {
+                  role: user.role,
+                  description: user.description ?? "",
+                  grantedAt: user.grantedAt,
+                }
               : null,
           }
         : null,

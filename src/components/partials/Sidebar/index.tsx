@@ -29,6 +29,7 @@ import {
   LucideIcon,
   HeartHandshake,
   Trophy,
+  Target,
 } from "lucide-react";
 
 import { useUser } from "@/contexts/users/UserContext";
@@ -62,6 +63,12 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
   ];
 
   const otherMenuItems = [
+    {
+      label: "アシスタント",
+      icon: Target,
+      href: "/optimizer",
+      isBeta: true,
+    },
     { label: "比較", icon: ChartArea, href: "/analytics" },
     { label: "メモ", icon: StickyNote, href: "/notes", isComingSoon: true },
     { label: "指標", icon: LandPlot, href: "/metrics" },
@@ -126,6 +133,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
       exact?: boolean;
       isExternal?: boolean;
       isComingSoon?: boolean;
+      isBeta?: boolean;
     },
     isNested = false,
   ) => {
@@ -141,6 +149,14 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
       <div className="flex w-full items-center gap-3">
         <item.icon className="h-4.5 w-4.5" />
         <span className="flex-1 text-left">{item.label}</span>
+        {item.isBeta && (
+          <Badge
+            variant="secondary"
+            className="text-[9px] px-1.5 py-0 bg-blue-500/10 text-blue-400 border-blue-500/20 font-bold tracking-tighter"
+          >
+            BETA
+          </Badge>
+        )}
         {item.isComingSoon && (
           <Badge
             variant="outline"

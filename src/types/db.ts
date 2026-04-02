@@ -21,6 +21,7 @@ export interface Database {
   allSongs: AllSongsTable;
   allScores: AllScoresTable;
   discordLinks: DiscordLinks;
+  optimizeMemo: OptimizeMemoTable;
   // 追加: 暫定/バックアップ用テーブル
   bkScores: BkScores;
   bkUsers: BkUsers;
@@ -206,6 +207,15 @@ export interface AllScoresTable {
   batchId: string | null;
 }
 
+export interface OptimizeMemoTable {
+  id: Generated<number>;
+  reportId: string;
+  userId: string;
+  reportData: string;
+  targetBpi: number | null;
+  createdAt: Generated<Date>;
+}
+
 export type UserStatusLog = Selectable<UserStatusLogs>;
 export type NewUserStatusLog = Insertable<UserStatusLogs>;
 export type TotalBPILog = Selectable<Logs>;
@@ -233,3 +243,6 @@ export type AllScoresUpdate = Updateable<AllScoresTable>;
 export type UserRoleRecord = Selectable<UserRoles>;
 export type NewUserRole = Insertable<UserRoles>;
 export type UserRoleUpdate = Updateable<UserRoles>;
+export type OptimizeMemo = Selectable<OptimizeMemoTable>;
+export type NewOptimizeMemo = Insertable<OptimizeMemoTable>;
+export type OptimizeMemoUpdate = Updateable<OptimizeMemoTable>;

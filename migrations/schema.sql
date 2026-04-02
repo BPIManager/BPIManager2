@@ -270,6 +270,19 @@ CREATE TABLE IF NOT EXISTS `userStatusLogs` (
   CONSTRAINT `userStatusLogs_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=200705 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `optimizeMemo` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `reportId` varchar(36) NOT NULL COMMENT '一意のUUID',
+  `userId` varchar(128) NOT NULL,
+  `reportData` JSON NOT NULL COMMENT '計算結果のJSON',
+  `targetBpi` float DEFAULT NULL COMMENT '検索性のための目標BPI（任意）',
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_reportId_unique` (`reportId`),
+  KEY `idx_report_userId_createdAt` (`userId`, `createdAt` DESC),
+  CONSTRAINT `fk_reports_users` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
