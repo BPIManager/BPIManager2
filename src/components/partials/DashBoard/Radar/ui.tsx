@@ -24,7 +24,8 @@ export const RadarSection = ({
   const { version, levels, diffs, compareVersion } = useStatsFilter();
 
   const isCompareMode = !rivalUserId && !!compareVersion;
-  const effectiveRivalUserId = rivalUserId ?? (isCompareMode ? userId : undefined);
+  const effectiveRivalUserId =
+    rivalUserId ?? (isCompareMode ? userId : undefined);
   const effectiveRivalVersion = rivalUserId ? version : compareVersion;
   const effectiveRivalName = rivalUserId
     ? (rivalName ?? "ライバル")

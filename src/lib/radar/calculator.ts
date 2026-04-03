@@ -49,7 +49,7 @@ const topElementMap = new Map<string, RadarCategory>(
  * @param scores - 計算対象のスコア配列（タイトル・難易度・EX スコア・BPI）
  * @returns 6 カテゴリそれぞれの総合 BPI と楽曲リストを含むレーダーデータ
  */
-export function calculateRadar(scores: RadarScoreInput[]): RadarResponse {
+export function calculateRadar(scores: RadarScoreInput[], validSongKeys?: Set<string>): RadarResponse {
   const categoryGroup = new Map<RadarCategory, RadarScoreInput[]>();
   ALL_CATEGORIES.forEach((cat) => categoryGroup.set(cat, []));
 
@@ -75,7 +75,10 @@ export function calculateRadar(scores: RadarScoreInput[]): RadarResponse {
       .sort((a, b) => b - a);
 
     const unplayedSongs = (topElements as TopElement[]).filter(
-      (e) => e.top === category && !playedKeys.has(`${e.title}___${e.difficulty}`),
+      (e) =>
+        e.top === category &&
+        !playedKeys.has(`${e.title}___${e.difficulty}`) &&
+        (validSongKeys === undefined || validSongKeys.has(`${e.title}___${e.difficulty}`)),
     );
 
     result[category] = {

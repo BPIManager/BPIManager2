@@ -16,14 +16,17 @@ export default async function handler(
     const access = await checkUserAccess(req, userId);
     if (!access.hasAccess) return rejectAccess(res, access);
 
-    const scores = await statsRepo.getLatestScoresWithMusicData(
-      userId,
-      version,
-      levels,
-      difficulties,
-    );
+    const [scores, validSongKeys] = await Promise.all([
+      statsRepo.getLatestScoresWithMusicData(
+        userId,
+        version,
+        levels,
+        difficulties,
+      ),
+      statsRepo.getFilteredSongKeys(version, levels, difficulties),
+    ]);
 
-    return res.status(200).json(calculateRadar(scores));
+    return res.status(200).json(calculateRadar(scores, validSongKeys));
   } catch (error: unknown) {
     const errorMessage =
       error instanceof Error ? error.message : "Internal Server Error";

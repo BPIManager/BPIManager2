@@ -359,6 +359,36 @@ class StatsRepository {
     const result = await query.executeTakeFirst();
     return Number(result?.count || 0);
   }
+
+  /**
+   * 指定バージョン・レベル・難易度に該当する全楽曲の `title___difficulty` キー集合を返す。
+   * レーダーチャートの未プレイ曲フィルタリングに使用する。
+   */
+  async getFilteredSongKeys(
+    version: string,
+    levels?: number[],
+    difficulties?: string[],
+  ): Promise<Set<string>> {
+    const versionNum = parseInt(version);
+
+    let query = db
+      .selectFrom("songs as m")
+      .select(["m.title", "m.difficulty"])
+      .where("m.releasedVersion", "<=", versionNum)
+      .where((eb) =>
+        eb.or([eb("m.deletedAt", "is", null), eb("m.deletedAt", ">", version)]),
+      );
+
+    if (levels && levels.length > 0) {
+      query = query.where("m.difficultyLevel", "in", levels);
+    }
+    if (difficulties && difficulties.length > 0) {
+      query = query.where("m.difficulty", "in", difficulties);
+    }
+
+    const rows = await query.execute();
+    return new Set(rows.map((r) => `${r.title}___${r.difficulty}`));
+  }
 }
 
 export const statsRepo = new StatsRepository();
