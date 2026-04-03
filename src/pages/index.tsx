@@ -7,6 +7,7 @@ import LoginPage from "@/components/partials/LogIn/ui";
 import AccountSettings from "@/components/partials/Modal/AccountSettings";
 import { DashBoardFilter } from "@/components/partials/DashBoard/Filter/ui";
 import { ActivitySection } from "@/components/partials/DashBoard/ActivityCalendar";
+import { CurrentBpiSection } from "@/components/partials/DashBoard/CurrentBpi";
 import { RankDistributionSection } from "@/components/partials/DashBoard/DJRankDistribution/ui";
 import { BpiDistributionSection } from "@/components/partials/DashBoard/BPIDistribution/ui";
 import { BpmBpiDistributionSection } from "@/components/partials/DashBoard/BpmBpiDistribution";
@@ -44,7 +45,10 @@ export default function DashboardPage() {
             <DashBoardFilter withCompare />
             <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2 2xl:grid-cols-3">
               <div className="flex flex-col gap-6 2xl:col-span-2">
-                <ActivitySection userId={fbUser.uid} />
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <CurrentBpiSection userId={fbUser.uid} />
+                  <ActivitySection userId={fbUser.uid} />
+                </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <RankDistributionSection myUserId={fbUser.uid} />
