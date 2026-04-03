@@ -1,6 +1,6 @@
 import type { RadarCategory } from "@/types/stats/radar";
 
-export type OptimizerStrategy = "unplayed" | "played" | "radar-priority";
+export type OptimizerStrategy = "unplayed" | "played";
 
 export interface SongOptimizerInput {
   songId: number;
@@ -50,7 +50,7 @@ export interface OptimizationResult {
 export interface OptimizerOptions {
   includeUnplayed: boolean;
   includePlayed: boolean;
-  radarPriority: boolean;
+  radarElementFilter: RadarCategory[] | null;
   radarCategoryBpis: Partial<Record<RadarCategory, number>>;
   candidateLevels: number[];
   candidateDifficulties: string[];

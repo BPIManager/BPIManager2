@@ -53,6 +53,15 @@ export default async function handler(
   const searchModeParam = String(req.query.searchMode ?? "flexible");
   const considerCurrentTotalBpi = req.query.considerCurrentTotalBpi !== "false";
 
+  const radarElementsParam = String(
+    req.query.radarElements ?? ALL_RADAR_CATEGORIES.join(","),
+  );
+  const selectedElements = radarElementsParam
+    .split(",")
+    .filter((e) =>
+      ALL_RADAR_CATEGORIES.includes(e as RadarCategory),
+    ) as RadarCategory[];
+
   if (isNaN(targetBpi) || targetBpi < -15 || targetBpi > 100) {
     return res
       .status(400)
@@ -85,24 +94,20 @@ export default async function handler(
   }
 
   const radarCategoryBpis: Partial<Record<RadarCategory, number>> = {};
-  const strategies = strategiesParam.split(",").filter(Boolean);
+  const playedScores = rawRows
+    .filter((r) => r.exScore !== null && r.bpi !== null)
+    .map((r) => ({
+      title: r.title,
+      difficulty: r.difficulty,
+      exScore: Number(r.exScore),
+      notes: r.notes,
+      bpi: r.bpi,
+    }));
 
-  if (strategies.includes("radar-priority")) {
-    const playedScores = rawRows
-      .filter((r) => r.exScore !== null && r.bpi !== null)
-      .map((r) => ({
-        title: r.title,
-        difficulty: r.difficulty,
-        exScore: Number(r.exScore),
-        notes: r.notes,
-        bpi: r.bpi,
-      }));
-
-    if (playedScores.length > 0) {
-      const radarResult = calculateRadar(playedScores);
-      for (const cat of ALL_RADAR_CATEGORIES) {
-        radarCategoryBpis[cat] = radarResult[cat].totalBpi;
-      }
+  if (playedScores.length > 0) {
+    const radarResult = calculateRadar(playedScores);
+    for (const cat of ALL_RADAR_CATEGORIES) {
+      radarCategoryBpis[cat] = radarResult[cat].totalBpi;
     }
   }
 
@@ -126,24 +131,53 @@ export default async function handler(
     radarCategory: topElementMap.get(`${r.title}___${r.difficulty}`) ?? null,
   }));
 
-  const options: OptimizerOptions & { searchMode: "fastest" | "flexible" } = {
-    includeUnplayed: strategies.includes("unplayed"),
-    includePlayed: strategies.includes("played"),
-    radarPriority: strategies.includes("radar-priority"),
-    radarCategoryBpis,
-    candidateLevels: [12],
-    candidateDifficulties,
-    searchMode: searchModeParam === "fastest" ? "fastest" : "flexible",
-    considerCurrentTotalBpi,
-  };
+  const strategies = strategiesParam.split(",").filter(Boolean);
+  const isFiltered = selectedElements.length < ALL_RADAR_CATEGORIES.length;
+  const radarElementFilter = isFiltered ? selectedElements : null;
 
-  const result = findOptimalBpiPath(
+  const baseOptions: OptimizerOptions & { searchMode: "fastest" | "flexible" } =
+    {
+      includeUnplayed: strategies.includes("unplayed"),
+      includePlayed: strategies.includes("played"),
+      radarCategoryBpis,
+      radarElementFilter,
+      candidateLevels: [12],
+      candidateDifficulties,
+      searchMode: searchModeParam === "fastest" ? "fastest" : "flexible",
+      considerCurrentTotalBpi,
+    };
+
+  let result = findOptimalBpiPath(
     songs,
     songs.length,
     targetBpi,
-    options,
+    baseOptions,
     maxSteps,
   );
+
+  if (!result.achievable && !result.alreadyAchieved && isFiltered) {
+    const fallbackOptions = { ...baseOptions, radarElementFilter: null };
+    const fallbackResult = findOptimalBpiPath(
+      songs,
+      songs.length,
+      targetBpi,
+      fallbackOptions,
+      maxSteps,
+    );
+    if (
+      fallbackResult.achievable ||
+      fallbackResult.steps.length > result.steps.length
+    ) {
+      const note =
+        "選択された要素の楽曲のみでは目標に到達できなかったため、全楽曲から再探索しました。";
+      result = {
+        ...fallbackResult,
+        autoAdjustmentNote: fallbackResult.autoAdjustmentNote
+          ? `${note} ${fallbackResult.autoAdjustmentNote}`
+          : note,
+      };
+    }
+  }
 
   return res.status(200).json(result);
 }

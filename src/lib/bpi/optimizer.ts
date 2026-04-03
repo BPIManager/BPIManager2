@@ -39,7 +39,7 @@ const MIN_BPI_GAIN = 0.5;
 const MIN_EX_GAIN = 5;
 const FLEXIBLE_BUFFER = 1.15;
 
-export function findOptimalBpiPath(
+function executeOptimization(
   sourceData: SongOptimizerInput[],
   totalCount: number,
   targetTotalValue: number,
@@ -69,17 +69,20 @@ export function findOptimalBpiPath(
   const strongCategories = new Set(
     validRadarEntries.slice(0, 3).map((e) => e[0]),
   );
-  const hasRadarData = strongCategories.size > 0;
+
+  const elementFilterSet =
+    options.radarElementFilter !== null
+      ? new Set(options.radarElementFilter)
+      : null;
 
   const candidates = sourceData.filter((s) => {
     const actualIsUnplayed = s.isUnplayed || s.currentBpi <= -15;
-    if (options.radarPriority && hasRadarData) {
-      if (!s.radarCategory || !strongCategories.has(s.radarCategory))
+    if (elementFilterSet !== null) {
+      if (!s.radarCategory || !elementFilterSet.has(s.radarCategory))
         return false;
-    } else {
-      if (!options.includeUnplayed && actualIsUnplayed) return false;
-      if (!options.includePlayed && !actualIsUnplayed) return false;
     }
+    if (!options.includeUnplayed && actualIsUnplayed) return false;
+    if (!options.includePlayed && !actualIsUnplayed) return false;
     const isLevelMatch =
       options.candidateLevels.length === 0 ||
       options.candidateLevels.includes(s.difficultyLevel);
@@ -441,4 +444,45 @@ export function findOptimalBpiPath(
     autoAdjustmentNote,
     maxAchievableBpi: !isAchievable ? maxAchievableBpi : undefined,
   };
+}
+
+export function findOptimalBpiPath(
+  sourceData: SongOptimizerInput[],
+  totalCount: number,
+  targetTotalValue: number,
+  options: OptimizerOptions & {
+    searchMode?: "fastest" | "flexible";
+    maxRetries?: number;
+  },
+  maxStepsInput = 30,
+): OptimizationResult {
+  const maxRetries = options.maxRetries ?? 10;
+
+  let bestResult: OptimizationResult | null = null;
+
+  for (let i = 0; i < maxRetries; i++) {
+    const result = executeOptimization(
+      sourceData,
+      totalCount,
+      targetTotalValue,
+      options,
+      maxStepsInput,
+    );
+
+    if (result.alreadyAchieved || result.achievable) {
+      return result;
+    }
+
+    const currentMaxBpi = result.maxAchievableBpi ?? result.currentTotalBpi;
+
+    const bestMaxBpi = bestResult
+      ? (bestResult.maxAchievableBpi ?? bestResult.currentTotalBpi)
+      : -Infinity;
+
+    if (!bestResult || currentMaxBpi > bestMaxBpi) {
+      bestResult = result;
+    }
+  }
+
+  return bestResult as OptimizationResult;
 }

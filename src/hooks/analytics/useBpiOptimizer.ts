@@ -8,11 +8,20 @@ import type {
   OptimizationResult,
   OptimizerStrategy,
 } from "@/types/bpi-optimizer";
+import type { RadarCategory } from "@/types/stats/radar";
 import { toast } from "sonner";
 
 const DEFAULT_STRATEGIES: OptimizerStrategy[] = ["unplayed", "played"];
 const DEFAULT_LEVELS = ["11", "12"];
 const DEFAULT_DIFFICULTIES = ["HYPER", "ANOTHER", "LEGGENDARIA"];
+const ALL_RADAR_ELEMENTS: RadarCategory[] = [
+  "NOTES",
+  "CHORD",
+  "PEAK",
+  "CHARGE",
+  "SCRATCH",
+  "SOFLAN",
+];
 
 export type { OptimizerStrategy };
 
@@ -40,6 +49,8 @@ export function useBpiOptimizer() {
   const [levels, setLevels] = useState<string[]>(DEFAULT_LEVELS);
   const [difficulties, setDifficulties] =
     useState<string[]>(DEFAULT_DIFFICULTIES);
+  const [radarElements, setRadarElements] =
+    useState<RadarCategory[]>(ALL_RADAR_ELEMENTS);
   const [maxStepsInput, setMaxStepsInput] = useState<string>("30");
   const [considerCurrentTotalBpi, setConsiderCurrentTotalBpi] = useState(true);
 
@@ -54,6 +65,7 @@ export function useBpiOptimizer() {
       strategies: strategies.join(","),
       levels: levels.join(","),
       difficulties: difficulties.join(","),
+      radarElements: radarElements.join(","),
       considerCurrentTotalBpi: String(considerCurrentTotalBpi),
     });
     return [
@@ -72,7 +84,7 @@ export function useBpiOptimizer() {
   const {
     data: _data,
     error,
-    isLoading,
+    isValidating,
     mutate,
   } = useSWR<OptimizationResult>(swrKey, fetcher, {
     revalidateOnFocus: false,
@@ -110,15 +122,9 @@ export function useBpiOptimizer() {
   );
 
   const toggleStrategy = useCallback((s: OptimizerStrategy) => {
-    setStrategies((prev) => {
-      const next = prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s];
-      // 「得意曲を伸ばす」を選択したら未プレイ・既プレイも自動的に有効化
-      if (s === "radar-priority" && !prev.includes("radar-priority")) {
-        const withBoth = new Set([...next, "unplayed" as OptimizerStrategy, "played" as OptimizerStrategy]);
-        return Array.from(withBoth);
-      }
-      return next;
-    });
+    setStrategies((prev) =>
+      prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s],
+    );
     setCommittedTargetBpi(null);
   }, []);
 
@@ -136,6 +142,13 @@ export function useBpiOptimizer() {
     setCommittedTargetBpi(null);
   }, []);
 
+  const toggleRadarElement = useCallback((cat: RadarCategory) => {
+    setRadarElements((prev) =>
+      prev.includes(cat) ? prev.filter((x) => x !== cat) : [...prev, cat],
+    );
+    setCommittedTargetBpi(null);
+  }, []);
+
   const inputError =
     targetBpiInput !== "" &&
     (isNaN(parseFloat(targetBpiInput)) ||
@@ -149,6 +162,7 @@ export function useBpiOptimizer() {
     strategies,
     levels,
     difficulties,
+    radarElements,
     maxStepsInput,
     setMaxStepsInput,
     searchMode,
@@ -158,9 +172,10 @@ export function useBpiOptimizer() {
     toggleStrategy,
     toggleLevel,
     toggleDifficulty,
+    toggleRadarElement,
     result,
     setResult,
-    isLoading,
+    isLoading: isValidating,
     isError: !!error,
     inputError,
     version: latestVersion,

@@ -18,7 +18,7 @@ export const OptimizationStepCard = ({
     <div className="group flex flex-col gap-3 rounded-2xl border border-bpim-border bg-bpim-surface p-4 transition-all">
       <div className="flex items-start justify-between gap-4">
         <div className="flex gap-3 min-w-0">
-          <div className="h-10 w-10 rounded-xl bg-bpim-bg flex items-center justify-center shrink-0 border border-bpim-border font-black text-bpim-muted group-hover:text-bpim-primary group-hover:border-bpim-primary/50 transition-colors">
+          <div className="h-10 w-10 rounded-xl bg-bpim-bg flex items-center justify-center shrink-0 border border-bpim-border font-black text-bpim-muted transition-colors">
             {step.rank}
           </div>
           <div className="min-w-0 flex flex-col gap-1">
@@ -41,7 +41,7 @@ export const OptimizationStepCard = ({
               )}
               {step.isRadarStrength && (
                 <Badge className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20 text-[9px] h-4">
-                  <Star className="h-2 w-2 mr-1 fill-yellow-500" /> 得意曲
+                  <Star className="h-2 w-2 mr-1 fill-yellow-500" /> 得意曲かも?
                 </Badge>
               )}
             </div>

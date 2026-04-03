@@ -5,7 +5,7 @@ export const RADAR_LABELS: Record<RadarCategory, string> = {
   CHORD: "CHORD",
   PEAK: "PEAK",
   CHARGE: "CHARGE",
-  SCRATCH: "SCR",
+  SCRATCH: "SCRATCH",
   SOFLAN: "SOFLAN",
 };
 

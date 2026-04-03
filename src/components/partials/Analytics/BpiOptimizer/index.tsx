@@ -2,16 +2,18 @@
 
 import { useBpiOptimizer } from "@/hooks/analytics/useBpiOptimizer";
 import { useBpiOptimizerMemos } from "@/hooks/analytics/useOptimizeMemo";
+import { useRadar } from "@/hooks/stats/useRadar";
 import { OptimizerForm, OptimizationStepList, SavedMemoList } from "./ui";
 import { BpiOptimizerSkeleton } from "./skeleton";
 import { useUser } from "@/contexts/users/UserContext";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { OptimizationResult } from "@/types/bpi-optimizer";
+import type { RadarCategory } from "@/types/stats/radar";
+import { latestVersion } from "@/constants/latestVersion";
 import { toast } from "sonner";
-import { AlertTriangle } from "lucide-react";
 
 export const BpiOptimizerSection = () => {
-  const { user } = useUser();
+  const { user, fbUser } = useUser();
   const {
     targetBpiInput,
     setTargetBpiInput,
@@ -22,11 +24,13 @@ export const BpiOptimizerSection = () => {
     strategies,
     levels,
     difficulties,
+    radarElements,
     handleSubmit,
     handleKeyDown,
     toggleStrategy,
     toggleLevel,
     toggleDifficulty,
+    toggleRadarElement,
     result,
     setResult,
     isLoading,
@@ -37,6 +41,29 @@ export const BpiOptimizerSection = () => {
 
   const { memos, saveMemo, deleteMemo, isSaving, isDeleting } =
     useBpiOptimizerMemos(user?.userId);
+
+  const { radar } = useRadar(
+    fbUser?.uid,
+    ["11", "12"],
+    ["HYPER", "ANOTHER", "LEGGENDARIA"],
+    latestVersion,
+  );
+
+  const strongRadarCategories = useMemo<RadarCategory[]>(() => {
+    if (!radar) return [];
+    const entries = (
+      Object.entries(radar) as [RadarCategory, { totalBpi: number }][]
+    ).sort((a, b) => b[1].totalBpi - a[1].totalBpi);
+    return entries.slice(0, 2).map(([cat]) => cat);
+  }, [radar]);
+
+  const weakRadarCategories = useMemo<RadarCategory[]>(() => {
+    if (!radar) return [];
+    const entries = (
+      Object.entries(radar) as [RadarCategory, { totalBpi: number }][]
+    ).sort((a, b) => a[1].totalBpi - b[1].totalBpi);
+    return entries.slice(0, 2).map(([cat]) => cat);
+  }, [radar]);
 
   const [savedResult, setSavedResult] = useState<OptimizationResult | null>(
     null,
@@ -53,24 +80,17 @@ export const BpiOptimizerSection = () => {
     toast.success("プランを保存しました");
   }, [result, targetBpiInput, saveMemo]);
 
+  const resultRef = useRef<HTMLDivElement>(null);
+  const prevIsLoading = useRef(false);
+  useEffect(() => {
+    if (prevIsLoading.current && !isLoading && result) {
+      resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    prevIsLoading.current = isLoading;
+  }, [isLoading, result]);
+
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex gap-2 rounded-lg border border-yellow-500/50 bg-yellow-500/10 p-3 text-sm text-yellow-700 dark:text-yellow-400">
-        <AlertTriangle className="mt-0.5 size-4 shrink-0" />
-        <span>
-          この機能はベータ版です。算出ロジックは今後見直される可能性があり、必ずしも適切なルートが探索されない場合があります。フィードバックは
-          <a
-            href="https://forms.gle/VfMJpFrKfSJqRYLA8"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline underline-offset-2"
-          >
-            こちら
-          </a>
-          からお願いします。
-        </span>
-      </div>
-
       <OptimizerForm
         targetBpiInput={targetBpiInput}
         onTargetBpiChange={setTargetBpiInput}
@@ -88,21 +108,27 @@ export const BpiOptimizerSection = () => {
         onToggleLevel={toggleLevel}
         difficulties={difficulties}
         onToggleDifficulty={toggleDifficulty}
+        radarElements={radarElements}
+        onToggleRadarElement={toggleRadarElement}
+        strongRadarCategories={strongRadarCategories}
+        weakRadarCategories={weakRadarCategories}
         currentTotalBpi={currentTotalBpi}
         considerCurrentTotalBpi={considerCurrentTotalBpi}
         onConsiderCurrentTotalBpiChange={setConsiderCurrentTotalBpi}
       />
 
-      {isLoading && <BpiOptimizerSkeleton />}
+      <div ref={resultRef}>
+        {isLoading && <BpiOptimizerSkeleton />}
 
-      {!isLoading && result && (
-        <OptimizationStepList
-          result={result}
-          onSave={handleSave}
-          isSaving={isSaving}
-          isSaved={savedResult === result}
-        />
-      )}
+        {!isLoading && result && (
+          <OptimizationStepList
+            result={result}
+            onSave={handleSave}
+            isSaving={isSaving}
+            isSaved={savedResult === result}
+          />
+        )}
+      </div>
 
       {!isLoading && memos && (
         <SavedMemoList
