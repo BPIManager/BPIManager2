@@ -886,10 +886,10 @@ class BpiOptimizer {
   /**
    * 指定された回数だけ最適化を試行し、最も良い結果（目標到達、または最高到達点）を返す
    *
-   * @param maxRetries - 最大試行回数（デフォルト: 10）
+   * @param maxRetries - 最大試行回数（デフォルト: 100）
    * @returns 最も高い総合BPIに到達した最適化パスの結果
    */
-  public findOptimalPath(maxRetries = 10): OptimizationResult {
+  public findOptimalPath(maxRetries = 100): OptimizationResult {
     let bestResult: OptimizationResult | null = null;
 
     for (let i = 0; i < maxRetries; i++) {
@@ -930,7 +930,7 @@ export function findOptimalBpiPath(
   },
   maxStepsInput = 30,
 ): OptimizationResult {
-  const { maxRetries = 10, ...executeOptions } = options;
+  const { maxRetries = 100, ...executeOptions } = options;
   return new BpiOptimizer(
     sourceData,
     totalCount,
