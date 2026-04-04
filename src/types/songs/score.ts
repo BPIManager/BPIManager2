@@ -102,7 +102,8 @@ export interface FilterParamsFrontend {
     | "loseBpiGapAsc"
     | "loseBpiGapDesc"
     | "rivalUpdated"
-    | "myUpdated";
+    | "myUpdated"
+    | "scoreRate";
   sortOrder?: "asc" | "desc";
   compareVersion?: string;
 }
