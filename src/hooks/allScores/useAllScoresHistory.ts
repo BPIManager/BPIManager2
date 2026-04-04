@@ -9,17 +9,19 @@ import { SongHistoryResponse } from "@/types/songs/score";
  *
  * @param userId - 対象ユーザー ID（未定義の場合はフェッチしない）
  * @param songId - 楽曲 ID（null の場合はフェッチしない）
+ * @param enabled - false の場合はフェッチしない（デフォルト: false）
  * @returns スコア履歴グループ・ローディング状態・エラー情報
  */
 export const useAllScoreHistory = (
   userId: string | undefined,
   songId: number | null,
+  enabled = true,
 ) => {
   const { fbUser } = useUser();
 
   const { data, error, isLoading } = useSWR<SongHistoryResponse>(
-    userId && songId
-      ? [`${API_PREFIX}/users/${userId}/all-scores/${songId}/history`, fbUser]
+    enabled && userId && songId
+      ? [`${API_PREFIX}/users/${userId}/scores/${songId}/history`, fbUser]
       : null,
     fetcher,
   );

@@ -9,27 +9,31 @@ type RivalTopRow = { songId: number; topExScore: number | null };
 
 /**
  * 指定楽曲のライバル平均・ライバルTOPスコアを取得する。
- * 全楽曲分のデータをSWRキャッシュし、songIdでフィルタする。
+ * enabled=false の場合はフェッチしない。
+ * songId をクエリパラメータで渡すことで当該楽曲のみ取得する。
  */
-export const useRivalScoresForSong = (songId: number | null) => {
+export const useRivalScoresForSong = (
+  songId: number | null,
+  enabled = false,
+) => {
   const { user, fbUser } = useUser();
   const userId = user?.userId;
 
-  const avgKey =
-    userId && songId != null
-      ? [
-          `${API_PREFIX}/users/${userId}/rivals/following/avg-scores?version=${latestVersion}`,
-          fbUser,
-        ]
-      : null;
+  const shouldFetch = enabled && userId != null && songId != null;
 
-  const topKey =
-    userId && songId != null
-      ? [
-          `${API_PREFIX}/users/${userId}/rivals/following/top-scores?version=${latestVersion}`,
-          fbUser,
-        ]
-      : null;
+  const avgKey = shouldFetch
+    ? [
+        `${API_PREFIX}/users/${userId}/rivals/following/avg-scores?version=${latestVersion}&songIds=${songId}`,
+        fbUser,
+      ]
+    : null;
+
+  const topKey = shouldFetch
+    ? [
+        `${API_PREFIX}/users/${userId}/rivals/following/top-scores?version=${latestVersion}&songIds=${songId}`,
+        fbUser,
+      ]
+    : null;
 
   const { data: avgData, isLoading: avgLoading } = useSWR<RivalAvgRow[]>(
     avgKey,

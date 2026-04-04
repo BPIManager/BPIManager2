@@ -325,10 +325,15 @@ class RivalRepository {
   }
 
   /**
-   * フォロー中ライバルの楽曲ごと平均スコアを取得する
+   * フォロー中ライバルの楽曲ごと平均スコアを取得する。
+   * songIds を指定した場合は当該楽曲のみに絞り込む。
    */
-  async getRivalAvgScores(params: { userId: string; version: string }) {
-    const { userId, version } = params;
+  async getRivalAvgScores(params: {
+    userId: string;
+    version: string;
+    songIds?: number[];
+  }) {
+    const { userId, version, songIds } = params;
 
     const latestPerRival = db
       .selectFrom("scores as sc")
@@ -343,6 +348,9 @@ class RivalRepository {
           .selectFrom("follows")
           .select("followingId")
           .where("followerId", "=", userId),
+      )
+      .$if(songIds != null && songIds.length > 0, (qb) =>
+        qb.where("sc.songId", "in", songIds!),
       )
       .groupBy(["sc.songId", "sc.userId"])
       .as("latest");
@@ -372,10 +380,15 @@ class RivalRepository {
   }
 
   /**
-   * フォロー中ライバルの楽曲ごとトップスコアを取得する
+   * フォロー中ライバルの楽曲ごとトップスコアを取得する。
+   * songIds を指定した場合は当該楽曲のみに絞り込む。
    */
-  async getRivalTopScores(params: { userId: string; version: string }) {
-    const { userId, version } = params;
+  async getRivalTopScores(params: {
+    userId: string;
+    version: string;
+    songIds?: number[];
+  }) {
+    const { userId, version, songIds } = params;
 
     const latestPerRival = db
       .selectFrom("scores as sc")
@@ -390,6 +403,9 @@ class RivalRepository {
           .selectFrom("follows")
           .select("followingId")
           .where("followerId", "=", userId),
+      )
+      .$if(songIds != null && songIds.length > 0, (qb) =>
+        qb.where("sc.songId", "in", songIds!),
       )
       .groupBy(["sc.songId", "sc.userId"])
       .as("latest");

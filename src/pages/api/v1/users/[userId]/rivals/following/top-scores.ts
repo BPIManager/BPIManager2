@@ -12,17 +12,26 @@ const handler = async (
   if (req.method !== "GET")
     return res.status(405).json({ message: "Method Not Allowed" });
 
-  const { version } = req.query;
+  const { version, songIds: songIdsRaw } = req.query;
   const userId = req.authUid;
 
   if (!userId || !version || typeof version !== "string") {
     return res.status(400).json({ message: "userId and version are required" });
   }
 
+  const songIds =
+    songIdsRaw && typeof songIdsRaw === "string"
+      ? songIdsRaw
+          .split(",")
+          .map(Number)
+          .filter((n) => !isNaN(n) && n > 0)
+      : undefined;
+
   try {
     const rows = await logsRepo.getRivalTopScores({
       userId,
       version,
+      songIds,
     });
 
     const result = rows.map((row) => ({

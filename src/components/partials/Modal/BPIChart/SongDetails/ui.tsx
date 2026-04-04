@@ -21,6 +21,7 @@ import { AppTabsList, AppTabsTrigger } from "@/components/ui/complex/tabs";
 import { DefinitionsTab } from "../Definitions/ui";
 import { useArenaAveragesForSong } from "@/hooks/metrics/useArenaAveragesForSong";
 import { useRivalScoresForSong } from "@/hooks/metrics/useRivalScoresForSong";
+import { useAllScoreHistory } from "@/hooks/allScores/useAllScoresHistory";
 import { useUser } from "@/contexts/users/UserContext";
 import {
   Select,
@@ -30,6 +31,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import dayjs from "@/lib/dayjs";
+import { useRouter } from "next/router";
 
 interface SongDetailViewProps {
   song: SongWithScore | null;
@@ -44,6 +46,7 @@ export const SongDetailView = ({
   onClose,
   defaultTab,
 }: SongDetailViewProps) => {
+  const router = useRouter();
   const [tab, setTab] = useState<string>(defaultTab || "stats");
   const tabs = [
     { value: "stats", label: "Statistics", icon: LineChart },
@@ -85,10 +88,6 @@ export const SongDetailView = ({
   }, [song, currentEx]);
 
   const { user } = useUser();
-  const { arenaAverages } = useArenaAveragesForSong(song?.songId || -1);
-  const { rivalAvgScore, rivalTopScore } = useRivalScoresForSong(
-    song?.songId ?? null,
-  );
 
   const [selectedRef, setSelectedRef] = useState<string>(() => {
     if (typeof window === "undefined") return "";
@@ -107,21 +106,57 @@ export const SongDetailView = ({
     }
   }, [user?.arenaRank, selectedRef]);
 
+  const { arenaAverages } = useArenaAveragesForSong(song?.songId || -1);
+  const needsRivalData =
+    selectedRef === "rival-avg" || selectedRef === "rival-top";
+  const { rivalAvgScore, rivalTopScore } = useRivalScoresForSong(
+    song?.songId ?? null,
+    needsRivalData,
+  );
+  const { historyGroups } = useAllScoreHistory(
+    user?.userId,
+    song?.songId ?? null,
+    selectedRef === "personal-best",
+  );
+
+  const personalBest = useMemo(() => {
+    if (!historyGroups) return null;
+    let bestScore = 0;
+    let bestVersion = "";
+    for (const [version, scores] of Object.entries(historyGroups)) {
+      for (const s of scores) {
+        if (s.exScore != null && s.exScore > bestScore) {
+          bestScore = s.exScore;
+          bestVersion = version;
+        }
+      }
+    }
+    return bestScore > 0 ? { score: bestScore, version: bestVersion } : null;
+  }, [historyGroups]);
+
   const refScore = useMemo(() => {
     if (!selectedRef || selectedRef === "none") return undefined;
     if (selectedRef === "rival-avg") return rivalAvgScore ?? undefined;
     if (selectedRef === "rival-top") return rivalTopScore ?? undefined;
+    if (selectedRef === "personal-best")
+      return personalBest?.version !== router.query.version
+        ? (personalBest?.score ?? undefined)
+        : undefined;
     if (!arenaAverages) return undefined;
     const raw = arenaAverages[selectedRef]?.avgExScore;
     return raw != null ? Math.round(raw) : undefined;
-  }, [selectedRef, arenaAverages, rivalAvgScore, rivalTopScore]);
+  }, [selectedRef, arenaAverages, rivalAvgScore, rivalTopScore, personalBest]);
 
   const refLabel = useMemo(() => {
     if (!selectedRef || selectedRef === "none") return undefined;
     if (selectedRef === "rival-avg") return "ライバル平均";
     if (selectedRef === "rival-top") return "ライバルトップ";
+    if (selectedRef === "personal-best")
+      return personalBest
+        ? `自己歴代(IIDX ${personalBest.version})`
+        : "自己歴代";
     return selectedRef + "平均";
-  }, [selectedRef]);
+  }, [selectedRef, personalBest]);
 
   if (!song) return null;
 
@@ -231,6 +266,9 @@ export const SongDetailView = ({
                     </SelectItem>
                     <SelectItem value="rival-top" className="text-xs">
                       ライバルトップ
+                    </SelectItem>
+                    <SelectItem value="personal-best" className="text-xs">
+                      自己歴代
                     </SelectItem>
                   </SelectContent>
                 </Select>
