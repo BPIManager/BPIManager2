@@ -130,7 +130,7 @@ export const BpiOptimizerSection = () => {
         )}
       </div>
 
-      {!isLoading && memos && (
+      {!isLoading && memos && memos.length > 0 && (
         <SavedMemoList
           memos={memos}
           onDelete={deleteMemo}
