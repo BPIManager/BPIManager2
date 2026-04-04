@@ -54,6 +54,34 @@ export interface OptimizerOptions {
   radarCategoryBpis: Partial<Record<RadarCategory, number>>;
   candidateLevels: number[];
   candidateDifficulties: string[];
-  /** trueのとき現在の総合BPIをhumanCapの基準として使用する（デフォルトtrue） */
   considerCurrentTotalBpi?: boolean;
 }
+
+export type ExecuteOptions = OptimizerOptions & {
+  searchMode?: "fastest" | "flexible";
+  rng?: () => number;
+};
+
+export type ScoredCandidate = {
+  song: SongOptimizerInput;
+  score: number;
+  estimatedTargetBpi: number;
+};
+
+export type ResolvedTarget = {
+  effectiveTarget: number;
+  autoAdjustmentNote?: string;
+  originalTarget?: number;
+};
+
+export type ExecutionState = {
+  steps: OptimizationStep[];
+  usedIds: Set<number>;
+  currentAccumulatedSum: number;
+  currentTotalBpi: number;
+  carryError: number;
+  effectiveTarget: number;
+  totalTargetSum: number;
+  candidates: SongOptimizerInput[];
+  strongCategories: Set<RadarCategory>;
+};
