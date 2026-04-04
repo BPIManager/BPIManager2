@@ -113,6 +113,7 @@ export const SongsTable = ({
         totalCount={totalCount}
         onOpenAdvancedFilter={() => setIsAdvancedOpen(true)}
         withSelfCompare
+        withScoreRate
         currentVersion={currentVersion}
       />
 

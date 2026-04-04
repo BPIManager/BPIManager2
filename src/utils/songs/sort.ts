@@ -47,6 +47,7 @@ export const sortSongs = (
         vB = getRate(b.rival?.exScore, b.notes);
         break;
       case "myRate":
+      case "scoreRate":
         vA = getRate(a.exScore, a.notes);
         vB = getRate(b.exScore, b.notes);
         break;

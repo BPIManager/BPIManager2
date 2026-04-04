@@ -21,6 +21,8 @@ export const soleSortOptions = [
   { label: "最終更新", value: "updatedAt" },
 ];
 
+export const scoreRateSortOption = { label: "スコアレート", value: "scoreRate" };
+
 export const sortOptions = [
   { label: "レベル", value: "level" },
   { label: "楽曲名", value: "title" },

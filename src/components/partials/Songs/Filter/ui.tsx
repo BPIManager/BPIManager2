@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   rivalSortOptions,
+  scoreRateSortOption,
   soleSortOptions,
   sortOptions,
   sortOrderOptions,
@@ -30,6 +31,7 @@ interface SongFilterBarProps {
   disableVersionSelect?: boolean;
   withRivals?: "full" | "score-only" | false;
   withSelfCompare?: boolean;
+  withScoreRate?: boolean;
   currentVersion?: string;
 }
 
@@ -41,6 +43,7 @@ export const SongFilterBar = ({
   disableVersionSelect,
   withRivals,
   withSelfCompare = false,
+  withScoreRate = false,
   currentVersion,
 }: SongFilterBarProps) => {
   const router = useRouter();
@@ -60,10 +63,10 @@ export const SongFilterBar = ({
   const combinedSortOptions = useMemo(() => {
     const base = withRivals
       ? [...sortOptions, ...rivalSortOptions]
-      : [...soleSortOptions, ...sortOptions];
+      : [...soleSortOptions, ...(withScoreRate ? [scoreRateSortOption] : []), ...sortOptions];
     if (hasCompare) return [...base];
     return base;
-  }, [withRivals, hasCompare]);
+  }, [withRivals, withScoreRate, hasCompare]);
 
   return (
     <FilterBarContainer totalCount={totalCount}>
