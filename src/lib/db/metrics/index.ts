@@ -86,6 +86,7 @@ class MetricsRepository {
       .where("u.arenarank", "in", ["A1", "A2", "A3", "A4", "A5"])
       .groupBy(["s.title", "s.difficulty", "u.arenarank"]);
   }
+
 }
 
 export const metricsRepo = new MetricsRepository();

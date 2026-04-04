@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useMemo } from "react";
+import { useMemo, useEffect, useRef } from "react";
 import {
   BarChart,
   Bar,
@@ -29,6 +29,8 @@ interface BPIAnimatedChartProps {
   data: ChartDataItem[];
   maxScore: number;
   song: SongWithScore;
+  refScore?: number;
+  refLabel?: string;
 }
 
 interface CustomBarProps {
@@ -36,14 +38,16 @@ interface CustomBarProps {
   y?: number;
   width?: number;
   height?: number;
+  index?: number;
   payload?: ChartDataItem;
   c: ReturnType<typeof useChartColors>;
+  animate?: boolean;
 }
 
 interface CustomLabelProps {
-  x?: string|number;
-  y?: string|number;
-  width?: string|number;
+  x?: string | number;
+  y?: string | number;
+  width?: string | number;
   index?: number;
   chartData: ChartDataItem[];
   youScore: number;
@@ -60,10 +64,12 @@ interface CustomTooltipProps extends TooltipProps<number, string> {
   label: string | number | undefined;
   youScore: number;
   maxScore: number;
+  refScore?: number;
+  refLabel?: string;
 }
 
 const CustomBarShape = (props: CustomBarProps) => {
-  const { x, y, width, height, payload, c } = props;
+  const { x, y, index, payload, c, animate } = props;
   if (!payload || x === undefined || y === undefined) return null;
 
   const isYou = payload.label === "YOU";
@@ -74,7 +80,15 @@ const CustomBarShape = (props: CustomBarProps) => {
       fill={isYou ? c.warning : c.primary}
       fillOpacity={isYou ? 1 : 0.5}
       radius={[4, 4, 0, 0]}
-      className="transition-all duration-300"
+      style={
+        animate
+          ? {
+              transformBox: "fill-box",
+              transformOrigin: "bottom",
+              animation: `bpimBarIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) ${(index ?? 0) * 20}ms both`,
+            }
+          : undefined
+      }
     />
   );
 };
@@ -133,6 +147,8 @@ const ChartTooltip = ({
   chartData,
   youScore,
   maxScore,
+  refScore,
+  refLabel,
 }: CustomTooltipProps) => {
   if (!active || !label) return null;
 
@@ -143,6 +159,7 @@ const ChartTooltip = ({
   const isYou = data.label === "YOU";
   const rate = ((score / maxScore) * 100).toFixed(2);
   const diff = score - youScore;
+  const refDiff = isYou && refScore != null ? score - refScore : null;
 
   return (
     <div className="rounded-lg border border-bpim-border bg-bpim-surface/90 p-3 shadow-2xl backdrop-blur-md">
@@ -165,13 +182,39 @@ const ChartTooltip = ({
             {diff > 0 ? `あと ${diff} 点` : `${Math.abs(diff)} 点超過`}
           </p>
         )}
+        {isYou && refDiff != null && (
+          <p
+            className={cn(
+              "mt-1 text-[11px] font-black",
+              refDiff >= 0 ? "text-bpim-success" : "text-bpim-danger",
+            )}
+          >
+            {refLabel}: {refDiff >= 0 ? `+${refDiff}` : refDiff}
+          </p>
+        )}
       </div>
     </div>
   );
 };
 
-export const BPIChart = ({ data, maxScore }: BPIAnimatedChartProps) => {
+export const BPIChart = ({
+  data,
+  maxScore,
+  refScore,
+  refLabel,
+}: BPIAnimatedChartProps) => {
   const c = useChartColors();
+
+  const hasAnimatedRef = useRef(false);
+  const animate = !hasAnimatedRef.current;
+  useEffect(() => {
+    hasAnimatedRef.current = true;
+  });
+
+  const barShape = useMemo(
+    () => <CustomBarShape c={c} animate={animate} />,
+    [c, animate],
+  );
 
   const chartData = useMemo(() => {
     return [...data].sort((a, b) => {
@@ -206,7 +249,7 @@ export const BPIChart = ({ data, maxScore }: BPIAnimatedChartProps) => {
   return (
     <div className="h-85 w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={chartData} margin={{ top:36,right: 16, left: 16 }}>
+        <BarChart data={chartData} margin={{ top: 36, right: 16, left: 16 }}>
           <XAxis
             dataKey="label"
             axisLine={false}
@@ -224,6 +267,8 @@ export const BPIChart = ({ data, maxScore }: BPIAnimatedChartProps) => {
                 chartData={chartData}
                 youScore={youScore}
                 maxScore={maxScore}
+                refScore={refScore}
+                refLabel={refLabel}
               />
             )}
             cursor={{ fill: c.primaryRgba(0.04) }}
@@ -249,11 +294,25 @@ export const BPIChart = ({ data, maxScore }: BPIAnimatedChartProps) => {
             </ReferenceLine>
           ))}
 
-          <Bar
-            dataKey="count"
-            shape={<CustomBarShape c={c} />}
-            animationDuration={800}
-          >
+          {refScore != null && refScore > yMin && (
+            <ReferenceLine
+              y={refScore}
+              stroke={c.success}
+              strokeOpacity={0.7}
+              strokeDasharray="4 4"
+            >
+              <RechartsLabel
+                value={refLabel ?? "Ref"}
+                position="insideTopLeft"
+                fill={c.success}
+                fontSize={9}
+                fontWeight="black"
+                dx={20}
+              />
+            </ReferenceLine>
+          )}
+
+          <Bar dataKey="count" shape={barShape} isAnimationActive={false}>
             <LabelList
               dataKey="count"
               content={(props) => (

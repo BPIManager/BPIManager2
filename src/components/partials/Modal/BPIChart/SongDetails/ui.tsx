@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { LineChart, LucideHistory, Users, DatabaseSearch } from "lucide-react";
 import {
   Dialog,
@@ -19,6 +19,17 @@ import { SongHistoryTab } from "../History/ui";
 import RivalsRanking from "../Rivals";
 import { AppTabsList, AppTabsTrigger } from "@/components/ui/complex/tabs";
 import { DefinitionsTab } from "../Definitions/ui";
+import { useArenaAveragesForSong } from "@/hooks/metrics/useArenaAveragesForSong";
+import { useRivalScoresForSong } from "@/hooks/metrics/useRivalScoresForSong";
+import { useUser } from "@/contexts/users/UserContext";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import dayjs from "@/lib/dayjs";
 
 interface SongDetailViewProps {
   song: SongWithScore | null;
@@ -72,6 +83,45 @@ export const SongDetailView = ({
     const targetScore = BpiCalculator.calcFromBPI(nextTargetBpi, song, true);
     return { next: nextTargetBpi, diff: targetScore - currentEx };
   }, [song, currentEx]);
+
+  const { user } = useUser();
+  const { arenaAverages } = useArenaAveragesForSong(song?.songId || -1);
+  const { rivalAvgScore, rivalTopScore } = useRivalScoresForSong(
+    song?.songId ?? null,
+  );
+
+  const [selectedRef, setSelectedRef] = useState<string>(() => {
+    if (typeof window === "undefined") return "";
+    return localStorage.getItem("bpim_arena_rank_select") ?? "";
+  });
+
+  useEffect(() => {
+    if (selectedRef) {
+      localStorage.setItem("bpim_arena_rank_select", selectedRef);
+    }
+  }, [selectedRef]);
+
+  useEffect(() => {
+    if (user?.arenaRank && !selectedRef) {
+      setSelectedRef(user.arenaRank);
+    }
+  }, [user?.arenaRank, selectedRef]);
+
+  const refScore = useMemo(() => {
+    if (!selectedRef || selectedRef === "none") return undefined;
+    if (selectedRef === "rival-avg") return rivalAvgScore ?? undefined;
+    if (selectedRef === "rival-top") return rivalTopScore ?? undefined;
+    if (!arenaAverages) return undefined;
+    const raw = arenaAverages[selectedRef]?.avgExScore;
+    return raw != null ? Math.round(raw) : undefined;
+  }, [selectedRef, arenaAverages, rivalAvgScore, rivalTopScore]);
+
+  const refLabel = useMemo(() => {
+    if (!selectedRef || selectedRef === "none") return undefined;
+    if (selectedRef === "rival-avg") return "ライバル平均";
+    if (selectedRef === "rival-top") return "ライバルトップ";
+    return selectedRef + "平均";
+  }, [selectedRef]);
 
   if (!song) return null;
 
@@ -151,13 +201,54 @@ export const SongDetailView = ({
             </AppTabsList>
 
             <TabsContent value="stats" className="mt-0 outline-none">
-              <BPIChart data={chartData} maxScore={maxScore} song={song} />
+              <div className="flex items-center justify-end px-1 gap-2 pt-2">
+                <span className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
+                  比較
+                </span>
+                <Select value={selectedRef} onValueChange={setSelectedRef}>
+                  <SelectTrigger className="h-6 w-30 text-[10px] px-2 py-0">
+                    <SelectValue placeholder="-" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem
+                      value="none"
+                      className="text-xs text-bpim-muted"
+                    >
+                      非表示
+                    </SelectItem>
+                    {["A1", "A2", "A3", "A4", "A5"].map((rank) => (
+                      <SelectItem
+                        key={rank}
+                        value={rank}
+                        className="text-xs"
+                        disabled={!arenaAverages}
+                      >
+                        {rank}平均
+                      </SelectItem>
+                    ))}
+                    <SelectItem value="rival-avg" className="text-xs">
+                      ライバル平均
+                    </SelectItem>
+                    <SelectItem value="rival-top" className="text-xs">
+                      ライバルトップ
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <BPIChart
+                key={song.songId}
+                data={chartData}
+                maxScore={maxScore}
+                song={song}
+                refScore={refScore}
+                refLabel={refLabel}
+              />
 
               <div className="mt-4 rounded-xl border border-bpim-border bg-bpim-surface-2/60 p-4">
                 <div className="flex flex-col gap-3">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-bpim-muted uppercase">
-                      World Record
+                      WR
                     </span>
                     <span className="font-mono text-sm font-black text-bpim-text">
                       {song.wrScore ?? 0}
@@ -165,7 +256,7 @@ export const SongDetailView = ({
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-bpim-muted uppercase">
-                      Kaiden Average
+                      スコア平均
                     </span>
                     <span className="font-mono text-sm font-black text-bpim-text">
                       {song.kaidenAvg ?? 0}
@@ -173,7 +264,7 @@ export const SongDetailView = ({
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-bpim-muted uppercase">
-                      Current Coef
+                      譜面係数
                     </span>
                     <span className="font-mono text-sm font-black text-bpim-text">
                       {song.coef ?? -1}
@@ -182,7 +273,7 @@ export const SongDetailView = ({
                   <Separator className="my-1 bg-bpim-border" />
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-bpim-muted uppercase">
-                      Clear Lamp
+                      クリアランプ
                     </span>
                     <span className="font-mono text-sm font-black text-bpim-text">
                       {song.clearState || "NO PLAY"}
@@ -190,12 +281,23 @@ export const SongDetailView = ({
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-bpim-muted uppercase">
-                      Miss Count
+                      BP
                     </span>
                     <span className="font-mono text-sm font-black text-bpim-danger">
                       {song.missCount ?? "-"}
                     </span>
                   </div>
+                  {song.scoreAt && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-bpim-muted uppercase">
+                        最終更新
+                      </span>
+                      <span className="font-mono text-sm font-black">
+                        {dayjs(song.scoreAt).format("YYYY/MM/DD HH:mm")} (
+                        {dayjs(song.scoreAt).fromNow()})
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             </TabsContent>

@@ -688,3 +688,12 @@ body {
     transform: rotate(360deg);
   }
 }
+
+@keyframes bpimBarIn {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
