@@ -163,22 +163,20 @@ class SocialComparisonRepository {
 
     const myLatest = db
       .selectFrom("scores as s")
-      .innerJoin("songs as sm", "s.songId", "sm.songId")
       .select(["s.songId", "s.exScore"])
       .where("s.userId", "=", viewerId)
       .where("s.version", "=", version)
       .where("s.logId", "in", (eb) =>
         eb
           .selectFrom("scores as s2")
-          .select((sub) => sub.fn.max("logId").as("max"))
-          .where("userId", "=", viewerId)
-          .where("version", "=", version)
-          .groupBy("songId"),
+          .select((sub) => sub.fn.max("s2.logId").as("max"))
+          .where("s2.userId", "=", viewerId)
+          .where("s2.version", "=", version)
+          .groupBy("s2.songId"),
       );
 
     const rivalsLatest = db
       .selectFrom("scores as s")
-      .innerJoin("songs as rm", "s.songId", "rm.songId")
       .innerJoin("follows as f", "f.followingId", "s.userId")
       .select(["s.userId", "s.songId", "s.exScore"])
       .where("f.followerId", "=", viewerId)
@@ -186,9 +184,11 @@ class SocialComparisonRepository {
       .where("s.logId", "in", (eb) =>
         eb
           .selectFrom("scores as s3")
-          .select((sub) => sub.fn.max("logId").as("max"))
-          .where("version", "=", version)
-          .groupBy(["userId", "songId"]),
+          .innerJoin("follows as f3", "f3.followingId", "s3.userId")
+          .select((sub) => sub.fn.max("s3.logId").as("max"))
+          .where("f3.followerId", "=", viewerId)
+          .where("s3.version", "=", version)
+          .groupBy(["s3.userId", "s3.songId"]),
       );
 
     const latestStatusIds = db
@@ -240,18 +240,73 @@ class SocialComparisonRepository {
         "ur.role as ur_role",
         "ur.description as ur_description",
         "ur.grantedAt as ur_grantedAt",
-        sql<number>`SUM(CASE WHEN v.exScore IS NULL AND r.exScore IS NULL THEN 0 WHEN COALESCE(v.exScore, 0) > COALESCE(r.exScore, 0) THEN 1 ELSE 0 END)`.as(
-          "win",
-        ),
-        sql<number>`SUM(CASE WHEN v.exScore IS NULL AND r.exScore IS NULL THEN 0 WHEN COALESCE(v.exScore, 0) < COALESCE(r.exScore, 0) THEN 1 ELSE 0 END)`.as(
-          "lose",
-        ),
-        sql<number>`SUM(CASE WHEN v.exScore IS NULL AND r.exScore IS NULL THEN 0 WHEN COALESCE(v.exScore, 0) = COALESCE(r.exScore, 0) AND (v.exScore IS NOT NULL OR r.exScore IS NOT NULL) THEN 1 ELSE 0 END)`.as(
-          "draw",
-        ),
-        sql<number>`SUM(CASE WHEN v.exScore IS NOT NULL OR r.exScore IS NOT NULL THEN 1 ELSE 0 END)`.as(
-          "totalCount",
-        ),
+        (eb) =>
+          eb.fn
+            .sum(
+              eb
+                .case()
+                .when(
+                  eb.and([
+                    eb("v.exScore", "is not", null),
+                    eb("r.exScore", "is not", null),
+                    eb("v.exScore", ">", eb.ref("r.exScore")),
+                  ]),
+                )
+                .then(1)
+                .else(0)
+                .end(),
+            )
+            .as("win"),
+        (eb) =>
+          eb.fn
+            .sum(
+              eb
+                .case()
+                .when(
+                  eb.and([
+                    eb("v.exScore", "is not", null),
+                    eb("r.exScore", "is not", null),
+                    eb("v.exScore", "<", eb.ref("r.exScore")),
+                  ]),
+                )
+                .then(1)
+                .else(0)
+                .end(),
+            )
+            .as("lose"),
+        (eb) =>
+          eb.fn
+            .sum(
+              eb
+                .case()
+                .when(
+                  eb.and([
+                    eb("v.exScore", "is not", null),
+                    eb("r.exScore", "is not", null),
+                    eb("v.exScore", "=", eb.ref("r.exScore")),
+                  ]),
+                )
+                .then(1)
+                .else(0)
+                .end(),
+            )
+            .as("draw"),
+        (eb) =>
+          eb.fn
+            .sum(
+              eb
+                .case()
+                .when(
+                  eb.and([
+                    eb("v.exScore", "is not", null),
+                    eb("r.exScore", "is not", null),
+                  ]),
+                )
+                .then(1)
+                .else(0)
+                .end(),
+            )
+            .as("totalCount"),
       ])
       .where("f.followerId", "=", viewerId)
       .where("u.isPublic", "=", 1)
