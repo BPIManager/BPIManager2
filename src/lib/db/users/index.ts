@@ -146,14 +146,6 @@ class UsersRepository {
       "scratch",
       "soflan",
     ] as const;
-    const radarColRefMap: Record<string, ReturnType<typeof sql>> = {
-      notes: sql`r.notes`,
-      chord: sql`r.chord`,
-      peak: sql`r.peak`,
-      charge: sql`r.charge`,
-      scratch: sql`r.scratch`,
-      soflan: sql`r.soflan`,
-    };
     const isRadarCategory = (RADAR_COLUMNS as readonly string[]).includes(
       category,
     );
@@ -168,9 +160,7 @@ class UsersRepository {
       return await db
         .selectFrom("users as u")
         .innerJoin("userRadarCache as r", (join) =>
-          join
-            .onRef("u.userId", "=", "r.userId")
-            .on("r.version", "=", version),
+          join.onRef("u.userId", "=", "r.userId").on("r.version", "=", version),
         )
         .leftJoin(latestStatusSubquery.as("ls"), "u.userId", "ls.userId")
         .leftJoin("userStatusLogs as usl", "ls.maxId", "usl.id")
@@ -189,7 +179,7 @@ class UsersRepository {
           "r.scratch",
           "r.soflan",
         ])
-        .orderBy(radarColRefMap[category], "desc")
+        .orderBy(sql.ref(`r.${category}`), "desc")
         .execute();
     }
 
@@ -207,7 +197,10 @@ class UsersRepository {
         "usl.arenaRank",
       ])
       .where("usl.id", "is not", null)
-      .orderBy(sql`COALESCE(usl.totalBpi, -15)`, "desc")
+      .orderBy(
+        (eb) => eb.fn("coalesce", [eb.ref("usl.totalBpi"), eb.val(-15)]),
+        "desc",
+      )
       .execute();
   }
 
@@ -413,7 +406,7 @@ class UsersRepository {
           profileText,
           profileImage,
           isPublic,
-          updatedAt: sql`NOW()`,
+          updatedAt: new Date(),
         })
         .onDuplicateKeyUpdate({
           userName,
@@ -421,7 +414,7 @@ class UsersRepository {
           profileText,
           profileImage,
           isPublic,
-          updatedAt: sql`NOW()`,
+          updatedAt: new Date(),
         })
         .execute();
 

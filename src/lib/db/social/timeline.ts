@@ -1,6 +1,5 @@
 import { db } from "@/lib/db";
 import dayjs from "dayjs";
-import { sql } from "kysely";
 import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
 
@@ -47,7 +46,7 @@ class SocialTimelineRepository {
       difficulties,
     } = params;
 
-    let query = db
+    return await db
       .selectFrom("scores as s")
       .innerJoin("users as u", "s.userId", "u.userId")
       .innerJoin("songs as m", "s.songId", "m.songId")
@@ -59,7 +58,7 @@ class SocialTimelineRepository {
           .onRef("f.followingId", "=", "s.userId")
           .on("f.followerId", "=", viewerId),
       )
-      .select([
+      .select((eb) => [
         "s.logId",
         "s.userId",
         "s.songId",
@@ -75,71 +74,97 @@ class SocialTimelineRepository {
         "m.notes",
         "d.wrScore",
         "d.kaidenAvg",
-        sql<number>`(SELECT COALESCE(MAX(s2.exScore), -1) FROM scores AS s2 WHERE s2.userId = s.userId AND s2.songId = s.songId AND s2.logId < s.logId)`.as(
-          "prevExScore",
-        ),
-        sql<
-          number | null
-        >`(SELECT s3.bpi FROM scores AS s3 WHERE s3.userId = s.userId AND s3.songId = s.songId AND s3.logId < s.logId ORDER BY s3.logId DESC LIMIT 1)`.as(
-          "prevBpi",
-        ),
-        sql<
-          number | null
-        >`(SELECT MAX(s4.exScore) FROM scores AS s4 WHERE s4.userId = ${viewerId} AND s4.songId = s.songId AND s4.version = ${version})`.as(
-          "myBestExScore",
-        ),
+        eb.fn
+          .coalesce(
+            eb
+              .selectFrom("scores as s2")
+              .select((s2eb) => s2eb.fn.max("s2.exScore").as("m"))
+              .whereRef("s2.userId", "=", "s.userId")
+              .whereRef("s2.songId", "=", "s.songId")
+              .whereRef("s2.logId", "<", "s.logId"),
+            eb.lit(-1),
+          )
+          .as("prevExScore"),
+        eb
+          .selectFrom("scores as s3")
+          .select("s3.bpi")
+          .whereRef("s3.userId", "=", "s.userId")
+          .whereRef("s3.songId", "=", "s.songId")
+          .whereRef("s3.logId", "<", "s.logId")
+          .orderBy("s3.logId", "desc")
+          .limit(1)
+          .as("prevBpi"),
+        eb
+          .selectFrom("scores as s4")
+          .select((s4eb) => s4eb.fn.max("s4.exScore").as("m"))
+          .where("s4.userId", "=", viewerId)
+          .whereRef("s4.songId", "=", "s.songId")
+          .where("s4.version", "=", version)
+          .as("myBestExScore"),
       ])
       .where("s.version", "=", version)
-      .where("u.isPublic", "=", 1);
-
-    if (search) {
-      const searchWord = `%${search}%`;
-      query = query.where((eb) =>
-        eb.or([
-          eb("u.userName", "like", searchWord),
-          eb("m.title", "like", searchWord),
-        ]),
-      );
-    }
-
-    if (levels && levels.length > 0) {
-      query = query.where("m.difficultyLevel", "in", levels);
-    }
-
-    if (difficulties && difficulties.length > 0) {
-      query = query.where("m.difficulty", "in", difficulties);
-    }
-
-    if (mode === "played") {
-      query = query.where(({ exists, selectFrom }) =>
-        exists(
-          selectFrom("scores as v")
-            .select("v.logId")
-            .whereRef("v.songId", "=", "s.songId")
-            .where("v.userId", "=", viewerId)
-            .where("v.version", "=", version),
+      .where("u.isPublic", "=", 1)
+      .$if(!!search, (qb) =>
+        qb.where((eb) =>
+          eb.or([
+            eb("u.userName", "like", `%${search}%`),
+            eb("m.title", "like", `%${search}%`),
+          ]),
         ),
-      );
-    } else if (mode === "overtaken") {
-      query = query.where(sql<boolean>`
-        EXISTS (
-          SELECT 1 FROM scores AS v
-          WHERE v.songId = s.songId AND v.userId = ${viewerId} AND v.version = ${version}
-          HAVING MAX(v.exScore) < s.exScore
-             AND MAX(v.exScore) > (
-               SELECT COALESCE(MAX(prev.exScore), -1)
-               FROM scores AS prev
-               WHERE prev.userId = s.userId AND prev.songId = s.songId AND prev.logId < s.logId
-             )
-        )
-      `);
-    }
-
-    if (lastId) {
-      query = query.where("s.lastPlayed", "<", dayjs.utc(lastId).toDate());
-    }
-
-    return await query.orderBy("s.lastPlayed", "desc").limit(limit).execute();
+      )
+      .$if(!!levels?.length, (qb) =>
+        qb.where("m.difficultyLevel", "in", levels!),
+      )
+      .$if(!!difficulties?.length, (qb) =>
+        qb.where("m.difficulty", "in", difficulties!),
+      )
+      .$if(mode === "played", (qb) =>
+        qb.where(({ exists, selectFrom }) =>
+          exists(
+            selectFrom("scores as v")
+              .select("v.logId")
+              .whereRef("v.songId", "=", "s.songId")
+              .where("v.userId", "=", viewerId)
+              .where("v.version", "=", version),
+          ),
+        ),
+      )
+      .$if(mode === "overtaken", (qb) =>
+        qb.where((eb) =>
+          eb.exists(
+            eb
+              .selectFrom("scores as v")
+              .select(eb.lit(1).as("one"))
+              .whereRef("v.songId", "=", "s.songId")
+              .where("v.userId", "=", viewerId)
+              .where("v.version", "=", version)
+              .having((heb) =>
+                heb.and([
+                  heb(heb.fn.max("v.exScore"), "<", heb.ref("s.exScore")),
+                  heb(
+                    heb.fn.max("v.exScore"),
+                    ">",
+                    heb.fn.coalesce(
+                      heb
+                        .selectFrom("scores as prev")
+                        .select((peb) => peb.fn.max("prev.exScore").as("m"))
+                        .whereRef("prev.userId", "=", "s.userId")
+                        .whereRef("prev.songId", "=", "s.songId")
+                        .whereRef("prev.logId", "<", "s.logId"),
+                      heb.lit(-1),
+                    ),
+                  ),
+                ]),
+              ),
+          ),
+        ),
+      )
+      .$if(!!lastId, (qb) =>
+        qb.where("s.lastPlayed", "<", dayjs.utc(lastId).toDate()),
+      )
+      .orderBy("s.lastPlayed", "desc")
+      .limit(limit)
+      .execute();
   }
 
   /**

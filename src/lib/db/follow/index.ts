@@ -148,7 +148,7 @@ class FollowRepository {
       .select((eb) => [
         eb
           .selectFrom("follows as f2")
-          .select([eb.fn.count<number>(sql`f2.id`).as("cnt")])
+          .select((eb2) => [eb2.fn.countAll<number>().as("cnt")])
           .whereRef("f2.followingId", "=", "u.userId")
           .where("f2.followerId", "=", viewerId ?? "")
           .as("isViewerFollowing"),

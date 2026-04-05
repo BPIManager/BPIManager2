@@ -112,10 +112,7 @@ class StatsRepository {
       query = query.where("m.difficulty", "in", difficulties);
     }
 
-    return await query
-      .groupBy(sql`date`)
-      .orderBy("date", "asc")
-      .execute();
+    return await query.groupBy("date").orderBy("date", "asc").execute();
   }
 
   /**
@@ -245,24 +242,34 @@ class StatsRepository {
             .selectFrom(
               db
                 .selectFrom("scores")
-                .select([
+                .select((eb) => [
                   "songId",
                   "bpi",
                   "exScore",
-                  sql<number>`ROW_NUMBER() OVER (PARTITION BY songId ORDER BY logId DESC)`.as(
-                    "rn",
-                  ),
+                  eb.fn
+                    .agg<number>("row_number", [])
+                    .over((ob) =>
+                      ob.partitionBy("songId").orderBy("logId", "desc"),
+                    )
+                    .as("rn"),
                 ])
                 .where("userId", "=", userId)
                 .where("version", "=", version)
                 .as("ranked"),
             )
             .select(["songId", "bpi", "exScore"])
-            .where(sql`rn`, "=", 1)
+            .where("rn", "=", 1)
             .as("latest"),
         (join) => join.onRef("latest.songId", "=", "m.songId"),
       )
-      .select(["m.title", "m.difficulty", "m.bpm", "m.notes", "latest.bpi", "latest.exScore"])
+      .select([
+        "m.title",
+        "m.difficulty",
+        "m.bpm",
+        "m.notes",
+        "latest.bpi",
+        "latest.exScore",
+      ])
       .where("m.releasedVersion", "<=", versionNum)
       .where((eb) =>
         eb.or([eb("m.deletedAt", "is", null), eb("m.deletedAt", ">", version)]),
@@ -296,10 +303,7 @@ class StatsRepository {
         (qb) =>
           qb
             .selectFrom("scores")
-            .select([
-              "userId",
-              (eb) => eb.fn.max("logId").as("maxLogId"),
-            ])
+            .select(["userId", (eb) => eb.fn.max("logId").as("maxLogId")])
             .where("songId", "=", songId)
             .where("version", "=", version)
             .groupBy("userId")

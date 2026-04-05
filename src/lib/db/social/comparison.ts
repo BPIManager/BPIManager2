@@ -1,5 +1,4 @@
 import { db } from "@/lib/db";
-import { sql } from "kysely";
 
 /**
  * ソーシャル比較機能（勝敗統計・レーダー・楽曲別スコア）を担当するリポジトリクラス。
@@ -40,17 +39,38 @@ class SocialComparisonRepository {
       .selectFrom("scores as s1")
       .innerJoin("scores as s2", "s1.songId", "s2.songId")
       .innerJoin("songs as m", "s1.songId", "m.songId")
-      .select([
+      .select((eb) => [
         "m.difficultyLevel",
-        sql<number>`SUM(CASE WHEN s1.exScore > s2.exScore THEN 1 ELSE 0 END)`.as(
-          "win",
-        ),
-        sql<number>`SUM(CASE WHEN s1.exScore < s2.exScore THEN 1 ELSE 0 END)`.as(
-          "lose",
-        ),
-        sql<number>`SUM(CASE WHEN s1.exScore = s2.exScore THEN 1 ELSE 0 END)`.as(
-          "draw",
-        ),
+        eb.fn
+          .sum<number>(
+            eb
+              .case()
+              .when(eb("s1.exScore", ">", eb.ref("s2.exScore")))
+              .then(eb.val(1))
+              .else(eb.val(0))
+              .end(),
+          )
+          .as("win"),
+        eb.fn
+          .sum<number>(
+            eb
+              .case()
+              .when(eb("s1.exScore", "<", eb.ref("s2.exScore")))
+              .then(eb.val(1))
+              .else(eb.val(0))
+              .end(),
+          )
+          .as("lose"),
+        eb.fn
+          .sum<number>(
+            eb
+              .case()
+              .when(eb("s1.exScore", "=", eb.ref("s2.exScore")))
+              .then(eb.val(1))
+              .else(eb.val(0))
+              .end(),
+          )
+          .as("draw"),
       ])
       .where("s1.logId", "in", vLogIds)
       .where("s2.logId", "in", rLogIds)
@@ -211,7 +231,7 @@ class SocialComparisonRepository {
         join.on("vrc.userId", "=", viewerId).on("vrc.version", "=", version),
       )
       .leftJoin("userRoles as ur", "u.userId", "ur.userId")
-      .innerJoin(targetSongs.as("m"), (join) => join.on(sql`1`, "=", sql`1`))
+      .crossJoin(targetSongs.as("m"))
       .leftJoin(myLatest.as("v"), "m.songId", "v.songId")
       .leftJoin(rivalsLatest.as("r"), (join) =>
         join

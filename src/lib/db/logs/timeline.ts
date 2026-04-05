@@ -1,5 +1,4 @@
 import { db } from "@/lib/db";
-import { sql } from "kysely";
 
 class ScoreTimelineRepository {
   /**
@@ -18,15 +17,16 @@ class ScoreTimelineRepository {
       .selectFrom((qb) => {
         let base = qb
           .selectFrom("logs")
-          .select([
+          .select((eb) => [
             "id as l_id",
             "totalBpi as l_totalBpi",
             "batchId as l_batchId",
             "createdAt as l_createdAt",
             "version as l_version",
-            sql<number | null>`LAG(totalBpi) OVER (ORDER BY createdAt ASC)`.as(
-              "l_prevTotalBpi",
-            ),
+            eb.fn
+              .agg<number | null>("lag", [eb.ref("totalBpi")])
+              .over((ob) => ob.orderBy("createdAt", "asc"))
+              .as("l_prevTotalBpi"),
           ])
           .where("userId", "=", userId)
           .where("version", "=", version);
@@ -54,14 +54,15 @@ class ScoreTimelineRepository {
           qb
             .selectFrom("scores as sc")
             .innerJoin("songs as s", "s.songId", "sc.songId")
-            .select([
+            .select((eb) => [
               "sc.batchId as ts_batchId",
               "s.title as ts_title",
               "sc.bpi as ts_bpi",
               "sc.clearState as ts_clearState",
-              sql`ROW_NUMBER() OVER (PARTITION BY sc.batchId ORDER BY sc.bpi DESC)`.as(
-                "rn",
-              ),
+              eb.fn
+                .agg("row_number", [])
+                .over((ob) => ob.partitionBy("sc.batchId").orderBy("sc.bpi", "desc"))
+                .as("rn"),
             ])
             .where("sc.userId", "=", userId)
             .as("ranked_scores"),
