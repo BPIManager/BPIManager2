@@ -33,6 +33,7 @@ export const logsRepo = {
   getOvertakenRivals: rivalRepo.getOvertakenRivals.bind(rivalRepo),
   getRivalAvgScores: rivalRepo.getRivalAvgScores.bind(rivalRepo),
   getRivalTopScores: rivalRepo.getRivalTopScores.bind(rivalRepo),
+  getRivalScoresForSongs: rivalRepo.getRivalScoresForSongs.bind(rivalRepo),
 
   // タイムライン・バージョン比較系
   getTimelineByBatches: timelineRepo.getTimelineByBatches.bind(timelineRepo),

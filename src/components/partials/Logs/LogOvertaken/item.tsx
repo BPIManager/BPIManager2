@@ -9,7 +9,7 @@ interface RankItemProps {
 }
 
 export const OvertakeRankItem = ({ item, onClick }: RankItemProps) => {
-  const { current, previous, overtaken = [] } = item;
+  const { current, previous, overtaken = [], rivalRankInfo } = item;
 
   const scoreDiff = current.exScore - (previous?.exScore || 0);
   const hasOvertaken = overtaken.length > 0;
@@ -43,17 +43,33 @@ export const OvertakeRankItem = ({ item, onClick }: RankItemProps) => {
           </div>
         </div>
 
-        <div className="flex items-center gap-4 shrink-0">
-          <div className="flex items-center gap-1.5 text-xs text-bpim-muted font-mono">
+        <div className="grid grid-cols-2 items-center gap-x-4 gap-y-0.5 shrink-0">
+          <div className="flex items-center gap-1.5 text-xs text-bpim-muted font-mono justify-end">
             <span className="font-medium">{previous?.exScore || 0}</span>
             <ChevronRight className="w-3 h-3" />
             <span className="font-black text-bpim-text text-base">
               {current.exScore}
             </span>
           </div>
-          <div className="flex h-6 min-w-[50px] items-center justify-center rounded-sm bg-bpim-primary px-2 text-xs font-bold text-bpim-text">
+          <div className="flex min-w-[50px] items-center justify-center rounded-sm bg-bpim-primary px-2 text-xs font-bold text-bpim-text">
             +{scoreDiff}
           </div>
+          {rivalRankInfo && (
+            <>
+              <div className="flex items-center gap-1 font-mono text-[11px] justify-end">
+                <span className="text-bpim-muted">
+                  {rivalRankInfo.myRankBefore}位
+                </span>
+                <ChevronRight className="w-2.5 h-2.5 text-[11px] text-bpim-subtle" />
+                <span className="font-bold text-yellow-400">
+                  {rivalRankInfo.myRankAfter}位
+                </span>
+              </div>
+              <span className="font-mono text-[11px] text-bpim-muted text-center">
+                {rivalRankInfo.totalRivals}人中
+              </span>
+            </>
+          )}
         </div>
       </div>
 

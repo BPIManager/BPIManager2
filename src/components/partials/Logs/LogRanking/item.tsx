@@ -1,6 +1,7 @@
 ﻿import { ChevronRight } from "lucide-react";
 import type { BatchDetailItem } from "@/types/logs/batchDetail";
 import { cn } from "@/lib/utils";
+import { getRankDetail } from "@/constants/djRank";
 
 interface RankItemProps {
   item: BatchDetailItem;
@@ -47,6 +48,10 @@ export const RankItem = ({
   const diffBpiColor = getBpiColor(isGrowth ? item.diff.bpi : item.current.bpi);
   const prevEx = isNew ? 0 : item.current.exScore - item.diff.exScore;
   const prevBpi = isNew ? -15 : item.current.bpi - item.diff.bpi;
+
+  const rankDetail = !isGrowth
+    ? getRankDetail(item.current.exScore, item.notes * 2)
+    : null;
 
   if (isSharing) {
     const fullDiff = String(item.difficulty || "").toUpperCase();
@@ -240,6 +245,13 @@ export const RankItem = ({
             <span className="text-[10px] font-bold text-bpim-subtle font-mono">
               ☆{item.level}
             </span>
+            {!isGrowth && rankDetail && (
+              <span className="font-mono text-[10px] text-bpim-muted">
+                {rankDetail.label === "MAX-"
+                  ? `MAX - ${rankDetail.shortage}`
+                  : `${rankDetail.label} + ${rankDetail.surplus}`}
+              </span>
+            )}
             {isNew && (
               <span className="rounded-sm bg-purple-600 px-1 text-[8px] font-bold text-white leading-none py-0.5">
                 NEW

@@ -380,6 +380,48 @@ class RivalRepository {
   }
 
   /**
+   * 指定楽曲のフォロー中ライバル最新スコアを全件取得する。
+   * ライバルランク計算用。
+   */
+  async getRivalScoresForSongs(params: {
+    userId: string;
+    version: string;
+    songIds: number[];
+  }) {
+    const { userId, version, songIds } = params;
+    if (songIds.length === 0) return [];
+
+    const latestPerRival = db
+      .selectFrom("scores as sc")
+      .select([
+        "sc.songId",
+        "sc.userId",
+        (eb) => eb.fn.max("sc.logId").as("latestLogId"),
+      ])
+      .where("sc.version", "=", version)
+      .where("sc.userId", "in", (qb) =>
+        qb
+          .selectFrom("follows")
+          .select("followingId")
+          .where("followerId", "=", userId),
+      )
+      .where("sc.songId", "in", songIds)
+      .groupBy(["sc.songId", "sc.userId"])
+      .as("latest");
+
+    return await db
+      .selectFrom("scores as s")
+      .innerJoin(latestPerRival, (join) =>
+        join
+          .onRef("s.logId", "=", "latest.latestLogId")
+          .onRef("s.userId", "=", "latest.userId")
+          .onRef("s.songId", "=", "latest.songId"),
+      )
+      .select(["s.songId", "s.exScore"])
+      .execute();
+  }
+
+  /**
    * フォロー中ライバルの楽曲ごとトップスコアを取得する。
    * songIds を指定した場合は当該楽曲のみに絞り込む。
    */

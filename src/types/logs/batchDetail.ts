@@ -37,6 +37,11 @@ export interface BatchDetailItem {
     isRankUp?: boolean;
   };
   overtaken: OvertakenRivalInfo[];
+  rivalRankInfo?: {
+    myRankBefore: number;
+    myRankAfter: number;
+    totalRivals: number;
+  } | null;
 }
 
 export interface BatchDetailResponse {

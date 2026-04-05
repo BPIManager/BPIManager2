@@ -2,7 +2,7 @@ import dayjs from "@/lib/dayjs";
 import { logsRepo } from "@/lib/db/logs";
 import { mapToLogNested } from "@/utils/logs/getMapNested";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { createOvertakenMap } from "./[batchId]/scores";
+import { createOvertakenMap, computeRivalRankMap } from "./[batchId]/scores";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 import { rejectAccess } from "@/middlewares/api/withApi";
 
@@ -55,6 +55,16 @@ export default async function handler(
     ]);
 
     const overtakenMap = createOvertakenMap(overtaken);
+    const overtakenSongIds = Object.keys(overtakenMap).map(Number).filter(Boolean);
+    const rivalScores =
+      isOwnLog && overtakenSongIds.length > 0
+        ? await logsRepo.getRivalScoresForSongs({
+            userId: uid,
+            version: v,
+            songIds: overtakenSongIds,
+          })
+        : [];
+    const rivalRankMap = computeRivalRankMap(overtakenMap, rivalScores);
 
     return res.status(200).json({
       songs: scores.map((s) => {
@@ -62,6 +72,7 @@ export default async function handler(
         return {
           ...mapped,
           overtaken: s.songId ? overtakenMap[s.songId] || [] : [],
+          rivalRankInfo: s.songId ? rivalRankMap[s.songId] ?? null : null,
         };
       }),
       pagination: {

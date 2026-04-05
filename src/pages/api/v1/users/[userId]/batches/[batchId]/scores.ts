@@ -103,6 +103,16 @@ async function handleLastPlayedBase(
   }
 
   const overtakenMap = createOvertakenMap(overtaken);
+  const overtakenSongIds = Object.keys(overtakenMap).map(Number).filter(Boolean);
+  const rivalScores =
+    isOwnLog && overtakenSongIds.length > 0
+      ? await logsRepo.getRivalScoresForSongs({
+          userId: uid,
+          version: ver,
+          songIds: overtakenSongIds,
+        })
+      : [];
+  const rivalRankMap = computeRivalRankMap(overtakenMap, rivalScores);
 
   const timeline = calculateTotalBpi(history, totalSongs, ver, 0);
   const currentSnapshot = timeline.find((t) => t.id === range.label);
@@ -116,6 +126,7 @@ async function handleLastPlayedBase(
       return {
         ...mapped,
         overtaken: overtakenMap[s.songId] || [],
+        rivalRankInfo: rivalRankMap[s.songId] ?? null,
       };
     }),
     pagination: {
@@ -170,6 +181,16 @@ async function handleCreatedAtBase(
       : [],
   ]);
   const overtakenMap = createOvertakenMap(overtaken);
+  const overtakenSongIds = Object.keys(overtakenMap).map(Number).filter(Boolean);
+  const rivalScores =
+    isOwnLog && overtakenSongIds.length > 0
+      ? await logsRepo.getRivalScoresForSongs({
+          userId: uid,
+          version: ver,
+          songIds: overtakenSongIds,
+        })
+      : [];
+  const rivalRankMap = computeRivalRankMap(overtakenMap, rivalScores);
 
   return {
     songs: scores.map((s) => {
@@ -177,6 +198,7 @@ async function handleCreatedAtBase(
       return {
         ...mapped,
         overtaken: s.songId ? overtakenMap[s.songId] || [] : [],
+        rivalRankInfo: s.songId ? rivalRankMap[s.songId] ?? null : null,
       };
     }),
     pagination: {
@@ -189,6 +211,39 @@ async function handleCreatedAtBase(
       groupedBy: "createdAt",
     },
   };
+}
+
+export function computeRivalRankMap(
+  overtakenMap: OvertakenMap,
+  rivalScores: { songId: number | null; exScore: number | null }[],
+): Record<number, { myRankBefore: number; myRankAfter: number; totalRivals: number }> {
+  const scoresBySong: Record<number, number[]> = {};
+  for (const row of rivalScores) {
+    if (row.songId == null || row.exScore == null) continue;
+    if (!scoresBySong[row.songId]) scoresBySong[row.songId] = [];
+    scoresBySong[row.songId].push(row.exScore);
+  }
+
+  const result: Record<
+    number,
+    { myRankBefore: number; myRankAfter: number; totalRivals: number }
+  > = {};
+  for (const [songIdStr, rivals] of Object.entries(overtakenMap)) {
+    const songId = Number(songIdStr);
+    const myOldScore = rivals[0]?.myOldScore ?? null;
+    const myNewScore = rivals[0]?.myNewScore ?? 0;
+    const allScores = scoresBySong[songId] ?? [];
+    const totalRivals = allScores.length;
+    result[songId] = {
+      myRankBefore:
+        myOldScore !== null
+          ? allScores.filter((s) => s > myOldScore).length + 1
+          : totalRivals + 1,
+      myRankAfter: allScores.filter((s) => s > myNewScore).length + 1,
+      totalRivals,
+    };
+  }
+  return result;
 }
 
 export function createOvertakenMap(
