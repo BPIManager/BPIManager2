@@ -66,7 +66,7 @@ export const OvertakeRankItem = ({ item, onClick }: RankItemProps) => {
                 </span>
               </div>
               <span className="font-mono text-[11px] text-bpim-muted text-center">
-                {rivalRankInfo.totalRivals}人中
+                {rivalRankInfo.totalRivals + 1}人中
               </span>
             </>
           )}
