@@ -9,6 +9,7 @@ import { AllDifficulties } from "./songs/allSongs";
 export interface Database {
   songs: Songs;
   songDef: SongDef;
+  songAttributes: SongAttributes;
   users: Users;
   scores: Scores;
   logs: Logs;
@@ -22,6 +23,8 @@ export interface Database {
   allScores: AllScoresTable;
   discordLinks: DiscordLinks;
   optimizeMemo: OptimizeMemoTable;
+  songNotes: SongNotesTable;
+  songNoteUpvotes: SongNoteUpvotesTable;
   // 追加: 暫定/バックアップ用テーブル
   bkScores: BkScores;
   bkUsers: BkUsers;
@@ -216,6 +219,33 @@ export interface OptimizeMemoTable {
   createdAt: Generated<Date>;
 }
 
+export interface SongAttributes {
+  songId: number;
+  // Profile (相対評価: 0-100)
+  p_intensity: Generated<number | null>;
+  p_scratch: Generated<number | null>;
+  p_soflan: Generated<number | null>;
+  p_cn: Generated<number | null>;
+  p_udeoshi: Generated<number | null>;
+  p_chord: Generated<number | null>;
+  p_delay: Generated<number | null>;
+  p_scratch_complex: Generated<number | null>;
+  p_tateren: Generated<number | null>;
+  p_trill_denim: Generated<number | null>;
+  // Global (絶対評価: 0-200)
+  g_intensity: Generated<number | null>;
+  g_scratch: Generated<number | null>;
+  g_soflan: Generated<number | null>;
+  g_cn: Generated<number | null>;
+  g_udeoshi: Generated<number | null>;
+  g_chord: Generated<number | null>;
+  g_delay: Generated<number | null>;
+  g_scratch_complex: Generated<number | null>;
+  g_tateren: Generated<number | null>;
+  g_trill_denim: Generated<number | null>;
+  updatedAt: Generated<Date>;
+}
+
 export type UserStatusLog = Selectable<UserStatusLogs>;
 export type NewUserStatusLog = Insertable<UserStatusLogs>;
 export type TotalBPILog = Selectable<Logs>;
@@ -246,3 +276,28 @@ export type UserRoleUpdate = Updateable<UserRoles>;
 export type OptimizeMemo = Selectable<OptimizeMemoTable>;
 export type NewOptimizeMemo = Insertable<OptimizeMemoTable>;
 export type OptimizeMemoUpdate = Updateable<OptimizeMemoTable>;
+export type SongAttribute = Selectable<SongAttributes>;
+export type NewSongAttribute = Insertable<SongAttributes>;
+export type SongAttributeUpdate = Updateable<SongAttributes>;
+
+export interface SongNotesTable {
+  id: Generated<number>;
+  songId: number;
+  userId: string;
+  body: string;
+  createdAt: Generated<Date>;
+  updatedAt: Generated<Date>;
+}
+
+export interface SongNoteUpvotesTable {
+  id: Generated<number>;
+  noteId: number;
+  userId: string;
+  createdAt: Generated<Date>;
+}
+
+export type SongNote = Selectable<SongNotesTable>;
+export type NewSongNote = Insertable<SongNotesTable>;
+export type SongNoteUpdate = Updateable<SongNotesTable>;
+export type SongNoteUpvote = Selectable<SongNoteUpvotesTable>;
+export type NewSongNoteUpvote = Insertable<SongNoteUpvotesTable>;

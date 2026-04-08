@@ -30,6 +30,7 @@ import {
   HeartHandshake,
   Trophy,
   Target,
+  Music,
 } from "lucide-react";
 
 import { useUser } from "@/contexts/users/UserContext";
@@ -70,8 +71,8 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
       isBeta: true,
     },
     { label: "比較", icon: ChartArea, href: "/analytics" },
-    { label: "メモ", icon: StickyNote, href: "/notes", isComingSoon: true },
     { label: "指標", icon: LandPlot, href: "/metrics" },
+    { label: "楽曲情報", icon: Music, href: "/songs" },
     {
       label: "全曲（☆10以下含む）",
       icon: ListIcon,

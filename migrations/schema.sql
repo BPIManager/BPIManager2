@@ -34,10 +34,9 @@ CREATE TABLE IF NOT EXISTS `allScores` (
   KEY `idx_scores_lastPlayed_version` (`lastPlayed` DESC,`version`) USING BTREE,
   KEY `idx_scores_lookup_v2` (`userId`,`songId`,`version`,`exScore`,`logId`) USING BTREE,
   CONSTRAINT `fk_allScores_allSongs` FOREIGN KEY (`songId`) REFERENCES `allSongs` (`songId`) ON DELETE CASCADE,
-  CONSTRAINT `fk_allScores_logs_batchId` FOREIGN KEY (`batchId`) REFERENCES `logs` (`batchId`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `fk_allScores_songDef` FOREIGN KEY (`definitionId`) REFERENCES `songDef` (`defId`),
   CONSTRAINT `fk_allScores_users` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=385842 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=594494 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `allSongs` (
   `songId` int(11) NOT NULL AUTO_INCREMENT,
@@ -68,7 +67,7 @@ CREATE TABLE IF NOT EXISTS `apiKeys` (
   UNIQUE KEY `key` (`key`) USING BTREE,
   UNIQUE KEY `userId` (`userId`) USING BTREE,
   CONSTRAINT `fk_apikeys_userid` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `bkScores` (
   `logId` int(11) NOT NULL AUTO_INCREMENT,
@@ -99,6 +98,15 @@ CREATE TABLE IF NOT EXISTS `bkUsers` (
   KEY `arenarank` (`arenarank`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `discordLinks` (
+  `discordUserId` varchar(64) NOT NULL,
+  `userId` varchar(128) NOT NULL,
+  `linkedAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`discordUserId`),
+  UNIQUE KEY `userId` (`userId`),
+  CONSTRAINT `fk_discordlinks_user` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `follows` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `followerId` varchar(128) NOT NULL,
@@ -110,7 +118,7 @@ CREATE TABLE IF NOT EXISTS `follows` (
   KEY `idx_following_follower` (`followingId`,`followerId`),
   CONSTRAINT `fk_follows_follower` FOREIGN KEY (`followerId`) REFERENCES `users` (`userId`) ON DELETE CASCADE,
   CONSTRAINT `fk_follows_following` FOREIGN KEY (`followingId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=501 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=580 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `logs` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -124,7 +132,7 @@ CREATE TABLE IF NOT EXISTS `logs` (
   KEY `idx_user_version` (`userId`,`version`) USING BTREE,
   KEY `createdAt` (`createdAt`),
   CONSTRAINT `fk_log_userId` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=199419 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=227985 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `notifications` (
   `userId` varchar(128) NOT NULL,
@@ -132,6 +140,19 @@ CREATE TABLE IF NOT EXISTS `notifications` (
   PRIMARY KEY (`userId`),
   CONSTRAINT `fk_notifications_user_id` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `optimizeMemo` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `reportId` varchar(36) NOT NULL COMMENT '一意のUUID',
+  `userId` varchar(128) NOT NULL,
+  `reportData` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '計算結果のJSON' CHECK (json_valid(`reportData`)),
+  `targetBpi` float DEFAULT NULL COMMENT '検索性のための目標BPI（任意）',
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_reportId_unique` (`reportId`),
+  KEY `idx_report_userId_createdAt` (`userId`,`createdAt` DESC),
+  CONSTRAINT `fk_reports_users` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `scores` (
   `logId` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -157,11 +178,39 @@ CREATE TABLE IF NOT EXISTS `scores` (
   KEY `idx_scores_lastPlayed_version` (`lastPlayed` DESC,`version`),
   KEY `idx_scores_lookup_v2` (`userId`,`songId`,`version`,`exScore`,`logId`),
   KEY `idx_scores_bpm_dist` (`userId`,`version`,`songId`,`logId`,`bpi`),
+  KEY `idx_scores_user_song_logid` (`userId`,`songId`,`logId` DESC),
   CONSTRAINT `fk_score_def` FOREIGN KEY (`definitionId`) REFERENCES `songDef` (`defId`),
   CONSTRAINT `fk_score_song` FOREIGN KEY (`songId`) REFERENCES `songs` (`songId`) ON DELETE CASCADE,
   CONSTRAINT `fk_score_userId` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE,
   CONSTRAINT `fk_scores_batchId` FOREIGN KEY (`batchId`) REFERENCES `logs` (`batchId`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=2658139 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3092606 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `songAttributes` (
+  `songId` int(11) NOT NULL,
+  `p_intensity` float DEFAULT 0,
+  `p_scratch` float DEFAULT 0,
+  `p_soflan` float DEFAULT 0,
+  `p_cn` float DEFAULT 0,
+  `p_udeoshi` float DEFAULT 0 COMMENT '腕押し',
+  `p_chord` float DEFAULT 0,
+  `p_delay` float DEFAULT 0,
+  `p_scratch_complex` float DEFAULT 0,
+  `p_tateren` float DEFAULT 0 COMMENT '縦連打',
+  `p_trill_denim` float DEFAULT 0,
+  `g_intensity` float DEFAULT 0,
+  `g_scratch` float DEFAULT 0,
+  `g_soflan` float DEFAULT 0,
+  `g_cn` float DEFAULT 0,
+  `g_udeoshi` float DEFAULT 0,
+  `g_chord` float DEFAULT 0,
+  `g_delay` float DEFAULT 0,
+  `g_scratch_complex` float DEFAULT 0,
+  `g_tateren` float DEFAULT 0,
+  `g_trill_denim` float DEFAULT 0,
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`songId`),
+  CONSTRAINT `fk_attr_songId` FOREIGN KEY (`songId`) REFERENCES `songs` (`songId`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `songDef` (
   `defId` int(11) NOT NULL AUTO_INCREMENT,
@@ -220,6 +269,16 @@ CREATE TABLE IF NOT EXISTS `userRadarCache` (
   CONSTRAINT `fk_urc_userId` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `userRoles` (
+  `userId` varchar(128) NOT NULL,
+  `role` enum('coffee','saba','iidx','developer','pro') NOT NULL,
+  `description` varchar(255) DEFAULT '',
+  `grantedAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`userId`),
+  UNIQUE KEY `idx_user_role` (`userId`,`role`),
+  CONSTRAINT `fk_userroles_user` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `users` (
   `userId` varchar(128) NOT NULL,
   `userName` varchar(50) NOT NULL,
@@ -236,24 +295,6 @@ CREATE TABLE IF NOT EXISTS `users` (
   KEY `idx_users_public_id` (`userId`,`isPublic`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `userRoles` (
-  `userId` varchar(128) NOT NULL,
-  `role` enum('coffee','saba','iidx','developer','pro') NOT NULL,
-  `description` varchar(255) DEFAULT NULL,
-  `grantedAt` timestamp NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`userId`),
-  CONSTRAINT `fk_userroles_user` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-CREATE TABLE IF NOT EXISTS `discordLinks` (
-  `discordUserId` varchar(64) NOT NULL,
-  `userId` varchar(128) NOT NULL,
-  `linkedAt` timestamp NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`discordUserId`),
-  UNIQUE KEY `userId` (`userId`),
-  CONSTRAINT `fk_discordlinks_user` FOREIGN KEY (`bpiUserId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 CREATE TABLE IF NOT EXISTS `userStatusLogs` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `userId` varchar(128) NOT NULL,
@@ -268,19 +309,32 @@ CREATE TABLE IF NOT EXISTS `userStatusLogs` (
   KEY `idx_usl_user_id_desc` (`userId`,`id` DESC),
   KEY `idx_usl_user_version_id_desc` (`userId`,`version`,`id` DESC),
   CONSTRAINT `userStatusLogs_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=200705 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=229649 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `optimizeMemo` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `reportId` varchar(36) NOT NULL COMMENT '一意のUUID',
+CREATE TABLE IF NOT EXISTS `songNotes` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `songId` int(11) NOT NULL,
   `userId` varchar(128) NOT NULL,
-  `reportData` JSON NOT NULL COMMENT '計算結果のJSON',
-  `targetBpi` float DEFAULT NULL COMMENT '検索性のための目標BPI（任意）',
+  `body` text NOT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `idx_song_notes_songId_createdAt` (`songId`,`createdAt` DESC),
+  KEY `idx_song_notes_userId` (`userId`),
+  CONSTRAINT `fk_song_notes_songId` FOREIGN KEY (`songId`) REFERENCES `songs` (`songId`) ON DELETE CASCADE,
+  CONSTRAINT `fk_song_notes_userId` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `songNoteUpvotes` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `noteId` bigint(20) unsigned NOT NULL,
+  `userId` varchar(128) NOT NULL,
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
-  UNIQUE KEY `idx_reportId_unique` (`reportId`),
-  KEY `idx_report_userId_createdAt` (`userId`, `createdAt` DESC),
-  CONSTRAINT `fk_reports_users` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
+  UNIQUE KEY `idx_note_upvote_unique` (`noteId`,`userId`),
+  KEY `idx_upvote_userId` (`userId`),
+  CONSTRAINT `fk_upvote_noteId` FOREIGN KEY (`noteId`) REFERENCES `songNotes` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_upvote_userId` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
