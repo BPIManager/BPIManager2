@@ -31,7 +31,7 @@ export function SongMetaCard({ song }: SongMetaCardProps) {
 
   const barItems = useMemo(
     () =>
-      SONG_ATTRIBUTES.filter(({ dbKey }) => dbKey !== "p_scratch_complex")
+      SONG_ATTRIBUTES.filter(({ dbKey }) => dbKey !== "p_scratch_complex" && dbKey !== "p_udeoshi")
         .map(({ dbKey, label }) => ({
           label,
           value: song[dbKey as keyof SongListItem] as number | null,

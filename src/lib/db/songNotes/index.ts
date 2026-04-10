@@ -70,7 +70,7 @@ class SongNotesRepository {
       updatedAt: r.updatedAt,
     }));
   }
-
+  
   async createNote(
     songId: number,
     userId: string,

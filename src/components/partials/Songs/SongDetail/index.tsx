@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { AppTabsList, AppTabsTrigger } from "@/components/ui/complex/tabs";
 import { ChevronLeft, Music, FileText, BarChart3, Layers } from "lucide-react";
 import { useSongDetail } from "@/hooks/songs/useSongDetail";
 import { latestVersion } from "@/constants/latestVersion";
@@ -48,36 +49,24 @@ export function SongDetailContent({
           <SongMetaCard song={song} />
 
           <Tabs value={activeTab} onValueChange={handleTabChange}>
-            <TabsList className="w-full bg-bpim-surface border border-bpim-border">
-              <TabsTrigger
-                value="notes"
-                className="flex-1 data-[state=active]:bg-bpim-overlay"
-              >
-                <FileText className="h-3.5 w-3.5 mr-1.5" />
-                攻略メモ
-              </TabsTrigger>
-              <TabsTrigger
-                value="similar"
-                className="flex-1 data-[state=active]:bg-bpim-overlay"
-              >
-                <Layers className="h-3.5 w-3.5 mr-1.5" />
-                類似楽曲
-              </TabsTrigger>
-              <TabsTrigger
-                value="ranking"
-                className="flex-1 data-[state=active]:bg-bpim-overlay"
-              >
-                <BarChart3 className="h-3.5 w-3.5 mr-1.5" />
-                ランキング
-              </TabsTrigger>
-              <TabsTrigger
-                value="pattern"
-                className="flex-1 data-[state=active]:bg-bpim-overlay"
-              >
-                <Music className="h-3.5 w-3.5 mr-1.5" />
-                当たり譜面
-              </TabsTrigger>
-            </TabsList>
+            <AppTabsList visual="card" cols={4}>
+              {[
+                { value: "notes", label: "攻略メモ", icon: FileText },
+                { value: "similar", label: "類似楽曲", icon: Layers },
+                { value: "ranking", label: "ランキング", icon: BarChart3 },
+                { value: "pattern", label: "当たり譜面", icon: Music },
+              ].map((t) => (
+                <AppTabsTrigger
+                  key={t.value}
+                  value={t.value}
+                  visual="card"
+                  icon={t.icon}
+                  iconOnly
+                >
+                  {t.label}
+                </AppTabsTrigger>
+              ))}
+            </AppTabsList>
 
             <TabsContent value="ranking">
               <RankingTab songId={songId} />
