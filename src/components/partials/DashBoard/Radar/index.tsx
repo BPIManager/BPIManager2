@@ -28,6 +28,12 @@ const RadarDefs = ({
         <stop offset="0%" stopColor={warningColor} stopOpacity={0.1} />
         <stop offset="100%" stopColor={warningColor} stopOpacity={0.5} />
       </radialGradient>
+      {/* songAttr モードで 100 超の値を炎上表現するオーバーフローグラデーション */}
+      <radialGradient id="radarOverGradient" cx="50%" cy="50%" r="50%">
+        <stop offset="60%" stopColor={warningColor} stopOpacity={0} />
+        <stop offset="85%" stopColor={warningColor} stopOpacity={0.25} />
+        <stop offset="100%" stopColor={warningColor} stopOpacity={0.65} />
+      </radialGradient>
       <radialGradient id="dotMeMax" cx="50%" cy="50%" r="50%">
         <stop offset="0%" stopColor="white" stopOpacity={1} />
         <stop offset="100%" stopColor={primaryColor} stopOpacity={1} />
@@ -175,66 +181,89 @@ interface RadarChartProps {
   data: RadarInput;
   rivalData?: RadarInput;
   isMini?: boolean;
+  /** isMini 時のチャート高さ (px)。未指定時は 150 */
+  miniHeight?: number;
+  /** isMini でもツールチップを表示する */
+  showTooltip?: boolean;
+  /** 楽曲属性モード: domain を [0,100] 固定にし、超過値がオーバーフローして強調表示される */
+  songAttr?: boolean;
+  /** rivalData のみ黄色で表示し、自分のレーダー（青）を描画しない */
+  rivalOnly?: boolean;
 }
 
 export const RadarSectionChart = ({
   data,
   rivalData,
   isMini = false,
+  miniHeight = 150,
+  showTooltip = false,
+  songAttr = false,
+  rivalOnly = false,
 }: RadarChartProps) => {
   const c = useChartColors();
 
   const chartData = useMemo(() => {
-    const categories = [
-      "notes",
-      "chord",
-      "peak",
-      "charge",
-      "scratch",
-      "soflan",
-    ];
+    const categories =
+      rivalOnly && rivalData ? Object.keys(rivalData) : Object.keys(data);
 
     const getBpiValue = (obj: RadarInput, key: string): number => {
       const val = obj[key] ?? obj[key.toUpperCase()];
       if (typeof val === "number") return val;
       if (val && typeof val === "object" && "totalBpi" in val)
         return val.totalBpi;
-      return -15;
+      return songAttr ? 0 : -15;
     };
+
+    const floor = songAttr ? 0 : -15;
 
     const raw = categories.map((key) => ({
       category: key.toUpperCase(),
-      value: Math.max(getBpiValue(data, key), -15),
+      value: Math.max(getBpiValue(data, key), floor),
       rivalValue: rivalData
-        ? Math.max(getBpiValue(rivalData, key), -15)
+        ? Math.max(getBpiValue(rivalData, key), floor)
         : undefined,
     }));
 
     const meMax = Math.max(...raw.map((d) => d.value));
     const rivalMax = rivalData
-      ? Math.max(...raw.map((d) => d.rivalValue ?? -15))
-      : -15;
+      ? Math.max(...raw.map((d) => d.rivalValue ?? floor))
+      : floor;
 
     return raw.map((d) => ({
       ...d,
-      isMeMax: d.value === meMax && meMax > -15,
-      isRivalMax: rivalData && d.rivalValue === rivalMax && rivalMax > -15,
+      // songAttr モード: グリッド内に収める capped 値（overflow Radar 用）
+      valueCapped: songAttr ? Math.min(d.value, 100) : d.value,
+      isMeMax: d.value === meMax && meMax > floor,
+      isRivalMax: rivalData && d.rivalValue === rivalMax && rivalMax > floor,
     }));
-  }, [data, rivalData]);
+  }, [data, rivalData, rivalOnly, songAttr]);
+
+  const hasOverflow =
+    songAttr &&
+    chartData.some((d) =>
+      rivalOnly
+        ? d.rivalValue !== undefined && d.rivalValue > 100
+        : d.value > 100,
+    );
 
   const domain = useMemo(() => {
+    if (songAttr) return [0, 100] as [number, number];
     const allValues = chartData.flatMap((d) =>
-      [d.value, d.rivalValue].filter((v) => v !== undefined),
+      rivalOnly
+        ? [d.rivalValue].filter((v) => v !== undefined)
+        : [d.value, d.rivalValue].filter((v) => v !== undefined),
     ) as number[];
     const min = Math.min(...allValues);
     const max = Math.max(...allValues);
     const range = Math.max(max - min, 10);
     const padding = range * 0.2;
     return [Math.floor(min - padding), Math.ceil(max + padding)];
-  }, [chartData]);
+  }, [chartData, songAttr]);
+
+  const chartHeight = isMini ? miniHeight : 330;
 
   return (
-    <div className={cn("relative w-full", isMini ? "h-[150px]" : "h-[330px]")}>
+    <div className={cn("relative w-full overflow-visible")} style={{ height: chartHeight }}>
       <RadarDefs primaryColor={c.primary} warningColor={c.warning} />
       <ResponsiveContainer width="100%" height="100%">
         <RadarChart cx="50%" cy="50%" outerRadius="80%" data={chartData}>
@@ -247,22 +276,39 @@ export const RadarSectionChart = ({
           )}
           <PolarRadiusAxis domain={domain} tick={false} axisLine={false} />
 
-          {!isMini && (
+          {(!isMini || showTooltip) && (
             <Tooltip content={<RadarCustomTooltip />} cursor={false} />
           )}
 
-          <Radar
-            name="YOU"
-            dataKey="value"
-            stroke={c.primary}
-            strokeWidth={1.5}
-            fill="url(#radarMeGradient)"
-            fillOpacity={1}
-            dot={
-              <CustomDot primaryColor={c.primary} warningColor={c.warning} />
-            }
-            isAnimationActive={!isMini}
-          />
+          {!rivalOnly && (
+            <Radar
+              name="YOU"
+              dataKey={songAttr ? "valueCapped" : "value"}
+              stroke={c.primary}
+              strokeWidth={1.5}
+              fill="url(#radarMeGradient)"
+              fillOpacity={1}
+              dot={
+                <CustomDot primaryColor={c.primary} warningColor={c.warning} />
+              }
+              isAnimationActive={!isMini}
+            />
+          )}
+
+          {/* songAttr モードで 100 超の値を炎のグラデーションで強調 */}
+          {hasOverflow && (
+            <Radar
+              name="OVERFLOW"
+              dataKey={rivalOnly ? "rivalValue" : "value"}
+              stroke={c.warning}
+              strokeWidth={2.5}
+              strokeOpacity={0.8}
+              fill="url(#radarOverGradient)"
+              fillOpacity={1}
+              isAnimationActive={false}
+              dot={false}
+            />
+          )}
 
           {rivalData && (
             <Radar

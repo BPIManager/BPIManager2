@@ -44,3 +44,14 @@ export const Meta = ({
     </Head>
   );
 };
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const JsonLd = ({ data }: { data: Record<string, any> }) => (
+  <Head>
+    <script
+      key="jsonld"
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
+  </Head>
+);

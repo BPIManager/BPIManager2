@@ -30,6 +30,7 @@ import {
   HeartHandshake,
   Trophy,
   Target,
+  Music,
 } from "lucide-react";
 
 import { useUser } from "@/contexts/users/UserContext";
@@ -54,6 +55,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
   const [isRivalOpen, setIsRivalOpen] = useState<boolean>(true);
   const [isInfoOpen, setIsInfoOpen] = useState<boolean>(true);
   const [isScoreOpen, setIsScoreOpen] = useState<boolean>(true);
+  const [isBetaOpen, setIsBetaOpen] = useState<boolean>(true);
 
   const rivalMenuItems = [
     { label: "ライバル一覧", icon: UsersIcon, href: "/rivals", exact: true },
@@ -63,21 +65,23 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
   ];
 
   const otherMenuItems = [
+    { label: "比較", icon: ChartArea, href: "/analytics" },
+    { label: "指標", icon: LandPlot, href: "/metrics" },
+    { label: "設定", icon: Settings, href: "/settings" },
+  ];
+
+  const betaMenuItems = [
     {
       label: "アシスタント",
       icon: Target,
       href: "/optimizer",
-      isBeta: true,
     },
-    { label: "比較", icon: ChartArea, href: "/analytics" },
-    { label: "メモ", icon: StickyNote, href: "/notes", isComingSoon: true },
-    { label: "指標", icon: LandPlot, href: "/metrics" },
+    { label: "楽曲情報", icon: Music, href: "/songs" },
     {
       label: "全曲（☆10以下含む）",
       icon: ListIcon,
       href: `/my/all/${latestVersion}`,
     },
-    { label: "設定", icon: Settings, href: "/settings" },
   ];
 
   const infoMenuItems = [
@@ -389,6 +393,36 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
         </Collapsible>
 
         {otherMenuItems.map((item) => renderMenuItem(item))}
+
+        <Collapsible
+          open={isBetaOpen}
+          onOpenChange={setIsBetaOpen}
+          className="w-full"
+        >
+          <CollapsibleTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start gap-3 px-3 text-bpim-muted hover:bg-bpim-overlay/50 hover:text-bpim-text data-[state=open]:bg-transparent"
+            >
+              {isBetaOpen ? (
+                <ChevronDown className="h-4.5 w-4.5" />
+              ) : (
+                <ChevronRight className="h-4.5 w-4.5" />
+              )}
+              <span className="text-xs font-bold tracking-wider">ベータ版機能</span>
+              <Badge
+                variant="secondary"
+                className="text-[9px] px-1.5 py-0 bg-blue-500/10 text-blue-400 border-blue-500/20 font-bold tracking-tighter"
+              >
+                BETA
+              </Badge>
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="flex flex-col gap-1 mt-1">
+            {betaMenuItems.map((item) => renderMenuItem(item, true))}
+          </CollapsibleContent>
+        </Collapsible>
 
         <Collapsible
           open={isInfoOpen}
