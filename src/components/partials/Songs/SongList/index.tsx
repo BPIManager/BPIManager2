@@ -1,8 +1,7 @@
 "use client";
 
 import { useSongListFilter } from "@/hooks/songs/useSongListFilter";
-import { SongFilterControls } from "./SongFilterControls";
-import { SongVirtualList } from "./SongVirtualList";
+import { SongFilterControls, SongVirtualList } from "./ui";
 
 export function SongListContent() {
   const {
@@ -33,7 +32,11 @@ export function SongListContent() {
         {isLoading ? "読み込み中..." : `${filteredSongs.length} 曲`}
       </p>
 
-      <SongVirtualList songs={filteredSongs} isLoading={isLoading} sortKey={sortKey} />
+      <SongVirtualList
+        songs={filteredSongs}
+        isLoading={isLoading}
+        sortKey={sortKey}
+      />
     </div>
   );
 }

@@ -1,14 +1,15 @@
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { RankingTab } from "./RankingTab";
-import { SimilarTab } from "./SimilarTab";
-import { SongMetaCard } from "./SongMetaCard";
+import { ChevronLeft, Music, FileText, BarChart3, Layers } from "lucide-react";
 import { useSongDetail } from "@/hooks/songs/useSongDetail";
 import { latestVersion } from "@/constants/latestVersion";
-import { ChevronLeft, Music, FileText, BarChart3, Layers } from "lucide-react";
-import { SongDetailSkeleton } from "./SongDetailSkeleton";
-import { WikiTab } from "./WikiTab";
+import { RankingTab } from "./Ranking";
+import { SimilarTab } from "./Similar";
+import { WikiTab } from "./Wiki";
+import { PatternTab } from "./Pattern";
+import { SongMetaCard } from "./ui";
+import { SongDetailSkeleton } from "./skeleton";
 
 interface SongDetailContentProps {
   songId: number;
@@ -91,11 +92,7 @@ export function SongDetailContent({
             </TabsContent>
 
             <TabsContent value="pattern">
-              <div className="mt-4 flex flex-col items-center gap-3 py-16 rounded-xl border border-dashed border-bpim-border text-bpim-muted">
-                <Music className="h-8 w-8 opacity-30" />
-                <p className="text-sm font-bold">当たり譜面分析</p>
-                <p className="text-xs opacity-60">準備中</p>
-              </div>
+              <PatternTab songId={songId} song={song} />
             </TabsContent>
           </Tabs>
         </>

@@ -48,6 +48,7 @@ class SongsRepository {
         "a.p_scratch_complex",
         "a.p_tateren",
         "a.p_trill_denim",
+        "a.p_peak",
         "a.g_scratch",
         "a.g_soflan",
         "a.g_cn",
@@ -58,6 +59,7 @@ class SongsRepository {
         "a.g_scratch_complex",
         "a.g_tateren",
         "a.g_trill_denim",
+        "a.g_peak",
       ])
       .where("s.releasedVersion", "<=", versionNum)
       .where((eb) =>
@@ -107,6 +109,7 @@ class SongsRepository {
         "a.p_scratch_complex",
         "a.p_tateren",
         "a.p_trill_denim",
+        "a.p_peak",
         "a.g_scratch",
         "a.g_soflan",
         "a.g_cn",
@@ -117,6 +120,7 @@ class SongsRepository {
         "a.g_scratch_complex",
         "a.g_tateren",
         "a.g_trill_denim",
+        "a.g_peak",
       ])
       .where("s.songId", "=", songId)
       .executeTakeFirst();
@@ -162,6 +166,7 @@ class SongsRepository {
         "a.p_scratch_complex",
         "a.p_tateren",
         "a.p_trill_denim",
+        "a.p_peak",
         "a.g_scratch",
         "a.g_soflan",
         "a.g_cn",
@@ -172,6 +177,7 @@ class SongsRepository {
         "a.g_scratch_complex",
         "a.g_tateren",
         "a.g_trill_denim",
+        "a.g_peak",
       ])
       .where("s.releasedVersion", "<=", versionNum)
       .where((eb) =>

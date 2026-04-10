@@ -197,6 +197,7 @@ CREATE TABLE IF NOT EXISTS `songAttributes` (
   `p_scratch_complex` float DEFAULT 0,
   `p_tateren` float DEFAULT 0 COMMENT '縦連打',
   `p_trill_denim` float DEFAULT 0,
+  `p_peak` float DEFAULT 0,
   `g_intensity` float DEFAULT 0,
   `g_scratch` float DEFAULT 0,
   `g_soflan` float DEFAULT 0,
@@ -207,6 +208,7 @@ CREATE TABLE IF NOT EXISTS `songAttributes` (
   `g_scratch_complex` float DEFAULT 0,
   `g_tateren` float DEFAULT 0,
   `g_trill_denim` float DEFAULT 0,
+  `g_peak` float DEFAULT 0,
   `updatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`songId`),
   CONSTRAINT `fk_attr_songId` FOREIGN KEY (`songId`) REFERENCES `songs` (`songId`) ON DELETE CASCADE
@@ -335,6 +337,28 @@ CREATE TABLE IF NOT EXISTS `songNoteUpvotes` (
   KEY `idx_upvote_userId` (`userId`),
   CONSTRAINT `fk_upvote_noteId` FOREIGN KEY (`noteId`) REFERENCES `songNotes` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_upvote_userId` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS songPatterns (
+  songId INT NOT NULL,
+  pattern VARCHAR(10) NOT NULL,
+  score DOUBLE NOT NULL,
+  PRIMARY KEY (songId, pattern),
+  FOREIGN KEY (songId) REFERENCES songs(songId) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `songPatternVotes` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `songId` int(11) NOT NULL,
+  `pattern` varchar(10) NOT NULL,
+  `userId` varchar(128) NOT NULL,
+  `voteType` enum('upvote','downvote') NOT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_pattern_vote_unique` (`songId`,`pattern`,`userId`),
+  KEY `idx_pattern_votes_songId_pattern` (`songId`,`pattern`),
+  CONSTRAINT `fk_pattern_votes_songId` FOREIGN KEY (`songId`) REFERENCES `songs` (`songId`) ON DELETE CASCADE,
+  CONSTRAINT `fk_pattern_votes_userId` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;

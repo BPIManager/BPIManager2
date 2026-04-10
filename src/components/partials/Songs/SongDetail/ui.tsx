@@ -2,8 +2,10 @@ import { useMemo } from "react";
 import { RadarSectionChart } from "@/components/partials/DashBoard/Radar/index";
 import { DifficultyBadge } from "@/components/partials/Songs/DifficultyBadge";
 import { SONG_ATTRIBUTES } from "@/constants/songAttributes";
-import type { SongListItem } from "@/types/songs/songInfo";
 import { buildRadarData } from "@/utils/songs/songListFilter";
+import type { SongListItem } from "@/types/songs/songInfo";
+
+// ---- helpers ----------------------------------------------------------------
 
 function buildTextageUrl(song: SongListItem, side: 1 | 2): string | null {
   if (!song.textage) return null;
@@ -16,6 +18,8 @@ function buildYouTubeUrl(song: SongListItem): string {
   return `https://www.youtube.com/results?search_query=${query}`;
 }
 
+// ---- SongMetaCard -----------------------------------------------------------
+
 interface SongMetaCardProps {
   song: SongListItem;
 }
@@ -27,15 +31,17 @@ export function SongMetaCard({ song }: SongMetaCardProps) {
 
   const barItems = useMemo(
     () =>
-      SONG_ATTRIBUTES.map(({ dbKey, label }) => ({
-        label,
-        value: song[dbKey as keyof SongListItem] as number | null,
-      })).sort((a, b) => (b.value ?? 0) - (a.value ?? 0)),
+      SONG_ATTRIBUTES.filter(({ dbKey }) => dbKey !== "p_scratch_complex")
+        .map(({ dbKey, label }) => ({
+          label,
+          value: song[dbKey as keyof SongListItem] as number | null,
+        }))
+        .sort((a, b) => (b.value ?? 0) - (a.value ?? 0)),
     [song],
   );
 
   const udeoshiRaw = song.p_udeoshi;
-
+  const scratchComplexRaw = song.p_scratch_complex;
   const hasAttributes = barItems.some(({ value }) => value !== null);
 
   return (
@@ -151,27 +157,43 @@ export function SongMetaCard({ song }: SongMetaCardProps) {
                 <p className="text-[10px] font-bold text-bpim-muted uppercase tracking-widest">
                   腕押し度
                 </p>
-                <div className="relative h-1.5 rounded-full bg-bpim-overlay overflow-hidden">
-                  <div className="absolute left-1/2 top-0 h-full w-px bg-bpim-border z-10 -translate-x-px" />
-                  {udeoshiRaw > 0 ? (
-                    <div
-                      className="absolute top-0 left-1/2 h-full rounded-r-full bg-bpim-primary/80"
-                      style={{ width: `${udeoshiRaw / 2}%` }}
-                    />
-                  ) : udeoshiRaw < 0 ? (
-                    <div
-                      className="absolute top-0 right-1/2 h-full rounded-l-full bg-bpim-primary/40"
-                      style={{ width: `${-udeoshiRaw / 2}%` }}
-                    />
-                  ) : null}
-                </div>
-                <div className="flex items-center justify-between text-[9px] font-bold text-bpim-muted/60">
-                  <span>← 指押し</span>
-                  <span className="font-mono text-bpim-muted">
-                    {udeoshiRaw > 0 ? "+" : ""}
-                    {Math.round(udeoshiRaw)}
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1 h-1.5 rounded-full bg-bpim-overlay overflow-hidden">
+                    <div className="absolute left-1/2 top-0 h-full w-px bg-bpim-border z-10 -translate-x-px" />
+                    {udeoshiRaw > 0 ? (
+                      <div
+                        className="absolute top-0 left-1/2 h-full rounded-r-full bg-bpim-primary/80"
+                        style={{ width: `${udeoshiRaw / 2}%` }}
+                      />
+                    ) : udeoshiRaw < 0 ? (
+                      <div
+                        className="absolute top-0 right-1/2 h-full rounded-l-full bg-bpim-primary/40"
+                        style={{ width: `${-udeoshiRaw / 2}%` }}
+                      />
+                    ) : null}
+                  </div>
+                  <span className="w-6 text-right font-mono text-[10px] text-bpim-muted">
+                    {udeoshiRaw > 0 ? "+" : ""}{Math.round(udeoshiRaw)}
                   </span>
-                  <span>腕押し →</span>
+                </div>
+              </div>
+            )}
+
+            {scratchComplexRaw !== null && (
+              <div className="flex flex-col gap-1">
+                <p className="text-[10px] font-bold text-bpim-muted uppercase tracking-widest">
+                  皿複合度
+                </p>
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1 h-1.5 rounded-full bg-bpim-overlay overflow-hidden">
+                    <div
+                      className="absolute top-0 left-0 h-full rounded-full bg-bpim-primary/70"
+                      style={{ width: `${scratchComplexRaw}%` }}
+                    />
+                  </div>
+                  <span className="w-6 text-right font-mono text-[10px] text-bpim-muted">
+                    {Math.round(scratchComplexRaw)}
+                  </span>
                 </div>
               </div>
             )}
@@ -179,7 +201,7 @@ export function SongMetaCard({ song }: SongMetaCardProps) {
         )}
       </div>
 
-      <div className="w-full sm:w-[280px] shrink-0">
+      <div className="w-full sm:w-70 shrink-0">
         {hasAttributes ? (
           <RadarSectionChart
             data={{}}
@@ -188,7 +210,7 @@ export function SongMetaCard({ song }: SongMetaCardProps) {
             songAttr
           />
         ) : (
-          <div className="flex h-[280px] items-center justify-center text-sm text-bpim-muted">
+          <div className="flex h-70 items-center justify-center text-sm text-bpim-muted">
             属性データなし
           </div>
         )}
@@ -196,3 +218,4 @@ export function SongMetaCard({ song }: SongMetaCardProps) {
     </div>
   );
 }
+

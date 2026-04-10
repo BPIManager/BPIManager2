@@ -57,6 +57,18 @@ export const SONG_ATTRIBUTES = [
     label: "トリル/デニム",
     sortLabel: "トリル・デニム",
   },
+  {
+    dbKey: "p_peak",
+    sortKey: "peak",
+    label: "ピーク",
+    sortLabel: "ピーク",
+  },
+  {
+    dbKey: "p_udeoshi",
+    sortKey: "udeoshi",
+    label: "腕押し",
+    sortLabel: "腕押し",
+  },
 ] as const satisfies readonly SongAttributeDef[];
 
 /** 属性 DB キーのユニオン型 */
@@ -76,9 +88,9 @@ export const SONG_ATTRIBUTES_GLOBAL = [
   { dbKey: "g_chord", label: "同時押し" },
   { dbKey: "g_intensity", label: "物量" },
   { dbKey: "g_delay", label: "ディレイ" },
-  { dbKey: "g_scratch_complex", label: "皿複合" },
   { dbKey: "g_tateren", label: "縦連" },
   { dbKey: "g_trill_denim", label: "トリル/デニム" },
+  { dbKey: "g_peak", label: "ピーク" },
 ] as const;
 
 export type GlobalAttrDbKey = (typeof SONG_ATTRIBUTES_GLOBAL)[number]["dbKey"];

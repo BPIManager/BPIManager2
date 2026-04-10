@@ -25,6 +25,8 @@ export interface Database {
   optimizeMemo: OptimizeMemoTable;
   songNotes: SongNotesTable;
   songNoteUpvotes: SongNoteUpvotesTable;
+  songPatterns: SongPatternsTable;
+  songPatternVotes: SongPatternVotesTable;
   // 追加: 暫定/バックアップ用テーブル
   bkScores: BkScores;
   bkUsers: BkUsers;
@@ -232,6 +234,7 @@ export interface SongAttributes {
   p_scratch_complex: Generated<number | null>;
   p_tateren: Generated<number | null>;
   p_trill_denim: Generated<number | null>;
+  p_peak: Generated<number | null>;
   // Global (絶対評価: 0-200)
   g_intensity: Generated<number | null>;
   g_scratch: Generated<number | null>;
@@ -243,6 +246,7 @@ export interface SongAttributes {
   g_scratch_complex: Generated<number | null>;
   g_tateren: Generated<number | null>;
   g_trill_denim: Generated<number | null>;
+  g_peak: Generated<number | null>;
   updatedAt: Generated<Date>;
 }
 
@@ -301,3 +305,24 @@ export type NewSongNote = Insertable<SongNotesTable>;
 export type SongNoteUpdate = Updateable<SongNotesTable>;
 export type SongNoteUpvote = Selectable<SongNoteUpvotesTable>;
 export type NewSongNoteUpvote = Insertable<SongNoteUpvotesTable>;
+
+export interface SongPatternsTable {
+  songId: number;
+  pattern: string;
+  score: number;
+}
+
+export type VoteType = "upvote" | "downvote";
+
+export interface SongPatternVotesTable {
+  id: Generated<number>;
+  songId: number;
+  pattern: string;
+  userId: string;
+  voteType: VoteType;
+  createdAt: Generated<Date>;
+}
+
+export type SongPattern = Selectable<SongPatternsTable>;
+export type SongPatternVote = Selectable<SongPatternVotesTable>;
+export type NewSongPatternVote = Insertable<SongPatternVotesTable>;

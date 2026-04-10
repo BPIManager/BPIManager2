@@ -45,7 +45,6 @@ export function useSongListFilter() {
 
   const initializedRef = useRef(false);
 
-  // 初回: router.isReady 後にURLクエリからstate初期化
   useEffect(() => {
     if (!router.isReady || initializedRef.current) return;
     initializedRef.current = true;
@@ -56,7 +55,6 @@ export function useSongListFilter() {
     setSortDir(parseSortDir(q.dir));
   }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // state変更をURLに反映 (shallow)
   useEffect(() => {
     if (!router.isReady || !initializedRef.current) return;
     const newQuery: Record<string, string> = {};
@@ -101,7 +99,7 @@ export function useSongListFilter() {
         setSortDir((d) => (d === "asc" ? "desc" : "asc"));
       } else {
         setSortKey(key);
-        setSortDir("asc");
+        setSortDir("desc");
       }
     },
     [sortKey],
