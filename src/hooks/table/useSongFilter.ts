@@ -24,7 +24,10 @@ const toFilterKey = (q: ParsedUrlQuery) => {
  * @param data - フィルタリング対象の全楽曲スコア配列
  * @returns フィルターパラメータ・更新関数・ページング情報・表示楽曲配列
  */
-export const useSongFilter = (data: SongWithScore[] | undefined) => {
+export const useSongFilter = (
+  data: SongWithScore[] | undefined,
+  defaults?: Pick<FilterParamsFrontend, "isMyPlayed" | "isRivalPlayed">,
+) => {
   const router = useRouter();
   const { query, isReady } = router;
 
@@ -49,11 +52,15 @@ export const useSongFilter = (data: SongWithScore[] | undefined) => {
       versions: q.versions ? q.versions.split(",").map(Number) : [],
       clearStates: q.clearStates ? q.clearStates.split(",") : [],
       isMyPlayed:
-        q.isMyPlayed === undefined ? undefined : q.isMyPlayed === "true",
+        q.isMyPlayed === undefined
+          ? defaults?.isMyPlayed
+          : q.isMyPlayed === "true",
       isRivalPlayed:
-        q.isRivalPlayed === undefined ? undefined : q.isRivalPlayed === "true",
+        q.isRivalPlayed === undefined
+          ? defaults?.isRivalPlayed
+          : q.isRivalPlayed === "true",
     };
-  }, [query, isReady]);
+  }, [query, isReady, defaults]);
 
   const prevFilterKey = useRef<string | null>(null);
   useEffect(() => {
@@ -85,7 +92,9 @@ export const useSongFilter = (data: SongWithScore[] | undefined) => {
       params.bpmMax !== undefined ||
       params.isSofran ||
       params.since !== undefined ||
-      params.until !== undefined;
+      params.until !== undefined ||
+      params.isMyPlayed !== undefined ||
+      params.isRivalPlayed !== undefined;
 
     if (!hasFilter) {
       return [];

@@ -36,8 +36,7 @@ export const AnalyticsComparisonTable = ({
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
 
   const { params, updateParams, page, setPage, visibleSongs, totalCount } =
-    useSongFilter(songs);
-  const withRivals = target?.kind === "rival" ? "full" : "score-only";
+    useSongFilter(songs, { isMyPlayed: true, isRivalPlayed: true });
 
   if (!fbUser) return <LoginRequiredCard />;
 
@@ -63,7 +62,7 @@ export const AnalyticsComparisonTable = ({
       )}
 
       <SongFilterBar
-        withRivals={withRivals}
+        withRivals={"full"}
         params={params}
         onParamsChange={updateParams}
         totalCount={totalCount}
