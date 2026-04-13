@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { SongWithScore } from "@/types/songs/score";
-import { useSongFilter, PAGE_SIZE } from "@/hooks/table/useSongFilter";
+import { useSongFilter } from "@/hooks/table/useSongFilter";
 import { SongFilterBar } from "../Songs/Filter/ui";
 import { SongList } from "./ui";
 import { CustomPagination } from "../Pagination/ui";
@@ -35,8 +35,8 @@ export const SongsTable = ({
     updateParams,
     page,
     setPage,
+    pageSize,
     totalCount,
-    totalPages,
     visibleSongs: rawVisible,
   } = useSongFilter(songs);
 
@@ -160,14 +160,12 @@ export const SongsTable = ({
         />
       )}
 
-      <footer className="py-2">
-        <CustomPagination
-          count={totalCount}
-          pageSize={PAGE_SIZE}
-          page={page}
-          onPageChange={setPage}
-        />
-      </footer>
+      <CustomPagination
+        count={totalCount}
+        pageSize={pageSize}
+        page={page}
+        onPageChange={setPage}
+      />
     </div>
   );
 };

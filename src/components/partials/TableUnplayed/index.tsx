@@ -84,14 +84,12 @@ export const UnplayedSongsTable = ({
         />
       )}
 
-      <footer className="py-2">
-        <CustomPagination
-          count={totalCount}
-          pageSize={PAGE_SIZE}
-          page={page}
-          onPageChange={setPage}
-        />
-      </footer>
+      <CustomPagination
+        count={totalCount}
+        pageSize={PAGE_SIZE}
+        page={page}
+        onPageChange={setPage}
+      />
     </div>
   );
 };

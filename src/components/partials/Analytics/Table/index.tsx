@@ -112,14 +112,12 @@ export const AnalyticsComparisonTable = ({
         />
       )}
 
-      <footer className="py-8 flex justify-center">
-        <CustomPagination
-          count={totalCount}
-          pageSize={PAGE_SIZE}
-          page={page}
-          onPageChange={setPage}
-        />
-      </footer>
+      <CustomPagination
+        count={totalCount}
+        pageSize={PAGE_SIZE}
+        page={page}
+        onPageChange={setPage}
+      />
     </div>
   );
 };

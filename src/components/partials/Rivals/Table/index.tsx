@@ -43,7 +43,9 @@ export const RivalSongsTable = ({
   if (!isLoading && (error || !songs)) {
     return (
       <div className="flex h-50 flex-col items-center justify-center gap-2">
-        <p className="font-bold text-bpim-danger">楽曲データの取得に失敗しました</p>
+        <p className="font-bold text-bpim-danger">
+          楽曲データの取得に失敗しました
+        </p>
         <p className="text-xs text-bpim-muted">{error?.message}</p>
       </div>
     );
@@ -102,14 +104,12 @@ export const RivalSongsTable = ({
         />
       )}
 
-      <footer className="py-8 flex justify-center">
-        <CustomPagination
-          count={totalCount}
-          pageSize={PAGE_SIZE}
-          page={page}
-          onPageChange={setPage}
-        />
-      </footer>
+      <CustomPagination
+        count={totalCount}
+        pageSize={PAGE_SIZE}
+        page={page}
+        onPageChange={setPage}
+      />
     </div>
   );
 };

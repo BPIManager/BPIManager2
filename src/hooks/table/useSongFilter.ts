@@ -1,4 +1,4 @@
-import { useMemo, useRef, useEffect } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { useRouter } from "next/router";
 import type { ParsedUrlQuery } from "querystring";
 import {
@@ -81,6 +81,14 @@ export const useSongFilter = (
 
   const page = useMemo(() => Number(query.page) || 1, [query.page]);
 
+  const [pageSize, setPageSizeState] = useState<number | null>(PAGE_SIZE);
+
+  const setPageSize = (size: number | null) => {
+    setPageSizeState(size);
+    const { page: _page, ...rest } = router.query;
+    router.replace({ query: rest }, undefined, { shallow: true });
+  };
+
   const displaySongs = useMemo(() => {
     if (!data) return [];
     const hasFilter =
@@ -118,7 +126,11 @@ export const useSongFilter = (
 
   const totalCount = displaySongs.length;
 
-  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+  const totalPages = useMemo(() => {
+    if (pageSize === null) return 1;
+    return Math.max(1, Math.ceil(totalCount / pageSize));
+  }, [totalCount, pageSize]);
+
   useEffect(() => {
     if (!isReady || totalCount === 0) return;
     if (page > totalPages) {
@@ -152,15 +164,18 @@ export const useSongFilter = (
   };
 
   const visibleSongs = useMemo(() => {
-    const startRange = (page - 1) * PAGE_SIZE;
-    return displaySongs.slice(startRange, startRange + PAGE_SIZE);
-  }, [displaySongs, page]);
+    if (pageSize === null) return displaySongs;
+    const startRange = (page - 1) * pageSize;
+    return displaySongs.slice(startRange, startRange + pageSize);
+  }, [displaySongs, page, pageSize]);
 
   return {
     params,
     updateParams,
     page,
     setPage,
+    pageSize,
+    setPageSize,
     displaySongs,
     visibleSongs,
     totalCount,
