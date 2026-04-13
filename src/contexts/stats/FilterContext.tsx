@@ -1,5 +1,10 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
-import { IIDX_LEVELS, IIDX_DIFFICULTIES } from "@/constants/diffs";
+import {
+  IIDX_LEVELS,
+  IIDX_DIFFICULTIES,
+  BPI_CALCABLE_LEVELS,
+  BPI_CALCABLE_DIFFICULTIES,
+} from "@/constants/diffs";
 import { latestVersion } from "@/constants/latestVersion";
 
 interface FilterContextType {
@@ -17,19 +22,16 @@ interface FilterContextType {
 const FilterContext = createContext<FilterContextType | undefined>(undefined);
 
 export const FilterProvider = ({ children }: { children: ReactNode }) => {
-  const [levels, setLevels] = useState<string[]>(
-    IIDX_LEVELS as unknown as string[],
-  );
-  const [diffs, setDiffs] = useState<string[]>(
-    IIDX_DIFFICULTIES as unknown as string[],
+  const [levels, setLevels] = useState<BPI_CALCABLE_LEVELS[]>(["12"]);
+  const [diffs, setDiffs] = useState<BPI_CALCABLE_DIFFICULTIES[]>(
+    IIDX_DIFFICULTIES as BPI_CALCABLE_DIFFICULTIES[],
   );
   const [version, setVersion] = useState<string>(latestVersion);
   const [compareVersion, setCompareVersion] = useState<string>("");
 
-  const toggle = (
-    curr: string[],
-    val: string,
-    set: React.Dispatch<React.SetStateAction<string[]>>,
+  const toggle = <T extends string>(
+    val: T,
+    set: React.Dispatch<React.SetStateAction<T[]>>,
   ) => {
     set((prev) =>
       prev.includes(val) ? prev.filter((i) => i !== val) : [...prev, val],
@@ -41,13 +43,14 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
     diffs,
     version,
     compareVersion,
-    toggleLevel: (val: string) => toggle(levels, val, setLevels),
-    toggleDiff: (val: string) => toggle(diffs, val, setDiffs),
+    toggleLevel: (val: string) => toggle(val as BPI_CALCABLE_LEVELS, setLevels),
+    toggleDiff: (val: string) =>
+      toggle(val as BPI_CALCABLE_DIFFICULTIES, setDiffs),
     setVersion,
     setCompareVersion,
     resetFilters: () => {
-      setLevels(IIDX_LEVELS as unknown as string[]);
-      setDiffs(IIDX_DIFFICULTIES as unknown as string[]);
+      setLevels(IIDX_LEVELS as unknown as BPI_CALCABLE_LEVELS[]);
+      setDiffs(IIDX_DIFFICULTIES as BPI_CALCABLE_DIFFICULTIES[]);
       setVersion(latestVersion);
       setCompareVersion("");
     },

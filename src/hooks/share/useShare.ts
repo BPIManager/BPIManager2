@@ -20,6 +20,7 @@ export const useShareResult = () => {
     text: string,
     captureWidth = 640,
   ): Promise<boolean> => {
+    console.log(element);
     if (!element) return false;
     setIsSharing(true);
 
@@ -52,6 +53,24 @@ export const useShareResult = () => {
         el.style.transform = "scaleY(1)";
       });
 
+      // html-to-image accesses cssRules on every stylesheet including cross-origin
+      // ones, which throws a SecurityError. Patch the prototype getter to return
+      // an empty CSSRuleList instead of throwing, then restore it afterward.
+      const cssRulesDescriptor = Object.getOwnPropertyDescriptor(
+        CSSStyleSheet.prototype,
+        "cssRules",
+      )!;
+      Object.defineProperty(CSSStyleSheet.prototype, "cssRules", {
+        get() {
+          try {
+            return cssRulesDescriptor.get!.call(this);
+          } catch {
+            return [] as unknown as CSSRuleList;
+          }
+        },
+        configurable: true,
+      });
+
       let blob: Blob | null = null;
       try {
         blob = await toBlob(element, {
@@ -61,6 +80,11 @@ export const useShareResult = () => {
           style: { margin: "0" },
         });
       } finally {
+        Object.defineProperty(
+          CSSStyleSheet.prototype,
+          "cssRules",
+          cssRulesDescriptor,
+        );
         element.setAttribute("style", originalStyle);
         if (!originalStyle) element.removeAttribute("style");
 

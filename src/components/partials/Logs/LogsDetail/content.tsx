@@ -22,7 +22,7 @@ import { BpiCalculator } from "@/lib/bpi";
 import { DistributionChart } from "../../DashBoard/DistributionChart/ui";
 import { RANK_COLORS } from "@/constants/djRankColor";
 import { getBpiColor } from "@/constants/bpiColor";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { AppTabsList, AppTabsTrigger } from "@/components/ui/complex/tabs";
 
