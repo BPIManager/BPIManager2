@@ -365,6 +365,115 @@ class StatsRepository {
   }
 
   /**
+   * 指定ユーザー・バージョンで、プレイ済みの各楽曲における全ユーザー内での順位を返す。
+   *
+   * allScores / allSongs テーブルを走査し、MySQL 8 のウィンドウ関数
+   * (RANK / COUNT) で楽曲ごとの順位と総プレイ人数を算出する。
+   *
+   * @param userId  - 対象ユーザー ID
+   * @param version - バージョン番号
+   * @returns 楽曲ごとの順位情報配列
+   */
+  async getUserSongRankings(userId: string, version: string) {
+    const rows = await db
+      .with("user_latest", (db) =>
+        db
+          .selectFrom("allScores as s")
+          .innerJoin(
+            (qb) =>
+              qb
+                .selectFrom("allScores")
+                .select(["songId", (eb) => eb.fn.max("logId").as("maxLogId")])
+                .where("userId", "=", userId)
+                .where("version", "=", version)
+                .groupBy("songId")
+                .as("m"),
+            (join) => join.onRef("m.maxLogId", "=", "s.logId"),
+          )
+          .where("s.userId", "=", userId)
+          .select([
+            "s.songId",
+            "s.logId",
+            "s.exScore",
+            "s.bpi",
+            "s.clearState",
+            "s.missCount",
+            "s.lastPlayed",
+          ]),
+      )
+      .with("per_song_latest", (db) =>
+        db
+          .selectFrom("allScores as s")
+          .innerJoin(
+            (qb) =>
+              qb
+                .selectFrom("allScores")
+                .select([
+                  "userId",
+                  "songId",
+                  (eb) => eb.fn.max("logId").as("maxLogId"),
+                ])
+                .where("version", "=", version)
+                .groupBy(["userId", "songId"])
+                .as("m"),
+            (join) =>
+              join
+                .onRef("m.maxLogId", "=", "s.logId")
+                .onRef("m.userId", "=", "s.userId")
+                .onRef("m.songId", "=", "s.songId"),
+          )
+          .select((eb) => [
+            "s.userId",
+            "s.songId",
+            "s.exScore",
+            eb.fn
+              .agg<number>("rank", [])
+              .over((ob) =>
+                ob.partitionBy("s.songId").orderBy("s.exScore", "desc"),
+              )
+              .as("rnk"),
+            eb.fn
+              .countAll<number>()
+              .over((ob) => ob.partitionBy("s.songId"))
+              .as("totalPlayers"),
+          ]),
+      )
+      .selectFrom("user_latest as ul")
+      .innerJoin("per_song_latest as psl", (join) =>
+        join
+          .onRef("psl.songId", "=", "ul.songId")
+          .on("psl.userId", "=", userId),
+      )
+      .innerJoin("allSongs as sg", "sg.songId", "ul.songId")
+      .select((eb) => [
+        "ul.songId",
+        "sg.title",
+        "sg.notes",
+        "sg.bpm",
+        "sg.difficulty",
+        "sg.difficultyLevel",
+        "sg.releasedVersion",
+        "ul.logId",
+        "ul.exScore",
+        "ul.bpi",
+        "ul.clearState",
+        "ul.missCount",
+        "ul.lastPlayed",
+        eb.ref("psl.rnk").as("rank"),
+        "psl.totalPlayers",
+      ])
+      .orderBy("psl.rnk", "asc")
+      .execute();
+
+    return rows.map((r) => ({
+      ...r,
+      rank: Number(r.rank),
+      totalPlayers: Number(r.totalPlayers),
+      bpi: r.bpi !== null && r.bpi !== undefined ? Number(r.bpi) : null,
+    }));
+  }
+
+  /**
    * 指定バージョン・レベル・難易度に該当する全楽曲の `title___difficulty` キー集合を返す。
    * レーダーチャートの未プレイ曲フィルタリングに使用する。
    */

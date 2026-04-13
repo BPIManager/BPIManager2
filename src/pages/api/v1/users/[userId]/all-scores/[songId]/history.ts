@@ -23,7 +23,7 @@ export default async function handler(
 
     return res
       .status(200)
-      .json(allScoresRepo.getScoreHistory(userId as string, songId as string));
+      .json(await allScoresRepo.getScoreHistory(userId as string, songId as string));
   } catch (error: unknown) {
     const errorMessage =
       error instanceof Error ? error.message : "Internal Server Error";

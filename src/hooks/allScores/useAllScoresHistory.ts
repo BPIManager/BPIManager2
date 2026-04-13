@@ -21,7 +21,7 @@ export const useAllScoreHistory = (
 
   const { data, error, isLoading } = useSWR<SongHistoryResponse>(
     enabled && userId && songId
-      ? [`${API_PREFIX}/users/${userId}/scores/${songId}/history`, fbUser]
+      ? [`${API_PREFIX}/users/${userId}/all-scores/${songId}/history`, fbUser]
       : null,
     fetcher,
   );

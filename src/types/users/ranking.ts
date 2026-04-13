@@ -32,3 +32,25 @@ export interface SongRankingResponse {
   totalCount: number;
   selfRank: number;
 }
+
+export interface SongRankEntry {
+  songId: number;
+  title: string;
+  notes: number;
+  bpm: string;
+  difficulty: string;
+  difficultyLevel: number;
+  releasedVersion: string | null;
+  logId: number;
+  exScore: number;
+  bpi: number | null;
+  clearState: string | null;
+  missCount: number | null;
+  lastPlayed: string;
+  rank: number;
+  totalPlayers: number;
+}
+
+export interface UserSongRankingsResponse {
+  songs: SongRankEntry[];
+}

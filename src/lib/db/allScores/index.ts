@@ -256,10 +256,10 @@ class allScoresRepository {
   async getScoreHistory(userId: string, songId: string) {
     const history = await db
       .selectFrom("allScores")
-      .selectAll()
       .where("userId", "=", userId as string)
       .where("songId", "=", Number(songId))
       .orderBy("lastPlayed", "desc")
+      .selectAll()
       .execute();
 
     return history.reduce(
