@@ -17,7 +17,13 @@ import {
 import { SectionLoader } from "@/components/ui/loading-spinner";
 import { useAllScoreHistory } from "@/hooks/allScores/useAllScoresHistory";
 
-export const AllSongHistoryTab = ({ songId }: { songId: number }) => {
+export const AllSongHistoryTab = ({
+  songId,
+  notes,
+}: {
+  songId: number;
+  notes: number;
+}) => {
   const { fbUser } = useUser();
   const { historyGroups, isLoading, isError } = useAllScoreHistory(
     fbUser?.uid,
@@ -126,6 +132,8 @@ export const AllSongHistoryTab = ({ songId }: { songId: number }) => {
                           {record.exScore}
                         </span>
                         <span className="font-mono text-[10px] font-medium text-bpim-muted mt-0.5">
+                          {((record.exScore / (notes * 2)) * 100).toFixed(1)}%
+                          {"  "}
                           {record.clearState || "NO PLAY"}
                         </span>
                       </div>

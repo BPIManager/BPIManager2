@@ -21,7 +21,7 @@ const diffLabel: Record<string, string> = {
   LEGGENDARIA: "L",
 };
 
-import RivalsRanking from "@/components/partials/Modal/BPIChart/Rivals";
+import AllSongsRivalsRanking from "@/components/partials/AllSongs/Modal/Rivals";
 import { AllSongWithScore } from "@/types/songs/allSongs";
 import { AllSongHistoryTab } from "./History";
 
@@ -122,23 +122,11 @@ export const AllSongDetailModal = ({
             </AppTabsList>
 
             <TabsContent value="history" className="mt-0 outline-none">
-              <AllSongHistoryTab songId={song.songId} />
+              <AllSongHistoryTab songId={song.songId} notes={song.notes} />
             </TabsContent>
 
             <TabsContent value="rivals" className="mt-0 outline-none">
-              <RivalsRanking
-                song={
-                  {
-                    ...song,
-                    bpi: null,
-                    wrScore: null,
-                    kaidenAvg: null,
-                    coef: null,
-                    scoreAt: song.lastPlayed,
-                    logId: song.logId,
-                  } as any
-                }
-              />
+              <AllSongsRivalsRanking song={song} />
             </TabsContent>
           </Tabs>
         </div>

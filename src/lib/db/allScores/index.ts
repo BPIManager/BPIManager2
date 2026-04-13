@@ -150,6 +150,103 @@ class allScoresRepository {
   }
 
   /**
+   * 指定楽曲におけるフォロー中ユーザーの最新スコアリストを取得（allScores テーブル使用）
+   */
+  async getRivalScoresForAllSong(params: {
+    viewerId: string;
+    songId: number;
+    version: string;
+  }) {
+    const { viewerId, songId, version } = params;
+
+    return await db
+      .selectFrom("follows as f")
+      .innerJoin("users as u", "f.followingId", "u.userId")
+      .innerJoin("allScores as s", "u.userId", "s.userId")
+      .innerJoin("allSongs as m", "s.songId", "m.songId")
+      .select([
+        "u.userId",
+        "u.userName",
+        "u.profileImage",
+        "s.exScore",
+        "s.bpi",
+        "s.clearState",
+        "s.lastPlayed",
+        "s.logId",
+        "m.title",
+        "m.difficulty",
+        "m.notes",
+      ])
+      .where("f.followerId", "=", viewerId)
+      .where("s.songId", "=", songId)
+      .where("s.version", "=", version)
+      .where("u.isPublic", "=", 1)
+      .where("s.logId", "in", (eb) =>
+        eb
+          .selectFrom("allScores as s2")
+          .select((subEb) => subEb.fn.max("logId").as("logId"))
+          .where("s2.songId", "=", songId)
+          .where("s2.version", "=", version)
+          .groupBy("s2.userId"),
+      )
+      .orderBy("s.exScore", "desc")
+      .execute();
+  }
+
+  /**
+   * 指定楽曲のグローバルランキングを取得する（allScores テーブル使用）
+   *
+   * @param songId - 楽曲 ID
+   * @param version - バージョン番号
+   * @param viewerId - 閲覧者のユーザー ID（自分自身の判定に使用）
+   */
+  async getAllSongRanking(songId: number, version: string, viewerId: string) {
+    const rows = await db
+      .selectFrom("allScores as s")
+      .innerJoin("users as u", "s.userId", "u.userId")
+      .innerJoin(
+        (qb) =>
+          qb
+            .selectFrom("allScores")
+            .select(["userId", (eb) => eb.fn.max("logId").as("maxLogId")])
+            .where("songId", "=", songId)
+            .where("version", "=", version)
+            .groupBy("userId")
+            .as("latest"),
+        (join) => join.onRef("latest.maxLogId", "=", "s.logId"),
+      )
+      .select([
+        "s.userId",
+        "u.userName",
+        "u.profileImage",
+        "u.isPublic",
+        "s.exScore",
+        "s.bpi",
+      ])
+      .where("s.songId", "=", songId)
+      .orderBy("s.exScore", "desc")
+      .execute();
+
+    const rankings = rows.map((r, i) => ({
+      rank: i + 1,
+      userId: r.isPublic ? r.userId : `anon-${i}`,
+      userName: r.isPublic ? r.userName : "-",
+      profileImage: r.isPublic ? r.profileImage : null,
+      exScore: r.exScore,
+      bpi: r.bpi !== null && r.bpi !== undefined ? Number(r.bpi) : null,
+      isSelf: r.userId === viewerId,
+    }));
+
+    const selfEntry = rankings.find((r) => r.isSelf);
+
+    return {
+      rankings,
+      totalCount: rankings.length,
+      selfRank: selfEntry?.rank ?? 0,
+    };
+  }
+
+  /**
    * 指定楽曲のスコア履歴をバージョンごとにグループ化して取得する。
    *
    * @param userId - ユーザー ID
