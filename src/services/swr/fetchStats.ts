@@ -8,6 +8,7 @@ interface StatsParams {
   version: string;
   levels: string[];
   difficulties: string[];
+  step?: number;
 }
 
 function buildStatsUrl(
@@ -16,10 +17,12 @@ function buildStatsUrl(
   version: string,
   levels: string[],
   difficulties: string[],
+  step?: number,
 ): string {
   const params = new URLSearchParams({ version });
   levels.forEach((l) => params.append("level", l));
   difficulties.forEach((d) => params.append("difficulty", d));
+  if (step !== undefined) params.set("step", String(step));
   return `${API_PREFIX}/users/${userId}/stats/${endpoint}?${params.toString()}`;
 }
 
@@ -29,7 +32,7 @@ interface UseStatsDataOptions extends SWRConfiguration {
 
 export function useStatsData<T>(
   endpoint: string,
-  { userId, version, levels, difficulties }: StatsParams,
+  { userId, version, levels, difficulties, step }: StatsParams,
   { requireLevels = true, ...swrOptions }: UseStatsDataOptions = {},
 ) {
   const { fbUser } = useUser();
@@ -37,7 +40,7 @@ export function useStatsData<T>(
   const shouldFetch = userId && version && (requireLevels ? hasLevels : true);
 
   const key = shouldFetch
-    ? [buildStatsUrl(userId, endpoint, version, levels, difficulties), fbUser]
+    ? [buildStatsUrl(userId, endpoint, version, levels, difficulties, step), fbUser]
     : null;
 
   return useSWR<T>(key, fetcher, swrOptions);

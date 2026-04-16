@@ -2,11 +2,22 @@ import { useState } from "react";
 import { DistributionChartSkeleton } from "@/components/partials/DashBoard/DistributionChart/skeleton";
 import { DashCard } from "@/components/ui/dashcard";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useChartColors } from "@/hooks/common/useChartColors";
 import type { ChartData } from "@/types/ui/chart";
-import { PieChart, Pie, Tooltip, ResponsiveContainer } from "recharts";
-import { BarChart2, PieChartIcon } from "lucide-react";
+import {
+  PieChart,
+  Pie,
+  Tooltip as RechartsTooltip,
+  ResponsiveContainer,
+} from "recharts";
+import { BarChart2, PieChartIcon, ZoomIn, ZoomOut } from "lucide-react";
 
 const animationStyles = `
   @keyframes bounceGrow {
@@ -26,6 +37,21 @@ interface DistributionChartProps {
   myName?: string;
   rivalName?: string;
   skeletonCount?: number;
+  step?: number;
+  onStepFiner?: () => void;
+  onStepCoarser?: () => void;
+  canStepFiner?: boolean;
+  canStepCoarser?: boolean;
+}
+
+function tooltipHeader(label: string, step?: number): string {
+  if (step === undefined) return label;
+  if (label === "<-10") return "BPI < -10";
+  if (label === "100+") return "BPI 100+";
+  const from = parseInt(label, 10);
+  if (isNaN(from)) return label;
+  const to = from + step;
+  return `BPI ${from} 〜 ${to >= 100 ? "100+" : to}`;
 }
 
 const ChartBarUnit = ({
@@ -35,8 +61,15 @@ const ChartBarUnit = ({
   maxCount,
   color,
   index,
+  totalCount,
   primaryColor,
   warningColor,
+  showLabel,
+  showCount,
+  step,
+  myName,
+  rivalName,
+  dense = false,
 }: {
   label: string;
   myCount: number;
@@ -44,81 +77,122 @@ const ChartBarUnit = ({
   maxCount: number;
   color: string;
   index: number;
+  totalCount: number;
   primaryColor: string;
   warningColor: string;
+  showLabel: boolean;
+  showCount: boolean;
+  step?: number;
+  myName: string;
+  rivalName: string;
+  dense?: boolean;
 }) => {
+  const [open, setOpen] = useState(false);
   const hasRival = rivalCount !== undefined;
   const myHeight = `${(myCount / maxCount) * 100}%`;
   const rivalHeight = hasRival ? `${(rivalCount! / maxCount) * 100}%` : "0%";
+  const animDelay = `${Math.min((index / totalCount) * 0.5, 0.5)}s`;
 
   return (
-    <div className="flex h-[180px] min-w-0 max-w-[60px] flex-1 flex-col items-stretch gap-0">
-      <div className="relative h-[150px] w-full">
+    <Tooltip open={open} onOpenChange={setOpen}>
+      <TooltipTrigger asChild>
         <div
           className={cn(
-            "absolute bottom-[25px] left-0 right-0 flex h-[100px] items-end justify-center",
-            hasRival ? "gap-[2px]" : "gap-0",
+            "flex h-[180px] cursor-default flex-col items-stretch gap-0",
+            dense
+              ? "min-w-[6px] flex-none"
+              : "min-w-0 max-w-[60px] flex-1",
           )}
+          onMouseEnter={() => setOpen(true)}
+          onMouseLeave={() => setOpen(false)}
+          onTouchStart={(e) => {
+            e.preventDefault();
+            setOpen((o) => !o);
+          }}
         >
-          <div className="relative flex h-full flex-1 min-w-0 flex-col justify-end">
-            <span
+          <div className="relative h-[150px] w-full">
+            <div
               className={cn(
-                "whitespace-nowrap text-[10px] font-bold text-bpim-primary",
-                myCount > 0 ? "visible" : "hidden",
-                hasRival
-                  ? "absolute bottom-[calc(100%+2px)] left-1/2 -translate-x-1/2"
-                  : "relative mb-[2px] w-full text-center",
+                "absolute bottom-[25px] left-0 right-0 flex h-[100px] items-end justify-center",
+                hasRival ? "gap-[2px]" : "gap-0",
               )}
             >
-              {myCount}
-            </span>
-            <div
-              data-capture-no-anim=""
-              className="w-full origin-bottom rounded-t-[2px] opacity-90 animate-[bounceGrow_0.6s_ease-out_both]"
-              style={{
-                height: myHeight,
-                backgroundColor: color,
-                borderTop: `2px solid ${primaryColor}`,
-                animationDelay: `${index * 0.04}s`,
-              }}
-            />
+              <div className="relative flex h-full flex-1 min-w-0 flex-col justify-end">
+                {showCount && (
+                  <span
+                    className={cn(
+                      "whitespace-nowrap text-[10px] font-bold text-bpim-primary",
+                      myCount > 0 ? "visible" : "hidden",
+                      hasRival
+                        ? "absolute bottom-[calc(100%+2px)] left-1/2 -translate-x-1/2"
+                        : "relative mb-[2px] w-full text-center",
+                    )}
+                  >
+                    {myCount}
+                  </span>
+                )}
+                <div
+                  data-capture-no-anim=""
+                  className="w-full origin-bottom rounded-t-[2px] opacity-90 animate-[bounceGrow_0.6s_ease-out_both]"
+                  style={{
+                    height: myHeight,
+                    backgroundColor: color,
+                    borderTop: `2px solid ${primaryColor}`,
+                    animationDelay: animDelay,
+                  }}
+                />
+              </div>
+
+              {hasRival && (
+                <div className="relative flex h-full flex-1 min-w-0 flex-col justify-end">
+                  <div
+                    data-capture-no-anim=""
+                    className="w-full origin-bottom rounded-t-[2px] opacity-45 animate-[bounceGrow_0.6s_ease-out_both]"
+                    style={{
+                      height: rivalHeight,
+                      backgroundColor: color,
+                      borderTop: `2px solid ${warningColor}`,
+                      animationDelay: animDelay,
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+
+            {hasRival && showCount && (
+              <span
+                className={cn(
+                  "absolute bottom-[5px] left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] font-bold text-bpim-warning",
+                  rivalCount! > 0 ? "visible" : "hidden",
+                )}
+              >
+                {rivalCount}
+              </span>
+            )}
           </div>
 
-          {hasRival && (
-            <div className="relative flex h-full flex-1 min-w-0 flex-col justify-end">
-              <div
-                data-capture-no-anim=""
-                className="w-full origin-bottom rounded-t-[2px] opacity-45 animate-[bounceGrow_0.6s_ease-out_both]"
-                style={{
-                  height: rivalHeight,
-                  backgroundColor: color,
-                  borderTop: `2px solid ${warningColor}`,
-                  animationDelay: `${index * 0.04 + 0.02}s`,
-                }}
-              />
-            </div>
-          )}
-        </div>
-
-        {hasRival && (
-          <span
-            className={cn(
-              "absolute bottom-[5px] left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] font-bold text-bpim-warning",
-              rivalCount! > 0 ? "visible" : "hidden",
+          <div className="h-[1px] w-full bg-bpim-overlay/60" />
+          <div className="flex h-[30px] justify-center">
+            {showLabel && (
+              <span className="mt-2 whitespace-nowrap text-[10px] font-bold text-bpim-muted">
+                {label}
+              </span>
             )}
-          >
-            {rivalCount}
+          </div>
+        </div>
+      </TooltipTrigger>
+      <TooltipContent side="top" className="flex flex-col gap-0.5">
+        <span className="font-bold">{tooltipHeader(label, step)}</span>
+        <span style={{ color: primaryColor }}>
+          {myName}: {myCount}
+        </span>
+        {hasRival && (
+          <span style={{ color: warningColor }}>
+            {rivalName}: {rivalCount}
           </span>
         )}
-      </div>
-
-      <div className="h-[1px] w-full bg-bpim-overlay/60" />
-      <div className="flex h-[30px] justify-center">
-        <span className="mt-2 whitespace-nowrap text-[10px] font-bold text-bpim-muted">
-          {label}
-        </span>
-      </div>
-    </div>
+      </TooltipContent>
+    </Tooltip>
   );
 };
 
@@ -176,7 +250,7 @@ const DistributionPie = ({
             startAngle={90}
             endAngle={-270}
           />
-          <Tooltip content={<PieTooltipContent total={total} />} />
+          <RechartsTooltip content={<PieTooltipContent total={total} />} />
         </PieChart>
       </ResponsiveContainer>
       <span className="text-xs font-bold" style={{ color: labelColor }}>
@@ -195,6 +269,11 @@ export const DistributionChart = ({
   myName = "自分",
   rivalName = "ライバル",
   skeletonCount = 10,
+  step,
+  onStepFiner,
+  onStepCoarser,
+  canStepFiner = false,
+  canStepCoarser = false,
 }: DistributionChartProps) => {
   const c = useChartColors();
   const [chartType, setChartType] = useState<"bar" | "pie">("bar");
@@ -231,6 +310,33 @@ export const DistributionChart = ({
               </div>
             </div>
           )}
+          {step !== undefined && (
+            <div className="flex items-center rounded-md border border-bpim-border">
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={onStepCoarser}
+                disabled={!canStepCoarser}
+                className="rounded-r-none border-r border-bpim-border"
+                title="分解能を下げる"
+              >
+                <ZoomOut />
+              </Button>
+              <span className="px-2 text-xs font-bold text-bpim-muted tabular-nums">
+                {step}
+              </span>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={onStepFiner}
+                disabled={!canStepFiner}
+                className="rounded-l-none border-l border-bpim-border"
+                title="分解能を上げる"
+              >
+                <ZoomIn />
+              </Button>
+            </div>
+          )}
           <div className="flex items-center rounded-md border border-bpim-border">
             <Button
               variant="ghost"
@@ -261,21 +367,45 @@ export const DistributionChart = ({
       </div>
 
       {chartType === "bar" ? (
-        <div className="flex items-start justify-between gap-1 px-1">
-          {myData.map((item, i) => (
-            <ChartBarUnit
-              key={item.label}
-              label={item.label}
-              myCount={item.count}
-              rivalCount={rivalMap?.get(item.label)}
-              maxCount={maxCount}
-              color={getColor(item.label)}
-              index={i}
-              primaryColor={c.primary}
-              warningColor={c.warning}
-            />
-          ))}
-        </div>
+        <TooltipProvider>
+          <div
+            className={cn(
+              "px-1",
+              myData.length > 30
+                ? "flex items-start overflow-x-auto gap-0"
+                : "flex items-start justify-between gap-1",
+            )}
+          >
+            {myData.map((item, i) => {
+              const numVal = parseFloat(item.label);
+              const showLabel =
+                item.label === "<-10" ||
+                item.label === "100+" ||
+                (!isNaN(numVal) && numVal % 10 === 0);
+              const showCount = !step || step >= 5;
+              return (
+                <ChartBarUnit
+                  key={item.label}
+                  label={item.label}
+                  myCount={item.count}
+                  rivalCount={rivalMap?.get(item.label)}
+                  maxCount={maxCount}
+                  color={getColor(item.label)}
+                  index={i}
+                  totalCount={myData.length}
+                  primaryColor={c.primary}
+                  warningColor={c.warning}
+                  showLabel={showLabel}
+                  showCount={showCount}
+                  step={step}
+                  myName={myName}
+                  rivalName={rivalName}
+                  dense={myData.length > 30}
+                />
+              );
+            })}
+          </div>
+        </TooltipProvider>
       ) : (
         <div className="flex items-start justify-center gap-2">
           <DistributionPie

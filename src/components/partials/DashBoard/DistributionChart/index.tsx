@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { useDjRankDistribution } from "@/hooks/stats/useDJRankDistribution";
 import { useBPIDistribution } from "@/hooks/stats/useBPIDistribution";
@@ -9,6 +10,9 @@ import type { DistributionSectionProps } from "@/types/ui/distribution";
 import { ChartData } from "@/types/ui/chart";
 import { getVersionNameFromNumber } from "@/constants/versions";
 
+const BPI_STEP_OPTIONS = [10, 5, 2, 1] as const;
+type BpiStep = (typeof BPI_STEP_OPTIONS)[number];
+
 export const DistributionSection = ({
   type,
   myUserId,
@@ -18,29 +22,51 @@ export const DistributionSection = ({
 }: DistributionSectionProps) => {
   const { levels, diffs, version, compareVersion } = useStatsFilter();
   const c = useChartColors();
+  const [bpiStep, setBpiStep] = useState<BpiStep>(10);
 
   const isCompareMode = !rivalUserId && !!compareVersion;
-  const effectiveRivalUserId = rivalUserId ?? (isCompareMode ? myUserId : undefined);
+  const effectiveRivalUserId =
+    rivalUserId ?? (isCompareMode ? myUserId : undefined);
   const effectiveRivalVersion = rivalUserId ? version : compareVersion;
   const effectiveRivalName = rivalUserId
     ? rivalName
     : getVersionNameFromNumber(compareVersion);
 
-  const useDistHook =
-    type === "rank" ? useDjRankDistribution : useBPIDistribution;
+  const isBpi = type === "bpi";
 
-  const { distribution: myDist, isLoading: myLoading } = useDistHook(
-    myUserId,
-    levels,
-    diffs,
-    version,
-  );
-  const { distribution: rivalDist, isLoading: rivalLoading } = useDistHook(
-    effectiveRivalUserId,
-    levels,
-    diffs,
-    effectiveRivalVersion,
-  );
+  const { distribution: myRankDist, isLoading: myRankLoading } =
+    useDjRankDistribution(isBpi ? undefined : myUserId, levels, diffs, version);
+  const { distribution: rivalRankDist, isLoading: rivalRankLoading } =
+    useDjRankDistribution(
+      isBpi ? undefined : effectiveRivalUserId,
+      levels,
+      diffs,
+      effectiveRivalVersion,
+    );
+
+  const { distribution: myBpiDist, isLoading: myBpiLoading } =
+    useBPIDistribution(
+      isBpi ? myUserId : undefined,
+      levels,
+      diffs,
+      version,
+      bpiStep,
+    );
+  const { distribution: rivalBpiDist, isLoading: rivalBpiLoading } =
+    useBPIDistribution(
+      isBpi ? effectiveRivalUserId : undefined,
+      levels,
+      diffs,
+      effectiveRivalVersion,
+      bpiStep,
+    );
+
+  const myDist = isBpi ? myBpiDist : myRankDist;
+  const rivalDist = isBpi ? rivalBpiDist : rivalRankDist;
+  const myLoading = isBpi ? myBpiLoading : myRankLoading;
+  const rivalLoading = isBpi ? rivalBpiLoading : rivalRankLoading;
+
+  const bpiSkeletonCount = Math.floor(110 / bpiStep) + 2;
 
   const config = {
     rank: {
@@ -51,9 +77,19 @@ export const DistributionSection = ({
     bpi: {
       title: "BPI分布",
       getColor: (label: string) => getBpiColorFromTheme(label, c),
-      skeletonCount: 13,
+      skeletonCount: bpiSkeletonCount,
     },
   }[type];
+
+  const handleStepFiner = () => {
+    const idx = BPI_STEP_OPTIONS.indexOf(bpiStep);
+    if (idx < BPI_STEP_OPTIONS.length - 1)
+      setBpiStep(BPI_STEP_OPTIONS[idx + 1]);
+  };
+  const handleStepCoarser = () => {
+    const idx = BPI_STEP_OPTIONS.indexOf(bpiStep);
+    if (idx > 0) setBpiStep(BPI_STEP_OPTIONS[idx - 1]);
+  };
 
   const isLoading = myLoading || (!!effectiveRivalUserId && rivalLoading);
   if (isLoading) {
@@ -80,6 +116,13 @@ export const DistributionSection = ({
       getColor={config.getColor}
       myName={myName}
       rivalName={effectiveRivalName}
+      step={isBpi ? bpiStep : undefined}
+      onStepFiner={isBpi ? handleStepFiner : undefined}
+      onStepCoarser={isBpi ? handleStepCoarser : undefined}
+      canStepFiner={
+        isBpi && BPI_STEP_OPTIONS.indexOf(bpiStep) < BPI_STEP_OPTIONS.length - 1
+      }
+      canStepCoarser={isBpi && BPI_STEP_OPTIONS.indexOf(bpiStep) > 0}
     />
   );
 };

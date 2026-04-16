@@ -3,11 +3,28 @@ import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { statsRepo } from "@/lib/db/stats";
 import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
 
+const VALID_STEPS = [1, 2, 5, 10] as const;
+type ValidStep = (typeof VALID_STEPS)[number];
+
+function buildBuckets(step: ValidStep) {
+  const buckets: { label: string; count: number }[] = [];
+  buckets.push({ label: "<-10", count: 0 });
+  for (let v = -10; v < 100; v += step) {
+    buckets.push({ label: v.toString(), count: 0 });
+  }
+  buckets.push({ label: "100+", count: 0 });
+  return buckets;
+}
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
   const { userId, version, levels, difficulties } = parseStatsQuery(req.query);
+  const rawStep = Number(req.query.step ?? 10);
+  const step: ValidStep = (VALID_STEPS.includes(rawStep as ValidStep)
+    ? rawStep
+    : 10) as ValidStep;
 
   try {
     const access = await checkUserAccess(req, userId);
@@ -18,11 +35,7 @@ export default async function handler(
       version,
     );
 
-    const buckets = [-15, -10, 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
-    const distribution = buckets.map((val) => ({
-      label: val === 100 ? "100+" : val.toString(),
-      count: 0,
-    }));
+    const distribution = buildBuckets(step);
 
     scores.forEach((s) => {
       if (!s.exScore || s.exScore <= 0) return;
@@ -36,10 +49,13 @@ export default async function handler(
 
       const bpi = s.bpi ?? -15;
       let idx: number;
-      if (bpi < -10) idx = 0;
-      else if (bpi < 0) idx = 1;
-      else if (bpi >= 100) idx = buckets.length - 1;
-      else idx = Math.floor(bpi / 10) + 2;
+      if (bpi < -10) {
+        idx = 0;
+      } else if (bpi >= 100) {
+        idx = distribution.length - 1;
+      } else {
+        idx = Math.floor((bpi - -10) / step) + 1;
+      }
 
       if (distribution[idx]) distribution[idx].count++;
     });
