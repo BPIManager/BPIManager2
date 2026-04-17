@@ -234,7 +234,7 @@ const BPI_SEGMENTS = [
 ];
 
 const BPI_MILESTONES = [
-  { bpi: -15, label: "十段平均", color: "#718096" },
+  { bpi: -15, label: "", color: "#718096" },
   { bpi: 0, label: "皆伝平均(約2699位)", color: "#63B3ED" },
   { bpi: 50, label: "約50位", color: "#48BB78" },
   { bpi: 100, label: "歴代全一", color: "#ff00ff" },
