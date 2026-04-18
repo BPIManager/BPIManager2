@@ -78,16 +78,16 @@ export const UserProfileLayout = ({
               />
             )}
 
-            <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
-              <aside className="lg:col-span-1">
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+              <div>
                 <ProfileSideBar
                   profile={profile}
                   onFollowToggle={toggleFollow}
                   isUpdating={isUpdating}
                 />
-              </aside>
+              </div>
 
-              <div className="lg:col-span-3">
+              <div className="lg:col-span-2">
                 <Tabs value={currentTab} className="w-full">
                   <AppTabsList visual="card" cols={4} className="mb-4 mx-auto">
                     {[

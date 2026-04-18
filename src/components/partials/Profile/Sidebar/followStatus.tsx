@@ -41,7 +41,7 @@ export const FollowSection = ({
           className={cn("w-full rounded-full font-bold h-9", className)}
         >
           <Settings2 className="mr-2 h-4 w-4" />
-          プロフィール編集
+          編集
         </Button>
         <AccountSettings
           isOpen={isSettingsOpen}
@@ -60,7 +60,7 @@ export const FollowSection = ({
       ) : (
         <Plus className="mr-2 h-4 w-4" />
       )}
-      {relationship.isFollowing ? "フォロー中" : "フォローする"}
+      {relationship.isFollowing ? "フォロー中" : "フォロー"}
     </>
   );
 
