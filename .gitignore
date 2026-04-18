@@ -46,3 +46,6 @@ certificates
 public/data/
 .claude/
 .claude/settings.local.json
+
+
+examples/
