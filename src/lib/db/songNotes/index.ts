@@ -1,6 +1,18 @@
 import { db } from "@/lib/db";
 import { sql } from "kysely";
 
+export interface RecentNoteRow {
+  id: number;
+  songId: number;
+  songTitle: string;
+  difficulty: string;
+  difficultyLevel: number;
+  body: string;
+  authorTotalBpi: number | null;
+  upvoteCount: number;
+  createdAt: Date;
+}
+
 export interface SongNoteRow {
   id: number;
   body: string;
@@ -131,6 +143,63 @@ class SongNotesRepository {
       .where("id", "=", noteId)
       .executeTakeFirst();
     return row !== undefined;
+  }
+
+  async getRecentNotes(
+    sort: "upvotes" | "latest",
+    limit = 20,
+    offset = 0,
+  ): Promise<RecentNoteRow[]> {
+    let query = db
+      .selectFrom("songNotes as sn")
+      .innerJoin("songs as s", "s.songId", "sn.songId")
+      .select([
+        "sn.id",
+        "sn.songId",
+        "s.title as songTitle",
+        "s.difficulty",
+        "s.difficultyLevel",
+        "sn.body",
+        "sn.createdAt",
+      ])
+      .select((eb) => [
+        eb
+          .selectFrom("userStatusLogs as usl")
+          .select("usl.totalBpi")
+          .whereRef("usl.userId", "=", "sn.userId")
+          .orderBy("usl.id", "desc")
+          .limit(1)
+          .as("authorTotalBpi"),
+        sql<number>`(SELECT COUNT(*) FROM songNoteUpvotes WHERE noteId = sn.id)`.as(
+          "upvoteCount",
+        ),
+      ])
+      .limit(limit)
+      .offset(offset);
+
+    if (sort === "upvotes") {
+      query = query.orderBy(
+        sql`(SELECT COUNT(*) FROM songNoteUpvotes WHERE noteId = sn.id)`,
+        "desc",
+      );
+    } else {
+      query = query.orderBy("sn.createdAt", "desc");
+    }
+
+    const rows = await query.execute();
+
+    return rows.map((r) => ({
+      id: r.id,
+      songId: r.songId,
+      songTitle: r.songTitle,
+      difficulty: r.difficulty,
+      difficultyLevel: r.difficultyLevel,
+      body: r.body,
+      authorTotalBpi:
+        r.authorTotalBpi !== null ? Number(r.authorTotalBpi) : null,
+      upvoteCount: Number(r.upvoteCount),
+      createdAt: r.createdAt,
+    }));
   }
 
   private async countUpvotes(noteId: number): Promise<number> {
