@@ -9,8 +9,8 @@ export type CsvType =
   | "unknown";
 
 const REFLUX_HEADER_MARKER = "title\tType\tLabel\t";
-const RIZALTO_HEADER_MARKER_1 = "バージョン";
-const RIZALTO_HEADER_MARKER_2 = "曲名";
+const RESULT_TECHO_HEADER_MARKER_1 = "バージョン";
+const RESULT_TECHO_HEADER_MARKER_2 = "曲名";
 const OFFICIAL_HEADER_MARKER = "タイトル";
 
 /**
@@ -22,8 +22,8 @@ export const detectCsvType = (text: string): CsvType => {
   if (firstLine.startsWith(REFLUX_HEADER_MARKER)) return "reflux";
 
   if (
-    firstLine.includes(RIZALTO_HEADER_MARKER_1) &&
-    firstLine.includes(RIZALTO_HEADER_MARKER_2)
+    firstLine.includes(RESULT_TECHO_HEADER_MARKER_1) &&
+    firstLine.includes(RESULT_TECHO_HEADER_MARKER_2)
   )
     return "result_techo";
 
