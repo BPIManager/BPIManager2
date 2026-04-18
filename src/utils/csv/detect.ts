@@ -3,7 +3,7 @@
  */
 
 export type CsvType =
-  | "official" // 公式INFINITAS CSV
+  | "official" // 公式CSV
   | "reflux" // Reflux TSV
   | "result_techo" // リザルト手帳 CSV
   | "unknown";
