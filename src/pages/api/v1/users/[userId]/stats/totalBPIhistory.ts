@@ -1,5 +1,6 @@
 import { BpiCalculator } from "@/lib/bpi";
 import { statsRepo } from "@/lib/db/stats";
+import dayjs from "@/lib/dayjs";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
 import type { NextApiRequest, NextApiResponse } from "next";
@@ -27,10 +28,13 @@ export default async function handler(
 
     if (allLogs.length === 0) return res.status(200).json([]);
 
+    const toJSTDateStr = (date: Date | string): string =>
+      dayjs(date).tz().format("YYYY-MM-DD");
+
     const logsByDate: Record<string, typeof allLogs> = {};
     allLogs.forEach((log) => {
       if (!log.songId || !log.lastPlayed) return;
-      const date = new Date(log.lastPlayed).toISOString().split("T")[0];
+      const date = toJSTDateStr(log.lastPlayed);
       if (!logsByDate[date]) logsByDate[date] = [];
       logsByDate[date].push(log);
     });
@@ -38,26 +42,13 @@ export default async function handler(
     const trend = [];
     const latestBpisBySong = new Map<number, number>();
 
-    const firstLogDate = new Date(allLogs[0].lastPlayed);
-    const startDate = new Date(
-      firstLogDate.getFullYear(),
-      firstLogDate.getMonth(),
-      firstLogDate.getDate(),
-    );
+    const startDate = dayjs(allLogs[0].lastPlayed).tz().startOf("day");
+    const endDate = dayjs(allLogs[allLogs.length - 1].lastPlayed)
+      .tz()
+      .startOf("day");
 
-    const lastLogDate = new Date(allLogs[allLogs.length - 1].lastPlayed);
-    const endDate = new Date(
-      lastLogDate.getFullYear(),
-      lastLogDate.getMonth(),
-      lastLogDate.getDate(),
-    );
-
-    for (
-      let d = new Date(startDate);
-      d <= endDate;
-      d.setDate(d.getDate() + 1)
-    ) {
-      const dateStr = d.toISOString().split("T")[0];
+    for (let d = startDate; !d.isAfter(endDate); d = d.add(1, "day")) {
+      const dateStr = d.format("YYYY-MM-DD");
       const updatedOnThisDay = logsByDate[dateStr] || [];
 
       updatedOnThisDay.forEach((log) => {
