@@ -46,6 +46,7 @@ class UsersRepository {
     searchQuery?: string;
     sort?: string;
     order?: "distance" | "desc" | "newest";
+    seed?: number;
   }) {
     const {
       viewerId,
@@ -56,6 +57,7 @@ class UsersRepository {
       searchQuery,
       sort,
       order,
+      seed,
     } = params;
     const columnMap: Record<string, string> = {
       totalBpi: "usl.totalBpi",
@@ -118,6 +120,14 @@ class UsersRepository {
       query = query.orderBy("usl.createdAt", "desc");
     } else if (order === "desc") {
       query = query.orderBy(sql.ref(`${sortColumn}`), "desc");
+    } else if (seed !== undefined) {
+      // BPI50超は50~100固定、それ以外はチョイ負けを対象にライバル候補をシャッフル
+      const lo = viewerValue > 50 ? 50 : viewerValue - 3;
+      const hi = viewerValue > 50 ? 100 : viewerValue + 5;
+      query = query
+        .where(sql.ref(sortColumn as string), ">=", lo)
+        .where(sql.ref(sortColumn as string), "<=", hi)
+        .orderBy(sql`RAND(${seed})`, "asc");
     } else {
       query = query.orderBy(
         sql`ABS(${viewerValue} - ${sql.ref(sortColumn as string)})`,

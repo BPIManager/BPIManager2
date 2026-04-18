@@ -11,7 +11,7 @@ export default async function handler(
   res: NextApiResponse,
 ) {
   if (req.method !== "GET") return res.status(405).end();
-  const { userId, q, p, s, o } = req.query;
+  const { userId, q, p, s, o, seed } = req.query;
   const currentPage = Math.max(1, Number(p || 1));
   const limit = 20;
   const offset = (currentPage - 1) * limit;
@@ -40,6 +40,7 @@ export default async function handler(
       const category = sortKey.toUpperCase() as keyof typeof viewerRadar;
       viewerBaseValue = viewerRadar[category]?.totalBpi ?? -15;
     }
+    const parsedSeed = seed ? Number(seed) : undefined;
     const recommendedUsers = await usersRepo.getRecommendedUsers({
       viewerId,
       viewerValue: viewerBaseValue,
@@ -49,6 +50,7 @@ export default async function handler(
       searchQuery: q as string,
       sort: sortKey,
       order: orderMode,
+      seed: parsedSeed,
     });
 
     return res.status(200).json({

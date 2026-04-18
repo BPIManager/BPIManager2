@@ -8,6 +8,7 @@ interface UserListQueryParams {
   p?: number;
   s?: string;
   o?: string;
+  seed?: number | null;
 }
 
 /**
@@ -22,25 +23,23 @@ export function useUserListParams() {
   const p = Number(router.query.p) || 1;
   const s = (router.query.s as string) || "totalBpi";
   const o = (router.query.o as string) || "distance";
+  const seed = router.query.seed ? Number(router.query.seed) : undefined;
 
   const updateParams = useCallback(
     (newParams: UserListQueryParams) => {
-      router.push(
-        {
-          pathname: router.pathname,
-          query: { ...router.query, ...newParams },
-        },
-        undefined,
-        { shallow: true },
+      const merged = { ...router.query, ...newParams };
+      const query = Object.fromEntries(
+        Object.entries(merged).filter(([, v]) => v !== null && v !== undefined),
       );
+      router.push({ pathname: router.pathname, query }, undefined, { shallow: true });
     },
     [router],
   );
 
   const handleReset = useCallback(
-    () => updateParams({ q: "", p: 1, s: "totalBpi", o: "distance" }),
+    () => updateParams({ q: "", p: 1, s: "totalBpi", o: "distance", seed: null }),
     [updateParams],
   );
 
-  return { q, p, s, o, updateParams, handleReset };
+  return { q, p, s, o, seed, updateParams, handleReset };
 }

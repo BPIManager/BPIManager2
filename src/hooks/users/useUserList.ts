@@ -27,6 +27,7 @@ export const useUserList = (
   page: number = 1,
   sort: string = "totalBpi",
   order: string = "distance",
+  seed?: number,
 ) => {
   const { fbUser } = useUser();
 
@@ -35,6 +36,7 @@ export const useUserList = (
   searchParams.append("p", page.toString());
   searchParams.append("s", sort);
   searchParams.append("o", order);
+  if (seed !== undefined) searchParams.append("seed", seed.toString());
 
   const { data, error, isLoading, mutate } = useSWR<UserListResponse>(
     fbUser

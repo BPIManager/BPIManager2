@@ -50,38 +50,36 @@ export const SortSelector = ({
   onChange: (val: string) => void;
 }) => {
   return (
-    <div className="mb-4">
-      <Select value={`${sort}_${order}`} onValueChange={onChange}>
-        <SelectTrigger className="w-full border-none bg-bpim-bg/50 text-bpim-text focus:ring-blue-500">
-          <SelectValue placeholder="並び替えを選択" />
-        </SelectTrigger>
-        <SelectContent className="border-bpim-border bg-bpim-bg text-bpim-text">
-          {GROUPS.map((group, index) => {
-            const items = SORT_ITEMS.filter((i) => i.group === group.id);
-            if (items.length === 0) return null;
+    <Select value={`${sort}_${order}`} onValueChange={onChange}>
+      <SelectTrigger className="h-9 w-full border-none bg-bpim-bg/50 text-bpim-text focus:ring-blue-500">
+        <SelectValue placeholder="並び替えを選択" />
+      </SelectTrigger>
+      <SelectContent className="border-bpim-border bg-bpim-bg text-bpim-text">
+        {GROUPS.map((group, index) => {
+          const items = SORT_ITEMS.filter((i) => i.group === group.id);
+          if (items.length === 0) return null;
 
-            return (
-              <React.Fragment key={group.id}>
-                {index > 0 && <SelectSeparator className="bg-bpim-surface-2/60" />}
-                <SelectGroup>
-                  <SelectLabel className="px-2 py-1.5 text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
-                    {group.label}
-                  </SelectLabel>
-                  {items.map((item) => (
-                    <SelectItem
-                      key={item.value}
-                      value={item.value}
-                      className="text-xs"
-                    >
-                      {item.label}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </React.Fragment>
-            );
-          })}
-        </SelectContent>
-      </Select>
-    </div>
+          return (
+            <React.Fragment key={group.id}>
+              {index > 0 && <SelectSeparator className="bg-bpim-surface-2/60" />}
+              <SelectGroup>
+                <SelectLabel className="px-2 py-1.5 text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
+                  {group.label}
+                </SelectLabel>
+                {items.map((item) => (
+                  <SelectItem
+                    key={item.value}
+                    value={item.value}
+                    className="text-xs"
+                  >
+                    {item.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </React.Fragment>
+          );
+        })}
+      </SelectContent>
+    </Select>
   );
 };
