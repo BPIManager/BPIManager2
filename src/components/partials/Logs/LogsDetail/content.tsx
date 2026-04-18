@@ -26,6 +26,7 @@ import { getBpiColor } from "@/constants/bpiColor";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { AppTabsList, AppTabsTrigger } from "@/components/ui/complex/tabs";
+import { useBpiStep } from "@/hooks/common/useBpiStep";
 
 export const LogsDetailContent = ({
   userId,
@@ -36,6 +37,8 @@ export const LogsDetailContent = ({
   isPublicPage,
 }: LogsDetailViewProps) => {
   const router = useRouter();
+  const { bpiStep, handleStepFiner, handleStepCoarser } = useBpiStep(5);
+
   const groupedBy = (router.query.groupedBy as string) || "createdAt";
   const {
     details,
@@ -94,8 +97,9 @@ export const LogsDetailContent = ({
   const prevBpi = details.pagination.prev?.totalBpi ?? -15;
   const bpiDiff = currentBpi - prevBpi;
   const currentRank = BpiCalculator.estimateRank(currentBpi);
-  const bpiData = getBpiDistribution(details.songs);
+  const bpiData = getBpiDistribution(details.songs, bpiStep);
   const rankData = getRankDistribution(details.songs);
+
   return (
     <div className="flex flex-col gap-6 w-full">
       <LogNavigator pagination={details.pagination} type={type} />
@@ -173,6 +177,11 @@ export const LogsDetailContent = ({
                 myData={bpiData}
                 isLoading={isLoading}
                 getColor={getBpiColor}
+                canStepFiner
+                canStepCoarser
+                onStepFiner={handleStepFiner}
+                onStepCoarser={handleStepCoarser}
+                step={bpiStep}
               />
               <DistributionChart
                 title="ランク分布"

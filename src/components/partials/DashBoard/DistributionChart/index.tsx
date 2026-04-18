@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { useDjRankDistribution } from "@/hooks/stats/useDJRankDistribution";
 import { useBPIDistribution } from "@/hooks/stats/useBPIDistribution";
@@ -6,12 +5,13 @@ import { DistributionChart } from "./ui";
 import { getRankColorFromTheme } from "@/constants/djRankColor";
 import { getBpiColorFromTheme } from "@/constants/bpiColor";
 import { useChartColors } from "@/hooks/common/useChartColors";
+import { useBpiStep } from "@/hooks/common/useBpiStep";
 import type { DistributionSectionProps } from "@/types/ui/distribution";
 import { ChartData } from "@/types/ui/chart";
 import { getVersionNameFromNumber } from "@/constants/versions";
 
-const BPI_STEP_OPTIONS = [10, 5, 2, 1] as const;
-type BpiStep = (typeof BPI_STEP_OPTIONS)[number];
+export const BPI_STEP_OPTIONS = [10, 5, 2, 1] as const;
+export type BpiStep = (typeof BPI_STEP_OPTIONS)[number];
 
 export const DistributionSection = ({
   type,
@@ -22,7 +22,7 @@ export const DistributionSection = ({
 }: DistributionSectionProps) => {
   const { levels, diffs, version, compareVersion } = useStatsFilter();
   const c = useChartColors();
-  const [bpiStep, setBpiStep] = useState<BpiStep>(10);
+  const { bpiStep, handleStepFiner, handleStepCoarser } = useBpiStep();
 
   const isCompareMode = !rivalUserId && !!compareVersion;
   const effectiveRivalUserId =
@@ -80,16 +80,6 @@ export const DistributionSection = ({
       skeletonCount: bpiSkeletonCount,
     },
   }[type];
-
-  const handleStepFiner = () => {
-    const idx = BPI_STEP_OPTIONS.indexOf(bpiStep);
-    if (idx < BPI_STEP_OPTIONS.length - 1)
-      setBpiStep(BPI_STEP_OPTIONS[idx + 1]);
-  };
-  const handleStepCoarser = () => {
-    const idx = BPI_STEP_OPTIONS.indexOf(bpiStep);
-    if (idx > 0) setBpiStep(BPI_STEP_OPTIONS[idx - 1]);
-  };
 
   const isLoading = myLoading || (!!effectiveRivalUserId && rivalLoading);
   if (isLoading) {

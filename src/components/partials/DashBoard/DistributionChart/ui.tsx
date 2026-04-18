@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { DistributionChartSkeleton } from "@/components/partials/DashBoard/DistributionChart/skeleton";
 import { DashCard } from "@/components/ui/dashcard";
 import { Button } from "@/components/ui/button";
@@ -70,6 +70,7 @@ const ChartBarUnit = ({
   myName,
   rivalName,
   dense = false,
+  maxRef,
 }: {
   label: string;
   myCount: number;
@@ -86,6 +87,7 @@ const ChartBarUnit = ({
   myName: string;
   rivalName: string;
   dense?: boolean;
+  maxRef?: React.RefObject<HTMLDivElement | null>;
 }) => {
   const [open, setOpen] = useState(false);
   const hasRival = rivalCount !== undefined;
@@ -97,11 +99,10 @@ const ChartBarUnit = ({
     <Tooltip open={open} onOpenChange={setOpen}>
       <TooltipTrigger asChild>
         <div
+          ref={maxRef}
           className={cn(
             "flex h-[180px] cursor-default flex-col items-stretch gap-0",
-            dense
-              ? "min-w-[6px] flex-none"
-              : "min-w-0 max-w-[60px] flex-1",
+            dense ? "min-w-[4px] flex-1" : "min-w-0 max-w-[60px] flex-1",
           )}
           onMouseEnter={() => setOpen(true)}
           onMouseLeave={() => setOpen(false)}
@@ -277,6 +278,21 @@ export const DistributionChart = ({
 }: DistributionChartProps) => {
   const c = useChartColors();
   const [chartType, setChartType] = useState<"bar" | "pie">("bar");
+  const containerRef = useRef<HTMLDivElement>(null);
+  const maxBarRef = useRef<HTMLDivElement>(null);
+
+  const maxIndex = myData.reduce(
+    (maxI, d, i, arr) => (d.count > arr[maxI].count ? i : maxI),
+    0,
+  );
+
+  useEffect(() => {
+    if (!containerRef.current || !maxBarRef.current) return;
+    const container = containerRef.current;
+    const bar = maxBarRef.current;
+    container.scrollLeft =
+      bar.offsetLeft - container.offsetWidth / 2 + bar.offsetWidth / 2;
+  }, [myData]);
 
   if (isLoading) return <DistributionChartSkeleton count={skeletonCount} />;
   if (!myData || myData.length === 0) return null;
@@ -369,19 +385,22 @@ export const DistributionChart = ({
       {chartType === "bar" ? (
         <TooltipProvider>
           <div
+            ref={containerRef}
             className={cn(
-              "px-1",
+              "overflow-x-auto px-1",
               myData.length > 30
-                ? "flex items-start overflow-x-auto gap-0"
+                ? "flex items-start gap-0"
                 : "flex items-start justify-between gap-1",
             )}
           >
             {myData.map((item, i) => {
               const numVal = parseFloat(item.label);
+              const dense = myData.length > 30;
+              const labelInterval = dense ? 20 : 10;
               const showLabel =
-                item.label === "<-10" ||
+                isNaN(numVal) ||
                 item.label === "100+" ||
-                (!isNaN(numVal) && numVal % 10 === 0);
+                numVal % labelInterval === 0;
               const showCount = !step || step >= 5;
               return (
                 <ChartBarUnit
@@ -401,6 +420,7 @@ export const DistributionChart = ({
                   myName={myName}
                   rivalName={rivalName}
                   dense={myData.length > 30}
+                  maxRef={i === maxIndex ? maxBarRef : undefined}
                 />
               );
             })}

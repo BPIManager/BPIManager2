@@ -3,34 +3,30 @@ import { getDJRank } from "../songs/djRank";
 import { RANK_THRESHOLDS } from "@/components/partials/Metrics/ArenaAverage/ui";
 import { BatchDetailItem } from "@/types/logs/batchDetail";
 
-export const getBpiDistribution = (details: BatchDetailItem[]): ChartData[] => {
-  const bins = [
-    "<0",
-    "0",
-    "10",
-    "20",
-    "30",
-    "40",
-    "50",
-    "60",
-    "70",
-    "80",
-    "90",
-    "100+",
-  ];
-  const counts = new Array(bins.length).fill(0);
+export const getBpiDistribution = (
+  details: BatchDetailItem[],
+  step: number = 10,
+): ChartData[] => {
+  const buckets: ChartData[] = [{ label: "<-10", count: 0 }];
+  for (let v = -10; v < 100; v += step) {
+    buckets.push({ label: v.toString(), count: 0 });
+  }
+  buckets.push({ label: "100+", count: 0 });
 
   details.forEach((item) => {
-    const bpi = item.current.bpi;
-    if (bpi < 0) counts[0]++;
-    else if (bpi >= 100) counts[11]++;
-    else {
-      const index = Math.floor(bpi / 10) + 1;
-      if (index >= 1 && index <= 10) counts[index]++;
+    const bpi = item.current.bpi ?? -15;
+    let idx: number;
+    if (bpi < -10) {
+      idx = 0;
+    } else if (bpi >= 100) {
+      idx = buckets.length - 1;
+    } else {
+      idx = Math.floor((bpi - -10) / step) + 1;
     }
+    if (buckets[idx]) buckets[idx].count++;
   });
 
-  return bins.map((label, i) => ({ label, count: counts[i] }));
+  return buckets;
 };
 
 export const getRankDistribution = (details: BatchDetailItem[]): ChartData[] => {
