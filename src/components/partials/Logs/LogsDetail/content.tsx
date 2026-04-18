@@ -16,6 +16,7 @@ import type { LogsDetailViewProps } from "@/types/logs/detail";
 import { XIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRef, useState } from "react";
+import { BatchDeleteSection } from "./BatchDeleteSection";
 import { useShareResult } from "@/hooks/share/useShare";
 import { ShareResultModal } from "../../Modal/Share/ui";
 import { BpiCalculator } from "@/lib/bpi";
@@ -95,7 +96,6 @@ export const LogsDetailContent = ({
   const currentRank = BpiCalculator.estimateRank(currentBpi);
   const bpiData = getBpiDistribution(details.songs);
   const rankData = getRankDistribution(details.songs);
-
   return (
     <div className="flex flex-col gap-6 w-full">
       <LogNavigator pagination={details.pagination} type={type} />
@@ -214,6 +214,14 @@ export const LogsDetailContent = ({
           <BatchSongsTable songs={details.songs} listRef={listRef} />
         </TabsContent>
       </Tabs>
+
+      {!isPublicPage && type === "batch" && (
+        <BatchDeleteSection
+          userId={userId ?? ""}
+          batchId={batchId ?? ""}
+          version={version ?? ""}
+        />
+      )}
     </div>
   );
 };

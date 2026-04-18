@@ -129,6 +129,41 @@ class LogNavigationRepository {
   }
 
   /**
+   * 特定のバッチIDとユーザーIDからログ情報を取得します（所有者確認用）
+   */
+  async findBatchByIdAndUser(batchId: string, userId: string) {
+    return await db
+      .selectFrom("logs")
+      .select(["batchId"])
+      .where("batchId", "=", batchId)
+      .where("userId", "=", userId)
+      .executeTakeFirst();
+  }
+
+  /**
+   * 指定バッチに紐づくスコア・ステータスログ・ログレコードをトランザクションで削除します
+   */
+  async deleteBatch(userId: string, batchId: string) {
+    return await db.transaction().execute(async (trx) => {
+      await trx
+        .deleteFrom("scores")
+        .where("batchId", "=", batchId)
+        .where("userId", "=", userId)
+        .execute();
+      await trx
+        .deleteFrom("userStatusLogs")
+        .where("batchId", "=", batchId)
+        .where("userId", "=", userId)
+        .execute();
+      await trx
+        .deleteFrom("logs")
+        .where("batchId", "=", batchId)
+        .where("userId", "=", userId)
+        .execute();
+    });
+  }
+
+  /**
    * 指定されたJSTの期間内に含まれる全てのバッチを取得します
    */
   async findBatchesInRange(

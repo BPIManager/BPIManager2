@@ -1,3 +1,4 @@
+import { latestVersion } from "@/constants/latestVersion";
 import { db } from "@/lib/db";
 import {
   AuthenticatedNextApiRequest,
@@ -22,6 +23,7 @@ const handler = async (
             .selectFrom("userStatusLogs")
             .select(["userId", "totalBpi", "arenaRank", "id"])
             .where("userId", "=", req.authUid)
+            .where("version", "=", latestVersion)
             .orderBy("id", "desc")
             .limit(1)
             .as("latest"),

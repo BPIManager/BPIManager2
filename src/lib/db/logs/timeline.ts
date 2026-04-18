@@ -61,7 +61,9 @@ class ScoreTimelineRepository {
               "sc.clearState as ts_clearState",
               eb.fn
                 .agg("row_number", [])
-                .over((ob) => ob.partitionBy("sc.batchId").orderBy("sc.bpi", "desc"))
+                .over((ob) =>
+                  ob.partitionBy("sc.batchId").orderBy("sc.bpi", "desc"),
+                )
                 .as("rn"),
             ])
             .where("sc.userId", "=", userId)
@@ -84,7 +86,7 @@ class ScoreTimelineRepository {
         log = {
           id: row.l_id,
           batchId: row.l_batchId,
-          version: Number(row.l_version),
+          version: row.l_version,
           totalBpi: currentBpi,
           songCount: Number(row.songCount ?? 0),
           diff:

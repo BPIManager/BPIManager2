@@ -16,9 +16,7 @@ export default function BatchLogsPage() {
   const isInitialLoading = !router.isReady || isUserLoading;
 
   if (isInitialLoading) {
-    return (
-      <PageLoader />
-    );
+    return <PageLoader />;
   }
 
   if (isOwnProfile) {

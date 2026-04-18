@@ -3,15 +3,18 @@ import { logsRepo } from "@/lib/db/logs";
 import { mapToLogNested } from "@/utils/logs/getMapNested";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createOvertakenMap, computeRivalRankMap } from "./[batchId]/scores";
-import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
+import {
+  checkProfileAccess,
+  authenticateViewer,
+} from "@/middlewares/api/withApiOnProfile";
 import { rejectAccess } from "@/middlewares/api/withApi";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  if (req.method !== "GET") {
-    res.setHeader("Allow", ["GET"]);
+  if (req.method !== "GET" && req.method !== "DELETE") {
+    res.setHeader("Allow", ["GET", "DELETE"]);
     return res
       .status(405)
       .json({ message: `Method ${req.method} Not Allowed` });
@@ -19,14 +22,40 @@ export default async function handler(
 
   const { userId, batchId, version } = req.query;
 
-  if (!userId || !batchId || !version) {
+  if (!userId || !batchId) {
     return res
       .status(400)
-      .json({ message: "userId, batchId, and version are required." });
+      .json({ message: "userId and batchId are required." });
   }
 
   const uid = String(userId);
   const bid = String(batchId);
+
+  if (req.method === "DELETE") {
+    try {
+      const viewerId = await authenticateViewer(req);
+      if (!viewerId || viewerId !== uid) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+
+      const targetBatch = await logsRepo.findBatchByIdAndUser(bid, uid);
+      if (!targetBatch) {
+        return res.status(404).json({ message: "Batch not found." });
+      }
+
+      await logsRepo.deleteBatch(uid, bid);
+
+      return res.status(200).json({ message: "Batch deleted successfully." });
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Internal Server Error";
+      return res.status(500).json({ message: errorMessage });
+    }
+  }
+
+  if (!version) {
+    return res.status(400).json({ message: "version is required." });
+  }
   const v = String(version);
 
   try {
@@ -55,7 +84,9 @@ export default async function handler(
     ]);
 
     const overtakenMap = createOvertakenMap(overtaken);
-    const overtakenSongIds = Object.keys(overtakenMap).map(Number).filter(Boolean);
+    const overtakenSongIds = Object.keys(overtakenMap)
+      .map(Number)
+      .filter(Boolean);
     const rivalScores =
       isOwnLog && overtakenSongIds.length > 0
         ? await logsRepo.getRivalScoresForSongs({
@@ -72,7 +103,7 @@ export default async function handler(
         return {
           ...mapped,
           overtaken: s.songId ? overtakenMap[s.songId] || [] : [],
-          rivalRankInfo: s.songId ? rivalRankMap[s.songId] ?? null : null,
+          rivalRankInfo: s.songId ? (rivalRankMap[s.songId] ?? null) : null,
         };
       }),
       pagination: {

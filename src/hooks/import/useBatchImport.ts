@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { parseCSV } from "@/utils/csv/parse";
+import { parseAnyCsv } from "@/utils/csv/parse";
+import { detectCsvType, validateCsvTypeForVersion } from "@/utils/csv/detect";
 import { API_PREFIX } from "@/constants/apiEndpoints";
 import { toast } from "sonner";
 import { User as FirebaseUser } from "firebase/auth";
@@ -40,7 +41,11 @@ export const useBatchImport = (
       }
 
       setProcessStatus("CSVを解析中...");
-      const formattedRows = parseCSV(targetData);
+      const detectedType = detectCsvType(targetData);
+      const validationError = validateCsvTypeForVersion(detectedType, version);
+      if (validationError) throw new Error(validationError);
+
+      const formattedRows = parseAnyCsv(targetData);
 
       if (formattedRows.length === 0)
         throw new Error("有効なデータがありません。");

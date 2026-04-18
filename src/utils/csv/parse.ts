@@ -1,7 +1,14 @@
 import Papa from "papaparse";
 import { IIDX_DIFFICULTIES } from "@/constants/diffs";
+import { detectCsvType } from "./detect";
+import { parseRefluxTsv } from "./adapters/reflux";
+import { parseRizaltoCsv } from "./adapters/result_techo";
+import type { ParsedCsvRow } from "./types";
 
-export const parseCSV = (csvData: string) => {
+export type { ParsedCsvRow };
+
+/** 公式CSVのパース用関数 */
+export const parseCSV = (csvData: string): ParsedCsvRow[] => {
   const parsed = Papa.parse(csvData, {
     header: true,
     skipEmptyLines: true,
@@ -31,9 +38,30 @@ export const parseCSV = (csvData: string) => {
           clearState,
           missCount,
           lastPlayed: lastPlayed || null,
-        };
+        } satisfies ParsedCsvRow;
       }
       return null;
-    }).filter(Boolean);
+    }).filter(Boolean) as ParsedCsvRow[];
   });
+};
+
+/**
+ * CSV/TSV 種別を自動判別し、適切なパーサーで変換して標準行配列を返す。
+ * 公式CSV・Reflux TSV・リザルト手帳 CSV に対応。
+ */
+export const parseAnyCsv = (rawData: string): ParsedCsvRow[] => {
+  const type = detectCsvType(rawData);
+
+  switch (type) {
+    case "official":
+      return parseCSV(rawData);
+    case "reflux":
+      return parseRefluxTsv(rawData);
+    case "result_techo":
+      return parseRizaltoCsv(rawData);
+    default:
+      throw new Error(
+        "未対応のフォーマットです。公式CSV・Reflux TSV・リザルト手帳 CSV を貼り付けてください。",
+      );
+  }
 };

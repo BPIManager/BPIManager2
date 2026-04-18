@@ -20,7 +20,9 @@ export const logsRepo = {
   getRangeNavigation: navigationRepo.getRangeNavigation.bind(navigationRepo),
   getBatchNavigation: navigationRepo.getBatchNavigation.bind(navigationRepo),
   findBatchById: navigationRepo.findBatchById.bind(navigationRepo),
+  findBatchByIdAndUser: navigationRepo.findBatchByIdAndUser.bind(navigationRepo),
   findBatchesInRange: navigationRepo.findBatchesInRange.bind(navigationRepo),
+  deleteBatch: navigationRepo.deleteBatch.bind(navigationRepo),
 
   // スコア詳細クエリ系
   getScoresWithDetails: scoreDetailRepo.getScoresWithDetails.bind(scoreDetailRepo),

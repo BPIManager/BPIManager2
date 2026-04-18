@@ -9,6 +9,7 @@ export const versionTitles: VersionTitle[] = [
   { num: "31", title: "31 EPOLIS", disabled: true },
   { num: "32", title: "32 Pinky Crush", disabled: true },
   { num: "33", title: "33 Sparkle Shower", default: true },
+  { num: "INF", title: "INFINITAS", disabled: true },
 ];
 
 export const getVersionNameFromNumber = (v: number | string): string => {

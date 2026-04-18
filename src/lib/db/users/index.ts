@@ -1,3 +1,4 @@
+import { latestVersion } from "@/constants/latestVersion";
 import { db } from "@/lib/db";
 import { sql } from "kysely";
 
@@ -329,7 +330,8 @@ class UsersRepository {
           }
         : null,
       history: formattedHistory,
-      current: formattedHistory[0] || null,
+      current:
+        formattedHistory.find((item) => item.version === latestVersion) || null,
     };
   }
 

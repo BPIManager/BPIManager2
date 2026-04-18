@@ -104,7 +104,7 @@ export const ImportSuccessModal = ({ result, version, onClose }: Props) => {
         {result.newTotalBpi !== undefined && (
           <div className="flex w-full flex-col gap-4 py-2">
             <span className="text-[10px] font-black tracking-[0.2em] text-bpim-muted uppercase">
-              Total BPI Change (☆12)
+              総合BPIの変化 (☆12)
             </span>
 
             <div className="flex items-center justify-center gap-6">

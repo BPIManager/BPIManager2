@@ -14,11 +14,15 @@ interface ScoreEntry {
 interface TimelineEntry {
   id: string;
   batchId: string;
-  version: number;
+  version: string;
   totalBpi: number;
   songCount: number;
   createdAt: string | Date | null | undefined;
-  topScores: { title: string; bpi: number; clearState: string | null | undefined }[];
+  topScores: {
+    title: string;
+    bpi: number;
+    clearState: string | null | undefined;
+  }[];
   diff: number;
 }
 
@@ -63,7 +67,7 @@ export const calculateTotalBpi = (
     timeline.push({
       id: dayKey,
       batchId: dayKey,
-      version: Number(version),
+      version: version,
       totalBpi,
       songCount: dayScores.length,
       createdAt: dayScores[dayScores.length - 1].lastPlayed,

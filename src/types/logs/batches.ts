@@ -13,7 +13,7 @@ export interface UpdateLog {
   id: number;
   batchId: string;
   /** IIDX バージョン番号 */
-  version: number;
+  version: string;
   /** バッチ時点の合計 BPI */
   totalBpi: number;
   /** 更新された楽曲数 */

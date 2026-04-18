@@ -1,4 +1,4 @@
-﻿import { Trash2, Upload, AlertCircle } from "lucide-react";
+﻿import { Trash2, Upload, AlertCircle, CheckCircle2 } from "lucide-react";
 import { PageContainer, PageHeader } from "@/components/partials/Header";
 import { DashboardLayout } from "@/components/partials/Main";
 import { InstructionSection } from "./instruction";
@@ -18,10 +18,12 @@ import { versionsOptions } from "@/constants/versions";
 import { iidxUrl } from "@/constants/iidxUrl";
 import { BookmarkletAccordion } from "./bookmarklet";
 import { AndroidAppAccordion } from "./android";
+import { type CsvType, CSV_TYPE_LABELS, validateCsvTypeForVersion } from "@/utils/csv/detect";
 
 interface Props {
   csvData: string;
   setCsvData: (v: string) => void;
+  detectedType: CsvType;
   selectedVersion: string[];
   setSelectedVersion: (v: string[]) => void;
   isProcessing: boolean;
@@ -30,7 +32,14 @@ interface Props {
   onStartImport: () => void;
 }
 
-export const ImportView = (props: Props) => (
+export const ImportView = (props: Props) => {
+  const version = props.selectedVersion[0];
+  const csvVersionError =
+    props.csvData && props.detectedType !== "unknown"
+      ? validateCsvTypeForVersion(props.detectedType, version)
+      : null;
+
+  return (
   <DashboardLayout>
     <div className="flex flex-col gap-8">
       <PageHeader
@@ -70,6 +79,26 @@ export const ImportView = (props: Props) => (
                   value={props.csvData}
                   onChange={(e) => props.setCsvData(e.target.value)}
                 />
+                {props.csvData && (
+                  <div className="flex items-center gap-1.5">
+                    {props.detectedType !== "unknown" ? (
+                      <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-green-500" />
+                    ) : (
+                      <AlertCircle className="h-3.5 w-3.5 shrink-0 text-bpim-danger" />
+                    )}
+                    <span
+                      className={`text-xs font-medium ${
+                        props.detectedType !== "unknown"
+                          ? "text-green-500"
+                          : "text-bpim-danger"
+                      }`}
+                    >
+                      {props.detectedType !== "unknown"
+                        ? `検出: ${CSV_TYPE_LABELS[props.detectedType]}`
+                        : "未対応のフォーマットです"}
+                    </span>
+                  </div>
+                )}
                 <BookmarkletAccordion />
                 <AndroidAppAccordion />
               </div>
@@ -98,6 +127,15 @@ export const ImportView = (props: Props) => (
                 </p>
               </div>
 
+              {csvVersionError && (
+                <div className="flex items-start gap-2 rounded-lg border border-bpim-danger/40 bg-bpim-danger/10 px-4 py-3">
+                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-bpim-danger" />
+                  <p className="text-xs leading-relaxed text-bpim-danger">
+                    {csvVersionError}
+                  </p>
+                </div>
+              )}
+
               <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
                 <Button
                   variant="ghost"
@@ -110,7 +148,7 @@ export const ImportView = (props: Props) => (
                 <Button
                   className="w-full bg-bpim-primary px-8 font-bold text-white hover:bg-bpim-primary sm:w-auto"
                   size="lg"
-                  disabled={props.isProcessing}
+                  disabled={props.isProcessing || !!csvVersionError}
                   onClick={props.onStartImport}
                 >
                   {props.isProcessing ? (
@@ -148,4 +186,5 @@ export const ImportView = (props: Props) => (
       </PageContainer>
     </div>
   </DashboardLayout>
-);
+  );
+};
