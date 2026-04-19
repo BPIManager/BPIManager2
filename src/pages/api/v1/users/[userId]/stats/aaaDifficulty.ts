@@ -2,14 +2,14 @@ import { BpiCalculator } from "@/lib/bpi";
 import { statsRepo } from "@/lib/db/stats";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { aaaDifficultySchema } from "@/schemas/stats/aaaDifficulty";
-import { parseBody } from "@/services/nextRequest/parseBody";
+import { parseQuery } from "@/services/nextRequest/parseBody";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const body = parseBody(aaaDifficultySchema, req.body, res);
+  const body = parseQuery(aaaDifficultySchema, req.query, res);
   if (!body) return;
 
   const { userId, version, level } = body;
