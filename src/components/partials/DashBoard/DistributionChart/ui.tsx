@@ -101,8 +101,8 @@ const ChartBarUnit = ({
         <div
           ref={maxRef}
           className={cn(
-            "flex h-[180px] cursor-default flex-col items-stretch gap-0",
-            dense ? "min-w-[4px] flex-1" : "min-w-0 max-w-[60px] flex-1",
+            "flex h-45 cursor-default flex-col items-stretch gap-0",
+            dense ? "min-w-1 flex-1" : "min-w-0 max-w-15 flex-1",
           )}
           onMouseEnter={() => setOpen(true)}
           onMouseLeave={() => setOpen(false)}
@@ -111,11 +111,11 @@ const ChartBarUnit = ({
             setOpen((o) => !o);
           }}
         >
-          <div className="relative h-[150px] w-full">
+          <div className="relative h-37.5 w-full">
             <div
               className={cn(
-                "absolute bottom-[25px] left-0 right-0 flex h-[100px] items-end justify-center",
-                hasRival ? "gap-[2px]" : "gap-0",
+                "absolute bottom-6.25 left-0 right-0 flex h-25 items-end justify-center",
+                hasRival ? "gap-0.5" : "gap-0",
               )}
             >
               <div className="relative flex h-full flex-1 min-w-0 flex-col justify-end">
@@ -126,7 +126,7 @@ const ChartBarUnit = ({
                       myCount > 0 ? "visible" : "hidden",
                       hasRival
                         ? "absolute bottom-[calc(100%+2px)] left-1/2 -translate-x-1/2"
-                        : "relative mb-[2px] w-full text-center",
+                        : "relative mb-0.5 w-full text-center",
                     )}
                   >
                     {myCount}
@@ -134,7 +134,7 @@ const ChartBarUnit = ({
                 )}
                 <div
                   data-capture-no-anim=""
-                  className="w-full origin-bottom rounded-t-[2px] opacity-90 animate-[bounceGrow_0.6s_ease-out_both]"
+                  className="w-full origin-bottom rounded-t-xs opacity-90 animate-[bounceGrow_0.6s_ease-out_both]"
                   style={{
                     height: myHeight,
                     backgroundColor: color,
@@ -148,7 +148,7 @@ const ChartBarUnit = ({
                 <div className="relative flex h-full flex-1 min-w-0 flex-col justify-end">
                   <div
                     data-capture-no-anim=""
-                    className="w-full origin-bottom rounded-t-[2px] opacity-45 animate-[bounceGrow_0.6s_ease-out_both]"
+                    className="w-full origin-bottom rounded-t-xs opacity-45 animate-[bounceGrow_0.6s_ease-out_both]"
                     style={{
                       height: rivalHeight,
                       backgroundColor: color,
@@ -163,7 +163,7 @@ const ChartBarUnit = ({
             {hasRival && showCount && (
               <span
                 className={cn(
-                  "absolute bottom-[5px] left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] font-bold text-bpim-warning",
+                  "absolute bottom-1.25 left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] font-bold text-bpim-warning",
                   rivalCount! > 0 ? "visible" : "hidden",
                 )}
               >
@@ -172,8 +172,8 @@ const ChartBarUnit = ({
             )}
           </div>
 
-          <div className="h-[1px] w-full bg-bpim-overlay/60" />
-          <div className="flex h-[30px] justify-center">
+          <div className="h-px w-full bg-bpim-overlay/60" />
+          <div className="flex h-7.5 justify-center">
             {showLabel && (
               <span className="mt-2 whitespace-nowrap text-[10px] font-bold text-bpim-muted">
                 {label}
