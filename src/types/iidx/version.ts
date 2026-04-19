@@ -2,7 +2,7 @@ import { IIDX_VERSIONS } from "@/constants/latestVersion";
 
 /** バージョン情報の定義 */
 export interface VersionTitle {
-  num: string;
+  num: IIDXVersion;
   title: string;
   default?: boolean;
   disabled?: boolean;

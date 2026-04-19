@@ -28,7 +28,9 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const { userId, version, levels, difficulties } = parseStatsQuery(req.query);
+  const query = parseStatsQuery(req.query, res);
+  if (!query) return;
+  const { userId, version, levels, difficulties } = query;
 
   try {
     const access = await checkUserAccess(req, userId);
@@ -50,7 +52,13 @@ export default async function handler(
     );
     const bandSongs = new Map<
       string,
-      { title: string; difficulty: string; bpi: number; exScore: number | null; notes: number | null }[]
+      {
+        title: string;
+        difficulty: string;
+        bpi: number;
+        exScore: number | null;
+        notes: number | null;
+      }[]
     >(bandLabels.map((label) => [label, []]));
 
     for (const song of songs) {

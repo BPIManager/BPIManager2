@@ -1,15 +1,22 @@
 import { statsRepo } from "@/lib/db/stats";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
+import { recommendedParamsSchema } from "@/schemas/stats/recommended";
 import { NextApiRequest, NextApiResponse } from "next";
+import { parseQuery } from "@/services/nextRequest/parseBody";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const { userId, version, levels, difficulties } = parseStatsQuery(req.query);
-  const limit = parseInt(String(req.query.limit ?? "10"), 10);
-  const offset = parseInt(String(req.query.offset ?? "0"), 10);
+  const query = parseStatsQuery(req.query, res);
+  if (!query) return;
+  const { userId, version, levels, difficulties } = query;
+
+  const body = parseQuery(recommendedParamsSchema, req.query, res);
+  if (!body) return;
+
+  const { limit, offset } = body;
 
   try {
     const access = await checkUserAccess(req, userId);

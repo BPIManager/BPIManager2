@@ -1,19 +1,18 @@
 import { BpiCalculator } from "@/lib/bpi";
 import { statsRepo } from "@/lib/db/stats";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
-import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
+import { aaaDifficultySchema } from "@/schemas/stats/aaaDifficulty";
+import { parseBody } from "@/services/nextRequest/parseBody";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const { userId, version } = parseStatsQuery(req.query);
-  const level = parseInt(String(req.query.level ?? ""), 10);
+  const body = parseBody(aaaDifficultySchema, req.body, res);
+  if (!body) return;
 
-  if (!userId || !version || isNaN(level)) {
-    return res.status(400).json({ message: "Missing parameters" });
-  }
+  const { userId, version, level } = body;
 
   try {
     const access = await checkUserAccess(req, userId);

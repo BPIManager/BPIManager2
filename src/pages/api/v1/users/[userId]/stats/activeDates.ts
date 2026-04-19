@@ -1,45 +1,30 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { statsRepo } from "@/lib/db/stats";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
-
-async function handleGet(
-  req: NextApiRequest,
-  res: NextApiResponse,
-  userId: string,
-) {
-  const { version } = req.query;
-
-  if (!version || typeof version !== "string") {
-    return res
-      .status(400)
-      .json({ message: "Missing or invalid version parameter." });
-  }
-
-  const activity = await statsRepo.getActivityData(userId, version, [12]);
-  const dates = activity
-    .filter((d) => Number(d.count) > 0)
-    .map((d) => d.date);
-
-  return res.status(200).json(dates);
-}
+import { activeDatesSchema } from "@/schemas/stats/activeDates";
+import { parseQuery } from "@/services/nextRequest/parseBody";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const { userId } = req.query;
+  const body = parseQuery(activeDatesSchema, req.query, res);
+  if (!body) return;
 
-  if (!userId || typeof userId !== "string") {
-    return res.status(400).json({ message: "Invalid userId" });
-  }
+  const { userId, version } = body;
 
   try {
     const access = await checkUserAccess(req, userId);
     if (!access.hasAccess) return rejectAccess(res, access);
 
     switch (req.method) {
-      case "GET":
-        return await handleGet(req, res, userId);
+      case "GET": {
+        const activity = await statsRepo.getActivityData(userId, version, [12]);
+        const dates = activity
+          .filter((d) => Number(d.count) > 0)
+          .map((d) => d.date);
+        return res.status(200).json(dates);
+      }
       default:
         res.setHeader("Allow", ["GET"]);
         return res

@@ -9,6 +9,7 @@ export const IIDX_VERSIONS = [
   "31",
   "32",
   "33",
+  "INF",
 ] as const;
 
 export const latestVersion: IIDXVersion = "33";

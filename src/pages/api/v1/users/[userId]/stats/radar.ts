@@ -10,7 +10,9 @@ export default async function handler(
 ) {
   if (req.method !== "GET") return res.status(405).end();
 
-  const { userId, version, levels, difficulties } = parseStatsQuery(req.query);
+  const query = parseStatsQuery(req.query, res);
+  if (!query) return;
+  const { userId, version, levels, difficulties } = query;
 
   try {
     const access = await checkUserAccess(req, userId);

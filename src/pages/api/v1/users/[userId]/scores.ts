@@ -5,27 +5,23 @@ import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { mapToFlatSong } from "@/utils/logs/getMapFlatten";
 import { filterSongsServerSide } from "@/utils/songs/filter";
 import { sortSongs } from "@/utils/songs/sort";
+import { parseQuery } from "@/services/nextRequest/parseBody";
+import { scoresQuerySchema } from "@/schemas/scores/query";
 
 async function handleGetScores(
   req: NextApiRequest,
   res: NextApiResponse,
   userId: string,
 ) {
-  const { version, asOf, ...filterParams } = req.query;
+  const body = parseQuery(scoresQuerySchema, req.query, res);
+  if (!body) return;
 
-  if (!version || typeof version !== "string") {
-    return res
-      .status(400)
-      .json({ message: "Missing or invalid version parameter." });
-  }
+  const { version, asOf, ...filterParams } = body;
 
   const time =
     !asOf || asOf === "latest"
       ? dayjs.tz().utc().toDate()
-      : dayjs
-          .tz(asOf as string)
-          .utc()
-          .toDate();
+      : dayjs.tz(asOf).utc().toDate();
 
   const results = await logsRepo.getScoresWithDetails(userId, version, {
     targetTime: time,

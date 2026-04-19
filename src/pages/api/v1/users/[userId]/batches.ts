@@ -3,33 +3,33 @@ import { logsRepo } from "@/lib/db/logs";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { statsRepo } from "@/lib/db/stats";
 import { calculateTotalBpi } from "@/services/logs/calculateTotalBpi";
+import { parseBody } from "@/services/nextRequest/parseBody";
+import { batchesQuerySchema } from "@/schemas/batches/query";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const { userId, version, groupedBy, topN = 5 } = req.query;
+  const query = parseBody(batchesQuerySchema, req.query, res);
+  if (!query) return;
 
-  const access = await checkUserAccess(req, userId as string);
+  const { userId, version, groupedBy, topN } = query;
+
+  const access = await checkUserAccess(req, userId);
   if (!access.hasAccess) return rejectAccess(res, access);
 
   if (groupedBy === "lastPlayed") {
     const [history, totalSongs12] = await Promise.all([
-      statsRepo.getScoreHistory(userId as string, version as string, [], []),
+      statsRepo.getScoreHistory(userId, version, [], []),
       statsRepo.getTotalSongCount([12], []),
     ]);
-    const timeline = calculateTotalBpi(
-      history,
-      totalSongs12,
-      version as string,
-      Number(topN),
-    );
+    const timeline = calculateTotalBpi(history, totalSongs12, version, topN);
     return res.status(200).json(timeline);
   } else {
     const timeline = await logsRepo.getTimelineByBatches({
-      userId: userId as string,
-      version: version as string,
-      topN: Number(topN),
+      userId,
+      version,
+      topN,
     });
     return res.status(200).json(timeline);
   }

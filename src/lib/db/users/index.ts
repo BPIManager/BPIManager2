@@ -444,6 +444,69 @@ class UsersRepository {
       return { success: true };
     });
   }
+
+  async getMe(userId: string, version: string) {
+    const user = await db
+      .selectFrom("users as u")
+      .leftJoin(
+        (qb) =>
+          qb
+            .selectFrom("userStatusLogs")
+            .select(["userId", "totalBpi", "arenaRank", "id"])
+            .where("userId", "=", userId)
+            .where("version", "=", version)
+            .orderBy("id", "desc")
+            .limit(1)
+            .as("latest"),
+        (join) => join.onRef("u.userId", "=", "latest.userId"),
+      )
+      .leftJoin("userRoles as ur", "ur.userId", "u.userId")
+      .select([
+        "u.userId",
+        "u.userName",
+        "u.profileText",
+        "u.profileImage",
+        "u.iidxId",
+        "u.xId",
+        "u.isPublic",
+        "u.createdAt",
+        "u.updatedAt",
+        "latest.totalBpi",
+        "latest.arenaRank",
+        "ur.role",
+        "ur.description",
+        "ur.grantedAt",
+        (eb) =>
+          eb
+            .selectFrom("follows")
+            .select(eb.fn.count("id").as("count"))
+            .where("followerId", "=", userId)
+            .as("followingCount"),
+        (eb) =>
+          eb
+            .selectFrom("follows")
+            .select(eb.fn.count("id").as("count"))
+            .where("followingId", "=", userId)
+            .as("followerCount"),
+      ])
+      .where("u.userId", "=", userId)
+      .executeTakeFirst();
+
+    if (!user) return null;
+
+    return {
+      ...user,
+      followingCount: Number(user.followingCount || 0),
+      followerCount: Number(user.followerCount || 0),
+      role: user.role
+        ? {
+            role: user.role,
+            description: user.description ?? "",
+            grantedAt: user.grantedAt,
+          }
+        : null,
+    };
+  }
 }
 
 export const usersRepo = new UsersRepository();

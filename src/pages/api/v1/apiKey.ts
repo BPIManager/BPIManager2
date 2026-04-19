@@ -1,20 +1,16 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { db } from "@/lib/db";
 import crypto from "crypto";
 import {
   AuthenticatedNextApiRequest,
   withAuth,
 } from "@/middlewares/api/withAuth";
+import { apiKeysRepo } from "@/lib/db/apiKeys";
 
 async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
   try {
     switch (req.method) {
       case "GET": {
-        const record = await db
-          .selectFrom("apiKeys")
-          .select("key")
-          .where("userId", "=", req.authUid)
-          .executeTakeFirst();
+        const record = await apiKeysRepo.findByUserId(req.authUid);
 
         return res.status(200).json({
           exists: !!record,
@@ -25,17 +21,7 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
       case "PUT": {
         const newKey = crypto.randomBytes(32).toString("hex");
 
-        await db
-          .insertInto("apiKeys")
-          .values({
-            userId: req.authUid,
-            key: newKey,
-            createdAt: new Date(),
-          })
-          .onDuplicateKeyUpdate({
-            key: newKey,
-          })
-          .execute();
+        await apiKeysRepo.upsert(req.authUid, newKey);
 
         return res.status(200).json({ key: newKey });
       }

@@ -116,6 +116,9 @@ importers:
       vaul:
         specifier: ^1.1.2
         version: 1.1.2(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      zod:
+        specifier: ^4.3.6
+        version: 4.3.6
     devDependencies:
       '@tailwindcss/typography':
         specifier: ^0.5.19

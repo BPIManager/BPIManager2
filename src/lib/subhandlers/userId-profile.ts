@@ -1,10 +1,11 @@
 import { latestVersion } from "@/constants/latestVersion";
-import { validateUserName } from "@/utils/common/nameValidation";
 import { NextApiRequest, NextApiResponse } from "next";
 import { socialRepo } from "../db/social";
 import { usersRepo } from "../db/users";
 import { v4 as uuidv4 } from "uuid";
 import { AccessResult } from "@/middlewares/api/withApi";
+import { parseBody } from "@/services/nextRequest/parseBody";
+import { profileUpsertSchema } from "@/schemas/profile/upsert";
 
 /**
  * プロフィール取得 API のレスポンス型。
@@ -142,10 +143,8 @@ export async function upsert(
   res: NextApiResponse,
   uid: string,
 ) {
-  const data = req.body;
-  const validation = validateUserName(data.userName);
-  if (!validation.isValid)
-    return res.status(400).json({ message: validation.message });
+  const data = parseBody(profileUpsertSchema, req.body, res);
+  if (!data) return;
 
   const result = await usersRepo.upsertUserProfile({
     ...data,

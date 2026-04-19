@@ -2,9 +2,12 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { statsRepo } from "@/lib/db/stats";
 import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
-
-const VALID_STEPS = [1, 2, 5, 10] as const;
-type ValidStep = (typeof VALID_STEPS)[number];
+import {
+  singleBPIDistributionParamsSchema,
+  VALID_STEPS,
+  type ValidStep,
+} from "@/schemas/stats/singleBPIDistribution";
+import { parseQuery } from "@/services/nextRequest/parseBody";
 
 function buildBuckets(step: ValidStep) {
   const buckets: { label: string; count: number }[] = [];
@@ -20,11 +23,14 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const { userId, version, levels, difficulties } = parseStatsQuery(req.query);
-  const rawStep = Number(req.query.step ?? 10);
-  const step: ValidStep = (VALID_STEPS.includes(rawStep as ValidStep)
-    ? rawStep
-    : 10) as ValidStep;
+  const query = parseStatsQuery(req.query, res);
+  if (!query) return;
+  const { userId, version, levels, difficulties } = query;
+
+  const body = parseQuery(singleBPIDistributionParamsSchema, req.query, res);
+  if (!body) return;
+
+  const { step } = body;
 
   try {
     const access = await checkUserAccess(req, userId);

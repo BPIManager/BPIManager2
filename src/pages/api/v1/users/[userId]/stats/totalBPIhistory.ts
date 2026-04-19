@@ -15,7 +15,9 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const { userId, version, levels, difficulties } = parseStatsQuery(req.query);
+  const body = parseStatsQuery(req.query, res);
+  if (!body) return;
+  const { userId, version, levels, difficulties } = body;
 
   try {
     const access = await checkUserAccess(req, userId);

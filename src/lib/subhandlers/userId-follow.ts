@@ -1,5 +1,6 @@
 import { followsRepo } from "@/lib/db/follow";
-import { NextApiRequest, NextApiResponse } from "next";
+import type { FollowsQuery } from "@/schemas/follows/query";
+import { NextApiResponse } from "next";
 
 /**
  * フォロー・フォロワー一覧を取得する API サブハンドラー。
@@ -13,28 +14,17 @@ import { NextApiRequest, NextApiResponse } from "next";
  * @param viewerId - 閲覧者のユーザー ID（未認証の場合は省略）
  */
 export async function handleGetFollows(
-  req: NextApiRequest,
   res: NextApiResponse,
   targetUserId: string,
-  viewerId?: string,
+  viewerId: string | undefined,
+  query: FollowsQuery,
 ) {
-  const { type, page, limit } = req.query;
-
-  if (type !== "following" && type !== "followers") {
-    return res
-      .status(400)
-      .json({ error: "Invalid type (following/followers)" });
-  }
-
-  const pageNum = Math.max(1, Number(page || 1));
-  const limitNum = Math.min(100, Math.max(1, Number(limit || 20)));
-
   const result = await followsRepo.getFollowList({
     targetUserId,
     viewerId,
-    type,
-    page: pageNum,
-    limit: limitNum,
+    type: query.type,
+    page: query.page,
+    limit: query.limit,
   });
 
   return res.status(200).json(result);

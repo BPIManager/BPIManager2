@@ -2,6 +2,8 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { latestVersion } from "@/constants/latestVersion";
 import { socialRepo } from "@/lib/db/social";
+import { parseQuery } from "@/services/nextRequest/parseBody";
+import { timelineQuerySchema } from "@/schemas/timeline/query";
 
 export default async function handler(
   req: NextApiRequest,
@@ -9,22 +11,16 @@ export default async function handler(
 ) {
   if (req.method !== "GET") return res.status(405).end();
 
-  const { userId, lastId, mode, search } = req.query;
+  const { userId } = req.query;
 
-  const levelsQuery = req.query["levels[]"] || req.query.levels;
-  const diffsQuery = req.query["difficulties[]"] || req.query.difficulties;
+  const normalizedQuery = {
+    ...req.query,
+    levels: req.query["levels[]"] ?? req.query.levels,
+    difficulties: req.query["difficulties[]"] ?? req.query.difficulties,
+  };
 
-  const levels = Array.isArray(levelsQuery)
-    ? levelsQuery.map(Number)
-    : levelsQuery
-      ? [Number(levelsQuery)]
-      : undefined;
-
-  const difficulties = Array.isArray(diffsQuery)
-    ? diffsQuery
-    : diffsQuery
-      ? [diffsQuery as string]
-      : undefined;
+  const query = parseQuery(timelineQuerySchema, normalizedQuery, res);
+  if (!query) return;
 
   const limit = 20;
   const version = latestVersion;
@@ -39,11 +35,11 @@ export default async function handler(
       viewerId,
       version,
       limit,
-      lastId: lastId as string,
-      mode: (mode as "all" | "played" | "overtaken") || "all",
-      search: search as string,
-      levels,
-      difficulties,
+      lastId: query.lastId,
+      mode: query.mode,
+      search: query.search,
+      levels: query.levels,
+      difficulties: query.difficulties?.length ? query.difficulties : undefined,
     });
 
     if (timeline.length === 0) {

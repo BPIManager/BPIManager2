@@ -12,7 +12,10 @@ export default async function handler(
     return res.status(405).json({ message: "Method Not Allowed" });
   }
 
-  const { userId, version, levels, difficulties } = parseStatsQuery(req.query);
+  const query = parseStatsQuery(req.query, res);
+  if (!query) return;
+
+  const { userId, version, levels, difficulties } = query;
 
   if (levels.length === 0 && difficulties.length === 0) {
     return res.status(400).json({ message: "Required parameters are missing" });

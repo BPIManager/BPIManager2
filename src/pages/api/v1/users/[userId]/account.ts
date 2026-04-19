@@ -6,6 +6,8 @@ import {
 import type { NextApiResponse } from "next";
 import { adminAuth } from "@/lib/firebase/admin";
 import { backupAndDeleteUser } from "@/lib/db/users/deletion";
+import { accountDeletionSchema } from "@/schemas/account/deletion";
+import { parseBody } from "@/services/nextRequest/parseBody";
 
 const handler = async (
   req: AuthenticatedNextApiRequest,
@@ -17,13 +19,11 @@ const handler = async (
   }
 
   const userId = req.authUid;
-  const { confirmUserName } = req.body as { confirmUserName: string };
+  const body = parseBody(accountDeletionSchema, req.body, res);
+  if (!body) return;
 
-  if (!confirmUserName) {
-    return res.status(400).json({ message: "confirmUserName is required" });
-  }
+  const { confirmUserName } = body;
 
-  // ユーザー存在確認とユーザー名照合
   const user = await db
     .selectFrom("users")
     .select(["userId", "userName"])

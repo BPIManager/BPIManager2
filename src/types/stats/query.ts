@@ -1,6 +1,8 @@
+import { IIDXVersion } from "../iidx/version";
+
 export interface StatsQuery {
   userId: string;
-  version: string;
+  version: IIDXVersion;
   levels: number[];
   difficulties: string[];
 }

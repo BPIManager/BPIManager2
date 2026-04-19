@@ -4,6 +4,8 @@ import {
   handleDeleteFollow,
 } from "@/lib/subhandlers/userId-follow";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
+import { parseBody } from "@/services/nextRequest/parseBody";
+import { followsQuerySchema } from "@/schemas/follows/query";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
@@ -27,8 +29,11 @@ export default async function handler(
     const { viewerId } = access;
 
     switch (req.method) {
-      case "GET":
-        return await handleGetFollows(req, res, targetUserId, viewerId);
+      case "GET": {
+        const query = parseBody(followsQuerySchema, req.query, res);
+        if (!query) return;
+        return await handleGetFollows(res, targetUserId, viewerId, query);
+      }
 
       case "PUT":
         if (!viewerId) return res.status(401).json({ error: "Unauthorized" });

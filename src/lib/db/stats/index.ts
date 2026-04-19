@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { IIDXVersion } from "@/types/iidx/version";
 import { sql } from "kysely";
 
 /**
@@ -27,8 +28,9 @@ class StatsRepository {
   /**
    * AAA達成難易度表用：楽曲マスタ、BPI定義、ユーザーの最新スコアを取得
    */
-  async getAAATableData(userId: string, version: string, level: number) {
-    const versionNum = parseInt(version);
+  async getAAATableData(userId: string, version: IIDXVersion, level: number) {
+    const isInf = version === "INF";
+    const versionNum = isInf ? null : parseInt(version);
 
     return await db
       .selectFrom("songs as m")
@@ -68,8 +70,10 @@ class StatsRepository {
         "userScore.bpi as userBpi",
       ])
       .where("m.difficultyLevel", "=", level)
-      // ↓旧作のデータをクエリしたときに当時存在しなかった曲を含めない
-      .where("m.releasedVersion", "<=", versionNum)
+      .$if(!isInf, (qb) =>
+        // ↓旧作のデータをクエリしたときに当時存在しなかった曲を含めない
+        qb.where("m.releasedVersion", "<=", versionNum!),
+      )
       .orderBy("m.title", "asc")
       .execute();
   }

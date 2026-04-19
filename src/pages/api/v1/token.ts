@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { db } from "@/lib/db";
 import { adminAuth } from "@/lib/firebase/admin";
+import { apiKeysRepo } from "@/lib/db/apiKeys";
 import { timingSafeEqual } from "@/utils/common/timingSafeEqual";
 
 export default async function handler(
@@ -19,11 +19,7 @@ export default async function handler(
   }
 
   try {
-    const keyRecord = await db
-      .selectFrom("apiKeys")
-      .select(["userId", "key"])
-      .where("key", "=", xApiKey)
-      .executeTakeFirst();
+    const keyRecord = await apiKeysRepo.findByKey(xApiKey);
 
     if (!keyRecord || !timingSafeEqual(xApiKey, keyRecord.key)) {
       return res.status(401).json({ message: "Invalid API Key" });

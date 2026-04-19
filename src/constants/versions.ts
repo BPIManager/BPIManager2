@@ -1,15 +1,15 @@
 import type { VersionTitle } from "@/types/iidx/version";
 
 export const versionTitles: VersionTitle[] = [
-  { num: "26", title: "26 Rootage", disabled: true },
-  { num: "27", title: "27 HEROIC VERSE", disabled: true },
-  { num: "28", title: "28 BISTROVER", disabled: true },
-  { num: "29", title: "29 CastHour", disabled: true },
-  { num: "30", title: "30 RESIDENT", disabled: true },
-  { num: "31", title: "31 EPOLIS", disabled: true },
-  { num: "32", title: "32 Pinky Crush", disabled: true },
+  { num: "26", title: "26 Rootage" },
+  { num: "27", title: "27 HEROIC VERSE" },
+  { num: "28", title: "28 BISTROVER" },
+  { num: "29", title: "29 CastHour" },
+  { num: "30", title: "30 RESIDENT" },
+  { num: "31", title: "31 EPOLIS" },
+  { num: "32", title: "32 Pinky Crush" },
   { num: "33", title: "33 Sparkle Shower", default: true },
-  { num: "INF", title: "INFINITAS", disabled: true },
+  { num: "INF", title: "INFINITAS" },
 ];
 
 export const getVersionNameFromNumber = (v: number | string): string => {

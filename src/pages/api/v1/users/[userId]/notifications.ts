@@ -4,6 +4,8 @@ import {
   AuthenticatedNextApiRequest,
   withAuth,
 } from "@/middlewares/api/withAuth";
+import { notificationsQuerySchema } from "@/schemas/notifications/query";
+import { parseBody } from "@/services/nextRequest/parseBody";
 import type { NextApiResponse } from "next";
 
 async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
@@ -11,13 +13,16 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
   if (!userId) return res.status(400).json({ error: "Missing userId" });
 
   if (req.method === "GET") {
-    const { type = "all", page = "0", limit = "20" } = req.query;
-    const offset = Number(page) * Number(limit);
+    const query = parseBody(notificationsQuerySchema, req.query, res);
+    if (!query) return;
+
+    const { type, page, limit } = query;
+    const offset = page * limit;
 
     const items = await notificationsRepo.getNotifications({
       userId,
-      type: type as "all" | "follow" | "overtaken",
-      limit: Number(limit),
+      type,
+      limit,
       latestVersion,
       offset,
     });
