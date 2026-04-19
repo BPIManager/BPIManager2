@@ -39,7 +39,7 @@ export const PageHeader = ({
             <p
               className={cn(
                 "hidden text-base font-medium text-bpim-text/60 sm:block max-w-2xl",
-                Icon ? "sm:pl-[52px]" : "pl-0",
+                Icon ? "sm:pl-13" : "pl-0",
               )}
             >
               {description}
@@ -54,7 +54,7 @@ export const PageHeader = ({
 );
 
 export const PageContainer = ({ children }: { children: ReactNode }) => (
-  <div className="mx-auto w-full max-w-[1920px] px-3 py-4 md:px-8 lg:px-16">
+  <div className="mx-auto w-full max-w-480 px-3 py-4 md:px-8 lg:px-16">
     {children}
   </div>
 );

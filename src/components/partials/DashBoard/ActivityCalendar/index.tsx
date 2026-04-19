@@ -2,16 +2,28 @@ import { useActivity } from "@/hooks/stats/useActivity";
 import { ActivityCalendar } from "./ui";
 import { ActivityCalendarSkeleton } from "./skeleton";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
-import { NoDataAlert } from "../NoData/ui";
+import { Dispatch, SetStateAction, useEffect } from "react";
 
-export const ActivitySection = ({ userId }: { userId?: string }) => {
+export const ActivitySection = ({
+  userId,
+  setNodata,
+}: {
+  userId?: string;
+  setNodata: Dispatch<SetStateAction<boolean>>;
+}) => {
   const { levels, diffs, version } = useStatsFilter();
   const { activity, isLoading } = useActivity(userId, levels, diffs, version);
+
+  useEffect(() => {
+    if (!isLoading && (!activity || activity.length === 0)) {
+      setNodata(true);
+    } else {
+      setNodata(false);
+    }
+  }, [isLoading, activity]);
+
   if (isLoading) return <ActivityCalendarSkeleton />;
 
-  if (!activity || activity.length === 0) {
-    return <NoDataAlert />;
-  }
   return activity ? (
     <ActivityCalendar
       data={activity}

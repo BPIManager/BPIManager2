@@ -1,5 +1,5 @@
 import { DashboardLayout } from "@/components/partials/Main";
-import { PageHeader, PageContainer } from "@/components/partials/Header";
+import { PageContainer } from "@/components/partials/Header";
 import { Meta } from "@/components/partials/Head";
 import { useUser } from "@/contexts/users/UserContext";
 import { LoginRequiredCard } from "@/components/partials/LoginRequired/ui";
@@ -10,10 +10,6 @@ export default function GlobalAAATablePage() {
 
   return (
     <DashboardLayout>
-      <PageHeader
-        title="AAA達成難易度表"
-        description="BPIに基づくAAAまたはMAX-達成の難易度"
-      />
       <Meta title="AAA達成難易度表" />
 
       <PageContainer>

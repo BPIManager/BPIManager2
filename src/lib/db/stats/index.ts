@@ -232,11 +232,12 @@ class StatsRepository {
    */
   async getSongsWithUserBpiForBpmDistribution(
     userId: string,
-    version: string,
+    version: IIDXVersion,
     levels?: number[],
     difficulties?: string[],
   ) {
-    const versionNum = parseInt(version);
+    const isInf = version === "INF";
+    const versionNum = isInf ? null : parseInt(version);
 
     let query = db
       .selectFrom("songs as m")
@@ -274,7 +275,7 @@ class StatsRepository {
         "latest.bpi",
         "latest.exScore",
       ])
-      .where("m.releasedVersion", "<=", versionNum)
+      .$if(!isInf, (qb) => qb.where("m.releasedVersion", "<=", versionNum!))
       .where((eb) =>
         eb.or([eb("m.deletedAt", "is", null), eb("m.deletedAt", ">", version)]),
       );
@@ -482,16 +483,17 @@ class StatsRepository {
    * レーダーチャートの未プレイ曲フィルタリングに使用する。
    */
   async getFilteredSongKeys(
-    version: string,
+    version: IIDXVersion,
     levels?: number[],
     difficulties?: string[],
   ): Promise<Set<string>> {
-    const versionNum = parseInt(version);
+    const isInf = version === "INF";
+    const versionNum = isInf ? null : parseInt(version);
 
     let query = db
       .selectFrom("songs as m")
       .select(["m.title", "m.difficulty"])
-      .where("m.releasedVersion", "<=", versionNum)
+      .$if(!isInf, (qb) => qb.where("m.releasedVersion", "<=", versionNum!))
       .where((eb) =>
         eb.or([eb("m.deletedAt", "is", null), eb("m.deletedAt", ">", version)]),
       );

@@ -9,6 +9,7 @@ import { RivalList } from "./container";
 import { LoginRequiredCard } from "../../LoginRequired/ui";
 import { useRivalListFilter } from "@/hooks/social/useRivalListFilter";
 import { useRouter } from "next/router";
+import { PageContainer, PageHeader } from "../../Header";
 
 export const RivalListContainer = ({
   viewerRadar,
@@ -30,19 +31,24 @@ export const RivalListContainer = ({
   if (!user && !isCredentialLoading) return <LoginRequiredCard />;
 
   return (
-    <div className="flex w-full flex-col gap-8">
-      <RivalFilter
-        levels={levels}
-        difficulties={difficulties}
-        onToggleLevel={handleToggleLevel}
-        onToggleDifficulty={handleToggleDifficulty}
-      />
-      <RivalList
-        results={rivals}
-        isLoading={isLoading}
-        isError={isError}
-        onCardClick={(id: string) => router.push(`/rivals/${id}`)}
-      />
-    </div>
+    <>
+      <PageHeader title="ライバル" description="ライバル一覧・全体ランキング" />
+      <PageContainer>
+        <div className="flex w-full flex-col gap-8">
+          <RivalFilter
+            levels={levels}
+            difficulties={difficulties}
+            onToggleLevel={handleToggleLevel}
+            onToggleDifficulty={handleToggleDifficulty}
+          />
+          <RivalList
+            results={rivals}
+            isLoading={isLoading}
+            isError={isError}
+            onCardClick={(id: string) => router.push(`/rivals/${id}`)}
+          />
+        </div>
+      </PageContainer>
+    </>
   );
 };

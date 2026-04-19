@@ -49,13 +49,6 @@ const TargetBadge = ({
   target: AnalyticsTarget;
   onClick: () => void;
 }) => {
-  const kindLabel: Record<string, string> = {
-    rival: "個別ライバル",
-    "rival-avg": "ライバル平均",
-    arena: "アリーナ平均",
-    aaa: "AAA達成スコア",
-  };
-
   return (
     <button
       onClick={onClick}
@@ -122,9 +115,7 @@ export default function AnalyticsPage() {
   if (!fbUser) {
     return (
       <DashboardLayout>
-        <PageContainer>
-          <LoginRequiredCard />
-        </PageContainer>
+        <LoginRequiredCard />
       </DashboardLayout>
     );
   }

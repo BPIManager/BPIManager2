@@ -10,9 +10,8 @@ import {
   Minus,
 } from "lucide-react";
 import Fireworks from "react-canvas-confetti/dist/presets/fireworks";
-import Lottie from "lottie-react";
-
 import { useUser } from "@/contexts/users/UserContext";
+import { LottieAnimation } from "@/components/ui/lottie-animation";
 import trendingUpAnimation from "@/assets/lottie/trending-up.json";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -63,7 +62,7 @@ export const ImportSuccessModal = ({ result, version, onClose }: Props) => {
   const isUnchanged = bpiDiff === 0;
 
   return (
-    <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-bpim-bg/80 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-1000 flex items-center justify-center bg-bpim-bg/80 backdrop-blur-sm p-4">
       {isImproved && (
         <Fireworks
           autorun={{ speed: 2, duration: 1500 }}
@@ -78,15 +77,10 @@ export const ImportSuccessModal = ({ result, version, onClose }: Props) => {
         />
       )}
 
-      <div className="relative z-[1002] flex w-full max-w-[400px] flex-col items-center gap-7 rounded-2xl border border-bpim-border bg-bpim-surface-2 p-8 text-center shadow-2xl">
+      <div className="relative z-1002 flex w-full max-w-100 flex-col items-center gap-7 rounded-2xl border border-bpim-border bg-bpim-surface-2 p-8 text-center shadow-2xl">
         <div className="flex h-20 w-20 items-center justify-center rounded-full bg-bpim-primary/10 text-bpim-primary">
           {isImproved ? (
-            <Lottie
-              animationData={trendingUpAnimation}
-              loop={false}
-              autoplay={true}
-              style={{ width: "48px", height: "48px" }}
-            />
+            <LottieAnimation animationData={trendingUpAnimation} />
           ) : (
             <ScrollText size={32} />
           )}

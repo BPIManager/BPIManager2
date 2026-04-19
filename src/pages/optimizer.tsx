@@ -23,9 +23,7 @@ export default function BpiOptimizerPage() {
   if (!fbUser) {
     return (
       <DashboardLayout>
-        <PageContainer>
-          <LoginRequiredCard />
-        </PageContainer>
+        <LoginRequiredCard />
       </DashboardLayout>
     );
   }

@@ -21,6 +21,9 @@ import { Info } from "lucide-react";
 import type { RankingEntry } from "@/types/users/ranking";
 import { useState } from "react";
 import { SongRankingList } from "./SongRankingList";
+import { LoginRequiredCard } from "../LoginRequired/ui";
+import { useUser } from "@/contexts/users/UserContext";
+import { PageContainer, PageHeader } from "../Header";
 
 const ITEM_SIZE = 58;
 
@@ -66,6 +69,7 @@ const VirtualRow = ({
 
 export const GlobalRankingContainer = () => {
   const router = useRouter();
+  const { user, isLoading: isCredentialLoading } = useUser();
   const version = (router.query.version as string) || latestVersion;
   const category = (router.query.category as string) || "totalBpi";
   const isSongsCategory = category === "songs";
@@ -102,7 +106,6 @@ export const GlobalRankingContainer = () => {
   const handleVersionChange = (v: string) => {
     const newVersion = v;
     const isNewVersionLatest = newVersion === latestVersion;
-    // レーダーカテゴリは最新バージョンのみ対応。個別楽曲は全バージョン対応。
     const keepCategory =
       category === "songs" || isNewVersionLatest || category === "totalBpi";
     router.push(
@@ -145,8 +148,6 @@ export const GlobalRankingContainer = () => {
     );
   }
 
-  if (!isSongsCategory && !data) return null;
-
   const totalCount = data?.totalCount ?? 0;
   const selfRank = data?.selfRank ?? 0;
   const viewerRadar = data?.viewerRadar ?? {};
@@ -156,106 +157,117 @@ export const GlobalRankingContainer = () => {
     onRowClick: handleRowClick,
   };
 
+  if (!user && !isCredentialLoading) {
+    return <LoginRequiredCard />;
+  }
+
+  if (!isSongsCategory && !data) return null;
+
   return (
     <>
-      <div className="flex gap-3 mb-4">
-        <div className="flex flex-col gap-1 flex-1">
-          <label className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
-            Version
-          </label>
-          <Select value={version} onValueChange={handleVersionChange}>
-            <SelectTrigger className="w-full h-9 border-bpim-border bg-bpim-bg text-bpim-text focus:ring-blue-500">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="border-bpim-border bg-bpim-bg text-bpim-text">
-              {versionsNonDisabledCollection.map((v) => (
-                <SelectItem key={v.value} value={v.value}>
-                  {v.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+      <PageHeader
+        title="全体ランキング"
+        description="BPIM2登録ユーザー内総合BPIランキング"
+      />
+      <PageContainer>
+        <div className="flex gap-3 mb-4">
+          <div className="flex flex-col gap-1 flex-1">
+            <label className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
+              Version
+            </label>
+            <Select value={version} onValueChange={handleVersionChange}>
+              <SelectTrigger className="w-full h-9 border-bpim-border bg-bpim-bg text-bpim-text focus:ring-blue-500">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="border-bpim-border bg-bpim-bg text-bpim-text">
+                {versionsNonDisabledCollection.map((v) => (
+                  <SelectItem key={v.value} value={v.value}>
+                    {v.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex flex-col gap-1 flex-1">
+            <label className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
+              Category
+            </label>
+            <Select value={category} onValueChange={handleCategoryChange}>
+              <SelectTrigger className="w-full h-9 border-bpim-border bg-bpim-bg text-bpim-text focus:ring-blue-500">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="border-bpim-border bg-bpim-bg text-bpim-text">
+                {RADAR_CATEGORIES.filter(
+                  (c) =>
+                    isLatestVersion ||
+                    c.value === "totalBpi" ||
+                    c.value === "songs",
+                ).map((c) => (
+                  <SelectItem key={c.value} value={c.value}>
+                    {c.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
-        <div className="flex flex-col gap-1 flex-1">
-          <label className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
-            Category
-          </label>
-          <Select
-            value={category}
-            onValueChange={handleCategoryChange}
-          >
-            <SelectTrigger className="w-full h-9 border-bpim-border bg-bpim-bg text-bpim-text focus:ring-blue-500">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="border-bpim-border bg-bpim-bg text-bpim-text">
-              {RADAR_CATEGORIES.filter(
-                (c) =>
-                  isLatestVersion ||
-                  c.value === "totalBpi" ||
-                  c.value === "songs",
-              ).map((c) => (
-                <SelectItem key={c.value} value={c.value}>
-                  {c.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
+        {isSongsCategory ? (
+          <SongRankingList version={version} />
+        ) : (
+          <>
+            {isRadarCategory && isLatestVersion && (
+              <div className="mb-3 flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-400">
+                <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                <span>
+                  レーダーランキングは事前計算された値を使用しているため、スコア反映まで最大24時間の遅延が発生します。
+                </span>
+              </div>
+            )}
 
-      {isSongsCategory ? (
-        <SongRankingList version={version} />
-      ) : (
-        <>
-          {isRadarCategory && isLatestVersion && (
-            <div className="mb-3 flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-400">
-              <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-              <span>
-                レーダーランキングは事前計算された値を使用しているため、スコア反映まで最大24時間の遅延が発生します。
-              </span>
-            </div>
-          )}
-
-          {selfRank > 0 && (
-            <div className="rounded-xl border border-bpim-muted/20 bg-bpim-overlay/40 p-4 shadow-sm mb-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-md text-bpim-muted">全 {totalCount} 人中</p>
-                </div>
-                <div className="text-right">
-                  <span className="text-xs text-bpim-muted">現在の順位</span>
-                  <div className="font-mono text-xl font-bold text-bpim-text">
-                    <span className="text-bpim-primary">{selfRank}</span>
-                    <span className="ml-0.5 text-sm">位</span>
+            {selfRank > 0 && (
+              <div className="rounded-xl border border-bpim-muted/20 bg-bpim-overlay/40 p-4 shadow-sm mb-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-md text-bpim-muted">
+                      全 {totalCount} 人中
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-xs text-bpim-muted">現在の順位</span>
+                    <div className="font-mono text-xl font-bold text-bpim-text">
+                      <span className="text-bpim-primary">{selfRank}</span>
+                      <span className="ml-0.5 text-sm">位</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          <List
-            listRef={listRef}
-            rowComponent={VirtualRow}
-            rowCount={rowProps.rankings.length}
-            rowHeight={ITEM_SIZE}
-            rowProps={rowProps}
-            defaultHeight={500}
-            overscanCount={5}
-            className="rounded-xl border border-bpim-border"
-            style={{ height: "calc(100svh - 380px)", minHeight: "350px" }}
-          />
-
-          {selectedUserId && (
-            <RivalComparisonModal
-              rivalId={selectedUserId}
-              isOpen={isModalOpen}
-              onClose={() => setIsModalOpen(false)}
-              viewerRadar={viewerRadar}
+            <List
+              listRef={listRef}
+              rowComponent={VirtualRow}
+              rowCount={rowProps.rankings.length}
+              rowHeight={ITEM_SIZE}
+              rowProps={rowProps}
+              defaultHeight={500}
+              overscanCount={5}
+              className="rounded-xl border border-bpim-border"
+              style={{ height: "calc(100svh - 380px)", minHeight: "350px" }}
             />
-          )}
-        </>
-      )}
+
+            {selectedUserId && (
+              <RivalComparisonModal
+                rivalId={selectedUserId}
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                viewerRadar={viewerRadar}
+              />
+            )}
+          </>
+        )}
+      </PageContainer>
     </>
   );
 };

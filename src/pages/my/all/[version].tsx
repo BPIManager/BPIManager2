@@ -4,7 +4,6 @@ import { DashboardLayout } from "@/components/partials/Main";
 import { useUser } from "@/contexts/users/UserContext";
 import AccountSettings from "@/components/partials/Modal/AccountSettings";
 import { LoginRequiredCard } from "@/components/partials/LoginRequired/ui";
-import { PageContainer } from "@/components/partials/Header";
 import { PageLoader } from "@/components/ui/loading-spinner";
 import { AllSongsTable } from "@/components/partials/AllSongs";
 
@@ -16,9 +15,7 @@ export default function MyScoresByVersion() {
   const isReady = router.isReady && !isUserLoading;
 
   if (!isReady) {
-    return (
-      <PageLoader />
-    );
+    return <PageLoader />;
   }
 
   const targetVersion = typeof version === "string" ? version : undefined;
@@ -31,9 +28,7 @@ export default function MyScoresByVersion() {
 
       <DashboardLayout>
         {!fbUser?.uid ? (
-          <PageContainer>
-            <LoginRequiredCard />
-          </PageContainer>
+          <LoginRequiredCard />
         ) : (
           <AllSongsTable userId={fbUser?.uid} />
         )}

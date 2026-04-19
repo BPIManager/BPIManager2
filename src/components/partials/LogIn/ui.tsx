@@ -4,6 +4,14 @@ import {
   Wrench,
   TrendingUp,
   ChevronRight,
+  Code2,
+  BookOpen,
+  ExternalLink,
+  Globe,
+  LockIcon,
+  EyeOff,
+  Eye,
+  Terminal,
 } from "lucide-react";
 import { Meta } from "../Head";
 import { DashboardLayout } from "../Main";
@@ -31,8 +39,6 @@ import {
 import { cn } from "@/lib/utils";
 import { authActions } from "@/lib/firebase/auth";
 import Link from "next/link";
-
-// ─── Static mock data ────────────────────────────────────────────────────────
 
 const BPI_HISTORY_MOCK = [
   { date: "4月", bpi: 14.2, count: 3 },
@@ -82,7 +88,6 @@ const BPI_DIST_MOCK = [
 ];
 const BPI_DIST_COUNTS = [8, 24, 45, 52, 41, 34, 22, 14, 8, 5, 2];
 
-// AA(SPA) の BPI ↔ 必要スコア対応表（係数 1.0、ドキュメント記載値）
 const AA_BPI_DATA = [
   { bpi: 0, score: 3240 },
   { bpi: 10, score: 3381 },
@@ -97,7 +102,6 @@ const AA_BPI_DATA = [
   { bpi: 100, score: 3660 },
 ];
 
-// 7 rows × 20 cols — deterministic, no Math.random()
 const ACTIVITY_MOCK = [
   0, 1, 0, 2, 0, 1, 3, 0, 0, 1, 0, 2, 1, 0, 0, 1, 0, 3, 0, 1, 1, 0, 2, 0, 1, 0,
   2, 1, 0, 2, 0, 1, 3, 0, 1, 0, 2, 0, 1, 0, 0, 2, 0, 1, 3, 0, 1, 0, 2, 0, 3, 2,
@@ -124,8 +128,6 @@ const CHART_ANIMS = `
     100% { transform: scaleY(1); }
   }
 `;
-
-// ─── Provider icons ──────────────────────────────────────────────────────────
 
 const GoogleIcon = ({ className }: { className?: string }) => (
   <svg
@@ -166,11 +168,8 @@ const LineProviderIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-// ─── Login section ────────────────────────────────────────────────────────────
-
-const LoginSection = () => (
+export const LoginSection = () => (
   <div className="mx-auto w-full max-w-sm">
-    {/* Google — primary */}
     <button
       onClick={() => authActions.signInWithGoogle()}
       className="group relative flex h-14 w-full items-center gap-4 overflow-hidden rounded-xl bg-white px-6 shadow-lg transition-all duration-200 hover:brightness-95 active:scale-[0.98]"
@@ -182,7 +181,6 @@ const LoginSection = () => (
       <ChevronRight className="h-4 w-4 text-gray-400 opacity-0 transition-opacity group-hover:opacity-100" />
     </button>
 
-    {/* Divider */}
     <div className="my-4 flex items-center gap-3">
       <div className="flex-1 border-t border-bpim-border" />
       <span className="text-[11px] font-medium uppercase tracking-wider text-bpim-muted/50">
@@ -191,7 +189,6 @@ const LoginSection = () => (
       <div className="flex-1 border-t border-bpim-border" />
     </div>
 
-    {/* X and LINE */}
     <div className="grid grid-cols-2 gap-3">
       <button
         onClick={() => authActions.signInWithTwitter()}
@@ -209,7 +206,6 @@ const LoginSection = () => (
       </button>
     </div>
 
-    {/* Terms */}
     <p className="mt-5 text-center text-[11px] leading-relaxed text-bpim-muted/60">
       続行することで、
       <Link
@@ -224,9 +220,7 @@ const LoginSection = () => (
   </div>
 );
 
-// ─── BPIとは？ section ────────────────────────────────────────────────────────
-
-const BPI_SCALE_RANGE = 115; // -15 → 100
+const BPI_SCALE_RANGE = 115;
 
 const BPI_SEGMENTS = [
   { from: -15, to: 0 },
@@ -307,7 +301,7 @@ const BpiCurveChart = () => {
         </div>
       </div>
 
-      <div className="h-[180px]">
+      <div className="h-45">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
             data={AA_BPI_DATA}
@@ -385,11 +379,11 @@ const BpiCurveChart = () => {
 
       <div className="mt-2 flex items-center gap-4 text-[10px]">
         <div className="flex items-center gap-1.5">
-          <div className="h-[1px] w-4 border-t-2 border-dashed border-bpim-muted/60" />
+          <div className="h-px w-4 border-t-2 border-dashed border-bpim-muted/60" />
           <span className="text-bpim-muted">皆伝平均 3240</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="h-[1px] w-4 border-t-2 border-dashed border-bpim-warning/70" />
+          <div className="h-px w-4 border-t-2 border-dashed border-bpim-warning/70" />
           <span className="text-bpim-warning">全一 3660</span>
         </div>
       </div>
@@ -475,18 +469,16 @@ const BpiExplainSection = () => (
   </div>
 );
 
-// ─── Dashboard mock charts ────────────────────────────────────────────────────
-
 const MockBpiHistoryChart = () => {
   const c = useChartColors();
   return (
-    <DashCard className="h-[260px]">
+    <DashCard className="h-65">
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-xs font-bold uppercase text-bpim-muted">
           総合BPI推移
         </h3>
       </div>
-      <div className="h-[195px]">
+      <div className="h-48.75">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart
             data={BPI_HISTORY_MOCK}
@@ -583,16 +575,16 @@ const MockRadarChart = () => {
         </h3>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1">
-            <div className="h-[2px] w-3 bg-bpim-primary" />
+            <div className="h-0.5 w-3 bg-bpim-primary" />
             <span className="text-[10px] text-bpim-primary">自分</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="h-[2px] w-3 border-t-2 border-dashed border-bpim-warning" />
+            <div className="h-0.5 w-3 border-t-2 border-dashed border-bpim-warning" />
             <span className="text-[10px] text-bpim-warning">ライバル</span>
           </div>
         </div>
       </div>
-      <div className="h-[220px]">
+      <div className="h-55">
         <ResponsiveContainer width="100%" height="100%">
           <RadarChart
             cx="50%"
@@ -651,12 +643,12 @@ const MockBpmBars = () => {
           const rivalWidth = ((row.rivalBpi - BPI_MIN) / range) * 100;
           return (
             <div key={i} className="flex items-center gap-2">
-              <span className="w-[60px] shrink-0 text-right text-[10px] font-bold text-bpim-muted">
+              <span className="w-15 shrink-0 text-right text-[10px] font-bold text-bpim-muted">
                 {row.label}
               </span>
-              <div className="flex flex-1 flex-col gap-[3px]">
+              <div className="flex flex-1 flex-col gap-0.75">
                 <div
-                  className="h-[9px] rounded-r-sm"
+                  className="h-2.25 rounded-r-sm"
                   style={{
                     width: `${myWidth}%`,
                     backgroundColor: myColor,
@@ -664,7 +656,7 @@ const MockBpmBars = () => {
                   }}
                 />
                 <div
-                  className="h-[9px] rounded-r-sm opacity-45"
+                  className="h-2.25 rounded-r-sm opacity-45"
                   style={{
                     width: `${rivalWidth}%`,
                     backgroundColor: rivalColor,
@@ -672,7 +664,7 @@ const MockBpmBars = () => {
                   }}
                 />
               </div>
-              <div className="w-[40px] shrink-0">
+              <div className="w-10 shrink-0">
                 <span
                   className="text-[11px] font-bold"
                   style={{ color: myColor }}
@@ -696,15 +688,15 @@ const MockBpiDistribution = () => {
       <h3 className="mb-4 text-xs font-bold uppercase text-bpim-muted">
         BPI分布
       </h3>
-      <div className="flex h-[140px] items-end justify-between gap-[3px] px-1">
+      <div className="flex h-35 items-end justify-between gap-0.75 px-1">
         {BPI_DIST_MOCK.map((item, i) => {
           const color = getBpiColorStyle(item.bpi).bg;
           const heightPct = (BPI_DIST_COUNTS[i] / maxCount) * 100;
           return (
             <div key={i} className="flex flex-1 flex-col items-center">
-              <div className="relative flex h-[110px] w-full flex-col justify-end">
+              <div className="relative flex h-27.5 w-full flex-col justify-end">
                 <div
-                  className="w-full origin-bottom rounded-t-[2px]"
+                  className="w-full origin-bottom rounded-t-xs"
                   style={{
                     height: `${heightPct}%`,
                     backgroundColor: color,
@@ -726,100 +718,6 @@ const MockBpiDistribution = () => {
     </DashCard>
   );
 };
-
-const SCORE_TABLE_MOCK = [
-  {
-    title: "AA",
-    diff: "SPA",
-    clearState: "HARD CLEAR",
-    bpi: 63.2,
-    djRank: "AAA",
-  },
-  {
-    title: "Almagest",
-    diff: "SPA",
-    clearState: "EX HARD CLEAR",
-    bpi: 72.4,
-    djRank: "AAA",
-  },
-  {
-    title: "嘆きの樹",
-    diff: "SPA",
-    clearState: "HARD CLEAR",
-    bpi: 45.1,
-    djRank: "AAA",
-  },
-  {
-    title: "THE SAFARI",
-    diff: "SPA",
-    clearState: "CLEAR",
-    bpi: 31.5,
-    djRank: "AA+",
-  },
-  {
-    title: "quell ~the seventh slave~",
-    diff: "SPA",
-    clearState: "CLEAR",
-    bpi: 18.7,
-    djRank: "AA",
-  },
-  {
-    title: "MENDES",
-    diff: "SPA",
-    clearState: "FAILED",
-    bpi: -8.3,
-    djRank: "A",
-  },
-  { title: "冥", diff: "SPA", clearState: "CLEAR", bpi: 42.6, djRank: "AAA" },
-];
-
-const SCORE_BPI_DIST_MOCK = [
-  { label: "<0", count: 12, bpi: -5 },
-  { label: "0〜10", count: 38, bpi: 5 },
-  { label: "10〜20", count: 47, bpi: 15 },
-  { label: "20〜30", count: 41, bpi: 25 },
-  { label: "30〜40", count: 33, bpi: 35 },
-  { label: "40〜50", count: 24, bpi: 45 },
-  { label: "50〜70", count: 18, bpi: 60 },
-  { label: "70+", count: 9, bpi: 80 },
-];
-
-const LOGS_MOCK = [
-  {
-    date: "2025/03/28 22:14",
-    totalBpi: 47.83,
-    diff: 2.41,
-    songCount: 12,
-    topScores: [
-      { title: "AA", bpi: 63.2 },
-      { title: "Almagest", bpi: 72.4 },
-      { title: "嘆きの樹", bpi: 45.1 },
-      { title: "quell ~the seventh slave~", bpi: 18.7 },
-    ],
-  },
-  {
-    date: "2025/03/15 21:33",
-    totalBpi: 45.42,
-    diff: 3.11,
-    songCount: 8,
-    topScores: [
-      { title: "THE SAFARI", bpi: 31.5 },
-      { title: "冥", bpi: 42.6 },
-      { title: "Verflucht", bpi: 29.1 },
-      { title: "Lachryma《Re:Queen'M》", bpi: 54.8 },
-    ],
-  },
-  {
-    date: "2025/02/22 20:07",
-    totalBpi: 42.31,
-    diff: -0.58,
-    songCount: 5,
-    topScores: [
-      { title: "perditus†paradisus", bpi: 38.9 },
-      { title: "Lachryma《Re:Queen'M》", bpi: 54.8 },
-    ],
-  },
-];
 
 const RIVAL_ROWS = [
   { name: "ライバルA", win: 142, draw: 23, lose: 89, total: 254 },
@@ -861,7 +759,7 @@ const MockRivalBars = () => (
                 {r.total}曲比較
               </span>
             </div>
-            <div className="relative h-[18px] w-full overflow-hidden rounded-sm bg-bpim-surface-2/60">
+            <div className="relative h-4.5 w-full overflow-hidden rounded-sm bg-bpim-surface-2/60">
               <div className="flex h-full w-full">
                 <div
                   className="relative h-full bg-bpim-primary"
@@ -916,7 +814,7 @@ const MockActivityCalendar = () => (
         {ACTIVITY_MOCK.map((level, i) => (
           <div
             key={i}
-            className="rounded-[2px]"
+            className="rounded-xs"
             style={{
               width: 11,
               height: 11,
@@ -931,7 +829,7 @@ const MockActivityCalendar = () => (
       {[0, 1, 2, 3, 4].map((v) => (
         <div
           key={v}
-          className="h-[10px] w-[10px] rounded-[2px]"
+          className="h-2.5 w-2.5 rounded-xs"
           style={{ backgroundColor: ACTIVITY_COLORS[v] }}
         />
       ))}
@@ -939,8 +837,6 @@ const MockActivityCalendar = () => (
     </div>
   </DashCard>
 );
-
-// ─── Showcase section layout ─────────────────────────────────────────────────
 
 const ShowcaseSection = ({
   tag,
@@ -978,87 +874,315 @@ const ShowcaseSection = ({
   </div>
 );
 
-// ─── API / Privacy standalone sections ───────────────────────────────────────
+export const ApiSection = () => {
+  const API_DOCS_URL = "https://bpim2.apidog.io/";
 
-const ApiSection = () => (
-  <div className="flex flex-col gap-4">
-    <div className="flex items-center gap-3">
-      <div className="flex shrink-0 items-center justify-center rounded-lg bg-bpim-primary/10 p-2.5 text-bpim-primary">
-        <Wrench className="h-5 w-5" />
+  return (
+    <div className="flex flex-col gap-5 rounded-xl border border-bpim-border bg-bpim-surface-2/30 p-6 backdrop-blur-sm">
+      <div className="flex items-center gap-4">
+        <div className="flex shrink-0 items-center justify-center rounded-xl bg-bpim-primary/10 p-3 text-bpim-primary shadow-inner">
+          <Wrench className="h-6 w-6" />
+        </div>
+        <div>
+          <span className="text-[10px] font-black uppercase tracking-[0.25em] text-bpim-primary/80">
+            Developer API
+          </span>
+          <h3 className="text-xl font-bold leading-tight text-bpim-text md:text-2xl">
+            APIへのフルアクセス
+          </h3>
+        </div>
       </div>
-      <div>
-        <span className="text-xs font-bold uppercase tracking-[0.2em] text-bpim-primary">
-          Developer API
-        </span>
-        <h3 className="text-xl font-bold leading-snug text-bpim-text md:text-2xl">
-          REST API
-        </h3>
-      </div>
-    </div>
-    <p className="text-sm leading-relaxed text-bpim-muted">
-      BPIM2 はREST APIを一般公開しています。
-      <br />
-      自分のスコアデータや、公開状態のライバルのデータを外部から自由に取得・分析できます。
-    </p>
-    <div className="rounded-lg border border-bpim-border bg-bpim-surface px-4 py-3 font-mono text-[11px] text-bpim-muted">
-      <span className="text-bpim-primary">GET</span>
-      {" /api/v1/users/:userId/scores"}
-      <br />
-      <span className="text-bpim-primary">GET</span>
-      {" /api/v1/users/:userId/stats/bpi"}
-      <br />
-      <span className="text-bpim-primary">GET</span>
-      {" /api/v1/users/:userId/rivals"}
-    </div>
-  </div>
-);
 
-const PrivacySection = () => (
-  <div className="flex flex-col gap-4">
-    <div className="flex items-center gap-3">
-      <div className="flex shrink-0 items-center justify-center rounded-lg bg-bpim-primary/10 p-2.5 text-bpim-primary">
-        <ShieldCheck className="h-5 w-5" />
+      <p className="text-sm leading-relaxed text-bpim-muted">
+        BPIM2 はREST APIを一般公開しています。
+        <br className="hidden sm:block" />
+        自身のスコアデータはもちろん、公開設定になっているライバルの統計データなどをGoogle
+        Apps Scriptや自作ツールから自由に取得・分析することが可能です。
+      </p>
+
+      <div className="overflow-hidden rounded-lg border border-bpim-border bg-bpim-surface p-4 font-mono text-[11px] leading-relaxed shadow-inner">
+        <div className="flex flex-col gap-1">
+          <div className="flex gap-2">
+            <span className="shrink-0 select-none text-bpim-primary">$</span>
+            <span className="text-bpim-text">
+              curl <span className="text-bpim-success">GET</span>{" "}
+              "https://bpi2.poyashi.me/api/v1/users/abc123uid/scores?version=32"
+            </span>
+          </div>
+
+          {/* Response Body */}
+          <pre className="mt-2 text-bpim-muted">
+            {`[`}
+            <br />
+            {`  {`}
+            <br />
+            {`    `}
+            <span className="text-bpim-info">"songId"</span>:{" "}
+            <span className="text-bpim-danger">1024</span>,
+            <br />
+            {`    `}
+            <span className="text-bpim-info">"title"</span>:{" "}
+            <span className="text-bpim-warning">"V"</span>,
+            <br />
+            {`    `}
+            <span className="text-bpim-info">"difficulty"</span>:{" "}
+            <span className="text-bpim-warning">"ANOTHER"</span>,
+            <br />
+            {`    `}
+            <span className="text-bpim-info">"exScore"</span>:{" "}
+            <span className="text-bpim-danger">2805</span>,
+            <br />
+            {`    `}
+            <span className="text-bpim-info">"bpi"</span>:{" "}
+            <span className="text-bpim-danger">52.45</span>,
+            <br />
+            {`    ...`}
+            <br />
+            {`  }, ...`}
+            <br />
+            {`]`}
+          </pre>
+        </div>
+
+        <p className="px-1 text-[10px] text-bpim-muted/60">
+          ※
+          公開設定のユーザーデータは、特別な認証なしにこのエンドポイントから直接取得可能です。
+        </p>
       </div>
-      <div>
-        <span className="text-xs font-bold uppercase tracking-[0.2em] text-bpim-primary">
-          Privacy Control
-        </span>
-        <h3 className="text-xl font-bold leading-snug text-bpim-text md:text-2xl">
-          プライバシーコントロール
-        </h3>
+
+      <div className="pt-2">
+        <a
+          href={API_DOCS_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-bpim-primary bg-bpim-primary/10 px-6 py-3 text-sm font-bold text-bpim-primary transition-all hover:bg-bpim-primary hover:text-bpim-bg active:scale-[0.98] sm:w-auto"
+        >
+          <BookOpen className="h-4 w-4" />
+          APIリファレンス
+          <ExternalLink className="ml-1 h-3.5 w-3.5 opacity-60" />
+        </a>
       </div>
     </div>
-    <p className="text-sm leading-relaxed text-bpim-muted">
-      スコアの公開状態は完全にユーザーが制御できます。非公開設定にすればAPIやライバル検索にも一切表示されません。安心して自身のデータに集中できます。
-    </p>
-    <div className="flex flex-col gap-2">
-      {[
-        { label: "公開", active: true },
-        { label: "非公開", active: false },
-      ].map(({ label, active }) => (
-        <div
-          key={label}
+  );
+};
+
+export const PrivacySection = () => {
+  return (
+    <div className="flex flex-col gap-5 rounded-xl border border-bpim-border bg-bpim-surface-2/30 p-6 backdrop-blur-sm">
+      <div className="flex items-center gap-4">
+        <div className="flex shrink-0 items-center justify-center rounded-xl bg-bpim-primary/10 p-3 text-bpim-primary shadow-inner">
+          <ShieldCheck className="h-6 w-6" />
+        </div>
+        <div>
+          <span className="text-[10px] font-black uppercase tracking-[0.25em] text-bpim-primary/80">
+            Privacy Control
+          </span>
+          <h3 className="text-xl font-bold leading-tight text-bpim-text md:text-2xl">
+            プライバシー制御
+          </h3>
+        </div>
+      </div>
+
+      <p className="text-sm leading-relaxed text-bpim-muted">
+        スコアデータの公開範囲は、いつでも自由に変更可能です。
+        <br className="hidden sm:block" />
+        非公開設定にすると、ライバル検索やAPI経由の取得対象から即座に除外され、あなたのデータは保護されます。
+      </p>
+
+      <div className="flex flex-col gap-3">
+        <div className="text-[10px] font-bold uppercase tracking-wider text-bpim-muted/70 ml-1">
+          Visibility States
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <PrivacyStatusCard
+            active={true}
+            label="公開"
+            description="ライバルから検索・閲覧が可能"
+            icon={<Globe className="h-4 w-4" />}
+          />
+          <PrivacyStatusCard
+            active={false}
+            label="非公開"
+            description="自分のみが閲覧可能な状態"
+            icon={<LockIcon className="h-4 w-4" />}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const PrivacyStatusCard = ({
+  active,
+  label,
+  description,
+  icon,
+}: {
+  active: boolean;
+  label: string;
+  description: string;
+  icon: React.ReactNode;
+}) => (
+  <div
+    className={cn(
+      "flex items-center gap-3 rounded-lg border p-3 transition-all",
+      active
+        ? "border-bpim-primary/40 bg-bpim-primary/5 shadow-sm shadow-bpim-primary/5"
+        : "border-bpim-border bg-bpim-surface/50 opacity-60",
+    )}
+  >
+    <div
+      className={cn(
+        "flex h-8 w-8 shrink-0 items-center justify-center rounded-md",
+        active
+          ? "bg-bpim-primary text-bpim-bg"
+          : "bg-bpim-surface-2 text-bpim-muted",
+      )}
+    >
+      {active ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+    </div>
+    <div className="flex flex-col">
+      <div className="flex items-center gap-1.5 font-bold text-sm text-bpim-text">
+        <span
           className={cn(
-            "flex items-center gap-2.5 rounded-lg border px-3 py-2 text-[12px]",
-            active
-              ? "border-bpim-primary/40 bg-bpim-primary/5 font-bold text-bpim-primary"
-              : "border-bpim-border bg-bpim-surface text-bpim-muted",
+            "text-xs",
+            active ? "text-bpim-primary" : "text-bpim-muted",
           )}
         >
-          <div
-            className={cn(
-              "h-2 w-2 rounded-full",
-              active ? "bg-bpim-primary" : "bg-bpim-overlay",
-            )}
-          />
-          {label}
-        </div>
-      ))}
+          {icon}
+        </span>
+        {label}
+      </div>
+      <span className="text-[10px] text-bpim-muted leading-none mt-1">
+        {description}
+      </span>
     </div>
   </div>
 );
 
-// ─── Main page ────────────────────────────────────────────────────────────────
+export const LoginPageBody = ({
+  requiredMessage,
+}: {
+  requiredMessage?: string;
+} = {}) => (
+  <div className="min-h-screen bg-bpim-bg py-16 text-bpim-text">
+    <PageContainer>
+      {requiredMessage && (
+        <div className="mb-10 flex items-start gap-3 rounded-xl border border-bpim-primary/30 bg-bpim-primary/8 px-4 py-3 text-bpim-primary">
+          <LockIcon className="mt-0.5 h-4 w-4 shrink-0" />
+          <span className="text-sm font-medium">{requiredMessage}</span>
+        </div>
+      )}
+      <div className="flex flex-col items-center gap-6 text-center">
+        <h1 className="bg-linear-to-br from-bpim-text to-gray-600 bg-clip-text text-6xl font-bold tracking-tighter text-transparent leading-none md:text-8xl">
+          BPIM2
+        </h1>
+        <p className="max-w-2xl text-base text-bpim-muted md:text-lg">
+          beatmania IIDX 上級者のためのスコアマネジメントツール
+        </p>
+      </div>
+
+      <div className="my-10">
+        <LoginSection />
+      </div>
+
+      <Separator className="mb-20 bg-bpim-overlay/60" />
+
+      <BpiExplainSection />
+
+      <Separator className="my-20 bg-bpim-overlay/30" />
+
+      <ShowcaseSection
+        tag="TRACK YOUR GROWTH"
+        title="成長の軌跡を辿る"
+        visual={
+          <div className="flex flex-col gap-4">
+            <MockBpiHistoryChart />
+            <MockCurrentBpiCard />
+          </div>
+        }
+      >
+        <p>
+          BPIM2では☆11・☆12全楽曲のスコア更新及び、☆12に基づく総合BPIが記録されます。
+          <br />
+          いつ・どれだけ成長したか、過去に遡って振り返ることも可能です。
+        </p>
+        <p>
+          また、総合BPIに基づき、今自分が全プレイヤーの中でどの水準にいるか、推定順位を確認することもできます。
+        </p>
+      </ShowcaseSection>
+
+      <Separator className="my-20 bg-bpim-overlay/30" />
+
+      <ShowcaseSection
+        tag="ANALYZE YOUR WEAKNESS"
+        title="自分の得意分野を分析する"
+        flip
+        visual={
+          <div className="flex flex-col gap-4 md:grid md:grid-cols-2">
+            <MockRadarChart />
+            <MockBpmBars />
+          </div>
+        }
+      >
+        <p>
+          NOTES・CHORD・PEAK・CHARGE・SCRATCH・SOFLANの6属性それぞれのBPIをレーダーチャートで可視化。自分の得意・苦手な譜面傾向が明らかになります。
+        </p>
+        <p>
+          BPM帯域別のBPI分布も確認可能。高速・中速・低速・ソフランなど、ピンポイントで強化すべき領域がわかります。
+        </p>
+        <p>
+          フォロー中のライバルと得意分野のチャートを重ねて、強み・弱みを比較することもできます。
+        </p>
+      </ShowcaseSection>
+
+      <Separator className="my-20 bg-bpim-overlay/30" />
+
+      <ShowcaseSection
+        tag="SCORE DISTRIBUTION"
+        title="スコア / BPI分布"
+        visual={
+          <div className="flex flex-col gap-4 md:grid md:grid-cols-2">
+            <MockBpiDistribution />
+            <MockActivityCalendar />
+          </div>
+        }
+      >
+        <p>
+          BPIやDJランクの分布を分かりやすく視覚化します。「BPI 20〜30
+          の曲が最も多い」「0以下がまだ残っている」など、現在の実力分布が直感的にわかります。
+        </p>
+        <p>
+          プレーの活動カレンダーも記録され、日別の記録を振り返ることができます。
+        </p>
+      </ShowcaseSection>
+
+      <Separator className="my-20 bg-bpim-overlay/30" />
+
+      <ShowcaseSection
+        tag="RIVAL TRACKING"
+        title="コーナーで差をつけろ"
+        flip
+        visual={<MockRivalBars />}
+      >
+        <p>
+          実力が近いプレイヤーを見つけて、無制限にフォローすることができます。
+        </p>
+        <p>
+          フォローしたライバルから日々のスコア更新の通知を受け取って切磋琢磨できるほか、
+          スコアの比較や、追いつき・引き離しも一目で把握できます。
+        </p>
+      </ShowcaseSection>
+
+      <Separator className="my-20 bg-bpim-overlay/30" />
+
+      <div className="grid grid-cols-1 gap-12 md:grid-cols-2">
+        <ApiSection />
+        <PrivacySection />
+      </div>
+    </PageContainer>
+  </div>
+);
 
 export default function LoginPage() {
   return (
@@ -1067,125 +1191,7 @@ export default function LoginPage() {
         title=""
         description="beatmania IIDX 上級者のためのスコアマネジメントツール"
       />
-      <div className="min-h-screen bg-bpim-bg py-16 text-bpim-text">
-        <PageContainer>
-          {/* ── Hero ── */}
-          <div className="flex flex-col items-center gap-6 text-center">
-            <h1 className="bg-gradient-to-br from-bpim-text to-gray-600 bg-clip-text text-6xl font-bold tracking-tighter text-transparent leading-none md:text-8xl">
-              BPIM2
-            </h1>
-            <p className="max-w-2xl text-base text-bpim-muted md:text-lg">
-              beatmania IIDX 上級者のためのスコアマネジメントツール
-            </p>
-          </div>
-
-          {/* ── Login ── */}
-          <div className="my-10">
-            <LoginSection />
-          </div>
-
-          <Separator className="mb-20 bg-bpim-overlay/60" />
-
-          {/* ── BPIとは？ ── */}
-          <BpiExplainSection />
-
-          <Separator className="my-20 bg-bpim-overlay/30" />
-
-          {/* ── Showcase 1: BPI成長 ── */}
-          <ShowcaseSection
-            tag="TRACK YOUR GROWTH"
-            title="成長の軌跡を辿る"
-            visual={
-              <div className="flex flex-col gap-4">
-                <MockBpiHistoryChart />
-                <MockCurrentBpiCard />
-              </div>
-            }
-          >
-            <p>
-              BPIM2では☆11・☆12全楽曲のスコア更新及び、☆12に基づく総合BPIが記録されます。
-              <br />
-              いつ・どれだけ成長したか、過去に遡って振り返ることも可能です。
-            </p>
-            <p>
-              また、総合BPIに基づき、今自分が全プレイヤーの中でどの水準にいるか、推定順位を確認することもできます。
-            </p>
-          </ShowcaseSection>
-
-          <Separator className="my-20 bg-bpim-overlay/30" />
-
-          {/* ── Showcase 2: 弱点分析 ── */}
-          <ShowcaseSection
-            tag="ANALYZE YOUR WEAKNESS"
-            title="自分の得意分野を分析する"
-            flip
-            visual={
-              <div className="flex flex-col gap-4 md:grid md:grid-cols-2">
-                <MockRadarChart />
-                <MockBpmBars />
-              </div>
-            }
-          >
-            <p>
-              NOTES・CHORD・PEAK・CHARGE・SCRATCH・SOFLANの6属性それぞれのBPIをレーダーチャートで可視化。自分の得意・苦手な譜面傾向が明らかになります。
-            </p>
-            <p>
-              BPM帯域別のBPI分布も確認可能。高速・中速・低速・ソフランなど、ピンポイントで強化すべき領域がわかります。
-            </p>
-            <p>
-              フォロー中のライバルと得意分野のチャートを重ねて、強み・弱みを比較することもできます。
-            </p>
-          </ShowcaseSection>
-
-          <Separator className="my-20 bg-bpim-overlay/30" />
-
-          {/* ── Showcase 3: BPI分布 ── */}
-          <ShowcaseSection
-            tag="SCORE DISTRIBUTION"
-            title="スコア / BPI分布"
-            visual={
-              <div className="flex flex-col gap-4 md:grid md:grid-cols-2">
-                <MockBpiDistribution />
-                <MockActivityCalendar />
-              </div>
-            }
-          >
-            <p>
-              BPIやDJランクの分布を分かりやすく視覚化します。「BPI 20〜30
-              の曲が最も多い」「0以下がまだ残っている」など、現在の実力分布が直感的にわかります。
-            </p>
-            <p>
-              プレーの活動カレンダーも記録され、日別の記録を振り返ることができます。
-            </p>
-          </ShowcaseSection>
-
-          <Separator className="my-20 bg-bpim-overlay/30" />
-
-          {/* ── Showcase 4: ライバル機能 ── */}
-          <ShowcaseSection
-            tag="RIVAL TRACKING"
-            title="コーナーで差をつけろ"
-            flip
-            visual={<MockRivalBars />}
-          >
-            <p>
-              実力が近いプレイヤーを見つけて、無制限にフォローすることができます。
-            </p>
-            <p>
-              フォローしたライバルから日々のスコア更新の通知を受け取って切磋琢磨できるほか、
-              スコアの比較や、追いつき・引き離しも一目で把握できます。
-            </p>
-          </ShowcaseSection>
-
-          <Separator className="my-20 bg-bpim-overlay/30" />
-
-          {/* ── API / Privacy ── */}
-          <div className="grid grid-cols-1 gap-12 md:grid-cols-2">
-            <ApiSection />
-            <PrivacySection />
-          </div>
-        </PageContainer>
-      </div>
+      <LoginPageBody />
     </DashboardLayout>
   );
 }

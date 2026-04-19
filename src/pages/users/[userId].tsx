@@ -16,6 +16,7 @@ import { RadarSection } from "@/components/partials/DashBoard/Radar/ui";
 import { BpiHistorySection } from "@/components/partials/DashBoard/TotalBPIHistory";
 import { LogFilterSection } from "@/components/partials/Logs/VersionSelector/ui";
 import { TabsContent } from "@/components/ui/tabs";
+import { useState } from "react";
 
 interface UserPageProps {
   defaultView?: "overview" | "songs" | "logs";
@@ -26,6 +27,7 @@ export default function UserPage({ defaultView = "overview" }: UserPageProps) {
   const userId = router.query.userId as string;
   const version = (router.query.version as string) || latestVersion;
   const groupedBy = (router.query.groupedBy as string) || "lastPlayed";
+  const [nodata, setNodata] = useState<boolean>(false);
 
   if (!userId) return null;
 
@@ -48,7 +50,7 @@ export default function UserPage({ defaultView = "overview" }: UserPageProps) {
           <div className="flex flex-col gap-6">
             <DashBoardFilter />
 
-            <ActivitySection userId={userId} />
+            <ActivitySection setNodata={setNodata} userId={userId} />
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <RankDistributionSection myUserId={userId} />
