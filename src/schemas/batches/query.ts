@@ -10,7 +10,7 @@ export const batchesQuerySchema = z.object({
     )
     .catch(latestVersion)
     .default(latestVersion),
-  groupedBy: z.enum(["lastPlayed", "batch"]).default("batch"),
+  groupedBy: z.enum(["lastPlayed", "batch", "createdAt"]).default("batch"),
   topN: z.coerce.number().int().positive().default(5),
 });
 

@@ -6,12 +6,14 @@ export type CsvType =
   | "official" // 公式CSV
   | "reflux" // Reflux TSV
   | "result_techo" // リザルト手帳 CSV
+  | "daken_counter" // 打鍵カウンタ CSV
   | "unknown";
 
 const REFLUX_HEADER_MARKER = "title\tType\tLabel\t";
 const RESULT_TECHO_HEADER_MARKER_1 = "バージョン";
 const RESULT_TECHO_HEADER_MARKER_2 = "曲名";
 const OFFICIAL_HEADER_MARKER = "タイトル";
+const DAKEN_COUNTER_HEADER_MARKER = "LV,Title,mode,";
 
 /**
  * テキストの1行目を見てCSV種別を返す。
@@ -20,6 +22,8 @@ export const detectCsvType = (text: string): CsvType => {
   const firstLine = text.trimStart().split(/\r?\n/)[0] ?? "";
 
   if (firstLine.startsWith(REFLUX_HEADER_MARKER)) return "reflux";
+
+  if (firstLine.startsWith(DAKEN_COUNTER_HEADER_MARKER)) return "daken_counter";
 
   if (
     firstLine.includes(RESULT_TECHO_HEADER_MARKER_1) &&
@@ -36,13 +40,14 @@ export const CSV_TYPE_LABELS: Record<CsvType, string> = {
   official: "公式CSV",
   reflux: "Reflux TSV",
   result_techo: "リザルト手帳 CSV",
+  daken_counter: "打鍵カウンタ CSV",
   unknown: "不明",
 };
 
 const INFINITAS_VERSION = "INF";
 
-/** INFINITASバージョン向け: Reflux TSV / リザルト手帳のみ受け付ける */
-const INF_ALLOWED: CsvType[] = ["reflux", "result_techo"];
+/** INFINITASバージョン向け: Reflux TSV / リザルト手帳 / 打鍵カウンタのみ受け付ける */
+const INF_ALLOWED: CsvType[] = ["reflux", "result_techo", "daken_counter"];
 /** 通常バージョン向け: 公式CSVのみ受け付ける */
 const NORMAL_ALLOWED: CsvType[] = ["official"];
 
@@ -60,7 +65,7 @@ export const validateCsvTypeForVersion = (
   const isInf = version === INFINITAS_VERSION;
 
   if (isInf && !INF_ALLOWED.includes(type)) {
-    return "INFINITASバージョンには公式CSVは使用できません。Reflux TSV またはリザルト手帳CSVを貼り付けてください。";
+    return "INFINITASバージョンには公式CSVは使用できません。Reflux TSV・リザルト手帳CSV・打鍵カウンタCSVを貼り付けてください。";
   }
   if (!isInf && !NORMAL_ALLOWED.includes(type)) {
     return "このバージョンには Reflux TSV / リザルト手帳CSVは使用できません。公式CSVを貼り付けてください。";

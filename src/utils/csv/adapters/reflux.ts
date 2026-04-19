@@ -13,6 +13,7 @@
  */
 
 import type { ParsedCsvRow } from "../types";
+import { correctTitle } from "../correct-title";
 
 /** SP 各難易度のヘッダープレフィックスとDB難易度名の対応 */
 const SP_DIFFICULTIES: { prefix: string; difficulty: string }[] = [
@@ -53,7 +54,7 @@ export const parseRefluxTsv = (tsvData: string): ParsedCsvRow[] => {
 
   for (let i = 1; i < lines.length; i++) {
     const cols = lines[i].split("\t");
-    const title = cols[titleIdx]?.trim();
+    const title = correctTitle(cols[titleIdx]?.trim() ?? "");
     if (!title) continue;
 
     for (const { prefix, difficulty } of SP_DIFFICULTIES) {

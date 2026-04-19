@@ -3,6 +3,7 @@ import { IIDX_DIFFICULTIES } from "@/constants/diffs";
 import { detectCsvType } from "./detect";
 import { parseRefluxTsv } from "./adapters/reflux";
 import { parseRizaltoCsv } from "./adapters/result_techo";
+import { parseDakenCounterCsv } from "./adapters/daken_counter";
 import type { ParsedCsvRow } from "./types";
 
 export type { ParsedCsvRow };
@@ -59,9 +60,11 @@ export const parseAnyCsv = (rawData: string): ParsedCsvRow[] => {
       return parseRefluxTsv(rawData);
     case "result_techo":
       return parseRizaltoCsv(rawData);
+    case "daken_counter":
+      return parseDakenCounterCsv(rawData);
     default:
       throw new Error(
-        "未対応のフォーマットです。公式CSV・Reflux TSV・リザルト手帳 CSV を貼り付けてください。",
+        "未対応のフォーマットです。公式CSV・Reflux TSV・リザルト手帳CSV・打鍵カウンタCSV を貼り付けてください。",
       );
   }
 };
