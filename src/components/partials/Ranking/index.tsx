@@ -24,6 +24,7 @@ import { SongRankingList } from "./SongRankingList";
 import { LoginRequiredCard } from "../LoginRequired/ui";
 import { useUser } from "@/contexts/users/UserContext";
 import { PageContainer, PageHeader } from "../Header";
+import { GlobalRankingContainerSkeleton } from "./skeleton";
 
 const ITEM_SIZE = 58;
 
@@ -134,17 +135,15 @@ export const GlobalRankingContainer = () => {
 
   if (!isSongsCategory && isLoading) {
     return (
-      <div className="flex flex-col gap-2">
-        <div className="flex gap-3 mb-4">
-          <Skeleton className="h-9 flex-1 rounded-md" />
-          <Skeleton className="h-9 flex-1 rounded-md" />
-        </div>
-        <div className="mt-2 flex flex-col gap-1.5">
-          {Array.from({ length: 10 }).map((_, i) => (
-            <Skeleton key={i} className="h-12 w-full rounded-lg" />
-          ))}
-        </div>
-      </div>
+      <>
+        <PageHeader
+          title="全体ランキング"
+          description="BPIM2登録ユーザー内総合BPIランキング"
+        />
+        <PageContainer>
+          <GlobalRankingContainerSkeleton />
+        </PageContainer>
+      </>
     );
   }
 
