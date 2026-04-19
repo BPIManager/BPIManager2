@@ -2,8 +2,17 @@
 import { TrendingUp, TrendingDown, ChevronRight, Minus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DashCard } from "@/components/ui/dashcard";
+import trendingUpAnimation from "@/assets/lottie/trending-up.json";
+import { LottieAnimation } from "@/components/ui/lottie-animation";
 
-export const BatchTotalBpiCard = ({ pagination }: { pagination: { prev?: { totalBpi?: number } | null; current?: { totalBpi?: number } | null } }) => {
+export const BatchTotalBpiCard = ({
+  pagination,
+}: {
+  pagination: {
+    prev?: { totalBpi?: number } | null;
+    current?: { totalBpi?: number } | null;
+  };
+}) => {
   const prevBpi = pagination.prev?.totalBpi ?? -15;
   const currentBpi = pagination.current?.totalBpi ?? -15;
   const bpiDiff = currentBpi - prevBpi;
@@ -37,7 +46,7 @@ export const BatchTotalBpiCard = ({ pagination }: { pagination: { prev?: { total
           <div
             className={cn("rounded-xl p-3 shrink-0", bpiBgClass, bpiColorClass)}
           >
-            <BpiIcon className="h-6 w-6 md:h-8 md:w-8" />
+            <LottieAnimation animationData={trendingUpAnimation} />
           </div>
         </div>
 
