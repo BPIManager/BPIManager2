@@ -27,7 +27,7 @@ export default function UserPage({ defaultView = "overview" }: UserPageProps) {
   const userId = router.query.userId as string;
   const version = (router.query.version as string) || latestVersion;
   const groupedBy = (router.query.groupedBy as string) || "lastPlayed";
-  const [nodata, setNodata] = useState<boolean>(false);
+  const [_nodata, setNodata] = useState<boolean>(false);
 
   if (!userId) return null;
 

@@ -13,10 +13,10 @@ export default async function handler(
   if (req.method !== "GET") return res.status(405).end();
   const { userId, q, p, s, o, seed } = req.query;
   const currentPage = Math.max(1, Number(p || 1));
-  const limit = 20;
-  const offset = (currentPage - 1) * limit;
+  const orderMode = (o as "distance" | "desc" | "newest" | "supporters") || "distance";
+  const limit = orderMode === "supporters" ? 1000 : 20;
+  const offset = orderMode === "supporters" ? 0 : (currentPage - 1) * limit;
   const sortKey = (s as string) || "totalBpi";
-  const orderMode = (o as "distance" | "desc" | "newest") || "distance";
 
   const access = await checkUserAccess(req, userId as string);
   const viewerId = access.user?.userId;

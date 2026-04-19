@@ -45,7 +45,7 @@ class UsersRepository {
     offset: number;
     searchQuery?: string;
     sort?: string;
-    order?: "distance" | "desc" | "newest";
+    order?: "distance" | "desc" | "newest" | "supporters";
     seed?: number;
   }) {
     const {
@@ -103,8 +103,11 @@ class UsersRepository {
         "ur.grantedAt",
       ])
       .where("r.version", "=", version)
-      .where("u.isPublic", "=", 1)
-      .where("u.userId", "!=", viewerId);
+      .where("u.isPublic", "=", 1);
+
+    if (order !== "supporters") {
+      query = query.where("u.userId", "!=", viewerId);
+    }
 
     if (searchQuery) {
       const searchPattern = `%${searchQuery}%`;
@@ -116,7 +119,11 @@ class UsersRepository {
       );
     }
 
-    if (order === "newest") {
+    if (order === "supporters") {
+      query = query
+        .where("ur.role", "is not", null)
+        .orderBy("ur.grantedAt", "asc");
+    } else if (order === "newest") {
       query = query.orderBy("usl.createdAt", "desc");
     } else if (order === "desc") {
       query = query.orderBy(sql.ref(`${sortColumn}`), "desc");
@@ -136,6 +143,33 @@ class UsersRepository {
     }
 
     return await query.limit(limit).offset(offset).execute();
+  }
+
+  async getSupporters(version: string) {
+    const latestStatusSubquery = db
+      .selectFrom("userStatusLogs")
+      .select((eb) => ["userId", eb.fn.max("id").as("maxId")])
+      .where("version", "=", version)
+      .groupBy("userId");
+
+    return await db
+      .selectFrom("users as u")
+      .innerJoin("userRoles as ur", "ur.userId", "u.userId")
+      .leftJoin(latestStatusSubquery.as("ls"), "u.userId", "ls.userId")
+      .leftJoin("userStatusLogs as usl", "ls.maxId", "usl.id")
+      .select([
+        "u.userId",
+        "u.userName",
+        "u.iidxId",
+        "u.profileImage",
+        "usl.totalBpi",
+        "ur.role",
+        "ur.description",
+        "ur.grantedAt",
+      ])
+      .where("u.isPublic", "=", 1)
+      .orderBy("ur.grantedAt", "asc")
+      .execute();
   }
 
   /**

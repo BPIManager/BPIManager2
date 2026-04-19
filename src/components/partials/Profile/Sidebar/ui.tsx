@@ -16,9 +16,27 @@ import { formatIIDXId } from "@/utils/common/formatIidxId";
 import { XIcon } from "../../LogIn";
 import { UserProfileData } from "@/types/users/profile";
 import { RoleBadge } from "../../UserRole/badge";
-import { ChevronDown, ExternalLink } from "lucide-react";
+import {
+  ChevronDown,
+  ExternalLink,
+  Coffee,
+  Fish,
+  Code2,
+  Trophy,
+  Sparkle,
+} from "lucide-react";
 import dayjs from "@/lib/dayjs";
 import { latestVersion } from "@/constants/latestVersion";
+
+type RoleKey = "coffee" | "saba" | "iidx" | "developer" | "pro";
+
+const ROLE_HEADER: Record<RoleKey, { from: string; Icon: typeof Coffee }> = {
+  coffee: { from: "#f59e0b40", Icon: Coffee },
+  saba: { from: "#22d3ee40", Icon: Fish },
+  iidx: { from: "#a78bfa40", Icon: Sparkle },
+  developer: { from: "#34d39940", Icon: Code2 },
+  pro: { from: "#facc1540", Icon: Trophy },
+};
 
 export const ProfileSideBar = ({
   profile,
@@ -31,10 +49,30 @@ export const ProfileSideBar = ({
 }) => {
   const [historyOpen, setHistoryOpen] = useState(false);
 
+  const roleKey = profile.role?.role as RoleKey | undefined;
+  const roleHeader = roleKey ? ROLE_HEADER[roleKey] : undefined;
+  const RoleIcon = roleHeader?.Icon;
+
   return (
     <div className="overflow-hidden rounded-2xl border border-bpim-border bg-bpim-bg/60 shadow-xl backdrop-blur-md lg:sticky lg:top-20">
-      <div className="h-20 bg-linear-to-br from-bpim-primary/40 via-bpim-surface-2 to-bpim-overlay" />
-      <div className="-mt-10 flex items-end justify-between px-4">
+      <div
+        className="relative h-20 overflow-hidden"
+        style={
+          roleHeader
+            ? {
+                background: `linear-gradient(to bottom right, ${roleHeader.from}, var(--color-bpim-surface-2), var(--color-bpim-overlay))`,
+              }
+            : undefined
+        }
+      >
+        {!roleHeader && (
+          <div className="absolute inset-0 bg-linear-to-br from-bpim-primary/40 via-bpim-surface-2 to-bpim-overlay" />
+        )}
+        {RoleIcon && (
+          <RoleIcon className="absolute -right-4 -bottom-4 h-28 w-28 rotate-[-15deg] opacity-[0.08]" />
+        )}
+      </div>
+      <div className="relative z-10 -mt-10 flex items-end justify-between px-4">
         <Avatar className="h-20 w-20 shrink-0 border-4 border-bpim-bg shadow-lg">
           <AvatarImage src={profile.profileImage ?? undefined} />
           <AvatarFallback className="text-2xl">
@@ -58,7 +96,9 @@ export const ProfileSideBar = ({
             <h2 className="text-xl font-extrabold leading-tight text-bpim-text">
               {profile.userName}
             </h2>
-            {profile.role && <RoleBadge {...profile.role} variant="full" />}
+            {profile.role && (
+              <RoleBadge {...profile.role} variant="full" size="small" />
+            )}
           </div>
           <div className="flex flex-row gap-4 text-[12px] lg:text-[10px]  text-bpim-muted">
             {profile.iidxId && (

@@ -86,12 +86,6 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
 
   const infoMenuItems = [
     {
-      label: "ご寄付のお願い",
-      icon: HeartHandshake,
-      href: "https://ci-en.net/creator/36005",
-      isExternal: true,
-    },
-    {
       label: "APIリファレンス",
       icon: Code2,
       href: "https://bpim2.apidog.io/",
@@ -410,7 +404,9 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
               ) : (
                 <ChevronRight className="h-4.5 w-4.5" />
               )}
-              <span className="text-xs font-bold tracking-wider">ベータ版機能</span>
+              <span className="text-xs font-bold tracking-wider">
+                ベータ版機能
+              </span>
               <Badge
                 variant="secondary"
                 className="text-[9px] px-1.5 py-0 bg-blue-500/10 text-blue-400 border-blue-500/20 font-bold tracking-tighter"
@@ -423,6 +419,21 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
             {betaMenuItems.map((item) => renderMenuItem(item, true))}
           </CollapsibleContent>
         </Collapsible>
+
+        <Button
+          asChild
+          variant="ghost"
+          size="sm"
+          className="w-full my-2 justify-start px-3 font-bold text-pink-400 hover:bg-pink-400/10 hover:text-pink-300 border border-pink-400/20 bg-pink-400/5"
+          onClick={onClose}
+        >
+          <Link href="/support">
+            <div className="flex w-full items-center gap-3">
+              <HeartHandshake className="h-4.5 w-4.5" />
+              <span className="flex-1 text-left">ご支援のお願い</span>
+            </div>
+          </Link>
+        </Button>
 
         <Collapsible
           open={isInfoOpen}
