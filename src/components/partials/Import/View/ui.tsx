@@ -48,13 +48,13 @@ export const ImportView = (props: Props) => {
       {!props.isLoggedIn ? (
         <LoginRequiredCard />
       ) : (
-        <div className="flex flex-col gap-8">
+        <>
+          <PageHeader
+            title="インポート"
+            description="CSVデータをアップロードしてBPIを更新します。"
+          />
           <PageContainer>
             <div className="relative">
-              <PageHeader
-                title="インポート"
-                description="CSVデータをアップロードしてBPIを更新します。"
-              />
               <div className="flex flex-col gap-6">
                 <div className="space-y-2">
                   <Label
@@ -174,7 +174,7 @@ export const ImportView = (props: Props) => {
               </div>
             </div>
           </PageContainer>
-        </div>
+        </>
       )}
     </DashboardLayout>
   );
