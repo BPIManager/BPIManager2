@@ -151,7 +151,7 @@ function IidxTowerComparisonCard({
             <LottieAnimation animationData={ghostAnimation} loop size={36} />
           </div>
           <h3 className="text-base font-black text-bpim-text tracking-tight">
-            データがありません
+            IIDXタワーのデータがありません
           </h3>
         </div>
       </DashCard>
