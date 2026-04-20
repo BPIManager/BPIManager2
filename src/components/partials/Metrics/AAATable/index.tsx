@@ -12,7 +12,7 @@ import { PageContainer, PageHeader } from "../../Header";
 interface AAATableContentProps {
   userId: string | undefined;
   defaultVersion?: string;
-  isSelf: boolean;
+  isSelf?: boolean;
 }
 
 export const AAATableContent = ({
