@@ -25,13 +25,12 @@ export const useAAATable = (
 ) => {
   const { fbUser } = useUser();
 
+  const endpoint = userId
+    ? `${API_PREFIX}/users/${userId}/stats/aaaDifficulty?level=${level}&version=${version}`
+    : `${API_PREFIX}/users/guest/stats/aaaDifficulty?level=${level}&version=${version}`;
+
   const { data, error, isLoading } = useSWR<AAATableItem[]>(
-    userId && version && level
-      ? [
-          `${API_PREFIX}/users/${userId}/stats/aaaDifficulty?level=${level}&version=${version}`,
-          fbUser,
-        ]
-      : null,
+    version && level ? [endpoint, fbUser] : null,
     fetcher,
   );
 

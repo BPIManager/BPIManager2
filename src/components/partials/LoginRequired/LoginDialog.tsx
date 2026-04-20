@@ -10,7 +10,7 @@ export function LoginDialog({ isOpen, onClose }: LoginDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-md border-none bg-transparent p-0 shadow-none outline-none">
-        <LoginRequiredCard />
+        <LoginRequiredCard isModal />
       </DialogContent>
     </Dialog>
   );

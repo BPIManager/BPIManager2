@@ -15,8 +15,10 @@ export default async function handler(
   const { userId, version, level } = body;
 
   try {
-    const access = await checkUserAccess(req, userId);
-    if (!access.hasAccess) return rejectAccess(res, access);
+    if (userId && userId !== "guest") {
+      const access = await checkUserAccess(req, userId);
+      if (!access.hasAccess) return rejectAccess(res, access);
+    }
 
     const rawData = await statsRepo.getAAATableData(userId, version, level);
 

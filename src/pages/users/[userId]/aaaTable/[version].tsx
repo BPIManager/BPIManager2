@@ -7,6 +7,7 @@ import { AAATableContent } from "@/components/partials/Metrics/AAATable";
 import { latestVersion } from "@/constants/latestVersion";
 import { ProfileMeta } from "@/components/partials/Profile/Meta/ui";
 import { DashCard } from "@/components/ui/dashcard";
+import { cn } from "@/lib/utils";
 
 export default function UserAAATablePage() {
   const router = useRouter();
@@ -32,9 +33,16 @@ export default function UserAAATablePage() {
   return (
     <UserProfileLayout userId={uid} currentTab="aaaTable">
       <ProfileMeta title="AAA達成難易度表" />
-      <DashCard>
-        <AAATableContent userId={uid} defaultVersion={v} isSelf={false} />
-      </DashCard>
+      <div className="flex flex-col gap-4">
+        <div
+          className={cn(
+            "rounded-2xl transition-all",
+            "border border-bpim-border bg-bpim-bg/40 p-4 md:p-6 shadow-xl backdrop-blur-md",
+          )}
+        >
+          <AAATableContent userId={uid} defaultVersion={v} isSelf={false} />
+        </div>
+      </div>
     </UserProfileLayout>
   );
 }

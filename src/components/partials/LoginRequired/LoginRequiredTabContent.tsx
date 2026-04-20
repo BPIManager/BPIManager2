@@ -7,7 +7,9 @@ interface LoginRequiredTabContentProps {
   feature: string;
 }
 
-export function LoginRequiredTabContent({ feature }: LoginRequiredTabContentProps) {
+export function LoginRequiredTabContent({
+  feature,
+}: LoginRequiredTabContentProps) {
   const { isOpen, open, close } = useLoginDialog();
 
   return (

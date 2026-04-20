@@ -94,7 +94,7 @@ export const FollowSection = ({
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-md border-none bg-transparent p-0 shadow-none outline-none">
-            <LoginRequiredCard />
+            <LoginRequiredCard isModal />
           </DialogContent>
         </Dialog>
       )}

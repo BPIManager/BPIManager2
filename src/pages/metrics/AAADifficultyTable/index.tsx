@@ -1,8 +1,6 @@
 import { DashboardLayout } from "@/components/partials/Main";
-import { PageContainer } from "@/components/partials/Header";
 import { Meta } from "@/components/partials/Head";
 import { useUser } from "@/contexts/users/UserContext";
-import { LoginRequiredCard } from "@/components/partials/LoginRequired/ui";
 import { AAATableContent } from "@/components/partials/Metrics/AAATable";
 
 export default function GlobalAAATablePage() {
@@ -10,15 +8,12 @@ export default function GlobalAAATablePage() {
 
   return (
     <DashboardLayout>
-      <Meta title="AAA達成難易度表" />
+      <Meta
+        title="AAA達成難易度表"
+        description="BPIを用いたbeatmania IIDXのAAA、MAX-難易度表です。自分のスコアを入れてAAA達成状況をチェックできます。"
+      />
 
-      <PageContainer>
-        {isLoading ? null : !fbUser ? (
-          <LoginRequiredCard />
-        ) : (
-          <AAATableContent userId={fbUser.uid} />
-        )}
-      </PageContainer>
+      {isLoading ? null : <AAATableContent userId={fbUser ? fbUser.uid : ""} />}
     </DashboardLayout>
   );
 }

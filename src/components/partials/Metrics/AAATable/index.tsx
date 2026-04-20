@@ -8,6 +8,11 @@ import { latestVersion } from "@/constants/latestVersion";
 import { AAATableFilter } from "@/components/partials/Metrics/AAATable/selector";
 import { AAAGridItem } from "@/components/partials/Metrics/AAATable/table";
 import { PageContainer, PageHeader } from "../../Header";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
+import { LoginRequiredCard } from "../../LoginRequired/ui";
 
 interface AAATableContentProps {
   userId: string | undefined;
@@ -33,14 +38,6 @@ export const AAATableContent = ({
     groupingMode,
   );
 
-  if (!userId) {
-    return (
-      <div className="flex h-40 items-center justify-center text-bpim-muted">
-        ユーザーIDが見つかりません
-      </div>
-    );
-  }
-
   if (isError) {
     return (
       <div className="flex h-40 items-center justify-center font-bold text-bpim-danger">
@@ -51,6 +48,37 @@ export const AAATableContent = ({
 
   const body = (
     <div className="flex w-full flex-col gap-8">
+      {!userId && (
+        <>
+          <section className="mb-8 rounded-xl bg-bpim-surface p-6 shadow-sm border border-bpim-border">
+            <h2 className="mb-4 text-xl font-bold text-bpim-text">
+              💡 これは何？
+            </h2>
+            <p className="text-sm leading-relaxed text-bpim-muted">
+              各楽曲でAAAやMAX-を達成するために必要な実力を可視化した難易度表です。
+              目標スコアに対する要求BPI帯ごとに楽曲がグループ化されており、次にどの曲を狙えばよいかの指標になります。
+            </p>
+            <p className="mt-2 text-sm text-bpim-text">
+              ログインすると、あなたの実際のスコアデータを使って達成状況を色付けできます。目標達成済みの楽曲や、目標までのスコア差分が一目でわかるようになります！
+            </p>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  className={cn(
+                    "mt-4 rounded-full font-bold h-9",
+                    "bg-bpim-primary text-bpim-bg hover:bg-bpim-primary/80",
+                  )}
+                >
+                  ログインしてスコアを反映する
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md border-none bg-transparent p-0 shadow-none outline-none">
+                <LoginRequiredCard isModal />
+              </DialogContent>
+            </Dialog>
+          </section>
+        </>
+      )}
       <AAATableFilter
         version={version}
         onVersionChange={setVersion}

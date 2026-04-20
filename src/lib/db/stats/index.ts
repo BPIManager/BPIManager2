@@ -37,24 +37,19 @@ class StatsRepository {
       .innerJoin("songDef as d", (join) =>
         join.onRef("d.songId", "=", "m.songId").on("d.isCurrent", "=", 1),
       )
-      .leftJoin(
-        (qb) =>
-          qb
-            .selectFrom("scores as s1")
-            .select(["s1.songId as latest_songId", "s1.exScore", "s1.bpi"])
-            .innerJoin(
-              (sub) =>
-                sub
-                  .selectFrom("scores")
-                  .select(["songId", (eb) => eb.fn.max("logId").as("maxLogId")])
-                  .where("userId", "=", userId)
-                  .where("version", "=", version)
-                  .groupBy("songId")
-                  .as("max_scores"),
-              (join) => join.onRef("max_scores.maxLogId", "=", "s1.logId"),
-            )
-            .as("userScore"),
-        (join) => join.onRef("userScore.latest_songId", "=", "m.songId"),
+      .leftJoin("scores as s", (join) =>
+        join
+          .onRef("s.songId", "=", "m.songId")
+          .on("s.userId", "=", userId)
+          .on("s.version", "=", version)
+          .on("s.logId", "=", (qb) =>
+            qb
+              .selectFrom("scores as s2")
+              .select((eb) => eb.fn.max("s2.logId").as("maxLogId"))
+              .whereRef("s2.songId", "=", "m.songId")
+              .where("s2.userId", "=", userId)
+              .where("s2.version", "=", version),
+          ),
       )
       .select([
         "m.songId",
@@ -66,14 +61,11 @@ class StatsRepository {
         "d.wrScore",
         "d.kaidenAvg",
         "d.coef",
-        "userScore.exScore as userExScore",
-        "userScore.bpi as userBpi",
+        "s.exScore as userExScore",
+        "s.bpi as userBpi",
       ])
       .where("m.difficultyLevel", "=", level)
-      .$if(!isInf, (qb) =>
-        // ↓旧作のデータをクエリしたときに当時存在しなかった曲を含めない
-        qb.where("m.releasedVersion", "<=", versionNum!),
-      )
+      .$if(!isInf, (qb) => qb.where("m.releasedVersion", "<=", versionNum!))
       .orderBy("m.title", "asc")
       .execute();
   }

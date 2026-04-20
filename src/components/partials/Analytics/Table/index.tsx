@@ -42,7 +42,7 @@ export const AnalyticsComparisonTable = ({
 
   if (!isLoading && error) {
     return (
-      <div className="flex h-[200px] flex-col items-center justify-center gap-2">
+      <div className="flex h-50 flex-col items-center justify-center gap-2">
         <p className="font-bold text-bpim-danger">
           楽曲データの取得に失敗しました
         </p>
@@ -52,7 +52,7 @@ export const AnalyticsComparisonTable = ({
   }
 
   return (
-    <div className="mx-auto w-full min-h-[100svh] flex flex-col bg-background">
+    <div className="mx-auto w-full min-h-svh flex flex-col bg-background">
       {rivalLabel && !isLoading && songs && (
         <div className="px-4 pt-3 pb-1">
           <span className="text-[10px] font-bold uppercase tracking-widest text-bpim-warning">
