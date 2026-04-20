@@ -33,7 +33,7 @@ export default function UserAAATablePage() {
     <UserProfileLayout userId={uid} currentTab="aaaTable">
       <ProfileMeta title="AAA達成難易度表" />
       <DashCard>
-        <AAATableContent userId={uid} defaultVersion={v} />
+        <AAATableContent userId={uid} defaultVersion={v} isSelf={false} />
       </DashCard>
     </UserProfileLayout>
   );
