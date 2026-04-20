@@ -260,6 +260,7 @@ class SocialComparisonRepository {
         "ur.role as ur_role",
         "ur.description as ur_description",
         "ur.grantedAt as ur_grantedAt",
+        "usl.updatedAt as usl_updatedAt",
         (eb) =>
           eb.fn
             .sum(
@@ -352,6 +353,7 @@ class SocialComparisonRepository {
         "ur.role",
         "ur.description",
         "ur.grantedAt",
+        "usl.updatedAt",
       ])
       .orderBy("win", "desc")
       .execute();
@@ -385,6 +387,7 @@ class SocialComparisonRepository {
         draw: Number(r.draw),
         totalCount: Number(r.totalCount),
       },
+      lastUpdated: r.usl_updatedAt ?? null,
       role: r.ur_role
         ? {
             role: r.ur_role,

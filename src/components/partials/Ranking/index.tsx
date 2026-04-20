@@ -77,7 +77,8 @@ export const GlobalRankingContainer = () => {
   const category = (router.query.category as string) || "totalBpi";
   const isSongsCategory = category === "songs";
   const isTowerCategory = category === "iidxTower";
-  const isRadarCategory = category !== "totalBpi" && !isSongsCategory && !isTowerCategory;
+  const isRadarCategory =
+    category !== "totalBpi" && !isSongsCategory && !isTowerCategory;
   const isLatestVersion = version === latestVersion;
 
   const { data, isLoading } = useGlobalRanking(
@@ -141,7 +142,7 @@ export const GlobalRankingContainer = () => {
       <>
         <PageHeader
           title="全体ランキング"
-          description="BPIM2登録ユーザー内総合BPIランキング"
+          description="総合BPI・個別楽曲・IIDXタワーなどのランキング(BPIM2内実順位ベース)"
         />
         <PageContainer>
           <GlobalRankingContainerSkeleton />
@@ -169,7 +170,7 @@ export const GlobalRankingContainer = () => {
     <>
       <PageHeader
         title="全体ランキング"
-        description="BPIM2登録ユーザー内総合BPIランキング"
+        description="総合BPI・個別楽曲・IIDXタワーなどのランキング(BPIM2内実順位ベース)"
       />
       <PageContainer>
         <div className="flex gap-3 mb-4">

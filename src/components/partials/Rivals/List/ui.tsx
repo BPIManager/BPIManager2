@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { RoleBadge } from "../../UserRole/badge";
+import dayjs from "@/lib/dayjs";
 
 export const ROLE_ICON: Record<string, { icon: LucideIcon; color: string }> = {
   coffee: { icon: Coffee, color: "text-amber-400" },
@@ -34,6 +35,7 @@ export const RivalSummaryCard = ({
     profileImage,
     arenaRank,
     iidxId,
+    lastUpdated,
   } = rival;
 
   const winRate =
@@ -131,6 +133,12 @@ export const RivalSummaryCard = ({
             <span>{winRate.toFixed(1)}% Win</span>
             <span>{stats.totalCount} Songs</span>
           </div>
+
+          {lastUpdated && (
+            <span className="text-[10px] text-bpim-muted">
+              最終更新: {dayjs(lastUpdated).fromNow()}
+            </span>
+          )}
         </div>
       </div>
 

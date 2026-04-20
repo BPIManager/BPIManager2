@@ -21,6 +21,7 @@ export interface RivalSummaryResult {
   iidxId: string | null;
   arenaRank: string | null;
   totalBpi: number | null;
+  lastUpdated: Date | null;
   /** ライバルのレーダーチャートデータ */
   radar: RadarSummaryData;
   /** 閲覧者のレーダーチャートデータ */

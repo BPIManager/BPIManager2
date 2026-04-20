@@ -18,8 +18,14 @@ export const RivalListContainer = ({
 }) => {
   const { user, isLoading: isCredentialLoading } = useUser();
   const router = useRouter();
-  const { levels, difficulties, handleToggleLevel, handleToggleDifficulty } =
-    useRivalListFilter();
+  const {
+    levels,
+    difficulties,
+    sortOrder,
+    handleToggleLevel,
+    handleToggleDifficulty,
+    setSortOrder,
+  } = useRivalListFilter();
 
   const { rivals, isLoading, isError } = useRivalSummary({
     userId: user?.userId || false,
@@ -27,6 +33,22 @@ export const RivalListContainer = ({
     difficulties,
     version: latestVersion,
   });
+
+  const sortedRivals = useMemo(() => {
+    if (!rivals.length) return rivals;
+    return [...rivals].sort((a, b) => {
+      if (sortOrder === "win_desc") {
+        return (b.stats.win - b.stats.lose) - (a.stats.win - a.stats.lose);
+      }
+      if (sortOrder === "lose_desc") {
+        return (b.stats.lose - b.stats.win) - (a.stats.lose - a.stats.win);
+      }
+      // updated_desc
+      const ta = a.lastUpdated ? new Date(a.lastUpdated).getTime() : 0;
+      const tb = b.lastUpdated ? new Date(b.lastUpdated).getTime() : 0;
+      return tb - ta;
+    });
+  }, [rivals, sortOrder]);
 
   if (!user && !isCredentialLoading) return <LoginRequiredCard />;
 
@@ -38,11 +60,13 @@ export const RivalListContainer = ({
           <RivalFilter
             levels={levels}
             difficulties={difficulties}
+            sortOrder={sortOrder}
             onToggleLevel={handleToggleLevel}
             onToggleDifficulty={handleToggleDifficulty}
+            onChangeSortOrder={setSortOrder}
           />
           <RivalList
-            results={rivals}
+            results={sortedRivals}
             isLoading={isLoading}
             isError={isError}
             onCardClick={(id: string) => router.push(`/rivals/${id}`)}

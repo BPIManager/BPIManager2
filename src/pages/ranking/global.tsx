@@ -9,8 +9,7 @@ export default function RivalsPage() {
     <DashboardLayout>
       <Meta
         title="全体ランキング"
-        description="BPIM2登録ユーザー内での総合BPIランキング"
-        noIndex
+        description="総合BPIランキング・個別楽曲ランキング・IIDXタワーランキングなどの各種ランキングを提供"
       />
 
       <GlobalRankingContainer />
