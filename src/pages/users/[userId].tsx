@@ -14,6 +14,7 @@ import { ProfileMeta } from "@/components/partials/Profile/Meta/ui";
 import { getVersionNameFromNumber } from "@/constants/versions";
 import { RadarSection } from "@/components/partials/DashBoard/Radar/ui";
 import { BpiHistorySection } from "@/components/partials/DashBoard/TotalBPIHistory";
+import { IidxTowerSection } from "@/components/partials/DashBoard/IidxTowerCard";
 import { LogFilterSection } from "@/components/partials/Logs/VersionSelector/ui";
 import { TabsContent } from "@/components/ui/tabs";
 import { useState } from "react";
@@ -61,6 +62,7 @@ export default function UserPage({ defaultView = "overview" }: UserPageProps) {
             </div>
 
             <BpiHistorySection myUserId={userId} />
+            <IidxTowerSection userId={userId} showImportAlert={false} />
             <RadarSection userId={userId} />
           </div>
         )}

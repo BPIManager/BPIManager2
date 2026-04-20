@@ -14,6 +14,7 @@ import { RankDistributionSection } from "@/components/partials/DashBoard/DJRankD
 import { BpiDistributionSection } from "@/components/partials/DashBoard/BPIDistribution/ui";
 import { BpmBpiDistributionSection } from "@/components/partials/DashBoard/BpmBpiDistribution";
 import { BpiHistorySection } from "@/components/partials/DashBoard/TotalBPIHistory";
+import { IidxTowerComparisonSection } from "@/components/partials/DashBoard/IidxTowerCard/comparison";
 import { TabsContent } from "@/components/ui/tabs";
 import { useRivalComparison } from "@/hooks/social/useRivalComparison";
 import { WinLossStats } from "@/components/partials/UserList/Modal/ui";
@@ -65,6 +66,12 @@ function RivalOverviewTab({
 
       <BpiHistorySection
         myUserId={myUserId}
+        rivalUserId={rivalUserId}
+        myName="自分"
+        rivalName={rivalName}
+      />
+
+      <IidxTowerComparisonSection
         rivalUserId={rivalUserId}
         myName="自分"
         rivalName={rivalName}

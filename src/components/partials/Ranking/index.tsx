@@ -21,6 +21,7 @@ import { Info } from "lucide-react";
 import type { RankingEntry } from "@/types/users/ranking";
 import { useState } from "react";
 import { SongRankingList } from "./SongRankingList";
+import { TowerRanking } from "./TowerRanking";
 import { LoginRequiredCard } from "../LoginRequired/ui";
 import { useUser } from "@/contexts/users/UserContext";
 import { PageContainer, PageHeader } from "../Header";
@@ -37,6 +38,7 @@ const RADAR_CATEGORIES = [
   { value: "scratch", label: "SCRATCH" },
   { value: "soflan", label: "SOFLAN" },
   { value: "songs", label: "個別楽曲" },
+  { value: "iidxTower", label: "IIDXタワー" },
 ] as const;
 
 interface RowData {
@@ -74,12 +76,13 @@ export const GlobalRankingContainer = () => {
   const version = (router.query.version as string) || latestVersion;
   const category = (router.query.category as string) || "totalBpi";
   const isSongsCategory = category === "songs";
-  const isRadarCategory = category !== "totalBpi" && !isSongsCategory;
+  const isTowerCategory = category === "iidxTower";
+  const isRadarCategory = category !== "totalBpi" && !isSongsCategory && !isTowerCategory;
   const isLatestVersion = version === latestVersion;
 
   const { data, isLoading } = useGlobalRanking(
     version,
-    isSongsCategory ? "totalBpi" : category,
+    isSongsCategory || isTowerCategory ? "totalBpi" : category,
   );
   const listRef = useListRef(null);
   const hasScrolled = useRef(false);
@@ -133,7 +136,7 @@ export const GlobalRankingContainer = () => {
     setIsModalOpen(true);
   }, []);
 
-  if (!isSongsCategory && isLoading) {
+  if (!isSongsCategory && !isTowerCategory && isLoading) {
     return (
       <>
         <PageHeader
@@ -160,7 +163,7 @@ export const GlobalRankingContainer = () => {
     return <LoginRequiredCard />;
   }
 
-  if (!isSongsCategory && !data) return null;
+  if (!isSongsCategory && !isTowerCategory && !data) return null;
 
   return (
     <>
@@ -212,7 +215,9 @@ export const GlobalRankingContainer = () => {
           </div>
         </div>
 
-        {isSongsCategory ? (
+        {isTowerCategory ? (
+          <TowerRanking version={version} />
+        ) : isSongsCategory ? (
           <SongRankingList version={version} />
         ) : (
           <>

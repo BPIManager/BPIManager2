@@ -361,6 +361,20 @@ CREATE TABLE IF NOT EXISTS `songPatternVotes` (
   CONSTRAINT `fk_pattern_votes_userId` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `iidxTower` (
+  `userId`       VARCHAR(128)  NOT NULL COLLATE utf8mb4_unicode_ci,
+  `version`      VARCHAR(50)   NOT NULL COLLATE utf8mb4_unicode_ci,
+  `playDate`     DATE          NOT NULL,
+  `keyCount`     INT UNSIGNED  NOT NULL DEFAULT 0,
+  `scratchCount` INT UNSIGNED  NOT NULL DEFAULT 0,
+  `updatedAt`    DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`userId`, `version`, `playDate`),
+  INDEX `idx_iidxTower_userId` (`userId`),
+  INDEX `idx_iidxTower_userId_version` (`userId`, `version`),
+  INDEX `idx_iidxTower_version_playDate` (`version`, `playDate`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;

@@ -20,6 +20,8 @@ import { BpiHistorySection } from "@/components/partials/DashBoard/TotalBPIHisto
 import { PageLoader } from "@/components/ui/loading-spinner";
 import { useState } from "react";
 import { NoDataAlert } from "@/components/partials/DashBoard/NoData/ui";
+import { IidxTowerCard } from "@/components/partials/DashBoard/IidxTowerCard/ui";
+import { IidxTowerSection } from "@/components/partials/DashBoard/IidxTowerCard";
 
 export default function DashboardPage() {
   const { user, isLoading: isUserLoading, fbUser } = useUser();
@@ -71,6 +73,8 @@ export default function DashboardPage() {
               </div>
 
               <aside className="lg:sticky lg:top-24 lg:h-fit">
+                <IidxTowerSection userId={fbUser.uid} />
+                <div className="mb-6" />
                 <RankingTabsCard userId={fbUser.uid} />
               </aside>
             </div>

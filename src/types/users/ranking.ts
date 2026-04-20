@@ -54,3 +54,28 @@ export interface SongRankEntry {
 export interface UserSongRankingsResponse {
   songs: SongRankEntry[];
 }
+
+export type TowerPeriod = "day" | "week" | "month";
+export type TowerType = "total" | "key" | "scratch";
+
+export interface TowerRankingEntry {
+  rank: number;
+  userId: string;
+  userName: string;
+  profileImage: string | null;
+  isPublic: number;
+  iidxId: string | null;
+  totalCount: number;
+  keyCount: number;
+  scratchCount: number;
+  isSelf: boolean;
+}
+
+export interface TowerRankingResponse {
+  rankings: TowerRankingEntry[];
+  totalCount: number;
+  selfRank: number;
+  startDate: string;
+  endDate: string;
+  viewerRadar: Record<string, { totalBpi: number; songs: unknown[] }>;
+}

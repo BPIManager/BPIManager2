@@ -16,10 +16,10 @@ export const DashboardLayout = ({
 
   return (
     <div
-      className="flex h-[100svh] w-full overflow-hidden"
+      className="flex h-svh w-full overflow-hidden"
       style={{ background: "var(--bpim-bg-gradient, hsl(var(--bpim-bg)))" }}
     >
-      <aside className="hidden w-[280px] shrink-0 border-r border-bpim-border bg-bpim-surface md:block">
+      <aside className="hidden w-70 shrink-0 border-r border-bpim-border bg-bpim-surface md:block">
         <SidebarContent />
       </aside>
 
@@ -39,7 +39,7 @@ export const DashboardLayout = ({
               </SheetTrigger>
               <SheetContent
                 side="left"
-                className="w-[280px] border-r-bpim-border bg-bpim-surface p-0"
+                className="w-70 border-r-bpim-border bg-bpim-surface p-0"
               >
                 <SidebarContent onClose={() => setOpen(false)} />
               </SheetContent>

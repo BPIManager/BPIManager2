@@ -27,6 +27,7 @@ export interface Database {
   songNoteUpvotes: SongNoteUpvotesTable;
   songPatterns: SongPatternsTable;
   songPatternVotes: SongPatternVotesTable;
+  iidxTower: IidxTowerTable;
   // 追加: 暫定/バックアップ用テーブル
   bkScores: BkScores;
   bkUsers: BkUsers;
@@ -326,3 +327,15 @@ export interface SongPatternVotesTable {
 export type SongPattern = Selectable<SongPatternsTable>;
 export type SongPatternVote = Selectable<SongPatternVotesTable>;
 export type NewSongPatternVote = Insertable<SongPatternVotesTable>;
+
+export interface IidxTowerTable {
+  userId: string;
+  version: string;
+  playDate: ColumnType<Date, string | Date, string | Date>;
+  keyCount: number;
+  scratchCount: number;
+  updatedAt: Generated<Date>;
+}
+
+export type IidxTowerRecord = Selectable<IidxTowerTable>;
+export type NewIidxTowerRecord = Insertable<IidxTowerTable>;
