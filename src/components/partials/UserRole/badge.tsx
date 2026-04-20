@@ -134,7 +134,7 @@ export const RoleBadge = ({
           <Button
             size="xs"
             className="mt-1"
-            onClick={() => window.open("https://ci-en.net/creator/36005")}
+            onClick={() => window.open("https://bpi2.poyashi.me/support")}
           >
             サポーターとは?
           </Button>
