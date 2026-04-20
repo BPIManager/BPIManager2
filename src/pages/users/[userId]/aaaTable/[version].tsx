@@ -1,7 +1,6 @@
 import { useRouter } from "next/router";
 import { useUser } from "@/contexts/users/UserContext";
 import { DashboardLayout } from "@/components/partials/Main";
-import { PageHeader, PageContainer } from "@/components/partials/Header";
 import { Meta } from "@/components/partials/Head";
 import { UserProfileLayout } from "@/components/partials/Profile/Layout/layout";
 import { AAATableContent } from "@/components/partials/Metrics/AAATable";
@@ -24,14 +23,8 @@ export default function UserAAATablePage() {
   if (isOwnedByFbId) {
     return (
       <DashboardLayout>
-        <PageHeader
-          title="AAA達成難易度表"
-          description="自分自身の達成状況を確認"
-        />
         <Meta title="AAA達成難易度表" noIndex />
-        <PageContainer>
-          <AAATableContent userId={uid} />
-        </PageContainer>
+        <AAATableContent userId={uid} />
       </DashboardLayout>
     );
   }
