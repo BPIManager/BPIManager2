@@ -244,7 +244,21 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
   ];
 
   return (
-    <div className="flex h-full flex-col gap-6 p-4 overflow-y-auto scrollbar-hide">
+    <div className="flex h-full flex-col gap-3 p-4 overflow-y-auto scrollbar-hide">
+      <Button
+        asChild
+        variant="ghost"
+        size="sm"
+        className="w-full mb-2 justify-start px-3 font-bold text-pink-400 hover:bg-pink-400/10 hover:text-pink-300 border border-pink-400/20 bg-pink-600/10"
+        onClick={onClose}
+      >
+        <Link href="/support">
+          <div className="flex w-full items-center gap-3">
+            <HeartHandshake className="h-4.5 w-4.5" />
+            <span className="flex-1 text-left">ご支援のお願い</span>
+          </div>
+        </Link>
+      </Button>
       <div className="rounded-xl border border-bpim-border bg-bpim-surface-2/60 p-4 flex flex-col gap-4">
         <div className="flex items-center gap-3">
           <Link href={`/users/${user?.userId}`} onClick={onClose}>
@@ -419,21 +433,6 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
             {betaMenuItems.map((item) => renderMenuItem(item, true))}
           </CollapsibleContent>
         </Collapsible>
-
-        <Button
-          asChild
-          variant="ghost"
-          size="sm"
-          className="w-full my-2 justify-start px-3 font-bold text-pink-400 hover:bg-pink-400/10 hover:text-pink-300 border border-pink-400/20 bg-pink-400/5"
-          onClick={onClose}
-        >
-          <Link href="/support">
-            <div className="flex w-full items-center gap-3">
-              <HeartHandshake className="h-4.5 w-4.5" />
-              <span className="flex-1 text-left">ご支援のお願い</span>
-            </div>
-          </Link>
-        </Button>
 
         <Collapsible
           open={isInfoOpen}
