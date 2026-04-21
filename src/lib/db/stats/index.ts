@@ -483,9 +483,9 @@ class StatsRepository {
   }
 
   /**
-   * 日別BPI統計計算用：指定ユーザーの全スコアの日付とBPI値を取得する。
+   * 日別BPI統計 + プレーボリューム取得用
    */
-  async getBpiPerDateRaw(
+  async getBpiAndVolumePerDate(
     userId: string,
     version: IIDXVersion,
     levels?: number[],
@@ -493,7 +493,7 @@ class StatsRepository {
   ) {
     const isInf = version === "INF";
 
-    let query = db
+    let scoreQuery = db
       .selectFrom("scores as s")
       .innerJoin("songs as m", "s.songId", "m.songId")
       .select((eb) => [
@@ -507,6 +507,7 @@ class StatsRepository {
           ])
           .as("date"),
         "s.songId",
+        "m.notes",
         eb.fn.max("s.bpi").as("bpi"),
       ])
       .where("s.userId", "=", userId)
@@ -521,17 +522,21 @@ class StatsRepository {
         ),
       );
 
-    if (levels && levels.length > 0) {
-      query = query.where("m.difficultyLevel", "in", levels);
-    }
-    if (difficulties && difficulties.length > 0) {
-      query = query.where("m.difficulty", "in", difficulties);
-    }
+    if (levels?.length)
+      scoreQuery = scoreQuery.where("m.difficultyLevel", "in", levels);
+    if (difficulties?.length)
+      scoreQuery = scoreQuery.where("m.difficulty", "in", difficulties);
 
-    return await query
-      .groupBy(["date", "s.songId"])
-      .orderBy("date", "asc")
+    const scores = await scoreQuery.groupBy(["date", "s.songId"]).execute();
+
+    const tower = await db
+      .selectFrom("iidxTower")
+      .select(["playDate as date", "keyCount", "scratchCount"])
+      .where("userId", "=", userId)
+      .where("version", "=", version)
       .execute();
+
+    return { scores, tower };
   }
 
   /**

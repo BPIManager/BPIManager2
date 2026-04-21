@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ComposedChart,
   Area,
@@ -16,17 +16,19 @@ import { DashCard } from "@/components/ui/dashcard";
 import { useChartColors } from "@/hooks/common/useChartColors";
 import { HelpTooltip } from "@/components/ui/tooltip";
 
-interface TooltipProps {
-  active?: boolean;
-  payload?: ReadonlyArray<{ payload: ChartDataPoint }>;
-  label?: string;
+interface ExtendedBpiBoxStatsItem extends BpiBoxStatsItem {
+  efficiency?: number;
 }
 
-interface ChartDataPoint extends BpiBoxStatsItem {
-  bandBase: number;
-  bandHeight: number;
+interface ChartDataPoint extends ExtendedBpiBoxStatsItem {
   totalBpiBandBase: number;
   totalBpiBandHeight: number;
+}
+
+interface TooltipProps {
+  active?: boolean;
+  payload?: any[];
+  label?: string;
 }
 
 const HelpText = (
@@ -52,31 +54,82 @@ const HelpText = (
           その期間の平均的な実力。これが右肩上がりなら、継続的に高い水準でプレーできている証拠です。
         </li>
         <li>
-          <span className="font-bold">上位25-75%帯（塗りつぶし）</span>:
-          全曲のうち、真ん中半分のスコアが収まっている範囲です。この帯が
-          <span className="text-bpim-warning">
-            「高い位置にある＝高難易度の地力が高い」「幅が狭い＝実力が安定している」
+          <span className="font-bold text-bpim-primary">
+            上位25-75%帯（塗りつぶし）
           </span>
-          ことを示します。
+          : 期間中更新した楽曲におけるBPIの厚みを示します。
+          <ul className="list-none pl-4 mt-1 space-y-1 text-bpim-muted">
+            <li>
+              ・<span className="italic">帯の「上端」</span>
+              ：上位25%の更新に絞った場合の期間総合BPI。ここが高い時は激ウマリザルトがあったことを示します。
+            </li>
+          </ul>
         </li>
         <li>
-          <span className="font-bold">上限/下限（点線）</span>:
-          その期間の最高・最低BPI。上限が跳ねている日は「一発の最大火力」が出た日、下限が高い日は「苦手曲でも底上げができている」ことを意味します。
+          <span className="font-bold text-bpim-warning">
+            打鍵効率（右軸：点線）
+          </span>
+          : 総打鍵数に対する、更新スコアのノーツ数の割合です。
+          <span className="text-bpim-warning">
+            「効率が高い＝その日にプレイした多くの楽曲で、高い割合でスコアを伸ばすことができた日」
+          </span>
+          と分析できます。
+        </li>
+        <li>
+          <span className="font-bold">上限/下限（点線）</span>: その期間における
+          <u>単曲</u>
+          の最高・最低BPI。上限が跳ねている日は「一発の最大火力」が出た日を意味します。
         </li>
       </ul>
     </section>
 
     <section className="bg-bpim-overlay/40 p-2 rounded text-[10px]">
       <p>
+        打鍵効率は、プレー全体のボリュームに対する「リザルトの質」を可視化したものです。BPIの推移と併せて見ることで、自身のプレーサイクルの良し悪しを確認できます。
+      </p>
+    </section>
+    <section className="bg-bpim-overlay/40 p-2 rounded text-[10px] space-y-1.5">
+      <p className="flex items-start gap-1">
+        <span className="text-bpim-danger font-bold">※</span>
+        <span className="font-bold border-b border-bpim-danger/50">
+          打鍵効率を表示するには、別途IIDXタワーデータの取り込みが必要です。
+        </span>
+      </p>
+      <p className="text-bpim-muted italic">
         プレー曲数が少ない日は極端な値が出やすいため、推移を見る際は曲数も併せて確認することをおすすめします。
       </p>
     </section>
   </div>
 );
 
+const TITLE_MAP: Record<StatsGroupBy, string> = {
+  day: "単日総合BPI 分布推移",
+  week: "週間総合BPI 分布推移",
+  month: "月間総合BPI 分布推移",
+};
+
+const Row = ({
+  label,
+  value,
+  color,
+  bold,
+}: {
+  label: string;
+  value: number;
+  color: string;
+  bold?: boolean;
+}) => (
+  <div className="flex items-center justify-between gap-4">
+    <span className={`text-[10px] ${color}`}>{label}</span>
+    <span className={`font-mono text-xs ${color} ${bold ? "font-bold" : ""}`}>
+      {typeof value === "number" ? value.toFixed(2) : "0.00"}
+    </span>
+  </div>
+);
+
 const BpiBoxTooltip = ({ active, payload, label }: TooltipProps) => {
   if (!active || !payload?.length) return null;
-  const d = payload[0].payload;
+  const d = payload[0].payload as ChartDataPoint;
 
   return (
     <div className="min-w-45 rounded-md border border-bpim-border bg-bpim-surface p-3 shadow-xl">
@@ -101,6 +154,14 @@ const BpiBoxTooltip = ({ active, payload, label }: TooltipProps) => {
         />
         <Row label="下限" value={d.min} color="text-bpim-success" />
         <div className="my-1 h-px w-full bg-bpim-overlay/60" />
+        <div className="flex items-center justify-between gap-4">
+          <span className="text-[10px] text-bpim-warning font-bold">
+            打鍵効率
+          </span>
+          <span className="font-mono text-xs text-bpim-warning font-bold">
+            {d.efficiency?.toFixed(1)}%
+          </span>
+        </div>
         <p className="text-right text-[10px] text-bpim-muted">
           集計対象: {d.count}曲
         </p>
@@ -109,66 +170,31 @@ const BpiBoxTooltip = ({ active, payload, label }: TooltipProps) => {
   );
 };
 
-const Row = ({
-  label,
-  value,
-  color,
-  bold,
-}: {
-  label: string;
-  value: number;
-  color: string;
-  bold?: boolean;
-}) => (
-  <div className="flex items-center justify-between gap-4">
-    <span className={`text-[10px] ${color}`}>{label}</span>
-    <span className={`font-mono text-xs ${color} ${bold ? "font-bold" : ""}`}>
-      {value.toFixed(2)}
-    </span>
-  </div>
-);
-
-const GROUP_BY_OPTIONS: { value: StatsGroupBy; label: string }[] = [
-  { value: "day", label: "単日" },
-  { value: "week", label: "週間" },
-  { value: "month", label: "月間" },
-];
-
-const TITLE_MAP: Record<StatsGroupBy, string> = {
-  day: "単日総合BPI 分布推移",
-  week: "週間総合BPI 分布推移",
-  month: "月間総合BPI 分布推移",
-};
-
-const DEFAULT_WINDOW: Record<StatsGroupBy, number> = {
-  day: 30,
-  week: 26,
-  month: 12,
-};
-
-interface BpiBoxStatsChartProps {
-  data?: BpiBoxStatsItem[];
-  isLoading: boolean;
-  groupBy: StatsGroupBy;
-  onGroupByChange: (g: StatsGroupBy) => void;
-}
-
 export const BpiBoxStatsChart = ({
   data,
   isLoading,
   groupBy,
   onGroupByChange,
-}: BpiBoxStatsChartProps) => {
+}: {
+  data?: ExtendedBpiBoxStatsItem[];
+  isLoading: boolean;
+  groupBy: StatsGroupBy;
+  onGroupByChange: (g: StatsGroupBy) => void;
+}) => {
   const c = useChartColors();
   const [visible, setVisible] = useState({
     median: true,
     band: true,
     minMax: false,
+    efficiency: true,
   });
 
-  const toggleVisibility = (key: keyof typeof visible) => {
-    setVisible((prev) => ({ ...prev, [key]: !prev[key] }));
-  };
+  useEffect(() => {
+    if (!isLoading && data && data.length > 0) {
+      const hasAnyEfficiency = data.some((d) => (d.efficiency ?? 0) > 0);
+      setVisible((prev) => ({ ...prev, efficiency: hasAnyEfficiency }));
+    }
+  }, [data, isLoading]);
 
   const { chartData, ticks, startIndex } = useMemo(() => {
     if (!data || data.length === 0)
@@ -176,8 +202,6 @@ export const BpiBoxStatsChart = ({
 
     const processed: ChartDataPoint[] = data.map((d) => ({
       ...d,
-      bandBase: d.p25,
-      bandHeight: d.p75 - d.p25,
       totalBpiBandBase: d.totalBpiTop75,
       totalBpiBandHeight: d.totalBpiTop25 - d.totalBpiTop75,
     }));
@@ -187,33 +211,20 @@ export const BpiBoxStatsChart = ({
       .filter((_, i) => i % interval === 0 || i === processed.length - 1)
       .map((d) => d.date);
 
+    const windowSize = groupBy === "day" ? 30 : groupBy === "week" ? 26 : 12;
+
     return {
       chartData: processed,
       ticks: calculatedTicks,
-      startIndex: Math.max(0, processed.length - DEFAULT_WINDOW[groupBy]),
+      startIndex: Math.max(0, processed.length - windowSize),
     };
   }, [data, groupBy]);
 
   if (isLoading) return <BpiBoxStatsSkeleton />;
-  if (chartData.length === 0) return null;
-
-  const formatDate = (value: string, index: number) => {
-    if (groupBy === "month") {
-      const [year, month] = value.split("-");
-      const prevYear = ticks[index - 1]?.split("-")[0];
-      return index === 0 || year !== prevYear
-        ? `${year}/${parseInt(month)}`
-        : `${parseInt(month)}月`;
-    }
-    const date = new Date(value);
-    return index === 0 ||
-      date.getFullYear() !== new Date(ticks[index - 1] ?? value).getFullYear()
-      ? `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`
-      : `${date.getMonth() + 1}/${date.getDate()}`;
-  };
+  if (!data || chartData.length === 0) return null;
 
   return (
-    <DashCard className="h-105">
+    <DashCard className="h-105 flex-col">
       <div className="mb-4 flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
         <div className="flex items-center gap-1 shrink-0">
           <h3 className="text-sm font-bold uppercase text-bpim-muted">
@@ -224,57 +235,61 @@ export const BpiBoxStatsChart = ({
 
         <div className="ml-auto flex flex-col items-end gap-2">
           <div className="flex overflow-hidden rounded border border-bpim-border bg-bpim-surface">
-            {GROUP_BY_OPTIONS.map(({ value, label }) => (
+            {(["day", "week", "month"] as const).map((v) => (
               <button
-                key={value}
-                onClick={() => onGroupByChange(value)}
+                key={v}
+                onClick={() => onGroupByChange(v)}
                 className={`px-2 py-0.5 text-[10px] transition-colors ${
-                  groupBy === value
+                  groupBy === v
                     ? "bg-bpim-primary text-bpim-surface"
                     : "text-bpim-muted hover:bg-bpim-overlay"
                 }`}
               >
-                {label}
+                {v === "day" ? "単日" : v === "week" ? "週間" : "月間"}
               </button>
             ))}
           </div>
 
           <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1.5 text-[10px] text-bpim-muted">
             <button
-              onClick={() => toggleVisibility("median")}
-              className={`flex items-center gap-1 whitespace-nowrap transition-opacity ${visible.median ? "opacity-100" : "opacity-40"}`}
+              onClick={() =>
+                setVisible((v) => ({ ...v, efficiency: !v.efficiency }))
+              }
+              className={`flex items-center gap-1 transition-opacity ${visible.efficiency ? "opacity-100" : "opacity-40"}`}
             >
-              <span className="inline-block h-2 w-2 rounded-full bg-bpim-primary" />
+              <span className="inline-block h-px w-3 border-t border-dashed border-bpim-warning" />{" "}
+              打鍵効率(%)
+            </button>
+            <button
+              onClick={() => setVisible((v) => ({ ...v, median: !v.median }))}
+              className={`flex items-center gap-1 transition-opacity ${visible.median ? "opacity-100" : "opacity-40"}`}
+            >
+              <span className="inline-block h-2 w-2 rounded-full bg-bpim-primary" />{" "}
               期間総合BPI
             </button>
-
             <button
-              onClick={() => toggleVisibility("band")}
-              className={`flex items-center gap-1 whitespace-nowrap transition-opacity ${visible.band ? "opacity-100" : "opacity-40"}`}
+              onClick={() => setVisible((v) => ({ ...v, band: !v.band }))}
+              className={`flex items-center gap-1 transition-opacity ${visible.band ? "opacity-100" : "opacity-40"}`}
             >
-              <span className="inline-block h-2 w-3 rounded-sm bg-bpim-primary opacity-20" />
-              上位25–75%帯
+              <span className="inline-block h-2 w-3 rounded-sm bg-bpim-primary opacity-20" />{" "}
+              上位25-75%帯
             </button>
-
             <button
-              onClick={() => toggleVisibility("minMax")}
-              className={`flex items-center gap-1 whitespace-nowrap transition-opacity ${visible.minMax ? "opacity-100" : "opacity-40"}`}
+              onClick={() => setVisible((v) => ({ ...v, minMax: !v.minMax }))}
+              className={`flex items-center gap-1 transition-opacity ${visible.minMax ? "opacity-100" : "opacity-40"}`}
             >
-              <span
-                className="inline-block h-px w-3"
-                style={{ borderTop: `1px dashed ${c.muted}` }}
-              />
+              <span className="inline-block h-px w-3 border-t border-dashed border-bpim-muted" />{" "}
               上限/下限
             </button>
           </div>
         </div>
       </div>
 
-      <div className="h-[80%] w-full">
+      <div className="h-[80%] w-full flex-1">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart
             data={chartData}
-            margin={{ top: 10, right: 10, left: -10, bottom: 10 }}
+            margin={{ top: 10, right: -10, left: -10, bottom: 0 }}
           >
             <CartesianGrid
               strokeDasharray="3 3"
@@ -284,111 +299,116 @@ export const BpiBoxStatsChart = ({
             <XAxis
               dataKey="date"
               ticks={ticks}
-              tickFormatter={formatDate}
+              tickFormatter={(v) => v.split("-").slice(1).join("/")}
               stroke={c.muted}
               fontSize={10}
               tickLine={false}
               axisLine={false}
-              minTickGap={20}
             />
+
             <YAxis
-              domain={([dataMin, dataMax]: readonly [number, number]) => {
-                const range = dataMax - dataMin;
-                if (range === 0) return [dataMin - 5, dataMax + 5];
-                const margin = range * 0.1;
-                return [
-                  Math.floor(dataMin - margin),
-                  Math.ceil(dataMax + margin),
-                ] as [number, number];
-              }}
+              yAxisId="left"
+              domain={["auto", "auto"]}
               stroke={c.muted}
               fontSize={10}
-              tickFormatter={(v: number) => v.toFixed(0)}
+              tickFormatter={(v) => v.toFixed(0)}
               axisLine={false}
               tickLine={false}
               width={35}
             />
 
-            <Tooltip
-              content={(props) => (
-                <BpiBoxTooltip
-                  active={props.active}
-                  payload={
-                    props.payload as
-                      | ReadonlyArray<{ payload: ChartDataPoint }>
-                      | undefined
-                  }
-                  label={props.label as string | undefined}
-                />
-              )}
-              cursor={{ stroke: c.grid }}
+            <YAxis
+              yAxisId="right"
+              orientation="right"
+              domain={[0, 100]}
+              stroke={c.warning}
+              fontSize={9}
+              tickFormatter={(v) => `${v}%`}
+              axisLine={false}
+              tickLine={false}
+              hide={!visible.efficiency}
+              width={40}
             />
+
+            <Tooltip content={<BpiBoxTooltip />} cursor={{ stroke: c.grid }} />
+
+            {visible.efficiency && (
+              <Line
+                yAxisId="right"
+                type="monotone"
+                dataKey="efficiency"
+                stroke={c.warning}
+                strokeWidth={1.5}
+                strokeDasharray="3 3"
+                dot={{ r: 2, fill: c.warning }}
+                connectNulls
+                animationDuration={1000}
+              />
+            )}
+
             {visible.band && (
-              <>
-                <Area
-                  type="monotone"
-                  dataKey="totalBpiBandBase"
-                  fill="transparent"
-                  stroke="none"
-                  stackId="band"
-                  connectNulls
-                  isAnimationActive={false}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="totalBpiBandHeight"
-                  fill={c.primary}
-                  fillOpacity={0.15}
-                  stroke="none"
-                  stackId="band"
-                  connectNulls
-                  animationDuration={1000}
-                />
-              </>
+              <Area
+                yAxisId="left"
+                type="monotone"
+                dataKey="totalBpiBandBase"
+                fill="transparent"
+                stroke="none"
+                stackId="band"
+                connectNulls
+                isAnimationActive={false}
+              />
+            )}
+            {visible.band && (
+              <Area
+                yAxisId="left"
+                type="monotone"
+                dataKey="totalBpiBandHeight"
+                fill={c.primary}
+                fillOpacity={0.15}
+                stroke="none"
+                stackId="band"
+                connectNulls
+              />
             )}
 
             {visible.minMax && (
-              <>
-                <Line
-                  type="monotone"
-                  dataKey="max"
-                  stroke={c.muted}
-                  strokeWidth={1.5}
-                  strokeDasharray="5 5"
-                  dot={false}
-                  connectNulls
-                  animationDuration={800}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="min"
-                  stroke={c.muted}
-                  strokeWidth={1.5}
-                  strokeDasharray="5 5"
-                  dot={false}
-                  connectNulls
-                  animationDuration={800}
-                />
-              </>
+              <Line
+                yAxisId="left"
+                type="monotone"
+                dataKey="max"
+                stroke={c.muted}
+                strokeWidth={1.5}
+                strokeDasharray="5 5"
+                dot={false}
+                connectNulls
+              />
+            )}
+            {visible.minMax && (
+              <Line
+                yAxisId="left"
+                type="monotone"
+                dataKey="min"
+                stroke={c.muted}
+                strokeWidth={1.5}
+                strokeDasharray="5 5"
+                dot={false}
+                connectNulls
+              />
             )}
 
             {visible.median && (
               <Line
+                yAxisId="left"
                 type="monotone"
                 dataKey="totalBpi"
                 stroke={c.primary}
                 strokeWidth={2}
                 dot={false}
-                activeDot={{
-                  r: 4,
-                  fill: c.surface,
-                  stroke: c.primary,
-                  strokeWidth: 2,
-                }}
+                activeDot={{ r: 4, strokeWidth: 0 }}
                 connectNulls
-                animationDuration={1000}
               />
             )}
+
             <Brush
               dataKey="date"
               height={20}
