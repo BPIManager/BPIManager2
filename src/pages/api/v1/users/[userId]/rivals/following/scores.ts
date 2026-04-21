@@ -3,6 +3,8 @@ import {
   AuthenticatedNextApiRequest,
   withAuth,
 } from "@/middlewares/api/withAuth";
+import { scoreComparisonQuerySchema } from "@/schemas/rivals/following/scores/query";
+import { parseQuery } from "@/services/nextRequest/parseBody";
 import { NextApiResponse } from "next";
 
 const handler = async (
@@ -11,7 +13,8 @@ const handler = async (
 ): Promise<void> => {
   if (req.method !== "GET")
     return res.status(405).json({ message: "Method Not Allowed" });
-
+  const query = parseQuery(scoreComparisonQuerySchema, req.query, res);
+  if (!query) return;
   const {
     version,
     limit,
@@ -22,7 +25,7 @@ const handler = async (
     difficulties,
     minDiff,
     maxDiff,
-  } = req.query;
+  } = query;
 
   const userId = req.authUid;
 
@@ -53,7 +56,7 @@ const handler = async (
 
     const rawResults = await logsRepo.getScoreComparisonList({
       userId: String(userId),
-      version: String(version),
+      version: version,
       limit: nLimit,
       minDiff: nMin,
       maxDiff: nMax,

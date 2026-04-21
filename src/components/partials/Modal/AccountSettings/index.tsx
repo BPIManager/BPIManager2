@@ -199,7 +199,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                       setFormData({ ...formData, arenaRank: val })
                     }
                   >
-                    <SelectTrigger className="!h-10 w-full py-2 border-bpim-border bg-bpim-surface-2/60 focus:ring-blue-500">
+                    <SelectTrigger className="h-10! w-full py-2 border-bpim-border bg-bpim-surface-2/60 focus:ring-blue-500">
                       <SelectValue placeholder="未設定" />
                     </SelectTrigger>
                     <SelectContent className="border-bpim-border bg-bpim-bg">
@@ -223,7 +223,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                 </Label>
                 <Textarea
                   className={cn(
-                    "min-h-[88px] bg-bpim-surface-2/60 border-bpim-border focus-visible:ring-blue-500",
+                    "min-h-22 bg-bpim-surface-2/60 border-bpim-border focus-visible:ring-blue-500",
                     formData.bio.length > 1000 && "border-bpim-danger",
                   )}
                   value={formData.bio}

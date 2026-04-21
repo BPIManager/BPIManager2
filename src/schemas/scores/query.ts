@@ -55,3 +55,21 @@ export const scoresQuerySchema = z.object({
 });
 
 export type ScoresQueryOutput = z.output<typeof scoresQuerySchema>;
+
+export const songHistoryQuerySchema = z.object({
+  userId: z.string().min(1),
+  songId: z.coerce.number().int().positive(),
+});
+
+export type SongHistoryQueryOutput = z.output<typeof songHistoryQuerySchema>;
+
+export const selfVersionComparisonQuerySchema = z
+  .object({
+    userId: z.string().min(1),
+    currentVersion: z.enum(IIDX_VERSIONS),
+    targetVersion: z.enum(IIDX_VERSIONS),
+  })
+  .refine((data) => data.currentVersion !== data.targetVersion, {
+    message: "currentVersion and targetVersion must differ.",
+    path: ["targetVersion"],
+  });

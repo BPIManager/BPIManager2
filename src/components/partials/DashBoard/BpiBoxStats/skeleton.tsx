@@ -3,12 +3,15 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export const BpiBoxStatsSkeleton = () => {
   return (
-    <DashCard className="h-[420px]">
-      <Skeleton className="mb-8 h-4 w-[180px]" />
+    <DashCard className="h-105">
+      <Skeleton className="mb-8 h-4 w-45" />
 
-      <div className="relative mb-6 flex h-[260px] w-full items-end justify-between px-2">
+      <div className="relative mb-6 flex h-65 w-full items-end justify-between px-2">
         {[...Array(14)].map((_, i) => (
-          <div key={i} className="flex flex-1 flex-col items-center justify-end gap-0.5">
+          <div
+            key={i}
+            className="flex flex-1 flex-col items-center justify-end gap-0.5"
+          >
             <Skeleton
               className="w-2 rounded-sm opacity-20"
               style={{ height: `${Math.random() * 30 + 5}%` }}

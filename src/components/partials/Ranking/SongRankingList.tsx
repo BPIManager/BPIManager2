@@ -113,7 +113,7 @@ const SongRankRow = ({ entry, onClick }: SongRankRowProps) => {
             {entry.totalPlayers}人中
           </span>
           <div
-            className="inline-flex min-w-[60px] items-center justify-center rounded-sm border px-2 py-0.5 font-mono text-xs font-bold"
+            className="inline-flex min-w-15 items-center justify-center rounded-sm border px-2 py-0.5 font-mono text-xs font-bold"
             style={{
               borderColor: pctColor.border,
               backgroundColor: pctColor.bg,
@@ -257,7 +257,7 @@ export const SongRankingList = ({ version }: SongRankingListProps) => {
             <span className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase whitespace-nowrap">
               順位
             </span>
-            <span className="inline-flex min-w-[60px] items-center justify-center text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
+            <span className="inline-flex min-w-15 items-center justify-center text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
               上位%
             </span>
           </div>

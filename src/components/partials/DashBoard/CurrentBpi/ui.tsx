@@ -160,7 +160,7 @@ export const CurrentBpiCard = ({
         </div>
       </div>
 
-      <div className="mt-5 min-h-[42px]">
+      <div className="mt-5 min-h-10.5">
         {effectiveDate ? (
           <div
             className={cn(

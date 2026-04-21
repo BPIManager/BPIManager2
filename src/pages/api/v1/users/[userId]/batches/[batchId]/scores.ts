@@ -6,6 +6,9 @@ import { mapToLogNested } from "@/utils/logs/getMapNested";
 import { calculateTotalBpi } from "@/services/logs/calculateTotalBpi";
 import { OvertakenMap } from "@/types/logs/overtaken";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
+import { parseQuery } from "@/services/nextRequest/parseBody";
+import { batchScoresQuerySchema } from "@/schemas/batches/query";
+import { IIDXVersion } from "@/types/iidx/version";
 
 export default async function handler(
   req: NextApiRequest,
@@ -18,21 +21,15 @@ export default async function handler(
       .json({ message: `Method ${req.method} Not Allowed` });
   }
 
+  const query = parseQuery(batchScoresQuerySchema, req.query, res);
+  if (!query) return;
   const {
-    userId,
-    batchId,
-    version,
-    type = "day",
-    groupedBy = "createdAt",
-  } = req.query;
-
-  if (!userId || !batchId || !version) {
-    return res.status(400).json({ message: "Required params missing." });
-  }
-
-  const uid = String(userId);
-  const dateStr = String(batchId);
-  const ver = String(version);
+    userId: uid,
+    batchId: dateStr,
+    version: ver,
+    type,
+    groupedBy,
+  } = query;
 
   try {
     const access = await checkProfileAccess(req, uid);
@@ -41,16 +38,13 @@ export default async function handler(
     const basis: "lastPlayed" | "createdAt" =
       groupedBy === "lastPlayed" ? "lastPlayed" : "createdAt";
 
-    const range = logsRepo.getJstRange(
-      dateStr,
-      type as "day" | "week" | "month",
-    );
+    const range = logsRepo.getJstRange(dateStr, type);
     const nav = await logsRepo.getRangeNavigation(uid, ver, range, basis);
 
     let responseData:
       | Awaited<ReturnType<typeof handleLastPlayedBase>>
       | Awaited<ReturnType<typeof handleCreatedAtBase>>;
-    const isOwnLog = access.viewerId === userId;
+    const isOwnLog = access.viewerId === uid;
 
     if (groupedBy === "lastPlayed") {
       responseData = await handleLastPlayedBase(uid, ver, range, nav, isOwnLog);
@@ -68,12 +62,9 @@ export default async function handler(
     });
   } catch (error: unknown) {
     console.error(`Fetch Detail Error:`, error);
-    return res
-      .status(500)
-      .json({
-        message:
-          error instanceof Error ? error.message : "Internal Server Error",
-      });
+    return res.status(500).json({
+      message: error instanceof Error ? error.message : "Internal Server Error",
+    });
   }
 }
 
@@ -82,7 +73,7 @@ export default async function handler(
  */
 async function handleLastPlayedBase(
   uid: string,
-  ver: string,
+  ver: IIDXVersion,
   range: ReturnType<typeof logsRepo.getJstRange>,
   nav: Awaited<ReturnType<typeof logsRepo.getRangeNavigation>>,
   isOwnLog: boolean,
@@ -103,7 +94,9 @@ async function handleLastPlayedBase(
   }
 
   const overtakenMap = createOvertakenMap(overtaken);
-  const overtakenSongIds = Object.keys(overtakenMap).map(Number).filter(Boolean);
+  const overtakenSongIds = Object.keys(overtakenMap)
+    .map(Number)
+    .filter(Boolean);
   const rivalScores =
     isOwnLog && overtakenSongIds.length > 0
       ? await logsRepo.getRivalScoresForSongs({
@@ -156,7 +149,7 @@ async function handleLastPlayedBase(
  */
 async function handleCreatedAtBase(
   uid: string,
-  ver: string,
+  ver: IIDXVersion,
   range: ReturnType<typeof logsRepo.getJstRange>,
   nav: Awaited<ReturnType<typeof logsRepo.getRangeNavigation>>,
   isOwnLog: boolean,
@@ -181,7 +174,9 @@ async function handleCreatedAtBase(
       : [],
   ]);
   const overtakenMap = createOvertakenMap(overtaken);
-  const overtakenSongIds = Object.keys(overtakenMap).map(Number).filter(Boolean);
+  const overtakenSongIds = Object.keys(overtakenMap)
+    .map(Number)
+    .filter(Boolean);
   const rivalScores =
     isOwnLog && overtakenSongIds.length > 0
       ? await logsRepo.getRivalScoresForSongs({
@@ -198,7 +193,7 @@ async function handleCreatedAtBase(
       return {
         ...mapped,
         overtaken: s.songId ? overtakenMap[s.songId] || [] : [],
-        rivalRankInfo: s.songId ? rivalRankMap[s.songId] ?? null : null,
+        rivalRankInfo: s.songId ? (rivalRankMap[s.songId] ?? null) : null,
       };
     }),
     pagination: {
@@ -216,7 +211,10 @@ async function handleCreatedAtBase(
 export function computeRivalRankMap(
   overtakenMap: OvertakenMap,
   rivalScores: { songId: number | null; exScore: number | null }[],
-): Record<number, { myRankBefore: number; myRankAfter: number; totalRivals: number }> {
+): Record<
+  number,
+  { myRankBefore: number; myRankAfter: number; totalRivals: number }
+> {
   const scoresBySong: Record<number, number[]> = {};
   for (const row of rivalScores) {
     if (row.songId == null || row.exScore == null) continue;

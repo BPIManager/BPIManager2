@@ -1,14 +1,18 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { socialRepo } from "@/lib/db/social";
+import { parseQuery } from "@/services/nextRequest/parseBody";
+import { rivalFollowingScoresQuerySchema } from "@/schemas/rivals/following/scores/query";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
   if (req.method !== "GET") return res.status(405).end();
+  const query = parseQuery(rivalFollowingScoresQuerySchema, req.query, res);
+  if (!query) return;
 
-  const { userId, songId, version } = req.query;
+  const { userId, songId, version } = query;
 
   if (!userId || !songId || !version) {
     return res.status(400).json({ message: "Missing required parameters" });
@@ -21,7 +25,7 @@ export default async function handler(
     const rivalsScores = await socialRepo.getRivalScoresForSong({
       viewerId: String(userId),
       songId: Number(songId),
-      version: String(version),
+      version: version,
     });
 
     return res.status(200).json({
@@ -35,7 +39,9 @@ export default async function handler(
   }
 }
 
-export const formatRivalScore = (r: Awaited<ReturnType<typeof socialRepo.getRivalScoresForSong>>[number]) => ({
+export const formatRivalScore = (
+  r: Awaited<ReturnType<typeof socialRepo.getRivalScoresForSong>>[number],
+) => ({
   userId: r.userId,
   userName: r.userName,
   profileImage: r.profileImage,

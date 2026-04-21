@@ -64,7 +64,7 @@ export const LogFilterSection = ({ version, groupedBy }: Props) => {
         </Select>
       </div>
 
-      <div className="flex flex-1 flex-col gap-1.5 max-w-full md:max-w-[400px]">
+      <div className="flex flex-1 flex-col gap-1.5 max-w-full md:max-w-100">
         <label className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
           Group By
         </label>
@@ -73,13 +73,13 @@ export const LogFilterSection = ({ version, groupedBy }: Props) => {
           onValueChange={handleGroupChange}
           className="w-full"
         >
-            <AppTabsGroup
-              visual="flat"
-              tabs={[
-                { value: "lastPlayed", label: "プレイ日単位" },
-                { value: "createdAt", label: "インポート日単位" },
-              ]}
-            />
+          <AppTabsGroup
+            visual="flat"
+            tabs={[
+              { value: "lastPlayed", label: "プレイ日単位" },
+              { value: "createdAt", label: "インポート日単位" },
+            ]}
+          />
         </Tabs>
       </div>
     </div>

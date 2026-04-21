@@ -1,14 +1,18 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { logsRepo } from "@/lib/db/logs";
+import { parseQuery } from "@/services/nextRequest/parseBody";
+import { rivalScoreDetailQuerySchema } from "@/schemas/rivals/rivalId/scores/query";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
   if (req.method !== "GET") return res.status(405).end();
+  const query = parseQuery(rivalScoreDetailQuerySchema, req.query, res);
+  if (!query) return;
 
-  const { userId, rivalId, songId, version } = req.query;
+  const { userId, rivalId, songId, version } = query;
 
   if (!userId || !rivalId || !songId || !version) {
     return res.status(400).json({ message: "Missing required parameters" });
@@ -21,7 +25,7 @@ export default async function handler(
     const result = await logsRepo.getRivalComparisonScores({
       viewerId: String(userId),
       rivalId: String(rivalId),
-      version: String(version),
+      version: version,
     });
 
     const rivalData = result.find((r) => r.songId === Number(songId));

@@ -18,6 +18,7 @@ import { IidxTowerSection } from "@/components/partials/DashBoard/IidxTowerCard"
 import { LogFilterSection } from "@/components/partials/Logs/VersionSelector/ui";
 import { TabsContent } from "@/components/ui/tabs";
 import { useState } from "react";
+import { BpiBoxStatsSection } from "@/components/partials/DashBoard/BpiBoxStats";
 
 interface UserPageProps {
   defaultView?: "overview" | "songs" | "logs";
@@ -61,6 +62,7 @@ export default function UserPage({ defaultView = "overview" }: UserPageProps) {
               <BpmBpiDistributionSection myUserId={userId} />
             </div>
 
+            <BpiBoxStatsSection userId={userId} />
             <BpiHistorySection myUserId={userId} />
             <IidxTowerSection userId={userId} showImportAlert={false} />
             <RadarSection userId={userId} />

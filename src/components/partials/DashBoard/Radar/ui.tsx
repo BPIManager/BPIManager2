@@ -105,12 +105,12 @@ export const RadarSection = ({
 
                 <div className="flex items-center gap-2">
                   {isRivalMode && rivalBpi !== undefined && (
-                    <div className="inline-flex min-w-[64px] items-center justify-center rounded-sm border border-orange-500/50 bg-orange-500/10 px-2 py-0.5 font-mono text-sm font-bold text-bpim-warning">
+                    <div className="inline-flex min-w-16 items-center justify-center rounded-sm border border-orange-500/50 bg-orange-500/10 px-2 py-0.5 font-mono text-sm font-bold text-bpim-warning">
                       {rivalBpi.toFixed(2)}
                     </div>
                   )}
                   <div
-                    className="inline-flex min-w-[64px] items-center justify-center rounded-sm border px-2 py-0.5 font-mono text-sm font-bold text-bpim-text"
+                    className="inline-flex min-w-16 items-center justify-center rounded-sm border px-2 py-0.5 font-mono text-sm font-bold text-bpim-text"
                     style={{
                       borderColor: style.bg,
                       backgroundColor: `${style.bg}15`,

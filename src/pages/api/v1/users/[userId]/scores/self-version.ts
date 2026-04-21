@@ -1,29 +1,15 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { logsRepo } from "@/lib/db/logs";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
+import { selfVersionComparisonQuerySchema } from "@/schemas/scores/query";
+import z from "zod";
+import { parseQuery } from "@/services/nextRequest/parseBody";
 
 async function handleGetSelfVersion(
-  req: NextApiRequest,
   res: NextApiResponse,
-  userId: string,
+  query: z.infer<typeof selfVersionComparisonQuerySchema>,
 ) {
-  const { currentVersion, targetVersion } = req.query;
-
-  if (!currentVersion || typeof currentVersion !== "string") {
-    return res
-      .status(400)
-      .json({ message: "Missing or invalid currentVersion parameter." });
-  }
-  if (!targetVersion || typeof targetVersion !== "string") {
-    return res
-      .status(400)
-      .json({ message: "Missing or invalid targetVersion parameter." });
-  }
-  if (currentVersion === targetVersion) {
-    return res
-      .status(400)
-      .json({ message: "currentVersion and targetVersion must differ." });
-  }
+  const { userId, currentVersion, targetVersion } = query;
 
   const rows = await logsRepo.getSelfVersionScores({
     userId,
@@ -94,25 +80,21 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const { userId } = req.query;
-
-  if (!userId || typeof userId !== "string") {
-    return res.status(400).json({ message: "Invalid userId" });
+  if (req.method !== "GET") {
+    res.setHeader("Allow", ["GET"]);
+    return res
+      .status(405)
+      .json({ message: `Method ${req.method} Not Allowed` });
   }
 
+  const query = parseQuery(selfVersionComparisonQuerySchema, req.query, res);
+  if (!query) return;
+
   try {
-    const access = await checkUserAccess(req, userId);
+    const access = await checkUserAccess(req, query.userId);
     if (!access.hasAccess) return rejectAccess(res, access);
 
-    switch (req.method) {
-      case "GET":
-        return await handleGetSelfVersion(req, res, userId);
-      default:
-        res.setHeader("Allow", ["GET"]);
-        return res
-          .status(405)
-          .json({ message: `Method ${req.method} Not Allowed` });
-    }
+    return await handleGetSelfVersion(res, query);
   } catch (error: unknown) {
     const errorMessage =
       error instanceof Error ? error.message : "Internal Server Error";

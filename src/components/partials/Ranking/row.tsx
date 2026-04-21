@@ -60,7 +60,7 @@ export const RankingRow = ({ entry, onClick, style }: RankingRowProps) => {
       </div>
 
       <div
-        className="inline-flex min-w-[72px] items-center justify-center rounded-sm border px-2 py-0.5 font-mono text-xs font-bold"
+        className="inline-flex min-w-18 items-center justify-center rounded-sm border px-2 py-0.5 font-mono text-xs font-bold"
         style={{
           borderColor: bpiStyle.bg,
           backgroundColor: `${bpiStyle.bg}22`,

@@ -18,7 +18,7 @@ export const TowerImportSuccessModal = ({ result, onClose }: Props) => {
   if (!result) return null;
 
   return (
-    <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-bpim-bg/80 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-1000 flex items-center justify-center bg-bpim-bg/80 backdrop-blur-sm p-4">
       <Fireworks
         autorun={{ speed: 2, duration: 1500 }}
         style={{

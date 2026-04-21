@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { songsRepo } from "@/lib/db/songs";
 import { latestVersion, IIDX_VERSIONS } from "@/constants/latestVersion";
+import { IIDXVersion } from "@/types/iidx/version";
 
 export default async function handler(
   req: NextApiRequest,
@@ -18,7 +19,7 @@ export default async function handler(
 
   const rawVersion = String(req.query.version ?? "");
   const version = (IIDX_VERSIONS as readonly string[]).includes(rawVersion)
-    ? rawVersion
+    ? (rawVersion as IIDXVersion)
     : latestVersion;
 
   const rawLimit = parseInt(String(req.query.limit ?? "10"), 10);
@@ -27,7 +28,12 @@ export default async function handler(
   const mode = req.query.mode === "global" ? "global" : "profile";
 
   try {
-    const result = await songsRepo.getSimilarSongs(songIdNum, version, limit, mode);
+    const result = await songsRepo.getSimilarSongs(
+      songIdNum,
+      version,
+      limit,
+      mode,
+    );
     return res.status(200).json(result);
   } catch (error: unknown) {
     const errorMessage =

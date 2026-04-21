@@ -145,7 +145,7 @@ export const UserRecommendationCard = ({
         </div>
       </div>
 
-      <div className="flex h-[100px] w-[100px] shrink-0 self-center items-center justify-center rounded-xl border border-bpim-border bg-bpim-bg/40 p-1 sm:h-[120px] sm:w-[120px] md:h-[140px] md:w-[140px]">
+      <div className="flex h-25 w-25 shrink-0 self-center items-center justify-center rounded-xl border border-bpim-border bg-bpim-bg/40 p-1 sm:h-[120px] sm:w-[120px] md:h-[140px] md:w-[140px]">
         <RadarSectionChart
           data={viewerRadar}
           rivalData={user.radar}

@@ -79,7 +79,7 @@ export const LoginButtons = () => {
                   border-bpim-border bg-transparent transition-all duration-200
                   hover:z-10 hover:bg-bpim-overlay/40
                   active:scale-[0.98]
-                  ${index === 0 ? "!rounded-t-xl rounded-b-none" : ""}
+                  ${index === 0 ? "rounded-t-xl! rounded-b-none" : ""}
                   ${index === LOGIN_PROVIDERS.length - 1 ? "rounded-b-xl rounded-t-none" : "rounded-none"}
                 `}
               >

@@ -10,7 +10,7 @@ import {
   ResponsiveContainer,
   Brush,
 } from "recharts";
-import type { BpiBoxStatsItem } from "@/types/stats/bpiBoxStats";
+import type { StatsGroupBy, BpiBoxStatsItem } from "@/types/stats/bpiBoxStats";
 import { BpiBoxStatsSkeleton } from "./skeleton";
 import { DashCard } from "@/components/ui/dashcard";
 import { useChartColors } from "@/hooks/common/useChartColors";
@@ -33,7 +33,7 @@ const BpiBoxTooltip = ({ active, payload, label }: TooltipProps) => {
   const d = payload[0].payload;
 
   return (
-    <div className="min-w-[180px] rounded-md border border-bpim-border bg-bpim-surface p-3 shadow-xl">
+    <div className="min-w-45 rounded-md border border-bpim-border bg-bpim-surface p-3 shadow-xl">
       <p className="mb-2 text-[10px] font-bold text-bpim-muted">{label}</p>
       <div className="flex flex-col gap-1">
         <Row label="最大" value={d.max} color="text-bpim-danger" />
@@ -80,14 +80,36 @@ const Row = ({
   </div>
 );
 
+const GROUP_BY_OPTIONS: { value: StatsGroupBy; label: string }[] = [
+  { value: "day", label: "単日" },
+  { value: "week", label: "週間" },
+  { value: "month", label: "月間" },
+];
+
+const TITLE_MAP: Record<StatsGroupBy, string> = {
+  day: "単日総合BPI 分布推移",
+  week: "週間総合BPI 分布推移",
+  month: "月間総合BPI 分布推移",
+};
+
+const DEFAULT_WINDOW: Record<StatsGroupBy, number> = {
+  day: 30,
+  week: 26,
+  month: 12,
+};
+
 interface BpiBoxStatsChartProps {
   data?: BpiBoxStatsItem[];
   isLoading: boolean;
+  groupBy: StatsGroupBy;
+  onGroupByChange: (g: StatsGroupBy) => void;
 }
 
 export const BpiBoxStatsChart = ({
   data,
   isLoading,
+  groupBy,
+  onGroupByChange,
 }: BpiBoxStatsChartProps) => {
   const c = useChartColors();
   const [visible, setVisible] = useState({
@@ -120,14 +142,21 @@ export const BpiBoxStatsChart = ({
     return {
       chartData: processed,
       ticks: calculatedTicks,
-      startIndex: Math.max(0, processed.length - 30),
+      startIndex: Math.max(0, processed.length - DEFAULT_WINDOW[groupBy]),
     };
-  }, [data]);
+  }, [data, groupBy]);
 
   if (isLoading) return <BpiBoxStatsSkeleton />;
   if (chartData.length === 0) return null;
 
   const formatDate = (value: string, index: number) => {
+    if (groupBy === "month") {
+      const [year, month] = value.split("-");
+      const prevYear = ticks[index - 1]?.split("-")[0];
+      return index === 0 || year !== prevYear
+        ? `${year}/${parseInt(month)}`
+        : `${parseInt(month)}月`;
+    }
     const date = new Date(value);
     return index === 0 ||
       date.getFullYear() !== new Date(ticks[index - 1] ?? value).getFullYear()
@@ -136,38 +165,55 @@ export const BpiBoxStatsChart = ({
   };
 
   return (
-    <DashCard className="h-[420px]">
+    <DashCard className="h-105">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-sm font-bold uppercase text-bpim-muted">
-          単日総合BPI 分布推移
+          {TITLE_MAP[groupBy]}
         </h3>
-        <div className="flex items-center gap-3 text-[10px] text-bpim-muted">
-          <button
-            onClick={() => toggleVisibility("median")}
-            className={`flex items-center gap-1 transition-opacity hover:opacity-80 ${visible.median ? "opacity-100" : "opacity-40"}`}
-          >
-            <span className="inline-block h-2 w-2 rounded-full bg-bpim-primary" />
-            総合BPI
-          </button>
+        <div className="flex flex-col items-end gap-1 text-[10px] text-bpim-muted sm:flex-row sm:items-center sm:gap-3">
+          <div className="flex overflow-hidden rounded border border-bpim-border">
+            {GROUP_BY_OPTIONS.map(({ value, label }) => (
+              <button
+                key={value}
+                onClick={() => onGroupByChange(value)}
+                className={`px-2 py-0.5 transition-colors ${
+                  groupBy === value
+                    ? "bg-bpim-primary text-bpim-surface"
+                    : "text-bpim-muted hover:bg-bpim-overlay"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => toggleVisibility("median")}
+              className={`flex items-center gap-1 transition-opacity hover:opacity-80 ${visible.median ? "opacity-100" : "opacity-40"}`}
+            >
+              <span className="inline-block h-2 w-2 rounded-full bg-bpim-primary" />
+              総合BPI
+            </button>
 
-          <button
-            onClick={() => toggleVisibility("band")}
-            className={`flex items-center gap-1 transition-opacity hover:opacity-80 ${visible.band ? "opacity-100" : "opacity-40"}`}
-          >
-            <span className="inline-block h-2 w-3 rounded-sm bg-bpim-primary opacity-20" />
-            上位25–75%帯
-          </button>
+            <button
+              onClick={() => toggleVisibility("band")}
+              className={`flex items-center gap-1 transition-opacity hover:opacity-80 ${visible.band ? "opacity-100" : "opacity-40"}`}
+            >
+              <span className="inline-block h-2 w-3 rounded-sm bg-bpim-primary opacity-20" />
+              上位25–75%帯
+            </button>
 
-          <button
-            onClick={() => toggleVisibility("minMax")}
-            className={`flex items-center gap-1 transition-opacity hover:opacity-80 ${visible.minMax ? "opacity-100" : "opacity-40"}`}
-          >
-            <span
-              className="inline-block h-px w-3"
-              style={{ borderTop: `1px dashed ${c.muted}` }}
-            />
-            最大/最小
-          </button>
+            <button
+              onClick={() => toggleVisibility("minMax")}
+              className={`flex items-center gap-1 transition-opacity hover:opacity-80 ${visible.minMax ? "opacity-100" : "opacity-40"}`}
+            >
+              <span
+                className="inline-block h-px w-3"
+                style={{ borderTop: `1px dashed ${c.muted}` }}
+              />
+              最大/最小
+            </button>
+          </div>
         </div>
       </div>
 

@@ -112,7 +112,7 @@ export default function DataExportUi() {
         <Button
           onClick={handleExport}
           disabled={isExporting || selectedVersions.size === 0}
-          className="gap-2 min-w-[160px]"
+          className="gap-2 min-w-40"
         >
           {isExporting ? (
             <LoadingSpinner size="sm" />

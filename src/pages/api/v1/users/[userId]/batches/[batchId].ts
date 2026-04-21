@@ -8,6 +8,11 @@ import {
   authenticateViewer,
 } from "@/middlewares/api/withApiOnProfile";
 import { rejectAccess } from "@/middlewares/api/withApi";
+import { parseQuery } from "@/services/nextRequest/parseBody";
+import {
+  batchDetailGetQuerySchema,
+  batchDetailDeleteQuerySchema,
+} from "@/schemas/batches/query";
 
 export default async function handler(
   req: NextApiRequest,
@@ -20,18 +25,11 @@ export default async function handler(
       .json({ message: `Method ${req.method} Not Allowed` });
   }
 
-  const { userId, batchId, version } = req.query;
-
-  if (!userId || !batchId) {
-    return res
-      .status(400)
-      .json({ message: "userId and batchId are required." });
-  }
-
-  const uid = String(userId);
-  const bid = String(batchId);
-
   if (req.method === "DELETE") {
+    const query = parseQuery(batchDetailDeleteQuerySchema, req.query, res);
+    if (!query) return;
+    const { userId: uid, batchId: bid } = query;
+
     try {
       const viewerId = await authenticateViewer(req);
       if (!viewerId || viewerId !== uid) {
@@ -53,10 +51,9 @@ export default async function handler(
     }
   }
 
-  if (!version) {
-    return res.status(400).json({ message: "version is required." });
-  }
-  const v = String(version);
+  const query = parseQuery(batchDetailGetQuerySchema, req.query, res);
+  if (!query) return;
+  const { userId: uid, batchId: bid, version: v } = query;
 
   try {
     const access = await checkProfileAccess(req, uid);
@@ -69,7 +66,7 @@ export default async function handler(
 
     const jstDate = dayjs.utc(targetBatch.createdAt).tz().format("YYYY-MM-DD");
     const dayRange = logsRepo.getJstRange(jstDate, "day");
-    const isOwnLog = access.viewerId === userId;
+    const isOwnLog = access.viewerId === uid;
 
     const [nav, sameDay, scores, overtaken] = await Promise.all([
       logsRepo.getBatchNavigation(uid, v, targetBatch.createdAt, dayRange),

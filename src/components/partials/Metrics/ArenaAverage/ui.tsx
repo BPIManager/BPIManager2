@@ -94,7 +94,7 @@ export const ArenaAverageTable = ({ data }: { data: ArenaAverageData[] }) => {
 
   const ArenaRow = memo(({ item }: { item: ArenaAverageData }) => (
     <TableRow className="group border-bpim-border hover:bg-bpim-overlay/50">
-      <TableCell className="sticky left-0 z-10 min-w-[200px] max-w-[250px] bg-bpim-bg p-3 shadow-[2px_0_5px_rgba(0,0,0,0.3)] group-hover:bg-bpim-bg transition-colors">
+      <TableCell className="sticky left-0 z-10 min-w-50 max-w-62.5 bg-bpim-bg p-3 shadow-[2px_0_5px_rgba(0,0,0,0.3)] group-hover:bg-bpim-bg transition-colors">
         <div className="flex flex-col gap-0.5">
           <span className="truncate text-xs font-bold text-bpim-text">
             {item.title}
@@ -158,7 +158,7 @@ export const ArenaAverageTable = ({ data }: { data: ArenaAverageData[] }) => {
                   <TableHead
                     key={rank}
                     onClick={() => handleSort(rank)}
-                    className="min-w-[85px] cursor-pointer text-center px-2 py-3 text-[10px] font-black uppercase tracking-widest text-bpim-muted hover:text-bpim-text transition-colors"
+                    className="min-w-21.25 cursor-pointer text-center px-2 py-3 text-[10px] font-black uppercase tracking-widest text-bpim-muted hover:text-bpim-text transition-colors"
                   >
                     <div className="flex flex-col items-center justify-center">
                       <span>{rank}</span>

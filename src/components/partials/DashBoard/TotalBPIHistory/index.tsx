@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { useTotalBpiHistory } from "@/hooks/stats/useTotalBPIHistory";
 import { TotalBpiHistoryChart } from "./ui";
 import { getVersionNameFromNumber } from "@/constants/versions";
+import type { StatsGroupBy } from "@/types/stats/bpiBoxStats";
 
 export const BpiHistorySection = ({
   myUserId,
@@ -15,6 +17,7 @@ export const BpiHistorySection = ({
   rivalName?: string;
 }) => {
   const { levels, diffs, version, compareVersion } = useStatsFilter();
+  const [groupBy, setGroupBy] = useState<StatsGroupBy>("day");
 
   const isCompareMode = !rivalUserId && !!compareVersion;
   const effectiveRivalUserId = rivalUserId ?? (isCompareMode ? myUserId : undefined);
@@ -28,12 +31,14 @@ export const BpiHistorySection = ({
     levels,
     diffs,
     version,
+    groupBy,
   );
   const { history: rivalHistory, isLoading: rivalLoading } = useTotalBpiHistory(
     effectiveRivalUserId,
     levels,
     diffs,
     effectiveRivalVersion,
+    groupBy,
   );
 
   return (
@@ -43,6 +48,8 @@ export const BpiHistorySection = ({
       isLoading={myLoading || (!!effectiveRivalUserId && rivalLoading)}
       myName={myName}
       rivalName={effectiveRivalName}
+      groupBy={groupBy}
+      onGroupByChange={setGroupBy}
     />
   );
 };

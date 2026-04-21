@@ -3,10 +3,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export const TotalBpiHistorySkeleton = () => {
   return (
-    <DashCard className="h-[420px]">
-      <Skeleton className="mb-8 h-4 w-[140px]" />
+    <DashCard className="h-105">
+      <Skeleton className="mb-8 h-4 w-35" />
 
-      <div className="relative mb-6 flex h-[240px] w-full items-end justify-between px-2">
+      <div className="relative mb-6 flex h-60 w-full items-end justify-between px-2">
         {[...Array(12)].map((_, i) => (
           <div key={i} className="flex flex-1 flex-col items-center">
             <Skeleton
@@ -16,8 +16,8 @@ export const TotalBpiHistorySkeleton = () => {
           </div>
         ))}
 
-        <div className="absolute left-10 right-10 top-[120px]">
-          <Skeleton className="h-[2px] w-full opacity-20" />
+        <div className="absolute left-10 right-10 top-30">
+          <Skeleton className="h-0.5 w-full opacity-20" />
         </div>
       </div>
 
@@ -28,7 +28,7 @@ export const TotalBpiHistorySkeleton = () => {
       </div>
 
       <div className="px-2">
-        <Skeleton className="h-[30px] w-full rounded-md" />
+        <Skeleton className="h-7.5 w-full rounded-md" />
       </div>
     </DashCard>
   );

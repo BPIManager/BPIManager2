@@ -3,6 +3,8 @@ import { rejectAccess } from "@/middlewares/api/withApi";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 import { sortSongs } from "@/utils/songs/sort";
 import { NextApiRequest, NextApiResponse } from "next";
+import { parseQuery } from "@/services/nextRequest/parseBody";
+import { rivalScoresQuerySchema } from "@/schemas/rivals/query";
 
 export default async function handler(
   req: NextApiRequest,
@@ -10,24 +12,20 @@ export default async function handler(
 ) {
   if (req.method !== "GET") return res.status(405).end();
 
-  const { userId, rivalId, version, ...filterParams } = req.query;
-
-  if (!userId || !rivalId || !version) {
-    return res
-      .status(400)
-      .json({ message: "userId, rivalUserId and version are required" });
-  }
+  const query = parseQuery(rivalScoresQuerySchema, req.query, res);
+  if (!query) return;
+  const { userId, rivalId, version, ...filterParams } = query;
 
   try {
-    const access = await checkProfileAccess(req, String(userId));
+    const access = await checkProfileAccess(req, userId);
     const viewerId = access.viewerId;
 
     if (!access.hasAccess) return rejectAccess(res, access);
 
     const rawResults = await logsRepo.getRivalComparisonScores({
       viewerId: String(viewerId),
-      rivalId: String(rivalId),
-      version: String(version),
+      rivalId,
+      version,
     });
 
     const compared = rawResults

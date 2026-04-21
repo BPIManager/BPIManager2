@@ -86,13 +86,13 @@ export const ActivityCalendar = ({ data, userId, version }: Props) => {
               marginTop: "2px",
             }}
           >
-            <div className="h-[11px]" />
-            <div className="flex items-center h-[11px]">Mon</div>
-            <div className="h-[11px]" />
-            <div className="flex items-center h-[11px]">Wed</div>
-            <div className="h-[11px]" />
-            <div className="flex items-center h-[11px]">Fri</div>
-            <div className="h-[11px]" />
+            <div className="h-2.75" />
+            <div className="flex items-center h-2.75">Mon</div>
+            <div className="h-2.75" />
+            <div className="flex items-center h-2.75">Wed</div>
+            <div className="h-2.75" />
+            <div className="flex items-center h-2.75">Fri</div>
+            <div className="h-2.75" />
           </div>
 
           <div
@@ -118,7 +118,7 @@ export const ActivityCalendar = ({ data, userId, version }: Props) => {
                   <PopoverTrigger asChild>
                     <div
                       className={cn(
-                        "h-[11px] w-[11px] rounded-[2px] transition-all duration-200",
+                        "h-2.75 w-2.75 rounded-xs transition-all duration-200",
                         !day.isFuture &&
                           "cursor-pointer hover:scale-125 hover:brightness-125",
                         day.isFuture && "cursor-default",
@@ -179,7 +179,7 @@ export const ActivityCalendar = ({ data, userId, version }: Props) => {
         {[0, 5, 15, 30, 50].map((v) => (
           <div
             key={v}
-            className="h-[10px] w-[10px] rounded-[2px]"
+            className="h-2.5 w-2.5 rounded-xs"
             style={{ backgroundColor: getActivityColor(v, false) }}
           />
         ))}

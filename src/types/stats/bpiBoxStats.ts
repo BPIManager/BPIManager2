@@ -1,3 +1,5 @@
+export type StatsGroupBy = "day" | "week" | "month";
+
 export interface BpiBoxStatsItem {
   date: string;
   min: number;

@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { songsRepo } from "@/lib/db/songs";
 import { latestVersion, IIDX_VERSIONS } from "@/constants/latestVersion";
+import { IIDXVersion } from "@/types/iidx/version";
 
 export default async function handler(
   req: NextApiRequest,
@@ -15,7 +16,7 @@ export default async function handler(
 
   const rawVersion = String(req.query.version ?? "");
   const version = (IIDX_VERSIONS as readonly string[]).includes(rawVersion)
-    ? rawVersion
+    ? (rawVersion as IIDXVersion)
     : latestVersion;
 
   try {

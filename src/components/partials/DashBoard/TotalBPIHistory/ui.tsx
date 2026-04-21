@@ -12,6 +12,7 @@ import {
   Rectangle,
 } from "recharts";
 import { BpiHistoryItem } from "@/types/stats/bpiHistory";
+import type { StatsGroupBy } from "@/types/stats/bpiBoxStats";
 import { TotalBpiHistorySkeleton } from "@/components/partials/DashBoard/TotalBPIHistory/skeleton";
 import { DashCard } from "@/components/ui/dashcard";
 import { cn } from "@/lib/utils";
@@ -62,7 +63,7 @@ const HistoryTooltip = ({
   const isComparison = data.rivalBpi !== undefined;
 
   return (
-    <div className="min-w-[200px] max-w-[300px] rounded-md border border-bpim-border bg-bpim-surface p-3 shadow-xl">
+    <div className="min-w-50 max-w-75 rounded-md border border-bpim-border bg-bpim-surface p-3 shadow-xl">
       <div className="flex flex-col gap-1">
         <p className="text-[10px] font-bold text-bpim-muted">{label}</p>
 
@@ -116,7 +117,7 @@ const HistoryTooltip = ({
                 <p className="text-[10px] font-bold text-bpim-success">
                   UPDATED: {data.updateCount} items
                 </p>
-                <div className="max-h-[120px] w-full overflow-y-auto pr-1">
+                <div className="max-h-30 w-full overflow-y-auto pr-1">
                   {data.updatedSongs?.map((song: string, idx: number) => (
                     <p key={idx} className="text-[10px] text-bpim-text/70">
                       • {song}
@@ -132,12 +133,32 @@ const HistoryTooltip = ({
   );
 };
 
+const GROUP_BY_OPTIONS: { value: StatsGroupBy; label: string }[] = [
+  { value: "day", label: "単日" },
+  { value: "week", label: "週間" },
+  { value: "month", label: "月間" },
+];
+
+const TITLE_MAP: Record<StatsGroupBy, string> = {
+  day: "総合BPI推移",
+  week: "週間総合BPI推移",
+  month: "月間総合BPI推移",
+};
+
+const DEFAULT_WINDOW: Record<StatsGroupBy, number> = {
+  day: 30,
+  week: 26,
+  month: 12,
+};
+
 interface UnifiedBpiHistoryChartProps {
   myData?: BpiHistoryItem[];
   rivalData?: BpiHistoryItem[];
   isLoading: boolean;
   myName?: string;
   rivalName?: string;
+  groupBy: StatsGroupBy;
+  onGroupByChange: (g: StatsGroupBy) => void;
 }
 
 export const TotalBpiHistoryChart = ({
@@ -146,6 +167,8 @@ export const TotalBpiHistoryChart = ({
   isLoading,
   myName = "自分",
   rivalName = "ライバル",
+  groupBy,
+  onGroupByChange,
 }: UnifiedBpiHistoryChartProps) => {
   const c = useChartColors();
 
@@ -190,14 +213,21 @@ export const TotalBpiHistoryChart = ({
     return {
       chartData: merged,
       ticks: calculatedTicks,
-      startIndex: Math.max(0, merged.length - 30),
+      startIndex: Math.max(0, merged.length - DEFAULT_WINDOW[groupBy]),
     };
-  }, [myData, rivalData]);
+  }, [myData, rivalData, groupBy]);
 
   if (isLoading) return <TotalBpiHistorySkeleton />;
   if (chartData.length === 0) return null;
 
   const formatDate = (value: string, index: number) => {
+    if (groupBy === "month") {
+      const [year, month] = value.split("-");
+      const prevYear = ticks[index - 1]?.split("-")[0];
+      return index === 0 || year !== prevYear
+        ? `${year}/${parseInt(month)}`
+        : `${parseInt(month)}月`;
+    }
     const date = new Date(value);
     return index === 0 ||
       date.getFullYear() !== new Date(ticks[index - 1]).getFullYear()
@@ -206,27 +236,44 @@ export const TotalBpiHistoryChart = ({
   };
 
   return (
-    <DashCard className="h-[420px]">
+    <DashCard className="h-105">
       <div className="mb-6 flex items-center justify-between">
         <h3 className="text-sm font-bold uppercase text-bpim-muted">
-          総合BPI推移
+          {TITLE_MAP[groupBy]}
         </h3>
-        {rivalData && (
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1.5">
-              <div className="h-[2px] w-3 bg-bpim-primary" />
-              <span className="text-xs font-medium text-bpim-primary">
-                {myName}
-              </span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="h-[2px] w-3 border-t-2 border-dashed border-bpim-warning bg-transparent" />
-              <span className="text-xs font-medium text-bpim-warning">
-                {rivalName}
-              </span>
-            </div>
+        <div className="flex items-center gap-3">
+          <div className="flex overflow-hidden rounded border border-bpim-border text-[10px]">
+            {GROUP_BY_OPTIONS.map(({ value, label }) => (
+              <button
+                key={value}
+                onClick={() => onGroupByChange(value)}
+                className={`px-2 py-0.5 transition-colors ${
+                  groupBy === value
+                    ? "bg-bpim-primary text-bpim-surface"
+                    : "text-bpim-muted hover:bg-bpim-overlay"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
           </div>
-        )}
+          {rivalData && (
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-1.5">
+                <div className="h-0.5 w-3 bg-bpim-primary" />
+                <span className="text-xs font-medium text-bpim-primary">
+                  {myName}
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="h-0.5 w-3 border-t-2 border-dashed border-bpim-warning bg-transparent" />
+                <span className="text-xs font-medium text-bpim-warning">
+                  {rivalName}
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="h-[80%] w-full">

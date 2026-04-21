@@ -1,7 +1,7 @@
 import { statsRepo } from "@/lib/db/stats";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
-import type { BpiBoxStatsItem } from "@/types/stats/bpiBoxStats";
+import type { BpiBoxStatsItem, StatsGroupBy } from "@/types/stats/bpiBoxStats";
 import dayjs from "@/lib/dayjs";
 import { NextApiRequest, NextApiResponse } from "next";
 import { BpiCalculator } from "@/lib/bpi";
@@ -23,6 +23,7 @@ export default async function handler(
   const query = parseStatsQuery(req.query, res);
   if (!query) return;
   const { userId, version, levels, difficulties } = query;
+  const groupBy = (req.query.groupBy as StatsGroupBy) || "day";
 
   if (levels.length === 0 && difficulties.length === 0) {
     return res.status(400).json({ message: "Required parameters are missing" });
@@ -44,7 +45,17 @@ export default async function handler(
       if (row.bpi === null || row.bpi === undefined) continue;
       const bpi = Number(row.bpi);
       if (!isFinite(bpi)) continue;
-      const dateKey = dayjs(row.date).format("YYYY-MM-DD");
+      const d = dayjs(row.date);
+      let dateKey: string;
+      if (groupBy === "month") {
+        dateKey = d.format("YYYY-MM");
+      } else if (groupBy === "week") {
+        const dow = d.day();
+        const mondayOffset = dow === 0 ? -6 : 1 - dow;
+        dateKey = d.add(mondayOffset, "day").format("YYYY-MM-DD");
+      } else {
+        dateKey = d.format("YYYY-MM-DD");
+      }
       const arr = grouped.get(dateKey) ?? [];
       arr.push(bpi);
       grouped.set(dateKey, arr);

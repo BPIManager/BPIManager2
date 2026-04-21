@@ -3,6 +3,7 @@ import { statsRepo } from "@/lib/db/stats";
 import dayjs from "@/lib/dayjs";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
+import type { StatsGroupBy } from "@/types/stats/bpiBoxStats";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 const DIFFICULTY_LABELS: Record<string, string> = {
@@ -18,6 +19,7 @@ export default async function handler(
   const body = parseStatsQuery(req.query, res);
   if (!body) return;
   const { userId, version, levels, difficulties } = body;
+  const groupBy = (req.query.groupBy as StatsGroupBy) || "day";
 
   try {
     const access = await checkUserAccess(req, userId);
@@ -77,7 +79,30 @@ export default async function handler(
       });
     }
 
-    return res.status(200).json(trend);
+    if (groupBy === "day") return res.status(200).json(trend);
+
+    const grouped = new Map<string, (typeof trend)[number]>();
+    for (const item of trend) {
+      const d = dayjs(item.date);
+      let key: string;
+      if (groupBy === "month") {
+        key = d.format("YYYY-MM");
+      } else {
+        const dow = d.day();
+        const offset = dow === 0 ? -6 : 1 - dow;
+        key = d.add(offset, "day").format("YYYY-MM-DD");
+      }
+      const existing = grouped.get(key);
+      if (!existing) {
+        grouped.set(key, { date: key, totalBpi: item.totalBpi, count: item.count, updatedSongs: [...item.updatedSongs] });
+      } else {
+        existing.totalBpi = item.totalBpi;
+        existing.count = item.count;
+        existing.updatedSongs.push(...item.updatedSongs);
+      }
+    }
+
+    return res.status(200).json(Array.from(grouped.values()));
   } catch (error: unknown) {
     const errorMessage =
       error instanceof Error ? error.message : "Internal Server Error";

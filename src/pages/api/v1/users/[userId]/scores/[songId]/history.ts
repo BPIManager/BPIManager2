@@ -1,6 +1,8 @@
 import { db } from "@/lib/db";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { parseQuery } from "@/services/nextRequest/parseBody";
+import { songHistoryQuerySchema } from "@/schemas/scores/query";
 
 export default async function handler(
   req: NextApiRequest,
@@ -10,21 +12,19 @@ export default async function handler(
     return res.status(405).json({ message: "Method not allowed" });
   }
 
-  const { userId, songId } = req.query;
-
-  if (!userId || !songId) {
-    return res.status(400).json({ message: "Parameters are missing." });
-  }
+  const query = parseQuery(songHistoryQuerySchema, req.query, res);
+  if (!query) return;
+  const { userId, songId } = query;
 
   try {
-    const access = await checkUserAccess(req, userId as string);
+    const access = await checkUserAccess(req, userId);
     if (!access.hasAccess) return rejectAccess(res, access);
 
     const history = await db
       .selectFrom("scores")
       .selectAll()
-      .where("userId", "=", userId as string)
-      .where("songId", "=", Number(songId))
+      .where("userId", "=", userId)
+      .where("songId", "=", songId)
       .orderBy("lastPlayed", "desc")
       .execute();
 
