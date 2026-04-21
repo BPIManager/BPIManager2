@@ -1,5 +1,6 @@
 ﻿import { PlusCircle, HelpCircle, MusicIcon } from "lucide-react";
 import {
+  HelpTooltip,
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -30,20 +31,7 @@ export const LabelWithTooltip = ({
       <span className="text-sm font-bold text-bpim-text tracking-tighter whitespace-nowrap">
         {label}
       </span>
-      {!isSharing && (
-        <TooltipProvider delayDuration={200}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button className="flex items-center justify-center cursor-help text-bpim-muted hover:text-bpim-muted outline-none">
-                <HelpCircle className="h-3.5 w-3.5" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent className="bg-bpim-surface-2 text-bpim-text border-slate-700">
-              <p className="text-xs">{tooltipText}</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      )}
+      {!isSharing && <HelpTooltip>{tooltipText}</HelpTooltip>}
     </div>
   );
 };
@@ -52,7 +40,11 @@ export const BatchSummaryCards = ({
   summary,
   isSharing,
 }: {
-  summary: { batchPerformance: number; newRecords: number; updatedScores: number };
+  summary: {
+    batchPerformance: number;
+    newRecords: number;
+    updatedScores: number;
+  };
   isSharing: boolean;
 }) => {
   const stats = [

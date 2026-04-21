@@ -236,8 +236,8 @@ export const TotalBpiHistoryChart = ({
   };
 
   return (
-    <DashCard className="h-105">
-      <div className="mb-6 flex items-center justify-between">
+    <DashCard className="h-105 flex flex-col">
+      <div className="mb-4 flex flex-wrap items-start justify-between gap-x-4 gap-y-3 shrink-0">
         <h3 className="text-sm font-bold uppercase text-bpim-muted">
           {TITLE_MAP[groupBy]}
         </h3>
@@ -275,16 +275,15 @@ export const TotalBpiHistoryChart = ({
           )}
         </div>
       </div>
-
-      <div className="h-[80%] w-full">
+      <div className="flex-1 w-full min-h-0">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart
             data={chartData}
-            margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+            margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
           >
             <CartesianGrid
               strokeDasharray="3 3"
-              stroke={c.muted}
+              stroke={c.grid}
               vertical={false}
             />
             <XAxis
@@ -295,6 +294,7 @@ export const TotalBpiHistoryChart = ({
               fontSize={10}
               tickLine={false}
               axisLine={false}
+              minTickGap={20}
             />
             <YAxis
               domain={["dataMin - 1", "dataMax + 1"]}
@@ -303,6 +303,7 @@ export const TotalBpiHistoryChart = ({
               tickFormatter={(v) => v.toFixed(1)}
               axisLine={false}
               tickLine={false}
+              width={40}
             />
             <YAxis yAxisId="right" hide />
 
@@ -363,7 +364,7 @@ export const TotalBpiHistoryChart = ({
 
             <Brush
               dataKey="date"
-              height={30}
+              height={20}
               stroke={c.grid}
               fill={c.surface}
               startIndex={startIndex}

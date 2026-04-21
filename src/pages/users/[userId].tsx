@@ -62,8 +62,8 @@ export default function UserPage({ defaultView = "overview" }: UserPageProps) {
               <BpmBpiDistributionSection myUserId={userId} />
             </div>
 
-            <BpiBoxStatsSection userId={userId} />
             <BpiHistorySection myUserId={userId} />
+            <BpiBoxStatsSection userId={userId} />
             <IidxTowerSection userId={userId} showImportAlert={false} />
             <RadarSection userId={userId} />
           </div>

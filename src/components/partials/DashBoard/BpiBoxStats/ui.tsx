@@ -14,6 +14,7 @@ import type { StatsGroupBy, BpiBoxStatsItem } from "@/types/stats/bpiBoxStats";
 import { BpiBoxStatsSkeleton } from "./skeleton";
 import { DashCard } from "@/components/ui/dashcard";
 import { useChartColors } from "@/hooks/common/useChartColors";
+import { HelpTooltip } from "@/components/ui/tooltip";
 
 interface TooltipProps {
   active?: boolean;
@@ -28,6 +29,51 @@ interface ChartDataPoint extends BpiBoxStatsItem {
   totalBpiBandHeight: number;
 }
 
+const HelpText = (
+  <div className="space-y-3">
+    <section>
+      <p className="font-bold text-bpim-primary border-b border-bpim-primary/30 mb-1">
+        統計の対象
+      </p>
+      <p>
+        選択した期間（単日・週間・月間）内に
+        <span className="text-bpim-warning">新規更新・登録されたスコア</span>
+        のみを対象に集計しています。全曲の累積データではないため、その時の「調子」や「地力の密度」がダイレクトに反映されます。
+      </p>
+    </section>
+
+    <section>
+      <p className="font-bold text-bpim-primary border-b border-bpim-primary/30 mb-1">
+        各項目の意味
+      </p>
+      <ul className="list-disc list-inside space-y-1.5">
+        <li>
+          <span className="font-bold">期間総合BPI</span>:
+          その期間の平均的な実力。これが右肩上がりなら、継続的に高い水準でプレーできている証拠です。
+        </li>
+        <li>
+          <span className="font-bold">上位25-75%帯（塗りつぶし）</span>:
+          全曲のうち、真ん中半分のスコアが収まっている範囲です。この帯が
+          <span className="text-bpim-warning">
+            「高い位置にある＝高難易度の地力が高い」「幅が狭い＝実力が安定している」
+          </span>
+          ことを示します。
+        </li>
+        <li>
+          <span className="font-bold">上限/下限（点線）</span>:
+          その期間の最高・最低BPI。上限が跳ねている日は「一発の最大火力」が出た日、下限が高い日は「苦手曲でも底上げができている」ことを意味します。
+        </li>
+      </ul>
+    </section>
+
+    <section className="bg-bpim-overlay/40 p-2 rounded text-[10px]">
+      <p>
+        プレー曲数が少ない日は極端な値が出やすいため、推移を見る際は曲数も併せて確認することをおすすめします。
+      </p>
+    </section>
+  </div>
+);
+
 const BpiBoxTooltip = ({ active, payload, label }: TooltipProps) => {
   if (!active || !payload?.length) return null;
   const d = payload[0].payload;
@@ -36,14 +82,14 @@ const BpiBoxTooltip = ({ active, payload, label }: TooltipProps) => {
     <div className="min-w-45 rounded-md border border-bpim-border bg-bpim-surface p-3 shadow-xl">
       <p className="mb-2 text-[10px] font-bold text-bpim-muted">{label}</p>
       <div className="flex flex-col gap-1">
-        <Row label="最大" value={d.max} color="text-bpim-danger" />
+        <Row label="上限" value={d.max} color="text-bpim-danger" />
         <Row
           label="上位25%総合"
           value={d.totalBpiTop25}
           color="text-bpim-warning"
         />
         <Row
-          label="総合BPI"
+          label="期間総合BPI"
           value={d.totalBpi}
           color="text-bpim-primary"
           bold
@@ -53,9 +99,11 @@ const BpiBoxTooltip = ({ active, payload, label }: TooltipProps) => {
           value={d.totalBpiTop75}
           color="text-bpim-warning"
         />
-        <Row label="最小" value={d.min} color="text-bpim-success" />
+        <Row label="下限" value={d.min} color="text-bpim-success" />
         <div className="my-1 h-px w-full bg-bpim-overlay/60" />
-        <p className="text-right text-[10px] text-bpim-muted">{d.count}曲</p>
+        <p className="text-right text-[10px] text-bpim-muted">
+          集計対象: {d.count}曲
+        </p>
       </div>
     </div>
   );
@@ -166,17 +214,21 @@ export const BpiBoxStatsChart = ({
 
   return (
     <DashCard className="h-105">
-      <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-sm font-bold uppercase text-bpim-muted">
-          {TITLE_MAP[groupBy]}
-        </h3>
-        <div className="flex flex-col items-end gap-1 text-[10px] text-bpim-muted sm:flex-row sm:items-center sm:gap-3">
-          <div className="flex overflow-hidden rounded border border-bpim-border">
+      <div className="mb-4 flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
+        <div className="flex items-center gap-1 shrink-0">
+          <h3 className="text-sm font-bold uppercase text-bpim-muted">
+            {TITLE_MAP[groupBy]}
+          </h3>
+          <HelpTooltip>{HelpText}</HelpTooltip>
+        </div>
+
+        <div className="ml-auto flex flex-col items-end gap-2">
+          <div className="flex overflow-hidden rounded border border-bpim-border bg-bpim-surface">
             {GROUP_BY_OPTIONS.map(({ value, label }) => (
               <button
                 key={value}
                 onClick={() => onGroupByChange(value)}
-                className={`px-2 py-0.5 transition-colors ${
+                className={`px-2 py-0.5 text-[10px] transition-colors ${
                   groupBy === value
                     ? "bg-bpim-primary text-bpim-surface"
                     : "text-bpim-muted hover:bg-bpim-overlay"
@@ -186,18 +238,19 @@ export const BpiBoxStatsChart = ({
               </button>
             ))}
           </div>
-          <div className="flex items-center gap-3">
+
+          <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1.5 text-[10px] text-bpim-muted">
             <button
               onClick={() => toggleVisibility("median")}
-              className={`flex items-center gap-1 transition-opacity hover:opacity-80 ${visible.median ? "opacity-100" : "opacity-40"}`}
+              className={`flex items-center gap-1 whitespace-nowrap transition-opacity ${visible.median ? "opacity-100" : "opacity-40"}`}
             >
               <span className="inline-block h-2 w-2 rounded-full bg-bpim-primary" />
-              総合BPI
+              期間総合BPI
             </button>
 
             <button
               onClick={() => toggleVisibility("band")}
-              className={`flex items-center gap-1 transition-opacity hover:opacity-80 ${visible.band ? "opacity-100" : "opacity-40"}`}
+              className={`flex items-center gap-1 whitespace-nowrap transition-opacity ${visible.band ? "opacity-100" : "opacity-40"}`}
             >
               <span className="inline-block h-2 w-3 rounded-sm bg-bpim-primary opacity-20" />
               上位25–75%帯
@@ -205,13 +258,13 @@ export const BpiBoxStatsChart = ({
 
             <button
               onClick={() => toggleVisibility("minMax")}
-              className={`flex items-center gap-1 transition-opacity hover:opacity-80 ${visible.minMax ? "opacity-100" : "opacity-40"}`}
+              className={`flex items-center gap-1 whitespace-nowrap transition-opacity ${visible.minMax ? "opacity-100" : "opacity-40"}`}
             >
               <span
                 className="inline-block h-px w-3"
                 style={{ borderTop: `1px dashed ${c.muted}` }}
               />
-              最大/最小
+              上限/下限
             </button>
           </div>
         </div>
@@ -221,7 +274,7 @@ export const BpiBoxStatsChart = ({
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart
             data={chartData}
-            margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+            margin={{ top: 10, right: 10, left: -10, bottom: 10 }}
           >
             <CartesianGrid
               strokeDasharray="3 3"
@@ -236,6 +289,7 @@ export const BpiBoxStatsChart = ({
               fontSize={10}
               tickLine={false}
               axisLine={false}
+              minTickGap={20}
             />
             <YAxis
               domain={([dataMin, dataMax]: readonly [number, number]) => {
@@ -252,6 +306,7 @@ export const BpiBoxStatsChart = ({
               tickFormatter={(v: number) => v.toFixed(0)}
               axisLine={false}
               tickLine={false}
+              width={35}
             />
 
             <Tooltip
@@ -334,10 +389,9 @@ export const BpiBoxStatsChart = ({
                 animationDuration={1000}
               />
             )}
-
             <Brush
               dataKey="date"
-              height={30}
+              height={20}
               stroke={c.grid}
               fill={c.surface}
               startIndex={startIndex}

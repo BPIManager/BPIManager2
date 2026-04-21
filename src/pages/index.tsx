@@ -66,8 +66,8 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="flex flex-col gap-6">
-                  <BpiBoxStatsSection userId={fbUser.uid} />
                   <BpiHistorySection myUserId={fbUser.uid} />
+                  <BpiBoxStatsSection userId={fbUser.uid} />
                   <RivalWinLossSummary userId={fbUser.uid} />
                   <RadarSection userId={fbUser.uid} />
                 </div>

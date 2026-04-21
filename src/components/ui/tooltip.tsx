@@ -55,10 +55,91 @@ function TooltipContent({
         {...props}
       >
         {children}
-        <TooltipPrimitive.Arrow className="z-50 size-2.5 translate-y-[calc(-50%_-_2px)] rotate-45 rounded-[2px] bg-bpim-surface-2 fill-bpim-surface-2" />
+        <TooltipPrimitive.Arrow className="z-50 size-2.5 translate-y-[calc(-50%-2px)] rotate-45 rounded-xs bg-bpim-surface-2 fill-bpim-surface-2" />
       </TooltipPrimitive.Content>
     </TooltipPrimitive.Portal>
   );
 }
 
 export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger };
+
+import { useState, useRef, useEffect, ReactNode } from "react";
+import { HelpCircle, X } from "lucide-react";
+
+interface HelpTooltipProps {
+  children: ReactNode;
+}
+export const HelpTooltip = ({ children }: HelpTooltipProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const showTooltip = isOpen || isHovered;
+
+  return (
+    <div
+      className="relative inline-block ml-1"
+      ref={containerRef}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className={`flex items-center transition-colors focus:outline-none ${
+          showTooltip
+            ? "text-bpim-primary"
+            : "text-bpim-muted hover:text-bpim-primary"
+        }`}
+      >
+        <HelpCircle size={14} />
+      </button>
+
+      {showTooltip && (
+        <>
+          {isOpen && (
+            <div
+              className="fixed inset-0 z-40 bg-black/40 sm:hidden"
+              onClick={() => setIsOpen(false)}
+            />
+          )}
+
+          <div
+            className="
+            fixed left-4 right-4 top-1/2 -translate-y-1/2 z-50 
+            sm:absolute sm:left-0 sm:top-6 sm:translate-y-0 sm:w-80 sm:right-auto
+            max-h-[80vh] overflow-y-auto
+            rounded-lg border border-bpim-border bg-bpim-surface p-4 shadow-2xl
+          "
+          >
+            <button
+              onClick={() => setIsOpen(false)}
+              className="absolute right-2 top-2 text-bpim-muted sm:hidden"
+            >
+              <X size={18} />
+            </button>
+
+            <div className="text-[11px] leading-relaxed text-bpim-light whitespace-pre-wrap">
+              {children}
+            </div>
+
+            <div className="hidden sm:block absolute -top-1 left-1.5 h-2 w-2 rotate-45 border-l border-t border-bpim-border bg-bpim-surface" />
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
