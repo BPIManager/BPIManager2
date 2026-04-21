@@ -13,12 +13,7 @@ import {
   CartesianGrid,
   Dot,
 } from "recharts";
-import {
-  BookOpen,
-  TrendingDown,
-  TrendingUp,
-  Minus,
-} from "lucide-react";
+import { BookOpen, TrendingDown, TrendingUp, Minus } from "lucide-react";
 import { SectionLoader } from "@/components/ui/loading-spinner";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -198,9 +193,7 @@ export const DefinitionsTab = ({ song }: DefinitionsTabProps) => {
   }, [chartPoints]);
 
   if (isLoading) {
-    return (
-      <SectionLoader className="h-64" />
-    );
+    return <SectionLoader className="h-64" />;
   }
 
   if (isError || !definitions || definitions.length === 0) {
@@ -224,11 +217,12 @@ export const DefinitionsTab = ({ song }: DefinitionsTabProps) => {
             </label>
             <Input
               type="number"
+              inputMode="numeric"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               min={0}
               max={maxScore}
-              className="h-8 font-mono text-sm font-bold border-bpim-border bg-bpim-bg/40 text-bpim-text focus-visible:ring-bpim-primary"
+              className="h-8 font-mono text-[16px] font-bold border-bpim-border bg-bpim-bg/40 text-bpim-text focus-visible:ring-bpim-primary"
             />
           </div>
           <div className="flex flex-col items-end gap-1 shrink-0">

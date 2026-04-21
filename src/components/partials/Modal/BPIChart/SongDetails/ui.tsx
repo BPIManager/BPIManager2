@@ -286,10 +286,25 @@ export const SongDetailView = ({
                 <div className="flex flex-col gap-3">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-bpim-muted uppercase">
+                      Notes / Max
+                    </span>
+                    <span className="font-mono text-sm font-black text-bpim-text">
+                      {song.notes} / {song.notes * 2}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-bpim-muted uppercase">
                       WR
                     </span>
                     <span className="font-mono text-sm font-black text-bpim-text">
                       {song.wrScore ?? 0}
+                      <span className="text-bpim-muted">
+                        {" / "}
+                        {Number(
+                          ((song.wrScore ?? 0) / (song.notes * 2)) * 100,
+                        ).toFixed(2)}{" "}
+                        %
+                      </span>
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
@@ -298,6 +313,13 @@ export const SongDetailView = ({
                     </span>
                     <span className="font-mono text-sm font-black text-bpim-text">
                       {song.kaidenAvg ?? 0}
+                      <span className="text-bpim-muted">
+                        {" / "}
+                        {Number(
+                          ((song.kaidenAvg ?? 0) / (song.notes * 2)) * 100,
+                        ).toFixed(2)}{" "}
+                        %
+                      </span>
                     </span>
                   </div>
                   <div className="flex items-center justify-between">

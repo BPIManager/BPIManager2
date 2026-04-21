@@ -29,10 +29,7 @@ import {
 import { useUser } from "@/contexts/users/UserContext";
 import { useRivalSummary } from "@/hooks/social/useRivalSummary";
 import { latestVersion } from "@/constants/latestVersion";
-import type {
-  AnalyticsTarget,
-  AnalyticsTargetKind,
-} from "@/types/analytics";
+import type { AnalyticsTarget, AnalyticsTargetKind } from "@/types/analytics";
 import { getBpiColorStyle } from "@/constants/bpiColor";
 import { formatIIDXId } from "@/utils/common/formatIidxId";
 import { versionTitles } from "@/constants/versions";
@@ -334,7 +331,7 @@ const KIND_OPTIONS: {
   {
     kind: "wr",
     icon: Trophy,
-    label: "WR達成スコア",
+    label: "WR",
     description:
       "各楽曲のWR達成に必要なスコアと比較します(BPIM定義におけるWRであり、最新のデータを反映していない可能性があります)",
     nextStep: "kind",
@@ -383,7 +380,7 @@ export const TargetSelectorModal = ({
       "rival-avg": "ライバル平均",
       aaa: "AAA達成スコア",
       "max-": "MAX-達成スコア",
-      wr: "WR達成スコア",
+      wr: "WR",
       "self-best": "自己歴代",
       "self-best-excl": "自己歴代（今作除く）",
     };
