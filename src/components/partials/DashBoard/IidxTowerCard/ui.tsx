@@ -206,14 +206,14 @@ export const IidxTowerCard = ({ data, showImportAlert = true }: Props) => {
           >
             <XAxis
               dataKey="date"
-              tick={{ fontSize: 9, fill: "var(--bpim-subtle)" }}
+              tick={{ fontSize: 9, fill: "var(--color-bpim-subtle)" }}
               tickLine={false}
               axisLine={false}
             />
             <YAxis
               yAxisId="left"
               orientation="left"
-              tick={{ fontSize: 9, fill: "var(--bpim-subtle)" }}
+              tick={{ fontSize: 9, fill: "var(--color-bpim-subtle)" }}
               tickLine={false}
               axisLine={false}
               tickFormatter={(v) =>
@@ -224,7 +224,7 @@ export const IidxTowerCard = ({ data, showImportAlert = true }: Props) => {
             <YAxis
               yAxisId="right"
               orientation="right"
-              tick={{ fontSize: 9, fill: "var(--bpim-subtle)" }}
+              tick={{ fontSize: 9, fill: "var(--color-bpim-subtle)" }}
               tickLine={false}
               axisLine={false}
               tickFormatter={(v) =>
