@@ -1,6 +1,10 @@
 import { db } from "@/lib/db";
-import { SONG_ATTRIBUTES, SONG_ATTRIBUTES_GLOBAL } from "@/constants/songAttributes";
+import {
+  SONG_ATTRIBUTES,
+  SONG_ATTRIBUTES_GLOBAL,
+} from "@/constants/songAttributes";
 import type { AttrMode } from "@/types/songs/songList";
+import { IIDXVersion } from "@/types/iidx/version";
 
 /**
  * 楽曲情報取得を担当するリポジトリクラス。
@@ -13,8 +17,9 @@ class SongsRepository {
    * @param version - バージョン番号文字列（例: "33"）
    * @returns 楽曲一覧（属性情報含む）
    */
-  async getSongList(version: string) {
-    const versionNum = parseInt(version, 10);
+  async getSongList(version: IIDXVersion) {
+    const isInf = version === "INF";
+    const versionNum = isInf ? null : parseInt(version, 10);
 
     return await db
       .selectFrom("songs as s")
@@ -61,9 +66,15 @@ class SongsRepository {
         "a.g_trill_denim",
         "a.g_peak",
       ])
-      .where("s.releasedVersion", "<=", versionNum)
-      .where((eb) =>
-        eb.or([eb("s.deletedAt", "is", null), eb("s.deletedAt", ">", version)]),
+      .$if(!isInf, (qb) =>
+        qb
+          .where("s.releasedVersion", "<=", versionNum!)
+          .where((eb) =>
+            eb.or([
+              eb("s.deletedAt", "is", null),
+              eb("s.deletedAt", ">", version),
+            ]),
+          ),
       )
       .orderBy("s.title", "asc")
       .orderBy("s.difficulty", "asc")
@@ -139,13 +150,13 @@ class SongsRepository {
    */
   async getSimilarSongs(
     songId: number,
-    version: string,
+    version: IIDXVersion,
     limit = 10,
     mode: AttrMode = "profile",
   ) {
-    const versionNum = parseInt(version, 10);
+    const isInf = version === "INF";
+    const versionNum = isInf ? null : parseInt(version, 10);
 
-    // 属性データが存在する楽曲のみ取得（INNER JOIN）
     const all = await db
       .selectFrom("songs as s")
       .innerJoin("songAttributes as a", "a.songId", "s.songId")
@@ -179,9 +190,15 @@ class SongsRepository {
         "a.g_trill_denim",
         "a.g_peak",
       ])
-      .where("s.releasedVersion", "<=", versionNum)
-      .where((eb) =>
-        eb.or([eb("s.deletedAt", "is", null), eb("s.deletedAt", ">", version)]),
+      .$if(!isInf, (qb) =>
+        qb
+          .where("s.releasedVersion", "<=", versionNum!)
+          .where((eb) =>
+            eb.or([
+              eb("s.deletedAt", "is", null),
+              eb("s.deletedAt", ">", version),
+            ]),
+          ),
       )
       .execute();
 

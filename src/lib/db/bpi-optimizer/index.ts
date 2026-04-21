@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { OptimizationResult } from "@/types/bpi-optimizer";
+import { IIDXVersion } from "@/types/iidx/version";
 import { sql } from "kysely";
 import { v4 as uuidv4 } from "uuid";
 
@@ -16,8 +17,9 @@ class BpiOptimizerRepository {
    * @param userId - ユーザーID
    * @param version - バージョン番号
    */
-  async getAllSongsWithUserScores(userId: string, version: string) {
-    const versionNum = parseInt(version);
+  async getAllSongsWithUserScores(userId: string, version: IIDXVersion) {
+    const isInf = version === "INF";
+    const versionNum = isInf ? null : parseInt(version);
     const latestScores = db
       .selectFrom("scores")
       .select([
@@ -55,9 +57,15 @@ class BpiOptimizerRepository {
       ])
       .where("m.difficultyLevel", "=", 12)
       .where("m.difficulty", "in", ["HYPER", "ANOTHER", "LEGGENDARIA"])
-      .where("m.releasedVersion", "<=", versionNum)
-      .where((eb) =>
-        eb.or([eb("m.deletedAt", "is", null), eb("m.deletedAt", ">", version)]),
+      .$if(!isInf, (qb) =>
+        qb
+          .where("m.releasedVersion", "<=", versionNum!)
+          .where((eb) =>
+            eb.or([
+              eb("m.deletedAt", "is", null),
+              eb("m.deletedAt", ">", version),
+            ]),
+          ),
       )
       .execute();
   }

@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { IIDXVersion } from "@/types/iidx/version";
 
 class ScoreTimelineRepository {
   /**
@@ -203,10 +204,11 @@ class ScoreTimelineRepository {
 
   async getSelfVersionScores(params: {
     userId: string;
-    currentVersion: string;
+    currentVersion: IIDXVersion;
     targetVersion: string;
   }) {
     const { userId, currentVersion, targetVersion } = params;
+    const isInf = currentVersion === "INF";
 
     const rows = await db
       .selectFrom("songs as s")
@@ -275,11 +277,13 @@ class ScoreTimelineRepository {
         "sd.kaidenAvg",
         "sd.coef",
       ])
-      .where((eb) =>
-        eb.or([
-          eb("s.deletedAt", "is", null),
-          eb("s.deletedAt", ">", currentVersion),
-        ]),
+      .$if(!isInf, (qb) =>
+        qb.where((eb) =>
+          eb.or([
+            eb("s.deletedAt", "is", null),
+            eb("s.deletedAt", ">", currentVersion),
+          ]),
+        ),
       )
       .where((eb) =>
         eb.or([

@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { IIDXVersion } from "@/types/iidx/version";
 import { sql } from "kysely";
 
 /**
@@ -11,11 +12,12 @@ class RivalRepository {
   async getRivalComparisonScores(params: {
     viewerId: string;
     rivalId?: string | null;
-    version: string;
+    version: IIDXVersion;
     limit?: number;
     offset?: number;
   }) {
     const { viewerId, rivalId, version, limit, offset } = params;
+    const isInf = version === "INF";
 
     let query = db
       .selectFrom("songs as s")
@@ -96,8 +98,13 @@ class RivalRepository {
         "r.missCount as rivalMissCount",
         "r.lastPlayed as rivalLastPlayed",
       ])
-      .where((eb) =>
-        eb.or([eb("s.deletedAt", "is", null), eb("s.deletedAt", ">", version)]),
+      .$if(!isInf, (qb) =>
+        qb.where((eb) =>
+          eb.or([
+            eb("s.deletedAt", "is", null),
+            eb("s.deletedAt", ">", version),
+          ]),
+        ),
       )
       .where((eb) =>
         eb.or([
@@ -117,7 +124,7 @@ class RivalRepository {
    */
   async getScoreComparisonList(params: {
     userId: string;
-    version: string;
+    version: IIDXVersion;
     limit: number;
     minDiff: number;
     maxDiff: number;

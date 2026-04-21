@@ -17,10 +17,10 @@ import { RankingTabsCard } from "@/components/partials/DashBoard/RecommendedCard
 import { RadarSection } from "@/components/partials/DashBoard/Radar/ui";
 import { RivalWinLossSummary } from "@/components/partials/DashBoard/Rivals";
 import { BpiHistorySection } from "@/components/partials/DashBoard/TotalBPIHistory";
+import { BpiBoxStatsSection } from "@/components/partials/DashBoard/BpiBoxStats";
 import { PageLoader } from "@/components/ui/loading-spinner";
 import { useState } from "react";
 import { NoDataAlert } from "@/components/partials/DashBoard/NoData/ui";
-import { IidxTowerCard } from "@/components/partials/DashBoard/IidxTowerCard/ui";
 import { IidxTowerSection } from "@/components/partials/DashBoard/IidxTowerCard";
 
 export default function DashboardPage() {
@@ -66,6 +66,7 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="flex flex-col gap-6">
+                  <BpiBoxStatsSection userId={fbUser.uid} />
                   <BpiHistorySection myUserId={fbUser.uid} />
                   <RivalWinLossSummary userId={fbUser.uid} />
                   <RadarSection userId={fbUser.uid} />

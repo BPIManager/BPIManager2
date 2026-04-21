@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { IIDXVersion } from "@/types/iidx/version";
 
 /**
  * スコア詳細情報（比較・曲定義結合）の参照を担当するリポジトリクラス。
@@ -15,7 +16,7 @@ class LogScoreRepository {
    */
   async getScoresByLastPlayedRange(
     userId: string,
-    version: string,
+    version: IIDXVersion,
     range: { start: Date; end: Date },
   ) {
     return await this.getScoresWithDetails(userId, version, {
@@ -36,7 +37,7 @@ class LogScoreRepository {
    */
   async getScoresWithDetails(
     userId: string,
-    version: string,
+    version: IIDXVersion,
     options: {
       batchIds?: string[];
       targetTime?: Date;
@@ -46,6 +47,7 @@ class LogScoreRepository {
   ) {
     const { batchIds, targetTime, comparisonTime, onlyLastPlayedInRange } =
       options;
+    const isInf = version === "INF";
 
     let query = db
       .selectFrom("scores as current")
@@ -160,8 +162,13 @@ class LogScoreRepository {
         .whereRef("current.logId", "=", "latest_sc.maxLogId");
     }
     return await query
-      .where((eb) =>
-        eb.or([eb("s.deletedAt", "is", null), eb("s.deletedAt", ">", version)]),
+      .$if(!isInf, (qb) =>
+        qb.where((eb) =>
+          eb.or([
+            eb("s.deletedAt", "is", null),
+            eb("s.deletedAt", ">", version),
+          ]),
+        ),
       )
       .orderBy("s.difficultyLevel", "desc")
       .orderBy("s.title", "asc")

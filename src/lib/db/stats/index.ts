@@ -85,6 +85,8 @@ class StatsRepository {
     levels?: number[],
     difficulties?: string[],
   ) {
+    const isInf = version === "INF";
+
     let query = db
       .selectFrom("scores as s")
       .innerJoin("songs as m", "s.songId", "m.songId")
@@ -95,11 +97,15 @@ class StatsRepository {
         sql<number>`COUNT(DISTINCT s.songId)`.as("count"),
       ])
       .where("s.userId", "=", userId)
-      .where("s.version", "=", version);
-
-    query = query.where((eb) =>
-      eb.or([eb("m.deletedAt", "is", null), eb("m.deletedAt", ">", version)]),
-    );
+      .where("s.version", "=", version)
+      .$if(!isInf, (qb) =>
+        qb.where((eb) =>
+          eb.or([
+            eb("m.deletedAt", "is", null),
+            eb("m.deletedAt", ">", version),
+          ]),
+        ),
+      );
 
     if (levels && levels.length > 0) {
       query = query.where("m.difficultyLevel", "in", levels);
@@ -267,9 +273,15 @@ class StatsRepository {
         "latest.bpi",
         "latest.exScore",
       ])
-      .$if(!isInf, (qb) => qb.where("m.releasedVersion", "<=", versionNum!))
-      .where((eb) =>
-        eb.or([eb("m.deletedAt", "is", null), eb("m.deletedAt", ">", version)]),
+      .$if(!isInf, (qb) =>
+        qb
+          .where("m.releasedVersion", "<=", versionNum!)
+          .where((eb) =>
+            eb.or([
+              eb("m.deletedAt", "is", null),
+              eb("m.deletedAt", ">", version),
+            ]),
+          ),
       );
 
     if (levels && levels.length > 0) {
@@ -471,6 +483,58 @@ class StatsRepository {
   }
 
   /**
+   * 日別BPI統計計算用：指定ユーザーの全スコアの日付とBPI値を取得する。
+   */
+  async getBpiPerDateRaw(
+    userId: string,
+    version: IIDXVersion,
+    levels?: number[],
+    difficulties?: string[],
+  ) {
+    const isInf = version === "INF";
+
+    let query = db
+      .selectFrom("scores as s")
+      .innerJoin("songs as m", "s.songId", "m.songId")
+      .select((eb) => [
+        eb
+          .fn<string>("DATE", [
+            eb.fn("CONVERT_TZ", [
+              eb.ref("s.lastPlayed"),
+              eb.val("+00:00"),
+              eb.val("+09:00"),
+            ]),
+          ])
+          .as("date"),
+        "s.songId",
+        eb.fn.max("s.bpi").as("bpi"),
+      ])
+      .where("s.userId", "=", userId)
+      .where("s.version", "=", version)
+      .where("s.bpi", "is not", null)
+      .$if(!isInf, (qb) =>
+        qb.where((eb) =>
+          eb.or([
+            eb("m.deletedAt", "is", null),
+            eb("m.deletedAt", ">", version),
+          ]),
+        ),
+      );
+
+    if (levels && levels.length > 0) {
+      query = query.where("m.difficultyLevel", "in", levels);
+    }
+    if (difficulties && difficulties.length > 0) {
+      query = query.where("m.difficulty", "in", difficulties);
+    }
+
+    return await query
+      .groupBy(["date", "s.songId"])
+      .orderBy("date", "asc")
+      .execute();
+  }
+
+  /**
    * 指定バージョン・レベル・難易度に該当する全楽曲の `title___difficulty` キー集合を返す。
    * レーダーチャートの未プレイ曲フィルタリングに使用する。
    */
@@ -485,9 +549,15 @@ class StatsRepository {
     let query = db
       .selectFrom("songs as m")
       .select(["m.title", "m.difficulty"])
-      .$if(!isInf, (qb) => qb.where("m.releasedVersion", "<=", versionNum!))
-      .where((eb) =>
-        eb.or([eb("m.deletedAt", "is", null), eb("m.deletedAt", ">", version)]),
+      .$if(!isInf, (qb) =>
+        qb
+          .where("m.releasedVersion", "<=", versionNum!)
+          .where((eb) =>
+            eb.or([
+              eb("m.deletedAt", "is", null),
+              eb("m.deletedAt", ">", version),
+            ]),
+          ),
       );
 
     if (levels && levels.length > 0) {
