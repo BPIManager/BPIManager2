@@ -224,7 +224,7 @@ export const BpiBoxStatsChart = ({
   if (!data || chartData.length === 0) return null;
 
   return (
-    <DashCard className="h-105 flex-col">
+    <DashCard className="h-105 flex flex-col">
       <div className="mb-4 flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
         <div className="flex items-center gap-1 shrink-0">
           <h3 className="text-sm font-bold uppercase text-bpim-muted">
@@ -285,7 +285,7 @@ export const BpiBoxStatsChart = ({
         </div>
       </div>
 
-      <div className="h-[80%] w-full flex-1">
+      <div className="flex-1 w-full min-h-0">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart
             data={chartData}
