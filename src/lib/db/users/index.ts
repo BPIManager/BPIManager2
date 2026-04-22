@@ -405,6 +405,7 @@ class UsersRepository {
     profileImage: string | null;
     isPublic: number;
     arenaRank: string | null;
+    xId: string | null;
     version: string;
     batchId: string;
   }) {
@@ -416,6 +417,7 @@ class UsersRepository {
       profileImage,
       isPublic,
       arenaRank,
+      xId,
       version,
       batchId,
     } = params;
@@ -452,6 +454,7 @@ class UsersRepository {
           profileText,
           profileImage,
           isPublic,
+          xId,
           updatedAt: new Date(),
         })
         .onDuplicateKeyUpdate({
@@ -460,6 +463,7 @@ class UsersRepository {
           profileText,
           profileImage,
           isPublic,
+          xId,
           updatedAt: new Date(),
         })
         .execute();

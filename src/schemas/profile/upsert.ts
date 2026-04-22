@@ -20,6 +20,7 @@ export const profileUpsertSchema = z.object({
   profileImage: z.string().nullable().default(null),
   isPublic: z.number().int().min(0).max(1),
   arenaRank: z.string().nullable().default(null),
+  xId: z.string().nullable().default(null),
 });
 
 export type ProfileUpsertInput = z.infer<typeof profileUpsertSchema>;
