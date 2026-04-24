@@ -64,7 +64,11 @@ export default function UserPage({ defaultView = "overview" }: UserPageProps) {
 
             <BpiHistorySection myUserId={userId} />
             <BpiBoxStatsSection userId={userId} />
-            <IidxTowerSection userId={userId} showImportAlert={false} />
+            <IidxTowerSection
+              userId={userId}
+              showImportAlert={false}
+              defaultPeriod={0}
+            />
             <RadarSection userId={userId} />
           </div>
         )}
