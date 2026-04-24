@@ -3,7 +3,13 @@ import type { Element as LordiconElement } from "@lordicon/element";
 
 type Props = {
   src: string;
-  trigger?: "loop" | "hover" | "click" | "morph" | "boomerang" | "loop-on-hover";
+  trigger?:
+    | "loop"
+    | "hover"
+    | "click"
+    | "morph"
+    | "boomerang"
+    | "loop-on-hover";
   size?: number;
   colors?: string;
   className?: string;
@@ -21,8 +27,8 @@ export const LordiconAnimation = ({
   useEffect(() => {
     if (initialized.current) return;
     initialized.current = true;
-    import("@lordicon/element").then(({ defineElement, Element }) => {
-      defineElement(Element);
+    import("@lordicon/element").then(({ defineElement }) => {
+      defineElement();
     });
   }, []);
 
@@ -32,15 +38,18 @@ export const LordiconAnimation = ({
       trigger={trigger}
       colors={colors}
       style={{ width: size, height: size } as React.CSSProperties}
-      class={className}
+      className={className}
     />
   );
 };
 
-declare global {
+declare module "react" {
   namespace JSX {
     interface IntrinsicElements {
-      "lord-icon": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+      "lord-icon": React.DetailedHTMLProps<
+        React.HTMLAttributes<HTMLElement>,
+        HTMLElement
+      > & {
         src?: string;
         trigger?: string;
         colors?: string;
