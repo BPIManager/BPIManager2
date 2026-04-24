@@ -5,11 +5,7 @@ type Props = Omit<LottieComponentProps, "animationData"> & {
   size?: number;
 };
 
-export const LottieAnimation = ({
-  size = 48,
-  style,
-  ...props
-}: Props) => {
+export const LottieAnimation = ({ size = 48, style, ...props }: Props) => {
   return (
     <Lottie
       loop={false}

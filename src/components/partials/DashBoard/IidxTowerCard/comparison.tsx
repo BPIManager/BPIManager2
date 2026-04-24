@@ -2,8 +2,7 @@ import { useMemo, useState } from "react";
 import { useIidxTowerCompare } from "@/hooks/iidxTower/useIidxTower";
 import { DashCard } from "@/components/ui/dashcard";
 import { IidxTowerCardSkeleton } from "@/components/partials/DashBoard/IidxTowerCard/skeleton";
-import { LottieAnimation } from "@/components/ui/lottie-animation";
-import ghostAnimation from "@/assets/lottie/ghost.json";
+import { LordiconAnimation } from "@/components/ui/lordicon-animation";
 import dayjs from "@/lib/dayjs";
 import {
   BarChart,
@@ -166,7 +165,7 @@ function IidxTowerComparisonCard({
       <DashCard className="border-2 border-dashed border-bpim-primary/30 bg-bpim-primary/5 p-6 text-center">
         <div className="flex flex-col items-center">
           <div className="mb-3 flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-bpim-primary/10">
-            <LottieAnimation animationData={ghostAnimation} loop size={36} />
+            <LordiconAnimation src="/lottie/ghost.json" trigger="loop" size={36} />
           </div>
           <h3 className="tracking-tight text-base font-black text-bpim-text">
             IIDXタワーのデータがありません

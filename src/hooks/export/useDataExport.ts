@@ -10,21 +10,27 @@ import { API_PREFIX } from "@/constants/apiEndpoints";
 import { SongWithScore } from "@/types/songs/score";
 import { useUser } from "@/contexts/users/UserContext";
 
-function songsToCSV(songs: SongWithScore[], version: string): string {
-  const header = [
-    "version",
-    "title",
-    "difficulty",
-    "difficultyLevel",
-    "notes",
-    "bpm",
-    "exScore",
-    "bpi",
-    "clearState",
-    "missCount",
-    "scoreAt",
-  ].join(",");
+export const EXPORT_FIELDS = [
+  "version",
+  "title",
+  "difficulty",
+  "difficultyLevel",
+  "notes",
+  "bpm",
+  "exScore",
+  "bpi",
+  "clearState",
+  "missCount",
+  "scoreAt",
+] as const;
 
+export type ExportField = (typeof EXPORT_FIELDS)[number];
+
+function songsToCSV(
+  songs: SongWithScore[],
+  version: string,
+  fields: Set<ExportField>,
+): string {
   const escape = (v: string | number | null | undefined) => {
     if (v === null || v === undefined) return "";
     const s = String(v);
@@ -34,21 +40,25 @@ function songsToCSV(songs: SongWithScore[], version: string): string {
     return s;
   };
 
-  const rows = songs.map((s) =>
-    [
-      version,
-      escape(s.title),
-      escape(s.difficulty),
-      s.difficultyLevel,
-      s.notes,
-      escape(s.bpm),
-      s.exScore ?? "",
-      s.bpi ?? "",
-      escape(s.clearState),
-      s.missCount ?? "",
-      s.scoreAt ? new Date(s.scoreAt).toISOString() : "",
-    ].join(","),
-  );
+  const getValue = (s: SongWithScore, field: ExportField): string => {
+    switch (field) {
+      case "version":       return version;
+      case "title":         return escape(s.title);
+      case "difficulty":    return escape(s.difficulty);
+      case "difficultyLevel": return String(s.difficultyLevel);
+      case "notes":         return String(s.notes);
+      case "bpm":           return escape(s.bpm);
+      case "exScore":       return s.exScore != null ? String(s.exScore) : "";
+      case "bpi":           return s.bpi != null ? String(s.bpi) : "";
+      case "clearState":    return escape(s.clearState);
+      case "missCount":     return s.missCount != null ? String(s.missCount) : "";
+      case "scoreAt":       return s.scoreAt ? new Date(s.scoreAt).toISOString() : "";
+    }
+  };
+
+  const activeFields = EXPORT_FIELDS.filter((f) => fields.has(f));
+  const header = activeFields.join(",");
+  const rows = songs.map((s) => activeFields.map((f) => getValue(s, f)).join(","));
   return [header, ...rows].join("\r\n");
 }
 
@@ -96,16 +106,13 @@ async function downloadAsZip(
   }
 }
 
-/**
- * 選択バージョンのスコアを CSV ファイルとしてエクスポートするフック。
- * 複数バージョン選択時は ZIP にまとめてダウンロードし、ZIP 生成失敗時は個別ダウンロードにフォールバックする。
- *
- * @returns バージョン選択状態・トグル関数・全選択/全解除・エクスポート実行関数・進捗テキスト
- */
 export function useDataExport() {
   const { fbUser } = useUser();
   const [selectedVersions, setSelectedVersions] = useState<Set<IIDXVersion>>(
     new Set(IIDX_VERSIONS),
+  );
+  const [selectedFields, setSelectedFields] = useState<Set<ExportField>>(
+    new Set(EXPORT_FIELDS),
   );
   const [isExporting, setIsExporting] = useState(false);
   const [progress, setProgress] = useState<string>("");
@@ -118,13 +125,28 @@ export function useDataExport() {
     });
   };
 
-  const selectAll = () => setSelectedVersions(new Set(IIDX_VERSIONS));
-  const clearAll = () => setSelectedVersions(new Set());
+  const selectAllVersions = () => setSelectedVersions(new Set(IIDX_VERSIONS));
+  const clearAllVersions = () => setSelectedVersions(new Set());
+
+  const toggleField = (f: ExportField) => {
+    setSelectedFields((prev) => {
+      const next = new Set(prev);
+      next.has(f) ? next.delete(f) : next.add(f);
+      return next;
+    });
+  };
+
+  const selectAllFields = () => setSelectedFields(new Set(EXPORT_FIELDS));
+  const clearAllFields = () => setSelectedFields(new Set());
 
   const handleExport = async () => {
     if (!fbUser?.uid) return;
     if (selectedVersions.size === 0) {
       toast.error("エクスポートするバージョンを選択してください");
+      return;
+    }
+    if (selectedFields.size === 0) {
+      toast.error("エクスポートするフィールドを選択してください");
       return;
     }
 
@@ -143,7 +165,7 @@ export function useDataExport() {
         );
         try {
           const songs = await fetchScoresForVersion(fbUser.uid, v, token);
-          const csv = songsToCSV(songs, v);
+          const csv = songsToCSV(songs, v, selectedFields);
           const withBom = "\uFEFF" + csv;
           files.push({
             name: `bpim2_scores_v${v}_${name}.csv`,
@@ -165,9 +187,7 @@ export function useDataExport() {
       const today = new Date().toISOString().slice(0, 10);
       if (files.length === 1) {
         const { name, content } = files[0];
-        const blob = new Blob([content], {
-          type: "text/csv;charset=utf-8;",
-        });
+        const blob = new Blob([content], { type: "text/csv;charset=utf-8;" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
@@ -190,11 +210,19 @@ export function useDataExport() {
     }
   };
 
+  // 後方互換: 旧 selectAll / clearAll を残す
+  const selectAll = selectAllVersions;
+  const clearAll = clearAllVersions;
+
   return {
     selectedVersions,
     toggleVersion,
     selectAll,
     clearAll,
+    selectedFields,
+    toggleField,
+    selectAllFields,
+    clearAllFields,
     isExporting,
     progress,
     handleExport,

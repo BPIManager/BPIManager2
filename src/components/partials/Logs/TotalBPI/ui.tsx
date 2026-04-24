@@ -2,8 +2,7 @@
 import { TrendingUp, TrendingDown, ChevronRight, Minus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DashCard } from "@/components/ui/dashcard";
-import trendingUpAnimation from "@/assets/lottie/trending-up.json";
-import { LottieAnimation } from "@/components/ui/lottie-animation";
+import { LordiconAnimation } from "@/components/ui/lordicon-animation";
 
 export const BatchTotalBpiCard = ({
   pagination,
@@ -46,7 +45,7 @@ export const BatchTotalBpiCard = ({
           <div
             className={cn("rounded-xl p-3 shrink-0", bpiBgClass, bpiColorClass)}
           >
-            <LottieAnimation animationData={trendingUpAnimation} />
+            <LordiconAnimation src="/lottie/trending-up.json" trigger="loop" />
           </div>
         </div>
 

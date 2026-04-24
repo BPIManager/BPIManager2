@@ -10,8 +10,7 @@ import {
   Download,
   Import,
 } from "lucide-react";
-import { LottieAnimation } from "@/components/ui/lottie-animation";
-import ghostAnimation from "@/assets/lottie/ghost.json";
+import { LordiconAnimation } from "@/components/ui/lordicon-animation";
 import {
   BarChart,
   Bar,
@@ -117,11 +116,7 @@ export const IidxTowerCard = ({
       <DashCard className="border-2 border-dashed border-bpim-primary/30 bg-bpim-primary/5 p-6 text-center transition-all hover:border-bpim-primary/50">
         <div className="flex flex-col items-center">
           <div className="relative mb-3 flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-bpim-primary/10">
-            <LottieAnimation
-              animationData={ghostAnimation}
-              loop={true}
-              size={36}
-            />
+            <LordiconAnimation src="/lottie/ghost.json" trigger="loop" size={36} />
           </div>
           <h3 className="text-base font-black tracking-tight text-bpim-text">
             IIDXタワーのデータがありません

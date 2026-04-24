@@ -11,8 +11,7 @@ import {
 } from "lucide-react";
 import Fireworks from "react-canvas-confetti/dist/presets/fireworks";
 import { useUser } from "@/contexts/users/UserContext";
-import { LottieAnimation } from "@/components/ui/lottie-animation";
-import trendingUpAnimation from "@/assets/lottie/trending-up.json";
+import { LordiconAnimation } from "@/components/ui/lordicon-animation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -80,7 +79,7 @@ export const ImportSuccessModal = ({ result, version, onClose }: Props) => {
       <div className="relative z-1002 flex w-full max-w-100 flex-col items-center gap-7 rounded-2xl border border-bpim-border bg-bpim-surface-2 p-8 text-center shadow-2xl">
         <div className="flex h-20 w-20 items-center justify-center rounded-full bg-bpim-primary/10 text-bpim-primary">
           {isImproved ? (
-            <LottieAnimation animationData={trendingUpAnimation} />
+            <LordiconAnimation src="/lottie/trending-up.json" trigger="loop" />
           ) : (
             <ScrollText size={32} />
           )}

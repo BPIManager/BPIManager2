@@ -11,6 +11,7 @@ import { Meta } from "@/components/partials/Head";
 import { PageLoader } from "@/components/ui/loading-spinner";
 import ThemeSettingsUi from "@/components/partials/Settings/ThemeSettings/ui";
 import DataExportUi from "@/components/partials/Settings/DataExport";
+import LayoutSettingsUi from "@/components/partials/Settings/LayoutSettings/ui";
 import { LoginRequiredCard } from "@/components/partials/LoginRequired/ui";
 
 export default function SettingsPage() {
@@ -41,6 +42,7 @@ export default function SettingsPage() {
 
               <ApiKeyUi />
 
+              <LayoutSettingsUi />
               <ThemeSettingsUi />
               <DataExportUi />
               <AccountDeletionUi />

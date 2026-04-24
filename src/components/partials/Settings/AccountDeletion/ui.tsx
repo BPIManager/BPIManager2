@@ -1,15 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { BadgeX, Trash2, TriangleAlert } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { BadgeX, Trash2 } from "lucide-react";
+import { ActionConfirmDialog } from "../../Modal/Confirmation";
 import { useAccountDeletion } from "@/hooks/users/useAccountDeletion";
 
 export default function AccountDeletionUi() {
@@ -50,14 +42,18 @@ export default function AccountDeletionUi() {
         </Button>
       </div>
 
-      <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-        <DialogContent>
-          <DialogHeader>
-            <div className="flex items-center gap-2 text-bpim-danger">
-              <TriangleAlert className="h-5 w-5" />
-              <DialogTitle>アカウントを削除しますか？</DialogTitle>
-            </div>
-            <DialogDescription className="flex flex-col gap-3 pt-1">
+      <ActionConfirmDialog
+        isOpen={isOpen}
+        onClose={handleClose}
+        onConfirm={handleDelete}
+        isDestructive
+        isLoading={isDeleting}
+        isConfirmDisabled={!isConfirmed}
+        title="アカウントを削除しますか？"
+        confirmLabel="削除する"
+        description={
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2 text-sm text-bpim-muted">
               <span>
                 この操作は
                 <strong className="text-bpim-text">取り消しできません</strong>。
@@ -68,41 +64,17 @@ export default function AccountDeletionUi() {
                 <strong className="text-bpim-text font-mono">{userName}</strong>{" "}
                 を入力してください。
               </span>
-            </DialogDescription>
-          </DialogHeader>
-
-          <Input
-            value={confirmUserName}
-            onChange={(e) => setConfirmUserName(e.target.value)}
-            placeholder={userName}
-            disabled={isDeleting}
-            autoComplete="off"
-          />
-
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={handleClose}
+            </div>
+            <Input
+              value={confirmUserName}
+              onChange={(e) => setConfirmUserName(e.target.value)}
+              placeholder={userName}
               disabled={isDeleting}
-            >
-              キャンセル
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={!isConfirmed || isDeleting}
-              className="gap-2"
-            >
-              {isDeleting ? (
-                <LoadingSpinner size="sm" />
-              ) : (
-                <Trash2 className="h-4 w-4" />
-              )}
-              {isDeleting ? "削除中..." : "削除する"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+              autoComplete="off"
+            />
+          </div>
+        }
+      />
     </>
   );
 }

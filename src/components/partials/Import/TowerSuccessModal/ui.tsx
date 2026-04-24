@@ -3,8 +3,7 @@
 import { useRouter } from "next/router";
 import Fireworks from "react-canvas-confetti/dist/presets/fireworks";
 import { Button } from "@/components/ui/button";
-import { LottieAnimation } from "@/components/ui/lottie-animation";
-import trendingUpAnimation from "@/assets/lottie/trending-up.json";
+import { LordiconAnimation } from "@/components/ui/lordicon-animation";
 import { type TowerImportResult } from "@/hooks/import/useIidxTowerImport";
 
 interface Props {
@@ -33,7 +32,7 @@ export const TowerImportSuccessModal = ({ result, onClose }: Props) => {
 
       <div className="relative z-1002 flex w-full max-w-100 flex-col items-center gap-7 rounded-2xl border border-bpim-border bg-bpim-surface-2 p-8 text-center shadow-2xl">
         <div className="flex h-20 w-20 items-center justify-center rounded-full bg-bpim-primary/10 text-bpim-primary">
-          <LottieAnimation animationData={trendingUpAnimation} />
+          <LordiconAnimation src="/lottie/trending-up.json" trigger="loop" />
         </div>
 
         <div className="flex flex-col gap-1">

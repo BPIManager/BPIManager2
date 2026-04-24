@@ -1,8 +1,7 @@
 ﻿import { DashCard } from "@/components/ui/dashcard";
 import NextLink from "next/link";
 import { Import, Settings, BookOpenText } from "lucide-react";
-import { LottieAnimation } from "@/components/ui/lottie-animation";
-import ghostAnimation from "@/assets/lottie/ghost.json";
+import { LordiconAnimation } from "@/components/ui/lordicon-animation";
 
 export const NoDataAlert = () => {
   const DOCS_URL =
@@ -12,9 +11,9 @@ export const NoDataAlert = () => {
     <DashCard className="my-6 border-2 border-dashed border-bpim-primary/30 bg-bpim-primary/5 p-8 text-center transition-all hover:border-bpim-primary/50">
       <div className="flex flex-col items-center">
         <div className="relative mb-4 flex h-18 w-18 items-center justify-center overflow-hidden rounded-full bg-bpim-primary/10">
-          <LottieAnimation
-            animationData={ghostAnimation}
-            loop={true}
+          <LordiconAnimation
+            src="/lottie/ghost.json"
+            trigger="loop"
             size={40}
           />
         </div>
