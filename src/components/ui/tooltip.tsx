@@ -68,77 +68,70 @@ import { HelpCircle, X } from "lucide-react";
 
 interface HelpTooltipProps {
   children: ReactNode;
+  /** デスクトップでパネルを開く方向。右端に配置する場合は "right" を指定 */
+  align?: "left" | "right";
 }
-export const HelpTooltip = ({ children }: HelpTooltipProps) => {
+export const HelpTooltip = ({ children, align = "left" }: HelpTooltipProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    if (!isOpen) return;
+    const close = (e: MouseEvent | TouchEvent) => {
       if (
         containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
+        !containerRef.current.contains(e.target as Node)
       ) {
         setIsOpen(false);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    document.addEventListener("mousedown", close);
+    document.addEventListener("touchstart", close);
+    return () => {
+      document.removeEventListener("mousedown", close);
+      document.removeEventListener("touchstart", close);
+    };
+  }, [isOpen]);
 
-  const showTooltip = isOpen || isHovered;
+  const panelPositionCls =
+    align === "right"
+      ? "sm:right-0 sm:left-auto"
+      : "sm:left-0 sm:right-auto";
+
+  const arrowPositionCls =
+    align === "right" ? "right-1.5 left-auto" : "left-1.5";
 
   return (
-    <div
-      className="relative inline-block ml-1"
-      ref={containerRef}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <div className="relative inline-block ml-1" ref={containerRef}>
       <button
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => setIsOpen((v) => !v)}
         className={`flex items-center transition-colors focus:outline-none ${
-          showTooltip
-            ? "text-bpim-primary"
-            : "text-bpim-muted hover:text-bpim-primary"
+          isOpen ? "text-bpim-primary" : "text-bpim-muted hover:text-bpim-primary"
         }`}
       >
         <HelpCircle size={14} />
       </button>
 
-      {showTooltip && (
-        <>
-          {isOpen && (
-            <div
-              className="fixed inset-0 z-40 bg-black/40 sm:hidden"
-              onClick={() => setIsOpen(false)}
-            />
-          )}
+      {isOpen && (
+        <div
+          className={`fixed left-4 right-4 top-1/2 -translate-y-1/2 z-50 sm:absolute sm:top-6 sm:translate-y-0 sm:w-80 ${panelPositionCls} max-h-[80vh] overflow-y-auto rounded-lg border border-bpim-border bg-bpim-surface p-4 shadow-2xl`}
+        >
+          <button
+            onClick={() => setIsOpen(false)}
+            className="absolute right-2 top-2 text-bpim-muted hover:text-bpim-text"
+          >
+            <X size={18} />
+          </button>
+
+          <div className="text-[11px] leading-relaxed text-bpim-light">
+            {children}
+          </div>
 
           <div
-            className="
-            fixed left-4 right-4 top-1/2 -translate-y-1/2 z-50 
-            sm:absolute sm:left-0 sm:top-6 sm:translate-y-0 sm:w-80 sm:right-auto
-            max-h-[80vh] overflow-y-auto
-            rounded-lg border border-bpim-border bg-bpim-surface p-4 shadow-2xl
-          "
-          >
-            <button
-              onClick={() => setIsOpen(false)}
-              className="absolute right-2 top-2 text-bpim-muted sm:hidden"
-            >
-              <X size={18} />
-            </button>
-
-            <div className="text-[11px] leading-relaxed text-bpim-light whitespace-pre-wrap">
-              {children}
-            </div>
-
-            <div className="hidden sm:block absolute -top-1 left-1.5 h-2 w-2 rotate-45 border-l border-t border-bpim-border bg-bpim-surface" />
-          </div>
-        </>
+            className={`hidden sm:block absolute -top-1 h-2 w-2 rotate-45 border-l border-t border-bpim-border bg-bpim-surface ${arrowPositionCls}`}
+          />
+        </div>
       )}
     </div>
   );

@@ -575,6 +575,147 @@ class StatsRepository {
     const rows = await query.execute();
     return new Set(rows.map((r) => `${r.title}___${r.difficulty}`));
   }
+
+  /**
+   * 指定ユーザーの総合 BPI に最も近い n 名のユーザー ID を返す。
+   *
+   * logs テーブルから各ユーザーの最新 totalBpi を取得し、
+   * |totalBpi - userTotalBpi| 昇順で上位 n 件を選ぶ。
+   *
+   * @param userTotalBpi - 基準となる総合 BPI
+   * @param userId       - 除外する自分自身のユーザー ID
+   * @param version      - バージョン番号
+   * @param n            - 取得する近傍プレイヤー数
+   */
+  async getNeighborIds(
+    userTotalBpi: number,
+    userId: string,
+    version: string,
+    n: number,
+  ): Promise<string[]> {
+    const rows = await db
+      .selectFrom("logs as l")
+      .innerJoin(
+        (qb) =>
+          qb
+            .selectFrom("logs")
+            .select(["userId", (eb) => eb.fn.max("id").as("maxId")])
+            .where("version", "=", version)
+            .groupBy("userId")
+            .as("latest"),
+        (join) => join.onRef("latest.maxId", "=", "l.id"),
+      )
+      .select("l.userId")
+      .where("l.userId", "!=", userId)
+      .orderBy(sql<number>`ABS(l.totalBpi - ${userTotalBpi})`, "asc")
+      .limit(n)
+      .execute();
+
+    return rows.map((r) => r.userId);
+  }
+
+  /**
+   * ユーザーの各曲最新スコアと、近傍プレイヤーの平均 BPI を結合して返す。
+   *
+   * @param userId      - 対象ユーザー ID
+   * @param neighborIds - 近傍プレイヤーの ID 配列
+   * @param version     - バージョン番号
+   * @param levels      - 絞り込む難易度レベル（省略時は全レベル）
+   * @param difficulties - 絞り込む難易度文字列（省略時は全難易度）
+   */
+  async getNeighborScoreComparison(
+    userId: string,
+    neighborIds: string[],
+    version: string,
+    levels?: number[],
+    difficulties?: string[],
+  ) {
+    if (neighborIds.length === 0) return [];
+
+    let query = db
+      .selectFrom("scores as s")
+      .innerJoin("songs as m", "s.songId", "m.songId")
+      .innerJoin("songDef as d", (join) =>
+        join.onRef("d.songId", "=", "m.songId").on("d.isCurrent", "=", 1),
+      )
+      .innerJoin(
+        (qb) =>
+          qb
+            .selectFrom("scores")
+            .select([
+              "songId as latest_songId",
+              (eb) => eb.fn.max("logId").as("maxLogId"),
+            ])
+            .where("userId", "=", userId)
+            .where("version", "=", version)
+            .groupBy("songId")
+            .as("userLatest"),
+        (join) => join.onRef("userLatest.maxLogId", "=", "s.logId"),
+      )
+      .leftJoin(
+        (qb) =>
+          qb
+            .selectFrom("scores as ns")
+            .innerJoin(
+              (qb2) =>
+                qb2
+                  .selectFrom("scores")
+                  .select([
+                    "userId",
+                    "songId",
+                    (eb) => eb.fn.max("logId").as("maxLogId"),
+                  ])
+                  .where("version", "=", version)
+                  .where("userId", "in", neighborIds)
+                  .groupBy(["userId", "songId"])
+                  .as("nLatest"),
+              (join) =>
+                join
+                  .onRef("nLatest.maxLogId", "=", "ns.logId")
+                  .onRef("nLatest.userId", "=", "ns.userId")
+                  .onRef("nLatest.songId", "=", "ns.songId"),
+            )
+            .select([
+              "ns.songId",
+              (eb) => eb.fn.avg<number>("ns.bpi").as("neighborAvgBpi"),
+              (eb) => eb.fn.count<number>("ns.userId").as("neighborCount"),
+            ])
+            .groupBy("ns.songId")
+            .as("neighbors"),
+        (join) => join.onRef("neighbors.songId", "=", "s.songId"),
+      )
+      .select([
+        "s.logId",
+        "s.songId",
+        "s.exScore",
+        "s.bpi",
+        "s.clearState",
+        "s.missCount",
+        "s.lastPlayed",
+        "m.title",
+        "m.notes",
+        "m.bpm",
+        "m.difficulty",
+        "m.difficultyLevel",
+        "m.releasedVersion",
+        "d.wrScore",
+        "d.kaidenAvg",
+        "d.coef",
+        "neighbors.neighborAvgBpi",
+        "neighbors.neighborCount",
+      ])
+      .where("s.userId", "=", userId)
+      .where("s.version", "=", version);
+
+    if (levels && levels.length > 0) {
+      query = query.where("m.difficultyLevel", "in", levels);
+    }
+    if (difficulties && difficulties.length > 0) {
+      query = query.where("m.difficulty", "in", difficulties);
+    }
+
+    return await query.execute();
+  }
 }
 
 export const statsRepo = new StatsRepository();
