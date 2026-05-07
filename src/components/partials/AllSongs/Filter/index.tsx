@@ -42,7 +42,7 @@ export const AllSongFilterBar = ({
         }
         options={SORT_OPTIONS}
         placeholder="ソート"
-        className="flex-1 min-w-[110px]"
+        className="flex-1 min-w-27.5"
       />
       <FilterSelect
         value={params.sortOrder || "desc"}
@@ -51,17 +51,15 @@ export const AllSongFilterBar = ({
         }
         options={SORT_ORDER_OPTIONS}
         placeholder="順序"
-        className="w-[90px] shrink-0"
+        className="w-22.5 shrink-0"
       />
     </div>
-
     <div className="flex w-full gap-2 items-center mb-3">
       <FilterSearchInput
         value={params.search || ""}
         onChange={(val) => onParamsChange({ search: val })}
       />
     </div>
-
     <div className="flex gap-4 flex-wrap items-start">
       <FilterCheckboxGroup
         label="LEVEL"

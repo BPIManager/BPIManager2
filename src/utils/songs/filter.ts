@@ -2,6 +2,18 @@ import {
   FilterParamsFrontend,
   SongWithScore,
 } from "@/types/songs/score";
+
+const DJRANK_THRESHOLDS = [
+  { label: "F", ratio: 0 },
+  { label: "E", ratio: 2 / 9 },
+  { label: "D", ratio: 3 / 9 },
+  { label: "C", ratio: 4 / 9 },
+  { label: "B", ratio: 5 / 9 },
+  { label: "A", ratio: 6 / 9 },
+  { label: "AA", ratio: 7 / 9 },
+  { label: "AAA", ratio: 8 / 9 },
+  { label: "MAX-", ratio: 17 / 18 },
+];
 import { getMaxBpm } from "./getMaxBPM";
 import dayjs from "@/lib/dayjs";
 import type { FilterParams } from "@/types/songs/filter";
@@ -121,6 +133,44 @@ export const filterSongsFrontend = (
       const scoreDate = dayjs(song.scoreAt);
       const end = dayjs(params.until).endOf("day");
       if (scoreDate.isAfter(end)) return false;
+    }
+
+    if (params.missCountMin !== undefined || params.missCountMax !== undefined) {
+      if (song.missCount === null) return false;
+      if (params.missCountMin !== undefined && song.missCount < params.missCountMin)
+        return false;
+      if (params.missCountMax !== undefined && song.missCount > params.missCountMax)
+        return false;
+    }
+
+    if (params.scoreFilters && params.scoreFilters.length > 0) {
+      const rate =
+        song.exScore !== null
+          ? (song.exScore / (song.notes * 2)) * 100
+          : null;
+      const ratio =
+        song.exScore !== null ? song.exScore / (song.notes * 2) : null;
+
+      for (const f of params.scoreFilters) {
+        if (!f.value) continue;
+        if (f.metric === "scoreRate") {
+          if (rate === null) return false;
+          const val = parseFloat(f.value);
+          if (isNaN(val)) continue;
+          if (f.operator === ">=" && rate < val) return false;
+          if (f.operator === "<=" && rate > val) return false;
+        } else if (f.metric === "djrank") {
+          if (ratio === null) return false;
+          const idx = DJRANK_THRESHOLDS.findIndex((t) => t.label === f.value);
+          if (idx === -1) continue;
+          if (f.operator === ">=") {
+            if (ratio < DJRANK_THRESHOLDS[idx].ratio) return false;
+          } else {
+            const next = DJRANK_THRESHOLDS[idx + 1];
+            if (next && ratio >= next.ratio) return false;
+          }
+        }
+      }
     }
 
     return true;

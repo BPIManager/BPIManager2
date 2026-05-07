@@ -30,22 +30,13 @@ async function performDailyTask() {
  */
 export async function setupArenaService() {
   performDailyTask();
-  let isArenaMissing = false;
-  try {
-    const files = await fs.readdir(OUTPUT_DIR);
-    if (files.length === 0) isArenaMissing = true;
-  } catch (err) {
-    isArenaMissing = true;
-  }
 
-  if (isArenaMissing) {
-    console.log("--- Initial Arena JSON generation starting... ---");
-    generateArenaJson()
-      .then(() => console.log("--- Initial Arena generation success. ---"))
-      .catch((err) =>
-        console.error("--- Initial Arena generation failed! ---", err),
-      );
-  }
+  console.log("--- Initial Arena JSON generation starting... ---");
+  generateArenaJson()
+    .then(() => console.log("--- Initial Arena generation success. ---"))
+    .catch((err) =>
+      console.error("--- Initial Arena generation failed! ---", err),
+    );
 
   console.log("--- Initial Radar Cache update starting... ---");
   updateAllUserRadarCache()

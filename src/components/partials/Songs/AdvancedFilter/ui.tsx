@@ -1,7 +1,10 @@
 ﻿"use client";
 
 import { useState, useEffect } from "react";
-import { FilterParamsFrontend } from "@/types/songs/score";
+import {
+  FilterParamsFrontend,
+  ScoreFilterCondition,
+} from "@/types/songs/score";
 import { verNameArr } from "@/constants/versions";
 import { CLEAR_STATES } from "@/constants/lampState";
 import dayjs from "@/lib/dayjs";
@@ -20,6 +23,26 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Plus, X } from "lucide-react";
+
+const DJRANK_OPTIONS = [
+  "MAX-",
+  "AAA",
+  "AA",
+  "A",
+  "B",
+  "C",
+  "D",
+  "E",
+  "F",
+] as const;
 
 interface Props {
   isOpen: boolean;
@@ -73,6 +96,40 @@ export const AdvancedFilterModal = ({
       until: undefined,
       versions: [],
       clearStates: [],
+      scoreFilters: [],
+      missCountMin: undefined,
+      missCountMax: undefined,
+    });
+  };
+
+  const addScoreFilter = () => {
+    updateLocal({
+      scoreFilters: [
+        ...(localParams.scoreFilters ?? []),
+        {
+          id: crypto.randomUUID(),
+          metric: "scoreRate",
+          operator: ">=",
+          value: "",
+        },
+      ],
+    });
+  };
+
+  const removeScoreFilter = (id: string) => {
+    updateLocal({
+      scoreFilters: (localParams.scoreFilters ?? []).filter((f) => f.id !== id),
+    });
+  };
+
+  const updateScoreFilter = (
+    id: string,
+    updates: Partial<ScoreFilterCondition>,
+  ) => {
+    updateLocal({
+      scoreFilters: (localParams.scoreFilters ?? []).map((f) =>
+        f.id === id ? { ...f, ...updates } : f,
+      ),
     });
   };
 
@@ -284,6 +341,154 @@ export const AdvancedFilterModal = ({
                 })}
               </div>
             </ScrollArea>
+          </section>
+
+          <Separator className="bg-bpim-surface-2/60" />
+
+          <section className="flex flex-col gap-3">
+            <div className="flex items-center gap-3">
+              <h3 className="text-[10px] font-bold tracking-widest text-bpim-text uppercase">
+                スコア条件
+              </h3>
+              <button
+                onClick={addScoreFilter}
+                className="flex items-center gap-1 text-[10px] font-bold text-bpim-primary hover:text-bpim-primary/70 transition-colors"
+              >
+                <Plus className="h-3 w-3" />
+                追加
+              </button>
+            </div>
+
+            {(localParams.scoreFilters ?? []).length > 0 && (
+              <div className="flex flex-col gap-2">
+                {(localParams.scoreFilters ?? []).map((f) => (
+                  <div key={f.id} className="flex flex-wrap items-center gap-2">
+                    <Select
+                      value={f.metric}
+                      onValueChange={(v) =>
+                        updateScoreFilter(f.id, {
+                          metric: v as ScoreFilterCondition["metric"],
+                          value: "",
+                        })
+                      }
+                    >
+                      <SelectTrigger className="h-8 w-28 border-bpim-border bg-bpim-surface-2/60 text-xs text-bpim-text">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="border-bpim-border bg-bpim-bg">
+                        <SelectItem value="scoreRate" className="text-xs">
+                          スコアレート
+                        </SelectItem>
+                        <SelectItem value="djrank" className="text-xs">
+                          DJRANK
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    <span className="text-xs text-bpim-muted">が</span>
+
+                    {f.metric === "djrank" ? (
+                      <Select
+                        value={f.value}
+                        onValueChange={(v) =>
+                          updateScoreFilter(f.id, { value: v })
+                        }
+                      >
+                        <SelectTrigger className="h-8 w-20 border-bpim-border bg-bpim-surface-2/60 text-xs text-bpim-text">
+                          <SelectValue placeholder="ランク" />
+                        </SelectTrigger>
+                        <SelectContent className="border-bpim-border bg-bpim-bg">
+                          {DJRANK_OPTIONS.map((r) => (
+                            <SelectItem key={r} value={r} className="text-xs">
+                              {r}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <Input
+                        value={f.value}
+                        onChange={(e) =>
+                          updateScoreFilter(f.id, { value: e.target.value })
+                        }
+                        placeholder="0-100"
+                        className="h-8 w-24 border-bpim-border bg-bpim-surface-2/60 text-xs text-bpim-text placeholder:text-bpim-muted"
+                        type="number"
+                        min={0}
+                        max={100}
+                      />
+                    )}
+
+                    <Select
+                      value={f.operator}
+                      onValueChange={(v) =>
+                        updateScoreFilter(f.id, {
+                          operator: v as ScoreFilterCondition["operator"],
+                        })
+                      }
+                    >
+                      <SelectTrigger className="h-8 w-16 border-bpim-border bg-bpim-surface-2/60 text-xs text-bpim-text">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="border-bpim-border bg-bpim-bg">
+                        <SelectItem value=">=" className="text-xs">
+                          以上
+                        </SelectItem>
+                        <SelectItem value="<=" className="text-xs">
+                          以下
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    <button
+                      onClick={() => removeScoreFilter(f.id)}
+                      className="text-bpim-muted hover:text-red-400 transition-colors"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+
+          <Separator className="bg-bpim-surface-2/60" />
+
+          <section className="flex flex-col gap-3">
+            <h3 className="text-[10px] font-bold tracking-widest text-bpim-text uppercase">
+              ミスカウント
+            </h3>
+            <div className="flex items-center gap-3">
+              <Input
+                placeholder="以上"
+                type="number"
+                min={0}
+                className="h-9 border-bpim-border bg-bpim-surface-2/60"
+                value={localParams.missCountMin ?? ""}
+                onChange={(e) =>
+                  updateLocal({
+                    missCountMin: e.target.value
+                      ? Number(e.target.value)
+                      : undefined,
+                  })
+                }
+              />
+              <span className="text-bpim-subtle">~</span>
+              <Input
+                placeholder="以下"
+                type="number"
+                min={0}
+                className="h-9 border-bpim-border bg-bpim-surface-2/60"
+                value={localParams.missCountMax ?? ""}
+                onChange={(e) =>
+                  updateLocal({
+                    missCountMax: e.target.value
+                      ? Number(e.target.value)
+                      : undefined,
+                  })
+                }
+              />
+            </div>
           </section>
         </div>
 

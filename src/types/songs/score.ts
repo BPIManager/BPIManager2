@@ -53,6 +53,13 @@ export interface SongWithRival extends SongWithScore {
 
 export type SongForSort = SongWithScore;
 
+export interface ScoreFilterCondition {
+  id: string;
+  metric: "scoreRate" | "djrank";
+  operator: ">=" | "<=";
+  value: string;
+}
+
 export interface FilterParamsFrontend {
   difficulties?: IidxDifficulty[];
   levels?: number[];
@@ -106,6 +113,10 @@ export interface FilterParamsFrontend {
     | "scoreRate";
   sortOrder?: "asc" | "desc";
   compareVersion?: string;
+
+  scoreFilters?: ScoreFilterCondition[];
+  missCountMin?: number;
+  missCountMax?: number;
 }
 
 export type SongHistoryResponse = {

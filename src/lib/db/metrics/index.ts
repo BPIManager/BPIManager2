@@ -42,6 +42,7 @@ class MetricsRepository {
    * 指定バージョン・難易度レベルにおけるアリーナランク別の平均スコアを集計する。
    *
    * 対象ランクは A1〜A5。`bkScores`・`bkUsers` テーブル（バックアップデータ）を使用する。
+   * 過去バージョンのデータ生成に使用する。
    *
    * @param version - バージョン番号
    * @param difficultyLevel - 難易度レベル（11 または 12）
@@ -54,10 +55,35 @@ class MetricsRepository {
     ).execute();
   }
 
+  /**
+   * 指定バージョン・難易度レベルにおけるアリーナランク別の平均スコアを集計する。
+   *
+   * 対象ランクは A1〜A5。`scores`・`songs`・`bkUsers` テーブルを使用する。
+   * 最新バージョンのデータ生成に使用する。
+   *
+   * @param version - バージョン番号
+   * @param difficultyLevel - 難易度レベル（11 または 12）
+   * @returns タイトル・難易度・ランク・平均スコア・サンプル数の配列
+   */
+  async getArenaAverageScoresFromScores(
+    version: string,
+    difficultyLevel: number,
+  ) {
+    return await this.buildArenaAverageQueryFromScores(
+      version,
+      difficultyLevel,
+    ).execute();
+  }
+
   private buildArenaAverageQuery(version: string, difficultyLevel: number) {
     return db
       .selectFrom("bkScores as s")
       .innerJoin("bkUsers as u", "s.userId", "u.userId")
+      .innerJoin("songs as sg", (join) =>
+        join
+          .onRef("sg.title", "=", "s.title")
+          .onRef("sg.difficulty", "=", "s.difficulty"),
+      )
       .innerJoin(
         (qb) =>
           qb
@@ -84,9 +110,69 @@ class MetricsRepository {
       .where("s.version", "=", version)
       .where("s.difficultyLevel", "=", difficultyLevel)
       .where("u.arenarank", "in", ["A1", "A2", "A3", "A4", "A5"])
+      .where("sg.releasedVersion", "<=", Number(version))
       .groupBy(["s.title", "s.difficulty", "u.arenarank"]);
   }
 
+  private buildArenaAverageQueryFromScores(
+    version: string,
+    difficultyLevel: number,
+  ) {
+    return db
+      .selectFrom("scores as s")
+      .innerJoin("songs as sg", "s.songId", "sg.songId")
+      .innerJoin(
+        (qb) =>
+          qb
+            .selectFrom("userStatusLogs as usl")
+            .innerJoin(
+              (qb2) =>
+                qb2
+                  .selectFrom("userStatusLogs")
+                  .select(["userId", (eb) => eb.fn.max("id").as("maxId")])
+                  .groupBy("userId")
+                  .as("m"),
+              (join) =>
+                join
+                  .onRef("m.userId", "=", "usl.userId")
+                  .onRef("m.maxId", "=", "usl.id"),
+            )
+            .select([
+              "usl.userId",
+              sql<string | null>`usl.arenaRank`.as("arenarank"),
+            ])
+            .as("u"),
+        (join) => join.onRef("u.userId", "=", "s.userId"),
+      )
+      .innerJoin(
+        (qb) =>
+          qb
+            .selectFrom("scores as s2")
+            .innerJoin("songs as sg2", "s2.songId", "sg2.songId")
+            .select([
+              "s2.songId",
+              "s2.userId",
+              (eb) => eb.fn.max("s2.logId").as("maxLogId"),
+            ])
+            .where("s2.version", "=", version)
+            .where("sg2.difficultyLevel", "=", difficultyLevel)
+            .groupBy(["s2.songId", "s2.userId"])
+            .as("latest"),
+        (join) => join.onRef("latest.maxLogId", "=", "s.logId"),
+      )
+      .select([
+        "sg.title",
+        "sg.difficulty",
+        sql<string | null>`u.arenarank`.as("arenarank"),
+        sql<number>`AVG(s.exScore)`.as("avgExScore"),
+        sql<number>`COUNT(s.userId)`.as("sampleSize"),
+      ])
+      .where("s.version", "=", version)
+      .where("sg.difficultyLevel", "=", difficultyLevel)
+      .where("sg.releasedVersion", "<=", Number(version))
+      .where(sql`u.arenarank`, "in", ["A1", "A2", "A3", "A4", "A5"])
+      .groupBy(sql`sg.title, sg.difficulty, u.arenarank`);
+  }
 }
 
 export const metricsRepo = new MetricsRepository();

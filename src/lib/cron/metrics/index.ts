@@ -63,48 +63,65 @@ export async function generateArenaJson() {
 
   for (const v of versions) {
     for (const level of LEVELS) {
+      const filePath = path.join(OUTPUT_DIR, `${v}_${level}.json`);
+      const isLatest = Number(v) > 32;
+
+      if (!isLatest) {
+        try {
+          await fs.access(filePath);
+          console.log(`Skipping: ${filePath}`);
+          continue;
+        } catch {
+          // File doesn't exist yet, proceed to generate
+        }
+      }
+
       console.log(`Processing: Ver.${v} Level.${level}`);
 
-      const arenaData = await metricsRepo.getArenaAverageScores(v, level);
+      const arenaData = isLatest
+        ? await metricsRepo.getArenaAverageScoresFromScores(v, level)
+        : await metricsRepo.getArenaAverageScores(v, level);
 
-      const grouped = arenaData.reduce((acc: Record<string, ArenaGroupEntry>, row) => {
-        const key = `${row.title}[${row.difficulty}]`;
-        const notes = songMap.get(key) || 0;
-        const maxScore = notes * 2;
-        const avgExScore = Number(row.avgExScore);
-        const rate = maxScore > 0 ? (avgExScore / maxScore) * 100 : 0;
+      const grouped = arenaData.reduce(
+        (acc: Record<string, ArenaGroupEntry>, row) => {
+          const key = `${row.title}[${row.difficulty}]`;
+          const notes = songMap.get(key) || 0;
+          const maxScore = notes * 2;
+          const avgExScore = Number(row.avgExScore);
+          const rate = maxScore > 0 ? (avgExScore / maxScore) * 100 : 0;
 
-        const def = defMap.get(key);
-        const avgBpi =
-          def && notes > 0
-            ? BpiCalculator.calc(Math.round(avgExScore), {
-                notes: def.notes,
-                kaidenAvg: def.kaidenAvg,
-                wrScore: def.wrScore,
-                coef: def.coef,
-              })
-            : null;
+          const def = defMap.get(key);
+          const avgBpi =
+            def && notes > 0
+              ? BpiCalculator.calc(Math.round(avgExScore), {
+                  notes: def.notes,
+                  kaidenAvg: def.kaidenAvg,
+                  wrScore: def.wrScore,
+                  coef: def.coef,
+                })
+              : null;
 
-        if (!acc[key]) {
-          acc[key] = {
-            title: row.title,
-            difficulty: row.difficulty,
-            notes,
-            maxScore,
-            averages: {},
+          if (!acc[key]) {
+            acc[key] = {
+              title: row.title,
+              difficulty: row.difficulty,
+              notes,
+              maxScore,
+              averages: {},
+            };
+          }
+          acc[key].averages[row.arenarank!] = {
+            avgExScore: Math.round(avgExScore * 100) / 100,
+            rate: parseFloat(rate.toFixed(2)),
+            count: row.sampleSize,
+            ...(avgBpi !== null && { avgBpi: Math.round(avgBpi * 100) / 100 }),
           };
-        }
-        acc[key].averages[row.arenarank!] = {
-          avgExScore: Math.round(avgExScore * 100) / 100,
-          rate: parseFloat(rate.toFixed(2)),
-          count: row.sampleSize,
-          ...(avgBpi !== null && { avgBpi: Math.round(avgBpi * 100) / 100 }),
-        };
-        return acc;
-      }, {});
+          return acc;
+        },
+        {},
+      );
 
       const finalResult = Object.values(grouped);
-      const filePath = path.join(OUTPUT_DIR, `${v}_${level}.json`);
       await fs.writeFile(filePath, JSON.stringify(finalResult));
       console.log(`Saved: ${filePath}`);
     }

@@ -63,7 +63,11 @@ export const SongFilterBar = ({
   const combinedSortOptions = useMemo(() => {
     const base = withRivals
       ? [...sortOptions, ...rivalSortOptions]
-      : [...soleSortOptions, ...(withScoreRate ? [scoreRateSortOption] : []), ...sortOptions];
+      : [
+          ...soleSortOptions,
+          ...(withScoreRate ? [scoreRateSortOption] : []),
+          ...sortOptions,
+        ];
     if (hasCompare) return [...base];
     return base;
   }, [withRivals, withScoreRate, hasCompare]);
@@ -82,7 +86,7 @@ export const SongFilterBar = ({
             }}
             options={versionsNonDisabledCollection}
             placeholder="Version"
-            className="flex-1 min-w-[110px]"
+            className="flex-1 min-w-27.5"
           />
         )}
         <FilterSelect
@@ -94,7 +98,7 @@ export const SongFilterBar = ({
           }
           options={combinedSortOptions}
           placeholder="ソート"
-          className="flex-1 min-w-[110px]"
+          className="flex-1 min-w-27.5"
         />
         <FilterSelect
           value={params.sortOrder || "desc"}
@@ -103,7 +107,7 @@ export const SongFilterBar = ({
           }
           options={sortOrderOptions}
           placeholder="順序"
-          className="w-[90px] shrink-0"
+          className="w-22.5 shrink-0"
         />
       </div>
 

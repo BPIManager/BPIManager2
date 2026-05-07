@@ -9,9 +9,7 @@ import {
   LogOut,
   ListIcon,
   ChartNoAxesGantt,
-  LandPlot,
   ChartArea,
-  StickyNote,
   UsersIcon,
   ScrollText,
   User,
@@ -31,6 +29,8 @@ import {
   Trophy,
   Target,
   Music,
+  Table,
+  Swords,
 } from "lucide-react";
 
 import { useUser } from "@/contexts/users/UserContext";
@@ -56,6 +56,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
   const [isInfoOpen, setIsInfoOpen] = useState<boolean>(true);
   const [isScoreOpen, setIsScoreOpen] = useState<boolean>(true);
   const [isBetaOpen, setIsBetaOpen] = useState<boolean>(true);
+  const [isAnalyticsOpen, setIsAnalyticsOpen] = useState<boolean>(true);
 
   const rivalMenuItems = [
     { label: "ライバル一覧", icon: UsersIcon, href: "/rivals", exact: true },
@@ -64,10 +65,18 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
     { label: "全体ランキング", icon: Trophy, href: "/ranking/global" },
   ];
 
-  const otherMenuItems = [
+  const analyticsMenuItems = [
     { label: "比較", icon: ChartArea, href: "/analytics" },
-    { label: "指標", icon: LandPlot, href: "/metrics" },
-    { label: "設定", icon: Settings, href: "/settings" },
+    {
+      label: "AAA達成難易度表",
+      icon: Table,
+      href: "/metrics/AAADifficultyTable",
+    },
+    {
+      label: "アリーナランク平均",
+      icon: Swords,
+      href: `/metrics/arenaAverage/${String(Number(latestVersion) - 1)}?difficultyLevel=12`,
+    },
   ];
 
   const betaMenuItems = [
@@ -400,7 +409,31 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
           </CollapsibleContent>
         </Collapsible>
 
-        {otherMenuItems.map((item) => renderMenuItem(item))}
+        <Collapsible
+          open={isAnalyticsOpen}
+          onOpenChange={setIsAnalyticsOpen}
+          className="w-full"
+        >
+          <CollapsibleTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start gap-3 px-3 text-bpim-muted hover:bg-bpim-overlay/50 hover:text-bpim-text data-[state=open]:bg-transparent"
+            >
+              {isAnalyticsOpen ? (
+                <ChevronDown className="h-4.5 w-4.5" />
+              ) : (
+                <ChevronRight className="h-4.5 w-4.5" />
+              )}
+              <span className="text-xs font-bold tracking-wider">分析</span>
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="flex flex-col gap-1 mt-1">
+            {analyticsMenuItems.map((item) => renderMenuItem(item, true))}
+          </CollapsibleContent>
+        </Collapsible>
+
+        {renderMenuItem({ label: "設定", icon: Settings, href: "/settings" })}
 
         <Collapsible
           open={isBetaOpen}

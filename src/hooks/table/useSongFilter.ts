@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import type { ParsedUrlQuery } from "querystring";
 import {
   FilterParamsFrontend,
+  ScoreFilterCondition,
   SongWithScore,
 } from "@/types/songs/score";
 import { filterSongsFrontend } from "@/utils/songs/filter";
@@ -59,6 +60,11 @@ export const useSongFilter = (
         q.isRivalPlayed === undefined
           ? defaults?.isRivalPlayed
           : q.isRivalPlayed === "true",
+      scoreFilters: q.scoreFilters
+        ? (JSON.parse(q.scoreFilters) as ScoreFilterCondition[])
+        : undefined,
+      missCountMin: q.missCountMin ? Number(q.missCountMin) : undefined,
+      missCountMax: q.missCountMax ? Number(q.missCountMax) : undefined,
     };
   }, [query, isReady, defaults]);
 
@@ -102,7 +108,10 @@ export const useSongFilter = (
       params.since !== undefined ||
       params.until !== undefined ||
       params.isMyPlayed !== undefined ||
-      params.isRivalPlayed !== undefined;
+      params.isRivalPlayed !== undefined ||
+      params.missCountMin !== undefined ||
+      params.missCountMax !== undefined ||
+      (params.scoreFilters?.length ?? 0) > 0;
 
     if (!hasFilter) {
       return [];
@@ -144,7 +153,10 @@ export const useSongFilter = (
     const nextQuery = { ...router.query };
     delete nextQuery.page;
     Object.entries(newParams).forEach(([key, value]) => {
-      if (Array.isArray(value)) {
+      if (key === "scoreFilters" && Array.isArray(value)) {
+        if (value.length > 0) nextQuery[key] = JSON.stringify(value);
+        else delete nextQuery[key];
+      } else if (Array.isArray(value)) {
         if (value.length > 0) nextQuery[key] = value.join(",");
         else delete nextQuery[key];
       } else if (value === "" || value === undefined || value === null) {
