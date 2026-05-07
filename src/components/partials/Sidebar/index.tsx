@@ -75,7 +75,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
     {
       label: "アリーナランク平均",
       icon: Swords,
-      href: `/metrics/arenaAverage/${String(Number(latestVersion) - 1)}?difficultyLevel=12`,
+      href: `/metrics/arenaAverage/${latestVersion}?difficultyLevel=12`,
     },
   ];
 
