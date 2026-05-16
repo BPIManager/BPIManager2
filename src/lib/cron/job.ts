@@ -1,11 +1,8 @@
 import cron from "node-cron";
-import fs from "fs/promises";
-import path from "path";
 import { generateArenaJson } from "./metrics";
+import { generateInfoJson } from "./metrics/info";
 import { updateAllUserRadarCache } from "./radar";
 import { generateUserSitemap } from "./sitemaps";
-
-const OUTPUT_DIR = path.join(process.cwd(), "public/data/metrics/arena");
 
 async function performDailyTask() {
   console.log("--- Executing Daily Task (Database sync, etc.) ---");
@@ -38,6 +35,13 @@ export async function setupArenaService() {
       console.error("--- Initial Arena generation failed! ---", err),
     );
 
+  console.log("--- Initial Info JSON generation starting... ---");
+  generateInfoJson()
+    .then(() => console.log("--- Initial Info generation success. ---"))
+    .catch((err) =>
+      console.error("--- Initial Info generation failed! ---", err),
+    );
+
   console.log("--- Initial Radar Cache update starting... ---");
   updateAllUserRadarCache()
     .then(() => console.log("--- Initial Radar Cache update success. ---"))
@@ -56,6 +60,16 @@ export async function setupArenaService() {
       await generateArenaJson();
     } catch (err) {
       console.error("[Cron] Arena Job Failed:", err);
+    }
+  });
+
+  // 毎日 01:00 JST (= 16:00 UTC) にサイト統計 JSON を再生成
+  cron.schedule("0 16 * * *", async () => {
+    console.log("[Cron] Running Task: generateInfoJson");
+    try {
+      await generateInfoJson();
+    } catch (err) {
+      console.error("[Cron] Info JSON Job Failed:", err);
     }
   });
 

@@ -31,6 +31,7 @@ import {
   Music,
   Table,
   Swords,
+  BarChart2,
 } from "lucide-react";
 
 import { useUser } from "@/contexts/users/UserContext";
@@ -129,6 +130,11 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
       icon: XIcon,
       href: "https://x.com/BPIManager",
       isExternal: true,
+    },
+    {
+      label: "統計情報",
+      icon: BarChart2 as LucideIcon,
+      href: "/info/stats",
     },
   ];
 
