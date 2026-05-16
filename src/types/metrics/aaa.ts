@@ -1,6 +1,14 @@
 /** AAA テーブルのグループ化基準。`"target"` はターゲット BPI 基準、`"self"` はユーザー BPI 基準 */
 export type GroupingMode = "target" | "self";
 
+export type GoalType = "aaa" | "maxMinus" | "custom";
+
+export type CardDisplay = "bpi" | "exScore";
+
+export type CustomGoalConfig =
+  | { type: "djRank"; label: string; ratio: number; offset: number }
+  | { type: "percentage"; ratio: number };
+
 /** AAA / Max- 達成に必要なスコア情報 */
 export interface AAATableTarget {
   /** 目標EXスコア */
@@ -21,10 +29,11 @@ export interface AAATableItem {
   notes: number;
   /** 最大スコア（notes × 2） */
   maxScore: number;
-  /** AAA / Max- それぞれの目標スコア情報 */
+  /** AAA / Max- / カスタム それぞれの目標スコア情報 */
   targets: {
     aaa: AAATableTarget;
     maxMinus: AAATableTarget;
+    custom?: AAATableTarget;
   };
   /** ユーザーの現在スコア情報 */
   user: {

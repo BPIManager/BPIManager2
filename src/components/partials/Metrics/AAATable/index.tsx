@@ -1,9 +1,9 @@
 ﻿"use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { SectionLoader } from "@/components/ui/loading-spinner";
 import { useAAATable } from "@/hooks/metrics/useAAATable";
-import { GroupingMode } from "@/types/metrics/aaa";
+import { GroupingMode, GoalType, AAATableItem, CustomGoalConfig, CardDisplay } from "@/types/metrics/aaa";
 import { latestVersion } from "@/constants/latestVersion";
 import { AAATableFilter } from "@/components/partials/Metrics/AAATable/selector";
 import { AAAGridItem } from "@/components/partials/Metrics/AAATable/table";
@@ -27,8 +27,34 @@ export const AAATableContent = ({
 }: AAATableContentProps) => {
   const [version, setVersion] = useState(defaultVersion);
   const [level, setLevel] = useState(12);
-  const [goal, setGoal] = useState<"aaa" | "maxMinus">("aaa");
+  const [goal, setGoal] = useState<GoalType>("aaa");
   const [groupingMode, setGroupingMode] = useState<GroupingMode>("target");
+  const [showAbove, setShowAbove] = useState(true);
+  const [showBelow, setShowBelow] = useState(true);
+  const [maxDiffFilter, setMaxDiffFilter] = useState<number | undefined>(
+    undefined,
+  );
+  const [cardDisplay, setCardDisplay] = useState<CardDisplay>("bpi");
+  const [customGoal, setCustomGoal] = useState<CustomGoalConfig | null>(() => {
+    try {
+      const raw = localStorage.getItem("bpim2_aaa_custom_goal");
+      return raw ? (JSON.parse(raw) as CustomGoalConfig) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const handleCustomGoalChange = (config: CustomGoalConfig) => {
+    setCustomGoal(config);
+    localStorage.setItem("bpim2_aaa_custom_goal", JSON.stringify(config));
+  };
+
+  const customGoalRatio =
+    goal === "custom" && customGoal ? customGoal.ratio : undefined;
+  const customGoalOffset =
+    goal === "custom" && customGoal?.type === "djRank"
+      ? customGoal.offset
+      : undefined;
 
   const { groupedData, isLoading, isError } = useAAATable(
     userId,
@@ -36,7 +62,31 @@ export const AAATableContent = ({
     level,
     goal,
     groupingMode,
+    customGoalRatio,
+    customGoalOffset,
   );
+
+  const filteredGroupedData = useMemo((): Record<number, AAATableItem[]> => {
+    const entries = Object.entries(groupedData).reduce<
+      Record<number, AAATableItem[]>
+    >((acc, [key, items]) => {
+      const filtered = items.filter((item) => {
+        const diff =
+          goal === "custom"
+            ? (item.targets.custom?.diff ?? 0)
+            : item.targets[goal].diff;
+        const isAbove = diff >= 0;
+        if (isAbove && !showAbove) return false;
+        if (!isAbove && !showBelow) return false;
+        if (maxDiffFilter !== undefined && (isAbove || diff < -maxDiffFilter))
+          return false;
+        return true;
+      });
+      if (filtered.length > 0) acc[Number(key)] = filtered;
+      return acc;
+    }, {});
+    return entries;
+  }, [groupedData, goal, showAbove, showBelow, maxDiffFilter]);
 
   if (isError) {
     return (
@@ -88,13 +138,23 @@ export const AAATableContent = ({
         onGoalChange={setGoal}
         groupingMode={groupingMode}
         onGroupingModeChange={setGroupingMode}
+        showAbove={showAbove}
+        onShowAboveChange={setShowAbove}
+        showBelow={showBelow}
+        onShowBelowChange={setShowBelow}
+        maxDiffFilter={maxDiffFilter}
+        onMaxDiffFilterChange={setMaxDiffFilter}
+        customGoal={customGoal}
+        onCustomGoalChange={handleCustomGoalChange}
+        cardDisplay={cardDisplay}
+        onCardDisplayChange={setCardDisplay}
       />
 
       {isLoading ? (
         <SectionLoader className="h-64" size="xl" />
       ) : (
         <div className="flex flex-col gap-12">
-          {Object.keys(groupedData)
+          {Object.keys(filteredGroupedData)
             .sort((a, b) => Number(b) - Number(a))
             .map((bpiKey) => (
               <section key={bpiKey} className="flex flex-col gap-4">
@@ -105,8 +165,8 @@ export const AAATableContent = ({
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-                  {groupedData[Number(bpiKey)].map((item) => (
-                    <AAAGridItem key={item.songId} item={item} goal={goal} />
+                  {filteredGroupedData[Number(bpiKey)].map((item) => (
+                    <AAAGridItem key={item.songId} item={item} goal={goal} cardDisplay={cardDisplay} />
                   ))}
                 </div>
               </section>

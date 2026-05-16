@@ -32,13 +32,9 @@ export class BpiCalculator {
     if (s > m) return null;
     if (s < 0) return -15;
 
-    const _s = this.pgf(s, m);
     const _k = this.pgf(k, m);
-    const _z = this.pgf(z, m);
-
-    const _s_ = _s / _k;
-    const _z_ = _z / _k;
-
+    const _s_ = this.pgf(s, m) / _k;
+    const _z_ = this.pgf(z, m) / _k;
     const p = s >= k;
     const powCoef = coef && coef > 0 ? coef : this.DEFAULT_POW_COEF;
 
@@ -47,9 +43,10 @@ export class BpiCalculator {
 
     if (Math.abs(logZ) < 0.00001) return 0;
 
-    const rawBPI = (p ? 100 : -100) * Math.pow(Math.abs(logS / logZ), powCoef);
-    let res = Math.round(rawBPI * 100) / 100;
-
+    const res =
+      Math.round(
+        (p ? 100 : -100) * Math.pow(Math.abs(logS / logZ), powCoef) * 100,
+      ) / 100;
     return isNaN(res) ? null : Math.max(-15, res);
   }
 
@@ -72,14 +69,13 @@ export class BpiCalculator {
     const powCoef = coef && coef > 0 ? coef : this.DEFAULT_POW_COEF;
 
     const _k = this.pgf(kaidenAvg, m);
-    const _z = this.pgf(wrScore, m);
-    const logZ = Math.log(_z / _k);
+    const logZ = Math.log(this.pgf(wrScore, m) / _k);
 
-    const isPositive = targetBpi >= 0;
-    const absBpi = Math.abs(targetBpi);
-
-    const inner = Math.pow(absBpi / 100, 1 / powCoef) * logZ;
-    const _s = isPositive ? _k * Math.exp(inner) : _k * Math.exp(-inner);
+    const inner =
+      (targetBpi >= 0 ? 1 : -1) *
+      Math.pow(Math.abs(targetBpi) / 100, 1 / powCoef) *
+      logZ;
+    const _s = _k * Math.exp(inner);
 
     const res = m * ((_s - 0.5) / _s);
 
@@ -104,8 +100,7 @@ export class BpiCalculator {
   ): number {
     if (totalSongCount === 0) return -15;
 
-    let k = Math.log2(totalSongCount);
-    if (k === 0) k = 1;
+    const k = Math.max(1, Math.log2(totalSongCount));
 
     let sum = 0;
     for (let i = 0; i < totalSongCount; i++) {

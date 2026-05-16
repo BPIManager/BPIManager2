@@ -12,7 +12,7 @@ export default async function handler(
   const body = parseQuery(aaaDifficultySchema, req.query, res);
   if (!body) return;
 
-  const { userId, version, level } = body;
+  const { userId, version, level, customGoalRatio, customGoalOffset } = body;
 
   try {
     if (userId && userId !== "guest") {
@@ -38,6 +38,20 @@ export default async function handler(
       const aaaTargetBpi = BpiCalculator.calc(aaaTarget, songParams) ?? -15;
       const maxMinusTargetBpi =
         BpiCalculator.calc(maxMinusTarget, songParams) ?? -15;
+      const customTarget =
+        customGoalRatio !== undefined
+          ? Math.min(
+              maxScore,
+              Math.max(
+                0,
+                Math.ceil(maxScore * customGoalRatio) + (customGoalOffset ?? 0),
+              ),
+            )
+          : undefined;
+      const customTargetBpi =
+        customTarget !== undefined
+          ? (BpiCalculator.calc(customTarget, songParams) ?? -15)
+          : undefined;
       const currentExScore = song.userExScore ?? 0;
       const currentBpi = song.userExScore
         ? BpiCalculator.calc(song.userExScore, songParams)
@@ -61,6 +75,15 @@ export default async function handler(
             targetBpi: maxMinusTargetBpi,
             diff: currentExScore - maxMinusTarget,
           },
+          ...(customTarget !== undefined && customTargetBpi !== undefined
+            ? {
+                custom: {
+                  exScore: customTarget,
+                  targetBpi: customTargetBpi,
+                  diff: currentExScore - customTarget,
+                },
+              }
+            : {}),
         },
         user: {
           exScore: currentExScore,

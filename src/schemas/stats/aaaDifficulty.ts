@@ -11,4 +11,6 @@ export const aaaDifficultySchema = z.object({
     .catch(latestVersion)
     .default(latestVersion),
   level: z.coerce.number().int(),
+  customGoalRatio: z.coerce.number().min(0).max(1).optional(),
+  customGoalOffset: z.coerce.number().int().optional(),
 });

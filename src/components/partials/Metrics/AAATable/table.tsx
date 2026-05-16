@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { useState } from "react";
-import { AAATableItem } from "@/types/metrics/aaa";
+import { AAATableItem, GoalType, CardDisplay } from "@/types/metrics/aaa";
 import {
   Tooltip,
   TooltipContent,
@@ -14,13 +14,18 @@ import { cn } from "@/lib/utils";
 export const AAAGridItem = ({
   item,
   goal,
+  cardDisplay,
 }: {
   item: AAATableItem;
-  goal: "aaa" | "maxMinus";
+  goal: GoalType;
+  cardDisplay: CardDisplay;
 }) => {
   const [open, setOpen] = useState(false);
 
-  const target = item.targets[goal];
+  const target =
+    goal === "custom"
+      ? (item.targets.custom ?? item.targets.aaa)
+      : item.targets[goal];
   const userBpi = item.user.bpi;
   const targetBpi = target.targetBpi;
   const bpiGap = userBpi - targetBpi;
@@ -72,16 +77,22 @@ export const AAAGridItem = ({
                   Target
                 </span>
                 <span className="font-mono text-sm font-black leading-none">
-                  {targetBpi.toFixed(2)}
+                  {cardDisplay === "bpi"
+                    ? targetBpi.toFixed(2)
+                    : target.exScore}
                 </span>
               </div>
 
               <div className="flex flex-col items-end gap-0">
                 <span className="text-[8px] font-black uppercase leading-none opacity-60 tracking-tighter">
-                  My BPI
+                  {cardDisplay === "bpi" ? "My BPI" : "My EX"}
                 </span>
                 <span className="font-mono text-sm font-black leading-none">
-                  {item.user.exScore > 0 ? userBpi.toFixed(2) : "-"}
+                  {item.user.exScore > 0
+                    ? cardDisplay === "bpi"
+                      ? userBpi.toFixed(2)
+                      : item.user.exScore
+                    : "-"}
                 </span>
               </div>
             </div>
