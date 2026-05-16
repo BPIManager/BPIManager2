@@ -23,18 +23,23 @@ export const ARENA_RANK_ORDER = [
 
 class SiteStatsRepository {
   async getSummary() {
-    // クロンが 01:00 JST に実行するため「今日」はほぼデータなし。前日(JST)を使う。
     const yesterday = sql`DATE_SUB(DATE(CONVERT_TZ(NOW(), '+00:00', '+09:00')), INTERVAL 1 DAY)`;
+
+    const BK_VERSIONS = ["26", "27", "28", "29", "30", "31", "32"] as const;
+    const EXCLUDE_FROM_CURRENT = [...BK_VERSIONS, "INF"] as const;
 
     const [
       totalUsers,
       newUsersToday,
       totalLogs,
       newLogsToday,
+
+      totalBk,
+      newBkYesterday,
       totalScores,
       newScoresToday,
-      totalAllScoresLow,
-      newAllScoresLowToday,
+      totalAllLow,
+      newAllLowToday,
     ] = await Promise.all([
       db
         .selectFrom("users")
@@ -43,7 +48,11 @@ class SiteStatsRepository {
       db
         .selectFrom("users")
         .select((eb) => eb.fn.count("userId").as("count"))
-        .where(sql`DATE(CONVERT_TZ(createdAt, '+00:00', '+09:00'))`, "=", yesterday)
+        .where(
+          sql`DATE(CONVERT_TZ(createdAt, '+00:00', '+09:00'))`,
+          "=",
+          yesterday,
+        )
         .executeTakeFirst(),
 
       db
@@ -53,17 +62,43 @@ class SiteStatsRepository {
       db
         .selectFrom("logs")
         .select((eb) => eb.fn.count("id").as("count"))
-        .where(sql`DATE(CONVERT_TZ(createdAt, '+00:00', '+09:00'))`, "=", yesterday)
+        .where(
+          sql`DATE(CONVERT_TZ(createdAt, '+00:00', '+09:00'))`,
+          "=",
+          yesterday,
+        )
+        .executeTakeFirst(),
+
+      db
+        .selectFrom("bkScores")
+        .select((eb) => eb.fn.count("logId").as("count"))
+        .where("version", "in", BK_VERSIONS)
+        .executeTakeFirst(),
+      db
+        .selectFrom("bkScores")
+        .select((eb) => eb.fn.count("logId").as("count"))
+        .where("version", "in", BK_VERSIONS)
+        .where(
+          sql`DATE(CONVERT_TZ(createdAt, '+00:00', '+09:00'))`,
+          "=",
+          yesterday,
+        )
         .executeTakeFirst(),
 
       db
         .selectFrom("scores")
         .select((eb) => eb.fn.count("logId").as("count"))
+        .where("version", "not in", EXCLUDE_FROM_CURRENT)
         .executeTakeFirst(),
       db
         .selectFrom("scores")
         .select((eb) => eb.fn.count("logId").as("count"))
-        .where(sql`DATE(CONVERT_TZ(createdAt, '+00:00', '+09:00'))`, "=", yesterday)
+        .where("version", "not in", EXCLUDE_FROM_CURRENT)
+        .where(
+          sql`DATE(CONVERT_TZ(createdAt, '+00:00', '+09:00'))`,
+          "=",
+          yesterday,
+        )
         .executeTakeFirst(),
 
       db
@@ -71,12 +106,14 @@ class SiteStatsRepository {
         .innerJoin("allSongs as sg", "sg.songId", "s.songId")
         .select((eb) => eb.fn.count("s.logId").as("count"))
         .where("sg.difficultyLevel", "not in", [11, 12])
+        .where("s.version", "not in", EXCLUDE_FROM_CURRENT)
         .executeTakeFirst(),
       db
         .selectFrom("allScores as s")
         .innerJoin("allSongs as sg", "sg.songId", "s.songId")
         .select((eb) => eb.fn.count("s.logId").as("count"))
         .where("sg.difficultyLevel", "not in", [11, 12])
+        .where("s.version", "not in", EXCLUDE_FROM_CURRENT)
         .where(
           sql`DATE(CONVERT_TZ(s.createdAt, '+00:00', '+09:00'))`,
           "=",
@@ -91,10 +128,13 @@ class SiteStatsRepository {
       totalLogs: Number(totalLogs?.count ?? 0),
       newLogsToday: Number(newLogsToday?.count ?? 0),
       totalAllScores:
-        Number(totalScores?.count ?? 0) + Number(totalAllScoresLow?.count ?? 0),
+        Number(totalBk?.count ?? 0) +
+        Number(totalScores?.count ?? 0) +
+        Number(totalAllLow?.count ?? 0),
       newAllScoresToday:
+        Number(newBkYesterday?.count ?? 0) +
         Number(newScoresToday?.count ?? 0) +
-        Number(newAllScoresLowToday?.count ?? 0),
+        Number(newAllLowToday?.count ?? 0),
     };
   }
 
@@ -235,22 +275,22 @@ class SiteStatsRepository {
     const EXCLUDE_FROM_CURRENT = [...BK_VERSIONS, "INF"];
 
     const [bkRows, scoresRows, allScoresRows] = await Promise.all([
-      // 26-32: bkScores 全件
-      db.selectFrom("bkScores")
+      db
+        .selectFrom("bkScores")
         .select(["version", sql<number>`COUNT(*)`.as("count")])
         .where("version", "in", BK_VERSIONS)
         .groupBy("version")
         .execute(),
 
-      // 33+: scores (☆11/☆12)
-      db.selectFrom("scores")
+      db
+        .selectFrom("scores")
         .select(["version", sql<number>`COUNT(*)`.as("count")])
         .where("version", "not in", EXCLUDE_FROM_CURRENT)
         .groupBy("version")
         .execute(),
 
-      // 33+: allScores (☆1-☆10)
-      db.selectFrom("allScores as s")
+      db
+        .selectFrom("allScores as s")
         .innerJoin("allSongs as sg", "sg.songId", "s.songId")
         .select(["s.version", sql<number>`COUNT(*)`.as("count")])
         .where("sg.difficultyLevel", "not in", [11, 12])
@@ -268,14 +308,16 @@ class SiteStatsRepository {
     scoresRows.forEach((r) => add(r.version, Number(r.count)));
     allScoresRows.forEach((r) => add(r.version, Number(r.count)));
 
-    // BK_VERSIONS 順 → それ以外を数値順に並べて INF を除外
     const bkSet = new Set<string>(BK_VERSIONS);
     const others = [...map.keys()]
       .filter((v) => !bkSet.has(v) && v !== "INF")
       .sort((a, b) => Number(a) - Number(b));
     const ordered = [...BK_VERSIONS, ...others];
 
-    const versions = ordered.map((v) => ({ version: v, count: map.get(v) ?? 0 }));
+    const versions = ordered.map((v) => ({
+      version: v,
+      count: map.get(v) ?? 0,
+    }));
     const total = versions.reduce((s, r) => s + r.count, 0);
     return { versions, total };
   }
