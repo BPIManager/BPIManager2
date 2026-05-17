@@ -11,6 +11,7 @@ import {
   HourlyChart,
   WeekdayChart,
   SongPopulationTable,
+  AreaDistributionTable,
 } from "@/components/partials/Info";
 import { useSiteStats } from "@/hooks/siteStats/useSiteStats";
 
@@ -103,6 +104,8 @@ export default function SiteStatsPage() {
                 title="楽曲別プレイ人口 ワースト (☆12)"
               />
             </div>
+
+            <AreaDistributionTable data={data.areaDistribution ?? []} />
           </div>
         )}
       </PageContainer>

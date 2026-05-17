@@ -18,11 +18,12 @@ export async function generateInfoJson() {
 
   await fs.mkdir(OUTPUT_DIR, { recursive: true });
 
-  const [summary, dailyRegistrations, arenaRankDistribution, versionScoreDistribution, hourlyDistribution, weekdayDistribution] =
+  const [summary, dailyRegistrations, arenaRankDistribution, areaDistribution, versionScoreDistribution, hourlyDistribution, weekdayDistribution] =
     await Promise.all([
       siteStatsRepo.getSummary(),
       siteStatsRepo.getDailyRegistrations(90),
       siteStatsRepo.getArenaRankDistribution(),
+      siteStatsRepo.getAreaDistribution(),
       siteStatsRepo.getVersionScoreDistribution(),
       siteStatsRepo.getHourlyDistribution(),
       siteStatsRepo.getWeekdayDistribution(),
@@ -34,6 +35,7 @@ export async function generateInfoJson() {
       summary,
       dailyRegistrations,
       arenaRankDistribution,
+      areaDistribution,
       versionScoreDistribution,
       hourlyDistribution,
       weekdayDistribution,

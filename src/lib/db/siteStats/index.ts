@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { sql } from "kysely";
 import { ARENA_RANK_ORDER } from "@/constants/arenaRanks";
+import { latestVersion } from "@/constants/latestVersion";
 
 export { ARENA_RANK_ORDER };
 
@@ -228,35 +229,48 @@ class SiteStatsRepository {
     const rows = await db
       .with("latest_per_user", (cte) =>
         cte
-          .selectFrom("userStatusLogs")
+          .selectFrom("officialArenaStats")
           .select(["userId", (eb) => eb.fn.max("id").as("maxId")])
+          .where("version", "=", latestVersion)
           .groupBy("userId"),
       )
-      .selectFrom("userStatusLogs as usl")
-      .innerJoin("latest_per_user as lpu", "lpu.maxId", "usl.id")
-      .select(["usl.arenaRank", sql<number>`COUNT(*)`.as("count")])
-      .groupBy("usl.arenaRank")
+      .selectFrom("officialArenaStats as oas")
+      .innerJoin("latest_per_user as lpu", "lpu.maxId", "oas.id")
+      .select(["oas.arenaClass", sql<number>`COUNT(*)`.as("count")])
+      .groupBy("oas.arenaClass")
       .execute();
 
     const countOf = (rank: string) =>
       rows
-        .filter((r) => r.arenaRank === rank)
+        .filter((r) => r.arenaClass === rank)
         .reduce((s, r) => s + Number(r.count), 0);
 
-    const result: { rank: string; count: number }[] = ARENA_RANK_ORDER.map(
-      (r) => ({ rank: r, count: countOf(r) }),
-    );
+    return (ARENA_RANK_ORDER as readonly string[]).map((r) => ({
+      rank: r,
+      count: countOf(r),
+    }));
+  }
 
-    const unknownCount = rows
-      .filter(
-        (r) =>
-          r.arenaRank === null ||
-          !(ARENA_RANK_ORDER as readonly string[]).includes(r.arenaRank),
+  async getAreaDistribution() {
+    const rows = await db
+      .with("latest_per_user", (cte) =>
+        cte
+          .selectFrom("officialArenaStats")
+          .select(["userId", (eb) => eb.fn.max("id").as("maxId")])
+          .where("version", "=", latestVersion)
+          .groupBy("userId"),
       )
-      .reduce((s, r) => s + Number(r.count), 0);
-    if (unknownCount > 0) result.push({ rank: "不明(-)", count: unknownCount });
+      .selectFrom("officialArenaStats as oas")
+      .innerJoin("latest_per_user as lpu", "lpu.maxId", "oas.id")
+      .where("oas.area", "is not", null)
+      .select(["oas.area", sql<number>`COUNT(*)`.as("count")])
+      .groupBy("oas.area")
+      .orderBy(sql`COUNT(*)`, "desc")
+      .execute();
 
-    return result;
+    return rows
+      .filter((r) => r.area != null)
+      .map((r) => ({ area: r.area as string, count: Number(r.count) }));
   }
 
   async getVersionScoreDistribution() {

@@ -51,10 +51,16 @@ export interface SongPlayerEntry {
   playerCount: number;
 }
 
+export interface AreaEntry {
+  area: string;
+  count: number;
+}
+
 export interface SiteStatsResponse {
   summary: SiteStatsSummary;
   dailyRegistrations: DailyRegistration[];
   arenaRankDistribution: ArenaRankEntry[];
+  areaDistribution: AreaEntry[];
   versionScoreDistribution: VersionScoreDistribution;
   hourlyDistribution: Record<SiteStatsPeriod, HourlyEntry[]>;
   weekdayDistribution: Record<SiteStatsPeriod, WeekdayEntry[]>;

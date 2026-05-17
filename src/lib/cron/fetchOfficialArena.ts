@@ -95,9 +95,9 @@ async function fetchGrade(
   sessionUrl: string,
 ): Promise<EagatePlayer[]> {
   console.log(`[fetchGrade] Starting fetch for grade_id=${gradeId}`);
-  const allPlayers: EagatePlayer[] = [];
+  const seen = new Map<string, EagatePlayer>();
 
-  for (let page = 0; page <= 10; page++) {
+  for (let page = 0; page <= 12; page++) {
     console.log(`[fetchGrade] Fetching grade_id=${gradeId}, page=${page}...`);
 
     const res = await fetch(rankingUrl, {
@@ -132,15 +132,24 @@ async function fetchGrade(
       break;
     }
 
-    allPlayers.push(...list);
+    // ページ超過時は最終ページと同じデータが返ってくるため、既出IDで判定して打ち切る
+    const beforeSize = seen.size;
+    for (const p of list) {
+      seen.set(p.id, p);
+    }
+    if (seen.size === beforeSize) {
+      console.log(`[fetchGrade] Duplicate page detected at page=${page}, stopping.`);
+      break;
+    }
 
     await new Promise((resolve) => setTimeout(resolve, 500));
   }
 
+  const players = Array.from(seen.values());
   console.log(
-    `[fetchGrade] Total fetched for grade_id=${gradeId}: ${allPlayers.length} players.`,
+    `[fetchGrade] Total fetched for grade_id=${gradeId}: ${players.length} players (unique).`,
   );
-  return allPlayers;
+  return players;
 }
 
 function normalizeId(id: string): string {
@@ -223,11 +232,18 @@ export async function fetchOfficialArenaDistribution(
     `[OfficialArena] DB upsert: inserted=${inserted}, skipped=${skipped}`,
   );
 
+  // eagate全プレイヤーのランク分布（カバー率の分母）
+  const allPlayersCountMap = new Map<string, number>();
+  for (const arenaClass of playerClassMap.values()) {
+    allPlayersCountMap.set(arenaClass, (allPlayersCountMap.get(arenaClass) ?? 0) + 1);
+  }
   const distribution = ARENA_RANK_ORDER.map((rank) => ({
     rank,
-    count: countMap.get(rank) ?? 0,
+    count: allPlayersCountMap.get(rank) ?? 0,
   }));
-  const totalMatched = distribution.reduce((s, r) => s + r.count, 0);
+
+  // BPIM2ユーザーの照合数（カバー率の分子合計）
+  const totalMatched = [...countMap.values()].reduce((s, c) => s + c, 0);
 
   const now = new Date();
   const dateStr = now.toISOString().slice(0, 10);

@@ -6,3 +6,4 @@ export { VersionScoreChart } from "./VersionScoreChart";
 export { HourlyChart } from "./HourlyChart";
 export { WeekdayChart } from "./WeekdayChart";
 export { SongPopulationTable } from "./SongPopulationTable";
+export { AreaDistributionTable } from "./AreaDistributionTable";
