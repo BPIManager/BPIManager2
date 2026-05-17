@@ -6,6 +6,7 @@ import { FollowSection } from "../../Profile/Sidebar/followStatus";
 import { cn } from "@/lib/utils";
 import { UserProfileData, UserProfileCompare } from "@/types/users/profile";
 import { RoleBadge } from "../../UserRole/badge";
+import { ArenaClassBadge } from "../../ArenaClassBadge";
 
 interface RivalHeaderProps {
   profile: UserProfileData | null | undefined;
@@ -66,14 +67,14 @@ export const RivalHeader = ({
           ID: {formatIIDXId(profile?.iidxId ?? "")}
         </p>
         <div className="mt-1 flex justify-center gap-2 md:justify-start">
-          <Badge className="bg-orange-600 text-bpim-text border-none rounded-sm px-2">
-            {profile?.current?.arenaRank || "N/A"}
-          </Badge>
+          <ArenaClassBadge
+            arenaClass={profile?.stats[0]?.arenaClass || "N/A"}
+          />
           <Badge
             variant="secondary"
             className="bg-bpim-primary/10 text-bpim-primary border-bpim-border rounded-sm px-2"
           >
-            ☆12 BPI: {profile?.current?.totalBpi?.toFixed(2) || "N/A"}
+            ☆12 BPI: {profile?.stats[0]?.totalBpi?.toFixed(2) || "N/A"}
           </Badge>
         </div>
       </div>

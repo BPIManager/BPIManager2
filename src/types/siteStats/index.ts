@@ -61,6 +61,18 @@ export interface SiteStatsResponse {
   generatedAt?: string;
 }
 
+export interface OfficialArenaEntry {
+  rank: string;
+  count: number;
+}
+
+export interface OfficialArenaResponse {
+  distribution: OfficialArenaEntry[];
+  totalMatched: number;
+  totalPlayers: number;
+  generatedAt: string;
+}
+
 export interface SongPopulationResponse {
   songs: SongPlayerEntry[];
   total: number;

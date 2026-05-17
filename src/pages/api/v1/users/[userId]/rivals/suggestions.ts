@@ -65,7 +65,7 @@ export default async function handler(
         userName: user.userName,
         profileImage: user.profileImage,
         profileText: user.profileText,
-        arenaRank: user.arenaRank ?? "N/A",
+        arenaClass: user.arenaClass ?? null,
         totalBpi: Number(user.totalBpi),
         updatedAt: user.createdAt, //バッチidの作成時間が最終更新日時
         role: user.role

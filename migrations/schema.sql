@@ -376,6 +376,34 @@ CREATE TABLE IF NOT EXISTS `userStatusLogs` (
   CONSTRAINT `userStatusLogs_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=255979 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `officialArenaStats` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `userId` varchar(128) NOT NULL,
+  `version` varchar(10) NOT NULL,
+  `area` varchar(50) DEFAULT NULL,
+  `arenaClass` varchar(10) NOT NULL,
+  `gradeSp` varchar(20) DEFAULT NULL,
+  `gradeDp` varchar(20) DEFAULT NULL,
+  `arenaRank` int(11) DEFAULT NULL,
+  `wins` int(11) DEFAULT NULL,
+  `fetchedAt` timestamp NOT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `idx_oas_userId_version_fetchedAt` (`userId`,`version`,`fetchedAt` DESC),
+  CONSTRAINT `fk_oas_userId` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `statsPrivacy` (
+  `userId` varchar(128) NOT NULL,
+  `showArenaClass` tinyint(1) NOT NULL DEFAULT 1,
+  `showArenaRank` tinyint(1) NOT NULL DEFAULT 0,
+  `showArea` tinyint(1) NOT NULL DEFAULT 0,
+  `showGrade` tinyint(1) NOT NULL DEFAULT 0,
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`userId`),
+  CONSTRAINT `fk_sp_userId` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;

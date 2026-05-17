@@ -1,6 +1,10 @@
-import { latestVersion } from "@/constants/latestVersion";
 import { db } from "@/lib/db";
 import { sql } from "kysely";
+import {
+  getLatestArenaStatsPerVersion,
+  getBestArenaClassPerVersion,
+} from "@/lib/db/officialArenaStats";
+import { getStatsPrivacy } from "@/lib/db/statsPrivacy";
 
 /**
  * ユーザープロフィールの参照・作成・更新を担当するリポジトリクラス。
@@ -77,11 +81,19 @@ class UsersRepository {
       .where("version", "=", version)
       .groupBy("userId");
 
+    const latestArenaSubquery = db
+      .selectFrom("officialArenaStats")
+      .select((eb) => ["userId", eb.fn.max("id").as("maxId")])
+      .where("version", "=", version)
+      .groupBy("userId");
+
     let query = db
       .selectFrom("users as u")
       .innerJoin("userRadarCache as r", "u.userId", "r.userId")
       .leftJoin(latestStatusSubquery.as("ls"), "u.userId", "ls.userId")
       .leftJoin("userStatusLogs as usl", "ls.maxId", "usl.id")
+      .leftJoin(latestArenaSubquery.as("la"), "u.userId", "la.userId")
+      .leftJoin("officialArenaStats as oas", "la.maxId", "oas.id")
       .leftJoin("userRoles as ur", "ur.userId", "u.userId")
       .select([
         "u.userId",
@@ -89,7 +101,7 @@ class UsersRepository {
         "u.iidxId",
         "u.profileImage",
         "u.profileText",
-        "usl.arenaRank",
+        "oas.arenaClass",
         "usl.totalBpi",
         "usl.createdAt",
         "r.notes",
@@ -179,10 +191,20 @@ class UsersRepository {
    * `userRadarCache` を INNER JOIN してそのカテゴリ値で降順ソートする（最新バージョンのみ）。
    * それ以外は `userStatusLogs.totalBpi` で降順ソートする。
    *
+   * `filterArea` を指定すると指定エリアのユーザーのみ表示（非公開ユーザーはマスク）。
+   * `filterArenaClass` を指定すると指定アリーナクラスのユーザーのみ表示（非公開ユーザーはマスク）。
+   *
    * @param version - バージョン番号
    * @param category - ソート対象カテゴリ（デフォルト: "totalBpi"）
+   * @param filterArea - 地域フィルタ（県名）
+   * @param filterArenaClass - アリーナクラスフィルタ
    */
-  async getGlobalRanking(version: string, category: string = "totalBpi") {
+  async getGlobalRanking(
+    version: string,
+    category: string = "totalBpi",
+    filterArea?: string,
+    filterArenaClass?: string,
+  ) {
     const RADAR_COLUMNS = [
       "notes",
       "chord",
@@ -195,8 +217,18 @@ class UsersRepository {
       category,
     );
 
+    const hasAreaFilter = Boolean(filterArea);
+    const hasArenaClassFilter = Boolean(filterArenaClass);
+    const hasFilter = hasAreaFilter || hasArenaClassFilter;
+
     const latestStatusSubquery = db
       .selectFrom("userStatusLogs")
+      .select(["userId", (eb) => eb.fn.max("id").as("maxId")])
+      .where("version", "=", version)
+      .groupBy("userId");
+
+    const latestArenaSubquery = db
+      .selectFrom("officialArenaStats")
       .select(["userId", (eb) => eb.fn.max("id").as("maxId")])
       .where("version", "=", version)
       .groupBy("userId");
@@ -209,6 +241,8 @@ class UsersRepository {
         )
         .leftJoin(latestStatusSubquery.as("ls"), "u.userId", "ls.userId")
         .leftJoin("userStatusLogs as usl", "ls.maxId", "usl.id")
+        .leftJoin(latestArenaSubquery.as("la"), "u.userId", "la.userId")
+        .leftJoin("officialArenaStats as oas", "la.maxId", "oas.id")
         .select([
           "u.userId",
           "u.userName",
@@ -216,7 +250,7 @@ class UsersRepository {
           "u.isPublic",
           "u.iidxId",
           "usl.totalBpi",
-          "usl.arenaRank",
+          "oas.arenaClass",
           "r.notes",
           "r.chord",
           "r.peak",
@@ -228,10 +262,49 @@ class UsersRepository {
         .execute();
     }
 
+    if (hasFilter) {
+      let filteredQuery = db
+        .selectFrom("users as u")
+        .leftJoin(latestStatusSubquery.as("ls"), "u.userId", "ls.userId")
+        .leftJoin("userStatusLogs as usl", "ls.maxId", "usl.id")
+        .innerJoin(latestArenaSubquery.as("la"), "u.userId", "la.userId")
+        .innerJoin("officialArenaStats as oas", "la.maxId", "oas.id")
+        .leftJoin("statsPrivacy as sp", "sp.userId", "u.userId")
+        .select([
+          "u.userId",
+          "u.userName",
+          "u.profileImage",
+          "u.isPublic",
+          "u.iidxId",
+          "usl.totalBpi",
+          "oas.arenaClass",
+          "oas.area",
+          sql<number>`COALESCE(sp.showArea, 0)`.as("showArea"),
+          sql<number>`COALESCE(sp.showArenaClass, 1)`.as("showArenaClass"),
+        ])
+        .where("usl.id", "is not", null)
+        .orderBy(sql`COALESCE(usl.totalBpi, -15)`, "desc");
+
+      if (hasAreaFilter) {
+        filteredQuery = filteredQuery.where("oas.area", "=", filterArea!);
+      }
+      if (hasArenaClassFilter) {
+        filteredQuery = filteredQuery.where(
+          "oas.arenaClass",
+          "=",
+          filterArenaClass!,
+        );
+      }
+
+      return await filteredQuery.execute();
+    }
+
     return await db
       .selectFrom("users as u")
       .leftJoin(latestStatusSubquery.as("ls"), "u.userId", "ls.userId")
       .leftJoin("userStatusLogs as usl", "ls.maxId", "usl.id")
+      .leftJoin(latestArenaSubquery.as("la"), "u.userId", "la.userId")
+      .leftJoin("officialArenaStats as oas", "la.maxId", "oas.id")
       .select([
         "u.userId",
         "u.userName",
@@ -239,13 +312,10 @@ class UsersRepository {
         "u.isPublic",
         "u.iidxId",
         "usl.totalBpi",
-        "usl.arenaRank",
+        "oas.arenaClass",
       ])
       .where("usl.id", "is not", null)
-      .orderBy(
-        (eb) => eb.fn("coalesce", [eb.ref("usl.totalBpi"), eb.val(-15)]),
-        "desc",
-      )
+      .orderBy(sql`COALESCE(usl.totalBpi, -15)`, "desc")
       .execute();
   }
 
@@ -325,26 +395,59 @@ class UsersRepository {
 
     if (!userBase) return null;
 
-    const history = await db
-      .selectFrom("userStatusLogs as usl")
-      .innerJoin(
-        (eb) =>
-          eb
-            .selectFrom("userStatusLogs")
-            .select(["version", (sub) => sub.fn.max("id").as("maxId")])
-            .where("userId", "=", userId)
-            .groupBy("version")
-            .as("latest"),
-        (join) => join.onRef("usl.id", "=", "latest.maxId"),
-      )
-      .select(["usl.version", "usl.totalBpi", "usl.arenaRank", "usl.updatedAt"])
-      .orderBy("usl.version", "desc")
-      .execute();
+    const isSelf = userBase.userId === myId;
 
-    const formattedHistory = history.map((h) => ({
-      ...h,
-      totalBpi: Number(h.totalBpi),
-    }));
+    const [bpiHistory, rawArenaStats, bestArenaStats, privacy] =
+      await Promise.all([
+        db
+          .selectFrom("userStatusLogs as usl")
+          .innerJoin(
+            (eb) =>
+              eb
+                .selectFrom("userStatusLogs")
+                .select(["version", (sub) => sub.fn.max("id").as("maxId")])
+                .where("userId", "=", userId)
+                .groupBy("version")
+                .as("latest"),
+            (join) => join.onRef("usl.id", "=", "latest.maxId"),
+          )
+          .select(["usl.version", "usl.totalBpi"])
+          .execute(),
+        getLatestArenaStatsPerVersion(userId),
+        getBestArenaClassPerVersion(userId),
+        getStatsPrivacy(userId),
+      ]);
+
+    const bpiMap = new Map(
+      bpiHistory.map((h) => [h.version, Number(h.totalBpi)]),
+    );
+    const arenaMap = new Map(rawArenaStats.map((s) => [s.version, s]));
+    const allVersions = [
+      ...new Set([...bpiMap.keys(), ...arenaMap.keys()]),
+    ].sort((a, b) => {
+      if (a === "INF") return 1;
+      if (b === "INF") return -1;
+      return b.localeCompare(a);
+    });
+
+    const stats = allVersions.map((version) => {
+      const arena = arenaMap.get(version);
+      const best = bestArenaStats.get(version);
+      const showArena = isSelf || privacy.showArenaClass;
+      return {
+        version,
+        totalBpi: bpiMap.get(version) ?? null,
+        arenaClass: arena && showArena ? arena.arenaClass : null,
+        arenaRank:
+          arena && (isSelf || privacy.showArenaRank) ? arena.arenaRank : null,
+        area: arena && (isSelf || privacy.showArea) ? arena.area : null,
+        gradeSp: arena && (isSelf || privacy.showGrade) ? arena.gradeSp : null,
+        gradeDp: arena && (isSelf || privacy.showGrade) ? arena.gradeDp : null,
+        updatedAt: arena?.fetchedAt ?? null,
+        bestArenaClass: best && showArena ? best.arenaClass : null,
+        bestArenaClassAt: best && showArena ? best.fetchedAt : null,
+      };
+    });
 
     return {
       userId: userBase.userId,
@@ -364,7 +467,7 @@ class UsersRepository {
         isMutual:
           Number(userBase.isFollowing ?? 0) > 0 &&
           Number(userBase.isFollowedBy ?? 0) > 0,
-        isSelf: userBase.userId === myId,
+        isSelf,
       },
       role: userBase.role
         ? {
@@ -373,9 +476,13 @@ class UsersRepository {
             grantedAt: userBase.grantedAt,
           }
         : null,
-      history: formattedHistory,
-      current:
-        formattedHistory.find((item) => item.version === latestVersion) || null,
+      stats,
+      statsPrivacy: {
+        showArenaClass: !!privacy.showArenaClass,
+        showArenaRank: !!privacy.showArenaRank,
+        showArea: !!privacy.showArea,
+        showGrade: !!privacy.showGrade,
+      },
     };
   }
 
@@ -404,7 +511,6 @@ class UsersRepository {
     profileText: string | null;
     profileImage: string | null;
     isPublic: number;
-    arenaRank: string | null;
     xId: string | null;
     version: string;
     batchId: string;
@@ -416,7 +522,6 @@ class UsersRepository {
       profileText,
       profileImage,
       isPublic,
-      arenaRank,
       xId,
       version,
       batchId,
@@ -438,7 +543,7 @@ class UsersRepository {
 
       const lastStatus = await trx
         .selectFrom("userStatusLogs")
-        .select(["totalBpi", "arenaRank"])
+        .select(["totalBpi"])
         .where("userId", "=", userId)
         .where("version", "=", version)
         .orderBy("id", "desc")
@@ -473,7 +578,6 @@ class UsersRepository {
         .values({
           userId,
           totalBpi: lastStatus?.totalBpi ?? -15,
-          arenaRank: arenaRank || lastStatus?.arenaRank,
           version,
           batchId,
         })

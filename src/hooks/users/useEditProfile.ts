@@ -20,11 +20,17 @@ export const useEditProfile = (onClose?: () => void) => {
   const [formData, setFormData] = useState({
     userName: "",
     iidxId: "",
-    arenaRank: "-",
     bio: "",
     isPublic: true,
     xId: "",
     profileImage: "",
+  });
+
+  const [arenaPrivacy, setArenaPrivacy] = useState({
+    showArenaClass: true,
+    showArenaRank: false,
+    showArea: false,
+    showGrade: false,
   });
 
   const [nameStatus, setNameStatus] = useState({
@@ -38,7 +44,6 @@ export const useEditProfile = (onClose?: () => void) => {
       setFormData({
         userName: user.userName || "",
         iidxId: user.iidxId || "",
-        arenaRank: user.arenaRank || "-",
         bio: user.profileText || "",
         isPublic: !!user.isPublic,
         xId: user.xId || "",
@@ -46,6 +51,22 @@ export const useEditProfile = (onClose?: () => void) => {
       });
     }
   }, [user]);
+
+  useEffect(() => {
+    if (!fbUid || !fbUser) return;
+    (async () => {
+      try {
+        const token = await fbUser.getIdToken();
+        const res = await fetch(`${API_PREFIX}/users/${fbUid}/profile`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.statsPrivacy) setArenaPrivacy(data.statsPrivacy);
+        }
+      } catch { /* ignore */ }
+    })();
+  }, [fbUid, fbUser]);
 
   useEffect(() => {
     return onAuthStateChanged(auth, (u) => {
@@ -121,9 +142,9 @@ export const useEditProfile = (onClose?: () => void) => {
         body: JSON.stringify({
           ...formData,
           iidxId: formData.iidxId.replace(/-/g, ""),
-          arenaRank: formData.arenaRank === "-" ? null : formData.arenaRank,
           profileText: formData.bio || null,
           isPublic: formData.isPublic ? 1 : 0,
+          arenaPrivacy,
         }),
       });
 
@@ -141,6 +162,8 @@ export const useEditProfile = (onClose?: () => void) => {
   return {
     formData,
     setFormData,
+    arenaPrivacy,
+    setArenaPrivacy,
     nameStatus,
     fbUid,
     isSubmitting,

@@ -28,6 +28,8 @@ export interface Database {
   songPatterns: SongPatternsTable;
   songPatternVotes: SongPatternVotesTable;
   iidxTower: IidxTowerTable;
+  officialArenaStats: OfficialArenaStats;
+  statsPrivacy: StatsPrivacy;
   // 追加: 暫定/バックアップ用テーブル
   bkScores: BkScores;
   bkUsers: BkUsers;
@@ -339,3 +341,31 @@ export interface IidxTowerTable {
 
 export type IidxTowerRecord = Selectable<IidxTowerTable>;
 export type NewIidxTowerRecord = Insertable<IidxTowerTable>;
+
+export interface OfficialArenaStats {
+  id: Generated<number>;
+  userId: string;
+  version: string;
+  area: string | null;
+  arenaClass: string;
+  gradeSp: string | null;
+  gradeDp: string | null;
+  arenaRank: number | null;
+  wins: number | null;
+  fetchedAt: Date;
+  createdAt: Generated<Date>;
+}
+
+export interface StatsPrivacy {
+  userId: string;
+  showArenaClass: Generated<number>;
+  showArenaRank: Generated<number>;
+  showArea: Generated<number>;
+  showGrade: Generated<number>;
+  updatedAt: Generated<Date>;
+}
+
+export type OfficialArenaStat = Selectable<OfficialArenaStats>;
+export type NewOfficialArenaStat = Insertable<OfficialArenaStats>;
+export type StatsPrivacyRecord = Selectable<StatsPrivacy>;
+export type NewStatsPrivacy = Insertable<StatsPrivacy>;

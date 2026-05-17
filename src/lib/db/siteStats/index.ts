@@ -1,5 +1,8 @@
 import { db } from "@/lib/db";
 import { sql } from "kysely";
+import { ARENA_RANK_ORDER } from "@/constants/arenaRanks";
+
+export { ARENA_RANK_ORDER };
 
 const DATE_EXPR = sql<string>`DATE_FORMAT(CONVERT_TZ(createdAt, '+00:00', '+09:00'), '%Y-%m-%d')`;
 
@@ -7,19 +10,6 @@ const JST_TODAY_START = sql<Date>`CONVERT_TZ(CONCAT(DATE(CONVERT_TZ(NOW(), '+00:
 
 const PERIODS = { all: null, d90: 90, d30: 30, d7: 7 } as const;
 type Period = keyof typeof PERIODS;
-
-export const ARENA_RANK_ORDER = [
-  "A1",
-  "A2",
-  "A3",
-  "A4",
-  "A5",
-  "B1",
-  "B2",
-  "B3",
-  "B4",
-  "B5",
-];
 
 class SiteStatsRepository {
   async getSummary() {
@@ -253,16 +243,15 @@ class SiteStatsRepository {
         .filter((r) => r.arenaRank === rank)
         .reduce((s, r) => s + Number(r.count), 0);
 
-    const result = ARENA_RANK_ORDER.map((r) => ({
-      rank: r,
-      count: countOf(r),
-    }));
+    const result: { rank: string; count: number }[] = ARENA_RANK_ORDER.map(
+      (r) => ({ rank: r, count: countOf(r) }),
+    );
 
     const unknownCount = rows
       .filter(
         (r) =>
           r.arenaRank === null ||
-          !ARENA_RANK_ORDER.includes(r.arenaRank as string),
+          !(ARENA_RANK_ORDER as readonly string[]).includes(r.arenaRank),
       )
       .reduce((s, r) => s + Number(r.count), 0);
     if (unknownCount > 0) result.push({ rank: "不明(-)", count: unknownCount });

@@ -5,11 +5,11 @@ import { RadarSectionChart } from "../../DashBoard/Radar";
 import { getBpiColorStyle } from "@/constants/bpiColor";
 import { getRoleCardStyle } from "@/constants/roleCardStyle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import type { RecommendedUser } from "@/types/users/list";
 import { RoleBadge } from "../../UserRole/badge";
 import { ROLE_ICON } from "../../Rivals/List/ui";
+import { ArenaClassBadge } from "@/components/partials/ArenaClassBadge";
 
 export const UserRecommendationCard = ({
   user,
@@ -90,9 +90,7 @@ export const UserRecommendationCard = ({
               {user.role && <RoleBadge {...user.role} />}
             </div>
             <div className="flex items-center gap-1.5 flex-wrap">
-              <Badge className="bg-orange-600 h-4 px-1.5 text-[10px] md:text-[11px] font-bold text-bpim-text">
-                {user.arenaRank || "N/A"}
-              </Badge>
+              <ArenaClassBadge arenaClass={user.arenaClass} size="sm" />
               <span className="font-mono text-[10px] text-bpim-muted md:text-[12px]">
                 ID: {formatIIDXId(user.iidxId)}
               </span>

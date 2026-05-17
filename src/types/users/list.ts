@@ -5,7 +5,7 @@ export interface RecommendedUser {
   userId: string;
   userName: string;
   profileImage: string | null;
-  arenaRank: string;
+  arenaClass: string | null;
   totalBpi: number;
   iidxId: string;
   /** レーダーカテゴリ別スコアマップ */

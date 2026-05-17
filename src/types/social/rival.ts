@@ -19,7 +19,7 @@ export interface RivalSummaryResult {
   userName: string;
   profileImage: string | null;
   iidxId: string | null;
-  arenaRank: string | null;
+  arenaClass: string | null;
   totalBpi: number | null;
   lastUpdated: Date | null;
   /** ライバルのレーダーチャートデータ */

@@ -217,11 +217,19 @@ class SocialComparisonRepository {
       .where("version", "=", version)
       .groupBy("userId");
 
+    const latestArenaIds = db
+      .selectFrom("officialArenaStats")
+      .select(["userId", (eb) => eb.fn.max("id").as("maxId")])
+      .where("version", "=", version)
+      .groupBy("userId");
+
     const results = await db
       .selectFrom("follows as f")
       .innerJoin("users as u", "f.followingId", "u.userId")
       .leftJoin(latestStatusIds.as("ls"), "u.userId", "ls.userId")
       .leftJoin("userStatusLogs as usl", "ls.maxId", "usl.id")
+      .leftJoin(latestArenaIds.as("lai"), "u.userId", "lai.userId")
+      .leftJoin("officialArenaStats as oas", "lai.maxId", "oas.id")
       .leftJoin("userRadarCache as urc", (join) =>
         join
           .onRef("u.userId", "=", "urc.userId")
@@ -243,7 +251,7 @@ class SocialComparisonRepository {
         "u.userName",
         "u.profileImage",
         "u.iidxId",
-        "usl.arenaRank",
+        "oas.arenaClass",
         "usl.totalBpi",
         "urc.notes as r_notes",
         "urc.chord as r_chord",
@@ -336,7 +344,7 @@ class SocialComparisonRepository {
         "u.userName",
         "u.profileImage",
         "u.iidxId",
-        "usl.arenaRank",
+        "oas.arenaClass",
         "usl.totalBpi",
         "urc.notes",
         "urc.chord",
@@ -363,7 +371,7 @@ class SocialComparisonRepository {
       userName: r.userName,
       profileImage: r.profileImage,
       iidxId: r.iidxId,
-      arenaRank: r.arenaRank,
+      arenaClass: r.arenaClass,
       totalBpi: r.totalBpi ? Number(r.totalBpi) : null,
       radar: {
         notes: Number(r.r_notes),

@@ -6,9 +6,9 @@ import { RivalSummaryResult } from "@/types/social/rival";
 import { getBpiColorStyle } from "@/constants/bpiColor";
 import { getRoleCardStyle } from "@/constants/roleCardStyle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { RoleBadge } from "../../UserRole/badge";
+import { ArenaClassBadge } from "@/components/partials/ArenaClassBadge";
 import dayjs from "@/lib/dayjs";
 
 export const ROLE_ICON: Record<string, { icon: LucideIcon; color: string }> = {
@@ -33,7 +33,7 @@ export const RivalSummaryCard = ({
     totalBpi,
     userName,
     profileImage,
-    arenaRank,
+    arenaClass,
     iidxId,
     lastUpdated,
   } = rival;
@@ -88,9 +88,7 @@ export const RivalSummaryCard = ({
               {rival.role && <RoleBadge {...rival.role} />}
             </div>
             <div className="flex items-center gap-2">
-              <Badge className="bg-orange-600 h-4 px-1.5 text-[10px] font-bold border-none">
-                {arenaRank || "N/A"}
-              </Badge>
+              <ArenaClassBadge arenaClass={arenaClass} size="sm" />
               <span className="font-mono text-[10px] text-bpim-muted">
                 {formatIIDXId(iidxId || "")}
               </span>

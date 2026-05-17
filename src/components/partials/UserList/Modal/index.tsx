@@ -100,13 +100,13 @@ export const RivalComparisonModal = ({
 
               <Button
                 asChild
-                className="h-[50px] w-full rounded-xl font-bold active:scale-95"
+                className="h-12.5 w-full rounded-xl font-bold active:scale-95"
               >
                 <Link href={`/users/${rivalId}`}>
                   <div className="flex items-center justify-center gap-2">
-                    <User className="h-[18px] w-[18px]" />
+                    <User className="h-4.5 w-4.5" />
                     <span className="text-sm">詳細プロフィールを見る</span>
-                    <ChevronRight className="h-[18px] w-[18px]" />
+                    <ChevronRight className="h-4.5 w-4.5" />
                   </div>
                 </Link>
               </Button>

@@ -13,14 +13,21 @@ const userNameSchema = z
     "名前に使用できない特殊な文字が含まれています",
   );
 
+export const arenaPrivacySchema = z.object({
+  showArenaClass: z.boolean().default(true),
+  showArenaRank: z.boolean().default(false),
+  showArea: z.boolean().default(false),
+  showGrade: z.boolean().default(false),
+});
+
 export const profileUpsertSchema = z.object({
   userName: userNameSchema,
   iidxId: z.string().nullable().default(null),
   profileText: z.string().nullable().default(null),
   profileImage: z.string().nullable().default(null),
   isPublic: z.number().int().min(0).max(1),
-  arenaRank: z.string().nullable().default(null),
   xId: z.string().nullable().default(null),
+  arenaPrivacy: arenaPrivacySchema.optional(),
 });
 
 export type ProfileUpsertInput = z.infer<typeof profileUpsertSchema>;

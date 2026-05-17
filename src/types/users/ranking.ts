@@ -6,7 +6,7 @@ export interface RankingEntry {
   isPublic: number;
   iidxId: string | null;
   totalBpi: number;
-  arenaRank: string | null;
+  arenaClass: string | null;
   isSelf: boolean;
 }
 

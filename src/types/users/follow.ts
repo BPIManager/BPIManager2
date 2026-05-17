@@ -5,7 +5,7 @@ export interface FollowUser {
   profileImage: string | null;
   profileText: string | null;
   totalBpi: number | null;
-  arenaRank: string | null;
+  arenaClass: string | null;
   /** 閲覧者がこのユーザーをフォローしているか */
   isViewerFollowing: boolean;
   /** このユーザーが閲覧者自身か */

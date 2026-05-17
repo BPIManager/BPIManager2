@@ -1,6 +1,7 @@
 import cron from "node-cron";
 import { generateArenaJson } from "./metrics";
 import { generateInfoJson } from "./metrics/info";
+import { fetchOfficialArenaDistribution } from "./fetchOfficialArena";
 import { updateAllUserRadarCache } from "./radar";
 import { generateUserSitemap } from "./sitemaps";
 
@@ -49,6 +50,13 @@ export async function setupArenaService() {
       console.error("--- Initial Radar Cache update failed! ---", err),
     );
 
+  console.log("--- Initial Official Arena fetch starting... ---");
+  fetchOfficialArenaDistribution()
+    .then(() => console.log("--- Initial Official Arena fetch success. ---"))
+    .catch((err) =>
+      console.error("--- Initial Official Arena fetch failed! ---", err),
+    );
+
   cron.schedule("0 2 * * *", async () => {
     console.log("[Cron] Running Task: performDailyTask");
     await performDailyTask();
@@ -63,13 +71,21 @@ export async function setupArenaService() {
     }
   });
 
-  // 毎日 01:00 JST (= 16:00 UTC) にサイト統計 JSON を再生成
   cron.schedule("0 16 * * *", async () => {
     console.log("[Cron] Running Task: generateInfoJson");
     try {
       await generateInfoJson();
     } catch (err) {
       console.error("[Cron] Info JSON Job Failed:", err);
+    }
+  });
+
+  cron.schedule("30 16 * * *", async () => {
+    console.log("[Cron] Running Task: fetchOfficialArenaDistribution");
+    try {
+      await fetchOfficialArenaDistribution();
+    } catch (err) {
+      console.error("[Cron] Official Arena Job Failed:", err);
     }
   });
 

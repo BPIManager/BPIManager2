@@ -17,6 +17,8 @@ import {
 } from "@/components/ui/select";
 import { versionsNonDisabledCollection } from "@/constants/versions";
 import { latestVersion } from "@/constants/latestVersion";
+import { JAPAN_PREFECTURES } from "@/constants/japanPrefectures";
+import { ARENA_RANK_ORDER } from "@/constants/arenaRanks";
 import { Info } from "lucide-react";
 import type { RankingEntry } from "@/types/users/ranking";
 import { useState } from "react";
@@ -80,10 +82,20 @@ export const GlobalRankingContainer = () => {
   const isRadarCategory =
     category !== "totalBpi" && !isSongsCategory && !isTowerCategory;
   const isLatestVersion = version === latestVersion;
+  const isTotalBpiCategory = category === "totalBpi";
+
+  const filterArea = isTotalBpiCategory
+    ? (router.query.area as string) || ""
+    : "";
+  const filterArenaClass = isTotalBpiCategory
+    ? (router.query.arenaClass as string) || ""
+    : "";
 
   const { data, isLoading } = useGlobalRanking(
     version,
     isSongsCategory || isTowerCategory ? "totalBpi" : category,
+    filterArea || undefined,
+    filterArenaClass || undefined,
   );
   const listRef = useListRef(null);
   const hasScrolled = useRef(false);
@@ -92,7 +104,7 @@ export const GlobalRankingContainer = () => {
 
   useEffect(() => {
     hasScrolled.current = false;
-  }, [version, category]);
+  }, [version, category, filterArea, filterArenaClass]);
 
   useEffect(() => {
     if (data && !hasScrolled.current) {
@@ -127,9 +139,41 @@ export const GlobalRankingContainer = () => {
   };
 
   const handleCategoryChange = (c: string) => {
-    router.push({ query: { ...router.query, category: c } }, undefined, {
-      shallow: true,
-    });
+    const newQuery: Record<string, string> = {
+      ...(router.query as Record<string, string>),
+      category: c,
+    };
+    if (c !== "totalBpi") {
+      delete newQuery.area;
+      delete newQuery.arenaClass;
+    }
+    router.push({ query: newQuery }, undefined, { shallow: true });
+  };
+
+  const handleAreaChange = (v: string) => {
+    router.push(
+      {
+        query: {
+          ...router.query,
+          area: v === "all" ? undefined : v,
+        },
+      },
+      undefined,
+      { shallow: true },
+    );
+  };
+
+  const handleArenaClassChange = (v: string) => {
+    router.push(
+      {
+        query: {
+          ...router.query,
+          arenaClass: v === "all" ? undefined : v,
+        },
+      },
+      undefined,
+      { shallow: true },
+    );
   };
 
   const handleRowClick = useCallback((userId: string) => {
@@ -216,6 +260,54 @@ export const GlobalRankingContainer = () => {
           </div>
         </div>
 
+        {isTotalBpiCategory && (
+          <div className="flex gap-3 mb-4">
+            <div className="flex flex-col gap-1 flex-1">
+              <label className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
+                地域
+              </label>
+              <Select
+                value={filterArea || "all"}
+                onValueChange={handleAreaChange}
+              >
+                <SelectTrigger className="w-full h-9 border-bpim-border bg-bpim-bg text-bpim-text focus:ring-blue-500">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="border-bpim-border bg-bpim-bg text-bpim-text">
+                  <SelectItem value="all">全て</SelectItem>
+                  {JAPAN_PREFECTURES.map((pref) => (
+                    <SelectItem key={pref} value={pref}>
+                      {pref}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex flex-col gap-1 flex-1">
+              <label className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
+                アリーナクラス
+              </label>
+              <Select
+                value={filterArenaClass || "all"}
+                onValueChange={handleArenaClassChange}
+              >
+                <SelectTrigger className="w-full h-9 border-bpim-border bg-bpim-bg text-bpim-text focus:ring-blue-500">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="border-bpim-border bg-bpim-bg text-bpim-text">
+                  <SelectItem value="all">全て</SelectItem>
+                  {ARENA_RANK_ORDER.map((cls) => (
+                    <SelectItem key={cls} value={cls}>
+                      {cls}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        )}
+
         {isTowerCategory ? (
           <TowerRanking version={version} />
         ) : isSongsCategory ? (
@@ -259,7 +351,7 @@ export const GlobalRankingContainer = () => {
               defaultHeight={500}
               overscanCount={5}
               className="rounded-xl border border-bpim-border"
-              style={{ height: "calc(100svh - 380px)", minHeight: "350px" }}
+              style={{ height: `calc(100svh - ${isTotalBpiCategory ? 440 : 380}px)`, minHeight: "350px" }}
             />
 
             {selectedUserId && (

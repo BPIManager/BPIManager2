@@ -1,13 +1,13 @@
 ﻿import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { ArenaClassBadge } from "@/components/partials/ArenaClassBadge";
 
 interface FollowUser {
   userId: string;
   profileImage: string | null;
   userName: string | null;
-  arenaRank: string | null;
+  arenaClass: string | null;
   totalBpi: number | null;
 }
 
@@ -25,9 +25,7 @@ export const UserFollowCard = ({ user }: { user: FollowUser }) => {
           {user.userName}
         </span>
         <div className="flex items-center gap-2">
-          <Badge className="bg-orange-600 px-1 py-0 text-[10px] font-bold border-none h-4">
-            {user.arenaRank || "N/A"}
-          </Badge>
+          <ArenaClassBadge arenaClass={user.arenaClass} size="sm" />
           <span className="font-mono text-xs font-bold text-bpim-primary uppercase">
             総合BPI: {user.totalBpi?.toFixed(2) ?? "N/A"}
           </span>

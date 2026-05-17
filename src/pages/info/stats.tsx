@@ -6,7 +6,7 @@ import {
   SummaryCard,
   SkeletonCard,
   RegistrationTrendChart,
-  ArenaRankChart,
+  ArenaRankComparison,
   VersionScoreChart,
   HourlyChart,
   WeekdayChart,
@@ -85,7 +85,7 @@ export default function SiteStatsPage() {
             </div>
 
             <RegistrationTrendChart data={data.dailyRegistrations} />
-            <ArenaRankChart data={data.arenaRankDistribution} />
+            <ArenaRankComparison selfReported={data.arenaRankDistribution} />
             <VersionScoreChart data={data.versionScoreDistribution} />
 
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">

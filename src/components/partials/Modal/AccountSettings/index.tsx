@@ -15,17 +15,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 import { useUser } from "@/contexts/users/UserContext";
 import { authActions } from "@/lib/firebase/auth";
-import { arenaRanksCollection } from "@/constants/arenaRank";
 import { ImageUploadModal } from "../ImageCrop/ui";
 import { useEditProfile } from "@/hooks/users/useEditProfile";
 import { AvatarSection } from "./avatar";
@@ -42,6 +34,8 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
   const {
     formData,
     setFormData,
+    arenaPrivacy,
+    setArenaPrivacy,
     nameStatus,
     fbUid,
     isSubmitting,
@@ -85,7 +79,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
             <div className="flex flex-col gap-6 p-6">
               <div className="flex flex-col gap-3 rounded-xl border border-bpim-border bg-bpim-surface-2/60 p-4">
                 <div className="flex items-center justify-between">
-                  <p className="text-[11px] font-bold uppercase tracking-widest text-bpim-muted">
+                  <p className="text-[11px] font-bold uppercase text-bpim-muted">
                     アイコン <span className="text-bpim-danger">*</span>
                   </p>
                 </div>
@@ -105,7 +99,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="flex flex-col gap-2">
-                  <Label className="text-[11px] font-bold uppercase tracking-widest text-bpim-muted">
+                  <Label className="text-[11px] font-bold uppercase text-bpim-muted">
                     表示名 <span className="text-bpim-danger">*</span>
                   </Label>
                   <div className="relative">
@@ -145,7 +139,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <Label className="text-[11px] font-bold uppercase tracking-widest text-bpim-muted">
+                  <Label className="text-[11px] font-bold uppercase text-bpim-muted">
                     IIDX ID <span className="text-bpim-danger">*</span>
                   </Label>
                   <Input
@@ -170,55 +164,26 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div className="flex flex-col gap-2">
-                  <Label className="text-[11px] font-bold uppercase tracking-widest text-bpim-muted">
-                    X ユーザー名
-                  </Label>
-                  <div className="flex h-10 overflow-hidden rounded-md border border-bpim-border bg-bpim-surface-2/60 focus-within:ring-2 focus-within:ring-blue-500">
-                    <div className="flex items-center border-r border-bpim-border px-3 text-sm text-bpim-muted">
-                      @
-                    </div>
-                    <input
-                      className="flex-1 bg-transparent px-3 py-2 text-sm text-bpim-text outline-none placeholder:text-bpim-subtle"
-                      value={formData.xId}
-                      onChange={handleXIdChange}
-                      placeholder="username"
-                    />
+              <div className="flex flex-col gap-2">
+                <Label className="text-[11px] font-bold uppercase text-bpim-muted">
+                  X ユーザー名
+                </Label>
+                <div className="flex h-10 overflow-hidden rounded-md border border-bpim-border bg-bpim-surface-2/60 focus-within:ring-2 focus-within:ring-blue-500">
+                  <div className="flex items-center border-r border-bpim-border px-3 text-sm text-bpim-muted">
+                    @
                   </div>
-                  <p className="text-[11px] text-bpim-muted">最大15文字</p>
+                  <input
+                    className="flex-1 bg-transparent px-3 py-2 text-sm text-bpim-text outline-none placeholder:text-bpim-subtle"
+                    value={formData.xId}
+                    onChange={handleXIdChange}
+                    placeholder="username"
+                  />
                 </div>
-
-                <div className="flex flex-col gap-2">
-                  <Label className="text-[11px] font-bold uppercase tracking-widest text-bpim-muted">
-                    アリーナランク
-                  </Label>
-                  <Select
-                    value={formData.arenaRank}
-                    onValueChange={(val) =>
-                      setFormData({ ...formData, arenaRank: val })
-                    }
-                  >
-                    <SelectTrigger className="h-10! w-full py-2 border-bpim-border bg-bpim-surface-2/60 focus:ring-blue-500">
-                      <SelectValue placeholder="未設定" />
-                    </SelectTrigger>
-                    <SelectContent className="border-bpim-border bg-bpim-bg">
-                      {arenaRanksCollection.map((item) => (
-                        <SelectItem
-                          key={item.value}
-                          value={item.value}
-                          className="text-xs"
-                        >
-                          {item.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                <p className="text-[11px] text-bpim-muted">最大15文字</p>
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label className="text-[11px] font-bold uppercase tracking-widest text-bpim-muted">
+                <Label className="text-[11px] font-bold uppercase text-bpim-muted">
                   自己紹介
                 </Label>
                 <Textarea
@@ -242,6 +207,37 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                 >
                   {formData.bio.length} / 1000
                 </p>
+              </div>
+
+              <div className="flex flex-col gap-3 rounded-xl border border-bpim-border bg-bpim-surface-2/60 p-4">
+                <p className="text-[11px] font-bold uppercase text-bpim-muted">
+                  詳細情報の公開設定
+                </p>
+                <p className="text-[11px] text-bpim-muted">
+                  それぞれの情報をプロフィールページで公開するかどうか選択できます。
+                  <br />
+                  公開設定にした場合、シーズン・日付ごとのアリーナクラス・順位などの推移を表示できます(予定)。
+                  <br />
+                  ※それぞれの情報は毎日午前1時頃に自動的に最新状態が反映されます。
+                </p>
+                {(
+                  [
+                    { key: "showArenaClass", label: "アリーナクラス" },
+                    { key: "showArea", label: "所属エリア" },
+                    { key: "showGrade", label: "段位（SP / DP）" },
+                  ] as const
+                ).map(({ key, label }) => (
+                  <div key={key} className="flex items-center justify-between">
+                    <span className="text-sm text-bpim-text">{label}</span>
+                    <Switch
+                      checked={arenaPrivacy[key]}
+                      onCheckedChange={(checked) =>
+                        setArenaPrivacy({ ...arenaPrivacy, [key]: checked })
+                      }
+                      className="shrink-0 data-[state=checked]:bg-bpim-primary"
+                    />
+                  </div>
+                ))}
               </div>
 
               <div className="flex items-center justify-between gap-4 rounded-xl border border-bpim-border bg-bpim-surface-2/60 p-4">

@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { ArenaClassBadge } from "@/components/partials/ArenaClassBadge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import {
@@ -154,9 +155,7 @@ const RivalPickStep = ({
                     {rival.userName}
                   </p>
                   <div className="flex items-center gap-2 mt-0.5">
-                    <Badge className="bg-orange-600 h-4 px-1.5 text-[10px] font-bold border-none">
-                      {rival.arenaRank || "N/A"}
-                    </Badge>
+                    <ArenaClassBadge arenaClass={rival.arenaClass} size="sm" />
                     <span className="font-mono text-[10px] text-bpim-muted">
                       {formatIIDXId(rival.iidxId || "")}
                     </span>

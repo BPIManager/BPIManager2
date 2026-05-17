@@ -117,7 +117,7 @@ class FollowRepository {
         (qb) =>
           qb
             .selectFrom("userStatusLogs")
-            .select(["userId as usl_userId", "totalBpi", "arenaRank"])
+            .select(["userId as usl_userId", "totalBpi"])
             .where("id", "in", (eb) =>
               eb
                 .selectFrom("userStatusLogs as sub")
@@ -126,6 +126,20 @@ class FollowRepository {
             )
             .as("latestStatus"),
         (join) => join.onRef("latestStatus.usl_userId", "=", `u.userId`),
+      )
+      .leftJoin(
+        (qb) =>
+          qb
+            .selectFrom("officialArenaStats")
+            .select(["userId as oas_userId", "arenaClass"])
+            .where("id", "in", (eb) =>
+              eb
+                .selectFrom("officialArenaStats as sub")
+                .select([eb.fn.max(sql<number>`sub.id`).as("maxId")])
+                .groupBy("sub.userId"),
+            )
+            .as("latestArena"),
+        (join) => join.onRef("latestArena.oas_userId", "=", `u.userId`),
       )
       .where(`f.${whereCol}`, "=", targetUserId);
 
@@ -142,7 +156,7 @@ class FollowRepository {
         "u.profileText",
         "u.isPublic",
         "latestStatus.totalBpi",
-        "latestStatus.arenaRank",
+        "latestArena.arenaClass",
         "f.createdAt as followedAt",
       ])
       .select((eb) => [
@@ -169,7 +183,7 @@ class FollowRepository {
           profileImage: shouldMask ? null : u.profileImage,
           profileText: shouldMask ? "" : u.profileText,
           totalBpi: shouldMask ? null : u.totalBpi ? Number(u.totalBpi) : null,
-          arenaRank: shouldMask ? null : u.arenaRank,
+          arenaClass: shouldMask ? null : u.arenaClass,
 
           isSelf,
           isViewerFollowing: Number(u.isViewerFollowing) > 0,

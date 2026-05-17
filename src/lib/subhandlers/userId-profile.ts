@@ -6,17 +6,22 @@ import { v4 as uuidv4 } from "uuid";
 import { AccessResult } from "@/middlewares/api/withApi";
 import { parseBody } from "@/services/nextRequest/parseBody";
 import { profileUpsertSchema } from "@/schemas/profile/upsert";
+import { upsertStatsPrivacy } from "@/lib/db/statsPrivacy";
 
 /**
  * プロフィール取得 API のレスポンス型。
  * `isCompare` が `true` の場合は `compare` フィールドに勝敗統計とレーダーデータを含む。
  */
+type ProfileSummary = NonNullable<Awaited<ReturnType<typeof usersRepo.getUserProfileSummary>>>;
+type ProfileSummaryWithoutPrivacy = Omit<ProfileSummary, "statsPrivacy">;
+
 interface ProfileResponse {
-  profile: Awaited<ReturnType<typeof usersRepo.getUserProfileSummary>>;
+  profile: ProfileSummaryWithoutPrivacy | null;
   compare?: {
     winLoss: Awaited<ReturnType<typeof socialRepo.getWinLossStats>> | null;
     radar: Record<string, number> | null;
   };
+  statsPrivacy?: ProfileSummary["statsPrivacy"];
 }
 
 /**
@@ -64,7 +69,10 @@ export async function handleGetProfile(
     return res.status(403).json({ message: "This profile is private" });
   }
 
-  const response: ProfileResponse = { profile };
+  const isSelf = viewerId === uid;
+  const { statsPrivacy, ...profileData } = profile;
+
+  const response: ProfileResponse = { profile: profileData };
   if (isCompare) {
     response.compare = {
       winLoss,
@@ -79,6 +87,9 @@ export async function handleGetProfile(
           }
         : null,
     };
+  }
+  if (isSelf) {
+    response.statsPrivacy = statsPrivacy;
   }
   return res.status(200).json(response);
 }
@@ -146,11 +157,23 @@ export async function upsert(
   const data = parseBody(profileUpsertSchema, req.body, res);
   if (!data) return;
 
-  const result = await usersRepo.upsertUserProfile({
-    ...data,
-    userId: uid,
-    version: latestVersion,
-    batchId: uuidv4(),
-  });
+  const { arenaPrivacy, ...profileData } = data;
+
+  const [result] = await Promise.all([
+    usersRepo.upsertUserProfile({
+      ...profileData,
+      userId: uid,
+      version: latestVersion,
+      batchId: uuidv4(),
+    }),
+    arenaPrivacy
+      ? upsertStatsPrivacy(uid, {
+          showArenaClass: arenaPrivacy.showArenaClass ? 1 : 0,
+          showArenaRank: arenaPrivacy.showArenaRank ? 1 : 0,
+          showArea: arenaPrivacy.showArea ? 1 : 0,
+          showGrade: arenaPrivacy.showGrade ? 1 : 0,
+        })
+      : null,
+  ]);
   return res.status(200).json(result);
 }

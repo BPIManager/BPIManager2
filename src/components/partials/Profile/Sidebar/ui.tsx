@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
   Collapsible,
@@ -10,6 +9,13 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { BpiHistoryTable } from "./bpiTable";
+import { ArenaClassBadge } from "./ArenaClassBadge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { FollowSection } from "./followStatus";
 import { FollowStats } from "./followCount";
 import { formatIIDXId } from "@/utils/common/formatIidxId";
@@ -27,6 +33,7 @@ import {
 } from "lucide-react";
 import dayjs from "@/lib/dayjs";
 import { latestVersion } from "@/constants/latestVersion";
+import { ARENA_RANK_ORDER } from "@/constants/arenaRanks";
 
 type RoleKey = "coffee" | "saba" | "iidx" | "developer" | "pro";
 
@@ -52,6 +59,33 @@ export const ProfileSideBar = ({
   const roleKey = profile.role?.role as RoleKey | undefined;
   const roleHeader = roleKey ? ROLE_HEADER[roleKey] : undefined;
   const RoleIcon = roleHeader?.Icon;
+
+  const current = profile.stats[0] ?? null;
+  const hasDetails = current != null;
+
+  const allTimeBest = useMemo(() => {
+    const order = ARENA_RANK_ORDER as readonly string[];
+    return profile.stats.reduce<{
+      arenaClass: string;
+      version: string;
+      at: Date | string | null;
+    } | null>((best, stat) => {
+      if (!stat.bestArenaClass) return best;
+      if (!best)
+        return {
+          arenaClass: stat.bestArenaClass,
+          version: stat.version,
+          at: stat.bestArenaClassAt ?? null,
+        };
+      return order.indexOf(stat.bestArenaClass) < order.indexOf(best.arenaClass)
+        ? {
+            arenaClass: stat.bestArenaClass,
+            version: stat.version,
+            at: stat.bestArenaClassAt ?? null,
+          }
+        : best;
+    }, null);
+  }, [profile.stats]);
 
   return (
     <div className="overflow-hidden rounded-2xl border border-bpim-border bg-bpim-bg/60 shadow-xl backdrop-blur-md lg:sticky lg:top-20">
@@ -149,23 +183,79 @@ export const ProfileSideBar = ({
 
         <Separator className="bg-bpim-surface-2/60" />
 
-        <div className="flex items-center justify-between rounded-xl border border-bpim-border bg-bpim-surface-2/60 px-5 py-4">
-          <div className="flex flex-col gap-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-bpim-muted">
-              アリーナランク
-            </span>
-            <Badge className="w-fit border-none bg-orange-800 px-3 py-1 text-md text-white shadow-md">
-              {profile.current?.arenaRank || "N/A"}
-            </Badge>
+        <div className="flex flex-col gap-0 rounded-xl border border-bpim-border bg-bpim-surface-2/60 overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3">
+            <div className="flex flex-col gap-1.5">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-bpim-muted">
+                現在のアリーナクラス
+              </span>
+              <ArenaClassBadge arenaClass={current?.arenaClass} contained />
+            </div>
+            <div className="flex flex-col items-end gap-0.5">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-bpim-muted">
+                総合BPI
+              </span>
+              <span className="font-mono text-2xl font-black leading-none text-bpim-primary">
+                {current?.totalBpi?.toFixed(2) ?? "N/A"}
+              </span>
+            </div>
           </div>
-          <div className="flex flex-col items-end gap-0.5">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-bpim-muted">
-              総合BPI
-            </span>
-            <span className="font-mono text-lg leading-none text-bpim-primary">
-              {profile.current?.totalBpi?.toFixed(2) ?? "N/A"}
-            </span>
-          </div>
+
+          {hasDetails && (
+            <div className="grid grid-cols-3 divide-x divide-bpim-border border-t border-bpim-border">
+              {allTimeBest ? (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex flex-col items-center gap-0.5 px-2 py-2.5 cursor-default">
+                        <span className="text-[9px] font-bold uppercase tracking-widest text-bpim-muted">
+                          最高クラス
+                        </span>
+                        <ArenaClassBadge
+                          arenaClass={allTimeBest.arenaClass}
+                          size="sm"
+                        />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">
+                      <span className="font-mono text-center">
+                        IIDX {allTimeBest.version}
+                        {allTimeBest.at
+                          ? ` · ${dayjs(allTimeBest.at).format("YYYY-MM-DD")}`
+                          : ""}
+                        <br />
+                        <small>
+                          ※その日中に過去最高ランクから降格した場合、データが記録されません
+                        </small>
+                      </span>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              ) : (
+                <div />
+              )}
+              <div className="flex flex-col items-center gap-0.5 px-2 py-2.5">
+                <span className="text-[9px] font-bold uppercase tracking-widest text-bpim-muted">
+                  エリア
+                </span>
+                <span className="text-xs text-bpim-text">
+                  {current?.area ?? "-"}
+                </span>
+              </div>
+              <div className="flex flex-col items-center gap-0.5 px-2 py-2.5">
+                <span className="text-[9px] font-bold uppercase tracking-widest text-bpim-muted">
+                  段位 SP/DP
+                </span>
+                <span className="text-xs text-bpim-text">
+                  {current?.gradeSp ? `${current.gradeSp}` : "-"}
+                  &nbsp;/&nbsp;
+                  {current?.gradeDp && current.gradeDp !== "---"
+                    ? `${current.gradeDp}`
+                    : "-"}
+                </span>
+              </div>
+            </div>
+          )}
         </div>
 
         <Collapsible open={historyOpen} onOpenChange={setHistoryOpen}>
@@ -178,13 +268,13 @@ export const ProfileSideBar = ({
             />
           </CollapsibleTrigger>
           <CollapsibleContent className="pt-2">
-            <BpiHistoryTable history={profile.history} />
+            <BpiHistoryTable stats={profile.stats} />
           </CollapsibleContent>
         </Collapsible>
-        {profile.current?.updatedAt && (
+        {profile.stats[0]?.updatedAt && (
           <p className="mt-3 text-center text-[11px] text-muted-foreground/60">
             最終更新:{" "}
-            {dayjs(profile.current.updatedAt).format("YYYY-MM-DD HH:mm:ss")}
+            {dayjs(profile.stats[0].updatedAt).format("YYYY-MM-DD HH:mm:ss")}
           </p>
         )}
       </div>

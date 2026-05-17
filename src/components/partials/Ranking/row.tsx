@@ -1,9 +1,9 @@
 import { Lock } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { getBpiColorStyle } from "@/constants/bpiColor";
 import type { RankingEntry } from "@/types/users/ranking";
+import { ArenaClassBadge } from "@/components/partials/ArenaClassBadge";
 
 interface RankingRowProps {
   entry: RankingEntry;
@@ -52,10 +52,8 @@ export const RankingRow = ({ entry, onClick, style }: RankingRowProps) => {
         >
           {isPrivate ? "非公開ユーザー" : entry.userName}
         </span>
-        {!isPrivate && entry.arenaRank && (
-          <Badge className="mt-0.5 h-3.5 bg-orange-600 px-1 text-[9px] font-bold text-white">
-            {entry.arenaRank}
-          </Badge>
+        {!isPrivate && entry.arenaClass && (
+          <ArenaClassBadge arenaClass={entry.arenaClass} size="sm" />
         )}
       </div>
 

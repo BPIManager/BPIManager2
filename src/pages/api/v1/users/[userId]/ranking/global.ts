@@ -5,6 +5,8 @@ import { statsRepo } from "@/lib/db/stats";
 import { calculateRadar } from "@/lib/radar/calculator";
 import { latestVersion, IIDX_VERSIONS } from "@/constants/latestVersion";
 import { v4 as uuidv4 } from "uuid";
+import { JAPAN_PREFECTURES } from "@/constants/japanPrefectures";
+import { ARENA_RANK_ORDER } from "@/constants/arenaRanks";
 
 const RADAR_CATEGORIES = [
   "notes",
@@ -41,9 +43,31 @@ export default async function handler(
     isRadarCategory && version === latestVersion ? rawCategory : "totalBpi";
   const effectiveRadarCategory = category !== "totalBpi";
 
+  const rawArea = String(req.query.area ?? "");
+  const filterArea = (JAPAN_PREFECTURES as readonly string[]).includes(rawArea)
+    ? rawArea
+    : undefined;
+
+  const rawArenaClass = String(req.query.arenaClass ?? "");
+  const filterArenaClass = (ARENA_RANK_ORDER as readonly string[]).includes(
+    rawArenaClass,
+  )
+    ? rawArenaClass
+    : undefined;
+
+  // フィルタは totalBpi カテゴリのみ有効
+  const effectiveFilterArea = category === "totalBpi" ? filterArea : undefined;
+  const effectiveFilterArenaClass =
+    category === "totalBpi" ? filterArenaClass : undefined;
+
   try {
     const [users, viewerScores] = await Promise.all([
-      usersRepo.getGlobalRanking(version, category),
+      usersRepo.getGlobalRanking(
+        version,
+        category,
+        effectiveFilterArea,
+        effectiveFilterArenaClass,
+      ),
       statsRepo.getLatestScoresWithMusicData(viewerId, latestVersion),
     ]);
 
@@ -55,15 +79,24 @@ export default async function handler(
         ? Number(radarRow[category as RadarCategory] ?? -15)
         : Number(u.totalBpi ?? -15);
 
+      const filteredRow = u as typeof u & {
+        showArea?: number;
+        showArenaClass?: number;
+      };
+      const isAreaPublic = !effectiveFilterArea || filteredRow.showArea === 1;
+      const isArenaClassPublic =
+        !effectiveFilterArenaClass || filteredRow.showArenaClass !== 0;
+      const isIdentityVisible = u.isPublic && isAreaPublic && isArenaClassPublic;
+
       return {
         rank: i + 1,
-        userId: u.isPublic ? u.userId : uuidv4(),
-        userName: u.isPublic ? u.userName : "-",
-        profileImage: u.isPublic ? u.profileImage : "",
+        userId: isIdentityVisible ? u.userId : uuidv4(),
+        userName: isIdentityVisible ? u.userName : "非公開ユーザー",
+        profileImage: isIdentityVisible ? u.profileImage : null,
         isPublic: u.isPublic,
-        iidxId: u.isPublic ? u.iidxId : "",
+        iidxId: isIdentityVisible ? u.iidxId : null,
         totalBpi: rankValue,
-        arenaRank: u.isPublic ? (u.arenaRank ?? null) : "",
+        arenaClass: isIdentityVisible ? (u.arenaClass ?? null) : null,
         isSelf: u.userId === viewerId,
       };
     });

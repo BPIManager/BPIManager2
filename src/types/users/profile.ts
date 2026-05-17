@@ -4,19 +4,32 @@ export interface UserRoleInfo {
   grantedAt: string | Date;
 }
 
-export interface UserProfileHistory {
-  version: string;
-  totalBpi: number | null;
-  arenaRank: string;
-  updatedAt: string | Date;
-}
-
 export interface UserRelationship {
   isFollowing: boolean;
   isFollowed: boolean;
   isSelf: boolean;
   isMutual: boolean;
   isFollowedBy: boolean;
+}
+
+export interface StatEntry {
+  version: string;
+  arenaClass: string | null;
+  arenaRank: number | null;
+  area: string | null;
+  gradeSp: string | null;
+  gradeDp: string | null;
+  totalBpi: number | null;
+  updatedAt: Date | string | null;
+  bestArenaClass: string | null;
+  bestArenaClassAt: Date | string | null;
+}
+
+export interface StatsPrivacySettings {
+  showArenaClass: boolean;
+  showArenaRank: boolean;
+  showArea: boolean;
+  showGrade: boolean;
 }
 
 export interface UserProfileData {
@@ -28,13 +41,12 @@ export interface UserProfileData {
   xId: string | null;
   isPublic: number;
   role: UserRoleInfo | null;
-  history: UserProfileHistory[];
-  current: UserProfileHistory | null;
   follows: {
     following: number;
     followers: number;
   };
   relationship: UserRelationship;
+  stats: StatEntry[];
 }
 
 export interface UserProfileCompare {
@@ -58,4 +70,5 @@ export interface UserProfileCompare {
 export interface UserProfileResponse {
   profile: UserProfileData;
   compare?: UserProfileCompare;
+  statsPrivacy?: StatsPrivacySettings;
 }
