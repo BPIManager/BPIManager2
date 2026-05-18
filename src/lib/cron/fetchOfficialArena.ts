@@ -138,9 +138,7 @@ async function fetchGrade(
       seen.set(p.id, p);
     }
     if (seen.size === beforeSize) {
-      console.log(
-        `[fetchGrade] Duplicate page detected at page=${page}, stopping.`,
-      );
+      console.log(`[fetchGrade] Duplicate page detected at page=${page}, stopping.`);
       break;
     }
 
@@ -237,10 +235,7 @@ export async function fetchOfficialArenaDistribution(
   // eagate全プレイヤーのランク分布（カバー率の分母）
   const allPlayersCountMap = new Map<string, number>();
   for (const arenaClass of playerClassMap.values()) {
-    allPlayersCountMap.set(
-      arenaClass,
-      (allPlayersCountMap.get(arenaClass) ?? 0) + 1,
-    );
+    allPlayersCountMap.set(arenaClass, (allPlayersCountMap.get(arenaClass) ?? 0) + 1);
   }
   const distribution = ARENA_RANK_ORDER.map((rank) => ({
     rank,
