@@ -18,7 +18,11 @@ import { toast } from "sonner";
 const BOOKMARKLET_CODE =
   "javascript:(function(){var s=document.createElement('script');s.src='https://bpi2.poyashi.me/bookmarklet.js?t='+Date.now();document.body.appendChild(s);})();";
 
-export const BookmarkletAccordion = () => {
+interface BookmarkletAccordionProps {
+  lastStep?: React.ReactNode;
+}
+
+export const BookmarkletAccordion = ({ lastStep }: BookmarkletAccordionProps = {}) => {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -36,13 +40,16 @@ export const BookmarkletAccordion = () => {
     </a>
   );
 
+  const defaultLastStep = <>このページに戻り、「インポートを開始」ボタンをクリックします。</>;
+  const finalStep = lastStep ?? defaultLastStep;
+
   const desktopSteps = [
     <>
       下のボタンをブラウザのブックマークバーにドラッグ＆ドロップして登録します。
     </>,
     <>{iidxLink}を開きます。</>,
     <>登録したブックマークレットをクリックして実行します。</>,
-    <>このページに戻り、「インポートを開始」ボタンをクリックします。</>,
+    finalStep,
   ];
 
   const mobileSteps = [
@@ -51,7 +58,7 @@ export const BookmarkletAccordion = () => {
       ブラウザで任意のページをブックマークし、そのブックマークを編集してURLをコピーしたコードに書き換えます。
     </>,
     <>{iidxLink}を開き、アドレスバーにブックマーク名を入力して実行します。</>,
-    <>このページに戻り、「インポートを開始」ボタンをクリックします。</>,
+    finalStep,
   ];
 
   const steps = isMobile ? mobileSteps : desktopSteps;

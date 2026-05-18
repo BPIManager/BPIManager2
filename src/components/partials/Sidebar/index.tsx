@@ -32,6 +32,7 @@ import {
   Table,
   Swords,
   BarChart2,
+  Ticket,
 } from "lucide-react";
 
 import { useUser } from "@/contexts/users/UserContext";
@@ -91,6 +92,11 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
       label: "全曲（☆10以下含む）",
       icon: ListIcon,
       href: `/my/all/${latestVersion}`,
+    },
+    {
+      label: "ランダムレーンチケット",
+      icon: Ticket,
+      href: "/tickets",
     },
   ];
 

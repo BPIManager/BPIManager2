@@ -3,14 +3,10 @@ import { RadarSectionChart } from "@/components/partials/DashBoard/Radar/index";
 import { DifficultyBadge } from "@/components/partials/Songs/DifficultyBadge";
 import { SONG_ATTRIBUTES } from "@/constants/songAttributes";
 import { buildRadarData } from "@/utils/songs/songListFilter";
+import { buildTextageUrl, buildChartViewerUrl } from "@/utils/songs/links";
 import type { SongListItem } from "@/types/songs/songInfo";
 
 // ---- helpers ----------------------------------------------------------------
-
-function buildTextageUrl(song: SongListItem, side: 1 | 2): string | null {
-  if (!song.textage) return null;
-  return `https://textage.cc/score/${song.textage.replace("?1", "?" + side)}`;
-}
 
 function buildYouTubeUrl(song: SongListItem): string {
   const sanitizedTitle = song.title.replace(/-/g, "");
@@ -25,8 +21,9 @@ interface SongMetaCardProps {
 }
 
 export function SongMetaCard({ song }: SongMetaCardProps) {
-  const textage1pUrl = useMemo(() => buildTextageUrl(song, 1), [song]);
-  const textage2pUrl = useMemo(() => buildTextageUrl(song, 2), [song]);
+  const textage1pUrl = useMemo(() => buildTextageUrl(song.textage, 1), [song]);
+  const textage2pUrl = useMemo(() => buildTextageUrl(song.textage, 2), [song]);
+  const chartViewerUrl = useMemo(() => buildChartViewerUrl(song.textage, song.difficulty), [song]);
   const youtubeUrl = useMemo(() => buildYouTubeUrl(song), [song]);
 
   const barItems = useMemo(
@@ -75,6 +72,16 @@ export function SongMetaCard({ song }: SongMetaCardProps) {
                   2P
                 </a>
               </div>
+            )}
+            {chartViewerUrl && (
+              <a
+                href={chartViewerUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest border border-bpim-border bg-bpim-overlay/40 text-bpim-muted hover:text-bpim-text hover:bg-bpim-overlay transition-colors"
+              >
+                Chart Viewer
+              </a>
             )}
             <a
               href={youtubeUrl}
