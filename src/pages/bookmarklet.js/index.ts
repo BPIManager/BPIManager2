@@ -12,7 +12,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   }
 
   const script = await fetch(
-    "https://raw.githubusercontent.com/BPIManager/IIDX-Scraping-Bookmarklet/refs/heads/main/dist/bookmarklet.min.js",
+    "https://raw.githubusercontent.com/BPIManager/IIDX-Scraping-Bookmarklet/refs/heads/main/dist/bookmarklet.min.js?q=" +
+      Math.random(),
   );
   const body = await script.text();
 
