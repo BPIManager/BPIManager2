@@ -32,6 +32,12 @@ export interface StatsPrivacySettings {
   showGrade: boolean;
 }
 
+export interface AreaRankInfo {
+  area: string;
+  areaRank: number;
+  totalInArea: number;
+}
+
 export interface UserProfileData {
   userId: string;
   userName: string;
@@ -47,6 +53,7 @@ export interface UserProfileData {
   };
   relationship: UserRelationship;
   stats: StatEntry[];
+  areaRank: AreaRankInfo | null;
 }
 
 export interface UserProfileCompare {

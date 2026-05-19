@@ -7,6 +7,7 @@ import { AccessResult } from "@/middlewares/api/withApi";
 import { parseBody } from "@/services/nextRequest/parseBody";
 import { profileUpsertSchema } from "@/schemas/profile/upsert";
 import { upsertStatsPrivacy } from "@/lib/db/statsPrivacy";
+import { getUserAreaRank, AreaRankInfo } from "@/lib/arena/prefectureRankings";
 
 /**
  * プロフィール取得 API のレスポンス型。
@@ -14,9 +15,10 @@ import { upsertStatsPrivacy } from "@/lib/db/statsPrivacy";
  */
 type ProfileSummary = NonNullable<Awaited<ReturnType<typeof usersRepo.getUserProfileSummary>>>;
 type ProfileSummaryWithoutPrivacy = Omit<ProfileSummary, "statsPrivacy">;
+type ProfileWithAreaRank = ProfileSummaryWithoutPrivacy & { areaRank: AreaRankInfo | null };
 
 interface ProfileResponse {
-  profile: ProfileSummaryWithoutPrivacy | null;
+  profile: ProfileWithAreaRank | null;
   compare?: {
     winLoss: Awaited<ReturnType<typeof socialRepo.getWinLossStats>> | null;
     radar: Record<string, number> | null;
@@ -72,7 +74,9 @@ export async function handleGetProfile(
   const isSelf = viewerId === uid;
   const { statsPrivacy, ...profileData } = profile;
 
-  const response: ProfileResponse = { profile: profileData };
+  const areaRank = getUserAreaRank(profileData.iidxId);
+
+  const response: ProfileResponse = { profile: { ...profileData, areaRank } };
   if (isCompare) {
     response.compare = {
       winLoss,
