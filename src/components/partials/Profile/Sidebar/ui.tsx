@@ -16,6 +16,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { AreaRankBadge } from "@/components/ui/area-rank-badge";
 import { FollowSection } from "./followStatus";
 import { FollowStats } from "./followCount";
 import { formatIIDXId } from "@/utils/common/formatIidxId";
@@ -30,7 +31,6 @@ import {
   Code2,
   Trophy,
   Sparkle,
-  MapPin,
 } from "lucide-react";
 import dayjs from "@/lib/dayjs";
 import { latestVersion } from "@/constants/latestVersion";
@@ -243,28 +243,11 @@ export const ProfileSideBar = ({
                   {current?.area ?? "-"}
                 </span>
                 {profile.areaRank && (
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <span className="mt-1 inline-flex cursor-default items-center gap-0.5 rounded-full bg-bpim-primary/15 px-1.5 py-0.5 text-[9px] font-bold tabular-nums text-bpim-primary">
-                          <MapPin className="h-2.5 w-2.5 shrink-0" />
-                          {profile.areaRank.areaRank}位/
-                          {profile.areaRank.totalInArea}人
-                        </span>
-                      </TooltipTrigger>
-                      <TooltipContent side="bottom">
-                        <span className="text-center text-xs leading-relaxed">
-                          {current?.area}のプレイヤー
-                          {profile.areaRank.totalInArea}
-                          人中
-                          <br />
-                          {profile.areaRank.areaRank}位（B帯以下は集計対象外）
-                          <br />
-                          ※IIDX公式準拠の順位です
-                        </span>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  <AreaRankBadge
+                    area={profile.areaRank.area}
+                    areaRank={profile.areaRank.areaRank}
+                    totalInArea={profile.areaRank.totalInArea}
+                  />
                 )}
               </div>
               <div className="flex h-full flex-col items-center justify-center gap-1 px-2 py-2.5">

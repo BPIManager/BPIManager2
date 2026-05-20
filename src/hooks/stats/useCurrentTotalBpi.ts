@@ -8,6 +8,9 @@ export interface TotalBpiStats {
   estimatedRank: number;
   playedCount: number;
   totalCount: number;
+  area: string | null;
+  areaRank: number | null;
+  totalInArea: number | null;
 }
 
 export const useTotalBpiStats = (

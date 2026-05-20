@@ -18,6 +18,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { DashCard } from "@/components/ui/dashcard";
 import { cn } from "@/lib/utils";
 import type { TotalBpiStats } from "@/hooks/stats/useCurrentTotalBpi";
+import { AreaRankBadge } from "@/components/ui/area-rank-badge";
 import { CurrentBpiSkeleton } from "./skeleton";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { CalendarPicker } from "./calendar";
@@ -33,6 +34,11 @@ interface CurrentBpiCardProps {
   selectedDate: string | null;
   defaultCompareDate?: string;
   onDateSelect: (date: string | null) => void;
+  areaRank?: {
+    area: string | null;
+    areaRank: number | null;
+    totalInArea: number | null;
+  } | null;
 }
 
 export const CurrentBpiCard = ({
@@ -45,6 +51,7 @@ export const CurrentBpiCard = ({
   selectedDate,
   defaultCompareDate,
   onDateSelect,
+  areaRank,
 }: CurrentBpiCardProps) => {
   const [calendarOpen, setCalendarOpen] = useState(false);
   const { version, compareVersion } = useStatsFilter();
@@ -138,19 +145,14 @@ export const CurrentBpiCard = ({
         </Popover>
       </div>
 
-      <div className="mt-4 flex flex-row items-end gap-8">
+      <div className="mt-4 flex flex-row items-start gap-8">
         <div>
-          <span
-            className={cn(
-              "font-mono text-5xl font-bold tabular-nums leading-none tracking-tighter",
-              bpi >= 0 ? "text-bpim-text" : "text-bpim-muted",
-            )}
-          >
+          <span className="font-mono text-5xl font-bold tabular-nums leading-none tracking-tighter text-bpim-text">
             {bpi.toFixed(2)}
           </span>
         </div>
         <div className="flex flex-col gap-1">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-bpim-muted">
+          <span className="text-[10px] font-bold tracking-widest text-bpim-muted">
             推定順位
           </span>
           <span className="text-xl font-bold text-bpim-text">
@@ -158,6 +160,20 @@ export const CurrentBpiCard = ({
             <span className="ml-1 text-sm font-normal text-bpim-muted">位</span>
           </span>
         </div>
+        {areaRank?.areaRank != null &&
+          areaRank.area != null &&
+          areaRank.totalInArea != null && (
+            <div className="flex flex-col gap-1">
+              <span className="text-[10px] font-bold tracking-widest text-bpim-muted">
+                {areaRank.area}
+              </span>
+              <AreaRankBadge
+                area={areaRank.area}
+                areaRank={areaRank.areaRank}
+                totalInArea={areaRank.totalInArea}
+              />
+            </div>
+          )}
       </div>
 
       <div className="mt-5 min-h-10.5">

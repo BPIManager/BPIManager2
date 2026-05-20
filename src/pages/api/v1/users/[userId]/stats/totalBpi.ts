@@ -6,6 +6,9 @@ import { BpiCalculator } from "@/lib/bpi";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { totalBpiSchema } from "@/schemas/stats/totalBpi";
 import { parseQuery } from "@/services/nextRequest/parseBody";
+import { db } from "@/lib/db";
+import { getUserAreaRank } from "@/lib/arena/prefectureRankings";
+import { latestVersion } from "@/constants/latestVersion";
 
 export default async function handler(
   req: NextApiRequest,
@@ -27,12 +30,17 @@ export default async function handler(
             ? dayjs.tz().utc().toDate()
             : dayjs.tz(asOf).endOf("day").utc().toDate();
 
-        const [scores, totalCount] = await Promise.all([
+        const [scores, totalCount, user] = await Promise.all([
           logsRepo.getScoresWithDetails(userId, version, {
             targetTime,
             onlyLastPlayedInRange: { start: new Date(0), end: targetTime },
           }),
           statsRepo.getTotalSongCount([12], []),
+          db
+            .selectFrom("users")
+            .select(["iidxId"])
+            .where("userId", "=", userId)
+            .executeTakeFirst(),
         ]);
 
         const level12Scores = scores.filter(
@@ -44,11 +52,19 @@ export default async function handler(
         const totalBpi = BpiCalculator.calculateTotalBPI(bpis, totalCount);
         const estimatedRank = BpiCalculator.estimateRank(totalBpi);
 
+        const areaRank =
+          version === latestVersion
+            ? getUserAreaRank(user?.iidxId ?? null)
+            : null;
+
         return res.status(200).json({
           totalBpi,
           estimatedRank,
           playedCount: level12Scores.length,
           totalCount,
+          area: areaRank?.area ?? null,
+          areaRank: areaRank?.areaRank ?? null,
+          totalInArea: areaRank?.totalInArea ?? null,
         });
       }
       default:

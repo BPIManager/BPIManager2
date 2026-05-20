@@ -57,6 +57,7 @@ export const CurrentBpiSection = ({ userId }: { userId: string }) => {
       selectedDate={selectedDate}
       defaultCompareDate={defaultCompareDate}
       onDateSelect={setSelectedDate}
+      areaRank={currentStats}
     />
   );
 };
