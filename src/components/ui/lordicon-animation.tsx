@@ -9,7 +9,8 @@ type Props = {
     | "click"
     | "morph"
     | "boomerang"
-    | "loop-on-hover";
+    | "loop-on-hover"
+    | "once";
   size?: number;
   colors?: string;
   className?: string;
@@ -23,19 +24,26 @@ export const LordiconAnimation = ({
   className,
 }: Props) => {
   const initialized = useRef(false);
+  const iconRef = useRef<LordiconElement>(null);
 
   useEffect(() => {
     if (initialized.current) return;
     initialized.current = true;
     import("@lordicon/element").then(({ defineElement }) => {
       defineElement();
+      if (trigger === "once") {
+        const el = iconRef.current;
+        if (!el) return;
+        el.readyPromise.then(() => el.playerInstance?.playFromStart());
+      }
     });
-  }, []);
+  }, [trigger]);
 
   return (
     <lord-icon
+      ref={iconRef as React.RefObject<HTMLElement>}
       src={src}
-      trigger={trigger}
+      trigger={trigger !== "once" ? trigger : undefined}
       colors={colors}
       style={{ width: size, height: size } as React.CSSProperties}
       className={className}
