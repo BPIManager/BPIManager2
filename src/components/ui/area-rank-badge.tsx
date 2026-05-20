@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { MapPin, ExternalLink } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import Link from "next/link";
 import {
   Tooltip,
@@ -126,7 +126,6 @@ export const AreaRankBadge = ({
                   }}
                 />
               ))}
-            <MapPin className="h-2.5 w-2.5 shrink-0" />
             {areaRank}位/{totalInArea}人
           </span>
         </TooltipTrigger>
