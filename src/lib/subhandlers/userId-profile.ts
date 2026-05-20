@@ -162,22 +162,20 @@ export async function upsert(
   if (!data) return;
 
   const { arenaPrivacy, ...profileData } = data;
+  const result = await usersRepo.upsertUserProfile({
+    ...profileData,
+    userId: uid,
+    version: latestVersion,
+    batchId: uuidv4(),
+  });
 
-  const [result] = await Promise.all([
-    usersRepo.upsertUserProfile({
-      ...profileData,
-      userId: uid,
-      version: latestVersion,
-      batchId: uuidv4(),
-    }),
-    arenaPrivacy
-      ? upsertStatsPrivacy(uid, {
-          showArenaClass: arenaPrivacy.showArenaClass ? 1 : 0,
-          showArenaRank: arenaPrivacy.showArenaRank ? 1 : 0,
-          showArea: arenaPrivacy.showArea ? 1 : 0,
-          showGrade: arenaPrivacy.showGrade ? 1 : 0,
-        })
-      : null,
-  ]);
+  if (arenaPrivacy) {
+    await upsertStatsPrivacy(uid, {
+      showArenaClass: arenaPrivacy.showArenaClass ? 1 : 0,
+      showArenaRank: arenaPrivacy.showArenaRank ? 1 : 0,
+      showArea: arenaPrivacy.showArea ? 1 : 0,
+      showGrade: arenaPrivacy.showGrade ? 1 : 0,
+    });
+  }
   return res.status(200).json(result);
 }
