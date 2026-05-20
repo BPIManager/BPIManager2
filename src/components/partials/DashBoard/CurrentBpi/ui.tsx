@@ -145,7 +145,7 @@ export const CurrentBpiCard = ({
         </Popover>
       </div>
 
-      <div className="mt-4 flex flex-row items-start gap-8">
+      <div className="mt-4 flex flex-row items-start gap-4">
         <div>
           <span className="font-mono text-5xl font-bold tabular-nums leading-none tracking-tighter text-bpim-text">
             {bpi.toFixed(2)}
