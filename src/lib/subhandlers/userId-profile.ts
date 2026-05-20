@@ -74,7 +74,10 @@ export async function handleGetProfile(
   const isSelf = viewerId === uid;
   const { statsPrivacy, ...profileData } = profile;
 
-  const areaRank = getUserAreaRank(profileData.iidxId);
+  const areaRank =
+    isSelf || statsPrivacy?.showArea
+      ? getUserAreaRank(profileData.iidxId)
+      : null;
 
   const response: ProfileResponse = { profile: { ...profileData, areaRank } };
   if (isCompare) {
