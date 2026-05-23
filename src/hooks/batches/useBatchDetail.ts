@@ -25,14 +25,16 @@ export const useLogsDetail = (
     batchId,
     date,
     groupedBy,
-  }: { batchId?: string; date?: string; groupedBy?: string },
+    type,
+  }: { batchId?: string; date?: string; groupedBy?: string; type?: "day" | "week" | "month" },
 ) => {
   const groupParam = groupedBy ? `&groupedBy=${groupedBy}` : "";
+  const typeParam = type && type !== "day" ? `&type=${type}` : "";
 
   const endpoint = batchId
     ? `${API_PREFIX}/users/${userId}/batches/${batchId}?version=${version}${groupParam}`
     : date
-      ? `${API_PREFIX}/users/${userId}/batches/${date}/scores?version=${version}${groupParam}`
+      ? `${API_PREFIX}/users/${userId}/batches/${date}/scores?version=${version}${groupParam}${typeParam}`
       : null;
 
   const { fbUser } = useUser();

@@ -40,6 +40,8 @@ export const LogsDetailContent = ({
   const { bpiStep, handleStepFiner, handleStepCoarser } = useBpiStep(5);
 
   const groupedBy = (router.query.groupedBy as string) || "createdAt";
+  const apiType =
+    type === "weekly" ? "week" : type === "monthly" ? "month" : "day";
   const {
     details,
     summary,
@@ -47,7 +49,12 @@ export const LogsDetailContent = ({
     isError,
     overtakenSongs,
     mutate,
-  } = useLogsDetail(userId, version, { batchId, date, groupedBy });
+  } = useLogsDetail(userId, version, {
+    batchId,
+    date,
+    groupedBy,
+    type: apiType,
+  });
   const isLoading = isl || (!details && !isError);
 
   const summaryRef = useRef<HTMLDivElement>(null);
@@ -102,7 +109,10 @@ export const LogsDetailContent = ({
 
   return (
     <div className="flex flex-col gap-6 w-full">
-      <LogNavigator pagination={details.pagination} type={type} />
+      <LogNavigator
+        pagination={details.pagination}
+        type={type as "batch" | "daily" | "weekly" | "monthly"}
+      />
 
       {type === "batch" && details.pagination.dailyBatchIds && (
         <DailyBatchNotice

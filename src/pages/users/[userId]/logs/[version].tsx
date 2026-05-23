@@ -17,10 +17,11 @@ export default function LogsPage() {
   const router = useRouter();
   const { user, isLoading: isUserLoading } = useUser();
 
-  const { userId, version, groupedBy } = router.query;
+  const { userId, version, groupedBy, granularity } = router.query;
   const uid = (userId as string) || "";
   const v = (version as string) || latestVersion;
   const g = (groupedBy as string) || "lastPlayed";
+  const gr = (granularity as string) || "day";
 
   const isOwnedByMe = !isUserLoading && user?.userId === userId;
 
@@ -34,10 +35,10 @@ export default function LogsPage() {
             : "border border-bpim-border bg-bpim-bg/40 p-4 md:p-6 shadow-xl backdrop-blur-md",
         )}
       >
-        <LogFilterSection version={v} groupedBy={g} />
+        <LogFilterSection version={v} groupedBy={g} granularity={gr} />
 
         <div className="mt-6">
-          <LogsList userId={uid} version={v} groupedBy={g} />
+          <LogsList userId={uid} version={v} groupedBy={g} granularity={gr} />
         </div>
       </div>
     </div>

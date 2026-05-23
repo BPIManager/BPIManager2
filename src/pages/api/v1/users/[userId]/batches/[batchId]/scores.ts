@@ -1,4 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
+import dayjs from "@/lib/dayjs";
 import { logsRepo } from "@/lib/db/logs";
 import { statsRepo } from "@/lib/db/stats";
 import { rejectAccess } from "@/middlewares/api/withApi";
@@ -47,9 +48,9 @@ export default async function handler(
     const isOwnLog = access.viewerId === uid;
 
     if (groupedBy === "lastPlayed") {
-      responseData = await handleLastPlayedBase(uid, ver, range, nav, isOwnLog);
+      responseData = await handleLastPlayedBase(uid, ver, range, nav, isOwnLog, type);
     } else {
-      responseData = await handleCreatedAtBase(uid, ver, range, nav, isOwnLog);
+      responseData = await handleCreatedAtBase(uid, ver, range, nav, isOwnLog, type);
     }
 
     return res.status(200).json({
@@ -77,11 +78,14 @@ async function handleLastPlayedBase(
   range: ReturnType<typeof logsRepo.getJstRange>,
   nav: Awaited<ReturnType<typeof logsRepo.getRangeNavigation>>,
   isOwnLog: boolean,
+  type: string = "day",
 ) {
   const [history, totalSongs, dailyScores, overtaken] = await Promise.all([
     statsRepo.getScoreHistory(uid, ver, [], []),
     statsRepo.getTotalSongCount([12], []),
-    logsRepo.getScoresByLastPlayedRange(uid, ver, range),
+    type === "day"
+      ? logsRepo.getScoresByLastPlayedRange(uid, ver, range)
+      : logsRepo.getScoresWithDetails(uid, ver, { onlyLastPlayedInRange: range }),
     isOwnLog
       ? logsRepo.getOvertakenRivals(uid, ver, {
           range: { ...range, basis: "lastPlayed" },
@@ -109,10 +113,22 @@ async function handleLastPlayedBase(
 
   const timeline = calculateTotalBpi(history, totalSongs, ver, 0);
   const currentSnapshot = timeline.find((t) => t.id === range.label);
-
   const currentIndex = timeline.findIndex((t) => t.id === range.label);
-  const prevSnapshot = timeline[currentIndex + 1];
   const nextSnapshot = timeline[currentIndex - 1];
+  // For week/month: find the last snapshot before the period start, not just the adjacent day
+  const prevSnapshot =
+    type === "day"
+      ? timeline[currentIndex + 1]
+      : timeline.find(
+          (t) => t.id < dayjs(range.start).tz().format("YYYY-MM-DD"),
+        );
+
+  // 週・月単位のナビゲーション用に nav の実際の日付を優先して使用する
+  const prevNavDate =
+    (nav.prevDate as { lastPlayed?: Date } | null)?.lastPlayed ?? null;
+  const nextNavDate =
+    (nav.nextDate as { lastPlayed?: Date } | null)?.lastPlayed ?? null;
+
   return {
     songs: dailyScores.map((s) => {
       const mapped = mapToLogNested(s);
@@ -124,20 +140,24 @@ async function handleLastPlayedBase(
     }),
     pagination: {
       prev: {
-        batchId: nav.prevDate || "previous",
-        createdAt: prevSnapshot?.createdAt || null,
-        totalBpi: prevSnapshot?.totalBpi || -15,
+        batchId: prevNavDate
+          ? dayjs(prevNavDate).format("YYYY-MM-DD")
+          : "previous",
+        createdAt: prevNavDate ?? prevSnapshot?.createdAt ?? null,
+        totalBpi: prevSnapshot?.totalBpi ?? -15,
       },
       current: {
         batchId: range.label,
         createdAt: range.end,
-        totalBpi: currentSnapshot?.totalBpi || -15,
+        totalBpi: currentSnapshot?.totalBpi ?? -15,
         label: `${range.label} のプレイ履歴`,
       },
       next: {
-        batchId: nav.nextDate || "next",
-        createdAt: nextSnapshot?.createdAt || null,
-        totalBpi: nextSnapshot?.totalBpi || -15,
+        batchId: nextNavDate
+          ? dayjs(nextNavDate).format("YYYY-MM-DD")
+          : "next",
+        createdAt: nextNavDate ?? nextSnapshot?.createdAt ?? null,
+        totalBpi: nextSnapshot?.totalBpi ?? -15,
       },
       groupedBy: "lastPlayed",
     },
@@ -153,6 +173,7 @@ async function handleCreatedAtBase(
   range: ReturnType<typeof logsRepo.getJstRange>,
   nav: Awaited<ReturnType<typeof logsRepo.getRangeNavigation>>,
   isOwnLog: boolean,
+  type: string = "day",
 ) {
   const batches = await logsRepo.findBatchesInRange(
     uid,
@@ -163,10 +184,14 @@ async function handleCreatedAtBase(
   if (batches.length === 0) throw new Error("No logs found.");
 
   const [scores, overtaken] = await Promise.all([
-    logsRepo.getScoresWithDetails(uid, ver, {
-      batchIds: batches.map((b) => b.batchId),
-      comparisonTime: batches[0].createdAt,
-    }),
+    type === "day"
+      ? logsRepo.getScoresWithDetails(uid, ver, {
+          batchIds: batches.map((b) => b.batchId),
+          comparisonTime: batches[0].createdAt,
+        })
+      : logsRepo.getScoresWithDetails(uid, ver, {
+          batchIds: batches.map((b) => b.batchId),
+        }),
     isOwnLog
       ? logsRepo.getOvertakenRivals(uid, ver, {
           range: { ...range, basis: "createdAt" },

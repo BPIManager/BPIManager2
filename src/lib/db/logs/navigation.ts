@@ -14,10 +14,12 @@ class LogNavigationRepository {
    */
   getJstRange(dateString: string, unit: "day" | "week" | "month" = "day") {
     const baseDate = dayjs.tz(dateString);
+    const startFn = unit === "week" ? "isoWeek" : unit;
+    const endFn = unit === "week" ? "isoWeek" : unit;
 
     return {
-      start: baseDate.startOf(unit).utc().toDate(),
-      end: baseDate.endOf(unit).utc().toDate(),
+      start: baseDate.startOf(startFn as Parameters<typeof baseDate.startOf>[0]).utc().toDate(),
+      end: baseDate.endOf(endFn as Parameters<typeof baseDate.endOf>[0]).utc().toDate(),
       label: baseDate.format("YYYY-MM-DD"),
       unit,
     };
@@ -181,6 +183,35 @@ class LogNavigationRepository {
       .where("createdAt", "<=", end)
       .orderBy("createdAt", "asc")
       .execute();
+  }
+  async getPreviousVersionWithScores(
+    userId: string,
+    currentVersion: string,
+  ): Promise<string | null> {
+    const versionsOrder = [
+      "26", "27", "28", "29", "30", "31", "32", "33", "INF",
+    ];
+    const currentIdx = versionsOrder.indexOf(currentVersion);
+    if (currentIdx <= 0) return null;
+
+    const previousVersions = versionsOrder.slice(0, currentIdx);
+
+    const rows = await db
+      .selectFrom("scores")
+      .select("version")
+      .where("userId", "=", userId)
+      .where("version", "in", previousVersions)
+      .distinct()
+      .execute();
+
+    const availableVersions = new Set(rows.map((r) => r.version));
+
+    for (let i = currentIdx - 1; i >= 0; i--) {
+      if (availableVersions.has(versionsOrder[i])) {
+        return versionsOrder[i];
+      }
+    }
+    return null;
   }
 }
 

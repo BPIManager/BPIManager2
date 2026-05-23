@@ -29,6 +29,7 @@ export default function UserPage({ defaultView = "overview" }: UserPageProps) {
   const userId = router.query.userId as string;
   const version = (router.query.version as string) || latestVersion;
   const groupedBy = (router.query.groupedBy as string) || "lastPlayed";
+  const granularity = (router.query.granularity as string) || "day";
   const [_nodata, setNodata] = useState<boolean>(false);
 
   if (!userId) return null;
@@ -85,12 +86,13 @@ export default function UserPage({ defaultView = "overview" }: UserPageProps) {
       <TabsContent value="logs" className="mt-0 border-none p-0 outline-none">
         {defaultView === "logs" && (
           <div className="rounded-2xl border border-bpim-border bg-bpim-bg/40 p-4 md:p-6 shadow-xl backdrop-blur-md">
-            <LogFilterSection version={version} groupedBy={groupedBy as any} />
+            <LogFilterSection version={version} groupedBy={groupedBy} granularity={granularity} />
             <div className="mt-6">
               <LogsList
                 userId={userId}
                 version={version}
-                groupedBy={groupedBy as any}
+                groupedBy={groupedBy}
+                granularity={granularity}
               />
             </div>
           </div>

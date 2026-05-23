@@ -1,4 +1,4 @@
-﻿import { useRouter } from "next/router";
+import { useRouter } from "next/router";
 import dayjs from "@/lib/dayjs";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -24,10 +24,24 @@ export const LogNavigator = ({ type, pagination }: LogNavigatorProps) => {
   const router = useRouter();
 
   const formatDateLabel = (dateString: string) => {
-    if (type === "daily") {
-      return dayjs(dateString).tz().format("M月D日");
+    if (type === "daily") return dayjs(dateString).tz().format("M月D日");
+    if (type === "weekly") {
+      const d = dayjs(dateString).tz();
+      return `${d.startOf("isoWeek").format("M/D")}〜${d.endOf("isoWeek").format("M/D")}`;
     }
+    if (type === "monthly") return dayjs(dateString).tz().format("YYYY年M月");
     return dayjs(dateString).tz().format("M/D HH:mm");
+  };
+
+  const formatCurrentLabel = (dateString: string | null) => {
+    if (!dateString) return "-";
+    if (type === "weekly") {
+      const d = dayjs(dateString).tz();
+      return `${d.startOf("isoWeek").format("M月D日")}〜${d.endOf("isoWeek").format("M月D日")}`;
+    }
+    if (type === "monthly") return dayjs(dateString).tz().format("YYYY年M月");
+    if (type === "daily") return dayjs(dateString).tz().format("M月D日");
+    return dayjs(dateString).tz().format("M月D日 HH:mm");
   };
 
   const navigateTo = (target: string) => {
@@ -36,9 +50,7 @@ export const LogNavigator = ({ type, pagination }: LogNavigatorProps) => {
       query.batchId = target;
     } else {
       query.date = target;
-      query.groupedBy = "lastPlayed";
     }
-
     router.push({ pathname: router.pathname, query }, undefined, {
       shallow: true,
     });
@@ -65,9 +77,30 @@ export const LogNavigator = ({ type, pagination }: LogNavigatorProps) => {
     ? formatDateLabel(pagination.next.createdAt)
     : "-";
 
-  const currentLabel = dayjs(pagination.current.createdAt)
-    .tz()
-    .format("M月D日 HH:mm");
+  const prevUnitLabel =
+    type === "batch"
+      ? "PREVIOUS BATCH"
+      : type === "weekly"
+        ? "PREVIOUS WEEK"
+        : type === "monthly"
+          ? "PREVIOUS MONTH"
+          : "PREVIOUS DAY";
+  const nextUnitLabel =
+    type === "batch"
+      ? "NEXT BATCH"
+      : type === "weekly"
+        ? "NEXT WEEK"
+        : type === "monthly"
+          ? "NEXT MONTH"
+          : "NEXT DAY";
+  const currentUnitLabel =
+    type === "batch"
+      ? "更新日時"
+      : type === "weekly"
+        ? "対象週"
+        : type === "monthly"
+          ? "対象月"
+          : "対象日";
 
   return (
     <nav className="mb-4 flex w-full items-center justify-between gap-0 rounded-xl border border-bpim-border bg-bpim-bg p-2">
@@ -85,7 +118,7 @@ export const LogNavigator = ({ type, pagination }: LogNavigatorProps) => {
           <ChevronLeft className="h-5 w-5 shrink-0" />
           <div className="ml-2 hidden flex-col items-start gap-0 md:flex">
             <span className="text-[10px] tracking-tighter text-bpim-subtle uppercase">
-              {type === "batch" ? "PREVIOUS BATCH" : "PREVIOUS DAY"}
+              {prevUnitLabel}
             </span>
             <span className="text-xs font-bold leading-tight">{prevLabel}</span>
           </div>
@@ -94,10 +127,10 @@ export const LogNavigator = ({ type, pagination }: LogNavigatorProps) => {
 
       <div className="flex flex-col items-center gap-0 px-4 text-center shrink-0">
         <span className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
-          {type === "batch" ? "更新日時" : "対象日"}
+          {currentUnitLabel}
         </span>
         <span className="font-mono text-sm font-bold text-bpim-text whitespace-nowrap">
-          {currentLabel}
+          {formatCurrentLabel(pagination.current.createdAt)}
         </span>
       </div>
 
@@ -114,7 +147,7 @@ export const LogNavigator = ({ type, pagination }: LogNavigatorProps) => {
         >
           <div className="mr-2 hidden flex-col items-end gap-0 md:flex">
             <span className="text-[10px] tracking-tighter text-bpim-subtle uppercase">
-              {type === "batch" ? "NEXT BATCH" : "NEXT DAY"}
+              {nextUnitLabel}
             </span>
             <span className="text-xs font-bold leading-tight">{nextLabel}</span>
           </div>

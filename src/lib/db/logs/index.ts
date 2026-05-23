@@ -41,4 +41,5 @@ export const logsRepo = {
   getTimelineByBatches: timelineRepo.getTimelineByBatches.bind(timelineRepo),
   getBestEverScores: timelineRepo.getBestEverScores.bind(timelineRepo),
   getSelfVersionScores: timelineRepo.getSelfVersionScores.bind(timelineRepo),
+  getPreviousVersionWithScores: navigationRepo.getPreviousVersionWithScores.bind(navigationRepo),
 };

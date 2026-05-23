@@ -1,9 +1,16 @@
 ﻿import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { RankItem } from "./item";
 import { useLogRank } from "@/hooks/batches/useLogRank";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { SongDetailView } from "../../Modal/BPIChart/SongDetails/ui";
 import { OvertakeRankItem } from "../LogOvertaken/item";
 import type { BatchDetailItem } from "@/types/logs/batchDetail";
@@ -47,8 +54,31 @@ export const LogRank = ({
 }) => {
   const [selectedSong, setSelectedSong] = useState<SongWithScore | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState<boolean>(false);
+  const [selectedRivalId, setSelectedRivalId] = useState<string>("");
 
   const config = RANK_CONFIG[type];
+
+  const allRivals = useMemo(() => {
+    if (type !== "overtake") return [];
+    const map = new Map<string, string>();
+    for (const d of details) {
+      for (const r of d.overtaken ?? []) {
+        map.set(r.rivalUserId, r.rivalName);
+      }
+    }
+    return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
+  }, [details, type]);
+
+  const filteredDetails = useMemo(() => {
+    if (type !== "overtake" || !selectedRivalId) return details;
+    return details.map((d) => ({
+      ...d,
+      overtaken: (d.overtaken ?? []).filter(
+        (r) => r.rivalUserId === selectedRivalId,
+      ),
+    }));
+  }, [details, type, selectedRivalId]);
+
   const {
     visibleSongs,
     hasMore,
@@ -57,7 +87,7 @@ export const LogRank = ({
     hideNewRecords,
     setHideNewRecords,
     setDisplayLimit,
-  } = useLogRank(details, type);
+  } = useLogRank(filteredDetails, type);
 
   const handleOpenDetail = (item: BatchDetailItem) => {
     const mappedSong = {
@@ -105,6 +135,31 @@ export const LogRank = ({
           </div>
         )}
       </div>
+
+      {type === "overtake" && allRivals.length > 0 && (
+        <Select
+          value={selectedRivalId}
+          onValueChange={(v) => {
+            const isAll = v === "all";
+            setSelectedRivalId(isAll ? "" : v);
+            setDisplayLimit(isAll ? 5 : 99999);
+          }}
+        >
+          <SelectTrigger className="h-8 w-full text-xs bg-bpim-surface-2 border-bpim-border text-bpim-text">
+            <SelectValue placeholder="すべて" />
+          </SelectTrigger>
+          <SelectContent className="bg-bpim-surface-2 border-bpim-border text-bpim-text">
+            <SelectItem value="all" className="text-xs">
+              すべて（{details.filter((d) => (d.overtaken ?? []).length > 0).length}件）
+            </SelectItem>
+            {allRivals.map((r) => (
+              <SelectItem key={r.id} value={r.id} className="text-xs">
+                {r.name}（{details.filter((d) => (d.overtaken ?? []).some((o) => o.rivalUserId === r.id)).length}件）
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
 
       <div className="flex flex-col overflow-hidden rounded-xl border border-bpim-border bg-bpim-bg">
         {visibleSongs.length === 0 ? (

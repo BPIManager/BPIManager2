@@ -9,9 +9,11 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import relativeTime from "dayjs/plugin/relativeTime";
+import isoWeek from "dayjs/plugin/isoWeek";
 import "dayjs/locale/ja";
 
 dayjs.extend(relativeTime);
+dayjs.extend(isoWeek);
 dayjs.locale("ja");
 dayjs.extend(utc);
 dayjs.extend(timezone);

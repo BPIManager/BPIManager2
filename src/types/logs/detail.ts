@@ -3,6 +3,6 @@ export interface LogsDetailViewProps {
   version: string | undefined;
   batchId?: string;
   date?: string;
-  type: "batch" | "daily" | "weekly" | "monthly";
+  type: "batch" | "daily" | "weekly" | "monthly" | "version";
   isPublicPage?: boolean;
 }
