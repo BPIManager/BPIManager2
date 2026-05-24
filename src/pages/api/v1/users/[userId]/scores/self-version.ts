@@ -4,6 +4,13 @@ import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { selfVersionComparisonQuerySchema } from "@/schemas/scores/query";
 import z from "zod";
 import { parseQuery } from "@/services/nextRequest/parseBody";
+import topElements from "@/constants/radars/topElements.json";
+
+const radarLookup = new Map<string, string>(
+  (topElements as { title: string; difficulty: string; top: string }[]).map(
+    (e) => [`${e.title}__${e.difficulty}`, e.top],
+  ),
+);
 
 async function handleGetSelfVersion(
   res: NextApiResponse,
@@ -70,6 +77,7 @@ async function handleGetSelfVersion(
         myBpi !== null && prevBpi !== null
           ? Math.round((myBpi - prevBpi) * 100) / 100
           : undefined,
+      radarTop: radarLookup.get(`${row.title}__${row.difficulty}`) ?? null,
     };
   });
 

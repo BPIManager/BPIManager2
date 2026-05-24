@@ -5,6 +5,13 @@ import { sortSongs } from "@/utils/songs/sort";
 import { NextApiRequest, NextApiResponse } from "next";
 import { parseQuery } from "@/services/nextRequest/parseBody";
 import { rivalScoresQuerySchema } from "@/schemas/rivals/query";
+import topElements from "@/constants/radars/topElements.json";
+
+const radarLookup = new Map<string, string>(
+  (topElements as { title: string; difficulty: string; top: string }[]).map(
+    (e) => [`${e.title}__${e.difficulty}`, e.top],
+  ),
+);
 
 export default async function handler(
   req: NextApiRequest,
@@ -78,6 +85,8 @@ export default async function handler(
                 ? row.myLastPlayed
                 : row.rivalLastPlayed
               : row.myLastPlayed || row.rivalLastPlayed || null,
+          radarTop:
+            radarLookup.get(`${row.title}__${row.difficulty}`) ?? null,
         };
       })
       .filter((song) => song.exScore !== null || song.rival.exScore !== null);

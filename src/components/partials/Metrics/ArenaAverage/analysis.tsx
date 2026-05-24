@@ -433,7 +433,7 @@ export const ArenaAnalysis = ({
           maxAbsBpi={maxAbsBpi}
         />
         <BpiRankingList
-          title="BPI 下位 10 曲（苦手傾向）"
+          title="BPI 下位 10 曲"
           songs={bottomSongs}
           maxAbsBpi={maxAbsBpi}
           reverse

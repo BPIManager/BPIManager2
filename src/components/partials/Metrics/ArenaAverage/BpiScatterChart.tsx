@@ -18,11 +18,11 @@ import { ALL_RADAR_CATEGORIES, RADAR_COLORS } from "@/constants/radars";
 const ScatterTooltip = ({
   active,
   payload,
-  rank,
+  xLabel,
 }: {
   active?: boolean;
   payload?: { payload: ScatterPoint }[];
-  rank: string;
+  xLabel: string;
 }) => {
   if (!active || !payload?.length) return null;
   const d = payload[0].payload;
@@ -32,7 +32,7 @@ const ScatterTooltip = ({
       <p className="font-bold text-bpim-text">{d.title}</p>
       <p className="text-bpim-muted">{d.difficulty}</p>
       <p className="mt-1 font-mono text-bpim-muted">
-        {rank}平均BPI:{" "}
+        {xLabel}:{" "}
         <span className="text-bpim-text">{d.bpi.toFixed(2)}</span>
       </p>
       <p className="font-mono text-bpim-muted">
@@ -60,6 +60,10 @@ interface BpiScatterChartProps {
   selectedCategories: Set<RadarCategory>;
   user: { userId: string } | null | undefined;
   userLoading: boolean;
+  /** カードタイトルの上書き（省略時: "{rank} 平均BPI vs 自分のBPI"）*/
+  title?: string;
+  /** X軸・ツールチップのラベル上書き（省略時: "{rank}平均BPI"）*/
+  xLabel?: string;
 }
 
 export const BpiScatterChart = ({
@@ -70,10 +74,15 @@ export const BpiScatterChart = ({
   selectedCategories,
   user,
   userLoading,
-}: BpiScatterChartProps) => (
+  title,
+  xLabel,
+}: BpiScatterChartProps) => {
+  const resolvedXLabel = xLabel ?? `${rank}平均BPI`;
+  const resolvedTitle = title ?? `${rank} 平均BPI vs 自分のBPI`;
+  return (
   <div className="rounded-xl border border-bpim-border bg-bpim-bg p-5 shadow-sm">
     <h3 className="mb-1 text-[10px] font-black uppercase tracking-widest text-bpim-muted">
-      {rank} 平均BPI vs 自分のBPI
+      {resolvedTitle}
     </h3>
     <p className="mb-4 text-[10px] text-bpim-muted">
       対角線より上 = このランク平均を上回っている曲 / 下 = 下回っている曲
@@ -94,11 +103,11 @@ export const BpiScatterChart = ({
             <XAxis
               dataKey="bpi"
               type="number"
-              name={`${rank}平均BPI`}
+              name={resolvedXLabel}
               domain={axisDomain}
               tick={{ fontSize: 10, fill: "#64748b" }}
               label={{
-                value: `${rank} 平均BPI`,
+                value: resolvedXLabel,
                 position: "insideBottom",
                 offset: -15,
                 fontSize: 10,
@@ -137,7 +146,7 @@ export const BpiScatterChart = ({
                   payload={
                     props.payload as unknown as { payload: ScatterPoint }[] | undefined
                   }
-                  rank={rank}
+                  xLabel={resolvedXLabel}
                 />
               )}
             />
@@ -193,4 +202,5 @@ export const BpiScatterChart = ({
       </div>
     )}
   </div>
-);
+  );
+};

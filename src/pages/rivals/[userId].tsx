@@ -137,6 +137,7 @@ export default function RivalsUserPage({
             myUserId={myUserId}
             rivalUserId={rivalUserId}
             version={version}
+            rivalName={rivalName}
           />
         </div>
       </TabsContent>

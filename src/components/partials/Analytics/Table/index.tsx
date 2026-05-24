@@ -12,8 +12,13 @@ import { CustomPagination } from "@/components/partials/Pagination/ui";
 import { AdvancedFilterModal } from "@/components/partials/Songs/AdvancedFilter/ui";
 import { SongDetailView } from "@/components/partials/Modal/BPIChart/SongDetails/ui";
 import { RivalSongItem } from "@/components/partials/Rivals/Table/ui";
+import { RivalAnalysis } from "@/components/partials/Rivals/Analysis/ui";
 import { useUser } from "@/contexts/users/UserContext";
 import type { AnalyticsTarget } from "@/types/analytics";
+import { List, BarChart2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+type SubTab = "list" | "analysis";
 
 interface AnalyticsComparisonTableProps {
   songs: SongWithRival[] | undefined;
@@ -34,6 +39,7 @@ export const AnalyticsComparisonTable = ({
   const [selectedSong, setSelectedSong] = useState<SongWithScore | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
+  const [subTab, setSubTab] = useState<SubTab>("list");
 
   const { params, updateParams, page, setPage, visibleSongs, totalCount } =
     useSongFilter(songs, { isMyPlayed: true, isRivalPlayed: true });
@@ -51,15 +57,56 @@ export const AnalyticsComparisonTable = ({
     );
   }
 
+  const SubTabBar = () => (
+    <div className="flex items-center gap-1 border-b border-bpim-border px-3 py-2">
+      {rivalLabel && !isLoading && songs && (
+        <span className="mr-3 text-[10px] font-bold uppercase tracking-widest text-bpim-warning">
+          vs {rivalLabel}
+        </span>
+      )}
+      {(["list", "analysis"] as SubTab[]).map((tab) => {
+        const Icon = tab === "list" ? List : BarChart2;
+        const label = tab === "list" ? "楽曲一覧" : "分析";
+        return (
+          <button
+            key={tab}
+            onClick={() => setSubTab(tab)}
+            className={cn(
+              "flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-colors",
+              subTab === tab
+                ? "bg-bpim-primary/15 text-bpim-primary"
+                : "text-bpim-muted hover:bg-bpim-overlay/50 hover:text-bpim-text",
+            )}
+          >
+            <Icon className="h-3.5 w-3.5" />
+            {label}
+          </button>
+        );
+      })}
+    </div>
+  );
+
+  if (subTab === "analysis") {
+    return (
+      <div className="mx-auto w-full min-h-svh flex flex-col bg-background">
+        <SubTabBar />
+        {isLoading ? (
+          <div className="flex h-40 items-center justify-center text-xs text-bpim-muted">
+            読み込み中...
+          </div>
+        ) : (
+          <RivalAnalysis
+            songs={songs as SongWithRival[] | undefined}
+            rivalName={rivalLabel}
+          />
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto w-full min-h-svh flex flex-col bg-background">
-      {rivalLabel && !isLoading && songs && (
-        <div className="px-4 pt-3 pb-1">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-bpim-warning">
-            vs {rivalLabel}
-          </span>
-        </div>
-      )}
+      <SubTabBar />
 
       <SongFilterBar
         withRivals={"full"}

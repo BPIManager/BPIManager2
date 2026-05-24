@@ -14,20 +14,28 @@ import { CustomPagination } from "@/components/partials/Pagination/ui";
 import { AdvancedFilterModal } from "@/components/partials/Songs/AdvancedFilter/ui";
 import { SongDetailView } from "@/components/partials/Modal/BPIChart/SongDetails/ui";
 import { RivalSongItem } from "./ui";
+import { RivalAnalysis } from "@/components/partials/Rivals/Analysis/ui";
+import { List, BarChart2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+type SubTab = "list" | "analysis";
 
 export const RivalSongsTable = ({
   myUserId,
   rivalUserId,
   version,
+  rivalName,
 }: {
   myUserId: string | undefined;
   rivalUserId: string | undefined;
   version?: string;
+  rivalName?: string;
 }) => {
   const { fbUser } = useUser();
   const [selectedSong, setSelectedSong] = useState<SongWithScore | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
+  const [subTab, setSubTab] = useState<SubTab>("list");
 
   const { songs, error, isLoading } = useRivalBothScores(
     myUserId,
@@ -51,8 +59,51 @@ export const RivalSongsTable = ({
     );
   }
 
+  const SubTabBar = () => (
+    <div className="flex items-center gap-1 border-b border-bpim-border px-3 py-2">
+      {(["list", "analysis"] as SubTab[]).map((tab) => {
+        const Icon = tab === "list" ? List : BarChart2;
+        const label = tab === "list" ? "楽曲一覧" : "分析";
+        return (
+          <button
+            key={tab}
+            onClick={() => setSubTab(tab)}
+            className={cn(
+              "flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-colors",
+              subTab === tab
+                ? "bg-bpim-primary/15 text-bpim-primary"
+                : "text-bpim-muted hover:bg-bpim-overlay/50 hover:text-bpim-text",
+            )}
+          >
+            <Icon className="h-3.5 w-3.5" />
+            {label}
+          </button>
+        );
+      })}
+    </div>
+  );
+
+  if (subTab === "analysis") {
+    return (
+      <div className="mx-auto w-full min-h-svh flex flex-col bg-background">
+        <SubTabBar />
+        {isLoading ? (
+          <div className="flex h-40 items-center justify-center text-xs text-bpim-muted">
+            読み込み中...
+          </div>
+        ) : (
+          <RivalAnalysis
+            songs={songs as SongWithRival[] | undefined}
+            rivalName={rivalName}
+          />
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto w-full min-h-svh flex flex-col bg-background">
+      <SubTabBar />
       <SongFilterBar
         withRivals="full"
         params={params}
