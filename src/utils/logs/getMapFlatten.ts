@@ -1,4 +1,11 @@
 import { SongWithScore } from "@/types/songs/score";
+import topElements from "@/constants/radars/topElements.json";
+
+const radarLookup = new Map<string, string>(
+  (topElements as { title: string; difficulty: string; top: string }[]).map(
+    (e) => [`${e.title}__${e.difficulty}`, e.top],
+  ),
+);
 
 interface RawSongScoreRow {
   songId: number;
@@ -37,5 +44,6 @@ export const mapToFlatSong = (row: RawSongScoreRow): SongWithScore => {
     wrScore: row.wrScore,
     kaidenAvg: row.kaidenAvg,
     coef: row.coef,
+    radarTop: radarLookup.get(`${row.title}__${row.difficulty}`) ?? null,
   };
 };

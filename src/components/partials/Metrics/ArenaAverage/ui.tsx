@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useMemo, memo } from "react";
 import { ArenaAverageData } from "@/types/metrics/arena";
@@ -13,8 +13,7 @@ import {
 import { CustomPagination } from "../../Pagination/ui";
 import { cn } from "@/lib/utils";
 import { ArrowUpDown, ChevronUp, ChevronDown } from "lucide-react";
-
-const RANKS = ["A1", "A2", "A3", "A4", "A5"] as const;
+import { A_RANKS } from "@/constants/arenaRanks";
 
 export const RANK_THRESHOLDS = [
   {
@@ -33,7 +32,9 @@ export const RANK_THRESHOLDS = [
   { label: "F", ratio: 0, bg: "bg-bpim-bg", text: "text-bpim-muted" },
 ] as const;
 
-type SortKey = "title" | (typeof RANKS)[number];
+export type DisplayMetric = "exScore" | "rate" | "bpi";
+
+type SortKey = "title" | (typeof A_RANKS)[number];
 type SortOrder = "asc" | "desc";
 
 export const getRankInfo = (rate: number) => {
@@ -42,7 +43,22 @@ export const getRankInfo = (rate: number) => {
   return rank || RANK_THRESHOLDS[RANK_THRESHOLDS.length - 1];
 };
 
-export const ArenaAverageTable = ({ data }: { data: ArenaAverageData[] }) => {
+const getBpiColor = (bpi: number): { bg: string; text: string } => {
+  if (bpi >= 100) return { bg: "bg-orange-500", text: "text-slate-950" };
+  if (bpi >= 50) return { bg: "bg-yellow-400", text: "text-black" };
+  if (bpi >= 20) return { bg: "bg-green-400", text: "text-slate-900" };
+  if (bpi >= 0) return { bg: "bg-bpim-primary", text: "text-slate-900" };
+  return { bg: "bg-slate-600", text: "text-bpim-text" };
+};
+
+
+export const ArenaAverageTable = ({
+  data,
+  displayMetric = "exScore",
+}: {
+  data: ArenaAverageData[];
+  displayMetric?: DisplayMetric;
+}) => {
   const [sortKey, setSortKey] = useState<SortKey>("title");
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
   const [page, setPage] = useState(1);
@@ -67,8 +83,15 @@ export const ArenaAverageTable = ({ data }: { data: ArenaAverageData[] }) => {
         valA = a.title;
         valB = b.title;
       } else {
-        valA = a.averages[sortKey]?.rate ?? -1;
-        valB = b.averages[sortKey]?.rate ?? -1;
+        const statsA = a.averages[sortKey];
+        const statsB = b.averages[sortKey];
+        if (displayMetric === "bpi") {
+          valA = statsA?.avgBpi ?? -999;
+          valB = statsB?.avgBpi ?? -999;
+        } else {
+          valA = statsA?.rate ?? -1;
+          valB = statsB?.rate ?? -1;
+        }
       }
 
       if (valA < valB) return sortOrder === "asc" ? -1 : 1;
@@ -76,7 +99,7 @@ export const ArenaAverageTable = ({ data }: { data: ArenaAverageData[] }) => {
       return 0;
     });
     return sorted;
-  }, [data, sortKey, sortOrder]);
+  }, [data, sortKey, sortOrder, displayMetric]);
 
   const visibleData = useMemo(() => {
     return sortedData.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
@@ -105,7 +128,7 @@ export const ArenaAverageTable = ({ data }: { data: ArenaAverageData[] }) => {
         </div>
       </TableCell>
 
-      {RANKS.map((rankName) => {
+      {A_RANKS.map((rankName) => {
         const stats = item.averages[rankName];
         if (!stats) {
           return (
@@ -114,6 +137,33 @@ export const ArenaAverageTable = ({ data }: { data: ArenaAverageData[] }) => {
             </TableCell>
           );
         }
+
+        if (displayMetric === "bpi") {
+          const bpi = stats.avgBpi;
+          if (bpi === undefined) {
+            return (
+              <TableCell key={rankName} className="text-center text-bpim-subtle">
+                -
+              </TableCell>
+            );
+          }
+          const { bg, text } = getBpiColor(bpi);
+          return (
+            <TableCell
+              key={rankName}
+              className={cn(
+                "text-center py-2 px-1 transition-opacity hover:opacity-80",
+                bg,
+                text,
+              )}
+            >
+              <span className="font-mono text-xs font-black leading-tight">
+                {bpi.toFixed(1)}
+              </span>
+            </TableCell>
+          );
+        }
+
         const rankInfo = getRankInfo(stats.rate);
         return (
           <TableCell
@@ -125,12 +175,25 @@ export const ArenaAverageTable = ({ data }: { data: ArenaAverageData[] }) => {
             )}
           >
             <div className="flex flex-col items-center gap-0">
-              <span className="font-mono text-xs font-black leading-tight">
-                {Math.round(stats.avgExScore)}
-              </span>
-              <span className="font-mono text-[9px] font-bold opacity-70">
-                {stats.rate.toFixed(1)}%
-              </span>
+              {displayMetric === "exScore" ? (
+                <>
+                  <span className="font-mono text-xs font-black leading-tight">
+                    {Math.round(stats.avgExScore)}
+                  </span>
+                  <span className="font-mono text-[9px] font-bold opacity-70">
+                    {stats.rate.toFixed(1)}%
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span className="font-mono text-xs font-black leading-tight">
+                    {stats.rate.toFixed(1)}%
+                  </span>
+                  <span className="font-mono text-[9px] font-bold opacity-70">
+                    {Math.round(stats.avgExScore)}
+                  </span>
+                </>
+              )}
             </div>
           </TableCell>
         );
@@ -154,7 +217,7 @@ export const ArenaAverageTable = ({ data }: { data: ArenaAverageData[] }) => {
                   </div>
                 </TableHead>
 
-                {RANKS.map((rank) => (
+                {A_RANKS.map((rank) => (
                   <TableHead
                     key={rank}
                     onClick={() => handleSort(rank)}

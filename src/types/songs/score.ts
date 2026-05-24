@@ -34,6 +34,8 @@ export interface SongWithScore {
   kaidenAvg: number | null;
   coef: number | null;
 
+  radarTop?: string | null;
+
   rival?: RivalScore | null;
 
   exDiff?: number;
@@ -117,6 +119,7 @@ export interface FilterParamsFrontend {
   scoreFilters?: ScoreFilterCondition[];
   missCountMin?: number;
   missCountMax?: number;
+  radarCategories?: string[];
 }
 
 export type SongHistoryResponse = {

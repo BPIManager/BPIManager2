@@ -3,16 +3,11 @@
 import { SongWithRival } from "@/types/songs/score";
 import { cn } from "@/lib/utils";
 import { getLampClass } from "../../Table/ui";
+import { DIFF_COLORS as diffColors } from "@/constants/difficultyColors";
 
 const f = (val: number | null | undefined, p?: number) => {
   if (val === null || val === undefined || !Number.isFinite(val)) return "---";
   return p !== undefined ? val.toFixed(p) : val.toString();
-};
-
-const diffColors: Record<string, string> = {
-  ANOTHER: "bg-red-900",
-  LEGGENDARIA: "bg-purple-900",
-  HYPER: "bg-yellow-700",
 };
 
 const SongInfo = ({ song }: { song: SongWithRival }) => (
@@ -96,7 +91,14 @@ interface ScoreBoxProps {
   isRival?: boolean;
 }
 
-const ScoreBox = ({ label, ex, bpi, clearState, colorClass, isRival }: ScoreBoxProps) => {
+const ScoreBox = ({
+  label,
+  ex,
+  bpi,
+  clearState,
+  colorClass,
+  isRival,
+}: ScoreBoxProps) => {
   const lampClass = getLampClass(clearState);
   return (
     <div
@@ -146,7 +148,13 @@ interface MobileScoreViewProps {
   align?: string;
 }
 
-const MobileScoreView = ({ label, ex, bpi, clearState, align }: MobileScoreViewProps) => {
+const MobileScoreView = ({
+  label,
+  ex,
+  bpi,
+  clearState,
+  align,
+}: MobileScoreViewProps) => {
   const lampClass = getLampClass(clearState);
   return (
     <div

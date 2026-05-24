@@ -7,6 +7,7 @@ import { useDebouncedSearch } from "@/hooks/common/useDebouncedSearch";
 import { filterAndSortSongs } from "@/utils/songs/songListFilter";
 import { latestVersion } from "@/constants/latestVersion";
 import { SONG_ATTRIBUTES } from "@/constants/songAttributes";
+import { IIDX_DIFFICULTIES } from "@/constants/diffs";
 import type { SortKey, SortDir } from "@/types/songs/songList";
 
 const VALID_SORT_KEYS = new Set<string>([
@@ -15,8 +16,8 @@ const VALID_SORT_KEYS = new Set<string>([
   "bpm",
   ...SONG_ATTRIBUTES.map((a) => a.sortKey),
 ]);
-const VALID_DIFFICULTIES = ["HYPER", "ANOTHER", "LEGGENDARIA"];
-const DEFAULT_DIFFICULTIES = new Set(["HYPER", "ANOTHER", "LEGGENDARIA"]);
+const VALID_DIFFICULTIES: string[] = [...IIDX_DIFFICULTIES];
+const DEFAULT_DIFFICULTIES = new Set(IIDX_DIFFICULTIES);
 
 function parseDiff(val: string | string[] | undefined): Set<string> {
   if (typeof val !== "string") return new Set(DEFAULT_DIFFICULTIES);
@@ -25,7 +26,8 @@ function parseDiff(val: string | string[] | undefined): Set<string> {
 }
 
 function parseSortKey(val: string | string[] | undefined): SortKey {
-  if (typeof val === "string" && VALID_SORT_KEYS.has(val)) return val as SortKey;
+  if (typeof val === "string" && VALID_SORT_KEYS.has(val))
+    return val as SortKey;
   return "title";
 }
 
@@ -39,7 +41,8 @@ export function useSongListFilter() {
   const version = (router.query.version as string) || latestVersion;
 
   const [committedSearch, setCommittedSearch] = useState("");
-  const [difficulties, setDifficulties] = useState<Set<string>>(DEFAULT_DIFFICULTIES);
+  const [difficulties, setDifficulties] =
+    useState<Set<string>>(DEFAULT_DIFFICULTIES);
   const [sortKey, setSortKey] = useState<SortKey>("title");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
 

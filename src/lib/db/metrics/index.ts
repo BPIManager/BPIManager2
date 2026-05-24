@@ -78,7 +78,34 @@ class MetricsRepository {
   private buildArenaAverageQuery(version: string, difficultyLevel: number) {
     return db
       .selectFrom("bkScores as s")
-      .innerJoin("bkUsers as u", "s.userId", "u.userId")
+      .innerJoin(
+        (qb) =>
+          qb
+            .selectFrom("officialArenaStats as oas")
+            .innerJoin(
+              (qb2) =>
+                qb2
+                  .selectFrom("officialArenaStats")
+                  .select([
+                    "userId",
+                    (eb) => eb.fn.max("fetchedAt").as("maxFetchedAt"),
+                  ])
+                  .where("version", "=", version)
+                  .groupBy("userId")
+                  .as("m"),
+              (join) =>
+                join
+                  .onRef("m.userId", "=", "oas.userId")
+                  .onRef("m.maxFetchedAt", "=", "oas.fetchedAt"),
+            )
+            .select([
+              "oas.userId",
+              sql<string>`oas.arenaClass`.as("arenarank"),
+            ])
+            .where("oas.version", "=", version)
+            .as("u"),
+        (join) => join.onRef("u.userId", "=", "s.userId"),
+      )
       .innerJoin("songs as sg", (join) =>
         join
           .onRef("sg.title", "=", "s.title")
@@ -103,15 +130,15 @@ class MetricsRepository {
       .select([
         "s.title",
         "s.difficulty",
-        "u.arenarank",
+        sql<string>`u.arenarank`.as("arenarank"),
         sql<number>`AVG(s.exScore)`.as("avgExScore"),
         sql<number>`COUNT(s.userId)`.as("sampleSize"),
       ])
       .where("s.version", "=", version)
       .where("s.difficultyLevel", "=", difficultyLevel)
-      .where("u.arenarank", "in", ["A1", "A2", "A3", "A4", "A5"])
+      .where(sql`u.arenarank`, "in", ["A1", "A2", "A3", "A4", "A5"])
       .where("sg.releasedVersion", "<=", Number(version))
-      .groupBy(["s.title", "s.difficulty", "u.arenarank"]);
+      .groupBy(sql`s.title, s.difficulty, u.arenarank`);
   }
 
   private buildArenaAverageQueryFromScores(
@@ -124,23 +151,28 @@ class MetricsRepository {
       .innerJoin(
         (qb) =>
           qb
-            .selectFrom("userStatusLogs as usl")
+            .selectFrom("officialArenaStats as oas")
             .innerJoin(
               (qb2) =>
                 qb2
-                  .selectFrom("userStatusLogs")
-                  .select(["userId", (eb) => eb.fn.max("id").as("maxId")])
+                  .selectFrom("officialArenaStats")
+                  .select([
+                    "userId",
+                    (eb) => eb.fn.max("fetchedAt").as("maxFetchedAt"),
+                  ])
+                  .where("version", "=", version)
                   .groupBy("userId")
                   .as("m"),
               (join) =>
                 join
-                  .onRef("m.userId", "=", "usl.userId")
-                  .onRef("m.maxId", "=", "usl.id"),
+                  .onRef("m.userId", "=", "oas.userId")
+                  .onRef("m.maxFetchedAt", "=", "oas.fetchedAt"),
             )
             .select([
-              "usl.userId",
-              sql<string | null>`usl.arenaRank`.as("arenarank"),
+              "oas.userId",
+              sql<string | null>`oas.arenaClass`.as("arenarank"),
             ])
+            .where("oas.version", "=", version)
             .as("u"),
         (join) => join.onRef("u.userId", "=", "s.userId"),
       )

@@ -3,12 +3,8 @@ import { getDJRank } from "@/utils/songs/djRank";
 import { RefObject } from "react";
 import { cn } from "@/lib/utils";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
-
-export const diffColors: Record<string, string> = {
-  ANOTHER: "bg-red-900",
-  LEGGENDARIA: "bg-purple-900",
-  HYPER: "bg-yellow-700",
-};
+import { DIFF_COLORS as diffColors } from "@/constants/difficultyColors";
+export { DIFF_COLORS as diffColors } from "@/constants/difficultyColors";
 
 export const getLampClass = (clearState: string | null | undefined) => {
   if (!clearState || clearState === "NO PLAY") return "bg-bpim-overlay";

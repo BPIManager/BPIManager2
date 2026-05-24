@@ -3,6 +3,13 @@ import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { db } from "@/lib/db";
 import { filterSongsServerSide } from "@/utils/songs/filter";
 import { sortSongs } from "@/utils/songs/sort";
+import topElements from "@/constants/radars/topElements.json";
+
+const radarLookup = new Map<string, string>(
+  (topElements as { title: string; difficulty: string; top: string }[]).map(
+    (e) => [`${e.title}__${e.difficulty}`, e.top],
+  ),
+);
 
 async function handleGetUnplayed(
   req: NextApiRequest,
@@ -96,6 +103,7 @@ async function handleGetUnplayed(
     wrScore: row.wrScore !== null ? Number(row.wrScore) : null,
     kaidenAvg: row.kaidenAvg !== null ? Number(row.kaidenAvg) : null,
     coef: row.coef !== null ? Number(row.coef) : null,
+    radarTop: radarLookup.get(`${row.title}__${row.difficulty}`) ?? null,
   }));
 
   const processed = sortSongs(

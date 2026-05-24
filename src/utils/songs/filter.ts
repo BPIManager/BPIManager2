@@ -2,18 +2,7 @@ import {
   FilterParamsFrontend,
   SongWithScore,
 } from "@/types/songs/score";
-
-const DJRANK_THRESHOLDS = [
-  { label: "F", ratio: 0 },
-  { label: "E", ratio: 2 / 9 },
-  { label: "D", ratio: 3 / 9 },
-  { label: "C", ratio: 4 / 9 },
-  { label: "B", ratio: 5 / 9 },
-  { label: "A", ratio: 6 / 9 },
-  { label: "AA", ratio: 7 / 9 },
-  { label: "AAA", ratio: 8 / 9 },
-  { label: "MAX-", ratio: 17 / 18 },
-];
+import { RANK_TABLE } from "@/constants/djRank";
 import { getMaxBpm } from "./getMaxBPM";
 import dayjs from "@/lib/dayjs";
 import type { FilterParams } from "@/types/songs/filter";
@@ -143,6 +132,11 @@ export const filterSongsFrontend = (
         return false;
     }
 
+    if (params.radarCategories && params.radarCategories.length > 0) {
+      if (!song.radarTop || !params.radarCategories.includes(song.radarTop))
+        return false;
+    }
+
     if (params.scoreFilters && params.scoreFilters.length > 0) {
       const rate =
         song.exScore !== null
@@ -161,12 +155,12 @@ export const filterSongsFrontend = (
           if (f.operator === "<=" && rate > val) return false;
         } else if (f.metric === "djrank") {
           if (ratio === null) return false;
-          const idx = DJRANK_THRESHOLDS.findIndex((t) => t.label === f.value);
+          const idx = RANK_TABLE.findIndex((t) => t.label === f.value);
           if (idx === -1) continue;
           if (f.operator === ">=") {
-            if (ratio < DJRANK_THRESHOLDS[idx].ratio) return false;
+            if (ratio < RANK_TABLE[idx].ratio) return false;
           } else {
-            const next = DJRANK_THRESHOLDS[idx + 1];
+            const next = RANK_TABLE[idx + 1];
             if (next && ratio >= next.ratio) return false;
           }
         }

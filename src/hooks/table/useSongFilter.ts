@@ -65,6 +65,9 @@ export const useSongFilter = (
         : undefined,
       missCountMin: q.missCountMin ? Number(q.missCountMin) : undefined,
       missCountMax: q.missCountMax ? Number(q.missCountMax) : undefined,
+      radarCategories: q.radarCategories
+        ? q.radarCategories.split(",")
+        : [],
     };
   }, [query, isReady, defaults]);
 
@@ -111,7 +114,8 @@ export const useSongFilter = (
       params.isRivalPlayed !== undefined ||
       params.missCountMin !== undefined ||
       params.missCountMax !== undefined ||
-      (params.scoreFilters?.length ?? 0) > 0;
+      (params.scoreFilters?.length ?? 0) > 0 ||
+      (params.radarCategories?.length ?? 0) > 0;
 
     if (!hasFilter) {
       return [];

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { toggleArrayItem } from "@/hooks/common/useToggleArray";
+import { IIDX_LEVELS, IIDX_DIFFICULTIES } from "@/constants/diffs";
 
 export type RivalSortOrder = "win_desc" | "lose_desc" | "updated_desc";
 
@@ -16,11 +17,9 @@ export const RIVAL_SORT_LABELS: Record<RivalSortOrder, string> = {
  * デフォルトはレベル 11/12・全難易度・勝ち越し順。
  */
 export function useRivalListFilter() {
-  const [levels, setLevels] = useState<string[]>(["11", "12"]);
+  const [levels, setLevels] = useState<string[]>([...IIDX_LEVELS]);
   const [difficulties, setDifficulties] = useState<string[]>([
-    "HYPER",
-    "ANOTHER",
-    "LEGGENDARIA",
+    ...IIDX_DIFFICULTIES,
   ]);
   const [sortOrder, setSortOrder] = useState<RivalSortOrder>("win_desc");
 

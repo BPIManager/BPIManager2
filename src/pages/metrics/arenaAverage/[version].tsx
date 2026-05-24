@@ -3,7 +3,11 @@
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/router";
 import { useArenaAverages } from "@/hooks/metrics/useArenaAverage";
-import { ArenaAverageTable } from "@/components/partials/Metrics/ArenaAverage/ui";
+import {
+  ArenaAverageTable,
+  type DisplayMetric,
+} from "@/components/partials/Metrics/ArenaAverage/ui";
+import { ArenaAnalysis } from "@/components/partials/Metrics/ArenaAverage/analysis";
 import { PageContainer, PageHeader } from "@/components/partials/Header";
 import { Meta } from "@/components/partials/Head";
 import { DashboardLayout } from "@/components/partials/Main";
@@ -13,21 +17,25 @@ import {
 } from "@/components/partials/Metrics/LevelSelector/ui";
 import { ArenaAverageFilterSkeleton } from "@/components/partials/Metrics/LevelSelector/skeleton";
 import { latestVersion } from "@/constants/latestVersion";
+import { versionsNonDisabledCollection } from "@/constants/versions";
+import { A_RANKS } from "@/constants/arenaRanks";
+import { ALL_RADAR_CATEGORIES } from "@/constants/radars";
+import { RANK_TABLE } from "@/constants/djRank";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const ALL_DIFFICULTIES = new Set(["HYPER", "ANOTHER", "LEGGENDARIA"]);
-
-const DJRANK_THRESHOLDS = [
-  { label: "F", ratio: 0 },
-  { label: "E", ratio: 2 / 9 },
-  { label: "D", ratio: 3 / 9 },
-  { label: "C", ratio: 4 / 9 },
-  { label: "B", ratio: 5 / 9 },
-  { label: "A", ratio: 6 / 9 },
-  { label: "AA", ratio: 7 / 9 },
-  { label: "AAA", ratio: 8 / 9 },
-  { label: "MAX-", ratio: 17 / 18 },
-];
+type RadarCat = (typeof ALL_RADAR_CATEGORIES)[number];
+const ALL_CATEGORIES_SET = new Set<RadarCat>(ALL_RADAR_CATEGORIES);
 
 export const ArenaMetricsView = ({
   version: initialVersion,
@@ -40,6 +48,21 @@ export const ArenaMetricsView = ({
     useState<Set<string>>(ALL_DIFFICULTIES);
   const [nameSearch, setNameSearch] = useState("");
   const [detailFilters, setDetailFilters] = useState<DetailFilter[]>([]);
+  const [displayMetric, setDisplayMetric] = useState<DisplayMetric>("exScore");
+  const [analysisRank, setAnalysisRank] = useState<string>("A1");
+  const [selectedCategories, setSelectedCategories] = useState<Set<RadarCat>>(ALL_CATEGORIES_SET);
+
+  const handleCategoryToggle = (cat: RadarCat) => {
+    setSelectedCategories((prev) => {
+      const next = new Set(prev);
+      if (next.has(cat)) {
+        if (next.size > 1) next.delete(cat);
+      } else {
+        next.add(cat);
+      }
+      return next;
+    });
+  };
 
   const v = router.isReady
     ? (router.query.version as string) || initialVersion || latestVersion
@@ -102,13 +125,13 @@ export const ArenaMetricsView = ({
           if (f.operator === ">=" && stats.rate < val) return false;
           if (f.operator === "<=" && stats.rate > val) return false;
         } else if (f.metric === "djrank") {
-          const idx = DJRANK_THRESHOLDS.findIndex((t) => t.label === f.value);
+          const idx = RANK_TABLE.findIndex((t) => t.label === f.value);
           if (idx === -1) continue;
           const ratio = stats.rate / 100;
           if (f.operator === ">=") {
-            if (ratio < DJRANK_THRESHOLDS[idx].ratio) return false;
+            if (ratio < RANK_TABLE[idx].ratio) return false;
           } else {
-            const nextThreshold = DJRANK_THRESHOLDS[idx + 1];
+            const nextThreshold = RANK_TABLE[idx + 1];
             if (nextThreshold && ratio >= nextThreshold.ratio) return false;
           }
         }
@@ -119,7 +142,6 @@ export const ArenaMetricsView = ({
   }, [averages, selectedDifficulties, nameSearch, detailFilters]);
 
   const filterKey = `${[...selectedDifficulties].sort().join(",")}-${nameSearch}-${JSON.stringify(detailFilters)}`;
-
   const isInitialLoading = !router.isReady || isLoading;
   const showLoading = !router.isReady || isLoading || isNavigating;
 
@@ -137,40 +159,165 @@ export const ArenaMetricsView = ({
       />
 
       <PageContainer>
-        <div className="flex flex-col gap-6">
-          {isInitialLoading ? (
-            <ArenaAverageFilterSkeleton />
-          ) : (
-            <ArenaAverageFilter
-              version={v}
-              onVersionChange={(newV: string) =>
-                handleFilterChange(newV, level)
-              }
-              level={level}
-              onLevelChange={(newL: string) => handleFilterChange(v, newL)}
-              selectedDifficulties={selectedDifficulties}
-              onDifficultiesChange={setSelectedDifficulties}
-              nameSearch={nameSearch}
-              onNameSearchChange={setNameSearch}
-              detailFilters={detailFilters}
-              onDetailFiltersChange={setDetailFilters}
-            />
-          )}
+        <Tabs defaultValue="list" className="flex flex-col gap-6">
+          <TabsList className="w-full">
+            <TabsTrigger value="list">一覧</TabsTrigger>
+            <TabsTrigger value="analysis">分析</TabsTrigger>
+          </TabsList>
 
-          {showLoading ? (
-            <div className="flex flex-col gap-4">
-              <Skeleton className="h-10 w-full rounded-md" />
-              <Skeleton className="h-100 w-full rounded-xl" />
+          <TabsContent value="list">
+            <div className="flex flex-col gap-6">
+              {isInitialLoading ? (
+                <ArenaAverageFilterSkeleton />
+              ) : (
+                <ArenaAverageFilter
+                  version={v}
+                  onVersionChange={(newV) => handleFilterChange(newV, level)}
+                  level={level}
+                  onLevelChange={(newL) => handleFilterChange(v, newL)}
+                  selectedDifficulties={selectedDifficulties}
+                  onDifficultiesChange={setSelectedDifficulties}
+                  nameSearch={nameSearch}
+                  onNameSearchChange={setNameSearch}
+                  detailFilters={detailFilters}
+                  onDetailFiltersChange={setDetailFilters}
+                  displayMetric={displayMetric}
+                  onDisplayMetricChange={setDisplayMetric}
+                />
+              )}
+
+              {showLoading ? (
+                <div className="flex flex-col gap-4">
+                  <Skeleton className="h-10 w-full rounded-md" />
+                  <Skeleton className="h-100 w-full rounded-xl" />
+                </div>
+              ) : (
+                <div className="w-full animate-in fade-in duration-500">
+                  <ArenaAverageTable
+                    key={filterKey}
+                    data={filteredAverages}
+                    displayMetric={displayMetric}
+                  />
+                </div>
+              )}
             </div>
-          ) : (
-            <div className="w-full animate-in fade-in duration-500">
-              <ArenaAverageTable key={filterKey} data={filteredAverages} />
+          </TabsContent>
+
+          <TabsContent value="analysis">
+            <div className="flex flex-col gap-6">
+              <AnalysisControls
+                version={v}
+                onVersionChange={(newV) => handleFilterChange(newV, level)}
+                rank={analysisRank}
+                onRankChange={setAnalysisRank}
+                level={level}
+                onLevelChange={(newL) => handleFilterChange(v, newL)}
+              />
+              {showLoading ? (
+                <div className="flex flex-col gap-4">
+                  <Skeleton className="h-32 w-full rounded-xl" />
+                  <Skeleton className="h-80 w-full rounded-xl" />
+                </div>
+              ) : (
+                <div className="animate-in fade-in duration-500">
+                  <ArenaAnalysis
+                    data={averages as import("@/types/metrics/arena").ArenaAverageData[]}
+                    rank={analysisRank}
+                    version={v}
+                    selectedCategories={selectedCategories}
+                    onCategoryToggle={handleCategoryToggle}
+                  />
+                </div>
+              )}
             </div>
-          )}
-        </div>
+          </TabsContent>
+        </Tabs>
       </PageContainer>
     </DashboardLayout>
   );
 };
+
+const AnalysisControls = ({
+  version,
+  onVersionChange,
+  rank,
+  onRankChange,
+  level,
+  onLevelChange,
+}: {
+  version: string;
+  onVersionChange: (v: string) => void;
+  rank: string;
+  onRankChange: (r: string) => void;
+  level: string;
+  onLevelChange: (l: string) => void;
+}) => (
+  <div className="rounded-xl border border-bpim-border bg-bpim-bg/80 p-4 shadow-sm backdrop-blur-md">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="flex flex-col gap-2">
+        <span className="text-[10px] font-black tracking-widest text-bpim-muted uppercase px-1">
+          Version
+        </span>
+        <Select value={version} onValueChange={onVersionChange}>
+          <SelectTrigger className="h-9 border-bpim-border bg-bpim-surface-2/60 text-xs text-bpim-text focus:ring-blue-500">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent className="border-bpim-border bg-bpim-bg">
+            {versionsNonDisabledCollection.map((v) => (
+              <SelectItem key={v.value} value={v.value} className="text-xs">
+                {v.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <span className="text-[10px] font-black tracking-widest text-bpim-muted uppercase px-1">
+          アリーナランク
+        </span>
+        <Select value={rank} onValueChange={onRankChange}>
+          <SelectTrigger className="h-9 border-bpim-border bg-bpim-surface-2/60 text-sm font-bold text-bpim-text">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent className="border-bpim-border bg-bpim-bg">
+            {A_RANKS.map((r) => (
+              <SelectItem key={r} value={r} className="text-sm font-bold">
+                {r}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <span className="text-[10px] font-black tracking-widest text-bpim-muted uppercase px-1">
+          Level
+        </span>
+        <RadioGroup
+          value={level}
+          onValueChange={onLevelChange}
+          className="flex h-9 items-center gap-8"
+        >
+          {["11", "12"].map((lv) => (
+            <div key={lv} className="flex items-center gap-2">
+              <RadioGroupItem
+                value={lv}
+                id={`analysis-lv-${lv}`}
+                className="border-bpim-primary"
+              />
+              <Label
+                htmlFor={`analysis-lv-${lv}`}
+                className="cursor-pointer text-sm font-bold text-bpim-text"
+              >
+                ☆{lv}
+              </Label>
+            </div>
+          ))}
+        </RadioGroup>
+      </div>
+    </div>
+  </div>
+);
 
 export default ArenaMetricsView;

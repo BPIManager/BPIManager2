@@ -3,6 +3,13 @@ import path from "path";
 import { latestVersion } from "@/constants/latestVersion";
 import { metricsRepo } from "@/lib/db/metrics";
 import { BpiCalculator } from "@/lib/bpi";
+import topElements from "@/constants/radars/topElements.json";
+
+const topElementMap = new Map(
+  (topElements as { title: string; difficulty: string; top: string }[]).map(
+    (e) => [`${e.title}___${e.difficulty}`, e.top],
+  ),
+);
 
 /**
  * Arena JSON の 1 楽曲エントリ。
@@ -17,6 +24,8 @@ interface ArenaGroupEntry {
   notes: number;
   /** 最大スコア（ノーツ数 × 2） */
   maxScore: number;
+  /** レーダーカテゴリ */
+  radarCategory?: string;
   /**
    * アリーナランク（A1〜A5）をキーとする統計データ。
    * `avgExScore`: 平均 EX スコア、`rate`: 達成率 (%)、`count`: サンプル数、`avgBpi`: 平均 BPI
@@ -107,6 +116,9 @@ export async function generateArenaJson() {
               difficulty: row.difficulty,
               notes,
               maxScore,
+              radarCategory:
+                topElementMap.get(`${row.title}___${row.difficulty}`) ??
+                undefined,
               averages: {},
             };
           }

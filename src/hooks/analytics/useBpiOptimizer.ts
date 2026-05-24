@@ -9,19 +9,13 @@ import type {
   OptimizerStrategy,
 } from "@/types/bpi-optimizer";
 import type { RadarCategory } from "@/types/stats/radar";
+import { IIDX_LEVELS, IIDX_DIFFICULTIES } from "@/constants/diffs";
+import { ALL_RADAR_CATEGORIES as ALL_RADAR_ELEMENTS } from "@/constants/radars";
 import { toast } from "sonner";
 
 const DEFAULT_STRATEGIES: OptimizerStrategy[] = ["unplayed", "played"];
-const DEFAULT_LEVELS = ["11", "12"];
-const DEFAULT_DIFFICULTIES = ["HYPER", "ANOTHER", "LEGGENDARIA"];
-const ALL_RADAR_ELEMENTS: RadarCategory[] = [
-  "NOTES",
-  "CHORD",
-  "PEAK",
-  "CHARGE",
-  "SCRATCH",
-  "SOFLAN",
-];
+const DEFAULT_LEVELS = [...IIDX_LEVELS];
+const DEFAULT_DIFFICULTIES = [...IIDX_DIFFICULTIES];
 
 export type { OptimizerStrategy };
 

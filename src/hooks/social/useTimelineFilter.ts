@@ -6,6 +6,7 @@ import { toggleArrayItem } from "@/hooks/common/useToggleArray";
 
 import type { TimelineMode } from "@/types/social/timeline";
 import { IidxDifficulty } from "@/types/iidx/difficulty";
+import { IIDX_DIFFICULTIES } from "@/constants/diffs";
 
 /**
  * タイムラインのモード・フィルター状態を管理するフック。
@@ -16,7 +17,7 @@ export function useTimelineFilter() {
   const [mode, setMode] = useState<TimelineMode>("all");
   const [filterParams, setFilterParams] = useState<FilterParamsFrontend>({
     levels: [11, 12],
-    difficulties: ["HYPER", "ANOTHER", "LEGGENDARIA"],
+    difficulties: [...IIDX_DIFFICULTIES],
     search: "",
   });
 

@@ -6,6 +6,7 @@ import { calculateRadar } from "@/lib/radar/calculator";
 import { latestVersion } from "@/constants/latestVersion";
 import topElements from "@/constants/radars/topElements.json";
 import type { RadarCategory } from "@/types/stats/radar";
+import { ALL_RADAR_CATEGORIES } from "@/constants/radars";
 import type {
   SongOptimizerInput,
   OptimizerOptions,
@@ -24,15 +25,6 @@ const topElementMap = new Map<string, RadarCategory>(
     e.top,
   ]),
 );
-
-const ALL_RADAR_CATEGORIES: RadarCategory[] = [
-  "NOTES",
-  "CHORD",
-  "PEAK",
-  "CHARGE",
-  "SCRATCH",
-  "SOFLAN",
-];
 
 export default async function handler(
   req: NextApiRequest,

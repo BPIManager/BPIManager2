@@ -13,8 +13,8 @@ import { Input } from "@/components/ui/input";
 import { versionsNonDisabledCollection } from "@/constants/versions";
 import { Checkbox } from "@/components/ui/checkbox";
 import { X, Plus } from "lucide-react";
-
-const RANKS = ["A1", "A2", "A3", "A4", "A5"] as const;
+import type { DisplayMetric } from "@/components/partials/Metrics/ArenaAverage/ui";
+import { A_RANKS } from "@/constants/arenaRanks";
 
 const METRICS = [
   { label: "スコア", value: "score" },
@@ -56,7 +56,15 @@ interface ArenaAverageFilterProps {
   onNameSearchChange: (search: string) => void;
   detailFilters: DetailFilter[];
   onDetailFiltersChange: (filters: DetailFilter[]) => void;
+  displayMetric?: DisplayMetric;
+  onDisplayMetricChange?: (metric: DisplayMetric) => void;
 }
+
+const DISPLAY_METRICS = [
+  { value: "exScore", label: "EXスコア" },
+  { value: "rate", label: "スコアレート" },
+  { value: "bpi", label: "BPI" },
+] as const;
 
 export const ArenaAverageFilter = ({
   version,
@@ -69,6 +77,8 @@ export const ArenaAverageFilter = ({
   onNameSearchChange,
   detailFilters,
   onDetailFiltersChange,
+  displayMetric,
+  onDisplayMetricChange,
 }: ArenaAverageFilterProps) => {
   const toggleDifficulty = (diff: string) => {
     const next = new Set(selectedDifficulties);
@@ -216,6 +226,37 @@ export const ArenaAverageFilter = ({
             </div>
           )}
         </div>
+
+        {onDisplayMetricChange && displayMetric && (
+          <div className="border-t border-bpim-border pt-3">
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+              <span className="text-[10px] font-black tracking-widest text-bpim-muted uppercase px-1 shrink-0">
+                表示
+              </span>
+              <RadioGroup
+                value={displayMetric}
+                onValueChange={(v) => onDisplayMetricChange(v as DisplayMetric)}
+                className="flex flex-nowrap items-center gap-6"
+              >
+                {DISPLAY_METRICS.map((opt) => (
+                  <div key={opt.value} className="flex items-center gap-1.5 shrink-0">
+                    <RadioGroupItem
+                      value={opt.value}
+                      id={`metric-${opt.value}`}
+                      className="border-bpim-primary"
+                    />
+                    <Label
+                      htmlFor={`metric-${opt.value}`}
+                      className="cursor-pointer text-xs font-medium text-bpim-text whitespace-nowrap"
+                    >
+                      {opt.label}
+                    </Label>
+                  </div>
+                ))}
+              </RadioGroup>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -236,7 +277,7 @@ const DetailFilterRow = ({
         <SelectValue />
       </SelectTrigger>
       <SelectContent className="border-bpim-border bg-bpim-bg">
-        {RANKS.map((r) => (
+        {A_RANKS.map((r) => (
           <SelectItem key={r} value={r} className="text-xs">
             {r}
           </SelectItem>

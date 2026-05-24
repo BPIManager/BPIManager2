@@ -9,8 +9,4 @@ export const RADAR_LABELS: Record<RadarCategory, string> = {
   SOFLAN: "SOFLAN",
 };
 
-export const DIFF_COLORS: Record<string, string> = {
-  ANOTHER: "bg-red-900",
-  LEGGENDARIA: "bg-purple-900",
-  HYPER: "bg-yellow-700",
-};
+export { DIFF_COLORS } from "@/constants/difficultyColors";
