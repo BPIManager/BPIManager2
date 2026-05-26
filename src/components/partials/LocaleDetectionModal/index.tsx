@@ -37,6 +37,7 @@ export function LocaleDetectionModal() {
 
   const handleSelect = (locale: Locale) => {
     setLocale(locale);
+    localStorage.setItem(DISMISSED_KEY, "1");
     setOpen(false);
   };
 
