@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/select";
 import { Plus, X } from "lucide-react";
 import { SectionTitle } from "./SectionTitle";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 const DJRANK_OPTIONS = ["MAX-", "AAA", "AA", "A", "B", "C", "D", "E", "F"] as const;
 
@@ -20,6 +21,7 @@ interface Props {
 }
 
 export const ScoreFilterSection = ({ scoreFilters, onChange }: Props) => {
+  const { t } = useTranslation();
   const filters = scoreFilters ?? [];
 
   const add = () => {
@@ -42,13 +44,13 @@ export const ScoreFilterSection = ({ scoreFilters, onChange }: Props) => {
   return (
     <section className="flex flex-col gap-3">
       <div className="flex items-center gap-3">
-        <SectionTitle>スコア条件</SectionTitle>
+        <SectionTitle>{t("filter.scoreCondition")}</SectionTitle>
         <button
           onClick={add}
           className="flex items-center gap-1 text-[10px] font-bold text-bpim-primary hover:text-bpim-primary/70 transition-colors"
         >
           <Plus className="h-3 w-3" />
-          追加
+          {t("filter.scoreConditionAdd")}
         </button>
       </div>
 
@@ -66,17 +68,17 @@ export const ScoreFilterSection = ({ scoreFilters, onChange }: Props) => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="border-bpim-border bg-bpim-bg">
-                  <SelectItem value="scoreRate" className="text-xs">スコアレート</SelectItem>
+                  <SelectItem value="scoreRate" className="text-xs">{t("filter.scoreRate")}</SelectItem>
                   <SelectItem value="djrank" className="text-xs">DJRANK</SelectItem>
                 </SelectContent>
               </Select>
 
-              <span className="text-xs text-bpim-muted">が</span>
+              <span className="text-xs text-bpim-muted">{t("filter.scoreConditionParticle")}</span>
 
               {f.metric === "djrank" ? (
                 <Select value={f.value} onValueChange={(v) => update(f.id, { value: v })}>
                   <SelectTrigger className="h-8 w-20 border-bpim-border bg-bpim-surface-2/60 text-xs text-bpim-text">
-                    <SelectValue placeholder="ランク" />
+                    <SelectValue placeholder={t("filter.rank")} />
                   </SelectTrigger>
                   <SelectContent className="border-bpim-border bg-bpim-bg">
                     {DJRANK_OPTIONS.map((r) => (
@@ -106,8 +108,8 @@ export const ScoreFilterSection = ({ scoreFilters, onChange }: Props) => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="border-bpim-border bg-bpim-bg">
-                  <SelectItem value=">=" className="text-xs">以上</SelectItem>
-                  <SelectItem value="<=" className="text-xs">以下</SelectItem>
+                  <SelectItem value=">=" className="text-xs">{t("filter.orMore")}</SelectItem>
+                  <SelectItem value="<=" className="text-xs">{t("filter.orLess")}</SelectItem>
                 </SelectContent>
               </Select>
 

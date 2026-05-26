@@ -2,6 +2,7 @@
 import { NearLoseSongItem } from "@/types/stats/nearLose";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface NearLoseRankItemProps {
   item: NearLoseSongItem;
@@ -14,6 +15,7 @@ export const NearLoseRankItem = ({
   rank,
   onClick,
 }: NearLoseRankItemProps) => {
+  const { t } = useTranslation();
   return (
     <div
       onClick={onClick}
@@ -65,10 +67,10 @@ export const NearLoseRankItem = ({
         </div>
         <div className="flex flex-col items-end gap-0">
           <span className="text-[12px] font-bold leading-none text-bpim-warning">
-            あと
+            {t("dashboard.ranking.toBeat")}
           </span>
           <span className="text-sm font-bold text-bpim-warning">
-            {item.exDiff}点
+            {item.exDiff}{t("dashboard.ranking.scoreUnit")}
           </span>
         </div>
       </div>

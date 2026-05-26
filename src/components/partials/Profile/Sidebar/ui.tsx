@@ -35,6 +35,7 @@ import {
 import dayjs from "@/lib/dayjs";
 import { latestVersion } from "@/constants/latestVersion";
 import { ARENA_RANK_ORDER } from "@/constants/arenaRanks";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 type RoleKey = "coffee" | "saba" | "iidx" | "developer" | "pro";
 
@@ -56,6 +57,7 @@ export const ProfileSideBar = ({
   isUpdating?: boolean;
 }) => {
   const [historyOpen, setHistoryOpen] = useState(false);
+  const { t } = useTranslation();
 
   const roleKey = profile.role?.role as RoleKey | undefined;
   const roleHeader = roleKey ? ROLE_HEADER[roleKey] : undefined;
@@ -188,13 +190,13 @@ export const ProfileSideBar = ({
           <div className="flex items-center justify-between px-4 py-3">
             <div className="flex flex-col gap-1.5">
               <span className="text-[10px] font-bold uppercase tracking-widest text-bpim-muted">
-                現在のアリーナクラス
+                {t("profile.sidebar.currentArenaClass")}
               </span>
               <ArenaClassBadge arenaClass={current?.arenaClass} contained />
             </div>
             <div className="flex flex-col items-end gap-0.5">
               <span className="text-[10px] font-bold uppercase tracking-widest text-bpim-muted">
-                総合BPI
+                {t("profile.sidebar.totalBpi")}
               </span>
               <span className="font-mono text-2xl font-black leading-none text-bpim-primary">
                 {current?.totalBpi?.toFixed(2) ?? "N/A"}
@@ -210,7 +212,7 @@ export const ProfileSideBar = ({
                     <TooltipTrigger asChild>
                       <div className="flex h-full flex-col items-center justify-center gap-1 px-2 py-2.5 cursor-default">
                         <span className="text-[9px] font-bold uppercase tracking-widest text-bpim-muted">
-                          最高クラス
+                          {t("profile.sidebar.allTimeBest")}
                         </span>
                         <ArenaClassBadge
                           arenaClass={allTimeBest.arenaClass}
@@ -226,7 +228,7 @@ export const ProfileSideBar = ({
                           : ""}
                         <br />
                         <small>
-                          ※その日中に過去最高ランクから降格した場合、データが記録されません
+                          {t("profile.sidebar.bestClassNote")}
                         </small>
                       </span>
                     </TooltipContent>
@@ -237,7 +239,7 @@ export const ProfileSideBar = ({
               )}
               <div className="flex h-full flex-col items-center justify-center gap-1 px-2 py-2.5">
                 <span className="text-[9px] font-bold uppercase tracking-widest text-bpim-muted">
-                  エリア
+                  {t("profile.sidebar.area")}
                 </span>
                 <span className="text-xs leading-none text-bpim-text">
                   {current?.area ?? "-"}
@@ -252,7 +254,7 @@ export const ProfileSideBar = ({
               </div>
               <div className="flex h-full flex-col items-center justify-center gap-1 px-2 py-2.5">
                 <span className="text-[9px] font-bold uppercase tracking-widest text-bpim-muted">
-                  段位 SP/DP
+                  {t("profile.sidebar.grade")}
                 </span>
                 <span className="text-xs text-bpim-text">
                   {current?.gradeSp ? `${current.gradeSp}` : "-"}
@@ -268,7 +270,7 @@ export const ProfileSideBar = ({
 
         <Collapsible open={historyOpen} onOpenChange={setHistoryOpen}>
           <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-bpim-muted transition-colors hover:bg-bpim-overlay">
-            <span>バージョン別履歴</span>
+            <span>{t("profile.sidebar.versionHistory")}</span>
             <ChevronDown
               className={`h-4 w-4 transition-transform duration-200 ${
                 historyOpen ? "rotate-180" : ""
@@ -281,7 +283,7 @@ export const ProfileSideBar = ({
         </Collapsible>
         {profile.stats[0]?.updatedAt && (
           <p className="mt-3 text-center text-[11px] text-muted-foreground/60">
-            最終更新:{" "}
+            {t("profile.sidebar.lastUpdated")}
             {dayjs(profile.stats[0].updatedAt).format("YYYY-MM-DD HH:mm:ss")}
           </p>
         )}

@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { iidxUrl } from "@/constants/iidxUrl";
 import { toast } from "sonner";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 const BOOKMARKLET_CODE =
   "javascript:(function(){var s=document.createElement('script');s.src='https://bpi2.poyashi.me/bookmarklet.js?t='+Date.now();document.body.appendChild(s);})();";
@@ -23,6 +24,7 @@ interface BookmarkletAccordionProps {
 }
 
 export const BookmarkletAccordion = ({ lastStep }: BookmarkletAccordionProps = {}) => {
+  const { t } = useTranslation();
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -36,28 +38,24 @@ export const BookmarkletAccordion = ({ lastStep }: BookmarkletAccordionProps = {
       rel="noopener noreferrer"
       className="text-bpim-primary underline decoration-bpim-primary/30 underline-offset-4 transition-colors hover:decoration-bpim-primary font-bold"
     >
-      IIDX公式サイト
+      {t("import.instruction.iidxSiteLink")}
     </a>
   );
 
-  const defaultLastStep = <>このページに戻り、「インポートを開始」ボタンをクリックします。</>;
+  const defaultLastStep = <>{t("import.bookmarklet.lastStep")}</>;
   const finalStep = lastStep ?? defaultLastStep;
 
   const desktopSteps = [
-    <>
-      下のボタンをブラウザのブックマークバーにドラッグ＆ドロップして登録します。
-    </>,
-    <>{iidxLink}を開きます。</>,
-    <>登録したブックマークレットをクリックして実行します。</>,
+    <>{t("import.bookmarklet.desktop.step1")}</>,
+    <>{t("import.bookmarklet.desktop.step2.prefix")}{iidxLink}{t("import.bookmarklet.desktop.step2.suffix")}</>,
+    <>{t("import.bookmarklet.desktop.step3")}</>,
     finalStep,
   ];
 
   const mobileSteps = [
-    <>下の「コピー」ボタンでブックマークレットのコードをコピーします。</>,
-    <>
-      ブラウザで任意のページをブックマークし、そのブックマークを編集してURLをコピーしたコードに書き換えます。
-    </>,
-    <>{iidxLink}を開き、アドレスバーにブックマーク名を入力して実行します。</>,
+    <>{t("import.bookmarklet.mobile.step1")}</>,
+    <>{t("import.bookmarklet.mobile.step2")}</>,
+    <>{t("import.bookmarklet.mobile.step3.prefix")}{iidxLink}{t("import.bookmarklet.mobile.step3.suffix")}</>,
     finalStep,
   ];
 
@@ -75,7 +73,7 @@ export const BookmarkletAccordion = ({ lastStep }: BookmarkletAccordionProps = {
             <div className="rounded-full bg-bpim-primary/10 p-1.5">
               <Bookmark className="h-4 w-4 text-bpim-primary" />
             </div>
-            <span>ブックマークレット経由で登録</span>
+            <span>{t("import.bookmarklet.accordionTitle")}</span>
           </div>
         </AccordionTrigger>
         <AccordionContent className="px-5 pb-5">
@@ -83,13 +81,9 @@ export const BookmarkletAccordion = ({ lastStep }: BookmarkletAccordionProps = {
             <div className="flex gap-3 rounded-lg border border-bpim-warning/30 bg-bpim-warning/10 p-4 text-[13px] leading-relaxed text-bpim-text">
               <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-bpim-warning" />
               <div className="space-y-2">
-                <p>
-                  このブックマークレットはログイン中の e-AMUSEMENT GATE
-                  上で実行されます。
-                </p>
+                <p>{t("import.bookmarklet.warning.main")}</p>
                 <p className="text-bpim-muted text-xs">
-                  ブックマークレットはページ上で任意の JavaScript
-                  を実行できるため、悪意あるコードであればセッションハイジャック等の攻撃が理論上可能です。ソースコードは{" "}
+                  {t("import.bookmarklet.warning.detailPrefix")}{" "}
                   <a
                     href="https://github.com/BPIManager/IIDX-Scraping-Bookmarklet"
                     target="_blank"
@@ -98,15 +92,15 @@ export const BookmarkletAccordion = ({ lastStep }: BookmarkletAccordionProps = {
                   >
                     GitHub <ExternalLink className="h-3 w-3" />
                   </a>{" "}
-                  で公開されています。内容を確認の上、自己責任でご使用ください。
+                  {t("import.bookmarklet.warning.detailSuffix")}
                   <br />
-                  (bpi2.poyashi.me/bookmarklet.jsはGitHubの最新リリースファイルに対するプロキシとして動作します)
+                  {t("import.bookmarklet.warning.proxyNote")}
                 </p>
               </div>
             </div>
 
             <p className="text-[13px] leading-relaxed text-bpim-muted">
-              以下の手順でスコアデータを自動抽出してインポートすることができます。
+              {t("import.bookmarklet.desc")}
             </p>
 
             <ol className="flex flex-col gap-3">
@@ -126,7 +120,7 @@ export const BookmarkletAccordion = ({ lastStep }: BookmarkletAccordionProps = {
             <div className="mt-2 flex flex-col gap-4 border-t border-bpim-border pt-4">
               <div className="flex flex-col gap-2">
                 <label className="text-[10px] font-bold uppercase tracking-wider text-bpim-muted">
-                  ブックマークレット
+                  {t("import.bookmarklet.codeLabel")}
                 </label>
                 <div className="flex items-center gap-2">
                   <input
@@ -145,10 +139,10 @@ export const BookmarkletAccordion = ({ lastStep }: BookmarkletAccordionProps = {
                   <div className="flex flex-col gap-0.5">
                     <div className="flex items-center gap-1.5 text-xs font-bold text-bpim-text">
                       <MousePointer2 className="h-3.5 w-3.5 text-bpim-primary" />
-                      ブックマークバーへ
+                      {t("import.bookmarklet.dragLabel")}
                     </div>
                     <p className="text-[11px] text-bpim-muted">
-                      左のボタンをツールバーへドラッグしてください
+                      {t("import.bookmarklet.dragHint")}
                     </p>
                   </div>
                 </div>
@@ -162,9 +156,11 @@ export const BookmarkletAccordion = ({ lastStep }: BookmarkletAccordionProps = {
 };
 
 const CopyCodeButton = () => {
+  const { t } = useTranslation();
+
   const handleCopy = async () => {
     await navigator.clipboard.writeText(BOOKMARKLET_CODE);
-    toast.success("コードをコピーしました");
+    toast.success(t("import.bookmarklet.copied"));
   };
 
   return (
@@ -173,16 +169,19 @@ const CopyCodeButton = () => {
       className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-bpim-primary bg-bpim-primary/10 px-4 py-2 text-sm font-bold text-bpim-primary transition-all hover:bg-bpim-primary hover:text-bpim-bg active:scale-95 select-none"
     >
       <Copy className="h-4 w-4" />
-      コピー
+      {t("import.bookmarklet.copyButton")}
     </button>
   );
 };
 
 const BookmarkletButton = () => {
+  const { t } = useTranslation();
   const ref = useRef<HTMLAnchorElement>(null);
+
   useEffect(() => {
     ref.current?.setAttribute("href", BOOKMARKLET_CODE);
   }, []);
+
   return (
     <a
       ref={ref}
@@ -192,7 +191,7 @@ const BookmarkletButton = () => {
       onClick={(e) => e.preventDefault()}
     >
       <Bookmark className="h-4 w-4" />
-      スコア取得
+      {t("import.bookmarklet.button")}
     </a>
   );
 };

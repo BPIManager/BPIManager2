@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Database, RefreshCw } from "lucide-react";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export default function TransferUi() {
   const { fbUser } = useUser();
@@ -19,6 +20,7 @@ export default function TransferUi() {
   const { checkData, foundVersions, isChecking } = useFirestoreDataCheck(
     fbUser?.uid,
   );
+  const { t } = useTranslation();
 
   const handleOpenConfirm = async () => {
     setIsConfirmOpen(true);
@@ -40,11 +42,11 @@ export default function TransferUi() {
           },
         },
       );
-      if (!response.ok) throw new Error("転送失敗");
-      toast.success("データの移行が完了しました。");
+      if (!response.ok) throw new Error("transfer failed");
+      toast.success(t("settings.transfer.success"));
       setIsConfirmOpen(false);
     } catch (e) {
-      toast.error("エラーが発生したため処理が完了しませんでした");
+      toast.error(t("settings.transfer.error"));
     } finally {
       setIsSyncing(false);
     }
@@ -55,17 +57,14 @@ export default function TransferUi() {
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-2 text-bpim-primary">
           <Database className="h-4 w-4" />
-          <span className="font-bold">データ移行</span>
+          <span className="font-bold">{t("settings.transfer.title")}</span>
         </div>
         <p className="text-sm text-bpim-muted">
-          BPIManagerで保存されたスコアをBPIM2へ引き継ぎます。
+          {t("settings.transfer.desc")}
         </p>
         <div className="mt-1 flex flex-col gap-0.5 text-[10px] text-bpim-warning leading-relaxed">
-          <span>
-            ※
-            BPIM2で登録されたデータをすべて削除し、BPIManagerのスコアに置き換えます。
-          </span>
-          <span>※ 操作を取り消すことはできません。</span>
+          <span>{t("settings.transfer.warning1")}</span>
+          <span>{t("settings.transfer.warning2")}</span>
         </div>
       </div>
 
@@ -76,30 +75,30 @@ export default function TransferUi() {
         className="w-full md:w-auto min-w-[100px] gap-2"
       >
         {isSyncing ? <LoadingSpinner size="sm" /> : <RefreshCw />}
-        {isSyncing ? "同期中..." : "同期"}
+        {isSyncing ? t("settings.transfer.syncing") : t("settings.transfer.sync")}
       </Button>
 
       <ActionConfirmDialog
         isOpen={isConfirmOpen}
         onClose={() => setIsConfirmOpen(false)}
         onConfirm={handleSyncFirestore}
-        title="データの同期と置き換え"
+        title={t("settings.transfer.dialogTitle")}
         isDestructive
         isLoading={isSyncing}
         description={
           <div className="flex flex-col gap-4 text-left">
             <p className="text-sm text-bpim-text">
-              BPIManagerで保存されたデータをBPIM2へ移行します。
+              {t("settings.transfer.dialogDesc")}
             </p>
 
             <div className="rounded-md border border-bpim-border bg-bpim-surface-2/60 p-3">
               <span className="mb-2 block text-xs font-bold text-bpim-muted">
-                移行可能なデータ:
+                {t("settings.transfer.migratableData")}
               </span>
               {isChecking ? (
                 <div className="flex items-center gap-2 text-xs text-bpim-text">
                   <LoadingSpinner size="xs" />
-                  <span>スキャン中...</span>
+                  <span>{t("common.scanning")}</span>
                 </div>
               ) : foundVersions.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
@@ -116,21 +115,20 @@ export default function TransferUi() {
                 </div>
               ) : (
                 <p className="text-xs text-bpim-danger font-bold">
-                  同期可能なデータが見つかりません。
+                  {t("settings.transfer.noData")}
                 </p>
               )}
             </div>
 
             <p className="text-[11px] text-bpim-warning font-bold leading-tight">
-              ※ 同期を実行すると現在のBPIM2のデータは上書き削除されます。
+              {t("settings.transfer.overwriteWarning")}
             </p>
             <p className="text-[11px] text-bpim-danger leading-tight">
-              ※
-              処理には最大2~3分かかることがあります。画面を閉じずにお待ちください。
+              {t("settings.transfer.timeWarning")}
             </p>
           </div>
         }
-        confirmLabel={foundVersions.length > 0 ? "同期" : "続行できません"}
+        confirmLabel={foundVersions.length > 0 ? t("settings.transfer.sync") : t("settings.transfer.cannotProceed")}
       />
     </div>
   );

@@ -4,6 +4,7 @@ import { Meta, JsonLd } from "@/components/partials/Head";
 import { SongListContent } from "@/components/partials/Songs/SongList";
 import { RecentNotesList } from "@/components/partials/Songs/RecentNotesList";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 const BASE_URL = "https://bpi2.poyashi.me";
 
@@ -26,14 +27,15 @@ const SONGS_JSONLD = {
 };
 
 export default function SongsPage() {
+  const { t } = useTranslation();
   return (
     <DashboardLayout>
       <PageHeader
-        title="楽曲情報"
-        description="楽曲メタ情報・属性の一覧と検索"
+        title={t("page.songs.title")}
+        description={t("page.songs.desc")}
       />
       <Meta
-        title="楽曲情報"
+        title={t("page.songs.title")}
         description="beatmania IIDX の楽曲メタ情報・難易度属性（皿・ソフラン・CN・物量など）の一覧と検索。当たり譜面検索や攻略情報も自由に書き込みできます。"
       />
       <JsonLd data={SONGS_JSONLD} />
@@ -46,8 +48,8 @@ export default function SongsPage() {
         <div className="md:hidden">
           <Tabs defaultValue="songs">
             <TabsList>
-              <TabsTrigger value="songs">楽曲検索</TabsTrigger>
-              <TabsTrigger value="notes">コメント一覧</TabsTrigger>
+              <TabsTrigger value="songs">{t("page.songs.search")}</TabsTrigger>
+              <TabsTrigger value="notes">{t("page.songs.comments")}</TabsTrigger>
             </TabsList>
             <TabsContent value="songs">
               <SongListContent />

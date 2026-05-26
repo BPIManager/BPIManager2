@@ -7,12 +7,14 @@ import { getVersionNameFromNumber } from "@/constants/versions";
 import { useUser } from "@/contexts/users/UserContext";
 import { PageLoader } from "@/components/ui/loading-spinner";
 import { useRouter } from "next/router";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export default function SummaryLogsPage() {
   const { fbUser, isLoading: isUserLoading } = useUser();
   const router = useRouter();
   const { userId, version, date } = router.query;
   const isOwnProfile = fbUser?.uid === userId;
+  const { t } = useTranslation();
 
   const isInitialLoading = !router.isReady || isUserLoading;
 
@@ -40,8 +42,8 @@ export default function SummaryLogsPage() {
   return (
     <UserProfileLayout userId={userId as string} currentTab="logs">
       <ProfileMeta
-        title={`${date as string}のプレイ記録まとめ`}
-        description={`$userName$さん($iidxid$)が${date as string}にbeatmaniaIIDX ${getVersionNameFromNumber(Number(version))}でプレイしたスコアの記録を確認できます。`}
+        title={`${date as string}${t("page.dailySummary.titleSuffix")}`}
+        description={`${t("profile.desc.datePre")}${date as string}${t("profile.desc.dateMid")}${getVersionNameFromNumber(Number(version))}${t("profile.desc.datePost")}`}
       />
       <div className="p-4">
         <LogsDetailContent

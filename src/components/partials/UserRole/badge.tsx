@@ -12,6 +12,7 @@ import dayjs from "@/lib/dayjs";
 import { cn } from "@/lib/utils";
 import type { UserRoleInfo } from "@/types/users/profile";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 type RoleKey = "coffee" | "saba" | "iidx" | "developer" | "pro";
 
@@ -81,6 +82,7 @@ export const RoleBadge = ({
   size?: "normal" | "small";
 }) => {
   const [open, setOpen] = useState(false);
+  const { t } = useTranslation();
   const config = ROLE_CONFIG[role as RoleKey];
   if (!config) return null;
 
@@ -125,9 +127,9 @@ export const RoleBadge = ({
           </button>
         </TooltipTrigger>
         <TooltipContent className="flex flex-col items-center gap-0.5 text-center">
-          <span className="font-bold">サポーターレベル:{tooltipText}</span>
+          <span className="font-bold">{t("role.supporterLevel")}{tooltipText}</span>
           <span className="text-[10px] text-bpim-muted">
-            {days}日間サポート中
+            {days} {t("role.supportingDays")}
             <br />
             {date}より
           </span>
@@ -136,7 +138,7 @@ export const RoleBadge = ({
             className="mt-1"
             onClick={() => window.open("https://bpi2.poyashi.me/support")}
           >
-            サポーターとは?
+            {t("role.whatIsSupporter")}
           </Button>
         </TooltipContent>
       </Tooltip>

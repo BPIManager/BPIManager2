@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import type { OptimizationResult } from "@/types/bpi-optimizer";
 import { OptimizationSummary } from "./OptimizationSummary";
 import { OptimizationStepCard } from "./OptimizationStepCard";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface OptimizationStepListProps {
   result: OptimizationResult;
@@ -16,6 +17,7 @@ export const OptimizationStepList = ({
   isSaving,
   isSaved,
 }: OptimizationStepListProps) => {
+  const { t } = useTranslation();
   const maxGain = Math.max(...result.steps.map((s) => s.bpiGain), 0.01);
 
   return (
@@ -34,7 +36,7 @@ export const OptimizationStepList = ({
               variant="outline"
               className="text-[10px] border-bpim-border text-bpim-subtle"
             >
-              推奨ルート（効率順）
+              {t("optimizer.steps.routeLabel")}
             </Badge>
           </div>
           {result.steps.map((step) => (

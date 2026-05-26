@@ -6,8 +6,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { diffColors } from "../../Table/ui";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export const TimelineItem = ({ entry }: { entry: TimelineEntry }) => {
+  const { t } = useTranslation();
   const { opponentScore: opp, viewerScore: viewer, isOvertaken } = entry;
 
   const hasViewerScore = !!viewer;
@@ -57,12 +59,12 @@ export const TimelineItem = ({ entry }: { entry: TimelineEntry }) => {
                     variant="destructive"
                     className="h-4 px-1.5 text-[9px] rounded-full gap-1"
                   >
-                    <Swords className="h-2.5 w-2.5" /> 敗北
+                    <Swords className="h-2.5 w-2.5" /> {t("rivals.card.lose")}
                   </Badge>
                 )}
                 {isCurrentlyWinning && (
                   <Badge className="h-4 px-1.5 text-[9px] rounded-full gap-1 bg-green-600 hover:bg-green-600 text-bpim-text border-none">
-                    <Crown className="h-2.5 w-2.5" /> 勝利
+                    <Crown className="h-2.5 w-2.5" /> {t("rivals.card.win")}
                   </Badge>
                 )}
               </div>

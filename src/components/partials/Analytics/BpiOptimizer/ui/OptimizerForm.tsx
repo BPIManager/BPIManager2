@@ -10,6 +10,7 @@ import type { RadarCategory } from "@/types/stats/radar";
 import { BpiChip } from "./BpiChip";
 import { OptimizerGuide } from "./OptimizerGuide";
 import { RADAR_LABELS } from "./shared";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 const ALL_RADAR_ELEMENTS: RadarCategory[] = [
   "NOTES",
@@ -66,13 +67,15 @@ export const OptimizerForm = ({
   onToggleRadarElement,
   strongRadarCategories,
   weakRadarCategories,
-}: OptimizerFormProps) => (
+}: OptimizerFormProps) => {
+  const { t } = useTranslation();
+  return (
   <div className="rounded-2xl border border-bpim-border bg-bpim-surface p-5 flex flex-col gap-6 shadow-lg">
     <div className="flex items-center justify-between border-b border-bpim-border pb-2">
-      <h2 className="text-sm font-bold flex items-center gap-2">条件設定</h2>
+      <h2 className="text-sm font-bold flex items-center gap-2">{t("optimizer.form.settings")}</h2>
       {currentTotalBpi !== null && (
         <div className="flex items-center gap-2 text-[11px] font-bold text-bpim-muted bg-bpim-bg px-2 py-2 rounded-full">
-          現在の総合BPI: <BpiChip bpi={currentTotalBpi} size="xs" />
+          {t("optimizer.currentBpiLabel")}: <BpiChip bpi={currentTotalBpi} size="xs" />
         </div>
       )}
     </div>
@@ -80,7 +83,7 @@ export const OptimizerForm = ({
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div className="space-y-2">
         <Label className="text-xs font-black text-bpim-muted uppercase tracking-tighter">
-          目標の総合BPI
+          {t("optimizer.targetBpiLabel")}
         </Label>
         <Input
           type="number"
@@ -98,7 +101,7 @@ export const OptimizerForm = ({
 
       <div className="space-y-2">
         <Label className="text-xs font-black text-bpim-muted uppercase tracking-tighter">
-          改善に取り組む曲数（目安）
+          {t("optimizer.maxStepsLabel")}
         </Label>
         <Input
           type="number"
@@ -113,16 +116,12 @@ export const OptimizerForm = ({
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
       <div className="space-y-3">
         <Label className="text-[10px] font-black text-bpim-muted uppercase tracking-widest">
-          アルゴリズムの性格
+          {t("optimizer.algorithmLabel")}
         </Label>
         <div className="flex p-1 bg-bpim-bg rounded-xl border border-bpim-border">
           {[
-            { id: "fastest", label: "スパルタ", desc: "最短経路を探索" },
-            {
-              id: "flexible",
-              label: "フレキシブル",
-              desc: "ゆるく達成できるルートを探索",
-            },
+            { id: "fastest", label: t("optimizer.mode.fastest.label"), desc: t("optimizer.mode.fastest.desc") },
+            { id: "flexible", label: t("optimizer.mode.flexible.label"), desc: t("optimizer.mode.flexible.desc") },
           ].map((mode) => (
             <button
               key={mode.id}
@@ -167,23 +166,23 @@ export const OptimizerForm = ({
             )}
           />
           <span className="text-xs font-bold">
-            現在の総合BPIを考慮して算出する
+            {t("optimizer.considerCurrentBpiLabel")}
           </span>
         </label>
       </div>
 
       <div className="space-y-3">
         <Label className="text-[10px] font-black text-bpim-muted uppercase tracking-widest">
-          重視するプレイスタイル
+          {t("optimizer.playStyleLabel")}
         </Label>
         <div className="grid grid-cols-1 gap-2">
           {[
             {
               key: "unplayed",
-              label: "未プレイ曲を埋める",
+              label: t("optimizer.strategy.unplayed"),
               icon: CircleDashed,
             },
-            { key: "played", label: "既プレイ曲を伸ばす", icon: TrendingUp },
+            { key: "played", label: t("optimizer.strategy.played"), icon: TrendingUp },
           ].map((item) => (
             <label
               key={item.key}
@@ -219,10 +218,10 @@ export const OptimizerForm = ({
     <div className="space-y-3">
       <div className="flex items-center gap-2">
         <Label className="text-[10px] font-black text-bpim-muted uppercase tracking-widest">
-          特定要素を持つ楽曲を指定
+          {t("optimizer.radarFilterLabel")}
         </Label>
         <span className="text-[9px] text-bpim-subtle">
-          （全選択で全楽曲を対象にします）
+          {t("optimizer.radarFilterHint")}
         </span>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -255,12 +254,12 @@ export const OptimizerForm = ({
               </span>
               {isStrong && (
                 <Badge className="text-[9px] h-4 px-1.5 ml-auto bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold">
-                  得意
+                  {t("optimizer.strong")}
                 </Badge>
               )}
               {isWeak && !isStrong && (
                 <Badge className="text-[9px] h-4 px-1.5 ml-auto bg-blue-500/20 text-blue-400 border border-blue-500/30 font-bold">
-                  苦手
+                  {t("optimizer.weak")}
                 </Badge>
               )}
             </label>
@@ -276,7 +275,8 @@ export const OptimizerForm = ({
       disabled={isLoading || inputError || !targetBpiInput || !maxStepsInput}
       className="w-full h-12 bg-bpim-primary text-white hover:bg-bpim-primary/90 font-black text-sm"
     >
-      {isLoading ? <CircleDashed className="animate-spin" /> : "計算開始"}
+      {isLoading ? <CircleDashed className="animate-spin" /> : t("optimizer.submit")}
     </Button>
   </div>
-);
+  );
+};

@@ -11,54 +11,58 @@ import { InfiniteScrollContainer } from "../../InfiniteScroll/ui";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AppTabsGroup } from "@/components/ui/complex/tabs";
 import { HelpTooltip } from "@/components/ui/tooltip";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
-const HelpText = (
-  <div className="space-y-3">
-    <section>
-      <p className="font-bold text-bpim-primary border-b border-bpim-primary/30 mb-1">
-        仕組み
-      </p>
-      <p>
-        自分の<span className="text-bpim-primary font-bold">総合BPI</span>
-        に近いプレイヤーをN名選出し、その近傍グループ内での
-        <span className="text-bpim-warning font-bold">相対的なスコア差</span>
-        を楽曲ごとに算出します。
-      </p>
-    </section>
+const RankingCardHelpContent = () => {
+  const { t } = useTranslation();
+  return (
+    <div className="space-y-3">
+      <section>
+        <p className="font-bold text-bpim-primary border-b border-bpim-primary/30 mb-1">
+          {t("dashboard.ranking.help.mechanismTitle")}
+        </p>
+        <p>
+          {t("dashboard.ranking.help.mechanismBefore")}
+          <span className="text-bpim-primary font-bold">{t("dashboard.ranking.help.mechanismBpiLabel")}</span>
+          {t("dashboard.ranking.help.mechanismMiddle")}
+          <span className="text-bpim-warning font-bold">{t("dashboard.ranking.help.mechanismHighlight")}</span>
+          {t("dashboard.ranking.help.mechanismAfter")}
+        </p>
+      </section>
 
-    <section>
-      <p className="font-bold text-bpim-primary border-b border-bpim-primary/30 mb-1">
-        各タブの意味
-      </p>
-      <ul className="space-y-2">
-        <li>
-          <span className="font-bold">武器曲かも?</span>
-          ：近傍N名の平均BPIより自分のBPIが高い楽曲。差が大きいほど得意な曲です。
-        </li>
-        <li>
-          <span className="font-bold">伸びるかも?</span>
-          ：近傍N名の平均BPIより自分のBPIが低い楽曲。同レベル帯の人が取れているスコアに届いていない曲を示します。
-        </li>
-      </ul>
-    </section>
+      <section>
+        <p className="font-bold text-bpim-primary border-b border-bpim-primary/30 mb-1">
+          {t("dashboard.ranking.help.tabsTitle")}
+        </p>
+        <ul className="space-y-2">
+          <li>
+            <span className="font-bold">{t("dashboard.ranking.help.weaponsLabel")}</span>
+            ：{t("dashboard.ranking.help.weaponsDesc")}
+          </li>
+          <li>
+            <span className="font-bold">{t("dashboard.ranking.help.potentialLabel")}</span>
+            ：{t("dashboard.ranking.help.potentialDesc")}
+          </li>
+        </ul>
+      </section>
 
-    <section>
-      <p className="font-bold text-bpim-primary border-b border-bpim-primary/30 mb-1">
-        N名の調整
-      </p>
-      <p>
-        タブ下のボタンで<span className="font-bold">10 / 20 / 50</span>
-        名を切り替えられます。少ないほど自分に近い実力帯に絞った比較、多いほど広いサンプルとの比較になります。
-      </p>
-    </section>
+      <section>
+        <p className="font-bold text-bpim-primary border-b border-bpim-primary/30 mb-1">
+          {t("dashboard.ranking.help.nTitle")}
+        </p>
+        <p>
+          {t("dashboard.ranking.help.nBefore")}
+          <span className="font-bold">{t("dashboard.ranking.help.nHighlight")}</span>
+          {t("dashboard.ranking.help.nAfter")}
+        </p>
+      </section>
 
-    <section className="bg-bpim-overlay/40 p-2 rounded text-[10px]">
-      <p>
-        近傍プレイヤーがプレイしていない曲はリストに表示されません。Nを増やすと表示される曲数が増える場合があります。
-      </p>
-    </section>
-  </div>
-);
+      <section className="bg-bpim-overlay/40 p-2 rounded text-[10px]">
+        <p>{t("dashboard.ranking.help.note")}</p>
+      </section>
+    </div>
+  );
+};
 
 const NEIGHBOR_OPTIONS = [10, 20, 50] as const;
 type NeighborN = (typeof NEIGHBOR_OPTIONS)[number];
@@ -102,6 +106,7 @@ const NeighborInfiniteList = ({
 };
 
 export const RankingTabsCard = ({ userId }: { userId: string }) => {
+  const { t } = useTranslation();
   const [selectedSong, setSelectedSong] = useState<SongWithScore | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [tab, setTab] = useState<string>("weapons");
@@ -118,16 +123,16 @@ export const RankingTabsCard = ({ userId }: { userId: string }) => {
         <AppTabsGroup
           visual="minimal"
           tabs={[
-            { value: "weapons", label: "武器曲かも?" },
-            { value: "potential", label: "伸びるかも?" },
-            { value: "nearLose", label: "ライバル僅差" },
+            { value: "weapons", label: t("dashboard.ranking.weapons") },
+            { value: "potential", label: t("dashboard.ranking.potential") },
+            { value: "nearLose", label: t("dashboard.ranking.nearLose") },
           ]}
         />
 
         {tab !== "nearLose" && (
           <div className="flex items-center gap-1.5 px-3 py-1.5 border-b border-bpim-border bg-bpim-surface-1">
             <span className="text-[10px] font-bold text-bpim-subtle">
-              近傍
+              {t("dashboard.ranking.neighbor")}
             </span>
             {NEIGHBOR_OPTIONS.map((opt) => (
               <button
@@ -139,11 +144,11 @@ export const RankingTabsCard = ({ userId }: { userId: string }) => {
                     : "text-bpim-muted hover:text-bpim-text"
                 }`}
               >
-                {opt}名
+                {opt}{t("dashboard.ranking.neighborUnit")}
               </button>
             ))}
             <div className="ml-auto">
-              <HelpTooltip align="right">{HelpText}</HelpTooltip>
+              <HelpTooltip align="right"><RankingCardHelpContent /></HelpTooltip>
             </div>
           </div>
         )}

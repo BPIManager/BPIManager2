@@ -28,20 +28,9 @@ import { LoginRequiredCard } from "../LoginRequired/ui";
 import { useUser } from "@/contexts/users/UserContext";
 import { PageContainer, PageHeader } from "../Header";
 import { GlobalRankingContainerSkeleton } from "./skeleton";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 const ITEM_SIZE = 58;
-
-const RADAR_CATEGORIES = [
-  { value: "totalBpi", label: "総合BPI" },
-  { value: "notes", label: "NOTES" },
-  { value: "chord", label: "CHORD" },
-  { value: "peak", label: "PEAK" },
-  { value: "charge", label: "CHARGE" },
-  { value: "scratch", label: "SCRATCH" },
-  { value: "soflan", label: "SOFLAN" },
-  { value: "songs", label: "個別楽曲" },
-  { value: "iidxTower", label: "IIDXタワー" },
-] as const;
 
 interface RowData {
   rankings: RankingEntry[];
@@ -75,6 +64,19 @@ const VirtualRow = ({
 export const GlobalRankingContainer = () => {
   const router = useRouter();
   const { user, isLoading: isCredentialLoading } = useUser();
+  const { t } = useTranslation();
+
+  const radarCategories = [
+    { value: "totalBpi", label: t("ranking.category.totalBpi") },
+    { value: "notes", label: t("ranking.category.notes") },
+    { value: "chord", label: t("ranking.category.chord") },
+    { value: "peak", label: t("ranking.category.peak") },
+    { value: "charge", label: t("ranking.category.charge") },
+    { value: "scratch", label: t("ranking.category.scratch") },
+    { value: "soflan", label: t("ranking.category.soflan") },
+    { value: "songs", label: t("ranking.category.songs") },
+    { value: "iidxTower", label: t("ranking.category.iidxTower") },
+  ];
   const version = (router.query.version as string) || latestVersion;
   const category = (router.query.category as string) || "totalBpi";
   const isSongsCategory = category === "songs";
@@ -185,8 +187,8 @@ export const GlobalRankingContainer = () => {
     return (
       <>
         <PageHeader
-          title="全体ランキング"
-          description="総合BPI・個別楽曲・IIDXタワーなどのランキング(BPIM2内実順位ベース)"
+          title={t("page.ranking.title")}
+          description={t("page.ranking.desc")}
         />
         <PageContainer>
           <GlobalRankingContainerSkeleton />
@@ -213,8 +215,8 @@ export const GlobalRankingContainer = () => {
   return (
     <>
       <PageHeader
-        title="全体ランキング"
-        description="総合BPI・個別楽曲・IIDXタワーなどのランキング(BPIM2内実順位ベース)"
+        title={t("page.ranking.title")}
+        description={t("page.ranking.desc")}
       />
       <PageContainer>
         <div className="flex gap-3 mb-4">
@@ -245,7 +247,7 @@ export const GlobalRankingContainer = () => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="border-bpim-border bg-bpim-bg text-bpim-text">
-                {RADAR_CATEGORIES.filter(
+                {radarCategories.filter(
                   (c) =>
                     isLatestVersion ||
                     c.value === "totalBpi" ||
@@ -264,7 +266,7 @@ export const GlobalRankingContainer = () => {
           <div className="flex gap-3 mb-4">
             <div className="flex flex-col gap-1 flex-1">
               <label className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
-                地域
+                {t("ranking.filter.area")}
               </label>
               <Select
                 value={filterArea || "all"}
@@ -274,7 +276,7 @@ export const GlobalRankingContainer = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="border-bpim-border bg-bpim-bg text-bpim-text">
-                  <SelectItem value="all">全て</SelectItem>
+                  <SelectItem value="all">{t("ranking.filter.all")}</SelectItem>
                   {JAPAN_PREFECTURES.map((pref) => (
                     <SelectItem key={pref} value={pref}>
                       {pref}
@@ -286,7 +288,7 @@ export const GlobalRankingContainer = () => {
 
             <div className="flex flex-col gap-1 flex-1">
               <label className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
-                アリーナクラス
+                {t("ranking.filter.arenaClass")}
               </label>
               <Select
                 value={filterArenaClass || "all"}
@@ -296,7 +298,7 @@ export const GlobalRankingContainer = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="border-bpim-border bg-bpim-bg text-bpim-text">
-                  <SelectItem value="all">全て</SelectItem>
+                  <SelectItem value="all">{t("ranking.filter.all")}</SelectItem>
                   {ARENA_RANK_ORDER.map((cls) => (
                     <SelectItem key={cls} value={cls}>
                       {cls}
@@ -317,9 +319,7 @@ export const GlobalRankingContainer = () => {
             {isRadarCategory && isLatestVersion && (
               <div className="mb-3 flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-400">
                 <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                <span>
-                  レーダーランキングは事前計算された値を使用しているため、スコア反映まで最大24時間の遅延が発生します。
-                </span>
+                <span>{t("ranking.radar.delayNotice")}</span>
               </div>
             )}
 
@@ -328,14 +328,14 @@ export const GlobalRankingContainer = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-md text-bpim-muted">
-                      全 {totalCount} 人中
+                      {t("ranking.selfRank.outOf")}{totalCount}{t("ranking.selfRank.people")}
                     </p>
                   </div>
                   <div className="text-right">
-                    <span className="text-xs text-bpim-muted">現在の順位</span>
+                    <span className="text-xs text-bpim-muted">{t("ranking.selfRank.label")}</span>
                     <div className="font-mono text-xl font-bold text-bpim-text">
                       <span className="text-bpim-primary">{selfRank}</span>
-                      <span className="ml-0.5 text-sm">位</span>
+                      <span className="ml-0.5 text-sm">{t("ranking.selfRank.suffix")}</span>
                     </div>
                   </div>
                 </div>

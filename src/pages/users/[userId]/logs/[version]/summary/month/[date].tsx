@@ -8,6 +8,7 @@ import { useUser } from "@/contexts/users/UserContext";
 import { PageLoader } from "@/components/ui/loading-spinner";
 import { useRouter } from "next/router";
 import dayjs from "@/lib/dayjs";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export default function MonthlyLogsPage() {
   const { fbUser, isLoading: isUserLoading } = useUser();
@@ -15,6 +16,12 @@ export default function MonthlyLogsPage() {
   const { userId, version, date } = router.query;
   const isOwnProfile = fbUser?.uid === userId;
   const isInitialLoading = !router.isReady || isUserLoading;
+  const { t } = useTranslation();
+
+  const dateStr = date as string;
+  const monthLabel = dateStr
+    ? dayjs.tz(dateStr).format(t("format.monthYear"))
+    : "";
 
   if (isInitialLoading) {
     return (
@@ -23,11 +30,6 @@ export default function MonthlyLogsPage() {
       </DashboardLayout>
     );
   }
-
-  const dateStr = date as string;
-  const monthLabel = dateStr
-    ? dayjs.tz(dateStr).format("YYYY年M月")
-    : "";
 
   if (isOwnProfile) {
     return (
@@ -45,8 +47,8 @@ export default function MonthlyLogsPage() {
   return (
     <UserProfileLayout userId={userId as string} currentTab="logs">
       <ProfileMeta
-        title={`${monthLabel}のプレイ記録まとめ`}
-        description={`$userName$さん($iidxid$)が${monthLabel}にbeatmaniaIIDX ${getVersionNameFromNumber(Number(version))}でプレイしたスコアの記録を確認できます。`}
+        title={`${monthLabel}${t("page.monthlySummary.titleSuffix")}`}
+        description={`${t("profile.desc.datePre")}${monthLabel}${t("profile.desc.dateMid")}${getVersionNameFromNumber(Number(version))}${t("profile.desc.datePost")}`}
       />
       <div className="p-4">
         <LogsDetailContent

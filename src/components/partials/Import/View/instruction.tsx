@@ -1,4 +1,4 @@
-﻿import { iidxUrl } from "@/constants/iidxUrl";
+import { iidxUrl } from "@/constants/iidxUrl";
 import {
   HelpCircle,
   Info,
@@ -6,8 +6,11 @@ import {
   Monitor,
   Gamepad2,
 } from "lucide-react";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export const InstructionSection = () => {
+  const { t } = useTranslation();
+
   const acSteps = [
     {
       step: 1,
@@ -19,14 +22,14 @@ export const InstructionSection = () => {
             rel="noopener noreferrer"
             className="text-bpim-primary underline decoration-bpim-primary/30 underline-offset-4 transition-colors hover:text-bpim-primary hover:decoration-bpim-primary"
           >
-            IIDX公式サイト
+            {t("import.instruction.iidxSiteLink")}
           </a>{" "}
-          にアクセスしてCSVをダウンロードします。
+          {t("import.instruction.ac.step1.suffix")}
         </>
       ),
     },
-    { step: 2, text: "入力エリアにCSVデータを直接貼り付けてください。" },
-    { step: 3, text: "「インポートを開始」ボタンを押して完了を待ちます。" },
+    { step: 2, text: t("import.instruction.ac.step2") },
+    { step: 3, text: t("import.instruction.ac.step3") },
   ];
 
   const infinitasSteps = [
@@ -61,13 +64,13 @@ export const InstructionSection = () => {
           >
             打鍵カウンタ
           </a>
-          」から出力されるCSVまたはTSVを用意します。
+          」{t("import.instruction.infinitas.step1.suffix")}
         </>
       ),
     },
-    { step: 2, text: "保存先バージョンを「INFINITAS」へ変更します。" },
-    { step: 3, text: "入力エリアにデータを直接貼り付けてください。" },
-    { step: 4, text: "「インポートを開始」ボタンを押して完了を待ちます。" },
+    { step: 2, text: t("import.instruction.infinitas.step2") },
+    { step: 3, text: t("import.instruction.infinitas.step3") },
+    { step: 4, text: t("import.instruction.infinitas.step4") },
   ];
 
   return (
@@ -75,7 +78,7 @@ export const InstructionSection = () => {
       <div className="flex items-center gap-3 border-b border-bpim-border pb-4">
         <HelpCircle className="h-6 w-6 text-bpim-primary" />
         <h3 className="text-xl font-bold text-bpim-text">
-          データインポート方法
+          {t("import.instruction.title")}
         </h3>
       </div>
 
@@ -83,7 +86,7 @@ export const InstructionSection = () => {
         <div className="space-y-4">
           <div className="flex items-center gap-2 text-bpim-primary">
             <Monitor className="h-5 w-5" />
-            <h4 className="font-bold">アーケード版</h4>
+            <h4 className="font-bold">{t("import.instruction.ac.title")}</h4>
           </div>
           <ul className="flex flex-col gap-3">
             {acSteps.map((item) => (
@@ -107,7 +110,7 @@ export const InstructionSection = () => {
             <div className="flex items-start gap-2 text-bpim-warning">
               <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
               <p className="text-bpim-muted text-xs">
-                Refluxからのデータは楽曲名の表記揺れにより、一部取り込みエラーが発生する場合があるため、打鍵カウンタ又はリザルト手帳の利用を推奨します。
+                {t("import.instruction.infinitas.note")}
               </p>
             </div>
           </div>

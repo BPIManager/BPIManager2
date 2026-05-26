@@ -5,6 +5,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, Eye, EyeOff, Columns, Square } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { WidgetConfig, WidgetId, WIDGET_META } from "@/types/dashboard/layout";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export function ColsPreview({ cols }: { cols: 1 | 2 }) {
   return (
@@ -249,6 +250,7 @@ export function WidgetRow({
   onToggleWidth,
   isOverlay = false,
 }: WidgetRowProps) {
+  const { t } = useTranslation();
   const {
     attributes,
     listeners,
@@ -278,7 +280,7 @@ export function WidgetRow({
       <button
         {...(isOverlay ? {} : { ...attributes, ...listeners })}
         className="cursor-grab touch-none text-bpim-muted active:cursor-grabbing"
-        aria-label="並び替え"
+        aria-label={t("dashboard.layoutSettings.reorderAria")}
         tabIndex={-1}
       >
         <GripVertical className="h-4 w-4" />
@@ -287,7 +289,7 @@ export function WidgetRow({
       {WIDGET_PREVIEWS[widget.id]}
 
       <span className="flex-1 truncate text-sm text-bpim-text">
-        {meta.label}
+        {t(meta.label)}
       </span>
 
       {widget.section === "main" && mainCols === 2 && (
@@ -301,21 +303,21 @@ export function WidgetRow({
               : "bg-bpim-overlay/30 text-bpim-muted",
             !widget.visible && "pointer-events-none",
           )}
-          title={widget.width === "half" ? "2列中1列" : "全幅"}
+          title={widget.width === "half" ? t("dashboard.layoutSettings.halfTitle") : t("dashboard.layoutSettings.fullTitle")}
         >
           {widget.width === "half" ? (
             <Columns className="h-3 w-3" />
           ) : (
             <Square className="h-3 w-3" />
           )}
-          <span>{widget.width === "half" ? "1/2" : "全幅"}</span>
+          <span>{widget.width === "half" ? "1/2" : t("dashboard.layoutSettings.fullWidth")}</span>
         </button>
       )}
 
       <button
         onClick={onToggleVisible}
         className="text-bpim-muted transition-colors hover:text-bpim-text"
-        aria-label={widget.visible ? "非表示にする" : "表示する"}
+        aria-label={widget.visible ? t("dashboard.layoutSettings.hideAria") : t("dashboard.layoutSettings.showAria")}
       >
         {widget.visible ? (
           <Eye className="h-4 w-4" />
@@ -344,6 +346,7 @@ export function DropZone({
   onToggleVisible: (id: WidgetId) => void;
   onToggleWidth: (id: WidgetId) => void;
 }) {
+  const { t } = useTranslation();
   return (
     <div className="flex flex-col gap-2">
       <h3
@@ -355,7 +358,7 @@ export function DropZone({
         {label}
         {sectionId === "main" && (
           <span className="ml-2 text-xs font-normal text-bpim-muted">
-            ドラッグで並び替え・移動
+            {t("dashboard.layoutSettings.reorder")}
           </span>
         )}
       </h3>
@@ -373,7 +376,7 @@ export function DropZone({
         >
           {widgets.length === 0 && (
             <div className="flex items-center justify-center py-3 text-xs text-bpim-muted">
-              ここにドロップ
+              {t("dashboard.layoutSettings.dropHere")}
             </div>
           )}
           {widgets.map((widget) => (

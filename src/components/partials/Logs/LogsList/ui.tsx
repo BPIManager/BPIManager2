@@ -11,6 +11,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ArrowRightLeft } from "lucide-react";
+import { useTranslation } from "@/hooks/common/useTranslation";
+import type { TranslationKey } from "@/lib/i18n/translations";
 
 interface Props {
   userId: string | undefined;
@@ -37,13 +39,17 @@ function getGroupKey(date: Date, granularity: string): string {
   return d.format("YYYY-MM-DD");
 }
 
-function getGroupLabel(key: string, granularity: string): string {
+function getGroupLabel(
+  key: string,
+  granularity: string,
+  t: (k: TranslationKey) => string,
+): string {
   if (granularity === "week") {
     const start = dayjs.tz(key);
-    return `${start.format("YYYY年M月D日")}〜${start.endOf("isoWeek").format("M月D日")}`;
+    return `${start.format(t("format.fullDate"))}${t("format.weekRangeSep")}${start.endOf("isoWeek").format(t("format.monthDay"))}`;
   }
   if (granularity === "month") {
-    return dayjs.tz(`${key}-01`).format("YYYY年M月");
+    return dayjs.tz(`${key}-01`).format(t("format.monthYear"));
   }
   return key;
 }
@@ -61,8 +67,14 @@ function getSummaryPath(
   return `/users/${userId}/logs/${version}/summary/${representativeDate}`;
 }
 
-export const LogsList = ({ userId, version, groupedBy, granularity }: Props) => {
+export const LogsList = ({
+  userId,
+  version,
+  groupedBy,
+  granularity,
+}: Props) => {
   const [page, setPage] = useState(1);
+  const { t } = useTranslation();
   const { logs, isLoading, isError } = useBatchesList(
     userId,
     version,
@@ -80,7 +92,7 @@ export const LogsList = ({ userId, version, groupedBy, granularity }: Props) => 
       if (!groups[key]) {
         groups[key] = {
           key,
-          label: getGroupLabel(key, granularity),
+          label: getGroupLabel(key, granularity, t),
           representativeDate: dayjs(log.createdAt).tz().format("YYYY-MM-DD"),
           logs: [],
           totalUpdates: 0,
@@ -94,7 +106,7 @@ export const LogsList = ({ userId, version, groupedBy, granularity }: Props) => 
     });
 
     return Object.values(groups);
-  }, [logs, granularity]);
+  }, [logs, granularity, t]);
 
   const displayGroups = useMemo(() => {
     const startIndex = (page - 1) * PAGE_SIZE;
@@ -103,8 +115,8 @@ export const LogsList = ({ userId, version, groupedBy, granularity }: Props) => 
 
   if (isError)
     return (
-      <div className="flex h-[200px] items-center justify-center">
-        <p className="text-bpim-danger font-bold">読み込みに失敗しました</p>
+      <div className="flex h-50 items-center justify-center">
+        <p className="text-bpim-danger font-bold">{t("logs.loadError")}</p>
       </div>
     );
 
@@ -114,13 +126,11 @@ export const LogsList = ({ userId, version, groupedBy, granularity }: Props) => 
         <div className="rounded-xl border border-bpim-border bg-bpim-bg/40 p-6 text-center max-w-md w-full">
           <ArrowRightLeft className="mx-auto mb-3 h-8 w-8 text-bpim-primary" />
           <p className="text-sm text-bpim-muted mb-4">
-            現バージョンと前作のスコアを比較します
+            {t("logs.versionCompareDesc")}
           </p>
           <Button asChild variant="default" className="w-full">
-            <Link
-              href={`/users/${userId}/logs/${version}/summary/version`}
-            >
-              バージョン比較を見る
+            <Link href={`/users/${userId}/logs/${version}/summary/version`}>
+              {t("logs.versionCompareBtn")}
             </Link>
           </Button>
         </div>
@@ -146,7 +156,7 @@ export const LogsList = ({ userId, version, groupedBy, granularity }: Props) => 
               <div key={group.key} className="relative">
                 <div className="relative z-10 mb-4 flex items-center gap-4">
                   <div
-                    className="hidden md:block h-3 w-3 shrink-0 rounded-full border-2 border-slate-950 bg-bpim-primary ml-[21px]"
+                    className="hidden md:block h-3 w-3 shrink-0 rounded-full border-2 border-slate-950 bg-bpim-primary ml-5.25"
                     aria-hidden="true"
                   />
                   <h2 className="text-xl font-bold tracking-tight text-bpim-text">
@@ -175,14 +185,14 @@ export const LogsList = ({ userId, version, groupedBy, granularity }: Props) => 
                   >
                     <div
                       className={cn(
-                        "rounded-xl border border-bpim-border bg-white/[0.02] p-4",
+                        "rounded-xl border border-bpim-border bg-white/2 p-4",
                         "transition-colors hover:bg-bpim-overlay/30 cursor-pointer",
                       )}
                     >
                       <div className="flex gap-8">
                         <div className="flex flex-col">
                           <span className="text-[10px] font-bold text-bpim-muted uppercase tracking-wider">
-                            合計更新件数
+                            {t("logs.totalUpdates")}
                           </span>
                           <span className="text-lg font-bold text-bpim-text">
                             {group.totalUpdates}{" "}
@@ -193,7 +203,7 @@ export const LogsList = ({ userId, version, groupedBy, granularity }: Props) => 
                         </div>
                         <div className="flex flex-col">
                           <span className="text-[10px] font-bold text-bpim-muted uppercase tracking-wider">
-                            BPI上昇幅計
+                            {t("logs.totalBpiDelta")}
                           </span>
                           <span
                             className={cn(
@@ -214,7 +224,7 @@ export const LogsList = ({ userId, version, groupedBy, granularity }: Props) => 
                   <>
                     <div
                       className={cn(
-                        "mb-4 rounded-xl border border-bpim-border bg-white/[0.02] p-4",
+                        "mb-4 rounded-xl border border-bpim-border bg-white/2 p-4",
                         "md:ml-12",
                       )}
                     >
@@ -222,7 +232,7 @@ export const LogsList = ({ userId, version, groupedBy, granularity }: Props) => 
                         <div className="flex gap-8">
                           <div className="flex flex-col">
                             <span className="text-[10px] font-bold text-bpim-muted uppercase tracking-wider">
-                              合計更新件数
+                              {t("logs.totalUpdates")}
                             </span>
                             <span className="text-lg font-bold text-bpim-text">
                               {group.totalUpdates}{" "}
@@ -233,7 +243,7 @@ export const LogsList = ({ userId, version, groupedBy, granularity }: Props) => 
                           </div>
                           <div className="flex flex-col">
                             <span className="text-[10px] font-bold text-bpim-muted uppercase tracking-wider">
-                              BPI上昇幅計
+                              {t("logs.totalBpiDelta")}
                             </span>
                             <span
                               className={cn(
@@ -260,7 +270,7 @@ export const LogsList = ({ userId, version, groupedBy, granularity }: Props) => 
                               query: { groupedBy },
                             }}
                           >
-                            詳細を見る
+                            {t("logs.viewDetail")}
                           </Link>
                         </Button>
                       </div>

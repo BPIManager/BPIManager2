@@ -1,6 +1,7 @@
 ﻿import { TrendingUp, TrendingDown } from "lucide-react";
 import { formatIIDXId } from "@/utils/common/formatIidxId";
 import dayjs from "@/lib/dayjs";
+import { useTranslation } from "@/hooks/common/useTranslation";
 import { RadarSectionChart } from "../../DashBoard/Radar";
 import { getBpiColorStyle } from "@/constants/bpiColor";
 import { getRoleCardStyle } from "@/constants/roleCardStyle";
@@ -27,6 +28,7 @@ export const UserRecommendationCard = ({
   currentSort?: string;
   onClick: () => void;
 }) => {
+  const { t } = useTranslation();
   const timeAgo = user.updatedAt ? dayjs(user.updatedAt).fromNow() : "-";
   const isTotalBpi = currentSort === "totalBpi";
   const displayLabel = isTotalBpi
@@ -96,7 +98,7 @@ export const UserRecommendationCard = ({
               </span>
             </div>
             <span className="text-[10px] text-bpim-muted md:text-[12px]">
-              最終更新: {timeAgo}
+              {t("common.lastUpdated")}{timeAgo}
             </span>
           </div>
         </div>

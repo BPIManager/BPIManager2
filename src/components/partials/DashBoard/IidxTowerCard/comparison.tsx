@@ -15,19 +15,7 @@ import {
   CartesianGrid,
   ReferenceLine,
 } from "recharts";
-
-const PERIODS = [
-  { label: "7日", days: 7 },
-  { label: "30日", days: 30 },
-  { label: "90日", days: 90 },
-  { label: "全期間", days: 0 },
-] as const;
-
-const GRANULARITIES = [
-  { label: "日次", value: "day" },
-  { label: "週次", value: "week" },
-  { label: "月次", value: "month" },
-] as const;
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 const fmt = (n: number) => n.toLocaleString("ja-JP");
 
@@ -42,11 +30,12 @@ type Granularity = "day" | "week" | "month";
 
 export const IidxTowerComparisonSection = ({
   rivalUserId,
-  myName = "自分",
-  rivalName = "ライバル",
+  myName,
+  rivalName,
   defaultPeriod = 0,
 }: Props) => {
   const { data, isLoading } = useIidxTowerCompare(rivalUserId);
+  const { t } = useTranslation();
 
   if (isLoading) return <IidxTowerCardSkeleton />;
 
@@ -54,8 +43,8 @@ export const IidxTowerComparisonSection = ({
     <IidxTowerComparisonCard
       myData={data?.self ?? []}
       rivalData={data?.target ?? []}
-      myName={myName}
-      rivalName={rivalName}
+      myName={myName ?? t("dashboard.me")}
+      rivalName={rivalName ?? t("dashboard.rival")}
       defaultPeriod={defaultPeriod}
     />
   );
@@ -74,8 +63,25 @@ function IidxTowerComparisonCard({
   rivalName: string;
   defaultPeriod: number;
 }) {
+  const { t } = useTranslation();
   const [periodDays, setPeriodDays] = useState<number>(defaultPeriod);
   const [granularity, setGranularity] = useState<Granularity>("week");
+
+  const PERIODS = [
+    { label: t("dashboard.iidxTower.period7"), days: 7 },
+    { label: t("dashboard.iidxTower.period30"), days: 30 },
+    { label: t("dashboard.iidxTower.period90"), days: 90 },
+    { label: t("dashboard.iidxTower.periodAll"), days: 0 },
+  ] as const;
+
+  const GRANULARITIES = [
+    { label: t("dashboard.iidxTower.granularityDay"), value: "day" as const },
+    { label: t("dashboard.iidxTower.granularityWeek"), value: "week" as const },
+    { label: t("dashboard.iidxTower.granularityMonth"), value: "month" as const },
+  ];
+
+  const keyLabel = t("dashboard.iidxTower.key");
+  const scratchLabel = t("dashboard.iidxTower.scratch");
 
   const { myTotals, rivalTotals, chartData, scratchScale } = useMemo(() => {
     const filterAndGroup = (
@@ -168,7 +174,7 @@ function IidxTowerComparisonCard({
             <LordiconAnimation src="/lottie/ghost.json" trigger="loop" size={36} />
           </div>
           <h3 className="tracking-tight text-base font-black text-bpim-text">
-            IIDXタワーのデータがありません
+            {t("dashboard.iidxTower.noData")}
           </h3>
         </div>
       </DashCard>
@@ -179,12 +185,12 @@ function IidxTowerComparisonCard({
     <DashCard>
       <div className="mb-4 flex items-center justify-between">
         <p className="text-xs font-bold uppercase tracking-wide text-bpim-muted">
-          打鍵比較
+          {t("dashboard.iidxTower.strokeCompare")}
         </p>
         <div className="flex gap-1">
           {PERIODS.map((p) => (
             <button
-              key={p.label}
+              key={p.days}
               onClick={() => setPeriodDays(p.days)}
               className={`rounded px-2 py-1 text-[10px] font-bold transition-colors ${
                 periodDays === p.days
@@ -217,7 +223,7 @@ function IidxTowerComparisonCard({
       <div className="rounded-xl border border-bpim-border bg-bpim-surface-1/50 p-4">
         <div className="mb-6 flex flex-col gap-3">
           <CompareBar
-            label="鍵盤累計"
+            label={t("dashboard.iidxTower.keyTotal")}
             myValue={myTotals.key}
             rivalValue={rivalTotals.key}
             myName={myName}
@@ -226,7 +232,7 @@ function IidxTowerComparisonCard({
             rivalColor="var(--color-bpim-success)"
           />
           <CompareBar
-            label="スクラッチ累計"
+            label={t("dashboard.iidxTower.scratchTotal")}
             myValue={myTotals.scratch}
             rivalValue={rivalTotals.scratch}
             myName={myName}
@@ -301,7 +307,7 @@ function IidxTowerComparisonCard({
                   }}
                   formatter={(v: any, name: any, props: any) => {
                     const nameStr = String(name);
-                    if (nameStr.includes("(スクラッチ)")) {
+                    if (nameStr.includes(`(${scratchLabel})`)) {
                       const rawVal = name.includes(myName)
                         ? props.payload.rawMyScr
                         : props.payload.rawRivalScr;
@@ -330,7 +336,7 @@ function IidxTowerComparisonCard({
                 <Bar
                   dataKey="myKey"
                   stackId="me"
-                  name={`${myName} (鍵盤)`}
+                  name={`${myName} (${keyLabel})`}
                   fill="var(--color-bpim-primary)"
                   radius={[2, 2, 0, 0]}
                   barSize={granularity === "day" ? 8 : 16}
@@ -338,7 +344,7 @@ function IidxTowerComparisonCard({
                 <Bar
                   dataKey="myScr"
                   stackId="me"
-                  name={`${myName} (スクラッチ)`}
+                  name={`${myName} (${scratchLabel})`}
                   fill="var(--color-bpim-warning)"
                   radius={[0, 0, 2, 2]}
                 />
@@ -346,7 +352,7 @@ function IidxTowerComparisonCard({
                 <Bar
                   dataKey="rivalKey"
                   stackId="rival"
-                  name={`${rivalName} (鍵盤)`}
+                  name={`${rivalName} (${keyLabel})`}
                   fill="var(--color-bpim-success)"
                   radius={[2, 2, 0, 0]}
                   barSize={granularity === "day" ? 8 : 16}
@@ -354,7 +360,7 @@ function IidxTowerComparisonCard({
                 <Bar
                   dataKey="rivalScr"
                   stackId="rival"
-                  name={`${rivalName} (スクラッチ)`}
+                  name={`${rivalName} (${scratchLabel})`}
                   fill="var(--color-bpim-danger)"
                   radius={[0, 0, 2, 2]}
                 />

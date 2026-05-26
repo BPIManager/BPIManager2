@@ -16,6 +16,7 @@ import { FilterProvider } from "@/contexts/stats/FilterContext";
 import { LayoutDashboard, Music, Table, History } from "lucide-react";
 import { PageLoader } from "@/components/ui/loading-spinner";
 import { AppTabsList, AppTabsTrigger } from "@/components/ui/complex/tabs";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface UserProfileLayoutProps {
   userId: string;
@@ -30,6 +31,7 @@ export const UserProfileLayout = ({
 }: UserProfileLayoutProps) => {
   const router = useRouter();
   const { user } = useUser();
+  const { t } = useTranslation();
   const {
     profile,
     isLoading,
@@ -94,37 +96,37 @@ export const UserProfileLayout = ({
                       {
                         value: "overview",
                         href: `/users/${userId}`,
-                        label: "サマリ",
+                        label: t("profile.tab.overview"),
                         icon: LayoutDashboard,
                       },
                       {
                         value: "songs",
                         href: `/users/${userId}/scores/${latestVersion}?${scoreParams}`,
-                        label: "スコア",
+                        label: t("profile.tab.scores"),
                         icon: Music,
                       },
                       {
                         value: "logs",
                         href: `/users/${userId}/logs/${version}`,
-                        label: "更新履歴",
+                        label: t("profile.tab.history"),
                         icon: History,
                       },
                       {
                         value: "aaaTable",
                         href: `/users/${userId}/aaaTable/${version}`,
-                        label: "AAA達成表",
+                        label: t("profile.tab.aaaTable"),
                         icon: Table,
                       },
-                    ].map((t) => (
+                    ].map((tab) => (
                       <AppTabsTrigger
-                        key={t.value}
-                        value={t.value}
+                        key={tab.value}
+                        value={tab.value}
                         visual="card"
-                        icon={t.icon}
-                        href={t.href}
+                        icon={tab.icon}
+                        href={tab.href}
                         iconOnly
                       >
-                        {t.label}
+                        {tab.label}
                       </AppTabsTrigger>
                     ))}
                   </AppTabsList>

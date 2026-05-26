@@ -2,6 +2,7 @@
 import type { BatchDetailItem } from "@/types/logs/batchDetail";
 import { cn } from "@/lib/utils";
 import { getRankDetail } from "@/constants/djRank";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface RankItemProps {
   item: BatchDetailItem;
@@ -18,6 +19,7 @@ export const RankItem = ({
   onClick,
   isSharing,
 }: RankItemProps) => {
+  const { t } = useTranslation();
   const isGrowth = type === "growth";
   const isNew = !item.previous;
 
@@ -123,7 +125,7 @@ export const RankItem = ({
             </span>
             {isNew && (
               <span className="rounded-sm bg-purple-600 px-1.5 py-0.5 text-[9px] font-bold text-bpim-text">
-                初プレイ
+                {t("logs.rank.newBadge")}
               </span>
             )}
           </div>

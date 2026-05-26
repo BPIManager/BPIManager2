@@ -22,6 +22,7 @@ import {
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useSupporters } from "@/hooks/users/useSupporters";
+import { useTranslation } from "@/hooks/common/useTranslation";
 import { PageContainer, PageHeader } from "../Header";
 import {
   SupporterListView,
@@ -37,8 +38,8 @@ const PLANS = [
     id: "coffee",
     icon: Coffee,
     label: "Coffee",
+    descKey: "support.plan.coffee.desc",
     price: "100",
-    description: "集中力維持のコーヒー代として活用させていただきます",
     color: "text-amber-400",
     border: "border-amber-400/20",
     bg: "bg-amber-400/5",
@@ -48,8 +49,8 @@ const PLANS = [
     id: "saba",
     icon: Fish,
     label: "Saba",
+    descKey: "support.plan.saba.desc",
     price: "500",
-    description: "サーバー維持費に充てさせていただきます",
     color: "text-cyan-400",
     border: "border-cyan-400/20",
     bg: "bg-cyan-400/5",
@@ -59,9 +60,8 @@ const PLANS = [
     id: "iidx",
     icon: Sparkles,
     label: "Sparkle",
+    descKey: "support.plan.sparkle.desc",
     price: "1,000",
-    description:
-      "Claude Code,Gemini Pro等の開発ツール費用に充てさせていただきます",
     color: "text-violet-300",
     border: "border-violet-400/20",
     bg: "bg-violet-500/5",
@@ -69,17 +69,14 @@ const PLANS = [
   },
 ] as const;
 
-const PlanCard = (props: (typeof PLANS)[number]) => {
-  const {
-    icon: Icon,
-    label,
-    price,
-    description,
-    color,
-    border,
-    bg,
-    glow,
-  } = props;
+type PlanCardProps = Omit<(typeof PLANS)[number], "descKey"> & {
+  description: string;
+};
+
+const PlanCard = (props: PlanCardProps) => {
+  const { t } = useTranslation();
+  const { icon: Icon, label, price, description, color, border, bg, glow } =
+    props;
   return (
     <div
       className={cn(
@@ -100,7 +97,7 @@ const PlanCard = (props: (typeof PLANS)[number]) => {
         </div>
         <div className="text-right">
           <p className="text-[10px] font-black uppercase tracking-tighter text-bpim-muted">
-            /月
+            {t("support.perMonth")}
           </p>
           <p className="text-xl font-black text-bpim-text">¥{price}</p>
         </div>
@@ -120,12 +117,13 @@ const PlanCard = (props: (typeof PLANS)[number]) => {
 
 export const SupportersPage = () => {
   const { data, isLoading } = useSupporters();
+  const { t } = useTranslation();
 
   return (
     <div className="pb-20">
       <PageHeader
-        title="ご支援のお願い"
-        description="BPIM2の継続開発のため、ご支援をお待ちしております"
+        title={t("page.support.title")}
+        description={t("page.support.desc")}
       />
 
       <PageContainer>
@@ -136,7 +134,7 @@ export const SupportersPage = () => {
                 <HandHeart className="h-6 w-6" />
               </div>
               <h2 className="text-xl font-bold tracking-tight text-bpim-text">
-                なぜサポートが必要なのですか？
+                {t("support.whyTitle")}
               </h2>
             </div>
 
@@ -145,15 +143,8 @@ export const SupportersPage = () => {
 
               <div className="grid gap-8 lg:grid-cols-2">
                 <div className="space-y-4 text-sm leading-relaxed text-bpim-muted">
-                  <p>
-                    BPIM2は個人により運営されているファンメイドツールです。
-                    一方で、 サーバー費用（約40ユーロ/月）
-                    に加え、開発ツールのライセンス費用などの固定費が毎月発生しています。
-                  </p>
-                  <p>
-                    また、サービスの維持・改善には多大な労力を注いでおり、ボランタリーのみでクオリティを維持し続けるのには限界があります。
-                    これからも皆様に快適な体験を提供し続けるため、ご支援をいただけると大変ありがたいです。
-                  </p>
+                  <p>{t("support.whyDesc1")}</p>
+                  <p>{t("support.whyDesc2")}</p>
                   <div className="flex flex-wrap gap-3 pt-2">
                     <button
                       type="button"
@@ -165,7 +156,7 @@ export const SupportersPage = () => {
                       className="flex items-center gap-2 rounded-xl border border-bpim-primary/30 bg-bpim-primary/5 px-4 py-2 text-sm font-bold text-bpim-primary transition-colors hover:bg-bpim-primary/10"
                     >
                       <Heart className="h-3.5 w-3.5" />
-                      ご寄付による支援
+                      {t("support.btnDonate")}
                     </button>
                     <button
                       type="button"
@@ -177,7 +168,7 @@ export const SupportersPage = () => {
                       className="flex items-center gap-2 rounded-xl border border-emerald-400/30 bg-emerald-400/5 px-4 py-2 text-sm font-bold text-emerald-400 transition-colors hover:bg-emerald-400/10"
                     >
                       <GitPullRequest className="h-3.5 w-3.5" />
-                      OSSへの貢献
+                      {t("support.btnOss")}
                     </button>
                   </div>
                 </div>
@@ -189,14 +180,14 @@ export const SupportersPage = () => {
                     </div>
                     <div className="space-y-1">
                       <p className="text-[13px] font-bold text-bpim-text">
-                        機能の公平性について
+                        {t("support.fairnessTitle")}
                       </p>
                       <p className="text-sm text-bpim-muted">
-                        ご支援の有無によって、BPIM2上での
+                        {t("support.fairnessDesc1")}
                         <span className="font-bold text-bpim-primary">
-                          機能差異は一切ありません。
+                          {t("support.fairnessHighlight")}
                         </span>
-                        サポーターロールは、開発を支えてくださる方への感謝の印としての表示です。
+                        {t("support.fairnessDesc2")}
                       </p>
                     </div>
                   </div>
@@ -207,10 +198,10 @@ export const SupportersPage = () => {
                     </div>
                     <div className="space-y-1">
                       <p className="text-[13px] font-bold text-bpim-text">
-                        支援の方法
+                        {t("support.howTitle")}
                       </p>
                       <p className="text-sm text-bpim-muted">
-                        「100円からのご寄付」または「OSSへの貢献」のいずれかの方法でご参加いただけます。ご希望の方にはサポーターロールを付与させていただきます。
+                        {t("support.howDesc")}
                       </p>
                     </div>
                   </div>
@@ -224,20 +215,24 @@ export const SupportersPage = () => {
                 <Heart className="h-6 w-6" />
               </div>
               <h2 className="text-xl font-bold tracking-tight text-bpim-text">
-                ご寄付による支援
+                {t("support.donationSectionTitle")}
               </h2>
             </div>
 
             <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
               {PLANS.map((plan) => (
-                <PlanCard key={plan.id} {...plan} />
+                <PlanCard
+                  key={plan.id}
+                  {...plan}
+                  description={t(plan.descKey)}
+                />
               ))}
             </div>
 
             <div className="flex flex-col gap-6">
               <div className="space-y-3 text-center">
                 <p className="text-xs font-bold text-bpim-muted">
-                  クレジットカード(JCB)・WebMoney・ペイディ・d払いの方はこちら
+                  {t("support.ciEnPayment")}
                 </p>
                 <a
                   href={CI_EN_URL}
@@ -248,20 +243,20 @@ export const SupportersPage = () => {
                     "bg-bpim-primary shadow-lg shadow-bpim-primary/20 hover:brightness-110",
                   )}
                 >
-                  Ci-enで支援する
+                  {t("support.ciEnBtn")}
                   <ExternalLink className="h-4 w-4" />
                 </a>
               </div>
 
               <div className="rounded-2xl border border-bpim-border bg-bpim-surface-2/20 p-6 backdrop-blur-sm md:p-8">
                 <p className="mb-6 text-xs text-bpim-muted text-center">
-                  または、以下のアドレス宛に任意の金額をお送りください
+                  {t("support.otherMethods")}
                 </p>
                 <div className="grid gap-8 lg:grid-cols-2">
                   <div className="space-y-4">
                     <div className="flex items-center gap-2 text-sm font-bold text-bpim-text">
                       <Bitcoin className="h-4 w-4 text-bpim-primary" />
-                      暗号通貨
+                      {t("support.crypto")}
                     </div>
                     <div className="space-y-3 font-mono text-[11px]">
                       {(
@@ -287,7 +282,9 @@ export const SupportersPage = () => {
                           type="button"
                           onClick={() => {
                             navigator.clipboard.writeText(address);
-                            toast.success(`${label}アドレスをコピーしました`);
+                            toast.success(
+                              t("support.copyAddress").replace("$label$", label),
+                            );
                           }}
                           className="cursor-pointer w-full text-left rounded-lg bg-bpim-bg/50 p-3 border border-bpim-border hover:border-bpim-primary/50 hover:bg-bpim-primary/5 transition-colors group"
                         >
@@ -313,7 +310,7 @@ export const SupportersPage = () => {
                           rel="noopener noreferrer"
                           className="flex items-center gap-1 underline"
                         >
-                          アマゾンギフト券
+                          {t("support.amazonGift")}
                           <ExternalLink className="h-3.5 w-3.5 text-bpim-muted" />
                         </a>
                       </div>
@@ -323,13 +320,13 @@ export const SupportersPage = () => {
                           navigator.clipboard.writeText(
                             "msqkn310+bpim@gmail.com",
                           );
-                          toast.success("メールアドレスをコピーしました");
+                          toast.success(t("support.copyEmail"));
                         }}
                         className="cursor-pointer w-full text-left rounded-lg bg-bpim-bg/50 p-4 border border-bpim-border hover:border-bpim-primary/50 hover:bg-bpim-primary/5 transition-colors group"
                       >
                         <div className="flex items-center justify-between mb-1">
                           <p className="text-[11px] text-bpim-muted font-bold tracking-widest uppercase">
-                            宛先
+                            {t("support.toAddress")}
                           </p>
                           <Copy className="h-3 w-3 text-bpim-muted group-hover:text-bpim-primary transition-colors" />
                         </div>
@@ -342,10 +339,10 @@ export const SupportersPage = () => {
                     <div className="rounded-xl border border-bpim-warning/30 bg-bpim-warning/5 p-4 shadow-sm">
                       <div className="mb-2 flex items-center gap-2 text-xs font-bold text-bpim-warning">
                         <AlertCircle className="h-4 w-4" />
-                        サポーターロール付与について
+                        {t("support.roleTitle")}
                       </div>
                       <p className="text-[11px] leading-relaxed text-bpim-text/80">
-                        暗号通貨またはアマギフでご支援いただいた場合で、サポーターロールの付与を希望される方は、お手数ですが以下のいずれかまでご連絡をお願いいたします。
+                        {t("support.roleDesc")}
                       </p>
                       <div className="mt-3 flex flex-wrap gap-4">
                         <a
@@ -354,7 +351,8 @@ export const SupportersPage = () => {
                           rel="noopener noreferrer"
                           className="flex items-center gap-1.5 text-[11px] font-bold text-bpim-primary hover:underline"
                         >
-                          <ExternalLink className="h-3 w-3" /> フォーム
+                          <ExternalLink className="h-3 w-3" />{" "}
+                          {t("support.form")}
                         </a>
                         <a
                           href="https://twitter.com/BPIManager"
@@ -380,16 +378,15 @@ export const SupportersPage = () => {
           <section className="space-y-8">
             <div className="space-y-1 border-l-4 border-bpim-primary pl-4">
               <p className="text-md text-bpim-muted font-medium">
-                ご支援者の皆様
+                {t("support.supportersTitle")}
               </p>
             </div>
             <div className="flex items-start gap-3 rounded-xl border border-bpim-info/20 bg-bpim-info/5 p-4 text-sm leading-relaxed text-bpim-muted shadow-sm">
               <Info className="mt-0.5 h-4 w-4 shrink-0 text-bpim-info" />
               <p>
-                ご支援プランに加入いただいたあと、専用Discord
-                botから支援者ロールをBPIM2アカウントに付与いただいた場合のみリストに表示されます。
+                {t("support.supportersInfoPart1")}
                 <br className="hidden md:block" />
-                Ci-en経由でご支援いただいた場合でDiscord連携を行っていただいていない方、アマギフや暗号通貨でご支援頂いた方でロール付与をご希望いただいていない方についてはリストに表示されませんのでご注意ください。
+                {t("support.supportersInfoPart2")}
               </p>
             </div>
 
@@ -412,7 +409,7 @@ export const SupportersPage = () => {
                 <GitPullRequest className="h-6 w-6" />
               </div>
               <h2 className="text-xl font-bold tracking-tight text-bpim-text">
-                OSSへの貢献
+                {t("support.ossSectionTitle")}
               </h2>
             </div>
 
@@ -421,12 +418,8 @@ export const SupportersPage = () => {
 
               <div className="grid gap-8 lg:grid-cols-2">
                 <div className="space-y-4 text-sm leading-relaxed text-bpim-muted">
-                  <p>
-                    BPIM2はモノレポのOSSとして公開されており、どなたでも開発に参加することができます。コードの改善・バグ修正・翻訳など、あらゆる形の貢献を歓迎しています。
-                  </p>
-                  <p>
-                    OSSへの貢献（コード寄稿、バグ報告等）をいただいた方で、コントリビューターロールの付与をご希望される方は、以下のいずれかまでご連絡ください。
-                  </p>
+                  <p>{t("support.ossDesc1")}</p>
+                  <p>{t("support.ossDesc2")}</p>
                   <div className="flex flex-wrap gap-4">
                     <a
                       href="https://forms.gle/VfMJpFrKfSJqRYLA8"
@@ -434,7 +427,7 @@ export const SupportersPage = () => {
                       rel="noopener noreferrer"
                       className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-400 hover:underline"
                     >
-                      <ExternalLink className="h-3 w-3" /> フォーム
+                      <ExternalLink className="h-3 w-3" /> {t("support.form")}
                     </a>
                     <a
                       href="https://twitter.com/BPIManager"
@@ -467,23 +460,23 @@ export const SupportersPage = () => {
                     [
                       {
                         icon: Code2,
-                        title: "コードの寄稿",
-                        desc: "バグ修正・機能追加・リファクタリングなど、Pull Requestをお送りください",
+                        titleKey: "support.ossCodeTitle",
+                        descKey: "support.ossCodeDesc",
                       },
                       {
                         icon: Bug,
-                        title: "バグ報告",
-                        desc: "GitHubのIssuesにて不具合・改善提案を報告していただけると助かります",
+                        titleKey: "support.ossBugTitle",
+                        descKey: "support.ossBugDesc",
                       },
                       {
                         icon: Globe,
-                        title: "フィードバック",
-                        desc: "X(@BPIManager)へのリプライ・DMでもご意見をお待ちしております",
+                        titleKey: "support.ossFeedbackTitle",
+                        descKey: "support.ossFeedbackDesc",
                       },
                     ] as const
-                  ).map(({ icon: Icon, title, desc }, i) => (
+                  ).map(({ icon: Icon, titleKey, descKey }, i) => (
                     <div
-                      key={title}
+                      key={titleKey}
                       className={cn(
                         "flex items-start gap-3",
                         i > 0 && "border-t border-bpim-border pt-4",
@@ -494,9 +487,9 @@ export const SupportersPage = () => {
                       </div>
                       <div className="space-y-1">
                         <p className="text-[13px] font-bold text-bpim-text">
-                          {title}
+                          {t(titleKey)}
                         </p>
-                        <p className="text-sm text-bpim-muted">{desc}</p>
+                        <p className="text-sm text-bpim-muted">{t(descKey)}</p>
                       </div>
                     </div>
                   ))}

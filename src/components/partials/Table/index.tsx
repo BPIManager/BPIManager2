@@ -13,6 +13,7 @@ import { NoDataAlert } from "../DashBoard/NoData/ui";
 import { SongListSkeleton } from "./skeleton";
 import { AdvancedFilterModal } from "../Songs/AdvancedFilter/ui";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export const SongsTable = ({
   userId,
@@ -21,6 +22,7 @@ export const SongsTable = ({
   userId: string | undefined;
   version?: string;
 }) => {
+  const { t } = useTranslation();
   const [selectedSong, setSelectedSong] = useState<SongWithScore | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
@@ -93,7 +95,7 @@ export const SongsTable = ({
     return (
       <div className="flex h-50 flex-col items-center justify-center gap-2">
         <p className="font-bold text-bpim-danger">
-          楽曲データの取得に失敗しました
+          {t("table.songLoadError")}
         </p>
         <p className="text-xs text-bpim-muted">{error?.message}</p>
       </div>
@@ -126,7 +128,7 @@ export const SongsTable = ({
       {showCompareLoading && (
         <div className="flex items-center justify-center gap-2 py-2 text-xs text-bpim-muted border-b border-bpim-border">
           <LoadingSpinner size="xs" />
-          前作データを読み込み中...
+          {t("table.loadingPrevVersion")}
         </div>
       )}
 

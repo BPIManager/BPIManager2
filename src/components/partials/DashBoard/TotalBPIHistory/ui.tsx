@@ -17,6 +17,7 @@ import { TotalBpiHistorySkeleton } from "@/components/partials/DashBoard/TotalBP
 import { DashCard } from "@/components/ui/dashcard";
 import { cn } from "@/lib/utils";
 import { useChartColors } from "@/hooks/common/useChartColors";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface UpdateBarProps {
   payload?: { rivalBpi?: number; updateCount: number };
@@ -58,6 +59,7 @@ const HistoryTooltip = ({
   myName,
   rivalName,
 }: HistoryTooltipProps) => {
+  const { t } = useTranslation();
   if (!active || !payload?.length) return null;
   const data = payload[0].payload;
   const isComparison = data.rivalBpi !== undefined;
@@ -87,7 +89,7 @@ const HistoryTooltip = ({
             </div>
             <div className="my-1 h-px w-full bg-bpim-overlay/60" />
             <div className="flex items-center justify-between">
-              <span className="text-[10px] text-bpim-muted">差分</span>
+              <span className="text-[10px] text-bpim-muted">{t("dashboard.bpiHistory.diff")}</span>
               <span
                 className={cn(
                   "font-mono text-xs font-bold",
@@ -105,10 +107,10 @@ const HistoryTooltip = ({
           <>
             <div className="flex items-center justify-between gap-4">
               <p className="text-sm font-bold text-bpim-primary">
-                総合BPI: {data.myBpi?.toFixed(2)}
+                {t("dashboard.bpiHistory.totalBpi")}: {data.myBpi?.toFixed(2)}
               </p>
               <span className="text-[10px] text-bpim-muted">
-                累計: {data.count}曲
+                {t("dashboard.bpiHistory.cumulative")}: {data.count}{t("dashboard.songUnit")}
               </span>
             </div>
             {data.updateCount > 0 && (
@@ -133,17 +135,6 @@ const HistoryTooltip = ({
   );
 };
 
-const GROUP_BY_OPTIONS: { value: StatsGroupBy; label: string }[] = [
-  { value: "day", label: "単日" },
-  { value: "week", label: "週間" },
-  { value: "month", label: "月間" },
-];
-
-const TITLE_MAP: Record<StatsGroupBy, string> = {
-  day: "総合BPI推移",
-  week: "週間総合BPI推移",
-  month: "月間総合BPI推移",
-};
 
 const DEFAULT_WINDOW: Record<StatsGroupBy, number> = {
   day: 30,
@@ -165,12 +156,25 @@ export const TotalBpiHistoryChart = ({
   myData,
   rivalData,
   isLoading,
-  myName = "自分",
-  rivalName = "ライバル",
+  myName,
+  rivalName,
   groupBy,
   onGroupByChange,
 }: UnifiedBpiHistoryChartProps) => {
   const c = useChartColors();
+  const { t } = useTranslation();
+  const effectiveMyName = myName ?? t("dashboard.me");
+  const effectiveRivalName = rivalName ?? t("dashboard.rival");
+  const GROUP_BY_OPTIONS: { value: StatsGroupBy; label: string }[] = [
+    { value: "day", label: t("dashboard.bpiHistory.day") },
+    { value: "week", label: t("dashboard.bpiHistory.week") },
+    { value: "month", label: t("dashboard.bpiHistory.month") },
+  ];
+  const TITLE_MAP: Record<StatsGroupBy, string> = {
+    day: t("dashboard.bpiHistory.titleDay"),
+    week: t("dashboard.bpiHistory.titleWeek"),
+    month: t("dashboard.bpiHistory.titleMonth"),
+  };
 
   const { chartData, ticks, startIndex } = useMemo(() => {
     if (!myData && !rivalData)
@@ -262,13 +266,13 @@ export const TotalBpiHistoryChart = ({
               <div className="flex items-center gap-1.5">
                 <div className="h-0.5 w-3 bg-bpim-primary" />
                 <span className="text-xs font-medium text-bpim-primary">
-                  {myName}
+                  {effectiveMyName}
                 </span>
               </div>
               <div className="flex items-center gap-1.5">
                 <div className="h-0.5 w-3 border-t-2 border-dashed border-bpim-warning bg-transparent" />
                 <span className="text-xs font-medium text-bpim-warning">
-                  {rivalName}
+                  {effectiveRivalName}
                 </span>
               </div>
             </div>
@@ -317,8 +321,8 @@ export const TotalBpiHistoryChart = ({
                       | undefined
                   }
                   label={props.label}
-                  myName={myName}
-                  rivalName={rivalName}
+                  myName={effectiveMyName}
+                  rivalName={effectiveRivalName}
                 />
               )}
               cursor={{ stroke: c.grid }}

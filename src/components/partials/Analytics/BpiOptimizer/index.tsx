@@ -11,8 +11,10 @@ import type { OptimizationResult } from "@/types/bpi-optimizer";
 import type { RadarCategory } from "@/types/stats/radar";
 import { latestVersion } from "@/constants/latestVersion";
 import { toast } from "sonner";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export const BpiOptimizerSection = () => {
+  const { t } = useTranslation();
   const { user, fbUser } = useUser();
   const {
     targetBpiInput,
@@ -77,7 +79,7 @@ export const BpiOptimizerSection = () => {
     if (!result || !targetBpiInput) return;
     await saveMemo(parseFloat(targetBpiInput), result);
     setSavedResult(result);
-    toast.success("プランを保存しました");
+    toast.success(t("optimizer.savedPlan"));
   }, [result, targetBpiInput, saveMemo]);
 
   const resultRef = useRef<HTMLDivElement>(null);

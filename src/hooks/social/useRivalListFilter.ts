@@ -3,13 +3,14 @@
 import { useState } from "react";
 import { toggleArrayItem } from "@/hooks/common/useToggleArray";
 import { IIDX_LEVELS, IIDX_DIFFICULTIES } from "@/constants/diffs";
+import type { TranslationKey } from "@/lib/i18n/translations";
 
 export type RivalSortOrder = "win_desc" | "lose_desc" | "updated_desc";
 
-export const RIVAL_SORT_LABELS: Record<RivalSortOrder, string> = {
-  win_desc: "勝ち越しが多い順",
-  lose_desc: "負け越しが多い順",
-  updated_desc: "最終更新が新しい順",
+export const RIVAL_SORT_LABELS: Record<RivalSortOrder, TranslationKey> = {
+  win_desc: "rivals.filter.winDesc",
+  lose_desc: "rivals.filter.loseDesc",
+  updated_desc: "rivals.filter.updatedDesc",
 };
 
 /**

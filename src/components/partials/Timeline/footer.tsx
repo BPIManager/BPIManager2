@@ -1,4 +1,6 @@
-﻿interface TimelineStatusFooterProps {
+import { useTranslation } from "@/hooks/common/useTranslation";
+
+interface TimelineStatusFooterProps {
   isEmpty: boolean;
   isEnd: boolean;
 }
@@ -7,14 +9,16 @@ export const TimelineStatusFooter = ({
   isEmpty,
   isEnd,
 }: TimelineStatusFooterProps) => {
+  const { t } = useTranslation();
+
   if (isEmpty) {
     return (
       <div className="flex flex-col items-center justify-center gap-2 py-10 text-center">
         <p className="text-sm text-bpim-muted">
-          アクティビティが見つかりませんでした。
+          {t("timeline.empty.title")}
         </p>
         <p className="text-xs text-bpim-subtle">
-          フィルター条件を変えてみてください
+          {t("timeline.empty.hint")}
         </p>
       </div>
     );

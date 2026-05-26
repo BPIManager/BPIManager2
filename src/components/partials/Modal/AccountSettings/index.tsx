@@ -22,6 +22,7 @@ import { ImageUploadModal } from "../ImageCrop/ui";
 import { useEditProfile } from "@/hooks/users/useEditProfile";
 import { AvatarSection } from "./avatar";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface Props {
   isOpen?: boolean;
@@ -29,6 +30,7 @@ interface Props {
 }
 
 export default function AccountSettings({ isOpen, onClose }: Props) {
+  const { t } = useTranslation();
   const { user, isLoading } = useUser();
   const { isSignedIn } = authActions;
   const {
@@ -70,7 +72,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
             <div className="flex items-center gap-3">
               <User2 className="h-5 w-5 text-bpim-muted" />
               <DialogTitle className="text-lg font-bold tracking-tight text-bpim-text">
-                プロフィール設定
+                {t("settings.profile.title")}
               </DialogTitle>
             </div>
           </DialogHeader>
@@ -80,7 +82,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
               <div className="flex flex-col gap-3 rounded-xl border border-bpim-border bg-bpim-surface-2/60 p-4">
                 <div className="flex items-center justify-between">
                   <p className="text-[11px] font-bold uppercase text-bpim-muted">
-                    アイコン <span className="text-bpim-danger">*</span>
+                    {t("settings.profile.icon.label")} <span className="text-bpim-danger">*</span>
                   </p>
                 </div>
                 <div className="flex items-center gap-4">
@@ -93,14 +95,14 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                   />
                 </div>
                 <p className="text-[11px] text-bpim-muted">
-                  公序良俗に反しないアイコンを設定してください
+                  {t("settings.profile.icon.hint")}
                 </p>
               </div>
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="flex flex-col gap-2">
                   <Label className="text-[11px] font-bold uppercase text-bpim-muted">
-                    表示名 <span className="text-bpim-danger">*</span>
+                    {t("settings.profile.displayName.label")} <span className="text-bpim-danger">*</span>
                   </Label>
                   <div className="relative">
                     <Input
@@ -132,8 +134,8 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                   ) : (
                     <p className="text-[11px] text-bpim-muted">
                       {nameStatus.isChecking
-                        ? "重複を確認中..."
-                        : "表示名を設定してください"}
+                        ? t("settings.profile.displayName.checking")
+                        : t("settings.profile.displayName.hint")}
                     </p>
                   )}
                 </div>
@@ -156,17 +158,17 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                   />
                   {!validateIidxId(formData.iidxId) ? (
                     <p className="text-[11px] font-bold text-bpim-danger">
-                      8桁のIIDX IDを入力してください
+                      {t("settings.profile.iidxId.error")}
                     </p>
                   ) : (
-                    <p className="text-[11px] text-bpim-muted">半角数字8桁</p>
+                    <p className="text-[11px] text-bpim-muted">{t("settings.profile.iidxId.hint")}</p>
                   )}
                 </div>
               </div>
 
               <div className="flex flex-col gap-2">
                 <Label className="text-[11px] font-bold uppercase text-bpim-muted">
-                  X ユーザー名
+                  {t("settings.profile.xId.label")}
                 </Label>
                 <div className="flex h-10 overflow-hidden rounded-md border border-bpim-border bg-bpim-surface-2/60 focus-within:ring-2 focus-within:ring-blue-500">
                   <div className="flex items-center border-r border-bpim-border px-3 text-sm text-bpim-muted">
@@ -179,12 +181,12 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                     placeholder="username"
                   />
                 </div>
-                <p className="text-[11px] text-bpim-muted">最大15文字</p>
+                <p className="text-[11px] text-bpim-muted">{t("settings.profile.xId.hint")}</p>
               </div>
 
               <div className="flex flex-col gap-2">
                 <Label className="text-[11px] font-bold uppercase text-bpim-muted">
-                  自己紹介
+                  {t("settings.profile.bio.label")}
                 </Label>
                 <Textarea
                   className={cn(
@@ -195,7 +197,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                   onChange={(e) =>
                     setFormData({ ...formData, bio: e.target.value })
                   }
-                  placeholder="自己紹介を入力..."
+                  placeholder={t("settings.profile.bio.placeholder")}
                 />
                 <p
                   className={cn(
@@ -211,24 +213,24 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
 
               <div className="flex flex-col gap-3 rounded-xl border border-bpim-border bg-bpim-surface-2/60 p-4">
                 <p className="text-[11px] font-bold uppercase text-bpim-muted">
-                  詳細情報の公開設定
+                  {t("settings.profile.privacy.title")}
                 </p>
                 <p className="text-[11px] text-bpim-muted">
-                  それぞれの情報をプロフィールページで公開するかどうか選択できます。
+                  {t("settings.profile.privacy.desc1")}
                   <br />
-                  公開設定にした場合、シーズン・日付ごとのアリーナクラス・順位などの推移を表示できます(予定)。
+                  {t("settings.profile.privacy.desc2")}
                   <br />
-                  ※それぞれの情報は毎日午前1時頃に自動的に最新状態が反映されます。
+                  {t("settings.profile.privacy.desc3")}
                 </p>
                 {(
                   [
-                    { key: "showArenaClass", label: "アリーナクラス" },
-                    { key: "showArea", label: "所属エリア" },
-                    { key: "showGrade", label: "段位（SP / DP）" },
+                    { key: "showArenaClass", labelKey: "settings.profile.privacy.arenaClass" },
+                    { key: "showArea", labelKey: "settings.profile.privacy.area" },
+                    { key: "showGrade", labelKey: "settings.profile.privacy.grade" },
                   ] as const
-                ).map(({ key, label }) => (
+                ).map(({ key, labelKey }) => (
                   <div key={key} className="flex items-center justify-between">
-                    <span className="text-sm text-bpim-text">{label}</span>
+                    <span className="text-sm text-bpim-text">{t(labelKey)}</span>
                     <Switch
                       checked={arenaPrivacy[key]}
                       onCheckedChange={(checked) =>
@@ -243,14 +245,14 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
               <div className="flex items-center justify-between gap-4 rounded-xl border border-bpim-border bg-bpim-surface-2/60 p-4">
                 <div className="flex flex-col gap-1">
                   <span className="text-sm font-bold text-bpim-text">
-                    プロフィールを公開
+                    {t("settings.profile.public.title")}
                   </span>
                   <span className="text-[11px] text-bpim-muted">
-                    他のユーザーがあなたを見つけられるようになります
+                    {t("settings.profile.public.desc")}
                   </span>
                   {!formData.isPublic && (
                     <span className="mt-0.5 text-[11px] font-bold text-bpim-danger">
-                      機能を最大限利用するため公開を推奨します
+                      {t("settings.profile.public.warning")}
                     </span>
                   )}
                 </div>
@@ -274,10 +276,10 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
               {isSubmitting ? (
                 <>
                   <LoadingSpinner size="sm" className="mr-2" />
-                  保存中...
+                  {t("common.saving")}
                 </>
               ) : (
-                "保存"
+                t("common.save")
               )}
             </Button>
           </DialogFooter>

@@ -4,6 +4,7 @@ import { auth } from "@/lib/firebase";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Dispatch, SetStateAction } from "react";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface AvatarSectionProps {
   image: string;
@@ -16,6 +17,7 @@ export const AvatarSection = ({
   onChange,
   setIsImageModalOpen,
 }: AvatarSectionProps) => {
+  const { t } = useTranslation();
   const useServiceIcon = () => {
     const photoURL = auth.currentUser?.photoURL;
     if (photoURL) onChange(photoURL);
@@ -28,7 +30,7 @@ export const AvatarSection = ({
 
   return (
     <div className="flex items-center gap-6 py-2">
-      <Avatar className="h-[72px] w-[72px] border-2 border-bpim-primary shadow-lg shadow-bpim-primary/20">
+      <Avatar className="h-18 w-18 border-2 border-bpim-primary shadow-lg shadow-bpim-primary/20">
         <AvatarImage
           src={image}
           alt="Avatar Preview"
@@ -46,7 +48,7 @@ export const AvatarSection = ({
           onClick={useServiceIcon}
           className="h-7 border-bpim-border px-3 text-[10px] font-bold hover:bg-bpim-overlay/50 hover:text-bpim-primary"
         >
-          連携サービスを使用
+          {t("settings.profile.avatar.useService")}
         </Button>
         <Button
           variant="outline"
@@ -54,7 +56,7 @@ export const AvatarSection = ({
           onClick={useDiceBearIcon}
           className="h-7 border-bpim-border px-3 text-[10px] font-bold hover:bg-bpim-overlay/50 hover:text-bpim-primary"
         >
-          ランダムに設定
+          {t("settings.profile.avatar.random")}
         </Button>
         <Button
           variant="outline"
@@ -62,7 +64,7 @@ export const AvatarSection = ({
           onClick={() => setIsImageModalOpen(true)}
           className="ml-auto h-7 shrink-0 border-bpim-border text-[10px] font-bold hover:bg-bpim-overlay/50"
         >
-          画像をアップロード
+          {t("settings.profile.avatar.upload")}
         </Button>
       </div>
     </div>

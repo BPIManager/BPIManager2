@@ -11,6 +11,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useChartColors } from "@/hooks/common/useChartColors";
 import type { ChartData } from "@/types/ui/chart";
+import { useTranslation } from "@/hooks/common/useTranslation";
 import {
   PieChart,
   Pie,
@@ -267,8 +268,8 @@ export const DistributionChart = ({
   rivalData,
   isLoading,
   getColor,
-  myName = "自分",
-  rivalName = "ライバル",
+  myName,
+  rivalName,
   skeletonCount = 10,
   step,
   onStepFiner,
@@ -277,6 +278,9 @@ export const DistributionChart = ({
   canStepCoarser = false,
 }: DistributionChartProps) => {
   const c = useChartColors();
+  const { t } = useTranslation();
+  const effectiveMyName = myName ?? t("dashboard.me");
+  const effectiveRivalName = rivalName ?? t("dashboard.rival");
   const [chartType, setChartType] = useState<"bar" | "pie">("bar");
   const containerRef = useRef<HTMLDivElement>(null);
   const maxBarRef = useRef<HTMLDivElement>(null);
@@ -318,11 +322,11 @@ export const DistributionChart = ({
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-1">
                 <div className="h-2 w-2 rounded-full bg-bpim-primary" />
-                <span className="text-xs text-bpim-primary">{myName}</span>
+                <span className="text-xs text-bpim-primary">{effectiveMyName}</span>
               </div>
               <div className="flex items-center gap-1">
                 <div className="h-2 w-2 rounded-full bg-bpim-warning opacity-60" />
-                <span className="text-xs text-bpim-warning">{rivalName}</span>
+                <span className="text-xs text-bpim-warning">{effectiveRivalName}</span>
               </div>
             </div>
           )}
@@ -334,7 +338,7 @@ export const DistributionChart = ({
                 onClick={onStepCoarser}
                 disabled={!canStepCoarser}
                 className="rounded-r-none border-r border-bpim-border"
-                title="分解能を下げる"
+                title={t("dashboard.distribution.zoomOut")}
               >
                 <ZoomOut />
               </Button>
@@ -347,7 +351,7 @@ export const DistributionChart = ({
                 onClick={onStepFiner}
                 disabled={!canStepFiner}
                 className="rounded-l-none border-l border-bpim-border"
-                title="分解能を上げる"
+                title={t("dashboard.distribution.zoomIn")}
               >
                 <ZoomIn />
               </Button>
@@ -417,8 +421,8 @@ export const DistributionChart = ({
                   showLabel={showLabel}
                   showCount={showCount}
                   step={step}
-                  myName={myName}
-                  rivalName={rivalName}
+                  myName={effectiveMyName}
+                  rivalName={effectiveRivalName}
                   dense={myData.length > 30}
                   maxRef={i === maxIndex ? maxBarRef : undefined}
                 />
@@ -431,14 +435,14 @@ export const DistributionChart = ({
           <DistributionPie
             data={myData}
             getColor={getColor}
-            label={rivalData ? myName : ""}
+            label={rivalData ? effectiveMyName : ""}
             labelColor={c.primary}
           />
           {rivalData && (
             <DistributionPie
               data={rivalData}
               getColor={getColor}
-              label={rivalName}
+              label={effectiveRivalName}
               labelColor={c.warning}
             />
           )}

@@ -12,10 +12,12 @@ import { ProfileMeta } from "@/components/partials/Profile/Meta/ui";
 import { getVersionNameFromNumber } from "@/constants/versions";
 import { LogFilterSection } from "@/components/partials/Logs/VersionSelector/ui";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export default function LogsPage() {
   const router = useRouter();
   const { user, isLoading: isUserLoading } = useUser();
+  const { t } = useTranslation();
 
   const { userId, version, groupedBy, granularity } = router.query;
   const uid = (userId as string) || "";
@@ -49,8 +51,8 @@ export default function LogsPage() {
   if (isOwnedByMe && user?.userId !== undefined) {
     return (
       <DashboardLayout>
-        <Meta title="更新ログ" noIndex />
-        <PageHeader title="更新ログ" description="スコアの更新ログと詳細情報" />
+        <Meta title={t("page.logs.title")} noIndex />
+        <PageHeader title={t("page.logs.title")} description={t("page.logs.desc")} />
         <PageContainer>{logsContent}</PageContainer>
       </DashboardLayout>
     );
@@ -59,8 +61,8 @@ export default function LogsPage() {
   return (
     <UserProfileLayout userId={uid} currentTab="logs">
       <ProfileMeta
-        title={`スコア更新記録`}
-        description={`$userName$さん($iidxid$)がbeatmaniaIIDX ${getVersionNameFromNumber(v)}でプレイしたスコアの記録を確認できます。`}
+        title={t("page.logs.publicTitle")}
+        description={`${t("profile.desc.logsPre")}${getVersionNameFromNumber(v)}${t("profile.desc.logsPost")}`}
       />
       {logsContent}
     </UserProfileLayout>

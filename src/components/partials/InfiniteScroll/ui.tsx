@@ -2,6 +2,7 @@
 import { useInfiniteScroll } from "@/hooks/common/useInfiniteScroll";
 import { cn } from "@/lib/utils";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface InfiniteScrollContainerProps<T> {
   items: T[];
@@ -22,10 +23,11 @@ export function InfiniteScrollContainer<T>({
   isReachingEnd,
   setSize,
   maxH = "500px",
-  emptyMessage = "データが見つかりませんでした",
+  emptyMessage,
   header,
   className,
 }: InfiniteScrollContainerProps<T>) {
+  const { t } = useTranslation();
   const handleIntersect = useCallback(() => {
     setSize((prev) => (typeof prev === "number" ? prev + 1 : 1));
   }, [setSize]);
@@ -61,14 +63,14 @@ export function InfiniteScrollContainer<T>({
         )}
         {!isLoadingMore && isReachingEnd && items.length > 0 && (
           <span className="text-[10px] font-medium text-bpim-subtle uppercase tracking-wider">
-            全てのデータを読み込みました
+            {t("common.allDataLoaded")}
           </span>
         )}
       </div>
 
       {!isLoadingMore && items.length === 0 && (
         <div className="flex flex-col items-center justify-center py-10 text-center">
-          <p className="text-sm text-bpim-muted">{emptyMessage}</p>
+          <p className="text-sm text-bpim-muted">{emptyMessage ?? t("common.noData")}</p>
         </div>
       )}
     </div>

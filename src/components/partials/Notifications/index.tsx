@@ -11,8 +11,10 @@ import { InfiniteScrollContainer } from "../InfiniteScroll/ui";
 import { NotificationItem } from "./item";
 import { Button } from "@/components/ui/button";
 import { AppTabsGroup } from "@/components/ui/complex/tabs";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export const NotificationBell = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<"all" | "follow" | "overtaken">(
     "all",
   );
@@ -58,9 +60,9 @@ export const NotificationBell = () => {
             visual="minimal"
             listClassName="rounded-none border-b border-bpim-border bg-bpim-bg/50"
             tabs={[
-              { value: "all", label: "すべて" },
-              { value: "follow", label: "フォロー" },
-              { value: "overtaken", label: "更新" },
+              { value: "all", label: t("notifications.tab.all") },
+              { value: "follow", label: t("notifications.tab.follow") },
+              { value: "overtaken", label: t("notifications.tab.overtaken") },
             ]}
           />
           <div className="max-h-100 p-2">
@@ -70,7 +72,7 @@ export const NotificationBell = () => {
               isLoadingMore={isLoadingMore}
               isReachingEnd={isReachingEnd}
               maxH="400px"
-              emptyMessage="通知はありません"
+              emptyMessage={t("notifications.empty")}
               renderItem={(n, i) => (
                 <NotificationItem key={`${n.timestamp}-${i}`} n={n} />
               )}

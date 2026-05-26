@@ -23,6 +23,7 @@ import { CurrentBpiSkeleton } from "./skeleton";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { CalendarPicker } from "./calendar";
 import dayjs from "@/lib/dayjs";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface CurrentBpiCardProps {
   currentStats?: TotalBpiStats;
@@ -55,6 +56,7 @@ export const CurrentBpiCard = ({
 }: CurrentBpiCardProps) => {
   const [calendarOpen, setCalendarOpen] = useState(false);
   const { version, compareVersion } = useStatsFilter();
+  const { t } = useTranslation();
 
   const bpi = currentStats?.totalBpi ?? -15;
   const rank = currentStats?.estimatedRank ?? 0;
@@ -100,7 +102,7 @@ export const CurrentBpiCard = ({
     >
       <div className="flex items-start justify-between">
         <span className="text-[10px] font-bold uppercase tracking-widest text-bpim-muted md:text-xs">
-          総合BPI(☆12のみ)
+          {t("dashboard.currentBpi.label")}
         </span>
 
         <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
@@ -126,7 +128,7 @@ export const CurrentBpiCard = ({
                 <div className="mb-2 flex items-center gap-1.5 border-b border-bpim-border px-1 pb-2">
                   <HistoryIcon className="size-3 text-bpim-primary" />
                   <span className="text-xs font-bold text-bpim-text uppercase tracking-tight">
-                    過去の特定時点と比較
+                    {t("dashboard.currentBpi.compareHistory")}
                   </span>
                 </div>
 
@@ -153,11 +155,11 @@ export const CurrentBpiCard = ({
         </div>
         <div className="flex flex-col gap-1">
           <span className="text-[10px] font-bold tracking-widest text-bpim-muted">
-            推定順位
+            {t("dashboard.currentBpi.estimatedRank")}
           </span>
           <span className="text-xl font-bold text-bpim-text">
             ~{rank.toLocaleString()}
-            <span className="ml-1 text-sm font-normal text-bpim-muted">位</span>
+            <span className="ml-1 text-sm font-normal text-bpim-muted">{t("dashboard.currentBpi.rankUnit")}</span>
           </span>
         </div>
         {areaRank?.areaRank != null &&
@@ -235,7 +237,7 @@ export const CurrentBpiCard = ({
         ) : (
           <div className="flex h-full items-center justify-center rounded-lg border border-dashed border-bpim-border/50 py-2.5">
             <span className="text-[10px] text-bpim-muted/40 font-medium">
-              日付を設定して比較を表示
+              {t("dashboard.currentBpi.setDateHint")}
             </span>
           </div>
         )}

@@ -8,14 +8,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { SongCard } from "@/components/partials/Tickets/SongCard";
+import { useTranslation } from "@/hooks/common/useTranslation";
 import type { TicketCardState } from "@/hooks/tickets/useTicketSearch";
 import type { TicketSongResult, TicketSortKey, ScoreMode } from "@/types/tickets";
-
-const SORT_OPTIONS: { value: TicketSortKey; label: string }[] = [
-  { value: "patternScore", label: "当たり譜面度順" },
-  { value: "bpiGap", label: "BPI差が大きい順" },
-  { value: "bpi", label: "スコア（BPI）順" },
-];
 
 function sortItems(
   items: TicketSongResult[],
@@ -49,8 +44,15 @@ interface TicketCardProps {
 }
 
 export function TicketCard({ state, scoreMode, onLoadMore, onSortChange }: TicketCardProps) {
+  const { t } = useTranslation();
   const { result, sortKey, isLoadingMore, allItems, hasMore } = state;
   const sorted = sortItems(allItems, sortKey, scoreMode);
+
+  const SORT_OPTIONS: { value: TicketSortKey; label: string }[] = [
+    { value: "patternScore", label: t("tickets.sortPatternScore") },
+    { value: "bpiGap", label: t("tickets.sortBpiGap") },
+    { value: "bpi", label: t("tickets.sortBpi") },
+  ];
 
   const today = new Date();
   const expiry = new Date(result.expiresAt.replace(/\//g, "-"));
@@ -68,13 +70,13 @@ export function TicketCard({ state, scoreMode, onLoadMore, onSortChange }: Ticke
               variant="outline"
               className={`text-[10px] px-1.5 py-0 ${daysLeft <= 7 ? "border-red-500/50 text-red-400" : "border-bpim-border text-bpim-muted"}`}
             >
-              {result.expiresAt} まで
-              {daysLeft > 0 && daysLeft <= 30 && ` (残${daysLeft}日)`}
+              {result.expiresAt} {t("tickets.expiresUntil")}
+              {daysLeft > 0 && daysLeft <= 30 && ` (${t("tickets.daysLeftPre")}${daysLeft}${t("tickets.daysLeftSuf")})`}
             </Badge>
           </div>
           {result.totalBpi != null && (
             <span className="text-xs text-bpim-muted">
-              現在の総合BPI:{" "}
+              {t("tickets.currentTotalBpi")}{" "}
               <span className="font-mono font-semibold text-bpim-text">
                 {result.totalBpi.toFixed(2)}
               </span>
@@ -101,7 +103,7 @@ export function TicketCard({ state, scoreMode, onLoadMore, onSortChange }: Ticke
 
       {sorted.length === 0 ? (
         <p className="text-sm text-bpim-muted text-center py-6">
-          このパターンに対応する楽曲データがありません
+          {t("tickets.noSongData")}
         </p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
@@ -125,7 +127,7 @@ export function TicketCard({ state, scoreMode, onLoadMore, onSortChange }: Ticke
           disabled={isLoadingMore}
           onClick={() => onLoadMore(result.ticketId)}
         >
-          {isLoadingMore ? "読み込み中..." : "もっと表示"}
+          {isLoadingMore ? t("tickets.loadingMore") : t("tickets.loadMore")}
         </Button>
       )}
     </div>

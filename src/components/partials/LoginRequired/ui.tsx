@@ -2,9 +2,7 @@ import { LoginPageBody } from "../LogIn/ui";
 import { cn } from "@/lib/utils";
 import { LockIcon } from "lucide-react";
 import { LoginButtons } from "../LogIn";
-
-const LOGIN_REQUIRED_MESSAGE =
-  "このコンテンツの利用にはBPIM2アカウントでのログインが必要です";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export const LoginRequiredCard = ({
   className,
@@ -13,6 +11,7 @@ export const LoginRequiredCard = ({
   className?: string;
   isModal?: boolean;
 }) => {
+  const { t } = useTranslation();
   if (isModal) {
     return (
       <div
@@ -33,10 +32,10 @@ export const LoginRequiredCard = ({
 
           <div className="flex flex-col gap-1">
             <h3 className="text-lg font-bold text-bpim-text">
-              ログインが必要です
+              {t("auth.loginRequiredTitle")}
             </h3>
             <p className="max-w-70 text-sm text-bpim-muted">
-              このコンテンツの利用には、BPIMアカウントへのログインが必要です。
+              {t("auth.loginRequiredModal")}
             </p>
           </div>
 
@@ -56,7 +55,7 @@ export const LoginRequiredCard = ({
     >
       <div className="mb-5 flex items-start gap-3 rounded-xl border border-bpim-primary/30 bg-bpim-primary/8 px-4 py-3 text-bpim-primary">
         <LockIcon className="mt-0.5 h-4 w-4 shrink-0" />
-        <span className="text-sm font-medium">{LOGIN_REQUIRED_MESSAGE}</span>
+        <span className="text-sm font-medium">{t("auth.loginRequired")}</span>
       </div>
       <LoginPageBody />
     </div>

@@ -6,11 +6,13 @@ import AccountSettings from "@/components/partials/Modal/AccountSettings";
 import { SongsTable } from "@/components/partials/Table";
 import { LoginRequiredCard } from "@/components/partials/LoginRequired/ui";
 import { PageLoader } from "@/components/ui/loading-spinner";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export default function MyScoresByVersion() {
   const router = useRouter();
   const { version } = router.query;
   const { user, isLoading: isUserLoading, fbUser } = useUser();
+  const { t } = useTranslation();
 
   const isReady = router.isReady && !isUserLoading;
 
@@ -24,7 +26,7 @@ export default function MyScoresByVersion() {
     <>
       {!user && <AccountSettings />}
 
-      <Meta noIndex title={`マイスコア - Version ${targetVersion || ""}`} />
+      <Meta noIndex title={`${t("page.myScores.title")} — Version ${targetVersion || ""}`} />
 
       <DashboardLayout>
         {!fbUser?.uid ? (

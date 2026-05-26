@@ -1,5 +1,6 @@
 ﻿import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface RivalComparisonRowProps {
   rival: {
@@ -16,6 +17,7 @@ interface RivalComparisonRowProps {
 }
 
 export const RivalComparisonRow = ({ rival }: RivalComparisonRowProps) => {
+  const { t } = useTranslation();
   const { userName, profileImage, userId } = rival;
   const { win, lose, draw, totalCount } = rival.stats;
 
@@ -41,7 +43,7 @@ export const RivalComparisonRow = ({ rival }: RivalComparisonRowProps) => {
           </Link>
         </div>
         <span className="text-[10px] font-bold text-bpim-muted whitespace-nowrap">
-          {totalCount}曲
+          {totalCount}{t("dashboard.songUnit")}
         </span>
       </div>
 

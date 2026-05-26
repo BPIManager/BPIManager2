@@ -1,4 +1,5 @@
-﻿import { useLogsDetail } from "@/hooks/batches/useBatchDetail";
+﻿import { useTranslation } from "@/hooks/common/useTranslation";
+import { useLogsDetail } from "@/hooks/batches/useBatchDetail";
 import {
   getBpiDistribution,
   getRankDistribution,
@@ -36,6 +37,7 @@ export const LogsDetailContent = ({
   type,
   isPublicPage,
 }: LogsDetailViewProps) => {
+  const { t, tFormat } = useTranslation();
   const router = useRouter();
   const { bpiStep, handleStepFiner, handleStepCoarser } = useBpiStep(5);
 
@@ -150,10 +152,10 @@ export const LogsDetailContent = ({
         <div className="flex w-full items-center justify-between gap-4">
           <AppTabsList visual="minimal" cols={2} className="max-w-md">
             <AppTabsTrigger visual="minimal" value="summary">
-              サマリー
+              {t("logs.detail.tab.summary")}
             </AppTabsTrigger>
             <AppTabsTrigger visual="minimal" value="songs">
-              更新楽曲 ({details.songs.length})
+              {tFormat("logs.detail.tab.songs", { count: details.songs.length })}
             </AppTabsTrigger>
           </AppTabsList>
 
@@ -166,7 +168,7 @@ export const LogsDetailContent = ({
                 onClick={() => setIsModalOpen(true)}
               >
                 <XIcon className="mr-2 h-4 w-4" />
-                共有
+                {t("logs.detail.share")}
               </Button>
             </div>
           )}
@@ -183,7 +185,7 @@ export const LogsDetailContent = ({
             )}
             <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
               <DistributionChart
-                title="BPI分布"
+                title={t("logs.detail.bpiDist")}
                 myData={bpiData}
                 isLoading={isLoading}
                 getColor={getBpiColor}
@@ -194,7 +196,7 @@ export const LogsDetailContent = ({
                 step={bpiStep}
               />
               <DistributionChart
-                title="ランク分布"
+                title={t("logs.detail.rankDist")}
                 myData={rankData}
                 isLoading={isLoading}
                 getColor={(l) => RANK_COLORS[l]}

@@ -1,5 +1,6 @@
 import type { BpmBandSongEntry } from "@/types/stats/distribution";
 import { SongListDialog } from "../Dialogs/songListDialog";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface Props {
   bandLabel: string;
@@ -14,9 +15,10 @@ export const BpmBandSongsDialog = ({
   isOpen,
   onClose,
 }: Props) => {
+  const { t } = useTranslation();
   return (
     <SongListDialog
-      dialogTitle={`BPM ${bandLabel} - 楽曲リスト (${songs.length})`}
+      dialogTitle={`BPM ${bandLabel} - ${t("dashboard.songList.songList")} (${songs.length})`}
       songs={songs}
       isOpen={isOpen}
       onClose={onClose}

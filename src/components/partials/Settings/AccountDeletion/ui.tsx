@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { BadgeX, Trash2 } from "lucide-react";
 import { ActionConfirmDialog } from "../../Modal/Confirmation";
 import { useAccountDeletion } from "@/hooks/users/useAccountDeletion";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export default function AccountDeletionUi() {
   const {
@@ -16,6 +17,7 @@ export default function AccountDeletionUi() {
     handleDelete,
     userName,
   } = useAccountDeletion();
+  const { t } = useTranslation();
 
   return (
     <>
@@ -23,13 +25,13 @@ export default function AccountDeletionUi() {
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2 text-bpim-danger">
             <BadgeX className="h-4 w-4" />
-            <span className="font-bold">アカウント削除</span>
+            <span className="font-bold">{t("settings.deletion.title")}</span>
           </div>
           <p className="text-sm text-bpim-muted">
-            BPIM2およびBPIMのアカウントを完全に削除します。
+            {t("settings.deletion.desc")}
           </p>
           <p className="text-[10px] text-bpim-muted italic">
-            ※ この操作は取り消しできません
+            {t("settings.deletion.irreversible")}
           </p>
         </div>
         <Button
@@ -38,7 +40,7 @@ export default function AccountDeletionUi() {
           className="w-full md:w-auto gap-2"
         >
           <Trash2 className="h-4 w-4" />
-          確認
+          {t("common.confirm")}
         </Button>
       </div>
 
@@ -49,20 +51,16 @@ export default function AccountDeletionUi() {
         isDestructive
         isLoading={isDeleting}
         isConfirmDisabled={!isConfirmed}
-        title="アカウントを削除しますか？"
-        confirmLabel="削除する"
+        title={t("settings.deletion.dialogTitle")}
+        confirmLabel={t("common.delete")}
         description={
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2 text-sm text-bpim-muted">
+              <span>{t("settings.deletion.warning")}</span>
               <span>
-                この操作は
-                <strong className="text-bpim-text">取り消しできません</strong>。
-                スコア・フォロー・すべてのデータが完全に削除されます。
-              </span>
-              <span>
-                削除を実行するには、ユーザー名{" "}
-                <strong className="text-bpim-text font-mono">{userName}</strong>{" "}
-                を入力してください。
+                {t("settings.deletion.confirmPrompt")}
+                <strong className="text-bpim-text font-mono">{userName}</strong>
+                {t("settings.deletion.confirmPromptSuffix")}
               </span>
             </div>
             <Input

@@ -9,6 +9,7 @@ import { useBpiStep } from "@/hooks/common/useBpiStep";
 import type { DistributionSectionProps } from "@/types/ui/distribution";
 import { ChartData } from "@/types/ui/chart";
 import { getVersionNameFromNumber } from "@/constants/versions";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export const BPI_STEP_OPTIONS = [10, 5, 2, 1] as const;
 export type BpiStep = (typeof BPI_STEP_OPTIONS)[number];
@@ -17,10 +18,12 @@ export const DistributionSection = ({
   type,
   myUserId,
   rivalUserId,
-  myName = "自分",
-  rivalName = "ライバル",
+  myName,
+  rivalName,
 }: DistributionSectionProps) => {
   const { levels, diffs, version, compareVersion } = useStatsFilter();
+  const { t } = useTranslation();
+  const effectiveMyName = myName ?? t("dashboard.me");
   const c = useChartColors();
   const { bpiStep, handleStepFiner, handleStepCoarser } = useBpiStep();
 
@@ -29,7 +32,7 @@ export const DistributionSection = ({
     rivalUserId ?? (isCompareMode ? myUserId : undefined);
   const effectiveRivalVersion = rivalUserId ? version : compareVersion;
   const effectiveRivalName = rivalUserId
-    ? rivalName
+    ? (rivalName ?? t("dashboard.rival"))
     : getVersionNameFromNumber(compareVersion);
 
   const isBpi = type === "bpi";
@@ -70,12 +73,12 @@ export const DistributionSection = ({
 
   const config = {
     rank: {
-      title: "DJRANK 分布",
+      title: t("dashboard.distribution.djRankTitle"),
       getColor: (label: string) => getRankColorFromTheme(label, c),
       skeletonCount: 9,
     },
     bpi: {
-      title: "BPI分布",
+      title: t("dashboard.distribution.bpiTitle"),
       getColor: (label: string) => getBpiColorFromTheme(label, c),
       skeletonCount: bpiSkeletonCount,
     },
@@ -104,7 +107,7 @@ export const DistributionSection = ({
       rivalData={effectiveRivalUserId ? rivalDist : undefined}
       isLoading={false}
       getColor={config.getColor}
-      myName={myName}
+      myName={effectiveMyName}
       rivalName={effectiveRivalName}
       step={isBpi ? bpiStep : undefined}
       onStepFiner={isBpi ? handleStepFiner : undefined}

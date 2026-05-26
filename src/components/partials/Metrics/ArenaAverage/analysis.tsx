@@ -13,6 +13,7 @@ import {
 } from "@/hooks/metrics/useArenaAnalysis";
 import { ALL_RADAR_CATEGORIES, RADAR_COLORS } from "@/constants/radars";
 import { BpiScatterChart } from "./BpiScatterChart";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 const StatCard = ({
   label,
@@ -44,11 +45,13 @@ const CategoryFilter = ({
 }: {
   selectedCategories: Set<RadarCategory>;
   onToggle: (cat: RadarCategory) => void;
-}) => (
+}) => {
+  const { t } = useTranslation();
+  return (
   <div className="rounded-xl border border-bpim-border bg-bpim-bg/80 p-4">
     <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
       <span className="shrink-0 text-[10px] font-black uppercase tracking-widest text-bpim-muted">
-        レーダー項目
+        {t("arenaAnalysis.radarCategory")}
       </span>
       {ALL_RADAR_CATEGORIES.map((cat) => {
         const active = selectedCategories.has(cat);
@@ -80,7 +83,8 @@ const CategoryFilter = ({
       })}
     </div>
   </div>
-);
+  );
+};
 
 const BpiRankingList = ({
   title,
@@ -150,6 +154,7 @@ const BpiHistogram = ({
   songs: ArenaSongPoint[];
   rankColor: string;
 }) => {
+  const { t } = useTranslation();
   const buckets = useMemo(() => {
     const STEP = 10;
     const MIN = -20;
@@ -173,7 +178,7 @@ const BpiHistogram = ({
   return (
     <div className="rounded-xl border border-bpim-border bg-bpim-bg p-5 shadow-sm">
       <h3 className="mb-4 text-[10px] font-black uppercase tracking-widest text-bpim-muted">
-        BPI 分布
+        {t("arenaAnalysis.bpiDistribution")}
       </h3>
       <div className="flex h-32 items-end gap-1">
         {buckets.map((b) => (
@@ -226,6 +231,7 @@ const CategoryBpiComparison = ({
   user: { userId: string } | null | undefined;
   userLoading: boolean;
 }) => {
+  const { t } = useTranslation();
   const maxAbs = Math.max(
     ...stats.flatMap((s) =>
       [s.arenaTotal, s.userTotal]
@@ -238,12 +244,12 @@ const CategoryBpiComparison = ({
   return (
     <div className="rounded-xl border border-bpim-border bg-bpim-bg p-5 shadow-sm">
       <h3 className="mb-1 text-[10px] font-black uppercase tracking-widest text-bpim-muted">
-        カテゴリ別 総合BPI比較
+        {t("arenaAnalysis.categoryComparison")}
       </h3>
       <p className="mb-4 text-[10px] text-bpim-muted">
-        各レーダー項目の楽曲群で計算した総合BPI
-        {!user && "（ログインすると自分のBPIが表示されます）"}
-        {user && userLoading && "（読み込み中...）"}
+        {t("arenaAnalysis.categoryDesc")}
+        {!user && t("arenaAnalysis.loginForMine")}
+        {user && userLoading && t("arenaAnalysis.loading")}
       </p>
       <div className="flex flex-col gap-3">
         {stats.map(({ cat, arenaTotal, userTotal, songCount }) => {
@@ -273,7 +279,7 @@ const CategoryBpiComparison = ({
                     {cat}
                   </span>
                   <span className="text-[10px] text-bpim-muted">
-                    ({songCount}曲)
+                    ({songCount}{t("filter.songUnit")})
                   </span>
                 </div>
                 <div className="flex items-center gap-3 font-mono text-[11px]">
@@ -286,7 +292,7 @@ const CategoryBpiComparison = ({
                   {user && !userLoading && (
                     <>
                       <span className="text-bpim-muted">
-                        自分:{" "}
+                        {t("arenaAnalysis.mine")}:{" "}
                         <span className="font-black text-bpim-primary">
                           {userTotal !== null ? userTotal.toFixed(2) : "-"}
                         </span>
@@ -333,12 +339,12 @@ const CategoryBpiComparison = ({
       <div className="mt-3 flex items-center gap-4 text-[10px] text-bpim-muted">
         <span className="flex items-center gap-1">
           <span className="inline-block h-2 w-4 rounded-sm bg-bpim-primary opacity-35" />
-          {rank}平均
+          {rank} {t("arenaAnalysis.rankAvg")}
         </span>
         {user && (
           <span className="flex items-center gap-1">
             <span className="inline-block h-2 w-4 rounded-sm bg-bpim-primary opacity-85" />
-            自分
+            {t("arenaAnalysis.mine")}
           </span>
         )}
       </div>
@@ -378,6 +384,7 @@ export const ArenaAnalysis = ({
     scatterAxisDomain,
     categoryBpiStats,
   } = useArenaAnalysis(data, rank, version, selectedCategories);
+  const { t } = useTranslation();
 
   if (songsWithArenaBpi.length === 0) {
     return (
@@ -387,7 +394,7 @@ export const ArenaAnalysis = ({
           onToggle={onCategoryToggle}
         />
         <div className="flex items-center justify-center py-20 text-sm text-bpim-muted">
-          このランク・カテゴリのBPIデータがありません
+          {t("arenaAnalysis.noData")}
         </div>
       </div>
     );
@@ -402,16 +409,16 @@ export const ArenaAnalysis = ({
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <StatCard
-          label="平均総合BPI"
+          label={t("arenaAnalysis.avgTotalBpi")}
           value={totalBpi !== null ? totalBpi.toFixed(2) : "-"}
           accent="text-bpim-primary"
         />
         <StatCard
-          label="単曲平均BPI"
+          label={t("arenaAnalysis.avgSongBpi")}
           value={avgBpi !== null ? avgBpi.toFixed(2) : "-"}
         />
         <StatCard
-          label="平均スコアレート"
+          label={t("arenaAnalysis.avgScoreRate")}
           value={avgRate !== null ? `${avgRate.toFixed(1)}%` : "-"}
         />
       </div>
@@ -428,12 +435,12 @@ export const ArenaAnalysis = ({
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <BpiRankingList
-          title="BPI 上位 15 曲"
+          title={t("arenaAnalysis.topSongs")}
           songs={topSongs}
           maxAbsBpi={maxAbsBpi}
         />
         <BpiRankingList
-          title="BPI 下位 10 曲"
+          title={t("arenaAnalysis.bottomSongs")}
           songs={bottomSongs}
           maxAbsBpi={maxAbsBpi}
           reverse

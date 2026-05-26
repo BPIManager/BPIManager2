@@ -7,6 +7,7 @@ import { RivalWinLossSummarySkeleton } from "./skeleton";
 import { RivalWinLossSummaryNotFound } from "./nodata";
 import { DashCard } from "@/components/ui/dashcard";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export const RivalWinLossSummary = ({
   userId,
@@ -21,6 +22,7 @@ export const RivalWinLossSummary = ({
     difficulties: diffs,
   });
   const [showAll, setShowAll] = useState(false);
+  const { t } = useTranslation();
 
   const displayCount = 5;
   const hasMore = rivals.length > displayCount;
@@ -29,7 +31,7 @@ export const RivalWinLossSummary = ({
   return (
     <DashCard>
       <h3 className="mb-4 text-sm font-bold uppercase text-bpim-muted">
-        ライバル勝敗
+        {t("dashboard.rivals.title")}
       </h3>
 
       {isLoading ? (
@@ -52,12 +54,11 @@ export const RivalWinLossSummary = ({
         >
           {showAll ? (
             <>
-              <ChevronUp className="h-4 w-4" /> 閉じる
+              <ChevronUp className="h-4 w-4" /> {t("dashboard.rivals.collapse")}
             </>
           ) : (
             <>
-              <ChevronDown className="h-4 w-4" /> 残り{" "}
-              {rivals.length - displayCount} 人を表示
+              <ChevronDown className="h-4 w-4" /> {rivals.length - displayCount} {t("dashboard.rivals.showMore")}
             </>
           )}
         </Button>

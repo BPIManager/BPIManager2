@@ -5,10 +5,13 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Smartphone, AlertTriangle, ExternalLink } from "lucide-react";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 const ANDROID_APP_URL = "https://github.com/BPIManager/BPIM2-Flutter/releases";
 
 export const AndroidAppAccordion = () => {
+  const { t } = useTranslation();
+
   const steps = [
     <>
       <a
@@ -17,14 +20,12 @@ export const AndroidAppAccordion = () => {
         rel="noopener noreferrer"
         className="text-bpim-primary underline decoration-bpim-primary/30 underline-offset-4 transition-colors hover:decoration-bpim-primary"
       >
-        こちら
+        {t("import.android.step1.linkText")}
       </a>
-      からAndroidアプリをダウンロード・インストールします。
+      {t("import.android.step1.suffix")}
     </>,
-    <>アプリを起動し、BPIM2アカウントでログインします。</>,
-    <>
-      右下の更新ボタンをタップすると、アプリがIIDX公式サイトからCSVを自動的に読み込みインポートします。
-    </>,
+    <>{t("import.android.step2")}</>,
+    <>{t("import.android.step3")}</>,
   ];
 
   return (
@@ -39,7 +40,7 @@ export const AndroidAppAccordion = () => {
             <div className="rounded-full bg-bpim-primary/10 p-1.5">
               <Smartphone className="h-4 w-4 text-bpim-primary" />
             </div>
-            <span>Android用アプリを使用（コピペ不要）</span>
+            <span>{t("import.android.accordionTitle")}</span>
           </div>
         </AccordionTrigger>
         <AccordionContent className="px-5 pb-5">
@@ -47,12 +48,9 @@ export const AndroidAppAccordion = () => {
             <div className="flex gap-3 rounded-lg border border-bpim-warning/30 bg-bpim-warning/10 p-4 text-[13px] leading-relaxed text-bpim-text">
               <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-bpim-warning" />
               <div className="space-y-2">
-                <p>
-                  本アプリはGoogle
-                  Playに登録しておらず、APKを直接インストールする必要がある「提供元不明のアプリ」扱いです。
-                </p>
+                <p>{t("import.android.warning.main")}</p>
                 <p className="text-bpim-muted text-xs">
-                  ソースコードは{" "}
+                  {t("import.android.warning.sourcePrefix")}{" "}
                   <a
                     href="https://github.com/BPIManager/BPIM2-Flutter"
                     target="_blank"
@@ -61,17 +59,17 @@ export const AndroidAppAccordion = () => {
                   >
                     GitHub <ExternalLink className="h-3 w-3" />
                   </a>{" "}
-                  で公開されています。内容を確認の上、自己責任でご使用ください。
+                  {t("import.android.warning.sourceSuffix")}
                 </p>
               </div>
             </div>
 
             <p className="text-[13px] leading-relaxed text-bpim-muted">
-              Androidアプリを使用すると、
+              {t("import.android.desc")}
               <span className="mx-1 font-bold text-bpim-text">
-                コピー＆ペースト不要
+                {t("import.android.descHighlight")}
               </span>
-              でIIDX公式サイトから自動的にデータを同期できます。
+              {t("import.android.descSuffix")}
             </p>
 
             <ol className="flex flex-col gap-3">
@@ -96,7 +94,7 @@ export const AndroidAppAccordion = () => {
                 className="inline-flex items-center gap-2 rounded-lg border border-bpim-primary bg-bpim-primary/10 px-5 py-2.5 text-sm font-bold text-bpim-primary transition-all hover:bg-bpim-primary hover:text-bpim-bg active:scale-95"
               >
                 <Smartphone className="h-4 w-4" />
-                アプリをダウンロード
+                {t("import.android.downloadButton")}
               </a>
             </div>
           </div>

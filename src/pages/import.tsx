@@ -1,4 +1,5 @@
 import { Meta } from "@/components/partials/Head";
+import { useTranslation } from "@/hooks/common/useTranslation";
 import { ImportSuccessModal } from "@/components/partials/Import/SuccessModal/ui";
 import { ImportView } from "@/components/partials/Import/View/ui";
 import AccountSettings from "@/components/partials/Modal/AccountSettings";
@@ -17,6 +18,7 @@ export default function ImportPage() {
   const router = useRouter();
   const defaultTab = router.query.tab === "tower" ? "tower" : "score";
   const { user, isLoading, fbUser, refresh } = useUser();
+  const { t } = useTranslation();
   const [csvData, setCsvData] = useState(dummyCsv);
   const [detectedType, setDetectedType] = useState<CsvType>("unknown");
   const [selectedVersion, setSelectedVersion] = useState<string[]>([
@@ -63,7 +65,7 @@ export default function ImportPage() {
   return (
     <>
       {!user && <AccountSettings />}
-      <Meta title="データインポート" description="..." noIndex />
+      <Meta title={t("page.import.title")} noIndex />
 
       <ImportView
         defaultTab={defaultTab}

@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { DashCard } from "@/components/ui/dashcard";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export const LabelWithTooltip = ({
   label,
@@ -47,22 +48,23 @@ export const BatchSummaryCards = ({
   };
   isSharing: boolean;
 }) => {
+  const { t } = useTranslation();
   const stats = [
     {
-      label: "今日のBPI",
+      label: t("logs.summary.batchBpi"),
       value: summary.batchPerformance,
       icon: PlusCircle,
       color: "text-bpim-primary",
-      tooltip: "今回更新した☆12のみを対象とした総合BPI",
+      tooltip: t("logs.summary.batchBpi.tooltip"),
     },
     {
-      label: "更新",
+      label: t("logs.summary.updated"),
       value: summary.updatedScores,
       icon: PlusCircle,
       color: "text-bpim-warning",
     },
     {
-      label: "新規",
+      label: t("logs.summary.newRecords"),
       value: summary.newRecords,
       icon: MusicIcon,
       color: "text-purple-300",

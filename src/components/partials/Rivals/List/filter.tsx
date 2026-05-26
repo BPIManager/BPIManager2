@@ -5,6 +5,7 @@ import {
   type RivalSortOrder,
   RIVAL_SORT_LABELS,
 } from "@/hooks/social/useRivalListFilter";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface RivalFilterProps {
   levels: string[];
@@ -23,6 +24,7 @@ export const RivalFilter = ({
   onToggleDifficulty,
   onChangeSortOrder,
 }: RivalFilterProps) => {
+  const { t } = useTranslation();
   return (
     <div className="flex flex-col gap-6 rounded-xl border border-bpim-border bg-bpim-bg/40 p-4 lg:flex-row lg:items-start lg:gap-10">
       <div className="flex flex-col gap-2.5">
@@ -92,7 +94,7 @@ export const RivalFilter = ({
                 htmlFor={`sort-${key}`}
                 className="text-xs font-bold text-bpim-text cursor-pointer"
               >
-                {RIVAL_SORT_LABELS[key]}
+                {t(RIVAL_SORT_LABELS[key])}
               </Label>
             </div>
           ))}

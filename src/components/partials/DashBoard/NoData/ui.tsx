@@ -1,9 +1,11 @@
-﻿import { DashCard } from "@/components/ui/dashcard";
+import { DashCard } from "@/components/ui/dashcard";
 import NextLink from "next/link";
 import { Import, Settings, BookOpenText } from "lucide-react";
 import { LordiconAnimation } from "@/components/ui/lordicon-animation";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export const NoDataAlert = () => {
+  const { t } = useTranslation();
   const DOCS_URL =
     "https://www.notion.so/BPIM2-32a9989ca87a80829561f4b9618f1d6f";
 
@@ -19,32 +21,29 @@ export const NoDataAlert = () => {
         </div>
 
         <h3 className="text-xl font-black text-bpim-text tracking-tight">
-          おっと！まだデータが登録されていないようです...
+          {t("dashboard.noData.title")}
         </h3>
 
         <p className="mt-3 max-w-lg text-sm leading-relaxed text-bpim-muted">
-          スコアデータを読み込むことで、詳細な分析機能を利用できるようになります。
-          まずは以下のいずれかの手順でデータを準備しましょう！
+          {t("dashboard.noData.desc")}
         </p>
 
         <p className="mt-3 max-w-lg text-xs leading-relaxed text-bpim-muted/80">
-          BPIM2ではアーケード版IIDX又はINFINITASのスコアを登録できます。
-          <br />
-          詳細はインポートページの説明またはドキュメントをご確認ください。
+          {t("dashboard.noData.desc2")}
         </p>
 
         <div className="mt-8 grid w-full max-w-2xl gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <ActionLink
             href="/import"
             icon={<Import className="h-5 w-5" />}
-            title="新規インポート"
-            description="公式サイト等からデータを登録"
+            title={t("dashboard.noData.import")}
+            description={t("dashboard.noData.importDesc")}
           />
           <ActionLink
             href="/settings"
             icon={<Settings className="h-5 w-5" />}
-            title="データを移行"
-            description="旧BPIManagerから引き継ぎ"
+            title={t("dashboard.noData.migrate")}
+            description={t("dashboard.noData.migrateDesc")}
           />
           <a
             href={DOCS_URL}
@@ -56,10 +55,10 @@ export const NoDataAlert = () => {
               <BookOpenText className="h-5 w-5" />
             </div>
             <span className="text-sm font-bold text-bpim-text">
-              使い方の確認
+              {t("dashboard.noData.docs")}
             </span>
             <span className="text-[10px] text-bpim-muted leading-tight">
-              困った時はドキュメントへ
+              {t("dashboard.noData.docsDesc")}
             </span>
           </a>
         </div>

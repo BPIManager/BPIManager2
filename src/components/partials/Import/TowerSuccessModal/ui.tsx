@@ -5,6 +5,7 @@ import Fireworks from "react-canvas-confetti/dist/presets/fireworks";
 import { Button } from "@/components/ui/button";
 import { LordiconAnimation } from "@/components/ui/lordicon-animation";
 import { type TowerImportResult } from "@/hooks/import/useIidxTowerImport";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface Props {
   result: TowerImportResult | null;
@@ -13,6 +14,7 @@ interface Props {
 
 export const TowerImportSuccessModal = ({ result, onClose }: Props) => {
   const router = useRouter();
+  const { t } = useTranslation();
 
   if (!result) return null;
 
@@ -37,21 +39,21 @@ export const TowerImportSuccessModal = ({ result, onClose }: Props) => {
 
         <div className="flex flex-col gap-1">
           <h2 className="text-xl font-black tracking-tight text-bpim-text uppercase">
-            Tower Import Completed
+            {t("import.towerSuccess.title")}
           </h2>
           <p className="text-sm font-medium text-bpim-muted">
-            {result.upsertedCount} 件のタワーデータを更新しました
+            {result.upsertedCount} {t("import.towerSuccess.updated")}
           </p>
         </div>
 
         <div className="flex w-full flex-col gap-4 py-2 border-t border-b border-bpim-border/50 my-2">
           <span className="text-[10px] font-black tracking-[0.2em] text-bpim-muted uppercase">
-            取り込まれたノーツ数
+            {t("import.towerSuccess.notesImported")}
           </span>
 
           <div className="flex items-center justify-center gap-8">
             <div className="flex flex-col items-center gap-1">
-              <span className="text-xs font-bold text-bpim-subtle">鍵盤</span>
+              <span className="text-xs font-bold text-bpim-subtle">{t("import.towerSuccess.keys")}</span>
               <span className="font-mono text-3xl font-black text-bpim-text tabular-nums leading-none">
                 +{result.addedKeyCount.toLocaleString()}
               </span>
@@ -59,7 +61,7 @@ export const TowerImportSuccessModal = ({ result, onClose }: Props) => {
 
             <div className="flex flex-col items-center gap-1">
               <span className="text-xs font-bold text-bpim-subtle">
-                スクラッチ
+                {t("import.towerSuccess.scratch")}
               </span>
               <span className="font-mono text-3xl font-black text-bpim-text tabular-nums leading-none">
                 +{result.addedScratchCount.toLocaleString()}
@@ -74,7 +76,7 @@ export const TowerImportSuccessModal = ({ result, onClose }: Props) => {
             className="w-full bg-bpim-primary font-black text-bpim-text hover:bg-bpim-primary active:scale-95 transition-all"
             onClick={() => router.push("/")}
           >
-            ダッシュボードへ戻る
+            {t("import.towerSuccess.backToDashboard")}
           </Button>
 
           <Button
@@ -82,7 +84,7 @@ export const TowerImportSuccessModal = ({ result, onClose }: Props) => {
             className="text-bpim-muted hover:text-bpim-text"
             onClick={onClose}
           >
-            閉じる
+            {t("common.close")}
           </Button>
         </div>
       </div>

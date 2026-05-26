@@ -4,6 +4,7 @@ import { useBpmBpiDistribution } from "@/hooks/stats/useBpmBpiDistribution";
 import { BpmBpiSkeleton } from "./skeleton";
 import { BpmBpiChart } from "./ui";
 import { getVersionNameFromNumber } from "@/constants/versions";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface BpmBpiDistributionSectionProps {
   myUserId?: string;
@@ -15,16 +16,18 @@ interface BpmBpiDistributionSectionProps {
 export const BpmBpiDistributionSection = ({
   myUserId,
   rivalUserId,
-  myName = "自分",
-  rivalName = "ライバル",
+  myName,
+  rivalName,
 }: BpmBpiDistributionSectionProps) => {
   const { levels, diffs, version, compareVersion } = useStatsFilter();
+  const { t } = useTranslation();
+  const effectiveMyName = myName ?? t("dashboard.me");
 
   const isCompareMode = !rivalUserId && !!compareVersion;
   const effectiveRivalUserId = rivalUserId ?? (isCompareMode ? myUserId : undefined);
   const effectiveRivalVersion = rivalUserId ? version : compareVersion;
   const effectiveRivalName = rivalUserId
-    ? rivalName
+    ? (rivalName ?? t("dashboard.rival"))
     : getVersionNameFromNumber(compareVersion);
 
   const { distribution: myDist, isLoading: myLoading } = useBpmBpiDistribution(
@@ -44,12 +47,12 @@ export const BpmBpiDistributionSection = ({
   return (
     <DashCard>
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-sm font-bold uppercase text-bpim-muted">BPM帯別</h3>
+        <h3 className="text-sm font-bold uppercase text-bpim-muted">{t("dashboard.bpmBpi.title")}</h3>
         {effectiveRivalUserId && (
           <div className="flex items-center gap-3 mb-1">
             <div className="flex items-center gap-1">
               <div className="h-2 w-2 rounded-full bg-bpim-primary" />
-              <span className="text-xs text-bpim-primary">{myName}</span>
+              <span className="text-xs text-bpim-primary">{effectiveMyName}</span>
             </div>
             <div className="flex items-center gap-1">
               <div className="h-2 w-2 rounded-full bg-bpim-warning opacity-60" />

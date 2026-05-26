@@ -10,8 +10,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export const DashBoardFilter = ({ withCompare }: { withCompare?: boolean }) => {
+  const { t } = useTranslation();
   const {
     levels,
     diffs,
@@ -56,11 +58,11 @@ export const DashBoardFilter = ({ withCompare }: { withCompare?: boolean }) => {
               }
             >
               <SelectTrigger className="h-8 w-full border-bpim-border bg-bpim-surface-2/60 text-xs hover:bg-bpim-overlay focus:ring-0">
-                <SelectValue placeholder="比較なし" />
+                <SelectValue placeholder={t("dashboard.filter.noCompare")} />
               </SelectTrigger>
               <SelectContent className="border-bpim-border bg-bpim-bg">
                 <SelectItem value="_none" className="text-xs text-bpim-muted">
-                  比較なし
+                  {t("dashboard.filter.noCompare")}
                 </SelectItem>
                 {versionsNonDisabledCollection
                   .filter((v) => v.value !== version)

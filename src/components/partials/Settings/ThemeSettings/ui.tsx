@@ -14,11 +14,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export default function ThemeSettingsUi() {
   const [isOpen, setIsOpen] = useState(false);
   const [current, setCurrent] = useState<ThemeId>("dark-blue");
   const [currentFont, setCurrentFont] = useState<FontId>("default");
+  const { t } = useTranslation();
 
   useEffect(() => {
     setCurrent(getStoredTheme());
@@ -54,10 +56,10 @@ export default function ThemeSettingsUi() {
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2 text-bpim-primary">
             <Palette className="h-4 w-4" />
-            <span className="font-bold">テーマ・フォント設定</span>
+            <span className="font-bold">{t("settings.theme.title")}</span>
           </div>
           <p className="text-sm text-bpim-muted">
-            アプリ全体の配色とフォントを選択します。設定はブラウザに保存されます。
+            {t("settings.theme.desc")}
           </p>
           {currentTheme && (
             <div className="mt-1 flex items-center gap-2 text-xs text-bpim-muted">
@@ -82,7 +84,7 @@ export default function ThemeSettingsUi() {
           className="w-full md:w-auto gap-2"
         >
           <Palette className="h-4 w-4" />
-          外観を変更
+          {t("settings.theme.customize")}
         </Button>
       </div>
 
@@ -90,26 +92,26 @@ export default function ThemeSettingsUi() {
         <DialogContent className="max-w-[90vw] sm:max-w-2xl border-bpim-border bg-bpim-bg p-0 overflow-hidden shadow-2xl rounded-2xl">
           <DialogHeader className="p-6 pb-4 border-b border-bpim-border">
             <DialogTitle className="text-lg font-bold text-bpim-text">
-              テーマ・フォント設定
+              {t("settings.theme.title")}
             </DialogTitle>
             <p className="text-xs text-bpim-muted mt-1">
-              設定はブラウザに保存されます
+              {t("settings.theme.savedInBrowser")}
             </p>
           </DialogHeader>
 
           <div className="overflow-y-auto max-h-[65vh] p-6 flex flex-col gap-6">
-            <ThemeGroup label="ダーク" themes={darkStandard} current={current} onSelect={handleSelect} />
-            <ThemeGroup label="ライト" themes={lightThemes} current={current} onSelect={handleSelect} />
-            <ThemeGroup label="ゲーミング" themes={darkVivid} current={current} onSelect={handleSelect} />
+            <ThemeGroup label={t("settings.theme.dark")} themes={darkStandard} current={current} onSelect={handleSelect} />
+            <ThemeGroup label={t("settings.theme.light")} themes={lightThemes} current={current} onSelect={handleSelect} />
+            <ThemeGroup label={t("settings.theme.gaming")} themes={darkVivid} current={current} onSelect={handleSelect} />
 
             <div className="border-t border-bpim-border pt-6 flex flex-col gap-4">
               <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-2 text-bpim-primary">
                   <Type className="h-4 w-4" />
-                  <span className="font-bold text-sm">フォント設定</span>
+                  <span className="font-bold text-sm">{t("settings.theme.font")}</span>
                 </div>
                 <p className="text-xs text-bpim-muted">
-                  アプリ全体のフォントを選択します。
+                  {t("settings.theme.fontDesc")}
                 </p>
               </div>
               <div className="flex flex-col gap-2">

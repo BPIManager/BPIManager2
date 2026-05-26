@@ -9,6 +9,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface AreaRankBadgeProps {
   area: string;
@@ -75,6 +76,7 @@ export const AreaRankBadge = ({
   areaRank,
   totalInArea,
 }: AreaRankBadgeProps) => {
+  const { t, tFormat } = useTranslation();
   const [open, setOpen] = useState(false);
   const tier = getRankTier(areaRank, totalInArea);
   const s = TIER_STYLE[tier];
@@ -126,7 +128,7 @@ export const AreaRankBadge = ({
                   }}
                 />
               ))}
-            {areaRank}位/{totalInArea}人
+            {tFormat("profile.areaRank.badge", { rank: areaRank, total: totalInArea })}
           </span>
         </TooltipTrigger>
         <TooltipContent
@@ -134,12 +136,11 @@ export const AreaRankBadge = ({
           className="flex flex-col items-center gap-2"
         >
           <span className="text-center text-xs leading-relaxed">
-            {area}のプレイヤー{totalInArea}人中
-            {areaRank}位
+            {tFormat("profile.areaRank.tooltip", { area, rank: areaRank, total: totalInArea })}
             <br />
-            ※IIDX公式のアリーナランクptに基づく順位
+            {t("profile.areaRank.officialNote")}
             <br />
-            （B帯以下は集計対象外. BPIM非登録者を含む）
+            {t("profile.areaRank.exclusionNote")}
           </span>
           <Link
             href={`/ranking/global?area=${encodeURIComponent(area)}`}
@@ -147,7 +148,7 @@ export const AreaRankBadge = ({
             className="inline-flex items-center gap-1 rounded-md bg-bpim-primary/15 px-2 py-1 text-[10px] font-bold text-bpim-primary hover:bg-bpim-primary/25 transition-colors"
           >
             <ExternalLink className="h-3 w-3" />
-            BPIに基づくランキングはこちら
+            {t("profile.areaRank.viewLink")}
           </Link>
         </TooltipContent>
       </Tooltip>

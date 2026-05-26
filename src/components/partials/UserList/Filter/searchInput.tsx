@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export const SearchInput = ({
   initialValue,
@@ -11,6 +12,7 @@ export const SearchInput = ({
   initialValue: string;
   onSearch: (val: string) => void;
 }) => {
+  const { t } = useTranslation();
   const [value, setValue] = useState(initialValue);
 
   useEffect(() => {
@@ -30,7 +32,7 @@ export const SearchInput = ({
         <Search className="h-4 w-4" />
       </div>
       <Input
-        placeholder="ユーザー名またはIIDX IDで検索"
+        placeholder={t("rivals.search.placeholder")}
         className="h-10 pl-10 border-none bg-bpim-bg/40 text-bpim-text focus-visible:ring-blue-500"
         value={value}
         onChange={(e) => setValue(e.target.value)}

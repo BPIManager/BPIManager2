@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import type { RadarCategory } from "@/types/stats/radar";
 import type { ScatterPoint } from "@/hooks/metrics/useArenaAnalysis";
 import { ALL_RADAR_CATEGORIES, RADAR_COLORS } from "@/constants/radars";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 const ScatterTooltip = ({
   active,
@@ -24,6 +25,7 @@ const ScatterTooltip = ({
   payload?: { payload: ScatterPoint }[];
   xLabel: string;
 }) => {
+  const { t } = useTranslation();
   if (!active || !payload?.length) return null;
   const d = payload[0].payload;
   const diff = d.userBpi - d.bpi;
@@ -36,7 +38,7 @@ const ScatterTooltip = ({
         <span className="text-bpim-text">{d.bpi.toFixed(2)}</span>
       </p>
       <p className="font-mono text-bpim-muted">
-        自分のBPI:{" "}
+        {t("scatter.myBpi")}:{" "}
         <span className="text-bpim-primary">{d.userBpi.toFixed(2)}</span>
       </p>
       <p
@@ -45,7 +47,7 @@ const ScatterTooltip = ({
           diff >= 0 ? "text-green-400" : "text-red-400",
         )}
       >
-        差: {diff >= 0 ? "+" : ""}
+        {t("scatter.diff")}: {diff >= 0 ? "+" : ""}
         {diff.toFixed(2)}
       </p>
     </div>
@@ -77,19 +79,20 @@ export const BpiScatterChart = ({
   title,
   xLabel,
 }: BpiScatterChartProps) => {
+  const { t } = useTranslation();
   const resolvedXLabel = xLabel ?? `${rank}平均BPI`;
-  const resolvedTitle = title ?? `${rank} 平均BPI vs 自分のBPI`;
+  const resolvedTitle = title ?? `${rank} 平均BPI vs ${t("scatter.myBpi")}`;
+  const myBpiLabel = t("scatter.myBpi");
   return (
   <div className="rounded-xl border border-bpim-border bg-bpim-bg p-5 shadow-sm">
     <h3 className="mb-1 text-[10px] font-black uppercase tracking-widest text-bpim-muted">
       {resolvedTitle}
     </h3>
     <p className="mb-4 text-[10px] text-bpim-muted">
-      対角線より上 = このランク平均を上回っている曲 / 下 = 下回っている曲
-      {!user && "（ログインすると自分のBPIと比較できます）"}
-      {user && userLoading && "（読み込み中...）"}
-      {user && !userLoading && scatterPoints.length === 0 &&
-        "（このバージョンのスコアデータがありません）"}
+      {t("scatter.diagonalDescPre")}{resolvedXLabel}{t("scatter.diagonalDescMid")}
+      {!user && t("scatter.loginToCompare")}
+      {user && userLoading && t("arenaAnalysis.loading")}
+      {user && !userLoading && scatterPoints.length === 0 && t("scatter.noVersionData")}
     </p>
 
     {scatterPoints.length > 0 ? (
@@ -117,11 +120,11 @@ export const BpiScatterChart = ({
             <YAxis
               dataKey="userBpi"
               type="number"
-              name="自分のBPI"
+              name={myBpiLabel}
               domain={axisDomain}
               tick={{ fontSize: 10, fill: "#64748b" }}
               label={{
-                value: "自分のBPI",
+                value: myBpiLabel,
                 angle: -90,
                 position: "insideLeft",
                 offset: 15,
@@ -177,11 +180,11 @@ export const BpiScatterChart = ({
         <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[10px] text-bpim-muted">
           <span className="flex items-center gap-1">
             <span className="inline-block h-2 w-2 rounded-full bg-green-400 opacity-80" />
-            ランク平均より上（カテゴリ色）
+            {t("scatter.aboveAvg")}
           </span>
           <span className="flex items-center gap-1">
             <span className="inline-block h-2 w-2 rounded-full bg-red-500 opacity-60" />
-            ランク平均より下
+            {t("scatter.belowAvg")}
           </span>
           {ALL_RADAR_CATEGORIES.filter((c) => selectedCategories.has(c)).map(
             (c) => (
@@ -198,7 +201,7 @@ export const BpiScatterChart = ({
       </>
     ) : (
       <div className="flex h-40 items-center justify-center rounded-lg border border-dashed border-bpim-border text-xs text-bpim-muted">
-        {!user ? "ログインして自分のBPIと比較" : "データなし"}
+        {!user ? t("scatter.loginToCompareEmpty") : t("scatter.noData")}
       </div>
     )}
   </div>

@@ -8,10 +8,12 @@ import { latestVersion } from "@/constants/latestVersion";
 import { ProfileMeta } from "@/components/partials/Profile/Meta/ui";
 import { DashCard } from "@/components/ui/dashcard";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export default function UserAAATablePage() {
   const router = useRouter();
   const { fbUser, isLoading: isUserLoading } = useUser();
+  const { t } = useTranslation();
 
   const { userId, version } = router.query;
   const uid = (userId as string) || "";
@@ -24,7 +26,7 @@ export default function UserAAATablePage() {
   if (isOwnedByFbId) {
     return (
       <DashboardLayout>
-        <Meta title="AAA達成難易度表" noIndex />
+        <Meta title={t("page.aaaTable.title")} noIndex />
         <AAATableContent userId={uid} />
       </DashboardLayout>
     );
@@ -32,7 +34,7 @@ export default function UserAAATablePage() {
 
   return (
     <UserProfileLayout userId={uid} currentTab="aaaTable">
-      <ProfileMeta title="AAA達成難易度表" />
+      <ProfileMeta title={t("page.aaaTable.title")} />
       <div className="flex flex-col gap-4">
         <div
           className={cn(

@@ -16,6 +16,7 @@ import { SongDetailView } from "@/components/partials/Modal/BPIChart/SongDetails
 import { RivalSongItem } from "./ui";
 import { RivalAnalysis } from "@/components/partials/Rivals/Analysis/ui";
 import { List, BarChart2 } from "lucide-react";
+import { useTranslation } from "@/hooks/common/useTranslation";
 import { cn } from "@/lib/utils";
 
 type SubTab = "list" | "analysis";
@@ -32,6 +33,7 @@ export const RivalSongsTable = ({
   rivalName?: string;
 }) => {
   const { fbUser } = useUser();
+  const { t } = useTranslation();
   const [selectedSong, setSelectedSong] = useState<SongWithScore | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
@@ -52,7 +54,7 @@ export const RivalSongsTable = ({
     return (
       <div className="flex h-50 flex-col items-center justify-center gap-2">
         <p className="font-bold text-bpim-danger">
-          楽曲データの取得に失敗しました
+          {t("table.songLoadError")}
         </p>
         <p className="text-xs text-bpim-muted">{error?.message}</p>
       </div>
@@ -63,7 +65,7 @@ export const RivalSongsTable = ({
     <div className="flex items-center gap-1 border-b border-bpim-border px-3 py-2">
       {(["list", "analysis"] as SubTab[]).map((tab) => {
         const Icon = tab === "list" ? List : BarChart2;
-        const label = tab === "list" ? "楽曲一覧" : "分析";
+        const label = tab === "list" ? t("rivals.table.songList") : t("rivals.table.analysis");
         return (
           <button
             key={tab}
@@ -89,7 +91,7 @@ export const RivalSongsTable = ({
         <SubTabBar />
         {isLoading ? (
           <div className="flex h-40 items-center justify-center text-xs text-bpim-muted">
-            読み込み中...
+            {t("common.loading")}
           </div>
         ) : (
           <RivalAnalysis

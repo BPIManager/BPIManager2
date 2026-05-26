@@ -23,6 +23,7 @@ import { ALL_RADAR_CATEGORIES } from "@/constants/radars";
 import { RANK_TABLE } from "@/constants/djRank";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { useTranslation } from "@/hooks/common/useTranslation";
 import {
   Select,
   SelectContent,
@@ -51,6 +52,7 @@ export const ArenaMetricsView = ({
   const [displayMetric, setDisplayMetric] = useState<DisplayMetric>("exScore");
   const [analysisRank, setAnalysisRank] = useState<string>("A1");
   const [selectedCategories, setSelectedCategories] = useState<Set<RadarCat>>(ALL_CATEGORIES_SET);
+  const { t } = useTranslation();
 
   const handleCategoryToggle = (cat: RadarCat) => {
     setSelectedCategories((prev) => {
@@ -148,21 +150,21 @@ export const ArenaMetricsView = ({
   return (
     <DashboardLayout>
       <Meta
-        title={`アリーナ平均 (Ver.${v} ☆${level})`}
-        description="アリーナランク別平均スコアを確認できます"
+        title={`${t("page.arenaAverage.title")} (Ver.${v} ☆${level})`}
+        description={t("page.arenaAverage.desc")}
         noIndex
       />
 
       <PageHeader
-        title="アリーナランク別平均"
-        description="アリーナランク別平均スコアを確認できます"
+        title={t("page.arenaAverage.title")}
+        description={t("page.arenaAverage.desc")}
       />
 
       <PageContainer>
         <Tabs defaultValue="list" className="flex flex-col gap-6">
           <TabsList className="w-full">
-            <TabsTrigger value="list">一覧</TabsTrigger>
-            <TabsTrigger value="analysis">分析</TabsTrigger>
+            <TabsTrigger value="list">{t("page.arenaAverage.list")}</TabsTrigger>
+            <TabsTrigger value="analysis">{t("page.arenaAverage.analytics")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="list">
@@ -251,7 +253,9 @@ const AnalysisControls = ({
   onRankChange: (r: string) => void;
   level: string;
   onLevelChange: (l: string) => void;
-}) => (
+}) => {
+  const { t } = useTranslation();
+  return (
   <div className="rounded-xl border border-bpim-border bg-bpim-bg/80 p-4 shadow-sm backdrop-blur-md">
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
       <div className="flex flex-col gap-2">
@@ -274,7 +278,7 @@ const AnalysisControls = ({
 
       <div className="flex flex-col gap-2">
         <span className="text-[10px] font-black tracking-widest text-bpim-muted uppercase px-1">
-          アリーナランク
+          {t("page.arenaAverage.rank")}
         </span>
         <Select value={rank} onValueChange={onRankChange}>
           <SelectTrigger className="h-9 border-bpim-border bg-bpim-surface-2/60 text-sm font-bold text-bpim-text">
@@ -318,6 +322,7 @@ const AnalysisControls = ({
       </div>
     </div>
   </div>
-);
+  );
+};
 
 export default ArenaMetricsView;

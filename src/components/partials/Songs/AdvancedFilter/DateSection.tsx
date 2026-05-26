@@ -7,15 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SectionTitle } from "./SectionTitle";
+import { useTranslation } from "@/hooks/common/useTranslation";
+import { type TranslationKey } from "@/lib/i18n/translations";
 
-const PERIOD_OPTIONS = [
-  { label: "今日", value: "today" },
-  { label: "昨日", value: "yesterday" },
-  { label: "今週", value: "thisWeek" },
-  { label: "今月", value: "thisMonth" },
-  { label: "直近7日", value: "past7" },
-  { label: "直近30日", value: "past30" },
-];
+const PERIOD_VALUES = ["today", "yesterday", "thisWeek", "thisMonth", "past7", "past30"] as const;
 
 interface Props {
   since: string | undefined;
@@ -24,11 +19,16 @@ interface Props {
 }
 
 export const DateSection = ({ since, until, onChange }: Props) => {
+  const { t } = useTranslation();
+  const PERIOD_OPTIONS = PERIOD_VALUES.map((value) => ({
+    label: t(`filter.period.${value}` as TranslationKey),
+    value,
+  }));
   const isCustomActive = since && !PERIOD_OPTIONS.find((v) => v.value === since);
 
   return (
     <section className="flex flex-col gap-3">
-      <SectionTitle>最終更新日</SectionTitle>
+      <SectionTitle>{t("filter.lastUpdated")}</SectionTitle>
       <div className="flex flex-wrap gap-2">
         {PERIOD_OPTIONS.map((opt) => (
           <Button
@@ -65,7 +65,7 @@ export const DateSection = ({ since, until, onChange }: Props) => {
             }
           }}
         >
-          カスタム
+          {t("filter.period.custom")}
         </Button>
       </div>
 
@@ -73,7 +73,7 @@ export const DateSection = ({ since, until, onChange }: Props) => {
         <div className="flex flex-col gap-3 rounded-lg bg-bpim-surface-2/60 p-3">
           <div className="grid grid-cols-[1fr_auto_1fr] items-end gap-2">
             <div className="flex flex-col gap-1.5">
-              <Label className="text-[10px] text-bpim-muted">開始日</Label>
+              <Label className="text-[10px] text-bpim-muted">{t("filter.startDate")}</Label>
               <Input
                 type="date"
                 className="h-8 border-bpim-border bg-bpim-bg text-xs scheme-dark"
@@ -83,7 +83,7 @@ export const DateSection = ({ since, until, onChange }: Props) => {
             </div>
             <span className="mb-2 text-bpim-subtle text-xs">~</span>
             <div className="flex flex-col gap-1.5">
-              <Label className="text-[10px] text-bpim-muted">終了日</Label>
+              <Label className="text-[10px] text-bpim-muted">{t("filter.endDate")}</Label>
               <Input
                 type="date"
                 className="h-8 border-bpim-border bg-bpim-bg text-xs scheme-dark"

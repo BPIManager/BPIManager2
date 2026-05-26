@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/accordion";
 import type { OptimizationResult } from "@/types/bpi-optimizer";
 import type { OptimizeMemo } from "@/hooks/analytics/useOptimizeMemo";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export const SavedMemoList = ({
   memos,
@@ -20,19 +21,21 @@ export const SavedMemoList = ({
   onDelete: (id: string) => void;
   isDeletingId: string | null;
   onSelect: (result: OptimizationResult) => void;
-}) => (
+}) => {
+  const { t, tFormat } = useTranslation();
+  return (
   <Accordion type="single" collapsible className="w-full mt-4">
     <AccordionItem value="memos" className="border-bpim-border">
       <AccordionTrigger className="text-sm font-bold text-bpim-muted hover:text-bpim-text py-3">
         <div className="flex items-center gap-2">
           <History className="h-4 w-4" />
-          保存済みのプラン ({memos.length})
+          {tFormat("optimizer.memo.header", { count: memos.length })}
         </div>
       </AccordionTrigger>
       <AccordionContent className="flex flex-col gap-2 pt-1 pb-4">
         {memos.length === 0 && (
           <p className="text-xs text-center py-8 text-bpim-subtle border border-dashed border-bpim-border rounded-lg">
-            保存された履歴はありません
+            {t("optimizer.memo.empty")}
           </p>
         )}
         {memos.map((memo) => (
@@ -47,7 +50,7 @@ export const SavedMemoList = ({
                   variant="secondary"
                   className="font-mono text-[10px] bg-bpim-overlay"
                 >
-                  目標 {memo.targetBpi.toFixed(2)}
+                  {tFormat("optimizer.memo.target", { bpi: memo.targetBpi.toFixed(2) })}
                 </Badge>
                 <span className="text-[10px] text-bpim-subtle flex items-center gap-1">
                   <Calendar className="h-3 w-3" />
@@ -72,11 +75,12 @@ export const SavedMemoList = ({
               </Button>
             </div>
             <p className="text-[11px] text-bpim-muted">
-              {memo.reportData.steps.length} 曲のプラン
+              {tFormat("optimizer.memo.songCount", { count: memo.reportData.steps.length })}
             </p>
           </div>
         ))}
       </AccordionContent>
     </AccordionItem>
   </Accordion>
-);
+  );
+};

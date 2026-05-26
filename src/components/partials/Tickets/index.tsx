@@ -15,13 +15,14 @@ import { TicketCardSkeleton } from "@/components/partials/Tickets/TicketSkeleton
 import { TicketFeatureDescription } from "@/components/partials/Tickets/FeatureDescription";
 import { useTicketSearch } from "@/hooks/tickets/useTicketSearch";
 import type { ScoreMode } from "@/types/tickets";
-
-const SCORE_MODE_OPTIONS: { value: ScoreMode; label: string }[] = [
-  { value: "relative", label: "当たり譜面度（%）" },
-  { value: "raw", label: "配置スコア（絶対値）" },
-];
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export function TicketsSection() {
+  const { t } = useTranslation();
+  const SCORE_MODE_OPTIONS: { value: ScoreMode; label: string }[] = [
+    { value: "relative", label: t("tickets.scoreRelative") },
+    { value: "raw", label: t("tickets.scoreRaw") },
+  ];
   const {
     csvInput,
     setCsvInput,
@@ -42,28 +43,24 @@ export function TicketsSection() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-3 rounded-xl border border-bpim-border bg-bpim-surface p-5">
         <div className="flex flex-col gap-1">
-          <p className="text-sm font-semibold text-bpim-text">チケット情報を貼り付け</p>
+          <p className="text-sm font-semibold text-bpim-text">{t("tickets.pasteCsv")}</p>
           <p className="text-xs text-bpim-muted">
-            ブックマークレットから出力されたCSVを貼り付けてください
+            {t("tickets.pasteCsvDesc")}
           </p>
         </div>
         <Textarea
-          placeholder={"チケット番号,有効期限\n2641753,2026/10/09\n3147625,2026/10/09"}
+          placeholder={t("tickets.placeholder")}
           className="font-mono text-xs resize-y min-h-28"
           value={csvInput}
           onChange={(e) => setCsvInput(e.target.value)}
         />
         <BookmarkletAccordion
-          lastStep={
-            <>
-              このページに戻り、チケット番号の一覧をテキストエリアに貼り付けて「当たり譜面を探す」をクリックします。
-            </>
-          }
+          lastStep={<>{t("tickets.lastStep")}</>}
         />
         {error && <p className="text-xs text-red-400">{error}</p>}
         <div className="flex items-center gap-3 flex-wrap">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-bpim-muted shrink-0">スコア表示:</span>
+            <span className="text-xs text-bpim-muted shrink-0">{t("tickets.scoreDisplay")}</span>
             <Select
               value={scoreMode}
               onValueChange={(v) => handleScoreModeChange(v as ScoreMode)}
@@ -81,7 +78,7 @@ export function TicketsSection() {
             </Select>
           </div>
           <Button onClick={handleSearch} disabled={isLoading || !csvInput.trim()}>
-            {isLoading ? "検索中..." : "当たり譜面を探す"}
+            {isLoading ? t("tickets.searching") : t("tickets.searchBtn")}
           </Button>
         </div>
       </div>

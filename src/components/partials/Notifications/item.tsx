@@ -6,8 +6,10 @@ import { NotificationItem as NotificationItemType } from "@/types/users/notifica
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export const NotificationItem = ({ n }: { n: NotificationItemType }) => {
+  const { t } = useTranslation();
   const isOvertaken = n.type === "overtaken";
   const diff = (n.rivalScore || 0) - (n.myScore || 0);
 
@@ -33,16 +35,15 @@ export const NotificationItem = ({ n }: { n: NotificationItemType }) => {
             <span className="font-bold text-bpim-text">{n.senderName}</span>
             {isOvertaken ? (
               <>
-                {" "}
-                さんが{" "}
+                {t("notifications.overtaken.pre")}
                 <span className="font-bold text-bpim-primary">
                   {n.songTitle}[
                   {(n.songDifficulty || "").charAt(0).toUpperCase()}]
-                </span>{" "}
-                であなたを上回りました
+                </span>
+                {t("notifications.overtaken.post")}
                 <div className="mt-1 flex items-center gap-2 text-xs text-bpim-primary/80">
-                  <span>あなた:{n.myScore || 0}</span>
-                  <span>ライバル:{n.rivalScore || 0}</span>
+                  <span>{t("notifications.myScore")}{n.myScore || 0}</span>
+                  <span>{t("notifications.rivalScore")}{n.rivalScore || 0}</span>
                   <Badge
                     variant="destructive"
                     className="h-4 px-1.5 text-[10px] font-bold"
@@ -52,7 +53,7 @@ export const NotificationItem = ({ n }: { n: NotificationItemType }) => {
                 </div>
               </>
             ) : (
-              " さんにフォローされました"
+              t("notifications.follow.msg")
             )}
           </div>
         </div>

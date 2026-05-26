@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import type { OptimizationStep } from "@/types/bpi-optimizer";
 import { BpiChip } from "./BpiChip";
 import { RADAR_LABELS, DIFF_COLORS } from "./shared";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export const OptimizationStepCard = ({
   step,
@@ -12,6 +13,7 @@ export const OptimizationStepCard = ({
   step: OptimizationStep;
   maxGain: number;
 }) => {
+  const { t } = useTranslation();
   const impactWidth = Math.min(100, (step.bpiGain / maxGain) * 100);
 
   return (
@@ -41,7 +43,7 @@ export const OptimizationStepCard = ({
               )}
               {step.isRadarStrength && (
                 <Badge className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20 text-[9px] h-4">
-                  <Star className="h-2 w-2 mr-1 fill-yellow-500" /> 得意曲かも?
+                  <Star className="h-2 w-2 mr-1 fill-yellow-500" /> {t("optimizer.step.mightBeStrong")}
                 </Badge>
               )}
             </div>
@@ -53,7 +55,7 @@ export const OptimizationStepCard = ({
             EX +{step.exScoreGap}
           </div>
           <div className="text-[10px] text-bpim-muted font-bold">
-            目標: {step.toExScore}
+            {t("optimizer.step.targetLabel")}: {step.toExScore}
           </div>
         </div>
       </div>
@@ -61,7 +63,7 @@ export const OptimizationStepCard = ({
       <div className="space-y-1.5">
         <div className="flex justify-between items-end">
           <span className="text-[9px] font-black text-bpim-subtle uppercase tracking-widest">
-            総合BPIへのインパクト
+            {t("optimizer.step.impact")}
           </span>
           <span className="text-[10px] font-mono font-bold text-bpim-primary">
             +{step.bpiGain.toFixed(2)}
@@ -77,7 +79,7 @@ export const OptimizationStepCard = ({
       <div className="flex items-center justify-between pt-2 border-t border-bpim-border/50">
         <div className="flex flex-col gap-1">
           <span className="text-[9px] font-black text-bpim-subtle uppercase tracking-widest leading-none">
-            単曲BPIの変化
+            {t("optimizer.step.bpiChange")}
           </span>
           <div className="flex items-center gap-2">
             <div className="flex flex-col items-center">
@@ -95,7 +97,7 @@ export const OptimizationStepCard = ({
 
         <div className="text-right flex flex-col justify-end">
           <span className="text-[9px] font-black text-bpim-subtle uppercase tracking-widest leading-none">
-            達成後総合BPI
+            {t("optimizer.step.totalBpiAfter")}
           </span>
           <div className="text-sm font-black text-bpim-text font-mono leading-tight mt-1">
             {step.cumulativeTotalBpi.toFixed(2)}

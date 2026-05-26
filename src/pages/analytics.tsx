@@ -17,30 +17,33 @@ import {
   useAnalyticsComparison,
 } from "@/hooks/analytics/useAnalyticsComparison";
 import type { AnalyticsTarget } from "@/types/analytics";
-import { TargetSelectorModal } from "@/components/partials/Analytics/TargetSelector/ui";
+import { TargetSelectorModal } from "@/components/partials/Analytics/TargetSelector";
 import { AnalyticsComparisonTable } from "@/components/partials/Analytics/Table";
 import { latestVersion } from "@/constants/latestVersion";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
-const EmptyState = ({ onOpen }: { onOpen: () => void }) => (
-  <div className="flex flex-col items-center justify-center gap-6 py-24 px-6 text-center">
-    <div className="flex flex-col gap-2">
-      <h2 className="text-lg font-bold text-bpim-text">
-        比較対象が設定されていません
-      </h2>
-      <p className="text-sm text-bpim-muted max-w-xs">
-        ライバル・アリーナ平均・AAA達成スコアなど、
-        さまざまな指標と自分のスコアを比較できます。
-      </p>
+const EmptyState = ({ onOpen }: { onOpen: () => void }) => {
+  const { t } = useTranslation();
+  return (
+    <div className="flex flex-col items-center justify-center gap-6 py-24 px-6 text-center">
+      <div className="flex flex-col gap-2">
+        <h2 className="text-lg font-bold text-bpim-text">
+          {t("page.analytics.noTarget")}
+        </h2>
+        <p className="text-sm text-bpim-muted max-w-xs">
+          {t("page.analytics.targetDesc")}
+        </p>
+      </div>
+      <Button
+        onClick={onOpen}
+        className="bg-bpim-primary font-bold text-white hover:bg-bpim-primary/80 px-8"
+      >
+        {t("page.analytics.selectTarget")}
+      </Button>
     </div>
-    <Button
-      onClick={onOpen}
-      className="bg-bpim-primary font-bold text-white hover:bg-bpim-primary/80 px-8"
-    >
-      比較対象を選択する
-    </Button>
-  </div>
-);
+  );
+};
 
 const TargetBadge = ({
   target,
@@ -66,6 +69,7 @@ const TargetBadge = ({
 export default function AnalyticsPage() {
   const router = useRouter();
   const { isLoading: isUserLoading, fbUser } = useUser();
+  const { t } = useTranslation();
 
   const [isSelectorOpen, setIsSelectorOpen] = useState(false);
 
@@ -122,11 +126,11 @@ export default function AnalyticsPage() {
 
   return (
     <DashboardLayout>
-      <Meta title="比較" noIndex />
+      <Meta title={t("page.analytics.title")} noIndex />
 
       <PageHeader
-        title="比較"
-        description="任意の対象と自分のスコアを比較します"
+        title={t("page.analytics.title")}
+        description={t("page.analytics.desc")}
         rightElement={
           target ? (
             <div className="flex items-center gap-2">
@@ -142,7 +146,7 @@ export default function AnalyticsPage() {
               className="border-bpim-border bg-bpim-surface text-bpim-text hover:bg-bpim-overlay"
             >
               <Settings2 className="mr-2 h-4 w-4" />
-              比較対象を設定
+              {t("page.analytics.setTarget")}
             </Button>
           )
         }

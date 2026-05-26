@@ -22,6 +22,8 @@ import {
 import { FilterSelect } from "./select";
 import { SlidersHorizontal } from "lucide-react";
 import { toggleArrayItem } from "@/hooks/common/useToggleArray";
+import { useTranslation } from "@/hooks/common/useTranslation";
+import { type TranslationKey } from "@/lib/i18n/translations";
 
 interface SongFilterBarProps {
   params: FilterParamsFrontend;
@@ -46,8 +48,12 @@ export const SongFilterBar = ({
   withScoreRate = false,
   currentVersion,
 }: SongFilterBarProps) => {
+  const { t } = useTranslation();
   const router = useRouter();
   const currentStoreVersion = router.query.version;
+
+  const translateOpts = (opts: { label: string; value: string }[]) =>
+    opts.map((o) => ({ ...o, label: t(`sort.${o.value}` as TranslationKey) }));
 
   const compareVersionOptions = useMemo(() => {
     const base = versionsNonDisabledCollection.filter(
@@ -55,22 +61,23 @@ export const SongFilterBar = ({
         v.value !==
         (currentVersion ?? String(currentStoreVersion ?? latestVersion)),
     );
-    return [{ label: "比較なし", value: "none" }, ...base];
-  }, [currentVersion, currentStoreVersion]);
+    return [{ label: t("filter.noCompare"), value: "none" }, ...base];
+  }, [currentVersion, currentStoreVersion, t]);
 
   const hasCompare = params.compareVersion && params.compareVersion !== "none";
 
   const combinedSortOptions = useMemo(() => {
     const base = withRivals
-      ? [...sortOptions, ...rivalSortOptions]
+      ? [...translateOpts(sortOptions), ...translateOpts(rivalSortOptions)]
       : [
-          ...soleSortOptions,
-          ...(withScoreRate ? [scoreRateSortOption] : []),
-          ...sortOptions,
+          ...translateOpts(soleSortOptions),
+          ...(withScoreRate ? translateOpts([scoreRateSortOption]) : []),
+          ...translateOpts(sortOptions),
         ];
     if (hasCompare) return [...base];
     return base;
-  }, [withRivals, withScoreRate, hasCompare]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [withRivals, withScoreRate, hasCompare, t]);
 
   return (
     <FilterBarContainer totalCount={totalCount}>
@@ -97,7 +104,7 @@ export const SongFilterBar = ({
             })
           }
           options={combinedSortOptions}
-          placeholder="ソート"
+          placeholder={t("filter.sort")}
           className="flex-1 min-w-27.5"
         />
         <FilterSelect
@@ -105,8 +112,8 @@ export const SongFilterBar = ({
           onValueChange={(val) =>
             onParamsChange({ sortOrder: val as "asc" | "desc" })
           }
-          options={sortOrderOptions}
-          placeholder="順序"
+          options={sortOrderOptions.map((o) => ({ ...o, label: t(`sort.${o.value}` as TranslationKey) }))}
+          placeholder={t("filter.order")}
           className="w-22.5 shrink-0"
         />
       </div>
@@ -126,7 +133,7 @@ export const SongFilterBar = ({
                 })
               }
               options={compareVersionOptions}
-              placeholder="比較表示"
+              placeholder={t("filter.compareVersion")}
               className="h-9"
             />
           </div>
@@ -168,7 +175,7 @@ export const SongFilterBar = ({
         <div className="flex gap-6 flex-wrap mt-3 pt-3 border-t border-bpim-border">
           <div className="flex flex-col gap-1.5">
             <span className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
-              プレイ状態
+              {t("filter.playState")}
             </span>
             <div className="flex items-center gap-4">
               <label className="flex items-center gap-2 cursor-pointer group">
@@ -179,7 +186,7 @@ export const SongFilterBar = ({
                   }
                 />
                 <span className="text-xs font-bold text-bpim-text group-hover:text-bpim-text transition-colors">
-                  自分プレイ済
+                  {t("filter.myPlayed")}
                 </span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer group">
@@ -190,7 +197,7 @@ export const SongFilterBar = ({
                   }
                 />
                 <span className="text-xs font-bold text-bpim-text group-hover:text-bpim-text transition-colors">
-                  ライバルプレイ済
+                  {t("filter.rivalPlayed")}
                 </span>
               </label>
             </div>

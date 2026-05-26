@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import * as React from "react";
 import {
@@ -11,34 +11,7 @@ import {
   SelectValue,
   SelectSeparator,
 } from "@/components/ui/select";
-
-const GROUPS = [
-  { id: "near", label: "実力が近いユーザーを探す" },
-  { id: "rank", label: "ランキング" },
-  { id: "active", label: "特殊検索" },
-] as const;
-
-const SORT_ITEMS = [
-  { label: "総合BPIが近い", value: "totalBpi_distance", group: "near" },
-  { label: "NOTESが近い", value: "notes_distance", group: "near" },
-  { label: "SCRATCHが近い", value: "scratch_distance", group: "near" },
-  { label: "CHORDが近い", value: "chord_distance", group: "near" },
-  { label: "PEAKが近い", value: "peak_distance", group: "near" },
-  { label: "CHARGEが近い", value: "charge_distance", group: "near" },
-  { label: "SOFLANが近い", value: "soflan_distance", group: "near" },
-  { label: "総合BPIが高い順", value: "totalBpi_desc", group: "rank" },
-  { label: "NOTESが高い順", value: "notes_desc", group: "rank" },
-  { label: "SCRATCHが高い順", value: "scratch_desc", group: "rank" },
-  { label: "CHORDが高い順", value: "chord_desc", group: "rank" },
-  { label: "PEAKが高い順", value: "peak_desc", group: "rank" },
-  { label: "CHARGEが高い順", value: "charge_desc", group: "rank" },
-  { label: "SOFLANが高い順", value: "soflan_desc", group: "rank" },
-  {
-    label: "最近スコアを更新した人",
-    value: "totalBpi_newest",
-    group: "active",
-  },
-];
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export const SortSelector = ({
   sort,
@@ -49,10 +22,36 @@ export const SortSelector = ({
   order: string;
   onChange: (val: string) => void;
 }) => {
+  const { t } = useTranslation();
+
+  const GROUPS = [
+    { id: "near", label: t("rivals.sort.groupNear") },
+    { id: "rank", label: t("rivals.sort.groupRank") },
+    { id: "active", label: t("rivals.sort.groupActive") },
+  ] as const;
+
+  const SORT_ITEMS = [
+    { label: t("rivals.sort.totalBpiNear"), value: "totalBpi_distance", group: "near" },
+    { label: t("rivals.sort.notesNear"), value: "notes_distance", group: "near" },
+    { label: t("rivals.sort.scratchNear"), value: "scratch_distance", group: "near" },
+    { label: t("rivals.sort.chordNear"), value: "chord_distance", group: "near" },
+    { label: t("rivals.sort.peakNear"), value: "peak_distance", group: "near" },
+    { label: t("rivals.sort.chargeNear"), value: "charge_distance", group: "near" },
+    { label: t("rivals.sort.soflanNear"), value: "soflan_distance", group: "near" },
+    { label: t("rivals.sort.totalBpiDesc"), value: "totalBpi_desc", group: "rank" },
+    { label: t("rivals.sort.notesDesc"), value: "notes_desc", group: "rank" },
+    { label: t("rivals.sort.scratchDesc"), value: "scratch_desc", group: "rank" },
+    { label: t("rivals.sort.chordDesc"), value: "chord_desc", group: "rank" },
+    { label: t("rivals.sort.peakDesc"), value: "peak_desc", group: "rank" },
+    { label: t("rivals.sort.chargeDesc"), value: "charge_desc", group: "rank" },
+    { label: t("rivals.sort.soflanDesc"), value: "soflan_desc", group: "rank" },
+    { label: t("rivals.sort.recentlyUpdated"), value: "totalBpi_newest", group: "active" },
+  ];
+
   return (
     <Select value={`${sort}_${order}`} onValueChange={onChange}>
       <SelectTrigger className="h-9 w-full border-none bg-bpim-bg/50 text-bpim-text focus:ring-blue-500">
-        <SelectValue placeholder="並び替えを選択" />
+        <SelectValue placeholder={t("rivals.sort.placeholder")} />
       </SelectTrigger>
       <SelectContent className="border-bpim-border bg-bpim-bg text-bpim-text">
         {GROUPS.map((group, index) => {

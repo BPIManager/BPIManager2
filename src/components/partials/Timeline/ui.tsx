@@ -6,6 +6,7 @@ import { FilterParamsFrontend } from "@/types/songs/score";
 import { TimelineHeader } from "./header";
 import { InfiniteScrollContainer } from "../InfiniteScroll/ui";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface TimelineListProps {
   mode: "all" | "played" | "overtaken";
@@ -13,6 +14,7 @@ interface TimelineListProps {
 }
 
 export const TimelineList = ({ mode, params }: TimelineListProps) => {
+  const { t } = useTranslation();
   const res = useTimeline(mode, params);
 
   return (
@@ -29,7 +31,7 @@ export const TimelineList = ({ mode, params }: TimelineListProps) => {
         isLoadingMore={res.isLoadingMore}
         isReachingEnd={res.isReachingEnd}
         header={<TimelineHeader />}
-        emptyMessage="アクティビティが見つかりませんでした。フィルター条件を変えてみてください"
+        emptyMessage={t("timeline.empty")}
         renderItem={(entry) => <TimelineItem key={entry.logId} entry={entry} />}
         maxH="full"
       />

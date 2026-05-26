@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
@@ -15,6 +15,7 @@ import { LordiconAnimation } from "@/components/ui/lordicon-animation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface Props {
   result: {
@@ -30,6 +31,7 @@ interface Props {
 export const ImportSuccessModal = ({ result, version, onClose }: Props) => {
   const router = useRouter();
   const { fbUser } = useUser();
+  const { t } = useTranslation();
   const [displayBpi, setDisplayBpi] = useState(0);
 
   useEffect(() => {
@@ -87,17 +89,17 @@ export const ImportSuccessModal = ({ result, version, onClose }: Props) => {
 
         <div className="flex flex-col gap-1">
           <h2 className="text-xl font-black tracking-tight text-bpim-text uppercase">
-            Import Completed
+            {t("import.success.title")}
           </h2>
           <p className="text-sm font-medium text-bpim-muted">
-            {result.updatedCount} 件のスコアを更新しました
+            {result.updatedCount} {t("import.success.updatedCount")}
           </p>
         </div>
 
         {result.newTotalBpi !== undefined && (
           <div className="flex w-full flex-col gap-4 py-2">
             <span className="text-[10px] font-black tracking-[0.2em] text-bpim-muted uppercase">
-              総合BPIの変化 (☆12)
+              {t("import.success.bpiChange")}
             </span>
 
             <div className="flex items-center justify-center gap-6">
@@ -134,8 +136,12 @@ export const ImportSuccessModal = ({ result, version, onClose }: Props) => {
                   <TrendingDown size={14} />
                 )}
                 <span>
-                  {isImproved ? "上昇" : isUnchanged ? "変動なし" : "低下"} :{" "}
-                  {bpiDiff > 0 ? "+" : ""}
+                  {isImproved
+                    ? t("import.success.bpiRise")
+                    : isUnchanged
+                    ? t("import.success.bpiUnchanged")
+                    : t("import.success.bpiFall")}{" "}
+                  : {bpiDiff > 0 ? "+" : ""}
                   {bpiDiff.toFixed(2)}
                 </span>
               </Badge>
@@ -153,7 +159,7 @@ export const ImportSuccessModal = ({ result, version, onClose }: Props) => {
               )
             }
           >
-            今回の更新ログを確認
+            {t("import.success.viewLog")}
           </Button>
 
           <Button
@@ -162,7 +168,7 @@ export const ImportSuccessModal = ({ result, version, onClose }: Props) => {
             className="w-full border-bpim-border text-bpim-muted font-bold hover:bg-bpim-overlay/50 hover:text-bpim-text"
             onClick={() => router.push("/my")}
           >
-            全スコア一覧を表示
+            {t("import.success.viewAllScores")}
           </Button>
 
           <Button
@@ -170,7 +176,7 @@ export const ImportSuccessModal = ({ result, version, onClose }: Props) => {
             className="text-bpim-muted hover:text-bpim-text"
             onClick={onClose}
           >
-            閉じる
+            {t("common.close")}
           </Button>
         </div>
       </div>

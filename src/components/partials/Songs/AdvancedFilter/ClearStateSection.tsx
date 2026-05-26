@@ -5,6 +5,7 @@ import { CLEAR_STATES } from "@/constants/lampState";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { SectionTitle } from "./SectionTitle";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface Props {
   clearStates: string[] | undefined;
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export const ClearStateSection = ({ clearStates, onChange }: Props) => {
+  const { t } = useTranslation();
   const toggle = (val: string) => {
     const current = clearStates || [];
     const next = current.includes(val) ? current.filter((i) => i !== val) : [...current, val];
@@ -20,7 +22,7 @@ export const ClearStateSection = ({ clearStates, onChange }: Props) => {
 
   return (
     <section className="flex flex-col gap-3">
-      <SectionTitle>ランプ状態</SectionTitle>
+      <SectionTitle>{t("filter.lampState")}</SectionTitle>
       <div className="grid grid-cols-2 gap-3">
         {CLEAR_STATES.map((state) => (
           <div key={state.value} className="flex items-center gap-2">

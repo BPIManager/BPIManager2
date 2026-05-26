@@ -15,6 +15,7 @@ import { BpiBoxStatsSkeleton } from "./skeleton";
 import { DashCard } from "@/components/ui/dashcard";
 import { useChartColors } from "@/hooks/common/useChartColors";
 import { HelpTooltip } from "@/components/ui/tooltip";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface ExtendedBpiBoxStatsItem extends BpiBoxStatsItem {
   efficiency?: number;
@@ -31,81 +32,74 @@ interface TooltipProps {
   label?: string;
 }
 
-const HelpText = (
-  <div className="space-y-3">
-    <section>
-      <p className="font-bold text-bpim-primary border-b border-bpim-primary/30 mb-1">
-        統計の対象
-      </p>
-      <p>
-        選択した期間（単日・週間・月間）内に
-        <span className="text-bpim-warning">新規更新・登録されたスコア</span>
-        のみを対象に集計しています。全曲の累積データではないため、その時の「調子」や「地力の密度」がダイレクトに反映されます。
-      </p>
-    </section>
+const BpiBoxHelpContent = () => {
+  const { t } = useTranslation();
+  return (
+    <div className="space-y-3">
+      <section>
+        <p className="font-bold text-bpim-primary border-b border-bpim-primary/30 mb-1">
+          {t("dashboard.bpiBoxStats.help.scopeTitle")}
+        </p>
+        <p>
+          {t("dashboard.bpiBoxStats.help.scopeBefore")}
+          <span className="text-bpim-warning">{t("dashboard.bpiBoxStats.help.scopeHighlight")}</span>
+          {t("dashboard.bpiBoxStats.help.scopeAfter")}
+        </p>
+      </section>
 
-    <section>
-      <p className="font-bold text-bpim-primary border-b border-bpim-primary/30 mb-1">
-        各項目の意味
-      </p>
-      <ul className="list-disc list-inside space-y-1.5">
-        <li>
-          <span className="font-bold">期間総合BPI</span>:
-          その期間の平均的な実力。これが右肩上がりなら、継続的に高い水準でプレーできている証拠です。
-        </li>
-        <li>
-          <span className="font-bold text-bpim-primary">
-            上位25-75%帯（塗りつぶし）
-          </span>
-          : 期間中更新した楽曲におけるBPIの厚みを示します。
-          <ul className="list-none pl-4 mt-1 space-y-1 text-bpim-muted">
-            <li>
-              ・<span className="italic">帯の「上端」</span>
-              ：上位25%の更新に絞った場合の期間総合BPI。ここが高い時は激ウマリザルトがあったことを示します。
-            </li>
-          </ul>
-        </li>
-        <li>
-          <span className="font-bold text-bpim-warning">
-            打鍵効率（右軸：点線）
-          </span>
-          : 総打鍵数に対する、更新スコアのノーツ数の割合です。
-          <span className="text-bpim-warning">
-            「効率が高い＝その日にプレイした多くの楽曲で、高い割合でスコアを伸ばすことができた日」
-          </span>
-          と分析できます。
-        </li>
-        <li>
-          <span className="font-bold">上限/下限（点線）</span>: その期間における
-          <u>単曲</u>
-          の最高・最低BPI。上限が跳ねている日は「一発の最大火力」が出た日を意味します。
-        </li>
-      </ul>
-    </section>
+      <section>
+        <p className="font-bold text-bpim-primary border-b border-bpim-primary/30 mb-1">
+          {t("dashboard.bpiBoxStats.help.itemsTitle")}
+        </p>
+        <ul className="list-disc list-inside space-y-1.5">
+          <li>
+            <span className="font-bold">{t("dashboard.bpiBoxStats.help.periodBpiLabel")}</span>:
+            {t("dashboard.bpiBoxStats.help.periodBpiDesc")}
+          </li>
+          <li>
+            <span className="font-bold text-bpim-primary">
+              {t("dashboard.bpiBoxStats.help.bandLabel")}
+            </span>
+            : {t("dashboard.bpiBoxStats.help.bandDesc")}
+            <ul className="list-none pl-4 mt-1 space-y-1 text-bpim-muted">
+              <li>
+                ・<span className="italic">{t("dashboard.bpiBoxStats.help.bandTopLabel")}</span>
+                ：{t("dashboard.bpiBoxStats.help.bandTopDesc")}
+              </li>
+            </ul>
+          </li>
+          <li>
+            <span className="font-bold text-bpim-warning">
+              {t("dashboard.bpiBoxStats.help.efficiencyLabel")}
+            </span>
+            : {t("dashboard.bpiBoxStats.help.efficiencyDesc")}
+            <span className="text-bpim-warning">
+              {t("dashboard.bpiBoxStats.help.efficiencyHighlight")}
+            </span>
+            {t("dashboard.bpiBoxStats.help.efficiencyAfter")}
+          </li>
+          <li>
+            <span className="font-bold">{t("dashboard.bpiBoxStats.help.minMaxLabel")}</span>: {t("dashboard.bpiBoxStats.help.minMaxDesc")}
+          </li>
+        </ul>
+      </section>
 
-    <section className="bg-bpim-overlay/40 p-2 rounded text-[10px]">
-      <p>
-        打鍵効率は、プレー全体のボリュームに対する「リザルトの質」を可視化したものです。BPIの推移と併せて見ることで、自身のプレーサイクルの良し悪しを確認できます。
-      </p>
-    </section>
-    <section className="bg-bpim-overlay/40 p-2 rounded text-[10px] space-y-1.5">
-      <p className="flex items-start gap-1">
-        <span className="text-bpim-danger font-bold">※</span>
-        <span className="font-bold border-b border-bpim-danger/50">
-          打鍵効率を表示するには、別途IIDXタワーデータの取り込みが必要です。
-        </span>
-      </p>
-      <p className="text-bpim-muted italic">
-        プレー曲数が少ない日は極端な値が出やすいため、推移を見る際は曲数も併せて確認することをおすすめします。
-      </p>
-    </section>
-  </div>
-);
-
-const TITLE_MAP: Record<StatsGroupBy, string> = {
-  day: "単日総合BPI 分布推移",
-  week: "週間総合BPI 分布推移",
-  month: "月間総合BPI 分布推移",
+      <section className="bg-bpim-overlay/40 p-2 rounded text-[10px]">
+        <p>{t("dashboard.bpiBoxStats.help.note1")}</p>
+      </section>
+      <section className="bg-bpim-overlay/40 p-2 rounded text-[10px] space-y-1.5">
+        <p className="flex items-start gap-1">
+          <span className="text-bpim-danger font-bold">※</span>
+          <span className="font-bold border-b border-bpim-danger/50">
+            {t("dashboard.bpiBoxStats.help.warningLabel")}
+          </span>
+        </p>
+        <p className="text-bpim-muted italic">
+          {t("dashboard.bpiBoxStats.help.note2")}
+        </p>
+      </section>
+    </div>
+  );
 };
 
 const Row = ({
@@ -128,6 +122,7 @@ const Row = ({
 );
 
 const BpiBoxTooltip = ({ active, payload, label }: TooltipProps) => {
+  const { t } = useTranslation();
   if (!active || !payload?.length) return null;
   const d = payload[0].payload as ChartDataPoint;
 
@@ -135,35 +130,35 @@ const BpiBoxTooltip = ({ active, payload, label }: TooltipProps) => {
     <div className="min-w-45 rounded-md border border-bpim-border bg-bpim-surface p-3 shadow-xl">
       <p className="mb-2 text-[10px] font-bold text-bpim-muted">{label}</p>
       <div className="flex flex-col gap-1">
-        <Row label="上限" value={d.max} color="text-bpim-danger" />
+        <Row label={t("dashboard.bpiBoxStats.upper")} value={d.max} color="text-bpim-danger" />
         <Row
-          label="上位25%総合"
+          label={t("dashboard.bpiBoxStats.top25")}
           value={d.totalBpiTop25}
           color="text-bpim-warning"
         />
         <Row
-          label="期間総合BPI"
+          label={t("dashboard.bpiBoxStats.periodBpi")}
           value={d.totalBpi}
           color="text-bpim-primary"
           bold
         />
         <Row
-          label="上位75%総合"
+          label={t("dashboard.bpiBoxStats.top75")}
           value={d.totalBpiTop75}
           color="text-bpim-warning"
         />
-        <Row label="下限" value={d.min} color="text-bpim-success" />
+        <Row label={t("dashboard.bpiBoxStats.lower")} value={d.min} color="text-bpim-success" />
         <div className="my-1 h-px w-full bg-bpim-overlay/60" />
         <div className="flex items-center justify-between gap-4">
           <span className="text-[10px] text-bpim-warning font-bold">
-            打鍵効率
+            {t("dashboard.bpiBoxStats.efficiency")}
           </span>
           <span className="font-mono text-xs text-bpim-warning font-bold">
             {d.efficiency?.toFixed(1)}%
           </span>
         </div>
         <p className="text-right text-[10px] text-bpim-muted">
-          集計対象: {d.count}曲
+          {t("dashboard.bpiBoxStats.count")}: {d.count}{t("dashboard.songUnit")}
         </p>
       </div>
     </div>
@@ -182,12 +177,19 @@ export const BpiBoxStatsChart = ({
   onGroupByChange: (g: StatsGroupBy) => void;
 }) => {
   const c = useChartColors();
+  const { t } = useTranslation();
   const [visible, setVisible] = useState({
     median: true,
     band: true,
     minMax: false,
     efficiency: true,
   });
+
+  const TITLE_MAP: Record<StatsGroupBy, string> = {
+    day: t("dashboard.bpiBoxStats.titleDay"),
+    week: t("dashboard.bpiBoxStats.titleWeek"),
+    month: t("dashboard.bpiBoxStats.titleMonth"),
+  };
 
   useEffect(() => {
     if (!isLoading && data && data.length > 0) {
@@ -230,7 +232,7 @@ export const BpiBoxStatsChart = ({
           <h3 className="text-sm font-bold uppercase text-bpim-muted">
             {TITLE_MAP[groupBy]}
           </h3>
-          <HelpTooltip>{HelpText}</HelpTooltip>
+          <HelpTooltip><BpiBoxHelpContent /></HelpTooltip>
         </div>
 
         <div className="ml-auto flex flex-col items-end gap-2">
@@ -245,7 +247,11 @@ export const BpiBoxStatsChart = ({
                     : "text-bpim-muted hover:bg-bpim-overlay"
                 }`}
               >
-                {v === "day" ? "単日" : v === "week" ? "週間" : "月間"}
+                {v === "day"
+                  ? t("dashboard.bpiHistory.day")
+                  : v === "week"
+                    ? t("dashboard.bpiHistory.week")
+                    : t("dashboard.bpiHistory.month")}
               </button>
             ))}
           </div>
@@ -258,28 +264,28 @@ export const BpiBoxStatsChart = ({
               className={`flex items-center gap-1 transition-opacity ${visible.efficiency ? "opacity-100" : "opacity-40"}`}
             >
               <span className="inline-block h-px w-3 border-t border-dashed border-bpim-warning" />{" "}
-              打鍵効率(%)
+              {t("dashboard.bpiBoxStats.efficiencyPct")}
             </button>
             <button
               onClick={() => setVisible((v) => ({ ...v, median: !v.median }))}
               className={`flex items-center gap-1 transition-opacity ${visible.median ? "opacity-100" : "opacity-40"}`}
             >
               <span className="inline-block h-2 w-2 rounded-full bg-bpim-primary" />{" "}
-              期間総合BPI
+              {t("dashboard.bpiBoxStats.periodBpi")}
             </button>
             <button
               onClick={() => setVisible((v) => ({ ...v, band: !v.band }))}
               className={`flex items-center gap-1 transition-opacity ${visible.band ? "opacity-100" : "opacity-40"}`}
             >
               <span className="inline-block h-2 w-3 rounded-sm bg-bpim-primary opacity-20" />{" "}
-              上位25-75%帯
+              {t("dashboard.bpiBoxStats.band2575")}
             </button>
             <button
               onClick={() => setVisible((v) => ({ ...v, minMax: !v.minMax }))}
               className={`flex items-center gap-1 transition-opacity ${visible.minMax ? "opacity-100" : "opacity-40"}`}
             >
               <span className="inline-block h-px w-3 border-t border-dashed border-bpim-muted" />{" "}
-              上限/下限
+              {t("dashboard.bpiBoxStats.minMax")}
             </button>
           </div>
         </div>

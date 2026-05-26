@@ -8,6 +8,7 @@ import { useUser } from "@/contexts/users/UserContext";
 import { PageLoader } from "@/components/ui/loading-spinner";
 import { useRouter } from "next/router";
 import dayjs from "@/lib/dayjs";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export default function WeeklyLogsPage() {
   const { fbUser, isLoading: isUserLoading } = useUser();
@@ -15,6 +16,15 @@ export default function WeeklyLogsPage() {
   const { userId, version, date } = router.query;
   const isOwnProfile = fbUser?.uid === userId;
   const isInitialLoading = !router.isReady || isUserLoading;
+  const { t } = useTranslation();
+
+  const dateStr = date as string;
+  const weekLabel = dateStr
+    ? (() => {
+        const d = dayjs.tz(dateStr);
+        return `${d.startOf("isoWeek").format(t("format.monthDay"))}${t("format.weekRangeSep")}${d.endOf("isoWeek").format(t("format.monthDay"))}`;
+      })()
+    : "";
 
   if (isInitialLoading) {
     return (
@@ -23,14 +33,6 @@ export default function WeeklyLogsPage() {
       </DashboardLayout>
     );
   }
-
-  const dateStr = date as string;
-  const weekLabel = dateStr
-    ? (() => {
-        const d = dayjs.tz(dateStr);
-        return `${d.startOf("isoWeek").format("M月D日")}〜${d.endOf("isoWeek").format("M月D日")}`;
-      })()
-    : "";
 
   if (isOwnProfile) {
     return (
@@ -48,8 +50,8 @@ export default function WeeklyLogsPage() {
   return (
     <UserProfileLayout userId={userId as string} currentTab="logs">
       <ProfileMeta
-        title={`${weekLabel}のプレイ記録まとめ`}
-        description={`$userName$さん($iidxid$)が${weekLabel}にbeatmaniaIIDX ${getVersionNameFromNumber(Number(version))}でプレイしたスコアの記録を確認できます。`}
+        title={`${weekLabel}${t("page.weeklySummary.titleSuffix")}`}
+        description={`${t("profile.desc.datePre")}${weekLabel}${t("profile.desc.dateMid")}${getVersionNameFromNumber(Number(version))}${t("profile.desc.datePost")}`}
       />
       <div className="p-4">
         <LogsDetailContent

@@ -6,6 +6,7 @@ import { SONG_ATTRIBUTES_GLOBAL } from "@/constants/songAttributes";
 import { Badge } from "@/components/ui/badge";
 import { API_PREFIX } from "@/constants/apiEndpoints";
 import { buildTextageUrl, buildChartViewerUrl } from "@/utils/songs/links";
+import { useTranslation } from "@/hooks/common/useTranslation";
 import type { TicketSongResult, ScoreMode } from "@/types/tickets";
 
 function buildRadarData(song: TicketSongResult): Record<string, number> {
@@ -26,6 +27,7 @@ interface SongCardProps {
 
 export function SongCard({ song, totalBpi, ticketId, scoreMode }: SongCardProps) {
   const { fbUser } = useUser();
+  const { t } = useTranslation();
   const [showRadar, setShowRadar] = useState(false);
   const [myVote, setMyVote] = useState<"upvote" | "downvote" | null>(song.myVote);
   const [upvoteCount, setUpvoteCount] = useState(song.upvoteCount);
@@ -85,7 +87,7 @@ export function SongCard({ song, totalBpi, ticketId, scoreMode }: SongCardProps)
             </span>
             {bpiGapPositive && (
               <Badge className="bg-amber-500/15 text-amber-400 border-amber-500/30 text-[10px] px-1.5 py-0">
-                総合BPIより{song.bpiGap!.toFixed(1)}低い
+                {t("tickets.bpiBelowPre")}{song.bpiGap!.toFixed(1)}{t("tickets.bpiBelowSuf")}
               </Badge>
             )}
           </div>
@@ -126,9 +128,9 @@ export function SongCard({ song, totalBpi, ticketId, scoreMode }: SongCardProps)
           </div>
         </div>
         <div className="flex flex-col items-end shrink-0 gap-1">
-          <span className="text-xs text-bpim-muted">スコア</span>
+          <span className="text-xs text-bpim-muted">{t("tickets.scoreLabel")}</span>
           <span className="font-mono text-sm font-bold text-bpim-text">
-            {song.bpi != null ? song.bpi.toFixed(2) : "未プレイ"}
+            {song.bpi != null ? song.bpi.toFixed(2) : t("tickets.notPlayed")}
           </span>
           {song.exScore != null && (
             <span className="font-mono text-[11px] text-bpim-muted">
@@ -141,7 +143,7 @@ export function SongCard({ song, totalBpi, ticketId, scoreMode }: SongCardProps)
       <div className="flex items-center justify-between text-xs text-bpim-muted">
         <div className="flex items-center gap-2">
           <span>
-            {scoreMode === "relative" ? "当たり譜面度" : "配置スコア"}:{" "}
+            {scoreMode === "relative" ? t("tickets.scoreRelativeShort") : t("tickets.scoreRawShort")}:{" "}
             <span className="font-mono text-bpim-text font-semibold">
               {scoreMode === "relative"
                 ? `${song.relativeScore.toFixed(1)}%`
@@ -177,7 +179,7 @@ export function SongCard({ song, totalBpi, ticketId, scoreMode }: SongCardProps)
         </div>
         {totalBpi != null && song.bpi != null && (
           <span>
-            単曲BPI:{" "}
+            {t("tickets.singleBpi")}{" "}
             <span
               className={`font-mono font-semibold ${bpiGapPositive ? "text-amber-400" : "text-bpim-text"}`}
             >
@@ -192,7 +194,7 @@ export function SongCard({ song, totalBpi, ticketId, scoreMode }: SongCardProps)
           className="text-xs text-bpim-primary hover:underline text-left"
           onClick={() => setShowRadar((v) => !v)}
         >
-          {showRadar ? "レーダーチャートを隠す" : "楽曲属性を表示"}
+          {showRadar ? t("tickets.hideRadar") : t("tickets.showAttributes")}
         </button>
       )}
 

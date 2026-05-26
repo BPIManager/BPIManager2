@@ -14,6 +14,7 @@ import { CustomPagination } from "../../Pagination/ui";
 import { cn } from "@/lib/utils";
 import { ArrowUpDown, ChevronUp, ChevronDown } from "lucide-react";
 import { A_RANKS } from "@/constants/arenaRanks";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export const RANK_THRESHOLDS = [
   {
@@ -59,6 +60,7 @@ export const ArenaAverageTable = ({
   data: ArenaAverageData[];
   displayMetric?: DisplayMetric;
 }) => {
+  const { t } = useTranslation();
   const [sortKey, setSortKey] = useState<SortKey>("title");
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
   const [page, setPage] = useState(1);
@@ -213,7 +215,7 @@ export const ArenaAverageTable = ({
                   className="sticky left-0 z-30 cursor-pointer bg-bpim-bg px-3 text-[10px] font-black uppercase tracking-widest text-bpim-muted hover:text-bpim-text"
                 >
                   <div className="flex items-center">
-                    楽曲名 <SortIcon k="title" />
+                    {t("arenaAverage.songTitle")} <SortIcon k="title" />
                   </div>
                 </TableHead>
 

@@ -7,6 +7,7 @@ import { ProfileMeta } from "@/components/partials/Profile/Meta/ui";
 import { useUser } from "@/contexts/users/UserContext";
 import { PageLoader } from "@/components/ui/loading-spinner";
 import { useRouter } from "next/router";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export default function BatchLogsPage() {
   const { fbUser, isLoading: isUserLoading } = useUser();
@@ -14,6 +15,7 @@ export default function BatchLogsPage() {
   const { userId, version, batchId } = router.query;
   const isOwnProfile = fbUser?.uid === userId;
   const isInitialLoading = !router.isReady || isUserLoading;
+  const { t } = useTranslation();
 
   if (isInitialLoading) {
     return <PageLoader />;
@@ -22,7 +24,7 @@ export default function BatchLogsPage() {
   if (isOwnProfile) {
     return (
       <DashboardLayout>
-        <Meta title={`プレイログ: ${batchId}`} noIndex />
+        <Meta title={`${t("page.batchLog.titlePrefix")}${batchId}`} noIndex />
         <LogsDetailView
           type="batch"
           userId={userId}
@@ -35,7 +37,7 @@ export default function BatchLogsPage() {
 
   return (
     <UserProfileLayout userId={userId as string} currentTab="logs">
-      <ProfileMeta title={`プレイログ: ${batchId}`} />
+      <ProfileMeta title={`${t("page.batchLog.titlePrefix")}${batchId}`} />
       <div className="p-4">
         <LogsDetailContent
           isPublicPage

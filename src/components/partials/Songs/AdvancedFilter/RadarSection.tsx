@@ -5,6 +5,7 @@ import { ALL_RADAR_CATEGORIES, RADAR_COLORS } from "@/constants/radars";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { SectionTitle } from "./SectionTitle";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface Props {
   radarCategories: string[] | undefined;
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export const RadarSection = ({ radarCategories, onChange }: Props) => {
+  const { t } = useTranslation();
   const toggle = (cat: string) => {
     const current = radarCategories || [];
     const next = current.includes(cat) ? current.filter((c) => c !== cat) : [...current, cat];
@@ -20,7 +22,7 @@ export const RadarSection = ({ radarCategories, onChange }: Props) => {
 
   return (
     <section className="flex flex-col gap-3">
-      <SectionTitle>レーダー属性</SectionTitle>
+      <SectionTitle>{t("filter.radarCategory")}</SectionTitle>
       <div className="grid grid-cols-3 gap-2">
         {ALL_RADAR_CATEGORIES.map((cat) => (
           <div key={cat} className="flex items-center gap-2">

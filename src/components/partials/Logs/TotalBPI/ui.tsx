@@ -3,6 +3,7 @@ import { TrendingUp, TrendingDown, ChevronRight, Minus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DashCard } from "@/components/ui/dashcard";
 import { LordiconAnimation } from "@/components/ui/lordicon-animation";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export const BatchTotalBpiCard = ({
   pagination,
@@ -12,6 +13,7 @@ export const BatchTotalBpiCard = ({
     current?: { totalBpi?: number } | null;
   };
 }) => {
+  const { t } = useTranslation();
   const prevBpi = pagination.prev?.totalBpi ?? -15;
   const currentBpi = pagination.current?.totalBpi ?? -15;
   const bpiDiff = currentBpi - prevBpi;
@@ -51,7 +53,7 @@ export const BatchTotalBpiCard = ({
 
         <div className="flex flex-1 flex-col items-start gap-1 w-full">
           <span className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
-            総合BPI (☆12)
+            {t("logs.totalBpi.cardLabel")}
           </span>
           <div className="flex flex-wrap items-baseline gap-2 md:gap-3">
             <span className="font-mono text-lg font-bold text-bpim-muted md:text-2xl">
@@ -79,17 +81,17 @@ export const BatchTotalBpiCard = ({
 
         <div className="flex flex-1 flex-col items-start gap-1 w-full">
           <span className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
-            推定順位
+            {t("logs.estimatedRank.label")}
           </span>
           <div className="flex flex-wrap items-baseline gap-2 md:gap-3">
             <div className="font-mono text-md font-bold text-bpim-muted md:text-xl">
               {prevRank.toLocaleString()}
-              <span className="ml-0.5 text-[10px]">位</span>
+              <span className="ml-0.5 text-[10px]">{t("logs.rank.rankUnit")}</span>
             </div>
             <ChevronRight className="h-3 w-3 text-bpim-subtle" />
             <div className="font-mono text-2xl font-bold text-bpim-warning leading-none md:text-3xl">
               {currentRank.toLocaleString()}
-              <span className="ml-0.5 text-xs">位</span>
+              <span className="ml-0.5 text-xs">{t("logs.rank.rankUnit")}</span>
             </div>
             {rankDiff !== 0 && (
               <div className={cn("flex items-center gap-1", rankColorClass)}>

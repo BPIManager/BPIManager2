@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { LoginRequiredCard } from "../../LoginRequired/ui";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface AAATableContentProps {
   userId: string | undefined;
@@ -25,6 +26,7 @@ export const AAATableContent = ({
   defaultVersion = latestVersion,
   isSelf = true,
 }: AAATableContentProps) => {
+  const { t } = useTranslation();
   const [version, setVersion] = useState(defaultVersion);
   const [level, setLevel] = useState(12);
   const [goal, setGoal] = useState<GoalType>("aaa");
@@ -91,7 +93,7 @@ export const AAATableContent = ({
   if (isError) {
     return (
       <div className="flex h-40 items-center justify-center font-bold text-bpim-danger">
-        データの読み込みに失敗しました
+        {t("aaaTable.loadError")}
       </div>
     );
   }
@@ -102,14 +104,13 @@ export const AAATableContent = ({
         <>
           <section className="mb-8 rounded-xl bg-bpim-surface p-6 shadow-sm border border-bpim-border">
             <h2 className="mb-4 text-xl font-bold text-bpim-text">
-              💡 これは何？
+              {t("aaaTable.whatIsThis")}
             </h2>
             <p className="text-sm leading-relaxed text-bpim-muted">
-              各楽曲でAAAやMAX-を達成するために必要な実力を可視化した難易度表です。
-              目標スコアに対する要求BPI帯ごとに楽曲がグループ化されており、次にどの曲を狙えばよいかの指標になります。
+              {t("aaaTable.whatDesc1")}
             </p>
             <p className="mt-2 text-sm text-bpim-text">
-              ログインすると、あなたの実際のスコアデータを使って達成状況を色付けできます。目標達成済みの楽曲や、目標までのスコア差分が一目でわかるようになります！
+              {t("aaaTable.whatDesc2")}
             </p>
             <Dialog>
               <DialogTrigger asChild>
@@ -119,7 +120,7 @@ export const AAATableContent = ({
                     "bg-bpim-primary text-bpim-bg hover:bg-bpim-primary/80",
                   )}
                 >
-                  ログインしてスコアを反映する
+                  {t("aaaTable.loginBtn")}
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-md border-none bg-transparent p-0 shadow-none outline-none">

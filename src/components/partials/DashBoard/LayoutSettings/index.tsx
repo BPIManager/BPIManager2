@@ -20,6 +20,7 @@ import {
 } from "@/types/dashboard/layout";
 import { ColsPreview, DropZone, WidgetRow } from "./ui";
 import { useDashboardLayoutEditor } from "@/hooks/dashboard/useDashboardLayoutEditor";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface Props {
   isOpen: boolean;
@@ -51,23 +52,24 @@ export function DashboardLayoutSettingsModal({
     handleSave,
     handleReset,
   } = useDashboardLayoutEditor({ config, onClose, onSave });
+  const { t } = useTranslation();
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent className="flex flex-col w-[92vw] max-w-lg max-h-[90dvh] border-bpim-border bg-bpim-bg p-0 overflow-hidden shadow-2xl rounded-2xl">
         <DialogHeader className="shrink-0 p-5 pb-4 border-b border-bpim-border">
           <DialogTitle className="text-lg font-bold text-bpim-text">
-            レイアウト設定
+            {t("dashLayout.title")}
           </DialogTitle>
           <p className="text-xs text-bpim-muted mt-1">
-            設定はこの端末のみに保存されます
+            {t("dashLayout.savedOnDevice")}
           </p>
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-6 min-h-0">
           <section className="flex flex-col gap-3">
             <h3 className="text-sm font-semibold text-bpim-text">
-              カラム数（メインエリア）
+              {t("dashLayout.columns")}
             </h3>
             <div className="flex gap-2">
               {([1, 2] as const).map((cols) => (
@@ -82,7 +84,7 @@ export function DashboardLayoutSettingsModal({
                   )}
                 >
                   <ColsPreview cols={cols} />
-                  <span>{cols}列</span>
+                  <span>{cols}{t("dashLayout.colUnit")}</span>
                 </button>
               ))}
             </div>
@@ -98,7 +100,7 @@ export function DashboardLayoutSettingsModal({
             <div className="flex flex-col gap-6">
               <DropZone
                 sectionId="main"
-                label="メインエリア"
+                label={t("dashLayout.main")}
                 widgets={mainWidgets}
                 mainCols={draft.mainCols}
                 isDragTarget={dragOverSection === "main"}
@@ -107,7 +109,7 @@ export function DashboardLayoutSettingsModal({
               />
               <DropZone
                 sectionId="sidebar"
-                label="サイドバー"
+                label={t("dashLayout.sidebar")}
                 widgets={sidebarWidgets}
                 mainCols={draft.mainCols}
                 isDragTarget={dragOverSection === "sidebar"}
@@ -137,7 +139,7 @@ export function DashboardLayoutSettingsModal({
             className="flex items-center gap-1.5 text-bpim-muted hover:text-bpim-text px-2"
           >
             <RotateCcw className="h-3.5 w-3.5" />
-            デフォルトに戻す
+            {t("dashLayout.resetDefault")}
           </Button>
           <div className="flex gap-2">
             <Button
@@ -145,13 +147,13 @@ export function DashboardLayoutSettingsModal({
               onClick={onClose}
               className="h-9 px-3 text-bpim-muted hover:text-bpim-text hover:bg-bpim-overlay/50"
             >
-              キャンセル
+              {t("common.cancel")}
             </Button>
             <Button
               onClick={handleSave}
               className="h-9 px-5 font-bold bg-bpim-primary hover:bg-bpim-primary text-bpim-text"
             >
-              保存
+              {t("common.save")}
             </Button>
           </div>
         </DialogFooter>

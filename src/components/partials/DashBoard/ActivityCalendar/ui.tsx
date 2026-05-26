@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { DashCard } from "@/components/ui/dashcard";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface ActivityData {
   date: string;
@@ -43,6 +44,7 @@ const getActivityColor = (count: number, isFuture: boolean): string => {
 export const ActivityCalendar = ({ data, userId, version }: Props) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [hoveredDate, setHoveredDate] = useState<string | null>(null);
+  const { t } = useTranslation();
   const isTouchDevice =
     typeof window !== "undefined" &&
     window.matchMedia("(pointer: coarse)").matches;
@@ -71,7 +73,7 @@ export const ActivityCalendar = ({ data, userId, version }: Props) => {
 
   return (
     <DashCard>
-      <p className="mb-4 text-sm font-bold text-bpim-muted">最近の更新</p>
+      <p className="mb-4 text-sm font-bold text-bpim-muted">{t("dashboard.activity.title")}</p>
 
       <div
         ref={scrollRef}
@@ -151,7 +153,7 @@ export const ActivityCalendar = ({ data, userId, version }: Props) => {
                   >
                     <div className="flex flex-col gap-2">
                       <p className="whitespace-nowrap text-xs font-bold text-bpim-text">
-                        {day.date}: {day.count} 件
+                        {day.date}: {day.count}{t("dashboard.activity.countUnit")}
                       </p>
                       <Button
                         asChild
@@ -162,7 +164,7 @@ export const ActivityCalendar = ({ data, userId, version }: Props) => {
                         <NextLink
                           href={`/users/${userId}/logs/${version}/summary/${day.date}?groupedBy=lastPlayed`}
                         >
-                          サマリを表示
+                          {t("dashboard.activity.viewSummary")}
                         </NextLink>
                       </Button>
                     </div>

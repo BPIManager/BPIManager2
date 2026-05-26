@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { UserProfileData, UserProfileCompare } from "@/types/users/profile";
 import { RoleBadge } from "../../UserRole/badge";
 import { ArenaClassBadge } from "../../ArenaClassBadge";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface RivalHeaderProps {
   profile: UserProfileData | null | undefined;
@@ -40,7 +41,9 @@ export const RivalHeader = ({
   profile,
   isUpdating,
   onToggleFollow,
-}: RivalHeaderProps) => (
+}: RivalHeaderProps) => {
+  const { t } = useTranslation();
+  return (
   <div className="flex w-full flex-col gap-4">
     <div className="flex flex-col items-center gap-4 text-center md:flex-row md:gap-6 md:text-left">
       <Avatar className="h-24 w-24 border-2 border-bpim-border">
@@ -59,7 +62,7 @@ export const RivalHeader = ({
               variant="secondary"
               className="bg-bpim-primary/10 text-bpim-primary border-bpim-border px-2 py-0 text-[10px]"
             >
-              相互フォロー
+              {t("rivals.mutual")}
             </Badge>
           )}
         </div>
@@ -106,7 +109,8 @@ export const RivalHeader = ({
       </div>
     )}
   </div>
-);
+  );
+};
 
 export const WinLossStats = ({ winLossData }: WinLossStatsProps) => (
   <div className="flex flex-col gap-3">

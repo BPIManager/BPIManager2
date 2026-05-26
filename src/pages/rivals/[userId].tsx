@@ -18,6 +18,7 @@ import { IidxTowerComparisonSection } from "@/components/partials/DashBoard/Iidx
 import { TabsContent } from "@/components/ui/tabs";
 import { useRivalComparison } from "@/hooks/social/useRivalComparison";
 import { WinLossStats } from "@/components/partials/UserList/Modal/ui";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 function RivalOverviewTab({
   myUserId,
@@ -29,6 +30,7 @@ function RivalOverviewTab({
   rivalName?: string;
 }) {
   const { data } = useRivalComparison(rivalUserId);
+  const { t } = useTranslation();
   const winLoss = data?.compare?.winLoss;
 
   return (
@@ -45,13 +47,13 @@ function RivalOverviewTab({
         <RankDistributionSection
           myUserId={myUserId}
           rivalUserId={rivalUserId}
-          myName="自分"
+          myName={t("page.rival.me")}
           rivalName={rivalName}
         />
         <BpiDistributionSection
           myUserId={myUserId}
           rivalUserId={rivalUserId}
-          myName="自分"
+          myName={t("page.rival.me")}
           rivalName={rivalName}
         />
       </div>
@@ -59,7 +61,7 @@ function RivalOverviewTab({
         <BpmBpiDistributionSection
           myUserId={myUserId}
           rivalUserId={rivalUserId}
-          myName="自分"
+          myName={t("page.rival.me")}
           rivalName={rivalName}
         />
       </div>
@@ -67,13 +69,13 @@ function RivalOverviewTab({
       <BpiHistorySection
         myUserId={myUserId}
         rivalUserId={rivalUserId}
-        myName="自分"
+        myName={t("page.rival.me")}
         rivalName={rivalName}
       />
 
       <IidxTowerComparisonSection
         rivalUserId={rivalUserId}
-        myName="自分"
+        myName={t("page.rival.me")}
         rivalName={rivalName}
       />
 
@@ -98,6 +100,7 @@ export default function RivalsUserPage({
 
   const { profile: rivalProfile } = useProfile(rivalUserId);
   const rivalName = rivalProfile?.userName;
+  const { t } = useTranslation();
 
   if (!rivalUserId) return null;
 
@@ -119,7 +122,7 @@ export default function RivalsUserPage({
   return (
     <RivalProfileLayout rivalUserId={rivalUserId} currentTab={defaultView}>
       <Meta
-        title={`${rivalName ? rivalName + "さん" : "ライバル"}とのスコア比較`}
+        title={rivalName ? `${rivalName} ${t("page.rival.titleSuffix")}` : t("page.rival.titleFallback")}
         noIndex
       />
 

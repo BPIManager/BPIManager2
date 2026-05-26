@@ -25,6 +25,7 @@ import {
   validateCsvTypeForVersion,
 } from "@/utils/csv/detect";
 import { TowerImportView } from "../TowerView/ui";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface Props {
   csvData: string;
@@ -47,6 +48,7 @@ interface Props {
 }
 
 export const ImportView = (props: Props) => {
+  const { t } = useTranslation();
   const { defaultTab = "score" } = props;
   const version = props.selectedVersion[0];
   const csvVersionError =
@@ -61,14 +63,14 @@ export const ImportView = (props: Props) => {
       ) : (
         <>
           <PageHeader
-            title="インポート"
-            description="CSVデータをアップロードしてデータを更新します。"
+            title={t("import.view.title")}
+            description={t("import.view.desc")}
           />
           <PageContainer>
             <Tabs defaultValue={defaultTab}>
               <TabsList className="mb-4 w-full sm:w-auto">
-                <TabsTrigger value="score">スコアインポート</TabsTrigger>
-                <TabsTrigger value="tower">IIDXタワーインポート</TabsTrigger>
+                <TabsTrigger value="score">{t("import.tab.score")}</TabsTrigger>
+                <TabsTrigger value="tower">{t("import.tab.tower")}</TabsTrigger>
               </TabsList>
 
               <TabsContent value="score">
@@ -79,25 +81,25 @@ export const ImportView = (props: Props) => {
                         htmlFor="csv-data"
                         className="text-sm font-bold text-bpim-text"
                       >
-                        CSVデータ(
+                        {t("import.csv.label")}(
                         <a
                           href={iidxUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-bpim-primary underline decoration-blue-400/30 underline-offset-4 transition-colors hover:text-bpim-primary hover:decoration-blue-300"
                         >
-                          公式CSVダウンロードはこちら
+                          {t("import.csv.officialDownload")}
                         </a>
                         )
                       </Label>
                       <p className="text-[10px] text-bpim-muted">
-                        データを改変しないですべて貼り付けてください
+                        {t("import.csv.pasteHint")}
                         <br />
-                        「インポートを開始」をクリックして、貼り付けを省略してクリップボードから読み取ることもできます。
+                        {t("import.csv.clipboardHint")}
                       </p>
                       <Textarea
                         id="csv-data"
-                        placeholder="バージョン,タイトル,ジャンル,アーティスト,プレー回数,..."
+                        placeholder={t("import.csv.placeholder")}
                         className="max-h-12.5 border-bpim-border bg-bpim-surface-2/60 p-4 font-mono text-sm transition-colors focus:border-bpim-primary focus:ring-0"
                         value={props.csvData}
                         onChange={(e) => props.setCsvData(e.target.value)}
@@ -117,8 +119,8 @@ export const ImportView = (props: Props) => {
                             }`}
                           >
                             {props.detectedType !== "unknown"
-                              ? `検出: ${CSV_TYPE_LABELS[props.detectedType]}`
-                              : "未対応のフォーマットです"}
+                              ? `${t("import.csv.detectedPrefix")}${CSV_TYPE_LABELS[props.detectedType]}`
+                              : t("import.csv.unsupported")}
                           </span>
                         </div>
                       )}
@@ -128,10 +130,10 @@ export const ImportView = (props: Props) => {
 
                     <div className="space-y-2">
                       <Label className="text-sm font-bold text-bpim-text">
-                        保存先バージョン
+                        {t("import.version.label")}
                       </Label>
                       <p className="text-[10px] text-bpim-muted">
-                        データを反映させるバージョンを選択してください
+                        {t("import.version.desc")}
                       </p>
                       <Select
                         value={props.selectedVersion[0]}
@@ -140,7 +142,7 @@ export const ImportView = (props: Props) => {
                         }
                       >
                         <SelectTrigger className="w-full border-bpim-border bg-bpim-surface-2/60 text-sm md:w-75">
-                          <SelectValue placeholder="バージョンを選択" />
+                          <SelectValue placeholder={t("import.version.placeholder")} />
                         </SelectTrigger>
                         <SelectContent className="border-bpim-border bg-bpim-bg text-bpim-text">
                           {versionsOptions.map((v) => (
@@ -168,7 +170,7 @@ export const ImportView = (props: Props) => {
                         onClick={() => props.setCsvData("")}
                         disabled={!props.csvData || props.isProcessing}
                       >
-                        <Trash2 className="mr-2 h-4 w-4" /> 入力をクリア
+                        <Trash2 className="mr-2 h-4 w-4" /> {t("import.button.clear")}
                       </Button>
                       <Button
                         className="w-full bg-bpim-primary px-8 font-bold text-white hover:bg-bpim-primary sm:w-auto"
@@ -183,7 +185,7 @@ export const ImportView = (props: Props) => {
                           </>
                         ) : (
                           <>
-                            <Upload className="mr-2 h-4 w-4" /> インポートを開始
+                            <Upload className="mr-2 h-4 w-4" /> {t("import.button.start")}
                           </>
                         )}
                       </Button>

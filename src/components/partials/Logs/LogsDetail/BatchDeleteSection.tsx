@@ -2,6 +2,7 @@ import { Trash2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ActionConfirmDialog } from "../../Modal/Confirmation";
 import { useBatchDelete } from "@/hooks/batches/useBatchDelete";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface Props {
   userId: string;
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export const BatchDeleteSection = ({ userId, batchId, version }: Props) => {
+  const { t } = useTranslation();
   const { isOpen, setIsOpen, isDeleting, handleDelete } = useBatchDelete(
     userId,
     batchId,
@@ -26,7 +28,7 @@ export const BatchDeleteSection = ({ userId, batchId, version }: Props) => {
           onClick={() => setIsOpen(true)}
         >
           <Trash2Icon className="mr-2 h-4 w-4" />
-          この更新を削除
+          {t("logs.detail.delete.button")}
         </Button>
       </div>
 
@@ -34,9 +36,9 @@ export const BatchDeleteSection = ({ userId, batchId, version }: Props) => {
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         onConfirm={handleDelete}
-        title="この更新を削除しますか？"
-        description="この操作は取り消せません。この更新に紐づくスコアログが完全に削除されます。"
-        confirmLabel="削除する"
+        title={t("logs.detail.delete.title")}
+        description={t("logs.detail.delete.desc")}
+        confirmLabel={t("logs.detail.delete.confirm")}
         isDestructive
         isLoading={isDeleting}
       />

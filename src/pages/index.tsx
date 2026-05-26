@@ -28,6 +28,7 @@ import { DashboardLayoutSettingsModal } from "@/components/partials/DashBoard/La
 import { useLayoutConfig } from "@/hooks/dashboard/useLayoutConfig";
 import { WidgetId } from "@/types/dashboard/layout";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 function WidgetRenderer({
   id,
@@ -71,6 +72,7 @@ export default function DashboardPage() {
   const [nodata, setNodata] = useState<boolean>(false);
   const [isLayoutSettingsOpen, setIsLayoutSettingsOpen] = useState(false);
   const { config, updateConfig, hydrated } = useLayoutConfig();
+  const { t } = useTranslation();
 
   if (isUserLoading) {
     return <PageLoader size="lg" />;
@@ -88,7 +90,7 @@ export default function DashboardPage() {
 
   return (
     <FilterProvider>
-      <Meta noIndex title="ダッシュボード" />
+      <Meta noIndex title={t("page.dashboard.title")} />
 
       {!user && <AccountSettings />}
 
@@ -103,8 +105,8 @@ export default function DashboardPage() {
 
       <DashboardLayout>
         <PageHeader
-          title="ダッシュボード"
-          description="おかえりなさい！成長の軌跡を確認しましょう。"
+          title={t("page.dashboard.title")}
+          description={t("page.dashboard.desc")}
           rightElement={
             <Button
               variant="ghost"
@@ -113,7 +115,7 @@ export default function DashboardPage() {
               className="flex items-center gap-1.5 text-bpim-muted hover:text-bpim-text"
             >
               <Settings2 className="h-4 w-4" />
-              <span>レイアウトを変更</span>
+              <span>{t("page.dashboard.editLayout")}</span>
             </Button>
           }
         />

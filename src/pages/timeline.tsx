@@ -1,13 +1,15 @@
 import { DashboardLayout } from "@/components/partials/Main";
 import { Meta } from "@/components/partials/Head";
 import { TimelineContainer } from "@/components/partials/Timeline";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export default function UsersPage() {
+  const { t } = useTranslation();
   return (
     <DashboardLayout>
       <Meta
-        title="タイムライン"
-        description="アリーナ平均やAAA達成難易度表など、IIDXスコアに関する指標データを閲覧できます。"
+        title={t("page.timeline.title")}
+        description={t("page.timeline.desc")}
       />
 
       <TimelineContainer />

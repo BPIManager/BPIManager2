@@ -21,9 +21,11 @@ import {
   EXPORT_FIELDS,
   ExportField,
 } from "@/hooks/export/useDataExport";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export default function DataExportUi() {
   const [isOpen, setIsOpen] = useState(false);
+  const { t } = useTranslation();
   const {
     selectedVersions,
     toggleVersion,
@@ -49,10 +51,10 @@ export default function DataExportUi() {
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2 text-bpim-primary">
             <FileArchive className="h-4 w-4" />
-            <span className="font-bold">データエクスポート</span>
+            <span className="font-bold">{t("settings.export.title")}</span>
           </div>
           <p className="text-sm text-bpim-muted">
-            スコアデータをCSV形式でダウンロードします。
+            {t("settings.export.desc")}
           </p>
         </div>
         <Button
@@ -61,7 +63,7 @@ export default function DataExportUi() {
           className="w-full md:w-auto gap-2"
         >
           <Download className="h-4 w-4" />
-          エクスポート
+          {t("settings.export.title")}
         </Button>
       </div>
 
@@ -72,10 +74,10 @@ export default function DataExportUi() {
         <DialogContent className="max-w-[90vw] sm:max-w-xl border-bpim-border bg-bpim-bg p-0 overflow-hidden shadow-2xl rounded-2xl">
           <DialogHeader className="p-6 pb-4 border-b border-bpim-border">
             <DialogTitle className="text-lg font-bold text-bpim-text">
-              データエクスポート
+              {t("settings.export.title")}
             </DialogTitle>
             <p className="text-xs text-bpim-muted mt-1">
-              複数バージョン選択時はZIPにまとめてダウンロードします。
+              {t("settings.export.zipNote")}
             </p>
           </DialogHeader>
 
@@ -84,21 +86,21 @@ export default function DataExportUi() {
             <section className="flex flex-col gap-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-semibold text-bpim-text">
-                  バージョン
+                  {t("settings.export.version")}
                 </span>
                 <div className="flex gap-2">
                   <button
                     className="text-[11px] text-bpim-primary hover:underline"
                     onClick={selectAll}
                   >
-                    すべて選択
+                    {t("common.selectAll")}
                   </button>
                   <span className="text-[11px] text-bpim-muted">/</span>
                   <button
                     className="text-[11px] text-bpim-muted hover:underline"
                     onClick={clearAll}
                   >
-                    すべて解除
+                    {t("common.deselectAll")}
                   </button>
                 </div>
               </div>
@@ -133,21 +135,21 @@ export default function DataExportUi() {
             <section className="flex flex-col gap-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-semibold text-bpim-text">
-                  出力フィールド
+                  {t("settings.export.fields")}
                 </span>
                 <div className="flex gap-2">
                   <button
                     className="text-[11px] text-bpim-primary hover:underline"
                     onClick={selectAllFields}
                   >
-                    すべて選択
+                    {t("common.selectAll")}
                   </button>
                   <span className="text-[11px] text-bpim-muted">/</span>
                   <button
                     className="text-[11px] text-bpim-muted hover:underline"
                     onClick={clearAllFields}
                   >
-                    すべて解除
+                    {t("common.deselectAll")}
                   </button>
                 </div>
               </div>
@@ -206,7 +208,7 @@ export default function DataExportUi() {
                 disabled={isExporting}
                 className="h-9 px-4 text-bpim-muted hover:text-bpim-text hover:bg-bpim-overlay/50"
               >
-                キャンセル
+                {t("common.cancel")}
               </Button>
               <Button
                 onClick={onExport}
@@ -222,7 +224,7 @@ export default function DataExportUi() {
                 ) : (
                   <Download className="h-4 w-4" />
                 )}
-                {isExporting ? "エクスポート中..." : "ダウンロード"}
+                {isExporting ? t("settings.export.exporting") : t("common.download")}
               </Button>
             </div>
           </DialogFooter>

@@ -11,8 +11,10 @@ import { cn } from "@/lib/utils";
 import { useTimelineFilter } from "@/hooks/social/useTimelineFilter";
 import { IidxDifficulty } from "@/types/iidx/difficulty";
 import { PageContainer, PageHeader } from "../Header";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export const TimelineContainer = () => {
+  const { t } = useTranslation();
   const { user, isLoading } = useUser();
   const {
     mode,
@@ -34,8 +36,8 @@ export const TimelineContainer = () => {
   return (
     <>
       <PageHeader
-        title="タイムライン"
-        description="フォロー中のユーザーのスコア更新ログ"
+        title={t("page.timeline.title")}
+        description={t("page.timeline.desc")}
       />
       <PageContainer>
         <div className="mx-auto w-full max-w-7xl px-4 py-6">
@@ -43,23 +45,23 @@ export const TimelineContainer = () => {
             <aside className="lg:sticky lg:top-20 z-10">
               <div className="flex flex-col gap-6 rounded-xl border border-bpim-border bg-bpim-bg/40 p-4 backdrop-blur-sm">
                 <div className="flex flex-col gap-1">
-                  <FilterHeader label="表示モード" />
+                  <FilterHeader label={t("timeline.mode.label")} />
                   <MenuButton
                     isActive={mode === "all"}
                     icon={Activity}
-                    label="すべて"
+                    label={t("timeline.mode.all")}
                     onClick={() => setMode("all")}
                   />
                   <MenuButton
                     isActive={mode === "played"}
                     icon={UserCheck}
-                    label="自分がプレイ済み"
+                    label={t("timeline.mode.played")}
                     onClick={() => setMode("played")}
                   />
                   <MenuButton
                     isActive={mode === "overtaken"}
                     icon={Swords}
-                    label="逆転された曲"
+                    label={t("timeline.mode.overtaken")}
                     activeVariant="destructive"
                     onClick={() => setMode("overtaken")}
                   />
@@ -90,7 +92,7 @@ export const TimelineContainer = () => {
                 <FilterSearchInput
                   value={filterParams.search || ""}
                   onChange={(search: string) => updateParams({ search })}
-                  placeholder="プレイヤー名または楽曲名で絞り込み..."
+                  placeholder={t("timeline.search.placeholder")}
                 />
               </div>
 

@@ -2,6 +2,7 @@
 import type { BatchDetailItem } from "@/types/logs/batchDetail";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChevronRight } from "lucide-react";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface RankItemProps {
   item: BatchDetailItem;
@@ -9,6 +10,7 @@ interface RankItemProps {
 }
 
 export const OvertakeRankItem = ({ item, onClick }: RankItemProps) => {
+  const { t, tFormat } = useTranslation();
   const { current, previous, overtaken = [], rivalRankInfo } = item;
 
   const scoreDiff = current.exScore - (previous?.exScore || 0);
@@ -58,15 +60,15 @@ export const OvertakeRankItem = ({ item, onClick }: RankItemProps) => {
             <>
               <div className="flex items-center gap-1 font-mono text-[11px] justify-end">
                 <span className="text-bpim-muted">
-                  {rivalRankInfo.myRankBefore}位
+                  {rivalRankInfo.myRankBefore}{t("logs.rank.rankUnit")}
                 </span>
                 <ChevronRight className="w-2.5 h-2.5 text-[11px] text-bpim-subtle" />
                 <span className="font-bold text-yellow-400">
-                  {rivalRankInfo.myRankAfter}位
+                  {rivalRankInfo.myRankAfter}{t("logs.rank.rankUnit")}
                 </span>
               </div>
               <span className="font-mono text-[11px] text-bpim-muted text-center">
-                {rivalRankInfo.totalRivals + 1}人中
+                {tFormat("logs.rank.totalRivalsOf", { count: rivalRankInfo.totalRivals + 1 })}
               </span>
             </>
           )}

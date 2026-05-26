@@ -39,6 +39,7 @@ import { useUser } from "@/contexts/users/UserContext";
 import { authActions } from "@/lib/firebase/auth";
 import { latestVersion } from "@/constants/latestVersion";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -54,6 +55,7 @@ import { RoleBadge } from "../UserRole/badge";
 export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
   const { user } = useUser();
   const router = useRouter();
+  const { t } = useTranslation();
   const [isRivalOpen, setIsRivalOpen] = useState<boolean>(true);
   const [isInfoOpen, setIsInfoOpen] = useState<boolean>(true);
   const [isScoreOpen, setIsScoreOpen] = useState<boolean>(true);
@@ -61,21 +63,21 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
   const [isAnalyticsOpen, setIsAnalyticsOpen] = useState<boolean>(true);
 
   const rivalMenuItems = [
-    { label: "ライバル一覧", icon: UsersIcon, href: "/rivals", exact: true },
-    { label: "タイムライン", icon: ChartNoAxesGantt, href: "/timeline" },
-    { label: "ライバルを探す", icon: Search, href: "/rivals/search" },
-    { label: "全体ランキング", icon: Trophy, href: "/ranking/global" },
+    { label: t("nav.rivals"), icon: UsersIcon, href: "/rivals", exact: true },
+    { label: t("nav.timeline"), icon: ChartNoAxesGantt, href: "/timeline" },
+    { label: t("nav.findRivals"), icon: Search, href: "/rivals/search" },
+    { label: t("nav.globalRanking"), icon: Trophy, href: "/ranking/global" },
   ];
 
   const analyticsMenuItems = [
-    { label: "比較", icon: ChartArea, href: "/analytics" },
+    { label: t("nav.compare"), icon: ChartArea, href: "/analytics" },
     {
-      label: "AAA達成難易度表",
+      label: t("nav.aaaChart"),
       icon: Table,
       href: "/metrics/AAADifficultyTable",
     },
     {
-      label: "アリーナランク平均",
+      label: t("nav.arenaAverage"),
       icon: Swords,
       href: `/metrics/arenaAverage/${latestVersion}?difficultyLevel=12`,
     },
@@ -83,18 +85,18 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
 
   const betaMenuItems = [
     {
-      label: "アシスタント",
+      label: t("nav.assistant"),
       icon: Target,
       href: "/optimizer",
     },
-    { label: "楽曲情報", icon: Music, href: "/songs" },
+    { label: t("nav.songs"), icon: Music, href: "/songs" },
     {
-      label: "全曲（☆10以下含む）",
+      label: t("nav.allSongs"),
       icon: ListIcon,
       href: `/my/all/${latestVersion}`,
     },
     {
-      label: "ランダムレーンチケット",
+      label: t("nav.tickets"),
       icon: Ticket,
       href: "/tickets",
     },
@@ -102,7 +104,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
 
   const infoMenuItems = [
     {
-      label: "APIリファレンス",
+      label: t("nav.apiRef"),
       icon: Code2,
       href: "https://bpim2.apidog.io/",
       isExternal: true,
@@ -114,31 +116,31 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
       isExternal: true,
     },
     {
-      label: "ヘルプページ",
+      label: t("nav.help"),
       icon: HelpCircle,
       href: "https://www.notion.so/BPIM2-3239989ca87a809f8058dc9736f0e197",
       isExternal: true,
     },
     {
-      label: "更新履歴",
+      label: t("nav.changelog"),
       icon: FileClock,
       href: "https://www.notion.so/BPIM2-3289989ca87a80d08bf7f916b97285e3",
       isExternal: true,
     },
     {
-      label: "不具合・要望の報告",
+      label: t("nav.reportIssue"),
       icon: Mail,
       href: "https://forms.gle/VfMJpFrKfSJqRYLA8",
       isExternal: true,
     },
     {
-      label: "Xでフォロー",
+      label: t("nav.followOnX"),
       icon: XIcon,
       href: "https://x.com/BPIManager",
       isExternal: true,
     },
     {
-      label: "統計情報",
+      label: t("nav.statistics"),
       icon: BarChart2 as LucideIcon,
       href: "/info/stats",
     },
@@ -181,7 +183,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
             variant="outline"
             className="text-[10px] py-0 border-bpim-border text-bpim-muted"
           >
-            近日公開
+            {t("common.comingSoon")}
           </Badge>
         )}
         {item.isExternal && <ExternalLink className="h-3 w-3 opacity-40" />}
@@ -253,12 +255,12 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
 
   const scoreSubItems = [
     {
-      label: "プレイ済み",
+      label: t("nav.scorePlayed"),
       icon: CircleCheck,
       href: `/my/${latestVersion}?levels=12%2C11&difficulties=LEGGENDARIA%2CHYPER%2CANOTHER`,
     },
     {
-      label: "未プレイ",
+      label: t("nav.scoreUnplayed"),
       icon: CircleDashed,
       href: `/my/unplayed/${latestVersion}?levels=12%2C11&difficulties=LEGGENDARIA%2CHYPER%2CANOTHER`,
     },
@@ -276,7 +278,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
         <Link href="/support">
           <div className="flex w-full items-center gap-3">
             <HeartHandshake className="h-4.5 w-4.5" />
-            <span className="flex-1 text-left">ご支援のお願い</span>
+            <span className="flex-1 text-left">{t("nav.support")}</span>
           </div>
         </Link>
       </Button>
@@ -298,7 +300,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
               {user?.userName || "Guest"}
             </p>
             <p className="truncate font-mono text-[10px] text-bpim-muted">
-              {user?.iidxId ? `ID: ${user.iidxId}` : "ID未設定"}
+              {user?.iidxId ? `ID: ${user.iidxId}` : t("nav.user.idNotSet")}
             </p>
             <p className="font-mono text-[10px] font-bold text-bpim-warning">
               ☆12 BPI: {user?.totalBpi ?? -15}
@@ -321,7 +323,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
               <Link href={`/users/${user?.userId}`}>
                 <div className="flex items-center gap-1.5">
                   <User className="h-3 w-3" />
-                  <span className="text-[10px]">プロフィールを表示</span>
+                  <span className="text-[10px]">{t("nav.user.viewProfile")}</span>
                 </div>
                 <ChevronRight className="h-3 w-3" />
               </Link>
@@ -337,7 +339,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
                   {user?.followingCount ?? 0}
                 </p>
                 <p className="text-[10px] text-bpim-muted group-hover:text-bpim-text">
-                  フォロー
+                  {t("nav.user.following")}
                 </p>
               </Link>
               <Link
@@ -349,7 +351,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
                   {user?.followerCount ?? 0}
                 </p>
                 <p className="text-[10px] text-bpim-muted group-hover:text-bpim-text">
-                  フォロワー
+                  {t("nav.user.followers")}
                 </p>
               </Link>
             </div>
@@ -359,11 +361,11 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
 
       <nav className="flex flex-col gap-1 flex-1">
         {renderMenuItem({
-          label: "ダッシュボード",
+          label: t("nav.dashboard"),
           icon: LayoutDashboard,
           href: "/",
         })}
-        {renderMenuItem({ label: "インポート", icon: FileUp, href: "/import" })}
+        {renderMenuItem({ label: t("nav.import"), icon: FileUp, href: "/import" })}
 
         <Collapsible
           open={isScoreOpen}
@@ -382,7 +384,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
                 <ChevronRight className="h-4.5 w-4.5" />
               )}
               <span className="text-xs font-bold tracking-wider">
-                スコア一覧
+                {t("nav.section.score")}
               </span>
             </Button>
           </CollapsibleTrigger>
@@ -392,7 +394,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
         </Collapsible>
 
         {renderMenuItem({
-          label: "スコア更新ログ",
+          label: t("nav.scoreLog"),
           icon: ScrollText,
           href: `/users/${user?.userId}/logs/${latestVersion}`,
         })}
@@ -413,7 +415,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
               ) : (
                 <ChevronRight className="h-4.5 w-4.5" />
               )}
-              <span className="text-xs font-bold tracking-wider">ライバル</span>
+              <span className="text-xs font-bold tracking-wider">{t("nav.section.rivals")}</span>
             </Button>
           </CollapsibleTrigger>
           <CollapsibleContent className="flex flex-col gap-1 mt-1">
@@ -437,7 +439,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
               ) : (
                 <ChevronRight className="h-4.5 w-4.5" />
               )}
-              <span className="text-xs font-bold tracking-wider">分析</span>
+              <span className="text-xs font-bold tracking-wider">{t("nav.section.analytics")}</span>
             </Button>
           </CollapsibleTrigger>
           <CollapsibleContent className="flex flex-col gap-1 mt-1">
@@ -445,7 +447,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
           </CollapsibleContent>
         </Collapsible>
 
-        {renderMenuItem({ label: "設定", icon: Settings, href: "/settings" })}
+        {renderMenuItem({ label: t("nav.settings"), icon: Settings, href: "/settings" })}
 
         <Collapsible
           open={isBetaOpen}
@@ -464,7 +466,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
                 <ChevronRight className="h-4.5 w-4.5" />
               )}
               <span className="text-xs font-bold tracking-wider">
-                ベータ版機能
+                {t("nav.section.beta")}
               </span>
               <Badge
                 variant="secondary"
@@ -495,7 +497,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
               ) : (
                 <ChevronRight className="h-4.5 w-4.5" />
               )}
-              <span className="text-xs font-bold tracking-wider">関連情報</span>
+              <span className="text-xs font-bold tracking-wider">{t("nav.section.info")}</span>
             </Button>
           </CollapsibleTrigger>
           <CollapsibleContent className="flex flex-col gap-1 mt-1">
@@ -513,7 +515,7 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
             onClick={() => authActions.logout()}
           >
             <LogOut className="h-4 w-4" />
-            <span className="font-bold text-xs">サインアウト</span>
+            <span className="font-bold text-xs">{t("nav.signOut")}</span>
           </Button>
         )}
       </div>

@@ -11,6 +11,7 @@ import { useMemo, useState } from "react";
 import { getBpiColorStyle } from "@/constants/bpiColor";
 import { ArrowDownWideNarrow, ArrowUpNarrowWide } from "lucide-react";
 import { AppTabsGroup } from "@/components/ui/complex/tabs";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export interface SongListEntry {
   title: string;
@@ -35,6 +36,7 @@ export const SongListDialog = ({
   onClose,
   showPlayedOnlyToggle = false,
 }: Props) => {
+  const { t } = useTranslation();
   const [sortOrder, setSortOrder] = useState<string>("desc");
   const [playedOnly, setPlayedOnly] = useState(false);
 
@@ -74,10 +76,10 @@ export const SongListDialog = ({
               tabs={[
                 {
                   value: "desc",
-                  label: "BPIが高い順",
+                  label: t("dashboard.songList.highBpi"),
                   icon: ArrowDownWideNarrow,
                 },
-                { value: "asc", label: "BPIが低い順", icon: ArrowUpNarrowWide },
+                { value: "asc", label: t("dashboard.songList.lowBpi"), icon: ArrowUpNarrowWide },
               ]}
             />
           </Tabs>
@@ -93,7 +95,7 @@ export const SongListDialog = ({
                 htmlFor="played-only"
                 className="text-xs text-bpim-muted cursor-pointer whitespace-nowrap"
               >
-                既プレイのみ
+                {t("dashboard.songList.playedOnly")}
               </Label>
             </div>
           )}

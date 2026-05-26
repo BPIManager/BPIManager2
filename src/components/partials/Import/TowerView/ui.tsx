@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { versionsOptions } from "@/constants/versions";
 import { BookmarkletAccordion } from "../View/bookmarklet";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface Props {
   csvData: string;
@@ -48,6 +49,7 @@ export const TowerImportView = ({
   processStatus,
   onStartImport,
 }: Props) => {
+  const { t } = useTranslation();
   const isValid = csvData.trim() ? isValidTowerCsv(csvData) : null;
   const towerDownloadUrl =
     "https://p.eagate.573.jp/game/2dx/33/djdata/score_download.html?style=tower";
@@ -56,21 +58,21 @@ export const TowerImportView = ({
     <div className="flex flex-col gap-6">
       <div className="space-y-2">
         <Label htmlFor="tower-csv" className="text-sm font-bold text-bpim-text">
-          IIDXタワーCSVデータ(
+          {t("import.towerCsv.label")}(
           <a
             href={towerDownloadUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="text-bpim-primary underline decoration-blue-400/30 underline-offset-4 transition-colors hover:text-bpim-primary hover:decoration-blue-300"
           >
-            公式CSVダウンロードはこちら
+            {t("import.csv.officialDownload")}
           </a>
           )
         </Label>
         <p className="text-[10px] text-bpim-muted">
-          データを改変しないですべて貼り付けてください
+          {t("import.csv.pasteHint")}
           <br />
-          「インポートを開始」をクリックして、貼り付けを省略してクリップボードから読み取ることもできます。
+          {t("import.csv.clipboardHint")}
         </p>
         <Textarea
           id="tower-csv"
@@ -94,8 +96,8 @@ export const TowerImportView = ({
               }`}
             >
               {isValid
-                ? "検出: IIDXタワーCSV"
-                : "対応していないフォーマットです"}
+                ? t("import.towerCsv.detected")
+                : t("import.towerCsv.unsupported")}
             </span>
           </div>
         )}
@@ -105,17 +107,17 @@ export const TowerImportView = ({
 
       <div className="space-y-2">
         <Label className="text-sm font-bold text-bpim-text">
-          保存先バージョン
+          {t("import.version.label")}
         </Label>
         <p className="text-[10px] text-bpim-muted">
-          データを反映させるバージョンを選択してください
+          {t("import.version.desc")}
         </p>
         <Select
           value={selectedVersion[0]}
           onValueChange={(value) => setSelectedVersion([value])}
         >
           <SelectTrigger className="w-full border-bpim-border bg-bpim-surface-2/60 text-sm md:w-75">
-            <SelectValue placeholder="バージョンを選択" />
+            <SelectValue placeholder={t("import.version.placeholder")} />
           </SelectTrigger>
           <SelectContent className="border-bpim-border bg-bpim-bg text-bpim-text">
             {versionsOptions.map((v) => (
@@ -134,7 +136,7 @@ export const TowerImportView = ({
           onClick={() => setCsvData("")}
           disabled={!csvData || isProcessing}
         >
-          <Trash2 className="mr-2 h-4 w-4" /> 入力をクリア
+          <Trash2 className="mr-2 h-4 w-4" /> {t("import.button.clear")}
         </Button>
         <Button
           className="w-full bg-bpim-primary px-8 font-bold text-white hover:bg-bpim-primary sm:w-auto"
@@ -153,7 +155,7 @@ export const TowerImportView = ({
             </>
           ) : (
             <>
-              <Upload className="mr-2 h-4 w-4" /> インポートを開始
+              <Upload className="mr-2 h-4 w-4" /> {t("import.button.start")}
             </>
           )}
         </Button>

@@ -3,6 +3,7 @@ import { getDJRank } from "@/utils/songs/djRank";
 import { RefObject } from "react";
 import { cn } from "@/lib/utils";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { useTranslation } from "@/hooks/common/useTranslation";
 import { DIFF_COLORS as diffColors } from "@/constants/difficultyColors";
 export { DIFF_COLORS as diffColors } from "@/constants/difficultyColors";
 
@@ -68,6 +69,7 @@ const SongItem = ({
   compareVersion?: string;
   onClick: () => void;
 }) => {
+  const { t } = useTranslation();
   const lampClass = getLampClass(song.clearState);
   const showCompare =
     compareVersion &&
@@ -152,12 +154,12 @@ const SongItem = ({
                   {prevEx !== null && prevEx !== undefined ? (
                     <>
                       <span className="text-[9px] text-bpim-muted leading-none">
-                        前:{prevEx}
+                        {t("table.prevLabel")}{prevEx}
                       </span>
                       <DiffBadge diff={song.exDiff} />
                     </>
                   ) : (
-                    <span className="text-[9px] text-bpim-muted">前:未</span>
+                    <span className="text-[9px] text-bpim-muted">{t("table.prevLabel")}{t("table.noData")}</span>
                   )}
                 </div>
               )}
@@ -180,12 +182,12 @@ const SongItem = ({
                   {prevBpi !== null && prevBpi !== undefined ? (
                     <>
                       <span className="text-[9px] text-bpim-muted leading-none">
-                        前:{prevBpi.toFixed(2)}
+                        {t("table.prevLabel")}{prevBpi.toFixed(2)}
                       </span>
                       <DiffBadge diff={song.bpiDiff} unit="bpi" />
                     </>
                   ) : (
-                    <span className="text-[9px] text-bpim-muted">前:未</span>
+                    <span className="text-[9px] text-bpim-muted">{t("table.prevLabel")}{t("table.noData")}</span>
                   )}
                 </div>
               )}

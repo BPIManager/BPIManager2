@@ -13,6 +13,7 @@ import {
   type RivalCategoryStat,
 } from "@/hooks/social/useRivalAnalysis";
 import { BpiScatterChart } from "@/components/partials/Metrics/ArenaAverage/BpiScatterChart";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 // ---- 小コンポーネント ----
 
@@ -46,11 +47,13 @@ const CategoryFilter = ({
 }: {
   selectedCategories: Set<RadarCategory>;
   onToggle: (cat: RadarCategory) => void;
-}) => (
+}) => {
+  const { t } = useTranslation();
+  return (
   <div className="rounded-xl border border-bpim-border bg-bpim-bg/80 p-4">
     <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
       <span className="shrink-0 text-[10px] font-black uppercase tracking-widest text-bpim-muted">
-        レーダー項目
+        {t("arenaAnalysis.radarCategory")}
       </span>
       {ALL_RADAR_CATEGORIES.map((cat) => {
         const active = selectedCategories.has(cat);
@@ -82,7 +85,8 @@ const CategoryFilter = ({
       })}
     </div>
   </div>
-);
+  );
+};
 
 const DiffRankingList = ({
   title,
@@ -93,6 +97,7 @@ const DiffRankingList = ({
   items: RivalDiffPoint[];
   isWin: boolean;
 }) => {
+  const { t } = useTranslation();
   const maxDiff = Math.max(...items.map((i) => i.diff), 1);
   return (
     <div className="rounded-xl border border-bpim-border bg-bpim-bg p-5 shadow-sm">
@@ -100,7 +105,7 @@ const DiffRankingList = ({
         {title}
       </h3>
       {items.length === 0 ? (
-        <p className="text-center text-xs text-bpim-muted">該当曲なし</p>
+        <p className="text-center text-xs text-bpim-muted">{t("rivals.analysis.noSongs")}</p>
       ) : (
         <div className="flex flex-col gap-1.5">
           {items.map((item, i) => {
@@ -164,6 +169,7 @@ const CategoryBpiComparison = ({
   stats: RivalCategoryStat[];
   rivalName?: string;
 }) => {
+  const { t } = useTranslation();
   const maxAbs = Math.max(
     ...stats.flatMap((s) =>
       [s.myTotal, s.rivalTotal]
@@ -176,10 +182,10 @@ const CategoryBpiComparison = ({
   return (
     <div className="rounded-xl border border-bpim-border bg-bpim-bg p-5 shadow-sm">
       <h3 className="mb-1 text-[10px] font-black uppercase tracking-widest text-bpim-muted">
-        カテゴリ別 総合BPI比較
+        {t("arenaAnalysis.categoryComparison")}
       </h3>
       <p className="mb-4 text-[10px] text-bpim-muted">
-        各レーダー項目の楽曲群で計算した総合BPI
+        {t("arenaAnalysis.categoryDesc")}
       </p>
       <div className="flex flex-col gap-3">
         {stats.map(({ cat, myTotal, rivalTotal, songCount }) => {
@@ -212,13 +218,13 @@ const CategoryBpiComparison = ({
                 </div>
                 <div className="flex items-center gap-3 font-mono text-[11px]">
                   <span className="text-bpim-muted">
-                    自分:{" "}
+                    {t("arenaAnalysis.mine")}:{" "}
                     <span className="font-black text-bpim-primary">
                       {myTotal !== null ? myTotal.toFixed(2) : "-"}
                     </span>
                   </span>
                   <span className="text-bpim-muted">
-                    {rivalName ?? "ライバル"}:{" "}
+                    {rivalName ?? t("rivals.analysis.rival")}:{" "}
                     <span className="font-black text-bpim-warning">
                       {rivalTotal !== null ? rivalTotal.toFixed(2) : "-"}
                     </span>
@@ -253,11 +259,11 @@ const CategoryBpiComparison = ({
       <div className="mt-3 flex items-center gap-4 text-[10px] text-bpim-muted">
         <span className="flex items-center gap-1">
           <span className="inline-block h-2 w-4 rounded-sm bg-bpim-primary opacity-85" />
-          自分
+          {t("arenaAnalysis.mine")}
         </span>
         <span className="flex items-center gap-1">
           <span className="inline-block h-2 w-4 rounded-sm bg-bpim-primary opacity-35" />
-          {rivalName ?? "ライバル"}
+          {rivalName ?? t("rivals.analysis.rival")}
         </span>
       </div>
     </div>
@@ -278,12 +284,14 @@ const SongFilter = ({
   selectedDifficulties: Set<DifficultyName>;
   onLevelToggle: (level: number) => void;
   onDifficultyToggle: (diff: DifficultyName) => void;
-}) => (
+}) => {
+  const { t } = useTranslation();
+  return (
   <div className="rounded-xl border border-bpim-border bg-bpim-bg/80 p-4">
     <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
         <span className="shrink-0 text-[10px] font-black uppercase tracking-widest text-bpim-muted">
-          レベル
+          {t("rivals.analysis.level")}
         </span>
         {LEVELS.map((level) => {
           const active = selectedLevels.has(level);
@@ -308,7 +316,7 @@ const SongFilter = ({
       <div className="h-4 w-px bg-bpim-border" />
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
         <span className="shrink-0 text-[10px] font-black uppercase tracking-widest text-bpim-muted">
-          難易度
+          {t("rivals.analysis.difficulty")}
         </span>
         {DIFFICULTIES.map((diff) => {
           const active = selectedDifficulties.has(diff);
@@ -332,7 +340,8 @@ const SongFilter = ({
       </div>
     </div>
   </div>
-);
+  );
+};
 
 // ---- メインコンポーネント ----
 
@@ -342,6 +351,7 @@ interface RivalAnalysisProps {
 }
 
 export const RivalAnalysis = ({ songs, rivalName }: RivalAnalysisProps) => {
+  const { t, tFormat } = useTranslation();
   const [selectedCategories, setSelectedCategories] = useState<Set<RadarCategory>>(
     new Set(ALL_RADAR_CATEGORIES),
   );
@@ -393,7 +403,7 @@ export const RivalAnalysis = ({ songs, rivalName }: RivalAnalysisProps) => {
     categoryStats,
   } = useRivalAnalysis(filteredSongs, selectedCategories);
 
-  const label = rivalName ?? "ライバル";
+  const label = rivalName ?? t("rivals.analysis.rival");
 
   return (
     <div className="flex flex-col gap-6 p-4">
@@ -410,17 +420,17 @@ export const RivalAnalysis = ({ songs, rivalName }: RivalAnalysisProps) => {
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <StatCard
-          label="勝ち（BPI上回り）"
+          label={t("rivals.analysis.winCount")}
           value={songs ? String(winCount) : "-"}
           accent="text-green-400"
         />
         <StatCard
-          label="負け（BPI下回り）"
+          label={t("rivals.analysis.lossCount")}
           value={songs ? String(lossCount) : "-"}
           accent="text-red-400"
         />
         <StatCard
-          label="平均BPI差"
+          label={t("rivals.analysis.avgBpiDiff")}
           value={
             avgBpiDiff !== null
               ? `${avgBpiDiff >= 0 ? "+" : ""}${avgBpiDiff.toFixed(2)}`
@@ -438,8 +448,8 @@ export const RivalAnalysis = ({ songs, rivalName }: RivalAnalysisProps) => {
 
       <BpiScatterChart
         rank={label}
-        title={`${label}BPI vs 自分のBPI`}
-        xLabel={`${label}のBPI`}
+        title={tFormat("rivals.analysis.bpiVs", { rival: label })}
+        xLabel={tFormat("rivals.analysis.rivalBpiLabel", { rival: label })}
         scatterPoints={scatterPoints}
         axisDomain={axisDomain}
         rankColor="#f59e0b"
@@ -450,12 +460,12 @@ export const RivalAnalysis = ({ songs, rivalName }: RivalAnalysisProps) => {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <DiffRankingList
-          title={`自分が上回っている上位 ${topWins.length} 曲`}
+          title={tFormat("rivals.analysis.topWins", { count: topWins.length })}
           items={topWins}
           isWin
         />
         <DiffRankingList
-          title={`${label}に負けている上位 ${topLosses.length} 曲`}
+          title={tFormat("rivals.analysis.topLosses", { rival: label, count: topLosses.length })}
           items={topLosses}
           isWin={false}
         />

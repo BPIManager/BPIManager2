@@ -11,6 +11,7 @@ import {
 import { Tabs } from "@/components/ui/tabs";
 import { versionsNonDisabledCollection } from "@/constants/versions";
 import { AppTabsGroup } from "@/components/ui/complex/tabs";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface Props {
   version: string;
@@ -21,6 +22,7 @@ interface Props {
 export const LogFilterSection = ({ version, groupedBy, granularity }: Props) => {
   const router = useRouter();
   const { userId } = router.query;
+  const { t } = useTranslation();
 
   const handleVersionChange = (nextVersion: string) => {
     if (!nextVersion) return;
@@ -65,7 +67,7 @@ export const LogFilterSection = ({ version, groupedBy, granularity }: Props) => 
           </label>
           <Select value={version} onValueChange={handleVersionChange}>
             <SelectTrigger className="h-9 border-bpim-border bg-bpim-bg text-bpim-text focus:ring-blue-500">
-              <SelectValue placeholder="バージョンを選択" />
+              <SelectValue placeholder={t("logs.versionPlaceholder")} />
             </SelectTrigger>
             <SelectContent className="border-bpim-border bg-bpim-bg text-bpim-text">
               {versionsNonDisabledCollection.map((v) => (
@@ -89,8 +91,8 @@ export const LogFilterSection = ({ version, groupedBy, granularity }: Props) => 
             <AppTabsGroup
               visual="flat"
               tabs={[
-                { value: "lastPlayed", label: "プレイ日単位" },
-                { value: "createdAt", label: "インポート日単位" },
+                { value: "lastPlayed", label: t("logs.groupBy.lastPlayed") },
+                { value: "createdAt", label: t("logs.groupBy.createdAt") },
               ]}
             />
           </Tabs>
@@ -99,7 +101,7 @@ export const LogFilterSection = ({ version, groupedBy, granularity }: Props) => 
 
       <div className="flex flex-col gap-1.5">
         <label className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
-          表示粒度
+          {t("logs.granularity.label")}
         </label>
         <Tabs
           value={granularity}
@@ -109,10 +111,10 @@ export const LogFilterSection = ({ version, groupedBy, granularity }: Props) => 
           <AppTabsGroup
             visual="flat"
             tabs={[
-              { value: "day", label: "日" },
-              { value: "week", label: "週" },
-              { value: "month", label: "月" },
-              { value: "version", label: "作品" },
+              { value: "day", label: t("logs.granularity.day") },
+              { value: "week", label: t("logs.granularity.week") },
+              { value: "month", label: t("logs.granularity.month") },
+              { value: "version", label: t("logs.granularity.version") },
             ]}
           />
         </Tabs>

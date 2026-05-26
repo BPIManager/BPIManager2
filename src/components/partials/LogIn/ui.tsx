@@ -4,14 +4,12 @@ import {
   Wrench,
   TrendingUp,
   ChevronRight,
-  Code2,
   BookOpen,
   ExternalLink,
   Globe,
   LockIcon,
   EyeOff,
   Eye,
-  Terminal,
 } from "lucide-react";
 import { Meta } from "../Head";
 import { DashboardLayout } from "../Main";
@@ -39,6 +37,7 @@ import {
 import { cn } from "@/lib/utils";
 import { authActions } from "@/lib/firebase/auth";
 import Link from "next/link";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 const BPI_HISTORY_MOCK = [
   { date: "4月", bpi: 14.2, count: 3 },
@@ -168,57 +167,60 @@ const LineProviderIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-export const LoginSection = () => (
-  <div className="mx-auto w-full max-w-sm">
-    <button
-      onClick={() => authActions.signInWithGoogle()}
-      className="group relative flex h-14 w-full items-center gap-4 overflow-hidden rounded-xl bg-white px-6 shadow-lg transition-all duration-200 hover:brightness-95 active:scale-[0.98]"
-    >
-      <GoogleIcon className="h-5 w-5 shrink-0 text-gray-500" />
-      <span className="flex-1 text-left text-sm font-bold text-gray-800">
-        Googleでログイン
-      </span>
-      <ChevronRight className="h-4 w-4 text-gray-400 opacity-0 transition-opacity group-hover:opacity-100" />
-    </button>
-
-    <div className="my-4 flex items-center gap-3">
-      <div className="flex-1 border-t border-bpim-border" />
-      <span className="text-[11px] font-medium uppercase tracking-wider text-bpim-muted/50">
-        または
-      </span>
-      <div className="flex-1 border-t border-bpim-border" />
-    </div>
-
-    <div className="grid grid-cols-2 gap-3">
+export const LoginSection = () => {
+  const { t } = useTranslation();
+  return (
+    <div className="mx-auto w-full max-w-sm">
       <button
-        onClick={() => authActions.signInWithTwitter()}
-        className="group flex h-12 items-center justify-center gap-2.5 rounded-xl border border-bpim-border bg-bpim-surface px-4 transition-all duration-200 hover:border-white/30 hover:bg-bpim-overlay active:scale-[0.98]"
+        onClick={() => authActions.signInWithGoogle()}
+        className="group relative flex h-14 w-full items-center gap-4 overflow-hidden rounded-xl bg-white px-6 shadow-lg transition-all duration-200 hover:brightness-95 active:scale-[0.98]"
       >
-        <XProviderIcon className="h-4 w-4 text-bpim-text" />
-        <span className="text-sm font-semibold text-bpim-text">X</span>
+        <GoogleIcon className="h-5 w-5 shrink-0 text-gray-500" />
+        <span className="flex-1 text-left text-sm font-bold text-gray-800">
+          {t("login.btnGoogle")}
+        </span>
+        <ChevronRight className="h-4 w-4 text-gray-400 opacity-0 transition-opacity group-hover:opacity-100" />
       </button>
-      <button
-        onClick={() => authActions.signInWithLINE()}
-        className="group flex h-12 items-center justify-center gap-2.5 rounded-xl border border-[#00B900]/30 bg-[#00B900]/5 px-4 transition-all duration-200 hover:border-[#00B900]/50 hover:bg-[#00B900]/10 active:scale-[0.98]"
-      >
-        <LineProviderIcon className="h-4 w-4 text-[#4ade80]" />
-        <span className="text-sm font-semibold text-[#4ade80]">LINE</span>
-      </button>
-    </div>
 
-    <p className="mt-5 text-center text-[11px] leading-relaxed text-bpim-muted/60">
-      続行することで、
-      <Link
-        target="_blank"
-        className="underline underline-offset-2 hover:text-bpim-muted"
-        href="https://www.notion.so/BPIM2-3239989ca87a809f8058dc9736f0e197"
-      >
-        利用規約・プライバシーポリシー・データポリシー
-      </Link>
-      に同意したものとみなされます。
-    </p>
-  </div>
-);
+      <div className="my-4 flex items-center gap-3">
+        <div className="flex-1 border-t border-bpim-border" />
+        <span className="text-[11px] font-medium uppercase tracking-wider text-bpim-muted/50">
+          {t("login.or")}
+        </span>
+        <div className="flex-1 border-t border-bpim-border" />
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <button
+          onClick={() => authActions.signInWithTwitter()}
+          className="group flex h-12 items-center justify-center gap-2.5 rounded-xl border border-bpim-border bg-bpim-surface px-4 transition-all duration-200 hover:border-white/30 hover:bg-bpim-overlay active:scale-[0.98]"
+        >
+          <XProviderIcon className="h-4 w-4 text-bpim-text" />
+          <span className="text-sm font-semibold text-bpim-text">X</span>
+        </button>
+        <button
+          onClick={() => authActions.signInWithLINE()}
+          className="group flex h-12 items-center justify-center gap-2.5 rounded-xl border border-[#00B900]/30 bg-[#00B900]/5 px-4 transition-all duration-200 hover:border-[#00B900]/50 hover:bg-[#00B900]/10 active:scale-[0.98]"
+        >
+          <LineProviderIcon className="h-4 w-4 text-[#4ade80]" />
+          <span className="text-sm font-semibold text-[#4ade80]">LINE</span>
+        </button>
+      </div>
+
+      <p className="mt-5 text-center text-[11px] leading-relaxed text-bpim-muted/60">
+        {t("login.policyNote").split(t("login.policyLinkText"))[0]}
+        <Link
+          target="_blank"
+          className="underline underline-offset-2 hover:text-bpim-muted"
+          href="https://www.notion.so/BPIM2-3239989ca87a809f8058dc9736f0e197"
+        >
+          {t("login.policyLinkText")}
+        </Link>
+        {t("login.policyNote").split(t("login.policyLinkText"))[1]}
+      </p>
+    </div>
+  );
+};
 
 const BPI_SCALE_RANGE = 115;
 
@@ -227,76 +229,80 @@ const BPI_SEGMENTS = [
   ...Array.from({ length: 10 }, (_, i) => ({ from: i * 10, to: (i + 1) * 10 })),
 ];
 
-const BPI_MILESTONES = [
-  { bpi: -15, label: "", color: "#718096" },
-  { bpi: 0, label: "皆伝平均(約2699位)", color: "#63B3ED" },
-  { bpi: 50, label: "約50位", color: "#48BB78" },
-  { bpi: 100, label: "歴代全一", color: "#ff00ff" },
-];
+const BpiScaleBar = () => {
+  const { t } = useTranslation();
 
-const BPI_LANDMARKS = [
-  { bpi: "0", label: "皆伝平均", color: "#63B3ED" },
-  { bpi: "100", label: "歴代全一", color: "#ff00ff" },
-];
+  const BPI_MILESTONES = [
+    { bpi: -15, label: "", color: "#718096" },
+    { bpi: 0, label: t("login.bpi.milestone.kaiden"), color: "#63B3ED" },
+    { bpi: 50, label: t("login.bpi.milestone.top50"), color: "#48BB78" },
+    { bpi: 100, label: t("login.bpi.milestone.wr"), color: "#ff00ff" },
+  ];
 
-const BpiScaleBar = () => (
-  <div className="w-full">
-    <div className="flex h-5 w-full overflow-hidden rounded-full">
-      {BPI_SEGMENTS.map(({ from, to }, i) => {
-        const width = ((to - from) / BPI_SCALE_RANGE) * 100;
-        const midBpi = (from + to) / 2;
-        const color = from < 0 ? "#4A5568" : getBpiColorStyle(midBpi).bg;
-        return (
-          <div key={i} style={{ width: `${width}%`, backgroundColor: color }} />
-        );
-      })}
-    </div>
+  return (
+    <div className="w-full">
+      <div className="flex h-5 w-full overflow-hidden rounded-full">
+        {BPI_SEGMENTS.map(({ from, to }, i) => {
+          const width = ((to - from) / BPI_SCALE_RANGE) * 100;
+          const midBpi = (from + to) / 2;
+          const color = from < 0 ? "#4A5568" : getBpiColorStyle(midBpi).bg;
+          return (
+            <div
+              key={i}
+              style={{ width: `${width}%`, backgroundColor: color }}
+            />
+          );
+        })}
+      </div>
 
-    <div className="relative mt-2 h-9">
-      {BPI_MILESTONES.map(({ bpi, label, color }) => {
-        const leftPct = ((bpi - -15) / BPI_SCALE_RANGE) * 100;
-        const isRight = leftPct > 85;
-        const isLeft = leftPct < 15;
-        return (
-          <div
-            key={bpi}
-            className="absolute flex flex-col"
-            style={{
-              left: `${leftPct}%`,
-              transform: isRight
-                ? "translateX(-100%)"
-                : isLeft
-                  ? "translateX(0%)"
-                  : "translateX(-50%)",
-            }}
-          >
-            <span
-              className="font-mono text-[12px] font-bold leading-none"
-              style={{ color }}
+      <div className="relative mt-2 h-9">
+        {BPI_MILESTONES.map(({ bpi, label, color }) => {
+          const leftPct = ((bpi - -15) / BPI_SCALE_RANGE) * 100;
+          const isRight = leftPct > 85;
+          const isLeft = leftPct < 15;
+          return (
+            <div
+              key={bpi}
+              className="absolute flex flex-col"
+              style={{
+                left: `${leftPct}%`,
+                transform: isRight
+                  ? "translateX(-100%)"
+                  : isLeft
+                    ? "translateX(0%)"
+                    : "translateX(-50%)",
+              }}
             >
-              {bpi}
-            </span>
-            <span className="whitespace-nowrap text-[12px] text-bpim-muted">
-              {label}
-            </span>
-          </div>
-        );
-      })}
+              <span
+                className="font-mono text-[12px] font-bold leading-none"
+                style={{ color }}
+              >
+                {bpi}
+              </span>
+              <span className="whitespace-nowrap text-[12px] text-bpim-muted">
+                {label}
+              </span>
+            </div>
+          );
+        })}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const BpiCurveChart = () => {
   const c = useChartColors();
+  const { t } = useTranslation();
+
   return (
     <DashCard>
       <div className="mb-3 flex items-start justify-between">
         <div>
           <h4 className="text-xs font-bold uppercase text-bpim-muted">
-            AA (SPA) を例に
+            {t("login.bpi.desc.title")}
           </h4>
           <p className="mt-0.5 text-[10px] text-bpim-muted/60">
-            BPI と必要 EX スコアの関係（係数 1.0）
+            {t("login.bpi.desc.sub")}
           </p>
         </div>
       </div>
@@ -380,102 +386,107 @@ const BpiCurveChart = () => {
       <div className="mt-2 flex items-center gap-4 text-[10px]">
         <div className="flex items-center gap-1.5">
           <div className="h-px w-4 border-t-2 border-dashed border-bpim-muted/60" />
-          <span className="text-bpim-muted">皆伝平均 3240</span>
+          <span className="text-bpim-muted">{t("login.bpi.chart.kaiden")}</span>
         </div>
         <div className="flex items-center gap-1.5">
           <div className="h-px w-4 border-t-2 border-dashed border-bpim-warning/70" />
-          <span className="text-bpim-warning">全一 3660</span>
+          <span className="text-bpim-warning">{t("login.bpi.chart.wr")}</span>
         </div>
       </div>
 
       <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 rounded-lg bg-bpim-surface-2/60 px-3 py-2.5 text-[10px]">
         <div>
-          <span className="text-bpim-muted">BPI 0→10</span>
+          <span className="text-bpim-muted">{t("login.bpi.diff.low")}</span>
           <span className="ml-1.5 font-bold text-bpim-text">+141点</span>
         </div>
         <div className="text-bpim-muted/30">vs</div>
         <div>
-          <span className="text-bpim-muted">BPI 90→100</span>
+          <span className="text-bpim-muted">{t("login.bpi.diff.high")}</span>
           <span className="ml-1.5 font-bold text-bpim-warning">+3点</span>
         </div>
         <span className="ml-auto text-[9px] italic text-bpim-muted/50">
-          高BPIほど指数関数的に希少
+          {t("login.bpi.exponential")}
         </span>
       </div>
     </DashCard>
   );
 };
 
-const BpiExplainSection = () => (
-  <div className="flex flex-col gap-8">
-    <div className="text-center">
-      <span className="text-xs font-bold uppercase tracking-[0.2em] text-bpim-primary">
-        Visualize your skills with BPI
-      </span>
-      <h2 className="mt-2 text-2xl font-bold text-bpim-text md:text-3xl">
-        BPIで実力を可視化する
-      </h2>
-    </div>
+const BpiExplainSection = () => {
+  const { t } = useTranslation();
 
-    <BpiScaleBar />
+  const BPI_LANDMARKS = [
+    { bpi: "0", label: t("login.bpi.landmark.kaiden"), color: "#63B3ED" },
+    { bpi: "100", label: t("login.bpi.milestone.wr"), color: "#ff00ff" },
+  ];
 
-    <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-5 lg:gap-12">
-      <div className="flex flex-col gap-5 lg:col-span-2">
-        <div className="flex items-center gap-3">
-          <div className="flex shrink-0 items-center justify-center rounded-lg bg-bpim-primary/10 p-2.5 text-bpim-primary">
-            <BarChart3 className="h-5 w-5" />
-          </div>
-          <h3 className="text-lg font-bold text-bpim-text">
-            BPI (Beat Power Indicator)
-          </h3>
-        </div>
-        <p className="text-sm leading-relaxed text-bpim-muted">
-          BPIとは、 beatmania IIDX の腕前を統計的に数値化するための指標です。
-          <br />
-          <strong className="text-bpim-text">
-            BPI 0 = 皆伝平均・BPI 100 = 歴代全一
-          </strong>
-          となるよう設計されており、自分が上位プレイヤー層の中でどの水準にいるかが数値として一目で可視化されます。
-        </p>
-        <p className="text-sm leading-relaxed text-bpim-muted">
-          EXスコアと BPI の関係は非線形です。高 BPI
-          帯ではBPIを1上げるために必要なスコア増分は小さくなりますが、理論値付近を要求されるため、実際の難易度は指数関数的に増加します。
-        </p>
+  return (
+    <div className="flex flex-col gap-8">
+      <div className="text-center">
+        <span className="text-xs font-bold uppercase tracking-[0.2em] text-bpim-primary">
+          {t("login.bpi.visualize")}
+        </span>
+        <h2 className="mt-2 text-2xl font-bold text-bpim-text md:text-3xl">
+          {t("login.bpi.title")}
+        </h2>
+      </div>
 
-        <div className="grid grid-cols-2 gap-2">
-          {BPI_LANDMARKS.map(({ bpi, label, color }) => (
-            <div
-              key={bpi}
-              className="flex items-center gap-2 rounded-lg border border-bpim-border bg-bpim-surface px-3 py-2"
-            >
-              <span
-                className="shrink-0 font-mono text-sm font-bold"
-                style={{ color }}
-              >
-                {bpi}
-              </span>
-              <span className="text-[11px] leading-tight text-bpim-muted">
-                {label}
-              </span>
+      <BpiScaleBar />
+
+      <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-5 lg:gap-12">
+        <div className="flex flex-col gap-5 lg:col-span-2">
+          <div className="flex items-center gap-3">
+            <div className="flex shrink-0 items-center justify-center rounded-lg bg-bpim-primary/10 p-2.5 text-bpim-primary">
+              <BarChart3 className="h-5 w-5" />
             </div>
-          ))}
+            <h3 className="text-lg font-bold text-bpim-text">
+              BPI (Beat Power Indicator)
+            </h3>
+          </div>
+          <p className="text-sm leading-relaxed text-bpim-muted">
+            {t("login.bpi.explain.p1")}
+          </p>
+          <p className="text-sm leading-relaxed text-bpim-muted">
+            {t("login.bpi.explain.p2")}
+          </p>
+
+          <div className="grid grid-cols-2 gap-2">
+            {BPI_LANDMARKS.map(({ bpi, label, color }) => (
+              <div
+                key={bpi}
+                className="flex items-center gap-2 rounded-lg border border-bpim-border bg-bpim-surface px-3 py-2"
+              >
+                <span
+                  className="shrink-0 font-mono text-sm font-bold"
+                  style={{ color }}
+                >
+                  {bpi}
+                </span>
+                <span className="text-[11px] leading-tight text-bpim-muted">
+                  {label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="lg:col-span-3">
+          <BpiCurveChart />
         </div>
       </div>
-
-      <div className="lg:col-span-3">
-        <BpiCurveChart />
-      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const MockBpiHistoryChart = () => {
   const c = useChartColors();
+  const { t } = useTranslation();
+
   return (
     <DashCard className="h-65">
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-xs font-bold uppercase text-bpim-muted">
-          総合BPI推移
+          {t("login.showcase.growth.chartTitle")}
         </h3>
       </div>
       <div className="h-48.75">
@@ -535,52 +546,65 @@ const MockBpiHistoryChart = () => {
   );
 };
 
-const MockCurrentBpiCard = () => (
-  <DashCard>
-    <span className="text-[10px] font-bold uppercase tracking-widest text-bpim-muted">
-      総合BPI（☆12のみ）
-    </span>
-    <div className="mt-4 flex flex-row items-end gap-6">
-      <span className="font-mono text-4xl font-bold tabular-nums leading-none tracking-tighter text-bpim-text">
-        47.83
+const MockCurrentBpiCard = () => {
+  const { t } = useTranslation();
+  return (
+    <DashCard>
+      <span className="text-[10px] font-bold uppercase tracking-widest text-bpim-muted">
+        {t("login.showcase.growth.cardTitle")}
       </span>
-      <div className="flex flex-col gap-1">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-bpim-muted">
-          推定順位
+      <div className="mt-4 flex flex-row items-end gap-6">
+        <span className="font-mono text-4xl font-bold tabular-nums leading-none tracking-tighter text-bpim-text">
+          47.83
         </span>
-        <span className="text-lg font-bold text-bpim-text">
-          ~62
-          <span className="ml-1 text-xs font-normal text-bpim-muted">位</span>
+        <div className="flex flex-col gap-1">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-bpim-muted">
+            {t("login.showcase.growth.rankLabel")}
+          </span>
+          <span className="text-lg font-bold text-bpim-text">
+            ~62
+            <span className="ml-1 text-xs font-normal text-bpim-muted">
+              {t("login.showcase.growth.rankUnit")}
+            </span>
+          </span>
+        </div>
+      </div>
+      <div className="mt-4 flex items-center gap-2 rounded-lg border border-bpim-primary/30 bg-bpim-primary/5 px-3 py-2">
+        <span className="font-mono text-[10px] text-bpim-muted">
+          2025-04-01
+        </span>
+        <span className="font-mono text-sm text-bpim-muted">38.21</span>
+        <span className="ml-auto flex items-center gap-1 font-mono text-sm font-bold text-bpim-success">
+          <TrendingUp className="h-3 w-3" />
+          +9.62
         </span>
       </div>
-    </div>
-    <div className="mt-4 flex items-center gap-2 rounded-lg border border-bpim-primary/30 bg-bpim-primary/5 px-3 py-2">
-      <span className="font-mono text-[10px] text-bpim-muted">2025-04-01</span>
-      <span className="font-mono text-sm text-bpim-muted">38.21</span>
-      <span className="ml-auto flex items-center gap-1 font-mono text-sm font-bold text-bpim-success">
-        <TrendingUp className="h-3 w-3" />
-        +9.62
-      </span>
-    </div>
-  </DashCard>
-);
+    </DashCard>
+  );
+};
 
 const MockRadarChart = () => {
   const c = useChartColors();
+  const { t } = useTranslation();
+
   return (
     <DashCard>
       <div className="mb-1 flex items-center justify-between">
         <h3 className="text-xs font-bold uppercase text-bpim-muted">
-          BPIレーダー
+          {t("login.showcase.weakness.radarTitle")}
         </h3>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1">
             <div className="h-0.5 w-3 bg-bpim-primary" />
-            <span className="text-[10px] text-bpim-primary">自分</span>
+            <span className="text-[10px] text-bpim-primary">
+              {t("login.showcase.weakness.me")}
+            </span>
           </div>
           <div className="flex items-center gap-1">
             <div className="h-0.5 w-3 border-t-2 border-dashed border-bpim-warning" />
-            <span className="text-[10px] text-bpim-warning">ライバル</span>
+            <span className="text-[10px] text-bpim-warning">
+              {t("login.showcase.weakness.rival")}
+            </span>
           </div>
         </div>
       </div>
@@ -626,14 +650,16 @@ const MockRadarChart = () => {
 };
 
 const MockBpmBars = () => {
+  const { t } = useTranslation();
   const BPI_MIN = -15;
   const scaleMax = 60;
   const range = scaleMax - BPI_MIN;
+
   return (
     <DashCard>
       <style dangerouslySetInnerHTML={{ __html: CHART_ANIMS }} />
       <h3 className="mb-4 text-xs font-bold uppercase text-bpim-muted">
-        BPM帯域別BPI
+        {t("login.showcase.weakness.bpmTitle")}
       </h3>
       <div className="flex flex-col gap-2.5">
         {BPM_MOCK_DATA.map((row, i) => {
@@ -681,12 +707,14 @@ const MockBpmBars = () => {
 };
 
 const MockBpiDistribution = () => {
+  const { t } = useTranslation();
   const maxCount = Math.max(...BPI_DIST_COUNTS);
+
   return (
     <DashCard>
       <style dangerouslySetInnerHTML={{ __html: CHART_ANIMS }} />
       <h3 className="mb-4 text-xs font-bold uppercase text-bpim-muted">
-        BPI分布
+        {t("login.showcase.dist.chartTitle")}
       </h3>
       <div className="flex h-35 items-end justify-between gap-0.75 px-1">
         {BPI_DIST_MOCK.map((item, i) => {
@@ -725,118 +753,129 @@ const RIVAL_ROWS = [
   { name: "ライバルC", win: 187, draw: 18, lose: 49, total: 254 },
 ];
 
-const MockRivalBars = () => (
-  <DashCard>
-    <div className="mb-4 flex items-center justify-between">
-      <h3 className="text-xs font-bold uppercase text-bpim-muted">
-        ライバル比較
-      </h3>
-      <div className="flex items-center gap-3 text-[10px]">
-        <div className="flex items-center gap-1">
-          <div className="h-2 w-2 rounded-sm bg-bpim-primary" />
-          <span className="text-bpim-primary">WIN</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <div className="h-2 w-2 rounded-sm bg-bpim-overlay" />
-          <span className="text-bpim-muted">DRAW</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <div className="h-2 w-2 rounded-sm bg-bpim-danger" />
-          <span className="text-bpim-danger">LOSE</span>
+const MockRivalBars = () => {
+  const { t } = useTranslation();
+  return (
+    <DashCard>
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="text-xs font-bold uppercase text-bpim-muted">
+          {t("login.showcase.rivals.chartTitle")}
+        </h3>
+        <div className="flex items-center gap-3 text-[10px]">
+          <div className="flex items-center gap-1">
+            <div className="h-2 w-2 rounded-sm bg-bpim-primary" />
+            <span className="text-bpim-primary">WIN</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="h-2 w-2 rounded-sm bg-bpim-overlay" />
+            <span className="text-bpim-muted">DRAW</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="h-2 w-2 rounded-sm bg-bpim-danger" />
+            <span className="text-bpim-danger">LOSE</span>
+          </div>
         </div>
       </div>
-    </div>
-    <div className="flex flex-col gap-4">
-      {RIVAL_ROWS.map((r, idx) => {
-        const winRate = (r.win / r.total) * 100;
-        const drawRate = (r.draw / r.total) * 100;
-        const loseRate = (r.lose / r.total) * 100;
-        return (
-          <div key={idx} className="flex flex-col gap-1">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-bpim-text">{r.name}</span>
-              <span className="text-[10px] text-bpim-muted">
-                {r.total}曲比較
-              </span>
-            </div>
-            <div className="relative h-4.5 w-full overflow-hidden rounded-sm bg-bpim-surface-2/60">
-              <div className="flex h-full w-full">
-                <div
-                  className="relative h-full bg-bpim-primary"
-                  style={{ width: `${winRate}%` }}
-                >
-                  {winRate > 10 && (
-                    <div className="flex h-full items-center justify-center">
-                      <span className="text-[10px] font-bold text-white">
-                        {r.win}
-                      </span>
-                    </div>
-                  )}
-                </div>
-                <div
-                  className="relative h-full bg-bpim-overlay"
-                  style={{ width: `${drawRate}%` }}
-                />
-                <div
-                  className="relative h-full flex-1 bg-bpim-danger"
-                  style={{ width: `${loseRate}%` }}
-                >
-                  {loseRate > 10 && (
-                    <div className="flex h-full items-center justify-center">
-                      <span className="text-[10px] font-bold text-white">
-                        {r.lose}
-                      </span>
-                    </div>
-                  )}
+      <div className="flex flex-col gap-4">
+        {RIVAL_ROWS.map((r, idx) => {
+          const winRate = (r.win / r.total) * 100;
+          const drawRate = (r.draw / r.total) * 100;
+          const loseRate = (r.lose / r.total) * 100;
+          return (
+            <div key={idx} className="flex flex-col gap-1">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-bpim-text">
+                  {r.name}
+                </span>
+                <span className="text-[10px] text-bpim-muted">
+                  {r.total}
+                  {t("login.showcase.rivals.compareUnit")}
+                </span>
+              </div>
+              <div className="relative h-4.5 w-full overflow-hidden rounded-sm bg-bpim-surface-2/60">
+                <div className="flex h-full w-full">
+                  <div
+                    className="relative h-full bg-bpim-primary"
+                    style={{ width: `${winRate}%` }}
+                  >
+                    {winRate > 10 && (
+                      <div className="flex h-full items-center justify-center">
+                        <span className="text-[10px] font-bold text-white">
+                          {r.win}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <div
+                    className="relative h-full bg-bpim-overlay"
+                    style={{ width: `${drawRate}%` }}
+                  />
+                  <div
+                    className="relative h-full flex-1 bg-bpim-danger"
+                    style={{ width: `${loseRate}%` }}
+                  >
+                    {loseRate > 10 && (
+                      <div className="flex h-full items-center justify-center">
+                        <span className="text-[10px] font-bold text-white">
+                          {r.lose}
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        );
-      })}
-    </div>
-  </DashCard>
-);
+          );
+        })}
+      </div>
+    </DashCard>
+  );
+};
 
-const MockActivityCalendar = () => (
-  <DashCard>
-    <p className="mb-4 text-xs font-bold text-bpim-muted">最近の更新</p>
-    <div className="overflow-hidden">
-      <div
-        style={{
-          display: "grid",
-          gridTemplateRows: "repeat(7, 11px)",
-          gridTemplateColumns: "repeat(20, 11px)",
-          gridAutoFlow: "column",
-          gap: "3px",
-        }}
-      >
-        {ACTIVITY_MOCK.map((level, i) => (
+const MockActivityCalendar = () => {
+  const { t } = useTranslation();
+  return (
+    <DashCard>
+      <p className="mb-4 text-xs font-bold text-bpim-muted">
+        {t("login.showcase.dist.calendarTitle")}
+      </p>
+      <div className="overflow-hidden">
+        <div
+          style={{
+            display: "grid",
+            gridTemplateRows: "repeat(7, 11px)",
+            gridTemplateColumns: "repeat(20, 11px)",
+            gridAutoFlow: "column",
+            gap: "3px",
+          }}
+        >
+          {ACTIVITY_MOCK.map((level, i) => (
+            <div
+              key={i}
+              className="rounded-xs"
+              style={{
+                width: 11,
+                height: 11,
+                backgroundColor: ACTIVITY_COLORS[level],
+              }}
+            />
+          ))}
+        </div>
+      </div>
+      <div className="mt-3 flex items-center justify-end gap-1 text-[10px] text-bpim-muted">
+        <span>Less</span>
+        {[0, 1, 2, 3, 4].map((v) => (
           <div
-            key={i}
-            className="rounded-xs"
-            style={{
-              width: 11,
-              height: 11,
-              backgroundColor: ACTIVITY_COLORS[level],
-            }}
+            key={v}
+            className="h-2.5 w-2.5 rounded-xs"
+            style={{ backgroundColor: ACTIVITY_COLORS[v] }}
           />
         ))}
+        <span>More</span>
       </div>
-    </div>
-    <div className="mt-3 flex items-center justify-end gap-1 text-[10px] text-bpim-muted">
-      <span>Less</span>
-      {[0, 1, 2, 3, 4].map((v) => (
-        <div
-          key={v}
-          className="h-2.5 w-2.5 rounded-xs"
-          style={{ backgroundColor: ACTIVITY_COLORS[v] }}
-        />
-      ))}
-      <span>More</span>
-    </div>
-  </DashCard>
-);
+    </DashCard>
+  );
+};
 
 const ShowcaseSection = ({
   tag,
@@ -875,6 +914,7 @@ const ShowcaseSection = ({
 );
 
 export const ApiSection = () => {
+  const { t } = useTranslation();
   const API_DOCS_URL = "https://bpim2.apidog.io/";
 
   return (
@@ -885,19 +925,16 @@ export const ApiSection = () => {
         </div>
         <div>
           <span className="text-[10px] font-black uppercase tracking-[0.25em] text-bpim-primary/80">
-            Developer API
+            {t("login.api.tag")}
           </span>
           <h3 className="text-xl font-bold leading-tight text-bpim-text md:text-2xl">
-            APIへのフルアクセス
+            {t("login.api.title")}
           </h3>
         </div>
       </div>
 
       <p className="text-sm leading-relaxed text-bpim-muted">
-        BPIM2 はREST APIを一般公開しています。
-        <br className="hidden sm:block" />
-        自身のスコアデータはもちろん、公開設定になっているライバルの統計データなどをGoogle
-        Apps Scriptや自作ツールから自由に取得・分析することが可能です。
+        {t("login.api.desc")}
       </p>
 
       <div className="overflow-hidden rounded-lg border border-bpim-border bg-bpim-surface p-4 font-mono text-[11px] leading-relaxed shadow-inner">
@@ -910,7 +947,6 @@ export const ApiSection = () => {
             </span>
           </div>
 
-          {/* Response Body */}
           <pre className="mt-2 text-bpim-muted">
             {`[`}
             <br />
@@ -945,8 +981,7 @@ export const ApiSection = () => {
         </div>
 
         <p className="px-1 text-[10px] text-bpim-muted/60">
-          ※
-          公開設定のユーザーデータは、特別な認証なしにこのエンドポイントから直接取得可能です。
+          {t("login.api.note")}
         </p>
       </div>
 
@@ -958,7 +993,7 @@ export const ApiSection = () => {
           className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-bpim-primary bg-bpim-primary/10 px-6 py-3 text-sm font-bold text-bpim-primary transition-all hover:bg-bpim-primary hover:text-bpim-bg active:scale-[0.98] sm:w-auto"
         >
           <BookOpen className="h-4 w-4" />
-          APIリファレンス
+          {t("login.api.btn")}
           <ExternalLink className="ml-1 h-3.5 w-3.5 opacity-60" />
         </a>
       </div>
@@ -967,6 +1002,8 @@ export const ApiSection = () => {
 };
 
 export const PrivacySection = () => {
+  const { t } = useTranslation();
+
   return (
     <div className="flex flex-col gap-5 rounded-xl border border-bpim-border bg-bpim-surface-2/30 p-6 backdrop-blur-sm">
       <div className="flex items-center gap-4">
@@ -975,35 +1012,33 @@ export const PrivacySection = () => {
         </div>
         <div>
           <span className="text-[10px] font-black uppercase tracking-[0.25em] text-bpim-primary/80">
-            Privacy Control
+            {t("login.privacy.tag")}
           </span>
           <h3 className="text-xl font-bold leading-tight text-bpim-text md:text-2xl">
-            プライバシー制御
+            {t("login.privacy.title")}
           </h3>
         </div>
       </div>
 
       <p className="text-sm leading-relaxed text-bpim-muted">
-        スコアデータの公開範囲は、いつでも自由に変更可能です。
-        <br className="hidden sm:block" />
-        非公開設定にすると、ライバル検索やAPI経由の取得対象から即座に除外され、あなたのデータは保護されます。
+        {t("login.privacy.desc")}
       </p>
 
       <div className="flex flex-col gap-3">
         <div className="text-[10px] font-bold uppercase tracking-wider text-bpim-muted/70 ml-1">
-          Visibility States
+          {t("login.privacy.states")}
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
           <PrivacyStatusCard
             active={true}
-            label="公開"
-            description="ライバルから検索・閲覧が可能"
+            label={t("login.privacy.public.label")}
+            description={t("login.privacy.public.desc")}
             icon={<Globe className="h-4 w-4" />}
           />
           <PrivacyStatusCard
             active={false}
-            label="非公開"
-            description="自分のみが閲覧可能な状態"
+            label={t("login.privacy.private.label")}
+            description={t("login.privacy.private.desc")}
             icon={<LockIcon className="h-4 w-4" />}
           />
         </div>
@@ -1064,133 +1099,118 @@ export const LoginPageBody = ({
   requiredMessage,
 }: {
   requiredMessage?: string;
-} = {}) => (
-  <div className="min-h-screen bg-bpim-bg py-16 text-bpim-text">
-    <PageContainer>
-      {requiredMessage && (
-        <div className="mb-10 flex items-start gap-3 rounded-xl border border-bpim-primary/30 bg-bpim-primary/8 px-4 py-3 text-bpim-primary">
-          <LockIcon className="mt-0.5 h-4 w-4 shrink-0" />
-          <span className="text-sm font-medium">{requiredMessage}</span>
+} = {}) => {
+  const { t } = useTranslation();
+
+  return (
+    <div className="min-h-screen bg-bpim-bg py-16 text-bpim-text">
+      <PageContainer>
+        {requiredMessage && (
+          <div className="mb-10 flex items-start gap-3 rounded-xl border border-bpim-primary/30 bg-bpim-primary/8 px-4 py-3 text-bpim-primary">
+            <LockIcon className="mt-0.5 h-4 w-4 shrink-0" />
+            <span className="text-sm font-medium">{requiredMessage}</span>
+          </div>
+        )}
+        <div className="flex flex-col items-center gap-6 text-center">
+          <h1 className="bg-linear-to-br from-bpim-text to-gray-600 bg-clip-text text-6xl font-bold tracking-tighter text-transparent leading-none md:text-8xl">
+            {t("login.title")}
+          </h1>
+          <p className="max-w-2xl text-base text-bpim-muted md:text-lg">
+            {t("login.subTitle")}
+          </p>
         </div>
-      )}
-      <div className="flex flex-col items-center gap-6 text-center">
-        <h1 className="bg-linear-to-br from-bpim-text to-gray-600 bg-clip-text text-6xl font-bold tracking-tighter text-transparent leading-none md:text-8xl">
-          BPIM2
-        </h1>
-        <p className="max-w-2xl text-base text-bpim-muted md:text-lg">
-          beatmania IIDX 上級者のためのスコアマネジメントツール
-        </p>
-      </div>
 
-      <div className="my-10">
-        <LoginSection />
-      </div>
+        <div className="my-10">
+          <LoginSection />
+        </div>
 
-      <Separator className="mb-20 bg-bpim-overlay/60" />
+        <Separator className="mb-20 bg-bpim-overlay/60" />
 
-      <BpiExplainSection />
+        <BpiExplainSection />
 
-      <Separator className="my-20 bg-bpim-overlay/30" />
+        <Separator className="my-20 bg-bpim-overlay/30" />
 
-      <ShowcaseSection
-        tag="TRACK YOUR GROWTH"
-        title="成長の軌跡を辿る"
-        visual={
-          <div className="flex flex-col gap-4">
-            <MockBpiHistoryChart />
-            <MockCurrentBpiCard />
-          </div>
-        }
-      >
-        <p>
-          BPIM2では☆11・☆12全楽曲のスコア更新及び、☆12に基づく総合BPIが記録されます。
-          <br />
-          いつ・どれだけ成長したか、過去に遡って振り返ることも可能です。
-        </p>
-        <p>
-          また、総合BPIに基づき、今自分が全プレイヤーの中でどの水準にいるか、推定順位を確認することもできます。
-        </p>
-      </ShowcaseSection>
+        <ShowcaseSection
+          tag={t("login.showcase.growth.tag")}
+          title={t("login.showcase.growth.title")}
+          visual={
+            <div className="flex flex-col gap-4">
+              <MockBpiHistoryChart />
+              <MockCurrentBpiCard />
+            </div>
+          }
+        >
+          {t("login.showcase.growth.desc1")
+            .split("<br />")
+            .map((text, i) => (
+              <p key={i}>{text}</p>
+            ))}
+          <p>{t("login.showcase.growth.desc2")}</p>
+        </ShowcaseSection>
 
-      <Separator className="my-20 bg-bpim-overlay/30" />
+        <Separator className="my-20 bg-bpim-overlay/30" />
 
-      <ShowcaseSection
-        tag="ANALYZE YOUR WEAKNESS"
-        title="自分の得意分野を分析する"
-        flip
-        visual={
-          <div className="flex flex-col gap-4 md:grid md:grid-cols-2">
-            <MockRadarChart />
-            <MockBpmBars />
-          </div>
-        }
-      >
-        <p>
-          NOTES・CHORD・PEAK・CHARGE・SCRATCH・SOFLANの6属性それぞれのBPIをレーダーチャートで可視化。自分の得意・苦手な譜面傾向が明らかになります。
-        </p>
-        <p>
-          BPM帯域別のBPI分布も確認可能。高速・中速・低速・ソフランなど、ピンポイントで強化すべき領域がわかります。
-        </p>
-        <p>
-          フォロー中のライバルと得意分野のチャートを重ねて、強み・弱みを比較することもできます。
-        </p>
-      </ShowcaseSection>
+        <ShowcaseSection
+          tag={t("login.showcase.weakness.tag")}
+          title={t("login.showcase.weakness.title")}
+          flip
+          visual={
+            <div className="flex flex-col gap-4 md:grid md:grid-cols-2">
+              <MockRadarChart />
+              <MockBpmBars />
+            </div>
+          }
+        >
+          <p>{t("login.showcase.weakness.desc1")}</p>
+          <p>{t("login.showcase.weakness.desc2")}</p>
+          <p>{t("login.showcase.weakness.desc3")}</p>
+        </ShowcaseSection>
 
-      <Separator className="my-20 bg-bpim-overlay/30" />
+        <Separator className="my-20 bg-bpim-overlay/30" />
 
-      <ShowcaseSection
-        tag="SCORE DISTRIBUTION"
-        title="スコア / BPI分布"
-        visual={
-          <div className="flex flex-col gap-4 md:grid md:grid-cols-2">
-            <MockBpiDistribution />
-            <MockActivityCalendar />
-          </div>
-        }
-      >
-        <p>
-          BPIやDJランクの分布を分かりやすく視覚化します。「BPI 20〜30
-          の曲が最も多い」「0以下がまだ残っている」など、現在の実力分布が直感的にわかります。
-        </p>
-        <p>
-          プレーの活動カレンダーも記録され、日別の記録を振り返ることができます。
-        </p>
-      </ShowcaseSection>
+        <ShowcaseSection
+          tag={t("login.showcase.dist.tag")}
+          title={t("login.showcase.dist.title")}
+          visual={
+            <div className="flex flex-col gap-4 md:grid md:grid-cols-2">
+              <MockBpiDistribution />
+              <MockActivityCalendar />
+            </div>
+          }
+        >
+          <p>{t("login.showcase.dist.desc1")}</p>
+          <p>{t("login.showcase.dist.desc2")}</p>
+        </ShowcaseSection>
 
-      <Separator className="my-20 bg-bpim-overlay/30" />
+        <Separator className="my-20 bg-bpim-overlay/30" />
 
-      <ShowcaseSection
-        tag="RIVAL TRACKING"
-        title="コーナーで差をつけろ"
-        flip
-        visual={<MockRivalBars />}
-      >
-        <p>
-          実力が近いプレイヤーを見つけて、無制限にフォローすることができます。
-        </p>
-        <p>
-          フォローしたライバルから日々のスコア更新の通知を受け取って切磋琢磨できるほか、
-          スコアの比較や、追いつき・引き離しも一目で把握できます。
-        </p>
-      </ShowcaseSection>
+        <ShowcaseSection
+          tag={t("login.showcase.rivals.tag")}
+          title={t("login.showcase.rivals.title")}
+          flip
+          visual={<MockRivalBars />}
+        >
+          <p>{t("login.showcase.rivals.desc1")}</p>
+          <p>{t("login.showcase.rivals.desc2")}</p>
+        </ShowcaseSection>
 
-      <Separator className="my-20 bg-bpim-overlay/30" />
+        <Separator className="my-20 bg-bpim-overlay/30" />
 
-      <div className="grid grid-cols-1 gap-12 md:grid-cols-2">
-        <ApiSection />
-        <PrivacySection />
-      </div>
-    </PageContainer>
-  </div>
-);
+        <div className="grid grid-cols-1 gap-12 md:grid-cols-2">
+          <ApiSection />
+          <PrivacySection />
+        </div>
+      </PageContainer>
+    </div>
+  );
+};
 
 export default function LoginPage() {
+  const { t } = useTranslation();
+
   return (
     <DashboardLayout>
-      <Meta
-        title=""
-        description="beatmania IIDX 上級者のためのスコアマネジメントツール"
-      />
+      <Meta title="" description={t("login.subTitle")} />
       <LoginPageBody />
     </DashboardLayout>
   );

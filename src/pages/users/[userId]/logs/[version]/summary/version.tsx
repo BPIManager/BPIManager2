@@ -7,6 +7,7 @@ import { useUser } from "@/contexts/users/UserContext";
 import { PageLoader } from "@/components/ui/loading-spinner";
 import { useRouter } from "next/router";
 import { VersionCompareContent } from "@/components/partials/Logs/VersionCompare/ui";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export default function VersionSummaryPage() {
   const { fbUser, isLoading: isUserLoading } = useUser();
@@ -14,6 +15,7 @@ export default function VersionSummaryPage() {
   const { userId, version } = router.query;
   const isOwnProfile = fbUser?.uid === userId;
   const isInitialLoading = !router.isReady || isUserLoading;
+  const { t } = useTranslation();
 
   if (isInitialLoading) {
     return (
@@ -29,8 +31,8 @@ export default function VersionSummaryPage() {
     return (
       <DashboardLayout>
         <PageHeader
-          title={`${getVersionNameFromNumber(versionStr)}のプレイデータまとめ`}
-          description="前作との比較を表示しています"
+          title={`${getVersionNameFromNumber(versionStr)}${t("page.versionSummary.titleSuffix")}`}
+          description={t("page.versionSummary.desc")}
         />
         <PageContainer>
           <VersionCompareContent
@@ -45,8 +47,7 @@ export default function VersionSummaryPage() {
   return (
     <UserProfileLayout userId={userId as string} currentTab="logs">
       <ProfileMeta
-        title={`${getVersionNameFromNumber(versionStr)} バージョン比較`}
-        description={`$userName$さん($iidxid$)のbeatmaniaIIDX ${getVersionNameFromNumber(versionStr)}と前作のスコア比較です。`}
+        title={`${getVersionNameFromNumber(versionStr)}${t("page.versionSummary.titleSuffix")}`}
       />
       <div className="p-4">
         <VersionCompareContent

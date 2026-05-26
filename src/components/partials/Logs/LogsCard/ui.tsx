@@ -7,9 +7,11 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Calendar, ListMusic } from "lucide-react";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export const LogsCard = ({ log }: { log: UpdateLog }) => {
   const router = useRouter();
+  const { t } = useTranslation();
   const userId = router.query.userId as string;
   const groupedBy = (router.query.groupedBy as string) || "lastPlayed";
   const isPositive = log.diff >= 0;
@@ -46,7 +48,7 @@ export const LogsCard = ({ log }: { log: UpdateLog }) => {
             </div>
             <div className="flex items-center gap-2">
               <span className="font-mono text-lg font-bold text-bpim-text md:text-xl">
-                総合BPI {log.totalBpi.toFixed(2)}
+                {t("logs.totalBpiLabel")} {log.totalBpi.toFixed(2)}
               </span>
               <Badge
                 className={cn(
@@ -88,7 +90,7 @@ export const LogsCard = ({ log }: { log: UpdateLog }) => {
                 <span className="flex-1 text-xs font-bold text-bpim-text truncate leading-tight">
                   {score.title}
                 </span>
-                <div className="w-[45px] shrink-0 text-right font-mono leading-none">
+                <div className="w-11.25 shrink-0 text-right font-mono leading-none">
                   <div className="text-[8px] font-bold text-bpim-text/60 uppercase">
                     BPI
                   </div>

@@ -6,9 +6,11 @@ import { Meta } from "@/components/partials/Head";
 import { LoginRequiredCard } from "@/components/partials/LoginRequired/ui";
 import { useUser } from "@/contexts/users/UserContext";
 import { TicketsSection } from "@/components/partials/Tickets";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export default function TicketsPage() {
   const { isLoading: isUserLoading, fbUser } = useUser();
+  const { t } = useTranslation();
 
   if (isUserLoading) {
     return (
@@ -30,10 +32,10 @@ export default function TicketsPage() {
 
   return (
     <DashboardLayout>
-      <Meta title="ランダムレーンチケット当たり探索" noIndex />
+      <Meta title={t("page.tickets.title")} noIndex />
       <PageHeader
-        title="ランダムレーンチケット当たり探索"
-        description="チケット番号から当たり譜面をレコメンドします"
+        title={t("page.tickets.title")}
+        description={t("page.tickets.desc")}
       />
       <PageContainer>
         <TicketsSection />

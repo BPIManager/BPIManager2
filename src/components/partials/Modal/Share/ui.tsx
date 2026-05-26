@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface ShareModalProps {
   isOpen: boolean;
@@ -38,6 +39,7 @@ export const ShareResultModal = ({
   handleTabChange,
   elements,
 }: ShareModalProps) => {
+  const { t } = useTranslation();
   const [shareType, setShareType] = useState("summary");
 
   const handleExecute = async () => {
@@ -48,20 +50,38 @@ export const ShareResultModal = ({
           ? elements.ranking
           : elements.list;
     if (!target) return;
-    const text = `BPIM2に新しいスコアを記録しました!\n更新件数:${shareData.updateCount}件\n\n総合BPI: ${shareData.bpi.toFixed(2)} (${shareData.diff >= 0 ? "+" : ""}${shareData.diff.toFixed(2)})\n推定順位: ${shareData.rank.toLocaleString()}位 #BPIM2 #IIDX\n${window.location.href}`;
+    const text = `${t("share.tweet.header")}\n${t("share.tweet.updateCount")}${shareData.updateCount}${t("share.tweet.countUnit")}\n\n${t("share.tweet.totalBpi")} ${shareData.bpi.toFixed(2)} (${shareData.diff >= 0 ? "+" : ""}${shareData.diff.toFixed(2)})\n${t("share.tweet.estimatedRank")} ${shareData.rank.toLocaleString()}${t("share.tweet.rankUnit")} #BPIM2 #IIDX\n${window.location.href}`;
     if (await onShare(target, text)) onClose();
   };
+
+  const options = [
+    {
+      id: "summary",
+      label: t("share.option.summary.label"),
+      desc: t("share.option.summary.desc"),
+    },
+    {
+      id: "ranking",
+      label: t("share.option.ranking.label"),
+      desc: t("share.option.ranking.desc"),
+    },
+    {
+      id: "list",
+      label: t("share.option.list.label"),
+      desc: t("share.option.list.desc"),
+    },
+  ];
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-sm border-bpim-border bg-bpim-bg text-bpim-text shadow-2xl rounded-2xl">
         <DialogHeader className="border-b border-bpim-border pb-4">
-          <DialogTitle className="text-lg font-bold">画像をシェア</DialogTitle>
+          <DialogTitle className="text-lg font-bold">{t("share.title")}</DialogTitle>
         </DialogHeader>
 
         <div className="py-4 flex flex-col gap-4">
           <p className="text-[11px] leading-relaxed text-bpim-muted">
-            出力対象を選択してください。Twitter用の画像として書き出し、クリップボードにコピーまたは共有ダイアログを開きます。
+            {t("share.description")}
           </p>
 
           <RadioGroup
@@ -72,23 +92,7 @@ export const ShareResultModal = ({
             }}
             className="flex flex-col gap-4"
           >
-            {[
-              {
-                id: "summary",
-                label: "サマリー",
-                desc: "総合BPI・順位・各種分布グラフ",
-              },
-              {
-                id: "ranking",
-                label: "ランキング",
-                desc: "BPIが伸びた曲 / TOP BPIリスト",
-              },
-              {
-                id: "list",
-                label: "楽曲リスト",
-                desc: "今回更新した全楽曲のリスト",
-              },
-            ].map((opt) => (
+            {options.map((opt) => (
               <div
                 key={opt.id}
                 className="flex items-start gap-3 space-x-2 rounded-lg border border-bpim-border bg-bpim-surface-2/60 p-3 transition-colors hover:bg-bpim-overlay"
@@ -121,7 +125,7 @@ export const ShareResultModal = ({
             disabled={isSharing}
             className="flex-1 text-bpim-muted"
           >
-            キャンセル
+            {t("common.cancel")}
           </Button>
           <Button
             disabled={isSharing}
@@ -131,7 +135,7 @@ export const ShareResultModal = ({
             {isSharing ? (
               <LoadingSpinner size="sm" className="mr-2" />
             ) : null}
-            {isSharing ? "生成中..." : "シェアする"}
+            {isSharing ? t("share.processing") : t("share.share")}
           </Button>
         </DialogFooter>
       </DialogContent>

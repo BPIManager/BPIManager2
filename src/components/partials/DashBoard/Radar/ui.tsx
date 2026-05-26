@@ -9,6 +9,7 @@ import { getBpiColorStyle } from "@/constants/bpiColor";
 import { DashCard } from "@/components/ui/dashcard";
 import { cn } from "@/lib/utils";
 import { getVersionNameFromNumber } from "@/constants/versions";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface RadarSectionProps {
   userId?: string;
@@ -27,8 +28,9 @@ export const RadarSection = ({
   const effectiveRivalUserId =
     rivalUserId ?? (isCompareMode ? userId : undefined);
   const effectiveRivalVersion = rivalUserId ? version : compareVersion;
+  const { t } = useTranslation();
   const effectiveRivalName = rivalUserId
-    ? (rivalName ?? "ライバル")
+    ? (rivalName ?? t("dashboard.rival"))
     : getVersionNameFromNumber(compareVersion);
 
   const { radar, isLoading } = useRadar(userId, levels, diffs, version);
@@ -62,14 +64,14 @@ export const RadarSection = ({
     <DashCard>
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-sm font-bold text-bpim-muted uppercase">
-          BPIレーダー
+          {t("dashboard.radar.title")}
         </h3>
         {isRivalMode && (
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5">
               <div className="h-2.5 w-2.5 rounded-full bg-bpim-primary" />
               <span className="text-xs text-bpim-primary font-medium">
-                自分
+                {t("dashboard.radar.me")}
               </span>
             </div>
             <div className="flex items-center gap-1.5">

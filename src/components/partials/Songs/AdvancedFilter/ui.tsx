@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
+import { useTranslation } from "@/hooks/common/useTranslation";
 import { BpmSection } from "./BpmSection";
 import { ClearStateSection } from "./ClearStateSection";
 import { DateSection } from "./DateSection";
@@ -48,6 +49,7 @@ export const AdvancedFilterModal = ({
   params,
   onParamsChange,
 }: Props) => {
+  const { t } = useTranslation();
   const [localParams, setLocalParams] = useState<FilterParamsFrontend>(params);
 
   useEffect(() => {
@@ -68,7 +70,7 @@ export const AdvancedFilterModal = ({
       <DialogContent className="max-w-2xl border-bpim-border p-6 text-bpim-text">
         <DialogHeader>
           <DialogTitle className="text-base font-bold">
-            詳細フィルター
+            {t("filter.advancedFilter")}
           </DialogTitle>
         </DialogHeader>
 
@@ -120,14 +122,14 @@ export const AdvancedFilterModal = ({
             onClick={() => setLocalParams(EMPTY_PARAMS)}
             className="text-bpim-muted"
           >
-            リセット
+            {t("filter.reset")}
           </Button>
           <Button
             className="bg-bpim-primary font-bold hover:bg-bpim-primary"
             size="sm"
             onClick={handleApply}
           >
-            適用して閉じる
+            {t("filter.apply")}
           </Button>
         </DialogFooter>
       </DialogContent>

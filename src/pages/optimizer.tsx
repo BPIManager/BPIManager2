@@ -6,9 +6,11 @@ import { Meta } from "@/components/partials/Head";
 import { LoginRequiredCard } from "@/components/partials/LoginRequired/ui";
 import { useUser } from "@/contexts/users/UserContext";
 import { BpiOptimizerSection } from "@/components/partials/Analytics/BpiOptimizer";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export default function BpiOptimizerPage() {
   const { isLoading: isUserLoading, fbUser } = useUser();
+  const { t } = useTranslation();
 
   if (isUserLoading) {
     return (
@@ -30,11 +32,11 @@ export default function BpiOptimizerPage() {
 
   return (
     <DashboardLayout>
-      <Meta title="総合BPIを伸ばす" noIndex />
+      <Meta title={t("page.optimizer.title")} noIndex />
 
       <PageHeader
-        title="総合BPIを伸ばす"
-        description="目標総合BPIに到達するためのトレーニングセットを見つける"
+        title={t("page.optimizer.title")}
+        description={t("page.optimizer.desc")}
       />
 
       <PageContainer>

@@ -1,5 +1,6 @@
 ﻿import { AlertCircle, RefreshCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface LogErrorStateProps {
   error: { status?: number; info?: { message?: string }; message?: string } | null | undefined;
@@ -7,9 +8,10 @@ interface LogErrorStateProps {
 }
 
 export const LogErrorState = ({ error, onRetry }: LogErrorStateProps) => {
+  const { t } = useTranslation();
   const status = error?.status;
   const message =
-    error?.info?.message || error?.message || "通信エラーが発生しました";
+    error?.info?.message || error?.message || t("logs.detail.error.defaultMessage");
 
   const errorDetail =
     typeof error === "object" ? JSON.stringify(error, null, 2) : String(error);
@@ -23,7 +25,7 @@ export const LogErrorState = ({ error, onRetry }: LogErrorStateProps) => {
 
         <div className="flex flex-col items-center gap-2">
           <h2 className="text-xl font-bold text-bpim-text">
-            データの取得に失敗しました
+            {t("logs.detail.error.title")}
           </h2>
           <p className="max-w-[400px] text-sm text-bpim-muted">{message}</p>
 
@@ -53,7 +55,7 @@ export const LogErrorState = ({ error, onRetry }: LogErrorStateProps) => {
             size={14}
             className="transition-transform group-hover:rotate-180 duration-500"
           />
-          再試行する
+          {t("logs.detail.error.retry")}
         </Button>
       </div>
     </div>

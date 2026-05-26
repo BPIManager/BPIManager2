@@ -22,6 +22,7 @@ import {
   CartesianGrid,
   ReferenceLine,
 } from "recharts";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface Props {
   data: IidxTowerEntry[];
@@ -30,13 +31,6 @@ interface Props {
 }
 
 const fmt = (n: number) => n.toLocaleString("ja-JP");
-
-const PERIODS = [
-  { label: "7日", days: 7 },
-  { label: "30日", days: 30 },
-  { label: "90日", days: 90 },
-  { label: "全期間", days: 0 },
-] as const;
 
 const getIntensityStyle = (value: number, max: number, type: "key" | "scr") => {
   if (max === 0) return {};
@@ -54,8 +48,16 @@ export const IidxTowerCard = ({
   showImportAlert = true,
   defaultPeriod = 30,
 }: Props) => {
+  const { t } = useTranslation();
   const [periodDays, setPeriodDays] = useState<number>(defaultPeriod);
   const [isExpanded, setIsExpanded] = useState(false);
+
+  const PERIODS = [
+    { label: t("dashboard.iidxTower.period7"), days: 7 },
+    { label: t("dashboard.iidxTower.period30"), days: 30 },
+    { label: t("dashboard.iidxTower.period90"), days: 90 },
+    { label: t("dashboard.iidxTower.periodAll"), days: 0 },
+  ] as const;
 
   const processedData = useMemo(() => {
     if (!data || data.length === 0) return null;
@@ -119,12 +121,10 @@ export const IidxTowerCard = ({
             <LordiconAnimation src="/lottie/ghost.json" trigger="loop" size={36} />
           </div>
           <h3 className="text-base font-black tracking-tight text-bpim-text">
-            IIDXタワーのデータがありません
+            {t("dashboard.iidxTower.noData")}
           </h3>
           <p className="mt-2 max-w-full text-xs leading-relaxed text-bpim-muted">
-            データをインポートすると、鍵盤・スクラッチの打鍵数推移を確認できます。
-            <br />
-            他のユーザーと鍵盤をシバいた数のランキング表示も可能です。
+            {t("dashboard.iidxTower.noDataDesc")}
           </p>
           {showImportAlert && (
             <Link
@@ -132,7 +132,7 @@ export const IidxTowerCard = ({
               className="mt-5 flex items-center gap-2 rounded-lg bg-bpim-primary/10 px-2 py-2 text-xs font-bold text-bpim-primary transition-all hover:bg-bpim-primary/20"
             >
               <Import className="h-4 w-4" />
-              インポート
+              {t("dashboard.iidxTower.import")}
             </Link>
           )}
         </div>
@@ -180,23 +180,26 @@ export const IidxTowerCard = ({
           </div>
         </div>
         <div className="text-right">
-          <p className="text-[9px] uppercase text-bpim-subtle">期間累計</p>
+          <p className="text-[9px] uppercase text-bpim-subtle">{t("dashboard.iidxTower.periodTotal")}</p>
           <p className="text-sm font-bold text-bpim-text">{fmt(totalCount)}</p>
         </div>
       </div>
     </div>
   );
 
+  const scratchLabel = t("dashboard.iidxTower.scratch");
+  const keyLabel = t("dashboard.iidxTower.key");
+
   return (
     <DashCard>
       <div className="mb-4 flex items-start justify-between">
         <p className="mt-1 text-[10px] font-bold text-bpim-muted">
-          最終プレー: {dayjs(latest.playDate).format("YYYY/MM/DD")}
+          {t("dashboard.iidxTower.lastPlayed")}: {dayjs(latest.playDate).format("YYYY/MM/DD")}
         </p>
         <div className="flex gap-1">
           {PERIODS.map((p) => (
             <button
-              key={p.label}
+              key={p.days}
               onClick={() => setPeriodDays(p.days)}
               className={`rounded px-2 py-1 text-[10px] font-bold transition-colors ${
                 periodDays === p.days
@@ -213,7 +216,7 @@ export const IidxTowerCard = ({
       <div className="mb-6 grid grid-cols-2 gap-4 divide-x divide-bpim-border">
         <div className="pr-2">
           <StatHeader
-            title="鍵盤"
+            title={keyLabel}
             latestCount={latest.keyCount}
             rank={keyRanks.get(latest.playDate) || 0}
             totalCount={totals.key}
@@ -222,7 +225,7 @@ export const IidxTowerCard = ({
         </div>
         <div className="pl-4">
           <StatHeader
-            title="スクラッチ"
+            title={scratchLabel}
             latestCount={latest.scratchCount}
             rank={scrRanks.get(latest.playDate) || 0}
             totalCount={totals.scratch}
@@ -289,7 +292,7 @@ export const IidxTowerCard = ({
                 }}
                 formatter={(v: any, name: any, props: any) => {
                   const nameStr = String(name);
-                  if (nameStr === "スクラッチ") {
+                  if (nameStr === scratchLabel) {
                     return [
                       <span key="v" className="tabular-nums font-bold">
                         {fmt(props.payload.rawScr)}
@@ -308,7 +311,7 @@ export const IidxTowerCard = ({
               />
               <Bar
                 dataKey="key"
-                name="鍵盤"
+                name={keyLabel}
                 stackId="a"
                 fill="var(--color-bpim-primary)"
                 radius={[2, 2, 0, 0]}
@@ -316,7 +319,7 @@ export const IidxTowerCard = ({
               />
               <Bar
                 dataKey="scr"
-                name="スクラッチ"
+                name={scratchLabel}
                 stackId="a"
                 fill="var(--color-bpim-warning)"
                 radius={[0, 0, 2, 2]}
@@ -332,7 +335,7 @@ export const IidxTowerCard = ({
           onClick={() => setIsExpanded(!isExpanded)}
           className="flex items-center gap-1 rounded-full bg-bpim-surface-3 px-3 py-1 text-[10px] text-bpim-text transition-all hover:brightness-110"
         >
-          {isExpanded ? "詳細を隠す" : "日別ランキングを表示"}
+          {isExpanded ? t("dashboard.iidxTower.hideDetail") : t("dashboard.iidxTower.showRanking")}
           {isExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
         </button>
       </div>
@@ -342,12 +345,12 @@ export const IidxTowerCard = ({
           <table className="w-full text-left text-[11px]">
             <thead className="bg-bpim-surface-3 text-[9px] uppercase text-bpim-subtle">
               <tr>
-                <th className="px-3 py-2 font-medium">日付</th>
+                <th className="px-3 py-2 font-medium">{t("dashboard.iidxTower.date")}</th>
                 <th className="px-3 py-2 text-right font-medium">
-                  鍵盤 (順位)
+                  {t("dashboard.iidxTower.keyRank")}
                 </th>
                 <th className="px-3 py-2 text-right font-medium">
-                  スクラッチ (順位)
+                  {t("dashboard.iidxTower.scratchRank")}
                 </th>
               </tr>
             </thead>
@@ -404,14 +407,14 @@ export const IidxTowerCard = ({
             className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-bpim-surface-2 px-3 py-2 text-[11px] font-bold text-bpim-text transition-all hover:brightness-110"
           >
             <BarChart2 size={13} />
-            ランキングを見る
+            {t("dashboard.iidxTower.viewRanking")}
           </Link>
           <Link
             href="/import?tab=tower"
             className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-bpim-surface-2 px-3 py-2 text-[11px] font-bold text-bpim-text transition-all hover:brightness-110"
           >
             <Download size={13} />
-            データをインポート
+            {t("dashboard.iidxTower.importData")}
           </Link>
         </div>
       )}

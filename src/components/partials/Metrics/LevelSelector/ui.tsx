@@ -15,12 +15,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { X, Plus } from "lucide-react";
 import type { DisplayMetric } from "@/components/partials/Metrics/ArenaAverage/ui";
 import { A_RANKS } from "@/constants/arenaRanks";
-
-const METRICS = [
-  { label: "スコア", value: "score" },
-  { label: "スコアレート", value: "scoreRate" },
-  { label: "DJRANK", value: "djrank" },
-] as const;
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 const DJRANK_OPTIONS = [
   "MAX-",
@@ -60,12 +55,6 @@ interface ArenaAverageFilterProps {
   onDisplayMetricChange?: (metric: DisplayMetric) => void;
 }
 
-const DISPLAY_METRICS = [
-  { value: "exScore", label: "EXスコア" },
-  { value: "rate", label: "スコアレート" },
-  { value: "bpi", label: "BPI" },
-] as const;
-
 export const ArenaAverageFilter = ({
   version,
   onVersionChange,
@@ -80,6 +69,14 @@ export const ArenaAverageFilter = ({
   displayMetric,
   onDisplayMetricChange,
 }: ArenaAverageFilterProps) => {
+  const { t } = useTranslation();
+
+  const DISPLAY_METRICS = [
+    { value: "exScore", label: t("arenaAvg.metric.exScore") },
+    { value: "rate", label: t("arenaAvg.metric.scoreRate") },
+    { value: "bpi", label: "BPI" },
+  ] as const;
+
   const toggleDifficulty = (diff: string) => {
     const next = new Set(selectedDifficulties);
     if (next.has(diff)) {
@@ -123,7 +120,7 @@ export const ArenaAverageFilter = ({
             </span>
             <Select value={version} onValueChange={onVersionChange}>
               <SelectTrigger className="h-9 border-bpim-border bg-bpim-surface-2/60 text-xs text-bpim-text focus:ring-blue-500">
-                <SelectValue placeholder="バージョンを選択" />
+                <SelectValue placeholder={t("logs.versionPlaceholder")} />
               </SelectTrigger>
               <SelectContent className="border-bpim-border bg-bpim-bg">
                 {versionsNonDisabledCollection.map((v) => (
@@ -188,12 +185,12 @@ export const ArenaAverageFilter = ({
 
           <div className="flex flex-col gap-2">
             <span className="text-[10px] font-black tracking-widest text-bpim-muted uppercase px-1">
-              楽曲名
+              {t("arenaAvg.filter.songName")}
             </span>
             <Input
               value={nameSearch}
               onChange={(e) => onNameSearchChange(e.target.value)}
-              placeholder="検索..."
+              placeholder={t("arenaAvg.filter.search")}
               className="h-9 border-bpim-border bg-bpim-surface-2/60 text-xs text-bpim-text placeholder:text-bpim-muted"
             />
           </div>
@@ -202,14 +199,14 @@ export const ArenaAverageFilter = ({
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-3 px-1">
             <span className="text-[10px] font-black tracking-widest text-bpim-muted uppercase">
-              フィルタ
+              {t("arenaAvg.filter.label")}
             </span>
             <button
               onClick={addFilter}
               className="flex items-center gap-1 text-[10px] font-bold text-bpim-primary hover:text-bpim-primary/70 transition-colors"
             >
               <Plus className="h-3 w-3" />
-              追加
+              {t("filter.scoreConditionAdd")}
             </button>
           </div>
 
@@ -231,7 +228,7 @@ export const ArenaAverageFilter = ({
           <div className="border-t border-bpim-border pt-3">
             <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
               <span className="text-[10px] font-black tracking-widest text-bpim-muted uppercase px-1 shrink-0">
-                表示
+                {t("arenaAvg.filter.display")}
               </span>
               <RadioGroup
                 value={displayMetric}
@@ -270,92 +267,100 @@ const DetailFilterRow = ({
   filter: DetailFilter;
   onChange: (updates: Partial<DetailFilter>) => void;
   onRemove: () => void;
-}) => (
-  <div className="flex flex-wrap items-center gap-2">
-    <Select value={filter.rank} onValueChange={(v) => onChange({ rank: v })}>
-      <SelectTrigger className="h-8 w-18 border-bpim-border bg-bpim-surface-2/60 text-xs text-bpim-text">
-        <SelectValue />
-      </SelectTrigger>
-      <SelectContent className="border-bpim-border bg-bpim-bg">
-        {A_RANKS.map((r) => (
-          <SelectItem key={r} value={r} className="text-xs">
-            {r}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-
-    <span className="text-xs text-bpim-muted">の</span>
-
-    <Select
-      value={filter.metric}
-      onValueChange={(v) =>
-        onChange({ metric: v as DetailFilterMetric, value: "" })
-      }
-    >
-      <SelectTrigger className="h-8 w-28 border-bpim-border bg-bpim-surface-2/60 text-xs text-bpim-text">
-        <SelectValue />
-      </SelectTrigger>
-      <SelectContent className="border-bpim-border bg-bpim-bg">
-        {METRICS.map((m) => (
-          <SelectItem key={m.value} value={m.value} className="text-xs">
-            {m.label}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-
-    <span className="text-xs text-bpim-muted">が</span>
-
-    {filter.metric === "djrank" ? (
-      <Select
-        value={filter.value}
-        onValueChange={(v) => onChange({ value: v })}
-      >
-        <SelectTrigger className="h-8 w-20 border-bpim-border bg-bpim-surface-2/60 text-xs text-bpim-text">
-          <SelectValue placeholder="ランク" />
+}) => {
+  const { t } = useTranslation();
+  const METRICS = [
+    { label: t("arenaAvg.metric.score"), value: "score" },
+    { label: t("arenaAvg.metric.scoreRate"), value: "scoreRate" },
+    { label: "DJRANK", value: "djrank" },
+  ];
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <Select value={filter.rank} onValueChange={(v) => onChange({ rank: v })}>
+        <SelectTrigger className="h-8 w-18 border-bpim-border bg-bpim-surface-2/60 text-xs text-bpim-text">
+          <SelectValue />
         </SelectTrigger>
         <SelectContent className="border-bpim-border bg-bpim-bg">
-          {DJRANK_OPTIONS.map((r) => (
+          {A_RANKS.map((r) => (
             <SelectItem key={r} value={r} className="text-xs">
               {r}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
-    ) : (
-      <Input
-        value={filter.value}
-        onChange={(e) => onChange({ value: e.target.value })}
-        placeholder={filter.metric === "score" ? "スコア" : "0-100"}
-        className="h-8 w-24 border-bpim-border bg-bpim-surface-2/60 text-xs text-bpim-text placeholder:text-bpim-muted"
-        type="number"
-        min={0}
-      />
-    )}
 
-    <Select
-      value={filter.operator}
-      onValueChange={(v) => onChange({ operator: v as DetailFilterOperator })}
-    >
-      <SelectTrigger className="h-8 w-16 border-bpim-border bg-bpim-surface-2/60 text-xs text-bpim-text">
-        <SelectValue />
-      </SelectTrigger>
-      <SelectContent className="border-bpim-border bg-bpim-bg">
-        <SelectItem value=">=" className="text-xs">
-          以上
-        </SelectItem>
-        <SelectItem value="<=" className="text-xs">
-          以下
-        </SelectItem>
-      </SelectContent>
-    </Select>
+      <span className="text-xs text-bpim-muted">{t("arenaAvg.filter.rankOf")}</span>
 
-    <button
-      onClick={onRemove}
-      className="text-bpim-muted hover:text-red-400 transition-colors"
-    >
-      <X className="h-4 w-4" />
-    </button>
-  </div>
-);
+      <Select
+        value={filter.metric}
+        onValueChange={(v) =>
+          onChange({ metric: v as DetailFilterMetric, value: "" })
+        }
+      >
+        <SelectTrigger className="h-8 w-28 border-bpim-border bg-bpim-surface-2/60 text-xs text-bpim-text">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent className="border-bpim-border bg-bpim-bg">
+          {METRICS.map((m) => (
+            <SelectItem key={m.value} value={m.value} className="text-xs">
+              {m.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <span className="text-xs text-bpim-muted">{t("filter.scoreConditionParticle")}</span>
+
+      {filter.metric === "djrank" ? (
+        <Select
+          value={filter.value}
+          onValueChange={(v) => onChange({ value: v })}
+        >
+          <SelectTrigger className="h-8 w-20 border-bpim-border bg-bpim-surface-2/60 text-xs text-bpim-text">
+            <SelectValue placeholder={t("arenaAvg.filter.rankPlaceholder")} />
+          </SelectTrigger>
+          <SelectContent className="border-bpim-border bg-bpim-bg">
+            {DJRANK_OPTIONS.map((r) => (
+              <SelectItem key={r} value={r} className="text-xs">
+                {r}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      ) : (
+        <Input
+          value={filter.value}
+          onChange={(e) => onChange({ value: e.target.value })}
+          placeholder={filter.metric === "score" ? t("arenaAvg.filter.scorePlaceholder") : "0-100"}
+          className="h-8 w-24 border-bpim-border bg-bpim-surface-2/60 text-xs text-bpim-text placeholder:text-bpim-muted"
+          type="number"
+          min={0}
+        />
+      )}
+
+      <Select
+        value={filter.operator}
+        onValueChange={(v) => onChange({ operator: v as DetailFilterOperator })}
+      >
+        <SelectTrigger className="h-8 w-16 border-bpim-border bg-bpim-surface-2/60 text-xs text-bpim-text">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent className="border-bpim-border bg-bpim-bg">
+          <SelectItem value=">=" className="text-xs">
+            {t("filter.orMore")}
+          </SelectItem>
+          <SelectItem value="<=" className="text-xs">
+            {t("filter.orLess")}
+          </SelectItem>
+        </SelectContent>
+      </Select>
+
+      <button
+        onClick={onRemove}
+        className="text-bpim-muted hover:text-red-400 transition-colors"
+      >
+        <X className="h-4 w-4" />
+      </button>
+    </div>
+  );
+};

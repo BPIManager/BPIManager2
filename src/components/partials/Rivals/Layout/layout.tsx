@@ -17,6 +17,7 @@ import { FilterProvider } from "@/contexts/stats/FilterContext";
 import { LayoutDashboard, Music } from "lucide-react";
 import { PageLoader } from "@/components/ui/loading-spinner";
 import { AppTabsList, AppTabsTrigger } from "@/components/ui/complex/tabs";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export const RivalProfileLayout = ({
   rivalUserId,
@@ -29,6 +30,7 @@ export const RivalProfileLayout = ({
 }) => {
   const router = useRouter();
   const { user } = useUser();
+  const { t } = useTranslation();
   const {
     profile,
     isLoading,
@@ -98,7 +100,7 @@ export const RivalProfileLayout = ({
                       href={`/rivals/${rivalUserId}`}
                       iconOnly
                     >
-                      サマリ
+                      {t("page.rival.tabOverview")}
                     </AppTabsTrigger>
                     <AppTabsTrigger
                       value="scores"
@@ -107,7 +109,7 @@ export const RivalProfileLayout = ({
                       href={`/rivals/${rivalUserId}/scores/${version}?${scoreParams}`}
                       iconOnly
                     >
-                      スコア比較
+                      {t("page.rival.tabScores")}
                     </AppTabsTrigger>
                   </AppTabsList>
                   {children}

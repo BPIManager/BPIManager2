@@ -14,8 +14,10 @@ import {
   AreaDistributionTable,
 } from "@/components/partials/Info";
 import { useSiteStats } from "@/hooks/siteStats/useSiteStats";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 function UpdateNotice({ generatedAt }: { generatedAt?: string }) {
+  const { t } = useTranslation();
   const formatted = generatedAt
     ? new Date(generatedAt).toLocaleString("ja-JP", {
         timeZone: "Asia/Tokyo",
@@ -31,8 +33,8 @@ function UpdateNotice({ generatedAt }: { generatedAt?: string }) {
     <div className="flex items-center gap-2 rounded-lg border border-bpim-border bg-bpim-surface px-3 py-2 text-xs text-bpim-muted">
       <Clock size={12} className="shrink-0" />
       <span>
-        前日までのデータが毎日 01:00 (JST) に更新されます。
-        {formatted && <>最終更新: {formatted}</>}
+        {t("page.stats.updateNote")}
+        {formatted && <>{formatted}</>}
       </span>
     </div>
   );
@@ -40,11 +42,12 @@ function UpdateNotice({ generatedAt }: { generatedAt?: string }) {
 
 export default function SiteStatsPage() {
   const { data, isLoading } = useSiteStats();
+  const { t } = useTranslation();
 
   return (
     <DashboardLayout>
-      <Meta title="統計情報" description="BPIM2のサービス利用統計情報" />
-      <PageHeader title="統計情報" description="BPIM2の利用統計です" />
+      <Meta title={t("page.stats.title")} description={t("page.stats.metaDesc")} />
+      <PageHeader title={t("page.stats.title")} description={t("page.stats.desc")} />
       <PageContainer>
         {isLoading || !data ? (
           <div className="flex flex-col gap-4">
@@ -66,19 +69,19 @@ export default function SiteStatsPage() {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <SummaryCard
-                label="登録ユーザー数"
+                label={t("page.stats.registeredUsers")}
                 total={data.summary.totalUsers}
                 today={data.summary.newUsersToday}
                 color="text-bpim-success"
               />
               <SummaryCard
-                label="CSV読み込み回数"
+                label={t("page.stats.csvImports")}
                 total={data.summary.totalLogs}
                 today={data.summary.newLogsToday}
                 color="text-bpim-primary"
               />
               <SummaryCard
-                label="登録スコア"
+                label={t("page.stats.registeredScores")}
                 total={data.summary.totalAllScores}
                 today={data.summary.newAllScoresToday}
                 color="text-bpim-warning"
@@ -97,11 +100,11 @@ export default function SiteStatsPage() {
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
               <SongPopulationTable
                 order="top"
-                title="楽曲別プレイ人口 TOP (☆12)"
+                title={t("page.stats.topPlayed")}
               />
               <SongPopulationTable
                 order="bottom"
-                title="楽曲別プレイ人口 ワースト (☆12)"
+                title={t("page.stats.leastPlayed")}
               />
             </div>
 

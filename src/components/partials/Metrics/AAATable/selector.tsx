@@ -18,6 +18,7 @@ import { Loader, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CustomGoalModal } from "./CustomGoalModal";
 import { CustomGoalConfig, GoalType, CardDisplay } from "@/types/metrics/aaa";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface Props {
   version: string;
@@ -60,6 +61,7 @@ export const AAATableFilter = ({
   cardDisplay,
   onCardDisplayChange,
 }: Props) => {
+  const { t } = useTranslation();
   const [modalOpen, setModalOpen] = useState(false);
   const [draftDiff, setDraftDiff] = useState<string>(
     maxDiffFilter !== undefined ? String(maxDiffFilter) : "",
@@ -77,7 +79,8 @@ export const AAATableFilter = ({
   }, [draftDiff]); // eslint-disable-line react-hooks/exhaustive-deps
   const sections = [
     {
-      label: "バージョン",
+      id: "version",
+      label: t("aaa.filter.version"),
       className: "min-w-[160px]",
       render: () => (
         <Select value={version} onValueChange={onVersionChange}>
@@ -95,7 +98,8 @@ export const AAATableFilter = ({
       ),
     },
     {
-      label: "レベル",
+      id: "level",
+      label: t("aaa.filter.level"),
       render: () => (
         <RadioGroup
           value={level.toString()}
@@ -121,7 +125,8 @@ export const AAATableFilter = ({
       ),
     },
     {
-      label: "目標",
+      id: "goal",
+      label: t("aaa.filter.goal"),
       render: () => {
         const customLabel = (() => {
           if (!customGoal) return null;
@@ -149,7 +154,7 @@ export const AAATableFilter = ({
               {[
                 { id: "aaa", label: "AAA" },
                 { id: "maxMinus", label: "MAX-" },
-                { id: "custom", label: "カスタム" },
+                { id: "custom", label: t("aaa.filter.goal.custom") },
               ].map((g) => (
                 <div key={g.id} className="flex items-center gap-1.5">
                   <RadioGroupItem
@@ -178,7 +183,7 @@ export const AAATableFilter = ({
                 className="ml-2 flex shrink-0 items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-bold text-bpim-muted border border-bpim-border hover:border-bpim-primary hover:text-bpim-text transition-colors whitespace-nowrap"
               >
                 <Pencil className="h-2.5 w-2.5" />
-                編集
+                {t("common.edit")}
               </button>
             )}
             <CustomGoalModal
@@ -192,7 +197,8 @@ export const AAATableFilter = ({
       },
     },
     {
-      label: "並び替え基準",
+      id: "grouping",
+      label: t("aaa.filter.grouping"),
       render: () => (
         <RadioGroup
           value={groupingMode}
@@ -200,8 +206,8 @@ export const AAATableFilter = ({
           className="flex h-8 items-center gap-4"
         >
           {[
-            { id: "target", label: "目標" },
-            { id: "self", label: "マイスコア" },
+            { id: "target", label: t("aaa.filter.grouping.target") },
+            { id: "self", label: t("aaa.filter.grouping.myScore") },
           ].map((m) => (
             <div key={m.id} className="flex items-center gap-1.5">
               <RadioGroupItem
@@ -221,7 +227,8 @@ export const AAATableFilter = ({
       ),
     },
     {
-      label: "達成状況",
+      id: "achievement",
+      label: t("aaa.filter.achievement"),
       render: () => (
         <div className="flex h-8 items-center gap-4">
           {[
@@ -257,7 +264,8 @@ export const AAATableFilter = ({
       ),
     },
     {
-      label: "目標まであと",
+      id: "distToGoal",
+      label: t("aaa.filter.distToGoal"),
       render: () => (
         <div className="flex h-8 items-center gap-1.5">
           <div className="relative">
@@ -273,12 +281,13 @@ export const AAATableFilter = ({
               <Loader className="absolute right-1.5 top-1/2 h-3 w-3 -translate-y-1/2 animate-spin text-bpim-muted" />
             )}
           </div>
-          <span className="text-xs font-bold text-bpim-muted">点以内</span>
+          <span className="text-xs font-bold text-bpim-muted">{t("aaa.filter.distToGoal.unit")}</span>
         </div>
       ),
     },
     {
-      label: "カード表示",
+      id: "cardDisplay",
+      label: t("aaa.filter.cardDisplay"),
       render: () => (
         <RadioGroup
           value={cardDisplay}
@@ -287,7 +296,7 @@ export const AAATableFilter = ({
         >
           {[
             { id: "bpi", label: "BPI" },
-            { id: "exScore", label: "EXスコア" },
+            { id: "exScore", label: t("sort.exScore") },
           ].map((m) => (
             <div key={m.id} className="flex items-center gap-1.5">
               <RadioGroupItem
@@ -308,12 +317,12 @@ export const AAATableFilter = ({
     },
   ];
 
-  const renderSection = (label: string) => {
-    const section = sections.find((s) => s.label === label)!;
+  const renderSection = (id: string) => {
+    const section = sections.find((s) => s.id === id)!;
     return (
-      <div key={label} className={cn("flex flex-col gap-2", section.className)}>
+      <div key={id} className={cn("flex flex-col gap-2", section.className)}>
         <span className="px-1 text-[10px] font-black tracking-widest text-bpim-muted uppercase">
-          {label}
+          {section.label}
         </span>
         <div className="flex items-center">{section.render()}</div>
       </div>
@@ -326,17 +335,17 @@ export const AAATableFilter = ({
     <div className="rounded-xl border border-bpim-border bg-bpim-bg/40 p-4 shadow-sm backdrop-blur-md">
       <div className="flex flex-col gap-4 md:hidden">
         <div className={row}>
-          {renderSection("バージョン")}
-          {renderSection("レベル")}
+          {renderSection("version")}
+          {renderSection("level")}
         </div>
-        <div>{renderSection("目標")}</div>
+        <div>{renderSection("goal")}</div>
         <div className={row}>
-          {renderSection("並び替え基準")}
-          {renderSection("達成状況")}
+          {renderSection("grouping")}
+          {renderSection("achievement")}
         </div>
         <div className={row}>
-          {renderSection("目標まであと")}
-          {renderSection("カード表示")}
+          {renderSection("distToGoal")}
+          {renderSection("cardDisplay")}
         </div>
       </div>
       <div className="hidden md:flex md:flex-wrap md:items-start md:gap-x-10 md:gap-y-6">

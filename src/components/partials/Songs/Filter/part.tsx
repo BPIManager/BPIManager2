@@ -9,16 +9,18 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { useDebouncedSearch } from "@/hooks/common/useDebouncedSearch";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export const FilterSearchInput = ({
   value,
   onChange,
-  placeholder = "曲名で検索...",
+  placeholder,
 }: {
   value: string;
   onChange: (val: string) => void;
   placeholder?: string;
 }) => {
+  const { t } = useTranslation();
   const { localSearch, setLocalSearch, isTyping } = useDebouncedSearch(
     value,
     onChange,
@@ -30,7 +32,7 @@ export const FilterSearchInput = ({
         <Search size={16} />
       </div>
       <Input
-        placeholder={placeholder}
+        placeholder={placeholder ?? t("filter.searchPlaceholder")}
         className="h-9 pl-10 pr-10 border-bpim-border bg-bpim-surface-2/60 text-[16px] md:text-xs placeholder:text-xs focus-visible:ring-gray-500"
         value={localSearch}
         onChange={(e) => setLocalSearch(e.target.value)}
@@ -116,6 +118,7 @@ export const FilterBarContainer = ({
   totalCount: number;
   children: ReactNode;
 }) => {
+  const { t } = useTranslation();
   const [isSticky, setIsSticky] = useState(true);
   return (
     <div
@@ -127,7 +130,7 @@ export const FilterBarContainer = ({
       {children}
       <div className="flex items-center justify-between h-6 mt-2">
         <span className="text-xs font-bold text-bpim-text leading-none">
-          {totalCount.toLocaleString()}曲
+          {totalCount.toLocaleString()}{t("filter.songUnit")}
         </span>
         <FilterStickyToggle isSticky={isSticky} onToggle={setIsSticky} />
       </div>

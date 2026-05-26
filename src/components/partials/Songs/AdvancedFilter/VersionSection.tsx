@@ -6,15 +6,18 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SectionTitle } from "./SectionTitle";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface Props {
   versions: number[] | undefined;
   onChange: (val: Partial<FilterParamsFrontend>) => void;
 }
 
-export const VersionSection = ({ versions, onChange }: Props) => (
+export const VersionSection = ({ versions, onChange }: Props) => {
+  const { t } = useTranslation();
+  return (
   <section className="flex flex-col gap-3">
-    <SectionTitle>楽曲バージョン</SectionTitle>
+    <SectionTitle>{t("filter.songVersion")}</SectionTitle>
     <ScrollArea className="h-50 w-full pr-4">
       <div className="grid grid-cols-2 gap-2">
         {verNameArr.map((name, index) => {
@@ -42,4 +45,5 @@ export const VersionSection = ({ versions, onChange }: Props) => (
       </div>
     </ScrollArea>
   </section>
-);
+  );
+};

@@ -19,6 +19,7 @@ import { LogFilterSection } from "@/components/partials/Logs/VersionSelector/ui"
 import { TabsContent } from "@/components/ui/tabs";
 import { useState } from "react";
 import { BpiBoxStatsSection } from "@/components/partials/DashBoard/BpiBoxStats";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface UserPageProps {
   defaultView?: "overview" | "songs" | "logs";
@@ -31,17 +32,18 @@ export default function UserPage({ defaultView = "overview" }: UserPageProps) {
   const groupedBy = (router.query.groupedBy as string) || "lastPlayed";
   const granularity = (router.query.granularity as string) || "day";
   const [_nodata, setNodata] = useState<boolean>(false);
+  const { t } = useTranslation();
 
   if (!userId) return null;
 
   return (
     <UserProfileLayout userId={userId} currentTab={defaultView}>
       <ProfileMeta
-        title={defaultView === "overview" ? "プロフィール" : `スコア一覧`}
+        title={defaultView === "overview" ? t("page.profile.overview") : t("page.profile.scoreList")}
         description={
           defaultView === "overview"
-            ? `$userName$さん($iidxid$)のbeatmaniaIIDX ${getVersionNameFromNumber(version)}のプレイログに関するプロフィールページです。 | $profileText$`
-            : `$userName$さん($iidxid$)がbeatmaniaIIDX ${getVersionNameFromNumber(version)}で記録したスコア一覧を表示します。`
+            ? `${t("profile.desc.overviewPre")}${getVersionNameFromNumber(version)}${t("profile.desc.overviewPost")}`
+            : `${t("profile.desc.scoresPre")}${getVersionNameFromNumber(version)}${t("profile.desc.scoresPost")}`
         }
       />
 

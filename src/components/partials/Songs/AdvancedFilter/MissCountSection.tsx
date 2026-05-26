@@ -3,6 +3,7 @@
 import { FilterParamsFrontend } from "@/types/songs/score";
 import { Input } from "@/components/ui/input";
 import { SectionTitle } from "./SectionTitle";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface Props {
   missCountMin: number | undefined;
@@ -10,12 +11,14 @@ interface Props {
   onChange: (val: Partial<FilterParamsFrontend>) => void;
 }
 
-export const MissCountSection = ({ missCountMin, missCountMax, onChange }: Props) => (
+export const MissCountSection = ({ missCountMin, missCountMax, onChange }: Props) => {
+  const { t } = useTranslation();
+  return (
   <section className="flex flex-col gap-3">
-    <SectionTitle>ミスカウント</SectionTitle>
+    <SectionTitle>{t("filter.missCount")}</SectionTitle>
     <div className="flex items-center gap-3">
       <Input
-        placeholder="以上"
+        placeholder={t("filter.missMin")}
         type="number"
         min={0}
         className="h-9 border-bpim-border bg-bpim-surface-2/60"
@@ -26,7 +29,7 @@ export const MissCountSection = ({ missCountMin, missCountMax, onChange }: Props
       />
       <span className="text-bpim-subtle">~</span>
       <Input
-        placeholder="以下"
+        placeholder={t("filter.missMax")}
         type="number"
         min={0}
         className="h-9 border-bpim-border bg-bpim-surface-2/60"
@@ -37,4 +40,5 @@ export const MissCountSection = ({ missCountMin, missCountMax, onChange }: Props
       />
     </div>
   </section>
-);
+  );
+};

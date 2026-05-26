@@ -8,22 +8,22 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Key, Copy, RefreshCw } from "lucide-react";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export default function ApiKeyUi() {
   const { keyInfo, generate, isLoading } = useApiKey();
   const [rawKey, setRawKey] = useState<string | null>(null);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const { t } = useTranslation();
 
   const executeGenerate = async () => {
     try {
       const key = await generate();
       setRawKey(key);
-      toast.success("APIキーを発行しました。必ず控えてください。", {
-        duration: 10000,
-      });
+      toast.success(t("settings.apiKey.issued"), { duration: 10000 });
       setIsConfirmOpen(false);
     } catch (e) {
-      toast.error("発行に失敗しました");
+      toast.error(t("settings.apiKey.failed"));
     }
   };
 
@@ -35,7 +35,7 @@ export default function ApiKeyUi() {
     const text = rawKey || keyInfo?.key;
     if (text) {
       navigator.clipboard.writeText(text);
-      toast.success("コピーしました");
+      toast.success(t("settings.apiKey.copied"));
     }
   };
 
@@ -44,10 +44,10 @@ export default function ApiKeyUi() {
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-2 text-bpim-primary">
           <Key className="h-4 w-4" />
-          <span className="font-bold">APIキー</span>
+          <span className="font-bold">{t("settings.apiKey.title")}</span>
         </div>
         <p className="text-sm text-bpim-muted">
-          API経由でBPIM2のデータを取得・更新します。
+          {t("settings.apiKey.desc")}
         </p>
       </div>
 
@@ -55,7 +55,7 @@ export default function ApiKeyUi() {
         <div className="flex w-full items-center md:w-[450px]">
           <Input
             value={rawKey || keyInfo?.key || ""}
-            placeholder={isLoading ? "Loading..." : "未発行"}
+            placeholder={isLoading ? "Loading..." : t("settings.apiKey.notIssued")}
             readOnly
             className="h-9 flex-1 rounded-r-none border-bpim-border bg-bpim-bg/40 font-mono text-xs focus-visible:ring-0"
           />
@@ -78,15 +78,14 @@ export default function ApiKeyUi() {
             ) : keyInfo?.exists ? (
               <RefreshCw className="mr-1 h-3 w-3" />
             ) : (
-              "発行"
+              t("settings.apiKey.issue")
             )}
-            {keyInfo?.exists && "再発行"}
+            {keyInfo?.exists && t("settings.apiKey.reissue")}
           </Button>
         </div>
         {rawKey && (
           <p className="text-[10px] font-bold text-bpim-warning">
-            ⚠️ 注意:
-            キーは今だけ表示されています。この画面を閉じると二度と表示されません。
+            {t("settings.apiKey.warning")}
           </p>
         )}
       </div>
@@ -96,9 +95,9 @@ export default function ApiKeyUi() {
         onClose={() => setIsConfirmOpen(false)}
         onConfirm={executeGenerate}
         isLoading={isLoading}
-        title="APIキーの再発行"
-        description="新しいキーを発行しますか？古いキーは即座に無効化されます。"
-        confirmLabel="再発行する"
+        title={t("settings.apiKey.dialogTitle")}
+        description={t("settings.apiKey.dialogDesc")}
+        confirmLabel={t("common.reissue")}
         isDestructive
       />
     </div>

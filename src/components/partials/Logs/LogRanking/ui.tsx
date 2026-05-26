@@ -18,30 +18,7 @@ import { SongWithScore } from "@/types/songs/score";
 import { LabelWithTooltip } from "../LogSummary/ui";
 import { cn } from "@/lib/utils";
 import { Swords, TrendingUp, Trophy } from "lucide-react";
-
-const RANK_CONFIG = {
-  growth: {
-    title: "BPI伸び幅ランキング",
-    icon: TrendingUp,
-    accentColor: "text-bpim-success",
-  },
-  top: {
-    title: "BPIランキング",
-    icon: Trophy,
-    accentColor: "text-yellow-400",
-  },
-  overtake: {
-    title: (
-      <LabelWithTooltip
-        label="ライバルに勝利"
-        isSharing={false}
-        tooltipText="このスコアを出した瞬間に、ライバルを上回っていたものを表示しています。（その後にライバルに抜き返されても、この時の更新結果は変わりません）"
-      />
-    ),
-    icon: Swords,
-    accentColor: "text-bpim-warning",
-  },
-};
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export const LogRank = ({
   details,
@@ -52,9 +29,34 @@ export const LogRank = ({
   type: "growth" | "top" | "overtake";
   isSharing?: boolean;
 }) => {
+  const { t, tFormat } = useTranslation();
   const [selectedSong, setSelectedSong] = useState<SongWithScore | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState<boolean>(false);
   const [selectedRivalId, setSelectedRivalId] = useState<string>("");
+
+  const RANK_CONFIG = {
+    growth: {
+      title: t("logs.rank.growth.title"),
+      icon: TrendingUp,
+      accentColor: "text-bpim-success",
+    },
+    top: {
+      title: t("logs.rank.top.title"),
+      icon: Trophy,
+      accentColor: "text-yellow-400",
+    },
+    overtake: {
+      title: (
+        <LabelWithTooltip
+          label={t("logs.rank.overtake.title")}
+          isSharing={false}
+          tooltipText={t("logs.rank.overtake.tooltip")}
+        />
+      ),
+      icon: Swords,
+      accentColor: "text-bpim-warning",
+    },
+  };
 
   const config = RANK_CONFIG[type];
 
@@ -123,7 +125,7 @@ export const LogRank = ({
         {type !== "top" && !isSharing && (
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-bold text-bpim-muted">
-              新規除外
+              {t("logs.rank.hideNew")}
             </span>
             <Switch
               checked={hideNewRecords}
@@ -146,15 +148,15 @@ export const LogRank = ({
           }}
         >
           <SelectTrigger className="h-8 w-full text-xs bg-bpim-surface-2 border-bpim-border text-bpim-text">
-            <SelectValue placeholder="すべて" />
+            <SelectValue placeholder={t("logs.rank.all")} />
           </SelectTrigger>
           <SelectContent className="bg-bpim-surface-2 border-bpim-border text-bpim-text">
             <SelectItem value="all" className="text-xs">
-              すべて（{details.filter((d) => (d.overtaken ?? []).length > 0).length}件）
+              {t("logs.rank.all")}{tFormat("logs.rank.countSuffix", { count: details.filter((d) => (d.overtaken ?? []).length > 0).length })}
             </SelectItem>
             {allRivals.map((r) => (
               <SelectItem key={r.id} value={r.id} className="text-xs">
-                {r.name}（{details.filter((d) => (d.overtaken ?? []).some((o) => o.rivalUserId === r.id)).length}件）
+                {r.name}{tFormat("logs.rank.countSuffix", { count: details.filter((d) => (d.overtaken ?? []).some((o) => o.rivalUserId === r.id)).length })}
               </SelectItem>
             ))}
           </SelectContent>
@@ -164,7 +166,7 @@ export const LogRank = ({
       <div className="flex flex-col overflow-hidden rounded-xl border border-bpim-border bg-bpim-bg">
         {visibleSongs.length === 0 ? (
           <div className="flex items-center justify-center p-8 bg-bpim-surface-2/60">
-            <span className="text-xs text-bpim-muted">データがありません</span>
+            <span className="text-xs text-bpim-muted">{t("logs.rank.empty")}</span>
           </div>
         ) : (
           visibleSongs.map((item, index) => (
@@ -198,7 +200,7 @@ export const LogRank = ({
           className="text-bpim-muted hover:bg-bpim-overlay/50 hover:text-bpim-text"
           onClick={loadMore}
         >
-          もっと表示（残り {remainingCount} 件）
+          {tFormat("logs.rank.loadMore", { count: remainingCount })}
         </Button>
       )}
 

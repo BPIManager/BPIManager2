@@ -5,6 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SectionTitle } from "./SectionTitle";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface Props {
   bpmMin: number | undefined;
@@ -13,9 +14,11 @@ interface Props {
   onChange: (val: Partial<FilterParamsFrontend>) => void;
 }
 
-export const BpmSection = ({ bpmMin, bpmMax, isSofran, onChange }: Props) => (
+export const BpmSection = ({ bpmMin, bpmMax, isSofran, onChange }: Props) => {
+  const { t } = useTranslation();
+  return (
   <section className="flex flex-col gap-3">
-    <SectionTitle>BPM範囲</SectionTitle>
+    <SectionTitle>{t("filter.bpmRange")}</SectionTitle>
     <div className="flex items-center gap-3">
       <Input
         placeholder="Min"
@@ -40,8 +43,9 @@ export const BpmSection = ({ bpmMin, bpmMax, isSofran, onChange }: Props) => (
         onCheckedChange={(checked) => onChange({ isSofran: !!checked })}
       />
       <Label htmlFor="isSofran" className="text-sm font-medium">
-        ソフラン曲のみ表示
+        {t("filter.sofranOnly")}
       </Label>
     </div>
   </section>
-);
+  );
+};

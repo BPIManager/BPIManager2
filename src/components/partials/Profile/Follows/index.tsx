@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { UserCheck, Users } from "lucide-react";
 import { LoadingSpinner, SectionLoader } from "@/components/ui/loading-spinner";
 import { AppTabsGroup } from "@/components/ui/complex/tabs";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export default function FollowPage({
   type,
@@ -22,6 +23,7 @@ export default function FollowPage({
     userId,
     type,
   );
+  const { t } = useTranslation();
 
   if (!userId) return null;
 
@@ -40,8 +42,8 @@ export default function FollowPage({
             iconOnly
             listClassName="mb-6"
             tabs={[
-              { value: "following", label: "フォロー", icon: UserCheck },
-              { value: "followers", label: "フォロワー", icon: Users },
+              { value: "following", label: t("profile.follow.following"), icon: UserCheck },
+              { value: "followers", label: t("profile.follow.followers"), icon: Users },
             ]}
           />
 
@@ -49,7 +51,7 @@ export default function FollowPage({
             {users.length === 0 && !isLoading ? (
               <div className="flex flex-col items-center justify-center py-16 gap-2">
                 <p className="text-sm font-medium text-bpim-muted">
-                  まだ誰もいません
+                  {t("profile.follow.noUsers")}
                 </p>
               </div>
             ) : (
@@ -72,7 +74,7 @@ export default function FollowPage({
                       {isLoading ? (
                         <LoadingSpinner size="sm" className="mr-2" />
                       ) : null}
-                      さらに読み込む
+                      {t("profile.follow.loadMore")}
                     </Button>
                   </div>
                 )}

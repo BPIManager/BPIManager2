@@ -109,7 +109,7 @@ const ScoreBox = ({
     >
       <div
         className={cn(
-          "absolute top-0 bottom-0 w-[3px]",
+          "absolute top-0 bottom-0 w-0.75",
           isRival ? "left-0" : "right-0",
           lampClass,
         )}
@@ -164,7 +164,7 @@ const MobileScoreView = ({
       )}
     >
       <div className="flex items-center gap-2">
-        <div className={cn("w-[3px] h-2.5 rounded-full", lampClass)} />
+        <div className={cn("w-0.75 h-2.5 rounded-full", lampClass)} />
         <span
           className={cn(
             "text-[10px] font-bold",

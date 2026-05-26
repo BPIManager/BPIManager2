@@ -13,8 +13,10 @@ import { useUser } from "@/contexts/users/UserContext";
 import { useUserList } from "@/hooks/users/useUserList";
 import { useUserListParams } from "@/hooks/users/useUserListParams";
 import { PageContainer, PageHeader } from "../Header";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export const UserRecommendationList = () => {
+  const { t } = useTranslation();
   const { user, isLoading: isCredentialLoading } = useUser();
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -38,8 +40,8 @@ export const UserRecommendationList = () => {
   return (
     <>
       <PageHeader
-        title="ライバルを探す"
-        description="実力が近いユーザーをライバル登録してスコアを競えます"
+        title={t("page.search.title")}
+        description={t("page.search.desc")}
       />
       <PageContainer>
         <div className="flex w-full flex-col gap-6">
@@ -59,7 +61,7 @@ export const UserRecommendationList = () => {
                 <button
                   onClick={handleShuffle}
                   className="shrink-0 flex items-center gap-1.5 rounded-lg border border-bpim-border bg-bpim-bg px-3 py-1.5 text-sm font-medium transition-colors hover:bg-bpim-border"
-                  title="実力が近い/少し自分より実力が上のユーザーをオススメします。"
+                  title={t("rivals.search.shuffleTitle")}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -77,7 +79,7 @@ export const UserRecommendationList = () => {
                     <polyline points="21 16 21 21 16 21" />
                     <line x1="15" y1="15" x2="21" y2="21" />
                   </svg>
-                  シャッフル
+                  {t("rivals.search.shuffle")}
                 </button>
               )}
             </div>

@@ -1,5 +1,6 @@
 import type { RadarSongEntry } from "@/types/stats/radar";
 import { SongListDialog } from "../Dialogs/songListDialog";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface Props {
   categoryName: string;
@@ -14,9 +15,10 @@ export const RadarCategorySongsDialog = ({
   isOpen,
   onClose,
 }: Props) => {
+  const { t } = useTranslation();
   return (
     <SongListDialog
-      dialogTitle={`${categoryName} - 楽曲リスト`}
+      dialogTitle={`${categoryName} - ${t("dashboard.songList.songList")}`}
       songs={songs}
       isOpen={isOpen}
       onClose={onClose}

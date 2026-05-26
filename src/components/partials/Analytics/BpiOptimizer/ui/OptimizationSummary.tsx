@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { OptimizationResult } from "@/types/bpi-optimizer";
 import { BpiChip } from "./BpiChip";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface OptimizationSummaryProps {
   result: OptimizationResult;
@@ -24,6 +25,7 @@ export const OptimizationSummary = ({
   isSaving,
   isSaved,
 }: OptimizationSummaryProps) => {
+  const { t, tFormat } = useTranslation();
   const {
     currentTotalBpi,
     targetTotalBpi,
@@ -44,7 +46,7 @@ export const OptimizationSummary = ({
       <div className="rounded-xl border border-bpim-success/40 bg-bpim-success/10 p-4 flex items-center gap-3">
         <Sparkles className="h-5 w-5 text-bpim-success shrink-0" />
         <p className="text-sm font-bold text-bpim-success">
-          目標 BPI {targetTotalBpi} は既に達成されています！
+          {tFormat("optimizer.summary.alreadyAchieved", { bpi: targetTotalBpi })}
         </p>
       </div>
     );
@@ -58,20 +60,15 @@ export const OptimizationSummary = ({
             <AlertTriangle className="h-4 w-4 text-bpim-warning shrink-0 mt-0.5" />
             <div className="flex flex-col gap-1">
               <p className="text-sm font-bold text-bpim-warning">
-                指定された条件では目標 BPI {targetTotalBpi}{" "}
-                に到達できませんでした
+                {tFormat("optimizer.summary.notAchievable", { bpi: targetTotalBpi })}
               </p>
               {maxAchievableBpi !== undefined && steps.length > 0 && (
                 <p className="text-xs text-bpim-muted">
-                  このメニュー（{steps.length}曲）で到達できる最大総合BPIは
-                  <span className="font-bold text-bpim-text mx-1">
-                    {maxAchievableBpi.toFixed(2)}
-                  </span>
-                  です。
+                  {tFormat("optimizer.summary.maxAchievable", { count: steps.length, bpi: maxAchievableBpi.toFixed(2) })}
                 </p>
               )}
               <p className="text-xs text-bpim-subtle mt-1">
-                曲数を増やすか、目標値を下げて再計算してみてください。
+                {t("optimizer.summary.tryMore")}
               </p>
             </div>
           </div>
@@ -79,7 +76,7 @@ export const OptimizationSummary = ({
         {steps.length > 0 && (
           <div className="rounded-xl border border-bpim-border bg-bpim-surface p-4 flex flex-col gap-3">
             <p className="text-xs text-bpim-muted font-bold">
-              部分達成ルート（参考）
+              {t("optimizer.summary.partialRoute")}
             </p>
             <div className="flex items-center gap-2 flex-wrap">
               <BpiChip bpi={currentTotalBpi} />
@@ -89,15 +86,11 @@ export const OptimizationSummary = ({
                 variant="outline"
                 className="border-bpim-warning/50 text-bpim-warning text-xs"
               >
-                目標まで残 {(targetTotalBpi - finalBpi).toFixed(2)}
+                {tFormat("optimizer.summary.remaining", { diff: (targetTotalBpi - finalBpi).toFixed(2) })}
               </Badge>
             </div>
             <p className="text-xs text-bpim-muted">
-              {steps.length} 曲の改善で総合 BPI 約
-              <span className="font-bold text-bpim-text mx-1">
-                +{(finalBpi - currentTotalBpi).toFixed(2)}
-              </span>
-              向上
+              {tFormat("optimizer.summary.bpiGain", { count: steps.length, gain: (finalBpi - currentTotalBpi).toFixed(2) })}
             </p>
           </div>
         )}
@@ -114,7 +107,7 @@ export const OptimizationSummary = ({
             {autoAdjustmentNote}
             {originalTargetTotalBpi !== undefined && (
               <span className="text-bpim-muted ml-1">
-                （元の目標: {originalTargetTotalBpi.toFixed(2)}）
+                （{tFormat("optimizer.summary.originalTarget", { bpi: originalTargetTotalBpi.toFixed(2) })}）
               </span>
             )}
           </p>
@@ -128,14 +121,14 @@ export const OptimizationSummary = ({
             <BpiChip bpi={finalBpi} />
             {finalBpi >= targetTotalBpi ? (
               <Badge className="bg-bpim-success/20 text-bpim-success border-bpim-success/30 text-xs">
-                目標達成
+                {t("optimizer.summary.achieved")}
               </Badge>
             ) : (
               <Badge
                 variant="outline"
                 className="border-bpim-warning/50 text-bpim-warning text-xs"
               >
-                目標まで残 {(targetTotalBpi - finalBpi).toFixed(2)}
+                {tFormat("optimizer.summary.remaining", { diff: (targetTotalBpi - finalBpi).toFixed(2) })}
               </Badge>
             )}
           </div>
@@ -153,16 +146,12 @@ export const OptimizationSummary = ({
               ) : (
                 <Save className="h-3.5 w-3.5" />
               )}
-              {isSaved ? "保存済み" : "結果を保存"}
+              {isSaved ? t("optimizer.summary.saved") : t("optimizer.summary.save")}
             </Button>
           )}
         </div>
         <p className="text-xs text-bpim-muted">
-          {steps.length} 曲の改善で
-          <span className="font-bold text-bpim-text mx-1">
-            +{(finalBpi - currentTotalBpi).toFixed(2)}
-          </span>
-          BPI 向上
+          {tFormat("optimizer.summary.bpiGain", { count: steps.length, gain: (finalBpi - currentTotalBpi).toFixed(2) })}
         </p>
       </div>
     </div>
