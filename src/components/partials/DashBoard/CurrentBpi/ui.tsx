@@ -101,7 +101,7 @@ export const CurrentBpiCard = ({
       )}
     >
       <div className="flex items-start justify-between">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-bpim-muted md:text-xs">
+        <span className="text-sm font-bold text-bpim-muted">
           {t("dashboard.currentBpi.label")}
         </span>
 
@@ -159,7 +159,9 @@ export const CurrentBpiCard = ({
           </span>
           <span className="text-xl font-bold text-bpim-text">
             ~{rank.toLocaleString()}
-            <span className="ml-1 text-sm font-normal text-bpim-muted">{t("dashboard.currentBpi.rankUnit")}</span>
+            <span className="ml-1 text-sm font-normal text-bpim-muted">
+              {t("dashboard.currentBpi.rankUnit")}
+            </span>
           </span>
         </div>
         {areaRank?.areaRank != null &&
