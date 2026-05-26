@@ -56,7 +56,7 @@ export const navTranslations = {
   "nav.compare": { ja: "比較", en: "Compare", "zh-TW": "比較", ko: "비교" },
   "nav.aaaChart": {
     ja: "AAA達成難易度表",
-    en: "AAA Clear Chart",
+    en: "AAA Difficulty Ratings",
     "zh-TW": "AAA達成難度表",
     ko: "AAA 달성 난이도표",
   },

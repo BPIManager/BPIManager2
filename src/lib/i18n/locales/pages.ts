@@ -759,7 +759,7 @@ export const pagesTranslations = {
   },
   "profile.tab.aaaTable": {
     ja: "AAA達成表",
-    en: "AAA Clear",
+    en: "AAA Achievements",
     "zh-TW": "AAA 達成表",
     ko: "AAA 달성표",
   },
