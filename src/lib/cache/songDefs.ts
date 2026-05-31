@@ -18,6 +18,7 @@ type CacheEntry = {
 };
 
 let cache: CacheEntry | null = null;
+let loadingPromise: Promise<CacheEntry> | null = null;
 
 function todayJst(): string {
   return new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().slice(0, 10);
@@ -61,15 +62,32 @@ async function loadCache(): Promise<Map<string, CachedSongWithDef>> {
   );
 }
 
+async function getOrLoadCache(): Promise<CacheEntry> {
+  const today = todayJst();
+  if (cache && cache.date === today) return cache;
+
+  if (!loadingPromise) {
+    loadingPromise = loadCache()
+      .then((data) => {
+        cache = { data, date: today };
+        loadingPromise = null;
+        return cache;
+      })
+      .catch((err) => {
+        loadingPromise = null;
+        throw err;
+      });
+  }
+
+  return loadingPromise;
+}
+
 export async function getSongWithDefCached(
   title: string,
   difficulty: string,
 ): Promise<CachedSongWithDef | null> {
-  const today = todayJst();
-  if (!cache || cache.date !== today) {
-    cache = { data: await loadCache(), date: today };
-  }
-  return cache.data.get(`${title}::${difficulty}`) ?? null;
+  const { data } = await getOrLoadCache();
+  return data.get(`${title}::${difficulty}`) ?? null;
 }
 
 export function invalidateSongDefsCache(): void {
