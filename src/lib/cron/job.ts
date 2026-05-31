@@ -4,6 +4,7 @@ import { generateInfoJson } from "./metrics/info";
 import { fetchOfficialArenaDistribution } from "./fetchOfficialArena";
 import { updateAllUserRadarCache } from "./radar";
 import { generateUserSitemap } from "./sitemaps";
+import { invalidateArenaAveragesCache } from "@/lib/cache/arenaAverages";
 
 async function performDailyTask() {
   console.log("--- Executing Daily Task (Database sync, etc.) ---");
@@ -66,6 +67,7 @@ export async function setupArenaService() {
     console.log("[Cron] Running Task: generateArenaJson");
     try {
       await generateArenaJson();
+      invalidateArenaAveragesCache();
     } catch (err) {
       console.error("[Cron] Arena Job Failed:", err);
     }

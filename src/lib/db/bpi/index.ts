@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { SongMaster } from "@/types/songs/master";
 import { Database, NewAllScores, NewScore, NewTotalBPILog } from "@/types/db";
 import { Transaction } from "kysely";
+import { latestVersion } from "@/constants/latestVersion";
 
 /**
  * BPI スコアのインポートおよびスコアマスタ参照を担当するリポジトリクラス。
@@ -254,6 +255,88 @@ class BpiRepository {
     for (const chunk of chunks) {
       await trx.insertInto("allScores").values(chunk).execute();
     }
+  }
+
+  /**
+   * title + difficulty で楽曲と最新 songDef を取得する。
+   * 削除済み楽曲は除外。
+   */
+  async getSongWithDefByTitleDifficulty(title: string, difficulty: string) {
+    return await db
+      .selectFrom("songs as s")
+      .leftJoin(
+        (qb) =>
+          qb
+            .selectFrom("songDef")
+            .select(["songId", "wrScore", "kaidenAvg", "coef"])
+            .where("isCurrent", "=", 1)
+            .as("def"),
+        (join) => join.onRef("def.songId", "=", "s.songId"),
+      )
+      .select([
+        "s.songId",
+        "s.title",
+        "s.difficulty",
+        "s.difficultyLevel",
+        "s.notes",
+        "def.wrScore",
+        "def.kaidenAvg",
+        "def.coef",
+      ])
+      .where("s.title", "=", title)
+      .where("s.difficulty", "=", difficulty)
+      .where((eb) =>
+        eb.or([
+          eb("s.deletedAt", "is", null),
+          eb("s.deletedAt", ">", latestVersion),
+        ]),
+      )
+      .executeTakeFirst();
+  }
+
+  /**
+   * BPIM内での指定スコアの順位と登録者総数を返す。
+   * 同バージョンのユーザーごとの最新スコアを対象とする。
+   */
+  async getSongBpimRank(
+    songId: number,
+    exScore: number,
+    version: string = latestVersion,
+  ): Promise<{ rank: number; total: number }> {
+    const makeLatest = () =>
+      db
+        .selectFrom("scores")
+        .select(["userId", (eb) => eb.fn.max("logId").as("maxLogId")])
+        .where("songId", "=", songId)
+        .where("version", "=", version)
+        .groupBy("userId")
+        .as("latest");
+
+    const [aboveRow, totalRow] = await Promise.all([
+      db
+        .selectFrom("scores as s")
+        .innerJoin(makeLatest(), (join) =>
+          join.onRef("latest.maxLogId", "=", "s.logId"),
+        )
+        .select((eb) => eb.fn.count("s.userId").as("cnt"))
+        .where("s.songId", "=", songId)
+        .where("s.exScore", ">", exScore)
+        .executeTakeFirst(),
+
+      db
+        .selectFrom("scores as s")
+        .innerJoin(makeLatest(), (join) =>
+          join.onRef("latest.maxLogId", "=", "s.logId"),
+        )
+        .select((eb) => eb.fn.count("s.userId").as("cnt"))
+        .where("s.songId", "=", songId)
+        .executeTakeFirst(),
+    ]);
+
+    return {
+      rank: Number(aboveRow?.cnt ?? 0) + 1,
+      total: Number(totalRow?.cnt ?? 0),
+    };
   }
 }
 
