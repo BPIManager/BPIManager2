@@ -29,6 +29,9 @@ export default async function handler(
 
     if (!access.hasAccess) return rejectAccess(res, access);
 
+    const rivalAccess = await checkProfileAccess(req, rivalId);
+    if (!rivalAccess.hasAccess) return rejectAccess(res, rivalAccess);
+
     const rawResults = await logsRepo.getRivalComparisonScores({
       viewerId: String(viewerId),
       rivalId,
@@ -85,8 +88,7 @@ export default async function handler(
                 ? row.myLastPlayed
                 : row.rivalLastPlayed
               : row.myLastPlayed || row.rivalLastPlayed || null,
-          radarTop:
-            radarLookup.get(`${row.title}__${row.difficulty}`) ?? null,
+          radarTop: radarLookup.get(`${row.title}__${row.difficulty}`) ?? null,
         };
       })
       .filter((song) => song.exScore !== null || song.rival.exScore !== null);
