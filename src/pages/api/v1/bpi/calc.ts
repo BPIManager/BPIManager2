@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
 import { BpiCalculator } from "@/lib/bpi";
 import { bpiRepo } from "@/lib/db/bpi";
+import { getSongWithDefCached } from "@/lib/cache/songDefs";
 import { getArenaAverages } from "@/lib/cache/arenaAverages";
 import { IIDX_DIFFICULTIES } from "@/constants/diffs";
 import { IIDX_VERSIONS, latestVersion } from "@/constants/latestVersion";
@@ -14,6 +15,10 @@ const querySchema = z.object({
     .enum(IIDX_VERSIONS)
     .optional()
     .transform((v) => v ?? latestVersion),
+  includeRank: z
+    .string()
+    .optional()
+    .transform((v) => v === "true"),
 });
 
 export default async function handler(
@@ -31,13 +36,10 @@ export default async function handler(
       .json({ message: "Invalid parameters", errors: parsed.error.issues });
   }
 
-  const { title, difficulty, exScore, version } = parsed.data;
+  const { title, difficulty, exScore, version, includeRank } = parsed.data;
 
   try {
-    const song = await bpiRepo.getSongWithDefByTitleDifficulty(
-      title,
-      difficulty,
-    );
+    const song = await getSongWithDefCached(title, difficulty);
 
     if (!song) {
       return res.status(404).json({ message: "Song not found" });
@@ -59,11 +61,9 @@ export default async function handler(
     const estimatedRankByFormula =
       bpi !== null ? BpiCalculator.estimateRank(bpi) : null;
 
-    const { rank: bpimRank, total: bpimTotal } = await bpiRepo.getSongBpimRank(
-      song.songId,
-      exScore,
-      version,
-    );
+    const { rank: bpimRank, total: bpimTotal } = includeRank
+      ? await bpiRepo.getSongBpimRank(song.songId, exScore, version)
+      : { rank: null, total: null };
 
     let arenaAverages = null;
     if (song.difficultyLevel === 11 || song.difficultyLevel === 12) {

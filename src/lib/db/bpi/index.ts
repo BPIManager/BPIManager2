@@ -303,39 +303,38 @@ class BpiRepository {
     exScore: number,
     version: string = latestVersion,
   ): Promise<{ rank: number; total: number }> {
-    const makeLatest = () =>
-      db
-        .selectFrom("scores")
-        .select(["userId", (eb) => eb.fn.max("logId").as("maxLogId")])
-        .where("songId", "=", songId)
-        .where("version", "=", version)
-        .groupBy("userId")
-        .as("latest");
+    const latest = db
+      .selectFrom("scores")
+      .select(["userId", (eb) => eb.fn.max("logId").as("maxLogId")])
+      .where("songId", "=", songId)
+      .where("version", "=", version)
+      .groupBy("userId")
+      .as("latest");
 
-    const [aboveRow, totalRow] = await Promise.all([
-      db
-        .selectFrom("scores as s")
-        .innerJoin(makeLatest(), (join) =>
-          join.onRef("latest.maxLogId", "=", "s.logId"),
-        )
-        .select((eb) => eb.fn.count("s.userId").as("cnt"))
-        .where("s.songId", "=", songId)
-        .where("s.exScore", ">", exScore)
-        .executeTakeFirst(),
-
-      db
-        .selectFrom("scores as s")
-        .innerJoin(makeLatest(), (join) =>
-          join.onRef("latest.maxLogId", "=", "s.logId"),
-        )
-        .select((eb) => eb.fn.count("s.userId").as("cnt"))
-        .where("s.songId", "=", songId)
-        .executeTakeFirst(),
-    ]);
+    const row = await db
+      .selectFrom("scores as s")
+      .innerJoin(latest, (join) =>
+        join.onRef("latest.maxLogId", "=", "s.logId"),
+      )
+      .select((eb) => [
+        eb.fn.countAll<number>().as("total"),
+        eb.fn
+          .sum(
+            eb
+              .case()
+              .when(eb("s.exScore", ">", exScore))
+              .then(eb.lit(1))
+              .else(eb.lit(0))
+              .end(),
+          )
+          .as("above"),
+      ])
+      .where("s.songId", "=", songId)
+      .executeTakeFirst();
 
     return {
-      rank: Number(aboveRow?.cnt ?? 0) + 1,
-      total: Number(totalRow?.cnt ?? 0),
+      rank: Number(row?.above ?? 0) + 1,
+      total: Number(row?.total ?? 0),
     };
   }
 }
