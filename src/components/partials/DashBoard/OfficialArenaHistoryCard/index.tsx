@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
-import {
-  useArenaMetadata,
-  useOfficialArenaHistory,
-} from "@/hooks/arena/useOfficialArenaHistory";
+import { useArenaMetadata, useOfficialArenaHistory } from "@/hooks/arena/useOfficialArenaHistory";
+import { useArenaHistory } from "@/hooks/arena/useArenaHistory";
 import { OfficialArenaHistoryCardUI } from "./ui";
 import { OfficialArenaHistoryCardSkeleton } from "./skeleton";
 
@@ -14,11 +12,8 @@ export const OfficialArenaHistorySection = ({ userId }: { userId: string }) => {
   const { data: metadata, isLoading: metaLoading } = useArenaMetadata(version);
   const selectedEvent = metadata?.events[selectedIndex] ?? null;
 
-  const { data, isLoading: dataLoading } = useOfficialArenaHistory(
-    userId,
-    version,
-    selectedEvent,
-  );
+  const { data, isLoading: dataLoading } = useOfficialArenaHistory(userId, version, selectedEvent);
+  const state = useArenaHistory(data, dataLoading, selectedEvent ?? undefined);
 
   if (metaLoading) return <OfficialArenaHistoryCardSkeleton />;
 
@@ -28,8 +23,8 @@ export const OfficialArenaHistorySection = ({ userId }: { userId: string }) => {
       metaLoading={metaLoading}
       selectedIndex={selectedIndex}
       onSelectIndex={setSelectedIndex}
-      data={data}
       dataLoading={dataLoading}
+      state={state}
     />
   );
 };
