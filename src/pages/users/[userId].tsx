@@ -15,6 +15,7 @@ import { getVersionNameFromNumber } from "@/constants/versions";
 import { RadarSection } from "@/components/partials/DashBoard/Radar/ui";
 import { BpiHistorySection } from "@/components/partials/DashBoard/TotalBPIHistory";
 import { IidxTowerSection } from "@/components/partials/DashBoard/IidxTowerCard";
+import { OfficialArenaHistorySection } from "@/components/partials/DashBoard/OfficialArenaHistoryCard";
 import { LogFilterSection } from "@/components/partials/Logs/VersionSelector/ui";
 import { TabsContent } from "@/components/ui/tabs";
 import { useState } from "react";
@@ -39,7 +40,11 @@ export default function UserPage({ defaultView = "overview" }: UserPageProps) {
   return (
     <UserProfileLayout userId={userId} currentTab={defaultView}>
       <ProfileMeta
-        title={defaultView === "overview" ? t("page.profile.overview") : t("page.profile.scoreList")}
+        title={
+          defaultView === "overview"
+            ? t("page.profile.overview")
+            : t("page.profile.scoreList")
+        }
         description={
           defaultView === "overview"
             ? `${t("profile.desc.overviewPre")}${getVersionNameFromNumber(version)}${t("profile.desc.overviewPost")}`
@@ -73,6 +78,7 @@ export default function UserPage({ defaultView = "overview" }: UserPageProps) {
               defaultPeriod={0}
             />
             <RadarSection userId={userId} />
+            <OfficialArenaHistorySection userId={userId} />
           </div>
         )}
       </TabsContent>
@@ -88,7 +94,11 @@ export default function UserPage({ defaultView = "overview" }: UserPageProps) {
       <TabsContent value="logs" className="mt-0 border-none p-0 outline-none">
         {defaultView === "logs" && (
           <div className="rounded-2xl border border-bpim-border bg-bpim-bg/40 p-4 md:p-6 shadow-xl backdrop-blur-md">
-            <LogFilterSection version={version} groupedBy={groupedBy} granularity={granularity} />
+            <LogFilterSection
+              version={version}
+              groupedBy={groupedBy}
+              granularity={granularity}
+            />
             <div className="mt-6">
               <LogsList
                 userId={userId}

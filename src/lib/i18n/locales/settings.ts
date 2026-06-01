@@ -617,4 +617,10 @@ export const settingsTranslations = {
     "zh-TW": "武器曲 / 潛力 / 接近",
     ko: "무기곡 / 성장 가능성 / 니어미스",
   },
+  "widget.officialArenaHistory": {
+    ja: "ARENAモード履歴",
+    en: "ARENA Mode History",
+    "zh-TW": "ARENA模式歷史",
+    ko: "ARENA 모드 기록",
+  },
 } as const;

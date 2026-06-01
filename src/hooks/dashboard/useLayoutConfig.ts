@@ -14,6 +14,12 @@ function loadConfig(): DashboardLayoutConfig {
     if (!raw) return DEFAULT_LAYOUT_CONFIG;
     const parsed = JSON.parse(raw) as DashboardLayoutConfig;
     if (parsed.version !== 2) return DEFAULT_LAYOUT_CONFIG;
+    // 新ウィジェットが保存済みconfigに存在しない場合はデフォルト設定で末尾に追加
+    const existingIds = new Set(parsed.widgets.map((w) => w.id));
+    const added = DEFAULT_LAYOUT_CONFIG.widgets.filter((w) => !existingIds.has(w.id));
+    if (added.length > 0) {
+      return { ...parsed, widgets: [...parsed.widgets, ...added] };
+    }
     return parsed;
   } catch {
     return DEFAULT_LAYOUT_CONFIG;

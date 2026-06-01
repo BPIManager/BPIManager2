@@ -13,13 +13,13 @@ import { statsRepo } from "@/lib/db/stats";
  */
 export async function updateAllUserRadarCache() {
   const version = latestVersion;
-
-  console.log(`Starting radar cache update for version: ${version}`);
-
   const users = await db.selectFrom("users").select("userId").execute();
-  console.log(`Found ${users.length} users.`);
+  const total = users.length;
+  let updated = 0;
 
-  for (const user of users) {
+  for (let i = 0; i < users.length; i++) {
+    const user = users[i];
+    process.stdout.write(`\r\x1b[K[Radar] Updating cache... ${i + 1}/${total}`);
     try {
       const scores = await statsRepo.getLatestScoresWithMusicData(
         user.userId,
@@ -61,11 +61,13 @@ export async function updateAllUserRadarCache() {
         })
         .execute();
 
-      console.log(`Updated cache for user: ${user.userId}`);
+      updated++;
     } catch (e) {
-      console.error(`Failed to update user ${user.userId}:`, e);
+      process.stdout.write("\r\x1b[K");
+      console.error(`[Radar] Failed for user ${user.userId}:`, e);
     }
   }
 
-  console.log("Radar cache update completed.");
+  process.stdout.write("\r\x1b[K");
+  console.log(`[Radar] Cache update done: ${updated}/${total} users updated`);
 }

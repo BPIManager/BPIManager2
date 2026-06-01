@@ -22,6 +22,7 @@ import { PageLoader } from "@/components/ui/loading-spinner";
 import { useState } from "react";
 import { NoDataAlert } from "@/components/partials/DashBoard/NoData/ui";
 import { IidxTowerSection } from "@/components/partials/DashBoard/IidxTowerCard";
+import { OfficialArenaHistorySection } from "@/components/partials/DashBoard/OfficialArenaHistoryCard";
 import { Settings2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DashboardLayoutSettingsModal } from "@/components/partials/DashBoard/LayoutSettings";
@@ -62,6 +63,8 @@ function WidgetRenderer({
       return <IidxTowerSection userId={userId} />;
     case "rankingTabs":
       return <RankingTabsCard userId={userId} />;
+    case "officialArenaHistory":
+      return <OfficialArenaHistorySection userId={userId} />;
     default:
       return null;
   }

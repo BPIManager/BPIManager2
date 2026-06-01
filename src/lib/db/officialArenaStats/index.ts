@@ -88,6 +88,23 @@ export async function upsertOfficialArenaStats(
   };
 }
 
+export async function getArenaStatsHistory(
+  userId: string,
+  version: string,
+  start: Date,
+  end: Date,
+) {
+  return db
+    .selectFrom("officialArenaStats")
+    .select(["fetchedAt", "arenaClass", "arenaRank", "wins"])
+    .where("userId", "=", userId)
+    .where("version", "=", version)
+    .where("fetchedAt", ">=", start)
+    .where("fetchedAt", "<=", end)
+    .orderBy("fetchedAt", "asc")
+    .execute();
+}
+
 async function fetchLatestByUserIds(userIds: string[], version: string) {
   const rows = await db
     .selectFrom("officialArenaStats as oas")

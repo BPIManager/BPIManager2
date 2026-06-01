@@ -144,7 +144,7 @@ async function fetchGrade(
       break;
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
   }
 
   const players = Array.from(seen.values());
@@ -156,6 +156,11 @@ async function fetchGrade(
 
 function normalizeId(id: string): string {
   return id.replace(/-/g, "");
+}
+
+function roundTo15Min(date: Date): Date {
+  const ms = 15 * 60 * 1000;
+  return new Date(Math.floor(date.getTime() / ms) * ms);
 }
 
 export async function fetchOfficialArenaDistribution(
@@ -192,7 +197,7 @@ export async function fetchOfficialArenaDistribution(
     .where("iidxId", "is not", null)
     .execute();
 
-  const fetchedAt = new Date();
+  const fetchedAt = roundTo15Min(new Date());
   const rawByNormalizedId = new Map<string, (typeof results)[0][0]>();
   for (const list of results) {
     for (const p of list) {
@@ -234,7 +239,7 @@ export async function fetchOfficialArenaDistribution(
     `[OfficialArena] DB upsert: inserted=${inserted}, skipped=${skipped}`,
   );
 
-  // eagate全プレイヤーのランク分布（カバー率の分母）
+  // eAMU全プレイヤーのランク分布（カバー率の分母）
   const allPlayersCountMap = new Map<string, number>();
   for (const arenaClass of playerClassMap.values()) {
     allPlayersCountMap.set(
