@@ -75,8 +75,16 @@ type PlanCardProps = Omit<(typeof PLANS)[number], "descKey"> & {
 
 const PlanCard = (props: PlanCardProps) => {
   const { t } = useTranslation();
-  const { icon: Icon, label, price, description, color, border, bg, glow } =
-    props;
+  const {
+    icon: Icon,
+    label,
+    price,
+    description,
+    color,
+    border,
+    bg,
+    glow,
+  } = props;
   return (
     <div
       className={cn(
@@ -283,7 +291,10 @@ export const SupportersPage = () => {
                           onClick={() => {
                             navigator.clipboard.writeText(address);
                             toast.success(
-                              t("support.copyAddress").replace("$label$", label),
+                              t("support.copyAddress").replace(
+                                "$label$",
+                                label,
+                              ),
                             );
                           }}
                           className="cursor-pointer w-full text-left rounded-lg bg-bpim-bg/50 p-3 border border-bpim-border hover:border-bpim-primary/50 hover:bg-bpim-primary/5 transition-colors group"

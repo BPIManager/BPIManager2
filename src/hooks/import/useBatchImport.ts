@@ -4,6 +4,7 @@ import { detectCsvType, validateCsvTypeForVersion } from "@/utils/csv/detect";
 import { API_PREFIX } from "@/constants/apiEndpoints";
 import { toast } from "sonner";
 import { User as FirebaseUser } from "firebase/auth";
+import { safeClipboardRead, safeClipboardClear } from "@/utils/clipboard";
 
 /**
  * CSV データのバッチインポート処理を管理するフック。
@@ -34,8 +35,11 @@ export const useBatchImport = (
     try {
       if (!targetData) {
         setProcessStatus("クリップボードを確認中...");
-        const text = await navigator.clipboard.readText();
-        if (!text.trim()) throw new Error("データが空です。");
+        const text = await safeClipboardRead();
+        if (!text?.trim())
+          throw new Error(
+            "クリップボードの読み取りに失敗しました。データを直接貼り付けてください。",
+          );
         targetData = text;
         toast.info("クリップボードから読み込みました");
       }
@@ -78,7 +82,7 @@ export const useBatchImport = (
       } else {
         toast.info("すでに最新の状態です");
       }
-      await navigator.clipboard.writeText("");
+      await safeClipboardClear();
 
       await refresh();
       return true;

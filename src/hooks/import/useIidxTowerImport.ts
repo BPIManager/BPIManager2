@@ -2,6 +2,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { User as FirebaseUser } from "firebase/auth";
 import { API_PREFIX } from "@/constants/apiEndpoints";
+import { safeClipboardRead, safeClipboardClear } from "@/utils/clipboard";
 
 type TowerRow = { playDate: string; keyCount: number; scratchCount: number };
 
@@ -46,8 +47,11 @@ export const useIidxTowerImport = (fbUser: FirebaseUser | null) => {
     try {
       if (!targetData) {
         setProcessStatus("クリップボードを確認中...");
-        const text = await navigator.clipboard.readText();
-        if (!text.trim()) throw new Error("データが空です。");
+        const text = await safeClipboardRead();
+        if (!text?.trim())
+          throw new Error(
+            "クリップボードの読み取りに失敗しました。データを直接貼り付けてください。",
+          );
         targetData = text;
         toast.info("クリップボードから読み込みました");
       }
@@ -96,7 +100,7 @@ export const useIidxTowerImport = (fbUser: FirebaseUser | null) => {
       toast.success(
         `${result.upsertedCount}件のタワーデータをインポートしました`,
       );
-      await navigator.clipboard.writeText("");
+      await safeClipboardClear();
       return true;
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : "エラーが発生しました");
