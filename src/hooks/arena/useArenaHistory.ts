@@ -119,7 +119,7 @@ export function useArenaHistory(
   }, [selectedEvent]);
 
   const processedData = useMemo(() => {
-    if (!data || data.length === 0) return null;
+    if (!Array.isArray(data) || data.length === 0) return null;
     return toProcessedPoints(downsample(filterByWindow(data, granularity), granularity));
   }, [data, granularity]);
 

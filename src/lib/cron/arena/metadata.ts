@@ -23,7 +23,9 @@ function getMetadataFile(version: IIDXVersion): string {
   );
 }
 
-async function loadMetadata(version: IIDXVersion): Promise<ArenaVersionMetadata> {
+async function loadMetadata(
+  version: IIDXVersion,
+): Promise<ArenaVersionMetadata> {
   try {
     const raw = await fs.readFile(getMetadataFile(version), "utf-8");
     return JSON.parse(raw) as ArenaVersionMetadata;
@@ -58,7 +60,9 @@ function parseAllArenaEvents(html: string): ArenaEventEntry[] {
     if (!block.includes("ARENAモード")) continue;
 
     const dateMatch = block.match(/<li>(\d{4})\/\d{2}\/\d{2}<\/li>/);
-    const newsYear = dateMatch ? parseInt(dateMatch[1]) : new Date().getUTCFullYear();
+    const newsYear = dateMatch
+      ? parseInt(dateMatch[1])
+      : new Date().getUTCFullYear();
 
     // Pattern A: 開催期間はX月X日（曜日）HH:MM～X月X日（曜日）HH:MMまで
     const stdPm = block.match(
@@ -70,8 +74,12 @@ function parseAllArenaEvents(html: string): ArenaEventEntry[] {
       const roundMatch = block.match(/第(\d+)回/);
       events.push({
         round: roundMatch ? parseInt(roundMatch[1]) : 0,
-        start: new Date(Date.UTC(newsYear, sm - 1, sd, sh - 9, smin)).toISOString(),
-        end: new Date(Date.UTC(endYear, em - 1, ed, eh - 9, emin)).toISOString(),
+        start: new Date(
+          Date.UTC(newsYear, sm - 1, sd, sh - 9, smin),
+        ).toISOString(),
+        end: new Date(
+          Date.UTC(endYear, em - 1, ed, eh - 9, emin),
+        ).toISOString(),
       });
       continue;
     }
@@ -90,8 +98,12 @@ function parseAllArenaEvents(html: string): ArenaEventEntry[] {
       const endYear = em < stm ? newsYear + 1 : newsYear;
       events.push({
         round: r,
-        start: new Date(Date.UTC(newsYear, stm - 1, std, sth - 9, 0)).toISOString(),
-        end: new Date(Date.UTC(endYear, em - 1, ed, eh - 9, emin)).toISOString(),
+        start: new Date(
+          Date.UTC(newsYear, stm - 1, std, sth - 9, 0),
+        ).toISOString(),
+        end: new Date(
+          Date.UTC(endYear, em - 1, ed, eh - 9, emin),
+        ).toISOString(),
       });
     }
   }
@@ -108,7 +120,10 @@ export async function fetchArenaMetadataForVersion(
 ): Promise<ArenaVersionMetadata> {
   const url = `https://p.eagate.573.jp/game/2dx/${version}/info/index.html`;
   const res = await fetch(url, { headers: { "User-Agent": UA } });
-  if (!res.ok) throw new Error(`HTTP ${res.status} fetching info page for version ${version}`);
+  if (!res.ok)
+    throw new Error(
+      `HTTP ${res.status} fetching info page for version ${version}`,
+    );
   const html = await res.text();
   const incoming = parseAllArenaEvents(html);
   const existing = await loadMetadata(version);
@@ -147,7 +162,11 @@ export async function getArenaEventPeriod(): Promise<{
       fetchedAt: now,
     };
     console.log(`[Arena] Period cached: Round ${latest.round}`);
-    return { start: _cachedArenaPeriod.start, end: _cachedArenaPeriod.end, round: latest.round };
+    return {
+      start: _cachedArenaPeriod.start,
+      end: _cachedArenaPeriod.end,
+      round: latest.round,
+    };
   } catch (err) {
     console.warn("[ArenaEvent] Failed to fetch event period:", err);
     return null;

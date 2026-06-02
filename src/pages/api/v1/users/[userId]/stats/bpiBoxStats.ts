@@ -29,6 +29,9 @@ export default async function handler(
     return res.status(400).json({ message: "Required parameters are missing" });
   }
   try {
+    const access = await checkUserAccess(req, userId);
+    if (!access.hasAccess) return rejectAccess(res, access);
+
     const { scores, tower } = await statsRepo.getBpiAndVolumePerDate(
       userId,
       version,

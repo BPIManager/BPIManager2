@@ -1,7 +1,11 @@
 import useSWR from "swr";
 import type { ArenaEventEntry, ArenaVersionMetadata } from "@/lib/cron/arena/types";
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
+const fetcher = async (url: string) => {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`${r.status}`);
+  return r.json();
+};
 
 export type ArenaHistoryRecord = {
   fetchedAt: string;
