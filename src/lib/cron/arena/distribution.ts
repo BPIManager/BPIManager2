@@ -182,6 +182,14 @@ function getActiveFile(version: IIDXVersion) {
   return path.join(process.cwd(), `public/data/info/arena_official/${version}/active.json`);
 }
 
+function getActiveBackupFile(version: IIDXVersion, prevFetchedAt: string, generatedAt: string) {
+  const fmt = (iso: string) => iso.slice(0, 16).replace(/[T:]/g, "-");
+  return path.join(
+    process.cwd(),
+    `public/data/info/arena_official/${version}/old/${fmt(prevFetchedAt)}~${fmt(generatedAt)}.json`,
+  );
+}
+
 async function loadPlayersSnapshot(version: IIDXVersion): Promise<PlayersSnapshot | null> {
   try {
     const raw = await fs.readFile(getPlayersFile(version), "utf-8");
@@ -343,14 +351,20 @@ export async function fetchOfficialArenaDistribution(
 
   // 前回との差分からアクティブプレイヤー数を算出して保存
   const activeByClass = computeActiveByClass(prevSnapshot, currentPlayers);
-  await fs.writeFile(
-    getActiveFile(version),
-    JSON.stringify({
-      generatedAt: now.toISOString(),
-      prevFetchedAt: prevSnapshot?.fetchedAt ?? null,
-      byClass: activeByClass,
-    }),
-  );
+  const activePayload = JSON.stringify({
+    generatedAt: now.toISOString(),
+    prevFetchedAt: prevSnapshot?.fetchedAt ?? null,
+    byClass: activeByClass,
+  });
+
+  // 上書き前に旧データをバックアップ
+  if (prevSnapshot?.fetchedAt) {
+    const backupFile = getActiveBackupFile(version, prevSnapshot.fetchedAt, now.toISOString());
+    await fs.mkdir(path.dirname(backupFile), { recursive: true });
+    await fs.writeFile(backupFile, activePayload).catch(() => {});
+  }
+
+  await fs.writeFile(getActiveFile(version), activePayload);
 
   // 今回スナップショットを保存（次回の prev として使用）
   await fs.writeFile(
