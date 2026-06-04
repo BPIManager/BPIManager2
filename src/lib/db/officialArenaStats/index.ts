@@ -68,6 +68,8 @@ export async function upsertOfficialArenaStats(
   const toInsert = records.filter((r) => {
     const latest = latestMap.get(r.userId);
     if (!latest) return true;
+    // 同じ fetchedAt ウィンドウでは重複挿入しない（サーバー再起動対策）
+    if (latest.fetchedAt.getTime() === (r.fetchedAt as Date).getTime()) return false;
     return (
       latest.arenaClass !== r.arenaClass ||
       latest.area !== r.area ||
@@ -129,6 +131,7 @@ async function fetchLatestByUserIds(userIds: string[], version: string) {
       "oas.gradeDp",
       "oas.arenaRank",
       "oas.wins",
+      "oas.fetchedAt",
     ])
     .execute();
 

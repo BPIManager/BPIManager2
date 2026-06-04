@@ -42,6 +42,7 @@ export function ArenaChart({ data, maxWinsDelta, hasRank, hasWins }: ArenaChartP
   const fmtTooltip = (v: unknown, name: unknown) => {
     if (name === "classNum")  return [NUM_TO_CLASS[v as number] ?? v, t("dashboard.arenaHistory.chart.class")];
     if (name === "rank")      return [(v as number).toLocaleString("ja-JP"), t("dashboard.arenaHistory.chart.rank")];
+    if (name === "classRank") return [(v as number).toLocaleString("ja-JP"), t("dashboard.arenaHistory.chart.classRank")];
     if (name === "winsDelta") return [v, t("dashboard.arenaHistory.chart.wins")];
     return [v, name];
   };
@@ -49,6 +50,7 @@ export function ArenaChart({ data, maxWinsDelta, hasRank, hasWins }: ArenaChartP
   const fmtLegend = (value: string) => {
     if (value === "classNum")  return t("dashboard.arenaHistory.chart.class");
     if (value === "rank")      return t("dashboard.arenaHistory.chart.rank");
+    if (value === "classRank") return t("dashboard.arenaHistory.chart.classRank");
     if (value === "winsDelta") return t("dashboard.arenaHistory.chart.wins");
     return value;
   };
@@ -90,6 +92,7 @@ export function ArenaChart({ data, maxWinsDelta, hasRank, hasWins }: ArenaChartP
               yAxisId="rank"
               orientation="right"
               reversed
+              domain={["auto", "auto"]}
               tick={TICK_PROPS}
               tickLine={false}
               axisLine={false}
@@ -119,6 +122,18 @@ export function ArenaChart({ data, maxWinsDelta, hasRank, hasWins }: ArenaChartP
               stroke="#10b981"
               strokeWidth={2}
               dot={{ r: 3, fill: "#10b981" }}
+              connectNulls={false}
+            />
+          )}
+          {hasRank && (
+            <Line
+              yAxisId="rank"
+              type="monotone"
+              dataKey="classRank"
+              stroke="#06b6d4"
+              strokeWidth={2}
+              strokeDasharray="4 2"
+              dot={{ r: 3, fill: "#06b6d4" }}
               connectNulls={false}
             />
           )}

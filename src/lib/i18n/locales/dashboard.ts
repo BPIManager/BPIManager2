@@ -504,8 +504,9 @@ export const dashboardTranslations = {
   "dashboard.arenaHistory.countdown.min": { ja: "分", en: "m", "zh-TW": "分", ko: "분" },
   "dashboard.arenaHistory.countdown.sec": { ja: "秒", en: "s", "zh-TW": "秒", ko: "초" },
   "dashboard.arenaHistory.chart.class": { ja: "クラス", en: "Class", "zh-TW": "等級", ko: "클래스" },
-  "dashboard.arenaHistory.chart.rank": { ja: "順位", en: "Rank", "zh-TW": "名次", ko: "순위" },
+  "dashboard.arenaHistory.chart.rank": { ja: "全体順位", en: "Overall Rank", "zh-TW": "整體名次", ko: "전체 순위" },
   "dashboard.arenaHistory.chart.wins": { ja: "+勝利", en: "+Wins", "zh-TW": "+勝場", ko: "+승리" },
+  "dashboard.arenaHistory.chart.classRank": { ja: "クラス内順位", en: "Class Rank", "zh-TW": "等級內名次", ko: "클래스 내 순위" },
 
   "dashboard.arenaHistory.help.overviewTitle": { ja: "このカードについて", en: "About this card", "zh-TW": "關於此卡片", ko: "이 카드에 대해" },
   "dashboard.arenaHistory.help.overviewDesc": {

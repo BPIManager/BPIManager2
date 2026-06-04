@@ -12,6 +12,8 @@ export type ArenaHistoryRecord = {
   arenaClass: string;
   arenaRank: number | null;
   wins: number | null;
+  classRank: number | null;   // = arenaRank（eagateクラス内順位）
+  globalRank: number | null;  // = arenaRank + 上位クラス累積人数
 };
 
 export function useArenaMetadata(version: string) {

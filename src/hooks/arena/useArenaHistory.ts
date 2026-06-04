@@ -20,6 +20,7 @@ export interface ProcessedPoint {
   time: string;
   classNum: number | null;
   rank: number | null;
+  classRank: number | null;
   winsDelta: number;
 }
 
@@ -82,8 +83,9 @@ function toProcessedPoints(records: ArenaHistoryRecord[]): ProcessedPoint[] {
   return records.map((d, i) => ({
     time: dayjs(d.fetchedAt).tz().format("M/D HH:mm"),
     classNum: CLASS_TO_NUM[d.arenaClass] ?? null,
-    rank: d.arenaRank,
-    winsDelta: i === 0 ? (d.wins ?? 0) : Math.max(0, (d.wins ?? 0) - (records[i - 1].wins ?? 0)),
+    rank: d.globalRank,
+    classRank: d.classRank,
+    winsDelta: i === 0 ? 0 : Math.max(0, (d.wins ?? 0) - (records[i - 1].wins ?? 0)),
   }));
 }
 
