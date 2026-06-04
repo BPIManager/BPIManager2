@@ -1,13 +1,11 @@
 import cron from "node-cron";
 import { generateArenaJson } from "./metrics";
 import { generateInfoJson } from "./metrics/info";
-import {
-  fetchOfficialArenaDistribution,
-  getArenaEventPeriod,
-} from "./arena";
+import { fetchOfficialArenaDistribution, getArenaEventPeriod } from "./arena";
 import { updateAllUserRadarCache } from "./radar";
 import { generateUserSitemap } from "./sitemaps";
 import { invalidateArenaAveragesCache } from "@/lib/cache/arenaAverages";
+import dayjs from "../dayjs";
 
 async function performDailyTask() {
   try {
@@ -49,12 +47,16 @@ async function printArenaStatus() {
       const upcoming = now < period.start;
 
       console.log(`  Event   : Round ${period.round}`);
-      console.log(`  Period  : ${toJST(period.start)} ~ ${toJST(period.end)} JST`);
+      console.log(
+        `  Period  : ${toJST(period.start)} ~ ${toJST(period.end)} JST`,
+      );
 
       if (inPeriod) {
         const remaining = formatDuration(period.end.getTime() - now.getTime());
         console.log(`  Status  : LIVE  (残り ${remaining})`);
-        console.log("  Interval: 30分ごと (JST 07:00-24:00)  +  daily JST 01:30");
+        console.log(
+          "  Interval: 30分ごと (JST 07:00-24:00)  +  daily JST 01:30",
+        );
       } else if (upcoming) {
         const until = formatDuration(period.start.getTime() - now.getTime());
         console.log(`  Status  : Upcoming  (開始まで ${until})`);
@@ -143,7 +145,9 @@ export async function setupArenaService() {
       const period = await getArenaEventPeriod();
       const now = new Date();
       if (!period || now < period.start || now > period.end) return;
-      console.log(`[Cron] fetchOfficialArenaDistribution (arena live Round ${period.round})`);
+      console.log(
+        `[Cron] fetchOfficialArenaDistribution (arena live Round ${period.round}) / ${dayjs().format("YYYY-MM-DD HH:mm:ss")}`,
+      );
       await fetchOfficialArenaDistribution();
     } catch (err) {
       console.error("[Cron] Frequent arena fetch failed:", err);
