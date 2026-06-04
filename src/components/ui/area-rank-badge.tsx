@@ -128,7 +128,10 @@ export const AreaRankBadge = ({
                   }}
                 />
               ))}
-            {tFormat("profile.areaRank.badge", { rank: areaRank, total: totalInArea })}
+            {tFormat("profile.areaRank.badge", {
+              rank: areaRank,
+              total: totalInArea,
+            })}
           </span>
         </TooltipTrigger>
         <TooltipContent
@@ -136,7 +139,11 @@ export const AreaRankBadge = ({
           className="flex flex-col items-center gap-2"
         >
           <span className="text-center text-xs leading-relaxed">
-            {tFormat("profile.areaRank.tooltip", { area, rank: areaRank, total: totalInArea })}
+            {tFormat("profile.areaRank.tooltip", {
+              area,
+              rank: areaRank,
+              total: totalInArea,
+            })}
             <br />
             {t("profile.areaRank.officialNote")}
             <br />

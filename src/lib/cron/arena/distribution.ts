@@ -163,10 +163,56 @@ function roundTo15Min(date: Date): Date {
   return new Date(Math.floor(date.getTime() / ms) * ms);
 }
 
+interface PlayerRecord {
+  id: string;
+  c: string;  // arena_class
+  w: number;  // wins
+}
+
+interface PlayersSnapshot {
+  fetchedAt: string;
+  players: PlayerRecord[];
+}
+
+function getPlayersFile(version: IIDXVersion) {
+  return path.join(process.cwd(), `public/data/info/arena_official/${version}/latest_players.json`);
+}
+
+function getActiveFile(version: IIDXVersion) {
+  return path.join(process.cwd(), `public/data/info/arena_official/${version}/active.json`);
+}
+
+async function loadPlayersSnapshot(version: IIDXVersion): Promise<PlayersSnapshot | null> {
+  try {
+    const raw = await fs.readFile(getPlayersFile(version), "utf-8");
+    return JSON.parse(raw) as PlayersSnapshot;
+  } catch {
+    return null;
+  }
+}
+
+function computeActiveByClass(
+  prev: PlayersSnapshot | null,
+  current: PlayerRecord[],
+): Record<string, number> {
+  if (!prev) return {};
+  const prevMap = new Map(prev.players.map((p) => [p.id, p]));
+  const byClass: Record<string, number> = {};
+  for (const p of current) {
+    const pp = prevMap.get(p.id);
+    if (!pp || pp.w !== p.w || pp.c !== p.c) {
+      byClass[p.c] = (byClass[p.c] ?? 0) + 1;
+    }
+  }
+  return byClass;
+}
+
 export async function fetchOfficialArenaDistribution(
   version: IIDXVersion = latestVersion,
 ) {
   console.log(`[OfficialArena] version=${version} Acquiring session cookie...`);
+  // 前回スナップショットをロード（差分計算用）
+  const prevSnapshot = await loadPlayersSnapshot(version);
   const { sessionUrl, rankingUrl } = getUrls(version);
   const outputFile = getOutputFile(version);
   const metricsDir = getMetricsDir(version);
@@ -286,7 +332,33 @@ export async function fetchOfficialArenaDistribution(
     }),
   );
 
+  // 今回の全プレイヤースナップショットを構築
+  const currentPlayers: PlayerRecord[] = Array.from(rawByNormalizedId.entries()).map(
+    ([id, p]) => ({
+      id,
+      c: p.arena_class.toUpperCase(),
+      w: parseInt(p.win ?? "0") || 0,
+    }),
+  );
+
+  // 前回との差分からアクティブプレイヤー数を算出して保存
+  const activeByClass = computeActiveByClass(prevSnapshot, currentPlayers);
+  await fs.writeFile(
+    getActiveFile(version),
+    JSON.stringify({
+      generatedAt: now.toISOString(),
+      prevFetchedAt: prevSnapshot?.fetchedAt ?? null,
+      byClass: activeByClass,
+    }),
+  );
+
+  // 今回スナップショットを保存（次回の prev として使用）
+  await fs.writeFile(
+    getPlayersFile(version),
+    JSON.stringify({ fetchedAt: now.toISOString(), players: currentPlayers }),
+  );
+
   console.log(
-    `[OfficialArena] Done. version=${version} Matched ${totalMatched}/${users.length} users (${playerClassMap.size} in rankings).`,
+    `[OfficialArena] Done. version=${version} Matched ${totalMatched}/${users.length} users (${playerClassMap.size} in rankings). Active: ${Object.values(activeByClass).reduce((a, b) => a + b, 0)}`,
   );
 }

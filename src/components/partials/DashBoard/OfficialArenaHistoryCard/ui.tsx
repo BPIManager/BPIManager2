@@ -4,8 +4,16 @@ import { HelpTooltip } from "@/components/ui/tooltip";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import dayjs from "@/lib/dayjs";
 import { ArenaChart } from "./chart";
-import { type Granularity, type ArenaHistoryState } from "@/hooks/arena/useArenaHistory";
-import type { ArenaEventEntry, ArenaVersionMetadata } from "@/lib/cron/arena/types";
+import { ActivePlayers } from "./ActivePlayers";
+import { useActiveArenaPlayers } from "@/hooks/arena/useActiveArenaPlayers";
+import {
+  type Granularity,
+  type ArenaHistoryState,
+} from "@/hooks/arena/useArenaHistory";
+import type {
+  ArenaEventEntry,
+  ArenaVersionMetadata,
+} from "@/lib/cron/arena/types";
 
 const ArenaHistoryHelpContent = () => {
   const { t } = useTranslation();
@@ -67,14 +75,36 @@ export const OfficialArenaHistoryCardUI = ({
   state,
 }: OfficialArenaHistoryCardUIProps) => {
   const { t } = useTranslation();
-  const { granularity, setGranularity, countdown, isUpcoming, hasNoData, processedData, maxWinsDelta, hasRank, hasWins } = state;
+  const {
+    granularity,
+    setGranularity,
+    countdown,
+    isUpcoming,
+    hasNoData,
+    processedData,
+    maxWinsDelta,
+    hasRank,
+    hasWins,
+  } = state;
 
   const events = metadata?.events ?? [];
   const selectedEvent: ArenaEventEntry | undefined = events[selectedIndex];
 
+  const now = Date.now();
+  const isLive =
+    !!selectedEvent &&
+    now >= new Date(selectedEvent.start).getTime() &&
+    now <= new Date(selectedEvent.end).getTime();
+
+  const version = metadata?.version ?? "";
+  const { data: activeData, isLoading: activeLoading } = useActiveArenaPlayers(
+    version,
+    isLive,
+  );
+
   const GRANULARITY_OPTIONS: { id: Granularity; label: string }[] = [
-    { id: "day",    label: t("dashboard.arenaHistory.granularity.day") },
-    { id: "week",   label: t("dashboard.arenaHistory.granularity.week") },
+    { id: "day", label: t("dashboard.arenaHistory.granularity.day") },
+    { id: "week", label: t("dashboard.arenaHistory.granularity.week") },
     { id: "season", label: t("dashboard.arenaHistory.granularity.season") },
   ];
 
@@ -82,7 +112,9 @@ export const OfficialArenaHistoryCardUI = ({
     <DashCard>
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-1">
-          <p className="text-sm font-black text-bpim-text">{t("dashboard.arenaHistory.title")}</p>
+          <p className="text-sm font-black text-bpim-text">
+            {t("dashboard.arenaHistory.title")}
+          </p>
           <HelpTooltip align="right">
             <ArenaHistoryHelpContent />
           </HelpTooltip>
@@ -97,7 +129,10 @@ export const OfficialArenaHistoryCardUI = ({
           >
             {events.map((ev, i) => (
               <option key={ev.round} value={i}>
-                {t("dashboard.arenaHistory.round").replace("{n}", String(ev.round))}
+                {t("dashboard.arenaHistory.round").replace(
+                  "{n}",
+                  String(ev.round),
+                )}
               </option>
             ))}
           </select>
@@ -132,21 +167,40 @@ export const OfficialArenaHistoryCardUI = ({
       {isUpcoming && countdown && (
         <div className="mb-5 rounded-xl border border-bpim-primary/20 bg-bpim-primary/5 px-4 py-4 text-center">
           <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-bpim-primary/70">
-            {t("dashboard.arenaHistory.countdown.until").replace("{n}", String(selectedEvent?.round ?? ""))}
+            {t("dashboard.arenaHistory.countdown.until").replace(
+              "{n}",
+              String(selectedEvent?.round ?? ""),
+            )}
           </p>
           <div className="flex items-end justify-center gap-1">
-            {(
-              [
-                { value: countdown.d, key: "dashboard.arenaHistory.countdown.day"  as const },
-                { value: countdown.h, key: "dashboard.arenaHistory.countdown.hour" as const },
-                { value: countdown.m, key: "dashboard.arenaHistory.countdown.min"  as const },
-                { value: countdown.s, key: "dashboard.arenaHistory.countdown.sec"  as const },
-              ]
-            ).map(({ value, key }, i) => (
+            {[
+              {
+                value: countdown.d,
+                key: "dashboard.arenaHistory.countdown.day" as const,
+              },
+              {
+                value: countdown.h,
+                key: "dashboard.arenaHistory.countdown.hour" as const,
+              },
+              {
+                value: countdown.m,
+                key: "dashboard.arenaHistory.countdown.min" as const,
+              },
+              {
+                value: countdown.s,
+                key: "dashboard.arenaHistory.countdown.sec" as const,
+              },
+            ].map(({ value, key }, i) => (
               <div key={key} className="flex items-end gap-0.5">
-                {i > 0 && <span className="mb-1 text-lg font-black text-bpim-primary/40">:</span>}
+                {i > 0 && (
+                  <span className="mb-1 text-lg font-black text-bpim-primary/40">
+                    :
+                  </span>
+                )}
                 <div className="flex flex-col items-center">
-                  <span className="font-mono text-2xl font-black tabular-nums text-bpim-primary">{value}</span>
+                  <span className="font-mono text-2xl font-black tabular-nums text-bpim-primary">
+                    {value}
+                  </span>
                   <span className="text-[9px] text-bpim-muted">{t(key)}</span>
                 </div>
               </div>
@@ -156,14 +210,23 @@ export const OfficialArenaHistoryCardUI = ({
       )}
 
       {!isUpcoming && hasNoData && !dataLoading && (
-        <p className="py-8 text-center text-xs text-bpim-muted">{t("dashboard.arenaHistory.noData")}</p>
+        <p className="py-8 text-center text-xs text-bpim-muted">
+          {t("dashboard.arenaHistory.noData")}
+        </p>
       )}
 
       {dataLoading && <Skeleton className="h-56 w-full rounded-lg" />}
 
       {processedData && (
-        <ArenaChart data={processedData} maxWinsDelta={maxWinsDelta} hasRank={hasRank} hasWins={hasWins} />
+        <ArenaChart
+          data={processedData}
+          maxWinsDelta={maxWinsDelta}
+          hasRank={hasRank}
+          hasWins={hasWins}
+        />
       )}
+
+      {isLive && <ActivePlayers data={activeData} isLoading={activeLoading} />}
     </DashCard>
   );
 };

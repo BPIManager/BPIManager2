@@ -10,7 +10,11 @@ import {
   CartesianGrid,
   Legend,
 } from "recharts";
-import { NUM_TO_CLASS, MAX_CLASS_NUM, type ProcessedPoint } from "@/hooks/arena/useArenaHistory";
+import {
+  NUM_TO_CLASS,
+  MAX_CLASS_NUM,
+  type ProcessedPoint,
+} from "@/hooks/arena/useArenaHistory";
 
 const CHART_STYLE = {
   contentStyle: {
@@ -36,21 +40,40 @@ export interface ArenaChartProps {
   hasWins: boolean;
 }
 
-export function ArenaChart({ data, maxWinsDelta, hasRank, hasWins }: ArenaChartProps) {
+export function ArenaChart({
+  data,
+  maxWinsDelta,
+  hasRank,
+  hasWins,
+}: ArenaChartProps) {
   const { t } = useTranslation();
 
   const fmtTooltip = (v: unknown, name: unknown) => {
-    if (name === "classNum")  return [NUM_TO_CLASS[v as number] ?? v, t("dashboard.arenaHistory.chart.class")];
-    if (name === "rank")      return [(v as number).toLocaleString("ja-JP"), t("dashboard.arenaHistory.chart.rank")];
-    if (name === "classRank") return [(v as number).toLocaleString("ja-JP"), t("dashboard.arenaHistory.chart.classRank")];
-    if (name === "winsDelta") return [v, t("dashboard.arenaHistory.chart.wins")];
+    if (name === "classNum")
+      return [
+        NUM_TO_CLASS[v as number] ?? v,
+        t("dashboard.arenaHistory.chart.class"),
+      ];
+    if (name === "rank")
+      return [
+        (v as number).toLocaleString("ja-JP"),
+        t("dashboard.arenaHistory.chart.rank"),
+      ];
+    if (name === "classRank")
+      return [
+        (v as number).toLocaleString("ja-JP"),
+        t("dashboard.arenaHistory.chart.classRank"),
+      ];
+    if (name === "winsDelta")
+      return [v, t("dashboard.arenaHistory.chart.wins")];
     return [v, name];
   };
 
   const fmtLegend = (value: string) => {
-    if (value === "classNum")  return t("dashboard.arenaHistory.chart.class");
-    if (value === "rank")      return t("dashboard.arenaHistory.chart.rank");
-    if (value === "classRank") return t("dashboard.arenaHistory.chart.classRank");
+    if (value === "classNum") return t("dashboard.arenaHistory.chart.class");
+    if (value === "rank") return t("dashboard.arenaHistory.chart.rank");
+    if (value === "classRank")
+      return t("dashboard.arenaHistory.chart.classRank");
     if (value === "winsDelta") return t("dashboard.arenaHistory.chart.wins");
     return value;
   };
@@ -58,7 +81,10 @@ export function ArenaChart({ data, maxWinsDelta, hasRank, hasWins }: ArenaChartP
   return (
     <div className="h-56 -mx-1">
       <ResponsiveContainer width="100%" height="100%">
-        <ComposedChart data={data} margin={{ top: 4, right: 40, left: 0, bottom: 8 }}>
+        <ComposedChart
+          data={data}
+          margin={{ top: 4, right: -10, left: 0, bottom: 8 }}
+        >
           <CartesianGrid
             strokeDasharray="3 3"
             vertical={false}
@@ -100,10 +126,16 @@ export function ArenaChart({ data, maxWinsDelta, hasRank, hasWins }: ArenaChartP
               tickFormatter={(v) => (v as number).toLocaleString("ja-JP")}
             />
           )}
-          {hasWins && <YAxis yAxisId="wins" hide domain={[0, maxWinsDelta * 3]} />}
+          {hasWins && (
+            <YAxis yAxisId="wins" hide domain={[0, maxWinsDelta * 3]} />
+          )}
 
           <Tooltip {...CHART_STYLE} formatter={fmtTooltip as never} />
-          <Legend iconSize={8} wrapperStyle={{ fontSize: 10, paddingTop: 4 }} formatter={fmtLegend} />
+          <Legend
+            iconSize={8}
+            wrapperStyle={{ fontSize: 10, paddingTop: 4 }}
+            formatter={fmtLegend}
+          />
 
           <Line
             yAxisId="class"

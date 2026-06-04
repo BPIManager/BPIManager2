@@ -37,16 +37,23 @@ export interface ArenaHistoryState {
 }
 
 const WINDOW_MS: Record<Granularity, number | null> = {
-  day:    24 * 3_600_000,
-  week:   7  * 86_400_000,
+  day: 24 * 3_600_000,
+  week: 7 * 86_400_000,
   season: null,
 };
 
-function filterByWindow(records: ArenaHistoryRecord[], granularity: Granularity): ArenaHistoryRecord[] {
+function filterByWindow(
+  records: ArenaHistoryRecord[],
+  granularity: Granularity,
+): ArenaHistoryRecord[] {
   const ms = WINDOW_MS[granularity];
   if (!ms || records.length === 0) return records;
-  const latestTs = Math.max(...records.map((r) => new Date(r.fetchedAt).getTime()));
-  return records.filter((r) => new Date(r.fetchedAt).getTime() >= latestTs - ms);
+  const latestTs = Math.max(
+    ...records.map((r) => new Date(r.fetchedAt).getTime()),
+  );
+  return records.filter(
+    (r) => new Date(r.fetchedAt).getTime() >= latestTs - ms,
+  );
 }
 
 function bestInBucket(records: ArenaHistoryRecord[]): ArenaHistoryRecord {
@@ -54,7 +61,11 @@ function bestInBucket(records: ArenaHistoryRecord[]): ArenaHistoryRecord {
   let bestIdx = CLASS_TO_NUM[best.arenaClass] ?? 999;
   for (const r of records) {
     const idx = CLASS_TO_NUM[r.arenaClass] ?? 999;
-    if (idx < bestIdx || (idx === bestIdx && (r.arenaRank ?? Infinity) < (best.arenaRank ?? Infinity))) {
+    if (
+      idx < bestIdx ||
+      (idx === bestIdx &&
+        (r.arenaRank ?? Infinity) < (best.arenaRank ?? Infinity))
+    ) {
       best = r;
       bestIdx = idx;
     }
@@ -62,11 +73,17 @@ function bestInBucket(records: ArenaHistoryRecord[]): ArenaHistoryRecord {
   return { ...best, wins: Math.max(...records.map((r) => r.wins ?? 0)) };
 }
 
-function downsample(records: ArenaHistoryRecord[], granularity: Granularity): ArenaHistoryRecord[] {
+function downsample(
+  records: ArenaHistoryRecord[],
+  granularity: Granularity,
+): ArenaHistoryRecord[] {
   if (granularity === "day") return records;
   const getBucket = (iso: string) =>
     granularity === "week"
-      ? String(Math.floor(new Date(iso).getTime() / (6 * 3_600_000)) * (6 * 3_600_000))
+      ? String(
+          Math.floor(new Date(iso).getTime() / (6 * 3_600_000)) *
+            (6 * 3_600_000),
+        )
       : dayjs(iso).tz().format("YYYY-MM-DD");
 
   const buckets = new Map<string, ArenaHistoryRecord[]>();
@@ -85,7 +102,8 @@ function toProcessedPoints(records: ArenaHistoryRecord[]): ProcessedPoint[] {
     classNum: CLASS_TO_NUM[d.arenaClass] ?? null,
     rank: d.globalRank,
     classRank: d.classRank,
-    winsDelta: i === 0 ? 0 : Math.max(0, (d.wins ?? 0) - (records[i - 1].wins ?? 0)),
+    winsDelta:
+      i === 0 ? 0 : Math.max(0, (d.wins ?? 0) - (records[i - 1].wins ?? 0)),
   }));
 }
 
@@ -105,8 +123,10 @@ export function useArenaHistory(
   dataLoading: boolean,
   selectedEvent: ArenaEventEntry | undefined,
 ): ArenaHistoryState {
-  const [granularity, setGranularity] = useState<Granularity>("season");
-  const [countdown, setCountdown] = useState<ReturnType<typeof formatCountdown> | null>(null);
+  const [granularity, setGranularity] = useState<Granularity>("day");
+  const [countdown, setCountdown] = useState<ReturnType<
+    typeof formatCountdown
+  > | null>(null);
 
   useEffect(() => {
     if (!selectedEvent) return;
@@ -122,7 +142,9 @@ export function useArenaHistory(
 
   const processedData = useMemo(() => {
     if (!Array.isArray(data) || data.length === 0) return null;
-    return toProcessedPoints(downsample(filterByWindow(data, granularity), granularity));
+    return toProcessedPoints(
+      downsample(filterByWindow(data, granularity), granularity),
+    );
   }, [data, granularity]);
 
   const maxWinsDelta = useMemo(
