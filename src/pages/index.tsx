@@ -64,7 +64,7 @@ function WidgetRenderer({
     case "rankingTabs":
       return <RankingTabsCard userId={userId} />;
     case "officialArenaHistory":
-      return <OfficialArenaHistorySection userId={userId} />;
+      return <OfficialArenaHistorySection userId={userId} showActivePlayers />;
     default:
       return null;
   }

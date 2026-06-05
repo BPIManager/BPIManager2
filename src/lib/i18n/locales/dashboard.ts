@@ -1052,4 +1052,22 @@ export const dashboardTranslations = {
     "zh-TW": "週/季顯示時，採用各期間內最佳等級、最低排名數及最高勝場數。",
     ko: "주/시즌 표시에서는 각 기간 내 최고 클래스·최저 순위 수치·최대 승리 수를 사용합니다.",
   },
+  "dashboard.arenaHistory.summary.bestClass": {
+    ja: "期間最高ランク",
+    en: "Best Class",
+    "zh-TW": "期間最高等級",
+    ko: "기간 최고 클래스",
+  },
+  "dashboard.arenaHistory.summary.bestA1Continue": {
+    ja: "最高A1維持回数",
+    en: "Best A1 Streak",
+    "zh-TW": "最高A1連續回數",
+    ko: "최고 A1 유지 횟수",
+  },
+  "dashboard.arenaHistory.summary.bestRank": {
+    ja: "最高順位",
+    en: "Best Rank",
+    "zh-TW": "最高排名",
+    ko: "최고 순위",
+  },
 } as const;

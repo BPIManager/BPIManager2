@@ -5,7 +5,13 @@ import { useArenaHistory } from "@/hooks/arena/useArenaHistory";
 import { OfficialArenaHistoryCardUI } from "./ui";
 import { OfficialArenaHistoryCardSkeleton } from "./skeleton";
 
-export const OfficialArenaHistorySection = ({ userId }: { userId: string }) => {
+export const OfficialArenaHistorySection = ({
+  userId,
+  showActivePlayers = false,
+}: {
+  userId: string;
+  showActivePlayers?: boolean;
+}) => {
   const { version } = useStatsFilter();
   const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -25,6 +31,7 @@ export const OfficialArenaHistorySection = ({ userId }: { userId: string }) => {
       onSelectIndex={setSelectedIndex}
       dataLoading={dataLoading}
       state={state}
+      showActivePlayers={showActivePlayers}
     />
   );
 };

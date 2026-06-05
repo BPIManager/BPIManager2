@@ -386,10 +386,12 @@ CREATE TABLE IF NOT EXISTS `officialArenaStats` (
   `gradeDp` varchar(20) DEFAULT NULL,
   `arenaRank` int(11) DEFAULT NULL,
   `wins` int(11) DEFAULT NULL,
+  `a1continue` varchar(20) DEFAULT NULL,
   `fetchedAt` timestamp NOT NULL,
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   KEY `idx_oas_userId_version_fetchedAt` (`userId`,`version`,`fetchedAt` DESC),
+  KEY `idx_oas_userId_version_id_desc` (`userId`,`version`,`id` DESC),
   CONSTRAINT `fk_oas_userId` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

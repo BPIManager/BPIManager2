@@ -42,8 +42,16 @@ export default function FollowPage({
             iconOnly
             listClassName="mb-6"
             tabs={[
-              { value: "following", label: t("profile.follow.following"), icon: UserCheck },
-              { value: "followers", label: t("profile.follow.followers"), icon: Users },
+              {
+                value: "following",
+                label: t("profile.follow.following"),
+                icon: UserCheck,
+              },
+              {
+                value: "followers",
+                label: t("profile.follow.followers"),
+                icon: Users,
+              },
             ]}
           />
 

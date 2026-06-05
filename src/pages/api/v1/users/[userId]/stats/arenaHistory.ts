@@ -50,6 +50,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       arenaClass: r.arenaClass,
       arenaRank: r.arenaRank,
       wins: r.wins,
+      a1continue: r.a1continue,
       classRank: r.arenaRank,
       globalRank: r.arenaRank !== null
         ? (classOffsets.get(r.arenaClass) ?? 0) + r.arenaRank

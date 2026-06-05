@@ -139,8 +139,8 @@ export async function setupArenaService() {
     }
   });
 
-  // アリーナ開催期間中は JST 07:00〜24:00（UTC 22:00〜14:59）の間、30 分ごとに取得
-  cron.schedule("*/30 22-23,0-14 * * *", async () => {
+  // アリーナ開催期間中は JST 07:00〜25:00（UTC 22:00〜15:59）の間、30 分ごとに取得
+  cron.schedule("*/30 22-23,0-15 * * *", async () => {
     try {
       const period = await getArenaEventPeriod();
       const now = new Date();

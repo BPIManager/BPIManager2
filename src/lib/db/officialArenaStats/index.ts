@@ -76,7 +76,8 @@ export async function upsertOfficialArenaStats(
       latest.gradeSp !== r.gradeSp ||
       latest.gradeDp !== r.gradeDp ||
       latest.arenaRank !== r.arenaRank ||
-      latest.wins !== r.wins
+      latest.wins !== r.wins ||
+      latest.a1continue !== r.a1continue
     );
   });
 
@@ -98,7 +99,7 @@ export async function getArenaStatsHistory(
 ) {
   return db
     .selectFrom("officialArenaStats")
-    .select(["fetchedAt", "arenaClass", "arenaRank", "wins"])
+    .select(["fetchedAt", "arenaClass", "arenaRank", "wins", "a1continue"])
     .where("userId", "=", userId)
     .where("version", "=", version)
     .where("fetchedAt", ">=", start)
@@ -131,6 +132,7 @@ async function fetchLatestByUserIds(userIds: string[], version: string) {
       "oas.gradeDp",
       "oas.arenaRank",
       "oas.wins",
+      "oas.a1continue",
       "oas.fetchedAt",
     ])
     .execute();

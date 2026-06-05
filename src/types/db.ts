@@ -352,6 +352,7 @@ export interface OfficialArenaStats {
   gradeDp: string | null;
   arenaRank: number | null;
   wins: number | null;
+  a1continue: string | null;
   fetchedAt: Date;
   createdAt: Generated<Date>;
 }

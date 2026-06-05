@@ -9,11 +9,43 @@ import { useActiveArenaPlayers } from "@/hooks/arena/useActiveArenaPlayers";
 import {
   type Granularity,
   type ArenaHistoryState,
+  type ArenaSummaryStats,
 } from "@/hooks/arena/useArenaHistory";
 import type {
   ArenaEventEntry,
   ArenaVersionMetadata,
 } from "@/lib/cron/arena/types";
+
+const ArenaSummaryCards = ({ stats }: { stats: ArenaSummaryStats }) => {
+  const { t } = useTranslation();
+  const items = [
+    {
+      label: t("dashboard.arenaHistory.summary.bestClass"),
+      value: stats.bestClass ?? "-",
+    },
+    {
+      label: t("dashboard.arenaHistory.summary.bestA1Continue"),
+      value: stats.bestA1Continue !== null ? `${stats.bestA1Continue}回` : "-",
+    },
+    {
+      label: t("dashboard.arenaHistory.summary.bestRank"),
+      value: stats.bestRank !== null ? `${stats.bestRank}位` : "-",
+    },
+  ];
+  return (
+    <div className="mb-4 grid grid-cols-3 gap-2">
+      {items.map(({ label, value }) => (
+        <div
+          key={label}
+          className="rounded-lg border border-bpim-border bg-bpim-surface-2 px-3 py-2 text-center"
+        >
+          <p className="text-[9px] text-bpim-muted">{label}</p>
+          <p className="mt-0.5 text-sm font-black text-bpim-text">{value}</p>
+        </div>
+      ))}
+    </div>
+  );
+};
 
 const ArenaHistoryHelpContent = () => {
   const { t } = useTranslation();
@@ -64,6 +96,7 @@ export interface OfficialArenaHistoryCardUIProps {
   onSelectIndex: (i: number) => void;
   dataLoading: boolean;
   state: ArenaHistoryState;
+  showActivePlayers?: boolean;
 }
 
 export const OfficialArenaHistoryCardUI = ({
@@ -73,6 +106,7 @@ export const OfficialArenaHistoryCardUI = ({
   onSelectIndex,
   dataLoading,
   state,
+  showActivePlayers = false,
 }: OfficialArenaHistoryCardUIProps) => {
   const { t } = useTranslation();
   const {
@@ -85,6 +119,7 @@ export const OfficialArenaHistoryCardUI = ({
     maxWinsDelta,
     hasRank,
     hasWins,
+    summaryStats,
   } = state;
 
   const events = metadata?.events ?? [];
@@ -217,6 +252,10 @@ export const OfficialArenaHistoryCardUI = ({
 
       {dataLoading && <Skeleton className="h-56 w-full rounded-lg" />}
 
+      {!isUpcoming && summaryStats && !dataLoading && (
+        <ArenaSummaryCards stats={summaryStats} />
+      )}
+
       {processedData && (
         <ArenaChart
           data={processedData}
@@ -226,7 +265,7 @@ export const OfficialArenaHistoryCardUI = ({
         />
       )}
 
-      {isLive && <ActivePlayers data={activeData} isLoading={activeLoading} />}
+      {isLive && showActivePlayers && <ActivePlayers data={activeData} isLoading={activeLoading} />}
     </DashCard>
   );
 };

@@ -52,25 +52,40 @@ const CACHE_DIR = join(DATA_DIR, "cache");
 const CACHE_FILE = join(CACHE_DIR, "prefecture_rankings.json");
 
 let memoryCache: CacheFile | null = null;
+let latestDateJsonCache: { result: { absolutePath: string; sourceFile: string } | null; checkedAt: number } | null = null;
+const LATEST_JSON_TTL_MS = 60_000;
 
 function getLatestDateJson(): {
   absolutePath: string;
   sourceFile: string;
 } | null {
+  const now = Date.now();
+  if (latestDateJsonCache && now - latestDateJsonCache.checkedAt < LATEST_JSON_TTL_MS) {
+    return latestDateJsonCache.result;
+  }
+
   const versionDir = join(DATA_DIR, latestVersion);
-  if (!existsSync(versionDir)) return null;
+  if (!existsSync(versionDir)) {
+    latestDateJsonCache = { result: null, checkedAt: now };
+    return null;
+  }
 
   const files = readdirSync(versionDir)
     .filter((f) => /^\d{4}-\d{2}-\d{2}\.json$/.test(f))
     .sort();
 
-  if (files.length === 0) return null;
+  if (files.length === 0) {
+    latestDateJsonCache = { result: null, checkedAt: now };
+    return null;
+  }
 
   const latest = files[files.length - 1];
-  return {
+  const result = {
     absolutePath: join(versionDir, latest),
     sourceFile: `${latestVersion}/${latest}`,
   };
+  latestDateJsonCache = { result, checkedAt: now };
+  return result;
 }
 
 function buildRankings(data: ArenaJson): Record<string, AreaRankInfo> {

@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { User, ChevronRight, Activity } from "lucide-react";
-import useSWR from "swr";
+import { useCallback } from "react";
+import useSWR, { useSWRConfig } from "swr";
 import { useRivalComparison } from "@/hooks/social/useRivalComparison";
 import { useProfile } from "@/hooks/users/useProfile";
+import { useFollow } from "@/hooks/users/useFollow";
 import { useUser } from "@/contexts/users/UserContext";
 import { RivalBodySkeleton, RivalHeaderSkeleton } from "./skeleton";
 import { RivalHeader, SectionTitle, WinLossStats } from "./ui";
@@ -15,6 +17,7 @@ import { Separator } from "@/components/ui/separator";
 import { fetcher } from "@/utils/common/fetch";
 import { API_PREFIX } from "@/constants/apiEndpoints";
 import { latestVersion } from "@/constants/latestVersion";
+import { toast } from "sonner";
 
 export const RivalComparisonModal = ({
   rivalId,
@@ -31,18 +34,61 @@ export const RivalComparisonModal = ({
 }) => {
   const { fbUser } = useUser();
 
+  // ログイン時: compare エンドポイントで profile + 勝敗データを1本で取得
   const {
     data,
     isLoading: isRivalLoading,
     isValidating,
+    mutate: mutateCompare,
   } = useRivalComparison(rivalId);
 
-  const {
-    toggleFollow,
-    isUpdating,
-    profile: profileData,
-    isLoading: isProfileLoading,
-  } = useProfile(rivalId ?? undefined);
+  // ゲスト時のみ: plain profile エンドポイントで表示用データを取得
+  const { profile: guestProfile, isLoading: isGuestProfileLoading } = useProfile(
+    !fbUser ? (rivalId ?? undefined) : undefined,
+  );
+
+  // ログイン時のフォロートグル (compare キャッシュを直接更新)
+  const { requestFollow, isUpdating } = useFollow(
+    fbUser ? (rivalId ?? undefined) : undefined,
+  );
+  const { mutate: globalMutate } = useSWRConfig();
+
+  const toggleFollow = useCallback(async () => {
+    const currentProfile = data?.profile;
+    if (!currentProfile || isUpdating) return;
+    const currentStatus = currentProfile.relationship.isFollowing;
+    const updatedRelationship = {
+      ...currentProfile.relationship,
+      isFollowing: !currentStatus,
+      isMutual: !currentStatus && currentProfile.relationship.isFollowedBy,
+    };
+    const optimisticData = {
+      ...data,
+      profile: {
+        ...currentProfile,
+        follows: {
+          ...currentProfile.follows,
+          followers: currentProfile.follows.followers + (currentStatus ? -1 : 1),
+        },
+        relationship: updatedRelationship,
+      },
+    };
+    try {
+      const followPromise = requestFollow(currentStatus);
+      await mutateCompare(
+        followPromise.then(() => optimisticData),
+        { optimisticData, rollbackOnError: true, populateCache: true, revalidate: true },
+      );
+      // plain profile キャッシュも同期
+      const plainKey = [`${API_PREFIX}/users/${rivalId}/profile`, fbUser];
+      globalMutate(plainKey, (cur: typeof optimisticData | undefined) => {
+        if (!cur) return cur;
+        return { ...cur, profile: { ...cur.profile, follows: optimisticData.profile.follows, relationship: updatedRelationship } };
+      }, { revalidate: true });
+    } catch {
+      toast.error("操作が完了しませんでした");
+    }
+  }, [data, isUpdating, requestFollow, mutateCompare, globalMutate, rivalId, fbUser]);
 
   // 未ログイン時にライバルのレーダーを公開エンドポイントで取得
   const v = version ?? latestVersion;
@@ -56,9 +102,9 @@ export const RivalComparisonModal = ({
 
   if (!rivalId) return null;
 
-  const profile = data?.profile || profileData;
+  const profile = data?.profile ?? guestProfile;
   const compare = data?.compare;
-  const isLoading = isRivalLoading || isProfileLoading;
+  const isLoading = fbUser ? isRivalLoading : isGuestProfileLoading;
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>

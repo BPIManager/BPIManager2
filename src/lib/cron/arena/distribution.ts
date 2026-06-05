@@ -18,6 +18,7 @@ interface EagatePlayer {
   grade_dp: string;
   rank: number;
   win: string;
+  a1continue: string;
 }
 
 function getUrls(version: IIDXVersion) {
@@ -283,6 +284,7 @@ export async function fetchOfficialArenaDistribution(
           const n = parseInt(raw.win ?? "");
           return isNaN(n) ? null : n;
         })(),
+        a1continue: raw.a1continue || null,
         fetchedAt,
       });
     }

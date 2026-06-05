@@ -24,6 +24,12 @@ export interface ProcessedPoint {
   winsDelta: number;
 }
 
+export interface ArenaSummaryStats {
+  bestClass: string | null;
+  bestA1Continue: number | null;
+  bestRank: number | null;
+}
+
 export interface ArenaHistoryState {
   granularity: Granularity;
   setGranularity: (g: Granularity) => void;
@@ -34,6 +40,7 @@ export interface ArenaHistoryState {
   maxWinsDelta: number;
   hasRank: boolean;
   hasWins: boolean;
+  summaryStats: ArenaSummaryStats | null;
 }
 
 const WINDOW_MS: Record<Granularity, number | null> = {
@@ -152,6 +159,31 @@ export function useArenaHistory(
     [processedData],
   );
 
+  const summaryStats = useMemo((): ArenaSummaryStats | null => {
+    if (!Array.isArray(data) || data.length === 0) return null;
+    let bestClassNum = Infinity;
+    let bestClass: string | null = null;
+    let bestA1Continue: number | null = null;
+    let bestRank: number | null = null;
+    for (const r of data) {
+      const classNum = CLASS_TO_NUM[r.arenaClass] ?? Infinity;
+      if (classNum < bestClassNum) {
+        bestClassNum = classNum;
+        bestClass = r.arenaClass;
+      }
+      if (r.a1continue && r.a1continue !== "---") {
+        const n = parseInt(r.a1continue, 10);
+        if (!isNaN(n) && (bestA1Continue === null || n > bestA1Continue)) {
+          bestA1Continue = n;
+        }
+      }
+      if (r.globalRank !== null && (bestRank === null || r.globalRank < bestRank)) {
+        bestRank = r.globalRank;
+      }
+    }
+    return { bestClass, bestA1Continue, bestRank };
+  }, [data]);
+
   return {
     granularity,
     setGranularity,
@@ -162,5 +194,6 @@ export function useArenaHistory(
     maxWinsDelta,
     hasRank: processedData?.some((d) => d.rank !== null) ?? false,
     hasWins: processedData?.some((d) => d.winsDelta > 0) ?? false,
+    summaryStats,
   };
 }

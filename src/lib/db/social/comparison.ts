@@ -15,73 +15,55 @@ class SocialComparisonRepository {
    * @returns `{ level, win, lose, draw }[]`
    */
   async getWinLossStats(viewerId: string, rivalId: string, version: string) {
-    const getLatestLogIds = (uid: string) =>
+    const getLatestScores = (uid: string) =>
       db
         .selectFrom("scores as s")
+        .innerJoin(
+          db
+            .selectFrom("scores")
+            .select(["songId", (eb) => eb.fn.max("logId").as("maxLogId")])
+            .where("userId", "=", uid)
+            .where("version", "=", version)
+            .groupBy("songId")
+            .as("latest"),
+          (join) =>
+            join
+              .onRef("s.songId", "=", "latest.songId")
+              .onRef("s.logId", "=", "latest.maxLogId"),
+        )
         .innerJoin("songs as m", "s.songId", "m.songId")
-        .select(["s.songId", (eb) => eb.fn.max("s.logId").as("maxId")])
-        .where("s.userId", "=", uid)
-        .where("s.version", "=", version)
-        .where("m.difficultyLevel", "in", [11, 12])
-        .groupBy("s.songId");
+        .select(["s.songId", "s.exScore", "m.difficultyLevel"])
+        .where("m.difficultyLevel", "in", [11, 12]);
 
-    const [vIds, rIds] = await Promise.all([
-      getLatestLogIds(viewerId).execute(),
-      getLatestLogIds(rivalId).execute(),
+    const [vScores, rScores] = await Promise.all([
+      getLatestScores(viewerId).execute(),
+      getLatestScores(rivalId).execute(),
     ]);
 
-    if (vIds.length === 0 || rIds.length === 0) return [];
+    if (vScores.length === 0 || rScores.length === 0) return [];
 
-    const vLogIds = vIds.map((v) => v.maxId as number);
-    const rLogIds = rIds.map((r) => r.maxId as number);
+    const rMap = new Map(rScores.map((r) => [r.songId, r.exScore]));
+    const levelStats = new Map<
+      number,
+      { win: number; lose: number; draw: number }
+    >();
 
-    const stats = await db
-      .selectFrom("scores as s1")
-      .innerJoin("scores as s2", "s1.songId", "s2.songId")
-      .innerJoin("songs as m", "s1.songId", "m.songId")
-      .select((eb) => [
-        "m.difficultyLevel",
-        eb.fn
-          .sum<number>(
-            eb
-              .case()
-              .when(eb("s1.exScore", ">", eb.ref("s2.exScore")))
-              .then(eb.val(1))
-              .else(eb.val(0))
-              .end(),
-          )
-          .as("win"),
-        eb.fn
-          .sum<number>(
-            eb
-              .case()
-              .when(eb("s1.exScore", "<", eb.ref("s2.exScore")))
-              .then(eb.val(1))
-              .else(eb.val(0))
-              .end(),
-          )
-          .as("lose"),
-        eb.fn
-          .sum<number>(
-            eb
-              .case()
-              .when(eb("s1.exScore", "=", eb.ref("s2.exScore")))
-              .then(eb.val(1))
-              .else(eb.val(0))
-              .end(),
-          )
-          .as("draw"),
-      ])
-      .where("s1.logId", "in", vLogIds)
-      .where("s2.logId", "in", rLogIds)
-      .groupBy("m.difficultyLevel")
-      .execute();
+    for (const v of vScores) {
+      const rExScore = rMap.get(v.songId);
+      if (rExScore === undefined) continue;
+      const level = v.difficultyLevel;
+      const s = levelStats.get(level) ?? { win: 0, lose: 0, draw: 0 };
+      if (v.exScore > rExScore) s.win++;
+      else if (v.exScore < rExScore) s.lose++;
+      else s.draw++;
+      levelStats.set(level, s);
+    }
 
-    return stats.map((s) => ({
-      level: Number(s.difficultyLevel),
-      win: Number(s.win),
-      lose: Number(s.lose),
-      draw: Number(s.draw),
+    return Array.from(levelStats.entries()).map(([level, s]) => ({
+      level,
+      win: s.win,
+      lose: s.lose,
+      draw: s.draw,
     }));
   }
 
