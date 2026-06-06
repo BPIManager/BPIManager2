@@ -371,7 +371,6 @@ const WIDGET_PREVIEWS: Record<WidgetId, React.ReactNode> = {
   iidxTower: (
     <MiniPreview>
       <svg viewBox="0 0 56 36" className="w-full h-full">
-        {/* 数値ラベル */}
         <text x="3" y="6" fontSize="4" fontWeight="700" fill={P}>
           58,261
         </text>
@@ -385,7 +384,7 @@ const WIDGET_PREVIEWS: Record<WidgetId, React.ReactNode> = {
         >
           6,245
         </text>
-        {/* ゼロライン */}
+
         <line
           x1="3"
           y1="22"
@@ -395,7 +394,7 @@ const WIDGET_PREVIEWS: Record<WidgetId, React.ReactNode> = {
           strokeOpacity={0.3}
           strokeWidth="0.5"
         />
-        {/* 正負バー */}
+
         {(
           [
             { h: 8, neg: false },

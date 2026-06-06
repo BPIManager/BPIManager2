@@ -53,9 +53,7 @@ export default function DataExportUi() {
             <FileArchive className="h-4 w-4" />
             <span className="font-bold">{t("settings.export.title")}</span>
           </div>
-          <p className="text-sm text-bpim-muted">
-            {t("settings.export.desc")}
-          </p>
+          <p className="text-sm text-bpim-muted">{t("settings.export.desc")}</p>
         </div>
         <Button
           variant="outline"
@@ -82,7 +80,6 @@ export default function DataExportUi() {
           </DialogHeader>
 
           <div className="overflow-y-auto max-h-[65vh] p-6 flex flex-col gap-6">
-            {/* バージョン選択 */}
             <section className="flex flex-col gap-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-semibold text-bpim-text">
@@ -131,7 +128,6 @@ export default function DataExportUi() {
               </div>
             </section>
 
-            {/* フィールド選択 */}
             <section className="flex flex-col gap-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-semibold text-bpim-text">
@@ -224,7 +220,9 @@ export default function DataExportUi() {
                 ) : (
                   <Download className="h-4 w-4" />
                 )}
-                {isExporting ? t("settings.export.exporting") : t("common.download")}
+                {isExporting
+                  ? t("settings.export.exporting")
+                  : t("common.download")}
               </Button>
             </div>
           </DialogFooter>

@@ -49,6 +49,8 @@ export const ActivityCalendar = ({ data, userId, version }: Props) => {
     typeof window !== "undefined" &&
     window.matchMedia("(pointer: coarse)").matches;
 
+  const lastMonthStr = dayjs().tz().subtract(1, "month").format("YYYY-MM");
+
   const calendarDays = useMemo(() => {
     const days = [];
     const today = dayjs().tz().startOf("day");
@@ -73,7 +75,23 @@ export const ActivityCalendar = ({ data, userId, version }: Props) => {
 
   return (
     <DashCard>
-      <p className="mb-4 text-sm font-bold text-bpim-muted">{t("dashboard.activity.title")}</p>
+      <div className="mb-4 flex items-center justify-between">
+        <p className="text-sm font-bold text-bpim-muted">
+          {t("dashboard.activity.title")}
+        </p>
+        <Button
+          asChild
+          size="sm"
+          variant="outline"
+          className="bg-bpim-bg h-6 text-[10px] px-2"
+        >
+          <NextLink
+            href={`/users/${userId}/monthly-review/${lastMonthStr}?version=${version}`}
+          >
+            {t("monthlyReview.activityCalendar.button")}
+          </NextLink>
+        </Button>
+      </div>
 
       <div
         ref={scrollRef}
@@ -153,7 +171,8 @@ export const ActivityCalendar = ({ data, userId, version }: Props) => {
                   >
                     <div className="flex flex-col gap-2">
                       <p className="whitespace-nowrap text-xs font-bold text-bpim-text">
-                        {day.date}: {day.count}{t("dashboard.activity.countUnit")}
+                        {day.date}: {day.count}
+                        {t("dashboard.activity.countUnit")}
                       </p>
                       <Button
                         asChild

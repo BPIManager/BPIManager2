@@ -34,7 +34,6 @@ export function ArenaRankComparison({
         </p>
       ) : (
         <div className="flex flex-col gap-2">
-          {/* header */}
           <div className="grid grid-cols-[48px_1fr_52px_52px_52px] gap-x-3 px-1">
             <span className="text-[8px] font-bold uppercase text-bpim-muted">
               ランク

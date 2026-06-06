@@ -53,7 +53,6 @@ export const LogsGroupSkeleton = () => {
         </div>
       </div>
 
-      {/* カードリスト */}
       <div className="flex flex-col gap-3 md:ml-8">
         <LogsCardSkeleton />
         <LogsCardSkeleton />

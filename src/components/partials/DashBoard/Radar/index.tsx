@@ -28,7 +28,7 @@ const RadarDefs = ({
         <stop offset="0%" stopColor={warningColor} stopOpacity={0.1} />
         <stop offset="100%" stopColor={warningColor} stopOpacity={0.5} />
       </radialGradient>
-      {/* songAttr モードで 100 超の値を炎上表現するオーバーフローグラデーション */}
+
       <radialGradient id="radarOverGradient" cx="50%" cy="50%" r="50%">
         <stop offset="60%" stopColor={warningColor} stopOpacity={0} />
         <stop offset="85%" stopColor={warningColor} stopOpacity={0.25} />
@@ -263,7 +263,10 @@ export const RadarSectionChart = ({
   const chartHeight = isMini ? miniHeight : 330;
 
   return (
-    <div className={cn("relative w-full overflow-visible")} style={{ height: chartHeight }}>
+    <div
+      className={cn("relative w-full overflow-visible")}
+      style={{ height: chartHeight }}
+    >
       <RadarDefs primaryColor={c.primary} warningColor={c.warning} />
       <ResponsiveContainer width="100%" height="100%">
         <RadarChart cx="50%" cy="50%" outerRadius="80%" data={chartData}>
@@ -295,7 +298,6 @@ export const RadarSectionChart = ({
             />
           )}
 
-          {/* songAttr モードで 100 超の値を炎のグラデーションで強調 */}
           {hasOverflow && (
             <Radar
               name="OVERFLOW"

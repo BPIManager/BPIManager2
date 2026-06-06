@@ -28,6 +28,8 @@ import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { AppTabsList, AppTabsTrigger } from "@/components/ui/complex/tabs";
 import { useBpiStep } from "@/hooks/common/useBpiStep";
+import { MonthlyReviewBanner } from "@/components/partials/MonthlyReview/Banner";
+import dayjs from "@/lib/dayjs";
 
 export const LogsDetailContent = ({
   userId,
@@ -122,6 +124,14 @@ export const LogsDetailContent = ({
           currentBatchId={batchId as string}
           createdAt={details.pagination.current.createdAt}
           version={version as string}
+        />
+      )}
+
+      {type === "monthly" && date && userId != null && (
+        <MonthlyReviewBanner
+          userId={userId}
+          month={dayjs.tz(date).format("YYYY-MM")}
+          version={version}
         />
       )}
 

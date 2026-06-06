@@ -540,6 +540,546 @@ class StatsRepository {
   }
 
   /**
+   * 月次まとめ用：月内の logs (BPI推移) を取得する。
+   * monthStart/monthEnd は JST での月初/月末日付文字列 (YYYY-MM-DD)
+   */
+  async getMonthlyBpiHistory(
+    userId: string,
+    version: string,
+    monthStart: string,
+    monthEnd: string,
+  ) {
+    return await db
+      .selectFrom("logs")
+      .select(["id", "totalBpi", "createdAt", "batchId"])
+      .where("userId", "=", userId)
+      .where("version", "=", version)
+      .where(
+        sql<string>`DATE(CONVERT_TZ(createdAt, '+00:00', '+09:00'))`,
+        ">=",
+        monthStart,
+      )
+      .where(
+        sql<string>`DATE(CONVERT_TZ(createdAt, '+00:00', '+09:00'))`,
+        "<=",
+        monthEnd,
+      )
+      .orderBy("createdAt", "asc")
+      .execute();
+  }
+
+  /**
+   * 月次まとめ用：月開始直前の最後の log を取得する。
+   */
+  async getLastLogBeforeMonth(
+    userId: string,
+    version: string,
+    monthStart: string,
+  ) {
+    return await db
+      .selectFrom("logs")
+      .select(["id", "totalBpi", "createdAt", "batchId"])
+      .where("userId", "=", userId)
+      .where("version", "=", version)
+      .where(
+        sql<string>`DATE(CONVERT_TZ(createdAt, '+00:00', '+09:00'))`,
+        "<",
+        monthStart,
+      )
+      .orderBy("createdAt", "desc")
+      .limit(1)
+      .executeTakeFirst();
+  }
+
+  /**
+   * 月次まとめ用：月内に更新されたスコア（楽曲情報付き）を取得する。
+   * batchIds は月内の logs.batchId 配列。
+   */
+  async getScoresForBatches(
+    userId: string,
+    version: string,
+    batchIds: string[],
+  ) {
+    if (batchIds.length === 0) return [];
+    return await db
+      .selectFrom("scores as s")
+      .innerJoin("songs as m", "s.songId", "m.songId")
+      .innerJoin("songDef as d", (join) =>
+        join.onRef("d.songId", "=", "m.songId").on("d.isCurrent", "=", 1),
+      )
+      .select([
+        "s.logId",
+        "s.songId",
+        "s.bpi",
+        "s.exScore",
+        "s.batchId",
+        "m.title",
+        "m.difficulty",
+        "m.difficultyLevel",
+        "m.notes",
+        "d.wrScore",
+        "d.kaidenAvg",
+        "d.coef",
+      ])
+      .where("s.userId", "=", userId)
+      .where("s.version", "=", version)
+      .where("s.batchId", "in", batchIds)
+      .execute();
+  }
+
+  /**
+   * 月次まとめ用：指定 songId 群について月開始直前の最新スコアを取得する。
+   */
+  async getPreMonthScores(
+    userId: string,
+    version: string,
+    songIds: number[],
+    beforeBatchIds: string[],
+  ) {
+    if (songIds.length === 0 || beforeBatchIds.length === 0) return [];
+    return await db
+      .selectFrom("scores as s")
+      .innerJoin(
+        (qb) =>
+          qb
+            .selectFrom("scores as s2")
+            .select(["s2.songId", (eb) => eb.fn.max("s2.logId").as("maxLogId")])
+            .where("s2.userId", "=", userId)
+            .where("s2.version", "=", version)
+            .where("s2.songId", "in", songIds)
+            .where("s2.batchId", "in", beforeBatchIds)
+            .groupBy("s2.songId")
+            .as("latest"),
+        (join) =>
+          join
+            .onRef("latest.songId", "=", "s.songId")
+            .onRef("latest.maxLogId", "=", "s.logId"),
+      )
+      .select(["s.songId", "s.bpi", "s.exScore"])
+      .where("s.userId", "=", userId)
+      .execute();
+  }
+
+  /**
+   * 月次まとめ用：月内の iidxTower データ（鍵盤・スクラッチ）を集計する。
+   */
+  async getMonthlyTowerStats(
+    userId: string,
+    version: string,
+    monthStart: string,
+    monthEnd: string,
+  ) {
+    const result = await db
+      .selectFrom("iidxTower")
+      .select([
+        (eb) => eb.fn.sum<number>("keyCount").as("totalKeys"),
+        (eb) => eb.fn.sum<number>("scratchCount").as("totalScratches"),
+        (eb) => eb.fn.count<number>("playDate").as("playDays"),
+      ])
+      .where("userId", "=", userId)
+      .where("version", "=", version)
+      .where(sql`playDate`, ">=", monthStart)
+      .where(sql`playDate`, "<=", monthEnd)
+      .executeTakeFirst();
+    return {
+      totalKeys: Number(result?.totalKeys ?? 0),
+      totalScratches: Number(result?.totalScratches ?? 0),
+      playDays: Number(result?.playDays ?? 0),
+    };
+  }
+
+  /**
+   * 月次まとめ用：指定ユーザーのレベル11/12の最新スコアを全曲取得する。
+   */
+  async getUserCurrentL1112Scores(userId: string, version: string) {
+    return await db
+      .selectFrom("scores as s")
+      .innerJoin("songs as m", "s.songId", "m.songId")
+      .innerJoin(
+        (qb) =>
+          qb
+            .selectFrom("scores as s2")
+            .select(["s2.songId", (eb) => eb.fn.max("s2.logId").as("maxLogId")])
+            .where("s2.userId", "=", userId)
+            .where("s2.version", "=", version)
+            .groupBy("s2.songId")
+            .as("latest"),
+        (join) =>
+          join
+            .onRef("latest.songId", "=", "s.songId")
+            .onRef("latest.maxLogId", "=", "s.logId"),
+      )
+      .select([
+        "s.songId",
+        "s.exScore",
+        "m.title",
+        "m.difficulty",
+        "m.difficultyLevel",
+      ])
+      .where("s.userId", "=", userId)
+      .where("s.version", "=", version)
+      .where("m.difficultyLevel", "in", [11, 12])
+      .execute();
+  }
+
+  /**
+   * 月次まとめ用：指定 logId より前のユーザーのL11/L12スコアを全曲取得する。
+   */
+  async getUserPreMonthL1112Scores(
+    userId: string,
+    version: string,
+    monthStart: string,
+  ) {
+    return await db
+      .selectFrom("scores as s")
+      .innerJoin("songs as m", "s.songId", "m.songId")
+      .innerJoin(
+        (qb) =>
+          qb
+            .selectFrom("scores as s2")
+            .select(["s2.songId", (eb) => eb.fn.max("s2.logId").as("maxLogId")])
+            .where("s2.userId", "=", userId)
+            .where("s2.version", "=", version)
+            .where(
+              sql<string>`DATE(CONVERT_TZ(s2.lastPlayed, '+00:00', '+09:00'))`,
+              "<",
+              monthStart,
+            )
+            .groupBy("s2.songId")
+            .as("latest"),
+        (join) =>
+          join
+            .onRef("latest.songId", "=", "s.songId")
+            .onRef("latest.maxLogId", "=", "s.logId"),
+      )
+      .select(["s.songId", "s.exScore"])
+      .where("s.userId", "=", userId)
+      .where("s.version", "=", version)
+      .where("m.difficultyLevel", "in", [11, 12])
+      .execute();
+  }
+
+  /**
+   * 月次まとめ用：複数ユーザーの月開始前の最新 BPI をL12曲ごとに取得する。
+   * BPI タイムラインの初期状態として使用。
+   */
+  async getPreMonthBpiStateForUsers(
+    userIds: string[],
+    version: string,
+    monthStart: string,
+  ) {
+    if (userIds.length === 0) return []
+    return await db
+      .selectFrom("scores as s")
+      .innerJoin(
+        (qb) =>
+          qb
+            .selectFrom("scores as s2")
+            .innerJoin("songs as m2", "s2.songId", "m2.songId")
+            .select([
+              "s2.userId",
+              "s2.songId",
+              (eb) => eb.fn.max("s2.logId").as("maxLogId"),
+            ])
+            .where("s2.userId", "in", userIds)
+            .where("s2.version", "=", version)
+            .where("m2.difficultyLevel", "=", 12)
+            .where("m2.difficulty", "in", ["HYPER", "ANOTHER", "LEGGENDARIA"])
+            .where(
+              sql<string>`DATE(CONVERT_TZ(s2.lastPlayed, '+00:00', '+09:00'))`,
+              "<",
+              monthStart,
+            )
+            .groupBy(["s2.userId", "s2.songId"])
+            .as("latest"),
+        (join) =>
+          join
+            .onRef("latest.userId", "=", "s.userId")
+            .onRef("latest.songId", "=", "s.songId")
+            .onRef("latest.maxLogId", "=", "s.logId"),
+      )
+      .select(["s.userId", "s.songId", "s.bpi"])
+      .execute()
+  }
+
+  /**
+   * 月次まとめ用：複数ユーザーの月内L12スコア更新履歴を lastPlayed 昇順で返す。
+   * BpiCalculator で日ごとに totalBPI を再計算するための素材。
+   */
+  async getInMonthScoreHistoryForUsers(
+    userIds: string[],
+    version: string,
+    monthStart: string,
+    monthEnd: string,
+  ) {
+    if (userIds.length === 0) return []
+    return await db
+      .selectFrom("scores as s")
+      .innerJoin("songs as m", "s.songId", "m.songId")
+      .select(["s.userId", "s.songId", "s.bpi", "s.lastPlayed"])
+      .where("s.userId", "in", userIds)
+      .where("s.version", "=", version)
+      .where("m.difficultyLevel", "=", 12)
+      .where("m.difficulty", "in", ["HYPER", "ANOTHER", "LEGGENDARIA"])
+      .where(
+        sql<string>`DATE(CONVERT_TZ(s.lastPlayed, '+00:00', '+09:00'))`,
+        ">=",
+        monthStart,
+      )
+      .where(
+        sql<string>`DATE(CONVERT_TZ(s.lastPlayed, '+00:00', '+09:00'))`,
+        "<=",
+        monthEnd,
+      )
+      .orderBy("s.lastPlayed", "asc")
+      .orderBy("s.logId", "asc")
+      .execute()
+  }
+
+  /**
+   * 月次まとめ用：月内スコア更新の曜日・時間帯別集計
+   * MySQL DAYOFWEEK: 1=Sun, 2=Mon, ..., 7=Sat
+   */
+  async getMonthlyActivityBreakdown(userId: string, version: string, batchIds: string[]) {
+    if (batchIds.length === 0) return []
+    return await db
+      .selectFrom("scores as s")
+      .select([
+        sql<number>`DAYOFWEEK(CONVERT_TZ(s.lastPlayed, '+00:00', '+09:00'))`.as("dow"),
+        sql<number>`HOUR(CONVERT_TZ(s.lastPlayed, '+00:00', '+09:00'))`.as("hour"),
+        sql<number>`COUNT(DISTINCT s.songId)`.as("count"),
+      ])
+      .where("s.userId", "=", userId)
+      .where("s.version", "=", version)
+      .where("s.batchId", "in", batchIds)
+      .groupBy(["dow", "hour"])
+      .execute()
+  }
+
+  /**
+   * 月次まとめ用：複数ライバルの月初・月末 totalBpi を一括取得する。
+   */
+  async getRivalsBpiForMonth(
+    rivalIds: string[],
+    version: string,
+    monthStart: string,
+    monthEnd: string,
+  ) {
+    if (rivalIds.length === 0) return []
+
+    const [preRows, endRows] = await Promise.all([
+      // Last log before the month (month-start BPI)
+      db
+        .selectFrom("logs as l")
+        .innerJoin(
+          (qb) =>
+            qb
+              .selectFrom("logs")
+              .select(["userId", (eb) => eb.fn.max("id").as("maxId")])
+              .where("userId", "in", rivalIds)
+              .where("version", "=", version)
+              .where(
+                sql<string>`DATE(CONVERT_TZ(createdAt, '+00:00', '+09:00'))`,
+                "<",
+                monthStart,
+              )
+              .groupBy("userId")
+              .as("pre"),
+          (join) =>
+            join.onRef("l.id", "=", "pre.maxId").onRef("l.userId", "=", "pre.userId"),
+        )
+        .select(["l.userId", "l.totalBpi"])
+        .execute(),
+
+      // Last log in month (month-end BPI)
+      db
+        .selectFrom("logs as l")
+        .innerJoin(
+          (qb) =>
+            qb
+              .selectFrom("logs")
+              .select(["userId", (eb) => eb.fn.max("id").as("maxId")])
+              .where("userId", "in", rivalIds)
+              .where("version", "=", version)
+              .where(
+                sql<string>`DATE(CONVERT_TZ(createdAt, '+00:00', '+09:00'))`,
+                ">=",
+                monthStart,
+              )
+              .where(
+                sql<string>`DATE(CONVERT_TZ(createdAt, '+00:00', '+09:00'))`,
+                "<=",
+                monthEnd,
+              )
+              .groupBy("userId")
+              .as("end"),
+          (join) =>
+            join.onRef("l.id", "=", "end.maxId").onRef("l.userId", "=", "end.userId"),
+        )
+        .select(["l.userId", "l.totalBpi"])
+        .execute(),
+    ])
+
+    const preMap = new Map(preRows.map((r) => [r.userId, Number(r.totalBpi)]))
+    const endMap = new Map(endRows.map((r) => [r.userId, Number(r.totalBpi)]))
+
+    return rivalIds.map((id) => {
+      const bpiStart = preMap.get(id) ?? null
+      const bpiEnd = endMap.get(id) ?? null
+      const bpiGrowth =
+        bpiStart !== null && bpiEnd !== null
+          ? Math.round((bpiEnd - bpiStart) * 100) / 100
+          : null
+      return { userId: id, bpiStart, bpiEnd, bpiGrowth }
+    })
+  }
+
+  /**
+   * 月次まとめ用：複数ライバルの月内 日別 totalBpi タイムラインを取得する。
+   * 1日1エントリ（最新 id のもの）を返す。
+   */
+  async getRivalsMonthlyBpiTimeline(
+    rivalIds: string[],
+    version: string,
+    monthStart: string,
+    monthEnd: string,
+  ) {
+    if (rivalIds.length === 0) return []
+
+    return await db
+      .selectFrom("logs as l")
+      .innerJoin(
+        (qb) =>
+          qb
+            .selectFrom("logs")
+            .select([
+              "userId",
+              sql<string>`DATE(CONVERT_TZ(createdAt, '+00:00', '+09:00'))`.as("date"),
+              (eb) => eb.fn.max("id").as("maxId"),
+            ])
+            .where("userId", "in", rivalIds)
+            .where("version", "=", version)
+            .where(
+              sql<string>`DATE(CONVERT_TZ(createdAt, '+00:00', '+09:00'))`,
+              ">=",
+              monthStart,
+            )
+            .where(
+              sql<string>`DATE(CONVERT_TZ(createdAt, '+00:00', '+09:00'))`,
+              "<=",
+              monthEnd,
+            )
+            .groupBy(["userId", "date"])
+            .as("latest"),
+        (join) => join.onRef("l.id", "=", "latest.maxId"),
+      )
+      .select([
+        "l.userId",
+        sql<string>`DATE(CONVERT_TZ(l.createdAt, '+00:00', '+09:00'))`.as("date"),
+        "l.totalBpi",
+      ])
+      .orderBy("l.userId")
+      .orderBy("date")
+      .execute()
+  }
+
+  /**
+   * 月次まとめ用：タワーデータの月間ランキング（キー・スクラッチ）を返す。
+   * 全ユーザーの月次合計を取得し、JS側でランクを計算する。
+   */
+  async getMonthlyTowerRanking(
+    userId: string,
+    version: string,
+    monthStart: string,
+    monthEnd: string,
+  ) {
+    const allTotals = await db
+      .selectFrom("iidxTower")
+      .select([
+        "userId",
+        (eb) => eb.fn.sum<number>("keyCount").as("totalKeys"),
+        (eb) => eb.fn.sum<number>("scratchCount").as("totalScratches"),
+      ])
+      .where("version", "=", version)
+      .where(sql`playDate`, ">=", monthStart)
+      .where(sql`playDate`, "<=", monthEnd)
+      .groupBy("userId")
+      .execute()
+
+    const totalUsers = allTotals.length
+    if (totalUsers === 0) return null
+
+    const userRow = allTotals.find((r) => r.userId === userId)
+    if (!userRow) return null
+
+    const userKeys = Number(userRow.totalKeys)
+    const userScratches = Number(userRow.totalScratches)
+
+    const keysRank = 1 + allTotals.filter((r) => Number(r.totalKeys) > userKeys).length
+    const scratchRank = 1 + allTotals.filter((r) => Number(r.totalScratches) > userScratches).length
+
+    return { keysRank, scratchRank, totalUsers }
+  }
+
+  /**
+   * 月次まとめ用：フォロー中ライバルの現在のスコア（レベル11/12）を取得する。
+   */
+  async getRivalsCurrentScoresForSongs(
+    viewerId: string,
+    version: string,
+    songIds: number[],
+  ) {
+    if (songIds.length === 0) return [];
+    return await db
+      .selectFrom("follows as f")
+      .innerJoin("users as u", "f.followingId", "u.userId")
+      .innerJoin("scores as s", "u.userId", "s.userId")
+      .innerJoin(
+        (qb) =>
+          qb
+            .selectFrom("scores as s2")
+            .innerJoin("follows as f2", "f2.followingId", "s2.userId")
+            .select(["s2.userId", "s2.songId", (eb) => eb.fn.max("s2.logId").as("maxLogId")])
+            .where("f2.followerId", "=", viewerId)
+            .where("s2.version", "=", version)
+            .where("s2.songId", "in", songIds)
+            .groupBy(["s2.userId", "s2.songId"])
+            .as("latest"),
+        (join) =>
+          join
+            .onRef("latest.userId", "=", "s.userId")
+            .onRef("latest.songId", "=", "s.songId")
+            .onRef("latest.maxLogId", "=", "s.logId"),
+      )
+      .select(["u.userId", "u.userName", "u.profileImage", "s.songId", "s.exScore"])
+      .where("f.followerId", "=", viewerId)
+      .where("s.version", "=", version)
+      .where("u.isPublic", "=", 1)
+      .execute();
+  }
+
+  /**
+   * 月次まとめ用：月内のアリーナ最高ランク・最高勝利数・最高A1維持を返す。
+   */
+  async getMonthlyArenaStats(
+    userId: string,
+    version: string,
+    monthStart: string,
+    monthEnd: string,
+  ) {
+    const rows = await db
+      .selectFrom("officialArenaStats")
+      .select(["arenaClass", "arenaRank", "wins", "a1continue", "fetchedAt"])
+      .where("userId", "=", userId)
+      .where("version", "=", version)
+      .where("fetchedAt", ">=", new Date(`${monthStart}T00:00:00+09:00`))
+      .where("fetchedAt", "<=", new Date(`${monthEnd}T23:59:59+09:00`))
+      .orderBy("fetchedAt", "asc")
+      .execute();
+    return rows;
+  }
+
+  /**
    * 指定バージョン・レベル・難易度に該当する全楽曲の `title___difficulty` キー集合を返す。
    * レーダーチャートの未プレイ曲フィルタリングに使用する。
    */
@@ -715,6 +1255,336 @@ class StatsRepository {
     }
 
     return await query.execute();
+  }
+
+  /**
+   * lastPlayed基準で月内に更新されたスコアのbatchIdと最終プレイ日を返す。
+   */
+  async getMonthlyScoreBatches(
+    userId: string,
+    version: string,
+    monthStart: string,
+    monthEnd: string,
+  ) {
+    return await db
+      .selectFrom("scores")
+      .select([
+        "batchId",
+        // DATE_FORMAT returns VARCHAR → MySQL2 returns string (not Date object)
+        sql<string>`DATE_FORMAT(MAX(CONVERT_TZ(lastPlayed, '+00:00', '+09:00')), '%Y-%m-%d')`.as("playDate"),
+      ])
+      .where("userId", "=", userId)
+      .where("version", "=", version)
+      .where(
+        sql<string>`DATE(CONVERT_TZ(lastPlayed, '+00:00', '+09:00'))`,
+        ">=",
+        monthStart,
+      )
+      .where(
+        sql<string>`DATE(CONVERT_TZ(lastPlayed, '+00:00', '+09:00'))`,
+        "<=",
+        monthEnd,
+      )
+      .where("batchId", "is not", null)
+      .groupBy("batchId")
+      .execute() as { batchId: string; playDate: string }[]
+  }
+
+  /**
+   * batchId一覧に対応するlogsを取得する（BPIスナップショット用）。
+   */
+  async getLogsForBatches(userId: string, version: string, batchIds: string[]) {
+    if (batchIds.length === 0) return []
+    return await db
+      .selectFrom("logs")
+      .select(["id", "totalBpi", "createdAt", "batchId"])
+      .where("userId", "=", userId)
+      .where("version", "=", version)
+      .where("batchId", "in", batchIds)
+      .orderBy("createdAt", "asc")
+      .execute()
+  }
+
+  /**
+   * lastPlayed基準で月開始直前の最後のlogを取得する。
+   */
+  async getLastLogBeforeMonthByLastPlayed(
+    userId: string,
+    version: string,
+    monthStart: string,
+  ) {
+    // 月開始より前にlastPlayedがある最後のバッチのlogを取得
+    return await db
+      .selectFrom("logs as l")
+      .innerJoin(
+        (qb) =>
+          qb
+            .selectFrom("scores")
+            .select([
+              "batchId",
+              sql<string>`DATE_FORMAT(MAX(CONVERT_TZ(lastPlayed, '+00:00', '+09:00')), '%Y-%m-%d')`.as("playDate"),
+            ])
+            .where("userId", "=", userId)
+            .where("version", "=", version)
+            .where("batchId", "is not", null)
+            .groupBy("batchId")
+            .as("sp"),
+        (join) => join.onRef("l.batchId", "=", "sp.batchId"),
+      )
+      .select(["l.id", "l.totalBpi", "l.createdAt", "l.batchId"])
+      .where("l.userId", "=", userId)
+      .where("l.version", "=", version)
+      .where(sql`sp.playDate`, "<", monthStart)
+      .orderBy(sql`sp.playDate`, "desc")
+      .orderBy("l.id", "desc")
+      .limit(1)
+      .executeTakeFirst()
+  }
+
+  /**
+   * lastPlayed基準で曜日・時間帯別スコア更新集計を返す。
+   */
+  async getMonthlyActivityBreakdownByLastPlayed(
+    userId: string,
+    version: string,
+    monthStart: string,
+    monthEnd: string,
+  ) {
+    return await db
+      .selectFrom("scores as s")
+      .select([
+        sql<number>`DAYOFWEEK(CONVERT_TZ(s.lastPlayed, '+00:00', '+09:00'))`.as("dow"),
+        sql<number>`HOUR(CONVERT_TZ(s.lastPlayed, '+00:00', '+09:00'))`.as("hour"),
+        sql<number>`COUNT(DISTINCT s.songId)`.as("count"),
+      ])
+      .where("s.userId", "=", userId)
+      .where("s.version", "=", version)
+      .where(
+        sql<string>`DATE(CONVERT_TZ(s.lastPlayed, '+00:00', '+09:00'))`,
+        ">=",
+        monthStart,
+      )
+      .where(
+        sql<string>`DATE(CONVERT_TZ(s.lastPlayed, '+00:00', '+09:00'))`,
+        "<=",
+        monthEnd,
+      )
+      .groupBy(["dow", "hour"])
+      .execute()
+  }
+
+  /**
+   * lastPlayed基準でライバルの月初・月末 totalBpi を取得する。
+   */
+  async getRivalsBpiForMonthByLastPlayed(
+    rivalIds: string[],
+    version: string,
+    monthStart: string,
+    monthEnd: string,
+  ) {
+    if (rivalIds.length === 0) return []
+
+    // 各ライバルのbatchId別最終プレイ日を取得（DATE_FORMAT→string返却）
+    const batchPlayDates = await db
+      .selectFrom("scores")
+      .select([
+        "userId",
+        "batchId",
+        sql<string>`DATE_FORMAT(MAX(CONVERT_TZ(lastPlayed, '+00:00', '+09:00')), '%Y-%m-%d')`.as("playDate"),
+      ])
+      .where("userId", "in", rivalIds)
+      .where("version", "=", version)
+      .where("batchId", "is not", null)
+      .groupBy(["userId", "batchId"])
+      .execute() as { userId: string; batchId: string; playDate: string }[]
+
+    const batchPlayMap = new Map(batchPlayDates.map((r) => [`${r.userId}:${r.batchId}`, r.playDate]))
+
+    // 全ライバルの全ログを1回で取得し、JS側でpre/endに分類する
+    const allLogs = await db
+      .selectFrom("logs as l")
+      .select(["l.userId", "l.totalBpi", "l.batchId"])
+      .where("l.userId", "in", rivalIds)
+      .where("l.version", "=", version)
+      .where("l.batchId", "is not", null)
+      .execute()
+
+    // playDate < monthStart の最終log per userId
+    const preByUser = new Map<string, { totalBpi: number; playDate: string }>()
+    for (const row of allLogs) {
+      const batchId = row.batchId as string
+      const playDate = batchPlayMap.get(`${row.userId}:${batchId}`)
+      if (!playDate || playDate >= monthStart) continue
+      const existing = preByUser.get(row.userId)
+      if (!existing || playDate > existing.playDate) {
+        preByUser.set(row.userId, { totalBpi: Number(row.totalBpi), playDate })
+      }
+    }
+
+    // playDate <= monthEnd の最終log per userId
+    const endByUser = new Map<string, { totalBpi: number; playDate: string }>()
+    for (const row of allLogs) {
+      const batchId = row.batchId as string
+      const playDate = batchPlayMap.get(`${row.userId}:${batchId}`)
+      if (!playDate || playDate > monthEnd) continue
+      const existing = endByUser.get(row.userId)
+      if (!existing || playDate > existing.playDate) {
+        endByUser.set(row.userId, { totalBpi: Number(row.totalBpi), playDate })
+      }
+    }
+
+    return rivalIds.map((id) => {
+      const bpiStart = preByUser.get(id)?.totalBpi ?? null
+      const bpiEnd = endByUser.get(id)?.totalBpi ?? null
+      const bpiGrowth =
+        bpiStart !== null && bpiEnd !== null
+          ? Math.round((bpiEnd - bpiStart) * 100) / 100
+          : null
+      return { userId: id, bpiStart, bpiEnd, bpiGrowth }
+    })
+  }
+
+  /**
+   * 月次まとめ用：指定曲について月開始直前の最新スコアをlastPlayed基準で取得する。
+   */
+  async getPreMonthScoresByLastPlayed(
+    userId: string,
+    version: string,
+    songIds: number[],
+    monthStart: string,
+  ) {
+    if (songIds.length === 0) return []
+    return await db
+      .selectFrom("scores as s")
+      .innerJoin(
+        (qb) =>
+          qb
+            .selectFrom("scores as s2")
+            .select([
+              "s2.songId",
+              (eb) => eb.fn.max("s2.logId").as("maxLogId"),
+            ])
+            .where("s2.userId", "=", userId)
+            .where("s2.version", "=", version)
+            .where("s2.songId", "in", songIds)
+            .where(
+              sql<string>`DATE(CONVERT_TZ(s2.lastPlayed, '+00:00', '+09:00'))`,
+              "<",
+              monthStart,
+            )
+            .groupBy("s2.songId")
+            .as("latest"),
+        (join) =>
+          join
+            .onRef("latest.songId", "=", "s.songId")
+            .onRef("latest.maxLogId", "=", "s.logId"),
+      )
+      .select(["s.songId", "s.bpi", "s.exScore"])
+      .execute()
+  }
+
+  /**
+   * lastPlayed基準でライバルの日別totalBpiタイムラインを返す。
+   */
+  async getRivalsMonthlyBpiTimelineByLastPlayed(
+    rivalIds: string[],
+    version: string,
+    monthStart: string,
+    monthEnd: string,
+  ) {
+    if (rivalIds.length === 0) return []
+
+    // 月内にlastPlayedがあるバッチのlogs
+    const rows = await db
+      .selectFrom("logs as l")
+      .innerJoin(
+        (qb) =>
+          qb
+            .selectFrom("scores as s")
+            .select([
+              "s.userId",
+              "s.batchId",
+              sql<string>`DATE_FORMAT(CONVERT_TZ(s.lastPlayed, '+00:00', '+09:00'), '%Y-%m-%d')`.as("playDate"),
+            ])
+            .where("s.userId", "in", rivalIds)
+            .where("s.version", "=", version)
+            .where(
+              sql<string>`DATE(CONVERT_TZ(s.lastPlayed, '+00:00', '+09:00'))`,
+              ">=",
+              monthStart,
+            )
+            .where(
+              sql<string>`DATE(CONVERT_TZ(s.lastPlayed, '+00:00', '+09:00'))`,
+              "<=",
+              monthEnd,
+            )
+            .where("s.batchId", "is not", null)
+            .groupBy(["s.userId", "s.batchId", "playDate"])
+            .as("sp"),
+        (join) =>
+          join
+            .onRef("l.batchId", "=", "sp.batchId")
+            .onRef("l.userId", "=", "sp.userId"),
+      )
+      .select([
+        "l.userId",
+        sql<string>`sp.playDate`.as("date"),
+        "l.totalBpi",
+      ])
+      .orderBy("l.userId")
+      .orderBy(sql`sp.playDate`)
+      .execute()
+
+    return rows
+  }
+
+  /**
+   * lastPlayed基準でスコアデータがある月一覧を返す（YYYY-MM 降順）。
+   */
+  /**
+   * 月次まとめ用：月内の iidxTower 日別データを返す（ベスト日計算用）。
+   */
+  async getMonthlyDailyTowerData(
+    userId: string,
+    version: string,
+    monthStart: string,
+    monthEnd: string,
+  ) {
+    return await db
+      .selectFrom("iidxTower")
+      .select(["playDate", "keyCount", "scratchCount"])
+      .where("userId", "=", userId)
+      .where("version", "=", version)
+      .where(sql`playDate`, ">=", monthStart)
+      .where(sql`playDate`, "<=", monthEnd)
+      .orderBy("playDate", "asc")
+      .execute()
+  }
+
+  /**
+   * 月次まとめ用：レーダー要素別総合BPI計算のため全L12曲のsongId・title・difficultyを返す。
+   */
+  async getAllL12SongMeta() {
+    return await db
+      .selectFrom("songs as m")
+      .select(["m.songId", "m.title", "m.difficulty"])
+      .where("m.difficultyLevel", "=", 12)
+      .where("m.difficulty", "in", ["HYPER", "ANOTHER", "LEGGENDARIA"])
+      .execute()
+  }
+
+  async getAvailableMonths(userId: string, version: string) {
+    const rows = await db
+      .selectFrom("scores")
+      .select(
+        sql<string>`DATE_FORMAT(CONVERT_TZ(lastPlayed, '+00:00', '+09:00'), '%Y-%m')`.as("month"),
+      )
+      .where("userId", "=", userId)
+      .where("version", "=", version)
+      .groupBy(sql`DATE_FORMAT(CONVERT_TZ(lastPlayed, '+00:00', '+09:00'), '%Y-%m')`)
+      .orderBy(sql`month`, "desc")
+      .execute()
+    return rows.map((r) => r.month)
   }
 }
 
