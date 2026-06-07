@@ -1,4 +1,4 @@
-import { statsRepo } from "@/lib/db/stats";
+import { monthlyReviewRepo } from "@/lib/db/monthly-review";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import type { NextApiRequest, NextApiResponse } from "next";
 
@@ -26,7 +26,7 @@ export default async function handler(
     const access = await checkUserAccess(req, userId);
     if (!access.hasAccess) return rejectAccess(res, access);
 
-    const months = await statsRepo.getAvailableMonths(userId, version);
+    const months = await monthlyReviewRepo.getAvailableMonths(userId, version);
     return res.status(200).json({ months } satisfies AvailablePeriodsData);
   } catch (error) {
     console.error("[available-periods]", error);

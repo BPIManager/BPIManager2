@@ -1,15 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown } from "lucide-react";
-import { useInView } from "@/hooks/common/useInView";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import { ChevronDown } from "lucide-react";
 import type {
   MonthlyReviewData,
   RivalBpiGrowthEntry,
   RivalSongHighlight,
-} from "@/pages/api/v1/users/[userId]/stats/monthly-review";
-import { GrowthChart, PALETTE } from "./GrowthChart";
+} from "@/types/stats/monthlyReview";
+import { GrowthChart, PALETTE } from "../GrowthChart";
+import { SectionCard } from "../SectionCard";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const styles = `
@@ -162,6 +162,7 @@ function RivalSongs({
   baseDelay: number;
 }) {
   const [visible, setVisible] = useState(SONG_PAGE);
+  const { tFormat } = useTranslation();
   return (
     <div
       className="mt-4 flex flex-col gap-2 border-t pt-4"
@@ -187,56 +188,62 @@ function RivalSongs({
           }
         >
           <ChevronDown className="h-3 w-3" />
-          もっとみる ({songs.length - visible}曲)
+          {tFormat("monthlyReview.rivals.seeMoreSongs", { count: String(songs.length - visible) })}
         </button>
       )}
     </div>
   );
 }
 
+const PAGE = 3;
+
 interface Props {
   rivals: MonthlyReviewData["rivals"];
   ranking: MonthlyReviewData["rivalsGrowthRanking"];
   timeline: MonthlyReviewData["rivalsGrowthTimeline"];
-  granularity?: "month" | "year";
+  granularity: "month" | "year";
+  inView: boolean;
+  sectionRef: React.RefObject<HTMLDivElement>;
+  isEmpty: boolean;
+  hasChart: boolean;
+  hiddenKeys: Set<string>;
+  viewerAbsRank: number;
+  viewerRateRank: number;
+  totalParticipants: number;
+  onToggleKey: (uid: string) => void;
+  noRivalsTitle: string;
+  noRivalsDesc: string;
+  sectionTitle: string;
+  rivalsSummary: string;
 }
 
-const PAGE = 3;
-
-export const RivalsSection = ({
+export const RivalsSectionUI = ({
   rivals,
   ranking,
   timeline,
-  granularity = "month",
+  granularity,
+  inView,
+  sectionRef,
+  isEmpty,
+  hasChart,
+  hiddenKeys,
+  viewerAbsRank,
+  viewerRateRank,
+  totalParticipants,
+  onToggleKey,
+  noRivalsTitle,
+  noRivalsDesc,
+  sectionTitle,
+  rivalsSummary,
 }: Props) => {
-  const [ref, inView] = useInView(0.1);
   const [visible, setVisible] = useState(PAGE);
-  const [hiddenKeys, setHiddenKeys] = useState<Set<string>>(new Set());
   const { t } = useTranslation();
-
-  const isEmpty = rivals.length === 0 && !ranking;
-
-  const toggleKey = (uid: string) => {
-    setHiddenKeys((prev) => {
-      const next = new Set(prev);
-      if (next.has(uid)) next.delete(uid);
-      else next.add(uid);
-      return next;
-    });
-  };
-
-  const viewerRateRank =
-    ranking?.byGrowthRate.findIndex((e) => e.isViewer) ?? -1;
-  const viewerAbsRank = ranking?.byAbsGrowth.findIndex((e) => e.isViewer) ?? -1;
-  const totalParticipants = ranking?.byAbsGrowth.length ?? 0;
-
-  const hasChart = timeline && timeline.length > 1;
 
   return (
     <>
       <style>{styles}</style>
       <section
-        ref={ref as React.RefObject<HTMLDivElement>}
+        ref={sectionRef}
         className="relative w-full"
       >
         <div className="flex min-h-[30vh] w-full flex-col items-center justify-end pb-8 pt-24">
@@ -248,34 +255,14 @@ export const RivalsSection = ({
               animation: inView ? "titleIn 0.8s ease-out both" : "none",
             }}
           >
-            {t("monthlyReview.rivals.sectionTitle")}
+            {sectionTitle}
           </h2>
           {!isEmpty && rivals.length > 0 && (
             <p
               className="mt-8 max-w-lg text-center text-sm leading-relaxed"
               style={{ color: "rgba(255,255,255,0.35)" }}
             >
-              {(() => {
-                const totalWins = rivals.reduce((sum, r) => sum + r.newWins, 0);
-                const totalLosses = rivals.reduce(
-                  (sum, r) => sum + r.newLosses,
-                  0,
-                );
-                const parts: string[] = [];
-                if (totalWins > 0)
-                  parts.push(
-                    `集計期間中、延べ ${totalWins} 曲でライバルに勝ち越しました。`,
-                  );
-                if (totalLosses > 0)
-                  parts.push(
-                    `集計期間中、延べ ${totalLosses} 曲でライバルに負けました。`,
-                  );
-                if (parts.length === 0)
-                  parts.push(
-                    "今月のライバルとの力関係に変動はありませんでした。",
-                  );
-                return parts.join(" ");
-              })()}
+              {rivalsSummary}
             </p>
           )}
         </div>
@@ -295,7 +282,7 @@ export const RivalsSection = ({
                 className="mb-2 font-bold"
                 style={{ color: "rgba(255,255,255,0.45)", fontSize: "0.9rem" }}
               >
-                {t("monthlyReview.rivals.noRivalsTitle")}
+                {noRivalsTitle}
               </p>
               <p
                 style={{
@@ -304,7 +291,7 @@ export const RivalsSection = ({
                   lineHeight: 1.65,
                 }}
               >
-                {t("monthlyReview.rivals.noRivalsDesc")}
+                {noRivalsDesc}
               </p>
             </div>
           </div>
@@ -332,14 +319,14 @@ export const RivalsSection = ({
             <div className="relative px-4 pb-4 pt-6 sm:px-10">
               {totalParticipants > 1 &&
                 (viewerRateRank >= 0 || viewerAbsRank >= 0) && (
-                  <div className="mb-6 flex flex-wrap gap-6">
+                  <div className="mb-6 flex flex-wrap justify-center gap-8">
                     {viewerAbsRank >= 0 && (
-                      <div>
+                      <div className="flex flex-col items-center text-center">
                         <p
                           className="mb-0.5 text-[10px] uppercase tracking-widest"
                           style={{ color: "rgba(255,255,255,0.3)" }}
                         >
-                          BPI伸び 順位
+                          {t("monthlyReview.rivals.bpiGrowthRank")}
                         </p>
                         <p
                           className="font-black tabular-nums leading-none"
@@ -359,12 +346,12 @@ export const RivalsSection = ({
                       </div>
                     )}
                     {viewerRateRank >= 0 && (
-                      <div>
+                      <div className="flex flex-col items-center text-center">
                         <p
                           className="mb-0.5 text-[10px] uppercase tracking-widest"
                           style={{ color: "rgba(255,255,255,0.3)" }}
                         >
-                          伸び率 順位
+                          {t("monthlyReview.rivals.growthRateRank")}
                         </p>
                         <p
                           className="font-black tabular-nums leading-none"
@@ -391,7 +378,7 @@ export const RivalsSection = ({
                   className="text-xs font-bold tracking-[0.3em] uppercase"
                   style={{ color: "rgba(255,255,255,0.35)" }}
                 >
-                  総合BPI成長推移
+                  {t("monthlyReview.rivals.growthTimeline")}
                 </p>
               </div>
 
@@ -402,7 +389,7 @@ export const RivalsSection = ({
                   return (
                     <button
                       key={p.userId}
-                      onClick={() => toggleKey(p.userId)}
+                      onClick={() => onToggleKey(p.userId)}
                       className="flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] transition-all"
                       style={{
                         color: hidden
@@ -436,161 +423,156 @@ export const RivalsSection = ({
 
         {!isEmpty && (
           <div className="flex w-full flex-col items-center px-6 py-10">
-            {ranking && (
-              <div
-                className="mb-10 w-full max-w-2xl rounded-2xl p-5"
-                style={{
-                  background: "rgba(8,8,14,0.55)",
-                  backdropFilter: "blur(14px)",
-                  WebkitBackdropFilter: "blur(14px)",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                  animation: inView
-                    ? "rivalIn 0.5s ease-out 0.1s both"
-                    : "none",
-                }}
-              >
-                <p
-                  className="mb-4 text-xs font-bold tracking-[0.3em] uppercase"
-                  style={{ color: "rgba(255,255,255,0.4)" }}
-                >
-                  BPI成長ランキング
-                </p>
-                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                  <GrowthRankList
-                    title="伸び（絶対値）"
-                    entries={ranking.byAbsGrowth}
-                    valueKey="bpiGrowth"
-                    formatValue={(e) =>
-                      `${e.bpiGrowth >= 0 ? "+" : ""}${e.bpiGrowth.toFixed(2)}`
-                    }
-                  />
-                  {ranking.byGrowthRate.length > 0 && (
+            <SectionCard
+              className="max-w-2xl flex flex-col gap-8"
+              style={{
+                animation: inView ? "rivalIn 0.5s ease-out 0.1s both" : "none",
+              }}
+            >
+              {ranking && (
+                <div>
+                  <p
+                    className="mb-4 text-xs font-bold tracking-[0.3em] uppercase"
+                    style={{ color: "rgba(255,255,255,0.4)" }}
+                  >
+                    {t("monthlyReview.rivals.growthRanking")}
+                  </p>
+                  <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                     <GrowthRankList
-                      title="伸び率"
-                      entries={ranking.byGrowthRate}
-                      valueKey="growthRate"
+                      title={t("monthlyReview.rivals.growthAbsTitle")}
+                      entries={ranking.byAbsGrowth}
+                      valueKey="bpiGrowth"
                       formatValue={(e) =>
-                        `${(e.growthRate ?? 0) >= 0 ? "+" : ""}${(e.growthRate ?? 0).toFixed(1)}%`
+                        `${e.bpiGrowth >= 0 ? "+" : ""}${e.bpiGrowth.toFixed(2)}`
                       }
                     />
-                  )}
-                </div>
-              </div>
-            )}
-
-            <div className="flex w-full max-w-2xl flex-col gap-6">
-              {rivals.slice(0, visible).map((rival, i) => (
-                <div
-                  key={rival.userId}
-                  className="rounded-2xl p-5"
-                  style={{
-                    background: "rgba(10,10,18,0.68)",
-                    backdropFilter: "blur(14px)",
-                    WebkitBackdropFilter: "blur(14px)",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    animation: inView
-                      ? `rivalIn 0.6s cubic-bezier(0.22,1,0.36,1) ${i * 0.1}s both`
-                      : "none",
-                  }}
-                >
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-9 w-9 shrink-0">
-                      <AvatarImage
-                        src={rival.profileImage ?? ""}
-                        alt={rival.userName}
+                    {ranking.byGrowthRate.length > 0 && (
+                      <GrowthRankList
+                        title={t("monthlyReview.rivals.growthRateTitle")}
+                        entries={ranking.byGrowthRate}
+                        valueKey="growthRate"
+                        formatValue={(e) =>
+                          `${(e.growthRate ?? 0) >= 0 ? "+" : ""}${(e.growthRate ?? 0).toFixed(1)}%`
+                        }
                       />
-                      <AvatarFallback
-                        className="text-xs"
+                    )}
+                  </div>
+                </div>
+              )}
+
+              <div className="flex flex-col gap-4">
+                {rivals.slice(0, visible).map((rival, i) => (
+                  <div
+                    key={rival.userId}
+                    className="rounded-2xl p-4"
+                    style={{
+                      background: "rgba(255,255,255,0.04)",
+                      border: "1px solid rgba(255,255,255,0.08)",
+                      animation: inView
+                        ? `rivalIn 0.6s cubic-bezier(0.22,1,0.36,1) ${i * 0.1}s both`
+                        : "none",
+                    }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-9 w-9 shrink-0">
+                        <AvatarImage
+                          src={rival.profileImage ?? ""}
+                          alt={rival.userName}
+                        />
+                        <AvatarFallback
+                          className="text-xs"
+                          style={{
+                            background: "rgba(255,255,255,0.08)",
+                            color: "rgba(255,255,255,0.5)",
+                          }}
+                        >
+                          {rival.userName[0]}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span
+                        className="flex-1 truncate font-bold"
                         style={{
-                          background: "rgba(255,255,255,0.08)",
-                          color: "rgba(255,255,255,0.5)",
+                          color: "rgba(255,255,255,0.85)",
+                          fontSize: "1rem",
                         }}
                       >
-                        {rival.userName[0]}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span
-                      className="flex-1 truncate font-bold"
-                      style={{
-                        color: "rgba(255,255,255,0.85)",
-                        fontSize: "1rem",
-                      }}
-                    >
-                      {rival.userName}
-                    </span>
-                    <div className="flex flex-wrap items-center justify-end gap-1.5">
-                      {rival.bpiGrowth !== null && (
-                        <span
-                          className="rounded-full px-2 py-0.5 text-[10px] font-bold tabular-nums"
-                          style={{
-                            background:
-                              rival.bpiGrowth >= 0
-                                ? "rgba(52,211,153,0.1)"
-                                : "rgba(248,113,113,0.1)",
-                            color: rival.bpiGrowth >= 0 ? "#34d399" : "#f87171",
-                            border: `1px solid ${rival.bpiGrowth >= 0 ? "rgba(52,211,153,0.25)" : "rgba(248,113,113,0.25)"}`,
-                          }}
-                        >
-                          BPI {rival.bpiGrowth >= 0 ? "+" : ""}
-                          {rival.bpiGrowth.toFixed(2)}
-                        </span>
-                      )}
-                      {rival.newWins > 0 && (
-                        <span
-                          className="rounded-full px-2 py-0.5 text-[10px] font-black"
-                          style={{
-                            background: "rgba(52,211,153,0.15)",
-                            color: "#34d399",
-                            border: "1px solid rgba(52,211,153,0.3)",
-                          }}
-                        >
-                          ↑{rival.newWins} WIN
-                        </span>
-                      )}
-                      {rival.newLosses > 0 && (
-                        <span
-                          className="rounded-full px-2 py-0.5 text-[10px] font-black"
-                          style={{
-                            background: "rgba(248,113,113,0.15)",
-                            color: "#f87171",
-                            border: "1px solid rgba(248,113,113,0.3)",
-                          }}
-                        >
-                          ↓{rival.newLosses} LOSE
-                        </span>
-                      )}
+                        {rival.userName}
+                      </span>
+                      <div className="flex flex-wrap items-center justify-end gap-1.5">
+                        {rival.bpiGrowth !== null && (
+                          <span
+                            className="rounded-full px-2 py-0.5 text-[10px] font-bold tabular-nums"
+                            style={{
+                              background:
+                                rival.bpiGrowth >= 0
+                                  ? "rgba(52,211,153,0.1)"
+                                  : "rgba(248,113,113,0.1)",
+                              color:
+                                rival.bpiGrowth >= 0 ? "#34d399" : "#f87171",
+                              border: `1px solid ${rival.bpiGrowth >= 0 ? "rgba(52,211,153,0.25)" : "rgba(248,113,113,0.25)"}`,
+                            }}
+                          >
+                            BPI {rival.bpiGrowth >= 0 ? "+" : ""}
+                            {rival.bpiGrowth.toFixed(2)}
+                          </span>
+                        )}
+                        {rival.newWins > 0 && (
+                          <span
+                            className="rounded-full px-2 py-0.5 text-[10px] font-black"
+                            style={{
+                              background: "rgba(52,211,153,0.15)",
+                              color: "#34d399",
+                              border: "1px solid rgba(52,211,153,0.3)",
+                            }}
+                          >
+                            ↑{rival.newWins} WIN
+                          </span>
+                        )}
+                        {rival.newLosses > 0 && (
+                          <span
+                            className="rounded-full px-2 py-0.5 text-[10px] font-black"
+                            style={{
+                              background: "rgba(248,113,113,0.15)",
+                              color: "#f87171",
+                              border: "1px solid rgba(248,113,113,0.3)",
+                            }}
+                          >
+                            ↓{rival.newLosses} LOSE
+                          </span>
+                        )}
+                      </div>
                     </div>
+                    {rival.topWinningSongs.length > 0 && (
+                      <RivalSongs
+                        songs={rival.topWinningSongs}
+                        baseDelay={i * 0.1}
+                      />
+                    )}
                   </div>
-                  {rival.topWinningSongs.length > 0 && (
-                    <RivalSongs
-                      songs={rival.topWinningSongs}
-                      baseDelay={i * 0.1}
-                    />
-                  )}
-                </div>
-              ))}
+                ))}
 
-              {visible < rivals.length && (
-                <button
-                  onClick={() => setVisible((v) => v + PAGE)}
-                  className="flex items-center justify-center gap-1.5 rounded-xl py-3 text-xs font-bold transition-colors"
-                  style={{
-                    color: "rgba(255,255,255,0.35)",
-                    border: "1px dashed rgba(255,255,255,0.12)",
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.background =
-                      "rgba(255,255,255,0.04)")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.background = "transparent")
-                  }
-                >
-                  <ChevronDown className="h-3.5 w-3.5" />
-                  もっとみる ({rivals.length - visible})
-                </button>
-              )}
-            </div>
+                {visible < rivals.length && (
+                  <button
+                    onClick={() => setVisible((v) => v + PAGE)}
+                    className="flex items-center justify-center gap-1.5 rounded-xl py-3 text-xs font-bold transition-colors"
+                    style={{
+                      color: "rgba(255,255,255,0.35)",
+                      border: "1px dashed rgba(255,255,255,0.12)",
+                    }}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.background =
+                        "rgba(255,255,255,0.04)")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.background = "transparent")
+                    }
+                  >
+                    <ChevronDown className="h-3.5 w-3.5" />
+                    {t("monthlyReview.seeMore")} ({rivals.length - visible})
+                  </button>
+                )}
+              </div>
+            </SectionCard>
           </div>
         )}
       </section>

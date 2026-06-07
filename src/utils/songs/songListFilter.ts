@@ -2,8 +2,6 @@ import { SONG_ATTRIBUTES, SONG_ATTRIBUTES_GLOBAL } from "@/constants/songAttribu
 import type { SongListItem, SimilarSongItem } from "@/types/songs/songInfo";
 import type { SortKey, SortDir, AttrMode } from "@/types/songs/songList";
 
-export const LEVEL_OPTIONS = ["11", "12"] as const;
-export const DIFFICULTY_OPTIONS = ["HYPER", "ANOTHER", "LEGGENDARIA"] as const;
 
 export const SORT_OPTIONS: { value: SortKey; label: string }[] = [
   { value: "title", label: "曲名" },

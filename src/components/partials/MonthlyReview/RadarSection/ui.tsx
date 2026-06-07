@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { useInView } from "@/hooks/common/useInView";
+import { useTranslation } from "@/hooks/common/useTranslation";
 import type {
   MonthlyReviewData,
   TopSongImproved,
   RadarGrowthEntry,
-} from "@/pages/api/v1/users/[userId]/stats/monthly-review";
+} from "@/types/stats/monthlyReview";
 import { ChevronDown } from "lucide-react";
+import { SectionCard } from "../SectionCard";
 import {
   LineChart,
   Line,
@@ -22,6 +23,7 @@ import {
   PolarRadiusAxis,
   Legend,
 } from "recharts";
+import { formatDate } from "./functions";
 
 const styles = `
   @keyframes radarFade { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
@@ -59,12 +61,6 @@ const DIFF_LABELS: Record<string, string> = {
 
 const PAGE = 5;
 
-function formatDate(dateStr: string): string {
-  const m = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if (!m) return dateStr;
-  return `${parseInt(m[2])}/${parseInt(m[3])}`;
-}
-
 function SongRow({
   rank,
   song,
@@ -79,55 +75,56 @@ function SongRow({
   const diffColor = DIFF_COLORS[song.difficulty] ?? "#94a3b8";
   return (
     <div
-      className="flex items-center gap-3 rounded-xl px-4 py-3"
+      className="flex flex-col gap-1 rounded-xl px-4 py-3"
       style={{
-        background: "rgba(255,255,255,0.03)",
-        border: "1px solid rgba(255,255,255,0.06)",
+        background: "rgba(255,255,255,0.06)",
+        border: "1px solid rgba(255,255,255,0.1)",
         animation: `radarRow 0.4s ease-out ${delay}s both`,
       }}
     >
-      <span
-        className="w-6 shrink-0 text-right text-xs font-black tabular-nums"
-        style={{ color: rank <= 3 ? accent : "rgba(255,255,255,0.2)" }}
-      >
-        {rank}
-      </span>
-      <span
-        className="shrink-0 rounded px-1.5 py-0.5 text-[9px] font-black"
-        style={{ background: `${diffColor}22`, color: diffColor }}
-      >
-        {DIFF_LABELS[song.difficulty] ?? song.difficulty}
-      </span>
-      <span
-        className="flex-1 truncate text-sm font-semibold"
-        style={{ color: "rgba(255,255,255,0.82)" }}
-      >
-        {song.title}
-      </span>
-      <span
-        className="shrink-0 font-mono text-xs tabular-nums"
-        style={{ color: "rgba(255,255,255,0.35)" }}
-      >
-        {song.bpiBefore.toFixed(2)}
-      </span>
-      <span
-        className="shrink-0 text-[10px]"
-        style={{ color: "rgba(255,255,255,0.2)" }}
-      >
-        →
-      </span>
-      <span
-        className="shrink-0 font-mono text-sm font-bold tabular-nums"
-        style={{ color: accent }}
-      >
-        {song.bpiAfter.toFixed(2)}
-      </span>
-      <span
-        className="shrink-0 text-xs font-bold"
-        style={{ color: `${accent}cc` }}
-      >
-        +{song.diff.toFixed(2)}
-      </span>
+      <div className="flex items-center gap-2">
+        <span
+          className="w-5 shrink-0 text-right text-xs font-black tabular-nums"
+          style={{ color: rank <= 3 ? accent : "rgba(255,255,255,0.3)" }}
+        >
+          {rank}
+        </span>
+        <span
+          className="shrink-0 rounded px-1.5 py-0.5 text-[9px] font-black"
+          style={{ background: `${diffColor}33`, color: diffColor }}
+        >
+          {DIFF_LABELS[song.difficulty] ?? song.difficulty}
+        </span>
+        <span
+          className="flex-1 text-sm font-semibold leading-snug"
+          style={{ color: "rgba(255,255,255,0.92)", wordBreak: "break-all" }}
+        >
+          {song.title}
+        </span>
+      </div>
+      <div className="flex items-center gap-1.5 pl-7">
+        <span
+          className="font-mono text-xs tabular-nums"
+          style={{ color: "rgba(255,255,255,0.45)" }}
+        >
+          {song.bpiBefore.toFixed(2)}
+        </span>
+        <span className="text-[10px]" style={{ color: "rgba(255,255,255,0.25)" }}>
+          →
+        </span>
+        <span
+          className="font-mono text-sm font-bold tabular-nums"
+          style={{ color: accent }}
+        >
+          {song.bpiAfter.toFixed(2)}
+        </span>
+        <span
+          className="ml-1 text-xs font-bold"
+          style={{ color: `${accent}dd` }}
+        >
+          +{song.diff.toFixed(2)}
+        </span>
+      </div>
     </div>
   );
 }
@@ -140,6 +137,7 @@ function ElementPanel({
   inView: boolean;
 }) {
   const [visible, setVisible] = useState(PAGE);
+  const { t, tFormat } = useTranslation();
   const accent = ELEMENT_COLORS[entry.element] ?? "#94a3b8";
   const totalDiff = entry.totalDiff;
 
@@ -166,7 +164,7 @@ function ElementPanel({
     <div className="flex flex-col gap-4">
       <div
         className="flex items-center justify-between rounded-2xl px-5 py-4"
-        style={{ background: `${accent}0d`, border: `1px solid ${accent}22` }}
+        style={{ background: `${accent}18`, border: `1px solid ${accent}44` }}
       >
         <div className="flex flex-col gap-0.5">
           <span
@@ -176,7 +174,7 @@ function ElementPanel({
             {ELEMENT_LABELS[entry.element]}
           </span>
           <span className="text-sm" style={{ color: "rgba(255,255,255,0.5)" }}>
-            {entry.songs.length} 曲が伸びました
+            {tFormat("monthlyReview.radar.songsImproved", { count: String(entry.songs.length) })}
           </span>
         </div>
         <div className="flex flex-col items-end gap-1">
@@ -208,7 +206,7 @@ function ElementPanel({
             className="mb-2 text-[10px] font-bold tracking-[0.3em] uppercase"
             style={{ color: "rgba(255,255,255,0.3)" }}
           >
-            成長推移
+            {t("monthlyReview.radar.growthTimeline")}
           </p>
           <ResponsiveContainer width="100%" height={100}>
             <LineChart
@@ -236,7 +234,7 @@ function ElementPanel({
                 formatter={(v) =>
                   [
                     typeof v === "number" ? `×${v.toFixed(2)}` : String(v),
-                    "成長率",
+                    t("monthlyReview.radar.growthRate"),
                   ] as [string, string]
                 }
               />
@@ -289,7 +287,7 @@ function ElementPanel({
           }
         >
           <ChevronDown className="h-3.5 w-3.5" />
-          もっとみる ({entry.songs.length - visible})
+          {t("monthlyReview.seeMore")} ({entry.songs.length - visible})
         </button>
       )}
 
@@ -297,7 +295,13 @@ function ElementPanel({
         className="text-center text-xs leading-relaxed"
         style={{ color: "rgba(255,255,255,0.3)" }}
       >
-        {`${ELEMENT_LABELS[entry.element]}カテゴリでは ${entry.songs.length} 曲が伸び、総合BPI ${entry.bpiStart.toFixed(2)} → ${entry.bpiEnd.toFixed(2)} (${totalDiff >= 0 ? "+" : ""}${totalDiff.toFixed(2)}) の変化でした。`}
+        {tFormat("monthlyReview.radar.elementSummary", {
+          element: ELEMENT_LABELS[entry.element] ?? entry.element,
+          count: String(entry.songs.length),
+          start: entry.bpiStart.toFixed(2),
+          end: entry.bpiEnd.toFixed(2),
+          diff: `${totalDiff >= 0 ? "+" : ""}${totalDiff.toFixed(2)}`,
+        })}
       </p>
     </div>
   );
@@ -310,23 +314,19 @@ function RadarComparisonChart({
   entries: RadarGrowthEntry[];
   inView: boolean;
 }) {
+  const { t } = useTranslation();
   if (entries.length < 3) return null;
 
   const radarData = entries.map((e) => {
     const diff = e.totalDiff;
     const rawGrowth = e.totalDiff / Math.max(Math.abs(e.bpiStart), 5);
-
     const growthRate = Math.pow(1 + Math.max(rawGrowth, 0), 2);
-
     return {
       subject: ELEMENT_LABELS[e.element] ?? e.element,
       element: e.element,
-
       start: 1,
       end: growthRate,
-
       growthPct: rawGrowth * 100,
-
       bpiStart: e.bpiStart,
       bpiEnd: e.bpiEnd,
       diff,
@@ -363,7 +363,7 @@ function RadarComparisonChart({
           {d.subject}
         </p>
         <p style={{ color: "rgba(255,255,255,0.5)", marginBottom: 2 }}>
-          伸び率:{" "}
+          {t("monthlyReview.radar.growthRateTooltip")}:{" "}
           <span
             style={{
               color: d.end >= 1 ? color : "#f87171",
@@ -375,7 +375,7 @@ function RadarComparisonChart({
           </span>
         </p>
         <p style={{ color: "rgba(255,255,255,0.5)", marginBottom: 2 }}>
-          伸び（絶対値）:{" "}
+          {t("monthlyReview.radar.growthAbsTooltip")}:{" "}
           <span style={{ color: "rgba(255,255,255,0.9)", fontWeight: "bold" }}>
             {sign}
             {d.diff.toFixed(2)}
@@ -403,12 +403,12 @@ function RadarComparisonChart({
         className="mb-1 text-center text-[10px] font-bold tracking-[0.3em] uppercase"
         style={{ color: "rgba(255,255,255,0.3)" }}
       >
-        各要素の成長
+        {t("monthlyReview.radar.elementGrowth")}
       </p>
-      <ResponsiveContainer width="100%" height={520}>
+      <ResponsiveContainer width="100%" aspect={1}>
         <RadarChart
           data={radarData}
-          margin={{ top: 16, right: 48, bottom: 16, left: 48 }}
+          margin={{ top: 20, right: 52, bottom: 20, left: 52 }}
         >
           <PolarGrid stroke="rgba(255,255,255,0.08)" />
           <PolarAngleAxis
@@ -446,7 +446,7 @@ function RadarComparisonChart({
           <PolarRadiusAxis domain={domain} tick={false} axisLine={false} />
           <Tooltip content={<CustomTooltip />} />
           <Radar
-            name="期間前"
+            name={t("monthlyReview.radar.before")}
             dataKey="start"
             stroke="rgba(255,255,255,0.2)"
             fill="rgba(255,255,255,0.04)"
@@ -455,7 +455,7 @@ function RadarComparisonChart({
             dot={false}
           />
           <Radar
-            name="期間後"
+            name={t("monthlyReview.radar.after")}
             dataKey="end"
             stroke="rgba(255,255,255,0.6)"
             fill="rgba(255,255,255,0.0)"
@@ -497,24 +497,31 @@ function RadarComparisonChart({
 }
 
 interface Props {
-  radarGrowth: MonthlyReviewData["radarGrowth"];
+  radarGrowth: NonNullable<MonthlyReviewData["radarGrowth"]>;
+  inView: boolean;
+  sectionRef: React.RefObject<HTMLDivElement>;
+  sortedAll: RadarGrowthEntry[];
+  sortedWithSongs: RadarGrowthEntry[];
+  activeTab: number;
+  onTabChange: (i: number) => void;
 }
 
-export const RadarSection = ({ radarGrowth }: Props) => {
-  const [ref, inView] = useInView(0.1);
-  const [activeTab, setActiveTab] = useState(0);
-
-  if (!radarGrowth || radarGrowth.length === 0) return null;
-
-  const sortedAll = [...radarGrowth].sort((a, b) => b.totalDiff - a.totalDiff);
-  const sortedWithSongs = sortedAll.filter((e) => e.songs.length > 0);
+export const RadarSectionUI = ({
+  inView,
+  sectionRef,
+  sortedAll,
+  sortedWithSongs,
+  activeTab,
+  onTabChange,
+}: Props) => {
+  const { t } = useTranslation();
   const currentEntry = sortedWithSongs[activeTab] ?? sortedWithSongs[0];
 
   return (
     <>
       <style>{styles}</style>
       <section
-        ref={ref as React.RefObject<HTMLDivElement>}
+        ref={sectionRef}
         className="relative flex min-h-screen w-full flex-col items-center justify-center px-5 py-24"
       >
         <h2
@@ -525,7 +532,7 @@ export const RadarSection = ({ radarGrowth }: Props) => {
             animation: inView ? "titleIn 0.8s ease-out both" : "none",
           }}
         >
-          レーダー別成長
+          {t("monthlyReview.radar.sectionTitle")}
         </h2>
         <p
           className="mb-8 text-center text-xs"
@@ -534,67 +541,59 @@ export const RadarSection = ({ radarGrowth }: Props) => {
             animation: inView ? "radarFade 0.6s ease-out 0.1s both" : "none",
           }}
         >
-          今月伸びた曲をレーダー要素別に集計しました
+          {t("monthlyReview.radar.sectionDesc")}
         </p>
 
-        <RadarComparisonChart entries={sortedAll} inView={inView} />
+        <SectionCard
+          className="max-w-2xl flex flex-col items-center gap-8"
+          style={{
+            animation: inView ? "radarFade 0.6s ease-out 0.25s both" : "none",
+          }}
+        >
+          <RadarComparisonChart entries={sortedAll} inView={inView} />
 
-        {sortedWithSongs.length > 0 && (
-          <>
-            <div
-              className="mt-10 mb-8 flex flex-wrap justify-center gap-2"
-              style={{
-                animation: inView
-                  ? "radarFade 0.6s ease-out 0.35s both"
-                  : "none",
-              }}
-            >
-              {sortedWithSongs.map((entry, i) => {
-                const accent = ELEMENT_COLORS[entry.element] ?? "#94a3b8";
-                const isActive = i === activeTab;
-                return (
-                  <button
-                    key={entry.element}
-                    onClick={() => setActiveTab(i)}
-                    className="rounded-full px-4 py-1.5 text-xs font-bold transition-all"
-                    style={{
-                      background: isActive ? `${accent}22` : "transparent",
-                      border: `1px solid ${isActive ? accent : `${accent}44`}`,
-                      color: isActive ? accent : `${accent}77`,
-                    }}
-                  >
-                    {ELEMENT_LABELS[entry.element]}
-                    <span className="ml-1.5 opacity-70">
-                      {entry.totalDiff >= 0 ? "+" : ""}
-                      {entry.totalDiff.toFixed(1)}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
+          {sortedWithSongs.length > 0 && (
+            <>
+              <div className="flex flex-wrap justify-center gap-2 w-full">
+                {sortedWithSongs.map((entry, i) => {
+                  const accent = ELEMENT_COLORS[entry.element] ?? "#94a3b8";
+                  const isActive = i === activeTab;
+                  return (
+                    <button
+                      key={entry.element}
+                      onClick={() => onTabChange(i)}
+                      className="rounded-full px-4 py-1.5 text-xs font-bold transition-all"
+                      style={{
+                        background: isActive ? `${accent}22` : "transparent",
+                        border: `1px solid ${isActive ? accent : `${accent}44`}`,
+                        color: isActive ? accent : `${accent}77`,
+                      }}
+                    >
+                      {ELEMENT_LABELS[entry.element]}
+                      <span className="ml-1.5 opacity-70">
+                        {entry.totalDiff >= 0 ? "+" : ""}
+                        {entry.totalDiff.toFixed(1)}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
 
-            <div
-              className="w-full max-w-2xl rounded-3xl px-6 py-8 sm:px-8"
-              style={{
-                background: "rgba(8,8,14,0.55)",
-                backdropFilter: "blur(16px)",
-                WebkitBackdropFilter: "blur(16px)",
-                border: "1px solid rgba(255,255,255,0.07)",
-                animation: inView
-                  ? "radarFade 0.6s ease-out 0.45s both"
-                  : "none",
-              }}
-            >
-              {currentEntry && (
-                <ElementPanel
-                  key={currentEntry.element}
-                  entry={currentEntry}
-                  inView={inView}
-                />
-              )}
-            </div>
-          </>
-        )}
+              <div
+                className="w-full border-t pt-6"
+                style={{ borderColor: "rgba(255,255,255,0.07)" }}
+              >
+                {currentEntry && (
+                  <ElementPanel
+                    key={currentEntry.element}
+                    entry={currentEntry}
+                    inView={inView}
+                  />
+                )}
+              </div>
+            </>
+          )}
+        </SectionCard>
       </section>
     </>
   );

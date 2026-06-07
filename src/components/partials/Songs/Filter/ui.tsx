@@ -13,6 +13,7 @@ import {
 } from "@/constants/sort";
 import { FilterParamsFrontend } from "@/types/songs/score";
 import { versionsNonDisabledCollection } from "@/constants/versions";
+import { IIDX_DIFFICULTIES } from "@/constants/diffs";
 import { latestVersion } from "@/constants/latestVersion";
 import {
   FilterBarContainer,
@@ -76,7 +77,7 @@ export const SongFilterBar = ({
         ];
     if (hasCompare) return [...base];
     return base;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [withRivals, withScoreRate, hasCompare, t]);
 
   return (
@@ -112,7 +113,10 @@ export const SongFilterBar = ({
           onValueChange={(val) =>
             onParamsChange({ sortOrder: val as "asc" | "desc" })
           }
-          options={sortOrderOptions.map((o) => ({ ...o, label: t(`sort.${o.value}` as TranslationKey) }))}
+          options={sortOrderOptions.map((o) => ({
+            ...o,
+            label: t(`sort.${o.value}` as TranslationKey),
+          }))}
           placeholder={t("filter.order")}
           className="w-22.5 shrink-0"
         />
@@ -160,7 +164,7 @@ export const SongFilterBar = ({
         />
         <FilterCheckboxGroup
           label="DIFFICULTY"
-          items={["HYPER", "ANOTHER", "LEGGENDARIA"]}
+          items={IIDX_DIFFICULTIES}
           selected={params.difficulties}
           onToggle={(v) =>
             onParamsChange({

@@ -9,7 +9,8 @@ import { SongListSkeleton } from "./skeleton";
 import { RadarSectionChart } from "@/components/partials/DashBoard/Radar/index";
 import { DifficultyBadge } from "@/components/partials/Songs/DifficultyBadge";
 import { SONG_ATTRIBUTES } from "@/constants/songAttributes";
-import { DIFFICULTY_OPTIONS, SORT_OPTIONS, buildRadarData } from "@/utils/songs/songListFilter";
+import { SORT_OPTIONS, buildRadarData } from "@/utils/songs/songListFilter";
+import { IIDX_DIFFICULTIES } from "@/constants/diffs";
 import type { SongListItem } from "@/types/songs/songInfo";
 import type { SortDir, SortKey } from "@/types/songs/songList";
 
@@ -65,7 +66,7 @@ export function SongFilterControls({
           Difficulty
         </span>
         <div className="flex h-8 items-center flex-wrap gap-x-4 gap-y-2">
-          {DIFFICULTY_OPTIONS.map((diff) => (
+          {IIDX_DIFFICULTIES.map((diff) => (
             <div key={diff} className="flex items-center gap-2">
               <Checkbox
                 id={`diff-${diff}`}

@@ -33,8 +33,9 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { IIDX_DIFFICULTIES } from "@/constants/diffs";
 
-const ALL_DIFFICULTIES = new Set(["HYPER", "ANOTHER", "LEGGENDARIA"]);
+const ALL_DIFFICULTIES = new Set(IIDX_DIFFICULTIES);
 type RadarCat = (typeof ALL_RADAR_CATEGORIES)[number];
 const ALL_CATEGORIES_SET = new Set<RadarCat>(ALL_RADAR_CATEGORIES);
 
@@ -51,7 +52,8 @@ export const ArenaMetricsView = ({
   const [detailFilters, setDetailFilters] = useState<DetailFilter[]>([]);
   const [displayMetric, setDisplayMetric] = useState<DisplayMetric>("exScore");
   const [analysisRank, setAnalysisRank] = useState<string>("A1");
-  const [selectedCategories, setSelectedCategories] = useState<Set<RadarCat>>(ALL_CATEGORIES_SET);
+  const [selectedCategories, setSelectedCategories] =
+    useState<Set<RadarCat>>(ALL_CATEGORIES_SET);
   const { t } = useTranslation();
 
   const handleCategoryToggle = (cat: RadarCat) => {
@@ -102,7 +104,9 @@ export const ArenaMetricsView = ({
   };
 
   const filteredAverages = useMemo(() => {
-    return (averages as import("@/types/metrics/arena").ArenaAverageData[]).filter((item) => {
+    return (
+      averages as import("@/types/metrics/arena").ArenaAverageData[]
+    ).filter((item) => {
       if (!selectedDifficulties.has(item.difficulty)) return false;
 
       if (
@@ -163,8 +167,12 @@ export const ArenaMetricsView = ({
       <PageContainer>
         <Tabs defaultValue="list" className="flex flex-col gap-6">
           <TabsList className="w-full">
-            <TabsTrigger value="list">{t("page.arenaAverage.list")}</TabsTrigger>
-            <TabsTrigger value="analysis">{t("page.arenaAverage.analytics")}</TabsTrigger>
+            <TabsTrigger value="list">
+              {t("page.arenaAverage.list")}
+            </TabsTrigger>
+            <TabsTrigger value="analysis">
+              {t("page.arenaAverage.analytics")}
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="list">
@@ -223,7 +231,9 @@ export const ArenaMetricsView = ({
               ) : (
                 <div className="animate-in fade-in duration-500">
                   <ArenaAnalysis
-                    data={averages as import("@/types/metrics/arena").ArenaAverageData[]}
+                    data={
+                      averages as import("@/types/metrics/arena").ArenaAverageData[]
+                    }
                     rank={analysisRank}
                     version={v}
                     selectedCategories={selectedCategories}
@@ -256,72 +266,72 @@ const AnalysisControls = ({
 }) => {
   const { t } = useTranslation();
   return (
-  <div className="rounded-xl border border-bpim-border bg-bpim-bg/80 p-4 shadow-sm backdrop-blur-md">
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-      <div className="flex flex-col gap-2">
-        <span className="text-[10px] font-black tracking-widest text-bpim-muted uppercase px-1">
-          Version
-        </span>
-        <Select value={version} onValueChange={onVersionChange}>
-          <SelectTrigger className="h-9 border-bpim-border bg-bpim-surface-2/60 text-xs text-bpim-text focus:ring-blue-500">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent className="border-bpim-border bg-bpim-bg">
-            {versionsNonDisabledCollection.map((v) => (
-              <SelectItem key={v.value} value={v.value} className="text-xs">
-                {v.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+    <div className="rounded-xl border border-bpim-border bg-bpim-bg/80 p-4 shadow-sm backdrop-blur-md">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="flex flex-col gap-2">
+          <span className="text-[10px] font-black tracking-widest text-bpim-muted uppercase px-1">
+            Version
+          </span>
+          <Select value={version} onValueChange={onVersionChange}>
+            <SelectTrigger className="h-9 border-bpim-border bg-bpim-surface-2/60 text-xs text-bpim-text focus:ring-blue-500">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="border-bpim-border bg-bpim-bg">
+              {versionsNonDisabledCollection.map((v) => (
+                <SelectItem key={v.value} value={v.value} className="text-xs">
+                  {v.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-      <div className="flex flex-col gap-2">
-        <span className="text-[10px] font-black tracking-widest text-bpim-muted uppercase px-1">
-          {t("page.arenaAverage.rank")}
-        </span>
-        <Select value={rank} onValueChange={onRankChange}>
-          <SelectTrigger className="h-9 border-bpim-border bg-bpim-surface-2/60 text-sm font-bold text-bpim-text">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent className="border-bpim-border bg-bpim-bg">
-            {A_RANKS.map((r) => (
-              <SelectItem key={r} value={r} className="text-sm font-bold">
-                {r}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+        <div className="flex flex-col gap-2">
+          <span className="text-[10px] font-black tracking-widest text-bpim-muted uppercase px-1">
+            {t("page.arenaAverage.rank")}
+          </span>
+          <Select value={rank} onValueChange={onRankChange}>
+            <SelectTrigger className="h-9 border-bpim-border bg-bpim-surface-2/60 text-sm font-bold text-bpim-text">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="border-bpim-border bg-bpim-bg">
+              {A_RANKS.map((r) => (
+                <SelectItem key={r} value={r} className="text-sm font-bold">
+                  {r}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-      <div className="flex flex-col gap-2">
-        <span className="text-[10px] font-black tracking-widest text-bpim-muted uppercase px-1">
-          Level
-        </span>
-        <RadioGroup
-          value={level}
-          onValueChange={onLevelChange}
-          className="flex h-9 items-center gap-8"
-        >
-          {["11", "12"].map((lv) => (
-            <div key={lv} className="flex items-center gap-2">
-              <RadioGroupItem
-                value={lv}
-                id={`analysis-lv-${lv}`}
-                className="border-bpim-primary"
-              />
-              <Label
-                htmlFor={`analysis-lv-${lv}`}
-                className="cursor-pointer text-sm font-bold text-bpim-text"
-              >
-                ☆{lv}
-              </Label>
-            </div>
-          ))}
-        </RadioGroup>
+        <div className="flex flex-col gap-2">
+          <span className="text-[10px] font-black tracking-widest text-bpim-muted uppercase px-1">
+            Level
+          </span>
+          <RadioGroup
+            value={level}
+            onValueChange={onLevelChange}
+            className="flex h-9 items-center gap-8"
+          >
+            {["11", "12"].map((lv) => (
+              <div key={lv} className="flex items-center gap-2">
+                <RadioGroupItem
+                  value={lv}
+                  id={`analysis-lv-${lv}`}
+                  className="border-bpim-primary"
+                />
+                <Label
+                  htmlFor={`analysis-lv-${lv}`}
+                  className="cursor-pointer text-sm font-bold text-bpim-text"
+                >
+                  ☆{lv}
+                </Label>
+              </div>
+            ))}
+          </RadioGroup>
+        </div>
       </div>
     </div>
-  </div>
   );
 };
 

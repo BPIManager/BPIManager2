@@ -1,8 +1,8 @@
-import { API_PREFIX } from "@/constants/apiEndpoints";
+﻿import { API_PREFIX } from "@/constants/apiEndpoints";
 import { useUser } from "@/contexts/users/UserContext";
 import { fetcher } from "@/utils/common/fetch";
 import useSWR from "swr";
-import type { MonthlyReviewData } from "@/pages/api/v1/users/[userId]/stats/monthly-review";
+import type { MonthlyReviewData } from "@/types/stats/monthlyReview";
 
 export const useMonthlyReview = (
   userId: string | undefined,

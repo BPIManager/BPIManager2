@@ -1,4 +1,4 @@
-import { MonthlyReviewView } from "@/components/partials/MonthlyReview";
+import { MonthlyReviewView } from "@/components/partials/MonthlyReview/index";
 import { PeriodSelector } from "@/components/partials/MonthlyReview/PeriodSelector";
 import { StarfieldBackground } from "@/components/ui/starfield-background";
 import { useMonthlyReview } from "@/hooks/stats/useMonthlyReview";
@@ -153,7 +153,9 @@ export default function MonthlyReviewPage() {
         {BackBtn}
         {CalendarBtn}
         <p style={{ color: "rgba(255,255,255,0.25)", fontSize: "0.875rem" }}>
-          {isAuthError ? "ログインが必要です" : "この期間のデータがありません"}
+          {isAuthError
+            ? "このデータを閲覧する権限がありません"
+            : "この期間のデータがありません"}
         </p>
       </div>
     );

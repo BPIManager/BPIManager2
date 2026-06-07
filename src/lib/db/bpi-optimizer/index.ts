@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { OptimizationResult } from "@/types/bpi-optimizer";
 import { IIDXVersion } from "@/types/iidx/version";
+import { IIDX_DIFFICULTIES } from "@/constants/diffs";
 import { sql } from "kysely";
 import { v4 as uuidv4 } from "uuid";
 
@@ -56,7 +57,7 @@ class BpiOptimizerRepository {
         "userScore.bpi",
       ])
       .where("m.difficultyLevel", "=", 12)
-      .where("m.difficulty", "in", ["HYPER", "ANOTHER", "LEGGENDARIA"])
+      .where("m.difficulty", "in", IIDX_DIFFICULTIES)
       .$if(!isInf, (qb) =>
         qb
           .where("m.releasedVersion", "<=", versionNum!)

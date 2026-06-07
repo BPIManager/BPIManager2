@@ -16,6 +16,7 @@ import { X, Plus } from "lucide-react";
 import type { DisplayMetric } from "@/components/partials/Metrics/ArenaAverage/ui";
 import { A_RANKS } from "@/constants/arenaRanks";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import { IIDX_DIFFICULTIES } from "@/constants/diffs";
 
 const DJRANK_OPTIONS = [
   "MAX-",
@@ -164,7 +165,7 @@ export const ArenaAverageFilter = ({
               Difficulty
             </span>
             <div className="flex h-9 items-center gap-x-4 gap-y-2 flex-wrap">
-              {(["HYPER", "ANOTHER", "LEGGENDARIA"] as const).map((str) => (
+              {IIDX_DIFFICULTIES.map((str) => (
                 <div key={str} className="flex items-center gap-2">
                   <Checkbox
                     id={`diff-${str}`}
@@ -236,7 +237,10 @@ export const ArenaAverageFilter = ({
                 className="flex flex-nowrap items-center gap-6"
               >
                 {DISPLAY_METRICS.map((opt) => (
-                  <div key={opt.value} className="flex items-center gap-1.5 shrink-0">
+                  <div
+                    key={opt.value}
+                    className="flex items-center gap-1.5 shrink-0"
+                  >
                     <RadioGroupItem
                       value={opt.value}
                       id={`metric-${opt.value}`}
@@ -289,7 +293,9 @@ const DetailFilterRow = ({
         </SelectContent>
       </Select>
 
-      <span className="text-xs text-bpim-muted">{t("arenaAvg.filter.rankOf")}</span>
+      <span className="text-xs text-bpim-muted">
+        {t("arenaAvg.filter.rankOf")}
+      </span>
 
       <Select
         value={filter.metric}
@@ -309,7 +315,9 @@ const DetailFilterRow = ({
         </SelectContent>
       </Select>
 
-      <span className="text-xs text-bpim-muted">{t("filter.scoreConditionParticle")}</span>
+      <span className="text-xs text-bpim-muted">
+        {t("filter.scoreConditionParticle")}
+      </span>
 
       {filter.metric === "djrank" ? (
         <Select
@@ -331,7 +339,11 @@ const DetailFilterRow = ({
         <Input
           value={filter.value}
           onChange={(e) => onChange({ value: e.target.value })}
-          placeholder={filter.metric === "score" ? t("arenaAvg.filter.scorePlaceholder") : "0-100"}
+          placeholder={
+            filter.metric === "score"
+              ? t("arenaAvg.filter.scorePlaceholder")
+              : "0-100"
+          }
           className="h-8 w-24 border-bpim-border bg-bpim-surface-2/60 text-xs text-bpim-text placeholder:text-bpim-muted"
           type="number"
           min={0}

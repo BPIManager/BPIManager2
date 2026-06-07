@@ -12,6 +12,7 @@ import type { RadarCategory } from "@/types/stats/radar";
 import { latestVersion } from "@/constants/latestVersion";
 import { toast } from "sonner";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import { IIDX_DIFFICULTIES } from "@/constants/diffs";
 
 export const BpiOptimizerSection = () => {
   const { t } = useTranslation();
@@ -47,7 +48,7 @@ export const BpiOptimizerSection = () => {
   const { radar } = useRadar(
     fbUser?.uid,
     ["11", "12"],
-    ["HYPER", "ANOTHER", "LEGGENDARIA"],
+    IIDX_DIFFICULTIES,
     latestVersion,
   );
 

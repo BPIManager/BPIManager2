@@ -12,6 +12,7 @@ import { useTimelineFilter } from "@/hooks/social/useTimelineFilter";
 import { IidxDifficulty } from "@/types/iidx/difficulty";
 import { PageContainer, PageHeader } from "../Header";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import { IIDX_DIFFICULTIES } from "@/constants/diffs";
 
 export const TimelineContainer = () => {
   const { t } = useTranslation();
@@ -77,7 +78,7 @@ export const TimelineContainer = () => {
 
                 <FilterCheckboxGroup
                   label="DIFFICULTY"
-                  items={["HYPER", "ANOTHER", "LEGGENDARIA"]}
+                  items={IIDX_DIFFICULTIES}
                   selected={filterParams.difficulties || []}
                   onToggle={(diff: string) =>
                     toggleDifficulty(diff as IidxDifficulty)

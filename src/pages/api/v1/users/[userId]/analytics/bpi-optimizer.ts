@@ -7,6 +7,7 @@ import { latestVersion } from "@/constants/latestVersion";
 import topElements from "@/constants/radars/topElements.json";
 import type { RadarCategory } from "@/types/stats/radar";
 import { ALL_RADAR_CATEGORIES } from "@/constants/radars";
+import { IIDX_DIFFICULTIES } from "@/constants/diffs";
 import type {
   SongOptimizerInput,
   OptimizerOptions,
@@ -103,7 +104,7 @@ export default async function handler(
     }
   }
 
-  const validDifficulties = new Set(["HYPER", "ANOTHER", "LEGGENDARIA"]);
+  const validDifficulties = new Set<string>(IIDX_DIFFICULTIES);
   const candidateDifficulties = difficultiesParam
     .split(",")
     .filter((d) => validDifficulties.has(d));

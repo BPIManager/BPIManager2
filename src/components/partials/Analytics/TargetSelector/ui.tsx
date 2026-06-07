@@ -18,6 +18,7 @@ import {
   PAST_VERSIONS,
   type KindOption,
 } from "../../../../hooks/analytics/useTargetSelector";
+import { IIDX_DIFFICULTIES } from "@/constants/diffs";
 
 // ---------------------------------------------------------------------------
 // KindCard — target-type selection button
@@ -113,7 +114,7 @@ export const RivalPickStep = ({
   const { rivals, isLoading } = useRivalSummary({
     userId: user?.userId || false,
     levels: ["11", "12"],
-    difficulties: ["HYPER", "ANOTHER", "LEGGENDARIA"],
+    difficulties: IIDX_DIFFICULTIES,
     version: latestVersion,
   });
 

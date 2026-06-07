@@ -1,10 +1,5 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { useInView } from "@/hooks/common/useInView";
-import { useTranslation } from "@/hooks/common/useTranslation";
-import type { MonthlyReviewData } from "@/pages/api/v1/users/[userId]/stats/monthly-review";
-import { useChartColors } from "@/hooks/common/useChartColors";
 import {
   BarChart,
   Bar,
@@ -14,119 +9,84 @@ import {
   Tooltip,
   Cell,
 } from "recharts";
+import type { MonthlyReviewData } from "@/types/stats/monthlyReview";
+import { formatDate } from "./functions";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 const styles = `
   @keyframes actFade { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
   @keyframes barGrowH { from{width:0} to{width:var(--w)} }
 `;
 
-function useCountUp(target: number, active: boolean, delay = 0) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const rafRef = useRef<number | null>(null);
-  useEffect(() => {
-    if (!active) return;
-    const startTime = performance.now() + delay * 1000;
-    const step = (now: number) => {
-      if (now < startTime) {
-        rafRef.current = requestAnimationFrame(step);
-        return;
-      }
-      const p = Math.min((now - startTime) / 1200, 1);
-      const e = 1 - Math.pow(1 - p, 3);
-      if (ref.current)
-        ref.current.textContent = Math.round(e * target).toLocaleString();
-      if (p < 1) rafRef.current = requestAnimationFrame(step);
-    };
-    rafRef.current = requestAnimationFrame(step);
-    return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
-  }, [active, target, delay]);
-  return ref;
-}
-
-function formatDate(dateStr: string): string {
-  const m = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if (!m) return dateStr;
-  return `${parseInt(m[2])}/${parseInt(m[3])}`;
-}
-
 interface Props {
+  sectionRef: React.RefObject<HTMLDivElement>;
+  inView: boolean;
+  keysRef: React.RefObject<HTMLSpanElement | null>;
+  scratchRef: React.RefObject<HTMLSpanElement | null>;
+  daysRef: React.RefObject<HTMLSpanElement | null>;
+  songsRef: React.RefObject<HTMLSpanElement | null>;
+  summary: string;
+  sectionTitle: string;
   activity: MonthlyReviewData["activity"];
-  granularity: "month" | "year";
+  dowData: { label: string; count: number }[];
+  hourData: { label: string; count: number }[];
+  maxDow: number;
+  tooltipStyle: React.CSSProperties;
+  hasNoKeyScratchData: boolean;
+  primaryColor: string;
+  noKeyScratchTitle: string;
+  noKeyScratchDesc: string;
+  bestDaysTitle: string;
+  bestGrowthDayLabel: string;
+  bestKeysDayLabel: string;
+  bestScratchDayLabel: string;
+  byDayOfWeekTitle: string;
+  byHourTitle: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  formatHourLabel: (...args: any[]) => React.ReactNode;
 }
 
-export const ActivitySection = ({ activity, granularity }: Props) => {
-  const [ref, inView] = useInView(0.1);
-  const colors = useChartColors();
+export const ActivitySectionUI = ({
+  sectionRef,
+  inView,
+  keysRef,
+  scratchRef,
+  daysRef,
+  songsRef,
+  summary,
+  sectionTitle,
+  activity,
+  dowData,
+  hourData,
+  maxDow,
+  tooltipStyle,
+  hasNoKeyScratchData,
+  primaryColor,
+  noKeyScratchTitle,
+  noKeyScratchDesc,
+  bestDaysTitle,
+  bestGrowthDayLabel,
+  bestKeysDayLabel,
+  bestScratchDayLabel,
+  byDayOfWeekTitle,
+  byHourTitle,
+  formatHourLabel,
+}: Props) => {
   const { t, tFormat } = useTranslation();
   const {
     totalKeys,
     totalScratches,
     playDays,
     updatedSongs,
-    byDayOfWeek,
-    byHour,
     bestDays,
+    towerRanking,
   } = activity;
-
-  const keysRef = useCountUp(totalKeys, inView, 0.2);
-  const scratchRef = useCountUp(totalScratches, inView, 0.35);
-  const daysRef = useCountUp(playDays, inView, 0.5);
-  const songsRef = useCountUp(updatedSongs, inView, 0.6);
-
-  const { towerRanking } = activity;
-  const dowLabels = t("monthlyReview.activity.dowLabels").split(",");
-  const dowData = byDayOfWeek.map((d) => ({
-    label: dowLabels[d.day] ?? String(d.day),
-    count: d.count,
-  }));
-  const hourData = byHour.map((h) => ({
-    label: String(h.hour),
-    count: h.count,
-  }));
-  const maxDow = Math.max(...dowData.map((d) => d.count), 1);
-
-  const tooltipStyle = {
-    background: "rgba(8,8,14,0.92)",
-    border: "1px solid rgba(255,255,255,0.1)",
-    borderRadius: 8,
-    fontSize: 11,
-    color: "#ffffff",
-  };
-
-  const isMonth = granularity === "month";
-  const bestDowIdx = dowData.reduce(
-    (best, d, i) => (d.count > dowData[best].count ? i : best),
-    0,
-  );
-  const bestDowLabel = dowLabels[bestDowIdx] ?? "";
-  const summaryParts: string[] = [
-    tFormat("monthlyReview.activity.summaryPlayed", {
-      days: playDays,
-      songs: updatedSongs,
-    }),
-    tFormat("monthlyReview.activity.summaryBestDow", {
-      day: isMonth ? `${bestDowLabel}曜` : bestDowLabel,
-    }),
-  ];
-  if (towerRanking) {
-    summaryParts.push(
-      tFormat("monthlyReview.activity.summaryKeysRank", {
-        rank: towerRanking.keysRank,
-        total: towerRanking.totalUsers,
-      }),
-    );
-  }
-  const summary = summaryParts.join(" ");
-
-  const hasNoKeyScratchData = totalKeys === 0 && totalScratches === 0;
 
   return (
     <>
       <style>{styles}</style>
       <section
-        ref={ref as React.RefObject<HTMLDivElement>}
+        ref={sectionRef}
         className="relative flex min-h-screen w-full flex-col items-center justify-center px-5 py-24"
       >
         <h2
@@ -137,7 +97,7 @@ export const ActivitySection = ({ activity, granularity }: Props) => {
             animation: inView ? "actFade 0.6s ease-out both" : "none",
           }}
         >
-          {t("monthlyReview.activity.sectionTitle")}
+          {sectionTitle}
         </h2>
 
         <p
@@ -181,7 +141,7 @@ export const ActivitySection = ({ activity, granularity }: Props) => {
                     fontSize: "0.875rem",
                   }}
                 >
-                  {t("monthlyReview.activity.noKeyScratchTitle")}
+                  {noKeyScratchTitle}
                 </p>
                 <p
                   style={{
@@ -190,7 +150,7 @@ export const ActivitySection = ({ activity, granularity }: Props) => {
                     lineHeight: 1.6,
                   }}
                 >
-                  {t("monthlyReview.activity.noKeyScratchDesc")}
+                  {noKeyScratchDesc}
                 </p>
               </div>
             </div>
@@ -198,14 +158,14 @@ export const ActivitySection = ({ activity, granularity }: Props) => {
             <div className="flex flex-col gap-5">
               {[
                 {
-                  label: "KEYS PRESSED",
+                  label: t("monthlyReview.activity.keys"),
                   value: totalKeys,
                   ref: keysRef,
                   accent: "#38bdf8",
                   rank: towerRanking?.keysRank,
                 },
                 {
-                  label: "SCRATCHES",
+                  label: t("monthlyReview.activity.scratches"),
                   value: totalScratches,
                   ref: scratchRef,
                   accent: "#a78bfa",
@@ -215,7 +175,7 @@ export const ActivitySection = ({ activity, granularity }: Props) => {
                 <div key={label} className="flex flex-col gap-1.5">
                   <div className="flex items-center justify-between">
                     <p
-                      className="text-[10px] font-bold tracking-[0.3em]"
+                      className="text-[10px] font-bold tracking-[0.3em] uppercase"
                       style={{ color: "rgba(255,255,255,0.3)" }}
                     >
                       {label}
@@ -229,7 +189,7 @@ export const ActivitySection = ({ activity, granularity }: Props) => {
                           border: `1px solid ${accent}44`,
                         }}
                       >
-                        {rank}位 / {towerRanking.totalUsers}人
+                        {tFormat("monthlyReview.activity.rankOf", { rank: String(rank), total: String(towerRanking.totalUsers) })}
                       </span>
                     )}
                   </div>
@@ -271,8 +231,8 @@ export const ActivitySection = ({ activity, granularity }: Props) => {
             style={{ borderColor: "rgba(255,255,255,0.07)" }}
           >
             {[
-              { label: "PLAY DAYS", ref: daysRef, value: playDays },
-              { label: "UPDATED SONGS", ref: songsRef, value: updatedSongs },
+              { label: t("monthlyReview.activity.playDays"), ref: daysRef, value: playDays },
+              { label: t("monthlyReview.activity.updatedSongs"), ref: songsRef, value: updatedSongs },
             ].map(({ label, ref: numRef }) => (
               <div key={label} className="flex flex-col items-center gap-1">
                 <span
@@ -307,12 +267,12 @@ export const ActivitySection = ({ activity, granularity }: Props) => {
                 className="mb-4 text-[10px] font-bold tracking-[0.3em] uppercase"
                 style={{ color: "rgba(255,255,255,0.3)" }}
               >
-                {t("monthlyReview.activity.bestDaysTitle")}
+                {bestDaysTitle}
               </p>
               <div className="flex gap-2">
                 {[
                   {
-                    label: t("monthlyReview.activity.bestGrowthDay"),
+                    label: bestGrowthDayLabel,
                     date: bestDays.bestGrowthDay?.date ?? null,
                     sub: bestDays.bestGrowthDay
                       ? `+${bestDays.bestGrowthDay.bpiDiff.toFixed(2)} BPI`
@@ -320,18 +280,18 @@ export const ActivitySection = ({ activity, granularity }: Props) => {
                     accent: "#34d399",
                   },
                   {
-                    label: t("monthlyReview.activity.bestKeysDay"),
+                    label: bestKeysDayLabel,
                     date: bestDays.bestKeysDay?.date ?? null,
                     sub: bestDays.bestKeysDay
-                      ? `${bestDays.bestKeysDay.keyCount.toLocaleString()} 打`
+                      ? tFormat("monthlyReview.activity.keysCount", { count: bestDays.bestKeysDay.keyCount.toLocaleString() })
                       : null,
                     accent: "#38bdf8",
                   },
                   {
-                    label: t("monthlyReview.activity.bestScratchDay"),
+                    label: bestScratchDayLabel,
                     date: bestDays.bestScratchDay?.date ?? null,
                     sub: bestDays.bestScratchDay
-                      ? `${bestDays.bestScratchDay.scratchCount.toLocaleString()} 回`
+                      ? tFormat("monthlyReview.activity.scratchCount", { count: bestDays.bestScratchDay.scratchCount.toLocaleString() })
                       : null,
                     accent: "#a78bfa",
                   },
@@ -390,9 +350,9 @@ export const ActivitySection = ({ activity, granularity }: Props) => {
               className="mb-3 text-[10px] font-bold tracking-[0.3em] uppercase"
               style={{ color: "rgba(255,255,255,0.3)" }}
             >
-              {t("monthlyReview.activity.byDayOfWeek")}
+              {byDayOfWeekTitle}
             </p>
-            <div className="flex items-end gap-1.5" style={{ height: 64 }}>
+            <div className="flex items-end gap-1.5" style={{ height: 164 }}>
               {dowData.map((d, i) => {
                 const pct = d.count / maxDow;
                 const isSat = i === 5;
@@ -401,7 +361,7 @@ export const ActivitySection = ({ activity, granularity }: Props) => {
                   ? "#38bdf8"
                   : isSun
                     ? "#f87171"
-                    : colors.primary;
+                    : primaryColor;
                 return (
                   <div
                     key={d.label}
@@ -409,7 +369,7 @@ export const ActivitySection = ({ activity, granularity }: Props) => {
                   >
                     <div
                       className="flex w-full flex-col justify-end"
-                      style={{ height: 48 }}
+                      style={{ height: 128 }}
                     >
                       <div
                         className="w-full rounded-t-sm"
@@ -450,9 +410,9 @@ export const ActivitySection = ({ activity, granularity }: Props) => {
               className="mb-3 text-[10px] font-bold tracking-[0.3em] uppercase"
               style={{ color: "rgba(255,255,255,0.3)" }}
             >
-              {t("monthlyReview.activity.byHour")}
+              {byHourTitle}
             </p>
-            <ResponsiveContainer width="100%" height={90}>
+            <ResponsiveContainer width="100%" height={128}>
               <BarChart
                 data={hourData}
                 margin={{ top: 4, right: 0, bottom: 0, left: 0 }}
@@ -473,10 +433,8 @@ export const ActivitySection = ({ activity, granularity }: Props) => {
                   contentStyle={tooltipStyle}
                   wrapperStyle={{ zIndex: 50 }}
                   cursor={{ fill: "rgba(255,255,255,0.04)" }}
-                  formatter={(v) => [String(v), "曲"] as [string, string]}
-                  labelFormatter={(l) =>
-                    tFormat("monthlyReview.activity.hourUnit", { h: l })
-                  }
+                  formatter={(v) => [String(v), t("monthlyReview.updatedSongsUnit")] as [string, string]}
+                  labelFormatter={formatHourLabel}
                 />
                 <Bar dataKey="count" radius={[2, 2, 0, 0]}>
                   {hourData.map((d, i) => {

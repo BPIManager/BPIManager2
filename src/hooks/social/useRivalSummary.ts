@@ -22,7 +22,7 @@ interface RivalSummaryResponse {
 export const useRivalSummary = (params: {
   userId?: string | boolean;
   levels: string[];
-  difficulties: string[];
+  difficulties: readonly string[];
   version: string;
 }) => {
   const { userId, levels, difficulties, version } = params;

@@ -13,8 +13,8 @@ import { RadarResponse } from "@/types/stats/radar";
  */
 export const useRadar = (
   userId: string | undefined,
-  levels: string[],
-  difficulties: string[],
+  levels: readonly string[],
+  difficulties: readonly string[],
   version: string,
 ) => {
   const { data, error, isLoading, mutate } = useStatsData<RadarResponse>(
