@@ -1,7 +1,6 @@
 import { useStatsData } from "@/services/swr/fetchStats";
 import { RadarResponse } from "@/types/stats/radar";
 
-
 /**
  * レーダーチャートデータ（スキルカテゴリ別スコア）を取得する。
  *
@@ -19,7 +18,7 @@ export const useRadar = (
 ) => {
   const { data, error, isLoading, mutate } = useStatsData<RadarResponse>(
     "radar",
-    { userId, version, levels, difficulties },
+    { userId, version, levels: [...levels], difficulties: [...difficulties] },
     {
       requireLevels: false,
       revalidateOnFocus: false,
