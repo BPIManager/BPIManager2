@@ -1,18 +1,16 @@
-﻿"use client";
+"use client";
 
-import { JSX, useState } from "react";
+import { ButtonHTMLAttributes, JSX, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import {
   FileUp,
   Settings,
-  LogOut,
   ListIcon,
   ChartNoAxesGantt,
   ChartArea,
   UsersIcon,
   ScrollText,
-  User,
   ChevronRight,
   ChevronDown,
   Search,
@@ -33,15 +31,15 @@ import {
   Swords,
   BarChart2,
   Ticket,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from "lucide-react";
 
 import { useUser } from "@/contexts/users/UserContext";
-import { authActions } from "@/lib/firebase/auth";
 import { latestVersion } from "@/constants/latestVersion";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -50,9 +48,18 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { XIcon } from "../LogIn";
-import { RoleBadge } from "../UserRole/badge";
 
-export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
+export const SidebarContent = ({
+  onClose,
+  expanded = false,
+  pinned = false,
+  onTogglePin,
+}: {
+  onClose?: () => void;
+  expanded?: boolean;
+  pinned?: boolean;
+  onTogglePin?: () => void;
+}) => {
   const { user } = useUser();
   const router = useRouter();
   const { t } = useTranslation();
@@ -61,6 +68,50 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
   const [isScoreOpen, setIsScoreOpen] = useState<boolean>(true);
   const [isBetaOpen, setIsBetaOpen] = useState<boolean>(true);
   const [isAnalyticsOpen, setIsAnalyticsOpen] = useState<boolean>(true);
+
+  // Helpers — depend on `expanded` closure
+  // Text labels: opacity-0 by default, opacity-1 on hover; when expanded force-show via inline style
+  const labelStyle = expanded ? { opacity: 1 } : undefined;
+  const labelCn =
+    "flex-1 text-left whitespace-nowrap overflow-hidden opacity-0 transition-opacity duration-150 group-hover/sidebar:opacity-100";
+
+  // display:flex/block elements that are hidden when collapsed
+  const showFlex = !expanded ? "hidden group-hover/sidebar:flex" : "";
+  const showBlock = !expanded ? "hidden group-hover/sidebar:block" : "";
+
+  // Separator — only shown in expanded mode
+  const Sep = () =>
+    expanded ? <div className="mx-3 my-0.5 h-px bg-bpim-border/50" /> : null;
+
+  // Section collapsible trigger — hidden when collapsed, shown when expanded
+  const SectionTrigger = ({
+    isOpen,
+    label,
+    badge,
+    ...props
+  }: {
+    isOpen: boolean;
+    label: string;
+    badge?: React.ReactNode;
+  } & ButtonHTMLAttributes<HTMLButtonElement>) => (
+    <Button
+      variant="ghost"
+      size="sm"
+      className={cn(
+        "w-full justify-start gap-3 px-3 text-bpim-muted hover:bg-bpim-overlay/50 hover:text-bpim-text data-[state=open]:bg-transparent",
+        !expanded && "hidden group-hover/sidebar:flex",
+      )}
+      {...props}
+    >
+      {isOpen ? (
+        <ChevronDown className="h-5 w-5 shrink-0" />
+      ) : (
+        <ChevronRight className="h-5 w-5 shrink-0" />
+      )}
+      <span className="text-xs font-bold tracking-wider">{label}</span>
+      {badge}
+    </Button>
+  );
 
   const rivalMenuItems = [
     { label: t("nav.rivals"), icon: UsersIcon, href: "/rivals", exact: true },
@@ -84,22 +135,14 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
   ];
 
   const betaMenuItems = [
-    {
-      label: t("nav.assistant"),
-      icon: Target,
-      href: "/optimizer",
-    },
+    { label: t("nav.assistant"), icon: Target, href: "/optimizer" },
     { label: t("nav.songs"), icon: Music, href: "/songs" },
     {
       label: t("nav.allSongs"),
       icon: ListIcon,
       href: `/my/all/${latestVersion}`,
     },
-    {
-      label: t("nav.tickets"),
-      icon: Ticket,
-      href: "/tickets",
-    },
+    { label: t("nav.tickets"), icon: Ticket, href: "/tickets" },
   ];
 
   const infoMenuItems = [
@@ -168,12 +211,17 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
 
     const content = (
       <div className="flex w-full items-center gap-3">
-        <item.icon className="h-4.5 w-4.5" />
-        <span className="flex-1 text-left">{item.label}</span>
+        <item.icon className="h-5 w-5 shrink-0" />
+        <span className={labelCn} style={labelStyle}>
+          {item.label}
+        </span>
         {item.isBeta && (
           <Badge
             variant="secondary"
-            className="text-[9px] px-1.5 py-0 bg-blue-500/10 text-blue-400 border-blue-500/20 font-bold tracking-tighter"
+            className={cn(
+              "text-[9px] px-1.5 py-0 bg-blue-500/10 text-blue-400 border-blue-500/20 font-bold tracking-tighter",
+              showFlex,
+            )}
           >
             BETA
           </Badge>
@@ -181,12 +229,19 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
         {item.isComingSoon && (
           <Badge
             variant="outline"
-            className="text-[10px] py-0 border-bpim-border text-bpim-muted"
+            className={cn(
+              "text-[10px] py-0 border-bpim-border text-bpim-muted",
+              showFlex,
+            )}
           >
             {t("common.comingSoon")}
           </Badge>
         )}
-        {item.isExternal && <ExternalLink className="h-3 w-3 opacity-40" />}
+        {item.isExternal && (
+          <ExternalLink
+            className={cn("h-3 w-3 shrink-0 opacity-40", showBlock)}
+          />
+        )}
       </div>
     );
 
@@ -198,7 +253,11 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
         size="sm"
         className={cn(
           "w-full justify-start px-3 transition-all",
-          isNested ? "pl-9" : "pl-3",
+          isNested
+            ? expanded
+              ? "pl-9"
+              : "pl-3 group-hover/sidebar:pl-9"
+            : "pl-3",
           isActive
             ? "bg-bpim-overlay/60 font-bold"
             : "font-medium text-bpim-text",
@@ -236,7 +295,8 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
         variant={isActive ? "secondary" : "ghost"}
         size="sm"
         className={cn(
-          "w-full justify-start pl-9 transition-all",
+          "w-full justify-start transition-all",
+          expanded ? "pl-9" : "pl-3 group-hover/sidebar:pl-9",
           isActive
             ? "bg-bpim-overlay/60 font-bold"
             : "font-medium text-bpim-text",
@@ -245,8 +305,10 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
       >
         <Link href={item.href}>
           <div className="flex w-full items-center gap-3">
-            <item.icon className="h-4 w-4" />
-            <span className="flex-1 text-left">{item.label}</span>
+            <item.icon className="h-5 w-5 shrink-0" />
+            <span className={labelCn} style={labelStyle}>
+              {item.label}
+            </span>
           </div>
         </Link>
       </Button>
@@ -267,105 +329,39 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
   ];
 
   return (
-    <div className="flex h-full flex-col gap-3 p-4 overflow-y-auto scrollbar-hide">
+    <div className="flex h-full flex-col gap-1 overflow-y-auto scrollbar-hide py-2 px-2">
+      {/* Support */}
       <Button
         asChild
         variant="ghost"
         size="sm"
-        className="w-full mb-2 justify-start px-3 font-bold text-pink-400 hover:bg-pink-400/10 hover:text-pink-300 border border-pink-400/20 bg-pink-600/10"
+        className="mb-1 w-full justify-start px-3 font-bold text-pink-400 hover:bg-pink-400/10 hover:text-pink-300 border border-pink-400/20 bg-pink-600/10"
         onClick={onClose}
       >
         <Link href="/support">
           <div className="flex w-full items-center gap-3">
-            <HeartHandshake className="h-4.5 w-4.5" />
-            <span className="flex-1 text-left">{t("nav.support")}</span>
+            <HeartHandshake className="h-5 w-5 shrink-0" />
+            <span className={labelCn} style={labelStyle}>
+              {t("nav.support")}
+            </span>
           </div>
         </Link>
       </Button>
-      <div className="rounded-xl border border-bpim-border bg-bpim-surface-2/60 p-4 flex flex-col gap-4">
-        <div className="flex items-center gap-3">
-          <Link href={`/users/${user?.userId}`} onClick={onClose}>
-            <Avatar className="h-12 w-12">
-              <AvatarImage
-                src={user?.profileImage || ""}
-                alt={user?.userName || "User"}
-              />
-              <AvatarFallback className="bg-bpim-surface-2 text-bpim-muted">
-                {user?.userName?.slice(0, 2) || "U"}
-              </AvatarFallback>
-            </Avatar>
-          </Link>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-bold text-bpim-text">
-              {user?.userName || "Guest"}
-            </p>
-            <p className="truncate font-mono text-[10px] text-bpim-muted">
-              {user?.iidxId ? `ID: ${user.iidxId}` : t("nav.user.idNotSet")}
-            </p>
-            <p className="font-mono text-[10px] font-bold text-bpim-warning">
-              ☆12 BPI: {user?.totalBpi ?? -15}
-            </p>
-            {user?.role && (
-              <RoleBadge {...user.role} variant="full" size="small" />
-            )}
-          </div>
-        </div>
 
-        {user?.userId && (
-          <div className="flex flex-col gap-3">
-            <Button
-              asChild
-              variant="outline"
-              size="xs"
-              className="w-full justify-between border-slate-700 h-7 px-2 hover:bg-bpim-overlay/50"
-              onClick={onClose}
-            >
-              <Link href={`/users/${user?.userId}`}>
-                <div className="flex items-center gap-1.5">
-                  <User className="h-3 w-3" />
-                  <span className="text-[10px]">{t("nav.user.viewProfile")}</span>
-                </div>
-                <ChevronRight className="h-3 w-3" />
-              </Link>
-            </Button>
-
-            <div className="flex justify-center gap-8 px-1">
-              <Link
-                href={`/users/${user?.userId}/following`}
-                onClick={onClose}
-                className="text-center group"
-              >
-                <p className="text-xs font-bold text-bpim-text">
-                  {user?.followingCount ?? 0}
-                </p>
-                <p className="text-[10px] text-bpim-muted group-hover:text-bpim-text">
-                  {t("nav.user.following")}
-                </p>
-              </Link>
-              <Link
-                href={`/users/${user?.userId}/followers`}
-                onClick={onClose}
-                className="text-center group"
-              >
-                <p className="text-xs font-bold text-bpim-text">
-                  {user?.followerCount ?? 0}
-                </p>
-                <p className="text-[10px] text-bpim-muted group-hover:text-bpim-text">
-                  {t("nav.user.followers")}
-                </p>
-              </Link>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <nav className="flex flex-col gap-1 flex-1">
+      {/* Nav items */}
+      <nav className="flex flex-1 flex-col gap-1">
         {renderMenuItem({
           label: t("nav.dashboard"),
           icon: LayoutDashboard,
           href: "/",
         })}
-        {renderMenuItem({ label: t("nav.import"), icon: FileUp, href: "/import" })}
+        {renderMenuItem({
+          label: t("nav.import"),
+          icon: FileUp,
+          href: "/import",
+        })}
+
+        <Sep />
 
         <Collapsible
           open={isScoreOpen}
@@ -373,20 +369,10 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
           className="w-full"
         >
           <CollapsibleTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full justify-start gap-3 px-3 text-bpim-muted hover:bg-bpim-overlay/50 hover:text-bpim-text data-[state=open]:bg-transparent"
-            >
-              {isInfoOpen ? (
-                <ChevronDown className="h-4.5 w-4.5" />
-              ) : (
-                <ChevronRight className="h-4.5 w-4.5" />
-              )}
-              <span className="text-xs font-bold tracking-wider">
-                {t("nav.section.score")}
-              </span>
-            </Button>
+            <SectionTrigger
+              isOpen={isScoreOpen}
+              label={t("nav.section.score")}
+            />
           </CollapsibleTrigger>
           <CollapsibleContent className="flex flex-col gap-1 mt-1">
             {scoreSubItems.map((item) => renderScoreSubItem(item))}
@@ -399,29 +385,25 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
           href: `/users/${user?.userId}/logs/${latestVersion}`,
         })}
 
+        <Sep />
+
         <Collapsible
           open={isRivalOpen}
           onOpenChange={setIsRivalOpen}
           className="w-full"
         >
           <CollapsibleTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full justify-start gap-3 px-3 text-bpim-muted hover:bg-bpim-overlay/50 hover:text-bpim-text data-[state=open]:bg-transparent"
-            >
-              {isRivalOpen ? (
-                <ChevronDown className="h-4.5 w-4.5" />
-              ) : (
-                <ChevronRight className="h-4.5 w-4.5" />
-              )}
-              <span className="text-xs font-bold tracking-wider">{t("nav.section.rivals")}</span>
-            </Button>
+            <SectionTrigger
+              isOpen={isRivalOpen}
+              label={t("nav.section.rivals")}
+            />
           </CollapsibleTrigger>
           <CollapsibleContent className="flex flex-col gap-1 mt-1">
             {rivalMenuItems.map((item) => renderMenuItem(item, true))}
           </CollapsibleContent>
         </Collapsible>
+
+        <Sep />
 
         <Collapsible
           open={isAnalyticsOpen}
@@ -429,25 +411,17 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
           className="w-full"
         >
           <CollapsibleTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full justify-start gap-3 px-3 text-bpim-muted hover:bg-bpim-overlay/50 hover:text-bpim-text data-[state=open]:bg-transparent"
-            >
-              {isAnalyticsOpen ? (
-                <ChevronDown className="h-4.5 w-4.5" />
-              ) : (
-                <ChevronRight className="h-4.5 w-4.5" />
-              )}
-              <span className="text-xs font-bold tracking-wider">{t("nav.section.analytics")}</span>
-            </Button>
+            <SectionTrigger
+              isOpen={isAnalyticsOpen}
+              label={t("nav.section.analytics")}
+            />
           </CollapsibleTrigger>
           <CollapsibleContent className="flex flex-col gap-1 mt-1">
             {analyticsMenuItems.map((item) => renderMenuItem(item, true))}
           </CollapsibleContent>
         </Collapsible>
 
-        {renderMenuItem({ label: t("nav.settings"), icon: Settings, href: "/settings" })}
+        <Sep />
 
         <Collapsible
           open={isBetaOpen}
@@ -455,31 +429,25 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
           className="w-full"
         >
           <CollapsibleTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full justify-start gap-3 px-3 text-bpim-muted hover:bg-bpim-overlay/50 hover:text-bpim-text data-[state=open]:bg-transparent"
-            >
-              {isBetaOpen ? (
-                <ChevronDown className="h-4.5 w-4.5" />
-              ) : (
-                <ChevronRight className="h-4.5 w-4.5" />
-              )}
-              <span className="text-xs font-bold tracking-wider">
-                {t("nav.section.beta")}
-              </span>
-              <Badge
-                variant="secondary"
-                className="text-[9px] px-1.5 py-0 bg-blue-500/10 text-blue-400 border-blue-500/20 font-bold tracking-tighter"
-              >
-                BETA
-              </Badge>
-            </Button>
+            <SectionTrigger
+              isOpen={isBetaOpen}
+              label={t("nav.section.beta")}
+              badge={
+                <Badge
+                  variant="secondary"
+                  className="text-[9px] px-1.5 py-0 bg-blue-500/10 text-blue-400 border-blue-500/20 font-bold tracking-tighter"
+                >
+                  BETA
+                </Badge>
+              }
+            />
           </CollapsibleTrigger>
           <CollapsibleContent className="flex flex-col gap-1 mt-1">
             {betaMenuItems.map((item) => renderMenuItem(item, true))}
           </CollapsibleContent>
         </Collapsible>
+
+        <Sep />
 
         <Collapsible
           open={isInfoOpen}
@@ -487,38 +455,43 @@ export const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
           className="w-full"
         >
           <CollapsibleTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full justify-start gap-3 px-3 text-bpim-muted hover:bg-bpim-overlay/50 hover:text-bpim-text data-[state=open]:bg-transparent"
-            >
-              {isInfoOpen ? (
-                <ChevronDown className="h-4.5 w-4.5" />
-              ) : (
-                <ChevronRight className="h-4.5 w-4.5" />
-              )}
-              <span className="text-xs font-bold tracking-wider">{t("nav.section.info")}</span>
-            </Button>
+            <SectionTrigger isOpen={isInfoOpen} label={t("nav.section.info")} />
           </CollapsibleTrigger>
           <CollapsibleContent className="flex flex-col gap-1 mt-1">
             {infoMenuItems.map((item) => renderMenuItem(item, true))}
           </CollapsibleContent>
         </Collapsible>
+
+        <Sep />
+        {renderMenuItem({
+          label: t("nav.settings"),
+          icon: Settings,
+          href: "/settings",
+        })}
       </nav>
 
-      <div className="flex flex-col gap-4 pt-4 mt-auto">
-        {user?.userId && (
+      {/* Pin/unpin toggle — desktop only (only rendered when onTogglePin is provided) */}
+      {onTogglePin && (
+        <div className="mt-auto border-t border-bpim-border pt-1">
           <Button
             variant="ghost"
             size="sm"
-            className="w-full justify-center gap-2 text-bpim-danger hover:bg-bpim-danger/10 hover:text-bpim-danger"
-            onClick={() => authActions.logout()}
+            className="w-full justify-start px-3 text-bpim-muted hover:text-bpim-text"
+            onClick={onTogglePin}
           >
-            <LogOut className="h-4 w-4" />
-            <span className="font-bold text-xs">{t("nav.signOut")}</span>
+            <div className="flex w-full items-center gap-3">
+              {pinned ? (
+                <PanelLeftClose className="h-5 w-5 shrink-0" />
+              ) : (
+                <PanelLeftOpen className="h-5 w-5 shrink-0" />
+              )}
+              <span className={labelCn} style={labelStyle}>
+                {pinned ? t("nav.sidebar.unpin") : t("nav.sidebar.pin")}
+              </span>
+            </div>
           </Button>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

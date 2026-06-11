@@ -133,6 +133,12 @@ export const navTranslations = {
     ko: "BPIM2 지원하기",
   },
   "nav.settings": { ja: "設定", en: "Settings", "zh-TW": "設定", ko: "설정" },
+  "nav.signIn": {
+    ja: "ログイン",
+    en: "Sign In",
+    "zh-TW": "登入",
+    ko: "로그인",
+  },
   "nav.signOut": {
     ja: "サインアウト",
     en: "Sign Out",
@@ -194,5 +200,17 @@ export const navTranslations = {
     en: "Followers",
     "zh-TW": "粉絲",
     ko: "팔로워",
+  },
+  "nav.sidebar.pin": {
+    ja: "サイドバーを固定",
+    en: "Pin sidebar",
+    "zh-TW": "固定側邊欄",
+    ko: "사이드바 고정",
+  },
+  "nav.sidebar.unpin": {
+    ja: "サイドバーを折りたたむ",
+    en: "Collapse sidebar",
+    "zh-TW": "收起側邊欄",
+    ko: "사이드바 접기",
   },
 } as const;

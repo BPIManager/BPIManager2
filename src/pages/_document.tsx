@@ -64,6 +64,9 @@ export default function Document() {
   return (
     <Html lang="ja" suppressHydrationWarning>
       <Head>
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
         <script dangerouslySetInnerHTML={{ __html: fontScript }} />
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />

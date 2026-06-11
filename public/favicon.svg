@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <style>
+    .bar { fill: hsl(217, 91%, 60%); }
+    @media (prefers-color-scheme: light) {
+      .bar { fill: hsl(217, 91%, 40%); }
+    }
+  </style>
+  <rect class="bar" x="2"  y="4"  width="4" height="24" rx="0.75" opacity="0.35"/>
+  <rect class="bar" x="10" y="11" width="4" height="17" rx="0.75" opacity="0.9"/>
+  <rect class="bar" x="18" y="17" width="4" height="11" rx="0.75" opacity="0.35"/>
+  <rect class="bar" x="26" y="24" width="4" height="4"  rx="0.75" opacity="0.35"/>
+</svg>
