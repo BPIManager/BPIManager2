@@ -12,12 +12,19 @@ import { socialComparisonRepo } from "./comparison";
  */
 export const socialRepo = {
   // タイムライン・フィード系
-  getFollowedTimeline: socialTimelineRepo.getFollowedTimeline.bind(socialTimelineRepo),
-  getViewerScoresForSongs: socialTimelineRepo.getViewerScoresForSongs.bind(socialTimelineRepo),
+  getFollowedTimeline:
+    socialTimelineRepo.getFollowedTimeline.bind(socialTimelineRepo),
+  getViewerScoresForSongs:
+    socialTimelineRepo.getViewerScoresForSongs.bind(socialTimelineRepo),
 
   // 比較・レーダー系
-  getWinLossStats: socialComparisonRepo.getWinLossStats.bind(socialComparisonRepo),
+  getWinLossStats:
+    socialComparisonRepo.getWinLossStats.bind(socialComparisonRepo),
+  getWinLossHistory:
+    socialComparisonRepo.getWinLossHistory.bind(socialComparisonRepo),
   getUserRadar: socialComparisonRepo.getUserRadar.bind(socialComparisonRepo),
-  getRivalScoresForSong: socialComparisonRepo.getRivalScoresForSong.bind(socialComparisonRepo),
-  getFollowedWinLossSummary: socialComparisonRepo.getFollowedWinLossSummary.bind(socialComparisonRepo),
+  getRivalScoresForSong:
+    socialComparisonRepo.getRivalScoresForSong.bind(socialComparisonRepo),
+  getFollowedWinLossSummary:
+    socialComparisonRepo.getFollowedWinLossSummary.bind(socialComparisonRepo),
 };

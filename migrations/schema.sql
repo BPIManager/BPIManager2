@@ -193,6 +193,7 @@ CREATE TABLE IF NOT EXISTS `scores` (
   KEY `idx_scores_lookup_v2` (`userId`,`songId`,`version`,`exScore`,`logId`),
   KEY `idx_scores_bpm_dist` (`userId`,`version`,`songId`,`logId`,`bpi`),
   KEY `idx_scores_user_song_logid` (`userId`,`songId`,`logId` DESC),
+  KEY `idx_scores_user_version_played` (`userId`,`version`,`lastPlayed`,`logId`),
   CONSTRAINT `fk_score_def` FOREIGN KEY (`definitionId`) REFERENCES `songDef` (`defId`),
   CONSTRAINT `fk_score_song` FOREIGN KEY (`songId`) REFERENCES `songs` (`songId`) ON DELETE CASCADE,
   CONSTRAINT `fk_score_userId` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE,

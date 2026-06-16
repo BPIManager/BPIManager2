@@ -17,15 +17,17 @@ import { BpiHistorySection } from "@/components/partials/DashBoard/TotalBPIHisto
 import { IidxTowerComparisonSection } from "@/components/partials/DashBoard/IidxTowerCard/comparison";
 import { TabsContent } from "@/components/ui/tabs";
 import { useRivalComparison } from "@/hooks/social/useRivalComparison";
-import { WinLossStats } from "@/components/partials/UserList/Modal/ui";
+import { WinLossStats } from "@/components/partials/WinLossStats";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 function RivalOverviewTab({
   myUserId,
+  myName,
   rivalUserId,
   rivalName,
 }: {
   myUserId: string;
+  myName?: string;
   rivalUserId: string;
   rivalName?: string;
 }) {
@@ -39,7 +41,13 @@ function RivalOverviewTab({
 
       {winLoss && winLoss.length > 0 && (
         <div className="rounded-2xl border border-bpim-border bg-bpim-bg/40 p-4 shadow-xl backdrop-blur-md">
-          <WinLossStats winLossData={winLoss} />
+          <WinLossStats
+            winLossData={winLoss}
+            viewerId={myUserId}
+            rivalId={rivalUserId}
+            myName={myName}
+            rivalName={rivalName}
+          />
         </div>
       )}
 
@@ -118,6 +126,7 @@ export default function RivalsUserPage({
   }
 
   const myUserId = user.userId;
+  const myName = user.userName;
 
   return (
     <RivalProfileLayout rivalUserId={rivalUserId} currentTab={defaultView}>
@@ -129,6 +138,7 @@ export default function RivalsUserPage({
       <TabsContent value="overview" className="mt-0 outline-none">
         <RivalOverviewTab
           myUserId={myUserId}
+          myName={myName}
           rivalUserId={rivalUserId}
           rivalName={rivalName}
         />

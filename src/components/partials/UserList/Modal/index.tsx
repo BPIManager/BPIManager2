@@ -32,7 +32,7 @@ export const RivalComparisonModal = ({
   viewerRadar: Record<string, number | { totalBpi: number }>;
   version?: string;
 }) => {
-  const { fbUser } = useUser();
+  const { fbUser, user } = useUser();
 
   // ログイン時: compare エンドポイントで profile + 勝敗データを1本で取得
   const {
@@ -131,7 +131,13 @@ export const RivalComparisonModal = ({
             <div className="flex flex-col gap-6">
               <Separator />
 
-              <WinLossStats winLossData={compare.winLoss} />
+              <WinLossStats
+                winLossData={compare.winLoss}
+                viewerId={user?.userId}
+                rivalId={rivalId ?? undefined}
+                myName={user?.userName}
+                rivalName={profile?.userName}
+              />
 
               <div className="flex flex-col gap-3">
                 <SectionTitle icon={Activity} label="RADAR COMPARISON" />

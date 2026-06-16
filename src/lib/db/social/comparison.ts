@@ -15,55 +15,84 @@ class SocialComparisonRepository {
    * @returns `{ level, win, lose, draw }[]`
    */
   async getWinLossStats(viewerId: string, rivalId: string, version: string) {
-    const getLatestScores = (uid: string) =>
-      db
-        .selectFrom("scores as s")
-        .innerJoin(
-          db
-            .selectFrom("scores")
-            .select(["songId", (eb) => eb.fn.max("logId").as("maxLogId")])
-            .where("userId", "=", uid)
-            .where("version", "=", version)
-            .groupBy("songId")
-            .as("latest"),
-          (join) =>
-            join
-              .onRef("s.songId", "=", "latest.songId")
-              .onRef("s.logId", "=", "latest.maxLogId"),
-        )
-        .innerJoin("songs as m", "s.songId", "m.songId")
-        .select(["s.songId", "s.exScore", "m.difficultyLevel"])
-        .where("m.difficultyLevel", "in", [11, 12]);
+    // songs をドライバーにして level 11/12 のみを対象とし、
+    // 相関サブクエリで最新 logId を取得しながら1クエリで集計まで完結させる。
+    // 相関サブクエリは idx_scores_version_user_song_log(version,userId,songId,logId DESC) を点引きするので高速。
+    const rows = await db
+      .selectFrom("songs as m")
+      .innerJoin("scores as v", (join) =>
+        join
+          .onRef("v.songId", "=", "m.songId")
+          .on("v.userId", "=", viewerId)
+          .on("v.version", "=", version)
+          .on("v.logId", "=", (eb) =>
+            eb
+              .selectFrom("scores as v2")
+              .select((sub) => sub.fn.max("v2.logId").as("m"))
+              .where("v2.userId", "=", viewerId)
+              .where("v2.version", "=", version)
+              .whereRef("v2.songId", "=", "m.songId"),
+          ),
+      )
+      .innerJoin("scores as r", (join) =>
+        join
+          .onRef("r.songId", "=", "m.songId")
+          .on("r.userId", "=", rivalId)
+          .on("r.version", "=", version)
+          .on("r.logId", "=", (eb) =>
+            eb
+              .selectFrom("scores as r2")
+              .select((sub) => sub.fn.max("r2.logId").as("m"))
+              .where("r2.userId", "=", rivalId)
+              .where("r2.version", "=", version)
+              .whereRef("r2.songId", "=", "m.songId"),
+          ),
+      )
+      .select([
+        "m.difficultyLevel as level",
+        (eb) =>
+          eb.fn
+            .sum(
+              eb
+                .case()
+                .when(eb("v.exScore", ">", eb.ref("r.exScore")))
+                .then(1)
+                .else(0)
+                .end(),
+            )
+            .as("win"),
+        (eb) =>
+          eb.fn
+            .sum(
+              eb
+                .case()
+                .when(eb("v.exScore", "<", eb.ref("r.exScore")))
+                .then(1)
+                .else(0)
+                .end(),
+            )
+            .as("lose"),
+        (eb) =>
+          eb.fn
+            .sum(
+              eb
+                .case()
+                .when(eb("v.exScore", "=", eb.ref("r.exScore")))
+                .then(1)
+                .else(0)
+                .end(),
+            )
+            .as("draw"),
+      ])
+      .where("m.difficultyLevel", "in", [11, 12])
+      .groupBy("m.difficultyLevel")
+      .execute();
 
-    const [vScores, rScores] = await Promise.all([
-      getLatestScores(viewerId).execute(),
-      getLatestScores(rivalId).execute(),
-    ]);
-
-    if (vScores.length === 0 || rScores.length === 0) return [];
-
-    const rMap = new Map(rScores.map((r) => [r.songId, r.exScore]));
-    const levelStats = new Map<
-      number,
-      { win: number; lose: number; draw: number }
-    >();
-
-    for (const v of vScores) {
-      const rExScore = rMap.get(v.songId);
-      if (rExScore === undefined) continue;
-      const level = v.difficultyLevel;
-      const s = levelStats.get(level) ?? { win: 0, lose: 0, draw: 0 };
-      if (v.exScore > rExScore) s.win++;
-      else if (v.exScore < rExScore) s.lose++;
-      else s.draw++;
-      levelStats.set(level, s);
-    }
-
-    return Array.from(levelStats.entries()).map(([level, s]) => ({
-      level,
-      win: s.win,
-      lose: s.lose,
-      draw: s.draw,
+    return rows.map((r) => ({
+      level: r.level as number,
+      win: Number(r.win),
+      lose: Number(r.lose),
+      draw: Number(r.draw),
     }));
   }
 
@@ -129,6 +158,42 @@ class SocialComparisonRepository {
           .groupBy("s2.userId"),
       )
       .orderBy("s.exScore", "desc")
+      .execute();
+  }
+
+  /**
+   * 閲覧者とライバルの難易度レベル別スコア更新履歴を全件取得する。
+   * 日次累積勝敗推移の計算に使用する。
+   *
+   * @param viewerId - 閲覧者のユーザー ID
+   * @param rivalId - 比較対象ライバルのユーザー ID
+   * @param version - バージョン番号
+   * @param level - 対象難易度レベル（11 または 12）
+   */
+  async getWinLossHistory(
+    viewerId: string,
+    rivalId: string,
+    version: string,
+    level: number,
+  ) {
+    const levelSongs = await db
+      .selectFrom("songs")
+      .select("songId")
+      .where("difficultyLevel", "=", level)
+      .execute();
+
+    if (levelSongs.length === 0) return [];
+
+    const songIds = levelSongs.map((s) => s.songId);
+
+    return db
+      .selectFrom("scores as s")
+      .select(["s.songId", "s.userId", "s.exScore", "s.lastPlayed", "s.logId"])
+      .where("s.userId", "in", [viewerId, rivalId])
+      .where("s.version", "=", version)
+      .where("s.songId", "in", songIds)
+      .orderBy("s.lastPlayed", "asc")
+      .orderBy("s.logId", "asc")
       .execute();
   }
 
