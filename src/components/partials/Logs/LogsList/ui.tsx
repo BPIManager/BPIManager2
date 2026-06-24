@@ -3,7 +3,7 @@ import { useBatchesList } from "@/hooks/batches/useBatchesList";
 import type { UpdateLog } from "@/types/logs/batches";
 import { LogsCard } from "../LogsCard/ui";
 import { LogsGroupSkeleton } from "../LogsCard/skeleton";
-import { NoDataAlert } from "../../DashBoard/NoData/ui";
+import { NoDataAlert } from "../../DashBoard/NoData";
 import { CustomPagination } from "../../Pagination/ui";
 import Link from "next/link";
 import dayjs from "@/lib/dayjs";

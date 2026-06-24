@@ -4,7 +4,7 @@ import { useInView } from "@/hooks/common/useInView";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import type { MonthlyReviewData } from "@/types/stats/monthlyReview";
 import { useChartColors } from "@/hooks/common/useChartColors";
-import { useCountUp } from "./functions";
+import { useCountUp } from "./utils";
 import { ActivitySectionUI } from "./ui";
 
 interface Props {
