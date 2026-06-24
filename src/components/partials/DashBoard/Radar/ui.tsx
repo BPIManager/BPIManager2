@@ -5,10 +5,10 @@ import { RadarSectionChart } from ".";
 import { RadarCategory } from "@/types/stats/radar";
 import { useMemo, useState } from "react";
 import { RadarCategorySongsDialog } from "./dialog";
-import { getBpiColorStyle } from "@/constants/bpiColor";
+import { getBpiColorStyle } from "@/constants/theme/bpiColor";
 import { DashCard } from "@/components/ui/dashcard";
 import { cn } from "@/lib/utils";
-import { getVersionNameFromNumber } from "@/constants/versions";
+import { getVersionNameFromNumber } from "@/constants/iidx/versions";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface RadarSectionProps {

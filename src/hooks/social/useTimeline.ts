@@ -1,6 +1,6 @@
-import { useUser } from "@/contexts/users/UserContext";
+﻿import { useUser } from "@/contexts/users/UserContext";
 import { FilterParamsFrontend } from "@/types/songs/score";
-import { API_PREFIX } from "@/constants/apiEndpoints";
+import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import { useInfiniteList } from "@/services/swr/useInfinite";
 
 import type { TimelineEntry } from "@/types/social/timeline";

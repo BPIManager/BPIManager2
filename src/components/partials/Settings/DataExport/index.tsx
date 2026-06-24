@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -14,8 +14,8 @@ import {
 } from "@/components/ui/dialog";
 import { Download, FileArchive } from "lucide-react";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
-import { IIDX_VERSIONS } from "@/constants/latestVersion";
-import { getVersionNameFromNumber } from "@/constants/versions";
+import { IIDX_VERSIONS } from "@/constants/iidx/latestVersion";
+import { getVersionNameFromNumber } from "@/constants/iidx/versions";
 import {
   useDataExport,
   EXPORT_FIELDS,

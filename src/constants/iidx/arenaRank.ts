@@ -1,4 +1,4 @@
-/** List collection for Arena Ranks */
+/** アリーナランクのセレクタ用コレクション */
 export const arenaRanks: { label: string; value: string }[] = [
   { label: "-", value: "-" },
   { label: "A1", value: "A1" },

@@ -4,8 +4,8 @@ import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 import { rejectAccess } from "@/middlewares/api/withApi";
 import { parseQuery } from "@/services/nextRequest/parseBody";
 import { z } from "zod";
-import { IIDX_VERSIONS } from "@/constants/latestVersion";
-import { getVersionNameFromNumber } from "@/constants/versions";
+import { IIDX_VERSIONS } from "@/constants/iidx/latestVersion";
+import { getVersionNameFromNumber } from "@/constants/iidx/versions";
 
 const versionSummaryQuerySchema = z.object({
   userId: z.string().min(1),

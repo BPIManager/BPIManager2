@@ -1,7 +1,7 @@
 ﻿import { ChevronRight } from "lucide-react";
 import type { BatchDetailItem } from "@/types/logs/batchDetail";
 import { cn } from "@/lib/utils";
-import { getRankDetail } from "@/constants/djRank";
+import { getRankDetail } from "@/constants/iidx/djRank";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface RankItemProps {

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useCallback } from "react";
 import { List, useListRef } from "react-window";
@@ -15,10 +15,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { versionsNonDisabledCollection } from "@/constants/versions";
-import { latestVersion } from "@/constants/latestVersion";
-import { JAPAN_PREFECTURES } from "@/constants/japanPrefectures";
-import { ARENA_RANK_ORDER } from "@/constants/arenaRanks";
+import { versionsNonDisabledCollection } from "@/constants/iidx/versions";
+import { latestVersion } from "@/constants/iidx/latestVersion";
+import { JAPAN_PREFECTURES } from "@/constants/iidx/japanPrefectures";
+import { ARENA_RANK_ORDER } from "@/constants/iidx/arenaRanks";
 import { Info } from "lucide-react";
 import type { RankingEntry } from "@/types/users/ranking";
 import { useState } from "react";

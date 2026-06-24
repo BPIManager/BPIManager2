@@ -1,11 +1,11 @@
-import type { NextApiRequest, NextApiResponse } from "next";
+﻿import type { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
 import { BpiCalculator } from "@/lib/bpi";
 import { bpiRepo } from "@/lib/db/bpi";
 import { getSongWithDefCached } from "@/lib/cache/songDefs";
 import { getArenaAverages } from "@/lib/cache/arenaAverages";
-import { IIDX_DIFFICULTIES } from "@/constants/diffs";
-import { IIDX_VERSIONS, latestVersion } from "@/constants/latestVersion";
+import { IIDX_DIFFICULTIES } from "@/constants/iidx/diffs";
+import { IIDX_VERSIONS, latestVersion } from "@/constants/iidx/latestVersion";
 
 const querySchema = z.object({
   title: z.string().min(1),

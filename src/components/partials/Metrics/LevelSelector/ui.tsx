@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -10,13 +10,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { versionsNonDisabledCollection } from "@/constants/versions";
+import { versionsNonDisabledCollection } from "@/constants/iidx/versions";
 import { Checkbox } from "@/components/ui/checkbox";
 import { X, Plus } from "lucide-react";
 import type { DisplayMetric } from "@/components/partials/Metrics/ArenaAverage/ui";
-import { A_RANKS } from "@/constants/arenaRanks";
+import { A_RANKS } from "@/constants/iidx/arenaRanks";
 import { useTranslation } from "@/hooks/common/useTranslation";
-import { IIDX_DIFFICULTIES } from "@/constants/diffs";
+import { IIDX_DIFFICULTIES } from "@/constants/iidx/diffs";
 
 const DJRANK_OPTIONS = [
   "MAX-",

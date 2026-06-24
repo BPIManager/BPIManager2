@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
-import { IIDX_VERSIONS } from "@/constants/latestVersion";
+import { IIDX_VERSIONS } from "@/constants/iidx/latestVersion";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 import { rejectAccess } from "@/middlewares/api/withApi";
 import { socialComparisonRepo } from "@/lib/db/social/comparison";

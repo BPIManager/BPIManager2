@@ -1,3 +1,4 @@
+/** レーダーチャートのカテゴリ・カラー定数 */
 import type { RadarCategory } from "@/types/stats/radar";
 
 export const ALL_RADAR_CATEGORIES: RadarCategory[] = [

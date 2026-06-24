@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import type {
@@ -7,7 +7,7 @@ import type {
   TopSongImproved,
 } from "@/types/stats/monthlyReview";
 import { useTranslation } from "@/hooks/common/useTranslation";
-import { getRankDetail } from "@/constants/djRank";
+import { getRankDetail } from "@/constants/iidx/djRank";
 import { ChevronDown, Trophy, TrendingUp } from "lucide-react";
 import { SectionCard } from "../SectionCard";
 

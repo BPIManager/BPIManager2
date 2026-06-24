@@ -1,7 +1,7 @@
-import {
+﻿import {
   IIDX_LEVELS,
   IIDX_DIFFICULTIES,
-} from "@/constants/diffs";
+} from "@/constants/iidx/diffs";
 
 export type IidxLevel = (typeof IIDX_LEVELS)[number];
 export type IidxDifficulty = (typeof IIDX_DIFFICULTIES)[number];

@@ -1,4 +1,4 @@
-import type { RadarCategory } from "@/types/stats/radar";
+﻿import type { RadarCategory } from "@/types/stats/radar";
 
 export const RADAR_LABELS: Record<RadarCategory, string> = {
   NOTES: "NOTES",
@@ -9,4 +9,4 @@ export const RADAR_LABELS: Record<RadarCategory, string> = {
   SOFLAN: "SOFLAN",
 };
 
-export { DIFF_COLORS } from "@/constants/difficultyColors";
+export { DIFF_COLORS } from "@/constants/theme/difficultyColors";

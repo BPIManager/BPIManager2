@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { GroupingMode } from "@/types/metrics/aaa";
-import { versionsNonDisabledCollection } from "@/constants/versions";
+import { versionsNonDisabledCollection } from "@/constants/iidx/versions";
 import {
   Select,
   SelectContent,

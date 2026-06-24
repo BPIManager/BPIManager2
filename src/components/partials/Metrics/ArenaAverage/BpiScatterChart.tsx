@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import {
   ScatterChart,
@@ -13,7 +13,7 @@ import {
 import { cn } from "@/lib/utils";
 import type { RadarCategory } from "@/types/stats/radar";
 import type { ScatterPoint } from "@/hooks/metrics/useArenaAnalysis";
-import { ALL_RADAR_CATEGORIES, RADAR_COLORS } from "@/constants/radars";
+import { ALL_RADAR_CATEGORIES, RADAR_COLORS } from "@/constants/iidx/radars";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 const ScatterTooltip = ({

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useMemo } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -11,7 +11,7 @@ import {
   getBpiBarColor,
   type ArenaSongPoint,
 } from "@/hooks/metrics/useArenaAnalysis";
-import { ALL_RADAR_CATEGORIES, RADAR_COLORS } from "@/constants/radars";
+import { ALL_RADAR_CATEGORIES, RADAR_COLORS } from "@/constants/iidx/radars";
 import { BpiScatterChart } from "./BpiScatterChart";
 import { useTranslation } from "@/hooks/common/useTranslation";
 

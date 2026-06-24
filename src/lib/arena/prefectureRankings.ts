@@ -1,4 +1,4 @@
-import {
+﻿import {
   readFileSync,
   writeFileSync,
   mkdirSync,
@@ -7,7 +7,7 @@ import {
   rmSync,
 } from "fs";
 import { join } from "path";
-import { latestVersion } from "@/constants/latestVersion";
+import { latestVersion } from "@/constants/iidx/latestVersion";
 
 export interface AreaRankInfo {
   area: string;

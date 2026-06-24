@@ -1,7 +1,7 @@
-import { db } from "@/lib/db";
+﻿import { db } from "@/lib/db";
 import { OptimizationResult } from "@/types/bpi-optimizer";
 import { IIDXVersion } from "@/types/iidx/version";
-import { IIDX_DIFFICULTIES } from "@/constants/diffs";
+import { IIDX_DIFFICULTIES } from "@/constants/iidx/diffs";
 import { sql } from "kysely";
 import { v4 as uuidv4 } from "uuid";
 

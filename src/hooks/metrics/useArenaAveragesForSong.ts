@@ -1,4 +1,4 @@
-import { API_PREFIX } from "@/constants/apiEndpoints";
+﻿import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import useSWR from "swr";
 
 const arenaFetcher = async (url: string) => {

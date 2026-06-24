@@ -1,13 +1,13 @@
-"use client";
+﻿"use client";
 
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import { useSongList } from "@/hooks/songs/useSongList";
 import { useDebouncedSearch } from "@/hooks/common/useDebouncedSearch";
 import { filterAndSortSongs } from "@/utils/songs/songListFilter";
-import { latestVersion } from "@/constants/latestVersion";
-import { SONG_ATTRIBUTES } from "@/constants/songAttributes";
-import { IIDX_DIFFICULTIES } from "@/constants/diffs";
+import { latestVersion } from "@/constants/iidx/latestVersion";
+import { SONG_ATTRIBUTES } from "@/constants/iidx/songAttributes";
+import { IIDX_DIFFICULTIES } from "@/constants/iidx/diffs";
 import type { SortKey, SortDir } from "@/types/songs/songList";
 
 const VALID_SORT_KEYS = new Set<string>([

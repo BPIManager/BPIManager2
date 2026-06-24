@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { API_PREFIX } from "@/constants/apiEndpoints";
+﻿import { useState } from "react";
+import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import { useInfiniteList } from "@/services/swr/useInfinite";
 
 export interface RecentNote {

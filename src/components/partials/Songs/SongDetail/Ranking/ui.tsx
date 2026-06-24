@@ -1,11 +1,11 @@
-import {
+﻿import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { versionsNonDisabledCollection } from "@/constants/versions";
+import { versionsNonDisabledCollection } from "@/constants/iidx/versions";
 
 interface RankingVersionSelectorProps {
   version: string;

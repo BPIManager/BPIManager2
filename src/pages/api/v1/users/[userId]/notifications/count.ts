@@ -5,7 +5,7 @@ import {
   AuthenticatedNextApiRequest,
   withAuth,
 } from "@/middlewares/api/withAuth";
-import { latestVersion } from "@/constants/latestVersion";
+import { latestVersion } from "@/constants/iidx/latestVersion";
 
 async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
   if (req.method !== "GET") {

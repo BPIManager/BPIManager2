@@ -16,11 +16,11 @@ import {
   type DetailFilter,
 } from "@/components/partials/Metrics/LevelSelector/ui";
 import { ArenaAverageFilterSkeleton } from "@/components/partials/Metrics/LevelSelector/skeleton";
-import { latestVersion } from "@/constants/latestVersion";
-import { versionsNonDisabledCollection } from "@/constants/versions";
-import { A_RANKS } from "@/constants/arenaRanks";
-import { ALL_RADAR_CATEGORIES } from "@/constants/radars";
-import { RANK_TABLE } from "@/constants/djRank";
+import { latestVersion } from "@/constants/iidx/latestVersion";
+import { versionsNonDisabledCollection } from "@/constants/iidx/versions";
+import { A_RANKS } from "@/constants/iidx/arenaRanks";
+import { ALL_RADAR_CATEGORIES } from "@/constants/iidx/radars";
+import { RANK_TABLE } from "@/constants/iidx/djRank";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useTranslation } from "@/hooks/common/useTranslation";
@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { IIDX_DIFFICULTIES } from "@/constants/diffs";
+import { IIDX_DIFFICULTIES } from "@/constants/iidx/diffs";
 
 const ALL_DIFFICULTIES = new Set(IIDX_DIFFICULTIES);
 type RadarCat = (typeof ALL_RADAR_CATEGORIES)[number];

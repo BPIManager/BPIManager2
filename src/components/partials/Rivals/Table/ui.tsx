@@ -3,7 +3,7 @@
 import { SongWithRival } from "@/types/songs/score";
 import { cn } from "@/lib/utils";
 import { getLampClass } from "../../Table/ui";
-import { DIFF_COLORS as diffColors } from "@/constants/difficultyColors";
+import { DIFF_COLORS as diffColors } from "@/constants/theme/difficultyColors";
 
 const f = (val: number | null | undefined, p?: number) => {
   if (val === null || val === undefined || !Number.isFinite(val)) return "---";

@@ -1,5 +1,5 @@
-import useSWR from "swr";
-import { API_PREFIX } from "@/constants/apiEndpoints";
+﻿import useSWR from "swr";
+import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import { useUser } from "@/contexts/users/UserContext";
 import { fetcher } from "@/utils/common/fetch";
 import type { SongListResponse } from "@/types/songs/songInfo";

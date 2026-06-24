@@ -1,6 +1,6 @@
-import { useMemo, useEffect, useState } from "react";
+﻿import { useMemo, useEffect, useState } from "react";
 import dayjs from "@/lib/dayjs";
-import { ARENA_RANK_ORDER } from "@/constants/arenaRanks";
+import { ARENA_RANK_ORDER } from "@/constants/iidx/arenaRanks";
 import type { ArenaEventEntry } from "@/lib/cron/arena/types";
 import type { ArenaHistoryRecord } from "@/hooks/arena/useOfficialArenaHistory";
 

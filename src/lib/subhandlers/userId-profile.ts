@@ -1,4 +1,4 @@
-import { latestVersion } from "@/constants/latestVersion";
+﻿import { latestVersion } from "@/constants/iidx/latestVersion";
 import { NextApiRequest, NextApiResponse } from "next";
 import { socialRepo } from "../db/social";
 import { usersRepo } from "../db/users";

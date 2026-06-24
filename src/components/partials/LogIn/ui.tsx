@@ -1,4 +1,4 @@
-import {
+﻿import {
   BarChart3,
   ShieldCheck,
   Wrench,
@@ -17,7 +17,7 @@ import { PageContainer } from "../Header";
 import { Separator } from "@/components/ui/separator";
 import { DashCard } from "@/components/ui/dashcard";
 import { useChartColors } from "@/hooks/common/useChartColors";
-import { getBpiColorStyle } from "@/constants/bpiColor";
+import { getBpiColorStyle } from "@/constants/theme/bpiColor";
 import {
   ComposedChart,
   LineChart,

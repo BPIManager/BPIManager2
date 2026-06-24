@@ -1,5 +1,5 @@
-import { db } from "@/lib/db";
-import { latestVersion } from "@/constants/latestVersion";
+﻿import { db } from "@/lib/db";
+import { latestVersion } from "@/constants/iidx/latestVersion";
 
 export type CachedSongWithDef = {
   songId: number;

@@ -1,9 +1,9 @@
-import { DashboardLayout } from "@/components/partials/Main";
+﻿import { DashboardLayout } from "@/components/partials/Main";
 import { PageContainer, PageHeader } from "@/components/partials/Header";
 import { Meta } from "@/components/partials/Head";
 import { ReusableMenuItem } from "@/components/partials/Metrics/Menu/ui";
 import { Swords, Table } from "lucide-react";
-import { latestVersion } from "@/constants/latestVersion";
+import { latestVersion } from "@/constants/iidx/latestVersion";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 export default function SettingsPage() {

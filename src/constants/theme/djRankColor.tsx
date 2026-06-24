@@ -1,3 +1,4 @@
+/** DJランクに応じたカラーマッピング */
 import { ChartColors } from "@/types/ui/chart";
 
 

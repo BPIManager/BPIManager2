@@ -1,4 +1,4 @@
-import { latestVersion } from "@/constants/latestVersion";
+﻿import { latestVersion } from "@/constants/iidx/latestVersion";
 import { usersRepo } from "@/lib/db/users";
 import {
   AuthenticatedNextApiRequest,

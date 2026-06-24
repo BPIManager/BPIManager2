@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
 import { FilterParamsFrontend } from "@/types/songs/score";
-import { ALL_RADAR_CATEGORIES, RADAR_COLORS } from "@/constants/radars";
+import { ALL_RADAR_CATEGORIES, RADAR_COLORS } from "@/constants/iidx/radars";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { SectionTitle } from "./SectionTitle";

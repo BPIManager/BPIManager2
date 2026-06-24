@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+﻿import { useMemo } from "react";
 import { BpiCalculator } from "@/lib/bpi";
 import { useUser } from "@/contexts/users/UserContext";
 import { useUserScores } from "@/hooks/table/useUserScores";
@@ -8,9 +8,9 @@ import {
   ALL_RADAR_CATEGORIES,
   RADAR_COLORS,
   ARENA_RANK_COLORS,
-} from "@/constants/radars";
+} from "@/constants/iidx/radars";
 
-export { RADAR_COLORS, ARENA_RANK_COLORS } from "@/constants/radars";
+export { RADAR_COLORS, ARENA_RANK_COLORS } from "@/constants/iidx/radars";
 
 export const getBpiBarColor = (bpi: number): string => {
   if (bpi >= 50) return "#facc15";

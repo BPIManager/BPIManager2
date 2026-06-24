@@ -1,4 +1,4 @@
-import { API_PREFIX } from "@/constants/apiEndpoints";
+﻿import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import { fetcher } from "@/utils/common/fetch";
 import { useState } from "react";
 import useSWR from "swr";

@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useEffect } from "react";
+﻿import { useState, useMemo, useRef, useEffect } from "react";
 import { useRouter } from "next/router";
 import type { ParsedUrlQuery } from "querystring";
 import {
@@ -9,7 +9,7 @@ import {
 import { filterSongsFrontend } from "@/utils/songs/filter";
 import { sortSongs } from "@/utils/songs/sort";
 
-import { PAGE_SIZE } from "@/constants/pagination";
+import { PAGE_SIZE } from "@/constants/logic/pagination";
 import { IidxDifficulty } from "@/types/iidx/difficulty";
 export { PAGE_SIZE };
 

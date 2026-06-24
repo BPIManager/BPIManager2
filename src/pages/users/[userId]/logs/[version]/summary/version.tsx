@@ -2,7 +2,7 @@ import { DashboardLayout } from "@/components/partials/Main";
 import { UserProfileLayout } from "@/components/partials/Profile/Layout/layout";
 import { ProfileMeta } from "@/components/partials/Profile/Meta/ui";
 import { PageHeader, PageContainer } from "@/components/partials/Header";
-import { getVersionNameFromNumber } from "@/constants/versions";
+import { getVersionNameFromNumber } from "@/constants/iidx/versions";
 import { useUser } from "@/contexts/users/UserContext";
 import { PageLoader } from "@/components/ui/loading-spinner";
 import { useRouter } from "next/router";

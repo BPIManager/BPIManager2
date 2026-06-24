@@ -1,8 +1,8 @@
-import useSWR from "swr";
+﻿import useSWR from "swr";
 import { fetcher } from "@/utils/common/fetch";
 import { useUser } from "@/contexts/users/UserContext";
-import { API_PREFIX } from "@/constants/apiEndpoints";
-import { latestVersion } from "@/constants/latestVersion";
+import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { latestVersion } from "@/constants/iidx/latestVersion";
 
 export interface WinLossHistoryPoint {
   date: string;

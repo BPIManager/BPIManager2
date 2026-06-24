@@ -1,8 +1,8 @@
-import useSWR from "swr";
+﻿import useSWR from "swr";
 import useSWRMutation from "swr/mutation";
 import { fetcher } from "@/utils/common/fetch";
 import { useUser } from "@/contexts/users/UserContext";
-import { API_PREFIX } from "@/constants/apiEndpoints";
+import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 
 /**
  * ユーザーの API キー情報の取得と再生成を行うフック。

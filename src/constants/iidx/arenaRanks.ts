@@ -1,3 +1,4 @@
+/** アリーナランクの順序定義と型 */
 export const ARENA_RANK_ORDER = [
   "A1",
   "A2",

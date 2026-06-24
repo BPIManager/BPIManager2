@@ -1,4 +1,4 @@
-import { IIDX_VERSIONS } from "@/constants/latestVersion";
+﻿import { IIDX_VERSIONS } from "@/constants/iidx/latestVersion";
 import { z } from "zod";
 
 export const totalBpiSchema = z.object({

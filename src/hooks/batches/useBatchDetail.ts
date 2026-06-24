@@ -1,4 +1,4 @@
-import { API_PREFIX } from "@/constants/apiEndpoints";
+﻿import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import { useUser } from "@/contexts/users/UserContext";
 import { BpiCalculator } from "@/lib/bpi";
 import {

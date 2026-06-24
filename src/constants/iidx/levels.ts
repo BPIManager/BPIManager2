@@ -1,3 +1,4 @@
+/** IIDXのレベル・難易度定数 */
 import { AllDifficulties } from "@/types/songs/allSongs";
 
 export const ALL_LEVELS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];

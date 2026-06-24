@@ -1,6 +1,6 @@
-import z from "zod";
+﻿import z from "zod";
 import { rivalScoresQuerySchema } from "../../query";
-import { IIDX_VERSIONS } from "@/constants/latestVersion";
+import { IIDX_VERSIONS } from "@/constants/iidx/latestVersion";
 
 export const rivalFollowingScoresQuerySchema = rivalScoresQuerySchema
   .omit({ rivalId: true })

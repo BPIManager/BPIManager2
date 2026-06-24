@@ -1,5 +1,5 @@
-import { API_PREFIX } from "@/constants/apiEndpoints";
-import { latestVersion } from "@/constants/latestVersion";
+﻿import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { latestVersion } from "@/constants/iidx/latestVersion";
 import { useUser } from "@/contexts/users/UserContext";
 import { fetcher } from "@/utils/common/fetch";
 import useSWR from "swr";

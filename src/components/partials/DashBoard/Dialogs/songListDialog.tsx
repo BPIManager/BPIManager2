@@ -1,4 +1,4 @@
-import {
+﻿import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -8,7 +8,7 @@ import { Tabs } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useMemo, useState } from "react";
-import { getBpiColorStyle } from "@/constants/bpiColor";
+import { getBpiColorStyle } from "@/constants/theme/bpiColor";
 import { ArrowDownWideNarrow, ArrowUpNarrowWide } from "lucide-react";
 import { AppTabsGroup } from "@/components/ui/complex/tabs";
 import { useTranslation } from "@/hooks/common/useTranslation";

@@ -4,7 +4,7 @@ import dayjs from "@/lib/dayjs";
 import fs from "fs";
 import path from "path";
 import { BpiCalculator } from "@/lib/bpi";
-import { IIDX_DIFFICULTIES } from "@/constants/diffs";
+import { IIDX_DIFFICULTIES } from "@/constants/iidx/diffs";
 import { isImproved } from "@/lib/lamp";
 
 describe("CSV Parser Test", () => {

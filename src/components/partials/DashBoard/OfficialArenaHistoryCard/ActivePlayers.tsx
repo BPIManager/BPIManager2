@@ -1,4 +1,4 @@
-import { A_RANKS } from "@/constants/arenaRanks";
+﻿import { A_RANKS } from "@/constants/iidx/arenaRanks";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { getArenaClassColor } from "@/utils/arenaClass";
 import { HelpTooltip } from "@/components/ui/tooltip";

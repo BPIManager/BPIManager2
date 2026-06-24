@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { useUser } from "@/contexts/users/UserContext";
 import { useFirestoreDataCheck } from "@/hooks/firestore/checkData";
-import { versionTitles } from "@/constants/versions";
-import { API_PREFIX } from "@/constants/apiEndpoints";
+import { versionTitles } from "@/constants/iidx/versions";
+import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import { ActionConfirmDialog } from "../../Modal/Confirmation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

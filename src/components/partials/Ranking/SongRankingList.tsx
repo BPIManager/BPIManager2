@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useMemo, useCallback, useRef } from "react";
 import { useUserSongRankings } from "@/hooks/stats/useUserSongRankings";
@@ -14,7 +14,7 @@ import {
 import type { SongRankEntry } from "@/types/users/ranking";
 import type { AllSongWithScore, AllDifficulties } from "@/types/songs/allSongs";
 import { AllSongDetailModal } from "@/components/partials/AllSongs/Modal";
-import { ALL_LEVELS } from "@/constants/levels";
+import { ALL_LEVELS } from "@/constants/iidx/levels";
 import { Search } from "lucide-react";
 
 type SortKey =

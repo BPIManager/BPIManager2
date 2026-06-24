@@ -1,8 +1,8 @@
-import {
+﻿import {
   FilterParamsFrontend,
   SongWithScore,
 } from "@/types/songs/score";
-import { RANK_TABLE } from "@/constants/djRank";
+import { RANK_TABLE } from "@/constants/iidx/djRank";
 import { getMaxBpm } from "./getMaxBPM";
 import dayjs from "@/lib/dayjs";
 import type { FilterParams } from "@/types/songs/filter";

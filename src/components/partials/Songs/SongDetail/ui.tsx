@@ -1,7 +1,7 @@
-import { useMemo } from "react";
+﻿import { useMemo } from "react";
 import { RadarSectionChart } from "@/components/partials/DashBoard/Radar/index";
 import { DifficultyBadge } from "@/components/partials/Songs/DifficultyBadge";
-import { SONG_ATTRIBUTES } from "@/constants/songAttributes";
+import { SONG_ATTRIBUTES } from "@/constants/iidx/songAttributes";
 import { buildRadarData } from "@/utils/songs/songListFilter";
 import { buildTextageUrl, buildChartViewerUrl } from "@/utils/songs/links";
 import type { SongListItem } from "@/types/songs/songInfo";

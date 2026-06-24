@@ -1,11 +1,11 @@
-"use client";
+﻿"use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import useSWR, { KeyedMutator } from "swr";
 import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { Session } from "@/types/session";
-import { API_PREFIX } from "@/constants/apiEndpoints";
+import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 
 interface UserContextType {
   user: Session | null;

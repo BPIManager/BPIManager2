@@ -1,5 +1,5 @@
-import { cn } from "@/lib/utils";
-import { getBpiColorStyle } from "@/constants/bpiColor";
+﻿import { cn } from "@/lib/utils";
+import { getBpiColorStyle } from "@/constants/theme/bpiColor";
 
 export const BpiChip = ({
   bpi,

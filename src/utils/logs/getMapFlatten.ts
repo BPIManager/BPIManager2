@@ -1,5 +1,5 @@
-import { SongWithScore } from "@/types/songs/score";
-import topElements from "@/constants/radars/topElements.json";
+﻿import { SongWithScore } from "@/types/songs/score";
+import topElements from "@/constants/iidx/radars/topElements.json";
 
 const radarLookup = new Map<string, string>(
   (topElements as { title: string; difficulty: string; top: string }[]).map(

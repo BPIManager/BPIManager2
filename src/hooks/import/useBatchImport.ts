@@ -1,7 +1,7 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { parseAnyCsv } from "@/utils/csv/parse";
 import { detectCsvType, validateCsvTypeForVersion } from "@/utils/csv/detect";
-import { API_PREFIX } from "@/constants/apiEndpoints";
+import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import { toast } from "sonner";
 import { User as FirebaseUser } from "firebase/auth";
 import { safeClipboardRead, safeClipboardClear } from "@/utils/clipboard";

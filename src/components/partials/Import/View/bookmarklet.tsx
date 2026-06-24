@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+﻿import { useEffect, useRef, useState } from "react";
 import {
   Accordion,
   AccordionContent,
@@ -12,7 +12,7 @@ import {
   ExternalLink,
   MousePointer2,
 } from "lucide-react";
-import { iidxUrl } from "@/constants/iidxUrl";
+import { iidxUrl } from "@/constants/iidx/iidxUrl";
 import { toast } from "sonner";
 import { useTranslation } from "@/hooks/common/useTranslation";
 

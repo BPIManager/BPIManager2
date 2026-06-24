@@ -1,9 +1,9 @@
-import useSWR, { useSWRConfig } from "swr";
+﻿import useSWR, { useSWRConfig } from "swr";
 import { fetcher } from "@/utils/common/fetch";
 import { useUser } from "@/contexts/users/UserContext";
 import { useFollow } from "./useFollow";
 import { UserProfileResponse } from "@/types/users/profile";
-import { API_PREFIX } from "@/constants/apiEndpoints";
+import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import { toast } from "sonner";
 
 /**

@@ -1,4 +1,4 @@
-import { RANK_TABLE } from "@/constants/djRank";
+﻿import { RANK_TABLE } from "@/constants/iidx/djRank";
 
 interface DJRankOptions {
   mode: "current" | "next";

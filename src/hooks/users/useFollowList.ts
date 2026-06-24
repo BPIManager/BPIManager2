@@ -1,5 +1,5 @@
-import { useUser } from "@/contexts/users/UserContext";
-import { API_PREFIX } from "@/constants/apiEndpoints";
+﻿import { useUser } from "@/contexts/users/UserContext";
+import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import { useInfiniteList } from "@/services/swr/useInfinite";
 
 import type { FollowUser } from "@/types/users/follow";

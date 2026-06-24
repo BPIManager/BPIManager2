@@ -1,4 +1,4 @@
-import { IIDX_VERSIONS } from "@/constants/latestVersion";
+﻿import { IIDX_VERSIONS } from "@/constants/iidx/latestVersion";
 
 /** バージョン情報の定義 */
 export interface VersionTitle {
