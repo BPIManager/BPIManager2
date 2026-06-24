@@ -1,6 +1,5 @@
-"use client";
-
 import { useRouter } from "next/router";
+import { GetServerSideProps } from "next";
 import { DashBoardFilter } from "@/components/partials/DashBoard/Filter";
 import { ActivitySection } from "@/components/partials/DashBoard/ActivityCalendar";
 import { RankDistributionSection } from "@/components/partials/DashBoard/DJRankDistribution";
@@ -21,6 +20,10 @@ import { TabsContent } from "@/components/ui/tabs";
 import { useState } from "react";
 import { BpiBoxStatsSection } from "@/components/partials/DashBoard/BpiBoxStats";
 import { useTranslation } from "@/hooks/common/useTranslation";
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  return { props: {} };
+};
 
 interface UserPageProps {
   defaultView?: "overview" | "songs" | "logs";
