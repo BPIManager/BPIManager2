@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useRouter } from "next/router";
 import { useVersionSummary } from "@/hooks/batches/useVersionSummary";
 import { BatchSongsTable } from "../LogTable/ui";
-import { NoDataAlert } from "../../DashBoard/NoData/ui";
+import { NoDataAlert } from "../../DashBoard/NoData";
 import { LogsDetailContentSkeleton } from "../LogsDetail/skeleton";
 import { LogErrorState } from "../LogsDetail/error";
 import { getBpiDistribution, getRankDistribution } from "@/utils/logs/getDistribution";

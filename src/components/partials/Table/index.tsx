@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useMemo } from "react";
 import { SongWithScore } from "@/types/songs/score";
@@ -9,7 +9,7 @@ import { CustomPagination } from "../Pagination/ui";
 import { SongDetailView } from "../Modal/BPIChart/SongDetails/ui";
 import { useUserScores } from "@/hooks/table/useUserScores";
 import { useCompareScores } from "@/hooks/table/useCompareScores";
-import { NoDataAlert } from "../DashBoard/NoData/ui";
+import { NoDataAlert } from "../DashBoard/NoData";
 import { SongListSkeleton } from "./skeleton";
 import { AdvancedFilterModal } from "../Songs/AdvancedFilter/ui";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";

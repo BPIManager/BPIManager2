@@ -2,7 +2,7 @@
 
 import { useInView } from "@/hooks/common/useInView";
 import type { MonthlyReviewData } from "@/types/stats/monthlyReview";
-import { useCountUp } from "./functions";
+import { useCountUp } from "./utils";
 import { ArenaSectionUI } from "./ui";
 
 interface Props {
@@ -11,7 +11,7 @@ interface Props {
 
 export const ArenaSection = ({ arena }: Props) => {
   const [ref, inView] = useInView(0.15);
-  const a1Ref = useCountUp(arena?.maxA1Continue ?? null, inView, 0.7);
+  const a1Ref = useCountUp(arena?.maxA1Continue ?? null, inView, 0.7, 900);
 
   if (!arena) return null;
 

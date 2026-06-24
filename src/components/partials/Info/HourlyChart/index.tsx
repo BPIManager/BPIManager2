@@ -11,7 +11,7 @@ import {
 } from "recharts";
 import { DashCard } from "@/components/ui/dashcard";
 import { useChartColors } from "@/hooks/common/useChartColors";
-import { PeriodTabs } from "./PeriodTabs";
+import { PeriodTabs } from "../PeriodTabs";
 import type { SiteStatsPeriod, HourlyEntry } from "@/types/siteStats";
 
 export function HourlyChart({

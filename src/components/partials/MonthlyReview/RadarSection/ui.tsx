@@ -23,7 +23,7 @@ import {
   PolarRadiusAxis,
   Legend,
 } from "recharts";
-import { formatDate } from "./functions";
+import { formatDate } from "./utils";
 
 const styles = `
   @keyframes radarFade { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }

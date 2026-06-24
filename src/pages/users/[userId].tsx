@@ -1,10 +1,10 @@
 "use client";
 
 import { useRouter } from "next/router";
-import { DashBoardFilter } from "@/components/partials/DashBoard/Filter/ui";
+import { DashBoardFilter } from "@/components/partials/DashBoard/Filter";
 import { ActivitySection } from "@/components/partials/DashBoard/ActivityCalendar";
-import { RankDistributionSection } from "@/components/partials/DashBoard/DJRankDistribution/ui";
-import { BpiDistributionSection } from "@/components/partials/DashBoard/BPIDistribution/ui";
+import { RankDistributionSection } from "@/components/partials/DashBoard/DJRankDistribution";
+import { BpiDistributionSection } from "@/components/partials/DashBoard/BPIDistribution";
 import { BpmBpiDistributionSection } from "@/components/partials/DashBoard/BpmBpiDistribution";
 import { SongsTable } from "@/components/partials/Table";
 import { latestVersion } from "@/constants/latestVersion";

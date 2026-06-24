@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { useUser } from "@/contexts/users/UserContext";
@@ -8,7 +8,7 @@ import { SongWithRival, SongWithScore } from "@/types/songs/score";
 
 import { SongFilterBar } from "@/components/partials/Songs/Filter/ui";
 import { SongListSkeleton } from "@/components/partials/Table/skeleton";
-import { NoDataAlert } from "@/components/partials/DashBoard/NoData/ui";
+import { NoDataAlert } from "@/components/partials/DashBoard/NoData";
 import { LoginRequiredCard } from "@/components/partials/LoginRequired/ui";
 import { CustomPagination } from "@/components/partials/Pagination/ui";
 import { AdvancedFilterModal } from "@/components/partials/Songs/AdvancedFilter/ui";

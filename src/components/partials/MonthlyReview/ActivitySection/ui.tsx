@@ -10,7 +10,7 @@ import {
   Cell,
 } from "recharts";
 import type { MonthlyReviewData } from "@/types/stats/monthlyReview";
-import { formatDate } from "./functions";
+import { formatDate } from "./utils";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 const styles = `
