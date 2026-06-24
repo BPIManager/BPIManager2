@@ -4,7 +4,7 @@ import { DashboardLayout } from "@/components/partials/Main";
 import { Meta } from "@/components/partials/Head";
 import { UserProfileLayout } from "@/components/partials/Profile/Layout/layout";
 import { AAATableContent } from "@/components/partials/Metrics/AAATable";
-import { latestVersion } from "@/constants/iidx/latestVersion";
+import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { ProfileMeta } from "@/components/partials/Profile/Meta/ui";
 import { DashCard } from "@/components/ui/dashcard";
 import { cn } from "@/lib/utils";

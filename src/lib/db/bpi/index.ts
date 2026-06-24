@@ -1,8 +1,8 @@
-﻿import { db } from "@/lib/db";
+import { db } from "@/lib/db";
 import { SongMaster } from "@/types/songs/master";
 import { Database, NewAllScores, NewScore, NewTotalBPILog } from "@/types/db";
 import { Transaction } from "kysely";
-import { latestVersion } from "@/constants/iidx/latestVersion";
+import { latestVersion } from "@/constants/iidx/iidxVersions";
 
 /**
  * BPI スコアのインポートおよびスコアマスタ参照を担当するリポジトリクラス。

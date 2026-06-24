@@ -1,6 +1,6 @@
-﻿import fs from "fs/promises";
+import fs from "fs/promises";
 import path from "path";
-import { latestVersion } from "@/constants/iidx/latestVersion";
+import { latestVersion } from "@/constants/iidx/iidxVersions";
 import type { IIDXVersion } from "@/types/iidx/version";
 import type { ArenaEventEntry, ArenaVersionMetadata } from "./types";
 

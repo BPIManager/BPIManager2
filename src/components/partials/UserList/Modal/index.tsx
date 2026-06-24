@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { User, ChevronRight, Activity } from "lucide-react";
@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { fetcher } from "@/utils/common/fetch";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
-import { latestVersion } from "@/constants/iidx/latestVersion";
+import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { toast } from "sonner";
 
 export const RivalComparisonModal = ({

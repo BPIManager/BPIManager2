@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useMemo } from "react";
 import { useRouter } from "next/router";
@@ -12,9 +12,9 @@ import {
   sortOrderOptions,
 } from "@/constants/ui/sort";
 import { FilterParamsFrontend } from "@/types/songs/score";
-import { versionsNonDisabledCollection } from "@/constants/iidx/versions";
-import { IIDX_DIFFICULTIES } from "@/constants/iidx/diffs";
-import { latestVersion } from "@/constants/iidx/latestVersion";
+import { versionsNonDisabledCollection } from "@/constants/iidx/versionTitles";
+import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
+import { latestVersion } from "@/constants/iidx/iidxVersions";
 import {
   FilterBarContainer,
   FilterCheckboxGroup,

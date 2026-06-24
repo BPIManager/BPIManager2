@@ -1,7 +1,7 @@
-﻿"use client";
+"use client";
 
 import { FilterParamsFrontend } from "@/types/songs/score";
-import { CLEAR_STATES } from "@/constants/iidx/lampState";
+import { CLEAR_STATES } from "@/constants/iidx/clearLamps";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { SectionTitle } from "./SectionTitle";

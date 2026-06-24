@@ -1,6 +1,6 @@
-﻿import { Checkbox } from "@/components/ui/checkbox";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { IIDX_LEVELS, IIDX_DIFFICULTIES } from "@/constants/iidx/diffs";
+import { IIDX_LEVELS, IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 import {
   type RivalSortOrder,
   RIVAL_SORT_LABELS,

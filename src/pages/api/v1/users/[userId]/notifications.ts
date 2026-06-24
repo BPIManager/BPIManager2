@@ -1,4 +1,4 @@
-import { latestVersion } from "@/constants/iidx/latestVersion";
+import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { notificationsRepo } from "@/lib/db/notifications";
 import {
   AuthenticatedNextApiRequest,

@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { allScoresRepo } from "@/lib/db/allScores";
-import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/latestVersion";
+import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 
 export default async function handler(
   req: NextApiRequest,

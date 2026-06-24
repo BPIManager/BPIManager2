@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import { Search, ChevronRight, Check } from "lucide-react";
 import { useUser } from "@/contexts/users/UserContext";
 import { useRivalSummary } from "@/hooks/social/useRivalSummary";
-import { latestVersion } from "@/constants/iidx/latestVersion";
+import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { getBpiColorStyle } from "@/constants/theme/bpiColor";
 import { formatIIDXId } from "@/utils/common/formatIidxId";
 import { useTranslation } from "@/hooks/common/useTranslation";
@@ -18,7 +18,7 @@ import {
   PAST_VERSIONS,
   type KindOption,
 } from "../../../../hooks/analytics/useTargetSelector";
-import { IIDX_DIFFICULTIES } from "@/constants/iidx/diffs";
+import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 
 // ---------------------------------------------------------------------------
 // KindCard — target-type selection button

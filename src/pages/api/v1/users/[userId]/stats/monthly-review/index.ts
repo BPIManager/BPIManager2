@@ -17,10 +17,10 @@ import {
   buildGrowthRanking,
   buildGrowthTimeline,
 } from "@/lib/monthly-review/rivals";
-import { IIDX_VERSIONS } from "@/constants/iidx/latestVersion";
+import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import type { MonthlyReviewData } from "@/types/stats/monthlyReview";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { IIDX_DIFFICULTIES } from "@/constants/iidx/diffs";
+import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 
 export type {
   TopSong,

@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { RANK_TABLE } from "@/constants/iidx/djRank";
+import { RANK_TABLE } from "@/constants/iidx/rankBorders";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { statsRepo } from "@/lib/db/stats";
 import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";

@@ -1,4 +1,4 @@
-﻿import { PageContainer, PageHeader } from "@/components/partials/Header";
+import { PageContainer, PageHeader } from "@/components/partials/Header";
 import { DashboardLayout } from "@/components/partials/Main";
 import { InstructionSection } from "./instruction";
 import { LoginRequiredCard } from "../../LoginRequired/ui";
@@ -15,8 +15,8 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Trash2, Upload, AlertCircle, CheckCircle2 } from "lucide-react";
-import { versionsOptions } from "@/constants/iidx/versions";
-import { iidxUrl } from "@/constants/iidx/iidxUrl";
+import { versionsOptions } from "@/constants/iidx/versionTitles";
+import { iidxUrl } from "@/constants/iidx/eamusementUrls";
 import { BookmarkletAccordion } from "./bookmarklet";
 import { AndroidAppAccordion } from "./android";
 import {

@@ -1,4 +1,4 @@
-﻿import { useStatsFilter } from "@/contexts/stats/FilterContext";
+import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { useDjRankDistribution } from "@/hooks/stats/useDJRankDistribution";
 import { useBPIDistribution } from "@/hooks/stats/useBPIDistribution";
 import { DistributionChart } from "./ui";
@@ -8,7 +8,7 @@ import { useChartColors } from "@/hooks/common/useChartColors";
 import { useBpiStep } from "@/hooks/common/useBpiStep";
 import type { DistributionSectionProps } from "@/types/ui/distribution";
 import { ChartData } from "@/types/ui/chart";
-import { getVersionNameFromNumber } from "@/constants/iidx/versions";
+import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 export const BPI_STEP_OPTIONS = [10, 5, 2, 1] as const;

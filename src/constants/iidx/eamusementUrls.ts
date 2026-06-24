@@ -1,5 +1,5 @@
 /** e-AMUSEMENT公式スコアダウンロードURL */
-import { latestVersion } from "./latestVersion";
+import { latestVersion } from "./iidxVersions";
 
 export const iidxUrl = `https://p.eagate.573.jp/game/2dx/${latestVersion}/djdata/score_download.html?style=SP`;
 

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useMemo } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -33,7 +33,7 @@ import {
   Sparkle,
 } from "lucide-react";
 import dayjs from "@/lib/dayjs";
-import { latestVersion } from "@/constants/iidx/latestVersion";
+import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { ARENA_RANK_ORDER } from "@/constants/iidx/arenaRanks";
 import { useTranslation } from "@/hooks/common/useTranslation";
 

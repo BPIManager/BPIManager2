@@ -1,6 +1,6 @@
-﻿import useSWR from "swr";
+import useSWR from "swr";
 import { SongWithScore } from "@/types/songs/score";
-import { latestVersion } from "@/constants/iidx/latestVersion";
+import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { useUser } from "@/contexts/users/UserContext";
 import { fetcher } from "@/utils/common/fetch";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";

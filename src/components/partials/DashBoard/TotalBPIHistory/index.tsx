@@ -1,8 +1,8 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { useTotalBpiHistory } from "@/hooks/stats/useTotalBPIHistory";
 import { TotalBpiHistoryChart } from "./ui";
-import { getVersionNameFromNumber } from "@/constants/iidx/versions";
+import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 import type { StatsGroupBy } from "@/types/stats/bpiBoxStats";
 
 export const BpiHistorySection = ({

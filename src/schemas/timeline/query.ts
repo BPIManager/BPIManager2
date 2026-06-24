@@ -1,5 +1,5 @@
-﻿import { z } from "zod";
-import { IIDX_DIFFICULTIES } from "@/constants/iidx/diffs";
+import { z } from "zod";
+import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 
 const toArray = (v: unknown) => (Array.isArray(v) ? v : v != null ? [v] : []);
 

@@ -1,6 +1,6 @@
-﻿import fs from "fs/promises";
+import fs from "fs/promises";
 import path from "path";
-import { latestVersion } from "@/constants/iidx/latestVersion";
+import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { metricsRepo } from "@/lib/db/metrics";
 import { BpiCalculator } from "@/lib/bpi";
 import topElements from "@/constants/iidx/radars/topElements.json";

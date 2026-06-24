@@ -1,4 +1,4 @@
-﻿import { ALL_DIFFICULTIES } from "@/constants/iidx/levels";
+import { ALL_DIFFICULTIES } from "@/constants/iidx/songLevels";
 import { db } from "@/lib/db";
 import { AllDifficulties, AllSongWithScore } from "@/types/songs/allSongs";
 

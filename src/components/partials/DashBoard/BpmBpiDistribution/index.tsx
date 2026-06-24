@@ -1,9 +1,9 @@
-﻿import { DashCard } from "@/components/ui/dashcard";
+import { DashCard } from "@/components/ui/dashcard";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { useBpmBpiDistribution } from "@/hooks/stats/useBpmBpiDistribution";
 import { BpmBpiSkeleton } from "./skeleton";
 import { BpmBpiChart } from "./ui";
-import { getVersionNameFromNumber } from "@/constants/iidx/versions";
+import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface BpmBpiDistributionSectionProps {

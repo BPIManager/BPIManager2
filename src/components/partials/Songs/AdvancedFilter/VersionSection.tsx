@@ -1,7 +1,7 @@
-﻿"use client";
+"use client";
 
 import { FilterParamsFrontend } from "@/types/songs/score";
-import { verNameArr } from "@/constants/iidx/versions";
+import { verNameArr } from "@/constants/iidx/versionTitles";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";

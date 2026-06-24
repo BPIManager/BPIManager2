@@ -1,8 +1,8 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { toggleArrayItem } from "@/hooks/common/useToggleArray";
-import { IIDX_LEVELS, IIDX_DIFFICULTIES } from "@/constants/iidx/diffs";
+import { IIDX_LEVELS, IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 import type { TranslationKey } from "@/lib/i18n/translations";
 
 export type RivalSortOrder = "win_desc" | "lose_desc" | "updated_desc";

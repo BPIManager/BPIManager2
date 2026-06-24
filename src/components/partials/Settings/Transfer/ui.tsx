@@ -1,9 +1,9 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { useUser } from "@/contexts/users/UserContext";
 import { useFirestoreDataCheck } from "@/hooks/firestore/checkData";
-import { versionTitles } from "@/constants/iidx/versions";
+import { versionTitles } from "@/constants/iidx/versionTitles";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import { ActionConfirmDialog } from "../../Modal/Confirmation";
 import { Button } from "@/components/ui/button";

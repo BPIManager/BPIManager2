@@ -1,8 +1,8 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { getBpiColorStyle } from "@/constants/theme/bpiColor";
-import { BPM_CONST } from "@/constants/iidx/bpm";
+import { BPM_CONST } from "@/constants/iidx/bpmBands";
 import { useChartColors } from "@/hooks/common/useChartColors";
 import type { BpmBandBpiItem } from "@/types/stats/distribution";
 import { BpmBandSongsDialog } from "./dialog";

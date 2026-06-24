@@ -1,7 +1,7 @@
-﻿import { useRouter } from "next/router";
+import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { List, type ListImperativeAPI } from "react-window";
-import { latestVersion } from "@/constants/iidx/latestVersion";
+import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { useUser } from "@/contexts/users/UserContext";
 import { useRadar } from "@/hooks/stats/useRadar";
 import { useSongRanking } from "@/hooks/songs/useSongRanking";

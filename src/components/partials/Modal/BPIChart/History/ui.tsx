@@ -1,11 +1,11 @@
-﻿"use client";
+"use client";
 
 import { useMemo } from "react";
 import dayjs from "@/lib/dayjs";
 import { useUser } from "@/contexts/users/UserContext";
 import { useScoreHistory } from "@/hooks/score/useScoreLogs";
 import { Score } from "@/types/db";
-import { versionTitles } from "@/constants/iidx/versions";
+import { versionTitles } from "@/constants/iidx/versionTitles";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";

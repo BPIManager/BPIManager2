@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -14,7 +14,7 @@ import {
 } from "@/hooks/social/useRivalAnalysis";
 import { BpiScatterChart } from "@/components/partials/Metrics/ArenaAverage/BpiScatterChart";
 import { useTranslation } from "@/hooks/common/useTranslation";
-import { IIDX_DIFFICULTIES } from "@/constants/iidx/diffs";
+import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 
 // ---- 小コンポーネント ----
 

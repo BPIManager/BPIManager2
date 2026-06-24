@@ -1,11 +1,11 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { toast } from "sonner";
 import JSZip from "jszip";
-import { IIDX_VERSIONS } from "@/constants/iidx/latestVersion";
+import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import type { IIDXVersion } from "@/types/iidx/version";
-import { getVersionNameFromNumber } from "@/constants/iidx/versions";
+import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import { SongWithScore } from "@/types/songs/score";
 import { useUser } from "@/contexts/users/UserContext";

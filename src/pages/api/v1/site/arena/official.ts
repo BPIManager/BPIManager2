@@ -1,7 +1,7 @@
-﻿import fs from "fs/promises";
+import fs from "fs/promises";
 import path from "path";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { latestVersion } from "@/constants/iidx/latestVersion";
+import { latestVersion } from "@/constants/iidx/iidxVersions";
 
 function getOfficialArenaFile(version: string) {
   return path.join(

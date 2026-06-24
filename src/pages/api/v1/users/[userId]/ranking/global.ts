@@ -3,9 +3,9 @@ import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { usersRepo } from "@/lib/db/users";
 import { statsRepo } from "@/lib/db/stats";
 import { calculateRadar } from "@/lib/radar/calculator";
-import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/latestVersion";
+import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import { v4 as uuidv4 } from "uuid";
-import { JAPAN_PREFECTURES } from "@/constants/iidx/japanPrefectures";
+import { JAPAN_PREFECTURES } from "@/constants/iidx/rankingPrefectures";
 import { ARENA_RANK_ORDER } from "@/constants/iidx/arenaRanks";
 
 const RADAR_CATEGORIES = [

@@ -16,11 +16,11 @@ import {
   type DetailFilter,
 } from "@/components/partials/Metrics/LevelSelector/ui";
 import { ArenaAverageFilterSkeleton } from "@/components/partials/Metrics/LevelSelector/skeleton";
-import { latestVersion } from "@/constants/iidx/latestVersion";
-import { versionsNonDisabledCollection } from "@/constants/iidx/versions";
+import { latestVersion } from "@/constants/iidx/iidxVersions";
+import { versionsNonDisabledCollection } from "@/constants/iidx/versionTitles";
 import { A_RANKS } from "@/constants/iidx/arenaRanks";
 import { ALL_RADAR_CATEGORIES } from "@/constants/iidx/radars";
-import { RANK_TABLE } from "@/constants/iidx/djRank";
+import { RANK_TABLE } from "@/constants/iidx/rankBorders";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useTranslation } from "@/hooks/common/useTranslation";
@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { IIDX_DIFFICULTIES } from "@/constants/iidx/diffs";
+import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 
 const ALL_DIFFICULTIES = new Set(IIDX_DIFFICULTIES);
 type RadarCat = (typeof ALL_RADAR_CATEGORIES)[number];

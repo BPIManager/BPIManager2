@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import {
@@ -18,7 +18,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { RANK_TABLE } from "@/constants/iidx/djRank";
+import { RANK_TABLE } from "@/constants/iidx/rankBorders";
 import { CustomGoalConfig } from "@/types/metrics/aaa";
 import { cn } from "@/lib/utils";
 

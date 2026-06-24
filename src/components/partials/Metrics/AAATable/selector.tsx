@@ -1,8 +1,8 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import { GroupingMode } from "@/types/metrics/aaa";
-import { versionsNonDisabledCollection } from "@/constants/iidx/versions";
+import { versionsNonDisabledCollection } from "@/constants/iidx/versionTitles";
 import {
   Select,
   SelectContent,

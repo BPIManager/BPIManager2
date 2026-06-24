@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { LineChart, LucideHistory, Users, DatabaseSearch } from "lucide-react";
@@ -14,7 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import { SongWithScore } from "@/types/songs/score";
 import { BpiCalculator } from "@/lib/bpi";
 import { BPIChart } from "./chart";
-import { getRankDetail } from "@/constants/iidx/djRank";
+import { getRankDetail } from "@/constants/iidx/rankBorders";
 import { SongHistoryTab } from "../History/ui";
 import RivalsRanking from "../Rivals";
 import { AppTabsList, AppTabsTrigger } from "@/components/ui/complex/tabs";

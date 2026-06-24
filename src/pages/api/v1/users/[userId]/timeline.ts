@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
-import { latestVersion } from "@/constants/iidx/latestVersion";
+import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { socialRepo } from "@/lib/db/social";
 import { parseQuery } from "@/services/nextRequest/parseBody";
 import { timelineQuerySchema } from "@/schemas/timeline/query";

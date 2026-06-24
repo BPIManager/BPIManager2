@@ -1,5 +1,5 @@
-﻿import { GetServerSideProps } from "next";
-import { latestVersion } from "@/constants/iidx/latestVersion";
+import { GetServerSideProps } from "next";
+import { latestVersion } from "@/constants/iidx/iidxVersions";
 
 export const getServerSideProps: GetServerSideProps = async () => {
   return {

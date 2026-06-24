@@ -1,5 +1,5 @@
-﻿import { db } from "@/lib/db";
-import { IIDX_DIFFICULTIES } from "@/constants/iidx/diffs";
+import { db } from "@/lib/db";
+import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 import { sql } from "kysely";
 
 const jstDayStart = (jstDate: string): Date =>

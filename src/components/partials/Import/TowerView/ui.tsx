@@ -1,4 +1,4 @@
-﻿import {
+import {
   Trash2,
   Upload,
   AlertCircle,
@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { versionsOptions } from "@/constants/iidx/versions";
+import { versionsOptions } from "@/constants/iidx/versionTitles";
 import { BookmarkletAccordion } from "../View/bookmarklet";
 import { useTranslation } from "@/hooks/common/useTranslation";
 

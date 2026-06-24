@@ -3,11 +3,11 @@ import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { bpiOptimizerRepo } from "@/lib/db/bpi-optimizer";
 import { findOptimalBpiPath } from "@/lib/bpi/optimizer";
 import { calculateRadar } from "@/lib/radar/calculator";
-import { latestVersion } from "@/constants/iidx/latestVersion";
+import { latestVersion } from "@/constants/iidx/iidxVersions";
 import topElements from "@/constants/iidx/radars/topElements.json";
 import type { RadarCategory } from "@/types/stats/radar";
 import { ALL_RADAR_CATEGORIES } from "@/constants/iidx/radars";
-import { IIDX_DIFFICULTIES } from "@/constants/iidx/diffs";
+import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 import type {
   SongOptimizerInput,
   OptimizerOptions,

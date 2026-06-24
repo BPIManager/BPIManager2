@@ -1,10 +1,10 @@
-﻿import { Meta } from "@/components/partials/Head";
+import { Meta } from "@/components/partials/Head";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { ImportSuccessModal } from "@/components/partials/Import/SuccessModal/ui";
 import { ImportView } from "@/components/partials/Import/View/ui";
 import AccountSettings from "@/components/partials/Modal/AccountSettings";
 import { dummyCsv } from "@/constants/ui/dummyCsv";
-import { latestVersion } from "@/constants/iidx/latestVersion";
+import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { useUser } from "@/contexts/users/UserContext";
 import { useBatchImport } from "@/hooks/import/useBatchImport";
 import { useIidxTowerImport } from "@/hooks/import/useIidxTowerImport";

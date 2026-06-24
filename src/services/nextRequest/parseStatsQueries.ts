@@ -1,5 +1,5 @@
-﻿import { latestVersion } from "@/constants/iidx/latestVersion";
-import { IIDX_LEVELS } from "@/constants/iidx/diffs";
+import { latestVersion } from "@/constants/iidx/iidxVersions";
+import { IIDX_LEVELS } from "@/constants/iidx/bpiDifficulties";
 import type { NextApiRequest, NextApiResponse } from "next";
 import type { StatsQuery } from "@/types/stats/query";
 import { statsQuerySchema } from "@/schemas/stats/query";

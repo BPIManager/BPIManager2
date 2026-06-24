@@ -1,15 +1,15 @@
-﻿import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect } from "react";
 import useSWR from "swr";
 import { useUser } from "@/contexts/users/UserContext";
 import { fetcher } from "@/utils/common/fetch";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
-import { latestVersion } from "@/constants/iidx/latestVersion";
+import { latestVersion } from "@/constants/iidx/iidxVersions";
 import type {
   OptimizationResult,
   OptimizerStrategy,
 } from "@/types/bpi-optimizer";
 import type { RadarCategory } from "@/types/stats/radar";
-import { IIDX_LEVELS, IIDX_DIFFICULTIES } from "@/constants/iidx/diffs";
+import { IIDX_LEVELS, IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 import { ALL_RADAR_CATEGORIES as ALL_RADAR_ELEMENTS } from "@/constants/iidx/radars";
 import { toast } from "sonner";
 

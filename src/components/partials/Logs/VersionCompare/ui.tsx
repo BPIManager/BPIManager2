@@ -1,4 +1,4 @@
-﻿import { useMemo } from "react";
+import { useMemo } from "react";
 import { useRouter } from "next/router";
 import { useVersionSummary } from "@/hooks/batches/useVersionSummary";
 import { BatchSongsTable } from "../LogTable/ui";
@@ -11,7 +11,7 @@ import { RANK_COLORS } from "@/constants/theme/djRankColor";
 import { getBpiColor } from "@/constants/theme/bpiColor";
 import { useBpiStep } from "@/hooks/common/useBpiStep";
 import { ArrowRightLeft } from "lucide-react";
-import { getVersionNameFromNumber } from "@/constants/iidx/versions";
+import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 import { BpiCalculator } from "@/lib/bpi";
 import { BatchTotalBpiCard } from "../TotalBPI/ui";
 import { LogRank } from "../LogRanking/ui";

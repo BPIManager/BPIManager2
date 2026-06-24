@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { AllScoreFilterParams } from "@/types/songs/allSongs";
 import {
@@ -7,7 +7,7 @@ import {
   FilterSearchInput,
 } from "../../Songs/Filter/part";
 import { FilterSelect } from "../../Songs/Filter/select";
-import { ALL_DIFFICULTIES, ALL_LEVELS } from "@/constants/iidx/levels";
+import { ALL_DIFFICULTIES, ALL_LEVELS } from "@/constants/iidx/songLevels";
 import { toggleArrayItem } from "@/hooks/common/useToggleArray";
 
 const SORT_OPTIONS = [

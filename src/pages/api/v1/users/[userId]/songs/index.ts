@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { songsRepo } from "@/lib/db/songs";
-import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/latestVersion";
+import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import { IIDXVersion } from "@/types/iidx/version";
 
 export default async function handler(

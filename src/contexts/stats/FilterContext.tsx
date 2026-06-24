@@ -1,11 +1,11 @@
-﻿import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, ReactNode } from "react";
 import {
   IIDX_LEVELS,
   IIDX_DIFFICULTIES,
   BPI_CALCABLE_LEVELS,
   BPI_CALCABLE_DIFFICULTIES,
-} from "@/constants/iidx/diffs";
-import { latestVersion } from "@/constants/iidx/latestVersion";
+} from "@/constants/iidx/bpiDifficulties";
+import { latestVersion } from "@/constants/iidx/iidxVersions";
 
 interface FilterContextType {
   levels: string[];

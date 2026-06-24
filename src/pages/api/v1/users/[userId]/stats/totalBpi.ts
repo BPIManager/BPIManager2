@@ -8,7 +8,7 @@ import { totalBpiSchema } from "@/schemas/stats/totalBpi";
 import { parseQuery } from "@/services/nextRequest/parseBody";
 import { db } from "@/lib/db";
 import { getUserAreaRank } from "@/lib/arena/prefectureRankings";
-import { latestVersion } from "@/constants/iidx/latestVersion";
+import { latestVersion } from "@/constants/iidx/iidxVersions";
 
 export default async function handler(
   req: NextApiRequest,

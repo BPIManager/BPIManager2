@@ -1,4 +1,4 @@
-﻿import { useRadar } from "@/hooks/stats/useRadar";
+import { useRadar } from "@/hooks/stats/useRadar";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { RadarSkeleton } from "./skeleton";
 import { RadarSectionChart } from ".";
@@ -8,7 +8,7 @@ import { RadarCategorySongsDialog } from "./dialog";
 import { getBpiColorStyle } from "@/constants/theme/bpiColor";
 import { DashCard } from "@/components/ui/dashcard";
 import { cn } from "@/lib/utils";
-import { getVersionNameFromNumber } from "@/constants/iidx/versions";
+import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface RadarSectionProps {

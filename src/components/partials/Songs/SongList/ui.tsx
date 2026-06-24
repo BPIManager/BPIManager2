@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
 import { List, type RowComponentProps } from "react-window";
 import Link from "next/link";
@@ -10,7 +10,7 @@ import { RadarSectionChart } from "@/components/partials/DashBoard/Radar/index";
 import { DifficultyBadge } from "@/components/partials/Songs/DifficultyBadge";
 import { SONG_ATTRIBUTES } from "@/constants/iidx/songAttributes";
 import { SORT_OPTIONS, buildRadarData } from "@/utils/songs/songListFilter";
-import { IIDX_DIFFICULTIES } from "@/constants/iidx/diffs";
+import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 import type { SongListItem } from "@/types/songs/songInfo";
 import type { SortDir, SortKey } from "@/types/songs/songList";
 

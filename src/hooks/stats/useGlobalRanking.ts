@@ -1,9 +1,9 @@
-﻿import useSWR from "swr";
+import useSWR from "swr";
 import { fetcher } from "@/utils/common/fetch";
 import { useUser } from "@/contexts/users/UserContext";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import type { GlobalRankingResponse } from "@/types/users/ranking";
-import { latestVersion } from "@/constants/iidx/latestVersion";
+import { latestVersion } from "@/constants/iidx/iidxVersions";
 
 export const useGlobalRanking = (
   version: string = latestVersion,

@@ -1,4 +1,4 @@
-﻿import { IIDX_VERSIONS } from "@/constants/iidx/latestVersion";
+import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import { z } from "zod";
 
 export const activeDatesSchema = z.object({

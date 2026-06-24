@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import {
@@ -6,7 +6,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { IIDX_VERSIONS } from "@/constants/iidx/latestVersion";
+import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface Props {

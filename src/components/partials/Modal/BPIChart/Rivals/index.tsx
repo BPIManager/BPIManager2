@@ -1,10 +1,10 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { SongWithScore } from "@/types/songs/score";
 import { RivalRankingBody, GlobalRankingBody } from "./ui";
-import { latestVersion } from "@/constants/iidx/latestVersion";
-import { versionsNonDisabledCollection } from "@/constants/iidx/versions";
+import { latestVersion } from "@/constants/iidx/iidxVersions";
+import { versionsNonDisabledCollection } from "@/constants/iidx/versionTitles";
 import {
   Select,
   SelectContent,

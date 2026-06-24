@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useRouter } from "next/router";
 import {
@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs } from "@/components/ui/tabs";
-import { versionsNonDisabledCollection } from "@/constants/iidx/versions";
+import { versionsNonDisabledCollection } from "@/constants/iidx/versionTitles";
 import { AppTabsGroup } from "@/components/ui/complex/tabs";
 import { useTranslation } from "@/hooks/common/useTranslation";
 

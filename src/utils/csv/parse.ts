@@ -1,5 +1,5 @@
-﻿import Papa from "papaparse";
-import { IIDX_DIFFICULTIES } from "@/constants/iidx/diffs";
+import Papa from "papaparse";
+import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 import { detectCsvType } from "./detect";
 import { parseRefluxTsv } from "./adapters/reflux";
 import { parseRizaltoCsv } from "./adapters/result_techo";

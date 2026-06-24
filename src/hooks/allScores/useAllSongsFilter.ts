@@ -1,9 +1,9 @@
-﻿"use client";
+"use client";
 
 import { useState, useMemo, useCallback } from "react";
 import { AllScoreFilterParams, AllSongWithScore } from "@/types/songs/allSongs";
 import { useAllScores } from "./useAllScores";
-import { ALL_DIFFICULTIES, ALL_LEVELS } from "@/constants/iidx/levels";
+import { ALL_DIFFICULTIES, ALL_LEVELS } from "@/constants/iidx/songLevels";
 
 import { PAGE_SIZE } from "@/constants/logic/pagination";
 export { PAGE_SIZE };

@@ -1,4 +1,4 @@
-﻿import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/latestVersion";
+import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import { z } from "zod";
 
 export const scoresQuerySchema = z.object({

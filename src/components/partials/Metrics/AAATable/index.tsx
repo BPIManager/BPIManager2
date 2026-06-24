@@ -1,10 +1,10 @@
-﻿"use client";
+"use client";
 
 import { useState, useMemo } from "react";
 import { SectionLoader } from "@/components/ui/loading-spinner";
 import { useAAATable } from "@/hooks/metrics/useAAATable";
 import { GroupingMode, GoalType, AAATableItem, CustomGoalConfig, CardDisplay } from "@/types/metrics/aaa";
-import { latestVersion } from "@/constants/iidx/latestVersion";
+import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { AAATableFilter } from "@/components/partials/Metrics/AAATable/selector";
 import { AAAGridItem } from "@/components/partials/Metrics/AAATable/table";
 import { PageContainer, PageHeader } from "../../Header";

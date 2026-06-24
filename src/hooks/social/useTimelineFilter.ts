@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { FilterParamsFrontend } from "@/types/songs/score";
@@ -6,7 +6,7 @@ import { toggleArrayItem } from "@/hooks/common/useToggleArray";
 
 import type { TimelineMode } from "@/types/social/timeline";
 import { IidxDifficulty } from "@/types/iidx/difficulty";
-import { IIDX_DIFFICULTIES } from "@/constants/iidx/diffs";
+import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 
 /**
  * タイムラインのモード・フィルター状態を管理するフック。

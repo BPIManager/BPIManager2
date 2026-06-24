@@ -1,7 +1,7 @@
-﻿"use client";
+"use client";
 
 import { useMemo } from "react";
-import { latestVersion } from "@/constants/iidx/latestVersion";
+import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { useUser } from "@/contexts/users/UserContext";
 import { useRivalSummary } from "@/hooks/social/useRivalSummary";
 import { RivalFilter } from "./filter";
