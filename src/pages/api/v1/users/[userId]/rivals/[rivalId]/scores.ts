@@ -5,7 +5,7 @@ import { sortSongs } from "@/utils/songs/sort";
 import { NextApiRequest, NextApiResponse } from "next";
 import { parseQuery } from "@/services/nextRequest/parseBody";
 import { rivalScoresQuerySchema } from "@/schemas/rivals/query";
-import topElements from "@/constants/iidx/radars/topElements.json";
+import topElements from "@/constants/iidx/radars/topElements";
 
 const radarLookup = new Map<string, string>(
   (topElements as { title: string; difficulty: string; top: string }[]).map(

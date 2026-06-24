@@ -3,7 +3,7 @@ import path from "path";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { metricsRepo } from "@/lib/db/metrics";
 import { BpiCalculator } from "@/lib/bpi";
-import topElements from "@/constants/iidx/radars/topElements.json";
+import topElements from "@/constants/iidx/radars/topElements";
 
 const topElementMap = new Map(
   (topElements as { title: string; difficulty: string; top: string }[]).map(
