@@ -1,7 +1,7 @@
-import useSWR from "swr";
+﻿import useSWR from "swr";
 import { useUser } from "@/contexts/users/UserContext";
 import { fetcher } from "@/utils/common/fetch";
-import { API_PREFIX } from "@/constants/apiEndpoints";
+import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import { AllScoreFilterParams, AllSongWithScore } from "@/types/songs/allSongs";
 
 /**

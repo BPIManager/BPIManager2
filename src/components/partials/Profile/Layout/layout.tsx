@@ -10,7 +10,7 @@ import { ProfileSideBar } from "@/components/partials/Profile/Sidebar/ui";
 import { ProfileErrorState } from "@/components/partials/Profile/Errors/ui";
 import { ModeSwitchBanner } from "../../Rivals/ModeSwitch/ui";
 import { Tabs } from "@/components/ui/tabs";
-import { latestVersion } from "@/constants/latestVersion";
+import { latestVersion } from "@/constants/iidx/latestVersion";
 import { ProfileProvider } from "@/contexts/profile/ProfileContext";
 import { FilterProvider } from "@/contexts/stats/FilterContext";
 import { LayoutDashboard, Music, Table, History } from "lucide-react";

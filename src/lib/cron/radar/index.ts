@@ -1,6 +1,6 @@
-import { db } from "@/lib/db";
+﻿import { db } from "@/lib/db";
 import { calculateRadar } from "@/lib/radar/calculator";
-import { latestVersion } from "@/constants/latestVersion";
+import { latestVersion } from "@/constants/iidx/latestVersion";
 import { BpiCalculator } from "@/lib/bpi";
 import { statsRepo } from "@/lib/db/stats";
 

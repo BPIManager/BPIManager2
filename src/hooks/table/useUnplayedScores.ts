@@ -1,9 +1,9 @@
-import useSWR from "swr";
+﻿import useSWR from "swr";
 import { SongWithScore } from "@/types/songs/score";
-import { latestVersion } from "@/constants/latestVersion";
+import { latestVersion } from "@/constants/iidx/latestVersion";
 import { useUser } from "@/contexts/users/UserContext";
 import { fetcher } from "@/utils/common/fetch";
-import { API_PREFIX } from "@/constants/apiEndpoints";
+import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 
 /**
  * 指定ユーザーがまだプレイしていない楽曲の一覧を取得する。

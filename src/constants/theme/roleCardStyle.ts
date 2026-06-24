@@ -1,3 +1,4 @@
+/** ユーザーロール別カードスタイルユーティリティ */
 import { cn } from "@/lib/utils";
 import type { UserRoleInfo } from "@/types/users/profile";
 

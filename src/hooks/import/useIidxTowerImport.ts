@@ -1,7 +1,7 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { toast } from "sonner";
 import { User as FirebaseUser } from "firebase/auth";
-import { API_PREFIX } from "@/constants/apiEndpoints";
+import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import { safeClipboardRead, safeClipboardClear } from "@/utils/clipboard";
 
 type TowerRow = { playDate: string; keyCount: number; scratchCount: number };

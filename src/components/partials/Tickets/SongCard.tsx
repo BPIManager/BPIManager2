@@ -1,10 +1,10 @@
-import { useState, useCallback } from "react";
+﻿import { useState, useCallback } from "react";
 import { ThumbsUp, ThumbsDown } from "lucide-react";
 import { useUser } from "@/contexts/users/UserContext";
 import { RadarSectionChart } from "@/components/partials/DashBoard/Radar";
-import { SONG_ATTRIBUTES_GLOBAL } from "@/constants/songAttributes";
+import { SONG_ATTRIBUTES_GLOBAL } from "@/constants/iidx/songAttributes";
 import { Badge } from "@/components/ui/badge";
-import { API_PREFIX } from "@/constants/apiEndpoints";
+import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import { buildTextageUrl, buildChartViewerUrl } from "@/utils/songs/links";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import type { TicketSongResult, ScoreMode } from "@/types/tickets";

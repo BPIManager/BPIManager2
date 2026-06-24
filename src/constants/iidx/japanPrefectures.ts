@@ -1,3 +1,4 @@
+/** 都道府県・海外地域リスト（ランキング絞り込み用） */
 export const JAPAN_PREFECTURES = [
   "北海道",
   "青森県",

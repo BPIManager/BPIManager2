@@ -1,3 +1,4 @@
+/** IIDXバージョン一覧と最新バージョン定数 */
 import type { IIDXVersion } from "@/types/iidx/version";
 
 export const IIDX_VERSIONS = [

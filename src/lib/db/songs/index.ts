@@ -1,8 +1,8 @@
-import { db } from "@/lib/db";
+﻿import { db } from "@/lib/db";
 import {
   SONG_ATTRIBUTES,
   SONG_ATTRIBUTES_GLOBAL,
-} from "@/constants/songAttributes";
+} from "@/constants/iidx/songAttributes";
 import type { AttrMode } from "@/types/songs/songList";
 import { IIDXVersion } from "@/types/iidx/version";
 

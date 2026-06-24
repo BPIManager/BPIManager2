@@ -1,4 +1,4 @@
-import { API_PREFIX } from "@/constants/apiEndpoints";
+﻿import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import { fetcher } from "@/utils/common/fetch";
 import useSWR from "swr";
 import type { SongDefinitionRecord } from "@/types/songs/definition";

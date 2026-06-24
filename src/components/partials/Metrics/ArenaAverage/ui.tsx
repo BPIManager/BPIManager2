@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useMemo, memo } from "react";
 import { ArenaAverageData } from "@/types/metrics/arena";
@@ -13,7 +13,7 @@ import {
 import { CustomPagination } from "../../Pagination/ui";
 import { cn } from "@/lib/utils";
 import { ArrowUpDown, ChevronUp, ChevronDown } from "lucide-react";
-import { A_RANKS } from "@/constants/arenaRanks";
+import { A_RANKS } from "@/constants/iidx/arenaRanks";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 export const RANK_THRESHOLDS = [

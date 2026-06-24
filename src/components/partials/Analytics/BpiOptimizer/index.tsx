@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useBpiOptimizer } from "@/hooks/analytics/useBpiOptimizer";
 import { useBpiOptimizerMemos } from "@/hooks/analytics/useOptimizeMemo";
@@ -9,10 +9,10 @@ import { useUser } from "@/contexts/users/UserContext";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { OptimizationResult } from "@/types/bpi-optimizer";
 import type { RadarCategory } from "@/types/stats/radar";
-import { latestVersion } from "@/constants/latestVersion";
+import { latestVersion } from "@/constants/iidx/latestVersion";
 import { toast } from "sonner";
 import { useTranslation } from "@/hooks/common/useTranslation";
-import { IIDX_DIFFICULTIES } from "@/constants/diffs";
+import { IIDX_DIFFICULTIES } from "@/constants/iidx/diffs";
 
 export const BpiOptimizerSection = () => {
   const { t } = useTranslation();

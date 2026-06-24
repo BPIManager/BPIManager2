@@ -1,10 +1,10 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { AllSongWithScore } from "@/types/songs/allSongs";
 import { AllSongRivalRankingBody, AllSongGlobalRankingBody } from "./ui";
-import { latestVersion } from "@/constants/latestVersion";
-import { versionsNonDisabledCollection } from "@/constants/versions";
+import { latestVersion } from "@/constants/iidx/latestVersion";
+import { versionsNonDisabledCollection } from "@/constants/iidx/versions";
 import {
   Select,
   SelectContent,

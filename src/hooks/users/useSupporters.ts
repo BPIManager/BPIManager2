@@ -1,6 +1,6 @@
-import useSWR from "swr";
+﻿import useSWR from "swr";
 import { fetcher } from "@/utils/common/fetch";
-import { API_PREFIX } from "@/constants/apiEndpoints";
+import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import type { UserRoleInfo } from "@/types/users/profile";
 
 export interface SupporterUser {

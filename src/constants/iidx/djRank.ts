@@ -1,3 +1,4 @@
+/** DJランク定義と計算ユーティリティ */
 type RankConfig = { label: string; ratio: number };
 
 export const RANK_TABLE: RankConfig[] = [

@@ -2,7 +2,7 @@ import type { NextApiResponse } from "next";
 import { adminDb } from "@/lib/firebase/admin";
 import { BpiImportService } from "@/lib/transfer/importer";
 import type { BpimScoreData } from "@/types/transfer";
-import { IIDX_VERSIONS } from "@/constants/latestVersion";
+import { IIDX_VERSIONS } from "@/constants/iidx/latestVersion";
 import {
   AuthenticatedNextApiRequest,
   withAuth,

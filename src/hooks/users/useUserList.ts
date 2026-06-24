@@ -1,7 +1,7 @@
-import useSWR from "swr";
+﻿import useSWR from "swr";
 import { fetcher } from "@/utils/common/fetch";
 import { useUser } from "@/contexts/users/UserContext";
-import { API_PREFIX } from "@/constants/apiEndpoints";
+import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import type { RecommendedUser } from "@/types/users/list";
 
 interface UserListResponse {

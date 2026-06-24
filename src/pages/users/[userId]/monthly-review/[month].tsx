@@ -2,7 +2,7 @@ import { MonthlyReviewView } from "@/components/partials/MonthlyReview/index";
 import { PeriodSelector } from "@/components/partials/MonthlyReview/PeriodSelector";
 import { StarfieldBackground } from "@/components/ui/starfield-background";
 import { useMonthlyReview } from "@/hooks/stats/useMonthlyReview";
-import { latestVersion } from "@/constants/latestVersion";
+import { latestVersion } from "@/constants/iidx/latestVersion";
 import { useRouter } from "next/router";
 import { ArrowLeft } from "lucide-react";
 

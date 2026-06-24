@@ -1,9 +1,9 @@
-import fs from "fs/promises";
+﻿import fs from "fs/promises";
 import path from "path";
-import { latestVersion } from "@/constants/latestVersion";
+import { latestVersion } from "@/constants/iidx/latestVersion";
 import { metricsRepo } from "@/lib/db/metrics";
 import { BpiCalculator } from "@/lib/bpi";
-import topElements from "@/constants/radars/topElements.json";
+import topElements from "@/constants/iidx/radars/topElements.json";
 
 const topElementMap = new Map(
   (topElements as { title: string; difficulty: string; top: string }[]).map(

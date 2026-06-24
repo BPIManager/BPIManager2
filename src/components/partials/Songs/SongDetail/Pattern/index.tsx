@@ -1,9 +1,9 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+﻿import { useCallback, useMemo, useRef, useState } from "react";
 import useSWR from "swr";
 import { List, type ListImperativeAPI } from "react-window";
 import { useUser } from "@/contexts/users/UserContext";
 import { useSongPatterns } from "@/hooks/songs/useSongPatterns";
-import { API_PREFIX } from "@/constants/apiEndpoints";
+import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import type { SongListItem } from "@/types/songs/songInfo";
 import {
   PATTERN_ROW_HEIGHT,

@@ -3,7 +3,7 @@ import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { iidxTowerRepo } from "@/lib/db/iidxTower";
 import { statsRepo } from "@/lib/db/stats";
 import { calculateRadar } from "@/lib/radar/calculator";
-import { latestVersion, IIDX_VERSIONS } from "@/constants/latestVersion";
+import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/latestVersion";
 import { v4 as uuidv4 } from "uuid";
 import dayjs from "dayjs";
 

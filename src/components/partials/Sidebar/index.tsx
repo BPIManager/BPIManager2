@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { ButtonHTMLAttributes, JSX, useEffect, useState } from "react";
 import Link from "next/link";
@@ -36,7 +36,7 @@ import {
 } from "lucide-react";
 
 import { useUser } from "@/contexts/users/UserContext";
-import { latestVersion } from "@/constants/latestVersion";
+import { latestVersion } from "@/constants/iidx/latestVersion";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/hooks/common/useTranslation";
 

@@ -1,8 +1,8 @@
-import useSWR from "swr";
+﻿import useSWR from "swr";
 import { SongWithScore } from "@/types/songs/score";
 import { useUser } from "@/contexts/users/UserContext";
 import { fetcher } from "@/utils/common/fetch";
-import { API_PREFIX } from "@/constants/apiEndpoints";
+import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 
 /**
  * 異なる IIDX バージョン間のスコア比較データを取得する。

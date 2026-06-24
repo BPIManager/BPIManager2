@@ -1,4 +1,4 @@
-import { IIDX_VERSIONS } from "@/constants/latestVersion";
+﻿import { IIDX_VERSIONS } from "@/constants/iidx/latestVersion";
 import { db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { useState } from "react";

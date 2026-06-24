@@ -1,7 +1,7 @@
-import { db } from "@/lib/db";
+﻿import { db } from "@/lib/db";
 import { sql } from "kysely";
-import { ARENA_RANK_ORDER } from "@/constants/arenaRanks";
-import { latestVersion } from "@/constants/latestVersion";
+import { ARENA_RANK_ORDER } from "@/constants/iidx/arenaRanks";
+import { latestVersion } from "@/constants/iidx/latestVersion";
 
 export { ARENA_RANK_ORDER };
 

@@ -1,3 +1,4 @@
+/** ソートオプション定数（ドロップダウン用） */
 export const rivalSortOptions = [
   { label: "ライバルのBPIが高い順", value: "rivalBpi" },
   { label: "自分のBPIが高い順", value: "myBpi" },

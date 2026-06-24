@@ -1,6 +1,6 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { useUser } from "@/contexts/users/UserContext";
-import { API_PREFIX } from "@/constants/apiEndpoints";
+import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 
 /**
  * 指定ユーザーへのフォロー / アンフォロー操作を行うフック。

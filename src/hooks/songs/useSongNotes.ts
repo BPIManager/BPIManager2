@@ -1,7 +1,7 @@
-import useSWR from "swr";
+﻿import useSWR from "swr";
 import { useState } from "react";
 import { User as FirebaseUser } from "firebase/auth";
-import { API_PREFIX } from "@/constants/apiEndpoints";
+import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import { fetcher } from "@/utils/common/fetch";
 
 export interface SongNote {

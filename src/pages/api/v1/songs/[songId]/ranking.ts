@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { adminAuth } from "@/lib/firebase/admin";
 import { statsRepo } from "@/lib/db/stats";
-import { latestVersion, IIDX_VERSIONS } from "@/constants/latestVersion";
+import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/latestVersion";
 
 /** Bearer トークンが有効なら uid を返し、なければ空文字を返す */
 async function resolveViewerId(req: NextApiRequest): Promise<string> {

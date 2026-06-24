@@ -1,6 +1,6 @@
-import { db } from "@/lib/db";
+﻿import { db } from "@/lib/db";
 import type { NewOfficialArenaStat } from "@/types/db";
-import { ARENA_RANK_ORDER } from "@/constants/arenaRanks";
+import { ARENA_RANK_ORDER } from "@/constants/iidx/arenaRanks";
 
 export async function getLatestArenaStatsPerVersion(userId: string) {
   return await db

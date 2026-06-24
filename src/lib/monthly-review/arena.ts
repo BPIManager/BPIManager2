@@ -1,4 +1,4 @@
-import { ARENA_RANK_ORDER } from "@/constants/arenaRanks";
+﻿import { ARENA_RANK_ORDER } from "@/constants/iidx/arenaRanks";
 import type { MonthlyArena } from "@/types/stats/monthlyReview";
 
 type ArenaRow = {

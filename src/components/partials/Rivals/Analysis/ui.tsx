@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import type { SongWithRival } from "@/types/songs/score";
 import type { RadarCategory } from "@/types/stats/radar";
-import { ALL_RADAR_CATEGORIES, RADAR_COLORS } from "@/constants/radars";
+import { ALL_RADAR_CATEGORIES, RADAR_COLORS } from "@/constants/iidx/radars";
 import {
   useRivalAnalysis,
   type RivalDiffPoint,
@@ -14,7 +14,7 @@ import {
 } from "@/hooks/social/useRivalAnalysis";
 import { BpiScatterChart } from "@/components/partials/Metrics/ArenaAverage/BpiScatterChart";
 import { useTranslation } from "@/hooks/common/useTranslation";
-import { IIDX_DIFFICULTIES } from "@/constants/diffs";
+import { IIDX_DIFFICULTIES } from "@/constants/iidx/diffs";
 
 // ---- 小コンポーネント ----
 

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Activity, LucideIcon, Swords, UserCheck } from "lucide-react";
 import { SectionLoader } from "@/components/ui/loading-spinner";
@@ -12,7 +12,7 @@ import { useTimelineFilter } from "@/hooks/social/useTimelineFilter";
 import { IidxDifficulty } from "@/types/iidx/difficulty";
 import { PageContainer, PageHeader } from "../Header";
 import { useTranslation } from "@/hooks/common/useTranslation";
-import { IIDX_DIFFICULTIES } from "@/constants/diffs";
+import { IIDX_DIFFICULTIES } from "@/constants/iidx/diffs";
 
 export const TimelineContainer = () => {
   const { t } = useTranslation();

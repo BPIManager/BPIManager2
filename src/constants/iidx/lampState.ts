@@ -1,3 +1,4 @@
+/** クリアランプ（ランプ状態）定数 */
 export const CLEAR_STATES = [
   //{ label: "NO PLAY", value: "NO PLAY", color: "gray.500" },
   { label: "FAILED", value: "FAILED", color: "red.500" },

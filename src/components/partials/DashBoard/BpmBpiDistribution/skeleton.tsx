@@ -1,6 +1,6 @@
-import { DashCard } from "@/components/ui/dashcard";
+﻿import { DashCard } from "@/components/ui/dashcard";
 import { Skeleton } from "@/components/ui/skeleton";
-import { BPM_CONST } from "@/constants/bpm";
+import { BPM_CONST } from "@/constants/iidx/bpm";
 
 export const BpmBpiSkeleton = () => (
   <DashCard>

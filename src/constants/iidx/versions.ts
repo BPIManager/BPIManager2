@@ -1,3 +1,4 @@
+/** IIDXバージョンタイトル一覧とユーティリティ関数 */
 import type { VersionTitle } from "@/types/iidx/version";
 
 export const versionTitles: VersionTitle[] = [

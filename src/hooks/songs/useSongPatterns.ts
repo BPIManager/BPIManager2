@@ -1,6 +1,6 @@
-import useSWRInfinite from "swr/infinite";
+﻿import useSWRInfinite from "swr/infinite";
 import { User as FirebaseUser } from "firebase/auth";
-import { API_PREFIX } from "@/constants/apiEndpoints";
+import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import type { VoteType } from "@/types/db";
 
 export interface SongPatternItem {

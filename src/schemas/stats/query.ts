@@ -1,5 +1,5 @@
-import { latestVersion, IIDX_VERSIONS } from "@/constants/latestVersion";
-import { IIDX_DIFFICULTIES } from "@/constants/diffs";
+﻿import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/latestVersion";
+import { IIDX_DIFFICULTIES } from "@/constants/iidx/diffs";
 import { z } from "zod";
 
 const toArray = (v: unknown) => (Array.isArray(v) ? v : v != null ? [v] : []);

@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/router";
 import { useUser } from "@/contexts/users/UserContext";
-import { latestVersion } from "@/constants/latestVersion";
+import { latestVersion } from "@/constants/iidx/latestVersion";
 import { useProfile } from "@/hooks/users/useProfile";
 import { LoginRequiredCard } from "@/components/partials/LoginRequired/ui";
 import { RivalProfileLayout } from "@/components/partials/Rivals/Layout/layout";

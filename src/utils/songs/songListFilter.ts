@@ -1,4 +1,4 @@
-import { SONG_ATTRIBUTES, SONG_ATTRIBUTES_GLOBAL } from "@/constants/songAttributes";
+﻿import { SONG_ATTRIBUTES, SONG_ATTRIBUTES_GLOBAL } from "@/constants/iidx/songAttributes";
 import type { SongListItem, SimilarSongItem } from "@/types/songs/songInfo";
 import type { SortKey, SortDir, AttrMode } from "@/types/songs/songList";
 

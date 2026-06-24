@@ -1,5 +1,5 @@
-import { BpiCalculator } from "@/lib/bpi";
-import topElements from "@/constants/radars/topElements.json";
+﻿import { BpiCalculator } from "@/lib/bpi";
+import topElements from "@/constants/iidx/radars/topElements.json";
 import {
   RadarCategory,
   RadarResponse,

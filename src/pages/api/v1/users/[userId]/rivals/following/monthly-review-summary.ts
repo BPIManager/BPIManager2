@@ -4,9 +4,9 @@ import { db } from "@/lib/db";
 import { monthlyReviewRepo } from "@/lib/db/monthly-review";
 import { statsRepo } from "@/lib/db/stats";
 import { buildBpiTimeline } from "@/lib/monthly-review/bpi";
-import { IIDX_DIFFICULTIES } from "@/constants/diffs";
+import { IIDX_DIFFICULTIES } from "@/constants/iidx/diffs";
 import dayjs from "@/lib/dayjs";
-import { IIDX_VERSIONS } from "@/constants/latestVersion";
+import { IIDX_VERSIONS } from "@/constants/iidx/latestVersion";
 
 export default async function handler(
   req: NextApiRequest,

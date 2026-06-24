@@ -1,4 +1,4 @@
-import { iidxUrl } from "@/constants/iidxUrl";
+﻿import { iidxUrl } from "@/constants/iidx/iidxUrl";
 import {
   HelpCircle,
   Info,

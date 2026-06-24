@@ -1,7 +1,7 @@
-import { useState, useCallback } from "react";
+﻿import { useState, useCallback } from "react";
 import useSWRMutation from "swr/mutation";
 import { useUser } from "@/contexts/users/UserContext";
-import { API_PREFIX } from "@/constants/apiEndpoints";
+import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import type { TicketItem, TicketRecommendResult, TicketSortKey, ScoreMode } from "@/types/tickets";
 
 export interface TicketCardState {

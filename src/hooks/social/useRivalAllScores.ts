@@ -1,9 +1,9 @@
-import useSWR from "swr";
+﻿import useSWR from "swr";
 import { useUser } from "@/contexts/users/UserContext";
 import { fetcher } from "@/utils/common/fetch";
-import { latestVersion } from "@/constants/latestVersion";
+import { latestVersion } from "@/constants/iidx/latestVersion";
 import { SongWithRival } from "@/types/songs/score";
-import { API_PREFIX } from "@/constants/apiEndpoints";
+import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 
 /**
  * 自分とライバルの全楽曲スコアを並べて取得する。

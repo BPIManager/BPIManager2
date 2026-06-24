@@ -14,7 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import { SongWithScore } from "@/types/songs/score";
 import { BpiCalculator } from "@/lib/bpi";
 import { BPIChart } from "./chart";
-import { getRankDetail } from "@/constants/djRank";
+import { getRankDetail } from "@/constants/iidx/djRank";
 import { SongHistoryTab } from "../History/ui";
 import RivalsRanking from "../Rivals";
 import { AppTabsList, AppTabsTrigger } from "@/components/ui/complex/tabs";

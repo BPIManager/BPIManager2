@@ -3,7 +3,7 @@ import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { db } from "@/lib/db";
 import { filterSongsServerSide } from "@/utils/songs/filter";
 import { sortSongs } from "@/utils/songs/sort";
-import topElements from "@/constants/radars/topElements.json";
+import topElements from "@/constants/iidx/radars/topElements.json";
 
 const radarLookup = new Map<string, string>(
   (topElements as { title: string; difficulty: string; top: string }[]).map(

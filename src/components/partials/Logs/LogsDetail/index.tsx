@@ -1,8 +1,8 @@
-import { PageContainer, PageHeader } from "../../Header";
+﻿import { PageContainer, PageHeader } from "../../Header";
 import dayjs from "@/lib/dayjs";
 import { LogsDetailContent } from "./content";
 import type { LogsDetailViewProps } from "@/types/logs/detail";
-import { getVersionNameFromNumber } from "@/constants/versions";
+import { getVersionNameFromNumber } from "@/constants/iidx/versions";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 export const LogsDetailView = (props: LogsDetailViewProps) => {

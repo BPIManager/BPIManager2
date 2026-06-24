@@ -1,8 +1,8 @@
-import { useMemo } from "react";
+﻿import { useMemo } from "react";
 import { BpiCalculator } from "@/lib/bpi";
 import type { SongWithRival } from "@/types/songs/score";
 import type { RadarCategory } from "@/types/stats/radar";
-import { ALL_RADAR_CATEGORIES } from "@/constants/radars";
+import { ALL_RADAR_CATEGORIES } from "@/constants/iidx/radars";
 import type { ScatterPoint } from "@/hooks/metrics/useArenaAnalysis";
 
 export interface RivalDiffPoint {

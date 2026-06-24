@@ -1,4 +1,4 @@
-import type { AttrSortKey } from "@/constants/songAttributes";
+﻿import type { AttrSortKey } from "@/constants/iidx/songAttributes";
 
 export type SortKey = "title" | "notes" | "bpm" | AttrSortKey;
 

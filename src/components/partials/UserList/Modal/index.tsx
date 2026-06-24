@@ -15,8 +15,8 @@ import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { fetcher } from "@/utils/common/fetch";
-import { API_PREFIX } from "@/constants/apiEndpoints";
-import { latestVersion } from "@/constants/latestVersion";
+import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { latestVersion } from "@/constants/iidx/latestVersion";
 import { toast } from "sonner";
 
 export const RivalComparisonModal = ({

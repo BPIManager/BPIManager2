@@ -1,10 +1,10 @@
-import { useRouter } from "next/router";
+﻿import { useRouter } from "next/router";
 import Link from "next/link";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { AppTabsList, AppTabsTrigger } from "@/components/ui/complex/tabs";
 import { ChevronLeft, Music, FileText, BarChart3, Layers } from "lucide-react";
 import { useSongDetail } from "@/hooks/songs/useSongDetail";
-import { latestVersion } from "@/constants/latestVersion";
+import { latestVersion } from "@/constants/iidx/latestVersion";
 import { RankingTab } from "./Ranking";
 import { SimilarTab } from "./Similar";
 import { WikiTab } from "./Wiki";

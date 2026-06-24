@@ -3,10 +3,10 @@ import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { usersRepo } from "@/lib/db/users";
 import { statsRepo } from "@/lib/db/stats";
 import { calculateRadar } from "@/lib/radar/calculator";
-import { latestVersion, IIDX_VERSIONS } from "@/constants/latestVersion";
+import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/latestVersion";
 import { v4 as uuidv4 } from "uuid";
-import { JAPAN_PREFECTURES } from "@/constants/japanPrefectures";
-import { ARENA_RANK_ORDER } from "@/constants/arenaRanks";
+import { JAPAN_PREFECTURES } from "@/constants/iidx/japanPrefectures";
+import { ARENA_RANK_ORDER } from "@/constants/iidx/arenaRanks";
 
 const RADAR_CATEGORIES = [
   "notes",

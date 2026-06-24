@@ -1,6 +1,6 @@
-﻿import { IIDX_LEVELS, IIDX_DIFFICULTIES } from "@/constants/diffs";
+﻿import { IIDX_LEVELS, IIDX_DIFFICULTIES } from "@/constants/iidx/diffs";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
-import { versionsNonDisabledCollection } from "@/constants/versions";
+import { versionsNonDisabledCollection } from "@/constants/iidx/versions";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,

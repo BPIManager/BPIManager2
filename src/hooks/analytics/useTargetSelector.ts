@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import {
   Users,
   User,
@@ -11,8 +11,8 @@ import {
 import { useTranslation } from "@/hooks/common/useTranslation";
 import type { TranslationKey } from "@/lib/i18n/translations";
 import type { AnalyticsTarget, AnalyticsTargetKind } from "@/types/analytics";
-import { versionTitles } from "@/constants/versions";
-import { latestVersion } from "@/constants/latestVersion";
+import { versionTitles } from "@/constants/iidx/versions";
+import { latestVersion } from "@/constants/iidx/latestVersion";
 
 export type Step = "kind" | "rival-pick" | "arena-rank" | "self-version-pick";
 

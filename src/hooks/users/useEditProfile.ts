@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { useUser } from "@/contexts/users/UserContext";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
-import { API_PREFIX } from "@/constants/apiEndpoints";
+import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import { toast } from "sonner";
 
 /**

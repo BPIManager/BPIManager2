@@ -1,3 +1,4 @@
+/** BPI値に応じたカラーマッピングユーティリティ */
 import { ChartColors } from "@/types/ui/chart";
 
 export const getBpiColorFromTheme = (

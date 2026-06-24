@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useCallback, useState } from "react";
 import { useRouter } from "next/router";
@@ -19,7 +19,7 @@ import {
 import type { AnalyticsTarget } from "@/types/analytics";
 import { TargetSelectorModal } from "@/components/partials/Analytics/TargetSelector";
 import { AnalyticsComparisonTable } from "@/components/partials/Analytics/Table";
-import { latestVersion } from "@/constants/latestVersion";
+import { latestVersion } from "@/constants/iidx/latestVersion";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/hooks/common/useTranslation";
 

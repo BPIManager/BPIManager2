@@ -1,9 +1,9 @@
-import useSWR from "swr";
+﻿import useSWR from "swr";
 import { fetcher } from "@/utils/common/fetch";
 import { useUser } from "@/contexts/users/UserContext";
-import { API_PREFIX } from "@/constants/apiEndpoints";
+import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import type { UserSongRankingsResponse } from "@/types/users/ranking";
-import { latestVersion } from "@/constants/latestVersion";
+import { latestVersion } from "@/constants/iidx/latestVersion";
 
 export const useUserSongRankings = (version: string = latestVersion) => {
   const { fbUser } = useUser();

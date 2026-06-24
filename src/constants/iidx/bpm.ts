@@ -1,3 +1,4 @@
+/** BPM帯域定数とBPI範囲定数 */
 const BPM_BAND_ORDER = [
   "200~",
   "180~200",

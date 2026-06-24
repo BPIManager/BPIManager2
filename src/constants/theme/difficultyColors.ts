@@ -1,3 +1,4 @@
+/** 難易度別背景カラークラス定数 */
 export const DIFF_COLORS: Record<string, string> = {
   ANOTHER: "bg-red-900",
   LEGGENDARIA: "bg-purple-900",
