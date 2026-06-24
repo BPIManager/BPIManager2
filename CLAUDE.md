@@ -74,6 +74,22 @@ src/
 - `src/constants/radars/topElements.json` (~95KB) は大きいので直接読まない
 - 新しいDB参照クエリを書くときは既存のDBスキーマ(/migration/schema.sql)を確認し、インデックスが最適化どうかを確認すること。可能であれば、既存のインデックスで高速なクエリを書くように努める。
 
+### `components/partials/` ファイル規則
+
+`partials/` 以下のコンポーネントは**必ずフォルダ単位**で管理する。単体の `機能名.tsx` は作らない。
+
+```
+partials/
+└── FeatureName/          # 機能名フォルダ（必須）
+    ├── index.tsx         # ロジック含む（データフェッチ、状態管理等）
+    ├── ui.tsx            # 純粋なUI関数のみ（副作用なし）
+    ├── skeleton.tsx      # スケルトンUI（任意）
+    └── errors.tsx        # エラー表示（任意）
+```
+
+- 共通化可能な汎用ロジックは `/utils` または `/services`、型定義は `/types` に格納
+- UI のみのコンポーネントでも必ずフォルダを作り `index.tsx` に配置（`ui.tsx` に分離するかはロジックの有無で判断）
+
 ## よく参照する型
 
 - `Song`, `Score`, `User`, `AllScores` → `src/types/db.ts`
