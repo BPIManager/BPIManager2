@@ -1,4 +1,5 @@
 ﻿import { useState } from "react";
+import { mutate } from "swr";
 import { parseAnyCsv } from "@/utils/csv/parse";
 import { detectCsvType, validateCsvTypeForVersion } from "@/utils/csv/detect";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
@@ -83,7 +84,12 @@ export const useBatchImport = (
         toast.info("すでに最新の状態です");
       }
       await safeClipboardClear();
-
+      await mutate(
+        (key) =>
+          Array.isArray(key) &&
+          typeof key[0] === "string" &&
+          key[0].includes("/scores?"),
+      );
       await refresh();
       return true;
     } catch (e: unknown) {

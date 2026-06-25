@@ -25,8 +25,8 @@ export const useUserScores = (userId: string | undefined, version?: string) => {
       : null,
     fetcher,
     {
-      revalidateOnFocus: false,
-      dedupingInterval: 10000,
+      revalidateOnFocus: true,
+      dedupingInterval: 2000,
     },
   );
 
