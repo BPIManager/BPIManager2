@@ -105,6 +105,7 @@ export interface Scores {
   lastPlayed: Generated<Date>;
   logId: Generated<number>;
   missCount: Generated<number | null>;
+  scoreClass: Generated<number | null>;
   songId: number;
   userId: string;
   version: string;
@@ -209,6 +210,7 @@ export interface AllScoresTable {
   bpi: number | null;
   clearState: string | null;
   missCount: number | null;
+  scoreClass: number | null;
   createdAt: Generated<Date>;
   lastPlayed: Generated<Date>;
   version: string;
