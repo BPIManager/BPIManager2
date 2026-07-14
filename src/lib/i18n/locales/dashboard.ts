@@ -380,6 +380,24 @@ export const dashboardTranslations = {
     "zh-TW": "BPI分布",
     ko: "BPI 분포",
   },
+  "dashboard.distribution.scoreRateTitle": {
+    ja: "スコアレート分布",
+    en: "Score Rate Distribution",
+    "zh-TW": "得分率分布",
+    ko: "스코어 레이트 분포",
+  },
+  "dashboard.distribution.modeRank": {
+    ja: "DJRANK表示",
+    en: "Show DJ Rank",
+    "zh-TW": "顯示DJ段位",
+    ko: "DJ 단위 표시",
+  },
+  "dashboard.distribution.modeScoreRate": {
+    ja: "スコアレート表示",
+    en: "Show score rate",
+    "zh-TW": "顯示得分率",
+    ko: "스코어 레이트 표시",
+  },
   "dashboard.distribution.zoomIn": {
     ja: "分解能を上げる",
     en: "Increase resolution",

@@ -1,0 +1,28 @@
+import { useStatsData } from "@/services/swr/fetchStats";
+
+import type { RankDistItem } from "@/types/stats/distribution";
+
+/**
+ * 楽曲ごとのスコアレート分布データを取得する。
+ *
+ * @param userId - 対象ユーザー ID（未定義の場合はフェッチしない）
+ * @param levels - フィルタリングするレベル配列
+ * @param difficulties - フィルタリングする難易度配列
+ * @param version - IIDX バージョン文字列
+ * @param step - バケット幅（1/2/5/10、デフォルト 10）
+ * @returns スコアレート分布配列・ローディング状態・エラー情報
+ */
+export const useScoreRateDistribution = (
+  userId: string | undefined,
+  levels: string[],
+  difficulties: string[],
+  version: string,
+  step?: number,
+) => {
+  const { data, error, isLoading } = useStatsData<RankDistItem[]>(
+    "scoreRateDistribution",
+    { userId, version, levels, difficulties, step },
+  );
+
+  return { distribution: data, isLoading, isError: error };
+};

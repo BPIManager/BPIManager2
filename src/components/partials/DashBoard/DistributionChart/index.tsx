@@ -1,9 +1,11 @@
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { useDjRankDistribution } from "@/hooks/stats/useDJRankDistribution";
 import { useBPIDistribution } from "@/hooks/stats/useBPIDistribution";
+import { useScoreRateDistribution } from "@/hooks/stats/useScoreRateDistribution";
 import { DistributionChart } from "./ui";
 import { getRankColorFromTheme } from "@/constants/theme/djRankColor";
 import { getBpiColorFromTheme } from "@/constants/theme/bpiColor";
+import { getScoreRateColorFromTheme } from "@/constants/theme/scoreRateColor";
 import { useChartColors } from "@/hooks/common/useChartColors";
 import { useBpiStep } from "@/hooks/common/useBpiStep";
 import type { DistributionSectionProps } from "@/types/ui/distribution";
@@ -20,12 +22,19 @@ export const DistributionSection = ({
   rivalUserId,
   myName,
   rivalName,
+  mode,
+  onModeChange,
 }: DistributionSectionProps) => {
   const { levels, diffs, version, compareVersion } = useStatsFilter();
   const { t } = useTranslation();
   const effectiveMyName = myName ?? t("dashboard.me");
   const c = useChartColors();
   const { bpiStep, handleStepFiner, handleStepCoarser } = useBpiStep();
+  const {
+    bpiStep: scoreRateStep,
+    handleStepFiner: handleScoreRateStepFiner,
+    handleStepCoarser: handleScoreRateStepCoarser,
+  } = useBpiStep();
 
   const isCompareMode = !rivalUserId && !!compareVersion;
   const effectiveRivalUserId =
@@ -36,12 +45,18 @@ export const DistributionSection = ({
     : getVersionNameFromNumber(compareVersion);
 
   const isBpi = type === "bpi";
+  const isScoreRate = type === "scoreRate";
 
   const { distribution: myRankDist, isLoading: myRankLoading } =
-    useDjRankDistribution(isBpi ? undefined : myUserId, levels, diffs, version);
+    useDjRankDistribution(
+      type === "rank" ? myUserId : undefined,
+      levels,
+      diffs,
+      version,
+    );
   const { distribution: rivalRankDist, isLoading: rivalRankLoading } =
     useDjRankDistribution(
-      isBpi ? undefined : effectiveRivalUserId,
+      type === "rank" ? effectiveRivalUserId : undefined,
       levels,
       diffs,
       effectiveRivalVersion,
@@ -64,12 +79,42 @@ export const DistributionSection = ({
       bpiStep,
     );
 
-  const myDist = isBpi ? myBpiDist : myRankDist;
-  const rivalDist = isBpi ? rivalBpiDist : rivalRankDist;
-  const myLoading = isBpi ? myBpiLoading : myRankLoading;
-  const rivalLoading = isBpi ? rivalBpiLoading : rivalRankLoading;
+  const { distribution: myScoreRateDist, isLoading: myScoreRateLoading } =
+    useScoreRateDistribution(
+      isScoreRate ? myUserId : undefined,
+      levels,
+      diffs,
+      version,
+      scoreRateStep,
+    );
+  const { distribution: rivalScoreRateDist, isLoading: rivalScoreRateLoading } =
+    useScoreRateDistribution(
+      isScoreRate ? effectiveRivalUserId : undefined,
+      levels,
+      diffs,
+      effectiveRivalVersion,
+      scoreRateStep,
+    );
+
+  const myDist = isBpi ? myBpiDist : isScoreRate ? myScoreRateDist : myRankDist;
+  const rivalDist = isBpi
+    ? rivalBpiDist
+    : isScoreRate
+      ? rivalScoreRateDist
+      : rivalRankDist;
+  const myLoading = isBpi
+    ? myBpiLoading
+    : isScoreRate
+      ? myScoreRateLoading
+      : myRankLoading;
+  const rivalLoading = isBpi
+    ? rivalBpiLoading
+    : isScoreRate
+      ? rivalScoreRateLoading
+      : rivalRankLoading;
 
   const bpiSkeletonCount = Math.floor(110 / bpiStep) + 2;
+  const scoreRateSkeletonCount = Math.floor(100 / scoreRateStep) + 1;
 
   const config = {
     rank: {
@@ -82,7 +127,16 @@ export const DistributionSection = ({
       getColor: (label: string) => getBpiColorFromTheme(label, c),
       skeletonCount: bpiSkeletonCount,
     },
+    scoreRate: {
+      title: t("dashboard.distribution.scoreRateTitle"),
+      getColor: (label: string) => getScoreRateColorFromTheme(label, c),
+      skeletonCount: scoreRateSkeletonCount,
+    },
   }[type];
+
+  const modeProps = onModeChange
+    ? { mode, onModeChange }
+    : {};
 
   const isLoading = myLoading || (!!effectiveRivalUserId && rivalLoading);
   if (isLoading) {
@@ -93,6 +147,7 @@ export const DistributionSection = ({
         isLoading={true}
         getColor={config.getColor}
         skeletonCount={config.skeletonCount}
+        {...modeProps}
       />
     );
   }
@@ -109,13 +164,32 @@ export const DistributionSection = ({
       getColor={config.getColor}
       myName={effectiveMyName}
       rivalName={effectiveRivalName}
-      step={isBpi ? bpiStep : undefined}
-      onStepFiner={isBpi ? handleStepFiner : undefined}
-      onStepCoarser={isBpi ? handleStepCoarser : undefined}
-      canStepFiner={
-        isBpi && BPI_STEP_OPTIONS.indexOf(bpiStep) < BPI_STEP_OPTIONS.length - 1
+      step={isBpi ? bpiStep : isScoreRate ? scoreRateStep : undefined}
+      onStepFiner={
+        isBpi
+          ? handleStepFiner
+          : isScoreRate
+            ? handleScoreRateStepFiner
+            : undefined
       }
-      canStepCoarser={isBpi && BPI_STEP_OPTIONS.indexOf(bpiStep) > 0}
+      onStepCoarser={
+        isBpi
+          ? handleStepCoarser
+          : isScoreRate
+            ? handleScoreRateStepCoarser
+            : undefined
+      }
+      canStepFiner={
+        (isBpi &&
+          BPI_STEP_OPTIONS.indexOf(bpiStep) < BPI_STEP_OPTIONS.length - 1) ||
+        (isScoreRate &&
+          BPI_STEP_OPTIONS.indexOf(scoreRateStep) < BPI_STEP_OPTIONS.length - 1)
+      }
+      canStepCoarser={
+        (isBpi && BPI_STEP_OPTIONS.indexOf(bpiStep) > 0) ||
+        (isScoreRate && BPI_STEP_OPTIONS.indexOf(scoreRateStep) > 0)
+      }
+      {...modeProps}
     />
   );
 };

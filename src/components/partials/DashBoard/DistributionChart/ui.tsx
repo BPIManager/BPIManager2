@@ -18,7 +18,15 @@ import {
   Tooltip as RechartsTooltip,
   ResponsiveContainer,
 } from "recharts";
-import { BarChart2, PieChartIcon, ZoomIn, ZoomOut } from "lucide-react";
+import {
+  BarChart2,
+  PieChartIcon,
+  ZoomIn,
+  ZoomOut,
+  Percent,
+  Medal,
+} from "lucide-react";
+import type { RankDisplayMode } from "@/types/ui/distribution";
 
 const animationStyles = `
   @keyframes bounceGrow {
@@ -43,10 +51,23 @@ interface DistributionChartProps {
   onStepCoarser?: () => void;
   canStepFiner?: boolean;
   canStepCoarser?: boolean;
+  mode?: RankDisplayMode;
+  onModeChange?: (mode: RankDisplayMode) => void;
 }
 
-function tooltipHeader(label: string, step?: number): string {
+function tooltipHeader(
+  label: string,
+  step?: number,
+  unit?: "bpi" | "scoreRate",
+): string {
   if (step === undefined) return label;
+  if (unit === "scoreRate") {
+    if (label === "100") return "100%";
+    const from = parseInt(label, 10);
+    if (isNaN(from)) return label;
+    const to = from + step;
+    return `${from}% 〜 ${to >= 100 ? "100" : to}%`;
+  }
   if (label === "<-10") return "BPI < -10";
   if (label === "100+") return "BPI 100+";
   const from = parseInt(label, 10);
@@ -68,6 +89,7 @@ const ChartBarUnit = ({
   showLabel,
   showCount,
   step,
+  unit,
   myName,
   rivalName,
   dense = false,
@@ -85,6 +107,7 @@ const ChartBarUnit = ({
   showLabel: boolean;
   showCount: boolean;
   step?: number;
+  unit?: "bpi" | "scoreRate";
   myName: string;
   rivalName: string;
   dense?: boolean;
@@ -184,7 +207,7 @@ const ChartBarUnit = ({
         </div>
       </TooltipTrigger>
       <TooltipContent side="top" className="flex flex-col gap-0.5">
-        <span className="font-bold">{tooltipHeader(label, step)}</span>
+        <span className="font-bold">{tooltipHeader(label, step, unit)}</span>
         <span style={{ color: primaryColor }}>
           {myName}: {myCount}
         </span>
@@ -276,6 +299,8 @@ export const DistributionChart = ({
   onStepCoarser,
   canStepFiner = false,
   canStepCoarser = false,
+  mode,
+  onModeChange,
 }: DistributionChartProps) => {
   const c = useChartColors();
   const { t } = useTranslation();
@@ -311,6 +336,9 @@ export const DistributionChart = ({
     1,
   );
 
+  const unit: "bpi" | "scoreRate" | undefined =
+    step === undefined ? undefined : mode === "scoreRate" ? "scoreRate" : "bpi";
+
   return (
     <DashCard>
       <style dangerouslySetInnerHTML={{ __html: animationStyles }} />
@@ -328,6 +356,36 @@ export const DistributionChart = ({
                 <div className="h-2 w-2 rounded-full bg-bpim-warning opacity-60" />
                 <span className="text-xs text-bpim-warning">{effectiveRivalName}</span>
               </div>
+            </div>
+          )}
+          {mode !== undefined && onModeChange && (
+            <div className="flex items-center rounded-md border border-bpim-border">
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={() => onModeChange("rank")}
+                className={cn(
+                  "rounded-r-none border-r border-bpim-border",
+                  mode === "rank" && "bg-bpim-overlay",
+                )}
+                aria-pressed={mode === "rank"}
+                title={t("dashboard.distribution.modeRank")}
+              >
+                <Medal />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={() => onModeChange("scoreRate")}
+                className={cn(
+                  "rounded-l-none",
+                  mode === "scoreRate" && "bg-bpim-overlay",
+                )}
+                aria-pressed={mode === "scoreRate"}
+                title={t("dashboard.distribution.modeScoreRate")}
+              >
+                <Percent />
+              </Button>
             </div>
           )}
           {step !== undefined && (
@@ -421,6 +479,7 @@ export const DistributionChart = ({
                   showLabel={showLabel}
                   showCount={showCount}
                   step={step}
+                  unit={unit}
                   myName={effectiveMyName}
                   rivalName={effectiveRivalName}
                   dense={myData.length > 30}
