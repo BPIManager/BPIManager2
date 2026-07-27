@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { versionsOptions } from "@/constants/iidx/versionTitles";
-import { BookmarkletAccordion } from "../View/bookmarklet";
+import { BookmarkletAccordion } from "../Bookmarklet";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 export interface TowerImportProps {

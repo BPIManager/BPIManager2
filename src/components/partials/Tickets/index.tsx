@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { BookmarkletAccordion } from "@/components/partials/Import/View/bookmarklet";
+import { BookmarkletAccordion } from "@/components/partials/Import/Bookmarklet";
 import { TicketCard } from "@/components/partials/Tickets/TicketCard";
 import { TicketCardSkeleton } from "@/components/partials/Tickets/TicketSkeleton";
 import { TicketFeatureDescription } from "@/components/partials/Tickets/FeatureDescription";

@@ -9,13 +9,13 @@ import {
   TrendingDown,
   Minus,
 } from "lucide-react";
-import Fireworks from "react-canvas-confetti/dist/presets/fireworks";
 import { useUser } from "@/contexts/users/UserContext";
 import { LordiconAnimation } from "@/components/ui/lordicon-animation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import { ResultModalShell } from "../ResultModalShell";
 
 interface Props {
   result: {
@@ -63,93 +63,19 @@ export const ImportSuccessModal = ({ result, version, onClose }: Props) => {
   const isUnchanged = bpiDiff === 0;
 
   return (
-    <div className="fixed inset-0 z-1000 flex items-center justify-center bg-bpim-bg/80 backdrop-blur-sm p-4">
-      {isImproved && (
-        <Fireworks
-          autorun={{ speed: 2, duration: 1500 }}
-          style={{
-            position: "fixed",
-            inset: 0,
-            width: "100%",
-            height: "100%",
-            zIndex: 1001,
-            pointerEvents: "none",
-          }}
-        />
-      )}
-
-      <div className="relative z-1002 flex w-full max-w-100 flex-col items-center gap-7 rounded-2xl border border-bpim-border bg-bpim-surface-2 p-8 text-center shadow-2xl">
-        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-bpim-primary/10 text-bpim-primary">
-          {isImproved ? (
-            <LordiconAnimation src="/lottie/trending-up.json" trigger="loop" />
-          ) : (
-            <ScrollText size={32} />
-          )}
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <h2 className="text-xl font-black tracking-tight text-bpim-text uppercase">
-            {t("import.success.title")}
-          </h2>
-          <p className="text-sm font-medium text-bpim-muted">
-            {result.updatedCount} {t("import.success.updatedCount")}
-          </p>
-        </div>
-
-        {result.newTotalBpi !== undefined && (
-          <div className="flex w-full flex-col gap-4 py-2">
-            <span className="text-[10px] font-black tracking-[0.2em] text-bpim-muted uppercase">
-              {t("import.success.bpiChange")}
-            </span>
-
-            <div className="flex items-center justify-center gap-6">
-              {result.previousTotalBpi !== undefined && (
-                <span className="font-mono text-xl font-bold text-bpim-subtle">
-                  {result.previousTotalBpi.toFixed(2)}
-                </span>
-              )}
-
-              <ChevronRight size={20} className="text-bpim-subtle" />
-
-              <span className="font-mono text-4xl font-black text-bpim-text tabular-nums leading-none">
-                {displayBpi.toFixed(2)}
-              </span>
-            </div>
-
-            <div className="flex justify-center">
-              <Badge
-                variant="outline"
-                className={cn(
-                  "flex items-center gap-1.5 rounded-full px-4 py-1 border-none font-black text-xs tracking-widest",
-                  isImproved && "bg-green-500/10 text-bpim-success",
-                  isUnchanged && "bg-slate-500/10 text-bpim-muted",
-                  !isImproved &&
-                    !isUnchanged &&
-                    "bg-bpim-danger/10 text-bpim-danger",
-                )}
-              >
-                {isImproved ? (
-                  <TrendingUp size={14} />
-                ) : isUnchanged ? (
-                  <Minus size={14} />
-                ) : (
-                  <TrendingDown size={14} />
-                )}
-                <span>
-                  {isImproved
-                    ? t("import.success.bpiRise")
-                    : isUnchanged
-                    ? t("import.success.bpiUnchanged")
-                    : t("import.success.bpiFall")}{" "}
-                  : {bpiDiff > 0 ? "+" : ""}
-                  {bpiDiff.toFixed(2)}
-                </span>
-              </Badge>
-            </div>
-          </div>
-        )}
-
-        <div className="flex w-full flex-col gap-3">
+    <ResultModalShell
+      showFireworks={isImproved}
+      icon={
+        isImproved ? (
+          <LordiconAnimation src="/lottie/trending-up.json" trigger="loop" />
+        ) : (
+          <ScrollText size={32} />
+        )
+      }
+      title={t("import.success.title")}
+      subtitle={`${result.updatedCount} ${t("import.success.updatedCount")}`}
+      actions={
+        <>
           <Button
             size="lg"
             className="w-full bg-bpim-primary font-black text-bpim-text hover:bg-bpim-primary active:scale-95 transition-all"
@@ -178,8 +104,61 @@ export const ImportSuccessModal = ({ result, version, onClose }: Props) => {
           >
             {t("common.close")}
           </Button>
+        </>
+      }
+    >
+      {result.newTotalBpi !== undefined && (
+        <div className="flex w-full flex-col gap-4 py-2">
+          <span className="text-[10px] font-black tracking-[0.2em] text-bpim-muted uppercase">
+            {t("import.success.bpiChange")}
+          </span>
+
+          <div className="flex items-center justify-center gap-6">
+            {result.previousTotalBpi !== undefined && (
+              <span className="font-mono text-xl font-bold text-bpim-subtle">
+                {result.previousTotalBpi.toFixed(2)}
+              </span>
+            )}
+
+            <ChevronRight size={20} className="text-bpim-subtle" />
+
+            <span className="font-mono text-4xl font-black text-bpim-text tabular-nums leading-none">
+              {displayBpi.toFixed(2)}
+            </span>
+          </div>
+
+          <div className="flex justify-center">
+            <Badge
+              variant="outline"
+              className={cn(
+                "flex items-center gap-1.5 rounded-full px-4 py-1 border-none font-black text-xs tracking-widest",
+                isImproved && "bg-green-500/10 text-bpim-success",
+                isUnchanged && "bg-slate-500/10 text-bpim-muted",
+                !isImproved &&
+                  !isUnchanged &&
+                  "bg-bpim-danger/10 text-bpim-danger",
+              )}
+            >
+              {isImproved ? (
+                <TrendingUp size={14} />
+              ) : isUnchanged ? (
+                <Minus size={14} />
+              ) : (
+                <TrendingDown size={14} />
+              )}
+              <span>
+                {isImproved
+                  ? t("import.success.bpiRise")
+                  : isUnchanged
+                    ? t("import.success.bpiUnchanged")
+                    : t("import.success.bpiFall")}{" "}
+                : {bpiDiff > 0 ? "+" : ""}
+                {bpiDiff.toFixed(2)}
+              </span>
+            </Badge>
+          </div>
         </div>
-      </div>
-    </div>
+      )}
+    </ResultModalShell>
   );
 };

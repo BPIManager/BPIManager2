@@ -12,9 +12,9 @@ import {
 import { Trash2, Upload, AlertCircle, CheckCircle2 } from "lucide-react";
 import { versionsOptions } from "@/constants/iidx/versionTitles";
 import { iidxUrl } from "@/constants/iidx/eamusementUrls";
-import { BookmarkletAccordion } from "../View/bookmarklet";
-import { AndroidAppAccordion } from "../View/android";
-import { InstructionSection } from "../View/instruction";
+import { BookmarkletAccordion } from "../Bookmarklet";
+import { AndroidAppAccordion } from "../AndroidApp";
+import { InstructionSection } from "../Instruction";
 import {
   type CsvType,
   CSV_TYPE_LABELS,
