@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { SongWithScore } from "@/types/songs/score";
+import type { SongDetailSubject } from "@/utils/songs/songDetailMode";
+import { hasBpiData } from "@/utils/songs/songDetailMode";
 import { RivalRankingBody, GlobalRankingBody } from "./ui";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { versionsNonDisabledCollection } from "@/constants/iidx/versionTitles";
@@ -18,13 +19,14 @@ import { RivalComparisonModal } from "@/components/partials/UserList/Modal";
 import { useRadar } from "@/hooks/stats/useRadar";
 import { useUser } from "@/contexts/users/UserContext";
 
-export default function RivalsRanking({ song }: { song: SongWithScore }) {
+export default function RivalsRanking({ song }: { song: SongDetailSubject }) {
   const { fbUser } = useUser();
   const [version, setVersion] = useState<string>(latestVersion);
   const [tab, setTab] = useState<"rivals" | "global">("rivals");
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { radar: viewerRadar } = useRadar(fbUser?.uid, [], [], version);
+  const notes = hasBpiData(song) ? undefined : song.notes;
 
   const handleNavigate = (userId: string) => {
     setSelectedUserId(userId);
@@ -67,6 +69,7 @@ export default function RivalsRanking({ song }: { song: SongWithScore }) {
             songId={song.songId}
             version={version}
             myScore={song}
+            notes={notes}
             onNavigate={handleNavigate}
           />
         </TabsContent>
@@ -76,6 +79,7 @@ export default function RivalsRanking({ song }: { song: SongWithScore }) {
             songId={song.songId}
             version={version}
             myScore={song}
+            notes={notes}
             onNavigate={handleNavigate}
           />
         </TabsContent>

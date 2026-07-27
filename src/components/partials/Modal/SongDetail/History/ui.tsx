@@ -1,44 +1,52 @@
 "use client";
 
 import { useMemo } from "react";
-import dayjs from "@/lib/dayjs";
 import { useUser } from "@/contexts/users/UserContext";
 import { useScoreHistory } from "@/hooks/score/useScoreLogs";
-import { Score } from "@/types/db";
+import { useAllScoreHistory } from "@/hooks/allScores/useAllScoresHistory";
 import { versionTitles } from "@/constants/iidx/versionTitles";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { cn } from "@/lib/utils";
-import { Crown, TrendingUp, History, Calendar } from "lucide-react";
+import { History } from "lucide-react";
 import { SectionLoader } from "@/components/ui/loading-spinner";
+import { HistoryRecordCard } from "@/components/partials/Songs/HistoryRecordCard";
 
 interface SongHistoryTabProps {
   songId: number;
+  /** 全難易度スコア(BPI未計算)の場合に notes を渡す。BPIの代わりにnotes基準の%を表示する */
+  notes?: number;
 }
 
-export const SongHistoryTab = ({ songId }: SongHistoryTabProps) => {
+export const SongHistoryTab = ({ songId, notes }: SongHistoryTabProps) => {
   const { fbUser } = useUser();
-  const { historyGroups, isLoading, isError } = useScoreHistory(
-    fbUser?.uid,
-    songId,
-  );
+  const isAllScores = notes != null;
+
+  const {
+    historyGroups: mainHistory,
+    isLoading: mainLoading,
+    isError: mainError,
+  } = useScoreHistory(isAllScores ? undefined : fbUser?.uid, songId);
+  const {
+    historyGroups: allHistory,
+    isLoading: allLoading,
+    isError: allError,
+  } = useAllScoreHistory(fbUser?.uid, songId, isAllScores);
+
+  const historyGroups = isAllScores ? allHistory : mainHistory;
+  const isLoading = isAllScores ? allLoading : mainLoading;
+  const isError = isAllScores ? allError : mainError;
 
   const globalMaxScore = useMemo(() => {
     if (!historyGroups) return 0;
     return Math.max(
       ...Object.values(historyGroups)
         .flat()
-        .map((s) => s.exScore),
+        .map((s) => s.exScore ?? 0),
     );
   }, [historyGroups]);
 
-  if (isLoading) {
-    return (
-      <SectionLoader className="h-64" />
-    );
-  }
+  if (isLoading) return <SectionLoader className="h-64" />;
 
-  if (isError || !historyGroups || Object.keys(historyGroups).length === 0) {
+  if (isError || !historyGroups || Object.keys(historyGroups).length === 0)
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-20">
         <History className="h-10 w-10 text-bpim-subtle" />
@@ -47,7 +55,6 @@ export const SongHistoryTab = ({ songId }: SongHistoryTabProps) => {
         </p>
       </div>
     );
-  }
 
   const sortedVersions = Object.keys(historyGroups).sort(
     (a, b) => Number(b) - Number(a),
@@ -56,8 +63,10 @@ export const SongHistoryTab = ({ songId }: SongHistoryTabProps) => {
   return (
     <div className="flex flex-col gap-6 max-h-[45svh] overflow-y-auto pr-2 custom-scrollbar">
       {sortedVersions.map((version) => {
-        const vInfo = versionTitles.find((v) => v.num === version);
-        const displayTitle = vInfo ? vInfo.title : `Ver.${version}`;
+        const records = historyGroups[version];
+        const displayTitle =
+          versionTitles.find((v) => v.num === version)?.title ??
+          `Ver.${version}`;
 
         return (
           <div key={version} className="flex flex-col">
@@ -69,84 +78,18 @@ export const SongHistoryTab = ({ songId }: SongHistoryTabProps) => {
             </div>
 
             <div className="flex flex-col gap-2.5">
-              {historyGroups[version].map((record: Score, idx: number) => {
-                const prevInVersion = historyGroups[version][idx + 1];
-                const scoreDiff = prevInVersion
-                  ? record.exScore - prevInVersion.exScore
-                  : null;
-
-                const isGlobalBest =
-                  record.exScore === globalMaxScore && globalMaxScore > 0;
-
+              {records.map((record, idx) => {
+                const prev = records[idx + 1];
                 return (
-                  <div
+                  <HistoryRecordCard
                     key={record.logId}
-                    className={cn(
-                      "group relative flex flex-col gap-2 rounded-lg border-l-3 bg-bpim-surface-2/60 p-3 transition-colors hover:bg-bpim-overlay",
-                      isGlobalBest
-                        ? "border-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.1)]"
-                        : "border-bpim-border",
-                    )}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1.5 text-bpim-muted">
-                        <Calendar className="h-3 w-3" />
-                        <span className="font-mono text-[10px] font-medium">
-                          {dayjs(record.lastPlayed)
-                            .tz()
-                            .format("YYYY/MM/DD HH:mm")}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        {scoreDiff !== null && scoreDiff > 0 && (
-                          <Badge
-                            variant="secondary"
-                            className="h-4 bg-green-500/10 text-bpim-success border-green-500/20 px-1.5 text-[9px] font-bold"
-                          >
-                            <TrendingUp className="mr-0.5 h-2.5 w-2.5" />+
-                            {scoreDiff}
-                          </Badge>
-                        )}
-
-                        {isGlobalBest && (
-                          <Badge className="h-4 bg-bpim-warning px-1.5 text-[9px] font-black border-none">
-                            <Crown className="mr-0.5 h-2.5 w-2.5" />
-                            BEST
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="flex items-end justify-between">
-                      <div className="flex flex-col gap-0">
-                        <span
-                          className={cn(
-                            "font-mono text-lg font-black leading-none tracking-tighter",
-                            isGlobalBest
-                              ? "text-bpim-warning"
-                              : "text-bpim-text",
-                          )}
-                        >
-                          {record.exScore}
-                        </span>
-                        <span className="font-mono text-[10px] font-bold text-bpim-muted">
-                          BPI: {(record.bpi || -15).toFixed(2)}
-                        </span>
-                      </div>
-
-                      <div className="flex flex-col items-end gap-0.5">
-                        <span className="text-[10px] font-black uppercase text-bpim-text">
-                          {record.clearState || "NO PLAY"}
-                        </span>
-                        {record.missCount !== null && (
-                          <span className="font-mono text-[9px] font-bold text-bpim-danger/80">
-                            MISS: {record.missCount}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+                    record={record}
+                    scoreDiff={prev ? record.exScore - prev.exScore : null}
+                    isGlobalBest={
+                      globalMaxScore > 0 && record.exScore === globalMaxScore
+                    }
+                    notes={notes}
+                  />
                 );
               })}
             </div>
