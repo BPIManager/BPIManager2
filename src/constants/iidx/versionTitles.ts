@@ -10,6 +10,7 @@ export const versionTitles: VersionTitle[] = [
   { num: "31", title: "31 EPOLIS" },
   { num: "32", title: "32 Pinky Crush" },
   { num: "33", title: "33 Sparkle Shower", default: true },
+  { num: "34", title: "34 ZINRAI", disabled: true },
   { num: "INF", title: "INFINITAS" },
 ];
 
@@ -71,4 +72,5 @@ export const verNameArr: string[] = [
   "31 EPOLIS",
   "32 Pinky Crush",
   "33 Sparkle Shower",
+  "34 ZINRAI",
 ];

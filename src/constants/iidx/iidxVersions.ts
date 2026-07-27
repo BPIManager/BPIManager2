@@ -10,6 +10,7 @@ export const IIDX_VERSIONS = [
   "31",
   "32",
   "33",
+  "34",
   "INF",
 ] as const;
 
