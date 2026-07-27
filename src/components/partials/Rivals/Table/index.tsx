@@ -12,7 +12,7 @@ import { NoDataAlert } from "@/components/partials/DashBoard/NoData";
 import { LoginRequiredCard } from "@/components/partials/LoginRequired/ui";
 import { CustomPagination } from "@/components/partials/Pagination/ui";
 import { AdvancedFilterModal } from "@/components/partials/Songs/AdvancedFilter/ui";
-import { SongDetailView } from "@/components/partials/Modal/BPIChart/SongDetails/ui";
+import { SongDetailView } from "@/components/partials/Modal/SongDetail/ui";
 import { RivalSongItem } from "./ui";
 import { RivalAnalysis } from "@/components/partials/Rivals/Analysis/ui";
 import { List, BarChart2 } from "lucide-react";

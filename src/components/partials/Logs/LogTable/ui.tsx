@@ -1,7 +1,7 @@
 import { useState, useMemo, RefObject } from "react";
 import { useSongFilter, PAGE_SIZE } from "@/hooks/table/useSongFilter";
 import { mapBatchToSongs } from "@/utils/logs/getSongTable";
-import { SongDetailView } from "../../Modal/BPIChart/SongDetails/ui";
+import { SongDetailView } from "../../Modal/SongDetail/ui";
 import { CustomPagination } from "../../Pagination/ui";
 import { AdvancedFilterModal } from "../../Songs/AdvancedFilter/ui";
 import { SongFilterBar } from "../../Songs/Filter/ui";

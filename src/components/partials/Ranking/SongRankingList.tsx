@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select";
 import type { SongRankEntry } from "@/types/users/ranking";
 import type { AllSongWithScore, AllDifficulties } from "@/types/songs/allSongs";
-import { AllSongDetailModal } from "@/components/partials/AllSongs/Modal";
+import { SongDetailView } from "@/components/partials/Modal/SongDetail/ui";
 import { ALL_LEVELS } from "@/constants/iidx/songLevels";
 import { Search } from "lucide-react";
 
@@ -285,7 +285,7 @@ export const SongRankingList = ({ version }: SongRankingListProps) => {
         </div>
       </div>
 
-      <AllSongDetailModal
+      <SongDetailView
         song={selectedSong}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

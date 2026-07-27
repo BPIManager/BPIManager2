@@ -5,7 +5,7 @@ import { SongWithScore } from "@/types/songs/score";
 import { useSongFilter, PAGE_SIZE } from "@/hooks/table/useSongFilter";
 import { useUnplayedScores } from "@/hooks/table/useUnplayedScores";
 import { NoDataAlert } from "../DashBoard/NoData";
-import { SongDetailView } from "../Modal/BPIChart/SongDetails/ui";
+import { SongDetailView } from "../Modal/SongDetail/ui";
 import { CustomPagination } from "../Pagination/ui";
 import { AdvancedFilterModal } from "../Songs/AdvancedFilter/ui";
 import { SongFilterBar } from "../Songs/Filter/ui";

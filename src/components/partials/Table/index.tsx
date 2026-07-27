@@ -6,7 +6,7 @@ import { useSongFilter } from "@/hooks/table/useSongFilter";
 import { SongFilterBar } from "../Songs/Filter/ui";
 import { SongList } from "./ui";
 import { CustomPagination } from "../Pagination/ui";
-import { SongDetailView } from "../Modal/BPIChart/SongDetails/ui";
+import { SongDetailView } from "../Modal/SongDetail/ui";
 import { useUserScores } from "@/hooks/table/useUserScores";
 import { useCompareScores } from "@/hooks/table/useCompareScores";
 import { NoDataAlert } from "../DashBoard/NoData";

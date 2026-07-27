@@ -4,7 +4,7 @@ import { NeighborRecommendedItem } from "@/types/stats/neighborRecommended";
 import { SimpleRankItem } from "./Common/SimpleRankItem";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { SongWithScore } from "@/types/songs/score";
-import { SongDetailView } from "../../Modal/BPIChart/SongDetails/ui";
+import { SongDetailView } from "../../Modal/SongDetail/ui";
 import { NearLoseList } from "./NearLose";
 import { DashCard } from "@/components/ui/dashcard";
 import { InfiniteScrollContainer } from "../../InfiniteScroll/ui";

@@ -6,7 +6,7 @@ import { CustomPagination } from "../Pagination/ui";
 import { AllSongWithScore } from "@/types/songs/allSongs";
 import { AllSongFilterBar } from "./Filter";
 import { AllSongList } from "./Table";
-import { AllSongDetailModal } from "./Modal";
+import { SongDetailView } from "@/components/partials/Modal/SongDetail/ui";
 import {
   useAllSongsFilter,
   PAGE_SIZE,
@@ -59,7 +59,7 @@ export const AllSongsTable = ({ userId }: { userId: string | undefined }) => {
         )}
       </main>
 
-      <AllSongDetailModal
+      <SongDetailView
         song={selected}
         isOpen={isDetailOpen}
         onClose={() => setIsDetailOpen(false)}
