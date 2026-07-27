@@ -142,11 +142,17 @@ export const ImportView = (props: Props) => {
                         }
                       >
                         <SelectTrigger className="w-full border-bpim-border bg-bpim-surface-2/60 text-sm md:w-75">
-                          <SelectValue placeholder={t("import.version.placeholder")} />
+                          <SelectValue
+                            placeholder={t("import.version.placeholder")}
+                          />
                         </SelectTrigger>
                         <SelectContent className="border-bpim-border bg-bpim-bg text-bpim-text">
                           {versionsOptions.map((v) => (
-                            <SelectItem key={v.value} value={v.value}>
+                            <SelectItem
+                              key={v.value}
+                              value={v.value}
+                              disabled={v.disabled}
+                            >
                               {v.label}
                             </SelectItem>
                           ))}
@@ -170,7 +176,8 @@ export const ImportView = (props: Props) => {
                         onClick={() => props.setCsvData("")}
                         disabled={!props.csvData || props.isProcessing}
                       >
-                        <Trash2 className="mr-2 h-4 w-4" /> {t("import.button.clear")}
+                        <Trash2 className="mr-2 h-4 w-4" />{" "}
+                        {t("import.button.clear")}
                       </Button>
                       <Button
                         className="w-full bg-bpim-primary px-8 font-bold text-white hover:bg-bpim-primary sm:w-auto"
@@ -185,7 +192,8 @@ export const ImportView = (props: Props) => {
                           </>
                         ) : (
                           <>
-                            <Upload className="mr-2 h-4 w-4" /> {t("import.button.start")}
+                            <Upload className="mr-2 h-4 w-4" />{" "}
+                            {t("import.button.start")}
                           </>
                         )}
                       </Button>
