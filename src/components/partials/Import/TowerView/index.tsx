@@ -1,10 +1,4 @@
-import {
-  Trash2,
-  Upload,
-  AlertCircle,
-  CheckCircle2,
-  HelpCircle,
-} from "lucide-react";
+import { Trash2, Upload, AlertCircle, CheckCircle2 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -19,7 +13,7 @@ import { versionsOptions } from "@/constants/iidx/versionTitles";
 import { BookmarkletAccordion } from "../View/bookmarklet";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
-interface Props {
+export interface TowerImportProps {
   csvData: string;
   setCsvData: (v: string) => void;
   selectedVersion: string[];
@@ -48,7 +42,7 @@ export const TowerImportView = ({
   isProcessing,
   processStatus,
   onStartImport,
-}: Props) => {
+}: TowerImportProps) => {
   const { t } = useTranslation();
   const isValid = csvData.trim() ? isValidTowerCsv(csvData) : null;
   const towerDownloadUrl =
@@ -121,7 +115,7 @@ export const TowerImportView = ({
           </SelectTrigger>
           <SelectContent className="border-bpim-border bg-bpim-bg text-bpim-text">
             {versionsOptions.map((v) => (
-              <SelectItem key={v.value} value={v.value}>
+              <SelectItem key={v.value} value={v.value} disabled={v.disabled}>
                 {v.label}
               </SelectItem>
             ))}

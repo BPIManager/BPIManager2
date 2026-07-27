@@ -1,7 +1,7 @@
 import { Meta } from "@/components/partials/Head";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { ImportSuccessModal } from "@/components/partials/Import/SuccessModal/ui";
-import { ImportView } from "@/components/partials/Import/View/ui";
+import { ImportView } from "@/components/partials/Import/View";
 import AccountSettings from "@/components/partials/Modal/AccountSettings";
 import { dummyCsv } from "@/constants/ui/dummyCsv";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
@@ -70,21 +70,25 @@ export default function ImportPage() {
       <ImportView
         defaultTab={defaultTab}
         isLoggedIn={!!user?.userId}
-        csvData={csvData}
-        setCsvData={handleSetCsvData}
-        detectedType={detectedType}
-        selectedVersion={selectedVersion}
-        setSelectedVersion={setSelectedVersion}
-        isProcessing={isProcessing}
-        processStatus={processStatus}
-        onStartImport={onStartImport}
-        towerCsvData={towerCsvData}
-        setTowerCsvData={setTowerCsvData}
-        towerSelectedVersion={towerSelectedVersion}
-        setTowerSelectedVersion={setTowerSelectedVersion}
-        isTowerProcessing={isTowerProcessing}
-        towerProcessStatus={towerProcessStatus}
-        onStartTowerImport={onStartTowerImport}
+        score={{
+          csvData,
+          setCsvData: handleSetCsvData,
+          detectedType,
+          selectedVersion,
+          setSelectedVersion,
+          isProcessing,
+          processStatus,
+          onStartImport,
+        }}
+        tower={{
+          csvData: towerCsvData,
+          setCsvData: setTowerCsvData,
+          selectedVersion: towerSelectedVersion,
+          setSelectedVersion: setTowerSelectedVersion,
+          isProcessing: isTowerProcessing,
+          processStatus: towerProcessStatus,
+          onStartImport: onStartTowerImport,
+        }}
       />
 
       <ImportSuccessModal
