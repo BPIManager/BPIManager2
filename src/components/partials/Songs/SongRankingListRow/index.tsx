@@ -2,6 +2,7 @@ import { Lock } from "lucide-react";
 import type { RowComponentProps } from "react-window";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { formatRankingRate } from "@/utils/songs/rankingRate";
 import type { SongRankingEntry } from "@/types/users/ranking";
 
 export const RANKING_ROW_HEIGHT = 48;
@@ -10,12 +11,16 @@ export interface SongRankingRowProps {
   rankings: SongRankingEntry[];
   selfExScore?: number | null;
   onNavigate: (userId: string) => void;
+  /** 全難易度スコア(BPI未計算)の場合に渡す。渡された場合はBPIの代わりにnotes基準の%を表示する */
+  notes?: number;
 }
 
 export function SongRankingTableHeader({
   showDiff = false,
+  rateLabel = "EX / BPI",
 }: {
   showDiff?: boolean;
+  rateLabel?: string;
 }) {
   return (
     <div
@@ -33,7 +38,7 @@ export function SongRankingTableHeader({
         Player
       </span>
       <span className="mr-2 text-right text-[10px] font-bold uppercase tracking-wider text-bpim-muted">
-        EX / BPI
+        {rateLabel}
       </span>
       {showDiff && (
         <span className="text-right text-[10px] font-bold uppercase tracking-wider text-bpim-muted">
@@ -50,6 +55,7 @@ export function SongRankingListRow({
   rankings,
   selfExScore,
   onNavigate,
+  notes,
 }: RowComponentProps<SongRankingRowProps>) {
   const row = rankings[index];
   if (!row) return null;
@@ -119,7 +125,7 @@ export function SongRankingListRow({
           {row.exScore ?? 0}
         </span>
         <span className="font-mono text-[10px] text-bpim-muted">
-          {row.bpi?.toFixed(1) ?? "-"}
+          {formatRankingRate(row, notes)}
         </span>
       </div>
 
