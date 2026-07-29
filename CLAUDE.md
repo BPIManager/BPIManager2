@@ -9,7 +9,8 @@ beatmania IIDXのスコア管理Webアプリ。Next.js (App Router **ではな�
 ```bash
 pnpm dev        # 開発サーバー起動 (--experimental-https)
 pnpm build      # ビルド
-pnpm test       # vitest
+pnpm test       # vitest（unit + integration）
+pnpm test:unit  # vitest（外部依存なしのunitのみ、日常はこちら）
 pnpm lint       # eslint
 ```
 
@@ -41,7 +42,7 @@ src/
 - **パスエイリアス**: `@/` → `src/`
 - **DB型**: `src/types/db.ts` はkysely-codegenで自動生成
 - **認証**: Firebase Auth（クライアント） + Firebase Admin（APIルート）
-- **テスト**: vitest + @testing-library/react、`test/` ディレクトリ
+- **テスト**: vitest + @testing-library/react、`test/unit`（外部依存なし）/ `test/integration`（devサーバー等が前提）に分離。詳細は [test/README.md](test/README.md)
 
 ## コアドメイン
 
@@ -72,7 +73,8 @@ src/
 - Kyselyクエリは `src/lib/db/[ドメイン]/index.ts` に集約
 - SWRフックは `src/hooks/[ドメイン]/` に配置、フェッチャーは `src/services/swr/` に分離
 - `src/constants/radars/topElements.json` (~95KB) は大きいので直接読まない
-- 新しいDB参照クエリを書くときは既存のDBスキーマ(/migration/schema.sql)を確認し、インデックスが最適化どうかを確認すること。可能であれば、既存のインデックスで高速なクエリを書くように努める。
+- 新しいDB参照クエリを書くときは既存のDBスキーマ(`migrations/schema.sql`)を確認し、インデックスが最適化どうかを確認すること。可能であれば、既存のインデックスで高速なクエリを書くように努める。
+- 複数テーブルにまたがる書き込み(バッチ削除等)を実装するときは、各テーブルへのクエリはそのテーブルを所有するドメインリポジトリ(`src/lib/db/[ドメイン]/index.ts`)のメソッドとして実装し、他ドメインのテーブルへ直接クエリを書かない。トランザクションを開始する側は`db.transaction().execute(trx => ...)`で各ドメインのメソッドを呼び出す**オーケストレーション役**に徹する。各メソッドは第一引数に`trx: Transaction<Database>`を受け取り、呼び出し元のトランザクションに参加できるようにする(例: [`src/lib/db/scores/index.ts`](src/lib/db/scores/index.ts)の`deleteByBatch`、[`src/lib/db/logs/navigation.ts`](src/lib/db/logs/navigation.ts)の`deleteBatch`)。
 
 ### `components/partials/` ファイル規則
 
@@ -89,6 +91,12 @@ partials/
 
 - 共通化可能な汎用ロジックは `/utils` または `/services`、型定義は `/types` に格納
 - UI のみのコンポーネントでも必ずフォルダを作り `index.tsx` に配置（`ui.tsx` に分離するかはロジックの有無で判断）
+- この規則は主に「他の機能から再利用される独立したコンポーネント」を対象とする。あるフォルダの `index.tsx`/`ui.tsx` を読みやすくするために内部でのみ使う分割ファイル（例: `AdvancedFilter/BpmSection.tsx` のような private なセクション分割）はそのフォルダ内に置いてよく、個別にフォルダ化する必要はない
+- 2つ以上のコンポーネントで見た目や構造(モーダルの殻、カードのレイアウト等)が重複したら、共通の親コンポーネント配下ではなく `partials/` 直下に共有プレゼンテーション用コンポーネント（例: `ResultModalShell/`）として切り出し、差分だけを `children` / props で渡す
+
+### Props設計
+
+- 1つのコンポーネントが複数の独立した機能領域(タブ、セクション等)を扱う場合、フラットなpropsを並べるのではなく機能単位でオブジェクトにグルーピングする（例: `score: ScoreImportProps` / `tower: TowerImportProps`）。目安として1コンポーネントのpropsが10個を超えたらグルーピングを検討する
 
 ## よく参照する型
 
