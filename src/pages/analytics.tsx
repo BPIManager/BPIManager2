@@ -8,7 +8,7 @@ import { DashboardLayout } from "@/components/partials/Main";
 import { PageContainer, PageHeader } from "@/components/partials/Header";
 import { Meta } from "@/components/partials/Head";
 import { Button } from "@/components/ui/button";
-import { LoginRequiredCard } from "@/components/partials/LoginRequired/ui";
+import { RequireAuth } from "@/components/partials/RequireAuth";
 import { useUser } from "@/contexts/users/UserContext";
 
 import {
@@ -106,74 +106,61 @@ export default function AnalyticsPage() {
     version,
   );
 
-  if (!router.isReady || isUserLoading) {
-    return (
-      <DashboardLayout>
-        <div className="flex h-[90vh] items-center justify-center">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-bpim-border border-t-bpim-primary" />
-        </div>
-      </DashboardLayout>
-    );
-  }
-
-  if (!fbUser) {
-    return (
-      <DashboardLayout>
-        <LoginRequiredCard />
-      </DashboardLayout>
-    );
-  }
-
   return (
-    <DashboardLayout>
-      <Meta title={t("page.analytics.title")} noIndex />
+    <RequireAuth
+      isLoading={!router.isReady || isUserLoading}
+      isAuthenticated={!!fbUser}
+    >
+      <DashboardLayout>
+        <Meta title={t("page.analytics.title")} noIndex />
 
-      <PageHeader
-        title={t("page.analytics.title")}
-        description={t("page.analytics.desc")}
-        rightElement={
-          target ? (
-            <div className="flex items-center gap-2">
-              <TargetBadge
-                target={target}
+        <PageHeader
+          title={t("page.analytics.title")}
+          description={t("page.analytics.desc")}
+          rightElement={
+            target ? (
+              <div className="flex items-center gap-2">
+                <TargetBadge
+                  target={target}
+                  onClick={() => setIsSelectorOpen(true)}
+                />
+              </div>
+            ) : (
+              <Button
                 onClick={() => setIsSelectorOpen(true)}
+                variant="outline"
+                className="border-bpim-border bg-bpim-surface text-bpim-text hover:bg-bpim-overlay"
+              >
+                <Settings2 className="mr-2 h-4 w-4" />
+                {t("page.analytics.setTarget")}
+              </Button>
+            )
+          }
+        />
+
+        <PageContainer>
+          {!target ? (
+            <EmptyState onOpen={() => setIsSelectorOpen(true)} />
+          ) : (
+            <div className="rounded-2xl border border-bpim-border bg-bpim-bg/40 p-1 shadow-xl backdrop-blur-md overflow-hidden">
+              <AnalyticsComparisonTable
+                songs={songs}
+                isLoading={isLoading}
+                error={error}
+                rivalLabel={rivalLabel}
+                target={target}
               />
             </div>
-          ) : (
-            <Button
-              onClick={() => setIsSelectorOpen(true)}
-              variant="outline"
-              className="border-bpim-border bg-bpim-surface text-bpim-text hover:bg-bpim-overlay"
-            >
-              <Settings2 className="mr-2 h-4 w-4" />
-              {t("page.analytics.setTarget")}
-            </Button>
-          )
-        }
-      />
+          )}
+        </PageContainer>
 
-      <PageContainer>
-        {!target ? (
-          <EmptyState onOpen={() => setIsSelectorOpen(true)} />
-        ) : (
-          <div className="rounded-2xl border border-bpim-border bg-bpim-bg/40 p-1 shadow-xl backdrop-blur-md overflow-hidden">
-            <AnalyticsComparisonTable
-              songs={songs}
-              isLoading={isLoading}
-              error={error}
-              rivalLabel={rivalLabel}
-              target={target}
-            />
-          </div>
-        )}
-      </PageContainer>
-
-      <TargetSelectorModal
-        isOpen={isSelectorOpen}
-        current={target}
-        onSelect={handleTargetSelect}
-        onClose={() => setIsSelectorOpen(false)}
-      />
-    </DashboardLayout>
+        <TargetSelectorModal
+          isOpen={isSelectorOpen}
+          current={target}
+          onSelect={handleTargetSelect}
+          onClose={() => setIsSelectorOpen(false)}
+        />
+      </DashboardLayout>
+    </RequireAuth>
   );
 }
