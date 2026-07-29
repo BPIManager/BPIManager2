@@ -5,8 +5,8 @@ import {
   FilterBarContainer,
   FilterCheckboxGroup,
   FilterSearchInput,
-} from "../../Songs/Filter/part";
-import { FilterSelect } from "../../Songs/Filter/select";
+  FilterSelect,
+} from "@/components/partials/FilterControls";
 import { ALL_DIFFICULTIES, ALL_LEVELS } from "@/constants/iidx/songLevels";
 import { toggleArrayItem } from "@/hooks/common/useToggleArray";
 

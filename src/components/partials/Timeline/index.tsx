@@ -3,7 +3,10 @@
 import { Activity, LucideIcon, Swords, UserCheck } from "lucide-react";
 import { SectionLoader } from "@/components/ui/loading-spinner";
 import { TimelineList } from "./ui";
-import { FilterCheckboxGroup, FilterSearchInput } from "../Songs/Filter/part";
+import {
+  FilterCheckboxGroup,
+  FilterSearchInput,
+} from "@/components/partials/FilterControls";
 import { useUser } from "@/contexts/users/UserContext";
 import { LoginRequiredCard } from "../LoginRequired/ui";
 import { Button } from "@/components/ui/button";

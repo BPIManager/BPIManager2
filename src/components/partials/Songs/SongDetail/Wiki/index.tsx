@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Clock, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { LoginRequiredTabContent } from "@/components/partials/LoginRequired/LoginRequiredTabContent";
+import { LoginRequiredTabContent } from "@/components/partials/LoginRequiredTabContent";
 import { ActionConfirmDialog } from "@/components/partials/Modal/Confirmation";
 import { useUser } from "@/contexts/users/UserContext";
 import { useSongNotes, type SongNote } from "@/hooks/songs/useSongNotes";

@@ -8,7 +8,7 @@ import { getRoleCardStyle } from "@/constants/theme/roleCardStyle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import type { RecommendedUser } from "@/types/users/list";
-import { RoleBadge } from "../../UserRole/badge";
+import { RoleBadge } from "../../UserRole";
 import { ROLE_ICON } from "../../Rivals/List/ui";
 import { ArenaClassBadge } from "@/components/partials/ArenaClassBadge";
 

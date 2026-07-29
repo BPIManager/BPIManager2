@@ -2,10 +2,10 @@ import { LucideIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { formatIIDXId } from "@/utils/common/formatIidxId";
-import { FollowSection } from "../../Profile/Sidebar/followStatus";
+import { FollowSection } from "@/components/partials/FollowSection";
 
 import { UserProfileData } from "@/types/users/profile";
-import { RoleBadge } from "../../UserRole/badge";
+import { RoleBadge } from "../../UserRole";
 import { ArenaClassBadge } from "../../ArenaClassBadge";
 import { useTranslation } from "@/hooks/common/useTranslation";
 

@@ -7,7 +7,7 @@ import { getBpiColorStyle } from "@/constants/theme/bpiColor";
 import { getRoleCardStyle } from "@/constants/theme/roleCardStyle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import { RoleBadge } from "../../UserRole/badge";
+import { RoleBadge } from "../../UserRole";
 import { ArenaClassBadge } from "@/components/partials/ArenaClassBadge";
 import dayjs from "@/lib/dayjs";
 

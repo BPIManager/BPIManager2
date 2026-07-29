@@ -1,6 +1,6 @@
 ﻿import { RivalSummaryCard } from "./ui";
 import { RivalSummarySkeleton } from "./skeleton";
-import { RivalWinLossSummaryNotFound } from "../../DashBoard/Rivals/nodata";
+import { RivalWinLossSummaryNotFound } from "@/components/partials/RivalWinLossSummaryNotFound";
 import { RivalSummaryResult } from "@/types/social/rival";
 
 interface RivalListProps {

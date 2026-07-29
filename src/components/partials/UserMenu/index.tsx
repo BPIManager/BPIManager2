@@ -17,9 +17,9 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
-import { RoleBadge } from "../UserRole/badge";
+import { RoleBadge } from "../UserRole";
 import AccountSettings from "../Modal/AccountSettings";
-import { LoginDialog } from "../LoginRequired/LoginDialog";
+import { LoginDialog } from "@/components/partials/LoginDialog";
 
 type MenuItemProps = {
   label: string;

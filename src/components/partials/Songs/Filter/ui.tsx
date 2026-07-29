@@ -19,8 +19,8 @@ import {
   FilterBarContainer,
   FilterCheckboxGroup,
   FilterSearchInput,
-} from "./part";
-import { FilterSelect } from "./select";
+  FilterSelect,
+} from "@/components/partials/FilterControls";
 import { SlidersHorizontal } from "lucide-react";
 import { toggleArrayItem } from "@/hooks/common/useToggleArray";
 import { useTranslation } from "@/hooks/common/useTranslation";
