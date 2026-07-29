@@ -2,20 +2,10 @@
 
 import { ReactNode } from "react";
 import { useRouter } from "next/router";
-import { useProfile } from "@/hooks/users/useProfile";
-import { useUser } from "@/contexts/users/UserContext";
-import { DashboardLayout } from "@/components/partials/Main";
-import { PageContainer } from "@/components/partials/Header";
-import { ProfileSideBar } from "@/components/partials/Profile/Sidebar/ui";
-import { FetchErrorState } from "@/components/partials/FetchErrorState";
-import { Lock, UserMinus } from "lucide-react";
-import { ModeSwitchBanner } from "../../Rivals/ModeSwitch/ui";
+import { ProfileLayoutShell } from "@/components/partials/ProfileLayoutShell";
 import { Tabs } from "@/components/ui/tabs";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
-import { ProfileProvider } from "@/contexts/profile/ProfileContext";
-import { FilterProvider } from "@/contexts/stats/FilterContext";
 import { LayoutDashboard, Music, Table, History } from "lucide-react";
-import { PageLoader } from "@/components/ui/loading-spinner";
 import { AppTabsList, AppTabsTrigger } from "@/components/ui/complex/tabs";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
@@ -31,17 +21,7 @@ export const UserProfileLayout = ({
   children,
 }: UserProfileLayoutProps) => {
   const router = useRouter();
-  const { user } = useUser();
   const { t } = useTranslation();
-  const {
-    profile,
-    isLoading,
-    isError,
-    isPrivate,
-    isNotFound,
-    toggleFollow,
-    isUpdating,
-  } = useProfile(userId);
   const version = (router.query.version as string) || latestVersion;
 
   const scoreParams = new URLSearchParams({
@@ -49,118 +29,52 @@ export const UserProfileLayout = ({
     levels: "12,11",
   }).toString();
 
-  if (isLoading) {
-    return (
-      <DashboardLayout>
-        <PageLoader />
-      </DashboardLayout>
-    );
-  }
-
-  if (isPrivate || isNotFound || isError || !profile) {
-    return (
-      <DashboardLayout>
-        <PageContainer>
-          <FetchErrorState
-            error={isError}
-            title={
-              isPrivate
-                ? "非公開のプロフィール"
-                : isNotFound
-                  ? "ユーザーが見つかりません"
-                  : undefined
-            }
-            description={
-              isPrivate
-                ? "このユーザーはプロフィールを非公開に設定しています。"
-                : isNotFound
-                  ? "指定されたIDのユーザーは存在しないか、退会した可能性があります。"
-                  : undefined
-            }
-            icon={
-              isPrivate ? (
-                <Lock size={48} />
-              ) : isNotFound ? (
-                <UserMinus size={48} />
-              ) : undefined
-            }
-            homeHref="/"
-          />
-        </PageContainer>
-      </DashboardLayout>
-    );
-  }
-
   return (
-    <FilterProvider>
-      <ProfileProvider profile={profile}>
-        <DashboardLayout>
-          <PageContainer>
-            {user && (
-              <ModeSwitchBanner
-                type="user"
-                targetUserId={profile.userId}
-                isMe={user.userId === profile.userId}
-              />
-            )}
-
-            <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-              <div>
-                <ProfileSideBar
-                  profile={profile}
-                  onFollowToggle={toggleFollow}
-                  isUpdating={isUpdating}
-                />
-              </div>
-
-              <div className="lg:col-span-2">
-                <Tabs value={currentTab} className="w-full">
-                  <AppTabsList visual="card" cols={4} className="mb-4 mx-auto">
-                    {[
-                      {
-                        value: "overview",
-                        href: `/users/${userId}`,
-                        label: t("profile.tab.overview"),
-                        icon: LayoutDashboard,
-                      },
-                      {
-                        value: "songs",
-                        href: `/users/${userId}/scores/${latestVersion}?${scoreParams}`,
-                        label: t("profile.tab.scores"),
-                        icon: Music,
-                      },
-                      {
-                        value: "logs",
-                        href: `/users/${userId}/logs/${version}`,
-                        label: t("profile.tab.history"),
-                        icon: History,
-                      },
-                      {
-                        value: "aaaTable",
-                        href: `/users/${userId}/aaaTable/${version}`,
-                        label: t("profile.tab.aaaTable"),
-                        icon: Table,
-                      },
-                    ].map((tab) => (
-                      <AppTabsTrigger
-                        key={tab.value}
-                        value={tab.value}
-                        visual="card"
-                        icon={tab.icon}
-                        href={tab.href}
-                        iconOnly
-                      >
-                        {tab.label}
-                      </AppTabsTrigger>
-                    ))}
-                  </AppTabsList>
-                  {children}
-                </Tabs>
-              </div>
-            </div>
-          </PageContainer>
-        </DashboardLayout>
-      </ProfileProvider>
-    </FilterProvider>
+    <ProfileLayoutShell userId={userId} bannerType="user">
+      {() => (
+        <Tabs value={currentTab} className="w-full">
+          <AppTabsList visual="card" cols={4} className="mb-4 mx-auto">
+            {[
+              {
+                value: "overview",
+                href: `/users/${userId}`,
+                label: t("profile.tab.overview"),
+                icon: LayoutDashboard,
+              },
+              {
+                value: "songs",
+                href: `/users/${userId}/scores/${latestVersion}?${scoreParams}`,
+                label: t("profile.tab.scores"),
+                icon: Music,
+              },
+              {
+                value: "logs",
+                href: `/users/${userId}/logs/${version}`,
+                label: t("profile.tab.history"),
+                icon: History,
+              },
+              {
+                value: "aaaTable",
+                href: `/users/${userId}/aaaTable/${version}`,
+                label: t("profile.tab.aaaTable"),
+                icon: Table,
+              },
+            ].map((tab) => (
+              <AppTabsTrigger
+                key={tab.value}
+                value={tab.value}
+                visual="card"
+                icon={tab.icon}
+                href={tab.href}
+                iconOnly
+              >
+                {tab.label}
+              </AppTabsTrigger>
+            ))}
+          </AppTabsList>
+          {children}
+        </Tabs>
+      )}
+    </ProfileLayoutShell>
   );
 };

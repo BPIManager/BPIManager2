@@ -1,22 +1,11 @@
 "use client";
 
 import { ReactNode } from "react";
-import NextLink from "next/link";
 import { useRouter } from "next/router";
-import { useProfile } from "@/hooks/users/useProfile";
-import { useUser } from "@/contexts/users/UserContext";
-import { DashboardLayout } from "@/components/partials/Main";
-import { PageContainer } from "@/components/partials/Header";
-import { ProfileSideBar } from "@/components/partials/Profile/Sidebar/ui";
-import { FetchErrorState } from "@/components/partials/FetchErrorState";
-import { Lock, UserMinus } from "lucide-react";
-import { ModeSwitchBanner } from "../ModeSwitch/ui";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ProfileLayoutShell } from "@/components/partials/ProfileLayoutShell";
+import { Tabs } from "@/components/ui/tabs";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
-import { ProfileProvider } from "@/contexts/profile/ProfileContext";
-import { FilterProvider } from "@/contexts/stats/FilterContext";
 import { LayoutDashboard, Music } from "lucide-react";
-import { PageLoader } from "@/components/ui/loading-spinner";
 import { AppTabsList, AppTabsTrigger } from "@/components/ui/complex/tabs";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
@@ -30,17 +19,7 @@ export const RivalProfileLayout = ({
   children: ReactNode;
 }) => {
   const router = useRouter();
-  const { user } = useUser();
   const { t } = useTranslation();
-  const {
-    profile,
-    isLoading,
-    isError,
-    isPrivate,
-    isNotFound,
-    toggleFollow,
-    isUpdating,
-  } = useProfile(rivalUserId);
   const version = (router.query.version as string) || latestVersion;
 
   const scoreParams = new URLSearchParams({
@@ -50,99 +29,33 @@ export const RivalProfileLayout = ({
     isRivalPlayed: "true",
   }).toString();
 
-  if (isLoading) {
-    return (
-      <DashboardLayout>
-        <PageLoader />
-      </DashboardLayout>
-    );
-  }
-
-  if (isPrivate || isNotFound || isError || !profile) {
-    return (
-      <DashboardLayout>
-        <PageContainer>
-          <FetchErrorState
-            error={isError}
-            title={
-              isPrivate
-                ? "非公開のプロフィール"
-                : isNotFound
-                  ? "ユーザーが見つかりません"
-                  : undefined
-            }
-            description={
-              isPrivate
-                ? "このユーザーはプロフィールを非公開に設定しています。"
-                : isNotFound
-                  ? "指定されたIDのユーザーは存在しないか、退会した可能性があります。"
-                  : undefined
-            }
-            icon={
-              isPrivate ? (
-                <Lock size={48} />
-              ) : isNotFound ? (
-                <UserMinus size={48} />
-              ) : undefined
-            }
-            homeHref="/"
-          />
-        </PageContainer>
-      </DashboardLayout>
-    );
-  }
-
   return (
-    <FilterProvider>
-      <ProfileProvider profile={profile}>
-        <DashboardLayout>
-          <PageContainer>
-            {user && (
-              <ModeSwitchBanner
-                type="rival"
-                targetUserId={profile.userId}
-                isMe={user.userId === profile.userId}
-              />
-            )}
-
-            <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
-              <aside className="lg:col-span-1">
-                <ProfileSideBar
-                  profile={profile}
-                  onFollowToggle={toggleFollow}
-                  isUpdating={isUpdating}
-                />
-              </aside>
-
-              <div className="lg:col-span-3">
-                <Tabs value={currentTab} className="w-full">
-                  <AppTabsList visual="card" cols={2} className="mb-6">
-                    <AppTabsTrigger
-                      value="overview"
-                      visual="card"
-                      icon={LayoutDashboard}
-                      href={`/rivals/${rivalUserId}`}
-                      iconOnly
-                    >
-                      {t("page.rival.tabOverview")}
-                    </AppTabsTrigger>
-                    <AppTabsTrigger
-                      value="scores"
-                      visual="card"
-                      icon={Music}
-                      href={`/rivals/${rivalUserId}/scores/${version}?${scoreParams}`}
-                      iconOnly
-                    >
-                      {t("page.rival.tabScores")}
-                    </AppTabsTrigger>
-                  </AppTabsList>
-                  {children}
-                </Tabs>
-              </div>
-            </div>
-          </PageContainer>
-        </DashboardLayout>
-      </ProfileProvider>
-    </FilterProvider>
+    <ProfileLayoutShell userId={rivalUserId} bannerType="rival">
+      {() => (
+        <Tabs value={currentTab} className="w-full">
+          <AppTabsList visual="card" cols={2} className="mb-6">
+            <AppTabsTrigger
+              value="overview"
+              visual="card"
+              icon={LayoutDashboard}
+              href={`/rivals/${rivalUserId}`}
+              iconOnly
+            >
+              {t("page.rival.tabOverview")}
+            </AppTabsTrigger>
+            <AppTabsTrigger
+              value="scores"
+              visual="card"
+              icon={Music}
+              href={`/rivals/${rivalUserId}/scores/${version}?${scoreParams}`}
+              iconOnly
+            >
+              {t("page.rival.tabScores")}
+            </AppTabsTrigger>
+          </AppTabsList>
+          {children}
+        </Tabs>
+      )}
+    </ProfileLayoutShell>
   );
 };
