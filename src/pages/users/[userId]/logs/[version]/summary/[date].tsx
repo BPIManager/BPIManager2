@@ -1,59 +1,48 @@
+import { LogsSummaryPageShell } from "@/components/partials/LogsSummaryPageShell";
+import { PublicLogsCard } from "@/components/partials/Logs/PublicLogsCard";
 import { LogsDetailContent } from "@/components/partials/Logs/LogsDetail/content";
 import { LogsDetailView } from "@/components/partials/Logs/LogsDetail";
 import { DashboardLayout } from "@/components/partials/Main";
 import { UserProfileLayout } from "@/components/partials/Profile/Layout/layout";
 import { ProfileMeta } from "@/components/partials/Profile/Meta/ui";
 import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
-import { useUser } from "@/contexts/users/UserContext";
-import { PageLoader } from "@/components/ui/loading-spinner";
-import { useRouter } from "next/router";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 export default function SummaryLogsPage() {
-  const { fbUser, isLoading: isUserLoading } = useUser();
-  const router = useRouter();
-  const { userId, version, date } = router.query;
-  const isOwnProfile = fbUser?.uid === userId;
   const { t } = useTranslation();
 
-  const isInitialLoading = !router.isReady || isUserLoading;
-
-  if (isInitialLoading) {
-    return (
-      <DashboardLayout>
-        <PageLoader />
-      </DashboardLayout>
-    );
-  }
-
-  if (isOwnProfile) {
-    return (
-      <DashboardLayout>
-        <LogsDetailView
-          type="daily"
-          userId={userId as string}
-          version={version as string}
-          date={date as string}
-        />
-      </DashboardLayout>
-    );
-  }
-
   return (
-    <UserProfileLayout userId={userId as string} currentTab="logs">
-      <ProfileMeta
-        title={`${date as string}${t("page.dailySummary.titleSuffix")}`}
-        description={`${t("profile.desc.datePre")}${date as string}${t("profile.desc.dateMid")}${getVersionNameFromNumber(Number(version))}${t("profile.desc.datePost")}`}
-      />
-      <div className="p-4">
-        <LogsDetailContent
-          isPublicPage
-          type="daily"
-          userId={userId as string}
-          version={version as string}
-          date={date as string}
-        />
-      </div>
-    </UserProfileLayout>
+    <LogsSummaryPageShell
+      ownProfile={({ userId, version, query }) => (
+        <DashboardLayout>
+          <LogsDetailView
+            type="daily"
+            userId={userId}
+            version={version}
+            date={query.date as string}
+          />
+        </DashboardLayout>
+      )}
+      publicProfile={({ userId, version, query }) => {
+        const date = query.date as string;
+        return (
+          <UserProfileLayout userId={userId} currentTab="logs">
+            <ProfileMeta
+              title={`${date}${t("page.dailySummary.titleSuffix")}`}
+              description={`${t("profile.desc.datePre")}${date}${t("profile.desc.dateMid")}${getVersionNameFromNumber(Number(version))}${t("profile.desc.datePost")}`}
+            />
+            <PublicLogsCard>
+              <LogsDetailContent
+                isPublicPage
+                type="daily"
+                userId={userId}
+                version={version}
+                date={date}
+              />
+            </PublicLogsCard>
+          </UserProfileLayout>
+        );
+      }}
+    />
   );
 }

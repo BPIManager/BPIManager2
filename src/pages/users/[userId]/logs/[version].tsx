@@ -3,6 +3,7 @@
 import { useRouter } from "next/router";
 import { useUser } from "@/contexts/users/UserContext";
 import { LogsList } from "@/components/partials/Logs/LogsList/ui";
+import { PublicLogsCard } from "@/components/partials/Logs/PublicLogsCard";
 import { Meta } from "@/components/partials/Head";
 import { PageHeader, PageContainer } from "@/components/partials/Header";
 import { DashboardLayout } from "@/components/partials/Main";
@@ -11,7 +12,6 @@ import { UserProfileLayout } from "@/components/partials/Profile/Layout/layout";
 import { ProfileMeta } from "@/components/partials/Profile/Meta/ui";
 import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 import { LogFilterSection } from "@/components/partials/Logs/VersionSelector/ui";
-import { cn } from "@/lib/utils";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 export default function LogsPage() {
@@ -29,20 +29,13 @@ export default function LogsPage() {
 
   const logsContent = (
     <div className="flex flex-col gap-4">
-      <div
-        className={cn(
-          "rounded-2xl transition-all",
-          isOwnedByMe
-            ? "bg-transparent p-0"
-            : "border border-bpim-border bg-bpim-bg/40 p-4 md:p-6 shadow-xl backdrop-blur-md",
-        )}
-      >
+      <PublicLogsCard isOwnProfile={isOwnedByMe}>
         <LogFilterSection version={v} groupedBy={g} granularity={gr} />
 
         <div className="mt-6">
           <LogsList userId={uid} version={v} groupedBy={g} granularity={gr} />
         </div>
-      </div>
+      </PublicLogsCard>
     </div>
   );
 
