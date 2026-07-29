@@ -6,7 +6,7 @@ import { useSongFilter } from "@/hooks/table/useSongFilter";
 import { SongFilterBar } from "../../Songs/Filter/ui";
 import { SongList } from "./ui";
 import { CustomPagination } from "@/components/partials/common/Pagination/ui";
-import { SongDetailView } from "@/components/partials/common/Modal/SongDetail/ui";
+import { SongDetailView } from "@/components/partials/modal/SongDetail/ui";
 import { useUserScores } from "@/hooks/table/useUserScores";
 import { useCompareScores } from "@/hooks/table/useCompareScores";
 import { NoDataAlert } from "@/components/partials/common/DashBoard/NoData";

@@ -1,5 +1,5 @@
 ﻿import { useState } from "react";
-import AccountSettings from "@/components/partials/common/Modal/AccountSettings";
+import AccountSettings from "@/components/partials/modal/AccountSettings";
 import { Button } from "@/components/ui/button";
 import { Settings2, User } from "lucide-react";
 import { useTranslation } from "@/hooks/common/useTranslation";

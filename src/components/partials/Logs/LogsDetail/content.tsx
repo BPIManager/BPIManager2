@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button";
 import { useRef, useState } from "react";
 import { BatchDeleteSection } from "./BatchDeleteSection";
 import { useShareResult } from "@/hooks/share/useShare";
-import { ShareResultModal } from "@/components/partials/common/Modal/Share/ui";
+import { ShareResultModal } from "@/components/partials/modal/Share/ui";
 import { BpiCalculator } from "@/lib/bpi";
 import { DistributionChart } from "@/components/partials/common/DashBoard/DistributionChart/ui";
 import { RANK_COLORS } from "@/constants/theme/djRankColor";

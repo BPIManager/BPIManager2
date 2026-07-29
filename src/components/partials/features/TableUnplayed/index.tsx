@@ -6,7 +6,7 @@ import { useSongFilter, PAGE_SIZE } from "@/hooks/table/useSongFilter";
 import { useUnplayedScores } from "@/hooks/table/useUnplayedScores";
 import { NoDataAlert } from "@/components/partials/common/DashBoard/NoData";
 import { FetchErrorState } from "@/components/partials/common/FetchErrorState";
-import { SongDetailView } from "@/components/partials/common/Modal/SongDetail/ui";
+import { SongDetailView } from "@/components/partials/modal/SongDetail/ui";
 import { CustomPagination } from "@/components/partials/common/Pagination/ui";
 import { AdvancedFilterModal } from "../../Songs/AdvancedFilter/ui";
 import { SongFilterBar } from "../../Songs/Filter/ui";

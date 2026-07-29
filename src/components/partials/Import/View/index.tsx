@@ -1,5 +1,5 @@
 import { PageContainer, PageHeader } from "@/components/partials/common/Header";
-import { DashboardLayout } from "@/components/partials/common/Main";
+import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
 import { LoginRequiredCard } from "@/components/partials/common/LoginRequired/ui";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ScoreImportView, type ScoreImportProps } from "../ScoreView";

@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { useRouter } from "next/router";
 import type { ParsedUrlQuery } from "querystring";
 import { useUser } from "@/contexts/users/UserContext";
-import { DashboardLayout } from "@/components/partials/common/Main";
+import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
 import { PageLoader } from "@/components/ui/loading-spinner";
 
 interface LogsSummaryRenderCtx {

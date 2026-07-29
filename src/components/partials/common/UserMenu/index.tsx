@@ -18,8 +18,8 @@ import {
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { RoleBadge } from "@/components/partials/common/UserRole";
-import AccountSettings from "@/components/partials/common/Modal/AccountSettings";
-import { LoginDialog } from "@/components/partials/common/LoginDialog";
+import AccountSettings from "@/components/partials/modal/AccountSettings";
+import { LoginDialog } from "@/components/partials/modal/LoginDialog";
 
 type MenuItemProps = {
   label: string;

@@ -6,7 +6,7 @@ import { CustomPagination } from "@/components/partials/common/Pagination/ui";
 import { AllSongWithScore } from "@/types/songs/allSongs";
 import { AllSongFilterBar } from "./Filter";
 import { AllSongList } from "./Table";
-import { SongDetailView } from "@/components/partials/common/Modal/SongDetail/ui";
+import { SongDetailView } from "@/components/partials/modal/SongDetail/ui";
 import { FetchErrorState } from "@/components/partials/common/FetchErrorState";
 import {
   useAllSongsFilter,

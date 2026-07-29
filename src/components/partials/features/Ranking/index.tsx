@@ -7,7 +7,7 @@ import { useGlobalRanking } from "@/hooks/stats/useGlobalRanking";
 import { RankingRow } from "./row";
 import { RankingFilters } from "./Filters";
 import { Skeleton } from "@/components/ui/skeleton";
-import { RivalComparisonModal } from "@/components/partials/common/UserList/Modal";
+import { RivalComparisonModal } from "@/components/partials/modal/RivalComparison";
 import { useRouter } from "next/router";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { Info } from "lucide-react";

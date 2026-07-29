@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { LoginRequiredCard } from "@/components/partials/common/LoginRequired/ui";
-import AccountSettings from "@/components/partials/common/Modal/AccountSettings";
+import AccountSettings from "@/components/partials/modal/AccountSettings";
 import { cn } from "@/lib/utils";
 import { UserRelationship } from "@/types/users/profile";
 

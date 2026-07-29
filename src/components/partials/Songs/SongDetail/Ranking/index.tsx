@@ -10,7 +10,7 @@ import {
   SongRankingListRow,
   SongRankingTableHeader,
 } from "@/components/partials/Songs/SongRankingListRow";
-import { RivalComparisonModal } from "@/components/partials/common/UserList/Modal";
+import { RivalComparisonModal } from "@/components/partials/modal/RivalComparison";
 import { RankingSelfRankCard, RankingVersionSelector } from "./ui";
 import { RankingTabSkeleton } from "./skeleton";
 import { FetchErrorState } from "@/components/partials/common/FetchErrorState";

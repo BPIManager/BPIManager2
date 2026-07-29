@@ -7,7 +7,7 @@ import { SearchInput } from "./Filter/searchInput";
 import { Pagination } from "./pagination";
 import { UserRecommendationCardSkeleton } from "./Card/skeleton";
 import { UserRecommendationEmpty } from "./Card/empty";
-import { RivalComparisonModal } from "./Modal";
+import { RivalComparisonModal } from "@/components/partials/modal/RivalComparison";
 import { LoginRequiredCard } from "@/components/partials/common/LoginRequired/ui";
 import { useUser } from "@/contexts/users/UserContext";
 import { useUserList } from "@/hooks/users/useUserList";

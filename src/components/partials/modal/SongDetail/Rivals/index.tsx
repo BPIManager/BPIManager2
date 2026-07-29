@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { AppTabsGroup } from "@/components/ui/complex/tabs";
-import { RivalComparisonModal } from "@/components/partials/common/UserList/Modal";
+import { RivalComparisonModal } from "@/components/partials/modal/RivalComparison";
 import { useRadar } from "@/hooks/stats/useRadar";
 import { useUser } from "@/contexts/users/UserContext";
 

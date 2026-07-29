@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { useProfile } from "@/hooks/users/useProfile";
 import { useUser } from "@/contexts/users/UserContext";
-import { DashboardLayout } from "@/components/partials/common/Main";
+import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
 import { PageContainer } from "@/components/partials/common/Header";
 import { FetchErrorState } from "@/components/partials/common/FetchErrorState";
 import { Lock, UserMinus } from "lucide-react";

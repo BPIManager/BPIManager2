@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { BadgeX, Trash2 } from "lucide-react";
-import { ActionConfirmDialog } from "@/components/partials/common/Modal/Confirmation";
+import { ActionConfirmDialog } from "@/components/partials/modal/Confirmation";
 import { useAccountDeletion } from "@/hooks/users/useAccountDeletion";
 import { useTranslation } from "@/hooks/common/useTranslation";
 

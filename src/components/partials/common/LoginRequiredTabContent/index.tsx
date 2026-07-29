@@ -1,7 +1,7 @@
 import { Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLoginDialog } from "@/hooks/common/useLoginDialog";
-import { LoginDialog } from "@/components/partials/common/LoginDialog";
+import { LoginDialog } from "@/components/partials/modal/LoginDialog";
 
 interface LoginRequiredTabContentProps {
   feature: string;

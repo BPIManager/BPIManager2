@@ -11,7 +11,7 @@ import dayjs from "dayjs";
 import { useIidxTowerRanking } from "@/hooks/stats/useIidxTowerRanking";
 import { TowerRankingRow } from "./row";
 import { Skeleton } from "@/components/ui/skeleton";
-import { RivalComparisonModal } from "@/components/partials/common/UserList/Modal";
+import { RivalComparisonModal } from "@/components/partials/modal/RivalComparison";
 import { FetchErrorState } from "@/components/partials/common/FetchErrorState";
 import type {
   TowerPeriod,
