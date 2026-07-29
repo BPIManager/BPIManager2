@@ -30,6 +30,7 @@ import {
 } from "../UserList/Supporters/ui";
 import { UserRecommendationCardSkeleton } from "../UserList/Card/skeleton";
 import { XIcon } from "../LogIn";
+import { FetchErrorState } from "../FetchErrorState";
 
 const CI_EN_URL = "https://ci-en.net/creator/36005";
 
@@ -124,7 +125,7 @@ const PlanCard = (props: PlanCardProps) => {
 };
 
 export const SupportersPage = () => {
-  const { data, isLoading } = useSupporters();
+  const { data, isLoading, isError } = useSupporters();
   const { t } = useTranslation();
 
   return (
@@ -408,6 +409,8 @@ export const SupportersPage = () => {
                     <UserRecommendationCardSkeleton key={i} />
                   ))}
                 </div>
+              ) : isError ? (
+                <FetchErrorState error={isError} />
               ) : (
                 <SupporterListView users={data?.supporters ?? []} />
               )}
@@ -515,6 +518,8 @@ export const SupportersPage = () => {
                     <UserRecommendationCardSkeleton key={i} />
                   ))}
                 </div>
+              ) : isError ? (
+                <FetchErrorState error={isError} />
               ) : (
                 <ContributorListView users={data?.supporters ?? []} />
               )}

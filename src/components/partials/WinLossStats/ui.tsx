@@ -13,6 +13,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { WinLossHistoryChartSkeleton } from "./skeleton";
+import { FetchErrorState } from "@/components/partials/FetchErrorState";
 
 interface WinLossEntry {
   level: number;
@@ -59,7 +60,12 @@ const WinLossHistoryChart = ({
   myName?: string;
   rivalName?: string;
 }) => {
-  const { data, isLoading } = useWinLossHistory(viewerId, rivalId, level, true);
+  const { data, isLoading, error } = useWinLossHistory(
+    viewerId,
+    rivalId,
+    level,
+    true,
+  );
   const fillId = `wlFill-${level}`;
   const strokeId = `wlStroke-${level}`;
 
@@ -113,6 +119,8 @@ const WinLossHistoryChart = ({
   }, [data]);
 
   if (isLoading) return <WinLossHistoryChartSkeleton />;
+
+  if (error) return <FetchErrorState error={error} className="min-h-36" />;
 
   return (
     <div className="mt-3 flex flex-col gap-2">

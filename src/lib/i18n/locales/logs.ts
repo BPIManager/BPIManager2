@@ -32,12 +32,6 @@ export const logsTranslations = {
     "zh-TW": "版本",
     ko: "작품",
   },
-  "logs.loadError": {
-    ja: "読み込みに失敗しました",
-    en: "Failed to load",
-    "zh-TW": "載入失敗",
-    ko: "로드 실패",
-  },
   "logs.versionCompareDesc": {
     ja: "現バージョンと前作のスコアを比較します",
     en: "Compare scores between the current version and the previous one.",
@@ -202,25 +196,6 @@ export const logsTranslations = {
     "zh-TW": "刪除",
     ko: "삭제",
   },
-  "logs.detail.error.defaultMessage": {
-    ja: "通信エラーが発生しました",
-    en: "A connection error occurred.",
-    "zh-TW": "發生通訊錯誤",
-    ko: "통신 오류가 발생했습니다",
-  },
-  "logs.detail.error.title": {
-    ja: "データの取得に失敗しました",
-    en: "Failed to load data",
-    "zh-TW": "資料取得失敗",
-    ko: "데이터 로드 실패",
-  },
-  "logs.detail.error.retry": {
-    ja: "再試行する",
-    en: "Retry",
-    "zh-TW": "重試",
-    ko: "다시 시도",
-  },
-
   // BatchTotalBpiCard
   "logs.totalBpi.cardLabel": {
     ja: "総合BPI (☆12)",

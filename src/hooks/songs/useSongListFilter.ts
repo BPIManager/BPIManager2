@@ -71,7 +71,7 @@ export function useSongListFilter() {
 
   const levels = new Set(["12"]);
 
-  const { songs, isLoading } = useSongList(version);
+  const { songs, isLoading, isError } = useSongList(version);
 
   const { localSearch, setLocalSearch, isTyping } = useDebouncedSearch(
     committedSearch,
@@ -135,6 +135,7 @@ export function useSongListFilter() {
     sortDir,
     handleSortClick,
     isLoading,
+    isError,
     filteredSongs,
     totalCount: songs.length,
   };

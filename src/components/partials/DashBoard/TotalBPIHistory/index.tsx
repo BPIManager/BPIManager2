@@ -4,6 +4,8 @@ import { useTotalBpiHistory } from "@/hooks/stats/useTotalBPIHistory";
 import { TotalBpiHistoryChart } from "./ui";
 import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 import type { StatsGroupBy } from "@/types/stats/bpiBoxStats";
+import { DashCard } from "@/components/ui/dashcard";
+import { FetchErrorState } from "@/components/partials/FetchErrorState";
 
 export const BpiHistorySection = ({
   myUserId,
@@ -26,13 +28,11 @@ export const BpiHistorySection = ({
     ? rivalName
     : getVersionNameFromNumber(compareVersion);
 
-  const { history: myHistory, isLoading: myLoading } = useTotalBpiHistory(
-    myUserId,
-    levels,
-    diffs,
-    version,
-    groupBy,
-  );
+  const {
+    history: myHistory,
+    isLoading: myLoading,
+    isError: myError,
+  } = useTotalBpiHistory(myUserId, levels, diffs, version, groupBy);
   const { history: rivalHistory, isLoading: rivalLoading } = useTotalBpiHistory(
     effectiveRivalUserId,
     levels,
@@ -40,6 +40,14 @@ export const BpiHistorySection = ({
     effectiveRivalVersion,
     groupBy,
   );
+
+  if (myError) {
+    return (
+      <DashCard>
+        <FetchErrorState error={myError} />
+      </DashCard>
+    );
+  }
 
   return (
     <TotalBpiHistoryChart

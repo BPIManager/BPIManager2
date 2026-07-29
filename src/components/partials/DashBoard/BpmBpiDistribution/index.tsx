@@ -3,6 +3,7 @@ import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { useBpmBpiDistribution } from "@/hooks/stats/useBpmBpiDistribution";
 import { BpmBpiSkeleton } from "./skeleton";
 import { BpmBpiChart } from "./ui";
+import { FetchErrorState } from "@/components/partials/FetchErrorState";
 import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
@@ -30,18 +31,24 @@ export const BpmBpiDistributionSection = ({
     ? (rivalName ?? t("dashboard.rival"))
     : getVersionNameFromNumber(compareVersion);
 
-  const { distribution: myDist, isLoading: myLoading } = useBpmBpiDistribution(
-    myUserId,
-    levels,
-    diffs,
-    version,
-  );
+  const {
+    distribution: myDist,
+    isLoading: myLoading,
+    isError: myError,
+  } = useBpmBpiDistribution(myUserId, levels, diffs, version);
   const { distribution: rivalDist, isLoading: rivalLoading } =
     useBpmBpiDistribution(effectiveRivalUserId, levels, diffs, effectiveRivalVersion);
 
   const isLoading = myLoading || (!!effectiveRivalUserId && rivalLoading);
 
   if (isLoading) return <BpmBpiSkeleton />;
+  if (myError) {
+    return (
+      <DashCard>
+        <FetchErrorState error={myError} />
+      </DashCard>
+    );
+  }
   if (!myDist || myDist.length === 0) return null;
 
   return (

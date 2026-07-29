@@ -11,6 +11,7 @@ import { WikiTab } from "./Wiki";
 import { PatternTab } from "./Pattern";
 import { SongMetaCard } from "./ui";
 import { SongDetailSkeleton } from "./skeleton";
+import { FetchErrorState } from "@/components/partials/FetchErrorState";
 
 interface SongDetailContentProps {
   songId: number;
@@ -24,7 +25,7 @@ export function SongDetailContent({
   const router = useRouter();
   const version = (router.query.version as string) || latestVersion;
 
-  const { song, isLoading } = useSongDetail(songId);
+  const { song, isLoading, isError } = useSongDetail(songId);
 
   function handleTabChange(tab: string) {
     router.push(`/songs/${songId}/${tab}`);
@@ -44,6 +45,8 @@ export function SongDetailContent({
 
       {isLoading ? (
         <SongDetailSkeleton />
+      ) : isError ? (
+        <FetchErrorState error={isError} />
       ) : song ? (
         <>
           <SongMetaCard song={song} />

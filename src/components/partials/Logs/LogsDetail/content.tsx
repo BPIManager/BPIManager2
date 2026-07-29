@@ -12,7 +12,7 @@ import { BatchSongsTable } from "../LogTable/ui";
 import { LogNavigator } from "../LogsNav/ui";
 import { BatchTotalBpiCard } from "../TotalBPI/ui";
 import { LogsDetailContentSkeleton } from "./skeleton";
-import { LogErrorState } from "./error";
+import { FetchErrorState } from "@/components/partials/FetchErrorState";
 import type { LogsDetailViewProps } from "@/types/logs/detail";
 import { XIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -102,7 +102,7 @@ export const LogsDetailContent = ({
 
   if (isLoading) return <LogsDetailContentSkeleton />;
   if (isError || !details)
-    return <LogErrorState error={isError} onRetry={() => mutate()} />;
+    return <FetchErrorState error={isError} onRetry={() => mutate()} />;
 
   const currentBpi = details.pagination.current?.totalBpi ?? -15;
   const prevBpi = details.pagination.prev?.totalBpi ?? -15;

@@ -7,7 +7,8 @@ import { useUser } from "@/contexts/users/UserContext";
 import { DashboardLayout } from "@/components/partials/Main";
 import { PageContainer } from "@/components/partials/Header";
 import { ProfileSideBar } from "@/components/partials/Profile/Sidebar/ui";
-import { ProfileErrorState } from "@/components/partials/Profile/Errors/ui";
+import { FetchErrorState } from "@/components/partials/FetchErrorState";
+import { Lock, UserMinus } from "lucide-react";
 import { ModeSwitchBanner } from "../../Rivals/ModeSwitch/ui";
 import { Tabs } from "@/components/ui/tabs";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
@@ -57,11 +58,34 @@ export const UserProfileLayout = ({
   }
 
   if (isPrivate || isNotFound || isError || !profile) {
-    const errorType = isPrivate ? "private" : isNotFound ? "notfound" : "error";
     return (
       <DashboardLayout>
         <PageContainer>
-          <ProfileErrorState type={errorType} />
+          <FetchErrorState
+            error={isError}
+            title={
+              isPrivate
+                ? "非公開のプロフィール"
+                : isNotFound
+                  ? "ユーザーが見つかりません"
+                  : undefined
+            }
+            description={
+              isPrivate
+                ? "このユーザーはプロフィールを非公開に設定しています。"
+                : isNotFound
+                  ? "指定されたIDのユーザーは存在しないか、退会した可能性があります。"
+                  : undefined
+            }
+            icon={
+              isPrivate ? (
+                <Lock size={48} />
+              ) : isNotFound ? (
+                <UserMinus size={48} />
+              ) : undefined
+            }
+            homeHref="/"
+          />
         </PageContainer>
       </DashboardLayout>
     );

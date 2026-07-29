@@ -15,6 +15,7 @@ import {
 } from "@/components/partials/Info";
 import { useSiteStats } from "@/hooks/siteStats/useSiteStats";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import { FetchErrorState } from "@/components/partials/FetchErrorState";
 
 function UpdateNotice({ generatedAt }: { generatedAt?: string }) {
   const { t } = useTranslation();
@@ -41,7 +42,7 @@ function UpdateNotice({ generatedAt }: { generatedAt?: string }) {
 }
 
 export default function SiteStatsPage() {
-  const { data, isLoading } = useSiteStats();
+  const { data, isLoading, error } = useSiteStats();
   const { t } = useTranslation();
 
   return (
@@ -49,7 +50,9 @@ export default function SiteStatsPage() {
       <Meta title={t("page.stats.title")} description={t("page.stats.metaDesc")} />
       <PageHeader title={t("page.stats.title")} description={t("page.stats.desc")} />
       <PageContainer>
-        {isLoading || !data ? (
+        {error ? (
+          <FetchErrorState error={error} />
+        ) : isLoading || !data ? (
           <div className="flex flex-col gap-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <SkeletonCard />

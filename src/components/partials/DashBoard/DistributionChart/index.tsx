@@ -3,6 +3,8 @@ import { useDjRankDistribution } from "@/hooks/stats/useDJRankDistribution";
 import { useBPIDistribution } from "@/hooks/stats/useBPIDistribution";
 import { useScoreRateDistribution } from "@/hooks/stats/useScoreRateDistribution";
 import { DistributionChart } from "./ui";
+import { DashCard } from "@/components/ui/dashcard";
+import { FetchErrorState } from "@/components/partials/FetchErrorState";
 import { getRankColorFromTheme } from "@/constants/theme/djRankColor";
 import { getBpiColorFromTheme } from "@/constants/theme/bpiColor";
 import { getScoreRateColorFromTheme } from "@/constants/theme/scoreRateColor";
@@ -47,13 +49,16 @@ export const DistributionSection = ({
   const isBpi = type === "bpi";
   const isScoreRate = type === "scoreRate";
 
-  const { distribution: myRankDist, isLoading: myRankLoading } =
-    useDjRankDistribution(
-      type === "rank" ? myUserId : undefined,
-      levels,
-      diffs,
-      version,
-    );
+  const {
+    distribution: myRankDist,
+    isLoading: myRankLoading,
+    isError: myRankError,
+  } = useDjRankDistribution(
+    type === "rank" ? myUserId : undefined,
+    levels,
+    diffs,
+    version,
+  );
   const { distribution: rivalRankDist, isLoading: rivalRankLoading } =
     useDjRankDistribution(
       type === "rank" ? effectiveRivalUserId : undefined,
@@ -62,14 +67,17 @@ export const DistributionSection = ({
       effectiveRivalVersion,
     );
 
-  const { distribution: myBpiDist, isLoading: myBpiLoading } =
-    useBPIDistribution(
-      isBpi ? myUserId : undefined,
-      levels,
-      diffs,
-      version,
-      bpiStep,
-    );
+  const {
+    distribution: myBpiDist,
+    isLoading: myBpiLoading,
+    isError: myBpiError,
+  } = useBPIDistribution(
+    isBpi ? myUserId : undefined,
+    levels,
+    diffs,
+    version,
+    bpiStep,
+  );
   const { distribution: rivalBpiDist, isLoading: rivalBpiLoading } =
     useBPIDistribution(
       isBpi ? effectiveRivalUserId : undefined,
@@ -79,14 +87,17 @@ export const DistributionSection = ({
       bpiStep,
     );
 
-  const { distribution: myScoreRateDist, isLoading: myScoreRateLoading } =
-    useScoreRateDistribution(
-      isScoreRate ? myUserId : undefined,
-      levels,
-      diffs,
-      version,
-      scoreRateStep,
-    );
+  const {
+    distribution: myScoreRateDist,
+    isLoading: myScoreRateLoading,
+    isError: myScoreRateError,
+  } = useScoreRateDistribution(
+    isScoreRate ? myUserId : undefined,
+    levels,
+    diffs,
+    version,
+    scoreRateStep,
+  );
   const { distribution: rivalScoreRateDist, isLoading: rivalScoreRateLoading } =
     useScoreRateDistribution(
       isScoreRate ? effectiveRivalUserId : undefined,
@@ -107,6 +118,11 @@ export const DistributionSection = ({
     : isScoreRate
       ? myScoreRateLoading
       : myRankLoading;
+  const myError = isBpi
+    ? myBpiError
+    : isScoreRate
+      ? myScoreRateError
+      : myRankError;
   const rivalLoading = isBpi
     ? rivalBpiLoading
     : isScoreRate
@@ -149,6 +165,14 @@ export const DistributionSection = ({
         skeletonCount={config.skeletonCount}
         {...modeProps}
       />
+    );
+  }
+
+  if (myError) {
+    return (
+      <DashCard>
+        <FetchErrorState error={myError} />
+      </DashCard>
     );
   }
 

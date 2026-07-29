@@ -5,6 +5,7 @@ import { SongWithScore } from "@/types/songs/score";
 import { useSongFilter, PAGE_SIZE } from "@/hooks/table/useSongFilter";
 import { useUnplayedScores } from "@/hooks/table/useUnplayedScores";
 import { NoDataAlert } from "../DashBoard/NoData";
+import { FetchErrorState } from "../FetchErrorState";
 import { SongDetailView } from "../Modal/SongDetail/ui";
 import { CustomPagination } from "../Pagination/ui";
 import { AdvancedFilterModal } from "../Songs/AdvancedFilter/ui";
@@ -29,14 +30,7 @@ export const UnplayedSongsTable = ({
     useSongFilter(songs);
 
   if (!isLoading && (error || !songs)) {
-    return (
-      <div className="flex h-50 flex-col items-center justify-center gap-2">
-        <p className="font-bold text-bpim-danger">
-          楽曲データの取得に失敗しました
-        </p>
-        <p className="text-xs text-bpim-muted">{error?.message}</p>
-      </div>
-    );
+    return <FetchErrorState error={error} />;
   }
 
   return (

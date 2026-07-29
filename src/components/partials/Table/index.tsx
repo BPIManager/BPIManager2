@@ -10,6 +10,7 @@ import { SongDetailView } from "../Modal/SongDetail/ui";
 import { useUserScores } from "@/hooks/table/useUserScores";
 import { useCompareScores } from "@/hooks/table/useCompareScores";
 import { NoDataAlert } from "../DashBoard/NoData";
+import { FetchErrorState } from "../FetchErrorState";
 import { SongListSkeleton } from "./skeleton";
 import { AdvancedFilterModal } from "../Songs/AdvancedFilter/ui";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
@@ -42,7 +43,7 @@ export const SongsTable = ({
     visibleSongs: rawVisible,
   } = useSongFilter(songs);
 
-  const { compareData, isCompareLoading } = useCompareScores(
+  const { compareData, compareError, isCompareLoading } = useCompareScores(
     userId,
     currentVersion,
     params.compareVersion,
@@ -92,18 +93,16 @@ export const SongsTable = ({
   }, [rawVisible, mergedSongs]);
 
   if (!isLoading && (error || !songs)) {
-    return (
-      <div className="flex h-50 flex-col items-center justify-center gap-2">
-        <p className="font-bold text-bpim-danger">
-          {t("table.songLoadError")}
-        </p>
-        <p className="text-xs text-bpim-muted">{error?.message}</p>
-      </div>
-    );
+    return <FetchErrorState error={error} />;
   }
 
   const showCompareLoading =
     isCompareLoading &&
+    params.compareVersion &&
+    params.compareVersion !== "none";
+  const showCompareError =
+    !isCompareLoading &&
+    compareError &&
     params.compareVersion &&
     params.compareVersion !== "none";
 
@@ -129,6 +128,12 @@ export const SongsTable = ({
         <div className="flex items-center justify-center gap-2 py-2 text-xs text-bpim-muted border-b border-bpim-border">
           <LoadingSpinner size="xs" />
           {t("table.loadingPrevVersion")}
+        </div>
+      )}
+
+      {showCompareError && (
+        <div className="flex items-center justify-center gap-2 py-2 text-xs font-bold text-bpim-danger border-b border-bpim-border">
+          {t("common.error.fetchFailed")}
         </div>
       )}
 

@@ -1,27 +1,27 @@
 ﻿import { RivalSummaryCard } from "./ui";
 import { RivalSummarySkeleton } from "./skeleton";
 import { RivalWinLossSummaryNotFound } from "@/components/partials/RivalWinLossSummaryNotFound";
+import {
+  FetchErrorState,
+  type FetchError,
+} from "@/components/partials/FetchErrorState";
 import { RivalSummaryResult } from "@/types/social/rival";
 
 interface RivalListProps {
   results: RivalSummaryResult[];
   isLoading: boolean;
-  isError: boolean;
+  error: FetchError;
   onCardClick: (userId: string) => void;
 }
 
 export const RivalList = ({
   results,
   isLoading,
-  isError,
+  error,
   onCardClick,
 }: RivalListProps) => {
-  if (isError) {
-    return (
-      <div className="flex h-64 items-center justify-center text-bpim-danger font-bold">
-        データの取得に失敗しました。
-      </div>
-    );
+  if (error) {
+    return <FetchErrorState error={error} />;
   }
 
   if (isLoading) {

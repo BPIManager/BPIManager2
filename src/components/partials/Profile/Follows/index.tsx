@@ -10,6 +10,7 @@ import { UserCheck, Users } from "lucide-react";
 import { LoadingSpinner, SectionLoader } from "@/components/ui/loading-spinner";
 import { AppTabsGroup } from "@/components/ui/complex/tabs";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import { FetchErrorState } from "@/components/partials/FetchErrorState";
 
 export default function FollowPage({
   type,
@@ -19,7 +20,7 @@ export default function FollowPage({
   const router = useRouter();
   const userId = router.query.userId as string;
 
-  const { users, isLoading, isReachingEnd, loadMore } = useFollowList(
+  const { users, isLoading, isReachingEnd, isError, loadMore } = useFollowList(
     userId,
     type,
   );
@@ -56,7 +57,9 @@ export default function FollowPage({
           />
 
           <TabsContent value={type} className="mt-0 outline-none">
-            {users.length === 0 && !isLoading ? (
+            {isError ? (
+              <FetchErrorState error={isError} />
+            ) : users.length === 0 && !isLoading ? (
               <div className="flex flex-col items-center justify-center py-16 gap-2">
                 <p className="text-sm font-medium text-bpim-muted">
                   {t("profile.follow.noUsers")}

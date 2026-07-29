@@ -4,7 +4,7 @@ import { useVersionSummary } from "@/hooks/batches/useVersionSummary";
 import { BatchSongsTable } from "../LogTable/ui";
 import { NoDataAlert } from "../../DashBoard/NoData";
 import { LogsDetailContentSkeleton } from "../LogsDetail/skeleton";
-import { LogErrorState } from "../LogsDetail/error";
+import { FetchErrorState } from "@/components/partials/FetchErrorState";
 import { getBpiDistribution, getRankDistribution } from "@/utils/logs/getDistribution";
 import { DistributionChart } from "../../DashBoard/DistributionChart/ui";
 import { RANK_COLORS } from "@/constants/theme/djRankColor";
@@ -94,7 +94,7 @@ export const VersionCompareContent = ({ userId, version }: Props) => {
   );
 
   if (isLoading) return <LogsDetailContentSkeleton />;
-  if (isError) return <LogErrorState error={isError} onRetry={() => {}} />;
+  if (isError) return <FetchErrorState error={isError} />;
 
   if (!data || data.compareVersion === null) {
     return (

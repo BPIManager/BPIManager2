@@ -2,6 +2,7 @@
 
 import { useSongListFilter } from "@/hooks/songs/useSongListFilter";
 import { SongFilterControls, SongVirtualList } from "./ui";
+import { FetchErrorState } from "@/components/partials/FetchErrorState";
 
 export function SongListContent() {
   const {
@@ -13,8 +14,13 @@ export function SongListContent() {
     sortDir,
     handleSortClick,
     isLoading,
+    isError,
     filteredSongs,
   } = useSongListFilter();
+
+  if (isError) {
+    return <FetchErrorState error={isError} />;
+  }
 
   return (
     <div className="flex flex-col gap-4">

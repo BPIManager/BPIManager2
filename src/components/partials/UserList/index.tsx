@@ -13,6 +13,7 @@ import { useUser } from "@/contexts/users/UserContext";
 import { useUserList } from "@/hooks/users/useUserList";
 import { useUserListParams } from "@/hooks/users/useUserListParams";
 import { PageContainer, PageHeader } from "../Header";
+import { FetchErrorState } from "@/components/partials/FetchErrorState";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 export const UserRecommendationList = () => {
@@ -22,7 +23,7 @@ export const UserRecommendationList = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { q, p, s, o, seed, updateParams, handleReset } = useUserListParams();
-  const { data, isLoading } = useUserList(q, p, s, o, seed);
+  const { data, isLoading, isError } = useUserList(q, p, s, o, seed);
 
   const handleShuffle = () => {
     updateParams({ seed: Math.floor(Math.random() * 1_000_000), p: 1 });
@@ -97,6 +98,8 @@ export const UserRecommendationList = () => {
                 <UserRecommendationCardSkeleton key={i} />
               ))}
             </div>
+          ) : isError ? (
+            <FetchErrorState error={isError} />
           ) : data?.users.length === 0 ? (
             <UserRecommendationEmpty onReset={handleReset} />
           ) : (

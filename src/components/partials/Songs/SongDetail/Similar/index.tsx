@@ -1,6 +1,7 @@
 import { useSimilarSongs } from "@/hooks/songs/useSimilarSongs";
 import { SimilarSongRow } from "./ui";
 import { SimilarTabSkeleton } from "./skeleton";
+import { FetchErrorState } from "@/components/partials/FetchErrorState";
 
 interface SimilarTabProps {
   songId: number;
@@ -8,9 +9,16 @@ interface SimilarTabProps {
 }
 
 export function SimilarTab({ songId, version }: SimilarTabProps) {
-  const { similar, isLoading } = useSimilarSongs(songId, version, 15, "global");
+  const { similar, isLoading, isError } = useSimilarSongs(
+    songId,
+    version,
+    15,
+    "global",
+  );
 
   if (isLoading) return <SimilarTabSkeleton />;
+
+  if (isError) return <FetchErrorState error={isError} className="min-h-64" />;
 
   return (
     <div className="flex flex-col gap-2 mt-2">

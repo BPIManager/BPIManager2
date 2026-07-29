@@ -83,6 +83,48 @@ export const commonTranslations = {
     "zh-TW": "資料取得失敗。",
     ko: "데이터 로드에 실패했습니다.",
   },
+  "common.error.defaultMessage": {
+    ja: "通信エラーが発生しました",
+    en: "A connection error occurred.",
+    "zh-TW": "發生通訊錯誤",
+    ko: "통신 오류가 발생했습니다",
+  },
+  "common.error.retry": {
+    ja: "再試行する",
+    en: "Retry",
+    "zh-TW": "重試",
+    ko: "다시 시도",
+  },
+  "common.error.backHome": {
+    ja: "トップページへ戻る",
+    en: "Back to top",
+    "zh-TW": "返回首頁",
+    ko: "홈으로 돌아가기",
+  },
+  "common.error.forbidden.title": {
+    ja: "アクセスが拒否されました",
+    en: "Access denied",
+    "zh-TW": "存取遭拒",
+    ko: "접근이 거부되었습니다",
+  },
+  "common.error.forbidden.description": {
+    ja: "このコンテンツを閲覧する権限がありません。",
+    en: "You don't have permission to view this content.",
+    "zh-TW": "您沒有權限查看此內容。",
+    ko: "이 콘텐츠를 볼 권한이 없습니다.",
+  },
+  "common.error.notFound.title": {
+    ja: "見つかりませんでした",
+    en: "Not found",
+    "zh-TW": "找不到",
+    ko: "찾을 수 없습니다",
+  },
+  "common.error.notFound.description": {
+    ja: "指定されたデータは存在しないか、削除された可能性があります。",
+    en: "The requested data doesn't exist or may have been removed.",
+    "zh-TW": "指定的資料不存在或可能已被刪除。",
+    ko: "요청한 데이터가 존재하지 않거나 삭제되었을 수 있습니다.",
+  },
   "common.noData": {
     ja: "データが見つかりませんでした",
     en: "No data found.",

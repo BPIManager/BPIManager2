@@ -10,6 +10,7 @@ import type { SongDetailSubject } from "@/utils/songs/songDetailMode";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { SectionLoader } from "@/components/ui/loading-spinner";
+import { FetchErrorState } from "@/components/partials/FetchErrorState";
 import { List, type ListImperativeAPI } from "react-window";
 import {
   RANKING_ROW_HEIGHT,
@@ -36,16 +37,19 @@ export const RivalRankingBody = ({
 }: RivalRankingProps) => {
   const { fbUser } = useUser();
   const isAllScores = notes != null;
-  const { data: mainData, isLoading: mainLoading } = useRivalScores(
-    isAllScores ? null : songId,
-    version,
-  );
-  const { data: allData, isLoading: allLoading } = useAllSongRivalScores(
-    isAllScores ? songId : null,
-    version,
-  );
+  const {
+    data: mainData,
+    isLoading: mainLoading,
+    error: mainError,
+  } = useRivalScores(isAllScores ? null : songId, version);
+  const {
+    data: allData,
+    isLoading: allLoading,
+    error: allError,
+  } = useAllSongRivalScores(isAllScores ? songId : null, version);
   const data = isAllScores ? allData : mainData;
   const isLoading = isAllScores ? allLoading : mainLoading;
+  const error = isAllScores ? allError : mainError;
 
   const ranking = useMemo(() => {
     if (!data?.rivals) return myScore ? [{ ...myScore, isSelf: true }] : [];
@@ -65,6 +69,10 @@ export const RivalRankingBody = ({
 
   if (isLoading) {
     return <SectionLoader className="py-8" color="text-bpim-info" />;
+  }
+
+  if (error) {
+    return <FetchErrorState error={error} className="min-h-64" />;
   }
 
   return (
@@ -184,16 +192,19 @@ export const GlobalRankingBody = ({
   onNavigate,
 }: RivalRankingProps) => {
   const isAllScores = notes != null;
-  const { data: mainData, isLoading: mainLoading } = useSongRanking(
-    isAllScores ? null : songId,
-    version,
-  );
-  const { data: allData, isLoading: allLoading } = useAllSongRanking(
-    isAllScores ? songId : null,
-    version,
-  );
+  const {
+    data: mainData,
+    isLoading: mainLoading,
+    isError: mainError,
+  } = useSongRanking(isAllScores ? null : songId, version);
+  const {
+    data: allData,
+    isLoading: allLoading,
+    isError: allError,
+  } = useAllSongRanking(isAllScores ? songId : null, version);
   const data = isAllScores ? allData : mainData;
   const isLoading = isAllScores ? allLoading : mainLoading;
+  const isError = isAllScores ? allError : mainError;
   const listRef = useRef<ListImperativeAPI>(null);
 
   useEffect(() => {
@@ -208,6 +219,10 @@ export const GlobalRankingBody = ({
 
   if (isLoading) {
     return <SectionLoader className="py-8" color="text-bpim-info" />;
+  }
+
+  if (isError) {
+    return <FetchErrorState error={isError} className="min-h-64" />;
   }
 
   if (!data) return null;

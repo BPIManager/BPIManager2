@@ -1,5 +1,6 @@
 import { useRadar } from "@/hooks/stats/useRadar";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
+import { FetchErrorState } from "@/components/partials/FetchErrorState";
 import { RadarSkeleton } from "./skeleton";
 import { RadarSectionChart } from ".";
 import { RadarCategory } from "@/types/stats/radar";
@@ -33,13 +34,12 @@ export const RadarSection = ({
     ? (rivalName ?? t("dashboard.rival"))
     : getVersionNameFromNumber(compareVersion);
 
-  const { radar, isLoading } = useRadar(userId, levels, diffs, version);
-  const { radar: rivalRadar, isLoading: rivalLoading } = useRadar(
-    effectiveRivalUserId,
-    levels,
-    diffs,
-    effectiveRivalVersion,
-  );
+  const { radar, isLoading, isError } = useRadar(userId, levels, diffs, version);
+  const {
+    radar: rivalRadar,
+    isLoading: rivalLoading,
+    isError: rivalError,
+  } = useRadar(effectiveRivalUserId, levels, diffs, effectiveRivalVersion);
   const [selectedCat, setSelectedCat] = useState<RadarCategory | null>(null);
 
   const isRivalMode = !!effectiveRivalUserId;
@@ -52,6 +52,13 @@ export const RadarSection = ({
   }, [radar]);
 
   if (isLoading || (isRivalMode && rivalLoading)) return <RadarSkeleton />;
+  if (isError || (isRivalMode && rivalError)) {
+    return (
+      <DashCard>
+        <FetchErrorState error={isError || rivalError} />
+      </DashCard>
+    );
+  }
   if (!radar) return null;
 
   const rivalDataFlat = rivalRadar

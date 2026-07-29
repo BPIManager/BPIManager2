@@ -56,8 +56,16 @@ function LoadingSkeleton() {
 }
 
 export function RecentNotesList() {
-  const { notes, isLoading, isLoadingMore, isReachingEnd, setSize, sort, setSort } =
-    useRecentNotes();
+  const {
+    notes,
+    isLoading,
+    isLoadingMore,
+    isReachingEnd,
+    isError,
+    setSize,
+    sort,
+    setSort,
+  } = useRecentNotes();
 
   const header = (
     <div className="p-3 flex flex-col gap-2 border-b border-bpim-border">
@@ -97,6 +105,7 @@ export function RecentNotesList() {
           renderItem={(note) => <RecentNoteCard key={note.id} note={note} />}
           isLoadingMore={isLoadingMore}
           isReachingEnd={isReachingEnd}
+          isError={isError}
           setSize={setSize}
           maxH="calc(100vh - 220px)"
           emptyMessage="まだ攻略メモがありません"

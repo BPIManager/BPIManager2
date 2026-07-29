@@ -4,6 +4,7 @@ import type { UpdateLog } from "@/types/logs/batches";
 import { LogsCard } from "../LogsCard/ui";
 import { LogsGroupSkeleton } from "../LogsCard/skeleton";
 import { NoDataAlert } from "../../DashBoard/NoData";
+import { FetchErrorState } from "../../FetchErrorState";
 import { CustomPagination } from "../../Pagination/ui";
 import Link from "next/link";
 import dayjs from "@/lib/dayjs";
@@ -113,12 +114,7 @@ export const LogsList = ({
     return groupedLogs.slice(startIndex, startIndex + PAGE_SIZE);
   }, [groupedLogs, page]);
 
-  if (isError)
-    return (
-      <div className="flex h-50 items-center justify-center">
-        <p className="text-bpim-danger font-bold">{t("logs.loadError")}</p>
-      </div>
-    );
+  if (isError) return <FetchErrorState error={isError} />;
 
   if (granularity === "version") {
     return (

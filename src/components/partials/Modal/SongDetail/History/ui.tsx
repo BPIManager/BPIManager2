@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { History } from "lucide-react";
 import { SectionLoader } from "@/components/ui/loading-spinner";
 import { HistoryRecordCard } from "@/components/partials/Songs/HistoryRecordCard";
+import { FetchErrorState } from "@/components/partials/FetchErrorState";
 
 interface SongHistoryTabProps {
   songId: number;
@@ -46,7 +47,9 @@ export const SongHistoryTab = ({ songId, notes }: SongHistoryTabProps) => {
 
   if (isLoading) return <SectionLoader className="h-64" />;
 
-  if (isError || !historyGroups || Object.keys(historyGroups).length === 0)
+  if (isError) return <FetchErrorState error={isError} className="min-h-64" />;
+
+  if (!historyGroups || Object.keys(historyGroups).length === 0)
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-20">
         <History className="h-10 w-10 text-bpim-subtle" />

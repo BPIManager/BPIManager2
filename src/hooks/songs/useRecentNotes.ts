@@ -21,7 +21,7 @@ const PAGE_SIZE = 20;
 export function useRecentNotes() {
   const [sort, setSort] = useState<RecentNoteSort>("latest");
 
-  const { items, isLoading, isLoadingMore, isReachingEnd, setSize } =
+  const { items, isLoading, isLoadingMore, isReachingEnd, isError, setSize } =
     useInfiniteList<RecentNote[], RecentNote>(
       (index) => `${API_PREFIX}/songs/notes/recent?sort=${sort}&page=${index}`,
       {
@@ -41,6 +41,7 @@ export function useRecentNotes() {
     isLoading,
     isLoadingMore,
     isReachingEnd,
+    isError,
     setSize,
     sort,
     setSort: handleSetSort,

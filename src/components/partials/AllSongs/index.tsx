@@ -7,6 +7,7 @@ import { AllSongWithScore } from "@/types/songs/allSongs";
 import { AllSongFilterBar } from "./Filter";
 import { AllSongList } from "./Table";
 import { SongDetailView } from "@/components/partials/Modal/SongDetail/ui";
+import { FetchErrorState } from "@/components/partials/FetchErrorState";
 import {
   useAllSongsFilter,
   PAGE_SIZE,
@@ -28,13 +29,7 @@ export const AllSongsTable = ({ userId }: { userId: string | undefined }) => {
   } = useAllSongsFilter(userId);
 
   if (!isLoading && error) {
-    return (
-      <div className="flex h-50 flex-col items-center justify-center gap-2">
-        <p className="font-bold text-bpim-danger">
-          楽曲データの取得に失敗しました
-        </p>
-      </div>
-    );
+    return <FetchErrorState error={error} />;
   }
 
   return (

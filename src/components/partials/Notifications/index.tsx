@@ -27,6 +27,7 @@ export const NotificationBell = () => {
     setSize,
     isLoadingMore,
     isReachingEnd,
+    isError,
   } = notificationRes;
 
   return (
@@ -71,6 +72,7 @@ export const NotificationBell = () => {
               setSize={setSize}
               isLoadingMore={isLoadingMore}
               isReachingEnd={isReachingEnd}
+              isError={isError}
               maxH="400px"
               emptyMessage={t("notifications.empty")}
               renderItem={(n, i) => (

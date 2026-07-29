@@ -28,6 +28,7 @@ import { LoginRequiredCard } from "../LoginRequired/ui";
 import { useUser } from "@/contexts/users/UserContext";
 import { PageContainer, PageHeader } from "../Header";
 import { GlobalRankingContainerSkeleton } from "./skeleton";
+import { FetchErrorState } from "@/components/partials/FetchErrorState";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 const ITEM_SIZE = 58;
@@ -93,7 +94,7 @@ export const GlobalRankingContainer = () => {
     ? (router.query.arenaClass as string) || ""
     : "";
 
-  const { data, isLoading } = useGlobalRanking(
+  const { data, isLoading, isError } = useGlobalRanking(
     version,
     isSongsCategory || isTowerCategory ? "totalBpi" : category,
     filterArea || undefined,
@@ -208,6 +209,20 @@ export const GlobalRankingContainer = () => {
 
   if (!user && !isCredentialLoading) {
     return <LoginRequiredCard />;
+  }
+
+  if (!isSongsCategory && !isTowerCategory && isError) {
+    return (
+      <>
+        <PageHeader
+          title={t("page.ranking.title")}
+          description={t("page.ranking.desc")}
+        />
+        <PageContainer>
+          <FetchErrorState error={isError} />
+        </PageContainer>
+      </>
+    );
   }
 
   if (!isSongsCategory && !isTowerCategory && !data) return null;

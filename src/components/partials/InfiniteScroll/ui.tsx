@@ -3,12 +3,17 @@ import { useInfiniteScroll } from "@/hooks/common/useInfiniteScroll";
 import { cn } from "@/lib/utils";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import {
+  FetchErrorState,
+  type FetchError,
+} from "@/components/partials/FetchErrorState";
 
 interface InfiniteScrollContainerProps<T> {
   items: T[];
   renderItem: (item: T, index: number) => ReactNode;
   isLoadingMore: boolean;
   isReachingEnd: boolean;
+  isError?: FetchError;
   setSize: (size: number | ((size: number) => number)) => void;
   maxH?: string;
   emptyMessage?: string;
@@ -21,6 +26,7 @@ export function InfiniteScrollContainer<T>({
   renderItem,
   isLoadingMore,
   isReachingEnd,
+  isError,
   setSize,
   maxH = "500px",
   emptyMessage,
@@ -37,6 +43,10 @@ export function InfiniteScrollContainer<T>({
     isLoading: isLoadingMore,
     isReachingEnd,
   });
+
+  if (isError && items.length === 0) {
+    return <FetchErrorState error={isError} className="min-h-64" />;
+  }
 
   return (
     <div

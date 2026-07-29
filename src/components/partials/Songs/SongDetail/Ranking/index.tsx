@@ -13,6 +13,7 @@ import {
 import { RivalComparisonModal } from "@/components/partials/UserList/Modal";
 import { RankingSelfRankCard, RankingVersionSelector } from "./ui";
 import { RankingTabSkeleton } from "./skeleton";
+import { FetchErrorState } from "@/components/partials/FetchErrorState";
 
 interface RankingTabProps {
   songId: number;
@@ -28,7 +29,7 @@ export function RankingTab({ songId }: RankingTabProps) {
 
   const { fbUser } = useUser();
   const { radar: viewerRadar } = useRadar(fbUser?.uid, [], [], version);
-  const { data, isLoading } = useSongRanking(songId, version);
+  const { data, isLoading, isError } = useSongRanking(songId, version);
 
   const selfEntry = data?.rankings.find((r) => r.isSelf);
   const selfExScore = selfEntry?.exScore;
@@ -64,6 +65,8 @@ export function RankingTab({ songId }: RankingTabProps) {
 
       {isLoading ? (
         <RankingTabSkeleton />
+      ) : isError ? (
+        <FetchErrorState error={isError} className="min-h-64" />
       ) : !data ? null : (
         <>
           {data.selfRank > 0 && (

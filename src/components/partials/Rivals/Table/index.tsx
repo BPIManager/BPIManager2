@@ -13,6 +13,7 @@ import { LoginRequiredCard } from "@/components/partials/LoginRequired/ui";
 import { CustomPagination } from "@/components/partials/Pagination/ui";
 import { AdvancedFilterModal } from "@/components/partials/Songs/AdvancedFilter/ui";
 import { SongDetailView } from "@/components/partials/Modal/SongDetail/ui";
+import { FetchErrorState } from "@/components/partials/FetchErrorState";
 import { RivalSongItem } from "./ui";
 import { RivalAnalysis } from "@/components/partials/Rivals/Analysis/ui";
 import { List, BarChart2 } from "lucide-react";
@@ -51,14 +52,7 @@ export const RivalSongsTable = ({
   if (!fbUser) return <LoginRequiredCard />;
 
   if (!isLoading && (error || !songs)) {
-    return (
-      <div className="flex h-50 flex-col items-center justify-center gap-2">
-        <p className="font-bold text-bpim-danger">
-          {t("table.songLoadError")}
-        </p>
-        <p className="text-xs text-bpim-muted">{error?.message}</p>
-      </div>
-    );
+    return <FetchErrorState error={error} />;
   }
 
   const SubTabBar = () => (

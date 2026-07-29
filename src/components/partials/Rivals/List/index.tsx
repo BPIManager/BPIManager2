@@ -27,7 +27,7 @@ export const RivalListContainer = ({
     setSortOrder,
   } = useRivalListFilter();
 
-  const { rivals, isLoading, isError } = useRivalSummary({
+  const { rivals, isLoading, isError: error } = useRivalSummary({
     userId: user?.userId || false,
     levels,
     difficulties,
@@ -68,7 +68,7 @@ export const RivalListContainer = ({
           <RivalList
             results={sortedRivals}
             isLoading={isLoading}
-            isError={isError}
+            error={error}
             onCardClick={(id: string) => router.push(`/rivals/${id}`)}
           />
         </div>

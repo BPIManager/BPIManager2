@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { LoginRequiredCard } from "../../LoginRequired/ui";
+import { FetchErrorState } from "../../FetchErrorState";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface AAATableContentProps {
@@ -91,11 +92,7 @@ export const AAATableContent = ({
   }, [groupedData, goal, showAbove, showBelow, maxDiffFilter]);
 
   if (isError) {
-    return (
-      <div className="flex h-40 items-center justify-center font-bold text-bpim-danger">
-        {t("aaaTable.loadError")}
-      </div>
-    );
+    return <FetchErrorState error={isError} />;
   }
 
   const body = (

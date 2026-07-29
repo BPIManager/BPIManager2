@@ -12,6 +12,7 @@ import { useIidxTowerRanking } from "@/hooks/stats/useIidxTowerRanking";
 import { TowerRankingRow } from "./TowerRankingRow";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RivalComparisonModal } from "../UserList/Modal";
+import { FetchErrorState } from "@/components/partials/FetchErrorState";
 import type {
   TowerPeriod,
   TowerType,
@@ -125,7 +126,7 @@ export const TowerRanking = ({ version }: TowerRankingProps) => {
 
   const { startDate, endDate, label } = getPeriodRange(period, selectedDate);
 
-  const { data, isLoading } = useIidxTowerRanking({
+  const { data, isLoading, isError } = useIidxTowerRanking({
     version,
     period,
     date: selectedDate,
@@ -327,6 +328,8 @@ export const TowerRanking = ({ version }: TowerRankingProps) => {
             <Skeleton key={i} className="h-13 w-full rounded-lg" />
           ))}
         </div>
+      ) : isError ? (
+        <FetchErrorState error={isError} />
       ) : sortedRankings.length === 0 ? (
         <div className="flex items-center justify-center rounded-xl border border-bpim-border py-12 text-sm text-bpim-muted">
           この期間のデータはありません

@@ -913,12 +913,6 @@ export const pagesTranslations = {
     "zh-TW": "登入以反映成績",
     ko: "로그인하여 점수 반영",
   },
-  "aaaTable.loadError": {
-    ja: "データの読み込みに失敗しました",
-    en: "Failed to load data.",
-    "zh-TW": "資料讀取失敗。",
-    ko: "데이터 불러오기에 실패했습니다.",
-  },
 
   // ArenaAverage table
   "arenaAverage.songTitle": {

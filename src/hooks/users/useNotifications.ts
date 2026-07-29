@@ -34,6 +34,7 @@ export const useNotifications = (
     isLoading,
     isLoadingMore,
     isReachingEnd,
+    isError,
     mutate: mutateList,
   } = useInfiniteList<NotificationItem[], NotificationItem>(
     (index) => {
@@ -69,6 +70,7 @@ export const useNotifications = (
     isLoading,
     isLoadingMore,
     isReachingEnd,
+    isError,
     size,
     setSize,
     markAsRead,

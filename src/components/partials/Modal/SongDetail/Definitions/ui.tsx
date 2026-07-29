@@ -15,6 +15,7 @@ import {
 } from "recharts";
 import { BookOpen, TrendingDown, TrendingUp, Minus } from "lucide-react";
 import { SectionLoader } from "@/components/ui/loading-spinner";
+import { FetchErrorState } from "@/components/partials/FetchErrorState";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -196,7 +197,11 @@ export const DefinitionsTab = ({ song }: DefinitionsTabProps) => {
     return <SectionLoader className="h-64" />;
   }
 
-  if (isError || !definitions || definitions.length === 0) {
+  if (isError) {
+    return <FetchErrorState error={isError} className="min-h-64" />;
+  }
+
+  if (!definitions || definitions.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-20">
         <BookOpen className="h-10 w-10 text-bpim-subtle" />

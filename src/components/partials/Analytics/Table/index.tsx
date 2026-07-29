@@ -11,6 +11,7 @@ import { LoginRequiredCard } from "@/components/partials/LoginRequired/ui";
 import { CustomPagination } from "@/components/partials/Pagination/ui";
 import { AdvancedFilterModal } from "@/components/partials/Songs/AdvancedFilter/ui";
 import { SongDetailView } from "@/components/partials/Modal/SongDetail/ui";
+import { FetchErrorState } from "@/components/partials/FetchErrorState";
 import { RivalSongItem } from "@/components/partials/Rivals/Table/ui";
 import { RivalAnalysis } from "@/components/partials/Rivals/Analysis/ui";
 import { useUser } from "@/contexts/users/UserContext";
@@ -47,14 +48,7 @@ export const AnalyticsComparisonTable = ({
   if (!fbUser) return <LoginRequiredCard />;
 
   if (!isLoading && error) {
-    return (
-      <div className="flex h-50 flex-col items-center justify-center gap-2">
-        <p className="font-bold text-bpim-danger">
-          楽曲データの取得に失敗しました
-        </p>
-        <p className="text-xs text-bpim-muted">{error?.message}</p>
-      </div>
-    );
+    return <FetchErrorState error={error} />;
   }
 
   const SubTabBar = () => (
