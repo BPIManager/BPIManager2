@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import definitions from "./resources/definitions.json";
+import definitions from "../resources/definitions.json";
 import { BpiCalculator } from "@/lib/bpi";
 import { IBpiBasicSongData } from "@/types/songs/bpi";
 

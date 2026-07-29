@@ -9,7 +9,7 @@ import { isImproved } from "@/lib/lamp";
 
 describe("CSV Parser Test", () => {
   it("CSV文字列が正しくJSONオブジェクトの配列に変換されること", () => {
-    const csvPath = path.join(__dirname, "./resources/testCsv.csv");
+    const csvPath = path.join(__dirname, "../resources/testCsv.csv");
     const csvData = fs.readFileSync(csvPath, "utf-8");
 
     const result = parseCSV(csvData);
