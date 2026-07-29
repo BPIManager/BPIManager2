@@ -44,64 +44,62 @@ export const TimelineContainer = () => {
         description={t("page.timeline.desc")}
       />
       <PageContainer>
-        <div className="mx-auto w-full max-w-7xl px-4 py-6">
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[260px_1fr] items-start">
-            <aside className="lg:sticky lg:top-20 z-10">
-              <div className="flex flex-col gap-6 rounded-xl border border-bpim-border bg-bpim-bg/40 p-4 backdrop-blur-sm">
-                <div className="flex flex-col gap-1">
-                  <FilterHeader label={t("timeline.mode.label")} />
-                  <MenuButton
-                    isActive={mode === "all"}
-                    icon={Activity}
-                    label={t("timeline.mode.all")}
-                    onClick={() => setMode("all")}
-                  />
-                  <MenuButton
-                    isActive={mode === "played"}
-                    icon={UserCheck}
-                    label={t("timeline.mode.played")}
-                    onClick={() => setMode("played")}
-                  />
-                  <MenuButton
-                    isActive={mode === "overtaken"}
-                    icon={Swords}
-                    label={t("timeline.mode.overtaken")}
-                    activeVariant="destructive"
-                    onClick={() => setMode("overtaken")}
-                  />
-                </div>
-
-                <FilterCheckboxGroup
-                  label="LEVEL"
-                  items={[11, 12]}
-                  selected={filterParams.levels || []}
-                  onToggle={(lv: number) => toggleLevel(lv)}
-                  getLabel={(lv: number) => `☆${lv}`}
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[260px_1fr] items-start">
+          <aside className="lg:sticky lg:top-20 z-10">
+            <div className="flex flex-col gap-6 rounded-xl border border-bpim-border bg-bpim-bg/40 p-4 backdrop-blur-sm">
+              <div className="flex flex-col gap-1">
+                <FilterHeader label={t("timeline.mode.label")} />
+                <MenuButton
+                  isActive={mode === "all"}
+                  icon={Activity}
+                  label={t("timeline.mode.all")}
+                  onClick={() => setMode("all")}
                 />
-
-                <FilterCheckboxGroup
-                  label="DIFFICULTY"
-                  items={IIDX_DIFFICULTIES}
-                  selected={filterParams.difficulties || []}
-                  onToggle={(diff: string) =>
-                    toggleDifficulty(diff as IidxDifficulty)
-                  }
-                  getLabel={(diff: string) => diff[0]}
+                <MenuButton
+                  isActive={mode === "played"}
+                  icon={UserCheck}
+                  label={t("timeline.mode.played")}
+                  onClick={() => setMode("played")}
                 />
-              </div>
-            </aside>
-
-            <div className="flex flex-col gap-4 min-w-0">
-              <div className="rounded-xl border border-bpim-border bg-bpim-bg p-2">
-                <FilterSearchInput
-                  value={filterParams.search || ""}
-                  onChange={(search: string) => updateParams({ search })}
-                  placeholder={t("timeline.search.placeholder")}
+                <MenuButton
+                  isActive={mode === "overtaken"}
+                  icon={Swords}
+                  label={t("timeline.mode.overtaken")}
+                  activeVariant="destructive"
+                  onClick={() => setMode("overtaken")}
                 />
               </div>
 
-              <TimelineList mode={mode} params={filterParams} />
+              <FilterCheckboxGroup
+                label="LEVEL"
+                items={[11, 12]}
+                selected={filterParams.levels || []}
+                onToggle={(lv: number) => toggleLevel(lv)}
+                getLabel={(lv: number) => `☆${lv}`}
+              />
+
+              <FilterCheckboxGroup
+                label="DIFFICULTY"
+                items={IIDX_DIFFICULTIES}
+                selected={filterParams.difficulties || []}
+                onToggle={(diff: string) =>
+                  toggleDifficulty(diff as IidxDifficulty)
+                }
+                getLabel={(diff: string) => diff[0]}
+              />
             </div>
+          </aside>
+
+          <div className="flex flex-col gap-4 min-w-0">
+            <div className="rounded-xl border border-bpim-border bg-bpim-bg p-2">
+              <FilterSearchInput
+                value={filterParams.search || ""}
+                onChange={(search: string) => updateParams({ search })}
+                placeholder={t("timeline.search.placeholder")}
+              />
+            </div>
+
+            <TimelineList mode={mode} params={filterParams} />
           </div>
         </div>
       </PageContainer>
