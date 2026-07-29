@@ -45,8 +45,21 @@ export function createQueryBuilderSpy(result: unknown) {
 export function createDbSpy(result: unknown) {
   const { proxy: chain, calls } = createQueryBuilderSpy(result);
 
+  // db.fn.max(...)のようなトップレベルの関数ビルダーアクセスに対応する
+  const fnHandler: ProxyHandler<object> = {
+    get(_target, prop) {
+      if (typeof prop !== "string") return undefined;
+      return (...args: unknown[]) => {
+        calls.push({ method: `fn.${prop}`, args });
+        return chain;
+      };
+    },
+  };
+  const fnProxy = new Proxy({}, fnHandler);
+
   const dbHandler: ProxyHandler<object> = {
     get(_target, prop) {
+      if (prop === "fn") return fnProxy;
       if (typeof prop !== "string") return undefined;
       return vi.fn((...args: unknown[]) => {
         calls.push({ method: prop, args });
