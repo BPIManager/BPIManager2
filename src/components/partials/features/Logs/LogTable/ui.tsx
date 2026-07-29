@@ -7,6 +7,7 @@ import { AdvancedFilterModal } from "@/components/partials/common/Songs/Advanced
 import { SongFilterBar } from "@/components/partials/common/Songs/Filter/ui";
 import { SongList } from "@/components/partials/common/Table/ui";
 import type { BatchDetailItem } from "@/types/logs/batchDetail";
+import type { SongWithScore } from "@/types/songs/score";
 
 export const BatchSongsTable = ({
   songs,
@@ -15,11 +16,11 @@ export const BatchSongsTable = ({
   songs: BatchDetailItem[];
   listRef?: RefObject<HTMLDivElement | null>;
 }) => {
-  const [selectedSong, setSelectedSong] = useState<any>(null);
+  const mappedSongs = useMemo(() => mapBatchToSongs(songs), [songs]);
+
+  const [selectedSong, setSelectedSong] = useState<SongWithScore | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
-
-  const mappedSongs = useMemo(() => mapBatchToSongs(songs), [songs]);
 
   const { params, updateParams, page, setPage, visibleSongs, totalCount } =
     useSongFilter(mappedSongs);

@@ -4,7 +4,6 @@ import { statsRepo } from "@/lib/db/stats";
 import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
 import {
   singleBPIDistributionParamsSchema,
-  VALID_STEPS,
   type ValidStep,
 } from "@/schemas/stats/singleBPIDistribution";
 import { parseQuery } from "@/services/nextRequest/parseBody";

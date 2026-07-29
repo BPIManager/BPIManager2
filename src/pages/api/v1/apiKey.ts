@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextApiResponse } from "next";
 import crypto from "crypto";
 import {
   AuthenticatedNextApiRequest,

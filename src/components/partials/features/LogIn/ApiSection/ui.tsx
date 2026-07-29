@@ -31,7 +31,7 @@ export const ApiSection = () => {
             <span className="shrink-0 select-none text-bpim-primary">$</span>
             <span className="text-bpim-text">
               curl <span className="text-bpim-success">GET</span>{" "}
-              "https://bpi2.poyashi.me/api/v1/users/abc123uid/scores?version=32"
+              {`"https://bpi2.poyashi.me/api/v1/users/abc123uid/scores?version=32"`}
             </span>
           </div>
 
@@ -41,23 +41,23 @@ export const ApiSection = () => {
             {`  {`}
             <br />
             {`    `}
-            <span className="text-bpim-info">"songId"</span>:{" "}
+            <span className="text-bpim-info">{`"songId"`}</span>:{" "}
             <span className="text-bpim-danger">1024</span>,
             <br />
             {`    `}
-            <span className="text-bpim-info">"title"</span>:{" "}
-            <span className="text-bpim-warning">"V"</span>,
+            <span className="text-bpim-info">{`"title"`}</span>:{" "}
+            <span className="text-bpim-warning">{`"V"`}</span>,
             <br />
             {`    `}
-            <span className="text-bpim-info">"difficulty"</span>:{" "}
-            <span className="text-bpim-warning">"ANOTHER"</span>,
+            <span className="text-bpim-info">{`"difficulty"`}</span>:{" "}
+            <span className="text-bpim-warning">{`"ANOTHER"`}</span>,
             <br />
             {`    `}
-            <span className="text-bpim-info">"exScore"</span>:{" "}
+            <span className="text-bpim-info">{`"exScore"`}</span>:{" "}
             <span className="text-bpim-danger">2805</span>,
             <br />
             {`    `}
-            <span className="text-bpim-info">"bpi"</span>:{" "}
+            <span className="text-bpim-info">{`"bpi"`}</span>:{" "}
             <span className="text-bpim-danger">52.45</span>,
             <br />
             {`    ...`}

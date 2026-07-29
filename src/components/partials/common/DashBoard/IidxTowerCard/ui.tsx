@@ -18,10 +18,10 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  Legend,
   CartesianGrid,
   ReferenceLine,
 } from "recharts";
+import type { Formatter } from "recharts/types/component/DefaultTooltipContent";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface Props {
@@ -290,12 +290,13 @@ export const IidxTowerCard = ({
                   fontWeight: "bold",
                   marginBottom: "4px",
                 }}
-                formatter={(v: any, name: any, props: any) => {
+                formatter={((v, name, props) => {
                   const nameStr = String(name);
                   if (nameStr === scratchLabel) {
+                    const payload = props.payload as { rawScr: number };
                     return [
                       <span key="v" className="tabular-nums font-bold">
-                        {fmt(props.payload.rawScr)}
+                        {fmt(payload.rawScr)}
                       </span>,
                       nameStr,
                     ];
@@ -306,7 +307,7 @@ export const IidxTowerCard = ({
                     </span>,
                     nameStr,
                   ];
-                }}
+                }) as Formatter}
                 cursor={{ fill: "var(--color-bpim-border)", opacity: 0.1 }}
               />
               <Bar

@@ -55,7 +55,7 @@ export async function authenticateViewer(
       const idToken = authHeader.split("Bearer ")[1];
       const decodedToken = await adminAuth.verifyIdToken(idToken);
       return decodedToken.uid;
-    } catch (e) {
+    } catch {
       console.error("Auth: Token verification failed");
     }
   }

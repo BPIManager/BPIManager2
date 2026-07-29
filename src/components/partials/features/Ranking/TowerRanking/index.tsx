@@ -124,7 +124,7 @@ export const TowerRanking = ({ version }: TowerRankingProps) => {
     "total") as TowerType;
   const selectedDate = (router.query.towerDate as string) || today;
 
-  const { startDate, endDate, label } = getPeriodRange(period, selectedDate);
+  const { label } = getPeriodRange(period, selectedDate);
 
   const { data, isLoading, isError } = useIidxTowerRanking({
     version,

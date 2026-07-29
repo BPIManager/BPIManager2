@@ -19,11 +19,10 @@ export const NearLoseList = ({ userId, onSelect }: NearLoseListProps) => {
     <InfiniteScrollContainer
       {...res}
       emptyMessage={t("dashboard.ranking.noSongs")}
-      renderItem={(item, i) => (
+      renderItem={(item, _i) => (
         <NearLoseRankItem
           key={`${item.songId}-${item.rival.userId}`}
           item={item}
-          rank={i + 1}
           onClick={() => onSelect(item)}
         />
       )}

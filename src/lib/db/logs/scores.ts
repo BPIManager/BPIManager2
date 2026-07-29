@@ -58,7 +58,7 @@ class LogScoreRepository {
           .on("prev.userId", "=", userId)
           .on("prev.version", "=", version)
           .on("prev.logId", "=", (qb) => {
-            let sub = qb
+            const sub = qb
               .selectFrom("scores as sub")
               .select((eb) => eb.fn.max("sub.logId").as("maxLogId"))
               .whereRef("sub.songId", "=", "current.songId")

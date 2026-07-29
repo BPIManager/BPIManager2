@@ -14,18 +14,6 @@ export const RANK_COLORS: Record<string, string> = {
   "MAX-": "#E2E8F0",
 };
 
-const RANK_ORDER: Record<string, number> = {
-  F: 0,
-  E: 1,
-  D: 2,
-  C: 3,
-  B: 4,
-  A: 5,
-  AA: 6,
-  AAA: 7,
-  "MAX-": 8,
-};
-
 export const getRankColorFromTheme = (
   label: string,
   _colors: ChartColors,

@@ -1,6 +1,17 @@
 import { db } from "@/lib/db";
 import { IIDXVersion } from "@/types/iidx/version";
 
+interface TimelineLogEntry {
+  id: number;
+  batchId: string;
+  version: string;
+  totalBpi: number;
+  songCount: number;
+  diff: number;
+  createdAt: Date;
+  topScores: { title: string; bpi: number; clearState: string | null }[];
+}
+
 class ScoreTimelineRepository {
   /**
    * ユーザーのタイムラインログ（BPI推移 + 各バッチのTOPnスコア）を取得 / バッチID基準
@@ -107,7 +118,7 @@ class ScoreTimelineRepository {
         });
       }
       return acc;
-    }, [] as any[]);
+    }, [] as TimelineLogEntry[]);
   }
 
   /**

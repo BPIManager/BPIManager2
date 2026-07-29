@@ -6,7 +6,6 @@ import type { ArenaAverageData } from "@/types/metrics/arena";
 import type { RadarCategory } from "@/types/stats/radar";
 import {
   ALL_RADAR_CATEGORIES,
-  RADAR_COLORS,
   ARENA_RANK_COLORS,
 } from "@/constants/iidx/radars";
 

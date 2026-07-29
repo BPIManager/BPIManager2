@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Coffee, Fish, Piano, Code2, Trophy, Sparkle } from "lucide-react";
+import { Coffee, Fish, Code2, Trophy, Sparkle } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,

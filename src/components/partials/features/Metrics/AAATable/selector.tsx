@@ -202,7 +202,7 @@ export const AAATableFilter = ({
       render: () => (
         <RadioGroup
           value={groupingMode}
-          onValueChange={(v) => onGroupingModeChange(v as any)}
+          onValueChange={(v) => onGroupingModeChange(v as GroupingMode)}
           className="flex h-8 items-center gap-4"
         >
           {[
@@ -281,7 +281,9 @@ export const AAATableFilter = ({
               <Loader className="absolute right-1.5 top-1/2 h-3 w-3 -translate-y-1/2 animate-spin text-bpim-muted" />
             )}
           </div>
-          <span className="text-xs font-bold text-bpim-muted">{t("aaa.filter.distToGoal.unit")}</span>
+          <span className="text-xs font-bold text-bpim-muted">
+            {t("aaa.filter.distToGoal.unit")}
+          </span>
         </div>
       ),
     },

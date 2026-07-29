@@ -52,6 +52,7 @@ export const LordiconAnimation = ({
 };
 
 declare module "react" {
+  // eslint-disable-next-line @typescript-eslint/no-namespace -- JSXの型宣言マージにnamespaceが必須
   namespace JSX {
     interface IntrinsicElements {
       "lord-icon": React.DetailedHTMLProps<

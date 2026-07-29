@@ -6,13 +6,11 @@ import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface NearLoseRankItemProps {
   item: NearLoseSongItem;
-  rank: number;
   onClick: () => void;
 }
 
 export const NearLoseRankItem = ({
   item,
-  rank,
   onClick,
 }: NearLoseRankItemProps) => {
   const { t } = useTranslation();

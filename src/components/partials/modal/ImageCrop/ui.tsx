@@ -145,7 +145,7 @@ export const ImageUploadModal = ({
               />
             </div>
           ) : (
-            <div className="relative max-h-[400px] w-full overflow-hidden rounded-lg bg-bpim-bg/50 border border-bpim-border">
+            <div className="relative max-h-100 w-full overflow-hidden rounded-lg bg-bpim-bg/50 border border-bpim-border">
               <ReactCrop
                 crop={crop}
                 onChange={(c) => setCrop(c)}
@@ -153,12 +153,13 @@ export const ImageUploadModal = ({
                 circularCrop
                 className="mx-auto"
               >
+                {/* eslint-disable-next-line @next/next/no-img-element -- react-image-cropがネイティブimg要素へのrefとnaturalWidth/Heightを直接必要とするためnext/imageは使えない */}
                 <img
                   ref={imgRef}
                   alt="Crop preview"
                   src={imgSrc}
                   onLoad={onImageLoad}
-                  className="max-h-[400px] object-contain"
+                  className="max-h-100 object-contain"
                 />
               </ReactCrop>
             </div>
@@ -187,13 +188,9 @@ export const ImageUploadModal = ({
             <Button
               onClick={handleUpload}
               disabled={isUploading}
-              className="h-9 min-w-[80px] bg-bpim-primary hover:bg-bpim-primary"
+              className="h-9 min-w-20 bg-bpim-primary hover:bg-bpim-primary"
             >
-              {isUploading ? (
-                <LoadingSpinner size="sm" />
-              ) : (
-                "保存"
-              )}
+              {isUploading ? <LoadingSpinner size="sm" /> : "保存"}
             </Button>
           )}
         </DialogFooter>

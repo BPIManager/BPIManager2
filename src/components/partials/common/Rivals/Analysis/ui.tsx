@@ -380,7 +380,11 @@ export const RivalAnalysis = ({ songs, rivalName }: RivalAnalysisProps) => {
   const handleToggle = (cat: RadarCategory) => {
     setSelectedCategories((prev) => {
       const next = new Set(prev);
-      next.has(cat) ? next.delete(cat) : next.add(cat);
+      if (next.has(cat)) {
+        next.delete(cat);
+      } else {
+        next.add(cat);
+      }
       return next;
     });
   };
@@ -388,7 +392,11 @@ export const RivalAnalysis = ({ songs, rivalName }: RivalAnalysisProps) => {
   const handleLevelToggle = (level: number) => {
     setSelectedLevels((prev) => {
       const next = new Set(prev);
-      next.has(level) ? next.delete(level) : next.add(level);
+      if (next.has(level)) {
+        next.delete(level);
+      } else {
+        next.add(level);
+      }
       return next;
     });
   };
@@ -396,7 +404,11 @@ export const RivalAnalysis = ({ songs, rivalName }: RivalAnalysisProps) => {
   const handleDifficultyToggle = (diff: DifficultyName) => {
     setSelectedDifficulties((prev) => {
       const next = new Set(prev);
-      next.has(diff) ? next.delete(diff) : next.add(diff);
+      if (next.has(diff)) {
+        next.delete(diff);
+      } else {
+        next.add(diff);
+      }
       return next;
     });
   };

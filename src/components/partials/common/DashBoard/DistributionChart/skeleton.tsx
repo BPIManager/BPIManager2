@@ -1,6 +1,5 @@
 ﻿import { DashCard } from "@/components/ui/dashcard";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
 
 interface BaseSkeletonProps {
   count?: number;

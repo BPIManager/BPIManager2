@@ -9,11 +9,11 @@ describe("BpiCalculator ロジックテスト", () => {
   // 1. 基本的な指標の検証
   describe("基本指標の検証", () => {
     it("皆伝平均スコアを入力した時、BPIがほぼ0になること", () => {
-      songs.slice(0, 100).forEach((songData: any) => {
+      songs.slice(0, 100).forEach((songData) => {
         const song: IBpiBasicSongData = {
           notes: Number(songData.notes),
-          kaidenAvg: Number(songData.avg),
-          wrScore: Number(songData.wr),
+          kaidenAvg: Number(songData.kaidenAvg),
+          wrScore: Number(songData.wrScore),
           coef: Number(songData.coef),
         };
         if (song.kaidenAvg && song.kaidenAvg > 0) {
@@ -25,11 +25,11 @@ describe("BpiCalculator ロジックテスト", () => {
     });
 
     it("歴代最高スコアを入力した時、BPIがほぼ100になること", () => {
-      songs.slice(0, 100).forEach((songData: any) => {
+      songs.slice(0, 100).forEach((songData) => {
         const song: IBpiBasicSongData = {
           notes: Number(songData.notes),
-          kaidenAvg: Number(songData.avg),
-          wrScore: Number(songData.wr),
+          kaidenAvg: Number(songData.kaidenAvg),
+          wrScore: Number(songData.wrScore),
           coef: Number(songData.coef),
         };
         if (song.wrScore && song.wrScore > 0) {

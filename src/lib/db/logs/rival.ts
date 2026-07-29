@@ -39,11 +39,11 @@ class RivalRepository {
           ),
       )
       .leftJoin("scores as r", (join) => {
-        let base = join
+        const base = join
           .onRef("r.songId", "=", "s.songId")
           .on("r.version", "=", version)
           .on("r.logId", "=", (eb) => {
-            let sub = eb
+            const sub = eb
               .selectFrom("scores as r2")
               .select((s) => s.fn.max("logId").as("m"))
               .where("r2.version", "=", version)

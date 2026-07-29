@@ -5,7 +5,10 @@ import { BatchSongsTable } from "../LogTable/ui";
 import { NoDataAlert } from "@/components/partials/common/DashBoard/NoData";
 import { LogsDetailContentSkeleton } from "../LogsDetail/skeleton";
 import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
-import { getBpiDistribution, getRankDistribution } from "@/utils/logs/getDistribution";
+import {
+  getBpiDistribution,
+  getRankDistribution,
+} from "@/utils/logs/getDistribution";
 import { DistributionChart } from "@/components/partials/common/DashBoard/DistributionChart/ui";
 import { RANK_COLORS } from "@/constants/theme/djRankColor";
 import { getBpiColor } from "@/constants/theme/bpiColor";
@@ -85,11 +88,11 @@ export const VersionCompareContent = ({ userId, version }: Props) => {
   }, [songsWithCurrent]);
 
   const bpiData = useMemo(
-    () => getBpiDistribution(songsWithCurrent as any, bpiStep),
+    () => getBpiDistribution(songsWithCurrent, bpiStep),
     [songsWithCurrent, bpiStep],
   );
   const rankData = useMemo(
-    () => getRankDistribution(songsWithCurrent as any),
+    () => getRankDistribution(songsWithCurrent),
     [songsWithCurrent],
   );
 
@@ -167,15 +170,15 @@ export const VersionCompareContent = ({ userId, version }: Props) => {
               getColor={(l) => RANK_COLORS[l]}
             />
           </div>
-          <LogRank details={songsWithCurrent as any} type="top" />
-          <LogRank details={songsWithCurrent as any} type="growth" />
+          <LogRank details={songsWithCurrent} type="top" />
+          <LogRank details={songsWithCurrent} type="growth" />
         </TabsContent>
 
         <TabsContent
           value="songs"
           className="mt-4 p-0 focus-visible:outline-none"
         >
-          <BatchSongsTable songs={songsWithCurrent as any} />
+          <BatchSongsTable songs={songsWithCurrent} />
         </TabsContent>
       </Tabs>
     </div>

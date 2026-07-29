@@ -35,6 +35,7 @@ export const ProfileMeta = ({
       }
       ogImage={ogImage}
       ogType="article"
+      noIndex={noIndex}
     />
   );
 };

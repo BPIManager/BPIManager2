@@ -9,7 +9,7 @@ import useSWR from "swr";
  * @returns 平均スコアデータ配列・ローディング状態
  */
 export const useArenaAverages = (version: string, level: number) => {
-  const { data, error, isLoading } = useSWR(
+  const { data, isLoading } = useSWR(
     version && level ? `/data/metrics/arena/${version}_${level}.json` : null,
     fetcher,
   );
