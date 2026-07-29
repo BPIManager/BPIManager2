@@ -91,7 +91,11 @@ export function useSongListFilter() {
   const toggleDifficulty = useCallback((diff: string) => {
     setDifficulties((prev) => {
       const next = new Set(prev);
-      next.has(diff) ? next.delete(diff) : next.add(diff);
+      if (next.has(diff)) {
+        next.delete(diff);
+      } else {
+        next.add(diff);
+      }
       return next;
     });
   }, []);

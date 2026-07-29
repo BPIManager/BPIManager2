@@ -15,7 +15,6 @@ import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchE
 import { RivalSongItem } from "@/components/partials/common/Rivals/Table/ui";
 import { RivalAnalysis } from "@/components/partials/common/Rivals/Analysis/ui";
 import { useUser } from "@/contexts/users/UserContext";
-import type { AnalyticsTarget } from "@/types/analytics";
 import { List, BarChart2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -26,7 +25,6 @@ interface AnalyticsComparisonTableProps {
   isLoading: boolean;
   error: Error | undefined;
   rivalLabel?: string;
-  target: AnalyticsTarget | null;
 }
 
 export const AnalyticsComparisonTable = ({
@@ -34,7 +32,6 @@ export const AnalyticsComparisonTable = ({
   isLoading,
   error,
   rivalLabel,
-  target,
 }: AnalyticsComparisonTableProps) => {
   const { fbUser } = useUser();
   const [selectedSong, setSelectedSong] = useState<SongWithScore | null>(null);

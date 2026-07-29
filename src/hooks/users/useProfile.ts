@@ -91,7 +91,7 @@ export const useProfile = (userId: string | undefined) => {
           { revalidate: true },
         );
       }
-    } catch (e) {
+    } catch {
       toast.error("操作が完了しませんでした");
     }
   };

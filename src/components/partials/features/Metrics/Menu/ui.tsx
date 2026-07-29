@@ -27,7 +27,7 @@ export const ReusableMenuItem = ({
   const Container = href ? (isExternal ? "a" : NextLink) : "button";
 
   return (
-    // @ts-ignore
+    // @ts-expect-error Containerは"a" | typeof NextLink | "button"の合成型のためpropsの型検査が緩くなる
     <Container
       href={href || "#"}
       target={isExternal ? "_blank" : undefined}

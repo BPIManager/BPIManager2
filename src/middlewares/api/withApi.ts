@@ -45,7 +45,7 @@ export async function checkUserAccess(
       if (decodedToken.uid === targetUserId) {
         return { hasAccess: true, user: userData, viewerId: decodedToken.uid };
       }
-    } catch (e) {
+    } catch {
       console.error("Access Control: Token verification failed");
     }
   }

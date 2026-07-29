@@ -45,7 +45,7 @@ export default function TransferUi() {
       if (!response.ok) throw new Error("transfer failed");
       toast.success(t("settings.transfer.success"));
       setIsConfirmOpen(false);
-    } catch (e) {
+    } catch {
       toast.error(t("settings.transfer.error"));
     } finally {
       setIsSyncing(false);

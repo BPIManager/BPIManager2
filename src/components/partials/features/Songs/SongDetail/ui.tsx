@@ -51,7 +51,6 @@ export function SongMetaCard({ song }: SongMetaCardProps) {
               difficulty={song.difficulty}
               level={song.difficultyLevel}
               size="md"
-              truncate={false}
             />
             {textage1pUrl && textage2pUrl && (
               <div className="inline-flex rounded border border-bpim-border overflow-hidden">

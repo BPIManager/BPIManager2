@@ -15,6 +15,7 @@ import {
   CartesianGrid,
   ReferenceLine,
 } from "recharts";
+import type { Formatter } from "recharts/types/component/DefaultTooltipContent";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 const fmt = (n: number) => n.toLocaleString("ja-JP");
@@ -77,7 +78,10 @@ function IidxTowerComparisonCard({
   const GRANULARITIES = [
     { label: t("dashboard.iidxTower.granularityDay"), value: "day" as const },
     { label: t("dashboard.iidxTower.granularityWeek"), value: "week" as const },
-    { label: t("dashboard.iidxTower.granularityMonth"), value: "month" as const },
+    {
+      label: t("dashboard.iidxTower.granularityMonth"),
+      value: "month" as const,
+    },
   ];
 
   const keyLabel = t("dashboard.iidxTower.key");
@@ -171,7 +175,11 @@ function IidxTowerComparisonCard({
       <DashCard className="border-2 border-dashed border-bpim-primary/30 bg-bpim-primary/5 p-6 text-center">
         <div className="flex flex-col items-center">
           <div className="mb-3 flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-bpim-primary/10">
-            <LordiconAnimation src="/lottie/ghost.json" trigger="loop" size={36} />
+            <LordiconAnimation
+              src="/lottie/ghost.json"
+              trigger="loop"
+              size={36}
+            />
           </div>
           <h3 className="tracking-tight text-base font-black text-bpim-text">
             {t("dashboard.iidxTower.noData")}
@@ -305,26 +313,32 @@ function IidxTowerComparisonCard({
                     fontWeight: "bold",
                     marginBottom: "4px",
                   }}
-                  formatter={(v: any, name: any, props: any) => {
-                    const nameStr = String(name);
-                    if (nameStr.includes(`(${scratchLabel})`)) {
-                      const rawVal = name.includes(myName)
-                        ? props.payload.rawMyScr
-                        : props.payload.rawRivalScr;
+                  formatter={
+                    ((v, name, props) => {
+                      const nameStr = String(name);
+                      if (nameStr.includes(`(${scratchLabel})`)) {
+                        const payload = props.payload as {
+                          rawMyScr: number;
+                          rawRivalScr: number;
+                        };
+                        const rawVal = nameStr.includes(myName)
+                          ? payload.rawMyScr
+                          : payload.rawRivalScr;
+                        return [
+                          <span key="v" className="tabular-nums font-bold">
+                            {fmt(rawVal)}
+                          </span>,
+                          name,
+                        ];
+                      }
                       return [
                         <span key="v" className="tabular-nums font-bold">
-                          {fmt(rawVal)}
+                          {fmt(Number(v))}
                         </span>,
-                        name,
+                        nameStr,
                       ];
-                    }
-                    return [
-                      <span key="v" className="tabular-nums font-bold">
-                        {fmt(Number(v))}
-                      </span>,
-                      nameStr,
-                    ];
-                  }}
+                    }) as Formatter
+                  }
                   cursor={{ fill: "var(--color-bpim-border)", opacity: 0.1 }}
                 />
 

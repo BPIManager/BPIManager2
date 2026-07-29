@@ -16,11 +16,10 @@ export const useBpiOptimizerMemos = (userId?: string) => {
   const { mutate } = useSWRConfig();
   const apiUrl = `/api/v1/users/${userId}/optimizeMemo`;
 
-  const {
-    data: memos,
-    error,
-    isLoading: isMemosLoading,
-  } = useSWR<OptimizeMemo[]>(userId ? apiUrl : null, fetcher);
+  const { data: memos, isLoading: isMemosLoading } = useSWR<OptimizeMemo[]>(
+    userId ? apiUrl : null,
+    fetcher,
+  );
 
   const [isSaving, setIsSaving] = useState(false);
   const saveMemo = useCallback(

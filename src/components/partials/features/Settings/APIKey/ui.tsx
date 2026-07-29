@@ -22,13 +22,17 @@ export default function ApiKeyUi() {
       setRawKey(key);
       toast.success(t("settings.apiKey.issued"), { duration: 10000 });
       setIsConfirmOpen(false);
-    } catch (e) {
+    } catch {
       toast.error(t("settings.apiKey.failed"));
     }
   };
 
   const handleGenerateClick = () => {
-    keyInfo?.exists ? setIsConfirmOpen(true) : executeGenerate();
+    if (keyInfo?.exists) {
+      setIsConfirmOpen(true);
+    } else {
+      executeGenerate();
+    }
   };
 
   const copyToClipboard = () => {

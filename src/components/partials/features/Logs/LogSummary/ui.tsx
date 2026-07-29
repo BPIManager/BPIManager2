@@ -1,11 +1,5 @@
-﻿import { PlusCircle, HelpCircle, MusicIcon } from "lucide-react";
-import {
-  HelpTooltip,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+﻿import { PlusCircle, MusicIcon } from "lucide-react";
+import { HelpTooltip } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { DashCard } from "@/components/ui/dashcard";
 import { useTranslation } from "@/hooks/common/useTranslation";

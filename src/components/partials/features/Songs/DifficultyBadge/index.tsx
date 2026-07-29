@@ -8,14 +8,12 @@ interface DifficultyBadgeProps {
   difficulty: string;
   level: number;
   size?: "sm" | "md";
-  truncate?: boolean;
 }
 
 export function DifficultyBadge({
   difficulty,
   level,
   size = "sm",
-  truncate = true,
 }: DifficultyBadgeProps) {
   const color =
     COLOR_MAP[difficulty] ??

@@ -3,7 +3,6 @@
 import { ArrowLeft, Share2, Users } from "lucide-react";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import Link from "next/link";
-import { useRef } from "react";
 import {
   Avatar,
   AvatarImage,

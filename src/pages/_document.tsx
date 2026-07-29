@@ -74,7 +74,7 @@ export default function Document() {
           async
           src="https://www.googletagmanager.com/gtag/js?id=G-98L27Y6ZDH"
         />
-        <Script>
+        <Script id="ga-init">
           {`window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-98L27Y6ZDH');`}
         </Script>
       </Head>

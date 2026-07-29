@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { getBpiColorStyle } from "@/constants/theme/bpiColor";
 import { BPM_CONST } from "@/constants/iidx/bpmBands";
-import { useChartColors } from "@/hooks/common/useChartColors";
 import type { BpmBandBpiItem } from "@/types/stats/distribution";
 import { BpmBandSongsDialog } from "./dialog";
 import { cn } from "@/lib/utils";
@@ -33,7 +32,7 @@ const HorizontalBar = ({
 
   return (
     <div
-      className="h-[10px] rounded-r-sm origin-left"
+      className="h-2.5 rounded-r-sm origin-left"
       style={{
         width: `${widthPct}%`,
         backgroundColor: color,
@@ -46,7 +45,6 @@ const HorizontalBar = ({
 
 export const BpmBpiChart = ({ myData, rivalData }: BpmBpiChartProps) => {
   const { BPI_MAX, BPI_MIN, BPM_BAND_ORDER } = BPM_CONST;
-  const c = useChartColors();
   const rivalMap = rivalData
     ? new Map(rivalData.map((d) => [d.label, d.totalBpi]))
     : null;

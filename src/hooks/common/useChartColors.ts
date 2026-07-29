@@ -74,7 +74,6 @@ export const useChartColors = (): ChartColors => {
       attributeFilter: ["data-theme"],
     });
     return () => observer.disconnect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return colors;

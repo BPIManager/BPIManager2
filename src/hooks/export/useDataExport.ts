@@ -120,7 +120,11 @@ export function useDataExport() {
   const toggleVersion = (v: IIDXVersion) => {
     setSelectedVersions((prev) => {
       const next = new Set(prev);
-      next.has(v) ? next.delete(v) : next.add(v);
+      if (next.has(v)) {
+        next.delete(v);
+      } else {
+        next.add(v);
+      }
       return next;
     });
   };
@@ -131,7 +135,11 @@ export function useDataExport() {
   const toggleField = (f: ExportField) => {
     setSelectedFields((prev) => {
       const next = new Set(prev);
-      next.has(f) ? next.delete(f) : next.add(f);
+      if (next.has(f)) {
+        next.delete(f);
+      } else {
+        next.add(f);
+      }
       return next;
     });
   };

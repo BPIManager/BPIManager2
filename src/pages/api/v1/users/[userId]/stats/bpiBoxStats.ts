@@ -120,7 +120,8 @@ export default async function handler(
 
     result.sort((a, b) => a.date.localeCompare(b.date));
     return res.status(200).json(result);
-  } catch (error: any) {
-    return res.status(500).json({ message: error.message });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return res.status(500).json({ message });
   }
 }

@@ -6,7 +6,6 @@ import { UserProfileLayout } from "@/components/partials/common/Profile/Layout/l
 import { AAATableContent } from "@/components/partials/features/Metrics/AAATable";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { ProfileMeta } from "@/components/partials/common/Profile/Meta/ui";
-import { DashCard } from "@/components/ui/dashcard";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/hooks/common/useTranslation";
 

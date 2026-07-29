@@ -11,11 +11,7 @@ import { useRivalListFilter } from "@/hooks/social/useRivalListFilter";
 import { useRouter } from "next/router";
 import { PageContainer, PageHeader } from "@/components/partials/common/PageChrome/Header";
 
-export const RivalListContainer = ({
-  viewerRadar,
-}: {
-  viewerRadar?: Record<string, number | { totalBpi: number }>;
-}) => {
+export const RivalListContainer = () => {
   const { user, isLoading: isCredentialLoading } = useUser();
   const router = useRouter();
   const {

@@ -1,7 +1,6 @@
 import { iidxUrl } from "@/constants/iidx/eamusementUrls";
 import {
   HelpCircle,
-  Info,
   AlertTriangle,
   Monitor,
   Gamepad2,

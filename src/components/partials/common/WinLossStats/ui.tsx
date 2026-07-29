@@ -263,7 +263,11 @@ export const WinLossStats = ({
   const toggleLevel = (lv: number) =>
     setExpandedLevels((prev) => {
       const next = new Set(prev);
-      next.has(lv) ? next.delete(lv) : next.add(lv);
+      if (next.has(lv)) {
+        next.delete(lv);
+      } else {
+        next.add(lv);
+      }
       return next;
     });
 

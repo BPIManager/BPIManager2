@@ -28,7 +28,7 @@ interface ChartDataPoint extends ExtendedBpiBoxStatsItem {
 
 interface TooltipProps {
   active?: boolean;
-  payload?: any[];
+  payload?: { payload: ChartDataPoint }[];
   label?: string;
 }
 
@@ -42,7 +42,9 @@ const BpiBoxHelpContent = () => {
         </p>
         <p>
           {t("dashboard.bpiBoxStats.help.scopeBefore")}
-          <span className="text-bpim-warning">{t("dashboard.bpiBoxStats.help.scopeHighlight")}</span>
+          <span className="text-bpim-warning">
+            {t("dashboard.bpiBoxStats.help.scopeHighlight")}
+          </span>
           {t("dashboard.bpiBoxStats.help.scopeAfter")}
         </p>
       </section>
@@ -53,8 +55,10 @@ const BpiBoxHelpContent = () => {
         </p>
         <ul className="list-disc list-inside space-y-1.5">
           <li>
-            <span className="font-bold">{t("dashboard.bpiBoxStats.help.periodBpiLabel")}</span>:
-            {t("dashboard.bpiBoxStats.help.periodBpiDesc")}
+            <span className="font-bold">
+              {t("dashboard.bpiBoxStats.help.periodBpiLabel")}
+            </span>
+            :{t("dashboard.bpiBoxStats.help.periodBpiDesc")}
           </li>
           <li>
             <span className="font-bold text-bpim-primary">
@@ -63,7 +67,10 @@ const BpiBoxHelpContent = () => {
             : {t("dashboard.bpiBoxStats.help.bandDesc")}
             <ul className="list-none pl-4 mt-1 space-y-1 text-bpim-muted">
               <li>
-                ・<span className="italic">{t("dashboard.bpiBoxStats.help.bandTopLabel")}</span>
+                ・
+                <span className="italic">
+                  {t("dashboard.bpiBoxStats.help.bandTopLabel")}
+                </span>
                 ：{t("dashboard.bpiBoxStats.help.bandTopDesc")}
               </li>
             </ul>
@@ -79,7 +86,10 @@ const BpiBoxHelpContent = () => {
             {t("dashboard.bpiBoxStats.help.efficiencyAfter")}
           </li>
           <li>
-            <span className="font-bold">{t("dashboard.bpiBoxStats.help.minMaxLabel")}</span>: {t("dashboard.bpiBoxStats.help.minMaxDesc")}
+            <span className="font-bold">
+              {t("dashboard.bpiBoxStats.help.minMaxLabel")}
+            </span>
+            : {t("dashboard.bpiBoxStats.help.minMaxDesc")}
           </li>
         </ul>
       </section>
@@ -130,7 +140,11 @@ const BpiBoxTooltip = ({ active, payload, label }: TooltipProps) => {
     <div className="min-w-45 rounded-md border border-bpim-border bg-bpim-surface p-3 shadow-xl">
       <p className="mb-2 text-[10px] font-bold text-bpim-muted">{label}</p>
       <div className="flex flex-col gap-1">
-        <Row label={t("dashboard.bpiBoxStats.upper")} value={d.max} color="text-bpim-danger" />
+        <Row
+          label={t("dashboard.bpiBoxStats.upper")}
+          value={d.max}
+          color="text-bpim-danger"
+        />
         <Row
           label={t("dashboard.bpiBoxStats.top25")}
           value={d.totalBpiTop25}
@@ -147,7 +161,11 @@ const BpiBoxTooltip = ({ active, payload, label }: TooltipProps) => {
           value={d.totalBpiTop75}
           color="text-bpim-warning"
         />
-        <Row label={t("dashboard.bpiBoxStats.lower")} value={d.min} color="text-bpim-success" />
+        <Row
+          label={t("dashboard.bpiBoxStats.lower")}
+          value={d.min}
+          color="text-bpim-success"
+        />
         <div className="my-1 h-px w-full bg-bpim-overlay/60" />
         <div className="flex items-center justify-between gap-4">
           <span className="text-[10px] text-bpim-warning font-bold">
@@ -158,7 +176,8 @@ const BpiBoxTooltip = ({ active, payload, label }: TooltipProps) => {
           </span>
         </div>
         <p className="text-right text-[10px] text-bpim-muted">
-          {t("dashboard.bpiBoxStats.count")}: {d.count}{t("dashboard.songUnit")}
+          {t("dashboard.bpiBoxStats.count")}: {d.count}
+          {t("dashboard.songUnit")}
         </p>
       </div>
     </div>
@@ -232,7 +251,9 @@ export const BpiBoxStatsChart = ({
           <h3 className="text-sm font-bold uppercase text-bpim-muted">
             {TITLE_MAP[groupBy]}
           </h3>
-          <HelpTooltip><BpiBoxHelpContent /></HelpTooltip>
+          <HelpTooltip>
+            <BpiBoxHelpContent />
+          </HelpTooltip>
         </div>
 
         <div className="ml-auto flex flex-col items-end gap-2">
