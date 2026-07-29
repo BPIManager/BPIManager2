@@ -1,6 +1,6 @@
 import { DashboardLayout } from "@/components/partials/Main";
 import { Meta } from "@/components/partials/Head";
-import { TimelineContainer } from "@/components/partials/Timeline";
+import { TimelineContainer } from "@/components/partials/features/Timeline";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 export default function UsersPage() {

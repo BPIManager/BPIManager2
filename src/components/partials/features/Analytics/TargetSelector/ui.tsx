@@ -17,7 +17,7 @@ import {
   ARENA_RANKS,
   PAST_VERSIONS,
   type KindOption,
-} from "../../../../hooks/analytics/useTargetSelector";
+} from "@/hooks/analytics/useTargetSelector";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 
 // ---------------------------------------------------------------------------

@@ -12,7 +12,7 @@ import {
   WeekdayChart,
   SongPopulationTable,
   AreaDistributionTable,
-} from "@/components/partials/Info";
+} from "@/components/partials/features/Info";
 import { useSiteStats } from "@/hooks/siteStats/useSiteStats";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { FetchErrorState } from "@/components/partials/FetchErrorState";

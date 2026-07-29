@@ -1,5 +1,5 @@
 import { MyScoresPageShell } from "@/components/partials/MyScoresPageShell";
-import { UnplayedSongsTable } from "@/components/partials/TableUnplayed";
+import { UnplayedSongsTable } from "@/components/partials/features/TableUnplayed";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 export default function UnplayedScoresByVersion() {

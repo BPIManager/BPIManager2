@@ -1,5 +1,5 @@
 import { MyScoresPageShell } from "@/components/partials/MyScoresPageShell";
-import { AllSongsTable } from "@/components/partials/AllSongs";
+import { AllSongsTable } from "@/components/partials/features/AllSongs";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 export default function MyScoresByVersion() {

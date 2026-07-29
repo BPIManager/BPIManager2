@@ -2,7 +2,7 @@
 
 import { DashboardLayout } from "@/components/partials/Main";
 import { Meta } from "@/components/partials/Head";
-import { SupportersPage } from "@/components/partials/Supporters";
+import { SupportersPage } from "@/components/partials/features/Supporters";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 export default function SupportersPageRoute() {

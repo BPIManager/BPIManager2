@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import type { AnalyticsTarget } from "@/types/analytics";
-import { useTargetSelector } from "../../../../hooks/analytics/useTargetSelector";
+import { useTargetSelector } from "@/hooks/analytics/useTargetSelector";
 import {
   KindStep,
   RivalPickStep,

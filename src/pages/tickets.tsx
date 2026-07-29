@@ -5,7 +5,7 @@ import { PageContainer, PageHeader } from "@/components/partials/Header";
 import { Meta } from "@/components/partials/Head";
 import { RequireAuth } from "@/components/partials/RequireAuth";
 import { useUser } from "@/contexts/users/UserContext";
-import { TicketsSection } from "@/components/partials/Tickets";
+import { TicketsSection } from "@/components/partials/features/Tickets";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 export default function TicketsPage() {

@@ -4,16 +4,16 @@ import { useUser } from "@/contexts/users/UserContext";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { DashboardLayout } from "@/components/partials/Main";
 import { PageContainer, PageHeader } from "@/components/partials/Header";
-import TransferUi from "@/components/partials/Settings/Transfer/ui";
-import AccountSettingsUi from "@/components/partials/Settings/AccountSettings/ui";
-import AccountDeletionUi from "@/components/partials/Settings/AccountDeletion/ui";
-import ApiKeyUi from "@/components/partials/Settings/APIKey/ui";
+import TransferUi from "@/components/partials/features/Settings/Transfer/ui";
+import AccountSettingsUi from "@/components/partials/features/Settings/AccountSettings/ui";
+import AccountDeletionUi from "@/components/partials/features/Settings/AccountDeletion/ui";
+import ApiKeyUi from "@/components/partials/features/Settings/APIKey/ui";
 import { Meta } from "@/components/partials/Head";
 import { PageLoader } from "@/components/ui/loading-spinner";
-import ThemeSettingsUi from "@/components/partials/Settings/ThemeSettings/ui";
-import DataExportUi from "@/components/partials/Settings/DataExport";
-import LayoutSettingsUi from "@/components/partials/Settings/LayoutSettings/ui";
-import LanguageSettingsUi from "@/components/partials/Settings/LanguageSettings/ui";
+import ThemeSettingsUi from "@/components/partials/features/Settings/ThemeSettings/ui";
+import DataExportUi from "@/components/partials/features/Settings/DataExport";
+import LayoutSettingsUi from "@/components/partials/features/Settings/LayoutSettings/ui";
+import LanguageSettingsUi from "@/components/partials/features/Settings/LanguageSettings/ui";
 import { RequireAuth } from "@/components/partials/RequireAuth";
 
 export default function SettingsPage() {
