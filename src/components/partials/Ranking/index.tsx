@@ -5,20 +5,11 @@ import { List, useListRef } from "react-window";
 import type { RowComponentProps } from "react-window";
 import { useGlobalRanking } from "@/hooks/stats/useGlobalRanking";
 import { RankingRow } from "./row";
+import { RankingFilters } from "./Filters";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RivalComparisonModal } from "../UserList/Modal";
 import { useRouter } from "next/router";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { versionsNonDisabledCollection } from "@/constants/iidx/versionTitles";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
-import { JAPAN_PREFECTURES } from "@/constants/iidx/rankingPrefectures";
-import { ARENA_RANK_ORDER } from "@/constants/iidx/arenaRanks";
 import { Info } from "lucide-react";
 import type { RankingEntry } from "@/types/users/ranking";
 import { useState } from "react";
@@ -234,96 +225,25 @@ export const GlobalRankingContainer = () => {
         description={t("page.ranking.desc")}
       />
       <PageContainer>
-        <div className="flex gap-3 mb-4">
-          <div className="flex flex-col gap-1 flex-1">
-            <label className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
-              Version
-            </label>
-            <Select value={version} onValueChange={handleVersionChange}>
-              <SelectTrigger className="w-full h-9 border-bpim-border bg-bpim-bg text-bpim-text focus:ring-blue-500">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="border-bpim-border bg-bpim-bg text-bpim-text">
-                {versionsNonDisabledCollection.map((v) => (
-                  <SelectItem key={v.value} value={v.value}>
-                    {v.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex flex-col gap-1 flex-1">
-            <label className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
-              Category
-            </label>
-            <Select value={category} onValueChange={handleCategoryChange}>
-              <SelectTrigger className="w-full h-9 border-bpim-border bg-bpim-bg text-bpim-text focus:ring-blue-500">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="border-bpim-border bg-bpim-bg text-bpim-text">
-                {radarCategories.filter(
-                  (c) =>
-                    isLatestVersion ||
-                    c.value === "totalBpi" ||
-                    c.value === "songs",
-                ).map((c) => (
-                  <SelectItem key={c.value} value={c.value}>
-                    {c.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        {isTotalBpiCategory && (
-          <div className="flex gap-3 mb-4">
-            <div className="flex flex-col gap-1 flex-1">
-              <label className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
-                {t("ranking.filter.area")}
-              </label>
-              <Select
-                value={filterArea || "all"}
-                onValueChange={handleAreaChange}
-              >
-                <SelectTrigger className="w-full h-9 border-bpim-border bg-bpim-bg text-bpim-text focus:ring-blue-500">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="border-bpim-border bg-bpim-bg text-bpim-text">
-                  <SelectItem value="all">{t("ranking.filter.all")}</SelectItem>
-                  {JAPAN_PREFECTURES.map((pref) => (
-                    <SelectItem key={pref} value={pref}>
-                      {pref}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex flex-col gap-1 flex-1">
-              <label className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
-                {t("ranking.filter.arenaClass")}
-              </label>
-              <Select
-                value={filterArenaClass || "all"}
-                onValueChange={handleArenaClassChange}
-              >
-                <SelectTrigger className="w-full h-9 border-bpim-border bg-bpim-bg text-bpim-text focus:ring-blue-500">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="border-bpim-border bg-bpim-bg text-bpim-text">
-                  <SelectItem value="all">{t("ranking.filter.all")}</SelectItem>
-                  {ARENA_RANK_ORDER.map((cls) => (
-                    <SelectItem key={cls} value={cls}>
-                      {cls}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        )}
+        <RankingFilters
+          version={{ value: version, onChange: handleVersionChange }}
+          category={{
+            value: category,
+            onChange: handleCategoryChange,
+            options: radarCategories,
+            isLatestVersion,
+          }}
+          areaArenaFilter={
+            isTotalBpiCategory
+              ? {
+                  area: filterArea,
+                  onAreaChange: handleAreaChange,
+                  arenaClass: filterArenaClass,
+                  onArenaClassChange: handleArenaClassChange,
+                }
+              : undefined
+          }
+        />
 
         {isTowerCategory ? (
           <TowerRanking version={version} />

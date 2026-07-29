@@ -9,9 +9,9 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
 import { useIidxTowerRanking } from "@/hooks/stats/useIidxTowerRanking";
-import { TowerRankingRow } from "./TowerRankingRow";
+import { TowerRankingRow } from "./row";
 import { Skeleton } from "@/components/ui/skeleton";
-import { RivalComparisonModal } from "../UserList/Modal";
+import { RivalComparisonModal } from "../../UserList/Modal";
 import { FetchErrorState } from "@/components/partials/FetchErrorState";
 import type {
   TowerPeriod,
