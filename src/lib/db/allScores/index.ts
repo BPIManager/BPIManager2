@@ -1,6 +1,8 @@
 import { ALL_DIFFICULTIES } from "@/constants/iidx/songLevels";
 import { db } from "@/lib/db";
 import { AllDifficulties, AllSongWithScore } from "@/types/songs/allSongs";
+import { Database } from "@/types/db";
+import { Transaction } from "kysely";
 
 /**
  * 全難易度スコア（`allScores` テーブル）の参照を担当するリポジトリクラス。
@@ -273,6 +275,25 @@ class allScoresRepository {
       },
       {} as Record<string, typeof history>,
     );
+  }
+
+  /**
+   * 指定バッチに紐づく全難易度スコアレコードを削除する。
+   *
+   * @param trx - 呼び出し元が管理するトランザクション
+   * @param userId - ユーザー ID
+   * @param batchId - バッチ ID
+   */
+  async deleteByBatch(
+    trx: Transaction<Database>,
+    userId: string,
+    batchId: string,
+  ) {
+    await trx
+      .deleteFrom("allScores")
+      .where("batchId", "=", batchId)
+      .where("userId", "=", userId)
+      .execute();
   }
 }
 

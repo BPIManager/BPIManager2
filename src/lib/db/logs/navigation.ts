@@ -1,5 +1,7 @@
 import dayjs from "@/lib/dayjs";
 import { db } from "@/lib/db";
+import { scoresRepo } from "../scores";
+import { allScoresRepo } from "../allScores";
 
 /**
  * スコアログの日付ナビゲーション・バッチ検索を担当するリポジトリクラス。
@@ -143,15 +145,12 @@ class LogNavigationRepository {
   }
 
   /**
-   * 指定バッチに紐づくスコア・ステータスログ・ログレコードをトランザクションで削除します
+   * 指定バッチに紐づくスコア・全難易度スコア・ステータスログ・ログレコードをトランザクションで削除します
    */
   async deleteBatch(userId: string, batchId: string) {
     return await db.transaction().execute(async (trx) => {
-      await trx
-        .deleteFrom("scores")
-        .where("batchId", "=", batchId)
-        .where("userId", "=", userId)
-        .execute();
+      await scoresRepo.deleteByBatch(trx, userId, batchId);
+      await allScoresRepo.deleteByBatch(trx, userId, batchId);
       await trx
         .deleteFrom("userStatusLogs")
         .where("batchId", "=", batchId)
