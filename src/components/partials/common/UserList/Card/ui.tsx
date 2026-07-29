@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import type { RecommendedUser } from "@/types/users/list";
 import { RoleBadge } from "@/components/partials/common/UserRole";
-import { ROLE_ICON } from "../../../Rivals/List/ui";
+import { ROLE_ICON } from "@/components/partials/common/Rivals/List/ui";
 import { ArenaClassBadge } from "@/components/partials/common/ArenaClassBadge";
 
 export const UserRecommendationCard = ({

@@ -16,7 +16,7 @@ import {
   RANKING_ROW_HEIGHT,
   SongRankingListRow,
   SongRankingTableHeader,
-} from "@/components/partials/Songs/SongRankingListRow";
+} from "@/components/partials/common/Songs/SongRankingListRow";
 import { formatRankingRate } from "@/utils/songs/rankingRate";
 
 interface RivalRankingProps {

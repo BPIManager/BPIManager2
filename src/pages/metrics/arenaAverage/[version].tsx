@@ -6,16 +6,16 @@ import { useArenaAverages } from "@/hooks/metrics/useArenaAverage";
 import {
   ArenaAverageTable,
   type DisplayMetric,
-} from "@/components/partials/Metrics/ArenaAverage/ui";
-import { ArenaAnalysis } from "@/components/partials/Metrics/ArenaAverage/analysis";
+} from "@/components/partials/common/ArenaAverage/ui";
+import { ArenaAnalysis } from "@/components/partials/common/ArenaAverage/analysis";
 import { PageContainer, PageHeader } from "@/components/partials/common/Header";
 import { Meta } from "@/components/partials/common/Head";
 import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
 import {
   ArenaAverageFilter,
   type DetailFilter,
-} from "@/components/partials/Metrics/LevelSelector/ui";
-import { ArenaAverageFilterSkeleton } from "@/components/partials/Metrics/LevelSelector/skeleton";
+} from "@/components/partials/features/Metrics/LevelSelector/ui";
+import { ArenaAverageFilterSkeleton } from "@/components/partials/features/Metrics/LevelSelector/skeleton";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { versionsNonDisabledCollection } from "@/constants/iidx/versionTitles";
 import { A_RANKS } from "@/constants/iidx/arenaRanks";

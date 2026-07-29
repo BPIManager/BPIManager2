@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/hooks/common/useTranslation";
-import { XIcon } from "../../../LogIn";
+import { XIcon } from "@/components/partials/common/LogIn";
 import { ContributorListView } from "@/components/partials/common/UserList/Supporters/ui";
 import { UserRecommendationCardSkeleton } from "@/components/partials/common/UserList/Card/skeleton";
 import { FetchErrorState } from "@/components/partials/common/FetchErrorState";

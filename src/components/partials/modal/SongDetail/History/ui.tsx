@@ -8,7 +8,7 @@ import { versionTitles } from "@/constants/iidx/versionTitles";
 import { Separator } from "@/components/ui/separator";
 import { History } from "lucide-react";
 import { SectionLoader } from "@/components/ui/loading-spinner";
-import { HistoryRecordCard } from "@/components/partials/Songs/HistoryRecordCard";
+import { HistoryRecordCard } from "@/components/partials/common/Songs/HistoryRecordCard";
 import { FetchErrorState } from "@/components/partials/common/FetchErrorState";
 
 interface SongHistoryTabProps {

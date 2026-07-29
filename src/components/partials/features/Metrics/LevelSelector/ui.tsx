@@ -1,0 +1,378 @@
+"use client";
+
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { versionsNonDisabledCollection } from "@/constants/iidx/versionTitles";
+import { Checkbox } from "@/components/ui/checkbox";
+import { X, Plus } from "lucide-react";
+import type { DisplayMetric } from "@/components/partials/common/ArenaAverage/ui";
+import { A_RANKS } from "@/constants/iidx/arenaRanks";
+import { useTranslation } from "@/hooks/common/useTranslation";
+import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
+
+const DJRANK_OPTIONS = [
+  "MAX-",
+  "AAA",
+  "AA",
+  "A",
+  "B",
+  "C",
+  "D",
+  "E",
+  "F",
+] as const;
+
+export type DetailFilterMetric = "score" | "scoreRate" | "djrank";
+export type DetailFilterOperator = ">=" | "<=";
+
+export interface DetailFilter {
+  id: string;
+  rank: string;
+  metric: DetailFilterMetric;
+  operator: DetailFilterOperator;
+  value: string;
+}
+
+interface ArenaAverageFilterProps {
+  version: string;
+  onVersionChange: (value: string) => void;
+  level: string;
+  onLevelChange: (value: string) => void;
+  selectedDifficulties: Set<string>;
+  onDifficultiesChange: (diffs: Set<string>) => void;
+  nameSearch: string;
+  onNameSearchChange: (search: string) => void;
+  detailFilters: DetailFilter[];
+  onDetailFiltersChange: (filters: DetailFilter[]) => void;
+  displayMetric?: DisplayMetric;
+  onDisplayMetricChange?: (metric: DisplayMetric) => void;
+}
+
+export const ArenaAverageFilter = ({
+  version,
+  onVersionChange,
+  level,
+  onLevelChange,
+  selectedDifficulties,
+  onDifficultiesChange,
+  nameSearch,
+  onNameSearchChange,
+  detailFilters,
+  onDetailFiltersChange,
+  displayMetric,
+  onDisplayMetricChange,
+}: ArenaAverageFilterProps) => {
+  const { t } = useTranslation();
+
+  const DISPLAY_METRICS = [
+    { value: "exScore", label: t("arenaAvg.metric.exScore") },
+    { value: "rate", label: t("arenaAvg.metric.scoreRate") },
+    { value: "bpi", label: "BPI" },
+  ] as const;
+
+  const toggleDifficulty = (diff: string) => {
+    const next = new Set(selectedDifficulties);
+    if (next.has(diff)) {
+      if (next.size > 1) next.delete(diff);
+    } else {
+      next.add(diff);
+    }
+    onDifficultiesChange(next);
+  };
+
+  const addFilter = () => {
+    onDetailFiltersChange([
+      ...detailFilters,
+      {
+        id: crypto.randomUUID(),
+        rank: "A1",
+        metric: "scoreRate",
+        operator: ">=",
+        value: "",
+      },
+    ]);
+  };
+
+  const removeFilter = (id: string) => {
+    onDetailFiltersChange(detailFilters.filter((f) => f.id !== id));
+  };
+
+  const updateFilter = (id: string, updates: Partial<DetailFilter>) => {
+    onDetailFiltersChange(
+      detailFilters.map((f) => (f.id === id ? { ...f, ...updates } : f)),
+    );
+  };
+
+  return (
+    <div className="rounded-xl border border-bpim-border bg-bpim-bg/80 p-4 shadow-sm backdrop-blur-md">
+      <div className="flex flex-col gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+          <div className="flex flex-col gap-2">
+            <span className="text-[10px] font-black tracking-widest text-bpim-muted uppercase px-1">
+              Version
+            </span>
+            <Select value={version} onValueChange={onVersionChange}>
+              <SelectTrigger className="h-9 border-bpim-border bg-bpim-surface-2/60 text-xs text-bpim-text focus:ring-blue-500">
+                <SelectValue placeholder={t("logs.versionPlaceholder")} />
+              </SelectTrigger>
+              <SelectContent className="border-bpim-border bg-bpim-bg">
+                {versionsNonDisabledCollection.map((v) => (
+                  <SelectItem key={v.value} value={v.value} className="text-xs">
+                    {v.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <span className="text-[10px] font-black tracking-widest text-bpim-muted uppercase px-1">
+              Level
+            </span>
+            <RadioGroup
+              value={level}
+              onValueChange={onLevelChange}
+              className="flex h-9 items-center gap-8"
+            >
+              {["11", "12"].map((lv) => (
+                <div key={lv} className="flex items-center gap-2">
+                  <RadioGroupItem
+                    value={lv}
+                    id={`lv-${lv}`}
+                    className="border-bpim-primary text-bpim-text"
+                  />
+                  <Label
+                    htmlFor={`lv-${lv}`}
+                    className="text-sm font-bold text-bpim-text cursor-pointer"
+                  >
+                    ☆{lv}
+                  </Label>
+                </div>
+              ))}
+            </RadioGroup>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <span className="text-[10px] font-black tracking-widest text-bpim-muted uppercase px-1">
+              Difficulty
+            </span>
+            <div className="flex h-9 items-center gap-x-4 gap-y-2 flex-wrap">
+              {IIDX_DIFFICULTIES.map((str) => (
+                <div key={str} className="flex items-center gap-2">
+                  <Checkbox
+                    id={`diff-${str}`}
+                    checked={selectedDifficulties.has(str)}
+                    onCheckedChange={() => toggleDifficulty(str)}
+                    className="h-4 w-4 border-bpim-border data-[state=checked]:bg-bpim-primary"
+                  />
+                  <Label
+                    htmlFor={`diff-${str}`}
+                    className="cursor-pointer text-xs font-medium leading-none md:text-sm text-bpim-text"
+                  >
+                    {str[0]}
+                  </Label>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <span className="text-[10px] font-black tracking-widest text-bpim-muted uppercase px-1">
+              {t("arenaAvg.filter.songName")}
+            </span>
+            <Input
+              value={nameSearch}
+              onChange={(e) => onNameSearchChange(e.target.value)}
+              placeholder={t("arenaAvg.filter.search")}
+              className="h-9 border-bpim-border bg-bpim-surface-2/60 text-xs text-bpim-text placeholder:text-bpim-muted"
+            />
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-3 px-1">
+            <span className="text-[10px] font-black tracking-widest text-bpim-muted uppercase">
+              {t("arenaAvg.filter.label")}
+            </span>
+            <button
+              onClick={addFilter}
+              className="flex items-center gap-1 text-[10px] font-bold text-bpim-primary hover:text-bpim-primary/70 transition-colors"
+            >
+              <Plus className="h-3 w-3" />
+              {t("filter.scoreConditionAdd")}
+            </button>
+          </div>
+
+          {detailFilters.length > 0 && (
+            <div className="flex flex-col gap-2">
+              {detailFilters.map((filter) => (
+                <DetailFilterRow
+                  key={filter.id}
+                  filter={filter}
+                  onChange={(updates) => updateFilter(filter.id, updates)}
+                  onRemove={() => removeFilter(filter.id)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {onDisplayMetricChange && displayMetric && (
+          <div className="border-t border-bpim-border pt-3">
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+              <span className="text-[10px] font-black tracking-widest text-bpim-muted uppercase px-1 shrink-0">
+                {t("arenaAvg.filter.display")}
+              </span>
+              <RadioGroup
+                value={displayMetric}
+                onValueChange={(v) => onDisplayMetricChange(v as DisplayMetric)}
+                className="flex flex-nowrap items-center gap-6"
+              >
+                {DISPLAY_METRICS.map((opt) => (
+                  <div
+                    key={opt.value}
+                    className="flex items-center gap-1.5 shrink-0"
+                  >
+                    <RadioGroupItem
+                      value={opt.value}
+                      id={`metric-${opt.value}`}
+                      className="border-bpim-primary"
+                    />
+                    <Label
+                      htmlFor={`metric-${opt.value}`}
+                      className="cursor-pointer text-xs font-medium text-bpim-text whitespace-nowrap"
+                    >
+                      {opt.label}
+                    </Label>
+                  </div>
+                ))}
+              </RadioGroup>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const DetailFilterRow = ({
+  filter,
+  onChange,
+  onRemove,
+}: {
+  filter: DetailFilter;
+  onChange: (updates: Partial<DetailFilter>) => void;
+  onRemove: () => void;
+}) => {
+  const { t } = useTranslation();
+  const METRICS = [
+    { label: t("arenaAvg.metric.score"), value: "score" },
+    { label: t("arenaAvg.metric.scoreRate"), value: "scoreRate" },
+    { label: "DJRANK", value: "djrank" },
+  ];
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <Select value={filter.rank} onValueChange={(v) => onChange({ rank: v })}>
+        <SelectTrigger className="h-8 w-18 border-bpim-border bg-bpim-surface-2/60 text-xs text-bpim-text">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent className="border-bpim-border bg-bpim-bg">
+          {A_RANKS.map((r) => (
+            <SelectItem key={r} value={r} className="text-xs">
+              {r}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <span className="text-xs text-bpim-muted">
+        {t("arenaAvg.filter.rankOf")}
+      </span>
+
+      <Select
+        value={filter.metric}
+        onValueChange={(v) =>
+          onChange({ metric: v as DetailFilterMetric, value: "" })
+        }
+      >
+        <SelectTrigger className="h-8 w-28 border-bpim-border bg-bpim-surface-2/60 text-xs text-bpim-text">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent className="border-bpim-border bg-bpim-bg">
+          {METRICS.map((m) => (
+            <SelectItem key={m.value} value={m.value} className="text-xs">
+              {m.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <span className="text-xs text-bpim-muted">
+        {t("filter.scoreConditionParticle")}
+      </span>
+
+      {filter.metric === "djrank" ? (
+        <Select
+          value={filter.value}
+          onValueChange={(v) => onChange({ value: v })}
+        >
+          <SelectTrigger className="h-8 w-20 border-bpim-border bg-bpim-surface-2/60 text-xs text-bpim-text">
+            <SelectValue placeholder={t("arenaAvg.filter.rankPlaceholder")} />
+          </SelectTrigger>
+          <SelectContent className="border-bpim-border bg-bpim-bg">
+            {DJRANK_OPTIONS.map((r) => (
+              <SelectItem key={r} value={r} className="text-xs">
+                {r}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      ) : (
+        <Input
+          value={filter.value}
+          onChange={(e) => onChange({ value: e.target.value })}
+          placeholder={
+            filter.metric === "score"
+              ? t("arenaAvg.filter.scorePlaceholder")
+              : "0-100"
+          }
+          className="h-8 w-24 border-bpim-border bg-bpim-surface-2/60 text-xs text-bpim-text placeholder:text-bpim-muted"
+          type="number"
+          min={0}
+        />
+      )}
+
+      <Select
+        value={filter.operator}
+        onValueChange={(v) => onChange({ operator: v as DetailFilterOperator })}
+      >
+        <SelectTrigger className="h-8 w-16 border-bpim-border bg-bpim-surface-2/60 text-xs text-bpim-text">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent className="border-bpim-border bg-bpim-bg">
+          <SelectItem value=">=" className="text-xs">
+            {t("filter.orMore")}
+          </SelectItem>
+          <SelectItem value="<=" className="text-xs">
+            {t("filter.orLess")}
+          </SelectItem>
+        </SelectContent>
+      </Select>
+
+      <button
+        onClick={onRemove}
+        className="text-bpim-muted hover:text-red-400 transition-colors"
+      >
+        <X className="h-4 w-4" />
+      </button>
+    </div>
+  );
+};

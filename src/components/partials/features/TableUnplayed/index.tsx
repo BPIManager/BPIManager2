@@ -8,8 +8,8 @@ import { NoDataAlert } from "@/components/partials/common/DashBoard/NoData";
 import { FetchErrorState } from "@/components/partials/common/FetchErrorState";
 import { SongDetailView } from "@/components/partials/modal/SongDetail/ui";
 import { CustomPagination } from "@/components/partials/common/Pagination/ui";
-import { AdvancedFilterModal } from "../../Songs/AdvancedFilter/ui";
-import { SongFilterBar } from "../../Songs/Filter/ui";
+import { AdvancedFilterModal } from "@/components/partials/common/Songs/AdvancedFilter/ui";
+import { SongFilterBar } from "@/components/partials/common/Songs/Filter/ui";
 import { SongListSkeleton } from "@/components/partials/common/Table/skeleton";
 import { SongList } from "@/components/partials/common/Table/ui";
 

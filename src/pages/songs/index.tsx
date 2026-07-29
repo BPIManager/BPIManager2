@@ -1,8 +1,8 @@
 import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
 import { PageContainer, PageHeader } from "@/components/partials/common/Header";
 import { Meta, JsonLd } from "@/components/partials/common/Head";
-import { SongListContent } from "@/components/partials/Songs/SongList";
-import { RecentNotesList } from "@/components/partials/Songs/RecentNotesList";
+import { SongListContent } from "@/components/partials/features/Songs/SongList";
+import { RecentNotesList } from "@/components/partials/features/Songs/RecentNotesList";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useTranslation } from "@/hooks/common/useTranslation";
 

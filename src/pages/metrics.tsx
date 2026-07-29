@@ -1,7 +1,7 @@
 import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
 import { PageContainer, PageHeader } from "@/components/partials/common/Header";
 import { Meta } from "@/components/partials/common/Head";
-import { ReusableMenuItem } from "@/components/partials/Metrics/Menu/ui";
+import { ReusableMenuItem } from "@/components/partials/features/Metrics/Menu/ui";
 import { Swords, Table } from "lucide-react";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { useTranslation } from "@/hooks/common/useTranslation";
