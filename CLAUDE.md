@@ -21,7 +21,7 @@ src/
 ├── pages/          # Next.js Pages Router（画面 & API Routes）
 │   └── api/v1/     # REST API: /users/[userId]/...
 ├── components/
-│   ├── partials/   # ページ固有の複合コンポーネント
+│   ├── partials/   # ページ固有・共有の複合コンポーネント（詳細は後述）
 │   └── ui/         # shadcn/ui ベースの汎用UIコンポーネント
 ├── hooks/          # SWRフェッチ + ローカル状態ロジック（ドメイン別サブディレクトリ）
 ├── lib/
@@ -76,13 +76,30 @@ src/
 - 新しいDB参照クエリを書くときは既存のDBスキーマ(`migrations/schema.sql`)を確認し、インデックスが最適化どうかを確認すること。可能であれば、既存のインデックスで高速なクエリを書くように努める。
 - 複数テーブルにまたがる書き込み(バッチ削除等)を実装するときは、各テーブルへのクエリはそのテーブルを所有するドメインリポジトリ(`src/lib/db/[ドメイン]/index.ts`)のメソッドとして実装し、他ドメインのテーブルへ直接クエリを書かない。トランザクションを開始する側は`db.transaction().execute(trx => ...)`で各ドメインのメソッドを呼び出す**オーケストレーション役**に徹する。各メソッドは第一引数に`trx: Transaction<Database>`を受け取り、呼び出し元のトランザクションに参加できるようにする(例: [`src/lib/db/scores/index.ts`](src/lib/db/scores/index.ts)の`deleteByBatch`、[`src/lib/db/logs/navigation.ts`](src/lib/db/logs/navigation.ts)の`deleteBatch`)。
 
-### `components/partials/` ファイル規則
+### `components/partials/` ディレクトリ構成
 
-`partials/` 以下のコンポーネントは**必ずフォルダ単位**で管理する。単体の `機能名.tsx` は作らない。
+`partials/` 直下は役割ごとに4つのカテゴリに分かれている。新しいコンポーネントを追加するときは、まずどのカテゴリに属するかを判断してから配置する。
 
 ```
 partials/
-└── FeatureName/          # 機能名フォルダ（必須）
+├── features/   # 特定の1ページからしか参照されないページ専用コンポーネント
+├── common/     # 2つ以上のfeatures/ページから再利用される共有コンポーネント
+├── modal/      # ダイアログ・モーダル系コンポーネント
+└── shell/      # ページ全体の殻（認証ガード、レイアウト、プロフィール殻等）
+```
+
+- **features/**: 対応する`src/pages/`配下のページ1つからのみimportされる想定。他のfeatureや`common/`からimportされてはいけない
+- **common/**: 複数のfeatureやshellから再利用されるコンポーネント。単一目的の小さいコンポーネントはそのまま`common/ComponentName/`、関連する複数コンポーネントをまとめる場合は`common/PurposeName/SubComponent/`のように目的名でラップする（例: `common/Auth/`, `common/Charts/`, `common/ListControls/`）
+- **modal/**: `<Dialog>`等を伴うモーダル・ポップアップ系
+- **shell/**: `RequireAuth`, `DashboardLayout`, `ProfileLayoutShell`など、ページの外枠・ゲート処理を担うコンポーネント
+- あるコンポーネントが「features/にいるべきか、common/にいるべきか」迷ったら、実際にimportしている箇所を`grep`で確認し、自分のページ以外から参照されているかどうかで判断する
+
+### `components/partials/` ファイル規則
+
+各カテゴリの中でも、コンポーネントは**必ずフォルダ単位**で管理する。単体の `機能名.tsx` は作らない。
+
+```
+common/FeatureName/         # 機能名フォルダ（必須）
     ├── index.tsx         # ロジック含む（データフェッチ、状態管理等）
     ├── ui.tsx            # 純粋なUI関数のみ（副作用なし）
     ├── skeleton.tsx      # スケルトンUI（任意）

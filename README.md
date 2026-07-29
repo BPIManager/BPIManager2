@@ -123,18 +123,24 @@ npx kysely-codegen --url "$DATABASE_URL" --out-file src/types/sql.d.ts
 ```
 src/
 ├── assets/                # Static assets (images, etc.)
-├── components/partials/   # Feature-level UI components
-│   ├── DashBoard/         # BPI distribution, activity calendar, radar, rivals, etc.
-│   ├── Import/            # CSV import flow and success modal
-│   ├── Logs/              # Score log views, ranking, overtaken log, BPI trend
-│   ├── Metrics/           # AAA difficulty table, Arena average, level selector
-│   ├── Notifications/     # In-app notification components
-│   ├── Profile/           # Public profile layout and follows
-│   ├── Rivals/            # Rival comparison list, table, mode switch
-│   ├── Settings/          # Account, theme, API key, data transfer, deletion
-│   ├── Songs/             # Per-song filters and advanced filter
-│   ├── Timeline/          # Social timeline card and header
-│   └── ...                # Shared UI (Header, Sidebar, Modal, Pagination, etc.)
+├── components/partials/   # UI components, split by role
+│   ├── features/          # Page-specific components, each used by exactly one page
+│   │   ├── Import/        # CSV import flow and success modal
+│   │   ├── Logs/          # Score log views, ranking, overtaken log, BPI trend
+│   │   ├── Metrics/       # AAA difficulty table, Arena average, level selector
+│   │   ├── Profile/       # Public profile page-only parts (e.g. Follows)
+│   │   ├── Settings/      # Account, theme, API key, data transfer, deletion
+│   │   ├── Songs/         # Song list/detail page-only parts
+│   │   ├── Timeline/      # Social timeline card and header
+│   │   └── ...
+│   ├── common/            # Shared components reused across multiple features
+│   │   ├── DashBoard/     # BPI distribution, activity calendar, radar, rivals, etc.
+│   │   ├── Notifications/ # In-app notification components
+│   │   ├── Rivals/        # Rival comparison list, table, mode switch (shared)
+│   │   ├── Songs/         # Song filter/advanced filter (shared across tables)
+│   │   ├── Sidebar/, PageChrome/, Badge/, Charts/, ListControls/, ErrorStates/, Auth/, ...
+│   ├── modal/              # Dialogs/modals (AccountSettings, ImageCrop, SongDetail, ...)
+│   └── shell/              # Page-level shells (RequireAuth, DashboardLayout, ProfileLayoutShell, ...)
 ├── contexts/              # React context providers
 ├── hooks/                 # Data-fetching hooks (SWR)
 ├── lib/
