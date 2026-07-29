@@ -88,7 +88,7 @@ function getLatestDateJson(): {
   return result;
 }
 
-function buildRankings(data: ArenaJson): Record<string, AreaRankInfo> {
+export function buildRankings(data: ArenaJson): Record<string, AreaRankInfo> {
   const areaPlayers: Record<
     string,
     { id: string; arenaClass: string; rank: number }[]
