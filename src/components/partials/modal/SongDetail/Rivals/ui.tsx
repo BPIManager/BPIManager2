@@ -10,7 +10,7 @@ import type { SongDetailSubject } from "@/utils/songs/songDetailMode";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { SectionLoader } from "@/components/ui/loading-spinner";
-import { FetchErrorState } from "@/components/partials/common/FetchErrorState";
+import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
 import { List, type ListImperativeAPI } from "react-window";
 import {
   RANKING_ROW_HEIGHT,

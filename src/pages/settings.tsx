@@ -3,12 +3,12 @@
 import { useUser } from "@/contexts/users/UserContext";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
-import { PageContainer, PageHeader } from "@/components/partials/common/Header";
+import { PageContainer, PageHeader } from "@/components/partials/common/PageChrome/Header";
 import TransferUi from "@/components/partials/features/Settings/Transfer/ui";
 import AccountSettingsUi from "@/components/partials/features/Settings/AccountSettings/ui";
 import AccountDeletionUi from "@/components/partials/features/Settings/AccountDeletion/ui";
 import ApiKeyUi from "@/components/partials/features/Settings/APIKey/ui";
-import { Meta } from "@/components/partials/common/Head";
+import { Meta } from "@/components/partials/common/PageChrome/Head";
 import { PageLoader } from "@/components/ui/loading-spinner";
 import ThemeSettingsUi from "@/components/partials/features/Settings/ThemeSettings/ui";
 import DataExportUi from "@/components/partials/features/Settings/DataExport";

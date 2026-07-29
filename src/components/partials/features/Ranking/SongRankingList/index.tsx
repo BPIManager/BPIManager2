@@ -14,7 +14,7 @@ import {
 import type { SongRankEntry } from "@/types/users/ranking";
 import type { AllSongWithScore, AllDifficulties } from "@/types/songs/allSongs";
 import { SongDetailView } from "@/components/partials/modal/SongDetail/ui";
-import { FetchErrorState } from "@/components/partials/common/FetchErrorState";
+import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
 import { ALL_LEVELS } from "@/constants/iidx/songLevels";
 import { Search } from "lucide-react";
 

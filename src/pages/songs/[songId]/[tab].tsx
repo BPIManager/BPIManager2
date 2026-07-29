@@ -1,7 +1,7 @@
 import type { GetServerSideProps } from "next";
 import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
-import { PageContainer } from "@/components/partials/common/Header";
-import { Meta, JsonLd } from "@/components/partials/common/Head";
+import { PageContainer } from "@/components/partials/common/PageChrome/Header";
+import { Meta, JsonLd } from "@/components/partials/common/PageChrome/Head";
 import { SongDetailContent } from "@/components/partials/features/Songs/SongDetail";
 import { songsRepo } from "@/lib/db/songs";
 

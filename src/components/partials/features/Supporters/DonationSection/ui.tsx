@@ -13,7 +13,7 @@ import {
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/hooks/common/useTranslation";
-import { XIcon } from "@/components/partials/common/LogIn";
+import { XIcon } from "@/components/partials/common/Auth/Buttons";
 
 const CI_EN_URL = "https://ci-en.net/creator/36005";
 

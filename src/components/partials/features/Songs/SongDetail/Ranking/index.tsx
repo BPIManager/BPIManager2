@@ -13,7 +13,7 @@ import {
 import { RivalComparisonModal } from "@/components/partials/modal/RivalComparison";
 import { RankingSelfRankCard, RankingVersionSelector } from "./ui";
 import { RankingTabSkeleton } from "./skeleton";
-import { FetchErrorState } from "@/components/partials/common/FetchErrorState";
+import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
 
 interface RankingTabProps {
   songId: number;

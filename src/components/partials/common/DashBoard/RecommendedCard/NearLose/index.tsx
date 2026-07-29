@@ -1,4 +1,4 @@
-import { InfiniteScrollContainer } from "@/components/partials/common/InfiniteScroll/ui";
+import { InfiniteScrollContainer } from "@/components/partials/common/ListControls/InfiniteScroll/ui";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { useNearLoseInfinite } from "@/hooks/stats/useRivalNearLose";
 import { NearLoseSongItem } from "@/types/stats/nearLose";

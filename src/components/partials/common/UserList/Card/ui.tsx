@@ -8,9 +8,9 @@ import { getRoleCardStyle } from "@/constants/theme/roleCardStyle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import type { RecommendedUser } from "@/types/users/list";
-import { RoleBadge } from "@/components/partials/common/UserRole";
+import { RoleBadge } from "@/components/partials/common/Badge/UserRole";
 import { ROLE_ICON } from "@/components/partials/common/Rivals/List/ui";
-import { ArenaClassBadge } from "@/components/partials/common/ArenaClassBadge";
+import { ArenaClassBadge } from "@/components/partials/common/Badge/ArenaClassBadge";
 
 export const UserRecommendationCard = ({
   user,

@@ -1,5 +1,5 @@
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { LoginRequiredCard } from "@/components/partials/common/LoginRequired/ui";
+import { LoginRequiredCard } from "@/components/partials/common/Auth/LoginRequired/ui";
 
 interface LoginDialogProps {
   isOpen: boolean;

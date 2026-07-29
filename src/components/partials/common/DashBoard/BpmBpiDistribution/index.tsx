@@ -3,7 +3,7 @@ import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { useBpmBpiDistribution } from "@/hooks/stats/useBpmBpiDistribution";
 import { BpmBpiSkeleton } from "./skeleton";
 import { BpmBpiChart } from "./ui";
-import { FetchErrorState } from "@/components/partials/common/FetchErrorState";
+import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
 import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 import { useTranslation } from "@/hooks/common/useTranslation";
 

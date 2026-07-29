@@ -9,7 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { History } from "lucide-react";
 import { SectionLoader } from "@/components/ui/loading-spinner";
 import { HistoryRecordCard } from "@/components/partials/common/Songs/HistoryRecordCard";
-import { FetchErrorState } from "@/components/partials/common/FetchErrorState";
+import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
 
 interface SongHistoryTabProps {
   songId: number;

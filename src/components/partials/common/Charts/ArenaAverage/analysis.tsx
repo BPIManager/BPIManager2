@@ -12,7 +12,7 @@ import {
   type ArenaSongPoint,
 } from "@/hooks/metrics/useArenaAnalysis";
 import { ALL_RADAR_CATEGORIES, RADAR_COLORS } from "@/constants/iidx/radars";
-import { BpiScatterChart } from "@/components/partials/common/BpiScatterChart";
+import { BpiScatterChart } from "@/components/partials/common/Charts/BpiScatterChart";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 const StatCard = ({

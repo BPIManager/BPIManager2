@@ -4,7 +4,7 @@ import { useBpiBoxStats } from "@/hooks/stats/useBpiBoxStats";
 import { BpiBoxStatsChart } from "./ui";
 import { StatsGroupBy } from "@/types/stats/bpiBoxStats";
 import { DashCard } from "@/components/ui/dashcard";
-import { FetchErrorState } from "@/components/partials/common/FetchErrorState";
+import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
 
 export const BpiBoxStatsSection = ({ userId }: { userId: string }) => {
   const { levels, diffs, version } = useStatsFilter();

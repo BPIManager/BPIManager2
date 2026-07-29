@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
-import { LoginRequiredCard } from "@/components/partials/common/LoginRequired/ui";
+import { LoginRequiredCard } from "@/components/partials/common/Auth/LoginRequired/ui";
 
 interface RequireAuthProps {
   /** trueの間はローディング表示をする。呼び出し側が「何を待つか」(router.isReady等)を判断し渡す */

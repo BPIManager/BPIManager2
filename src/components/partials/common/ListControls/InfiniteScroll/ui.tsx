@@ -6,7 +6,7 @@ import { useTranslation } from "@/hooks/common/useTranslation";
 import {
   FetchErrorState,
   type FetchError,
-} from "@/components/partials/common/FetchErrorState";
+} from "@/components/partials/common/ErrorStates/FetchErrorState";
 
 interface InfiniteScrollContainerProps<T> {
   items: T[];

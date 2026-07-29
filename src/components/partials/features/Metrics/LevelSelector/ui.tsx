@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { versionsNonDisabledCollection } from "@/constants/iidx/versionTitles";
 import { Checkbox } from "@/components/ui/checkbox";
 import { X, Plus } from "lucide-react";
-import type { DisplayMetric } from "@/components/partials/common/ArenaAverage/ui";
+import type { DisplayMetric } from "@/components/partials/common/Charts/ArenaAverage/ui";
 import { A_RANKS } from "@/constants/iidx/arenaRanks";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";

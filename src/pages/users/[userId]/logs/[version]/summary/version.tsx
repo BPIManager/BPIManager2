@@ -3,7 +3,7 @@ import { PublicLogsCard } from "@/components/partials/features/Logs/PublicLogsCa
 import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
 import { UserProfileLayout } from "@/components/partials/common/Profile/Layout/layout";
 import { ProfileMeta } from "@/components/partials/common/Profile/Meta/ui";
-import { PageHeader, PageContainer } from "@/components/partials/common/Header";
+import { PageHeader, PageContainer } from "@/components/partials/common/PageChrome/Header";
 import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 import { VersionCompareContent } from "@/components/partials/features/Logs/VersionCompare/ui";
 import { useTranslation } from "@/hooks/common/useTranslation";

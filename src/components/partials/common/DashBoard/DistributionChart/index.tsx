@@ -4,7 +4,7 @@ import { useBPIDistribution } from "@/hooks/stats/useBPIDistribution";
 import { useScoreRateDistribution } from "@/hooks/stats/useScoreRateDistribution";
 import { DistributionChart } from "./ui";
 import { DashCard } from "@/components/ui/dashcard";
-import { FetchErrorState } from "@/components/partials/common/FetchErrorState";
+import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
 import { getRankColorFromTheme } from "@/constants/theme/djRankColor";
 import { getBpiColorFromTheme } from "@/constants/theme/bpiColor";
 import { getScoreRateColorFromTheme } from "@/constants/theme/scoreRateColor";

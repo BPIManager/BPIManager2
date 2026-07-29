@@ -1,6 +1,6 @@
 import { useRadar } from "@/hooks/stats/useRadar";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
-import { FetchErrorState } from "@/components/partials/common/FetchErrorState";
+import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
 import { RadarSkeleton } from "./skeleton";
 import { RadarSectionChart } from ".";
 import { RadarCategory } from "@/types/stats/radar";

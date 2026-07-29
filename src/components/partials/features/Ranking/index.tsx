@@ -15,11 +15,11 @@ import type { RankingEntry } from "@/types/users/ranking";
 import { useState } from "react";
 import { SongRankingList } from "./SongRankingList";
 import { TowerRanking } from "./TowerRanking";
-import { LoginRequiredCard } from "@/components/partials/common/LoginRequired/ui";
+import { LoginRequiredCard } from "@/components/partials/common/Auth/LoginRequired/ui";
 import { useUser } from "@/contexts/users/UserContext";
-import { PageContainer, PageHeader } from "@/components/partials/common/Header";
+import { PageContainer, PageHeader } from "@/components/partials/common/PageChrome/Header";
 import { GlobalRankingContainerSkeleton } from "./skeleton";
-import { FetchErrorState } from "@/components/partials/common/FetchErrorState";
+import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 const ITEM_SIZE = 58;

@@ -1,8 +1,8 @@
 "use client";
 
 import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
-import { PageContainer, PageHeader } from "@/components/partials/common/Header";
-import { Meta } from "@/components/partials/common/Head";
+import { PageContainer, PageHeader } from "@/components/partials/common/PageChrome/Header";
+import { Meta } from "@/components/partials/common/PageChrome/Head";
 import { RequireAuth } from "@/components/partials/shell/RequireAuth";
 import { useUser } from "@/contexts/users/UserContext";
 import { BpiOptimizerSection } from "@/components/partials/features/Analytics/BpiOptimizer";

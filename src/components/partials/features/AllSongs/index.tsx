@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { SongListSkeleton } from "@/components/partials/common/Table/skeleton";
-import { CustomPagination } from "@/components/partials/common/Pagination/ui";
+import { CustomPagination } from "@/components/partials/common/ListControls/Pagination/ui";
 import { AllSongWithScore } from "@/types/songs/allSongs";
 import { AllSongFilterBar } from "./Filter";
 import { AllSongList } from "./Table";
 import { SongDetailView } from "@/components/partials/modal/SongDetail/ui";
-import { FetchErrorState } from "@/components/partials/common/FetchErrorState";
+import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
 import {
   useAllSongsFilter,
   PAGE_SIZE,

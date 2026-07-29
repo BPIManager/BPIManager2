@@ -7,7 +7,7 @@ import { SongWithScore } from "@/types/songs/score";
 import { SongDetailView } from "@/components/partials/modal/SongDetail/ui";
 import { NearLoseList } from "./NearLose";
 import { DashCard } from "@/components/ui/dashcard";
-import { InfiniteScrollContainer } from "@/components/partials/common/InfiniteScroll/ui";
+import { InfiniteScrollContainer } from "@/components/partials/common/ListControls/InfiniteScroll/ui";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AppTabsGroup } from "@/components/ui/complex/tabs";
 import { HelpTooltip } from "@/components/ui/tooltip";

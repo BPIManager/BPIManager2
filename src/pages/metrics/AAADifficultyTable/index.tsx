@@ -1,5 +1,5 @@
 import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
-import { Meta } from "@/components/partials/common/Head";
+import { Meta } from "@/components/partials/common/PageChrome/Head";
 import { useUser } from "@/contexts/users/UserContext";
 import { AAATableContent } from "@/components/partials/features/Metrics/AAATable";
 import { useTranslation } from "@/hooks/common/useTranslation";

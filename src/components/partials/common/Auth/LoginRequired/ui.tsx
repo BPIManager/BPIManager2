@@ -1,7 +1,7 @@
 import { LoginPageBody } from "@/components/partials/features/LogIn/ui";
 import { cn } from "@/lib/utils";
 import { LockIcon } from "lucide-react";
-import { LoginButtons } from "@/components/partials/common/LogIn";
+import { LoginButtons } from "@/components/partials/common/Auth/Buttons";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 export const LoginRequiredCard = ({

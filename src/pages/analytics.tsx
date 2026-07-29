@@ -5,8 +5,8 @@ import { useRouter } from "next/router";
 import { Settings2, ChevronDown } from "lucide-react";
 
 import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
-import { PageContainer, PageHeader } from "@/components/partials/common/Header";
-import { Meta } from "@/components/partials/common/Head";
+import { PageContainer, PageHeader } from "@/components/partials/common/PageChrome/Header";
+import { Meta } from "@/components/partials/common/PageChrome/Head";
 import { Button } from "@/components/ui/button";
 import { RequireAuth } from "@/components/partials/shell/RequireAuth";
 import { useUser } from "@/contexts/users/UserContext";

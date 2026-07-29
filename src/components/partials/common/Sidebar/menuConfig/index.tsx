@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import type { TranslationKey } from "@/lib/i18n/translations";
-import { XIcon } from "@/components/partials/common/LogIn";
+import { XIcon } from "@/components/partials/common/Auth/Buttons";
 
 type T = (key: TranslationKey) => string;
 

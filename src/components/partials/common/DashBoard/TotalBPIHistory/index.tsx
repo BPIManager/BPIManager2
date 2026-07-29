@@ -5,7 +5,7 @@ import { TotalBpiHistoryChart } from "./ui";
 import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 import type { StatsGroupBy } from "@/types/stats/bpiBoxStats";
 import { DashCard } from "@/components/ui/dashcard";
-import { FetchErrorState } from "@/components/partials/common/FetchErrorState";
+import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
 
 export const BpiHistorySection = ({
   myUserId,

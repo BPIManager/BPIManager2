@@ -13,7 +13,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { WinLossHistoryChartSkeleton } from "./skeleton";
-import { FetchErrorState } from "@/components/partials/common/FetchErrorState";
+import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
 
 interface WinLossEntry {
   level: number;

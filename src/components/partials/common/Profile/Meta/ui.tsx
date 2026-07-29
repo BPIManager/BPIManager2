@@ -1,5 +1,5 @@
 import { useStaticProfile } from "@/contexts/profile/ProfileContext";
-import { Meta } from "@/components/partials/common/Head";
+import { Meta } from "@/components/partials/common/PageChrome/Head";
 import { formatIIDXId } from "@/utils/common/formatIidxId";
 import { useTranslation } from "@/hooks/common/useTranslation";
 

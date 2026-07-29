@@ -5,8 +5,8 @@ import { formatIIDXId } from "@/utils/common/formatIidxId";
 import { FollowSection } from "@/components/partials/common/FollowSection";
 
 import { UserProfileData } from "@/types/users/profile";
-import { RoleBadge } from "@/components/partials/common/UserRole";
-import { ArenaClassBadge } from "@/components/partials/common/ArenaClassBadge";
+import { RoleBadge } from "@/components/partials/common/Badge/UserRole";
+import { ArenaClassBadge } from "@/components/partials/common/Badge/ArenaClassBadge";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface RivalHeaderProps {

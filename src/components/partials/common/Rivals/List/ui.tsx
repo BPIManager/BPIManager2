@@ -7,8 +7,8 @@ import { getBpiColorStyle } from "@/constants/theme/bpiColor";
 import { getRoleCardStyle } from "@/constants/theme/roleCardStyle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import { RoleBadge } from "@/components/partials/common/UserRole";
-import { ArenaClassBadge } from "@/components/partials/common/ArenaClassBadge";
+import { RoleBadge } from "@/components/partials/common/Badge/UserRole";
+import { ArenaClassBadge } from "@/components/partials/common/Badge/ArenaClassBadge";
 import dayjs from "@/lib/dayjs";
 
 export const ROLE_ICON: Record<string, { icon: LucideIcon; color: string }> = {

@@ -12,7 +12,7 @@ import { BatchSongsTable } from "../LogTable/ui";
 import { LogNavigator } from "../LogsNav/ui";
 import { BatchTotalBpiCard } from "../TotalBPI/ui";
 import { LogsDetailContentSkeleton } from "./skeleton";
-import { FetchErrorState } from "@/components/partials/common/FetchErrorState";
+import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
 import type { LogsDetailViewProps } from "@/types/logs/detail";
 import { XIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";

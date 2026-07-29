@@ -12,7 +12,7 @@ import {
   type RivalDiffPoint,
   type RivalCategoryStat,
 } from "@/hooks/social/useRivalAnalysis";
-import { BpiScatterChart } from "@/components/partials/common/BpiScatterChart";
+import { BpiScatterChart } from "@/components/partials/common/Charts/BpiScatterChart";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 

@@ -20,7 +20,7 @@ import {
   FilterCheckboxGroup,
   FilterSearchInput,
   FilterSelect,
-} from "@/components/partials/common/FilterControls";
+} from "@/components/partials/common/ListControls/FilterControls";
 import { SlidersHorizontal } from "lucide-react";
 import { toggleArrayItem } from "@/hooks/common/useToggleArray";
 import { useTranslation } from "@/hooks/common/useTranslation";

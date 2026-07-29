@@ -6,7 +6,7 @@ import {
   FilterCheckboxGroup,
   FilterSearchInput,
   FilterSelect,
-} from "@/components/partials/common/FilterControls";
+} from "@/components/partials/common/ListControls/FilterControls";
 import { ALL_DIFFICULTIES, ALL_LEVELS } from "@/constants/iidx/songLevels";
 import { toggleArrayItem } from "@/hooks/common/useToggleArray";
 

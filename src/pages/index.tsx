@@ -2,7 +2,7 @@
 
 import { useUser } from "@/contexts/users/UserContext";
 import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
-import { Meta } from "@/components/partials/common/Head";
+import { Meta } from "@/components/partials/common/PageChrome/Head";
 import LoginPage from "@/components/partials/features/LogIn/ui";
 import AccountSettings from "@/components/partials/modal/AccountSettings";
 import { DashBoardFilter } from "@/components/partials/common/DashBoard/Filter";
@@ -12,7 +12,7 @@ import { RankDistributionSection } from "@/components/partials/common/DashBoard/
 import { BpiDistributionSection } from "@/components/partials/common/DashBoard/BPIDistribution";
 import { BpmBpiDistributionSection } from "@/components/partials/common/DashBoard/BpmBpiDistribution";
 import { FilterProvider } from "@/contexts/stats/FilterContext";
-import { PageContainer, PageHeader } from "@/components/partials/common/Header";
+import { PageContainer, PageHeader } from "@/components/partials/common/PageChrome/Header";
 import { RankingTabsCard } from "@/components/partials/common/DashBoard/RecommendedCard/ui";
 import { RadarSection } from "@/components/partials/common/DashBoard/Radar/ui";
 import { RivalWinLossSummary } from "@/components/partials/common/DashBoard/Rivals";

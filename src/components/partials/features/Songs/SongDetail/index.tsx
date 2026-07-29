@@ -11,7 +11,7 @@ import { WikiTab } from "./Wiki";
 import { PatternTab } from "./Pattern";
 import { SongMetaCard } from "./ui";
 import { SongDetailSkeleton } from "./skeleton";
-import { FetchErrorState } from "@/components/partials/common/FetchErrorState";
+import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
 
 interface SongDetailContentProps {
   songId: number;

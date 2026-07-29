@@ -6,10 +6,10 @@ import { useArenaAverages } from "@/hooks/metrics/useArenaAverage";
 import {
   ArenaAverageTable,
   type DisplayMetric,
-} from "@/components/partials/common/ArenaAverage/ui";
-import { ArenaAnalysis } from "@/components/partials/common/ArenaAverage/analysis";
-import { PageContainer, PageHeader } from "@/components/partials/common/Header";
-import { Meta } from "@/components/partials/common/Head";
+} from "@/components/partials/common/Charts/ArenaAverage/ui";
+import { ArenaAnalysis } from "@/components/partials/common/Charts/ArenaAverage/analysis";
+import { PageContainer, PageHeader } from "@/components/partials/common/PageChrome/Header";
+import { Meta } from "@/components/partials/common/PageChrome/Head";
 import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
 import {
   ArenaAverageFilter,

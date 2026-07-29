@@ -4,7 +4,7 @@ import { useVersionSummary } from "@/hooks/batches/useVersionSummary";
 import { BatchSongsTable } from "../LogTable/ui";
 import { NoDataAlert } from "@/components/partials/common/DashBoard/NoData";
 import { LogsDetailContentSkeleton } from "../LogsDetail/skeleton";
-import { FetchErrorState } from "@/components/partials/common/FetchErrorState";
+import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
 import { getBpiDistribution, getRankDistribution } from "@/utils/logs/getDistribution";
 import { DistributionChart } from "@/components/partials/common/DashBoard/DistributionChart/ui";
 import { RANK_COLORS } from "@/constants/theme/djRankColor";

@@ -1,5 +1,5 @@
 import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
-import { Meta } from "@/components/partials/common/Head";
+import { Meta } from "@/components/partials/common/PageChrome/Head";
 import { UserRecommendationList } from "@/components/partials/common/UserList";
 import { useTranslation } from "@/hooks/common/useTranslation";
 

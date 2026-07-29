@@ -17,7 +17,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
-import { RoleBadge } from "@/components/partials/common/UserRole";
+import { RoleBadge } from "@/components/partials/common/Badge/UserRole";
 import AccountSettings from "@/components/partials/modal/AccountSettings";
 import { LoginDialog } from "@/components/partials/modal/LoginDialog";
 

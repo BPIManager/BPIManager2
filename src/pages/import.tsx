@@ -1,4 +1,4 @@
-import { Meta } from "@/components/partials/common/Head";
+import { Meta } from "@/components/partials/common/PageChrome/Head";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { ImportSuccessModal } from "@/components/partials/features/Import/SuccessModal/ui";
 import { ImportView } from "@/components/partials/features/Import/View";

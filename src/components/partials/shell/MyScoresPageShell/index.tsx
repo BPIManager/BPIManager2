@@ -1,10 +1,10 @@
 import { ReactNode } from "react";
 import { useRouter } from "next/router";
-import { Meta } from "@/components/partials/common/Head";
+import { Meta } from "@/components/partials/common/PageChrome/Head";
 import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
 import { useUser } from "@/contexts/users/UserContext";
 import AccountSettings from "@/components/partials/modal/AccountSettings";
-import { LoginRequiredCard } from "@/components/partials/common/LoginRequired/ui";
+import { LoginRequiredCard } from "@/components/partials/common/Auth/LoginRequired/ui";
 import { PageLoader } from "@/components/ui/loading-spinner";
 
 interface MyScoresPageShellProps {

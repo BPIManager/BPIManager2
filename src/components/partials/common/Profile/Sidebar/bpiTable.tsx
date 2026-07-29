@@ -1,5 +1,5 @@
 import { StatEntry } from "@/types/users/profile";
-import { ArenaClassBadge } from "@/components/partials/common/ArenaClassBadge";
+import { ArenaClassBadge } from "@/components/partials/common/Badge/ArenaClassBadge";
 
 export const BpiHistoryTable = ({ stats }: { stats: StatEntry[] }) => (
   <div className="flex flex-col gap-1 w-full">

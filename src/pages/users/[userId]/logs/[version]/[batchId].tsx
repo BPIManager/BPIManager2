@@ -1,6 +1,6 @@
 import { LogsSummaryPageShell } from "@/components/partials/shell/LogsSummaryPageShell";
 import { PublicLogsCard } from "@/components/partials/features/Logs/PublicLogsCard";
-import { Meta } from "@/components/partials/common/Head";
+import { Meta } from "@/components/partials/common/PageChrome/Head";
 import { LogsDetailContent } from "@/components/partials/features/Logs/LogsDetail/content";
 import { LogsDetailView } from "@/components/partials/features/Logs/LogsDetail";
 import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
