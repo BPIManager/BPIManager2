@@ -83,11 +83,7 @@ export const ActionConfirmDialog = ({
                 : "bg-bpim-primary hover:bg-bpim-primary text-bpim-text",
             )}
           >
-            {isLoading ? (
-              <LoadingSpinner size="sm" />
-            ) : (
-              confirmLabel
-            )}
+            {isLoading ? <LoadingSpinner size="sm" /> : confirmLabel}
           </Button>
         </DialogFooter>
       </DialogContent>

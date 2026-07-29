@@ -447,9 +447,9 @@ export const StatsTabView = ({
             {song.kaidenAvg ?? 0}
             <span className="text-bpim-muted">
               {" / "}
-              {Number(
-                ((song.kaidenAvg ?? 0) / (song.notes * 2)) * 100,
-              ).toFixed(2)}{" "}
+              {Number(((song.kaidenAvg ?? 0) / (song.notes * 2)) * 100).toFixed(
+                2,
+              )}{" "}
               %
             </span>
           </span>
