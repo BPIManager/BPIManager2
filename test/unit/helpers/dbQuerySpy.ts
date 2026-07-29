@@ -12,7 +12,7 @@ export interface RecordedCall {
  * `execute`系メソッドだけ指定した結果を解決するPromiseを返す。
  * コールバック引数(join/where等の関数)は記録するだけで実行はしない。
  */
-export function createQueryBuilderSpy(result: unknown = []) {
+export function createQueryBuilderSpy(result: unknown) {
   const calls: RecordedCall[] = [];
 
   const handler: ProxyHandler<object> = {
@@ -42,7 +42,7 @@ export function createQueryBuilderSpy(result: unknown = []) {
  *
  * @param result - `execute`系メソッドが解決する値
  */
-export function createDbSpy(result: unknown = []) {
+export function createDbSpy(result: unknown) {
   const { proxy: chain, calls } = createQueryBuilderSpy(result);
 
   const dbHandler: ProxyHandler<object> = {
