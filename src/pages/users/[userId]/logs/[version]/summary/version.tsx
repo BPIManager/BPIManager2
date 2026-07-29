@@ -1,6 +1,6 @@
-import { LogsSummaryPageShell } from "@/components/partials/common/LogsSummaryPageShell";
+import { LogsSummaryPageShell } from "@/components/partials/shell/LogsSummaryPageShell";
 import { PublicLogsCard } from "@/components/partials/Logs/PublicLogsCard";
-import { DashboardLayout } from "@/components/partials/common/Main";
+import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
 import { UserProfileLayout } from "@/components/partials/Profile/Layout/layout";
 import { ProfileMeta } from "@/components/partials/Profile/Meta/ui";
 import { PageHeader, PageContainer } from "@/components/partials/common/Header";

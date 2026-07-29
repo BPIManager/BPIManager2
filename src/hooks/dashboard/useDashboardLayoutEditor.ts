@@ -16,7 +16,7 @@ import {
   DEFAULT_LAYOUT_CONFIG,
   WidgetId,
 } from "@/types/dashboard/layout";
-import { moveToSection, mergePreservingOtherSection } from "@/components/partials/DashBoard/LayoutSettings/utils";
+import { moveToSection, mergePreservingOtherSection } from "@/components/partials/common/DashBoard/LayoutSettings/utils";
 
 interface Options {
   config: DashboardLayoutConfig;

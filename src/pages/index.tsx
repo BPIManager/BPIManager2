@@ -1,10 +1,10 @@
 "use client";
 
 import { useUser } from "@/contexts/users/UserContext";
-import { DashboardLayout } from "@/components/partials/common/Main";
+import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
 import { Meta } from "@/components/partials/common/Head";
 import LoginPage from "@/components/partials/LogIn/ui";
-import AccountSettings from "@/components/partials/common/Modal/AccountSettings";
+import AccountSettings from "@/components/partials/modal/AccountSettings";
 import { DashBoardFilter } from "@/components/partials/common/DashBoard/Filter";
 import { ActivitySection } from "@/components/partials/common/DashBoard/ActivityCalendar";
 import { CurrentBpiSection } from "@/components/partials/common/DashBoard/CurrentBpi";

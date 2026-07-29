@@ -10,7 +10,7 @@ import {
 import { ArenaAnalysis } from "@/components/partials/Metrics/ArenaAverage/analysis";
 import { PageContainer, PageHeader } from "@/components/partials/common/Header";
 import { Meta } from "@/components/partials/common/Head";
-import { DashboardLayout } from "@/components/partials/common/Main";
+import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
 import {
   ArenaAverageFilter,
   type DetailFilter,

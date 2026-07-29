@@ -1,4 +1,4 @@
-import { DashboardLayout } from "@/components/partials/common/Main";
+import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
 import { PageContainer, PageHeader } from "@/components/partials/common/Header";
 import { Meta } from "@/components/partials/common/Head";
 import { ReusableMenuItem } from "@/components/partials/Metrics/Menu/ui";

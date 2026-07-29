@@ -1,5 +1,5 @@
 import { Clock } from "lucide-react";
-import { DashboardLayout } from "@/components/partials/common/Main";
+import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
 import { PageContainer, PageHeader } from "@/components/partials/common/Header";
 import { Meta } from "@/components/partials/common/Head";
 import {

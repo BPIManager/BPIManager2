@@ -1,4 +1,4 @@
-import { DashboardLayout } from "@/components/partials/common/Main";
+import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
 import { Meta } from "@/components/partials/common/Head";
 import { useUser } from "@/contexts/users/UserContext";
 import { AAATableContent } from "@/components/partials/Metrics/AAATable";

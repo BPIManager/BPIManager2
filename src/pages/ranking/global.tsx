@@ -1,5 +1,5 @@
 import { GetServerSideProps } from "next";
-import { DashboardLayout } from "@/components/partials/common/Main";
+import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
 import { Meta } from "@/components/partials/common/Head";
 import { GlobalRankingContainer } from "@/components/partials/features/Ranking";
 import { useTranslation } from "@/hooks/common/useTranslation";

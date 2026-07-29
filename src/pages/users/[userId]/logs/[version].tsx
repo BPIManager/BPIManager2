@@ -6,7 +6,7 @@ import { LogsList } from "@/components/partials/Logs/LogsList/ui";
 import { PublicLogsCard } from "@/components/partials/Logs/PublicLogsCard";
 import { Meta } from "@/components/partials/common/Head";
 import { PageHeader, PageContainer } from "@/components/partials/common/Header";
-import { DashboardLayout } from "@/components/partials/common/Main";
+import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { UserProfileLayout } from "@/components/partials/Profile/Layout/layout";
 import { ProfileMeta } from "@/components/partials/Profile/Meta/ui";

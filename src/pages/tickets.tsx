@@ -1,9 +1,9 @@
 "use client";
 
-import { DashboardLayout } from "@/components/partials/common/Main";
+import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
 import { PageContainer, PageHeader } from "@/components/partials/common/Header";
 import { Meta } from "@/components/partials/common/Head";
-import { RequireAuth } from "@/components/partials/common/RequireAuth";
+import { RequireAuth } from "@/components/partials/shell/RequireAuth";
 import { useUser } from "@/contexts/users/UserContext";
 import { TicketsSection } from "@/components/partials/features/Tickets";
 import { useTranslation } from "@/hooks/common/useTranslation";

@@ -1,4 +1,4 @@
-import { MyScoresPageShell } from "@/components/partials/common/MyScoresPageShell";
+import { MyScoresPageShell } from "@/components/partials/shell/MyScoresPageShell";
 import { UnplayedSongsTable } from "@/components/partials/features/TableUnplayed";
 import { useTranslation } from "@/hooks/common/useTranslation";
 

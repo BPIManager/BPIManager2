@@ -4,11 +4,11 @@ import { useCallback, useState } from "react";
 import { useRouter } from "next/router";
 import { Settings2, ChevronDown } from "lucide-react";
 
-import { DashboardLayout } from "@/components/partials/common/Main";
+import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
 import { PageContainer, PageHeader } from "@/components/partials/common/Header";
 import { Meta } from "@/components/partials/common/Head";
 import { Button } from "@/components/ui/button";
-import { RequireAuth } from "@/components/partials/common/RequireAuth";
+import { RequireAuth } from "@/components/partials/shell/RequireAuth";
 import { useUser } from "@/contexts/users/UserContext";
 
 import {

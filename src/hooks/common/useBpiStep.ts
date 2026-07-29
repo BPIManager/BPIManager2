@@ -2,7 +2,7 @@ import { useState } from "react";
 import {
   BPI_STEP_OPTIONS,
   BpiStep,
-} from "@/components/partials/DashBoard/DistributionChart";
+} from "@/components/partials/common/DashBoard/DistributionChart";
 
 export const useBpiStep = (defaultSteps?: BpiStep) => {
   const [bpiStep, setBpiStep] = useState<BpiStep>(defaultSteps || 10);
