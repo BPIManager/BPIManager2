@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
-import { createDbSpy, callsFor } from "./helpers/dbQuerySpy";
+import { createDbSpy, callsFor } from "../helpers/dbQuerySpy";
 
 const { dbHolder } = vi.hoisted(() => ({
-  dbHolder: { current: null as ReturnType<typeof import("./helpers/dbQuerySpy")["createDbSpy"]> | null },
+  dbHolder: { current: null as ReturnType<typeof import("../helpers/dbQuerySpy")["createDbSpy"]> | null },
 }));
 
 vi.mock("@/lib/db", () => ({

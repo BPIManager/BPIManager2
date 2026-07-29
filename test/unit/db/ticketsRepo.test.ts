@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
-import { createDbSpy, callsFor } from "./helpers/dbQuerySpy";
+import { createDbSpy, callsFor } from "../helpers/dbQuerySpy";
 
 const { dbHolder } = vi.hoisted(() => ({
-  dbHolder: { current: null as ReturnType<typeof import("./helpers/dbQuerySpy")["createDbSpy"]> | null },
+  dbHolder: { current: null as ReturnType<typeof import("../helpers/dbQuerySpy")["createDbSpy"]> | null },
 }));
 
 vi.mock("@/lib/db", () => ({
@@ -125,7 +125,19 @@ describe("ticketsRepo.getTopSongsForTicket", () => {
       0,
       "raw",
     );
-    expect(callsFor(dbHolder.current.calls, "orderBy")).toHaveLength(1);
+    const orderByArg = callsFor(dbHolder.current.calls, "orderBy")[0]
+      .args[0] as { toOperationNode: () => { sqlFragments: string[] } };
+    expect(orderByArg.toOperationNode().sqlFragments).toEqual(["sp.score"]);
+  });
+
+  it("scoreMode='relative'(デフォルト)の場合maxPatternScoreに対する割合をソート基準にすること", async () => {
+    dbHolder.current = createDbSpy([]);
+    await ticketsRepo.getTopSongsForTicket("1234567", "user-1", "33", null);
+    const orderByArg = callsFor(dbHolder.current.calls, "orderBy")[0]
+      .args[0] as { toOperationNode: () => { sqlFragments: string[] } };
+    expect(orderByArg.toOperationNode().sqlFragments[0]).toContain(
+      "CASE WHEN",
+    );
   });
 
   it("offsetが適用されること", async () => {

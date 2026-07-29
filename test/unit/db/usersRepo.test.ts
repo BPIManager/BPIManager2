@@ -3,7 +3,7 @@ import {
   createDbSpy,
   createTransactionalDbSpy,
   callsFor,
-} from "./helpers/dbQuerySpy";
+} from "../helpers/dbQuerySpy";
 
 const { dbHolder } = vi.hoisted(() => ({
   dbHolder: { current: null as unknown },
