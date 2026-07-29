@@ -5,7 +5,7 @@ import { PageContainer, PageHeader } from "@/components/partials/Header";
 import { Meta } from "@/components/partials/Head";
 import { RequireAuth } from "@/components/partials/RequireAuth";
 import { useUser } from "@/contexts/users/UserContext";
-import { BpiOptimizerSection } from "@/components/partials/Analytics/BpiOptimizer";
+import { BpiOptimizerSection } from "@/components/partials/features/Analytics/BpiOptimizer";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 export default function BpiOptimizerPage() {

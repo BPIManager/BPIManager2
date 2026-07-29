@@ -17,8 +17,8 @@ import {
   useAnalyticsComparison,
 } from "@/hooks/analytics/useAnalyticsComparison";
 import type { AnalyticsTarget } from "@/types/analytics";
-import { TargetSelectorModal } from "@/components/partials/Analytics/TargetSelector";
-import { AnalyticsComparisonTable } from "@/components/partials/Analytics/Table";
+import { TargetSelectorModal } from "@/components/partials/features/Analytics/TargetSelector";
+import { AnalyticsComparisonTable } from "@/components/partials/features/Analytics/Table";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/hooks/common/useTranslation";
