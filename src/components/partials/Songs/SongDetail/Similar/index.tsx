@@ -1,7 +1,7 @@
 import { useSimilarSongs } from "@/hooks/songs/useSimilarSongs";
 import { SimilarSongRow } from "./ui";
 import { SimilarTabSkeleton } from "./skeleton";
-import { FetchErrorState } from "@/components/partials/FetchErrorState";
+import { FetchErrorState } from "@/components/partials/common/FetchErrorState";
 
 interface SimilarTabProps {
   songId: number;

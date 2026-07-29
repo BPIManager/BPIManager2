@@ -1,0 +1,142 @@
+"use client";
+
+import { useState } from "react";
+import { UserRecommendationCard } from "./Card/ui";
+import { SortSelector } from "./Filter/sortInput";
+import { SearchInput } from "./Filter/searchInput";
+import { Pagination } from "./pagination";
+import { UserRecommendationCardSkeleton } from "./Card/skeleton";
+import { UserRecommendationEmpty } from "./Card/empty";
+import { RivalComparisonModal } from "./Modal";
+import { LoginRequiredCard } from "@/components/partials/common/LoginRequired/ui";
+import { useUser } from "@/contexts/users/UserContext";
+import { useUserList } from "@/hooks/users/useUserList";
+import { useUserListParams } from "@/hooks/users/useUserListParams";
+import { PageContainer, PageHeader } from "@/components/partials/common/Header";
+import { FetchErrorState } from "@/components/partials/common/FetchErrorState";
+import { useTranslation } from "@/hooks/common/useTranslation";
+
+export const UserRecommendationList = () => {
+  const { t } = useTranslation();
+  const { user, isLoading: isCredentialLoading } = useUser();
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const { q, p, s, o, seed, updateParams, handleReset } = useUserListParams();
+  const { data, isLoading, isError } = useUserList(q, p, s, o, seed);
+
+  const handleShuffle = () => {
+    updateParams({ seed: Math.floor(Math.random() * 1_000_000), p: 1 });
+  };
+
+  const handleCardClick = (userId: string) => {
+    setSelectedUserId(userId);
+    setIsModalOpen(true);
+  };
+
+  if (!user && !isCredentialLoading) {
+    return <LoginRequiredCard />;
+  }
+
+  return (
+    <>
+      <PageHeader
+        title={t("page.search.title")}
+        description={t("page.search.desc")}
+      />
+      <PageContainer>
+        <div className="flex w-full flex-col gap-6">
+          <div className="rounded-xl border border-bpim-border bg-bpim-bg/40 p-4 shadow-sm">
+            <div className="mb-3 flex items-center gap-2">
+              <div className="flex-1 min-w-0">
+                <SortSelector
+                  sort={s}
+                  order={o}
+                  onChange={(val) => {
+                    const [sort, order] = val.split("_");
+                    updateParams({ s: sort, o: order, p: 1, seed: null });
+                  }}
+                />
+              </div>
+              {o === "distance" && (
+                <button
+                  onClick={handleShuffle}
+                  className="shrink-0 flex items-center gap-1.5 rounded-lg border border-bpim-border bg-bpim-bg px-3 py-1.5 text-sm font-medium transition-colors hover:bg-bpim-border"
+                  title={t("rivals.search.shuffleTitle")}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polyline points="16 3 21 3 21 8" />
+                    <line x1="4" y1="20" x2="21" y2="3" />
+                    <polyline points="21 16 21 21 16 21" />
+                    <line x1="15" y1="15" x2="21" y2="21" />
+                  </svg>
+                  {t("rivals.search.shuffle")}
+                </button>
+              )}
+            </div>
+            <div className="flex gap-4">
+              <SearchInput
+                initialValue={q}
+                onSearch={(val) => updateParams({ q: val, p: 1 })}
+              />
+            </div>
+          </div>
+
+          {isLoading ? (
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+              {Array.from({ length: 10 }).map((_, i) => (
+                <UserRecommendationCardSkeleton key={i} />
+              ))}
+            </div>
+          ) : isError ? (
+            <FetchErrorState error={isError} />
+          ) : data?.users.length === 0 ? (
+            <UserRecommendationEmpty onReset={handleReset} />
+          ) : (
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+              {data?.users.map((u) => (
+                <UserRecommendationCard
+                  key={u.userId}
+                  user={u}
+                  viewerRadar={data.viewer.radar}
+                  viewerTotalBpi={data.viewer.totalBpi}
+                  currentSort={s}
+                  onClick={() => handleCardClick(u.userId)}
+                />
+              ))}
+            </div>
+          )}
+
+          {selectedUserId && (
+            <RivalComparisonModal
+              rivalId={selectedUserId}
+              isOpen={isModalOpen}
+              onClose={() => setIsModalOpen(false)}
+              viewerRadar={data?.viewer.radar ?? {}}
+            />
+          )}
+
+          {!isLoading && data && (
+            <div className="mt-4 flex justify-center">
+              <Pagination
+                p={p}
+                hasMore={data.users.length === 20}
+                onPageChange={(next) => updateParams({ p: next })}
+              />
+            </div>
+          )}
+        </div>
+      </PageContainer>
+    </>
+  );
+};

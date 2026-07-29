@@ -1,9 +1,9 @@
-import { LogsSummaryPageShell } from "@/components/partials/LogsSummaryPageShell";
+import { LogsSummaryPageShell } from "@/components/partials/common/LogsSummaryPageShell";
 import { PublicLogsCard } from "@/components/partials/Logs/PublicLogsCard";
-import { DashboardLayout } from "@/components/partials/Main";
+import { DashboardLayout } from "@/components/partials/common/Main";
 import { UserProfileLayout } from "@/components/partials/Profile/Layout/layout";
 import { ProfileMeta } from "@/components/partials/Profile/Meta/ui";
-import { PageHeader, PageContainer } from "@/components/partials/Header";
+import { PageHeader, PageContainer } from "@/components/partials/common/Header";
 import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 import { VersionCompareContent } from "@/components/partials/Logs/VersionCompare/ui";
 import { useTranslation } from "@/hooks/common/useTranslation";

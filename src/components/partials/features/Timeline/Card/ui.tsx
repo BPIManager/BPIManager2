@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { diffColors } from "../../../Table/ui";
+import { diffColors } from "@/components/partials/common/Table/ui";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 export const TimelineItem = ({ entry }: { entry: TimelineEntry }) => {

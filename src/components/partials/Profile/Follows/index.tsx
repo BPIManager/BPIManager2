@@ -10,7 +10,7 @@ import { UserCheck, Users } from "lucide-react";
 import { LoadingSpinner, SectionLoader } from "@/components/ui/loading-spinner";
 import { AppTabsGroup } from "@/components/ui/complex/tabs";
 import { useTranslation } from "@/hooks/common/useTranslation";
-import { FetchErrorState } from "@/components/partials/FetchErrorState";
+import { FetchErrorState } from "@/components/partials/common/FetchErrorState";
 
 export default function FollowPage({
   type,

@@ -1,6 +1,6 @@
 import { Trash2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ActionConfirmDialog } from "../../Modal/Confirmation";
+import { ActionConfirmDialog } from "@/components/partials/common/Modal/Confirmation";
 import { useBatchDelete } from "@/hooks/batches/useBatchDelete";
 import { useTranslation } from "@/hooks/common/useTranslation";
 

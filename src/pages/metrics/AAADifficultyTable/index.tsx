@@ -1,5 +1,5 @@
-import { DashboardLayout } from "@/components/partials/Main";
-import { Meta } from "@/components/partials/Head";
+import { DashboardLayout } from "@/components/partials/common/Main";
+import { Meta } from "@/components/partials/common/Head";
 import { useUser } from "@/contexts/users/UserContext";
 import { AAATableContent } from "@/components/partials/Metrics/AAATable";
 import { useTranslation } from "@/hooks/common/useTranslation";

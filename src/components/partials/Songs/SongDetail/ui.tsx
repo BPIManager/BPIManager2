@@ -1,5 +1,5 @@
 ﻿import { useMemo } from "react";
-import { RadarSectionChart } from "@/components/partials/DashBoard/Radar/index";
+import { RadarSectionChart } from "@/components/partials/common/DashBoard/Radar/index";
 import { DifficultyBadge } from "@/components/partials/Songs/DifficultyBadge";
 import { SONG_ATTRIBUTES } from "@/constants/iidx/songAttributes";
 import { buildRadarData } from "@/utils/songs/songListFilter";

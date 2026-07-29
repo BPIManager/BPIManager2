@@ -1,11 +1,11 @@
 import { useState, useMemo, RefObject } from "react";
 import { useSongFilter, PAGE_SIZE } from "@/hooks/table/useSongFilter";
 import { mapBatchToSongs } from "@/utils/logs/getSongTable";
-import { SongDetailView } from "../../Modal/SongDetail/ui";
-import { CustomPagination } from "../../Pagination/ui";
+import { SongDetailView } from "@/components/partials/common/Modal/SongDetail/ui";
+import { CustomPagination } from "@/components/partials/common/Pagination/ui";
 import { AdvancedFilterModal } from "../../Songs/AdvancedFilter/ui";
 import { SongFilterBar } from "../../Songs/Filter/ui";
-import { SongList } from "../../Table/ui";
+import { SongList } from "@/components/partials/common/Table/ui";
 import type { BatchDetailItem } from "@/types/logs/batchDetail";
 
 export const BatchSongsTable = ({

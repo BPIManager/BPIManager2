@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ArenaClassBadge } from "@/components/partials/ArenaClassBadge";
+import { ArenaClassBadge } from "@/components/partials/common/ArenaClassBadge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { Search, ChevronRight, Check } from "lucide-react";

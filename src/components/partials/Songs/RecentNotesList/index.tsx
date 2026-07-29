@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useRecentNotes } from "@/hooks/songs/useRecentNotes";
 import { DifficultyBadge } from "@/components/partials/Songs/DifficultyBadge";
 import { SortButton, formatDate } from "@/components/partials/Songs/SongDetail/Wiki/ui";
-import { InfiniteScrollContainer } from "@/components/partials/InfiniteScroll/ui";
+import { InfiniteScrollContainer } from "@/components/partials/common/InfiniteScroll/ui";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { RecentNote } from "@/hooks/songs/useRecentNotes";
 

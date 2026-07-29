@@ -1,24 +1,24 @@
 import { useRouter } from "next/router";
 import { GetServerSideProps } from "next";
-import { DashBoardFilter } from "@/components/partials/DashBoard/Filter";
-import { ActivitySection } from "@/components/partials/DashBoard/ActivityCalendar";
-import { RankDistributionSection } from "@/components/partials/DashBoard/DJRankDistribution";
-import { BpiDistributionSection } from "@/components/partials/DashBoard/BPIDistribution";
-import { BpmBpiDistributionSection } from "@/components/partials/DashBoard/BpmBpiDistribution";
-import { SongsTable } from "@/components/partials/Table";
+import { DashBoardFilter } from "@/components/partials/common/DashBoard/Filter";
+import { ActivitySection } from "@/components/partials/common/DashBoard/ActivityCalendar";
+import { RankDistributionSection } from "@/components/partials/common/DashBoard/DJRankDistribution";
+import { BpiDistributionSection } from "@/components/partials/common/DashBoard/BPIDistribution";
+import { BpmBpiDistributionSection } from "@/components/partials/common/DashBoard/BpmBpiDistribution";
+import { SongsTable } from "@/components/partials/common/Table";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { LogsList } from "@/components/partials/Logs/LogsList/ui";
 import { UserProfileLayout } from "@/components/partials/Profile/Layout/layout";
 import { ProfileMeta } from "@/components/partials/Profile/Meta/ui";
 import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
-import { RadarSection } from "@/components/partials/DashBoard/Radar/ui";
-import { BpiHistorySection } from "@/components/partials/DashBoard/TotalBPIHistory";
-import { IidxTowerSection } from "@/components/partials/DashBoard/IidxTowerCard";
-import { OfficialArenaHistorySection } from "@/components/partials/DashBoard/OfficialArenaHistoryCard";
+import { RadarSection } from "@/components/partials/common/DashBoard/Radar/ui";
+import { BpiHistorySection } from "@/components/partials/common/DashBoard/TotalBPIHistory";
+import { IidxTowerSection } from "@/components/partials/common/DashBoard/IidxTowerCard";
+import { OfficialArenaHistorySection } from "@/components/partials/common/DashBoard/OfficialArenaHistoryCard";
 import { LogFilterSection } from "@/components/partials/Logs/VersionSelector/ui";
 import { TabsContent } from "@/components/ui/tabs";
 import { useState } from "react";
-import { BpiBoxStatsSection } from "@/components/partials/DashBoard/BpiBoxStats";
+import { BpiBoxStatsSection } from "@/components/partials/common/DashBoard/BpiBoxStats";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 export const getServerSideProps: GetServerSideProps = async () => {

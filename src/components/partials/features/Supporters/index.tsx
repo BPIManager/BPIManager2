@@ -2,7 +2,7 @@
 
 import { useSupporters } from "@/hooks/users/useSupporters";
 import { useTranslation } from "@/hooks/common/useTranslation";
-import { PageContainer, PageHeader } from "../../Header";
+import { PageContainer, PageHeader } from "@/components/partials/common/Header";
 import { WhySection } from "./WhySection/ui";
 import { DonationSection } from "./DonationSection/ui";
 import { SupportersListSection } from "./SupportersListSection/ui";

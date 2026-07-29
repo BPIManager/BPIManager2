@@ -1,8 +1,8 @@
-import { Meta } from "@/components/partials/Head";
+import { Meta } from "@/components/partials/common/Head";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { ImportSuccessModal } from "@/components/partials/Import/SuccessModal/ui";
 import { ImportView } from "@/components/partials/Import/View";
-import AccountSettings from "@/components/partials/Modal/AccountSettings";
+import AccountSettings from "@/components/partials/common/Modal/AccountSettings";
 import { dummyCsv } from "@/constants/ui/dummyCsv";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { useUser } from "@/contexts/users/UserContext";

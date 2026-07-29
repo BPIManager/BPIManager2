@@ -1,9 +1,9 @@
 "use client";
 
-import { DashboardLayout } from "@/components/partials/Main";
-import { PageContainer, PageHeader } from "@/components/partials/Header";
-import { Meta } from "@/components/partials/Head";
-import { RequireAuth } from "@/components/partials/RequireAuth";
+import { DashboardLayout } from "@/components/partials/common/Main";
+import { PageContainer, PageHeader } from "@/components/partials/common/Header";
+import { Meta } from "@/components/partials/common/Head";
+import { RequireAuth } from "@/components/partials/common/RequireAuth";
 import { useUser } from "@/contexts/users/UserContext";
 import { BpiOptimizerSection } from "@/components/partials/features/Analytics/BpiOptimizer";
 import { useTranslation } from "@/hooks/common/useTranslation";

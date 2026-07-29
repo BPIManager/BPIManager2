@@ -2,19 +2,19 @@
 
 import { useUser } from "@/contexts/users/UserContext";
 import { useTranslation } from "@/hooks/common/useTranslation";
-import { DashboardLayout } from "@/components/partials/Main";
-import { PageContainer, PageHeader } from "@/components/partials/Header";
+import { DashboardLayout } from "@/components/partials/common/Main";
+import { PageContainer, PageHeader } from "@/components/partials/common/Header";
 import TransferUi from "@/components/partials/features/Settings/Transfer/ui";
 import AccountSettingsUi from "@/components/partials/features/Settings/AccountSettings/ui";
 import AccountDeletionUi from "@/components/partials/features/Settings/AccountDeletion/ui";
 import ApiKeyUi from "@/components/partials/features/Settings/APIKey/ui";
-import { Meta } from "@/components/partials/Head";
+import { Meta } from "@/components/partials/common/Head";
 import { PageLoader } from "@/components/ui/loading-spinner";
 import ThemeSettingsUi from "@/components/partials/features/Settings/ThemeSettings/ui";
 import DataExportUi from "@/components/partials/features/Settings/DataExport";
 import LayoutSettingsUi from "@/components/partials/features/Settings/LayoutSettings/ui";
 import LanguageSettingsUi from "@/components/partials/features/Settings/LanguageSettings/ui";
-import { RequireAuth } from "@/components/partials/RequireAuth";
+import { RequireAuth } from "@/components/partials/common/RequireAuth";
 
 export default function SettingsPage() {
   const { isLoading, fbUser } = useUser();

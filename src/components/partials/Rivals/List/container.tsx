@@ -1,10 +1,10 @@
 ﻿import { RivalSummaryCard } from "./ui";
 import { RivalSummarySkeleton } from "./skeleton";
-import { RivalWinLossSummaryNotFound } from "@/components/partials/RivalWinLossSummaryNotFound";
+import { RivalWinLossSummaryNotFound } from "@/components/partials/common/RivalWinLossSummaryNotFound";
 import {
   FetchErrorState,
   type FetchError,
-} from "@/components/partials/FetchErrorState";
+} from "@/components/partials/common/FetchErrorState";
 import { RivalSummaryResult } from "@/types/social/rival";
 
 interface RivalListProps {

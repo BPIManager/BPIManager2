@@ -2,7 +2,7 @@
 
 import { ReactNode } from "react";
 import { useRouter } from "next/router";
-import { ProfileLayoutShell } from "@/components/partials/ProfileLayoutShell";
+import { ProfileLayoutShell } from "@/components/partials/common/ProfileLayoutShell";
 import { Tabs } from "@/components/ui/tabs";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { LayoutDashboard, Music } from "lucide-react";

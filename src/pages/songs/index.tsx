@@ -1,6 +1,6 @@
-import { DashboardLayout } from "@/components/partials/Main";
-import { PageContainer, PageHeader } from "@/components/partials/Header";
-import { Meta, JsonLd } from "@/components/partials/Head";
+import { DashboardLayout } from "@/components/partials/common/Main";
+import { PageContainer, PageHeader } from "@/components/partials/common/Header";
+import { Meta, JsonLd } from "@/components/partials/common/Head";
 import { SongListContent } from "@/components/partials/Songs/SongList";
 import { RecentNotesList } from "@/components/partials/Songs/RecentNotesList";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";

@@ -7,13 +7,13 @@ import { GroupingMode, GoalType, AAATableItem, CustomGoalConfig, CardDisplay } f
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { AAATableFilter } from "@/components/partials/Metrics/AAATable/selector";
 import { AAAGridItem } from "@/components/partials/Metrics/AAATable/table";
-import { PageContainer, PageHeader } from "../../Header";
+import { PageContainer, PageHeader } from "@/components/partials/common/Header";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { LoginRequiredCard } from "../../LoginRequired/ui";
-import { FetchErrorState } from "../../FetchErrorState";
+import { LoginRequiredCard } from "@/components/partials/common/LoginRequired/ui";
+import { FetchErrorState } from "@/components/partials/common/FetchErrorState";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface AAATableContentProps {

@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { useUser } from "@/contexts/users/UserContext";
-import { DashboardLayout } from "@/components/partials/Main";
-import { Meta } from "@/components/partials/Head";
+import { DashboardLayout } from "@/components/partials/common/Main";
+import { Meta } from "@/components/partials/common/Head";
 import { UserProfileLayout } from "@/components/partials/Profile/Layout/layout";
 import { AAATableContent } from "@/components/partials/Metrics/AAATable";
 import { latestVersion } from "@/constants/iidx/iidxVersions";

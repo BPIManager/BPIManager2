@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { SongListSkeleton } from "../../Table/skeleton";
-import { CustomPagination } from "../../Pagination/ui";
+import { SongListSkeleton } from "@/components/partials/common/Table/skeleton";
+import { CustomPagination } from "@/components/partials/common/Pagination/ui";
 import { AllSongWithScore } from "@/types/songs/allSongs";
 import { AllSongFilterBar } from "./Filter";
 import { AllSongList } from "./Table";
-import { SongDetailView } from "@/components/partials/Modal/SongDetail/ui";
-import { FetchErrorState } from "@/components/partials/FetchErrorState";
+import { SongDetailView } from "@/components/partials/common/Modal/SongDetail/ui";
+import { FetchErrorState } from "@/components/partials/common/FetchErrorState";
 import {
   useAllSongsFilter,
   PAGE_SIZE,

@@ -1,7 +1,7 @@
 import { Clock } from "lucide-react";
-import { DashboardLayout } from "@/components/partials/Main";
-import { PageContainer, PageHeader } from "@/components/partials/Header";
-import { Meta } from "@/components/partials/Head";
+import { DashboardLayout } from "@/components/partials/common/Main";
+import { PageContainer, PageHeader } from "@/components/partials/common/Header";
+import { Meta } from "@/components/partials/common/Head";
 import {
   SummaryCard,
   SkeletonCard,
@@ -15,7 +15,7 @@ import {
 } from "@/components/partials/features/Info";
 import { useSiteStats } from "@/hooks/siteStats/useSiteStats";
 import { useTranslation } from "@/hooks/common/useTranslation";
-import { FetchErrorState } from "@/components/partials/FetchErrorState";
+import { FetchErrorState } from "@/components/partials/common/FetchErrorState";
 
 function UpdateNotice({ generatedAt }: { generatedAt?: string }) {
   const { t } = useTranslation();

@@ -4,14 +4,14 @@ import { useState } from "react";
 import { SongWithScore } from "@/types/songs/score";
 import { useSongFilter, PAGE_SIZE } from "@/hooks/table/useSongFilter";
 import { useUnplayedScores } from "@/hooks/table/useUnplayedScores";
-import { NoDataAlert } from "../../DashBoard/NoData";
-import { FetchErrorState } from "../../FetchErrorState";
-import { SongDetailView } from "../../Modal/SongDetail/ui";
-import { CustomPagination } from "../../Pagination/ui";
+import { NoDataAlert } from "@/components/partials/common/DashBoard/NoData";
+import { FetchErrorState } from "@/components/partials/common/FetchErrorState";
+import { SongDetailView } from "@/components/partials/common/Modal/SongDetail/ui";
+import { CustomPagination } from "@/components/partials/common/Pagination/ui";
 import { AdvancedFilterModal } from "../../Songs/AdvancedFilter/ui";
 import { SongFilterBar } from "../../Songs/Filter/ui";
-import { SongListSkeleton } from "../../Table/skeleton";
-import { SongList } from "../../Table/ui";
+import { SongListSkeleton } from "@/components/partials/common/Table/skeleton";
+import { SongList } from "@/components/partials/common/Table/ui";
 
 export const UnplayedSongsTable = ({
   userId,

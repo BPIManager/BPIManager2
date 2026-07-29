@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { CustomPagination } from "../../Pagination/ui";
+import { CustomPagination } from "@/components/partials/common/Pagination/ui";
 import { cn } from "@/lib/utils";
 import { ArrowUpDown, ChevronUp, ChevronDown } from "lucide-react";
 import { A_RANKS } from "@/constants/iidx/arenaRanks";

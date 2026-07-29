@@ -1,4 +1,4 @@
-import { PageContainer, PageHeader } from "../../Header";
+import { PageContainer, PageHeader } from "@/components/partials/common/Header";
 import dayjs from "@/lib/dayjs";
 import { LogsDetailContent } from "./content";
 import type { LogsDetailViewProps } from "@/types/logs/detail";

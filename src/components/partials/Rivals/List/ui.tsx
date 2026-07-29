@@ -1,14 +1,14 @@
 ﻿import { Coffee, Fish, Sparkle, Code2, Trophy } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { formatIIDXId } from "@/utils/common/formatIidxId";
-import { RadarSectionChart } from "../../DashBoard/Radar";
+import { RadarSectionChart } from "@/components/partials/common/DashBoard/Radar";
 import { RivalSummaryResult } from "@/types/social/rival";
 import { getBpiColorStyle } from "@/constants/theme/bpiColor";
 import { getRoleCardStyle } from "@/constants/theme/roleCardStyle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import { RoleBadge } from "../../UserRole";
-import { ArenaClassBadge } from "@/components/partials/ArenaClassBadge";
+import { RoleBadge } from "@/components/partials/common/UserRole";
+import { ArenaClassBadge } from "@/components/partials/common/ArenaClassBadge";
 import dayjs from "@/lib/dayjs";
 
 export const ROLE_ICON: Record<string, { icon: LucideIcon; color: string }> = {

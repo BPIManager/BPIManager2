@@ -2,7 +2,7 @@
 
 import { useSongListFilter } from "@/hooks/songs/useSongListFilter";
 import { SongFilterControls, SongVirtualList } from "./ui";
-import { FetchErrorState } from "@/components/partials/FetchErrorState";
+import { FetchErrorState } from "@/components/partials/common/FetchErrorState";
 
 export function SongListContent() {
   const {

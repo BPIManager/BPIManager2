@@ -1,7 +1,7 @@
 import { LockIcon } from "lucide-react";
-import { Meta } from "../Head";
-import { DashboardLayout } from "../Main";
-import { PageContainer } from "../Header";
+import { Meta } from "@/components/partials/common/Head";
+import { DashboardLayout } from "@/components/partials/common/Main";
+import { PageContainer } from "@/components/partials/common/Header";
 import { Separator } from "@/components/ui/separator";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { LoginSection } from "./LoginSection/ui";

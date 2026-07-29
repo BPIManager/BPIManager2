@@ -6,10 +6,10 @@ import { useUser } from "@/contexts/users/UserContext";
 import { useRivalSummary } from "@/hooks/social/useRivalSummary";
 import { RivalFilter } from "./filter";
 import { RivalList } from "./container";
-import { LoginRequiredCard } from "../../LoginRequired/ui";
+import { LoginRequiredCard } from "@/components/partials/common/LoginRequired/ui";
 import { useRivalListFilter } from "@/hooks/social/useRivalListFilter";
 import { useRouter } from "next/router";
-import { PageContainer, PageHeader } from "../../Header";
+import { PageContainer, PageHeader } from "@/components/partials/common/Header";
 
 export const RivalListContainer = ({
   viewerRadar,

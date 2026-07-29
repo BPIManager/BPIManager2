@@ -1,6 +1,6 @@
-import { DashboardLayout } from "@/components/partials/Main";
-import { Meta } from "@/components/partials/Head";
-import { UserRecommendationList } from "@/components/partials/UserList";
+import { DashboardLayout } from "@/components/partials/common/Main";
+import { Meta } from "@/components/partials/common/Head";
+import { UserRecommendationList } from "@/components/partials/common/UserList";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 export default function UsersPage() {

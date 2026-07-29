@@ -6,14 +6,14 @@ import { TimelineList } from "./ui";
 import {
   FilterCheckboxGroup,
   FilterSearchInput,
-} from "@/components/partials/FilterControls";
+} from "@/components/partials/common/FilterControls";
 import { useUser } from "@/contexts/users/UserContext";
-import { LoginRequiredCard } from "../../LoginRequired/ui";
+import { LoginRequiredCard } from "@/components/partials/common/LoginRequired/ui";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useTimelineFilter } from "@/hooks/social/useTimelineFilter";
 import { IidxDifficulty } from "@/types/iidx/difficulty";
-import { PageContainer, PageHeader } from "../../Header";
+import { PageContainer, PageHeader } from "@/components/partials/common/Header";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 

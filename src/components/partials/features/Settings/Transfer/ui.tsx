@@ -5,7 +5,7 @@ import { useUser } from "@/contexts/users/UserContext";
 import { useFirestoreDataCheck } from "@/hooks/firestore/checkData";
 import { versionTitles } from "@/constants/iidx/versionTitles";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
-import { ActionConfirmDialog } from "../../../Modal/Confirmation";
+import { ActionConfirmDialog } from "@/components/partials/common/Modal/Confirmation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";

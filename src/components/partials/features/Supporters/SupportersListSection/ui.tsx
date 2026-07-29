@@ -1,8 +1,8 @@
 import { Info } from "lucide-react";
 import { useTranslation } from "@/hooks/common/useTranslation";
-import { SupporterListView } from "../../../UserList/Supporters/ui";
-import { UserRecommendationCardSkeleton } from "../../../UserList/Card/skeleton";
-import { FetchErrorState } from "../../../FetchErrorState";
+import { SupporterListView } from "@/components/partials/common/UserList/Supporters/ui";
+import { UserRecommendationCardSkeleton } from "@/components/partials/common/UserList/Card/skeleton";
+import { FetchErrorState } from "@/components/partials/common/FetchErrorState";
 import { useSupporters } from "@/hooks/users/useSupporters";
 
 type UseSupportersResult = ReturnType<typeof useSupporters>;

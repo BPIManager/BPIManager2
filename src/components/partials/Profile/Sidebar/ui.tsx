@@ -9,7 +9,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { BpiHistoryTable } from "./bpiTable";
-import { ArenaClassBadge } from "@/components/partials/ArenaClassBadge";
+import { ArenaClassBadge } from "@/components/partials/common/ArenaClassBadge";
 import {
   Tooltip,
   TooltipContent,
@@ -17,12 +17,12 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { AreaRankBadge } from "@/components/ui/area-rank-badge";
-import { FollowSection } from "@/components/partials/FollowSection";
+import { FollowSection } from "@/components/partials/common/FollowSection";
 import { FollowStats } from "./followCount";
 import { formatIIDXId } from "@/utils/common/formatIidxId";
 import { XIcon } from "../../LogIn";
 import { UserProfileData } from "@/types/users/profile";
-import { RoleBadge } from "../../UserRole";
+import { RoleBadge } from "@/components/partials/common/UserRole";
 import {
   ChevronDown,
   ExternalLink,
