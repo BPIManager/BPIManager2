@@ -11,10 +11,12 @@ export const useSongRanking = (
 ) => {
   const { fbUser } = useUser();
 
-  const { data, isLoading, error } = useSWR<SongRankingResponse>(
+  const url =
     fbUser && songId
       ? `${API_PREFIX}/users/${fbUser.uid}/ranking/song/${songId}?version=${version || latestVersion}`
-      : null,
+      : null;
+  const { data, isLoading, error } = useSWR<SongRankingResponse>(
+    url ? [url, fbUser] : null,
     fetcher,
     { revalidateOnFocus: false },
   );
