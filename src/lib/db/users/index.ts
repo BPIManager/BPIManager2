@@ -11,6 +11,28 @@ import { getStatsPrivacy } from "@/lib/db/statsPrivacy";
  */
 class UsersRepository {
   /**
+   * 指定バージョンにおける各ユーザーの最新 `userStatusLogs` 行の ID を取得するサブクエリ。
+   */
+  private latestStatusSubquery(version: string) {
+    return db
+      .selectFrom("userStatusLogs")
+      .select((eb) => ["userId", eb.fn.max("id").as("maxId")])
+      .where("version", "=", version)
+      .groupBy("userId");
+  }
+
+  /**
+   * 指定バージョンにおける各ユーザーの最新 `officialArenaStats` 行の ID を取得するサブクエリ。
+   */
+  private latestArenaSubquery(version: string) {
+    return db
+      .selectFrom("officialArenaStats")
+      .select((eb) => ["userId", eb.fn.max("id").as("maxId")])
+      .where("version", "=", version)
+      .groupBy("userId");
+  }
+
+  /**
    * 指定ユーザー名が既に使用されているか確認する。
    *
    * @param userName - チェックするユーザー名
@@ -75,17 +97,8 @@ class UsersRepository {
     const sortColumn =
       sort && columnMap[sort] ? columnMap[sort] : "usl.totalBpi";
 
-    const latestStatusSubquery = db
-      .selectFrom("userStatusLogs")
-      .select((eb) => ["userId", eb.fn.max("id").as("maxId")])
-      .where("version", "=", version)
-      .groupBy("userId");
-
-    const latestArenaSubquery = db
-      .selectFrom("officialArenaStats")
-      .select((eb) => ["userId", eb.fn.max("id").as("maxId")])
-      .where("version", "=", version)
-      .groupBy("userId");
+    const latestStatusSubquery = this.latestStatusSubquery(version);
+    const latestArenaSubquery = this.latestArenaSubquery(version);
 
     let query = db
       .selectFrom("users as u")
@@ -158,11 +171,7 @@ class UsersRepository {
   }
 
   async getSupporters(version: string) {
-    const latestStatusSubquery = db
-      .selectFrom("userStatusLogs")
-      .select((eb) => ["userId", eb.fn.max("id").as("maxId")])
-      .where("version", "=", version)
-      .groupBy("userId");
+    const latestStatusSubquery = this.latestStatusSubquery(version);
 
     return await db
       .selectFrom("users as u")
@@ -221,17 +230,8 @@ class UsersRepository {
     const hasArenaClassFilter = Boolean(filterArenaClass);
     const hasFilter = hasAreaFilter || hasArenaClassFilter;
 
-    const latestStatusSubquery = db
-      .selectFrom("userStatusLogs")
-      .select(["userId", (eb) => eb.fn.max("id").as("maxId")])
-      .where("version", "=", version)
-      .groupBy("userId");
-
-    const latestArenaSubquery = db
-      .selectFrom("officialArenaStats")
-      .select(["userId", (eb) => eb.fn.max("id").as("maxId")])
-      .where("version", "=", version)
-      .groupBy("userId");
+    const latestStatusSubquery = this.latestStatusSubquery(version);
+    const latestArenaSubquery = this.latestArenaSubquery(version);
 
     if (isRadarCategory) {
       return await db
