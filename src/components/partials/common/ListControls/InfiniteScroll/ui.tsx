@@ -66,7 +66,7 @@ export function InfiniteScrollContainer<T>({
 
       <div
         ref={observerTarget}
-        className="flex min-h-[40px] items-center justify-center py-4"
+        className="flex min-h-10 items-center justify-center py-4"
       >
         {isLoadingMore && (
           <LoadingSpinner size="md" className="text-bpim-text" />

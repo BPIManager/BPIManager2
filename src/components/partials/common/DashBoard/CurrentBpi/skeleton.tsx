@@ -17,7 +17,7 @@ export const CurrentBpiSkeleton = () => (
     </div>
 
     <div className="mt-5">
-      <Skeleton className="h-[42px] w-full rounded-lg" />
+      <Skeleton className="h-10.5 w-full rounded-lg" />
     </div>
   </DashCard>
 );

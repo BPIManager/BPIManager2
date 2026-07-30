@@ -8,11 +8,11 @@ export const RivalWinLossSummarySkeleton = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Skeleton className="h-5 w-5 rounded-full" />
-              <Skeleton className="h-3 w-[100px]" />
+              <Skeleton className="h-3 w-25" />
             </div>
-            <Skeleton className="h-2.5 w-[40px]" />
+            <Skeleton className="h-2.5 w-10" />
           </div>
-          <Skeleton className="h-[18px] w-full rounded-sm" />
+          <Skeleton className="h-4.5 w-full rounded-sm" />
         </div>
       ))}
     </div>

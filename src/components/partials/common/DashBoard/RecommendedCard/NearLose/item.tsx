@@ -40,7 +40,7 @@ export const NearLoseRankItem = ({
           </span>
           <div className="flex items-center gap-1">
             <span
-              className="flex h-[14px] items-center rounded-sm px-2 text-[9px] font-bold text-bpim-text uppercase"
+              className="flex h-3.5 items-center rounded-sm px-2 text-[9px] font-bold text-bpim-text uppercase"
               style={{
                 backgroundColor: diffColors[item.difficulty] || "#1f2937",
               }}

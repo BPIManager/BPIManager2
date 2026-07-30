@@ -49,7 +49,7 @@ export const AllSongItem = ({
             <div className="flex items-center gap-2">
               <div
                 className={cn(
-                  "w-8 h-[18px] flex items-center justify-center rounded-sm",
+                  "w-8 h-4.5 flex items-center justify-center rounded-sm",
                   diffColorAll[song.difficulty] || "bg-bpim-surface-2",
                 )}
               >
@@ -66,7 +66,7 @@ export const AllSongItem = ({
 
         <div className="flex items-center bg-bpim-bg/30 p-2 lg:p-4 shrink-0">
           <div className="flex items-end gap-3 font-mono">
-            <div className="flex flex-col items-end min-w-[48px]">
+            <div className="flex flex-col items-end min-w-12">
               <span className="text-[10px] text-bpim-muted leading-none mb-0.5 uppercase">
                 EX
               </span>
@@ -74,7 +74,7 @@ export const AllSongItem = ({
                 {song.exScore !== null ? song.exScore : "---"}
               </span>
             </div>
-            <div className="flex flex-col items-end min-w-[40px]">
+            <div className="flex flex-col items-end min-w-10">
               <span className="text-[10px] text-bpim-muted leading-none mb-0.5 uppercase">
                 Rate
               </span>

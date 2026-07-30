@@ -49,7 +49,7 @@ export const TimelineItem = ({ entry }: { entry: TimelineEntry }) => {
               <div className="flex items-center gap-2 text-xs">
                 <Link
                   href={`/rivals/${entry.userId}`}
-                  className="font-bold text-bpim-text hover:underline truncate max-w-[120px]"
+                  className="font-bold text-bpim-text hover:underline truncate max-w-30"
                 >
                   {entry.userName}
                 </Link>
@@ -163,7 +163,7 @@ const ComparisonRow = ({
         {hasViewer ? (
           <span
             className={cn(
-              "inline-flex items-center justify-center h-3.5 min-w-[38px] px-1 rounded-sm text-[10px] font-bold border",
+              "inline-flex items-center justify-center h-3.5 min-w-9.5 px-1 rounded-sm text-[10px] font-bold border",
               (diff ?? 0) >= 0
                 ? "border-green-900 text-bpim-success bg-green-500/5"
                 : "border-red-900 text-bpim-danger bg-bpim-danger/5",
@@ -173,7 +173,7 @@ const ComparisonRow = ({
             {format(diff ?? 0)}
           </span>
         ) : (
-          <div className="w-[38px]" />
+          <div className="w-9.5" />
         )}
       </div>
     </div>

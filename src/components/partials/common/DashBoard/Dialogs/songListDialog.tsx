@@ -143,7 +143,7 @@ export const SongListDialog = ({
                     )}
 
                     <div
-                      className="inline-flex min-w-[80px] items-center justify-center rounded-sm border px-2 py-0.5 font-mono text-xs font-bold"
+                      className="inline-flex min-w-20 items-center justify-center rounded-sm border px-2 py-0.5 font-mono text-xs font-bold"
                       style={{
                         borderColor: style.bg,
                         backgroundColor: `${style.bg}22`,

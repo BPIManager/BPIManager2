@@ -10,8 +10,8 @@ const SongItemSkeleton = () => {
           <Skeleton className="h-3.5 w-[60%]" />
 
           <div className="mt-1 flex items-center gap-3">
-            <Skeleton className="h-[18px] w-6 rounded-sm" />
-            <Skeleton className="h-3 w-[100px]" />
+            <Skeleton className="h-4.5 w-6 rounded-sm" />
+            <Skeleton className="h-3 w-25" />
           </div>
         </div>
 

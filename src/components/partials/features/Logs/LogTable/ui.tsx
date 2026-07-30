@@ -36,7 +36,7 @@ export const BatchSongsTable = ({
         onOpenAdvancedFilter={() => setIsAdvancedOpen(true)}
       />
 
-      <div className="min-h-[400px]">
+      <div className="min-h-100">
         <SongList
           songs={visibleSongs}
           onSongSelect={(song) => {

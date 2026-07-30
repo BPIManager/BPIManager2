@@ -50,7 +50,7 @@ export const BpiBoxStatsSkeleton = () => {
       </div>
 
       <div className="px-2">
-        <Skeleton className="h-[30px] w-full rounded-md" />
+        <Skeleton className="h-7.5 w-full rounded-md" />
       </div>
     </DashCard>
   );

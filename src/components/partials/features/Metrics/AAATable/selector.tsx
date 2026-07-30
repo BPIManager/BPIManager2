@@ -88,7 +88,7 @@ export const AAATableFilter = ({
     {
       id: "version",
       label: t("aaa.filter.version"),
-      className: "min-w-[160px]",
+      className: "min-w-40",
       render: () => (
         <Select value={version} onValueChange={onVersionChange}>
           <SelectTrigger className="h-8 border-bpim-border bg-bpim-bg/20 text-xs text-bpim-text focus:ring-blue-500">

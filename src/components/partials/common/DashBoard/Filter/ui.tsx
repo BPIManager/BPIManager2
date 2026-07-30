@@ -28,7 +28,7 @@ export const DashBoardFilter = ({ withCompare }: { withCompare?: boolean }) => {
   return (
     <div className="rounded-lg border border-bpim-border bg-bpim-surface p-4">
       <div className="flex flex-col items-start gap-2 lg:flex-row lg:items-center">
-        <div className="flex w-full flex-col gap-2 lg:min-w-[240px] lg:w-auto">
+        <div className="flex w-full flex-col gap-2 lg:min-w-60 lg:w-auto">
           <span className="text-[10px] font-bold uppercase text-bpim-muted md:text-xs">
             VERSION
           </span>
@@ -47,7 +47,7 @@ export const DashBoardFilter = ({ withCompare }: { withCompare?: boolean }) => {
         </div>
 
         {withCompare && (
-          <div className="flex w-full flex-col gap-2 lg:min-w-[240px] lg:w-auto">
+          <div className="flex w-full flex-col gap-2 lg:min-w-60 lg:w-auto">
             <span className="text-[10px] font-bold uppercase text-bpim-muted md:text-xs">
               COMPARE
             </span>

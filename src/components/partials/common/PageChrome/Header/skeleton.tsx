@@ -12,11 +12,11 @@ export const PageHeaderSkeleton = () => (
         <div className="flex flex-1 flex-col gap-3">
           <div className="flex items-center gap-3">
             <Skeleton className="h-10 w-10 rounded-lg" />
-            <Skeleton className="h-8 w-full max-w-[240px] md:h-10 md:max-w-[320px]" />
+            <Skeleton className="h-8 w-full max-w-60 md:h-10 md:max-w-80" />
           </div>
 
-          <div className="hidden sm:block sm:pl-[52px]">
-            <Skeleton className="h-4 w-full max-w-[450px]" />
+          <div className="hidden sm:block sm:pl-13">
+            <Skeleton className="h-4 w-full max-w-112.5" />
           </div>
         </div>
 

@@ -159,7 +159,7 @@ export function SongRow({ song, sortKey }: SongRowProps) {
         </div>
       </div>
 
-      <div className="w-[120px] shrink-0">
+      <div className="w-30 shrink-0">
         {hasAttributes ? (
           <RadarSectionChart
             data={{}}
@@ -169,7 +169,7 @@ export function SongRow({ song, sortKey }: SongRowProps) {
             songAttr
           />
         ) : (
-          <div className="flex h-[100px] items-center justify-center text-[10px] text-bpim-muted">
+          <div className="flex h-25 items-center justify-center text-[10px] text-bpim-muted">
             データなし
           </div>
         )}

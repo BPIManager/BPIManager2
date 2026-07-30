@@ -53,7 +53,7 @@ export const OvertakeRankItem = ({ item, onClick }: RankItemProps) => {
               {current.exScore}
             </span>
           </div>
-          <div className="flex min-w-[50px] items-center justify-center rounded-sm bg-bpim-primary px-2 text-xs font-bold text-bpim-text">
+          <div className="flex min-w-12.5 items-center justify-center rounded-sm bg-bpim-primary px-2 text-xs font-bold text-bpim-text">
             +{scoreDiff}
           </div>
           {rivalRankInfo && (
@@ -104,7 +104,7 @@ export const OvertakeRankItem = ({ item, onClick }: RankItemProps) => {
                     <span className="text-xs text-bpim-muted">
                       {rival.rivalScore}
                     </span>
-                    <div className="text-xs font-bold text-yellow-400 min-w-[40px] text-right">
+                    <div className="text-xs font-bold text-yellow-400 min-w-10 text-right">
                       <span className="text-[10px] mr-0.5 opacity-80">+</span>
                       {current.exScore - rival.rivalScore}
                     </div>

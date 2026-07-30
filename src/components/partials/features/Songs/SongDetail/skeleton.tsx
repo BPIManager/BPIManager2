@@ -33,8 +33,8 @@ export function SongDetailSkeleton() {
           </div>
         </div>
 
-        <div className="w-full sm:w-[280px] shrink-0 flex items-center justify-center">
-          <Skeleton className="h-[280px] w-[280px] rounded-full" />
+        <div className="w-full sm:w-70 shrink-0 flex items-center justify-center">
+          <Skeleton className="h-70 w-70 rounded-full" />
         </div>
       </div>
 

@@ -4,14 +4,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 export const RadarSkeleton = () => {
   return (
     <DashCard>
-      <Skeleton className="mb-4 h-[14px] w-[100px]" />
+      <Skeleton className="mb-4 h-3.5 w-25" />
 
       <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-2">
-        <div className="flex h-[300px] items-center justify-center">
-          <div className="relative h-[200px] w-[200px]">
+        <div className="flex h-75 items-center justify-center">
+          <div className="relative h-50 w-50">
             <div className="absolute inset-0 rounded-full border border-bpim-border" />
-            <div className="absolute inset-[30px] rounded-full border border-bpim-border" />
-            <div className="absolute inset-[60px] rounded-full border border-bpim-border" />
+            <div className="absolute inset-7.5 rounded-full border border-bpim-border" />
+            <div className="absolute inset-15 rounded-full border border-bpim-border" />
             <div
               className="h-full w-full bg-bpim-primary/10"
               style={{
@@ -24,7 +24,7 @@ export const RadarSkeleton = () => {
 
         <div className="flex flex-col gap-2">
           {[...Array(6)].map((_, i) => (
-            <Skeleton key={i} className="h-[36px] w-full rounded-md" />
+            <Skeleton key={i} className="h-9 w-full rounded-md" />
           ))}
         </div>
       </div>

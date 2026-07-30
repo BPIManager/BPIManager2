@@ -105,7 +105,7 @@ const RadarCustomTooltip = ({ active, payload }: RadarCustomTooltipProps) => {
   const hasRival = rivalVal !== undefined;
 
   return (
-    <div className="min-w-[160px] rounded-md border border-bpim-border bg-bpim-surface p-3 shadow-xl">
+    <div className="min-w-40 rounded-md border border-bpim-border bg-bpim-surface p-3 shadow-xl">
       <div className="flex flex-col gap-1">
         <p className="text-xs font-bold text-bpim-text uppercase">
           {data.category}

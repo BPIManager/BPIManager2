@@ -49,7 +49,7 @@ function LoadingSkeleton() {
   return (
     <div className="flex flex-col gap-2 p-1">
       {Array.from({ length: 5 }).map((_, i) => (
-        <Skeleton key={i} className="h-[110px] w-full rounded-xl" />
+        <Skeleton key={i} className="h-27.5 w-full rounded-xl" />
       ))}
     </div>
   );

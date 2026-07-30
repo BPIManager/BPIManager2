@@ -72,7 +72,7 @@ export default function TransferUi() {
         variant="outline"
         onClick={handleOpenConfirm}
         disabled={isSyncing}
-        className="w-full md:w-auto min-w-[100px] gap-2"
+        className="w-full md:w-auto min-w-25 gap-2"
       >
         {isSyncing ? <LoadingSpinner size="sm" /> : <RefreshCw />}
         {isSyncing ? t("settings.transfer.syncing") : t("settings.transfer.sync")}

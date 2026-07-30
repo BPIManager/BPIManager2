@@ -140,7 +140,7 @@ export const RivalSummaryCard = ({
         </div>
       </div>
 
-      <div className="flex h-22.5 w-22.5 shrink-0 self-center items-center justify-center rounded-xl border border-bpim-border bg-bpim-bg/40 p-1 sm:h-[110px] sm:w-[110px] md:h-[130px] md:w-[130px]">
+      <div className="flex h-22.5 w-22.5 shrink-0 self-center items-center justify-center rounded-xl border border-bpim-border bg-bpim-bg/40 p-1 sm:h-27.5 sm:w-27.5 md:h-32.5 md:w-32.5">
         <RadarSectionChart data={viewerRadar} rivalData={radar} isMini={true} />
       </div>
     </button>

@@ -20,17 +20,17 @@ const ShareDataRow = ({
   isBpi?: boolean;
 }) => (
   <div className="flex w-full items-center justify-between font-mono text-sm leading-none">
-    <span className="w-[30px] text-[10px] font-bold text-bpim-subtle">
+    <span className="w-7.5 text-[10px] font-bold text-bpim-subtle">
       {label}
     </span>
-    <span className="w-[55px] text-right text-bpim-muted">
+    <span className="w-13.75 text-right text-bpim-muted">
       {isBpi ? prev.toFixed(2) : prev}
     </span>
     <ChevronRight className="mx-1 h-3 w-3 text-bpim-subtle" />
-    <span className="w-[55px] text-right font-bold text-bpim-text">
+    <span className="w-13.75 text-right font-bold text-bpim-text">
       {isBpi ? current.toFixed(2) : current}
     </span>
-    <span className={cn("w-[60px] text-right font-bold", diffColor)}>
+    <span className={cn("w-15 text-right font-bold", diffColor)}>
       +{isBpi ? diff.toFixed(2) : diff}
     </span>
   </div>
@@ -58,24 +58,24 @@ const ScoreRow = ({
     <div
       className={cn(
         "flex items-center justify-end gap-1 font-mono leading-none",
-        isGrowth || isTopBpi ? "h-[26px]" : "h-[20px]",
+        isGrowth || isTopBpi ? "h-6.5" : "h-5",
       )}
     >
-      <span className="w-[25px] text-left text-[9px] font-bold text-bpim-subtle">
+      <span className="w-6.25 text-left text-[9px] font-bold text-bpim-subtle">
         {label}
       </span>
       {isGrowth ? (
         <>
-          <span className="w-[45px] text-right text-xs text-bpim-muted">
+          <span className="w-11.25 text-right text-xs text-bpim-muted">
             {isBpi ? prev.toFixed(2) : prev}
           </span>
           <ChevronRight className="h-2 w-2 text-bpim-subtle" />
-          <span className="w-[45px] text-right text-xs font-bold text-bpim-muted">
+          <span className="w-11.25 text-right text-xs font-bold text-bpim-muted">
             {isBpi ? current.toFixed(2) : current}
           </span>
           <span
             className={cn(
-              "w-[60px] text-right font-bold",
+              "w-15 text-right font-bold",
               isBpi ? "text-lg" : "text-sm",
               diffColor,
             )}
@@ -84,7 +84,7 @@ const ScoreRow = ({
           </span>
         </>
       ) : (
-        <div className="flex w-[60px] justify-end items-baseline">
+        <div className="flex w-15 justify-end items-baseline">
           <span
             className={cn(
               "text-right font-mono",

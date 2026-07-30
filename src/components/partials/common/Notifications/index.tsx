@@ -42,7 +42,7 @@ export const NotificationBell = () => {
             <Bell size={20} />
           </Button>
           {unreadCount > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-bpim-danger px-1 font-mono text-[10px] font-bold text-bpim-text ring-2 ring-bpim-bg">
+            <span className="absolute -top-0.5 -right-0.5 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-bpim-danger px-1 font-mono text-[10px] font-bold text-bpim-text ring-2 ring-bpim-bg">
               {unreadCount > 99 ? "99+" : unreadCount}
             </span>
           )}
@@ -50,7 +50,7 @@ export const NotificationBell = () => {
       </PopoverTrigger>
       <PopoverContent
         align="end"
-        className="w-[350px] overflow-hidden border-bpim-border bg-bpim-surface-2 p-0 shadow-2xl"
+        className="w-87.5 overflow-hidden border-bpim-border bg-bpim-surface-2 p-0 shadow-2xl"
       >
         <Tabs
           value={activeTab}

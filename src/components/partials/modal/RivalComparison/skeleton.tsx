@@ -31,7 +31,7 @@ export const RivalBodySkeleton = () => (
     </div>
     <div className="flex flex-col gap-3">
       <Skeleton className="h-3 w-32" />
-      <Skeleton className="h-[250px] w-full rounded-xl md:h-[300px]" />
+      <Skeleton className="h-62.5 w-full rounded-xl md:h-75" />
     </div>
     <Skeleton className="h-12 w-full rounded-xl" />
   </div>

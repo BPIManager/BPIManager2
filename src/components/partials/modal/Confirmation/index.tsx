@@ -77,7 +77,7 @@ export const ActionConfirmDialog = ({
             onClick={onConfirm}
             disabled={isConfirmDisabled || isLoading}
             className={cn(
-              "h-9 px-6 font-bold transition-all min-w-[100px]",
+              "h-9 px-6 font-bold transition-all min-w-25",
               isDestructive
                 ? "bg-bpim-danger hover:bg-bpim-danger text-bpim-text"
                 : "bg-bpim-primary hover:bg-bpim-primary text-bpim-text",

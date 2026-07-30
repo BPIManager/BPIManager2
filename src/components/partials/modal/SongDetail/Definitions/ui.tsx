@@ -61,7 +61,7 @@ const DefTooltip = ({
   const rate = ((exScore / maxScore) * 100).toFixed(1);
 
   return (
-    <div className="rounded-lg border border-bpim-border bg-bpim-surface/95 p-3 shadow-2xl backdrop-blur-md min-w-[160px]">
+    <div className="rounded-lg border border-bpim-border bg-bpim-surface/95 p-3 shadow-2xl backdrop-blur-md min-w-40">
       <div className="flex items-center gap-1.5 mb-2">
         {point.isCurrent === 1 && (
           <span className="text-[9px] font-black tracking-widest text-bpim-primary uppercase">

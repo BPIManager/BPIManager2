@@ -88,11 +88,11 @@ export const BpmBpiChart = ({ myData, rivalData }: BpmBpiChartProps) => {
               )}
               onClick={() => setSelectedLabel(row.label)}
             >
-              <span className="w-[64px] shrink-0 text-right text-[11px] font-bold text-bpim-muted">
+              <span className="w-16 shrink-0 text-right text-[11px] font-bold text-bpim-muted">
                 {row.label}
               </span>
 
-              <div className="flex flex-1 flex-col gap-[3px]">
+              <div className="flex flex-1 flex-col gap-0.75">
                 {row.myBpi !== null && (
                   <HorizontalBar
                     bpi={row.myBpi}
@@ -112,7 +112,7 @@ export const BpmBpiChart = ({ myData, rivalData }: BpmBpiChartProps) => {
                 )}
               </div>
 
-              <div className="flex w-[52px] shrink-0 flex-col gap-[3px]">
+              <div className="flex w-13 shrink-0 flex-col gap-0.75">
                 {row.myBpi !== null && (
                   <span
                     className="text-[11px] font-bold leading-[10px]"
@@ -134,7 +134,7 @@ export const BpmBpiChart = ({ myData, rivalData }: BpmBpiChartProps) => {
           );
         })}
 
-        <div className="mt-1 flex justify-between px-[68px]">
+        <div className="mt-1 flex justify-between px-17">
           <span className="text-[10px] text-bpim-muted">{BPI_MIN}</span>
           <span className="text-[10px] text-bpim-muted">0</span>
           <span className="text-[10px] text-bpim-muted">{scaleMax}</span>

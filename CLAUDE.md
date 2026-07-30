@@ -69,6 +69,7 @@ src/
 
 - コンポーネントはデフォルトエクスポート、型はnamed export
 - スタイルはTailwind CSS v4のユーティリティクラス（`globals.css` はほぼ空）
+- 数値がキャノニカルなスペーシングスケールに乗る場合、`h-[30px]`のような任意値記法ではなく`h-7.5`のようなキャノニカルクラスを使う（Tailwind v4はスペーシングスケールが`calc(var(--spacing) * N)`で任意の数値に対応しているため、`px`値を4で割った数値がそのままクラス名になる）。フォントサイズや色など、スペーシングスケールに乗らない値は任意値記法のままでよい。
 - UI部品はshadcn/ui (`src/components/ui/`)を優先利用
 - Kyselyクエリは `src/lib/db/[ドメイン]/index.ts` に集約
 - SWRフックは `src/hooks/[ドメイン]/` に配置、フェッチャーは `src/services/swr/` に分離

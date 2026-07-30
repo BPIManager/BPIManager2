@@ -56,7 +56,7 @@ export default function ApiKeyUi() {
       </div>
 
       <div className="flex w-full flex-col gap-2 md:w-auto">
-        <div className="flex w-full items-center md:w-[450px]">
+        <div className="flex w-full items-center md:w-112.5">
           <Input
             value={rawKey || keyInfo?.key || ""}
             placeholder={isLoading ? "Loading..." : t("settings.apiKey.notIssued")}

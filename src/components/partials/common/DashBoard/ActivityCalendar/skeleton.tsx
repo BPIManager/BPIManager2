@@ -8,21 +8,21 @@ export const ActivityCalendarSkeleton = () => {
 
       <div className="flex items-start gap-2">
         <div
-          className="grid gap-[3px]"
+          className="grid gap-0.75"
           style={{
             gridTemplateRows: "repeat(7, 11px)",
             marginTop: "2px",
           }}
         >
-          <div className="h-[11px]" />
-          <Skeleton className="h-[11px] w-6" />
-          <div className="h-[11px]" />
-          <Skeleton className="h-[11px] w-6" />
-          <div className="h-[11px]" />
-          <Skeleton className="h-[11px] w-6" />
-          <div className="h-[11px]" />
+          <div className="h-2.75" />
+          <Skeleton className="h-2.75 w-6" />
+          <div className="h-2.75" />
+          <Skeleton className="h-2.75 w-6" />
+          <div className="h-2.75" />
+          <Skeleton className="h-2.75 w-6" />
+          <div className="h-2.75" />
         </div>
-        <Skeleton className="h-[95px] flex-1 rounded-sm" />
+        <Skeleton className="h-23.75 flex-1 rounded-sm" />
       </div>
 
       <div className="mt-3 flex justify-end gap-1">
