@@ -22,7 +22,7 @@ export async function handleMessageCreate(message: Message, client: Client) {
   if (message.channel.type !== ChannelType.DM) return;
 
   console.log(
-    `[Discord Bot] DM受信: "${message.content}" from ${message.author.tag}`,
+    `[Discord Bot] DM受信 (length: ${message.content.length}) from ${message.author.tag}`,
   );
 
   const guildId = process.env.DISCORD_GUILD_ID;
