@@ -3,8 +3,6 @@ import { sql } from "kysely";
 import { ARENA_RANK_ORDER } from "@/constants/iidx/arenaRanks";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 
-export { ARENA_RANK_ORDER };
-
 const DATE_EXPR = sql<string>`DATE_FORMAT(CONVERT_TZ(createdAt, '+00:00', '+09:00'), '%Y-%m-%d')`;
 
 const JST_TODAY_START = sql<Date>`CONVERT_TZ(CONCAT(DATE(CONVERT_TZ(NOW(), '+00:00', '+09:00')), ' 00:00:00'), '+09:00', '+00:00')`;

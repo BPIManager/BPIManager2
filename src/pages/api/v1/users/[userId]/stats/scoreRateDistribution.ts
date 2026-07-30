@@ -2,10 +2,8 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { statsRepo } from "@/lib/db/stats";
 import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
-import {
-  scoreRateDistributionParamsSchema,
-  type ValidStep,
-} from "@/schemas/stats/scoreRateDistribution";
+import { scoreRateDistributionParamsSchema } from "@/schemas/stats/scoreRateDistribution";
+import type { ValidStep } from "@/schemas/stats/singleBPIDistribution";
 import { parseQuery } from "@/services/nextRequest/parseBody";
 
 function buildBuckets(step: ValidStep) {

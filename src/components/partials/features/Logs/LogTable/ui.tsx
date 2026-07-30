@@ -1,5 +1,6 @@
 import { useState, useMemo, RefObject } from "react";
-import { useSongFilter, PAGE_SIZE } from "@/hooks/table/useSongFilter";
+import { useSongFilter } from "@/hooks/table/useSongFilter";
+import { PAGE_SIZE } from "@/constants/logic/pagination";
 import { mapBatchToSongs } from "@/utils/logs/getSongTable";
 import { SongDetailView } from "@/components/partials/modal/SongDetail/ui";
 import { CustomPagination } from "@/components/partials/common/ListControls/Pagination/ui";

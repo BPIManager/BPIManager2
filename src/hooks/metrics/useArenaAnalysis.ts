@@ -9,8 +9,6 @@ import {
   ARENA_RANK_COLORS,
 } from "@/constants/iidx/radars";
 
-export { RADAR_COLORS, ARENA_RANK_COLORS } from "@/constants/iidx/radars";
-
 export const getBpiBarColor = (bpi: number): string => {
   if (bpi >= 50) return "#facc15";
   if (bpi >= 20) return "#4ade80";

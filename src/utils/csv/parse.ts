@@ -6,8 +6,6 @@ import { parseRizaltoCsv } from "./adapters/result_techo";
 import { parseDakenCounterCsv } from "./adapters/daken_counter";
 import type { ParsedCsvRow } from "./types";
 
-export type { ParsedCsvRow };
-
 /** 公式CSVのパース用関数 */
 export const parseCSV = (csvData: string): ParsedCsvRow[] => {
   const parsed = Papa.parse(csvData, {

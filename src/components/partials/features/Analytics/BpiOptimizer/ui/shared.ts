@@ -8,5 +8,3 @@ export const RADAR_LABELS: Record<RadarCategory, string> = {
   SCRATCH: "SCRATCH",
   SOFLAN: "SOFLAN",
 };
-
-export { DIFF_COLORS } from "@/constants/theme/difficultyColors";

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useSongFilter, PAGE_SIZE } from "@/hooks/table/useSongFilter";
+import { useSongFilter } from "@/hooks/table/useSongFilter";
+import { PAGE_SIZE } from "@/constants/logic/pagination";
 import { SongWithRival, SongWithScore } from "@/types/songs/score";
 
 import { SongFilterBar } from "@/components/partials/common/Songs/Filter/ui";

@@ -1,4 +1,4 @@
-﻿import { diffColors } from "@/components/partials/common/Table/ui";
+﻿import { DIFF_COLORS as diffColors } from "@/constants/theme/difficultyColors";
 import { NearLoseSongItem } from "@/types/stats/nearLose";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";

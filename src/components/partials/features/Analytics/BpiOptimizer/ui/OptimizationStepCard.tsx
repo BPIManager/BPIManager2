@@ -3,7 +3,8 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import type { OptimizationStep } from "@/types/bpi-optimizer";
 import { BpiChip } from "./BpiChip";
-import { RADAR_LABELS, DIFF_COLORS } from "./shared";
+import { RADAR_LABELS } from "./shared";
+import { DIFF_COLORS } from "@/constants/theme/difficultyColors";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 export const OptimizationStepCard = ({

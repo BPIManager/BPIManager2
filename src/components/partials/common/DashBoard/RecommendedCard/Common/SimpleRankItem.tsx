@@ -2,7 +2,8 @@
 
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { diffColors, getLampClass } from "@/components/partials/common/Table/ui";
+import { getLampClass } from "@/components/partials/common/Table/ui";
+import { DIFF_COLORS as diffColors } from "@/constants/theme/difficultyColors";
 import { RecommendedItem } from "@/types/stats/recommended";
 
 interface SimpleRankItemProps {

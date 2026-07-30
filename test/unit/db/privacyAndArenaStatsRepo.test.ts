@@ -14,7 +14,6 @@ vi.mock("@/lib/db", () => ({
 const { getStatsPrivacy, upsertStatsPrivacy } = await import(
   "@/lib/db/statsPrivacy"
 );
-const arenaStatsPrivacyModule = await import("@/lib/db/arenaStatsPrivacy");
 const {
   getBestArenaClassPerVersion,
   upsertOfficialArenaStats,
@@ -63,15 +62,6 @@ describe("statsPrivacy.upsertStatsPrivacy", () => {
     expect(
       callsFor(dbHolder.current.calls, "onDuplicateKeyUpdate")[0].args,
     ).toEqual([{ showArea: 1 }]);
-  });
-});
-
-describe("arenaStatsPrivacy (re-export shim)", () => {
-  it("statsPrivacyと同じ実装を再エクスポートしていること", () => {
-    expect(arenaStatsPrivacyModule.getStatsPrivacy).toBe(getStatsPrivacy);
-    expect(arenaStatsPrivacyModule.upsertStatsPrivacy).toBe(
-      upsertStatsPrivacy,
-    );
   });
 });
 

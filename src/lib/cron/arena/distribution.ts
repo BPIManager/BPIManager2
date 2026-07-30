@@ -2,7 +2,7 @@ import fs from "fs/promises";
 import path from "path";
 import { db } from "@/lib/db";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
-import { ARENA_RANK_ORDER } from "@/lib/db/siteStats";
+import { ARENA_RANK_ORDER } from "@/constants/iidx/arenaRanks";
 import { upsertOfficialArenaStats } from "@/lib/db/officialArenaStats";
 import type { IIDXVersion } from "@/types/iidx/version";
 

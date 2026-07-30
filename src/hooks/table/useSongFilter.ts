@@ -11,7 +11,6 @@ import { sortSongs } from "@/utils/songs/sort";
 
 import { PAGE_SIZE } from "@/constants/logic/pagination";
 import { IidxDifficulty } from "@/types/iidx/difficulty";
-export { PAGE_SIZE };
 
 const toFilterKey = (q: ParsedUrlQuery) => {
   const { page: _page, ...rest } = q;

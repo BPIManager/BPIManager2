@@ -17,8 +17,6 @@ const DEFAULT_STRATEGIES: OptimizerStrategy[] = ["unplayed", "played"];
 const DEFAULT_LEVELS = [...IIDX_LEVELS];
 const DEFAULT_DIFFICULTIES = [...IIDX_DIFFICULTIES];
 
-export type { OptimizerStrategy };
-
 export function useBpiOptimizer() {
   const { fbUser, user } = useUser();
 

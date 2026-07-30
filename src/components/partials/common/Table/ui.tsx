@@ -5,7 +5,6 @@ import { cn } from "@/lib/utils";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { DIFF_COLORS as diffColors } from "@/constants/theme/difficultyColors";
-export { DIFF_COLORS as diffColors } from "@/constants/theme/difficultyColors";
 
 export const getLampClass = (clearState: string | null | undefined) => {
   if (!clearState || clearState === "NO PLAY") return "bg-bpim-overlay";

@@ -8,10 +8,8 @@ import { AllSongFilterBar } from "./Filter";
 import { AllSongList } from "./Table";
 import { SongDetailView } from "@/components/partials/modal/SongDetail/ui";
 import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
-import {
-  useAllSongsFilter,
-  PAGE_SIZE,
-} from "@/hooks/allScores/useAllSongsFilter";
+import { useAllSongsFilter } from "@/hooks/allScores/useAllSongsFilter";
+import { PAGE_SIZE } from "@/constants/logic/pagination";
 
 export const AllSongsTable = ({ userId }: { userId: string | undefined }) => {
   const [selected, setSelected] = useState<AllSongWithScore | null>(null);

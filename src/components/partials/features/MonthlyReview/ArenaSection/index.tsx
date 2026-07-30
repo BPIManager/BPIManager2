@@ -2,7 +2,7 @@
 
 import { useInView } from "@/hooks/common/useInView";
 import type { MonthlyReviewData } from "@/types/stats/monthlyReview";
-import { useCountUp } from "./utils";
+import { useCountUp } from "../utils";
 import { ArenaSectionUI } from "./ui";
 
 interface Props {

@@ -1,7 +1,8 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { getLampClass, diffColors } from "@/components/partials/common/Table/ui";
+import { getLampClass } from "@/components/partials/common/Table/ui";
+import { DIFF_COLORS as diffColors } from "@/constants/theme/difficultyColors";
 import { AllSongWithScore } from "@/types/songs/allSongs";
 
 const diffShort: Record<string, string> = {

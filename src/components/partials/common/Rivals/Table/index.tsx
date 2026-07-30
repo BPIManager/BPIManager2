@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useUser } from "@/contexts/users/UserContext";
-import { useSongFilter, PAGE_SIZE } from "@/hooks/table/useSongFilter";
+import { useSongFilter } from "@/hooks/table/useSongFilter";
+import { PAGE_SIZE } from "@/constants/logic/pagination";
 import { useRivalBothScores } from "@/hooks/social/useRivalAllScores";
 import { SongWithRival, SongWithScore } from "@/types/songs/score";
 

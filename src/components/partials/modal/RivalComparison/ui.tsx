@@ -103,5 +103,3 @@ export const SectionTitle = ({ icon: Icon, label }: SectionTitleProps) => (
     </span>
   </div>
 );
-
-export { WinLossStats } from "@/components/partials/common/WinLossStats";

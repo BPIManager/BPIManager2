@@ -22,18 +22,6 @@ import type { MonthlyReviewData } from "@/types/stats/monthlyReview";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 
-export type {
-  TopSong,
-  TopSongImproved,
-  RivalSongHighlight,
-  GrowthParticipant,
-  RivalBpiGrowthEntry,
-  RivalDiff,
-  MonthlyArena,
-  RadarGrowthEntry,
-  MonthlyReviewData,
-} from "@/types/stats/monthlyReview";
-
 const L12_DIFFICULTIES = IIDX_DIFFICULTIES;
 
 export default async function handler(

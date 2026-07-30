@@ -6,7 +6,6 @@ import { useAllScores } from "./useAllScores";
 import { ALL_DIFFICULTIES, ALL_LEVELS } from "@/constants/iidx/songLevels";
 
 import { PAGE_SIZE } from "@/constants/logic/pagination";
-export { PAGE_SIZE };
 
 function filterLocal(
   songs: AllSongWithScore[],

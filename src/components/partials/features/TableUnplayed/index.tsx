@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { SongWithScore } from "@/types/songs/score";
-import { useSongFilter, PAGE_SIZE } from "@/hooks/table/useSongFilter";
+import { useSongFilter } from "@/hooks/table/useSongFilter";
+import { PAGE_SIZE } from "@/constants/logic/pagination";
 import { useUnplayedScores } from "@/hooks/table/useUnplayedScores";
 import { NoDataAlert } from "@/components/partials/common/DashBoard/NoData";
 import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
