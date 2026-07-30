@@ -1,7 +1,7 @@
 import { Clock, ThumbsUp } from "lucide-react";
 import Link from "next/link";
 import { useRecentNotes } from "@/hooks/songs/useRecentNotes";
-import { DifficultyBadge } from "@/components/partials/features/Songs/DifficultyBadge";
+import { DifficultyBadge } from "@/components/partials/common/Songs/DifficultyBadge";
 import { SortButton, formatDate } from "@/components/partials/features/Songs/SongDetail/Wiki/ui";
 import { InfiniteScrollContainer } from "@/components/partials/common/ListControls/InfiniteScroll/ui";
 import { Skeleton } from "@/components/ui/skeleton";

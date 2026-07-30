@@ -7,7 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { SongListSkeleton } from "./skeleton";
 import { RadarSectionChart } from "@/components/partials/common/DashBoard/Radar/index";
-import { DifficultyBadge } from "@/components/partials/features/Songs/DifficultyBadge";
+import { DifficultyBadge } from "@/components/partials/common/Songs/DifficultyBadge";
 import { SONG_ATTRIBUTES } from "@/constants/iidx/songAttributes";
 import { SORT_OPTIONS, buildRadarData } from "@/utils/songs/songListFilter";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";

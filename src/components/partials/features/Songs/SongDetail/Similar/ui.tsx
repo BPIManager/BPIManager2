@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { RadarSectionChart } from "@/components/partials/common/DashBoard/Radar/index";
-import { DifficultyBadge } from "@/components/partials/features/Songs/DifficultyBadge";
+import { DifficultyBadge } from "@/components/partials/common/Songs/DifficultyBadge";
 import { buildRadarData } from "@/utils/songs/songListFilter";
 import type { SimilarSongItem } from "@/types/songs/songInfo";
 
