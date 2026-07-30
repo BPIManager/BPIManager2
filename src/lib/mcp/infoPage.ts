@@ -298,7 +298,7 @@ ${renderStyle()}
   <header class="hero">
     <h1>BPIM2 MCP</h1>
   </header>
-  <p class="lead">beatmania IIDXのスコアデータをLLMクライアントから利用するための Model Context Protocol サーバーです。</p>
+  <p class="lead">BPIM2に登録されたbeatmania IIDXのスコアデータをLLMクライアントから利用するための Model Context Protocol サーバーです。</p>
 
   <section>
     <h2>このエンドポイントについて</h2>
