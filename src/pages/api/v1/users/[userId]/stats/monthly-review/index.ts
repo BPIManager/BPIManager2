@@ -1,7 +1,10 @@
 import { monthlyReviewRepo } from "@/lib/db/monthly-review";
 import { statsRepo } from "@/lib/db/stats";
 import dayjs from "@/lib/dayjs";
-import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
+import {
+  AuthenticatedNextApiRequest,
+  withAuth,
+} from "@/middlewares/api/withAuth";
 import { buildBpiTimeline } from "@/lib/monthly-review/bpi";
 import { buildTopSongs } from "@/lib/monthly-review/topSongs";
 import {
@@ -19,13 +22,13 @@ import {
 } from "@/lib/monthly-review/rivals";
 import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import type { MonthlyReviewData } from "@/types/stats/monthlyReview";
-import type { NextApiRequest, NextApiResponse } from "next";
+import type { NextApiResponse } from "next";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 
 const L12_DIFFICULTIES = IIDX_DIFFICULTIES;
 
-export default async function handler(
-  req: NextApiRequest,
+async function handler(
+  req: AuthenticatedNextApiRequest,
   res: NextApiResponse,
 ) {
   if (req.method !== "GET") {
@@ -33,7 +36,7 @@ export default async function handler(
     return res.status(405).json({ message: "Method Not Allowed" });
   }
 
-  const userId = req.query.userId as string;
+  const userId = req.authUid;
   const version = req.query.version as string;
   const month = req.query.month as string; // YYYY-MM or YYYY (year mode)
 
@@ -50,10 +53,7 @@ export default async function handler(
   const granularity: "month" | "year" = isYearMode ? "year" : "month";
 
   try {
-    const access = await checkUserAccess(req, userId);
-    if (!access.hasAccess) return rejectAccess(res, access);
-    const viewerId = access.user?.userId;
-    if (!viewerId) return res.status(401).json({ message: "Unauthorized" });
+    const viewerId = userId;
 
     const monthStart = isYearMode
       ? dayjs.tz(`${month}-01-01`).format("YYYY-MM-DD")
@@ -309,3 +309,5 @@ export default async function handler(
     return res.status(500).json({ message: "Internal Server Error" });
   }
 }
+
+export default withAuth(handler);

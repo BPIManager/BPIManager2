@@ -1,26 +1,29 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { checkUserAccess } from "@/middlewares/api/withApi";
+import { NextApiResponse } from "next";
+import {
+  AuthenticatedNextApiRequest,
+  withAuth,
+} from "@/middlewares/api/withAuth";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { calculateRadar } from "@/lib/radar/calculator";
 import { statsRepo } from "@/lib/db/stats";
 import { bpiRepo } from "@/lib/db/bpi";
 import { usersRepo } from "@/lib/db/users";
 
-export default async function handler(
-  req: NextApiRequest,
+async function handler(
+  req: AuthenticatedNextApiRequest,
   res: NextApiResponse,
 ) {
-  if (req.method !== "GET") return res.status(405).end();
-  const { userId, q, p, s, o, seed } = req.query;
+  if (req.method !== "GET") {
+    res.status(405).end();
+    return;
+  }
+  const { q, p, s, o, seed } = req.query;
   const currentPage = Math.max(1, Number(p || 1));
   const orderMode = (o as "distance" | "desc" | "newest" | "supporters") || "distance";
   const limit = orderMode === "supporters" ? 1000 : 20;
   const offset = orderMode === "supporters" ? 0 : (currentPage - 1) * limit;
   const sortKey = (s as string) || "totalBpi";
-
-  const access = await checkUserAccess(req, userId as string);
-  const viewerId = access.user?.userId;
-  if (!viewerId) return res.status(401).json({ message: "Unauthorized" });
+  const viewerId = req.authUid;
 
   try {
     const version = latestVersion;
@@ -87,3 +90,5 @@ export default async function handler(
     return res.status(500).json({ message: errorMessage });
   }
 }
+
+export default withAuth(handler);

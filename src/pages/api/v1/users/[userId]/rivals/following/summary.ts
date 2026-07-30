@@ -1,22 +1,26 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { checkUserAccess } from "@/middlewares/api/withApi";
+import { NextApiResponse } from "next";
+import {
+  AuthenticatedNextApiRequest,
+  withAuth,
+} from "@/middlewares/api/withAuth";
 import { socialRepo } from "@/lib/db/social";
 import { bpiRepo } from "@/lib/db/bpi";
 
-export default async function handler(
-  req: NextApiRequest,
+async function handler(
+  req: AuthenticatedNextApiRequest,
   res: NextApiResponse,
 ) {
-  if (req.method !== "GET") return res.status(405).end();
-  const { userId, version, levels, difficulties } = req.query;
+  if (req.method !== "GET") {
+    res.status(405).end();
+    return;
+  }
+  const { version, levels, difficulties } = req.query;
 
-  if (!userId || !version) {
-    return res.status(400).json({ message: "userId and version are required" });
+  if (!version) {
+    return res.status(400).json({ message: "version is required" });
   }
 
-  const access = await checkUserAccess(req, userId as string);
-  const viewerId = access.user?.userId;
-  if (!viewerId) return res.status(401).json({ message: "Unauthorized" });
+  const viewerId = req.authUid;
 
   try {
     const normalize = (val: string | string[] | undefined): string[] => {
@@ -46,3 +50,5 @@ export default async function handler(
     return res.status(500).json({ message: "Internal Server Error" });
   }
 }
+
+export default withAuth(handler);

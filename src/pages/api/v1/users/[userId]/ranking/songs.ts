@@ -1,18 +1,21 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
+import { NextApiResponse } from "next";
+import {
+  AuthenticatedNextApiRequest,
+  withAuth,
+} from "@/middlewares/api/withAuth";
 import { statsRepo } from "@/lib/db/stats";
 import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 
-export default async function handler(
-  req: NextApiRequest,
+async function handler(
+  req: AuthenticatedNextApiRequest,
   res: NextApiResponse,
 ) {
-  if (req.method !== "GET") return res.status(405).end();
+  if (req.method !== "GET") {
+    res.status(405).end();
+    return;
+  }
 
-  const { userId } = req.query;
-  const access = await checkUserAccess(req, userId as string);
-  const viewerId = access.user?.userId;
-  if (!viewerId) return rejectAccess(res, access);
+  const viewerId = req.authUid;
 
   const rawVersion = String(req.query.version ?? "");
   const version = (IIDX_VERSIONS as readonly string[]).includes(rawVersion)
@@ -28,3 +31,5 @@ export default async function handler(
     return res.status(500).json({ message: errorMessage });
   }
 }
+
+export default withAuth(handler);

@@ -1,17 +1,21 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
+import { NextApiResponse } from "next";
+import {
+  AuthenticatedNextApiRequest,
+  withAuth,
+} from "@/middlewares/api/withAuth";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { socialRepo } from "@/lib/db/social";
 import { parseQuery } from "@/services/nextRequest/parseBody";
 import { timelineQuerySchema } from "@/schemas/timeline/query";
 
-export default async function handler(
-  req: NextApiRequest,
+async function handler(
+  req: AuthenticatedNextApiRequest,
   res: NextApiResponse,
 ) {
-  if (req.method !== "GET") return res.status(405).end();
-
-  const { userId } = req.query;
+  if (req.method !== "GET") {
+    res.status(405).end();
+    return;
+  }
 
   const normalizedQuery = {
     ...req.query,
@@ -24,11 +28,7 @@ export default async function handler(
 
   const limit = 20;
   const version = latestVersion;
-
-  const access = await checkUserAccess(req, userId as string);
-  const viewerId = access.user?.userId;
-  if (!viewerId) return res.status(401).json({ message: "Unauthorized" });
-  if (!access.hasAccess) return rejectAccess(res, access);
+  const viewerId = req.authUid;
 
   try {
     const timeline = await socialRepo.getFollowedTimeline({
@@ -112,3 +112,5 @@ export default async function handler(
     return res.status(500).json({ message: errorMessage });
   }
 }
+
+export default withAuth(handler);
