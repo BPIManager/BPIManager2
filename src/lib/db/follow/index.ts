@@ -1,5 +1,4 @@
 import { db } from "@/lib/db";
-import { sql } from "kysely";
 
 /**
  * フォロー関係（`follows` テーブル）の参照・更新を担当するリポジトリクラス。
@@ -93,6 +92,7 @@ class FollowRepository {
    * @param params.targetUserId - 一覧を取得する対象ユーザーの ID
    * @param params.viewerId - 閲覧者の ID（フォロー状態の判定に使用）
    * @param params.type - `"following"`: フォロー中、`"followers"`: フォロワー
+   * @param params.version - 総合BPI・アリーナクラスを取得する対象バージョン
    * @param params.page - ページ番号（1 始まり）
    * @param params.limit - 1 ページあたりの件数
    * @returns ユーザーリスト・総件数・続きがあるかどうか
@@ -101,10 +101,11 @@ class FollowRepository {
     targetUserId: string;
     viewerId?: string;
     type: "following" | "followers";
+    version: string;
     page: number;
     limit: number;
   }) {
-    const { targetUserId, viewerId, type, page, limit } = params;
+    const { targetUserId, viewerId, type, version, page, limit } = params;
     const offset = (page - 1) * limit;
 
     const joinCol = type === "following" ? "followingId" : "followerId";
@@ -113,34 +114,6 @@ class FollowRepository {
     const query = db
       .selectFrom("follows as f")
       .innerJoin("users as u", `u.userId`, `f.${joinCol}`)
-      .leftJoin(
-        (qb) =>
-          qb
-            .selectFrom("userStatusLogs")
-            .select(["userId as usl_userId", "totalBpi"])
-            .where("id", "in", (eb) =>
-              eb
-                .selectFrom("userStatusLogs as sub")
-                .select([eb.fn.max(sql<number>`sub.id`).as("maxId")])
-                .groupBy("sub.userId"),
-            )
-            .as("latestStatus"),
-        (join) => join.onRef("latestStatus.usl_userId", "=", `u.userId`),
-      )
-      .leftJoin(
-        (qb) =>
-          qb
-            .selectFrom("officialArenaStats")
-            .select(["userId as oas_userId", "arenaClass"])
-            .where("id", "in", (eb) =>
-              eb
-                .selectFrom("officialArenaStats as sub")
-                .select([eb.fn.max(sql<number>`sub.id`).as("maxId")])
-                .groupBy("sub.userId"),
-            )
-            .as("latestArena"),
-        (join) => join.onRef("latestArena.oas_userId", "=", `u.userId`),
-      )
       .where(`f.${whereCol}`, "=", targetUserId);
 
     const countRes = await query
@@ -155,11 +128,25 @@ class FollowRepository {
         "u.profileImage",
         "u.profileText",
         "u.isPublic",
-        "latestStatus.totalBpi",
-        "latestArena.arenaClass",
         "f.createdAt as followedAt",
       ])
       .select((eb) => [
+        eb
+          .selectFrom("userStatusLogs as usl")
+          .select("usl.totalBpi")
+          .whereRef("usl.userId", "=", "u.userId")
+          .where("usl.version", "=", version)
+          .orderBy("usl.id", "desc")
+          .limit(1)
+          .as("totalBpi"),
+        eb
+          .selectFrom("officialArenaStats as oas")
+          .select("oas.arenaClass")
+          .whereRef("oas.userId", "=", "u.userId")
+          .where("oas.version", "=", version)
+          .orderBy("oas.id", "desc")
+          .limit(1)
+          .as("arenaClass"),
         eb
           .selectFrom("follows as f2")
           .select((eb2) => [eb2.fn.countAll<number>().as("cnt")])

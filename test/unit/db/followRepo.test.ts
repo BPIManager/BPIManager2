@@ -130,6 +130,7 @@ describe("followsRepo.getFollowList", () => {
       targetUserId: "target-1",
       viewerId: "viewer-1",
       type: "followers",
+      version: "33",
       page: 1,
       limit: 20,
     });
@@ -161,6 +162,7 @@ describe("followsRepo.getFollowList", () => {
     const result = await followsRepo.getFollowList({
       targetUserId: "target-1",
       type: "following",
+      version: "33",
       page: 1,
       limit: 1,
     });

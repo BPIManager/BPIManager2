@@ -1,4 +1,5 @@
 import { followsRepo } from "@/lib/db/follow";
+import { latestVersion } from "@/constants/iidx/iidxVersions";
 import type { FollowsQuery } from "@/schemas/follows/query";
 import { NextApiResponse } from "next";
 
@@ -23,6 +24,7 @@ export async function handleGetFollows(
     targetUserId,
     viewerId,
     type: query.type,
+    version: latestVersion,
     page: query.page,
     limit: query.limit,
   });
