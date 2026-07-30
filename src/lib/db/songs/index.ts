@@ -82,6 +82,66 @@ class SongsRepository {
   }
 
   /**
+   * 楽曲マスタをタイトル・難易度・難易度レベルで絞り込み検索する。
+   * `getSongList` と異なり属性情報は含まず、軽量なフィールドのみ返す。
+   *
+   * @param params.version - バージョン番号文字列（例: "33"）
+   * @param params.title - 楽曲タイトルの部分一致検索文字列
+   * @param params.difficulty - 難易度表記の完全一致（例: "ANOTHER"）
+   * @param params.difficultyLevel - 難易度レベルの完全一致
+   * @param params.limit - 取得件数上限
+   */
+  async searchSongs(params: {
+    version: IIDXVersion;
+    title?: string;
+    difficulty?: string;
+    difficultyLevel?: number;
+    limit: number;
+  }) {
+    const { version, title, difficulty, difficultyLevel, limit } = params;
+    const isInf = version === "INF";
+    const versionNum = isInf ? null : parseInt(version, 10);
+
+    let query = db
+      .selectFrom("songs as s")
+      .select([
+        "s.songId",
+        "s.title",
+        "s.difficulty",
+        "s.difficultyLevel",
+        "s.notes",
+        "s.bpm",
+        "s.releasedVersion",
+      ])
+      .$if(!isInf, (qb) =>
+        qb
+          .where("s.releasedVersion", "<=", versionNum!)
+          .where((eb) =>
+            eb.or([
+              eb("s.deletedAt", "is", null),
+              eb("s.deletedAt", ">", version),
+            ]),
+          ),
+      );
+
+    if (title) {
+      query = query.where("s.title", "like", `%${title}%`);
+    }
+    if (difficulty) {
+      query = query.where("s.difficulty", "=", difficulty);
+    }
+    if (difficultyLevel !== undefined) {
+      query = query.where("s.difficultyLevel", "=", difficultyLevel);
+    }
+
+    return await query
+      .orderBy("s.title", "asc")
+      .orderBy("s.difficulty", "asc")
+      .limit(limit)
+      .execute();
+  }
+
+  /**
    * 指定 songId の楽曲詳細を取得する。
    *
    * @param songId - 楽曲 ID

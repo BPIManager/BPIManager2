@@ -171,6 +171,61 @@ class UsersRepository {
     return await query.limit(limit).offset(offset).execute();
   }
 
+  /**
+   * ユーザー名・IIDX ID・アリーナクラスでユーザーを検索する。
+   *
+   * 非公開ユーザー(`isPublic !== 1`)は検索対象外。
+   *
+   * @param params.query - ユーザー名または IIDX ID の部分一致検索文字列
+   * @param params.arenaClass - アリーナクラス（皆伝/中伝など）の完全一致フィルタ
+   * @param params.version - アリーナクラス・総合BPIを取得する対象バージョン
+   * @param params.limit - 取得件数上限
+   */
+  async searchUsers(params: {
+    query?: string;
+    arenaClass?: string;
+    version: string;
+    limit: number;
+  }) {
+    const { query, arenaClass, version, limit } = params;
+
+    const latestStatusSubquery = this.latestStatusSubquery(version);
+    const latestArenaSubquery = this.latestArenaSubquery(version);
+
+    let dbQuery = db
+      .selectFrom("users as u")
+      .leftJoin(latestStatusSubquery.as("ls"), "u.userId", "ls.userId")
+      .leftJoin("userStatusLogs as usl", "ls.maxId", "usl.id")
+      .leftJoin(latestArenaSubquery.as("la"), "u.userId", "la.userId")
+      .leftJoin("officialArenaStats as oas", "la.maxId", "oas.id")
+      .select([
+        "u.userId",
+        "u.userName",
+        "u.iidxId",
+        "u.profileImage",
+        "u.profileText",
+        "oas.arenaClass",
+        "usl.totalBpi",
+      ])
+      .where("u.isPublic", "=", 1);
+
+    if (query) {
+      const searchPattern = `%${query}%`;
+      dbQuery = dbQuery.where((eb) =>
+        eb.or([
+          eb("u.userName", "like", searchPattern),
+          eb("u.iidxId", "like", searchPattern),
+        ]),
+      );
+    }
+
+    if (arenaClass) {
+      dbQuery = dbQuery.where("oas.arenaClass", "=", arenaClass);
+    }
+
+    return await dbQuery.limit(limit).execute();
+  }
+
   async getSupporters(version: string) {
     const latestStatusSubquery = this.latestStatusSubquery(version);
 

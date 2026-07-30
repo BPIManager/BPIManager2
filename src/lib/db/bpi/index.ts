@@ -112,6 +112,22 @@ class BpiRepository {
   }
 
   /**
+   * 指定ユーザー・バージョン・楽曲の最新スコアを1件取得する。
+   * idx_scores_version_user_song_log(version,userId,songId,logId DESC) を点引きする。
+   */
+  async getLatestScoreForSong(userId: string, songId: number, version: string) {
+    return await db
+      .selectFrom("scores")
+      .selectAll()
+      .where("userId", "=", userId)
+      .where("songId", "=", songId)
+      .where("version", "=", version)
+      .orderBy("logId", "desc")
+      .limit(1)
+      .executeTakeFirst();
+  }
+
+  /**
    * 指定したユーザー・バージョンの最新のバッチログを取得する
    */
   async getLatestTotalBpi(userId: string, version: string) {
