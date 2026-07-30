@@ -310,7 +310,8 @@ class RivalRepository {
         "prevBest.exScore as myOldScore",
       ])
       .where("current.userId", "=", userId)
-      .where("current.version", "=", version);
+      .where("current.version", "=", version)
+      .where("ru.isPublic", "=", 1);
 
     if (batchId) {
       query = query.where("current.batchId", "=", batchId);

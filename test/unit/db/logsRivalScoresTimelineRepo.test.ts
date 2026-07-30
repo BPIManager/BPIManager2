@@ -95,6 +95,17 @@ describe("rivalRepo.getOvertakenRivals", () => {
       whereCalls.some((c) => c.args[0] === "current.lastPlayed"),
     ).toBe(true);
   });
+
+  it("ライバルの公開設定(isPublic)での絞り込みを追加すること", async () => {
+    dbHolder.current = createDbSpy([]);
+    await rivalRepo.getOvertakenRivals("user-1", "33", { batchId: "batch-1" });
+    const whereCalls = callsFor(dbHolder.current.calls, "where");
+    expect(
+      whereCalls.some(
+        (c) => c.args[0] === "ru.isPublic" && c.args[2] === 1,
+      ),
+    ).toBe(true);
+  });
 });
 
 describe("rivalRepo.getRivalScoresForSongs", () => {
