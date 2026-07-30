@@ -2,11 +2,9 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { adminAuth } from "@/lib/firebase/admin";
 import { apiKeysRepo } from "@/lib/db/apiKeys";
 import { timingSafeEqual } from "@/utils/common/timingSafeEqual";
+import { withRateLimit } from "@/middlewares/api/withRateLimit";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
     res.setHeader("Allow", ["POST"]);
     return res.status(405).json({ message: "Method Not Allowed" });
@@ -36,3 +34,5 @@ export default async function handler(
     return res.status(500).json({ message: "Internal Server Error" });
   }
 }
+
+export default withRateLimit(handler, { windowMs: 60_000, max: 20 });
