@@ -100,6 +100,25 @@ describe("BpiCalculator ロジックテスト", () => {
       expect(BpiCalculator.calcFromBPI(100, zeroSong)).toBe(0);
     });
 
+    it("kaidenAvg/wrScoreが0（null以外）の場合、calcとcalcFromBPIで一貫して有効な値として扱われること", () => {
+      const zeroKaidenSong = { notes: 1000, kaidenAvg: 0, wrScore: 1800 };
+      const zeroWrScoreSong = { notes: 1000, kaidenAvg: 1500, wrScore: 0 };
+
+      expect(BpiCalculator.calc(900, zeroKaidenSong)).not.toBe(-15);
+      // wrScore(歴代最高)が0でも、皆伝平均スコア相当を入力すればBPIはほぼ0になる
+      expect(BpiCalculator.calc(1500, zeroWrScoreSong)).toBeCloseTo(0, 1);
+      expect(
+        BpiCalculator.calcFromBPI(50, zeroKaidenSong),
+      ).not.toBe(0);
+    });
+
+    it("kaidenAvg/wrScoreがnullの場合のみ、calcが-15を返すこと", () => {
+      const nullKaidenSong = { notes: 1000, kaidenAvg: null, wrScore: 1800 };
+      const nullWrScoreSong = { notes: 1000, kaidenAvg: 1500, wrScore: null };
+      expect(BpiCalculator.calc(900, nullKaidenSong)).toBe(-15);
+      expect(BpiCalculator.calc(900, nullWrScoreSong)).toBe(-15);
+    });
+
     it("coefが0以下の時、デフォルト値が適用されること", () => {
       const noCoefSong = {
         notes: 1000,

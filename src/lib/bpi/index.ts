@@ -26,7 +26,7 @@ export class BpiCalculator {
    */
   public static calc(s: number, song: IBpiBasicSongData): number | null {
     const { notes, kaidenAvg: k, wrScore: z, coef } = song;
-    if (!k || !z) return -15;
+    if (k === null || z === null || notes === 0) return -15;
     const m = notes * 2;
 
     if (s > m) return null;
