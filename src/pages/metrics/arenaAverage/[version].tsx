@@ -147,7 +147,6 @@ export const ArenaMetricsView = ({
     });
   }, [averages, selectedDifficulties, nameSearch, detailFilters]);
 
-  const filterKey = `${[...selectedDifficulties].sort().join(",")}-${nameSearch}-${JSON.stringify(detailFilters)}`;
   const isInitialLoading = !router.isReady || isLoading;
   const showLoading = !router.isReady || isLoading || isNavigating;
 
@@ -204,7 +203,6 @@ export const ArenaMetricsView = ({
               ) : (
                 <div className="w-full animate-in fade-in duration-500">
                   <ArenaAverageTable
-                    key={filterKey}
                     data={filteredAverages}
                     displayMetric={displayMetric}
                   />

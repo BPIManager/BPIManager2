@@ -175,7 +175,13 @@ export const ArenaAverageTable = ({
   const [sortKey, setSortKey] = useState<SortKey>("title");
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
   const [page, setPage] = useState(1);
+  const [prevData, setPrevData] = useState(data);
   const PAGE_SIZE = 50;
+
+  if (data !== prevData) {
+    setPrevData(data);
+    setPage(1);
+  }
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
