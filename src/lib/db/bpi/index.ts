@@ -3,6 +3,7 @@ import { SongMaster } from "@/types/songs/master";
 import { Database, NewAllScores, NewScore, NewTotalBPILog } from "@/types/db";
 import { Transaction } from "kysely";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
+import { userStatusLogsRepo } from "@/lib/db/userStatusLogs";
 
 /**
  * BPI スコアのインポートおよびスコアマスタ参照を担当するリポジトリクラス。
@@ -168,16 +169,10 @@ class BpiRepository {
         .deleteFrom("logs")
         .where("userId", "=", params.userId)
         .execute();
-      await trx
-        .deleteFrom("userStatusLogs")
-        .where("userId", "=", params.userId)
-        .execute();
+      await userStatusLogsRepo.deleteByUser(trx, params.userId);
 
       if (params.statusLogs.length > 0) {
-        await trx
-          .insertInto("userStatusLogs")
-          .values(params.statusLogs)
-          .execute();
+        await userStatusLogsRepo.insert(trx, params.statusLogs);
         await trx.insertInto("logs").values(params.statusLogs).execute();
       }
 
@@ -206,14 +201,11 @@ class BpiRepository {
       newTotalBpi: number;
     },
   ) {
-    const latestLog = await trx
-      .selectFrom("userStatusLogs")
-      .select("arenaRank")
-      .where("userId", "=", params.userId)
-      .where("version", "=", params.version)
-      .orderBy("id", "desc")
-      .limit(1)
-      .executeTakeFirst();
+    const latestLog = await userStatusLogsRepo.getLatestArenaRank(
+      trx,
+      params.userId,
+      params.version,
+    );
 
     const currentArenaRank = latestLog?.arenaRank ?? null;
     if (params.scoreUpdates.length > 0) {
@@ -227,16 +219,13 @@ class BpiRepository {
         })
         .execute();
 
-      await trx
-        .insertInto("userStatusLogs")
-        .values({
-          userId: params.userId,
-          totalBpi: params.newTotalBpi,
-          arenaRank: currentArenaRank,
-          version: params.version,
-          batchId: params.batchId,
-        })
-        .execute();
+      await userStatusLogsRepo.insert(trx, {
+        userId: params.userId,
+        totalBpi: params.newTotalBpi,
+        arenaRank: currentArenaRank,
+        version: params.version,
+        batchId: params.batchId,
+      });
 
       await trx.insertInto("scores").values(params.scoreUpdates).execute();
     }

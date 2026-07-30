@@ -2,6 +2,7 @@ import dayjs from "@/lib/dayjs";
 import { db } from "@/lib/db";
 import { scoresRepo } from "../scores";
 import { allScoresRepo } from "../allScores";
+import { userStatusLogsRepo } from "../userStatusLogs";
 
 /**
  * スコアログの日付ナビゲーション・バッチ検索を担当するリポジトリクラス。
@@ -151,11 +152,7 @@ class LogNavigationRepository {
     return await db.transaction().execute(async (trx) => {
       await scoresRepo.deleteByBatch(trx, userId, batchId);
       await allScoresRepo.deleteByBatch(trx, userId, batchId);
-      await trx
-        .deleteFrom("userStatusLogs")
-        .where("batchId", "=", batchId)
-        .where("userId", "=", userId)
-        .execute();
+      await userStatusLogsRepo.deleteByBatch(trx, userId, batchId);
       await trx
         .deleteFrom("logs")
         .where("batchId", "=", batchId)

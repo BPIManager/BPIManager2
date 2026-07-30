@@ -5,6 +5,7 @@ import {
   getBestArenaClassPerVersion,
 } from "@/lib/db/officialArenaStats";
 import { getStatsPrivacy } from "@/lib/db/statsPrivacy";
+import { userStatusLogsRepo } from "@/lib/db/userStatusLogs";
 
 /**
  * ユーザープロフィールの参照・作成・更新を担当するリポジトリクラス。
@@ -541,14 +542,11 @@ class UsersRepository {
         throw error;
       }
 
-      const lastStatus = await trx
-        .selectFrom("userStatusLogs")
-        .select(["totalBpi"])
-        .where("userId", "=", userId)
-        .where("version", "=", version)
-        .orderBy("id", "desc")
-        .limit(1)
-        .executeTakeFirst();
+      const lastStatus = await userStatusLogsRepo.getLatestTotalBpi(
+        trx,
+        userId,
+        version,
+      );
 
       await trx
         .insertInto("users")
@@ -573,15 +571,12 @@ class UsersRepository {
         })
         .execute();
 
-      await trx
-        .insertInto("userStatusLogs")
-        .values({
-          userId,
-          totalBpi: lastStatus?.totalBpi ?? -15,
-          version,
-          batchId,
-        })
-        .execute();
+      await userStatusLogsRepo.insert(trx, {
+        userId,
+        totalBpi: lastStatus?.totalBpi ?? -15,
+        version,
+        batchId,
+      });
 
       return { success: true };
     });

@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { userStatusLogsRepo } from "@/lib/db/userStatusLogs";
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
@@ -124,10 +125,7 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
     await trx.deleteFrom("userRoles").where("userId", "=", userId).execute();
 
     // userStatusLogs: FK to users(CASCADE)
-    await trx
-      .deleteFrom("userStatusLogs")
-      .where("userId", "=", userId)
-      .execute();
+    await userStatusLogsRepo.deleteByUser(trx, userId);
 
     // discordLinks: FK to users(CASCADE)
     await trx.deleteFrom("discordLinks").where("userId", "=", userId).execute();
