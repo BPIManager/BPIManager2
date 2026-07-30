@@ -16,10 +16,12 @@ export const useRivalScores = (
   version: string | null,
 ) => {
   const { fbUser } = useUser();
-  const { data, error, isLoading, mutate, isValidating } = useSWR(
+  const url =
     fbUser && songId
       ? `${API_PREFIX}/users/${fbUser.uid}/rivals/following/scores/${songId}?version=${version || latestVersion}`
-      : null,
+      : null;
+  const { data, error, isLoading, mutate, isValidating } = useSWR(
+    url ? [url, fbUser] : null,
     fetcher,
   );
 

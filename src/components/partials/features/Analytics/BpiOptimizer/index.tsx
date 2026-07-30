@@ -43,7 +43,7 @@ export const BpiOptimizerSection = () => {
   } = useBpiOptimizer();
 
   const { memos, saveMemo, deleteMemo, isSaving, isDeleting } =
-    useBpiOptimizerMemos(user?.userId);
+    useBpiOptimizerMemos(user?.userId, fbUser);
 
   const { radar } = useRadar(
     fbUser?.uid,
