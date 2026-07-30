@@ -1,5 +1,5 @@
 import { bpiOptimizerRepo } from "@/lib/db/bpi-optimizer";
-import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
+import { adminAuth } from "@/lib/firebase/admin";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
@@ -10,10 +10,22 @@ export default async function handler(
   const uid = String(userId);
   const rid = String(memoId);
 
-  const access = await checkUserAccess(req, uid);
-  if (!access.hasAccess) return rejectAccess(res, access);
-
   if (req.method === "DELETE") {
+    const authHeader = req.headers.authorization;
+    if (!authHeader?.startsWith("Bearer ")) {
+      return res.status(401).json({ message: "Missing or invalid token" });
+    }
+    try {
+      const decodedToken = await adminAuth.verifyIdToken(
+        authHeader.split("Bearer ")[1],
+      );
+      if (decodedToken.uid !== uid) {
+        return res.status(403).json({ message: "Forbidden: User ID mismatch" });
+      }
+    } catch {
+      return res.status(401).json({ message: "Invalid token" });
+    }
+
     const success = await bpiOptimizerRepo.deleteMemo(uid, rid);
     if (!success) return res.status(404).json({ message: "Memo not found" });
     return res.status(204).end();
