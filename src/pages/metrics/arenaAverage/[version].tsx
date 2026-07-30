@@ -17,23 +17,13 @@ import {
 } from "@/components/partials/features/Metrics/LevelSelector/ui";
 import { ArenaAverageFilterSkeleton } from "@/components/partials/features/Metrics/LevelSelector/skeleton";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
-import { versionsNonDisabledCollection } from "@/constants/iidx/versionTitles";
-import { A_RANKS } from "@/constants/iidx/arenaRanks";
 import { ALL_RADAR_CATEGORIES } from "@/constants/iidx/radars";
-import { RANK_TABLE } from "@/constants/iidx/rankBorders";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useTranslation } from "@/hooks/common/useTranslation";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
+import { filterArenaAverages } from "@/components/partials/features/Metrics/ArenaAverage/filterAverages";
+import { AnalysisControls } from "@/components/partials/features/Metrics/ArenaAverage/AnalysisControls";
 
 const ALL_DIFFICULTIES = new Set(IIDX_DIFFICULTIES);
 type RadarCat = (typeof ALL_RADAR_CATEGORIES)[number];
@@ -103,49 +93,14 @@ export const ArenaMetricsView = ({
     );
   };
 
-  const filteredAverages = useMemo(() => {
-    return (
-      averages as import("@/types/metrics/arena").ArenaAverageData[]
-    ).filter((item) => {
-      if (!selectedDifficulties.has(item.difficulty)) return false;
-
-      if (
-        nameSearch &&
-        !item.title.toLowerCase().includes(nameSearch.toLowerCase())
-      )
-        return false;
-
-      for (const f of detailFilters) {
-        if (!f.value) continue;
-        const stats = item.averages[f.rank];
-        if (!stats) return false;
-
-        if (f.metric === "score") {
-          const val = parseFloat(f.value);
-          if (isNaN(val)) continue;
-          if (f.operator === ">=" && stats.avgExScore < val) return false;
-          if (f.operator === "<=" && stats.avgExScore > val) return false;
-        } else if (f.metric === "scoreRate") {
-          const val = parseFloat(f.value);
-          if (isNaN(val)) continue;
-          if (f.operator === ">=" && stats.rate < val) return false;
-          if (f.operator === "<=" && stats.rate > val) return false;
-        } else if (f.metric === "djrank") {
-          const idx = RANK_TABLE.findIndex((t) => t.label === f.value);
-          if (idx === -1) continue;
-          const ratio = stats.rate / 100;
-          if (f.operator === ">=") {
-            if (ratio < RANK_TABLE[idx].ratio) return false;
-          } else {
-            const nextThreshold = RANK_TABLE[idx + 1];
-            if (nextThreshold && ratio >= nextThreshold.ratio) return false;
-          }
-        }
-      }
-
-      return true;
-    });
-  }, [averages, selectedDifficulties, nameSearch, detailFilters]);
+  const filteredAverages = useMemo(
+    () =>
+      filterArenaAverages(
+        averages as import("@/types/metrics/arena").ArenaAverageData[],
+        { selectedDifficulties, nameSearch, detailFilters },
+      ),
+    [averages, selectedDifficulties, nameSearch, detailFilters],
+  );
 
   const isInitialLoading = !router.isReady || isLoading;
   const showLoading = !router.isReady || isLoading || isNavigating;
@@ -244,92 +199,6 @@ export const ArenaMetricsView = ({
         </Tabs>
       </PageContainer>
     </DashboardLayout>
-  );
-};
-
-const AnalysisControls = ({
-  version,
-  onVersionChange,
-  rank,
-  onRankChange,
-  level,
-  onLevelChange,
-}: {
-  version: string;
-  onVersionChange: (v: string) => void;
-  rank: string;
-  onRankChange: (r: string) => void;
-  level: string;
-  onLevelChange: (l: string) => void;
-}) => {
-  const { t } = useTranslation();
-  return (
-    <div className="rounded-xl border border-bpim-border bg-bpim-bg/80 p-4 shadow-sm backdrop-blur-md">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div className="flex flex-col gap-2">
-          <span className="text-[10px] font-black tracking-widest text-bpim-muted uppercase px-1">
-            Version
-          </span>
-          <Select value={version} onValueChange={onVersionChange}>
-            <SelectTrigger className="h-9 border-bpim-border bg-bpim-surface-2/60 text-xs text-bpim-text focus:ring-blue-500">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="border-bpim-border bg-bpim-bg">
-              {versionsNonDisabledCollection.map((v) => (
-                <SelectItem key={v.value} value={v.value} className="text-xs">
-                  {v.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <span className="text-[10px] font-black tracking-widest text-bpim-muted uppercase px-1">
-            {t("page.arenaAverage.rank")}
-          </span>
-          <Select value={rank} onValueChange={onRankChange}>
-            <SelectTrigger className="h-9 border-bpim-border bg-bpim-surface-2/60 text-sm font-bold text-bpim-text">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="border-bpim-border bg-bpim-bg">
-              {A_RANKS.map((r) => (
-                <SelectItem key={r} value={r} className="text-sm font-bold">
-                  {r}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <span className="text-[10px] font-black tracking-widest text-bpim-muted uppercase px-1">
-            Level
-          </span>
-          <RadioGroup
-            value={level}
-            onValueChange={onLevelChange}
-            className="flex h-9 items-center gap-8"
-          >
-            {["11", "12"].map((lv) => (
-              <div key={lv} className="flex items-center gap-2">
-                <RadioGroupItem
-                  value={lv}
-                  id={`analysis-lv-${lv}`}
-                  className="border-bpim-primary"
-                />
-                <Label
-                  htmlFor={`analysis-lv-${lv}`}
-                  className="cursor-pointer text-sm font-bold text-bpim-text"
-                >
-                  ☆{lv}
-                </Label>
-              </div>
-            ))}
-          </RadioGroup>
-        </div>
-      </div>
-    </div>
   );
 };
 
