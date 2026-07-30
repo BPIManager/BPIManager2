@@ -146,8 +146,8 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ params }) 
         bpm: song.bpm,
       };
     }
-  } catch {
-    // DB 取得失敗時はメタなしで続行
+  } catch (error) {
+    console.error("Song meta fetch error:", error);
   }
 
   return { props: { tab: tab as Tab, songId, songMeta } };
