@@ -169,6 +169,7 @@ class StatsRepository {
         "s.logId",
         "s.songId",
         "s.bpi",
+        "s.exScore",
         "s.lastPlayed",
         "m.title",
         "m.difficulty",

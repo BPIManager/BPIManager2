@@ -45,6 +45,7 @@ export default async function handler(
 
     const trend = [];
     const latestBpisBySong = new Map<number, number>();
+    const latestExScoresBySong = new Map<number, number>();
 
     const startDate = dayjs(allLogs[0].lastPlayed).tz().startOf("day");
     const endDate = dayjs(allLogs[allLogs.length - 1].lastPlayed)
@@ -55,10 +56,26 @@ export default async function handler(
       const dateStr = d.format("YYYY-MM-DD");
       const updatedOnThisDay = logsByDate[dateStr] || [];
 
-      updatedOnThisDay.forEach((log) => {
-        if (log.songId == null) return;
-        latestBpisBySong.set(log.songId, log.bpi ?? -15);
-      });
+      const updatedSongs = updatedOnThisDay
+        .filter((s) => s.songId != null)
+        .map((s) => {
+          const songId = s.songId as number;
+          const suffix = DIFFICULTY_LABELS[s.difficulty as string] || "";
+          const prevExScore = latestExScoresBySong.get(songId) ?? null;
+          const prevBpi = latestBpisBySong.get(songId) ?? null;
+          const newBpi = s.bpi ?? -15;
+
+          latestBpisBySong.set(songId, newBpi);
+          latestExScoresBySong.set(songId, s.exScore);
+
+          return {
+            title: `${s.title}${suffix}`,
+            prevExScore,
+            newExScore: s.exScore,
+            prevBpi,
+            newBpi,
+          };
+        });
 
       const allCurrentBpis = Array.from(latestBpisBySong.values());
       const totalBpi = BpiCalculator.calculateTotalBPI(
@@ -70,12 +87,7 @@ export default async function handler(
         date: dateStr,
         totalBpi,
         count: allCurrentBpis.length,
-        updatedSongs: updatedOnThisDay
-          .map((s) => {
-            const suffix = DIFFICULTY_LABELS[s.difficulty as string] || "";
-            return `${s.title}${suffix}`;
-          })
-          .filter(Boolean),
+        updatedSongs,
       });
     }
 

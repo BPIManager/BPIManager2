@@ -11,7 +11,7 @@ import {
   Brush,
   Rectangle,
 } from "recharts";
-import { BpiHistoryItem } from "@/types/stats/bpiHistory";
+import { BpiHistoryItem, BpiHistoryUpdatedSong } from "@/types/stats/bpiHistory";
 import type { StatsGroupBy } from "@/types/stats/bpiBoxStats";
 import { TotalBpiHistorySkeleton } from "@/components/partials/common/DashBoard/TotalBPIHistory/skeleton";
 import { DashCard } from "@/components/ui/dashcard";
@@ -40,7 +40,7 @@ interface ChartDataPoint {
   myBpi?: number;
   rivalBpi?: number;
   updateCount: number;
-  updatedSongs?: string[];
+  updatedSongs?: BpiHistoryUpdatedSong[];
   count?: number;
 }
 
@@ -119,12 +119,41 @@ const HistoryTooltip = ({
                 <p className="text-[10px] font-bold text-bpim-success">
                   UPDATED: {data.updateCount} items
                 </p>
-                <div className="max-h-30 w-full overflow-y-auto pr-1">
-                  {data.updatedSongs?.map((song: string, idx: number) => (
-                    <p key={idx} className="text-[10px] text-bpim-text/70">
-                      • {song}
-                    </p>
-                  ))}
+                <div className="flex max-h-30 w-full flex-col gap-1 overflow-y-auto pr-1">
+                  {data.updatedSongs?.map((song, idx) => {
+                    const bpiDiff = song.newBpi - (song.prevBpi ?? song.newBpi);
+                    return (
+                      <div key={idx} className="flex flex-col">
+                        <p className="text-[10px] text-bpim-text/70">
+                          • {song.title}
+                        </p>
+                        <div className="flex items-center gap-1 pl-2.5 font-mono text-[10px] text-bpim-muted">
+                          <span>
+                            {song.prevExScore ?? "-"} → {song.newExScore}
+                          </span>
+                          <span className="text-bpim-text/40">/</span>
+                          <span>
+                            {song.prevBpi?.toFixed(2) ?? "-"} → {song.newBpi.toFixed(2)}
+                          </span>
+                          {song.prevBpi !== null && (
+                            <span
+                              className={cn(
+                                "font-bold",
+                                bpiDiff > 0
+                                  ? "text-bpim-success"
+                                  : bpiDiff < 0
+                                    ? "text-bpim-danger"
+                                    : "text-bpim-muted",
+                              )}
+                            >
+                              ({bpiDiff > 0 ? "+" : ""}
+                              {bpiDiff.toFixed(2)})
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </>
             )}
