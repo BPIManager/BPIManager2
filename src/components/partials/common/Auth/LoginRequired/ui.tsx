@@ -1,4 +1,4 @@
-import { LoginPageBody } from "@/components/partials/features/LogIn/ui";
+import { LoginPageBody } from "@/components/partials/common/Auth/LoginPageBody";
 import { cn } from "@/lib/utils";
 import { LockIcon } from "lucide-react";
 import { LoginButtons } from "@/components/partials/common/Auth/Buttons";
