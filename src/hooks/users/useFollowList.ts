@@ -23,7 +23,7 @@ export const useFollowList = (
 ) => {
   const { fbUser } = useUser();
 
-  const { items, size, setSize, isLoading, isReachingEnd, isError, mutate } =
+  const { items, data, size, setSize, isLoading, isReachingEnd, isError, mutate } =
     useInfiniteList<FollowListResponse, FollowUser>(
       (index) =>
         userId
@@ -41,7 +41,7 @@ export const useFollowList = (
 
   return {
     users: items,
-    totalCount: 0,
+    totalCount: data?.[0]?.totalCount ?? 0,
     isLoading,
     isReachingEnd,
     isError,

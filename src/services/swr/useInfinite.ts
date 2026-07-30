@@ -25,6 +25,7 @@ export function useInfiniteList<TPage, TItem>(
 
   return {
     items,
+    data,
     size,
     setSize,
     isLoading,
