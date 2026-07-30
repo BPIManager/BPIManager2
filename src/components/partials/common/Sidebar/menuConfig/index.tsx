@@ -17,6 +17,7 @@ import {
   Swords,
   BarChart2,
   Ticket,
+  Plug,
   LucideIcon,
 } from "lucide-react";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
@@ -76,6 +77,12 @@ export const getInfoMenuItems = (t: T) => [
     label: t("nav.apiRef"),
     icon: Code2,
     href: "https://bpim2.apidog.io/",
+    isExternal: true,
+  },
+  {
+    label: "MCP Server",
+    icon: Plug,
+    href: "https://bpi2.poyashi.me/api/mcp",
     isExternal: true,
   },
   {
