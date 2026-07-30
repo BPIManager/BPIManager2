@@ -60,7 +60,8 @@ export const calculateTotalBpi = (
 
     const bpis12 = Array.from(currentPBs.values())
       .filter((v) => v.level === 12)
-      .map((v) => v.bpi);
+      .map((v) => v.bpi)
+      .sort((a, b) => b - a);
 
     const totalBpi = BpiCalculator.calculateTotalBPI(bpis12, totalSongs);
 
