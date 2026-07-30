@@ -213,7 +213,7 @@ export const TowerRanking = ({ version }: TowerRankingProps) => {
   const handleRowClick = useCallback((userId: string) => {
     setSelectedUserId(userId);
     setIsModalOpen(true);
-  }, []);
+  }, [setSelectedUserId, setIsModalOpen]);
 
   const rowProps: RowData = {
     rankings: sortedRankings,

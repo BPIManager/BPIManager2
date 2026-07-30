@@ -81,7 +81,7 @@ export const BpiOptimizerSection = () => {
     await saveMemo(parseFloat(targetBpiInput), result);
     setSavedResult(result);
     toast.success(t("optimizer.savedPlan"));
-  }, [result, targetBpiInput, saveMemo]);
+  }, [result, targetBpiInput, saveMemo, t]);
 
   const resultRef = useRef<HTMLDivElement>(null);
   const prevIsLoading = useRef(false);

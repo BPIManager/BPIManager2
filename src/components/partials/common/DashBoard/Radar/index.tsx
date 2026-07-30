@@ -258,7 +258,7 @@ export const RadarSectionChart = ({
     const range = Math.max(max - min, 10);
     const padding = range * 0.2;
     return [Math.floor(min - padding), Math.ceil(max + padding)];
-  }, [chartData, songAttr]);
+  }, [chartData, songAttr, rivalOnly]);
 
   const chartHeight = isMini ? miniHeight : 330;
 

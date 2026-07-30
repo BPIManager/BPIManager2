@@ -86,7 +86,7 @@ export const useSongFilter = (
     } else {
       prevFilterKey.current = key;
     }
-  }, [isReady, query]);
+  }, [isReady, query, router]);
 
   const page = useMemo(() => Number(query.page) || 1, [query.page]);
 
@@ -151,7 +151,7 @@ export const useSongFilter = (
         shallow: true,
       });
     }
-  }, [totalPages, page, isReady]);
+  }, [totalPages, page, isReady, query, router, totalCount]);
 
   const updateParams = (newParams: Partial<FilterParamsFrontend>) => {
     const nextQuery = { ...router.query };

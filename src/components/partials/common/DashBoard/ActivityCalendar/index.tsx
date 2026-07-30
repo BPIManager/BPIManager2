@@ -20,7 +20,7 @@ export const ActivitySection = ({
     } else {
       setNodata(false);
     }
-  }, [isLoading, activity]);
+  }, [isLoading, activity, setNodata]);
 
   if (isLoading) return <ActivityCalendarSkeleton />;
 

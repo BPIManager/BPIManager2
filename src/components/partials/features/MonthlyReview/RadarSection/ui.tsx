@@ -307,6 +307,74 @@ function ElementPanel({
   );
 }
 
+interface RadarDataPoint {
+  subject: string;
+  element: string;
+  start: number;
+  end: number;
+  growthPct: number;
+  bpiStart: number;
+  bpiEnd: number;
+  diff: number;
+}
+
+const CustomTooltip = ({
+  active,
+  payload,
+}: {
+  active?: boolean;
+  payload?: Array<{ payload: RadarDataPoint }>;
+}) => {
+  const { t } = useTranslation();
+  if (!active || !payload?.length) return null;
+  const d = payload[0].payload;
+  const color = ELEMENT_COLORS[d.element] ?? "#94a3b8";
+  const growthPct = d.growthPct.toFixed(1);
+  const sign = d.diff >= 0 ? "+" : "";
+  return (
+    <div
+      style={{
+        background: "rgba(8,8,14,0.92)",
+        border: `1px solid ${color}55`,
+        borderRadius: 8,
+        padding: "8px 12px",
+        fontSize: 11,
+        minWidth: 140,
+      }}
+    >
+      <p style={{ color, fontWeight: "bold", marginBottom: 6 }}>
+        {d.subject}
+      </p>
+      <p style={{ color: "rgba(255,255,255,0.5)", marginBottom: 2 }}>
+        {t("monthlyReview.radar.growthRateTooltip")}:{" "}
+        <span
+          style={{
+            color: d.end >= 1 ? color : "#f87171",
+            fontWeight: "bold",
+          }}
+        >
+          {d.end >= 1 ? "+" : ""}
+          {growthPct}%
+        </span>
+      </p>
+      <p style={{ color: "rgba(255,255,255,0.5)", marginBottom: 2 }}>
+        {t("monthlyReview.radar.growthAbsTooltip")}:{" "}
+        <span style={{ color: "rgba(255,255,255,0.9)", fontWeight: "bold" }}>
+          {sign}
+          {d.diff.toFixed(2)}
+        </span>
+      </p>
+      <p
+        style={{ color: "rgba(255,255,255,0.3)", marginTop: 4, fontSize: 10 }}
+      >
+        {d.bpiStart.toFixed(2)}{" "}
+        <span style={{ color: "rgba(255,255,255,0.2)" }}>→</span>{" "}
+        <span style={{ color }}>{d.bpiEnd.toFixed(2)}</span>
+      </p>
+    </div>
+  );
+};
+
 function RadarComparisonChart({
   entries,
   inView,
@@ -317,7 +385,7 @@ function RadarComparisonChart({
   const { t } = useTranslation();
   if (entries.length < 3) return null;
 
-  const radarData = entries.map((e) => {
+  const radarData: RadarDataPoint[] = entries.map((e) => {
     const diff = e.totalDiff;
     const rawGrowth = e.totalDiff / Math.max(Math.abs(e.bpiStart), 5);
     const growthRate = Math.pow(1 + Math.max(rawGrowth, 0), 2);
@@ -335,62 +403,6 @@ function RadarComparisonChart({
 
   const maxGrowth = Math.max(...radarData.map((d) => d.end), 1.1);
   const domain: [number, number] = [0, Math.ceil(maxGrowth * 10) / 10 + 0.1];
-
-  const CustomTooltip = ({
-    active,
-    payload,
-  }: {
-    active?: boolean;
-    payload?: Array<{ payload: (typeof radarData)[0] }>;
-  }) => {
-    if (!active || !payload?.length) return null;
-    const d = payload[0].payload;
-    const color = ELEMENT_COLORS[d.element] ?? "#94a3b8";
-    const growthPct = d.growthPct.toFixed(1);
-    const sign = d.diff >= 0 ? "+" : "";
-    return (
-      <div
-        style={{
-          background: "rgba(8,8,14,0.92)",
-          border: `1px solid ${color}55`,
-          borderRadius: 8,
-          padding: "8px 12px",
-          fontSize: 11,
-          minWidth: 140,
-        }}
-      >
-        <p style={{ color, fontWeight: "bold", marginBottom: 6 }}>
-          {d.subject}
-        </p>
-        <p style={{ color: "rgba(255,255,255,0.5)", marginBottom: 2 }}>
-          {t("monthlyReview.radar.growthRateTooltip")}:{" "}
-          <span
-            style={{
-              color: d.end >= 1 ? color : "#f87171",
-              fontWeight: "bold",
-            }}
-          >
-            {d.end >= 1 ? "+" : ""}
-            {growthPct}%
-          </span>
-        </p>
-        <p style={{ color: "rgba(255,255,255,0.5)", marginBottom: 2 }}>
-          {t("monthlyReview.radar.growthAbsTooltip")}:{" "}
-          <span style={{ color: "rgba(255,255,255,0.9)", fontWeight: "bold" }}>
-            {sign}
-            {d.diff.toFixed(2)}
-          </span>
-        </p>
-        <p
-          style={{ color: "rgba(255,255,255,0.3)", marginTop: 4, fontSize: 10 }}
-        >
-          {d.bpiStart.toFixed(2)}{" "}
-          <span style={{ color: "rgba(255,255,255,0.2)" }}>→</span>{" "}
-          <span style={{ color }}>{d.bpiEnd.toFixed(2)}</span>
-        </p>
-      </div>
-    );
-  };
 
   return (
     <div
