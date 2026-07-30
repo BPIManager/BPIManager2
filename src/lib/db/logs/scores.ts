@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { IIDXVersion } from "@/types/iidx/version";
+import { statsRepo } from "@/lib/db/stats";
 
 /**
  * スコア詳細情報（比較・曲定義結合）の参照を担当するリポジトリクラス。
@@ -190,28 +191,7 @@ class LogScoreRepository {
     levels: number[],
     difficulties: string[],
   ) {
-    let query = db
-      .selectFrom("scores as s")
-      .innerJoin("songs as m", "s.songId", "m.songId")
-      .select([
-        "s.logId",
-        "s.songId",
-        "s.bpi",
-        "s.lastPlayed",
-        "m.title",
-        "m.difficulty",
-        "m.difficultyLevel",
-      ])
-      .where("s.userId", "=", userId)
-      .where("s.version", "=", version)
-      .where("s.songId", "is not", null);
-
-    if (levels.length > 0)
-      query = query.where("m.difficultyLevel", "in", levels);
-    if (difficulties.length > 0)
-      query = query.where("m.difficulty", "in", difficulties);
-
-    return await query.orderBy("s.lastPlayed", "asc").execute();
+    return statsRepo.getScoreHistory(userId, version, levels, difficulties);
   }
 }
 
