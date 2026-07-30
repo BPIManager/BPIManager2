@@ -52,72 +52,31 @@ const getBpiColor = (bpi: number): { bg: string; text: string } => {
   return { bg: "bg-slate-600", text: "text-bpim-text" };
 };
 
-
-export const ArenaAverageTable = ({
-  data,
-  displayMetric = "exScore",
+const SortIcon = ({
+  k,
+  sortKey,
+  sortOrder,
 }: {
-  data: ArenaAverageData[];
-  displayMetric?: DisplayMetric;
+  k: SortKey;
+  sortKey: SortKey;
+  sortOrder: SortOrder;
 }) => {
-  const { t } = useTranslation();
-  const [sortKey, setSortKey] = useState<SortKey>("title");
-  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
-  const [page, setPage] = useState(1);
-  const PAGE_SIZE = 50;
+  if (sortKey !== k) return <ArrowUpDown className="ml-1 h-3 w-3 opacity-30" />;
+  return sortOrder === "asc" ? (
+    <ChevronUp className="ml-1 h-3 w-3 text-bpim-primary" />
+  ) : (
+    <ChevronDown className="ml-1 h-3 w-3 text-bpim-primary" />
+  );
+};
 
-  const handleSort = (key: SortKey) => {
-    if (sortKey === key) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    } else {
-      setSortKey(key);
-      setSortOrder("desc");
-    }
-  };
-
-  const sortedData = useMemo(() => {
-    const sorted = [...data];
-    sorted.sort((a, b) => {
-      let valA: string | number;
-      let valB: string | number;
-
-      if (sortKey === "title") {
-        valA = a.title;
-        valB = b.title;
-      } else {
-        const statsA = a.averages[sortKey];
-        const statsB = b.averages[sortKey];
-        if (displayMetric === "bpi") {
-          valA = statsA?.avgBpi ?? -999;
-          valB = statsB?.avgBpi ?? -999;
-        } else {
-          valA = statsA?.rate ?? -1;
-          valB = statsB?.rate ?? -1;
-        }
-      }
-
-      if (valA < valB) return sortOrder === "asc" ? -1 : 1;
-      if (valA > valB) return sortOrder === "asc" ? 1 : -1;
-      return 0;
-    });
-    return sorted;
-  }, [data, sortKey, sortOrder, displayMetric]);
-
-  const visibleData = useMemo(() => {
-    return sortedData.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-  }, [sortedData, page]);
-
-  const SortIcon = ({ k }: { k: SortKey }) => {
-    if (sortKey !== k)
-      return <ArrowUpDown className="ml-1 h-3 w-3 opacity-30" />;
-    return sortOrder === "asc" ? (
-      <ChevronUp className="ml-1 h-3 w-3 text-bpim-primary" />
-    ) : (
-      <ChevronDown className="ml-1 h-3 w-3 text-bpim-primary" />
-    );
-  };
-
-  const ArenaRow = memo(({ item }: { item: ArenaAverageData }) => (
+const ArenaRow = memo(function ArenaRow({
+    item,
+    displayMetric,
+  }: {
+    item: ArenaAverageData;
+    displayMetric: DisplayMetric;
+  }) {
+  return (
     <TableRow className="group border-bpim-border hover:bg-bpim-overlay/50">
       <TableCell className="sticky left-0 z-10 min-w-50 max-w-62.5 bg-bpim-bg p-3 shadow-[2px_0_5px_rgba(0,0,0,0.3)] group-hover:bg-bpim-bg transition-colors">
         <div className="flex flex-col gap-0.5">
@@ -201,7 +160,63 @@ export const ArenaAverageTable = ({
         );
       })}
     </TableRow>
-  ));
+  );
+});
+
+
+export const ArenaAverageTable = ({
+  data,
+  displayMetric = "exScore",
+}: {
+  data: ArenaAverageData[];
+  displayMetric?: DisplayMetric;
+}) => {
+  const { t } = useTranslation();
+  const [sortKey, setSortKey] = useState<SortKey>("title");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 50;
+
+  const handleSort = (key: SortKey) => {
+    if (sortKey === key) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortKey(key);
+      setSortOrder("desc");
+    }
+  };
+
+  const sortedData = useMemo(() => {
+    const sorted = [...data];
+    sorted.sort((a, b) => {
+      let valA: string | number;
+      let valB: string | number;
+
+      if (sortKey === "title") {
+        valA = a.title;
+        valB = b.title;
+      } else {
+        const statsA = a.averages[sortKey];
+        const statsB = b.averages[sortKey];
+        if (displayMetric === "bpi") {
+          valA = statsA?.avgBpi ?? -999;
+          valB = statsB?.avgBpi ?? -999;
+        } else {
+          valA = statsA?.rate ?? -1;
+          valB = statsB?.rate ?? -1;
+        }
+      }
+
+      if (valA < valB) return sortOrder === "asc" ? -1 : 1;
+      if (valA > valB) return sortOrder === "asc" ? 1 : -1;
+      return 0;
+    });
+    return sorted;
+  }, [data, sortKey, sortOrder, displayMetric]);
+
+  const visibleData = useMemo(() => {
+    return sortedData.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  }, [sortedData, page]);
 
   return (
     <div className="flex w-full flex-col gap-4">
@@ -215,7 +230,8 @@ export const ArenaAverageTable = ({
                   className="sticky left-0 z-30 cursor-pointer bg-bpim-bg px-3 text-[10px] font-black uppercase tracking-widest text-bpim-muted hover:text-bpim-text"
                 >
                   <div className="flex items-center">
-                    {t("arenaAverage.songTitle")} <SortIcon k="title" />
+                    {t("arenaAverage.songTitle")}{" "}
+                    <SortIcon k="title" sortKey={sortKey} sortOrder={sortOrder} />
                   </div>
                 </TableHead>
 
@@ -227,7 +243,7 @@ export const ArenaAverageTable = ({
                   >
                     <div className="flex flex-col items-center justify-center">
                       <span>{rank}</span>
-                      <SortIcon k={rank} />
+                      <SortIcon k={rank} sortKey={sortKey} sortOrder={sortOrder} />
                     </div>
                   </TableHead>
                 ))}
@@ -239,6 +255,7 @@ export const ArenaAverageTable = ({
                 <ArenaRow
                   key={`${item.title}-${item.difficulty}`}
                   item={item}
+                  displayMetric={displayMetric}
                 />
               ))}
             </TableBody>

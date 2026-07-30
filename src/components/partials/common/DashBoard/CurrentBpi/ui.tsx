@@ -69,6 +69,9 @@ export const CurrentBpiCard = ({
     if (selectedDate) {
       onDateSelect(null);
     }
+    // バージョン/比較バージョンが変わった時だけ選択日をリセットしたいため、
+    // selectedDate/onDateSelect自体の変化では再実行させない
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [version, compareVersion]);
 
   const initialMonth = useMemo(() => {

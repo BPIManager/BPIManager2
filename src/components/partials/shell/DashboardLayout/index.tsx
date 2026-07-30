@@ -20,6 +20,9 @@ export const DashboardLayout = ({
   const [sidebarPinned, setSidebarPinned] = useState(false);
 
   useEffect(() => {
+    // SSR時はlocalStorageが無くサーバー/クライアントで結果が変わるため、
+    // hydration後にのみ読み込んでハイドレーションミスマッチを避ける
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSidebarPinned(localStorage.getItem("sidebar-pinned") === "true");
   }, []);
 

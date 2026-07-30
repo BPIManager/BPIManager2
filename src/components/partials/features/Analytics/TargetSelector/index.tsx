@@ -18,6 +18,18 @@ import {
   SelfVersionPickStep,
 } from "./ui";
 
+const BackButton = ({ onBack }: { onBack: () => void }) => {
+  const { t } = useTranslation();
+  return (
+    <button
+      onClick={onBack}
+      className="self-start text-xs text-bpim-muted hover:text-bpim-text flex items-center gap-1"
+    >
+      {t("common.back")}
+    </button>
+  );
+};
+
 interface TargetSelectorModalProps {
   isOpen: boolean;
   current: AnalyticsTarget | null;
@@ -47,15 +59,6 @@ export const TargetSelectorModal = ({
     handleSelfVersionPick,
   } = useTargetSelector({ isOpen, current, onSelect, onClose });
 
-  const BackButton = () => (
-    <button
-      onClick={() => setStep("kind")}
-      className="self-start text-xs text-bpim-muted hover:text-bpim-text flex items-center gap-1"
-    >
-      {t("common.back")}
-    </button>
-  );
-
   return (
     <Dialog open={isOpen} onOpenChange={(o) => !o && onClose()}>
       <DialogContent
@@ -81,14 +84,14 @@ export const TargetSelectorModal = ({
 
             {step === "rival-pick" && (
               <>
-                <BackButton />
+                <BackButton onBack={() => setStep("kind")} />
                 <RivalPickStep onSelect={handleRivalPick} />
               </>
             )}
 
             {step === "arena-rank" && (
               <>
-                <BackButton />
+                <BackButton onBack={() => setStep("kind")} />
                 <ArenaRankStep
                   selected={selectedArenaRank}
                   onSelect={setSelectedArenaRank}
@@ -113,7 +116,7 @@ export const TargetSelectorModal = ({
 
             {step === "self-version-pick" && (
               <>
-                <BackButton />
+                <BackButton onBack={() => setStep("kind")} />
                 <p className="text-xs text-bpim-muted">
                   {t("analytics.selfVersionNote")}
                 </p>

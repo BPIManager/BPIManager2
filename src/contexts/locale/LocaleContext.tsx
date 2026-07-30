@@ -21,6 +21,9 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY) as Locale | null;
     if (saved === "en" || saved === "ja" || saved === "zh-TW" || saved === "ko") {
+      // SSR時はlocalStorageが無くサーバー/クライアントで結果が変わるため、
+      // hydration後にのみ読み込んでハイドレーションミスマッチを避ける
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLocaleState(saved);
     }
   }, []);

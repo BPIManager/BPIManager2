@@ -32,6 +32,45 @@ interface Props {
 
 const fmt = (n: number) => n.toLocaleString("ja-JP");
 
+const StatHeader = ({
+  title,
+  latestCount,
+  rank,
+  totalCount,
+  textColorClass,
+}: {
+  title: string;
+  latestCount: number;
+  rank: number;
+  totalCount: number;
+  textColorClass: string;
+}) => {
+  const { t } = useTranslation();
+  return (
+    <div className="flex flex-col justify-between">
+      <div className="flex items-end justify-between">
+        <div>
+          <h4 className="mb-1 text-[10px] font-bold text-bpim-subtle">
+            {title}
+          </h4>
+          <div className="flex items-baseline gap-2">
+            <p className={`text-xl font-black leading-none ${textColorClass}`}>
+              {fmt(latestCount)}
+            </p>
+            <p className={`text-[10px] opacity-70 ${textColorClass}`}>
+              #{rank}
+            </p>
+          </div>
+        </div>
+        <div className="text-right">
+          <p className="text-[9px] uppercase text-bpim-subtle">{t("dashboard.iidxTower.periodTotal")}</p>
+          <p className="text-sm font-bold text-bpim-text">{fmt(totalCount)}</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const getIntensityStyle = (value: number, max: number, type: "key" | "scr") => {
   if (max === 0) return {};
   const ratio = value / max;
@@ -150,42 +189,6 @@ export const IidxTowerCard = ({
     chartData,
     scratchScale,
   } = processedData;
-
-  const StatHeader = ({
-    title,
-    latestCount,
-    rank,
-    totalCount,
-    textColorClass,
-  }: {
-    title: string;
-    latestCount: number;
-    rank: number;
-    totalCount: number;
-    textColorClass: string;
-  }) => (
-    <div className="flex flex-col justify-between">
-      <div className="flex items-end justify-between">
-        <div>
-          <h4 className="mb-1 text-[10px] font-bold text-bpim-subtle">
-            {title}
-          </h4>
-          <div className="flex items-baseline gap-2">
-            <p className={`text-xl font-black leading-none ${textColorClass}`}>
-              {fmt(latestCount)}
-            </p>
-            <p className={`text-[10px] opacity-70 ${textColorClass}`}>
-              #{rank}
-            </p>
-          </div>
-        </div>
-        <div className="text-right">
-          <p className="text-[9px] uppercase text-bpim-subtle">{t("dashboard.iidxTower.periodTotal")}</p>
-          <p className="text-sm font-bold text-bpim-text">{fmt(totalCount)}</p>
-        </div>
-      </div>
-    </div>
-  );
 
   const scratchLabel = t("dashboard.iidxTower.scratch");
   const keyLabel = t("dashboard.iidxTower.key");

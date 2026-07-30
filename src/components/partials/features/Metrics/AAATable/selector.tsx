@@ -69,6 +69,8 @@ export const AAATableFilter = ({
   const [isPending, setIsPending] = useState(false);
 
   useEffect(() => {
+    // draftDiffの変更を検知した瞬間にpending表示を出すためのデバウンス起点
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsPending(true);
     const timer = setTimeout(() => {
       const v = draftDiff.trim();

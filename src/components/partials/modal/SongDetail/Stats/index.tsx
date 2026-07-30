@@ -27,6 +27,8 @@ export const StatsTab = ({ song }: { song: SongWithScore }) => {
 
   useEffect(() => {
     if (user?.arenaRank && !selectedRef) {
+      // ユーザー情報の非同期読み込み完了後、未選択なら自分のアリーナ級位を初期値にする
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedRef(user.arenaRank);
     }
   }, [user?.arenaRank, selectedRef]);

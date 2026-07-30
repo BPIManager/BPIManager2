@@ -22,6 +22,39 @@ import { cn } from "@/lib/utils";
 
 type SubTab = "list" | "analysis";
 
+const SubTabBar = ({
+  subTab,
+  onTabChange,
+}: {
+  subTab: SubTab;
+  onTabChange: (tab: SubTab) => void;
+}) => {
+  const { t } = useTranslation();
+  return (
+    <div className="flex items-center gap-1 border-b border-bpim-border px-3 py-2">
+      {(["list", "analysis"] as SubTab[]).map((tab) => {
+        const Icon = tab === "list" ? List : BarChart2;
+        const label = tab === "list" ? t("rivals.table.songList") : t("rivals.table.analysis");
+        return (
+          <button
+            key={tab}
+            onClick={() => onTabChange(tab)}
+            className={cn(
+              "flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-colors",
+              subTab === tab
+                ? "bg-bpim-primary/15 text-bpim-primary"
+                : "text-bpim-muted hover:bg-bpim-overlay/50 hover:text-bpim-text",
+            )}
+          >
+            <Icon className="h-3.5 w-3.5" />
+            {label}
+          </button>
+        );
+      })}
+    </div>
+  );
+};
+
 export const RivalSongsTable = ({
   myUserId,
   rivalUserId,
@@ -55,34 +88,10 @@ export const RivalSongsTable = ({
     return <FetchErrorState error={error} />;
   }
 
-  const SubTabBar = () => (
-    <div className="flex items-center gap-1 border-b border-bpim-border px-3 py-2">
-      {(["list", "analysis"] as SubTab[]).map((tab) => {
-        const Icon = tab === "list" ? List : BarChart2;
-        const label = tab === "list" ? t("rivals.table.songList") : t("rivals.table.analysis");
-        return (
-          <button
-            key={tab}
-            onClick={() => setSubTab(tab)}
-            className={cn(
-              "flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-colors",
-              subTab === tab
-                ? "bg-bpim-primary/15 text-bpim-primary"
-                : "text-bpim-muted hover:bg-bpim-overlay/50 hover:text-bpim-text",
-            )}
-          >
-            <Icon className="h-3.5 w-3.5" />
-            {label}
-          </button>
-        );
-      })}
-    </div>
-  );
-
   if (subTab === "analysis") {
     return (
       <div className="mx-auto w-full min-h-svh flex flex-col bg-background">
-        <SubTabBar />
+        <SubTabBar subTab={subTab} onTabChange={setSubTab} />
         {isLoading ? (
           <div className="flex h-40 items-center justify-center text-xs text-bpim-muted">
             {t("common.loading")}
@@ -99,7 +108,7 @@ export const RivalSongsTable = ({
 
   return (
     <div className="mx-auto w-full min-h-svh flex flex-col bg-background">
-      <SubTabBar />
+      <SubTabBar subTab={subTab} onTabChange={setSubTab} />
       <SongFilterBar
         withRivals="full"
         params={params}

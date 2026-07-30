@@ -4,6 +4,104 @@ import { cn } from "@/lib/utils";
 import { getRankDetail } from "@/constants/iidx/rankBorders";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
+const ShareDataRow = ({
+  label,
+  prev,
+  current,
+  diff,
+  diffColor,
+  isBpi = false,
+}: {
+  label: string;
+  prev: number;
+  current: number;
+  diff: number;
+  diffColor: string;
+  isBpi?: boolean;
+}) => (
+  <div className="flex w-full items-center justify-between font-mono text-sm leading-none">
+    <span className="w-[30px] text-[10px] font-bold text-bpim-subtle">
+      {label}
+    </span>
+    <span className="w-[55px] text-right text-bpim-muted">
+      {isBpi ? prev.toFixed(2) : prev}
+    </span>
+    <ChevronRight className="mx-1 h-3 w-3 text-bpim-subtle" />
+    <span className="w-[55px] text-right font-bold text-bpim-text">
+      {isBpi ? current.toFixed(2) : current}
+    </span>
+    <span className={cn("w-[60px] text-right font-bold", diffColor)}>
+      +{isBpi ? diff.toFixed(2) : diff}
+    </span>
+  </div>
+);
+
+const ScoreRow = ({
+  label,
+  prev,
+  current,
+  diff,
+  diffColor,
+  isBpi = false,
+  isGrowth,
+}: {
+  label: string;
+  prev: number;
+  current: number;
+  diff: number;
+  diffColor: string;
+  isBpi?: boolean;
+  isGrowth: boolean;
+}) => {
+  const isTopBpi = !isGrowth && isBpi;
+  return (
+    <div
+      className={cn(
+        "flex items-center justify-end gap-1 font-mono leading-none",
+        isGrowth || isTopBpi ? "h-[26px]" : "h-[20px]",
+      )}
+    >
+      <span className="w-[25px] text-left text-[9px] font-bold text-bpim-subtle">
+        {label}
+      </span>
+      {isGrowth ? (
+        <>
+          <span className="w-[45px] text-right text-xs text-bpim-muted">
+            {isBpi ? prev.toFixed(2) : prev}
+          </span>
+          <ChevronRight className="h-2 w-2 text-bpim-subtle" />
+          <span className="w-[45px] text-right text-xs font-bold text-bpim-muted">
+            {isBpi ? current.toFixed(2) : current}
+          </span>
+          <span
+            className={cn(
+              "w-[60px] text-right font-bold",
+              isBpi ? "text-lg" : "text-sm",
+              diffColor,
+            )}
+          >
+            +{isBpi ? diff.toFixed(2) : diff}
+          </span>
+        </>
+      ) : (
+        <div className="flex w-[60px] justify-end items-baseline">
+          <span
+            className={cn(
+              "text-right font-mono",
+              isTopBpi
+                ? "text-lg font-black"
+                : "text-xs font-bold text-bpim-text",
+              isTopBpi ? diffColor : "text-bpim-text",
+            )}
+          >
+            {isBpi ? current.toFixed(2) : current}
+          </span>
+        </div>
+      )}
+    </div>
+  );
+};
+
 interface RankItemProps {
   item: BatchDetailItem;
   rank: number;
@@ -57,38 +155,6 @@ export const RankItem = ({
 
   if (isSharing) {
     const fullDiff = String(item.difficulty || "").toUpperCase();
-
-    const ShareDataRow = ({
-      label,
-      prev,
-      current,
-      diff,
-      diffColor,
-      isBpi = false,
-    }: {
-      label: string;
-      prev: number;
-      current: number;
-      diff: number;
-      diffColor: string;
-      isBpi?: boolean;
-    }) => (
-      <div className="flex w-full items-center justify-between font-mono text-sm leading-none">
-        <span className="w-[30px] text-[10px] font-bold text-bpim-subtle">
-          {label}
-        </span>
-        <span className="w-[55px] text-right text-bpim-muted">
-          {isBpi ? prev.toFixed(2) : prev}
-        </span>
-        <ChevronRight className="mx-1 h-3 w-3 text-bpim-subtle" />
-        <span className="w-[55px] text-right font-bold text-bpim-text">
-          {isBpi ? current.toFixed(2) : current}
-        </span>
-        <span className={cn("w-[60px] text-right font-bold", diffColor)}>
-          +{isBpi ? diff.toFixed(2) : diff}
-        </span>
-      </div>
-    );
 
     return (
       <div className="w-full border-b border-bpim-border bg-bpim-bg p-4">
@@ -152,70 +218,6 @@ export const RankItem = ({
     );
   }
 
-  const ScoreRow = ({
-    label,
-    prev,
-    current,
-    diff,
-    diffColor,
-    isBpi = false,
-  }: {
-    label: string;
-    prev: number;
-    current: number;
-    diff: number;
-    diffColor: string;
-    isBpi?: boolean;
-  }) => {
-    const isTopBpi = !isGrowth && isBpi;
-    return (
-      <div
-        className={cn(
-          "flex items-center justify-end gap-1 font-mono leading-none",
-          isGrowth || isTopBpi ? "h-[26px]" : "h-[20px]",
-        )}
-      >
-        <span className="w-[25px] text-left text-[9px] font-bold text-bpim-subtle">
-          {label}
-        </span>
-        {isGrowth ? (
-          <>
-            <span className="w-[45px] text-right text-xs text-bpim-muted">
-              {isBpi ? prev.toFixed(2) : prev}
-            </span>
-            <ChevronRight className="h-2 w-2 text-bpim-subtle" />
-            <span className="w-[45px] text-right text-xs font-bold text-bpim-muted">
-              {isBpi ? current.toFixed(2) : current}
-            </span>
-            <span
-              className={cn(
-                "w-[60px] text-right font-bold",
-                isBpi ? "text-lg" : "text-sm",
-                diffColor,
-              )}
-            >
-              +{isBpi ? diff.toFixed(2) : diff}
-            </span>
-          </>
-        ) : (
-          <div className="flex w-[60px] justify-end items-baseline">
-            <span
-              className={cn(
-                "text-right font-mono",
-                isTopBpi
-                  ? "text-lg font-black"
-                  : "text-xs font-bold text-bpim-text",
-                isTopBpi ? diffColor : "text-bpim-text",
-              )}
-            >
-              {isBpi ? current.toFixed(2) : current}
-            </span>
-          </div>
-        )}
-      </div>
-    );
-  };
-
   return (
     <div
       onClick={onClick}
@@ -270,6 +272,7 @@ export const RankItem = ({
           current={item.current.exScore}
           diff={item.diff.exScore}
           diffColor="text-bpim-primary"
+          isGrowth={isGrowth}
         />
         <ScoreRow
           label="BPI"
@@ -278,6 +281,7 @@ export const RankItem = ({
           diff={item.diff.bpi}
           diffColor={diffBpiColor}
           isBpi
+          isGrowth={isGrowth}
         />
       </div>
     </div>

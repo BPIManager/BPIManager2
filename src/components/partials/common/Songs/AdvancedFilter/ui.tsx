@@ -53,6 +53,9 @@ export const AdvancedFilterModal = ({
   const [localParams, setLocalParams] = useState<FilterParamsFrontend>(params);
 
   useEffect(() => {
+    // モーダルを開くたびに親の確定済みparamsで下書きをリセットする
+    // (未適用の編集を次回オープン時まで持ち越さないため)
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (isOpen) setLocalParams(params);
   }, [isOpen, params]);
 

@@ -213,6 +213,8 @@ export const BpiBoxStatsChart = ({
   useEffect(() => {
     if (!isLoading && data && data.length > 0) {
       const hasAnyEfficiency = data.some((d) => (d.efficiency ?? 0) > 0);
+      // データ読み込み完了時にefficiency系列の表示可否を自動切り替えするための同期
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setVisible((prev) => ({ ...prev, efficiency: hasAnyEfficiency }));
     }
   }, [data, isLoading]);

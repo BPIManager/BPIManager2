@@ -140,9 +140,9 @@ export const LogsDetailContent = ({
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         elements={{
-          summary: summaryRef.current,
-          ranking: rankRef.current,
-          list: listRef.current,
+          summary: summaryRef,
+          ranking: rankRef,
+          list: listRef,
         }}
         shareData={{
           bpi: currentBpi,

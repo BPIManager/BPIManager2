@@ -7,7 +7,7 @@
 } from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useState, type RefObject } from "react";
 import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useTranslation } from "@/hooks/common/useTranslation";
@@ -16,9 +16,9 @@ interface ShareModalProps {
   isOpen: boolean;
   onClose: () => void;
   elements: {
-    summary?: HTMLElement | null;
-    ranking?: HTMLElement | null;
-    list?: HTMLElement | null;
+    summary?: RefObject<HTMLElement | null>;
+    ranking?: RefObject<HTMLElement | null>;
+    list?: RefObject<HTMLElement | null>;
   };
   shareData: { bpi: number; diff: number; rank: number; updateCount: number };
   onShare: (
@@ -45,10 +45,10 @@ export const ShareResultModal = ({
   const handleExecute = async () => {
     const target =
       shareType === "summary"
-        ? elements.summary
+        ? (elements.summary?.current ?? null)
         : shareType === "ranking"
-          ? elements.ranking
-          : elements.list;
+          ? (elements.ranking?.current ?? null)
+          : (elements.list?.current ?? null);
     if (!target) return;
     const text = `${t("share.tweet.header")}\n${t("share.tweet.updateCount")}${shareData.updateCount}${t("share.tweet.countUnit")}\n\n${t("share.tweet.totalBpi")} ${shareData.bpi.toFixed(2)} (${shareData.diff >= 0 ? "+" : ""}${shareData.diff.toFixed(2)})\n${t("share.tweet.estimatedRank")} ${shareData.rank.toLocaleString()}${t("share.tweet.rankUnit")} #BPIM2 #IIDX\n${window.location.href}`;
     if (await onShare(target, text)) onClose();

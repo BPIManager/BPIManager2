@@ -36,6 +36,8 @@ export const CalendarPicker = ({
 
   useEffect(() => {
     if (initialMonth) {
+      // initialMonthが変わるたびに表示月をそれに同期させる(ユーザーのprevMonth/nextMonth操作とは別に、親からの再指定を反映する)
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setView(
         dayjs()
           .year(initialMonth.year)

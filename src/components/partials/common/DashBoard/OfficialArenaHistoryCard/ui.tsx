@@ -125,6 +125,7 @@ export const OfficialArenaHistoryCardUI = ({
   const events = metadata?.events ?? [];
   const selectedEvent: ArenaEventEntry | undefined = events[selectedIndex];
 
+  // eslint-disable-next-line react-hooks/purity -- 現在時刻とイベント開催期間を比較してライブ判定するため意図的にDate.now()を都度評価している
   const now = Date.now();
   const isLive =
     !!selectedEvent &&

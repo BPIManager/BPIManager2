@@ -28,6 +28,10 @@ import {
   getScoreSubItems,
 } from "./menuConfig";
 
+// Separator — only shown in expanded mode
+const Sep = ({ expanded }: { expanded: boolean }) =>
+  expanded ? <div className="mx-3 my-0.5 h-px bg-bpim-border/50" /> : null;
+
 export const SidebarContent = ({
   onClose,
   expanded = false,
@@ -51,10 +55,6 @@ export const SidebarContent = ({
   const labelStyle = expanded ? { opacity: 1 } : undefined;
   const labelCn =
     "flex-1 text-left whitespace-nowrap overflow-hidden opacity-0 transition-opacity duration-150 group-hover/sidebar:opacity-100";
-
-  // Separator — only shown in expanded mode
-  const Sep = () =>
-    expanded ? <div className="mx-3 my-0.5 h-px bg-bpim-border/50" /> : null;
 
   const rivalMenuItems = getRivalMenuItems(t);
   const analyticsMenuItems = getAnalyticsMenuItems(t);
@@ -95,7 +95,7 @@ export const SidebarContent = ({
           onClose={onClose}
         />
 
-        <Sep />
+        <Sep expanded={expanded} />
 
         <SidebarSection
           label={t("nav.section.score")}
@@ -123,7 +123,7 @@ export const SidebarContent = ({
           onClose={onClose}
         />
 
-        <Sep />
+        <Sep expanded={expanded} />
 
         <SidebarSection
           label={t("nav.section.rivals")}
@@ -142,7 +142,7 @@ export const SidebarContent = ({
           ))}
         </SidebarSection>
 
-        <Sep />
+        <Sep expanded={expanded} />
 
         <SidebarSection
           label={t("nav.section.analytics")}
@@ -161,7 +161,7 @@ export const SidebarContent = ({
           ))}
         </SidebarSection>
 
-        <Sep />
+        <Sep expanded={expanded} />
 
         <SidebarSection
           label={t("nav.section.beta")}
@@ -188,7 +188,7 @@ export const SidebarContent = ({
           ))}
         </SidebarSection>
 
-        <Sep />
+        <Sep expanded={expanded} />
 
         <SidebarSection
           label={t("nav.section.info")}
@@ -207,7 +207,7 @@ export const SidebarContent = ({
           ))}
         </SidebarSection>
 
-        <Sep />
+        <Sep expanded={expanded} />
         <MenuItemButton
           item={{ label: t("nav.settings"), icon: Settings, href: "/settings" }}
           expanded={expanded}

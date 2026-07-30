@@ -23,6 +23,9 @@ export default function ThemeSettingsUi() {
   const { t } = useTranslation();
 
   useEffect(() => {
+    // SSR時はlocalStorageが無くサーバー/クライアントで結果が変わるため、
+    // hydration後にのみ読み込んでハイドレーションミスマッチを避ける
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrent(getStoredTheme());
     setCurrentFont(getStoredFont());
   }, []);

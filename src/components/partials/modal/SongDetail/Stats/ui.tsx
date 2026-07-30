@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useMemo, useEffect, useRef } from "react";
+import { useMemo, useEffect, useState } from "react";
 import {
   BarChart,
   Bar,
@@ -214,11 +214,13 @@ export const BPIChart = ({
 }: BPIAnimatedChartProps) => {
   const c = useChartColors();
 
-  const hasAnimatedRef = useRef(false);
-  const animate = !hasAnimatedRef.current;
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const animate = !hasAnimated;
   useEffect(() => {
-    hasAnimatedRef.current = true;
-  });
+    // 初回マウント時のみアニメーションさせ、以降の再描画では止める
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setHasAnimated(true);
+  }, []);
 
   const barShape = useMemo(
     () => <CustomBarShape c={c} animate={animate} />,

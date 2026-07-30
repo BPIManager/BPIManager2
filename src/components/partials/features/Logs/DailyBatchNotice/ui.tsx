@@ -18,10 +18,10 @@ export const DailyBatchNotice = ({
   createdAt,
   version,
 }: DailyBatchNoticeProps) => {
-  if (dailyBatchIds.length <= 1) return null;
-
   const router = useRouter();
   const { userId } = router.query;
+
+  if (dailyBatchIds.length <= 1) return null;
 
   const dateStr = dayjs(createdAt).tz().format("YYYY-MM-DD");
   const currentIndex = dailyBatchIds.indexOf(currentBatchId) + 1;

@@ -41,6 +41,9 @@ export function useLayoutConfig() {
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
+    // SSR時はlocalStorageが無くサーバー/クライアントで結果が変わるため、
+    // hydration後にのみ読み込んでハイドレーションミスマッチを避ける
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setConfig(loadConfig());
     setHydrated(true);
   }, []);

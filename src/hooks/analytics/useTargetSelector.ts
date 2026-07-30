@@ -140,6 +140,8 @@ export function useTargetSelector({
 
   useEffect(() => {
     if (isOpen) {
+      // モーダルを開くたびに確定済みcurrentから選択状態をリセットする
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setStep("kind");
       setSelectedKind(current?.kind ?? null);
       setSelectedArenaRank(

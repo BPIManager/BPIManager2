@@ -71,6 +71,8 @@ export function useBpiOptimizer() {
   useEffect(() => {
     if (user?.totalBpi !== undefined && targetBpiInput === "") {
       const current = Number(user.totalBpi);
+      // ユーザー情報の非同期読み込み完了後、未入力なら現在BPI+1を初期値にする
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTargetBpiInput((current + 1).toFixed(2));
     }
   }, [user?.totalBpi, targetBpiInput]);
