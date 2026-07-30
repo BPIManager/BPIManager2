@@ -9,26 +9,38 @@ import {
 import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
+interface YearNavProps {
+  calendarYear: string;
+  calendarYearIdx: number;
+  canPrevYear: boolean;
+  canNextYear: boolean;
+  onPrevYear: () => void;
+  onNextYear: () => void;
+}
+
+interface MonthSelectionProps {
+  availableMonths: string[];
+  availableSet: Set<string>;
+  onMonthClick: (monthStr: string) => void;
+}
+
+interface YearSelectionProps {
+  availableYears: string[];
+  onYearClick: (year: string) => void;
+}
+
 interface Props {
   currentVersion: string;
   currentPeriod: string;
   granularity: "month" | "year";
   version: string;
-  availableMonths: string[];
-  availableSet: Set<string>;
-  availableYears: string[];
-  calendarYear: string;
-  calendarYearIdx: number;
-  canPrevYear: boolean;
-  canNextYear: boolean;
   isLoading: boolean;
   isCurrentYearMode: boolean;
   onGranularityChange: (g: "month" | "year") => void;
   onVersionChange: (v: string) => void;
-  onMonthClick: (monthStr: string) => void;
-  onYearClick: (year: string) => void;
-  onPrevYear: () => void;
-  onNextYear: () => void;
+  yearNav: YearNavProps;
+  monthSelection: MonthSelectionProps;
+  yearSelection: YearSelectionProps;
 }
 
 const btnActive = {
@@ -53,21 +65,23 @@ export const PeriodSelectorUI = ({
   currentPeriod,
   granularity,
   version,
-  availableMonths,
-  availableSet,
-  availableYears,
-  calendarYear,
-  canPrevYear,
-  canNextYear,
   isLoading,
   isCurrentYearMode,
   onGranularityChange,
   onVersionChange,
-  onMonthClick,
-  onYearClick,
-  onPrevYear,
-  onNextYear,
+  yearNav,
+  monthSelection,
+  yearSelection,
 }: Props) => {
+  const {
+    calendarYear,
+    canPrevYear,
+    canNextYear,
+    onPrevYear,
+    onNextYear,
+  } = yearNav;
+  const { availableMonths, availableSet, onMonthClick } = monthSelection;
+  const { availableYears, onYearClick } = yearSelection;
   const { t, tFormat } = useTranslation();
   const monthLabels = t("monthlyReview.period.monthLabels").split(",");
   return (

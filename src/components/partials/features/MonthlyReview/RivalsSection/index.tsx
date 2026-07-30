@@ -53,23 +53,19 @@ export const RivalsSection = ({
 
   return (
     <RivalsSectionUI
-      rivals={rivals}
-      ranking={ranking}
-      timeline={timeline}
+      data={{ rivals, ranking, timeline }}
+      chart={{ hasChart, hiddenKeys, onToggleKey: toggleKey }}
+      rankSummary={{ viewerAbsRank, viewerRateRank, totalParticipants }}
+      labels={{
+        noRivalsTitle: t("monthlyReview.rivals.noRivalsTitle"),
+        noRivalsDesc: t("monthlyReview.rivals.noRivalsDesc"),
+        sectionTitle: t("monthlyReview.rivals.sectionTitle"),
+        rivalsSummary,
+      }}
       granularity={granularity}
       inView={inView}
       sectionRef={ref as React.RefObject<HTMLDivElement>}
       isEmpty={isEmpty}
-      hasChart={hasChart}
-      hiddenKeys={hiddenKeys}
-      viewerAbsRank={viewerAbsRank}
-      viewerRateRank={viewerRateRank}
-      totalParticipants={totalParticipants}
-      onToggleKey={toggleKey}
-      noRivalsTitle={t("monthlyReview.rivals.noRivalsTitle")}
-      noRivalsDesc={t("monthlyReview.rivals.noRivalsDesc")}
-      sectionTitle={t("monthlyReview.rivals.sectionTitle")}
-      rivalsSummary={rivalsSummary}
     />
   );
 };

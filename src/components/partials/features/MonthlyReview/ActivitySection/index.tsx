@@ -77,14 +77,26 @@ export const ActivitySection = ({ activity, granularity }: Props) => {
 
   return (
     <ActivitySectionUI
-      sectionRef={ref as React.RefObject<HTMLDivElement>}
+      refs={{
+        section: ref as React.RefObject<HTMLDivElement>,
+        keys: keysRef,
+        scratch: scratchRef,
+        days: daysRef,
+        songs: songsRef,
+      }}
+      labels={{
+        summary,
+        sectionTitle: t("monthlyReview.activity.sectionTitle"),
+        noKeyScratchTitle: t("monthlyReview.activity.noKeyScratchTitle"),
+        noKeyScratchDesc: t("monthlyReview.activity.noKeyScratchDesc"),
+        bestDaysTitle: t("monthlyReview.activity.bestDaysTitle"),
+        bestGrowthDayLabel: t("monthlyReview.activity.bestGrowthDay"),
+        bestKeysDayLabel: t("monthlyReview.activity.bestKeysDay"),
+        bestScratchDayLabel: t("monthlyReview.activity.bestScratchDay"),
+        byDayOfWeekTitle: t("monthlyReview.activity.byDayOfWeek"),
+        byHourTitle: t("monthlyReview.activity.byHour"),
+      }}
       inView={inView}
-      keysRef={keysRef}
-      scratchRef={scratchRef}
-      daysRef={daysRef}
-      songsRef={songsRef}
-      summary={summary}
-      sectionTitle={t("monthlyReview.activity.sectionTitle")}
       activity={activity}
       dowData={dowData}
       hourData={hourData}
@@ -92,14 +104,6 @@ export const ActivitySection = ({ activity, granularity }: Props) => {
       tooltipStyle={tooltipStyle}
       hasNoKeyScratchData={totalKeys === 0 && totalScratches === 0}
       primaryColor={colors.primary}
-      noKeyScratchTitle={t("monthlyReview.activity.noKeyScratchTitle")}
-      noKeyScratchDesc={t("monthlyReview.activity.noKeyScratchDesc")}
-      bestDaysTitle={t("monthlyReview.activity.bestDaysTitle")}
-      bestGrowthDayLabel={t("monthlyReview.activity.bestGrowthDay")}
-      bestKeysDayLabel={t("monthlyReview.activity.bestKeysDay")}
-      bestScratchDayLabel={t("monthlyReview.activity.bestScratchDay")}
-      byDayOfWeekTitle={t("monthlyReview.activity.byDayOfWeek")}
-      byHourTitle={t("monthlyReview.activity.byHour")}
       formatHourLabel={(l) =>
         tFormat("monthlyReview.activity.hourUnit", { h: String(l) })
       }

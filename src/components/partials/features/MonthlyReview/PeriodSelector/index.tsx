@@ -62,25 +62,29 @@ export const PeriodSelector = ({
       currentPeriod={currentPeriod}
       granularity={granularity}
       version={version}
-      availableMonths={availableMonths}
-      availableSet={availableSet}
-      availableYears={availableYears}
-      calendarYear={calendarYear}
-      calendarYearIdx={calendarYearIdx}
-      canPrevYear={canPrevYear}
-      canNextYear={canNextYear}
       isLoading={isLoading}
       isCurrentYearMode={isCurrentYearMode}
       onGranularityChange={setGranularity}
       onVersionChange={handleVersionChange}
-      onMonthClick={(monthStr) => onSelect(version, monthStr)}
-      onYearClick={(year) => onSelect(version, year)}
-      onPrevYear={() =>
-        canPrevYear && setCalendarYear(availableYears[calendarYearIdx + 1])
-      }
-      onNextYear={() =>
-        canNextYear && setCalendarYear(availableYears[calendarYearIdx - 1])
-      }
+      yearNav={{
+        calendarYear,
+        calendarYearIdx,
+        canPrevYear,
+        canNextYear,
+        onPrevYear: () =>
+          canPrevYear && setCalendarYear(availableYears[calendarYearIdx + 1]),
+        onNextYear: () =>
+          canNextYear && setCalendarYear(availableYears[calendarYearIdx - 1]),
+      }}
+      monthSelection={{
+        availableMonths,
+        availableSet,
+        onMonthClick: (monthStr) => onSelect(version, monthStr),
+      }}
+      yearSelection={{
+        availableYears,
+        onYearClick: (year) => onSelect(version, year),
+      }}
     />
   );
 };

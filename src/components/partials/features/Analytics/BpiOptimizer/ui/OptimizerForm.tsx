@@ -21,6 +21,11 @@ const ALL_RADAR_ELEMENTS: RadarCategory[] = [
   "SOFLAN",
 ];
 
+interface OptimizerFilterGroup<T> {
+  value: T[];
+  onToggle: (item: T) => void;
+}
+
 interface OptimizerFormProps {
   targetBpiInput: string;
   onTargetBpiChange: (v: string) => void;
@@ -28,14 +33,10 @@ interface OptimizerFormProps {
   onSubmit: () => void;
   inputError: boolean;
   isLoading: boolean;
-  strategies: OptimizerStrategy[];
-  onToggleStrategy: (s: OptimizerStrategy) => void;
-  levels: string[];
-  onToggleLevel: (l: string) => void;
-  difficulties: string[];
-  onToggleDifficulty: (d: string) => void;
-  radarElements: RadarCategory[];
-  onToggleRadarElement: (cat: RadarCategory) => void;
+  strategies: OptimizerFilterGroup<OptimizerStrategy>;
+  levels: OptimizerFilterGroup<string>;
+  difficulties: OptimizerFilterGroup<string>;
+  radarElements: OptimizerFilterGroup<RadarCategory>;
   strongRadarCategories: RadarCategory[];
   weakRadarCategories: RadarCategory[];
   currentTotalBpi: number | null;
@@ -57,14 +58,12 @@ export const OptimizerForm = ({
   inputError,
   isLoading,
   strategies,
-  onToggleStrategy,
   currentTotalBpi,
   searchMode,
   onSearchModeChange,
   considerCurrentTotalBpi,
   onConsiderCurrentTotalBpiChange,
   radarElements,
-  onToggleRadarElement,
   strongRadarCategories,
   weakRadarCategories,
 }: OptimizerFormProps) => {
@@ -188,22 +187,24 @@ export const OptimizerForm = ({
               key={item.key}
               className={cn(
                 "flex items-center gap-3 p-2 rounded-lg border cursor-pointer transition-colors",
-                strategies.includes(item.key as OptimizerStrategy)
+                strategies.value.includes(item.key as OptimizerStrategy)
                   ? "border-bpim-primary/40 bg-bpim-primary/5"
                   : "border-bpim-border bg-bpim-bg hover:bg-bpim-overlay",
               )}
             >
               <Checkbox
-                checked={strategies.includes(item.key as OptimizerStrategy)}
+                checked={strategies.value.includes(
+                  item.key as OptimizerStrategy,
+                )}
                 onCheckedChange={() =>
-                  onToggleStrategy(item.key as OptimizerStrategy)
+                  strategies.onToggle(item.key as OptimizerStrategy)
                 }
                 className="sr-only"
               />
               <item.icon
                 className={cn(
                   "h-3.5 w-3.5",
-                  strategies.includes(item.key as OptimizerStrategy)
+                  strategies.value.includes(item.key as OptimizerStrategy)
                     ? "text-bpim-primary"
                     : "text-bpim-subtle",
                 )}
@@ -226,7 +227,7 @@ export const OptimizerForm = ({
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
         {ALL_RADAR_ELEMENTS.map((cat) => {
-          const isChecked = radarElements.includes(cat);
+          const isChecked = radarElements.value.includes(cat);
           const isStrong = strongRadarCategories.includes(cat);
           const isWeak = weakRadarCategories.includes(cat);
           return (
@@ -241,7 +242,7 @@ export const OptimizerForm = ({
             >
               <Checkbox
                 checked={isChecked}
-                onCheckedChange={() => onToggleRadarElement(cat)}
+                onCheckedChange={() => radarElements.onToggle(cat)}
                 className="sr-only"
               />
               <span

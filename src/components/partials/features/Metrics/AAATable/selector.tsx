@@ -21,46 +21,51 @@ import { CustomGoalConfig, GoalType, CardDisplay } from "@/types/metrics/aaa";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface Props {
-  version: string;
-  onVersionChange: (v: string) => void;
-  level: number;
-  onLevelChange: (l: number) => void;
-  goal: GoalType;
-  onGoalChange: (g: GoalType) => void;
-  groupingMode: GroupingMode;
-  onGroupingModeChange: (m: GroupingMode) => void;
-  showAbove: boolean;
-  onShowAboveChange: (v: boolean) => void;
-  showBelow: boolean;
-  onShowBelowChange: (v: boolean) => void;
-  maxDiffFilter: number | undefined;
-  onMaxDiffFilterChange: (v: number | undefined) => void;
-  customGoal: CustomGoalConfig | null;
-  onCustomGoalChange: (config: CustomGoalConfig) => void;
-  cardDisplay: CardDisplay;
-  onCardDisplayChange: (v: CardDisplay) => void;
+  version: { value: string; onChange: (v: string) => void };
+  level: { value: number; onChange: (l: number) => void };
+  goal: {
+    value: GoalType;
+    onChange: (g: GoalType) => void;
+    custom: CustomGoalConfig | null;
+    onCustomChange: (config: CustomGoalConfig) => void;
+  };
+  grouping: { value: GroupingMode; onChange: (m: GroupingMode) => void };
+  achievement: {
+    showAbove: boolean;
+    onShowAboveChange: (v: boolean) => void;
+    showBelow: boolean;
+    onShowBelowChange: (v: boolean) => void;
+  };
+  distToGoal: {
+    maxDiffFilter: number | undefined;
+    onMaxDiffFilterChange: (v: number | undefined) => void;
+  };
+  cardDisplay: { value: CardDisplay; onChange: (v: CardDisplay) => void };
 }
 
 export const AAATableFilter = ({
-  version,
-  onVersionChange,
-  level,
-  onLevelChange,
-  goal,
-  onGoalChange,
-  groupingMode,
-  onGroupingModeChange,
-  showAbove,
-  onShowAboveChange,
-  showBelow,
-  onShowBelowChange,
-  maxDiffFilter,
-  onMaxDiffFilterChange,
-  customGoal,
-  onCustomGoalChange,
-  cardDisplay,
-  onCardDisplayChange,
+  version: versionProp,
+  level: levelProp,
+  goal: goalProp,
+  grouping,
+  achievement,
+  distToGoal,
+  cardDisplay: cardDisplayProp,
 }: Props) => {
+  const { value: version, onChange: onVersionChange } = versionProp;
+  const { value: level, onChange: onLevelChange } = levelProp;
+  const {
+    value: goal,
+    onChange: onGoalChange,
+    custom: customGoal,
+    onCustomChange: onCustomGoalChange,
+  } = goalProp;
+  const { value: groupingMode, onChange: onGroupingModeChange } = grouping;
+  const { showAbove, onShowAboveChange, showBelow, onShowBelowChange } =
+    achievement;
+  const { maxDiffFilter, onMaxDiffFilterChange } = distToGoal;
+  const { value: cardDisplay, onChange: onCardDisplayChange } =
+    cardDisplayProp;
   const { t } = useTranslation();
   const [modalOpen, setModalOpen] = useState(false);
   const [draftDiff, setDraftDiff] = useState<string>(

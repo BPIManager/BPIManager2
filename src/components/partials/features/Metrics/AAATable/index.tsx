@@ -127,24 +127,26 @@ export const AAATableContent = ({
         </>
       )}
       <AAATableFilter
-        version={version}
-        onVersionChange={setVersion}
-        level={level}
-        onLevelChange={setLevel}
-        goal={goal}
-        onGoalChange={setGoal}
-        groupingMode={groupingMode}
-        onGroupingModeChange={setGroupingMode}
-        showAbove={showAbove}
-        onShowAboveChange={setShowAbove}
-        showBelow={showBelow}
-        onShowBelowChange={setShowBelow}
-        maxDiffFilter={maxDiffFilter}
-        onMaxDiffFilterChange={setMaxDiffFilter}
-        customGoal={customGoal}
-        onCustomGoalChange={handleCustomGoalChange}
-        cardDisplay={cardDisplay}
-        onCardDisplayChange={setCardDisplay}
+        version={{ value: version, onChange: setVersion }}
+        level={{ value: level, onChange: setLevel }}
+        goal={{
+          value: goal,
+          onChange: setGoal,
+          custom: customGoal,
+          onCustomChange: handleCustomGoalChange,
+        }}
+        grouping={{ value: groupingMode, onChange: setGroupingMode }}
+        achievement={{
+          showAbove,
+          onShowAboveChange: setShowAbove,
+          showBelow,
+          onShowBelowChange: setShowBelow,
+        }}
+        distToGoal={{
+          maxDiffFilter,
+          onMaxDiffFilterChange: setMaxDiffFilter,
+        }}
+        cardDisplay={{ value: cardDisplay, onChange: setCardDisplay }}
       />
 
       {isLoading ? (

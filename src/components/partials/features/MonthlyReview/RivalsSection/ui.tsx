@@ -197,45 +197,56 @@ function RivalSongs({
 
 const PAGE = 3;
 
-interface Props {
+interface RivalsSectionData {
   rivals: MonthlyReviewData["rivals"];
   ranking: MonthlyReviewData["rivalsGrowthRanking"];
   timeline: MonthlyReviewData["rivalsGrowthTimeline"];
-  granularity: "month" | "year";
-  inView: boolean;
-  sectionRef: React.RefObject<HTMLDivElement>;
-  isEmpty: boolean;
+}
+
+interface RivalsSectionChart {
   hasChart: boolean;
   hiddenKeys: Set<string>;
+  onToggleKey: (uid: string) => void;
+}
+
+interface RivalsSectionRankSummary {
   viewerAbsRank: number;
   viewerRateRank: number;
   totalParticipants: number;
-  onToggleKey: (uid: string) => void;
+}
+
+interface RivalsSectionLabels {
   noRivalsTitle: string;
   noRivalsDesc: string;
   sectionTitle: string;
   rivalsSummary: string;
 }
 
+interface Props {
+  data: RivalsSectionData;
+  chart: RivalsSectionChart;
+  rankSummary: RivalsSectionRankSummary;
+  labels: RivalsSectionLabels;
+  granularity: "month" | "year";
+  inView: boolean;
+  sectionRef: React.RefObject<HTMLDivElement>;
+  isEmpty: boolean;
+}
+
 export const RivalsSectionUI = ({
-  rivals,
-  ranking,
-  timeline,
+  data,
+  chart,
+  rankSummary,
+  labels,
   granularity,
   inView,
   sectionRef,
   isEmpty,
-  hasChart,
-  hiddenKeys,
-  viewerAbsRank,
-  viewerRateRank,
-  totalParticipants,
-  onToggleKey,
-  noRivalsTitle,
-  noRivalsDesc,
-  sectionTitle,
-  rivalsSummary,
 }: Props) => {
+  const { rivals, ranking, timeline } = data;
+  const { hasChart, hiddenKeys, onToggleKey } = chart;
+  const { viewerAbsRank, viewerRateRank, totalParticipants } = rankSummary;
+  const { noRivalsTitle, noRivalsDesc, sectionTitle, rivalsSummary } = labels;
   const [visible, setVisible] = useState(PAGE);
   const { t } = useTranslation();
 

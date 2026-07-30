@@ -18,22 +18,17 @@ const styles = `
   @keyframes barGrowH { from{width:0} to{width:var(--w)} }
 `;
 
-interface Props {
-  sectionRef: React.RefObject<HTMLDivElement>;
-  inView: boolean;
-  keysRef: React.RefObject<HTMLSpanElement | null>;
-  scratchRef: React.RefObject<HTMLSpanElement | null>;
-  daysRef: React.RefObject<HTMLSpanElement | null>;
-  songsRef: React.RefObject<HTMLSpanElement | null>;
+interface ActivitySectionRefs {
+  section: React.RefObject<HTMLDivElement>;
+  keys: React.RefObject<HTMLSpanElement | null>;
+  scratch: React.RefObject<HTMLSpanElement | null>;
+  days: React.RefObject<HTMLSpanElement | null>;
+  songs: React.RefObject<HTMLSpanElement | null>;
+}
+
+interface ActivitySectionLabels {
   summary: string;
   sectionTitle: string;
-  activity: MonthlyReviewData["activity"];
-  dowData: { label: string; count: number }[];
-  hourData: { label: string; count: number }[];
-  maxDow: number;
-  tooltipStyle: React.CSSProperties;
-  hasNoKeyScratchData: boolean;
-  primaryColor: string;
   noKeyScratchTitle: string;
   noKeyScratchDesc: string;
   bestDaysTitle: string;
@@ -42,19 +37,27 @@ interface Props {
   bestScratchDayLabel: string;
   byDayOfWeekTitle: string;
   byHourTitle: string;
+}
+
+interface Props {
+  refs: ActivitySectionRefs;
+  labels: ActivitySectionLabels;
+  inView: boolean;
+  activity: MonthlyReviewData["activity"];
+  dowData: { label: string; count: number }[];
+  hourData: { label: string; count: number }[];
+  maxDow: number;
+  tooltipStyle: React.CSSProperties;
+  hasNoKeyScratchData: boolean;
+  primaryColor: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   formatHourLabel: (...args: any[]) => React.ReactNode;
 }
 
 export const ActivitySectionUI = ({
-  sectionRef,
+  refs,
+  labels,
   inView,
-  keysRef,
-  scratchRef,
-  daysRef,
-  songsRef,
-  summary,
-  sectionTitle,
   activity,
   dowData,
   hourData,
@@ -62,16 +65,27 @@ export const ActivitySectionUI = ({
   tooltipStyle,
   hasNoKeyScratchData,
   primaryColor,
-  noKeyScratchTitle,
-  noKeyScratchDesc,
-  bestDaysTitle,
-  bestGrowthDayLabel,
-  bestKeysDayLabel,
-  bestScratchDayLabel,
-  byDayOfWeekTitle,
-  byHourTitle,
   formatHourLabel,
 }: Props) => {
+  const {
+    section: sectionRef,
+    keys: keysRef,
+    scratch: scratchRef,
+    days: daysRef,
+    songs: songsRef,
+  } = refs;
+  const {
+    summary,
+    sectionTitle,
+    noKeyScratchTitle,
+    noKeyScratchDesc,
+    bestDaysTitle,
+    bestGrowthDayLabel,
+    bestKeysDayLabel,
+    bestScratchDayLabel,
+    byDayOfWeekTitle,
+    byHourTitle,
+  } = labels;
   const { t, tFormat } = useTranslation();
   const {
     totalKeys,
