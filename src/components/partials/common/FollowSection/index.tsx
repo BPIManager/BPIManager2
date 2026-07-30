@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Check, Plus, Settings2 } from "lucide-react";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useUser } from "@/contexts/users/UserContext";
+import { useIsOwnProfile } from "@/hooks/users/useIsOwnProfile";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
@@ -30,7 +31,7 @@ export const FollowSection = ({
   const { fbUser } = useUser();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const isLoggedIn = !!fbUser?.uid;
-  const isMe = isLoggedIn && fbUser?.uid === userId;
+  const isMe = useIsOwnProfile(userId);
 
   if (isMe) {
     return (

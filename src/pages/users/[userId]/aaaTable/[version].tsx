@@ -8,17 +8,18 @@ import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { ProfileMeta } from "@/components/partials/common/Profile/Meta/ui";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import { useIsOwnProfile } from "@/hooks/users/useIsOwnProfile";
 
 export default function UserAAATablePage() {
   const router = useRouter();
-  const { fbUser, isLoading: isUserLoading } = useUser();
+  const { isLoading: isUserLoading } = useUser();
   const { t } = useTranslation();
 
   const { userId, version } = router.query;
   const uid = (userId as string) || "";
   const v = (version as string) || latestVersion;
 
-  const isOwnedByFbId = fbUser?.uid === userId;
+  const isOwnedByFbId = useIsOwnProfile(userId);
 
   if (!router.isReady || isUserLoading) return null;
 

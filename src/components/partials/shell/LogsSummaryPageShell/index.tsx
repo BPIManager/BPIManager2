@@ -4,6 +4,7 @@ import type { ParsedUrlQuery } from "querystring";
 import { useUser } from "@/contexts/users/UserContext";
 import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
 import { PageLoader } from "@/components/ui/loading-spinner";
+import { useIsOwnProfile } from "@/hooks/users/useIsOwnProfile";
 
 interface LogsSummaryRenderCtx {
   userId: string;
@@ -27,10 +28,10 @@ export const LogsSummaryPageShell = ({
   ownProfile,
   publicProfile,
 }: LogsSummaryPageShellProps) => {
-  const { fbUser, isLoading: isUserLoading } = useUser();
+  const { isLoading: isUserLoading } = useUser();
   const router = useRouter();
   const { userId, version } = router.query;
-  const isOwnProfile = fbUser?.uid === userId;
+  const isOwnProfile = useIsOwnProfile(userId);
   const isInitialLoading = !router.isReady || isUserLoading;
 
   if (isInitialLoading) {

@@ -13,6 +13,7 @@ import { ProfileMeta } from "@/components/partials/common/Profile/Meta/ui";
 import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 import { LogFilterSection } from "@/components/partials/features/Logs/VersionSelector/ui";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import { useIsOwnProfile } from "@/hooks/users/useIsOwnProfile";
 
 export default function LogsPage() {
   const router = useRouter();
@@ -25,7 +26,8 @@ export default function LogsPage() {
   const g = (groupedBy as string) || "lastPlayed";
   const gr = (granularity as string) || "day";
 
-  const isOwnedByMe = !isUserLoading && user?.userId === userId;
+  const isOwnProfile = useIsOwnProfile(userId);
+  const isOwnedByMe = !isUserLoading && isOwnProfile;
 
   const logsContent = (
     <div className="flex flex-col gap-4">
