@@ -52,6 +52,19 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+
+  async rewrites() {
+    return [
+      {
+        source: "/.well-known/oauth-authorization-server",
+        destination: "/api/oauth/authorization-server-metadata",
+      },
+      {
+        source: "/.well-known/oauth-protected-resource",
+        destination: "/api/oauth/protected-resource-metadata",
+      },
+    ];
+  },
 };
 
 export default nextConfig;

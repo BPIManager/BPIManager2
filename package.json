@@ -20,6 +20,7 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@lordicon/element": "^2.2.0",
+    "@modelcontextprotocol/sdk": "^1.27.1",
     "@tailwindcss/postcss": "^4.2.1",
     "@types/papaparse": "^5.5.2",
     "@types/react-window": "^2.0.0",

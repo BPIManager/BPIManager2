@@ -30,6 +30,9 @@ export interface Database {
   iidxTower: IidxTowerTable;
   officialArenaStats: OfficialArenaStats;
   statsPrivacy: StatsPrivacy;
+  oauthClients: OauthClients;
+  oauthAuthorizationCodes: OauthAuthorizationCodes;
+  oauthAccessTokens: OauthAccessTokens;
   // 追加: 暫定/バックアップ用テーブル
   bkScores: BkScores;
   bkUsers: BkUsers;
@@ -47,6 +50,35 @@ export interface ApiKeys {
   id: Generated<number>;
   key: string;
   userId: string;
+}
+
+export interface OauthClients {
+  clientId: string;
+  userId: Generated<string | null>;
+  clientName: Generated<string | null>;
+  redirectUris: string;
+  clientSecret: Generated<string | null>;
+  createdAt: Generated<Date>;
+}
+
+export interface OauthAuthorizationCodes {
+  code: string;
+  userId: string;
+  clientId: string;
+  redirectUri: string;
+  codeChallenge: string;
+  codeChallengeMethod: Generated<string>;
+  expiresAt: Date;
+  consumedAt: Generated<Date | null>;
+  createdAt: Generated<Date>;
+}
+
+export interface OauthAccessTokens {
+  token: string;
+  userId: string;
+  clientId: string;
+  expiresAt: Date;
+  createdAt: Generated<Date>;
 }
 
 export interface BkScores {
@@ -262,6 +294,12 @@ export type NewTotalBPILog = Insertable<Logs>;
 export type ApiKey = Selectable<ApiKeys>;
 export type NewApiKey = Insertable<ApiKeys>;
 export type ApiKeyUpdate = Updateable<ApiKeys>;
+export type OauthClient = Selectable<OauthClients>;
+export type NewOauthClient = Insertable<OauthClients>;
+export type OauthAuthorizationCode = Selectable<OauthAuthorizationCodes>;
+export type NewOauthAuthorizationCode = Insertable<OauthAuthorizationCodes>;
+export type OauthAccessToken = Selectable<OauthAccessTokens>;
+export type NewOauthAccessToken = Insertable<OauthAccessTokens>;
 export type BkScore = Selectable<BkScores>;
 export type NewBkScore = Insertable<BkScores>;
 export type BkUser = Selectable<BkUsers>;

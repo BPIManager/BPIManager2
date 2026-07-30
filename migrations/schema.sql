@@ -409,6 +409,47 @@ CREATE TABLE IF NOT EXISTS `statsPrivacy` (
   CONSTRAINT `fk_sp_userId` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- MCPサーバー(/api/mcp)向けOAuth 2.0 (Authorization Code + PKCE + Dynamic Client Registration)用テーブル群
+-- userId/clientSecretが設定されている場合はSettings画面から手動発行されたconfidential client(client_secret検証あり)、
+-- 両方NULLの場合はDynamic Client Registrationで自動登録されたpublic client(PKCEのみ)
+CREATE TABLE IF NOT EXISTS `oauthClients` (
+  `clientId` varchar(64) NOT NULL,
+  `userId` varchar(128) DEFAULT NULL,
+  `clientName` varchar(255) DEFAULT NULL,
+  `redirectUris` text NOT NULL,
+  `clientSecret` varchar(128) DEFAULT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`clientId`) USING BTREE,
+  UNIQUE KEY `idx_oauthclients_userId` (`userId`) USING BTREE,
+  CONSTRAINT `fk_oauthclients_userId` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `oauthAuthorizationCodes` (
+  `code` varchar(128) NOT NULL,
+  `userId` varchar(128) NOT NULL,
+  `clientId` varchar(64) NOT NULL,
+  `redirectUri` varchar(512) NOT NULL,
+  `codeChallenge` varchar(128) NOT NULL,
+  `codeChallengeMethod` varchar(16) NOT NULL DEFAULT 'S256',
+  `expiresAt` timestamp NOT NULL,
+  `consumedAt` timestamp NULL DEFAULT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`code`) USING BTREE,
+  KEY `idx_oauthcodes_expiresAt` (`expiresAt`) USING BTREE,
+  CONSTRAINT `fk_oauthcodes_userId` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `oauthAccessTokens` (
+  `token` varchar(128) NOT NULL,
+  `userId` varchar(128) NOT NULL,
+  `clientId` varchar(64) NOT NULL,
+  `expiresAt` timestamp NOT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`token`) USING BTREE,
+  KEY `idx_oauthtokens_userId` (`userId`) USING BTREE,
+  CONSTRAINT `fk_oauthtokens_userId` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
