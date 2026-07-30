@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import { useUser } from "@/contexts/users/UserContext";
 import { LoginButtons } from "@/components/partials/common/Auth/Buttons";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { PageLoader } from "@/components/ui/loading-spinner";
 import { Meta } from "@/components/partials/common/PageChrome/Head";
@@ -14,7 +15,7 @@ function getStringParam(value: string | string[] | undefined) {
 
 export default function OAuthAuthorizePage() {
   const router = useRouter();
-  const { fbUser, isLoading } = useUser();
+  const { fbUser, user, isLoading } = useUser();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -114,6 +115,22 @@ export default function OAuthAuthorizePage() {
           <LoginButtons />
         ) : (
           <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-3 rounded-lg bg-bpim-bg-secondary p-3 text-left">
+              <Avatar className="h-10 w-10 border-2 border-bpim-border">
+                <AvatarImage src={user?.profileImage ?? ""} />
+                <AvatarFallback>
+                  {(user?.userName ?? fbUser.uid).slice(0, 2)}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex flex-col min-w-0">
+                <span className="text-xs text-bpim-muted">
+                  ログイン中のアカウント
+                </span>
+                <span className="truncate text-sm font-semibold text-bpim-text">
+                  {user?.userName ?? fbUser.uid}
+                </span>
+              </div>
+            </div>
             {error && <p className="text-sm text-destructive">{error}</p>}
             <Button onClick={handleAllow} disabled={isSubmitting}>
               許可する
