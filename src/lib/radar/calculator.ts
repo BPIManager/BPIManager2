@@ -84,7 +84,10 @@ export function calculateRadar(scores: RadarScoreInput[], validSongKeys?: Set<st
     result[category] = {
       totalBpi:
         bpiList.length > 0
-          ? BpiCalculator.calculateTotalBPI(bpiList, bpiList.length)
+          ? BpiCalculator.calculateTotalBPI(
+              bpiList,
+              bpiList.length + unplayedSongs.length,
+            )
           : -15,
       songs: [
         ...categoryScores.map(
