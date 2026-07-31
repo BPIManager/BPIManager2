@@ -69,19 +69,3 @@ describe("iidxTowerRepo.getLatest", () => {
   });
 });
 
-describe("iidxTowerRepo.getTowerRanking", () => {
-  it("期間・バージョンで絞り込み集計結果を返すこと", async () => {
-    const rows = [{ userId: "user-1", totalCount: 300 }];
-    dbHolder.current = createDbSpy(rows);
-
-    const result = await iidxTowerRepo.getTowerRanking({
-      version: "33",
-      startDate: "2025-06-01",
-      endDate: "2025-06-30",
-    });
-
-    expect(result).toEqual(rows);
-    const whereCalls = callsFor(dbHolder.current.calls, "where");
-    expect(whereCalls[0].args).toEqual(["t.version", "=", "33"]);
-  });
-});

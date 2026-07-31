@@ -3,7 +3,7 @@ import {
   AuthenticatedNextApiRequest,
   withAuth,
 } from "@/middlewares/api/withAuth";
-import { iidxTowerRepo } from "@/lib/db/domains/iidxTower";
+import { iidxTowerAggregateRepo } from "@/lib/db/aggregates/iidxTower";
 import { statsRepo } from "@/lib/db/aggregates/stats";
 import { maskPrivateIdentity } from "@/lib/db/shared/privacyMask";
 import { calculateRadar } from "@/lib/radar/calculator";
@@ -67,7 +67,7 @@ async function handler(
 
   try {
     const [rows, viewerScores] = await Promise.all([
-      iidxTowerRepo.getTowerRanking({ version, startDate, endDate }),
+      iidxTowerAggregateRepo.getTowerRanking({ version, startDate, endDate }),
       statsRepo.getLatestScoresWithMusicData(viewerId, latestVersion),
     ]);
 
