@@ -6,12 +6,14 @@ import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore";
 import { rivalRepo } from "@/lib/db/aggregates/rivalScores/rival";
 import { scoreDetailRepo } from "./detail";
 import { timelineRepo } from "./timeline";
+import { scoreTimelineRepo } from "@/lib/db/aggregates/scoreTimeline";
 import { socialComparisonRepo } from "@/lib/db/aggregates/rivalScores/comparison";
 import { socialTimelineRepo } from "@/lib/db/aggregates/rivalScores/feed";
 
 export { rivalRepo } from "@/lib/db/aggregates/rivalScores/rival";
 export { scoreDetailRepo } from "./detail";
 export { timelineRepo } from "./timeline";
+export { scoreTimelineRepo } from "@/lib/db/aggregates/scoreTimeline";
 export { socialComparisonRepo } from "@/lib/db/aggregates/rivalScores/comparison";
 export { socialTimelineRepo } from "@/lib/db/aggregates/rivalScores/feed";
 
@@ -213,7 +215,8 @@ export const scoresRepo = {
   getScoreHistory: scoreDetailRepo.getScoreHistory.bind(scoreDetailRepo),
 
   // タイムライン・バージョン比較系
-  getTimelineByBatches: timelineRepo.getTimelineByBatches.bind(timelineRepo),
+  getTimelineByBatches:
+    scoreTimelineRepo.getTimelineByBatches.bind(scoreTimelineRepo),
   getBestEverScores: timelineRepo.getBestEverScores.bind(timelineRepo),
   getSelfVersionScores: timelineRepo.getSelfVersionScores.bind(timelineRepo),
 

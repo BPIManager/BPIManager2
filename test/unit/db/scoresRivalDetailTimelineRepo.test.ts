@@ -14,6 +14,7 @@ vi.mock("@/lib/db", () => ({
 const { rivalRepo } = await import("@/lib/db/aggregates/rivalScores/rival");
 const { scoreDetailRepo } = await import("@/lib/db/domains/scores/detail");
 const { timelineRepo } = await import("@/lib/db/domains/scores/timeline");
+const { scoreTimelineRepo } = await import("@/lib/db/aggregates/scoreTimeline");
 
 describe("rivalRepo.getRivalComparisonScores", () => {
   it("limit/offsetが指定された場合のみ適用されること", async () => {
@@ -193,7 +194,7 @@ describe("scoreDetailRepo.getScoreHistory", () => {
   });
 });
 
-describe("timelineRepo.getTimelineByBatches", () => {
+describe("scoreTimelineRepo.getTimelineByBatches", () => {
   it("バッチごとにログをグループ化しtopScoresを構築すること", async () => {
     dbHolder.current = createDbSpy([
       {
@@ -224,7 +225,7 @@ describe("timelineRepo.getTimelineByBatches", () => {
       },
     ]);
 
-    const result = await timelineRepo.getTimelineByBatches({
+    const result = await scoreTimelineRepo.getTimelineByBatches({
       userId: "user-1",
       version: "33",
     });
@@ -256,7 +257,7 @@ describe("timelineRepo.getTimelineByBatches", () => {
       },
     ]);
 
-    const result = await timelineRepo.getTimelineByBatches({
+    const result = await scoreTimelineRepo.getTimelineByBatches({
       userId: "user-1",
       version: "33",
     });
@@ -270,7 +271,7 @@ describe("timelineRepo.getTimelineByBatches", () => {
     // クエリスパイはコールバック引数を実行しないため分岐自体は検証できない。
     // ここでは指定時にクラッシュしないことのみ確認する。
     dbHolder.current = createDbSpy([]);
-    const result = await timelineRepo.getTimelineByBatches({
+    const result = await scoreTimelineRepo.getTimelineByBatches({
       userId: "user-1",
       version: "33",
       since: new Date("2025-06-01"),
