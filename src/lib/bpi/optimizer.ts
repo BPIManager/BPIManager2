@@ -683,9 +683,7 @@ class BpiOptimizer {
    * @returns 次のステップが実行可能かどうか
    */
   private runStep(state: ExecutionState): boolean {
-    const remainingPool = state.candidates.filter(
-      (c) => !state.usedIds.has(c.songId),
-    );
+    const remainingPool = state.candidates;
     if (remainingPool.length === 0) return false;
 
     this.opsBudgetRemaining -= remainingPool.length;
@@ -709,6 +707,12 @@ class BpiOptimizer {
     if (scored.length === 0) return false;
 
     const { song: pickedSong } = this.pickFromPool(scored);
+    const poolSizeBeforePick = remainingPool.length;
+    const pickedIndex = remainingPool.findIndex(
+      (c) => c.songId === pickedSong.songId,
+    );
+    if (pickedIndex !== -1) remainingPool.splice(pickedIndex, 1);
+
     const fromBpi = pickedSong.currentBpi;
     const radarBpi =
       pickedSong.radarCategory != null
@@ -722,7 +726,7 @@ class BpiOptimizer {
     );
 
     const isLastStep =
-      state.steps.length === this.maxSteps - 1 || remainingPool.length === 1;
+      state.steps.length === this.maxSteps - 1 || poolSizeBeforePick === 1;
 
     const theoreticalNextBpi = this.computeTheoreticalBpi(
       pickedSong,
@@ -755,7 +759,6 @@ class BpiOptimizer {
       exGain < BpiOptimizer.MIN_EX_GAIN &&
       actualNextBpi - fromBpi < BpiOptimizer.MIN_BPI_GAIN
     ) {
-      state.usedIds.add(pickedSong.songId);
       return true;
     }
 
@@ -785,7 +788,6 @@ class BpiOptimizer {
     });
 
     state.currentTotalBpi = nextTotalBpi;
-    state.usedIds.add(pickedSong.songId);
 
     return true;
   }
@@ -869,7 +871,6 @@ class BpiOptimizer {
 
     const state: ExecutionState = {
       steps: [],
-      usedIds: new Set<number>(),
       currentAccumulatedSum: initialSum,
       currentTotalBpi: initialTotal,
       carryError: 0,

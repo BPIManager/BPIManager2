@@ -76,7 +76,6 @@ export type ResolvedTarget = {
 
 export type ExecutionState = {
   steps: OptimizationStep[];
-  usedIds: Set<number>;
   currentAccumulatedSum: number;
   currentTotalBpi: number;
   carryError: number;
