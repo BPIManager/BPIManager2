@@ -82,35 +82,34 @@ async function handleLastPlayedBase(
   isOwnLog: boolean,
   type: string = "day",
 ) {
-  const [history, totalSongs, dailyScores, overtaken] = await Promise.all([
-    statsTablesRepo.getScoreHistory(uid, ver, [], []),
-    statsTablesRepo.getTotalSongCount([12], []),
-    type === "day"
-      ? scoreDetailRepo.getScoresByLastPlayedRange(uid, ver, range)
-      : scoreDetailRepo.getScoresWithDetails(uid, ver, { onlyLastPlayedInRange: range }),
-    isOwnLog
-      ? rivalRepo.getOvertakenRivals(uid, ver, {
-          range: { ...range, basis: "lastPlayed" },
-        })
-      : [],
-  ]);
+  const overtakenPromise = isOwnLog
+    ? rivalRepo.getOvertakenRivals(uid, ver, {
+        range: { ...range, basis: "lastPlayed" },
+      })
+    : Promise.resolve([]);
+  const rivalScoresPromise = fetchRivalScoresForOvertaken(
+    overtakenPromise,
+    uid,
+    ver,
+    isOwnLog,
+  );
+
+  const [history, totalSongs, dailyScores, overtaken, rivalScores] =
+    await Promise.all([
+      statsTablesRepo.getScoreHistory(uid, ver, [], []),
+      statsTablesRepo.getTotalSongCount([12], []),
+      type === "day"
+        ? scoreDetailRepo.getScoresByLastPlayedRange(uid, ver, range)
+        : scoreDetailRepo.getScoresWithDetails(uid, ver, { onlyLastPlayedInRange: range }),
+      overtakenPromise,
+      rivalScoresPromise,
+    ]);
 
   if (dailyScores.length === 0) {
     throw new Error("No activity found for this period.");
   }
 
   const overtakenMap = createOvertakenMap(overtaken);
-  const overtakenSongIds = Object.keys(overtakenMap)
-    .map(Number)
-    .filter(Boolean);
-  const rivalScores =
-    isOwnLog && overtakenSongIds.length > 0
-      ? await rivalRepo.getRivalLatestScoresBySong({
-          userId: uid,
-          version: ver,
-          songIds: overtakenSongIds,
-        })
-      : [];
   const rivalRankMap = computeRivalRankMap(overtakenMap, rivalScores);
 
   const timeline = calculateTotalBpi(history, totalSongs, ver, 0);
@@ -185,7 +184,19 @@ async function handleCreatedAtBase(
   );
   if (batches.length === 0) throw new Error("No logs found.");
 
-  const [scores, overtaken] = await Promise.all([
+  const overtakenPromise = isOwnLog
+    ? rivalRepo.getOvertakenRivals(uid, ver, {
+        range: { ...range, basis: "createdAt" },
+      })
+    : Promise.resolve([]);
+  const rivalScoresPromise = fetchRivalScoresForOvertaken(
+    overtakenPromise,
+    uid,
+    ver,
+    isOwnLog,
+  );
+
+  const [scores, overtaken, rivalScores] = await Promise.all([
     type === "day"
       ? scoreDetailRepo.getScoresWithDetails(uid, ver, {
           batchIds: batches.map((b) => b.batchId),
@@ -194,24 +205,10 @@ async function handleCreatedAtBase(
       : scoreDetailRepo.getScoresWithDetails(uid, ver, {
           batchIds: batches.map((b) => b.batchId),
         }),
-    isOwnLog
-      ? rivalRepo.getOvertakenRivals(uid, ver, {
-          range: { ...range, basis: "createdAt" },
-        })
-      : [],
+    overtakenPromise,
+    rivalScoresPromise,
   ]);
   const overtakenMap = createOvertakenMap(overtaken);
-  const overtakenSongIds = Object.keys(overtakenMap)
-    .map(Number)
-    .filter(Boolean);
-  const rivalScores =
-    isOwnLog && overtakenSongIds.length > 0
-      ? await rivalRepo.getRivalLatestScoresBySong({
-          userId: uid,
-          version: ver,
-          songIds: overtakenSongIds,
-        })
-      : [];
   const rivalRankMap = computeRivalRankMap(overtakenMap, rivalScores);
 
   return {
@@ -233,6 +230,33 @@ async function handleCreatedAtBase(
       groupedBy: "createdAt",
     },
   };
+}
+
+/**
+ * 追い抜きライバル取得の完了を待ってから、その楽曲群のライバル最新スコアを取得する。
+ * overtakenPromise 自体は他のクエリと独立なため、呼び出し元でPromise.allに含めることで
+ * history/totalSongs/scores取得と並行させ、直列awaitを避ける。
+ */
+async function fetchRivalScoresForOvertaken(
+  overtakenPromise: Promise<
+    Awaited<ReturnType<typeof rivalRepo.getOvertakenRivals>>
+  >,
+  uid: string,
+  ver: IIDXVersion,
+  isOwnLog: boolean,
+) {
+  const overtaken = await overtakenPromise;
+  const overtakenSongIds = Object.keys(createOvertakenMap(overtaken))
+    .map(Number)
+    .filter(Boolean);
+
+  return isOwnLog && overtakenSongIds.length > 0
+    ? rivalRepo.getRivalLatestScoresBySong({
+        userId: uid,
+        version: ver,
+        songIds: overtakenSongIds,
+      })
+    : [];
 }
 
 export function computeRivalRankMap(
