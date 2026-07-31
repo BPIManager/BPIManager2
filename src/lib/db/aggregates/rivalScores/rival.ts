@@ -255,8 +255,6 @@ class RivalRepository {
    * @param options.range - 期間指定（`start`, `end`, 基準列 `basis`）
    * @param options.batchId - バッチ ID（`range` と排他）
    */
-  // scores(自分/ライバル)・songs・usersを横断JOINした追い抜き検出のため、
-  // 直接クエリを維持する。
   async getOvertakenRivals(
     userId: string,
     version: string,
@@ -271,17 +269,15 @@ class RivalRepository {
 
     let query = db
       .selectFrom("scores as current")
+      .modifyFront(sql`straight_join`)
       .innerJoin("songs as s", "s.songId", "current.songId")
+      .innerJoin("follows as f", (join) => join.on("f.followerId", "=", userId))
+      .innerJoin("users as ru", "ru.userId", "f.followingId")
       .innerJoin("scores as r", (join) =>
         join
           .onRef("r.songId", "=", "current.songId")
           .on("r.version", "=", version)
-          .on("r.userId", "in", (qb) =>
-            qb
-              .selectFrom("follows")
-              .select("followingId")
-              .where("followerId", "=", userId),
-          )
+          .onRef("r.userId", "=", "ru.userId")
           .on("r.logId", "=", (eb) =>
             eb
               .selectFrom("scores as r2")
@@ -292,7 +288,6 @@ class RivalRepository {
               .whereRef(`r2.${timeCol}`, "<", `current.${timeCol}`),
           ),
       )
-      .innerJoin("users as ru", "ru.userId", "r.userId")
       .leftJoin("scores as prevBest", (join) =>
         join
           .onRef("prevBest.songId", "=", "current.songId")
