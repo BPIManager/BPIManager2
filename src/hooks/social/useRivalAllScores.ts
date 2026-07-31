@@ -1,6 +1,5 @@
-import useSWR from "swr";
 import { useUser } from "@/contexts/users/UserContext";
-import { fetcher } from "@/utils/common/fetch";
+import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { SongWithRival } from "@/types/songs/score";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
@@ -21,14 +20,10 @@ export const useRivalBothScores = (
   const { fbUser } = useUser();
   const targetVersion = version || latestVersion;
 
-  const { data, error, isLoading, mutate } = useSWR<SongWithRival[]>(
+  const { data, error, isLoading, mutate } = useAuthedSWR<SongWithRival[]>(
     myUserId && rivalUserId && fbUser
-      ? [
-          `${API_PREFIX}/users/${myUserId}/rivals/${rivalUserId}/scores?version=${targetVersion}`,
-          fbUser,
-        ]
+      ? `${API_PREFIX}/users/${myUserId}/rivals/${rivalUserId}/scores?version=${targetVersion}`
       : null,
-    fetcher,
     {
       revalidateOnFocus: false,
       dedupingInterval: 10000,

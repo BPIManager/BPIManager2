@@ -1,5 +1,4 @@
-﻿import useSWR from "swr";
-import { fetcher } from "@/utils/common/fetch";
+import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
 import { useUser } from "@/contexts/users/UserContext";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import type { RecommendedUser } from "@/types/users/list";
@@ -38,14 +37,10 @@ export const useUserList = (
   searchParams.append("o", order);
   if (seed !== undefined) searchParams.append("seed", seed.toString());
 
-  const { data, error, isLoading, mutate } = useSWR<UserListResponse>(
+  const { data, error, isLoading, mutate } = useAuthedSWR<UserListResponse>(
     fbUser
-      ? [
-          `${API_PREFIX}/users/${fbUser?.uid}/rivals/suggestions?${searchParams.toString()}`,
-          fbUser,
-        ]
+      ? `${API_PREFIX}/users/${fbUser.uid}/rivals/suggestions?${searchParams.toString()}`
       : null,
-    fetcher,
     { revalidateOnFocus: false },
   );
 

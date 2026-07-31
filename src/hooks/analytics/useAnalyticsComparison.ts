@@ -1,5 +1,6 @@
 import useSWR from "swr";
 import { useUser } from "@/contexts/users/UserContext";
+import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
 import { fetcher } from "@/utils/common/fetch";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
@@ -129,30 +130,20 @@ const SCORE_RATE: Record<"aaa" | "max-", number> = {
 };
 
 const useRivalAvgScores = (userId: string | undefined, version: string) => {
-  const { fbUser } = useUser();
-  const { data, error, isLoading } = useSWR<RivalAvgRow[]>(
-    userId && fbUser
-      ? [
-          `${API_PREFIX}/users/${userId}/rivals/following/avg-scores?version=${version}`,
-          fbUser,
-        ]
+  const { data, error, isLoading } = useAuthedSWR<RivalAvgRow[]>(
+    userId
+      ? `${API_PREFIX}/users/${userId}/rivals/following/avg-scores?version=${version}`
       : null,
-    fetcher,
     { revalidateOnFocus: false, dedupingInterval: 10000 },
   );
   return { data, error, isLoading };
 };
 
 const useRivalTopScores = (userId: string | undefined, version: string) => {
-  const { fbUser } = useUser();
-  const { data, error, isLoading } = useSWR<RivalTopRow[]>(
-    userId && fbUser
-      ? [
-          `${API_PREFIX}/users/${userId}/rivals/following/top-scores?version=${version}`,
-          fbUser,
-        ]
+  const { data, error, isLoading } = useAuthedSWR<RivalTopRow[]>(
+    userId
+      ? `${API_PREFIX}/users/${userId}/rivals/following/top-scores?version=${version}`
       : null,
-    fetcher,
     { revalidateOnFocus: false, dedupingInterval: 10000 },
   );
   return { data, error, isLoading };
@@ -202,14 +193,10 @@ export const useAnalyticsComparison = (
     data: rivalData,
     error: rivalError,
     isLoading: rivalLoading,
-  } = useSWR<SongWithRival[]>(
+  } = useAuthedSWR<SongWithRival[]>(
     target?.kind === "rival" && myUserId && target.param && fbUser
-      ? [
-          `${API_PREFIX}/users/${myUserId}/rivals/${target.param}/scores?version=${targetVersion}`,
-          fbUser,
-        ]
+      ? `${API_PREFIX}/users/${myUserId}/rivals/${target.param}/scores?version=${targetVersion}`
       : null,
-    fetcher,
     { revalidateOnFocus: false, dedupingInterval: 10000 },
   );
 
@@ -217,14 +204,10 @@ export const useAnalyticsComparison = (
     data: selfVersionData,
     error: selfVersionError,
     isLoading: selfVersionLoading,
-  } = useSWR<SongWithRival[]>(
+  } = useAuthedSWR<SongWithRival[]>(
     target?.kind === "self-version" && myUserId && target.param && fbUser
-      ? [
-          `${API_PREFIX}/users/${myUserId}/scores/self-version?currentVersion=${targetVersion}&targetVersion=${target.param}`,
-          fbUser,
-        ]
+      ? `${API_PREFIX}/users/${myUserId}/scores/self-version?currentVersion=${targetVersion}&targetVersion=${target.param}`
       : null,
-    fetcher,
     { revalidateOnFocus: false, dedupingInterval: 10000 },
   );
 
@@ -236,14 +219,10 @@ export const useAnalyticsComparison = (
     data: bestEverData,
     error: bestEverError,
     isLoading: bestEverLoading,
-  } = useSWR<BestEverRow[]>(
+  } = useAuthedSWR<BestEverRow[]>(
     needsBestEver && myUserId && fbUser
-      ? [
-          `${API_PREFIX}/users/${myUserId}/scores/best-ever?currentVersion=${targetVersion}&excludeCurrent=${excludeCurrent}`,
-          fbUser,
-        ]
+      ? `${API_PREFIX}/users/${myUserId}/scores/best-ever?currentVersion=${targetVersion}&excludeCurrent=${excludeCurrent}`
       : null,
-    fetcher,
     { revalidateOnFocus: false, dedupingInterval: 10000 },
   );
 
@@ -260,14 +239,10 @@ export const useAnalyticsComparison = (
     data: myScores,
     error: myError,
     isLoading: myLoading,
-  } = useSWR<SongWithScore[]>(
+  } = useAuthedSWR<SongWithScore[]>(
     needsMyScores && myUserId && fbUser
-      ? [
-          `${API_PREFIX}/users/${myUserId}/scores?version=${targetVersion}`,
-          fbUser,
-        ]
+      ? `${API_PREFIX}/users/${myUserId}/scores?version=${targetVersion}`
       : null,
-    fetcher,
     { revalidateOnFocus: false, dedupingInterval: 10000 },
   );
 

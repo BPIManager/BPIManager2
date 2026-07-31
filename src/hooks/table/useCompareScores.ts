@@ -1,7 +1,5 @@
-﻿import useSWR from "swr";
 import { SongWithScore } from "@/types/songs/score";
-import { useUser } from "@/contexts/users/UserContext";
-import { fetcher } from "@/utils/common/fetch";
+import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 
 /**
@@ -18,8 +16,6 @@ export const useCompareScores = (
   currentVersion: string | undefined,
   compareVersion: string | undefined,
 ) => {
-  const { fbUser } = useUser();
-
   const shouldFetch =
     !!userId &&
     !!currentVersion &&
@@ -27,14 +23,10 @@ export const useCompareScores = (
     compareVersion !== "none" &&
     compareVersion !== currentVersion;
 
-  const { data, error, isLoading } = useSWR<SongWithScore[]>(
+  const { data, error, isLoading } = useAuthedSWR<SongWithScore[]>(
     shouldFetch
-      ? [
-          `${API_PREFIX}/users/${userId}/scores/self-version?currentVersion=${currentVersion}&targetVersion=${compareVersion}`,
-          fbUser,
-        ]
+      ? `${API_PREFIX}/users/${userId}/scores/self-version?currentVersion=${currentVersion}&targetVersion=${compareVersion}`
       : null,
-    fetcher,
     {
       revalidateOnFocus: false,
       dedupingInterval: 30000,

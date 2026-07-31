@@ -1,8 +1,6 @@
-import useSWR from "swr";
 import { SongWithScore } from "@/types/songs/score";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
-import { useUser } from "@/contexts/users/UserContext";
-import { fetcher } from "@/utils/common/fetch";
+import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 
 /**
@@ -17,16 +15,11 @@ export const useUnplayedScores = (
   version?: string,
 ) => {
   const targetVersion = version || latestVersion;
-  const { fbUser } = useUser();
 
-  const { data, error, isLoading, mutate } = useSWR<SongWithScore[]>(
+  const { data, error, isLoading, mutate } = useAuthedSWR<SongWithScore[]>(
     userId
-      ? [
-          `${API_PREFIX}/users/${userId}/scores/unplayed?version=${targetVersion}`,
-          fbUser,
-        ]
+      ? `${API_PREFIX}/users/${userId}/scores/unplayed?version=${targetVersion}`
       : null,
-    fetcher,
     {
       revalidateOnFocus: false,
       dedupingInterval: 10000,

@@ -1,6 +1,4 @@
-﻿import useSWR from "swr";
-import { useUser } from "@/contexts/users/UserContext";
-import { fetcher } from "@/utils/common/fetch";
+import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 
 export interface TotalBpiStats {
@@ -18,20 +16,15 @@ export const useTotalBpiStats = (
   version: string,
   asOf?: string,
 ) => {
-  const { fbUser } = useUser();
-
   const params = new URLSearchParams({ version });
   if (asOf) params.set("asOf", asOf);
 
-  const key =
+  const url =
     userId && version
-      ? [
-          `${API_PREFIX}/users/${userId}/stats/totalBpi?${params.toString()}`,
-          fbUser,
-        ]
+      ? `${API_PREFIX}/users/${userId}/stats/totalBpi?${params.toString()}`
       : null;
 
-  const { data, error, isLoading } = useSWR<TotalBpiStats>(key, fetcher);
+  const { data, error, isLoading } = useAuthedSWR<TotalBpiStats>(url);
   return { stats: data, isLoading, isError: error };
 };
 
@@ -39,16 +32,11 @@ export const useActiveDates = (
   userId: string | undefined,
   version: string,
 ) => {
-  const { fbUser } = useUser();
-
-  const key =
+  const url =
     userId && version
-      ? [
-          `${API_PREFIX}/users/${userId}/stats/activeDates?version=${version}`,
-          fbUser,
-        ]
+      ? `${API_PREFIX}/users/${userId}/stats/activeDates?version=${version}`
       : null;
 
-  const { data, isLoading } = useSWR<string[]>(key, fetcher);
+  const { data, isLoading } = useAuthedSWR<string[]>(url);
   return { dates: data ?? [], isLoading };
 };

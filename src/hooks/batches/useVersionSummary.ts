@@ -1,7 +1,5 @@
-﻿import { API_PREFIX } from "@/constants/logic/apiEndpoints";
-import { useUser } from "@/contexts/users/UserContext";
-import { fetcher } from "@/utils/common/fetch";
-import useSWR from "swr";
+import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
 import type { BatchDetailItem } from "@/types/logs/batchDetail";
 
 export interface VersionSummaryResponse {
@@ -15,16 +13,10 @@ export const useVersionSummary = (
   userId: string | undefined,
   version: string | undefined,
 ) => {
-  const { fbUser } = useUser();
-
-  const { data, error, isLoading } = useSWR<VersionSummaryResponse>(
+  const { data, error, isLoading } = useAuthedSWR<VersionSummaryResponse>(
     userId && version
-      ? [
-          `${API_PREFIX}/users/${userId}/batches/version-summary?version=${version}`,
-          fbUser,
-        ]
+      ? `${API_PREFIX}/users/${userId}/batches/version-summary?version=${version}`
       : null,
-    fetcher,
     { revalidateOnFocus: false },
   );
 

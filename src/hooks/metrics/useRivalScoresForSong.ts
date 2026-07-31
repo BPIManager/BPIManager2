@@ -1,8 +1,7 @@
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { useUser } from "@/contexts/users/UserContext";
-import { fetcher } from "@/utils/common/fetch";
-import useSWR from "swr";
+import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
 
 type RivalAvgRow = { songId: number; avgExScore: number | null };
 type RivalTopRow = { songId: number; topExScore: number | null };
@@ -16,33 +15,23 @@ export const useRivalScoresForSong = (
   songId: number | null,
   enabled = false,
 ) => {
-  const { user, fbUser } = useUser();
+  const { user } = useUser();
   const userId = user?.userId;
 
   const shouldFetch = enabled && userId != null && songId != null;
 
-  const avgKey = shouldFetch
-    ? [
-        `${API_PREFIX}/users/${userId}/rivals/following/avg-scores?version=${latestVersion}&songIds=${songId}`,
-        fbUser,
-      ]
+  const avgUrl = shouldFetch
+    ? `${API_PREFIX}/users/${userId}/rivals/following/avg-scores?version=${latestVersion}&songIds=${songId}`
     : null;
 
-  const topKey = shouldFetch
-    ? [
-        `${API_PREFIX}/users/${userId}/rivals/following/top-scores?version=${latestVersion}&songIds=${songId}`,
-        fbUser,
-      ]
+  const topUrl = shouldFetch
+    ? `${API_PREFIX}/users/${userId}/rivals/following/top-scores?version=${latestVersion}&songIds=${songId}`
     : null;
 
-  const { data: avgData, isLoading: avgLoading } = useSWR<RivalAvgRow[]>(
-    avgKey,
-    fetcher,
-  );
-  const { data: topData, isLoading: topLoading } = useSWR<RivalTopRow[]>(
-    topKey,
-    fetcher,
-  );
+  const { data: avgData, isLoading: avgLoading } =
+    useAuthedSWR<RivalAvgRow[]>(avgUrl);
+  const { data: topData, isLoading: topLoading } =
+    useAuthedSWR<RivalTopRow[]>(topUrl);
 
   const rawAvg = avgData?.find((r) => r.songId === songId)?.avgExScore ?? null;
   const rawTop = topData?.find((r) => r.songId === songId)?.topExScore ?? null;
