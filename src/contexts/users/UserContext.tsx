@@ -39,10 +39,8 @@ const authenticatedFetcher = async (url: string) => {
 
 export const UserProvider = ({
   children,
-  previewUserId,
 }: {
   children: React.ReactNode;
-  previewUserId?: string;
 }) => {
   const [fbUser, setFbUser] = useState<FirebaseUser | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
@@ -79,14 +77,7 @@ export const UserProvider = ({
         isLoading: combinedLoading,
         error,
         refresh: mutate,
-        fbUser:
-          fbUser && previewUserId
-            ? Object.assign(
-                Object.create(Object.getPrototypeOf(fbUser)),
-                fbUser,
-                { uid: previewUserId },
-              )
-            : fbUser,
+        fbUser,
       }}
     >
       {children}
