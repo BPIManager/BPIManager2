@@ -231,6 +231,19 @@ export class NotificationsRepository {
       .where("userId", "=", userId)
       .execute();
   }
+
+  /**
+   * バックアップ用にユーザーの通知既読状態レコードを取得する。
+   *
+   * @param userId - ユーザー ID
+   */
+  async getAllForUser(userId: string) {
+    return await db
+      .selectFrom("notifications")
+      .selectAll()
+      .where("userId", "=", userId)
+      .execute();
+  }
 }
 
 export const notificationsRepo = new NotificationsRepository();

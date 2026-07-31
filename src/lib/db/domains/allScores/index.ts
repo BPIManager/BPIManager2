@@ -308,6 +308,19 @@ class allScoresRepository {
   async deleteByUser(trx: Transaction<Database>, userId: string) {
     await trx.deleteFrom("allScores").where("userId", "=", userId).execute();
   }
+
+  /**
+   * バックアップ用にユーザーの全難易度スコアレコードを取得する。
+   *
+   * @param userId - ユーザー ID
+   */
+  async getAllForUser(userId: string) {
+    return await db
+      .selectFrom("allScores")
+      .selectAll()
+      .where("userId", "=", userId)
+      .execute();
+  }
 }
 
 export const allScoresRepo = new allScoresRepository();

@@ -40,6 +40,19 @@ class ApiKeysRepository {
   async deleteByUser(trx: Transaction<Database>, userId: string) {
     await trx.deleteFrom("apiKeys").where("userId", "=", userId).execute();
   }
+
+  /**
+   * バックアップ用にユーザーのAPIキーレコードを取得する。
+   *
+   * @param userId - ユーザー ID
+   */
+  async getAllForUser(userId: string) {
+    return await db
+      .selectFrom("apiKeys")
+      .selectAll()
+      .where("userId", "=", userId)
+      .execute();
+  }
 }
 
 export const apiKeysRepo = new ApiKeysRepository();

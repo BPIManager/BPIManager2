@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { usersRepo } from "@/lib/db/domains/users";
 import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
 import { scoresRepo } from "@/lib/db/domains/scores";
 import { allScoresRepo } from "@/lib/db/domains/allScores";
@@ -30,47 +31,17 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
     allScores,
     discordLinks,
   ] = await Promise.all([
-    db.selectFrom("users").selectAll().where("userId", "=", userId).execute(),
-    db
-      .selectFrom("follows")
-      .selectAll()
-      .where((eb) =>
-        eb.or([eb("followerId", "=", userId), eb("followingId", "=", userId)]),
-      )
-      .execute(),
-    db.selectFrom("scores").selectAll().where("userId", "=", userId).execute(),
-    db.selectFrom("logs").selectAll().where("userId", "=", userId).execute(),
-    db
-      .selectFrom("userRadarCache")
-      .selectAll()
-      .where("userId", "=", userId)
-      .execute(),
-    db
-      .selectFrom("notifications")
-      .selectAll()
-      .where("userId", "=", userId)
-      .execute(),
-    db
-      .selectFrom("userStatusLogs")
-      .selectAll()
-      .where("userId", "=", userId)
-      .execute(),
-    db
-      .selectFrom("userRoles")
-      .selectAll()
-      .where("userId", "=", userId)
-      .execute(),
-    db.selectFrom("apiKeys").selectAll().where("userId", "=", userId).execute(),
-    db
-      .selectFrom("allScores")
-      .selectAll()
-      .where("userId", "=", userId)
-      .execute(),
-    db
-      .selectFrom("discordLinks")
-      .selectAll()
-      .where("userId", "=", userId)
-      .execute(),
+    usersRepo.getAllForUser(userId),
+    followsRepo.getAllForUser(userId),
+    scoresRepo.getAllForUser(userId),
+    navigationRepo.getAllForUser(userId),
+    radarCacheRepo.getAllForUser(userId),
+    notificationsRepo.getAllForUser(userId),
+    userStatusLogsRepo.getAllForUser(userId),
+    discordLinksRepo.getRolesForUser(userId),
+    apiKeysRepo.getAllForUser(userId),
+    allScoresRepo.getAllForUser(userId),
+    discordLinksRepo.getLinksForUser(userId),
   ]);
 
   // apiKeys.key は秘密情報のため、バックアップには残さずレコードの存在のみ記録する
@@ -103,8 +74,9 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
   );
 
   // 3. FK制約を考慮した順序で物理削除(トランザクション)。
-  // このオーケストレーターは各ドメインリポジトリのdeleteByUserメソッドを
-  // 呼び出す役に徹し、他ドメインが所有するテーブルへ直接クエリを発行しない。
+  // このオーケストレーターは各ドメインリポジトリのdeleteByUser/getAllForUser
+  // メソッドを呼び出す役に徹し、他ドメインが所有するテーブルへ直接クエリを
+  // 発行しない(usersテーブル自身の削除を除く。関連: #164)。
   await db.transaction().execute(async (trx) => {
     // allScores: FK to logs(SET NULL), users(CASCADE)
     await allScoresRepo.deleteByUser(trx, userId);

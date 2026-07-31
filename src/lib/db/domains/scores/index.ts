@@ -64,6 +64,19 @@ class ScoresRepository {
   }
 
   /**
+   * バックアップ用にユーザーの全スコアレコードを取得する。
+   *
+   * @param userId - ユーザー ID
+   */
+  async getAllForUser(userId: string) {
+    return await db
+      .selectFrom("scores")
+      .selectAll()
+      .where("userId", "=", userId)
+      .execute();
+  }
+
+  /**
    * 指定バージョンより前で、直近にスコア登録のあるバージョンを取得する。
    *
    * @param userId - ユーザー ID
@@ -372,6 +385,7 @@ export const scoresRepo = {
   insert: scoresCoreRepo.insert.bind(scoresCoreRepo),
   deleteByBatch: scoresCoreRepo.deleteByBatch.bind(scoresCoreRepo),
   deleteByUser: scoresCoreRepo.deleteByUser.bind(scoresCoreRepo),
+  getAllForUser: scoresCoreRepo.getAllForUser.bind(scoresCoreRepo),
   getPreviousVersionWithScores:
     scoresCoreRepo.getPreviousVersionWithScores.bind(scoresCoreRepo),
   getLatestScores: scoresCoreRepo.getLatestScores.bind(scoresCoreRepo),

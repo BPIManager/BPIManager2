@@ -80,6 +80,32 @@ class DiscordLinksRepository {
   async deleteRoleByUser(trx: Transaction<Database>, userId: string) {
     await trx.deleteFrom("userRoles").where("userId", "=", userId).execute();
   }
+
+  /**
+   * バックアップ用にユーザーのロールレコードを取得する。
+   *
+   * @param userId - ユーザー ID
+   */
+  async getRolesForUser(userId: string) {
+    return await db
+      .selectFrom("userRoles")
+      .selectAll()
+      .where("userId", "=", userId)
+      .execute();
+  }
+
+  /**
+   * バックアップ用にユーザーのDiscord連携レコードを取得する。
+   *
+   * @param userId - ユーザー ID
+   */
+  async getLinksForUser(userId: string) {
+    return await db
+      .selectFrom("discordLinks")
+      .selectAll()
+      .where("userId", "=", userId)
+      .execute();
+  }
 }
 
 export const discordLinksRepo = new DiscordLinksRepository();

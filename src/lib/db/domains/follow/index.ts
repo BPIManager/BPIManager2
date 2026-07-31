@@ -224,6 +224,21 @@ class FollowRepository {
   }
 
   /**
+   * バックアップ用に、ユーザーが関わる全フォロー関係（フォロー・被フォロー双方）を取得する。
+   *
+   * @param userId - ユーザー ID
+   */
+  async getAllForUser(userId: string) {
+    return await db
+      .selectFrom("follows")
+      .selectAll()
+      .where((eb) =>
+        eb.or([eb("followerId", "=", userId), eb("followingId", "=", userId)]),
+      )
+      .execute();
+  }
+
+  /**
    * ユーザーが関わる全フォロー関係（フォロー・被フォロー双方）を削除する。
    *
    * @param trx - 呼び出し元が管理するトランザクション

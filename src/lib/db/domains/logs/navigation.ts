@@ -155,6 +155,19 @@ class LogNavigationRepository {
   }
 
   /**
+   * バックアップ用にユーザーの全ログレコードを取得する。
+   *
+   * @param userId - ユーザー ID
+   */
+  async getAllForUser(userId: string) {
+    return await db
+      .selectFrom("logs")
+      .selectAll()
+      .where("userId", "=", userId)
+      .execute();
+  }
+
+  /**
    * ログレコードを1件以上挿入する。
    *
    * @param trx - 呼び出し元が管理するトランザクション

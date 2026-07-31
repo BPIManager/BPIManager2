@@ -138,6 +138,19 @@ class UsersRepository {
     const result = await query.executeTakeFirst();
     return Number(result?.count ?? 0);
   }
+
+  /**
+   * バックアップ用にユーザーレコードを取得する（`userId` は一意のため0または1件）。
+   *
+   * @param userId - ユーザー ID
+   */
+  async getAllForUser(userId: string) {
+    return await db
+      .selectFrom("users")
+      .selectAll()
+      .where("userId", "=", userId)
+      .execute();
+  }
 }
 
 export const usersRepo = new UsersRepository();

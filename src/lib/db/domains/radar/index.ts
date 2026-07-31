@@ -1,3 +1,4 @@
+import { db } from "@/lib/db";
 import { Database } from "@/types/db";
 import { Transaction } from "kysely";
 
@@ -14,6 +15,19 @@ class RadarCacheRepository {
   async deleteByUser(trx: Transaction<Database>, userId: string) {
     await trx
       .deleteFrom("userRadarCache")
+      .where("userId", "=", userId)
+      .execute();
+  }
+
+  /**
+   * バックアップ用にユーザーのレーダーキャッシュレコードを取得する。
+   *
+   * @param userId - ユーザー ID
+   */
+  async getAllForUser(userId: string) {
+    return await db
+      .selectFrom("userRadarCache")
+      .selectAll()
       .where("userId", "=", userId)
       .execute();
   }
