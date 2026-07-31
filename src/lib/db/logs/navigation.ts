@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { scoresRepo } from "../scores";
 import { allScoresRepo } from "../allScores";
 import { userStatusLogsRepo } from "../userStatusLogs";
+import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 
 /**
  * スコアログの日付ナビゲーション・バッチ検索を担当するリポジトリクラス。
@@ -184,9 +185,7 @@ class LogNavigationRepository {
     userId: string,
     currentVersion: string,
   ): Promise<string | null> {
-    const versionsOrder = [
-      "26", "27", "28", "29", "30", "31", "32", "33", "INF",
-    ];
+    const versionsOrder: readonly string[] = IIDX_VERSIONS;
     const currentIdx = versionsOrder.indexOf(currentVersion);
     if (currentIdx <= 0) return null;
 

@@ -73,7 +73,7 @@ export async function generateArenaJson() {
   for (const v of versions) {
     for (const level of LEVELS) {
       const filePath = path.join(OUTPUT_DIR, `${v}_${level}.json`);
-      const isLatest = Number(v) > 32;
+      const isLatest = Number(v) >= Number(latestVersion);
 
       if (!isLatest) {
         try {
