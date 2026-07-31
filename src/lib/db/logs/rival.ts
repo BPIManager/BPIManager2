@@ -159,6 +159,7 @@ class RivalRepository {
               .selectFrom("scores as v2")
               .select((s) => s.fn.max("logId").as("m"))
               .where("v2.userId", "=", userId)
+              .where("v2.version", "=", version)
               .whereRef("v2.songId", "=", "s.songId"),
           ),
       )
@@ -177,6 +178,7 @@ class RivalRepository {
               .selectFrom("scores as r2")
               .select((s) => s.fn.max("logId").as("m"))
               .whereRef("r2.userId", "=", "r.userId")
+              .where("r2.version", "=", version)
               .whereRef("r2.songId", "=", "s.songId"),
           ),
       )
@@ -281,6 +283,7 @@ class RivalRepository {
               .selectFrom("scores as r2")
               .select((s) => s.fn.max("logId").as("m"))
               .whereRef("r2.userId", "=", "r.userId")
+              .where("r2.version", "=", version)
               .whereRef("r2.songId", "=", "current.songId")
               .whereRef(`r2.${timeCol}`, "<", `current.${timeCol}`),
           ),
@@ -296,6 +299,7 @@ class RivalRepository {
               .selectFrom("scores as pb")
               .select((s) => s.fn.max("logId").as("m"))
               .where("pb.userId", "=", userId)
+              .where("pb.version", "=", version)
               .whereRef("pb.songId", "=", "current.songId")
               .whereRef(`pb.${timeCol}`, "<", `current.${timeCol}`),
           ),
