@@ -1,6 +1,6 @@
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { calculateRadar } from "@/lib/radar/calculator";
-import { statsRepo } from "@/lib/db/aggregates/stats";
+import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { NextApiRequest, NextApiResponse } from "next";
 import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
 
@@ -19,13 +19,13 @@ export default async function handler(
     if (!access.hasAccess) return rejectAccess(res, access);
 
     const [scores, validSongKeys] = await Promise.all([
-      statsRepo.getLatestScoresWithMusicData(
+      statsTablesRepo.getLatestScoresWithMusicData(
         userId,
         version,
         levels,
         difficulties,
       ),
-      statsRepo.getFilteredSongKeys(version, levels, difficulties),
+      statsTablesRepo.getFilteredSongKeys(version, levels, difficulties),
     ]);
 
     return res.status(200).json(calculateRadar(scores, validSongKeys));

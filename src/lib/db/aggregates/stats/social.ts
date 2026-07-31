@@ -3,8 +3,7 @@ import { latestLogIdPerSongSubquery, latestLogIdPerUserSongSubquery } from "@/li
 import { logsRepo } from "@/lib/db/domains/logs";
 
 /**
- * 統計ダッシュボード向けの近傍ユーザー比較を担当するリポジトリクラス
- * （#182で`stats/index.ts`から分割）。
+ * 統計ダッシュボード向けの近傍ユーザー比較を担当するリポジトリクラス。
  */
 class StatsSocialRepository {
   async getNeighborIds(

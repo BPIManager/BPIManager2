@@ -1,11 +1,11 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import dayjs from "@/lib/dayjs";
-import { statsRepo } from "@/lib/db/aggregates/stats";
+import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { rivalRepo } from "@/lib/db/aggregates/rivalScores/rival";
 import { BpiCalculator } from "@/lib/bpi";
 import { dashboardSchema } from "@/lib/mcp/schemas";
 
-type HistoryRow = Awaited<ReturnType<typeof statsRepo.getScoreHistory>>[number];
+type HistoryRow = Awaited<ReturnType<typeof statsTablesRepo.getScoreHistory>>[number];
 
 function toJSTDateStr(date: Date | string) {
   return dayjs(date).tz().format("YYYY-MM-DD");
@@ -97,10 +97,10 @@ export function registerGetMyDashboard(server: McpServer, userId: string) {
 
       const [canonicalHistory, canonicalCount, filteredHistory, filteredCount, closeRivalRows] =
         await Promise.all([
-          statsRepo.getScoreHistory(userId, version, [12], []),
-          statsRepo.getTotalSongCount([12], []),
-          statsRepo.getScoreHistory(userId, version, numericLevels, difficulties),
-          statsRepo.getTotalSongCount(numericLevels, difficulties),
+          statsTablesRepo.getScoreHistory(userId, version, [12], []),
+          statsTablesRepo.getTotalSongCount([12], []),
+          statsTablesRepo.getScoreHistory(userId, version, numericLevels, difficulties),
+          statsTablesRepo.getTotalSongCount(numericLevels, difficulties),
           rivalRepo.getScoreComparisonList({
             userId,
             version,

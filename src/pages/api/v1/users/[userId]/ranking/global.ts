@@ -4,7 +4,7 @@ import {
   withAuth,
 } from "@/middlewares/api/withAuth";
 import { userRankingRepo } from "@/lib/db/aggregates/userProfiles/ranking";
-import { statsRepo } from "@/lib/db/aggregates/stats";
+import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { calculateRadar } from "@/lib/radar/calculator";
 import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import { v4 as uuidv4 } from "uuid";
@@ -71,7 +71,7 @@ async function handler(
         effectiveFilterArea,
         effectiveFilterArenaClass,
       ),
-      statsRepo.getLatestScoresWithMusicData(viewerId, latestVersion),
+      statsTablesRepo.getLatestScoresWithMusicData(viewerId, latestVersion),
     ]);
 
     const viewerRadar = calculateRadar(viewerScores);

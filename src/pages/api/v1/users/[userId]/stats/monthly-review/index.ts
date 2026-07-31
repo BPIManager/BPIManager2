@@ -1,5 +1,5 @@
 import { monthlyReviewRepo } from "@/lib/db/aggregates/monthly-review";
-import { statsRepo } from "@/lib/db/aggregates/stats";
+import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import dayjs from "@/lib/dayjs";
 import {
   AuthenticatedNextApiRequest,
@@ -106,7 +106,7 @@ async function handler(
         monthStart,
         monthEnd,
       ),
-      statsRepo.getTotalSongCount([12], [...L12_DIFFICULTIES]),
+      statsTablesRepo.getTotalSongCount([12], [...L12_DIFFICULTIES]),
       monthlyReviewRepo.getPreMonthBpiStateForUsers(
         [viewerId],
         version,

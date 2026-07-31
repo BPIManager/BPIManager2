@@ -5,7 +5,7 @@ import {
 } from "@/middlewares/api/withAuth";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { calculateRadar } from "@/lib/radar/calculator";
-import { statsRepo } from "@/lib/db/aggregates/stats";
+import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { logsRepo } from "@/lib/db/domains/logs";
 import { userDiscoveryRepo } from "@/lib/db/aggregates/userProfiles/discovery";
 
@@ -28,7 +28,7 @@ async function handler(
   try {
     const version = latestVersion;
 
-    const viewerScores = await statsRepo.getLatestScoresWithMusicData(
+    const viewerScores = await statsTablesRepo.getLatestScoresWithMusicData(
       viewerId,
       version,
     );

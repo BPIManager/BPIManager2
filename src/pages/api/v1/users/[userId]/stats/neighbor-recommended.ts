@@ -1,4 +1,5 @@
-import { statsRepo } from "@/lib/db/aggregates/stats";
+import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
+import { statsSocialRepo } from "@/lib/db/aggregates/stats/social";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
 import { neighborRecommendedParamsSchema } from "@/schemas/stats/neighborRecommended";
@@ -22,15 +23,18 @@ export default async function handler(
     const access = await checkUserAccess(req, userId);
     if (!access.hasAccess) return rejectAccess(res, access);
 
-    const userTotalBpi = await statsRepo.getLatestTotalBpi(userId, version);
-    const neighborIds = await statsRepo.getNeighborIds(
+    const userTotalBpi = await statsTablesRepo.getLatestTotalBpi(
+      userId,
+      version,
+    );
+    const neighborIds = await statsSocialRepo.getNeighborIds(
       userTotalBpi,
       userId,
       version,
       n,
     );
 
-    const scores = await statsRepo.getNeighborScoreComparison(
+    const scores = await statsSocialRepo.getNeighborScoreComparison(
       userId,
       neighborIds,
       version,

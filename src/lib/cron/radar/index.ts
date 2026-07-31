@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { calculateRadar } from "@/lib/radar/calculator";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { BpiCalculator } from "@/lib/bpi";
-import { statsRepo } from "@/lib/db/aggregates/stats";
+import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 
 /** 同時に処理するユーザー数の上限。DB・イベントループへの負荷とジョブ実行時間のバランスを取る。 */
 const CONCURRENCY = 10;
@@ -49,7 +49,7 @@ export async function updateAllUserRadarCache() {
 
   await runWithConcurrency(users, CONCURRENCY, async (user) => {
     try {
-      const scores = await statsRepo.getLatestScoresWithMusicData(
+      const scores = await statsTablesRepo.getLatestScoresWithMusicData(
         user.userId,
         version,
       );

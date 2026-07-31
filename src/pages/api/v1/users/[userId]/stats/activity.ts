@@ -1,4 +1,4 @@
-import { statsRepo } from "@/lib/db/aggregates/stats";
+import { statsChartsRepo } from "@/lib/db/aggregates/stats/charts";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
 import { NextApiRequest, NextApiResponse } from "next";
@@ -19,7 +19,7 @@ export default async function handler(
     const access = await checkUserAccess(req, userId);
     if (!access.hasAccess) return rejectAccess(res, access);
 
-    const activity = await statsRepo.getActivityData(
+    const activity = await statsChartsRepo.getActivityData(
       userId,
       version,
       levels,

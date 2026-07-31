@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
-import { statsRepo } from "@/lib/db/aggregates/stats";
+import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 
 export default async function handler(
@@ -22,7 +22,7 @@ export default async function handler(
     : latestVersion;
 
   try {
-    const result = await statsRepo.getSongRanking(
+    const result = await statsTablesRepo.getSongRanking(
       songIdNum,
       version,
       access.user!.userId,

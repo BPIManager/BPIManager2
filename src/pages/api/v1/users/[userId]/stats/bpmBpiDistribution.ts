@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
-import { statsRepo } from "@/lib/db/aggregates/stats";
+import { statsChartsRepo } from "@/lib/db/aggregates/stats/charts";
 import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
 import { BpiCalculator } from "@/lib/bpi";
 
@@ -36,7 +36,7 @@ export default async function handler(
     const access = await checkUserAccess(req, userId);
     if (!access.hasAccess) return rejectAccess(res, access);
 
-    const songs = await statsRepo.getSongsWithUserBpiForBpmDistribution(
+    const songs = await statsChartsRepo.getSongsWithUserBpiForBpmDistribution(
       userId,
       version,
       levels.length > 0 ? levels : undefined,

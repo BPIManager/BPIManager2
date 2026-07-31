@@ -1,4 +1,4 @@
-import { statsRepo } from "@/lib/db/aggregates/stats";
+import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
 import { recommendedParamsSchema } from "@/schemas/stats/recommended";
@@ -22,9 +22,9 @@ export default async function handler(
     const access = await checkUserAccess(req, userId);
     if (!access.hasAccess) return rejectAccess(res, access);
 
-    const totalBpi = await statsRepo.getLatestTotalBpi(userId, version);
+    const totalBpi = await statsTablesRepo.getLatestTotalBpi(userId, version);
 
-    const allScores = await statsRepo.getLatestScoresWithMusicData(
+    const allScores = await statsTablesRepo.getLatestScoresWithMusicData(
       userId,
       version,
       levels,

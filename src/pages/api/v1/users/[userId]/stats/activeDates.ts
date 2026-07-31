@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { statsRepo } from "@/lib/db/aggregates/stats";
+import { statsChartsRepo } from "@/lib/db/aggregates/stats/charts";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { activeDatesSchema } from "@/schemas/stats/activeDates";
 import { parseQuery } from "@/services/nextRequest/parseBody";
@@ -19,7 +19,7 @@ export default async function handler(
 
     switch (req.method) {
       case "GET": {
-        const activity = await statsRepo.getActivityData(userId, version, [12]);
+        const activity = await statsChartsRepo.getActivityData(userId, version, [12]);
         const dates = activity
           .filter((d) => Number(d.count) > 0)
           .map((d) => d.date);

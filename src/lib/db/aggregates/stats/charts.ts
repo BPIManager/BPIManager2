@@ -4,8 +4,7 @@ import { sql } from "kysely";
 
 /**
  * 統計ダッシュボード向けのチャート用データ（活動ヒートマップ・BPM分布・
- * BPI/プレイ数の日次推移等）を担当するリポジトリクラス
- * （#182で`stats/index.ts`から分割）。
+ * BPI/プレイ数の日次推移等）を担当するリポジトリクラス。
  */
 class StatsChartsRepository {
   // scores・songsを横断JOINした日別プレイ数集計のため、直接クエリを維持する。

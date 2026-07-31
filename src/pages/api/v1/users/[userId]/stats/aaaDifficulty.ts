@@ -1,5 +1,5 @@
 import { BpiCalculator } from "@/lib/bpi";
-import { statsRepo } from "@/lib/db/aggregates/stats";
+import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { aaaDifficultySchema } from "@/schemas/stats/aaaDifficulty";
 import { parseQuery } from "@/services/nextRequest/parseBody";
@@ -20,7 +20,7 @@ export default async function handler(
       if (!access.hasAccess) return rejectAccess(res, access);
     }
 
-    const rawData = await statsRepo.getAAATableData(userId, version, level);
+    const rawData = await statsTablesRepo.getAAATableData(userId, version, level);
 
     const result = rawData.map((song) => {
       const maxScore = song.notes * 2;

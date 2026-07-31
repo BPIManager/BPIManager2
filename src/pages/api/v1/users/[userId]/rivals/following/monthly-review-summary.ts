@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { checkUserAccess } from "@/middlewares/api/withApi";
 import { db } from "@/lib/db";
 import { monthlyReviewRepo } from "@/lib/db/aggregates/monthly-review";
-import { statsRepo } from "@/lib/db/aggregates/stats";
+import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { buildBpiTimeline } from "@/lib/monthly-review/bpi";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 import dayjs from "@/lib/dayjs";
@@ -61,7 +61,7 @@ export default async function handler(
         monthStart,
         monthEnd,
       ),
-      statsRepo.getTotalSongCount([12], [...IIDX_DIFFICULTIES]),
+      statsTablesRepo.getTotalSongCount([12], [...IIDX_DIFFICULTIES]),
     ]);
 
     const preByUser = new Map<string, Map<number, number>>();

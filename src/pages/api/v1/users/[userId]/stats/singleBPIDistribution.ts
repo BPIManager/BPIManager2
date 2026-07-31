@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
-import { statsRepo } from "@/lib/db/aggregates/stats";
+import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
 import {
   singleBPIDistributionParamsSchema,
@@ -35,7 +35,7 @@ export default async function handler(
     const access = await checkUserAccess(req, userId);
     if (!access.hasAccess) return rejectAccess(res, access);
 
-    const scores = await statsRepo.getLatestScoresWithMusicData(
+    const scores = await statsTablesRepo.getLatestScoresWithMusicData(
       userId,
       version,
     );

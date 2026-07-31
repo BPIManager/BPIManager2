@@ -1,5 +1,5 @@
 import { BpiCalculator } from "@/lib/bpi";
-import { statsRepo } from "@/lib/db/aggregates/stats";
+import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import dayjs from "@/lib/dayjs";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
@@ -26,8 +26,8 @@ export default async function handler(
     if (!access.hasAccess) return rejectAccess(res, access);
 
     const [allLogs, totalSongs] = await Promise.all([
-      statsRepo.getScoreHistory(userId, version, levels, difficulties),
-      statsRepo.getTotalSongCount(levels, difficulties),
+      statsTablesRepo.getScoreHistory(userId, version, levels, difficulties),
+      statsTablesRepo.getTotalSongCount(levels, difficulties),
     ]);
 
     if (allLogs.length === 0) return res.status(200).json([]);

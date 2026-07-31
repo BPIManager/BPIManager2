@@ -3,7 +3,7 @@ import {
   AuthenticatedNextApiRequest,
   withAuth,
 } from "@/middlewares/api/withAuth";
-import { statsRepo } from "@/lib/db/aggregates/stats";
+import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 
 async function handler(
@@ -23,7 +23,7 @@ async function handler(
     : latestVersion;
 
   try {
-    const songs = await statsRepo.getUserSongRankings(viewerId, version);
+    const songs = await statsTablesRepo.getUserSongRankings(viewerId, version);
     return res.status(200).json({ songs });
   } catch (error: unknown) {
     const errorMessage =

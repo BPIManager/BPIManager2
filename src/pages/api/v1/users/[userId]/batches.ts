@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { scoresRepo } from "@/lib/db/aggregates/scoresFacade";
+import { scoreTimelineRepo } from "@/lib/db/aggregates/scoreTimeline";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
-import { statsRepo } from "@/lib/db/aggregates/stats";
+import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { calculateTotalBpi } from "@/services/logs/calculateTotalBpi";
 import { parseBody } from "@/services/nextRequest/parseBody";
 import { batchesQuerySchema } from "@/schemas/batches/query";
@@ -20,13 +20,13 @@ export default async function handler(
 
   if (groupedBy === "lastPlayed") {
     const [history, totalSongs12] = await Promise.all([
-      statsRepo.getScoreHistory(userId, version, [], []),
-      statsRepo.getTotalSongCount([12], []),
+      statsTablesRepo.getScoreHistory(userId, version, [], []),
+      statsTablesRepo.getTotalSongCount([12], []),
     ]);
     const timeline = calculateTotalBpi(history, totalSongs12, version, topN);
     return res.status(200).json(timeline);
   } else {
-    const timeline = await scoresRepo.getTimelineByBatches({
+    const timeline = await scoreTimelineRepo.getTimelineByBatches({
       userId,
       version,
       topN,

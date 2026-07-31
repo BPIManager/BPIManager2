@@ -1,4 +1,4 @@
-import { statsRepo } from "@/lib/db/aggregates/stats";
+import { statsChartsRepo } from "@/lib/db/aggregates/stats/charts";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
 import type { StatsGroupBy } from "@/types/stats/bpiBoxStats";
@@ -32,7 +32,7 @@ export default async function handler(
     const access = await checkUserAccess(req, userId);
     if (!access.hasAccess) return rejectAccess(res, access);
 
-    const { scores, tower } = await statsRepo.getBpiAndVolumePerDate(
+    const { scores, tower } = await statsChartsRepo.getBpiAndVolumePerDate(
       userId,
       version,
       levels,

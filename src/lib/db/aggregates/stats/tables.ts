@@ -7,7 +7,7 @@ import { songsRepo } from "@/lib/db/domains/songs";
 
 /**
  * 統計ダッシュボード向けの表形式データ（AAA表・スコア履歴・楽曲ランキング等）を
- * 担当するリポジトリクラス（#182で`stats/index.ts`から分割）。
+ * 担当するリポジトリクラス。
  */
 class StatsTablesRepository {
   async getLatestTotalBpi(userId: string, version: string): Promise<number> {
@@ -113,7 +113,6 @@ class StatsTablesRepository {
   }
 
   // scores・songsを横断JOINしたスコア推移集計のため、直接クエリを維持する。
-  // domains/scores からの委譲は廃止し、本メソッドを唯一の実装とした（#156）。
   async getScoreHistory(
     userId: string,
     version: string,
