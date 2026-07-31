@@ -34,22 +34,44 @@ export class NotificationsRepository {
     const overtakenCount = await db
       .selectFrom("scores as s2")
       .innerJoin("follows as f", "f.followingId", "s2.userId")
+      .innerJoin("scores as r", (join) =>
+        join
+          .onRef("r.songId", "=", "s2.songId")
+          .on("r.version", "=", latestVersion)
+          .onRef("r.userId", "=", "f.followerId")
+          .on("r.logId", "=", (eb) =>
+            eb
+              .selectFrom("scores as r2")
+              .select((s) => s.fn.max("logId").as("m"))
+              .whereRef("r2.userId", "=", "r.userId")
+              .whereRef("r2.songId", "=", "s2.songId")
+              .whereRef("r2.lastPlayed", "<", "s2.lastPlayed"),
+          ),
+      )
+      .leftJoin("scores as prevRival", (join) =>
+        join
+          .onRef("prevRival.songId", "=", "s2.songId")
+          .onRef("prevRival.userId", "=", "s2.userId")
+          .on("prevRival.version", "=", latestVersion)
+          .on("prevRival.logId", "=", (eb) =>
+            eb
+              .selectFrom("scores as pr2")
+              .select((s) => s.fn.max("logId").as("m"))
+              .whereRef("pr2.userId", "=", "s2.userId")
+              .whereRef("pr2.songId", "=", "s2.songId")
+              .whereRef("pr2.lastPlayed", "<", "s2.lastPlayed"),
+          ),
+      )
       .select(sql<number>`count(DISTINCT s2.logId)`.as("cnt"))
       .where("f.followerId", "=", userId)
       .where("s2.version", "=", latestVersion)
       .where("s2.lastPlayed", ">", lastRead)
+      .whereRef("s2.exScore", ">", "r.exScore")
       .where((eb) =>
-        eb.not(
-          eb.exists(
-            eb
-              .selectFrom("scores as s1")
-              .select("s1.logId")
-              .whereRef("s1.userId", "=", "f.followerId")
-              .whereRef("s1.songId", "=", "s2.songId")
-              .where("s1.version", "=", latestVersion)
-              .whereRef("s1.exScore", ">=", "s2.exScore"),
-          ),
-        ),
+        eb.or([
+          eb("prevRival.exScore", "is", null),
+          eb("r.exScore", ">", eb.ref("prevRival.exScore")),
+        ]),
       )
       .executeTakeFirst();
 
@@ -120,6 +142,34 @@ export class NotificationsRepository {
       .innerJoin("follows as f", "f.followingId", "s2.userId")
       .innerJoin("users as u", "s2.userId", "u.userId")
       .innerJoin("songs as song", "s2.songId", "song.songId")
+      .innerJoin("scores as r", (join) =>
+        join
+          .onRef("r.songId", "=", "s2.songId")
+          .on("r.version", "=", latestVersion)
+          .onRef("r.userId", "=", "f.followerId")
+          .on("r.logId", "=", (eb) =>
+            eb
+              .selectFrom("scores as r2")
+              .select((s) => s.fn.max("logId").as("m"))
+              .whereRef("r2.userId", "=", "r.userId")
+              .whereRef("r2.songId", "=", "s2.songId")
+              .whereRef("r2.lastPlayed", "<", "s2.lastPlayed"),
+          ),
+      )
+      .leftJoin("scores as prevRival", (join) =>
+        join
+          .onRef("prevRival.songId", "=", "s2.songId")
+          .onRef("prevRival.userId", "=", "s2.userId")
+          .on("prevRival.version", "=", latestVersion)
+          .on("prevRival.logId", "=", (eb) =>
+            eb
+              .selectFrom("scores as pr2")
+              .select((s) => s.fn.max("logId").as("m"))
+              .whereRef("pr2.userId", "=", "s2.userId")
+              .whereRef("pr2.songId", "=", "s2.songId")
+              .whereRef("pr2.lastPlayed", "<", "s2.lastPlayed"),
+          ),
+      )
       .select([
         sql<string>`'overtaken'`.as("type"),
         "s2.lastPlayed as timestamp",
@@ -141,18 +191,12 @@ export class NotificationsRepository {
       ])
       .where("f.followerId", "=", userId)
       .where("s2.version", "=", latestVersion)
+      .whereRef("s2.exScore", ">", "r.exScore")
       .where((eb) =>
-        eb.not(
-          eb.exists(
-            eb
-              .selectFrom("scores as s1")
-              .select("s1.logId")
-              .whereRef("s1.userId", "=", "f.followerId")
-              .whereRef("s1.songId", "=", "s2.songId")
-              .where("s1.version", "=", latestVersion)
-              .whereRef("s1.exScore", ">=", "s2.exScore"),
-          ),
-        ),
+        eb.or([
+          eb("prevRival.exScore", "is", null),
+          eb("r.exScore", ">", eb.ref("prevRival.exScore")),
+        ]),
       )
       .$castTo<NotificationOvertakenRow>();
 
