@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Lock } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
@@ -8,7 +9,7 @@ interface TowerRankingRowProps {
   onClick?: (userId: string) => void;
 }
 
-export const TowerRankingRow = ({ entry, onClick }: TowerRankingRowProps) => {
+const TowerRankingRowComponent = ({ entry, onClick }: TowerRankingRowProps) => {
   const isPrivate = entry.isPublic === 0 && !entry.isSelf;
   const isClickable = !isPrivate && !!onClick;
 
@@ -93,3 +94,5 @@ export const TowerRankingRow = ({ entry, onClick }: TowerRankingRowProps) => {
     </div>
   );
 };
+
+export const TowerRankingRow = memo(TowerRankingRowComponent);

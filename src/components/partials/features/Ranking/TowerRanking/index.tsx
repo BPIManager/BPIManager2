@@ -215,10 +215,10 @@ export const TowerRanking = ({ version }: TowerRankingProps) => {
     setIsModalOpen(true);
   }, [setSelectedUserId, setIsModalOpen]);
 
-  const rowProps: RowData = {
-    rankings: sortedRankings,
-    onRowClick: handleRowClick,
-  };
+  const rowProps: RowData = useMemo(
+    () => ({ rankings: sortedRankings, onRowClick: handleRowClick }),
+    [sortedRankings, handleRowClick],
+  );
 
   return (
     <div className="flex flex-col gap-3">

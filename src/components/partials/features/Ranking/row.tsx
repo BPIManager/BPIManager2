@@ -1,4 +1,5 @@
-﻿import { Lock } from "lucide-react";
+﻿import { memo } from "react";
+import { Lock } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { getBpiColorStyle } from "@/constants/theme/bpiColor";
@@ -11,7 +12,7 @@ interface RankingRowProps {
   style?: React.CSSProperties;
 }
 
-export const RankingRow = ({ entry, onClick, style }: RankingRowProps) => {
+const RankingRowComponent = ({ entry, onClick, style }: RankingRowProps) => {
   const isPrivate = entry.isPublic === 0 && !entry.isSelf;
   const bpiStyle = getBpiColorStyle(entry.totalBpi);
 
@@ -88,3 +89,5 @@ export const RankingRow = ({ entry, onClick, style }: RankingRowProps) => {
     </button>
   );
 };
+
+export const RankingRow = memo(RankingRowComponent);

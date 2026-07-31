@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useMemo } from "react";
 import { List, useListRef } from "react-window";
 import type { RowComponentProps } from "react-window";
 import { useGlobalRanking } from "@/hooks/stats/useGlobalRanking";
@@ -174,6 +174,11 @@ export const GlobalRankingContainer = () => {
     setIsModalOpen(true);
   }, []);
 
+  const rowProps: RowData = useMemo(
+    () => ({ rankings: data?.rankings ?? [], onRowClick: handleRowClick }),
+    [data?.rankings, handleRowClick],
+  );
+
   if (!isSongsCategory && !isTowerCategory && isLoading) {
     return (
       <>
@@ -191,11 +196,6 @@ export const GlobalRankingContainer = () => {
   const totalCount = data?.totalCount ?? 0;
   const selfRank = data?.selfRank ?? 0;
   const viewerRadar = data?.viewerRadar ?? {};
-
-  const rowProps: RowData = {
-    rankings: data?.rankings ?? [],
-    onRowClick: handleRowClick,
-  };
 
   if (!user && !isCredentialLoading) {
     return <LoginRequiredCard />;
