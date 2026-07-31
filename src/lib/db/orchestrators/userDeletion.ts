@@ -81,7 +81,7 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
   // 3. FK制約を考慮した順序で物理削除(トランザクション)。
   // このオーケストレーターは各ドメインリポジトリのdeleteByUser/getAllForUser
   // メソッドを呼び出す役に徹し、他ドメインが所有するテーブルへ直接クエリを
-  // 発行しない(usersテーブル自身の削除を除く。関連: #164)。
+  // 発行しない(usersテーブル自身の削除を除く)。
   await db.transaction().execute(async (trx) => {
     // allScores: FK to logs(SET NULL), users(CASCADE)
     await allScoresRepo.deleteByUser(trx, userId);

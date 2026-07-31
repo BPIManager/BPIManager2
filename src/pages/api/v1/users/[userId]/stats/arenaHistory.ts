@@ -1,6 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
-import { getArenaStatsHistory } from "@/lib/db/domains/officialArenaStats";
+import { getArenaStatsHistory } from "@/lib/db/domains/arenaHistory";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import type { NextApiRequest, NextApiResponse } from "next";

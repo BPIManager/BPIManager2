@@ -13,7 +13,7 @@ import { userDisplayColumns } from "@/lib/db/shared/userDisplay";
  *
  * `allSongs`ドメインは「他ドメインから直接クエリせず本リポジトリ経由で
  * 行う方針」を明示しているため、`allSongs`を横断JOINするこれらのクエリは
- * `domains/allScores`ではなくここに置く（#171）。
+ * `domains/allScores`ではなくここに置く。
  */
 class AllScoresAggregateRepository {
   /**

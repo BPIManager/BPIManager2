@@ -5,7 +5,7 @@ import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { usersRepo } from "@/lib/db/domains/users";
 import { logsRepo } from "@/lib/db/domains/logs";
 import { scoresRepo } from "@/lib/db/domains/scores";
-import { latestPerUserSubquery as latestArenaStatsPerUserSubquery } from "@/lib/db/domains/officialArenaStats";
+import { latestPerUserSubquery as latestArenaStatsPerUserSubquery } from "@/lib/db/domains/arenaHistory";
 
 const DATE_EXPR = sql<string>`DATE_FORMAT(CONVERT_TZ(createdAt, '+00:00', '+09:00'), '%Y-%m-%d')`;
 
@@ -13,8 +13,7 @@ const JST_TODAY_START = sql<Date>`CONVERT_TZ(CONCAT(DATE(CONVERT_TZ(NOW(), '+00:
 
 /**
  * サイト統計ダッシュボードのサマリカウンター・日次登録推移・分布集計
- * （アリーナランク/エリア/バージョン別）を担当するリポジトリクラス
- * （#183で`siteStats/index.ts`から分割）。
+ * （アリーナランク/エリア/バージョン別）を担当するリポジトリクラス。
  */
 class SiteStatsSummaryRepository {
   async getSummary() {

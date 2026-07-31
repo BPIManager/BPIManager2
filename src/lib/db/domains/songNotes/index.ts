@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
  * `songNotes`/`songNoteUpvotes`テーブル自体の読み書きを担当するリポジトリクラス。
  *
  * 投稿者の表示用情報（`userStatusLogs`）や楽曲情報（`songs`）と結合した
- * 複合ビューは `aggregates/songNotes/` に切り出している（#173）。
+ * 複合ビューは `aggregates/songNotes/` に切り出している。
  */
 class SongNotesRepository {
   async createNote(

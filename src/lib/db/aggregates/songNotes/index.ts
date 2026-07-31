@@ -29,7 +29,7 @@ export interface SongNoteRow {
  * 最新totalBpi）や楽曲情報（`songs`）を結合した複合ビューを組み立てる。
  *
  * `songNotes`ドメイン本来の責務（ノートの読み書き）を超えたクロスドメイン
- * 参照のため、`domains/songNotes`ではなくここに置く（#173）。
+ * 参照のため、`domains/songNotes`ではなくここに置く。
  */
 class SongNotesAggregateRepository {
   async getNotes(

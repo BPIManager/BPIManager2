@@ -32,9 +32,7 @@ class allScoresRepository {
   /**
    * 指定楽曲のグローバルランキングを取得する（allScores テーブル使用）
    *
-   * `aggregates/songRanking`（`users`横断のクロスドメイン複合ビュー）への
-   * 委譲であり、本来は`domains → aggregates`の逆方向依存になる（#166も参照）。
-   * `scores`ドメイン側の同名メソッドと合わせて解消は別issueで検討する。
+   * `users`と横断する集計のため、実体は`aggregates/songRanking`に委譲する。
    *
    * @param songId - 楽曲 ID
    * @param version - バージョン番号

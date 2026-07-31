@@ -17,7 +17,7 @@ export type TowerRankingRawEntry = {
  * `iidxTower`と`users`を横断するランキング表示用の複合ビューを組み立てる。
  *
  * ランキング表示用の`userName`/`profileImage`/`isPublic`/`iidxId`等は
- * `users`ドメインのカラムのため、`domains/iidxTower`ではなくここに置く（#174）。
+ * `users`ドメインのカラムのため、`domains/iidxTower`ではなくここに置く。
  */
 export const iidxTowerAggregateRepo = {
   async getTowerRanking(params: {

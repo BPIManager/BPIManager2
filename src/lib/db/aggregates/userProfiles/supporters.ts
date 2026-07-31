@@ -5,7 +5,7 @@ import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
  * サポーター一覧を担当するリポジトリクラス。
  *
  * users・userStatusLogs・userRolesを横断してユーザー向けの複合ビューを
- * 組み立てる（#181で`userProfiles/index.ts`から分割）。
+ * 組み立てる。
  */
 class SupportersRepository {
   async getSupporters(version: string) {

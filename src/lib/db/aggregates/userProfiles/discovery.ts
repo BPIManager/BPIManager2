@@ -1,13 +1,13 @@
 import { db } from "@/lib/db";
 import { sql } from "kysely";
-import { latestPerUserSubquery as latestArenaPerUserSubquery } from "@/lib/db/domains/officialArenaStats";
+import { latestPerUserSubquery as latestArenaPerUserSubquery } from "@/lib/db/domains/arenaHistory";
 import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
 
 /**
  * おすすめユーザー発見・検索を担当するリポジトリクラス。
  *
  * users・userStatusLogs・officialArenaStats・userRadarCache・userRoles等を
- * 横断してユーザー向けの複合ビューを組み立てる（#181で`userProfiles/index.ts`から分割）。
+ * 横断してユーザー向けの複合ビューを組み立てる。
  */
 class UserDiscoveryRepository {
   /**

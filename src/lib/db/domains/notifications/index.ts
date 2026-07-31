@@ -7,7 +7,7 @@ import { Database } from "@/types/db";
  *
  * フォロー通知・追い抜き通知の集計・一覧取得は`follows`/`scores`/`users`/
  * `songs`を横断する複合ビューのため、`aggregates/notifications/`に
- * 切り出している（#170）。
+ * 切り出している。
  */
 export class NotificationsRepository {
   /**

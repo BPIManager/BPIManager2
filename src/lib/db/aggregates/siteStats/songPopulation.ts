@@ -3,7 +3,7 @@ import { sql } from "kysely";
 
 /**
  * サイト統計ダッシュボードの楽曲人気ランキング（12レベル帯のプレイ人口）を
- * 担当するリポジトリクラス（#183で`siteStats/index.ts`から分割）。
+ * 担当するリポジトリクラス。
  */
 class SiteStatsSongPopulationRepository {
   // scores・songsを横断JOINしたプレイ人口ランキング集計のため、直接参照を維持する。

@@ -8,8 +8,8 @@ import { sql } from "kysely";
  * （`s2`: 追い抜いたスコア, `r`: 追い抜かれた側の直前のスコア,
  * `prevRival`: 追い抜いた側のさらに前のスコア）の共通部分を組み立てる。
  *
- * `getUnreadCount`/`getNotifications`で個別に実装されていたほぼ同一の
- * self joinをここに集約する（#170）。呼び出し側は必要な`.select()`/
+ * `getUnreadCount`/`getNotifications`双方が同じ検出ロジックを必要とするため
+ * 共通部分を関数化している。呼び出し側は必要な`.select()`/
  * 追加の`.where()`/`.innerJoin()`を続けて使う。
  */
 function overtakenScoresBaseQuery(params: {

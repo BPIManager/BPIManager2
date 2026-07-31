@@ -2,8 +2,8 @@ import { db } from "@/lib/db";
 import {
   getLatestArenaStatsPerVersion,
   getBestArenaClassPerVersion,
-} from "@/lib/db/domains/officialArenaStats";
-import { getStatsPrivacy } from "@/lib/db/domains/statsPrivacy";
+} from "@/lib/db/domains/arenaHistory";
+import { getStatsPrivacy } from "@/lib/db/domains/arenaPrivacy";
 import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
 import { followsRepo } from "@/lib/db/domains/follow";
 
@@ -11,7 +11,7 @@ import { followsRepo } from "@/lib/db/domains/follow";
  * 公開プロフィールページ・自分のダッシュボード用の複合ビューを担当するリポジトリクラス。
  *
  * users・userStatusLogs・officialArenaStats・userRoles・follows・statsPrivacy等を
- * 横断してユーザー向けの複合ビューを組み立てる（#181で`userProfiles/index.ts`から分割）。
+ * 横断してユーザー向けの複合ビューを組み立てる。
  */
 class UserProfileRepository {
   /**

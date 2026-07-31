@@ -8,7 +8,7 @@ type Period = keyof typeof PERIODS;
 
 /**
  * サイト統計ダッシュボードの時間帯別・曜日別サイト活動集計を担当する
- * リポジトリクラス（#183で`siteStats/index.ts`から分割）。
+ * リポジトリクラス。
  *
  * `getHourly*`/`getWeekday*`の4つのprivateヘルパーはJST変換ロジックを
  * 共有する密結合したペアのため、同一ファイルにまとめている。
