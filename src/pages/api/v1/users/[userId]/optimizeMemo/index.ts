@@ -2,6 +2,8 @@ import { bpiOptimizerRepo } from "@/lib/db/bpi-optimizer";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { adminAuth } from "@/lib/firebase/admin";
 import { NextApiRequest, NextApiResponse } from "next";
+import { createOptimizeMemoBodySchema } from "@/schemas/optimizeMemo/create";
+import { parseBody } from "@/services/nextRequest/parseBody";
 
 export default async function handler(
   req: NextApiRequest,
@@ -34,10 +36,9 @@ export default async function handler(
       return res.status(401).json({ message: "Invalid token" });
     }
 
-    const { targetBpi, reportData } = req.body;
-    if (targetBpi === undefined || !reportData) {
-      return res.status(400).json({ message: "Invalid payload" });
-    }
+    const body = parseBody(createOptimizeMemoBodySchema, req.body, res);
+    if (!body) return;
+    const { targetBpi, reportData } = body;
     const reportId = await bpiOptimizerRepo.saveMemo(
       uid,
       targetBpi,

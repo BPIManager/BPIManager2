@@ -9,6 +9,8 @@ import { BpiCalculator } from "@/lib/bpi";
 import { NewScore, NewAllScores } from "@/types/db";
 import { bpiRepo } from "@/lib/db/bpi";
 import dayjs from "@/lib/dayjs";
+import { scoresBulkBodySchema } from "@/schemas/scores/bulk";
+import { parseBody } from "@/services/nextRequest/parseBody";
 
 const handler = async (
   req: AuthenticatedNextApiRequest,
@@ -17,7 +19,9 @@ const handler = async (
   if (req.method !== "POST")
     return res.status(405).json({ message: "Method Not Allowed" });
 
-  const { version, csvRows } = req.body;
+  const body = parseBody(scoresBulkBodySchema, req.body, res);
+  if (!body) return;
+  const { version, csvRows } = body;
   const userId = req.authUid;
   const batchId = uuidv4();
 
