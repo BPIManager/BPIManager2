@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
-import { allScoresRepo } from "@/lib/db/domains/allScores";
+import { allScoresAggregateRepo } from "@/lib/db/aggregates/allScores";
 import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 
 export default async function handler(
@@ -24,7 +24,7 @@ export default async function handler(
       ? rawVersion
       : latestVersion;
 
-    const rivalsScores = await allScoresRepo.getRivalScoresForAllSong({
+    const rivalsScores = await allScoresAggregateRepo.getRivalScoresForAllSong({
       viewerId: String(userId),
       songId: Number(songId),
       version,

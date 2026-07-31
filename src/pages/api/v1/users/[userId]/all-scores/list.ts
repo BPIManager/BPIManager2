@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { rejectAccess } from "@/middlewares/api/withApi";
-import { allScoresRepo } from "@/lib/db/domains/allScores";
+import { allScoresAggregateRepo } from "@/lib/db/aggregates/allScores";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 
 export default async function handler(
@@ -28,7 +28,10 @@ export default async function handler(
 
     switch (req.method) {
       case "GET":
-        const results = await allScoresRepo.getAllScoresList(userId, params);
+        const results = await allScoresAggregateRepo.getAllScoresList(
+          userId,
+          params,
+        );
         return results && results.length > 0
           ? res.status(200).json(results)
           : res.status(404).json({ message: "No data found" });
