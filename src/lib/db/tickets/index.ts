@@ -38,12 +38,20 @@ class TicketsRepository {
       .where("userId", "=", userId)
       .where("version", "=", version);
 
+    const maxPatternScores = db
+      .selectFrom("songPatterns")
+      .select(["songId", (eb) => eb.fn.max("score").as("maxScore")])
+      .groupBy("songId");
+
     const rows = await db
       .selectFrom("songPatterns as sp")
       .innerJoin("songs as s", "s.songId", "sp.songId")
       .leftJoin("songAttributes as sa", "sa.songId", "sp.songId")
       .leftJoin(latestScores.as("sc"), (join) =>
         join.onRef("sc.songId", "=", "sp.songId").on("sc.rn", "=", 1),
+      )
+      .leftJoin(maxPatternScores.as("mp"), (join) =>
+        join.onRef("mp.songId", "=", "sp.songId"),
       )
       .select([
         "sp.songId",
@@ -66,9 +74,9 @@ class TicketsRepository {
         "sa.g_tateren",
         "sa.g_trill_denim",
         "sa.g_peak",
+        "mp.maxScore as maxPatternScore",
       ])
       .select(() => [
-        sql<number>`(SELECT MAX(score) FROM songPatterns WHERE songId = sp.songId)`.as("maxPatternScore"),
         sql<number>`(SELECT COUNT(*) FROM songPatternVotes WHERE songId = sp.songId AND pattern = sp.pattern AND voteType = 'upvote')`.as("upvoteCount"),
         sql<number>`(SELECT COUNT(*) FROM songPatternVotes WHERE songId = sp.songId AND pattern = sp.pattern AND voteType = 'downvote')`.as("downvoteCount"),
         sql<VoteType | null>`(SELECT voteType FROM songPatternVotes WHERE songId = sp.songId AND pattern = sp.pattern AND userId = ${userId} LIMIT 1)`.as("myVote"),
@@ -77,8 +85,8 @@ class TicketsRepository {
       .orderBy(
         scoreMode === "raw"
           ? sql`sp.score`
-          : sql`CASE WHEN (SELECT MAX(score) FROM songPatterns WHERE songId = sp.songId) > 0
-                  THEN sp.score / (SELECT MAX(score) FROM songPatterns WHERE songId = sp.songId)
+          : sql`CASE WHEN mp.maxScore > 0
+                  THEN sp.score / mp.maxScore
                   ELSE -9999 END`,
         "desc",
       )

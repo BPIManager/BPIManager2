@@ -277,6 +277,7 @@ CREATE TABLE IF NOT EXISTS `songPatterns` (
   `pattern` varchar(10) NOT NULL,
   `score` double NOT NULL,
   PRIMARY KEY (`songId`,`pattern`),
+  KEY `idx_pattern_score` (`pattern`,`score` DESC),
   CONSTRAINT `songPatterns_ibfk_1` FOREIGN KEY (`songId`) REFERENCES `songs` (`songId`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
