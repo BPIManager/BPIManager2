@@ -2,6 +2,7 @@ import dayjs from "@/lib/dayjs";
 import { db } from "@/lib/db";
 import { Database, NewTotalBPILog } from "@/types/db";
 import { Transaction, sql, Expression } from "kysely";
+import { scoresRepo } from "@/lib/db/domains/scores";
 
 /**
  * スコアログの日付ナビゲーション・バッチ検索を担当するリポジトリクラス。
@@ -42,30 +43,28 @@ class LogNavigationRepository {
     range: { start: Date; end: Date; unit: string },
     groupedBy: "createdAt" | "lastPlayed" = "createdAt",
   ) {
+    if (groupedBy === "lastPlayed") {
+      return scoresRepo.getLastPlayedNavigation(userId, version, range);
+    }
+
     const { start, end } = range;
-    const isLastPlayed = groupedBy === "lastPlayed";
-    const dateCol = isLastPlayed ? "lastPlayed" : "createdAt";
-    const columns: ("lastPlayed" | "createdAt" | "totalBpi")[] = isLastPlayed
-      ? [dateCol]
-      : [dateCol, "totalBpi"];
-    const table = isLastPlayed ? "scores" : "logs";
 
     const [prevRow, nextRow] = await Promise.all([
       db
-        .selectFrom(table)
-        .select(columns)
+        .selectFrom("logs")
+        .select(["createdAt", "totalBpi"])
         .where("userId", "=", userId)
         .where("version", "=", version)
-        .where(dateCol, "<", start)
-        .orderBy(dateCol, "desc")
+        .where("createdAt", "<", start)
+        .orderBy("createdAt", "desc")
         .executeTakeFirst(),
       db
-        .selectFrom(table)
-        .select(columns)
+        .selectFrom("logs")
+        .select(["createdAt", "totalBpi"])
         .where("userId", "=", userId)
         .where("version", "=", version)
-        .where(dateCol, ">", end)
-        .orderBy(dateCol, "asc")
+        .where("createdAt", ">", end)
+        .orderBy("createdAt", "asc")
         .executeTakeFirst(),
     ]);
 
