@@ -1,14 +1,7 @@
 ﻿import { BpiCalculator } from "@/lib/bpi";
 import { ALL_CATEGORIES } from "@/lib/radar/calculator";
-import type { RadarCategory } from "@/types/stats/radar";
-import topElements from "@/constants/iidx/radars/topElements";
+import { topElementMap } from "@/constants/iidx/radars/topElements";
 import type { TopSongImproved, RadarGrowthEntry } from "@/types/stats/monthlyReview";
-
-export const topElementMap = new Map<string, RadarCategory>(
-  (
-    topElements as { title: string; difficulty: string; top: RadarCategory }[]
-  ).map((e) => [`${e.title}___${e.difficulty}`, e.top]),
-);
 
 type SongMeta = { songId: number; title: string; difficulty: string };
 

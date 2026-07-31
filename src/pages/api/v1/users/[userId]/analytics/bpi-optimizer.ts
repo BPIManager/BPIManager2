@@ -4,7 +4,7 @@ import { bpiOptimizerAggregateRepo } from "@/lib/db/aggregates/bpiOptimizer";
 import { findOptimalBpiPath } from "@/lib/bpi/optimizer";
 import { calculateRadar } from "@/lib/radar/calculator";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
-import topElements from "@/constants/iidx/radars/topElements";
+import { topElementMap } from "@/constants/iidx/radars/topElements";
 import type { RadarCategory } from "@/types/stats/radar";
 import { ALL_RADAR_CATEGORIES } from "@/constants/iidx/radars";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
@@ -13,19 +13,6 @@ import type {
   OptimizerOptions,
   OptimizationResult,
 } from "@/types/bpi-optimizer";
-
-interface TopElement {
-  title: string;
-  difficulty: string;
-  top: RadarCategory;
-}
-
-const topElementMap = new Map<string, RadarCategory>(
-  (topElements as TopElement[]).map((e) => [
-    `${e.title}___${e.difficulty}`,
-    e.top,
-  ]),
-);
 
 export default async function handler(
   req: NextApiRequest,

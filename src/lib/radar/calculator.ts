@@ -1,5 +1,8 @@
 ﻿import { BpiCalculator } from "@/lib/bpi";
-import topElements from "@/constants/iidx/radars/topElements";
+import {
+  topElementMap,
+  topElementsByCategory,
+} from "@/constants/iidx/radars/topElements";
 import {
   RadarCategory,
   RadarResponse,
@@ -19,12 +22,6 @@ export const ALL_CATEGORIES: RadarCategory[] = [
   "SOFLAN",
 ];
 
-interface TopElement {
-  title: string;
-  difficulty: string;
-  top: RadarCategory;
-}
-
 interface RadarScoreInput {
   title: string;
   difficulty: string | null;
@@ -32,13 +29,6 @@ interface RadarScoreInput {
   notes: number | null;
   bpi: number | string | null;
 }
-
-const topElementMap = new Map<string, RadarCategory>(
-  (topElements as TopElement[]).map((e) => [
-    `${e.title}___${e.difficulty}`,
-    e.top,
-  ]),
-);
 
 /**
  * スコアリストからレーダーチャートデータを計算する。
@@ -74,9 +64,8 @@ export function calculateRadar(scores: RadarScoreInput[], validSongKeys?: Set<st
       .map((s) => Number(s.bpi ?? -15))
       .sort((a, b) => b - a);
 
-    const unplayedSongs = (topElements as TopElement[]).filter(
+    const unplayedSongs = (topElementsByCategory.get(category) ?? []).filter(
       (e) =>
-        e.top === category &&
         !playedKeys.has(`${e.title}___${e.difficulty}`) &&
         (validSongKeys === undefined || validSongKeys.has(`${e.title}___${e.difficulty}`)),
     );
