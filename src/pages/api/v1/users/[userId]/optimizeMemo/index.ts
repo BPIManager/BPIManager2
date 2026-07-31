@@ -1,4 +1,4 @@
-import { bpiOptimizerRepo } from "@/lib/db/bpi-optimizer";
+import { bpiOptimizerRepo } from "@/lib/db/domains/bpiOptimizer";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { withAuth } from "@/middlewares/api/withAuth";
 import { NextApiRequest, NextApiResponse } from "next";

@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
-import { bpiOptimizerRepo } from "@/lib/db/bpi-optimizer";
+import { bpiOptimizerAggregateRepo } from "@/lib/db/aggregates/bpiOptimizer";
 import { findOptimalBpiPath } from "@/lib/bpi/optimizer";
 import { calculateRadar } from "@/lib/radar/calculator";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
@@ -70,7 +70,7 @@ export default async function handler(
   const access = await checkUserAccess(req, userId);
   if (!access.hasAccess) return rejectAccess(res, access);
 
-  const rawRows = await bpiOptimizerRepo.getAllSongsWithUserScores(
+  const rawRows = await bpiOptimizerAggregateRepo.getAllSongsWithUserScores(
     userId,
     latestVersion,
   );

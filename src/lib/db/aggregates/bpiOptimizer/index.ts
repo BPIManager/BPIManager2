@@ -1,14 +1,13 @@
 import { db } from "@/lib/db";
-import { OptimizationResult } from "@/types/bpi-optimizer";
 import { IIDXVersion } from "@/types/iidx/version";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
-import { v4 as uuidv4 } from "uuid";
 import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore";
 
 /**
- * BPI最適化機能向けのDBアクセスを担当するリポジトリクラス。
+ * BPI最適化機能向けに、`songs`・`songDef`・`scores` を横断してBPI対象楽曲一覧と
+ * ユーザーの最新スコアを組み立てるリポジトリクラス。
  */
-class BpiOptimizerRepository {
+class BpiOptimizerAggregateRepository {
   /**
    * 指定バージョンの全BPI対象楽曲（☆11/☆12、HYPER/ANOTHER/LEGGENDARIA）と
    * ユーザーの最新スコアをLEFT JOINで取得する。
@@ -64,59 +63,6 @@ class BpiOptimizerRepository {
       )
       .execute();
   }
-
-  /**
-   * 最適化結果（メモ）を保存する
-   */
-  async saveMemo(
-    userId: string,
-    targetBpi: number,
-    reportData: OptimizationResult,
-  ) {
-    const reportId = uuidv4();
-
-    await db
-      .insertInto("optimizeMemo")
-      .values({
-        reportId,
-        userId,
-        targetBpi,
-        reportData: JSON.stringify(reportData),
-      })
-      .execute();
-
-    return reportId;
-  }
-
-  /**
-   * ユーザーのメモ一覧を保存日時の降順で取得する
-   */
-  async getMemosByUserId(userId: string) {
-    const rows = await db
-      .selectFrom("optimizeMemo")
-      .select(["reportId", "targetBpi", "reportData", "createdAt"])
-      .where("userId", "=", userId)
-      .orderBy("createdAt", "desc")
-      .execute();
-
-    return rows.map((row) => ({
-      ...row,
-      reportData: JSON.parse(row.reportData) as OptimizationResult,
-    }));
-  }
-
-  /**
-   * 特定のメモを削除する
-   */
-  async deleteMemo(userId: string, reportId: string) {
-    const result = await db
-      .deleteFrom("optimizeMemo")
-      .where("userId", "=", userId)
-      .where("reportId", "=", reportId)
-      .executeTakeFirst();
-
-    return Number(result.numDeletedRows) > 0;
-  }
 }
 
-export const bpiOptimizerRepo = new BpiOptimizerRepository();
+export const bpiOptimizerAggregateRepo = new BpiOptimizerAggregateRepository();

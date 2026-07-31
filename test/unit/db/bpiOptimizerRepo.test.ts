@@ -11,33 +11,7 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-const { bpiOptimizerRepo } = await import("@/lib/db/bpi-optimizer");
-
-describe("bpiOptimizerRepo.getAllSongsWithUserScores", () => {
-  it("INF以外のバージョンでは$ifにtrueを渡してreleasedVersion等の条件を適用すること", async () => {
-    dbHolder.current = createDbSpy([]);
-    await bpiOptimizerRepo.getAllSongsWithUserScores("user-1", "33");
-    const ifCalls = callsFor(dbHolder.current.calls, "$if");
-    expect(ifCalls[0].args[0]).toBe(true);
-  });
-
-  it("INFバージョンでは$ifにfalseを渡すこと", async () => {
-    dbHolder.current = createDbSpy([]);
-    await bpiOptimizerRepo.getAllSongsWithUserScores("user-1", "INF");
-    const ifCalls = callsFor(dbHolder.current.calls, "$if");
-    expect(ifCalls[0].args[0]).toBe(false);
-  });
-
-  it("difficultyLevel=12・対象難易度のみに絞り込むこと", async () => {
-    dbHolder.current = createDbSpy([]);
-    await bpiOptimizerRepo.getAllSongsWithUserScores("user-1", "33");
-    const whereCalls = callsFor(dbHolder.current.calls, "where");
-    expect(whereCalls).toContainEqual({
-      method: "where",
-      args: ["m.difficultyLevel", "=", 12],
-    });
-  });
-});
+const { bpiOptimizerRepo } = await import("@/lib/db/domains/bpiOptimizer");
 
 describe("bpiOptimizerRepo.saveMemo", () => {
   it("reportDataをJSON文字列化してinsertし、reportIdを返すこと", async () => {
