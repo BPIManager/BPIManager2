@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
-import type { UserRole } from "@/types/db";
+import type { Database, UserRole } from "@/types/db";
+import type { Transaction } from "kysely";
 
 /** Discord 連携で付与される BPI ロール（手動付与の developer/pro は対象外） */
 const DISCORD_MANAGED_ROLES: UserRole[] = ["coffee", "saba", "iidx"];
@@ -58,6 +59,26 @@ class DiscordLinksRepository {
       .select("userId")
       .where("userId", "=", bpiUserId)
       .executeTakeFirst();
+  }
+
+  /**
+   * ユーザーのDiscord連携レコードを削除する。
+   *
+   * @param trx - 呼び出し元が管理するトランザクション
+   * @param userId - ユーザー ID
+   */
+  async deleteLinkByUser(trx: Transaction<Database>, userId: string) {
+    await trx.deleteFrom("discordLinks").where("userId", "=", userId).execute();
+  }
+
+  /**
+   * ユーザーのロールレコードを全て削除する。
+   *
+   * @param trx - 呼び出し元が管理するトランザクション
+   * @param userId - ユーザー ID
+   */
+  async deleteRoleByUser(trx: Transaction<Database>, userId: string) {
+    await trx.deleteFrom("userRoles").where("userId", "=", userId).execute();
   }
 }
 

@@ -295,6 +295,16 @@ class allScoresRepository {
       .where("userId", "=", userId)
       .execute();
   }
+
+  /**
+   * ユーザーの全難易度スコアレコードを削除する。
+   *
+   * @param trx - 呼び出し元が管理するトランザクション
+   * @param userId - ユーザー ID
+   */
+  async deleteByUser(trx: Transaction<Database>, userId: string) {
+    await trx.deleteFrom("allScores").where("userId", "=", userId).execute();
+  }
 }
 
 export const allScoresRepo = new allScoresRepository();

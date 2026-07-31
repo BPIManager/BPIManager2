@@ -1,5 +1,13 @@
 import { db } from "@/lib/db";
 import { userStatusLogsRepo } from "@/lib/db/userStatusLogs";
+import { scoresRepo } from "@/lib/db/scores";
+import { allScoresRepo } from "@/lib/db/allScores";
+import { navigationRepo } from "@/lib/db/logs/navigation";
+import { followsRepo } from "@/lib/db/follow";
+import { apiKeysRepo } from "@/lib/db/apiKeys";
+import { notificationsRepo } from "@/lib/db/notifications";
+import { radarCacheRepo } from "@/lib/db/radar";
+import { discordLinksRepo } from "@/lib/db/discord";
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
@@ -94,48 +102,39 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
     "utf-8",
   );
 
-  // 3. FK制約を考慮した順序で物理削除（トランザクション）
+  // 3. FK制約を考慮した順序で物理削除（トランザクション）。
+  // このオーケストレーターは各ドメインリポジトリのdeleteByUserメソッドを
+  // 呼び出す役に徹し、他ドメインが所有するテーブルへ直接クエリを発行しない。
   await db.transaction().execute(async (trx) => {
     // allScores: FK to logs(SET NULL), users(CASCADE)
-    await trx.deleteFrom("allScores").where("userId", "=", userId).execute();
+    await allScoresRepo.deleteByUser(trx, userId);
 
     // scores: FK to logs(SET NULL), users(CASCADE)
-    await trx.deleteFrom("scores").where("userId", "=", userId).execute();
+    await scoresRepo.deleteByUser(trx, userId);
 
     // logs: FK to users(CASCADE)
-    await trx.deleteFrom("logs").where("userId", "=", userId).execute();
+    await navigationRepo.deleteByUser(trx, userId);
 
     // follows: FK to users(CASCADE) for both sides
-    await trx
-      .deleteFrom("follows")
-      .where((eb) =>
-        eb.or([eb("followerId", "=", userId), eb("followingId", "=", userId)]),
-      )
-      .execute();
+    await followsRepo.deleteByUser(trx, userId);
 
     // apiKeys: FK to users(CASCADE)
-    await trx.deleteFrom("apiKeys").where("userId", "=", userId).execute();
+    await apiKeysRepo.deleteByUser(trx, userId);
 
     // notifications: FK to users(CASCADE)
-    await trx
-      .deleteFrom("notifications")
-      .where("userId", "=", userId)
-      .execute();
+    await notificationsRepo.deleteByUser(trx, userId);
 
     // userRadarCache: FK to users(CASCADE)
-    await trx
-      .deleteFrom("userRadarCache")
-      .where("userId", "=", userId)
-      .execute();
+    await radarCacheRepo.deleteByUser(trx, userId);
 
     // userRoles: FK to users(CASCADE)
-    await trx.deleteFrom("userRoles").where("userId", "=", userId).execute();
+    await discordLinksRepo.deleteRoleByUser(trx, userId);
 
     // userStatusLogs: FK to users(CASCADE)
     await userStatusLogsRepo.deleteByUser(trx, userId);
 
     // discordLinks: FK to users(CASCADE)
-    await trx.deleteFrom("discordLinks").where("userId", "=", userId).execute();
+    await discordLinksRepo.deleteLinkByUser(trx, userId);
 
     // users: メインレコード
     await trx.deleteFrom("users").where("userId", "=", userId).execute();

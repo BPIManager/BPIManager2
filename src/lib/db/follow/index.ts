@@ -1,4 +1,6 @@
 import { db } from "@/lib/db";
+import { Database } from "@/types/db";
+import { Transaction } from "kysely";
 
 /**
  * フォロー関係（`follows` テーブル）の参照・更新を担当するリポジトリクラス。
@@ -181,6 +183,21 @@ class FollowRepository {
       totalCount,
       hasMore: offset + users.length < totalCount,
     };
+  }
+
+  /**
+   * ユーザーが関わる全フォロー関係（フォロー・被フォロー双方）を削除する。
+   *
+   * @param trx - 呼び出し元が管理するトランザクション
+   * @param userId - ユーザー ID
+   */
+  async deleteByUser(trx: Transaction<Database>, userId: string) {
+    await trx
+      .deleteFrom("follows")
+      .where((eb) =>
+        eb.or([eb("followerId", "=", userId), eb("followingId", "=", userId)]),
+      )
+      .execute();
   }
 }
 

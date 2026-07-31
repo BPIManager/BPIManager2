@@ -23,6 +23,16 @@ class ScoresRepository {
       .where("userId", "=", userId)
       .execute();
   }
+
+  /**
+   * ユーザーの全スコアレコードを削除する。
+   *
+   * @param trx - 呼び出し元が管理するトランザクション
+   * @param userId - ユーザー ID
+   */
+  async deleteByUser(trx: Transaction<Database>, userId: string) {
+    await trx.deleteFrom("scores").where("userId", "=", userId).execute();
+  }
 }
 
 export const scoresRepo = new ScoresRepository();

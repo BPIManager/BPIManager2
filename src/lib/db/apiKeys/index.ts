@@ -1,4 +1,6 @@
 import { db } from "@/lib/db";
+import { Database } from "@/types/db";
+import { Transaction } from "kysely";
 
 class ApiKeysRepository {
   async findByKey(key: string) {
@@ -27,6 +29,16 @@ class ApiKeysRepository {
       })
       .onDuplicateKeyUpdate({ key })
       .execute();
+  }
+
+  /**
+   * ユーザーのAPIキーレコードを削除する。
+   *
+   * @param trx - 呼び出し元が管理するトランザクション
+   * @param userId - ユーザー ID
+   */
+  async deleteByUser(trx: Transaction<Database>, userId: string) {
+    await trx.deleteFrom("apiKeys").where("userId", "=", userId).execute();
   }
 }
 

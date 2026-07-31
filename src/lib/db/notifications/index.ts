@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { NotificationOvertakenRow } from "@/types/users/notifications";
-import { sql } from "kysely";
+import { sql, Transaction } from "kysely";
+import { Database } from "@/types/db";
 
 /**
  * 通知（フォロー・追い抜き）の参照・既読管理を担当するリポジトリクラス。
@@ -215,6 +216,19 @@ export class NotificationsRepository {
       .orderBy("timestamp", "desc")
       .limit(limit)
       .offset(offset)
+      .execute();
+  }
+
+  /**
+   * ユーザーの通知既読状態レコードを削除する。
+   *
+   * @param trx - 呼び出し元が管理するトランザクション
+   * @param userId - ユーザー ID
+   */
+  async deleteByUser(trx: Transaction<Database>, userId: string) {
+    await trx
+      .deleteFrom("notifications")
+      .where("userId", "=", userId)
       .execute();
   }
 }

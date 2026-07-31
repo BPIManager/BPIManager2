@@ -4,6 +4,8 @@ import { scoresRepo } from "../scores";
 import { allScoresRepo } from "../allScores";
 import { userStatusLogsRepo } from "../userStatusLogs";
 import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
+import { Database } from "@/types/db";
+import { Transaction } from "kysely";
 
 /**
  * スコアログの日付ナビゲーション・バッチ検索を担当するリポジトリクラス。
@@ -160,6 +162,16 @@ class LogNavigationRepository {
         .where("userId", "=", userId)
         .execute();
     });
+  }
+
+  /**
+   * ユーザーの全ログレコードを削除する。
+   *
+   * @param trx - 呼び出し元が管理するトランザクション
+   * @param userId - ユーザー ID
+   */
+  async deleteByUser(trx: Transaction<Database>, userId: string) {
+    await trx.deleteFrom("logs").where("userId", "=", userId).execute();
   }
 
   /**
