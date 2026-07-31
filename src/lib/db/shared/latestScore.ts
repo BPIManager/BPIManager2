@@ -10,7 +10,7 @@ import { sql } from "kysely";
  * ここに集約するのはあくまで「基準時刻を指定しない、単純な最新スコア」パターンのみ。
  * 「ある基準時刻より前の最新スコア」(追い抜き判定などの時刻境界付き相関サブクエリ)は
  * 意味的に別物のため、意図的にここには含めない
- * ({@link "@/lib/db/logs/rival"}の`getOvertakenRivals`、
+ * ({@link "@/lib/db/scores/rival"}の`getOvertakenRivals`、
  * {@link "@/lib/db/notifications"}の追い抜き通知検出ロジックを参照)。
  */
 

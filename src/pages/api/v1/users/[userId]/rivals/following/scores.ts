@@ -1,4 +1,4 @@
-import { logsRepo } from "@/lib/db/logs";
+import { scoresRepo } from "@/lib/db/scores";
 import {
   AuthenticatedNextApiRequest,
   withAuth,
@@ -54,7 +54,7 @@ const handler = async (
           }
         : undefined;
 
-    const rawResults = await logsRepo.getScoreComparisonList({
+    const rawResults = await scoresRepo.getScoreComparisonList({
       userId: String(userId),
       version: version,
       limit: nLimit,

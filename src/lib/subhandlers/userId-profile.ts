@@ -1,6 +1,6 @@
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { NextApiRequest, NextApiResponse } from "next";
-import { socialRepo } from "../db/social";
+import { scoresRepo } from "../db/scores";
 import { usersRepo } from "../db/users";
 import { v4 as uuidv4 } from "uuid";
 import { AccessResult } from "@/middlewares/api/withApi";
@@ -20,7 +20,7 @@ type ProfileWithAreaRank = ProfileSummaryWithoutPrivacy & { areaRank: AreaRankIn
 interface ProfileResponse {
   profile: ProfileWithAreaRank | null;
   compare?: {
-    winLoss: Awaited<ReturnType<typeof socialRepo.getWinLossStats>> | null;
+    winLoss: Awaited<ReturnType<typeof scoresRepo.getWinLossStats>> | null;
     radar: Record<string, number> | null;
   };
   statsPrivacy?: ProfileSummary["statsPrivacy"];
@@ -56,9 +56,9 @@ export async function handleGetProfile(
   const [profile, winLoss, radar] = await Promise.all([
     usersRepo.getUserProfileSummary(uid, viewerId),
     isCompare && viewerId
-      ? socialRepo.getWinLossStats(viewerId, uid, version)
+      ? scoresRepo.getWinLossStats(viewerId, uid, version)
       : null,
-    isCompare ? socialRepo.getUserRadar(uid, version) : null,
+    isCompare ? scoresRepo.getUserRadar(uid, version) : null,
   ]);
 
   if (!profile) return res.status(404).json({ message: "User not found" });

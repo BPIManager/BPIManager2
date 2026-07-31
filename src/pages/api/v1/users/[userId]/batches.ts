@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { logsRepo } from "@/lib/db/logs";
+import { scoresRepo } from "@/lib/db/scores";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { statsRepo } from "@/lib/db/stats";
 import { calculateTotalBpi } from "@/services/logs/calculateTotalBpi";
@@ -26,7 +26,7 @@ export default async function handler(
     const timeline = calculateTotalBpi(history, totalSongs12, version, topN);
     return res.status(200).json(timeline);
   } else {
-    const timeline = await logsRepo.getTimelineByBatches({
+    const timeline = await scoresRepo.getTimelineByBatches({
       userId,
       version,
       topN,

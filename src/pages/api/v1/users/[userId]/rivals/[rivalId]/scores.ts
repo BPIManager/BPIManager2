@@ -1,4 +1,4 @@
-import { logsRepo } from "@/lib/db/logs";
+import { scoresRepo } from "@/lib/db/scores";
 import { rejectAccess } from "@/middlewares/api/withApi";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 import { sortSongs } from "@/utils/songs/sort";
@@ -32,7 +32,7 @@ export default async function handler(
     const rivalAccess = await checkProfileAccess(req, rivalId);
     if (!rivalAccess.hasAccess) return rejectAccess(res, rivalAccess);
 
-    const rawResults = await logsRepo.getRivalComparisonScores({
+    const rawResults = await scoresRepo.getRivalComparisonScores({
       viewerId: String(viewerId),
       rivalId,
       version,

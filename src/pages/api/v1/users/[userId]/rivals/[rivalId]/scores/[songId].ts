@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
-import { logsRepo } from "@/lib/db/logs";
+import { scoresRepo } from "@/lib/db/scores";
 import { parseQuery } from "@/services/nextRequest/parseBody";
 import { rivalScoreDetailQuerySchema } from "@/schemas/rivals/rivalId/scores/query";
 
@@ -26,7 +26,7 @@ export default async function handler(
     const rivalAccess = await checkProfileAccess(req, String(rivalId));
     if (!rivalAccess.hasAccess) return rejectAccess(res, rivalAccess);
 
-    const result = await logsRepo.getRivalComparisonScores({
+    const result = await scoresRepo.getRivalComparisonScores({
       viewerId: String(userId),
       rivalId: String(rivalId),
       version: version,

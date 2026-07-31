@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { logsRepo } from "@/lib/db/logs";
+import { scoresRepo } from "@/lib/db/scores";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { selfVersionComparisonQuerySchema } from "@/schemas/scores/query";
 import z from "zod";
@@ -18,7 +18,7 @@ async function handleGetSelfVersion(
 ) {
   const { userId, currentVersion, targetVersion } = query;
 
-  const rows = await logsRepo.getSelfVersionScores({
+  const rows = await scoresRepo.getSelfVersionScores({
     userId,
     currentVersion,
     targetVersion,

@@ -1,4 +1,4 @@
-import { logsRepo } from "@/lib/db/logs";
+import { scoresRepo } from "@/lib/db/scores";
 import {
   AuthenticatedNextApiRequest,
   withAuth,
@@ -28,7 +28,7 @@ const handler = async (
       : undefined;
 
   try {
-    const rows = await logsRepo.getRivalAvgScores({
+    const rows = await scoresRepo.getRivalAvgScores({
       userId,
       version,
       songIds,

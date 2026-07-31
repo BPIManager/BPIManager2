@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import dayjs from "@/lib/dayjs";
 import { logsRepo } from "@/lib/db/logs";
+import { scoresRepo } from "@/lib/db/scores";
 import { statsRepo } from "@/lib/db/stats";
 import { rejectAccess } from "@/middlewares/api/withApi";
 import { mapToLogNested } from "@/utils/logs/getMapNested";
@@ -84,10 +85,10 @@ async function handleLastPlayedBase(
     statsRepo.getScoreHistory(uid, ver, [], []),
     statsRepo.getTotalSongCount([12], []),
     type === "day"
-      ? logsRepo.getScoresByLastPlayedRange(uid, ver, range)
-      : logsRepo.getScoresWithDetails(uid, ver, { onlyLastPlayedInRange: range }),
+      ? scoresRepo.getScoresByLastPlayedRange(uid, ver, range)
+      : scoresRepo.getScoresWithDetails(uid, ver, { onlyLastPlayedInRange: range }),
     isOwnLog
-      ? logsRepo.getOvertakenRivals(uid, ver, {
+      ? scoresRepo.getOvertakenRivals(uid, ver, {
           range: { ...range, basis: "lastPlayed" },
         })
       : [],
@@ -103,7 +104,7 @@ async function handleLastPlayedBase(
     .filter(Boolean);
   const rivalScores =
     isOwnLog && overtakenSongIds.length > 0
-      ? await logsRepo.getRivalScoresForSongs({
+      ? await scoresRepo.getRivalScoresForSongs({
           userId: uid,
           version: ver,
           songIds: overtakenSongIds,
@@ -185,15 +186,15 @@ async function handleCreatedAtBase(
 
   const [scores, overtaken] = await Promise.all([
     type === "day"
-      ? logsRepo.getScoresWithDetails(uid, ver, {
+      ? scoresRepo.getScoresWithDetails(uid, ver, {
           batchIds: batches.map((b) => b.batchId),
           comparisonTime: batches[0].createdAt,
         })
-      : logsRepo.getScoresWithDetails(uid, ver, {
+      : scoresRepo.getScoresWithDetails(uid, ver, {
           batchIds: batches.map((b) => b.batchId),
         }),
     isOwnLog
-      ? logsRepo.getOvertakenRivals(uid, ver, {
+      ? scoresRepo.getOvertakenRivals(uid, ver, {
           range: { ...range, basis: "createdAt" },
         })
       : [],
@@ -204,7 +205,7 @@ async function handleCreatedAtBase(
     .filter(Boolean);
   const rivalScores =
     isOwnLog && overtakenSongIds.length > 0
-      ? await logsRepo.getRivalScoresForSongs({
+      ? await scoresRepo.getRivalScoresForSongs({
           userId: uid,
           version: ver,
           songIds: overtakenSongIds,
@@ -270,7 +271,7 @@ export function computeRivalRankMap(
 }
 
 export function createOvertakenMap(
-  overtakenList: Awaited<ReturnType<typeof logsRepo.getOvertakenRivals>>,
+  overtakenList: Awaited<ReturnType<typeof scoresRepo.getOvertakenRivals>>,
 ): OvertakenMap {
   return overtakenList.reduce<OvertakenMap>((acc, curr) => {
     if (!curr.songId) return acc;

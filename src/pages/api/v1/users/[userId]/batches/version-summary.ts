@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { timelineRepo, navigationRepo } from "@/lib/db/logs";
+import { scoresRepo } from "@/lib/db/scores";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 import { rejectAccess } from "@/middlewares/api/withApi";
 import { parseQuery } from "@/services/nextRequest/parseBody";
@@ -31,7 +31,7 @@ export default async function handler(
     const access = await checkProfileAccess(req, userId);
     if (!access.hasAccess) return rejectAccess(res, access);
 
-    const compareVersion = await navigationRepo.getPreviousVersionWithScores(
+    const compareVersion = await scoresRepo.getPreviousVersionWithScores(
       userId,
       version,
     );
@@ -45,7 +45,7 @@ export default async function handler(
       });
     }
 
-    const rows = await timelineRepo.getSelfVersionScores({
+    const rows = await scoresRepo.getSelfVersionScores({
       userId,
       currentVersion: version,
       targetVersion: compareVersion,

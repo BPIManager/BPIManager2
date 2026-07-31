@@ -1,5 +1,6 @@
 import dayjs from "@/lib/dayjs";
 import { logsRepo } from "@/lib/db/logs";
+import { scoresRepo } from "@/lib/db/scores";
 import { mapToLogNested } from "@/utils/logs/getMapNested";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createOvertakenMap, computeRivalRankMap } from "./[batchId]/scores";
@@ -71,9 +72,9 @@ export default async function handler(
     const [nav, sameDay, scores, overtaken] = await Promise.all([
       logsRepo.getBatchNavigation(uid, v, targetBatch.createdAt, dayRange),
       logsRepo.findBatchesInRange(uid, v, dayRange.start, dayRange.end),
-      logsRepo.getScoresWithDetails(uid, v, { batchIds: [bid] }),
+      scoresRepo.getScoresWithDetails(uid, v, { batchIds: [bid] }),
       isOwnLog
-        ? logsRepo.getOvertakenRivals(uid, v, {
+        ? scoresRepo.getOvertakenRivals(uid, v, {
             batchId: bid,
             range: { ...dayRange, basis: "createdAt" },
           })
@@ -86,7 +87,7 @@ export default async function handler(
       .filter(Boolean);
     const rivalScores =
       isOwnLog && overtakenSongIds.length > 0
-        ? await logsRepo.getRivalScoresForSongs({
+        ? await scoresRepo.getRivalScoresForSongs({
             userId: uid,
             version: v,
             songIds: overtakenSongIds,

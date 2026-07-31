@@ -1,6 +1,5 @@
 import dayjs from "@/lib/dayjs";
 import { db } from "@/lib/db";
-import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import { Database, NewTotalBPILog } from "@/types/db";
 import { Transaction } from "kysely";
 
@@ -186,33 +185,6 @@ class LogNavigationRepository {
       .where("createdAt", "<=", end)
       .orderBy("createdAt", "asc")
       .execute();
-  }
-  async getPreviousVersionWithScores(
-    userId: string,
-    currentVersion: string,
-  ): Promise<string | null> {
-    const versionsOrder: readonly string[] = IIDX_VERSIONS;
-    const currentIdx = versionsOrder.indexOf(currentVersion);
-    if (currentIdx <= 0) return null;
-
-    const previousVersions = versionsOrder.slice(0, currentIdx);
-
-    const rows = await db
-      .selectFrom("scores")
-      .select("version")
-      .where("userId", "=", userId)
-      .where("version", "in", previousVersions)
-      .distinct()
-      .execute();
-
-    const availableVersions = new Set(rows.map((r) => r.version));
-
-    for (let i = currentIdx - 1; i >= 0; i--) {
-      if (availableVersions.has(versionsOrder[i])) {
-        return versionsOrder[i];
-      }
-    }
-    return null;
   }
 }
 

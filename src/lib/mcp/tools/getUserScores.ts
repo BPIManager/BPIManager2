@@ -1,6 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import dayjs from "@/lib/dayjs";
-import { logsRepo } from "@/lib/db/logs";
+import { scoresRepo } from "@/lib/db/scores";
 import { mapToFlatSong } from "@/utils/logs/getMapFlatten";
 import { filterSongsServerSide } from "@/utils/songs/filter";
 import { sortSongs } from "@/utils/songs/sort";
@@ -39,7 +39,7 @@ export function registerGetUserScores(server: McpServer, userId: string) {
           ? dayjs.tz().utc().toDate()
           : dayjs.tz(asOf).utc().toDate();
 
-      const results = await logsRepo.getScoresWithDetails(
+      const results = await scoresRepo.getScoresWithDetails(
         targetUserId,
         version,
         { targetTime: time },

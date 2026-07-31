@@ -4,7 +4,7 @@ import {
   withAuth,
 } from "@/middlewares/api/withAuth";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
-import { socialRepo } from "@/lib/db/social";
+import { scoresRepo } from "@/lib/db/scores";
 import { parseQuery } from "@/services/nextRequest/parseBody";
 import { timelineQuerySchema } from "@/schemas/timeline/query";
 
@@ -31,7 +31,7 @@ async function handler(
   const viewerId = req.authUid;
 
   try {
-    const timeline = await socialRepo.getFollowedTimeline({
+    const timeline = await scoresRepo.getFollowedTimeline({
       viewerId,
       version,
       limit,
@@ -47,7 +47,7 @@ async function handler(
     }
 
     const songIds = Array.from(new Set(timeline.map((t) => Number(t.songId))));
-    const viewerScores = await socialRepo.getViewerScoresForSongs(
+    const viewerScores = await scoresRepo.getViewerScoresForSongs(
       viewerId,
       version,
       songIds,
