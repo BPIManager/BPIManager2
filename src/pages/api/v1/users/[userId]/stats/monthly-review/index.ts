@@ -1,5 +1,5 @@
-import { monthlyReviewRepo } from "@/lib/db/monthly-review";
-import { statsRepo } from "@/lib/db/stats";
+import { monthlyReviewRepo } from "@/lib/db/aggregates/monthly-review";
+import { statsRepo } from "@/lib/db/aggregates/stats";
 import dayjs from "@/lib/dayjs";
 import {
   AuthenticatedNextApiRequest,

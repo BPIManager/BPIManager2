@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { checkUserAccess } from "@/middlewares/api/withApi";
 import { db } from "@/lib/db";
-import { monthlyReviewRepo } from "@/lib/db/monthly-review";
-import { statsRepo } from "@/lib/db/stats";
+import { monthlyReviewRepo } from "@/lib/db/aggregates/monthly-review";
+import { statsRepo } from "@/lib/db/aggregates/stats";
 import { buildBpiTimeline } from "@/lib/monthly-review/bpi";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 import dayjs from "@/lib/dayjs";

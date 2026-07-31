@@ -4,7 +4,7 @@ import {
   withAuth,
 } from "@/middlewares/api/withAuth";
 import { usersRepo } from "@/lib/db/domains/users";
-import { statsRepo } from "@/lib/db/stats";
+import { statsRepo } from "@/lib/db/aggregates/stats";
 import { calculateRadar } from "@/lib/radar/calculator";
 import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import { v4 as uuidv4 } from "uuid";

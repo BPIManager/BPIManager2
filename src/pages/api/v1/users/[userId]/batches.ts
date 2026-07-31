@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { scoresRepo } from "@/lib/db/domains/scores";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
-import { statsRepo } from "@/lib/db/stats";
+import { statsRepo } from "@/lib/db/aggregates/stats";
 import { calculateTotalBpi } from "@/services/logs/calculateTotalBpi";
 import { parseBody } from "@/services/nextRequest/parseBody";
 import { batchesQuerySchema } from "@/schemas/batches/query";

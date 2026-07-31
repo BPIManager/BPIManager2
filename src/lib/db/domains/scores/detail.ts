@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { IIDXVersion } from "@/types/iidx/version";
-import { statsRepo } from "@/lib/db/stats";
+import { statsRepo } from "@/lib/db/aggregates/stats";
 import {
   latestLogIdPerSongScalarSubquery,
   latestLogIdPerSongSubquery,

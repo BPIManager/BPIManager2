@@ -1,5 +1,5 @@
 import { BpiCalculator } from "@/lib/bpi";
-import { statsRepo } from "@/lib/db/stats";
+import { statsRepo } from "@/lib/db/aggregates/stats";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { aaaDifficultySchema } from "@/schemas/stats/aaaDifficulty";
 import { parseQuery } from "@/services/nextRequest/parseBody";

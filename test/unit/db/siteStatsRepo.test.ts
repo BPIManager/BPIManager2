@@ -11,7 +11,7 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-const { siteStatsRepo } = await import("@/lib/db/siteStats");
+const { siteStatsRepo } = await import("@/lib/db/aggregates/siteStats");
 
 describe("siteStatsRepo.getSummary", () => {
   it("totalAllScores/newAllScoresTodayはbk+scores+allLowの合算になること", async () => {

@@ -11,7 +11,7 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-const { statsRepo } = await import("@/lib/db/stats");
+const { statsRepo } = await import("@/lib/db/aggregates/stats");
 
 describe("statsRepo.getLatestTotalBpi", () => {
   it("結果がある場合数値化して返すこと", async () => {

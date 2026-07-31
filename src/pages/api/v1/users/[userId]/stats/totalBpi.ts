@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import dayjs from "@/lib/dayjs";
 import { scoresRepo } from "@/lib/db/domains/scores";
-import { statsRepo } from "@/lib/db/stats";
+import { statsRepo } from "@/lib/db/aggregates/stats";
 import { BpiCalculator } from "@/lib/bpi";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { totalBpiSchema } from "@/schemas/stats/totalBpi";

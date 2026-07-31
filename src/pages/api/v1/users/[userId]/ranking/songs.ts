@@ -3,7 +3,7 @@ import {
   AuthenticatedNextApiRequest,
   withAuth,
 } from "@/middlewares/api/withAuth";
-import { statsRepo } from "@/lib/db/stats";
+import { statsRepo } from "@/lib/db/aggregates/stats";
 import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 
 async function handler(

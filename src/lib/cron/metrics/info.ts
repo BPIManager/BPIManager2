@@ -1,6 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
-import { siteStatsRepo } from "@/lib/db/siteStats";
+import { siteStatsRepo } from "@/lib/db/aggregates/siteStats";
 
 const OUTPUT_DIR = path.join(process.cwd(), "public/data/info");
 const STATS_FILE = path.join(OUTPUT_DIR, "stats.json");

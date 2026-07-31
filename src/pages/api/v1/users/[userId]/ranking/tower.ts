@@ -4,7 +4,7 @@ import {
   withAuth,
 } from "@/middlewares/api/withAuth";
 import { iidxTowerRepo } from "@/lib/db/domains/iidxTower";
-import { statsRepo } from "@/lib/db/stats";
+import { statsRepo } from "@/lib/db/aggregates/stats";
 import { maskPrivateIdentity } from "@/lib/db/shared/privacyMask";
 import { calculateRadar } from "@/lib/radar/calculator";
 import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";

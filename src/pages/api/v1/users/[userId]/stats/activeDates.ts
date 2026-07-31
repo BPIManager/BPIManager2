@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { statsRepo } from "@/lib/db/stats";
+import { statsRepo } from "@/lib/db/aggregates/stats";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { activeDatesSchema } from "@/schemas/stats/activeDates";
 import { parseQuery } from "@/services/nextRequest/parseBody";

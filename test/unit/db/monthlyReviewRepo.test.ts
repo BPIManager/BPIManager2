@@ -11,7 +11,7 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-const { monthlyReviewRepo } = await import("@/lib/db/monthly-review");
+const { monthlyReviewRepo } = await import("@/lib/db/aggregates/monthly-review");
 
 describe("monthlyReviewRepo: 空配列入力での早期return", () => {
   it("getPreMonthBpiStateForUsersはuserIdsが空ならDBに問い合わせず空配列を返すこと", async () => {

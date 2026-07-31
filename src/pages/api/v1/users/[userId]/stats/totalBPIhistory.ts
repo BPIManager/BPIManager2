@@ -1,5 +1,5 @@
 import { BpiCalculator } from "@/lib/bpi";
-import { statsRepo } from "@/lib/db/stats";
+import { statsRepo } from "@/lib/db/aggregates/stats";
 import dayjs from "@/lib/dayjs";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";

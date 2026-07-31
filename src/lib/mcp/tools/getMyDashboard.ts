@@ -1,6 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import dayjs from "@/lib/dayjs";
-import { statsRepo } from "@/lib/db/stats";
+import { statsRepo } from "@/lib/db/aggregates/stats";
 import { rivalRepo } from "@/lib/db/domains/scores";
 import { BpiCalculator } from "@/lib/bpi";
 import { dashboardSchema } from "@/lib/mcp/schemas";

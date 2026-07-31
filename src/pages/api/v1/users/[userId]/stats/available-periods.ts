@@ -1,4 +1,4 @@
-import { monthlyReviewRepo } from "@/lib/db/monthly-review";
+import { monthlyReviewRepo } from "@/lib/db/aggregates/monthly-review";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import type { NextApiRequest, NextApiResponse } from "next";
 

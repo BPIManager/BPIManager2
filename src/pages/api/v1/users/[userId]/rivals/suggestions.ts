@@ -5,7 +5,7 @@ import {
 } from "@/middlewares/api/withAuth";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { calculateRadar } from "@/lib/radar/calculator";
-import { statsRepo } from "@/lib/db/stats";
+import { statsRepo } from "@/lib/db/aggregates/stats";
 import { logsRepo } from "@/lib/db/domains/logs";
 import { usersRepo } from "@/lib/db/domains/users";
 

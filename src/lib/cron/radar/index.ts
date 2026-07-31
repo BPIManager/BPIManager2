@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { calculateRadar } from "@/lib/radar/calculator";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { BpiCalculator } from "@/lib/bpi";
-import { statsRepo } from "@/lib/db/stats";
+import { statsRepo } from "@/lib/db/aggregates/stats";
 
 /** 同時に処理するユーザー数の上限。DB・イベントループへの負荷とジョブ実行時間のバランスを取る。 */
 const CONCURRENCY = 10;

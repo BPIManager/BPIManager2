@@ -1,4 +1,4 @@
-import { statsRepo } from "@/lib/db/stats";
+import { statsRepo } from "@/lib/db/aggregates/stats";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
 import { neighborRecommendedParamsSchema } from "@/schemas/stats/neighborRecommended";

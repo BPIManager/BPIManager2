@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
-import { statsRepo } from "@/lib/db/stats";
+import { statsRepo } from "@/lib/db/aggregates/stats";
 import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
 import { BpiCalculator } from "@/lib/bpi";
 

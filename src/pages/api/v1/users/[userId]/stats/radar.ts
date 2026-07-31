@@ -1,6 +1,6 @@
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { calculateRadar } from "@/lib/radar/calculator";
-import { statsRepo } from "@/lib/db/stats";
+import { statsRepo } from "@/lib/db/aggregates/stats";
 import { NextApiRequest, NextApiResponse } from "next";
 import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
 

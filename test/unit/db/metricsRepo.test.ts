@@ -11,7 +11,7 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-const { metricsRepo } = await import("@/lib/db/metrics");
+const { metricsRepo } = await import("@/lib/db/aggregates/metrics");
 
 describe("metricsRepo.getSongDefs", () => {
   it("isCurrent=1の曲定義のみを取得すること", async () => {
