@@ -7,7 +7,7 @@ import {
 import { scoresRepo } from "@/lib/db/domains/scores";
 import { iidxTowerRepo } from "@/lib/db/domains/iidxTower";
 import { songsRepo } from "@/lib/db/domains/songs";
-import { getArenaStatsHistory } from "@/lib/db/domains/officialArenaStats";
+import { getArenaStatsHistory } from "@/lib/db/domains/arenaHistory";
 
 const jstDayStart = (jstDate: string): Date =>
   new Date(`${jstDate}T00:00:00+09:00`);
