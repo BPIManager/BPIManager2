@@ -9,36 +9,6 @@ import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore";
  * BPI スコアのインポートおよびスコアマスタ参照を担当するリポジトリクラス。
  */
 class BpiRepository {
-  /**
-   * 全難易度の楽曲マスタ（`allSongs` テーブル）を取得する。
-   *
-   * @returns 楽曲 ID・タイトル・ノーツ数・難易度・BPM・textage を含む配列
-   */
-  async getAllLevelMaster(): Promise<
-    {
-      songId: number;
-      title: string;
-      notes: number;
-      difficulty: string;
-      difficultyLevel: number;
-      bpm: string;
-      textage: string;
-    }[]
-  > {
-    return await db
-      .selectFrom("allSongs")
-      .select([
-        "songId",
-        "title",
-        "notes",
-        "difficulty",
-        "difficultyLevel",
-        "bpm",
-        "textage",
-      ])
-      .execute();
-  }
-
   private async getLatestFromTable(
     userId: string,
     version: string,
