@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useMemo, useCallback, useRef } from "react";
+import { useState, useMemo, useCallback, useRef, memo } from "react";
+import { List } from "react-window";
+import type { RowComponentProps } from "react-window";
 import { useUserSongRankings } from "@/hooks/stats/useUserSongRankings";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
@@ -25,6 +27,8 @@ type SortKey =
   | "rank_desc"
   | "title"
   | "updated";
+
+const ITEM_SIZE = 58;
 
 const SORT_OPTIONS: { value: SortKey; label: string }[] = [
   { value: "pct_asc", label: "上位%が高い順" },
@@ -92,7 +96,7 @@ interface SongRankRowProps {
   onClick: () => void;
 }
 
-const SongRankRow = ({ entry, onClick }: SongRankRowProps) => {
+const SongRankRowComponent = ({ entry, onClick }: SongRankRowProps) => {
   const p = pct(entry);
   const pctColor = getPctColor(p);
 
@@ -126,6 +130,35 @@ const SongRankRow = ({ entry, onClick }: SongRankRowProps) => {
         </div>
       </div>
     </button>
+  );
+};
+
+const SongRankRow = memo(SongRankRowComponent);
+
+interface RowData {
+  entries: SongRankEntry[];
+  onRowClick: (entry: SongRankEntry) => void;
+}
+
+const VirtualRow = ({
+  index,
+  style,
+  ariaAttributes,
+  entries,
+  onRowClick,
+}: RowComponentProps<RowData>) => {
+  const entry = entries[index];
+  return (
+    <div
+      style={{
+        ...style,
+        paddingTop: 3,
+        paddingBottom: 3,
+      }}
+      {...ariaAttributes}
+    >
+      <SongRankRow entry={entry} onClick={() => onRowClick(entry)} />
+    </div>
   );
 };
 
@@ -178,6 +211,11 @@ export const SongRankingList = ({ version }: SongRankingListProps) => {
 
     return sortSongs(songs, sort);
   }, [data, sort, levelFilter, debouncedQuery]);
+
+  const rowProps: RowData = useMemo(
+    () => ({ entries: filtered, onRowClick: handleRowClick }),
+    [filtered, handleRowClick],
+  );
 
   if (isLoading) {
     return (
@@ -266,26 +304,27 @@ export const SongRankingList = ({ version }: SongRankingListProps) => {
           </div>
         </div>
 
-        <div
-          className="overflow-y-auto flex flex-col gap-1"
-          style={{ height: "calc(100svh - 440px)", minHeight: "300px" }}
-        >
-          {filtered.length === 0 ? (
-            <div className="flex h-full items-center justify-center text-sm text-bpim-muted">
-              {debouncedQuery || levelFilter !== "all"
-                ? "該当する楽曲がありません"
-                : "データがありません"}
-            </div>
-          ) : (
-            filtered.map((entry) => (
-              <SongRankRow
-                key={`${entry.songId}-${entry.difficulty}`}
-                entry={entry}
-                onClick={() => handleRowClick(entry)}
-              />
-            ))
-          )}
-        </div>
+        {filtered.length === 0 ? (
+          <div
+            className="flex items-center justify-center text-sm text-bpim-muted"
+            style={{ height: "calc(100svh - 440px)", minHeight: "300px" }}
+          >
+            {debouncedQuery || levelFilter !== "all"
+              ? "該当する楽曲がありません"
+              : "データがありません"}
+          </div>
+        ) : (
+          <List
+            rowComponent={VirtualRow}
+            rowCount={filtered.length}
+            rowHeight={ITEM_SIZE}
+            rowProps={rowProps}
+            defaultHeight={500}
+            overscanCount={5}
+            className="rounded-xl border border-bpim-border"
+            style={{ height: "calc(100svh - 440px)", minHeight: "300px" }}
+          />
+        )}
       </div>
 
       <SongDetailView
