@@ -14,6 +14,27 @@ import { getSongRankingFromTable } from "@/lib/db/shared/songRanking";
  */
 class allScoresRepository {
   /**
+   * 指定ユーザー・バージョンの `allScores` テーブルから、曲ごとの最新スコアを取得する。
+   *
+   * @param userId - ユーザー ID
+   * @param version - バージョン番号
+   */
+  async getLatestAllScores(userId: string, version: string) {
+    return await db
+      .selectFrom("allScores")
+      .innerJoin(
+        latestLogIdPerSongSubquery({
+          table: "allScores",
+          userId,
+          version,
+        }).as("latest"),
+        (join) => join.onRef("latest.maxLogId", "=", "allScores.logId"),
+      )
+      .selectAll("allScores")
+      .execute();
+  }
+
+  /**
    * 全難易度の楽曲一覧を、ユーザーの最新スコアと結合して取得する。
    *
    * 検索・レベル・難易度・クリア状態でフィルタリングでき、

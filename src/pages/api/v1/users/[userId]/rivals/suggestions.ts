@@ -6,7 +6,7 @@ import {
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { calculateRadar } from "@/lib/radar/calculator";
 import { statsRepo } from "@/lib/db/stats";
-import { bpiRepo } from "@/lib/db/bpi";
+import { logsRepo } from "@/lib/db/logs";
 import { usersRepo } from "@/lib/db/users";
 
 async function handler(
@@ -37,7 +37,7 @@ async function handler(
     let viewerBaseValue: number;
 
     if (sortKey === "totalBpi") {
-      const record = await bpiRepo.getLatestTotalBpi(viewerId, version);
+      const record = await logsRepo.getLatestTotalBpi(viewerId, version);
       viewerBaseValue = record ? record.totalBpi : -15;
     } else {
       const category = sortKey.toUpperCase() as keyof typeof viewerRadar;

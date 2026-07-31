@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
 import { BpiCalculator } from "@/lib/bpi";
-import { bpiRepo } from "@/lib/db/bpi";
+import { scoresRepo } from "@/lib/db/scores";
 import { getSongWithDefCached } from "@/lib/cache/songDefs";
 import { getArenaAverages } from "@/lib/cache/arenaAverages";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
@@ -62,7 +62,7 @@ export default async function handler(
       bpi !== null ? BpiCalculator.estimateRank(bpi) : null;
 
     const { rank: bpimRank, total: bpimTotal } = includeRank
-      ? await bpiRepo.getSongBpimRank(song.songId, exScore, version)
+      ? await scoresRepo.getSongBpimRank(song.songId, exScore, version)
       : { rank: null, total: null };
 
     let arenaAverages = null;

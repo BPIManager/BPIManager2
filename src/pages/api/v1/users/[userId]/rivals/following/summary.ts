@@ -4,7 +4,7 @@ import {
   withAuth,
 } from "@/middlewares/api/withAuth";
 import { scoresRepo } from "@/lib/db/scores";
-import { bpiRepo } from "@/lib/db/bpi";
+import { logsRepo } from "@/lib/db/logs";
 
 async function handler(
   req: AuthenticatedNextApiRequest,
@@ -38,7 +38,7 @@ async function handler(
         levels: levelArray,
         difficulties: diffArray,
       }),
-      bpiRepo.getLatestTotalBpi(viewerId, version as string),
+      logsRepo.getLatestTotalBpi(viewerId, version as string),
     ]);
 
     return res.status(200).json({

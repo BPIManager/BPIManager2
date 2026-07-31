@@ -13,6 +13,16 @@ vi.mock("@/lib/db", () => ({
 
 const { allScoresRepo } = await import("@/lib/db/allScores");
 
+describe("allScoresRepo.getLatestAllScores", () => {
+  it("allScoresテーブルから最新スコアを取得すること", async () => {
+    dbHolder.current = createDbSpy([]);
+    await allScoresRepo.getLatestAllScores("user-1", "33");
+    expect(callsFor(dbHolder.current.calls, "selectFrom")[0].args).toEqual([
+      "allScores",
+    ]);
+  });
+});
+
 describe("allScoresRepo.getAllScoresList", () => {
   it("フィルタなしの場合、ベースのwhere(deletedAt)のみが適用されること", async () => {
     dbHolder.current = createDbSpy([]);

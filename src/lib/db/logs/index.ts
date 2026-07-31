@@ -20,4 +20,5 @@ export const logsRepo = {
   deleteBatch,
   insert: navigationRepo.insert.bind(navigationRepo),
   deleteByUser: navigationRepo.deleteByUser.bind(navigationRepo),
+  getLatestTotalBpi: navigationRepo.getLatestTotalBpi.bind(navigationRepo),
 };
