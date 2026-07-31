@@ -3,17 +3,17 @@ import { Database, NewScore } from "@/types/db";
 import { Transaction } from "kysely";
 import { IIDX_VERSIONS, latestVersion } from "@/constants/iidx/iidxVersions";
 import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore";
-import { rivalRepo } from "./rival";
+import { rivalRepo } from "@/lib/db/aggregates/rivalScores/rival";
 import { scoreDetailRepo } from "./detail";
 import { timelineRepo } from "./timeline";
-import { socialComparisonRepo } from "./comparison";
-import { socialTimelineRepo } from "./feed";
+import { socialComparisonRepo } from "@/lib/db/aggregates/rivalScores/comparison";
+import { socialTimelineRepo } from "@/lib/db/aggregates/rivalScores/feed";
 
-export { rivalRepo } from "./rival";
+export { rivalRepo } from "@/lib/db/aggregates/rivalScores/rival";
 export { scoreDetailRepo } from "./detail";
 export { timelineRepo } from "./timeline";
-export { socialComparisonRepo } from "./comparison";
-export { socialTimelineRepo } from "./feed";
+export { socialComparisonRepo } from "@/lib/db/aggregates/rivalScores/comparison";
+export { socialTimelineRepo } from "@/lib/db/aggregates/rivalScores/feed";
 
 /**
  * `scores` テーブル（単曲スコア）の書き込み・基本参照を担当するリポジトリクラス。

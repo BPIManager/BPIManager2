@@ -11,7 +11,7 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-const { rivalRepo } = await import("@/lib/db/domains/scores/rival");
+const { rivalRepo } = await import("@/lib/db/aggregates/rivalScores/rival");
 const { scoreDetailRepo } = await import("@/lib/db/domains/scores/detail");
 const { timelineRepo } = await import("@/lib/db/domains/scores/timeline");
 

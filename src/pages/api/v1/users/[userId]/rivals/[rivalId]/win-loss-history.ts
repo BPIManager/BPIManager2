@@ -3,7 +3,7 @@ import { z } from "zod";
 import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 import { rejectAccess } from "@/middlewares/api/withApi";
-import { socialComparisonRepo } from "@/lib/db/domains/scores/comparison";
+import { socialComparisonRepo } from "@/lib/db/aggregates/rivalScores/comparison";
 import dayjs from "@/lib/dayjs";
 import { parseQuery } from "@/services/nextRequest/parseBody";
 
