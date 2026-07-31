@@ -7,23 +7,19 @@ import {
   latestLogIdPerUserSongSubquery,
 } from "@/lib/db/shared/latestScore";
 import { getSongRankingFromTable } from "@/lib/db/shared/songRanking";
+import { logsRepo } from "@/lib/db/domains/logs";
+import { songsRepo } from "@/lib/db/domains/songs";
 
 /**
  * 統計ダッシュボード・分析画面向けのデータ取得を担当するリポジトリクラス。
  */
 class StatsRepository {
   async getLatestTotalBpi(userId: string, version: string): Promise<number> {
-    const result = await db
-      .selectFrom("logs")
-      .select("totalBpi")
-      .where("userId", "=", userId)
-      .where("version", "=", version)
-      .orderBy("createdAt", "desc")
-      .executeTakeFirst();
-
+    const result = await logsRepo.getLatestTotalBpi(userId, version);
     return result ? Number(result.totalBpi) : -15;
   }
 
+  // songs・scores・songDefを横断JOINしたAAA表データ集計のため、直接クエリを維持する。
   async getAAATableData(userId: string, version: IIDXVersion, level: number) {
     const isInf = version === "INF";
     const versionNum = isInf ? null : parseInt(version);
@@ -67,6 +63,7 @@ class StatsRepository {
       .execute();
   }
 
+  // scores・songsを横断JOINした日別プレイ数集計のため、直接クエリを維持する。
   async getActivityData(
     userId: string,
     version: string,
@@ -105,6 +102,7 @@ class StatsRepository {
     return await query.groupBy("date").orderBy("date", "asc").execute();
   }
 
+  // scores・songs・songDefを横断JOINした一覧取得のため、直接クエリを維持する。
   async getLatestScoresWithMusicData(
     userId: string,
     version: string,
@@ -157,6 +155,8 @@ class StatsRepository {
     return await query.execute();
   }
 
+  // scores・songsを横断JOINしたスコア推移集計のため、直接クエリを維持する。
+  // domains/scores からの委譲は廃止し、本メソッドを唯一の実装とした（#156）。
   async getScoreHistory(
     userId: string,
     version: string,
@@ -190,6 +190,7 @@ class StatsRepository {
     return await query.orderBy("s.lastPlayed", "asc").execute();
   }
 
+  // songs・scoresを横断JOINしたBPM分布集計のため、直接クエリを維持する。
   async getSongsWithUserBpiForBpmDistribution(
     userId: string,
     version: IIDXVersion,
@@ -269,18 +270,10 @@ class StatsRepository {
     levels: number[],
     difficulties: string[],
   ): Promise<number> {
-    let query = db
-      .selectFrom("songs")
-      .select((eb) => eb.fn.count("songId").as("count"));
-
-    if (levels.length > 0) query = query.where("difficultyLevel", "in", levels);
-    if (difficulties.length > 0)
-      query = query.where("difficulty", "in", difficulties);
-
-    const result = await query.executeTakeFirst();
-    return Number(result?.count || 0);
+    return songsRepo.getCount(levels, difficulties);
   }
 
+  // allScores・allSongsを横断JOINした全楽曲ランキング集計のため、直接クエリを維持する。
   async getUserSongRankings(userId: string, version: string) {
     const rows = await db
       .with("user_latest", (db) =>
@@ -380,6 +373,7 @@ class StatsRepository {
     }));
   }
 
+  // scores・songs・iidxTowerを横断JOINしたBPI推移・段位別プレイ量集計のため、直接クエリを維持する。
   async getBpiAndVolumePerDate(
     userId: string,
     version: IIDXVersion,
@@ -439,31 +433,11 @@ class StatsRepository {
     levels?: number[],
     difficulties?: string[],
   ): Promise<Set<string>> {
-    const isInf = version === "INF";
-    const versionNum = isInf ? null : parseInt(version);
-
-    let query = db
-      .selectFrom("songs as m")
-      .select(["m.title", "m.difficulty"])
-      .$if(!isInf, (qb) =>
-        qb
-          .where("m.releasedVersion", "<=", versionNum!)
-          .where((eb) =>
-            eb.or([
-              eb("m.deletedAt", "is", null),
-              eb("m.deletedAt", ">", version),
-            ]),
-          ),
-      );
-
-    if (levels && levels.length > 0) {
-      query = query.where("m.difficultyLevel", "in", levels);
-    }
-    if (difficulties && difficulties.length > 0) {
-      query = query.where("m.difficulty", "in", difficulties);
-    }
-
-    const rows = await query.execute();
+    const rows = await songsRepo.getFilteredTitleDifficultyPairs(
+      version,
+      levels,
+      difficulties,
+    );
     return new Set(rows.map((r) => `${r.title}___${r.difficulty}`));
   }
 
@@ -473,27 +447,15 @@ class StatsRepository {
     version: string,
     n: number,
   ): Promise<string[]> {
-    const rows = await db
-      .selectFrom("logs as l")
-      .innerJoin(
-        (qb) =>
-          qb
-            .selectFrom("logs")
-            .select(["userId", (eb) => eb.fn.max("id").as("maxId")])
-            .where("version", "=", version)
-            .groupBy("userId")
-            .as("latest"),
-        (join) => join.onRef("latest.maxId", "=", "l.id"),
-      )
-      .select("l.userId")
-      .where("l.userId", "!=", userId)
-      .orderBy(sql<number>`ABS(l.totalBpi - ${userTotalBpi})`, "asc")
-      .limit(n)
-      .execute();
-
-    return rows.map((r) => r.userId);
+    return logsRepo.getUserIdsOrderedByBpiDistance(
+      version,
+      userId,
+      userTotalBpi,
+      n,
+    );
   }
 
+  // scores・songs・songDefを横断JOINした近傍ユーザーとのスコア比較集計のため、直接クエリを維持する。
   async getNeighborScoreComparison(
     userId: string,
     neighborIds: string[],

@@ -212,7 +212,6 @@ export const scoresRepo = {
     scoreDetailRepo.getScoresWithDetails.bind(scoreDetailRepo),
   getScoresByLastPlayedRange:
     scoreDetailRepo.getScoresByLastPlayedRange.bind(scoreDetailRepo),
-  getScoreHistory: scoreDetailRepo.getScoreHistory.bind(scoreDetailRepo),
 
   // タイムライン・バージョン比較系
   getTimelineByBatches:

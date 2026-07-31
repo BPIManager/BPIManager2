@@ -21,4 +21,6 @@ export const logsRepo = {
   insert: navigationRepo.insert.bind(navigationRepo),
   deleteByUser: navigationRepo.deleteByUser.bind(navigationRepo),
   getLatestTotalBpi: navigationRepo.getLatestTotalBpi.bind(navigationRepo),
+  getUserIdsOrderedByBpiDistance:
+    navigationRepo.getUserIdsOrderedByBpiDistance.bind(navigationRepo),
 };

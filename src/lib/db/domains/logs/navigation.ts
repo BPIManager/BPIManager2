@@ -1,7 +1,7 @@
 import dayjs from "@/lib/dayjs";
 import { db } from "@/lib/db";
 import { Database, NewTotalBPILog } from "@/types/db";
-import { Transaction } from "kysely";
+import { Transaction, sql } from "kysely";
 
 /**
  * スコアログの日付ナビゲーション・バッチ検索を担当するリポジトリクラス。
@@ -199,6 +199,41 @@ class LogNavigationRepository {
       .where("createdAt", "<=", end)
       .orderBy("createdAt", "asc")
       .execute();
+  }
+
+  /**
+   * 指定バージョンの最新バッチログを基準に、目標BPIとの差が近い順にユーザーIDを取得する。
+   *
+   * @param version - バージョン番号
+   * @param excludeUserId - 除外するユーザーID（基準ユーザー自身）
+   * @param targetBpi - 比較対象の総合BPI
+   * @param limit - 取得件数上限
+   */
+  async getUserIdsOrderedByBpiDistance(
+    version: string,
+    excludeUserId: string,
+    targetBpi: number,
+    limit: number,
+  ): Promise<string[]> {
+    const rows = await db
+      .selectFrom("logs as l")
+      .innerJoin(
+        (qb) =>
+          qb
+            .selectFrom("logs")
+            .select(["userId", (eb) => eb.fn.max("id").as("maxId")])
+            .where("version", "=", version)
+            .groupBy("userId")
+            .as("latest"),
+        (join) => join.onRef("latest.maxId", "=", "l.id"),
+      )
+      .select("l.userId")
+      .where("l.userId", "!=", excludeUserId)
+      .orderBy(sql<number>`ABS(l.totalBpi - ${targetBpi})`, "asc")
+      .limit(limit)
+      .execute();
+
+    return rows.map((r) => r.userId);
   }
 }
 

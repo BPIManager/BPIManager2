@@ -179,21 +179,6 @@ describe("scoreDetailRepo.getScoresWithDetails", () => {
   });
 });
 
-describe("scoreDetailRepo.getScoreHistory", () => {
-  it("levels/difficultiesが空でない場合、絞り込みが追加されること", async () => {
-    dbHolder.current = createDbSpy([]);
-    await scoreDetailRepo.getScoreHistory("user-1", "33", [12], ["ANOTHER"]);
-    // ベース3件 + levels + difficulties = 5件
-    expect(callsFor(dbHolder.current.calls, "where")).toHaveLength(5);
-  });
-
-  it("levels/difficultiesが空の場合、ベースのwhereのみになること", async () => {
-    dbHolder.current = createDbSpy([]);
-    await scoreDetailRepo.getScoreHistory("user-1", "33", [], []);
-    expect(callsFor(dbHolder.current.calls, "where")).toHaveLength(3);
-  });
-});
-
 describe("scoreTimelineRepo.getTimelineByBatches", () => {
   it("バッチごとにログをグループ化しtopScoresを構築すること", async () => {
     dbHolder.current = createDbSpy([

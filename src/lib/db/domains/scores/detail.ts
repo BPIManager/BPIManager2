@@ -1,6 +1,5 @@
 import { db } from "@/lib/db";
 import { IIDXVersion } from "@/types/iidx/version";
-import { statsRepo } from "@/lib/db/aggregates/stats";
 import {
   latestLogIdPerSongScalarSubquery,
   latestLogIdPerSongSubquery,
@@ -175,24 +174,6 @@ class LogScoreRepository {
       .orderBy("s.difficultyLevel", "desc")
       .orderBy("s.title", "asc")
       .execute();
-  }
-
-  /**
-   * 指定ユーザーのスコア履歴（BPI 推移）を取得する。
-   *
-   * @param userId - ユーザー ID
-   * @param version - バージョン番号
-   * @param levels - 対象難易度レベルの配列（空の場合は全レベル）
-   * @param difficulties - 対象難易度文字列の配列（空の場合は全難易度）
-   * @returns lastPlayed 昇順のスコア・楽曲情報配列
-   */
-  async getScoreHistory(
-    userId: string,
-    version: string,
-    levels: number[],
-    difficulties: string[],
-  ) {
-    return statsRepo.getScoreHistory(userId, version, levels, difficulties);
   }
 }
 

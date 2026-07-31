@@ -349,6 +349,57 @@ class SongsRepository {
       .sort((a, b) => a.distance - b.distance)
       .slice(0, limit);
   }
+
+  /**
+   * 難易度レベル・難易度表記で絞り込んだ楽曲の総数を返す。
+   */
+  async getCount(levels: number[], difficulties: string[]): Promise<number> {
+    let query = db
+      .selectFrom("songs")
+      .select((eb) => eb.fn.count("songId").as("count"));
+
+    if (levels.length > 0) query = query.where("difficultyLevel", "in", levels);
+    if (difficulties.length > 0)
+      query = query.where("difficulty", "in", difficulties);
+
+    const result = await query.executeTakeFirst();
+    return Number(result?.count || 0);
+  }
+
+  /**
+   * 指定バージョン・難易度レベル・難易度表記で絞り込んだ楽曲の title/difficulty ペアを返す。
+   */
+  async getFilteredTitleDifficultyPairs(
+    version: IIDXVersion,
+    levels?: number[],
+    difficulties?: string[],
+  ) {
+    const isInf = version === "INF";
+    const versionNum = isInf ? null : parseInt(version);
+
+    let query = db
+      .selectFrom("songs as m")
+      .select(["m.title", "m.difficulty"])
+      .$if(!isInf, (qb) =>
+        qb
+          .where("m.releasedVersion", "<=", versionNum!)
+          .where((eb) =>
+            eb.or([
+              eb("m.deletedAt", "is", null),
+              eb("m.deletedAt", ">", version),
+            ]),
+          ),
+      );
+
+    if (levels && levels.length > 0) {
+      query = query.where("m.difficultyLevel", "in", levels);
+    }
+    if (difficulties && difficulties.length > 0) {
+      query = query.where("m.difficulty", "in", difficulties);
+    }
+
+    return await query.execute();
+  }
 }
 
 export const songsRepo = new SongsRepository();
