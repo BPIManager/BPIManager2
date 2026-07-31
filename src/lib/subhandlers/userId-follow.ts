@@ -1,4 +1,5 @@
 import { followsRepo } from "@/lib/db/domains/follow";
+import { followListAggregateRepo } from "@/lib/db/aggregates/followList";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import type { FollowsQuery } from "@/schemas/follows/query";
 import { NextApiResponse } from "next";
@@ -20,7 +21,7 @@ export async function handleGetFollows(
   viewerId: string | undefined,
   query: FollowsQuery,
 ) {
-  const result = await followsRepo.getFollowList({
+  const result = await followListAggregateRepo.getFollowList({
     targetUserId,
     viewerId,
     type: query.type,

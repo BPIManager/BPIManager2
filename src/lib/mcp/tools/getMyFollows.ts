@@ -1,5 +1,5 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { followsRepo } from "@/lib/db/domains/follow";
+import { followListAggregateRepo } from "@/lib/db/aggregates/followList";
 import { myFollowsSchema, MCP_LIST_DEFAULT_LIMIT } from "@/lib/mcp/schemas";
 
 export function registerGetMyFollows(server: McpServer, userId: string) {
@@ -14,7 +14,7 @@ export function registerGetMyFollows(server: McpServer, userId: string) {
       inputSchema: myFollowsSchema.shape,
     },
     async ({ version, page, limit }) => {
-      const result = await followsRepo.getFollowList({
+      const result = await followListAggregateRepo.getFollowList({
         targetUserId: userId,
         viewerId: userId,
         type: "following",
