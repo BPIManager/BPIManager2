@@ -45,8 +45,10 @@ cd BPIManager2
 
 ### 2. Install dependencies
 
+This project uses [pnpm](https://pnpm.io/) (enforced via `preinstall`, so `npm install`/`yarn` will refuse to run):
+
 ```bash
-npm install
+pnpm install
 ```
 
 ### 3. Configure environment variables
@@ -90,21 +92,24 @@ This creates the `beatmaniaBpi` database and all required tables (`users`, `scor
 The dev server uses HTTPS (required for certain browser APIs):
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 Open [https://localhost:3000](https://localhost:3000) in your browser. Accept the self-signed certificate warning on first launch.
 
 ## Available Scripts
 
-| Command           | Description                      |
-| ----------------- | -------------------------------- |
-| `npm run dev`     | Start development server (HTTPS) |
-| `npm run build`   | Build for production             |
-| `npm start`       | Start production server          |
-| `npm run lint`    | Run ESLint                       |
-| `npm test`        | Run tests with Vitest            |
-| `npm run test:ui` | Run tests with Vitest UI         |
+| Command                     | Description                                                 |
+| ---------------------------- | ------------------------------------------------------------ |
+| `pnpm dev`                   | Start development server (HTTPS)                             |
+| `pnpm build`                 | Build for production                                          |
+| `pnpm start`                 | Start production server                                       |
+| `pnpm lint`                  | Run ESLint                                                    |
+| `pnpm test`                  | Run all tests with Vitest (unit + integration)                |
+| `pnpm test:unit`             | Run only unit tests (no external dependencies required)       |
+| `pnpm test:integration`      | Run integration tests (requires a running dev server etc.)    |
+| `pnpm test:ui`               | Run tests with the Vitest UI                                  |
+| `pnpm fetch-arena-metadata`  | Fetch Arena metadata via `scripts/fetchArenaMetadata.ts`      |
 
 ## Database Migrations
 
@@ -115,73 +120,64 @@ The `migrations/schema.sql` file contains the full database schema. It uses `CRE
 After schema changes, regenerate the Kysely type definitions:
 
 ```bash
-npx kysely-codegen --url "$DATABASE_URL" --out-file src/types/sql.d.ts
+npx kysely-codegen --url "$DATABASE_URL" --out-file src/types/db.ts
 ```
 
 ## Project Structure
 
 ```
 src/
-├── assets/                # Static assets (images, etc.)
-├── components/partials/   # UI components, split by role
-│   ├── features/          # Page-specific components, each used by exactly one page
-│   │   ├── Import/        # CSV import flow and success modal
-│   │   ├── Logs/          # Score log views, ranking, overtaken log, BPI trend
-│   │   ├── Metrics/       # AAA difficulty table, Arena average, level selector
-│   │   ├── Profile/       # Public profile page-only parts (e.g. Follows)
-│   │   ├── Settings/      # Account, theme, API key, data transfer, deletion
-│   │   ├── Songs/         # Song list/detail page-only parts
-│   │   ├── Timeline/      # Social timeline card and header
-│   │   └── ...
-│   ├── common/            # Shared components reused across multiple features
-│   │   ├── DashBoard/     # BPI distribution, activity calendar, radar, rivals, etc.
-│   │   ├── Notifications/ # In-app notification components
-│   │   ├── Rivals/        # Rival comparison list, table, mode switch (shared)
-│   │   ├── Songs/         # Song filter/advanced filter (shared across tables)
-│   │   ├── Sidebar/, PageChrome/, Badge/, Charts/, ListControls/, ErrorStates/, Auth/, ...
-│   ├── modal/              # Dialogs/modals (AccountSettings, ImageCrop, SongDetail, ...)
-│   └── shell/              # Page-level shells (RequireAuth, DashboardLayout, ProfileLayoutShell, ...)
-├── contexts/              # React context providers
-├── hooks/                 # Data-fetching hooks (SWR)
+├── assets/               # Static assets (images, lottie animations, etc.)
+├── components/
+│   ├── partials/         # Page-specific & shared composite components
+│   │   ├── features/     # Used by exactly one page (Import, Logs, Metrics, Profile,
+│   │   │                 #   Ranking, Rivals, Settings, Songs, Timeline, ...)
+│   │   ├── common/       # Reused across 2+ features/shells (Auth, Charts, DashBoard,
+│   │   │                 #   ListControls, Notifications, Rivals, Songs, ...)
+│   │   ├── modal/        # Dialogs/modals (AccountSettings, ImageCrop, RivalComparison, SongDetail, ...)
+│   │   └── shell/        # Page-level shells (RequireAuth, DashboardLayout, ProfileLayoutShell, ...)
+│   └── ui/               # shadcn/ui-based generic UI primitives
+├── constants/            # Constants (IIDX versions/ranks, BPM, radar topElements, theme, ...)
+├── contexts/             # React context providers (locale, profile, stats, users)
+├── hooks/                # SWR fetch + local state hooks, grouped by domain
+│                         #   (dashboard, logs, rivals/social, stats, songs, users, ...)
 ├── lib/
-│   ├── bpi/               # BPI calculation logic
-│   ├── cron/              # Scheduled jobs (sitemap, Arena metrics, Radar cache)
-│   ├── db/                # Kysely query modules per domain
-│   │   ├── bpi/
-│   │   ├── follow/
-│   │   ├── logs/
-│   │   ├── metrics/
-│   │   ├── notifications/
-│   │   ├── social/
-│   │   ├── stats/
-│   │   └── users/
-│   ├── firebase/          # Firebase Admin & Auth helpers
-│   ├── lamp/              # LAMP score import utilities
-│   ├── radar/             # Radar chart cache calculation
-│   ├── subhandlers/       # API sub-handlers
-│   ├── transfer/          # Data transfer / migration utilities
-│   └── utils.ts           # Shared utilities
-├── middlewares/           # Next.js middleware (API auth, etc.)
-├── pages/
-│   ├── api/v1/            # REST API routes
-│   ├── import.tsx         # Score import page
-│   ├── index.tsx          # Home / Dashboard
-│   ├── logs.tsx           # Score logs page
-│   ├── metrics/           # Metrics pages (AAA table, Arena average)
-│   ├── my/[version].tsx   # My scores per version
-│   ├── rivals/            # Rival pages
-│   ├── settings.tsx       # Settings page
-│   ├── timeline.tsx       # Social timeline page
-│   └── users/             # Public user profile pages
-├── services/              # Client-side service helpers
-├── styles/                # Global styles
-├── types/                 # TypeScript types including generated DB types
-└── utils/                 # Shared utility functions
+│   ├── arena/            # Arena rank metrics generation
+│   ├── bpi/              # BPI calculation (BpiCalculator) & score optimizer
+│   ├── cache/            # Caching helpers
+│   ├── cron/             # Scheduled jobs (sitemap, Arena metrics, Radar cache)
+│   ├── dayjs/            # dayjs instance with plugins/timezone configured
+│   ├── db/               # Kysely queries, split by role (see CLAUDE.md for details)
+│   │   ├── domains/        # Single-table repositories (scores, songs, users, follow, ...)
+│   │   ├── orchestrators/  # Cross-domain write transactions (batchDeletion, userDeletion, ...)
+│   │   ├── aggregates/     # Cross-domain read-only aggregation views (stats, rivalScores, ...)
+│   │   ├── shared/         # Side-effect-free query builders/helpers
+│   │   └── index.ts        # Kysely connection singleton
+│   ├── discord/          # Discord.js bot
+│   ├── firebase/         # Firebase Admin & Auth helpers
+│   ├── i18n/             # Internationalization helpers
+│   ├── lamp/             # LAMP score import utilities
+│   ├── mcp/              # MCP server tools
+│   ├── monthly-review/   # Monthly review generation
+│   ├── radar/            # Radar chart cache calculation
+│   ├── subhandlers/      # API sub-handlers
+│   ├── transfer/         # Data transfer / migration utilities
+│   └── utils.ts          # Shared utilities
+├── middlewares/api/      # Next.js API middlewares (auth guards, profile access, etc.)
+├── pages/                # Next.js Pages Router (screens & API routes)
+│   └── api/v1/users/[userId]/  # REST API: scores, batches, stats, rivals,
+│                                #   all-scores, ranking, notifications, iidx-tower, tickets, ...
+├── services/             # SWR fetchers / Next.js API request helpers
+├── styles/               # Global styles (Tailwind CSS v4)
+├── types/                # Type definitions (db.ts is kysely-codegen generated)
+└── utils/                # Pure function utilities
 public/
-└── data/metrics/arena/    # Auto-generated Arena metric JSON files
+└── data/metrics/arena/   # Auto-generated Arena metric JSON files
 migrations/
-└── schema.sql             # Full database schema
-test/                      # Vitest test files
+└── schema.sql            # Full database schema
+test/
+├── unit/                 # No external dependencies (day-to-day: `pnpm test:unit`)
+└── integration/          # Requires a running dev server etc.
 ```
 
 ## Background Jobs
@@ -203,5 +199,5 @@ On server startup, three cron jobs are registered automatically via `src/instrum
 
 1. Create a feature branch from `main`
 2. Make your changes
-3. Run `npm test` and `npm run lint` to verify
+3. Run `pnpm test` and `pnpm lint` to verify
 4. Open a pull request
