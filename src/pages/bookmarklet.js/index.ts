@@ -1,5 +1,10 @@
 import type { GetServerSideProps } from "next";
 
+// IIDX-Scraping-Bookmarklet の main ブランチ最新コミットに追従すると、
+// 参照先リポジトリが侵害された場合に未検証のコードを配信してしまうため、
+// 特定コミットに固定する。更新する場合はこのSHAを明示的に書き換えること。
+const BOOKMARKLET_SOURCE_COMMIT = "4bed7f19317d5b1c98037b60eac8b5b72f71d6c1";
+
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
@@ -12,8 +17,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   }
 
   const script = await fetch(
-    "https://raw.githubusercontent.com/BPIManager/IIDX-Scraping-Bookmarklet/refs/heads/main/dist/bookmarklet.min.js?q=" +
-      Math.random(),
+    `https://raw.githubusercontent.com/BPIManager/IIDX-Scraping-Bookmarklet/${BOOKMARKLET_SOURCE_COMMIT}/dist/bookmarklet.min.js`,
   );
   const body = await script.text();
 
