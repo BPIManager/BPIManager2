@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { Database } from "@/types/db";
 import { Transaction } from "kysely";
+import { userDisplayColumns } from "@/lib/db/shared/userDisplay";
 
 /**
  * フォロー関係（`follows` テーブル）の参照・更新を担当するリポジトリクラス。
@@ -163,11 +164,8 @@ class FollowRepository {
 
     const users = await query
       .select([
-        "u.userId",
-        "u.userName",
-        "u.profileImage",
+        ...userDisplayColumns("u"),
         "u.profileText",
-        "u.isPublic",
         "f.createdAt as followedAt",
       ])
       .select((eb) => [

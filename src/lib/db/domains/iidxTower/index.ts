@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { sql } from "kysely";
+import { userDisplayColumns } from "@/lib/db/shared/userDisplay";
 
 type TowerRow = { playDate: string; keyCount: number; scratchCount: number };
 
@@ -165,10 +166,7 @@ export const iidxTowerRepo = {
       .selectFrom("iidxTower as t")
       .innerJoin("users as u", "t.userId", "u.userId")
       .select([
-        "u.userId",
-        "u.userName",
-        "u.profileImage",
-        "u.isPublic",
+        ...userDisplayColumns("u"),
         "u.iidxId",
         sql<number>`SUM(t.keyCount + t.scratchCount)`.as("totalCount"),
         sql<number>`SUM(t.keyCount)`.as("keyCount"),
@@ -177,13 +175,7 @@ export const iidxTowerRepo = {
       .where("t.version", "=", version)
       .where("t.playDate", ">=", new Date(startDate))
       .where("t.playDate", "<=", new Date(endDate))
-      .groupBy([
-        "u.userId",
-        "u.userName",
-        "u.profileImage",
-        "u.isPublic",
-        "u.iidxId",
-      ])
+      .groupBy([...userDisplayColumns("u"), "u.iidxId"])
       .orderBy(sql`SUM(t.keyCount + t.scratchCount)`, "desc")
       .execute();
   },
