@@ -55,7 +55,7 @@ async function printArenaStatus() {
         const remaining = formatDuration(period.end.getTime() - now.getTime());
         console.log(`  Status  : LIVE  (残り ${remaining})`);
         console.log(
-          "  Interval: 30分ごと (JST 07:00-24:00)  +  daily JST 01:30",
+          "  Interval: 30分ごと (JST 07:00-翌00:59)  +  daily JST 01:30",
         );
       } else if (upcoming) {
         const until = formatDuration(period.start.getTime() - now.getTime());
@@ -81,7 +81,7 @@ async function printArenaStatus() {
  * - 毎日 16:00 UTC に `generateInfoJson`
  * - 毎日 UTC 16:30（JST 01:30）に `fetchOfficialArenaDistribution`
  * - 12 時間ごとに `updateAllUserRadarCache`
- * - アリーナ開催期間中は JST 07:00〜24:00（UTC 22:00〜14:59）の間、
+ * - アリーナ開催期間中は JST 07:00〜翌00:59（UTC 22:00〜15:59）の間、
  *   30 分ごとに `fetchOfficialArenaDistribution` を追加実行
  */
 export async function setupArenaService() {
@@ -139,7 +139,7 @@ export async function setupArenaService() {
     }
   });
 
-  // アリーナ開催期間中は JST 07:00〜25:00（UTC 22:00〜15:59）の間、30 分ごとに取得
+  // アリーナ開催期間中は JST 07:00〜翌00:59（UTC 22:00〜15:59）の間、30 分ごとに取得
   cron.schedule("*/30 22-23,0-15 * * *", async () => {
     try {
       const period = await getArenaEventPeriod();
