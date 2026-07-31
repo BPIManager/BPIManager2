@@ -2,6 +2,7 @@ import fs from "fs/promises";
 import path from "path";
 import { getArenaStatsHistory } from "@/lib/db/officialArenaStats";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
+import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -17,6 +18,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (!version || !start || !end) {
     return res.status(400).json({ message: "Missing required params: version, start, end" });
+  }
+  if (!(IIDX_VERSIONS as readonly string[]).includes(version)) {
+    return res.status(400).json({ message: "Invalid version param" });
   }
 
   const startDate = new Date(start);

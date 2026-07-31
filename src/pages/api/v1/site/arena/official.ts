@@ -1,7 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { latestVersion } from "@/constants/iidx/iidxVersions";
+import { IIDX_VERSIONS, latestVersion } from "@/constants/iidx/iidxVersions";
 
 function getOfficialArenaFile(version: string) {
   return path.join(
@@ -16,8 +16,11 @@ export default async function handler(
 ) {
   if (req.method !== "GET") return res.status(405).end();
 
-  const version =
-    typeof req.query.version === "string" ? req.query.version : latestVersion;
+  const rawVersion =
+    typeof req.query.version === "string" ? req.query.version : "";
+  const version = (IIDX_VERSIONS as readonly string[]).includes(rawVersion)
+    ? rawVersion
+    : latestVersion;
 
   try {
     const raw = await fs.readFile(getOfficialArenaFile(version), "utf-8");
