@@ -1,18 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { adminAuth } from "@/lib/firebase/admin";
 import { songPatternsRepo } from "@/lib/db/songPatterns";
+import { resolveOptionalUid } from "@/middlewares/api/resolveOptionalUid";
 import type { VoteType } from "@/types/db";
-
-async function resolveUid(req: NextApiRequest): Promise<string> {
-  const authHeader = req.headers.authorization;
-  if (!authHeader?.startsWith("Bearer ")) return "";
-  try {
-    const decoded = await adminAuth.verifyIdToken(authHeader.slice(7));
-    return decoded.uid;
-  } catch {
-    return "";
-  }
-}
 
 function parseSongId(raw: string | string[] | undefined): number | null {
   if (!raw || Array.isArray(raw)) return null;
@@ -31,7 +20,7 @@ export default async function handler(
   if (!pattern || Array.isArray(pattern))
     return res.status(400).json({ message: "Invalid pattern" });
 
-  const uid = await resolveUid(req);
+  const uid = await resolveOptionalUid(req);
   if (!uid) return res.status(401).json({ message: "Unauthorized" });
 
   if (req.method === "POST") {

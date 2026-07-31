@@ -1,17 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { adminAuth } from "@/lib/firebase/admin";
 import { songNotesRepo } from "@/lib/db/songNotes";
-
-async function resolveUid(req: NextApiRequest): Promise<string> {
-  const authHeader = req.headers.authorization;
-  if (!authHeader?.startsWith("Bearer ")) return "";
-  try {
-    const decoded = await adminAuth.verifyIdToken(authHeader.slice(7));
-    return decoded.uid;
-  } catch {
-    return "";
-  }
-}
+import { resolveOptionalUid } from "@/middlewares/api/resolveOptionalUid";
 
 function parseSongId(raw: string | string[] | undefined): number | null {
   if (!raw || Array.isArray(raw)) return null;
@@ -29,13 +18,13 @@ export default async function handler(
   if (req.method === "GET") {
     const sort =
       req.query.sort === "bpi" ? "bpi" : ("latest" as "latest" | "bpi");
-    const viewerId = await resolveUid(req);
+    const viewerId = await resolveOptionalUid(req);
     const notes = await songNotesRepo.getNotes(songId, viewerId, sort);
     return res.status(200).json(notes);
   }
 
   if (req.method === "POST") {
-    const uid = await resolveUid(req);
+    const uid = await resolveOptionalUid(req);
     if (!uid) return res.status(401).json({ message: "Unauthorized" });
 
     const { body } = req.body ?? {};

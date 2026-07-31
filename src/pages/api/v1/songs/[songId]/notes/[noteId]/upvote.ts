@@ -1,17 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { adminAuth } from "@/lib/firebase/admin";
 import { songNotesRepo } from "@/lib/db/songNotes";
-
-async function requireAuth(req: NextApiRequest): Promise<string | null> {
-  const authHeader = req.headers.authorization;
-  if (!authHeader?.startsWith("Bearer ")) return null;
-  try {
-    const decoded = await adminAuth.verifyIdToken(authHeader.slice(7));
-    return decoded.uid;
-  } catch {
-    return null;
-  }
-}
+import { resolveOptionalUid } from "@/middlewares/api/resolveOptionalUid";
 
 export default async function handler(
   req: NextApiRequest,
@@ -25,7 +14,7 @@ export default async function handler(
   if (req.method !== "POST" && req.method !== "DELETE")
     return res.status(405).end();
 
-  const uid = await requireAuth(req);
+  const uid = await resolveOptionalUid(req);
   if (!uid) return res.status(401).json({ message: "Unauthorized" });
 
   const exists = await songNotesRepo.noteExists(noteId);

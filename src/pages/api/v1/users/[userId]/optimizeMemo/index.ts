@@ -1,18 +1,28 @@
 import { bpiOptimizerRepo } from "@/lib/db/bpi-optimizer";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
-import { adminAuth } from "@/lib/firebase/admin";
+import { withAuth } from "@/middlewares/api/withAuth";
 import { NextApiRequest, NextApiResponse } from "next";
 import { createOptimizeMemoBodySchema } from "@/schemas/optimizeMemo/create";
 import { parseBody } from "@/services/nextRequest/parseBody";
+
+const postHandler = withAuth(async (req, res) => {
+  const uid = req.authUid;
+
+  const body = parseBody(createOptimizeMemoBodySchema, req.body, res);
+  if (!body) return;
+  const { targetBpi, reportData } = body;
+  const reportId = await bpiOptimizerRepo.saveMemo(uid, targetBpi, reportData);
+  return res.status(201).json({ reportId });
+});
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const { userId } = req.query;
-  const uid = String(userId);
-
   if (req.method === "GET") {
+    const { userId } = req.query;
+    const uid = String(userId);
+
     const access = await checkUserAccess(req, uid);
     if (!access.hasAccess) return rejectAccess(res, access);
 
@@ -21,30 +31,7 @@ export default async function handler(
   }
 
   if (req.method === "POST") {
-    const authHeader = req.headers.authorization;
-    if (!authHeader?.startsWith("Bearer ")) {
-      return res.status(401).json({ message: "Missing or invalid token" });
-    }
-    try {
-      const decodedToken = await adminAuth.verifyIdToken(
-        authHeader.split("Bearer ")[1],
-      );
-      if (decodedToken.uid !== uid) {
-        return res.status(403).json({ message: "Forbidden: User ID mismatch" });
-      }
-    } catch {
-      return res.status(401).json({ message: "Invalid token" });
-    }
-
-    const body = parseBody(createOptimizeMemoBodySchema, req.body, res);
-    if (!body) return;
-    const { targetBpi, reportData } = body;
-    const reportId = await bpiOptimizerRepo.saveMemo(
-      uid,
-      targetBpi,
-      reportData,
-    );
-    return res.status(201).json({ reportId });
+    return postHandler(req, res);
   }
 
   return res.status(405).end();

@@ -1,19 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { adminAuth } from "@/lib/firebase/admin";
 import { statsRepo } from "@/lib/db/stats";
 import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
-
-/** Bearer トークンが有効なら uid を返し、なければ空文字を返す */
-async function resolveViewerId(req: NextApiRequest): Promise<string> {
-  const authHeader = req.headers.authorization;
-  if (!authHeader?.startsWith("Bearer ")) return "";
-  try {
-    const decoded = await adminAuth.verifyIdToken(authHeader.slice(7));
-    return decoded.uid;
-  } catch {
-    return "";
-  }
-}
+import { resolveOptionalUid } from "@/middlewares/api/resolveOptionalUid";
 
 export default async function handler(
   req: NextApiRequest,
@@ -36,7 +24,7 @@ export default async function handler(
 
   try {
     // ログイン済みなら viewerId を解決して自分の順位を isSelf=true にする
-    const viewerId = await resolveViewerId(req);
+    const viewerId = await resolveOptionalUid(req);
     const result = await statsRepo.getSongRanking(songIdNum, version, viewerId);
     return res.status(200).json(result);
   } catch (error: unknown) {
