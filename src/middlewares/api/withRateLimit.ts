@@ -18,8 +18,10 @@ const MAX_TRACKED_CLIENTS = 5000;
 const buckets = new Map<string, Bucket>();
 
 function getClientIp(req: NextApiRequest): string {
-  const forwarded = req.headers["x-forwarded-for"];
-  if (typeof forwarded === "string") return forwarded.split(",")[0].trim();
+  // Cloudflare経由の構成のため、クライアントが偽装できるX-Forwarded-Forではなく
+  // Cloudflareがエッジで上書き設定するCF-Connecting-IPを信頼する
+  const cfConnectingIp = req.headers["cf-connecting-ip"];
+  if (typeof cfConnectingIp === "string") return cfConnectingIp.trim();
   return req.socket.remoteAddress ?? "unknown";
 }
 
