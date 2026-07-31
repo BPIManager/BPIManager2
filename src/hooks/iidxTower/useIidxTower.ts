@@ -1,7 +1,6 @@
 ﻿import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import { useUser } from "@/contexts/users/UserContext";
-import { fetcher } from "@/utils/common/fetch";
-import useSWR from "swr";
+import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
 
 export interface IidxTowerEntry {
   playDate: string;
@@ -10,15 +9,14 @@ export interface IidxTowerEntry {
 }
 
 export function useIidxTower(userId: string | undefined, version?: string) {
-  const { fbUser } = useUser();
   const base = userId ? `${API_PREFIX}/users/${userId}/iidx-tower` : null;
   const url = base
     ? version
       ? `${base}?version=${encodeURIComponent(version)}`
       : base
     : null;
-  // fbUser is passed to attach auth token when available (required for private profiles)
-  return useSWR<IidxTowerEntry[]>(url ? [url, fbUser] : null, fetcher);
+  // 認証トークンは取得できれば付与する（非公開プロフィール向け）
+  return useAuthedSWR<IidxTowerEntry[]>(url);
 }
 
 export interface IidxTowerCompareResult {
@@ -39,8 +37,5 @@ export function useIidxTowerCompare(
       ? `${base}?compare=true&version=${encodeURIComponent(version)}`
       : `${base}?compare=true`
     : null;
-  return useSWR<IidxTowerCompareResult>(
-    url && fbUser ? [url, fbUser] : null,
-    fetcher,
-  );
+  return useAuthedSWR<IidxTowerCompareResult>(fbUser && url ? url : null);
 }

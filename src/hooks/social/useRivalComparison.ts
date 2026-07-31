@@ -1,6 +1,5 @@
-﻿import useSWR from "swr";
-import { fetcher } from "@/utils/common/fetch";
-import { useUser } from "@/contexts/users/UserContext";
+﻿import { useUser } from "@/contexts/users/UserContext";
+import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 
 /**
@@ -12,11 +11,10 @@ import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 export const useRivalComparison = (rivalId: string | null) => {
   const { fbUser } = useUser();
 
-  const { data, error, isLoading, mutate, isValidating } = useSWR(
+  const { data, error, isLoading, mutate, isValidating } = useAuthedSWR(
     fbUser && rivalId
-      ? [`${API_PREFIX}/users/${rivalId}/profile?compare=true`, fbUser]
+      ? `${API_PREFIX}/users/${rivalId}/profile?compare=true`
       : null,
-    fetcher,
   );
 
   return {

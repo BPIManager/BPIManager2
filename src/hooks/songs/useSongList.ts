@@ -1,24 +1,21 @@
-﻿import useSWR from "swr";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+﻿import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import { useUser } from "@/contexts/users/UserContext";
-import { fetcher } from "@/utils/common/fetch";
+import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
 import type { SongListResponse } from "@/types/songs/songInfo";
 
 export const useSongList = (version: string) => {
-  const { fbUser, user } = useUser();
+  const { user } = useUser();
   const userId = user?.userId;
 
-  const key = version
+  const url = version
     ? userId
-      ? [`${API_PREFIX}/users/${userId}/songs?version=${version}`, fbUser]
+      ? `${API_PREFIX}/users/${userId}/songs?version=${version}`
       : `${API_PREFIX}/songs?version=${version}`
     : null;
 
-  const { data, isLoading, error } = useSWR<SongListResponse>(
-    key,
-    fetcher,
-    { revalidateOnFocus: false },
-  );
+  const { data, isLoading, error } = useAuthedSWR<SongListResponse>(url, {
+    revalidateOnFocus: false,
+  });
 
   return { songs: data ?? [], isLoading, isError: error };
 };

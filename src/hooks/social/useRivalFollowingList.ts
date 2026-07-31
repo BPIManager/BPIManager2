@@ -1,6 +1,4 @@
-﻿import useSWR from "swr";
-import { fetcher } from "@/utils/common/fetch";
-import { useUser } from "@/contexts/users/UserContext";
+﻿import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 
 interface RivalListItem {
@@ -14,16 +12,14 @@ interface RivalListResponse {
 }
 
 export const useRivalFollowingList = (userId?: string) => {
-  const { fbUser } = useUser();
   const url = userId
     ? `${API_PREFIX}/users/${userId}/rivals/following/list`
     : null;
 
-  const { data, error, isLoading } = useSWR<RivalListResponse>(
-    url ? [url, fbUser] : null,
-    fetcher,
-    { revalidateOnFocus: false, shouldRetryOnError: false },
-  );
+  const { data, error, isLoading } = useAuthedSWR<RivalListResponse>(url, {
+    revalidateOnFocus: false,
+    shouldRetryOnError: false,
+  });
 
   return {
     rivals: data?.rivals ?? [],

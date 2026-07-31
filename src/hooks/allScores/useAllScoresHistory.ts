@@ -1,6 +1,4 @@
-﻿import useSWR from "swr";
-import { useUser } from "@/contexts/users/UserContext";
-import { fetcher } from "@/utils/common/fetch";
+﻿import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import { SongHistoryResponse } from "@/types/songs/score";
 
@@ -17,13 +15,10 @@ export const useAllScoreHistory = (
   songId: number | null,
   enabled = true,
 ) => {
-  const { fbUser } = useUser();
-
-  const { data, error, isLoading } = useSWR<SongHistoryResponse>(
+  const { data, error, isLoading } = useAuthedSWR<SongHistoryResponse>(
     enabled && userId && songId
-      ? [`${API_PREFIX}/users/${userId}/all-scores/${songId}/history`, fbUser]
+      ? `${API_PREFIX}/users/${userId}/all-scores/${songId}/history`
       : null,
-    fetcher,
   );
 
   return { historyGroups: data, isLoading, isError: error };

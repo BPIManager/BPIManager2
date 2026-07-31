@@ -1,7 +1,6 @@
 ﻿import { API_PREFIX } from "@/constants/logic/apiEndpoints";
-import { useUser } from "@/contexts/users/UserContext";
-import { fetcher } from "@/utils/common/fetch";
-import useSWR, { SWRConfiguration } from "swr";
+import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
+import { SWRConfiguration } from "swr";
 
 interface StatsParams {
   userId: string | undefined;
@@ -38,13 +37,12 @@ export function useStatsData<T>(
   { userId, version, levels, difficulties, step, groupBy }: StatsParams,
   { requireLevels = true, ...swrOptions }: UseStatsDataOptions = {},
 ) {
-  const { fbUser } = useUser();
   const hasLevels = levels.length > 0 || difficulties.length > 0;
   const shouldFetch = userId && version && (requireLevels ? hasLevels : true);
 
-  const key = shouldFetch
-    ? [buildStatsUrl(userId, endpoint, version, levels, difficulties, step, groupBy), fbUser]
+  const url = shouldFetch
+    ? buildStatsUrl(userId, endpoint, version, levels, difficulties, step, groupBy)
     : null;
 
-  return useSWR<T>(key, fetcher, swrOptions);
+  return useAuthedSWR<T>(url, swrOptions);
 }

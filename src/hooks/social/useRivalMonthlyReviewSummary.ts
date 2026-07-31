@@ -1,6 +1,4 @@
-﻿import useSWR from "swr";
-import { fetcher } from "@/utils/common/fetch";
-import { useUser } from "@/contexts/users/UserContext";
+﻿import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 
 export interface RivalMonthlyReviewEntry {
@@ -21,18 +19,16 @@ export const useRivalMonthlyReviewSummary = (params: {
   version?: string;
 }) => {
   const { userId, month, version } = params;
-  const { fbUser } = useUser();
 
   const url =
     userId && month && version
       ? `${API_PREFIX}/users/${userId}/rivals/following/monthly-review-summary?month=${month}&version=${version}`
       : null;
 
-  const { data, error, isLoading } = useSWR<Response>(
-    url ? [url, fbUser] : null,
-    fetcher,
-    { revalidateOnFocus: false, shouldRetryOnError: false },
-  );
+  const { data, error, isLoading } = useAuthedSWR<Response>(url, {
+    revalidateOnFocus: false,
+    shouldRetryOnError: false,
+  });
 
   return {
     rivals: data?.rivals ?? [],

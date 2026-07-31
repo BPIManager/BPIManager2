@@ -50,10 +50,7 @@ export const useRecommendedInfinite = (
       levels.forEach((l) => params.append("level", l));
       diffs.forEach((d) => params.append("difficulty", d));
 
-      return [
-        `${API_PREFIX}/users/${userId}/stats/recommended?${params.toString()}`,
-        fbUser,
-      ];
+      return `${API_PREFIX}/users/${userId}/stats/recommended?${params.toString()}`;
     },
     {
       getItems: (page) => page?.[type]?.data ?? [],

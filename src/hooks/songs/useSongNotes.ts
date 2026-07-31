@@ -38,7 +38,8 @@ export function useSongNotes(songId: number, fbUser: FirebaseUser | null) {
   const [sort, setSort] = useState<SongNoteSort>("latest");
 
   const url = `${API_PREFIX}/songs/${songId}/notes?sort=${sort}`;
-  const swrKey: [string, FirebaseUser | null] = [url, fbUser];
+  // キャッシュキーにはFirebase Userオブジェクト全体でなくuidのみを使う
+  const swrKey: [string, string | null] = [url, fbUser?.uid ?? null];
 
   const { data, isLoading, mutate } = useSWR<SongNote[]>(
     swrKey,

@@ -1,6 +1,5 @@
-import useSWR from "swr";
 import useSWRMutation from "swr/mutation";
-import { fetcher } from "@/utils/common/fetch";
+import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
 import { useUser } from "@/contexts/users/UserContext";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 
@@ -19,9 +18,8 @@ interface OAuthClientInfo {
 export const useOAuthClient = () => {
   const { fbUser } = useUser();
 
-  const { data, mutate, isLoading } = useSWR<OAuthClientInfo>(
-    fbUser ? [`${API_PREFIX}/oauthClient`, fbUser] : null,
-    fetcher,
+  const { data, mutate, isLoading } = useAuthedSWR<OAuthClientInfo>(
+    fbUser ? `${API_PREFIX}/oauthClient` : null,
   );
 
   const { trigger: triggerIssue, isMutating: isIssuing } = useSWRMutation(

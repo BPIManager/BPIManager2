@@ -1,6 +1,4 @@
-﻿import useSWR from "swr";
-import { fetcher } from "@/utils/common/fetch";
-import { useUser } from "@/contexts/users/UserContext";
+﻿import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 
 import type { RivalSummaryResult } from "@/types/social/rival";
@@ -26,7 +24,6 @@ export const useRivalSummary = (params: {
   version: string;
 }) => {
   const { userId, levels, difficulties, version } = params;
-  const { fbUser } = useUser();
   const query = new URLSearchParams({ version });
   levels.forEach((l) => query.append("levels", l));
   difficulties.forEach((d) => query.append("difficulties", d));
@@ -40,7 +37,7 @@ export const useRivalSummary = (params: {
     error,
     isLoading: swrLoading,
     mutate,
-  } = useSWR<RivalSummaryResponse>(url ? [url, fbUser] : null, fetcher, {
+  } = useAuthedSWR<RivalSummaryResponse>(url, {
     revalidateOnFocus: false,
     shouldRetryOnError: false,
   });

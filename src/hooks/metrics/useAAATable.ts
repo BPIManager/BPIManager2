@@ -1,8 +1,6 @@
 ﻿import { API_PREFIX } from "@/constants/logic/apiEndpoints";
-import { useUser } from "@/contexts/users/UserContext";
-import { fetcher } from "@/utils/common/fetch";
+import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
 import { useMemo } from "react";
-import useSWR from "swr";
 
 import type { GroupingMode, GoalType, AAATableItem } from "@/types/metrics/aaa";
 
@@ -25,8 +23,6 @@ export const useAAATable = (
   customGoalRatio?: number,
   customGoalOffset?: number,
 ) => {
-  const { fbUser } = useUser();
-
   const params = new URLSearchParams({ level: String(level), version });
   if (goal === "custom" && customGoalRatio !== undefined) {
     params.set("customGoalRatio", String(customGoalRatio));
@@ -41,9 +37,8 @@ export const useAAATable = (
     !!(version && level) &&
     (goal !== "custom" || customGoalRatio !== undefined);
 
-  const { data, error, isLoading } = useSWR<AAATableItem[]>(
-    isReady ? [endpoint, fbUser] : null,
-    fetcher,
+  const { data, error, isLoading } = useAuthedSWR<AAATableItem[]>(
+    isReady ? endpoint : null,
   );
 
   const getTargetBpi = (item: AAATableItem) =>

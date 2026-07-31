@@ -1,12 +1,10 @@
 ﻿import { API_PREFIX } from "@/constants/logic/apiEndpoints";
-import { useUser } from "@/contexts/users/UserContext";
 import { BpiCalculator } from "@/lib/bpi";
 import {
   LogsDetailResponse,
 } from "@/types/logs/batchDetail";
-import { fetcher } from "@/utils/common/fetch";
+import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
 import { useMemo } from "react";
-import useSWR from "swr";
 
 /**
  * バッチ詳細または日付別スコア詳細を取得し、サマリーと抜いた楽曲を付加して返す。
@@ -37,11 +35,8 @@ export const useLogsDetail = (
       ? `${API_PREFIX}/users/${userId}/batches/${date}/scores?version=${version}${groupParam}${typeParam}`
       : null;
 
-  const { fbUser } = useUser();
-
-  const { data, error, isLoading, mutate } = useSWR<LogsDetailResponse>(
-    endpoint ? [endpoint, fbUser] : null,
-    fetcher,
+  const { data, error, isLoading, mutate } = useAuthedSWR<LogsDetailResponse>(
+    endpoint,
     { revalidateOnFocus: false },
   );
 

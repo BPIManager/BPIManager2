@@ -57,10 +57,7 @@ export const useNearLoseInfinite = (
           params.append("lastRivalId", lastRivalId);
         }
 
-        return [
-          `${API_PREFIX}/users/${userId}/rivals/following/scores?${params.toString()}`,
-          fbUser,
-        ];
+        return `${API_PREFIX}/users/${userId}/rivals/following/scores?${params.toString()}`;
       },
       {
         getItems: (page) => page?.items ?? [],

@@ -41,10 +41,7 @@ export const useNeighborRecommendedInfinite = (
       levels.forEach((l) => params.append("level", l));
       diffs.forEach((d) => params.append("difficulty", d));
 
-      return [
-        `${API_PREFIX}/users/${userId}/stats/neighbor-recommended?${params.toString()}`,
-        fbUser,
-      ];
+      return `${API_PREFIX}/users/${userId}/stats/neighbor-recommended?${params.toString()}`;
     },
     {
       getItems: (page) => page?.[type]?.data ?? [],

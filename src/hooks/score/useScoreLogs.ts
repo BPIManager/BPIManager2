@@ -1,8 +1,6 @@
 ﻿import { API_PREFIX } from "@/constants/logic/apiEndpoints";
-import { useUser } from "@/contexts/users/UserContext";
 import { SongHistoryResponse } from "@/types/songs/score";
-import { fetcher } from "@/utils/common/fetch";
-import useSWR from "swr";
+import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
 
 /**
  * 指定楽曲のスコア履歴を取得する。
@@ -12,13 +10,10 @@ import useSWR from "swr";
  * @returns スコア履歴グループ・ローディング状態・エラー情報
  */
 export const useScoreHistory = (userId: string | undefined, songId: number) => {
-  const { fbUser } = useUser();
-
-  const { data, error, isLoading } = useSWR<SongHistoryResponse>(
+  const { data, error, isLoading } = useAuthedSWR<SongHistoryResponse>(
     userId && songId
-      ? [`${API_PREFIX}/users/${userId}/scores/${songId}/history`, fbUser]
+      ? `${API_PREFIX}/users/${userId}/scores/${songId}/history`
       : null,
-    fetcher,
   );
 
   return {

@@ -18,8 +18,10 @@ export const useBpiOptimizerMemos = (
 ) => {
   const { mutate } = useSWRConfig();
   const apiUrl = `/api/v1/users/${userId}/optimizeMemo`;
-  const swrKey = useMemo<[string, FirebaseUser | null | undefined] | null>(
-    () => (userId ? [apiUrl, fbUser] : null),
+  // キャッシュキーにはFirebase Userオブジェクト全体でなくuidのみを使う
+  // (fbUser自体はクロージャ経由でfetcherに渡す)
+  const swrKey = useMemo<[string, string | null] | null>(
+    () => (userId ? [apiUrl, fbUser?.uid ?? null] : null),
     [userId, apiUrl, fbUser],
   );
 

@@ -49,10 +49,7 @@ export const useTimeline = (
         query.append("lastId", previousPageData.nextId);
       }
 
-      return [
-        `${API_PREFIX}/users/${fbUser.uid}/timeline?${query.toString()}`,
-        fbUser,
-      ];
+      return `${API_PREFIX}/users/${fbUser.uid}/timeline?${query.toString()}`;
     },
     {
       getItems: (page) => page.timeline,

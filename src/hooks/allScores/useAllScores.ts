@@ -1,6 +1,4 @@
-﻿import useSWR from "swr";
-import { useUser } from "@/contexts/users/UserContext";
-import { fetcher } from "@/utils/common/fetch";
+﻿import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import { AllScoreFilterParams, AllSongWithScore } from "@/types/songs/allSongs";
 
@@ -15,8 +13,6 @@ export const useAllScores = (
   userId: string | undefined,
   params?: AllScoreFilterParams,
 ) => {
-  const { fbUser } = useUser();
-
   const queryString = params
     ? new URLSearchParams(
         Object.entries(params)
@@ -27,11 +23,10 @@ export const useAllScores = (
       ).toString()
     : "";
 
-  const { data, error, isLoading, mutate } = useSWR<AllSongWithScore[]>(
+  const { data, error, isLoading, mutate } = useAuthedSWR<AllSongWithScore[]>(
     userId
-      ? [`${API_PREFIX}/users/${userId}/all-scores/list?${queryString}`, fbUser]
+      ? `${API_PREFIX}/users/${userId}/all-scores/list?${queryString}`
       : null,
-    fetcher,
     { revalidateOnFocus: false, dedupingInterval: 10000 },
   );
 

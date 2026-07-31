@@ -1,5 +1,4 @@
-import useSWR from "swr";
-import { fetcher } from "@/utils/common/fetch";
+import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
 import { useUser } from "@/contexts/users/UserContext";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
@@ -21,11 +20,9 @@ export const useAllSongRanking = (
     fbUser && songId
       ? `${API_PREFIX}/users/${fbUser.uid}/all-scores/${songId}/ranking?version=${version || latestVersion}`
       : null;
-  const { data, isLoading, error } = useSWR<SongRankingResponse>(
-    url ? [url, fbUser] : null,
-    fetcher,
-    { revalidateOnFocus: false },
-  );
+  const { data, isLoading, error } = useAuthedSWR<SongRankingResponse>(url, {
+    revalidateOnFocus: false,
+  });
 
   return { data, isLoading, isError: error };
 };

@@ -1,6 +1,5 @@
-﻿import useSWR from "swr";
-import useSWRMutation from "swr/mutation";
-import { fetcher } from "@/utils/common/fetch";
+﻿import useSWRMutation from "swr/mutation";
+import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
 import { useUser } from "@/contexts/users/UserContext";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 
@@ -12,9 +11,8 @@ import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 export const useApiKey = () => {
   const { fbUser } = useUser();
 
-  const { data, mutate, isLoading } = useSWR(
-    fbUser ? [`${API_PREFIX}/apiKey`, fbUser] : null,
-    fetcher,
+  const { data, mutate, isLoading } = useAuthedSWR(
+    fbUser ? `${API_PREFIX}/apiKey` : null,
   );
 
   const { trigger, isMutating } = useSWRMutation(
