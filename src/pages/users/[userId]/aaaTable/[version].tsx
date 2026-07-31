@@ -3,7 +3,7 @@ import { useUser } from "@/contexts/users/UserContext";
 import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
 import { Meta } from "@/components/partials/common/PageChrome/Head";
 import { UserProfileLayout } from "@/components/partials/common/Profile/Layout/layout";
-import { AAATableContent } from "@/components/partials/features/Metrics/AAATable";
+import { AAATableContent } from "@/components/partials/common/Metrics/AAATable";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { ProfileMeta } from "@/components/partials/common/Profile/Meta/ui";
 import { cn } from "@/lib/utils";

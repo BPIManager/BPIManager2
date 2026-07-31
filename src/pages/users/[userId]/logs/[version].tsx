@@ -2,8 +2,8 @@
 
 import { useRouter } from "next/router";
 import { useUser } from "@/contexts/users/UserContext";
-import { LogsList } from "@/components/partials/features/Logs/LogsList/ui";
-import { PublicLogsCard } from "@/components/partials/features/Logs/PublicLogsCard";
+import { LogsList } from "@/components/partials/common/Logs/LogsList/ui";
+import { PublicLogsCard } from "@/components/partials/common/Logs/PublicLogsCard";
 import { Meta } from "@/components/partials/common/PageChrome/Head";
 import { PageHeader, PageContainer } from "@/components/partials/common/PageChrome/Header";
 import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
@@ -11,7 +11,7 @@ import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { UserProfileLayout } from "@/components/partials/common/Profile/Layout/layout";
 import { ProfileMeta } from "@/components/partials/common/Profile/Meta/ui";
 import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
-import { LogFilterSection } from "@/components/partials/features/Logs/VersionSelector/ui";
+import { LogFilterSection } from "@/components/partials/common/Logs/VersionSelector/ui";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { useIsOwnProfile } from "@/hooks/users/useIsOwnProfile";
 

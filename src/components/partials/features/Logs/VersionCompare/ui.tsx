@@ -1,9 +1,9 @@
 import { useMemo } from "react";
 import { useRouter } from "next/router";
 import { useVersionSummary } from "@/hooks/batches/useVersionSummary";
-import { BatchSongsTable } from "../LogTable/ui";
+import { BatchSongsTable } from "@/components/partials/common/Logs/LogTable/ui";
 import { NoDataAlert } from "@/components/partials/common/DashBoard/NoData";
-import { LogsDetailContentSkeleton } from "../LogsDetail/skeleton";
+import { LogsDetailContentSkeleton } from "@/components/partials/common/Logs/LogsDetail/skeleton";
 import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
 import {
   getBpiDistribution,
@@ -16,8 +16,8 @@ import { useBpiStep } from "@/hooks/common/useBpiStep";
 import { ArrowRightLeft } from "lucide-react";
 import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 import { BpiCalculator } from "@/lib/bpi";
-import { BatchTotalBpiCard } from "../TotalBPI/ui";
-import { LogRank } from "../LogRanking/ui";
+import { BatchTotalBpiCard } from "@/components/partials/common/Logs/TotalBPI/ui";
+import { LogRank } from "@/components/partials/common/Logs/LogRanking/ui";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { AppTabsList, AppTabsTrigger } from "@/components/ui/complex/tabs";
 
