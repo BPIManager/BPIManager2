@@ -8,9 +8,27 @@ import { userDisplayColumns } from "@/lib/db/shared/userDisplay";
  * 結合して組み立てるリポジトリクラス。
  *
  * `follows`ドメイン本来の責務（フォロー関係の読み書き）を超えた
- * クロスドメイン参照のため、`domains/follow`ではなくここに置く（#172）。
+ * クロスドメイン参照のため、`domains/follow`ではなくここに置く。
  */
 class FollowListAggregateRepository {
+  /**
+   * フォロー中の公開ユーザー一覧を取得する（ライバル選択・月次レビュー集計用の軽量版）。
+   *
+   * ページネーションなし。非公開ユーザーは除外する。
+   *
+   * @param userId - フォローしている側のユーザー ID
+   */
+  async getPublicFollowingUsers(userId: string) {
+    return await db
+      .selectFrom("follows as f")
+      .innerJoin("users as u", "f.followingId", "u.userId")
+      .select(["u.userId", "u.userName", "u.profileImage"])
+      .where("f.followerId", "=", userId)
+      .where("u.isPublic", "=", 1)
+      .orderBy("u.userName", "asc")
+      .execute();
+  }
+
   /**
    * フォロー中またはフォロワーのユーザー一覧をページネーション付きで取得する。
    *

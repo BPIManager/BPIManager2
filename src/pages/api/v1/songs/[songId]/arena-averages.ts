@@ -1,4 +1,4 @@
-import { db } from "@/lib/db";
+import { songsRepo } from "@/lib/db/domains/songs";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import fs from "fs/promises";
 import path from "path";
@@ -19,11 +19,7 @@ export default async function handler(
   }
 
   try {
-    const song = await db
-      .selectFrom("songs")
-      .select(["title", "difficulty", "difficultyLevel"])
-      .where("songId", "=", Number(songId))
-      .executeTakeFirst();
+    const song = await songsRepo.getTitleDifficultyLevel(Number(songId));
 
     if (!song) {
       return res.status(404).json({ message: "Song not found" });

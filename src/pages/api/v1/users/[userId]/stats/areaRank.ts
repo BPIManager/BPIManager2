@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { parseQuery } from "@/services/nextRequest/parseBody";
 import { z } from "zod";
-import { db } from "@/lib/db";
+import { usersRepo } from "@/lib/db/domains/users";
 import { getUserAreaRank } from "@/lib/arena/prefectureRankings";
 
 const schema = z.object({ userId: z.string() });
@@ -27,11 +27,7 @@ export default async function handler(
         .json({ message: `Method ${req.method} Not Allowed` });
     }
 
-    const user = await db
-      .selectFrom("users")
-      .select(["iidxId"])
-      .where("userId", "=", userId)
-      .executeTakeFirst();
+    const user = await usersRepo.getIidxId(userId);
 
     if (!user) return res.status(404).json({ message: "User not found" });
 

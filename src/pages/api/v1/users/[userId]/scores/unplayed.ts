@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
-import { db } from "@/lib/db";
+import { unplayedSongsAggregateRepo } from "@/lib/db/aggregates/unplayedSongs";
 import { filterSongsServerSide } from "@/utils/songs/filter";
 import { sortSongs } from "@/utils/songs/sort";
 import topElements from "@/constants/iidx/radars/topElements";
@@ -24,67 +24,10 @@ async function handleGetUnplayed(
       .json({ message: "Missing or invalid version parameter." });
   }
 
-  const rows = await db
-    .selectFrom("songs as s")
-    .innerJoin(
-      (qb) =>
-        qb
-          .selectFrom("songDef")
-          .select([
-            "songId as l_defSongId",
-            (eb) => eb.fn.max("defId").as("maxDefId"),
-          ])
-          .where("isCurrent", "=", 1)
-          .groupBy("songId")
-          .as("latest_sd"),
-      (join) => join.onRef("latest_sd.l_defSongId", "=", "s.songId"),
-    )
-    .leftJoin("songDef as sd", "sd.defId", "latest_sd.maxDefId")
-    .leftJoin(
-      (qb) =>
-        qb
-          .selectFrom("scores as sc")
-          .select([
-            "sc.songId as sc_songId",
-            "sc.exScore",
-            "sc.bpi",
-            "sc.clearState",
-            "sc.missCount",
-            "sc.lastPlayed",
-            "sc.logId",
-          ])
-          .where("sc.userId", "=", userId)
-          .where("sc.version", "=", version)
-          .where("sc.logId", "=", (eb) =>
-            eb
-              .selectFrom("scores as sc2")
-              .select((s) => s.fn.max("logId").as("m"))
-              .where("sc2.userId", "=", userId)
-              .where("sc2.version", "=", version)
-              .whereRef("sc2.songId", "=", "sc.songId"),
-          )
-          .as("my"),
-      (join) => join.onRef("my.sc_songId", "=", "s.songId"),
-    )
-    .select([
-      "s.songId",
-      "s.title",
-      "s.notes",
-      "s.bpm",
-      "s.difficulty",
-      "s.difficultyLevel",
-      "s.releasedVersion",
-      "sd.wrScore",
-      "sd.kaidenAvg",
-      "sd.coef",
-    ])
-    .where("my.sc_songId", "is", null)
-    .where((eb) =>
-      eb.or([eb("s.deletedAt", "is", null), eb("s.deletedAt", ">", version)]),
-    )
-    .orderBy("s.difficultyLevel", "desc")
-    .orderBy("s.title", "asc")
-    .execute();
+  const rows = await unplayedSongsAggregateRepo.getUnplayedSongs(
+    userId,
+    version,
+  );
 
   const songs = rows.map((row) => ({
     songId: Number(row.songId),

@@ -1,12 +1,12 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import dayjs from "@/lib/dayjs";
 import { scoreDetailRepo } from "@/lib/db/domains/scores";
-import { statsRepo } from "@/lib/db/aggregates/stats";
+import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { BpiCalculator } from "@/lib/bpi";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { totalBpiSchema } from "@/schemas/stats/totalBpi";
 import { parseQuery } from "@/services/nextRequest/parseBody";
-import { db } from "@/lib/db";
+import { usersRepo } from "@/lib/db/domains/users";
 import { getUserAreaRank } from "@/lib/arena/prefectureRankings";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 
@@ -35,12 +35,8 @@ export default async function handler(
             targetTime,
             onlyLastPlayedInRange: { start: new Date(0), end: targetTime },
           }),
-          statsRepo.getTotalSongCount([12], []),
-          db
-            .selectFrom("users")
-            .select(["iidxId"])
-            .where("userId", "=", userId)
-            .executeTakeFirst(),
+          statsTablesRepo.getTotalSongCount([12], []),
+          usersRepo.getIidxId(userId),
         ]);
 
         const level12Scores = scores.filter(

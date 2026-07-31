@@ -75,6 +75,7 @@ src/
 - SWRフックは `src/hooks/[ドメイン]/` に配置、フェッチャーは `src/services/swr/` に分離
 - `src/constants/radars/topElements.json` (~95KB) は大きいので直接読まない
 - 新しいDB参照クエリを書くときは既存のDBスキーマ(`migrations/schema.sql`)を確認し、インデックスが最適化どうかを確認すること。可能であれば、既存のインデックスで高速なクエリを書くように努める。
+- `src/pages/api/`配下（APIルート）・`src/lib/mcp/tools/`・`src/lib/cron/`等の呼び出し元レイヤーで`import { db } from "@/lib/db"`し、Kyselyクエリを直接書くことは禁止。どんなに小さい単一テーブル参照(`db.selectFrom("users").select(...).where("userId","=",userId).executeTakeFirst()`等)でも、対応する`domains/[ドメイン]/index.ts`（複数テーブルに及ぶ場合は`aggregates/`）にメソッドとして追加し、呼び出し元はそのメソッドを呼ぶ。同じクエリ形が2箇所以上に登場したら、新規に書く前に既存メソッドで代替できないか確認する
 - 複数テーブルにまたがる書き込み(バッチ削除等)を実装するときは、各テーブルへのクエリはそのテーブルを所有するドメインリポジトリ(`src/lib/db/domains/[ドメイン]/index.ts`)のメソッドとして実装し、他ドメインのテーブルへ直接クエリを書かない。トランザクションを開始する側は`db.transaction().execute(trx => ...)`で各ドメインのメソッドを呼び出す**オーケストレーション役**（`src/lib/db/orchestrators/`）に徹する。各メソッドは第一引数に`trx: Transaction<Database>`を受け取り、呼び出し元のトランザクションに参加できるようにする(例: [`src/lib/db/domains/scores/index.ts`](src/lib/db/domains/scores/index.ts)の`deleteByBatch`、[`src/lib/db/domains/logs/navigation.ts`](src/lib/db/domains/logs/navigation.ts)の`deleteBatch`)。
 
 ### `src/lib/db/` ディレクトリ構成

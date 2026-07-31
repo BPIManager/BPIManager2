@@ -1,4 +1,4 @@
-import { db } from "@/lib/db";
+import { songsRepo } from "@/lib/db/domains/songs";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
@@ -16,19 +16,7 @@ export default async function handler(
   }
 
   try {
-    const definitions = await db
-      .selectFrom("songDef")
-      .select([
-        "defId",
-        "wrScore",
-        "kaidenAvg",
-        "coef",
-        "isCurrent",
-        "updatedAt",
-      ])
-      .where("songId", "=", Number(songId))
-      .orderBy("defId", "desc")
-      .execute();
+    const definitions = await songsRepo.getDefinitionHistory(Number(songId));
 
     return res.status(200).json(definitions);
   } catch (error: unknown) {

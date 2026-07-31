@@ -1,4 +1,4 @@
-import { db } from "@/lib/db";
+import { usersRepo } from "@/lib/db/domains/users";
 import {
   AuthenticatedNextApiRequest,
   withAuth,
@@ -24,17 +24,13 @@ const handler = async (
 
   const { confirmUserName } = body;
 
-  const user = await db
-    .selectFrom("users")
-    .select(["userId", "userName"])
-    .where("userId", "=", userId)
-    .executeTakeFirst();
+  const userName = await usersRepo.getUserName(userId);
 
-  if (!user) {
+  if (userName === null) {
     return res.status(404).json({ message: "User not found" });
   }
 
-  if (confirmUserName !== user.userName) {
+  if (confirmUserName !== userName) {
     return res
       .status(400)
       .json({ message: "ユーザー名が一致しません。入力を確認してください。" });

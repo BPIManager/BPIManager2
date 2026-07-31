@@ -7,7 +7,7 @@ import { Database } from "@/types/db";
  *
  * 他ドメインを横断してユーザー向けの複合ビューを組み立てる処理
  * （おすすめユーザー一覧・検索・ランキング・プロフィール取得等）は
- * `db/aggregates/userProfiles/` に切り出している（#160）。
+ * `db/aggregates/userProfiles/` に切り出している。
  */
 class UsersRepository {
   /**
@@ -110,6 +110,35 @@ class UsersRepository {
     }
     const result = await query.executeTakeFirst();
     return Number(result?.count ?? 0);
+  }
+
+  /**
+   * ユーザー名を取得する（アカウント削除時の確認用）。
+   *
+   * @param userId - ユーザー ID
+   * @returns ユーザー名、存在しない場合は `null`
+   */
+  async getUserName(userId: string): Promise<string | null> {
+    const user = await db
+      .selectFrom("users")
+      .select("userName")
+      .where("userId", "=", userId)
+      .executeTakeFirst();
+    return user?.userName ?? null;
+  }
+
+  /**
+   * IIDX ID を取得する（地域ランキング表示用）。
+   *
+   * @param userId - ユーザー ID
+   * @returns `{ iidxId }`（`iidxId`は未設定の場合`null`）、ユーザー自体が存在しない場合は `undefined`
+   */
+  async getIidxId(userId: string) {
+    return await db
+      .selectFrom("users")
+      .select("iidxId")
+      .where("userId", "=", userId)
+      .executeTakeFirst();
   }
 
   /**

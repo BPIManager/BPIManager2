@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { checkUserAccess } from "@/middlewares/api/withApi";
-import { db } from "@/lib/db";
+import { followListAggregateRepo } from "@/lib/db/aggregates/followList";
 import { monthlyReviewRepo } from "@/lib/db/aggregates/monthly-review";
 import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { buildBpiTimeline } from "@/lib/monthly-review/bpi";
@@ -36,14 +36,9 @@ export default async function handler(
       ? dayjs.tz(`${month}-12-31`).format("YYYY-MM-DD")
       : dayjs.tz(`${month as string}-01`).endOf("month").format("YYYY-MM-DD");
 
-    const rivalRows = await db
-      .selectFrom("follows as f")
-      .innerJoin("users as u", "f.followingId", "u.userId")
-      .select(["u.userId", "u.userName", "u.profileImage"])
-      .where("f.followerId", "=", userId as string)
-      .where("u.isPublic", "=", 1)
-      .orderBy("u.userName", "asc")
-      .execute();
+    const rivalRows = await followListAggregateRepo.getPublicFollowingUsers(
+      userId as string,
+    );
 
     if (rivalRows.length === 0) return res.status(200).json({ rivals: [] });
 

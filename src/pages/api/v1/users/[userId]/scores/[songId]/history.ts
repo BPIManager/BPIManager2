@@ -1,4 +1,4 @@
-import { db } from "@/lib/db";
+import { scoresRepo } from "@/lib/db/domains/scores";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { parseQuery } from "@/services/nextRequest/parseBody";
@@ -20,13 +20,7 @@ export default async function handler(
     const access = await checkUserAccess(req, userId);
     if (!access.hasAccess) return rejectAccess(res, access);
 
-    const history = await db
-      .selectFrom("scores")
-      .selectAll()
-      .where("userId", "=", userId)
-      .where("songId", "=", songId)
-      .orderBy("lastPlayed", "desc")
-      .execute();
+    const history = await scoresRepo.getHistoryForSong(userId, songId);
 
     const groupedHistory = history.reduce(
       (acc, record) => {
