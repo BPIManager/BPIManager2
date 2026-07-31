@@ -4,7 +4,7 @@ import {
   filterSongsFrontend,
   filterSongsServerSide,
 } from "@/utils/songs/filter";
-import { getMaxBpm } from "@/utils/songs/getMaxBPM";
+import { getMaxBpm, getMinBpm, isSoflanBpm } from "@/utils/songs/getMaxBPM";
 import { buildChartViewerUrl, buildTextageUrl } from "@/utils/songs/links";
 import {
   getPatternBadge,
@@ -48,6 +48,26 @@ describe("getMaxBpm", () => {
 
   it("nullのときは0を返すこと", () => {
     expect(getMaxBpm(null)).toBe(0);
+  });
+
+  it("「~」区切りのソフラン表記でも最大値を返すこと(getMaxBPMとfilter.tsでの不統一の回帰防止)", () => {
+    expect(getMaxBpm("100~200")).toBe(200);
+    expect(getMinBpm("100~200")).toBe(100);
+  });
+});
+
+describe("isSoflanBpm", () => {
+  it("「-」「~」どちらの区切りもソフランと判定すること", () => {
+    expect(isSoflanBpm("100-200")).toBe(true);
+    expect(isSoflanBpm("100~200")).toBe(true);
+  });
+
+  it("固定BPMはソフランと判定しないこと", () => {
+    expect(isSoflanBpm("150")).toBe(false);
+  });
+
+  it("nullはソフランと判定しないこと", () => {
+    expect(isSoflanBpm(null)).toBe(false);
   });
 });
 

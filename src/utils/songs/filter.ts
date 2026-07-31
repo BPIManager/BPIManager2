@@ -3,7 +3,7 @@ import {
   SongWithScore,
 } from "@/types/songs/score";
 import { RANK_TABLE } from "@/constants/iidx/rankBorders";
-import { getMaxBpm } from "./getMaxBPM";
+import { getMaxBpm, getMinBpm, isSoflanBpm } from "./getMaxBPM";
 import dayjs from "@/lib/dayjs";
 import type { FilterParams } from "@/types/songs/filter";
 import isBetween from "dayjs/plugin/isBetween";
@@ -27,7 +27,7 @@ export const filterSongsServerSide = (
     const maxBpm = getMaxBpm(s.bpm);
     if (p.bpmMin && maxBpm < Number(p.bpmMin)) return false;
     if (p.bpmMax && maxBpm > Number(p.bpmMax)) return false;
-    if (p.isSofran && !s.bpm?.includes("-")) return false;
+    if (p.isSofran && !isSoflanBpm(s.bpm ?? null)) return false;
 
     if (p.notesMin && s.notes < Number(p.notesMin)) return false;
     if (p.notesMax && s.notes > Number(p.notesMax)) return false;
@@ -77,15 +77,11 @@ export const filterSongsFrontend = (
         return false;
     }
 
-    const isSongSofran = song.bpm
-      ? song.bpm.includes("-") || song.bpm.includes("~")
-      : "";
-    if (params.isSofran && !isSongSofran) return false;
+    if (params.isSofran && !isSoflanBpm(song.bpm ?? null)) return false;
 
     if (params.bpmMin || params.bpmMax) {
-      const bpmParts = (song.bpm ?? "").split(/[-~]/).map((b) => parseInt(b));
-      const minBpm = bpmParts[0];
-      const maxBpm = bpmParts[bpmParts.length - 1];
+      const minBpm = getMinBpm(song.bpm ?? null);
+      const maxBpm = getMaxBpm(song.bpm ?? null);
 
       if (params.bpmMin && maxBpm < params.bpmMin) return false;
       if (params.bpmMax && minBpm > params.bpmMax) return false;

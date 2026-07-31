@@ -1,6 +1,7 @@
 ﻿import { SONG_ATTRIBUTES, SONG_ATTRIBUTES_GLOBAL } from "@/constants/iidx/songAttributes";
 import type { SongListItem, SimilarSongItem } from "@/types/songs/songInfo";
 import type { SortKey, SortDir, AttrMode } from "@/types/songs/songList";
+import { getMaxBpm } from "./getMaxBPM";
 
 
 export const SORT_OPTIONS: { value: SortKey; label: string }[] = [
@@ -11,8 +12,7 @@ export const SORT_OPTIONS: { value: SortKey; label: string }[] = [
 ];
 
 export function getBpmNum(bpm: string): number {
-  const parts = bpm.split("-").map(Number).filter(Boolean);
-  return parts.length > 0 ? Math.max(...parts) : 0;
+  return getMaxBpm(bpm);
 }
 
 export function getSortValue(
