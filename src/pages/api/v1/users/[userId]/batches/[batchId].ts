@@ -1,6 +1,7 @@
 import dayjs from "@/lib/dayjs";
 import { logsRepo } from "@/lib/db/domains/logs";
 import { scoresRepo } from "@/lib/db/domains/scores";
+import { deleteBatch } from "@/lib/db/orchestrators/batchDeletion";
 import { mapToLogNested } from "@/utils/logs/getMapNested";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createOvertakenMap, computeRivalRankMap } from "./[batchId]/scores";
@@ -42,7 +43,7 @@ export default async function handler(
         return res.status(404).json({ message: "Batch not found." });
       }
 
-      await logsRepo.deleteBatch(uid, bid);
+      await deleteBatch(uid, bid);
 
       return res.status(200).json({ message: "Batch deleted successfully." });
     } catch (error: unknown) {
