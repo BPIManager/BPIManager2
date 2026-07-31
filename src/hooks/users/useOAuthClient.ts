@@ -36,6 +36,7 @@ export const useOAuthClient = () => {
         },
         body: JSON.stringify({ redirect_uris: arg.redirectUris }),
       });
+      if (!res.ok) throw new Error("Failed to issue OAuth client");
       return res.json();
     },
   );
@@ -44,10 +45,11 @@ export const useOAuthClient = () => {
     `${API_PREFIX}/oauthClient`,
     async (url) => {
       const token = await fbUser?.getIdToken();
-      await fetch(url, {
+      const res = await fetch(url, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
+      if (!res.ok) throw new Error("Failed to delete OAuth client");
     },
   );
 
