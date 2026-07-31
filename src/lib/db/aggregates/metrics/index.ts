@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { sql } from "kysely";
+import { songsRepo } from "@/lib/db/domains/songs";
 
 /**
  * Arena メトリクス生成に使用する集計クエリを担当するリポジトリクラス。
@@ -11,19 +12,7 @@ class MetricsRepository {
    * @returns タイトル・難易度・ノーツ数・皆伝平均・WR スコア・補正係数の配列
    */
   async getSongDefs() {
-    return await db
-      .selectFrom("songDef as sd")
-      .innerJoin("songs as s", "s.songId", "sd.songId")
-      .select([
-        "s.title",
-        "s.difficulty",
-        "s.notes",
-        "sd.kaidenAvg",
-        "sd.wrScore",
-        "sd.coef",
-      ])
-      .where("sd.isCurrent", "=", 1)
-      .execute();
+    return songsRepo.getCurrentDefsWithSongInfo();
   }
 
   /**
@@ -32,10 +21,7 @@ class MetricsRepository {
    * @returns `{ title, difficulty, notes }` の配列
    */
   async getAllSongs() {
-    return await db
-      .selectFrom("songs")
-      .select(["title", "difficulty", "notes"])
-      .execute();
+    return songsRepo.getAllTitleDifficultyNotes();
   }
 
   /**
@@ -75,6 +61,8 @@ class MetricsRepository {
     ).execute();
   }
 
+  // bkScores(所有ドメインなしの旧バージョン集計専用テーブル)・officialArenaStats・songsを
+  // 横断JOINしたアリーナランク別平均スコア集計のため、直接参照を維持する。
   private buildArenaAverageQuery(version: string, difficultyLevel: number) {
     return db
       .selectFrom("bkScores as s")
@@ -141,6 +129,7 @@ class MetricsRepository {
       .groupBy(sql`s.title, s.difficulty, u.arenarank`);
   }
 
+  // scores・songs・officialArenaStatsを横断JOINしたアリーナランク別平均スコア集計のため、直接参照を維持する。
   private buildArenaAverageQueryFromScores(
     version: string,
     difficultyLevel: number,

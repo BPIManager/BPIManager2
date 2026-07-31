@@ -351,6 +351,35 @@ class SongsRepository {
   }
 
   /**
+   * 現在有効な曲定義（`songDef.isCurrent = 1`）とタイトル・難易度・ノーツ数を結合して取得する（メトリクス生成用）。
+   */
+  async getCurrentDefsWithSongInfo() {
+    return await db
+      .selectFrom("songDef as sd")
+      .innerJoin("songs as s", "s.songId", "sd.songId")
+      .select([
+        "s.title",
+        "s.difficulty",
+        "s.notes",
+        "sd.kaidenAvg",
+        "sd.wrScore",
+        "sd.coef",
+      ])
+      .where("sd.isCurrent", "=", 1)
+      .execute();
+  }
+
+  /**
+   * 全楽曲のタイトル・難易度・ノーツ数を取得する（メトリクス生成用）。
+   */
+  async getAllTitleDifficultyNotes() {
+    return await db
+      .selectFrom("songs")
+      .select(["title", "difficulty", "notes"])
+      .execute();
+  }
+
+  /**
    * 難易度レベル・難易度表記で絞り込んだ楽曲の songId/title/difficulty のみを返す（軽量メタ情報）。
    */
   async getMetaByLevelAndDifficulties(
