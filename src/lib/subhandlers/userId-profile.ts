@@ -1,6 +1,6 @@
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { NextApiRequest, NextApiResponse } from "next";
-import { scoresRepo } from "../db/domains/scores";
+import { scoresRepo } from "../db/aggregates/scoresFacade";
 import { upsertUserProfile } from "../db/orchestrators/userProfileUpsert";
 import { userProfilesRepo } from "../db/aggregates/userProfiles";
 import { v4 as uuidv4 } from "uuid";

@@ -1,4 +1,4 @@
-import { scoresRepo } from "@/lib/db/domains/scores";
+import { scoresRepo } from "@/lib/db/aggregates/scoresFacade";
 import { rejectAccess } from "@/middlewares/api/withApi";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 import { sortSongs } from "@/utils/songs/sort";

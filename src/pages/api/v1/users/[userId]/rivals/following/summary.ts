@@ -3,7 +3,7 @@ import {
   AuthenticatedNextApiRequest,
   withAuth,
 } from "@/middlewares/api/withAuth";
-import { scoresRepo } from "@/lib/db/domains/scores";
+import { scoresRepo } from "@/lib/db/aggregates/scoresFacade";
 import { logsRepo } from "@/lib/db/domains/logs";
 
 async function handler(

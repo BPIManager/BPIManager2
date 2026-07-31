@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
-import { scoresRepo } from "@/lib/db/domains/scores";
+import { scoresRepo } from "@/lib/db/aggregates/scoresFacade";
 import { parseQuery } from "@/services/nextRequest/parseBody";
 import { rivalScoreDetailQuerySchema } from "@/schemas/rivals/rivalId/scores/query";
 

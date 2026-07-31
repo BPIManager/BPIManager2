@@ -1,6 +1,6 @@
 import dayjs from "@/lib/dayjs";
 import { logsRepo } from "@/lib/db/domains/logs";
-import { scoresRepo } from "@/lib/db/domains/scores";
+import { scoresRepo } from "@/lib/db/aggregates/scoresFacade";
 import { deleteBatch } from "@/lib/db/orchestrators/batchDeletion";
 import { mapToLogNested } from "@/utils/logs/getMapNested";
 import type { NextApiRequest, NextApiResponse } from "next";

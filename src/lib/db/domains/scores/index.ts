@@ -6,19 +6,11 @@ import {
   latestLogIdPerSongSubquery,
   latestLogIdPerUserSongSubquery,
 } from "@/lib/db/shared/latestScore";
-import { rivalRepo } from "@/lib/db/aggregates/rivalScores/rival";
 import { scoreDetailRepo } from "./detail";
 import { timelineRepo } from "./timeline";
-import { scoreTimelineRepo } from "@/lib/db/aggregates/scoreTimeline";
-import { socialComparisonRepo } from "@/lib/db/aggregates/rivalScores/comparison";
-import { socialTimelineRepo } from "@/lib/db/aggregates/rivalScores/feed";
 
-export { rivalRepo } from "@/lib/db/aggregates/rivalScores/rival";
 export { scoreDetailRepo } from "./detail";
 export { timelineRepo } from "./timeline";
-export { scoreTimelineRepo } from "@/lib/db/aggregates/scoreTimeline";
-export { socialComparisonRepo } from "@/lib/db/aggregates/rivalScores/comparison";
-export { socialTimelineRepo } from "@/lib/db/aggregates/rivalScores/feed";
 
 /**
  * `scores` テーブル（単曲スコア）の書き込み・基本参照を担当するリポジトリクラス。
@@ -416,10 +408,13 @@ class ScoresRepository {
 const scoresCoreRepo = new ScoresRepository();
 
 /**
- * scores ドメインの各サブリポジトリのメソッドを集約したファサードオブジェクト。
+ * scores ドメイン自身が所有する基本CRUD（`scoresCoreRepo`）・詳細クエリ
+ * （`scoreDetailRepo`）・自己タイムライン（`timelineRepo`）を集約した
+ * ファサードオブジェクト。
  *
- * 基本CRUD（`scoresCoreRepo`）に加え、`rivalRepo`・`scoreDetailRepo`・`timelineRepo`・
- * `socialComparisonRepo`・`socialTimelineRepo` を統合している。
+ * `aggregates/rivalScores`・`aggregates/scoreTimeline`等のクロスドメイン
+ * 複合ビューまで統合した全体ファサードは、依存方向（`aggregates/ → domains/`
+ * の一方向）を守るため`aggregates/scoresFacade`側に置く（#166）。
  * 新規コードでは個別のリポジトリを直接使用することを推奨する。
  */
 export const scoresRepo = {
@@ -448,41 +443,13 @@ export const scoresRepo = {
     scoresCoreRepo.getActivityBreakdownByLastPlayed.bind(scoresCoreRepo),
   getAvailableMonths: scoresCoreRepo.getAvailableMonths.bind(scoresCoreRepo),
 
-  // ライバル比較系
-  getRivalComparisonScores:
-    rivalRepo.getRivalComparisonScores.bind(rivalRepo),
-  getScoreComparisonList: rivalRepo.getScoreComparisonList.bind(rivalRepo),
-  getOvertakenRivals: rivalRepo.getOvertakenRivals.bind(rivalRepo),
-  getRivalAvgScores: rivalRepo.getRivalAvgScores.bind(rivalRepo),
-  getRivalTopScores: rivalRepo.getRivalTopScores.bind(rivalRepo),
-  getRivalLatestScoresBySong:
-    rivalRepo.getRivalLatestScoresBySong.bind(rivalRepo),
-  getFollowedScoresForSong: rivalRepo.getFollowedScoresForSong.bind(rivalRepo),
-
   // スコア詳細クエリ系
   getScoresWithDetails:
     scoreDetailRepo.getScoresWithDetails.bind(scoreDetailRepo),
   getScoresByLastPlayedRange:
     scoreDetailRepo.getScoresByLastPlayedRange.bind(scoreDetailRepo),
 
-  // タイムライン・バージョン比較系
-  getTimelineByBatches:
-    scoreTimelineRepo.getTimelineByBatches.bind(scoreTimelineRepo),
+  // 自己タイムライン系
   getBestEverScores: timelineRepo.getBestEverScores.bind(timelineRepo),
   getSelfVersionScores: timelineRepo.getSelfVersionScores.bind(timelineRepo),
-
-  // ソーシャル比較系（勝敗統計・レーダー・楽曲別スコア）
-  getWinLossStats:
-    socialComparisonRepo.getWinLossStats.bind(socialComparisonRepo),
-  getWinLossHistory:
-    socialComparisonRepo.getWinLossHistory.bind(socialComparisonRepo),
-  getUserRadar: socialComparisonRepo.getUserRadar.bind(socialComparisonRepo),
-  getFollowedWinLossSummary:
-    socialComparisonRepo.getFollowedWinLossSummary.bind(socialComparisonRepo),
-
-  // ソーシャルフィード系（フォロー中ユーザーのスコア更新タイムライン）
-  getFollowedTimeline:
-    socialTimelineRepo.getFollowedTimeline.bind(socialTimelineRepo),
-  getViewerScoresForSongs:
-    socialTimelineRepo.getViewerScoresForSongs.bind(socialTimelineRepo),
 };
