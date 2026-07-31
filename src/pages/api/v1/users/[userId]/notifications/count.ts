@@ -1,4 +1,4 @@
-import { notificationsRepo } from "@/lib/db/domains/notifications";
+import { notificationsAggregateRepo } from "@/lib/db/aggregates/notifications";
 import type { NextApiResponse } from "next";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 import {
@@ -22,7 +22,10 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
     if (!access.hasAccess)
       return res.status(403).json({ message: "Forbidden" });
 
-    const count = await notificationsRepo.getUnreadCount(uid, latestVersion);
+    const count = await notificationsAggregateRepo.getUnreadCount(
+      uid,
+      latestVersion,
+    );
     return res.status(200).json(count);
   } catch (error: unknown) {
     const errorMessage =

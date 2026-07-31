@@ -1,5 +1,6 @@
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { notificationsRepo } from "@/lib/db/domains/notifications";
+import { notificationsAggregateRepo } from "@/lib/db/aggregates/notifications";
 import {
   AuthenticatedNextApiRequest,
   withAuth,
@@ -19,7 +20,7 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
     const { type, page, limit } = query;
     const offset = page * limit;
 
-    const items = await notificationsRepo.getNotifications({
+    const items = await notificationsAggregateRepo.getNotifications({
       userId,
       type,
       limit,
