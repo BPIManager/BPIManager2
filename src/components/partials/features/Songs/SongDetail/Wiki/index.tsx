@@ -6,7 +6,8 @@ import { LoginRequiredTabContent } from "@/components/partials/common/Auth/Login
 import { ActionConfirmDialog } from "@/components/partials/modal/Confirmation";
 import { useUser } from "@/contexts/users/UserContext";
 import { useSongNotes, type SongNote } from "@/hooks/songs/useSongNotes";
-import { NoteCard, SortButton } from "./ui";
+import { NoteCard } from "./ui";
+import { SortButton } from "@/components/partials/common/Songs/SortButton";
 import { WikiTabSkeleton } from "./skeleton";
 
 interface WikiTabProps {
