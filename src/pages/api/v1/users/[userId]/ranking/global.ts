@@ -4,8 +4,7 @@ import {
   withAuth,
 } from "@/middlewares/api/withAuth";
 import { userRankingRepo } from "@/lib/db/aggregates/userProfiles/ranking";
-import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
-import { calculateRadar } from "@/lib/radar/calculator";
+import { radarCacheRepo } from "@/lib/db/domains/radar";
 import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import { v4 as uuidv4 } from "uuid";
 import { JAPAN_PREFECTURES } from "@/constants/iidx/rankingPrefectures";
@@ -64,17 +63,27 @@ async function handler(
     category === "totalBpi" ? filterArenaClass : undefined;
 
   try {
-    const [users, viewerScores] = await Promise.all([
+    const [users, viewerRadarCache] = await Promise.all([
       userRankingRepo.getGlobalRanking(
         version,
         category,
         effectiveFilterArea,
         effectiveFilterArenaClass,
       ),
-      statsTablesRepo.getLatestScoresWithMusicData(viewerId, latestVersion),
+      radarCacheRepo.getForUserAndVersion(viewerId, latestVersion),
     ]);
 
-    const viewerRadar = calculateRadar(viewerScores);
+    const viewerRadar = {
+      NOTES: { totalBpi: Number(viewerRadarCache?.notes ?? -15), songs: [] },
+      CHORD: { totalBpi: Number(viewerRadarCache?.chord ?? -15), songs: [] },
+      PEAK: { totalBpi: Number(viewerRadarCache?.peak ?? -15), songs: [] },
+      CHARGE: { totalBpi: Number(viewerRadarCache?.charge ?? -15), songs: [] },
+      SCRATCH: {
+        totalBpi: Number(viewerRadarCache?.scratch ?? -15),
+        songs: [],
+      },
+      SOFLAN: { totalBpi: Number(viewerRadarCache?.soflan ?? -15), songs: [] },
+    };
 
     const rankings = users.map((u, i) => {
       const radarRow = u as typeof u & Partial<Record<RadarCategory, string | null>>;

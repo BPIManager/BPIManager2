@@ -31,6 +31,21 @@ class RadarCacheRepository {
       .where("userId", "=", userId)
       .execute();
   }
+
+  /**
+   * 指定ユーザー・バージョンのレーダーキャッシュレコードを1件取得する。
+   *
+   * @param userId - ユーザー ID
+   * @param version - バージョン番号
+   */
+  async getForUserAndVersion(userId: string, version: string) {
+    return await db
+      .selectFrom("userRadarCache")
+      .select(["notes", "chord", "peak", "charge", "scratch", "soflan"])
+      .where("userId", "=", userId)
+      .where("version", "=", version)
+      .executeTakeFirst();
+  }
 }
 
 export const radarCacheRepo = new RadarCacheRepository();
