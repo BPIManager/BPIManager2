@@ -145,12 +145,14 @@ export function registerGetMyDashboard(server: McpServer, userId: string) {
         exScore: s.exScore,
         bpi: s.bpi,
       });
-      const strongSongs = [...playedWithBpi]
-        .sort((a, b) => (b.bpi ?? -15) - (a.bpi ?? -15))
-        .slice(0, topSongsLimit)
+      const sortedByBpiAsc = [...playedWithBpi].sort(
+        (a, b) => (a.bpi ?? -15) - (b.bpi ?? -15),
+      );
+      const strongSongs = sortedByBpiAsc
+        .slice(-topSongsLimit)
+        .reverse()
         .map(toSongSummary);
-      const weakSongs = [...playedWithBpi]
-        .sort((a, b) => (a.bpi ?? -15) - (b.bpi ?? -15))
+      const weakSongs = sortedByBpiAsc
         .slice(0, topSongsLimit)
         .map(toSongSummary);
 
