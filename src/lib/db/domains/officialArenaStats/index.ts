@@ -84,9 +84,12 @@ export async function upsertOfficialArenaStats(
     const toInsert = records.filter((r) => {
       const latest = latestMap.get(r.userId);
       if (!latest) return true;
+      const fetchedAt =
+        r.fetchedAt instanceof Date
+          ? r.fetchedAt
+          : new Date(r.fetchedAt as unknown as string);
       // 同じ fetchedAt ウィンドウでは重複挿入しない（サーバー再起動対策）
-      if (latest.fetchedAt.getTime() === (r.fetchedAt as Date).getTime())
-        return false;
+      if (latest.fetchedAt.getTime() === fetchedAt.getTime()) return false;
       return (
         latest.arenaClass !== r.arenaClass ||
         latest.area !== r.area ||

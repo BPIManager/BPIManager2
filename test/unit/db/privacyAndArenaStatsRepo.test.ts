@@ -179,6 +179,40 @@ describe("officialArenaStats.upsertOfficialArenaStats", () => {
 
     expect(result).toEqual({ inserted: 1, skipped: 0 });
   });
+
+  it("fetchedAtがstringで渡されても例外を投げず比較できること", async () => {
+    const fetchedAtIso = "2025-06-01T00:00:00.000Z";
+    dbHolder.current = createTransactionalDbSpy([
+      {
+        userId: "user-1",
+        arenaClass: "A1",
+        area: "東京都",
+        gradeSp: 1,
+        gradeDp: 1,
+        arenaRank: 5,
+        wins: 10,
+        a1continue: 2,
+        fetchedAt: new Date(fetchedAtIso),
+      },
+    ]);
+
+    const result = await upsertOfficialArenaStats([
+      {
+        userId: "user-1",
+        version: "33",
+        arenaClass: "A1",
+        area: "東京都",
+        gradeSp: 1,
+        gradeDp: 1,
+        arenaRank: 5,
+        wins: 10,
+        a1continue: 2,
+        fetchedAt: fetchedAtIso,
+      } as never,
+    ]);
+
+    expect(result).toEqual({ inserted: 0, skipped: 1 });
+  });
 });
 
 describe("officialArenaStats.getLatestArenaStatsPerVersion / getArenaStatsHistory", () => {
