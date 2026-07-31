@@ -46,9 +46,25 @@ export function useArenaAnalysis(
 
   const userBpiMap = useMemo(() => {
     if (!userSongs) return new Map<string, number | null>();
-    return new Map(
-      userSongs.map((s) => [`${s.title}[${s.difficulty}]`, s.bpi]),
-    );
+
+    // アリーナ集計データはsongIdを持たずtitleでしか突合できないため、
+    // 同名リメイク曲(同じtitle[difficulty]で異なるsongId)がuserSongsに
+    // 混在する場合、どちらのスコアかを区別できず誤集計になりうる。
+    // そのようなキーは安全側に倒してマップから除外する。
+    const songIdsByTitleKey = new Map<string, Set<number>>();
+    for (const s of userSongs) {
+      const key = `${s.title}[${s.difficulty}]`;
+      if (!songIdsByTitleKey.has(key)) songIdsByTitleKey.set(key, new Set());
+      songIdsByTitleKey.get(key)!.add(s.songId);
+    }
+
+    const map = new Map<string, number | null>();
+    for (const s of userSongs) {
+      const key = `${s.title}[${s.difficulty}]`;
+      if ((songIdsByTitleKey.get(key)?.size ?? 0) > 1) continue;
+      map.set(key, s.bpi);
+    }
+    return map;
   }, [userSongs]);
 
   const allCategoriesSelected = selectedCategories.size === ALL_RADAR_CATEGORIES.length;

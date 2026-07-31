@@ -386,8 +386,21 @@ export const useAnalyticsComparison = (
       }
     }
 
+    // アリーナ集計データはsongIdを持たずtitleでしか突合できないため、
+    // 同名リメイク曲(同じtitle__difficultyで異なるsongId)がmyScoresに
+    // 混在する場合は誤ったアリーナ平均と静かにマージされてしまう。
+    // そのようなキーは安全側に倒して突合自体をスキップする。
+    const songIdsByTitleKey = new Map<string, Set<number>>();
+    for (const s of myScores) {
+      const key = `${s.title}__${s.difficulty}`;
+      if (!songIdsByTitleKey.has(key)) songIdsByTitleKey.set(key, new Set());
+      songIdsByTitleKey.get(key)!.add(s.songId);
+    }
+
     const songs = myScores.map((s) => {
-      const arena = arenaMap.get(`${s.title}__${s.difficulty}`) ?? null;
+      const key = `${s.title}__${s.difficulty}`;
+      const isAmbiguous = (songIdsByTitleKey.get(key)?.size ?? 0) > 1;
+      const arena = isAmbiguous ? null : (arenaMap.get(key) ?? null);
       return mergeFixedTarget(
         s,
         arena?.avgExScore ?? null,
