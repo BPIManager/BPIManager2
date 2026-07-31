@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useUser } from "@/contexts/users/UserContext";
 import { LoginButtons } from "@/components/partials/common/Auth/Buttons";
@@ -13,11 +13,20 @@ function getStringParam(value: string | string[] | undefined) {
   return typeof value === "string" ? value : undefined;
 }
 
+interface ClientIdentity {
+  clientName: string | null;
+  redirectHosts: string[];
+}
+
 export default function OAuthAuthorizePage() {
   const router = useRouter();
   const { fbUser, user, isLoading } = useUser();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [clientIdentity, setClientIdentity] = useState<ClientIdentity | null>(
+    null,
+  );
+  const [clientLookupFailed, setClientLookupFailed] = useState(false);
 
   const clientId = getStringParam(router.query.client_id);
   const redirectUri = getStringParam(router.query.redirect_uri);
@@ -35,6 +44,27 @@ export default function OAuthAuthorizePage() {
     codeChallengeMethod === "S256" &&
     (!responseType || responseType === "code");
 
+  useEffect(() => {
+    if (!paramsAreValid || !clientId) return;
+
+    let cancelled = false;
+    fetch(`/api/oauth/client?client_id=${encodeURIComponent(clientId)}`)
+      .then((res) => {
+        if (!res.ok) throw new Error("client lookup failed");
+        return res.json();
+      })
+      .then((data: ClientIdentity) => {
+        if (!cancelled) setClientIdentity(data);
+      })
+      .catch(() => {
+        if (!cancelled) setClientLookupFailed(true);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [paramsAreValid, clientId]);
+
   if (isLoading || !router.isReady) {
     return <PageLoader size="lg" />;
   }
@@ -49,6 +79,22 @@ export default function OAuthAuthorizePage() {
         </p>
       </div>
     );
+  }
+
+  if (clientLookupFailed) {
+    return (
+      <div className="mx-auto flex min-h-[60vh] max-w-md flex-col items-center justify-center gap-2 p-6 text-center">
+        <Meta noIndex title="接続の許可" />
+        <p className="text-sm text-bpim-muted">
+          接続元のアプリケーションが見つかりませんでした。
+          リクエストされたclient_idが登録されていません。
+        </p>
+      </div>
+    );
+  }
+
+  if (!clientIdentity) {
+    return <PageLoader size="lg" />;
   }
 
   const handleDeny = () => {
@@ -103,13 +149,19 @@ export default function OAuthAuthorizePage() {
 
       <div className="w-full rounded-2xl border border-bpim-border p-6 text-center">
         <h1 className="mb-2 text-lg font-semibold text-bpim-text">
-          外部アプリケーションからの接続
+          {clientIdentity.clientName ?? "名称未設定のアプリケーション"}
+          からの接続
         </h1>
-        <p className="mb-6 text-sm text-bpim-muted">
-          外部アプリケーションが、あなたのBPIM2データの読み取りを
+        <p className="mb-1 text-sm text-bpim-muted">
+          上記のアプリケーションが、あなたのBPIM2データの読み取りを
           リクエストしています。許可すると、そのアプリケーションはあなた自身の
           スコア情報を取得できるようになります。
         </p>
+        {clientIdentity.redirectHosts.length > 0 && (
+          <p className="mb-6 text-xs text-bpim-muted">
+            接続先: {clientIdentity.redirectHosts.join(", ")}
+          </p>
+        )}
 
         {!fbUser ? (
           <LoginButtons />
