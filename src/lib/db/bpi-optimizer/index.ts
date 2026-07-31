@@ -2,8 +2,8 @@ import { db } from "@/lib/db";
 import { OptimizationResult } from "@/types/bpi-optimizer";
 import { IIDXVersion } from "@/types/iidx/version";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
-import { sql } from "kysely";
 import { v4 as uuidv4 } from "uuid";
+import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore";
 
 /**
  * BPI最適化機能向けのDBアクセスを担当するリポジトリクラス。
@@ -21,28 +21,22 @@ class BpiOptimizerRepository {
   async getAllSongsWithUserScores(userId: string, version: IIDXVersion) {
     const isInf = version === "INF";
     const versionNum = isInf ? null : parseInt(version);
-    const latestScores = db
-      .selectFrom("scores")
-      .select([
-        "songId",
-        "exScore",
-        "bpi",
-        sql<number>`row_number() over(partition by songId order by logId desc)`.as(
-          "rn",
-        ),
-      ])
-      .where("userId", "=", userId)
-      .where("version", "=", version);
+    const latestLogIds = latestLogIdPerSongSubquery({
+      table: "scores",
+      userId,
+      version,
+    });
 
     return db
       .selectFrom("songs as m")
       .innerJoin("songDef as d", (join) =>
         join.onRef("d.songId", "=", "m.songId").on("d.isCurrent", "=", 1),
       )
-      .leftJoin(latestScores.as("userScore"), (join) =>
-        join
-          .onRef("userScore.songId", "=", "m.songId")
-          .on("userScore.rn", "=", 1),
+      .leftJoin(latestLogIds.as("latest"), (join) =>
+        join.onRef("latest.songId", "=", "m.songId"),
+      )
+      .leftJoin("scores as userScore", (join) =>
+        join.onRef("userScore.logId", "=", "latest.maxLogId"),
       )
       .select([
         "m.songId",

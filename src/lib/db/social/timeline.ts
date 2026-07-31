@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
+import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore";
 dayjs.extend(utc);
 
 /**
@@ -184,16 +185,14 @@ class SocialTimelineRepository {
   ) {
     if (songIds.length === 0) return [];
 
-    const latestLogIds = await db
-      .selectFrom("scores")
-      .select(["songId", (eb) => eb.fn.max("logId").as("maxId")])
-      .where("userId", "=", viewerId)
-      .where("version", "=", version)
-      .where("songId", "in", songIds)
-      .groupBy("songId")
-      .execute();
+    const latestLogIds = await latestLogIdPerSongSubquery({
+      table: "scores",
+      userId: viewerId,
+      version,
+      extra: (qb) => qb.where("songId", "in", songIds),
+    }).execute();
 
-    const ids = latestLogIds.map((l) => l.maxId as number);
+    const ids = latestLogIds.map((l) => l.maxLogId as number);
     if (ids.length === 0) return [];
 
     return await db

@@ -1,6 +1,10 @@
 import { db } from "@/lib/db";
 import { IIDXVersion } from "@/types/iidx/version";
 import { sql } from "kysely";
+import {
+  correlatedLatestLogId,
+  latestLogIdPerUserSongSubquery,
+} from "@/lib/db/shared/latestScore";
 
 /**
  * ライバル比較・フォロー中ユーザーとのスコア比較を担当するリポジトリクラス。
@@ -30,36 +34,28 @@ class RivalRepository {
           .on("v.userId", "=", viewerId)
           .on("v.version", "=", version)
           .on("v.logId", "=", (eb) =>
-            eb
-              .selectFrom("scores as v2")
-              .select((sub) => sub.fn.max("logId").as("maxId"))
-              .where("v2.userId", "=", viewerId)
-              .where("v2.version", "=", version)
-              .whereRef("v2.songId", "=", "s.songId"),
+            correlatedLatestLogId(eb, {
+              table: "scores",
+              alias: "v2",
+              songIdRef: "s.songId",
+              version,
+              userId: viewerId,
+            }),
           ),
       )
       .leftJoin("scores as r", (join) => {
         const base = join
           .onRef("r.songId", "=", "s.songId")
           .on("r.version", "=", version)
-          .on("r.logId", "=", (eb) => {
-            const sub = eb
-              .selectFrom("scores as r2")
-              .select((s) => s.fn.max("logId").as("m"))
-              .where("r2.version", "=", version)
-              .whereRef("r2.songId", "=", "s.songId");
-
-            if (rivalId) {
-              return sub.where("r2.userId", "=", rivalId);
-            } else {
-              return sub.where("r2.userId", "in", (qb) =>
-                qb
-                  .selectFrom("follows")
-                  .select("followingId")
-                  .where("followerId", "=", viewerId),
-              );
-            }
-          });
+          .on("r.logId", "=", (eb) =>
+            correlatedLatestLogId(eb, {
+              table: "scores",
+              alias: "r2",
+              songIdRef: "s.songId",
+              version,
+              ...(rivalId ? { userId: rivalId } : { followersOf: viewerId }),
+            }),
+          );
 
         if (rivalId) {
           return base.on("r.userId", "=", rivalId);
@@ -155,12 +151,13 @@ class RivalRepository {
           .on("v.userId", "=", userId)
           .on("v.version", "=", version)
           .on("v.logId", "=", (eb) =>
-            eb
-              .selectFrom("scores as v2")
-              .select((s) => s.fn.max("logId").as("m"))
-              .where("v2.userId", "=", userId)
-              .where("v2.version", "=", version)
-              .whereRef("v2.songId", "=", "s.songId"),
+            correlatedLatestLogId(eb, {
+              table: "scores",
+              alias: "v2",
+              songIdRef: "s.songId",
+              version,
+              userId,
+            }),
           ),
       )
       .innerJoin("scores as r", (join) =>
@@ -174,12 +171,13 @@ class RivalRepository {
               .where("followerId", "=", userId),
           )
           .on("r.logId", "=", (eb) =>
-            eb
-              .selectFrom("scores as r2")
-              .select((s) => s.fn.max("logId").as("m"))
-              .whereRef("r2.userId", "=", "r.userId")
-              .where("r2.version", "=", version)
-              .whereRef("r2.songId", "=", "s.songId"),
+            correlatedLatestLogId(eb, {
+              table: "scores",
+              alias: "r2",
+              songIdRef: "s.songId",
+              version,
+              userIdRef: "r.userId",
+            }),
           ),
       )
       .innerJoin("users as ru", "ru.userId", "r.userId")
@@ -347,31 +345,18 @@ class RivalRepository {
   }) {
     const { userId, version, songIds } = params;
 
-    const latestPerRival = db
-      .selectFrom("scores as sc")
-      .select([
-        "sc.songId",
-        "sc.userId",
-        (eb) => eb.fn.max("sc.logId").as("latestLogId"),
-      ])
-      .where("sc.version", "=", version)
-      .where("sc.userId", "in", (qb) =>
-        qb
-          .selectFrom("follows")
-          .select("followingId")
-          .where("followerId", "=", userId),
-      )
-      .$if(songIds != null && songIds.length > 0, (qb) =>
-        qb.where("sc.songId", "in", songIds!),
-      )
-      .groupBy(["sc.songId", "sc.userId"])
-      .as("latest");
+    const latestPerRival = latestLogIdPerUserSongSubquery({
+      table: "scores",
+      version,
+      followersOf: userId,
+      songIds,
+    }).as("latest");
 
     const rows = await db
       .selectFrom("scores as s")
       .innerJoin(latestPerRival, (join) =>
         join
-          .onRef("s.logId", "=", "latest.latestLogId")
+          .onRef("s.logId", "=", "latest.maxLogId")
           .onRef("s.userId", "=", "latest.userId")
           .onRef("s.songId", "=", "latest.songId"),
       )
@@ -403,29 +388,18 @@ class RivalRepository {
     const { userId, version, songIds } = params;
     if (songIds.length === 0) return [];
 
-    const latestPerRival = db
-      .selectFrom("scores as sc")
-      .select([
-        "sc.songId",
-        "sc.userId",
-        (eb) => eb.fn.max("sc.logId").as("latestLogId"),
-      ])
-      .where("sc.version", "=", version)
-      .where("sc.userId", "in", (qb) =>
-        qb
-          .selectFrom("follows")
-          .select("followingId")
-          .where("followerId", "=", userId),
-      )
-      .where("sc.songId", "in", songIds)
-      .groupBy(["sc.songId", "sc.userId"])
-      .as("latest");
+    const latestPerRival = latestLogIdPerUserSongSubquery({
+      table: "scores",
+      version,
+      followersOf: userId,
+      songIds,
+    }).as("latest");
 
     return await db
       .selectFrom("scores as s")
       .innerJoin(latestPerRival, (join) =>
         join
-          .onRef("s.logId", "=", "latest.latestLogId")
+          .onRef("s.logId", "=", "latest.maxLogId")
           .onRef("s.userId", "=", "latest.userId")
           .onRef("s.songId", "=", "latest.songId"),
       )
@@ -444,31 +418,18 @@ class RivalRepository {
   }) {
     const { userId, version, songIds } = params;
 
-    const latestPerRival = db
-      .selectFrom("scores as sc")
-      .select([
-        "sc.songId",
-        "sc.userId",
-        (eb) => eb.fn.max("sc.logId").as("latestLogId"),
-      ])
-      .where("sc.version", "=", version)
-      .where("sc.userId", "in", (qb) =>
-        qb
-          .selectFrom("follows")
-          .select("followingId")
-          .where("followerId", "=", userId),
-      )
-      .$if(songIds != null && songIds.length > 0, (qb) =>
-        qb.where("sc.songId", "in", songIds!),
-      )
-      .groupBy(["sc.songId", "sc.userId"])
-      .as("latest");
+    const latestPerRival = latestLogIdPerUserSongSubquery({
+      table: "scores",
+      version,
+      followersOf: userId,
+      songIds,
+    }).as("latest");
 
     const rows = await db
       .selectFrom("scores as s")
       .innerJoin(latestPerRival, (join) =>
         join
-          .onRef("s.logId", "=", "latest.latestLogId")
+          .onRef("s.logId", "=", "latest.maxLogId")
           .onRef("s.userId", "=", "latest.userId")
           .onRef("s.songId", "=", "latest.songId"),
       )

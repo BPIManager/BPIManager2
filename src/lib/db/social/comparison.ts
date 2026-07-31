@@ -1,4 +1,9 @@
 import { db } from "@/lib/db";
+import {
+  correlatedLatestLogId,
+  latestLogIdPerSongScalarSubquery,
+  latestLogIdPerUserSongScalarSubquery,
+} from "@/lib/db/shared/latestScore";
 
 /**
  * ソーシャル比較機能（勝敗統計・レーダー・楽曲別スコア）を担当するリポジトリクラス。
@@ -26,12 +31,13 @@ class SocialComparisonRepository {
           .on("v.userId", "=", viewerId)
           .on("v.version", "=", version)
           .on("v.logId", "=", (eb) =>
-            eb
-              .selectFrom("scores as v2")
-              .select((sub) => sub.fn.max("v2.logId").as("m"))
-              .where("v2.userId", "=", viewerId)
-              .where("v2.version", "=", version)
-              .whereRef("v2.songId", "=", "m.songId"),
+            correlatedLatestLogId(eb, {
+              table: "scores",
+              alias: "v2",
+              songIdRef: "m.songId",
+              version,
+              userId: viewerId,
+            }),
           ),
       )
       .innerJoin("scores as r", (join) =>
@@ -40,12 +46,13 @@ class SocialComparisonRepository {
           .on("r.userId", "=", rivalId)
           .on("r.version", "=", version)
           .on("r.logId", "=", (eb) =>
-            eb
-              .selectFrom("scores as r2")
-              .select((sub) => sub.fn.max("r2.logId").as("m"))
-              .where("r2.userId", "=", rivalId)
-              .where("r2.version", "=", version)
-              .whereRef("r2.songId", "=", "m.songId"),
+            correlatedLatestLogId(eb, {
+              table: "scores",
+              alias: "r2",
+              songIdRef: "m.songId",
+              version,
+              userId: rivalId,
+            }),
           ),
       )
       .select([
@@ -149,13 +156,14 @@ class SocialComparisonRepository {
       .where("s.songId", "=", songId)
       .where("s.version", "=", version)
       .where("u.isPublic", "=", 1)
-      .where("s.logId", "in", (eb) =>
-        eb
-          .selectFrom("scores as s2")
-          .select((subEb) => subEb.fn.max("logId").as("logId"))
-          .where("s2.songId", "=", songId)
-          .where("s2.version", "=", version)
-          .groupBy("s2.userId"),
+      .where(
+        "s.logId",
+        "in",
+        latestLogIdPerUserSongScalarSubquery({
+          table: "scores",
+          version,
+          songIds: [songId],
+        }),
       )
       .orderBy("s.exScore", "desc")
       .execute();
@@ -233,13 +241,14 @@ class SocialComparisonRepository {
       .select(["s.songId", "s.exScore"])
       .where("s.userId", "=", viewerId)
       .where("s.version", "=", version)
-      .where("s.logId", "in", (eb) =>
-        eb
-          .selectFrom("scores as s2")
-          .select((sub) => sub.fn.max("s2.logId").as("max"))
-          .where("s2.userId", "=", viewerId)
-          .where("s2.version", "=", version)
-          .groupBy("s2.songId"),
+      .where(
+        "s.logId",
+        "in",
+        latestLogIdPerSongScalarSubquery({
+          table: "scores",
+          userId: viewerId,
+          version,
+        }),
       );
 
     const rivalsLatest = db
@@ -248,14 +257,14 @@ class SocialComparisonRepository {
       .select(["s.userId", "s.songId", "s.exScore"])
       .where("f.followerId", "=", viewerId)
       .where("s.version", "=", version)
-      .where("s.logId", "in", (eb) =>
-        eb
-          .selectFrom("scores as s3")
-          .innerJoin("follows as f3", "f3.followingId", "s3.userId")
-          .select((sub) => sub.fn.max("s3.logId").as("max"))
-          .where("f3.followerId", "=", viewerId)
-          .where("s3.version", "=", version)
-          .groupBy(["s3.userId", "s3.songId"]),
+      .where(
+        "s.logId",
+        "in",
+        latestLogIdPerUserSongScalarSubquery({
+          table: "scores",
+          version,
+          followersOf: viewerId,
+        }),
       );
 
     const latestStatusIds = db

@@ -3,6 +3,11 @@ import { db } from "@/lib/db";
 import { AllDifficulties, AllSongWithScore } from "@/types/songs/allSongs";
 import { Database } from "@/types/db";
 import { Transaction } from "kysely";
+import {
+  latestLogIdPerSongSubquery,
+  latestLogIdPerUserSongScalarSubquery,
+} from "@/lib/db/shared/latestScore";
+import { getSongRankingFromTable } from "@/lib/db/shared/songRanking";
 
 /**
  * 全難易度スコア（`allScores` テーブル）の参照を担当するリポジトリクラス。
@@ -46,17 +51,11 @@ class allScoresRepository {
     let query = db
       .selectFrom("allSongs as s")
       .innerJoin(
-        (qb) =>
-          qb
-            .selectFrom("allScores as sc")
-            .select([
-              "sc.songId as sc_songId",
-              (eb) => eb.fn.max("sc.logId").as("maxLogId"),
-            ])
-            .where("sc.userId", "=", userId)
-            .groupBy("sc.songId")
-            .as("latest"),
-        (join) => join.onRef("latest.sc_songId", "=", "s.songId"),
+        latestLogIdPerSongSubquery({
+          table: "allScores",
+          userId,
+        }).as("latest"),
+        (join) => join.onRef("latest.songId", "=", "s.songId"),
       )
       .innerJoin("allScores as a", (join) =>
         join
@@ -183,13 +182,14 @@ class allScoresRepository {
       .where("s.songId", "=", songId)
       .where("s.version", "=", version)
       .where("u.isPublic", "=", 1)
-      .where("s.logId", "in", (eb) =>
-        eb
-          .selectFrom("allScores as s2")
-          .select((subEb) => subEb.fn.max("logId").as("logId"))
-          .where("s2.songId", "=", songId)
-          .where("s2.version", "=", version)
-          .groupBy("s2.userId"),
+      .where(
+        "s.logId",
+        "in",
+        latestLogIdPerUserSongScalarSubquery({
+          table: "allScores",
+          version,
+          songIds: [songId],
+        }),
       )
       .orderBy("s.exScore", "desc")
       .execute();
@@ -203,49 +203,12 @@ class allScoresRepository {
    * @param viewerId - 閲覧者のユーザー ID（自分自身の判定に使用）
    */
   async getAllSongRanking(songId: number, version: string, viewerId: string) {
-    const rows = await db
-      .selectFrom("allScores as s")
-      .innerJoin("users as u", "s.userId", "u.userId")
-      .innerJoin(
-        (qb) =>
-          qb
-            .selectFrom("allScores")
-            .select(["userId", (eb) => eb.fn.max("logId").as("maxLogId")])
-            .where("songId", "=", songId)
-            .where("version", "=", version)
-            .groupBy("userId")
-            .as("latest"),
-        (join) => join.onRef("latest.maxLogId", "=", "s.logId"),
-      )
-      .select([
-        "s.userId",
-        "u.userName",
-        "u.profileImage",
-        "u.isPublic",
-        "s.exScore",
-        "s.bpi",
-      ])
-      .where("s.songId", "=", songId)
-      .orderBy("s.exScore", "desc")
-      .execute();
-
-    const rankings = rows.map((r, i) => ({
-      rank: i + 1,
-      userId: r.isPublic ? r.userId : `anon-${i}`,
-      userName: r.isPublic ? r.userName : "-",
-      profileImage: r.isPublic ? r.profileImage : null,
-      exScore: r.exScore,
-      bpi: r.bpi !== null && r.bpi !== undefined ? Number(r.bpi) : null,
-      isSelf: r.userId === viewerId,
-    }));
-
-    const selfEntry = rankings.find((r) => r.isSelf);
-
-    return {
-      rankings,
-      totalCount: rankings.length,
-      selfRank: selfEntry?.rank ?? 0,
-    };
+    return getSongRankingFromTable({
+      table: "allScores",
+      songId,
+      version,
+      viewerId,
+    });
   }
 
   /**

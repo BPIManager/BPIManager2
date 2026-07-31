@@ -1,6 +1,10 @@
 import { db } from "@/lib/db";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 import { sql } from "kysely";
+import {
+  latestLogIdPerSongSubquery,
+  latestLogIdPerUserSongSubquery,
+} from "@/lib/db/shared/latestScore";
 
 const jstDayStart = (jstDate: string): Date =>
   new Date(`${jstDate}T00:00:00+09:00`);
@@ -243,16 +247,15 @@ class MonthlyReviewRepository {
     return await db
       .selectFrom("scores as s")
       .innerJoin(
-        (qb) =>
-          qb
-            .selectFrom("scores as s2")
-            .select(["s2.songId", (eb) => eb.fn.max("s2.logId").as("maxLogId")])
-            .where("s2.userId", "=", userId)
-            .where("s2.version", "=", version)
-            .where("s2.songId", "in", songIds)
-            .where("s2.lastPlayed", "<", jstDayStart(monthStart))
-            .groupBy("s2.songId")
-            .as("latest"),
+        latestLogIdPerSongSubquery({
+          table: "scores",
+          userId,
+          version,
+          extra: (qb) =>
+            qb
+              .where("songId", "in", songIds)
+              .where("lastPlayed", "<", jstDayStart(monthStart)),
+        }).as("latest"),
         (join) =>
           join
             .onRef("latest.songId", "=", "s.songId")
@@ -275,18 +278,11 @@ class MonthlyReviewRepository {
             qb
               .selectFrom("scores as s")
               .innerJoin(
-                (qb2) =>
-                  qb2
-                    .selectFrom("scores")
-                    .select([
-                      "userId",
-                      "songId",
-                      (eb2) => eb2.fn.max("logId").as("maxLogId"),
-                    ])
-                    .where("songId", "in", songIds)
-                    .where("version", "=", version)
-                    .groupBy(["userId", "songId"])
-                    .as("latest"),
+                latestLogIdPerUserSongSubquery({
+                  table: "scores",
+                  version,
+                  songIds,
+                }).as("latest"),
                 (join) => join.onRef("latest.maxLogId", "=", "s.logId"),
               )
               .select([
@@ -344,14 +340,11 @@ class MonthlyReviewRepository {
       .selectFrom("scores as s")
       .innerJoin("songs as m", "s.songId", "m.songId")
       .innerJoin(
-        (qb) =>
-          qb
-            .selectFrom("scores as s2")
-            .select(["s2.songId", (eb) => eb.fn.max("s2.logId").as("maxLogId")])
-            .where("s2.userId", "=", userId)
-            .where("s2.version", "=", version)
-            .groupBy("s2.songId")
-            .as("latest"),
+        latestLogIdPerSongSubquery({
+          table: "scores",
+          userId,
+          version,
+        }).as("latest"),
         (join) =>
           join
             .onRef("latest.songId", "=", "s.songId")
@@ -379,15 +372,13 @@ class MonthlyReviewRepository {
       .selectFrom("scores as s")
       .innerJoin("songs as m", "s.songId", "m.songId")
       .innerJoin(
-        (qb) =>
-          qb
-            .selectFrom("scores as s2")
-            .select(["s2.songId", (eb) => eb.fn.max("s2.logId").as("maxLogId")])
-            .where("s2.userId", "=", userId)
-            .where("s2.version", "=", version)
-            .where("s2.lastPlayed", "<", jstDayStart(monthStart))
-            .groupBy("s2.songId")
-            .as("latest"),
+        latestLogIdPerSongSubquery({
+          table: "scores",
+          userId,
+          version,
+          extra: (qb) =>
+            qb.where("lastPlayed", "<", jstDayStart(monthStart)),
+        }).as("latest"),
         (join) =>
           join
             .onRef("latest.songId", "=", "s.songId")
@@ -411,20 +402,12 @@ class MonthlyReviewRepository {
       .innerJoin("users as u", "f.followingId", "u.userId")
       .innerJoin("scores as s", "u.userId", "s.userId")
       .innerJoin(
-        (qb) =>
-          qb
-            .selectFrom("scores as s2")
-            .innerJoin("follows as f2", "f2.followingId", "s2.userId")
-            .select([
-              "s2.userId",
-              "s2.songId",
-              (eb) => eb.fn.max("s2.logId").as("maxLogId"),
-            ])
-            .where("f2.followerId", "=", viewerId)
-            .where("s2.version", "=", version)
-            .where("s2.songId", "in", songIds)
-            .groupBy(["s2.userId", "s2.songId"])
-            .as("latest"),
+        latestLogIdPerUserSongSubquery({
+          table: "scores",
+          version,
+          followersOf: viewerId,
+          songIds,
+        }).as("latest"),
         (join) =>
           join
             .onRef("latest.userId", "=", "s.userId")

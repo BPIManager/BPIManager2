@@ -4,6 +4,7 @@ import { Database, NewAllScores, NewScore, NewTotalBPILog } from "@/types/db";
 import { Transaction } from "kysely";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { userStatusLogsRepo } from "@/lib/db/userStatusLogs";
+import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore";
 
 /**
  * BPI スコアのインポートおよびスコアマスタ参照を担当するリポジトリクラス。
@@ -73,17 +74,11 @@ class BpiRepository {
     return await db
       .selectFrom(tableName as "scores" | "allScores")
       .innerJoin(
-        (qb) =>
-          qb
-            .selectFrom(tableName as "scores" | "allScores")
-            .select([
-              "songId as l_songId",
-              (eb) => eb.fn.max("logId").as("maxLogId"),
-            ])
-            .where("userId", "=", userId)
-            .where("version", "=", version)
-            .groupBy("songId")
-            .as("latest"),
+        latestLogIdPerSongSubquery({
+          table: tableName,
+          userId,
+          version,
+        }).as("latest"),
         (join) =>
           join.onRef("latest.maxLogId", "=", `${tableName}.logId` as never),
       )

@@ -122,20 +122,26 @@ describe("rivalRepo.getRivalScoresForSongs", () => {
 });
 
 describe("rivalRepo.getRivalAvgScores / getRivalTopScores", () => {
-  it("getRivalAvgScoresはsongIds指定時に$ifがtrueになること", async () => {
+  it("getRivalAvgScoresはsongIds指定時にsongIdでのwhere絞り込みが含まれること", async () => {
     dbHolder.current = createDbSpy([]);
     await rivalRepo.getRivalAvgScores({
       userId: "user-1",
       version: "33",
       songIds: [1, 2],
     });
-    expect(callsFor(dbHolder.current.calls, "$if")[0].args[0]).toBe(true);
+    const whereCalls = callsFor(dbHolder.current.calls, "where");
+    expect(
+      whereCalls.some(
+        (c) => c.args[0] === "songId" && c.args[1] === "in" && Array.isArray(c.args[2]) && (c.args[2] as number[]).includes(1),
+      ),
+    ).toBe(true);
   });
 
-  it("getRivalTopScoresはsongIds未指定時に$ifがfalseになること", async () => {
+  it("getRivalTopScoresはsongIds未指定時にsongIdでのwhere絞り込みが含まれないこと", async () => {
     dbHolder.current = createDbSpy([]);
     await rivalRepo.getRivalTopScores({ userId: "user-1", version: "33" });
-    expect(callsFor(dbHolder.current.calls, "$if")[0].args[0]).toBe(false);
+    const whereCalls = callsFor(dbHolder.current.calls, "where");
+    expect(whereCalls.some((c) => c.args[0] === "songId")).toBe(false);
   });
 });
 

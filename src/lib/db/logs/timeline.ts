@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { IIDXVersion } from "@/types/iidx/version";
+import { correlatedLatestLogId } from "@/lib/db/shared/latestScore";
 
 interface TimelineLogEntry {
   id: number;
@@ -244,12 +245,13 @@ class ScoreTimelineRepository {
           .on("cur.userId", "=", userId)
           .on("cur.version", "=", currentVersion)
           .on("cur.logId", "=", (eb) =>
-            eb
-              .selectFrom("scores as c2")
-              .select((s) => s.fn.max("logId").as("m"))
-              .where("c2.userId", "=", userId)
-              .where("c2.version", "=", currentVersion)
-              .whereRef("c2.songId", "=", "s.songId"),
+            correlatedLatestLogId(eb, {
+              table: "scores",
+              alias: "c2",
+              songIdRef: "s.songId",
+              version: currentVersion,
+              userId,
+            }),
           ),
       )
       .leftJoin("scores as prev", (join) =>
@@ -258,12 +260,13 @@ class ScoreTimelineRepository {
           .on("prev.userId", "=", userId)
           .on("prev.version", "=", targetVersion)
           .on("prev.logId", "=", (eb) =>
-            eb
-              .selectFrom("scores as p2")
-              .select((s) => s.fn.max("logId").as("m"))
-              .where("p2.userId", "=", userId)
-              .where("p2.version", "=", targetVersion)
-              .whereRef("p2.songId", "=", "s.songId"),
+            correlatedLatestLogId(eb, {
+              table: "scores",
+              alias: "p2",
+              songIdRef: "s.songId",
+              version: targetVersion,
+              userId,
+            }),
           ),
       )
       .select([

@@ -24,7 +24,8 @@ describe("allScoresRepo.getAllScoresList", () => {
       sortKey: "level",
       sortOrder: "desc",
     });
-    expect(callsFor(dbHolder.current.calls, "where")).toHaveLength(1);
+    // ベース1件 + 共有サブクエリ内のuserId絞り込み1件 = 2件
+    expect(callsFor(dbHolder.current.calls, "where")).toHaveLength(2);
   });
 
   it("search/levels/difficulties/clearStatesを指定するとwhere呼び出しが増えること", async () => {
@@ -37,8 +38,8 @@ describe("allScoresRepo.getAllScoresList", () => {
       sortKey: "level",
       sortOrder: "desc",
     });
-    // ベース1件 + search + levels + difficulties + clearStates = 5件
-    expect(callsFor(dbHolder.current.calls, "where")).toHaveLength(5);
+    // ベース1件 + 共有サブクエリ内のuserId絞り込み1件 + search + levels + difficulties + clearStates = 6件
+    expect(callsFor(dbHolder.current.calls, "where")).toHaveLength(6);
   });
 
   it("sortKeyに応じたorderByカラムが指定されること", async () => {

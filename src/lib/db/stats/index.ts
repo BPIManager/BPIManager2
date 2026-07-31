@@ -1,6 +1,12 @@
 import { db } from "@/lib/db";
 import { IIDXVersion } from "@/types/iidx/version";
 import { sql } from "kysely";
+import {
+  correlatedLatestLogId,
+  latestLogIdPerSongSubquery,
+  latestLogIdPerUserSongSubquery,
+} from "@/lib/db/shared/latestScore";
+import { getSongRankingFromTable } from "@/lib/db/shared/songRanking";
 
 /**
  * 統計ダッシュボード・分析画面向けのデータ取得を担当するリポジトリクラス。
@@ -32,13 +38,14 @@ class StatsRepository {
           .onRef("s.songId", "=", "m.songId")
           .on("s.userId", "=", userId)
           .on("s.version", "=", version)
-          .on("s.logId", "=", (qb) =>
-            qb
-              .selectFrom("scores as s2")
-              .select((eb) => eb.fn.max("s2.logId").as("maxLogId"))
-              .whereRef("s2.songId", "=", "m.songId")
-              .where("s2.userId", "=", userId)
-              .where("s2.version", "=", version),
+          .on("s.logId", "=", (eb) =>
+            correlatedLatestLogId(eb, {
+              table: "scores",
+              alias: "s2",
+              songIdRef: "m.songId",
+              version,
+              userId,
+            }),
           ),
       )
       .select([
@@ -111,17 +118,11 @@ class StatsRepository {
         join.onRef("d.songId", "=", "m.songId").on("d.isCurrent", "=", 1),
       )
       .innerJoin(
-        (qb) =>
-          qb
-            .selectFrom("scores")
-            .select([
-              "songId as latest_songId",
-              (eb) => eb.fn.max("logId").as("maxLogId"),
-            ])
-            .where("userId", "=", userId)
-            .where("version", "=", version)
-            .groupBy("songId")
-            .as("latest"),
+        latestLogIdPerSongSubquery({
+          table: "scores",
+          userId,
+          version,
+        }).as("latest"),
         (join) => join.onRef("latest.maxLogId", "=", "s.logId"),
       )
       .select([
@@ -256,49 +257,12 @@ class StatsRepository {
   }
 
   async getSongRanking(songId: number, version: string, viewerId: string) {
-    const rows = await db
-      .selectFrom("scores as s")
-      .innerJoin("users as u", "s.userId", "u.userId")
-      .innerJoin(
-        (qb) =>
-          qb
-            .selectFrom("scores")
-            .select(["userId", (eb) => eb.fn.max("logId").as("maxLogId")])
-            .where("songId", "=", songId)
-            .where("version", "=", version)
-            .groupBy("userId")
-            .as("latest"),
-        (join) => join.onRef("latest.maxLogId", "=", "s.logId"),
-      )
-      .select([
-        "s.userId",
-        "u.userName",
-        "u.profileImage",
-        "u.isPublic",
-        "s.exScore",
-        "s.bpi",
-      ])
-      .where("s.songId", "=", songId)
-      .orderBy("s.exScore", "desc")
-      .execute();
-
-    const rankings = rows.map((r, i) => ({
-      rank: i + 1,
-      userId: r.isPublic ? r.userId : `anon-${i}`,
-      userName: r.isPublic ? r.userName : "-",
-      profileImage: r.isPublic ? r.profileImage : null,
-      exScore: r.exScore,
-      bpi: r.bpi !== null && r.bpi !== undefined ? Number(r.bpi) : null,
-      isSelf: r.userId === viewerId,
-    }));
-
-    const selfEntry = rankings.find((r) => r.isSelf);
-
-    return {
-      rankings,
-      totalCount: rankings.length,
-      selfRank: selfEntry?.rank ?? 0,
-    };
+    return getSongRankingFromTable({
+      table: "scores",
+      songId,
+      version,
+      viewerId,
+    });
   }
 
   async getTotalSongCount(
@@ -546,17 +510,11 @@ class StatsRepository {
         join.onRef("d.songId", "=", "m.songId").on("d.isCurrent", "=", 1),
       )
       .innerJoin(
-        (qb) =>
-          qb
-            .selectFrom("scores")
-            .select([
-              "songId as latest_songId",
-              (eb) => eb.fn.max("logId").as("maxLogId"),
-            ])
-            .where("userId", "=", userId)
-            .where("version", "=", version)
-            .groupBy("songId")
-            .as("userLatest"),
+        latestLogIdPerSongSubquery({
+          table: "scores",
+          userId,
+          version,
+        }).as("userLatest"),
         (join) => join.onRef("userLatest.maxLogId", "=", "s.logId"),
       )
       .leftJoin(
@@ -564,18 +522,11 @@ class StatsRepository {
           qb
             .selectFrom("scores as ns")
             .innerJoin(
-              (qb2) =>
-                qb2
-                  .selectFrom("scores")
-                  .select([
-                    "userId",
-                    "songId",
-                    (eb) => eb.fn.max("logId").as("maxLogId"),
-                  ])
-                  .where("version", "=", version)
-                  .where("userId", "in", neighborIds)
-                  .groupBy(["userId", "songId"])
-                  .as("nLatest"),
+              latestLogIdPerUserSongSubquery({
+                table: "scores",
+                version,
+                userIds: neighborIds,
+              }).as("nLatest"),
               (join) =>
                 join
                   .onRef("nLatest.maxLogId", "=", "ns.logId")

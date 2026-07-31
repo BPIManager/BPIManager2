@@ -1,6 +1,10 @@
 import { db } from "@/lib/db";
 import { IIDXVersion } from "@/types/iidx/version";
 import { statsRepo } from "@/lib/db/stats";
+import {
+  latestLogIdPerSongScalarSubquery,
+  latestLogIdPerSongSubquery,
+} from "@/lib/db/shared/latestScore";
 
 /**
  * スコア詳細情報（比較・曲定義結合）の参照を担当するリポジトリクラス。
@@ -133,32 +137,29 @@ class LogScoreRepository {
         .where("current.version", "=", version)
         .where("current.lastPlayed", ">=", onlyLastPlayedInRange.start)
         .where("current.lastPlayed", "<=", onlyLastPlayedInRange.end)
-        .where("current.logId", "in", (qb) =>
-          qb
-            .selectFrom("scores as inner_sc")
-            .select((eb) => eb.fn.max("inner_sc.logId").as("maxId"))
-            .where("inner_sc.userId", "=", userId)
-            .where("inner_sc.version", "=", version)
-            .where("inner_sc.lastPlayed", ">=", onlyLastPlayedInRange.start)
-            .where("inner_sc.lastPlayed", "<=", onlyLastPlayedInRange.end)
-            .groupBy("inner_sc.songId"),
+        .where(
+          "current.logId",
+          "in",
+          latestLogIdPerSongScalarSubquery({
+            table: "scores",
+            userId,
+            version,
+            extra: (qb) =>
+              qb
+                .where("lastPlayed", ">=", onlyLastPlayedInRange.start)
+                .where("lastPlayed", "<=", onlyLastPlayedInRange.end),
+          }),
         );
     } else if (targetTime) {
       query = query
         .innerJoin(
-          (qb) =>
-            qb
-              .selectFrom("scores")
-              .select([
-                "songId as l_songId",
-                (eb) => eb.fn.max("logId").as("maxLogId"),
-              ])
-              .where("userId", "=", userId)
-              .where("version", "=", version)
-              .where("createdAt", "<=", targetTime)
-              .groupBy("songId")
-              .as("latest_sc"),
-          (join) => join.onRef("latest_sc.l_songId", "=", "s.songId"),
+          latestLogIdPerSongSubquery({
+            table: "scores",
+            userId,
+            version,
+            extra: (qb) => qb.where("createdAt", "<=", targetTime),
+          }).as("latest_sc"),
+          (join) => join.onRef("latest_sc.songId", "=", "s.songId"),
         )
         .whereRef("current.logId", "=", "latest_sc.maxLogId");
     }
