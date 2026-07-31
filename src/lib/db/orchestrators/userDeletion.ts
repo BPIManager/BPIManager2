@@ -64,7 +64,12 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
   };
 
   // 2. バックアップをファイルに書き出す
-  const backupDir = path.join(os.homedir(), "backups", "delete");
+  // コンテナ/サーバーレス環境ではos.homedir()配下が書き込み不可・非永続の
+  // 場合があるため、USER_DELETION_BACKUP_DIRで永続ストレージ上のパスを
+  // 指定できるようにする(未指定時は従来通りos.homedir()配下を使う)。
+  const backupDir =
+    process.env.USER_DELETION_BACKUP_DIR ??
+    path.join(os.homedir(), "backups", "delete");
   await fs.promises.mkdir(backupDir, { recursive: true });
   const backupPath = path.join(backupDir, `${userId}_${Date.now()}.json`);
   await fs.promises.writeFile(
