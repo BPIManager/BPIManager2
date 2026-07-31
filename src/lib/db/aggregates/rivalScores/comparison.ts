@@ -166,6 +166,11 @@ class SocialComparisonRepository {
    * @param params.levels - 対象難易度レベルの配列（空の場合は全レベル）
    * @param params.difficulties - 対象難易度文字列の配列（空の場合は全難易度）
    */
+  // follows・users・userStatusLogs・officialArenaStats・userRadarCache・
+  // userRoles・songs・songDef・scores(自分/ライバル)を横断JOINした
+  // 勝敗サマリー集計のため、直接クエリを維持する。aggregates/内で最も
+  // 重いクエリであり、フォロー数が増えるとcrossJoin(targetSongs)の行数が
+  // 線形に増加する点は将来的なスケール懸念として認識している。
   async getFollowedWinLossSummary(params: {
     viewerId: string;
     version: string;

@@ -18,6 +18,7 @@ class ScoreTimelineAggregateRepository {
   /**
    * ユーザーのタイムラインログ（BPI推移 + 各バッチのTOPnスコア）を取得 / バッチID基準
    */
+  // logs・scores・songsを横断JOINしたタイムライン集計のため、直接クエリを維持する。
   async getTimelineByBatches(params: {
     userId: string;
     version: string;

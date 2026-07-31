@@ -18,6 +18,8 @@ class TicketsRepository {
     return row ? Number(row.totalBpi) : null;
   }
 
+  // songPatterns・songs・songAttributes・scores・songPatternVotesを横断JOIN
+  // した投票付きチケット候補一覧のため、直接クエリを維持する。
   async getTopSongsForTicket(
     pattern: string,
     userId: string,

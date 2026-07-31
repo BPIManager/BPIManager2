@@ -15,6 +15,8 @@ class RivalRepository {
   /**
    * 楽曲マスタをベースに、自分とライバルのスコアを並列で取得する
    */
+  // songs・songDef・scores(自分/ライバル)・usersを横断JOINした比較テーブル
+  // データのため、直接クエリを維持する。
   async getRivalComparisonScores(params: {
     viewerId: string;
     rivalId?: string | null;
@@ -253,6 +255,8 @@ class RivalRepository {
    * @param options.range - 期間指定（`start`, `end`, 基準列 `basis`）
    * @param options.batchId - バッチ ID（`range` と排他）
    */
+  // scores(自分/ライバル)・songs・usersを横断JOINした追い抜き検出のため、
+  // 直接クエリを維持する。
   async getOvertakenRivals(
     userId: string,
     version: string,
@@ -413,6 +417,8 @@ class RivalRepository {
    * 特定楽曲におけるフォロー中ユーザーの最新スコア一覧を取得する
    * （ユーザー表示情報・楽曲情報付き）。単曲のライバル比較表示用。
    */
+  // follows・users・scores・songs・songDefを横断JOINした単曲比較データの
+  // ため、直接クエリを維持する。
   async getFollowedScoresForSong(params: {
     viewerId: string;
     songId: number;
