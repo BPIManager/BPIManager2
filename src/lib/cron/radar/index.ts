@@ -1,3 +1,4 @@
+import { sql } from "kysely";
 import { db } from "@/lib/db";
 import { calculateRadar } from "@/lib/radar/calculator";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
@@ -6,6 +7,21 @@ import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 
 /** 同時に処理するユーザー数の上限。DB・イベントループへの負荷とジョブ実行時間のバランスを取る。 */
 const CONCURRENCY = 10;
+
+/** 1回のbulk UPSERTに含める最大行数。 */
+const UPSERT_CHUNK_SIZE = 500;
+
+interface RadarCacheRow {
+  userId: string;
+  version: string;
+  notes: string;
+  chord: string;
+  peak: string;
+  charge: string;
+  scratch: string;
+  soflan: string;
+  totalBpi: string;
+}
 
 /**
  * 各アイテムに対する非同期処理を、指定した同時実行数を超えないよう実行する。
@@ -32,20 +48,46 @@ async function runWithConcurrency<T>(
 }
 
 /**
+ * 計算済みのレーダーキャッシュ行を`UPSERT_CHUNK_SIZE`件ずつのbulk UPSERTで書き込む。
+ *
+ * @param rows - 書き込み対象の行
+ */
+async function bulkUpsertRadarCache(rows: RadarCacheRow[]): Promise<void> {
+  for (let i = 0; i < rows.length; i += UPSERT_CHUNK_SIZE) {
+    const chunk = rows.slice(i, i + UPSERT_CHUNK_SIZE);
+    await db
+      .insertInto("userRadarCache")
+      .values(chunk)
+      .onDuplicateKeyUpdate({
+        notes: sql`VALUES(notes)`,
+        chord: sql`VALUES(chord)`,
+        peak: sql`VALUES(peak)`,
+        charge: sql`VALUES(charge)`,
+        scratch: sql`VALUES(scratch)`,
+        soflan: sql`VALUES(soflan)`,
+        totalBpi: sql`VALUES(totalBpi)`,
+        updatedAt: sql`NOW()`,
+      })
+      .execute();
+  }
+}
+
+/**
  * 全ユーザーのレーダーキャッシュ（`userRadarCache` テーブル）を最新スコアで更新する。
  *
  * 各ユーザーの最新スコアから `calculateRadar` でカテゴリ別 BPI を算出し、
- * 総合 BPI とともに `userRadarCache` に UPSERT する。
+ * 総合 BPI とともに算出結果をメモリ上に集約したうえで、最後にbulk UPSERTで
+ * まとめて書き込むことでDBラウンドトリップ数を削減する。
  * スコアが存在しないユーザーはスキップされる。
  * ユーザー数の増加に伴う実行時間の線形増大を避けるため、
- * {@link CONCURRENCY} 件ずつ並列処理する。
+ * 読み取り・計算部分は{@link CONCURRENCY}件ずつ並列処理する。
  */
 export async function updateAllUserRadarCache() {
   const version = latestVersion;
   const users = await db.selectFrom("users").select("userId").execute();
   const total = users.length;
   let done = 0;
-  let updated = 0;
+  const pendingRows: RadarCacheRow[] = [];
 
   await runWithConcurrency(users, CONCURRENCY, async (user) => {
     try {
@@ -65,7 +107,9 @@ export async function updateAllUserRadarCache() {
           scores.length,
         );
 
-        const data = {
+        pendingRows.push({
+          userId: user.userId,
+          version,
           notes: radar.NOTES.totalBpi.toFixed(2),
           chord: radar.CHORD.totalBpi.toFixed(2),
           peak: radar.PEAK.totalBpi.toFixed(2),
@@ -73,32 +117,22 @@ export async function updateAllUserRadarCache() {
           scratch: radar.SCRATCH.totalBpi.toFixed(2),
           soflan: radar.SOFLAN.totalBpi.toFixed(2),
           totalBpi: totalBpi.toFixed(2),
-        };
-
-        await db
-          .insertInto("userRadarCache")
-          .values({
-            userId: user.userId,
-            version: version,
-            ...data,
-          })
-          .onDuplicateKeyUpdate({
-            ...data,
-            updatedAt: new Date(),
-          })
-          .execute();
-
-        updated++;
+        });
       }
     } catch (e) {
       process.stdout.write("\r\x1b[K");
       console.error(`[Radar] Failed for user ${user.userId}:`, e);
     } finally {
       done++;
-      process.stdout.write(`\r\x1b[K[Radar] Updating cache... ${done}/${total}`);
+      process.stdout.write(`\r\x1b[K[Radar] Calculating... ${done}/${total}`);
     }
   });
 
   process.stdout.write("\r\x1b[K");
-  console.log(`[Radar] Cache update done: ${updated}/${total} users updated`);
+  console.log(`[Radar] Writing cache for ${pendingRows.length} users...`);
+  await bulkUpsertRadarCache(pendingRows);
+
+  console.log(
+    `[Radar] Cache update done: ${pendingRows.length}/${total} users updated`,
+  );
 }
