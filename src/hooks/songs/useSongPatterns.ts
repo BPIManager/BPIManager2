@@ -69,22 +69,24 @@ export function useSongPatterns(
 
   async function vote(pattern: string, voteType: VoteType): Promise<void> {
     if (!fbUser) return;
-    await authFetch(
+    const res = await authFetch(
       `${API_PREFIX}/songs/${songId}/patterns/${pattern}/vote`,
       "POST",
       fbUser,
       { voteType },
     );
+    if (!res.ok) throw new Error("Failed to vote pattern");
     await mutate();
   }
 
   async function deleteVote(pattern: string): Promise<void> {
     if (!fbUser) return;
-    await authFetch(
+    const res = await authFetch(
       `${API_PREFIX}/songs/${songId}/patterns/${pattern}/vote`,
       "DELETE",
       fbUser,
     );
+    if (!res.ok) throw new Error("Failed to delete pattern vote");
     await mutate();
   }
 

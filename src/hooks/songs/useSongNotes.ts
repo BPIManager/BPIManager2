@@ -47,28 +47,34 @@ export function useSongNotes(songId: number, fbUser: FirebaseUser | null) {
   );
 
   async function createNote(body: string): Promise<void> {
-    await authFetch(`${API_PREFIX}/songs/${songId}/notes`, "POST", fbUser, {
-      body,
-    });
+    const res = await authFetch(
+      `${API_PREFIX}/songs/${songId}/notes`,
+      "POST",
+      fbUser,
+      { body },
+    );
+    if (!res.ok) throw new Error("Failed to create note");
     await mutate();
   }
 
   async function updateNote(noteId: number, body: string): Promise<void> {
-    await authFetch(
+    const res = await authFetch(
       `${API_PREFIX}/songs/${songId}/notes/${noteId}`,
       "PATCH",
       fbUser,
       { body },
     );
+    if (!res.ok) throw new Error("Failed to update note");
     await mutate();
   }
 
   async function deleteNote(noteId: number): Promise<void> {
-    await authFetch(
+    const res = await authFetch(
       `${API_PREFIX}/songs/${songId}/notes/${noteId}`,
       "DELETE",
       fbUser,
     );
+    if (!res.ok) throw new Error("Failed to delete note");
     await mutate();
   }
 
