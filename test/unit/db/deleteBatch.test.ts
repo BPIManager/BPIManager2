@@ -41,7 +41,7 @@ vi.mock("@/lib/db", () => ({ db: dbMock }));
 
 import { scoresRepo } from "@/lib/db/scores";
 import { allScoresRepo } from "@/lib/db/allScores";
-import { navigationRepo } from "@/lib/db/logs/navigation";
+import { deleteBatch } from "@/lib/db/orchestrators/batchDeletion";
 
 describe("バッチ削除まわりのリポジトリ", () => {
   afterEach(() => {
@@ -92,7 +92,7 @@ describe("バッチ削除まわりのリポジトリ", () => {
     });
   });
 
-  describe("navigationRepo.deleteBatch", () => {
+  describe("batchDeletion.deleteBatch", () => {
     it("scoresRepo/allScoresRepoに委譲しつつ、logs系テーブルは自身で削除すること", async () => {
       const scoresSpy = vi
         .spyOn(scoresRepo, "deleteByBatch")
@@ -101,7 +101,7 @@ describe("バッチ削除まわりのリポジトリ", () => {
         .spyOn(allScoresRepo, "deleteByBatch")
         .mockResolvedValue(undefined);
 
-      await navigationRepo.deleteBatch("user-1", "batch-1");
+      await deleteBatch("user-1", "batch-1");
 
       const usedTrx = dbMock.lastTrxSpy?.trx;
       expect(scoresSpy).toHaveBeenCalledWith(usedTrx, "user-1", "batch-1");

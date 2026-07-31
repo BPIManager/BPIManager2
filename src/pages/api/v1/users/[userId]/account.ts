@@ -5,7 +5,7 @@ import {
 } from "@/middlewares/api/withAuth";
 import type { NextApiResponse } from "next";
 import { adminAuth } from "@/lib/firebase/admin";
-import { backupAndDeleteUser } from "@/lib/db/users/deletion";
+import { backupAndDeleteUser } from "@/lib/db/orchestrators/userDeletion";
 import { accountDeletionSchema } from "@/schemas/account/deletion";
 import { parseBody } from "@/services/nextRequest/parseBody";
 

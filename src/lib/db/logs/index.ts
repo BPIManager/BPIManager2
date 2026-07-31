@@ -7,6 +7,7 @@ import { navigationRepo } from "./navigation";
 import { scoreDetailRepo } from "./scores";
 import { rivalRepo } from "./rival";
 import { timelineRepo } from "./timeline";
+import { deleteBatch } from "@/lib/db/orchestrators/batchDeletion";
 
 /**
  * ログ機能の各サブリポジトリのメソッドを集約したファサードオブジェクト。
@@ -22,7 +23,7 @@ export const logsRepo = {
   findBatchById: navigationRepo.findBatchById.bind(navigationRepo),
   findBatchByIdAndUser: navigationRepo.findBatchByIdAndUser.bind(navigationRepo),
   findBatchesInRange: navigationRepo.findBatchesInRange.bind(navigationRepo),
-  deleteBatch: navigationRepo.deleteBatch.bind(navigationRepo),
+  deleteBatch,
 
   // スコア詳細クエリ系
   getScoresWithDetails: scoreDetailRepo.getScoresWithDetails.bind(scoreDetailRepo),

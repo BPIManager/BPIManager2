@@ -1,8 +1,5 @@
 import dayjs from "@/lib/dayjs";
 import { db } from "@/lib/db";
-import { scoresRepo } from "../scores";
-import { allScoresRepo } from "../allScores";
-import { userStatusLogsRepo } from "../userStatusLogs";
 import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import { Database } from "@/types/db";
 import { Transaction } from "kysely";
@@ -146,22 +143,6 @@ class LogNavigationRepository {
       .where("batchId", "=", batchId)
       .where("userId", "=", userId)
       .executeTakeFirst();
-  }
-
-  /**
-   * 指定バッチに紐づくスコア・全難易度スコア・ステータスログ・ログレコードをトランザクションで削除します
-   */
-  async deleteBatch(userId: string, batchId: string) {
-    return await db.transaction().execute(async (trx) => {
-      await scoresRepo.deleteByBatch(trx, userId, batchId);
-      await allScoresRepo.deleteByBatch(trx, userId, batchId);
-      await userStatusLogsRepo.deleteByBatch(trx, userId, batchId);
-      await trx
-        .deleteFrom("logs")
-        .where("batchId", "=", batchId)
-        .where("userId", "=", userId)
-        .execute();
-    });
   }
 
   /**
