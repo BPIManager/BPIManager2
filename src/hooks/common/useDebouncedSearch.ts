@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 /**
  * 入力値をデバウンスして確定値として伝播するフック。
@@ -17,6 +17,13 @@ export function useDebouncedSearch(
 ) {
   const [localSearch, setLocalSearch] = useState(externalValue);
 
+  // onChangeの参照が毎レンダリングで変わってもタイマーがリセットされないよう、
+  // 最新のコールバックをrefで保持する
+  const onChangeRef = useRef(onChange);
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
+
   // 外部からリセットされたときにローカル値を同期
   useEffect(() => {
     setLocalSearch(externalValue);
@@ -26,11 +33,11 @@ export function useDebouncedSearch(
   useEffect(() => {
     const timer = setTimeout(() => {
       if (localSearch !== externalValue) {
-        onChange(localSearch);
+        onChangeRef.current(localSearch);
       }
     }, delay);
     return () => clearTimeout(timer);
-  }, [localSearch, onChange, externalValue, delay]);
+  }, [localSearch, externalValue, delay]);
 
   const isTyping = localSearch !== externalValue;
 
