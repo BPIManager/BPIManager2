@@ -1,5 +1,5 @@
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
-import { ticketsRepo } from "@/lib/db/tickets";
+import { ticketsRepo } from "@/lib/db/aggregates/tickets";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import type { NextApiRequest, NextApiResponse } from "next";
 import type { TicketRecommendResult } from "@/types/tickets";
