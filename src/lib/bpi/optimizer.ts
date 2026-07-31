@@ -343,7 +343,6 @@ class BpiOptimizer {
    * 目標BPIの推定処理
    */
   private estimateTargetBpi(
-    c: SongOptimizerInput,
     fromBpi: number,
     humanCap: number,
     userCapability: number,
@@ -485,7 +484,6 @@ class BpiOptimizer {
       c.isUnplayed || fromBpi <= BpiOptimizer.UNPLAYED_BPI_THRESHOLD;
 
     const estimatedTargetBpi = this.estimateTargetBpi(
-      c,
       fromBpi,
       humanCap,
       userCapability,
