@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { iidxTowerRepo } from "@/lib/db/iidxTower";
+import { iidxTowerRepo } from "@/lib/db/domains/iidxTower";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 import { withAuth } from "@/middlewares/api/withAuth";
 import { z } from "zod";

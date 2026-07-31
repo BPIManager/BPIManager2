@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { rejectAccess } from "@/middlewares/api/withApi";
-import { allScoresRepo } from "@/lib/db/allScores";
+import { allScoresRepo } from "@/lib/db/domains/allScores";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 
 export default async function handler(

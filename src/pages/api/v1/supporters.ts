@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
-import { usersRepo } from "@/lib/db/users";
+import { usersRepo } from "@/lib/db/domains/users";
 
 export default async function handler(
   req: NextApiRequest,

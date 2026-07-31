@@ -1,6 +1,6 @@
 import { randomBytes } from "crypto";
 import { NextApiRequest, NextApiResponse } from "next";
-import { oauthRepo } from "@/lib/db/oauth";
+import { oauthRepo } from "@/lib/db/domains/oauth";
 import { withRateLimit } from "@/middlewares/api/withRateLimit";
 import { tokenRequestSchema } from "@/schemas/oauth";
 import { timingSafeEqual } from "@/utils/common/timingSafeEqual";

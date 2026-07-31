@@ -11,7 +11,7 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-const { userStatusLogsRepo } = await import("@/lib/db/userStatusLogs");
+const { userStatusLogsRepo } = await import("@/lib/db/domains/userStatusLogs");
 
 describe("userStatusLogsRepo.latestPerUserSubquery", () => {
   it("versionで絞り込みuserIdごとにグループ化するクエリを組み立てること", () => {

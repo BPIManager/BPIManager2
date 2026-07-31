@@ -11,7 +11,7 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-const { allSongsRepo } = await import("@/lib/db/allSongs");
+const { allSongsRepo } = await import("@/lib/db/domains/allSongs");
 
 describe("allSongsRepo.getAllLevelMaster", () => {
   it("allSongsテーブルから全難易度の楽曲マスタを取得すること", async () => {

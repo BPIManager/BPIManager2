@@ -1,8 +1,8 @@
 import { describe, it, expect } from "vitest";
 
-import { scoresRepo } from "@/lib/db/scores";
-import { allScoresRepo } from "@/lib/db/allScores";
-import { navigationRepo } from "@/lib/db/logs/navigation";
+import { scoresRepo } from "@/lib/db/domains/scores";
+import { allScoresRepo } from "@/lib/db/domains/allScores";
+import { navigationRepo } from "@/lib/db/domains/logs/navigation";
 
 function createTrxSpy() {
   const calls: { table: string; values: unknown }[] = [];

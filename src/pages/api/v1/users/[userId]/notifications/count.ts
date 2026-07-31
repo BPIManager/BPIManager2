@@ -1,4 +1,4 @@
-import { notificationsRepo } from "@/lib/db/notifications";
+import { notificationsRepo } from "@/lib/db/domains/notifications";
 import type { NextApiResponse } from "next";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 import {

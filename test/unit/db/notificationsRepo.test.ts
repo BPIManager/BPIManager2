@@ -11,7 +11,7 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-const { notificationsRepo } = await import("@/lib/db/notifications");
+const { notificationsRepo } = await import("@/lib/db/domains/notifications");
 
 describe("notificationsRepo.getUnreadCount", () => {
   it("フォロー通知数と追い抜き通知数の合計を返すこと", async () => {

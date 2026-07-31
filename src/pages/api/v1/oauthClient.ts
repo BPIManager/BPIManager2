@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { NextApiResponse } from "next";
-import { oauthRepo } from "@/lib/db/oauth";
+import { oauthRepo } from "@/lib/db/domains/oauth";
 import {
   AuthenticatedNextApiRequest,
   withAuth,

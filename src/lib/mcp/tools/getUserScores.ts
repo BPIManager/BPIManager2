@@ -1,6 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import dayjs from "@/lib/dayjs";
-import { scoresRepo } from "@/lib/db/scores";
+import { scoresRepo } from "@/lib/db/domains/scores";
 import { mapToFlatSong } from "@/utils/logs/getMapFlatten";
 import { filterSongsServerSide } from "@/utils/songs/filter";
 import { sortSongs } from "@/utils/songs/sort";

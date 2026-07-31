@@ -1,5 +1,5 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { followsRepo } from "@/lib/db/follow";
+import { followsRepo } from "@/lib/db/domains/follow";
 import { myFollowsSchema, MCP_LIST_DEFAULT_LIMIT } from "@/lib/mcp/schemas";
 
 export function registerGetMyFollows(server: McpServer, userId: string) {

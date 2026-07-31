@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { adminAuth } from "@/lib/firebase/admin";
-import { apiKeysRepo } from "@/lib/db/apiKeys";
+import { apiKeysRepo } from "@/lib/db/domains/apiKeys";
 import { timingSafeEqual } from "@/utils/common/timingSafeEqual";
 import { withRateLimit } from "@/middlewares/api/withRateLimit";
 

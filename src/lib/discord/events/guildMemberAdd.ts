@@ -1,5 +1,5 @@
 import type { GuildMember } from "discord.js";
-import { discordLinksRepo } from "@/lib/db/discord";
+import { discordLinksRepo } from "@/lib/db/domains/discord";
 import { getManagedRoleIds } from "@/lib/discord/roleMap";
 import { sendLinkRequest } from "./sendLinkRequest";
 

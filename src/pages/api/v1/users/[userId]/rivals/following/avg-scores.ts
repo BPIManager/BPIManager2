@@ -1,4 +1,4 @@
-import { scoresRepo } from "@/lib/db/scores";
+import { scoresRepo } from "@/lib/db/domains/scores";
 import {
   AuthenticatedNextApiRequest,
   withAuth,

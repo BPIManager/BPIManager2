@@ -1,5 +1,5 @@
 import { ChannelType, type Client, type Message } from "discord.js";
-import { discordLinksRepo } from "@/lib/db/discord";
+import { discordLinksRepo } from "@/lib/db/domains/discord";
 import { getManagedRoleIds, resolveUserRoleFromMember } from "@/lib/discord/roleMap";
 
 const BPI_USER_URL_PATTERN = /bpi2\.poyashi\.me\/users\/([A-Za-z0-9_-]+)/;

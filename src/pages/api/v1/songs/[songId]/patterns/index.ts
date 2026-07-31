@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { songPatternsRepo } from "@/lib/db/songPatterns";
+import { songPatternsRepo } from "@/lib/db/domains/songPatterns";
 import { resolveOptionalUid } from "@/middlewares/api/resolveOptionalUid";
 
 function parseSongId(raw: string | string[] | undefined): number | null {

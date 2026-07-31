@@ -1,5 +1,5 @@
 import type { GuildMember, PartialGuildMember } from "discord.js";
-import { discordLinksRepo } from "@/lib/db/discord";
+import { discordLinksRepo } from "@/lib/db/domains/discord";
 
 /**
  * メンバーがサーバーを離れたとき、discordLinks の紐付けと userRoles を削除する。

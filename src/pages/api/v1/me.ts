@@ -1,5 +1,5 @@
 import { latestVersion } from "@/constants/iidx/iidxVersions";
-import { usersRepo } from "@/lib/db/users";
+import { usersRepo } from "@/lib/db/domains/users";
 import {
   AuthenticatedNextApiRequest,
   withAuth,

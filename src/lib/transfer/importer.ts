@@ -1,7 +1,7 @@
 import { BpiCalculator } from "../bpi";
 import dayjs from "../dayjs";
 import { importFromBPIM } from "../db/orchestrators/bpiImport";
-import { songsRepo } from "../db/songs";
+import { songsRepo } from "../db/domains/songs";
 import { SongLookup } from "./songLookup";
 import { v4 as uuidv4 } from "uuid";
 

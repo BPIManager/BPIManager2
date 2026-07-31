@@ -11,7 +11,7 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-const { songNotesRepo } = await import("@/lib/db/songNotes");
+const { songNotesRepo } = await import("@/lib/db/domains/songNotes");
 
 describe("songNotesRepo.getNotes", () => {
   it("行データをSongNoteRow形式に変換すること(数値化・真偽値化)", async () => {

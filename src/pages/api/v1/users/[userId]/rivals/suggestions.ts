@@ -6,8 +6,8 @@ import {
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { calculateRadar } from "@/lib/radar/calculator";
 import { statsRepo } from "@/lib/db/stats";
-import { logsRepo } from "@/lib/db/logs";
-import { usersRepo } from "@/lib/db/users";
+import { logsRepo } from "@/lib/db/domains/logs";
+import { usersRepo } from "@/lib/db/domains/users";
 
 async function handler(
   req: AuthenticatedNextApiRequest,

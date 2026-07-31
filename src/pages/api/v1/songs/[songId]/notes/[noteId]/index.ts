@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { songNotesRepo } from "@/lib/db/songNotes";
+import { songNotesRepo } from "@/lib/db/domains/songNotes";
 import { resolveOptionalUid } from "@/middlewares/api/resolveOptionalUid";
 
 function parseId(raw: string | string[] | undefined): number | null {

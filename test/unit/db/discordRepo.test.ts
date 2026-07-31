@@ -11,7 +11,7 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-const { discordLinksRepo } = await import("@/lib/db/discord");
+const { discordLinksRepo } = await import("@/lib/db/domains/discord");
 
 describe("discordLinksRepo.findByDiscordUserId", () => {
   it("discordUserIdでdiscordLinksを検索すること", async () => {

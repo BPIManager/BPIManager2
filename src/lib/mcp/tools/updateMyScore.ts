@@ -1,10 +1,10 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { v4 as uuidv4 } from "uuid";
-import { scoresRepo } from "@/lib/db/scores";
-import { allScoresRepo } from "@/lib/db/allScores";
-import { logsRepo } from "@/lib/db/logs";
-import { songsRepo } from "@/lib/db/songs";
-import { allSongsRepo } from "@/lib/db/allSongs";
+import { scoresRepo } from "@/lib/db/domains/scores";
+import { allScoresRepo } from "@/lib/db/domains/allScores";
+import { logsRepo } from "@/lib/db/domains/logs";
+import { songsRepo } from "@/lib/db/domains/songs";
+import { allSongsRepo } from "@/lib/db/domains/allSongs";
 import { saveImportResults } from "@/lib/db/orchestrators/bpiImport";
 import { BpiCalculator } from "@/lib/bpi";
 import { isImproved } from "@/lib/lamp";

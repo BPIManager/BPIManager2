@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
 import { BpiCalculator } from "@/lib/bpi";
-import { scoresRepo } from "@/lib/db/scores";
+import { scoresRepo } from "@/lib/db/domains/scores";
 import { getSongWithDefCached } from "@/lib/cache/songDefs";
 import { getArenaAverages } from "@/lib/cache/arenaAverages";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";

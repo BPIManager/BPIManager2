@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
-import { scoresRepo } from "@/lib/db/scores";
+import { scoresRepo } from "@/lib/db/domains/scores";
 import { parseQuery } from "@/services/nextRequest/parseBody";
 import { rivalFollowingScoresQuerySchema } from "@/schemas/rivals/following/scores/query";
 

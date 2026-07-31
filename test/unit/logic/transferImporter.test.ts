@@ -11,7 +11,7 @@ vi.mock("@/lib/db/orchestrators/bpiImport", () => ({
   importFromBPIM: importFromBPIMMock,
 }));
 
-vi.mock("@/lib/db/songs", () => ({
+vi.mock("@/lib/db/domains/songs", () => ({
   songsRepo: {
     getSongMasterWithDef: getSongMasterWithDefMock,
   },

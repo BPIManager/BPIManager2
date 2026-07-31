@@ -1,5 +1,5 @@
 import { latestVersion } from "@/constants/iidx/iidxVersions";
-import { notificationsRepo } from "@/lib/db/notifications";
+import { notificationsRepo } from "@/lib/db/domains/notifications";
 import {
   AuthenticatedNextApiRequest,
   withAuth,

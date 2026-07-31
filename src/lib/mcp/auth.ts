@@ -1,6 +1,6 @@
 import { NextApiRequest } from "next";
 import { db } from "@/lib/db";
-import { oauthRepo } from "@/lib/db/oauth";
+import { oauthRepo } from "@/lib/db/domains/oauth";
 
 export function getBaseUrl() {
   return (process.env.BASEURL ?? "").replace(/\/+$/, "");

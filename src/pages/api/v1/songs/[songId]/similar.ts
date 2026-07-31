@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { songsRepo } from "@/lib/db/songs";
+import { songsRepo } from "@/lib/db/domains/songs";
 import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import { IIDXVersion } from "@/types/iidx/version";
 

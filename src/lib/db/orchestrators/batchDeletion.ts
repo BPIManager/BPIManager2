@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
-import { scoresRepo } from "@/lib/db/scores";
-import { allScoresRepo } from "@/lib/db/allScores";
-import { userStatusLogsRepo } from "@/lib/db/userStatusLogs";
+import { scoresRepo } from "@/lib/db/domains/scores";
+import { allScoresRepo } from "@/lib/db/domains/allScores";
+import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
 
 /**
  * 指定バッチに紐づくスコア・全難易度スコア・ステータスログ・ログレコードをトランザクションで削除する。

@@ -11,7 +11,7 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-const { iidxTowerRepo } = await import("@/lib/db/iidxTower");
+const { iidxTowerRepo } = await import("@/lib/db/domains/iidxTower");
 
 describe("iidxTowerRepo.upsertRows", () => {
   it("rowsが空の場合、DB操作を行わず0を返すこと", async () => {

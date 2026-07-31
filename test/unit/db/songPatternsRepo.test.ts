@@ -11,7 +11,7 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-const { songPatternsRepo } = await import("@/lib/db/songPatterns");
+const { songPatternsRepo } = await import("@/lib/db/domains/songPatterns");
 
 const makeRow = (i: number) => ({
   pattern: `pattern-${i}`,

@@ -1,4 +1,4 @@
-import { allScoresRepo } from "@/lib/db/allScores";
+import { allScoresRepo } from "@/lib/db/domains/allScores";
 import { rejectAccess } from "@/middlewares/api/withApi";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 import type { NextApiRequest, NextApiResponse } from "next";

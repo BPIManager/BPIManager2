@@ -1,5 +1,5 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { usersRepo } from "@/lib/db/users";
+import { usersRepo } from "@/lib/db/domains/users";
 import { searchUsersSchema, MCP_LIST_DEFAULT_LIMIT } from "@/lib/mcp/schemas";
 
 export function registerSearchUsers(server: McpServer) {

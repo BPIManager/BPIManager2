@@ -12,7 +12,7 @@ vi.mock("@/lib/db", () => ({
 }));
 
 const { getStatsPrivacy, upsertStatsPrivacy } = await import(
-  "@/lib/db/statsPrivacy"
+  "@/lib/db/domains/statsPrivacy"
 );
 const {
   getBestArenaClassPerVersion,
@@ -20,7 +20,7 @@ const {
   getLatestArenaStatsPerVersion,
   getArenaStatsHistory,
   latestPerUserSubquery,
-} = await import("@/lib/db/officialArenaStats");
+} = await import("@/lib/db/domains/officialArenaStats");
 
 describe("officialArenaStats.latestPerUserSubquery", () => {
   it("versionで絞り込みuserIdごとにグループ化するクエリを組み立てること", () => {

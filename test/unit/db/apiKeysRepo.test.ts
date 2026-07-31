@@ -11,7 +11,7 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-const { apiKeysRepo } = await import("@/lib/db/apiKeys");
+const { apiKeysRepo } = await import("@/lib/db/domains/apiKeys");
 
 describe("apiKeysRepo.findByKey", () => {
   it("keyでapiKeysテーブルを検索すること", async () => {

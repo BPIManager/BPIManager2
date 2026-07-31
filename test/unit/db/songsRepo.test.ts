@@ -11,7 +11,7 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-const { songsRepo } = await import("@/lib/db/songs");
+const { songsRepo } = await import("@/lib/db/domains/songs");
 
 describe("songsRepo.getSongMasterWithDef", () => {
   it("songsとsongDefを結合したクエリを実行し結果を返すこと", async () => {

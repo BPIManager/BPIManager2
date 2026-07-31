@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { scoresRepo } from "@/lib/db/scores";
+import { scoresRepo } from "@/lib/db/domains/scores";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 import { rejectAccess } from "@/middlewares/api/withApi";
 import { parseQuery } from "@/services/nextRequest/parseBody";

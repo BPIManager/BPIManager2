@@ -11,7 +11,7 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-const { navigationRepo } = await import("@/lib/db/logs/navigation");
+const { navigationRepo } = await import("@/lib/db/domains/logs/navigation");
 
 describe("navigationRepo.getLatestTotalBpi", () => {
   it("userId/versionで絞り込み最新1件を取得すること", async () => {

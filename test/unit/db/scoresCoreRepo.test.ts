@@ -11,7 +11,7 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-const { scoresRepo } = await import("@/lib/db/scores");
+const { scoresRepo } = await import("@/lib/db/domains/scores");
 
 describe("scoresRepo.getLatestScores", () => {
   it("scoresテーブルから最新スコアを取得すること", async () => {

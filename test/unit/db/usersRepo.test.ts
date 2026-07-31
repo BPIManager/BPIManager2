@@ -19,20 +19,20 @@ const getLatestArenaStatsPerVersionMock = vi.hoisted(() => vi.fn());
 const getBestArenaClassPerVersionMock = vi.hoisted(() => vi.fn());
 const getStatsPrivacyMock = vi.hoisted(() => vi.fn());
 
-vi.mock("@/lib/db/officialArenaStats", async (importOriginal) => {
+vi.mock("@/lib/db/domains/officialArenaStats", async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import("@/lib/db/officialArenaStats")>();
+    await importOriginal<typeof import("@/lib/db/domains/officialArenaStats")>();
   return {
     ...actual,
     getLatestArenaStatsPerVersion: getLatestArenaStatsPerVersionMock,
     getBestArenaClassPerVersion: getBestArenaClassPerVersionMock,
   };
 });
-vi.mock("@/lib/db/statsPrivacy", () => ({
+vi.mock("@/lib/db/domains/statsPrivacy", () => ({
   getStatsPrivacy: getStatsPrivacyMock,
 }));
 
-const { usersRepo } = await import("@/lib/db/users");
+const { usersRepo } = await import("@/lib/db/domains/users");
 
 describe("usersRepo.checkUserNameAvailability", () => {
   it("userNameで検索すること", async () => {

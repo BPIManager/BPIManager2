@@ -39,8 +39,8 @@ const { createTrxSpy, dbMock } = vi.hoisted(() => {
 
 vi.mock("@/lib/db", () => ({ db: dbMock }));
 
-import { scoresRepo } from "@/lib/db/scores";
-import { allScoresRepo } from "@/lib/db/allScores";
+import { scoresRepo } from "@/lib/db/domains/scores";
+import { allScoresRepo } from "@/lib/db/domains/allScores";
 import { deleteBatch } from "@/lib/db/orchestrators/batchDeletion";
 
 describe("バッチ削除まわりのリポジトリ", () => {

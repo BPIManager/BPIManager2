@@ -1,10 +1,10 @@
 import { db } from "@/lib/db";
 import { Database, NewAllScores, NewScore, NewTotalBPILog } from "@/types/db";
 import { Transaction } from "kysely";
-import { scoresRepo } from "@/lib/db/scores";
-import { allScoresRepo } from "@/lib/db/allScores";
-import { navigationRepo } from "@/lib/db/logs/navigation";
-import { userStatusLogsRepo } from "@/lib/db/userStatusLogs";
+import { scoresRepo } from "@/lib/db/domains/scores";
+import { allScoresRepo } from "@/lib/db/domains/allScores";
+import { navigationRepo } from "@/lib/db/domains/logs/navigation";
+import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
 
 /**
  * スコアインポート結果をトランザクション内で保存する。

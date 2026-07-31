@@ -1,12 +1,12 @@
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { NextApiRequest, NextApiResponse } from "next";
-import { scoresRepo } from "../db/scores";
-import { usersRepo } from "../db/users";
+import { scoresRepo } from "../db/domains/scores";
+import { usersRepo } from "../db/domains/users";
 import { v4 as uuidv4 } from "uuid";
 import { AccessResult } from "@/middlewares/api/withApi";
 import { parseBody } from "@/services/nextRequest/parseBody";
 import { profileUpsertSchema } from "@/schemas/profile/upsert";
-import { upsertStatsPrivacy } from "@/lib/db/statsPrivacy";
+import { upsertStatsPrivacy } from "@/lib/db/domains/statsPrivacy";
 import { getUserAreaRank, AreaRankInfo } from "@/lib/arena/prefectureRankings";
 
 /**

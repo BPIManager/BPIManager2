@@ -15,7 +15,7 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-const { followsRepo } = await import("@/lib/db/follow");
+const { followsRepo } = await import("@/lib/db/domains/follow");
 
 describe("followsRepo.isFollowing", () => {
   it("レコードが存在すればtrueを返すこと", async () => {

@@ -1,4 +1,4 @@
-import { followsRepo } from "@/lib/db/follow";
+import { followsRepo } from "@/lib/db/domains/follow";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import type { FollowsQuery } from "@/schemas/follows/query";
 import { NextApiResponse } from "next";

@@ -4,7 +4,7 @@ import {
   AuthenticatedNextApiRequest,
   withAuth,
 } from "@/middlewares/api/withAuth";
-import { apiKeysRepo } from "@/lib/db/apiKeys";
+import { apiKeysRepo } from "@/lib/db/domains/apiKeys";
 
 async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
   try {

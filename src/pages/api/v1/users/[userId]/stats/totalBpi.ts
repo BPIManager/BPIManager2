@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import dayjs from "@/lib/dayjs";
-import { scoresRepo } from "@/lib/db/scores";
+import { scoresRepo } from "@/lib/db/domains/scores";
 import { statsRepo } from "@/lib/db/stats";
 import { BpiCalculator } from "@/lib/bpi";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";

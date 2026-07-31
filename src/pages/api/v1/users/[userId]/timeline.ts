@@ -4,7 +4,7 @@ import {
   withAuth,
 } from "@/middlewares/api/withAuth";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
-import { scoresRepo } from "@/lib/db/scores";
+import { scoresRepo } from "@/lib/db/domains/scores";
 import { parseQuery } from "@/services/nextRequest/parseBody";
 import { timelineQuerySchema } from "@/schemas/timeline/query";
 

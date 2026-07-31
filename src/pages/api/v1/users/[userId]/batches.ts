@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { scoresRepo } from "@/lib/db/scores";
+import { scoresRepo } from "@/lib/db/domains/scores";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { statsRepo } from "@/lib/db/stats";
 import { calculateTotalBpi } from "@/services/logs/calculateTotalBpi";

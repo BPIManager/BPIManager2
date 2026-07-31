@@ -1,6 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { songsRepo } from "@/lib/db/songs";
-import { scoresRepo, socialComparisonRepo } from "@/lib/db/scores";
+import { songsRepo } from "@/lib/db/domains/songs";
+import { scoresRepo, socialComparisonRepo } from "@/lib/db/domains/scores";
 import { songRivalsSchema } from "@/lib/mcp/schemas";
 
 export function registerGetSongRivals(server: McpServer, userId: string) {

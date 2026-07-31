@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { songPatternsRepo } from "@/lib/db/songPatterns";
+import { songPatternsRepo } from "@/lib/db/domains/songPatterns";
 import { resolveOptionalUid } from "@/middlewares/api/resolveOptionalUid";
 import type { VoteType } from "@/types/db";
 

@@ -1,5 +1,5 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { songsRepo } from "@/lib/db/songs";
+import { songsRepo } from "@/lib/db/domains/songs";
 import { searchSongsSchema, MCP_LIST_DEFAULT_LIMIT } from "@/lib/mcp/schemas";
 
 export function registerSearchSongs(server: McpServer) {

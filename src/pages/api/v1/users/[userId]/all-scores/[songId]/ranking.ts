@@ -3,7 +3,7 @@ import {
   AuthenticatedNextApiRequest,
   withAuth,
 } from "@/middlewares/api/withAuth";
-import { allScoresRepo } from "@/lib/db/allScores";
+import { allScoresRepo } from "@/lib/db/domains/allScores";
 import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 
 async function handler(

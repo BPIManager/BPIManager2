@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { songsRepo } from "@/lib/db/songs";
+import { songsRepo } from "@/lib/db/domains/songs";
 
 export default async function handler(
   req: NextApiRequest,

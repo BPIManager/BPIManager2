@@ -4,10 +4,10 @@ import {
   getLatestArenaStatsPerVersion,
   getBestArenaClassPerVersion,
   latestPerUserSubquery as latestArenaPerUserSubquery,
-} from "@/lib/db/officialArenaStats";
-import { getStatsPrivacy } from "@/lib/db/statsPrivacy";
-import { userStatusLogsRepo } from "@/lib/db/userStatusLogs";
-import { followsRepo } from "@/lib/db/follow";
+} from "@/lib/db/domains/officialArenaStats";
+import { getStatsPrivacy } from "@/lib/db/domains/statsPrivacy";
+import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
+import { followsRepo } from "@/lib/db/domains/follow";
 
 /**
  * ユーザープロフィールの参照・作成・更新を担当するリポジトリクラス。

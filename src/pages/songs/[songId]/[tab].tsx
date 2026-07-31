@@ -3,7 +3,7 @@ import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
 import { PageContainer } from "@/components/partials/common/PageChrome/Header";
 import { Meta, JsonLd } from "@/components/partials/common/PageChrome/Head";
 import { SongDetailContent } from "@/components/partials/features/Songs/SongDetail";
-import { songsRepo } from "@/lib/db/songs";
+import { songsRepo } from "@/lib/db/domains/songs";
 
 const VALID_TABS = ["ranking", "similar", "notes", "pattern"] as const;
 type Tab = (typeof VALID_TABS)[number];
