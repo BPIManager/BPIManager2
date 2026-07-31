@@ -155,6 +155,25 @@ class LogNavigationRepository {
   }
 
   /**
+   * 指定バッチに紐づくログレコードを削除する。
+   *
+   * @param trx - 呼び出し元が管理するトランザクション
+   * @param userId - ユーザー ID
+   * @param batchId - バッチ ID
+   */
+  async deleteByBatch(
+    trx: Transaction<Database>,
+    userId: string,
+    batchId: string,
+  ) {
+    await trx
+      .deleteFrom("logs")
+      .where("batchId", "=", batchId)
+      .where("userId", "=", userId)
+      .execute();
+  }
+
+  /**
    * バックアップ用にユーザーの全ログレコードを取得する。
    *
    * @param userId - ユーザー ID

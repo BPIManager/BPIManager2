@@ -114,6 +114,6 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
     await discordLinksRepo.deleteLinkByUser(trx, userId);
 
     // users: メインレコード
-    await trx.deleteFrom("users").where("userId", "=", userId).execute();
+    await usersRepo.deleteByUser(trx, userId);
   });
 }

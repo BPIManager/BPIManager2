@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
-import { sql, Expression } from "kysely";
+import { sql, Expression, Transaction } from "kysely";
+import { Database } from "@/types/db";
 import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
 
 /**
@@ -150,6 +151,16 @@ class UsersRepository {
       .selectAll()
       .where("userId", "=", userId)
       .execute();
+  }
+
+  /**
+   * ユーザーのメインレコードを削除する。
+   *
+   * @param trx - 呼び出し元が管理するトランザクション
+   * @param userId - ユーザー ID
+   */
+  async deleteByUser(trx: Transaction<Database>, userId: string) {
+    await trx.deleteFrom("users").where("userId", "=", userId).execute();
   }
 }
 
