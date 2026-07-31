@@ -5,6 +5,7 @@ import {
 } from "@/middlewares/api/withAuth";
 import { iidxTowerRepo } from "@/lib/db/iidxTower";
 import { statsRepo } from "@/lib/db/stats";
+import { maskPrivateIdentity } from "@/lib/db/shared/privacyMask";
 import { calculateRadar } from "@/lib/radar/calculator";
 import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import { v4 as uuidv4 } from "uuid";
@@ -74,9 +75,13 @@ async function handler(
 
     const rankings = rows.map((u, i) => ({
       rank: i + 1,
-      userId: u.isPublic ? u.userId : uuidv4(),
-      userName: u.isPublic ? u.userName : "-",
-      profileImage: u.isPublic ? u.profileImage : null,
+      ...maskPrivateIdentity({
+        isPublic: u.isPublic,
+        userId: u.userId,
+        userName: u.userName,
+        profileImage: u.profileImage,
+        anonId: uuidv4(),
+      }),
       isPublic: u.isPublic,
       iidxId: u.isPublic ? u.iidxId : null,
       totalCount: Number(u.totalCount),

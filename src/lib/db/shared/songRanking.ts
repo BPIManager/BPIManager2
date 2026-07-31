@@ -3,6 +3,7 @@ import {
   LatestScoreTable,
   latestLogIdPerUserSongSubquery,
 } from "@/lib/db/shared/latestScore";
+import { maskPrivateIdentity } from "@/lib/db/shared/privacyMask";
 
 export interface SongRankingEntry {
   rank: number;
@@ -67,9 +68,13 @@ export async function getSongRankingFromTable(params: {
 
   const rankings: SongRankingEntry[] = rows.map((r, i) => ({
     rank: i + 1,
-    userId: r.isPublic ? r.userId : `anon-${i}`,
-    userName: r.isPublic ? r.userName : "-",
-    profileImage: r.isPublic ? r.profileImage : null,
+    ...maskPrivateIdentity({
+      isPublic: r.isPublic,
+      userId: r.userId,
+      userName: r.userName,
+      profileImage: r.profileImage,
+      anonId: `anon-${i}`,
+    }),
     exScore: r.exScore,
     bpi: r.bpi !== null && r.bpi !== undefined ? Number(r.bpi) : null,
     isSelf: r.userId === viewerId,
