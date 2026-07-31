@@ -2,6 +2,7 @@ import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { NextApiRequest, NextApiResponse } from "next";
 import { scoresRepo } from "../db/domains/scores";
 import { usersRepo } from "../db/domains/users";
+import { userProfilesRepo } from "../db/aggregates/userProfiles";
 import { v4 as uuidv4 } from "uuid";
 import { AccessResult } from "@/middlewares/api/withApi";
 import { parseBody } from "@/services/nextRequest/parseBody";
@@ -13,7 +14,7 @@ import { getUserAreaRank, AreaRankInfo } from "@/lib/arena/prefectureRankings";
  * プロフィール取得 API のレスポンス型。
  * `isCompare` が `true` の場合は `compare` フィールドに勝敗統計とレーダーデータを含む。
  */
-type ProfileSummary = NonNullable<Awaited<ReturnType<typeof usersRepo.getUserProfileSummary>>>;
+type ProfileSummary = NonNullable<Awaited<ReturnType<typeof userProfilesRepo.getUserProfileSummary>>>;
 type ProfileSummaryWithoutPrivacy = Omit<ProfileSummary, "statsPrivacy">;
 type ProfileWithAreaRank = ProfileSummaryWithoutPrivacy & { areaRank: AreaRankInfo | null };
 
@@ -54,7 +55,7 @@ export async function handleGetProfile(
   const version = latestVersion;
 
   const [profile, winLoss, radar] = await Promise.all([
-    usersRepo.getUserProfileSummary(uid, viewerId),
+    userProfilesRepo.getUserProfileSummary(uid, viewerId),
     isCompare && viewerId
       ? scoresRepo.getWinLossStats(viewerId, uid, version)
       : null,
@@ -115,7 +116,7 @@ export async function handleCreateProfile(
   res: NextApiResponse,
   uid: string,
 ) {
-  const existing = await usersRepo.getUserProfileSummary(uid);
+  const existing = await userProfilesRepo.getUserProfileSummary(uid);
   if (existing)
     return res
       .status(409)
@@ -138,7 +139,7 @@ export async function handleUpdateProfile(
   res: NextApiResponse,
   uid: string,
 ) {
-  const existing = await usersRepo.getUserProfileSummary(uid);
+  const existing = await userProfilesRepo.getUserProfileSummary(uid);
   if (!existing)
     return res
       .status(404)
