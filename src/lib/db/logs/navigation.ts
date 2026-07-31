@@ -1,7 +1,7 @@
 import dayjs from "@/lib/dayjs";
 import { db } from "@/lib/db";
 import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
-import { Database } from "@/types/db";
+import { Database, NewTotalBPILog } from "@/types/db";
 import { Transaction } from "kysely";
 
 /**
@@ -153,6 +153,19 @@ class LogNavigationRepository {
    */
   async deleteByUser(trx: Transaction<Database>, userId: string) {
     await trx.deleteFrom("logs").where("userId", "=", userId).execute();
+  }
+
+  /**
+   * ログレコードを1件以上挿入する。
+   *
+   * @param trx - 呼び出し元が管理するトランザクション
+   * @param values - 挿入するレコード（単数または複数）
+   */
+  async insert(
+    trx: Transaction<Database>,
+    values: NewTotalBPILog | NewTotalBPILog[],
+  ) {
+    await trx.insertInto("logs").values(values).execute();
   }
 
   /**

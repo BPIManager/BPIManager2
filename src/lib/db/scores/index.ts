@@ -1,10 +1,20 @@
-import { Database } from "@/types/db";
+import { Database, NewScore } from "@/types/db";
 import { Transaction } from "kysely";
 
 /**
  * `scores` テーブル（単曲スコア）の書き込みを担当するリポジトリクラス。
  */
 class ScoresRepository {
+  /**
+   * スコアレコードを1件以上挿入する。
+   *
+   * @param trx - 呼び出し元が管理するトランザクション
+   * @param values - 挿入するレコード（単数または複数）
+   */
+  async insert(trx: Transaction<Database>, values: NewScore | NewScore[]) {
+    await trx.insertInto("scores").values(values).execute();
+  }
+
   /**
    * 指定バッチに紐づくスコアレコードを削除する。
    *

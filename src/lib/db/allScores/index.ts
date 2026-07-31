@@ -1,7 +1,7 @@
 import { ALL_DIFFICULTIES } from "@/constants/iidx/songLevels";
 import { db } from "@/lib/db";
 import { AllDifficulties, AllSongWithScore } from "@/types/songs/allSongs";
-import { Database } from "@/types/db";
+import { Database, NewAllScores } from "@/types/db";
 import { Transaction } from "kysely";
 import {
   latestLogIdPerSongSubquery,
@@ -238,6 +238,25 @@ class allScoresRepository {
       },
       {} as Record<string, typeof history>,
     );
+  }
+
+  /**
+   * 全難易度スコアレコードを1件以上挿入する。1000件ごとにチャンク分割して挿入する。
+   *
+   * @param trx - 呼び出し元が管理するトランザクション
+   * @param values - 挿入するレコード（単数または複数）
+   */
+  async insert(
+    trx: Transaction<Database>,
+    values: NewAllScores | NewAllScores[],
+  ) {
+    const records = Array.isArray(values) ? values : [values];
+    if (records.length === 0) return;
+
+    for (let i = 0; i < records.length; i += 1000) {
+      const chunk = records.slice(i, i + 1000);
+      await trx.insertInto("allScores").values(chunk).execute();
+    }
   }
 
   /**

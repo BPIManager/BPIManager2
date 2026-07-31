@@ -24,6 +24,8 @@ export const logsRepo = {
   findBatchByIdAndUser: navigationRepo.findBatchByIdAndUser.bind(navigationRepo),
   findBatchesInRange: navigationRepo.findBatchesInRange.bind(navigationRepo),
   deleteBatch,
+  insert: navigationRepo.insert.bind(navigationRepo),
+  deleteByUser: navigationRepo.deleteByUser.bind(navigationRepo),
 
   // スコア詳細クエリ系
   getScoresWithDetails: scoreDetailRepo.getScoresWithDetails.bind(scoreDetailRepo),
