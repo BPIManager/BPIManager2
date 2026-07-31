@@ -20,7 +20,6 @@ export const RadarSection = ({ radarGrowth }: Props) => {
 
   return (
     <RadarSectionUI
-      radarGrowth={radarGrowth}
       inView={inView}
       sectionRef={ref as React.RefObject<HTMLDivElement>}
       sortedAll={sortedAll}

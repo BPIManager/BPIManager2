@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import type {
-  MonthlyReviewData,
   TopSongImproved,
   RadarGrowthEntry,
 } from "@/types/stats/monthlyReview";
@@ -509,7 +508,6 @@ function RadarComparisonChart({
 }
 
 interface Props {
-  radarGrowth: NonNullable<MonthlyReviewData["radarGrowth"]>;
   inView: boolean;
   sectionRef: React.RefObject<HTMLDivElement>;
   sortedAll: RadarGrowthEntry[];
