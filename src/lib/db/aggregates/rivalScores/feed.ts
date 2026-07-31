@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { sql } from "kysely";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore";
@@ -47,17 +48,19 @@ class SocialTimelineRepository {
       difficulties,
     } = params;
 
+    // followsを起点に結合順序をstraight_joinで固定する。scores起点だと
+    // フォロー中でない大多数のユーザー分まで走査する非効率な実行計画になりうるため
+    // (getOvertakenRivals: commit adef304と同型の問題)。
     return await db
-      .selectFrom("scores as s")
+      .selectFrom("follows as f")
+      .modifyFront(sql`straight_join`)
+      .innerJoin("scores as s", (join) =>
+        join.onRef("s.userId", "=", "f.followingId").on("s.version", "=", version),
+      )
       .innerJoin("users as u", "s.userId", "u.userId")
       .innerJoin("songs as m", "s.songId", "m.songId")
       .innerJoin("songDef as d", (join) =>
         join.onRef("d.songId", "=", "m.songId").on("d.isCurrent", "=", 1),
-      )
-      .innerJoin("follows as f", (join) =>
-        join
-          .onRef("f.followingId", "=", "s.userId")
-          .on("f.followerId", "=", viewerId),
       )
       .select((eb) => [
         "s.logId",
@@ -103,7 +106,7 @@ class SocialTimelineRepository {
           .where("s4.version", "=", version)
           .as("myBestExScore"),
       ])
-      .where("s.version", "=", version)
+      .where("f.followerId", "=", viewerId)
       .where("u.isPublic", "=", 1)
       .$if(!!search, (qb) =>
         qb.where((eb) =>

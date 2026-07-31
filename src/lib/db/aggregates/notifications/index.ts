@@ -18,9 +18,17 @@ function overtakenScoresBaseQuery(params: {
 }) {
   const { userId, latestVersion } = params;
 
+  // followsを起点に結合順序をstraight_joinで固定する。s2(scores)起点だと
+  // フォロー中でない大多数のユーザー分まで走査する非効率な実行計画になりうるため
+  // (getOvertakenRivals: commit adef304と同型の問題)。
   return db
-    .selectFrom("scores as s2")
-    .innerJoin("follows as f", "f.followingId", "s2.userId")
+    .selectFrom("follows as f")
+    .modifyFront(sql`straight_join`)
+    .innerJoin("scores as s2", (join) =>
+      join
+        .onRef("s2.userId", "=", "f.followingId")
+        .on("s2.version", "=", latestVersion),
+    )
     .innerJoin("scores as r", (join) =>
       join
         .onRef("r.songId", "=", "s2.songId")
@@ -50,7 +58,6 @@ function overtakenScoresBaseQuery(params: {
         ),
     )
     .where("f.followerId", "=", userId)
-    .where("s2.version", "=", latestVersion)
     .whereRef("s2.exScore", ">", "r.exScore")
     .where((eb) =>
       eb.or([
