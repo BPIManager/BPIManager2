@@ -26,6 +26,11 @@ export const parseCSV = (csvData: string): ParsedCsvRow[] => {
       const clearState = row[`${diff} クリアタイプ`];
 
       if (clearState !== "NO PLAY") {
+        const exScore = parseInt(row[`${diff} スコア`] || "0");
+        // 他のCSVインポートアダプタ(reflux/result_techo/daken_counter)と
+        // 挙動を揃えるため、EXスコア0点のプレイ行は取り込まない
+        if (!exScore || exScore <= 0) return null;
+
         const missStr = row[`${diff} ミスカウント`];
         const missCount =
           missStr === "---" || !missStr ? null : parseInt(missStr);
@@ -33,7 +38,7 @@ export const parseCSV = (csvData: string): ParsedCsvRow[] => {
         return {
           title,
           difficulty: diff,
-          exScore: parseInt(row[`${diff} スコア`] || "0"),
+          exScore,
           clearState,
           missCount,
           lastPlayed: lastPlayed || null,

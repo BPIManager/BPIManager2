@@ -26,6 +26,12 @@ describe("CSV Parser Test", () => {
     const result = parseCSV(csvData);
     expect(result[0]?.missCount).toBeNull();
   });
+
+  it("EXスコア0点のプレイ行は他のCSVアダプタと同様に取り込まれないこと", () => {
+    const csvData = `タイトル,ANOTHER 難易度,ANOTHER クリアタイプ,ANOTHER スコア,ANOTHER ミスカウント,最終プレー日時\n"Test Song",12,FAILED,0,50,2025-01-01 12:00`;
+    const result = parseCSV(csvData);
+    expect(result).toHaveLength(0);
+  });
 });
 
 describe("Server-side Import Logic Simulation", () => {
