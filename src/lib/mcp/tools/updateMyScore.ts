@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import { bpiRepo } from "@/lib/db/bpi";
 import { songsRepo } from "@/lib/db/songs";
 import { allSongsRepo } from "@/lib/db/allSongs";
+import { saveImportResults } from "@/lib/db/orchestrators/bpiImport";
 import { BpiCalculator } from "@/lib/bpi";
 import { isImproved } from "@/lib/lamp";
 import { NewAllScores, NewScore } from "@/types/db";
@@ -134,7 +135,7 @@ export function registerUpdateMyScore(server: McpServer, userId: string) {
         twelves.length,
       );
 
-      await bpiRepo.saveImportResults({
+      await saveImportResults({
         userId,
         version,
         batchId,

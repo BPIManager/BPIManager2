@@ -10,6 +10,7 @@ import { NewScore, NewAllScores } from "@/types/db";
 import { bpiRepo } from "@/lib/db/bpi";
 import { songsRepo } from "@/lib/db/songs";
 import { allSongsRepo } from "@/lib/db/allSongs";
+import { saveImportResults } from "@/lib/db/orchestrators/bpiImport";
 import dayjs from "@/lib/dayjs";
 import { scoresBulkBodySchema } from "@/schemas/scores/bulk";
 import { parseBody } from "@/services/nextRequest/parseBody";
@@ -153,7 +154,7 @@ const handler = async (
       twelves.length,
     );
 
-    await bpiRepo.saveImportResults({
+    await saveImportResults({
       userId,
       version,
       batchId,

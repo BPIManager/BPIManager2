@@ -1,6 +1,6 @@
 import { BpiCalculator } from "../bpi";
 import dayjs from "../dayjs";
-import { bpiRepo } from "../db/bpi";
+import { importFromBPIM } from "../db/orchestrators/bpiImport";
 import { songsRepo } from "../db/songs";
 import { SongLookup } from "./songLookup";
 import { v4 as uuidv4 } from "uuid";
@@ -191,7 +191,7 @@ export class BpiImportService {
       });
     }
 
-    await bpiRepo.importFromBPIM({
+    await importFromBPIM({
       userId,
       scoreUpdates: allScoreUpdates,
       statusLogs: allStatusLogs,

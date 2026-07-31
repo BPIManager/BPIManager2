@@ -7,10 +7,8 @@ const { getSongMasterWithDefMock, importFromBPIMMock } = vi.hoisted(() => ({
   importFromBPIMMock: vi.fn(),
 }));
 
-vi.mock("@/lib/db/bpi", () => ({
-  bpiRepo: {
-    importFromBPIM: importFromBPIMMock,
-  },
+vi.mock("@/lib/db/orchestrators/bpiImport", () => ({
+  importFromBPIM: importFromBPIMMock,
 }));
 
 vi.mock("@/lib/db/songs", () => ({
