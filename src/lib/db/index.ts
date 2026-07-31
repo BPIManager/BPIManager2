@@ -4,6 +4,12 @@
  * 開発環境では HMR による接続の多重生成を防ぐため、グローバル変数を介してインスタンスを共有する。
  * 接続設定は環境変数（`DB_HOST`, `DB_USER`, `DB_PW`, `DB_DATABASE`）から読み込む。
  *
+ * `db/domains/`（単一テーブル所有）・`db/orchestrators/`（書き込み横断）・
+ * `db/aggregates/`（読み取り横断）・`db/shared/`（副作用なし共通ヘルパー）の
+ * いずれにも属さない、接続確立のみを担うインフラ層のモジュール。
+ * `import { db } from "@/lib/db"` という参照形が広く定着しているため、
+ * リネームによる大規模なimportパス変更は行わずこの場所に留めている。
+ *
  * @module
  */
 import { Kysely, MysqlDialect, MysqlPool } from "kysely";
