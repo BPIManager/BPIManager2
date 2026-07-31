@@ -1,9 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import {
-  createDbSpy,
-  createTransactionalDbSpy,
-  callsFor,
-} from "../helpers/dbQuerySpy";
+import { createDbSpy, createQueryBuilderSpy, callsFor } from "../helpers/dbQuerySpy";
 
 const { dbHolder } = vi.hoisted(() => ({
   dbHolder: { current: null as unknown },
@@ -27,11 +23,10 @@ describe("usersRepo.checkUserNameAvailability", () => {
 
 describe("usersRepo.upsertUserProfile", () => {
   it("同名かつ別ユーザーが存在する場合409エラーを投げること", async () => {
-    const spy = createTransactionalDbSpy({ userId: "other-user" });
-    dbHolder.current = spy;
+    const { proxy: trx } = createQueryBuilderSpy({ userId: "other-user" });
 
     await expect(
-      usersRepo.upsertUserProfile({
+      usersRepo.upsertUserProfile(trx as never, {
         userId: "user-1",
         userName: "重複名",
         iidxId: null,
@@ -39,17 +34,14 @@ describe("usersRepo.upsertUserProfile", () => {
         profileImage: null,
         isPublic: 1,
         xId: null,
-        version: "33",
-        batchId: "batch-1",
       }),
     ).rejects.toMatchObject({ status: 409 });
   });
 
-  it("重複がない場合、users/userStatusLogsへ書き込み成功を返すこと", async () => {
-    const spy = createTransactionalDbSpy(undefined);
-    dbHolder.current = spy;
+  it("重複がない場合、usersテーブルへUPSERTすること", async () => {
+    const { proxy: trx, calls } = createQueryBuilderSpy(undefined);
 
-    const result = await usersRepo.upsertUserProfile({
+    await usersRepo.upsertUserProfile(trx as never, {
       userId: "user-1",
       userName: "新規名",
       iidxId: null,
@@ -57,14 +49,10 @@ describe("usersRepo.upsertUserProfile", () => {
       profileImage: null,
       isPublic: 1,
       xId: null,
-      version: "33",
-      batchId: "batch-1",
     });
 
-    expect(result).toEqual({ success: true });
-    expect(callsFor(spy.calls, "insertInto").map((c) => c.args[0])).toEqual([
+    expect(callsFor(calls, "insertInto").map((c) => c.args[0])).toEqual([
       "users",
-      "userStatusLogs",
     ]);
   });
 });

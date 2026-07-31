@@ -1,7 +1,7 @@
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { NextApiRequest, NextApiResponse } from "next";
 import { scoresRepo } from "../db/domains/scores";
-import { usersRepo } from "../db/domains/users";
+import { upsertUserProfile } from "../db/orchestrators/userProfileUpsert";
 import { userProfilesRepo } from "../db/aggregates/userProfiles";
 import { v4 as uuidv4 } from "uuid";
 import { AccessResult } from "@/middlewares/api/withApi";
@@ -151,7 +151,7 @@ export async function handleUpdateProfile(
 /**
  * プロフィールの作成・更新共通ロジック。
  *
- * ユーザー名のバリデーションを行った後、`usersRepo.upsertUserProfile` を呼び出す。
+ * ユーザー名のバリデーションを行った後、`orchestrators/userProfileUpsert` を呼び出す。
  *
  * @param req - Next.js API リクエスト（ボディにプロフィールデータを含む）
  * @param res - Next.js API レスポンス
@@ -166,7 +166,7 @@ export async function upsert(
   if (!data) return;
 
   const { arenaPrivacy, ...profileData } = data;
-  const result = await usersRepo.upsertUserProfile({
+  const result = await upsertUserProfile({
     ...profileData,
     userId: uid,
     version: latestVersion,

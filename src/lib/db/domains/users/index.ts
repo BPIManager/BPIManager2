@@ -1,7 +1,6 @@
 import { db } from "@/lib/db";
 import { sql, Expression, Transaction } from "kysely";
 import { Database } from "@/types/db";
-import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
 
 /**
  * `users` テーブル自体の参照・作成・更新を担当するリポジトリクラス。
@@ -28,96 +27,69 @@ class UsersRepository {
   /**
    * ユーザープロフィールを作成または更新する（UPSERT）。
    *
-   * トランザクション内でユーザー名の重複チェックを行い、
-   * `users` テーブルを UPSERT した後に `userStatusLogs` にもレコードを追加する。
+   * ユーザー名の重複チェックを行った上で `users` テーブルを UPSERT する。
+   * `userStatusLogs` への追加書き込みを含む複数ドメインへのトランザクション
+   * 制御は呼び出し元（`orchestrators/userProfileUpsert`）の責務とする。
    *
+   * @param trx - 呼び出し元が管理するトランザクション
    * @param params.userId - ユーザー ID
    * @param params.userName - ユーザー名（他ユーザーと重複不可）
    * @param params.iidxId - IIDX プレイヤー ID
    * @param params.profileText - プロフィールテキスト
    * @param params.profileImage - プロフィール画像 URL
    * @param params.isPublic - 公開設定（`1`: 公開、`0`: 非公開）
-   * @param params.arenaRank - アリーナランク
-   * @param params.version - バージョン番号
-   * @param params.batchId - バッチ ID
-   * @returns `{ success: true }`
    * @throws ユーザー名が重複する場合は `status: 409` を持つエラー
    */
-  async upsertUserProfile(params: {
-    userId: string;
-    userName: string;
-    iidxId: string | null;
-    profileText: string | null;
-    profileImage: string | null;
-    isPublic: number;
-    xId: string | null;
-    version: string;
-    batchId: string;
-  }) {
-    const {
-      userId,
-      userName,
-      iidxId,
-      profileText,
-      profileImage,
-      isPublic,
-      xId,
-      version,
-      batchId,
-    } = params;
+  async upsertUserProfile(
+    trx: Transaction<Database>,
+    params: {
+      userId: string;
+      userName: string;
+      iidxId: string | null;
+      profileText: string | null;
+      profileImage: string | null;
+      isPublic: number;
+      xId: string | null;
+    },
+  ) {
+    const { userId, userName, iidxId, profileText, profileImage, isPublic, xId } =
+      params;
 
-    return await db.transaction().execute(async (trx) => {
-      const existingUser = await trx
-        .selectFrom("users")
-        .select("userId")
-        .where("userName", "=", userName)
-        .where("userId", "!=", userId)
-        .executeTakeFirst();
+    const existingUser = await trx
+      .selectFrom("users")
+      .select("userId")
+      .where("userName", "=", userName)
+      .where("userId", "!=", userId)
+      .executeTakeFirst();
 
-      if (existingUser) {
-        const error = new Error("UserName is already taken");
-        Object.assign(error, { status: 409 });
-        throw error;
-      }
+    if (existingUser) {
+      const error = new Error("UserName is already taken");
+      Object.assign(error, { status: 409 });
+      throw error;
+    }
 
-      const lastStatus = await userStatusLogsRepo.getLatestTotalBpi(
-        trx,
+    await trx
+      .insertInto("users")
+      .values({
         userId,
-        version,
-      );
-
-      await trx
-        .insertInto("users")
-        .values({
-          userId,
-          userName,
-          iidxId,
-          profileText,
-          profileImage,
-          isPublic,
-          xId,
-          updatedAt: new Date(),
-        })
-        .onDuplicateKeyUpdate({
-          userName,
-          iidxId,
-          profileText,
-          profileImage,
-          isPublic,
-          xId,
-          updatedAt: new Date(),
-        })
-        .execute();
-
-      await userStatusLogsRepo.insert(trx, {
-        userId,
-        totalBpi: lastStatus?.totalBpi ?? -15,
-        version,
-        batchId,
-      });
-
-      return { success: true };
-    });
+        userName,
+        iidxId,
+        profileText,
+        profileImage,
+        isPublic,
+        xId,
+        updatedAt: new Date(),
+      })
+      .onDuplicateKeyUpdate({
+        userName,
+        iidxId,
+        profileText,
+        profileImage,
+        isPublic,
+        xId,
+        updatedAt: new Date(),
+      })
+      .execute();
   }
 
   /**
