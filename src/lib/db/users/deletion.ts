@@ -65,6 +65,9 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
       .execute(),
   ]);
 
+  // apiKeys.key は秘密情報のため、バックアップには残さずレコードの存在のみ記録する
+  const redactedApiKeys = apiKeys.map(({ key: _key, ...rest }) => rest);
+
   const backup = {
     exportedAt: new Date().toISOString(),
     userId,
@@ -76,16 +79,20 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
     notifications,
     statusLogs,
     roles,
-    apiKeys,
+    apiKeys: redactedApiKeys,
     allScores,
     discordLinks,
   };
 
   // 2. バックアップをファイルに書き出す
   const backupDir = path.join(os.homedir(), "backups", "delete");
-  fs.mkdirSync(backupDir, { recursive: true });
+  await fs.promises.mkdir(backupDir, { recursive: true });
   const backupPath = path.join(backupDir, `${userId}_${Date.now()}.json`);
-  fs.writeFileSync(backupPath, JSON.stringify(backup, null, 2), "utf-8");
+  await fs.promises.writeFile(
+    backupPath,
+    JSON.stringify(backup, null, 2),
+    "utf-8",
+  );
 
   // 3. FK制約を考慮した順序で物理削除（トランザクション）
   await db.transaction().execute(async (trx) => {
