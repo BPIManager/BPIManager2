@@ -4,7 +4,9 @@ import { sql } from "kysely";
 import {
   correlatedLatestLogId,
   latestLogIdPerUserSongSubquery,
+  latestLogIdPerUserSongScalarSubquery,
 } from "@/lib/db/shared/latestScore";
+import { userDisplayColumns } from "@/lib/db/shared/userDisplay";
 
 /**
  * ライバル比較・フォロー中ユーザーとのスコア比較を担当するリポジトリクラス。
@@ -377,10 +379,10 @@ class RivalRepository {
   }
 
   /**
-   * 指定楽曲のフォロー中ライバル最新スコアを全件取得する。
-   * ライバルランク計算用。
+   * 指定楽曲のフォロー中ライバル最新スコアを全件取得する（`songId`/`exScore`のみ）。
+   * ライバルランク計算用の集計クエリ。
    */
-  async getRivalScoresForSongs(params: {
+  async getRivalLatestScoresBySong(params: {
     userId: string;
     version: string;
     songIds: number[];
@@ -404,6 +406,55 @@ class RivalRepository {
           .onRef("s.songId", "=", "latest.songId"),
       )
       .select(["s.songId", "s.exScore"])
+      .execute();
+  }
+
+  /**
+   * 特定楽曲におけるフォロー中ユーザーの最新スコア一覧を取得する
+   * （ユーザー表示情報・楽曲情報付き）。単曲のライバル比較表示用。
+   */
+  async getFollowedScoresForSong(params: {
+    viewerId: string;
+    songId: number;
+    version: string;
+  }) {
+    const { viewerId, songId, version } = params;
+
+    return await db
+      .selectFrom("follows as f")
+      .innerJoin("users as u", "f.followingId", "u.userId")
+      .innerJoin("scores as s", "u.userId", "s.userId")
+      .innerJoin("songs as m", "s.songId", "m.songId")
+      .innerJoin("songDef as d", (join) =>
+        join.onRef("d.songId", "=", "m.songId").on("d.isCurrent", "=", 1),
+      )
+      .select([
+        ...userDisplayColumns("u"),
+        "s.exScore",
+        "s.bpi",
+        "s.clearState",
+        "s.lastPlayed",
+        "s.logId",
+        "m.title",
+        "m.difficulty",
+        "m.notes",
+        "d.wrScore",
+        "d.kaidenAvg",
+      ])
+      .where("f.followerId", "=", viewerId)
+      .where("s.songId", "=", songId)
+      .where("s.version", "=", version)
+      .where("u.isPublic", "=", 1)
+      .where(
+        "s.logId",
+        "in",
+        latestLogIdPerUserSongScalarSubquery({
+          table: "scores",
+          version,
+          songIds: [songId],
+        }),
+      )
+      .orderBy("s.exScore", "desc")
       .execute();
   }
 

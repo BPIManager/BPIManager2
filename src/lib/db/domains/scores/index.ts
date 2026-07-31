@@ -455,7 +455,9 @@ export const scoresRepo = {
   getOvertakenRivals: rivalRepo.getOvertakenRivals.bind(rivalRepo),
   getRivalAvgScores: rivalRepo.getRivalAvgScores.bind(rivalRepo),
   getRivalTopScores: rivalRepo.getRivalTopScores.bind(rivalRepo),
-  getRivalScoresForSongs: rivalRepo.getRivalScoresForSongs.bind(rivalRepo),
+  getRivalLatestScoresBySong:
+    rivalRepo.getRivalLatestScoresBySong.bind(rivalRepo),
+  getFollowedScoresForSong: rivalRepo.getFollowedScoresForSong.bind(rivalRepo),
 
   // スコア詳細クエリ系
   getScoresWithDetails:
@@ -475,8 +477,6 @@ export const scoresRepo = {
   getWinLossHistory:
     socialComparisonRepo.getWinLossHistory.bind(socialComparisonRepo),
   getUserRadar: socialComparisonRepo.getUserRadar.bind(socialComparisonRepo),
-  getRivalScoresForSong:
-    socialComparisonRepo.getRivalScoresForSong.bind(socialComparisonRepo),
   getFollowedWinLossSummary:
     socialComparisonRepo.getFollowedWinLossSummary.bind(socialComparisonRepo),
 

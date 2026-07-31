@@ -88,7 +88,7 @@ export default async function handler(
       .filter(Boolean);
     const rivalScores =
       isOwnLog && overtakenSongIds.length > 0
-        ? await scoresRepo.getRivalScoresForSongs({
+        ? await scoresRepo.getRivalLatestScoresBySong({
             userId: uid,
             version: v,
             songIds: overtakenSongIds,

@@ -104,7 +104,7 @@ async function handleLastPlayedBase(
     .filter(Boolean);
   const rivalScores =
     isOwnLog && overtakenSongIds.length > 0
-      ? await scoresRepo.getRivalScoresForSongs({
+      ? await scoresRepo.getRivalLatestScoresBySong({
           userId: uid,
           version: ver,
           songIds: overtakenSongIds,
@@ -205,7 +205,7 @@ async function handleCreatedAtBase(
     .filter(Boolean);
   const rivalScores =
     isOwnLog && overtakenSongIds.length > 0
-      ? await scoresRepo.getRivalScoresForSongs({
+      ? await scoresRepo.getRivalLatestScoresBySong({
           userId: uid,
           version: ver,
           songIds: overtakenSongIds,

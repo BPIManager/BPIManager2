@@ -109,16 +109,34 @@ describe("rivalRepo.getOvertakenRivals", () => {
   });
 });
 
-describe("rivalRepo.getRivalScoresForSongs", () => {
+describe("rivalRepo.getRivalLatestScoresBySong", () => {
   it("songIdsが空の場合、DBに問い合わせず空配列を返すこと", async () => {
     dbHolder.current = createDbSpy([]);
-    const result = await rivalRepo.getRivalScoresForSongs({
+    const result = await rivalRepo.getRivalLatestScoresBySong({
       userId: "user-1",
       version: "33",
       songIds: [],
     });
     expect(result).toEqual([]);
     expect(dbHolder.current.calls).toHaveLength(0);
+  });
+});
+
+describe("rivalRepo.getFollowedScoresForSong", () => {
+  it("followsとscoresを結合したクエリを実行し結果をそのまま返すこと", async () => {
+    const rows = [{ userId: "rival-1", exScore: 1800 }];
+    dbHolder.current = createDbSpy(rows);
+
+    const result = await rivalRepo.getFollowedScoresForSong({
+      viewerId: "viewer-1",
+      songId: 1,
+      version: "33",
+    });
+
+    expect(result).toEqual(rows);
+    expect(callsFor(dbHolder.current.calls, "selectFrom")[0].args).toEqual([
+      "follows as f",
+    ]);
   });
 });
 

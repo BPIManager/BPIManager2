@@ -22,7 +22,7 @@ export default async function handler(
     const access = await checkUserAccess(req, String(userId));
     if (!access.hasAccess) return rejectAccess(res, access);
 
-    const rivalsScores = await scoresRepo.getRivalScoresForSong({
+    const rivalsScores = await scoresRepo.getFollowedScoresForSong({
       viewerId: String(userId),
       songId: Number(songId),
       version: version,
@@ -40,7 +40,7 @@ export default async function handler(
 }
 
 export const formatRivalScore = (
-  r: Awaited<ReturnType<typeof scoresRepo.getRivalScoresForSong>>[number],
+  r: Awaited<ReturnType<typeof scoresRepo.getFollowedScoresForSong>>[number],
 ) => ({
   userId: r.userId,
   userName: r.userName,

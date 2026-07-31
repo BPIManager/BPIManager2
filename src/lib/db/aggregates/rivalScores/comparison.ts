@@ -120,56 +120,6 @@ class SocialComparisonRepository {
   }
 
   /**
-   * 特定楽曲におけるフォロー中ユーザーの最新スコアリストを取得
-   */
-  async getRivalScoresForSong(params: {
-    viewerId: string;
-    songId: number;
-    version: string;
-  }) {
-    const { viewerId, songId, version } = params;
-
-    return await db
-      .selectFrom("follows as f")
-      .innerJoin("users as u", "f.followingId", "u.userId")
-      .innerJoin("scores as s", "u.userId", "s.userId")
-      .innerJoin("songs as m", "s.songId", "m.songId")
-      .innerJoin("songDef as d", (join) =>
-        join.onRef("d.songId", "=", "m.songId").on("d.isCurrent", "=", 1),
-      )
-      .select([
-        "u.userId",
-        "u.userName",
-        "u.profileImage",
-        "s.exScore",
-        "s.bpi",
-        "s.clearState",
-        "s.lastPlayed",
-        "s.logId",
-        "m.title",
-        "m.difficulty",
-        "m.notes",
-        "d.wrScore",
-        "d.kaidenAvg",
-      ])
-      .where("f.followerId", "=", viewerId)
-      .where("s.songId", "=", songId)
-      .where("s.version", "=", version)
-      .where("u.isPublic", "=", 1)
-      .where(
-        "s.logId",
-        "in",
-        latestLogIdPerUserSongScalarSubquery({
-          table: "scores",
-          version,
-          songIds: [songId],
-        }),
-      )
-      .orderBy("s.exScore", "desc")
-      .execute();
-  }
-
-  /**
    * 閲覧者とライバルの難易度レベル別スコア更新履歴を全件取得する。
    * 日次累積勝敗推移の計算に使用する。
    *
