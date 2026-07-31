@@ -5,6 +5,7 @@ import {
   latestLogIdPerSongSubquery,
   latestLogIdPerUserSongScalarSubquery,
 } from "@/lib/db/shared/latestScore";
+import { userDisplayColumns } from "@/lib/db/shared/userDisplay";
 
 /**
  * `allScores`/`allSongs`（全難易度スコア・楽曲マスタ）をまたぐ複合ビューを
@@ -168,9 +169,7 @@ class AllScoresAggregateRepository {
       .innerJoin("allScores as s", "u.userId", "s.userId")
       .innerJoin("allSongs as m", "s.songId", "m.songId")
       .select([
-        "u.userId",
-        "u.userName",
-        "u.profileImage",
+        ...userDisplayColumns("u"),
         "s.exScore",
         "s.bpi",
         "s.clearState",
