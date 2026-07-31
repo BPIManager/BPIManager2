@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { Database, NewScore } from "@/types/db";
-import { Transaction } from "kysely";
+import { Transaction, Expression, sql } from "kysely";
 import { IIDX_VERSIONS, latestVersion } from "@/constants/iidx/iidxVersions";
 import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore";
 import { rivalRepo } from "@/lib/db/aggregates/rivalScores/rival";
@@ -175,6 +175,32 @@ class ScoresRepository {
       total: Number(row?.total ?? 0),
     };
   }
+
+  /**
+   * 指定バージョン群を除外した `scores` レコード件数を取得する。
+   * `onJstDate` 指定時はその日(JST)に作成されたレコード件数に絞り込む。
+   *
+   * @param excludeVersions - 除外するバージョン番号の配列
+   * @param onJstDate - `DATE(CONVERT_TZ(createdAt, '+00:00', '+09:00'))` と比較するSQL式
+   */
+  async getCountExcludingVersions(
+    excludeVersions: readonly string[],
+    onJstDate?: Expression<unknown>,
+  ): Promise<number> {
+    let query = db
+      .selectFrom("scores")
+      .select((eb) => eb.fn.count("logId").as("count"))
+      .where("version", "not in", excludeVersions as string[]);
+    if (onJstDate) {
+      query = query.where(
+        sql`DATE(CONVERT_TZ(createdAt, '+00:00', '+09:00'))`,
+        "=",
+        onJstDate,
+      );
+    }
+    const result = await query.executeTakeFirst();
+    return Number(result?.count ?? 0);
+  }
 }
 
 const scoresCoreRepo = new ScoresRepository();
@@ -197,6 +223,8 @@ export const scoresRepo = {
   getLatestScoreForSong:
     scoresCoreRepo.getLatestScoreForSong.bind(scoresCoreRepo),
   getSongBpimRank: scoresCoreRepo.getSongBpimRank.bind(scoresCoreRepo),
+  getCountExcludingVersions:
+    scoresCoreRepo.getCountExcludingVersions.bind(scoresCoreRepo),
 
   // ライバル比較系
   getRivalComparisonScores:

@@ -1,7 +1,7 @@
 import dayjs from "@/lib/dayjs";
 import { db } from "@/lib/db";
 import { Database, NewTotalBPILog } from "@/types/db";
-import { Transaction, sql } from "kysely";
+import { Transaction, sql, Expression } from "kysely";
 
 /**
  * スコアログの日付ナビゲーション・バッチ検索を担当するリポジトリクラス。
@@ -234,6 +234,26 @@ class LogNavigationRepository {
       .execute();
 
     return rows.map((r) => r.userId);
+  }
+
+  /**
+   * ログ（バッチ）の総件数を取得する。`onJstDate` 指定時はその日(JST)に作成されたログ件数に絞り込む。
+   *
+   * @param onJstDate - `DATE(CONVERT_TZ(createdAt, '+00:00', '+09:00'))` と比較するSQL式
+   */
+  async getCount(onJstDate?: Expression<unknown>): Promise<number> {
+    let query = db
+      .selectFrom("logs")
+      .select((eb) => eb.fn.count("id").as("count"));
+    if (onJstDate) {
+      query = query.where(
+        sql`DATE(CONVERT_TZ(createdAt, '+00:00', '+09:00'))`,
+        "=",
+        onJstDate,
+      );
+    }
+    const result = await query.executeTakeFirst();
+    return Number(result?.count ?? 0);
   }
 }
 

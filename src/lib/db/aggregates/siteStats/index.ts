@@ -2,6 +2,10 @@ import { db } from "@/lib/db";
 import { sql } from "kysely";
 import { ARENA_RANK_ORDER } from "@/constants/iidx/arenaRanks";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
+import { usersRepo } from "@/lib/db/domains/users";
+import { logsRepo } from "@/lib/db/domains/logs";
+import { scoresRepo } from "@/lib/db/domains/scores";
+import { latestPerUserSubquery as latestArenaStatsPerUserSubquery } from "@/lib/db/domains/officialArenaStats";
 
 const DATE_EXPR = sql<string>`DATE_FORMAT(CONVERT_TZ(createdAt, '+00:00', '+09:00'), '%Y-%m-%d')`;
 
@@ -30,34 +34,13 @@ class SiteStatsRepository {
       totalAllLow,
       newAllLowToday,
     ] = await Promise.all([
-      db
-        .selectFrom("users")
-        .select((eb) => eb.fn.count("userId").as("count"))
-        .executeTakeFirst(),
-      db
-        .selectFrom("users")
-        .select((eb) => eb.fn.count("userId").as("count"))
-        .where(
-          sql`DATE(CONVERT_TZ(createdAt, '+00:00', '+09:00'))`,
-          "=",
-          yesterday,
-        )
-        .executeTakeFirst(),
+      usersRepo.getCount(),
+      usersRepo.getCount(yesterday),
 
-      db
-        .selectFrom("logs")
-        .select((eb) => eb.fn.count("id").as("count"))
-        .executeTakeFirst(),
-      db
-        .selectFrom("logs")
-        .select((eb) => eb.fn.count("id").as("count"))
-        .where(
-          sql`DATE(CONVERT_TZ(createdAt, '+00:00', '+09:00'))`,
-          "=",
-          yesterday,
-        )
-        .executeTakeFirst(),
+      logsRepo.getCount(),
+      logsRepo.getCount(yesterday),
 
+      // bkScoresは所有ドメインが存在しない旧バージョンスコアの集計専用テーブルのため、直接参照を維持する。
       db
         .selectFrom("bkScores")
         .select((eb) => eb.fn.count("logId").as("count"))
@@ -74,22 +57,10 @@ class SiteStatsRepository {
         )
         .executeTakeFirst(),
 
-      db
-        .selectFrom("scores")
-        .select((eb) => eb.fn.count("logId").as("count"))
-        .where("version", "not in", EXCLUDE_FROM_CURRENT)
-        .executeTakeFirst(),
-      db
-        .selectFrom("scores")
-        .select((eb) => eb.fn.count("logId").as("count"))
-        .where("version", "not in", EXCLUDE_FROM_CURRENT)
-        .where(
-          sql`DATE(CONVERT_TZ(createdAt, '+00:00', '+09:00'))`,
-          "=",
-          yesterday,
-        )
-        .executeTakeFirst(),
+      scoresRepo.getCountExcludingVersions(EXCLUDE_FROM_CURRENT),
+      scoresRepo.getCountExcludingVersions(EXCLUDE_FROM_CURRENT, yesterday),
 
+      // allScores×allSongsの横断JOIN（難易度絞り込み）のため、直接参照を維持する。
       db
         .selectFrom("allScores as s")
         .innerJoin("allSongs as sg", "sg.songId", "s.songId")
@@ -112,21 +83,22 @@ class SiteStatsRepository {
     ]);
 
     return {
-      totalUsers: Number(totalUsers?.count ?? 0),
-      newUsersToday: Number(newUsersToday?.count ?? 0),
-      totalLogs: Number(totalLogs?.count ?? 0),
-      newLogsToday: Number(newLogsToday?.count ?? 0),
+      totalUsers,
+      newUsersToday,
+      totalLogs,
+      newLogsToday,
       totalAllScores:
         Number(totalBk?.count ?? 0) +
-        Number(totalScores?.count ?? 0) +
+        totalScores +
         Number(totalAllLow?.count ?? 0),
       newAllScoresToday:
         Number(newBkYesterday?.count ?? 0) +
-        Number(newScoresToday?.count ?? 0) +
+        newScoresToday +
         Number(newAllLowToday?.count ?? 0),
     };
   }
 
+  // users・logs・scores・allScores×allSongsを横断する日次集計を1つの日付軸にマージするため、直接参照を維持する。
   async getDailyRegistrations(days: number = 90) {
     const interval = sql<Date>`DATE_SUB(NOW(), INTERVAL ${days} DAY)`;
     const scoreDateExpr = sql<string>`DATE_FORMAT(CONVERT_TZ(s.createdAt, '+00:00', '+09:00'), '%Y-%m-%d')`;
@@ -225,13 +197,7 @@ class SiteStatsRepository {
 
   async getArenaRankDistribution() {
     const rows = await db
-      .with("latest_per_user", (cte) =>
-        cte
-          .selectFrom("officialArenaStats")
-          .select(["userId", (eb) => eb.fn.max("id").as("maxId")])
-          .where("version", "=", latestVersion)
-          .groupBy("userId"),
-      )
+      .with("latest_per_user", () => latestArenaStatsPerUserSubquery(latestVersion))
       .selectFrom("officialArenaStats as oas")
       .innerJoin("latest_per_user as lpu", "lpu.maxId", "oas.id")
       .select(["oas.arenaClass", sql<number>`COUNT(*)`.as("count")])
@@ -251,13 +217,7 @@ class SiteStatsRepository {
 
   async getAreaDistribution() {
     const rows = await db
-      .with("latest_per_user", (cte) =>
-        cte
-          .selectFrom("officialArenaStats")
-          .select(["userId", (eb) => eb.fn.max("id").as("maxId")])
-          .where("version", "=", latestVersion)
-          .groupBy("userId"),
-      )
+      .with("latest_per_user", () => latestArenaStatsPerUserSubquery(latestVersion))
       .selectFrom("officialArenaStats as oas")
       .innerJoin("latest_per_user as lpu", "lpu.maxId", "oas.id")
       .where("oas.area", "is not", null)
@@ -271,6 +231,7 @@ class SiteStatsRepository {
       .map((r) => ({ area: r.area as string, count: Number(r.count) }));
   }
 
+  // bkScores・scores・allScores×allSongsを横断するバージョン別集計のため、直接参照を維持する。
   async getVersionScoreDistribution() {
     const BK_VERSIONS = ["26", "27", "28", "29", "30", "31", "32"] as const;
     const EXCLUDE_FROM_CURRENT = [...BK_VERSIONS, "INF"];
@@ -323,6 +284,7 @@ class SiteStatsRepository {
     return { versions, total };
   }
 
+  // getHourlyAllScoresとペアで時間帯別サイト活動を集計するため、直接参照を維持する（JST時間帯式を共有）。
   private async getHourlyLogs(days?: number | null) {
     let q = db
       .selectFrom("logs")
@@ -347,6 +309,7 @@ class SiteStatsRepository {
     }));
   }
 
+  // scores・allScores×allSongsを横断する時間帯別集計のため、直接参照を維持する。
   private async getHourlyAllScores(days?: number | null) {
     const interval = days
       ? sql<Date>`DATE_SUB(NOW(), INTERVAL ${days} DAY)`
@@ -396,6 +359,7 @@ class SiteStatsRepository {
     }));
   }
 
+  // getWeekdayAllScoresとペアで曜日別サイト活動を集計するため、直接参照を維持する（JST曜日式を共有）。
   private async getWeekdayLogs(days?: number | null) {
     let q = db
       .selectFrom("logs")
@@ -422,6 +386,7 @@ class SiteStatsRepository {
     }));
   }
 
+  // scores・allScores×allSongsを横断する曜日別集計のため、直接参照を維持する。
   private async getWeekdayAllScores(days?: number | null) {
     const interval = days
       ? sql<Date>`DATE_SUB(NOW(), INTERVAL ${days} DAY)`
@@ -520,6 +485,7 @@ class SiteStatsRepository {
     ) as Record<Period, { weekday: number; logs: number; allScores: number }[]>;
   }
 
+  // scores・songsを横断JOINしたプレイ人口ランキング集計のため、直接参照を維持する。
   async getSongPopulationPage(
     order: "top" | "bottom",
     offset: number,
@@ -550,6 +516,7 @@ class SiteStatsRepository {
     }));
   }
 
+  // scores・songsを横断JOINしたプレイ人口集計のため、直接参照を維持する。
   async getSongPopulationTotal() {
     const result = await db
       .selectFrom("scores as s")

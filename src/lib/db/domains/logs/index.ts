@@ -23,4 +23,5 @@ export const logsRepo = {
   getLatestTotalBpi: navigationRepo.getLatestTotalBpi.bind(navigationRepo),
   getUserIdsOrderedByBpiDistance:
     navigationRepo.getUserIdsOrderedByBpiDistance.bind(navigationRepo),
+  getCount: navigationRepo.getCount.bind(navigationRepo),
 };

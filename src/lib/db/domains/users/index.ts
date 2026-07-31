@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { sql } from "kysely";
+import { sql, Expression } from "kysely";
 import {
   getLatestArenaStatsPerVersion,
   getBestArenaClassPerVersion,
@@ -609,6 +609,26 @@ class UsersRepository {
           }
         : null,
     };
+  }
+
+  /**
+   * 登録ユーザー数を取得する。`onJstDate` 指定時はその日(JST)に登録したユーザー数に絞り込む。
+   *
+   * @param onJstDate - `DATE(CONVERT_TZ(createdAt, '+00:00', '+09:00'))` と比較するSQL式
+   */
+  async getCount(onJstDate?: Expression<unknown>): Promise<number> {
+    let query = db
+      .selectFrom("users")
+      .select((eb) => eb.fn.count("userId").as("count"));
+    if (onJstDate) {
+      query = query.where(
+        sql`DATE(CONVERT_TZ(createdAt, '+00:00', '+09:00'))`,
+        "=",
+        onJstDate,
+      );
+    }
+    const result = await query.executeTakeFirst();
+    return Number(result?.count ?? 0);
   }
 }
 
