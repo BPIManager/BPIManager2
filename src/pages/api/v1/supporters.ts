@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
-import { userProfilesRepo } from "@/lib/db/aggregates/userProfiles";
+import { supportersRepo } from "@/lib/db/aggregates/userProfiles/supporters";
 
 export default async function handler(
   req: NextApiRequest,
@@ -9,7 +9,7 @@ export default async function handler(
   if (req.method !== "GET") return res.status(405).end();
 
   try {
-    const supporters = await userProfilesRepo.getSupporters(latestVersion);
+    const supporters = await supportersRepo.getSupporters(latestVersion);
 
     return res.status(200).json({
       supporters: supporters.map((u) => ({

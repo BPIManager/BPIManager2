@@ -1,5 +1,5 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { userProfilesRepo } from "@/lib/db/aggregates/userProfiles";
+import { userDiscoveryRepo } from "@/lib/db/aggregates/userProfiles/discovery";
 import { searchUsersSchema, MCP_LIST_DEFAULT_LIMIT } from "@/lib/mcp/schemas";
 
 export function registerSearchUsers(server: McpServer) {
@@ -15,7 +15,7 @@ export function registerSearchUsers(server: McpServer) {
       inputSchema: searchUsersSchema.shape,
     },
     async ({ query, arenaClass, version, limit }) => {
-      const rows = await userProfilesRepo.searchUsers({
+      const rows = await userDiscoveryRepo.searchUsers({
         query,
         arenaClass,
         version,

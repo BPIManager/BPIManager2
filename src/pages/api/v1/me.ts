@@ -1,5 +1,5 @@
 import { latestVersion } from "@/constants/iidx/iidxVersions";
-import { userProfilesRepo } from "@/lib/db/aggregates/userProfiles";
+import { userProfileRepo } from "@/lib/db/aggregates/userProfiles/profile";
 import {
   AuthenticatedNextApiRequest,
   withAuth,
@@ -15,7 +15,7 @@ const handler = async (
     return res.status(405).json({ message: "Method Not Allowed" });
   }
   try {
-    const user = await userProfilesRepo.getMe(req.authUid, latestVersion);
+    const user = await userProfileRepo.getMe(req.authUid, latestVersion);
 
     return res.status(200).json({ exists: !!user, user });
   } catch (error) {

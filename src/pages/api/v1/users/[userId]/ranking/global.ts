@@ -3,7 +3,7 @@ import {
   AuthenticatedNextApiRequest,
   withAuth,
 } from "@/middlewares/api/withAuth";
-import { userProfilesRepo } from "@/lib/db/aggregates/userProfiles";
+import { userRankingRepo } from "@/lib/db/aggregates/userProfiles/ranking";
 import { statsRepo } from "@/lib/db/aggregates/stats";
 import { calculateRadar } from "@/lib/radar/calculator";
 import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
@@ -65,7 +65,7 @@ async function handler(
 
   try {
     const [users, viewerScores] = await Promise.all([
-      userProfilesRepo.getGlobalRanking(
+      userRankingRepo.getGlobalRanking(
         version,
         category,
         effectiveFilterArea,

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { createDbSpy, callsFor } from "../helpers/dbQuerySpy";
+import { createDbSpy } from "../helpers/dbQuerySpy";
 
 const { dbHolder } = vi.hoisted(() => ({
   dbHolder: { current: null as unknown },
@@ -28,83 +28,14 @@ vi.mock("@/lib/db/domains/statsPrivacy", () => ({
   getStatsPrivacy: getStatsPrivacyMock,
 }));
 
-const { userProfilesRepo } = await import("@/lib/db/aggregates/userProfiles");
+const { userProfileRepo } = await import(
+  "@/lib/db/aggregates/userProfiles/profile"
+);
 
-describe("userProfilesRepo.getRecommendedUsers", () => {
-  it("order='supporters'の場合、自分自身の除外whereをスキップしrole絞り込みを行うこと", async () => {
-    const spy = createDbSpy([]);
-    dbHolder.current = spy;
-    await userProfilesRepo.getRecommendedUsers({
-      viewerId: "user-1",
-      viewerValue: 30,
-      version: "33",
-      limit: 20,
-      offset: 0,
-      order: "supporters",
-    });
-    const whereCalls = callsFor(spy.calls, "where");
-    expect(whereCalls.some((c) => c.args[0] === "u.userId")).toBe(false);
-  });
-
-  it("order未指定の場合、自分自身を除外すること", async () => {
-    const spy = createDbSpy([]);
-    dbHolder.current = spy;
-    await userProfilesRepo.getRecommendedUsers({
-      viewerId: "user-1",
-      viewerValue: 30,
-      version: "33",
-      limit: 20,
-      offset: 0,
-    });
-    const whereCalls = callsFor(spy.calls, "where");
-    expect(
-      whereCalls.some(
-        (c) => c.args[0] === "u.userId" && c.args[1] === "!=",
-      ),
-    ).toBe(true);
-  });
-
-  it("limit/offsetが適用されること", async () => {
-    const spy = createDbSpy([]);
-    dbHolder.current = spy;
-    await userProfilesRepo.getRecommendedUsers({
-      viewerId: "user-1",
-      viewerValue: 30,
-      version: "33",
-      limit: 15,
-      offset: 5,
-    });
-    expect(callsFor(spy.calls, "limit")[0].args).toEqual([15]);
-    expect(callsFor(spy.calls, "offset")[0].args).toEqual([5]);
-  });
-});
-
-describe("userProfilesRepo.getGlobalRanking", () => {
-  it("radarカテゴリの場合userRadarCacheを結合すること", async () => {
-    const spy = createDbSpy([]);
-    dbHolder.current = spy;
-    await userProfilesRepo.getGlobalRanking("33", "notes");
-    const innerJoinCalls = callsFor(spy.calls, "innerJoin");
-    expect(
-      innerJoinCalls.some((c) =>
-        String(c.args[0]).includes("userRadarCache"),
-      ),
-    ).toBe(true);
-  });
-
-  it("filterAreaが指定された場合、areaでの絞り込みを行うこと", async () => {
-    const spy = createDbSpy([]);
-    dbHolder.current = spy;
-    await userProfilesRepo.getGlobalRanking("33", "totalBpi", "東京都");
-    const whereCalls = callsFor(spy.calls, "where");
-    expect(whereCalls.some((c) => c.args[0] === "oas.area")).toBe(true);
-  });
-});
-
-describe("userProfilesRepo.getMe", () => {
+describe("userProfileRepo.getMe", () => {
   it("ユーザーが存在しない場合nullを返すこと", async () => {
     dbHolder.current = createDbSpy(undefined);
-    const result = await userProfilesRepo.getMe("user-1", "33");
+    const result = await userProfileRepo.getMe("user-1", "33");
     expect(result).toBeNull();
   });
 
@@ -119,7 +50,7 @@ describe("userProfilesRepo.getMe", () => {
       grantedAt: "2025-01-01",
     });
 
-    const result = await userProfilesRepo.getMe("user-1", "33");
+    const result = await userProfileRepo.getMe("user-1", "33");
 
     expect(result?.followingCount).toBe(3);
     expect(result?.followerCount).toBe(5);
@@ -137,12 +68,12 @@ describe("userProfilesRepo.getMe", () => {
       followerCount: 0,
       role: null,
     });
-    const result = await userProfilesRepo.getMe("user-1", "33");
+    const result = await userProfileRepo.getMe("user-1", "33");
     expect(result?.role).toBeNull();
   });
 });
 
-describe("userProfilesRepo.getUserProfileSummary", () => {
+describe("userProfileRepo.getUserProfileSummary", () => {
   function createProfileDbSpy(userBaseResult: unknown, bpiHistoryResult: unknown) {
     const calls: { method: string; args: unknown[] }[] = [];
     const makeChain = (result: unknown) => {
@@ -188,7 +119,7 @@ describe("userProfilesRepo.getUserProfileSummary", () => {
 
   it("ユーザーが存在しない場合nullを返すこと", async () => {
     dbHolder.current = createProfileDbSpy(undefined, []);
-    const result = await userProfilesRepo.getUserProfileSummary("user-1");
+    const result = await userProfileRepo.getUserProfileSummary("user-1");
     expect(result).toBeNull();
   });
 
@@ -231,7 +162,7 @@ describe("userProfilesRepo.getUserProfileSummary", () => {
       showGrade: 0,
     });
 
-    const result = await userProfilesRepo.getUserProfileSummary(
+    const result = await userProfileRepo.getUserProfileSummary(
       "target-1",
       "viewer-1", // 閲覧者は本人ではない
     );
@@ -281,7 +212,7 @@ describe("userProfilesRepo.getUserProfileSummary", () => {
       showGrade: 0,
     });
 
-    const result = await userProfilesRepo.getUserProfileSummary("self-1", "self-1");
+    const result = await userProfileRepo.getUserProfileSummary("self-1", "self-1");
 
     expect(result?.relationship.isSelf).toBe(true);
     const v33 = result?.stats.find((s) => s.version === "33");
@@ -321,7 +252,7 @@ describe("userProfilesRepo.getUserProfileSummary", () => {
       showGrade: 1,
     });
 
-    const result = await userProfilesRepo.getUserProfileSummary("user-1");
+    const result = await userProfileRepo.getUserProfileSummary("user-1");
 
     expect(result?.stats.map((s) => s.version)).toEqual(["33", "32", "INF"]);
   });

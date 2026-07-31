@@ -7,7 +7,7 @@ import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { calculateRadar } from "@/lib/radar/calculator";
 import { statsRepo } from "@/lib/db/aggregates/stats";
 import { logsRepo } from "@/lib/db/domains/logs";
-import { userProfilesRepo } from "@/lib/db/aggregates/userProfiles";
+import { userDiscoveryRepo } from "@/lib/db/aggregates/userProfiles/discovery";
 
 async function handler(
   req: AuthenticatedNextApiRequest,
@@ -44,7 +44,7 @@ async function handler(
       viewerBaseValue = viewerRadar[category]?.totalBpi ?? -15;
     }
     const parsedSeed = seed ? Number(seed) : undefined;
-    const recommendedUsers = await userProfilesRepo.getRecommendedUsers({
+    const recommendedUsers = await userDiscoveryRepo.getRecommendedUsers({
       viewerId,
       viewerValue: viewerBaseValue,
       version,
