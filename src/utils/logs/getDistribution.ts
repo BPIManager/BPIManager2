@@ -1,5 +1,5 @@
 import type { ChartData } from "@/types/ui/chart";
-import { RANK_THRESHOLDS } from "@/components/partials/common/Charts/ArenaAverage/ui";
+import { RANK_THRESHOLDS } from "@/constants/theme/rankThreshold";
 import { BatchDetailItem } from "@/types/logs/batchDetail";
 
 export const getBpiDistribution = (
@@ -38,13 +38,9 @@ export const getRankDistribution = (details: BatchDetailItem[]): ChartData[] => 
     if (!item.notes) return;
     const percentage = item.current.exScore / (item.notes * 2);
 
-    const achieved = RANK_THRESHOLDS.find((r) => percentage >= r.ratio);
-
-    if (achieved) {
-      counts[achieved.label]++;
-    } else {
-      counts["F"]++;
-    }
+    // RANK_THRESHOLDSの末尾はratio: 0(=F)のため必ずいずれかにヒットする
+    const achieved = RANK_THRESHOLDS.find((r) => percentage >= r.ratio)!;
+    counts[achieved.label]++;
   });
 
   return targetLabels.map((label) => ({
