@@ -1,10 +1,13 @@
 import { db } from "@/lib/db";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
-import { sql } from "kysely";
 import {
   latestLogIdPerSongSubquery,
   latestLogIdPerUserSongSubquery,
 } from "@/lib/db/shared/latestScore";
+import { scoresRepo } from "@/lib/db/domains/scores";
+import { iidxTowerRepo } from "@/lib/db/domains/iidxTower";
+import { songsRepo } from "@/lib/db/domains/songs";
+import { getArenaStatsHistory } from "@/lib/db/domains/officialArenaStats";
 
 const jstDayStart = (jstDate: string): Date =>
   new Date(`${jstDate}T00:00:00+09:00`);
@@ -20,21 +23,12 @@ class MonthlyReviewRepository {
     monthStart: string,
     monthEnd: string,
   ) {
-    return (await db
-      .selectFrom("scores")
-      .select([
-        "batchId",
-        sql<string>`DATE_FORMAT(MAX(CONVERT_TZ(lastPlayed, '+00:00', '+09:00')), '%Y-%m-%d')`.as(
-          "playDate",
-        ),
-      ])
-      .where("userId", "=", userId)
-      .where("version", "=", version)
-      .where("lastPlayed", ">=", jstDayStart(monthStart))
-      .where("lastPlayed", "<=", jstDayEnd(monthEnd))
-      .where("batchId", "is not", null)
-      .groupBy("batchId")
-      .execute()) as { batchId: string; playDate: string }[];
+    return scoresRepo.getBatchesWithLastPlayedInRange(
+      userId,
+      version,
+      jstDayStart(monthStart),
+      jstDayEnd(monthEnd),
+    );
   }
 
   async getMonthlyTowerStats(
@@ -43,23 +37,12 @@ class MonthlyReviewRepository {
     monthStart: string,
     monthEnd: string,
   ) {
-    const result = await db
-      .selectFrom("iidxTower")
-      .select([
-        (eb) => eb.fn.sum<number>("keyCount").as("totalKeys"),
-        (eb) => eb.fn.sum<number>("scratchCount").as("totalScratches"),
-        (eb) => eb.fn.count<number>("playDate").as("playDays"),
-      ])
-      .where("userId", "=", userId)
-      .where("version", "=", version)
-      .where("playDate", ">=", toPlayDate(monthStart))
-      .where("playDate", "<=", toPlayDate(monthEnd))
-      .executeTakeFirst();
-    return {
-      totalKeys: Number(result?.totalKeys ?? 0),
-      totalScratches: Number(result?.totalScratches ?? 0),
-      playDays: Number(result?.playDays ?? 0),
-    };
+    return iidxTowerRepo.getRangeSummary(
+      userId,
+      version,
+      toPlayDate(monthStart),
+      toPlayDate(monthEnd),
+    );
   }
 
   async getMonthlyArenaStats(
@@ -68,15 +51,12 @@ class MonthlyReviewRepository {
     monthStart: string,
     monthEnd: string,
   ) {
-    return await db
-      .selectFrom("officialArenaStats")
-      .select(["arenaClass", "arenaRank", "wins", "a1continue", "fetchedAt"])
-      .where("userId", "=", userId)
-      .where("version", "=", version)
-      .where("fetchedAt", ">=", new Date(`${monthStart}T00:00:00+09:00`))
-      .where("fetchedAt", "<=", new Date(`${monthEnd}T23:59:59+09:00`))
-      .orderBy("fetchedAt", "asc")
-      .execute();
+    return getArenaStatsHistory(
+      userId,
+      version,
+      new Date(`${monthStart}T00:00:00+09:00`),
+      new Date(`${monthEnd}T23:59:59+09:00`),
+    );
   }
 
   async getMonthlyTowerRanking(
@@ -85,50 +65,12 @@ class MonthlyReviewRepository {
     monthStart: string,
     monthEnd: string,
   ) {
-    const result = await db
-      .selectFrom((eb) =>
-        eb
-          .selectFrom((qb) =>
-            qb
-              .selectFrom("iidxTower")
-              .select([
-                "userId",
-                (eb2) => eb2.fn.sum<number>("keyCount").as("totalKeys"),
-                (eb2) =>
-                  eb2.fn.sum<number>("scratchCount").as("totalScratches"),
-              ])
-              .where("version", "=", version)
-              .where("playDate", ">=", toPlayDate(monthStart))
-              .where("playDate", "<=", toPlayDate(monthEnd))
-              .groupBy("userId")
-              .as("agg"),
-          )
-          .select((eb2) => [
-            "agg.userId",
-            "agg.totalKeys",
-            "agg.totalScratches",
-            eb2.fn
-              .agg<number>("RANK")
-              .over((ob) => ob.orderBy("agg.totalKeys", "desc"))
-              .as("keysRank"),
-            eb2.fn
-              .agg<number>("RANK")
-              .over((ob) => ob.orderBy("agg.totalScratches", "desc"))
-              .as("scratchRank"),
-            eb2.fn.countAll<number>().over().as("totalUsers"),
-          ])
-          .as("ranked"),
-      )
-      .select(["keysRank", "scratchRank", "totalUsers"])
-      .where("userId", "=", userId)
-      .executeTakeFirst();
-
-    if (!result) return null;
-    return {
-      keysRank: Number(result.keysRank),
-      scratchRank: Number(result.scratchRank),
-      totalUsers: Number(result.totalUsers),
-    };
+    return iidxTowerRepo.getRangeRanking(
+      userId,
+      version,
+      toPlayDate(monthStart),
+      toPlayDate(monthEnd),
+    );
   }
 
   async getMonthlyDailyTowerData(
@@ -137,17 +79,15 @@ class MonthlyReviewRepository {
     monthStart: string,
     monthEnd: string,
   ) {
-    return await db
-      .selectFrom("iidxTower")
-      .select(["playDate", "keyCount", "scratchCount"])
-      .where("userId", "=", userId)
-      .where("version", "=", version)
-      .where("playDate", ">=", toPlayDate(monthStart))
-      .where("playDate", "<=", toPlayDate(monthEnd))
-      .orderBy("playDate", "asc")
-      .execute();
+    return iidxTowerRepo.getDailyInRange(
+      userId,
+      version,
+      toPlayDate(monthStart),
+      toPlayDate(monthEnd),
+    );
   }
 
+  // scores・songsを横断JOINした複数ユーザー分のBPI状態一括取得のため、直接参照を維持する。
   async getPreMonthBpiStateForUsers(
     userIds: string[],
     version: string,
@@ -183,6 +123,7 @@ class MonthlyReviewRepository {
       .execute();
   }
 
+  // scores・songsを横断JOINした複数ユーザー分の月内スコア推移一括取得のため、直接参照を維持する。
   async getInMonthScoreHistoryForUsers(
     userIds: string[],
     version: string,
@@ -205,6 +146,7 @@ class MonthlyReviewRepository {
       .execute();
   }
 
+  // scores・songs・songDefを横断JOINしたバッチ内スコア詳細取得のため、直接参照を維持する。
   async getScoresForBatches(
     userId: string,
     version: string,
@@ -243,26 +185,12 @@ class MonthlyReviewRepository {
     songIds: number[],
     monthStart: string,
   ) {
-    if (songIds.length === 0) return [];
-    return await db
-      .selectFrom("scores as s")
-      .innerJoin(
-        latestLogIdPerSongSubquery({
-          table: "scores",
-          userId,
-          version,
-          extra: (qb) =>
-            qb
-              .where("songId", "in", songIds)
-              .where("lastPlayed", "<", jstDayStart(monthStart)),
-        }).as("latest"),
-        (join) =>
-          join
-            .onRef("latest.songId", "=", "s.songId")
-            .onRef("latest.maxLogId", "=", "s.logId"),
-      )
-      .select(["s.songId", "s.bpi", "s.exScore"])
-      .execute();
+    return scoresRepo.getLatestExScoresForSongsBeforeDate(
+      userId,
+      version,
+      songIds,
+      jstDayStart(monthStart),
+    );
   }
 
   async getBatchSongRanks(
@@ -270,44 +198,7 @@ class MonthlyReviewRepository {
     version: string,
     songIds: number[],
   ): Promise<Map<number, number>> {
-    if (songIds.length === 0) return new Map();
-    const rows = await db
-      .selectFrom((eb) =>
-        eb
-          .selectFrom((qb) =>
-            qb
-              .selectFrom("scores as s")
-              .innerJoin(
-                latestLogIdPerUserSongSubquery({
-                  table: "scores",
-                  version,
-                  songIds,
-                }).as("latest"),
-                (join) => join.onRef("latest.maxLogId", "=", "s.logId"),
-              )
-              .select([
-                "s.songId",
-                "s.userId",
-                (eb2) =>
-                  eb2.fn
-                    .agg<number>("RANK")
-                    .over((ob) =>
-                      ob.partitionBy("s.songId").orderBy("s.exScore", "desc"),
-                    )
-                    .as("rnk"),
-              ])
-              .where("s.songId", "in", songIds)
-              .as("ranked"),
-          )
-          .selectAll()
-          .where("userId", "=", userId)
-          .as("mine"),
-      )
-      .select(["songId", "rnk"])
-      .execute();
-    const map = new Map<number, number>();
-    for (const r of rows) map.set(r.songId, Number(r.rnk));
-    return map;
+    return scoresRepo.getSongRanksForSongs(userId, version, songIds);
   }
 
   async getMonthlyActivityBreakdownByLastPlayed(
@@ -316,25 +207,15 @@ class MonthlyReviewRepository {
     monthStart: string,
     monthEnd: string,
   ) {
-    return await db
-      .selectFrom("scores as s")
-      .select([
-        sql<number>`DAYOFWEEK(CONVERT_TZ(s.lastPlayed, '+00:00', '+09:00'))`.as(
-          "dow",
-        ),
-        sql<number>`HOUR(CONVERT_TZ(s.lastPlayed, '+00:00', '+09:00'))`.as(
-          "hour",
-        ),
-        sql<number>`COUNT(DISTINCT s.songId)`.as("count"),
-      ])
-      .where("s.userId", "=", userId)
-      .where("s.version", "=", version)
-      .where("s.lastPlayed", ">=", jstDayStart(monthStart))
-      .where("s.lastPlayed", "<=", jstDayEnd(monthEnd))
-      .groupBy(["dow", "hour"])
-      .execute();
+    return scoresRepo.getActivityBreakdownByLastPlayed(
+      userId,
+      version,
+      jstDayStart(monthStart),
+      jstDayEnd(monthEnd),
+    );
   }
 
+  // scores・songsを横断JOINしたレベル11/12現在スコア取得のため、直接参照を維持する。
   async getUserCurrentL1112Scores(userId: string, version: string) {
     return await db
       .selectFrom("scores as s")
@@ -363,6 +244,7 @@ class MonthlyReviewRepository {
       .execute();
   }
 
+  // scores・songsを横断JOINしたレベル11/12月初時点スコア取得のため、直接参照を維持する。
   async getUserPreMonthL1112Scores(
     userId: string,
     version: string,
@@ -391,6 +273,7 @@ class MonthlyReviewRepository {
       .execute();
   }
 
+  // follows・users・scoresを横断JOINしたフォロー中ライバルの現在スコア取得のため、直接参照を維持する。
   async getRivalsCurrentScoresForSongs(
     viewerId: string,
     version: string,
@@ -428,30 +311,11 @@ class MonthlyReviewRepository {
   }
 
   async getAllL12SongMeta() {
-    return await db
-      .selectFrom("songs as m")
-      .select(["m.songId", "m.title", "m.difficulty"])
-      .where("m.difficultyLevel", "=", 12)
-      .where("m.difficulty", "in", IIDX_DIFFICULTIES)
-      .execute();
+    return songsRepo.getMetaByLevelAndDifficulties(12, IIDX_DIFFICULTIES);
   }
 
   async getAvailableMonths(userId: string, version: string) {
-    const rows = await db
-      .selectFrom("scores")
-      .select(
-        sql<string>`DATE_FORMAT(CONVERT_TZ(lastPlayed, '+00:00', '+09:00'), '%Y-%m')`.as(
-          "month",
-        ),
-      )
-      .where("userId", "=", userId)
-      .where("version", "=", version)
-      .groupBy(
-        sql`DATE_FORMAT(CONVERT_TZ(lastPlayed, '+00:00', '+09:00'), '%Y-%m')`,
-      )
-      .orderBy(sql`month`, "desc")
-      .execute();
-    return rows.map((r) => r.month);
+    return scoresRepo.getAvailableMonths(userId, version);
   }
 }
 

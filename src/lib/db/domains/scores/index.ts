@@ -2,7 +2,10 @@ import { db } from "@/lib/db";
 import { Database, NewScore } from "@/types/db";
 import { Transaction, Expression, sql } from "kysely";
 import { IIDX_VERSIONS, latestVersion } from "@/constants/iidx/iidxVersions";
-import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore";
+import {
+  latestLogIdPerSongSubquery,
+  latestLogIdPerUserSongSubquery,
+} from "@/lib/db/shared/latestScore";
 import { rivalRepo } from "@/lib/db/aggregates/rivalScores/rival";
 import { scoreDetailRepo } from "./detail";
 import { timelineRepo } from "./timeline";
@@ -201,6 +204,158 @@ class ScoresRepository {
     const result = await query.executeTakeFirst();
     return Number(result?.count ?? 0);
   }
+
+  /**
+   * 指定期間内に最終プレイのあったバッチIDと、そのバッチの最終プレイ日を取得する。
+   */
+  async getBatchesWithLastPlayedInRange(
+    userId: string,
+    version: string,
+    start: Date,
+    end: Date,
+  ): Promise<{ batchId: string; playDate: string }[]> {
+    return (await db
+      .selectFrom("scores")
+      .select([
+        "batchId",
+        sql<string>`DATE_FORMAT(MAX(CONVERT_TZ(lastPlayed, '+00:00', '+09:00')), '%Y-%m-%d')`.as(
+          "playDate",
+        ),
+      ])
+      .where("userId", "=", userId)
+      .where("version", "=", version)
+      .where("lastPlayed", ">=", start)
+      .where("lastPlayed", "<=", end)
+      .where("batchId", "is not", null)
+      .groupBy("batchId")
+      .execute()) as { batchId: string; playDate: string }[];
+  }
+
+  /**
+   * 指定日時より前における、指定楽曲群の最新スコア（EXスコア・BPI）を取得する。
+   */
+  async getLatestExScoresForSongsBeforeDate(
+    userId: string,
+    version: string,
+    songIds: number[],
+    beforeDate: Date,
+  ) {
+    if (songIds.length === 0) return [];
+    return await db
+      .selectFrom("scores as s")
+      .innerJoin(
+        latestLogIdPerSongSubquery({
+          table: "scores",
+          userId,
+          version,
+          extra: (qb) =>
+            qb.where("songId", "in", songIds).where("lastPlayed", "<", beforeDate),
+        }).as("latest"),
+        (join) =>
+          join
+            .onRef("latest.songId", "=", "s.songId")
+            .onRef("latest.maxLogId", "=", "s.logId"),
+      )
+      .select(["s.songId", "s.bpi", "s.exScore"])
+      .execute();
+  }
+
+  /**
+   * 指定楽曲群について、自分のEXスコアが同バージョンの全ユーザー中で何位かを取得する。
+   */
+  async getSongRanksForSongs(
+    userId: string,
+    version: string,
+    songIds: number[],
+  ): Promise<Map<number, number>> {
+    if (songIds.length === 0) return new Map();
+    const rows = await db
+      .selectFrom((eb) =>
+        eb
+          .selectFrom((qb) =>
+            qb
+              .selectFrom("scores as s")
+              .innerJoin(
+                latestLogIdPerUserSongSubquery({
+                  table: "scores",
+                  version,
+                  songIds,
+                }).as("latest"),
+                (join) => join.onRef("latest.maxLogId", "=", "s.logId"),
+              )
+              .select([
+                "s.songId",
+                "s.userId",
+                (eb2) =>
+                  eb2.fn
+                    .agg<number>("RANK")
+                    .over((ob) =>
+                      ob.partitionBy("s.songId").orderBy("s.exScore", "desc"),
+                    )
+                    .as("rnk"),
+              ])
+              .where("s.songId", "in", songIds)
+              .as("ranked"),
+          )
+          .selectAll()
+          .where("userId", "=", userId)
+          .as("mine"),
+      )
+      .select(["songId", "rnk"])
+      .execute();
+    const map = new Map<number, number>();
+    for (const r of rows) map.set(r.songId, Number(r.rnk));
+    return map;
+  }
+
+  /**
+   * 指定期間内の最終プレイ日時を曜日・時間帯別に集計する（プレイ済み楽曲数ベース）。
+   */
+  async getActivityBreakdownByLastPlayed(
+    userId: string,
+    version: string,
+    start: Date,
+    end: Date,
+  ) {
+    return await db
+      .selectFrom("scores as s")
+      .select([
+        sql<number>`DAYOFWEEK(CONVERT_TZ(s.lastPlayed, '+00:00', '+09:00'))`.as(
+          "dow",
+        ),
+        sql<number>`HOUR(CONVERT_TZ(s.lastPlayed, '+00:00', '+09:00'))`.as(
+          "hour",
+        ),
+        sql<number>`COUNT(DISTINCT s.songId)`.as("count"),
+      ])
+      .where("s.userId", "=", userId)
+      .where("s.version", "=", version)
+      .where("s.lastPlayed", ">=", start)
+      .where("s.lastPlayed", "<=", end)
+      .groupBy(["dow", "hour"])
+      .execute();
+  }
+
+  /**
+   * 指定ユーザー・バージョンでスコア登録のある年月一覧を新しい順で返す。
+   */
+  async getAvailableMonths(userId: string, version: string): Promise<string[]> {
+    const rows = await db
+      .selectFrom("scores")
+      .select(
+        sql<string>`DATE_FORMAT(CONVERT_TZ(lastPlayed, '+00:00', '+09:00'), '%Y-%m')`.as(
+          "month",
+        ),
+      )
+      .where("userId", "=", userId)
+      .where("version", "=", version)
+      .groupBy(
+        sql`DATE_FORMAT(CONVERT_TZ(lastPlayed, '+00:00', '+09:00'), '%Y-%m')`,
+      )
+      .orderBy(sql`month`, "desc")
+      .execute();
+    return rows.map((r) => r.month);
+  }
 }
 
 const scoresCoreRepo = new ScoresRepository();
@@ -225,6 +380,15 @@ export const scoresRepo = {
   getSongBpimRank: scoresCoreRepo.getSongBpimRank.bind(scoresCoreRepo),
   getCountExcludingVersions:
     scoresCoreRepo.getCountExcludingVersions.bind(scoresCoreRepo),
+  getBatchesWithLastPlayedInRange:
+    scoresCoreRepo.getBatchesWithLastPlayedInRange.bind(scoresCoreRepo),
+  getLatestExScoresForSongsBeforeDate:
+    scoresCoreRepo.getLatestExScoresForSongsBeforeDate.bind(scoresCoreRepo),
+  getSongRanksForSongs:
+    scoresCoreRepo.getSongRanksForSongs.bind(scoresCoreRepo),
+  getActivityBreakdownByLastPlayed:
+    scoresCoreRepo.getActivityBreakdownByLastPlayed.bind(scoresCoreRepo),
+  getAvailableMonths: scoresCoreRepo.getAvailableMonths.bind(scoresCoreRepo),
 
   // ライバル比較系
   getRivalComparisonScores:

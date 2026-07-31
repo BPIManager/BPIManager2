@@ -351,6 +351,21 @@ class SongsRepository {
   }
 
   /**
+   * 難易度レベル・難易度表記で絞り込んだ楽曲の songId/title/difficulty のみを返す（軽量メタ情報）。
+   */
+  async getMetaByLevelAndDifficulties(
+    level: number,
+    difficulties: readonly string[],
+  ) {
+    return await db
+      .selectFrom("songs as m")
+      .select(["m.songId", "m.title", "m.difficulty"])
+      .where("m.difficultyLevel", "=", level)
+      .where("m.difficulty", "in", difficulties as string[])
+      .execute();
+  }
+
+  /**
    * 難易度レベル・難易度表記で絞り込んだ楽曲の総数を返す。
    */
   async getCount(levels: number[], difficulties: string[]): Promise<number> {
