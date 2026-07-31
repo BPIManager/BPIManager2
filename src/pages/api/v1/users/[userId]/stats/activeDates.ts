@@ -1,22 +1,11 @@
-import { NextApiRequest, NextApiResponse } from "next";
 import { statsChartsRepo } from "@/lib/db/aggregates/stats/charts";
-import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
+import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
 import { activeDatesSchema } from "@/schemas/stats/activeDates";
 import { parseQuery } from "@/services/nextRequest/parseBody";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  const body = parseQuery(activeDatesSchema, req.query, res);
-  if (!body) return;
-
-  const { userId, version } = body;
-
-  try {
-    const access = await checkUserAccess(req, userId);
-    if (!access.hasAccess) return rejectAccess(res, access);
-
+export default withUserApiHandler(
+  (req, res) => parseQuery(activeDatesSchema, req.query, res),
+  async (req, res, { userId, version }) => {
     switch (req.method) {
       case "GET": {
         const activity = await statsChartsRepo.getActivityData(userId, version, [12]);
@@ -31,9 +20,5 @@ export default async function handler(
           .status(405)
           .json({ message: `Method ${req.method} Not Allowed` });
     }
-  } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Internal Server Error";
-    return res.status(500).json({ message: errorMessage });
-  }
-}
+  },
+);

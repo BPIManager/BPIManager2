@@ -1,30 +1,26 @@
-import type { NextApiRequest, NextApiResponse } from "next";
 import { RANK_TABLE } from "@/constants/iidx/rankBorders";
-import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
+import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
 import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  if (req.method !== "GET") {
-    return res.status(405).json({ message: "Method Not Allowed" });
-  }
+export default withUserApiHandler(
+  (req, res) => {
+    if (req.method !== "GET") {
+      res.status(405).json({ message: "Method Not Allowed" });
+      return null;
+    }
 
-  const query = parseStatsQuery(req.query, res);
-  if (!query) return;
+    const query = parseStatsQuery(req.query, res);
+    if (!query) return null;
 
-  const { userId, version, levels, difficulties } = query;
+    if (query.levels.length === 0 && query.difficulties.length === 0) {
+      res.status(400).json({ message: "Required parameters are missing" });
+      return null;
+    }
 
-  if (levels.length === 0 && difficulties.length === 0) {
-    return res.status(400).json({ message: "Required parameters are missing" });
-  }
-
-  try {
-    const access = await checkUserAccess(req, userId);
-    if (!access.hasAccess) return rejectAccess(res, access);
-
+    return query;
+  },
+  async (req, res, { userId, version, levels, difficulties }) => {
     const scores = await statsTablesRepo.getLatestScoresWithMusicData(
       userId,
       version,
@@ -52,9 +48,5 @@ export default async function handler(
     });
 
     return res.status(200).json(distribution);
-  } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Internal Server Error";
-    return res.status(500).json({ message: errorMessage });
-  }
-}
+  },
+);

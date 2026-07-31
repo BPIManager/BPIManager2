@@ -1,23 +1,17 @@
-import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
+import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
 import { calculateRadar } from "@/lib/radar/calculator";
 import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
-import { NextApiRequest, NextApiResponse } from "next";
 import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  if (req.method !== "GET") return res.status(405).end();
-
-  const query = parseStatsQuery(req.query, res);
-  if (!query) return;
-  const { userId, version, levels, difficulties } = query;
-
-  try {
-    const access = await checkUserAccess(req, userId);
-    if (!access.hasAccess) return rejectAccess(res, access);
-
+export default withUserApiHandler(
+  (req, res) => {
+    if (req.method !== "GET") {
+      res.status(405).end();
+      return null;
+    }
+    return parseStatsQuery(req.query, res);
+  },
+  async (req, res, { userId, version, levels, difficulties }) => {
     const [scores, validSongKeys] = await Promise.all([
       statsTablesRepo.getLatestScoresWithMusicData(
         userId,
@@ -29,9 +23,5 @@ export default async function handler(
     ]);
 
     return res.status(200).json(calculateRadar(scores, validSongKeys));
-  } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Internal Server Error";
-    return res.status(500).json({ message: errorMessage });
-  }
-}
+  },
+);

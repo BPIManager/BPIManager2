@@ -1,27 +1,20 @@
 import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
-import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
+import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
 import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
 import { recommendedParamsSchema } from "@/schemas/stats/recommended";
-import { NextApiRequest, NextApiResponse } from "next";
 import { parseQuery } from "@/services/nextRequest/parseBody";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  const query = parseStatsQuery(req.query, res);
-  if (!query) return;
-  const { userId, version, levels, difficulties } = query;
+export default withUserApiHandler(
+  (req, res) => {
+    const query = parseStatsQuery(req.query, res);
+    if (!query) return null;
 
-  const body = parseQuery(recommendedParamsSchema, req.query, res);
-  if (!body) return;
+    const body = parseQuery(recommendedParamsSchema, req.query, res);
+    if (!body) return null;
 
-  const { limit, offset } = body;
-
-  try {
-    const access = await checkUserAccess(req, userId);
-    if (!access.hasAccess) return rejectAccess(res, access);
-
+    return { ...query, ...body };
+  },
+  async (req, res, { userId, version, levels, difficulties, limit, offset }) => {
     const totalBpi = await statsTablesRepo.getLatestTotalBpi(userId, version);
 
     const allScores = await statsTablesRepo.getLatestScoresWithMusicData(
@@ -72,9 +65,5 @@ export default async function handler(
         total: sortedPotential.length,
       },
     });
-  } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Internal Server Error";
-    return res.status(500).json({ message: errorMessage });
-  }
-}
+  },
+);

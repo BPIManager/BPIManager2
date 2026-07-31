@@ -1,28 +1,21 @@
 import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { statsSocialRepo } from "@/lib/db/aggregates/stats/social";
-import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
+import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
 import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
 import { neighborRecommendedParamsSchema } from "@/schemas/stats/neighborRecommended";
-import { NextApiRequest, NextApiResponse } from "next";
 import { parseQuery } from "@/services/nextRequest/parseBody";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  const query = parseStatsQuery(req.query, res);
-  if (!query) return;
-  const { userId, version, levels, difficulties } = query;
+export default withUserApiHandler(
+  (req, res) => {
+    const query = parseStatsQuery(req.query, res);
+    if (!query) return null;
 
-  const body = parseQuery(neighborRecommendedParamsSchema, req.query, res);
-  if (!body) return;
+    const body = parseQuery(neighborRecommendedParamsSchema, req.query, res);
+    if (!body) return null;
 
-  const { limit, offset, n } = body;
-
-  try {
-    const access = await checkUserAccess(req, userId);
-    if (!access.hasAccess) return rejectAccess(res, access);
-
+    return { ...query, ...body };
+  },
+  async (req, res, { userId, version, levels, difficulties, limit, offset, n }) => {
     const userTotalBpi = await statsTablesRepo.getLatestTotalBpi(
       userId,
       version,
@@ -107,9 +100,5 @@ export default async function handler(
       },
       usedNeighbors: neighborIds.length,
     });
-  } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Internal Server Error";
-    return res.status(500).json({ message: errorMessage });
-  }
-}
+  },
+);

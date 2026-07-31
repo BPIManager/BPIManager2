@@ -1,24 +1,18 @@
 import { statsChartsRepo } from "@/lib/db/aggregates/stats/charts";
-import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
+import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
 import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
-import { NextApiRequest, NextApiResponse } from "next";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  const query = parseStatsQuery(req.query, res);
-  if (!query) return;
-  const { userId, version, levels, difficulties } = query;
-
-  if (levels.length === 0 && difficulties.length === 0) {
-    return res.status(400).json({ message: "Required parameters are missing" });
-  }
-
-  try {
-    const access = await checkUserAccess(req, userId);
-    if (!access.hasAccess) return rejectAccess(res, access);
-
+export default withUserApiHandler(
+  (req, res) => {
+    const query = parseStatsQuery(req.query, res);
+    if (!query) return null;
+    if (query.levels.length === 0 && query.difficulties.length === 0) {
+      res.status(400).json({ message: "Required parameters are missing" });
+      return null;
+    }
+    return query;
+  },
+  async (req, res, { userId, version, levels, difficulties }) => {
     const activity = await statsChartsRepo.getActivityData(
       userId,
       version,
@@ -27,9 +21,5 @@ export default async function handler(
     );
 
     return res.status(200).json(activity);
-  } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Internal Server Error";
-    return res.status(500).json({ message: errorMessage });
-  }
-}
+  },
+);

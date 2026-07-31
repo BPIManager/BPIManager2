@@ -1,30 +1,24 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
+import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
 import { songsRepo } from "@/lib/db/domains/songs";
 import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import { IIDXVersion } from "@/types/iidx/version";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  if (req.method !== "GET") return res.status(405).end();
+export default withUserApiHandler(
+  (req, res) => {
+    if (req.method !== "GET") {
+      res.status(405).end();
+      return null;
+    }
+    const { userId } = req.query;
+    return { userId: userId as string };
+  },
+  async (req, res) => {
+    const rawVersion = String(req.query.version ?? "");
+    const version = (IIDX_VERSIONS as readonly string[]).includes(rawVersion)
+      ? (rawVersion as IIDXVersion)
+      : latestVersion;
 
-  const { userId } = req.query;
-  const access = await checkUserAccess(req, userId as string);
-  if (!access.hasAccess) return rejectAccess(res, access);
-
-  const rawVersion = String(req.query.version ?? "");
-  const version = (IIDX_VERSIONS as readonly string[]).includes(rawVersion)
-    ? (rawVersion as IIDXVersion)
-    : latestVersion;
-
-  try {
     const songs = await songsRepo.getSongList(version);
     return res.status(200).json(songs);
-  } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Internal Server Error";
-    return res.status(500).json({ message: errorMessage });
-  }
-}
+  },
+);

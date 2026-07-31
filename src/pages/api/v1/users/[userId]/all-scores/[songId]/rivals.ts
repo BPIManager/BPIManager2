@@ -1,24 +1,24 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
+import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
 import { allScoresAggregateRepo } from "@/lib/db/aggregates/allScores";
 import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  if (req.method !== "GET") return res.status(405).end();
+export default withUserApiHandler(
+  (req, res) => {
+    if (req.method !== "GET") {
+      res.status(405).end();
+      return null;
+    }
 
-  const { userId, songId } = req.query;
+    const { userId, songId } = req.query;
 
-  if (!userId || !songId) {
-    return res.status(400).json({ message: "Missing required parameters" });
-  }
+    if (!userId || !songId) {
+      res.status(400).json({ message: "Missing required parameters" });
+      return null;
+    }
 
-  try {
-    const access = await checkUserAccess(req, String(userId));
-    if (!access.hasAccess) return rejectAccess(res, access);
-
+    return { userId: String(userId), songId };
+  },
+  async (req, res, { userId, songId }) => {
     const rawVersion = String(req.query.version ?? "");
     const version = (IIDX_VERSIONS as readonly string[]).includes(rawVersion)
       ? rawVersion
@@ -43,8 +43,11 @@ export default async function handler(
         lastPlayed: r.lastPlayed,
       })),
     });
-  } catch (error) {
-    console.error("All-Score Rival Scores API Error:", error);
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
-}
+  },
+  {
+    onError: (error, res) => {
+      console.error("All-Score Rival Scores API Error:", error);
+      return res.status(500).json({ message: "Internal Server Error" });
+    },
+  },
+);

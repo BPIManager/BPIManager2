@@ -1,10 +1,9 @@
 import { BpiCalculator } from "@/lib/bpi";
 import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import dayjs from "@/lib/dayjs";
-import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
+import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
 import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
 import type { StatsGroupBy } from "@/types/stats/bpiBoxStats";
-import type { NextApiRequest, NextApiResponse } from "next";
 
 const DIFFICULTY_LABELS: Record<string, string> = {
   HYPER: "[H]",
@@ -12,18 +11,10 @@ const DIFFICULTY_LABELS: Record<string, string> = {
   LEGGENDARIA: "[L]",
 };
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  const body = parseStatsQuery(req.query, res);
-  if (!body) return;
-  const { userId, version, levels, difficulties } = body;
-  const groupBy = (req.query.groupBy as StatsGroupBy) || "day";
-
-  try {
-    const access = await checkUserAccess(req, userId);
-    if (!access.hasAccess) return rejectAccess(res, access);
+export default withUserApiHandler(
+  (req, res) => parseStatsQuery(req.query, res),
+  async (req, res, { userId, version, levels, difficulties }) => {
+    const groupBy = (req.query.groupBy as StatsGroupBy) || "day";
 
     const [allLogs, totalSongs] = await Promise.all([
       statsTablesRepo.getScoreHistory(userId, version, levels, difficulties),
@@ -115,9 +106,5 @@ export default async function handler(
     }
 
     return res.status(200).json(Array.from(grouped.values()));
-  } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Internal Server Error";
-    return res.status(500).json({ message: errorMessage });
-  }
-}
+  },
+);

@@ -1,5 +1,4 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
+import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
 import { parseQuery } from "@/services/nextRequest/parseBody";
 import { z } from "zod";
 import { usersRepo } from "@/lib/db/domains/users";
@@ -7,19 +6,9 @@ import { getUserAreaRank } from "@/lib/arena/prefectureRankings";
 
 const schema = z.object({ userId: z.string() });
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  const body = parseQuery(schema, req.query, res);
-  if (!body) return;
-
-  const { userId } = body;
-
-  try {
-    const access = await checkUserAccess(req, userId);
-    if (!access.hasAccess) return rejectAccess(res, access);
-
+export default withUserApiHandler(
+  (req, res) => parseQuery(schema, req.query, res),
+  async (req, res, { userId }) => {
     if (req.method !== "GET") {
       res.setHeader("Allow", ["GET"]);
       return res
@@ -33,9 +22,5 @@ export default async function handler(
 
     const areaRank = getUserAreaRank(user.iidxId);
     return res.status(200).json(areaRank ?? null);
-  } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Internal Server Error";
-    return res.status(500).json({ message: errorMessage });
-  }
-}
+  },
+);

@@ -1,27 +1,26 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
+import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
 import { rivalRepo } from "@/lib/db/aggregates/rivalScores/rival";
 import { parseQuery } from "@/services/nextRequest/parseBody";
 import { rivalFollowingScoresQuerySchema } from "@/schemas/rivals/following/scores/query";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  if (req.method !== "GET") return res.status(405).end();
-  const query = parseQuery(rivalFollowingScoresQuerySchema, req.query, res);
-  if (!query) return;
+export default withUserApiHandler(
+  (req, res) => {
+    if (req.method !== "GET") {
+      res.status(405).end();
+      return null;
+    }
+    const query = parseQuery(rivalFollowingScoresQuerySchema, req.query, res);
+    if (!query) return null;
 
-  const { userId, songId, version } = query;
+    const { userId, songId, version } = query;
+    if (!userId || !songId || !version) {
+      res.status(400).json({ message: "Missing required parameters" });
+      return null;
+    }
 
-  if (!userId || !songId || !version) {
-    return res.status(400).json({ message: "Missing required parameters" });
-  }
-
-  try {
-    const access = await checkUserAccess(req, String(userId));
-    if (!access.hasAccess) return rejectAccess(res, access);
-
+    return query;
+  },
+  async (req, res, { userId, songId, version }) => {
     const rivalsScores = await rivalRepo.getFollowedScoresForSong({
       viewerId: String(userId),
       songId: Number(songId),
@@ -33,11 +32,14 @@ export default async function handler(
       version: String(version),
       rivals: rivalsScores.map(formatRivalScore),
     });
-  } catch (error) {
-    console.error("Rival Following Scores API Error:", error);
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
-}
+  },
+  {
+    onError: (error, res) => {
+      console.error("Rival Following Scores API Error:", error);
+      return res.status(500).json({ message: "Internal Server Error" });
+    },
+  },
+);
 
 export const formatRivalScore = (
   r: Awaited<ReturnType<typeof rivalRepo.getFollowedScoresForSong>>[number],

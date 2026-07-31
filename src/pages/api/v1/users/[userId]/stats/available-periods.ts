@@ -1,35 +1,36 @@
 import { monthlyReviewRepo } from "@/lib/db/aggregates/monthly-review";
-import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
-import type { NextApiRequest, NextApiResponse } from "next";
+import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
 
 export interface AvailablePeriodsData {
   months: string[]; // YYYY-MM, desc order
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  if (req.method !== "GET") {
-    res.setHeader("Allow", ["GET"]);
-    return res.status(405).json({ message: "Method Not Allowed" });
-  }
+export default withUserApiHandler(
+  (req, res) => {
+    if (req.method !== "GET") {
+      res.setHeader("Allow", ["GET"]);
+      res.status(405).json({ message: "Method Not Allowed" });
+      return null;
+    }
 
-  const userId = req.query.userId as string;
-  const version = req.query.version as string;
+    const userId = req.query.userId as string;
+    const version = req.query.version as string;
 
-  if (!version) {
-    return res.status(400).json({ message: "Missing param: version" });
-  }
+    if (!version) {
+      res.status(400).json({ message: "Missing param: version" });
+      return null;
+    }
 
-  try {
-    const access = await checkUserAccess(req, userId);
-    if (!access.hasAccess) return rejectAccess(res, access);
-
+    return { userId, version };
+  },
+  async (req, res, { userId, version }) => {
     const months = await monthlyReviewRepo.getAvailableMonths(userId, version);
     return res.status(200).json({ months } satisfies AvailablePeriodsData);
-  } catch (error) {
-    console.error("[available-periods]", error);
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
-}
+  },
+  {
+    onError: (error, res) => {
+      console.error("[available-periods]", error);
+      return res.status(500).json({ message: "Internal Server Error" });
+    },
+  },
+);

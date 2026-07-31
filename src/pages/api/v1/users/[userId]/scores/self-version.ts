@@ -1,6 +1,6 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import type { NextApiResponse } from "next";
+import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
 import { timelineRepo } from "@/lib/db/domains/scores";
-import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { selfVersionComparisonQuerySchema } from "@/schemas/scores/query";
 import z from "zod";
 import { parseQuery } from "@/services/nextRequest/parseBody";
@@ -84,28 +84,16 @@ async function handleGetSelfVersion(
   return res.status(200).json(result);
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  if (req.method !== "GET") {
-    res.setHeader("Allow", ["GET"]);
-    return res
-      .status(405)
-      .json({ message: `Method ${req.method} Not Allowed` });
-  }
-
-  const query = parseQuery(selfVersionComparisonQuerySchema, req.query, res);
-  if (!query) return;
-
-  try {
-    const access = await checkUserAccess(req, query.userId);
-    if (!access.hasAccess) return rejectAccess(res, access);
-
+export default withUserApiHandler(
+  (req, res) => {
+    if (req.method !== "GET") {
+      res.setHeader("Allow", ["GET"]);
+      res.status(405).json({ message: `Method ${req.method} Not Allowed` });
+      return null;
+    }
+    return parseQuery(selfVersionComparisonQuerySchema, req.query, res);
+  },
+  async (req, res, query) => {
     return await handleGetSelfVersion(res, query);
-  } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Internal Server Error";
-    return res.status(500).json({ message: errorMessage });
-  }
-}
+  },
+);

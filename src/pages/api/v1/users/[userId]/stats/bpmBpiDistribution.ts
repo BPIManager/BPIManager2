@@ -1,5 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
+import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
 import { statsChartsRepo } from "@/lib/db/aggregates/stats/charts";
 import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
 import { BpiCalculator } from "@/lib/bpi";
@@ -24,18 +23,9 @@ function getBpmBand(bpm: string | null | undefined): string {
   return "Soflan";
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  const query = parseStatsQuery(req.query, res);
-  if (!query) return;
-  const { userId, version, levels, difficulties } = query;
-
-  try {
-    const access = await checkUserAccess(req, userId);
-    if (!access.hasAccess) return rejectAccess(res, access);
-
+export default withUserApiHandler(
+  (req, res) => parseStatsQuery(req.query, res),
+  async (req, res, { userId, version, levels, difficulties }) => {
     const songs = await statsChartsRepo.getSongsWithUserBpiForBpmDistribution(
       userId,
       version,
@@ -89,9 +79,5 @@ export default async function handler(
     });
 
     return res.status(200).json(result.filter((r) => r.totalBpi !== null));
-  } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Internal Server Error";
-    return res.status(500).json({ message: errorMessage });
-  }
-}
+  },
+);

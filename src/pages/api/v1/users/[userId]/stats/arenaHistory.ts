@@ -1,38 +1,43 @@
 import fs from "fs/promises";
 import path from "path";
 import { getArenaStatsHistory } from "@/lib/db/domains/arenaHistory";
-import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
+import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
 import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
-import type { NextApiRequest, NextApiResponse } from "next";
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== "GET") {
-    res.setHeader("Allow", ["GET"]);
-    return res.status(405).json({ message: "Method Not Allowed" });
-  }
+export default withUserApiHandler(
+  (req, res) => {
+    if (req.method !== "GET") {
+      res.setHeader("Allow", ["GET"]);
+      res.status(405).json({ message: "Method Not Allowed" });
+      return null;
+    }
 
-  const userId = req.query.userId as string;
-  const version = req.query.version as string;
-  const start = req.query.start as string;
-  const end = req.query.end as string;
+    const userId = req.query.userId as string;
+    const version = req.query.version as string;
+    const start = req.query.start as string;
+    const end = req.query.end as string;
 
-  if (!version || !start || !end) {
-    return res.status(400).json({ message: "Missing required params: version, start, end" });
-  }
-  if (!(IIDX_VERSIONS as readonly string[]).includes(version)) {
-    return res.status(400).json({ message: "Invalid version param" });
-  }
+    if (!version || !start || !end) {
+      res
+        .status(400)
+        .json({ message: "Missing required params: version, start, end" });
+      return null;
+    }
+    if (!(IIDX_VERSIONS as readonly string[]).includes(version)) {
+      res.status(400).json({ message: "Invalid version param" });
+      return null;
+    }
 
-  const startDate = new Date(start);
-  const endDate = new Date(end);
-  if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-    return res.status(400).json({ message: "Invalid date params" });
-  }
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      res.status(400).json({ message: "Invalid date params" });
+      return null;
+    }
 
-  try {
-    const access = await checkUserAccess(req, userId);
-    if (!access.hasAccess) return rejectAccess(res, access);
-
+    return { userId, version, startDate, endDate };
+  },
+  async (req, res, { userId, version, startDate, endDate }) => {
     const rows = await getArenaStatsHistory(userId, version, startDate, endDate);
 
     // distribution から上位クラスの累積人数オフセットを構築
@@ -62,8 +67,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }));
 
     return res.status(200).json(result);
-  } catch (error) {
-    console.error("[arenaHistory]", error);
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
-}
+  },
+  {
+    onError: (error, res) => {
+      console.error("[arenaHistory]", error);
+      return res.status(500).json({ message: "Internal Server Error" });
+    },
+  },
+);

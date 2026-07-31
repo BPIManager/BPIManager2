@@ -1,9 +1,8 @@
 import { statsChartsRepo } from "@/lib/db/aggregates/stats/charts";
-import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
+import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
 import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
 import type { StatsGroupBy } from "@/types/stats/bpiBoxStats";
 import dayjs from "@/lib/dayjs";
-import { NextApiRequest, NextApiResponse } from "next";
 import { BpiCalculator } from "@/lib/bpi";
 
 function percentile(sorted: number[], p: number): number {
@@ -16,21 +15,18 @@ function percentile(sorted: number[], p: number): number {
   return sorted[lower] + (sorted[upper] - sorted[lower]) * (index - lower);
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  const query = parseStatsQuery(req.query, res);
-  if (!query) return;
-  const { userId, version, levels, difficulties } = query;
-  const groupBy = (req.query.groupBy as StatsGroupBy) || "day";
-
-  if (levels.length === 0 && difficulties.length === 0) {
-    return res.status(400).json({ message: "Required parameters are missing" });
-  }
-  try {
-    const access = await checkUserAccess(req, userId);
-    if (!access.hasAccess) return rejectAccess(res, access);
+export default withUserApiHandler(
+  (req, res) => {
+    const query = parseStatsQuery(req.query, res);
+    if (!query) return null;
+    if (query.levels.length === 0 && query.difficulties.length === 0) {
+      res.status(400).json({ message: "Required parameters are missing" });
+      return null;
+    }
+    return query;
+  },
+  async (req, res, { userId, version, levels, difficulties }) => {
+    const groupBy = (req.query.groupBy as StatsGroupBy) || "day";
 
     const { scores, tower } = await statsChartsRepo.getBpiAndVolumePerDate(
       userId,
@@ -120,8 +116,11 @@ export default async function handler(
 
     result.sort((a, b) => a.date.localeCompare(b.date));
     return res.status(200).json(result);
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown error";
-    return res.status(500).json({ message });
-  }
-}
+  },
+  {
+    onError: (error, res) => {
+      const message = error instanceof Error ? error.message : "Unknown error";
+      return res.status(500).json({ message });
+    },
+  },
+);

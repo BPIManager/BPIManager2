@@ -1,28 +1,28 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
+import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
+import { rejectAccess } from "@/middlewares/api/withApi";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 import { rivalRepo } from "@/lib/db/aggregates/rivalScores/rival";
 import { parseQuery } from "@/services/nextRequest/parseBody";
 import { rivalScoreDetailQuerySchema } from "@/schemas/rivals/rivalId/scores/query";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  if (req.method !== "GET") return res.status(405).end();
-  const query = parseQuery(rivalScoreDetailQuerySchema, req.query, res);
-  if (!query) return;
+export default withUserApiHandler(
+  (req, res) => {
+    if (req.method !== "GET") {
+      res.status(405).end();
+      return null;
+    }
+    const query = parseQuery(rivalScoreDetailQuerySchema, req.query, res);
+    if (!query) return null;
 
-  const { userId, rivalId, songId, version } = query;
+    const { userId, rivalId, songId, version } = query;
+    if (!userId || !rivalId || !songId || !version) {
+      res.status(400).json({ message: "Missing required parameters" });
+      return null;
+    }
 
-  if (!userId || !rivalId || !songId || !version) {
-    return res.status(400).json({ message: "Missing required parameters" });
-  }
-
-  try {
-    const access = await checkUserAccess(req, String(userId));
-    if (!access.hasAccess) return rejectAccess(res, access);
-
+    return query;
+  },
+  async (req, res, { userId, rivalId, songId, version }) => {
     const rivalAccess = await checkProfileAccess(req, String(rivalId));
     if (!rivalAccess.hasAccess) return rejectAccess(res, rivalAccess);
 
@@ -55,9 +55,5 @@ export default async function handler(
         },
       },
     });
-  } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Internal Server Error";
-    return res.status(500).json({ message: errorMessage });
-  }
-}
+  },
+);

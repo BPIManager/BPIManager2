@@ -1,28 +1,17 @@
-import { NextApiRequest, NextApiResponse } from "next";
 import dayjs from "@/lib/dayjs";
 import { scoreDetailRepo } from "@/lib/db/domains/scores";
 import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { BpiCalculator } from "@/lib/bpi";
-import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
+import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
 import { totalBpiSchema } from "@/schemas/stats/totalBpi";
 import { parseQuery } from "@/services/nextRequest/parseBody";
 import { usersRepo } from "@/lib/db/domains/users";
 import { getUserAreaRank } from "@/lib/arena/prefectureRankings";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  const body = parseQuery(totalBpiSchema, req.query, res);
-  if (!body) return;
-
-  const { userId, version, asOf } = body;
-
-  try {
-    const access = await checkUserAccess(req, userId);
-    if (!access.hasAccess) return rejectAccess(res, access);
-
+export default withUserApiHandler(
+  (req, res) => parseQuery(totalBpiSchema, req.query, res),
+  async (req, res, { userId, version, asOf }) => {
     switch (req.method) {
       case "GET": {
         const targetTime =
@@ -69,9 +58,5 @@ export default async function handler(
           .status(405)
           .json({ message: `Method ${req.method} Not Allowed` });
     }
-  } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Internal Server Error";
-    return res.status(500).json({ message: errorMessage });
-  }
-}
+  },
+);
