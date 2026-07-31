@@ -1,5 +1,6 @@
 import { useUser } from "@/contexts/users/UserContext";
 import { fetcher } from "@/utils/common/fetch";
+import { useMemo } from "react";
 import useSWRInfinite, { SWRInfiniteConfiguration } from "swr/infinite";
 
 interface UseInfiniteListOptions<
@@ -38,7 +39,10 @@ export function useInfiniteList<TPage, TItem>(
       swrOptions,
     );
 
-  const items = data ? data.flatMap(getItems) : [];
+  const items = useMemo(
+    () => (data ? data.flatMap(getItems) : []),
+    [data, getItems],
+  );
   const isLoadingMore = isLoading || (isValidating && size > 1);
   const isReachingEnd = !!data && isLastPage(data[data.length - 1]);
 
