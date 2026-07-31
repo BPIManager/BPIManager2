@@ -38,10 +38,21 @@ export const calculateTotalBpi = (
   const currentPBs = new Map<number, { bpi: number; level: number }>();
   const dailyGroups = new Map<string, ScoreEntry[]>();
 
+  // 日付情報が欠損したスコアを「今日」として扱うと実際の推移を歪めるため、
+  // 既知の日付の中で最も古いバケットに寄せる
+  const knownDayKeys = allScores
+    .filter((score) => score.playDay || score.lastPlayed)
+    .map((score) =>
+      dayjs(score.playDay || score.lastPlayed).format("YYYY-MM-DD"),
+    )
+    .sort();
+  const fallbackDayKey = knownDayKeys[0] ?? dayjs(0).format("YYYY-MM-DD");
+
   allScores.forEach((score) => {
-    const dayKey = dayjs(score.playDay || score.lastPlayed).format(
-      "YYYY-MM-DD",
-    );
+    const dayKey =
+      score.playDay || score.lastPlayed
+        ? dayjs(score.playDay || score.lastPlayed).format("YYYY-MM-DD")
+        : fallbackDayKey;
     if (!dailyGroups.has(dayKey)) dailyGroups.set(dayKey, []);
     dailyGroups.get(dayKey)!.push(score);
   });
