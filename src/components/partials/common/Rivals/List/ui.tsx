@@ -1,23 +1,14 @@
-﻿import { Coffee, Fish, Sparkle, Code2, Trophy } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
-import { formatIIDXId } from "@/utils/common/formatIidxId";
+﻿import { formatIIDXId } from "@/utils/common/formatIidxId";
 import { RadarSectionChart } from "@/components/partials/common/DashBoard/Radar";
 import { RivalSummaryResult } from "@/types/social/rival";
 import { getBpiColorStyle } from "@/constants/theme/bpiColor";
 import { getRoleCardStyle } from "@/constants/theme/roleCardStyle";
+import { ROLE_ICON } from "@/constants/theme/roleIcon";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { RoleBadge } from "@/components/partials/common/Badge/UserRole";
 import { ArenaClassBadge } from "@/components/partials/common/Badge/ArenaClassBadge";
 import dayjs from "@/lib/dayjs";
-
-export const ROLE_ICON: Record<string, { icon: LucideIcon; color: string }> = {
-  coffee: { icon: Coffee, color: "text-amber-400" },
-  saba: { icon: Fish, color: "text-cyan-400" },
-  iidx: { icon: Sparkle, color: "text-violet-300" },
-  developer: { icon: Code2, color: "text-emerald-400" },
-  pro: { icon: Trophy, color: "text-yellow-400" },
-};
 
 export const RivalSummaryCard = ({
   rival,
