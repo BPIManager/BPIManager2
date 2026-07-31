@@ -11,9 +11,9 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-const { rivalRepo } = await import("@/lib/db/logs/rival");
-const { scoreDetailRepo } = await import("@/lib/db/logs/scores");
-const { timelineRepo } = await import("@/lib/db/logs/timeline");
+const { rivalRepo } = await import("@/lib/db/scores/rival");
+const { scoreDetailRepo } = await import("@/lib/db/scores/detail");
+const { timelineRepo } = await import("@/lib/db/scores/timeline");
 
 describe("rivalRepo.getRivalComparisonScores", () => {
   it("limit/offsetが指定された場合のみ適用されること", async () => {

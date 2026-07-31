@@ -11,8 +11,8 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-const { socialTimelineRepo } = await import("@/lib/db/social/timeline");
-const { socialComparisonRepo } = await import("@/lib/db/social/comparison");
+const { socialTimelineRepo } = await import("@/lib/db/scores/feed");
+const { socialComparisonRepo } = await import("@/lib/db/scores/comparison");
 
 describe("socialTimelineRepo.getFollowedTimeline", () => {
   it("search/levels/difficulties/lastIdを指定すると対応する$ifがtrueになること", async () => {
