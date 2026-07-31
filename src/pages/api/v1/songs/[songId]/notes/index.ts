@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { songNotesRepo } from "@/lib/db/domains/songNotes";
+import { songNotesAggregateRepo } from "@/lib/db/aggregates/songNotes";
 import { resolveOptionalUid } from "@/middlewares/api/resolveOptionalUid";
 
 function parseSongId(raw: string | string[] | undefined): number | null {
@@ -19,7 +20,7 @@ export default async function handler(
     const sort =
       req.query.sort === "bpi" ? "bpi" : ("latest" as "latest" | "bpi");
     const viewerId = await resolveOptionalUid(req);
-    const notes = await songNotesRepo.getNotes(songId, viewerId, sort);
+    const notes = await songNotesAggregateRepo.getNotes(songId, viewerId, sort);
     return res.status(200).json(notes);
   }
 

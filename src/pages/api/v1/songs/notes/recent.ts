@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { songNotesRepo } from "@/lib/db/domains/songNotes";
+import { songNotesAggregateRepo } from "@/lib/db/aggregates/songNotes";
 
 const PAGE_SIZE = 20;
 
@@ -14,6 +14,10 @@ export default async function handler(
 
   const page = Math.max(0, parseInt(String(req.query.page ?? "0"), 10) || 0);
 
-  const notes = await songNotesRepo.getRecentNotes(sort, PAGE_SIZE, page * PAGE_SIZE);
+  const notes = await songNotesAggregateRepo.getRecentNotes(
+    sort,
+    PAGE_SIZE,
+    page * PAGE_SIZE,
+  );
   return res.status(200).json(notes);
 }
