@@ -1,6 +1,7 @@
 import { BpiCalculator } from "../bpi";
 import dayjs from "../dayjs";
 import { bpiRepo } from "../db/bpi";
+import { songsRepo } from "../db/songs";
 import { SongLookup } from "./songLookup";
 import { v4 as uuidv4 } from "uuid";
 
@@ -79,7 +80,7 @@ export class BpiImportService {
     userId: string,
     payloads: { version: string; data: BpimScoreData }[],
   ) {
-    const songMaster = await bpiRepo.getSongMasterWithDef();
+    const songMaster = await songsRepo.getSongMasterWithDef();
     const lookup = new SongLookup(songMaster);
 
     const allScoreUpdates: ScoreUpdate[] = [];

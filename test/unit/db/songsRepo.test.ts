@@ -13,6 +13,34 @@ vi.mock("@/lib/db", () => ({
 
 const { songsRepo } = await import("@/lib/db/songs");
 
+describe("songsRepo.getSongMasterWithDef", () => {
+  it("songsとsongDefを結合したクエリを実行し結果を返すこと", async () => {
+    const rows = [{ songId: 1, title: "冥" }];
+    dbHolder.current = createDbSpy(rows);
+
+    const result = await songsRepo.getSongMasterWithDef();
+
+    expect(result).toEqual(rows);
+    expect(callsFor(dbHolder.current.calls, "selectFrom")[0].args).toEqual([
+      "songs as s",
+    ]);
+  });
+});
+
+describe("songsRepo.getSongWithDefByTitleDifficulty", () => {
+  it("title/difficultyで楽曲を検索すること", async () => {
+    dbHolder.current = createDbSpy({ songId: 1 });
+    const result = await songsRepo.getSongWithDefByTitleDifficulty(
+      "冥",
+      "ANOTHER",
+    );
+    expect(result).toEqual({ songId: 1 });
+    const whereCalls = callsFor(dbHolder.current.calls, "where");
+    expect(whereCalls[0].args).toEqual(["s.title", "=", "冥"]);
+    expect(whereCalls[1].args).toEqual(["s.difficulty", "=", "ANOTHER"]);
+  });
+});
+
 describe("songsRepo.getSongList", () => {
   it("INF以外のバージョンでは$ifにtrueを渡すこと", async () => {
     dbHolder.current = createDbSpy([]);

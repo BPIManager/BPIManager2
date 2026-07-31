@@ -1,5 +1,4 @@
 import { db } from "@/lib/db";
-import { SongMaster } from "@/types/songs/master";
 import { Database, NewAllScores, NewScore, NewTotalBPILog } from "@/types/db";
 import { Transaction } from "kysely";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
@@ -10,32 +9,6 @@ import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore";
  * BPI スコアのインポートおよびスコアマスタ参照を担当するリポジトリクラス。
  */
 class BpiRepository {
-  /**
-   * 現在有効な曲定義（`songDef.isCurrent = 1`）を結合した楽曲マスタを取得する。
-   *
-   * @returns 楽曲 ID・タイトル・ノーツ数・難易度・皆伝平均・WR スコア・補正係数を含む配列
-   */
-  async getSongMasterWithDef(): Promise<SongMaster> {
-    const result = await db
-      .selectFrom("songs as s")
-      .innerJoin("songDef as sd", (join) =>
-        join.onRef("sd.songId", "=", "s.songId").on("sd.isCurrent", "=", 1),
-      )
-      .select([
-        "s.songId",
-        "s.title",
-        "s.notes",
-        "s.difficulty",
-        "s.difficultyLevel",
-        "sd.defId",
-        "sd.wrScore",
-        "sd.kaidenAvg",
-        "sd.coef",
-      ])
-      .execute();
-    return result as SongMaster;
-  }
-
   /**
    * 全難易度の楽曲マスタ（`allSongs` テーブル）を取得する。
    *
@@ -255,43 +228,6 @@ class BpiRepository {
     for (const chunk of chunks) {
       await trx.insertInto("allScores").values(chunk).execute();
     }
-  }
-
-  /**
-   * title + difficulty で楽曲と最新 songDef を取得する。
-   * 削除済み楽曲は除外。
-   */
-  async getSongWithDefByTitleDifficulty(title: string, difficulty: string) {
-    return await db
-      .selectFrom("songs as s")
-      .leftJoin(
-        (qb) =>
-          qb
-            .selectFrom("songDef")
-            .select(["songId", "wrScore", "kaidenAvg", "coef"])
-            .where("isCurrent", "=", 1)
-            .as("def"),
-        (join) => join.onRef("def.songId", "=", "s.songId"),
-      )
-      .select([
-        "s.songId",
-        "s.title",
-        "s.difficulty",
-        "s.difficultyLevel",
-        "s.notes",
-        "def.wrScore",
-        "def.kaidenAvg",
-        "def.coef",
-      ])
-      .where("s.title", "=", title)
-      .where("s.difficulty", "=", difficulty)
-      .where((eb) =>
-        eb.or([
-          eb("s.deletedAt", "is", null),
-          eb("s.deletedAt", ">", latestVersion),
-        ]),
-      )
-      .executeTakeFirst();
   }
 
   /**

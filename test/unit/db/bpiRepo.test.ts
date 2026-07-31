@@ -24,20 +24,6 @@ vi.mock("@/lib/db", () => ({
 
 const { bpiRepo } = await import("@/lib/db/bpi");
 
-describe("bpiRepo.getSongMasterWithDef", () => {
-  it("songsとsongDefを結合したクエリを実行し結果を返すこと", async () => {
-    const rows = [{ songId: 1, title: "冥" }];
-    dbHolder.current = createDbSpy(rows);
-
-    const result = await bpiRepo.getSongMasterWithDef();
-
-    expect(result).toEqual(rows);
-    expect(callsFor(dbHolder.current.calls, "selectFrom")[0].args).toEqual([
-      "songs as s",
-    ]);
-  });
-});
-
 describe("bpiRepo.getLatestScores / getLatestAllScores", () => {
   it("scoresテーブルから最新スコアを取得すること", async () => {
     dbHolder.current = createDbSpy([]);
@@ -66,20 +52,6 @@ describe("bpiRepo.getLatestTotalBpi", () => {
       "id",
       "desc",
     ]);
-  });
-});
-
-describe("bpiRepo.getSongWithDefByTitleDifficulty", () => {
-  it("title/difficultyで楽曲を検索すること", async () => {
-    dbHolder.current = createDbSpy({ songId: 1 });
-    const result = await bpiRepo.getSongWithDefByTitleDifficulty(
-      "冥",
-      "ANOTHER",
-    );
-    expect(result).toEqual({ songId: 1 });
-    const whereCalls = callsFor(dbHolder.current.calls, "where");
-    expect(whereCalls[0].args).toEqual(["s.title", "=", "冥"]);
-    expect(whereCalls[1].args).toEqual(["s.difficulty", "=", "ANOTHER"]);
   });
 });
 

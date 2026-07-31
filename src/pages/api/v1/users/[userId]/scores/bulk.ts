@@ -8,6 +8,7 @@ import { isImproved } from "@/lib/lamp";
 import { BpiCalculator } from "@/lib/bpi";
 import { NewScore, NewAllScores } from "@/types/db";
 import { bpiRepo } from "@/lib/db/bpi";
+import { songsRepo } from "@/lib/db/songs";
 import dayjs from "@/lib/dayjs";
 import { scoresBulkBodySchema } from "@/schemas/scores/bulk";
 import { parseBody } from "@/services/nextRequest/parseBody";
@@ -33,7 +34,7 @@ const handler = async (
       existingAllScores,
       lastLog,
     ] = await Promise.all([
-      bpiRepo.getSongMasterWithDef(),
+      songsRepo.getSongMasterWithDef(),
       bpiRepo.getAllLevelMaster(),
       bpiRepo.getLatestScores(userId, version),
       bpiRepo.getLatestAllScores(userId, version),

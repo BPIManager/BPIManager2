@@ -1,6 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { v4 as uuidv4 } from "uuid";
 import { bpiRepo } from "@/lib/db/bpi";
+import { songsRepo } from "@/lib/db/songs";
 import { BpiCalculator } from "@/lib/bpi";
 import { isImproved } from "@/lib/lamp";
 import { NewAllScores, NewScore } from "@/types/db";
@@ -23,7 +24,7 @@ export function registerUpdateMyScore(server: McpServer, userId: string) {
     async ({ songId, version, exScore, clearState, missCount }) => {
       const [bpiSongMaster, allLevelMaster, currentScores, currentAllScores, lastLog] =
         await Promise.all([
-          bpiRepo.getSongMasterWithDef(),
+          songsRepo.getSongMasterWithDef(),
           bpiRepo.getAllLevelMaster(),
           bpiRepo.getLatestScores(userId, version),
           bpiRepo.getLatestAllScores(userId, version),
