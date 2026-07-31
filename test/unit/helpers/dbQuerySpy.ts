@@ -90,9 +90,23 @@ export function createTransactionalDbSpy(
   directResult: unknown = [],
 ) {
   const { proxy: trx, calls } = createQueryBuilderSpy(trxResult);
+
+  // db.fn.max(...)/trx.fn.max(...)のようなトップレベルの関数ビルダーアクセスに対応する
+  const fnHandler: ProxyHandler<object> = {
+    get(_target, prop) {
+      if (typeof prop !== "string") return undefined;
+      return (...args: unknown[]) => {
+        calls.push({ method: `fn.${prop}`, args });
+        return trx;
+      };
+    },
+  };
+  const fnProxy = new Proxy({}, fnHandler);
+
   // directProxy自身のcallsもtrxと同じ配列に集約する
   const directHandler: ProxyHandler<object> = {
     get(_target, prop) {
+      if (prop === "fn") return fnProxy;
       if (typeof prop !== "string") return undefined;
       return (...args: unknown[]) => {
         calls.push({ method: prop, args });
@@ -118,6 +132,7 @@ export function createTransactionalDbSpy(
           ),
         }));
       }
+      if (prop === "fn") return fnProxy;
       if (typeof prop !== "string") return undefined;
       return vi.fn((...args: unknown[]) => {
         calls.push({ method: prop, args });

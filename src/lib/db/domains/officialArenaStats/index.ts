@@ -1,5 +1,6 @@
 ﻿import { db } from "@/lib/db";
-import type { NewOfficialArenaStat } from "@/types/db";
+import type { Transaction } from "kysely";
+import type { Database, NewOfficialArenaStat } from "@/types/db";
 import { ARENA_RANK_ORDER } from "@/constants/iidx/arenaRanks";
 
 /**
@@ -74,32 +75,38 @@ export async function upsertOfficialArenaStats(
 
   const version = String(records[0].version);
   const userIds = records.map((r) => r.userId);
-  const latestMap = await fetchLatestByUserIds(userIds, version);
 
-  const toInsert = records.filter((r) => {
-    const latest = latestMap.get(r.userId);
-    if (!latest) return true;
-    // 同じ fetchedAt ウィンドウでは重複挿入しない（サーバー再起動対策）
-    if (latest.fetchedAt.getTime() === (r.fetchedAt as Date).getTime()) return false;
-    return (
-      latest.arenaClass !== r.arenaClass ||
-      latest.area !== r.area ||
-      latest.gradeSp !== r.gradeSp ||
-      latest.gradeDp !== r.gradeDp ||
-      latest.arenaRank !== r.arenaRank ||
-      latest.wins !== r.wins ||
-      latest.a1continue !== r.a1continue
-    );
+  // 読み取り(FOR UPDATE)と書き込みを同一トランザクション内で行い、
+  // 同一ユーザー・バージョンへの同時更新による重複行の混入を防ぐ。
+  return await db.transaction().execute(async (trx) => {
+    const latestMap = await fetchLatestByUserIds(trx, userIds, version);
+
+    const toInsert = records.filter((r) => {
+      const latest = latestMap.get(r.userId);
+      if (!latest) return true;
+      // 同じ fetchedAt ウィンドウでは重複挿入しない（サーバー再起動対策）
+      if (latest.fetchedAt.getTime() === (r.fetchedAt as Date).getTime())
+        return false;
+      return (
+        latest.arenaClass !== r.arenaClass ||
+        latest.area !== r.area ||
+        latest.gradeSp !== r.gradeSp ||
+        latest.gradeDp !== r.gradeDp ||
+        latest.arenaRank !== r.arenaRank ||
+        latest.wins !== r.wins ||
+        latest.a1continue !== r.a1continue
+      );
+    });
+
+    if (toInsert.length > 0) {
+      await trx.insertInto("officialArenaStats").values(toInsert).execute();
+    }
+
+    return {
+      inserted: toInsert.length,
+      skipped: records.length - toInsert.length,
+    };
   });
-
-  if (toInsert.length > 0) {
-    await db.insertInto("officialArenaStats").values(toInsert).execute();
-  }
-
-  return {
-    inserted: toInsert.length,
-    skipped: records.length - toInsert.length,
-  };
 }
 
 export async function getArenaStatsHistory(
@@ -119,11 +126,15 @@ export async function getArenaStatsHistory(
     .execute();
 }
 
-async function fetchLatestByUserIds(userIds: string[], version: string) {
-  const rows = await db
+async function fetchLatestByUserIds(
+  trx: Transaction<Database>,
+  userIds: string[],
+  version: string,
+) {
+  const rows = await trx
     .selectFrom("officialArenaStats as oas")
     .innerJoin(
-      db
+      trx
         .selectFrom("officialArenaStats")
         .select(["userId", db.fn.max("id").as("maxId")])
         .where("userId", "in", userIds)
@@ -146,6 +157,7 @@ async function fetchLatestByUserIds(userIds: string[], version: string) {
       "oas.a1continue",
       "oas.fetchedAt",
     ])
+    .forUpdate()
     .execute();
 
   return new Map(rows.map((r) => [r.userId, r]));

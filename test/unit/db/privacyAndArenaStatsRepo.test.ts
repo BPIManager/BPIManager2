@@ -1,13 +1,17 @@
 import { describe, it, expect, vi } from "vitest";
-import { createDbSpy, callsFor } from "../helpers/dbQuerySpy";
+import {
+  createDbSpy,
+  createTransactionalDbSpy,
+  callsFor,
+} from "../helpers/dbQuerySpy";
 
 const { dbHolder } = vi.hoisted(() => ({
-  dbHolder: { current: null as ReturnType<typeof import("../helpers/dbQuerySpy")["createDbSpy"]> | null },
+  dbHolder: { current: null as unknown },
 }));
 
 vi.mock("@/lib/db", () => ({
   get db() {
-    return dbHolder.current!.db;
+    return (dbHolder.current as { db: unknown }).db;
   },
 }));
 
@@ -24,16 +28,11 @@ const {
 
 describe("officialArenaStats.latestPerUserSubquery", () => {
   it("versionで絞り込みuserIdごとにグループ化するクエリを組み立てること", () => {
-    dbHolder.current = createDbSpy(undefined);
+    const spy = createDbSpy(undefined);
+    dbHolder.current = spy;
     latestPerUserSubquery("33");
-    expect(callsFor(dbHolder.current.calls, "where")[0].args).toEqual([
-      "version",
-      "=",
-      "33",
-    ]);
-    expect(callsFor(dbHolder.current.calls, "groupBy")[0].args).toEqual([
-      "userId",
-    ]);
+    expect(callsFor(spy.calls, "where")[0].args).toEqual(["version", "=", "33"]);
+    expect(callsFor(spy.calls, "groupBy")[0].args).toEqual(["userId"]);
   });
 });
 
@@ -64,10 +63,11 @@ describe("statsPrivacy.getStatsPrivacy", () => {
 
 describe("statsPrivacy.upsertStatsPrivacy", () => {
   it("デフォルト値と指定settingsをマージしてinsertし、onDuplicateKeyUpdateにはsettingsのみ渡すこと", async () => {
-    dbHolder.current = createDbSpy(undefined);
+    const spy = createDbSpy(undefined);
+    dbHolder.current = spy;
     await upsertStatsPrivacy("user-1", { showArea: 1 });
 
-    const valuesCall = callsFor(dbHolder.current.calls, "values")[0];
+    const valuesCall = callsFor(spy.calls, "values")[0];
     expect(valuesCall.args[0]).toEqual({
       userId: "user-1",
       showArenaClass: 1,
@@ -75,9 +75,9 @@ describe("statsPrivacy.upsertStatsPrivacy", () => {
       showArea: 1,
       showGrade: 0,
     });
-    expect(
-      callsFor(dbHolder.current.calls, "onDuplicateKeyUpdate")[0].args,
-    ).toEqual([{ showArea: 1 }]);
+    expect(callsFor(spy.calls, "onDuplicateKeyUpdate")[0].args).toEqual([
+      { showArea: 1 },
+    ]);
   });
 });
 
@@ -106,15 +106,16 @@ describe("officialArenaStats.getBestArenaClassPerVersion", () => {
 
 describe("officialArenaStats.upsertOfficialArenaStats", () => {
   it("recordsが空の場合、DBに問い合わせず{inserted:0,skipped:0}を返すこと", async () => {
-    dbHolder.current = createDbSpy([]);
+    const spy = createDbSpy([]);
+    dbHolder.current = spy;
     const result = await upsertOfficialArenaStats([]);
     expect(result).toEqual({ inserted: 0, skipped: 0 });
-    expect(dbHolder.current.calls).toHaveLength(0);
+    expect(spy.calls).toHaveLength(0);
   });
 
   it("直近と同じfetchedAtのレコードはスキップされること", async () => {
     const fetchedAt = new Date("2025-06-01T00:00:00Z");
-    dbHolder.current = createDbSpy([
+    dbHolder.current = createTransactionalDbSpy([
       {
         userId: "user-1",
         arenaClass: "A1",
@@ -147,7 +148,7 @@ describe("officialArenaStats.upsertOfficialArenaStats", () => {
   });
 
   it("値に変化があるレコードはinsert対象になること", async () => {
-    dbHolder.current = createDbSpy([
+    dbHolder.current = createTransactionalDbSpy([
       {
         userId: "user-1",
         arenaClass: "A2",
@@ -189,13 +190,14 @@ describe("officialArenaStats.getLatestArenaStatsPerVersion / getArenaStatsHistor
   });
 
   it("getArenaStatsHistoryは期間で絞り込むこと", async () => {
-    dbHolder.current = createDbSpy([]);
+    const spy = createDbSpy([]);
+    dbHolder.current = spy;
     await getArenaStatsHistory(
       "user-1",
       "33",
       new Date("2025-06-01"),
       new Date("2025-06-30"),
     );
-    expect(callsFor(dbHolder.current.calls, "where")).toHaveLength(4);
+    expect(callsFor(spy.calls, "where")).toHaveLength(4);
   });
 });
