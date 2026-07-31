@@ -11,14 +11,16 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-const { siteStatsRepo } = await import("@/lib/db/aggregates/siteStats");
+const { siteStatsSummaryRepo } = await import(
+  "@/lib/db/aggregates/siteStats/summary"
+);
 
-describe("siteStatsRepo.getSummary", () => {
+describe("siteStatsSummaryRepo.getSummary", () => {
   it("totalAllScores/newAllScoresTodayはbk+scores+allLowの合算になること", async () => {
     // executeTakeFirstは常に同じcanned値を返すため、3系統(bk/scores/allLow)を
     // 合算するtotalAllScoresは count*3 になる
     dbHolder.current = createDbSpy({ count: 5 });
-    const result = await siteStatsRepo.getSummary();
+    const result = await siteStatsSummaryRepo.getSummary();
 
     expect(result.totalUsers).toBe(5);
     expect(result.totalAllScores).toBe(15);
@@ -27,7 +29,7 @@ describe("siteStatsRepo.getSummary", () => {
 
   it("結果がundefinedの場合すべて0になること", async () => {
     dbHolder.current = createDbSpy(undefined);
-    const result = await siteStatsRepo.getSummary();
+    const result = await siteStatsSummaryRepo.getSummary();
     expect(result).toEqual({
       totalUsers: 0,
       newUsersToday: 0,
@@ -39,7 +41,7 @@ describe("siteStatsRepo.getSummary", () => {
   });
 });
 
-describe("siteStatsRepo.getArenaRankDistribution", () => {
+describe("siteStatsSummaryRepo.getArenaRankDistribution", () => {
   it("ARENA_RANK_ORDER全ランクを含み、該当データのないランクは0になること", async () => {
     dbHolder.current = createDbSpy([
       { arenaClass: "A1", count: 10 },
@@ -47,7 +49,7 @@ describe("siteStatsRepo.getArenaRankDistribution", () => {
       { arenaClass: "B3", count: 3 },
     ]);
 
-    const result = await siteStatsRepo.getArenaRankDistribution();
+    const result = await siteStatsSummaryRepo.getArenaRankDistribution();
 
     const a1 = result.find((r) => r.rank === "A1");
     const b3 = result.find((r) => r.rank === "B3");
@@ -58,20 +60,20 @@ describe("siteStatsRepo.getArenaRankDistribution", () => {
   });
 });
 
-describe("siteStatsRepo.getAreaDistribution", () => {
+describe("siteStatsSummaryRepo.getAreaDistribution", () => {
   it("areaがnullの行を除外して返すこと", async () => {
     dbHolder.current = createDbSpy([
       { area: "東京都", count: 10 },
       { area: null, count: 5 },
     ]);
 
-    const result = await siteStatsRepo.getAreaDistribution();
+    const result = await siteStatsSummaryRepo.getAreaDistribution();
 
     expect(result).toEqual([{ area: "東京都", count: 10 }]);
   });
 });
 
-describe("siteStatsRepo.getVersionScoreDistribution", () => {
+describe("siteStatsSummaryRepo.getVersionScoreDistribution", () => {
   it("BK版数を先頭に、それ以外を数値昇順で並べ件数を合算すること", async () => {
     // bkRows/scoresRows/allScoresRowsはすべて同じcanned配列を返す
     dbHolder.current = createDbSpy([
@@ -79,7 +81,7 @@ describe("siteStatsRepo.getVersionScoreDistribution", () => {
       { version: "26", count: 5 },
     ]);
 
-    const result = await siteStatsRepo.getVersionScoreDistribution();
+    const result = await siteStatsSummaryRepo.getVersionScoreDistribution();
 
     const versionOrder = result.versions.map((v) => v.version);
     expect(versionOrder[0]).toBe("26"); // BK_VERSIONSの先頭
@@ -87,31 +89,5 @@ describe("siteStatsRepo.getVersionScoreDistribution", () => {
     const v33 = result.versions.find((v) => v.version === "33");
     // 3クエリすべてが同じ行を返すため 10*3 = 30
     expect(v33?.count).toBe(30);
-  });
-});
-
-describe("siteStatsRepo.getSongPopulationPage", () => {
-  it("orderがtopの場合desc、bottomの場合ascでソートすること", async () => {
-    dbHolder.current = createDbSpy([
-      { songId: 1, title: "冥", difficulty: "ANOTHER", playerCount: "100" },
-    ]);
-    const result = await siteStatsRepo.getSongPopulationPage("top", 0, 20);
-    expect(result).toEqual([
-      { songId: 1, title: "冥", difficulty: "ANOTHER", playerCount: 100 },
-    ]);
-  });
-});
-
-describe("siteStatsRepo.getSongPopulationTotal", () => {
-  it("楽曲総数を数値で返すこと", async () => {
-    dbHolder.current = createDbSpy({ count: "500" });
-    const result = await siteStatsRepo.getSongPopulationTotal();
-    expect(result).toBe(500);
-  });
-
-  it("結果がundefinedの場合0を返すこと", async () => {
-    dbHolder.current = createDbSpy(undefined);
-    const result = await siteStatsRepo.getSongPopulationTotal();
-    expect(result).toBe(0);
   });
 });

@@ -1,6 +1,8 @@
 import fs from "fs/promises";
 import path from "path";
-import { siteStatsRepo } from "@/lib/db/aggregates/siteStats";
+import { siteStatsSummaryRepo } from "@/lib/db/aggregates/siteStats/summary";
+import { siteStatsActivityDistributionRepo } from "@/lib/db/aggregates/siteStats/activityDistribution";
+import { siteStatsSongPopulationRepo } from "@/lib/db/aggregates/siteStats/songPopulation";
 
 const OUTPUT_DIR = path.join(process.cwd(), "public/data/info");
 const STATS_FILE = path.join(OUTPUT_DIR, "stats.json");
@@ -20,13 +22,13 @@ export async function generateInfoJson() {
 
   const [summary, dailyRegistrations, arenaRankDistribution, areaDistribution, versionScoreDistribution, hourlyDistribution, weekdayDistribution] =
     await Promise.all([
-      siteStatsRepo.getSummary(),
-      siteStatsRepo.getDailyRegistrations(90),
-      siteStatsRepo.getArenaRankDistribution(),
-      siteStatsRepo.getAreaDistribution(),
-      siteStatsRepo.getVersionScoreDistribution(),
-      siteStatsRepo.getHourlyDistribution(),
-      siteStatsRepo.getWeekdayDistribution(),
+      siteStatsSummaryRepo.getSummary(),
+      siteStatsSummaryRepo.getDailyRegistrations(90),
+      siteStatsSummaryRepo.getArenaRankDistribution(),
+      siteStatsSummaryRepo.getAreaDistribution(),
+      siteStatsSummaryRepo.getVersionScoreDistribution(),
+      siteStatsActivityDistributionRepo.getHourlyDistribution(),
+      siteStatsActivityDistributionRepo.getWeekdayDistribution(),
     ]);
 
   await fs.writeFile(
@@ -45,8 +47,12 @@ export async function generateInfoJson() {
   console.log(`[Info] Saved: ${STATS_FILE}`);
 
   // 全件取得してplayerCount降順で保存（APIでスライス）
-  const total = await siteStatsRepo.getSongPopulationTotal();
-  const songs = await siteStatsRepo.getSongPopulationPage("top", 0, total || 9999);
+  const total = await siteStatsSongPopulationRepo.getSongPopulationTotal();
+  const songs = await siteStatsSongPopulationRepo.getSongPopulationPage(
+    "top",
+    0,
+    total || 9999,
+  );
 
   await fs.writeFile(SONGS_FILE, JSON.stringify({ songs, generatedAt: new Date().toISOString() }));
   console.log(`[Info] Saved: ${SONGS_FILE} (${songs.length} songs)`);
