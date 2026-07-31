@@ -1,13 +1,13 @@
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { NextApiRequest, NextApiResponse } from "next";
-import { scoresRepo } from "../db/aggregates/scoresFacade";
+import { socialComparisonRepo } from "../db/aggregates/rivalScores/comparison";
 import { upsertUserProfile } from "../db/orchestrators/userProfileUpsert";
 import { userProfileRepo } from "../db/aggregates/userProfiles/profile";
 import { v4 as uuidv4 } from "uuid";
 import { AccessResult } from "@/middlewares/api/withApi";
 import { parseBody } from "@/services/nextRequest/parseBody";
 import { profileUpsertSchema } from "@/schemas/profile/upsert";
-import { upsertStatsPrivacy } from "@/lib/db/domains/statsPrivacy";
+import { upsertStatsPrivacy } from "@/lib/db/domains/arenaPrivacy";
 import { getUserAreaRank, AreaRankInfo } from "@/lib/arena/prefectureRankings";
 
 /**
@@ -21,7 +21,7 @@ type ProfileWithAreaRank = ProfileSummaryWithoutPrivacy & { areaRank: AreaRankIn
 interface ProfileResponse {
   profile: ProfileWithAreaRank | null;
   compare?: {
-    winLoss: Awaited<ReturnType<typeof scoresRepo.getWinLossStats>> | null;
+    winLoss: Awaited<ReturnType<typeof socialComparisonRepo.getWinLossStats>> | null;
     radar: Record<string, number> | null;
   };
   statsPrivacy?: ProfileSummary["statsPrivacy"];
@@ -57,9 +57,9 @@ export async function handleGetProfile(
   const [profile, winLoss, radar] = await Promise.all([
     userProfileRepo.getUserProfileSummary(uid, viewerId),
     isCompare && viewerId
-      ? scoresRepo.getWinLossStats(viewerId, uid, version)
+      ? socialComparisonRepo.getWinLossStats(viewerId, uid, version)
       : null,
-    isCompare ? scoresRepo.getUserRadar(uid, version) : null,
+    isCompare ? socialComparisonRepo.getUserRadar(uid, version) : null,
   ]);
 
   if (!profile) return res.status(404).json({ message: "User not found" });

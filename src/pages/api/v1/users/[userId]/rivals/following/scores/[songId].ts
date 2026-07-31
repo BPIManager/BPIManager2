@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
-import { scoresRepo } from "@/lib/db/aggregates/scoresFacade";
+import { rivalRepo } from "@/lib/db/aggregates/rivalScores/rival";
 import { parseQuery } from "@/services/nextRequest/parseBody";
 import { rivalFollowingScoresQuerySchema } from "@/schemas/rivals/following/scores/query";
 
@@ -22,7 +22,7 @@ export default async function handler(
     const access = await checkUserAccess(req, String(userId));
     if (!access.hasAccess) return rejectAccess(res, access);
 
-    const rivalsScores = await scoresRepo.getFollowedScoresForSong({
+    const rivalsScores = await rivalRepo.getFollowedScoresForSong({
       viewerId: String(userId),
       songId: Number(songId),
       version: version,
@@ -40,7 +40,7 @@ export default async function handler(
 }
 
 export const formatRivalScore = (
-  r: Awaited<ReturnType<typeof scoresRepo.getFollowedScoresForSong>>[number],
+  r: Awaited<ReturnType<typeof rivalRepo.getFollowedScoresForSong>>[number],
 ) => ({
   userId: r.userId,
   userName: r.userName,

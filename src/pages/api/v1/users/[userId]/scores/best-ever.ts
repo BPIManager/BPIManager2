@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { scoresRepo } from "@/lib/db/domains/scores";
+import { timelineRepo } from "@/lib/db/domains/scores";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 
 async function handleGetBestEver(
@@ -17,7 +17,7 @@ async function handleGetBestEver(
 
   const shouldExclude = excludeCurrent === "true";
 
-  const rows = await scoresRepo.getBestEverScores({
+  const rows = await timelineRepo.getBestEverScores({
     userId,
     currentVersion,
     excludeCurrent: shouldExclude,

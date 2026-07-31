@@ -6,9 +6,6 @@ import {
   latestLogIdPerSongSubquery,
   latestLogIdPerUserSongSubquery,
 } from "@/lib/db/shared/latestScore";
-import { scoreDetailRepo } from "./detail";
-import { timelineRepo } from "./timeline";
-
 export { scoreDetailRepo } from "./detail";
 export { timelineRepo } from "./timeline";
 
@@ -95,6 +92,22 @@ class ScoresRepository {
       prevDate: prevRow,
       nextDate: nextRow,
     };
+  }
+
+  /**
+   * 指定楽曲の全スコア登録履歴を、プレイ日時の新しい順で取得する。
+   *
+   * @param userId - ユーザー ID
+   * @param songId - 楽曲 ID
+   */
+  async getHistoryForSong(userId: string, songId: number) {
+    return await db
+      .selectFrom("scores")
+      .selectAll()
+      .where("userId", "=", userId)
+      .where("songId", "=", songId)
+      .orderBy("lastPlayed", "desc")
+      .execute();
   }
 
   /**
@@ -405,51 +418,10 @@ class ScoresRepository {
   }
 }
 
-const scoresCoreRepo = new ScoresRepository();
-
 /**
- * scores ドメイン自身が所有する基本CRUD（`scoresCoreRepo`）・詳細クエリ
- * （`scoreDetailRepo`）・自己タイムライン（`timelineRepo`）を集約した
- * ファサードオブジェクト。
+ * `scores` テーブル（単曲スコア）の基本CRUD・参照を提供するリポジトリのインスタンス。
  *
- * `aggregates/rivalScores`・`aggregates/scoreTimeline`等のクロスドメイン
- * 複合ビューまで統合した全体ファサードは、依存方向（`aggregates/ → domains/`
- * の一方向）を守るため`aggregates/scoresFacade`側に置く（#166）。
- * 新規コードでは個別のリポジトリを直接使用することを推奨する。
+ * スコア詳細クエリ（比較・曲定義結合）は{@link scoreDetailRepo}、
+ * 自己タイムライン系は{@link timelineRepo}を利用する。
  */
-export const scoresRepo = {
-  // 基本CRUD
-  insert: scoresCoreRepo.insert.bind(scoresCoreRepo),
-  deleteByBatch: scoresCoreRepo.deleteByBatch.bind(scoresCoreRepo),
-  deleteByUser: scoresCoreRepo.deleteByUser.bind(scoresCoreRepo),
-  getAllForUser: scoresCoreRepo.getAllForUser.bind(scoresCoreRepo),
-  getLastPlayedNavigation:
-    scoresCoreRepo.getLastPlayedNavigation.bind(scoresCoreRepo),
-  getPreviousVersionWithScores:
-    scoresCoreRepo.getPreviousVersionWithScores.bind(scoresCoreRepo),
-  getLatestScores: scoresCoreRepo.getLatestScores.bind(scoresCoreRepo),
-  getLatestScoreForSong:
-    scoresCoreRepo.getLatestScoreForSong.bind(scoresCoreRepo),
-  getSongBpimRank: scoresCoreRepo.getSongBpimRank.bind(scoresCoreRepo),
-  getCountExcludingVersions:
-    scoresCoreRepo.getCountExcludingVersions.bind(scoresCoreRepo),
-  getBatchesWithLastPlayedInRange:
-    scoresCoreRepo.getBatchesWithLastPlayedInRange.bind(scoresCoreRepo),
-  getLatestExScoresForSongsBeforeDate:
-    scoresCoreRepo.getLatestExScoresForSongsBeforeDate.bind(scoresCoreRepo),
-  getSongRanksForSongs:
-    scoresCoreRepo.getSongRanksForSongs.bind(scoresCoreRepo),
-  getActivityBreakdownByLastPlayed:
-    scoresCoreRepo.getActivityBreakdownByLastPlayed.bind(scoresCoreRepo),
-  getAvailableMonths: scoresCoreRepo.getAvailableMonths.bind(scoresCoreRepo),
-
-  // スコア詳細クエリ系
-  getScoresWithDetails:
-    scoreDetailRepo.getScoresWithDetails.bind(scoreDetailRepo),
-  getScoresByLastPlayedRange:
-    scoreDetailRepo.getScoresByLastPlayedRange.bind(scoreDetailRepo),
-
-  // 自己タイムライン系
-  getBestEverScores: timelineRepo.getBestEverScores.bind(timelineRepo),
-  getSelfVersionScores: timelineRepo.getSelfVersionScores.bind(timelineRepo),
-};
+export const scoresRepo = new ScoresRepository();

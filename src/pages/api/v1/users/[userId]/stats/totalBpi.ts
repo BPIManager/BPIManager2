@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import dayjs from "@/lib/dayjs";
-import { scoresRepo } from "@/lib/db/domains/scores";
+import { scoreDetailRepo } from "@/lib/db/domains/scores";
 import { statsRepo } from "@/lib/db/aggregates/stats";
 import { BpiCalculator } from "@/lib/bpi";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
@@ -31,7 +31,7 @@ export default async function handler(
             : dayjs.tz(asOf).endOf("day").utc().toDate();
 
         const [scores, totalCount, user] = await Promise.all([
-          scoresRepo.getScoresWithDetails(userId, version, {
+          scoreDetailRepo.getScoresWithDetails(userId, version, {
             targetTime,
             onlyLastPlayedInRange: { start: new Date(0), end: targetTime },
           }),

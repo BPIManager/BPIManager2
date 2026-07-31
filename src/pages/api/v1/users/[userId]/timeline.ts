@@ -4,7 +4,7 @@ import {
   withAuth,
 } from "@/middlewares/api/withAuth";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
-import { scoresRepo } from "@/lib/db/aggregates/scoresFacade";
+import { socialTimelineRepo } from "@/lib/db/aggregates/rivalScores/feed";
 import { parseQuery } from "@/services/nextRequest/parseBody";
 import { timelineQuerySchema } from "@/schemas/timeline/query";
 
@@ -31,7 +31,7 @@ async function handler(
   const viewerId = req.authUid;
 
   try {
-    const timeline = await scoresRepo.getFollowedTimeline({
+    const timeline = await socialTimelineRepo.getFollowedTimeline({
       viewerId,
       version,
       limit,
@@ -47,7 +47,7 @@ async function handler(
     }
 
     const songIds = Array.from(new Set(timeline.map((t) => Number(t.songId))));
-    const viewerScores = await scoresRepo.getViewerScoresForSongs(
+    const viewerScores = await socialTimelineRepo.getViewerScoresForSongs(
       viewerId,
       version,
       songIds,

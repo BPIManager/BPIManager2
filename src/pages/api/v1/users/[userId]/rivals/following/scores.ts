@@ -1,4 +1,4 @@
-import { scoresRepo } from "@/lib/db/aggregates/scoresFacade";
+import { rivalRepo } from "@/lib/db/aggregates/rivalScores/rival";
 import {
   AuthenticatedNextApiRequest,
   withAuth,
@@ -54,7 +54,7 @@ const handler = async (
           }
         : undefined;
 
-    const rawResults = await scoresRepo.getScoreComparisonList({
+    const rawResults = await rivalRepo.getScoreComparisonList({
       userId: String(userId),
       version: version,
       limit: nLimit,

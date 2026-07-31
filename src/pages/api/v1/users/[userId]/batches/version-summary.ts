@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { scoresRepo } from "@/lib/db/domains/scores";
+import { scoresRepo, timelineRepo } from "@/lib/db/domains/scores";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 import { rejectAccess } from "@/middlewares/api/withApi";
 import { parseQuery } from "@/services/nextRequest/parseBody";
@@ -45,7 +45,7 @@ export default async function handler(
       });
     }
 
-    const rows = await scoresRepo.getSelfVersionScores({
+    const rows = await timelineRepo.getSelfVersionScores({
       userId,
       currentVersion: version,
       targetVersion: compareVersion,

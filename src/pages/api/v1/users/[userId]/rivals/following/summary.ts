@@ -3,7 +3,7 @@ import {
   AuthenticatedNextApiRequest,
   withAuth,
 } from "@/middlewares/api/withAuth";
-import { scoresRepo } from "@/lib/db/aggregates/scoresFacade";
+import { socialComparisonRepo } from "@/lib/db/aggregates/rivalScores/comparison";
 import { logsRepo } from "@/lib/db/domains/logs";
 
 async function handler(
@@ -32,7 +32,7 @@ async function handler(
     const diffArray = normalize(difficulties);
 
     const [summary, viewerBpiRecord] = await Promise.all([
-      scoresRepo.getFollowedWinLossSummary({
+      socialComparisonRepo.getFollowedWinLossSummary({
         viewerId,
         version: version as string,
         levels: levelArray,

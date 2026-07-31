@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { scoresRepo } from "@/lib/db/domains/scores";
+import { timelineRepo } from "@/lib/db/domains/scores";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { selfVersionComparisonQuerySchema } from "@/schemas/scores/query";
 import z from "zod";
@@ -18,7 +18,7 @@ async function handleGetSelfVersion(
 ) {
   const { userId, currentVersion, targetVersion } = query;
 
-  const rows = await scoresRepo.getSelfVersionScores({
+  const rows = await timelineRepo.getSelfVersionScores({
     userId,
     currentVersion,
     targetVersion,

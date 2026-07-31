@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import dayjs from "@/lib/dayjs";
-import { scoresRepo } from "@/lib/db/domains/scores";
+import { scoreDetailRepo } from "@/lib/db/domains/scores";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { mapToFlatSong } from "@/utils/logs/getMapFlatten";
 import { filterSongsServerSide } from "@/utils/songs/filter";
@@ -23,7 +23,7 @@ async function handleGetScores(
       ? dayjs.tz().utc().toDate()
       : dayjs.tz(asOf).utc().toDate();
 
-  const results = await scoresRepo.getScoresWithDetails(userId, version, {
+  const results = await scoreDetailRepo.getScoresWithDetails(userId, version, {
     targetTime: time,
   });
 
