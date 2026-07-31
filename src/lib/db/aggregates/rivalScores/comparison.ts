@@ -169,8 +169,10 @@ class SocialComparisonRepository {
   // follows・users・userStatusLogs・officialArenaStats・userRadarCache・
   // userRoles・songs・songDef・scores(自分/ライバル)を横断JOINした
   // 勝敗サマリー集計のため、直接クエリを維持する。aggregates/内で最も
-  // 重いクエリであり、フォロー数が増えるとcrossJoin(targetSongs)の行数が
-  // 線形に増加する点は将来的なスケール懸念として認識している。
+  // 重いクエリである。以前はfollows×targetSongsのcrossJoinで行数が線形増加
+  // する構造だったが、勝敗集計をrivalsLatest×myLatest(実際にスコアが両者に
+  // 存在する組み合わせのみ)側で先に集約するwl小テーブルへ寄せ、外側の
+  // follows一覧とは1:1のLEFT JOINで結合する形に変更した。
   async getFollowedWinLossSummary(params: {
     viewerId: string;
     version: string;
@@ -190,6 +192,12 @@ class SocialComparisonRepository {
       .$if(difficulties.length > 0, (qb) =>
         qb.where("m.difficulty", "in", difficulties),
       );
+
+    const targetSongCount = await db
+      .selectFrom(targetSongs.as("m"))
+      .select((eb) => eb.fn.countAll().as("count"))
+      .executeTakeFirst();
+    if (!targetSongCount || Number(targetSongCount.count) === 0) return [];
 
     const myLatest = db
       .selectFrom("scores as s")
@@ -234,6 +242,49 @@ class SocialComparisonRepository {
       .where("version", "=", version)
       .groupBy("userId");
 
+    const winLossByRival = db
+      .selectFrom(rivalsLatest.as("r"))
+      .innerJoin(myLatest.as("v"), "v.songId", "r.songId")
+      .innerJoin(targetSongs.as("m"), "m.songId", "r.songId")
+      .select([
+        "r.userId",
+        (eb) =>
+          eb.fn
+            .sum(
+              eb
+                .case()
+                .when(eb("v.exScore", ">", eb.ref("r.exScore")))
+                .then(1)
+                .else(0)
+                .end(),
+            )
+            .as("win"),
+        (eb) =>
+          eb.fn
+            .sum(
+              eb
+                .case()
+                .when(eb("v.exScore", "<", eb.ref("r.exScore")))
+                .then(1)
+                .else(0)
+                .end(),
+            )
+            .as("lose"),
+        (eb) =>
+          eb.fn
+            .sum(
+              eb
+                .case()
+                .when(eb("v.exScore", "=", eb.ref("r.exScore")))
+                .then(1)
+                .else(0)
+                .end(),
+            )
+            .as("draw"),
+        (eb) => eb.fn.countAll().as("totalCount"),
+      ])
+      .groupBy("r.userId");
+
     const results = await db
       .selectFrom("follows as f")
       .innerJoin("users as u", "f.followingId", "u.userId")
@@ -250,13 +301,7 @@ class SocialComparisonRepository {
         join.on("vrc.userId", "=", viewerId).on("vrc.version", "=", version),
       )
       .leftJoin("userRoles as ur", "u.userId", "ur.userId")
-      .crossJoin(targetSongs.as("m"))
-      .leftJoin(myLatest.as("v"), "m.songId", "v.songId")
-      .leftJoin(rivalsLatest.as("r"), (join) =>
-        join
-          .onRef("m.songId", "=", "r.songId")
-          .onRef("f.followingId", "=", "r.userId"),
-      )
+      .leftJoin(winLossByRival.as("wl"), "wl.userId", "u.userId")
       .select([
         "u.userId",
         "u.userName",
@@ -280,100 +325,14 @@ class SocialComparisonRepository {
         "ur.description as ur_description",
         "ur.grantedAt as ur_grantedAt",
         "usl.updatedAt as usl_updatedAt",
+        (eb) => eb.fn.coalesce(eb.ref("wl.win"), eb.lit(0)).as("win"),
+        (eb) => eb.fn.coalesce(eb.ref("wl.lose"), eb.lit(0)).as("lose"),
+        (eb) => eb.fn.coalesce(eb.ref("wl.draw"), eb.lit(0)).as("draw"),
         (eb) =>
-          eb.fn
-            .sum(
-              eb
-                .case()
-                .when(
-                  eb.and([
-                    eb("v.exScore", "is not", null),
-                    eb("r.exScore", "is not", null),
-                    eb("v.exScore", ">", eb.ref("r.exScore")),
-                  ]),
-                )
-                .then(1)
-                .else(0)
-                .end(),
-            )
-            .as("win"),
-        (eb) =>
-          eb.fn
-            .sum(
-              eb
-                .case()
-                .when(
-                  eb.and([
-                    eb("v.exScore", "is not", null),
-                    eb("r.exScore", "is not", null),
-                    eb("v.exScore", "<", eb.ref("r.exScore")),
-                  ]),
-                )
-                .then(1)
-                .else(0)
-                .end(),
-            )
-            .as("lose"),
-        (eb) =>
-          eb.fn
-            .sum(
-              eb
-                .case()
-                .when(
-                  eb.and([
-                    eb("v.exScore", "is not", null),
-                    eb("r.exScore", "is not", null),
-                    eb("v.exScore", "=", eb.ref("r.exScore")),
-                  ]),
-                )
-                .then(1)
-                .else(0)
-                .end(),
-            )
-            .as("draw"),
-        (eb) =>
-          eb.fn
-            .sum(
-              eb
-                .case()
-                .when(
-                  eb.and([
-                    eb("v.exScore", "is not", null),
-                    eb("r.exScore", "is not", null),
-                  ]),
-                )
-                .then(1)
-                .else(0)
-                .end(),
-            )
-            .as("totalCount"),
+          eb.fn.coalesce(eb.ref("wl.totalCount"), eb.lit(0)).as("totalCount"),
       ])
       .where("f.followerId", "=", viewerId)
       .where("u.isPublic", "=", 1)
-      .groupBy([
-        "u.userId",
-        "u.userName",
-        "u.profileImage",
-        "u.iidxId",
-        "oas.arenaClass",
-        "usl.totalBpi",
-        "urc.notes",
-        "urc.chord",
-        "urc.peak",
-        "urc.charge",
-        "urc.scratch",
-        "urc.soflan",
-        "vrc.notes",
-        "vrc.chord",
-        "vrc.peak",
-        "vrc.charge",
-        "vrc.scratch",
-        "vrc.soflan",
-        "ur.role",
-        "ur.description",
-        "ur.grantedAt",
-        "usl.updatedAt",
-      ])
       .orderBy("win", "desc")
       .execute();
 
