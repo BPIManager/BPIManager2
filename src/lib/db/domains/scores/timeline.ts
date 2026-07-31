@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { IIDXVersion } from "@/types/iidx/version";
 import { correlatedLatestLogId } from "@/lib/db/shared/latestScore";
+import { latestSongDefIdSubquery } from "@/lib/db/shared/songDef";
 
 class ScoreTimelineRepository {
   /**
@@ -106,17 +107,7 @@ class ScoreTimelineRepository {
     const rows = await db
       .selectFrom("songs as s")
       .innerJoin(
-        (qb) => {
-          return qb
-            .selectFrom("songDef")
-            .select([
-              "songId as l_defSongId",
-              (eb) => eb.fn.max("defId").as("maxDefId"),
-            ])
-            .where("isCurrent", "=", 1)
-            .groupBy("songId")
-            .as("latest_sd");
-        },
+        () => latestSongDefIdSubquery().as("latest_sd"),
         (join) => join.onRef("latest_sd.l_defSongId", "=", "s.songId"),
       )
       .leftJoin("songDef as sd", "sd.defId", "latest_sd.maxDefId")

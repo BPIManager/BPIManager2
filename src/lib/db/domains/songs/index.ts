@@ -7,6 +7,8 @@ import type { AttrMode } from "@/types/songs/songList";
 import { IIDXVersion } from "@/types/iidx/version";
 import { SongMaster } from "@/types/songs/master";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
+import { currentSongDefSubquery } from "@/lib/db/shared/songDef";
+import { SONG_ATTRIBUTE_SELECT_COLUMNS } from "@/lib/db/shared/songAttributes";
 
 /**
  * 楽曲情報取得を担当するリポジトリクラス。
@@ -46,11 +48,9 @@ class SongsRepository {
     return await db
       .selectFrom("songs as s")
       .leftJoin(
-        (qb) =>
-          qb
-            .selectFrom("songDef")
+        () =>
+          currentSongDefSubquery()
             .select(["songId", "wrScore", "kaidenAvg", "coef"])
-            .where("isCurrent", "=", 1)
             .as("def"),
         (join) => join.onRef("def.songId", "=", "s.songId"),
       )
@@ -89,11 +89,9 @@ class SongsRepository {
     return await db
       .selectFrom("songs as s")
       .leftJoin(
-        (qb) =>
-          qb
-            .selectFrom("songDef")
+        () =>
+          currentSongDefSubquery()
             .select(["songId", "wrScore", "kaidenAvg"])
-            .where("isCurrent", "=", 1)
             .as("def"),
         (join) => join.onRef("def.songId", "=", "s.songId"),
       )
@@ -108,28 +106,7 @@ class SongsRepository {
         "s.textage",
         "def.wrScore",
         "def.kaidenAvg",
-        "a.p_scratch",
-        "a.p_soflan",
-        "a.p_cn",
-        "a.p_chord",
-        "a.p_intensity",
-        "a.p_udeoshi",
-        "a.p_delay",
-        "a.p_scratch_complex",
-        "a.p_tateren",
-        "a.p_trill_denim",
-        "a.p_peak",
-        "a.g_scratch",
-        "a.g_soflan",
-        "a.g_cn",
-        "a.g_chord",
-        "a.g_intensity",
-        "a.g_udeoshi",
-        "a.g_delay",
-        "a.g_scratch_complex",
-        "a.g_tateren",
-        "a.g_trill_denim",
-        "a.g_peak",
+        ...SONG_ATTRIBUTE_SELECT_COLUMNS,
       ])
       .$if(!isInf, (qb) =>
         qb
@@ -216,11 +193,9 @@ class SongsRepository {
     return await db
       .selectFrom("songs as s")
       .leftJoin(
-        (qb) =>
-          qb
-            .selectFrom("songDef")
+        () =>
+          currentSongDefSubquery()
             .select(["songId", "wrScore", "kaidenAvg"])
-            .where("isCurrent", "=", 1)
             .as("def"),
         (join) => join.onRef("def.songId", "=", "s.songId"),
       )
@@ -235,28 +210,7 @@ class SongsRepository {
         "s.textage",
         "def.wrScore",
         "def.kaidenAvg",
-        "a.p_scratch",
-        "a.p_soflan",
-        "a.p_cn",
-        "a.p_chord",
-        "a.p_intensity",
-        "a.p_udeoshi",
-        "a.p_delay",
-        "a.p_scratch_complex",
-        "a.p_tateren",
-        "a.p_trill_denim",
-        "a.p_peak",
-        "a.g_scratch",
-        "a.g_soflan",
-        "a.g_cn",
-        "a.g_chord",
-        "a.g_intensity",
-        "a.g_udeoshi",
-        "a.g_delay",
-        "a.g_scratch_complex",
-        "a.g_tateren",
-        "a.g_trill_denim",
-        "a.g_peak",
+        ...SONG_ATTRIBUTE_SELECT_COLUMNS,
       ])
       .where("s.songId", "=", songId)
       .executeTakeFirst();
@@ -292,28 +246,7 @@ class SongsRepository {
         "s.difficultyLevel",
         "s.notes",
         "s.bpm",
-        "a.p_scratch",
-        "a.p_soflan",
-        "a.p_cn",
-        "a.p_chord",
-        "a.p_intensity",
-        "a.p_udeoshi",
-        "a.p_delay",
-        "a.p_scratch_complex",
-        "a.p_tateren",
-        "a.p_trill_denim",
-        "a.p_peak",
-        "a.g_scratch",
-        "a.g_soflan",
-        "a.g_cn",
-        "a.g_chord",
-        "a.g_intensity",
-        "a.g_udeoshi",
-        "a.g_delay",
-        "a.g_scratch_complex",
-        "a.g_tateren",
-        "a.g_trill_denim",
-        "a.g_peak",
+        ...SONG_ATTRIBUTE_SELECT_COLUMNS,
       ])
       .$if(!isInf, (qb) =>
         qb

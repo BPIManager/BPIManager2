@@ -4,6 +4,7 @@ import {
   latestLogIdPerSongScalarSubquery,
   latestLogIdPerSongSubquery,
 } from "@/lib/db/shared/latestScore";
+import { latestSongDefIdSubquery } from "@/lib/db/shared/songDef";
 
 /**
  * スコア詳細情報（比較・曲定義結合）の参照を担当するリポジトリクラス。
@@ -80,21 +81,7 @@ class LogScoreRepository {
           }),
       )
       .leftJoin(
-        (qb) => {
-          let sub = qb
-            .selectFrom("songDef")
-            .select([
-              "songId as l_defSongId",
-              (eb) => eb.fn.max("defId").as("maxDefId"),
-            ]);
-
-          if (targetTime) {
-            sub = sub.where("updatedAt", "<=", targetTime);
-          } else {
-            sub = sub.where("isCurrent", "=", 1);
-          }
-          return sub.groupBy("songId").as("latest_sd");
-        },
+        () => latestSongDefIdSubquery(targetTime).as("latest_sd"),
         (join) => join.onRef("latest_sd.l_defSongId", "=", "s.songId"),
       )
       .leftJoin("songDef as sd", "sd.defId", "latest_sd.maxDefId")
