@@ -77,6 +77,12 @@ class BpiOptimizer {
   private static readonly FLEXIBLE_BUFFER = 1.15;
   /** 無限ループを防止するための、システム的な絶対最大ステップ数 */
   private static readonly ABSOLUTE_MAX_STEPS = 600;
+  /**
+   * findOptimalPath全体(全リトライ合計)で許容する候補スコアリング回数の上限。
+   * 候補数×ステップ数×リトライ数が無制限だとNode.jsのイベントループを
+   * 長時間ブロックしうるため、同期探索の総演算量に安全弁を設ける。
+   */
+  private static readonly MAX_TOTAL_SCORING_OPS = 2_000_000;
 
   /** 未プレイ（または実質未プレイ）とみなすBPIの閾値（-15以下） */
   private static readonly UNPLAYED_BPI_THRESHOLD = -15;
@@ -155,6 +161,8 @@ class BpiOptimizer {
   private readonly math: BpiMath;
   /** 乱数生成器 */
   private readonly rng: () => number;
+  /** findOptimalPathの全リトライを通じて共有される、残り演算予算 */
+  private opsBudgetRemaining = BpiOptimizer.MAX_TOTAL_SCORING_OPS;
 
   /**
    * @param sourceData - 最適化の候補となる楽曲データの配列
@@ -663,7 +671,8 @@ class BpiOptimizer {
       state.currentTotalBpi <
         state.effectiveTarget - BpiOptimizer.EXEC_BPI_MARGIN &&
       state.steps.length < this.maxSteps &&
-      state.steps.length < BpiOptimizer.ABSOLUTE_MAX_STEPS
+      state.steps.length < BpiOptimizer.ABSOLUTE_MAX_STEPS &&
+      this.opsBudgetRemaining > 0
     );
   }
 
@@ -678,6 +687,9 @@ class BpiOptimizer {
       (c) => !state.usedIds.has(c.songId),
     );
     if (remainingPool.length === 0) return false;
+
+    this.opsBudgetRemaining -= remainingPool.length;
+    if (this.opsBudgetRemaining <= 0) return false;
 
     const remainingSteps = Math.max(1, this.maxSteps - state.steps.length);
     const remainingSumGap = state.totalTargetSum - state.currentAccumulatedSum;
