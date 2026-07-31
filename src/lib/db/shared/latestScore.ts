@@ -17,6 +17,36 @@ import { sql } from "kysely";
 export type LatestScoreTable = "scores" | "allScores";
 
 /**
+ * 「フォロー中ユーザー群」または「明示的な userId 配列」による `userId IN (...)` 絞り込みを
+ * 適用する。{@link latestLogIdPerUserSongSubquery}/{@link latestLogIdPerUserSongScalarSubquery}
+ * で同一の分岐がそれぞれ個別実装されていたため共通化した。
+ *
+ * @param qb - 絞り込みを適用するクエリビルダー（`userId` カラムを持つテーブルが対象）
+ * @param params.userIds - 対象ユーザー ID の明示的な配列（`followersOf` と排他）
+ * @param params.followersOf - このユーザーがフォローしているユーザー群を対象にする場合の viewerId
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function applyUserIdsOrFollowersFilter<QB extends { where: (...args: any[]) => QB }>(
+  qb: QB,
+  params: { userIds?: string[]; followersOf?: string },
+): QB {
+  const { userIds, followersOf } = params;
+
+  if (followersOf) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return qb.where("userId", "in", (sub: any) =>
+      sub
+        .selectFrom("follows")
+        .select("followingId")
+        .where("followerId", "=", followersOf),
+    );
+  } else if (userIds && userIds.length > 0) {
+    return qb.where("userId", "in", userIds);
+  }
+  return qb;
+}
+
+/**
  * 指定した1ユーザー×バージョンの「曲ごとの最新 logId」を集計するサブクエリを組み立てる。
  *
  * 返り値は `songId, maxLogId` の2列を持つ。`logId` はテーブル内で一意なため、
@@ -86,16 +116,7 @@ export function latestLogIdPerUserSongSubquery(params: {
     .select(["userId", "songId", (eb) => eb.fn.max("logId").as("maxLogId")])
     .where("version", "=", version);
 
-  if (followersOf) {
-    qb = qb.where("userId", "in", (sub) =>
-      sub
-        .selectFrom("follows")
-        .select("followingId")
-        .where("followerId", "=", followersOf),
-    );
-  } else if (userIds && userIds.length > 0) {
-    qb = qb.where("userId", "in", userIds);
-  }
+  qb = applyUserIdsOrFollowersFilter(qb, { userIds, followersOf });
 
   if (songIds && songIds.length > 0) {
     qb = qb.where("songId", "in", songIds);
@@ -174,16 +195,7 @@ export function latestLogIdPerUserSongScalarSubquery(params: {
     .select((eb) => eb.fn.max("logId").as("logId"))
     .where("version", "=", version);
 
-  if (followersOf) {
-    qb = qb.where("userId", "in", (sub) =>
-      sub
-        .selectFrom("follows")
-        .select("followingId")
-        .where("followerId", "=", followersOf),
-    );
-  } else if (userIds && userIds.length > 0) {
-    qb = qb.where("userId", "in", userIds);
-  }
+  qb = applyUserIdsOrFollowersFilter(qb, { userIds, followersOf });
 
   if (songIds && songIds.length > 0) {
     qb = qb.where("songId", "in", songIds);
