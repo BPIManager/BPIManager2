@@ -61,6 +61,44 @@ class FollowRepository {
   }
 
   /**
+   * 指定ユーザーのフォロワー数を取得するスカラーサブクエリを組み立てる。
+   *
+   * @param userId - ユーザー ID
+   */
+  followerCountSubquery(userId: string) {
+    return db
+      .selectFrom("follows")
+      .select((eb) => eb.fn.count<number>("id").as("count"))
+      .where("followingId", "=", userId);
+  }
+
+  /**
+   * 指定ユーザーのフォロー中数を取得するスカラーサブクエリを組み立てる。
+   *
+   * @param userId - ユーザー ID
+   */
+  followingCountSubquery(userId: string) {
+    return db
+      .selectFrom("follows")
+      .select((eb) => eb.fn.count<number>("id").as("count"))
+      .where("followerId", "=", userId);
+  }
+
+  /**
+   * `followerId` が `followingId` をフォローしているかを表すスカラーサブクエリを組み立てる。
+   *
+   * @param followerId - フォローする側のユーザー ID
+   * @param followingId - フォローされる側のユーザー ID
+   */
+  isFollowingSubquery(followerId: string, followingId: string) {
+    return db
+      .selectFrom("follows")
+      .select((eb) => eb.fn.count<number>("id").as("count"))
+      .where("followerId", "=", followerId)
+      .where("followingId", "=", followingId);
+  }
+
+  /**
    * 指定ユーザーのフォロワー数とフォロー中数を取得する。
    *
    * @param userId - ユーザー ID

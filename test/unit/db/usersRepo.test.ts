@@ -19,10 +19,15 @@ const getLatestArenaStatsPerVersionMock = vi.hoisted(() => vi.fn());
 const getBestArenaClassPerVersionMock = vi.hoisted(() => vi.fn());
 const getStatsPrivacyMock = vi.hoisted(() => vi.fn());
 
-vi.mock("@/lib/db/officialArenaStats", () => ({
-  getLatestArenaStatsPerVersion: getLatestArenaStatsPerVersionMock,
-  getBestArenaClassPerVersion: getBestArenaClassPerVersionMock,
-}));
+vi.mock("@/lib/db/officialArenaStats", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import("@/lib/db/officialArenaStats")>();
+  return {
+    ...actual,
+    getLatestArenaStatsPerVersion: getLatestArenaStatsPerVersionMock,
+    getBestArenaClassPerVersion: getBestArenaClassPerVersionMock,
+  };
+});
 vi.mock("@/lib/db/statsPrivacy", () => ({
   getStatsPrivacy: getStatsPrivacyMock,
 }));

@@ -1,3 +1,4 @@
+import { db } from "@/lib/db";
 import { Database, NewUserStatusLog } from "@/types/db";
 import { Transaction } from "kysely";
 
@@ -48,6 +49,57 @@ class UserStatusLogsRepository {
       .orderBy("id", "desc")
       .limit(1)
       .executeTakeFirst();
+  }
+
+  /**
+   * 指定バージョンにおける各ユーザーの最新 `userStatusLogs` 行の ID を取得するサブクエリを組み立てる。
+   *
+   * @param version - バージョン番号
+   */
+  latestPerUserSubquery(version: string) {
+    return db
+      .selectFrom("userStatusLogs")
+      .select((eb) => ["userId", eb.fn.max("id").as("maxId")])
+      .where("version", "=", version)
+      .groupBy("userId");
+  }
+
+  /**
+   * 指定ユーザーの全バージョンのBPI履歴（バージョンごとの最新1件）を取得する。
+   *
+   * @param userId - ユーザー ID
+   */
+  async getBpiHistoryByVersion(userId: string) {
+    return await db
+      .selectFrom("userStatusLogs as usl")
+      .innerJoin(
+        (eb) =>
+          eb
+            .selectFrom("userStatusLogs")
+            .select(["version", (sub) => sub.fn.max("id").as("maxId")])
+            .where("userId", "=", userId)
+            .groupBy("version")
+            .as("latest"),
+        (join) => join.onRef("usl.id", "=", "latest.maxId"),
+      )
+      .select(["usl.version", "usl.totalBpi"])
+      .execute();
+  }
+
+  /**
+   * 指定ユーザー・バージョンの最新1件をJOIN用サブクエリとして組み立てる。
+   *
+   * @param userId - ユーザー ID
+   * @param version - バージョン番号
+   */
+  latestRowSubquery(userId: string, version: string) {
+    return db
+      .selectFrom("userStatusLogs")
+      .select(["userId", "totalBpi", "arenaRank", "id"])
+      .where("userId", "=", userId)
+      .where("version", "=", version)
+      .orderBy("id", "desc")
+      .limit(1);
   }
 
   /**

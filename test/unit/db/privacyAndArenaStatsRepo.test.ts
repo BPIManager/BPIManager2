@@ -19,7 +19,23 @@ const {
   upsertOfficialArenaStats,
   getLatestArenaStatsPerVersion,
   getArenaStatsHistory,
+  latestPerUserSubquery,
 } = await import("@/lib/db/officialArenaStats");
+
+describe("officialArenaStats.latestPerUserSubquery", () => {
+  it("versionで絞り込みuserIdごとにグループ化するクエリを組み立てること", () => {
+    dbHolder.current = createDbSpy(undefined);
+    latestPerUserSubquery("33");
+    expect(callsFor(dbHolder.current.calls, "where")[0].args).toEqual([
+      "version",
+      "=",
+      "33",
+    ]);
+    expect(callsFor(dbHolder.current.calls, "groupBy")[0].args).toEqual([
+      "userId",
+    ]);
+  });
+});
 
 describe("statsPrivacy.getStatsPrivacy", () => {
   it("レコードが存在する場合はその値を返すこと", async () => {

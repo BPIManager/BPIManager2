@@ -3,36 +3,16 @@ import { sql } from "kysely";
 import {
   getLatestArenaStatsPerVersion,
   getBestArenaClassPerVersion,
+  latestPerUserSubquery as latestArenaPerUserSubquery,
 } from "@/lib/db/officialArenaStats";
 import { getStatsPrivacy } from "@/lib/db/statsPrivacy";
 import { userStatusLogsRepo } from "@/lib/db/userStatusLogs";
+import { followsRepo } from "@/lib/db/follow";
 
 /**
  * ユーザープロフィールの参照・作成・更新を担当するリポジトリクラス。
  */
 class UsersRepository {
-  /**
-   * 指定バージョンにおける各ユーザーの最新 `userStatusLogs` 行の ID を取得するサブクエリ。
-   */
-  private latestStatusSubquery(version: string) {
-    return db
-      .selectFrom("userStatusLogs")
-      .select((eb) => ["userId", eb.fn.max("id").as("maxId")])
-      .where("version", "=", version)
-      .groupBy("userId");
-  }
-
-  /**
-   * 指定バージョンにおける各ユーザーの最新 `officialArenaStats` 行の ID を取得するサブクエリ。
-   */
-  private latestArenaSubquery(version: string) {
-    return db
-      .selectFrom("officialArenaStats")
-      .select((eb) => ["userId", eb.fn.max("id").as("maxId")])
-      .where("version", "=", version)
-      .groupBy("userId");
-  }
-
   /**
    * 指定ユーザー名が既に使用されているか確認する。
    *
@@ -98,8 +78,8 @@ class UsersRepository {
     const sortColumn =
       sort && columnMap[sort] ? columnMap[sort] : "usl.totalBpi";
 
-    const latestStatusSubquery = this.latestStatusSubquery(version);
-    const latestArenaSubquery = this.latestArenaSubquery(version);
+    const latestStatusSubquery = userStatusLogsRepo.latestPerUserSubquery(version);
+    const latestArenaSubquery = latestArenaPerUserSubquery(version);
 
     let query = db
       .selectFrom("users as u")
@@ -189,8 +169,8 @@ class UsersRepository {
   }) {
     const { query, arenaClass, version, limit } = params;
 
-    const latestStatusSubquery = this.latestStatusSubquery(version);
-    const latestArenaSubquery = this.latestArenaSubquery(version);
+    const latestStatusSubquery = userStatusLogsRepo.latestPerUserSubquery(version);
+    const latestArenaSubquery = latestArenaPerUserSubquery(version);
 
     let dbQuery = db
       .selectFrom("users as u")
@@ -227,7 +207,7 @@ class UsersRepository {
   }
 
   async getSupporters(version: string) {
-    const latestStatusSubquery = this.latestStatusSubquery(version);
+    const latestStatusSubquery = userStatusLogsRepo.latestPerUserSubquery(version);
 
     return await db
       .selectFrom("users as u")
@@ -286,8 +266,8 @@ class UsersRepository {
     const hasArenaClassFilter = Boolean(filterArenaClass);
     const hasFilter = hasAreaFilter || hasArenaClassFilter;
 
-    const latestStatusSubquery = this.latestStatusSubquery(version);
-    const latestArenaSubquery = this.latestArenaSubquery(version);
+    const latestStatusSubquery = userStatusLogsRepo.latestPerUserSubquery(version);
+    const latestArenaSubquery = latestArenaPerUserSubquery(version);
 
     if (isRadarCategory) {
       return await db
@@ -375,26 +355,6 @@ class UsersRepository {
       .execute();
   }
 
-  private async getRelationship(myId: string, targetId: string) {
-    const follow = await db
-      .selectFrom("follows")
-      .select("id")
-      .where("followerId", "=", myId)
-      .where("followingId", "=", targetId)
-      .executeTakeFirst();
-    const followedBy = await db
-      .selectFrom("follows")
-      .select("id")
-      .where("followerId", "=", targetId)
-      .where("followingId", "=", myId)
-      .executeTakeFirst();
-    return {
-      isFollowing: !!follow,
-      isFollowedBy: !!followedBy,
-      isMutual: !!follow && !!followedBy,
-    };
-  }
-
   /**
    * ユーザープロフィールの全情報を取得する。
    *
@@ -419,32 +379,14 @@ class UsersRepository {
         "ur.role",
         "ur.description",
         "ur.grantedAt",
-        (eb) =>
-          eb
-            .selectFrom("follows")
-            .select(eb.fn.countAll<number>().as("count"))
-            .where("followingId", "=", userId)
-            .as("followerCount"),
-        (eb) =>
-          eb
-            .selectFrom("follows")
-            .select(eb.fn.countAll<number>().as("count"))
-            .where("followerId", "=", userId)
-            .as("followingCount"),
-        (eb) =>
-          eb
-            .selectFrom("follows")
-            .select(eb.fn.countAll<number>().as("count"))
-            .where("followerId", "=", myId ?? "GUEST")
-            .where("followingId", "=", userId)
-            .as("isFollowing"),
-        (eb) =>
-          eb
-            .selectFrom("follows")
-            .select(eb.fn.countAll<number>().as("count"))
-            .where("followerId", "=", userId)
-            .where("followingId", "=", myId ?? "GUEST")
-            .as("isFollowedBy"),
+        followsRepo.followerCountSubquery(userId).as("followerCount"),
+        followsRepo.followingCountSubquery(userId).as("followingCount"),
+        followsRepo
+          .isFollowingSubquery(myId ?? "GUEST", userId)
+          .as("isFollowing"),
+        followsRepo
+          .isFollowingSubquery(userId, myId ?? "GUEST")
+          .as("isFollowedBy"),
       ])
       .where("u.userId", "=", userId)
       .executeTakeFirst();
@@ -455,20 +397,7 @@ class UsersRepository {
 
     const [bpiHistory, rawArenaStats, bestArenaStats, privacy] =
       await Promise.all([
-        db
-          .selectFrom("userStatusLogs as usl")
-          .innerJoin(
-            (eb) =>
-              eb
-                .selectFrom("userStatusLogs")
-                .select(["version", (sub) => sub.fn.max("id").as("maxId")])
-                .where("userId", "=", userId)
-                .groupBy("version")
-                .as("latest"),
-            (join) => join.onRef("usl.id", "=", "latest.maxId"),
-          )
-          .select(["usl.version", "usl.totalBpi"])
-          .execute(),
+        userStatusLogsRepo.getBpiHistoryByVersion(userId),
         getLatestArenaStatsPerVersion(userId),
         getBestArenaClassPerVersion(userId),
         getStatsPrivacy(userId),
@@ -641,15 +570,7 @@ class UsersRepository {
     const user = await db
       .selectFrom("users as u")
       .leftJoin(
-        (qb) =>
-          qb
-            .selectFrom("userStatusLogs")
-            .select(["userId", "totalBpi", "arenaRank", "id"])
-            .where("userId", "=", userId)
-            .where("version", "=", version)
-            .orderBy("id", "desc")
-            .limit(1)
-            .as("latest"),
+        userStatusLogsRepo.latestRowSubquery(userId, version).as("latest"),
         (join) => join.onRef("u.userId", "=", "latest.userId"),
       )
       .leftJoin("userRoles as ur", "ur.userId", "u.userId")
@@ -668,18 +589,8 @@ class UsersRepository {
         "ur.role",
         "ur.description",
         "ur.grantedAt",
-        (eb) =>
-          eb
-            .selectFrom("follows")
-            .select(eb.fn.count("id").as("count"))
-            .where("followerId", "=", userId)
-            .as("followingCount"),
-        (eb) =>
-          eb
-            .selectFrom("follows")
-            .select(eb.fn.count("id").as("count"))
-            .where("followingId", "=", userId)
-            .as("followerCount"),
+        followsRepo.followingCountSubquery(userId).as("followingCount"),
+        followsRepo.followerCountSubquery(userId).as("followerCount"),
       ])
       .where("u.userId", "=", userId)
       .executeTakeFirst();

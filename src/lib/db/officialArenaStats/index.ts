@@ -2,6 +2,17 @@
 import type { NewOfficialArenaStat } from "@/types/db";
 import { ARENA_RANK_ORDER } from "@/constants/iidx/arenaRanks";
 
+/**
+ * 指定バージョンにおける各ユーザーの最新 `officialArenaStats` 行の ID を取得するサブクエリを組み立てる。
+ */
+export function latestPerUserSubquery(version: string) {
+  return db
+    .selectFrom("officialArenaStats")
+    .select((eb) => ["userId", eb.fn.max("id").as("maxId")])
+    .where("version", "=", version)
+    .groupBy("userId");
+}
+
 export async function getLatestArenaStatsPerVersion(userId: string) {
   return await db
     .selectFrom("officialArenaStats as oas")

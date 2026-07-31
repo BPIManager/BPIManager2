@@ -31,6 +31,39 @@ describe("followsRepo.isFollowing", () => {
   });
 });
 
+describe("followsRepo.followerCountSubquery / followingCountSubquery / isFollowingSubquery", () => {
+  it("followerCountSubqueryはfollowingIdで絞り込むクエリを組み立てること", () => {
+    const spy = createDbSpy(undefined);
+    dbHolder.current = spy;
+    followsRepo.followerCountSubquery("user-1");
+    expect(callsFor(spy.calls, "where")[0].args).toEqual([
+      "followingId",
+      "=",
+      "user-1",
+    ]);
+  });
+
+  it("followingCountSubqueryはfollowerIdで絞り込むクエリを組み立てること", () => {
+    const spy = createDbSpy(undefined);
+    dbHolder.current = spy;
+    followsRepo.followingCountSubquery("user-1");
+    expect(callsFor(spy.calls, "where")[0].args).toEqual([
+      "followerId",
+      "=",
+      "user-1",
+    ]);
+  });
+
+  it("isFollowingSubqueryはfollowerId/followingId両方で絞り込むクエリを組み立てること", () => {
+    const spy = createDbSpy(undefined);
+    dbHolder.current = spy;
+    followsRepo.isFollowingSubquery("user-1", "user-2");
+    const whereCalls = callsFor(spy.calls, "where");
+    expect(whereCalls[0].args).toEqual(["followerId", "=", "user-1"]);
+    expect(whereCalls[1].args).toEqual(["followingId", "=", "user-2"]);
+  });
+});
+
 describe("followsRepo.toggleFollow", () => {
   it("既にフォロー済みなら削除してfalseを返すこと", async () => {
     const spy = createTransactionalDbSpy({ id: 5 });
