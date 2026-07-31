@@ -6,7 +6,7 @@ import {
   latestLogIdPerSongSubquery,
   latestLogIdPerUserSongSubquery,
 } from "@/lib/db/shared/latestScore";
-import { getSongRankingFromTable } from "@/lib/db/shared/songRanking";
+import { getSongRankingFromTable } from "@/lib/db/aggregates/songRanking";
 import { logsRepo } from "@/lib/db/domains/logs";
 import { songsRepo } from "@/lib/db/domains/songs";
 
