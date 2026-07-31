@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNeighborRecommendedInfinite } from "@/hooks/stats/useNeighborRecommended";
 import { NeighborRecommendedItem } from "@/types/stats/neighborRecommended";
-import { SimpleRankItem } from "./Common/SimpleRankItem";
+import { SimpleRankItem } from "./simpleRankItem";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { SongWithScore } from "@/types/songs/score";
 import { SongDetailView } from "@/components/partials/modal/SongDetail/ui";

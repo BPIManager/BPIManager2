@@ -3,7 +3,9 @@
 import { useBpiOptimizer } from "@/hooks/analytics/useBpiOptimizer";
 import { useBpiOptimizerMemos } from "@/hooks/analytics/useOptimizeMemo";
 import { useRadar } from "@/hooks/stats/useRadar";
-import { OptimizerForm, OptimizationStepList, SavedMemoList } from "./ui";
+import { OptimizerForm } from "./ui/OptimizerForm";
+import { OptimizationStepList } from "./ui/OptimizationStepList";
+import { SavedMemoList } from "./ui/SavedMemoList";
 import { BpiOptimizerSkeleton } from "./skeleton";
 import { useUser } from "@/contexts/users/UserContext";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
