@@ -2,19 +2,13 @@ import { db } from "@/lib/db";
 import { sql } from "kysely";
 import type { TicketSongResult } from "@/types/tickets";
 import type { VoteType } from "@/types/db";
+import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
 
 const PAGE_SIZE = 10;
 
 class TicketsRepository {
   async getLatestTotalBpi(userId: string, version: string): Promise<number | null> {
-    const row = await db
-      .selectFrom("userStatusLogs")
-      .select("totalBpi")
-      .where("userId", "=", userId)
-      .where("version", "=", version)
-      .orderBy("id", "desc")
-      .limit(1)
-      .executeTakeFirst();
+    const row = await userStatusLogsRepo.getLatestTotalBpi(db, userId, version);
     return row ? Number(row.totalBpi) : null;
   }
 

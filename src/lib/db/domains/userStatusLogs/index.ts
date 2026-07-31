@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { Database, NewUserStatusLog } from "@/types/db";
-import { Transaction } from "kysely";
+import { Kysely, Transaction } from "kysely";
 
 /**
  * `userStatusLogs` テーブル（バージョン別の総合BPI・アリーナランク履歴）の
@@ -32,12 +32,13 @@ class UserStatusLogsRepository {
   /**
    * 指定ユーザー・バージョンの最新行から `totalBpi` を取得する。
    *
-   * @param trx - 呼び出し元が管理するトランザクション
+   * @param trx - 呼び出し元が管理するトランザクション（トランザクション外から
+   *   呼ぶ場合は `db` をそのまま渡す）
    * @param userId - ユーザー ID
    * @param version - バージョン番号
    */
   async getLatestTotalBpi(
-    trx: Transaction<Database>,
+    trx: Kysely<Database> | Transaction<Database>,
     userId: string,
     version: string,
   ) {
