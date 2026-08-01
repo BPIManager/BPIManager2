@@ -1,7 +1,5 @@
 ﻿import { useState, useEffect } from "react";
 import { useUser } from "@/contexts/users/UserContext";
-import { auth } from "@/lib/firebase";
-import { onAuthStateChanged } from "firebase/auth";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import { toast } from "sonner";
 
@@ -14,7 +12,7 @@ import { toast } from "sonner";
  */
 export const useEditProfile = (onClose?: () => void) => {
   const { user, fbUser, refresh } = useUser();
-  const [fbUid, setFbUid] = useState<string | null>(null);
+  const fbUid = fbUser?.uid ?? null;
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -69,22 +67,16 @@ export const useEditProfile = (onClose?: () => void) => {
   }, [fbUid, fbUser]);
 
   useEffect(() => {
-    return onAuthStateChanged(auth, (u) => {
-      if (u) {
-        setFbUid(u.uid);
-        if (!user) {
-          setFormData((prev) => ({
-            ...prev,
-            userName: prev.userName || u.displayName || "",
-            profileImage:
-              prev.profileImage ||
-              u.photoURL?.replace("_normal", "") ||
-              `https://api.dicebear.com/9.x/identicon/svg?seed=${u.uid}`,
-          }));
-        }
-      }
-    });
-  }, [user]);
+    if (!fbUser || user) return;
+    setFormData((prev) => ({
+      ...prev,
+      userName: prev.userName || fbUser.displayName || "",
+      profileImage:
+        prev.profileImage ||
+        fbUser.photoURL?.replace("_normal", "") ||
+        `https://api.dicebear.com/9.x/identicon/svg?seed=${fbUser.uid}`,
+    }));
+  }, [fbUser, user]);
 
   useEffect(() => {
     if (!formData.userName) {
