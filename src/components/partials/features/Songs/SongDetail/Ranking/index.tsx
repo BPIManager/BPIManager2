@@ -26,6 +26,7 @@ export function RankingTab({ songId }: RankingTabProps) {
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const listRef = useRef<ListImperativeAPI>(null);
+  const hasScrolled = useRef(false);
 
   const { fbUser } = useUser();
   const { radar: viewerRadar } = useRadar(fbUser?.uid, [], [], version);
@@ -47,14 +48,19 @@ export function RankingTab({ songId }: RankingTabProps) {
   }
 
   useEffect(() => {
-    if (!data || !listRef.current) return;
+    hasScrolled.current = false;
+  }, [songId, version]);
+
+  useEffect(() => {
+    if (!data || !listRef.current || hasScrolled.current) return;
     const selfIndex = data.rankings.findIndex((r) => r.isSelf);
     if (selfIndex < 0) return;
+    hasScrolled.current = true;
     const timer = setTimeout(() => {
       listRef.current?.scrollToRow({ align: "center", index: selfIndex });
     }, 50);
     return () => clearTimeout(timer);
-  }, [data]);
+  }, [data, songId, version]);
 
   return (
     <div className="flex flex-col gap-3 mt-2">

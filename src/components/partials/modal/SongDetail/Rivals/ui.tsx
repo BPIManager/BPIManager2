@@ -206,16 +206,22 @@ export const GlobalRankingBody = ({
   const isLoading = isAllScores ? allLoading : mainLoading;
   const isError = isAllScores ? allError : mainError;
   const listRef = useRef<ListImperativeAPI>(null);
+  const hasScrolled = useRef(false);
 
   useEffect(() => {
-    if (!data || !listRef.current) return;
+    hasScrolled.current = false;
+  }, [songId, version, isAllScores]);
+
+  useEffect(() => {
+    if (!data || !listRef.current || hasScrolled.current) return;
     const selfIndex = data.rankings.findIndex((r) => r.isSelf);
     if (selfIndex < 0) return;
+    hasScrolled.current = true;
     const timer = setTimeout(() => {
       listRef.current?.scrollToRow({ align: "center", index: selfIndex });
     }, 50);
     return () => clearTimeout(timer);
-  }, [data]);
+  }, [data, songId, version, isAllScores]);
 
   if (isLoading) {
     return <SectionLoader className="py-8" color="text-bpim-info" />;
