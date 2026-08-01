@@ -247,7 +247,13 @@ export const GlobalRankingContainer = () => {
         {isTowerCategory ? (
           <TowerRanking version={version} />
         ) : isSongsCategory ? (
-          <SongRankingList version={version} />
+          <>
+            <div className="mb-3 flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-400">
+              <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+              <span>{t("ranking.songs.delayNotice")}</span>
+            </div>
+            <SongRankingList version={version} />
+          </>
         ) : (
           <>
             {isRadarCategory && isLatestVersion && (

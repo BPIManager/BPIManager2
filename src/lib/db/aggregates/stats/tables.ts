@@ -224,96 +224,48 @@ class StatsTablesRepository {
     return new Set(rows.map((r) => `${r.title}___${r.difficulty}`));
   }
 
-  // allScores・allSongsを横断JOINした全楽曲ランキング集計のため、直接クエリを維持する。
+  // 曲ごとの全ユーザー順位・総プレイヤー数は songRankingCache（cronで事前算出）から取得し、
+  // ユーザー自身の最新スコアのみその場でJOINする。allSongsとの横断JOINのため直接クエリを維持する。
   async getUserSongRankings(userId: string, version: string) {
     const rows = await db
-      .with("user_latest", (db) =>
-        db
-          .selectFrom("allScores as s")
-          .innerJoin(
-            (qb) =>
-              qb
-                .selectFrom("allScores")
-                .select(["songId", (eb) => eb.fn.max("logId").as("maxLogId")])
-                .where("userId", "=", userId)
-                .where("version", "=", version)
-                .groupBy("songId")
-                .as("m"),
-            (join) => join.onRef("m.maxLogId", "=", "s.logId"),
-          )
-          .where("s.userId", "=", userId)
-          .select([
-            "s.songId",
-            "s.logId",
-            "s.exScore",
-            "s.bpi",
-            "s.clearState",
-            "s.missCount",
-            "s.lastPlayed",
-          ]),
+      .selectFrom("allScores as s")
+      .innerJoin(
+        (qb) =>
+          qb
+            .selectFrom("allScores")
+            .select(["songId", (eb) => eb.fn.max("logId").as("maxLogId")])
+            .where("userId", "=", userId)
+            .where("version", "=", version)
+            .groupBy("songId")
+            .as("m"),
+        (join) => join.onRef("m.maxLogId", "=", "s.logId"),
       )
-      .with("per_song_latest", (db) =>
-        db
-          .selectFrom("allScores as s")
-          .innerJoin(
-            (qb) =>
-              qb
-                .selectFrom("allScores")
-                .select([
-                  "userId",
-                  "songId",
-                  (eb) => eb.fn.max("logId").as("maxLogId"),
-                ])
-                .where("version", "=", version)
-                .groupBy(["userId", "songId"])
-                .as("m"),
-            (join) =>
-              join
-                .onRef("m.maxLogId", "=", "s.logId")
-                .onRef("m.userId", "=", "s.userId")
-                .onRef("m.songId", "=", "s.songId"),
-          )
-          .select((eb) => [
-            "s.userId",
-            "s.songId",
-            "s.exScore",
-            eb.fn
-              .agg<number>("rank", [])
-              .over((ob) =>
-                ob.partitionBy("s.songId").orderBy("s.exScore", "desc"),
-              )
-              .as("rnk"),
-            eb.fn
-              .countAll<number>()
-              .over((ob) => ob.partitionBy("s.songId"))
-              .as("totalPlayers"),
-          ]),
-      )
-      .selectFrom("user_latest as ul")
-      .innerJoin("per_song_latest as psl", (join) =>
+      .innerJoin("songRankingCache as src", (join) =>
         join
-          .onRef("psl.songId", "=", "ul.songId")
-          .on("psl.userId", "=", userId),
+          .onRef("src.songId", "=", "s.songId")
+          .on("src.userId", "=", userId)
+          .on("src.version", "=", version),
       )
-      .innerJoin("allSongs as sg", "sg.songId", "ul.songId")
-      .select((eb) => [
-        "ul.songId",
+      .innerJoin("allSongs as sg", "sg.songId", "s.songId")
+      .where("s.userId", "=", userId)
+      .select([
+        "s.songId",
         "sg.title",
         "sg.notes",
         "sg.bpm",
         "sg.difficulty",
         "sg.difficultyLevel",
         "sg.releasedVersion",
-        "ul.logId",
-        "ul.exScore",
-        "ul.bpi",
-        "ul.clearState",
-        "ul.missCount",
-        "ul.lastPlayed",
-        eb.ref("psl.rnk").as("rank"),
-        "psl.totalPlayers",
+        "s.logId",
+        "s.exScore",
+        "s.bpi",
+        "s.clearState",
+        "s.missCount",
+        "s.lastPlayed",
+        "src.rank",
+        "src.totalPlayers",
       ])
-      .orderBy("psl.rnk", "asc")
+      .orderBy("src.rank", "asc")
       .execute();
 
     return rows.map((r) => ({

@@ -316,6 +316,18 @@ CREATE TABLE IF NOT EXISTS `songs` (
   KEY `idx_level_difficulty` (`difficultyLevel`,`difficulty`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1301 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `songRankingCache` (
+  `userId` varchar(128) NOT NULL,
+  `version` varchar(20) NOT NULL,
+  `songId` int(11) NOT NULL,
+  `rank` int(11) NOT NULL,
+  `totalPlayers` int(11) NOT NULL,
+  `updatedAt` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`userId`,`version`,`songId`),
+  CONSTRAINT `fk_src_userId` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE,
+  CONSTRAINT `fk_src_songId` FOREIGN KEY (`songId`) REFERENCES `allSongs` (`songId`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `userRadarCache` (
   `userId` varchar(128) NOT NULL,
   `version` varchar(20) NOT NULL,

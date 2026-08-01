@@ -17,6 +17,7 @@ export interface Database {
   apiKeys: ApiKeys;
   follows: Follows;
   userRadarCache: UserRadarCache;
+  songRankingCache: SongRankingCache;
   notifications: Notifications;
   userRoles: UserRoles;
   allSongs: AllSongsTable;
@@ -180,6 +181,15 @@ export interface UserRadarCache {
   updatedAt: Generated<Date | null>;
   userId: string;
   version: string;
+}
+
+export interface SongRankingCache {
+  userId: string;
+  version: string;
+  songId: number;
+  rank: number;
+  totalPlayers: number;
+  updatedAt: Generated<Date | null>;
 }
 
 export type UserRole = "coffee" | "saba" | "iidx" | "developer" | "pro";
