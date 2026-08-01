@@ -71,6 +71,7 @@ GitHubのopen issueを順序立てて解消する。1issue = 1ブランチ = 1�
    - `pnpm test:unit`（全件パス）
    - 大きめの変更やビルド設定が絡む場合は `pnpm exec next build` も通す
    - UIの見た目が変わる変更は、可能なら実際に動作確認する
+   - issue本文に受け入れ基準がある場合はそれも確認する（`.claude/rules/issue-driven-development.md`参照）
 5. **コミット**: 細粒度に。1つの論理的変更 = 1コミット。大きい issue は複数コミットに分けてよいが、コミットメッセージには必ず issue 番号を含める
    - 作業中は `Refs #<番号>`
    - そのissueを完全に解消するコミットには `Closes #<番号>`（GitHub上でマージ時に自動クローズされる）
