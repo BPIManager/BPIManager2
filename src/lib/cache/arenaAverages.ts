@@ -1,5 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
+import { todayJst } from "@/lib/dayjs";
 
 export type ArenaAverageEntry = {
   avgExScore: number;
@@ -20,12 +21,6 @@ type CacheEntry = {
 };
 
 const cache = new Map<string, CacheEntry>();
-
-function todayJst(): string {
-  return new Date(Date.now() + 9 * 60 * 60 * 1000)
-    .toISOString()
-    .slice(0, 10);
-}
 
 /**
  * バージョン + レベルのアリーナ平均データを返す。

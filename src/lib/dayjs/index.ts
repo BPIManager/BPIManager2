@@ -20,3 +20,6 @@ dayjs.extend(timezone);
 dayjs.tz.setDefault("Asia/Tokyo");
 
 export default dayjs;
+
+/** JST基準の今日の日付を YYYY-MM-DD 形式で返す */
+export const todayJst = (): string => dayjs().tz().format("YYYY-MM-DD");

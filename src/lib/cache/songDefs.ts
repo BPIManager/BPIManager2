@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
+import { todayJst } from "@/lib/dayjs";
 
 export type CachedSongWithDef = {
   songId: number;
@@ -19,10 +20,6 @@ type CacheEntry = {
 
 let cache: CacheEntry | null = null;
 let loadingPromise: Promise<CacheEntry> | null = null;
-
-function todayJst(): string {
-  return new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().slice(0, 10);
-}
 
 async function loadCache(): Promise<Map<string, CachedSongWithDef>> {
   const rows = await db
