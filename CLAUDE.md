@@ -2,13 +2,11 @@
 
 ## プロジェクト概要
 
-beatmania IIDXのスコア管理Webアプリ。Next.js (App Router **ではなく** Pages Router) + TypeScript + Tailwind CSS v4 + shadcn/ui。DBはMySQL (Kysely ORM)、認証はFirebase Auth。
-
-セットアップ・コマンド一覧・ディレクトリ構成は [README.md](README.md) を参照。
+beatmania IIDXのスコア管理Webアプリ。技術スタック・セットアップ・コマンド一覧・ディレクトリ構成は [README.md](README.md) を参照。
 
 ## アーキテクチャ
 
-- **Pages Router**: `src/pages/` 以下。`pages/api/` はAPIルート
+- **Pages Router**（App Routerではない）: `src/pages/` 以下。`pages/api/` はAPIルート
 - **データフェッチ**: クライアントはSWR (`src/services/swr/`)、サーバーはKysely (`src/lib/db/`)
 - **パスエイリアス**: `@/` → `src/`
 - **DB型**: `src/types/db.ts` はkysely-codegenで自動生成
