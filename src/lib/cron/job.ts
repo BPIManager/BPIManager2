@@ -3,6 +3,7 @@ import { generateArenaJson } from "./metrics";
 import { generateInfoJson } from "./metrics/info";
 import { fetchOfficialArenaDistribution, getArenaEventPeriod } from "./arena";
 import { updateAllUserRadarCache } from "./radar";
+import { updateAllSongRankingCache } from "./songRanking";
 import { generateUserSitemap } from "./sitemaps";
 import { invalidateArenaAveragesCache } from "@/lib/cache/arenaAverages";
 import dayjs from "../dayjs";
@@ -81,6 +82,7 @@ async function printArenaStatus() {
  * - 毎日 16:00 UTC に `generateInfoJson`
  * - 毎日 UTC 16:30（JST 01:30）に `fetchOfficialArenaDistribution`
  * - 12 時間ごとに `updateAllUserRadarCache`
+ * - 12 時間ごと（radarキャッシュとは6時間ずらして）に `updateAllSongRankingCache`
  * - アリーナ開催期間中は JST 07:00〜翌00:59（UTC 22:00〜15:59）の間、
  *   30 分ごとに `fetchOfficialArenaDistribution` を追加実行
  */
@@ -96,6 +98,9 @@ export async function setupArenaService() {
   );
   updateAllUserRadarCache().catch((err) =>
     console.error("[Cron] Initial radar cache failed:", err),
+  );
+  updateAllSongRankingCache().catch((err) =>
+    console.error("[Cron] Initial song ranking cache failed:", err),
   );
   fetchOfficialArenaDistribution().catch((err) =>
     console.error("[Cron] Initial arena distribution failed:", err),
@@ -160,6 +165,15 @@ export async function setupArenaService() {
       await updateAllUserRadarCache();
     } catch (err) {
       console.error("[Cron] Radar cache failed:", err);
+    }
+  });
+
+  cron.schedule("0 6,18 * * *", async () => {
+    console.log("[Cron] updateAllSongRankingCache");
+    try {
+      await updateAllSongRankingCache();
+    } catch (err) {
+      console.error("[Cron] Song ranking cache failed:", err);
     }
   });
 

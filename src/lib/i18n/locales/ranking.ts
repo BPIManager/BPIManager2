@@ -72,6 +72,12 @@ export const rankingTranslations = {
     "zh-TW": "雷達排名使用預先計算的數值，分數反映最多需24小時。",
     ko: "레이더 랭킹은 사전 계산된 값을 사용하므로 점수 반영까지 최대 24시간이 소요될 수 있습니다.",
   },
+  "ranking.songs.delayNotice": {
+    ja: "この一覧の順位は事前計算された値のため、反映まで最大24時間の遅延が発生します。楽曲名をタップすると、その楽曲のリアルタイムの順位を確認できます。",
+    en: "Ranks in this list use pre-calculated values and may take up to 24 hours to reflect your latest scores. Tap a song name to see its real-time ranking.",
+    "zh-TW": "此列表的排名使用預先計算的數值，反映最多需24小時。點擊曲名可查看該曲目的即時排名。",
+    ko: "이 목록의 순위는 사전 계산된 값이므로 반영까지 최대 24시간이 소요될 수 있습니다. 곡 이름을 탭하면 실시간 순위를 확인할 수 있습니다.",
+  },
   "ranking.selfRank.outOf": {
     ja: "全 ",
     en: "Out of ",
