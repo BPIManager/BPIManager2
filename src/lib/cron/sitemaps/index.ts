@@ -1,4 +1,4 @@
-import { db } from "@/lib/db";
+import { usersRepo } from "@/lib/db/domains/users";
 import fs from "fs/promises";
 import path from "path";
 
@@ -17,7 +17,7 @@ export async function generateUserSitemap() {
   console.log("Starting sitemap generation for users...");
 
   try {
-    const users = await db.selectFrom("users").select("userId").execute();
+    const users = await usersRepo.getAllUserIds();
     console.log(`Found ${users.length} users.`);
 
     let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;

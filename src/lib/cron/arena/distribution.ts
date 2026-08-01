@@ -1,6 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
-import { db } from "@/lib/db";
+import { usersRepo } from "@/lib/db/domains/users";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { ARENA_RANK_ORDER } from "@/constants/iidx/arenaRanks";
 import { upsertOfficialArenaStats } from "@/lib/db/domains/arenaHistory";
@@ -246,11 +246,7 @@ export async function fetchOfficialArenaDistribution(
     }
   }
 
-  const users = await db
-    .selectFrom("users")
-    .select(["userId", "iidxId"])
-    .where("iidxId", "is not", null)
-    .execute();
+  const users = await usersRepo.getUsersWithIidxId();
 
   const fetchedAt = roundTo15Min(new Date());
   const rawByNormalizedId = new Map<string, (typeof results)[0][0]>();

@@ -163,6 +163,25 @@ class UsersRepository {
   async deleteByUser(trx: Transaction<Database>, userId: string) {
     await trx.deleteFrom("users").where("userId", "=", userId).execute();
   }
+
+  /**
+   * 全ユーザーIDの一覧を取得する（sitemap生成・cronバッチ処理用）。
+   */
+  async getAllUserIds() {
+    return await db.selectFrom("users").select("userId").execute();
+  }
+
+  /**
+   * `iidxId` が設定済みの全ユーザーの `userId`・`iidxId` を取得する
+   * （公式アリーナランキングとの照合用）。
+   */
+  async getUsersWithIidxId() {
+    return await db
+      .selectFrom("users")
+      .select(["userId", "iidxId"])
+      .where("iidxId", "is not", null)
+      .execute();
+  }
 }
 
 export const usersRepo = new UsersRepository();
