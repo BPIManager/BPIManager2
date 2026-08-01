@@ -25,15 +25,13 @@ export default async function handler(
 
   try {
     const access = await checkProfileAccess(req, userId);
-    const viewerId = access.viewerId;
-
     if (!access.hasAccess) return rejectAccess(res, access);
 
     const rivalAccess = await checkProfileAccess(req, rivalId);
     if (!rivalAccess.hasAccess) return rejectAccess(res, rivalAccess);
 
     const rawResults = await rivalRepo.getRivalComparisonScores({
-      viewerId: String(viewerId),
+      viewerId: String(userId),
       rivalId,
       version,
     });

@@ -49,11 +49,8 @@ export default async function handler(
     const rivalAccess = await checkProfileAccess(req, rivalId);
     if (!rivalAccess.hasAccess) return rejectAccess(res, rivalAccess);
 
-    const viewerId = access.viewerId;
-    if (!viewerId) return res.status(401).json({ message: "Unauthorized" });
-
     const rows = await socialComparisonRepo.getWinLossHistory(
-      viewerId,
+      userId,
       rivalId,
       version,
       level,
@@ -92,7 +89,7 @@ export default async function handler(
         };
         const oldOutcome = getOutcome(state.viewer, state.rival);
 
-        if (update.userId === viewerId) {
+        if (update.userId === userId) {
           state.viewer = update.exScore;
         } else {
           state.rival = update.exScore;
