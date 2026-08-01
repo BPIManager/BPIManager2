@@ -1,6 +1,7 @@
 ﻿import useSWRInfinite from "swr/infinite";
 import { User as FirebaseUser } from "firebase/auth";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { authFetch } from "@/utils/common/fetch";
 import type { VoteType } from "@/types/db";
 
 export interface SongPatternItem {
@@ -14,23 +15,6 @@ export interface SongPatternItem {
 export interface PatternsPage {
   items: SongPatternItem[];
   nextCursor: number | null;
-}
-
-async function authFetch(
-  url: string,
-  method: string,
-  fbUser: FirebaseUser | null,
-  body?: unknown,
-): Promise<Response> {
-  const token = fbUser ? await fbUser.getIdToken() : null;
-  return fetch(url, {
-    method,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    body: body !== undefined ? JSON.stringify(body) : undefined,
-  });
 }
 
 export function useSongPatterns(

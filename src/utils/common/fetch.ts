@@ -1,3 +1,20 @@
+export async function authFetch(
+  url: string,
+  method: string,
+  fbUser: { getIdToken: () => Promise<string> } | null,
+  body?: unknown,
+): Promise<Response> {
+  const token = fbUser ? await fbUser.getIdToken() : null;
+  return fetch(url, {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  });
+}
+
 export const fetcher = async (args: string | [string, { getIdToken: () => Promise<string> } | null]) => {
   const url = typeof args === "string" ? args : args[0];
   const user = typeof args === "string" ? null : args[1];

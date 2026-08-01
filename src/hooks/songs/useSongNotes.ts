@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { User as FirebaseUser } from "firebase/auth";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
-import { fetcher } from "@/utils/common/fetch";
+import { authFetch, fetcher } from "@/utils/common/fetch";
 
 export interface SongNote {
   id: number;
@@ -16,23 +16,6 @@ export interface SongNote {
 }
 
 export type SongNoteSort = "latest" | "bpi";
-
-async function authFetch(
-  url: string,
-  method: string,
-  fbUser: FirebaseUser | null,
-  body?: unknown,
-): Promise<Response> {
-  const token = fbUser ? await fbUser.getIdToken() : null;
-  return fetch(url, {
-    method,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    body: body !== undefined ? JSON.stringify(body) : undefined,
-  });
-}
 
 export function useSongNotes(songId: number, fbUser: FirebaseUser | null) {
   const [sort, setSort] = useState<SongNoteSort>("latest");
