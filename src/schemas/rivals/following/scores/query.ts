@@ -11,7 +11,7 @@ export const rivalFollowingScoresQuerySchema = rivalScoresQuerySchema
 
 export const scoreComparisonQuerySchema = z.object({
   version: z.enum(IIDX_VERSIONS),
-  limit: z.coerce.number().int().default(10),
+  limit: z.coerce.number().int().min(1).max(100).default(10),
   lastDiff: z.coerce.number().optional(),
   lastSongId: z.string().optional(),
   lastRivalId: z.string().optional(),

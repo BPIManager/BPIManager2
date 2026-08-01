@@ -29,7 +29,7 @@ export const batchesQuerySchema = z.object({
   userId: z.string().min(1),
   version: iidxVersionQuerySchema,
   groupedBy: z.enum(["lastPlayed", "batch", "createdAt"]).default("batch"),
-  topN: z.coerce.number().int().positive().default(5),
+  topN: z.coerce.number().int().positive().max(100).default(5),
 });
 
 export type BatchesQueryOutput = z.output<typeof batchesQuerySchema>;
