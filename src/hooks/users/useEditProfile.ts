@@ -101,6 +101,7 @@ export const useEditProfile = (onClose?: () => void) => {
     }
 
     setNameStatus((prev) => ({ ...prev, isChecking: true, error: null }));
+    const controller = new AbortController();
     const timer = setTimeout(async () => {
       try {
         const token = await fbUser?.getIdToken();
@@ -108,6 +109,7 @@ export const useEditProfile = (onClose?: () => void) => {
           `${API_PREFIX}/usernames/${encodeURIComponent(formData.userName)}/availability`,
           {
             headers: { Authorization: `Bearer ${token}` },
+            signal: controller.signal,
           },
         );
         const data = await res.json();
@@ -116,7 +118,9 @@ export const useEditProfile = (onClose?: () => void) => {
           error: data.available ? null : data.message,
           available: data.available,
         });
-      } catch {
+      } catch (e) {
+        // 古い入力向けのリクエストがキャンセルされた場合、新しい入力の判定結果を上書きしない
+        if (e instanceof DOMException && e.name === "AbortError") return;
         setNameStatus({
           isChecking: false,
           error: "接続エラー",
@@ -124,7 +128,10 @@ export const useEditProfile = (onClose?: () => void) => {
         });
       }
     }, 500);
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
   }, [formData.userName, user, fbUser]);
 
   const handleSubmit = async () => {
