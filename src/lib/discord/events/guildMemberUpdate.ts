@@ -3,6 +3,10 @@ import { discordLinksRepo } from "@/lib/db/domains/discord";
 import { getManagedRoleIds, resolveUserRoleFromMember } from "@/lib/discord/roleMap";
 import { sendLinkRequest } from "./sendLinkRequest";
 
+function isSameRoleSet(a: string[], b: string[]): boolean {
+  return a.length === b.length && a.every((id, i) => id === b[i]);
+}
+
 /**
  * メンバーのロールが変化したとき:
  * - Coffee/Saba/Sparkle を新たに取得（Ci-en が付与）→ 未リンクならリンク案内 DM を送る、リンク済みならロールを付与
@@ -16,12 +20,16 @@ export async function handleGuildMemberUpdate(
   newMember: GuildMember,
 ) {
   const managedRoleIds = getManagedRoleIds();
-  const hadManagedRole = oldMember.roles.cache.some((r) =>
-    managedRoleIds.includes(r.id),
-  );
-  const hasManagedRole = newMember.roles.cache.some((r) =>
-    managedRoleIds.includes(r.id),
-  );
+  const oldManagedRoleIds = oldMember.roles.cache
+    .filter((r) => managedRoleIds.includes(r.id))
+    .map((r) => r.id)
+    .sort();
+  const newManagedRoleIds = newMember.roles.cache
+    .filter((r) => managedRoleIds.includes(r.id))
+    .map((r) => r.id)
+    .sort();
+  const hadManagedRole = oldManagedRoleIds.length > 0;
+  const hasManagedRole = newManagedRoleIds.length > 0;
 
   if (!hadManagedRole && hasManagedRole) {
     const existing = await discordLinksRepo.findByDiscordUserId(newMember.id);
@@ -48,7 +56,13 @@ export async function handleGuildMemberUpdate(
   }
 
   // 両方 managed role を持っている場合: ロール変更（coffee→saba 等）
-  if (hadManagedRole && hasManagedRole) {
+  // managed role の集合が変わっていなければ、ニックネーム変更等の
+  // 無関係なイベント発火のため何もしない
+  if (
+    hadManagedRole &&
+    hasManagedRole &&
+    !isSameRoleSet(oldManagedRoleIds, newManagedRoleIds)
+  ) {
     const existing = await discordLinksRepo.findByDiscordUserId(newMember.id);
     if (!existing) return;
     const userRole = resolveUserRoleFromMember(
