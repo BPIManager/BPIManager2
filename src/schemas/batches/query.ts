@@ -1,4 +1,5 @@
-import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
+import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
+import { iidxVersionQuerySchema } from "@/schemas/common/version";
 import { z } from "zod";
 
 const batchPathSchema = z.object({
@@ -26,13 +27,7 @@ export type BatchScoresQueryOutput = z.output<typeof batchScoresQuerySchema>;
 
 export const batchesQuerySchema = z.object({
   userId: z.string().min(1),
-  version: z
-    .string()
-    .refine((v): v is (typeof IIDX_VERSIONS)[number] =>
-      (IIDX_VERSIONS as readonly string[]).includes(v),
-    )
-    .catch(latestVersion)
-    .default(latestVersion),
+  version: iidxVersionQuerySchema,
   groupedBy: z.enum(["lastPlayed", "batch", "createdAt"]).default("batch"),
   topN: z.coerce.number().int().positive().default(5),
 });

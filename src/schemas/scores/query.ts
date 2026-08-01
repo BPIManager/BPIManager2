@@ -1,16 +1,9 @@
-import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
+import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
+import { iidxVersionQuerySchema } from "@/schemas/common/version";
 import { z } from "zod";
 
 export const scoresQuerySchema = z.object({
-  version: z
-    .string()
-    .refine(
-      (v): v is (typeof IIDX_VERSIONS)[number] =>
-        (IIDX_VERSIONS as readonly string[]).includes(v),
-      { message: "Missing or invalid version parameter." },
-    )
-    .catch(latestVersion)
-    .default(latestVersion),
+  version: iidxVersionQuerySchema,
   asOf: z.string().optional(),
   clearState: z.string().optional(),
   bpiMin: z.coerce.number().optional(),
