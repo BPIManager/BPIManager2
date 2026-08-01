@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import dayjs from "@/lib/dayjs";
-import { logsRepo } from "@/lib/db/domains/logs";
-import { scoreDetailRepo } from "@/lib/db/domains/scores";
+import { navigationRepo } from "@/lib/db/domains/logs/navigation";
+import { scoreDetailRepo } from "@/lib/db/domains/scores/detail";
 import { rivalRepo } from "@/lib/db/aggregates/rivalScores/rival";
 import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { rejectAccess } from "@/middlewares/api/withApi";
@@ -41,8 +41,8 @@ export default async function handler(
     const basis: "lastPlayed" | "createdAt" =
       groupedBy === "lastPlayed" ? "lastPlayed" : "createdAt";
 
-    const range = logsRepo.getJstRange(dateStr, type);
-    const nav = await logsRepo.getRangeNavigation(uid, ver, range, basis);
+    const range = navigationRepo.getJstRange(dateStr, type);
+    const nav = await navigationRepo.getRangeNavigation(uid, ver, range, basis);
 
     let responseData:
       | Awaited<ReturnType<typeof handleLastPlayedBase>>
@@ -77,8 +77,8 @@ export default async function handler(
 async function handleLastPlayedBase(
   uid: string,
   ver: IIDXVersion,
-  range: ReturnType<typeof logsRepo.getJstRange>,
-  nav: Awaited<ReturnType<typeof logsRepo.getRangeNavigation>>,
+  range: ReturnType<typeof navigationRepo.getJstRange>,
+  nav: Awaited<ReturnType<typeof navigationRepo.getRangeNavigation>>,
   isOwnLog: boolean,
   type: string = "day",
 ) {
@@ -171,12 +171,12 @@ async function handleLastPlayedBase(
 async function handleCreatedAtBase(
   uid: string,
   ver: IIDXVersion,
-  range: ReturnType<typeof logsRepo.getJstRange>,
-  nav: Awaited<ReturnType<typeof logsRepo.getRangeNavigation>>,
+  range: ReturnType<typeof navigationRepo.getJstRange>,
+  nav: Awaited<ReturnType<typeof navigationRepo.getRangeNavigation>>,
   isOwnLog: boolean,
   type: string = "day",
 ) {
-  const batches = await logsRepo.findBatchesInRange(
+  const batches = await navigationRepo.findBatchesInRange(
     uid,
     ver,
     range.start,

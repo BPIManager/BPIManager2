@@ -3,7 +3,7 @@ import { sql } from "kysely";
 import { ARENA_RANK_ORDER } from "@/constants/iidx/arenaRanks";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { usersRepo } from "@/lib/db/domains/users";
-import { logsRepo } from "@/lib/db/domains/logs";
+import { navigationRepo } from "@/lib/db/domains/logs/navigation";
 import { scoresRepo } from "@/lib/db/domains/scores";
 import { latestPerUserSubquery as latestArenaStatsPerUserSubquery } from "@/lib/db/domains/arenaHistory";
 
@@ -38,8 +38,8 @@ class SiteStatsSummaryRepository {
       usersRepo.getCount(),
       usersRepo.getCount(yesterday),
 
-      logsRepo.getCount(),
-      logsRepo.getCount(yesterday),
+      navigationRepo.getCount(),
+      navigationRepo.getCount(yesterday),
 
       // bkScoresは所有ドメインが存在しない旧バージョンスコアの集計専用テーブルのため、直接参照を維持する。
       db

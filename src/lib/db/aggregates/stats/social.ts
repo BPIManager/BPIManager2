@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { latestLogIdPerSongSubquery, latestLogIdPerUserSongSubquery } from "@/lib/db/shared/latestScore";
-import { logsRepo } from "@/lib/db/domains/logs";
+import { navigationRepo } from "@/lib/db/domains/logs/navigation";
 
 /**
  * 統計ダッシュボード向けの近傍ユーザー比較を担当するリポジトリクラス。
@@ -12,7 +12,7 @@ class StatsSocialRepository {
     version: string,
     n: number,
   ): Promise<string[]> {
-    return logsRepo.getUserIdsOrderedByBpiDistance(
+    return navigationRepo.getUserIdsOrderedByBpiDistance(
       version,
       userId,
       userTotalBpi,

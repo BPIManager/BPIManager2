@@ -4,7 +4,7 @@ import {
   withAuth,
 } from "@/middlewares/api/withAuth";
 import { socialComparisonRepo } from "@/lib/db/aggregates/rivalScores/comparison";
-import { logsRepo } from "@/lib/db/domains/logs";
+import { navigationRepo } from "@/lib/db/domains/logs/navigation";
 
 async function handler(
   req: AuthenticatedNextApiRequest,
@@ -38,7 +38,7 @@ async function handler(
         levels: levelArray,
         difficulties: diffArray,
       }),
-      logsRepo.getLatestTotalBpi(viewerId, version as string),
+      navigationRepo.getLatestTotalBpi(viewerId, version as string),
     ]);
 
     return res.status(200).json({

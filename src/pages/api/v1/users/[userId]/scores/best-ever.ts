@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { timelineRepo } from "@/lib/db/domains/scores";
+import { timelineRepo } from "@/lib/db/domains/scores/timeline";
 import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
 
 async function handleGetBestEver(

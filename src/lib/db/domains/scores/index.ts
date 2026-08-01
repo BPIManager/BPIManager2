@@ -6,9 +6,6 @@ import {
   latestLogIdPerSongSubquery,
   latestLogIdPerUserSongSubquery,
 } from "@/lib/db/shared/latestScore";
-export { scoreDetailRepo } from "./detail";
-export { timelineRepo } from "./timeline";
-
 /**
  * `scores` テーブル（単曲スコア）の書き込み・基本参照を担当するリポジトリクラス。
  */

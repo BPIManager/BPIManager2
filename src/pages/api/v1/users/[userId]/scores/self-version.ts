@@ -1,6 +1,6 @@
 import type { NextApiResponse } from "next";
 import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
-import { timelineRepo } from "@/lib/db/domains/scores";
+import { timelineRepo } from "@/lib/db/domains/scores/timeline";
 import { selfVersionComparisonQuerySchema } from "@/schemas/scores/query";
 import z from "zod";
 import { parseQuery } from "@/services/nextRequest/parseBody";

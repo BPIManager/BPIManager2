@@ -1,6 +1,6 @@
 import dayjs from "@/lib/dayjs";
-import { logsRepo } from "@/lib/db/domains/logs";
-import { scoreDetailRepo } from "@/lib/db/domains/scores";
+import { navigationRepo } from "@/lib/db/domains/logs/navigation";
+import { scoreDetailRepo } from "@/lib/db/domains/scores/detail";
 import { rivalRepo } from "@/lib/db/aggregates/rivalScores/rival";
 import { deleteBatch } from "@/lib/db/orchestrators/batchDeletion";
 import { mapToLogNested } from "@/utils/logs/getMapNested";
@@ -39,7 +39,7 @@ export default async function handler(
         return res.status(403).json({ message: "Forbidden" });
       }
 
-      const targetBatch = await logsRepo.findBatchByIdAndUser(bid, uid);
+      const targetBatch = await navigationRepo.findBatchByIdAndUser(bid, uid);
       if (!targetBatch) {
         return res.status(404).json({ message: "Batch not found." });
       }
@@ -62,18 +62,18 @@ export default async function handler(
     const access = await checkProfileAccess(req, uid);
     if (!access.hasAccess) return rejectAccess(res, access);
 
-    const targetBatch = await logsRepo.findBatchById(bid);
+    const targetBatch = await navigationRepo.findBatchById(bid);
     if (!targetBatch) {
       return res.status(404).json({ message: "Batch not found." });
     }
 
     const jstDate = dayjs.utc(targetBatch.createdAt).tz().format("YYYY-MM-DD");
-    const dayRange = logsRepo.getJstRange(jstDate, "day");
+    const dayRange = navigationRepo.getJstRange(jstDate, "day");
     const isOwnLog = access.viewerId === uid;
 
     const [nav, sameDay, scores, overtaken] = await Promise.all([
-      logsRepo.getBatchNavigation(uid, v, targetBatch.createdAt, dayRange),
-      logsRepo.findBatchesInRange(uid, v, dayRange.start, dayRange.end),
+      navigationRepo.getBatchNavigation(uid, v, targetBatch.createdAt, dayRange),
+      navigationRepo.findBatchesInRange(uid, v, dayRange.start, dayRange.end),
       scoreDetailRepo.getScoresWithDetails(uid, v, { batchIds: [bid] }),
       isOwnLog
         ? rivalRepo.getOvertakenRivals(uid, v, {

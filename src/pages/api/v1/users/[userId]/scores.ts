@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import dayjs from "@/lib/dayjs";
-import { scoreDetailRepo } from "@/lib/db/domains/scores";
+import { scoreDetailRepo } from "@/lib/db/domains/scores/detail";
 import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
 import { mapToFlatSong } from "@/utils/logs/getMapFlatten";
 import { filterSongsServerSide } from "@/utils/songs/filter";

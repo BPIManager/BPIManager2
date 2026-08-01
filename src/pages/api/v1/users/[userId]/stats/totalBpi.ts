@@ -1,5 +1,5 @@
 import dayjs from "@/lib/dayjs";
-import { scoreDetailRepo } from "@/lib/db/domains/scores";
+import { scoreDetailRepo } from "@/lib/db/domains/scores/detail";
 import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { BpiCalculator } from "@/lib/bpi";
 import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";

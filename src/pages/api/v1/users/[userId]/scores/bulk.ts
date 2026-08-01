@@ -9,7 +9,7 @@ import { BpiCalculator } from "@/lib/bpi";
 import { NewScore, NewAllScores } from "@/types/db";
 import { scoresRepo } from "@/lib/db/domains/scores";
 import { allScoresRepo } from "@/lib/db/domains/allScores";
-import { logsRepo } from "@/lib/db/domains/logs";
+import { navigationRepo } from "@/lib/db/domains/logs/navigation";
 import { songsRepo } from "@/lib/db/domains/songs";
 import { allSongsRepo } from "@/lib/db/domains/allSongs";
 import { saveImportResults } from "@/lib/db/orchestrators/bpiImport";
@@ -42,7 +42,7 @@ const handler = async (
       allSongsRepo.getAllLevelMaster(),
       scoresRepo.getLatestScores(userId, version),
       allScoresRepo.getLatestAllScores(userId, version),
-      logsRepo.getLatestTotalBpi(userId, version),
+      navigationRepo.getLatestTotalBpi(userId, version),
     ]);
 
     const bpiMasterMap = new Map(

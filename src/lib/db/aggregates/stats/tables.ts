@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { IIDXVersion } from "@/types/iidx/version";
 import { correlatedLatestLogId, latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore";
 import { getSongRankingFromTable } from "@/lib/db/aggregates/songRanking";
-import { logsRepo } from "@/lib/db/domains/logs";
+import { navigationRepo } from "@/lib/db/domains/logs/navigation";
 import { songsRepo } from "@/lib/db/domains/songs";
 
 /**
@@ -11,7 +11,7 @@ import { songsRepo } from "@/lib/db/domains/songs";
  */
 class StatsTablesRepository {
   async getLatestTotalBpi(userId: string, version: string): Promise<number> {
-    const result = await logsRepo.getLatestTotalBpi(userId, version);
+    const result = await navigationRepo.getLatestTotalBpi(userId, version);
     return result ? Number(result.totalBpi) : -15;
   }
 
