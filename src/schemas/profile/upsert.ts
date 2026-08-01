@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const userNameSchema = z
+export const userNameSchema = z
   .string()
   .min(2, "ユーザー名は2文字以上20文字以内で入力してください")
   .max(20, "ユーザー名は2文字以上20文字以内で入力してください")
