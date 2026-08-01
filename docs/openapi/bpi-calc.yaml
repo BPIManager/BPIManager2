@@ -1,0 +1,226 @@
+openapi: "3.0.3"
+info:
+  title: BPIManager2 BPI Calc API
+  version: "1.0.0"
+
+paths:
+  /api/v1/bpi/calc:
+    get:
+      summary: 単曲 BPI 計算
+      description: |
+        楽曲タイトル・難易度・EX スコアを指定して単曲 BPI を計算し、
+        BPI 公式による推定順位・BPIM 内順位・アリーナランク別平均を返す。
+        認証不要。
+      parameters:
+        - name: title
+          in: query
+          required: true
+          description: 楽曲タイトル（songs テーブルの title と完全一致）
+          schema:
+            type: string
+          example: "(This Is Not) The Angels"
+
+        - name: difficulty
+          in: query
+          required: true
+          description: 難易度
+          schema:
+            type: string
+            enum: [HYPER, ANOTHER, LEGGENDARIA]
+          example: ANOTHER
+
+        - name: exScore
+          in: query
+          required: true
+          description: EX スコア（0 〜 notes×2 の整数）
+          schema:
+            type: integer
+            minimum: 0
+          example: 1200
+
+        - name: version
+          in: query
+          required: false
+          description: |
+            IIDX バージョン番号。BPIM 内順位とアリーナ平均の集計対象バージョンを指定する。
+            省略時は最新バージョン（33）にフォールバック。
+          schema:
+            type: string
+            enum: ["26", "27", "28", "29", "30", "31", "32", "33", "INF"]
+          example: "33"
+
+      responses:
+        "200":
+          description: BPI 計算結果
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BpiCalcResponse"
+              example:
+                song:
+                  title: "(This Is Not) The Angels"
+                  difficulty: ANOTHER
+                  difficultyLevel: 12
+                  notes: 1364
+                bpi: 45.23
+                rank:
+                  estimatedRank: 512
+                  bpimRank: 38
+                  bpimTotal: 1420
+                metadata:
+                  version: "33"
+                  arenaAverages:
+                    A1:
+                      avgExScore: 2450.1
+                      rate: 89.83
+                      count: 124
+                      avgBpi: 72.5
+                    A2:
+                      avgExScore: 2300.4
+                      rate: 84.34
+                      count: 210
+                    A3:
+                      avgExScore: 2100.0
+                      rate: 76.98
+                      count: 305
+
+        "400":
+          description: パラメータ不正（バリデーションエラー、または exScore が最大値超過）
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/ErrorWithIssues"
+                  - $ref: "#/components/schemas/ErrorMessage"
+              examples:
+                validation_error:
+                  summary: Zod バリデーションエラー
+                  value:
+                    message: Invalid parameters
+                    errors:
+                      - code: invalid_enum_value
+                        path: [difficulty]
+                        message: "Invalid enum value. Expected 'HYPER' | 'ANOTHER' | 'LEGGENDARIA', received 'NORMAL'"
+                exscore_overflow:
+                  summary: EX スコアが最大値超過
+                  value:
+                    message: "exScore exceeds maximum (2728)"
+
+        "404":
+          description: 指定した楽曲が見つからない
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+              example:
+                message: Song not found
+
+        "405":
+          description: GET 以外のメソッド
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+              example:
+                message: Method not allowed
+
+        "500":
+          description: サーバー内部エラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+              example:
+                message: Internal Server Error
+
+components:
+  schemas:
+    BpiCalcResponse:
+      type: object
+      required: [song, bpi, rank, metadata]
+      properties:
+        song:
+          type: object
+          required: [title, difficulty, difficultyLevel, notes]
+          properties:
+            title:
+              type: string
+            difficulty:
+              type: string
+              enum: [HYPER, ANOTHER, LEGGENDARIA]
+            difficultyLevel:
+              type: integer
+              description: 難易度レベル（例: 11, 12）
+            notes:
+              type: integer
+              description: ノーツ数（最大スコアは notes×2）
+        bpi:
+          type: number
+          nullable: true
+          description: |
+            単曲 BPI 値。-15 〜 理論上限。
+            kaidenAvg / wrScore が未設定の場合は -15 固定。
+        rank:
+          type: object
+          required: [estimatedRank, bpimRank, bpimTotal]
+          properties:
+            estimatedRank:
+              type: integer
+              nullable: true
+              description: BPI 公式による皆伝内推定順位（bpi が null の場合は null）
+            bpimRank:
+              type: integer
+              description: BPIM 登録ユーザー内での当該曲のスコア順位（1 始まり）
+            bpimTotal:
+              type: integer
+              description: BPIM 内で当該曲・バージョンのスコアを登録しているユーザー総数
+        metadata:
+          type: object
+          required: [version, arenaAverages]
+          properties:
+            version:
+              type: string
+              description: 集計対象バージョン
+            arenaAverages:
+              type: object
+              nullable: true
+              description: |
+                アリーナランク別の平均スコア統計。
+                difficultyLevel が 11 / 12 以外、またはデータが未生成の場合は null。
+              additionalProperties:
+                $ref: "#/components/schemas/ArenaAverageEntry"
+
+    ArenaAverageEntry:
+      type: object
+      required: [avgExScore, rate, count]
+      properties:
+        avgExScore:
+          type: number
+          description: 平均 EX スコア
+        rate:
+          type: number
+          description: 達成率（%）
+        count:
+          type: integer
+          description: サンプル数
+        avgBpi:
+          type: number
+          description: 平均 BPI（算出不能な場合は省略）
+
+    ErrorMessage:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+
+    ErrorWithIssues:
+      type: object
+      required: [message, errors]
+      properties:
+        message:
+          type: string
+        errors:
+          type: array
+          items:
+            type: object
