@@ -32,8 +32,11 @@ export const parseCSV = (csvData: string): ParsedCsvRow[] => {
         if (!exScore || exScore <= 0) return null;
 
         const missStr = row[`${diff} ミスカウント`];
-        const missCount =
+        const parsedMissCount =
           missStr === "---" || !missStr ? null : parseInt(missStr);
+        const missCount = isNaN(parsedMissCount as number)
+          ? null
+          : parsedMissCount;
 
         return {
           title,
