@@ -16,7 +16,15 @@ export const NearLoseRankItem = ({
   const { t } = useTranslation();
   return (
     <div
+      role="button"
+      tabIndex={0}
       onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick();
+        }
+      }}
       className={cn(
         "group relative flex items-center justify-between gap-3 border-b border-bpim-border p-3 pl-4 transition-colors",
         "cursor-pointer hover:bg-bpim-overlay/50",

@@ -64,11 +64,24 @@ export function SongRankingListRow({
   const isSelf = row.isSelf;
   const showDiff = selfExScore !== undefined;
   const diff = showDiff ? (row.exScore ?? 0) - (selfExScore ?? 0) : 0;
+  const isClickable = !isSelf && !isPrivate;
 
   return (
     <div
       style={style}
-      onClick={() => !isSelf && !isPrivate && onNavigate(row.userId)}
+      role={isClickable ? "button" : undefined}
+      tabIndex={isClickable ? 0 : undefined}
+      onClick={isClickable ? () => onNavigate(row.userId) : undefined}
+      onKeyDown={
+        isClickable
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onNavigate(row.userId);
+              }
+            }
+          : undefined
+      }
       className={cn(
         "grid items-center border-b border-bpim-border px-3 transition-colors last:border-b-0",
         showDiff

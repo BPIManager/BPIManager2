@@ -33,7 +33,15 @@ export const AllSongItem = ({
 
   return (
     <div
+      role="button"
+      tabIndex={0}
       onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick();
+        }
+      }}
       className="relative w-full mb-2 cursor-pointer overflow-hidden rounded-sm bg-bpim-surface hover:bg-bpim-overlay transition-colors duration-200"
     >
       <div
