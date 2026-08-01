@@ -41,16 +41,18 @@ export function useSongPatterns(
   const getKey = (
     _pageIndex: number,
     previousPageData: PatternsPage | null,
-  ): string | null => {
+  ): [string, string | null] | null => {
     if (previousPageData && previousPageData.nextCursor === null) return null;
     const cursor = previousPageData?.nextCursor ?? 0;
-    return `${API_PREFIX}/songs/${songId}/patterns?cursor=${cursor}&sortBy=${sortBy}`;
+    const url = `${API_PREFIX}/songs/${songId}/patterns?cursor=${cursor}&sortBy=${sortBy}`;
+    // キャッシュキーにはFirebase Userオブジェクト全体でなくuidのみを使う
+    return [url, fbUser?.uid ?? null];
   };
 
   const { data, isLoading, size, setSize, mutate } =
     useSWRInfinite<PatternsPage>(
       getKey,
-      async (url: string) => {
+      async ([url]: [string, string | null]) => {
         const token = fbUser ? await fbUser.getIdToken() : null;
         const res = await fetch(url, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
