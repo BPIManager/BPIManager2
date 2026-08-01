@@ -18,6 +18,7 @@ export function buildArena(arenaRows: ArenaRow[]): MonthlyArena | null {
 
   for (const row of arenaRows) {
     const idx = order.indexOf(row.arenaClass);
+    if (idx === -1) continue;
     if (idx < bestClassIdx) {
       bestClassIdx = idx;
       bestClass = row.arenaClass;

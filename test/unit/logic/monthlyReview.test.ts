@@ -90,6 +90,15 @@ describe("buildArena", () => {
   it("空配列の場合はnullを返すこと", () => {
     expect(buildArena([])).toBeNull();
   });
+
+  it("ARENA_RANK_ORDERに含まれない未知のarenaClassをベストクラス候補から除外すること", () => {
+    const result = buildArena([
+      { arenaClass: "UNKNOWN", arenaRank: 1, a1continue: null },
+      { arenaClass: "A2", arenaRank: 5, a1continue: null },
+    ]);
+
+    expect(result).toEqual({ bestClass: "A2", bestRank: 5, maxA1Continue: null });
+  });
 });
 
 describe("buildBpiTimeline", () => {
