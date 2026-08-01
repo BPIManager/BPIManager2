@@ -37,7 +37,10 @@ export const versionsNonDisabledCollection = versionTitles.map((v) => ({
   value: v.num,
 }));
 
-export const verNameArr: string[] = [
+// versionTitlesに定義の無い過去バージョン（3rd style〜25 CANNON BALLERS）の
+// タイトルは他に管理元が無いため、配列インデックス=バージョン番号のまま
+// ここに直接保持する。26以降はversionTitlesを正としてそこから導出する。
+const HISTORICAL_VERSION_TITLES: readonly string[] = [
   "",
   "",
   "",
@@ -64,13 +67,10 @@ export const verNameArr: string[] = [
   "23 copula",
   "24 SINOBUZ",
   "25 CANNON BALLERS",
-  "26 Rootage",
-  "27 HEROIC VERSE",
-  "28 BISTROVER",
-  "29 CastHour",
-  "30 RESIDENT",
-  "31 EPOLIS",
-  "32 Pinky Crush",
-  "33 Sparkle Shower",
-  "34 ZINRAI",
 ];
+
+export const verNameArr: string[] = [...HISTORICAL_VERSION_TITLES];
+for (const v of versionTitles) {
+  if (v.num === "INF") continue;
+  verNameArr[Number(v.num)] = v.title;
+}
