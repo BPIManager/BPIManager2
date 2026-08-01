@@ -1,8 +1,7 @@
 import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
+import { parseArray } from "@/utils/common/parseArray";
 import { z } from "zod";
-
-const toArray = (v: unknown) => (Array.isArray(v) ? v : v != null ? [v] : []);
 
 export const statsQuerySchema = z.object({
   userId: z.string().default(""),
@@ -13,10 +12,10 @@ export const statsQuerySchema = z.object({
     )
     .catch(latestVersion)
     .default(latestVersion),
-  level: z.preprocess(toArray, z.array(z.coerce.number())).default([]),
+  level: z.preprocess(parseArray, z.array(z.coerce.number())).default([]),
   difficulty: z
     .preprocess(
-      toArray,
+      parseArray,
       z.array(
         z
           .string()

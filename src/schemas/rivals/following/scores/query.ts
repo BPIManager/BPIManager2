@@ -1,6 +1,7 @@
 import z from "zod";
 import { rivalScoresQuerySchema } from "../../query";
 import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
+import { parseArray } from "@/utils/common/parseArray";
 
 export const rivalFollowingScoresQuerySchema = rivalScoresQuerySchema
   .omit({ rivalId: true })
@@ -15,17 +16,9 @@ export const scoreComparisonQuerySchema = z.object({
   lastSongId: z.string().optional(),
   lastRivalId: z.string().optional(),
   levels: z
-    .preprocess(
-      (v) => (Array.isArray(v) ? v : v ? [v] : []),
-      z.array(z.coerce.string()),
-    )
+    .preprocess(parseArray, z.array(z.coerce.string()))
     .default([]),
-  difficulties: z
-    .preprocess(
-      (v) => (Array.isArray(v) ? v : v ? [v] : []),
-      z.array(z.string()),
-    )
-    .default([]),
+  difficulties: z.preprocess(parseArray, z.array(z.string())).default([]),
   minDiff: z.coerce.number().default(1),
   maxDiff: z.coerce.number().default(30),
 });

@@ -1,16 +1,15 @@
 import { z } from "zod";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
-
-const toArray = (v: unknown) => (Array.isArray(v) ? v : v != null ? [v] : []);
+import { parseArray } from "@/utils/common/parseArray";
 
 export const timelineQuerySchema = z.object({
   lastId: z.string().optional(),
   mode: z.enum(["all", "played", "overtaken"]).default("all"),
   search: z.string().optional(),
-  levels: z.preprocess(toArray, z.array(z.coerce.number())).optional(),
+  levels: z.preprocess(parseArray, z.array(z.coerce.number())).optional(),
   difficulties: z
     .preprocess(
-      toArray,
+      parseArray,
       z.array(
         z
           .string()
