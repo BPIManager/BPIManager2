@@ -77,16 +77,13 @@ GitHubのopen issueを順序立てて解消する。1issue = 1ブランチ = 1�
    - そのissueを完全に解消するコミットには `Closes #<番号>`（GitHub上でマージ時に自動クローズされる）
    - コミットメッセージは「何を」より「なぜ」を書く。日本語プロジェクトなら日本語で書く（このリポジトリの既存コミット規約に合わせる）
    - `git add -A <path1> <path2> ...` で複数パスを渡す際、1つでも存在しないパスがあると全体が失敗し他の変更が未ステージのまま残ることがある。1回 `git status --short` で意図通りにステージされたか必ず確認する
-6. **マージ**:
-   - 確認ありモード: ユーザーに「マージ・pushしますか」と確認してから進める
-   - 全自動モード: 検証が全て通っていれば確認せず即座に進める
-   - `git checkout master && git merge <branch> --ff-only`（fast-forward不可なら理由を確認してrebaseを検討）してから `git push origin master`
-   - Windows環境でフォルダ名の大文字小文字だけを変えるリネームを含む場合、`git checkout` がcase-insensitiveなファイルシステムの衝突でuntracked-file-would-be-overwrittenエラーを出すことがある。その場合は `git branch -f master <branch>` でrefだけ進めてから `git checkout master` する（作業木の実体は既に同じツリーなので安全）
-   - push後、コミットメッセージに `Closes #N` を含めていればissueが自動クローズされる。念のため `gh issue view <番号> --json state` で確認する
-7. **ブランチ削除**: マージ後、ローカル・リモート双方の作業ブランチを削除する
-   - 確認ありモード: 削除してよいか確認してから削除する
-   - 全自動モード: 確認せず削除して次のissueへ進む
-8. **完了報告**: 全自動モードでは、この時点で1〜2文の完了報告（何をClosesしたか）だけ出して次issueへ。確認や感想を求める文で終わらせない（会話が止まる原因になる）
+6. **マージ方式の分岐**: ブランチ種別（手順2で選んだプレフィックス）で分岐する。詳細は `.claude/rules/issue-driven-development.md` を参照
+   - `fix/`・`refactor/`・`docs/`（バグ修正・挙動不変のリファクタ・ドキュメント）→ **6A. 直接merge**
+   - `feat/`（機能追加・仕様issue）→ **6B. PR経由**
+   - 6A: 確認ありモードはユーザーに「マージ・pushしますか」と確認、全自動モードは検証通過後すぐ進める。`git checkout master && git merge <branch> --ff-only`（fast-forward不可なら理由を確認してrebaseを検討）してから `git push origin master`。Windows環境でフォルダ名の大文字小文字だけを変えるリネームを含む場合、`git checkout` がcase-insensitiveなファイルシステムの衝突でuntracked-file-would-be-overwrittenエラーを出すことがある。その場合は `git branch -f master <branch>` でrefだけ進めてから `git checkout master` する（作業木の実体は既に同じツリーなので安全）。push後、コミットメッセージに `Closes #N` を含めていればissueが自動クローズされる。念のため `gh issue view <番号> --json state` で確認する
+   - 6B: `git push origin <branch>` でリモートへpushし、`gh pr create --title ... --body ...` でPRを作成する。PR本文に対応issueへの`Closes #N`を含める。全自動モードでもここでは自動マージまで進めず、**PR作成をもって当該issueの処理完了とする**（マージ・issueクローズはユーザーのレビュー後）
+7. **ブランチ削除**（6Aのみ）: マージ後、ローカル・リモート双方の作業ブランチを削除する。確認ありモードは削除してよいか確認してから、全自動モードは確認せず削除して次のissueへ進む。6B（PR経由）はPRがマージされるまでブランチを残す
+8. **完了報告**: 全自動モードでは、この時点で1〜2文の完了報告（6Aは何をClosesしたか、6BはPR URL）だけ出して次issueへ。確認や感想を求める文で終わらせない（会話が止まる原因になる）
 
 ## 安全策
 
