@@ -54,7 +54,7 @@ export default async function handler(
           : undefined;
       const currentExScore = song.userExScore ?? 0;
       const currentBpi = song.userExScore
-        ? BpiCalculator.calc(song.userExScore, songParams)
+        ? (BpiCalculator.calc(song.userExScore, songParams) ?? -15)
         : -15;
 
       return {
