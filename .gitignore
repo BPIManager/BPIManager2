@@ -47,7 +47,10 @@ next-env.d.ts
 
 certificates
 public/data/
-.claude/
+.claude/settings.json
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
+.claude/worktrees/
 examples/
 scripts/
 docs/
