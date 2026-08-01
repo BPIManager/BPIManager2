@@ -6,10 +6,28 @@ import { navigationRepo } from "@/lib/db/domains/logs/navigation";
 import { songsRepo } from "@/lib/db/domains/songs";
 
 /**
+ * {@link StatsTablesRepository.getLatestScoresWithMusicData}の結果をキャッシュする
+ * 有効期間(ms)。ダッシュボードの複数ウィジェットが同一ページロード内で
+ * 同じuserId/versionのデータをほぼ同時に要求するケースでDBラウンドトリップを
+ * 削減するための短時間キャッシュであり、データ鮮度を犠牲にする長期キャッシュではない。
+ */
+const LATEST_SCORES_CACHE_TTL_MS = 5000;
+
+/**
  * 統計ダッシュボード向けの表形式データ（AAA表・スコア履歴・楽曲ランキング等）を
  * 担当するリポジトリクラス。
  */
 class StatsTablesRepository {
+  private latestScoresWithMusicDataCache = new Map<
+    string,
+    {
+      data: Awaited<
+        ReturnType<StatsTablesRepository["fetchLatestScoresWithMusicData"]>
+      >;
+      expiresAt: number;
+    }
+  >();
+
   async getLatestTotalBpi(userId: string, version: string): Promise<number> {
     const result = await navigationRepo.getLatestTotalBpi(userId, version);
     return result ? Number(result.totalBpi) : -15;
@@ -61,6 +79,37 @@ class StatsTablesRepository {
 
   // scores・songs・songDefを横断JOINした一覧取得のため、直接クエリを維持する。
   async getLatestScoresWithMusicData(
+    userId: string,
+    version: string,
+    levels?: number[],
+    difficulties?: string[],
+  ) {
+    const cacheKey = JSON.stringify([
+      userId,
+      version,
+      levels ?? [],
+      difficulties ?? [],
+    ]);
+    const cached = this.latestScoresWithMusicDataCache.get(cacheKey);
+    if (cached) {
+      if (cached.expiresAt > Date.now()) return cached.data;
+      this.latestScoresWithMusicDataCache.delete(cacheKey);
+    }
+
+    const data = await this.fetchLatestScoresWithMusicData(
+      userId,
+      version,
+      levels,
+      difficulties,
+    );
+    this.latestScoresWithMusicDataCache.set(cacheKey, {
+      data,
+      expiresAt: Date.now() + LATEST_SCORES_CACHE_TTL_MS,
+    });
+    return data;
+  }
+
+  private async fetchLatestScoresWithMusicData(
     userId: string,
     version: string,
     levels?: number[],
