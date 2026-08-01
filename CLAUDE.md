@@ -4,38 +4,7 @@
 
 beatmania IIDXのスコア管理Webアプリ。Next.js (App Router **ではなく** Pages Router) + TypeScript + Tailwind CSS v4 + shadcn/ui。DBはMySQL (Kysely ORM)、認証はFirebase Auth。
 
-コーディング規約・ディレクトリ別の詳細ルールは `.claude/rules/` に分割されている。関連ファイルを開くと自動的に読み込まれるので、ここには常時必要な概要のみを置く。
-
-## コマンド
-
-```bash
-pnpm dev        # 開発サーバー起動 (--experimental-https)
-pnpm build      # ビルド
-pnpm test       # vitest（unit + integration）
-pnpm test:unit  # vitest（外部依存なしのunitのみ、日常はこちら）
-pnpm lint       # eslint
-```
-
-## ディレクトリ構成
-
-```
-src/
-├── pages/          # Next.js Pages Router（画面 & API Routes）
-│   └── api/v1/     # REST API: /users/[userId]/...
-├── components/
-│   ├── partials/   # ページ固有・共有の複合コンポーネント（詳細は .claude/rules/components.md）
-│   └── ui/         # shadcn/ui ベースの汎用UIコンポーネント
-├── hooks/          # SWRフェッチ + ローカル状態ロジック（ドメイン別サブディレクトリ）
-├── lib/
-│   ├── bpi/        # BPI計算ロジック（BpiCalculator クラス）
-│   ├── db/         # Kyselyクエリ（ドメイン別サブディレクトリ、詳細は .claude/rules/db-layer.md）
-│   ├── firebase/   # Firebase Admin / Client 初期化
-│   └── discord/    # Discord.js ボット
-├── types/          # 型定義（db.ts はkysely-codegen自動生成）
-├── constants/      # 定数（バージョン、ランク、BPM等）
-├── services/       # SWRフェッチャー / Next.js API リクエストヘルパー
-└── utils/          # 純粋関数ユーティリティ
-```
+セットアップ・コマンド一覧・ディレクトリ構成は [README.md](README.md) を参照。
 
 ## アーキテクチャ
 
@@ -73,3 +42,13 @@ src/
 - `IBpiBasicSongData` → `src/types/songs/bpi.ts`
 - IIDXバージョン → `src/types/iidx/version.ts`
 - 難易度 → `src/types/iidx/difficulty.ts`
+
+## 詳細ルール（`.claude/rules/`）
+
+該当パスを触るファイルが開かれると自動で読み込まれる。どの状況でどのファイルが効くかの一覧:
+
+- `coding-conventions.md` — 全般のコーディング規約（常時読み込み）
+- `db-layer.md` — `src/lib/db/`・`src/pages/api/`・`src/lib/mcp/tools/`・`src/lib/cron/` を触るとき
+- `components.md` — `src/components/` を触るとき
+- `git-workflow.md` — commit作成・issueとの紐付けのとき（常時読み込み）
+- `issue-driven-development.md` — issue駆動開発の運用（`spec-ready`ラベル等、常時読み込み）
