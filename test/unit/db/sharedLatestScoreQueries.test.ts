@@ -70,13 +70,13 @@ describe("latestLogIdPerSongSubquery", () => {
       table: "scores",
       userId: "user-1",
       version: "33",
-      extra: (qb) => qb.where("lastPlayed", "<", "2025-01-01"),
+      extra: (qb) => qb.where("lastPlayed", "<", new Date("2025-01-01")),
     });
 
     const whereCalls = callsFor(dbHolder.current.calls, "where");
     expect(whereCalls).toContainEqual({
       method: "where",
-      args: ["lastPlayed", "<", "2025-01-01"],
+      args: ["lastPlayed", "<", new Date("2025-01-01")],
     });
   });
 });

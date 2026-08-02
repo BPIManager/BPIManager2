@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
-import { sql } from "kysely";
+import { sql, type SelectQueryBuilder } from "kysely";
+import type { Database } from "@/types/db";
 
 /**
  * 「最新スコア取得」パターンの共通クエリビルダー群。
@@ -16,6 +17,12 @@ import { sql } from "kysely";
 
 export type LatestScoreTable = "scores" | "allScores";
 
+type LatestScoreQueryBuilder<O> = SelectQueryBuilder<
+  Database,
+  LatestScoreTable,
+  O
+>;
+
 /**
  * 「フォロー中ユーザー群」または「明示的な userId 配列」による `userId IN (...)` 絞り込みを
  * 適用する。{@link latestLogIdPerUserSongSubquery}/{@link latestLogIdPerUserSongScalarSubquery}
@@ -25,16 +32,14 @@ export type LatestScoreTable = "scores" | "allScores";
  * @param params.userIds - 対象ユーザー ID の明示的な配列（`followersOf` と排他）
  * @param params.followersOf - このユーザーがフォローしているユーザー群を対象にする場合の viewerId
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function applyUserIdsOrFollowersFilter<QB extends { where: (...args: any[]) => QB }>(
-  qb: QB,
+function applyUserIdsOrFollowersFilter<O>(
+  qb: LatestScoreQueryBuilder<O>,
   params: { userIds?: string[]; followersOf?: string },
-): QB {
+): LatestScoreQueryBuilder<O> {
   const { userIds, followersOf } = params;
 
   if (followersOf) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return qb.where("userId", "in", (sub: any) =>
+    return qb.where("userId", "in", (sub) =>
       sub
         .selectFrom("follows")
         .select("followingId")
@@ -43,6 +48,23 @@ function applyUserIdsOrFollowersFilter<QB extends { where: (...args: any[]) => Q
   } else if (userIds && userIds.length > 0) {
     return qb.where("userId", "in", userIds);
   }
+  return qb;
+}
+
+function baseLatestLogIdPerSongQuery(
+  table: LatestScoreTable,
+  userId: string,
+  version?: string,
+) {
+  let qb = db
+    .selectFrom(table)
+    .select(["songId", (eb) => eb.fn.max("logId").as("maxLogId")])
+    .where("userId", "=", userId);
+
+  if (version !== undefined) {
+    qb = qb.where("version", "=", version);
+  }
+
   return qb;
 }
 
@@ -62,24 +84,28 @@ export function latestLogIdPerSongSubquery(params: {
   table: LatestScoreTable;
   userId: string;
   version?: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  extra?: (qb: any) => any;
+  extra?: (
+    qb: ReturnType<typeof baseLatestLogIdPerSongQuery>,
+  ) => ReturnType<typeof baseLatestLogIdPerSongQuery>;
 }) {
   const { table, userId, version, extra } = params;
 
-  let qb = db
-    .selectFrom(table as "scores" | "allScores")
-    .select(["songId", (eb) => eb.fn.max("logId").as("maxLogId")])
-    .where("userId", "=", userId);
-
-  if (version !== undefined) {
-    qb = qb.where("version", "=", version);
-  }
+  let qb = baseLatestLogIdPerSongQuery(table, userId, version);
   if (extra) {
     qb = extra(qb);
   }
 
   return qb.groupBy("songId");
+}
+
+function baseLatestLogIdPerUserSongQuery(
+  table: LatestScoreTable,
+  version: string,
+) {
+  return db
+    .selectFrom(table)
+    .select(["userId", "songId", (eb) => eb.fn.max("logId").as("maxLogId")])
+    .where("version", "=", version);
 }
 
 /**
@@ -106,17 +132,16 @@ export function latestLogIdPerUserSongSubquery(params: {
   userIds?: string[];
   followersOf?: string;
   songIds?: number[];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  extra?: (qb: any) => any;
+  extra?: (
+    qb: ReturnType<typeof baseLatestLogIdPerUserSongQuery>,
+  ) => ReturnType<typeof baseLatestLogIdPerUserSongQuery>;
 }) {
   const { table, version, userIds, followersOf, songIds, extra } = params;
 
-  let qb = db
-    .selectFrom(table as "scores" | "allScores")
-    .select(["userId", "songId", (eb) => eb.fn.max("logId").as("maxLogId")])
-    .where("version", "=", version);
-
-  qb = applyUserIdsOrFollowersFilter(qb, { userIds, followersOf });
+  let qb = applyUserIdsOrFollowersFilter(
+    baseLatestLogIdPerUserSongQuery(table, version),
+    { userIds, followersOf },
+  );
 
   if (songIds && songIds.length > 0) {
     qb = qb.where("songId", "in", songIds);
@@ -126,6 +151,18 @@ export function latestLogIdPerUserSongSubquery(params: {
   }
 
   return qb.groupBy(["userId", "songId"]);
+}
+
+function baseLatestLogIdPerSongScalarQuery(
+  table: LatestScoreTable,
+  userId: string,
+  version: string,
+) {
+  return db
+    .selectFrom(table)
+    .select((eb) => eb.fn.max("logId").as("logId"))
+    .where("userId", "=", userId)
+    .where("version", "=", version);
 }
 
 /**
@@ -145,22 +182,28 @@ export function latestLogIdPerSongScalarSubquery(params: {
   table: LatestScoreTable;
   userId: string;
   version: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  extra?: (qb: any) => any;
+  extra?: (
+    qb: ReturnType<typeof baseLatestLogIdPerSongScalarQuery>,
+  ) => ReturnType<typeof baseLatestLogIdPerSongScalarQuery>;
 }) {
   const { table, userId, version, extra } = params;
 
-  let qb = db
-    .selectFrom(table as "scores" | "allScores")
-    .select((eb) => eb.fn.max("logId").as("logId"))
-    .where("userId", "=", userId)
-    .where("version", "=", version);
-
+  let qb = baseLatestLogIdPerSongScalarQuery(table, userId, version);
   if (extra) {
     qb = extra(qb);
   }
 
   return qb.groupBy("songId");
+}
+
+function baseLatestLogIdPerUserSongScalarQuery(
+  table: LatestScoreTable,
+  version: string,
+) {
+  return db
+    .selectFrom(table)
+    .select((eb) => eb.fn.max("logId").as("logId"))
+    .where("version", "=", version);
 }
 
 /**
@@ -185,17 +228,16 @@ export function latestLogIdPerUserSongScalarSubquery(params: {
   userIds?: string[];
   followersOf?: string;
   songIds?: number[];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  extra?: (qb: any) => any;
+  extra?: (
+    qb: ReturnType<typeof baseLatestLogIdPerUserSongScalarQuery>,
+  ) => ReturnType<typeof baseLatestLogIdPerUserSongScalarQuery>;
 }) {
   const { table, version, userIds, followersOf, songIds, extra } = params;
 
-  let qb = db
-    .selectFrom(table as "scores" | "allScores")
-    .select((eb) => eb.fn.max("logId").as("logId"))
-    .where("version", "=", version);
-
-  qb = applyUserIdsOrFollowersFilter(qb, { userIds, followersOf });
+  let qb = applyUserIdsOrFollowersFilter(
+    baseLatestLogIdPerUserSongScalarQuery(table, version),
+    { userIds, followersOf },
+  );
 
   if (songIds && songIds.length > 0) {
     qb = qb.where("songId", "in", songIds);
@@ -218,6 +260,10 @@ export function latestLogIdPerUserSongScalarSubquery(params: {
  * 独立したサブクエリとして `innerJoin`/`leftJoin` するのに対し、こちらは
  * 複数の相関サブクエリを1クエリ内で並列に JOIN する（自分のスコアとライバルのスコアを
  * 同時に左結合する、等）ケース向け。
+ *
+ * `eb` は呼び出し元の `.on()` コールバックが受け取るものをそのまま渡す想定だが、
+ * 呼び出し元ごとにJOIN済みテーブル集合(alias含む)が異なりKyselyの型では表現しきれないため、
+ * ここだけは`any`を許容する(呼び出し元での`.on()`自体は個別に型チェックされている)。
  *
  * @param eb - 呼び出し元の `.on()` コールバックが受け取る `ExpressionBuilder`
  * @param params.table - 対象テーブル（`scores` | `allScores`）
