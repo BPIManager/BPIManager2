@@ -20,14 +20,6 @@ const handler = async (
     return res.status(405).json({ error: `Method ${req.method} Not Allowed` });
   }
 
-  const { userId } = req.query;
-
-  if (!userId || typeof userId !== "string") {
-    return res
-      .status(400)
-      .json({ error: "User ID is required and must be a string" });
-  }
-
   const service = new BpiImportService();
 
   try {
