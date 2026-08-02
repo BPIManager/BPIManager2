@@ -196,6 +196,7 @@ async function loadPlayersSnapshot(version: IIDXVersion): Promise<PlayersSnapsho
     const raw = await fs.readFile(getPlayersFile(version), "utf-8");
     return JSON.parse(raw) as PlayersSnapshot;
   } catch {
+    // 初回実行時はスナップショットファイルが存在しないため、意図的に握りつぶしnullを返す
     return null;
   }
 }
@@ -355,7 +356,7 @@ export async function fetchOfficialArenaDistribution(
     byClass: activeByClass,
   });
 
-  // 上書き前に旧データをバックアップ
+  // 上書き前に旧データをバックアップ(失敗しても本処理は継続してよいベストエフォート)
   if (prevSnapshot?.fetchedAt) {
     const backupFile = getActiveBackupFile(version, prevSnapshot.fetchedAt, now.toISOString());
     await fs.mkdir(path.dirname(backupFile), { recursive: true });

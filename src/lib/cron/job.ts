@@ -8,11 +8,16 @@ import { generateUserSitemap } from "./sitemaps";
 import { invalidateArenaAveragesCache } from "@/lib/cache/arenaAverages";
 import dayjs from "../dayjs";
 
-async function performDailyTask() {
+/**
+ * cronジョブ共通の実行ラッパー。開始ログを出し、失敗時はエラーをログに
+ * 残した上で握りつぶす(cronの次回実行を妨げないため再throwはしない)。
+ */
+async function runCronJob(name: string, task: () => Promise<void>) {
+  console.log(`[Cron] ${name}`);
   try {
-    await generateUserSitemap();
+    await task();
   } catch (err) {
-    console.error("[Cron] Daily task failed:", err);
+    console.error(`[Cron] ${name} failed:`, err);
   }
 }
 
@@ -88,23 +93,12 @@ async function printArenaStatus() {
  */
 export async function setupArenaService() {
   // 起動時バックグラウンドタスク
-  performDailyTask();
-
-  generateArenaJson().catch((err) =>
-    console.error("[Cron] Initial arena JSON failed:", err),
-  );
-  generateInfoJson().catch((err) =>
-    console.error("[Cron] Initial info JSON failed:", err),
-  );
-  updateAllUserRadarCache().catch((err) =>
-    console.error("[Cron] Initial radar cache failed:", err),
-  );
-  updateAllSongRankingCache().catch((err) =>
-    console.error("[Cron] Initial song ranking cache failed:", err),
-  );
-  fetchOfficialArenaDistribution().catch((err) =>
-    console.error("[Cron] Initial arena distribution failed:", err),
-  );
+  runCronJob("Daily task", generateUserSitemap);
+  runCronJob("Initial arena JSON", generateArenaJson);
+  runCronJob("Initial info JSON", generateInfoJson);
+  runCronJob("Initial radar cache", updateAllUserRadarCache);
+  runCronJob("Initial song ranking cache", updateAllSongRankingCache);
+  runCronJob("Initial arena distribution", fetchOfficialArenaDistribution);
 
   // アリーナステータス表示
   printArenaStatus().catch(() => {});
@@ -112,36 +106,22 @@ export async function setupArenaService() {
   // ── Cron 登録 ──────────────────────────────────────────────
 
   cron.schedule("0 2 * * *", () => {
-    console.log("[Cron] performDailyTask");
-    performDailyTask();
+    runCronJob("Daily task", generateUserSitemap);
   });
 
-  cron.schedule("0 4 * * *", async () => {
-    console.log("[Cron] generateArenaJson");
-    try {
+  cron.schedule("0 4 * * *", () => {
+    runCronJob("generateArenaJson", async () => {
       await generateArenaJson();
       invalidateArenaAveragesCache();
-    } catch (err) {
-      console.error("[Cron] Arena JSON failed:", err);
-    }
+    });
   });
 
-  cron.schedule("0 16 * * *", async () => {
-    console.log("[Cron] generateInfoJson");
-    try {
-      await generateInfoJson();
-    } catch (err) {
-      console.error("[Cron] Info JSON failed:", err);
-    }
+  cron.schedule("0 16 * * *", () => {
+    runCronJob("generateInfoJson", generateInfoJson);
   });
 
-  cron.schedule("30 16 * * *", async () => {
-    console.log("[Cron] fetchOfficialArenaDistribution (daily)");
-    try {
-      await fetchOfficialArenaDistribution();
-    } catch (err) {
-      console.error("[Cron] Arena distribution failed:", err);
-    }
+  cron.schedule("30 16 * * *", () => {
+    runCronJob("fetchOfficialArenaDistribution (daily)", fetchOfficialArenaDistribution);
   });
 
   // アリーナ開催期間中は JST 07:00〜翌00:59（UTC 22:00〜15:59）の間、30 分ごとに取得
@@ -150,31 +130,21 @@ export async function setupArenaService() {
       const period = await getArenaEventPeriod();
       const now = new Date();
       if (!period || now < period.start || now > period.end) return;
-      console.log(
-        `[Cron] fetchOfficialArenaDistribution (arena live Round ${period.round}) / ${dayjs().format("YYYY-MM-DD HH:mm:ss")}`,
+      await runCronJob(
+        `fetchOfficialArenaDistribution (arena live Round ${period.round}) / ${dayjs().format("YYYY-MM-DD HH:mm:ss")}`,
+        fetchOfficialArenaDistribution,
       );
-      await fetchOfficialArenaDistribution();
     } catch (err) {
       console.error("[Cron] Frequent arena fetch failed:", err);
     }
   });
 
-  cron.schedule("0 */12 * * *", async () => {
-    console.log("[Cron] updateAllUserRadarCache");
-    try {
-      await updateAllUserRadarCache();
-    } catch (err) {
-      console.error("[Cron] Radar cache failed:", err);
-    }
+  cron.schedule("0 */12 * * *", () => {
+    runCronJob("updateAllUserRadarCache", updateAllUserRadarCache);
   });
 
-  cron.schedule("0 6,18 * * *", async () => {
-    console.log("[Cron] updateAllSongRankingCache");
-    try {
-      await updateAllSongRankingCache();
-    } catch (err) {
-      console.error("[Cron] Song ranking cache failed:", err);
-    }
+  cron.schedule("0 6,18 * * *", () => {
+    runCronJob("updateAllSongRankingCache", updateAllSongRankingCache);
   });
 
   console.log("[Cron] All jobs registered.");
