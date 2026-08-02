@@ -5,6 +5,8 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { createOptimizeMemoBodySchema } from "@/schemas/optimizeMemo/create";
 import { parseBody } from "@/services/nextRequest/parseBody";
 
+// メモの作成は常に本人のみ許可する。パスのuserIdはwithAuth内で
+// authUidとの一致チェックに使われるため、ここで改めて認可チェックは不要。
 const postHandler = withAuth(async (req, res) => {
   const uid = req.authUid;
 
@@ -20,6 +22,8 @@ export default async function handler(
   res: NextApiResponse,
 ) {
   if (req.method === "GET") {
+    // 閲覧は公開プロフィールなら本人以外にも許可するため、
+    // withAuthの本人確認より緩いcheckUserAccessを使う。
     const { userId } = req.query;
     const uid = String(userId);
 
