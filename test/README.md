@@ -7,11 +7,16 @@ test/
 ├── unit/
 │   ├── db/         # dbをモックしてクエリ組み立て・変換ロジックを検証するリポジトリテスト
 │   ├── logic/      # DBに触れない純粋関数・サービスロジックのテスト
+│   ├── hooks/      # src/hooks/**のカスタムフックのテスト(React状態管理を伴うもの)
 │   └── helpers/    # unit配下で共通利用するスパイ等(dbQuerySpy.ts等)
 ├── integration/   # 起動中のサーバーや実DBなど、外部システムに依存するテスト
 ├── resources/      # unit/integration 共通のフィクスチャ(CSV・JSON等)
 └── setup.ts        # vitest 共通セットアップ(@testing-library/jest-dom 等)
 ```
+
+`test/unit/hooks/`配下のテストはReactのレンダリングを伴うため、ファイル先頭に
+`// @vitest-environment jsdom`を付けてvitest.config.tsのデフォルト環境(`node`)を
+上書きする。`@testing-library/react`の`renderHook`/`act`を使う。
 
 `test/unit/` に新しくテストを追加するときは、`vi.mock("@/lib/db", ...)` 等でDBをモックしてクエリ組み立てを検証するものは `db/`、DBに触れない純粋関数やサービスロジックのテストは `logic/` に置く。
 
