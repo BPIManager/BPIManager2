@@ -165,6 +165,20 @@ class UsersRepository {
   }
 
   /**
+   * アクセス権判定用にユーザーの公開設定を取得する。
+   *
+   * @param userId - ユーザー ID
+   * @returns `{ userId, isPublic }`、存在しない場合は `undefined`
+   */
+  async getAccessInfo(userId: string) {
+    return await db
+      .selectFrom("users")
+      .select(["userId", "isPublic"])
+      .where("userId", "=", userId)
+      .executeTakeFirst();
+  }
+
+  /**
    * 全ユーザーIDの一覧を取得する（sitemap生成・cronバッチ処理用）。
    */
   async getAllUserIds() {

@@ -6,11 +6,8 @@ import { deleteBatch } from "@/lib/db/orchestrators/batchDeletion";
 import { mapToLogNested } from "@/utils/logs/getMapNested";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createOvertakenMap, computeRivalRankMap } from "./[batchId]/scores";
-import {
-  checkProfileAccess,
-  authenticateViewer,
-} from "@/middlewares/api/withApiOnProfile";
-import { rejectAccess } from "@/middlewares/api/withApi";
+import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
+import { rejectAccess, authenticateViewer } from "@/middlewares/api/withApi";
 import { parseQuery } from "@/services/nextRequest/parseBody";
 import {
   batchDetailGetQuerySchema,

@@ -1,4 +1,4 @@
-import { db } from "@/lib/db";
+import { usersRepo } from "@/lib/db/domains/users";
 import { adminAuth } from "@/lib/firebase/admin";
 import type { NextApiRequest, NextApiResponse } from "next";
 
@@ -15,15 +15,33 @@ export interface AccessResult {
   viewerId?: string;
 }
 
+/**
+ * リクエストのAuthorizationヘッダーからFirebase IDトークンを検証し、
+ * 送信者のuidを取得する。トークンが無い・検証に失敗した場合は`undefined`。
+ */
+export async function authenticateViewer(
+  req: NextApiRequest,
+): Promise<string | undefined> {
+  const authHeader = req.headers.authorization;
+
+  if (authHeader?.startsWith("Bearer ")) {
+    try {
+      const idToken = authHeader.split("Bearer ")[1];
+      const decodedToken = await adminAuth.verifyIdToken(idToken);
+      return decodedToken.uid;
+    } catch {
+      console.error("Auth: Token verification failed");
+    }
+  }
+
+  return undefined;
+}
+
 export async function checkUserAccess(
   req: NextApiRequest,
   targetUserId: string,
 ): Promise<AccessResult> {
-  const userData = await db
-    .selectFrom("users as u")
-    .select(["u.userId", "u.isPublic"])
-    .where("u.userId", "=", targetUserId)
-    .executeTakeFirst();
+  const userData = await usersRepo.getAccessInfo(targetUserId);
 
   if (!userData) {
     return {
@@ -36,18 +54,10 @@ export async function checkUserAccess(
     return { hasAccess: true, user: userData };
   }
 
-  const authHeader = req.headers.authorization;
+  const viewerId = await authenticateViewer(req);
 
-  if (authHeader?.startsWith("Bearer ")) {
-    try {
-      const idToken = authHeader.split("Bearer ")[1];
-      const decodedToken = await adminAuth.verifyIdToken(idToken);
-      if (decodedToken.uid === targetUserId) {
-        return { hasAccess: true, user: userData, viewerId: decodedToken.uid };
-      }
-    } catch {
-      console.error("Access Control: Token verification failed");
-    }
+  if (viewerId === targetUserId) {
+    return { hasAccess: true, user: userData, viewerId };
   }
 
   return {

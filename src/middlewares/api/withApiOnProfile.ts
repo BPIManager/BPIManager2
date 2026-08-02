@@ -1,7 +1,6 @@
 import { NextApiRequest } from "next";
-import { AccessResult } from "./withApi";
-import { db } from "@/lib/db";
-import { adminAuth } from "@/lib/firebase/admin";
+import { AccessResult, authenticateViewer } from "./withApi";
+import { usersRepo } from "@/lib/db/domains/users";
 
 export async function checkProfileAccess(
   req: NextApiRequest,
@@ -10,11 +9,7 @@ export async function checkProfileAccess(
   const viewerId = await authenticateViewer(req);
   const isOwner = viewerId === targetUserId;
 
-  const userData = await db
-    .selectFrom("users")
-    .select(["userId", "isPublic"])
-    .where("userId", "=", targetUserId)
-    .executeTakeFirst();
+  const userData = await usersRepo.getAccessInfo(targetUserId);
 
   if (isOwner) {
     return {
@@ -43,22 +38,4 @@ export async function checkProfileAccess(
     hasAccess: false,
     error: { status: 403, message: "This profile is set as a private." },
   };
-}
-
-export async function authenticateViewer(
-  req: NextApiRequest,
-): Promise<string | undefined> {
-  const authHeader = req.headers.authorization;
-
-  if (authHeader?.startsWith("Bearer ")) {
-    try {
-      const idToken = authHeader.split("Bearer ")[1];
-      const decodedToken = await adminAuth.verifyIdToken(idToken);
-      return decodedToken.uid;
-    } catch {
-      console.error("Auth: Token verification failed");
-    }
-  }
-
-  return undefined;
 }
