@@ -1,16 +1,17 @@
 import type { RadarCategory } from "@/types/stats/radar";
+import type { IBpiBasicSongData } from "@/types/songs/bpi";
 
 export type OptimizerStrategy = "unplayed" | "played";
 
-export interface SongOptimizerInput {
+export interface SongOptimizerInput
+  extends Pick<
+    IBpiBasicSongData,
+    "notes" | "kaidenAvg" | "wrScore" | "coef"
+  > {
   songId: number;
   title: string;
   difficulty: string;
   difficultyLevel: number;
-  notes: number;
-  kaidenAvg: number | null;
-  wrScore: number | null;
-  coef: number | null;
   currentBpi: number;
   currentExScore: number | null;
   isUnplayed: boolean;

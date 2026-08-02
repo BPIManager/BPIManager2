@@ -180,7 +180,7 @@ class BpiOptimizer {
   ) {
     this.sourceData = sourceData;
     this.n = totalCount;
-    const exponent = Math.log2(totalCount) || 1;
+    const exponent = BpiCalculator.totalBpiExponent(totalCount);
     this.targetTotalValue = targetTotalValue;
     this.options = options;
     this.maxSteps = maxSteps;

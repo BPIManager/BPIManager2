@@ -18,6 +18,15 @@ export class BpiCalculator {
   }
 
   /**
+   * 総合BPIのべき乗平均で使用する指数を計算する。
+   *
+   * @param totalSongCount - 対象楽曲の総数
+   */
+  public static totalBpiExponent(totalSongCount: number): number {
+    return Math.max(1, Math.log2(totalSongCount));
+  }
+
+  /**
    * 単曲 BPI を計算する。
    *
    * @param s - プレイヤーの EX スコア
@@ -100,7 +109,7 @@ export class BpiCalculator {
   ): number {
     if (totalSongCount === 0) return -15;
 
-    const k = Math.max(1, Math.log2(totalSongCount));
+    const k = this.totalBpiExponent(totalSongCount);
 
     let sum = 0;
     for (let i = 0; i < totalSongCount; i++) {

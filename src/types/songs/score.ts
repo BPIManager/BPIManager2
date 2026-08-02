@@ -1,5 +1,6 @@
 import { IidxDifficulty } from "../iidx/difficulty";
 import { Score } from "@/types/db";
+import type { IBpiBasicSongData } from "@/types/songs/bpi";
 
 export interface RivalScore {
   userId?: string | null;
@@ -11,11 +12,11 @@ export interface RivalScore {
   lastPlayed: Date | string | null;
 }
 
-export interface SongWithScore {
+export interface SongWithScore
+  extends Pick<IBpiBasicSongData, "notes" | "kaidenAvg" | "wrScore" | "coef"> {
   // 楽曲基本情報
   songId: number;
   title: string;
-  notes: number;
   bpm: string | null;
   difficulty: string;
   difficultyLevel: number;
@@ -28,11 +29,6 @@ export interface SongWithScore {
   clearState: string | null;
   missCount: number | null;
   scoreAt: Date | string | null;
-
-  // 楽曲定義（BPI計算用）
-  wrScore: number | null;
-  kaidenAvg: number | null;
-  coef: number | null;
 
   radarTop?: string | null;
 
