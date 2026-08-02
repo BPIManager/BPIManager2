@@ -114,6 +114,17 @@ export function buildRivals(
   return rivals;
 }
 
+/**
+ * DBから受け取ったbpi値(decimal列のため文字列で返る場合を含むunknown)を、
+ * 未設定時のフォールバック込みでnumberへ変換する。
+ *
+ * `as number`のような無検証キャストだと文字列がそのまま紛れ込んでも
+ * 気づけないため、必ずNumber()で変換してから扱う。
+ */
+function toBpiNumber<T>(bpi: unknown, fallback: T): number | T {
+  return bpi != null ? Number(bpi) : fallback;
+}
+
 export function attachRivalBpiTimelines(
   rivals: RivalDiff[],
   rivalPreMonthState: { userId: string; songId: number; bpi: unknown }[],
@@ -132,7 +143,7 @@ export function attachRivalBpiTimelines(
       rivalPreMonthByUser.set(s.userId, new Map());
     rivalPreMonthByUser
       .get(s.userId)!
-      .set(s.songId, s.bpi != null ? Number(s.bpi) : -15);
+      .set(s.songId, toBpiNumber(s.bpi, -15));
   }
 
   const rivalInMonthByUser = new Map<string, typeof rivalInMonthHistory>();
@@ -152,7 +163,7 @@ export function attachRivalBpiTimelines(
     const rawInMonth = rivalInMonthByUser.get(r.userId) ?? [];
     const inMonth = rawInMonth.map((e) => ({
       songId: e.songId,
-      bpi: e.bpi != null ? (e.bpi as number) : null,
+      bpi: toBpiNumber(e.bpi, null),
       lastPlayed: e.lastPlayed,
     }));
     const { history, bpiStart: rBpiStart, bpiEnd: rBpiEnd } = buildBpiTimeline(
