@@ -1,171 +1,23 @@
-import useSWR from "swr";
 import { useUser } from "@/contexts/users/UserContext";
 import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
-import { fetcher } from "@/utils/common/fetch";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
-import {
-  SongWithRival,
-  SongWithScore,
-  RivalScore,
-} from "@/types/songs/score";
+import { SongWithRival, SongWithScore } from "@/types/songs/score";
 import { BpiCalculator } from "@/lib/bpi";
-import type { IBpiBasicSongData } from "@/types/songs/bpi";
+import { AnalyticsTarget } from "@/types/analytics";
 import {
-  AnalyticsTargetKind,
-  AnalyticsTarget,
-} from "@/types/analytics";
-
-/**
- * {@link AnalyticsTarget} を URL クエリに埋め込める文字列にエンコードする。
- *
- * @param t - エンコード対象のターゲット
- * @returns `encodeURIComponent` 済みの文字列
- */
-export function encodeTarget(t: AnalyticsTarget): string {
-  return encodeURIComponent(`${t.kind}:${t.param ?? ""}:${t.label}`);
-}
-
-/**
- * {@link encodeTarget} でエンコードされた文字列を {@link AnalyticsTarget} にデコードする。
- *
- * @param raw - エンコード済み文字列
- * @returns デコード結果。パースに失敗した場合は `null`
- */
-export function decodeTarget(raw: string): AnalyticsTarget | null {
-  try {
-    const decoded = decodeURIComponent(raw);
-    const [kind, param, ...labelParts] = decoded.split(":");
-    const label = labelParts.join(":");
-    if (!kind) return null;
-    return {
-      kind: kind as AnalyticsTargetKind,
-      param: param || undefined,
-      label,
-    };
-  } catch {
-    return null;
-  }
-}
-
-interface ArenaAverageRow {
-  title: string;
-  difficulty: string;
-  notes: number;
-  maxScore: number;
-  averages: Record<
-    string,
-    { avgExScore: number; rate: number; count: number; avgBpi?: number }
-  >;
-}
-
-interface RivalCommonRow {
-  songId: number;
-  title: string;
-  difficulty: string;
-  difficultyLevel: number;
-}
-
-interface RivalAvgRow extends RivalCommonRow {
-  avgExScore: number | null;
-  avgBpi: number | null;
-}
-
-interface RivalTopRow extends RivalCommonRow {
-  topExScore: number | null;
-  topBpi: number | null;
-}
-
-interface BestEverRow {
-  songId: number;
-  title: string;
-  difficulty: string;
-  difficultyLevel: number;
-  notes: number;
-  bpm: string | null;
-  releasedVersion: number | null;
-  bestExScore: number | null;
-  bestBpi: number | null;
-  bestVersion: string | null;
-  wrScore: number | null;
-  kaidenAvg: number | null;
-  coef: number | null;
-}
-
-function toBpiParams(s: SongWithScore): IBpiBasicSongData {
-  return {
-    notes: s.notes,
-    kaidenAvg: s.kaidenAvg,
-    wrScore: s.wrScore,
-    coef: s.coef,
-  };
-}
-
-function mergeFixedTarget(
-  s: SongWithScore,
-  targetEx: number | null,
-  targetBpi: number | null,
-): SongWithRival {
-  const exDiff =
-    s.exScore !== null && targetEx !== null ? s.exScore - targetEx : undefined;
-  const bpiDiff =
-    s.bpi !== null && targetBpi !== null
-      ? Math.round((Number(s.bpi) - targetBpi) * 100) / 100
-      : undefined;
-
-  const rival: RivalScore = {
-    exScore: targetEx,
-    bpi: targetBpi,
-    clearState: null,
-    missCount: null,
-    lastPlayed: null,
-  };
-
-  return { ...s, rival, exDiff, bpiDiff } as SongWithRival;
-}
-
-const SCORE_RATE: Record<"aaa" | "max-", number> = {
-  aaa: 8 / 9,
-  "max-": 17 / 18,
-};
-
-const useRivalAvgScores = (userId: string | undefined, version: string) => {
-  const { data, error, isLoading } = useAuthedSWR<RivalAvgRow[]>(
-    userId
-      ? `${API_PREFIX}/users/${userId}/rivals/following/avg-scores?version=${version}`
-      : null,
-    { revalidateOnFocus: false, dedupingInterval: 10000 },
-  );
-  return { data, error, isLoading };
-};
-
-const useRivalTopScores = (userId: string | undefined, version: string) => {
-  const { data, error, isLoading } = useAuthedSWR<RivalTopRow[]>(
-    userId
-      ? `${API_PREFIX}/users/${userId}/rivals/following/top-scores?version=${version}`
-      : null,
-    { revalidateOnFocus: false, dedupingInterval: 10000 },
-  );
-  return { data, error, isLoading };
-};
-
-const useArenaJson = (version: string, levels: number[]) => {
-  const v = "32";
-  const { data: data11, isLoading: l11 } = useSWR<ArenaAverageRow[]>(
-    levels.includes(11) ? `/data/metrics/arena/${v}_11.json` : null,
-    fetcher,
-    { revalidateOnFocus: false },
-  );
-  const { data: data12, isLoading: l12 } = useSWR<ArenaAverageRow[]>(
-    levels.includes(12) ? `/data/metrics/arena/${v}_12.json` : null,
-    fetcher,
-    { revalidateOnFocus: false },
-  );
-  return {
-    rows: [...(data11 ?? []), ...(data12 ?? [])],
-    isLoading: l11 || l12,
-  };
-};
+  BestEverRow,
+  RivalAvgRow,
+  RivalTopRow,
+  SCORE_RATE,
+  mergeFixedTarget,
+  toBpiParams,
+} from "./comparisonRows";
+import {
+  useArenaJson,
+  useRivalAvgScores,
+  useRivalTopScores,
+} from "./useComparisonSources";
 
 /**
  * アナリティクス比較ターゲット（ライバル / 旧バージョン自己 / アリーナ / AAA 目標など）に

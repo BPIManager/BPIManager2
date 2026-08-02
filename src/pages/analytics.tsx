@@ -11,11 +11,8 @@ import { Button } from "@/components/ui/button";
 import { RequireAuth } from "@/components/partials/shell/RequireAuth";
 import { useUser } from "@/contexts/users/UserContext";
 
-import {
-  decodeTarget,
-  encodeTarget,
-  useAnalyticsComparison,
-} from "@/hooks/analytics/useAnalyticsComparison";
+import { useAnalyticsComparison } from "@/hooks/analytics/useAnalyticsComparison";
+import { decodeTarget, encodeTarget } from "@/hooks/analytics/targetCodec";
 import type { AnalyticsTarget } from "@/types/analytics";
 import { TargetSelectorModal } from "@/components/partials/features/Analytics/TargetSelector";
 import { AnalyticsComparisonTable } from "@/components/partials/features/Analytics/Table";
