@@ -8,6 +8,7 @@ import {
 } from "fs";
 import { join } from "path";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
+import { MemoryCache } from "@/lib/cache/memoryCache";
 
 export interface AreaRankInfo {
   area: string;
@@ -51,8 +52,11 @@ const DATA_DIR = join(
 const CACHE_DIR = join(DATA_DIR, "cache");
 const CACHE_FILE = join(CACHE_DIR, "prefecture_rankings.json");
 
-let memoryCache: CacheFile | null = null;
-let latestDateJsonCache: { result: { absolutePath: string; sourceFile: string } | null; checkedAt: number } | null = null;
+const memoryCache = new MemoryCache<"singleton", CacheFile>();
+const latestDateJsonCache = new MemoryCache<
+  "singleton",
+  { result: { absolutePath: string; sourceFile: string } | null; checkedAt: number }
+>();
 const LATEST_JSON_TTL_MS = 60_000;
 
 function getLatestDateJson(): {
@@ -60,13 +64,14 @@ function getLatestDateJson(): {
   sourceFile: string;
 } | null {
   const now = Date.now();
-  if (latestDateJsonCache && now - latestDateJsonCache.checkedAt < LATEST_JSON_TTL_MS) {
-    return latestDateJsonCache.result;
+  const cached = latestDateJsonCache.get("singleton");
+  if (cached && now - cached.checkedAt < LATEST_JSON_TTL_MS) {
+    return cached.result;
   }
 
   const versionDir = join(DATA_DIR, latestVersion);
   if (!existsSync(versionDir)) {
-    latestDateJsonCache = { result: null, checkedAt: now };
+    latestDateJsonCache.set("singleton", { result: null, checkedAt: now });
     return null;
   }
 
@@ -75,7 +80,7 @@ function getLatestDateJson(): {
     .sort();
 
   if (files.length === 0) {
-    latestDateJsonCache = { result: null, checkedAt: now };
+    latestDateJsonCache.set("singleton", { result: null, checkedAt: now });
     return null;
   }
 
@@ -84,7 +89,7 @@ function getLatestDateJson(): {
     absolutePath: join(versionDir, latest),
     sourceFile: `${latestVersion}/${latest}`,
   };
-  latestDateJsonCache = { result, checkedAt: now };
+  latestDateJsonCache.set("singleton", { result, checkedAt: now });
   return result;
 }
 
@@ -157,17 +162,18 @@ function loadCache(): CacheFile | null {
   const latest = getLatestDateJson();
   if (!latest) return null;
 
-  if (memoryCache && isCacheValid(memoryCache, latest.sourceFile)) {
-    return memoryCache;
+  const cachedInMemory = memoryCache.get("singleton");
+  if (cachedInMemory && isCacheValid(cachedInMemory, latest.sourceFile)) {
+    return cachedInMemory;
   }
-  memoryCache = null;
+  memoryCache.clear();
 
   if (existsSync(CACHE_FILE)) {
     try {
       const raw = readFileSync(CACHE_FILE, "utf-8");
       const cache: CacheFile = JSON.parse(raw);
       if (isCacheValid(cache, latest.sourceFile)) {
-        memoryCache = cache;
+        memoryCache.set("singleton", cache);
         return cache;
       }
       rmSync(CACHE_FILE, { force: true });
@@ -175,7 +181,7 @@ function loadCache(): CacheFile | null {
   }
 
   const cache = generateCache();
-  if (cache) memoryCache = cache;
+  if (cache) memoryCache.set("singleton", cache);
   return cache;
 }
 
