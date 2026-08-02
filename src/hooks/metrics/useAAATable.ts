@@ -63,7 +63,9 @@ export const useAAATable = (
       },
       {} as Record<number, AAATableItem[]>,
     );
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // getTargetBpiは毎レンダー再生成される関数だが、その挙動はgoal(依存に含めている)
+    // だけで決まるため、関数自体を依存に含めると無意味な再計算を招くので除外する
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, goal, mode, customGoalRatio, customGoalOffset]);
 
   return { groupedData, isLoading, isError: error };

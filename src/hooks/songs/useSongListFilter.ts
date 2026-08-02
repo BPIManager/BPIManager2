@@ -56,7 +56,10 @@ export function useSongListFilter() {
     setDifficulties(parseDiff(q.diff));
     setSortKey(parseSortKey(q.sort));
     setSortDir(parseSortDir(q.dir));
-  }, [router.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
+    // router.isReadyがtrueになった最初の1回だけURLからの初期化を行いたいため、
+    // router自体(毎レンダーで参照が変わりうる)は依存に含めない(initializedRefで二重実行も防止)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router.isReady]);
 
   useEffect(() => {
     if (!router.isReady || !initializedRef.current) return;
@@ -67,7 +70,11 @@ export function useSongListFilter() {
     newQuery.sort = sortKey;
     newQuery.dir = sortDir;
     router.replace({ query: newQuery }, undefined, { shallow: true });
-  }, [committedSearch, difficulties, sortKey, sortDir]); // eslint-disable-line react-hooks/exhaustive-deps
+    // router/versionをフィルタ状態の変化だけで反映させたいため依存に含めない。
+    // routerを含めるとrouter.replace自体が引き起こすrouter変化で再実行される
+    // フィードバックループになりうる
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [committedSearch, difficulties, sortKey, sortDir]);
 
   const levels = new Set(["12"]);
 
@@ -123,6 +130,8 @@ export function useSongListFilter() {
         sortDir,
         "global",
       ),
+    // levelsは`new Set(["12"])`で毎レンダー新規生成される値のため、依存に含めると
+    // 常に再計算されメモ化が無意味になる。値自体は不変なので意図的に除外する
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [songs, committedSearch, difficulties, sortKey, sortDir],
   );
