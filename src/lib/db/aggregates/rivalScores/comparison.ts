@@ -169,10 +169,10 @@ class SocialComparisonRepository {
   // follows・users・userStatusLogs・officialArenaStats・userRadarCache・
   // userRoles・songs・songDef・scores(自分/ライバル)を横断JOINした
   // 勝敗サマリー集計のため、直接クエリを維持する。aggregates/内で最も
-  // 重いクエリである。以前はfollows×targetSongsのcrossJoinで行数が線形増加
-  // する構造だったが、勝敗集計をrivalsLatest×myLatest(実際にスコアが両者に
-  // 存在する組み合わせのみ)側で先に集約するwl小テーブルへ寄せ、外側の
-  // follows一覧とは1:1のLEFT JOINで結合する形に変更した。
+  // 重いクエリである。勝敗集計はrivalsLatest×myLatest(実際にスコアが
+  // 両者に存在する組み合わせのみ)側で先に集約したwl小テーブルとして
+  // 求め、外側のfollows一覧とは1:1のLEFT JOINで結合することで行数の
+  // 爆発を防いでいる。
   async getFollowedWinLossSummary(params: {
     viewerId: string;
     version: string;
