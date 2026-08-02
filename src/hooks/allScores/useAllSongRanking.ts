@@ -1,8 +1,5 @@
-import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
-import { useUser } from "@/contexts/users/UserContext";
-import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
-import type { SongRankingResponse } from "@/types/users/ranking";
+import { useSongRankingQuery } from "@/hooks/common/useSongRankingQuery";
 
 /**
  * 指定 allSongs 楽曲のグローバルランキングを取得する（allScores テーブル使用）。
@@ -13,16 +10,7 @@ import type { SongRankingResponse } from "@/types/users/ranking";
 export const useAllSongRanking = (
   songId: number | null,
   version: string | null,
-) => {
-  const { fbUser } = useUser();
-
-  const url =
-    fbUser && songId
-      ? `${API_PREFIX}/users/${fbUser.uid}/all-scores/${songId}/ranking?version=${version || latestVersion}`
-      : null;
-  const { data, isLoading, error } = useAuthedSWR<SongRankingResponse>(url, {
-    revalidateOnFocus: false,
-  });
-
-  return { data, isLoading, isError: error };
-};
+) =>
+  useSongRankingQuery(songId, version, (uid, songId, version) =>
+    `${API_PREFIX}/users/${uid}/all-scores/${songId}/ranking?version=${version}`,
+  );
