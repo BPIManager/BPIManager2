@@ -7,7 +7,7 @@ import { songsRepo } from "@/lib/db/domains/songs";
 import { allSongsRepo } from "@/lib/db/domains/allSongs";
 import { saveImportResults } from "@/lib/db/orchestrators/bpiImport";
 import { BpiCalculator } from "@/lib/bpi";
-import { isImproved } from "@/lib/lamp";
+import { isScoreImproved } from "@/lib/scores/evaluateImprovement";
 import { NewAllScores, NewScore } from "@/types/db";
 import { updateMyScoreSchema } from "@/lib/mcp/schemas";
 
@@ -50,11 +50,7 @@ export function registerUpdateMyScore(server: McpServer, userId: string) {
       }
 
       const current = currentScores.find((s) => s.songId === songId);
-      const scoreBetter = exScore > (current?.exScore ?? 0);
-      const lampBetter = isImproved(clearState, current?.clearState ?? null);
-      const currentMiss = current?.missCount ?? Infinity;
-      const missBetter = missCount !== undefined && missCount < currentMiss;
-      const improved = exScore > 0 && (scoreBetter || lampBetter || missBetter);
+      const improved = isScoreImproved({ exScore, clearState, missCount }, current);
 
       if (!improved) {
         return {
@@ -99,16 +95,10 @@ export function registerUpdateMyScore(server: McpServer, userId: string) {
         const currentAllScore = currentAllScores.find(
           (s) => s.songId === allSong.songId,
         );
-        const allScoreBetter = exScore > (currentAllScore?.exScore ?? 0);
-        const allLampBetter = isImproved(
-          clearState,
-          currentAllScore?.clearState ?? null,
+        const allImproved = isScoreImproved(
+          { exScore, clearState, missCount },
+          currentAllScore,
         );
-        const currentAllMiss = currentAllScore?.missCount ?? Infinity;
-        const allMissBetter =
-          missCount !== undefined && missCount < currentAllMiss;
-        const allImproved =
-          exScore > 0 && (allScoreBetter || allLampBetter || allMissBetter);
 
         if (allImproved) {
           allScoreUpdates.push({

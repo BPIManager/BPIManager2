@@ -4,7 +4,7 @@ import {
   AuthenticatedNextApiRequest,
 } from "@/middlewares/api/withAuth";
 import { v4 as uuidv4 } from "uuid";
-import { isImproved } from "@/lib/lamp";
+import { isScoreImproved } from "@/lib/scores/evaluateImprovement";
 import { BpiCalculator } from "@/lib/bpi";
 import { NewScore, NewAllScores } from "@/types/db";
 import { scoresRepo } from "@/lib/db/domains/scores";
@@ -60,30 +60,6 @@ const handler = async (
     const notFound: { title: string; difficulty: string }[] = [];
     const previousTotalBpi = lastLog?.totalBpi ?? -15;
 
-    type CsvRow = {
-      title: string;
-      difficulty: string;
-      exScore: number;
-      clearState: string;
-      missCount: number | null;
-      lastPlayed: string | null;
-    };
-    type CurrentScore =
-      | { exScore: number; clearState: string | null; missCount: number | null }
-      | undefined;
-
-    const checkImprovement = (row: CsvRow, current: CurrentScore) => {
-      if (!row.exScore || row.exScore <= 0) return false;
-      const scoreBetter = row.exScore > (current?.exScore ?? 0);
-      const lampBetter = isImproved(
-        row.clearState,
-        current?.clearState ?? null,
-      );
-      const currentMiss = current?.missCount ?? Infinity;
-      const missBetter = row.missCount !== null && row.missCount < currentMiss;
-      return scoreBetter || lampBetter || missBetter;
-    };
-
     const lastPlayedDate = (dateStr: string | null) =>
       dateStr && dayjs(dateStr).isValid()
         ? dayjs.tz(dateStr).utc().toDate()
@@ -99,7 +75,7 @@ const handler = async (
       }
 
       const current = allScoreMap.get(song.songId);
-      if (checkImprovement(row, current)) {
+      if (isScoreImproved(row, current)) {
         const bpiTarget = bpiMasterMap.get(`${row.title}_${row.difficulty}`);
         const bpiValue = bpiTarget
           ? BpiCalculator.calc(row.exScore, bpiTarget)
@@ -126,7 +102,7 @@ const handler = async (
       if (!song) continue;
 
       const current = bpiScoreMap.get(song.songId);
-      if (checkImprovement(row, current)) {
+      if (isScoreImproved(row, current)) {
         scoreUpdates.push({
           userId,
           songId: song.songId,
