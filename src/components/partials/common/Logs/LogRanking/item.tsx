@@ -220,7 +220,15 @@ export const RankItem = ({
 
   return (
     <div
+      role="button"
+      tabIndex={0}
       onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick();
+        }
+      }}
       className={cn(
         "flex items-center justify-between gap-2 border-b border-bpim-border p-3 transition-colors cursor-pointer md:p-4",
         rank <= 3 ? "bg-bpim-card/50" : "bg-transparent",
