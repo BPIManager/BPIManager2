@@ -1,5 +1,6 @@
 import { User as FirebaseUser } from "firebase/auth";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { authFetch, fetcher } from "@/utils/common/fetch";
 
 export interface ArenaPrivacySettings {
   showArenaClass: boolean;
@@ -11,13 +12,8 @@ export interface ArenaPrivacySettings {
 export async function fetchStatsPrivacy(
   fbUid: string,
   fbUser: FirebaseUser,
-): Promise<{ statsPrivacy?: ArenaPrivacySettings } | null> {
-  const token = await fbUser.getIdToken();
-  const res = await fetch(`${API_PREFIX}/users/${fbUid}/profile`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) return null;
-  return res.json();
+): Promise<{ statsPrivacy?: ArenaPrivacySettings }> {
+  return fetcher([`${API_PREFIX}/users/${fbUid}/profile`, fbUser]);
 }
 
 export async function checkUserNameAvailability(
@@ -52,21 +48,18 @@ export async function saveProfile(
   formData: EditProfileFormData,
   arenaPrivacy: ArenaPrivacySettings,
 ) {
-  const token = await fbUser.getIdToken();
-  const res = await fetch(`${API_PREFIX}/users/${fbUid}/profile`, {
+  const res = await authFetch(
+    `${API_PREFIX}/users/${fbUid}/profile`,
     method,
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({
+    fbUser,
+    {
       ...formData,
       iidxId: formData.iidxId.replace(/-/g, ""),
       profileText: formData.bio || null,
       isPublic: formData.isPublic ? 1 : 0,
       arenaPrivacy,
-    }),
-  });
+    },
+  );
 
   if (!res.ok) throw new Error();
 }

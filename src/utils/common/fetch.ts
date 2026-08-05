@@ -1,10 +1,11 @@
 export async function authFetch(
   url: string,
   method: string,
-  fbUser: { getIdToken: () => Promise<string> } | null,
+  fbUser: { getIdToken: (forceRefresh?: boolean) => Promise<string> } | null,
   body?: unknown,
+  forceRefresh?: boolean,
 ): Promise<Response> {
-  const token = fbUser ? await fbUser.getIdToken() : null;
+  const token = fbUser ? await fbUser.getIdToken(forceRefresh) : null;
   return fetch(url, {
     method,
     headers: {

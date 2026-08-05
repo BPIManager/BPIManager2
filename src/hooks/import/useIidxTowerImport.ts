@@ -67,9 +67,8 @@ export const useIidxTowerImport = (fbUser: FirebaseUser | null) => {
         throw new Error("有効なデータが見つかりませんでした。");
 
       setProcessStatus(`${rows.length}件をアップロード中...`);
-      const idToken = await fbUser.getIdToken(true);
 
-      const result = await submitTowerImport(fbUser.uid, idToken, version, rows);
+      const result = await submitTowerImport(fbUser.uid, fbUser, version, rows);
 
       const addedKeyCount = rows.reduce((acc, row) => acc + row.keyCount, 0);
       const addedScratchCount = rows.reduce(

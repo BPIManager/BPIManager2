@@ -1,5 +1,6 @@
 import { User as FirebaseUser } from "firebase/auth";
 import type { TicketItem, TicketRecommendResult, ScoreMode } from "@/types/tickets";
+import { authFetch, fetcher } from "@/utils/common/fetch";
 
 export async function searchTickets(
   url: string,
@@ -7,15 +8,7 @@ export async function searchTickets(
   ticketIds: TicketItem[],
   scoreMode: ScoreMode,
 ): Promise<TicketRecommendResult[]> {
-  const token = await fbUser.getIdToken();
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ ticketIds, scoreMode }),
-  });
+  const res = await authFetch(url, "POST", fbUser, { ticketIds, scoreMode });
   if (!res.ok) {
     const data = await res.json().catch(() => ({}));
     throw new Error((data as { message?: string }).message ?? `HTTPエラー: ${res.status}`);
@@ -23,12 +16,9 @@ export async function searchTickets(
   return res.json();
 }
 
-export async function loadMoreTicketResults(
+export function loadMoreTicketResults(
   url: string,
   fbUser: FirebaseUser,
 ): Promise<TicketRecommendResult> {
-  const token = await fbUser.getIdToken();
-  const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
-  if (!res.ok) throw new Error(`HTTPエラー: ${res.status}`);
-  return res.json();
+  return fetcher([url, fbUser]);
 }

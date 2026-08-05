@@ -56,11 +56,10 @@ export const useBatchImport = (
         throw new Error("有効なデータがありません。");
 
       setProcessStatus(`${formattedRows.length}件をアップロード中...`);
-      const idToken = await fbUser.getIdToken(true);
 
       const result = await submitBatchImport(
         fbUser.uid,
-        idToken,
+        fbUser,
         version,
         formattedRows,
       );

@@ -1,5 +1,6 @@
 import { User as FirebaseUser } from "firebase/auth";
 import type { OptimizationResult } from "@/types/bpi-optimizer";
+import { authFetch } from "@/utils/common/fetch";
 
 export async function saveOptimizeMemo(
   apiUrl: string,
@@ -7,14 +8,9 @@ export async function saveOptimizeMemo(
   targetBpi: number,
   reportData: OptimizationResult,
 ) {
-  const token = fbUser ? await fbUser.getIdToken() : null;
-  const res = await fetch(apiUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    body: JSON.stringify({ targetBpi, reportData }),
+  const res = await authFetch(apiUrl, "POST", fbUser ?? null, {
+    targetBpi,
+    reportData,
   });
   if (!res.ok) throw new Error("Failed to save memo");
 }
@@ -24,12 +20,6 @@ export async function deleteOptimizeMemo(
   fbUser: FirebaseUser | null | undefined,
   reportId: string,
 ) {
-  const token = fbUser ? await fbUser.getIdToken() : null;
-  const res = await fetch(`${apiUrl}/${reportId}`, {
-    method: "DELETE",
-    headers: {
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-  });
+  const res = await authFetch(`${apiUrl}/${reportId}`, "DELETE", fbUser ?? null);
   if (!res.ok) throw new Error("Failed to delete memo");
 }
