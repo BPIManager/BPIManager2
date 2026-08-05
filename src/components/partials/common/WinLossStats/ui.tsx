@@ -12,8 +12,8 @@ import {
   ReferenceLine,
   ResponsiveContainer,
 } from "recharts";
-import { WinLossHistoryChartSkeleton } from "./skeleton";
-import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
+import WinLossHistoryChartSkeleton from "./skeleton";
+import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
 
 interface WinLossEntry {
   level: number;
@@ -251,7 +251,7 @@ const WinLossHistoryChart = ({
   );
 };
 
-export const WinLossStats = ({
+const WinLossStats = ({
   winLossData,
   viewerId,
   rivalId,
@@ -363,3 +363,5 @@ export const WinLossStats = ({
     </div>
   );
 };
+
+export default WinLossStats;

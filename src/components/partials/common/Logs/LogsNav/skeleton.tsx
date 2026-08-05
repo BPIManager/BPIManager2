@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-export const LogNavigatorSkeleton = () => (
+const LogNavigatorSkeleton = () => (
   <div className="mb-6 flex w-full items-center justify-between rounded-xl border border-bpim-border bg-bpim-bg p-2">
     <div className="flex-1">
       <Skeleton className="h-10 w-15 rounded-md md:w-30" />
@@ -16,3 +16,5 @@ export const LogNavigatorSkeleton = () => (
     </div>
   </div>
 );
+
+export default LogNavigatorSkeleton;

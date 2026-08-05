@@ -9,7 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { OptimizationResult } from "@/types/bpi-optimizer";
-import { BpiChip } from "./BpiChip";
+import BpiChip from "./BpiChip";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface OptimizationSummaryProps {
@@ -19,7 +19,7 @@ interface OptimizationSummaryProps {
   isSaved?: boolean;
 }
 
-export const OptimizationSummary = ({
+const OptimizationSummary = ({
   result,
   onSave,
   isSaving,
@@ -157,3 +157,5 @@ export const OptimizationSummary = ({
     </div>
   );
 };
+
+export default OptimizationSummary;

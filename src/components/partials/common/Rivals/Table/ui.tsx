@@ -191,7 +191,7 @@ const MobileScoreView = ({
   );
 };
 
-export const RivalSongItem = ({
+const RivalSongItem = ({
   song,
   onClick,
 }: {
@@ -252,3 +252,5 @@ export const RivalSongItem = ({
     </div>
   );
 };
+
+export default RivalSongItem;

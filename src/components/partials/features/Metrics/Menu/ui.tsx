@@ -14,7 +14,7 @@ interface MenuItemProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
   isExternal?: boolean;
 }
 
-export const ReusableMenuItem = ({
+const ReusableMenuItem = ({
   icon: IconComponent,
   title,
   subtitle,
@@ -60,3 +60,5 @@ export const ReusableMenuItem = ({
     </Container>
   );
 };
+
+export default ReusableMenuItem;

@@ -14,13 +14,13 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
 import { useTranslation } from "@/hooks/common/useTranslation";
-import { BpmSection } from "./BpmSection";
-import { ClearStateSection } from "./ClearStateSection";
-import { DateSection } from "./DateSection";
-import { VersionSection } from "./VersionSection";
-import { RadarSection } from "./RadarSection";
-import { ScoreFilterSection } from "./ScoreFilterSection";
-import { MissCountSection } from "./MissCountSection";
+import BpmSection from "./BpmSection";
+import ClearStateSection from "./ClearStateSection";
+import DateSection from "./DateSection";
+import VersionSection from "./VersionSection";
+import RadarSection from "./RadarSection";
+import ScoreFilterSection from "./ScoreFilterSection";
+import MissCountSection from "./MissCountSection";
 
 const EMPTY_PARAMS: FilterParamsFrontend = {
   bpmMin: undefined,
@@ -43,7 +43,7 @@ interface Props {
   onParamsChange: (params: Partial<FilterParamsFrontend>) => void;
 }
 
-export const AdvancedFilterModal = ({
+const AdvancedFilterModal = ({
   isOpen,
   onClose,
   params,
@@ -139,3 +139,5 @@ export const AdvancedFilterModal = ({
     </Dialog>
   );
 };
+
+export default AdvancedFilterModal;

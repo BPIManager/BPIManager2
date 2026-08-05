@@ -3,8 +3,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { HelpTooltip } from "@/components/ui/tooltip";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import dayjs from "@/lib/dayjs";
-import { ArenaChart } from "./chart";
-import { ActivePlayers } from "./ActivePlayers";
+import ArenaChart from "./chart";
+import ActivePlayers from "./ActivePlayers";
 import { useActiveArenaPlayers } from "@/hooks/arena/useActiveArenaPlayers";
 import {
   type Granularity,
@@ -99,7 +99,7 @@ export interface OfficialArenaHistoryCardUIProps {
   showActivePlayers?: boolean;
 }
 
-export const OfficialArenaHistoryCardUI = ({
+const OfficialArenaHistoryCardUI = ({
   metadata,
   metaLoading,
   selectedIndex,
@@ -270,3 +270,5 @@ export const OfficialArenaHistoryCardUI = ({
     </DashCard>
   );
 };
+
+export default OfficialArenaHistoryCardUI;

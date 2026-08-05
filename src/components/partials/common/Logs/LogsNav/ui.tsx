@@ -20,7 +20,7 @@ interface LogNavigatorProps {
   };
 }
 
-export const LogNavigator = ({ type, pagination }: LogNavigatorProps) => {
+const LogNavigator = ({ type, pagination }: LogNavigatorProps) => {
   const router = useRouter();
 
   const formatDateLabel = (dateString: string) => {
@@ -157,3 +157,5 @@ export const LogNavigator = ({ type, pagination }: LogNavigatorProps) => {
     </nav>
   );
 };
+
+export default LogNavigator;

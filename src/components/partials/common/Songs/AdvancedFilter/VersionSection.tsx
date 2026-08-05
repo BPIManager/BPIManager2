@@ -5,7 +5,7 @@ import { verNameArr } from "@/constants/iidx/versionTitles";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { SectionTitle } from "./SectionTitle";
+import SectionTitle from "./SectionTitle";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface Props {
@@ -13,7 +13,7 @@ interface Props {
   onChange: (val: Partial<FilterParamsFrontend>) => void;
 }
 
-export const VersionSection = ({ versions, onChange }: Props) => {
+const VersionSection = ({ versions, onChange }: Props) => {
   const { t } = useTranslation();
   return (
   <section className="flex flex-col gap-3">
@@ -47,3 +47,5 @@ export const VersionSection = ({ versions, onChange }: Props) => {
   </section>
   );
 };
+
+export default VersionSection;

@@ -15,7 +15,7 @@ interface CalendarPickerProps {
   initialMonth?: { year: number; month: number };
 }
 
-export const CalendarPicker = ({
+const CalendarPicker = ({
   activeDates,
   selectedDate,
   onSelect,
@@ -123,3 +123,5 @@ export const CalendarPicker = ({
     </div>
   );
 };
+
+export default CalendarPicker;

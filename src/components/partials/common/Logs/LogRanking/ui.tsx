@@ -8,11 +8,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { RankItem } from "./item";
+import RankItem from "./item";
 import { useLogRank } from "@/hooks/batches/useLogRank";
 import { useMemo, useState } from "react";
-import { SongDetailView } from "@/components/partials/modal/SongDetail/ui";
-import { OvertakeRankItem } from "../LogOvertaken/item";
+import SongDetailView from "@/components/partials/modal/SongDetail/ui";
+import OvertakeRankItem from "../LogOvertaken/item";
 import type { BatchDetailItem } from "@/types/logs/batchDetail";
 import { SongWithScore } from "@/types/songs/score";
 import { LabelWithTooltip } from "../LogSummary/ui";
@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils";
 import { Swords, TrendingUp, Trophy } from "lucide-react";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
-export const LogRank = ({
+const LogRank = ({
   details,
   type,
   isSharing,
@@ -214,3 +214,5 @@ export const LogRank = ({
     </div>
   );
 };
+
+export default LogRank;

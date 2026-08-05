@@ -2,7 +2,7 @@
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
-export const FollowStats = ({
+const FollowStats = ({
   userId,
   follows,
   className,
@@ -42,3 +42,5 @@ export const FollowStats = ({
     </div>
   );
 };
+
+export default FollowStats;

@@ -41,7 +41,7 @@ const getActivityColor = (count: number, isFuture: boolean): string => {
   return ACTIVITY_VARS[4];
 };
 
-export const ActivityCalendar = ({ data, userId, version }: Props) => {
+const ActivityCalendar = ({ data, userId, version }: Props) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [hoveredDate, setHoveredDate] = useState<string | null>(null);
   const { t } = useTranslation();
@@ -209,3 +209,5 @@ export const ActivityCalendar = ({ data, userId, version }: Props) => {
     </DashCard>
   );
 };
+
+export default ActivityCalendar;

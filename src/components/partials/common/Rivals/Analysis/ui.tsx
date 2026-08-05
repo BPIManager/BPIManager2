@@ -12,7 +12,7 @@ import {
   type RivalDiffPoint,
   type RivalCategoryStat,
 } from "@/hooks/social/useRivalAnalysis";
-import { BpiScatterChart } from "@/components/partials/common/Charts/BpiScatterChart";
+import BpiScatterChart from "@/components/partials/common/Charts/BpiScatterChart";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 
@@ -365,7 +365,7 @@ interface RivalAnalysisProps {
   rivalName?: string;
 }
 
-export const RivalAnalysis = ({ songs, rivalName }: RivalAnalysisProps) => {
+const RivalAnalysis = ({ songs, rivalName }: RivalAnalysisProps) => {
   const { t, tFormat } = useTranslation();
   const [selectedCategories, setSelectedCategories] = useState<
     Set<RadarCategory>
@@ -505,3 +505,5 @@ export const RivalAnalysis = ({ songs, rivalName }: RivalAnalysisProps) => {
     </div>
   );
 };
+
+export default RivalAnalysis;

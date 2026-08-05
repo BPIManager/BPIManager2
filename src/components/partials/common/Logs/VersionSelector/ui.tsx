@@ -19,7 +19,7 @@ interface Props {
   granularity: string;
 }
 
-export const LogFilterSection = ({ version, groupedBy, granularity }: Props) => {
+const LogFilterSection = ({ version, groupedBy, granularity }: Props) => {
   const router = useRouter();
   const { userId } = router.query;
   const { t } = useTranslation();
@@ -122,3 +122,5 @@ export const LogFilterSection = ({ version, groupedBy, granularity }: Props) => 
     </div>
   );
 };
+
+export default LogFilterSection;

@@ -11,7 +11,7 @@ interface Props {
   buttonLabel: string;
 }
 
-export const MonthlyReviewBannerUI = ({
+const MonthlyReviewBannerUI = ({
   href,
   title,
   desc,
@@ -37,3 +37,5 @@ export const MonthlyReviewBannerUI = ({
     </Button>
   </div>
 );
+
+export default MonthlyReviewBannerUI;

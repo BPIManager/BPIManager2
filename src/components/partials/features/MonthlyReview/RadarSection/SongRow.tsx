@@ -1,7 +1,7 @@
 import type { TopSongImproved } from "@/types/stats/monthlyReview";
 import { DIFF_COLORS, DIFF_LABELS } from "./constants";
 
-export function SongRow({
+function SongRow({
   rank,
   song,
   accent,
@@ -68,3 +68,5 @@ export function SongRow({
     </div>
   );
 }
+
+export default SongRow;

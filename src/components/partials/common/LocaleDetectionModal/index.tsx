@@ -21,7 +21,7 @@ const MULTILANG_DESC = [
   { lang: "ko", text: "선호하는 언어를 선택해 주세요." },
 ];
 
-export function LocaleDetectionModal() {
+function LocaleDetectionModal() {
   const { t, setLocale } = useTranslation();
   const [open, setOpen] = useState(false);
 
@@ -106,3 +106,5 @@ export function LocaleDetectionModal() {
     </Dialog>
   );
 }
+
+export default LocaleDetectionModal;

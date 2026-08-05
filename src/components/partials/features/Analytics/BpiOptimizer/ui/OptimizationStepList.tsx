@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import type { OptimizationResult } from "@/types/bpi-optimizer";
-import { OptimizationSummary } from "./OptimizationSummary";
-import { OptimizationStepCard } from "./OptimizationStepCard";
+import OptimizationSummary from "./OptimizationSummary";
+import OptimizationStepCard from "./OptimizationStepCard";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface OptimizationStepListProps {
@@ -11,7 +11,7 @@ interface OptimizationStepListProps {
   isSaved?: boolean;
 }
 
-export const OptimizationStepList = ({
+const OptimizationStepList = ({
   result,
   onSave,
   isSaving,
@@ -51,3 +51,5 @@ export const OptimizationStepList = ({
     </div>
   );
 };
+
+export default OptimizationStepList;

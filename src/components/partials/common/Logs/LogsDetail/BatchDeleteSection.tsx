@@ -1,6 +1,6 @@
 import { Trash2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ActionConfirmDialog } from "@/components/partials/modal/Confirmation";
+import ActionConfirmDialog from "@/components/partials/modal/Confirmation";
 import { useBatchDelete } from "@/hooks/batches/useBatchDelete";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
@@ -10,7 +10,7 @@ interface Props {
   version: string;
 }
 
-export const BatchDeleteSection = ({ userId, batchId, version }: Props) => {
+const BatchDeleteSection = ({ userId, batchId, version }: Props) => {
   const { t } = useTranslation();
   const { isOpen, setIsOpen, isDeleting, handleDelete } = useBatchDelete(
     userId,
@@ -45,3 +45,5 @@ export const BatchDeleteSection = ({ userId, batchId, version }: Props) => {
     </>
   );
 };
+
+export default BatchDeleteSection;

@@ -5,33 +5,33 @@ import {
   getRankDistribution,
 } from "@/utils/logs/getDistribution";
 import { useRouter } from "next/router";
-import { DailyBatchNotice } from "../DailyBatchNotice/ui";
+import DailyBatchNotice from "../DailyBatchNotice/ui";
 import { BatchSummaryCards } from "../LogSummary/ui";
-import { LogRank } from "../LogRanking/ui";
-import { BatchSongsTable } from "../LogTable/ui";
-import { LogNavigator } from "../LogsNav/ui";
-import { BatchTotalBpiCard } from "../TotalBPI/ui";
-import { LogsDetailContentSkeleton } from "./skeleton";
-import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
+import LogRank from "../LogRanking/ui";
+import BatchSongsTable from "../LogTable/ui";
+import LogNavigator from "../LogsNav/ui";
+import BatchTotalBpiCard from "../TotalBPI/ui";
+import LogsDetailContentSkeleton from "./skeleton";
+import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
 import type { LogsDetailViewProps } from "@/types/logs/detail";
 import { XIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRef, useState } from "react";
-import { BatchDeleteSection } from "./BatchDeleteSection";
+import BatchDeleteSection from "./BatchDeleteSection";
 import { useShareResult } from "@/hooks/share/useShare";
-import { ShareResultModal } from "@/components/partials/modal/Share/ui";
+import ShareResultModal from "@/components/partials/modal/Share/ui";
 import { BpiCalculator } from "@/lib/bpi";
-import { DistributionChart } from "@/components/partials/common/DashBoard/DistributionChart/ui";
+import DistributionChart from "@/components/partials/common/DashBoard/DistributionChart/ui";
 import { RANK_COLORS } from "@/constants/theme/djRankColor";
 import { getBpiColor } from "@/constants/theme/bpiColor";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { AppTabsList, AppTabsTrigger } from "@/components/ui/complex/tabs";
 import { useBpiStep } from "@/hooks/common/useBpiStep";
-import { MonthlyReviewBanner } from "@/components/partials/common/MonthlyReviewBanner";
+import MonthlyReviewBanner from "@/components/partials/common/MonthlyReviewBanner";
 import dayjs from "@/lib/dayjs";
 
-export const LogsDetailContent = ({
+const LogsDetailContent = ({
   userId,
   version,
   batchId,
@@ -256,3 +256,5 @@ export const LogsDetailContent = ({
     </div>
   );
 };
+
+export default LogsDetailContent;

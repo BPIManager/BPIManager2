@@ -9,10 +9,10 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
 import { useIidxTowerRanking } from "@/hooks/stats/useIidxTowerRanking";
-import { TowerRankingRow } from "./row";
+import TowerRankingRow from "./row";
 import { Skeleton } from "@/components/ui/skeleton";
-import { RivalComparisonModal } from "@/components/partials/modal/RivalComparison";
-import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
+import RivalComparisonModal from "@/components/partials/modal/RivalComparison";
+import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
 import type {
   TowerPeriod,
   TowerType,
@@ -115,7 +115,7 @@ interface TowerRankingProps {
   version: string;
 }
 
-export const TowerRanking = ({ version }: TowerRankingProps) => {
+const TowerRanking = ({ version }: TowerRankingProps) => {
   const router = useRouter();
   const today = dayjs().format("YYYY-MM-DD");
 
@@ -359,3 +359,5 @@ export const TowerRanking = ({ version }: TowerRankingProps) => {
     </div>
   );
 };
+
+export default TowerRanking;

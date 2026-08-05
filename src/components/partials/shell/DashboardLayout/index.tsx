@@ -2,15 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { Menu } from "lucide-react";
-import { SidebarContent } from "@/components/partials/common/Sidebar";
-import { NotificationBell } from "@/components/partials/common/Notifications";
-import { UserMenu } from "@/components/partials/common/UserMenu";
+import SidebarContent from "@/components/partials/common/Sidebar";
+import NotificationBell from "@/components/partials/common/Notifications";
+import UserMenu from "@/components/partials/common/UserMenu";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { BpimLogo } from "@/components/ui/bpim-logo";
 import { cn } from "@/lib/utils";
 
-export const DashboardLayout = ({
+const DashboardLayout = ({
   children,
 }: {
   children: React.ReactNode;
@@ -109,3 +109,5 @@ export const DashboardLayout = ({
     </div>
   );
 };
+
+export default DashboardLayout;

@@ -18,9 +18,9 @@ import { Label } from "@/components/ui/label";
 
 import { useUser } from "@/contexts/users/UserContext";
 import { authActions } from "@/lib/firebase/auth";
-import { ImageUploadModal } from "../ImageCrop/ui";
+import ImageUploadModal from "../ImageCrop/ui";
 import { useEditProfile } from "@/hooks/users/useEditProfile";
-import { AvatarSection } from "./avatar";
+import AvatarSection from "./avatar";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/hooks/common/useTranslation";
 

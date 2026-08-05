@@ -15,11 +15,11 @@ import type { SongDetailSubject } from "@/utils/songs/songDetailMode";
 import { hasBpiData } from "@/utils/songs/songDetailMode";
 import { BpiCalculator } from "@/lib/bpi";
 import { getRankDetail } from "@/constants/iidx/rankBorders";
-import { SongHistoryTab } from "./History/ui";
+import SongHistoryTab from "./History/ui";
 import RivalsRanking from "./Rivals";
 import { AppTabsList, AppTabsTrigger } from "@/components/ui/complex/tabs";
-import { DefinitionsTab } from "./Definitions/ui";
-import { StatsTab } from "./Stats";
+import DefinitionsTab from "./Definitions/ui";
+import StatsTab from "./Stats";
 
 interface SongDetailViewProps {
   song: SongDetailSubject | null;
@@ -28,7 +28,7 @@ interface SongDetailViewProps {
   defaultTab?: "stats" | "history" | "rivals" | "definitions";
 }
 
-export const SongDetailView = ({
+const SongDetailView = ({
   song,
   isOpen,
   onClose,
@@ -192,3 +192,5 @@ export const SongDetailView = ({
     </Dialog>
   );
 };
+
+export default SongDetailView;

@@ -9,15 +9,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { BookmarkletAccordion } from "@/components/partials/common/Bookmarklet";
-import { TicketCard } from "@/components/partials/features/Tickets/TicketCard";
+import BookmarkletAccordion from "@/components/partials/common/Bookmarklet";
+import TicketCard from "@/components/partials/features/Tickets/TicketCard";
 import { TicketCardSkeleton } from "@/components/partials/features/Tickets/TicketSkeleton";
-import { TicketFeatureDescription } from "@/components/partials/features/Tickets/FeatureDescription";
+import TicketFeatureDescription from "@/components/partials/features/Tickets/FeatureDescription";
 import { useTicketSearch } from "@/hooks/tickets/useTicketSearch";
 import type { ScoreMode } from "@/types/tickets";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
-export function TicketsSection() {
+function TicketsSection() {
   const { t } = useTranslation();
   const SCORE_MODE_OPTIONS: { value: ScoreMode; label: string }[] = [
     { value: "relative", label: t("tickets.scoreRelative") },
@@ -111,3 +111,5 @@ export function TicketsSection() {
     </div>
   );
 }
+
+export default TicketsSection;

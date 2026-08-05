@@ -4,18 +4,18 @@ import { useCallback, useState } from "react";
 import { useRouter } from "next/router";
 import { Settings2, ChevronDown } from "lucide-react";
 
-import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
+import DashboardLayout from "@/components/partials/shell/DashboardLayout";
 import { PageContainer, PageHeader } from "@/components/partials/common/PageChrome/Header";
 import { Meta } from "@/components/partials/common/PageChrome/Head";
 import { Button } from "@/components/ui/button";
-import { RequireAuth } from "@/components/partials/shell/RequireAuth";
+import RequireAuth from "@/components/partials/shell/RequireAuth";
 import { useUser } from "@/contexts/users/UserContext";
 
 import { useAnalyticsComparison } from "@/hooks/analytics/useAnalyticsComparison";
 import { decodeTarget, encodeTarget } from "@/hooks/analytics/targetCodec";
 import type { AnalyticsTarget } from "@/types/analytics";
-import { TargetSelectorModal } from "@/components/partials/features/Analytics/TargetSelector";
-import { AnalyticsComparisonTable } from "@/components/partials/features/Analytics/Table";
+import TargetSelectorModal from "@/components/partials/features/Analytics/TargetSelector";
+import AnalyticsComparisonTable from "@/components/partials/features/Analytics/Table";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/hooks/common/useTranslation";

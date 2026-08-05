@@ -17,9 +17,9 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
-import { RoleBadge } from "@/components/partials/common/Badge/UserRole";
+import RoleBadge from "@/components/partials/common/Badge/UserRole";
 import AccountSettings from "@/components/partials/modal/AccountSettings";
-import { LoginDialog } from "@/components/partials/modal/LoginDialog";
+import LoginDialog from "@/components/partials/modal/LoginDialog";
 
 type MenuItemProps = {
   label: string;
@@ -45,7 +45,7 @@ const MenuItem = ({ label, onClick, danger = false }: MenuItemProps) => (
   </button>
 );
 
-export const UserMenu = () => {
+const UserMenu = () => {
   const { user, isLoading } = useUser();
   const { t } = useTranslation();
   const [popoverOpen, setPopoverOpen] = useState(false);
@@ -182,3 +182,5 @@ export const UserMenu = () => {
     </>
   );
 };
+
+export default UserMenu;

@@ -16,7 +16,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Loader, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { CustomGoalModal } from "./CustomGoalModal";
+import CustomGoalModal from "./CustomGoalModal";
 import { CustomGoalConfig, GoalType, CardDisplay } from "@/types/metrics/aaa";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
@@ -43,7 +43,7 @@ interface Props {
   cardDisplay: { value: CardDisplay; onChange: (v: CardDisplay) => void };
 }
 
-export const AAATableFilter = ({
+const AAATableFilter = ({
   version: versionProp,
   level: levelProp,
   goal: goalProp,
@@ -376,3 +376,5 @@ export const AAATableFilter = ({
     </div>
   );
 };
+
+export default AAATableFilter;

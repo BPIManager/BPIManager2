@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import type { GrowthParticipant } from "@/types/stats/monthlyReview";
 import dayjs from "@/lib/dayjs";
-import { GrowthChartUI } from "./ui";
+import GrowthChartUI from "./ui";
 
 export { PALETTE } from "./ui";
 
@@ -13,7 +13,7 @@ interface Props {
   granularity?: "month" | "year";
 }
 
-export const GrowthChart = ({
+const GrowthChart = ({
   participants,
   hiddenKeys = new Set(),
   granularity = "month",
@@ -71,3 +71,5 @@ export const GrowthChart = ({
     />
   );
 };
+
+export default GrowthChart;

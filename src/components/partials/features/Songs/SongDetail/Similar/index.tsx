@@ -1,14 +1,14 @@
 import { useSimilarSongs } from "@/hooks/songs/useSimilarSongs";
-import { SimilarSongRow } from "./ui";
-import { SimilarTabSkeleton } from "./skeleton";
-import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
+import SimilarSongRow from "./ui";
+import SimilarTabSkeleton from "./skeleton";
+import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
 
 interface SimilarTabProps {
   songId: number;
   version: string;
 }
 
-export function SimilarTab({ songId, version }: SimilarTabProps) {
+function SimilarTab({ songId, version }: SimilarTabProps) {
   const { similar, isLoading, isError } = useSimilarSongs(
     songId,
     version,
@@ -32,3 +32,5 @@ export function SimilarTab({ songId, version }: SimilarTabProps) {
     </div>
   );
 }
+
+export default SimilarTab;

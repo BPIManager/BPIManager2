@@ -3,10 +3,7 @@ import { useInfiniteScroll } from "@/hooks/common/useInfiniteScroll";
 import { cn } from "@/lib/utils";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useTranslation } from "@/hooks/common/useTranslation";
-import {
-  FetchErrorState,
-  type FetchError,
-} from "@/components/partials/common/ErrorStates/FetchErrorState";
+import FetchErrorState, { type FetchError } from "@/components/partials/common/ErrorStates/FetchErrorState";
 
 interface InfiniteScrollContainerProps<T> {
   items: T[];
@@ -21,7 +18,7 @@ interface InfiniteScrollContainerProps<T> {
   className?: string;
 }
 
-export function InfiniteScrollContainer<T>({
+function InfiniteScrollContainer<T>({
   items,
   renderItem,
   isLoadingMore,
@@ -86,3 +83,5 @@ export function InfiniteScrollContainer<T>({
     </div>
   );
 }
+
+export default InfiniteScrollContainer;

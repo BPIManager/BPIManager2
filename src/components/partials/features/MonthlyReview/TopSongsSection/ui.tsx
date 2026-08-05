@@ -358,7 +358,7 @@ interface Props {
   summary: string;
 }
 
-export const TopSongsSectionUI = ({
+const TopSongsSectionUI = ({
   topSongs,
   inView,
   sectionRef,
@@ -430,3 +430,5 @@ export const TopSongsSectionUI = ({
     </>
   );
 };
+
+export default TopSongsSectionUI;

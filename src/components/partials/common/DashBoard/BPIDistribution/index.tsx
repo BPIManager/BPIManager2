@@ -1,1 +1,1 @@
-export { BpiDistributionSection } from "./ui";
+export { default as BpiDistributionSection } from "./ui";

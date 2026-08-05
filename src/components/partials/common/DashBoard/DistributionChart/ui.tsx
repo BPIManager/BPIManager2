@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { DistributionChartSkeleton } from "@/components/partials/common/DashBoard/DistributionChart/skeleton";
+import DistributionChartSkeleton from "@/components/partials/common/DashBoard/DistributionChart/skeleton";
 import { DashCard } from "@/components/ui/dashcard";
 import { Button } from "@/components/ui/button";
 import {
@@ -285,7 +285,7 @@ const DistributionPie = ({
   );
 };
 
-export const DistributionChart = ({
+const DistributionChart = ({
   title,
   myData,
   rivalData,
@@ -510,3 +510,5 @@ export const DistributionChart = ({
     </DashCard>
   );
 };
+
+export default DistributionChart;

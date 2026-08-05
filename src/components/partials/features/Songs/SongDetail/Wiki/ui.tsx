@@ -17,7 +17,7 @@ export interface NoteCardProps {
   onToggleUpvote: () => void;
 }
 
-export function NoteCard({
+function NoteCard({
   note,
   isLoggedIn,
   isEditing,
@@ -121,3 +121,4 @@ export function NoteCard({
   );
 }
 
+export default NoteCard;

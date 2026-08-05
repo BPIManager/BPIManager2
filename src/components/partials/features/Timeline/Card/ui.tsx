@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { DIFF_COLORS as diffColors } from "@/constants/theme/difficultyColors";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
-export const TimelineItem = ({ entry }: { entry: TimelineEntry }) => {
+const TimelineItem = ({ entry }: { entry: TimelineEntry }) => {
   const { t } = useTranslation();
   const { opponentScore: opp, viewerScore: viewer, isOvertaken } = entry;
 
@@ -179,3 +179,5 @@ const ComparisonRow = ({
     </div>
   );
 };
+
+export default TimelineItem;

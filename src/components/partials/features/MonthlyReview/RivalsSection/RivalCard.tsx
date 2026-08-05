@@ -1,8 +1,8 @@
 import type { MonthlyReviewData } from "@/types/stats/monthlyReview";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { RivalSongs } from "./RivalSongs";
+import RivalSongs from "./RivalSongs";
 
-export function RivalCard({
+function RivalCard({
   rival,
   index,
   inView,
@@ -93,3 +93,5 @@ export function RivalCard({
     </div>
   );
 }
+
+export default RivalCard;

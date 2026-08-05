@@ -42,7 +42,7 @@ const LineProviderIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-export const LoginSection = () => {
+const LoginSection = () => {
   const { t } = useTranslation();
   return (
     <div className="mx-auto w-full max-w-sm">
@@ -96,3 +96,5 @@ export const LoginSection = () => {
     </div>
   );
 };
+
+export default LoginSection;

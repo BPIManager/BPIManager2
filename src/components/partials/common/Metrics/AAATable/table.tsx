@@ -8,10 +8,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { AAATableTooltip } from "./tooltip";
+import AAATableTooltip from "./tooltip";
 import { cn } from "@/lib/utils";
 
-export const AAAGridItem = ({
+const AAAGridItem = ({
   item,
   goal,
   cardDisplay,
@@ -109,3 +109,5 @@ export const AAAGridItem = ({
     </TooltipProvider>
   );
 };
+
+export default AAAGridItem;

@@ -18,7 +18,7 @@ import { useTranslation } from "@/hooks/common/useTranslation";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { SidebarSection } from "./Section/ui";
+import SidebarSection from "./Section/ui";
 import { MenuItemButton, ScoreSubItemButton } from "./NavButtons/ui";
 import {
   getRivalMenuItems,
@@ -32,7 +32,7 @@ import {
 const Sep = ({ expanded }: { expanded: boolean }) =>
   expanded ? <div className="mx-3 my-0.5 h-px bg-bpim-border/50" /> : null;
 
-export const SidebarContent = ({
+const SidebarContent = ({
   onClose,
   expanded = false,
   pinned = false,
@@ -240,3 +240,5 @@ export const SidebarContent = ({
     </div>
   );
 };
+
+export default SidebarContent;

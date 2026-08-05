@@ -95,4 +95,6 @@ const TowerRankingRowComponent = ({ entry, onClick }: TowerRankingRowProps) => {
   );
 };
 
-export const TowerRankingRow = memo(TowerRankingRowComponent);
+const TowerRankingRow = memo(TowerRankingRowComponent);
+
+export default TowerRankingRow;

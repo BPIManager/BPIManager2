@@ -38,7 +38,7 @@ interface SongFilterBarProps {
   currentVersion?: string;
 }
 
-export const SongFilterBar = ({
+const SongFilterBar = ({
   params,
   onParamsChange,
   onOpenAdvancedFilter,
@@ -213,3 +213,5 @@ export const SongFilterBar = ({
     </FilterBarContainer>
   );
 };
+
+export default SongFilterBar;

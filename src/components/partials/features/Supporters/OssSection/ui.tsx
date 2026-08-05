@@ -11,8 +11,8 @@ import { cn } from "@/lib/utils";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { XIcon } from "@/components/partials/common/Auth/Buttons";
 import { ContributorListView } from "@/components/partials/common/UserList/Supporters/ui";
-import { UserRecommendationCardSkeleton } from "@/components/partials/common/UserList/Card/skeleton";
-import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
+import UserRecommendationCardSkeleton from "@/components/partials/common/UserList/Card/skeleton";
+import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
 import { useSupporters } from "@/hooks/users/useSupporters";
 
 type UseSupportersResult = ReturnType<typeof useSupporters>;
@@ -35,7 +35,7 @@ const OSS_ITEMS = [
   },
 ] as const;
 
-export const OssSection = ({ data, isLoading, isError }: UseSupportersResult) => {
+const OssSection = ({ data, isLoading, isError }: UseSupportersResult) => {
   const { t } = useTranslation();
 
   return (
@@ -131,3 +131,5 @@ export const OssSection = ({ data, isLoading, isError }: UseSupportersResult) =>
     </section>
   );
 };
+
+export default OssSection;

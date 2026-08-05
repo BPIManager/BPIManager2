@@ -9,7 +9,7 @@ interface ModeSwitchBannerProps {
   isMe: boolean;
 }
 
-export const ModeSwitchBanner = ({
+const ModeSwitchBanner = ({
   type,
   targetUserId,
   isMe,
@@ -72,3 +72,5 @@ export const ModeSwitchBanner = ({
     </div>
   );
 };
+
+export default ModeSwitchBanner;

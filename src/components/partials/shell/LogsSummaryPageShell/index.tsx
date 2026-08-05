@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { useRouter } from "next/router";
 import type { ParsedUrlQuery } from "querystring";
 import { useUser } from "@/contexts/users/UserContext";
-import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
+import DashboardLayout from "@/components/partials/shell/DashboardLayout";
 import { PageLoader } from "@/components/ui/loading-spinner";
 import { useIsOwnProfile } from "@/hooks/users/useIsOwnProfile";
 
@@ -24,7 +24,7 @@ interface LogsSummaryPageShellProps {
  * 「router準備待ち → 本人/他人の判定」までをまとめたシェル。
  * 本人/他人それぞれで実際に描画する内容はrender propとして呼び出し側が持つ。
  */
-export const LogsSummaryPageShell = ({
+const LogsSummaryPageShell = ({
   ownProfile,
   publicProfile,
 }: LogsSummaryPageShellProps) => {
@@ -50,3 +50,5 @@ export const LogsSummaryPageShell = ({
 
   return isOwnProfile ? ownProfile(ctx) : publicProfile(ctx);
 };
+
+export default LogsSummaryPageShell;

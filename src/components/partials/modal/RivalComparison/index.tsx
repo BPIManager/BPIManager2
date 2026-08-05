@@ -11,7 +11,7 @@ import { useUser } from "@/contexts/users/UserContext";
 import { RivalBodySkeleton, RivalHeaderSkeleton } from "./skeleton";
 import { RivalHeader, SectionTitle } from "./ui";
 import { WinLossStats } from "@/components/partials/common/WinLossStats";
-import { RadarSectionChart } from "@/components/partials/common/DashBoard/Radar";
+import RadarSectionChart from "@/components/partials/common/DashBoard/Radar";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -20,7 +20,7 @@ import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { toast } from "sonner";
 
-export const RivalComparisonModal = ({
+const RivalComparisonModal = ({
   rivalId,
   isOpen,
   onClose,
@@ -201,3 +201,5 @@ export const RivalComparisonModal = ({
     </Dialog>
   );
 };
+
+export default RivalComparisonModal;

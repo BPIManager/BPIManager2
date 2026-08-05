@@ -8,7 +8,7 @@ const PERIOD_LABELS: Record<SiteStatsPeriod, string> = {
 };
 const PERIODS: SiteStatsPeriod[] = ["all", "d90", "d30", "d7"];
 
-export function PeriodTabs({
+function PeriodTabs({
   value,
   onChange,
 }: {
@@ -33,3 +33,5 @@ export function PeriodTabs({
     </div>
   );
 }
+
+export default PeriodTabs;

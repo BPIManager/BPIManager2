@@ -15,8 +15,8 @@ import {
 } from "@/components/ui/select";
 import type { SongRankEntry } from "@/types/users/ranking";
 import type { AllSongWithScore, AllDifficulties } from "@/types/songs/allSongs";
-import { SongDetailView } from "@/components/partials/modal/SongDetail/ui";
-import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
+import SongDetailView from "@/components/partials/modal/SongDetail/ui";
+import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
 import { ALL_LEVELS } from "@/constants/iidx/songLevels";
 import { Search } from "lucide-react";
 
@@ -166,7 +166,7 @@ interface SongRankingListProps {
   version: string;
 }
 
-export const SongRankingList = ({ version }: SongRankingListProps) => {
+const SongRankingList = ({ version }: SongRankingListProps) => {
   const { data, isLoading, isError } = useUserSongRankings(version);
   const [sort, setSort] = useState<SortKey>("pct_asc");
   const [levelFilter, setLevelFilter] = useState<string>("all");
@@ -335,3 +335,5 @@ export const SongRankingList = ({ version }: SongRankingListProps) => {
     </>
   );
 };
+
+export default SongRankingList;

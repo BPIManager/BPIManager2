@@ -2,7 +2,7 @@ import { DashCard } from "@/components/ui/dashcard";
 import { Button } from "@/components/ui/button";
 import { useSongPopulation } from "@/hooks/siteStats/useSongPopulation";
 
-export function SongPopulationTable({
+function SongPopulationTable({
   order,
   title,
 }: {
@@ -59,3 +59,5 @@ export function SongPopulationTable({
     </DashCard>
   );
 }
+
+export default SongPopulationTable;

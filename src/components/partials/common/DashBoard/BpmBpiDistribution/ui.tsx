@@ -4,7 +4,7 @@ import { useState } from "react";
 import { getBpiColorStyle } from "@/constants/theme/bpiColor";
 import { BPM_CONST } from "@/constants/iidx/bpmBands";
 import type { BpmBandBpiItem } from "@/types/stats/distribution";
-import { BpmBandSongsDialog } from "./dialog";
+import BpmBandSongsDialog from "./dialog";
 import { cn } from "@/lib/utils";
 
 interface BpmBpiChartProps {
@@ -43,7 +43,7 @@ const HorizontalBar = ({
   );
 };
 
-export const BpmBpiChart = ({ myData, rivalData }: BpmBpiChartProps) => {
+const BpmBpiChart = ({ myData, rivalData }: BpmBpiChartProps) => {
   const { BPI_MAX, BPI_MIN, BPM_BAND_ORDER } = BPM_CONST;
   const rivalMap = rivalData
     ? new Map(rivalData.map((d) => [d.label, d.totalBpi]))
@@ -152,3 +152,5 @@ export const BpmBpiChart = ({ myData, rivalData }: BpmBpiChartProps) => {
     </>
   );
 };
+
+export default BpmBpiChart;

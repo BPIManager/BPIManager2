@@ -4,7 +4,7 @@ import { FilterParamsFrontend } from "@/types/songs/score";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { SectionTitle } from "./SectionTitle";
+import SectionTitle from "./SectionTitle";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface Props {
@@ -14,7 +14,7 @@ interface Props {
   onChange: (val: Partial<FilterParamsFrontend>) => void;
 }
 
-export const BpmSection = ({ bpmMin, bpmMax, isSofran, onChange }: Props) => {
+const BpmSection = ({ bpmMin, bpmMax, isSofran, onChange }: Props) => {
   const { t } = useTranslation();
   return (
   <section className="flex flex-col gap-3">
@@ -49,3 +49,5 @@ export const BpmSection = ({ bpmMin, bpmMax, isSofran, onChange }: Props) => {
   </section>
   );
 };
+
+export default BpmSection;

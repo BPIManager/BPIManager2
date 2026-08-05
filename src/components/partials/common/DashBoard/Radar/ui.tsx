@@ -1,11 +1,11 @@
 import { useRadar } from "@/hooks/stats/useRadar";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
-import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
-import { RadarSkeleton } from "./skeleton";
-import { RadarSectionChart } from ".";
+import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
+import RadarSkeleton from "./skeleton";
+import RadarSectionChart from ".";
 import { RadarCategory } from "@/types/stats/radar";
 import { useMemo, useState } from "react";
-import { RadarCategorySongsDialog } from "./dialog";
+import RadarCategorySongsDialog from "./dialog";
 import { getBpiColorStyle } from "@/constants/theme/bpiColor";
 import { DashCard } from "@/components/ui/dashcard";
 import { cn } from "@/lib/utils";
@@ -18,7 +18,7 @@ interface RadarSectionProps {
   rivalName?: string;
 }
 
-export const RadarSection = ({
+const RadarSection = ({
   userId,
   rivalUserId,
   rivalName,
@@ -145,3 +145,5 @@ export const RadarSection = ({
     </DashCard>
   );
 };
+
+export default RadarSection;

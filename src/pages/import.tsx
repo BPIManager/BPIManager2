@@ -1,7 +1,7 @@
 import { Meta } from "@/components/partials/common/PageChrome/Head";
 import { useTranslation } from "@/hooks/common/useTranslation";
-import { ImportSuccessModal } from "@/components/partials/features/Import/SuccessModal/ui";
-import { ImportView } from "@/components/partials/features/Import/View";
+import ImportSuccessModal from "@/components/partials/features/Import/SuccessModal/ui";
+import ImportView from "@/components/partials/features/Import/View";
 import AccountSettings from "@/components/partials/modal/AccountSettings";
 import { dummyCsv } from "@/constants/ui/dummyCsv";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
@@ -12,7 +12,7 @@ import { useState, useCallback } from "react";
 import { useRouter } from "next/router";
 import { PageLoader } from "@/components/ui/loading-spinner";
 import { detectCsvType, type CsvType } from "@/utils/csv/detect";
-import { TowerImportSuccessModal } from "@/components/partials/features/Import/TowerSuccessModal/ui";
+import TowerImportSuccessModal from "@/components/partials/features/Import/TowerSuccessModal/ui";
 
 export default function ImportPage() {
   const router = useRouter();

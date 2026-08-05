@@ -32,7 +32,7 @@ interface RankingFiltersProps {
  * ランキングのバージョン/カテゴリ選択と、totalBpiカテゴリ限定の
  * エリア/アリーナクラス絞り込みをまとめたフィルターUI。
  */
-export const RankingFilters = ({
+const RankingFilters = ({
   version,
   category,
   areaArenaFilter,
@@ -136,3 +136,5 @@ export const RankingFilters = ({
     </>
   );
 };
+
+export default RankingFilters;

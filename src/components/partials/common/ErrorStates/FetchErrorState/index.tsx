@@ -25,7 +25,7 @@ interface FetchErrorStateProps {
  * error.status(403/404)に応じてデフォルトの文言・アイコンを切り替え、
  * title/description/iconで各画面固有の文言に上書きできる。
  */
-export const FetchErrorState = ({
+const FetchErrorState = ({
   error,
   title,
   description,
@@ -140,3 +140,5 @@ export const FetchErrorState = ({
     </div>
   );
 };
+
+export default FetchErrorState;

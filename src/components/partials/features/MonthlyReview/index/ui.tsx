@@ -1,14 +1,14 @@
 "use client";
 
 import { StarfieldBackground } from "@/components/ui/starfield-background";
-import { TitleSection } from "../TitleSection";
-import { HeroSection } from "../HeroSection";
-import { TopSongsSection } from "../TopSongsSection";
-import { ActivitySection } from "../ActivitySection";
-import { RivalsSection } from "../RivalsSection";
-import { ArenaSection } from "../ArenaSection";
-import { RadarSection } from "../RadarSection";
-import { FooterSection } from "../FooterSection";
+import TitleSection from "../TitleSection";
+import HeroSection from "../HeroSection";
+import TopSongsSection from "../TopSongsSection";
+import ActivitySection from "../ActivitySection";
+import RivalsSection from "../RivalsSection";
+import ArenaSection from "../ArenaSection";
+import RadarSection from "../RadarSection";
+import FooterSection from "../FooterSection";
 import type { MonthlyReviewData } from "@/types/stats/monthlyReview";
 
 const BASE_SPEED = 0.6;
@@ -18,7 +18,7 @@ interface Props {
   speedRef: React.RefObject<number>;
 }
 
-export const MonthlyReviewViewUI = ({ data, speedRef }: Props) => (
+const MonthlyReviewViewUI = ({ data, speedRef }: Props) => (
   <div style={{ background: "#0a0a0f" }}>
     <StarfieldBackground
       speedRef={speedRef}
@@ -53,3 +53,5 @@ export const MonthlyReviewViewUI = ({ data, speedRef }: Props) => (
     </div>
   </div>
 );
+
+export default MonthlyReviewViewUI;

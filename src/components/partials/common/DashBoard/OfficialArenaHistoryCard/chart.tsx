@@ -40,7 +40,7 @@ export interface ArenaChartProps {
   hasWins: boolean;
 }
 
-export function ArenaChart({
+function ArenaChart({
   data,
   maxWinsDelta,
   hasRank,
@@ -184,3 +184,5 @@ export function ArenaChart({
     </div>
   );
 }
+
+export default ArenaChart;

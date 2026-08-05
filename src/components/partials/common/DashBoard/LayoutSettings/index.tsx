@@ -29,7 +29,7 @@ interface Props {
   onSave: (config: DashboardLayoutConfig) => void;
 }
 
-export function DashboardLayoutSettingsModal({
+function DashboardLayoutSettingsModal({
   isOpen,
   onClose,
   config,
@@ -161,3 +161,5 @@ export function DashboardLayoutSettingsModal({
     </Dialog>
   );
 }
+
+export default DashboardLayoutSettingsModal;

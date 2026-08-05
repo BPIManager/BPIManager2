@@ -14,7 +14,7 @@ const SPARKLE_POSITIONS_CONTAINED = [
   { bottom: "10%", left: "80%", delay: "0.8s" },
 ];
 
-export const ArenaClassBadge = ({
+const ArenaClassBadge = ({
   arenaClass,
   contained = false,
 }: {
@@ -81,3 +81,5 @@ export const ArenaClassBadge = ({
     </>
   );
 };
+
+export default ArenaClassBadge;

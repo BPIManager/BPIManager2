@@ -5,14 +5,14 @@ import { useTranslation } from "@/hooks/common/useTranslation";
 import type { MonthlyReviewData } from "@/types/stats/monthlyReview";
 import { useChartColors } from "@/hooks/common/useChartColors";
 import { useCountUp } from "../utils";
-import { ActivitySectionUI } from "./ui";
+import ActivitySectionUI from "./ui";
 
 interface Props {
   activity: MonthlyReviewData["activity"];
   granularity: "month" | "year";
 }
 
-export const ActivitySection = ({ activity, granularity }: Props) => {
+const ActivitySection = ({ activity, granularity }: Props) => {
   const [ref, inView] = useInView(0.1);
   const colors = useChartColors();
   const { t, tFormat } = useTranslation();
@@ -110,3 +110,5 @@ export const ActivitySection = ({ activity, granularity }: Props) => {
     />
   );
 };
+
+export default ActivitySection;

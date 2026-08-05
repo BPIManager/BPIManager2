@@ -5,7 +5,7 @@ import type { AreaEntry } from "@/types/siteStats";
 
 const PAGE_SIZE = 10;
 
-export function AreaDistributionTable({ data }: { data: AreaEntry[] }) {
+function AreaDistributionTable({ data }: { data: AreaEntry[] }) {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   const visible = data.slice(0, visibleCount);
@@ -55,3 +55,5 @@ export function AreaDistributionTable({ data }: { data: AreaEntry[] }) {
     </DashCard>
   );
 }
+
+export default AreaDistributionTable;

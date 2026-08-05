@@ -1,9 +1,9 @@
 export { SummaryCard, SkeletonCard } from "./SummaryCards";
-export { RegistrationTrendChart } from "./RegistrationTrendChart";
-export { ArenaRankChart } from "./ArenaRankChart";
-export { ArenaRankComparison } from "./ArenaRankComparison";
-export { VersionScoreChart } from "./VersionScoreChart";
-export { HourlyChart } from "./HourlyChart";
-export { WeekdayChart } from "./WeekdayChart";
-export { SongPopulationTable } from "./SongPopulationTable";
-export { AreaDistributionTable } from "./AreaDistributionTable";
+export { default as RegistrationTrendChart } from "./RegistrationTrendChart";
+export { default as ArenaRankChart } from "./ArenaRankChart";
+export { default as ArenaRankComparison } from "./ArenaRankComparison";
+export { default as VersionScoreChart } from "./VersionScoreChart";
+export { default as HourlyChart } from "./HourlyChart";
+export { default as WeekdayChart } from "./WeekdayChart";
+export { default as SongPopulationTable } from "./SongPopulationTable";
+export { default as AreaDistributionTable } from "./AreaDistributionTable";

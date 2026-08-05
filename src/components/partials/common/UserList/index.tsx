@@ -1,22 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { UserRecommendationCard } from "./Card/ui";
-import { SortSelector } from "./Filter/sortInput";
-import { SearchInput } from "./Filter/searchInput";
-import { Pagination } from "./pagination";
-import { UserRecommendationCardSkeleton } from "./Card/skeleton";
-import { UserRecommendationEmpty } from "./Card/empty";
-import { RivalComparisonModal } from "@/components/partials/modal/RivalComparison";
+import UserRecommendationCard from "./Card/ui";
+import SortSelector from "./Filter/sortInput";
+import SearchInput from "./Filter/searchInput";
+import Pagination from "./pagination";
+import UserRecommendationCardSkeleton from "./Card/skeleton";
+import UserRecommendationEmpty from "./Card/empty";
+import RivalComparisonModal from "@/components/partials/modal/RivalComparison";
 import { LoginRequiredCard } from "@/components/partials/common/Auth/LoginRequired/ui";
 import { useUser } from "@/contexts/users/UserContext";
 import { useUserList } from "@/hooks/users/useUserList";
 import { useUserListParams } from "@/hooks/users/useUserListParams";
 import { PageContainer, PageHeader } from "@/components/partials/common/PageChrome/Header";
-import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
+import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
-export const UserRecommendationList = () => {
+const UserRecommendationList = () => {
   const { t } = useTranslation();
   const { user, isLoading: isCredentialLoading } = useUser();
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
@@ -140,3 +140,5 @@ export const UserRecommendationList = () => {
     </>
   );
 };
+
+export default UserRecommendationList;

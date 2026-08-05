@@ -12,7 +12,7 @@ import {
   type ArenaSongPoint,
 } from "@/hooks/metrics/useArenaAnalysis";
 import { ALL_RADAR_CATEGORIES, RADAR_COLORS } from "@/constants/iidx/radars";
-import { BpiScatterChart } from "@/components/partials/common/Charts/BpiScatterChart";
+import BpiScatterChart from "@/components/partials/common/Charts/BpiScatterChart";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 const StatCard = ({
@@ -362,7 +362,7 @@ interface ArenaAnalysisProps {
   onCategoryToggle: (cat: RadarCategory) => void;
 }
 
-export const ArenaAnalysis = ({
+const ArenaAnalysis = ({
   data,
   rank,
   version,
@@ -458,3 +458,5 @@ export const ArenaAnalysis = ({
     </div>
   );
 };
+
+export default ArenaAnalysis;

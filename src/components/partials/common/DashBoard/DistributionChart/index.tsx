@@ -2,9 +2,9 @@ import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { useDjRankDistribution } from "@/hooks/stats/useDJRankDistribution";
 import { useBPIDistribution } from "@/hooks/stats/useBPIDistribution";
 import { useScoreRateDistribution } from "@/hooks/stats/useScoreRateDistribution";
-import { DistributionChart } from "./ui";
+import DistributionChart from "./ui";
 import { DashCard } from "@/components/ui/dashcard";
-import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
+import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
 import { getRankColorFromTheme } from "@/constants/theme/djRankColor";
 import { getBpiColorFromTheme } from "@/constants/theme/bpiColor";
 import { getScoreRateColorFromTheme } from "@/constants/theme/scoreRateColor";
@@ -18,7 +18,7 @@ import { useTranslation } from "@/hooks/common/useTranslation";
 export const BPI_STEP_OPTIONS = [10, 5, 2, 1] as const;
 export type BpiStep = (typeof BPI_STEP_OPTIONS)[number];
 
-export const DistributionSection = ({
+const DistributionSection = ({
   type,
   myUserId,
   rivalUserId,
@@ -217,3 +217,5 @@ export const DistributionSection = ({
     />
   );
 };
+
+export default DistributionSection;

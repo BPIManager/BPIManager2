@@ -13,7 +13,7 @@ import {
 } from "recharts";
 import { BpiHistoryItem, BpiHistoryUpdatedSong } from "@/types/stats/bpiHistory";
 import type { StatsGroupBy } from "@/types/stats/bpiBoxStats";
-import { TotalBpiHistorySkeleton } from "@/components/partials/common/DashBoard/TotalBPIHistory/skeleton";
+import TotalBpiHistorySkeleton from "@/components/partials/common/DashBoard/TotalBPIHistory/skeleton";
 import { DashCard } from "@/components/ui/dashcard";
 import { cn } from "@/lib/utils";
 import { useChartColors } from "@/hooks/common/useChartColors";
@@ -181,7 +181,7 @@ interface UnifiedBpiHistoryChartProps {
   onGroupByChange: (g: StatsGroupBy) => void;
 }
 
-export const TotalBpiHistoryChart = ({
+const TotalBpiHistoryChart = ({
   myData,
   rivalData,
   isLoading,
@@ -409,3 +409,5 @@ export const TotalBpiHistoryChart = ({
     </DashCard>
   );
 };
+
+export default TotalBpiHistoryChart;

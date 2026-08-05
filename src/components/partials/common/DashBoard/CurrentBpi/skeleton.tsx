@@ -1,7 +1,7 @@
 import { DashCard } from "@/components/ui/dashcard";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export const CurrentBpiSkeleton = () => (
+const CurrentBpiSkeleton = () => (
   <DashCard>
     <div className="flex items-start justify-between">
       <Skeleton className="h-3 w-20" />
@@ -21,3 +21,5 @@ export const CurrentBpiSkeleton = () => (
     </div>
   </DashCard>
 );
+
+export default CurrentBpiSkeleton;

@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { SectionTitle } from "./SectionTitle";
+import SectionTitle from "./SectionTitle";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { type TranslationKey } from "@/lib/i18n/translations";
 
@@ -18,7 +18,7 @@ interface Props {
   onChange: (val: Partial<FilterParamsFrontend>) => void;
 }
 
-export const DateSection = ({ since, until, onChange }: Props) => {
+const DateSection = ({ since, until, onChange }: Props) => {
   const { t } = useTranslation();
   const PERIOD_OPTIONS = PERIOD_VALUES.map((value) => ({
     label: t(`filter.period.${value}` as TranslationKey),
@@ -97,3 +97,5 @@ export const DateSection = ({ since, until, onChange }: Props) => {
     </section>
   );
 };
+
+export default DateSection;

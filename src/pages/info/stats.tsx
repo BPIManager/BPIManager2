@@ -1,5 +1,5 @@
 import { Clock } from "lucide-react";
-import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
+import DashboardLayout from "@/components/partials/shell/DashboardLayout";
 import { PageContainer, PageHeader } from "@/components/partials/common/PageChrome/Header";
 import { Meta } from "@/components/partials/common/PageChrome/Head";
 import {
@@ -15,7 +15,7 @@ import {
 } from "@/components/partials/features/Info";
 import { useSiteStats } from "@/hooks/siteStats/useSiteStats";
 import { useTranslation } from "@/hooks/common/useTranslation";
-import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
+import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
 
 function UpdateNotice({ generatedAt }: { generatedAt?: string }) {
   const { t } = useTranslation();

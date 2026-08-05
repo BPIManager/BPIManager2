@@ -5,14 +5,14 @@ import { SectionLoader } from "@/components/ui/loading-spinner";
 import { useAAATable } from "@/hooks/metrics/useAAATable";
 import { GroupingMode, GoalType, AAATableItem, CustomGoalConfig, CardDisplay } from "@/types/metrics/aaa";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
-import { AAATableFilter } from "@/components/partials/common/Metrics/AAATable/selector";
-import { AAAGridItem } from "@/components/partials/common/Metrics/AAATable/table";
+import AAATableFilter from "@/components/partials/common/Metrics/AAATable/selector";
+import AAAGridItem from "@/components/partials/common/Metrics/AAATable/table";
 import { PageContainer, PageHeader } from "@/components/partials/common/PageChrome/Header";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { LoginRequiredCard } from "@/components/partials/common/Auth/LoginRequired/ui";
-import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
+import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface AAATableContentProps {
@@ -21,7 +21,7 @@ interface AAATableContentProps {
   isSelf?: boolean;
 }
 
-export const AAATableContent = ({
+const AAATableContent = ({
   userId,
   defaultVersion = latestVersion,
   isSelf = true,
@@ -192,3 +192,5 @@ export const AAATableContent = ({
     </>
   );
 };
+
+export default AAATableContent;

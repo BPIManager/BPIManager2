@@ -2,7 +2,7 @@ import { DashCard } from "@/components/ui/dashcard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BPM_CONST } from "@/constants/iidx/bpmBands";
 
-export const BpmBpiSkeleton = () => (
+const BpmBpiSkeleton = () => (
   <DashCard>
     <div className="mb-6 flex items-center justify-between">
       <Skeleton className="h-4 w-40" />
@@ -18,3 +18,5 @@ export const BpmBpiSkeleton = () => (
     </div>
   </DashCard>
 );
+
+export default BpmBpiSkeleton;

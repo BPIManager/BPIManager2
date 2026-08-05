@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function SongDetailSkeleton() {
+function SongDetailSkeleton() {
   return (
     <div className="flex flex-col gap-4">
       <div className="rounded-xl border border-bpim-border bg-bpim-surface p-4 flex flex-col gap-4 sm:flex-row sm:items-start">
@@ -49,3 +49,5 @@ export function SongDetailSkeleton() {
     </div>
   );
 }
+
+export default SongDetailSkeleton;

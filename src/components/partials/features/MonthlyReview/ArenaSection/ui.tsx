@@ -84,7 +84,7 @@ interface Props {
   a1Ref: React.RefObject<HTMLSpanElement | null>;
 }
 
-export const ArenaSectionUI = ({ arena, inView, sectionRef, a1Ref }: Props) => {
+const ArenaSectionUI = ({ arena, inView, sectionRef, a1Ref }: Props) => {
   const { t, tFormat } = useTranslation();
   const s = CLASS_STYLES[arena.bestClass] ?? CLASS_STYLES["B5"];
 
@@ -196,3 +196,5 @@ export const ArenaSectionUI = ({ arena, inView, sectionRef, a1Ref }: Props) => {
     </>
   );
 };
+
+export default ArenaSectionUI;

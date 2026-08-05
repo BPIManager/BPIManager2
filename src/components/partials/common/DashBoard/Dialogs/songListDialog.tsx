@@ -29,7 +29,7 @@ interface Props {
   showPlayedOnlyToggle?: boolean;
 }
 
-export const SongListDialog = ({
+const SongListDialog = ({
   dialogTitle,
   songs,
   isOpen,
@@ -161,3 +161,5 @@ export const SongListDialog = ({
     </Dialog>
   );
 };
+
+export default SongListDialog;

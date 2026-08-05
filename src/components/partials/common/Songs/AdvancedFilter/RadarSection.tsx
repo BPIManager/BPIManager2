@@ -4,7 +4,7 @@ import { FilterParamsFrontend } from "@/types/songs/score";
 import { ALL_RADAR_CATEGORIES, RADAR_COLORS } from "@/constants/iidx/radars";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { SectionTitle } from "./SectionTitle";
+import SectionTitle from "./SectionTitle";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface Props {
@@ -12,7 +12,7 @@ interface Props {
   onChange: (val: Partial<FilterParamsFrontend>) => void;
 }
 
-export const RadarSection = ({ radarCategories, onChange }: Props) => {
+const RadarSection = ({ radarCategories, onChange }: Props) => {
   const { t } = useTranslation();
   const toggle = (cat: string) => {
     const current = radarCategories || [];
@@ -44,3 +44,5 @@ export const RadarSection = ({ radarCategories, onChange }: Props) => {
     </section>
   );
 };
+
+export default RadarSection;

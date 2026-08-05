@@ -1,7 +1,7 @@
 import { DashCard } from "@/components/ui/dashcard";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export const IidxTowerCardSkeleton = () => (
+const IidxTowerCardSkeleton = () => (
   <DashCard>
     <Skeleton className="mb-4 h-4 w-32" />
     <div className="space-y-3">
@@ -15,3 +15,5 @@ export const IidxTowerCardSkeleton = () => (
     </div>
   </DashCard>
 );
+
+export default IidxTowerCardSkeleton;

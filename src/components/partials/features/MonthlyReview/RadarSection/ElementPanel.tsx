@@ -12,9 +12,9 @@ import {
 } from "recharts";
 import { formatDate } from "../utils";
 import { ELEMENT_LABELS, ELEMENT_COLORS, PAGE } from "./constants";
-import { SongRow } from "./SongRow";
+import SongRow from "./SongRow";
 
-export function ElementPanel({
+function ElementPanel({
   entry,
   inView,
 }: {
@@ -191,3 +191,5 @@ export function ElementPanel({
     </div>
   );
 }
+
+export default ElementPanel;

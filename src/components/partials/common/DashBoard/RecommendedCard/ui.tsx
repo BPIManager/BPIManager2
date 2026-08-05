@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useNeighborRecommendedInfinite } from "@/hooks/stats/useNeighborRecommended";
 import { NeighborRecommendedItem } from "@/types/stats/neighborRecommended";
-import { SimpleRankItem } from "./simpleRankItem";
+import SimpleRankItem from "./simpleRankItem";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { SongWithScore } from "@/types/songs/score";
-import { SongDetailView } from "@/components/partials/modal/SongDetail/ui";
-import { NearLoseList } from "./NearLose";
+import SongDetailView from "@/components/partials/modal/SongDetail/ui";
+import NearLoseList from "./NearLose";
 import { DashCard } from "@/components/ui/dashcard";
-import { InfiniteScrollContainer } from "@/components/partials/common/ListControls/InfiniteScroll/ui";
+import InfiniteScrollContainer from "@/components/partials/common/ListControls/InfiniteScroll/ui";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { AppTabsGroup } from "@/components/ui/complex/tabs";
 import { HelpTooltip } from "@/components/ui/tooltip";
@@ -105,7 +105,7 @@ const NeighborInfiniteList = ({
   );
 };
 
-export const RankingTabsCard = ({ userId }: { userId: string }) => {
+const RankingTabsCard = ({ userId }: { userId: string }) => {
   const { t } = useTranslation();
   const [selectedSong, setSelectedSong] = useState<SongWithScore | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -196,3 +196,5 @@ export const RankingTabsCard = ({ userId }: { userId: string }) => {
     </DashCard>
   );
 };
+
+export default RankingTabsCard;

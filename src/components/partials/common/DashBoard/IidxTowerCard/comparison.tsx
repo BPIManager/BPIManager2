@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useIidxTowerCompare } from "@/hooks/iidxTower/useIidxTower";
 import { DashCard } from "@/components/ui/dashcard";
-import { IidxTowerCardSkeleton } from "@/components/partials/common/DashBoard/IidxTowerCard/skeleton";
+import IidxTowerCardSkeleton from "@/components/partials/common/DashBoard/IidxTowerCard/skeleton";
 import { LordiconAnimation } from "@/components/ui/lordicon-animation";
 import dayjs from "@/lib/dayjs";
 import {
@@ -29,7 +29,7 @@ interface Props {
 
 type Granularity = "day" | "week" | "month";
 
-export const IidxTowerComparisonSection = ({
+const IidxTowerComparisonSection = ({
   rivalUserId,
   myName,
   rivalName,
@@ -442,3 +442,5 @@ function CompareBar({
     </div>
   );
 }
+
+export default IidxTowerComparisonSection;

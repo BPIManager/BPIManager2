@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
-export const SearchInput = ({
+const SearchInput = ({
   initialValue,
   onSearch,
 }: {
@@ -40,3 +40,5 @@ export const SearchInput = ({
     </div>
   );
 };
+
+export default SearchInput;

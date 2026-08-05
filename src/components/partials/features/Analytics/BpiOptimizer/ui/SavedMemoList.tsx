@@ -11,7 +11,7 @@ import type { OptimizationResult } from "@/types/bpi-optimizer";
 import type { OptimizeMemo } from "@/hooks/analytics/useOptimizeMemo";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
-export const SavedMemoList = ({
+const SavedMemoList = ({
   memos,
   onDelete,
   isDeletingId,
@@ -84,3 +84,5 @@ export const SavedMemoList = ({
   </Accordion>
   );
 };
+
+export default SavedMemoList;

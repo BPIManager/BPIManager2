@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { Crown, TrendingUp, Calendar, AlertCircle } from "lucide-react";
 import type { Score } from "@/types/db";
 
-export const HistoryRecordCard = ({
+const HistoryRecordCard = ({
   record,
   scoreDiff,
   isGlobalBest,
@@ -108,3 +108,5 @@ export const HistoryRecordCard = ({
     </div>
   );
 };
+
+export default HistoryRecordCard;

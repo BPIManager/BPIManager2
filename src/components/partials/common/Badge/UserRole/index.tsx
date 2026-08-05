@@ -71,7 +71,7 @@ const ROLE_CONFIG: Record<
 
 type RoleBadgeVariant = "compact" | "full";
 
-export const RoleBadge = ({
+const RoleBadge = ({
   role,
   description,
   grantedAt,
@@ -145,3 +145,5 @@ export const RoleBadge = ({
     </TooltipProvider>
   );
 };
+
+export default RoleBadge;

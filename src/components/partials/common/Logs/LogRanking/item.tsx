@@ -110,7 +110,7 @@ interface RankItemProps {
   isSharing?: boolean;
 }
 
-export const RankItem = ({
+const RankItem = ({
   item,
   rank,
   type,
@@ -295,3 +295,5 @@ export const RankItem = ({
     </div>
   );
 };
+
+export default RankItem;

@@ -1,16 +1,16 @@
 ﻿import { formatIIDXId } from "@/utils/common/formatIidxId";
-import { RadarSectionChart } from "@/components/partials/common/DashBoard/Radar";
+import RadarSectionChart from "@/components/partials/common/DashBoard/Radar";
 import { RivalSummaryResult } from "@/types/social/rival";
 import { getBpiColorStyle } from "@/constants/theme/bpiColor";
 import { getRoleCardStyle } from "@/constants/theme/roleCardStyle";
 import { ROLE_ICON } from "@/constants/theme/roleIcon";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import { RoleBadge } from "@/components/partials/common/Badge/UserRole";
-import { ArenaClassBadge } from "@/components/partials/common/Badge/ArenaClassBadge";
+import RoleBadge from "@/components/partials/common/Badge/UserRole";
+import ArenaClassBadge from "@/components/partials/common/Badge/ArenaClassBadge";
 import dayjs from "@/lib/dayjs";
 
-export const RivalSummaryCard = ({
+const RivalSummaryCard = ({
   rival,
   onClick,
 }: {
@@ -137,3 +137,5 @@ export const RivalSummaryCard = ({
     </button>
   );
 };
+
+export default RivalSummaryCard;

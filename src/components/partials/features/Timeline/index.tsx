@@ -2,7 +2,7 @@
 
 import { Activity, LucideIcon, Swords, UserCheck } from "lucide-react";
 import { SectionLoader } from "@/components/ui/loading-spinner";
-import { TimelineList } from "./ui";
+import TimelineList from "./ui";
 import {
   FilterCheckboxGroup,
   FilterSearchInput,
@@ -17,7 +17,7 @@ import { PageContainer, PageHeader } from "@/components/partials/common/PageChro
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 
-export const TimelineContainer = () => {
+const TimelineContainer = () => {
   const { t } = useTranslation();
   const { user, isLoading } = useUser();
   const {
@@ -141,3 +141,5 @@ const MenuButton = ({
     <span className="text-xs">{label}</span>
   </Button>
 );
+
+export default TimelineContainer;

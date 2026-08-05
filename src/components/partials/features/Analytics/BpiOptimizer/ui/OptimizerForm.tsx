@@ -7,8 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import type { OptimizerStrategy } from "@/types/bpi-optimizer";
 import type { RadarCategory } from "@/types/stats/radar";
-import { BpiChip } from "./BpiChip";
-import { OptimizerGuide } from "./OptimizerGuide";
+import BpiChip from "./BpiChip";
+import OptimizerGuide from "./OptimizerGuide";
 import { RADAR_LABELS } from "./shared";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
@@ -48,7 +48,7 @@ interface OptimizerFormProps {
   onConsiderCurrentTotalBpiChange: (v: boolean) => void;
 }
 
-export const OptimizerForm = ({
+const OptimizerForm = ({
   targetBpiInput,
   onTargetBpiChange,
   maxStepsInput,
@@ -281,3 +281,5 @@ export const OptimizerForm = ({
   </div>
   );
 };
+
+export default OptimizerForm;

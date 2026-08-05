@@ -4,14 +4,14 @@ import { useMemo } from "react";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { useUser } from "@/contexts/users/UserContext";
 import { useRivalSummary } from "@/hooks/social/useRivalSummary";
-import { RivalFilter } from "./filter";
-import { RivalList } from "./container";
+import RivalFilter from "./filter";
+import RivalList from "./container";
 import { LoginRequiredCard } from "@/components/partials/common/Auth/LoginRequired/ui";
 import { useRivalListFilter } from "@/hooks/social/useRivalListFilter";
 import { useRouter } from "next/router";
 import { PageContainer, PageHeader } from "@/components/partials/common/PageChrome/Header";
 
-export const RivalListContainer = () => {
+const RivalListContainer = () => {
   const { user, isLoading: isCredentialLoading } = useUser();
   const router = useRouter();
   const {
@@ -72,3 +72,5 @@ export const RivalListContainer = () => {
     </>
   );
 };
+
+export default RivalListContainer;

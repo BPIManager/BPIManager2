@@ -1,10 +1,10 @@
 import { useActivity } from "@/hooks/stats/useActivity";
-import { ActivityCalendar } from "./ui";
-import { ActivityCalendarSkeleton } from "./skeleton";
+import ActivityCalendar from "./ui";
+import ActivityCalendarSkeleton from "./skeleton";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { Dispatch, SetStateAction, useEffect } from "react";
 
-export const ActivitySection = ({
+const ActivitySection = ({
   userId,
   setNodata,
 }: {
@@ -32,3 +32,5 @@ export const ActivitySection = ({
     />
   ) : null;
 };
+
+export default ActivitySection;

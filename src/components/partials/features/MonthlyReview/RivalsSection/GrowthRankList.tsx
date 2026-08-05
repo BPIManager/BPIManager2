@@ -1,6 +1,6 @@
 import type { RivalBpiGrowthEntry } from "@/types/stats/monthlyReview";
 
-export function GrowthRankList({
+function GrowthRankList({
   title,
   entries,
   valueKey,
@@ -71,3 +71,5 @@ export function GrowthRankList({
     </div>
   );
 }
+
+export default GrowthRankList;

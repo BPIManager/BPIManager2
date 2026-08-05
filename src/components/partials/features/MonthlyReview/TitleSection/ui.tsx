@@ -22,7 +22,7 @@ interface Props {
   profileImage: string | null;
 }
 
-export const TitleSectionUI = ({
+const TitleSectionUI = ({
   periodLabel,
   diffColor,
   subtitle,
@@ -105,3 +105,5 @@ export const TitleSectionUI = ({
     </section>
   </>
 );
+
+export default TitleSectionUI;

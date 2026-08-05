@@ -191,7 +191,7 @@ interface RadarChartProps {
   rivalOnly?: boolean;
 }
 
-export const RadarSectionChart = ({
+const RadarSectionChart = ({
   data,
   rivalData,
   isMini = false,
@@ -331,3 +331,5 @@ export const RadarSectionChart = ({
     </div>
   );
 };
+
+export default RadarSectionChart;

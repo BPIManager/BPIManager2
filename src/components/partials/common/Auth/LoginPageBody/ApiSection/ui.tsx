@@ -1,7 +1,7 @@
 import { Wrench, BookOpen, ExternalLink } from "lucide-react";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
-export const ApiSection = () => {
+const ApiSection = () => {
   const { t } = useTranslation();
   const API_DOCS_URL = "https://bpim2.apidog.io/";
 
@@ -88,3 +88,5 @@ export const ApiSection = () => {
     </div>
   );
 };
+
+export default ApiSection;

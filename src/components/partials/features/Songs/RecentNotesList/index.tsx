@@ -1,10 +1,10 @@
 import { Clock, ThumbsUp } from "lucide-react";
 import Link from "next/link";
 import { useRecentNotes } from "@/hooks/songs/useRecentNotes";
-import { DifficultyBadge } from "@/components/partials/common/Songs/DifficultyBadge";
-import { SortButton } from "@/components/partials/common/Songs/SortButton";
+import DifficultyBadge from "@/components/partials/common/Songs/DifficultyBadge";
+import SortButton from "@/components/partials/common/Songs/SortButton";
 import { formatDate } from "@/utils/common/formatDate";
-import { InfiniteScrollContainer } from "@/components/partials/common/ListControls/InfiniteScroll/ui";
+import InfiniteScrollContainer from "@/components/partials/common/ListControls/InfiniteScroll/ui";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { RecentNote } from "@/hooks/songs/useRecentNotes";
 
@@ -56,7 +56,7 @@ function LoadingSkeleton() {
   );
 }
 
-export function RecentNotesList() {
+function RecentNotesList() {
   const {
     notes,
     isLoading,
@@ -117,3 +117,5 @@ export function RecentNotesList() {
     </div>
   );
 }
+
+export default RecentNotesList;

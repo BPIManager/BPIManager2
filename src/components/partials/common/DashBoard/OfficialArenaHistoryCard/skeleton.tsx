@@ -1,7 +1,7 @@
 import { DashCard } from "@/components/ui/dashcard";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export const OfficialArenaHistoryCardSkeleton = () => (
+const OfficialArenaHistoryCardSkeleton = () => (
   <DashCard>
     <div className="mb-4 flex items-center justify-between">
       <Skeleton className="h-4 w-32" />
@@ -16,3 +16,5 @@ export const OfficialArenaHistoryCardSkeleton = () => (
     ))}
   </DashCard>
 );
+
+export default OfficialArenaHistoryCardSkeleton;

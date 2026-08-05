@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { CustomPagination } from "@/components/partials/common/ListControls/Pagination/ui";
+import CustomPagination from "@/components/partials/common/ListControls/Pagination/ui";
 import { cn } from "@/lib/utils";
 import { ArrowUpDown, ChevronUp, ChevronDown } from "lucide-react";
 import { A_RANKS } from "@/constants/iidx/arenaRanks";
@@ -148,7 +148,7 @@ const ArenaRow = memo(function ArenaRow({
 });
 
 
-export const ArenaAverageTable = ({
+const ArenaAverageTable = ({
   data,
   displayMetric = "exScore",
 }: {
@@ -268,3 +268,5 @@ export const ArenaAverageTable = ({
     </div>
   );
 };
+
+export default ArenaAverageTable;

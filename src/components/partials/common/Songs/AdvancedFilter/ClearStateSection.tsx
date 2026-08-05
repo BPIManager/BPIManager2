@@ -4,7 +4,7 @@ import { FilterParamsFrontend } from "@/types/songs/score";
 import { CLEAR_STATES } from "@/constants/iidx/clearLamps";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { SectionTitle } from "./SectionTitle";
+import SectionTitle from "./SectionTitle";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface Props {
@@ -12,7 +12,7 @@ interface Props {
   onChange: (val: Partial<FilterParamsFrontend>) => void;
 }
 
-export const ClearStateSection = ({ clearStates, onChange }: Props) => {
+const ClearStateSection = ({ clearStates, onChange }: Props) => {
   const { t } = useTranslation();
   const toggle = (val: string) => {
     const current = clearStates || [];
@@ -44,3 +44,5 @@ export const ClearStateSection = ({ clearStates, onChange }: Props) => {
     </section>
   );
 };
+
+export default ClearStateSection;

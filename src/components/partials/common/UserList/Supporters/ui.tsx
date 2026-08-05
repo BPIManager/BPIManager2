@@ -5,7 +5,7 @@ import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import { RoleBadge } from "@/components/partials/common/Badge/UserRole";
+import RoleBadge from "@/components/partials/common/Badge/UserRole";
 import type { SupporterUser } from "@/hooks/users/useSupporters";
 
 type RoleKey = "pro" | "iidx" | "saba" | "developer" | "coffee";

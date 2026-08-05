@@ -1,12 +1,12 @@
 import { ReactNode } from "react";
 import { useProfile } from "@/hooks/users/useProfile";
 import { useUser } from "@/contexts/users/UserContext";
-import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
+import DashboardLayout from "@/components/partials/shell/DashboardLayout";
 import { PageContainer } from "@/components/partials/common/PageChrome/Header";
-import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
+import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
 import { Lock, UserMinus } from "lucide-react";
-import { ModeSwitchBanner } from "@/components/partials/common/Rivals/ModeSwitch/ui";
-import { ProfileSideBar } from "@/components/partials/common/Profile/Sidebar/ui";
+import ModeSwitchBanner from "@/components/partials/common/Rivals/ModeSwitch/ui";
+import ProfileSideBar from "@/components/partials/common/Profile/Sidebar/ui";
 import { ProfileProvider } from "@/contexts/profile/ProfileContext";
 import { FilterProvider } from "@/contexts/stats/FilterContext";
 import { PageLoader } from "@/components/ui/loading-spinner";
@@ -27,7 +27,7 @@ interface ProfileLayoutShellProps {
  * 「ローディング → 非公開/未発見/エラー → サイドバー+タブのグリッド」までを丸ごとまとめたシェル。
  * サイドバー隣に表示するタブ本体だけをchildren(render prop)側に残す。
  */
-export const ProfileLayoutShell = ({
+const ProfileLayoutShell = ({
   userId,
   bannerType,
   children,
@@ -115,3 +115,5 @@ export const ProfileLayoutShell = ({
     </FilterProvider>
   );
 };
+
+export default ProfileLayoutShell;

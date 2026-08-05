@@ -86,7 +86,7 @@ function RivalCard({
   );
 }
 
-export const FooterSectionUI = ({
+const FooterSectionUI = ({
   inView,
   sectionRef,
   twitterUrl,
@@ -179,3 +179,5 @@ export const FooterSectionUI = ({
     </>
   );
 };
+
+export default FooterSectionUI;

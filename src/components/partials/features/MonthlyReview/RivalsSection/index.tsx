@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useInView } from "@/hooks/common/useInView";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import type { MonthlyReviewData } from "@/types/stats/monthlyReview";
-import { RivalsSectionUI } from "./ui";
+import RivalsSectionUI from "./ui";
 
 interface Props {
   rivals: MonthlyReviewData["rivals"];
@@ -13,7 +13,7 @@ interface Props {
   granularity?: "month" | "year";
 }
 
-export const RivalsSection = ({
+const RivalsSection = ({
   rivals,
   ranking,
   timeline,
@@ -69,3 +69,5 @@ export const RivalsSection = ({
     />
   );
 };
+
+export default RivalsSection;

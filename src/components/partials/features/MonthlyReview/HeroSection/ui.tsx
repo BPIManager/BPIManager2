@@ -27,7 +27,7 @@ interface Props {
   spanRef: React.RefObject<HTMLSpanElement | null>;
 }
 
-export const HeroSectionUI = ({
+const HeroSectionUI = ({
   bpi,
   inView,
   sectionRef,
@@ -262,3 +262,5 @@ export const HeroSectionUI = ({
   </>
   );
 };
+
+export default HeroSectionUI;

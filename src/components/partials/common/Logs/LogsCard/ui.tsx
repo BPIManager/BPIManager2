@@ -9,7 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { Calendar, ListMusic } from "lucide-react";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
-export const LogsCard = ({ log }: { log: UpdateLog }) => {
+const LogsCard = ({ log }: { log: UpdateLog }) => {
   const router = useRouter();
   const { t } = useTranslation();
   const userId = router.query.userId as string;
@@ -106,3 +106,5 @@ export const LogsCard = ({ log }: { log: UpdateLog }) => {
     </Link>
   );
 };
+
+export default LogsCard;

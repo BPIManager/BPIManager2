@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { getBpiColorStyle } from "@/constants/theme/bpiColor";
 import type { RankingEntry } from "@/types/users/ranking";
-import { ArenaClassBadge } from "@/components/partials/common/Badge/ArenaClassBadge";
+import ArenaClassBadge from "@/components/partials/common/Badge/ArenaClassBadge";
 
 interface RankingRowProps {
   entry: RankingEntry;
@@ -90,4 +90,6 @@ const RankingRowComponent = ({ entry, onClick, style }: RankingRowProps) => {
   );
 };
 
-export const RankingRow = memo(RankingRowComponent);
+const RankingRow = memo(RankingRowComponent);
+
+export default RankingRow;

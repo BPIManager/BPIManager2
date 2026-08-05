@@ -16,7 +16,7 @@ interface RivalComparisonRowProps {
   };
 }
 
-export const RivalComparisonRow = ({ rival }: RivalComparisonRowProps) => {
+const RivalComparisonRow = ({ rival }: RivalComparisonRowProps) => {
   const { t } = useTranslation();
   const { userName, profileImage, userId } = rival;
   const { win, lose, draw, totalCount } = rival.stats;
@@ -97,3 +97,5 @@ export const RivalComparisonRow = ({ rival }: RivalComparisonRowProps) => {
     </div>
   );
 };
+
+export default RivalComparisonRow;

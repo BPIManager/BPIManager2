@@ -2,17 +2,17 @@
 import { formatIIDXId } from "@/utils/common/formatIidxId";
 import dayjs from "@/lib/dayjs";
 import { useTranslation } from "@/hooks/common/useTranslation";
-import { RadarSectionChart } from "@/components/partials/common/DashBoard/Radar";
+import RadarSectionChart from "@/components/partials/common/DashBoard/Radar";
 import { getBpiColorStyle } from "@/constants/theme/bpiColor";
 import { getRoleCardStyle } from "@/constants/theme/roleCardStyle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import type { RecommendedUser } from "@/types/users/list";
-import { RoleBadge } from "@/components/partials/common/Badge/UserRole";
+import RoleBadge from "@/components/partials/common/Badge/UserRole";
 import { ROLE_ICON } from "@/constants/theme/roleIcon";
-import { ArenaClassBadge } from "@/components/partials/common/Badge/ArenaClassBadge";
+import ArenaClassBadge from "@/components/partials/common/Badge/ArenaClassBadge";
 
-export const UserRecommendationCard = ({
+const UserRecommendationCard = ({
   user,
   viewerRadar,
   viewerTotalBpi,
@@ -155,3 +155,5 @@ export const UserRecommendationCard = ({
     </button>
   );
 };
+
+export default UserRecommendationCard;

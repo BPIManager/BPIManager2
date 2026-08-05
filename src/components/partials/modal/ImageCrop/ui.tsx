@@ -29,7 +29,7 @@ interface Props {
   onSuccess: (url: string) => void;
 }
 
-export const ImageUploadModal = ({
+const ImageUploadModal = ({
   uid,
   isOpen,
   onClose,
@@ -198,3 +198,5 @@ export const ImageUploadModal = ({
     </Dialog>
   );
 };
+
+export default ImageUploadModal;

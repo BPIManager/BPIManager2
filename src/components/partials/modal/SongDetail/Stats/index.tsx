@@ -10,7 +10,7 @@ import { BpiCalculator } from "@/lib/bpi";
 import type { SongWithScore } from "@/types/songs/score";
 import { StatsTabView } from "./ui";
 
-export const StatsTab = ({ song }: { song: SongWithScore }) => {
+const StatsTab = ({ song }: { song: SongWithScore }) => {
   const router = useRouter();
   const { user } = useUser();
 
@@ -120,3 +120,5 @@ export const StatsTab = ({ song }: { song: SongWithScore }) => {
     />
   );
 };
+
+export default StatsTab;

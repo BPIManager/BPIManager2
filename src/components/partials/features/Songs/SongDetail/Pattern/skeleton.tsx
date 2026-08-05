@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function PatternTabSkeleton() {
+function PatternTabSkeleton() {
   return (
     <div className="flex flex-col gap-3 mt-3">
       <Skeleton className="h-9 w-full" />
@@ -10,3 +10,5 @@ export function PatternTabSkeleton() {
     </div>
   );
 }
+
+export default PatternTabSkeleton;

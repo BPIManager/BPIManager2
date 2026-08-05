@@ -217,7 +217,7 @@ const BpiCurveChart = () => {
   );
 };
 
-export const BpiExplainSection = () => {
+const BpiExplainSection = () => {
   const { t } = useTranslation();
 
   const BPI_LANDMARKS = [
@@ -282,3 +282,5 @@ export const BpiExplainSection = () => {
     </div>
   );
 };
+
+export default BpiExplainSection;

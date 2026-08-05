@@ -30,7 +30,7 @@ interface ShareModalProps {
   handleTabChange: (details: { value: string }) => void;
 }
 
-export const ShareResultModal = ({
+const ShareResultModal = ({
   isOpen,
   onClose,
   shareData,
@@ -142,3 +142,5 @@ export const ShareResultModal = ({
     </Dialog>
   );
 };
+
+export default ShareResultModal;

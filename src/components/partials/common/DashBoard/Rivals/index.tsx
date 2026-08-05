@@ -2,14 +2,14 @@
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useRivalSummary } from "@/hooks/social/useRivalSummary";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
-import { RivalComparisonRow } from "./ui";
-import { RivalWinLossSummarySkeleton } from "./skeleton";
-import { RivalWinLossSummaryNotFound } from "@/components/partials/common/ErrorStates/RivalWinLossSummaryNotFound";
+import RivalComparisonRow from "./ui";
+import RivalWinLossSummarySkeleton from "./skeleton";
+import RivalWinLossSummaryNotFound from "@/components/partials/common/ErrorStates/RivalWinLossSummaryNotFound";
 import { DashCard } from "@/components/ui/dashcard";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
-export const RivalWinLossSummary = ({
+const RivalWinLossSummary = ({
   userId,
 }: {
   userId?: string | undefined;
@@ -66,3 +66,5 @@ export const RivalWinLossSummary = ({
     </DashCard>
   );
 };
+
+export default RivalWinLossSummary;

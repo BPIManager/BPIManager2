@@ -1,8 +1,8 @@
 "use client";
 
-import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
+import DashboardLayout from "@/components/partials/shell/DashboardLayout";
 import { Meta } from "@/components/partials/common/PageChrome/Head";
-import { SupportersPage } from "@/components/partials/features/Supporters";
+import SupportersPage from "@/components/partials/features/Supporters";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 export default function SupportersPageRoute() {

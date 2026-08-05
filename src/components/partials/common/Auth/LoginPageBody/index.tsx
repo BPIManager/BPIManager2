@@ -2,8 +2,8 @@ import { LockIcon } from "lucide-react";
 import { PageContainer } from "@/components/partials/common/PageChrome/Header";
 import { Separator } from "@/components/ui/separator";
 import { useTranslation } from "@/hooks/common/useTranslation";
-import { LoginSection } from "./LoginSection/ui";
-import { BpiExplainSection } from "./BpiExplainSection/ui";
+import LoginSection from "./LoginSection/ui";
+import BpiExplainSection from "./BpiExplainSection/ui";
 import {
   ShowcaseSection,
   MockBpiHistoryChart,
@@ -14,10 +14,10 @@ import {
   MockActivityCalendar,
   MockRivalBars,
 } from "./ShowcaseSection/ui";
-import { ApiSection } from "./ApiSection/ui";
-import { PrivacySection } from "./PrivacySection/ui";
+import ApiSection from "./ApiSection/ui";
+import PrivacySection from "./PrivacySection/ui";
 
-export const LoginPageBody = ({
+const LoginPageBody = ({
   requiredMessage,
 }: {
   requiredMessage?: string;
@@ -126,3 +126,5 @@ export const LoginPageBody = ({
     </div>
   );
 };
+
+export default LoginPageBody;

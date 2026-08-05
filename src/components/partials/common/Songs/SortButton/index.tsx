@@ -5,7 +5,7 @@ interface SortButtonProps {
   onClick: () => void;
 }
 
-export function SortButton({ active, icon, label, onClick }: SortButtonProps) {
+function SortButton({ active, icon, label, onClick }: SortButtonProps) {
   return (
     <button
       onClick={onClick}
@@ -20,3 +20,5 @@ export function SortButton({ active, icon, label, onClick }: SortButtonProps) {
     </button>
   );
 }
+
+export default SortButton;

@@ -1,11 +1,11 @@
-import { LogsSummaryPageShell } from "@/components/partials/shell/LogsSummaryPageShell";
-import { PublicLogsCard } from "@/components/partials/common/Logs/PublicLogsCard";
+import LogsSummaryPageShell from "@/components/partials/shell/LogsSummaryPageShell";
+import PublicLogsCard from "@/components/partials/common/Logs/PublicLogsCard";
 import { Meta } from "@/components/partials/common/PageChrome/Head";
-import { LogsDetailContent } from "@/components/partials/common/Logs/LogsDetail/content";
-import { LogsDetailView } from "@/components/partials/common/Logs/LogsDetail";
-import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
-import { UserProfileLayout } from "@/components/partials/common/Profile/Layout/layout";
-import { ProfileMeta } from "@/components/partials/common/Profile/Meta/ui";
+import LogsDetailContent from "@/components/partials/common/Logs/LogsDetail/content";
+import LogsDetailView from "@/components/partials/common/Logs/LogsDetail";
+import DashboardLayout from "@/components/partials/shell/DashboardLayout";
+import UserProfileLayout from "@/components/partials/common/Profile/Layout/layout";
+import ProfileMeta from "@/components/partials/common/Profile/Meta/ui";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 export default function BatchLogsPage() {

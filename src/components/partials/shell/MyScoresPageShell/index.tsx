@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { useRouter } from "next/router";
 import { Meta } from "@/components/partials/common/PageChrome/Head";
-import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
+import DashboardLayout from "@/components/partials/shell/DashboardLayout";
 import { useUser } from "@/contexts/users/UserContext";
 import AccountSettings from "@/components/partials/modal/AccountSettings";
 import { LoginRequiredCard } from "@/components/partials/common/Auth/LoginRequired/ui";
@@ -21,7 +21,7 @@ interface MyScoresPageShellProps {
  * 「router準備待ち → 未ログイン時のAccountSettings → LoginRequiredCard分岐」を
  * まとめたページシェル。表示するテーブル本体だけを呼び出し側が渡す。
  */
-export const MyScoresPageShell = ({
+const MyScoresPageShell = ({
   titlePrefix,
   renderTable,
 }: MyScoresPageShellProps) => {
@@ -53,3 +53,5 @@ export const MyScoresPageShell = ({
     </>
   );
 };
+
+export default MyScoresPageShell;

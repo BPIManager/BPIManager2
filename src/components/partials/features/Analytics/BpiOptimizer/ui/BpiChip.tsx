@@ -1,7 +1,7 @@
 ﻿import { cn } from "@/lib/utils";
 import { getBpiColorStyle } from "@/constants/theme/bpiColor";
 
-export const BpiChip = ({
+const BpiChip = ({
   bpi,
   size = "sm",
 }: {
@@ -21,3 +21,5 @@ export const BpiChip = ({
     </span>
   );
 };
+
+export default BpiChip;

@@ -80,7 +80,7 @@ const CustomTooltip = ({
   );
 };
 
-export function RadarComparisonChart({
+function RadarComparisonChart({
   entries,
   inView,
 }: {
@@ -212,3 +212,5 @@ export function RadarComparisonChart({
     </div>
   );
 }
+
+export default RadarComparisonChart;

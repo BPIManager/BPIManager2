@@ -2,7 +2,7 @@
 
 import { ReactNode } from "react";
 import { useRouter } from "next/router";
-import { ProfileLayoutShell } from "@/components/partials/shell/ProfileLayoutShell";
+import ProfileLayoutShell from "@/components/partials/shell/ProfileLayoutShell";
 import { Tabs } from "@/components/ui/tabs";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { LayoutDashboard, Music, Table, History } from "lucide-react";
@@ -15,7 +15,7 @@ interface UserProfileLayoutProps {
   children: ReactNode;
 }
 
-export const UserProfileLayout = ({
+const UserProfileLayout = ({
   userId,
   currentTab,
   children,
@@ -78,3 +78,5 @@ export const UserProfileLayout = ({
     </ProfileLayoutShell>
   );
 };
+
+export default UserProfileLayout;

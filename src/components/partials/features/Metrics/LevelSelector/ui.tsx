@@ -56,7 +56,7 @@ interface ArenaAverageFilterProps {
   onDisplayMetricChange?: (metric: DisplayMetric) => void;
 }
 
-export const ArenaAverageFilter = ({
+const ArenaAverageFilter = ({
   version,
   onVersionChange,
   level,
@@ -376,3 +376,5 @@ const DetailFilterRow = ({
     </div>
   );
 };
+
+export default ArenaAverageFilter;

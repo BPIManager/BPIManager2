@@ -99,7 +99,7 @@ const PlanCard = (props: PlanCardProps) => {
   );
 };
 
-export const DonationSection = () => {
+const DonationSection = () => {
   const { t } = useTranslation();
 
   return (
@@ -261,3 +261,5 @@ export const DonationSection = () => {
     </section>
   );
 };
+
+export default DonationSection;

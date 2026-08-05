@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/hooks/common/useTranslation";
-import { ResultModalShell } from "../ResultModalShell";
+import ResultModalShell from "../ResultModalShell";
 
 interface Props {
   result: {
@@ -28,7 +28,7 @@ interface Props {
   onClose: () => void;
 }
 
-export const ImportSuccessModal = ({ result, version, onClose }: Props) => {
+const ImportSuccessModal = ({ result, version, onClose }: Props) => {
   const router = useRouter();
   const { fbUser } = useUser();
   const { t } = useTranslation();
@@ -162,3 +162,5 @@ export const ImportSuccessModal = ({ result, version, onClose }: Props) => {
     </ResultModalShell>
   );
 };
+
+export default ImportSuccessModal;

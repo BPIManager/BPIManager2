@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { DashboardLayoutSettingsModal } from "@/components/partials/common/DashBoard/LayoutSettings";
+import DashboardLayoutSettingsModal from "@/components/partials/common/DashBoard/LayoutSettings";
 import { useLayoutConfig } from "@/hooks/dashboard/useLayoutConfig";
 import { useTranslation } from "@/hooks/common/useTranslation";
 

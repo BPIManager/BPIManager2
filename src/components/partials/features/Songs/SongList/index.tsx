@@ -2,9 +2,9 @@
 
 import { useSongListFilter } from "@/hooks/songs/useSongListFilter";
 import { SongFilterControls, SongVirtualList } from "./ui";
-import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
+import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
 
-export function SongListContent() {
+function SongListContent() {
   const {
     localSearch,
     setLocalSearch,
@@ -46,3 +46,5 @@ export function SongListContent() {
     </div>
   );
 }
+
+export default SongListContent;

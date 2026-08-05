@@ -1,6 +1,6 @@
 ﻿import { useMemo } from "react";
-import { RadarSectionChart } from "@/components/partials/common/DashBoard/Radar/index";
-import { DifficultyBadge } from "@/components/partials/common/Songs/DifficultyBadge";
+import RadarSectionChart from "@/components/partials/common/DashBoard/Radar/index";
+import DifficultyBadge from "@/components/partials/common/Songs/DifficultyBadge";
 import { SONG_ATTRIBUTES } from "@/constants/iidx/songAttributes";
 import { buildRadarData } from "@/utils/songs/songListFilter";
 import { buildTextageUrl, buildChartViewerUrl } from "@/utils/songs/links";
@@ -20,7 +20,7 @@ interface SongMetaCardProps {
   song: SongListItem;
 }
 
-export function SongMetaCard({ song }: SongMetaCardProps) {
+function SongMetaCard({ song }: SongMetaCardProps) {
   const textage1pUrl = useMemo(() => buildTextageUrl(song.textage, 1), [song]);
   const textage2pUrl = useMemo(() => buildTextageUrl(song.textage, 2), [song]);
   const chartViewerUrl = useMemo(() => buildChartViewerUrl(song.textage, song.difficulty), [song]);
@@ -225,3 +225,4 @@ export function SongMetaCard({ song }: SongMetaCardProps) {
   );
 }
 
+export default SongMetaCard;

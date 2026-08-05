@@ -5,7 +5,7 @@ import { useTranslation } from "@/hooks/common/useTranslation";
 import { useProfile } from "@/hooks/users/useProfile";
 import dayjs from "@/lib/dayjs";
 import { useRouter } from "next/router";
-import { TitleSectionUI } from "./ui";
+import TitleSectionUI from "./ui";
 
 interface Props {
   month: string;
@@ -13,7 +13,7 @@ interface Props {
   granularity: "month" | "year";
 }
 
-export const TitleSection = ({ month, bpiDiff, granularity }: Props) => {
+const TitleSection = ({ month, bpiDiff, granularity }: Props) => {
   const [ref, inView] = useInView(0.1);
   const { t } = useTranslation();
   const router = useRouter();
@@ -45,3 +45,5 @@ export const TitleSection = ({ month, bpiDiff, granularity }: Props) => {
     />
   );
 };
+
+export default TitleSection;

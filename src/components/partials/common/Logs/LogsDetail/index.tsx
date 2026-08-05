@@ -1,11 +1,11 @@
 import { PageContainer, PageHeader } from "@/components/partials/common/PageChrome/Header";
 import dayjs from "@/lib/dayjs";
-import { LogsDetailContent } from "./content";
+import LogsDetailContent from "./content";
 import type { LogsDetailViewProps } from "@/types/logs/detail";
 import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
-export const LogsDetailView = (props: LogsDetailViewProps) => {
+const LogsDetailView = (props: LogsDetailViewProps) => {
   const { t } = useTranslation();
 
   const pageTitle = (() => {
@@ -43,3 +43,5 @@ export const LogsDetailView = (props: LogsDetailViewProps) => {
     </div>
   );
 };
+
+export default LogsDetailView;

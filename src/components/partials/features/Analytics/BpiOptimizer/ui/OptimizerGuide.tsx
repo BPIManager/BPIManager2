@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/accordion";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
-export const OptimizerGuide = () => {
+const OptimizerGuide = () => {
   const { t } = useTranslation();
   return (
   <Accordion type="single" collapsible className="w-full mt-4">
@@ -132,3 +132,5 @@ export const OptimizerGuide = () => {
   </Accordion>
   );
 };
+
+export default OptimizerGuide;

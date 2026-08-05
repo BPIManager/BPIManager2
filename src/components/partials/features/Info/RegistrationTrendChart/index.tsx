@@ -27,7 +27,7 @@ function getWeekKey(dateStr: string): string {
     .slice(0, 10);
 }
 
-export function RegistrationTrendChart({ data }: { data: TrendEntry[] }) {
+function RegistrationTrendChart({ data }: { data: TrendEntry[] }) {
   const c = useChartColors();
   const [groupBy, setGroupBy] = useState<"day" | "week" | "month">("day");
 
@@ -146,3 +146,5 @@ export function RegistrationTrendChart({ data }: { data: TrendEntry[] }) {
     </DashCard>
   );
 }
+
+export default RegistrationTrendChart;

@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { useBpiBoxStats } from "@/hooks/stats/useBpiBoxStats";
-import { BpiBoxStatsChart } from "./ui";
+import BpiBoxStatsChart from "./ui";
 import { StatsGroupBy } from "@/types/stats/bpiBoxStats";
 import { DashCard } from "@/components/ui/dashcard";
-import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
+import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
 
-export const BpiBoxStatsSection = ({ userId }: { userId: string }) => {
+const BpiBoxStatsSection = ({ userId }: { userId: string }) => {
   const { levels, diffs, version } = useStatsFilter();
   const [groupBy, setGroupBy] = useState<StatsGroupBy>("day");
   const { stats, isLoading, isError } = useBpiBoxStats(
@@ -34,3 +34,5 @@ export const BpiBoxStatsSection = ({ userId }: { userId: string }) => {
     />
   );
 };
+
+export default BpiBoxStatsSection;

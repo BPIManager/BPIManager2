@@ -1,13 +1,13 @@
 import { Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLoginDialog } from "@/hooks/common/useLoginDialog";
-import { LoginDialog } from "@/components/partials/modal/LoginDialog";
+import LoginDialog from "@/components/partials/modal/LoginDialog";
 
 interface LoginRequiredTabContentProps {
   feature: string;
 }
 
-export function LoginRequiredTabContent({
+function LoginRequiredTabContent({
   feature,
 }: LoginRequiredTabContentProps) {
   const { isOpen, open, close } = useLoginDialog();
@@ -34,3 +34,5 @@ export function LoginRequiredTabContent({
     </div>
   );
 }
+
+export default LoginRequiredTabContent;

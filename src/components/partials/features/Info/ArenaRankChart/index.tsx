@@ -10,7 +10,7 @@ import {
 import { DashCard } from "@/components/ui/dashcard";
 import { useChartColors } from "@/hooks/common/useChartColors";
 
-export function ArenaRankChart({ data }: { data: { rank: string; count: number }[] }) {
+function ArenaRankChart({ data }: { data: { rank: string; count: number }[] }) {
   const c = useChartColors();
   return (
     <DashCard className="h-80 flex flex-col">
@@ -56,3 +56,5 @@ export function ArenaRankChart({ data }: { data: { rank: string; count: number }
     </DashCard>
   );
 }
+
+export default ArenaRankChart;

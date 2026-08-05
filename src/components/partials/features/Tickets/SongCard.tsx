@@ -1,7 +1,7 @@
 ﻿import { useState, useCallback } from "react";
 import { ThumbsUp, ThumbsDown } from "lucide-react";
 import { useUser } from "@/contexts/users/UserContext";
-import { RadarSectionChart } from "@/components/partials/common/DashBoard/Radar";
+import RadarSectionChart from "@/components/partials/common/DashBoard/Radar";
 import { SONG_ATTRIBUTES_GLOBAL } from "@/constants/iidx/songAttributes";
 import { Badge } from "@/components/ui/badge";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
@@ -25,7 +25,7 @@ interface SongCardProps {
   scoreMode: ScoreMode;
 }
 
-export function SongCard({ song, totalBpi, ticketId, scoreMode }: SongCardProps) {
+function SongCard({ song, totalBpi, ticketId, scoreMode }: SongCardProps) {
   const { fbUser } = useUser();
   const { t } = useTranslation();
   const [showRadar, setShowRadar] = useState(false);
@@ -212,3 +212,5 @@ export function SongCard({ song, totalBpi, ticketId, scoreMode }: SongCardProps)
     </div>
   );
 }
+
+export default SongCard;

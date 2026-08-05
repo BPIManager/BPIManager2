@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
-export function TicketFeatureDescription() {
+function TicketFeatureDescription() {
   const { t } = useTranslation();
 
   const sortOptions = [
@@ -132,3 +132,5 @@ export function TicketFeatureDescription() {
     </div>
   );
 }
+
+export default TicketFeatureDescription;

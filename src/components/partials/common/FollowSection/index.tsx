@@ -13,7 +13,7 @@ import AccountSettings from "@/components/partials/modal/AccountSettings";
 import { cn } from "@/lib/utils";
 import { UserRelationship } from "@/types/users/profile";
 
-export const FollowSection = ({
+const FollowSection = ({
   relationship,
   onToggle,
   isUpdating,
@@ -122,3 +122,5 @@ export const FollowSection = ({
     </div>
   );
 };
+
+export default FollowSection;

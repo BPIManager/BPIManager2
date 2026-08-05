@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-export const UserRecommendationCardSkeleton = () => {
+const UserRecommendationCardSkeleton = () => {
   return (
     <div className="flex min-h-35 w-full items-stretch justify-between gap-3 rounded-2xl border border-bpim-border bg-bpim-bg/40 p-3 md:min-h-45 md:gap-6 md:p-5">
       <div className="flex flex-1 flex-col justify-start gap-3 py-1 md:gap-4">
@@ -27,3 +27,5 @@ export const UserRecommendationCardSkeleton = () => {
     </div>
   );
 };
+
+export default UserRecommendationCardSkeleton;

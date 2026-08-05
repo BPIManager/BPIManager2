@@ -205,7 +205,7 @@ const SongItem = ({
   );
 };
 
-export const SongList = ({
+const SongList = ({
   songs,
   compareVersion,
   onSongSelect,
@@ -229,3 +229,5 @@ export const SongList = ({
     </div>
   );
 };
+
+export default SongList;

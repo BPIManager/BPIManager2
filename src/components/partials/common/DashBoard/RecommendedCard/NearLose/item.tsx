@@ -9,7 +9,7 @@ interface NearLoseRankItemProps {
   onClick: () => void;
 }
 
-export const NearLoseRankItem = ({
+const NearLoseRankItem = ({
   item,
   onClick,
 }: NearLoseRankItemProps) => {
@@ -83,3 +83,5 @@ export const NearLoseRankItem = ({
     </div>
   );
 };
+
+export default NearLoseRankItem;

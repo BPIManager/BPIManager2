@@ -3,9 +3,9 @@ import { useTranslation } from "@/hooks/common/useTranslation";
 import { ChevronDown } from "lucide-react";
 import type { RivalSongHighlight } from "@/types/stats/monthlyReview";
 import { SONG_PAGE } from "./constants";
-import { SongRow } from "./SongRow";
+import SongRow from "./SongRow";
 
-export function RivalSongs({
+function RivalSongs({
   songs,
   baseDelay,
 }: {
@@ -45,3 +45,5 @@ export function RivalSongs({
     </div>
   );
 }
+
+export default RivalSongs;

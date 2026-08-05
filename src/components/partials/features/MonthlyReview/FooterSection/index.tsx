@@ -4,13 +4,13 @@ import { useRouter } from "next/router";
 import { useInView } from "@/hooks/common/useInView";
 import type { MonthlyReviewData } from "@/types/stats/monthlyReview";
 import { useRivalMonthlyReviewSummary } from "@/hooks/social/useRivalMonthlyReviewSummary";
-import { FooterSectionUI } from "./ui";
+import FooterSectionUI from "./ui";
 
 interface Props {
   data: MonthlyReviewData;
 }
 
-export const FooterSection = ({ data }: Props) => {
+const FooterSection = ({ data }: Props) => {
   const router = useRouter();
   const [ref, inView] = useInView(0.1);
   const userId = router.query.userId as string | undefined;
@@ -48,3 +48,5 @@ export const FooterSection = ({ data }: Props) => {
     />
   );
 };
+
+export default FooterSection;

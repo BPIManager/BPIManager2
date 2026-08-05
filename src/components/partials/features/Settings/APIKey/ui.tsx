@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useApiKey } from "@/hooks/users/useAPIKey";
-import { ActionConfirmDialog } from "@/components/partials/modal/Confirmation";
+import ActionConfirmDialog from "@/components/partials/modal/Confirmation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";

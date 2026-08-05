@@ -11,7 +11,7 @@ import { DashCard } from "@/components/ui/dashcard";
 import { useChartColors } from "@/hooks/common/useChartColors";
 import type { VersionScoreDistribution } from "@/types/siteStats";
 
-export function VersionScoreChart({ data }: { data: VersionScoreDistribution }) {
+function VersionScoreChart({ data }: { data: VersionScoreDistribution }) {
   const c = useChartColors();
 
   return (
@@ -76,3 +76,5 @@ export function VersionScoreChart({ data }: { data: VersionScoreDistribution }) 
     </DashCard>
   );
 }
+
+export default VersionScoreChart;

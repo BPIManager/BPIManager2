@@ -1,7 +1,7 @@
 import { Heart, Sparkles, ShieldCheck, GitPullRequest, HandHeart } from "lucide-react";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
-export const WhySection = () => {
+const WhySection = () => {
   const { t } = useTranslation();
 
   return (
@@ -86,3 +86,5 @@ export const WhySection = () => {
     </section>
   );
 };
+
+export default WhySection;

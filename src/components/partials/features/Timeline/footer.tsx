@@ -5,7 +5,7 @@ interface TimelineStatusFooterProps {
   isEnd: boolean;
 }
 
-export const TimelineStatusFooter = ({
+const TimelineStatusFooter = ({
   isEmpty,
   isEnd,
 }: TimelineStatusFooterProps) => {
@@ -36,3 +36,5 @@ export const TimelineStatusFooter = ({
 
   return null;
 };
+
+export default TimelineStatusFooter;

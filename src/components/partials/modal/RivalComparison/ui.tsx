@@ -2,11 +2,11 @@ import { LucideIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { formatIIDXId } from "@/utils/common/formatIidxId";
-import { FollowSection } from "@/components/partials/common/FollowSection";
+import FollowSection from "@/components/partials/common/FollowSection";
 
 import { UserProfileData } from "@/types/users/profile";
-import { RoleBadge } from "@/components/partials/common/Badge/UserRole";
-import { ArenaClassBadge } from "@/components/partials/common/Badge/ArenaClassBadge";
+import RoleBadge from "@/components/partials/common/Badge/UserRole";
+import ArenaClassBadge from "@/components/partials/common/Badge/ArenaClassBadge";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface RivalHeaderProps {

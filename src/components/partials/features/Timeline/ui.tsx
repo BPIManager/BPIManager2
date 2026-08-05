@@ -1,10 +1,10 @@
 "use client";
 
 import { useTimeline } from "@/hooks/social/useTimeline";
-import { TimelineItem } from "./Card/ui";
+import TimelineItem from "./Card/ui";
 import { FilterParamsFrontend } from "@/types/songs/score";
-import { TimelineHeader } from "./header";
-import { InfiniteScrollContainer } from "@/components/partials/common/ListControls/InfiniteScroll/ui";
+import TimelineHeader from "./header";
+import InfiniteScrollContainer from "@/components/partials/common/ListControls/InfiniteScroll/ui";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
@@ -13,7 +13,7 @@ interface TimelineListProps {
   params: FilterParamsFrontend;
 }
 
-export const TimelineList = ({ mode, params }: TimelineListProps) => {
+const TimelineList = ({ mode, params }: TimelineListProps) => {
   const { t } = useTranslation();
   const res = useTimeline(mode, params);
 
@@ -38,3 +38,5 @@ export const TimelineList = ({ mode, params }: TimelineListProps) => {
     </div>
   );
 };
+
+export default TimelineList;

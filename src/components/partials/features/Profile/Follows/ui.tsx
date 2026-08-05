@@ -1,7 +1,7 @@
 ﻿import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { ArenaClassBadge } from "@/components/partials/common/Badge/ArenaClassBadge";
+import ArenaClassBadge from "@/components/partials/common/Badge/ArenaClassBadge";
 
 interface FollowUser {
   userId: string;
@@ -11,7 +11,7 @@ interface FollowUser {
   totalBpi: number | null;
 }
 
-export const UserFollowCard = ({ user }: { user: FollowUser }) => {
+const UserFollowCard = ({ user }: { user: FollowUser }) => {
   const isMasked = user.userId === "";
 
   const UserInfo = (
@@ -47,3 +47,5 @@ export const UserFollowCard = ({ user }: { user: FollowUser }) => {
     </Link>
   );
 };
+
+export default UserFollowCard;

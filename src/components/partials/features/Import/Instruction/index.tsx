@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
-export const InstructionSection = () => {
+const InstructionSection = () => {
   const { t } = useTranslation();
 
   const acSteps = [
@@ -127,3 +127,5 @@ const StepItem = ({ step, text }: { step: number; text: React.ReactNode }) => (
     <div className="pt-0.5">{text}</div>
   </li>
 );
+
+export default InstructionSection;

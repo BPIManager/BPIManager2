@@ -5,14 +5,14 @@ import { Button } from "@/components/ui/button";
 import { LordiconAnimation } from "@/components/ui/lordicon-animation";
 import { type TowerImportResult } from "@/hooks/import/useIidxTowerImport";
 import { useTranslation } from "@/hooks/common/useTranslation";
-import { ResultModalShell } from "../ResultModalShell";
+import ResultModalShell from "../ResultModalShell";
 
 interface Props {
   result: TowerImportResult | null;
   onClose: () => void;
 }
 
-export const TowerImportSuccessModal = ({ result, onClose }: Props) => {
+const TowerImportSuccessModal = ({ result, onClose }: Props) => {
   const router = useRouter();
   const { t } = useTranslation();
 
@@ -72,3 +72,5 @@ export const TowerImportSuccessModal = ({ result, onClose }: Props) => {
     </ResultModalShell>
   );
 };
+
+export default TowerImportSuccessModal;

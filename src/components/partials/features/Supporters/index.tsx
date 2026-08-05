@@ -3,12 +3,12 @@
 import { useSupporters } from "@/hooks/users/useSupporters";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { PageContainer, PageHeader } from "@/components/partials/common/PageChrome/Header";
-import { WhySection } from "./WhySection/ui";
-import { DonationSection } from "./DonationSection/ui";
-import { SupportersListSection } from "./SupportersListSection/ui";
-import { OssSection } from "./OssSection/ui";
+import WhySection from "./WhySection/ui";
+import DonationSection from "./DonationSection/ui";
+import SupportersListSection from "./SupportersListSection/ui";
+import OssSection from "./OssSection/ui";
 
-export const SupportersPage = () => {
+const SupportersPage = () => {
   const supporters = useSupporters();
   const { t } = useTranslation();
 
@@ -30,3 +30,5 @@ export const SupportersPage = () => {
     </div>
   );
 };
+
+export default SupportersPage;

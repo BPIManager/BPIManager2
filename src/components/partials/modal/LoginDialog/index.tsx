@@ -6,7 +6,7 @@ interface LoginDialogProps {
   onClose: () => void;
 }
 
-export function LoginDialog({ isOpen, onClose }: LoginDialogProps) {
+function LoginDialog({ isOpen, onClose }: LoginDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-md border-none bg-transparent p-0 shadow-none outline-none">
@@ -15,3 +15,5 @@ export function LoginDialog({ isOpen, onClose }: LoginDialogProps) {
     </Dialog>
   );
 }
+
+export default LoginDialog;

@@ -27,7 +27,7 @@ interface Props {
   isLoading?: boolean;
 }
 
-export const ActionConfirmDialog = ({
+const ActionConfirmDialog = ({
   isOpen,
   onClose,
   onConfirm,
@@ -90,3 +90,5 @@ export const ActionConfirmDialog = ({
     </Dialog>
   );
 };
+
+export default ActionConfirmDialog;

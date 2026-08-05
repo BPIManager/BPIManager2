@@ -1,16 +1,16 @@
 ﻿"use client";
 
 import { useRouter } from "next/router";
-import { UserProfileLayout } from "@/components/partials/common/Profile/Layout/layout";
+import UserProfileLayout from "@/components/partials/common/Profile/Layout/layout";
 import { useFollowList } from "@/hooks/users/useFollowList";
-import { UserFollowCard } from "./ui";
+import UserFollowCard from "./ui";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { UserCheck, Users } from "lucide-react";
 import { LoadingSpinner, SectionLoader } from "@/components/ui/loading-spinner";
 import { AppTabsGroup } from "@/components/ui/complex/tabs";
 import { useTranslation } from "@/hooks/common/useTranslation";
-import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
+import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
 
 export default function FollowPage({
   type,

@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslation } from "@/hooks/common/useTranslation";
-import { MonthlyReviewBannerUI } from "./ui";
+import MonthlyReviewBannerUI from "./ui";
 
 interface Props {
   userId: string;
@@ -9,7 +9,7 @@ interface Props {
   version?: string;
 }
 
-export const MonthlyReviewBanner = ({ userId, month, version }: Props) => {
+const MonthlyReviewBanner = ({ userId, month, version }: Props) => {
   const { t } = useTranslation();
   const href = version
     ? `/users/${userId}/monthly-review/${month}?version=${version}`
@@ -24,3 +24,5 @@ export const MonthlyReviewBanner = ({ userId, month, version }: Props) => {
     />
   );
 };
+
+export default MonthlyReviewBanner;

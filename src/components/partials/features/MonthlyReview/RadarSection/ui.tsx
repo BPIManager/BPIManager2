@@ -4,8 +4,8 @@ import { useTranslation } from "@/hooks/common/useTranslation";
 import type { RadarGrowthEntry } from "@/types/stats/monthlyReview";
 import { SectionCard } from "../SectionCard";
 import { styles, ELEMENT_COLORS, ELEMENT_LABELS } from "./constants";
-import { ElementPanel } from "./ElementPanel";
-import { RadarComparisonChart } from "./RadarComparisonChart";
+import ElementPanel from "./ElementPanel";
+import RadarComparisonChart from "./RadarComparisonChart";
 
 interface Props {
   inView: boolean;
@@ -16,7 +16,7 @@ interface Props {
   onTabChange: (i: number) => void;
 }
 
-export const RadarSectionUI = ({
+const RadarSectionUI = ({
   inView,
   sectionRef,
   sortedAll,
@@ -108,3 +108,5 @@ export const RadarSectionUI = ({
     </>
   );
 };
+
+export default RadarSectionUI;

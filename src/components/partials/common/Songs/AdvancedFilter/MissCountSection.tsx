@@ -2,7 +2,7 @@
 
 import { FilterParamsFrontend } from "@/types/songs/score";
 import { Input } from "@/components/ui/input";
-import { SectionTitle } from "./SectionTitle";
+import SectionTitle from "./SectionTitle";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface Props {
@@ -11,7 +11,7 @@ interface Props {
   onChange: (val: Partial<FilterParamsFrontend>) => void;
 }
 
-export const MissCountSection = ({ missCountMin, missCountMax, onChange }: Props) => {
+const MissCountSection = ({ missCountMin, missCountMax, onChange }: Props) => {
   const { t } = useTranslation();
   return (
   <section className="flex flex-col gap-3">
@@ -42,3 +42,5 @@ export const MissCountSection = ({ missCountMin, missCountMax, onChange }: Props
   </section>
   );
 };
+
+export default MissCountSection;

@@ -1,17 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { SongListSkeleton } from "@/components/partials/common/Table/skeleton";
-import { CustomPagination } from "@/components/partials/common/ListControls/Pagination/ui";
+import SongListSkeleton from "@/components/partials/common/Table/skeleton";
+import CustomPagination from "@/components/partials/common/ListControls/Pagination/ui";
 import { AllSongWithScore } from "@/types/songs/allSongs";
-import { AllSongFilterBar } from "./Filter";
+import AllSongFilterBar from "./Filter";
 import { AllSongList } from "./Table";
-import { SongDetailView } from "@/components/partials/modal/SongDetail/ui";
-import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
+import SongDetailView from "@/components/partials/modal/SongDetail/ui";
+import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
 import { useAllSongsFilter } from "@/hooks/allScores/useAllSongsFilter";
 import { PAGE_SIZE } from "@/constants/logic/pagination";
 
-export const AllSongsTable = ({ userId }: { userId: string | undefined }) => {
+const AllSongsTable = ({ userId }: { userId: string | undefined }) => {
   const [selected, setSelected] = useState<AllSongWithScore | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
 
@@ -67,3 +67,5 @@ export const AllSongsTable = ({ userId }: { userId: string | undefined }) => {
     </div>
   );
 };
+
+export default AllSongsTable;

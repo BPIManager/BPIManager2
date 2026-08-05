@@ -51,7 +51,7 @@ const PrivacyStatusCard = ({
   </div>
 );
 
-export const PrivacySection = () => {
+const PrivacySection = () => {
   const { t } = useTranslation();
 
   return (
@@ -96,3 +96,5 @@ export const PrivacySection = () => {
     </div>
   );
 };
+
+export default PrivacySection;

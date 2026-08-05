@@ -8,7 +8,7 @@ interface Props {
   onPageChange: (v: number) => void;
 }
 
-export const Pagination = ({ p, hasMore, onPageChange }: Props) => {
+const Pagination = ({ p, hasMore, onPageChange }: Props) => {
   const { t } = useTranslation();
 
   return (
@@ -53,3 +53,5 @@ export const Pagination = ({ p, hasMore, onPageChange }: Props) => {
     </div>
   );
 };
+
+export default Pagination;

@@ -5,16 +5,16 @@ import { useSongFilter } from "@/hooks/table/useSongFilter";
 import { PAGE_SIZE } from "@/constants/logic/pagination";
 import { SongWithRival, SongWithScore } from "@/types/songs/score";
 
-import { SongFilterBar } from "@/components/partials/common/Songs/Filter/ui";
-import { SongListSkeleton } from "@/components/partials/common/Table/skeleton";
+import SongFilterBar from "@/components/partials/common/Songs/Filter/ui";
+import SongListSkeleton from "@/components/partials/common/Table/skeleton";
 import { NoDataAlert } from "@/components/partials/common/DashBoard/NoData";
 import { LoginRequiredCard } from "@/components/partials/common/Auth/LoginRequired/ui";
-import { CustomPagination } from "@/components/partials/common/ListControls/Pagination/ui";
-import { AdvancedFilterModal } from "@/components/partials/common/Songs/AdvancedFilter/ui";
-import { SongDetailView } from "@/components/partials/modal/SongDetail/ui";
-import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
-import { RivalSongItem } from "@/components/partials/common/Rivals/Table/ui";
-import { RivalAnalysis } from "@/components/partials/common/Rivals/Analysis/ui";
+import CustomPagination from "@/components/partials/common/ListControls/Pagination/ui";
+import AdvancedFilterModal from "@/components/partials/common/Songs/AdvancedFilter/ui";
+import SongDetailView from "@/components/partials/modal/SongDetail/ui";
+import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
+import RivalSongItem from "@/components/partials/common/Rivals/Table/ui";
+import RivalAnalysis from "@/components/partials/common/Rivals/Analysis/ui";
 import { useUser } from "@/contexts/users/UserContext";
 import { List, BarChart2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -69,7 +69,7 @@ interface AnalyticsComparisonTableProps {
   rivalLabel?: string;
 }
 
-export const AnalyticsComparisonTable = ({
+const AnalyticsComparisonTable = ({
   songs,
   isLoading,
   error,
@@ -184,3 +184,5 @@ export const AnalyticsComparisonTable = ({
     </div>
   );
 };
+
+export default AnalyticsComparisonTable;

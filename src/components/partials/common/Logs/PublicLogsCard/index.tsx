@@ -11,7 +11,7 @@ interface PublicLogsCardProps {
  * ログ一覧・ログ詳細(日次/週次/月次/バージョン/バッチ)ページで共通の
  * 「他人のプロフィールから見た場合だけカード枠で囲む」表示を共通化したもの。
  */
-export const PublicLogsCard = ({
+const PublicLogsCard = ({
   isOwnProfile = false,
   children,
 }: PublicLogsCardProps) => (
@@ -26,3 +26,5 @@ export const PublicLogsCard = ({
     {children}
   </div>
 );
+
+export default PublicLogsCard;

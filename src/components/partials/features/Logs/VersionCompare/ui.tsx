@@ -1,23 +1,23 @@
 import { useMemo } from "react";
 import { useRouter } from "next/router";
 import { useVersionSummary } from "@/hooks/batches/useVersionSummary";
-import { BatchSongsTable } from "@/components/partials/common/Logs/LogTable/ui";
+import BatchSongsTable from "@/components/partials/common/Logs/LogTable/ui";
 import { NoDataAlert } from "@/components/partials/common/DashBoard/NoData";
-import { LogsDetailContentSkeleton } from "@/components/partials/common/Logs/LogsDetail/skeleton";
-import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
+import LogsDetailContentSkeleton from "@/components/partials/common/Logs/LogsDetail/skeleton";
+import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
 import {
   getBpiDistribution,
   getRankDistribution,
 } from "@/utils/logs/getDistribution";
-import { DistributionChart } from "@/components/partials/common/DashBoard/DistributionChart/ui";
+import DistributionChart from "@/components/partials/common/DashBoard/DistributionChart/ui";
 import { RANK_COLORS } from "@/constants/theme/djRankColor";
 import { getBpiColor } from "@/constants/theme/bpiColor";
 import { useBpiStep } from "@/hooks/common/useBpiStep";
 import { ArrowRightLeft } from "lucide-react";
 import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 import { BpiCalculator } from "@/lib/bpi";
-import { BatchTotalBpiCard } from "@/components/partials/common/Logs/TotalBPI/ui";
-import { LogRank } from "@/components/partials/common/Logs/LogRanking/ui";
+import BatchTotalBpiCard from "@/components/partials/common/Logs/TotalBPI/ui";
+import LogRank from "@/components/partials/common/Logs/LogRanking/ui";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { AppTabsList, AppTabsTrigger } from "@/components/ui/complex/tabs";
 
@@ -27,7 +27,7 @@ interface Props {
   isPublicPage?: boolean;
 }
 
-export const VersionCompareContent = ({ userId, version }: Props) => {
+const VersionCompareContent = ({ userId, version }: Props) => {
   const router = useRouter();
   const { data, isLoading, isError } = useVersionSummary(userId, version);
   const { bpiStep, handleStepFiner, handleStepCoarser } = useBpiStep(5);
@@ -184,3 +184,5 @@ export const VersionCompareContent = ({ userId, version }: Props) => {
     </div>
   );
 };
+
+export default VersionCompareContent;

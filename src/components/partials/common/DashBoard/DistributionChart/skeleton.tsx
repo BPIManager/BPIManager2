@@ -6,7 +6,7 @@ interface BaseSkeletonProps {
   hasButton?: boolean;
 }
 
-export const DistributionChartSkeleton = ({
+const DistributionChartSkeleton = ({
   count = 9,
   hasButton = false,
 }: BaseSkeletonProps) => {
@@ -44,3 +44,5 @@ export const DistributionChartSkeleton = ({
     </DashCard>
   );
 };
+
+export default DistributionChartSkeleton;

@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
-export const NotificationItem = ({ n }: { n: NotificationItemType }) => {
+const NotificationItem = ({ n }: { n: NotificationItemType }) => {
   const { t } = useTranslation();
   const isOvertaken = n.type === "overtaken";
   const diff = (n.rivalScore || 0) - (n.myScore || 0);
@@ -61,3 +61,5 @@ export const NotificationItem = ({ n }: { n: NotificationItemType }) => {
     </Link>
   );
 };
+
+export default NotificationItem;

@@ -82,7 +82,7 @@ const getIntensityStyle = (value: number, max: number, type: "key" | "scr") => {
   return { color };
 };
 
-export const IidxTowerCard = ({
+const IidxTowerCard = ({
   data,
   showImportAlert = true,
   defaultPeriod = 30,
@@ -425,3 +425,5 @@ export const IidxTowerCard = ({
     </DashCard>
   );
 };
+
+export default IidxTowerCard;

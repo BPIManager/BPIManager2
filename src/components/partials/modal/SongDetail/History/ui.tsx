@@ -8,8 +8,8 @@ import { versionTitles } from "@/constants/iidx/versionTitles";
 import { Separator } from "@/components/ui/separator";
 import { History } from "lucide-react";
 import { SectionLoader } from "@/components/ui/loading-spinner";
-import { HistoryRecordCard } from "@/components/partials/common/Songs/HistoryRecordCard";
-import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
+import HistoryRecordCard from "@/components/partials/common/Songs/HistoryRecordCard";
+import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
 
 interface SongHistoryTabProps {
   songId: number;
@@ -17,7 +17,7 @@ interface SongHistoryTabProps {
   notes?: number;
 }
 
-export const SongHistoryTab = ({ songId, notes }: SongHistoryTabProps) => {
+const SongHistoryTab = ({ songId, notes }: SongHistoryTabProps) => {
   const { fbUser } = useUser();
   const isAllScores = notes != null;
 
@@ -102,3 +102,5 @@ export const SongHistoryTab = ({ songId, notes }: SongHistoryTabProps) => {
     </div>
   );
 };
+
+export default SongHistoryTab;

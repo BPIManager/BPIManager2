@@ -2,10 +2,10 @@ import { useState } from "react";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { useArenaMetadata, useOfficialArenaHistory } from "@/hooks/arena/useOfficialArenaHistory";
 import { useArenaHistory } from "@/hooks/arena/useArenaHistory";
-import { OfficialArenaHistoryCardUI } from "./ui";
-import { OfficialArenaHistoryCardSkeleton } from "./skeleton";
+import OfficialArenaHistoryCardUI from "./ui";
+import OfficialArenaHistoryCardSkeleton from "./skeleton";
 
-export const OfficialArenaHistorySection = ({
+const OfficialArenaHistorySection = ({
   userId,
   showActivePlayers = false,
 }: {
@@ -35,3 +35,5 @@ export const OfficialArenaHistorySection = ({
     />
   );
 };
+
+export default OfficialArenaHistorySection;

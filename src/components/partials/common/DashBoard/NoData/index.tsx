@@ -1,1 +1,1 @@
-export { NoDataAlert } from "./ui";
+export { default as NoDataAlert } from "./ui";

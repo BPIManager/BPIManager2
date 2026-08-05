@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useAvailablePeriods } from "@/hooks/stats/useAvailablePeriods";
 import { useRouter } from "next/router";
-import { PeriodSelectorUI } from "./ui";
+import PeriodSelectorUI from "./ui";
 
 interface Props {
   currentVersion: string;
@@ -11,7 +11,7 @@ interface Props {
   onSelect: (version: string, period: string) => void;
 }
 
-export const PeriodSelector = ({
+const PeriodSelector = ({
   currentVersion,
   currentPeriod,
   onSelect,
@@ -88,3 +88,5 @@ export const PeriodSelector = ({
     />
   );
 };
+
+export default PeriodSelector;

@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-export const RivalSummarySkeleton = () => (
+const RivalSummarySkeleton = () => (
   <div className="flex min-h-35 w-full items-stretch justify-between gap-3 rounded-2xl border border-bpim-border bg-bpim-bg/40 p-3 md:gap-6 md:p-5">
     <div className="flex flex-1 flex-col gap-4 py-1">
       <div className="flex w-full items-center gap-3">
@@ -33,3 +33,5 @@ export const RivalSummarySkeleton = () => (
     <Skeleton className="h-22.5 w-22.5 self-center rounded-xl sm:h-27.5 sm:w-27.5 md:h-32.5 md:w-32.5" />
   </div>
 );
+
+export default RivalSummarySkeleton;

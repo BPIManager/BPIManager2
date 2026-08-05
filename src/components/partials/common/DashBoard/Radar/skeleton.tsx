@@ -1,7 +1,7 @@
 ﻿import { DashCard } from "@/components/ui/dashcard";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export const RadarSkeleton = () => {
+const RadarSkeleton = () => {
   return (
     <DashCard>
       <Skeleton className="mb-4 h-3.5 w-25" />
@@ -31,3 +31,5 @@ export const RadarSkeleton = () => {
     </DashCard>
   );
 };
+
+export default RadarSkeleton;

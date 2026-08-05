@@ -1,9 +1,9 @@
 import { useIidxTower } from "@/hooks/iidxTower/useIidxTower";
-import { IidxTowerCard } from "@/components/partials/common/DashBoard/IidxTowerCard/ui";
-import { IidxTowerCardSkeleton } from "@/components/partials/common/DashBoard/IidxTowerCard/skeleton";
+import IidxTowerCard from "@/components/partials/common/DashBoard/IidxTowerCard/ui";
+import IidxTowerCardSkeleton from "@/components/partials/common/DashBoard/IidxTowerCard/skeleton";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
 
-export const IidxTowerSection = ({
+const IidxTowerSection = ({
   userId,
   showImportAlert = true,
   defaultPeriod = 30,
@@ -23,3 +23,5 @@ export const IidxTowerSection = ({
     />
   );
 };
+
+export default IidxTowerSection;

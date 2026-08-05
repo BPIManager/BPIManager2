@@ -10,7 +10,7 @@ interface Props {
   actions: ReactNode;
 }
 
-export const ResultModalShell = ({
+const ResultModalShell = ({
   icon,
   title,
   subtitle,
@@ -53,3 +53,5 @@ export const ResultModalShell = ({
     </div>
   );
 };
+
+export default ResultModalShell;

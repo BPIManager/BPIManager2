@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { RadarSectionChart } from "@/components/partials/common/DashBoard/Radar/index";
-import { DifficultyBadge } from "@/components/partials/common/Songs/DifficultyBadge";
+import RadarSectionChart from "@/components/partials/common/DashBoard/Radar/index";
+import DifficultyBadge from "@/components/partials/common/Songs/DifficultyBadge";
 import { buildRadarData } from "@/utils/songs/songListFilter";
 import type { SimilarSongItem } from "@/types/songs/songInfo";
 
-export function SimilarSongRow({ song }: { song: SimilarSongItem }) {
+function SimilarSongRow({ song }: { song: SimilarSongItem }) {
   return (
     <Link
       href={`/songs/${song.songId}/notes`}
@@ -41,3 +41,4 @@ export function SimilarSongRow({ song }: { song: SimilarSongItem }) {
   );
 }
 
+export default SimilarSongRow;

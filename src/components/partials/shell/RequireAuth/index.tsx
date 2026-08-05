@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
+import DashboardLayout from "@/components/partials/shell/DashboardLayout";
 import { LoginRequiredCard } from "@/components/partials/common/Auth/LoginRequired/ui";
 
 interface RequireAuthProps {
@@ -23,7 +23,7 @@ const DefaultLoadingFallback = () => (
  * ログイン必須ページの「ローディング中」「未ログイン」ガードを共通化する。
  * どちらでもない場合はchildrenをそのまま描画する。
  */
-export const RequireAuth = ({
+const RequireAuth = ({
   isLoading,
   isAuthenticated,
   loadingFallback,
@@ -47,3 +47,5 @@ export const RequireAuth = ({
 
   return <>{children}</>;
 };
+
+export default RequireAuth;

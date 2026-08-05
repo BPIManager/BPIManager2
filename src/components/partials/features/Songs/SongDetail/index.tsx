@@ -5,20 +5,20 @@ import { AppTabsList, AppTabsTrigger } from "@/components/ui/complex/tabs";
 import { ChevronLeft, Music, FileText, BarChart3, Layers } from "lucide-react";
 import { useSongDetail } from "@/hooks/songs/useSongDetail";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
-import { RankingTab } from "./Ranking";
-import { SimilarTab } from "./Similar";
-import { WikiTab } from "./Wiki";
-import { PatternTab } from "./Pattern";
-import { SongMetaCard } from "./ui";
-import { SongDetailSkeleton } from "./skeleton";
-import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
+import RankingTab from "./Ranking";
+import SimilarTab from "./Similar";
+import WikiTab from "./Wiki";
+import PatternTab from "./Pattern";
+import SongMetaCard from "./ui";
+import SongDetailSkeleton from "./skeleton";
+import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
 
 interface SongDetailContentProps {
   songId: number;
   activeTab: string;
 }
 
-export function SongDetailContent({
+function SongDetailContent({
   songId,
   activeTab,
 }: SongDetailContentProps) {
@@ -97,3 +97,5 @@ export function SongDetailContent({
     </div>
   );
 }
+
+export default SongDetailContent;

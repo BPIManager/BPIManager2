@@ -9,7 +9,7 @@ import { useTranslation } from "@/hooks/common/useTranslation";
 
 const ANDROID_APP_URL = "https://github.com/BPIManager/BPIM2-Flutter/releases";
 
-export const AndroidAppAccordion = () => {
+const AndroidAppAccordion = () => {
   const { t } = useTranslation();
 
   const steps = [
@@ -103,3 +103,5 @@ export const AndroidAppAccordion = () => {
     </Accordion>
   );
 };
+
+export default AndroidAppAccordion;

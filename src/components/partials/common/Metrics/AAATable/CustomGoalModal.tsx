@@ -45,7 +45,7 @@ interface Props {
   onSave: (config: CustomGoalConfig) => void;
 }
 
-export const CustomGoalModal = ({
+const CustomGoalModal = ({
   open,
   onOpenChange,
   initial,
@@ -232,3 +232,5 @@ export const CustomGoalModal = ({
     </Dialog>
   );
 };
+
+export default CustomGoalModal;

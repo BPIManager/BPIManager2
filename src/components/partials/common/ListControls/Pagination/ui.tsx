@@ -41,7 +41,7 @@ function buildPageList(current: number, total: number): (number | "...")[] {
   return pages;
 }
 
-export const CustomPagination = ({
+const CustomPagination = ({
   count,
   pageSize,
   page,
@@ -137,3 +137,5 @@ export const CustomPagination = ({
     </div>
   );
 };
+
+export default CustomPagination;

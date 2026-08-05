@@ -15,7 +15,7 @@ import {
 } from "recharts";
 import { BookOpen, TrendingDown, TrendingUp, Minus } from "lucide-react";
 import { SectionLoader } from "@/components/ui/loading-spinner";
-import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
+import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -129,7 +129,7 @@ const CustomDot = (props: CustomDotProps) => {
   );
 };
 
-export const DefinitionsTab = ({ song }: DefinitionsTabProps) => {
+const DefinitionsTab = ({ song }: DefinitionsTabProps) => {
   const { definitions, isLoading, isError } = useSongDefinitions(song.songId);
   const c = useChartColors();
 
@@ -389,3 +389,5 @@ export const DefinitionsTab = ({ song }: DefinitionsTabProps) => {
     </div>
   );
 };
+
+export default DefinitionsTab;

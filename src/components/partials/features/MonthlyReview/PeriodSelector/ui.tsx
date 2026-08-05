@@ -60,7 +60,7 @@ const btnDisabled = {
   cursor: "not-allowed" as const,
 };
 
-export const PeriodSelectorUI = ({
+const PeriodSelectorUI = ({
   currentVersion,
   currentPeriod,
   granularity,
@@ -298,3 +298,5 @@ export const PeriodSelectorUI = ({
   </Popover>
   );
 };
+
+export default PeriodSelectorUI;

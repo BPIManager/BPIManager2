@@ -6,9 +6,9 @@ import { ChevronDown } from "lucide-react";
 import type { MonthlyReviewData } from "@/types/stats/monthlyReview";
 import { SectionCard } from "../SectionCard";
 import { styles, PAGE } from "./constants";
-import { GrowthRankList } from "./GrowthRankList";
-import { RivalCard } from "./RivalCard";
-import { RivalsGrowthChartSection } from "./RivalsGrowthChartSection";
+import GrowthRankList from "./GrowthRankList";
+import RivalCard from "./RivalCard";
+import RivalsGrowthChartSection from "./RivalsGrowthChartSection";
 
 interface RivalsSectionData {
   rivals: MonthlyReviewData["rivals"];
@@ -46,7 +46,7 @@ interface Props {
   isEmpty: boolean;
 }
 
-export const RivalsSectionUI = ({
+const RivalsSectionUI = ({
   data,
   chart,
   rankSummary,
@@ -209,3 +209,5 @@ export const RivalsSectionUI = ({
     </>
   );
 };
+
+export default RivalsSectionUI;

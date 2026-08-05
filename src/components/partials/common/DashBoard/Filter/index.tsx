@@ -1,1 +1,1 @@
-export { DashBoardFilter } from "./ui";
+export { default as DashBoardFilter } from "./ui";

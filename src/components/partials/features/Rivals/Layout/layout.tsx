@@ -2,14 +2,14 @@
 
 import { ReactNode } from "react";
 import { useRouter } from "next/router";
-import { ProfileLayoutShell } from "@/components/partials/shell/ProfileLayoutShell";
+import ProfileLayoutShell from "@/components/partials/shell/ProfileLayoutShell";
 import { Tabs } from "@/components/ui/tabs";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { LayoutDashboard, Music } from "lucide-react";
 import { AppTabsList, AppTabsTrigger } from "@/components/ui/complex/tabs";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
-export const RivalProfileLayout = ({
+const RivalProfileLayout = ({
   rivalUserId,
   currentTab,
   children,
@@ -59,3 +59,5 @@ export const RivalProfileLayout = ({
     </ProfileLayoutShell>
   );
 };
+
+export default RivalProfileLayout;

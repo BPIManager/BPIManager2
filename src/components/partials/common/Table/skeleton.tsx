@@ -32,7 +32,7 @@ const SongItemSkeleton = () => {
   );
 };
 
-export const SongListSkeleton = () => {
+const SongListSkeleton = () => {
   return (
     <div className="w-full p-2">
       {Array.from({ length: 15 }).map((_, i) => (
@@ -41,3 +41,5 @@ export const SongListSkeleton = () => {
     </div>
   );
 };
+
+export default SongListSkeleton;

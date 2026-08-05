@@ -1,1 +1,1 @@
-export { SectionCard } from "./ui";
+export { default as SectionCard } from "./ui";

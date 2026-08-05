@@ -22,7 +22,7 @@ interface SidebarSectionProps {
  * サイドバーの折りたたみ可能なメニューセクション(スコア/ライバル/分析/ベータ/情報)を
  * 共通化したもの。開閉状態は呼び出し側で管理し、中身の項目はchildrenで渡す。
  */
-export const SidebarSection = ({
+const SidebarSection = ({
   label,
   isOpen,
   onOpenChange,
@@ -54,3 +54,5 @@ export const SidebarSection = ({
     </CollapsibleContent>
   </Collapsible>
 );
+
+export default SidebarSection;

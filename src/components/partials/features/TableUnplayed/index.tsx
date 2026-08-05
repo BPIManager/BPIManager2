@@ -6,15 +6,15 @@ import { useSongFilter } from "@/hooks/table/useSongFilter";
 import { PAGE_SIZE } from "@/constants/logic/pagination";
 import { useUnplayedScores } from "@/hooks/table/useUnplayedScores";
 import { NoDataAlert } from "@/components/partials/common/DashBoard/NoData";
-import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
-import { SongDetailView } from "@/components/partials/modal/SongDetail/ui";
-import { CustomPagination } from "@/components/partials/common/ListControls/Pagination/ui";
-import { AdvancedFilterModal } from "@/components/partials/common/Songs/AdvancedFilter/ui";
-import { SongFilterBar } from "@/components/partials/common/Songs/Filter/ui";
-import { SongListSkeleton } from "@/components/partials/common/Table/skeleton";
-import { SongList } from "@/components/partials/common/Table/ui";
+import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
+import SongDetailView from "@/components/partials/modal/SongDetail/ui";
+import CustomPagination from "@/components/partials/common/ListControls/Pagination/ui";
+import AdvancedFilterModal from "@/components/partials/common/Songs/AdvancedFilter/ui";
+import SongFilterBar from "@/components/partials/common/Songs/Filter/ui";
+import SongListSkeleton from "@/components/partials/common/Table/skeleton";
+import SongList from "@/components/partials/common/Table/ui";
 
-export const UnplayedSongsTable = ({
+const UnplayedSongsTable = ({
   userId,
   version,
 }: {
@@ -88,3 +88,5 @@ export const UnplayedSongsTable = ({
     </div>
   );
 };
+
+export default UnplayedSongsTable;

@@ -4,21 +4,21 @@ import { useEffect, useRef, useCallback, useMemo } from "react";
 import { List, useListRef } from "react-window";
 import type { RowComponentProps } from "react-window";
 import { useGlobalRanking } from "@/hooks/stats/useGlobalRanking";
-import { RankingRow } from "./row";
-import { RankingFilters } from "./Filters";
-import { RivalComparisonModal } from "@/components/partials/modal/RivalComparison";
+import RankingRow from "./row";
+import RankingFilters from "./Filters";
+import RivalComparisonModal from "@/components/partials/modal/RivalComparison";
 import { useRouter } from "next/router";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { Info } from "lucide-react";
 import type { RankingEntry } from "@/types/users/ranking";
 import { useState } from "react";
-import { SongRankingList } from "./SongRankingList";
-import { TowerRanking } from "./TowerRanking";
+import SongRankingList from "./SongRankingList";
+import TowerRanking from "./TowerRanking";
 import { LoginRequiredCard } from "@/components/partials/common/Auth/LoginRequired/ui";
 import { useUser } from "@/contexts/users/UserContext";
 import { PageContainer, PageHeader } from "@/components/partials/common/PageChrome/Header";
-import { GlobalRankingContainerSkeleton } from "./skeleton";
-import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
+import GlobalRankingContainerSkeleton from "./skeleton";
+import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 const ITEM_SIZE = 58;
@@ -52,7 +52,7 @@ const VirtualRow = ({
   );
 };
 
-export const GlobalRankingContainer = () => {
+const GlobalRankingContainer = () => {
   const router = useRouter();
   const { user, isLoading: isCredentialLoading } = useUser();
   const { t } = useTranslation();
@@ -308,3 +308,5 @@ export const GlobalRankingContainer = () => {
     </>
   );
 };
+
+export default GlobalRankingContainer;

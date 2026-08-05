@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { versionsOptions } from "@/constants/iidx/versionTitles";
-import { BookmarkletAccordion } from "@/components/partials/common/Bookmarklet";
+import BookmarkletAccordion from "@/components/partials/common/Bookmarklet";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 export interface TowerImportProps {
@@ -34,7 +34,7 @@ function isValidTowerCsv(csv: string): boolean {
   });
 }
 
-export const TowerImportView = ({
+const TowerImportView = ({
   csvData,
   setCsvData,
   selectedVersion,
@@ -157,3 +157,5 @@ export const TowerImportView = ({
     </div>
   );
 };
+
+export default TowerImportView;

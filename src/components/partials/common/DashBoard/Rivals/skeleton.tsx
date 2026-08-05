@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-export const RivalWinLossSummarySkeleton = () => {
+const RivalWinLossSummarySkeleton = () => {
   return (
     <div className="flex flex-col gap-4">
       {[...Array(5)].map((_, i) => (
@@ -18,3 +18,5 @@ export const RivalWinLossSummarySkeleton = () => {
     </div>
   );
 };
+
+export default RivalWinLossSummarySkeleton;

@@ -2,19 +2,19 @@ import { useState } from "react";
 import { Clock, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { LoginRequiredTabContent } from "@/components/partials/common/Auth/LoginRequiredTabContent";
-import { ActionConfirmDialog } from "@/components/partials/modal/Confirmation";
+import LoginRequiredTabContent from "@/components/partials/common/Auth/LoginRequiredTabContent";
+import ActionConfirmDialog from "@/components/partials/modal/Confirmation";
 import { useUser } from "@/contexts/users/UserContext";
 import { useSongNotes, type SongNote } from "@/hooks/songs/useSongNotes";
-import { NoteCard } from "./ui";
-import { SortButton } from "@/components/partials/common/Songs/SortButton";
-import { WikiTabSkeleton } from "./skeleton";
+import NoteCard from "./ui";
+import SortButton from "@/components/partials/common/Songs/SortButton";
+import WikiTabSkeleton from "./skeleton";
 
 interface WikiTabProps {
   songId: number;
 }
 
-export function WikiTab({ songId }: WikiTabProps) {
+function WikiTab({ songId }: WikiTabProps) {
   const { fbUser } = useUser();
   const isLoggedIn = !!fbUser?.uid;
 
@@ -141,3 +141,5 @@ export function WikiTab({ songId }: WikiTabProps) {
     </div>
   );
 }
+
+export default WikiTab;

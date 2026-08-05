@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { DashCard } from "@/components/ui/dashcard";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export const TotalBpiHistorySkeleton = () => {
+const TotalBpiHistorySkeleton = () => {
   // スケルトンのダミー棒グラフ高さをランダム生成する(表示専用・機能に影響しないため許容)
   const barHeights = useMemo(
     // eslint-disable-next-line react-hooks/purity
@@ -41,3 +41,5 @@ export const TotalBpiHistorySkeleton = () => {
     </DashCard>
   );
 };
+
+export default TotalBpiHistorySkeleton;

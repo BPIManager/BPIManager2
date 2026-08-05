@@ -1,11 +1,11 @@
 "use client";
 
-import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
+import DashboardLayout from "@/components/partials/shell/DashboardLayout";
 import { PageContainer, PageHeader } from "@/components/partials/common/PageChrome/Header";
 import { Meta } from "@/components/partials/common/PageChrome/Head";
-import { RequireAuth } from "@/components/partials/shell/RequireAuth";
+import RequireAuth from "@/components/partials/shell/RequireAuth";
 import { useUser } from "@/contexts/users/UserContext";
-import { BpiOptimizerSection } from "@/components/partials/features/Analytics/BpiOptimizer";
+import BpiOptimizerSection from "@/components/partials/features/Analytics/BpiOptimizer";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 export default function BpiOptimizerPage() {

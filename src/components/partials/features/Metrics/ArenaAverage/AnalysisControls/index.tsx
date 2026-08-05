@@ -11,7 +11,7 @@ import { versionsNonDisabledCollection } from "@/constants/iidx/versionTitles";
 import { A_RANKS } from "@/constants/iidx/arenaRanks";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
-export const AnalysisControls = ({
+const AnalysisControls = ({
   version,
   onVersionChange,
   rank,
@@ -96,3 +96,5 @@ export const AnalysisControls = ({
     </div>
   );
 };
+
+export default AnalysisControls;

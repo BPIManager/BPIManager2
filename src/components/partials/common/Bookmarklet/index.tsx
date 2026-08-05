@@ -23,7 +23,7 @@ interface BookmarkletAccordionProps {
   lastStep?: React.ReactNode;
 }
 
-export const BookmarkletAccordion = ({ lastStep }: BookmarkletAccordionProps = {}) => {
+const BookmarkletAccordion = ({ lastStep }: BookmarkletAccordionProps = {}) => {
   const { t } = useTranslation();
   const [isMobile, setIsMobile] = useState(false);
 
@@ -198,3 +198,5 @@ const BookmarkletButton = () => {
     </a>
   );
 };
+
+export default BookmarkletAccordion;

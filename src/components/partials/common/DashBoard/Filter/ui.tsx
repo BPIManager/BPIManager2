@@ -12,7 +12,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
-export const DashBoardFilter = ({ withCompare }: { withCompare?: boolean }) => {
+const DashBoardFilter = ({ withCompare }: { withCompare?: boolean }) => {
   const { t } = useTranslation();
   const {
     levels,
@@ -131,3 +131,5 @@ export const DashBoardFilter = ({ withCompare }: { withCompare?: boolean }) => {
     </div>
   );
 };
+
+export default DashBoardFilter;

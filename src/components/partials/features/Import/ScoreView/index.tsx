@@ -12,9 +12,9 @@ import {
 import { Trash2, Upload, AlertCircle, CheckCircle2 } from "lucide-react";
 import { versionsOptions } from "@/constants/iidx/versionTitles";
 import { iidxUrl } from "@/constants/iidx/eamusementUrls";
-import { BookmarkletAccordion } from "@/components/partials/common/Bookmarklet";
-import { AndroidAppAccordion } from "../AndroidApp";
-import { InstructionSection } from "../Instruction";
+import BookmarkletAccordion from "@/components/partials/common/Bookmarklet";
+import AndroidAppAccordion from "../AndroidApp";
+import InstructionSection from "../Instruction";
 import {
   type CsvType,
   CSV_TYPE_LABELS,
@@ -33,7 +33,7 @@ export interface ScoreImportProps {
   onStartImport: () => void;
 }
 
-export const ScoreImportView = (props: ScoreImportProps) => {
+const ScoreImportView = (props: ScoreImportProps) => {
   const { t } = useTranslation();
   const version = props.selectedVersion[0];
   const csvVersionError =
@@ -163,3 +163,5 @@ export const ScoreImportView = (props: ScoreImportProps) => {
     </div>
   );
 };
+
+export default ScoreImportView;

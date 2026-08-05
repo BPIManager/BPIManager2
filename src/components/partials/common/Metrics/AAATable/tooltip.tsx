@@ -73,7 +73,7 @@ const TargetSection = ({
   );
 };
 
-export const AAATableTooltip = ({ item }: Props) => {
+const AAATableTooltip = ({ item }: Props) => {
   const diffChar = item.difficulty.slice(0, 1).toUpperCase();
   const maxScore = item.notes * 2;
   const scoreRate = ((item.user.exScore / maxScore) * 100).toFixed(2);
@@ -149,3 +149,5 @@ export const AAATableTooltip = ({ item }: Props) => {
     </div>
   );
 };
+
+export default AAATableTooltip;

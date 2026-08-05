@@ -1,7 +1,7 @@
 import { GetServerSideProps } from "next";
-import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
+import DashboardLayout from "@/components/partials/shell/DashboardLayout";
 import { Meta } from "@/components/partials/common/PageChrome/Head";
-import { GlobalRankingContainer } from "@/components/partials/features/Ranking";
+import GlobalRankingContainer from "@/components/partials/features/Ranking";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 export const getServerSideProps: GetServerSideProps = async () => {

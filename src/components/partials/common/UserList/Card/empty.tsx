@@ -6,7 +6,7 @@ interface Props {
   onReset: () => void;
 }
 
-export const UserRecommendationEmpty = ({ onReset }: Props) => {
+const UserRecommendationEmpty = ({ onReset }: Props) => {
   const { t } = useTranslation();
 
   return (
@@ -32,3 +32,5 @@ export const UserRecommendationEmpty = ({ onReset }: Props) => {
     </div>
   );
 };
+
+export default UserRecommendationEmpty;

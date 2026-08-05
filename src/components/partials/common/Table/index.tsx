@@ -3,20 +3,20 @@
 import { useState, useMemo } from "react";
 import { SongWithScore } from "@/types/songs/score";
 import { useSongFilter } from "@/hooks/table/useSongFilter";
-import { SongFilterBar } from "@/components/partials/common/Songs/Filter/ui";
-import { SongList } from "./ui";
-import { CustomPagination } from "@/components/partials/common/ListControls/Pagination/ui";
-import { SongDetailView } from "@/components/partials/modal/SongDetail/ui";
+import SongFilterBar from "@/components/partials/common/Songs/Filter/ui";
+import SongList from "./ui";
+import CustomPagination from "@/components/partials/common/ListControls/Pagination/ui";
+import SongDetailView from "@/components/partials/modal/SongDetail/ui";
 import { useUserScores } from "@/hooks/table/useUserScores";
 import { useCompareScores } from "@/hooks/table/useCompareScores";
 import { NoDataAlert } from "@/components/partials/common/DashBoard/NoData";
-import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
-import { SongListSkeleton } from "./skeleton";
-import { AdvancedFilterModal } from "@/components/partials/common/Songs/AdvancedFilter/ui";
+import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
+import SongListSkeleton from "./skeleton";
+import AdvancedFilterModal from "@/components/partials/common/Songs/AdvancedFilter/ui";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
-export const SongsTable = ({
+const SongsTable = ({
   userId,
   version,
 }: {
@@ -176,3 +176,5 @@ export const SongsTable = ({
     </div>
   );
 };
+
+export default SongsTable;

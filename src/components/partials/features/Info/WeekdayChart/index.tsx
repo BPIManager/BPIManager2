@@ -11,12 +11,12 @@ import {
 } from "recharts";
 import { DashCard } from "@/components/ui/dashcard";
 import { useChartColors } from "@/hooks/common/useChartColors";
-import { PeriodTabs } from "../PeriodTabs";
+import PeriodTabs from "../PeriodTabs";
 import type { SiteStatsPeriod, WeekdayEntry } from "@/types/siteStats";
 
 const WEEKDAY_LABELS = ["日", "月", "火", "水", "木", "金", "土"];
 
-export function WeekdayChart({
+function WeekdayChart({
   data,
 }: {
   data: Record<SiteStatsPeriod, WeekdayEntry[]>;
@@ -101,3 +101,5 @@ export function WeekdayChart({
     </DashCard>
   );
 }
+
+export default WeekdayChart;

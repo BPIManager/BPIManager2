@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
-export const SortSelector = ({
+const SortSelector = ({
   sort,
   order,
   onChange,
@@ -84,3 +84,5 @@ export const SortSelector = ({
     </Select>
   );
 };
+
+export default SortSelector;

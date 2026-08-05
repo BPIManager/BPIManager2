@@ -30,7 +30,7 @@ interface Props {
   hiddenKeys: Set<string>;
 }
 
-export const GrowthChartUI = ({
+const GrowthChartUI = ({
   chartData,
   keys,
   participants,
@@ -100,3 +100,5 @@ export const GrowthChartUI = ({
     </LineChart>
   </ResponsiveContainer>
 );
+
+export default GrowthChartUI;

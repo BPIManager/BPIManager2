@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function RankingTabSkeleton() {
+function RankingTabSkeleton() {
   return (
     <div className="flex flex-col gap-2">
       {Array.from({ length: 8 }).map((_, i) => (
@@ -9,3 +9,5 @@ export function RankingTabSkeleton() {
     </div>
   );
 }
+
+export default RankingTabSkeleton;

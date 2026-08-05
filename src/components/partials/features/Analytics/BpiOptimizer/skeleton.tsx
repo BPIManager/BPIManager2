@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-export const BpiOptimizerSkeleton = () => (
+const BpiOptimizerSkeleton = () => (
   <div className="flex flex-col gap-3">
     {Array.from({ length: 5 }).map((_, i) => (
       <div
@@ -20,3 +20,5 @@ export const BpiOptimizerSkeleton = () => (
     ))}
   </div>
 );
+
+export default BpiOptimizerSkeleton;

@@ -1,5 +1,5 @@
 import type { BpmBandSongEntry } from "@/types/stats/distribution";
-import { SongListDialog } from "../Dialogs/songListDialog";
+import SongListDialog from "../Dialogs/songListDialog";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface Props {
@@ -9,7 +9,7 @@ interface Props {
   onClose: () => void;
 }
 
-export const BpmBandSongsDialog = ({
+const BpmBandSongsDialog = ({
   bandLabel,
   songs,
   isOpen,
@@ -26,3 +26,5 @@ export const BpmBandSongsDialog = ({
     />
   );
 };
+
+export default BpmBandSongsDialog;

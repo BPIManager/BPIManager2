@@ -3,10 +3,10 @@
 import { useBpiOptimizer } from "@/hooks/analytics/useBpiOptimizer";
 import { useBpiOptimizerMemos } from "@/hooks/analytics/useOptimizeMemo";
 import { useRadar } from "@/hooks/stats/useRadar";
-import { OptimizerForm } from "./ui/OptimizerForm";
-import { OptimizationStepList } from "./ui/OptimizationStepList";
-import { SavedMemoList } from "./ui/SavedMemoList";
-import { BpiOptimizerSkeleton } from "./skeleton";
+import OptimizerForm from "./ui/OptimizerForm";
+import OptimizationStepList from "./ui/OptimizationStepList";
+import SavedMemoList from "./ui/SavedMemoList";
+import BpiOptimizerSkeleton from "./skeleton";
 import { useUser } from "@/contexts/users/UserContext";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { OptimizationResult } from "@/types/bpi-optimizer";
@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 
-export const BpiOptimizerSection = () => {
+const BpiOptimizerSection = () => {
   const { t } = useTranslation();
   const { user, fbUser } = useUser();
   const {
@@ -147,3 +147,5 @@ export const BpiOptimizerSection = () => {
     </div>
   );
 };
+
+export default BpiOptimizerSection;

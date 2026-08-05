@@ -1,8 +1,8 @@
 import { useTranslation } from "@/hooks/common/useTranslation";
 import type { MonthlyReviewData } from "@/types/stats/monthlyReview";
-import { GrowthChart, PALETTE } from "../GrowthChart";
+import GrowthChart, { PALETTE } from "../GrowthChart";
 
-export function RivalsGrowthChartSection({
+function RivalsGrowthChartSection({
   ranking,
   timeline,
   hiddenKeys,
@@ -149,3 +149,5 @@ export function RivalsGrowthChartSection({
     </div>
   );
 }
+
+export default RivalsGrowthChartSection;

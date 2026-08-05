@@ -11,7 +11,7 @@ import {
   Brush,
 } from "recharts";
 import type { StatsGroupBy, BpiBoxStatsItem } from "@/types/stats/bpiBoxStats";
-import { BpiBoxStatsSkeleton } from "./skeleton";
+import BpiBoxStatsSkeleton from "./skeleton";
 import { DashCard } from "@/components/ui/dashcard";
 import { useChartColors } from "@/hooks/common/useChartColors";
 import { HelpTooltip } from "@/components/ui/tooltip";
@@ -184,7 +184,7 @@ const BpiBoxTooltip = ({ active, payload, label }: TooltipProps) => {
   );
 };
 
-export const BpiBoxStatsChart = ({
+const BpiBoxStatsChart = ({
   data,
   isLoading,
   groupBy,
@@ -452,3 +452,5 @@ export const BpiBoxStatsChart = ({
     </DashCard>
   );
 };
+
+export default BpiBoxStatsChart;

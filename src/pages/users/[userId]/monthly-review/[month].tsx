@@ -1,5 +1,5 @@
-import { MonthlyReviewView } from "@/components/partials/features/MonthlyReview/index";
-import { PeriodSelector } from "@/components/partials/features/MonthlyReview/PeriodSelector";
+import MonthlyReviewView from "@/components/partials/features/MonthlyReview/index";
+import PeriodSelector from "@/components/partials/features/MonthlyReview/PeriodSelector";
 import { StarfieldBackground } from "@/components/ui/starfield-background";
 import { useMonthlyReview } from "@/hooks/stats/useMonthlyReview";
 import { latestVersion } from "@/constants/iidx/iidxVersions";

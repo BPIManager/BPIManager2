@@ -1,7 +1,7 @@
 import { StatEntry } from "@/types/users/profile";
-import { ArenaClassBadge } from "@/components/partials/common/Badge/ArenaClassBadge";
+import ArenaClassBadge from "@/components/partials/common/Badge/ArenaClassBadge";
 
-export const BpiHistoryTable = ({ stats }: { stats: StatEntry[] }) => (
+const BpiHistoryTable = ({ stats }: { stats: StatEntry[] }) => (
   <div className="flex flex-col gap-1 w-full">
     <div className="grid grid-cols-[1fr_2fr_2fr] gap-3 px-4 py-1">
       <span className="text-[9px] font-bold tracking-widest text-bpim-muted uppercase">
@@ -35,3 +35,5 @@ export const BpiHistoryTable = ({ stats }: { stats: StatEntry[] }) => (
     </div>
   </div>
 );
+
+export default BpiHistoryTable;

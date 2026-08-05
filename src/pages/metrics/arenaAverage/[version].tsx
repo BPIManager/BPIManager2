@@ -3,19 +3,13 @@
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/router";
 import { useArenaAverages } from "@/hooks/metrics/useArenaAverage";
-import {
-  ArenaAverageTable,
-  type DisplayMetric,
-} from "@/components/partials/common/Charts/ArenaAverage/ui";
-import { ArenaAnalysis } from "@/components/partials/common/Charts/ArenaAverage/analysis";
+import ArenaAverageTable, { type DisplayMetric } from "@/components/partials/common/Charts/ArenaAverage/ui";
+import ArenaAnalysis from "@/components/partials/common/Charts/ArenaAverage/analysis";
 import { PageContainer, PageHeader } from "@/components/partials/common/PageChrome/Header";
 import { Meta } from "@/components/partials/common/PageChrome/Head";
-import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
-import {
-  ArenaAverageFilter,
-  type DetailFilter,
-} from "@/components/partials/features/Metrics/LevelSelector/ui";
-import { ArenaAverageFilterSkeleton } from "@/components/partials/features/Metrics/LevelSelector/skeleton";
+import DashboardLayout from "@/components/partials/shell/DashboardLayout";
+import ArenaAverageFilter, { type DetailFilter } from "@/components/partials/features/Metrics/LevelSelector/ui";
+import ArenaAverageFilterSkeleton from "@/components/partials/features/Metrics/LevelSelector/skeleton";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { ALL_RADAR_CATEGORIES } from "@/constants/iidx/radars";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -23,7 +17,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 import { filterArenaAverages } from "@/components/partials/features/Metrics/ArenaAverage/filterAverages";
-import { AnalysisControls } from "@/components/partials/features/Metrics/ArenaAverage/AnalysisControls";
+import AnalysisControls from "@/components/partials/features/Metrics/ArenaAverage/AnalysisControls";
 
 const ALL_DIFFICULTIES = new Set(IIDX_DIFFICULTIES);
 type RadarCat = (typeof ALL_RADAR_CATEGORIES)[number];

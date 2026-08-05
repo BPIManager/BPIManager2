@@ -9,7 +9,7 @@ interface ProfileMetaProps {
   noIndex?: boolean;
 }
 
-export const ProfileMeta = ({
+const ProfileMeta = ({
   title,
   description,
   noIndex,
@@ -39,3 +39,5 @@ export const ProfileMeta = ({
     />
   );
 };
+
+export default ProfileMeta;

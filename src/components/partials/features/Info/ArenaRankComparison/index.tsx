@@ -4,7 +4,7 @@ import { getArenaClassColor } from "@/utils/arenaClass";
 import type { ArenaRankEntry } from "@/types/siteStats";
 import { AlertCircleIcon } from "lucide-react";
 
-export function ArenaRankComparison({
+function ArenaRankComparison({
   selfReported,
 }: {
   selfReported: ArenaRankEntry[];
@@ -119,3 +119,5 @@ export function ArenaRankComparison({
     </DashCard>
   );
 }
+
+export default ArenaRankComparison;

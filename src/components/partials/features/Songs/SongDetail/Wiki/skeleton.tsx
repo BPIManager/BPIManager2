@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function WikiTabSkeleton() {
+function WikiTabSkeleton() {
   return (
     <div className="flex flex-col gap-2">
       {Array.from({ length: 3 }).map((_, i) => (
@@ -9,3 +9,5 @@ export function WikiTabSkeleton() {
     </div>
   );
 }
+
+export default WikiTabSkeleton;

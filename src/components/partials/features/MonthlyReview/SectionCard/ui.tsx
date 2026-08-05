@@ -4,7 +4,7 @@ interface SectionCardProps {
   style?: React.CSSProperties;
 }
 
-export const SectionCard = ({
+const SectionCard = ({
   children,
   className = "",
   style,
@@ -22,3 +22,5 @@ export const SectionCard = ({
     {children}
   </div>
 );
+
+export default SectionCard;

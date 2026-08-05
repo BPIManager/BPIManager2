@@ -13,7 +13,7 @@ import {
   type PatternRowProps,
   type PatternSearchResult,
 } from "./ui";
-import { PatternTabSkeleton } from "./skeleton";
+import PatternTabSkeleton from "./skeleton";
 
 interface PatternTabProps {
   songId: number;
@@ -47,7 +47,7 @@ function usePatternSearch(songId: number, input: string): PatternSearchResult {
   }, [isValid, isLoading, data]);
 }
 
-export function PatternTab({ songId, song }: PatternTabProps) {
+function PatternTab({ songId, song }: PatternTabProps) {
   const { fbUser } = useUser();
   const isLoggedIn = !!fbUser?.uid;
 
@@ -134,3 +134,5 @@ export function PatternTab({ songId, song }: PatternTabProps) {
     </div>
   );
 }
+
+export default PatternTab;

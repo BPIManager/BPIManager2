@@ -16,7 +16,7 @@ interface RivalFilterProps {
   onChangeSortOrder: (order: RivalSortOrder) => void;
 }
 
-export const RivalFilter = ({
+const RivalFilter = ({
   levels,
   difficulties,
   sortOrder,
@@ -103,3 +103,5 @@ export const RivalFilter = ({
     </div>
   );
 };
+
+export default RivalFilter;

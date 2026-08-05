@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { DistributionSection } from "../DistributionChart";
+import DistributionSection from "../DistributionChart";
 import type {
   DistributionSectionProps,
   RankDisplayMode,
 } from "@/types/ui/distribution";
 
-export const RankDistributionSection = (
+const RankDistributionSection = (
   props: Omit<DistributionSectionProps, "type" | "mode" | "onModeChange">,
 ) => {
   const [mode, setMode] = useState<RankDisplayMode>("rank");
@@ -19,3 +19,5 @@ export const RankDistributionSection = (
     />
   );
 };
+
+export default RankDistributionSection;

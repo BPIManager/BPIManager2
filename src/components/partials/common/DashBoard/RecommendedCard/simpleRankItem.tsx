@@ -12,7 +12,7 @@ interface SimpleRankItemProps {
   onClick: () => void;
 }
 
-export const SimpleRankItem = ({
+const SimpleRankItem = ({
   item,
   rank,
   onClick,
@@ -89,3 +89,5 @@ export const SimpleRankItem = ({
     </div>
   );
 };
+
+export default SimpleRankItem;

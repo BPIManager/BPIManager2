@@ -1,7 +1,7 @@
 import { DashCard } from "@/components/ui/dashcard";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export const ActivityCalendarSkeleton = () => {
+const ActivityCalendarSkeleton = () => {
   return (
     <DashCard className="p-5">
       <Skeleton className="mb-4 h-4 w-24" />
@@ -31,3 +31,5 @@ export const ActivityCalendarSkeleton = () => {
     </DashCard>
   );
 };
+
+export default ActivityCalendarSkeleton;

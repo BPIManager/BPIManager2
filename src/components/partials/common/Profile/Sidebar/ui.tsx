@@ -8,8 +8,8 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { BpiHistoryTable } from "./bpiTable";
-import { ArenaClassBadge } from "@/components/partials/common/Badge/ArenaClassBadge";
+import BpiHistoryTable from "./bpiTable";
+import ArenaClassBadge from "@/components/partials/common/Badge/ArenaClassBadge";
 import {
   Tooltip,
   TooltipContent,
@@ -17,12 +17,12 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { AreaRankBadge } from "@/components/ui/area-rank-badge";
-import { FollowSection } from "@/components/partials/common/FollowSection";
-import { FollowStats } from "./followCount";
+import FollowSection from "@/components/partials/common/FollowSection";
+import FollowStats from "./followCount";
 import { formatIIDXId } from "@/utils/common/formatIidxId";
 import { XIcon } from "@/components/partials/common/Auth/Buttons";
 import { UserProfileData } from "@/types/users/profile";
-import { RoleBadge } from "@/components/partials/common/Badge/UserRole";
+import RoleBadge from "@/components/partials/common/Badge/UserRole";
 import {
   ChevronDown,
   ExternalLink,
@@ -47,7 +47,7 @@ const ROLE_HEADER: Record<RoleKey, { from: string; Icon: typeof Coffee }> = {
   pro: { from: "#facc1540", Icon: Trophy },
 };
 
-export const ProfileSideBar = ({
+const ProfileSideBar = ({
   profile,
   onFollowToggle,
   isUpdating = false,
@@ -291,3 +291,5 @@ export const ProfileSideBar = ({
     </div>
   );
 };
+
+export default ProfileSideBar;

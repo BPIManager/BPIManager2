@@ -37,7 +37,7 @@ interface TargetSelectorModalProps {
   onClose: () => void;
 }
 
-export const TargetSelectorModal = ({
+const TargetSelectorModal = ({
   isOpen,
   current,
   onSelect,
@@ -132,3 +132,5 @@ export const TargetSelectorModal = ({
     </Dialog>
   );
 };
+
+export default TargetSelectorModal;

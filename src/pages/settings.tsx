@@ -2,7 +2,7 @@
 
 import { useUser } from "@/contexts/users/UserContext";
 import { useTranslation } from "@/hooks/common/useTranslation";
-import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
+import DashboardLayout from "@/components/partials/shell/DashboardLayout";
 import { PageContainer, PageHeader } from "@/components/partials/common/PageChrome/Header";
 import TransferUi from "@/components/partials/features/Settings/Transfer/ui";
 import AccountSettingsUi from "@/components/partials/features/Settings/AccountSettings/ui";
@@ -15,7 +15,7 @@ import ThemeSettingsUi from "@/components/partials/features/Settings/ThemeSettin
 import DataExportUi from "@/components/partials/features/Settings/DataExport";
 import LayoutSettingsUi from "@/components/partials/features/Settings/LayoutSettings/ui";
 import LanguageSettingsUi from "@/components/partials/features/Settings/LanguageSettings/ui";
-import { RequireAuth } from "@/components/partials/shell/RequireAuth";
+import RequireAuth from "@/components/partials/shell/RequireAuth";
 
 export default function SettingsPage() {
   const { isLoading, fbUser } = useUser();

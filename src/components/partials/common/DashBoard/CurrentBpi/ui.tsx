@@ -19,9 +19,9 @@ import { DashCard } from "@/components/ui/dashcard";
 import { cn } from "@/lib/utils";
 import type { TotalBpiStats } from "@/hooks/stats/useCurrentTotalBpi";
 import { AreaRankBadge } from "@/components/ui/area-rank-badge";
-import { CurrentBpiSkeleton } from "./skeleton";
+import CurrentBpiSkeleton from "./skeleton";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
-import { CalendarPicker } from "./calendar";
+import CalendarPicker from "./calendar";
 import dayjs from "@/lib/dayjs";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
@@ -42,7 +42,7 @@ interface CurrentBpiCardProps {
   } | null;
 }
 
-export const CurrentBpiCard = ({
+const CurrentBpiCard = ({
   currentStats,
   historicalStats,
   activeDates,
@@ -250,3 +250,5 @@ export const CurrentBpiCard = ({
     </DashCard>
   );
 };
+
+export default CurrentBpiCard;

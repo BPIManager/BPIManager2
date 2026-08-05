@@ -6,7 +6,7 @@ import {
   useTotalBpiStats,
   useActiveDates,
 } from "@/hooks/stats/useCurrentTotalBpi";
-import { CurrentBpiCard } from "./ui";
+import CurrentBpiCard from "./ui";
 
 function calcDefaultCompareDate(activeDates: string[]): string | undefined {
   if (activeDates.length === 0) return undefined;
@@ -22,7 +22,7 @@ function calcDefaultCompareDate(activeDates: string[]): string | undefined {
   return candidates.length > 0 ? candidates[candidates.length - 1] : undefined;
 }
 
-export const CurrentBpiSection = ({ userId }: { userId: string }) => {
+const CurrentBpiSection = ({ userId }: { userId: string }) => {
   const { version, compareVersion } = useStatsFilter();
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
@@ -61,3 +61,5 @@ export const CurrentBpiSection = ({ userId }: { userId: string }) => {
     />
   );
 };
+
+export default CurrentBpiSection;

@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Plus, X } from "lucide-react";
-import { SectionTitle } from "./SectionTitle";
+import SectionTitle from "./SectionTitle";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 const DJRANK_OPTIONS = ["MAX-", "AAA", "AA", "A", "B", "C", "D", "E", "F"] as const;
@@ -20,7 +20,7 @@ interface Props {
   onChange: (val: Partial<FilterParamsFrontend>) => void;
 }
 
-export const ScoreFilterSection = ({ scoreFilters, onChange }: Props) => {
+const ScoreFilterSection = ({ scoreFilters, onChange }: Props) => {
   const { t } = useTranslation();
   const filters = scoreFilters ?? [];
 
@@ -126,3 +126,5 @@ export const ScoreFilterSection = ({ scoreFilters, onChange }: Props) => {
     </section>
   );
 };
+
+export default ScoreFilterSection;

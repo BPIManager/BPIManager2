@@ -12,7 +12,7 @@ interface AvatarSectionProps {
   setIsImageModalOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-export const AvatarSection = ({
+const AvatarSection = ({
   image,
   onChange,
   setIsImageModalOpen,
@@ -70,3 +70,5 @@ export const AvatarSection = ({
     </div>
   );
 };
+
+export default AvatarSection;

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
-export const RivalWinLossSummaryNotFound = () => {
+const RivalWinLossSummaryNotFound = () => {
   const { t } = useTranslation();
   return (
     <DashCard className="flex flex-col items-center justify-center gap-4 p-8">
@@ -26,3 +26,5 @@ export const RivalWinLossSummaryNotFound = () => {
     </DashCard>
   );
 };
+
+export default RivalWinLossSummaryNotFound;

@@ -1,9 +1,9 @@
 import { PageContainer, PageHeader } from "@/components/partials/common/PageChrome/Header";
-import { DashboardLayout } from "@/components/partials/shell/DashboardLayout";
+import DashboardLayout from "@/components/partials/shell/DashboardLayout";
 import { LoginRequiredCard } from "@/components/partials/common/Auth/LoginRequired/ui";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { ScoreImportView, type ScoreImportProps } from "../ScoreView";
-import { TowerImportView, type TowerImportProps } from "../TowerView";
+import ScoreImportView, { type ScoreImportProps } from "../ScoreView";
+import TowerImportView, { type TowerImportProps } from "../TowerView";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface Props {
@@ -13,7 +13,7 @@ interface Props {
   tower: TowerImportProps;
 }
 
-export const ImportView = (props: Props) => {
+const ImportView = (props: Props) => {
   const { t } = useTranslation();
   const { defaultTab = "score" } = props;
 
@@ -48,3 +48,5 @@ export const ImportView = (props: Props) => {
     </DashboardLayout>
   );
 };
+
+export default ImportView;

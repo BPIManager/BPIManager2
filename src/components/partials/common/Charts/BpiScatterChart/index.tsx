@@ -68,7 +68,7 @@ interface BpiScatterChartProps {
   xLabel?: string;
 }
 
-export const BpiScatterChart = ({
+const BpiScatterChart = ({
   rank,
   scatterPoints,
   axisDomain,
@@ -207,3 +207,5 @@ export const BpiScatterChart = ({
   </div>
   );
 };
+
+export default BpiScatterChart;

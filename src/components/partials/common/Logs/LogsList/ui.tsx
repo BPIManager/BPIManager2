@@ -1,11 +1,11 @@
 import { useState, useMemo } from "react";
 import { useBatchesList } from "@/hooks/batches/useBatchesList";
 import type { UpdateLog } from "@/types/logs/batches";
-import { LogsCard } from "../LogsCard/ui";
+import LogsCard from "../LogsCard/ui";
 import { LogsGroupSkeleton } from "../LogsCard/skeleton";
 import { NoDataAlert } from "@/components/partials/common/DashBoard/NoData";
-import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
-import { CustomPagination } from "@/components/partials/common/ListControls/Pagination/ui";
+import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
+import CustomPagination from "@/components/partials/common/ListControls/Pagination/ui";
 import Link from "next/link";
 import dayjs from "@/lib/dayjs";
 import { Badge } from "@/components/ui/badge";
@@ -68,7 +68,7 @@ function getSummaryPath(
   return `/users/${userId}/logs/${version}/summary/${representativeDate}`;
 }
 
-export const LogsList = ({
+const LogsList = ({
   userId,
   version,
   groupedBy,
@@ -295,3 +295,5 @@ export const LogsList = ({
     </div>
   );
 };
+
+export default LogsList;

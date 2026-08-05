@@ -1,7 +1,7 @@
 import type { RivalSongHighlight } from "@/types/stats/monthlyReview";
 import { DIFF_COLORS, DIFF_LABELS } from "./constants";
 
-export const SongRow = ({
+const SongRow = ({
   song,
   delay,
 }: {
@@ -50,3 +50,5 @@ export const SongRow = ({
     </span>
   </div>
 );
+
+export default SongRow;

@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { useTotalBpiHistory } from "@/hooks/stats/useTotalBPIHistory";
-import { TotalBpiHistoryChart } from "./ui";
+import TotalBpiHistoryChart from "./ui";
 import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 import type { StatsGroupBy } from "@/types/stats/bpiBoxStats";
 import { DashCard } from "@/components/ui/dashcard";
-import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
+import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
 
-export const BpiHistorySection = ({
+const BpiHistorySection = ({
   myUserId,
   rivalUserId,
   myName,
@@ -61,3 +61,5 @@ export const BpiHistorySection = ({
     />
   );
 };
+
+export default BpiHistorySection;

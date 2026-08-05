@@ -2,13 +2,13 @@
 
 import { useInView } from "@/hooks/common/useInView";
 import type { MonthlyReviewData } from "@/types/stats/monthlyReview";
-import { TopSongsSectionUI } from "./ui";
+import TopSongsSectionUI from "./ui";
 
 interface Props {
   topSongs: MonthlyReviewData["topSongs"];
 }
 
-export const TopSongsSection = ({ topSongs }: Props) => {
+const TopSongsSection = ({ topSongs }: Props) => {
   const [ref, inView] = useInView(0.1);
   const { topBpiSongs, topImprovedSongs } = topSongs;
 
@@ -35,3 +35,5 @@ export const TopSongsSection = ({ topSongs }: Props) => {
     />
   );
 };
+
+export default TopSongsSection;

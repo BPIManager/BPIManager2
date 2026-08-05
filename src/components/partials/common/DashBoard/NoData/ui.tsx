@@ -4,7 +4,7 @@ import { Import, Settings, BookOpenText } from "lucide-react";
 import { LordiconAnimation } from "@/components/ui/lordicon-animation";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
-export const NoDataAlert = () => {
+const NoDataAlert = () => {
   const { t } = useTranslation();
   const DOCS_URL =
     "https://www.notion.so/BPIM2-32a9989ca87a80829561f4b9618f1d6f";
@@ -91,3 +91,5 @@ const ActionLink = ({
     </span>
   </NextLink>
 );
+
+export default NoDataAlert;

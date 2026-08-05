@@ -10,7 +10,7 @@ interface DifficultyBadgeProps {
   size?: "sm" | "md";
 }
 
-export function DifficultyBadge({
+function DifficultyBadge({
   difficulty,
   level,
   size = "sm",
@@ -30,3 +30,5 @@ export function DifficultyBadge({
     </span>
   );
 }
+
+export default DifficultyBadge;

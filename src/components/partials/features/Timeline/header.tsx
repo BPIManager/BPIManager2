@@ -1,6 +1,6 @@
 ﻿import { cn } from "@/lib/utils";
 
-export const TimelineHeader = () => {
+const TimelineHeader = () => {
   return (
     <div
       className={cn(
@@ -40,3 +40,5 @@ const HeaderText = ({
     {children}
   </span>
 );
+
+export default TimelineHeader;

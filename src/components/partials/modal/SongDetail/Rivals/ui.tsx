@@ -8,7 +8,7 @@ import { useSongRanking } from "@/hooks/stats/useSongRanking";
 import { useAllSongRanking } from "@/hooks/allScores/useAllSongRanking";
 import type { SongDetailSubject } from "@/utils/songs/songDetailMode";
 import { SectionLoader } from "@/components/ui/loading-spinner";
-import { FetchErrorState } from "@/components/partials/common/ErrorStates/FetchErrorState";
+import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
 import { List, type ListImperativeAPI } from "react-window";
 import {
   RANKING_ROW_HEIGHT,

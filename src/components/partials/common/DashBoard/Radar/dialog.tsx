@@ -1,5 +1,5 @@
 import type { RadarSongEntry } from "@/types/stats/radar";
-import { SongListDialog } from "../Dialogs/songListDialog";
+import SongListDialog from "../Dialogs/songListDialog";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface Props {
@@ -9,7 +9,7 @@ interface Props {
   onClose: () => void;
 }
 
-export const RadarCategorySongsDialog = ({
+const RadarCategorySongsDialog = ({
   categoryName,
   songs,
   isOpen,
@@ -26,3 +26,5 @@ export const RadarCategorySongsDialog = ({
     />
   );
 };
+
+export default RadarCategorySongsDialog;

@@ -7,7 +7,7 @@ import type { AppProps } from "next/app";
 import { PagesProgressBar as ProgressBar } from "next-nprogress-bar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "sonner";
-import { LocaleDetectionModal } from "@/components/partials/common/LocaleDetectionModal";
+import LocaleDetectionModal from "@/components/partials/common/LocaleDetectionModal";
 import { updateFavicon } from "@/components/ui/bpim-logo";
 
 export default function App({ Component, pageProps }: AppProps) {

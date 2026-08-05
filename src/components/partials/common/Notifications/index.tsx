@@ -7,13 +7,13 @@ import { Tabs } from "@/components/ui/tabs";
 import { useNotifications } from "@/hooks/users/useNotifications";
 import { Bell } from "lucide-react";
 import { useState } from "react";
-import { InfiniteScrollContainer } from "@/components/partials/common/ListControls/InfiniteScroll/ui";
-import { NotificationItem } from "./item";
+import InfiniteScrollContainer from "@/components/partials/common/ListControls/InfiniteScroll/ui";
+import NotificationItem from "./item";
 import { Button } from "@/components/ui/button";
 import { AppTabsGroup } from "@/components/ui/complex/tabs";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
-export const NotificationBell = () => {
+const NotificationBell = () => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<"all" | "follow" | "overtaken">(
     "all",
@@ -85,3 +85,5 @@ export const NotificationBell = () => {
     </Popover>
   );
 };
+
+export default NotificationBell;

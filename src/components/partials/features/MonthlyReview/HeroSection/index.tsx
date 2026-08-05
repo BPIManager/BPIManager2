@@ -4,13 +4,13 @@ import { useEffect, useRef } from "react";
 import { useInView } from "@/hooks/common/useInView";
 import type { MonthlyReviewData } from "@/types/stats/monthlyReview";
 import dayjs from "@/lib/dayjs";
-import { HeroSectionUI } from "./ui";
+import HeroSectionUI from "./ui";
 
 interface Props {
   bpi: MonthlyReviewData["bpi"];
 }
 
-export const HeroSection = ({ bpi }: Props) => {
+const HeroSection = ({ bpi }: Props) => {
   const [ref, inView] = useInView(0.15);
   const rafRef = useRef<number | null>(null);
   const spanRef = useRef<HTMLSpanElement>(null);
@@ -53,3 +53,5 @@ export const HeroSection = ({ bpi }: Props) => {
     />
   );
 };
+
+export default HeroSection;

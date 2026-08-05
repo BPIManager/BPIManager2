@@ -9,7 +9,7 @@ interface RankItemProps {
   onClick: () => void;
 }
 
-export const OvertakeRankItem = ({ item, onClick }: RankItemProps) => {
+const OvertakeRankItem = ({ item, onClick }: RankItemProps) => {
   const { t, tFormat } = useTranslation();
   const { current, previous, overtaken = [], rivalRankInfo } = item;
 
@@ -117,3 +117,5 @@ export const OvertakeRankItem = ({ item, onClick }: RankItemProps) => {
     </div>
   );
 };
+
+export default OvertakeRankItem;

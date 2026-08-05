@@ -1,7 +1,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import { LogNavigatorSkeleton } from "../LogsNav/skeleton";
+import LogNavigatorSkeleton from "../LogsNav/skeleton";
 
-export const LogsDetailContentSkeleton = () => {
+const LogsDetailContentSkeleton = () => {
   return (
     <div className="flex flex-col gap-6 w-full">
       <LogNavigatorSkeleton />
@@ -33,3 +33,5 @@ export const LogsDetailContentSkeleton = () => {
     </div>
   );
 };
+
+export default LogsDetailContentSkeleton;

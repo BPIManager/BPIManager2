@@ -54,7 +54,7 @@ interface Props {
   formatHourLabel: (...args: any[]) => React.ReactNode;
 }
 
-export const ActivitySectionUI = ({
+const ActivitySectionUI = ({
   refs,
   labels,
   inView,
@@ -472,3 +472,5 @@ export const ActivitySectionUI = ({
     </>
   );
 };
+
+export default ActivitySectionUI;

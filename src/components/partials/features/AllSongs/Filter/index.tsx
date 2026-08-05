@@ -28,7 +28,7 @@ interface AllSongFilterBarProps {
   totalCount: number;
 }
 
-export const AllSongFilterBar = ({
+const AllSongFilterBar = ({
   params,
   onParamsChange,
   totalCount,
@@ -86,3 +86,5 @@ export const AllSongFilterBar = ({
     </div>
   </FilterBarContainer>
 );
+
+export default AllSongFilterBar;

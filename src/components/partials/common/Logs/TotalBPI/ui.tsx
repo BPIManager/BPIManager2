@@ -5,7 +5,7 @@ import { DashCard } from "@/components/ui/dashcard";
 import { LordiconAnimation } from "@/components/ui/lordicon-animation";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
-export const BatchTotalBpiCard = ({
+const BatchTotalBpiCard = ({
   pagination,
 }: {
   pagination: {
@@ -107,3 +107,5 @@ export const BatchTotalBpiCard = ({
     </DashCard>
   );
 };
+
+export default BatchTotalBpiCard;

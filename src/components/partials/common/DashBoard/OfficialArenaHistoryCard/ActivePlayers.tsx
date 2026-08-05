@@ -23,7 +23,7 @@ interface ActivePlayersProps {
   isLoading: boolean;
 }
 
-export function ActivePlayers({ data, isLoading }: ActivePlayersProps) {
+function ActivePlayers({ data, isLoading }: ActivePlayersProps) {
   const { t } = useTranslation();
 
   return (
@@ -75,3 +75,5 @@ export function ActivePlayers({ data, isLoading }: ActivePlayersProps) {
     </div>
   );
 }
+
+export default ActivePlayers;

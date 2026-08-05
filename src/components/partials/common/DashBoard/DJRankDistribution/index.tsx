@@ -1,1 +1,1 @@
-export { RankDistributionSection } from "./ui";
+export { default as RankDistributionSection } from "./ui";

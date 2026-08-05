@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { SongCard } from "@/components/partials/features/Tickets/SongCard";
+import SongCard from "@/components/partials/features/Tickets/SongCard";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import type { TicketCardState } from "@/hooks/tickets/useTicketSearch";
 import type { TicketSongResult, TicketSortKey, ScoreMode } from "@/types/tickets";
@@ -43,7 +43,7 @@ interface TicketCardProps {
   onSortChange: (ticketId: string, sortKey: TicketSortKey) => void;
 }
 
-export function TicketCard({ state, scoreMode, onLoadMore, onSortChange }: TicketCardProps) {
+function TicketCard({ state, scoreMode, onLoadMore, onSortChange }: TicketCardProps) {
   const { t } = useTranslation();
   const { result, sortKey, isLoadingMore, allItems, hasMore } = state;
   const sorted = sortItems(allItems, sortKey, scoreMode);
@@ -133,3 +133,5 @@ export function TicketCard({ state, scoreMode, onLoadMore, onSortChange }: Ticke
     </div>
   );
 }
+
+export default TicketCard;

@@ -1,10 +1,7 @@
-﻿import { RivalSummaryCard } from "./ui";
-import { RivalSummarySkeleton } from "./skeleton";
-import { RivalWinLossSummaryNotFound } from "@/components/partials/common/ErrorStates/RivalWinLossSummaryNotFound";
-import {
-  FetchErrorState,
-  type FetchError,
-} from "@/components/partials/common/ErrorStates/FetchErrorState";
+﻿import RivalSummaryCard from "./ui";
+import RivalSummarySkeleton from "./skeleton";
+import RivalWinLossSummaryNotFound from "@/components/partials/common/ErrorStates/RivalWinLossSummaryNotFound";
+import FetchErrorState, { type FetchError } from "@/components/partials/common/ErrorStates/FetchErrorState";
 import { RivalSummaryResult } from "@/types/social/rival";
 
 interface RivalListProps {
@@ -14,7 +11,7 @@ interface RivalListProps {
   onCardClick: (userId: string) => void;
 }
 
-export const RivalList = ({
+const RivalList = ({
   results,
   isLoading,
   error,
@@ -48,3 +45,5 @@ export const RivalList = ({
     </div>
   );
 };
+
+export default RivalList;

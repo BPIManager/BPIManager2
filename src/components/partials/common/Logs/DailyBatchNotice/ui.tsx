@@ -12,7 +12,7 @@ interface DailyBatchNoticeProps {
   version: string;
 }
 
-export const DailyBatchNotice = ({
+const DailyBatchNotice = ({
   dailyBatchIds,
   currentBatchId,
   createdAt,
@@ -72,3 +72,5 @@ export const DailyBatchNotice = ({
     </div>
   );
 };
+
+export default DailyBatchNotice;
