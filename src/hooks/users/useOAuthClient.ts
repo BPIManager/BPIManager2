@@ -2,6 +2,7 @@ import useSWRMutation from "swr/mutation";
 import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
 import { useUser } from "@/contexts/users/UserContext";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { issueOAuthClient, deleteOAuthClient } from "@/services/swr/oauthClient";
 
 interface OAuthClientInfo {
   exists: boolean;
@@ -24,31 +25,13 @@ export const useOAuthClient = () => {
 
   const { trigger: triggerIssue, isMutating: isIssuing } = useSWRMutation(
     `${API_PREFIX}/oauthClient`,
-    async (url, { arg }: { arg: { redirectUris: string[] } }) => {
-      const token = await fbUser?.getIdToken();
-      const res = await fetch(url, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ redirect_uris: arg.redirectUris }),
-      });
-      if (!res.ok) throw new Error("Failed to issue OAuth client");
-      return res.json();
-    },
+    (url, { arg }: { arg: { redirectUris: string[] } }) =>
+      issueOAuthClient(url, fbUser, arg.redirectUris),
   );
 
   const { trigger: triggerDelete, isMutating: isDeleting } = useSWRMutation(
     `${API_PREFIX}/oauthClient`,
-    async (url) => {
-      const token = await fbUser?.getIdToken();
-      const res = await fetch(url, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) throw new Error("Failed to delete OAuth client");
-    },
+    (url) => deleteOAuthClient(url, fbUser),
   );
 
   return {

@@ -1,8 +1,8 @@
 ﻿import { useState } from "react";
 import { useUser } from "@/contexts/users/UserContext";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import { toast } from "sonner";
 import { useRouter } from "next/router";
+import { deleteBatch } from "@/services/swr/batchDelete";
 
 export const useBatchDelete = (
   userId: string,
@@ -18,20 +18,9 @@ export const useBatchDelete = (
     if (!fbUser) return;
     setIsDeleting(true);
     try {
-      const token = await fbUser.getIdToken();
-      const res = await fetch(
-        `${API_PREFIX}/users/${userId}/batches/${batchId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        toast.error(data.message || "削除に失敗しました");
+      const result = await deleteBatch(userId, batchId, fbUser);
+      if (!result.ok) {
+        toast.error(result.message || "削除に失敗しました");
         return;
       }
 

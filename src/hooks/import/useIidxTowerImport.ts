@@ -1,8 +1,8 @@
 ﻿import { useState } from "react";
 import { toast } from "sonner";
 import { User as FirebaseUser } from "firebase/auth";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import { safeClipboardRead, safeClipboardClear } from "@/utils/clipboard";
+import { submitTowerImport } from "@/services/swr/iidxTowerImport";
 
 type TowerRow = { playDate: string; keyCount: number; scratchCount: number };
 
@@ -69,21 +69,7 @@ export const useIidxTowerImport = (fbUser: FirebaseUser | null) => {
       setProcessStatus(`${rows.length}件をアップロード中...`);
       const idToken = await fbUser.getIdToken(true);
 
-      const response = await fetch(
-        `${API_PREFIX}/users/${fbUser.uid}/iidx-tower`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${idToken}`,
-          },
-          body: JSON.stringify({ version, rows }),
-        },
-      );
-
-      if (!response.ok) throw new Error("サーバーエラーが発生しました。");
-
-      const result = await response.json();
+      const result = await submitTowerImport(fbUser.uid, idToken, version, rows);
 
       const addedKeyCount = rows.reduce((acc, row) => acc + row.keyCount, 0);
       const addedScratchCount = rows.reduce(

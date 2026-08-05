@@ -1,6 +1,6 @@
 ﻿import { useState } from "react";
 import { useUser } from "@/contexts/users/UserContext";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { requestFollowUser } from "@/services/swr/follow";
 
 /**
  * 指定ユーザーへのフォロー / アンフォロー操作を行うフック。
@@ -17,20 +17,7 @@ export const useFollow = (targetUserId: string | undefined) => {
 
     setIsUpdating(true);
     try {
-      const token = await fbUser.getIdToken();
-      const method = isFollowing ? "DELETE" : "PUT";
-
-      const res = await fetch(`${API_PREFIX}/users/${targetUserId}/follows`, {
-        method,
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!res.ok) throw new Error(`Failed to ${method} follow`);
-
-      const data = await res.json();
+      const data = await requestFollowUser(targetUserId, isFollowing, fbUser);
       refresh();
       return data.isFollowing;
     } catch (e) {

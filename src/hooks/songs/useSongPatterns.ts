@@ -2,6 +2,7 @@
 import { User as FirebaseUser } from "firebase/auth";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import { authFetch } from "@/utils/common/fetch";
+import { fetchSongPatternsPage } from "@/services/swr/songPatterns";
 import type { VoteType } from "@/types/db";
 
 export interface SongPatternItem {
@@ -36,14 +37,7 @@ export function useSongPatterns(
   const { data, isLoading, size, setSize, mutate } =
     useSWRInfinite<PatternsPage>(
       getKey,
-      async ([url]: [string, string | null]) => {
-        const token = fbUser ? await fbUser.getIdToken() : null;
-        const res = await fetch(url, {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
-        if (!res.ok) throw new Error("Failed to fetch patterns");
-        return res.json();
-      },
+      ([url]: [string, string | null]) => fetchSongPatternsPage(url, fbUser),
       { revalidateOnFocus: false },
     );
 

@@ -2,10 +2,10 @@
 import { mutate } from "swr";
 import { parseAnyCsv } from "@/utils/csv/parse";
 import { detectCsvType, validateCsvTypeForVersion } from "@/utils/csv/detect";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import { toast } from "sonner";
 import { User as FirebaseUser } from "firebase/auth";
 import { safeClipboardRead, safeClipboardClear } from "@/utils/clipboard";
+import { submitBatchImport } from "@/services/swr/batchImport";
 
 /**
  * CSV データのバッチインポート処理を管理するフック。
@@ -58,21 +58,12 @@ export const useBatchImport = (
       setProcessStatus(`${formattedRows.length}件をアップロード中...`);
       const idToken = await fbUser.getIdToken(true);
 
-      const response = await fetch(
-        `${API_PREFIX}/users/${fbUser.uid}/scores/bulk`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${idToken}`,
-          },
-          body: JSON.stringify({ version, csvRows: formattedRows }),
-        },
+      const result = await submitBatchImport(
+        fbUser.uid,
+        idToken,
+        version,
+        formattedRows,
       );
-
-      if (!response.ok) throw new Error("サーバーエラーが発生しました。");
-
-      const result = await response.json();
       if (result.updatedBpiCount > 0) {
         setImportResult({
           batchId: result.batchId,

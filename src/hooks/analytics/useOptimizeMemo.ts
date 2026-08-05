@@ -3,6 +3,7 @@ import { useCallback, useMemo, useState } from "react";
 import { User as FirebaseUser } from "firebase/auth";
 import type { OptimizationResult } from "@/types/bpi-optimizer";
 import { fetcher } from "@/utils/common/fetch";
+import { saveOptimizeMemo, deleteOptimizeMemo } from "@/services/swr/optimizeMemo";
 
 export interface OptimizeMemo {
   reportId: string;
@@ -36,17 +37,7 @@ export const useBpiOptimizerMemos = (
       if (!userId) return;
       setIsSaving(true);
       try {
-        const token = fbUser ? await fbUser.getIdToken() : null;
-        const res = await fetch(apiUrl, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
-          body: JSON.stringify({ targetBpi, reportData }),
-        });
-        if (!res.ok) throw new Error("Failed to save memo");
-
+        await saveOptimizeMemo(apiUrl, fbUser, targetBpi, reportData);
         await mutate(swrKey);
       } finally {
         setIsSaving(false);
@@ -61,15 +52,7 @@ export const useBpiOptimizerMemos = (
       if (!userId) return;
       setIsDeleting(reportId);
       try {
-        const token = fbUser ? await fbUser.getIdToken() : null;
-        const res = await fetch(`${apiUrl}/${reportId}`, {
-          method: "DELETE",
-          headers: {
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
-        });
-        if (!res.ok) throw new Error("Failed to delete memo");
-
+        await deleteOptimizeMemo(apiUrl, fbUser, reportId);
         await mutate(
           swrKey,
           (currentMemos: OptimizeMemo[] | undefined) => {

@@ -1,7 +1,11 @@
 ﻿import { useState, useEffect } from "react";
 import { useUser } from "@/contexts/users/UserContext";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import { toast } from "sonner";
+import {
+  fetchStatsPrivacy,
+  checkUserNameAvailability,
+  saveProfile,
+} from "@/services/swr/editProfile";
 
 /**
  * プロフィール編集フォームの状態管理・バリデーション・保存処理を行うフック。
@@ -54,14 +58,8 @@ export const useEditProfile = (onClose?: () => void) => {
     if (!fbUid || !fbUser) return;
     (async () => {
       try {
-        const token = await fbUser.getIdToken();
-        const res = await fetch(`${API_PREFIX}/users/${fbUid}/profile`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (res.ok) {
-          const data = await res.json();
-          if (data.statsPrivacy) setArenaPrivacy(data.statsPrivacy);
-        }
+        const data = await fetchStatsPrivacy(fbUid, fbUser);
+        if (data?.statsPrivacy) setArenaPrivacy(data.statsPrivacy);
       } catch { /* ignore */ }
     })();
   }, [fbUid, fbUser]);
@@ -96,18 +94,14 @@ export const useEditProfile = (onClose?: () => void) => {
     const controller = new AbortController();
     const timer = setTimeout(async () => {
       try {
-        const token = await fbUser?.getIdToken();
-        const res = await fetch(
-          `${API_PREFIX}/usernames/${encodeURIComponent(formData.userName)}/availability`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-            signal: controller.signal,
-          },
+        const data = await checkUserNameAvailability(
+          formData.userName,
+          fbUser,
+          controller.signal,
         );
-        const data = await res.json();
         setNameStatus({
           isChecking: false,
-          error: data.available ? null : data.message,
+          error: data.available ? null : (data.message ?? null),
           available: data.available,
         });
       } catch (e) {
@@ -130,24 +124,8 @@ export const useEditProfile = (onClose?: () => void) => {
     if (!fbUid || !fbUser) return;
     setIsSubmitting(true);
     try {
-      const token = await fbUser.getIdToken();
       const method = user ? "PATCH" : "POST";
-      const res = await fetch(`${API_PREFIX}/users/${fbUid}/profile`, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          ...formData,
-          iidxId: formData.iidxId.replace(/-/g, ""),
-          profileText: formData.bio || null,
-          isPublic: formData.isPublic ? 1 : 0,
-          arenaPrivacy,
-        }),
-      });
-
-      if (!res.ok) throw new Error();
+      await saveProfile(fbUid, fbUser, method, formData, arenaPrivacy);
       await refresh?.();
       toast.success("保存しました");
       onClose?.();

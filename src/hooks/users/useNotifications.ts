@@ -2,6 +2,7 @@
 import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import { useInfiniteList } from "@/services/swr/useInfinite";
+import { markNotificationsRead } from "@/services/swr/notifications";
 import type {
   NotificationItem,
   NotificationCountResponse,
@@ -49,10 +50,7 @@ export const useNotifications = (
   const markAsRead = async () => {
     if (!fbUser) return;
     try {
-      await fetch(`${API_PREFIX}/users/${fbUser.uid}/notifications`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${await fbUser?.getIdToken()}` },
-      });
+      await markNotificationsRead(fbUser);
       mutateCount({ total: 0 }, { revalidate: false });
     } catch (e) {
       console.error(e);

@@ -3,6 +3,7 @@ import useSWRMutation from "swr/mutation";
 import { useUser } from "@/contexts/users/UserContext";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import type { TicketItem, TicketRecommendResult, TicketSortKey, ScoreMode } from "@/types/tickets";
+import { searchTickets, loadMoreTicketResults } from "@/services/swr/ticketSearch";
 
 export interface TicketCardState {
   result: TicketRecommendResult;
@@ -40,25 +41,10 @@ export function useTicketSearch() {
 
   const { trigger, isMutating, error: swrError } = useSWRMutation(
     key,
-    async (
+    (
       url: string,
       { arg }: { arg: { ticketIds: TicketItem[]; scoreMode: ScoreMode } },
-    ): Promise<TicketRecommendResult[]> => {
-      const token = await fbUser!.getIdToken();
-      const res = await fetch(url, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(arg),
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error((data as { message?: string }).message ?? `HTTPエラー: ${res.status}`);
-      }
-      return res.json();
-    },
+    ) => searchTickets(url, fbUser!, arg.ticketIds, arg.scoreMode),
   );
 
   const applyResults = useCallback((results: TicketRecommendResult[]) => {
@@ -116,19 +102,16 @@ export function useTicketSearch() {
       });
 
       try {
-        const token = await fbUser.getIdToken();
         const params = new URLSearchParams({
           ticketId,
           expiresAt: state.result.expiresAt,
           offset: String(state.offset),
           scoreMode,
         });
-        const res = await fetch(
+        const data = await loadMoreTicketResults(
           `${API_PREFIX}/users/${user.userId}/tickets/recommend?${params}`,
-          { headers: { Authorization: `Bearer ${token}` } },
+          fbUser,
         );
-        if (!res.ok) throw new Error(`HTTPエラー: ${res.status}`);
-        const data: TicketRecommendResult = await res.json();
 
         setCardStates((prev) => {
           const next = new Map(prev);

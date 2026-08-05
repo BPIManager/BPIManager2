@@ -1,12 +1,6 @@
 ﻿import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import useSWR from "swr";
-
-const arenaFetcher = async (url: string) => {
-  const res = await fetch(url);
-  if (res.status === 404) return null;
-  if (!res.ok) throw new Error("Failed to fetch arena averages");
-  return res.json();
-};
+import { arenaAveragesFetcher } from "@/services/swr/arenaAverages";
 
 export type ArenaAverages = Record<
   string,
@@ -24,7 +18,7 @@ export type ArenaAverages = Record<
 export const useArenaAveragesForSong = (songId: number | null) => {
   const { data, isLoading } = useSWR<ArenaAverages | null>(
     songId != null ? `${API_PREFIX}/songs/${songId}/arena-averages` : null,
-    arenaFetcher,
+    arenaAveragesFetcher,
   );
 
   return { arenaAverages: data ?? null, isLoading };

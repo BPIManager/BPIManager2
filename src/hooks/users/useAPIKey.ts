@@ -2,6 +2,7 @@
 import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
 import { useUser } from "@/contexts/users/UserContext";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { generateApiKey } from "@/services/swr/apiKey";
 
 /**
  * ユーザーの API キー情報の取得と再生成を行うフック。
@@ -17,15 +18,7 @@ export const useApiKey = () => {
 
   const { trigger, isMutating } = useSWRMutation(
     `${API_PREFIX}/apiKey`,
-    async (url) => {
-      const token = await fbUser?.getIdToken();
-      const res = await fetch(url, {
-        method: "PUT",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) throw new Error("Failed to generate API key");
-      return res.json();
-    },
+    (url) => generateApiKey(url, fbUser),
   );
 
   return {
