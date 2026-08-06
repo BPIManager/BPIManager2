@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import LoginRequiredTabContent from "@/components/partials/common/Auth/LoginRequiredTabContent";
 import ActionConfirmDialog from "@/components/partials/modal/Confirmation";
 import { useUser } from "@/contexts/users/UserContext";
-import { useSongNotes, type SongNote } from "@/hooks/songs/useSongNotes";
+import { useSongNotes } from "@/hooks/songs/useSongNotes";
 import NoteCard from "./ui";
 import SortButton from "@/components/partials/common/Songs/SortButton";
 import WikiTabSkeleton from "./skeleton";
@@ -23,8 +23,6 @@ function WikiTab({ songId }: WikiTabProps) {
 
   const [composeBody, setComposeBody] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [editBody, setEditBody] = useState("");
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
   async function handleSubmit() {
@@ -36,17 +34,6 @@ function WikiTab({ songId }: WikiTabProps) {
     } finally {
       setSubmitting(false);
     }
-  }
-
-  function startEdit(note: SongNote) {
-    setEditingId(note.id);
-    setEditBody(note.body);
-  }
-
-  async function handleEditSave(noteId: number) {
-    if (!editBody.trim()) return;
-    await updateNote(noteId, editBody.trim());
-    setEditingId(null);
   }
 
   async function handleDeleteConfirm() {
@@ -116,12 +103,7 @@ function WikiTab({ songId }: WikiTabProps) {
               key={note.id}
               note={note}
               isLoggedIn={isLoggedIn}
-              isEditing={editingId === note.id}
-              editBody={editBody}
-              onEditBodyChange={setEditBody}
-              onStartEdit={() => startEdit(note)}
-              onEditSave={() => handleEditSave(note.id)}
-              onEditCancel={() => setEditingId(null)}
+              onSave={(newBody) => updateNote(note.id, newBody)}
               onDelete={() => setDeletingId(note.id)}
               onToggleUpvote={() => toggleUpvote(note.id, note.upvoted)}
             />

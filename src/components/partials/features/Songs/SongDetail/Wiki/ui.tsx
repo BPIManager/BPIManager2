@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { ThumbsUp, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -7,12 +8,7 @@ import { formatDate } from "@/utils/common/formatDate";
 export interface NoteCardProps {
   note: SongNote;
   isLoggedIn: boolean;
-  isEditing: boolean;
-  editBody: string;
-  onEditBodyChange: (v: string) => void;
-  onStartEdit: () => void;
-  onEditSave: () => void;
-  onEditCancel: () => void;
+  onSave: (newBody: string) => Promise<void>;
   onDelete: () => void;
   onToggleUpvote: () => void;
 }
@@ -20,15 +16,24 @@ export interface NoteCardProps {
 function NoteCard({
   note,
   isLoggedIn,
-  isEditing,
-  editBody,
-  onEditBodyChange,
-  onStartEdit,
-  onEditSave,
-  onEditCancel,
+  onSave,
   onDelete,
   onToggleUpvote,
 }: NoteCardProps) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editBody, setEditBody] = useState(note.body);
+
+  const startEdit = () => {
+    setEditBody(note.body);
+    setIsEditing(true);
+  };
+
+  const handleSave = async () => {
+    if (!editBody.trim()) return;
+    await onSave(editBody.trim());
+    setIsEditing(false);
+  };
+
   const bpiLabel =
     note.authorTotalBpi !== null
       ? `BPI ${note.authorTotalBpi.toFixed(2)}`
@@ -40,7 +45,7 @@ function NoteCard({
         <>
           <Textarea
             value={editBody}
-            onChange={(e) => onEditBodyChange(e.target.value)}
+            onChange={(e) => setEditBody(e.target.value)}
             rows={4}
             maxLength={2000}
             className="resize-none bg-bpim-bg border-bpim-border text-bpim-text text-sm focus-visible:ring-bpim-primary"
@@ -53,7 +58,7 @@ function NoteCard({
               <Button
                 size="sm"
                 variant="ghost"
-                onClick={onEditCancel}
+                onClick={() => setIsEditing(false)}
                 className="h-6 text-xs text-bpim-muted"
               >
                 キャンセル
@@ -61,7 +66,7 @@ function NoteCard({
               <Button
                 size="sm"
                 disabled={!editBody.trim()}
-                onClick={onEditSave}
+                onClick={handleSave}
                 className="h-6 rounded-full bg-bpim-primary text-bpim-bg font-bold text-xs hover:bg-bpim-primary/80"
               >
                 保存
@@ -102,7 +107,7 @@ function NoteCard({
           {note.editable && !isEditing && (
             <>
               <button
-                onClick={onStartEdit}
+                onClick={startEdit}
                 className="rounded p-1 text-bpim-muted hover:text-bpim-text transition-colors"
               >
                 <Pencil className="h-3 w-3" />
