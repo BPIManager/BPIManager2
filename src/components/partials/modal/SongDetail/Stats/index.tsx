@@ -25,17 +25,13 @@ const StatsTab = ({ song }: { song: SongWithScore }) => {
     }
   }, [selectedRef]);
 
-  useEffect(() => {
-    if (user?.arenaRank && !selectedRef) {
-      // ユーザー情報の非同期読み込み完了後、未選択なら自分のアリーナ級位を初期値にする
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setSelectedRef(user.arenaRank);
-    }
-  }, [user?.arenaRank, selectedRef]);
+  // selectedRefはユーザーが明示的に選択(または過去にlocalStorageへ保存)した値のみを保持し、
+  // 未選択時のフォールバックはrender中にuser.arenaRankから導出する
+  const effectiveRef = selectedRef || user?.arenaRank || "";
 
   const { arenaAverages } = useArenaAveragesForSong(song.songId);
   const needsRivalData =
-    selectedRef === "rival-avg" || selectedRef === "rival-top";
+    effectiveRef === "rival-avg" || effectiveRef === "rival-top";
   const { rivalAvgScore, rivalTopScore } = useRivalScoresForSong(
     song.songId,
     needsRivalData,
@@ -43,7 +39,7 @@ const StatsTab = ({ song }: { song: SongWithScore }) => {
   const { historyGroups } = useAllScoreHistory(
     user?.userId,
     song.songId,
-    selectedRef === "personal-best",
+    effectiveRef === "personal-best",
   );
 
   const personalBest = useMemo(() => {
@@ -62,18 +58,18 @@ const StatsTab = ({ song }: { song: SongWithScore }) => {
   }, [historyGroups]);
 
   const refScore = useMemo(() => {
-    if (!selectedRef || selectedRef === "none") return undefined;
-    if (selectedRef === "rival-avg") return rivalAvgScore ?? undefined;
-    if (selectedRef === "rival-top") return rivalTopScore ?? undefined;
-    if (selectedRef === "personal-best")
+    if (!effectiveRef || effectiveRef === "none") return undefined;
+    if (effectiveRef === "rival-avg") return rivalAvgScore ?? undefined;
+    if (effectiveRef === "rival-top") return rivalTopScore ?? undefined;
+    if (effectiveRef === "personal-best")
       return personalBest?.version !== router.query.version
         ? (personalBest?.score ?? undefined)
         : undefined;
     if (!arenaAverages) return undefined;
-    const raw = arenaAverages[selectedRef]?.avgExScore;
+    const raw = arenaAverages[effectiveRef]?.avgExScore;
     return raw != null ? Math.round(raw) : undefined;
   }, [
-    selectedRef,
+    effectiveRef,
     arenaAverages,
     rivalAvgScore,
     rivalTopScore,
@@ -82,15 +78,15 @@ const StatsTab = ({ song }: { song: SongWithScore }) => {
   ]);
 
   const refLabel = useMemo(() => {
-    if (!selectedRef || selectedRef === "none") return undefined;
-    if (selectedRef === "rival-avg") return "ライバル平均";
-    if (selectedRef === "rival-top") return "ライバルトップ";
-    if (selectedRef === "personal-best")
+    if (!effectiveRef || effectiveRef === "none") return undefined;
+    if (effectiveRef === "rival-avg") return "ライバル平均";
+    if (effectiveRef === "rival-top") return "ライバルトップ";
+    if (effectiveRef === "personal-best")
       return personalBest
         ? `自己歴代(IIDX ${personalBest.version})`
         : "自己歴代";
-    return selectedRef + "平均";
-  }, [selectedRef, personalBest]);
+    return effectiveRef + "平均";
+  }, [effectiveRef, personalBest]);
 
   const chartData = useMemo(() => {
     const data: { label: string; count: number; bpi: number }[] = [];
@@ -114,7 +110,7 @@ const StatsTab = ({ song }: { song: SongWithScore }) => {
       maxScore={song.notes * 2}
       refScore={refScore}
       refLabel={refLabel}
-      selectedRef={selectedRef}
+      selectedRef={effectiveRef}
       onSelectedRefChange={setSelectedRef}
       arenaAverages={arenaAverages}
     />
