@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import {
   CalendarIcon,
   XIcon,
@@ -20,7 +20,6 @@ import { cn } from "@/lib/utils";
 import type { TotalBpiStats } from "@/hooks/stats/useCurrentTotalBpi";
 import { AreaRankBadge } from "@/components/ui/area-rank-badge";
 import CurrentBpiSkeleton from "./skeleton";
-import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import CalendarPicker from "./calendar";
 import dayjs from "@/lib/dayjs";
 import { useTranslation } from "@/hooks/common/useTranslation";
@@ -55,7 +54,6 @@ const CurrentBpiCard = ({
   areaRank,
 }: CurrentBpiCardProps) => {
   const [calendarOpen, setCalendarOpen] = useState(false);
-  const { version, compareVersion } = useStatsFilter();
   const { t } = useTranslation();
 
   const bpi = currentStats?.totalBpi ?? -15;
@@ -64,15 +62,6 @@ const CurrentBpiCard = ({
   const activeDateSet = new Set(
     activeDates.map((d) => dayjs(d).format("YYYY-MM-DD")),
   );
-
-  useEffect(() => {
-    if (selectedDate) {
-      onDateSelect(null);
-    }
-    // バージョン/比較バージョンが変わった時だけ選択日をリセットしたいため、
-    // selectedDate/onDateSelect自体の変化では再実行させない
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [version, compareVersion]);
 
   const initialMonth = useMemo(() => {
     const targetDate =

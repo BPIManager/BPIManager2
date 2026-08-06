@@ -26,6 +26,15 @@ const CurrentBpiSection = ({ userId }: { userId: string }) => {
   const { version, compareVersion } = useStatsFilter();
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
+  const versionKey = `${version}:${compareVersion ?? ""}`;
+  const [prevVersionKey, setPrevVersionKey] = useState(versionKey);
+  if (versionKey !== prevVersionKey) {
+    setPrevVersionKey(versionKey);
+    if (selectedDate !== null) {
+      setSelectedDate(null);
+    }
+  }
+
   const historicalVersion = compareVersion || version;
 
   const { stats: currentStats, isLoading } = useTotalBpiStats(userId, version);

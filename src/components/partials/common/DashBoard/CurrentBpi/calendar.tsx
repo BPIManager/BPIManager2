@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -34,18 +34,20 @@ const CalendarPicker = ({
     return today.startOf("month");
   });
 
-  useEffect(() => {
-    if (initialMonth) {
-      // initialMonthが変わるたびに表示月をそれに同期させる(ユーザーのprevMonth/nextMonth操作とは別に、親からの再指定を反映する)
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setView(
-        dayjs()
-          .year(initialMonth.year)
-          .month(initialMonth.month)
-          .startOf("month"),
-      );
-    }
-  }, [initialMonth]);
+  const [prevInitialMonth, setPrevInitialMonth] = useState(initialMonth);
+  if (
+    initialMonth &&
+    (prevInitialMonth?.year !== initialMonth.year ||
+      prevInitialMonth?.month !== initialMonth.month)
+  ) {
+    setPrevInitialMonth(initialMonth);
+    setView(
+      dayjs()
+        .year(initialMonth.year)
+        .month(initialMonth.month)
+        .startOf("month"),
+    );
+  }
 
   const prevMonth = () => setView((v) => v.subtract(1, "month"));
   const nextMonth = () => setView((v) => v.add(1, "month"));
