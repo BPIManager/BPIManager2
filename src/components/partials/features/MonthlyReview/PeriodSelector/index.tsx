@@ -66,25 +66,20 @@ const PeriodSelector = ({
       isCurrentYearMode={isCurrentYearMode}
       onGranularityChange={setGranularity}
       onVersionChange={handleVersionChange}
-      yearNav={{
-        calendarYear,
-        calendarYearIdx,
-        canPrevYear,
-        canNextYear,
-        onPrevYear: () =>
-          canPrevYear && setCalendarYear(availableYears[calendarYearIdx + 1]),
-        onNextYear: () =>
-          canNextYear && setCalendarYear(availableYears[calendarYearIdx - 1]),
-      }}
-      monthSelection={{
-        availableMonths,
-        availableSet,
-        onMonthClick: (monthStr) => onSelect(version, monthStr),
-      }}
-      yearSelection={{
-        availableYears,
-        onYearClick: (year) => onSelect(version, year),
-      }}
+      calendarYear={calendarYear}
+      canPrevYear={canPrevYear}
+      canNextYear={canNextYear}
+      onPrevYear={() =>
+        canPrevYear && setCalendarYear(availableYears[calendarYearIdx + 1])
+      }
+      onNextYear={() =>
+        canNextYear && setCalendarYear(availableYears[calendarYearIdx - 1])
+      }
+      availableMonths={availableMonths}
+      availableSet={availableSet}
+      onMonthClick={(monthStr) => onSelect(version, monthStr)}
+      availableYears={availableYears}
+      onYearClick={(year) => onSelect(version, year)}
     />
   );
 };
