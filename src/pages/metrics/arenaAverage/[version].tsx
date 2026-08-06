@@ -8,8 +8,8 @@ import ArenaAnalysis from "@/components/partials/common/Charts/ArenaAverage/anal
 import { PageContainer, PageHeader } from "@/components/partials/common/PageChrome/Header";
 import { Meta } from "@/components/partials/common/PageChrome/Head";
 import DashboardLayout from "@/components/partials/shell/DashboardLayout";
-import ArenaAverageFilter, { type DetailFilter } from "@/components/partials/features/Metrics/LevelSelector/ui";
-import ArenaAverageFilterSkeleton from "@/components/partials/features/Metrics/LevelSelector/skeleton";
+import ArenaAverageFilter, { type DetailFilter } from "@/components/partials/features/Metrics/ArenaAverageFilter/ui";
+import ArenaAverageFilterSkeleton from "@/components/partials/features/Metrics/ArenaAverageFilter/skeleton";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { ALL_RADAR_CATEGORIES } from "@/constants/iidx/radars";
 import { Skeleton } from "@/components/ui/skeleton";

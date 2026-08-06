@@ -72,12 +72,6 @@ const ArenaAverageFilter = ({
 }: ArenaAverageFilterProps) => {
   const { t } = useTranslation();
 
-  const DISPLAY_METRICS = [
-    { value: "exScore", label: t("arenaAvg.metric.exScore") },
-    { value: "rate", label: t("arenaAvg.metric.scoreRate") },
-    { value: "bpi", label: "BPI" },
-  ] as const;
-
   const toggleDifficulty = (diff: string) => {
     const next = new Set(selectedDifficulties);
     if (next.has(diff)) {
@@ -86,29 +80,6 @@ const ArenaAverageFilter = ({
       next.add(diff);
     }
     onDifficultiesChange(next);
-  };
-
-  const addFilter = () => {
-    onDetailFiltersChange([
-      ...detailFilters,
-      {
-        id: crypto.randomUUID(),
-        rank: "A1",
-        metric: "scoreRate",
-        operator: ">=",
-        value: "",
-      },
-    ]);
-  };
-
-  const removeFilter = (id: string) => {
-    onDetailFiltersChange(detailFilters.filter((f) => f.id !== id));
-  };
-
-  const updateFilter = (id: string, updates: Partial<DetailFilter>) => {
-    onDetailFiltersChange(
-      detailFilters.map((f) => (f.id === id ? { ...f, ...updates } : f)),
-    );
   };
 
   return (
@@ -197,67 +168,126 @@ const ArenaAverageFilter = ({
           </div>
         </div>
 
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-3 px-1">
-            <span className="text-[10px] font-black tracking-widest text-bpim-muted uppercase">
-              {t("arenaAvg.filter.label")}
-            </span>
-            <button
-              onClick={addFilter}
-              className="flex items-center gap-1 text-[10px] font-bold text-bpim-primary hover:text-bpim-primary/70 transition-colors"
-            >
-              <Plus className="h-3 w-3" />
-              {t("filter.scoreConditionAdd")}
-            </button>
-          </div>
-
-          {detailFilters.length > 0 && (
-            <div className="flex flex-col gap-2">
-              {detailFilters.map((filter) => (
-                <DetailFilterRow
-                  key={filter.id}
-                  filter={filter}
-                  onChange={(updates) => updateFilter(filter.id, updates)}
-                  onRemove={() => removeFilter(filter.id)}
-                />
-              ))}
-            </div>
-          )}
-        </div>
+        <DetailFilterSection
+          detailFilters={detailFilters}
+          onDetailFiltersChange={onDetailFiltersChange}
+        />
 
         {onDisplayMetricChange && displayMetric && (
-          <div className="border-t border-bpim-border pt-3">
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
-              <span className="text-[10px] font-black tracking-widest text-bpim-muted uppercase px-1 shrink-0">
-                {t("arenaAvg.filter.display")}
-              </span>
-              <RadioGroup
-                value={displayMetric}
-                onValueChange={(v) => onDisplayMetricChange(v as DisplayMetric)}
-                className="flex flex-nowrap items-center gap-6"
-              >
-                {DISPLAY_METRICS.map((opt) => (
-                  <div
-                    key={opt.value}
-                    className="flex items-center gap-1.5 shrink-0"
-                  >
-                    <RadioGroupItem
-                      value={opt.value}
-                      id={`metric-${opt.value}`}
-                      className="border-bpim-primary"
-                    />
-                    <Label
-                      htmlFor={`metric-${opt.value}`}
-                      className="cursor-pointer text-xs font-medium text-bpim-text whitespace-nowrap"
-                    >
-                      {opt.label}
-                    </Label>
-                  </div>
-                ))}
-              </RadioGroup>
-            </div>
-          </div>
+          <DisplayMetricToggle
+            displayMetric={displayMetric}
+            onDisplayMetricChange={onDisplayMetricChange}
+          />
         )}
+      </div>
+    </div>
+  );
+};
+
+const DetailFilterSection = ({
+  detailFilters,
+  onDetailFiltersChange,
+}: {
+  detailFilters: DetailFilter[];
+  onDetailFiltersChange: (filters: DetailFilter[]) => void;
+}) => {
+  const { t } = useTranslation();
+
+  const addFilter = () => {
+    onDetailFiltersChange([
+      ...detailFilters,
+      {
+        id: crypto.randomUUID(),
+        rank: "A1",
+        metric: "scoreRate",
+        operator: ">=",
+        value: "",
+      },
+    ]);
+  };
+
+  const removeFilter = (id: string) => {
+    onDetailFiltersChange(detailFilters.filter((f) => f.id !== id));
+  };
+
+  const updateFilter = (id: string, updates: Partial<DetailFilter>) => {
+    onDetailFiltersChange(
+      detailFilters.map((f) => (f.id === id ? { ...f, ...updates } : f)),
+    );
+  };
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center gap-3 px-1">
+        <span className="text-[10px] font-black tracking-widest text-bpim-muted uppercase">
+          {t("arenaAvg.filter.label")}
+        </span>
+        <button
+          onClick={addFilter}
+          className="flex items-center gap-1 text-[10px] font-bold text-bpim-primary hover:text-bpim-primary/70 transition-colors"
+        >
+          <Plus className="h-3 w-3" />
+          {t("filter.scoreConditionAdd")}
+        </button>
+      </div>
+
+      {detailFilters.length > 0 && (
+        <div className="flex flex-col gap-2">
+          {detailFilters.map((filter) => (
+            <DetailFilterRow
+              key={filter.id}
+              filter={filter}
+              onChange={(updates) => updateFilter(filter.id, updates)}
+              onRemove={() => removeFilter(filter.id)}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const DisplayMetricToggle = ({
+  displayMetric,
+  onDisplayMetricChange,
+}: {
+  displayMetric: DisplayMetric;
+  onDisplayMetricChange: (metric: DisplayMetric) => void;
+}) => {
+  const { t } = useTranslation();
+  const DISPLAY_METRICS = [
+    { value: "exScore", label: t("arenaAvg.metric.exScore") },
+    { value: "rate", label: t("arenaAvg.metric.scoreRate") },
+    { value: "bpi", label: "BPI" },
+  ] as const;
+
+  return (
+    <div className="border-t border-bpim-border pt-3">
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+        <span className="text-[10px] font-black tracking-widest text-bpim-muted uppercase px-1 shrink-0">
+          {t("arenaAvg.filter.display")}
+        </span>
+        <RadioGroup
+          value={displayMetric}
+          onValueChange={(v) => onDisplayMetricChange(v as DisplayMetric)}
+          className="flex flex-nowrap items-center gap-6"
+        >
+          {DISPLAY_METRICS.map((opt) => (
+            <div key={opt.value} className="flex items-center gap-1.5 shrink-0">
+              <RadioGroupItem
+                value={opt.value}
+                id={`metric-${opt.value}`}
+                className="border-bpim-primary"
+              />
+              <Label
+                htmlFor={`metric-${opt.value}`}
+                className="cursor-pointer text-xs font-medium text-bpim-text whitespace-nowrap"
+              >
+                {opt.label}
+              </Label>
+            </div>
+          ))}
+        </RadioGroup>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import type { ArenaAverageData } from "@/types/metrics/arena";
 import { RANK_TABLE } from "@/constants/iidx/rankBorders";
-import type { DetailFilter } from "@/components/partials/features/Metrics/LevelSelector/ui";
+import type { DetailFilter } from "@/components/partials/features/Metrics/ArenaAverageFilter/ui";
 
 /**
  * アリーナ平均一覧を、選択された難易度・楽曲名検索・詳細フィルタ（スコア・スコアレート・DJ RANK閾値）で絞り込む。
