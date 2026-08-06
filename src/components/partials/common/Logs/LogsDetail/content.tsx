@@ -136,22 +136,26 @@ const LogsDetailContent = ({
       )}
 
       <ShareResultModal
-        handleTabChange={(d) => handleTabChange(d.value)}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        elements={{
-          summary: summaryRef,
-          ranking: rankRef,
-          list: listRef,
-        }}
-        shareData={{
-          bpi: currentBpi,
-          diff: bpiDiff,
-          rank: currentRank,
-          updateCount: details.songs.length,
+        target={{
+          elements: {
+            summary: summaryRef,
+            ranking: rankRef,
+            list: listRef,
+          },
+          shareData: {
+            bpi: currentBpi,
+            diff: bpiDiff,
+            rank: currentRank,
+            updateCount: details.songs.length,
+          },
         }}
         onShare={share}
         isSharing={isSharing}
+        onShareTypeChange={(shareType) =>
+          handleTabChange(shareType === "list" ? "songs" : "summary")
+        }
       />
 
       <Tabs

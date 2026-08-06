@@ -12,46 +12,51 @@ import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
-interface ShareModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+interface ShareTarget {
   elements: {
     summary?: RefObject<HTMLElement | null>;
     ranking?: RefObject<HTMLElement | null>;
     list?: RefObject<HTMLElement | null>;
   };
   shareData: { bpi: number; diff: number; rank: number; updateCount: number };
+}
+
+interface ShareModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  target: ShareTarget;
   onShare: (
     element: HTMLElement | null,
     text: string,
     width?: number,
   ) => Promise<boolean>;
   isSharing: boolean;
-  handleTabChange: (details: { value: string }) => void;
+  /** 選択された共有種別が変わるたびに通知する。呼び出し元がタブ切り替え等の表示側の関心事を判断する */
+  onShareTypeChange?: (shareType: string) => void;
 }
 
 const ShareResultModal = ({
   isOpen,
   onClose,
-  shareData,
+  target,
   onShare,
   isSharing,
-  handleTabChange,
-  elements,
+  onShareTypeChange,
 }: ShareModalProps) => {
   const { t } = useTranslation();
   const [shareType, setShareType] = useState("summary");
 
   const handleExecute = async () => {
-    const target =
+    const { elements, shareData } = target;
+    const el =
       shareType === "summary"
         ? (elements.summary?.current ?? null)
         : shareType === "ranking"
           ? (elements.ranking?.current ?? null)
           : (elements.list?.current ?? null);
-    if (!target) return;
+    if (!el) return;
     const text = `${t("share.tweet.header")}\n${t("share.tweet.updateCount")}${shareData.updateCount}${t("share.tweet.countUnit")}\n\n${t("share.tweet.totalBpi")} ${shareData.bpi.toFixed(2)} (${shareData.diff >= 0 ? "+" : ""}${shareData.diff.toFixed(2)})\n${t("share.tweet.estimatedRank")} ${shareData.rank.toLocaleString()}${t("share.tweet.rankUnit")} #BPIM2 #IIDX\n${window.location.href}`;
-    if (await onShare(target, text)) onClose();
+    if (await onShare(el, text)) onClose();
   };
 
   const options = [
@@ -88,7 +93,7 @@ const ShareResultModal = ({
             value={shareType}
             onValueChange={(val) => {
               setShareType(val);
-              handleTabChange({ value: val === "list" ? "songs" : "summary" });
+              onShareTypeChange?.(val);
             }}
             className="flex flex-col gap-4"
           >
