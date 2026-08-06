@@ -20,6 +20,33 @@ import CustomGoalModal from "./CustomGoalModal";
 import { CustomGoalConfig, GoalType, CardDisplay } from "@/types/metrics/aaa";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
+function useDistToGoalDraft(
+  maxDiffFilter: number | undefined,
+  onMaxDiffFilterChange: (v: number | undefined) => void,
+) {
+  const [draftDiff, setDraftDiff] = useState<string>(
+    maxDiffFilter !== undefined ? String(maxDiffFilter) : "",
+  );
+  const [isPending, setIsPending] = useState(false);
+
+  useEffect(() => {
+    // draftDiffの変更を検知した瞬間にpending表示を出すためのデバウンス起点
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsPending(true);
+    const timer = setTimeout(() => {
+      const v = draftDiff.trim();
+      onMaxDiffFilterChange(v === "" ? undefined : Math.max(0, Number(v)));
+      setIsPending(false);
+    }, 400);
+    return () => clearTimeout(timer);
+    // onMaxDiffFilterChangeを依存に含めると、親の再レンダーで関数の参照が変わる
+    // たびにデバウンスタイマーがリセットされてしまうため、draftDiffの変化時のみ
+    // 再実行したく意図的に除外する
+  }, [draftDiff]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  return { draftDiff, setDraftDiff, isPending };
+}
+
 interface Props {
   version: { value: string; onChange: (v: string) => void };
   level: { value: number; onChange: (l: number) => void };
@@ -68,25 +95,10 @@ const AAATableFilter = ({
     cardDisplayProp;
   const { t } = useTranslation();
   const [modalOpen, setModalOpen] = useState(false);
-  const [draftDiff, setDraftDiff] = useState<string>(
-    maxDiffFilter !== undefined ? String(maxDiffFilter) : "",
+  const { draftDiff, setDraftDiff, isPending } = useDistToGoalDraft(
+    maxDiffFilter,
+    onMaxDiffFilterChange,
   );
-  const [isPending, setIsPending] = useState(false);
-
-  useEffect(() => {
-    // draftDiffの変更を検知した瞬間にpending表示を出すためのデバウンス起点
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setIsPending(true);
-    const timer = setTimeout(() => {
-      const v = draftDiff.trim();
-      onMaxDiffFilterChange(v === "" ? undefined : Math.max(0, Number(v)));
-      setIsPending(false);
-    }, 400);
-    return () => clearTimeout(timer);
-    // onMaxDiffFilterChangeを依存に含めると、親の再レンダーで関数の参照が変わる
-    // たびにデバウンスタイマーがリセットされてしまうため、draftDiffの変化時のみ
-    // 再実行したく意図的に除外する
-  }, [draftDiff]); // eslint-disable-line react-hooks/exhaustive-deps
   const sections = [
     {
       id: "version",
