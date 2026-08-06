@@ -24,16 +24,20 @@ import CalendarPicker from "./calendar";
 import dayjs from "@/lib/dayjs";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
+interface HistoricalComparisonData {
+  stats?: TotalBpiStats;
+  isLoading: boolean;
+  defaultCompareDate?: string;
+}
+
 interface CurrentBpiCardProps {
   currentStats?: TotalBpiStats;
-  historicalStats?: TotalBpiStats;
   activeDates: string[];
   isActiveDatesLoading: boolean;
   isLoading: boolean;
-  isHistoricalLoading: boolean;
   selectedDate: string | null;
-  defaultCompareDate?: string;
   onDateSelect: (date: string | null) => void;
+  historicalComparison: HistoricalComparisonData;
   areaRank?: {
     area: string | null;
     areaRank: number | null;
@@ -41,16 +45,100 @@ interface CurrentBpiCardProps {
   } | null;
 }
 
+const HistoricalComparison = ({
+  bpi,
+  selectedDate,
+  onDateSelect,
+  comparison,
+}: {
+  bpi: number;
+  selectedDate: string | null;
+  onDateSelect: (date: string | null) => void;
+  comparison: HistoricalComparisonData;
+}) => {
+  const { t } = useTranslation();
+  const effectiveDate = selectedDate ?? comparison.defaultCompareDate ?? null;
+  const delta =
+    effectiveDate && comparison.stats != null
+      ? bpi - comparison.stats.totalBpi
+      : null;
+
+  return (
+    <div className="mt-5 min-h-10.5">
+      {effectiveDate ? (
+        <div
+          className={cn(
+            "flex items-center gap-3 rounded-lg border px-3 py-2 transition-all",
+            selectedDate
+              ? "border-bpim-primary/30 bg-bpim-primary/5"
+              : "border-bpim-border bg-bpim-surface-2/60",
+          )}
+        >
+          <div className="flex items-center gap-2 shrink-0">
+            <HistoryIcon className="size-3 text-bpim-muted" />
+            <span className="font-mono text-[11px] font-medium text-bpim-muted">
+              {dayjs(effectiveDate).format("YYYY-MM-DD")}
+            </span>
+          </div>
+          <div className="flex items-center gap-3 flex-1">
+            {comparison.isLoading ? (
+              <Skeleton className="h-4 w-24" />
+            ) : (
+              comparison.stats && (
+                <>
+                  <span className="font-mono text-sm text-bpim-muted">
+                    {comparison.stats.totalBpi.toFixed(2)}
+                  </span>
+                  <span
+                    className={cn(
+                      "flex items-center gap-1 font-mono text-sm font-bold",
+                      delta! > 0
+                        ? "text-bpim-success"
+                        : delta! < 0
+                          ? "text-bpim-danger"
+                          : "text-bpim-muted",
+                    )}
+                  >
+                    {delta! > 0 ? (
+                      <TrendingUpIcon className="size-3.5" />
+                    ) : delta! < 0 ? (
+                      <TrendingDownIcon className="size-3.5" />
+                    ) : null}
+                    {delta! > 0 ? "+" : ""}
+                    {delta!.toFixed(2)}
+                  </span>
+                </>
+              )
+            )}
+          </div>
+          {selectedDate && (
+            <button
+              onClick={() => onDateSelect(null)}
+              className="ml-auto p-1 text-bpim-muted hover:text-bpim-danger"
+            >
+              <XIcon className="size-3.5" />
+            </button>
+          )}
+        </div>
+      ) : (
+        <div className="flex h-full items-center justify-center rounded-lg border border-dashed border-bpim-border/50 py-2.5">
+          <span className="text-[10px] text-bpim-muted/40 font-medium">
+            {t("dashboard.currentBpi.setDateHint")}
+          </span>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const CurrentBpiCard = ({
   currentStats,
-  historicalStats,
   activeDates,
   isActiveDatesLoading,
   isLoading,
-  isHistoricalLoading,
   selectedDate,
-  defaultCompareDate,
   onDateSelect,
+  historicalComparison,
   areaRank,
 }: CurrentBpiCardProps) => {
   const [calendarOpen, setCalendarOpen] = useState(false);
@@ -76,12 +164,6 @@ const CurrentBpiCard = ({
       month: target.month(),
     };
   }, [selectedDate, activeDates]);
-
-  const effectiveDate = selectedDate ?? defaultCompareDate ?? null;
-  const delta =
-    effectiveDate && historicalStats != null
-      ? bpi - historicalStats.totalBpi
-      : null;
 
   if (isLoading) return <CurrentBpiSkeleton />;
 
@@ -172,70 +254,12 @@ const CurrentBpiCard = ({
           )}
       </div>
 
-      <div className="mt-5 min-h-10.5">
-        {effectiveDate ? (
-          <div
-            className={cn(
-              "flex items-center gap-3 rounded-lg border px-3 py-2 transition-all",
-              selectedDate
-                ? "border-bpim-primary/30 bg-bpim-primary/5"
-                : "border-bpim-border bg-bpim-surface-2/60",
-            )}
-          >
-            <div className="flex items-center gap-2 shrink-0">
-              <HistoryIcon className="size-3 text-bpim-muted" />
-              <span className="font-mono text-[11px] font-medium text-bpim-muted">
-                {dayjs(effectiveDate).format("YYYY-MM-DD")}
-              </span>
-            </div>
-            <div className="flex items-center gap-3 flex-1">
-              {isHistoricalLoading ? (
-                <Skeleton className="h-4 w-24" />
-              ) : (
-                historicalStats && (
-                  <>
-                    <span className="font-mono text-sm text-bpim-muted">
-                      {historicalStats.totalBpi.toFixed(2)}
-                    </span>
-                    <span
-                      className={cn(
-                        "flex items-center gap-1 font-mono text-sm font-bold",
-                        delta! > 0
-                          ? "text-bpim-success"
-                          : delta! < 0
-                            ? "text-bpim-danger"
-                            : "text-bpim-muted",
-                      )}
-                    >
-                      {delta! > 0 ? (
-                        <TrendingUpIcon className="size-3.5" />
-                      ) : delta! < 0 ? (
-                        <TrendingDownIcon className="size-3.5" />
-                      ) : null}
-                      {delta! > 0 ? "+" : ""}
-                      {delta!.toFixed(2)}
-                    </span>
-                  </>
-                )
-              )}
-            </div>
-            {selectedDate && (
-              <button
-                onClick={() => onDateSelect(null)}
-                className="ml-auto p-1 text-bpim-muted hover:text-bpim-danger"
-              >
-                <XIcon className="size-3.5" />
-              </button>
-            )}
-          </div>
-        ) : (
-          <div className="flex h-full items-center justify-center rounded-lg border border-dashed border-bpim-border/50 py-2.5">
-            <span className="text-[10px] text-bpim-muted/40 font-medium">
-              {t("dashboard.currentBpi.setDateHint")}
-            </span>
-          </div>
-        )}
-      </div>
+      <HistoricalComparison
+        bpi={bpi}
+        selectedDate={selectedDate}
+        onDateSelect={onDateSelect}
+        comparison={historicalComparison}
+      />
     </DashCard>
   );
 };

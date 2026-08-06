@@ -58,14 +58,16 @@ const CurrentBpiSection = ({ userId }: { userId: string }) => {
   return (
     <CurrentBpiCard
       currentStats={currentStats}
-      historicalStats={compareDate ? historicalStats : undefined}
       activeDates={activeDates}
       isActiveDatesLoading={isActiveDatesLoading}
       isLoading={isLoading}
-      isHistoricalLoading={isHistoricalLoading}
       selectedDate={selectedDate}
-      defaultCompareDate={defaultCompareDate}
       onDateSelect={setSelectedDate}
+      historicalComparison={{
+        stats: compareDate ? historicalStats : undefined,
+        isLoading: isHistoricalLoading,
+        defaultCompareDate,
+      }}
       areaRank={currentStats}
     />
   );
