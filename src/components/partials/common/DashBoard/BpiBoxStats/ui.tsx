@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   ComposedChart,
   Area,
@@ -201,8 +201,10 @@ const BpiBoxStatsChart = ({
     median: true,
     band: true,
     minMax: false,
-    efficiency: true,
   });
+  const [efficiencyOverride, setEfficiencyOverride] = useState<
+    boolean | null
+  >(null);
 
   const TITLE_MAP: Record<StatsGroupBy, string> = {
     day: t("dashboard.bpiBoxStats.titleDay"),
@@ -210,14 +212,11 @@ const BpiBoxStatsChart = ({
     month: t("dashboard.bpiBoxStats.titleMonth"),
   };
 
-  useEffect(() => {
-    if (!isLoading && data && data.length > 0) {
-      const hasAnyEfficiency = data.some((d) => (d.efficiency ?? 0) > 0);
-      // データ読み込み完了時にefficiency系列の表示可否を自動切り替えするための同期
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setVisible((prev) => ({ ...prev, efficiency: hasAnyEfficiency }));
-    }
-  }, [data, isLoading]);
+  const hasAnyEfficiency = useMemo(
+    () => (data ? data.some((d) => (d.efficiency ?? 0) > 0) : false),
+    [data],
+  );
+  const efficiencyVisible = efficiencyOverride ?? hasAnyEfficiency;
 
   const { chartData, ticks, startIndex } = useMemo(() => {
     if (!data || data.length === 0)
@@ -281,10 +280,8 @@ const BpiBoxStatsChart = ({
 
           <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1.5 text-[10px] text-bpim-muted">
             <button
-              onClick={() =>
-                setVisible((v) => ({ ...v, efficiency: !v.efficiency }))
-              }
-              className={`flex items-center gap-1 transition-opacity ${visible.efficiency ? "opacity-100" : "opacity-40"}`}
+              onClick={() => setEfficiencyOverride(!efficiencyVisible)}
+              className={`flex items-center gap-1 transition-opacity ${efficiencyVisible ? "opacity-100" : "opacity-40"}`}
             >
               <span className="inline-block h-px w-3 border-t border-dashed border-bpim-warning" />{" "}
               {t("dashboard.bpiBoxStats.efficiencyPct")}
@@ -355,13 +352,13 @@ const BpiBoxStatsChart = ({
               tickFormatter={(v) => `${v}%`}
               axisLine={false}
               tickLine={false}
-              hide={!visible.efficiency}
+              hide={!efficiencyVisible}
               width={40}
             />
 
             <Tooltip content={<BpiBoxTooltip />} cursor={{ stroke: c.grid }} />
 
-            {visible.efficiency && (
+            {efficiencyVisible && (
               <Line
                 yAxisId="right"
                 type="monotone"
