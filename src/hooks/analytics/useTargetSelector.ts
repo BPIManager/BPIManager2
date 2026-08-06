@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Users,
   User,
@@ -138,20 +138,24 @@ export function useTargetSelector({
     current?.kind === "self-version" ? (current.param ?? "") : "",
   );
 
-  useEffect(() => {
-    if (isOpen) {
-      // モーダルを開くたびに確定済みcurrentから選択状態をリセットする
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setStep("kind");
-      setSelectedKind(current?.kind ?? null);
-      setSelectedArenaRank(
-        current?.kind === "arena" ? (current.param ?? "A1") : "A1",
-      );
-      setSelectedSelfVersion(
-        current?.kind === "self-version" ? (current.param ?? "") : "",
-      );
-    }
-  }, [isOpen, current]);
+  // モーダルを開いた瞬間、またはモーダルが開いている間にcurrentが変わった時だけ
+  // 選択状態を確定済みcurrentからrender中に同期的にリセットする
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+  const [prevCurrent, setPrevCurrent] = useState(current);
+  if (isOpen && (!prevIsOpen || current !== prevCurrent)) {
+    setPrevIsOpen(true);
+    setPrevCurrent(current);
+    setStep("kind");
+    setSelectedKind(current?.kind ?? null);
+    setSelectedArenaRank(
+      current?.kind === "arena" ? (current.param ?? "A1") : "A1",
+    );
+    setSelectedSelfVersion(
+      current?.kind === "self-version" ? (current.param ?? "") : "",
+    );
+  } else if (!isOpen && prevIsOpen) {
+    setPrevIsOpen(false);
+  }
 
   const handleKindClick = (opt: KindOption) => {
     setSelectedKind(opt.kind);
