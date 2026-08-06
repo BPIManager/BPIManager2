@@ -11,15 +11,11 @@ import { ProfileProvider } from "@/contexts/profile/ProfileContext";
 import { FilterProvider } from "@/contexts/stats/FilterContext";
 import { PageLoader } from "@/components/ui/loading-spinner";
 
-type UseProfileResult = ReturnType<typeof useProfile>;
-
 interface ProfileLayoutShellProps {
   userId: string;
   bannerType: "user" | "rival";
-  /** サイドバーの隣(lg:col-span-3)に描画するタブ本体 */
-  children: (ctx: {
-    profile: NonNullable<UseProfileResult["profile"]>;
-  }) => ReactNode;
+  /** サイドバーの隣(lg:col-span-3)に描画するタブ本体。profileは`useStaticProfile()`で取得する */
+  children: () => ReactNode;
 }
 
 /**
@@ -101,13 +97,12 @@ const ProfileLayoutShell = ({
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
               <aside className="lg:col-span-1">
                 <ProfileSideBar
-                  profile={profile}
                   onFollowToggle={toggleFollow}
                   isUpdating={isUpdating}
                 />
               </aside>
 
-              <div className="lg:col-span-3">{children({ profile })}</div>
+              <div className="lg:col-span-3">{children()}</div>
             </div>
           </PageContainer>
         </DashboardLayout>

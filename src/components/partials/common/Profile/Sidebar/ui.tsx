@@ -21,8 +21,8 @@ import FollowSection from "@/components/partials/common/FollowSection";
 import FollowStats from "./followCount";
 import { formatIIDXId } from "@/utils/common/formatIidxId";
 import { XIcon } from "@/components/partials/common/Auth/Buttons";
-import { UserProfileData } from "@/types/users/profile";
 import RoleBadge from "@/components/partials/common/Badge/UserRole";
+import { useStaticProfile } from "@/contexts/profile/ProfileContext";
 import {
   ChevronDown,
   ExternalLink,
@@ -48,14 +48,13 @@ const ROLE_HEADER: Record<RoleKey, { from: string; Icon: typeof Coffee }> = {
 };
 
 const ProfileSideBar = ({
-  profile,
   onFollowToggle,
   isUpdating = false,
 }: {
-  profile: UserProfileData;
   onFollowToggle?: () => void;
   isUpdating?: boolean;
 }) => {
+  const { profile } = useStaticProfile();
   const [historyOpen, setHistoryOpen] = useState(false);
   const { t } = useTranslation();
 
