@@ -27,14 +27,10 @@ const BpiOptimizerSection = () => {
     searchMode,
     setSearchMode,
     strategies,
-    levels,
-    difficulties,
     radarElements,
     handleSubmit,
     handleKeyDown,
     toggleStrategy,
-    toggleLevel,
-    toggleDifficulty,
     toggleRadarElement,
     result,
     setResult,
@@ -108,8 +104,6 @@ const BpiOptimizerSection = () => {
         inputError={inputError}
         isLoading={isLoading}
         strategies={{ value: strategies, onToggle: toggleStrategy }}
-        levels={{ value: levels, onToggle: toggleLevel }}
-        difficulties={{ value: difficulties, onToggle: toggleDifficulty }}
         radarElements={{ value: radarElements, onToggle: toggleRadarElement }}
         strongRadarCategories={strongRadarCategories}
         weakRadarCategories={weakRadarCategories}

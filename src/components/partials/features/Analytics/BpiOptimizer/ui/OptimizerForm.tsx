@@ -34,8 +34,6 @@ interface OptimizerFormProps {
   inputError: boolean;
   isLoading: boolean;
   strategies: OptimizerFilterGroup<OptimizerStrategy>;
-  levels: OptimizerFilterGroup<string>;
-  difficulties: OptimizerFilterGroup<string>;
   radarElements: OptimizerFilterGroup<RadarCategory>;
   strongRadarCategories: RadarCategory[];
   weakRadarCategories: RadarCategory[];
@@ -48,37 +46,23 @@ interface OptimizerFormProps {
   onConsiderCurrentTotalBpiChange: (v: boolean) => void;
 }
 
-const OptimizerForm = ({
+const TargetInputSection = ({
   targetBpiInput,
   onTargetBpiChange,
+  onKeyDown,
+  inputError,
   maxStepsInput,
   onMaxStepsChange,
-  onKeyDown,
-  onSubmit,
-  inputError,
-  isLoading,
-  strategies,
-  currentTotalBpi,
-  searchMode,
-  onSearchModeChange,
-  considerCurrentTotalBpi,
-  onConsiderCurrentTotalBpiChange,
-  radarElements,
-  strongRadarCategories,
-  weakRadarCategories,
-}: OptimizerFormProps) => {
+}: {
+  targetBpiInput: string;
+  onTargetBpiChange: (v: string) => void;
+  onKeyDown: (e: React.KeyboardEvent) => void;
+  inputError: boolean;
+  maxStepsInput: string;
+  onMaxStepsChange: (v: string) => void;
+}) => {
   const { t } = useTranslation();
   return (
-  <div className="rounded-2xl border border-bpim-border bg-bpim-surface p-5 flex flex-col gap-6 shadow-lg">
-    <div className="flex items-center justify-between border-b border-bpim-border pb-2">
-      <h2 className="text-sm font-bold flex items-center gap-2">{t("optimizer.form.settings")}</h2>
-      {currentTotalBpi !== null && (
-        <div className="flex items-center gap-2 text-[11px] font-bold text-bpim-muted bg-bpim-bg px-2 py-2 rounded-full">
-          {t("optimizer.currentBpiLabel")}: <BpiChip bpi={currentTotalBpi} size="xs" />
-        </div>
-      )}
-    </div>
-
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div className="space-y-2">
         <Label className="text-xs font-black text-bpim-muted uppercase tracking-tighter">
@@ -111,111 +95,142 @@ const OptimizerForm = ({
         />
       </div>
     </div>
+  );
+};
 
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-      <div className="space-y-3">
-        <Label className="text-[10px] font-black text-bpim-muted uppercase tracking-widest">
-          {t("optimizer.algorithmLabel")}
-        </Label>
-        <div className="flex p-1 bg-bpim-bg rounded-xl border border-bpim-border">
-          {[
-            { id: "fastest", label: t("optimizer.mode.fastest.label"), desc: t("optimizer.mode.fastest.desc") },
-            { id: "flexible", label: t("optimizer.mode.flexible.label"), desc: t("optimizer.mode.flexible.desc") },
-          ].map((mode) => (
-            <button
-              key={mode.id}
-              onClick={() =>
-                onSearchModeChange(mode.id as "fastest" | "flexible")
-              }
-              className={cn(
-                "flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex flex-col items-center",
-                searchMode === mode.id
-                  ? "bg-bpim-surface text-bpim-primary shadow-sm ring-1 ring-bpim-border"
-                  : "text-bpim-subtle hover:text-bpim-text",
-              )}
-            >
-              <span>{mode.label}</span>
-              <span className="text-[9px] opacity-60 font-normal">
-                {mode.desc}
-              </span>
-            </button>
-          ))}
-        </div>
-        <label
-          className={cn(
-            "flex items-center gap-3 p-2 rounded-lg border cursor-pointer transition-colors",
-            considerCurrentTotalBpi
-              ? "border-bpim-primary/40 bg-bpim-primary/5"
-              : "border-bpim-border bg-bpim-bg hover:bg-bpim-overlay",
-          )}
-        >
-          <Checkbox
-            checked={considerCurrentTotalBpi}
-            onCheckedChange={(checked) =>
-              onConsiderCurrentTotalBpiChange(checked === true)
+const AlgorithmSection = ({
+  searchMode,
+  onSearchModeChange,
+  considerCurrentTotalBpi,
+  onConsiderCurrentTotalBpiChange,
+}: {
+  searchMode: "fastest" | "flexible";
+  onSearchModeChange: (mode: "fastest" | "flexible") => void;
+  considerCurrentTotalBpi: boolean;
+  onConsiderCurrentTotalBpiChange: (v: boolean) => void;
+}) => {
+  const { t } = useTranslation();
+  return (
+    <div className="space-y-3">
+      <Label className="text-[10px] font-black text-bpim-muted uppercase tracking-widest">
+        {t("optimizer.algorithmLabel")}
+      </Label>
+      <div className="flex p-1 bg-bpim-bg rounded-xl border border-bpim-border">
+        {[
+          { id: "fastest", label: t("optimizer.mode.fastest.label"), desc: t("optimizer.mode.fastest.desc") },
+          { id: "flexible", label: t("optimizer.mode.flexible.label"), desc: t("optimizer.mode.flexible.desc") },
+        ].map((mode) => (
+          <button
+            key={mode.id}
+            onClick={() =>
+              onSearchModeChange(mode.id as "fastest" | "flexible")
             }
-            className="sr-only"
-          />
-          <TrendingUp
             className={cn(
-              "h-3.5 w-3.5",
-              considerCurrentTotalBpi
-                ? "text-bpim-primary"
-                : "text-bpim-subtle",
+              "flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex flex-col items-center",
+              searchMode === mode.id
+                ? "bg-bpim-surface text-bpim-primary shadow-sm ring-1 ring-bpim-border"
+                : "text-bpim-subtle hover:text-bpim-text",
             )}
-          />
-          <span className="text-xs font-bold">
-            {t("optimizer.considerCurrentBpiLabel")}
-          </span>
-        </label>
+          >
+            <span>{mode.label}</span>
+            <span className="text-[9px] opacity-60 font-normal">
+              {mode.desc}
+            </span>
+          </button>
+        ))}
       </div>
+      <label
+        className={cn(
+          "flex items-center gap-3 p-2 rounded-lg border cursor-pointer transition-colors",
+          considerCurrentTotalBpi
+            ? "border-bpim-primary/40 bg-bpim-primary/5"
+            : "border-bpim-border bg-bpim-bg hover:bg-bpim-overlay",
+        )}
+      >
+        <Checkbox
+          checked={considerCurrentTotalBpi}
+          onCheckedChange={(checked) =>
+            onConsiderCurrentTotalBpiChange(checked === true)
+          }
+          className="sr-only"
+        />
+        <TrendingUp
+          className={cn(
+            "h-3.5 w-3.5",
+            considerCurrentTotalBpi ? "text-bpim-primary" : "text-bpim-subtle",
+          )}
+        />
+        <span className="text-xs font-bold">
+          {t("optimizer.considerCurrentBpiLabel")}
+        </span>
+      </label>
+    </div>
+  );
+};
 
-      <div className="space-y-3">
-        <Label className="text-[10px] font-black text-bpim-muted uppercase tracking-widest">
-          {t("optimizer.playStyleLabel")}
-        </Label>
-        <div className="grid grid-cols-1 gap-2">
-          {[
-            {
-              key: "unplayed",
-              label: t("optimizer.strategy.unplayed"),
-              icon: CircleDashed,
-            },
-            { key: "played", label: t("optimizer.strategy.played"), icon: TrendingUp },
-          ].map((item) => (
-            <label
-              key={item.key}
+const PlayStyleSection = ({
+  strategies,
+}: {
+  strategies: OptimizerFilterGroup<OptimizerStrategy>;
+}) => {
+  const { t } = useTranslation();
+  return (
+    <div className="space-y-3">
+      <Label className="text-[10px] font-black text-bpim-muted uppercase tracking-widest">
+        {t("optimizer.playStyleLabel")}
+      </Label>
+      <div className="grid grid-cols-1 gap-2">
+        {[
+          {
+            key: "unplayed",
+            label: t("optimizer.strategy.unplayed"),
+            icon: CircleDashed,
+          },
+          { key: "played", label: t("optimizer.strategy.played"), icon: TrendingUp },
+        ].map((item) => (
+          <label
+            key={item.key}
+            className={cn(
+              "flex items-center gap-3 p-2 rounded-lg border cursor-pointer transition-colors",
+              strategies.value.includes(item.key as OptimizerStrategy)
+                ? "border-bpim-primary/40 bg-bpim-primary/5"
+                : "border-bpim-border bg-bpim-bg hover:bg-bpim-overlay",
+            )}
+          >
+            <Checkbox
+              checked={strategies.value.includes(item.key as OptimizerStrategy)}
+              onCheckedChange={() =>
+                strategies.onToggle(item.key as OptimizerStrategy)
+              }
+              className="sr-only"
+            />
+            <item.icon
               className={cn(
-                "flex items-center gap-3 p-2 rounded-lg border cursor-pointer transition-colors",
+                "h-3.5 w-3.5",
                 strategies.value.includes(item.key as OptimizerStrategy)
-                  ? "border-bpim-primary/40 bg-bpim-primary/5"
-                  : "border-bpim-border bg-bpim-bg hover:bg-bpim-overlay",
+                  ? "text-bpim-primary"
+                  : "text-bpim-subtle",
               )}
-            >
-              <Checkbox
-                checked={strategies.value.includes(
-                  item.key as OptimizerStrategy,
-                )}
-                onCheckedChange={() =>
-                  strategies.onToggle(item.key as OptimizerStrategy)
-                }
-                className="sr-only"
-              />
-              <item.icon
-                className={cn(
-                  "h-3.5 w-3.5",
-                  strategies.value.includes(item.key as OptimizerStrategy)
-                    ? "text-bpim-primary"
-                    : "text-bpim-subtle",
-                )}
-              />
-              <span className="text-xs font-bold">{item.label}</span>
-            </label>
-          ))}
-        </div>
+            />
+            <span className="text-xs font-bold">{item.label}</span>
+          </label>
+        ))}
       </div>
     </div>
+  );
+};
 
+const RadarFilterSection = ({
+  radarElements,
+  strongRadarCategories,
+  weakRadarCategories,
+}: {
+  radarElements: OptimizerFilterGroup<RadarCategory>;
+  strongRadarCategories: RadarCategory[];
+  weakRadarCategories: RadarCategory[];
+}) => {
+  const { t } = useTranslation();
+  return (
     <div className="space-y-3">
       <div className="flex items-center gap-2">
         <Label className="text-[10px] font-black text-bpim-muted uppercase tracking-widest">
@@ -268,6 +283,64 @@ const OptimizerForm = ({
         })}
       </div>
     </div>
+  );
+};
+
+const OptimizerForm = ({
+  targetBpiInput,
+  onTargetBpiChange,
+  maxStepsInput,
+  onMaxStepsChange,
+  onKeyDown,
+  onSubmit,
+  inputError,
+  isLoading,
+  strategies,
+  currentTotalBpi,
+  searchMode,
+  onSearchModeChange,
+  considerCurrentTotalBpi,
+  onConsiderCurrentTotalBpiChange,
+  radarElements,
+  strongRadarCategories,
+  weakRadarCategories,
+}: OptimizerFormProps) => {
+  const { t } = useTranslation();
+  return (
+  <div className="rounded-2xl border border-bpim-border bg-bpim-surface p-5 flex flex-col gap-6 shadow-lg">
+    <div className="flex items-center justify-between border-b border-bpim-border pb-2">
+      <h2 className="text-sm font-bold flex items-center gap-2">{t("optimizer.form.settings")}</h2>
+      {currentTotalBpi !== null && (
+        <div className="flex items-center gap-2 text-[11px] font-bold text-bpim-muted bg-bpim-bg px-2 py-2 rounded-full">
+          {t("optimizer.currentBpiLabel")}: <BpiChip bpi={currentTotalBpi} size="xs" />
+        </div>
+      )}
+    </div>
+
+    <TargetInputSection
+      targetBpiInput={targetBpiInput}
+      onTargetBpiChange={onTargetBpiChange}
+      onKeyDown={onKeyDown}
+      inputError={inputError}
+      maxStepsInput={maxStepsInput}
+      onMaxStepsChange={onMaxStepsChange}
+    />
+
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <AlgorithmSection
+        searchMode={searchMode}
+        onSearchModeChange={onSearchModeChange}
+        considerCurrentTotalBpi={considerCurrentTotalBpi}
+        onConsiderCurrentTotalBpiChange={onConsiderCurrentTotalBpiChange}
+      />
+      <PlayStyleSection strategies={strategies} />
+    </div>
+
+    <RadarFilterSection
+      radarElements={radarElements}
+      strongRadarCategories={strongRadarCategories}
+      weakRadarCategories={weakRadarCategories}
+    />
 
     <OptimizerGuide />
 
