@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { FilterParamsFrontend } from "@/types/songs/score";
 
 import {
@@ -43,98 +43,107 @@ interface Props {
   onParamsChange: (params: Partial<FilterParamsFrontend>) => void;
 }
 
+interface AdvancedFilterModalBodyProps {
+  initialParams: FilterParamsFrontend;
+  onApply: (params: FilterParamsFrontend) => void;
+}
+
+const AdvancedFilterModalBody = ({
+  initialParams,
+  onApply,
+}: AdvancedFilterModalBodyProps) => {
+  const { t } = useTranslation();
+  const [localParams, setLocalParams] =
+    useState<FilterParamsFrontend>(initialParams);
+
+  const updateLocal = (val: Partial<FilterParamsFrontend>) => {
+    setLocalParams((prev) => ({ ...prev, ...val }));
+  };
+
+  return (
+    <>
+      <DialogHeader>
+        <DialogTitle className="text-base font-bold">
+          {t("filter.advancedFilter")}
+        </DialogTitle>
+      </DialogHeader>
+
+      <div className="flex flex-col gap-6 py-4 overflow-y-auto max-h-[70vh] pr-2 scrollbar-thin">
+        <BpmSection
+          bpmMin={localParams.bpmMin}
+          bpmMax={localParams.bpmMax}
+          isSofran={localParams.isSofran}
+          onChange={updateLocal}
+        />
+        <Separator className="bg-bpim-surface-2/60" />
+        <ClearStateSection
+          clearStates={localParams.clearStates}
+          onChange={updateLocal}
+        />
+        <Separator className="bg-bpim-surface-2/60" />
+        <DateSection
+          since={localParams.since}
+          until={localParams.until}
+          onChange={updateLocal}
+        />
+        <Separator className="bg-bpim-surface-2/60" />
+        <VersionSection versions={localParams.versions} onChange={updateLocal} />
+        <Separator className="bg-bpim-surface-2/60" />
+        <RadarSection
+          radarCategories={localParams.radarCategories}
+          onChange={updateLocal}
+        />
+        <Separator className="bg-bpim-surface-2/60" />
+        <ScoreFilterSection
+          scoreFilters={localParams.scoreFilters}
+          onChange={updateLocal}
+        />
+        <Separator className="bg-bpim-surface-2/60" />
+        <MissCountSection
+          missCountMin={localParams.missCountMin}
+          missCountMax={localParams.missCountMax}
+          onChange={updateLocal}
+        />
+      </div>
+
+      <DialogFooter className="gap-2 sm:gap-0">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setLocalParams(EMPTY_PARAMS)}
+          className="text-bpim-muted"
+        >
+          {t("filter.reset")}
+        </Button>
+        <Button
+          className="bg-bpim-primary font-bold hover:bg-bpim-primary"
+          size="sm"
+          onClick={() => onApply(localParams)}
+        >
+          {t("filter.apply")}
+        </Button>
+      </DialogFooter>
+    </>
+  );
+};
+
 const AdvancedFilterModal = ({
   isOpen,
   onClose,
   params,
   onParamsChange,
 }: Props) => {
-  const { t } = useTranslation();
-  const [localParams, setLocalParams] = useState<FilterParamsFrontend>(params);
-
-  useEffect(() => {
-    // モーダルを開くたびに親の確定済みparamsで下書きをリセットする
-    // (未適用の編集を次回オープン時まで持ち越さないため)
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (isOpen) setLocalParams(params);
-  }, [isOpen, params]);
-
-  const updateLocal = (val: Partial<FilterParamsFrontend>) => {
-    setLocalParams((prev) => ({ ...prev, ...val }));
-  };
-
-  const handleApply = () => {
-    onParamsChange(localParams);
-    onClose();
-  };
-
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-2xl border-bpim-border p-6 text-bpim-text">
-        <DialogHeader>
-          <DialogTitle className="text-base font-bold">
-            {t("filter.advancedFilter")}
-          </DialogTitle>
-        </DialogHeader>
-
-        <div className="flex flex-col gap-6 py-4 overflow-y-auto max-h-[70vh] pr-2 scrollbar-thin">
-          <BpmSection
-            bpmMin={localParams.bpmMin}
-            bpmMax={localParams.bpmMax}
-            isSofran={localParams.isSofran}
-            onChange={updateLocal}
-          />
-          <Separator className="bg-bpim-surface-2/60" />
-          <ClearStateSection
-            clearStates={localParams.clearStates}
-            onChange={updateLocal}
-          />
-          <Separator className="bg-bpim-surface-2/60" />
-          <DateSection
-            since={localParams.since}
-            until={localParams.until}
-            onChange={updateLocal}
-          />
-          <Separator className="bg-bpim-surface-2/60" />
-          <VersionSection
-            versions={localParams.versions}
-            onChange={updateLocal}
-          />
-          <Separator className="bg-bpim-surface-2/60" />
-          <RadarSection
-            radarCategories={localParams.radarCategories}
-            onChange={updateLocal}
-          />
-          <Separator className="bg-bpim-surface-2/60" />
-          <ScoreFilterSection
-            scoreFilters={localParams.scoreFilters}
-            onChange={updateLocal}
-          />
-          <Separator className="bg-bpim-surface-2/60" />
-          <MissCountSection
-            missCountMin={localParams.missCountMin}
-            missCountMax={localParams.missCountMax}
-            onChange={updateLocal}
-          />
-        </div>
-
-        <DialogFooter className="gap-2 sm:gap-0">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setLocalParams(EMPTY_PARAMS)}
-            className="text-bpim-muted"
-          >
-            {t("filter.reset")}
-          </Button>
-          <Button
-            className="bg-bpim-primary font-bold hover:bg-bpim-primary"
-            size="sm"
-            onClick={handleApply}
-          >
-            {t("filter.apply")}
-          </Button>
-        </DialogFooter>
+        <AdvancedFilterModalBody
+          key={isOpen ? JSON.stringify(params) : "closed"}
+          initialParams={params}
+          onApply={(next) => {
+            onParamsChange(next);
+            onClose();
+          }}
+        />
       </DialogContent>
     </Dialog>
   );
