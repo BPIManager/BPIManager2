@@ -33,7 +33,7 @@ export const RivalRankingBody = ({
   notes,
   onNavigate,
 }: RivalRankingProps) => {
-  const { fbUser } = useUser();
+  const { user, fbUser } = useUser();
   const isAllScores = notes != null;
   const {
     data: mainData,
@@ -60,7 +60,13 @@ export const RivalRankingBody = ({
     };
 
     const selfRow: RivalRow | null = myScore
-      ? { ...myScore, userId: fbUser?.uid ?? "", isSelf: true }
+      ? {
+          ...myScore,
+          userId: fbUser?.uid ?? "",
+          userName: user?.userName,
+          profileImage: user?.profileImage,
+          isSelf: true,
+        }
       : null;
 
     let rows: RivalRow[];
@@ -84,7 +90,7 @@ export const RivalRankingBody = ({
         bpi: row.bpi ?? null,
         isSelf: !!row.isSelf,
       }));
-  }, [data, myScore, fbUser?.uid]);
+  }, [data, myScore, fbUser?.uid, user?.userName, user?.profileImage]);
 
   if (isLoading) {
     return <SectionLoader className="py-8" color="text-bpim-info" />;
