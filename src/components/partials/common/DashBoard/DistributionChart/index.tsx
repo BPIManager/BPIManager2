@@ -150,9 +150,8 @@ const DistributionSection = ({
     },
   }[type];
 
-  const modeProps = onModeChange
-    ? { mode, onModeChange }
-    : {};
+  const displayMode =
+    mode && onModeChange ? { mode, onModeChange } : undefined;
 
   const isLoading = myLoading || (!!effectiveRivalUserId && rivalLoading);
   if (isLoading) {
@@ -163,7 +162,7 @@ const DistributionSection = ({
         isLoading={true}
         getColor={config.getColor}
         skeletonCount={config.skeletonCount}
-        {...modeProps}
+        displayMode={displayMode}
       />
     );
   }
@@ -179,41 +178,36 @@ const DistributionSection = ({
   const hasData = (d?: ChartData[]) => d && d.some((item) => item.count > 0);
   if (!hasData(myDist) && !hasData(rivalDist)) return null;
 
+  const stepControl =
+    isBpi || isScoreRate
+      ? {
+          step: isBpi ? bpiStep : scoreRateStep,
+          onStepFiner: isBpi ? handleStepFiner : handleScoreRateStepFiner,
+          onStepCoarser: isBpi ? handleStepCoarser : handleScoreRateStepCoarser,
+          canStepFiner: isBpi
+            ? BPI_STEP_OPTIONS.indexOf(bpiStep) < BPI_STEP_OPTIONS.length - 1
+            : BPI_STEP_OPTIONS.indexOf(scoreRateStep) <
+              BPI_STEP_OPTIONS.length - 1,
+          canStepCoarser: isBpi
+            ? BPI_STEP_OPTIONS.indexOf(bpiStep) > 0
+            : BPI_STEP_OPTIONS.indexOf(scoreRateStep) > 0,
+        }
+      : undefined;
+
   return (
     <DistributionChart
       title={config.title}
       myData={myDist || []}
-      rivalData={effectiveRivalUserId ? rivalDist : undefined}
       isLoading={false}
       getColor={config.getColor}
       myName={effectiveMyName}
-      rivalName={effectiveRivalName}
-      step={isBpi ? bpiStep : isScoreRate ? scoreRateStep : undefined}
-      onStepFiner={
-        isBpi
-          ? handleStepFiner
-          : isScoreRate
-            ? handleScoreRateStepFiner
-            : undefined
+      rivalComparison={
+        effectiveRivalUserId && rivalDist
+          ? { rivalData: rivalDist, rivalName: effectiveRivalName }
+          : undefined
       }
-      onStepCoarser={
-        isBpi
-          ? handleStepCoarser
-          : isScoreRate
-            ? handleScoreRateStepCoarser
-            : undefined
-      }
-      canStepFiner={
-        (isBpi &&
-          BPI_STEP_OPTIONS.indexOf(bpiStep) < BPI_STEP_OPTIONS.length - 1) ||
-        (isScoreRate &&
-          BPI_STEP_OPTIONS.indexOf(scoreRateStep) < BPI_STEP_OPTIONS.length - 1)
-      }
-      canStepCoarser={
-        (isBpi && BPI_STEP_OPTIONS.indexOf(bpiStep) > 0) ||
-        (isScoreRate && BPI_STEP_OPTIONS.indexOf(scoreRateStep) > 0)
-      }
-      {...modeProps}
+      stepControl={stepControl}
+      displayMode={displayMode}
     />
   );
 };

@@ -199,11 +199,13 @@ const LogsDetailContent = ({
                 myData={bpiData}
                 isLoading={isLoading}
                 getColor={getBpiColor}
-                canStepFiner
-                canStepCoarser
-                onStepFiner={handleStepFiner}
-                onStepCoarser={handleStepCoarser}
-                step={bpiStep}
+                stepControl={{
+                  step: bpiStep,
+                  onStepFiner: handleStepFiner,
+                  onStepCoarser: handleStepCoarser,
+                  canStepFiner: true,
+                  canStepCoarser: true,
+                }}
               />
               <DistributionChart
                 title={t("logs.detail.rankDist")}

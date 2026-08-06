@@ -37,22 +37,34 @@ const animationStyles = `
   }
 `;
 
+interface StepControl {
+  step: number;
+  onStepFiner: () => void;
+  onStepCoarser: () => void;
+  canStepFiner: boolean;
+  canStepCoarser: boolean;
+}
+
+interface DisplayModeControl {
+  mode: RankDisplayMode;
+  onModeChange: (mode: RankDisplayMode) => void;
+}
+
+interface RivalComparison {
+  rivalData: ChartData[];
+  rivalName?: string;
+}
+
 interface DistributionChartProps {
   title: string;
   myData: ChartData[];
-  rivalData?: ChartData[];
   isLoading: boolean;
   getColor: (label: string) => string;
   myName?: string;
-  rivalName?: string;
   skeletonCount?: number;
-  step?: number;
-  onStepFiner?: () => void;
-  onStepCoarser?: () => void;
-  canStepFiner?: boolean;
-  canStepCoarser?: boolean;
-  mode?: RankDisplayMode;
-  onModeChange?: (mode: RankDisplayMode) => void;
+  stepControl?: StepControl;
+  displayMode?: DisplayModeControl;
+  rivalComparison?: RivalComparison;
 }
 
 function tooltipHeader(
@@ -285,27 +297,59 @@ const DistributionPie = ({
   );
 };
 
-const DistributionChart = ({
-  title,
-  myData,
-  rivalData,
-  isLoading,
-  getColor,
-  myName,
-  rivalName,
-  skeletonCount = 10,
+const HistogramStepControl = ({
   step,
   onStepFiner,
   onStepCoarser,
-  canStepFiner = false,
-  canStepCoarser = false,
-  mode,
-  onModeChange,
+  canStepFiner,
+  canStepCoarser,
+}: StepControl) => {
+  const { t } = useTranslation();
+  return (
+    <div className="flex items-center rounded-md border border-bpim-border">
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        onClick={onStepCoarser}
+        disabled={!canStepCoarser}
+        className="rounded-r-none border-r border-bpim-border"
+        title={t("dashboard.distribution.zoomOut")}
+      >
+        <ZoomOut />
+      </Button>
+      <span className="px-2 text-xs font-bold text-bpim-muted tabular-nums">
+        {step}
+      </span>
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        onClick={onStepFiner}
+        disabled={!canStepFiner}
+        className="rounded-l-none border-l border-bpim-border"
+        title={t("dashboard.distribution.zoomIn")}
+      >
+        <ZoomIn />
+      </Button>
+    </div>
+  );
+};
+
+const DistributionChart = ({
+  title,
+  myData,
+  isLoading,
+  getColor,
+  myName,
+  skeletonCount = 10,
+  stepControl,
+  displayMode,
+  rivalComparison,
 }: DistributionChartProps) => {
   const c = useChartColors();
   const { t } = useTranslation();
   const effectiveMyName = myName ?? t("dashboard.me");
-  const effectiveRivalName = rivalName ?? t("dashboard.rival");
+  const effectiveRivalName = rivalComparison?.rivalName ?? t("dashboard.rival");
+  const rivalData = rivalComparison?.rivalData;
   const [chartType, setChartType] = useState<"bar" | "pie">("bar");
   const containerRef = useRef<HTMLDivElement>(null);
   const maxBarRef = useRef<HTMLDivElement>(null);
@@ -337,7 +381,11 @@ const DistributionChart = ({
   );
 
   const unit: "bpi" | "scoreRate" | undefined =
-    step === undefined ? undefined : mode === "scoreRate" ? "scoreRate" : "bpi";
+    stepControl === undefined
+      ? undefined
+      : displayMode?.mode === "scoreRate"
+        ? "scoreRate"
+        : "bpi";
 
   return (
     <DashCard>
@@ -358,17 +406,17 @@ const DistributionChart = ({
               </div>
             </div>
           )}
-          {mode !== undefined && onModeChange && (
+          {displayMode && (
             <div className="flex items-center rounded-md border border-bpim-border">
               <Button
                 variant="ghost"
                 size="icon-sm"
-                onClick={() => onModeChange("rank")}
+                onClick={() => displayMode.onModeChange("rank")}
                 className={cn(
                   "rounded-r-none border-r border-bpim-border",
-                  mode === "rank" && "bg-bpim-overlay",
+                  displayMode.mode === "rank" && "bg-bpim-overlay",
                 )}
-                aria-pressed={mode === "rank"}
+                aria-pressed={displayMode.mode === "rank"}
                 title={t("dashboard.distribution.modeRank")}
               >
                 <Medal />
@@ -376,45 +424,19 @@ const DistributionChart = ({
               <Button
                 variant="ghost"
                 size="icon-sm"
-                onClick={() => onModeChange("scoreRate")}
+                onClick={() => displayMode.onModeChange("scoreRate")}
                 className={cn(
                   "rounded-l-none",
-                  mode === "scoreRate" && "bg-bpim-overlay",
+                  displayMode.mode === "scoreRate" && "bg-bpim-overlay",
                 )}
-                aria-pressed={mode === "scoreRate"}
+                aria-pressed={displayMode.mode === "scoreRate"}
                 title={t("dashboard.distribution.modeScoreRate")}
               >
                 <Percent />
               </Button>
             </div>
           )}
-          {step !== undefined && (
-            <div className="flex items-center rounded-md border border-bpim-border">
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                onClick={onStepCoarser}
-                disabled={!canStepCoarser}
-                className="rounded-r-none border-r border-bpim-border"
-                title={t("dashboard.distribution.zoomOut")}
-              >
-                <ZoomOut />
-              </Button>
-              <span className="px-2 text-xs font-bold text-bpim-muted tabular-nums">
-                {step}
-              </span>
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                onClick={onStepFiner}
-                disabled={!canStepFiner}
-                className="rounded-l-none border-l border-bpim-border"
-                title={t("dashboard.distribution.zoomIn")}
-              >
-                <ZoomIn />
-              </Button>
-            </div>
-          )}
+          {stepControl && <HistogramStepControl {...stepControl} />}
           <div className="flex items-center rounded-md border border-bpim-border">
             <Button
               variant="ghost"
@@ -463,7 +485,7 @@ const DistributionChart = ({
                 isNaN(numVal) ||
                 item.label === "100+" ||
                 numVal % labelInterval === 0;
-              const showCount = !step || step >= 5;
+              const showCount = !stepControl || stepControl.step >= 5;
               return (
                 <ChartBarUnit
                   key={item.label}
@@ -478,7 +500,7 @@ const DistributionChart = ({
                   warningColor={c.warning}
                   showLabel={showLabel}
                   showCount={showCount}
-                  step={step}
+                  step={stepControl?.step}
                   unit={unit}
                   myName={effectiveMyName}
                   rivalName={effectiveRivalName}
