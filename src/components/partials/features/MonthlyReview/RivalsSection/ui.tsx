@@ -28,29 +28,53 @@ interface RivalsSectionRankSummary {
   totalParticipants: number;
 }
 
-interface RivalsSectionLabels {
-  noRivalsTitle: string;
-  noRivalsDesc: string;
-  sectionTitle: string;
-  rivalsSummary: string;
-}
-
 interface Props {
   data: RivalsSectionData;
   chart: RivalsSectionChart;
   rankSummary: RivalsSectionRankSummary;
-  labels: RivalsSectionLabels;
   granularity: "month" | "year";
   inView: boolean;
   sectionRef: React.RefObject<HTMLDivElement>;
   isEmpty: boolean;
 }
 
+const EmptyRivalsState = () => {
+  const { t } = useTranslation();
+  return (
+    <div className="flex flex-col items-center gap-3 px-5 pb-24 text-center">
+      <div
+        className="w-full max-w-md rounded-2xl px-8 py-8"
+        style={{
+          background: "rgba(8,8,14,0.55)",
+          backdropFilter: "blur(16px)",
+          WebkitBackdropFilter: "blur(16px)",
+          border: "1px solid rgba(255,255,255,0.07)",
+        }}
+      >
+        <p
+          className="mb-2 font-bold"
+          style={{ color: "rgba(255,255,255,0.45)", fontSize: "0.9rem" }}
+        >
+          {t("monthlyReview.rivals.noRivalsTitle")}
+        </p>
+        <p
+          style={{
+            color: "rgba(255,255,255,0.25)",
+            fontSize: "0.8rem",
+            lineHeight: 1.65,
+          }}
+        >
+          {t("monthlyReview.rivals.noRivalsDesc")}
+        </p>
+      </div>
+    </div>
+  );
+};
+
 const RivalsSectionUI = ({
   data,
   chart,
   rankSummary,
-  labels,
   granularity,
   inView,
   sectionRef,
@@ -59,9 +83,25 @@ const RivalsSectionUI = ({
   const { rivals, ranking, timeline } = data;
   const { hasChart, hiddenKeys, onToggleKey } = chart;
   const { viewerAbsRank, viewerRateRank, totalParticipants } = rankSummary;
-  const { noRivalsTitle, noRivalsDesc, sectionTitle, rivalsSummary } = labels;
   const [visible, setVisible] = useState(PAGE);
-  const { t } = useTranslation();
+  const { t, tFormat } = useTranslation();
+
+  const totalWins = rivals.reduce((sum, r) => sum + r.newWins, 0);
+  const totalLosses = rivals.reduce((sum, r) => sum + r.newLosses, 0);
+  const summaryParts: string[] = [];
+  if (totalWins > 0)
+    summaryParts.push(
+      tFormat("monthlyReview.rivals.summaryWins", { count: String(totalWins) }),
+    );
+  if (totalLosses > 0)
+    summaryParts.push(
+      tFormat("monthlyReview.rivals.summaryLosses", {
+        count: String(totalLosses),
+      }),
+    );
+  if (summaryParts.length === 0)
+    summaryParts.push(t("monthlyReview.rivals.summaryNoChange"));
+  const rivalsSummary = summaryParts.join(" ");
 
   return (
     <>
@@ -76,7 +116,7 @@ const RivalsSectionUI = ({
               animation: inView ? "titleIn 0.8s ease-out both" : "none",
             }}
           >
-            {sectionTitle}
+            {t("monthlyReview.rivals.sectionTitle")}
           </h2>
           {!isEmpty && rivals.length > 0 && (
             <p
@@ -88,35 +128,7 @@ const RivalsSectionUI = ({
           )}
         </div>
 
-        {isEmpty && (
-          <div className="flex flex-col items-center gap-3 px-5 pb-24 text-center">
-            <div
-              className="w-full max-w-md rounded-2xl px-8 py-8"
-              style={{
-                background: "rgba(8,8,14,0.55)",
-                backdropFilter: "blur(16px)",
-                WebkitBackdropFilter: "blur(16px)",
-                border: "1px solid rgba(255,255,255,0.07)",
-              }}
-            >
-              <p
-                className="mb-2 font-bold"
-                style={{ color: "rgba(255,255,255,0.45)", fontSize: "0.9rem" }}
-              >
-                {noRivalsTitle}
-              </p>
-              <p
-                style={{
-                  color: "rgba(255,255,255,0.25)",
-                  fontSize: "0.8rem",
-                  lineHeight: 1.65,
-                }}
-              >
-                {noRivalsDesc}
-              </p>
-            </div>
-          </div>
-        )}
+        {isEmpty && <EmptyRivalsState />}
 
         {!isEmpty && hasChart && (
           <RivalsGrowthChartSection

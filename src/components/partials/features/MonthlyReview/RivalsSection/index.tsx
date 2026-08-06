@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useInView } from "@/hooks/common/useInView";
-import { useTranslation } from "@/hooks/common/useTranslation";
 import type { MonthlyReviewData } from "@/types/stats/monthlyReview";
 import RivalsSectionUI from "./ui";
 
@@ -21,7 +20,6 @@ const RivalsSection = ({
 }: Props) => {
   const [ref, inView] = useInView(0.1);
   const [hiddenKeys, setHiddenKeys] = useState<Set<string>>(new Set());
-  const { t, tFormat } = useTranslation();
 
   const isEmpty = rivals.length === 0 && !ranking;
 
@@ -40,28 +38,11 @@ const RivalsSection = ({
   const totalParticipants = ranking?.byAbsGrowth.length ?? 0;
   const hasChart = !!(timeline && timeline.length > 1);
 
-  const totalWins = rivals.reduce((sum, r) => sum + r.newWins, 0);
-  const totalLosses = rivals.reduce((sum, r) => sum + r.newLosses, 0);
-  const summaryParts: string[] = [];
-  if (totalWins > 0)
-    summaryParts.push(tFormat("monthlyReview.rivals.summaryWins", { count: String(totalWins) }));
-  if (totalLosses > 0)
-    summaryParts.push(tFormat("monthlyReview.rivals.summaryLosses", { count: String(totalLosses) }));
-  if (summaryParts.length === 0)
-    summaryParts.push(t("monthlyReview.rivals.summaryNoChange"));
-  const rivalsSummary = summaryParts.join(" ");
-
   return (
     <RivalsSectionUI
       data={{ rivals, ranking, timeline }}
       chart={{ hasChart, hiddenKeys, onToggleKey: toggleKey }}
       rankSummary={{ viewerAbsRank, viewerRateRank, totalParticipants }}
-      labels={{
-        noRivalsTitle: t("monthlyReview.rivals.noRivalsTitle"),
-        noRivalsDesc: t("monthlyReview.rivals.noRivalsDesc"),
-        sectionTitle: t("monthlyReview.rivals.sectionTitle"),
-        rivalsSummary,
-      }}
       granularity={granularity}
       inView={inView}
       sectionRef={ref as React.RefObject<HTMLDivElement>}
