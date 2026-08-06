@@ -18,6 +18,7 @@ const VALID_SORT_KEYS = new Set<string>([
 ]);
 const VALID_DIFFICULTIES: string[] = [...IIDX_DIFFICULTIES];
 const DEFAULT_DIFFICULTIES = new Set(IIDX_DIFFICULTIES);
+const LEVELS = new Set(["12"]);
 
 function parseDiff(val: string | string[] | undefined): Set<string> {
   if (typeof val !== "string") return new Set(DEFAULT_DIFFICULTIES);
@@ -76,8 +77,6 @@ export function useSongListFilter() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [committedSearch, difficulties, sortKey, sortDir]);
 
-  const levels = new Set(["12"]);
-
   const { songs, isLoading, isError } = useSongList(version);
 
   const { localSearch, setLocalSearch, isTyping } = useDebouncedSearch(
@@ -124,15 +123,12 @@ export function useSongListFilter() {
       filterAndSortSongs(
         songs,
         committedSearch,
-        levels,
+        LEVELS,
         difficulties,
         sortKey,
         sortDir,
         "global",
       ),
-    // levelsは`new Set(["12"])`で毎レンダー新規生成される値のため、依存に含めると
-    // 常に再計算されメモ化が無意味になる。値自体は不変なので意図的に除外する
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [songs, committedSearch, difficulties, sortKey, sortDir],
   );
 

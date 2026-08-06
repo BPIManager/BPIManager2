@@ -1,6 +1,6 @@
 ﻿import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 
 import type { GroupingMode, GoalType, AAATableItem } from "@/types/metrics/aaa";
 
@@ -41,10 +41,13 @@ export const useAAATable = (
     isReady ? endpoint : null,
   );
 
-  const getTargetBpi = (item: AAATableItem) =>
-    goal === "custom"
-      ? (item.targets.custom?.targetBpi ?? 0)
-      : item.targets[goal].targetBpi ?? 0;
+  const getTargetBpi = useCallback(
+    (item: AAATableItem) =>
+      goal === "custom"
+        ? (item.targets.custom?.targetBpi ?? 0)
+        : item.targets[goal].targetBpi ?? 0,
+    [goal],
+  );
 
   const groupedData = useMemo(() => {
     if (!data) return {};
@@ -63,10 +66,7 @@ export const useAAATable = (
       },
       {} as Record<number, AAATableItem[]>,
     );
-    // getTargetBpiは毎レンダー再生成される関数だが、その挙動はgoal(依存に含めている)
-    // だけで決まるため、関数自体を依存に含めると無意味な再計算を招くので除外する
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, goal, mode, customGoalRatio, customGoalOffset]);
+  }, [data, mode, getTargetBpi]);
 
   return { groupedData, isLoading, isError: error };
 };
