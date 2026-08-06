@@ -10,7 +10,7 @@ import {
   Cell,
 } from "recharts";
 import type { MonthlyReviewData } from "@/types/stats/monthlyReview";
-import { formatDate } from "../utils";
+import { formatDate, useCountUp } from "../utils";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 const styles = `
@@ -18,30 +18,9 @@ const styles = `
   @keyframes barGrowH { from{width:0} to{width:var(--w)} }
 `;
 
-interface ActivitySectionRefs {
-  section: React.RefObject<HTMLDivElement>;
-  keys: React.RefObject<HTMLSpanElement | null>;
-  scratch: React.RefObject<HTMLSpanElement | null>;
-  days: React.RefObject<HTMLSpanElement | null>;
-  songs: React.RefObject<HTMLSpanElement | null>;
-}
-
-interface ActivitySectionLabels {
-  summary: string;
-  sectionTitle: string;
-  noKeyScratchTitle: string;
-  noKeyScratchDesc: string;
-  bestDaysTitle: string;
-  bestGrowthDayLabel: string;
-  bestKeysDayLabel: string;
-  bestScratchDayLabel: string;
-  byDayOfWeekTitle: string;
-  byHourTitle: string;
-}
-
 interface Props {
-  refs: ActivitySectionRefs;
-  labels: ActivitySectionLabels;
+  sectionRef: React.RefObject<HTMLDivElement>;
+  granularity: "month" | "year";
   inView: boolean;
   activity: MonthlyReviewData["activity"];
   dowData: { label: string; count: number }[];
@@ -54,9 +33,30 @@ interface Props {
   formatHourLabel: (...args: any[]) => React.ReactNode;
 }
 
+const AnimatedStat = ({
+  value,
+  active,
+  delay,
+  className,
+  style,
+}: {
+  value: number;
+  active: boolean;
+  delay: number;
+  className: string;
+  style: React.CSSProperties;
+}) => {
+  const ref = useCountUp(value, active, delay);
+  return (
+    <span ref={ref} className={className} style={style}>
+      0
+    </span>
+  );
+};
+
 const ActivitySectionUI = ({
-  refs,
-  labels,
+  sectionRef,
+  granularity,
   inView,
   activity,
   dowData,
@@ -67,25 +67,6 @@ const ActivitySectionUI = ({
   primaryColor,
   formatHourLabel,
 }: Props) => {
-  const {
-    section: sectionRef,
-    keys: keysRef,
-    scratch: scratchRef,
-    days: daysRef,
-    songs: songsRef,
-  } = refs;
-  const {
-    summary,
-    sectionTitle,
-    noKeyScratchTitle,
-    noKeyScratchDesc,
-    bestDaysTitle,
-    bestGrowthDayLabel,
-    bestKeysDayLabel,
-    bestScratchDayLabel,
-    byDayOfWeekTitle,
-    byHourTitle,
-  } = labels;
   const { t, tFormat } = useTranslation();
   const {
     totalKeys,
@@ -95,6 +76,31 @@ const ActivitySectionUI = ({
     bestDays,
     towerRanking,
   } = activity;
+
+  const bestDowIdx = dowData.reduce(
+    (best, d, i) => (d.count > dowData[best].count ? i : best),
+    0,
+  );
+  const isMonth = granularity === "month";
+  const bestDowLabel = dowData[bestDowIdx]?.label ?? "";
+  const summaryParts: string[] = [
+    tFormat("monthlyReview.activity.summaryPlayed", {
+      days: playDays,
+      songs: updatedSongs,
+    }),
+    tFormat("monthlyReview.activity.summaryBestDow", {
+      day: isMonth ? `${bestDowLabel}曜` : bestDowLabel,
+    }),
+  ];
+  if (towerRanking) {
+    summaryParts.push(
+      tFormat("monthlyReview.activity.summaryKeysRank", {
+        rank: towerRanking.keysRank,
+        total: towerRanking.totalUsers,
+      }),
+    );
+  }
+  const summary = summaryParts.join(" ");
 
   return (
     <>
@@ -111,7 +117,7 @@ const ActivitySectionUI = ({
             animation: inView ? "actFade 0.6s ease-out both" : "none",
           }}
         >
-          {sectionTitle}
+          {t("monthlyReview.activity.sectionTitle")}
         </h2>
 
         <p
@@ -155,7 +161,7 @@ const ActivitySectionUI = ({
                     fontSize: "0.875rem",
                   }}
                 >
-                  {noKeyScratchTitle}
+                  {t("monthlyReview.activity.noKeyScratchTitle")}
                 </p>
                 <p
                   style={{
@@ -164,7 +170,7 @@ const ActivitySectionUI = ({
                     lineHeight: 1.6,
                   }}
                 >
-                  {noKeyScratchDesc}
+                  {t("monthlyReview.activity.noKeyScratchDesc")}
                 </p>
               </div>
             </div>
@@ -174,18 +180,18 @@ const ActivitySectionUI = ({
                 {
                   label: t("monthlyReview.activity.keys"),
                   value: totalKeys,
-                  ref: keysRef,
+                  delay: 0.2,
                   accent: "#38bdf8",
                   rank: towerRanking?.keysRank,
                 },
                 {
                   label: t("monthlyReview.activity.scratches"),
                   value: totalScratches,
-                  ref: scratchRef,
+                  delay: 0.35,
                   accent: "#a78bfa",
                   rank: towerRanking?.scratchRank,
                 },
-              ].map(({ label, value, ref: numRef, accent, rank }) => (
+              ].map(({ label, value, delay, accent, rank }) => (
                 <div key={label} className="flex flex-col gap-1.5">
                   <div className="flex items-center justify-between">
                     <p
@@ -207,17 +213,17 @@ const ActivitySectionUI = ({
                       </span>
                     )}
                   </div>
-                  <span
-                    ref={numRef}
+                  <AnimatedStat
+                    value={value}
+                    active={inView}
+                    delay={delay}
                     className="font-black tabular-nums leading-none"
                     style={{
                       fontSize: "clamp(2.5rem, 8vw, 5rem)",
                       color: accent,
                       textShadow: `0 0 40px ${accent}44`,
                     }}
-                  >
-                    0
-                  </span>
+                  />
                   <div
                     className="h-0.5 w-full overflow-hidden rounded-full"
                     style={{ background: "rgba(255,255,255,0.05)" }}
@@ -245,20 +251,20 @@ const ActivitySectionUI = ({
             style={{ borderColor: "rgba(255,255,255,0.07)" }}
           >
             {[
-              { label: t("monthlyReview.activity.playDays"), ref: daysRef, value: playDays },
-              { label: t("monthlyReview.activity.updatedSongs"), ref: songsRef, value: updatedSongs },
-            ].map(({ label, ref: numRef }) => (
+              { label: t("monthlyReview.activity.playDays"), delay: 0.5, value: playDays },
+              { label: t("monthlyReview.activity.updatedSongs"), delay: 0.6, value: updatedSongs },
+            ].map(({ label, delay, value }) => (
               <div key={label} className="flex flex-col items-center gap-1">
-                <span
-                  ref={numRef}
+                <AnimatedStat
+                  value={value}
+                  active={inView}
+                  delay={delay}
                   className="font-black tabular-nums"
                   style={{
                     fontSize: "clamp(1.8rem, 5vw, 3rem)",
                     color: "rgba(255,255,255,0.85)",
                   }}
-                >
-                  0
-                </span>
+                />
                 <span
                   className="text-[10px] tracking-widest"
                   style={{ color: "rgba(255,255,255,0.3)" }}
@@ -281,12 +287,12 @@ const ActivitySectionUI = ({
                 className="mb-4 text-[10px] font-bold tracking-[0.3em] uppercase"
                 style={{ color: "rgba(255,255,255,0.3)" }}
               >
-                {bestDaysTitle}
+                {t("monthlyReview.activity.bestDaysTitle")}
               </p>
               <div className="flex gap-2">
                 {[
                   {
-                    label: bestGrowthDayLabel,
+                    label: t("monthlyReview.activity.bestGrowthDay"),
                     date: bestDays.bestGrowthDay?.date ?? null,
                     sub: bestDays.bestGrowthDay
                       ? `+${bestDays.bestGrowthDay.bpiDiff.toFixed(2)} BPI`
@@ -294,7 +300,7 @@ const ActivitySectionUI = ({
                     accent: "#34d399",
                   },
                   {
-                    label: bestKeysDayLabel,
+                    label: t("monthlyReview.activity.bestKeysDay"),
                     date: bestDays.bestKeysDay?.date ?? null,
                     sub: bestDays.bestKeysDay
                       ? tFormat("monthlyReview.activity.keysCount", { count: bestDays.bestKeysDay.keyCount.toLocaleString() })
@@ -302,7 +308,7 @@ const ActivitySectionUI = ({
                     accent: "#38bdf8",
                   },
                   {
-                    label: bestScratchDayLabel,
+                    label: t("monthlyReview.activity.bestScratchDay"),
                     date: bestDays.bestScratchDay?.date ?? null,
                     sub: bestDays.bestScratchDay
                       ? tFormat("monthlyReview.activity.scratchCount", { count: bestDays.bestScratchDay.scratchCount.toLocaleString() })
@@ -364,7 +370,7 @@ const ActivitySectionUI = ({
               className="mb-3 text-[10px] font-bold tracking-[0.3em] uppercase"
               style={{ color: "rgba(255,255,255,0.3)" }}
             >
-              {byDayOfWeekTitle}
+              {t("monthlyReview.activity.byDayOfWeek")}
             </p>
             <div className="flex items-end gap-1.5" style={{ height: 164 }}>
               {dowData.map((d, i) => {
@@ -424,7 +430,7 @@ const ActivitySectionUI = ({
               className="mb-3 text-[10px] font-bold tracking-[0.3em] uppercase"
               style={{ color: "rgba(255,255,255,0.3)" }}
             >
-              {byHourTitle}
+              {t("monthlyReview.activity.byHour")}
             </p>
             <ResponsiveContainer width="100%" height={128}>
               <BarChart
