@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { useState } from "react";
-import { User2, Check, X } from "lucide-react";
+import { User2, Check, X, LogOut } from "lucide-react";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import {
   Dialog,
@@ -57,6 +57,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
     setFormData({ ...formData, xId: value });
   };
 
+  const isAutoPrompt = isOpen === undefined;
   const finalOpen = isOpen || (!isLoading && isSignedIn() && !user);
 
   return (
@@ -79,6 +80,23 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
 
           <div className="flex-1 overflow-y-auto custom-scrollbar">
             <div className="flex flex-col gap-6 p-6">
+              {isAutoPrompt && (
+                <div className="flex items-start gap-3 rounded-xl border border-bpim-danger/30 bg-bpim-danger/8 px-4 py-3 text-bpim-danger">
+                  <LogOut className="mt-0.5 h-4 w-4 shrink-0" />
+                  <div className="flex flex-1 flex-wrap items-center justify-between gap-x-4 gap-y-1">
+                    <p className="text-sm font-medium">
+                      {t("settings.profile.wrongAccountAlert")}
+                    </p>
+                    <button
+                      onClick={() => authActions.logout()}
+                      className="shrink-0 text-xs font-bold underline hover:no-underline"
+                    >
+                      {t("nav.signOut")}
+                    </button>
+                  </div>
+                </div>
+              )}
+
               <div className="flex flex-col gap-3 rounded-xl border border-bpim-border bg-bpim-surface-2/60 p-4">
                 <div className="flex items-center justify-between">
                   <p className="text-[11px] font-bold uppercase text-bpim-muted">
@@ -269,7 +287,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
 
           <DialogFooter className="shrink-0 border-t border-bpim-border px-6 py-4">
             <Button
-              className="h-10 w-full rounded-xl bg-bpim-primary text-sm font-black hover:bg-bpim-primary/90 active:scale-[0.98] disabled:opacity-50 mb-2"
+              className="h-10 w-full rounded-xl bg-bpim-primary text-sm font-black hover:bg-bpim-primary/90 active:scale-[0.98] disabled:opacity-50"
               disabled={!isValid || isSubmitting}
               onClick={handleSubmit}
             >

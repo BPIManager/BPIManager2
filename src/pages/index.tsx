@@ -4,7 +4,6 @@ import { useUser } from "@/contexts/users/UserContext";
 import DashboardLayout from "@/components/partials/shell/DashboardLayout";
 import { Meta } from "@/components/partials/common/PageChrome/Head";
 import LoginPage from "@/components/partials/features/LogIn/ui";
-import AccountSettings from "@/components/partials/modal/AccountSettings";
 import { DashBoardFilter } from "@/components/partials/common/DashBoard/Filter";
 import ActivitySection from "@/components/partials/common/DashBoard/ActivityCalendar";
 import CurrentBpiSection from "@/components/partials/common/DashBoard/CurrentBpi";
@@ -71,7 +70,7 @@ function WidgetRenderer({
 }
 
 export default function DashboardPage() {
-  const { user, isLoading: isUserLoading, fbUser } = useUser();
+  const { isLoading: isUserLoading, fbUser } = useUser();
   const [nodata, setNodata] = useState<boolean>(false);
   const [isLayoutSettingsOpen, setIsLayoutSettingsOpen] = useState(false);
   const { config, updateConfig, hydrated } = useLayoutConfig();
@@ -94,8 +93,6 @@ export default function DashboardPage() {
   return (
     <FilterProvider>
       <Meta noIndex title={t("page.dashboard.title")} />
-
-      {!user && <AccountSettings />}
 
       {hydrated && (
         <DashboardLayoutSettingsModal

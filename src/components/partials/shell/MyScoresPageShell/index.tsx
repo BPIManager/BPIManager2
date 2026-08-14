@@ -3,7 +3,6 @@ import { useRouter } from "next/router";
 import { Meta } from "@/components/partials/common/PageChrome/Head";
 import DashboardLayout from "@/components/partials/shell/DashboardLayout";
 import { useUser } from "@/contexts/users/UserContext";
-import AccountSettings from "@/components/partials/modal/AccountSettings";
 import { LoginRequiredCard } from "@/components/partials/common/Auth/LoginRequired/ui";
 import { PageLoader } from "@/components/ui/loading-spinner";
 
@@ -18,8 +17,8 @@ interface MyScoresPageShellProps {
 
 /**
  * `/my/[version]`, `/my/all/[version]`, `/my/unplayed/[version]` で共通の
- * 「router準備待ち → 未ログイン時のAccountSettings → LoginRequiredCard分岐」を
- * まとめたページシェル。表示するテーブル本体だけを呼び出し側が渡す。
+ * 「router準備待ち → LoginRequiredCard分岐」をまとめたページシェル。
+ * 表示するテーブル本体だけを呼び出し側が渡す。
  */
 const MyScoresPageShell = ({
   titlePrefix,
@@ -27,7 +26,7 @@ const MyScoresPageShell = ({
 }: MyScoresPageShellProps) => {
   const router = useRouter();
   const { version } = router.query;
-  const { user, isLoading: isUserLoading, fbUser } = useUser();
+  const { isLoading: isUserLoading, fbUser } = useUser();
 
   const isReady = router.isReady && !isUserLoading;
 
@@ -39,8 +38,6 @@ const MyScoresPageShell = ({
 
   return (
     <>
-      {!user && <AccountSettings />}
-
       <Meta noIndex title={`${titlePrefix} — Version ${targetVersion || ""}`} />
 
       <DashboardLayout>
