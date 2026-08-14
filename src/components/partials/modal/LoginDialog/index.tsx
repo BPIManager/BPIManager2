@@ -11,7 +11,7 @@ function LoginDialog({ isOpen, onClose, variant }: LoginDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-md border-none bg-transparent p-0 shadow-none outline-none">
-        <LoginRequiredCard isModal variant={variant} />
+        <LoginRequiredCard isModal variant={variant} onSuccess={onClose} />
       </DialogContent>
     </Dialog>
   );

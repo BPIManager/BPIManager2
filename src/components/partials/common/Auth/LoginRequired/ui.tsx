@@ -8,10 +8,13 @@ export const LoginRequiredCard = ({
   className,
   isModal,
   variant = "loginRequired",
+  onSuccess,
 }: {
   className?: string;
   isModal?: boolean;
   variant?: "loginRequired" | "addAccount";
+  /** サインイン成功時に呼び出す（isModalのときのみ意味を持つ） */
+  onSuccess?: () => void;
 }) => {
   const { t } = useTranslation();
   if (isModal) {
@@ -42,7 +45,7 @@ export const LoginRequiredCard = ({
           </div>
 
           <div className="w-full min-w-70">
-            <LoginButtons />
+            <LoginButtons onSuccess={onSuccess} />
           </div>
         </div>
       </div>
