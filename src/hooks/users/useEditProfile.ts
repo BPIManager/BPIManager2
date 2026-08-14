@@ -68,7 +68,8 @@ export const useEditProfile = (onClose?: () => void) => {
     if (!fbUser || user) return;
     setFormData((prev) => ({
       ...prev,
-      userName: prev.userName || fbUser.displayName || "",
+      // fbUser.displayNameは連携プロバイダ側の表示名（本名等の機密情報を含む
+      // ことがある）のため初期値に使わない。ユーザーに明示的に入力させる
       profileImage:
         prev.profileImage ||
         fbUser.photoURL?.replace("_normal", "") ||

@@ -40,8 +40,12 @@ export const authActions = {
    * await authActions.signInWithGoogle();
    * ```
    */
-  signInWithGoogle: (): Promise<UserCredential> =>
-    signInWithPopup(auth, googleProvider),
+  signInWithGoogle: (loginHint?: string): Promise<UserCredential> => {
+    googleProvider.setCustomParameters(
+      loginHint ? { login_hint: loginHint } : {},
+    );
+    return signInWithPopup(auth, googleProvider);
+  },
 
   /**
    * Initiates the X (formerly Twitter) sign-in flow via a page redirect.
@@ -54,7 +58,12 @@ export const authActions = {
    * Initiates the LINE sign-in flow via a page redirect using OIDC.
    * * @returns A promise that resolves when the redirect is initiated.
    */
-  signInWithLINE: (): Promise<void> => signInWithRedirect(auth, lineProvider),
+  signInWithLINE: (loginHint?: string): Promise<void> => {
+    lineProvider.setCustomParameters(
+      loginHint ? { login_hint: loginHint } : {},
+    );
+    return signInWithRedirect(auth, lineProvider);
+  },
 
   /**
    * Signs out the current user and clears local session data.

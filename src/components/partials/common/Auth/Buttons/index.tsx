@@ -62,7 +62,21 @@ const LOGIN_PROVIDERS = [
   },
 ] as const;
 
-export const LoginButtons = () => {
+export const LoginButtons = ({
+  onSuccess,
+}: {
+  /** サインイン成功時に呼び出す（LINEはリダイレクト遷移するため呼ばれない） */
+  onSuccess?: () => void;
+} = {}) => {
+  const handleClick = async (action: () => Promise<unknown>) => {
+    try {
+      await action();
+      onSuccess?.();
+    } catch {
+      // ポップアップを閉じた等のキャンセルはエラー表示不要
+    }
+  };
+
   return (
     <div className="mx-auto w-full max-w-2xl overflow-hidden rounded-2xl">
       <div className="flex flex-col items-center gap-6 p-4">
@@ -73,7 +87,7 @@ export const LoginButtons = () => {
               <Button
                 key={index}
                 variant="outline"
-                onClick={provider.onClick}
+                onClick={() => handleClick(provider.onClick)}
                 className={`
                   group relative flex h-13 w-full items-center justify-start gap-4 px-6 
                   border-bpim-border bg-transparent transition-all duration-200
