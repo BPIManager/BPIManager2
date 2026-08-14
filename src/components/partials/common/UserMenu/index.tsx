@@ -205,6 +205,11 @@ const UserMenu = () => {
         isOpen={accountSettingsOpen}
         onClose={() => setAccountSettingsOpen(false)}
       />
+
+      <LoginDialog
+        isOpen={loginDialogOpen}
+        onClose={() => setLoginDialogOpen(false)}
+      />
     </>
   );
 };

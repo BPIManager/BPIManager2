@@ -84,8 +84,8 @@ export const UserProvider = ({
     upsertRememberedAccount(
       {
         uid: fbUser.uid,
-        displayName: fbUser.displayName || data.user.userName,
-        avatarUrl: fbUser.photoURL || data.user.profileImage || "",
+        displayName: data.user.userName || fbUser.displayName || "",
+        avatarUrl: data.user.profileImage || fbUser.photoURL || "",
         provider: providerId,
         isPublic: !!data.user.isPublic,
       },
