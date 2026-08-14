@@ -13,6 +13,12 @@ export const settingsTranslations = {
   },
 
   // AccountSettings modal
+  "settings.profile.wrongAccountAlert": {
+    ja: "アカウントを間違えた場合はこちらからログアウトできます。",
+    en: "Signed in with the wrong account? You can sign out here.",
+    "zh-TW": "如果登入了錯誤的帳戶，可以從這裡登出。",
+    ko: "잘못된 계정으로 로그인했다면 여기서 로그아웃할 수 있습니다.",
+  },
   "settings.profile.icon.label": {
     ja: "アイコン",
     en: "Icon",
