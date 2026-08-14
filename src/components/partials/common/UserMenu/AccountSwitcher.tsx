@@ -49,6 +49,16 @@ const AccountSwitcher = ({
     }
   };
 
+  const handleRemove = (account: RememberedAccount) => {
+    removeAccount(account.uid);
+    // 現在ログイン中のアカウントを一覧から削除した場合、記憶からは消えたのに
+    // ログイン状態だけ残るのは不整合なためサインアウトする
+    if (account.uid === currentUid) {
+      authActions.logout();
+      onSwitched();
+    }
+  };
+
   return (
     <div className="flex flex-col p-1">
       <button
@@ -99,7 +109,7 @@ const AccountSwitcher = ({
                 )}
               </button>
               <button
-                onClick={() => removeAccount(account.uid)}
+                onClick={() => handleRemove(account)}
                 aria-label={t("common.delete")}
                 className="shrink-0 rounded p-0.5 text-bpim-muted opacity-0 transition-opacity hover:bg-bpim-danger/10 hover:text-bpim-danger group-hover:opacity-100"
               >
