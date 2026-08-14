@@ -209,6 +209,7 @@ const UserMenu = () => {
       <LoginDialog
         isOpen={loginDialogOpen}
         onClose={() => setLoginDialogOpen(false)}
+        variant="addAccount"
       />
     </>
   );

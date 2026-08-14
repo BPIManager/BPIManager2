@@ -61,7 +61,9 @@ export const UserProvider = ({
     isLoading: isSwrLoading,
     mutate,
   } = useSWR<{ user: Session }>(
-    fbUser ? `${API_PREFIX}/me` : null,
+    // fbUser.uidをキーに含め、Firebase Authの単一インスタンス上でアカウントを
+    // 切り替えた際（URL文字列自体は変わらない）にもSWRが再フェッチするようにする
+    fbUser ? `${API_PREFIX}/me?uid=${fbUser.uid}` : null,
     authenticatedFetcher,
     {
       revalidateOnFocus: false,

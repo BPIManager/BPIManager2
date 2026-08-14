@@ -7,12 +7,18 @@ import { useTranslation } from "@/hooks/common/useTranslation";
 export const LoginRequiredCard = ({
   className,
   isModal,
+  variant = "loginRequired",
 }: {
   className?: string;
   isModal?: boolean;
+  variant?: "loginRequired" | "addAccount";
 }) => {
   const { t } = useTranslation();
   if (isModal) {
+    const titleKey =
+      variant === "addAccount" ? "auth.addAccountTitle" : "auth.loginRequiredTitle";
+    const descKey =
+      variant === "addAccount" ? "auth.addAccountDesc" : "auth.loginRequiredModal";
     return (
       <div
         className={cn(
@@ -31,12 +37,8 @@ export const LoginRequiredCard = ({
           </div>
 
           <div className="flex flex-col gap-1">
-            <h3 className="text-lg font-bold text-bpim-text">
-              {t("auth.loginRequiredTitle")}
-            </h3>
-            <p className="max-w-70 text-sm text-bpim-muted">
-              {t("auth.loginRequiredModal")}
-            </p>
+            <h3 className="text-lg font-bold text-bpim-text">{t(titleKey)}</h3>
+            <p className="max-w-70 text-sm text-bpim-muted">{t(descKey)}</p>
           </div>
 
           <div className="w-full min-w-70">
