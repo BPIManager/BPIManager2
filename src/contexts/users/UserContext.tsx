@@ -86,8 +86,11 @@ export const UserProvider = ({
     upsertRememberedAccount(
       {
         uid: fbUser.uid,
-        displayName: data.user.userName || fbUser.displayName || "",
+        // fbUser.displayNameは連携プロバイダ側の表示名（本名等の機密情報を含む
+        // ことがある）のため使わない。BPIM側で明示的に設定されたuserNameのみ使う
+        displayName: data.user.userName,
         avatarUrl: data.user.profileImage || fbUser.photoURL || "",
+        email: fbUser.email || undefined,
         provider: providerId,
         isPublic: !!data.user.isPublic,
       },

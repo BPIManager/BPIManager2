@@ -12,11 +12,11 @@ import { RememberedAccount } from "@/types/auth/rememberedAccount";
 
 const PROVIDER_REAUTH: Record<
   RememberedAccount["provider"],
-  () => Promise<unknown>
+  (loginHint?: string) => Promise<unknown>
 > = {
-  "google.com": () => authActions.signInWithGoogle(),
+  "google.com": (loginHint) => authActions.signInWithGoogle(loginHint),
   "twitter.com": () => authActions.signInWithTwitter(),
-  "oidc.line": () => authActions.signInWithLINE(),
+  "oidc.line": (loginHint) => authActions.signInWithLINE(loginHint),
 };
 
 interface Props {
@@ -40,7 +40,7 @@ const AccountSwitcher = ({
     if (account.uid === currentUid || switchingUid) return;
     setSwitchingUid(account.uid);
     try {
-      await PROVIDER_REAUTH[account.provider]();
+      await PROVIDER_REAUTH[account.provider](account.email);
       onSwitched();
     } catch {
       toast.error(t("nav.switchAccountFailed"));
