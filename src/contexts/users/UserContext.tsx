@@ -1,11 +1,13 @@
 ﻿"use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import useSWR, { KeyedMutator } from "swr";
 import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { Session } from "@/types/session";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { isRememberedAccountProvider } from "@/types/auth/rememberedAccount";
+import { upsertRememberedAccount } from "@/utils/auth/rememberedAccounts";
 
 interface UserContextType {
   user: Session | null;
@@ -69,6 +71,27 @@ export const UserProvider = ({
 
   const combinedLoading =
     isInitializing || (!!fbUser && isSwrLoading && !data && !error);
+
+  const recordedUidRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!fbUser || !data?.user) return;
+    const providerId = fbUser.providerData[0]?.providerId;
+    if (!isRememberedAccountProvider(providerId)) return;
+
+    const isNewSignIn = recordedUidRef.current !== fbUser.uid;
+    recordedUidRef.current = fbUser.uid;
+
+    upsertRememberedAccount(
+      {
+        uid: fbUser.uid,
+        displayName: fbUser.displayName || data.user.userName,
+        avatarUrl: fbUser.photoURL || data.user.profileImage || "",
+        provider: providerId,
+        isPublic: !!data.user.isPublic,
+      },
+      { bumpLastSwitchedAt: isNewSignIn },
+    );
+  }, [fbUser, data?.user]);
 
   return (
     <UserContext.Provider

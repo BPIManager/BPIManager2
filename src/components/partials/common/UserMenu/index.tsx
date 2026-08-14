@@ -20,6 +20,8 @@ import { Separator } from "@/components/ui/separator";
 import RoleBadge from "@/components/partials/common/Badge/UserRole";
 import AccountSettings from "@/components/partials/modal/AccountSettings";
 import LoginDialog from "@/components/partials/modal/LoginDialog";
+import AccountSwitcher from "./AccountSwitcher";
+import { cn } from "@/lib/utils";
 
 type MenuItemProps = {
   label: string;
@@ -46,17 +48,22 @@ const MenuItem = ({ label, onClick, danger = false }: MenuItemProps) => (
 );
 
 const UserMenu = () => {
-  const { user, isLoading } = useUser();
+  const { user, fbUser, isLoading } = useUser();
   const { t } = useTranslation();
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [accountSettingsOpen, setAccountSettingsOpen] = useState(false);
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
+  const [view, setView] = useState<"menu" | "accounts">("menu");
 
   const router = useRouter();
   const close = () => setPopoverOpen(false);
   const navigate = (path: string) => {
     close();
     router.push(path);
+  };
+  const setPopoverOpenAndResetView = (open: boolean) => {
+    setPopoverOpen(open);
+    if (!open) setView("menu");
   };
 
   if (!isLoading && !user) {
@@ -75,7 +82,7 @@ const UserMenu = () => {
 
   return (
     <>
-      <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+      <Popover open={popoverOpen} onOpenChange={setPopoverOpenAndResetView}>
         <PopoverTrigger asChild>
           <button className="cursor-pointer rounded-full outline-none ring-offset-2 ring-offset-bpim-surface focus-visible:ring-2 focus-visible:ring-bpim-primary">
             <Avatar className="h-8 w-8">
@@ -93,7 +100,10 @@ const UserMenu = () => {
         <PopoverContent
           align="end"
           sideOffset={8}
-          className="w-52 p-0 overflow-hidden"
+          className={cn(
+            "p-0 overflow-hidden",
+            view === "accounts" ? "w-64" : "w-52",
+          )}
         >
           <div className="bg-bpim-overlay/60 px-4 py-3 flex flex-col gap-1">
             <div className="flex items-center justify-between gap-2">
@@ -139,39 +149,55 @@ const UserMenu = () => {
             </div>
           )}
 
-          <div className="flex flex-col p-1">
-            {user?.userId && (
+          {view === "accounts" ? (
+            <AccountSwitcher
+              currentUid={fbUser?.uid}
+              onBack={() => setView("menu")}
+              onRequestAddAccount={() => {
+                setPopoverOpenAndResetView(false);
+                setLoginDialogOpen(true);
+              }}
+              onSwitched={() => setPopoverOpenAndResetView(false)}
+            />
+          ) : (
+            <div className="flex flex-col p-1">
+              {user?.userId && (
+                <MenuItem
+                  label={t("nav.user.viewProfile")}
+                  onClick={() => {
+                    close();
+                    navigate(`/users/${user.userId}`);
+                  }}
+                />
+              )}
               <MenuItem
-                label={t("nav.user.viewProfile")}
+                label={t("settings.profile.title")}
                 onClick={() => {
                   close();
-                  navigate(`/users/${user.userId}`);
+                  setAccountSettingsOpen(true);
                 }}
               />
-            )}
-            <MenuItem
-              label={t("settings.profile.title")}
-              onClick={() => {
-                close();
-                setAccountSettingsOpen(true);
-              }}
-            />
-            <MenuItem
-              label={t("nav.settings")}
-              onClick={() => {
-                close();
-                navigate("/settings");
-              }}
-            />
+              <MenuItem
+                label={t("nav.settings")}
+                onClick={() => {
+                  close();
+                  navigate("/settings");
+                }}
+              />
+              <MenuItem
+                label={t("nav.switchAccount")}
+                onClick={() => setView("accounts")}
+              />
 
-            <Separator className="bg-bpim-border my-1" />
+              <Separator className="bg-bpim-border my-1" />
 
-            <MenuItem
-              label={t("nav.signOut")}
-              onClick={() => authActions.logout()}
-              danger
-            />
-          </div>
+              <MenuItem
+                label={t("nav.signOut")}
+                onClick={() => authActions.logout()}
+                danger
+              />
+            </div>
+          )}
         </PopoverContent>
       </Popover>
 

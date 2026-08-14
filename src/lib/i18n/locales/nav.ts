@@ -145,6 +145,36 @@ export const navTranslations = {
     "zh-TW": "登出",
     ko: "로그아웃",
   },
+  "nav.switchAccount": {
+    ja: "アカウント切り替え",
+    en: "Switch Account",
+    "zh-TW": "切換帳戶",
+    ko: "계정 전환",
+  },
+  "nav.addAccount": {
+    ja: "新規アカウントを追加",
+    en: "Add Account",
+    "zh-TW": "新增帳戶",
+    ko: "계정 추가",
+  },
+  "nav.currentAccount": {
+    ja: "現在のアカウント",
+    en: "Current",
+    "zh-TW": "目前帳戶",
+    ko: "현재 계정",
+  },
+  "nav.noRememberedAccounts": {
+    ja: "サインイン済みのアカウントはありません",
+    en: "No signed-in accounts on this device",
+    "zh-TW": "此裝置尚無已登入的帳戶",
+    ko: "이 기기에 로그인한 계정이 없습니다",
+  },
+  "nav.switchAccountFailed": {
+    ja: "アカウントの切り替えに失敗しました",
+    en: "Failed to switch account",
+    "zh-TW": "切換帳戶失敗",
+    ko: "계정 전환에 실패했습니다",
+  },
   // Section headers
   "nav.section.score": {
     ja: "スコア一覧",
