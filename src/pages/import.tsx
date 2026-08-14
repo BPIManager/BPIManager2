@@ -2,7 +2,6 @@ import { Meta } from "@/components/partials/common/PageChrome/Head";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import ImportSuccessModal from "@/components/partials/features/Import/SuccessModal/ui";
 import ImportView from "@/components/partials/features/Import/View";
-import AccountSettings from "@/components/partials/modal/AccountSettings";
 import { dummyCsv } from "@/constants/ui/dummyCsv";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { useUser } from "@/contexts/users/UserContext";
@@ -64,7 +63,6 @@ export default function ImportPage() {
 
   return (
     <>
-      {!user && <AccountSettings />}
       <Meta title={t("page.import.title")} noIndex />
 
       <ImportView

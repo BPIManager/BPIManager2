@@ -8,6 +8,7 @@ import { PagesProgressBar as ProgressBar } from "next-nprogress-bar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "sonner";
 import LocaleDetectionModal from "@/components/partials/common/LocaleDetectionModal";
+import AccountSettings from "@/components/partials/modal/AccountSettings";
 import { updateFavicon } from "@/components/ui/bpim-logo";
 
 export default function App({ Component, pageProps }: AppProps) {
@@ -34,6 +35,7 @@ export default function App({ Component, pageProps }: AppProps) {
           <TooltipProvider>
             <Toaster />
             <LocaleDetectionModal />
+            <AccountSettings />
             <Component {...pageProps} />
           </TooltipProvider>
         </UserProvider>

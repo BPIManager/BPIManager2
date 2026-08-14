@@ -57,6 +57,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
     setFormData({ ...formData, xId: value });
   };
 
+  const isAutoPrompt = isOpen === undefined;
   const finalOpen = isOpen || (!isLoading && isSignedIn() && !user);
 
   return (
@@ -282,6 +283,15 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                 t("common.save")
               )}
             </Button>
+            {isAutoPrompt && (
+              <Button
+                variant="ghost"
+                className="h-10 w-full text-sm font-bold text-bpim-danger hover:bg-bpim-danger/10"
+                onClick={() => authActions.logout()}
+              >
+                {t("nav.signOut")}
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>
