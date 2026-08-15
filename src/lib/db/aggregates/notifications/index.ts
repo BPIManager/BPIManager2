@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { notificationsRepo } from "@/lib/db/domains/notifications";
 import { followRequestsRepo } from "@/lib/db/domains/followRequests";
 import { followApprovalNotificationsRepo } from "@/lib/db/domains/followApprovalNotifications";
+import { followAccessAggregateRepo } from "@/lib/db/aggregates/followAccess";
 import { NotificationOvertakenRow } from "@/types/users/notifications";
 import { sql } from "kysely";
 
@@ -105,16 +106,19 @@ class NotificationsAggregateRepository {
       .where("s2.lastPlayed", ">", lastRead)
       .executeTakeFirst();
 
-    const [pendingRequestCount, unreadApprovalCount] = await Promise.all([
-      followRequestsRepo.countPendingForTarget(userId),
-      followApprovalNotificationsRepo.countUnreadSince(userId, lastRead),
-    ]);
+    const [pendingRequestCount, unapprovedFollowerCount, unreadApprovalCount] =
+      await Promise.all([
+        followRequestsRepo.countPendingForTarget(userId),
+        followAccessAggregateRepo.countUnapprovedFollowers(userId),
+        followApprovalNotificationsRepo.countUnreadSince(userId, lastRead),
+      ]);
 
     return {
       total:
         Number(followCount?.cnt || 0) +
         Number(overtakenCount?.cnt || 0) +
         pendingRequestCount +
+        unapprovedFollowerCount +
         unreadApprovalCount,
     };
   }

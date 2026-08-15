@@ -2,7 +2,7 @@ import { NextApiRequest } from "next";
 import { db } from "@/lib/db";
 import { oauthRepo } from "@/lib/db/domains/oauth";
 import { canViewUserData } from "@/lib/db/shared/visibility";
-import { followsRepo } from "@/lib/db/domains/follow";
+import { followAccessAggregateRepo } from "@/lib/db/aggregates/followAccess";
 
 export function getBaseUrl() {
   return (process.env.BASEURL ?? "").replace(/\/+$/, "");
@@ -42,7 +42,11 @@ export async function checkSelfOrPublicAccess(
     return { allowed: false as const, message: "指定されたユーザーが見つかりません。" };
   }
   const hasFollowAccess =
-    !target.isPublic && (await followsRepo.isFollowing(selfUserId, targetUserId));
+    !target.isPublic &&
+    (await followAccessAggregateRepo.hasApprovedFollowAccess(
+      selfUserId,
+      targetUserId,
+    ));
 
   if (
     !canViewUserData({

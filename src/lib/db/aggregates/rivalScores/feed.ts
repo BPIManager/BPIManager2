@@ -107,9 +107,21 @@ class SocialTimelineRepository {
           .as("myBestExScore"),
       ])
       .where("f.followerId", "=", viewerId)
-      // followsが存在するのは公開ユーザーへのフォロー、または非公開ユーザーへの
-      // 承認済みフォローのみ(#275)。viewerId自身が閲覧者本人でありfollowerId=viewerId
-      // なので、isPublicによる絞り込みは不要(followsの存在自体が閲覧許可を意味する)
+      // 対象が公開、または対象が非公開でも承認記録がある場合のみ表示する。
+      // followsの存在だけでは判定できない(#275フォロー後方修正: 公開時代に
+      // 成立したfollowsには承認記録がないため、承認記録の有無も要求する)
+      .where((eb) =>
+        eb.or([
+          eb("u.isPublic", "=", 1),
+          eb.exists(
+            eb
+              .selectFrom("followApprovalNotifications as fan")
+              .select("fan.id")
+              .where("fan.recipientId", "=", viewerId)
+              .whereRef("fan.actorId", "=", "u.userId"),
+          ),
+        ]),
+      )
       .$if(!!search, (qb) =>
         qb.where((eb) =>
           eb.or([

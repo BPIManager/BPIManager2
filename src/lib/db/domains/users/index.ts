@@ -128,7 +128,7 @@ class UsersRepository {
   }
 
   /**
-   * 表示用の最小情報（ユーザー名・プロフィール画像）を取得する。
+   * 表示用の最小情報（ユーザー名・プロフィール画像・公開設定）を取得する。
    *
    * 招待URLのプレビュー等、フルプロフィールが不要な用途に使う。
    *
@@ -137,7 +137,7 @@ class UsersRepository {
   async getDisplayInfo(userId: string) {
     return await db
       .selectFrom("users")
-      .select(["userId", "userName", "profileImage"])
+      .select(["userId", "userName", "profileImage", "isPublic"])
       .where("userId", "=", userId)
       .executeTakeFirst();
   }

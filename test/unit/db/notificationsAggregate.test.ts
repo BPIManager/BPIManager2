@@ -23,8 +23,8 @@ describe("notificationsAggregateRepo.getUnreadCount", () => {
       "33",
     );
     // executeTakeFirstは常に同じcanned値を返すため followCount=3, overtakenCount=3,
-    // pendingRequestCount=3, unreadApprovalCount=3 の合計12
-    expect(result).toEqual({ total: 12 });
+    // pendingRequestCount=3, unapprovedFollowerCount=3, unreadApprovalCount=3 の合計15
+    expect(result).toEqual({ total: 15 });
   });
 
   it("結果がすべてundefinedの場合0を返すこと", async () => {

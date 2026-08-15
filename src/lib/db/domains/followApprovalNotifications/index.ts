@@ -27,6 +27,44 @@ class FollowApprovalNotificationsRepository {
   }
 
   /**
+   * 承認通知を記録する（トランザクション不要の単独呼び出し版）。
+   *
+   * 「以前は公開だったが非公開に変わったユーザー」の既存フォロワーを
+   * 事後承認する場合など、`follows`行が既に存在し他テーブルへの
+   * 書き込みを伴わないケースで使う。
+   *
+   * @param recipientId - 通知の受信者（フォロワー）
+   * @param actorId - 承認したユーザー
+   */
+  async recordApproval(recipientId: string, actorId: string) {
+    await db
+      .insertInto("followApprovalNotifications")
+      .values({ recipientId, actorId })
+      .execute();
+  }
+
+  /**
+   * 指定の組み合わせで、過去に承認記録があるかを確認する。
+   *
+   * `follows`行の存在だけでは「承認制導入前(公開時代)からフォローして
+   * いた」ケースと区別できないため、`hasFollowAccess`の判定に使う
+   * （follows存在 AND この承認記録存在、の両方を要求する）。
+   *
+   * @param recipientId - リクエスト送信者（フォロワー）側のユーザー ID
+   * @param actorId - 承認した（された）側のユーザー ID
+   */
+  async existsForPair(recipientId: string, actorId: string): Promise<boolean> {
+    const result = await db
+      .selectFrom("followApprovalNotifications")
+      .select("id")
+      .where("recipientId", "=", recipientId)
+      .where("actorId", "=", actorId)
+      .executeTakeFirst();
+
+    return !!result;
+  }
+
+  /**
    * 指定ユーザー宛の未読件数を取得する。
    *
    * @param recipientId - 通知の受信者

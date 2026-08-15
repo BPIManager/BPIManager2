@@ -3,6 +3,7 @@
 import { useState } from "react";
 import dayjs from "@/lib/dayjs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import type { PendingFollowRequest } from "@/hooks/users/useFollowRequests";
@@ -13,17 +14,19 @@ const NotificationRequestItem = ({
   onReject,
 }: {
   request: PendingFollowRequest;
-  onApprove: (id: number) => Promise<void>;
-  onReject: (id: number) => Promise<void>;
+  onApprove: (request: PendingFollowRequest) => Promise<void>;
+  onReject: (request: PendingFollowRequest) => Promise<void>;
 }) => {
   const { t } = useTranslation();
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const handle = async (action: (id: number) => Promise<void>) => {
+  const handle = async (
+    action: (request: PendingFollowRequest) => Promise<void>,
+  ) => {
     if (isUpdating) return;
     setIsUpdating(true);
     try {
-      await action(request.id);
+      await action(request);
     } finally {
       setIsUpdating(false);
     }
@@ -47,7 +50,17 @@ const NotificationRequestItem = ({
           <span className="font-bold text-bpim-text">
             {request.requesterName}
           </span>
-          {t("notifications.requests.msg")}
+          {request.kind === "legacy"
+            ? t("notifications.requests.legacyMsg")
+            : t("notifications.requests.msg")}
+          {request.kind === "legacy" && (
+            <Badge
+              variant="secondary"
+              className="ml-2 h-4 px-1.5 text-[10px] font-bold"
+            >
+              {t("notifications.requests.legacyBadge")}
+            </Badge>
+          )}
         </div>
         <div className="mt-1 flex gap-2">
           <Button

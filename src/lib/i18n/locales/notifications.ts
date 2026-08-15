@@ -95,4 +95,17 @@ export const notificationsTranslations = {
     "zh-TW": " 請求追蹤你",
     ko: "님이 팔로우를 요청했습니다",
   },
+  // Legacy follower message: "{name}{msg}"
+  "notifications.requests.legacyMsg": {
+    ja: " さんは以前からのフォロワーです(未承認)",
+    en: " has been following you (not yet approved).",
+    "zh-TW": " 一直以來都在追蹤你(尚未核准)",
+    ko: "님은 이전부터 팔로우하고 있습니다 (미승인)",
+  },
+  "notifications.requests.legacyBadge": {
+    ja: "既存フォロワー",
+    en: "Existing follower",
+    "zh-TW": "既有追蹤者",
+    ko: "기존 팔로워",
+  },
 } as const;

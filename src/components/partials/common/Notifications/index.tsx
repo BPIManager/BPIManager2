@@ -93,7 +93,7 @@ const NotificationBell = () => {
               ) : (
                 requests.map((r) => (
                   <NotificationRequestItem
-                    key={r.id}
+                    key={`${r.kind}-${r.kind === "request" ? r.id : r.requesterId}`}
                     request={r}
                     onApprove={approve}
                     onReject={reject}

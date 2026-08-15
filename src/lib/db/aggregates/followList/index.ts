@@ -103,6 +103,12 @@ class FollowListAggregateRepository {
           .whereRef("f2.followingId", "=", "u.userId")
           .where("f2.followerId", "=", viewerId ?? "")
           .as("isViewerFollowing"),
+        eb
+          .selectFrom("followApprovalNotifications as fan")
+          .select((eb2) => [eb2.fn.countAll<number>().as("cnt")])
+          .whereRef("fan.actorId", "=", "u.userId")
+          .where("fan.recipientId", "=", viewerId ?? "")
+          .as("isViewerApproved"),
       ])
       .orderBy("f.createdAt", "desc")
       .limit(limit)
@@ -115,7 +121,10 @@ class FollowListAggregateRepository {
           viewerId,
           targetUserId: u.userId,
           isPublic: u.isPublic,
-          hasFollowAccess: Number(u.isViewerFollowing) > 0,
+          // follows存在だけでなく承認記録も必要(#275フォロー後方修正:
+          // 公開時代に成立したfollowsには承認記録がないため)
+          hasFollowAccess:
+            Number(u.isViewerFollowing) > 0 && Number(u.isViewerApproved) > 0,
         });
 
         return {

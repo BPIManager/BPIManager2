@@ -22,6 +22,12 @@ export const commonTranslations = {
     "zh-TW": "重新發行",
     ko: "재발급",
   },
+  "common.privateAccount": {
+    ja: "非公開アカウント",
+    en: "Private account",
+    "zh-TW": "非公開帳號",
+    ko: "비공개 계정",
+  },
   "common.selectAll": {
     ja: "すべて選択",
     en: "Select all",

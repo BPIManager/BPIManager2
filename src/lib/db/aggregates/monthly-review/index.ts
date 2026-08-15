@@ -306,9 +306,21 @@ class MonthlyReviewRepository {
       ])
       .where("f.followerId", "=", viewerId)
       .where("s.version", "=", version)
-      // followsが存在するのは公開ユーザーへのフォロー、または非公開ユーザーへの
-      // 承認済みフォローのみ(#275)。呼び出し元は必ずviewerId=req.authUid(閲覧者本人)
-      // で呼ぶため、isPublicによる絞り込みは不要
+      // 対象が公開、または対象が非公開でも承認記録がある場合のみ表示する。
+      // followsの存在だけでは判定できない(#275フォロー後方修正: 公開時代に
+      // 成立したfollowsには承認記録がないため、承認記録の有無も要求する)
+      .where((eb) =>
+        eb.or([
+          eb("u.isPublic", "=", 1),
+          eb.exists(
+            eb
+              .selectFrom("followApprovalNotifications as fan")
+              .select("fan.id")
+              .where("fan.recipientId", "=", viewerId)
+              .whereRef("fan.actorId", "=", "u.userId"),
+          ),
+        ]),
+      )
       .execute();
   }
 

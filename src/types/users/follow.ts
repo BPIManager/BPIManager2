@@ -10,4 +10,8 @@ export interface FollowUser {
   isViewerFollowing: boolean;
   /** このユーザーが閲覧者自身か */
   isSelf: boolean;
+  /** このユーザーが公開設定か */
+  isPublic: boolean;
+  /** 閲覧許可がなく情報がマスクされているか */
+  isMasked: boolean;
 }

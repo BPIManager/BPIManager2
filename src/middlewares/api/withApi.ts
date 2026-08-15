@@ -2,7 +2,7 @@ import { usersRepo } from "@/lib/db/domains/users";
 import { adminAuth } from "@/lib/firebase/admin";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { canViewUserData } from "@/lib/db/shared/visibility";
-import { followsRepo } from "@/lib/db/domains/follow";
+import { followAccessAggregateRepo } from "@/lib/db/aggregates/followAccess";
 
 export interface AccessResult {
   hasAccess: boolean;
@@ -58,7 +58,11 @@ export async function checkUserAccess(
 
   const viewerId = await authenticateViewer(req);
   const hasFollowAccess =
-    !!viewerId && (await followsRepo.isFollowing(viewerId, targetUserId));
+    !!viewerId &&
+    (await followAccessAggregateRepo.hasApprovedFollowAccess(
+      viewerId,
+      targetUserId,
+    ));
 
   if (
     canViewUserData({

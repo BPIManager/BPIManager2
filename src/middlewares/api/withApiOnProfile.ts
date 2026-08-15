@@ -1,7 +1,7 @@
 import { NextApiRequest } from "next";
 import { AccessResult, authenticateViewer } from "./withApi";
 import { usersRepo } from "@/lib/db/domains/users";
-import { followsRepo } from "@/lib/db/domains/follow";
+import { followAccessAggregateRepo } from "@/lib/db/aggregates/followAccess";
 import { canViewUserData } from "@/lib/db/shared/visibility";
 
 export async function checkProfileAccess(
@@ -28,11 +28,14 @@ export async function checkProfileAccess(
     };
   }
 
-  // isPublicで既に許可される場合はfollowsの存在確認(DBアクセス)を省略する
+  // isPublicで既に許可される場合はfollows/承認記録の確認(DBアクセス)を省略する
   const hasFollowAccess =
     !userData.isPublic &&
     !!viewerId &&
-    (await followsRepo.isFollowing(viewerId, targetUserId));
+    (await followAccessAggregateRepo.hasApprovedFollowAccess(
+      viewerId,
+      targetUserId,
+    ));
 
   if (
     canViewUserData({

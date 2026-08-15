@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/collapsible";
 import BpiHistoryTable from "./bpiTable";
 import ArenaClassBadge from "@/components/partials/common/Badge/ArenaClassBadge";
+import PrivateAccountBadge from "@/components/partials/common/Badge/PrivateAccountBadge";
 import {
   Tooltip,
   TooltipContent,
@@ -140,6 +141,7 @@ const ProfileSideBar = ({
             <h2 className="text-xl font-extrabold leading-tight text-bpim-text">
               {profile.userName}
             </h2>
+            {!profile.isPublic && <PrivateAccountBadge />}
             {profile.role && (
               <RoleBadge {...profile.role} variant="full" size="small" />
             )}

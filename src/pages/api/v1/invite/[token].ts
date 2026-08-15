@@ -3,6 +3,7 @@ import { followInviteLinksRepo } from "@/lib/db/domains/followInviteLinks";
 import { usersRepo } from "@/lib/db/domains/users";
 import { followsRepo } from "@/lib/db/domains/follow";
 import { followRequestsRepo } from "@/lib/db/domains/followRequests";
+import { followAccessAggregateRepo } from "@/lib/db/aggregates/followAccess";
 import { authenticateViewer } from "@/middlewares/api/withApi";
 
 /**
@@ -45,8 +46,17 @@ export default async function handler(
       let isFollowing = false;
       let hasPendingRequest = false;
       if (viewerId && viewerId !== inviter.userId) {
+        // 対象が公開の場合は通常のfollows存在のみで判定する(公開時代の
+        // インスタントフォローには承認記録がないため)。非公開の場合は
+        // 承認記録も要求する(#275フォロー後方修正: 公開→非公開に変わった
+        // ユーザーの未承認フォロワーを「承認済み」扱いにしないため)
         [isFollowing, hasPendingRequest] = await Promise.all([
-          followsRepo.isFollowing(viewerId, inviter.userId),
+          inviter.isPublic
+            ? followsRepo.isFollowing(viewerId, inviter.userId)
+            : followAccessAggregateRepo.hasApprovedFollowAccess(
+                viewerId,
+                inviter.userId,
+              ),
           followRequestsRepo.existsPending(viewerId, inviter.userId),
         ]);
       }

@@ -2,6 +2,7 @@ import { usersRepo } from "@/lib/db/domains/users";
 import { followInviteLinksRepo } from "@/lib/db/domains/followInviteLinks";
 import { followRequestsRepo } from "@/lib/db/domains/followRequests";
 import { followsRepo } from "@/lib/db/domains/follow";
+import { followAccessAggregateRepo } from "@/lib/db/aggregates/followAccess";
 
 export type SubmitFollowRequestResult =
   | { status: "requested" }
@@ -33,16 +34,26 @@ export async function submitFollowRequest(
   const target = await usersRepo.getAccessInfo(targetUserId);
   if (!target) return { status: "target_not_found" };
 
-  const isAlreadyFollowing = await followsRepo.isFollowing(
+  if (target.isPublic) {
+    const isAlreadyFollowing = await followsRepo.isFollowing(
+      requesterId,
+      targetUserId,
+    );
+    if (!isAlreadyFollowing) {
+      await followsRepo.toggleFollow(requesterId, targetUserId);
+    }
+    return { status: "followed" };
+  }
+
+  // 対象が非公開の場合、follows行の有無だけでなく承認記録も確認する。
+  // 承認制導入前(公開時代)に成立した未承認のfollowsは「既にフォロー済み」
+  // として扱わない(招待URL再送信をきっかけに正規のリクエストとして
+  // 再送信できるようにする。承認されればlegacyの仮想エントリも自動解消する)
+  const hasApprovedAccess = await followAccessAggregateRepo.hasApprovedFollowAccess(
     requesterId,
     targetUserId,
   );
-  if (isAlreadyFollowing) return { status: "followed" };
-
-  if (target.isPublic) {
-    await followsRepo.toggleFollow(requesterId, targetUserId);
-    return { status: "followed" };
-  }
+  if (hasApprovedAccess) return { status: "followed" };
 
   await followRequestsRepo.create(requesterId, targetUserId);
   return { status: "requested" };
