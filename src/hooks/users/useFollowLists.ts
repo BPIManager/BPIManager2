@@ -29,8 +29,11 @@ export const useFollowLists = (userId?: string | boolean) => {
     { revalidateOnFocus: false },
   );
 
-  const createList = async (name: string, isPublic: boolean) => {
-    if (!fbUser) return;
+  const createList = async (
+    name: string,
+    isPublic: boolean,
+  ): Promise<number | undefined> => {
+    if (!fbUser) return undefined;
     const res = await authFetch(
       `${API_PREFIX}/users/${fbUser.uid}/follow-lists`,
       "POST",
@@ -38,7 +41,9 @@ export const useFollowLists = (userId?: string | boolean) => {
       { name, isPublic },
     );
     if (!res.ok) throw new Error("Failed to create follow list");
+    const { id } = (await res.json()) as { id: number };
     await invalidateFollowListsCache(fbUser.uid);
+    return id;
   };
 
   const renameList = async (listId: number, name: string) => {

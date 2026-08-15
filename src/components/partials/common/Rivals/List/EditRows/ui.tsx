@@ -8,9 +8,16 @@ interface Props {
   lists: FollowListSummary[];
   pending: boolean;
   onToggleList: (listId: number) => void;
+  onCreateList: (name: string) => Promise<void>;
 }
 
-const RivalListEditRow = ({ user, lists, pending, onToggleList }: Props) => {
+const RivalListEditRow = ({
+  user,
+  lists,
+  pending,
+  onToggleList,
+  onCreateList,
+}: Props) => {
   const { t } = useTranslation();
   return (
     <div className="flex w-full items-center justify-between gap-4 rounded-lg border border-bpim-border bg-bpim-surface-2/60 px-3 py-2">
@@ -27,6 +34,7 @@ const RivalListEditRow = ({ user, lists, pending, onToggleList }: Props) => {
         lists={lists}
         selectedListIds={user.listIds}
         onToggle={onToggleList}
+        onCreateList={onCreateList}
         disabled={pending}
       />
     </div>

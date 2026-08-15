@@ -425,4 +425,10 @@ export const rivalsTranslations = {
     "zh-TW": "清單更新失敗",
     ko: "리스트 업데이트에 실패했습니다",
   },
+  "rivals.list.editModeAlert": {
+    ja: "フォロー中のユーザーをリストに分類できます。1人を複数のリストに同時に追加できます。リストは自分だけが閲覧できます。",
+    en: "Organize the people you follow into lists. One person can belong to multiple lists at once. Lists are only visible to you.",
+    "zh-TW": "可以將你追蹤的使用者分類到清單中。同一個人可以同時屬於多個清單。清單只有你自己看得到。",
+    ko: "팔로우 중인 사용자를 리스트로 분류할 수 있습니다. 한 명을 여러 리스트에 동시에 추가할 수 있습니다. 리스트는 본인만 볼 수 있습니다.",
+  },
 } as const;

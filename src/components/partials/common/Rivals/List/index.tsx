@@ -67,7 +67,7 @@ const RivalListContainer = () => {
     <>
       <PageHeader
         title="ライバル"
-        description="ライバル一覧・全体ランキング"
+        description="フォロー中ライバルの一覧・リスト管理"
         rightElement={
           user && (
             <div className="flex items-center gap-2">
