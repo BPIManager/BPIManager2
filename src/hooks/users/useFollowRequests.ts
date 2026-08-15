@@ -34,7 +34,8 @@ export const useFollowRequests = () => {
       request.kind === "request"
         ? `${API_PREFIX}/users/${fbUser.uid}/follow-requests/${request.id}`
         : `${API_PREFIX}/users/${fbUser.uid}/followers/${request.requesterId}`;
-    await authFetch(url, "POST", fbUser);
+    const res = await authFetch(url, "POST", fbUser);
+    if (!res.ok) throw new Error("Failed to approve follow request");
     mutate();
   };
 
@@ -44,7 +45,8 @@ export const useFollowRequests = () => {
       request.kind === "request"
         ? `${API_PREFIX}/users/${fbUser.uid}/follow-requests/${request.id}`
         : `${API_PREFIX}/users/${fbUser.uid}/followers/${request.requesterId}`;
-    await authFetch(url, "DELETE", fbUser);
+    const res = await authFetch(url, "DELETE", fbUser);
+    if (!res.ok) throw new Error("Failed to reject follow request");
     mutate();
   };
 

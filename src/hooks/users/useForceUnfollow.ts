@@ -19,11 +19,14 @@ export const useForceUnfollow = (followerId: string) => {
     if (!fbUser || isUpdating) return;
     setIsUpdating(true);
     try {
-      await authFetch(
+      const res = await authFetch(
         `${API_PREFIX}/users/${fbUser.uid}/followers/${followerId}`,
         "DELETE",
         fbUser,
       );
+      if (!res.ok) {
+        throw new Error("Failed to force-unfollow");
+      }
       refresh();
     } finally {
       setIsUpdating(false);

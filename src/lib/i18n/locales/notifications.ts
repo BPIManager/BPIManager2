@@ -108,4 +108,10 @@ export const notificationsTranslations = {
     "zh-TW": "既有追蹤者",
     ko: "기존 팔로워",
   },
+  "notifications.requests.actionFailed": {
+    ja: "操作に失敗しました",
+    en: "Action failed.",
+    "zh-TW": "操作失敗",
+    ko: "작업에 실패했습니다",
+  },
 } as const;

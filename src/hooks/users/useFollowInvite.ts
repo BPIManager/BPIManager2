@@ -21,6 +21,9 @@ export const useFollowInvite = () => {
       "POST",
       fbUser,
     );
+    if (!res.ok) {
+      throw new Error("Failed to regenerate invite link");
+    }
     const body = (await res.json()) as { token: string };
     mutate(body, { revalidate: false });
     return body.token;

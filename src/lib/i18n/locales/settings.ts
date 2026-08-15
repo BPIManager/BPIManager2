@@ -382,6 +382,18 @@ export const settingsTranslations = {
     "zh-TW": "已複製",
     ko: "복사됨",
   },
+  "settings.followInvite.copy": {
+    ja: "コピー",
+    en: "Copy",
+    "zh-TW": "複製",
+    ko: "복사",
+  },
+  "settings.followInvite.copyFailed": {
+    ja: "コピーに失敗しました",
+    en: "Failed to copy.",
+    "zh-TW": "複製失敗",
+    ko: "복사에 실패했습니다",
+  },
 
   "settings.oauthClient.title": {
     ja: "MCP接続 (OAuth)",

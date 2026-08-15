@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 import { MoreVertical, UserX } from "lucide-react";
 import {
   Popover,
@@ -45,7 +46,12 @@ const ForceUnfollowMenu = ({
   }
 
   const handleConfirm = async () => {
-    await forceUnfollow();
+    try {
+      await forceUnfollow();
+    } catch {
+      toast.error(t("follow.forceUnfollow.failed"));
+      return;
+    }
     setIsConfirmOpen(false);
     onSuccess?.();
   };

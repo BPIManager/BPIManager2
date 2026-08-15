@@ -78,12 +78,18 @@ const FollowInviteContent = ({
     if (!fbUser) return;
     setIsSubmitting(true);
     try {
-      await authFetch(
+      const res = await authFetch(
         `${API_PREFIX}/follow-requests/${preview.userId}`,
         "DELETE",
         fbUser,
       );
+      if (!res.ok) {
+        setResult({ status: "error", message: t("invite.failed") });
+        return;
+      }
       setResult(null);
+    } catch {
+      setResult({ status: "error", message: t("invite.failed") });
     } finally {
       setIsSubmitting(false);
     }

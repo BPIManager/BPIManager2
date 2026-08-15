@@ -43,10 +43,13 @@ export default function FollowInviteSection() {
     }
   };
 
-  const copyToClipboard = () => {
-    if (inviteUrl) {
-      navigator.clipboard.writeText(inviteUrl);
+  const copyToClipboard = async () => {
+    if (!inviteUrl) return;
+    try {
+      await navigator.clipboard.writeText(inviteUrl);
       toast.success(t("settings.followInvite.copied"));
+    } catch {
+      toast.error(t("settings.followInvite.copyFailed"));
     }
   };
 
@@ -74,6 +77,7 @@ export default function FollowInviteSection() {
           <Button
             type="button"
             variant="secondary"
+            aria-label={t("settings.followInvite.copy")}
             className="h-9 rounded-none border-y border-bpim-border px-3 hover:bg-bpim-overlay"
             onClick={copyToClipboard}
           >

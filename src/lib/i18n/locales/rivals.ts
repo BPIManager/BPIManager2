@@ -297,4 +297,10 @@ export const rivalsTranslations = {
     "zh-TW": "此使用者將從你的追蹤者中移除。這並非永久封鎖，對方隨時可以再次追蹤你。",
     ko: "이 사용자를 팔로워에서 삭제합니다. 영구 차단이 아니므로 언제든 다시 팔로우할 수 있습니다.",
   },
+  "follow.forceUnfollow.failed": {
+    ja: "解除に失敗しました",
+    en: "Failed to remove follower.",
+    "zh-TW": "移除失敗",
+    ko: "해제에 실패했습니다",
+  },
 } as const;

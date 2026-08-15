@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import dayjs from "@/lib/dayjs";
+import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,8 @@ const NotificationRequestItem = ({
     setIsUpdating(true);
     try {
       await action(request);
+    } catch {
+      toast.error(t("notifications.requests.actionFailed"));
     } finally {
       setIsUpdating(false);
     }
