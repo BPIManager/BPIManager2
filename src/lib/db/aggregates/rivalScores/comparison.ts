@@ -165,6 +165,9 @@ class SocialComparisonRepository {
    * @param params.version - バージョン番号
    * @param params.levels - 対象難易度レベルの配列（空の場合は全レベル）
    * @param params.difficulties - 対象難易度文字列の配列（空の場合は全難易度）
+   * @param params.listId - 指定時、`viewerId`が所有するこのフォローリストの
+   *   所属ユーザーだけに絞り込む（呼び出し元で所有権を確認済みであること。
+   *   #277）
    */
   // follows・users・userStatusLogs・officialArenaStats・userRadarCache・
   // userRoles・songs・songDef・scores(自分/ライバル)を横断JOINした
@@ -178,8 +181,9 @@ class SocialComparisonRepository {
     version: string;
     levels: number[];
     difficulties: string[];
+    listId?: number;
   }) {
-    const { viewerId, version, levels, difficulties } = params;
+    const { viewerId, version, levels, difficulties, listId } = params;
     const targetSongs = db
       .selectFrom("songs as m")
       .innerJoin("songDef as d", (join) =>
@@ -346,6 +350,16 @@ class SocialComparisonRepository {
               .whereRef("fan.actorId", "=", "u.userId"),
           ),
         ]),
+      )
+      .$if(listId !== undefined, (qb) =>
+        qb.where(
+          "f.followingId",
+          "in",
+          db
+            .selectFrom("followListMembers")
+            .select("followingId")
+            .where("listId", "=", listId as number),
+        ),
       )
       .orderBy("win", "desc")
       .execute();

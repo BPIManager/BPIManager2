@@ -15,6 +15,8 @@ interface RivalSummaryResponse {
  * @param params.levels - フィルタリングするレベル配列
  * @param params.difficulties - フィルタリングする難易度配列
  * @param params.version - IIDX バージョン文字列
+ * @param params.listId - 指定時、このフォローリストの所属ユーザーだけに
+ *   絞り込む（#277）。`null`/未指定なら従来通りフォロー中全ユーザーが対象
  * @returns ライバルサマリー配列・閲覧者BPI・ローディング状態・エラー・更新関数
  */
 export const useRivalSummary = (params: {
@@ -22,11 +24,13 @@ export const useRivalSummary = (params: {
   levels: string[];
   difficulties: readonly string[];
   version: string;
+  listId?: number | null;
 }) => {
-  const { userId, levels, difficulties, version } = params;
+  const { userId, levels, difficulties, version, listId } = params;
   const query = new URLSearchParams({ version });
   levels.forEach((l) => query.append("levels", l));
   difficulties.forEach((d) => query.append("difficulties", d));
+  if (listId != null) query.append("listId", String(listId));
 
   const url = userId
     ? `${API_PREFIX}/users/${userId}/rivals/following/summary?${query.toString()}`

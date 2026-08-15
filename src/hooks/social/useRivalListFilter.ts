@@ -23,6 +23,9 @@ export function useRivalListFilter() {
     ...IIDX_DIFFICULTIES,
   ]);
   const [sortOrder, setSortOrder] = useState<RivalSortOrder>("win_desc");
+  // フォローリストによる絞り込み(#277)。未選択(null)時は既存挙動どおり
+  // フォロー中全ユーザーが対象になる。
+  const [listId, setListId] = useState<number | null>(null);
 
   const handleToggleLevel = (lv: string) =>
     setLevels((prev) => toggleArrayItem(prev, lv));
@@ -34,8 +37,10 @@ export function useRivalListFilter() {
     levels,
     difficulties,
     sortOrder,
+    listId,
     handleToggleLevel,
     handleToggleDifficulty,
     setSortOrder,
+    setListId,
   };
 }

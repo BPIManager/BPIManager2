@@ -147,6 +147,34 @@ CREATE TABLE IF NOT EXISTS `followRequests` (
   CONSTRAINT `fk_followrequests_target` FOREIGN KEY (`targetUserId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- フォロー中ユーザーを分類する任意のリスト(#277)。1ユーザーが作成できる
+-- リスト数に上限は設けない。isPublicは将来の第三者閲覧用に保持するが、
+-- 現時点では本人のみがリスト・所属ユーザーを参照できる。
+CREATE TABLE IF NOT EXISTS `followLists` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `userId` varchar(128) NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `isPublic` tinyint(1) NOT NULL DEFAULT 0,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `idx_followlists_userId` (`userId`),
+  CONSTRAINT `fk_followlists_user` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- followListsへのユーザー所属(多対多)。1人のフォロー中ユーザーを複数の
+-- リストに同時に所属させられる。
+CREATE TABLE IF NOT EXISTS `followListMembers` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `listId` int(11) NOT NULL,
+  `followingId` varchar(128) NOT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_followlistmembers_list_following` (`listId`,`followingId`),
+  KEY `idx_followlistmembers_following` (`followingId`),
+  CONSTRAINT `fk_followlistmembers_list` FOREIGN KEY (`listId`) REFERENCES `followLists` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_followlistmembers_following` FOREIGN KEY (`followingId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `follows` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `followerId` varchar(128) NOT NULL,
