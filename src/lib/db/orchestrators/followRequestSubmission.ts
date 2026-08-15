@@ -33,14 +33,14 @@ export async function submitFollowRequest(
   const target = await usersRepo.getAccessInfo(targetUserId);
   if (!target) return { status: "target_not_found" };
 
+  const isAlreadyFollowing = await followsRepo.isFollowing(
+    requesterId,
+    targetUserId,
+  );
+  if (isAlreadyFollowing) return { status: "followed" };
+
   if (target.isPublic) {
-    const isAlreadyFollowing = await followsRepo.isFollowing(
-      requesterId,
-      targetUserId,
-    );
-    if (!isAlreadyFollowing) {
-      await followsRepo.toggleFollow(requesterId, targetUserId);
-    }
+    await followsRepo.toggleFollow(requesterId, targetUserId);
     return { status: "followed" };
   }
 

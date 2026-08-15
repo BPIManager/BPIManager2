@@ -37,6 +37,7 @@ const ProfileLayoutShell = ({
     isNotFound,
     toggleFollow,
     isUpdating,
+    mutate,
   } = useProfile(userId);
 
   if (isLoading) {
@@ -99,6 +100,7 @@ const ProfileLayoutShell = ({
                 <ProfileSideBar
                   onFollowToggle={toggleFollow}
                   isUpdating={isUpdating}
+                  onRelationshipChange={() => mutate()}
                 />
               </aside>
 

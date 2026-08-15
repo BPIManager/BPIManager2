@@ -54,6 +54,7 @@ describe("submitFollowRequest", () => {
       userId: "target-1",
       isPublic: 0,
     });
+    vi.spyOn(followsRepo, "isFollowing").mockResolvedValue(false);
     const createSpy = vi
       .spyOn(followRequestsRepo, "create")
       .mockResolvedValue(undefined);
@@ -62,6 +63,27 @@ describe("submitFollowRequest", () => {
 
     expect(result).toEqual({ status: "requested" });
     expect(createSpy).toHaveBeenCalledWith("requester-1", "target-1");
+  });
+
+  it("対象が非公開かつ既に承認済み(follows済み)の場合、重複したリクエストを作らずfollowedを返すこと", async () => {
+    vi.spyOn(followInviteLinksRepo, "getByToken").mockResolvedValue({
+      userId: "target-1",
+      token: "tok",
+      createdAt: new Date(),
+    });
+    vi.spyOn(usersRepo, "getAccessInfo").mockResolvedValue({
+      userId: "target-1",
+      isPublic: 0,
+    });
+    vi.spyOn(followsRepo, "isFollowing").mockResolvedValue(true);
+    const createSpy = vi
+      .spyOn(followRequestsRepo, "create")
+      .mockResolvedValue(undefined);
+
+    const result = await submitFollowRequest("requester-1", "tok");
+
+    expect(result).toEqual({ status: "followed" });
+    expect(createSpy).not.toHaveBeenCalled();
   });
 
   it("対象が(招待発行後に)公開に変わっていた場合、保留リクエストを作らず即時followsを作成しfollowedを返すこと", async () => {

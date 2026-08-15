@@ -2,26 +2,30 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import Link from "next/link";
 import { useUser } from "@/contexts/users/UserContext";
-import { LoginButtons } from "@/components/partials/common/Auth/Buttons";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import DashboardLayout from "@/components/partials/shell/DashboardLayout";
 import { PageLoader } from "@/components/ui/loading-spinner";
 import { Meta } from "@/components/partials/common/PageChrome/Head";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import { authFetch } from "@/utils/common/fetch";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import FollowInviteContent from "@/components/partials/features/Invite/FollowInvite";
 
-interface InvitePreview {
+/**
+ * 招待URL(`/invite/[token]`)共通ページ。
+ *
+ * `/api/v1/invite/[token]`が返す`type`によって表示内容を出し分ける
+ * （現時点では`"follow"`のみ。チーム招待(#276)等、他の招待種別を
+ * 追加する際は同じURL形式のままこのswitchに分岐を追加する）。
+ */
+type InvitePreviewData = {
+  type: "follow";
   userId: string;
   userName: string;
   profileImage: string | null;
-}
-
-type SubmitResult =
-  | { status: "requested" | "followed" }
-  | { status: "error"; message: string };
+  isFollowing: boolean;
+  hasPendingRequest: boolean;
+};
 
 export default function InvitePage() {
   const router = useRouter();
@@ -29,20 +33,21 @@ export default function InvitePage() {
   const { fbUser, isLoading } = useUser();
   const token = typeof router.query.token === "string" ? router.query.token : null;
 
-  const [preview, setPreview] = useState<InvitePreview | null>(null);
+  const [preview, setPreview] = useState<InvitePreviewData | null>(null);
   const [lookupFailed, setLookupFailed] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [result, setResult] = useState<SubmitResult | null>(null);
 
   useEffect(() => {
-    if (!token) return;
+    // fbUserの認証状態が確定してから取得する(認証ヘッダー付きでisFollowing等を
+    // 一緒に取得するため。先に未認証でフェッチすると承認済みでも
+    // 「送信」ボタンが一瞬表示されてしまう)
+    if (!token || isLoading) return;
     let cancelled = false;
-    fetch(`${API_PREFIX}/follow-invite/${token}`)
+    authFetch(`${API_PREFIX}/invite/${token}`, "GET", fbUser ?? null)
       .then((res) => {
         if (!res.ok) throw new Error("invite lookup failed");
         return res.json();
       })
-      .then((data: InvitePreview) => {
+      .then((data: InvitePreviewData) => {
         if (!cancelled) setPreview(data);
       })
       .catch(() => {
@@ -51,117 +56,41 @@ export default function InvitePage() {
     return () => {
       cancelled = true;
     };
-  }, [token]);
+  }, [token, isLoading, fbUser]);
 
-  if (!router.isReady || isLoading) {
-    return <PageLoader size="lg" />;
-  }
-
-  if (lookupFailed) {
-    return (
-      <div className="mx-auto flex min-h-[60vh] max-w-md flex-col items-center justify-center gap-2 p-6 text-center">
-        <Meta noIndex title={t("invite.title")} />
-        <p className="text-sm text-bpim-muted">{t("invite.invalid")}</p>
-      </div>
-    );
-  }
-
-  if (!preview) {
-    return <PageLoader size="lg" />;
-  }
-
-  const isSelf = fbUser?.uid === preview.userId;
-
-  const handleSend = async () => {
-    if (!fbUser || !token) return;
-    setIsSubmitting(true);
-    try {
-      const res = await authFetch(
-        `${API_PREFIX}/follow-requests`,
-        "POST",
-        fbUser,
-        { token },
-      );
-      const data = await res.json();
-      if (!res.ok) {
-        setResult({
-          status: "error",
-          message: data.message ?? t("invite.failed"),
-        });
-        return;
-      }
-      setResult({ status: data.status });
-    } catch {
-      setResult({ status: "error", message: t("invite.failed") });
-    } finally {
-      setIsSubmitting(false);
+  const content = () => {
+    if (!router.isReady || isLoading) {
+      return <PageLoader size="lg" />;
     }
-  };
 
-  const handleWithdraw = async () => {
-    if (!fbUser) return;
-    setIsSubmitting(true);
-    try {
-      await authFetch(
-        `${API_PREFIX}/follow-requests/${preview.userId}`,
-        "DELETE",
-        fbUser,
+    if (lookupFailed) {
+      return (
+        <div className="mx-auto flex min-h-[60vh] max-w-md flex-col items-center justify-center gap-2 p-6 text-center">
+          <p className="text-sm text-bpim-muted">{t("invite.invalid")}</p>
+        </div>
       );
-      setResult(null);
-    } finally {
-      setIsSubmitting(false);
+    }
+
+    if (!preview) {
+      return <PageLoader size="lg" />;
+    }
+
+    switch (preview.type) {
+      case "follow":
+        return <FollowInviteContent token={token!} preview={preview} />;
+      default:
+        return (
+          <div className="mx-auto flex min-h-[60vh] max-w-md flex-col items-center justify-center gap-2 p-6 text-center">
+            <p className="text-sm text-bpim-muted">{t("invite.invalid")}</p>
+          </div>
+        );
     }
   };
 
   return (
-    <div className="mx-auto flex min-h-[60vh] max-w-md flex-col items-center justify-center gap-6 p-6">
+    <DashboardLayout>
       <Meta noIndex title={t("invite.title")} />
-
-      <div className="w-full rounded-2xl border border-bpim-border p-6 text-center">
-        <Avatar className="mx-auto mb-3 h-16 w-16 border-2 border-bpim-border">
-          <AvatarImage src={preview.profileImage ?? ""} alt={preview.userName} />
-          <AvatarFallback>{preview.userName.slice(0, 2)}</AvatarFallback>
-        </Avatar>
-        <h1 className="mb-2 text-lg font-semibold text-bpim-text">
-          {preview.userName}
-        </h1>
-        <p className="mb-6 text-sm text-bpim-muted">{t("invite.desc")}</p>
-
-        {isSelf ? (
-          <p className="text-sm text-bpim-muted">{t("invite.self")}</p>
-        ) : !fbUser ? (
-          <LoginButtons />
-        ) : result?.status === "requested" ? (
-          <div className="flex flex-col gap-3">
-            <p className="text-sm text-bpim-success">{t("invite.requested")}</p>
-            <Button
-              variant="outline"
-              onClick={handleWithdraw}
-              disabled={isSubmitting}
-            >
-              {t("invite.withdraw")}
-            </Button>
-          </div>
-        ) : result?.status === "followed" ? (
-          <div className="flex flex-col gap-3">
-            <p className="text-sm text-bpim-success">{t("invite.followed")}</p>
-            <Link href={`/users/${preview.userId}`}>
-              <Button variant="outline" className="w-full">
-                {t("invite.viewProfile")}
-              </Button>
-            </Link>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-3">
-            {result?.status === "error" && (
-              <p className="text-sm text-bpim-danger">{result.message}</p>
-            )}
-            <Button onClick={handleSend} disabled={isSubmitting}>
-              {t("invite.send")}
-            </Button>
-          </div>
-        )}
-      </div>
-    </div>
+      {content()}
+    </DashboardLayout>
   );
 }

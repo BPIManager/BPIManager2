@@ -51,9 +51,11 @@ const ROLE_HEADER: Record<RoleKey, { from: string; Icon: typeof Coffee }> = {
 const ProfileSideBar = ({
   onFollowToggle,
   isUpdating = false,
+  onRelationshipChange,
 }: {
   onFollowToggle?: () => void;
   isUpdating?: boolean;
+  onRelationshipChange?: () => void;
 }) => {
   const { profile } = useStaticProfile();
   const [historyOpen, setHistoryOpen] = useState(false);
@@ -127,6 +129,7 @@ const ProfileSideBar = ({
           <ForceUnfollowMenu
             userId={profile.userId}
             relationship={profile.relationship}
+            onSuccess={onRelationshipChange}
           />
         </div>
       </div>

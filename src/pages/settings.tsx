@@ -8,7 +8,6 @@ import TransferUi from "@/components/partials/features/Settings/Transfer/ui";
 import AccountSettingsUi from "@/components/partials/features/Settings/AccountSettings/ui";
 import AccountDeletionUi from "@/components/partials/features/Settings/AccountDeletion/ui";
 import ApiKeyUi from "@/components/partials/features/Settings/APIKey/ui";
-import FollowInviteUi from "@/components/partials/features/Settings/FollowInvite/ui";
 import OAuthClientUi from "@/components/partials/features/Settings/OAuthClient/ui";
 import { Meta } from "@/components/partials/common/PageChrome/Head";
 import { PageLoader } from "@/components/ui/loading-spinner";
@@ -42,7 +41,6 @@ export default function SettingsPage() {
             <LanguageSettingsUi />
             <TransferUi />
 
-            <FollowInviteUi />
             <ApiKeyUi />
             <OAuthClientUi />
 

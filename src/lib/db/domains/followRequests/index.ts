@@ -42,6 +42,29 @@ class FollowRequestsRepository {
   }
 
   /**
+   * 指定の送信者→リクエスト先の組み合わせで、保留中のリクエストがあるかを確認する。
+   *
+   * 招待ページで「送信」ボタンではなく「取り下げる」ボタンを最初から
+   * 出し分けるために使う。
+   *
+   * @param requesterId - リクエストを送った側のユーザー ID
+   * @param targetUserId - リクエスト先ユーザー ID
+   */
+  async existsPending(
+    requesterId: string,
+    targetUserId: string,
+  ): Promise<boolean> {
+    const result = await db
+      .selectFrom("followRequests")
+      .select("id")
+      .where("requesterId", "=", requesterId)
+      .where("targetUserId", "=", targetUserId)
+      .executeTakeFirst();
+
+    return !!result;
+  }
+
+  /**
    * 指定ユーザー宛の保留中フォローリクエスト件数を取得する。
    *
    * 通知バッジの「承認待ち件数」に使う。

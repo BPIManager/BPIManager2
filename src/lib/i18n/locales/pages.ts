@@ -48,6 +48,12 @@ export const pagesTranslations = {
     "zh-TW": "已追蹤",
     ko: "팔로우했습니다",
   },
+  "invite.alreadyApproved": {
+    ja: "既にフォローリクエストが承認されています",
+    en: "Your follow request has already been approved.",
+    "zh-TW": "你的追蹤請求已獲核准",
+    ko: "이미 팔로우 요청이 승인되었습니다",
+  },
   "invite.self": {
     ja: "自分自身の招待URLです",
     en: "This is your own invite link.",

@@ -25,9 +25,12 @@ import { UserRelationship } from "@/types/users/profile";
 const ForceUnfollowMenu = ({
   userId,
   relationship,
+  onSuccess,
 }: {
   userId: string;
   relationship: UserRelationship;
+  /** 強制フォロー解除が成功した後に呼ばれる（閲覧中プロフィールの再取得等に使う） */
+  onSuccess?: () => void;
 }) => {
   const { t } = useTranslation();
   const { user } = useUser();
@@ -43,6 +46,7 @@ const ForceUnfollowMenu = ({
   const handleConfirm = async () => {
     await forceUnfollow();
     setIsConfirmOpen(false);
+    onSuccess?.();
   };
 
   return (
