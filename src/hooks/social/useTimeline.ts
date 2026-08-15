@@ -15,11 +15,13 @@ interface TimelineResponse {
  *
  * @param mode - 表示モード。`"all"` 全件、`"played"` 閲覧者もプレイ済み、`"overtaken"` 抜かれた楽曲
  * @param params - レベル・難易度・検索キーワードなどのフィルター条件
+ * @param listId - 指定時、このフォローリストの所属ユーザーだけに絞り込む（#278）
  * @returns タイムライン配列・ローディング状態・ページング操作
  */
 export const useTimeline = (
   mode: "all" | "played" | "overtaken",
   params: FilterParamsFrontend,
+  listId?: number | null,
 ) => {
   const { fbUser } = useUser();
 
@@ -45,6 +47,7 @@ export const useTimeline = (
       if (params.difficulties?.length) {
         params.difficulties.forEach((df) => query.append("difficulties[]", df));
       }
+      if (listId != null) query.append("listId", String(listId));
       if (pageIndex > 0 && previousPageData?.nextId) {
         query.append("lastId", previousPageData.nextId);
       }
