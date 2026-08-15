@@ -72,6 +72,12 @@ export const pagesTranslations = {
     "zh-TW": "查看個人檔案",
     ko: "프로필 보기",
   },
+  "invite.withdraw": {
+    ja: "リクエストを取り下げる",
+    en: "Withdraw Request",
+    "zh-TW": "撤回請求",
+    ko: "요청 취소",
+  },
 
   "page.settings.title": {
     ja: "設定",

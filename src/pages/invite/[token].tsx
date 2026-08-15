@@ -98,6 +98,21 @@ export default function InvitePage() {
     }
   };
 
+  const handleWithdraw = async () => {
+    if (!fbUser) return;
+    setIsSubmitting(true);
+    try {
+      await authFetch(
+        `${API_PREFIX}/follow-requests/${preview.userId}`,
+        "DELETE",
+        fbUser,
+      );
+      setResult(null);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="mx-auto flex min-h-[60vh] max-w-md flex-col items-center justify-center gap-6 p-6">
       <Meta noIndex title={t("invite.title")} />
@@ -117,7 +132,16 @@ export default function InvitePage() {
         ) : !fbUser ? (
           <LoginButtons />
         ) : result?.status === "requested" ? (
-          <p className="text-sm text-bpim-success">{t("invite.requested")}</p>
+          <div className="flex flex-col gap-3">
+            <p className="text-sm text-bpim-success">{t("invite.requested")}</p>
+            <Button
+              variant="outline"
+              onClick={handleWithdraw}
+              disabled={isSubmitting}
+            >
+              {t("invite.withdraw")}
+            </Button>
+          </div>
         ) : result?.status === "followed" ? (
           <div className="flex flex-col gap-3">
             <p className="text-sm text-bpim-success">{t("invite.followed")}</p>
