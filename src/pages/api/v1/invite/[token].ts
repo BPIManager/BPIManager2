@@ -5,6 +5,7 @@ import { followsRepo } from "@/lib/db/domains/follow";
 import { followRequestsRepo } from "@/lib/db/domains/followRequests";
 import { followAccessAggregateRepo } from "@/lib/db/aggregates/followAccess";
 import { authenticateViewer } from "@/middlewares/api/withApi";
+import { withRateLimit } from "@/middlewares/api/withRateLimit";
 
 /**
  * 招待URL(`/invite/[token]`)共通の解決エンドポイント。
@@ -20,7 +21,7 @@ import { authenticateViewer } from "@/middlewares/api/withApi";
  * 「送信」ボタンではなく「承認済み」「取り下げる」の状態を最初から
  * 出し分けられるようにする。
  */
-export default async function handler(
+async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
@@ -77,3 +78,6 @@ export default async function handler(
     return res.status(500).json({ message: "Internal Server Error" });
   }
 }
+
+// 認証不要の公開エンドポイントのため、トークン試行によるDB負荷を抑える
+export default withRateLimit(handler, { windowMs: 60_000, max: 30 });
