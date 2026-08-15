@@ -24,14 +24,17 @@ interface Props {
 }
 
 /**
- * フォローリストの作成・改名・公開設定変更・削除を行うVaulドロワー(#277)。
+ * フォローリストの作成・改名・削除を行うVaulドロワー(#277)。
  *
- * `/rivals`編集モードから開く。リストは本人以外に共有されないため、
- * ここでの操作は常に本人（`userId`）のリストのみを対象にする。
+ * `/rivals`編集モードから開く。リストは本人以外に共有されない前提のため、
+ * ここでの操作は常に本人（`userId`）のリストのみを対象にする。公開設定
+ * (`isPublic`)は第三者への公開経路が存在しない現状ではUIから操作できる
+ * 意味がないため、あえて表示しない（DB・APIには温存済み）。
  */
 const ListManageDrawer = ({ userId, open, onOpenChange }: Props) => {
-  const { lists, createList, renameList, setListPublic, deleteList } =
-    useFollowLists(userId);
+  const { lists, createList, renameList, deleteList } = useFollowLists(
+    userId,
+  );
   const { t } = useTranslation();
   const [newName, setNewName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
@@ -107,7 +110,6 @@ const ListManageDrawer = ({ userId, open, onOpenChange }: Props) => {
                     key={list.id}
                     list={list}
                     onRename={(name) => renameList(list.id, name)}
-                    onSetPublic={(isPublic) => setListPublic(list.id, isPublic)}
                     onDelete={() => setDeleteTargetId(list.id)}
                   />
                 ))}

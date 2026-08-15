@@ -2,6 +2,7 @@ import { useUser } from "@/contexts/users/UserContext";
 import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import { authFetch } from "@/utils/common/fetch";
+import { invalidateFollowListsCache } from "./followListsCache";
 import type { FollowingWithLists } from "@/types/users/followList";
 
 interface FollowingWithListsResponse {
@@ -36,7 +37,8 @@ export const useFollowingWithLists = (userId?: string | boolean) => {
       fbUser,
     );
     if (!res.ok) throw new Error("Failed to add to follow list");
-    await mutate();
+    // メンバー数(useFollowListsの一覧)側も合わせて再検証する
+    await invalidateFollowListsCache(fbUser.uid);
   };
 
   const removeFromList = async (listId: number, followingId: string) => {
@@ -47,7 +49,7 @@ export const useFollowingWithLists = (userId?: string | boolean) => {
       fbUser,
     );
     if (!res.ok) throw new Error("Failed to remove from follow list");
-    await mutate();
+    await invalidateFollowListsCache(fbUser.uid);
   };
 
   return {

@@ -2,6 +2,7 @@ import { useUser } from "@/contexts/users/UserContext";
 import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
 import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 import { authFetch } from "@/utils/common/fetch";
+import { invalidateFollowListsCache } from "./followListsCache";
 import type { FollowListSummary } from "@/types/users/followList";
 
 interface FollowListsResponse {
@@ -37,7 +38,7 @@ export const useFollowLists = (userId?: string | boolean) => {
       { name, isPublic },
     );
     if (!res.ok) throw new Error("Failed to create follow list");
-    await mutate();
+    await invalidateFollowListsCache(fbUser.uid);
   };
 
   const renameList = async (listId: number, name: string) => {
@@ -49,7 +50,7 @@ export const useFollowLists = (userId?: string | boolean) => {
       { name },
     );
     if (!res.ok) throw new Error("Failed to rename follow list");
-    await mutate();
+    await invalidateFollowListsCache(fbUser.uid);
   };
 
   const setListPublic = async (listId: number, isPublic: boolean) => {
@@ -61,7 +62,7 @@ export const useFollowLists = (userId?: string | boolean) => {
       { isPublic },
     );
     if (!res.ok) throw new Error("Failed to update follow list");
-    await mutate();
+    await invalidateFollowListsCache(fbUser.uid);
   };
 
   const deleteList = async (listId: number) => {
@@ -72,7 +73,9 @@ export const useFollowLists = (userId?: string | boolean) => {
       fbUser,
     );
     if (!res.ok) throw new Error("Failed to delete follow list");
-    await mutate();
+    // 削除したリストへの所属は連鎖削除されるため、フォロー中一覧側の
+    // listIdsキャッシュ(useFollowingWithLists)も合わせて再検証する
+    await invalidateFollowListsCache(fbUser.uid);
   };
 
   return {

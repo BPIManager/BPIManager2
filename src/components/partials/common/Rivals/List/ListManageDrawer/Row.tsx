@@ -4,21 +4,18 @@ import { useState } from "react";
 import { Pencil, Trash2, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import type { FollowListSummary } from "@/types/users/followList";
 
 interface Props {
   list: FollowListSummary;
   onRename: (name: string) => Promise<void>;
-  onSetPublic: (isPublic: boolean) => Promise<void>;
   onDelete: () => void;
 }
 
 const ListManageDrawerRow = ({
   list,
   onRename,
-  onSetPublic,
   onDelete,
 }: Props) => {
   const { t, tFormat } = useTranslation();
@@ -95,11 +92,6 @@ const ListManageDrawerRow = ({
       </div>
 
       <div className="flex shrink-0 items-center gap-3">
-        <Switch
-          size="sm"
-          checked={list.isPublic}
-          onCheckedChange={(v) => onSetPublic(v === true)}
-        />
         <Button
           size="icon-xs"
           variant="ghost"

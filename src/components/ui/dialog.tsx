@@ -38,7 +38,9 @@ function DialogOverlay({
     <DialogPrimitive.Overlay
       data-slot="dialog-overlay"
       className={cn(
-        "fixed inset-0 isolate z-50 bg-bpim-bg/60 backdrop-blur-sm duration-100",
+        // z-1003: サイドバー(z-1000)・Drawer(z-1000/1002)より確実に手前に
+        // 表示する必要がある(Vaulドロワーからの削除確認ダイアログ等)
+        "fixed inset-0 isolate z-1003 bg-bpim-bg/60 backdrop-blur-sm duration-100",
         "data-open:animate-in data-open:fade-in-0",
         "data-closed:animate-out data-closed:fade-out-0",
         className,
@@ -66,7 +68,7 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          "fixed z-50 grid gap-4 bg-bpim-surface text-bpim-text",
+          "fixed z-1005 grid gap-4 bg-bpim-surface text-bpim-text",
           "text-sm ring-1 ring-bpim-border duration-100 outline-none",
           "data-open:animate-in data-open:fade-in-0",
           "data-closed:animate-out data-closed:fade-out-0",
