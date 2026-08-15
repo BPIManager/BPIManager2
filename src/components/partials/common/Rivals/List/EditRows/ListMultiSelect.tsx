@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Select, SelectContent, SelectTrigger } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { ChevronDown } from "lucide-react";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import type { FollowListSummary } from "@/types/users/followList";
 
@@ -14,12 +16,13 @@ interface Props {
 }
 
 /**
- * フォロー中ユーザー1人を、複数のリストへ同時に所属させるためのSelect。
+ * フォロー中ユーザー1人を、複数のリストへ同時に所属させるためのチェック
+ * ボックス式ドロップダウン。
  *
- * 標準の`Select`は単一値選択が前提のため、ここでは`value`/`onValueChange`は
- * 使わず`open`のみを制御し、`SelectContent`内をチェックボックス項目の
- * 素のリストとして描画する（`SelectItem`はクリックで自動的に閉じるため
- * 複数選択に使えない）。
+ * 標準の`Select`(Radix)は単一値選択・選択済み項目のアラインメント計算が
+ * 前提のコンポーネントで、`SelectItem`を使わずチェックボックス項目を
+ * 独自描画すると内部の位置計算が破綻しコンテンツが開かない不具合が
+ * 起きたため、位置計算に依存しない`Popover`をベースに実装する。
  */
 const ListMultiSelect = ({
   lists,
@@ -39,38 +42,47 @@ const ListMultiSelect = ({
         : tFormat("rivals.list.selectedCount", { count: selectedListIds.length });
 
   return (
-    <Select open={open} onOpenChange={setOpen}>
-      <SelectTrigger
-        size="sm"
-        disabled={disabled}
-        className="h-8 w-40 border-bpim-border bg-bpim-bg/20 text-xs text-bpim-text"
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={disabled}
+          className="h-8 w-40 justify-between border-bpim-border bg-bpim-bg/20 text-xs font-normal text-bpim-text"
+        >
+          <span className="truncate">{label}</span>
+          <ChevronDown className="h-3.5 w-3.5 shrink-0 text-bpim-muted" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent
+        align="end"
+        className="w-40 border-bpim-border bg-bpim-bg p-1"
       >
-        <span className="truncate">{label}</span>
-      </SelectTrigger>
-      <SelectContent className="border-bpim-border bg-bpim-bg">
         {lists.length === 0 ? (
           <div className="px-2 py-1.5 text-xs text-bpim-muted">
             {t("rivals.list.empty")}
           </div>
         ) : (
-          lists.map((list) => {
-            const checked = selectedListIds.includes(list.id);
-            return (
-              <div
-                key={list.id}
-                role="option"
-                aria-selected={checked}
-                onClick={() => onToggle(list.id)}
-                className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-xs text-bpim-text hover:bg-bpim-overlay"
-              >
-                <Checkbox checked={checked} className="pointer-events-none" />
-                <span className="truncate">{list.name}</span>
-              </div>
-            );
-          })
+          <div className="flex flex-col gap-0.5">
+            {lists.map((list) => {
+              const checked = selectedListIds.includes(list.id);
+              return (
+                <button
+                  key={list.id}
+                  type="button"
+                  onClick={() => onToggle(list.id)}
+                  className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-xs text-bpim-text hover:bg-bpim-overlay"
+                >
+                  <Checkbox checked={checked} className="pointer-events-none" />
+                  <span className="truncate">{list.name}</span>
+                </button>
+              );
+            })}
+          </div>
         )}
-      </SelectContent>
-    </Select>
+      </PopoverContent>
+    </Popover>
   );
 };
 
