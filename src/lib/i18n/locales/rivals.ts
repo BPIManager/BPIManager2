@@ -285,10 +285,16 @@ export const rivalsTranslations = {
     "zh-TW": "要移除此追蹤者嗎？",
     ko: "이 팔로워를 삭제하시겠습니까？",
   },
-  "follow.forceUnfollow.dialogDesc": {
+  "follow.forceUnfollow.dialogDescPrivate": {
     ja: "このユーザーはあなたのプロフィールを閲覧できなくなります。恒久的なブロックではないため、招待URLがあれば再度リクエストできます。",
     en: "This user will lose access to your profile. This isn't a permanent block — they can send a new request if they still have your invite link.",
     "zh-TW": "此使用者將無法再查看你的個人檔案。這並非永久封鎖，若對方仍持有你的邀請連結，可再次傳送請求。",
     ko: "이 사용자는 더 이상 회원님의 프로필을 볼 수 없게 됩니다. 영구 차단이 아니므로 초대 URL이 있으면 다시 요청할 수 있습니다.",
+  },
+  "follow.forceUnfollow.dialogDescPublic": {
+    ja: "このユーザーをフォロワーから削除します。恒久的なブロックではないため、いつでも再びフォローできます。",
+    en: "This user will be removed from your followers. This isn't a permanent block — they can follow you again at any time.",
+    "zh-TW": "此使用者將從你的追蹤者中移除。這並非永久封鎖，對方隨時可以再次追蹤你。",
+    ko: "이 사용자를 팔로워에서 삭제합니다. 영구 차단이 아니므로 언제든 다시 팔로우할 수 있습니다.",
   },
 } as const;

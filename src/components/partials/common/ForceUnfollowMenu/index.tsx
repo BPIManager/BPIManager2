@@ -18,9 +18,10 @@ import { UserRelationship } from "@/types/users/profile";
 /**
  * 「強制フォロー解除」用の三点メニュー。
  *
- * 自分が非公開設定かつ、閲覧中のプロフィールの相手が自分をフォローしている
- * 場合のみ表示する（それ以外のケースでは解除する対象の`follows`関係が
- * ないか、非公開ユーザー向けの承認制フォローの文脈に該当しないため）。
+ * 閲覧中のプロフィールの相手が自分をフォローしている場合のみ表示する
+ * （それ以外のケースでは解除する対象の`follows`関係がないため）。
+ * 自分が公開設定かどうかは問わない（非公開ユーザーに限らず、任意の
+ * フォロワーを外したいケースがあるため）。
  */
 const ForceUnfollowMenu = ({
   userId,
@@ -39,7 +40,7 @@ const ForceUnfollowMenu = ({
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
-  if (isMe || !user || user.isPublic || !relationship.isFollowedBy) {
+  if (isMe || !user || !relationship.isFollowedBy) {
     return null;
   }
 
@@ -84,7 +85,11 @@ const ForceUnfollowMenu = ({
         onConfirm={handleConfirm}
         isLoading={isUpdating}
         title={t("follow.forceUnfollow.dialogTitle")}
-        description={t("follow.forceUnfollow.dialogDesc")}
+        description={t(
+          user.isPublic
+            ? "follow.forceUnfollow.dialogDescPublic"
+            : "follow.forceUnfollow.dialogDescPrivate",
+        )}
         confirmLabel={t("follow.forceUnfollow.action")}
         isDestructive
       />
