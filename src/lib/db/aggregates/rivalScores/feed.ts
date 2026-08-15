@@ -3,7 +3,6 @@ import { sql } from "kysely";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore";
-import { wherePublicOnly } from "@/lib/db/shared/visibility";
 dayjs.extend(utc);
 
 /**
@@ -108,7 +107,9 @@ class SocialTimelineRepository {
           .as("myBestExScore"),
       ])
       .where("f.followerId", "=", viewerId)
-      .$call((qb) => wherePublicOnly(qb, "u.isPublic"))
+      // followsが存在するのは公開ユーザーへのフォロー、または非公開ユーザーへの
+      // 承認済みフォローのみ(#275)。viewerId自身が閲覧者本人でありfollowerId=viewerId
+      // なので、isPublicによる絞り込みは不要(followsの存在自体が閲覧許可を意味する)
       .$if(!!search, (qb) =>
         qb.where((eb) =>
           eb.or([

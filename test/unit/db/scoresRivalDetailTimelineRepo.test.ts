@@ -98,17 +98,16 @@ describe("rivalRepo.getOvertakenRivals", () => {
     ).toBe(true);
   });
 
-  it("ライバルの公開設定(isPublic)での絞り込みを追加すること", async () => {
+  it("isPublicでの絞り込みを追加しないこと(#275: followsの存在=閲覧許可のため不要)", async () => {
     dbHolder.current = createDbSpy([]);
     await rivalRepo.getOvertakenRivals("user-1", "33", { batchId: "batch-1" });
     const whereCalls = callsFor(dbHolder.current.calls, "where");
     expect(
       whereCalls.some(
         (c) =>
-          JSON.stringify(c.args[0]) === JSON.stringify(sql.ref("ru.isPublic")) &&
-          c.args[2] === 1,
+          JSON.stringify(c.args[0]) === JSON.stringify(sql.ref("ru.isPublic")),
       ),
-    ).toBe(true);
+    ).toBe(false);
   });
 });
 

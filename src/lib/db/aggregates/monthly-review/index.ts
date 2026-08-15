@@ -8,7 +8,6 @@ import { scoresRepo } from "@/lib/db/domains/scores";
 import { iidxTowerRepo } from "@/lib/db/domains/iidxTower";
 import { songsRepo } from "@/lib/db/domains/songs";
 import { getArenaStatsHistory } from "@/lib/db/domains/arenaHistory";
-import { wherePublicOnly } from "@/lib/db/shared/visibility";
 
 const jstDayStart = (jstDate: string): Date =>
   new Date(`${jstDate}T00:00:00+09:00`);
@@ -307,7 +306,9 @@ class MonthlyReviewRepository {
       ])
       .where("f.followerId", "=", viewerId)
       .where("s.version", "=", version)
-      .$call((qb) => wherePublicOnly(qb, "u.isPublic"))
+      // followsが存在するのは公開ユーザーへのフォロー、または非公開ユーザーへの
+      // 承認済みフォローのみ(#275)。呼び出し元は必ずviewerId=req.authUid(閲覧者本人)
+      // で呼ぶため、isPublicによる絞り込みは不要
       .execute();
   }
 

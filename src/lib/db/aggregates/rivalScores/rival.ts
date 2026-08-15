@@ -314,8 +314,10 @@ class RivalRepository {
         "prevBest.exScore as myOldScore",
       ])
       .where("current.userId", "=", userId)
-      .where("current.version", "=", version)
-      .$call((qb) => wherePublicOnly(qb, "ru.isPublic"));
+      .where("current.version", "=", version);
+      // followsが存在するのは公開ユーザーへのフォロー、または非公開ユーザーへの
+      // 承認済みフォローのみ(#275)。呼び出し元は必ずuserId=閲覧者本人(isOwnLog確認済み)
+      // で呼ぶため、isPublicによる絞り込みは不要
 
     if (batchId) {
       query = query.where("current.batchId", "=", batchId);
@@ -415,6 +417,10 @@ class RivalRepository {
    */
   // follows・users・scores・songs・songDefを横断JOINした単曲比較データの
   // ため、直接クエリを維持する。
+  // 呼び出し元(rivals/following/scores/[songId].ts)は`viewerId`にURLの[userId]
+  // (第三者が閲覧している可能性のある対象ユーザー)をそのまま渡すため、
+  // 「followsの存在=閲覧者本人への閲覧許可」の前提(#275)が成立しない。
+  // isPublicによる絞り込みを維持する
   async getFollowedScoresForSong(params: {
     viewerId: string;
     songId: number;
