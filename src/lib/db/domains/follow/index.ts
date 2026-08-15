@@ -68,6 +68,31 @@ class FollowRepository {
   }
 
   /**
+   * フォロー関係を確実に削除する（`remove`のトランザクション参加版）。
+   *
+   * フォロー解除時に`followListMembers`の連動削除を同一トランザクションで
+   * 行う`orchestrators/unfollow`から呼ばれる。
+   *
+   * @param trx - 呼び出し元が管理するトランザクション
+   * @param followerId - フォローしている側のユーザー ID
+   * @param followingId - フォローされている側のユーザー ID
+   * @returns 削除対象が存在した場合は `true`
+   */
+  async removeInTransaction(
+    trx: Transaction<Database>,
+    followerId: string,
+    followingId: string,
+  ): Promise<boolean> {
+    const result = await trx
+      .deleteFrom("follows")
+      .where("followerId", "=", followerId)
+      .where("followingId", "=", followingId)
+      .executeTakeFirst();
+
+    return Number(result.numDeletedRows) > 0;
+  }
+
+  /**
    * フォロー状態をトグルする。存在すれば削除し、なければ追加する。
    *
    * @param followerId - フォローする側のユーザー ID

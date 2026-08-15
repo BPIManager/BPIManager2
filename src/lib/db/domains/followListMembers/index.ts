@@ -58,6 +58,22 @@ class FollowListMembersRepository {
   }
 
   /**
+   * 指定リストID群に属する所属レコードを全て取得する。
+   *
+   * アカウント削除前のバックアップ用（所有リストの所属構成を保存する）。
+   *
+   * @param listIds - リスト ID の配列
+   */
+  async getAllForLists(listIds: number[]) {
+    if (listIds.length === 0) return [];
+    return await db
+      .selectFrom("followListMembers")
+      .selectAll()
+      .where("listId", "in", listIds)
+      .execute();
+  }
+
+  /**
    * アカウント削除時に、このユーザーが所属している全てのリスト所属
    * （他人が作成したリストへの所属も含む）を削除する。
    *
@@ -73,6 +89,34 @@ class FollowListMembersRepository {
     await trx
       .deleteFrom("followListMembers")
       .where("followingId", "=", followingId)
+      .execute();
+  }
+
+  /**
+   * フォロー解除時に、解除した相手を`ownerId`本人の全リストから外す。
+   *
+   * リストへの所属は「フォロー中であること」を前提にしているため
+   * （追加時は`followsRepo.isFollowing`で確認済み）、フォロー解除後も
+   * 所属レコードが残ると孤立データになる。`orchestrators/unfollow`から
+   * `follows`削除と同一トランザクションで呼ばれる。
+   *
+   * @param trx - 呼び出し元が管理するトランザクション
+   * @param ownerId - リスト所有者（フォローを解除した側）のユーザー ID
+   * @param followingId - フォロー解除された（リストから外す）ユーザー ID
+   */
+  async deleteByFollowingForOwner(
+    trx: Transaction<Database>,
+    ownerId: string,
+    followingId: string,
+  ) {
+    await trx
+      .deleteFrom("followListMembers")
+      .where("followingId", "=", followingId)
+      .where(
+        "listId",
+        "in",
+        trx.selectFrom("followLists").select("id").where("userId", "=", ownerId),
+      )
       .execute();
   }
 }

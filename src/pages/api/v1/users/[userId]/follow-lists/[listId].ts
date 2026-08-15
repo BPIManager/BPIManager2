@@ -32,15 +32,10 @@ async function handler(
         const body = parseBody(updateFollowListBodySchema, req.body, res);
         if (!body) return;
 
-        let updated = false;
-        if (body.name !== undefined) {
-          updated = (await followListsRepo.rename(id, userId, body.name)) || updated;
-        }
-        if (body.isPublic !== undefined) {
-          updated =
-            (await followListsRepo.setPublic(id, userId, body.isPublic)) ||
-            updated;
-        }
+        const updated = await followListsRepo.update(id, userId, {
+          name: body.name,
+          isPublic: body.isPublic,
+        });
         if (!updated) {
           return res.status(404).json({ message: "List not found" });
         }

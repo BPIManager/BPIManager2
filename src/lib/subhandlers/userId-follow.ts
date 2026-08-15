@@ -1,4 +1,5 @@
 import { followsRepo } from "@/lib/db/domains/follow";
+import { unfollowAndCleanupLists } from "@/lib/db/orchestrators/unfollow";
 import { followListAggregateRepo } from "@/lib/db/aggregates/followList";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import type { FollowsQuery } from "@/schemas/follows/query";
@@ -93,8 +94,13 @@ export async function handleDeleteFollow(
     });
   }
 
-  const isFollowed = await followsRepo.toggleFollow(viewerId, targetUserId);
+  // toggleFollowではなく専用オーケストレーターを使う理由は、直前の
+  // isCurrentlyFollowingチェックにより必ず「解除」方向になることが
+  // 保証されているため、その解除に伴うfollowListMembersの連動削除
+  // (#277: フォロー解除された相手を自分の全リストから外す)を同一
+  // トランザクションで行う必要があるため
+  await unfollowAndCleanupLists(viewerId, targetUserId);
   return res
     .status(200)
-    .json({ success: true, isFollowing: isFollowed, message: "Unfollowed" });
+    .json({ success: true, isFollowing: false, message: "Unfollowed" });
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { useUser } from "@/contexts/users/UserContext";
 import { useRivalSummary } from "@/hooks/social/useRivalSummary";
@@ -44,6 +44,15 @@ const RivalListContainer = () => {
 
   const [isEditMode, setIsEditMode] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  // 選択中のリストが削除された場合、フィルタを「すべて」に戻す
+  // (listIdを保持したままだと、存在しないリストへの絞り込みリクエストが
+  // 送られ続けエラー状態から抜けられなくなる)
+  useEffect(() => {
+    if (listId != null && !lists.some((l) => l.id === listId)) {
+      setListId(null);
+    }
+  }, [listId, lists, setListId]);
 
   const sortedRivals = useMemo(() => {
     if (!rivals.length) return rivals;

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 import { Pencil, Trash2, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,6 +35,8 @@ const ListManageDrawerRow = ({
     try {
       await onRename(trimmed);
       setIsEditingName(false);
+    } catch {
+      toast.error(t("rivals.list.updateFailed"));
     } finally {
       setIsSaving(false);
     }

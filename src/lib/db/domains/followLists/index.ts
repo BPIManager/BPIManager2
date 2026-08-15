@@ -60,40 +60,29 @@ class FollowListsRepository {
   }
 
   /**
-   * リスト名を変更する。
+   * リスト名・公開設定を更新する（指定したフィールドのみ）。
+   *
+   * 改名と公開設定変更を別々のUPDATE文にすると、片方が失敗した場合に
+   * 中途半端な状態のまま確定してしまうため、1つのUPDATE文にまとめて
+   * 原子的に反映する。
    *
    * @param id - リスト ID
    * @param userId - 操作者のユーザー ID（所有者本人であることの確認に使う）
-   * @param name - 新しいリスト名
+   * @param fields - 更新するフィールド（`undefined`のフィールドは更新しない）
    * @returns 対象のリストが存在し、所有者が一致した場合は `true`
    */
-  async rename(id: number, userId: string, name: string): Promise<boolean> {
-    const result = await db
-      .updateTable("followLists")
-      .set({ name })
-      .where("id", "=", id)
-      .where("userId", "=", userId)
-      .executeTakeFirst();
-
-    return Number(result.numUpdatedRows) > 0;
-  }
-
-  /**
-   * リストの公開設定を変更する。
-   *
-   * @param id - リスト ID
-   * @param userId - 操作者のユーザー ID（所有者本人であることの確認に使う）
-   * @param isPublic - 新しい公開設定
-   * @returns 対象のリストが存在し、所有者が一致した場合は `true`
-   */
-  async setPublic(
+  async update(
     id: number,
     userId: string,
-    isPublic: boolean,
+    fields: { name?: string; isPublic?: boolean },
   ): Promise<boolean> {
+    const set: { name?: string; isPublic?: number } = {};
+    if (fields.name !== undefined) set.name = fields.name;
+    if (fields.isPublic !== undefined) set.isPublic = fields.isPublic ? 1 : 0;
+
     const result = await db
       .updateTable("followLists")
-      .set({ isPublic: isPublic ? 1 : 0 })
+      .set(set)
       .where("id", "=", id)
       .where("userId", "=", userId)
       .executeTakeFirst();

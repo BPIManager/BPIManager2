@@ -57,6 +57,11 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
     followListsRepo.getAllForUser(userId),
   ]);
 
+  // followListsの取得結果(id)に依存するため、上のPromise.allとは別に取得する
+  const followListMembers = await followListMembersRepo.getAllForLists(
+    followLists.map((l) => l.id),
+  );
+
   // apiKeys.key / followInviteLinks.token は秘密情報のため、バックアップには
   // 残さずレコードの存在のみ記録する
   const redactedApiKeys = apiKeys.map(({ key: _key, ...rest }) => rest);
@@ -82,6 +87,7 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
     followInviteLinks: redactedFollowInviteLinks,
     followApprovalNotifications,
     followLists,
+    followListMembers,
   };
 
   // 2. バックアップをファイルに書き出す

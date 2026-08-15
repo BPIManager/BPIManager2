@@ -51,14 +51,22 @@ class FollowListsAggregateRepository {
    * @param userId - フォローしている側のユーザー ID
    */
   async getFollowingWithListMembership(userId: string) {
+    // 先にuserId本人が所有するリストへの所属だけに絞ったfollowListMembers
+    // を組み立ててからfollowingIdでJOINする。先にfollowingIdだけでJOIN
+    // すると、対象ユーザーが他人のリストに所属している行まで結合されて
+    // しまい(所有者フィルタは結果を捨てるだけで結合行数は減らない)、
+    // 人気ユーザーほど無駄な結合行数が増えてしまうため
+    const ownedMembers = db
+      .selectFrom("followListMembers as flm")
+      .innerJoin("followLists as fl", "fl.id", "flm.listId")
+      .select(["flm.followingId", "flm.listId"])
+      .where("fl.userId", "=", userId);
+
     const rows = await db
       .selectFrom("follows as f")
       .innerJoin("users as u", "f.followingId", "u.userId")
-      .leftJoin("followListMembers as flm", "flm.followingId", "f.followingId")
-      .leftJoin("followLists as fl", (join) =>
-        join.onRef("fl.id", "=", "flm.listId").on("fl.userId", "=", userId),
-      )
-      .select(["u.userId", "u.userName", "u.profileImage", "fl.id as listId"])
+      .leftJoin(ownedMembers.as("om"), "om.followingId", "f.followingId")
+      .select(["u.userId", "u.userName", "u.profileImage", "om.listId"])
       .where("f.followerId", "=", userId)
       .orderBy("u.userName", "asc")
       .execute();

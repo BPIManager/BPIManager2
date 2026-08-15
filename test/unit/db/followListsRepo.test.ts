@@ -28,12 +28,14 @@ describe("followListsRepo.create", () => {
   });
 });
 
-describe("followListsRepo.rename", () => {
+describe("followListsRepo.update", () => {
   it("所有者一致で更新できた場合trueを返すこと", async () => {
     const spy = createDbSpy({ numUpdatedRows: 1 });
     dbHolder.current = spy;
 
-    const result = await followListsRepo.rename(1, "user-1", "新しい名前");
+    const result = await followListsRepo.update(1, "user-1", {
+      name: "新しい名前",
+    });
 
     expect(result).toBe(true);
     expect(callsFor(spy.calls, "updateTable")[0].args).toEqual([
@@ -48,18 +50,33 @@ describe("followListsRepo.rename", () => {
     const spy = createDbSpy({ numUpdatedRows: 0 });
     dbHolder.current = spy;
 
-    expect(await followListsRepo.rename(1, "user-1", "x")).toBe(false);
+    expect(await followListsRepo.update(1, "user-1", { name: "x" })).toBe(
+      false,
+    );
   });
-});
 
-describe("followListsRepo.setPublic", () => {
   it("isPublicを1/0に変換して更新すること", async () => {
     const spy = createDbSpy({ numUpdatedRows: 1 });
     dbHolder.current = spy;
 
-    await followListsRepo.setPublic(1, "user-1", true);
+    await followListsRepo.update(1, "user-1", { isPublic: true });
 
     expect(callsFor(spy.calls, "set")[0].args).toEqual([{ isPublic: 1 }]);
+  });
+
+  it("name/isPublic両方を指定すると1回のUPDATEにまとめること", async () => {
+    const spy = createDbSpy({ numUpdatedRows: 1 });
+    dbHolder.current = spy;
+
+    await followListsRepo.update(1, "user-1", {
+      name: "新しい名前",
+      isPublic: false,
+    });
+
+    expect(callsFor(spy.calls, "updateTable")).toHaveLength(1);
+    expect(callsFor(spy.calls, "set")[0].args).toEqual([
+      { name: "新しい名前", isPublic: 0 },
+    ]);
   });
 });
 
