@@ -7,9 +7,9 @@ import { Transaction } from "kysely";
  * 読み書きを担当するリポジトリクラス。
  *
  * 却下・強制解除は相手に通知しない（角が立つため）。承認のみ通知する。
- * `follow`/`overtaken`通知(`aggregates/notifications`)は`lastReadAt`基準の
- * 動的生成のみで完結するが、こちらは1件ごとに既読/未読を個別に持つ必要が
- * あるため別テーブルで管理する。
+ * `follow`/`overtaken`通知(`aggregates/notifications`)と同じ`notifications`
+ * テーブルの`lastReadAt`基準で既読を判定する（この行自体は削除されない
+ * 恒久ログのため、`createdAt > lastReadAt`の絞り込みが機能する）。
  */
 class FollowApprovalNotificationsRepository {
   /**
@@ -30,56 +30,17 @@ class FollowApprovalNotificationsRepository {
    * 指定ユーザー宛の未読件数を取得する。
    *
    * @param recipientId - 通知の受信者
+   * @param lastRead - `notifications.lastReadAt`基準の既読境界時刻
    */
-  async countUnread(recipientId: string): Promise<number> {
+  async countUnreadSince(recipientId: string, lastRead: Date): Promise<number> {
     const result = await db
       .selectFrom("followApprovalNotifications")
       .select((eb) => eb.fn.countAll<number>().as("cnt"))
       .where("recipientId", "=", recipientId)
-      .where("isRead", "=", 0)
+      .where("createdAt", ">", lastRead)
       .executeTakeFirst();
 
     return Number(result?.cnt ?? 0);
-  }
-
-  /**
-   * 指定ユーザー宛の承認通知をページネーション付きで取得する。
-   *
-   * @param recipientId - 通知の受信者
-   * @param limit - 取得件数
-   * @param offset - オフセット
-   */
-  async listForRecipient(recipientId: string, limit: number, offset: number) {
-    return await db
-      .selectFrom("followApprovalNotifications as e")
-      .innerJoin("users as u", "u.userId", "e.actorId")
-      .select([
-        "e.id",
-        "e.isRead",
-        "e.createdAt",
-        "u.userId as actorId",
-        "u.userName as actorName",
-        "u.profileImage as actorImage",
-      ])
-      .where("e.recipientId", "=", recipientId)
-      .orderBy("e.createdAt", "desc")
-      .limit(limit)
-      .offset(offset)
-      .execute();
-  }
-
-  /**
-   * 指定ユーザー宛の全承認通知を既読にする。
-   *
-   * @param recipientId - 通知の受信者
-   */
-  async markAllRead(recipientId: string) {
-    await db
-      .updateTable("followApprovalNotifications")
-      .set({ isRead: 1 })
-      .where("recipientId", "=", recipientId)
-      .where("isRead", "=", 0)
-      .execute();
   }
 
   /**

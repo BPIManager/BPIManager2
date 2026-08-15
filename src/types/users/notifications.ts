@@ -14,8 +14,11 @@ export interface NotificationOvertakenRow {
 
 /** 通知の1件分 */
 export interface NotificationItem {
-  /** 通知種別。`"follow"` フォロー通知、`"overtaken"` 抜かれ通知 */
-  type: "follow" | "overtaken";
+  /**
+   * 通知種別。`"follow"` フォロー通知、`"overtaken"` 抜かれ通知、
+   * `"followApproved"` フォローリクエスト承認通知
+   */
+  type: "follow" | "overtaken" | "followApproved";
   timestamp: string;
   senderId: string;
   senderName: string;

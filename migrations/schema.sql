@@ -118,15 +118,15 @@ CREATE TABLE IF NOT EXISTS `followInviteLinks` (
   CONSTRAINT `fk_followinvitelinks_user` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 承認通知のみを扱う(却下は相手に通知しない。角が立つため)。
+-- 承認通知のみを扱う(却下は相手に通知しない。角が立つため)。follow/overtaken通知と
+-- 同様、既読状態はnotifications.lastReadAtの全体既読基準に統一する(個別isReadは持たない。
+-- この行自体は削除されない恒久ログのため、createdAt > lastReadAtでの絞り込みが機能する)。
 CREATE TABLE IF NOT EXISTS `followApprovalNotifications` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `recipientId` varchar(128) NOT NULL COMMENT '通知の受信者(リクエスト送信者)',
   `actorId` varchar(128) NOT NULL COMMENT '承認したユーザー',
-  `isRead` tinyint(1) NOT NULL DEFAULT 0,
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
-  KEY `idx_followapprovalnotifications_recipient_isRead` (`recipientId`,`isRead`),
   KEY `idx_followapprovalnotifications_recipient_createdAt` (`recipientId`,`createdAt`),
   CONSTRAINT `fk_followapprovalnotifications_recipient` FOREIGN KEY (`recipientId`) REFERENCES `users` (`userId`) ON DELETE CASCADE,
   CONSTRAINT `fk_followapprovalnotifications_actor` FOREIGN KEY (`actorId`) REFERENCES `users` (`userId`) ON DELETE CASCADE

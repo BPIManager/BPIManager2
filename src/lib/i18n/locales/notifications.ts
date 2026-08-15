@@ -57,4 +57,42 @@ export const notificationsTranslations = {
     "zh-TW": " 追蹤了你",
     ko: "님이 팔로우했습니다",
   },
+  // Follow approved message: "{name}{msg}"
+  "notifications.followApproved.msg": {
+    ja: " さんがフォローリクエストを承認しました",
+    en: " approved your follow request.",
+    "zh-TW": " 已核准你的追蹤請求",
+    ko: "님이 팔로우 요청을 승인했습니다",
+  },
+  "notifications.tab.requests": {
+    ja: "承認待ち",
+    en: "Requests",
+    "zh-TW": "待審核",
+    ko: "승인 대기",
+  },
+  "notifications.requests.empty": {
+    ja: "保留中のリクエストはありません",
+    en: "No pending requests.",
+    "zh-TW": "沒有待處理的請求",
+    ko: "대기 중인 요청이 없습니다",
+  },
+  "notifications.requests.approve": {
+    ja: "承認",
+    en: "Approve",
+    "zh-TW": "核准",
+    ko: "승인",
+  },
+  "notifications.requests.reject": {
+    ja: "却下",
+    en: "Reject",
+    "zh-TW": "拒絕",
+    ko: "거절",
+  },
+  // Follow request message: "{name}{msg}"
+  "notifications.requests.msg": {
+    ja: " さんがフォローをリクエストしています",
+    en: " requested to follow you.",
+    "zh-TW": " 請求追蹤你",
+    ko: "님이 팔로우를 요청했습니다",
+  },
 } as const;

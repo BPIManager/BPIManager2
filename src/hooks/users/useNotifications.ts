@@ -15,7 +15,7 @@ import type {
  * @returns 通知配列・未読件数・ローディング状態・既読化関数・ページング操作
  */
 export const useNotifications = (
-  type: "all" | "follow" | "overtaken" = "all",
+  type: "all" | "follow" | "overtaken" | "followApproved" = "all",
 ) => {
   const { fbUser, isLoading: fbLoading } = useUser();
 

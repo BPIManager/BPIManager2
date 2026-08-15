@@ -16,14 +16,15 @@ const { notificationsAggregateRepo } = await import(
 );
 
 describe("notificationsAggregateRepo.getUnreadCount", () => {
-  it("フォロー通知数と追い抜き通知数の合計を返すこと", async () => {
+  it("フォロー通知数・追い抜き通知数・承認待ちリクエスト数・承認通知数の合計を返すこと", async () => {
     dbHolder.current = createDbSpy({ cnt: 3 });
     const result = await notificationsAggregateRepo.getUnreadCount(
       "user-1",
       "33",
     );
-    // executeTakeFirstは常に同じcanned値を返すため followCount=3, overtakenCount=3
-    expect(result).toEqual({ total: 6 });
+    // executeTakeFirstは常に同じcanned値を返すため followCount=3, overtakenCount=3,
+    // pendingRequestCount=3, unreadApprovalCount=3 の合計12
+    expect(result).toEqual({ total: 12 });
   });
 
   it("結果がすべてundefinedの場合0を返すこと", async () => {
@@ -37,7 +38,7 @@ describe("notificationsAggregateRepo.getUnreadCount", () => {
 });
 
 describe("notificationsAggregateRepo.getNotifications", () => {
-  it("type='all'の場合、follow/overtakenをunionAllすること", async () => {
+  it("type='all'の場合、follow/overtaken/followApprovedをunionAllすること", async () => {
     dbHolder.current = createDbSpy([]);
     await notificationsAggregateRepo.getNotifications({
       userId: "user-1",
@@ -46,7 +47,8 @@ describe("notificationsAggregateRepo.getNotifications", () => {
       limit: 20,
       offset: 0,
     });
-    expect(callsFor(dbHolder.current.calls, "unionAll")).toHaveLength(1);
+    // 3種類をunionAllで連結するため呼び出しは2回(chain: follow.unionAll(overtaken).unionAll(approved))
+    expect(callsFor(dbHolder.current.calls, "unionAll")).toHaveLength(2);
   });
 
   it("type='follow'の場合、unionAllは呼ばれないこと", async () => {

@@ -127,7 +127,6 @@ export interface FollowApprovalNotifications {
   id: Generated<number>;
   recipientId: string;
   actorId: string;
-  isRead: Generated<number>;
   createdAt: Generated<Date>;
 }
 
