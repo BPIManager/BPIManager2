@@ -41,6 +41,12 @@ class FollowAccessAggregateRepository {
    * 対象が公開だった時代に成立したフォロー）を、フォロワーの表示情報付きで
    * 取得する。
    *
+   * **対象ユーザーが現在非公開の場合のみ**返す。公開ユーザーのフォロワーは
+   * 元々承認記録を持ち得ない（公開時のフォローは常に即時成立で承認フローを
+   * 経由しない）ため、対象が公開のままだと全フォロワーが毎回「未承認」として
+   * 検出されてしまう。公開ユーザーはisPublicによる閲覧許可が優先されるため
+   * 承認自体が無意味であり、表示する必要がない。
+   *
    * 実データの`followRequests`行は作らず、常にこの2テーブルの差分から
    * 動的に導出する（マイグレーションでの一括レコード挿入を避けるため）。
    * 通知ベルの「承認待ち」タブで、本物の`followRequests`と統合して
@@ -53,8 +59,10 @@ class FollowAccessAggregateRepository {
     return await db
       .selectFrom("follows as f")
       .innerJoin("users as u", "u.userId", "f.followerId")
+      .innerJoin("users as target", "target.userId", "f.followingId")
       .select(["f.createdAt", "u.userId as followerId", "u.userName as followerName", "u.profileImage as followerImage"])
       .where("f.followingId", "=", targetUserId)
+      .where("target.isPublic", "=", 0)
       .where(({ not, exists, selectFrom }) =>
         not(
           exists(
@@ -71,14 +79,17 @@ class FollowAccessAggregateRepository {
 
   /**
    * {@link listUnapprovedFollowers}の件数版。通知バッジの「承認待ち件数」に使う。
+   * 同様に対象ユーザーが現在非公開の場合のみカウントする。
    *
    * @param targetUserId - 対象ユーザー ID
    */
   async countUnapprovedFollowers(targetUserId: string): Promise<number> {
     const result = await db
       .selectFrom("follows as f")
+      .innerJoin("users as target", "target.userId", "f.followingId")
       .select((eb) => eb.fn.countAll<number>().as("cnt"))
       .where("f.followingId", "=", targetUserId)
+      .where("target.isPublic", "=", 0)
       .where(({ not, exists, selectFrom }) =>
         not(
           exists(
