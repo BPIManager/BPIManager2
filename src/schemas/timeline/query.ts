@@ -9,6 +9,7 @@ export const timelineQuerySchema = z.object({
   // 未指定・不正値は最新バージョンへフォールバック
   version: iidxVersionQuerySchema,
   search: z.string().optional(),
+  listId: z.coerce.number().optional(),
   levels: z.preprocess(parseArray, z.array(z.coerce.number())).optional(),
   difficulties: z
     .preprocess(
