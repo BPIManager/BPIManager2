@@ -34,7 +34,9 @@ function DrawerOverlay({
     <DrawerPrimitive.Overlay
       data-slot="drawer-overlay"
       className={cn(
-        "fixed inset-0 z-50 bg-bpim-bg/60 backdrop-blur-sm",
+        // z-1000: サイドバー(DashboardLayout)がz-1000のため、それより
+        // 手前に表示する必要がある(ResultModalShellと同じ理由)
+        "fixed inset-0 z-1000 bg-bpim-bg/60 backdrop-blur-sm",
         "data-open:animate-in data-open:fade-in-0",
         "data-closed:animate-out data-closed:fade-out-0",
         className,
@@ -55,7 +57,7 @@ function DrawerContent({
       <DrawerPrimitive.Content
         data-slot="drawer-content"
         className={cn(
-          "group/drawer-content fixed z-50 flex h-auto flex-col",
+          "group/drawer-content fixed z-1002 flex h-auto flex-col",
           "bg-bpim-surface text-bpim-text text-sm border-bpim-border",
           "data-[vaul-drawer-direction=bottom]:inset-x-0 data-[vaul-drawer-direction=bottom]:bottom-0",
           "data-[vaul-drawer-direction=bottom]:mt-24 data-[vaul-drawer-direction=bottom]:max-h-[80vh]",
@@ -74,7 +76,6 @@ function DrawerContent({
         )}
         {...props}
       >
-        <div className="mx-auto mt-4 hidden h-1 w-25 shrink-0 rounded-full bg-bpim-overlay group-data-[vaul-drawer-direction=bottom]/drawer-content:block" />
         {children}
       </DrawerPrimitive.Content>
     </DrawerPortal>

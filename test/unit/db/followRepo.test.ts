@@ -88,6 +88,34 @@ describe("followsRepo.toggleFollow", () => {
   });
 });
 
+describe("followsRepo.removeInTransaction", () => {
+  it("trxで削除対象が存在すればtrueを返すこと", async () => {
+    const spy = createDbSpy({ numDeletedRows: 1 });
+    dbHolder.current = spy;
+
+    const result = await followsRepo.removeInTransaction(
+      spy.db as never,
+      "a",
+      "b",
+    );
+
+    expect(result).toBe(true);
+    expect(callsFor(spy.calls, "deleteFrom")[0].args).toEqual(["follows"]);
+    const whereCalls = callsFor(spy.calls, "where");
+    expect(whereCalls[0].args).toEqual(["followerId", "=", "a"]);
+    expect(whereCalls[1].args).toEqual(["followingId", "=", "b"]);
+  });
+
+  it("削除対象が存在しなければfalseを返すこと", async () => {
+    const spy = createDbSpy({ numDeletedRows: 0 });
+    dbHolder.current = spy;
+
+    expect(
+      await followsRepo.removeInTransaction(spy.db as never, "a", "b"),
+    ).toBe(false);
+  });
+});
+
 describe("followsRepo.getFollowCounts", () => {
   it("フォロワー数とフォロー中数を数値で返すこと", async () => {
     const spy = createDbSpy({ count: 3 });

@@ -42,6 +42,10 @@ export interface Database {
   followInviteLinks: FollowInviteLinks;
   followApprovalNotifications: FollowApprovalNotifications;
   followRequests: FollowRequests;
+  // 追加: フォロー中ユーザーを分類するリスト(#277)。kysely-codegenは使わず、
+  // 既存の生成済み型のスタイルに合わせて手動で追加している
+  followLists: FollowLists;
+  followListMembers: FollowListMembers;
 }
 
 export type Decimal = ColumnType<string, number | string>;
@@ -133,6 +137,21 @@ export interface FollowApprovalNotifications {
 export interface FollowInviteLinks {
   userId: string;
   token: string;
+  createdAt: Generated<Date>;
+}
+
+export interface FollowLists {
+  id: Generated<number>;
+  userId: string;
+  name: string;
+  isPublic: Generated<number>;
+  createdAt: Generated<Date>;
+}
+
+export interface FollowListMembers {
+  id: Generated<number>;
+  listId: number;
+  followingId: string;
   createdAt: Generated<Date>;
 }
 

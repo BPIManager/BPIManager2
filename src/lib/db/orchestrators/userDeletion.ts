@@ -12,6 +12,8 @@ import { discordLinksRepo } from "@/lib/db/domains/discord";
 import { followRequestsRepo } from "@/lib/db/domains/followRequests";
 import { followInviteLinksRepo } from "@/lib/db/domains/followInviteLinks";
 import { followApprovalNotificationsRepo } from "@/lib/db/domains/followApprovalNotifications";
+import { followListsRepo } from "@/lib/db/domains/followLists";
+import { followListMembersRepo } from "@/lib/db/domains/followListMembers";
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
@@ -36,6 +38,7 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
     followRequests,
     followInviteLinks,
     followApprovalNotifications,
+    followLists,
   ] = await Promise.all([
     usersRepo.getAllForUser(userId),
     followsRepo.getAllForUser(userId),
@@ -51,7 +54,13 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
     followRequestsRepo.getAllForUser(userId),
     followInviteLinksRepo.getByUserId(userId),
     followApprovalNotificationsRepo.getAllForUser(userId),
+    followListsRepo.getAllForUser(userId),
   ]);
+
+  // followListsの取得結果(id)に依存するため、上のPromise.allとは別に取得する
+  const followListMembers = await followListMembersRepo.getAllForLists(
+    followLists.map((l) => l.id),
+  );
 
   // apiKeys.key / followInviteLinks.token は秘密情報のため、バックアップには
   // 残さずレコードの存在のみ記録する
@@ -77,6 +86,8 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
     followRequests,
     followInviteLinks: redactedFollowInviteLinks,
     followApprovalNotifications,
+    followLists,
+    followListMembers,
   };
 
   // 2. バックアップをファイルに書き出す
@@ -110,6 +121,14 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
 
     // follows: FK to users(CASCADE) for both sides
     await followsRepo.deleteByUser(trx, userId);
+
+    // followListMembers(followingId側): 他人のリストに追加されている分。
+    // listId側(自分のリスト所有分)はfollowListsの削除でCASCADEされる
+    await followListMembersRepo.deleteByFollowing(trx, userId);
+
+    // followLists: FK to users(CASCADE)。所属メンバー(followListMembers)は
+    // listIdのON DELETE CASCADEで連動削除される
+    await followListsRepo.deleteByUser(trx, userId);
 
     // apiKeys: FK to users(CASCADE)
     await apiKeysRepo.deleteByUser(trx, userId);

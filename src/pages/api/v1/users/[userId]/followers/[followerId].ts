@@ -4,6 +4,7 @@ import {
   withAuth,
 } from "@/middlewares/api/withAuth";
 import { followsRepo } from "@/lib/db/domains/follow";
+import { unfollowAndCleanupLists } from "@/lib/db/orchestrators/unfollow";
 import { followApprovalNotificationsRepo } from "@/lib/db/domains/followApprovalNotifications";
 import { followRequestsRepo } from "@/lib/db/domains/followRequests";
 
@@ -32,7 +33,13 @@ async function handler(
   try {
     switch (req.method) {
       case "DELETE": {
-        const removed = await followsRepo.remove(followerId, req.authUid);
+        // followsRepo.removeではなく専用オーケストレーターを使う理由は、
+        // 解除された相手(req.authUid)をfollowerId本人の全リストからも
+        // 同一トランザクションで外す(#277)必要があるため
+        const removed = await unfollowAndCleanupLists(
+          followerId,
+          req.authUid,
+        );
         if (!removed) {
           return res.status(404).json({ message: "Follower not found" });
         }

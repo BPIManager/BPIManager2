@@ -127,6 +127,21 @@ describe("socialComparisonRepo.getFollowedWinLossSummary", () => {
     const ifCalls = callsFor(dbHolder.current.calls, "$if");
     expect(ifCalls[0].args[0]).toBe(true);
     expect(ifCalls[1].args[0]).toBe(true);
+    // listId未指定時は絞り込み$ifがfalseのまま(#277導入前の既存挙動を維持)
+    expect(ifCalls[2].args[0]).toBe(false);
+  });
+
+  it("listIdを指定するとフォローリスト絞り込みの$ifがtrueになること(#277)", async () => {
+    dbHolder.current = createDbSpy([]);
+    await socialComparisonRepo.getFollowedWinLossSummary({
+      viewerId: "user-1",
+      version: "33",
+      levels: [],
+      difficulties: [],
+      listId: 42,
+    });
+    const ifCalls = callsFor(dbHolder.current.calls, "$if");
+    expect(ifCalls[2].args[0]).toBe(true);
   });
 
   it("結果行をradar/viewerRadar/stats構造にマッピングすること", async () => {
