@@ -8,7 +8,6 @@ import { scoresRepo } from "@/lib/db/domains/scores";
 import { iidxTowerRepo } from "@/lib/db/domains/iidxTower";
 import { songsRepo } from "@/lib/db/domains/songs";
 import { getArenaStatsHistory } from "@/lib/db/domains/arenaHistory";
-import { wherePublicOnly } from "@/lib/db/shared/visibility";
 
 const jstDayStart = (jstDate: string): Date =>
   new Date(`${jstDate}T00:00:00+09:00`);
@@ -307,7 +306,21 @@ class MonthlyReviewRepository {
       ])
       .where("f.followerId", "=", viewerId)
       .where("s.version", "=", version)
-      .$call((qb) => wherePublicOnly(qb, "u.isPublic"))
+      // 対象が公開、または対象が非公開でも承認記録がある場合のみ表示する。
+      // followsの存在だけでは判定できない(#275フォロー後方修正: 公開時代に
+      // 成立したfollowsには承認記録がないため、承認記録の有無も要求する)
+      .where((eb) =>
+        eb.or([
+          eb("u.isPublic", "=", 1),
+          eb.exists(
+            eb
+              .selectFrom("followApprovalNotifications as fan")
+              .select("fan.id")
+              .where("fan.recipientId", "=", viewerId)
+              .whereRef("fan.actorId", "=", "u.userId"),
+          ),
+        ]),
+      )
       .execute();
   }
 

@@ -57,4 +57,61 @@ export const notificationsTranslations = {
     "zh-TW": " 追蹤了你",
     ko: "님이 팔로우했습니다",
   },
+  // Follow approved message: "{name}{msg}"
+  "notifications.followApproved.msg": {
+    ja: " さんがフォローリクエストを承認しました",
+    en: " approved your follow request.",
+    "zh-TW": " 已核准你的追蹤請求",
+    ko: "님이 팔로우 요청을 승인했습니다",
+  },
+  "notifications.tab.requests": {
+    ja: "承認待ち",
+    en: "Requests",
+    "zh-TW": "待審核",
+    ko: "승인 대기",
+  },
+  "notifications.requests.empty": {
+    ja: "保留中のリクエストはありません",
+    en: "No pending requests.",
+    "zh-TW": "沒有待處理的請求",
+    ko: "대기 중인 요청이 없습니다",
+  },
+  "notifications.requests.approve": {
+    ja: "承認",
+    en: "Approve",
+    "zh-TW": "核准",
+    ko: "승인",
+  },
+  "notifications.requests.reject": {
+    ja: "却下",
+    en: "Reject",
+    "zh-TW": "拒絕",
+    ko: "거절",
+  },
+  // Follow request message: "{name}{msg}"
+  "notifications.requests.msg": {
+    ja: " さんがフォローをリクエストしています",
+    en: " requested to follow you.",
+    "zh-TW": " 請求追蹤你",
+    ko: "님이 팔로우를 요청했습니다",
+  },
+  // Legacy follower message: "{name}{msg}"
+  "notifications.requests.legacyMsg": {
+    ja: " さんは以前からのフォロワーです(未承認)",
+    en: " has been following you (not yet approved).",
+    "zh-TW": " 一直以來都在追蹤你(尚未核准)",
+    ko: "님은 이전부터 팔로우하고 있습니다 (미승인)",
+  },
+  "notifications.requests.legacyBadge": {
+    ja: "既存フォロワー",
+    en: "Existing follower",
+    "zh-TW": "既有追蹤者",
+    ko: "기존 팔로워",
+  },
+  "notifications.requests.actionFailed": {
+    ja: "操作に失敗しました",
+    en: "Action failed.",
+    "zh-TW": "操作失敗",
+    ko: "작업에 실패했습니다",
+  },
 } as const;

@@ -1,25 +1,29 @@
-﻿import {
+import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Tabs } from "@/components/ui/tabs";
 import { useNotifications } from "@/hooks/users/useNotifications";
+import { useFollowRequests } from "@/hooks/users/useFollowRequests";
 import { Bell } from "lucide-react";
 import { useState } from "react";
 import InfiniteScrollContainer from "@/components/partials/common/ListControls/InfiniteScroll/ui";
 import NotificationItem from "./item";
+import NotificationRequestItem from "./requestItem";
 import { Button } from "@/components/ui/button";
 import { AppTabsGroup } from "@/components/ui/complex/tabs";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
+type NotificationTab = "all" | "follow" | "overtaken" | "requests";
+
 const NotificationBell = () => {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState<"all" | "follow" | "overtaken">(
-    "all",
-  );
+  const [activeTab, setActiveTab] = useState<NotificationTab>("all");
 
-  const notificationRes = useNotifications(activeTab);
+  const notificationRes = useNotifications(
+    activeTab === "requests" ? "all" : activeTab,
+  );
   const {
     unreadCount,
     markAsRead,
@@ -29,6 +33,13 @@ const NotificationBell = () => {
     isReachingEnd,
     isError,
   } = notificationRes;
+
+  const {
+    requests,
+    isLoading: isLoadingRequests,
+    approve,
+    reject,
+  } = useFollowRequests();
 
   return (
     <Popover onOpenChange={(open) => open && markAsRead()}>
@@ -54,7 +65,7 @@ const NotificationBell = () => {
       >
         <Tabs
           value={activeTab}
-          onValueChange={(v) => setActiveTab(v as "all" | "follow" | "overtaken")}
+          onValueChange={(v) => setActiveTab(v as NotificationTab)}
           className="w-full"
         >
           <AppTabsGroup
@@ -64,21 +75,45 @@ const NotificationBell = () => {
               { value: "all", label: t("notifications.tab.all") },
               { value: "follow", label: t("notifications.tab.follow") },
               { value: "overtaken", label: t("notifications.tab.overtaken") },
+              {
+                value: "requests",
+                label:
+                  requests.length > 0
+                    ? `${t("notifications.tab.requests")} (${requests.length})`
+                    : t("notifications.tab.requests"),
+              },
             ]}
           />
           <div className="max-h-100 p-2">
-            <InfiniteScrollContainer
-              items={notifications}
-              setSize={setSize}
-              isLoadingMore={isLoadingMore}
-              isReachingEnd={isReachingEnd}
-              isError={isError}
-              maxH="400px"
-              emptyMessage={t("notifications.empty")}
-              renderItem={(n, i) => (
-                <NotificationItem key={`${n.timestamp}-${i}`} n={n} />
-              )}
-            />
+            {activeTab === "requests" ? (
+              requests.length === 0 ? (
+                <p className="p-6 text-center text-sm text-bpim-muted">
+                  {isLoadingRequests ? "" : t("notifications.requests.empty")}
+                </p>
+              ) : (
+                requests.map((r) => (
+                  <NotificationRequestItem
+                    key={`${r.kind}-${r.kind === "request" ? r.id : r.requesterId}`}
+                    request={r}
+                    onApprove={approve}
+                    onReject={reject}
+                  />
+                ))
+              )
+            ) : (
+              <InfiniteScrollContainer
+                items={notifications}
+                setSize={setSize}
+                isLoadingMore={isLoadingMore}
+                isReachingEnd={isReachingEnd}
+                isError={isError}
+                maxH="400px"
+                emptyMessage={t("notifications.empty")}
+                renderItem={(n, i) => (
+                  <NotificationItem key={`${n.timestamp}-${i}`} n={n} />
+                )}
+              />
+            )}
           </div>
         </Tabs>
       </PopoverContent>

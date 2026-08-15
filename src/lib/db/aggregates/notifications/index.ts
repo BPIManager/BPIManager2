@@ -1,5 +1,8 @@
 import { db } from "@/lib/db";
 import { notificationsRepo } from "@/lib/db/domains/notifications";
+import { followRequestsRepo } from "@/lib/db/domains/followRequests";
+import { followApprovalNotificationsRepo } from "@/lib/db/domains/followApprovalNotifications";
+import { followAccessAggregateRepo } from "@/lib/db/aggregates/followAccess";
 import { NotificationOvertakenRow } from "@/types/users/notifications";
 import { sql } from "kysely";
 
@@ -75,9 +78,11 @@ function overtakenScoresBaseQuery(params: {
  */
 class NotificationsAggregateRepository {
   /**
-   * 未読通知数（フォロー通知 + 追い抜き通知）を取得する。
+   * 未読通知数（フォロー通知 + 追い抜き通知 + 承認通知 + 保留中フォローリクエスト）を取得する。
    *
    * `notifications` テーブルの `lastReadAt` を基準に、それ以降の件数を集計する。
+   * 保留中フォローリクエストは「既読/未読」ではなく対応が必要な件数のため、
+   * 対応（承認/却下）されるまで常にカウントに含める。
    *
    * @param userId - ユーザー ID
    * @param latestVersion - 追い抜き通知の対象バージョン
@@ -101,8 +106,20 @@ class NotificationsAggregateRepository {
       .where("s2.lastPlayed", ">", lastRead)
       .executeTakeFirst();
 
+    const [pendingRequestCount, unapprovedFollowerCount, unreadApprovalCount] =
+      await Promise.all([
+        followRequestsRepo.countPendingForTarget(userId),
+        followAccessAggregateRepo.countUnapprovedFollowers(userId),
+        followApprovalNotificationsRepo.countUnreadSince(userId, lastRead),
+      ]);
+
     return {
-      total: Number(followCount?.cnt || 0) + Number(overtakenCount?.cnt || 0),
+      total:
+        Number(followCount?.cnt || 0) +
+        Number(overtakenCount?.cnt || 0) +
+        pendingRequestCount +
+        unapprovedFollowerCount +
+        unreadApprovalCount,
     };
   }
 
@@ -120,7 +137,7 @@ class NotificationsAggregateRepository {
    */
   async getNotifications(params: {
     userId: string;
-    type: "all" | "follow" | "overtaken";
+    type: "all" | "follow" | "overtaken" | "followApproved";
     latestVersion: string;
     limit: number;
     offset: number;
@@ -169,13 +186,33 @@ class NotificationsAggregateRepository {
       ])
       .$castTo<NotificationOvertakenRow>();
 
+    const approvedQuery = db
+      .selectFrom("followApprovalNotifications as e")
+      .innerJoin("users as u", "e.actorId", "u.userId")
+      .select([
+        sql<string>`'followApproved'`.as("type"),
+        "e.createdAt as timestamp",
+        "u.userName as senderName",
+        "u.profileImage as senderImage",
+        "u.userId as senderId",
+        sql<string | null>`NULL`.as("songTitle"),
+        sql<string | null>`NULL`.as("songDifficulty"),
+        sql<number | null>`NULL`.as("rivalScore"),
+        sql<number | null>`0`.as("myScore"),
+        sql<number | null>`NULL`.as("songId"),
+      ])
+      .where("e.recipientId", "=", userId)
+      .$castTo<NotificationOvertakenRow>();
+
     let baseUnionQuery;
     if (type === "follow") {
       baseUnionQuery = followQuery;
     } else if (type === "overtaken") {
       baseUnionQuery = overtakenQuery;
+    } else if (type === "followApproved") {
+      baseUnionQuery = approvedQuery;
     } else {
-      baseUnionQuery = followQuery.unionAll(overtakenQuery);
+      baseUnionQuery = followQuery.unionAll(overtakenQuery).unionAll(approvedQuery);
     }
 
     return await db

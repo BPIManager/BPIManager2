@@ -17,7 +17,8 @@ export function registerGetUserScores(server: McpServer, userId: string) {
       title: "指定ユーザーのスコア一覧を取得",
       description:
         `指定したuserIdのbeatmania IIDXスコア一覧を取得する。自分自身は常に閲覧可能、` +
-        `他ユーザーは公開プロフィール(isPublic)のユーザーのみ閲覧可能（フォローの有無は影響しない）。` +
+        `他ユーザーは公開プロフィール(isPublic)のユーザー、または承認済みフォロー関係が` +
+        `あるユーザーのみ閲覧可能。` +
         `絞り込みなしだとプレイ済み全曲（数百〜数千件）を返しレスポンスが非常に大きくなるため、` +
         `目的に応じて必ず絞り込みパラメータを使うこと。` +
         `絞り込み可能な項目: version(バージョン), clearState(クリア状況), ` +

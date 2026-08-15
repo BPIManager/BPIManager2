@@ -1,5 +1,4 @@
 import { describe, it, expect, vi } from "vitest";
-import { sql } from "kysely";
 import { createDbSpy, callsFor } from "../helpers/dbQuerySpy";
 
 const { dbHolder } = vi.hoisted(() => ({
@@ -98,17 +97,19 @@ describe("rivalRepo.getOvertakenRivals", () => {
     ).toBe(true);
   });
 
-  it("ライバルの公開設定(isPublic)での絞り込みを追加すること", async () => {
+  it("公開または承認済みのライバルのみに絞り込むwhere条件(コールバック形式)を追加すること(#275フォロー後方修正)", async () => {
     dbHolder.current = createDbSpy([]);
     await rivalRepo.getOvertakenRivals("user-1", "33", { batchId: "batch-1" });
     const whereCalls = callsFor(dbHolder.current.calls, "where");
-    expect(
-      whereCalls.some(
-        (c) =>
-          JSON.stringify(c.args[0]) === JSON.stringify(sql.ref("ru.isPublic")) &&
-          c.args[2] === 1,
-      ),
-    ).toBe(true);
+    // isPublic単純フィルタ(#274/#275初期実装)ではなく、
+    // isPublic OR 承認記録の存在、をコールバック形式のwhereで判定する
+    // (公開時代に成立したfollowsを自動承認扱いにしないため)
+    expect(whereCalls.some((c) => typeof c.args[0] === "function")).toBe(
+      true,
+    );
+    // 退行防止: コールバック形式と併存/置き換えで"ru.isPublic"への単純な
+    // 文字列where(#274/#275初期実装の再混入)が残っていないことを保証する
+    expect(whereCalls.some((c) => c.args[0] === "ru.isPublic")).toBe(false);
   });
 });
 

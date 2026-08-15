@@ -21,6 +21,7 @@ import { authActions } from "@/lib/firebase/auth";
 import ImageUploadModal from "../ImageCrop/ui";
 import { useEditProfile } from "@/hooks/users/useEditProfile";
 import AvatarSection from "./avatar";
+import FollowInviteSection from "./followInvite";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
@@ -282,6 +283,8 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                   className="shrink-0 data-[state=checked]:bg-bpim-primary"
                 />
               </div>
+
+              {!formData.isPublic && <FollowInviteSection />}
             </div>
           </div>
 

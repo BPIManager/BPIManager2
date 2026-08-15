@@ -2,6 +2,7 @@
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import ArenaClassBadge from "@/components/partials/common/Badge/ArenaClassBadge";
+import PrivateAccountBadge from "@/components/partials/common/Badge/PrivateAccountBadge";
 
 interface FollowUser {
   userId: string;
@@ -9,6 +10,7 @@ interface FollowUser {
   userName: string | null;
   arenaClass: string | null;
   totalBpi: number | null;
+  isPublic: boolean;
 }
 
 const UserFollowCard = ({ user }: { user: FollowUser }) => {
@@ -21,8 +23,9 @@ const UserFollowCard = ({ user }: { user: FollowUser }) => {
         <AvatarFallback>{user.userName?.slice(0, 2)}</AvatarFallback>
       </Avatar>
       <div className="flex flex-col items-start gap-0">
-        <span className="text-sm font-bold text-bpim-text">
+        <span className="flex items-center gap-1.5 text-sm font-bold text-bpim-text">
           {user.userName}
+          {!isMasked && !user.isPublic && <PrivateAccountBadge size="xs" />}
         </span>
         <div className="flex items-center gap-2">
           <ArenaClassBadge arenaClass={user.arenaClass} size="sm" />

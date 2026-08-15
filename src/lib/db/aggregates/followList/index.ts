@@ -17,6 +17,13 @@ class FollowListAggregateRepository {
    *
    * ページネーションなし。非公開ユーザーは除外する。
    *
+   * 呼び出し元は`userId`本人ではなく第三者が閲覧するケースがあるため
+   * （例: `checkUserAccess`で`userId`のプロフィール閲覧権を確認した別の
+   * 閲覧者がここを呼ぶ）、「`follows`が存在する = 閲覧者本人に閲覧許可がある」
+   * という判定（#275, `wherePublicOnly`除去）は使えない。`userId`が
+   * フォローしている非公開ユーザーの閲覧許可は`userId`本人にしかないため、
+   * 引き続きisPublicで一律除外する。
+   *
    * @param userId - フォローしている側のユーザー ID
    */
   async getPublicFollowingUsers(userId: string) {
@@ -96,6 +103,12 @@ class FollowListAggregateRepository {
           .whereRef("f2.followingId", "=", "u.userId")
           .where("f2.followerId", "=", viewerId ?? "")
           .as("isViewerFollowing"),
+        eb
+          .selectFrom("followApprovalNotifications as fan")
+          .select((eb2) => [eb2.fn.countAll<number>().as("cnt")])
+          .whereRef("fan.actorId", "=", "u.userId")
+          .where("fan.recipientId", "=", viewerId ?? "")
+          .as("isViewerApproved"),
       ])
       .orderBy("f.createdAt", "desc")
       .limit(limit)
@@ -108,6 +121,10 @@ class FollowListAggregateRepository {
           viewerId,
           targetUserId: u.userId,
           isPublic: u.isPublic,
+          // follows存在だけでなく承認記録も必要(#275フォロー後方修正:
+          // 公開時代に成立したfollowsには承認記録がないため)
+          hasFollowAccess:
+            Number(u.isViewerFollowing) > 0 && Number(u.isViewerApproved) > 0,
         });
 
         return {

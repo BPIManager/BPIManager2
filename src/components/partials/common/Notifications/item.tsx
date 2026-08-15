@@ -11,6 +11,7 @@ import { useTranslation } from "@/hooks/common/useTranslation";
 const NotificationItem = ({ n }: { n: NotificationItemType }) => {
   const { t } = useTranslation();
   const isOvertaken = n.type === "overtaken";
+  const isFollowApproved = n.type === "followApproved";
   const diff = (n.rivalScore || 0) - (n.myScore || 0);
 
   return (
@@ -52,6 +53,8 @@ const NotificationItem = ({ n }: { n: NotificationItemType }) => {
                   </Badge>
                 </div>
               </>
+            ) : isFollowApproved ? (
+              t("notifications.followApproved.msg")
             ) : (
               t("notifications.follow.msg")
             )}

@@ -25,6 +25,49 @@ class FollowRepository {
   }
 
   /**
+   * フォロー関係を作成する（呼び出し元のトランザクションに参加する版）。
+   *
+   * フォローリクエスト承認時など、複数ドメインへの書き込みを1トランザクションで
+   * 行うオーケストレーターから呼ばれる。既に存在する場合はそのまま成功する。
+   *
+   * @param trx - 呼び出し元が管理するトランザクション
+   * @param followerId - フォローする側のユーザー ID
+   * @param followingId - フォローされる側のユーザー ID
+   */
+  async create(
+    trx: Transaction<Database>,
+    followerId: string,
+    followingId: string,
+  ) {
+    await trx
+      .insertInto("follows")
+      .values({ followerId, followingId })
+      .onDuplicateKeyUpdate({ followerId })
+      .execute();
+  }
+
+  /**
+   * フォロー関係を確実に削除する（トグルではなく一方向の削除）。
+   *
+   * 「強制フォロー解除」のように、操作者(対象ユーザー)と`followerId`(削除対象の
+   * フォロワー)が異なる場合に使う。`toggleFollow`は呼び出し元自身の
+   * フォロー状態を反転する用途のため、この非対称な操作には使えない。
+   *
+   * @param followerId - フォローしている側のユーザー ID
+   * @param followingId - フォローされている側のユーザー ID
+   * @returns 削除対象が存在した場合は `true`
+   */
+  async remove(followerId: string, followingId: string): Promise<boolean> {
+    const result = await db
+      .deleteFrom("follows")
+      .where("followerId", "=", followerId)
+      .where("followingId", "=", followingId)
+      .executeTakeFirst();
+
+    return Number(result.numDeletedRows) > 0;
+  }
+
+  /**
    * フォロー状態をトグルする。存在すれば削除し、なければ追加する。
    *
    * @param followerId - フォローする側のユーザー ID

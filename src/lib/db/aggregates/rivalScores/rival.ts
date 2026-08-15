@@ -67,9 +67,25 @@ class RivalRepository {
         } else {
           return base.on("r.userId", "in", (qb) =>
             qb
-              .selectFrom("follows")
-              .select("followingId")
-              .where("followerId", "=", viewerId),
+              .selectFrom("follows as f")
+              .innerJoin("users as fu", "fu.userId", "f.followingId")
+              .select("f.followingId")
+              .where("f.followerId", "=", viewerId)
+              // follows行の存在だけでは判定できない(#275フォロー後方修正:
+              // 公開時代に成立したfollowsには承認記録がないため、対象が
+              // 非公開の場合は承認記録の有無も要求する)
+              .where((eb) =>
+                eb.or([
+                  eb("fu.isPublic", "=", 1),
+                  eb.exists(
+                    eb
+                      .selectFrom("followApprovalNotifications as fan")
+                      .select("fan.id")
+                      .where("fan.recipientId", "=", viewerId)
+                      .whereRef("fan.actorId", "=", "f.followingId"),
+                  ),
+                ]),
+              ),
           );
         }
       })
@@ -171,9 +187,25 @@ class RivalRepository {
           .on("r.version", "=", version)
           .on("r.userId", "in", (qb) =>
             qb
-              .selectFrom("follows")
-              .select("followingId")
-              .where("followerId", "=", userId),
+              .selectFrom("follows as f")
+              .innerJoin("users as fu", "fu.userId", "f.followingId")
+              .select("f.followingId")
+              .where("f.followerId", "=", userId)
+              // follows行の存在だけでは判定できない(#275フォロー後方修正:
+              // 公開時代に成立したfollowsには承認記録がないため、対象が
+              // 非公開の場合は承認記録の有無も要求する)
+              .where((eb) =>
+                eb.or([
+                  eb("fu.isPublic", "=", 1),
+                  eb.exists(
+                    eb
+                      .selectFrom("followApprovalNotifications as fan")
+                      .select("fan.id")
+                      .where("fan.recipientId", "=", userId)
+                      .whereRef("fan.actorId", "=", "f.followingId"),
+                  ),
+                ]),
+              ),
           )
           .on("r.logId", "=", (eb) =>
             correlatedLatestLogId(eb, {
@@ -315,7 +347,21 @@ class RivalRepository {
       ])
       .where("current.userId", "=", userId)
       .where("current.version", "=", version)
-      .$call((qb) => wherePublicOnly(qb, "ru.isPublic"));
+      // 対象が公開、または対象が非公開でも承認記録がある場合のみ表示する。
+      // followsの存在だけでは判定できない(#275フォロー後方修正: 公開時代に
+      // 成立したfollowsには承認記録がないため、承認記録の有無も要求する)
+      .where((eb) =>
+        eb.or([
+          eb("ru.isPublic", "=", 1),
+          eb.exists(
+            eb
+              .selectFrom("followApprovalNotifications as fan")
+              .select("fan.id")
+              .where("fan.recipientId", "=", userId)
+              .whereRef("fan.actorId", "=", "ru.userId"),
+          ),
+        ]),
+      );
 
     if (batchId) {
       query = query.where("current.batchId", "=", batchId);
@@ -415,6 +461,10 @@ class RivalRepository {
    */
   // follows・users・scores・songs・songDefを横断JOINした単曲比較データの
   // ため、直接クエリを維持する。
+  // 呼び出し元(rivals/following/scores/[songId].ts)は`viewerId`にURLの[userId]
+  // (第三者が閲覧している可能性のある対象ユーザー)をそのまま渡すため、
+  // 「followsの存在=閲覧者本人への閲覧許可」の前提(#275)が成立しない。
+  // isPublicによる絞り込みを維持する
   async getFollowedScoresForSong(params: {
     viewerId: string;
     songId: number;

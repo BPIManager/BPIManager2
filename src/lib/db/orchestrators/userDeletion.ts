@@ -9,6 +9,9 @@ import { apiKeysRepo } from "@/lib/db/domains/apiKeys";
 import { notificationsRepo } from "@/lib/db/domains/notifications";
 import { radarCacheRepo } from "@/lib/db/domains/radar";
 import { discordLinksRepo } from "@/lib/db/domains/discord";
+import { followRequestsRepo } from "@/lib/db/domains/followRequests";
+import { followInviteLinksRepo } from "@/lib/db/domains/followInviteLinks";
+import { followApprovalNotificationsRepo } from "@/lib/db/domains/followApprovalNotifications";
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
@@ -30,6 +33,9 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
     apiKeys,
     allScores,
     discordLinks,
+    followRequests,
+    followInviteLinks,
+    followApprovalNotifications,
   ] = await Promise.all([
     usersRepo.getAllForUser(userId),
     followsRepo.getAllForUser(userId),
@@ -42,10 +48,17 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
     apiKeysRepo.getAllForUser(userId),
     allScoresRepo.getAllForUser(userId),
     discordLinksRepo.getLinksForUser(userId),
+    followRequestsRepo.getAllForUser(userId),
+    followInviteLinksRepo.getByUserId(userId),
+    followApprovalNotificationsRepo.getAllForUser(userId),
   ]);
 
-  // apiKeys.key は秘密情報のため、バックアップには残さずレコードの存在のみ記録する
+  // apiKeys.key / followInviteLinks.token は秘密情報のため、バックアップには
+  // 残さずレコードの存在のみ記録する
   const redactedApiKeys = apiKeys.map(({ key: _key, ...rest }) => rest);
+  const redactedFollowInviteLinks = followInviteLinks
+    ? (({ token: _token, ...rest }) => rest)(followInviteLinks)
+    : followInviteLinks;
 
   const backup = {
     exportedAt: new Date().toISOString(),
@@ -61,6 +74,9 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
     apiKeys: redactedApiKeys,
     allScores,
     discordLinks,
+    followRequests,
+    followInviteLinks: redactedFollowInviteLinks,
+    followApprovalNotifications,
   };
 
   // 2. バックアップをファイルに書き出す
@@ -112,6 +128,15 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
 
     // discordLinks: FK to users(CASCADE)
     await discordLinksRepo.deleteLinkByUser(trx, userId);
+
+    // followRequests: FK to users(CASCADE) for both requesterId/targetUserId
+    await followRequestsRepo.deleteByUser(trx, userId);
+
+    // followInviteLinks: FK to users(CASCADE)
+    await followInviteLinksRepo.deleteByUser(trx, userId);
+
+    // followApprovalNotifications: FK to users(CASCADE) for both recipientId/actorId
+    await followApprovalNotificationsRepo.deleteByUser(trx, userId);
 
     // users: メインレコード
     await usersRepo.deleteByUser(trx, userId);

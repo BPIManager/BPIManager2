@@ -15,7 +15,7 @@ import type {
  * @returns 通知配列・未読件数・ローディング状態・既読化関数・ページング操作
  */
 export const useNotifications = (
-  type: "all" | "follow" | "overtaken" = "all",
+  type: "all" | "follow" | "overtaken" | "followApproved" = "all",
 ) => {
   const { fbUser, isLoading: fbLoading } = useUser();
 
@@ -51,7 +51,10 @@ export const useNotifications = (
     if (!fbUser) return;
     try {
       await markNotificationsRead(fbUser);
-      mutateCount({ total: 0 }, { revalidate: false });
+      // 未読件数には承認待ちリクエスト数(既読/未読の概念を持たず、対応
+      // されるまで常にカウントされる)も含まれるため、既読化後もtotal:0に
+      // 決め打ちせず再取得する
+      mutateCount();
     } catch (e) {
       console.error(e);
     }

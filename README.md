@@ -117,11 +117,13 @@ The `migrations/schema.sql` file contains the full database schema. It uses `CRE
 
 > **Note:** This project uses a single SQL file for schema management rather than a migration framework. When making schema changes, update `migrations/schema.sql` and apply the diff manually to existing environments. If you need incremental migrations in the future, consider adopting a tool like [Flyway](https://flywaydb.org/) or [golang-migrate](https://github.com/golang-migrate/migrate).
 
-After schema changes, regenerate the Kysely type definitions:
+After schema changes, apply `migrations/schema.sql` to the database pointed at by `DATABASE_URL` first, then regenerate the Kysely type definitions:
 
 ```bash
 npx kysely-codegen --url "$DATABASE_URL" --out-file src/types/db.ts
 ```
+
+`kysely-codegen` introspects the live database, so regenerating against a database that hasn't received the latest schema changes will drop the types for any newly added tables/columns.
 
 ## Project Structure
 

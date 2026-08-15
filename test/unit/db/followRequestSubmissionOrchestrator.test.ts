@@ -1,0 +1,190 @@
+import { describe, it, expect, vi, afterEach } from "vitest";
+
+const { dbMock } = vi.hoisted(() => {
+  const dbMock = {
+    lastTrx: null as unknown,
+    transaction() {
+      return {
+        execute: async (cb: (trx: unknown) => Promise<unknown>) => {
+          const trx = { marker: "trx" };
+          dbMock.lastTrx = trx;
+          return cb(trx);
+        },
+      };
+    },
+  };
+  return { dbMock };
+});
+
+vi.mock("@/lib/db", () => ({ db: dbMock }));
+
+import { usersRepo } from "@/lib/db/domains/users";
+import { followInviteLinksRepo } from "@/lib/db/domains/followInviteLinks";
+import { followRequestsRepo } from "@/lib/db/domains/followRequests";
+import { followsRepo } from "@/lib/db/domains/follow";
+import { followAccessAggregateRepo } from "@/lib/db/aggregates/followAccess";
+import { submitFollowRequest } from "@/lib/db/orchestrators/followRequestSubmission";
+
+describe("submitFollowRequest", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("トークンが無効な場合invalid_tokenを返すこと", async () => {
+    vi.spyOn(followInviteLinksRepo, "getByToken").mockResolvedValue(undefined);
+
+    const result = await submitFollowRequest("requester-1", "bad-token");
+
+    expect(result).toEqual({ status: "invalid_token" });
+  });
+
+  it("招待発行者が自分自身の場合selfを返すこと", async () => {
+    vi.spyOn(followInviteLinksRepo, "getByToken").mockResolvedValue({
+      userId: "requester-1",
+      token: "tok",
+      createdAt: new Date(),
+    });
+
+    const result = await submitFollowRequest("requester-1", "tok");
+
+    expect(result).toEqual({ status: "self" });
+  });
+
+  it("対象ユーザーが存在しない場合target_not_foundを返すこと", async () => {
+    vi.spyOn(followInviteLinksRepo, "getByToken").mockResolvedValue({
+      userId: "target-1",
+      token: "tok",
+      createdAt: new Date(),
+    });
+    vi.spyOn(usersRepo, "getAccessInfo").mockResolvedValue(undefined);
+
+    const result = await submitFollowRequest("requester-1", "tok");
+
+    expect(result).toEqual({ status: "target_not_found" });
+  });
+
+  it("対象が非公開の場合followRequestsにpendingで作成しrequestedを返すこと", async () => {
+    vi.spyOn(followInviteLinksRepo, "getByToken").mockResolvedValue({
+      userId: "target-1",
+      token: "tok",
+      createdAt: new Date(),
+    });
+    vi.spyOn(usersRepo, "getAccessInfo").mockResolvedValue({
+      userId: "target-1",
+      isPublic: 0,
+    });
+    vi.spyOn(
+      followAccessAggregateRepo,
+      "hasApprovedFollowAccess",
+    ).mockResolvedValue(false);
+    const createSpy = vi
+      .spyOn(followRequestsRepo, "create")
+      .mockResolvedValue(undefined);
+
+    const result = await submitFollowRequest("requester-1", "tok");
+
+    expect(result).toEqual({ status: "requested" });
+    expect(createSpy).toHaveBeenCalledWith("requester-1", "target-1");
+  });
+
+  it("対象が非公開かつ既に承認済みの場合、重複したリクエストを作らずfollowedを返すこと", async () => {
+    vi.spyOn(followInviteLinksRepo, "getByToken").mockResolvedValue({
+      userId: "target-1",
+      token: "tok",
+      createdAt: new Date(),
+    });
+    vi.spyOn(usersRepo, "getAccessInfo").mockResolvedValue({
+      userId: "target-1",
+      isPublic: 0,
+    });
+    vi.spyOn(
+      followAccessAggregateRepo,
+      "hasApprovedFollowAccess",
+    ).mockResolvedValue(true);
+    const createSpy = vi
+      .spyOn(followRequestsRepo, "create")
+      .mockResolvedValue(undefined);
+
+    const result = await submitFollowRequest("requester-1", "tok");
+
+    expect(result).toEqual({ status: "followed" });
+    expect(createSpy).not.toHaveBeenCalled();
+  });
+
+  it("対象が非公開かつfollowsは存在するが未承認(公開時代の既存フォロー)の場合、既存扱いにせず新規リクエストを作成すること", async () => {
+    vi.spyOn(followInviteLinksRepo, "getByToken").mockResolvedValue({
+      userId: "target-1",
+      token: "tok",
+      createdAt: new Date(),
+    });
+    vi.spyOn(usersRepo, "getAccessInfo").mockResolvedValue({
+      userId: "target-1",
+      isPublic: 0,
+    });
+    // follows行はあるが承認記録がない(公開時代の既存フォロー)ケースを模す
+    vi.spyOn(
+      followAccessAggregateRepo,
+      "hasApprovedFollowAccess",
+    ).mockResolvedValue(false);
+    const createSpy = vi
+      .spyOn(followRequestsRepo, "create")
+      .mockResolvedValue(undefined);
+
+    const result = await submitFollowRequest("requester-1", "tok");
+
+    expect(result).toEqual({ status: "requested" });
+    expect(createSpy).toHaveBeenCalledWith("requester-1", "target-1");
+  });
+
+  it("対象が(招待発行後に)公開に変わっていた場合、保留リクエストを作らず即時followsを作成しfollowedを返すこと", async () => {
+    vi.spyOn(followInviteLinksRepo, "getByToken").mockResolvedValue({
+      userId: "target-1",
+      token: "tok",
+      createdAt: new Date(),
+    });
+    vi.spyOn(usersRepo, "getAccessInfo").mockResolvedValue({
+      userId: "target-1",
+      isPublic: 1,
+    });
+    const followsCreateSpy = vi
+      .spyOn(followsRepo, "create")
+      .mockResolvedValue(undefined);
+    const createSpy = vi
+      .spyOn(followRequestsRepo, "create")
+      .mockResolvedValue(undefined);
+
+    const result = await submitFollowRequest("requester-1", "tok");
+
+    expect(result).toEqual({ status: "followed" });
+    expect(followsCreateSpy).toHaveBeenCalledWith(
+      dbMock.lastTrx,
+      "requester-1",
+      "target-1",
+    );
+    expect(createSpy).not.toHaveBeenCalled();
+  });
+
+  it("対象が公開かつ既にフォロー済みの場合も、冪等なcreateにより誤って解除しないこと", async () => {
+    vi.spyOn(followInviteLinksRepo, "getByToken").mockResolvedValue({
+      userId: "target-1",
+      token: "tok",
+      createdAt: new Date(),
+    });
+    vi.spyOn(usersRepo, "getAccessInfo").mockResolvedValue({
+      userId: "target-1",
+      isPublic: 1,
+    });
+    const followsCreateSpy = vi
+      .spyOn(followsRepo, "create")
+      .mockResolvedValue(undefined);
+
+    const result = await submitFollowRequest("requester-1", "tok");
+
+    expect(result).toEqual({ status: "followed" });
+    expect(followsCreateSpy).toHaveBeenCalledWith(
+      dbMock.lastTrx,
+      "requester-1",
+      "target-1",
+    );
+  });
+});

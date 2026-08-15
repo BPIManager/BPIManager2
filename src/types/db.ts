@@ -37,6 +37,11 @@ export interface Database {
   // 追加: 暫定/バックアップ用テーブル
   bkScores: BkScores;
   bkUsers: BkUsers;
+  // 追加: 非公開ユーザーへのフォロー承認制(#275)。kysely-codegenは使わず、
+  // 既存の生成済み型のスタイルに合わせて手動で追加している
+  followInviteLinks: FollowInviteLinks;
+  followApprovalNotifications: FollowApprovalNotifications;
+  followRequests: FollowRequests;
 }
 
 export type Decimal = ColumnType<string, number | string>;
@@ -109,6 +114,26 @@ export interface Follows {
   followerId: string;
   followingId: string;
   id: Generated<number>;
+}
+
+export interface FollowRequests {
+  id: Generated<number>;
+  requesterId: string;
+  targetUserId: string;
+  createdAt: Generated<Date>;
+}
+
+export interface FollowApprovalNotifications {
+  id: Generated<number>;
+  recipientId: string;
+  actorId: string;
+  createdAt: Generated<Date>;
+}
+
+export interface FollowInviteLinks {
+  userId: string;
+  token: string;
+  createdAt: Generated<Date>;
 }
 
 export interface Logs {

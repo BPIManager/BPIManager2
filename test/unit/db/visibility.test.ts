@@ -71,6 +71,38 @@ describe("canViewUserData", () => {
       }),
     ).toBe(false);
   });
+
+  it("非公開でもhasFollowAccessがtrueなら見えること(#275: 承認済みフォロー)", () => {
+    expect(
+      canViewUserData({
+        viewerId: "viewer-1",
+        targetUserId: "target-1",
+        isPublic: 0,
+        hasFollowAccess: true,
+      }),
+    ).toBe(true);
+  });
+
+  it("非公開かつhasFollowAccessがfalseなら見えないこと", () => {
+    expect(
+      canViewUserData({
+        viewerId: "viewer-1",
+        targetUserId: "target-1",
+        isPublic: 0,
+        hasFollowAccess: false,
+      }),
+    ).toBe(false);
+  });
+
+  it("hasFollowAccess省略時は未承認として扱うこと", () => {
+    expect(
+      canViewUserData({
+        viewerId: "viewer-1",
+        targetUserId: "target-1",
+        isPublic: 0,
+      }),
+    ).toBe(false);
+  });
 });
 
 describe("wherePublicOnly", () => {

@@ -1,0 +1,181 @@
+import { db } from "@/lib/db";
+import { Database } from "@/types/db";
+import { Transaction } from "kysely";
+
+/**
+ * 非公開ユーザーへのフォローリクエスト（`followRequests` テーブル）の
+ * 読み書きを担当するリポジトリクラス。
+ *
+ * このテーブルは保留中のリクエストのみを保持する。承認/却下されたリクエストは
+ * 行ごと削除する（`follows`自体に取り消し済み行を置かないのと同じ設計）。
+ * 承認時のみ`domains/followApprovalNotifications`に通知ログを残す
+ * （却下は角が立つため通知・履歴のどちらも残さない）。
+ */
+class FollowRequestsRepository {
+  /**
+   * フォローリクエストを送信する（保留状態で作成）。
+   *
+   * 既に同じ相手への保留中リクエストがある場合は何もしない
+   * （招待URLの再クリック等での重複送信に対応）。
+   *
+   * @param requesterId - リクエストを送る側のユーザー ID
+   * @param targetUserId - リクエスト先（非公開ユーザー）の ID
+   */
+  async create(requesterId: string, targetUserId: string) {
+    await db
+      .insertInto("followRequests")
+      .values({ requesterId, targetUserId })
+      .onDuplicateKeyUpdate({ requesterId })
+      .execute();
+  }
+
+  /**
+   * 指定IDのフォローリクエストを取得する。
+   *
+   * @param id - フォローリクエストID
+   */
+  async getById(id: number) {
+    return await db
+      .selectFrom("followRequests")
+      .selectAll()
+      .where("id", "=", id)
+      .executeTakeFirst();
+  }
+
+  /**
+   * 指定の送信者→リクエスト先の組み合わせで、保留中のリクエストがあるかを確認する。
+   *
+   * 招待ページで「送信」ボタンではなく「取り下げる」ボタンを最初から
+   * 出し分けるために使う。
+   *
+   * @param requesterId - リクエストを送った側のユーザー ID
+   * @param targetUserId - リクエスト先ユーザー ID
+   */
+  async existsPending(
+    requesterId: string,
+    targetUserId: string,
+  ): Promise<boolean> {
+    const result = await db
+      .selectFrom("followRequests")
+      .select("id")
+      .where("requesterId", "=", requesterId)
+      .where("targetUserId", "=", targetUserId)
+      .executeTakeFirst();
+
+    return !!result;
+  }
+
+  /**
+   * 指定ユーザー宛の保留中フォローリクエスト件数を取得する。
+   *
+   * 通知バッジの「承認待ち件数」に使う。
+   *
+   * @param targetUserId - リクエスト先ユーザー ID
+   */
+  async countPendingForTarget(targetUserId: string): Promise<number> {
+    const result = await db
+      .selectFrom("followRequests")
+      .select((eb) => eb.fn.countAll<number>().as("cnt"))
+      .where("targetUserId", "=", targetUserId)
+      .executeTakeFirst();
+
+    return Number(result?.cnt ?? 0);
+  }
+
+  /**
+   * フォローリクエストを取り消す/承認・却下により解決する。
+   *
+   * 呼び出し元（`orchestrators/followRequestApproval`）は返り値で実際に
+   * 行が削除されたかを確認し、他リクエストとの競合（同一リクエストへの
+   * 却下・取り下げとの同時実行）で既に消費済みだった場合に後続の
+   * `follows`作成・承認通知記録をスキップする。
+   *
+   * @param trx - 呼び出し元が管理するトランザクション
+   * @param id - フォローリクエストID
+   * @returns 削除対象の行が存在した場合は `true`
+   */
+  async deleteById(trx: Transaction<Database>, id: number): Promise<boolean> {
+    const result = await trx
+      .deleteFrom("followRequests")
+      .where("id", "=", id)
+      .executeTakeFirst();
+
+    return Number(result.numDeletedRows) > 0;
+  }
+
+  /**
+   * リクエスト先本人がリクエストを却下する。
+   *
+   * @param id - フォローリクエストID
+   * @param targetUserId - 却下操作を行うユーザー ID（リクエスト先本人であることの確認に使う）
+   * @returns 却下対象のリクエストが存在し、`targetUserId`がリクエスト先と一致した場合は `true`
+   */
+  async reject(id: number, targetUserId: string): Promise<boolean> {
+    const result = await db
+      .deleteFrom("followRequests")
+      .where("id", "=", id)
+      .where("targetUserId", "=", targetUserId)
+      .executeTakeFirst();
+
+    return Number(result.numDeletedRows) > 0;
+  }
+
+  /**
+   * リクエスト送信者本人がリクエストを取り下げる。
+   *
+   * @param requesterId - リクエストを送った側のユーザー ID
+   * @param targetUserId - リクエスト先ユーザー ID
+   * @returns 取り下げ対象のリクエストが存在した場合は `true`
+   */
+  async withdraw(
+    requesterId: string,
+    targetUserId: string,
+  ): Promise<boolean> {
+    const result = await db
+      .deleteFrom("followRequests")
+      .where("requesterId", "=", requesterId)
+      .where("targetUserId", "=", targetUserId)
+      .executeTakeFirst();
+
+    return Number(result.numDeletedRows) > 0;
+  }
+
+  /**
+   * バックアップ用に、ユーザーが関わる全フォローリクエスト
+   * （送信・受信双方）を取得する。
+   *
+   * @param userId - ユーザー ID
+   */
+  async getAllForUser(userId: string) {
+    return await db
+      .selectFrom("followRequests")
+      .selectAll()
+      .where((eb) =>
+        eb.or([
+          eb("requesterId", "=", userId),
+          eb("targetUserId", "=", userId),
+        ]),
+      )
+      .execute();
+  }
+
+  /**
+   * ユーザーが関わる全フォローリクエスト（送信・受信双方）を削除する。
+   *
+   * @param trx - 呼び出し元が管理するトランザクション
+   * @param userId - ユーザー ID
+   */
+  async deleteByUser(trx: Transaction<Database>, userId: string) {
+    await trx
+      .deleteFrom("followRequests")
+      .where((eb) =>
+        eb.or([
+          eb("requesterId", "=", userId),
+          eb("targetUserId", "=", userId),
+        ]),
+      )
+      .execute();
+  }
+}
+
+export const followRequestsRepo = new FollowRequestsRepository();

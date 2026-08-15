@@ -322,6 +322,79 @@ export const settingsTranslations = {
     ko: "복사됨",
   },
 
+  "settings.followInvite.title": {
+    ja: "フォロー招待URL",
+    en: "Follow Invite Link",
+    "zh-TW": "追蹤邀請連結",
+    ko: "팔로우 초대 URL",
+  },
+  "settings.followInvite.desc": {
+    ja: "非公開設定中、このURLを知っている人だけがフォローリクエストを送信できます。受け取ったリクエストは承認/却下できます。",
+    en: "While your profile is private, only people with this link can send you a follow request. You can approve or reject each request.",
+    "zh-TW": "設為非公開時，只有擁有此連結的人可以傳送追蹤請求。你可以核准或拒絕收到的請求。",
+    ko: "비공개 상태에서는 이 URL을 아는 사람만 팔로우 요청을 보낼 수 있습니다. 받은 요청은 승인/거절할 수 있습니다.",
+  },
+  "settings.followInvite.notIssued": {
+    ja: "未発行",
+    en: "Not issued",
+    "zh-TW": "未發行",
+    ko: "미발급",
+  },
+  "settings.followInvite.issue": {
+    ja: "発行",
+    en: "Issue",
+    "zh-TW": "發行",
+    ko: "발급",
+  },
+  "settings.followInvite.reissue": {
+    ja: "再発行",
+    en: "Reissue",
+    "zh-TW": "重新發行",
+    ko: "재발급",
+  },
+  "settings.followInvite.dialogTitle": {
+    ja: "招待URLの再発行",
+    en: "Reissue Invite Link",
+    "zh-TW": "重新發行邀請連結",
+    ko: "초대 URL 재발급",
+  },
+  "settings.followInvite.dialogDesc": {
+    ja: "新しいURLを発行しますか？古いURLは即座に無効化されます。",
+    en: "Issue a new link? Your current link will be invalidated immediately.",
+    "zh-TW": "要發行新連結嗎？舊連結將立即失效。",
+    ko: "새 URL을 발급하시겠습니까? 기존 URL은 즉시 무효화됩니다.",
+  },
+  "settings.followInvite.issued": {
+    ja: "招待URLを発行しました",
+    en: "Invite link issued.",
+    "zh-TW": "已發行邀請連結",
+    ko: "초대 URL이 발급되었습니다",
+  },
+  "settings.followInvite.failed": {
+    ja: "発行に失敗しました",
+    en: "Failed to issue invite link.",
+    "zh-TW": "發行失敗",
+    ko: "발급에 실패했습니다",
+  },
+  "settings.followInvite.copied": {
+    ja: "コピーしました",
+    en: "Copied.",
+    "zh-TW": "已複製",
+    ko: "복사됨",
+  },
+  "settings.followInvite.copy": {
+    ja: "コピー",
+    en: "Copy",
+    "zh-TW": "複製",
+    ko: "복사",
+  },
+  "settings.followInvite.copyFailed": {
+    ja: "コピーに失敗しました",
+    en: "Failed to copy.",
+    "zh-TW": "複製失敗",
+    ko: "복사에 실패했습니다",
+  },
+
   "settings.oauthClient.title": {
     ja: "MCP接続 (OAuth)",
     en: "MCP Connection (OAuth)",
