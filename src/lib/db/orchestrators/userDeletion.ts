@@ -53,8 +53,12 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
     followApprovalNotificationsRepo.getAllForUser(userId),
   ]);
 
-  // apiKeys.key は秘密情報のため、バックアップには残さずレコードの存在のみ記録する
+  // apiKeys.key / followInviteLinks.token は秘密情報のため、バックアップには
+  // 残さずレコードの存在のみ記録する
   const redactedApiKeys = apiKeys.map(({ key: _key, ...rest }) => rest);
+  const redactedFollowInviteLinks = followInviteLinks
+    ? (({ token: _token, ...rest }) => rest)(followInviteLinks)
+    : followInviteLinks;
 
   const backup = {
     exportedAt: new Date().toISOString(),
@@ -71,7 +75,7 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
     allScores,
     discordLinks,
     followRequests,
-    followInviteLinks,
+    followInviteLinks: redactedFollowInviteLinks,
     followApprovalNotifications,
   };
 
