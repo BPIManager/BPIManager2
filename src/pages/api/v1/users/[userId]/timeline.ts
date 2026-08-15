@@ -7,6 +7,7 @@ import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { socialTimelineRepo } from "@/lib/db/aggregates/rivalScores/feed";
 import { parseQuery } from "@/services/nextRequest/parseBody";
 import { timelineQuerySchema } from "@/schemas/timeline/query";
+import { followListsRepo } from "@/lib/db/domains/followLists";
 
 async function handler(
   req: AuthenticatedNextApiRequest,
@@ -31,6 +32,13 @@ async function handler(
   const viewerId = req.authUid;
 
   try {
+    if (query.listId !== undefined) {
+      const list = await followListsRepo.getById(query.listId);
+      if (!list || list.userId !== viewerId) {
+        return res.status(404).json({ message: "List not found" });
+      }
+    }
+
     const timeline = await socialTimelineRepo.getFollowedTimeline({
       viewerId,
       version,
@@ -40,6 +48,7 @@ async function handler(
       search: query.search,
       levels: query.levels,
       difficulties: query.difficulties?.length ? query.difficulties : undefined,
+      listId: query.listId,
     });
 
     if (timeline.length === 0) {

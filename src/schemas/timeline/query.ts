@@ -6,6 +6,7 @@ export const timelineQuerySchema = z.object({
   lastId: z.string().optional(),
   mode: z.enum(["all", "played", "overtaken"]).default("all"),
   search: z.string().optional(),
+  listId: z.coerce.number().optional(),
   levels: z.preprocess(parseArray, z.array(z.coerce.number())).optional(),
   difficulties: z
     .preprocess(
