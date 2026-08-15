@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { sql } from "kysely";
 import { latestPerUserSubquery as latestArenaPerUserSubquery } from "@/lib/db/domains/arenaHistory";
 import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
+import { wherePublicOnly } from "@/lib/db/shared/visibility";
 
 /**
  * おすすめユーザー発見・検索を担当するリポジトリクラス。
@@ -93,7 +94,7 @@ class UserDiscoveryRepository {
         "ur.grantedAt",
       ])
       .where("r.version", "=", version)
-      .where("u.isPublic", "=", 1);
+      .$call((qb) => wherePublicOnly(qb, "u.isPublic"));
 
     if (order !== "supporters") {
       query = query.where("u.userId", "!=", viewerId);
@@ -172,7 +173,7 @@ class UserDiscoveryRepository {
         "oas.arenaClass",
         "usl.totalBpi",
       ])
-      .where("u.isPublic", "=", 1);
+      .$call((qb) => wherePublicOnly(qb, "u.isPublic"));
 
     if (query) {
       const searchPattern = `%${query}%`;

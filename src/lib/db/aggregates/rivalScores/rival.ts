@@ -7,6 +7,7 @@ import {
   latestLogIdPerUserSongScalarSubquery,
 } from "@/lib/db/shared/latestScore";
 import { userDisplayColumns } from "@/lib/db/shared/userDisplay";
+import { wherePublicOnly } from "@/lib/db/shared/visibility";
 
 /**
  * ライバル比較・フォロー中ユーザーとのスコア比較を担当するリポジトリクラス。
@@ -314,7 +315,7 @@ class RivalRepository {
       ])
       .where("current.userId", "=", userId)
       .where("current.version", "=", version)
-      .where("ru.isPublic", "=", 1);
+      .$call((qb) => wherePublicOnly(qb, "ru.isPublic"));
 
     if (batchId) {
       query = query.where("current.batchId", "=", batchId);
@@ -445,7 +446,7 @@ class RivalRepository {
       .where("f.followerId", "=", viewerId)
       .where("s.songId", "=", songId)
       .where("s.version", "=", version)
-      .where("u.isPublic", "=", 1)
+      .$call((qb) => wherePublicOnly(qb, "u.isPublic"))
       .where(
         "s.logId",
         "in",

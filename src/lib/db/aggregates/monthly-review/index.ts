@@ -8,6 +8,7 @@ import { scoresRepo } from "@/lib/db/domains/scores";
 import { iidxTowerRepo } from "@/lib/db/domains/iidxTower";
 import { songsRepo } from "@/lib/db/domains/songs";
 import { getArenaStatsHistory } from "@/lib/db/domains/arenaHistory";
+import { wherePublicOnly } from "@/lib/db/shared/visibility";
 
 const jstDayStart = (jstDate: string): Date =>
   new Date(`${jstDate}T00:00:00+09:00`);
@@ -306,7 +307,7 @@ class MonthlyReviewRepository {
       ])
       .where("f.followerId", "=", viewerId)
       .where("s.version", "=", version)
-      .where("u.isPublic", "=", 1)
+      .$call((qb) => wherePublicOnly(qb, "u.isPublic"))
       .execute();
   }
 

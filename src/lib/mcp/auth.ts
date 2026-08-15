@@ -1,6 +1,7 @@
 import { NextApiRequest } from "next";
 import { db } from "@/lib/db";
 import { oauthRepo } from "@/lib/db/domains/oauth";
+import { canViewUserData } from "@/lib/db/shared/visibility";
 
 export function getBaseUrl() {
   return (process.env.BASEURL ?? "").replace(/\/+$/, "");
@@ -38,7 +39,7 @@ export async function checkSelfOrPublicAccess(
   if (!target) {
     return { allowed: false as const, message: "指定されたユーザーが見つかりません。" };
   }
-  if (target.isPublic !== 1) {
+  if (!canViewUserData({ viewerId: selfUserId, targetUserId, isPublic: target.isPublic })) {
     return {
       allowed: false as const,
       message: "このユーザーは非公開設定のため閲覧できません。",

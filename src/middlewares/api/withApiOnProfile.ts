@@ -1,6 +1,7 @@
 import { NextApiRequest } from "next";
 import { AccessResult, authenticateViewer } from "./withApi";
 import { usersRepo } from "@/lib/db/domains/users";
+import { canViewUserData } from "@/lib/db/shared/visibility";
 
 export async function checkProfileAccess(
   req: NextApiRequest,
@@ -26,7 +27,7 @@ export async function checkProfileAccess(
     };
   }
 
-  if (userData.isPublic === 1) {
+  if (canViewUserData({ viewerId, targetUserId, isPublic: userData.isPublic })) {
     return {
       hasAccess: true,
       user: userData,

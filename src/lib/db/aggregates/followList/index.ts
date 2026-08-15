@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { userDisplayColumns } from "@/lib/db/shared/userDisplay";
+import { canViewUserData, wherePublicOnly } from "@/lib/db/shared/visibility";
 
 /**
  * フォロー中/フォロワー一覧を、プロフィール表示用の複合データ
@@ -24,7 +25,7 @@ class FollowListAggregateRepository {
       .innerJoin("users as u", "f.followingId", "u.userId")
       .select(["u.userId", "u.userName", "u.profileImage"])
       .where("f.followerId", "=", userId)
-      .where("u.isPublic", "=", 1)
+      .$call((qb) => wherePublicOnly(qb, "u.isPublic"))
       .orderBy("u.userName", "asc")
       .execute();
   }
@@ -103,7 +104,11 @@ class FollowListAggregateRepository {
     return {
       users: users.map((u) => {
         const isSelf = u.userId === viewerId;
-        const shouldMask = Number(u.isPublic) !== 1 && !isSelf;
+        const shouldMask = !canViewUserData({
+          viewerId,
+          targetUserId: u.userId,
+          isPublic: u.isPublic,
+        });
 
         return {
           ...u,

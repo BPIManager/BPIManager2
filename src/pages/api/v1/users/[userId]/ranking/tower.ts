@@ -6,6 +6,7 @@ import {
 import { iidxTowerAggregateRepo } from "@/lib/db/aggregates/iidxTower";
 import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { maskPrivateIdentity } from "@/lib/db/shared/privacyMask";
+import { canViewUserData } from "@/lib/db/shared/visibility";
 import { calculateRadar } from "@/lib/radar/calculator";
 import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import { v4 as uuidv4 } from "uuid";
@@ -83,7 +84,9 @@ async function handler(
         anonId: uuidv4(),
       }),
       isPublic: u.isPublic,
-      iidxId: u.isPublic ? u.iidxId : null,
+      iidxId: canViewUserData({ targetUserId: u.userId, isPublic: u.isPublic })
+        ? u.iidxId
+        : null,
       totalCount: Number(u.totalCount),
       keyCount: Number(u.keyCount),
       scratchCount: Number(u.scratchCount),

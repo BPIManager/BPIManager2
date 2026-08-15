@@ -3,6 +3,7 @@ import { sql } from "kysely";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore";
+import { wherePublicOnly } from "@/lib/db/shared/visibility";
 dayjs.extend(utc);
 
 /**
@@ -107,7 +108,7 @@ class SocialTimelineRepository {
           .as("myBestExScore"),
       ])
       .where("f.followerId", "=", viewerId)
-      .where("u.isPublic", "=", 1)
+      .$call((qb) => wherePublicOnly(qb, "u.isPublic"))
       .$if(!!search, (qb) =>
         qb.where((eb) =>
           eb.or([

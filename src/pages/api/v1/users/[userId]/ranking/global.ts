@@ -9,6 +9,7 @@ import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import { v4 as uuidv4 } from "uuid";
 import { JAPAN_PREFECTURES } from "@/constants/iidx/rankingPrefectures";
 import { ARENA_RANK_ORDER } from "@/constants/iidx/arenaRanks";
+import { canViewUserData } from "@/lib/db/shared/visibility";
 
 const RADAR_CATEGORIES = [
   "notes",
@@ -98,7 +99,13 @@ async function handler(
       const isAreaPublic = !effectiveFilterArea || filteredRow.showArea === 1;
       const isArenaClassPublic =
         !effectiveFilterArenaClass || filteredRow.showArenaClass !== 0;
-      const isIdentityVisible = u.isPublic && isAreaPublic && isArenaClassPublic;
+      // 匿名の全体ランキングのため、閲覧者に関わらずisPublicのみで判定する(自分自身でも
+      // 非公開ならマスクされる。viewerIdを渡さないことでcanViewUserDataの自分自身
+      // バイパスを無効化している)
+      const isIdentityVisible =
+        canViewUserData({ targetUserId: u.userId, isPublic: u.isPublic }) &&
+        isAreaPublic &&
+        isArenaClassPublic;
 
       return {
         rank: i + 1,

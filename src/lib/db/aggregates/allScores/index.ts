@@ -6,6 +6,7 @@ import {
   latestLogIdPerUserSongScalarSubquery,
 } from "@/lib/db/shared/latestScore";
 import { userDisplayColumns } from "@/lib/db/shared/userDisplay";
+import { wherePublicOnly } from "@/lib/db/shared/visibility";
 
 /**
  * `allScores`/`allSongs`（全難易度スコア・楽曲マスタ）をまたぐ複合ビューを
@@ -182,7 +183,7 @@ class AllScoresAggregateRepository {
       .where("f.followerId", "=", viewerId)
       .where("s.songId", "=", songId)
       .where("s.version", "=", version)
-      .where("u.isPublic", "=", 1)
+      .$call((qb) => wherePublicOnly(qb, "u.isPublic"))
       .where(
         "s.logId",
         "in",

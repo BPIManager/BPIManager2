@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
+import { wherePublicOnly } from "@/lib/db/shared/visibility";
 
 /**
  * サポーター一覧を担当するリポジトリクラス。
@@ -27,7 +28,7 @@ class SupportersRepository {
         "ur.description",
         "ur.grantedAt",
       ])
-      .where("u.isPublic", "=", 1)
+      .$call((qb) => wherePublicOnly(qb, "u.isPublic"))
       .orderBy("ur.grantedAt", "asc")
       .execute();
   }

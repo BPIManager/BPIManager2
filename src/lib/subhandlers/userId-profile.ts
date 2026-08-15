@@ -9,6 +9,7 @@ import { parseBody } from "@/services/nextRequest/parseBody";
 import { profileUpsertSchema } from "@/schemas/profile/upsert";
 import { upsertStatsPrivacy } from "@/lib/db/domains/arenaPrivacy";
 import { getUserAreaRank, AreaRankInfo } from "@/lib/arena/prefectureRankings";
+import { canViewUserData } from "@/lib/db/shared/visibility";
 
 /**
  * プロフィール取得 API のレスポンス型。
@@ -65,8 +66,7 @@ export async function handleGetProfile(
   if (!profile) return res.status(404).json({ message: "User not found" });
 
   if (
-    profile.isPublic !== 1 &&
-    viewerId !== uid &&
+    !canViewUserData({ viewerId, targetUserId: uid, isPublic: profile.isPublic }) &&
     !profile.relationship?.isFollowing
   ) {
     return res.status(403).json({ message: "This profile is private" });

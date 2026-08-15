@@ -1,4 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
+import { sql } from "kysely";
 import { createDbSpy, callsFor } from "../helpers/dbQuerySpy";
 
 const { dbHolder } = vi.hoisted(() => ({
@@ -103,7 +104,9 @@ describe("rivalRepo.getOvertakenRivals", () => {
     const whereCalls = callsFor(dbHolder.current.calls, "where");
     expect(
       whereCalls.some(
-        (c) => c.args[0] === "ru.isPublic" && c.args[2] === 1,
+        (c) =>
+          JSON.stringify(c.args[0]) === JSON.stringify(sql.ref("ru.isPublic")) &&
+          c.args[2] === 1,
       ),
     ).toBe(true);
   });

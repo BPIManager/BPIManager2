@@ -27,6 +27,13 @@ export function createQueryBuilderSpy(result: unknown) {
         ) {
           return Promise.resolve(result);
         }
+        // Kysely実物の$callは`func(this)`を呼びその戻り値を返す。呼び出し元が
+        // $call経由で追加したwhere等の呼び出しもcallsに記録されるようにするため、
+        // モックでも実際にコールバックを実行する(他のコールバック引数メソッド
+        // ($if等)は分岐条件の評価が必要でモック側では判定できないため対象外)。
+        if (prop === "$call" && typeof args[0] === "function") {
+          return args[0](proxy);
+        }
         return proxy;
       };
     },

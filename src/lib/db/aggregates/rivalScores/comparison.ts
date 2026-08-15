@@ -4,6 +4,7 @@ import {
   latestLogIdPerSongScalarSubquery,
   latestLogIdPerUserSongScalarSubquery,
 } from "@/lib/db/shared/latestScore";
+import { wherePublicOnly } from "@/lib/db/shared/visibility";
 
 /**
  * ソーシャル比較機能（勝敗統計・レーダー・楽曲別スコア）を担当するリポジトリクラス。
@@ -332,7 +333,7 @@ class SocialComparisonRepository {
           eb.fn.coalesce(eb.ref("wl.totalCount"), eb.lit(0)).as("totalCount"),
       ])
       .where("f.followerId", "=", viewerId)
-      .where("u.isPublic", "=", 1)
+      .$call((qb) => wherePublicOnly(qb, "u.isPublic"))
       .orderBy("win", "desc")
       .execute();
 
