@@ -7,8 +7,9 @@ import { Transaction } from "kysely";
  * 読み書きを担当するリポジトリクラス。
  *
  * このテーブルは保留中のリクエストのみを保持する。承認/却下されたリクエストは
- * 行ごと削除し（`follows`自体に取り消し済み行を置かないのと同じ設計）、
- * 履歴は`domains/followNotificationEvents`の通知ログに残す。
+ * 行ごと削除する（`follows`自体に取り消し済み行を置かないのと同じ設計）。
+ * 承認時のみ`domains/followApprovalNotifications`に通知ログを残す
+ * （却下は角が立つため通知・履歴のどちらも残さない）。
  */
 class FollowRequestsRepository {
   /**
@@ -84,11 +85,22 @@ class FollowRequestsRepository {
   /**
    * フォローリクエストを取り消す/承認・却下により解決する。
    *
+   * 呼び出し元（`orchestrators/followRequestApproval`）は返り値で実際に
+   * 行が削除されたかを確認し、他リクエストとの競合（同一リクエストへの
+   * 却下・取り下げとの同時実行）で既に消費済みだった場合に後続の
+   * `follows`作成・承認通知記録をスキップする。
+   *
    * @param trx - 呼び出し元が管理するトランザクション
    * @param id - フォローリクエストID
+   * @returns 削除対象の行が存在した場合は `true`
    */
-  async deleteById(trx: Transaction<Database>, id: number) {
-    await trx.deleteFrom("followRequests").where("id", "=", id).execute();
+  async deleteById(trx: Transaction<Database>, id: number): Promise<boolean> {
+    const result = await trx
+      .deleteFrom("followRequests")
+      .where("id", "=", id)
+      .executeTakeFirst();
+
+    return Number(result.numDeletedRows) > 0;
   }
 
   /**

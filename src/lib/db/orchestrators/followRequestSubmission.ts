@@ -1,3 +1,4 @@
+import { db } from "@/lib/db";
 import { usersRepo } from "@/lib/db/domains/users";
 import { followInviteLinksRepo } from "@/lib/db/domains/followInviteLinks";
 import { followRequestsRepo } from "@/lib/db/domains/followRequests";
@@ -35,13 +36,13 @@ export async function submitFollowRequest(
   if (!target) return { status: "target_not_found" };
 
   if (target.isPublic) {
-    const isAlreadyFollowing = await followsRepo.isFollowing(
-      requesterId,
-      targetUserId,
-    );
-    if (!isAlreadyFollowing) {
-      await followsRepo.toggleFollow(requesterId, targetUserId);
-    }
+    // isFollowingの事前チェック+toggleFollow(反転)の組み合わせは、招待URLの
+    // 連打等で同時に複数回呼ばれた場合にフォロー状態を意図せず反転(解除)
+    // させてしまう競合を招く。ここでは常にフォロー成立のみを意図するため、
+    // 事前チェックを介さない冪等なcreate(upsert)を使う
+    await db
+      .transaction()
+      .execute((trx) => followsRepo.create(trx, requesterId, targetUserId));
     return { status: "followed" };
   }
 
@@ -49,10 +50,11 @@ export async function submitFollowRequest(
   // 承認制導入前(公開時代)に成立した未承認のfollowsは「既にフォロー済み」
   // として扱わない(招待URL再送信をきっかけに正規のリクエストとして
   // 再送信できるようにする。承認されればlegacyの仮想エントリも自動解消する)
-  const hasApprovedAccess = await followAccessAggregateRepo.hasApprovedFollowAccess(
-    requesterId,
-    targetUserId,
-  );
+  const hasApprovedAccess =
+    await followAccessAggregateRepo.hasApprovedFollowAccess(
+      requesterId,
+      targetUserId,
+    );
   if (hasApprovedAccess) return { status: "followed" };
 
   await followRequestsRepo.create(requesterId, targetUserId);

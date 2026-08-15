@@ -1,5 +1,23 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 
+const { dbMock } = vi.hoisted(() => {
+  const dbMock = {
+    lastTrx: null as unknown,
+    transaction() {
+      return {
+        execute: async (cb: (trx: unknown) => Promise<unknown>) => {
+          const trx = { marker: "trx" };
+          dbMock.lastTrx = trx;
+          return cb(trx);
+        },
+      };
+    },
+  };
+  return { dbMock };
+});
+
+vi.mock("@/lib/db", () => ({ db: dbMock }));
+
 import { usersRepo } from "@/lib/db/domains/users";
 import { followInviteLinksRepo } from "@/lib/db/domains/followInviteLinks";
 import { followRequestsRepo } from "@/lib/db/domains/followRequests";
@@ -128,10 +146,9 @@ describe("submitFollowRequest", () => {
       userId: "target-1",
       isPublic: 1,
     });
-    vi.spyOn(followsRepo, "isFollowing").mockResolvedValue(false);
-    const toggleSpy = vi
-      .spyOn(followsRepo, "toggleFollow")
-      .mockResolvedValue(true);
+    const followsCreateSpy = vi
+      .spyOn(followsRepo, "create")
+      .mockResolvedValue(undefined);
     const createSpy = vi
       .spyOn(followRequestsRepo, "create")
       .mockResolvedValue(undefined);
@@ -139,11 +156,15 @@ describe("submitFollowRequest", () => {
     const result = await submitFollowRequest("requester-1", "tok");
 
     expect(result).toEqual({ status: "followed" });
-    expect(toggleSpy).toHaveBeenCalledWith("requester-1", "target-1");
+    expect(followsCreateSpy).toHaveBeenCalledWith(
+      dbMock.lastTrx,
+      "requester-1",
+      "target-1",
+    );
     expect(createSpy).not.toHaveBeenCalled();
   });
 
-  it("対象が公開かつ既にフォロー済みの場合、toggleFollowを呼ばず(誤って解除しない)followedを返すこと", async () => {
+  it("対象が公開かつ既にフォロー済みの場合も、冪等なcreateにより誤って解除しないこと", async () => {
     vi.spyOn(followInviteLinksRepo, "getByToken").mockResolvedValue({
       userId: "target-1",
       token: "tok",
@@ -153,14 +174,17 @@ describe("submitFollowRequest", () => {
       userId: "target-1",
       isPublic: 1,
     });
-    vi.spyOn(followsRepo, "isFollowing").mockResolvedValue(true);
-    const toggleSpy = vi
-      .spyOn(followsRepo, "toggleFollow")
-      .mockResolvedValue(true);
+    const followsCreateSpy = vi
+      .spyOn(followsRepo, "create")
+      .mockResolvedValue(undefined);
 
     const result = await submitFollowRequest("requester-1", "tok");
 
     expect(result).toEqual({ status: "followed" });
-    expect(toggleSpy).not.toHaveBeenCalled();
+    expect(followsCreateSpy).toHaveBeenCalledWith(
+      dbMock.lastTrx,
+      "requester-1",
+      "target-1",
+    );
   });
 });

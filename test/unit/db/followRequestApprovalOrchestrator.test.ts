@@ -37,7 +37,7 @@ describe("approveFollowRequest", () => {
     });
     const deleteByIdSpy = vi
       .spyOn(followRequestsRepo, "deleteById")
-      .mockResolvedValue(undefined);
+      .mockResolvedValue(true);
     const followsCreateSpy = vi
       .spyOn(followsRepo, "create")
       .mockResolvedValue(undefined);
@@ -65,7 +65,7 @@ describe("approveFollowRequest", () => {
     vi.spyOn(followRequestsRepo, "getById").mockResolvedValue(undefined);
     const deleteByIdSpy = vi
       .spyOn(followRequestsRepo, "deleteById")
-      .mockResolvedValue(undefined);
+      .mockResolvedValue(true);
 
     const result = await approveFollowRequest(999, "target-1");
 
@@ -82,11 +82,36 @@ describe("approveFollowRequest", () => {
     });
     const deleteByIdSpy = vi
       .spyOn(followRequestsRepo, "deleteById")
-      .mockResolvedValue(undefined);
+      .mockResolvedValue(true);
 
     const result = await approveFollowRequest(1, "someone-else");
 
     expect(result).toBeNull();
     expect(deleteByIdSpy).not.toHaveBeenCalled();
+  });
+
+  it("承認直前に他の操作(却下・取り下げ等)で既に消費済み(deleteByIdが0件削除)の場合、follows作成・通知記録を行わずnullを返すこと", async () => {
+    vi.spyOn(followRequestsRepo, "getById").mockResolvedValue({
+      id: 1,
+      requesterId: "requester-1",
+      targetUserId: "target-1",
+      createdAt: new Date(),
+    });
+    const deleteByIdSpy = vi
+      .spyOn(followRequestsRepo, "deleteById")
+      .mockResolvedValue(false);
+    const followsCreateSpy = vi
+      .spyOn(followsRepo, "create")
+      .mockResolvedValue(undefined);
+    const notifyCreateSpy = vi
+      .spyOn(followApprovalNotificationsRepo, "create")
+      .mockResolvedValue(undefined);
+
+    const result = await approveFollowRequest(1, "target-1");
+
+    expect(result).toBeNull();
+    expect(deleteByIdSpy).toHaveBeenCalled();
+    expect(followsCreateSpy).not.toHaveBeenCalled();
+    expect(notifyCreateSpy).not.toHaveBeenCalled();
   });
 });
