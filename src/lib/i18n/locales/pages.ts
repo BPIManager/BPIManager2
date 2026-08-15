@@ -18,6 +18,61 @@ export const pagesTranslations = {
     ko: "레이아웃 변경",
   },
 
+  "invite.title": {
+    ja: "フォローリクエスト",
+    en: "Follow Request",
+    "zh-TW": "追蹤請求",
+    ko: "팔로우 요청",
+  },
+  "invite.desc": {
+    ja: "からのフォロー招待です。リクエストを送信すると、相手が承認した場合にプロフィールを閲覧できるようになります。",
+    en: " invited you to follow them. If you send a request, you'll be able to view their profile once approved.",
+    "zh-TW": " 邀請你追蹤。傳送請求後，經對方核准即可查看其個人檔案。",
+    ko: "님이 팔로우 초대를 보냈습니다. 요청을 보내면 상대가 승인한 경우 프로필을 볼 수 있습니다.",
+  },
+  "invite.send": {
+    ja: "リクエストを送信",
+    en: "Send Request",
+    "zh-TW": "傳送請求",
+    ko: "요청 보내기",
+  },
+  "invite.requested": {
+    ja: "リクエストを送信しました。相手の承認をお待ちください。",
+    en: "Request sent. Waiting for approval.",
+    "zh-TW": "已傳送請求，請等待對方核准。",
+    ko: "요청을 보냈습니다. 승인을 기다려 주세요.",
+  },
+  "invite.followed": {
+    ja: "フォローしました",
+    en: "You are now following them.",
+    "zh-TW": "已追蹤",
+    ko: "팔로우했습니다",
+  },
+  "invite.self": {
+    ja: "自分自身の招待URLです",
+    en: "This is your own invite link.",
+    "zh-TW": "這是你自己的邀請連結",
+    ko: "본인의 초대 URL입니다",
+  },
+  "invite.invalid": {
+    ja: "無効な招待URLです",
+    en: "This invite link is invalid.",
+    "zh-TW": "此邀請連結無效",
+    ko: "유효하지 않은 초대 URL입니다",
+  },
+  "invite.failed": {
+    ja: "リクエストの送信に失敗しました",
+    en: "Failed to send request.",
+    "zh-TW": "傳送請求失敗",
+    ko: "요청 전송에 실패했습니다",
+  },
+  "invite.viewProfile": {
+    ja: "プロフィールを見る",
+    en: "View Profile",
+    "zh-TW": "查看個人檔案",
+    ko: "프로필 보기",
+  },
+
   "page.settings.title": {
     ja: "設定",
     en: "Settings",

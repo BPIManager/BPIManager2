@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/tooltip";
 import { AreaRankBadge } from "@/components/ui/area-rank-badge";
 import FollowSection from "@/components/partials/common/FollowSection";
+import ForceUnfollowMenu from "@/components/partials/common/ForceUnfollowMenu";
 import FollowStats from "./followCount";
 import { formatIIDXId } from "@/utils/common/formatIidxId";
 import { XIcon } from "@/components/partials/common/Auth/Buttons";
@@ -115,13 +116,17 @@ const ProfileSideBar = ({
             {profile.userName?.slice(0, 2)}
           </AvatarFallback>
         </Avatar>
-        <div className="pb-1">
+        <div className="flex items-center gap-2 pb-1">
           <FollowSection
             userId={profile.userId}
             isUpdating={isUpdating}
             relationship={profile.relationship}
             onToggle={onFollowToggle}
             className="h-8 w-auto min-w-25 px-4 text-[13px] font-bold"
+          />
+          <ForceUnfollowMenu
+            userId={profile.userId}
+            relationship={profile.relationship}
           />
         </div>
       </div>

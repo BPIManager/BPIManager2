@@ -272,4 +272,23 @@ export const rivalsTranslations = {
     "zh-TW": "{rival}的BPI",
     ko: "{rival}의 BPI",
   },
+
+  "follow.forceUnfollow.action": {
+    ja: "強制フォロー解除",
+    en: "Remove Follower",
+    "zh-TW": "強制取消追蹤",
+    ko: "강제 팔로우 해제",
+  },
+  "follow.forceUnfollow.dialogTitle": {
+    ja: "フォロワーを削除しますか？",
+    en: "Remove this follower?",
+    "zh-TW": "要移除此追蹤者嗎？",
+    ko: "이 팔로워를 삭제하시겠습니까？",
+  },
+  "follow.forceUnfollow.dialogDesc": {
+    ja: "このユーザーはあなたのプロフィールを閲覧できなくなります。恒久的なブロックではないため、招待URLがあれば再度リクエストできます。",
+    en: "This user will lose access to your profile. This isn't a permanent block — they can send a new request if they still have your invite link.",
+    "zh-TW": "此使用者將無法再查看你的個人檔案。這並非永久封鎖，若對方仍持有你的邀請連結，可再次傳送請求。",
+    ko: "이 사용자는 더 이상 회원님의 프로필을 볼 수 없게 됩니다. 영구 차단이 아니므로 초대 URL이 있으면 다시 요청할 수 있습니다.",
+  },
 } as const;
