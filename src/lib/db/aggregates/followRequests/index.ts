@@ -11,6 +11,10 @@ class FollowRequestsAggregateRepository {
   /**
    * 指定ユーザー宛の保留中フォローリクエストを、送信者の表示情報付きで取得する。
    *
+   * 通知ベルでの一覧表示用のため、大量のリクエストが滞留していても
+   * 表示件数を上限で打ち切る（未読件数のバッジ表示は`domains/followRequests`の
+   * `countPendingForTarget`を別途使うため、ここでの上限打ち切りの影響を受けない）。
+   *
    * @param targetUserId - リクエスト先ユーザー ID
    */
   async listPendingForTarget(targetUserId: string) {
@@ -26,6 +30,7 @@ class FollowRequestsAggregateRepository {
       ])
       .where("fr.targetUserId", "=", targetUserId)
       .orderBy("fr.createdAt", "asc")
+      .limit(200)
       .execute();
   }
 }

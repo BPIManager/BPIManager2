@@ -32,6 +32,10 @@ async function handler(
       followAccessAggregateRepo.listUnapprovedFollowers(req.authUid),
     ]);
 
+    const requesterIdsWithRealRequest = new Set(
+      pendingRequests.map((r) => r.requesterId),
+    );
+
     const requests = [
       ...pendingRequests.map((r) => ({
         kind: "request" as const,
@@ -41,13 +45,17 @@ async function handler(
         requesterImage: r.requesterImage,
         createdAt: r.createdAt,
       })),
-      ...unapprovedFollowers.map((f) => ({
-        kind: "legacy" as const,
-        requesterId: f.followerId,
-        requesterName: f.followerName,
-        requesterImage: f.followerImage,
-        createdAt: f.createdAt,
-      })),
+      // 招待URL再送信によりlegacyフォロワーが正規のリクエストを送信済みの
+      // 場合、同じ相手が両方に重複して並ばないよう"request"側を優先する
+      ...unapprovedFollowers
+        .filter((f) => !requesterIdsWithRealRequest.has(f.followerId))
+        .map((f) => ({
+          kind: "legacy" as const,
+          requesterId: f.followerId,
+          requesterName: f.followerName,
+          requesterImage: f.followerImage,
+          createdAt: f.createdAt,
+        })),
     ].sort(
       (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
     );

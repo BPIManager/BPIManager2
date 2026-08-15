@@ -5,6 +5,7 @@ import {
 } from "@/middlewares/api/withAuth";
 import { followsRepo } from "@/lib/db/domains/follow";
 import { followApprovalNotificationsRepo } from "@/lib/db/domains/followApprovalNotifications";
+import { followRequestsRepo } from "@/lib/db/domains/followRequests";
 
 /**
  * 指定フォロワーの強制フォロー解除(DELETE)・事後承認(POST)。
@@ -50,6 +51,9 @@ async function handler(
           followerId,
           req.authUid,
         );
+        // 招待URL再送信等で同じ相手の本物のfollowRequests行が並行して
+        // 存在する場合、事後承認後に迷子の保留リクエストとして残さない
+        await followRequestsRepo.withdraw(followerId, req.authUid);
         return res.status(200).json({ status: "approved" });
       }
 
