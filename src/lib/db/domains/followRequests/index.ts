@@ -69,6 +69,23 @@ class FollowRequestsRepository {
   }
 
   /**
+   * リクエスト先本人がリクエストを却下する。
+   *
+   * @param id - フォローリクエストID
+   * @param targetUserId - 却下操作を行うユーザー ID（リクエスト先本人であることの確認に使う）
+   * @returns 却下対象のリクエストが存在し、`targetUserId`がリクエスト先と一致した場合は `true`
+   */
+  async reject(id: number, targetUserId: string): Promise<boolean> {
+    const result = await db
+      .deleteFrom("followRequests")
+      .where("id", "=", id)
+      .where("targetUserId", "=", targetUserId)
+      .executeTakeFirst();
+
+    return Number(result.numDeletedRows) > 0;
+  }
+
+  /**
    * リクエスト送信者本人がリクエストを取り下げる。
    *
    * @param requesterId - リクエストを送った側のユーザー ID

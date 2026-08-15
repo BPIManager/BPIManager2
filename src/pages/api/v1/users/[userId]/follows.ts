@@ -36,6 +36,11 @@ export default async function handler(
       }
 
       case "PUT":
+        // 非公開ユーザーへの直接フォローは、上のcheckProfileAccessが
+        // isOwner/isPublic/承認済みfollowsのいずれも満たさない場合に
+        // 既に403で弾いているため、ここに到達する時点で許可されている
+        // (#275: 非公開ユーザーへのフォローは招待URL経由のリクエスト
+        // 承認でのみfollowsが作られ、この通常フォローエンドポイントからは作られない)
         if (!viewerId) return res.status(401).json({ error: "Unauthorized" });
         return await handlePutFollow(res, targetUserId, viewerId);
 
