@@ -39,11 +39,27 @@ function applyUserIdsOrFollowersFilter<O>(
   const { userIds, followersOf } = params;
 
   if (followersOf) {
+    // follows行の存在だけでは判定できない(#275フォロー後方修正: 公開時代に
+    // 成立したfollowsには承認記録がないため、対象が非公開の場合は承認記録の
+    // 有無も要求する)
     return qb.where("userId", "in", (sub) =>
       sub
-        .selectFrom("follows")
-        .select("followingId")
-        .where("followerId", "=", followersOf),
+        .selectFrom("follows as f")
+        .innerJoin("users as u", "u.userId", "f.followingId")
+        .select("f.followingId")
+        .where("f.followerId", "=", followersOf)
+        .where((eb) =>
+          eb.or([
+            eb("u.isPublic", "=", 1),
+            eb.exists(
+              eb
+                .selectFrom("followApprovalNotifications as fan")
+                .select("fan.id")
+                .where("fan.recipientId", "=", followersOf)
+                .whereRef("fan.actorId", "=", "f.followingId"),
+            ),
+          ]),
+        ),
     );
   } else if (userIds && userIds.length > 0) {
     return qb.where("userId", "in", userIds);
@@ -305,12 +321,29 @@ export function correlatedLatestLogId(
   if (userId) {
     sub = sub.where(sql.ref(`${alias}.userId`), "=", userId);
   } else if (followersOf) {
+    // follows行の存在だけでは判定できない(#275フォロー後方修正)。
+    // shared/latestScore.tsのapplyUserIdsOrFollowersFilterと同じ理由で
+    // 承認記録の有無も要求する
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     sub = sub.where(sql.ref(`${alias}.userId`), "in", (qb: any) =>
       qb
-        .selectFrom("follows")
-        .select("followingId")
-        .where("followerId", "=", followersOf),
+        .selectFrom("follows as f")
+        .innerJoin("users as u", "u.userId", "f.followingId")
+        .select("f.followingId")
+        .where("f.followerId", "=", followersOf)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .where((eb: any) =>
+          eb.or([
+            eb("u.isPublic", "=", 1),
+            eb.exists(
+              eb
+                .selectFrom("followApprovalNotifications as fan")
+                .select("fan.id")
+                .where("fan.recipientId", "=", followersOf)
+                .whereRef("fan.actorId", "=", "f.followingId"),
+            ),
+          ]),
+        ),
     );
   } else if (userIdRef) {
     sub = sub.whereRef(sql.ref(`${alias}.userId`), "=", userIdRef);

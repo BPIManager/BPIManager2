@@ -67,9 +67,25 @@ class RivalRepository {
         } else {
           return base.on("r.userId", "in", (qb) =>
             qb
-              .selectFrom("follows")
-              .select("followingId")
-              .where("followerId", "=", viewerId),
+              .selectFrom("follows as f")
+              .innerJoin("users as fu", "fu.userId", "f.followingId")
+              .select("f.followingId")
+              .where("f.followerId", "=", viewerId)
+              // follows行の存在だけでは判定できない(#275フォロー後方修正:
+              // 公開時代に成立したfollowsには承認記録がないため、対象が
+              // 非公開の場合は承認記録の有無も要求する)
+              .where((eb) =>
+                eb.or([
+                  eb("fu.isPublic", "=", 1),
+                  eb.exists(
+                    eb
+                      .selectFrom("followApprovalNotifications as fan")
+                      .select("fan.id")
+                      .where("fan.recipientId", "=", viewerId)
+                      .whereRef("fan.actorId", "=", "f.followingId"),
+                  ),
+                ]),
+              ),
           );
         }
       })
@@ -171,9 +187,25 @@ class RivalRepository {
           .on("r.version", "=", version)
           .on("r.userId", "in", (qb) =>
             qb
-              .selectFrom("follows")
-              .select("followingId")
-              .where("followerId", "=", userId),
+              .selectFrom("follows as f")
+              .innerJoin("users as fu", "fu.userId", "f.followingId")
+              .select("f.followingId")
+              .where("f.followerId", "=", userId)
+              // follows行の存在だけでは判定できない(#275フォロー後方修正:
+              // 公開時代に成立したfollowsには承認記録がないため、対象が
+              // 非公開の場合は承認記録の有無も要求する)
+              .where((eb) =>
+                eb.or([
+                  eb("fu.isPublic", "=", 1),
+                  eb.exists(
+                    eb
+                      .selectFrom("followApprovalNotifications as fan")
+                      .select("fan.id")
+                      .where("fan.recipientId", "=", userId)
+                      .whereRef("fan.actorId", "=", "f.followingId"),
+                  ),
+                ]),
+              ),
           )
           .on("r.logId", "=", (eb) =>
             correlatedLatestLogId(eb, {

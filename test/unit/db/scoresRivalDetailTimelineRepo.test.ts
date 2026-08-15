@@ -107,6 +107,9 @@ describe("rivalRepo.getOvertakenRivals", () => {
     expect(whereCalls.some((c) => typeof c.args[0] === "function")).toBe(
       true,
     );
+    // 退行防止: コールバック形式と併存/置き換えで"ru.isPublic"への単純な
+    // 文字列where(#274/#275初期実装の再混入)が残っていないことを保証する
+    expect(whereCalls.some((c) => c.args[0] === "ru.isPublic")).toBe(false);
   });
 });
 
