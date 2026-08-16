@@ -7,10 +7,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import type { AnalyticsTarget } from "@/types/analytics";
 import { useTargetSelector } from "@/hooks/analytics/useTargetSelector";
+import { MAX_COMPARISON_TARGETS } from "@/constants/logic/analyticsComparison";
 import {
   KindStep,
   RivalPickStep,
@@ -32,32 +34,36 @@ const BackButton = ({ onBack }: { onBack: () => void }) => {
 
 interface TargetSelectorModalProps {
   isOpen: boolean;
-  current: AnalyticsTarget | null;
-  onSelect: (target: AnalyticsTarget) => void;
+  /** 現在選択中のターゲット一覧（複数選択、#287） */
+  current: AnalyticsTarget[];
+  onChange: (targets: AnalyticsTarget[]) => void;
   onClose: () => void;
 }
 
 const TargetSelectorModal = ({
   isOpen,
   current,
-  onSelect,
+  onChange,
   onClose,
 }: TargetSelectorModalProps) => {
-  const { t } = useTranslation();
+  const { t, tFormat } = useTranslation();
   const {
     step,
     setStep,
-    selectedKind,
-    selectedArenaRank,
-    setSelectedArenaRank,
-    selectedSelfVersion,
     kindOptions,
     stepTitle,
+    isSelected,
+    countForKind,
+    isCapReached,
     handleKindClick,
-    handleRivalPick,
-    handleArenaConfirm,
-    handleSelfVersionPick,
-  } = useTargetSelector({ isOpen, current, onSelect, onClose });
+    handleKindToggle,
+    handleRivalToggle,
+    handleRivalSelectOnly,
+    handleArenaToggle,
+    handleArenaSelectOnly,
+    handleSelfVersionToggle,
+    handleSelfVersionSelectOnly,
+  } = useTargetSelector({ isOpen, current, onChange, onClose });
 
   return (
     <Dialog open={isOpen} onOpenChange={(o) => !o && onClose()}>
@@ -70,6 +76,12 @@ const TargetSelectorModal = ({
           <DialogTitle className="flex items-center gap-2 text-bpim-text">
             {stepTitle[step]}
           </DialogTitle>
+          <Badge variant={isCapReached ? "destructive" : "secondary"}>
+            {tFormat("analytics.selectedCount", {
+              count: current.length + 1,
+              max: MAX_COMPARISON_TARGETS,
+            })}
+          </Badge>
         </DialogHeader>
 
         <div className="flex min-h-0 flex-col overflow-y-auto p-2 custom-scrollbar">
@@ -77,15 +89,25 @@ const TargetSelectorModal = ({
             {step === "kind" && (
               <KindStep
                 kindOptions={kindOptions}
-                selectedKind={selectedKind}
+                isSelected={(opt) => isSelected({ kind: opt.kind, label: opt.label })}
+                countForKind={countForKind}
+                isCapReached={isCapReached}
                 onKindClick={handleKindClick}
+                onKindToggle={handleKindToggle}
               />
             )}
 
             {step === "rival-pick" && (
               <>
                 <BackButton onBack={() => setStep("kind")} />
-                <RivalPickStep onSelect={handleRivalPick} />
+                <RivalPickStep
+                  isSelected={(userId) =>
+                    isSelected({ kind: "rival", param: userId, label: "" })
+                  }
+                  isCapReached={isCapReached}
+                  onToggle={handleRivalToggle}
+                  onSelectOnly={handleRivalSelectOnly}
+                />
               </>
             )}
 
@@ -93,8 +115,12 @@ const TargetSelectorModal = ({
               <>
                 <BackButton onBack={() => setStep("kind")} />
                 <ArenaRankStep
-                  selected={selectedArenaRank}
-                  onSelect={setSelectedArenaRank}
+                  isSelected={(rankId) =>
+                    isSelected({ kind: "arena", param: rankId, label: "" })
+                  }
+                  isCapReached={isCapReached}
+                  onToggle={handleArenaToggle}
+                  onSelectOnly={handleArenaSelectOnly}
                 />
                 <div className="flex gap-3 rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-4">
                   <AlertCircle className="h-5 w-5 shrink-0 text-yellow-500/80" />
@@ -105,12 +131,6 @@ const TargetSelectorModal = ({
                     {t("analytics.arenaWarning")}
                   </p>
                 </div>
-                <Button
-                  onClick={handleArenaConfirm}
-                  className="mt-2 w-full bg-bpim-primary font-bold text-white hover:bg-bpim-primary/80"
-                >
-                  {t("analytics.compareWithSetting")}
-                </Button>
               </>
             )}
 
@@ -121,12 +141,29 @@ const TargetSelectorModal = ({
                   {t("analytics.selfVersionNote")}
                 </p>
                 <SelfVersionPickStep
-                  selected={selectedSelfVersion}
-                  onSelect={handleSelfVersionPick}
+                  isSelected={(versionNum) =>
+                    isSelected({
+                      kind: "self-version",
+                      param: versionNum,
+                      label: "",
+                    })
+                  }
+                  isCapReached={isCapReached}
+                  onToggle={handleSelfVersionToggle}
+                  onSelectOnly={handleSelfVersionSelectOnly}
                 />
               </>
             )}
           </div>
+        </div>
+
+        <div className="border-t p-4">
+          <Button
+            onClick={onClose}
+            className="w-full bg-bpim-primary font-bold text-white hover:bg-bpim-primary/80"
+          >
+            {t("common.close")}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

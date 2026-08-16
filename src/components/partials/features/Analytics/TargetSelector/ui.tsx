@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Checkbox } from "@/components/ui/checkbox";
 import ArenaClassBadge from "@/components/partials/common/Badge/ArenaClassBadge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { Search, ChevronRight, Check } from "lucide-react";
+import { Search, Check } from "lucide-react";
 import { useUser } from "@/contexts/users/UserContext";
 import { useRivalSummary } from "@/hooks/social/useRivalSummary";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
@@ -28,47 +29,68 @@ interface KindCardProps {
   icon: React.ElementType;
   label: string;
   description: string;
-  selected: boolean;
+  /** paramを持たないkind向け: チェックボックスの選択状態 */
+  checked?: boolean;
+  /** paramを持つkind向け: 既に選択済みの件数バッジ */
+  selectedCount?: number;
+  onCheckToggle?: () => void;
   onClick: () => void;
+  disabled?: boolean;
 }
 
 export const KindCard = ({
   icon: Icon,
   label,
   description,
-  selected,
+  checked,
+  selectedCount,
+  onCheckToggle,
   onClick,
+  disabled,
 }: KindCardProps) => (
-  <button
-    onClick={onClick}
+  <div
     className={cn(
-      "flex w-full items-center gap-4 rounded-xl border-2 p-4 text-left transition-all duration-200",
-      selected
+      "flex w-full items-center gap-3 rounded-xl border-2 p-4 text-left transition-all duration-200",
+      checked
         ? "border-bpim-primary bg-bpim-surface shadow-[0_0_0_3px] shadow-bpim-primary/20"
         : "border-bpim-border bg-bpim-surface hover:border-bpim-primary/50",
     )}
   >
-    <div
-      className={cn(
-        "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border",
-        selected
-          ? "border-bpim-primary bg-bpim-primary/10"
-          : "border-bpim-border bg-bpim-bg",
-      )}
-    >
-      <Icon
-        className={cn(
-          "h-5 w-5",
-          selected ? "text-bpim-primary" : "text-bpim-muted",
-        )}
+    {onCheckToggle && (
+      <Checkbox
+        checked={checked}
+        disabled={disabled && !checked}
+        onCheckedChange={onCheckToggle}
       />
-    </div>
-    <div className="flex-1 min-w-0">
-      <p className="font-bold text-bpim-text text-sm">{label}</p>
-      <p className="text-xs text-bpim-muted mt-0.5">{description}</p>
-    </div>
-    {selected && <Check className="h-4 w-4 shrink-0 text-bpim-primary" />}
-  </button>
+    )}
+    <button onClick={onClick} className="flex flex-1 items-center gap-4 text-left">
+      <div
+        className={cn(
+          "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border",
+          checked
+            ? "border-bpim-primary bg-bpim-primary/10"
+            : "border-bpim-border bg-bpim-bg",
+        )}
+      >
+        <Icon
+          className={cn(
+            "h-5 w-5",
+            checked ? "text-bpim-primary" : "text-bpim-muted",
+          )}
+        />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="font-bold text-bpim-text text-sm">{label}</p>
+        <p className="text-xs text-bpim-muted mt-0.5">{description}</p>
+      </div>
+      {!!selectedCount && (
+        <span className="shrink-0 rounded-full bg-bpim-primary/15 px-2 py-0.5 text-[10px] font-bold text-bpim-primary">
+          {selectedCount}
+        </span>
+      )}
+      {checked && <Check className="h-4 w-4 shrink-0 text-bpim-primary" />}
+    </button>
+  </div>
 );
 
 // ---------------------------------------------------------------------------
@@ -77,12 +99,18 @@ export const KindCard = ({
 
 export const KindStep = ({
   kindOptions,
-  selectedKind,
+  isSelected,
+  countForKind,
+  isCapReached,
   onKindClick,
+  onKindToggle,
 }: {
   kindOptions: KindOption[];
-  selectedKind: string | null;
+  isSelected: (opt: KindOption) => boolean;
+  countForKind: (kind: KindOption["kind"]) => number;
+  isCapReached: boolean;
   onKindClick: (opt: KindOption) => void;
+  onKindToggle: (opt: KindOption) => void;
 }) => (
   <>
     {kindOptions.map((opt) => (
@@ -91,8 +119,11 @@ export const KindStep = ({
         icon={opt.icon}
         label={opt.label}
         description={opt.description}
-        selected={selectedKind === opt.kind}
+        checked={opt.hasNoParam ? isSelected(opt) : undefined}
+        selectedCount={opt.hasNoParam ? undefined : countForKind(opt.kind)}
+        onCheckToggle={opt.hasNoParam ? () => onKindToggle(opt) : undefined}
         onClick={() => onKindClick(opt)}
+        disabled={isCapReached}
       />
     ))}
   </>
@@ -103,9 +134,15 @@ export const KindStep = ({
 // ---------------------------------------------------------------------------
 
 export const RivalPickStep = ({
-  onSelect,
+  isSelected,
+  isCapReached,
+  onToggle,
+  onSelectOnly,
 }: {
-  onSelect: (userId: string, name: string) => void;
+  isSelected: (userId: string) => boolean;
+  isCapReached: boolean;
+  onToggle: (userId: string, name: string) => void;
+  onSelectOnly: (userId: string, name: string) => void;
 }) => {
   const { user } = useUser();
   const { t } = useTranslation();
@@ -149,41 +186,50 @@ export const RivalPickStep = ({
         ) : (
           filtered.map((rival) => {
             const bpiStyle = getBpiColorStyle(rival.totalBpi ?? -15);
+            const checked = isSelected(rival.userId);
             return (
-              <button
+              <div
                 key={rival.userId}
-                onClick={() => onSelect(rival.userId, rival.userName)}
-                className="flex items-center gap-3 rounded-xl border border-bpim-border bg-bpim-surface p-3 text-left transition-all hover:bg-bpim-overlay/50 hover:border-bpim-primary/50"
+                className="flex items-center gap-3 rounded-xl border border-bpim-border bg-bpim-surface p-3 transition-all hover:border-bpim-primary/50"
               >
-                <div
-                  className="h-10 w-1 rounded-full shrink-0"
-                  style={{ backgroundColor: bpiStyle.bg }}
+                <Checkbox
+                  checked={checked}
+                  disabled={isCapReached && !checked}
+                  onCheckedChange={() => onToggle(rival.userId, rival.userName)}
                 />
-                <Avatar className="h-8 w-8 border border-bpim-border shrink-0">
-                  <AvatarImage src={rival.profileImage ?? ""} />
-                  <AvatarFallback>{rival.userName.slice(0, 2)}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <p className="font-bold text-sm text-bpim-text truncate">
-                    {rival.userName}
-                  </p>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <ArenaClassBadge arenaClass={rival.arenaClass} size="sm" />
-                    <span className="font-mono text-[10px] text-bpim-muted">
-                      {formatIIDXId(rival.iidxId || "")}
+                <button
+                  onClick={() => onSelectOnly(rival.userId, rival.userName)}
+                  className="flex flex-1 items-center gap-3 text-left"
+                >
+                  <div
+                    className="h-10 w-1 rounded-full shrink-0"
+                    style={{ backgroundColor: bpiStyle.bg }}
+                  />
+                  <Avatar className="h-8 w-8 border border-bpim-border shrink-0">
+                    <AvatarImage src={rival.profileImage ?? ""} />
+                    <AvatarFallback>{rival.userName.slice(0, 2)}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-sm text-bpim-text truncate">
+                      {rival.userName}
+                    </p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <ArenaClassBadge arenaClass={rival.arenaClass} size="sm" />
+                      <span className="font-mono text-[10px] text-bpim-muted">
+                        {formatIIDXId(rival.iidxId || "")}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <span className="block text-[9px] font-bold tracking-widest text-bpim-muted uppercase">
+                      BPI
+                    </span>
+                    <span className="font-mono text-sm font-bold text-bpim-text">
+                      {rival.totalBpi?.toFixed(1) ?? "-15.0"}
                     </span>
                   </div>
-                </div>
-                <div className="text-right shrink-0">
-                  <span className="block text-[9px] font-bold tracking-widest text-bpim-muted uppercase">
-                    BPI
-                  </span>
-                  <span className="font-mono text-sm font-bold text-bpim-text">
-                    {rival.totalBpi?.toFixed(1) ?? "-15.0"}
-                  </span>
-                </div>
-                <ChevronRight className="h-4 w-4 text-bpim-muted shrink-0" />
-              </button>
+                </button>
+              </div>
             );
           })
         )}
@@ -197,28 +243,44 @@ export const RivalPickStep = ({
 // ---------------------------------------------------------------------------
 
 export const ArenaRankStep = ({
-  selected,
-  onSelect,
+  isSelected,
+  isCapReached,
+  onToggle,
+  onSelectOnly,
 }: {
-  selected: string;
-  onSelect: (rank: string) => void;
+  isSelected: (rankId: string) => boolean;
+  isCapReached: boolean;
+  onToggle: (rankId: string) => void;
+  onSelectOnly: (rankId: string) => void;
 }) => (
   <div className="flex flex-col gap-2">
-    {ARENA_RANKS.map((r) => (
-      <button
-        key={r.id}
-        onClick={() => onSelect(r.id)}
-        className={cn(
-          "flex items-center justify-between rounded-xl border-2 px-4 py-3 text-left transition-all hover:scale-[1.01]",
-          selected === r.id
-            ? "border-bpim-primary bg-bpim-surface shadow-[0_0_0_3px] shadow-bpim-primary/20"
-            : "border-bpim-border bg-bpim-surface hover:border-bpim-primary/50",
-        )}
-      >
-        <span className="font-bold text-sm text-bpim-text">{r.label}</span>
-        {selected === r.id && <Check className="h-4 w-4 text-bpim-primary" />}
-      </button>
-    ))}
+    {ARENA_RANKS.map((r) => {
+      const checked = isSelected(r.id);
+      return (
+        <div
+          key={r.id}
+          className={cn(
+            "flex items-center gap-3 rounded-xl border-2 px-4 py-3 transition-all",
+            checked
+              ? "border-bpim-primary bg-bpim-surface shadow-[0_0_0_3px] shadow-bpim-primary/20"
+              : "border-bpim-border bg-bpim-surface hover:border-bpim-primary/50",
+          )}
+        >
+          <Checkbox
+            checked={checked}
+            disabled={isCapReached && !checked}
+            onCheckedChange={() => onToggle(r.id)}
+          />
+          <button
+            onClick={() => onSelectOnly(r.id)}
+            className="flex flex-1 items-center justify-between text-left"
+          >
+            <span className="font-bold text-sm text-bpim-text">{r.label}</span>
+            {checked && <Check className="h-4 w-4 text-bpim-primary" />}
+          </button>
+        </div>
+      );
+    })}
   </div>
 );
 
@@ -227,11 +289,15 @@ export const ArenaRankStep = ({
 // ---------------------------------------------------------------------------
 
 export const SelfVersionPickStep = ({
-  selected,
-  onSelect,
+  isSelected,
+  isCapReached,
+  onToggle,
+  onSelectOnly,
 }: {
-  selected: string;
-  onSelect: (version: string, label: string) => void;
+  isSelected: (versionNum: string) => boolean;
+  isCapReached: boolean;
+  onToggle: (versionNum: string, label: string) => void;
+  onSelectOnly: (versionNum: string, label: string) => void;
 }) => {
   const { t } = useTranslation();
   return (
@@ -241,30 +307,42 @@ export const SelfVersionPickStep = ({
           {t("analytics.noPastVersions")}
         </div>
       ) : (
-        PAST_VERSIONS.map((v) => (
-          <button
-            key={v.num}
-            onClick={() => onSelect(v.num, v.title)}
-            className={cn(
-              "flex items-center justify-between rounded-xl border-2 px-4 py-3 text-left transition-all hover:scale-[1.01]",
-              selected === v.num
-                ? "border-bpim-primary bg-bpim-surface shadow-[0_0_0_3px] shadow-bpim-primary/20"
-                : "border-bpim-border bg-bpim-surface hover:border-bpim-primary/50",
-            )}
-          >
-            <div>
-              <span className="font-bold text-sm text-bpim-text">
-                {v.title}
-              </span>
-              <span className="ml-2 text-[10px] font-mono text-bpim-muted">
-                ver.{v.num}
-              </span>
+        PAST_VERSIONS.map((v) => {
+          const checked = isSelected(v.num);
+          return (
+            <div
+              key={v.num}
+              className={cn(
+                "flex items-center gap-3 rounded-xl border-2 px-4 py-3 transition-all",
+                checked
+                  ? "border-bpim-primary bg-bpim-surface shadow-[0_0_0_3px] shadow-bpim-primary/20"
+                  : "border-bpim-border bg-bpim-surface hover:border-bpim-primary/50",
+              )}
+            >
+              <Checkbox
+                checked={checked}
+                disabled={isCapReached && !checked}
+                onCheckedChange={() => onToggle(v.num, v.title)}
+              />
+              <button
+                onClick={() => onSelectOnly(v.num, v.title)}
+                className="flex flex-1 items-center justify-between text-left"
+              >
+                <div>
+                  <span className="font-bold text-sm text-bpim-text">
+                    {v.title}
+                  </span>
+                  <span className="ml-2 text-[10px] font-mono text-bpim-muted">
+                    ver.{v.num}
+                  </span>
+                </div>
+                {checked && (
+                  <Check className="h-4 w-4 text-bpim-primary shrink-0" />
+                )}
+              </button>
             </div>
-            {selected === v.num && (
-              <Check className="h-4 w-4 text-bpim-primary shrink-0" />
-            )}
-          </button>
-        ))
+          );
+        })
       )}
     </div>
   );
