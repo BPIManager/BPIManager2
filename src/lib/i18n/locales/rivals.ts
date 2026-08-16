@@ -419,6 +419,80 @@ export const rivalsTranslations = {
     "zh-TW": "尚未追蹤任何使用者",
     ko: "팔로우 중인 사용자가 없습니다",
   },
+
+  // Rival comparison pick step (#287)
+  "rivals.pickStep.addButton": {
+    ja: "比較メンバーを編集",
+    en: "Edit Comparison Members",
+    "zh-TW": "編輯比較成員",
+    ko: "비교 멤버 편집",
+  },
+  "rivals.pickStep.title": {
+    ja: "比較メンバーを編集",
+    en: "Edit Comparison Members",
+    "zh-TW": "編輯比較成員",
+    ko: "비교 멤버 편집",
+  },
+  "rivals.pickStep.desc": {
+    ja: "追加で比較するライバルを選択できます。チェックマークを押すと複数選択、行全体をクリックすると1人だけの比較に切り替わります。",
+    en: "Select additional rivals to compare. Tap the checkmark to multi-select, or tap the whole row to switch to a 1:1 comparison with just that person.",
+    "zh-TW": "選擇要追加比較的對手。點選左側勾選框可多選，點選整行則切換為與該對象的1對1比較。",
+    ko: "추가로 비교할 라이벌을 선택하세요. 체크마크를 누르면 다중 선택, 행 전체를 클릭하면 그 사람과의 1:1 비교로 전환됩니다.",
+  },
+  "rivals.pickStep.searchPlaceholder": {
+    ja: "フォロー中のユーザーを検索",
+    en: "Search users you follow",
+    "zh-TW": "搜尋你追蹤的使用者",
+    ko: "팔로우 중인 사용자 검색",
+  },
+  "rivals.pickStep.virtualSectionLabel": {
+    ja: "参考指標",
+    en: "Reference Metrics",
+    "zh-TW": "參考指標",
+    ko: "참고 지표",
+  },
+  "rivals.pickStep.wr": {
+    ja: "WR(世界記録)",
+    en: "WR (World Record)",
+    "zh-TW": "WR(世界紀錄)",
+    ko: "WR(세계 기록)",
+  },
+  "rivals.pickStep.kaidenAvg": {
+    ja: "皆伝平均",
+    en: "Kaiden Average",
+    "zh-TW": "皆傳平均",
+    ko: "카이덴 평균",
+  },
+  "rivals.pickStep.listSectionLabel": {
+    ja: "リストから一括追加",
+    en: "Bulk-add from a List",
+    "zh-TW": "從清單批次加入",
+    ko: "리스트에서 일괄 추가",
+  },
+  "rivals.pickStep.selectedCount": {
+    ja: "選択中: {count}/{max}",
+    en: "Selected: {count}/{max}",
+    "zh-TW": "已選: {count}/{max}",
+    ko: "선택됨: {count}/{max}",
+  },
+  "rivals.pickStep.apply": {
+    ja: "適用",
+    en: "Apply",
+    "zh-TW": "套用",
+    ko: "적용",
+  },
+  "rivals.pickStep.primaryBadge": {
+    ja: "基準",
+    en: "Base",
+    "zh-TW": "基準",
+    ko: "기준",
+  },
+  "rivals.pickStep.capReachedToast": {
+    ja: "比較対象の上限に達しました",
+    en: "You've reached the comparison member limit.",
+    "zh-TW": "已達比較對象上限",
+    ko: "비교 대상 상한에 도달했습니다",
+  },
   "rivals.list.updateFailed": {
     ja: "リストの更新に失敗しました",
     en: "Failed to update the list.",

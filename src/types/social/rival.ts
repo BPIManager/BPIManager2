@@ -29,3 +29,20 @@ export interface RivalSummaryResult {
   stats: RivalStats;
   role: UserRoleInfo | null;
 }
+
+/** 比較ページ(1:N)の比較対象1人分のスコア行(#287) */
+export interface MultiRivalScoreRow {
+  userId: string;
+  userName: string | null;
+  profileImage: string | null;
+  songId: number;
+  title: string;
+  difficulty: string;
+  difficultyLevel: number;
+  exScore: number;
+  bpi: number | null;
+  clearState: string | null;
+  lastPlayed: string;
+  wrScore: number;
+  kaidenAvg: number;
+}

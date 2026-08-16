@@ -9,6 +9,23 @@ import {
 import { userDisplayColumns } from "@/lib/db/shared/userDisplay";
 import { wherePublicOnly } from "@/lib/db/shared/visibility";
 
+/** 比較ページ(1:N)の比較対象1人分のスコア行(#287) */
+export interface MultiRivalScoreRow {
+  userId: string;
+  userName: string | null;
+  profileImage: string | null;
+  songId: number;
+  title: string;
+  difficulty: string;
+  difficultyLevel: number;
+  exScore: number;
+  bpi: number | null;
+  clearState: string | null;
+  lastPlayed: Date;
+  wrScore: number;
+  kaidenAvg: number;
+}
+
 /**
  * ライバル比較・フォロー中ユーザーとのスコア比較を担当するリポジトリクラス。
  */
@@ -550,6 +567,105 @@ class RivalRepository {
       .execute();
 
     return rows;
+  }
+
+  /**
+   * 指定した候補ユーザーID群のうち、`viewerId`が実際にフォローしており
+   * 閲覧可能な（公開、または非公開でも承認済みの）ものだけを返す。
+   *
+   * 比較ページ(1:N)の比較対象選択(#287)で、フロントから送られてきた
+   * 候補IDをそのまま信用せず、閲覧許可のあるユーザーだけに絞り込むための
+   * 安全弁。`getRivalComparisonScores`の`followersOf`分岐と同じ判定条件。
+   *
+   * @param viewerId - 閲覧者のユーザー ID
+   * @param candidateIds - 候補ユーザーID配列
+   */
+  async filterVisibleRivalIds(
+    viewerId: string,
+    candidateIds: string[],
+  ): Promise<string[]> {
+    if (candidateIds.length === 0) return [];
+
+    const rows = await db
+      .selectFrom("follows as f")
+      .innerJoin("users as u", "u.userId", "f.followingId")
+      .select("f.followingId")
+      .where("f.followerId", "=", viewerId)
+      .where("f.followingId", "in", candidateIds)
+      // follows行の存在だけでは判定できない(#275フォロー後方修正: 公開時代に
+      // 成立したfollowsには承認記録がないため、対象が非公開の場合は
+      // 承認記録の有無も要求する)
+      .where((eb) =>
+        eb.or([
+          eb("u.isPublic", "=", 1),
+          eb.exists(
+            eb
+              .selectFrom("followApprovalNotifications as fan")
+              .select("fan.id")
+              .where("fan.recipientId", "=", viewerId)
+              .whereRef("fan.actorId", "=", "u.userId"),
+          ),
+        ]),
+      )
+      .execute();
+
+    return rows.map((r) => r.followingId);
+  }
+
+  /**
+   * 指定した複数ユーザー(自分+選択したライバル群)の楽曲ごと最新スコアを
+   * 取得する。比較ページの複数ライバル(1:N)比較(#287)の基盤クエリ。
+   *
+   * 1人のみ(自分のみ、または自分+ライバル1人)を指定した場合も同じ形の
+   * 結果を返す（呼び出し元で1:1表示に読み替える）。
+   *
+   * @param params.userIds - 対象ユーザーID配列（自分自身のIDを含めること）
+   * @param params.version - バージョン番号
+   */
+  // users・songs・songDef・scoresを横断JOINした比較テーブルデータのため、
+  // 直接クエリを維持する。
+  async getMultiUserLatestScores(params: {
+    userIds: string[];
+    version: IIDXVersion;
+  }): Promise<MultiRivalScoreRow[]> {
+    const { userIds, version } = params;
+    if (userIds.length === 0) return [];
+
+    const latest = latestLogIdPerUserSongSubquery({
+      table: "scores",
+      version,
+      userIds,
+    }).as("latest");
+
+    return await db
+      .selectFrom("scores as s")
+      .innerJoin(latest, (join) =>
+        join
+          .onRef("s.logId", "=", "latest.maxLogId")
+          .onRef("s.userId", "=", "latest.userId")
+          .onRef("s.songId", "=", "latest.songId"),
+      )
+      .innerJoin("users as u", "u.userId", "s.userId")
+      .innerJoin("songs as sg", "sg.songId", "s.songId")
+      .innerJoin("songDef as sd", (join) =>
+        join.onRef("sd.songId", "=", "sg.songId").on("sd.isCurrent", "=", 1),
+      )
+      .select([
+        "s.userId",
+        "u.userName",
+        "u.profileImage",
+        "sg.songId",
+        "sg.title",
+        "sg.difficulty",
+        "sg.difficultyLevel",
+        "s.exScore",
+        "s.bpi",
+        "s.clearState",
+        "s.lastPlayed",
+        "sd.wrScore",
+        "sd.kaidenAvg",
+      ])
+      .execute();
   }
 }
 

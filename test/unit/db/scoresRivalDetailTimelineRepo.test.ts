@@ -168,6 +168,84 @@ describe("rivalRepo.getRivalAvgScores / getRivalTopScores", () => {
   });
 });
 
+describe("rivalRepo.filterVisibleRivalIds", () => {
+  it("候補が空の場合、DBに問い合わせず空配列を返すこと", async () => {
+    dbHolder.current = createDbSpy([]);
+    const result = await rivalRepo.filterVisibleRivalIds("viewer-1", []);
+    expect(result).toEqual([]);
+    expect(dbHolder.current.calls).toHaveLength(0);
+  });
+
+  it("followerId・候補ID・公開/承認条件で絞り込み、followingIdの配列を返すこと(#287)", async () => {
+    dbHolder.current = createDbSpy([
+      { followingId: "rival-1" },
+      { followingId: "rival-2" },
+    ]);
+
+    const result = await rivalRepo.filterVisibleRivalIds("viewer-1", [
+      "rival-1",
+      "rival-2",
+      "rival-3",
+    ]);
+
+    expect(result).toEqual(["rival-1", "rival-2"]);
+    const whereCalls = callsFor(dbHolder.current.calls, "where");
+    expect(whereCalls[0].args).toEqual(["f.followerId", "=", "viewer-1"]);
+    expect(whereCalls[1].args).toEqual([
+      "f.followingId",
+      "in",
+      ["rival-1", "rival-2", "rival-3"],
+    ]);
+  });
+});
+
+describe("rivalRepo.getMultiUserLatestScores", () => {
+  it("userIdsが空の場合、DBに問い合わせず空配列を返すこと", async () => {
+    dbHolder.current = createDbSpy([]);
+    const result = await rivalRepo.getMultiUserLatestScores({
+      userIds: [],
+      version: "33",
+    });
+    expect(result).toEqual([]);
+    expect(dbHolder.current.calls).toHaveLength(0);
+  });
+
+  it("結果をそのまま返すこと(#287)", async () => {
+    const rows = [
+      {
+        userId: "viewer-1",
+        userName: "自分",
+        profileImage: null,
+        songId: 1,
+        title: "冥",
+        difficulty: "ANOTHER",
+        difficultyLevel: 12,
+        exScore: 1800,
+        bpi: 50,
+        clearState: "HARD CLEAR",
+        lastPlayed: new Date("2025-06-01"),
+        wrScore: 1900,
+        kaidenAvg: 1700,
+      },
+    ];
+    dbHolder.current = createDbSpy(rows);
+
+    const result = await rivalRepo.getMultiUserLatestScores({
+      userIds: ["viewer-1", "rival-1"],
+      version: "33",
+    });
+
+    expect(result).toEqual(rows);
+    // 内部でlatestLogIdPerUserSongSubqueryが先にdb.selectFrom("scores")を
+    // 呼ぶため、メインクエリの"scores as s"は先頭とは限らない
+    expect(
+      callsFor(dbHolder.current.calls, "selectFrom").some(
+        (c) => c.args[0] === "scores as s",
+      ),
+    ).toBe(true);
+  });
+});
+
 describe("scoreDetailRepo.getScoresWithDetails", () => {
   it("batchIds指定時はbatchIdでの絞り込みが優先されること", async () => {
     dbHolder.current = createDbSpy([]);
