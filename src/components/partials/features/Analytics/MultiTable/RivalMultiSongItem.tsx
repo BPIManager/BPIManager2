@@ -34,7 +34,7 @@ const RivalMultiSongItem = ({ song, targets, onClick }: Props) => {
         <div className="flex w-70 shrink-0 items-center px-4 min-w-0">
           <SongInfo song={song} />
         </div>
-        <div className="w-35 shrink-0">
+        <div className="flex w-35 shrink-0 items-stretch">
           <ScoreBox
             label="YOU"
             ex={song.exScore}
@@ -43,12 +43,12 @@ const RivalMultiSongItem = ({ song, targets, onClick }: Props) => {
             colorClass="text-bpim-primary"
           />
         </div>
-        <div className="flex flex-1 overflow-x-auto">
+        <div className="flex shrink-0 overflow-x-auto">
           {targets.map((target) => {
             const value = song.targets[targetKey(target)];
             return (
-              <div key={targetKey(target)} className="flex shrink-0">
-                <div className="w-25 shrink-0">
+              <div key={targetKey(target)} className="flex shrink-0 items-stretch">
+                <div className="flex w-25 shrink-0 items-stretch">
                   <DiffBox
                     exDiff={
                       value?.exScore != null && song.exScore != null
@@ -62,7 +62,7 @@ const RivalMultiSongItem = ({ song, targets, onClick }: Props) => {
                     }
                   />
                 </div>
-                <div className="w-35 shrink-0">
+                <div className="flex w-35 shrink-0 items-stretch">
                   <ScoreBox
                     label={target.label || target.kind}
                     ex={value?.exScore ?? null}
