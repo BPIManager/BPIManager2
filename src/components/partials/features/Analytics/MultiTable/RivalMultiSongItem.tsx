@@ -69,7 +69,6 @@ const RivalMultiSongItem = ({ song, targets, onClick }: Props) => {
                     bpi={value?.bpi ?? null}
                     clearState={null}
                     colorClass="text-bpim-warning"
-                    isRival
                   />
                 </div>
               </div>
@@ -99,6 +98,7 @@ const RivalMultiSongItem = ({ song, targets, onClick }: Props) => {
                 ex={value?.exScore ?? null}
                 bpi={value?.bpi ?? null}
                 clearState={null}
+                align="end"
               />
             );
           })}
