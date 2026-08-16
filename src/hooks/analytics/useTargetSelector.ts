@@ -15,6 +15,9 @@ import { versionTitles } from "@/constants/iidx/versionTitles";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { MAX_COMPARISON_TARGETS } from "@/constants/logic/analyticsComparison";
 import { targetKey } from "@/hooks/analytics/resolveMultiTargets";
+import { useUser } from "@/contexts/users/UserContext";
+import { useRivalSummary } from "@/hooks/social/useRivalSummary";
+import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 
 export type Step = "kind" | "rival-pick" | "arena-rank" | "self-version-pick";
 
@@ -153,6 +156,17 @@ export function useTargetSelector({
 }: UseTargetSelectorProps) {
   const { t } = useTranslation();
   const kindOptions = buildKindOptions(t);
+  const { user } = useUser();
+
+  // 「個別ライバル」カードの一括選択チェックボックス用(フォロー中全員を
+  // 個別ターゲットとして追加する)。RivalPickStepも同じデータを使うが、
+  // SWRの同一キャッシュを共有するため二重取得のコストは実質無い
+  const { rivals } = useRivalSummary({
+    userId: user?.userId || false,
+    levels: ["11", "12"],
+    difficulties: IIDX_DIFFICULTIES,
+    version: latestVersion,
+  });
 
   const [step, setStep] = useState<Step>("kind");
 
@@ -208,6 +222,33 @@ export function useTargetSelector({
 
   const handleRivalSelectOnly = (userId: string, name: string) => {
     selectOnly({ kind: "rival", param: userId, label: name });
+  };
+
+  /** フォロー中の全ライバルが、個別ターゲットとして選択済みか */
+  const isAllRivalsSelected =
+    rivals.length > 0 &&
+    rivals.every((r) =>
+      isSelected({ kind: "rival", param: r.userId, label: r.userName }),
+    );
+
+  /**
+   * 「個別ライバル」カードのチェックボックス操作: フォロー中の全ライバルを
+   * まとめて個別ターゲットとして追加/除外する（ライバル平均ではなく、
+   * 1人ずつ別ターゲットとして扱う）。上限に達している分は追加しない。
+   */
+  const handleToggleAllRivals = () => {
+    if (isAllRivalsSelected) {
+      onChange(current.filter((c) => c.kind !== "rival"));
+      return;
+    }
+    const toAdd = rivals
+      .map((r): AnalyticsTarget => ({
+        kind: "rival",
+        param: r.userId,
+        label: r.userName,
+      }))
+      .filter((t) => !isSelected(t));
+    onChange([...current, ...toAdd.slice(0, Math.max(0, remaining))]);
   };
 
   const arenaTargetFor = (rankId: string): AnalyticsTarget => {
@@ -266,6 +307,8 @@ export function useTargetSelector({
     remaining,
     handleKindClick,
     handleKindToggle,
+    isAllRivalsSelected,
+    handleToggleAllRivals,
     handleRivalToggle,
     handleRivalSelectOnly,
     handleArenaToggle,

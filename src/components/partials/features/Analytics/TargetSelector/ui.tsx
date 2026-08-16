@@ -104,6 +104,8 @@ export const KindStep = ({
   isCapReached,
   onKindClick,
   onKindToggle,
+  isAllRivalsSelected,
+  onToggleAllRivals,
 }: {
   kindOptions: KindOption[];
   isSelected: (opt: KindOption) => boolean;
@@ -111,21 +113,42 @@ export const KindStep = ({
   isCapReached: boolean;
   onKindClick: (opt: KindOption) => void;
   onKindToggle: (opt: KindOption) => void;
+  /** 「個別ライバル」カード専用: フォロー中全員が選択済みか */
+  isAllRivalsSelected: boolean;
+  /** 「個別ライバル」カード専用: フォロー中全員を個別ターゲットとして一括追加/除外 */
+  onToggleAllRivals: () => void;
 }) => (
   <>
-    {kindOptions.map((opt) => (
+    {kindOptions.map((opt) => {
+      const isRivalKind = opt.kind === "rival";
+      return (
       <KindCard
         key={opt.kind}
         icon={opt.icon}
         label={opt.label}
         description={opt.description}
-        checked={opt.hasNoParam ? isSelected(opt) : undefined}
-        selectedCount={opt.hasNoParam ? undefined : countForKind(opt.kind)}
-        onCheckToggle={opt.hasNoParam ? () => onKindToggle(opt) : undefined}
+        checked={
+          isRivalKind
+            ? isAllRivalsSelected
+            : opt.hasNoParam
+              ? isSelected(opt)
+              : undefined
+        }
+        selectedCount={
+          !opt.hasNoParam || isRivalKind ? countForKind(opt.kind) : undefined
+        }
+        onCheckToggle={
+          isRivalKind
+            ? onToggleAllRivals
+            : opt.hasNoParam
+              ? () => onKindToggle(opt)
+              : undefined
+        }
         onClick={() => onKindClick(opt)}
         disabled={isCapReached}
       />
-    ))}
+      );
+    })}
   </>
 );
 

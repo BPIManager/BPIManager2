@@ -57,6 +57,8 @@ const TargetSelectorModal = ({
     isCapReached,
     handleKindClick,
     handleKindToggle,
+    isAllRivalsSelected,
+    handleToggleAllRivals,
     handleRivalToggle,
     handleRivalSelectOnly,
     handleArenaToggle,
@@ -94,6 +96,8 @@ const TargetSelectorModal = ({
                 isCapReached={isCapReached}
                 onKindClick={handleKindClick}
                 onKindToggle={handleKindToggle}
+                isAllRivalsSelected={isAllRivalsSelected}
+                onToggleAllRivals={handleToggleAllRivals}
               />
             )}
 

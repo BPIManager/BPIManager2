@@ -17,7 +17,6 @@ import { decodeTarget, decodeTargets, encodeTargets } from "@/hooks/analytics/ta
 import type { AnalyticsTarget } from "@/types/analytics";
 import TargetSelectorModal from "@/components/partials/features/Analytics/TargetSelector";
 import AnalyticsComparisonTable from "@/components/partials/features/Analytics/Table";
-import AnalyticsMultiComparisonTable from "@/components/partials/features/Analytics/MultiTable";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { MAX_COMPARISON_TARGETS } from "@/constants/logic/analyticsComparison";
 import { cn } from "@/lib/utils";
@@ -161,7 +160,7 @@ export default function AnalyticsPage() {
           ) : (
             <div className="rounded-2xl border border-bpim-border bg-bpim-bg/40 p-1 shadow-xl backdrop-blur-md overflow-hidden">
               {isMulti ? (
-                <AnalyticsMultiComparisonTable
+                <AnalyticsComparisonTable
                   songs={multi.songs}
                   targets={targets}
                   isLoading={multi.isLoading}

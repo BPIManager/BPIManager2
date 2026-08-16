@@ -54,6 +54,12 @@ export const analyticsTranslations = {
       "此為BPIM中申報競技場等級的使用者平均值，可能與實際競技場平均有差異。",
     ko: "BPIM에 등록하고 아레나 랭크를 신고한 유저 내 평균값으로, 실제 아레나 평균과 차이가 있을 수 있습니다.",
   },
+  "analytics.multiAnalysisComingSoon": {
+    ja: "（複数ターゲットの分析タブ対応は準備中です）",
+    en: "(Analysis tab for multiple targets is coming soon.)",
+    "zh-TW": "（多目標的分析頁籤即將推出）",
+    ko: "（복수 타겟의 분석 탭 지원은 준비 중입니다）",
+  },
   "analytics.selectedCount": {
     ja: "選択中: {count}/{max}",
     en: "Selected: {count}/{max}",
