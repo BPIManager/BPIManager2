@@ -84,11 +84,25 @@
           },
           "405": {
             "description": "Method Not Allowed (POST 以外)",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -192,11 +206,25 @@
           },
           "405": {
             "description": "Method Not Allowed",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -239,11 +267,25 @@
           },
           "401": {
             "description": "認証エラー",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -280,15 +322,36 @@
           },
           "401": {
             "description": "認証エラー",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "405": {
             "description": "Method Not Allowed",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -384,19 +447,47 @@
           },
           "403": {
             "description": "アクセス拒否（非公開プロフィール）",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
             "description": "ユーザーが存在しない",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "405": {
             "description": "Method Not Allowed",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -482,19 +573,47 @@
           },
           "400": {
             "description": "バリデーションエラー",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "403": {
             "description": "認証エラーまたは本人以外からのリクエスト",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "405": {
             "description": "Method Not Allowed",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Database Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -575,15 +694,36 @@
           },
           "400": {
             "description": "バリデーションエラー",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "403": {
             "description": "認証エラーまたは本人以外からのリクエスト",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Database Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -744,19 +884,47 @@
           },
           "401": {
             "description": "認証エラー",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "403": {
             "description": "本人以外からのリクエスト",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "405": {
             "description": "Method Not Allowed",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -816,19 +984,55 @@
           },
           "401": {
             "description": "認証エラー",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
             "description": "Firestore にインポート可能データなし",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "405": {
             "description": "Method Not Allowed",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1010,19 +1214,47 @@
           },
           "400": {
             "description": "パラメータ不正",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "403": {
             "description": "アクセス権限なし",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
             "description": "ユーザーが存在しない",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1126,19 +1358,47 @@
           },
           "400": {
             "description": "パラメータ不正",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "403": {
             "description": "アクセス権限なし",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "405": {
             "description": "Method Not Allowed",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1247,15 +1507,36 @@
           },
           "404": {
             "description": "データなし",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "405": {
             "description": "Method Not Allowed",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1305,19 +1586,47 @@
           },
           "400": {
             "description": "パラメータ不足",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "403": {
             "description": "アクセス権限なし",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "405": {
             "description": "Method Not Allowed",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1434,19 +1743,47 @@
           },
           "400": {
             "description": "currentVersionが不正または未指定",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "401": {
             "description": "認証エラー",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "405": {
             "description": "Method Not Allowed",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1511,19 +1848,47 @@
           },
           "400": {
             "description": "パラメータ不足または両バージョンが同一",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "401": {
             "description": "認証エラー",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "405": {
             "description": "Method Not Allowed",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1619,19 +1984,47 @@
           },
           "400": {
             "description": "versionが未指定または不正",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "401": {
             "description": "認証エラー",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "405": {
             "description": "Method Not Allowed",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1714,11 +2107,25 @@
           },
           "400": {
             "description": "パラメータ不正",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1793,19 +2200,47 @@
           },
           "400": {
             "description": "パラメータ不正",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "403": {
             "description": "アクセス権限なし",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
             "description": "バッチが見つからない",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1908,15 +2343,36 @@
           },
           "403": {
             "description": "アクセス権限なし",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
             "description": "対象期間にログなし",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -2034,19 +2490,47 @@
           },
           "400": {
             "description": "必須パラメータ不足",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "403": {
             "description": "アクセス権限なし",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
             "description": "対象期間にログなし",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -2125,11 +2609,25 @@
           },
           "401": {
             "description": "認証エラー",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -2177,11 +2675,25 @@
           },
           "401": {
             "description": "認証エラー",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -2227,19 +2739,47 @@
           },
           "401": {
             "description": "認証エラー",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "403": {
             "description": "アクセス拒否",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "405": {
             "description": "Method Not Allowed",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -2319,15 +2859,44 @@
           },
           "400": {
             "description": "パラメータ不正",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           },
           "403": {
             "description": "アクセス権限なし",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
             "description": "ユーザーが存在しない",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "405": {
             "description": "Method Not Allowed",
@@ -2335,7 +2904,22 @@
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -2371,19 +2955,71 @@
           },
           "400": {
             "description": "自分自身へのフォローまたはパラメータ不正",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           },
           "401": {
             "description": "認証エラー",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           },
           "404": {
             "description": "対象ユーザーが存在しない",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -2419,15 +3055,60 @@
           },
           "400": {
             "description": "パラメータ不正",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           },
           "401": {
             "description": "認証エラー",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           }
         },
         "security": [
@@ -2531,7 +3212,14 @@
           },
           "401": {
             "description": "認証エラー",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "405": {
             "description": "Method Not Allowed",
@@ -2539,7 +3227,14 @@
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -2653,11 +3348,25 @@
           },
           "403": {
             "description": "アクセス権限なし",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -2760,11 +3469,25 @@
           },
           "403": {
             "description": "アクセス権限なし",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -2867,19 +3590,47 @@
           },
           "403": {
             "description": "アクセス権限なし",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
             "description": "フィルタパラメータが不足",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "405": {
             "description": "Method Not Allowed",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -2989,7 +3740,14 @@
           },
           "403": {
             "description": "アクセス権限なし",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "405": {
             "description": "Method Not Allowed",
@@ -2997,7 +3755,14 @@
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -3101,15 +3866,36 @@
           },
           "403": {
             "description": "アクセス権限なし",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
             "description": "フィルタパラメータが不足",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -3251,11 +4037,25 @@
           },
           "403": {
             "description": "アクセス権限なし",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -3322,15 +4122,36 @@
           },
           "400": {
             "description": "パラメータ不正",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "403": {
             "description": "アクセス権限なし",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -3442,7 +4263,14 @@
           },
           "401": {
             "description": "認証エラー",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "405": {
             "description": "Method Not Allowed",
@@ -3450,7 +4278,14 @@
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -3514,11 +4349,25 @@
           },
           "400": {
             "description": "songIdが不正",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "401": {
             "description": "認証エラー",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "405": {
             "description": "Method Not Allowed",
@@ -3526,7 +4375,14 @@
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -3583,19 +4439,47 @@
           },
           "400": {
             "description": "versionが未指定",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "401": {
             "description": "認証エラー",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "405": {
             "description": "Method Not Allowed",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -3685,15 +4569,36 @@
           },
           "401": {
             "description": "認証エラー",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "405": {
             "description": "Method Not Allowed",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -3771,19 +4676,47 @@
           },
           "400": {
             "description": "versionが未指定または不正",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "401": {
             "description": "認証エラー",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "405": {
             "description": "Method Not Allowed",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -3922,15 +4855,36 @@
           },
           "400": {
             "description": "パラメータ不正",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "403": {
             "description": "アクセス権限なし",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -4005,19 +4959,47 @@
           },
           "400": {
             "description": "パラメータ不正",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "403": {
             "description": "アクセス権限なし",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
             "description": "スコアが見つからない",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -4189,19 +5171,47 @@
           },
           "400": {
             "description": "パラメータ不正",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "401": {
             "description": "認証エラー",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "405": {
             "description": "Method Not Allowed",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -4280,15 +5290,36 @@
           },
           "400": {
             "description": "パラメータ不正",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "403": {
             "description": "アクセス権限なし",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -4416,15 +5447,36 @@
           },
           "400": {
             "description": "パラメータ不正",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "401": {
             "description": "認証エラー",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -4523,7 +5575,14 @@
           },
           "401": {
             "description": "認証エラー",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "405": {
             "description": "Method Not Allowed",
@@ -4531,7 +5590,14 @@
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -4621,15 +5687,36 @@
           },
           "400": {
             "description": "パラメータ不足",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "405": {
             "description": "Method Not Allowed",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -4719,15 +5806,36 @@
           },
           "400": {
             "description": "パラメータ不足",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "405": {
             "description": "Method Not Allowed",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -4791,19 +5899,47 @@
           },
           "400": {
             "description": "songIdが不正",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
             "description": "楽曲またはエントリが見つからない",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "405": {
             "description": "Method Not Allowed",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": []
@@ -4871,15 +6007,36 @@
           },
           "400": {
             "description": "songIdが不正",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "405": {
             "description": "Method Not Allowed",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": []
@@ -5021,19 +6178,47 @@
           },
           "400": {
             "description": "パラメータ不正",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "401": {
             "description": "認証エラー",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "405": {
             "description": "Method Not Allowed",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -5081,7 +6266,14 @@
           },
           "401": {
             "description": "認証エラー",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "405": {
             "description": "Method Not Allowed",
@@ -5089,7 +6281,14 @@
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -5158,11 +6357,25 @@
           },
           "400": {
             "description": "ペイロード不正",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "401": {
             "description": "認証エラー",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "405": {
             "description": "Method Not Allowed",
@@ -5170,7 +6383,14 @@
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -5217,11 +6437,25 @@
           },
           "401": {
             "description": "認証エラー",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "404": {
             "description": "メモが見つからない",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           },
           "405": {
             "description": "Method Not Allowed",
@@ -5229,7 +6463,14 @@
           },
           "500": {
             "description": "Internal Server Error",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
           }
         },
         "security": [
