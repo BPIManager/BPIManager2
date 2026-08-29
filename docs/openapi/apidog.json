@@ -1,0 +1,5990 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Default module",
+    "description": "BPI Manager 2 は beatmania IIDX プレイヤー向けのスコア管理・分析サービスです。\n本ドキュメントはそのバックエンド API (Next.js Pages Router) の仕様を定義します。\n\n## 認証\n\nエンドポイントによって以下の認証方式が使用されます。\n\n### Firebase ID Token (Bearer)\nFirebase Authentication が発行した ID トークンを `Authorization: Bearer <token>` ヘッダーで送信します。\n書き込み系 API (`POST`) および自分のデータへのアクセスに必要です。\n\n### API Key\n設定画面で発行した API キーを `X-Api-Key: <key>` ヘッダーで送信します。\n非公開プロフィールのデータへの読み取りアクセスに利用できます。\n\n### 公開アクセス\n`isPublic=1` のユーザーのデータは認証なしで読み取れます。\n\n## バージョン (version パラメータ)\nIIDX のバージョン番号 (`26` 〜 `33`) を文字列で指定します。\n現在の最新バージョンは `\"33\"` です。\n",
+    "version": "1.0.0"
+  },
+  "tags": [
+    {
+      "name": "Auth"
+    },
+    {
+      "name": "Profile"
+    },
+    {
+      "name": "Scores"
+    },
+    {
+      "name": "Logs"
+    },
+    {
+      "name": "Social"
+    },
+    {
+      "name": "Stats"
+    },
+    {
+      "name": "Rivals"
+    },
+    {
+      "name": "Songs"
+    },
+    {
+      "name": "Optimize"
+    }
+  ],
+  "paths": {
+    "/token": {
+      "post": {
+        "summary": "カスタムトークン取得",
+        "deprecated": false,
+        "description": "API キーを使用して Firebase Custom Token を取得します。\n取得した `customToken` は、そのままでは Bearer トークンとして使用できません。\nGoogleapis の Firebase REST API (`https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken`) に渡して **Firebase ID Token** (`idToken`) に交換してから `Authorization: Bearer <idToken>` として使用してください。\n\nCustom Token の有効期限は **1時間** です。\n",
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "カスタムトークン発行成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "customToken": {
+                      "type": "string",
+                      "description": "Firebase Custom Token。このままでは使用不可 — Firebase REST API で ID Token に交換が必要。"
+                    },
+                    "expiresIn": {
+                      "type": "integer",
+                      "description": "有効秒数 (常に 3600)",
+                      "example": 3600
+                    }
+                  }
+                },
+                "example": {
+                  "customToken": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+                  "expiresIn": 3600
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "API キーが未指定または無効",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed (POST 以外)",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/me": {
+      "get": {
+        "summary": "ログインユーザー情報取得",
+        "deprecated": false,
+        "description": "Firebase ID トークンで認証されたユーザー自身のプロフィールと統計サマリーを返します。\nユーザーが存在しない場合は `exists: false` を返します（初回登録フロー用）。\n",
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "exists": {
+                      "type": "boolean",
+                      "description": "ユーザーが DB に存在するか"
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "userId": {
+                          "type": "string"
+                        },
+                        "userName": {
+                          "type": "string"
+                        },
+                        "profileText": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "profileImage": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "iidxId": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "xId": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "isPublic": {
+                          "type": "integer"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "totalBpi": {
+                          "type": "number",
+                          "format": "float",
+                          "nullable": true
+                        },
+                        "arenaRank": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "followingCount": {
+                          "type": "integer"
+                        },
+                        "followerCount": {
+                          "type": "integer"
+                        }
+                      },
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー（トークン未指定または無効）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/apiKey": {
+      "get": {
+        "summary": "API キー確認",
+        "deprecated": false,
+        "description": "現在ログイン中のユーザーの API キーが存在するかを確認します。\nセキュリティのため末尾 4 桁のみ返します。\n",
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "exists": {
+                      "type": "boolean"
+                    },
+                    "key": {
+                      "type": "string",
+                      "description": "末尾 4 桁のみ (例: ****a1b2)",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "API キー発行 / 再発行",
+        "deprecated": false,
+        "description": "新しい API キーを発行します。既存のキーは上書きされます。\n発行されたキーは **この一度しか平文で返されません**。安全に保管してください。\n",
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "発行成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string",
+                      "description": "新しい API キー（平文、64 hex 文字）"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/profile": {
+      "get": {
+        "summary": "ユーザープロフィール取得",
+        "deprecated": false,
+        "description": "指定ユーザーのプロフィール情報を取得します。\n- 公開ユーザー: 認証不要\n- 非公開ユーザー: Bearer トークン（本人のみ）が必要\n\n`compare=true` を指定するとビューワーとの勝敗比較・レーダー情報が追加されます（要認証）。\n",
+        "tags": [
+          "Profile"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ターゲットユーザーの Firebase UID",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "compare",
+            "in": "query",
+            "description": "`true` を指定するとビューワーとの比較データを含める。認証必須。",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "profile": {
+                      "$ref": "#/components/schemas/UserProfile"
+                    },
+                    "compare": {
+                      "type": "object",
+                      "description": "compare=true のときのみ存在",
+                      "properties": {
+                        "winLoss": {
+                          "type": "object",
+                          "properties": {
+                            "win": {
+                              "type": "integer"
+                            },
+                            "loss": {
+                              "type": "integer"
+                            },
+                            "draw": {
+                              "type": "integer"
+                            },
+                            "total": {
+                              "type": "integer"
+                            },
+                            "winRate": {
+                              "type": "number",
+                              "format": "float"
+                            }
+                          },
+                          "nullable": true
+                        },
+                        "radar": {
+                          "$ref": "#/components/schemas/RadarStats",
+                          "nullable": true
+                        }
+                      },
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス拒否（非公開プロフィール）",
+            "headers": {}
+          },
+          "404": {
+            "description": "ユーザーが存在しない",
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "ユーザープロフィール作成",
+        "deprecated": false,
+        "description": "自分のプロフィール情報を新規作成します。Bearer トークンによる本人認証が必要です。",
+        "tags": [
+          "Profile"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ターゲットユーザーの Firebase UID",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userName"
+                ],
+                "properties": {
+                  "userName": {
+                    "type": "string",
+                    "example": "playerName123"
+                  },
+                  "iidxId": {
+                    "type": "string",
+                    "nullable": true,
+                    "example": "1234-5678"
+                  },
+                  "profileText": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "profileImage": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "isPublic": {
+                    "type": "integer",
+                    "enum": [
+                      0,
+                      1
+                    ]
+                  },
+                  "arenaRank": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "作成成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfile"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "バリデーションエラー",
+            "headers": {}
+          },
+          "403": {
+            "description": "認証エラーまたは本人以外からのリクエスト",
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Database Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "patch": {
+        "summary": "ユーザープロフィール部分更新",
+        "deprecated": false,
+        "description": "自分のプロフィール情報を部分的に更新します。指定したフィールドのみ更新されます。Bearer トークンによる本人認証が必要です。",
+        "tags": [
+          "Profile"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ターゲットユーザーの Firebase UID",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userName": {
+                    "type": "string"
+                  },
+                  "iidxId": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "profileText": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "profileImage": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "isPublic": {
+                    "type": "integer",
+                    "enum": [
+                      0,
+                      1
+                    ]
+                  },
+                  "arenaRank": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "更新成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfile"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "バリデーションエラー",
+            "headers": {}
+          },
+          "403": {
+            "description": "認証エラーまたは本人以外からのリクエスト",
+            "headers": {}
+          },
+          "500": {
+            "description": "Database Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/scores/bulk": {
+      "post": {
+        "summary": "スコア一括インポート (CSV 解析済みデータ)",
+        "deprecated": false,
+        "description": "クライアント側で CSV を解析した結果を送信し、DB に一括保存します。\n既存スコアより良いスコア（EX スコア向上・クリアランプ向上・ミスカウント減少）のみ保存されます。\n同時に TotalBPI も再計算されます。Bearer トークンによる本人認証が必要です。\n",
+        "tags": [
+          "Scores"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ターゲットユーザーの Firebase UID",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "version",
+                  "csvRows"
+                ],
+                "properties": {
+                  "version": {
+                    "$ref": "#/components/schemas/IIDXVersion"
+                  },
+                  "csvRows": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "title",
+                        "difficulty",
+                        "exScore"
+                      ],
+                      "properties": {
+                        "title": {
+                          "type": "string"
+                        },
+                        "difficulty": {
+                          "$ref": "#/components/schemas/Difficulty"
+                        },
+                        "exScore": {
+                          "type": "integer"
+                        },
+                        "clearState": {
+                          "$ref": "#/components/schemas/ClearState"
+                        },
+                        "missCount": {
+                          "type": "integer",
+                          "nullable": true
+                        },
+                        "lastPlayed": {
+                          "type": "string",
+                          "format": "date-time",
+                          "nullable": true
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "インポート結果",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "batchId": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "updatedCount": {
+                      "type": "integer"
+                    },
+                    "previousTotalBpi": {
+                      "type": "number",
+                      "format": "float"
+                    },
+                    "newTotalBpi": {
+                      "type": "number",
+                      "format": "float"
+                    },
+                    "message": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "details": {
+                      "type": "object",
+                      "properties": {
+                        "updated": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "integer"
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "diff": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "notFound": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "title": {
+                                "type": "string"
+                              },
+                              "difficulty": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "noImprovementCount": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "headers": {}
+          },
+          "403": {
+            "description": "本人以外からのリクエスト",
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/scores/transfer": {
+      "post": {
+        "summary": "Firestore からのデータ移行",
+        "deprecated": false,
+        "description": "旧版 BPI Manager (Firestore) に保存されたスコアデータを MySQL に移行します。\nBearer トークンによる本人認証が必要です。\n",
+        "tags": [
+          "Scores"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ターゲットユーザーの Firebase UID",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "移行成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Transfer successful"
+                    },
+                    "importedVersions": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/IIDXVersion"
+                      }
+                    },
+                    "totalProcessed": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "headers": {}
+          },
+          "404": {
+            "description": "Firestore にインポート可能データなし",
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/scores": {
+      "get": {
+        "summary": "指定日時のスコア一覧取得",
+        "deprecated": false,
+        "description": "指定した日時時点での全楽曲のスコアスナップショットを返します。\n公開ユーザーは認証不要。非公開ユーザーは Bearer トークン（本人）が必要です。\nフィルタ・ソートクエリパラメータを利用して絞り込みが可能です。\n",
+        "tags": [
+          "Scores"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ターゲットユーザーの Firebase UID",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "IIDX バージョン番号 (26〜33)",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "asOf",
+            "in": "query",
+            "description": "スナップショットの日時。`\"latest\"` を指定すると現在の最新スコアを返します。ISO 8601 形式も使用可能。",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "latest"
+            }
+          },
+          {
+            "name": "level",
+            "in": "query",
+            "description": "難易度レベルでフィルタ（複数可）",
+            "required": false,
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "difficulty",
+            "in": "query",
+            "description": "難易度でフィルタ（複数可）",
+            "required": false,
+            "schema": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/Difficulty"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Difficulty"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "sortKey",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "title",
+                "level",
+                "bpi",
+                "notes",
+                "bpm",
+                "updatedAt",
+                "version"
+              ]
+            }
+          },
+          {
+            "name": "sortOrder",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "楽曲タイトルでのキーワード検索",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "bpiMin",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "bpiMax",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "clearStates",
+            "in": "query",
+            "description": "クリアランプでフィルタ（複数可）",
+            "required": false,
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "スコア一覧",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SongWithScore"
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不正",
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "headers": {}
+          },
+          "404": {
+            "description": "ユーザーが存在しない",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/scores/{songId}/history": {
+      "get": {
+        "summary": "特定楽曲のスコア履歴取得",
+        "deprecated": false,
+        "description": "指定ユーザーの特定楽曲における全バージョンのスコア履歴を取得します。\n公開ユーザーは認証不要。非公開ユーザーは Bearer トークン（本人）が必要です。\n",
+        "tags": [
+          "Scores"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ターゲットユーザーの Firebase UID",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "songId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": 0,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "バージョン別スコア履歴",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "キーは IIDX バージョン番号",
+                  "additionalProperties": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "logId": {
+                          "type": "integer"
+                        },
+                        "userId": {
+                          "type": "string"
+                        },
+                        "songId": {
+                          "type": "integer"
+                        },
+                        "definitionId": {
+                          "type": "integer",
+                          "nullable": true
+                        },
+                        "exScore": {
+                          "type": "integer"
+                        },
+                        "bpi": {
+                          "type": "number",
+                          "format": "float",
+                          "nullable": true
+                        },
+                        "clearState": {
+                          "$ref": "#/components/schemas/ClearState"
+                        },
+                        "missCount": {
+                          "type": "integer",
+                          "nullable": true
+                        },
+                        "lastPlayed": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "version": {
+                          "$ref": "#/components/schemas/IIDXVersion"
+                        },
+                        "batchId": {
+                          "type": "string",
+                          "nullable": true
+                        }
+                      }
+                    }
+                  },
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不正",
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/all-scores/list": {
+      "get": {
+        "summary": "全難易度スコア一覧取得",
+        "deprecated": false,
+        "description": "11・12以外も含む全難易度のベストスコア一覧を返します。公開ユーザーは認証不要。",
+        "tags": [
+          "Scores"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "levels",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "カンマ区切りの難易度レベル (例: 11,12)"
+            }
+          },
+          {
+            "name": "difficulties",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "カンマ区切りの譜面種別 (例: ANOTHER,HYPER)"
+            }
+          },
+          {
+            "name": "clearStates",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortKey",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "level"
+            }
+          },
+          {
+            "name": "sortOrder",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "スコア一覧",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SongWithScore"
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "データなし",
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/all-scores/{songId}/history": {
+      "get": {
+        "summary": "全難易度スコア履歴取得",
+        "deprecated": false,
+        "description": "指定した楽曲の全難易度スコア履歴を返します。公開ユーザーは認証不要。",
+        "tags": [
+          "Scores"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "songId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "スコア履歴",
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不足",
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/scores/best-ever": {
+      "get": {
+        "summary": "歴代ベストスコア取得",
+        "deprecated": false,
+        "description": "全バージョンを通じた各楽曲の歴代最高スコアを返します。`excludeCurrent=true`で現行バージョンを除外できます。",
+        "tags": [
+          "Scores"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "currentVersion",
+            "in": "query",
+            "description": "現行バージョン",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "excludeCurrent",
+            "in": "query",
+            "description": "現行バージョンを除外する場合true",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "歴代ベストスコア一覧",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "songId": {
+                        "type": "integer"
+                      },
+                      "title": {
+                        "type": "string"
+                      },
+                      "notes": {
+                        "type": "integer"
+                      },
+                      "bpm": {
+                        "type": "string"
+                      },
+                      "difficulty": {
+                        "$ref": "#/components/schemas/Difficulty"
+                      },
+                      "difficultyLevel": {
+                        "type": "integer"
+                      },
+                      "releasedVersion": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "bestExScore": {
+                        "type": "integer",
+                        "nullable": true
+                      },
+                      "bestBpi": {
+                        "type": "number",
+                        "nullable": true
+                      },
+                      "bestVersion": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "wrScore": {
+                        "type": "integer",
+                        "nullable": true
+                      },
+                      "kaidenAvg": {
+                        "type": "integer",
+                        "nullable": true
+                      },
+                      "coef": {
+                        "type": "number",
+                        "nullable": true
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "currentVersionが不正または未指定",
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/scores/self-version": {
+      "get": {
+        "summary": "バージョン間スコア比較取得",
+        "deprecated": false,
+        "description": "現行バージョンのスコアと旧バージョンのスコアを楽曲ごとに比較した一覧を返します。",
+        "tags": [
+          "Scores"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "currentVersion",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "targetVersion",
+            "in": "query",
+            "description": "比較対象の旧バージョン（currentVersionと異なる必要あり）",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "バージョン間比較スコア一覧",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SongWithScore"
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不足または両バージョンが同一",
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/scores/unplayed": {
+      "get": {
+        "summary": "未プレイ楽曲一覧取得",
+        "deprecated": false,
+        "description": "指定バージョンでまだスコアを登録していない楽曲の一覧を返します。",
+        "tags": [
+          "Scores"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "levels",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "difficulties",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortKey",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortOrder",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "未プレイ楽曲一覧",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SongWithScore"
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "versionが未指定または不正",
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/batches": {
+      "get": {
+        "summary": "バッチログ一覧取得（タイムライン形式）",
+        "deprecated": false,
+        "description": "指定バージョンのインポートバッチ一覧を返します。\n`groupedBy=lastPlayed` を指定するとプレイ日時ベースの集計になります。\n",
+        "tags": [
+          "Logs"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ターゲットユーザーの Firebase UID",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "IIDX バージョン番号 (26〜33)",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "groupedBy",
+            "in": "query",
+            "description": "集計軸。`lastPlayed` でプレイ日時ベース、未指定でバッチ (インポート日時) ベース。",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "lastPlayed",
+                "createdAt"
+              ]
+            }
+          },
+          {
+            "name": "topN",
+            "in": "query",
+            "description": "バッチごとに返す上位楽曲数（デフォルト: 5）",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 5,
+              "minimum": 1,
+              "maximum": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "バッチログ一覧",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {}
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不正",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/batches/{batchId}": {
+      "get": {
+        "summary": "特定バッチの詳細取得",
+        "deprecated": false,
+        "description": "指定バッチでスコアが更新された全楽曲の詳細を返します。前後バッチへのナビゲーション情報・同日バッチ情報・抜かれたライバル情報（本人のみ）も含みます。\n公開ユーザーは認証不要。非公開ユーザーは Bearer トークン（本人）が必要です。\n",
+        "tags": [
+          "Logs"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ターゲットユーザーの Firebase UID",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "batchId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "IIDX バージョン番号 (26〜33)",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "バッチ詳細",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "songs": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/LogEntry"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/BatchPagination"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不正",
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "headers": {}
+          },
+          "404": {
+            "description": "バッチが見つからない",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/batches/{date}/scores": {
+      "get": {
+        "summary": "日次サマリーのスコア詳細取得",
+        "deprecated": false,
+        "description": "指定した日の全バッチを集約した詳細を返します。`groupedBy` で集計軸を切り替えられます。\n公開ユーザーは認証不要。非公開ユーザーは Bearer トークン（本人）が必要です。\n",
+        "tags": [
+          "Logs"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ターゲットユーザーの Firebase UID",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "date",
+            "in": "path",
+            "description": "日付文字列 (YYYY-MM-DD) またはバッチ ID",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "IIDX バージョン番号 (26〜33)",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "description": "集計単位（デフォルト: day）",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "day",
+                "week",
+                "month"
+              ],
+              "default": "day"
+            }
+          },
+          {
+            "name": "groupedBy",
+            "in": "query",
+            "description": "`lastPlayed` でプレイ日時ベース、未指定でバッチ (インポート日時) ベース。",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "lastPlayed",
+                "createdAt"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "サマリー詳細",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "songs": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/LogEntry"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/BatchPagination"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "headers": {}
+          },
+          "404": {
+            "description": "対象期間にログなし",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/batches/{batchId}/scores": {
+      "get": {
+        "summary": "バッチ/期間のスコア詳細取得",
+        "deprecated": false,
+        "description": "指定したバッチIDまたは日付の全バッチを集約した詳細を返します。`groupedBy`で集計軸を切り替えられます。公開ユーザーは認証不要。",
+        "tags": [
+          "Logs"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "Firebase UID",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "batchId",
+            "in": "path",
+            "description": "バッチID または 日付文字列 (YYYY-MM-DD)",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "IIDX バージョン番号 (26〜33)",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "description": "集計単位（デフォルト: day）",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "day",
+                "week",
+                "month"
+              ],
+              "default": "day"
+            }
+          },
+          {
+            "name": "groupedBy",
+            "in": "query",
+            "description": "`lastPlayed`でプレイ日時ベース、未指定でバッチ(インポート日時)ベース",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "lastPlayed",
+                "createdAt"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "バッチ詳細",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "songs": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/LogEntry"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/BatchPagination"
+                    },
+                    "range": {
+                      "type": "object",
+                      "properties": {
+                        "start": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "end": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "unit": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "必須パラメータ不足",
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "headers": {}
+          },
+          "404": {
+            "description": "対象期間にログなし",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/notifications": {
+      "get": {
+        "summary": "通知一覧取得",
+        "deprecated": false,
+        "description": "認証ユーザー自身の通知を取得します。Bearer トークンによる本人認証が必要です。",
+        "tags": [
+          "Social"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ターゲットユーザーの Firebase UID",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "description": "通知タイプ。`all` で全通知、その他は特定タイプのみ。",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "all"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "通知一覧",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {}
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "通知を既読にする",
+        "deprecated": false,
+        "description": "未読通知を全て既読にします。Bearer トークンによる本人認証が必要です。",
+        "tags": [
+          "Social"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ターゲットユーザーの Firebase UID",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "既読更新成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/notifications/count": {
+      "get": {
+        "summary": "未読通知数取得",
+        "deprecated": false,
+        "description": "認証ユーザーの未読通知数を取得します。Bearer トークンによる本人認証が必要です。",
+        "tags": [
+          "Social"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ターゲットユーザーの Firebase UID",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "未読通知数",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス拒否",
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/follows": {
+      "get": {
+        "summary": "フォロー / フォロワー一覧取得",
+        "deprecated": false,
+        "description": "指定ユーザーのフォロー一覧またはフォロワー一覧を返します。\n公開ユーザーは認証不要。非公開ユーザーは Bearer トークン（本人）が必要です。\n",
+        "tags": [
+          "Social"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ターゲットユーザーの Firebase UID",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "following",
+                "followers"
+              ]
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "maximum": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "フォローリスト",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不正",
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "headers": {}
+          },
+          "404": {
+            "description": "ユーザーが存在しない",
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "フォロー",
+        "deprecated": false,
+        "description": "対象ユーザーをフォローします。自分自身はフォローできません。Bearer トークンによる認証が必要です。",
+        "tags": [
+          "Social"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ターゲットユーザーの Firebase UID",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "フォロー成功",
+            "headers": {}
+          },
+          "400": {
+            "description": "自分自身へのフォローまたはパラメータ不正",
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "headers": {}
+          },
+          "404": {
+            "description": "対象ユーザーが存在しない",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "アンフォロー",
+        "deprecated": false,
+        "description": "対象ユーザーをアンフォローします。Bearer トークンによる認証が必要です。",
+        "tags": [
+          "Social"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ターゲットユーザーの Firebase UID",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "アンフォロー成功",
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不正",
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/timeline": {
+      "get": {
+        "summary": "フォロー中ユーザーのタイムライン取得",
+        "deprecated": false,
+        "description": "フォロー中のユーザーの最新スコア更新情報をタイムライン形式で返します。`lastId` カーソルによる無限スクロールをサポートします。\nBearer トークンによる認証が必要です（`checkUserAccess` 使用、viewerId 必須）。\n",
+        "tags": [
+          "Social"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ターゲットユーザーの Firebase UID",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "lastId",
+            "in": "query",
+            "description": "カーソル (前ページ最後のエントリの lastPlayed)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "mode",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "played",
+                "overtaken"
+              ],
+              "default": "all"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "levels[]",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          },
+          {
+            "name": "difficulties[]",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Difficulty"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "タイムライン",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/stats/totalBPIhistory": {
+      "get": {
+        "summary": "TotalBPI の日別推移取得",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "Stats"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ターゲットユーザーの Firebase UID",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "IIDX バージョン番号 (26〜33)",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "level",
+            "in": "query",
+            "description": "難易度レベルでフィルタ（複数可）",
+            "required": false,
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "difficulty",
+            "in": "query",
+            "description": "難易度でフィルタ（複数可）",
+            "required": false,
+            "schema": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/Difficulty"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Difficulty"
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "日別 TotalBPI 推移",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "date": {
+                        "type": "string",
+                        "format": "date"
+                      },
+                      "totalBpi": {
+                        "type": "number",
+                        "format": "float"
+                      },
+                      "count": {
+                        "type": "integer"
+                      },
+                      "updatedSongs": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/stats/singleBPIDistribution": {
+      "get": {
+        "summary": "楽曲別 BPI 分布取得",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "Stats"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ターゲットユーザーの Firebase UID",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "IIDX バージョン番号 (26〜33)",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "level",
+            "in": "query",
+            "description": "難易度レベルでフィルタ（複数可）",
+            "required": false,
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "difficulty",
+            "in": "query",
+            "description": "難易度でフィルタ（複数可）",
+            "required": false,
+            "schema": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/Difficulty"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Difficulty"
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "BPI 分布",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "label": {
+                        "type": "string"
+                      },
+                      "count": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/stats/djRankDistribution": {
+      "get": {
+        "summary": "DJ ランク分布取得",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "Stats"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ターゲットユーザーの Firebase UID",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "IIDX バージョン番号 (26〜33)",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "level",
+            "in": "query",
+            "description": "難易度レベルでフィルタ（複数可）",
+            "required": false,
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "difficulty",
+            "in": "query",
+            "description": "難易度でフィルタ（複数可）",
+            "required": false,
+            "schema": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/Difficulty"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Difficulty"
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "DJ ランク分布",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "label": {
+                        "type": "string"
+                      },
+                      "count": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "headers": {}
+          },
+          "404": {
+            "description": "フィルタパラメータが不足",
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/stats/radar": {
+      "get": {
+        "summary": "レーダーチャート用スタッツ取得",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "Stats"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ターゲットユーザーの Firebase UID",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "IIDX バージョン番号 (26〜33)",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "level",
+            "in": "query",
+            "description": "難易度レベルでフィルタ（複数可）",
+            "required": false,
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "difficulty",
+            "in": "query",
+            "description": "難易度でフィルタ（複数可）",
+            "required": false,
+            "schema": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/Difficulty"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Difficulty"
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "レーダースタッツ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object",
+                    "properties": {
+                      "totalBpi": {
+                        "type": "number"
+                      },
+                      "count": {
+                        "type": "integer"
+                      }
+                    }
+                  },
+                  "properties": {},
+                  "example": {
+                    "NOTES": {
+                      "totalBpi": 45.5,
+                      "count": 120
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/stats/activity": {
+      "get": {
+        "summary": "アクティビティカレンダー用データ取得",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "Stats"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ターゲットユーザーの Firebase UID",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "IIDX バージョン番号 (26〜33)",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "level",
+            "in": "query",
+            "description": "難易度レベルでフィルタ（複数可）",
+            "required": false,
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "difficulty",
+            "in": "query",
+            "description": "難易度でフィルタ（複数可）",
+            "required": false,
+            "schema": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/Difficulty"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Difficulty"
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "アクティビティデータ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "date": {
+                        "type": "string",
+                        "format": "date"
+                      },
+                      "count": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "headers": {}
+          },
+          "404": {
+            "description": "フィルタパラメータが不足",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/stats/recommended": {
+      "get": {
+        "summary": "おすすめ楽曲（武器・ポテンシャル）取得",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "Stats"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ターゲットユーザーの Firebase UID",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "IIDX バージョン番号 (26〜33)",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "level",
+            "in": "query",
+            "description": "難易度レベルでフィルタ（複数可）",
+            "required": false,
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "difficulty",
+            "in": "query",
+            "description": "難易度でフィルタ（複数可）",
+            "required": false,
+            "schema": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/Difficulty"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Difficulty"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "おすすめ楽曲",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "weapons": {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/SongWithScore"
+                          }
+                        },
+                        "total": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "potential": {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/SongWithScore"
+                          }
+                        },
+                        "total": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/stats/aaaDifficulty": {
+      "get": {
+        "summary": "AAA 達成難易度テーブル取得",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "Stats"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ターゲットユーザーの Firebase UID",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "IIDX バージョン番号 (26〜33)",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "level",
+            "in": "query",
+            "description": "対象レベル (例: 12)",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "AAA 難易度テーブル",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {}
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不正",
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/ranking/global": {
+      "get": {
+        "summary": "グローバルランキング取得",
+        "deprecated": false,
+        "description": "TotalBPIまたはレーダーカテゴリ別のグローバルランキングを返します。ビューワー自身のランキング位置も含みます。",
+        "tags": [
+          "Stats"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "description": "ランキング軸 (totalBpi / notes / chord / peak / charge / scratch / soflan)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "totalBpi"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ランキングデータ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "rankings": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "rank": {
+                            "type": "integer"
+                          },
+                          "userId": {
+                            "type": "string"
+                          },
+                          "userName": {
+                            "type": "string"
+                          },
+                          "profileImage": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "isPublic": {
+                            "type": "boolean"
+                          },
+                          "iidxId": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "totalBpi": {
+                            "type": "number"
+                          },
+                          "arenaRank": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "isSelf": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    },
+                    "totalCount": {
+                      "type": "integer"
+                    },
+                    "selfRank": {
+                      "type": "integer"
+                    },
+                    "viewerRadar": {
+                      "$ref": "#/components/schemas/RadarStats"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/ranking/song/{songId}": {
+      "get": {
+        "summary": "楽曲別ランキング取得",
+        "deprecated": false,
+        "description": "指定した楽曲のEXスコアランキングを返します。",
+        "tags": [
+          "Stats"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "songId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "楽曲ランキング",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "songIdが不正",
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/stats/activeDates": {
+      "get": {
+        "summary": "プレイ活動日付一覧取得",
+        "deprecated": false,
+        "description": "指定バージョンでスコアが更新された日付の一覧（YYYY-MM-DD）を返します。カレンダーUI向け。",
+        "tags": [
+          "Stats"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "活動日付リスト",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "date"
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "versionが未指定",
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/stats/bpmBpiDistribution": {
+      "get": {
+        "summary": "BPM帯別BPI分布取得",
+        "deprecated": false,
+        "description": "BPM帯（~120, 120~140, ..., 200~, Soflan）ごとのTotalBPIと楽曲一覧を返します。",
+        "tags": [
+          "Stats"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "levels",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "difficulties",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "BPM帯別BPI分布",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "label": {
+                        "type": "string"
+                      },
+                      "totalBpi": {
+                        "type": "number",
+                        "nullable": true
+                      },
+                      "songs": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {}
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/stats/totalBpi": {
+      "get": {
+        "summary": "TotalBPI取得",
+        "deprecated": false,
+        "description": "指定バージョンのTotalBPI・推定アリーナランク・プレイ済み曲数・全曲数を返します。`asOf`で任意時点のスナップショットを取得可能。",
+        "tags": [
+          "Stats"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "asOf",
+            "in": "query",
+            "description": "任意時点の日時 (省略時は現在)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "TotalBPIデータ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "totalBpi": {
+                      "type": "number"
+                    },
+                    "estimatedRank": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "playedCount": {
+                      "type": "integer"
+                    },
+                    "totalCount": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "versionが未指定または不正",
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/rivals/{rivalId}/scores": {
+      "get": {
+        "summary": "特定ライバルとのスコア比較一覧",
+        "deprecated": false,
+        "description": "ビューワーと指定ライバルのスコアを楽曲ごとに並べて返します。\n公開ユーザーは認証不要。非公開ユーザーは Bearer トークン（本人）が必要です。\n",
+        "tags": [
+          "Rivals"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ターゲットユーザーの Firebase UID",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "rivalId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "IIDX バージョン番号 (26〜33)",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "level",
+            "in": "query",
+            "description": "難易度レベルでフィルタ（複数可）",
+            "required": false,
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "difficulty",
+            "in": "query",
+            "description": "難易度でフィルタ（複数可）",
+            "required": false,
+            "schema": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/Difficulty"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Difficulty"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "sortKey",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "rivalBpi",
+                "myBpi",
+                "rivalRate",
+                "myRate",
+                "winGapAsc",
+                "winGapDesc",
+                "loseGapAsc",
+                "loseGapDesc",
+                "bpi",
+                "title"
+              ]
+            }
+          },
+          {
+            "name": "sortOrder",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ライバル比較スコア一覧",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SongWithScore"
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不正",
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/rivals/{rivalId}/scores/{songId}": {
+      "get": {
+        "summary": "特定ライバルとの特定楽曲スコア比較",
+        "deprecated": false,
+        "description": "指定ライバルとの特定楽曲のスコア比較を返します。\n公開ユーザーは認証不要。非公開ユーザーは Bearer トークン（本人）が必要です。\n",
+        "tags": [
+          "Rivals"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ターゲットユーザーの Firebase UID",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "rivalId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "songId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": 0,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "IIDX バージョン番号 (26〜33)",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "楽曲別ライバル比較",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不正",
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "headers": {}
+          },
+          "404": {
+            "description": "スコアが見つからない",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/rivals/following/scores": {
+      "get": {
+        "summary": "フォロー中ユーザーとの比較（ページネーション付き）",
+        "deprecated": false,
+        "description": "フォロー中の全ユーザーとのスコア差分を降順で返します。カーソルベースのページネーション。Bearer トークンによる認証が必要です。",
+        "tags": [
+          "Rivals"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ターゲットユーザーの Firebase UID",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "IIDX バージョン番号 (26〜33)",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "level",
+            "in": "query",
+            "description": "難易度レベルでフィルタ（複数可）",
+            "required": false,
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "difficulty",
+            "in": "query",
+            "description": "難易度でフィルタ（複数可）",
+            "required": false,
+            "schema": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/Difficulty"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Difficulty"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          },
+          {
+            "name": "minDiff",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "maxDiff",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 30
+            }
+          },
+          {
+            "name": "lastDiff",
+            "in": "query",
+            "description": "カーソル用",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "lastSongId",
+            "in": "query",
+            "description": "カーソル用",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lastRivalId",
+            "in": "query",
+            "description": "カーソル用",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "比較結果",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/SongWithScore"
+                      }
+                    },
+                    "nextCursor": {
+                      "type": "object",
+                      "properties": {
+                        "lastDiff": {
+                          "type": "integer"
+                        },
+                        "lastSongId": {
+                          "type": "string"
+                        },
+                        "lastRivalId": {
+                          "type": "string"
+                        }
+                      },
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不正",
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/rivals/following/scores/{songId}": {
+      "get": {
+        "summary": "特定楽曲のフォロー中ライバルスコア一覧",
+        "deprecated": false,
+        "description": "フォロー中の全ユーザーについて、指定楽曲のスコアを一覧で返します。\n公開ユーザーは認証不要。非公開ユーザーは Bearer トークン（本人）が必要です。\n",
+        "tags": [
+          "Rivals"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ターゲットユーザーの Firebase UID",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "songId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": 0,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "IIDX バージョン番号 (26〜33)",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ライバルスコア一覧",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "songId": {
+                      "type": "integer"
+                    },
+                    "version": {
+                      "$ref": "#/components/schemas/IIDXVersion"
+                    },
+                    "rivals": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {}
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不正",
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/rivals/following/summary": {
+      "get": {
+        "summary": "フォロー中ユーザーとの勝敗サマリー",
+        "deprecated": false,
+        "description": "フォロー中の全ユーザーとの楽曲単位の勝敗サマリーを返します。\nBearer トークンによる認証が必要です（`checkUserAccess` を使用、認証必須）。\n",
+        "tags": [
+          "Rivals"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ターゲットユーザーの Firebase UID",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "IIDX バージョン番号 (26〜33)",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "level",
+            "in": "query",
+            "description": "難易度レベルでフィルタ（複数可）",
+            "required": false,
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "difficulty",
+            "in": "query",
+            "description": "難易度でフィルタ（複数可）",
+            "required": false,
+            "schema": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/Difficulty"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Difficulty"
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "勝敗サマリー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "rivals": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "userId": {
+                            "type": "string"
+                          },
+                          "userName": {
+                            "type": "string"
+                          },
+                          "profileImage": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "win": {
+                            "type": "integer"
+                          },
+                          "loss": {
+                            "type": "integer"
+                          },
+                          "draw": {
+                            "type": "integer"
+                          },
+                          "total": {
+                            "type": "integer"
+                          },
+                          "winRate": {
+                            "type": "number",
+                            "format": "float"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不正",
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/rivals/suggestions": {
+      "get": {
+        "summary": "おすすめユーザー（ライバル候補）一覧",
+        "deprecated": false,
+        "description": "ビューワーと TotalBPI や各レーダー値が近いユーザーの一覧を返します。\nBearer トークンによる認証が必要です（`checkUserAccess` を使用、viewerId が必須）。\n",
+        "tags": [
+          "Rivals"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ターゲットユーザーの Firebase UID",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "IIDX バージョン番号 (26〜33)",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "description": "ユーザー名での検索クエリ",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "p",
+            "in": "query",
+            "description": "ページ番号（デフォルト: 1）",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "s",
+            "in": "query",
+            "description": "ソートキー (totalBpi or レーダーカテゴリ名)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "totalBpi"
+            }
+          },
+          {
+            "name": "o",
+            "in": "query",
+            "description": "並び順モード",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "distance",
+                "desc",
+                "newest"
+              ],
+              "default": "distance"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "おすすめユーザー一覧",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/rivals/following/avg-scores": {
+      "get": {
+        "summary": "フォロー中ライバルの平均スコア取得",
+        "deprecated": false,
+        "description": "フォロー中ライバル全員の楽曲別平均EXスコア・BPIを返します。songIdsで絞り込み可能。",
+        "tags": [
+          "Rivals"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "songIds",
+            "in": "query",
+            "description": "カンマ区切りの楽曲IDリスト",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "楽曲別平均スコア",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "songId": {
+                        "type": "integer"
+                      },
+                      "title": {
+                        "type": "string"
+                      },
+                      "difficulty": {
+                        "$ref": "#/components/schemas/Difficulty"
+                      },
+                      "difficultyLevel": {
+                        "type": "integer"
+                      },
+                      "avgExScore": {
+                        "type": "number",
+                        "nullable": true
+                      },
+                      "avgBpi": {
+                        "type": "number",
+                        "nullable": true
+                      },
+                      "rivalCount": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不足",
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/rivals/following/top-scores": {
+      "get": {
+        "summary": "フォロー中ライバルのトップスコア取得",
+        "deprecated": false,
+        "description": "フォロー中ライバル全員の楽曲別最高EXスコア・BPIを返します。",
+        "tags": [
+          "Rivals"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "songIds",
+            "in": "query",
+            "description": "カンマ区切りの楽曲IDリスト",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "楽曲別トップスコア",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "songId": {
+                        "type": "integer"
+                      },
+                      "title": {
+                        "type": "string"
+                      },
+                      "difficulty": {
+                        "$ref": "#/components/schemas/Difficulty"
+                      },
+                      "difficultyLevel": {
+                        "type": "integer"
+                      },
+                      "topExScore": {
+                        "type": "number",
+                        "nullable": true
+                      },
+                      "topBpi": {
+                        "type": "number",
+                        "nullable": true
+                      },
+                      "rivalCount": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不足",
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/songs/{songId}/arena-averages": {
+      "get": {
+        "summary": "楽曲のアリーナ平均スコア取得",
+        "deprecated": false,
+        "description": "指定した楽曲のアリーナランク別平均EXスコア・BPI・プレイ率を返します。難易度11・12のみ対象。",
+        "tags": [
+          "Songs"
+        ],
+        "parameters": [
+          {
+            "name": "songId",
+            "in": "path",
+            "description": "楽曲ID",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "アリーナランク別平均データ（nullの場合は対象難易度外）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object",
+                    "properties": {
+                      "avgExScore": {
+                        "type": "number"
+                      },
+                      "rate": {
+                        "type": "number"
+                      },
+                      "count": {
+                        "type": "integer"
+                      },
+                      "avgBpi": {
+                        "type": "number",
+                        "nullable": true
+                      }
+                    }
+                  },
+                  "properties": {},
+                  "nullable": true
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "songIdが不正",
+            "headers": {}
+          },
+          "404": {
+            "description": "楽曲またはエントリが見つからない",
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/songs/{songId}/definitions": {
+      "get": {
+        "summary": "楽曲のBPI定義一覧取得",
+        "deprecated": false,
+        "description": "指定した楽曲の世界記録・皆伝平均・coef等のBPI定義履歴を返します。",
+        "tags": [
+          "Songs"
+        ],
+        "parameters": [
+          {
+            "name": "songId",
+            "in": "path",
+            "description": "楽曲ID",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "BPI定義リスト（新しい順）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "defId": {
+                        "type": "integer"
+                      },
+                      "wrScore": {
+                        "type": "integer",
+                        "nullable": true
+                      },
+                      "kaidenAvg": {
+                        "type": "integer",
+                        "nullable": true
+                      },
+                      "coef": {
+                        "type": "number",
+                        "nullable": true
+                      },
+                      "isCurrent": {
+                        "type": "integer",
+                        "description": "現行定義フラグ(0/1)"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "songIdが不正",
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/users/{userId}/analytics/bpi-optimizer": {
+      "get": {
+        "summary": "BPI最適化パス計算",
+        "deprecated": false,
+        "description": "目標BPIに到達するための最適な練習曲リストをアルゴリズムで計算します。本人のみアクセス可能。",
+        "tags": [
+          "Optimize"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "targetBpi",
+            "in": "query",
+            "description": "目標BPI (-15〜100)",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "maxSteps",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 30,
+              "minimum": 1,
+              "maximum": 400
+            }
+          },
+          {
+            "name": "strategies",
+            "in": "query",
+            "description": "対象戦略 (カンマ区切り: unplayed,played)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "unplayed,played"
+            }
+          },
+          {
+            "name": "difficulties",
+            "in": "query",
+            "description": "対象譜面種別 (カンマ区切り)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "HYPER,ANOTHER,LEGGENDARIA"
+            }
+          },
+          {
+            "name": "searchMode",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "fastest",
+                "flexible"
+              ],
+              "default": "flexible"
+            }
+          },
+          {
+            "name": "radarElements",
+            "in": "query",
+            "description": "対象レーダー要素 (カンマ区切り)",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "considerCurrentTotalBpi",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "最適化結果",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "steps": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {}
+                      }
+                    },
+                    "currentTotalBpi": {
+                      "type": "number"
+                    },
+                    "targetTotalBpi": {
+                      "type": "number"
+                    },
+                    "achievable": {
+                      "type": "boolean"
+                    },
+                    "alreadyAchieved": {
+                      "type": "boolean"
+                    },
+                    "totalSongCount": {
+                      "type": "integer"
+                    },
+                    "autoAdjustmentNote": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不正",
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/optimizeMemo": {
+      "get": {
+        "summary": "BPI最適化メモ一覧取得",
+        "deprecated": false,
+        "description": "ユーザーが保存したBPI最適化レポートのメモ一覧を返します。本人のみアクセス可能。",
+        "tags": [
+          "Optimize"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "メモ一覧",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {}
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "BPI最適化メモ保存",
+        "deprecated": false,
+        "description": "BPI最適化レポートをメモとして保存します。",
+        "tags": [
+          "Optimize"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "targetBpi",
+                  "reportData"
+                ],
+                "properties": {
+                  "targetBpi": {
+                    "type": "number"
+                  },
+                  "reportData": {
+                    "type": "object",
+                    "properties": {}
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "保存成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "reportId": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "ペイロード不正",
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/optimizeMemo/{memoId}": {
+      "delete": {
+        "summary": "BPI最適化メモ削除",
+        "deprecated": false,
+        "description": "指定したBPI最適化メモを削除します。本人のみ可能。",
+        "tags": [
+          "Optimize"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "memoId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "削除成功",
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "headers": {}
+          },
+          "404": {
+            "description": "メモが見つからない",
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/bpi/calc": {
+      "get": {
+        "summary": "単曲 BPI 計算",
+        "deprecated": false,
+        "description": "楽曲タイトル・難易度・EX スコアをURLパラメータに付与してリクエストすることで、最新の定義データに基づく単曲 BPI 及び推定順位・BPIM 内順位・アリーナランク別平均などのメタデータを返却します。\n認証は不要です。",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "title",
+            "in": "query",
+            "description": "楽曲タイトル（IIDX公式サイトのCSV表記に準拠するため、厳密な楽曲名と異なる場合があります）",
+            "required": true,
+            "example": "(This Is Not) The Angels",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "difficulty",
+            "in": "query",
+            "description": "難易度",
+            "required": true,
+            "example": "ANOTHER",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "HYPER",
+                "ANOTHER",
+                "LEGGENDARIA"
+              ]
+            }
+          },
+          {
+            "name": "exScore",
+            "in": "query",
+            "description": "EX スコア（0 〜 notes×2 の整数）",
+            "required": true,
+            "example": 1200,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "IIDX バージョン番号。BPIM 内順位とアリーナ平均の集計対象バージョンを指定する。省略時は最新バージョンにフォールバックします。",
+            "required": false,
+            "example": "33",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "26",
+                "27",
+                "28",
+                "29",
+                "30",
+                "31",
+                "32",
+                "33",
+                "INF"
+              ]
+            }
+          },
+          {
+            "name": "includeRank",
+            "in": "query",
+            "description": "省略された場合false. BPIM2に登録されたユーザーベースでの実順位データをレスポンスに追加します。\nこれをオンにするとDBアクセスが発生するため、短期間に大量のリクエストが飛ぶユースケースではfalse又は省略してください",
+            "required": false,
+            "example": "false",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "BPI 計算結果",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BpiCalcResponse"
+                },
+                "example": {
+                  "song": {
+                    "title": "(This Is Not) The Angels",
+                    "difficulty": "ANOTHER",
+                    "difficultyLevel": 12,
+                    "notes": 1364
+                  },
+                  "bpi": 45.23,
+                  "rank": {
+                    "estimatedRank": 512,
+                    "bpimRank": 38,
+                    "bpimTotal": 1420
+                  },
+                  "metadata": {
+                    "version": "33",
+                    "arenaAverages": {
+                      "A1": {
+                        "avgExScore": 2450.1,
+                        "rate": 89.83,
+                        "count": 124,
+                        "avgBpi": 72.5
+                      },
+                      "A2": {
+                        "avgExScore": 2300.4,
+                        "rate": 84.34,
+                        "count": 210
+                      },
+                      "A3": {
+                        "avgExScore": 2100,
+                        "rate": 76.98,
+                        "count": 305
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不正（バリデーションエラー、または exScore が最大値超過）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorWithIssues"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ErrorMessage"
+                    }
+                  ]
+                },
+                "examples": {
+                  "validation_error": {
+                    "summary": "Zod バリデーションエラー",
+                    "value": {
+                      "message": "Invalid parameters",
+                      "errors": [
+                        {
+                          "code": "invalid_enum_value",
+                          "path": [
+                            "difficulty"
+                          ],
+                          "message": "Invalid enum value. Expected 'HYPER' | 'ANOTHER' | 'LEGGENDARIA', received 'NORMAL'"
+                        }
+                      ]
+                    }
+                  },
+                  "exscore_overflow": {
+                    "summary": "EX スコアが最大値超過",
+                    "value": {
+                      "message": "exScore exceeds maximum (2728)"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "指定した楽曲が見つからない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                },
+                "example": {
+                  "message": "Song not found"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "GET 以外のメソッド",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                },
+                "example": {
+                  "message": "Method not allowed"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "サーバー内部エラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                },
+                "example": {
+                  "message": "Internal Server Error"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Internal Server Error"
+          }
+        }
+      },
+      "IIDXVersion": {
+        "type": "string",
+        "enum": [
+          "26",
+          "27",
+          "28",
+          "29",
+          "30",
+          "31",
+          "32",
+          "33"
+        ],
+        "description": "IIDX バージョン番号"
+      },
+      "Difficulty": {
+        "type": "string",
+        "enum": [
+          "HYPER",
+          "ANOTHER",
+          "LEGGENDARIA"
+        ]
+      },
+      "ClearState": {
+        "type": "string",
+        "description": "クリアランプ。例: NO PLAY, FAILED, ASSIST CLEAR, EASY CLEAR, CLEAR, HARD CLEAR, EX HARD CLEAR, FULL COMBO"
+      },
+      "SongWithScore": {
+        "type": "object",
+        "description": "楽曲情報とスコアを結合したオブジェクト",
+        "properties": {
+          "songId": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "integer"
+          },
+          "bpm": {
+            "type": "string",
+            "nullable": true
+          },
+          "difficulty": {
+            "$ref": "#/components/schemas/Difficulty"
+          },
+          "difficultyLevel": {
+            "type": "integer"
+          },
+          "releasedVersion": {
+            "type": "integer",
+            "nullable": true
+          },
+          "logId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "exScore": {
+            "type": "integer",
+            "nullable": true
+          },
+          "bpi": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "clearState": {
+            "$ref": "#/components/schemas/ClearState"
+          },
+          "missCount": {
+            "type": "integer",
+            "nullable": true
+          },
+          "scoreAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "wrScore": {
+            "type": "integer",
+            "nullable": true
+          },
+          "kaidenAvg": {
+            "type": "integer",
+            "nullable": true
+          },
+          "coef": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          }
+        }
+      },
+      "RadarStats": {
+        "type": "object",
+        "properties": {
+          "NOTES": {
+            "type": "number",
+            "format": "float"
+          },
+          "CHORD": {
+            "type": "number",
+            "format": "float"
+          },
+          "PEAK": {
+            "type": "number",
+            "format": "float"
+          },
+          "CHARGE": {
+            "type": "number",
+            "format": "float"
+          },
+          "SCRATCH": {
+            "type": "number",
+            "format": "float"
+          },
+          "SOFLAN": {
+            "type": "number",
+            "format": "float"
+          }
+        }
+      },
+      "UserProfile": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "userName": {
+            "type": "string"
+          },
+          "profileText": {
+            "type": "string",
+            "nullable": true
+          },
+          "profileImage": {
+            "type": "string",
+            "nullable": true
+          },
+          "iidxId": {
+            "type": "string",
+            "nullable": true
+          },
+          "xId": {
+            "type": "string",
+            "nullable": true
+          },
+          "isPublic": {
+            "type": "integer",
+            "enum": [
+              0,
+              1
+            ]
+          },
+          "history": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserProfileHistory"
+            }
+          },
+          "current": {
+            "$ref": "#/components/schemas/UserProfileHistory",
+            "nullable": true
+          },
+          "follows": {
+            "type": "object",
+            "properties": {
+              "following": {
+                "type": "integer"
+              },
+              "followers": {
+                "type": "integer"
+              }
+            }
+          },
+          "relationship": {
+            "type": "object",
+            "properties": {
+              "isFollowing": {
+                "type": "boolean"
+              },
+              "isFollowed": {
+                "type": "boolean"
+              },
+              "isSelf": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "UserProfileHistory": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "$ref": "#/components/schemas/IIDXVersion"
+          },
+          "totalBpi": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "arenaRank": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "BatchPagination": {
+        "type": "object",
+        "properties": {
+          "prev": {
+            "type": "object",
+            "properties": {},
+            "nullable": true
+          },
+          "next": {
+            "type": "object",
+            "properties": {},
+            "nullable": true
+          },
+          "current": {
+            "type": "object",
+            "properties": {
+              "batchId": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          },
+          "dailyBatchIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "dailyBatchCount": {
+            "type": "integer"
+          }
+        }
+      },
+      "LogEntry": {
+        "type": "object",
+        "properties": {
+          "songId": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "difficulty": {
+            "$ref": "#/components/schemas/Difficulty"
+          },
+          "difficultyLevel": {
+            "type": "integer"
+          },
+          "current": {
+            "type": "object",
+            "properties": {
+              "exScore": {
+                "type": "integer"
+              },
+              "bpi": {
+                "type": "number",
+                "format": "float"
+              },
+              "clearState": {
+                "$ref": "#/components/schemas/ClearState"
+              }
+            }
+          },
+          "previous": {
+            "type": "object",
+            "properties": {
+              "exScore": {
+                "type": "integer"
+              },
+              "bpi": {
+                "type": "number",
+                "format": "float"
+              },
+              "clearState": {
+                "$ref": "#/components/schemas/ClearState"
+              }
+            },
+            "nullable": true
+          },
+          "exDiff": {
+            "type": "integer"
+          },
+          "bpiDiff": {
+            "type": "number",
+            "format": "float"
+          }
+        }
+      },
+      "BpiCalcResponse": {
+        "type": "object",
+        "required": [
+          "song",
+          "bpi",
+          "rank",
+          "metadata"
+        ],
+        "properties": {
+          "song": {
+            "type": "object",
+            "required": [
+              "title",
+              "difficulty",
+              "difficultyLevel",
+              "notes"
+            ],
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "difficulty": {
+                "type": "string",
+                "enum": [
+                  "HYPER",
+                  "ANOTHER",
+                  "LEGGENDARIA"
+                ]
+              },
+              "difficultyLevel": {
+                "type": "integer",
+                "description": "難易度レベル（例: 11, 12）"
+              },
+              "notes": {
+                "type": "integer",
+                "description": "ノーツ数（最大スコアは notes×2）"
+              }
+            }
+          },
+          "bpi": {
+            "type": "number",
+            "description": "単曲 BPI 値。-15 〜 理論上限。kaidenAvg / wrScore が未設定の場合は -15 固定。",
+            "nullable": true
+          },
+          "rank": {
+            "type": "object",
+            "required": [
+              "estimatedRank"
+            ],
+            "properties": {
+              "estimatedRank": {
+                "type": "integer",
+                "description": "BPI 公式による皆伝内推定順位（bpi が null の場合は null）",
+                "nullable": true
+              },
+              "bpimRank": {
+                "type": "integer",
+                "description": "BPIM 登録ユーザー内での当該曲のスコア順位（1 始まり） ※includeRankパラメータがtrueの場合のみ"
+              },
+              "bpimTotal": {
+                "type": "integer",
+                "description": "BPIM 内で当該曲・バージョンのスコアを登録しているユーザー総数 ※includeRankパラメータがtrueの場合のみ"
+              }
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "required": [
+              "version",
+              "arenaAverages"
+            ],
+            "properties": {
+              "version": {
+                "type": "string",
+                "description": "集計対象バージョン"
+              },
+              "arenaAverages": {
+                "type": "object",
+                "description": "アリーナランク別の平均スコア統計。difficultyLevel が 11 / 12 以外、またはデータが未生成の場合は null。",
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/ArenaAverageEntry"
+                },
+                "properties": {},
+                "nullable": true
+              }
+            }
+          }
+        }
+      },
+      "ArenaAverageEntry": {
+        "type": "object",
+        "required": [
+          "avgExScore",
+          "rate",
+          "count"
+        ],
+        "properties": {
+          "avgExScore": {
+            "type": "number",
+            "description": "平均 EX スコア"
+          },
+          "rate": {
+            "type": "number",
+            "description": "達成率（%）"
+          },
+          "count": {
+            "type": "integer",
+            "description": "サンプル数"
+          },
+          "avgBpi": {
+            "type": "number",
+            "description": "平均 BPI（算出不能な場合は省略）"
+          }
+        }
+      },
+      "ErrorMessage": {
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "ErrorWithIssues": {
+        "type": "object",
+        "required": [
+          "message",
+          "errors"
+        ],
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        }
+      }
+    },
+    "responses": {},
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "Firebase ID Token",
+        "description": "Firebase REST API で customToken を交換して取得した Firebase ID Token"
+      },
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Api-Key",
+        "description": "設定画面または PUT /apiKey で発行した API キー。POST /token エンドポイント専用。"
+      }
+    },
+    "parameters": {
+      "userId": {
+        "name": "userId",
+        "in": "path",
+        "required": true,
+        "description": "ターゲットユーザーの Firebase UID",
+        "schema": {
+          "type": "string",
+          "example": "abc123uid"
+        }
+      },
+      "version": {
+        "name": "version",
+        "in": "query",
+        "required": true,
+        "description": "IIDX バージョン番号 (26〜33)",
+        "schema": {
+          "$ref": "#/components/schemas/IIDXVersion"
+        }
+      },
+      "levelQuery": {
+        "name": "level",
+        "in": "query",
+        "description": "難易度レベルでフィルタ（複数可）",
+        "schema": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          ]
+        },
+        "style": "form",
+        "explode": true
+      },
+      "difficultyQuery": {
+        "name": "difficulty",
+        "in": "query",
+        "description": "難易度でフィルタ（複数可）",
+        "schema": {
+          "oneOf": [
+            {
+              "$ref": "#/components/schemas/Difficulty"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Difficulty"
+              }
+            }
+          ]
+        },
+        "style": "form",
+        "explode": true
+      }
+    }
+  },
+  "servers": [],
+  "security": []
+}
