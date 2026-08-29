@@ -202,7 +202,8 @@
                                 }
                               }
                             }
-                          ]
+                          ],
+                          "type": "object"
                         }
                       },
                       "nullable": true
@@ -432,7 +433,8 @@
                         {
                           "$ref": "#/components/schemas/UserProfile"
                         }
-                      ]
+                      ],
+                      "type": "object"
                     },
                     "compare": {
                       "description": "?compare=true かつ認証済みの場合のみ返る",
@@ -452,7 +454,8 @@
                                 {
                                   "$ref": "#/components/schemas/RadarStats"
                                 }
-                              ]
+                              ],
+                              "type": "object"
                             }
                           }
                         }
@@ -5194,7 +5197,8 @@
                             }
                           }
                         }
-                      ]
+                      ],
+                      "type": "object"
                     }
                   }
                 }
@@ -7369,7 +7373,8 @@
                         }
                       }
                     }
-                  ]
+                  ],
+                  "type": "object"
                 }
               }
             },
@@ -9502,7 +9507,8 @@
                             "type": "string"
                           }
                         }
-                      ]
+                      ],
+                      "type": "object"
                     }
                   }
                 }
@@ -9684,7 +9690,8 @@
                     {
                       "$ref": "#/components/schemas/AreaRankInfo"
                     }
-                  ]
+                  ],
+                  "type": "object"
                 }
               }
             },
@@ -12597,7 +12604,8 @@
                   }
                 }
               }
-            ]
+            ],
+            "type": "object"
           },
           "stats": {
             "type": "array",
@@ -12611,7 +12619,8 @@
               {
                 "$ref": "#/components/schemas/AreaRankInfo"
               }
-            ]
+            ],
+            "type": "object"
           }
         }
       },
@@ -12877,8 +12886,7 @@
             "nullable": true
           },
           "clearState": {
-            "$ref": "#/components/schemas/ClearState",
-            "nullable": true
+            "$ref": "#/components/schemas/ClearState"
           },
           "missCount": {
             "type": "integer",
@@ -12958,8 +12966,7 @@
                   "format": "float"
                 },
                 "clearState": {
-                  "$ref": "#/components/schemas/ClearState",
-                  "nullable": true
+                  "$ref": "#/components/schemas/ClearState"
                 }
               }
             }
@@ -13217,8 +13224,7 @@
             "format": "float"
           },
           "clearState": {
-            "$ref": "#/components/schemas/ClearState",
-            "nullable": true
+            "$ref": "#/components/schemas/ClearState"
           },
           "lastPlayed": {
             "type": "string",
@@ -13293,7 +13299,8 @@
                   }
                 }
               }
-            ]
+            ],
+            "type": "object"
           },
           "radar": {
             "$ref": "#/components/schemas/RadarStats"
@@ -13494,8 +13501,7 @@
                     "nullable": true
                   },
                   "clearState": {
-                    "$ref": "#/components/schemas/ClearState",
-                    "nullable": true
+                    "$ref": "#/components/schemas/ClearState"
                   },
                   "diffFromOpponentEx": {
                     "type": "integer"
@@ -13506,7 +13512,8 @@
                   }
                 }
               }
-            ]
+            ],
+            "type": "object"
           }
         }
       },
@@ -13664,7 +13671,8 @@
                   }
                 }
               }
-            ]
+            ],
+            "type": "object"
           },
           "diff": {
             "type": "object",
@@ -13715,7 +13723,8 @@
                   }
                 }
               }
-            ]
+            ],
+            "type": "object"
           }
         }
       },
@@ -14335,7 +14344,8 @@
                   "properties": {}
                 }
               }
-            ]
+            ],
+            "type": "object"
           }
         }
       },
