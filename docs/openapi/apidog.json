@@ -1301,56 +1301,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "description": "キーは IIDX バージョン番号",
-                  "additionalProperties": {
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "logId": {
-                          "type": "integer"
-                        },
-                        "userId": {
-                          "type": "string"
-                        },
-                        "songId": {
-                          "type": "integer"
-                        },
-                        "definitionId": {
-                          "type": "integer",
-                          "nullable": true
-                        },
-                        "exScore": {
-                          "type": "integer"
-                        },
-                        "bpi": {
-                          "type": "number",
-                          "format": "float",
-                          "nullable": true
-                        },
-                        "clearState": {
-                          "$ref": "#/components/schemas/ClearState"
-                        },
-                        "missCount": {
-                          "type": "integer",
-                          "nullable": true
-                        },
-                        "lastPlayed": {
-                          "type": "string",
-                          "format": "date-time"
-                        },
-                        "version": {
-                          "$ref": "#/components/schemas/IIDXVersion"
-                        },
-                        "batchId": {
-                          "type": "string",
-                          "nullable": true
-                        }
-                      }
-                    }
-                  },
-                  "properties": {}
+                  "$ref": "#/components/schemas/ScoreHistoryByVersion"
                 }
               }
             },
@@ -1582,7 +1533,14 @@
         "responses": {
           "200": {
             "description": "スコア履歴",
-            "headers": {}
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScoreHistoryByVersion"
+                }
+              }
+            }
           },
           "400": {
             "description": "パラメータ不足",
@@ -2097,8 +2055,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "type": "object",
-                    "properties": {}
+                    "$ref": "#/components/schemas/TimelineBatchEntry"
                   }
                 }
               }
@@ -2186,7 +2143,7 @@
                     "songs": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/LogEntry"
+                        "$ref": "#/components/schemas/BatchScoreEntry"
                       }
                     },
                     "pagination": {
@@ -2222,138 +2179,6 @@
           },
           "404": {
             "description": "バッチが見つからない",
-            "headers": {},
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorMessage"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "headers": {},
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorMessage"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      }
-    },
-    "/users/{userId}/batches/{date}/scores": {
-      "get": {
-        "summary": "日次サマリーのスコア詳細取得",
-        "deprecated": false,
-        "description": "指定した日の全バッチを集約した詳細を返します。`groupedBy` で集計軸を切り替えられます。\n公開ユーザーは認証不要。非公開ユーザーは Bearer トークン（本人）が必要です。\n",
-        "tags": [
-          "Logs"
-        ],
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "path",
-            "description": "ターゲットユーザーの Firebase UID",
-            "required": true,
-            "example": "",
-            "schema": {
-              "type": "string",
-              "example": "abc123uid"
-            }
-          },
-          {
-            "name": "date",
-            "in": "path",
-            "description": "日付文字列 (YYYY-MM-DD) またはバッチ ID",
-            "required": true,
-            "example": "",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "version",
-            "in": "query",
-            "description": "IIDX バージョン番号 (26〜33)",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/IIDXVersion"
-            }
-          },
-          {
-            "name": "type",
-            "in": "query",
-            "description": "集計単位（デフォルト: day）",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "day",
-                "week",
-                "month"
-              ],
-              "default": "day"
-            }
-          },
-          {
-            "name": "groupedBy",
-            "in": "query",
-            "description": "`lastPlayed` でプレイ日時ベース、未指定でバッチ (インポート日時) ベース。",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "lastPlayed",
-                "createdAt"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "サマリー詳細",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "songs": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/LogEntry"
-                      }
-                    },
-                    "pagination": {
-                      "$ref": "#/components/schemas/BatchPagination"
-                    }
-                  }
-                }
-              }
-            },
-            "headers": {}
-          },
-          "403": {
-            "description": "アクセス権限なし",
-            "headers": {},
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorMessage"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "対象期間にログなし",
             "headers": {},
             "content": {
               "application/json": {
@@ -2599,8 +2424,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "type": "object",
-                    "properties": {}
+                    "$ref": "#/components/schemas/NotificationEntry"
                   }
                 }
               }
@@ -2730,8 +2554,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {}
+                  "$ref": "#/components/schemas/UnreadNotificationCount"
                 }
               }
             },
@@ -2850,8 +2673,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {}
+                  "$ref": "#/components/schemas/FollowListResult"
                 }
               }
             },
@@ -2950,8 +2772,26 @@
         ],
         "responses": {
           "200": {
-            "description": "フォロー成功",
-            "headers": {}
+            "description": "フォロー結果",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "isFollowing": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "自分自身へのフォローまたはパラメータ不正",
@@ -3050,8 +2890,26 @@
         ],
         "responses": {
           "200": {
-            "description": "アンフォロー成功",
-            "headers": {}
+            "description": "アンフォロー結果",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "isFollowing": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "パラメータ不正",
@@ -3204,7 +3062,19 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "properties": {}
+                  "properties": {
+                    "timeline": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/TimelineFeedEntry"
+                      }
+                    },
+                    "nextId": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "次ページ取得用カーソル（前ページ末尾の lastPlayed）"
+                    }
+                  }
                 }
               }
             },
@@ -3714,25 +3584,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "type": "object",
-                    "properties": {
-                      "totalBpi": {
-                        "type": "number"
-                      },
-                      "count": {
-                        "type": "integer"
-                      }
-                    }
-                  },
-                  "properties": {},
-                  "example": {
-                    "NOTES": {
-                      "totalBpi": 45.5,
-                      "count": 120
-                    }
-                  }
+                  "$ref": "#/components/schemas/RadarDetail"
                 }
               }
             },
@@ -4112,8 +3964,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "type": "object",
-                    "properties": {}
+                    "$ref": "#/components/schemas/AaaDifficultyEntry"
                   }
                 }
               }
@@ -4340,8 +4191,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {}
+                  "$ref": "#/components/schemas/SongRankingResult"
                 }
               }
             },
@@ -4951,7 +4801,17 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "properties": {}
+                  "properties": {
+                    "songId": {
+                      "type": "integer"
+                    },
+                    "version": {
+                      "$ref": "#/components/schemas/IIDXVersion"
+                    },
+                    "rival": {
+                      "$ref": "#/components/schemas/RivalSongScore"
+                    }
+                  }
                 }
               }
             },
@@ -5278,8 +5138,7 @@
                     "rivals": {
                       "type": "array",
                       "items": {
-                        "type": "object",
-                        "properties": {}
+                        "$ref": "#/components/schemas/RivalSongScore"
                       }
                     }
                   }
@@ -5567,7 +5426,29 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "properties": {}
+                  "properties": {
+                    "viewer": {
+                      "type": "object",
+                      "properties": {
+                        "userId": {
+                          "type": "string"
+                        },
+                        "totalBpi": {
+                          "type": "number",
+                          "format": "float"
+                        },
+                        "radar": {
+                          "$ref": "#/components/schemas/RadarDetail"
+                        }
+                      }
+                    },
+                    "users": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/SuggestedUser"
+                      }
+                    }
+                  }
                 }
               }
             },
@@ -5872,26 +5753,11 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "nullable": true,
+                  "description": "アリーナランクをキーとした平均スコア。難易度が 11/12 以外、またはデータ未生成の場合は null",
                   "additionalProperties": {
-                    "type": "object",
-                    "properties": {
-                      "avgExScore": {
-                        "type": "number"
-                      },
-                      "rate": {
-                        "type": "number"
-                      },
-                      "count": {
-                        "type": "integer"
-                      },
-                      "avgBpi": {
-                        "type": "number",
-                        "nullable": true
-                      }
-                    }
-                  },
-                  "properties": {},
-                  "nullable": true
+                    "$ref": "#/components/schemas/ArenaAverageEntry"
+                  }
                 }
               }
             },
@@ -6142,35 +6008,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "steps": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {}
-                      }
-                    },
-                    "currentTotalBpi": {
-                      "type": "number"
-                    },
-                    "targetTotalBpi": {
-                      "type": "number"
-                    },
-                    "achievable": {
-                      "type": "boolean"
-                    },
-                    "alreadyAchieved": {
-                      "type": "boolean"
-                    },
-                    "totalSongCount": {
-                      "type": "integer"
-                    },
-                    "autoAdjustmentNote": {
-                      "type": "string",
-                      "nullable": true
-                    }
-                  }
+                  "$ref": "#/components/schemas/OptimizationResult"
                 }
               }
             },
@@ -6257,7 +6095,21 @@
                   "type": "array",
                   "items": {
                     "type": "object",
-                    "properties": {}
+                    "properties": {
+                      "reportId": {
+                        "type": "string"
+                      },
+                      "targetBpi": {
+                        "type": "number"
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "reportData": {
+                        "$ref": "#/components/schemas/OptimizationResult"
+                      }
+                    }
                   }
                 }
               }
@@ -7139,6 +6991,874 @@
               "type": "object",
               "properties": {}
             }
+          }
+        }
+      },
+      "ScoreRecord": {
+        "type": "object",
+        "description": "scores / allScores テーブルの1レコード",
+        "properties": {
+          "logId": {
+            "type": "integer"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "songId": {
+            "type": "integer"
+          },
+          "definitionId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "exScore": {
+            "type": "integer"
+          },
+          "bpi": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "clearState": {
+            "$ref": "#/components/schemas/ClearState",
+            "nullable": true
+          },
+          "missCount": {
+            "type": "integer",
+            "nullable": true
+          },
+          "scoreClass": {
+            "type": "integer",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastPlayed": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "$ref": "#/components/schemas/IIDXVersion"
+          },
+          "batchId": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ScoreHistoryByVersion": {
+        "type": "object",
+        "description": "IIDX バージョン番号をキーとし、そのバージョンのスコア履歴（新しい順）を値とするマップ",
+        "additionalProperties": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ScoreRecord"
+          }
+        }
+      },
+      "TimelineBatchEntry": {
+        "type": "object",
+        "description": "バッチ（またはプレイ日）単位の TotalBPI 推移エントリ",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "batchId": {
+            "type": "string"
+          },
+          "version": {
+            "$ref": "#/components/schemas/IIDXVersion"
+          },
+          "totalBpi": {
+            "type": "number",
+            "format": "float"
+          },
+          "songCount": {
+            "type": "integer"
+          },
+          "diff": {
+            "type": "number",
+            "format": "float",
+            "description": "前エントリからの TotalBPI 増減"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "topScores": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "bpi": {
+                  "type": "number",
+                  "format": "float"
+                },
+                "clearState": {
+                  "$ref": "#/components/schemas/ClearState",
+                  "nullable": true
+                }
+              }
+            }
+          }
+        }
+      },
+      "NotificationEntry": {
+        "type": "object",
+        "description": "通知1件。種別により songTitle 等の有無が変わる",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "follow",
+              "overtaken",
+              "followApproved"
+            ]
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "senderName": {
+            "type": "string"
+          },
+          "senderImage": {
+            "type": "string",
+            "nullable": true
+          },
+          "senderId": {
+            "type": "string"
+          },
+          "songTitle": {
+            "type": "string",
+            "nullable": true
+          },
+          "songDifficulty": {
+            "type": "string",
+            "nullable": true
+          },
+          "rivalScore": {
+            "type": "integer",
+            "nullable": true
+          },
+          "myScore": {
+            "type": "integer",
+            "nullable": true
+          },
+          "songId": {
+            "type": "integer",
+            "nullable": true
+          }
+        }
+      },
+      "UnreadNotificationCount": {
+        "type": "object",
+        "required": [
+          "total"
+        ],
+        "properties": {
+          "total": {
+            "type": "integer",
+            "description": "未読通知の合計件数"
+          }
+        }
+      },
+      "RadarCategoryResult": {
+        "type": "object",
+        "properties": {
+          "totalBpi": {
+            "type": "number",
+            "format": "float"
+          },
+          "songs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "difficulty": {
+                  "type": "string"
+                },
+                "exScore": {
+                  "type": "integer",
+                  "nullable": true
+                },
+                "notes": {
+                  "type": "integer",
+                  "nullable": true
+                },
+                "bpi": {
+                  "type": "number",
+                  "format": "float"
+                }
+              }
+            }
+          }
+        }
+      },
+      "RadarDetail": {
+        "type": "object",
+        "description": "6 レーダーカテゴリそれぞれの総合 BPI と対象楽曲リスト",
+        "properties": {
+          "NOTES": {
+            "$ref": "#/components/schemas/RadarCategoryResult"
+          },
+          "CHORD": {
+            "$ref": "#/components/schemas/RadarCategoryResult"
+          },
+          "PEAK": {
+            "$ref": "#/components/schemas/RadarCategoryResult"
+          },
+          "CHARGE": {
+            "$ref": "#/components/schemas/RadarCategoryResult"
+          },
+          "SCRATCH": {
+            "$ref": "#/components/schemas/RadarCategoryResult"
+          },
+          "SOFLAN": {
+            "$ref": "#/components/schemas/RadarCategoryResult"
+          }
+        }
+      },
+      "FollowUser": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "userName": {
+            "type": "string"
+          },
+          "profileImage": {
+            "type": "string",
+            "nullable": true
+          },
+          "profileText": {
+            "type": "string",
+            "nullable": true
+          },
+          "iidxId": {
+            "type": "string",
+            "nullable": true
+          },
+          "isPublic": {
+            "type": "integer",
+            "enum": [
+              0,
+              1
+            ]
+          },
+          "followedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "totalBpi": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "arenaClass": {
+            "type": "string",
+            "nullable": true
+          },
+          "isSelf": {
+            "type": "boolean"
+          },
+          "isViewerFollowing": {
+            "type": "boolean"
+          }
+        }
+      },
+      "FollowListResult": {
+        "type": "object",
+        "properties": {
+          "users": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FollowUser"
+            }
+          },
+          "totalCount": {
+            "type": "integer"
+          }
+        }
+      },
+      "SongRankingResult": {
+        "type": "object",
+        "properties": {
+          "rankings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "rank": {
+                  "type": "integer"
+                },
+                "userId": {
+                  "type": "string"
+                },
+                "userName": {
+                  "type": "string"
+                },
+                "profileImage": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "exScore": {
+                  "type": "integer",
+                  "nullable": true
+                },
+                "bpi": {
+                  "type": "number",
+                  "format": "float",
+                  "nullable": true
+                },
+                "isSelf": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "totalCount": {
+            "type": "integer"
+          },
+          "selfRank": {
+            "type": "integer",
+            "description": "自分の順位。ランキング外なら 0"
+          }
+        }
+      },
+      "RivalSongScore": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "nullable": true
+          },
+          "userName": {
+            "type": "string",
+            "nullable": true
+          },
+          "profileImage": {
+            "type": "string",
+            "nullable": true
+          },
+          "exScore": {
+            "type": "integer",
+            "nullable": true
+          },
+          "bpi": {
+            "type": "number",
+            "format": "float"
+          },
+          "clearState": {
+            "$ref": "#/components/schemas/ClearState",
+            "nullable": true
+          },
+          "lastPlayed": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "metadata": {
+            "type": "object",
+            "properties": {
+              "wrScore": {
+                "type": "integer",
+                "nullable": true
+              },
+              "kaidenAvg": {
+                "type": "integer",
+                "nullable": true
+              }
+            }
+          }
+        }
+      },
+      "SuggestedUser": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "iidxId": {
+            "type": "string",
+            "nullable": true
+          },
+          "userName": {
+            "type": "string"
+          },
+          "profileImage": {
+            "type": "string",
+            "nullable": true
+          },
+          "profileText": {
+            "type": "string",
+            "nullable": true
+          },
+          "arenaClass": {
+            "type": "string",
+            "nullable": true
+          },
+          "totalBpi": {
+            "type": "number",
+            "format": "float"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "最終スコア更新日時（バッチ作成時刻）"
+          },
+          "role": {
+            "nullable": true,
+            "allOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "role": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "grantedAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              }
+            ]
+          },
+          "radar": {
+            "$ref": "#/components/schemas/RadarStats"
+          }
+        }
+      },
+      "OptimizationStep": {
+        "type": "object",
+        "properties": {
+          "rank": {
+            "type": "integer"
+          },
+          "songId": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "difficulty": {
+            "type": "string"
+          },
+          "difficultyLevel": {
+            "type": "integer"
+          },
+          "fromBpi": {
+            "type": "number"
+          },
+          "toBpi": {
+            "type": "number"
+          },
+          "fromExScore": {
+            "type": "integer",
+            "nullable": true
+          },
+          "toExScore": {
+            "type": "integer"
+          },
+          "exScoreGap": {
+            "type": "integer"
+          },
+          "bpiGain": {
+            "type": "number"
+          },
+          "cumulativeTotalBpi": {
+            "type": "number"
+          },
+          "isUnplayed": {
+            "type": "boolean"
+          },
+          "radarCategory": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "NOTES",
+              "CHORD",
+              "PEAK",
+              "CHARGE",
+              "SCRATCH",
+              "SOFLAN",
+              null
+            ]
+          },
+          "isRadarStrength": {
+            "type": "boolean"
+          }
+        }
+      },
+      "OptimizationResult": {
+        "type": "object",
+        "required": [
+          "steps",
+          "currentTotalBpi",
+          "targetTotalBpi",
+          "achievable",
+          "alreadyAchieved",
+          "totalSongCount"
+        ],
+        "properties": {
+          "steps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OptimizationStep"
+            }
+          },
+          "currentTotalBpi": {
+            "type": "number"
+          },
+          "targetTotalBpi": {
+            "type": "number"
+          },
+          "originalTargetTotalBpi": {
+            "type": "number"
+          },
+          "achievable": {
+            "type": "boolean"
+          },
+          "alreadyAchieved": {
+            "type": "boolean"
+          },
+          "totalSongCount": {
+            "type": "integer"
+          },
+          "autoAdjustmentNote": {
+            "type": "string"
+          },
+          "maxAchievableBpi": {
+            "type": "number"
+          }
+        }
+      },
+      "TimelineFeedEntry": {
+        "type": "object",
+        "properties": {
+          "logId": {
+            "type": "integer"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "userName": {
+            "type": "string"
+          },
+          "profileImage": {
+            "type": "string",
+            "nullable": true
+          },
+          "songId": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "difficulty": {
+            "type": "string"
+          },
+          "difficultyLevel": {
+            "type": "integer"
+          },
+          "lastPlayed": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "wrScore": {
+            "type": "integer",
+            "nullable": true
+          },
+          "kaidenAvg": {
+            "type": "integer",
+            "nullable": true
+          },
+          "isOvertaken": {
+            "type": "boolean"
+          },
+          "opponentScore": {
+            "type": "object",
+            "properties": {
+              "currentEx": {
+                "type": "integer"
+              },
+              "prevEx": {
+                "type": "integer",
+                "nullable": true
+              },
+              "diffEx": {
+                "type": "integer",
+                "nullable": true
+              },
+              "currentBpi": {
+                "type": "number",
+                "format": "float"
+              },
+              "prevBpi": {
+                "type": "number",
+                "format": "float",
+                "nullable": true
+              },
+              "diffBpi": {
+                "type": "number",
+                "format": "float",
+                "nullable": true
+              }
+            }
+          },
+          "viewerScore": {
+            "nullable": true,
+            "allOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "exScore": {
+                    "type": "integer",
+                    "nullable": true
+                  },
+                  "bpi": {
+                    "type": "number",
+                    "format": "float",
+                    "nullable": true
+                  },
+                  "clearState": {
+                    "$ref": "#/components/schemas/ClearState",
+                    "nullable": true
+                  },
+                  "diffFromOpponentEx": {
+                    "type": "integer"
+                  },
+                  "diffFromOpponentBpi": {
+                    "type": "number",
+                    "format": "float"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "AaaTarget": {
+        "type": "object",
+        "properties": {
+          "exScore": {
+            "type": "integer"
+          },
+          "targetBpi": {
+            "type": "number",
+            "format": "float"
+          },
+          "diff": {
+            "type": "integer",
+            "description": "現在の EX スコア - 目標 EX スコア"
+          }
+        }
+      },
+      "AaaDifficultyEntry": {
+        "type": "object",
+        "properties": {
+          "songId": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "difficulty": {
+            "$ref": "#/components/schemas/Difficulty"
+          },
+          "notes": {
+            "type": "integer"
+          },
+          "releasedVersion": {
+            "type": "integer",
+            "nullable": true
+          },
+          "maxScore": {
+            "type": "integer"
+          },
+          "targets": {
+            "type": "object",
+            "required": [
+              "aaa",
+              "maxMinus"
+            ],
+            "properties": {
+              "aaa": {
+                "$ref": "#/components/schemas/AaaTarget"
+              },
+              "maxMinus": {
+                "$ref": "#/components/schemas/AaaTarget"
+              },
+              "custom": {
+                "$ref": "#/components/schemas/AaaTarget"
+              }
+            }
+          },
+          "user": {
+            "type": "object",
+            "properties": {
+              "exScore": {
+                "type": "integer"
+              },
+              "bpi": {
+                "type": "number",
+                "format": "float"
+              },
+              "isAaa": {
+                "type": "boolean"
+              },
+              "isMaxMinus": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "BatchScoreEntry": {
+        "type": "object",
+        "properties": {
+          "songId": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "difficulty": {
+            "type": "string"
+          },
+          "difficultyLevel": {
+            "type": "integer"
+          },
+          "level": {
+            "type": "integer"
+          },
+          "notes": {
+            "type": "integer"
+          },
+          "bpm": {
+            "type": "string",
+            "nullable": true
+          },
+          "releasedVersion": {
+            "type": "integer",
+            "nullable": true
+          },
+          "current": {
+            "type": "object",
+            "properties": {
+              "exScore": {
+                "type": "integer"
+              },
+              "bpi": {
+                "type": "number",
+                "format": "float"
+              },
+              "clearState": {
+                "type": "string",
+                "nullable": true
+              },
+              "missCount": {
+                "type": "integer",
+                "nullable": true
+              },
+              "lastPlayedAt": {
+                "type": "string",
+                "format": "date-time",
+                "nullable": true
+              }
+            }
+          },
+          "previous": {
+            "nullable": true,
+            "allOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "exScore": {
+                    "type": "integer"
+                  },
+                  "bpi": {
+                    "type": "number",
+                    "format": "float",
+                    "nullable": true
+                  },
+                  "clearState": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "missCount": {
+                    "type": "integer",
+                    "nullable": true
+                  }
+                }
+              }
+            ]
+          },
+          "diff": {
+            "type": "object",
+            "properties": {
+              "exScore": {
+                "type": "integer"
+              },
+              "bpi": {
+                "type": "number",
+                "format": "float"
+              }
+            }
+          },
+          "wrScore": {
+            "type": "integer",
+            "nullable": true
+          },
+          "kaidenAvg": {
+            "type": "integer",
+            "nullable": true
+          },
+          "coef": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "overtaken": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "rivalRankInfo": {
+            "nullable": true,
+            "allOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "myRankBefore": {
+                    "type": "integer"
+                  },
+                  "myRankAfter": {
+                    "type": "integer"
+                  },
+                  "totalRivals": {
+                    "type": "integer"
+                  }
+                }
+              }
+            ]
           }
         }
       }
