@@ -202,7 +202,8 @@
                                 }
                               }
                             }
-                          ]
+                          ],
+                          "type": "object"
                         }
                       },
                       "nullable": true
@@ -432,7 +433,8 @@
                         {
                           "$ref": "#/components/schemas/UserProfile"
                         }
-                      ]
+                      ],
+                      "type": "object"
                     },
                     "compare": {
                       "description": "?compare=true かつ認証済みの場合のみ返る",
@@ -452,7 +454,8 @@
                                 {
                                   "$ref": "#/components/schemas/RadarStats"
                                 }
-                              ]
+                              ],
+                              "type": "object"
                             }
                           }
                         }
@@ -5194,7 +5197,8 @@
                             }
                           }
                         }
-                      ]
+                      ],
+                      "type": "object"
                     }
                   }
                 }
@@ -6730,6 +6734,5669 @@
         },
         "security": []
       }
+    },
+    "/songs": {
+      "get": {
+        "summary": "楽曲マスタ一覧取得",
+        "deprecated": false,
+        "tags": [
+          "Songs"
+        ],
+        "parameters": [
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "description": "IIDX バージョン番号。未指定・不正値は最新にフォールバック",
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "楽曲一覧（タイトル・難易度昇順）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Song"
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/songs/{songId}": {
+      "get": {
+        "summary": "楽曲情報取得",
+        "deprecated": false,
+        "tags": [
+          "Songs"
+        ],
+        "parameters": [
+          {
+            "name": "songId",
+            "in": "path",
+            "required": true,
+            "description": "楽曲 ID",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "楽曲情報",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Song"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "songId が不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "楽曲が見つからない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/songs/{songId}/ranking": {
+      "get": {
+        "summary": "楽曲別ランキング取得（☆11/☆12）",
+        "deprecated": false,
+        "tags": [
+          "Songs"
+        ],
+        "parameters": [
+          {
+            "name": "songId",
+            "in": "path",
+            "required": true,
+            "description": "楽曲 ID",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "description": "IIDX バージョン番号。未指定・不正値は最新にフォールバック",
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ランキング。認証時は自分のエントリが isSelf=true",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SongRankingResult"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "songId が不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/songs/{songId}/similar": {
+      "get": {
+        "summary": "類似楽曲取得（属性ベクトル距離）",
+        "deprecated": false,
+        "tags": [
+          "Songs"
+        ],
+        "parameters": [
+          {
+            "name": "songId",
+            "in": "path",
+            "required": true,
+            "description": "楽曲 ID",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "description": "IIDX バージョン番号。未指定・不正値は最新にフォールバック",
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "取得件数",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 10
+            }
+          },
+          {
+            "name": "mode",
+            "in": "query",
+            "required": false,
+            "description": "属性の算出元",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "profile",
+                "global"
+              ],
+              "default": "profile"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "類似楽曲リスト（距離が近い順）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Song"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "distance": {
+                            "type": "number",
+                            "format": "float",
+                            "description": "属性ベクトルのユークリッド距離"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "songId が不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/songs/{songId}/patterns": {
+      "get": {
+        "summary": "運指パターン一覧取得",
+        "deprecated": false,
+        "tags": [
+          "Songs"
+        ],
+        "parameters": [
+          {
+            "name": "songId",
+            "in": "path",
+            "required": true,
+            "description": "楽曲 ID",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "ページングカーソル（オフセット）",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "required": false,
+            "description": "並び順",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "score",
+                "upvote"
+              ],
+              "default": "score"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "パターン一覧ページ（認証時は myVote を含む）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "pattern": {
+                            "type": "string",
+                            "description": "7 桁の運指文字列"
+                          },
+                          "upvotes": {
+                            "type": "integer"
+                          },
+                          "downvotes": {
+                            "type": "integer"
+                          },
+                          "myVote": {
+                            "type": "string",
+                            "nullable": true,
+                            "enum": [
+                              "upvote",
+                              "downvote",
+                              null
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    "nextCursor": {
+                      "type": "integer",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "songId / cursor が不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/songs/{songId}/patterns/{pattern}/vote": {
+      "post": {
+        "summary": "運指パターンへ投票",
+        "deprecated": false,
+        "tags": [
+          "Songs"
+        ],
+        "parameters": [
+          {
+            "name": "songId",
+            "in": "path",
+            "required": true,
+            "description": "楽曲 ID",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pattern",
+            "in": "path",
+            "required": true,
+            "description": "7 桁の運指文字列",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "voteType"
+                ],
+                "properties": {
+                  "voteType": {
+                    "type": "string",
+                    "enum": [
+                      "upvote",
+                      "downvote"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "投票成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "pattern / voteType が不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "運指パターンへの投票を取り消し",
+        "deprecated": false,
+        "tags": [
+          "Songs"
+        ],
+        "parameters": [
+          {
+            "name": "songId",
+            "in": "path",
+            "required": true,
+            "description": "楽曲 ID",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pattern",
+            "in": "path",
+            "required": true,
+            "description": "7 桁の運指文字列",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "取り消し成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "pattern が不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/songs/{songId}/patterns/search": {
+      "get": {
+        "summary": "運指パターン完全一致検索",
+        "deprecated": false,
+        "tags": [
+          "Songs"
+        ],
+        "parameters": [
+          {
+            "name": "songId",
+            "in": "path",
+            "required": true,
+            "description": "楽曲 ID",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "description": "7 桁の運指文字列",
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{7}$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "一致したパターン（無ければ null）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "nullable": true,
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "pattern": {
+                          "type": "string"
+                        },
+                        "upvotes": {
+                          "type": "integer"
+                        },
+                        "downvotes": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "q が 7 桁数字でない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "一致なし（本文は null）",
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/songs/{songId}/notes": {
+      "get": {
+        "summary": "楽曲メモ一覧取得",
+        "deprecated": false,
+        "tags": [
+          "Songs"
+        ],
+        "parameters": [
+          {
+            "name": "songId",
+            "in": "path",
+            "required": true,
+            "description": "楽曲 ID",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "並び順",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "latest",
+                "bpi"
+              ],
+              "default": "latest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "メモ一覧（認証時は upvoted / editable を反映）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SongNote"
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "songId が不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          }
+        },
+        "security": []
+      },
+      "post": {
+        "summary": "楽曲メモ投稿",
+        "deprecated": false,
+        "tags": [
+          "Songs"
+        ],
+        "parameters": [
+          {
+            "name": "songId",
+            "in": "path",
+            "required": true,
+            "description": "楽曲 ID",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "body"
+                ],
+                "properties": {
+                  "body": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2000
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "投稿成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "body が空 / 2000 文字超",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/songs/{songId}/notes/{noteId}": {
+      "patch": {
+        "summary": "楽曲メモ編集",
+        "deprecated": false,
+        "tags": [
+          "Songs"
+        ],
+        "parameters": [
+          {
+            "name": "songId",
+            "in": "path",
+            "required": true,
+            "description": "楽曲 ID",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "noteId",
+            "in": "path",
+            "required": true,
+            "description": "メモ ID",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "body"
+                ],
+                "properties": {
+                  "body": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2000
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "更新成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "body が空 / 2000 文字超",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "403": {
+            "description": "投稿者本人でない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "メモが存在しない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "楽曲メモ削除",
+        "deprecated": false,
+        "tags": [
+          "Songs"
+        ],
+        "parameters": [
+          {
+            "name": "songId",
+            "in": "path",
+            "required": true,
+            "description": "楽曲 ID",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "noteId",
+            "in": "path",
+            "required": true,
+            "description": "メモ ID",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "削除成功",
+            "headers": {}
+          },
+          "400": {
+            "description": "noteId が不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "403": {
+            "description": "投稿者本人でない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "メモが存在しない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/songs/{songId}/notes/{noteId}/upvote": {
+      "post": {
+        "summary": "楽曲メモへ高評価",
+        "deprecated": false,
+        "tags": [
+          "Songs"
+        ],
+        "parameters": [
+          {
+            "name": "songId",
+            "in": "path",
+            "required": true,
+            "description": "楽曲 ID",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "noteId",
+            "in": "path",
+            "required": true,
+            "description": "メモ ID",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "高評価後の合計数",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "upvoteCount": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "noteId が不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "メモが存在しない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "楽曲メモの高評価を取り消し",
+        "deprecated": false,
+        "tags": [
+          "Songs"
+        ],
+        "parameters": [
+          {
+            "name": "songId",
+            "in": "path",
+            "required": true,
+            "description": "楽曲 ID",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "noteId",
+            "in": "path",
+            "required": true,
+            "description": "メモ ID",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "取り消し後の合計数",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "upvoteCount": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "noteId が不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "メモが存在しない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/songs/notes/recent": {
+      "get": {
+        "summary": "最近の楽曲メモ一覧取得（全楽曲横断）",
+        "deprecated": false,
+        "tags": [
+          "Songs"
+        ],
+        "parameters": [
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "並び順",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "latest",
+                "upvotes"
+              ],
+              "default": "latest"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "0 始まりのページ番号（1 ページ 20 件）",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "メモ一覧",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RecentSongNote"
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/follow-requests": {
+      "post": {
+        "summary": "招待トークンでフォローリクエスト送信",
+        "deprecated": false,
+        "tags": [
+          "Social"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "token"
+                ],
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "公開ユーザーのため即フォロー成立",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "followed"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "201": {
+            "description": "リクエスト送信（承認待ち）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "requested"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "対象が見つからない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/follow-requests/{targetUserId}": {
+      "delete": {
+        "summary": "自分が送ったフォローリクエストを取り下げ",
+        "deprecated": false,
+        "tags": [
+          "Social"
+        ],
+        "parameters": [
+          {
+            "name": "targetUserId",
+            "in": "path",
+            "required": true,
+            "description": "リクエスト先ユーザーの Firebase UID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "取り下げ結果",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "withdrawn": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/follow-requests": {
+      "get": {
+        "summary": "自分宛の承認待ち一覧取得",
+        "deprecated": false,
+        "tags": [
+          "Social"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "承認待ち（送信/フォロー日時の昇順）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "requests": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PendingFollowRequest"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/follow-requests/{requestId}": {
+      "post": {
+        "summary": "フォローリクエストを承認",
+        "deprecated": false,
+        "tags": [
+          "Social"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "requestId",
+            "in": "path",
+            "required": true,
+            "description": "フォローリクエスト ID",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "承認成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "approved"
+                      ]
+                    },
+                    "requesterId": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "対象が見つからない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "フォローリクエストを却下",
+        "deprecated": false,
+        "tags": [
+          "Social"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "requestId",
+            "in": "path",
+            "required": true,
+            "description": "フォローリクエスト ID",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "却下成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "rejected"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "対象が見つからない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/followers/{followerId}": {
+      "post": {
+        "summary": "承認記録のない既存フォロワーを事後承認",
+        "deprecated": false,
+        "tags": [
+          "Social"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "followerId",
+            "in": "path",
+            "required": true,
+            "description": "対象フォロワーの Firebase UID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "事後承認成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "approved"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "対象が見つからない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "指定フォロワーを強制フォロー解除",
+        "deprecated": false,
+        "tags": [
+          "Social"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "followerId",
+            "in": "path",
+            "required": true,
+            "description": "対象フォロワーの Firebase UID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "解除成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "removed"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "対象が見つからない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/follow-invite": {
+      "get": {
+        "summary": "フォロー招待URLトークン取得",
+        "deprecated": false,
+        "tags": [
+          "Social"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "現在のトークン（未発行なら null）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "フォロー招待URLトークンを発行/再発行",
+        "deprecated": false,
+        "tags": [
+          "Social"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "新しいトークン",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/invite/{token}": {
+      "get": {
+        "summary": "招待トークンの解決",
+        "deprecated": false,
+        "tags": [
+          "Social"
+        ],
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "description": "招待URLのトークン（秘密情報）",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "招待情報（認証時は isFollowing / hasPendingRequest も反映）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "follow"
+                      ]
+                    },
+                    "userId": {
+                      "type": "string"
+                    },
+                    "userName": {
+                      "type": "string"
+                    },
+                    "profileImage": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "isFollowing": {
+                      "type": "boolean"
+                    },
+                    "hasPendingRequest": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "token が不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "無効な招待リンク",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "429": {
+            "description": "レート制限（60 秒あたり 30 回）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/users/{userId}/follow-lists": {
+      "get": {
+        "summary": "フォローリスト一覧取得",
+        "deprecated": false,
+        "tags": [
+          "Social"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "リスト一覧（メンバー数付き）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "lists": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/FollowListSummary"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "フォローリスト作成",
+        "deprecated": false,
+        "tags": [
+          "Social"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
+                  },
+                  "isPublic": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "作成成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/follow-lists/{listId}": {
+      "patch": {
+        "summary": "フォローリストの改名・公開設定変更",
+        "deprecated": false,
+        "tags": [
+          "Social"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "listId",
+            "in": "path",
+            "required": true,
+            "description": "フォローリスト ID",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "name / isPublic のいずれか一方以上が必須",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
+                  },
+                  "isPublic": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "更新成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "updated"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "対象が見つからない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "フォローリスト削除",
+        "deprecated": false,
+        "tags": [
+          "Social"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "listId",
+            "in": "path",
+            "required": true,
+            "description": "フォローリスト ID",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "削除成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "deleted"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "対象が見つからない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/follow-lists/{listId}/members/{followingId}": {
+      "put": {
+        "summary": "フォローリストにユーザー追加",
+        "deprecated": false,
+        "tags": [
+          "Social"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "listId",
+            "in": "path",
+            "required": true,
+            "description": "フォローリスト ID",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "followingId",
+            "in": "path",
+            "required": true,
+            "description": "リストに出し入れするフォロー中ユーザーの Firebase UID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "追加成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "added"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "未フォローのユーザー / パラメータ不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "リストが存在しない / 本人所有でない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "フォローリストからユーザー削除",
+        "deprecated": false,
+        "tags": [
+          "Social"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "listId",
+            "in": "path",
+            "required": true,
+            "description": "フォローリスト ID",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "followingId",
+            "in": "path",
+            "required": true,
+            "description": "リストに出し入れするフォロー中ユーザーの Firebase UID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "削除成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "removed"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "対象が見つからない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/follow-lists/following": {
+      "get": {
+        "summary": "フォロー中ユーザーと所属リストID一覧取得",
+        "deprecated": false,
+        "tags": [
+          "Social"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "フォロー中ユーザー × 所属リスト",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "following": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "userId": {
+                            "type": "string"
+                          },
+                          "userName": {
+                            "type": "string"
+                          },
+                          "profileImage": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "listIds": {
+                            "type": "array",
+                            "items": {
+                              "type": "integer"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/oauthClient": {
+      "get": {
+        "summary": "OAuth クライアント確認",
+        "deprecated": false,
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "登録状況（secret はマスク）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "exists": {
+                      "type": "boolean"
+                    },
+                    "clientId": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "maskedSecret": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "redirectUris": {
+                      "nullable": true,
+                      "allOf": [
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      ],
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "OAuth クライアント発行/再発行",
+        "deprecated": false,
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "redirect_uris"
+                ],
+                "properties": {
+                  "redirect_uris": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "発行成功（clientSecret はこの応答でのみ取得可能）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "clientId": {
+                      "type": "string"
+                    },
+                    "clientSecret": {
+                      "type": "string"
+                    },
+                    "redirectUris": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "OAuth クライアント削除",
+        "deprecated": false,
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "削除成功",
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/stats/areaRank": {
+      "get": {
+        "summary": "都道府県内順位取得",
+        "deprecated": false,
+        "tags": [
+          "Stats"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "エリア内順位（対象外なら null）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "nullable": true,
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/AreaRankInfo"
+                    }
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "対象が見つからない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/stats/arenaHistory": {
+      "get": {
+        "summary": "アリーナ順位の推移取得",
+        "deprecated": false,
+        "tags": [
+          "Stats"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": true,
+            "description": "IIDX バージョン番号",
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "required": true,
+            "description": "取得開始日 (YYYY-MM-DD)",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": true,
+            "description": "取得終了日 (YYYY-MM-DD)",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "アリーナ順位推移",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "fetchedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "arenaClass": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "arenaRank": {
+                        "type": "integer",
+                        "nullable": true
+                      },
+                      "wins": {
+                        "type": "integer",
+                        "nullable": true
+                      },
+                      "a1continue": {
+                        "type": "integer",
+                        "nullable": true
+                      },
+                      "classRank": {
+                        "type": "integer",
+                        "nullable": true
+                      },
+                      "globalRank": {
+                        "type": "integer",
+                        "nullable": true,
+                        "description": "上位クラスの累積人数 + クラス内順位"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/stats/available-periods": {
+      "get": {
+        "summary": "月間レビュー可能な年月一覧取得",
+        "deprecated": false,
+        "tags": [
+          "Stats"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": true,
+            "description": "IIDX バージョン番号",
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "YYYY-MM の配列（降順）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "months": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/stats/bpiBoxStats": {
+      "get": {
+        "summary": "日別 BPI 箱ひげ統計取得",
+        "deprecated": false,
+        "tags": [
+          "Stats"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "description": "IIDX バージョン番号。未指定・不正値は最新にフォールバック",
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/levelQuery"
+          },
+          {
+            "$ref": "#/components/parameters/difficultyQuery"
+          },
+          {
+            "name": "groupBy",
+            "in": "query",
+            "required": false,
+            "description": "集計単位",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "day",
+                "week",
+                "month"
+              ],
+              "default": "day"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "期間別の分布統計（level / difficulty のいずれか必須）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "date": {
+                        "type": "string"
+                      },
+                      "min": {
+                        "type": "number"
+                      },
+                      "max": {
+                        "type": "number"
+                      },
+                      "median": {
+                        "type": "number"
+                      },
+                      "p25": {
+                        "type": "number"
+                      },
+                      "p75": {
+                        "type": "number"
+                      },
+                      "count": {
+                        "type": "integer"
+                      },
+                      "totalBpi": {
+                        "type": "number"
+                      },
+                      "totalBpiTop75": {
+                        "type": "number"
+                      },
+                      "totalBpiTop25": {
+                        "type": "number"
+                      },
+                      "totalPhysicalNotes": {
+                        "type": "integer"
+                      },
+                      "registeredNotes": {
+                        "type": "integer"
+                      },
+                      "efficiency": {
+                        "type": "number",
+                        "description": "登録ノーツ / 物理ノーツ (%)"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/stats/scoreRateDistribution": {
+      "get": {
+        "summary": "スコアレート分布取得",
+        "deprecated": false,
+        "tags": [
+          "Stats"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "description": "IIDX バージョン番号。未指定・不正値は最新にフォールバック",
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/levelQuery"
+          },
+          {
+            "$ref": "#/components/parameters/difficultyQuery"
+          },
+          {
+            "name": "step",
+            "in": "query",
+            "required": false,
+            "description": "バケット幅 (%)",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                1,
+                2,
+                5,
+                10
+              ],
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "レート帯ごとの件数",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "label": {
+                        "type": "string"
+                      },
+                      "count": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/stats/neighbor-recommended": {
+      "get": {
+        "summary": "BPI 近傍プレイヤーとの比較おすすめ楽曲取得",
+        "deprecated": false,
+        "tags": [
+          "Stats"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "description": "IIDX バージョン番号。未指定・不正値は最新にフォールバック",
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/levelQuery"
+          },
+          {
+            "$ref": "#/components/parameters/difficultyQuery"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "取得件数",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 10
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "オフセット",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          },
+          {
+            "name": "n",
+            "in": "query",
+            "required": false,
+            "description": "対象とする近傍プレイヤー数",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "武器曲・ポテンシャル曲",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/WeaponsPotential"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "usedNeighbors": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/stats/monthly-review": {
+      "get": {
+        "summary": "月間/年間レビュー取得",
+        "deprecated": false,
+        "tags": [
+          "Stats"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": true,
+            "description": "IIDX バージョン番号",
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "required": true,
+            "description": "YYYY-MM（月間）または YYYY（年間）",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "レビューデータ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonthlyReviewData"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/ranking/songs": {
+      "get": {
+        "summary": "自分の全曲別 BPIM 内順位一覧取得",
+        "deprecated": false,
+        "tags": [
+          "Rivals"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "description": "IIDX バージョン番号。未指定・不正値は最新にフォールバック",
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "曲別順位一覧",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "songs": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {}
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/ranking/tower": {
+      "get": {
+        "summary": "打鍵数タワーランキング取得",
+        "deprecated": false,
+        "tags": [
+          "Rivals"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "description": "IIDX バージョン番号。未指定・不正値は最新にフォールバック",
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "required": false,
+            "description": "集計単位",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "day",
+                "week",
+                "month"
+              ],
+              "default": "day"
+            }
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "required": false,
+            "description": "基準日 (YYYY-MM-DD)。未来日は今日に丸める",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "打鍵数ランキング",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "rankings": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "rank": {
+                            "type": "integer"
+                          },
+                          "userId": {
+                            "type": "string"
+                          },
+                          "userName": {
+                            "type": "string"
+                          },
+                          "profileImage": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "isPublic": {
+                            "type": "integer",
+                            "enum": [
+                              0,
+                              1
+                            ]
+                          },
+                          "iidxId": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "totalCount": {
+                            "type": "integer"
+                          },
+                          "keyCount": {
+                            "type": "integer"
+                          },
+                          "scratchCount": {
+                            "type": "integer"
+                          },
+                          "isSelf": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    },
+                    "totalCount": {
+                      "type": "integer"
+                    },
+                    "selfRank": {
+                      "type": "integer"
+                    },
+                    "startDate": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "endDate": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "viewerRadar": {
+                      "$ref": "#/components/schemas/RadarDetail"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/rivals/{rivalId}/win-loss-history": {
+      "get": {
+        "summary": "特定ライバルとの勝敗推移取得",
+        "deprecated": false,
+        "tags": [
+          "Rivals"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "rivalId",
+            "in": "path",
+            "required": true,
+            "description": "ライバルの Firebase UID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": true,
+            "description": "IIDX バージョン番号",
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "level",
+            "in": "query",
+            "required": true,
+            "description": "対象レベル (11 または 12)",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                11,
+                12
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "日別の勝敗差分と累積",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "date": {
+                        "type": "string",
+                        "format": "date"
+                      },
+                      "delta": {
+                        "type": "integer"
+                      },
+                      "cumulative": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/rivals/following/list": {
+      "get": {
+        "summary": "フォロー中の公開ユーザー一覧取得（ライバル選択用）",
+        "deprecated": false,
+        "tags": [
+          "Rivals"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "公開フォロー中ユーザー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "rivals": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PublicFollowingUser"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "userId 未指定",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/rivals/following/monthly-review-summary": {
+      "get": {
+        "summary": "フォロー中ライバルの月間 BPI 増減サマリー取得",
+        "deprecated": false,
+        "tags": [
+          "Rivals"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": true,
+            "description": "IIDX バージョン番号",
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "required": true,
+            "description": "YYYY-MM または YYYY",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ライバルごとの月初/月末 BPI",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "rivals": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "userId": {
+                            "type": "string"
+                          },
+                          "userName": {
+                            "type": "string"
+                          },
+                          "profileImage": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "bpiStart": {
+                            "type": "number"
+                          },
+                          "bpiEnd": {
+                            "type": "number"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "month / version が不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/site/arena/official": {
+      "get": {
+        "summary": "公式アリーナ分布データ取得",
+        "deprecated": false,
+        "tags": [
+          "Songs"
+        ],
+        "parameters": [
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "description": "IIDX バージョン番号。未指定・不正値は最新にフォールバック",
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "公式アリーナのクラス別分布 (public/data の JSON をそのまま返す)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "503": {
+            "description": "元データ (public/data 配下の JSON) が未生成",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/site/songs/popular": {
+      "get": {
+        "summary": "プレイ人数の多い/少ない楽曲一覧取得",
+        "deprecated": false,
+        "tags": [
+          "Songs"
+        ],
+        "parameters": [
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "description": "top=多い順 / bottom=少ない順",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "top",
+                "bottom"
+              ],
+              "default": "top"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "オフセット",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "取得件数",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "楽曲一覧ページ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "songs": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                      }
+                    },
+                    "total": {
+                      "type": "integer"
+                    },
+                    "hasMore": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "503": {
+            "description": "元データ (public/data 配下の JSON) が未生成",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/site/stats": {
+      "get": {
+        "summary": "サイト全体の統計サマリー取得",
+        "deprecated": false,
+        "tags": [
+          "Stats"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "サイト統計 (public/data の JSON をそのまま返す)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "503": {
+            "description": "元データ (public/data 配下の JSON) が未生成",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/supporters": {
+      "get": {
+        "summary": "サポーター一覧取得",
+        "deprecated": false,
+        "tags": [
+          "Profile"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "サポーター（ロール付きユーザー）一覧",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "supporters": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/SupporterUser"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/usernames/{username}/availability": {
+      "get": {
+        "summary": "ユーザー名の利用可否チェック",
+        "deprecated": false,
+        "tags": [
+          "Profile"
+        ],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "description": "確認するユーザー名",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "利用可否（名前が不正な場合も 200 で available=false）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "available": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/account": {
+      "delete": {
+        "summary": "アカウント削除",
+        "deprecated": false,
+        "tags": [
+          "Profile"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "confirmUserName"
+                ],
+                "properties": {
+                  "confirmUserName": {
+                    "type": "string",
+                    "description": "確認用：本人のユーザー名と完全一致が必要"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "削除完了",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "confirmUserName がユーザー名と一致しない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "ユーザーが存在しない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "削除に失敗",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/batches/version-summary": {
+      "get": {
+        "summary": "旧バージョンとの差分サマリー取得",
+        "deprecated": false,
+        "tags": [
+          "Logs"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": true,
+            "description": "IIDX バージョン番号",
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "直近でスコアのある旧バージョンとの比較（無ければ songs は空・compareVersion は null）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "songs": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/BatchScoreEntry"
+                      }
+                    },
+                    "currentVersion": {
+                      "$ref": "#/components/schemas/IIDXVersion"
+                    },
+                    "compareVersion": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "compareVersionLabel": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "version が不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/iidx-tower": {
+      "get": {
+        "summary": "打鍵数タワーデータ取得",
+        "deprecated": false,
+        "tags": [
+          "Stats"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "description": "IIDX バージョン番号。未指定・不正値は最新にフォールバック",
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "compare",
+            "in": "query",
+            "required": false,
+            "description": "true で閲覧者自身のデータも含める",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "compare=false は対象データのみ、compare=true は { target, self }",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "target": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "additionalProperties": true
+                          }
+                        },
+                        "self": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "additionalProperties": true
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "compare モードで未認証",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "打鍵数タワーデータ登録",
+        "deprecated": false,
+        "tags": [
+          "Stats"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "version",
+                  "rows"
+                ],
+                "properties": {
+                  "version": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 50
+                  },
+                  "rows": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 1000,
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "playDate",
+                        "keyCount",
+                        "scratchCount"
+                      ],
+                      "properties": {
+                        "playDate": {
+                          "type": "string",
+                          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                        },
+                        "keyCount": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "scratchCount": {
+                          "type": "integer",
+                          "minimum": 0
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "登録結果",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "upsertedCount": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "リクエストボディが不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/all-scores/{songId}/ranking": {
+      "get": {
+        "summary": "全難易度スコアの楽曲別ランキング取得",
+        "deprecated": false,
+        "tags": [
+          "Rivals"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "songId",
+            "in": "path",
+            "required": true,
+            "description": "楽曲 ID",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "description": "IIDX バージョン番号。未指定・不正値は最新にフォールバック",
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ランキング",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SongRankingResult"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "songId が不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/all-scores/{songId}/rivals": {
+      "get": {
+        "summary": "全難易度スコアの特定楽曲ライバル一覧取得",
+        "deprecated": false,
+        "tags": [
+          "Rivals"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "songId",
+            "in": "path",
+            "required": true,
+            "description": "楽曲 ID",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "description": "IIDX バージョン番号。未指定・不正値は最新にフォールバック",
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ライバルスコア一覧",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "songId": {
+                      "type": "integer"
+                    },
+                    "version": {
+                      "$ref": "#/components/schemas/IIDXVersion"
+                    },
+                    "rivals": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PlainRivalScore"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不足",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/songs": {
+      "get": {
+        "summary": "楽曲マスタ一覧取得（プロフィール文脈）",
+        "deprecated": false,
+        "tags": [
+          "Songs"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "description": "IIDX バージョン番号。未指定・不正値は最新にフォールバック",
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "楽曲一覧",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Song"
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/songs/{songId}/ranking": {
+      "get": {
+        "summary": "楽曲別ランキング取得（プロフィール文脈）",
+        "deprecated": false,
+        "tags": [
+          "Songs"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "songId",
+            "in": "path",
+            "required": true,
+            "description": "楽曲 ID",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "description": "IIDX バージョン番号。未指定・不正値は最新にフォールバック",
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ランキング",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SongRankingResult"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "songId が不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/songs/{songId}/similar": {
+      "get": {
+        "summary": "類似楽曲取得（プロフィール文脈）",
+        "deprecated": false,
+        "tags": [
+          "Songs"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "songId",
+            "in": "path",
+            "required": true,
+            "description": "楽曲 ID",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "description": "IIDX バージョン番号。未指定・不正値は最新にフォールバック",
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "取得件数",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 10
+            }
+          },
+          {
+            "name": "mode",
+            "in": "query",
+            "required": false,
+            "description": "属性の算出元",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "profile",
+                "global"
+              ],
+              "default": "profile"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "類似楽曲リスト（距離が近い順）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Song"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "distance": {
+                            "type": "number",
+                            "format": "float"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "songId が不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/tickets/recommend": {
+      "get": {
+        "summary": "楽曲解禁チケットのおすすめ曲取得（単一チケット）",
+        "deprecated": false,
+        "tags": [
+          "Optimize"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "ticketId",
+            "in": "query",
+            "required": true,
+            "description": "チケット ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expiresAt",
+            "in": "query",
+            "required": false,
+            "description": "チケットの有効期限（レスポンスにそのまま返る）",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "オフセット",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          },
+          {
+            "name": "scoreMode",
+            "in": "query",
+            "required": false,
+            "description": "スコア表示モード",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "relative",
+                "raw"
+              ],
+              "default": "relative"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "おすすめ曲",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketRecommendResult"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "ticketId 未指定",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "楽曲解禁チケットのおすすめ曲取得（複数チケット一括）",
+        "deprecated": false,
+        "tags": [
+          "Optimize"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "ticketIds"
+                ],
+                "properties": {
+                  "ticketIds": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 50,
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "ticketId",
+                        "expiresAt"
+                      ],
+                      "properties": {
+                        "ticketId": {
+                          "type": "string"
+                        },
+                        "expiresAt": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "scoreMode": {
+                    "type": "string",
+                    "enum": [
+                      "relative",
+                      "raw"
+                    ],
+                    "default": "relative"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "チケットごとのおすすめ曲",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TicketRecommendResult"
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "ticketIds が空 / 50 件超",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -6937,7 +12604,8 @@
                   }
                 }
               }
-            ]
+            ],
+            "type": "object"
           },
           "stats": {
             "type": "array",
@@ -6951,7 +12619,8 @@
               {
                 "$ref": "#/components/schemas/AreaRankInfo"
               }
-            ]
+            ],
+            "type": "object"
           }
         }
       },
@@ -7217,8 +12886,7 @@
             "nullable": true
           },
           "clearState": {
-            "$ref": "#/components/schemas/ClearState",
-            "nullable": true
+            "$ref": "#/components/schemas/ClearState"
           },
           "missCount": {
             "type": "integer",
@@ -7298,8 +12966,7 @@
                   "format": "float"
                 },
                 "clearState": {
-                  "$ref": "#/components/schemas/ClearState",
-                  "nullable": true
+                  "$ref": "#/components/schemas/ClearState"
                 }
               }
             }
@@ -7557,8 +13224,7 @@
             "format": "float"
           },
           "clearState": {
-            "$ref": "#/components/schemas/ClearState",
-            "nullable": true
+            "$ref": "#/components/schemas/ClearState"
           },
           "lastPlayed": {
             "type": "string",
@@ -7633,7 +13299,8 @@
                   }
                 }
               }
-            ]
+            ],
+            "type": "object"
           },
           "radar": {
             "$ref": "#/components/schemas/RadarStats"
@@ -7834,8 +13501,7 @@
                     "nullable": true
                   },
                   "clearState": {
-                    "$ref": "#/components/schemas/ClearState",
-                    "nullable": true
+                    "$ref": "#/components/schemas/ClearState"
                   },
                   "diffFromOpponentEx": {
                     "type": "integer"
@@ -7846,7 +13512,8 @@
                   }
                 }
               }
-            ]
+            ],
+            "type": "object"
           }
         }
       },
@@ -8004,7 +13671,8 @@
                   }
                 }
               }
-            ]
+            ],
+            "type": "object"
           },
           "diff": {
             "type": "object",
@@ -8055,7 +13723,8 @@
                   }
                 }
               }
-            ]
+            ],
+            "type": "object"
           }
         }
       },
@@ -8375,6 +14044,407 @@
             }
           }
         ]
+      },
+      "Song": {
+        "type": "object",
+        "description": "楽曲マスタ（songs テーブル + 現行 BPI 定義 + 属性）",
+        "properties": {
+          "songId": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "difficulty": {
+            "$ref": "#/components/schemas/Difficulty"
+          },
+          "difficultyLevel": {
+            "type": "integer"
+          },
+          "notes": {
+            "type": "integer",
+            "nullable": true
+          },
+          "bpm": {
+            "type": "string",
+            "nullable": true
+          },
+          "textage": {
+            "type": "string",
+            "nullable": true
+          },
+          "wrScore": {
+            "type": "integer",
+            "nullable": true
+          },
+          "kaidenAvg": {
+            "type": "integer",
+            "nullable": true
+          }
+        },
+        "additionalProperties": true
+      },
+      "SongNote": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "body": {
+            "type": "string"
+          },
+          "authorTotalBpi": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "upvoteCount": {
+            "type": "integer"
+          },
+          "upvoted": {
+            "type": "boolean"
+          },
+          "editable": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "RecentSongNote": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SongNote"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "songId": {
+                "type": "integer"
+              },
+              "songTitle": {
+                "type": "string"
+              },
+              "difficulty": {
+                "$ref": "#/components/schemas/Difficulty"
+              },
+              "difficultyLevel": {
+                "type": "integer"
+              }
+            }
+          }
+        ]
+      },
+      "PendingFollowRequest": {
+        "type": "object",
+        "required": [
+          "kind",
+          "requesterId",
+          "createdAt"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "request",
+              "legacy"
+            ],
+            "description": "request=招待URL経由の正規リクエスト / legacy=承認記録のない既存フォロワー"
+          },
+          "id": {
+            "type": "integer",
+            "description": "kind=request のときのみ存在"
+          },
+          "requesterId": {
+            "type": "string"
+          },
+          "requesterName": {
+            "type": "string"
+          },
+          "requesterImage": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "FollowListSummary": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "isPublic": {
+            "type": "boolean"
+          },
+          "memberCount": {
+            "type": "integer"
+          }
+        }
+      },
+      "PublicFollowingUser": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "userName": {
+            "type": "string"
+          },
+          "profileImage": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": true
+      },
+      "WeaponsPotential": {
+        "type": "object",
+        "properties": {
+          "weapons": {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {}
+                }
+              },
+              "total": {
+                "type": "integer"
+              }
+            }
+          },
+          "potential": {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {}
+                }
+              },
+              "total": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      },
+      "MonthlyReviewData": {
+        "type": "object",
+        "description": "月間/年間レビュー。ネストが深いため主要フィールドのみ定義",
+        "properties": {
+          "month": {
+            "type": "string",
+            "description": "YYYY-MM または YYYY"
+          },
+          "version": {
+            "$ref": "#/components/schemas/IIDXVersion"
+          },
+          "granularity": {
+            "type": "string",
+            "enum": [
+              "month",
+              "year"
+            ]
+          },
+          "bpi": {
+            "type": "object",
+            "properties": {
+              "start": {
+                "type": "number"
+              },
+              "end": {
+                "type": "number"
+              },
+              "diff": {
+                "type": "number"
+              },
+              "history": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          },
+          "topSongs": {
+            "type": "object",
+            "properties": {
+              "topBpiSongs": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {}
+                }
+              },
+              "topImprovedSongs": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          },
+          "activity": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "rivals": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "rivalsGrowthRanking": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "rivalsGrowthTimeline": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "arena": {
+            "type": "object",
+            "additionalProperties": true,
+            "nullable": true
+          },
+          "radarGrowth": {
+            "nullable": true,
+            "allOf": [
+              {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            ],
+            "type": "object"
+          }
+        }
+      },
+      "SupporterUser": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "userName": {
+            "type": "string"
+          },
+          "iidxId": {
+            "type": "string",
+            "nullable": true
+          },
+          "profileImage": {
+            "type": "string",
+            "nullable": true
+          },
+          "totalBpi": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "role": {
+            "type": "object",
+            "properties": {
+              "role": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "grantedAt": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        }
+      },
+      "TicketRecommendResult": {
+        "type": "object",
+        "properties": {
+          "ticketId": {
+            "type": "string"
+          },
+          "expiresAt": {
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "hasMore": {
+            "type": "boolean"
+          },
+          "totalBpi": {
+            "type": "number",
+            "format": "float"
+          }
+        }
+      },
+      "PlainRivalScore": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "userName": {
+            "type": "string"
+          },
+          "profileImage": {
+            "type": "string",
+            "nullable": true
+          },
+          "exScore": {
+            "type": "integer",
+            "nullable": true
+          },
+          "bpi": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "clearState": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastPlayed": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
       }
     },
     "responses": {},
