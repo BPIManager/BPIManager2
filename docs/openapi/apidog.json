@@ -9653,6 +9653,1322 @@
           }
         ]
       }
+    },
+    "/users/{userId}/stats/areaRank": {
+      "get": {
+        "summary": "都道府県内順位取得",
+        "deprecated": false,
+        "tags": [
+          "Stats"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "エリア内順位（対象外なら null）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "nullable": true,
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/AreaRankInfo"
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "対象が見つからない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/stats/arenaHistory": {
+      "get": {
+        "summary": "アリーナ順位の推移取得",
+        "deprecated": false,
+        "tags": [
+          "Stats"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": true,
+            "description": "IIDX バージョン番号",
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "required": true,
+            "description": "取得開始日 (YYYY-MM-DD)",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": true,
+            "description": "取得終了日 (YYYY-MM-DD)",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "アリーナ順位推移",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "fetchedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "arenaClass": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "arenaRank": {
+                        "type": "integer",
+                        "nullable": true
+                      },
+                      "wins": {
+                        "type": "integer",
+                        "nullable": true
+                      },
+                      "a1continue": {
+                        "type": "integer",
+                        "nullable": true
+                      },
+                      "classRank": {
+                        "type": "integer",
+                        "nullable": true
+                      },
+                      "globalRank": {
+                        "type": "integer",
+                        "nullable": true,
+                        "description": "上位クラスの累積人数 + クラス内順位"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/stats/available-periods": {
+      "get": {
+        "summary": "月間レビュー可能な年月一覧取得",
+        "deprecated": false,
+        "tags": [
+          "Stats"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": true,
+            "description": "IIDX バージョン番号",
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "YYYY-MM の配列（降順）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "months": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/stats/bpiBoxStats": {
+      "get": {
+        "summary": "日別 BPI 箱ひげ統計取得",
+        "deprecated": false,
+        "tags": [
+          "Stats"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "description": "IIDX バージョン番号。未指定・不正値は最新にフォールバック",
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/levelQuery"
+          },
+          {
+            "$ref": "#/components/parameters/difficultyQuery"
+          },
+          {
+            "name": "groupBy",
+            "in": "query",
+            "required": false,
+            "description": "集計単位",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "day",
+                "week",
+                "month"
+              ],
+              "default": "day"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "期間別の分布統計（level / difficulty のいずれか必須）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "date": {
+                        "type": "string"
+                      },
+                      "min": {
+                        "type": "number"
+                      },
+                      "max": {
+                        "type": "number"
+                      },
+                      "median": {
+                        "type": "number"
+                      },
+                      "p25": {
+                        "type": "number"
+                      },
+                      "p75": {
+                        "type": "number"
+                      },
+                      "count": {
+                        "type": "integer"
+                      },
+                      "totalBpi": {
+                        "type": "number"
+                      },
+                      "totalBpiTop75": {
+                        "type": "number"
+                      },
+                      "totalBpiTop25": {
+                        "type": "number"
+                      },
+                      "totalPhysicalNotes": {
+                        "type": "integer"
+                      },
+                      "registeredNotes": {
+                        "type": "integer"
+                      },
+                      "efficiency": {
+                        "type": "number",
+                        "description": "登録ノーツ / 物理ノーツ (%)"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/stats/scoreRateDistribution": {
+      "get": {
+        "summary": "スコアレート分布取得",
+        "deprecated": false,
+        "tags": [
+          "Stats"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "description": "IIDX バージョン番号。未指定・不正値は最新にフォールバック",
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/levelQuery"
+          },
+          {
+            "$ref": "#/components/parameters/difficultyQuery"
+          },
+          {
+            "name": "step",
+            "in": "query",
+            "required": false,
+            "description": "バケット幅 (%)",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                1,
+                2,
+                5,
+                10
+              ],
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "レート帯ごとの件数",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "label": {
+                        "type": "string"
+                      },
+                      "count": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/stats/neighbor-recommended": {
+      "get": {
+        "summary": "BPI 近傍プレイヤーとの比較おすすめ楽曲取得",
+        "deprecated": false,
+        "tags": [
+          "Stats"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "description": "IIDX バージョン番号。未指定・不正値は最新にフォールバック",
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/levelQuery"
+          },
+          {
+            "$ref": "#/components/parameters/difficultyQuery"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "取得件数",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 10
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "オフセット",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          },
+          {
+            "name": "n",
+            "in": "query",
+            "required": false,
+            "description": "対象とする近傍プレイヤー数",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "武器曲・ポテンシャル曲",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/WeaponsPotential"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "usedNeighbors": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/stats/monthly-review": {
+      "get": {
+        "summary": "月間/年間レビュー取得",
+        "deprecated": false,
+        "tags": [
+          "Stats"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": true,
+            "description": "IIDX バージョン番号",
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "required": true,
+            "description": "YYYY-MM（月間）または YYYY（年間）",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "レビューデータ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonthlyReviewData"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/ranking/songs": {
+      "get": {
+        "summary": "自分の全曲別 BPIM 内順位一覧取得",
+        "deprecated": false,
+        "tags": [
+          "Rivals"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "description": "IIDX バージョン番号。未指定・不正値は最新にフォールバック",
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "曲別順位一覧",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "songs": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {}
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/ranking/tower": {
+      "get": {
+        "summary": "打鍵数タワーランキング取得",
+        "deprecated": false,
+        "tags": [
+          "Rivals"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "description": "IIDX バージョン番号。未指定・不正値は最新にフォールバック",
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "required": false,
+            "description": "集計単位",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "day",
+                "week",
+                "month"
+              ],
+              "default": "day"
+            }
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "required": false,
+            "description": "基準日 (YYYY-MM-DD)。未来日は今日に丸める",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "打鍵数ランキング",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "rankings": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "rank": {
+                            "type": "integer"
+                          },
+                          "userId": {
+                            "type": "string"
+                          },
+                          "userName": {
+                            "type": "string"
+                          },
+                          "profileImage": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "isPublic": {
+                            "type": "integer",
+                            "enum": [
+                              0,
+                              1
+                            ]
+                          },
+                          "iidxId": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "totalCount": {
+                            "type": "integer"
+                          },
+                          "keyCount": {
+                            "type": "integer"
+                          },
+                          "scratchCount": {
+                            "type": "integer"
+                          },
+                          "isSelf": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    },
+                    "totalCount": {
+                      "type": "integer"
+                    },
+                    "selfRank": {
+                      "type": "integer"
+                    },
+                    "startDate": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "endDate": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "viewerRadar": {
+                      "$ref": "#/components/schemas/RadarDetail"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/rivals/{rivalId}/win-loss-history": {
+      "get": {
+        "summary": "特定ライバルとの勝敗推移取得",
+        "deprecated": false,
+        "tags": [
+          "Rivals"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "rivalId",
+            "in": "path",
+            "required": true,
+            "description": "ライバルの Firebase UID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": true,
+            "description": "IIDX バージョン番号",
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "level",
+            "in": "query",
+            "required": true,
+            "description": "対象レベル (11 または 12)",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                11,
+                12
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "日別の勝敗差分と累積",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "date": {
+                        "type": "string",
+                        "format": "date"
+                      },
+                      "delta": {
+                        "type": "integer"
+                      },
+                      "cumulative": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/rivals/following/list": {
+      "get": {
+        "summary": "フォロー中の公開ユーザー一覧取得（ライバル選択用）",
+        "deprecated": false,
+        "tags": [
+          "Rivals"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "公開フォロー中ユーザー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "rivals": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PublicFollowingUser"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "userId 未指定",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/rivals/following/monthly-review-summary": {
+      "get": {
+        "summary": "フォロー中ライバルの月間 BPI 増減サマリー取得",
+        "deprecated": false,
+        "tags": [
+          "Rivals"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "ターゲットユーザーの Firebase UID",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": true,
+            "description": "IIDX バージョン番号",
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "required": true,
+            "description": "YYYY-MM または YYYY",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ライバルごとの月初/月末 BPI",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "rivals": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "userId": {
+                            "type": "string"
+                          },
+                          "userName": {
+                            "type": "string"
+                          },
+                          "profileImage": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "bpiStart": {
+                            "type": "number"
+                          },
+                          "bpiEnd": {
+                            "type": "number"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "month / version が不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -11446,6 +12762,159 @@
           },
           "memberCount": {
             "type": "integer"
+          }
+        }
+      },
+      "PublicFollowingUser": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "userName": {
+            "type": "string"
+          },
+          "profileImage": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": true
+      },
+      "WeaponsPotential": {
+        "type": "object",
+        "properties": {
+          "weapons": {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {}
+                }
+              },
+              "total": {
+                "type": "integer"
+              }
+            }
+          },
+          "potential": {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {}
+                }
+              },
+              "total": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      },
+      "MonthlyReviewData": {
+        "type": "object",
+        "description": "月間/年間レビュー。ネストが深いため主要フィールドのみ定義",
+        "properties": {
+          "month": {
+            "type": "string",
+            "description": "YYYY-MM または YYYY"
+          },
+          "version": {
+            "$ref": "#/components/schemas/IIDXVersion"
+          },
+          "granularity": {
+            "type": "string",
+            "enum": [
+              "month",
+              "year"
+            ]
+          },
+          "bpi": {
+            "type": "object",
+            "properties": {
+              "start": {
+                "type": "number"
+              },
+              "end": {
+                "type": "number"
+              },
+              "diff": {
+                "type": "number"
+              },
+              "history": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          },
+          "topSongs": {
+            "type": "object",
+            "properties": {
+              "topBpiSongs": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {}
+                }
+              },
+              "topImprovedSongs": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          },
+          "activity": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "rivals": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "rivalsGrowthRanking": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "rivalsGrowthTimeline": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "arena": {
+            "type": "object",
+            "additionalProperties": true,
+            "nullable": true
+          },
+          "radarGrowth": {
+            "nullable": true,
+            "allOf": [
+              {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            ]
           }
         }
       }
