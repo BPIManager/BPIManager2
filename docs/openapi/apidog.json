@@ -6730,6 +6730,1265 @@
         },
         "security": []
       }
+    },
+    "/songs": {
+      "get": {
+        "summary": "楽曲マスタ一覧取得",
+        "deprecated": false,
+        "tags": [
+          "Songs"
+        ],
+        "parameters": [
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "description": "IIDX バージョン番号。未指定・不正値は最新にフォールバック",
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "楽曲一覧（タイトル・難易度昇順）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Song"
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/songs/{songId}": {
+      "get": {
+        "summary": "楽曲情報取得",
+        "deprecated": false,
+        "tags": [
+          "Songs"
+        ],
+        "parameters": [
+          {
+            "name": "songId",
+            "in": "path",
+            "required": true,
+            "description": "楽曲 ID",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "楽曲情報",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Song"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "songId が不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "楽曲が見つからない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/songs/{songId}/ranking": {
+      "get": {
+        "summary": "楽曲別ランキング取得（☆11/☆12）",
+        "deprecated": false,
+        "tags": [
+          "Songs"
+        ],
+        "parameters": [
+          {
+            "name": "songId",
+            "in": "path",
+            "required": true,
+            "description": "楽曲 ID",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "description": "IIDX バージョン番号。未指定・不正値は最新にフォールバック",
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ランキング。認証時は自分のエントリが isSelf=true",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SongRankingResult"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "songId が不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/songs/{songId}/similar": {
+      "get": {
+        "summary": "類似楽曲取得（属性ベクトル距離）",
+        "deprecated": false,
+        "tags": [
+          "Songs"
+        ],
+        "parameters": [
+          {
+            "name": "songId",
+            "in": "path",
+            "required": true,
+            "description": "楽曲 ID",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "description": "IIDX バージョン番号。未指定・不正値は最新にフォールバック",
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "取得件数",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 10
+            }
+          },
+          {
+            "name": "mode",
+            "in": "query",
+            "required": false,
+            "description": "属性の算出元",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "profile",
+                "global"
+              ],
+              "default": "profile"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "類似楽曲リスト（距離が近い順）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Song"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "distance": {
+                            "type": "number",
+                            "format": "float",
+                            "description": "属性ベクトルのユークリッド距離"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "songId が不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/songs/{songId}/patterns": {
+      "get": {
+        "summary": "運指パターン一覧取得",
+        "deprecated": false,
+        "tags": [
+          "Songs"
+        ],
+        "parameters": [
+          {
+            "name": "songId",
+            "in": "path",
+            "required": true,
+            "description": "楽曲 ID",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "ページングカーソル（オフセット）",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "required": false,
+            "description": "並び順",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "score",
+                "upvote"
+              ],
+              "default": "score"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "パターン一覧ページ（認証時は myVote を含む）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "pattern": {
+                            "type": "string",
+                            "description": "7 桁の運指文字列"
+                          },
+                          "upvotes": {
+                            "type": "integer"
+                          },
+                          "downvotes": {
+                            "type": "integer"
+                          },
+                          "myVote": {
+                            "type": "string",
+                            "nullable": true,
+                            "enum": [
+                              "upvote",
+                              "downvote",
+                              null
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    "nextCursor": {
+                      "type": "integer",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "songId / cursor が不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/songs/{songId}/patterns/{pattern}/vote": {
+      "post": {
+        "summary": "運指パターンへ投票",
+        "deprecated": false,
+        "tags": [
+          "Songs"
+        ],
+        "parameters": [
+          {
+            "name": "songId",
+            "in": "path",
+            "required": true,
+            "description": "楽曲 ID",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pattern",
+            "in": "path",
+            "required": true,
+            "description": "7 桁の運指文字列",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "voteType"
+                ],
+                "properties": {
+                  "voteType": {
+                    "type": "string",
+                    "enum": [
+                      "upvote",
+                      "downvote"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "投票成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "pattern / voteType が不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "運指パターンへの投票を取り消し",
+        "deprecated": false,
+        "tags": [
+          "Songs"
+        ],
+        "parameters": [
+          {
+            "name": "songId",
+            "in": "path",
+            "required": true,
+            "description": "楽曲 ID",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pattern",
+            "in": "path",
+            "required": true,
+            "description": "7 桁の運指文字列",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "取り消し成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "pattern が不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/songs/{songId}/patterns/search": {
+      "get": {
+        "summary": "運指パターン完全一致検索",
+        "deprecated": false,
+        "tags": [
+          "Songs"
+        ],
+        "parameters": [
+          {
+            "name": "songId",
+            "in": "path",
+            "required": true,
+            "description": "楽曲 ID",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "description": "7 桁の運指文字列",
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{7}$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "一致したパターン（無ければ null）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "nullable": true,
+                  "allOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "pattern": {
+                          "type": "string"
+                        },
+                        "upvotes": {
+                          "type": "integer"
+                        },
+                        "downvotes": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "q が 7 桁数字でない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "一致なし（本文は null）",
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/songs/{songId}/notes": {
+      "get": {
+        "summary": "楽曲メモ一覧取得",
+        "deprecated": false,
+        "tags": [
+          "Songs"
+        ],
+        "parameters": [
+          {
+            "name": "songId",
+            "in": "path",
+            "required": true,
+            "description": "楽曲 ID",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "並び順",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "latest",
+                "bpi"
+              ],
+              "default": "latest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "メモ一覧（認証時は upvoted / editable を反映）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SongNote"
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "songId が不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          }
+        },
+        "security": []
+      },
+      "post": {
+        "summary": "楽曲メモ投稿",
+        "deprecated": false,
+        "tags": [
+          "Songs"
+        ],
+        "parameters": [
+          {
+            "name": "songId",
+            "in": "path",
+            "required": true,
+            "description": "楽曲 ID",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "body"
+                ],
+                "properties": {
+                  "body": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2000
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "投稿成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "body が空 / 2000 文字超",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/songs/{songId}/notes/{noteId}": {
+      "patch": {
+        "summary": "楽曲メモ編集",
+        "deprecated": false,
+        "tags": [
+          "Songs"
+        ],
+        "parameters": [
+          {
+            "name": "songId",
+            "in": "path",
+            "required": true,
+            "description": "楽曲 ID",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "noteId",
+            "in": "path",
+            "required": true,
+            "description": "メモ ID",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "body"
+                ],
+                "properties": {
+                  "body": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2000
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "更新成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "body が空 / 2000 文字超",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "403": {
+            "description": "投稿者本人でない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "メモが存在しない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "楽曲メモ削除",
+        "deprecated": false,
+        "tags": [
+          "Songs"
+        ],
+        "parameters": [
+          {
+            "name": "songId",
+            "in": "path",
+            "required": true,
+            "description": "楽曲 ID",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "noteId",
+            "in": "path",
+            "required": true,
+            "description": "メモ ID",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "削除成功",
+            "headers": {}
+          },
+          "400": {
+            "description": "noteId が不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "403": {
+            "description": "投稿者本人でない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "メモが存在しない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/songs/{songId}/notes/{noteId}/upvote": {
+      "post": {
+        "summary": "楽曲メモへ高評価",
+        "deprecated": false,
+        "tags": [
+          "Songs"
+        ],
+        "parameters": [
+          {
+            "name": "songId",
+            "in": "path",
+            "required": true,
+            "description": "楽曲 ID",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "noteId",
+            "in": "path",
+            "required": true,
+            "description": "メモ ID",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "高評価後の合計数",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "upvoteCount": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "noteId が不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "メモが存在しない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "楽曲メモの高評価を取り消し",
+        "deprecated": false,
+        "tags": [
+          "Songs"
+        ],
+        "parameters": [
+          {
+            "name": "songId",
+            "in": "path",
+            "required": true,
+            "description": "楽曲 ID",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "noteId",
+            "in": "path",
+            "required": true,
+            "description": "メモ ID",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "取り消し後の合計数",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "upvoteCount": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "noteId が不正",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "404": {
+            "description": "メモが存在しない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/songs/notes/recent": {
+      "get": {
+        "summary": "最近の楽曲メモ一覧取得（全楽曲横断）",
+        "deprecated": false,
+        "tags": [
+          "Songs"
+        ],
+        "parameters": [
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "description": "並び順",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "latest",
+                "upvotes"
+              ],
+              "default": "latest"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "0 始まりのページ番号（1 ページ 20 件）",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "メモ一覧",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RecentSongNote"
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {}
+          }
+        },
+        "security": []
+      }
     }
   },
   "components": {
@@ -8371,6 +9630,103 @@
               "radarTop": {
                 "type": "string",
                 "nullable": true
+              }
+            }
+          }
+        ]
+      },
+      "Song": {
+        "type": "object",
+        "description": "楽曲マスタ（songs テーブル + 現行 BPI 定義 + 属性）",
+        "properties": {
+          "songId": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "difficulty": {
+            "$ref": "#/components/schemas/Difficulty"
+          },
+          "difficultyLevel": {
+            "type": "integer"
+          },
+          "notes": {
+            "type": "integer",
+            "nullable": true
+          },
+          "bpm": {
+            "type": "string",
+            "nullable": true
+          },
+          "textage": {
+            "type": "string",
+            "nullable": true
+          },
+          "wrScore": {
+            "type": "integer",
+            "nullable": true
+          },
+          "kaidenAvg": {
+            "type": "integer",
+            "nullable": true
+          }
+        },
+        "additionalProperties": true
+      },
+      "SongNote": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "body": {
+            "type": "string"
+          },
+          "authorTotalBpi": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "upvoteCount": {
+            "type": "integer"
+          },
+          "upvoted": {
+            "type": "boolean"
+          },
+          "editable": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "RecentSongNote": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SongNote"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "songId": {
+                "type": "integer"
+              },
+              "songTitle": {
+                "type": "string"
+              },
+              "difficulty": {
+                "$ref": "#/components/schemas/Difficulty"
+              },
+              "difficultyLevel": {
+                "type": "integer"
               }
             }
           }
