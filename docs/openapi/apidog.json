@@ -76,7 +76,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ErrorMessage"
                 }
               }
             },
@@ -184,7 +184,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ErrorMessage"
                 }
               }
             },
@@ -5239,7 +5239,7 @@
         ]
       }
     },
-    "/api/v1/bpi/calc": {
+    "/bpi/calc": {
       "get": {
         "summary": "単曲 BPI 計算",
         "deprecated": false,
@@ -5299,6 +5299,7 @@
                 "31",
                 "32",
                 "33",
+                "34",
                 "INF"
               ]
             }
@@ -5451,15 +5452,6 @@
   },
   "components": {
     "schemas": {
-      "ErrorResponse": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "example": "Internal Server Error"
-          }
-        }
-      },
       "IIDXVersion": {
         "type": "string",
         "enum": [
@@ -5470,7 +5462,9 @@
           "30",
           "31",
           "32",
-          "33"
+          "33",
+          "34",
+          "INF"
         ],
         "description": "IIDX バージョン番号"
       },
@@ -5985,6 +5979,11 @@
       }
     }
   },
-  "servers": [],
+  "servers": [
+    {
+      "url": "/api/v1",
+      "description": "BPIM2 API (本番は同一オリジンの /api/v1 配下)"
+    }
+  ],
   "security": []
 }
