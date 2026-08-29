@@ -183,6 +183,26 @@
                         },
                         "followerCount": {
                           "type": "integer"
+                        },
+                        "role": {
+                          "nullable": true,
+                          "allOf": [
+                            {
+                              "type": "object",
+                              "properties": {
+                                "role": {
+                                  "type": "string"
+                                },
+                                "description": {
+                                  "type": "string"
+                                },
+                                "grantedAt": {
+                                  "type": "string",
+                                  "format": "date-time"
+                                }
+                              }
+                            }
+                          ]
                         }
                       },
                       "nullable": true
@@ -402,42 +422,63 @@
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": [
+                    "profile"
+                  ],
                   "properties": {
                     "profile": {
-                      "$ref": "#/components/schemas/UserProfile"
+                      "nullable": true,
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/UserProfile"
+                        }
+                      ]
                     },
                     "compare": {
-                      "type": "object",
-                      "description": "compare=true のときのみ存在",
-                      "properties": {
-                        "winLoss": {
+                      "description": "?compare=true かつ認証済みの場合のみ返る",
+                      "allOf": [
+                        {
                           "type": "object",
                           "properties": {
-                            "win": {
-                              "type": "integer"
+                            "winLoss": {
+                              "type": "object",
+                              "nullable": true,
+                              "description": "勝敗統計",
+                              "properties": {}
                             },
-                            "loss": {
-                              "type": "integer"
-                            },
-                            "draw": {
-                              "type": "integer"
-                            },
-                            "total": {
-                              "type": "integer"
-                            },
-                            "winRate": {
-                              "type": "number",
-                              "format": "float"
+                            "radar": {
+                              "nullable": true,
+                              "allOf": [
+                                {
+                                  "$ref": "#/components/schemas/RadarStats"
+                                }
+                              ]
                             }
-                          },
-                          "nullable": true
-                        },
-                        "radar": {
-                          "$ref": "#/components/schemas/RadarStats",
-                          "nullable": true
+                          }
                         }
-                      },
-                      "nullable": true
+                      ]
+                    },
+                    "statsPrivacy": {
+                      "description": "本人が閲覧した場合のみ返る",
+                      "allOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "showArenaClass": {
+                              "type": "boolean"
+                            },
+                            "showArenaRank": {
+                              "type": "boolean"
+                            },
+                            "showArea": {
+                              "type": "boolean"
+                            },
+                            "showGrade": {
+                              "type": "boolean"
+                            }
+                          }
+                        }
+                      ]
                     }
                   }
                 }
@@ -517,22 +558,24 @@
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "required": [
-                  "userName"
+                  "userName",
+                  "isPublic"
                 ],
                 "properties": {
                   "userName": {
                     "type": "string",
-                    "example": "playerName123"
+                    "minLength": 2,
+                    "maxLength": 20
                   },
                   "iidxId": {
                     "type": "string",
-                    "nullable": true,
-                    "example": "1234-5678"
+                    "nullable": true
                   },
                   "profileText": {
                     "type": "string",
@@ -549,15 +592,31 @@
                       1
                     ]
                   },
-                  "arenaRank": {
+                  "xId": {
                     "type": "string",
                     "nullable": true
+                  },
+                  "arenaPrivacy": {
+                    "type": "object",
+                    "properties": {
+                      "showArenaClass": {
+                        "type": "boolean"
+                      },
+                      "showArenaRank": {
+                        "type": "boolean"
+                      },
+                      "showArea": {
+                        "type": "boolean"
+                      },
+                      "showGrade": {
+                        "type": "boolean"
+                      }
+                    }
                   }
                 }
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -565,7 +624,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserProfile"
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             },
@@ -603,6 +667,17 @@
                 }
               }
             }
+          },
+          "409": {
+            "description": "プロフィールが既に存在する（PATCH を使用）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
           },
           "500": {
             "description": "Database Error",
@@ -643,13 +718,20 @@
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
+                "required": [
+                  "userName",
+                  "isPublic"
+                ],
                 "properties": {
                   "userName": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 20
                   },
                   "iidxId": {
                     "type": "string",
@@ -670,15 +752,31 @@
                       1
                     ]
                   },
-                  "arenaRank": {
+                  "xId": {
                     "type": "string",
                     "nullable": true
+                  },
+                  "arenaPrivacy": {
+                    "type": "object",
+                    "properties": {
+                      "showArenaClass": {
+                        "type": "boolean"
+                      },
+                      "showArenaRank": {
+                        "type": "boolean"
+                      },
+                      "showArea": {
+                        "type": "boolean"
+                      },
+                      "showGrade": {
+                        "type": "boolean"
+                      }
+                    }
                   }
                 }
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -686,7 +784,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserProfile"
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             },
@@ -713,6 +816,17 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "プロフィールが存在しない（POST を使用）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
           },
           "500": {
             "description": "Database Error",
@@ -755,6 +869,7 @@
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
@@ -769,25 +884,30 @@
                   },
                   "csvRows": {
                     "type": "array",
+                    "maxItems": 10000,
                     "items": {
                       "type": "object",
                       "required": [
                         "title",
                         "difficulty",
-                        "exScore"
+                        "exScore",
+                        "clearState",
+                        "missCount",
+                        "lastPlayed"
                       ],
                       "properties": {
                         "title": {
                           "type": "string"
                         },
                         "difficulty": {
-                          "$ref": "#/components/schemas/Difficulty"
+                          "type": "string",
+                          "description": "難易度文字列（列挙ではなく生値）"
                         },
                         "exScore": {
-                          "type": "integer"
+                          "type": "number"
                         },
                         "clearState": {
-                          "$ref": "#/components/schemas/ClearState"
+                          "type": "string"
                         },
                         "missCount": {
                           "type": "integer",
@@ -795,7 +915,6 @@
                         },
                         "lastPlayed": {
                           "type": "string",
-                          "format": "date-time",
                           "nullable": true
                         }
                       }
@@ -804,8 +923,7 @@
                 }
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -819,44 +937,25 @@
                       "type": "boolean"
                     },
                     "batchId": {
-                      "type": "string",
-                      "nullable": true
+                      "type": "string"
                     },
-                    "updatedCount": {
-                      "type": "integer"
+                    "updatedAllCount": {
+                      "type": "integer",
+                      "description": "更新された全難易度スコア件数"
+                    },
+                    "updatedBpiCount": {
+                      "type": "integer",
+                      "description": "更新された☆11/☆12スコア件数"
                     },
                     "previousTotalBpi": {
-                      "type": "number",
-                      "format": "float"
+                      "type": "number"
                     },
                     "newTotalBpi": {
-                      "type": "number",
-                      "format": "float"
-                    },
-                    "message": {
-                      "type": "string",
-                      "nullable": true
+                      "type": "number"
                     },
                     "details": {
                       "type": "object",
                       "properties": {
-                        "updated": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "type": "integer"
-                              },
-                              "title": {
-                                "type": "string"
-                              },
-                              "diff": {
-                                "type": "string"
-                              }
-                            }
-                          }
-                        },
                         "notFound": {
                           "type": "array",
                           "items": {
@@ -870,9 +969,6 @@
                               }
                             }
                           }
-                        },
-                        "noImprovementCount": {
-                          "type": "integer"
                         }
                       }
                     }
@@ -1065,8 +1161,8 @@
           {
             "name": "version",
             "in": "query",
-            "description": "IIDX バージョン番号 (26〜33)",
-            "required": true,
+            "description": "IIDX バージョン番号 (26〜34, INF)。未指定・不正値は最新バージョンにフォールバック",
+            "required": false,
             "schema": {
               "$ref": "#/components/schemas/IIDXVersion"
             }
@@ -1797,7 +1893,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/SongWithScore"
+                    "$ref": "#/components/schemas/SelfVersionRow"
                   }
                 }
               }
@@ -1933,7 +2029,20 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/SongWithScore"
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/SongWithScore"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "radarTop": {
+                            "type": "string",
+                            "nullable": true
+                          }
+                        }
+                      }
+                    ]
                   }
                 }
               }
@@ -2015,8 +2124,8 @@
           {
             "name": "version",
             "in": "query",
-            "description": "IIDX バージョン番号 (26〜33)",
-            "required": true,
+            "description": "IIDX バージョン番号 (26〜34, INF)。未指定・不正値は最新バージョンにフォールバック",
+            "required": false,
             "schema": {
               "$ref": "#/components/schemas/IIDXVersion"
             }
@@ -2024,14 +2133,16 @@
           {
             "name": "groupedBy",
             "in": "query",
-            "description": "集計軸。`lastPlayed` でプレイ日時ベース、未指定でバッチ (インポート日時) ベース。",
+            "description": "集計軸。既定は batch（インポート日時単位）",
             "required": false,
             "schema": {
               "type": "string",
               "enum": [
                 "lastPlayed",
+                "batch",
                 "createdAt"
-              ]
+              ],
+              "default": "batch"
             }
           },
           {
@@ -2041,9 +2152,9 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "default": 5,
               "minimum": 1,
-              "maximum": 20
+              "maximum": 100,
+              "default": 5
             }
           }
         ],
@@ -2392,16 +2503,23 @@
             "required": false,
             "schema": {
               "type": "string",
+              "enum": [
+                "all",
+                "follow",
+                "overtaken",
+                "followApproved"
+              ],
               "default": "all"
             }
           },
           {
             "name": "page",
             "in": "query",
-            "description": "",
+            "description": "0 始まりのページ番号",
             "required": false,
             "schema": {
               "type": "integer",
+              "minimum": 0,
               "default": 0
             }
           },
@@ -2412,6 +2530,8 @@
             "required": false,
             "schema": {
               "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
               "default": 20
             }
           }
@@ -3137,8 +3257,8 @@
           {
             "name": "version",
             "in": "query",
-            "description": "IIDX バージョン番号 (26〜33)",
-            "required": true,
+            "description": "IIDX バージョン番号 (26〜34, INF)。未指定・不正値は最新バージョンにフォールバック",
+            "required": false,
             "schema": {
               "$ref": "#/components/schemas/IIDXVersion"
             }
@@ -3269,8 +3389,8 @@
           {
             "name": "version",
             "in": "query",
-            "description": "IIDX バージョン番号 (26〜33)",
-            "required": true,
+            "description": "IIDX バージョン番号 (26〜34, INF)。未指定・不正値は最新バージョンにフォールバック",
+            "required": false,
             "schema": {
               "$ref": "#/components/schemas/IIDXVersion"
             }
@@ -3390,8 +3510,8 @@
           {
             "name": "version",
             "in": "query",
-            "description": "IIDX バージョン番号 (26〜33)",
-            "required": true,
+            "description": "IIDX バージョン番号 (26〜34, INF)。未指定・不正値は最新バージョンにフォールバック",
+            "required": false,
             "schema": {
               "$ref": "#/components/schemas/IIDXVersion"
             }
@@ -3533,8 +3653,8 @@
           {
             "name": "version",
             "in": "query",
-            "description": "IIDX バージョン番号 (26〜33)",
-            "required": true,
+            "description": "IIDX バージョン番号 (26〜34, INF)。未指定・不正値は最新バージョンにフォールバック",
+            "required": false,
             "schema": {
               "$ref": "#/components/schemas/IIDXVersion"
             }
@@ -3647,8 +3767,8 @@
           {
             "name": "version",
             "in": "query",
-            "description": "IIDX バージョン番号 (26〜33)",
-            "required": true,
+            "description": "IIDX バージョン番号 (26〜34, INF)。未指定・不正値は最新バージョンにフォールバック",
+            "required": false,
             "schema": {
               "$ref": "#/components/schemas/IIDXVersion"
             }
@@ -3780,8 +3900,8 @@
           {
             "name": "version",
             "in": "query",
-            "description": "IIDX バージョン番号 (26〜33)",
-            "required": true,
+            "description": "IIDX バージョン番号 (26〜34, INF)。未指定・不正値は最新バージョンにフォールバック",
+            "required": false,
             "schema": {
               "$ref": "#/components/schemas/IIDXVersion"
             }
@@ -3940,8 +4060,8 @@
           {
             "name": "version",
             "in": "query",
-            "description": "IIDX バージョン番号 (26〜33)",
-            "required": true,
+            "description": "IIDX バージョン番号 (26〜34, INF)。未指定・不正値は最新バージョンにフォールバック",
+            "required": false,
             "schema": {
               "$ref": "#/components/schemas/IIDXVersion"
             }
@@ -3951,6 +4071,26 @@
             "in": "query",
             "description": "対象レベル (例: 12)",
             "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "customGoalRatio",
+            "in": "query",
+            "required": false,
+            "description": "カスタム目標を最大スコア比 (0〜1) で指定",
+            "schema": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          },
+          {
+            "name": "customGoalOffset",
+            "in": "query",
+            "required": false,
+            "description": "カスタム目標 EX スコアへの加算オフセット",
             "schema": {
               "type": "integer"
             }
@@ -4049,6 +4189,24 @@
               "type": "string",
               "default": "totalBpi"
             }
+          },
+          {
+            "name": "area",
+            "in": "query",
+            "required": false,
+            "description": "都道府県名でフィルタ（category=totalBpi のときのみ有効）",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "arenaClass",
+            "in": "query",
+            "required": false,
+            "description": "アリーナ段位でフィルタ（category=totalBpi のときのみ有効）",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -4078,16 +4236,22 @@
                             "nullable": true
                           },
                           "isPublic": {
-                            "type": "boolean"
+                            "type": "integer",
+                            "enum": [
+                              0,
+                              1
+                            ]
                           },
                           "iidxId": {
                             "type": "string",
                             "nullable": true
                           },
                           "totalBpi": {
-                            "type": "number"
+                            "type": "number",
+                            "format": "float",
+                            "description": "category がレーダーの場合はそのカテゴリ値"
                           },
-                          "arenaRank": {
+                          "arenaClass": {
                             "type": "string",
                             "nullable": true
                           },
@@ -4101,10 +4265,11 @@
                       "type": "integer"
                     },
                     "selfRank": {
-                      "type": "integer"
+                      "type": "integer",
+                      "description": "自分の順位。ランキング外なら 0"
                     },
                     "viewerRadar": {
-                      "$ref": "#/components/schemas/RadarStats"
+                      "$ref": "#/components/schemas/RankingRadarViewer"
                     }
                   }
                 }
@@ -4264,8 +4429,8 @@
           {
             "name": "version",
             "in": "query",
-            "description": "",
-            "required": true,
+            "description": "IIDX バージョン番号 (26〜34, INF)。未指定・不正値は最新バージョンにフォールバック",
+            "required": false,
             "schema": {
               "$ref": "#/components/schemas/IIDXVersion"
             }
@@ -4361,8 +4526,8 @@
           {
             "name": "version",
             "in": "query",
-            "description": "",
-            "required": true,
+            "description": "IIDX バージョン番号 (26〜34, INF)。未指定・不正値は最新バージョンにフォールバック",
+            "required": false,
             "schema": {
               "$ref": "#/components/schemas/IIDXVersion"
             }
@@ -4480,8 +4645,8 @@
           {
             "name": "version",
             "in": "query",
-            "description": "",
-            "required": true,
+            "description": "IIDX バージョン番号 (26〜34, INF)。未指定・不正値は最新バージョンにフォールバック",
+            "required": false,
             "schema": {
               "$ref": "#/components/schemas/IIDXVersion"
             }
@@ -4509,14 +4674,26 @@
                       "type": "number"
                     },
                     "estimatedRank": {
-                      "type": "string",
-                      "nullable": true
+                      "type": "integer",
+                      "description": "BPI 公式による皆伝内推定順位"
                     },
                     "playedCount": {
                       "type": "integer"
                     },
                     "totalCount": {
                       "type": "integer"
+                    },
+                    "area": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "areaRank": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "totalInArea": {
+                      "type": "integer",
+                      "nullable": true
                     }
                   }
                 }
@@ -4696,7 +4873,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/SongWithScore"
+                    "$ref": "#/components/schemas/RivalComparisonRow"
                   }
                 }
               }
@@ -4899,50 +5076,14 @@
             }
           },
           {
-            "name": "level",
-            "in": "query",
-            "description": "難易度レベルでフィルタ（複数可）",
-            "required": false,
-            "schema": {
-              "oneOf": [
-                {
-                  "type": "integer"
-                },
-                {
-                  "type": "array",
-                  "items": {
-                    "type": "integer"
-                  }
-                }
-              ]
-            }
-          },
-          {
-            "name": "difficulty",
-            "in": "query",
-            "description": "難易度でフィルタ（複数可）",
-            "required": false,
-            "schema": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/Difficulty"
-                },
-                {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Difficulty"
-                  }
-                }
-              ]
-            }
-          },
-          {
             "name": "limit",
             "in": "query",
             "description": "",
             "required": false,
             "schema": {
               "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
               "default": 10
             }
           },
@@ -4992,6 +5133,34 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "levels",
+            "in": "query",
+            "required": false,
+            "description": "難易度レベルでフィルタ（複数可・CSV可）",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "style": "form",
+            "explode": true
+          },
+          {
+            "name": "difficulties",
+            "in": "query",
+            "required": false,
+            "description": "難易度でフィルタ（複数可・CSV可）",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Difficulty"
+              }
+            },
+            "style": "form",
+            "explode": true
           }
         ],
         "responses": {
@@ -5005,23 +5174,27 @@
                     "items": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/SongWithScore"
+                        "$ref": "#/components/schemas/RivalComparisonListItem"
                       }
                     },
                     "nextCursor": {
-                      "type": "object",
-                      "properties": {
-                        "lastDiff": {
-                          "type": "integer"
-                        },
-                        "lastSongId": {
-                          "type": "string"
-                        },
-                        "lastRivalId": {
-                          "type": "string"
+                      "nullable": true,
+                      "allOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "lastDiff": {
+                              "type": "integer"
+                            },
+                            "lastSongId": {
+                              "type": "string"
+                            },
+                            "lastRivalId": {
+                              "type": "string"
+                            }
+                          }
                         }
-                      },
-                      "nullable": true
+                      ]
                     }
                   }
                 }
@@ -5218,42 +5391,41 @@
             }
           },
           {
-            "name": "level",
+            "name": "listId",
             "in": "query",
-            "description": "難易度レベルでフィルタ（複数可）",
             "required": false,
+            "description": "フォローリスト ID でフィルタ（本人所有のリストのみ）",
             "schema": {
-              "oneOf": [
-                {
-                  "type": "integer"
-                },
-                {
-                  "type": "array",
-                  "items": {
-                    "type": "integer"
-                  }
-                }
-              ]
+              "type": "string"
             }
           },
           {
-            "name": "difficulty",
+            "name": "levels",
             "in": "query",
-            "description": "難易度でフィルタ（複数可）",
             "required": false,
+            "description": "難易度レベルでフィルタ（複数可）",
             "schema": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/Difficulty"
-                },
-                {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Difficulty"
-                  }
-                }
-              ]
-            }
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            "style": "form",
+            "explode": true
+          },
+          {
+            "name": "difficulties",
+            "in": "query",
+            "required": false,
+            "description": "難易度でフィルタ（複数可）",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Difficulty"
+              }
+            },
+            "style": "form",
+            "explode": true
           }
         ],
         "responses": {
@@ -5297,6 +5469,11 @@
                           }
                         }
                       }
+                    },
+                    "viewerBpi": {
+                      "type": "number",
+                      "format": "float",
+                      "description": "閲覧者の TotalBPI"
                     }
                   }
                 }
@@ -5325,6 +5502,17 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "指定した listId が存在しない／本人所有でない",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "headers": {}
           },
           "500": {
             "description": "Internal Server Error",
@@ -6169,6 +6357,7 @@
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
@@ -6182,8 +6371,7 @@
                     "type": "number"
                   },
                   "reportData": {
-                    "type": "object",
-                    "properties": {}
+                    "$ref": "#/components/schemas/OptimizationResult"
                   }
                 }
               }
@@ -6671,6 +6859,7 @@
       },
       "UserProfile": {
         "type": "object",
+        "description": "userProfileRepo.getUserProfileSummary の結果（statsPrivacy を除く）+ areaRank",
         "properties": {
           "userId": {
             "type": "string"
@@ -6701,23 +6890,13 @@
               1
             ]
           },
-          "history": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/UserProfileHistory"
-            }
-          },
-          "current": {
-            "$ref": "#/components/schemas/UserProfileHistory",
-            "nullable": true
-          },
           "follows": {
             "type": "object",
             "properties": {
-              "following": {
+              "followers": {
                 "type": "integer"
               },
-              "followers": {
+              "following": {
                 "type": "integer"
               }
             }
@@ -6728,33 +6907,50 @@
               "isFollowing": {
                 "type": "boolean"
               },
-              "isFollowed": {
+              "isFollowedBy": {
+                "type": "boolean"
+              },
+              "isMutual": {
                 "type": "boolean"
               },
               "isSelf": {
                 "type": "boolean"
               }
             }
-          }
-        }
-      },
-      "UserProfileHistory": {
-        "type": "object",
-        "properties": {
-          "version": {
-            "$ref": "#/components/schemas/IIDXVersion"
           },
-          "totalBpi": {
-            "type": "number",
-            "format": "float",
-            "nullable": true
+          "role": {
+            "nullable": true,
+            "allOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "role": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "grantedAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              }
+            ]
           },
-          "arenaRank": {
-            "type": "string"
+          "stats": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserProfileStatsEntry"
+            }
           },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
+          "areaRank": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AreaRankInfo"
+              }
+            ]
           }
         }
       },
@@ -7861,6 +8057,323 @@
             ]
           }
         }
+      },
+      "AreaRankInfo": {
+        "type": "object",
+        "required": [
+          "area",
+          "areaRank",
+          "totalInArea"
+        ],
+        "properties": {
+          "area": {
+            "type": "string"
+          },
+          "areaRank": {
+            "type": "integer"
+          },
+          "totalInArea": {
+            "type": "integer"
+          }
+        }
+      },
+      "UserProfileStatsEntry": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "$ref": "#/components/schemas/IIDXVersion"
+          },
+          "totalBpi": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "arenaClass": {
+            "type": "string",
+            "nullable": true
+          },
+          "arenaRank": {
+            "type": "integer",
+            "nullable": true
+          },
+          "area": {
+            "type": "string",
+            "nullable": true
+          },
+          "gradeSp": {
+            "type": "string",
+            "nullable": true
+          },
+          "gradeDp": {
+            "type": "string",
+            "nullable": true
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "bestArenaClass": {
+            "type": "string",
+            "nullable": true
+          },
+          "bestArenaClassAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "RankingRadarViewer": {
+        "type": "object",
+        "description": "閲覧者のレーダー各カテゴリ（songs は常に空配列）",
+        "properties": {
+          "NOTES": {
+            "type": "object",
+            "properties": {
+              "totalBpi": {
+                "type": "number",
+                "format": "float"
+              },
+              "songs": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          },
+          "CHORD": {
+            "type": "object",
+            "properties": {
+              "totalBpi": {
+                "type": "number",
+                "format": "float"
+              },
+              "songs": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          },
+          "PEAK": {
+            "type": "object",
+            "properties": {
+              "totalBpi": {
+                "type": "number",
+                "format": "float"
+              },
+              "songs": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          },
+          "CHARGE": {
+            "type": "object",
+            "properties": {
+              "totalBpi": {
+                "type": "number",
+                "format": "float"
+              },
+              "songs": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          },
+          "SCRATCH": {
+            "type": "object",
+            "properties": {
+              "totalBpi": {
+                "type": "number",
+                "format": "float"
+              },
+              "songs": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          },
+          "SOFLAN": {
+            "type": "object",
+            "properties": {
+              "totalBpi": {
+                "type": "number",
+                "format": "float"
+              },
+              "songs": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        }
+      },
+      "RivalComparisonListItem": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SongWithScore"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "exDiff": {
+                "type": "integer"
+              },
+              "rival": {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  },
+                  "userName": {
+                    "type": "string"
+                  },
+                  "profileImage": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "exScore": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "RivalComparisonRow": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SongWithScore"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "rival": {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "userName": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "exScore": {
+                    "type": "integer",
+                    "nullable": true
+                  },
+                  "bpi": {
+                    "type": "number",
+                    "format": "float",
+                    "nullable": true
+                  },
+                  "clearState": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "missCount": {
+                    "type": "integer",
+                    "nullable": true
+                  },
+                  "lastPlayed": {
+                    "type": "string",
+                    "format": "date-time",
+                    "nullable": true
+                  }
+                }
+              },
+              "exDiff": {
+                "type": "integer"
+              },
+              "bpiDiff": {
+                "type": "number",
+                "format": "float"
+              },
+              "lastPlayedMax": {
+                "type": "string",
+                "format": "date-time",
+                "nullable": true
+              },
+              "radarTop": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          }
+        ]
+      },
+      "SelfVersionRow": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SongWithScore"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "rival": {
+                "type": "object",
+                "properties": {
+                  "exScore": {
+                    "type": "integer",
+                    "nullable": true
+                  },
+                  "bpi": {
+                    "type": "number",
+                    "format": "float",
+                    "nullable": true
+                  },
+                  "clearState": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "missCount": {
+                    "type": "integer",
+                    "nullable": true
+                  },
+                  "lastPlayed": {
+                    "type": "string",
+                    "format": "date-time",
+                    "nullable": true
+                  }
+                }
+              },
+              "exDiff": {
+                "type": "integer"
+              },
+              "bpiDiff": {
+                "type": "number",
+                "format": "float"
+              },
+              "radarTop": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          }
+        ]
       }
     },
     "responses": {},
