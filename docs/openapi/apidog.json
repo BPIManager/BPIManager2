@@ -5554,18 +5554,9 @@
             }
           },
           {
-            "name": "version",
-            "in": "query",
-            "description": "IIDX バージョン番号 (26〜33)",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/IIDXVersion"
-            }
-          },
-          {
             "name": "q",
             "in": "query",
-            "description": "ユーザー名での検索クエリ",
+            "description": "ユーザー名または IIDX ID の部分一致検索",
             "required": false,
             "schema": {
               "type": "string"
@@ -5584,7 +5575,7 @@
           {
             "name": "s",
             "in": "query",
-            "description": "ソートキー (totalBpi or レーダーカテゴリ名)",
+            "description": "ソートキー: totalBpi / notes / chord / peak / charge / scratch / soflan",
             "required": false,
             "schema": {
               "type": "string",
@@ -5594,16 +5585,26 @@
           {
             "name": "o",
             "in": "query",
-            "description": "並び順モード",
+            "description": "並び順モード。distance=閲覧者の BPI に近い順 / desc=s の降順 / newest=最新スコア登録順 / supporters=サポーターを付与日順（全件返す）",
             "required": false,
             "schema": {
               "type": "string",
               "enum": [
                 "distance",
                 "desc",
-                "newest"
+                "newest",
+                "supporters"
               ],
               "default": "distance"
+            }
+          },
+          {
+            "name": "seed",
+            "in": "query",
+            "required": false,
+            "description": "並び順のランダム化シード（newest など order に揺らぎを持たせる用途）",
+            "schema": {
+              "type": "integer"
             }
           }
         ],
