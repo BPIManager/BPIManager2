@@ -32,6 +32,7 @@ function overtakenScoresBaseQuery(params: {
         .onRef("s2.userId", "=", "f.followingId")
         .on("s2.version", "=", latestVersion),
     )
+    .innerJoin("users as fu", "fu.userId", "f.followingId")
     .innerJoin("scores as r", (join) =>
       join
         .onRef("r.songId", "=", "s2.songId")
@@ -61,6 +62,21 @@ function overtakenScoresBaseQuery(params: {
         ),
     )
     .where("f.followerId", "=", userId)
+    // フォロー対象が公開、または対象が非公開でも承認記録がある場合のみ通知する。
+    // followsの存在だけでは判定できない(#275フォロー後方修正: 公開時代に成立した
+    // followsには承認記録がないため、承認記録の有無も要求する / #295)。
+    .where((eb) =>
+      eb.or([
+        eb("fu.isPublic", "=", 1),
+        eb.exists(
+          eb
+            .selectFrom("followApprovalNotifications as fan")
+            .select("fan.id")
+            .where("fan.recipientId", "=", userId)
+            .whereRef("fan.actorId", "=", "f.followingId"),
+        ),
+      ]),
+    )
     .whereRef("s2.exScore", ">", "r.exScore")
     .where((eb) =>
       eb.or([
@@ -163,14 +179,13 @@ class NotificationsAggregateRepository {
       .$castTo<NotificationOvertakenRow>();
 
     const overtakenQuery = overtakenScoresBaseQuery({ userId, latestVersion })
-      .innerJoin("users as u", "s2.userId", "u.userId")
       .innerJoin("songs as song", "s2.songId", "song.songId")
       .select([
         sql<string>`'overtaken'`.as("type"),
         "s2.lastPlayed as timestamp",
-        "u.userName as senderName",
-        "u.profileImage as senderImage",
-        "u.userId as senderId",
+        "fu.userName as senderName",
+        "fu.profileImage as senderImage",
+        "fu.userId as senderId",
         "song.title as songTitle",
         "song.difficulty as songDifficulty",
         "s2.exScore as rivalScore",

@@ -35,6 +35,21 @@ describe("notificationsAggregateRepo.getUnreadCount", () => {
     );
     expect(result).toEqual({ total: 0 });
   });
+
+  it("追い抜き通知の集計でフォロー対象のusersを結合し公開/承認ガードを効かせること(#295 非公開・未承認フォロー対象のスコア漏洩の回帰防止)", async () => {
+    dbHolder.current = createDbSpy({ cnt: 0 });
+    await notificationsAggregateRepo.getUnreadCount("user-1", "33");
+
+    const joinCalls = callsFor(dbHolder.current.calls, "innerJoin");
+    expect(
+      joinCalls.some(
+        (c) =>
+          c.args[0] === "users as fu" &&
+          c.args[1] === "fu.userId" &&
+          c.args[2] === "f.followingId",
+      ),
+    ).toBe(true);
+  });
 });
 
 describe("notificationsAggregateRepo.getNotifications", () => {
@@ -61,6 +76,30 @@ describe("notificationsAggregateRepo.getNotifications", () => {
       offset: 0,
     });
     expect(callsFor(dbHolder.current.calls, "unionAll")).toHaveLength(0);
+  });
+
+  it("追い抜き通知でフォロー対象のusersを結合し(公開/承認ガード)、s2.userId起点の重複join(users as u)を張らないこと(#295)", async () => {
+    dbHolder.current = createDbSpy([]);
+    await notificationsAggregateRepo.getNotifications({
+      userId: "user-1",
+      type: "overtaken",
+      latestVersion: "33",
+      limit: 20,
+      offset: 0,
+    });
+
+    const joinCalls = callsFor(dbHolder.current.calls, "innerJoin");
+    expect(
+      joinCalls.some(
+        (c) => c.args[0] === "users as fu" && c.args[2] === "f.followingId",
+      ),
+    ).toBe(true);
+    // base query の fu と重複する s2.userId 起点の users 結合は張らない
+    expect(
+      joinCalls.some(
+        (c) => c.args[0] === "users as u" && c.args[1] === "s2.userId",
+      ),
+    ).toBe(false);
   });
 
   it("limit/offsetが適用されること", async () => {
