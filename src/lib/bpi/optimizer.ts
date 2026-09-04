@@ -10,7 +10,17 @@ import type {
 } from "@/types/bpi-optimizer";
 import { RadarCategory } from "@/types/stats/radar";
 
+/**
+ * `BpiCalculator.calculateTotalBPI` と同じ集約を、
+ * 「1曲の貢献度」と「貢献度の合計」に分解して相互変換できるようにしたもの。
+ *
+ * 総合BPIはシフト後のべき乗平均なので、BPI 値は常に
+ * `+BpiCalculator.BPI_FLOOR` の絶対値だけずらした非負の空間で扱う。
+ */
 class BpiMath {
+  /** BPI を非負域へ移すシフト量（`BpiCalculator` の下限と同じ） */
+  private readonly shift = -BpiCalculator.BPI_FLOOR;
+
   /**
    * @param n - 対象となる全楽曲数
    * @param exponent - 計算に使用する指数
@@ -24,11 +34,11 @@ class BpiMath {
    * 単一のBPI値から貢献度を計算
    *
    * @param value - 計算対象のBPI値
-   * @returns 計算された貢献度
+   * @returns 計算された貢献度（常に0以上）
    */
   public contribution(value: number): number {
-    const power = Math.pow(Math.abs(value), this.exponent) / this.n;
-    return value > 0 ? power : -power;
+    const shifted = Math.max(0, value + this.shift);
+    return Math.pow(shifted, this.exponent) / this.n;
   }
 
   /**
@@ -38,9 +48,7 @@ class BpiMath {
    * @returns 総合BPI
    */
   public totalFromSum(sum: number): number {
-    if (sum === 0) return 0;
-    const result = Math.pow(Math.abs(sum), 1 / this.exponent);
-    return sum > 0 ? result : -result;
+    return Math.pow(Math.max(0, sum), 1 / this.exponent) - this.shift;
   }
 
   /**
@@ -50,9 +58,8 @@ class BpiMath {
    * @returns 逆算されたBPI値
    */
   public bpiFromContribution(contribution: number): number {
-    const power = contribution * this.n;
-    const result = Math.pow(Math.abs(power), 1 / this.exponent);
-    return power > 0 ? result : -result;
+    const power = Math.max(0, contribution) * this.n;
+    return Math.pow(power, 1 / this.exponent) - this.shift;
   }
 
   /**
@@ -62,9 +69,7 @@ class BpiMath {
    * @returns 必要な貢献度の合計値
    */
   public sumForBpi(bpi: number): number {
-    return bpi > 0
-      ? Math.pow(bpi, this.exponent)
-      : -Math.pow(Math.abs(bpi), this.exponent);
+    return Math.pow(Math.max(0, bpi + this.shift), this.exponent);
   }
 }
 

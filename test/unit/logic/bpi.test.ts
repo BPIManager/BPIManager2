@@ -173,6 +173,118 @@ describe("BpiCalculator ロジックテスト", () => {
       expect(total).toBeGreaterThan(0);
     });
 
+    it("対象楽曲数が0の場合、下限値を返すこと", () => {
+      expect(BpiCalculator.calculateTotalBPI([], 0)).toBe(
+        BpiCalculator.BPI_FLOOR,
+      );
+    });
+
+    it("全曲未プレイの場合、下限値になること", () => {
+      [1, 10, 92, 470].forEach((n) => {
+        expect(BpiCalculator.calculateTotalBPI([], n)).toBe(
+          BpiCalculator.BPI_FLOOR,
+        );
+      });
+    });
+
+    it("1曲だけ全一(BPI 100)を持ち他が未プレイの場合、総合BPIが50になること", () => {
+      // BPI本来の設計性質。totalBpiExponent はこれを満たすように校正されている
+      [2, 10, 92, 470, 980].forEach((n) => {
+        expect(BpiCalculator.calculateTotalBPI([100], n)).toBeCloseTo(50, 2);
+      });
+    });
+
+    it("全曲が同一BPIの場合、総合BPIがその値そのものになること", () => {
+      [470, 92, 10].forEach((n) => {
+        [-15, 0, 12.5, 50, 100].forEach((v) => {
+          expect(
+            BpiCalculator.calculateTotalBPI(new Array(n).fill(v), n),
+          ).toBeCloseTo(v, 2);
+        });
+      });
+    });
+
+    it("いずれか1曲のBPIを上げたとき、総合BPIが下がらないこと（単調性）", () => {
+      const base = [62, 41, 30, 30, 18, 5, 0, -3, -12];
+      const n = 40;
+      const before = BpiCalculator.calculateTotalBPI([...base], n);
+      for (let i = 0; i < base.length; i++) {
+        const bumped = [...base];
+        bumped[i] += 7;
+        bumped.sort((a, b) => b - a);
+        expect(BpiCalculator.calculateTotalBPI(bumped, n)).toBeGreaterThanOrEqual(
+          before,
+        );
+      }
+    });
+
+    it("1曲をΔ改善しても総合BPIの変化がΔを超えないこと（1-Lipschitz）", () => {
+      const profiles = [
+        new Array(50).fill(0),
+        new Array(50).fill(-8),
+        [70, 55, 40, 22, 10, -2, -11],
+        new Array(120).fill(35),
+      ];
+      const deltas = [1, 5, 20];
+      profiles.forEach((profile) => {
+        [profile.length, 92, 470].forEach((n) => {
+          const before = BpiCalculator.calculateTotalBPI([...profile], n);
+          deltas.forEach((delta) => {
+            for (let i = 0; i < profile.length; i++) {
+              const bumped = [...profile];
+              bumped[i] += delta;
+              bumped.sort((a, b) => b - a);
+              const after = BpiCalculator.calculateTotalBPI(bumped, n);
+              // 小数第2位への丸めぶんの誤差を許容する
+              expect(after - before).toBeLessThanOrEqual(delta + 0.011);
+            }
+          });
+        });
+      });
+    });
+
+    it("1曲だけを連続的に改善したとき、総合BPIが不連続に飛ばないこと（断崖の回帰テスト）", () => {
+      // 修正前は「他50曲が0・1曲が25→30」で総合が -11.24 から +13.66 へ跳んでいた
+      const n = 92;
+      const rest = new Array(50).fill(0);
+      let prev = BpiCalculator.calculateTotalBPI([...rest], n);
+      for (let x = -15; x <= 100; x += 1) {
+        const total = BpiCalculator.calculateTotalBPI(
+          [x, ...rest].sort((a, b) => b - a),
+          n,
+        );
+        expect(total - prev).toBeLessThanOrEqual(1.011);
+        prev = total;
+      }
+    });
+
+    it("未プレイ以外の曲の底上げが総合BPIに反映されること", () => {
+      // 修正前は最良1曲に支配され、残り50曲が -8 でも 0 でも +5 でも総合が同じ値になっていた
+      const n = 92;
+      const withMinus8 = BpiCalculator.calculateTotalBPI(
+        new Array(50).fill(-8),
+        n,
+      );
+      const withZero = BpiCalculator.calculateTotalBPI(new Array(50).fill(0), n);
+      const withPlus5 = BpiCalculator.calculateTotalBPI(
+        new Array(50).fill(5),
+        n,
+      );
+      expect(withZero).toBeGreaterThan(withMinus8);
+      expect(withPlus5).toBeGreaterThan(withZero);
+    });
+
+    it("下限を下回るBPIが渡されてもNaNにならず、下限扱いになること", () => {
+      const n = 10;
+      const clamped = BpiCalculator.calculateTotalBPI([-40, -20, 30], n);
+      const floored = BpiCalculator.calculateTotalBPI(
+        [BpiCalculator.BPI_FLOOR, BpiCalculator.BPI_FLOOR, 30],
+        n,
+      );
+      expect(clamped).not.toBeNaN();
+      expect(clamped).toBe(floored);
+    });
+
     it("推定順位がBPI 100で1位、BPI 0付近で皆伝平均順位になること", () => {
       expect(BpiCalculator.estimateRank(100)).toBe(1);
       expect(BpiCalculator.estimateRank(0)).toBeGreaterThan(2000);

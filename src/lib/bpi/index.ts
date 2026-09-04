@@ -12,6 +12,17 @@ export class BpiCalculator {
   private static readonly DEFAULT_POW_COEF = 1.175;
   private static readonly AVERAGE_OF_ALL_KAIDENS = 2699;
 
+  /** 単曲 BPI の下限。未プレイ楽曲もこの値として扱う。 */
+  public static readonly BPI_FLOOR = -15;
+
+  /**
+   * 総合 BPI のべき乗平均を非負の値域で行うためのシフト量。
+   *
+   * べき乗平均は負の値を扱えないため、下限 `BPI_FLOOR` が 0 に移るだけのシフトを掛ける。
+   * これにより「未プレイ楽曲＝寄与ゼロ」がそのまま成立する。
+   */
+  private static readonly TOTAL_BPI_SHIFT = -BpiCalculator.BPI_FLOOR;
+
   private static pgf(j: number, m: number): number {
     if (j === m) return m * 0.8;
     return 1 + (j / m - 0.5) / (1 - j / m);
@@ -20,10 +31,19 @@ export class BpiCalculator {
   /**
    * 総合BPIのべき乗平均で使用する指数を計算する。
    *
+   * 「1曲だけ全一(BPI 100)を持ち、他が全て未プレイなら総合 BPI が 50 になる」という
+   * BPI 本来の設計性質を満たす指数。シフト量 `c` のもとでこの性質は
+   * `n^(1/k) = (100 + c) / (50 + c)` と同値なので、そこから k を解いて得られる。
+   * （シフトしない場合の `log2(n)` は c = 0 のときの解にあたる）
+   *
    * @param totalSongCount - 対象楽曲の総数
    */
   public static totalBpiExponent(totalSongCount: number): number {
-    return Math.max(1, Math.log2(totalSongCount));
+    const c = this.TOTAL_BPI_SHIFT;
+    return Math.max(
+      1,
+      Math.log(totalSongCount) / Math.log((100 + c) / (50 + c)),
+    );
   }
 
   /**
@@ -31,15 +51,15 @@ export class BpiCalculator {
    *
    * @param s - プレイヤーの EX スコア
    * @param song - 楽曲データ（ノーツ数・皆伝平均・WR スコア・補正係数）
-   * @returns BPI 値（-15 〜 理論上限）。スコアが最大値を超える場合は `null`
+   * @returns BPI 値（`BPI_FLOOR` 〜 理論上限）。スコアが最大値を超える場合は `null`
    */
   public static calc(s: number, song: IBpiBasicSongData): number | null {
     const { notes, kaidenAvg: k, wrScore: z, coef } = song;
-    if (k === null || z === null || notes === 0) return -15;
+    if (k === null || z === null || notes === 0) return this.BPI_FLOOR;
     const m = notes * 2;
 
     if (s > m) return null;
-    if (s < 0) return -15;
+    if (s < 0) return this.BPI_FLOOR;
 
     const _k = this.pgf(k, m);
     const _s_ = this.pgf(s, m) / _k;
@@ -56,7 +76,7 @@ export class BpiCalculator {
       Math.round(
         (p ? 100 : -100) * Math.pow(Math.abs(logS / logZ), powCoef) * 100,
       ) / 100;
-    return isNaN(res) ? null : Math.max(-15, res);
+    return isNaN(res) ? null : Math.max(this.BPI_FLOOR, res);
   }
 
   /**
@@ -97,7 +117,16 @@ export class BpiCalculator {
   /**
    * 総合 BPI をべき乗平均で計算する。
    *
-   * 全楽曲数に対してプレイしていない楽曲は BPI `-15` として扱う。
+   * 全楽曲数に対してプレイしていない楽曲は BPI `BPI_FLOOR` として扱う。
+   *
+   * 各単曲 BPI を `+TOTAL_BPI_SHIFT` して非負域へ移してからべき乗平均を取り、
+   * 最後にシフトを戻す。混合符号のまま冪を取ると値は平均ではなく符号付き
+   * L^k ノルムになり、絶対値最大の 1 曲に支配されて符号反転点で不連続に飛ぶ
+   * （下限で埋まった未プレイ曲が多いほど顕著になる）。
+   *
+   * この形は単調かつ 1-Lipschitz で、どの 1 曲を Δ 改善しても総合の変化は
+   * Δ を超えない。`totalBpiExponent` の校正により「1曲全一 + 残り未プレイ = 50」
+   * および「全曲同一 BPI ならその値そのもの」は従来どおり成立する。
    *
    * @param allBpis - 各楽曲の BPI 配列（降順ソート推奨）
    * @param totalSongCount - 対象楽曲の総数
@@ -107,20 +136,21 @@ export class BpiCalculator {
     allBpis: number[],
     totalSongCount: number,
   ): number {
-    if (totalSongCount === 0) return -15;
+    if (totalSongCount === 0) return this.BPI_FLOOR;
 
+    const c = this.TOTAL_BPI_SHIFT;
     const k = this.totalBpiExponent(totalSongCount);
 
     let sum = 0;
     for (let i = 0; i < totalSongCount; i++) {
-      //未プレイ楽曲がある（totalSongCountにallBpisが満たない場合）は、-15で埋める
-      const bpi = i < allBpis.length ? allBpis[i] : -15;
-      const m = Math.pow(Math.abs(bpi), k) / totalSongCount;
-      sum += bpi > 0 ? m : -m;
+      //未プレイ楽曲がある（totalSongCountにallBpisが満たない場合）は、下限で埋める
+      const bpi = i < allBpis.length ? allBpis[i] : this.BPI_FLOOR;
+      // 下限を下回る値が渡されても負の底で冪を取らないようクランプする
+      const shifted = Math.max(0, bpi + c);
+      sum += Math.pow(shifted, k) / totalSongCount;
     }
 
-    const res = Math.round(Math.pow(Math.abs(sum), 1 / k) * 100) / 100;
-    return sum > 0 ? res : -res;
+    return Math.round((Math.pow(sum, 1 / k) - c) * 100) / 100;
   }
 
   /**
