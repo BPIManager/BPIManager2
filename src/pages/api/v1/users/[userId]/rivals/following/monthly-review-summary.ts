@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { checkUserAccess } from "@/middlewares/api/withApi";
+import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { followListAggregateRepo } from "@/lib/db/aggregates/followList";
 import { monthlyReviewRepo } from "@/lib/db/aggregates/monthly-review";
 import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
@@ -26,7 +26,7 @@ export default async function handler(
     return res.status(400).json({ message: "Invalid month or version" });
 
   const access = await checkUserAccess(req, userId as string);
-  if (!access.user) return res.status(401).json({ message: "Unauthorized" });
+  if (!access.hasAccess) return rejectAccess(res, access);
 
   try {
     const monthStart = isYearMode

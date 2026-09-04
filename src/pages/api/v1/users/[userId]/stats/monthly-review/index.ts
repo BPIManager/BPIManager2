@@ -1,10 +1,7 @@
 import { monthlyReviewRepo } from "@/lib/db/aggregates/monthly-review";
 import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import dayjs from "@/lib/dayjs";
-import {
-  AuthenticatedNextApiRequest,
-  withAuth,
-} from "@/middlewares/api/withAuth";
+import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
 import { buildBpiTimeline } from "@/lib/monthly-review/bpi";
 import { buildTopSongs } from "@/lib/monthly-review/topSongs";
 import {
@@ -22,38 +19,49 @@ import {
 } from "@/lib/monthly-review/rivals";
 import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import type { MonthlyReviewData } from "@/types/stats/monthlyReview";
-import type { NextApiResponse } from "next";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 
 const L12_DIFFICULTIES = IIDX_DIFFICULTIES;
 
-async function handler(
-  req: AuthenticatedNextApiRequest,
-  res: NextApiResponse,
-) {
-  if (req.method !== "GET") {
-    res.setHeader("Allow", ["GET"]);
-    return res.status(405).json({ message: "Method Not Allowed" });
-  }
+export default withUserApiHandler(
+  (req, res) => {
+    if (req.method !== "GET") {
+      res.setHeader("Allow", ["GET"]);
+      res.status(405).json({ message: "Method Not Allowed" });
+      return null;
+    }
 
-  const userId = req.authUid;
-  const version = req.query.version as string;
-  const month = req.query.month as string; // YYYY-MM or YYYY (year mode)
+    const userId = req.query.userId as string;
+    const version = req.query.version as string;
+    const month = req.query.month as string; // YYYY-MM or YYYY (year mode)
 
-  const isYearMode = /^\d{4}$/.test(month);
-  const isMonthMode = /^\d{4}-\d{2}$/.test(month);
+    const isYearMode = /^\d{4}$/.test(month ?? "");
+    const isMonthMode = /^\d{4}-\d{2}$/.test(month ?? "");
+    const isValidVersion = (IIDX_VERSIONS as readonly string[]).includes(
+      version,
+    );
 
-  const isValidVersion = (IIDX_VERSIONS as readonly string[]).includes(version);
-  if (!version || !isValidVersion || !month || (!isYearMode && !isMonthMode)) {
-    return res.status(400).json({
-      message: "Missing or invalid params: version, month (YYYY-MM or YYYY)",
-    });
-  }
+    if (!userId || typeof userId !== "string") {
+      res.status(400).json({ message: "Invalid userId" });
+      return null;
+    }
+    if (!version || !isValidVersion || !month || (!isYearMode && !isMonthMode)) {
+      res.status(400).json({
+        message: "Missing or invalid params: version, month (YYYY-MM or YYYY)",
+      });
+      return null;
+    }
 
-  const granularity: "month" | "year" = isYearMode ? "year" : "month";
+    return { userId, version, month };
+  },
+  async (_req, res, { userId: owner, version, month }, access) => {
+    // owner: URL の [userId] = ページ所有者。全データはこのユーザーのもの。
+    // viewerId: 実際の閲覧者(未ログインなら undefined)。ライバル欄で
+    // 「所有者が承認しただけの非公開フォロー」を含めてよいかの判定にのみ使う。
+    const viewerId = access.viewerId;
 
-  try {
-    const viewerId = userId;
+    const isYearMode = /^\d{4}$/.test(month);
+    const granularity: "month" | "year" = isYearMode ? "year" : "month";
 
     const monthStart = isYearMode
       ? dayjs.tz(`${month}-01-01`).format("YYYY-MM-DD")
@@ -69,68 +77,64 @@ async function handler(
       towerRanking,
       dailyTowerData,
       totalSongs,
-      viewerPreMonthState,
-      viewerInMonthHistory,
+      ownerPreMonthState,
+      ownerInMonthHistory,
       breakdownRows,
       allL12SongMeta,
       userCurrentL1112,
       preL1112,
     ] = await Promise.all([
       monthlyReviewRepo.getMonthlyScoreBatches(
-        userId,
+        owner,
         version,
         monthStart,
         monthEnd,
       ),
       monthlyReviewRepo.getMonthlyTowerStats(
-        userId,
+        owner,
         version,
         monthStart,
         monthEnd,
       ),
       monthlyReviewRepo.getMonthlyArenaStats(
-        userId,
+        owner,
         version,
         monthStart,
         monthEnd,
       ),
       monthlyReviewRepo.getMonthlyTowerRanking(
-        userId,
+        owner,
         version,
         monthStart,
         monthEnd,
       ),
       monthlyReviewRepo.getMonthlyDailyTowerData(
-        userId,
+        owner,
         version,
         monthStart,
         monthEnd,
       ),
       statsTablesRepo.getTotalSongCount([12], [...L12_DIFFICULTIES]),
       monthlyReviewRepo.getPreMonthBpiStateForUsers(
-        [viewerId],
+        [owner],
         version,
         monthStart,
       ),
       monthlyReviewRepo.getInMonthScoreHistoryForUsers(
-        [viewerId],
+        [owner],
         version,
         monthStart,
         monthEnd,
       ),
       monthlyReviewRepo.getMonthlyActivityBreakdownByLastPlayed(
-        userId,
+        owner,
         version,
         monthStart,
         monthEnd,
       ),
       monthlyReviewRepo.getAllL12SongMeta(),
-      monthlyReviewRepo.getUserCurrentL1112Scores(viewerId, version),
-      monthlyReviewRepo.getUserPreMonthL1112Scores(
-        viewerId,
-        version,
-        monthStart,
-      ),
+      monthlyReviewRepo.getUserCurrentL1112Scores(owner, version),
+      monthlyReviewRepo.getUserPreMonthL1112Scores(owner, version, monthStart),
     ]);
 
     const monthlyBatchIds = scoreBatches.map((b) => b.batchId);
@@ -138,18 +142,18 @@ async function handler(
       scoreBatches.map((b) => [b.batchId, b.playDate]),
     );
 
-    const viewerPreMonthBpiMap = new Map<number, number>();
-    for (const s of viewerPreMonthState) {
-      viewerPreMonthBpiMap.set(s.songId, s.bpi != null ? Number(s.bpi) : -15);
+    const ownerPreMonthBpiMap = new Map<number, number>();
+    for (const s of ownerPreMonthState) {
+      ownerPreMonthBpiMap.set(s.songId, s.bpi != null ? Number(s.bpi) : -15);
     }
     const {
       history: bpiHistory,
       bpiStart,
       bpiEnd,
-      finalBpiMap: viewerFinalBpiMap,
+      finalBpiMap: ownerFinalBpiMap,
     } = buildBpiTimeline(
-      viewerPreMonthBpiMap,
-      viewerInMonthHistory,
+      ownerPreMonthBpiMap,
+      ownerInMonthHistory,
       totalSongs,
       isYearMode,
     );
@@ -158,13 +162,14 @@ async function handler(
     const userL1112SongIds = userCurrentL1112.map((s) => s.songId);
 
     const [monthlyScores, rivalL1112Scores] = await Promise.all([
-      monthlyReviewRepo.getScoresForBatches(userId, version, monthlyBatchIds),
+      monthlyReviewRepo.getScoresForBatches(owner, version, monthlyBatchIds),
       userL1112SongIds.length > 0
-        ? monthlyReviewRepo.getRivalsCurrentScoresForSongs(
+        ? monthlyReviewRepo.getRivalsCurrentScoresForSongs({
+            ownerId: owner,
             viewerId,
             version,
-            userL1112SongIds,
-          )
+            songIds: userL1112SongIds,
+          })
         : Promise.resolve([]),
     ]);
 
@@ -181,12 +186,12 @@ async function handler(
 
     const [preScores, rankMap] = await Promise.all([
       monthlyReviewRepo.getPreMonthScoresByLastPlayed(
-        userId,
+        owner,
         version,
         songIdsUpdated,
         monthStart,
       ),
-      monthlyReviewRepo.getBatchSongRanks(userId, version, allSongIds),
+      monthlyReviewRepo.getBatchSongRanks(owner, version, allSongIds),
     ]);
 
     const preScoreMap = new Map<
@@ -223,8 +228,8 @@ async function handler(
       topImprovedSongs,
       allL12SongMeta,
       songUpdateDateMap,
-      viewerPreMonthBpiMap,
-      viewerFinalBpiMap,
+      ownerPreMonthBpiMap,
+      ownerFinalBpiMap,
     );
 
     const arena = buildArena(arenaRows);
@@ -266,16 +271,17 @@ async function handler(
       isYearMode,
     );
 
+    // 成長ランキング・タイムラインの基準(「本人」行)はページ所有者。
     const rivalsGrowthRanking = buildGrowthRanking(
       rivals,
-      viewerId,
+      owner,
       bpiDiff,
       bpiStart,
     );
     const rivalsGrowthTimeline = buildGrowthTimeline(
       rivals,
       rivalComputedTimeline,
-      viewerId,
+      owner,
       bpiHistory,
       bpiStart,
       bpiEnd,
@@ -304,10 +310,11 @@ async function handler(
     };
 
     return res.status(200).json(result);
-  } catch (error) {
-    console.error("[monthly-review]", error);
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
-}
-
-export default withAuth(handler);
+  },
+  {
+    onError: (error, res) => {
+      console.error("[monthly-review]", error);
+      return res.status(500).json({ message: "Internal Server Error" });
+    },
+  },
+);

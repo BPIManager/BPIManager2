@@ -4,6 +4,7 @@ import {
   latestLogIdPerSongSubquery,
   latestLogIdPerUserSongSubquery,
 } from "@/lib/db/shared/latestScore";
+import { wherePublicOnly } from "@/lib/db/shared/visibility";
 import { scoresRepo } from "@/lib/db/domains/scores";
 import { iidxTowerRepo } from "@/lib/db/domains/iidxTower";
 import { songsRepo } from "@/lib/db/domains/songs";
@@ -274,12 +275,23 @@ class MonthlyReviewRepository {
   }
 
   // follows・users・scoresを横断JOINしたフォロー中ライバルの現在スコア取得のため、直接参照を維持する。
-  async getRivalsCurrentScoresForSongs(
-    viewerId: string,
-    version: string,
-    songIds: number[],
-  ) {
+  //
+  // 対象は「ページ所有者(ownerId)のフォロー中ユーザー」。誰がこのまとめを
+  // 閲覧しているか(viewerId)で可視範囲が変わる:
+  // - viewerId === ownerId(本人が自分のまとめを見る): 公開 + 所有者が承認済みの非公開
+  // - それ以外(第三者が所有者のまとめを見る): 公開フォローのみ。所有者が承認した
+  //   だけの非公開ライバルを第三者に晒さない(#296 / #275フォロー後方修正)。
+  async getRivalsCurrentScoresForSongs(params: {
+    ownerId: string;
+    viewerId: string | undefined;
+    version: string;
+    songIds: number[];
+  }) {
+    const { ownerId, viewerId, version, songIds } = params;
     if (songIds.length === 0) return [];
+
+    const includeApproved = !!viewerId && viewerId === ownerId;
+
     return await db
       .selectFrom("follows as f")
       .innerJoin("users as u", "f.followingId", "u.userId")
@@ -288,7 +300,7 @@ class MonthlyReviewRepository {
         latestLogIdPerUserSongSubquery({
           table: "scores",
           version,
-          followersOf: viewerId,
+          followersOf: ownerId,
           songIds,
         }).as("latest"),
         (join) =>
@@ -304,22 +316,23 @@ class MonthlyReviewRepository {
         "s.songId",
         "s.exScore",
       ])
-      .where("f.followerId", "=", viewerId)
+      .where("f.followerId", "=", ownerId)
       .where("s.version", "=", version)
-      // 対象が公開、または対象が非公開でも承認記録がある場合のみ表示する。
-      // followsの存在だけでは判定できない(#275フォロー後方修正: 公開時代に
-      // 成立したfollowsには承認記録がないため、承認記録の有無も要求する)
-      .where((eb) =>
-        eb.or([
-          eb("u.isPublic", "=", 1),
-          eb.exists(
-            eb
-              .selectFrom("followApprovalNotifications as fan")
-              .select("fan.id")
-              .where("fan.recipientId", "=", viewerId)
-              .whereRef("fan.actorId", "=", "u.userId"),
-          ),
-        ]),
+      .$call((qb) =>
+        includeApproved
+          ? qb.where((eb) =>
+              eb.or([
+                eb("u.isPublic", "=", 1),
+                eb.exists(
+                  eb
+                    .selectFrom("followApprovalNotifications as fan")
+                    .select("fan.id")
+                    .where("fan.recipientId", "=", ownerId)
+                    .whereRef("fan.actorId", "=", "u.userId"),
+                ),
+              ]),
+            )
+          : wherePublicOnly(qb, "u.isPublic"),
       )
       .execute();
   }
