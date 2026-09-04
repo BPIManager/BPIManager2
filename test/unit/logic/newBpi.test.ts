@@ -26,9 +26,9 @@ describe("NewBpiCalculator ロジックテスト（issue #299〜304 検証用）
     expect(high).toBeGreaterThan(low);
   });
 
-  it("現行実装と異なり-15の床を設けない（0点近くでも床に張り付かない）", () => {
+  it("現行実装と同じく-15を下限としてクランプする（暫定対応）", () => {
     const [songId] = [...newBpiSongParamMap.keys()];
     const veryLow = NewBpiCalculator.calc(1, songId, 1500)!;
-    expect(veryLow).toBeLessThan(-15);
+    expect(veryLow).toBe(NewBpiCalculator.BPI_FLOOR);
   });
 });
