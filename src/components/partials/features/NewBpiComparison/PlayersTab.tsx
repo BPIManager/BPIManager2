@@ -100,36 +100,34 @@ export default function PlayersTab() {
 
   return (
     <div className="flex flex-col gap-4">
+      <DashCard className="text-xs text-muted-foreground">
+        {t("newBpi.players.privacyNotice")}
+      </DashCard>
+
       <DashCard className="p-0">
-        <div className="flex flex-wrap items-center justify-between gap-2 p-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <p className="text-xs text-muted-foreground">
-              {t("newBpi.players.desc")}
-            </p>
-            <Select
-              value={bucketKey}
-              onValueChange={(v) => {
-                setBucketKey(v);
-                setPage(1);
-              }}
-            >
-              <SelectTrigger size="sm" className="w-40">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t("newBpi.players.allBpi")}</SelectItem>
-                {BPI_BUCKETS.filter((b) => b.key !== "all").map((b) => (
-                  <SelectItem key={b.key} value={b.key}>
-                    {b.key}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <span className="text-xs text-muted-foreground">
-            {totalCount}
-            {t("newBpi.players.countUnit")}
-          </span>
+        <div className="flex flex-wrap items-center gap-2 p-3">
+          <p className="text-xs text-muted-foreground">
+            {t("newBpi.players.desc")}
+          </p>
+          <Select
+            value={bucketKey}
+            onValueChange={(v) => {
+              setBucketKey(v);
+              setPage(1);
+            }}
+          >
+            <SelectTrigger size="sm" className="w-40">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t("newBpi.players.allBpi")}</SelectItem>
+              {BPI_BUCKETS.filter((b) => b.key !== "all").map((b) => (
+                <SelectItem key={b.key} value={b.key}>
+                  {b.key}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {isLoading ? (

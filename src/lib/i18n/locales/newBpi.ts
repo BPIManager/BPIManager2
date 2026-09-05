@@ -149,11 +149,11 @@ export const newBpiTranslations = {
     "zh-TW": "公開使用者的綜合BPI變化與單曲增減數(☆12)。為降低運算量，採分頁計算。",
     ko: "공개 사용자의 종합BPI 변화와 곡별 증감 수(☆12). 연산량을 줄이기 위해 페이지 단위로 계산합니다.",
   },
-  "newBpi.players.countUnit": {
-    ja: "人",
-    en: " users",
-    "zh-TW": "人",
-    ko: "명",
+  "newBpi.players.privacyNotice": {
+    ja: "データが非公開のプレイヤーはこの一覧に表示されていません。",
+    en: "Players whose data is private are not shown in this list.",
+    "zh-TW": "資料為非公開的玩家不會顯示在此清單中。",
+    ko: "데이터가 비공개인 플레이어는 이 목록에 표시되지 않습니다.",
   },
   "newBpi.players.user": {
     ja: "ユーザー",

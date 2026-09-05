@@ -205,7 +205,7 @@ class ScoresRepository {
             .onRef("latest.songId", "=", "scores.songId")
             .onRef("latest.maxLogId", "=", "scores.logId"),
       )
-      .select(["scores.userId", "scores.songId", "scores.exScore"])
+      .select(["scores.userId", "scores.songId", "scores.exScore", "scores.bpi"])
       .execute();
   }
 

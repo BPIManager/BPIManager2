@@ -57,7 +57,10 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
   const songById = new Map(songs.map((s) => [s.songId, s]));
   const totalSongCount = songs.length;
 
-  const scoresByUser = new Map<string, { songId: number; exScore: number }[]>();
+  const scoresByUser = new Map<
+    string,
+    { songId: number; exScore: number; bpi: number | null }[]
+  >();
   for (const row of scores) {
     if (!scoresByUser.has(row.userId)) scoresByUser.set(row.userId, []);
     scoresByUser.get(row.userId)!.push(row);
@@ -77,12 +80,11 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
       const song = songById.get(s.songId);
       if (!song) continue;
 
-      const currentBpi = BpiCalculator.calc(s.exScore, {
-        notes: song.notes,
-        kaidenAvg: song.kaidenAvg,
-        wrScore: song.wrScore,
-        coef: song.coef,
-      });
+      // 「一覧」タブ等、他の画面と現行BPIの値を一致させるため、その場で
+      // BpiCalculatorで再計算せずscores.bpi(取り込み時に算出・保存された値)を
+      // そのまま使う。再計算すると、取り込み後に曲定義(WR/皆伝平均)が
+      // 更新された場合に値がズレる。
+      const currentBpi = s.bpi;
       if (currentBpi !== null) currentBpis.push(currentBpi);
 
       const newBpi = NewBpiCalculator.calc(s.exScore, {
