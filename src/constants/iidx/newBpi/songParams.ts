@@ -15,6 +15,7 @@ type NewBpiSongParamsFile = {
   minSongsPerPlayer: number;
   z0: number;
   z100: number;
+  zRef: number;
   songs: Record<string, { mu: number; sigma: number }>;
 };
 
@@ -34,3 +35,4 @@ export const newBpiSongParamMap: Map<number, NewBpiSongParam> = new Map(
 
 export const NEW_BPI_Z0 = newBpiParams.z0;
 export const NEW_BPI_Z100 = newBpiParams.z100;
+export const NEW_BPI_Z_REF = newBpiParams.zRef;

@@ -84,4 +84,50 @@ describe("NewBpiCalculator ロジックテスト（issue #299〜304 検証用）
     expect(NewBpiCalculator.calcFromBPI(1000, song)).toBeLessThanOrEqual(M);
     expect(NewBpiCalculator.calcFromBPI(-1000, song)).toBeGreaterThanOrEqual(0);
   });
+
+  describe("gamma補正（全一が極端に遠い曲のカーブ歪み対策）", () => {
+    // 全一がほぼ理論値(m)の曲は、mu/sigmaで測るとz100が極端な外れ値になり
+    // やすい(issue #299〜304検証で実データにより確認済み)。
+    const EXTREME_WR_SCORE = Math.round(M * 0.999);
+
+    it("全一が極端に遠い曲でもBPI(全一)=100を厳密に保つ", () => {
+      const [songId] = [...newBpiSongParamMap.keys()];
+      const song = { songId, notes: NOTES, kaidenAvg: KAIDEN_AVG, wrScore: EXTREME_WR_SCORE };
+      const atWr = NewBpiCalculator.calc(EXTREME_WR_SCORE, song)!;
+      expect(atWr).toBeCloseTo(100, 1);
+    });
+
+    it("全一が極端に遠い曲では、通常曲より皆伝平均超えのBPIが高く補正される", () => {
+      const [songId] = [...newBpiSongParamMap.keys()];
+      const normalSong = { songId, notes: NOTES, kaidenAvg: KAIDEN_AVG, wrScore: WR_SCORE };
+      const extremeSong = { songId, notes: NOTES, kaidenAvg: KAIDEN_AVG, wrScore: EXTREME_WR_SCORE };
+
+      // BPI0の実際のクロス地点はこのテスト用songIdの実際のmu/sigma次第で
+      // KAIDEN_AVGから多少ずれうるため、皆伝平均をはっきり超える位置を使う
+      const midScore = KAIDEN_AVG + Math.round((WR_SCORE - KAIDEN_AVG) * 0.8);
+      const normalParams = NewBpiCalculator.getSongParams(normalSong)!;
+      const extremeParams = NewBpiCalculator.getSongParams(extremeSong)!;
+
+      // 全一がより遠い(gapが大きい)曲ほどgammaは緩和方向(より小さく)になる
+      expect(extremeParams.gamma).toBeLessThan(normalParams.gamma);
+
+      const normalBpi = NewBpiCalculator.calc(midScore, normalSong)!;
+      const extremeBpiCorrected = NewBpiCalculator.calc(midScore, extremeSong)!;
+      expect(extremeBpiCorrected).toBeGreaterThan(0);
+      // gamma補正が無ければ(z100−z0)が大きい分BPIはnormalBpiよりずっと低く
+      // 圧縮されるはずだが、補正により同程度の水準まで引き上げられる
+      expect(extremeBpiCorrected).toBeGreaterThan(normalBpi * 0.5);
+    });
+
+    it("gammaで曲間の式自体は変えない（同じ計算式・同じ全曲共通定数から算出）", () => {
+      const [songId] = [...newBpiSongParamMap.keys()];
+      const song = { songId, notes: NOTES, kaidenAvg: KAIDEN_AVG, wrScore: WR_SCORE };
+      // calc/calcFromBPIが相互に整合していること(同じgammaで往復できること)を確認
+      const bpi = NewBpiCalculator.calc(2700, song)!;
+      const backToScore = NewBpiCalculator.calcFromBPI(bpi, song)!;
+      // calc()側の丸め(小数第2位)がgammaの累乗を通って増幅されうるため、
+      // 数点程度のずれは許容する
+      expect(Math.abs(backToScore - 2700)).toBeLessThan(3);
+    });
+  });
 });

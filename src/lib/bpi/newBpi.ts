@@ -1,6 +1,8 @@
 import {
   newBpiSongParamMap,
   NEW_BPI_Z0,
+  NEW_BPI_Z100,
+  NEW_BPI_Z_REF,
 } from "@/constants/iidx/newBpi/songParams";
 
 export interface NewBpiSongBasicData {
@@ -20,7 +22,7 @@ export interface NewBpiSongBasicData {
  * `songDef` に持たせず `songParams.json`（ALS推定の生成物）から読む。
  *
  * z(s) = (t(s) - mu) / sigma,  t(s) = -ln(m - s)
- * newBpi(s) = 100 * (z(s) - z0) / (z100 - z0)
+ * newBpi(s) = 100 * sign(z-z0) * |(z(s) - z0) / (z100 - z0)|^gamma
  *
  * アンカーの決め方はissue #302の提案と実測（issue #299の分析）を
  * 踏まえたハイブリッド:
@@ -31,10 +33,17 @@ export interface NewBpiSongBasicData {
  *   曲間のばらつきが元々小さい(issue #299実測で0.53SD程度)ため、
  *   全曲共通にしても「BPI0≈皆伝平均」からの乖離は小さい
  *
- * このハイブリッドでは、issue #302 が解決しようとしたWR更新時の不安定性
- * （他人のWR更新で自分のBPIが動く問題）はz100が曲ごとの実WR依存のままの
- * ため残る。mu/sigmaによる分布フィットで「曲間のカーブの歪み」自体は
- * 補正される。
+ * `gamma`（曲間のカーブの歪みを補正する指数、全曲同じ式で算出）:
+ * 「かなり強いプレイヤー(z_ref、全曲共通の基準潜在能力位置)が、典型的な
+ * gap(z100の全曲中央値 − z0)の曲で得られるはずのBPI」を、この曲でも同じ
+ * ように得られるよう解析的に決める。ratio=1(z=z100)では常に1^gamma=1に
+ * なるため、gammaの値に関わらずBPI100=WRは厳密に保たれる。
+ *
+ * WR(全一)は曲ごとの実スコアという単一の順序統計量のため、z100が全曲共通の
+ * 典型的なgapから外れる(=WRが平均的な強豪プレイヤー層から見て極端に遠い/
+ * 近い)曲が一定数ある。gammaはこの外れを補正し、"z_ref付近のプレイヤー"に
+ * とってのBPIの意味が曲間で揃うようにする(issue #299のもう一つの実測:
+ * 全一の到達難度が曲間で5〜13SDばらつく問題への対処)。
  *
  * 床の撤廃自体がissue #303の論点だが、比較UIでの見え方を現行に揃えるため
  * 暫定的に現行と同じ `BPI_FLOOR`（-15）でクランプしている。恒久対応（尺度の
@@ -43,6 +52,10 @@ export interface NewBpiSongBasicData {
 export class NewBpiCalculator {
   /** 単曲BPIの下限。現行実装(`BpiCalculator`)に合わせた暫定値。 */
   public static readonly BPI_FLOOR = -15;
+
+  /** gammaの許容範囲。極端な曲でも式が破綻しないようクランプする。 */
+  private static readonly GAMMA_MIN = 0.3;
+  private static readonly GAMMA_MAX = 3;
 
   /**
    * 指定楽曲の分布パラメータ（mu/sigma）が用意されているかどうか。
@@ -58,12 +71,41 @@ export class NewBpiCalculator {
   }
 
   /**
-   * BPI100アンカー（曲ごとの全一のz値）とBPI0アンカー（全曲共通のz0）を
-   * 算出する。全一が未設定の楽曲はnullを返す（新方式の計算自体ができない）。
+   * 曲ごとのgamma(カーブ補正指数)を算出する。全曲同じ式・同じ全曲共通定数
+   * (z0/z100の全曲中央値/z_ref)から導出し、曲ごとに式そのものを変えることは
+   * しない。典型的なgapの曲ではgamma=1(補正なし)になる。
    */
-  private static getAnchors(
-    song: NewBpiSongBasicData,
-  ): { mu: number; sigma: number; m: number; z0: number; z100: number } | null {
+  private static gammaFor(z100: number, z0: number): number {
+    const gRef = NEW_BPI_Z100 - z0; // 全曲中央値ベースの典型的なgap
+    const gSong = z100 - z0;
+    const ratioAtRefTypical = (NEW_BPI_Z_REF - z0) / gRef;
+    const ratioAtRefSong = (NEW_BPI_Z_REF - z0) / gSong;
+    if (
+      ratioAtRefTypical <= 0 ||
+      ratioAtRefTypical >= 1 ||
+      ratioAtRefSong <= 0 ||
+      ratioAtRefSong >= 1
+    ) {
+      return 1;
+    }
+    const gamma = Math.log(ratioAtRefTypical) / Math.log(ratioAtRefSong);
+    if (!Number.isFinite(gamma)) return 1;
+    return Math.max(this.GAMMA_MIN, Math.min(this.GAMMA_MAX, gamma));
+  }
+
+  /**
+   * BPI100アンカー（曲ごとの全一のz値）とBPI0アンカー（全曲共通のz0）、
+   * および曲間の歪み補正指数gammaを算出する。全一が未設定の楽曲はnullを
+   * 返す（新方式の計算自体ができない）。
+   */
+  private static getAnchors(song: NewBpiSongBasicData): {
+    mu: number;
+    sigma: number;
+    m: number;
+    z0: number;
+    z100: number;
+    gamma: number;
+  } | null {
     const param = newBpiSongParamMap.get(song.songId);
     if (!param || song.notes === 0) return null;
     if (song.wrScore === null) return null;
@@ -75,16 +117,22 @@ export class NewBpiCalculator {
     const z100 = zAt(song.wrScore);
     if (Math.abs(z100 - z0) < 1e-9) return null;
 
-    return { mu: param.mu, sigma: param.sigma, m, z0, z100 };
+    const gamma = this.gammaFor(z100, z0);
+    return { mu: param.mu, sigma: param.sigma, m, z0, z100, gamma };
   }
 
   /**
-   * 指定楽曲のmu/sigma、およびBPI0/100アンカー(z0=全曲共通の定数、
-   * z100=曲ごとの全一のz値)を表示用に取得する。式表示(FormulaCard等)向け。
+   * 指定楽曲のmu/sigma、BPI0/100アンカー(z0=全曲共通の定数、z100=曲ごとの
+   * 全一のz値)、および曲間の歪み補正指数gammaを表示用に取得する。
+   * 式表示(FormulaCard等)向け。
    */
-  public static getSongParams(
-    song: NewBpiSongBasicData,
-  ): { mu: number; sigma: number; z0: number; z100: number } | null {
+  public static getSongParams(song: NewBpiSongBasicData): {
+    mu: number;
+    sigma: number;
+    z0: number;
+    z100: number;
+    gamma: number;
+  } | null {
     const anchors = this.getAnchors(song);
     if (!anchors) return null;
     return {
@@ -92,12 +140,13 @@ export class NewBpiCalculator {
       sigma: anchors.sigma,
       z0: anchors.z0,
       z100: anchors.z100,
+      gamma: anchors.gamma,
     };
   }
 
   /**
-   * 新方式（z尺度、曲ごとの全一=100・全曲共通のz0=0で再アンカー）での
-   * 単曲BPIを計算する。
+   * 新方式（z尺度、曲ごとの全一=100・全曲共通のz0=0で再アンカー、
+   * gammaで曲間の歪みを補正）での単曲BPIを計算する。
    *
    * @param exScore - プレイヤーの EX スコア
    * @param song - 楽曲の基本データ（songId/notes/kaidenAvg/wrScore）
@@ -110,9 +159,10 @@ export class NewBpiCalculator {
     const anchors = this.getAnchors(song);
     if (!anchors) return null;
 
-    const { mu, sigma, m, z0, z100 } = anchors;
+    const { mu, sigma, m, z0, z100, gamma } = anchors;
     const z = (this.tOf(exScore, m) - mu) / sigma;
-    const bpi = 100 * ((z - z0) / (z100 - z0));
+    const ratio = (z - z0) / (z100 - z0);
+    const bpi = 100 * Math.sign(ratio) * Math.pow(Math.abs(ratio), gamma);
     return Math.max(this.BPI_FLOOR, Math.round(bpi * 100) / 100);
   }
 
@@ -131,8 +181,10 @@ export class NewBpiCalculator {
     const anchors = this.getAnchors(song);
     if (!anchors) return null;
 
-    const { mu, sigma, m, z0, z100 } = anchors;
-    const z = z0 + (targetBpi * (z100 - z0)) / 100;
+    const { mu, sigma, m, z0, z100, gamma } = anchors;
+    const sign = Math.sign(targetBpi) || 1;
+    const ratio = Math.pow(Math.abs(targetBpi) / 100, 1 / gamma);
+    const z = z0 + sign * ratio * (z100 - z0);
     const t = mu + sigma * z;
     const miss = Math.exp(-t);
     const s = m - miss;

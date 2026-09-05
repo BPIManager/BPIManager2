@@ -286,6 +286,7 @@ export default function NewBpiComparison({ userId }: Props) {
         sigma: selectedSongNewParams?.sigma ?? null,
         z0: selectedSongNewParams?.z0 ?? null,
         z100: selectedSongNewParams?.z100 ?? null,
+        gamma: selectedSongNewParams?.gamma ?? null,
       }
     : null;
 
