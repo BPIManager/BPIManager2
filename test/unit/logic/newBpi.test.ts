@@ -21,30 +21,46 @@ describe("NewBpiCalculator ロジックテスト（issue #299〜304 検証用）
     ).toBeNull();
   });
 
-  it("皆伝平均・全一が未設定の楽曲もnullを返す（曲ごとのアンカーが組めないため）", () => {
+  it("全一が未設定の楽曲はnullを返す（BPI100のアンカーが組めないため）", () => {
     const [songId] = [...newBpiSongParamMap.keys()];
     expect(
       NewBpiCalculator.calc(1000, {
         songId,
         notes: NOTES,
-        kaidenAvg: null,
-        wrScore: WR_SCORE,
+        kaidenAvg: KAIDEN_AVG,
+        wrScore: null,
       }),
     ).toBeNull();
   });
 
-  it("BPI0=皆伝平均、BPI100=全一という原典の定義を崩さない（曲ごとに再アンカー）", () => {
+  it("皆伝平均が未設定でも計算できる（BPI0は全曲共通の定数を使うため）", () => {
+    const [songId] = [...newBpiSongParamMap.keys()];
+    const bpi = NewBpiCalculator.calc(WR_SCORE, {
+      songId,
+      notes: NOTES,
+      kaidenAvg: null,
+      wrScore: WR_SCORE,
+    });
+    expect(bpi).not.toBeNull();
+  });
+
+  it("BPI100=全一という原典の定義を崩さない（曲ごとに再アンカー）", () => {
+    const [songId] = [...newBpiSongParamMap.keys()];
+    const song = { songId, notes: NOTES, kaidenAvg: KAIDEN_AVG, wrScore: WR_SCORE };
+
+    const atWr = NewBpiCalculator.calc(WR_SCORE, song)!;
+    expect(atWr).toBeCloseTo(100, 1);
+    expect(NewBpiCalculator.calcFromBPI(100, song)!).toBeCloseTo(WR_SCORE, 0);
+  });
+
+  it("BPI0は全曲共通の定数(issue #302)であり、必ずしも皆伝平均ちょうどにはならない", () => {
     const [songId] = [...newBpiSongParamMap.keys()];
     const song = { songId, notes: NOTES, kaidenAvg: KAIDEN_AVG, wrScore: WR_SCORE };
 
     const atKaidenAvg = NewBpiCalculator.calc(KAIDEN_AVG, song)!;
-    const atWr = NewBpiCalculator.calc(WR_SCORE, song)!;
-    expect(atKaidenAvg).toBeCloseTo(0, 1);
-    expect(atWr).toBeCloseTo(100, 1);
-
-    // 逆算(calcFromBPI)でも同じアンカーが成り立つこと
-    expect(NewBpiCalculator.calcFromBPI(0, song)!).toBeCloseTo(KAIDEN_AVG, 0);
-    expect(NewBpiCalculator.calcFromBPI(100, song)!).toBeCloseTo(WR_SCORE, 0);
+    // 皆伝平均アンカーの曲間ばらつきは実測で小さい(issue #299実測: 0.53SD程度)ため、
+    // 0からの乖離もその範囲に収まることを緩くチェックする(ゼロぴったりは要求しない)
+    expect(Math.abs(atKaidenAvg)).toBeLessThan(30);
   });
 
   it("スコアが高いほど新方式BPIも高くなる（単調性）", () => {

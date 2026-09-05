@@ -8,9 +8,9 @@ export interface FormulaSongInfo {
   coef: number;
   mu: number | null;
   sigma: number | null;
-  /** この曲の皆伝平均に対応するz値(BPI0のアンカー) */
+  /** 全曲共通のBPI0アンカー(issue #302の提案通り、皆伝平均のz位置の全曲中央値) */
   z0: number | null;
-  /** この曲の全一に対応するz値(BPI100のアンカー) */
+  /** この曲の全一に対応するz値(BPI100のアンカー。原典の定義維持のため曲ごと) */
   z100: number | null;
 }
 
@@ -49,14 +49,16 @@ BPI(s) = sign(s−k) × 100 × |ln(PGF(s)/PGF(k)) / ln(PGF(z)/PGF(k))|^coef`}
             <pre className="overflow-x-auto rounded-md bg-bpim-surface-2 p-3 text-[11px] leading-relaxed whitespace-pre-wrap">
 {`mu = ${mu}
 sigma = ${sigma}
-z0 = ${z0.toFixed(4)} (皆伝平均${kaidenAvg}のz値。BPI0のアンカー)
-z100 = ${z100.toFixed(4)} (全一${wrScore}のz値。BPI100のアンカー)
+z0 = ${z0.toFixed(4)} (全曲共通。皆伝平均のz位置の中央値。BPI0のアンカー)
+z100 = ${z100.toFixed(4)} (この曲の全一${wrScore}のz値。BPI100のアンカー)
 
 t(s) = −ln(m − s)
 z(s) = (t(s) − mu) / sigma
 BPI(s) = 100 × (z(s) − z0) / (z100 − z0)　※下限−15でクランプ
-※ BPI0=皆伝平均・BPI100=全一という原典の定義を崩さないよう、
-　 z0/z100は全曲共通ではなくこの曲自身の値を使っている`}
+※ BPI100=全一という原典の定義は曲ごとに維持しつつ、BPI0はissue #302の
+　 提案通り全曲共通の定数を使うハイブリッド。皆伝平均のアンカー位置は
+　 曲間のばらつきが元々小さいため、全曲共通にしても実際の皆伝平均との
+　 ズレはわずか`}
             </pre>
           ) : (
             <p className="text-xs text-muted-foreground">
