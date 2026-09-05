@@ -16,6 +16,8 @@ type NewBpiSongParamsFile = {
   z0: number;
   z100: number;
   zRef: number;
+  /** ALS残差の標準偏差(t単位)。潜在スキルa_iの縮小推定(#304)の事前分散との重み付けに使う。 */
+  residualRmse: number;
   songs: Record<string, { mu: number; sigma: number }>;
 };
 
@@ -36,3 +38,4 @@ export const newBpiSongParamMap: Map<number, NewBpiSongParam> = new Map(
 export const NEW_BPI_Z0 = newBpiParams.z0;
 export const NEW_BPI_Z100 = newBpiParams.z100;
 export const NEW_BPI_Z_REF = newBpiParams.zRef;
+export const NEW_BPI_RESIDUAL_RMSE = newBpiParams.residualRmse;

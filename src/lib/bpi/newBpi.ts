@@ -3,6 +3,7 @@ import {
   NEW_BPI_Z0,
   NEW_BPI_Z100,
   NEW_BPI_Z_REF,
+  NEW_BPI_RESIDUAL_RMSE,
 } from "@/constants/iidx/newBpi/songParams";
 
 export interface NewBpiSongBasicData {
@@ -12,6 +13,13 @@ export interface NewBpiSongBasicData {
   kaidenAvg: number | null;
   /** 世界記録(歴代全一)スコア。BPI100のアンカー。 */
   wrScore: number | null;
+}
+
+/** 潜在スキル a_i / 総合BPI(issue #304)の推定に使う1曲分の観測。 */
+export interface NewBpiScoreObservation {
+  songId: number;
+  notes: number;
+  exScore: number;
 }
 
 /**
@@ -48,6 +56,28 @@ export interface NewBpiSongBasicData {
  * 床の撤廃自体がissue #303の論点だが、比較UIでの見え方を現行に揃えるため
  * 暫定的に現行と同じ `BPI_FLOOR`（-15）でクランプしている。恒久対応（尺度の
  * 正式決定）はissue #303で行う。
+ *
+ * 総合BPI（issue #304）は、実際にプレイした曲は単曲BPIをそのまま使い、
+ * 未プレイ曲だけをプレイヤーの潜在スキル a_i からの予測値で埋めたうえで、
+ * シフト法（issue #297、{@link shiftedPowerMean}）で集約する
+ * （{@link calculateTotalBPI}）。a_i 自体は事前分布 a_i〜N(0,1) への
+ * 縮小推定を行う（{@link estimateLatentSkill}）。
+ *
+ * 単曲BPIの集約ではなく a_i を線形にBPI化した値をそのまま総合BPIとする
+ * 素朴な方式も検証したが、これは「得意な数曲で高スコアを出すと総合BPIが
+ * 大きく伸びる」という現行方式の性質（べき乗平均の指数が大きく、実質的に
+ * 上位の数曲に支配される）を失い、プレイ曲数が多い上位層ほど総合BPIが
+ * 直感に反して下がる問題があった（全曲を均した「平均的な実力」になって
+ * しまうため）。「実際のスコアはそのまま使い、未プレイ曲だけを埋める」
+ * 方式に変更することでこれを避けている。
+ *
+ * また、埋めた後の集約に現行と同じ生のべき乗平均（`BpiCalculator.
+ * calculateTotalBPI`）を使う案も検証したが、これは正側だけでなく負側でも
+ * 極値に支配されるため、プレイ曲数が多く実力が平均よりやや低い程度の
+ * プレイヤーでも、-15床の単曲BPIが数曲あるだけで総合BPIが-15付近まで
+ * 落ち込む「壁」ができてしまった。issue #297のシフト法（指数を
+ * `ln(n)/ln((100+c)/(50+c))` に再校正）を集約に採用することでこれを解消
+ * している。
  */
 export class NewBpiCalculator {
   /** 単曲BPIの下限。現行実装(`BpiCalculator`)に合わせた暫定値。 */
@@ -192,5 +222,147 @@ export class NewBpiCalculator {
     if (s > m) return m;
     if (s < 0) return 0;
     return s;
+  }
+
+  /**
+   * 加重最小二乗解 a_hat と、その情報量 den(= Σ_j sigma_j²) をあわせて返す。
+   * den はそのまま「この推定にどれだけ根拠があるか」を表す量で、
+   * 縮小推定（事後分散の逆数の一部）にも未プレイ曲埋めの信頼度重み
+   * （{@link predictUnplayedBpi}）にも使う。
+   */
+  private static estimateLatentSkillWithConfidence(
+    observations: NewBpiScoreObservation[],
+  ): { a: number; den: number } | null {
+    let num = 0;
+    let den = 0;
+    for (const obs of observations) {
+      const param = newBpiSongParamMap.get(obs.songId);
+      if (!param || obs.notes === 0) continue;
+      const m = obs.notes * 2;
+      const t = this.tOf(obs.exScore, m);
+      num += param.sigma * (t - param.mu);
+      den += param.sigma * param.sigma;
+    }
+    if (den === 0) return null;
+    const residualVariance = NEW_BPI_RESIDUAL_RMSE * NEW_BPI_RESIDUAL_RMSE;
+    return { a: num / (den + residualVariance), den };
+  }
+
+  /**
+   * プレイヤーの潜在スキル a_i（issue #304）を、そのユーザーが持つスコアから
+   * 直接推定する（縮小推定つき）。
+   *
+   * 加重最小二乗の解 a_hat = Σ_j sigma_j(t_ij - mu_j) / Σ_j sigma_j² は、
+   * プレイ曲数が少ないユーザーほど分散が大きくなる。事前分布
+   * a_i ~ N(0, 1)（ALS推定時にa_iをこの分布へ正規化しているため、母集団の
+   * 分布そのもの）と、尤度 a_hat ~ N(a_i, residualVariance / den)
+   * （residualVariance = ALS残差の分散、t単位）をベイズ結合した事後平均
+   * が a_shrunk = num / (den + residualVariance) になる（標準的なリッジ型の
+   * 縮小推定）。プレイ曲数が少なく den が小さいユーザーほど 0（母集団平均）
+   * へ強く縮み、多いユーザーほど a_hat に漸近する。
+   */
+  public static estimateLatentSkill(
+    observations: NewBpiScoreObservation[],
+  ): number | null {
+    return this.estimateLatentSkillWithConfidence(observations)?.a ?? null;
+  }
+
+  /** 未プレイ曲埋めで、a_iの推定に対する信頼度をどれだけ重視するか(sigma²単位)。 */
+  private static readonly UNPLAYED_FILL_PRIOR_WEIGHT = 1;
+
+  /**
+   * 未プレイ曲のBPIを、推定済みの潜在スキル a から予測する。
+   *
+   * a をそのまま使うと「1曲だけ全一・残りは未プレイ」のような少数観測でも
+   * 全曲に対して強気な予測をしてしまい、原典由来の「この場合の総合BPIは
+   * 50になる」という性質が大きく崩れる（実測: 約85まで跳ね上がる）。
+   * そこで、推定の根拠となった観測量 den に応じて予測値を`BPI_FLOOR`(-15、
+   * 「その曲を全く触っていない」という現行の扱い)とブレンドする
+   * （w = den / (den + UNPLAYED_FILL_PRIOR_WEIGHT)）。den が大きい
+   * （プレイ曲数が多く弁別力の高い曲を多く含む）プレイヤーほど予測を
+   * そのまま信頼し、den が小さいプレイヤーほど「未プレイ＝-15」寄りに
+   * 留まる。定数1は、上記の「1曲全一+残り未プレイ→50」がほぼ厳密に
+   * 成り立つ点を基準に定めた（実測で50.00〜50.20程度に収まる）。
+   */
+  private static predictUnplayedBpi(
+    a: number,
+    den: number,
+    song: NewBpiSongBasicData,
+  ): number | null {
+    const params = this.getSongParams(song);
+    if (!params) return null;
+    const { z0, z100, gamma } = params;
+    const ratio = (a - z0) / (z100 - z0);
+    const rawPrediction = 100 * Math.sign(ratio) * Math.pow(Math.abs(ratio), gamma);
+    const w = den / (den + this.UNPLAYED_FILL_PRIOR_WEIGHT);
+    const blended = w * rawPrediction + (1 - w) * this.BPI_FLOOR;
+    return Math.max(this.BPI_FLOOR, Math.round(blended * 100) / 100);
+  }
+
+  /** シフト法（issue #297）の単曲BPI下限の絶対値。集約前後のシフト量として使う。 */
+  private static readonly TOTAL_BPI_SHIFT = 15;
+
+  /**
+   * シフト法（issue #297）によるべき乗平均。単曲BPIの下限（-15）ぶんだけ
+   * 全体をシフトしてから通常のべき乗平均を取り、最後に戻す。
+   *
+   * 符号付きの生のべき乗平均（`BpiCalculator.calculateTotalBPI`、現行実装）
+   * は正側だけでなく負側でも極値に支配される（実質的に最良/最悪の1曲で
+   * 総合が決まる）。このため、プレイ曲数が多く実力が平均よりやや低い程度の
+   * プレイヤーでも、-15床に張り付く単曲BPIが数曲あるだけで総合BPIが
+   * -15付近まで落ち込んでしまう（実測で確認済み: 潜在スキルa_iの推定値
+   * からは本来もっと高い水準が見込めるにもかかわらず、-15〜-10帯に多数の
+   * プレイヤーが集まる「壁」ができていた）。
+   *
+   * シフト法は指数を `k' = ln(n) / ln((100+c)/(50+c))` に再校正することで、
+   * 「1曲全一・残りは未プレイ→総合50」という性質を厳密に保ったまま、
+   * この極値支配を解消する（`docs/bpi-math.md` §4.3、issue #297 参照）。
+   * 未プレイ曲の埋め（`predictUnplayedBpi`）で下限-15に寄せた値を渡しても
+   * 崖を作らないため、新総合BPI（issue #304）の集約方式として採用する。
+   */
+  private static shiftedPowerMean(sortedDesc: number[], n: number): number {
+    const c = this.TOTAL_BPI_SHIFT;
+    const kPrime = Math.log(n) / Math.log((100 + c) / (50 + c));
+    let sum = 0;
+    for (let i = 0; i < n; i++) {
+      const bpi = i < sortedDesc.length ? sortedDesc[i] : this.BPI_FLOOR;
+      sum += Math.pow(bpi + c, kPrime) / n;
+    }
+    return Math.round((Math.pow(sum, 1 / kPrime) - c) * 100) / 100;
+  }
+
+  /**
+   * 総合BPI（issue #304）を、実際にプレイした曲の単曲BPIはそのまま使い、
+   * 未プレイ曲だけを潜在スキル a_i からの予測値（{@link predictUnplayedBpi}）
+   * で埋めたうえで、シフト法（{@link shiftedPowerMean}）で集約して算出する。
+   *
+   * @param observations - そのユーザーが実際にプレイしたスコア
+   * @param allSongs - 集計対象の全楽曲（未プレイ曲の判定・予測に使う）
+   * @returns 総合BPI。有効な曲が1つも無い場合は `null`
+   */
+  public static calculateTotalBPI(
+    observations: NewBpiScoreObservation[],
+    allSongs: NewBpiSongBasicData[],
+  ): number | null {
+    const exScoreBySongId = new Map(
+      observations.map((o) => [o.songId, o.exScore]),
+    );
+    const skill = this.estimateLatentSkillWithConfidence(observations);
+
+    const bpis: number[] = [];
+    for (const song of allSongs) {
+      const exScore = exScoreBySongId.get(song.songId);
+      if (exScore !== undefined) {
+        const measured = this.calc(exScore, song);
+        if (measured !== null) bpis.push(measured);
+      } else if (skill !== null) {
+        const predicted = this.predictUnplayedBpi(skill.a, skill.den, song);
+        if (predicted !== null) bpis.push(predicted);
+      }
+    }
+    if (bpis.length === 0) return null;
+
+    bpis.sort((a, b) => b - a);
+    return this.shiftedPowerMean(bpis, allSongs.length);
   }
 }

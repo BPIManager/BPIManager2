@@ -130,4 +130,158 @@ describe("NewBpiCalculator ロジックテスト（issue #299〜304 検証用）
       expect(Math.abs(backToScore - 2700)).toBeLessThan(3);
     });
   });
+
+  describe("総合BPI(issue #304: プレイ済み曲は単曲BPIそのまま・未プレイ曲はa_i予測で埋める)", () => {
+    it("観測・楽曲情報が無ければnullを返す", () => {
+      expect(NewBpiCalculator.estimateLatentSkill([])).toBeNull();
+      expect(NewBpiCalculator.calculateTotalBPI([], [])).toBeNull();
+    });
+
+    it("パラメータ未収録の楽曲しか無ければnullを返す", () => {
+      expect(
+        NewBpiCalculator.estimateLatentSkill([
+          { songId: -1, notes: NOTES, exScore: 2500 },
+        ]),
+      ).toBeNull();
+    });
+
+    it("同じ実力でも観測曲数が少ないほど0(母集団平均)側へ縮む", () => {
+      const songIds = [...newBpiSongParamMap.keys()].slice(0, 30);
+      // 全曲について「そこそこ上手い」スコアを与え、素の重み付き最小二乗解が
+      // 曲数によらずほぼ同じ水準になるようにする(全曲同一スコアレートで代用)。
+      const scoreOf = (songId: number) => {
+        const param = newBpiSongParamMap.get(songId)!;
+        // t = mu + sigma * a を a=1.5 相当のスコアに逆算
+        const t = param.mu + param.sigma * 1.5;
+        const miss = Math.exp(-t);
+        return Math.max(0, NOTES * 2 - miss);
+      };
+
+      const fewObservations = songIds.slice(0, 3).map((songId) => ({
+        songId,
+        notes: NOTES,
+        exScore: scoreOf(songId),
+      }));
+      const manyObservations = songIds.map((songId) => ({
+        songId,
+        notes: NOTES,
+        exScore: scoreOf(songId),
+      }));
+
+      const aFew = NewBpiCalculator.estimateLatentSkill(fewObservations)!;
+      const aMany = NewBpiCalculator.estimateLatentSkill(manyObservations)!;
+      expect(aFew).not.toBeNull();
+      expect(aMany).not.toBeNull();
+      // 縮小推定なので、観測が少ないほど真値(≈1.5)から0側へ寄る
+      expect(Math.abs(aFew)).toBeLessThan(Math.abs(aMany));
+      expect(aFew).toBeGreaterThan(0);
+      expect(aMany).toBeGreaterThan(aFew);
+    });
+
+    it("全曲プレイ済みなら、シフト法(issue #297)によるべき乗平均に一致する(未プレイ埋めが介在しない)", () => {
+      const songIds = [...newBpiSongParamMap.keys()].slice(0, 20);
+      const allSongs = songIds.map((songId) => ({
+        songId,
+        notes: NOTES,
+        kaidenAvg: KAIDEN_AVG,
+        wrScore: WR_SCORE,
+      }));
+      const observations = allSongs.map((s) => ({
+        songId: s.songId,
+        notes: s.notes,
+        exScore: 2700,
+      }));
+
+      const measured = allSongs
+        .map((s) => NewBpiCalculator.calc(2700, s)!)
+        .sort((a, b) => b - a);
+      // シフト法(c=15, k'=ln(n)/ln((100+c)/(50+c)))を素朴に再実装して照合する
+      const n = allSongs.length;
+      const c = 15;
+      const kPrime = Math.log(n) / Math.log((100 + c) / (50 + c));
+      const sum = measured.reduce((acc, bpi) => acc + Math.pow(bpi + c, kPrime) / n, 0);
+      const expected = Math.round((Math.pow(sum, 1 / kPrime) - c) * 100) / 100;
+
+      const total = NewBpiCalculator.calculateTotalBPI(observations, allSongs);
+      expect(total).toBeCloseTo(expected, 1);
+    });
+
+    it("未プレイ曲を含む場合、下限(-15)に張り付かず埋められる（皆伝平均程度のスコアなら）", () => {
+      const songIds = [...newBpiSongParamMap.keys()].slice(0, 50);
+      const allSongs = songIds.map((songId) => ({
+        songId,
+        notes: NOTES,
+        kaidenAvg: KAIDEN_AVG,
+        wrScore: WR_SCORE,
+      }));
+      // 5曲だけプレイ、残り45曲は未プレイ
+      const observations = allSongs.slice(0, 5).map((s) => ({
+        songId: s.songId,
+        notes: s.notes,
+        exScore: KAIDEN_AVG,
+      }));
+
+      const total = NewBpiCalculator.calculateTotalBPI(observations, allSongs);
+      expect(total).not.toBeNull();
+      expect(total!).toBeGreaterThan(-15);
+    });
+
+    it("1曲だけ全一・残りが未プレイの場合、総合BPIは原典の性質(50前後)にほぼ従う", () => {
+      // 上位勢のような「多くの曲を高いレベルでプレイしている」ケースで総合BPIが
+      // 直感に反して下がる問題(現行方式の性質: 得意曲に支配されるべき乗平均)を
+      // 避けるため、未プレイ曲をa_iからの予測で埋める設計にした。予測を
+      // そのまま信頼すると、少数観測でも全曲に対して強気な予測をしてしまい、
+      // この「1曲全一+残り未プレイ→50」という原典由来の性質が大きく崩れる
+      // (無补正では約85まで跳ね上がることを確認済み)。信頼度重み付けにより
+      // この性質がほぼ保たれることを確認する。
+      const songIds = [...newBpiSongParamMap.keys()].slice(0, 100);
+      const allSongs = songIds.map((songId) => ({
+        songId,
+        notes: NOTES,
+        kaidenAvg: KAIDEN_AVG,
+        wrScore: WR_SCORE,
+      }));
+      const observations = [
+        { songId: allSongs[0].songId, notes: NOTES, exScore: WR_SCORE },
+      ];
+
+      const total = NewBpiCalculator.calculateTotalBPI(observations, allSongs);
+      expect(total).not.toBeNull();
+      expect(total!).toBeGreaterThan(40);
+      expect(total!).toBeLessThan(60);
+    });
+
+    it("プレイ曲数が多いほど、未プレイ曲の予測をより強く信頼する(betterな推定に漸近する)", () => {
+      const songIds = [...newBpiSongParamMap.keys()].slice(0, 100);
+      const allSongs = songIds.map((songId) => ({
+        songId,
+        notes: NOTES,
+        kaidenAvg: KAIDEN_AVG,
+        wrScore: WR_SCORE,
+      }));
+      const scoreOf = (songId: number) => {
+        const param = newBpiSongParamMap.get(songId)!;
+        const t = param.mu + param.sigma * 2;
+        const miss = Math.exp(-t);
+        return Math.max(0, NOTES * 2 - miss);
+      };
+
+      const fewPlayed = allSongs.slice(0, 3).map((s) => ({
+        songId: s.songId,
+        notes: s.notes,
+        exScore: scoreOf(s.songId),
+      }));
+      const manyPlayed = allSongs.slice(0, 80).map((s) => ({
+        songId: s.songId,
+        notes: s.notes,
+        exScore: scoreOf(s.songId),
+      }));
+
+      const totalFew = NewBpiCalculator.calculateTotalBPI(fewPlayed, allSongs)!;
+      const totalMany = NewBpiCalculator.calculateTotalBPI(manyPlayed, allSongs)!;
+      // どちらも同じ実力(a=2相当)のスコアだが、観測が少ないfewPlayed側は
+      // 未プレイ曲の埋めが-15寄りになる分、totalManyより低くなるはず
+      expect(totalFew).toBeLessThan(totalMany);
+    });
+  });
 });

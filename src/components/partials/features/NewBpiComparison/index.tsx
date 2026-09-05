@@ -2,13 +2,9 @@ import { useMemo, useState } from "react";
 import type { SongWithScore } from "@/types/songs/score";
 import { useUserScores } from "@/hooks/table/useUserScores";
 import { useTotalBpiStats } from "@/hooks/stats/useCurrentTotalBpi";
+import { useSongList } from "@/hooks/songs/useSongList";
 import { useProfile } from "@/hooks/users/useProfile";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
-import {
-  newBpiSongParamMap,
-  NEW_BPI_Z0,
-  NEW_BPI_Z100,
-} from "@/constants/iidx/newBpi/songParams";
 import { BpiCalculator } from "@/lib/bpi";
 import { NewBpiCalculator } from "@/lib/bpi/newBpi";
 import NewBpiComparisonUi, { NewBpiRow, SortKey } from "./ui";
@@ -89,6 +85,11 @@ export default function NewBpiComparison({ userId }: Props) {
     accessState === "ok" ? viewedUserId : undefined,
     latestVersion,
   );
+  // 総合BPI(issue #304, 未プレイ曲をa_iからの予測で埋める方式)には
+  // 未プレイ曲を含む☆12全曲の一覧が要る。useUserScores(/scores)はプレイ済み
+  // 楽曲しか返さないため、曲マスタ自体は別途取得する(閲覧対象ユーザーに
+  // 依存しない共通データのため、viewedUserIdとは無関係に取得してよい)。
+  const { songs: songMaster } = useSongList(latestVersion);
 
   const {
     rows,
@@ -162,28 +163,24 @@ export default function NewBpiComparison({ userId }: Props) {
         ? BpiCalculator.calculateTotalBPI(newBpisLevel12Desc, totalSongCount12)
         : null;
 
-    // (C) 単曲BPI・総合BPIの導出方法の両方を新方式に置き換える。issue #304の
-    // 潜在スキル a_i を「パラメータのある☆12楽曲かつプレイ済み」の範囲で
-    // この場で直接推定する。
-    let num = 0;
-    let den = 0;
-    let comparableCount = 0;
-    for (const s of level12Played) {
-      const param = newBpiSongParamMap.get(s.songId);
-      if (!param) continue;
-      const m = s.notes * 2;
-      const miss = Math.max(0.5, m - Math.min(s.exScore, m));
-      const t = -Math.log(miss);
-      num += param.sigma * (t - param.mu);
-      den += param.sigma * param.sigma;
-      comparableCount++;
-    }
-    const a = den > 0 ? num / den : null;
+    // (C) 単曲BPI・総合BPIの導出方法の両方を新方式に置き換える。issue #304:
+    // プレイ済み曲は単曲BPIをそのまま使い、未プレイ曲は潜在スキルa_iからの
+    // 予測で埋めたうえで現行と同じべき乗平均にかける（詳細はNewBpiCalculator
+    // 参照）。未プレイ曲の判定・予測には☆12全曲のマスタ(songMaster)が要る。
+    const comparableCount = level12Played.filter((s) =>
+      NewBpiCalculator.hasParams(s.songId),
+    ).length;
+    const allLevel12Songs = songMaster.filter((s) => s.difficultyLevel === 12);
     const newTotalBpi =
-      a !== null
-        ? Math.round(
-            100 * ((a - NEW_BPI_Z0) / (NEW_BPI_Z100 - NEW_BPI_Z0)) * 100,
-          ) / 100
+      allLevel12Songs.length > 0
+        ? NewBpiCalculator.calculateTotalBPI(
+            level12Played.map((s) => ({
+              songId: s.songId,
+              notes: s.notes,
+              exScore: s.exScore,
+            })),
+            allLevel12Songs,
+          )
         : null;
 
     return {
@@ -193,7 +190,7 @@ export default function NewBpiComparison({ userId }: Props) {
       comparableCount,
       playedSongMap,
     };
-  }, [songs, stats?.totalCount]);
+  }, [songs, stats?.totalCount, songMaster]);
 
   // 推移グラフで選べるのは新方式パラメータのある楽曲のみ(新方式の曲線が描けないため)
   const curveEligibleRows = useMemo(

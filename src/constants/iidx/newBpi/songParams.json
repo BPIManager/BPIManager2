@@ -1,12 +1,13 @@
 {
   "_comment": "issue#300のALS推定(mu/sigma)を、BPIM2-AutomatedDefinitionCalculatorのアリーナクロール結果(プレイヤーID紐付き)とbpim2登録ユーザー自身の実スコアを統合した母集団に対して実行した結果。z0は皆伝平均の潜在能力位置の全曲中央値(issue #302の提案通り全曲共通で使用)。z100は参考値(全曲中央値)で、実際の単曲BPI計算(NewBpiCalculator)では各曲の実際の歴代全一から都度計算するため使用しない。zRefは強豪プレイヤーの基準潜在能力位置(a_iの95%ile)で、WR外挿による曲間の歪みを補正する指数gamma_jの算出に使う。",
-  "generatedAt": "2026-09-05T04:27:18.510Z",
+  "generatedAt": "2026-09-05T06:40:35.770Z",
   "sourceVersion": "33",
   "playerCount": 5942,
   "minSongsPerPlayer": 10,
   "z0": -0.13174867985181202,
   "z100": 6.581752145506125,
   "zRef": 1.9140167224345994,
+  "residualRmse": 0.284,
   "songs": {
     "1": {
       "mu": -5.5125,

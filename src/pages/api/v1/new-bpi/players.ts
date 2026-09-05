@@ -6,11 +6,6 @@ import {
 import { newBpiPlayersAggregateRepo } from "@/lib/db/aggregates/newBpiPlayers";
 import { BpiCalculator } from "@/lib/bpi";
 import { NewBpiCalculator } from "@/lib/bpi/newBpi";
-import {
-  newBpiSongParamMap,
-  NEW_BPI_Z0,
-  NEW_BPI_Z100,
-} from "@/constants/iidx/newBpi/songParams";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 
 const DEFAULT_PAGE_SIZE = 20;
@@ -73,8 +68,6 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
     const newBpis: number[] = [];
     let increaseCount = 0;
     let decreaseCount = 0;
-    let num = 0;
-    let den = 0;
 
     for (const s of userScores) {
       const song = songById.get(s.songId);
@@ -99,26 +92,20 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
         if (newBpi > currentBpi + 0.005) increaseCount++;
         else if (newBpi < currentBpi - 0.005) decreaseCount++;
       }
-
-      const param = newBpiSongParamMap.get(s.songId);
-      if (param) {
-        const m = song.notes * 2;
-        const miss = Math.max(0.5, m - Math.min(s.exScore, m));
-        const t = -Math.log(miss);
-        num += param.sigma * (t - param.mu);
-        den += param.sigma * param.sigma;
-      }
     }
 
     currentBpis.sort((a, b) => b - a);
     newBpis.sort((a, b) => b - a);
     const currentTotal = BpiCalculator.calculateTotalBPI(currentBpis, totalSongCount);
     const hybridTotal = BpiCalculator.calculateTotalBPI(newBpis, totalSongCount);
-    const a = den > 0 ? num / den : null;
-    const fullNewTotal =
-      a !== null
-        ? Math.round(100 * ((a - NEW_BPI_Z0) / (NEW_BPI_Z100 - NEW_BPI_Z0)) * 100) / 100
-        : null;
+    const fullNewTotal = NewBpiCalculator.calculateTotalBPI(
+      userScores.map((s) => ({
+        songId: s.songId,
+        notes: songById.get(s.songId)?.notes ?? 0,
+        exScore: s.exScore,
+      })),
+      songs,
+    );
 
     return {
       userId: user.userId,
