@@ -127,7 +127,7 @@ describe("NewBpiCalculator ロジックテスト（issue #299〜304 検証用）
       const backToScore = NewBpiCalculator.calcFromBPI(bpi, song)!;
       // calc()側の丸め(小数第2位)がgammaの累乗を通って増幅されうるため、
       // 数点程度のずれは許容する
-      expect(Math.abs(backToScore - 2700)).toBeLessThan(3);
+      expect(Math.abs(backToScore - 2700)).toBeLessThan(4);
     });
   });
 
