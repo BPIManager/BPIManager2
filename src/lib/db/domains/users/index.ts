@@ -201,6 +201,33 @@ class UsersRepository {
   }
 
   /**
+   * 公開ユーザーを userId 順にページ単位で取得する
+   * (issue #299〜304検証用「全プレイヤー」一覧のページング用)。
+   */
+  async getPublicUsersPage(limit: number, offset: number) {
+    return await db
+      .selectFrom("users")
+      .select(["userId", "userName"])
+      .where("isPublic", "=", 1)
+      .orderBy("userId")
+      .limit(limit)
+      .offset(offset)
+      .execute();
+  }
+
+  /**
+   * 公開ユーザーの総数を取得する（ページング用）。
+   */
+  async getPublicUserCount(): Promise<number> {
+    const row = await db
+      .selectFrom("users")
+      .select((eb) => eb.fn.countAll<number>().as("count"))
+      .where("isPublic", "=", 1)
+      .executeTakeFirst();
+    return Number(row?.count ?? 0);
+  }
+
+  /**
    * `iidxId` が設定済みの全ユーザーの `userId`・`iidxId` を取得する
    * （公式アリーナランキングとの照合用）。
    */
