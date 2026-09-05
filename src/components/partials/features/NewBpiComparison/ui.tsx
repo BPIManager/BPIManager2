@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { DashCard } from "@/components/ui/dashcard";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -17,7 +18,12 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { PageContainer, PageHeader } from "@/components/partials/common/PageChrome/Header";
+import { SectionLoader } from "@/components/ui/loading-spinner";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import {
+  IIDX_LEVELS,
+  IIDX_DIFFICULTIES,
+} from "@/constants/iidx/bpiDifficulties";
 import CurveChart, { CurvePoint } from "./CurveChart";
 import FormulaCard, { FormulaSongInfo } from "./FormulaCard";
 import ScoreSimulatorCard, {
@@ -25,8 +31,10 @@ import ScoreSimulatorCard, {
 } from "./ScoreSimulatorCard";
 import ScoreRateTable, { ScoreRateRow } from "./ScoreRateTable";
 import DeltaCell from "./DeltaCell";
+import UserSearchBar from "./UserSearchBar";
 
 export type SortKey = "deltaDesc" | "deltaAsc" | "level";
+export type AccessState = "loading" | "not-found" | "private" | "ok";
 
 export interface NewBpiRow {
   songId: number;
@@ -46,6 +54,15 @@ interface UserPoint {
 }
 
 interface Props {
+  searchInput: string;
+  onSearchInputChange: (value: string) => void;
+  onSearch: () => void;
+  onReset: () => void;
+  isViewingSelf: boolean;
+  viewedUserName: string | null;
+  accessState: AccessState;
+  isDataLoading: boolean;
+
   rows: NewBpiRow[];
   sortKey: SortKey;
   onSortKeyChange: (key: SortKey) => void;
@@ -58,6 +75,7 @@ interface Props {
   onSelectedSongIdChange: (songId: number) => void;
   curveData: CurvePoint[] | null;
   scoreRateRows: ScoreRateRow[] | null;
+  scoreRateMaxScore: number | null;
   selectedSongUserPoint: UserPoint | null;
   selectedSongFormula: FormulaSongInfo | null;
   selectedSongSimulator: ScoreSimulatorSongInfo | null;
@@ -122,25 +140,68 @@ const SummaryCards = ({
   );
 };
 
+type LevelFilter = "all" | 11 | 12;
+type DifficultyFilter = "all" | (typeof IIDX_DIFFICULTIES)[number];
+
 const ListTab = ({
   rows,
   sortKey,
   onSortKeyChange,
 }: Pick<Props, "rows" | "sortKey" | "onSortKeyChange">) => {
   const { t } = useTranslation();
-  const sorted = sortRows(rows, sortKey);
+  const [levelFilter, setLevelFilter] = useState<LevelFilter>("all");
+  const [difficultyFilter, setDifficultyFilter] =
+    useState<DifficultyFilter>("all");
 
-  if (rows.length === 0) {
-    return (
-      <DashCard className="text-center text-sm text-muted-foreground">
-        {t("newBpi.empty")}
-      </DashCard>
-    );
-  }
+  const filtered = rows.filter(
+    (row) =>
+      (levelFilter === "all" || row.difficultyLevel === levelFilter) &&
+      (difficultyFilter === "all" || row.difficulty === difficultyFilter),
+  );
+  const sorted = sortRows(filtered, sortKey);
 
   return (
     <DashCard className="p-0">
-      <div className="flex items-center justify-end p-3">
+      <div className="flex flex-wrap items-center justify-between gap-2 p-3">
+        <div className="flex flex-wrap gap-2">
+          <Select
+            value={String(levelFilter)}
+            onValueChange={(v) =>
+              setLevelFilter(v === "all" ? "all" : (Number(v) as 11 | 12))
+            }
+          >
+            <SelectTrigger size="sm" className="w-32">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t("newBpi.filter.allLevels")}</SelectItem>
+              {IIDX_LEVELS.map((level) => (
+                <SelectItem key={level} value={level}>
+                  ☆{level}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            value={difficultyFilter}
+            onValueChange={(v) => setDifficultyFilter(v as DifficultyFilter)}
+          >
+            <SelectTrigger size="sm" className="w-40">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">
+                {t("newBpi.filter.allDifficulties")}
+              </SelectItem>
+              {IIDX_DIFFICULTIES.map((difficulty) => (
+                <SelectItem key={difficulty} value={difficulty}>
+                  {difficulty}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
         <Select value={sortKey} onValueChange={(v) => onSortKeyChange(v as SortKey)}>
           <SelectTrigger size="sm" className="w-48">
             <SelectValue />
@@ -152,42 +213,49 @@ const ListTab = ({
           </SelectContent>
         </Select>
       </div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>{t("newBpi.table.song")}</TableHead>
-            <TableHead>{t("newBpi.table.level")}</TableHead>
-            <TableHead className="text-right">{t("newBpi.table.exScore")}</TableHead>
-            <TableHead className="text-right">{t("newBpi.table.currentBpi")}</TableHead>
-            <TableHead className="text-right">{t("newBpi.table.newBpi")}</TableHead>
-            <TableHead className="text-right">{t("newBpi.table.delta")}</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {sorted.map((row) => (
-            <TableRow key={row.songId}>
-              <TableCell className="max-w-60 truncate font-medium">
-                {row.title}
-              </TableCell>
-              <TableCell>
-                <Badge variant="outline">
-                  {row.difficultyLevel} {row.difficulty}
-                </Badge>
-              </TableCell>
-              <TableCell className="text-right tabular-nums">{row.exScore}</TableCell>
-              <TableCell className="text-right tabular-nums">
-                {row.currentBpi !== null ? row.currentBpi.toFixed(2) : "—"}
-              </TableCell>
-              <TableCell className="text-right tabular-nums">
-                {row.newBpi !== null ? row.newBpi.toFixed(2) : t("newBpi.table.noParam")}
-              </TableCell>
-              <TableCell className="text-right tabular-nums">
-                <DeltaCell delta={row.delta} />
-              </TableCell>
+
+      {sorted.length === 0 ? (
+        <div className="p-6 text-center text-sm text-muted-foreground">
+          {t("newBpi.empty")}
+        </div>
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>{t("newBpi.table.song")}</TableHead>
+              <TableHead>{t("newBpi.table.level")}</TableHead>
+              <TableHead className="text-right">{t("newBpi.table.exScore")}</TableHead>
+              <TableHead className="text-right">{t("newBpi.table.currentBpi")}</TableHead>
+              <TableHead className="text-right">{t("newBpi.table.newBpi")}</TableHead>
+              <TableHead className="text-right">{t("newBpi.table.delta")}</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {sorted.map((row) => (
+              <TableRow key={row.songId}>
+                <TableCell className="max-w-60 truncate font-medium">
+                  {row.title}
+                </TableCell>
+                <TableCell>
+                  <Badge variant="outline">
+                    {row.difficultyLevel} {row.difficulty}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-right tabular-nums">{row.exScore}</TableCell>
+                <TableCell className="text-right tabular-nums">
+                  {row.currentBpi !== null ? row.currentBpi.toFixed(2) : "—"}
+                </TableCell>
+                <TableCell className="text-right tabular-nums">
+                  {row.newBpi !== null ? row.newBpi.toFixed(2) : t("newBpi.table.noParam")}
+                </TableCell>
+                <TableCell className="text-right tabular-nums">
+                  <DeltaCell delta={row.delta} />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
     </DashCard>
   );
 };
@@ -198,6 +266,7 @@ const ChartTab = ({
   onSelectedSongIdChange,
   curveData,
   scoreRateRows,
+  scoreRateMaxScore,
   selectedSongUserPoint,
   selectedSongFormula,
   selectedSongSimulator,
@@ -209,6 +278,7 @@ const ChartTab = ({
   | "onSelectedSongIdChange"
   | "curveData"
   | "scoreRateRows"
+  | "scoreRateMaxScore"
   | "selectedSongUserPoint"
   | "selectedSongFormula"
   | "selectedSongSimulator"
@@ -251,7 +321,9 @@ const ChartTab = ({
         )}
       </DashCard>
 
-      {scoreRateRows && <ScoreRateTable rows={scoreRateRows} />}
+      {scoreRateRows && scoreRateMaxScore !== null && (
+        <ScoreRateTable rows={scoreRateRows} maxScore={scoreRateMaxScore} />
+      )}
 
       {selectedSongFormula && <FormulaCard {...selectedSongFormula} />}
 
@@ -273,43 +345,72 @@ export default function NewBpiComparisonUi(props: Props) {
       <PageHeader title={t("page.newBpi.title")} description={t("page.newBpi.desc")} />
       <PageContainer>
         <div className="flex flex-col gap-4">
-          <DashCard className="border-amber-500/40 bg-amber-500/5 text-sm text-muted-foreground">
-            {t("newBpi.notice")}
-          </DashCard>
-
-          <SummaryCards
-            currentTotalBpi={props.currentTotalBpi}
-            hybridTotalBpi={props.hybridTotalBpi}
-            newTotalBpi={props.newTotalBpi}
-            comparableCount={props.comparableCount}
+          <UserSearchBar
+            searchInput={props.searchInput}
+            onSearchInputChange={props.onSearchInputChange}
+            onSearch={props.onSearch}
+            onReset={props.onReset}
+            isViewingSelf={props.isViewingSelf}
+            viewedUserName={props.viewedUserName}
           />
 
-          <Tabs defaultValue="list">
-            <TabsList className="w-fit">
-              <TabsTrigger value="list">{t("newBpi.tab.list")}</TabsTrigger>
-              <TabsTrigger value="chart">{t("newBpi.tab.chart")}</TabsTrigger>
-            </TabsList>
-            <TabsContent value="list">
-              <ListTab
-                rows={props.rows}
-                sortKey={props.sortKey}
-                onSortKeyChange={props.onSortKeyChange}
+          {props.accessState === "not-found" && (
+            <DashCard className="text-center text-sm text-muted-foreground">
+              {t("newBpi.userSearch.notFound")}
+            </DashCard>
+          )}
+          {props.accessState === "private" && (
+            <DashCard className="text-center text-sm text-muted-foreground">
+              {t("newBpi.userSearch.private")}
+            </DashCard>
+          )}
+          {(props.accessState === "loading" ||
+            (props.accessState === "ok" && props.isDataLoading)) && (
+            <SectionLoader className="h-64 w-full" />
+          )}
+
+          {props.accessState === "ok" && !props.isDataLoading && (
+            <>
+              <DashCard className="border-amber-500/40 bg-amber-500/5 text-sm text-muted-foreground">
+                {t("newBpi.notice")}
+              </DashCard>
+
+              <SummaryCards
+                currentTotalBpi={props.currentTotalBpi}
+                hybridTotalBpi={props.hybridTotalBpi}
+                newTotalBpi={props.newTotalBpi}
+                comparableCount={props.comparableCount}
               />
-            </TabsContent>
-            <TabsContent value="chart">
-              <ChartTab
-                curveEligibleRows={props.curveEligibleRows}
-                selectedSongId={props.selectedSongId}
-                onSelectedSongIdChange={props.onSelectedSongIdChange}
-                curveData={props.curveData}
-                scoreRateRows={props.scoreRateRows}
-                selectedSongUserPoint={props.selectedSongUserPoint}
-                selectedSongFormula={props.selectedSongFormula}
-                selectedSongSimulator={props.selectedSongSimulator}
-                selectedSongInitialScore={props.selectedSongInitialScore}
-              />
-            </TabsContent>
-          </Tabs>
+
+              <Tabs defaultValue="list">
+                <TabsList className="w-fit">
+                  <TabsTrigger value="list">{t("newBpi.tab.list")}</TabsTrigger>
+                  <TabsTrigger value="chart">{t("newBpi.tab.chart")}</TabsTrigger>
+                </TabsList>
+                <TabsContent value="list">
+                  <ListTab
+                    rows={props.rows}
+                    sortKey={props.sortKey}
+                    onSortKeyChange={props.onSortKeyChange}
+                  />
+                </TabsContent>
+                <TabsContent value="chart">
+                  <ChartTab
+                    curveEligibleRows={props.curveEligibleRows}
+                    selectedSongId={props.selectedSongId}
+                    onSelectedSongIdChange={props.onSelectedSongIdChange}
+                    curveData={props.curveData}
+                    scoreRateRows={props.scoreRateRows}
+                    scoreRateMaxScore={props.scoreRateMaxScore}
+                    selectedSongUserPoint={props.selectedSongUserPoint}
+                    selectedSongFormula={props.selectedSongFormula}
+                    selectedSongSimulator={props.selectedSongSimulator}
+                    selectedSongInitialScore={props.selectedSongInitialScore}
+                  />
+                </TabsContent>
+              </Tabs>
+            </>
+          )}
         </div>
       </PageContainer>
     </>

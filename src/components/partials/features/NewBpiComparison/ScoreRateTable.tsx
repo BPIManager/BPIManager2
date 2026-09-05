@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/table";
 import { DashCard } from "@/components/ui/dashcard";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import { getDJRank } from "@/utils/songs/djRank";
 import DeltaCell from "./DeltaCell";
 
 export interface ScoreRateRow {
@@ -26,7 +27,13 @@ const formatRate = (rate: number) => {
   return Number.isInteger(rounded) ? `${rounded}` : `${rounded.toFixed(2).replace(/0$/, "")}`;
 };
 
-export default function ScoreRateTable({ rows }: { rows: ScoreRateRow[] }) {
+export default function ScoreRateTable({
+  rows,
+  maxScore,
+}: {
+  rows: ScoreRateRow[];
+  maxScore: number;
+}) {
   const { t } = useTranslation();
   return (
     <DashCard className="p-0">
@@ -38,6 +45,7 @@ export default function ScoreRateTable({ rows }: { rows: ScoreRateRow[] }) {
           <TableRow>
             <TableHead>{t("newBpi.chart.table.scoreRate")}</TableHead>
             <TableHead className="text-right">{t("newBpi.table.exScore")}</TableHead>
+            <TableHead className="text-right">{t("newBpi.chart.table.djRank")}</TableHead>
             <TableHead className="text-right">{t("newBpi.table.currentBpi")}</TableHead>
             <TableHead className="text-right">{t("newBpi.table.newBpi")}</TableHead>
             <TableHead className="text-right">{t("newBpi.table.delta")}</TableHead>
@@ -55,6 +63,16 @@ export default function ScoreRateTable({ rows }: { rows: ScoreRateRow[] }) {
                 )}
               </TableCell>
               <TableCell className="text-right tabular-nums">{row.exScore}</TableCell>
+              <TableCell className="text-right font-mono text-xs tabular-nums text-muted-foreground">
+                {getDJRank(row.exScore, maxScore, {
+                  mode: "current",
+                  output: "label",
+                })}
+                {getDJRank(row.exScore, maxScore, {
+                  mode: "current",
+                  output: "value",
+                })}
+              </TableCell>
               <TableCell className="text-right tabular-nums">
                 {row.current !== null ? row.current.toFixed(2) : "—"}
               </TableCell>

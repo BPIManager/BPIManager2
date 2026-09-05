@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import type { SongWithScore } from "@/types/songs/score";
 import { useUserScores } from "@/hooks/table/useUserScores";
 import { useTotalBpiStats } from "@/hooks/stats/useCurrentTotalBpi";
+import { useProfile } from "@/hooks/users/useProfile";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import {
   newBpiSongParamMap,
@@ -10,7 +11,6 @@ import {
 } from "@/constants/iidx/newBpi/songParams";
 import { BpiCalculator } from "@/lib/bpi";
 import { NewBpiCalculator } from "@/lib/bpi/newBpi";
-import { PageLoader } from "@/components/ui/loading-spinner";
 import NewBpiComparisonUi, { NewBpiRow, SortKey } from "./ui";
 import type { CurvePoint } from "./CurveChart";
 import type { FormulaSongInfo } from "./FormulaCard";
@@ -45,12 +45,48 @@ const SCORE_RATE_STEPS: number[] = (() => {
 export default function NewBpiComparison({ userId }: Props) {
   const [sortKey, setSortKey] = useState<SortKey>("deltaDesc");
   const [selectedSongId, setSelectedSongId] = useState<number | null>(null);
+
+  // 他ユーザーのデータをユーザーIDで検索して閲覧する機能。アクセス可否の
+  // 判定自体はAPI側(checkUserAccess: 公開プロフィール or 承認済みフォロー)
+  // に委ね、ここでは検索状態と結果表示のみを担う。
+  const [searchInput, setSearchInput] = useState("");
+  const [viewedUserId, setViewedUserId] = useState(userId);
+  const isViewingSelf = viewedUserId === userId;
+
+  const handleSearch = () => {
+    const trimmed = searchInput.trim();
+    if (!trimmed) return;
+    setViewedUserId(trimmed);
+    setSelectedSongId(null);
+  };
+  const handleReset = () => {
+    setViewedUserId(userId);
+    setSearchInput("");
+    setSelectedSongId(null);
+  };
+
+  const {
+    profile,
+    isLoading: isProfileLoading,
+    isPrivate,
+    isNotFound,
+  } = useProfile(viewedUserId);
+
+  const accessState: "loading" | "not-found" | "private" | "ok" =
+    isProfileLoading
+      ? "loading"
+      : isNotFound
+        ? "not-found"
+        : isPrivate
+          ? "private"
+          : "ok";
+
   const { songs, isLoading: isSongsLoading } = useUserScores(
-    userId,
+    accessState === "ok" ? viewedUserId : undefined,
     latestVersion,
   );
   const { stats, isLoading: isStatsLoading } = useTotalBpiStats(
-    userId,
+    accessState === "ok" ? viewedUserId : undefined,
     latestVersion,
   );
 
@@ -264,12 +300,17 @@ export default function NewBpiComparison({ userId }: Props) {
       }
     : null;
 
-  if (isSongsLoading || isStatsLoading) {
-    return <PageLoader />;
-  }
-
   return (
     <NewBpiComparisonUi
+      searchInput={searchInput}
+      onSearchInputChange={setSearchInput}
+      onSearch={handleSearch}
+      onReset={handleReset}
+      isViewingSelf={isViewingSelf}
+      viewedUserName={profile?.userName ?? null}
+      accessState={accessState}
+      isDataLoading={isSongsLoading || isStatsLoading}
+      scoreRateMaxScore={selectedSong ? selectedSong.notes * 2 : null}
       rows={rows}
       sortKey={sortKey}
       onSortKeyChange={setSortKey}

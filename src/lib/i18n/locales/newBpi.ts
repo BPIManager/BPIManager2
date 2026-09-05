@@ -167,6 +167,12 @@ export const newBpiTranslations = {
     "zh-TW": "相當於BPI0",
     ko: "BPI0 상당",
   },
+  "newBpi.chart.table.djRank": {
+    ja: "DJ RANK",
+    en: "DJ Rank",
+    "zh-TW": "DJ RANK",
+    ko: "DJ RANK",
+  },
   "newBpi.formula.title": {
     ja: "この楽曲の計算式",
     en: "This song's formula",
@@ -202,5 +208,65 @@ export const newBpiTranslations = {
     en: "Enter EX score",
     "zh-TW": "輸入EX分數",
     ko: "EX스코어 입력",
+  },
+  "newBpi.userSearch.label": {
+    ja: "ユーザーIDで検索",
+    en: "Search by user ID",
+    "zh-TW": "以使用者ID搜尋",
+    ko: "사용자 ID로 검색",
+  },
+  "newBpi.userSearch.placeholder": {
+    ja: "ユーザーID（プロフィールURLのID部分）",
+    en: "User ID (from their profile URL)",
+    "zh-TW": "使用者ID（個人檔案網址中的ID部分）",
+    ko: "사용자 ID(프로필 URL의 ID 부분)",
+  },
+  "newBpi.userSearch.button": {
+    ja: "検索",
+    en: "Search",
+    "zh-TW": "搜尋",
+    ko: "검색",
+  },
+  "newBpi.userSearch.reset": {
+    ja: "自分に戻る",
+    en: "Back to my data",
+    "zh-TW": "返回自己的資料",
+    ko: "내 데이터로 돌아가기",
+  },
+  "newBpi.userSearch.viewing": {
+    ja: "閲覧中",
+    en: "Viewing",
+    "zh-TW": "檢視中",
+    ko: "조회 중",
+  },
+  "newBpi.userSearch.notFound": {
+    ja: "指定されたユーザーIDが見つかりません。",
+    en: "No user found with that ID.",
+    "zh-TW": "找不到該使用者ID。",
+    ko: "해당 사용자 ID를 찾을 수 없습니다.",
+  },
+  "newBpi.userSearch.private": {
+    ja: "このユーザーのデータは非公開です。フォローが承認されている場合のみ閲覧できます。",
+    en: "This user's data is private. You can only view it if your follow request has been approved.",
+    "zh-TW": "此使用者的資料為非公開。僅在追蹤獲得核准後才能檢視。",
+    ko: "이 사용자의 데이터는 비공개입니다. 팔로우가 승인된 경우에만 볼 수 있습니다.",
+  },
+  "newBpi.filter.level": {
+    ja: "難易度",
+    en: "Level",
+    "zh-TW": "難度",
+    ko: "난이도",
+  },
+  "newBpi.filter.allLevels": {
+    ja: "すべての☆",
+    en: "All levels",
+    "zh-TW": "所有星等",
+    ko: "모든 난이도",
+  },
+  "newBpi.filter.allDifficulties": {
+    ja: "すべての種別",
+    en: "All difficulties",
+    "zh-TW": "所有難度類型",
+    ko: "모든 종류",
   },
 };
