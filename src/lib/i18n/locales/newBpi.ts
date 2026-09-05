@@ -107,4 +107,40 @@ export const newBpiTranslations = {
     "zh-TW": "依難度",
     ko: "난이도순",
   },
+  "newBpi.tab.list": {
+    ja: "一覧",
+    en: "List",
+    "zh-TW": "清單",
+    ko: "목록",
+  },
+  "newBpi.tab.chart": {
+    ja: "推移グラフ",
+    en: "Curve Chart",
+    "zh-TW": "趨勢圖",
+    ko: "추이 그래프",
+  },
+  "newBpi.chart.desc": {
+    ja: "楽曲を選ぶと、BPIを10刻みで達成するために必要なEXスコアを現行方式・新方式それぞれで結んだ曲線を表示します。●は現在のスコア位置です。",
+    en: "Pick a song to see the EX score needed to reach each BPI (in steps of 10) as a curve for both the current and new formulas. ● marks your current score.",
+    "zh-TW": "選擇樂曲後，會顯示以10為單位達成各BPI所需EX分數的曲線（現行公式與新公式）。●為目前分數的位置。",
+    ko: "곡을 선택하면 BPI를 10단위로 달성하는 데 필요한 EX스코어를 현행 방식과 신규 방식 각각의 곡선으로 표시합니다. ●는 현재 스코어 위치입니다.",
+  },
+  "newBpi.chart.xLabel": {
+    ja: "BPI",
+    en: "BPI",
+    "zh-TW": "BPI",
+    ko: "BPI",
+  },
+  "newBpi.chart.yLabel": {
+    ja: "EXスコア",
+    en: "EX Score",
+    "zh-TW": "EX分數",
+    ko: "EX스코어",
+  },
+  "newBpi.chart.userPoint": {
+    ja: "● 現在のスコア",
+    en: "● Your current score",
+    "zh-TW": "● 目前分數",
+    ko: "● 현재 스코어",
+  },
 };

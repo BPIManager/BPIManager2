@@ -53,4 +53,32 @@ export class NewBpiCalculator {
     const bpi = 100 * ((z - NEW_BPI_Z0) / (NEW_BPI_Z100 - NEW_BPI_Z0));
     return Math.max(this.BPI_FLOOR, Math.round(bpi * 100) / 100);
   }
+
+  /**
+   * 新方式（z尺度）で目標BPIを達成するために必要なEXスコアを逆算する。
+   * `BpiCalculator.calcFromBPI` の新方式版（推移グラフ描画用）。
+   *
+   * @param targetBpi - 目標とするBPI値
+   * @param songId - 楽曲ID（`songParams.json` 参照キー）
+   * @param notes - ノーツ数
+   * @returns 目標BPIを達成するためのEXスコア（0〜最大スコア）。パラメータ未整備の楽曲は `null`
+   */
+  public static calcFromBPI(
+    targetBpi: number,
+    songId: number,
+    notes: number,
+  ): number | null {
+    const param = newBpiSongParamMap.get(songId);
+    if (!param || notes === 0) return null;
+
+    const m = notes * 2;
+    const z = NEW_BPI_Z0 + (targetBpi * (NEW_BPI_Z100 - NEW_BPI_Z0)) / 100;
+    const t = param.mu + param.sigma * z;
+    const miss = Math.exp(-t);
+    const s = m - miss;
+
+    if (s > m) return m;
+    if (s < 0) return 0;
+    return s;
+  }
 }
