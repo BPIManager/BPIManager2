@@ -97,6 +97,8 @@ export default function NewBpiComparison({ userId }: Props) {
     comparableCount,
     playedSongMap,
   } = useMemo(() => {
+    const totalCount12 = stats?.totalCount;
+
     if (!songs)
       return {
         rows: [],
@@ -105,6 +107,13 @@ export default function NewBpiComparison({ userId }: Props) {
         comparableCount: 0,
         playedSongMap: new Map<number, SongWithScore>(),
       };
+
+    // useUserScores(/scores API)はプレイ済み楽曲のみをscores経由のINNER JOINで
+    // 返す(未プレイ楽曲は含まれない)ため、`songs.length`は総曲数ではなく
+    // 比較可能数(プレイ済み数)にしかならない。総合BPIの分母には
+    // /stats/totalBpi と同じ「☆12の現行選曲数」(stats.totalCount、
+    // 未プレイ楽曲を含む)を使う必要がある(揃えないと未プレイ楽曲の
+    // 床(-15)埋めが効かず、総合BPIが本来より高く出てしまう)。
 
     const played = songs.filter(
       (s): s is typeof s & { exScore: number } => s.exScore !== null,
@@ -133,9 +142,7 @@ export default function NewBpiComparison({ userId }: Props) {
     // 総合BPI(現行の /stats/totalBpi)は☆12のみを対象にしているため、
     // 比較用の2種の総合BPIも同じ☆12スコープに揃える。
     const level12Played = played.filter((s) => s.difficultyLevel === 12);
-    const totalSongCount12 = songs.filter(
-      (s) => s.difficultyLevel === 12,
-    ).length;
+    const totalSongCount12 = totalCount12 ?? level12Played.length;
 
     // (B) 単曲BPIだけ新方式に置き換え、総合BPIの集計方法(べき乗平均)は
     // 現行のまま。issue #299〜303単独の影響を見るためのケース。
@@ -186,7 +193,7 @@ export default function NewBpiComparison({ userId }: Props) {
       comparableCount,
       playedSongMap,
     };
-  }, [songs]);
+  }, [songs, stats?.totalCount]);
 
   // 推移グラフで選べるのは新方式パラメータのある楽曲のみ(新方式の曲線が描けないため)
   const curveEligibleRows = useMemo(
