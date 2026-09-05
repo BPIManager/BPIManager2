@@ -18,6 +18,13 @@ type NewBpiSongParamsFile = {
   zRef: number;
   /** ALS残差の標準偏差(t単位)。潜在スキルa_iの縮小推定(#304)の事前分散との重み付けに使う。 */
   residualRmse: number;
+  /**
+   * 実際のアリーナ順位(パーセンタイル)と潜在能力a_iの経験的な対応表
+   * （percentile昇順、aは非増加）。NewBpiCalculator.estimateRankの順位推定に使う。
+   */
+  rankCurve: { percentile: number; a: number }[];
+  /** rankCurveのパーセンタイルを絶対順位に変換する基準人数(z0と同じアリーナA帯在籍者数)。 */
+  arenaPopulationSize: number;
   songs: Record<string, { mu: number; sigma: number }>;
 };
 
@@ -39,3 +46,5 @@ export const NEW_BPI_Z0 = newBpiParams.z0;
 export const NEW_BPI_Z100 = newBpiParams.z100;
 export const NEW_BPI_Z_REF = newBpiParams.zRef;
 export const NEW_BPI_RESIDUAL_RMSE = newBpiParams.residualRmse;
+export const NEW_BPI_RANK_CURVE = newBpiParams.rankCurve;
+export const NEW_BPI_ARENA_POPULATION_SIZE = newBpiParams.arenaPopulationSize;

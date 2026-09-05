@@ -1,6 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { NewBpiCalculator } from "@/lib/bpi/newBpi";
-import { newBpiSongParamMap } from "@/constants/iidx/newBpi/songParams";
+import {
+  newBpiSongParamMap,
+  NEW_BPI_ARENA_POPULATION_SIZE,
+  NEW_BPI_Z0,
+} from "@/constants/iidx/newBpi/songParams";
 
 const NOTES = 1500;
 const M = NOTES * 2;
@@ -289,6 +293,32 @@ describe("NewBpiCalculator ロジックテスト（issue #299〜304 検証用）
       // どちらも同じ実力(a=2相当)のスコアだが、観測が少ないfewPlayed側は
       // 未プレイ曲の埋めが-15寄りになる分、totalManyより低くなるはず
       expect(totalFew).toBeLessThan(totalMany);
+    });
+  });
+
+  describe("順位推定(estimateRank: 実測アリーナ順位カーブに基づく経験的推定)", () => {
+    it("潜在能力が高いほど推定順位は良くなる(単調性)", () => {
+      const rankLow = NewBpiCalculator.estimateRank(-1);
+      const rankMid = NewBpiCalculator.estimateRank(0);
+      const rankHigh = NewBpiCalculator.estimateRank(2);
+      expect(rankHigh).toBeLessThan(rankMid);
+      expect(rankMid).toBeLessThan(rankLow);
+    });
+
+    it("順位は1からアリーナA帯在籍者数の範囲に収まる", () => {
+      expect(NewBpiCalculator.estimateRank(100)).toBe(1);
+      expect(NewBpiCalculator.estimateRank(-100)).toBe(NEW_BPI_ARENA_POPULATION_SIZE);
+      const midRank = NewBpiCalculator.estimateRank(0);
+      expect(midRank).toBeGreaterThanOrEqual(1);
+      expect(midRank).toBeLessThanOrEqual(NEW_BPI_ARENA_POPULATION_SIZE);
+    });
+
+    it("z0(BPI=0のアンカー)相当の潜在能力では、アリーナA帯のおおむね中央付近の順位になる", () => {
+      // z0はアリーナA帯在籍者のa_iの中央値として定義されている(決定記録0007)ため、
+      // a=z0での推定順位はアリーナA帯人数のおおむね半分に近いはず
+      const rank = NewBpiCalculator.estimateRank(NEW_BPI_Z0);
+      expect(rank).toBeGreaterThan(NEW_BPI_ARENA_POPULATION_SIZE * 0.3);
+      expect(rank).toBeLessThan(NEW_BPI_ARENA_POPULATION_SIZE * 0.7);
     });
   });
 });

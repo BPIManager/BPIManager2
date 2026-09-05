@@ -4,6 +4,8 @@ import {
   NEW_BPI_Z100,
   NEW_BPI_Z_REF,
   NEW_BPI_RESIDUAL_RMSE,
+  NEW_BPI_RANK_CURVE,
+  NEW_BPI_ARENA_POPULATION_SIZE,
 } from "@/constants/iidx/newBpi/songParams";
 
 export interface NewBpiSongBasicData {
@@ -374,5 +376,48 @@ export class NewBpiCalculator {
 
     bpis.sort((a, b) => b - a);
     return this.shiftedPowerMean(bpis, allSongs.length);
+  }
+
+  /**
+   * プレイヤーの潜在スキル a から、アリーナA帯（z0と同じ母集団）内での
+   * 推定順位を算出する。
+   *
+   * 原典の順位推定式（`順位 = 2616^((100-BPI)/100)`）は、DOLCE.氏1人の
+   * 実測BPIから逆算した、1点のデータで校正されたパラメトリックな式
+   * だった。ここでは実際のアリーナクロールデータ（実測順位×同一プレイヤー
+   * の潜在能力a_iのペア、58,000件超）から直接作った経験的なカーブ
+   * （`NEW_BPI_RANK_CURVE`、生成: `scripts/generate-new-bpi-params.ts`）を
+   * 参照する。正規分布等のパラメトリックな仮定を置かず、実測データの
+   * 分布形状（例えばアリーナ在籍者の実力分布が正規分布から歪んでいる
+   * こと）をそのまま反映できる。
+   *
+   * @param a - 潜在スキルの推定値（{@link estimateLatentSkill}の返り値）
+   * @returns アリーナA帯内での推定順位（1〜`arenaPopulationSize`）
+   */
+  public static estimateRank(a: number): number {
+    const curve = NEW_BPI_RANK_CURVE;
+    if (curve.length === 0) return NEW_BPI_ARENA_POPULATION_SIZE;
+
+    // curveはpercentile昇順・a非増加。aから該当区間を探し、
+    // percentileを線形補間する（区間外は最も近い端点で頭打ち）。
+    if (a >= curve[0].a) return 1;
+    if (a <= curve[curve.length - 1].a) return NEW_BPI_ARENA_POPULATION_SIZE;
+
+    let lo = 0;
+    let hi = curve.length - 1;
+    while (hi - lo > 1) {
+      const mid = Math.floor((lo + hi) / 2);
+      if (curve[mid].a > a) lo = mid;
+      else hi = mid;
+    }
+    const [pLo, aLo] = [curve[lo].percentile, curve[lo].a];
+    const [pHi, aHi] = [curve[hi].percentile, curve[hi].a];
+    const t = aLo === aHi ? 0 : (aLo - a) / (aLo - aHi);
+    const percentile = pLo + t * (pHi - pLo);
+
+    return Math.min(
+      NEW_BPI_ARENA_POPULATION_SIZE,
+      Math.max(1, Math.round(percentile * NEW_BPI_ARENA_POPULATION_SIZE)),
+    );
   }
 }
