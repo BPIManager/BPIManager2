@@ -144,16 +144,22 @@ export const newBpiTranslations = {
     ko: "● 현재 스코어",
   },
   "newBpi.chart.tableTitle": {
-    ja: "BPI別 必要EXスコア",
-    en: "EX score required per BPI",
-    "zh-TW": "各BPI所需EX分數",
-    ko: "BPI별 필요 EX스코어",
+    ja: "スコアレート別 現行BPI・新BPI",
+    en: "Current vs New BPI by Score Rate",
+    "zh-TW": "各分數率的目前BPI・新BPI",
+    ko: "스코어레이트별 현행BPI・신규BPI",
   },
-  "newBpi.chart.table.bpi": {
-    ja: "目標BPI",
-    en: "Target BPI",
-    "zh-TW": "目標BPI",
-    ko: "목표BPI",
+  "newBpi.chart.table.scoreRate": {
+    ja: "スコアレート",
+    en: "Score Rate",
+    "zh-TW": "分數率",
+    ko: "스코어레이트",
+  },
+  "newBpi.chart.table.bpi0Anchor": {
+    ja: "BPI0相当",
+    en: "BPI 0",
+    "zh-TW": "相當於BPI0",
+    ko: "BPI0 상당",
   },
   "newBpi.formula.title": {
     ja: "この楽曲の計算式",

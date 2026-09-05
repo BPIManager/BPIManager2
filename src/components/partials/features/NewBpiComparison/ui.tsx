@@ -18,12 +18,13 @@ import {
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { PageContainer, PageHeader } from "@/components/partials/common/PageChrome/Header";
 import { useTranslation } from "@/hooks/common/useTranslation";
-import { cn } from "@/lib/utils";
 import CurveChart, { CurvePoint } from "./CurveChart";
 import FormulaCard, { FormulaSongInfo } from "./FormulaCard";
 import ScoreSimulatorCard, {
   ScoreSimulatorSongInfo,
 } from "./ScoreSimulatorCard";
+import ScoreRateTable, { ScoreRateRow } from "./ScoreRateTable";
+import DeltaCell from "./DeltaCell";
 
 export type SortKey = "deltaDesc" | "deltaAsc" | "level";
 
@@ -55,6 +56,7 @@ interface Props {
   selectedSongId: number | null;
   onSelectedSongIdChange: (songId: number) => void;
   curveData: CurvePoint[] | null;
+  scoreRateRows: ScoreRateRow[] | null;
   selectedSongUserPoint: UserPoint | null;
   selectedSongFormula: FormulaSongInfo | null;
   selectedSongSimulator: ScoreSimulatorSongInfo | null;
@@ -71,25 +73,6 @@ const sortRows = (rows: NewBpiRow[], key: SortKey): NewBpiRow[] => {
     case "level":
       return sorted.sort((a, b) => b.difficultyLevel - a.difficultyLevel);
   }
-};
-
-const DeltaCell = ({ delta }: { delta: number | null }) => {
-  const { t } = useTranslation();
-  if (delta === null) {
-    return <span className="text-muted-foreground">{t("newBpi.table.noParam")}</span>;
-  }
-  return (
-    <span
-      className={cn(
-        "font-medium",
-        delta > 0 && "text-emerald-600 dark:text-emerald-400",
-        delta < 0 && "text-rose-600 dark:text-rose-400",
-      )}
-    >
-      {delta > 0 ? "+" : ""}
-      {delta.toFixed(2)}
-    </span>
-  );
 };
 
 const SummaryCards = ({
@@ -196,54 +179,12 @@ const ListTab = ({
   );
 };
 
-const CurveTable = ({ curveData }: { curveData: CurvePoint[] }) => {
-  const { t } = useTranslation();
-  return (
-    <DashCard className="p-0">
-      <h3 className="p-3 text-xs font-bold uppercase tracking-wide text-muted-foreground">
-        {t("newBpi.chart.tableTitle")}
-      </h3>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>{t("newBpi.chart.table.bpi")}</TableHead>
-            <TableHead className="text-right">{t("newBpi.table.currentBpi")}</TableHead>
-            <TableHead className="text-right">{t("newBpi.table.newBpi")}</TableHead>
-            <TableHead className="text-right">{t("newBpi.table.delta")}</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {curveData.map((row) => (
-            <TableRow key={row.bpi}>
-              <TableCell className="font-medium">{row.bpi}</TableCell>
-              <TableCell className="text-right tabular-nums">
-                {row.current !== null ? Math.round(row.current) : "—"}
-              </TableCell>
-              <TableCell className="text-right tabular-nums">
-                {row.new !== null ? Math.round(row.new) : t("newBpi.table.noParam")}
-              </TableCell>
-              <TableCell className="text-right tabular-nums">
-                <DeltaCell
-                  delta={
-                    row.current !== null && row.new !== null
-                      ? row.new - row.current
-                      : null
-                  }
-                />
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </DashCard>
-  );
-};
-
 const ChartTab = ({
   curveEligibleRows,
   selectedSongId,
   onSelectedSongIdChange,
   curveData,
+  scoreRateRows,
   selectedSongUserPoint,
   selectedSongFormula,
   selectedSongSimulator,
@@ -254,6 +195,7 @@ const ChartTab = ({
   | "selectedSongId"
   | "onSelectedSongIdChange"
   | "curveData"
+  | "scoreRateRows"
   | "selectedSongUserPoint"
   | "selectedSongFormula"
   | "selectedSongSimulator"
@@ -296,7 +238,7 @@ const ChartTab = ({
         )}
       </DashCard>
 
-      {curveData && <CurveTable curveData={curveData} />}
+      {scoreRateRows && <ScoreRateTable rows={scoreRateRows} />}
 
       {selectedSongFormula && <FormulaCard {...selectedSongFormula} />}
 
@@ -346,6 +288,7 @@ export default function NewBpiComparisonUi(props: Props) {
                 selectedSongId={props.selectedSongId}
                 onSelectedSongIdChange={props.onSelectedSongIdChange}
                 curveData={props.curveData}
+                scoreRateRows={props.scoreRateRows}
                 selectedSongUserPoint={props.selectedSongUserPoint}
                 selectedSongFormula={props.selectedSongFormula}
                 selectedSongSimulator={props.selectedSongSimulator}
