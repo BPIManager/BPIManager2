@@ -3,14 +3,16 @@
  *
  * `mu`/`sigma` はDBスキーマ変更を避けるため、`songDef` にカラムを追加せず
  * このJSON経由でのみ供給する（#299以降が未実装の検証段階のため）。
- * `scripts/generate-new-bpi-params.ts` で本番データから再生成できる。
+ * `scripts/generate-new-bpi-params.ts` で
+ * BPIM2-AutomatedDefinitionCalculatorのアリーナクロール結果(IIDX ID紐付け)
+ * とbpim2自身のスコアを統合した母集団から再生成できる。
  */
 type NewBpiSongParamsFile = {
   _comment: string;
   generatedAt: string;
   sourceVersion: string;
-  userCount: number;
-  minSongsPerUser: number;
+  playerCount: number;
+  minSongsPerPlayer: number;
   z0: number;
   z100: number;
   songs: Record<string, { mu: number; sigma: number }>;
