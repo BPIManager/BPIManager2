@@ -177,6 +177,39 @@ class ScoresRepository {
   }
 
   /**
+   * 複数ユーザー×複数楽曲の最新スコアをまとめて取得する
+   * (issue #299〜304検証用「全プレイヤー」一覧のページ単位バッチ取得用)。
+   *
+   * @param userIds - 対象ユーザー ID の配列
+   * @param version - バージョン番号
+   * @param songIds - 対象楽曲 ID の配列
+   */
+  async getLatestScoresForUsers(
+    userIds: string[],
+    version: string,
+    songIds: number[],
+  ) {
+    if (userIds.length === 0 || songIds.length === 0) return [];
+    return await db
+      .selectFrom("scores")
+      .innerJoin(
+        latestLogIdPerUserSongSubquery({
+          table: "scores",
+          version,
+          userIds,
+          songIds,
+        }).as("latest"),
+        (join) =>
+          join
+            .onRef("latest.userId", "=", "scores.userId")
+            .onRef("latest.songId", "=", "scores.songId")
+            .onRef("latest.maxLogId", "=", "scores.logId"),
+      )
+      .select(["scores.userId", "scores.songId", "scores.exScore"])
+      .execute();
+  }
+
+  /**
    * 指定ユーザー・バージョン・楽曲の最新スコアを1件取得する。
    * idx_scores_version_user_song_log(version,userId,songId,logId DESC) を点引きする。
    */

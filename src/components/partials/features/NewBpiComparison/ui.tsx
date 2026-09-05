@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { DashCard } from "@/components/ui/dashcard";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableHeader,
@@ -32,8 +33,15 @@ import ScoreSimulatorCard, {
 import ScoreRateTable, { ScoreRateRow } from "./ScoreRateTable";
 import DeltaCell from "./DeltaCell";
 import UserSearchBar from "./UserSearchBar";
+import ListSummary from "./ListSummary";
+import PlayersTab from "./PlayersTab";
 
-export type SortKey = "deltaDesc" | "deltaAsc" | "level";
+export type SortKey =
+  | "deltaDesc"
+  | "deltaAsc"
+  | "level"
+  | "currentBpiDesc"
+  | "newBpiDesc";
 export type AccessState = "loading" | "not-found" | "private" | "ok";
 
 export interface NewBpiRow {
@@ -91,6 +99,10 @@ const sortRows = (rows: NewBpiRow[], key: SortKey): NewBpiRow[] => {
       return sorted.sort((a, b) => (a.delta ?? Infinity) - (b.delta ?? Infinity));
     case "level":
       return sorted.sort((a, b) => b.difficultyLevel - a.difficultyLevel);
+    case "currentBpiDesc":
+      return sorted.sort((a, b) => (b.currentBpi ?? -Infinity) - (a.currentBpi ?? -Infinity));
+    case "newBpiDesc":
+      return sorted.sort((a, b) => (b.newBpi ?? -Infinity) - (a.newBpi ?? -Infinity));
   }
 };
 
@@ -161,102 +173,108 @@ const ListTab = ({
   const sorted = sortRows(filtered, sortKey);
 
   return (
-    <DashCard className="p-0">
-      <div className="flex flex-wrap items-center justify-between gap-2 p-3">
-        <div className="flex flex-wrap gap-2">
-          <Select
-            value={String(levelFilter)}
-            onValueChange={(v) =>
-              setLevelFilter(v === "all" ? "all" : (Number(v) as 11 | 12))
-            }
-          >
-            <SelectTrigger size="sm" className="w-32">
+    <div className="flex flex-col gap-4">
+      <ListSummary rows={filtered} />
+
+      <DashCard className="p-0">
+        <div className="flex flex-wrap items-center justify-between gap-2 p-3">
+          <div className="flex flex-wrap gap-2">
+            <Select
+              value={String(levelFilter)}
+              onValueChange={(v) =>
+                setLevelFilter(v === "all" ? "all" : (Number(v) as 11 | 12))
+              }
+            >
+              <SelectTrigger size="sm" className="w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t("newBpi.filter.allLevels")}</SelectItem>
+                {IIDX_LEVELS.map((level) => (
+                  <SelectItem key={level} value={level}>
+                    ☆{level}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select
+              value={difficultyFilter}
+              onValueChange={(v) => setDifficultyFilter(v as DifficultyFilter)}
+            >
+              <SelectTrigger size="sm" className="w-40">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">
+                  {t("newBpi.filter.allDifficulties")}
+                </SelectItem>
+                {IIDX_DIFFICULTIES.map((difficulty) => (
+                  <SelectItem key={difficulty} value={difficulty}>
+                    {difficulty}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <Select value={sortKey} onValueChange={(v) => onSortKeyChange(v as SortKey)}>
+            <SelectTrigger size="sm" className="w-48">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">{t("newBpi.filter.allLevels")}</SelectItem>
-              {IIDX_LEVELS.map((level) => (
-                <SelectItem key={level} value={level}>
-                  ☆{level}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select
-            value={difficultyFilter}
-            onValueChange={(v) => setDifficultyFilter(v as DifficultyFilter)}
-          >
-            <SelectTrigger size="sm" className="w-40">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">
-                {t("newBpi.filter.allDifficulties")}
-              </SelectItem>
-              {IIDX_DIFFICULTIES.map((difficulty) => (
-                <SelectItem key={difficulty} value={difficulty}>
-                  {difficulty}
-                </SelectItem>
-              ))}
+              <SelectItem value="deltaDesc">{t("newBpi.sort.deltaDesc")}</SelectItem>
+              <SelectItem value="deltaAsc">{t("newBpi.sort.deltaAsc")}</SelectItem>
+              <SelectItem value="level">{t("newBpi.sort.level")}</SelectItem>
+              <SelectItem value="currentBpiDesc">{t("newBpi.sort.currentBpiDesc")}</SelectItem>
+              <SelectItem value="newBpiDesc">{t("newBpi.sort.newBpiDesc")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
-        <Select value={sortKey} onValueChange={(v) => onSortKeyChange(v as SortKey)}>
-          <SelectTrigger size="sm" className="w-48">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="deltaDesc">{t("newBpi.sort.deltaDesc")}</SelectItem>
-            <SelectItem value="deltaAsc">{t("newBpi.sort.deltaAsc")}</SelectItem>
-            <SelectItem value="level">{t("newBpi.sort.level")}</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      {sorted.length === 0 ? (
-        <div className="p-6 text-center text-sm text-muted-foreground">
-          {t("newBpi.empty")}
-        </div>
-      ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>{t("newBpi.table.song")}</TableHead>
-              <TableHead>{t("newBpi.table.level")}</TableHead>
-              <TableHead className="text-right">{t("newBpi.table.exScore")}</TableHead>
-              <TableHead className="text-right">{t("newBpi.table.currentBpi")}</TableHead>
-              <TableHead className="text-right">{t("newBpi.table.newBpi")}</TableHead>
-              <TableHead className="text-right">{t("newBpi.table.delta")}</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {sorted.map((row) => (
-              <TableRow key={row.songId}>
-                <TableCell className="max-w-60 truncate font-medium">
-                  {row.title}
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline">
-                    {row.difficultyLevel} {row.difficulty}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right tabular-nums">{row.exScore}</TableCell>
-                <TableCell className="text-right tabular-nums">
-                  {row.currentBpi !== null ? row.currentBpi.toFixed(2) : "—"}
-                </TableCell>
-                <TableCell className="text-right tabular-nums">
-                  {row.newBpi !== null ? row.newBpi.toFixed(2) : t("newBpi.table.noParam")}
-                </TableCell>
-                <TableCell className="text-right tabular-nums">
-                  <DeltaCell delta={row.delta} />
-                </TableCell>
+        {sorted.length === 0 ? (
+          <div className="p-6 text-center text-sm text-muted-foreground">
+            {t("newBpi.empty")}
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{t("newBpi.table.song")}</TableHead>
+                <TableHead>{t("newBpi.table.level")}</TableHead>
+                <TableHead className="text-right">{t("newBpi.table.exScore")}</TableHead>
+                <TableHead className="text-right">{t("newBpi.table.currentBpi")}</TableHead>
+                <TableHead className="text-right">{t("newBpi.table.newBpi")}</TableHead>
+                <TableHead className="text-right">{t("newBpi.table.delta")}</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      )}
-    </DashCard>
+            </TableHeader>
+            <TableBody>
+              {sorted.map((row) => (
+                <TableRow key={row.songId}>
+                  <TableCell className="max-w-60 truncate font-medium">
+                    {row.title}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline">
+                      {row.difficultyLevel} {row.difficulty}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right tabular-nums">{row.exScore}</TableCell>
+                  <TableCell className="text-right tabular-nums">
+                    {row.currentBpi !== null ? row.currentBpi.toFixed(2) : "—"}
+                  </TableCell>
+                  <TableCell className="text-right tabular-nums">
+                    {row.newBpi !== null ? row.newBpi.toFixed(2) : t("newBpi.table.noParam")}
+                  </TableCell>
+                  <TableCell className="text-right tabular-nums">
+                    <DeltaCell delta={row.delta} />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </DashCard>
+    </div>
   );
 };
 
@@ -285,6 +303,7 @@ const ChartTab = ({
   | "selectedSongInitialScore"
 >) => {
   const { t } = useTranslation();
+  const [songSearch, setSongSearch] = useState("");
 
   if (curveEligibleRows.length === 0) {
     return (
@@ -294,6 +313,11 @@ const ChartTab = ({
     );
   }
 
+  const query = songSearch.trim().toLowerCase();
+  const filteredSongOptions = query
+    ? curveEligibleRows.filter((row) => row.title.toLowerCase().includes(query))
+    : curveEligibleRows;
+
   return (
     <div className="flex flex-col gap-4">
       <DashCard>
@@ -302,16 +326,35 @@ const ChartTab = ({
           <Select
             value={selectedSongId !== null ? String(selectedSongId) : undefined}
             onValueChange={(v) => onSelectedSongIdChange(Number(v))}
+            onOpenChange={(open) => {
+              if (!open) setSongSearch("");
+            }}
           >
             <SelectTrigger size="sm" className="mt-2 w-full sm:w-80">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {curveEligibleRows.map((row) => (
-                <SelectItem key={row.songId} value={String(row.songId)}>
-                  {row.title}（{row.difficultyLevel} {row.difficulty}）
-                </SelectItem>
-              ))}
+              <div className="p-1">
+                <Input
+                  value={songSearch}
+                  onChange={(e) => setSongSearch(e.target.value)}
+                  onKeyDown={(e) => e.stopPropagation()}
+                  placeholder={t("newBpi.chart.songSearchPlaceholder")}
+                  className="h-8"
+                  autoFocus
+                />
+              </div>
+              {filteredSongOptions.length === 0 ? (
+                <div className="px-2 py-4 text-center text-xs text-muted-foreground">
+                  {t("newBpi.empty")}
+                </div>
+              ) : (
+                filteredSongOptions.map((row) => (
+                  <SelectItem key={row.songId} value={String(row.songId)}>
+                    {row.title}（{row.difficultyLevel} {row.difficulty}）
+                  </SelectItem>
+                ))
+              )}
             </SelectContent>
           </Select>
         </div>
@@ -386,6 +429,7 @@ export default function NewBpiComparisonUi(props: Props) {
                 <TabsList className="w-fit">
                   <TabsTrigger value="list">{t("newBpi.tab.list")}</TabsTrigger>
                   <TabsTrigger value="chart">{t("newBpi.tab.chart")}</TabsTrigger>
+                  <TabsTrigger value="players">{t("newBpi.tab.players")}</TabsTrigger>
                 </TabsList>
                 <TabsContent value="list">
                   <ListTab
@@ -393,6 +437,9 @@ export default function NewBpiComparisonUi(props: Props) {
                     sortKey={props.sortKey}
                     onSortKeyChange={props.onSortKeyChange}
                   />
+                </TabsContent>
+                <TabsContent value="players">
+                  <PlayersTab />
                 </TabsContent>
                 <TabsContent value="chart">
                   <ChartTab
