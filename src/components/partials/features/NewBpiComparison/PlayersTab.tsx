@@ -64,6 +64,11 @@ const ValueWithDeltaCell = ({
   );
 };
 
+interface PlayersTabProps {
+  /** ユーザー名クリック時のハンドラ。「一覧」タブでそのユーザーを表示する。 */
+  onSelectUser: (userId: string) => void;
+}
+
 /**
  * issue #299〜304検証用「全プレイヤー」一覧。公開ユーザー(☆12のスコアが
  * 1曲以上ある人のみ)を現行総合BPIが高い順にページ単位で列挙し、総合BPI
@@ -73,7 +78,7 @@ const ValueWithDeltaCell = ({
  * ページごとにサーバー側でBPIを再計算するため({@link usePlayersList}参照)、
  * 一度に全公開ユーザー分の計算は行わない。
  */
-export default function PlayersTab() {
+export default function PlayersTab({ onSelectUser }: PlayersTabProps) {
   const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [bucketKey, setBucketKey] = useState("all");
@@ -162,7 +167,13 @@ export default function PlayersTab() {
               {players.map((p) => (
                 <TableRow key={p.userId}>
                   <TableCell className="max-w-40 truncate font-medium">
-                    {p.userName}
+                    <button
+                      type="button"
+                      onClick={() => onSelectUser(p.userId)}
+                      className="truncate text-left hover:underline"
+                    >
+                      {p.userName}
+                    </button>
                   </TableCell>
                   <TableCell className="text-right tabular-nums">
                     {p.currentTotal.toFixed(2)}

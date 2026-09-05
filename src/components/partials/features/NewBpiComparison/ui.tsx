@@ -25,6 +25,7 @@ import {
   IIDX_LEVELS,
   IIDX_DIFFICULTIES,
 } from "@/constants/iidx/bpiDifficulties";
+import RadarSectionChart from "@/components/partials/common/DashBoard/Radar";
 import CurveChart, { CurvePoint } from "./CurveChart";
 import FormulaCard, { FormulaSongInfo } from "./FormulaCard";
 import ScoreSimulatorCard, {
@@ -66,6 +67,7 @@ interface Props {
   onSearchInputChange: (value: string) => void;
   onSearch: () => void;
   onReset: () => void;
+  onSelectUser: (userId: string) => void;
   isViewingSelf: boolean;
   viewedUserName: string | null;
   accessState: AccessState;
@@ -74,6 +76,9 @@ interface Props {
   rows: NewBpiRow[];
   sortKey: SortKey;
   onSortKeyChange: (key: SortKey) => void;
+  /** 既存のノーツレーダーと同じカテゴリ分けによる、現行/新方式のカテゴリ別総合BPI。 */
+  radarCurrent: Record<string, number> | null;
+  radarNew: Record<string, number> | null;
   currentTotalBpi: number | null;
   hybridTotalBpi: number | null;
   newTotalBpi: number | null;
@@ -155,11 +160,32 @@ const SummaryCards = ({
 type LevelFilter = "all" | 11 | 12;
 type DifficultyFilter = "all" | (typeof IIDX_DIFFICULTIES)[number];
 
+const RadarComparisonCard = ({
+  radarCurrent,
+  radarNew,
+}: Pick<Props, "radarCurrent" | "radarNew">) => {
+  const { t } = useTranslation();
+  if (!radarCurrent || !radarNew) return null;
+  return (
+    <DashCard>
+      <p className="mb-2 text-xs text-muted-foreground">
+        {t("newBpi.radar.desc")}
+      </p>
+      <RadarSectionChart data={radarCurrent} rivalData={radarNew} />
+    </DashCard>
+  );
+};
+
 const ListTab = ({
   rows,
   sortKey,
   onSortKeyChange,
-}: Pick<Props, "rows" | "sortKey" | "onSortKeyChange">) => {
+  radarCurrent,
+  radarNew,
+}: Pick<
+  Props,
+  "rows" | "sortKey" | "onSortKeyChange" | "radarCurrent" | "radarNew"
+>) => {
   const { t } = useTranslation();
   const [levelFilter, setLevelFilter] = useState<LevelFilter>("all");
   const [difficultyFilter, setDifficultyFilter] =
@@ -175,6 +201,7 @@ const ListTab = ({
   return (
     <div className="flex flex-col gap-4">
       <ListSummary rows={filtered} />
+      <RadarComparisonCard radarCurrent={radarCurrent} radarNew={radarNew} />
 
       <DashCard className="p-0">
         <div className="flex flex-wrap items-center justify-between gap-2 p-3">
@@ -382,6 +409,7 @@ const ChartTab = ({
 
 export default function NewBpiComparisonUi(props: Props) {
   const { t } = useTranslation();
+  const [activeTab, setActiveTab] = useState("list");
 
   return (
     <>
@@ -425,7 +453,7 @@ export default function NewBpiComparisonUi(props: Props) {
                 comparableCount={props.comparableCount}
               />
 
-              <Tabs defaultValue="list">
+              <Tabs value={activeTab} onValueChange={setActiveTab}>
                 <TabsList className="w-fit">
                   <TabsTrigger value="list">{t("newBpi.tab.list")}</TabsTrigger>
                   <TabsTrigger value="chart">{t("newBpi.tab.chart")}</TabsTrigger>
@@ -436,10 +464,17 @@ export default function NewBpiComparisonUi(props: Props) {
                     rows={props.rows}
                     sortKey={props.sortKey}
                     onSortKeyChange={props.onSortKeyChange}
+                    radarCurrent={props.radarCurrent}
+                    radarNew={props.radarNew}
                   />
                 </TabsContent>
                 <TabsContent value="players">
-                  <PlayersTab />
+                  <PlayersTab
+                    onSelectUser={(targetUserId) => {
+                      props.onSelectUser(targetUserId);
+                      setActiveTab("list");
+                    }}
+                  />
                 </TabsContent>
                 <TabsContent value="chart">
                   <ChartTab

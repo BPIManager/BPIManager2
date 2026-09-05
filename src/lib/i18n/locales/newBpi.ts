@@ -209,6 +209,12 @@ export const newBpiTranslations = {
     "zh-TW": "以樂曲名稱搜尋",
     ko: "곡 이름으로 검색",
   },
+  "newBpi.radar.desc": {
+    ja: "既存のノーツレーダーと同じカテゴリ分けで、現行方式（青）と新方式（黄）のカテゴリ別総合BPIを比較します。",
+    en: "Compares category-wise total BPI between the current formula (blue) and the new formula (yellow), using the same categories as the existing notes radar.",
+    "zh-TW": "使用與現有音符雷達相同的分類，比較現行公式（藍）與新公式（黃）各分類的綜合BPI。",
+    ko: "기존 노트 레이더와 같은 카테고리 분류로, 현행 방식(파랑)과 신규 방식(노랑)의 카테고리별 종합BPI를 비교합니다.",
+  },
   "newBpi.listSummary.increase": {
     ja: "上昇",
     en: "Increased",

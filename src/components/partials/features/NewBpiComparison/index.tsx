@@ -7,6 +7,7 @@ import { useProfile } from "@/hooks/users/useProfile";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { BpiCalculator } from "@/lib/bpi";
 import { NewBpiCalculator } from "@/lib/bpi/newBpi";
+import { calculateRadar, ALL_CATEGORIES } from "@/lib/radar/calculator";
 import NewBpiComparisonUi, { NewBpiRow, SortKey } from "./ui";
 import type { CurvePoint } from "./CurveChart";
 import type { FormulaSongInfo } from "./FormulaCard";
@@ -57,6 +58,13 @@ export default function NewBpiComparison({ userId }: Props) {
   };
   const handleReset = () => {
     setViewedUserId(userId);
+    setSearchInput("");
+    setSelectedSongId(null);
+  };
+  // 「全プレイヤー」タブでユーザー名をクリックしたときに、そのユーザーを
+  // 「一覧」タブで表示する(検索欄からの検索と同じ仕組みに乗せる)。
+  const handleSelectUser = (targetUserId: string) => {
+    setViewedUserId(targetUserId);
     setSearchInput("");
     setSelectedSongId(null);
   };
@@ -192,6 +200,62 @@ export default function NewBpiComparison({ userId }: Props) {
     };
   }, [songs, stats?.totalCount, songMaster]);
 
+  // 既存のノーツレーダー(カテゴリ別総合BPI)と同じカテゴリ分け(topElements.json)
+  // を使い、現行/新方式それぞれのカテゴリ別総合BPIを算出する。現行側は既存の
+  // calculateRadar をそのまま使い、カテゴリごとの played/unplayed 内訳
+  // (RadarResponse.songs)を新方式側の計算にも流用することで、両者の対象曲・
+  // 分母を完全に一致させる。
+  const radarComparison = useMemo(() => {
+    if (!songs || songMaster.length === 0) return null;
+    const played = songs.filter(
+      (s): s is typeof s & { exScore: number } => s.exScore !== null,
+    );
+    if (played.length === 0) return null;
+
+    const radarResult = calculateRadar(
+      played.map((s) => ({
+        title: s.title,
+        difficulty: s.difficulty,
+        exScore: s.exScore,
+        notes: s.notes,
+        bpi: s.bpi,
+      })),
+    );
+
+    const songMasterByKey = new Map(
+      songMaster.map((s) => [`${s.title}___${s.difficulty}`, s]),
+    );
+
+    const current: Record<string, number> = {};
+    const next: Record<string, number> = {};
+    for (const category of ALL_CATEGORIES) {
+      const categoryResult = radarResult[category];
+      current[category] = categoryResult.totalBpi;
+
+      const totalCount = categoryResult.songs.length;
+      const newBpis = categoryResult.songs
+        .filter((s) => s.exScore !== null)
+        .map((s) => {
+          const master = songMasterByKey.get(`${s.title}___${s.difficulty}`);
+          if (!master) return null;
+          return NewBpiCalculator.calc(s.exScore!, {
+            songId: master.songId,
+            notes: master.notes,
+            kaidenAvg: master.kaidenAvg,
+            wrScore: master.wrScore,
+          });
+        })
+        .filter((b): b is number => b !== null)
+        .sort((a, b) => b - a);
+
+      next[category] =
+        newBpis.length > 0
+          ? BpiCalculator.calculateTotalBPI(newBpis, totalCount)
+          : -15;
+    }
+    return { current, next };
+  }, [songs, songMaster]);
+
   // 推移グラフで選べるのは新方式パラメータのある楽曲のみ(新方式の曲線が描けないため)
   const curveEligibleRows = useMemo(
     () => rows.filter((r) => r.newBpi !== null),
@@ -311,6 +375,7 @@ export default function NewBpiComparison({ userId }: Props) {
       onSearchInputChange={setSearchInput}
       onSearch={handleSearch}
       onReset={handleReset}
+      onSelectUser={handleSelectUser}
       isViewingSelf={isViewingSelf}
       viewedUserName={profile?.userName ?? null}
       accessState={accessState}
@@ -319,6 +384,8 @@ export default function NewBpiComparison({ userId }: Props) {
       rows={rows}
       sortKey={sortKey}
       onSortKeyChange={setSortKey}
+      radarCurrent={radarComparison?.current ?? null}
+      radarNew={radarComparison?.next ?? null}
       currentTotalBpi={stats?.totalBpi ?? null}
       hybridTotalBpi={hybridTotalBpi}
       newTotalBpi={newTotalBpi}
