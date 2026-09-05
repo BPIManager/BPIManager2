@@ -267,22 +267,31 @@ export class NewBpiCalculator {
     return this.estimateLatentSkillWithConfidence(observations)?.a ?? null;
   }
 
-  /** 未プレイ曲埋めで、a_iの推定に対する信頼度をどれだけ重視するか(sigma²単位)。 */
-  private static readonly UNPLAYED_FILL_PRIOR_WEIGHT = 1;
-
   /**
    * 未プレイ曲のBPIを、推定済みの潜在スキル a から予測する。
    *
-   * a をそのまま使うと「1曲だけ全一・残りは未プレイ」のような少数観測でも
-   * 全曲に対して強気な予測をしてしまい、原典由来の「この場合の総合BPIは
-   * 50になる」という性質が大きく崩れる（実測: 約85まで跳ね上がる）。
-   * そこで、推定の根拠となった観測量 den に応じて予測値を`BPI_FLOOR`(-15、
-   * 「その曲を全く触っていない」という現行の扱い)とブレンドする
-   * （w = den / (den + UNPLAYED_FILL_PRIOR_WEIGHT)）。den が大きい
-   * （プレイ曲数が多く弁別力の高い曲を多く含む）プレイヤーほど予測を
-   * そのまま信頼し、den が小さいプレイヤーほど「未プレイ＝-15」寄りに
-   * 留まる。定数1は、上記の「1曲全一+残り未プレイ→50」がほぼ厳密に
-   * 成り立つ点を基準に定めた（実測で50.00〜50.20程度に収まる）。
+   * a をそのまま使うと、少数観測でも全曲に対して強気な予測をしてしまう
+   * （例: 1曲だけ全一を持つユーザーの a_shrunk は、この1曲についての
+   * 事後分散がまだ大きい＝本来なら「全曲について強気に予測してよいほど
+   * 確信が持てる状態ではない」にもかかわらず、素の a をそのまま使うと
+   * 全曲を「ほぼ全一級の実力」として予測してしまう）。
+   *
+   * そこで、a_i推定の事後分散に基づいて予測値を`BPI_FLOOR`(-15、「その曲を
+   * 全く触っていない」という現行の扱い)とブレンドする。
+   * a_i の事後分布は N(a_shrunk, residualVariance/(den+residualVariance))
+   * であり、事後分散は den→0 で1（事前分布の分散、＝何も分かっていない
+   * 状態）に、den→∞ で0（完全に確信できる状態）に連続的に近づく。
+   * この「事後分散の残り具合」の補数をそのまま予測の信頼度重みとして使う
+   * （w = 1 - 事後分散 = den / (den + residualVariance)）。residualVariance
+   * は{@link estimateLatentSkillWithConfidence}で使うものと同じ、ALS残差
+   * から実測した値であり、この予測専用に別途チューニングした自由パラメータ
+   * ではない。
+   *
+   * なお、この方式では「1曲だけ全一・残りは未プレイ」という原典由来のケース
+   * の総合BPIは、旧来の`k=log2(n)`べき乗平均が定義する50ちょうどには
+   * ならない（実測で58程度）。50という値は旧尺度の指数の選び方に由来する
+   * 目印であり、分布ベースの新モデルがそれと一致すべき統計的な必然性は
+   * ないため、意図してこの乖離を許容している。
    */
   private static predictUnplayedBpi(
     a: number,
@@ -294,7 +303,8 @@ export class NewBpiCalculator {
     const { z0, z100, gamma } = params;
     const ratio = (a - z0) / (z100 - z0);
     const rawPrediction = 100 * Math.sign(ratio) * Math.pow(Math.abs(ratio), gamma);
-    const w = den / (den + this.UNPLAYED_FILL_PRIOR_WEIGHT);
+    const residualVariance = NEW_BPI_RESIDUAL_RMSE * NEW_BPI_RESIDUAL_RMSE;
+    const w = den / (den + residualVariance);
     const blended = w * rawPrediction + (1 - w) * this.BPI_FLOOR;
     return Math.max(this.BPI_FLOOR, Math.round(blended * 100) / 100);
   }
