@@ -54,65 +54,103 @@ export default function NewBpiComparison({ userId }: Props) {
     latestVersion,
   );
 
-  const { rows, newTotalBpi, comparableCount, playedSongMap } =
-    useMemo(() => {
-      if (!songs)
-        return {
-          rows: [],
-          newTotalBpi: null,
-          comparableCount: 0,
-          playedSongMap: new Map<number, SongWithScore>(),
-        };
+  const {
+    rows,
+    hybridTotalBpi,
+    newTotalBpi,
+    comparableCount,
+    playedSongMap,
+  } = useMemo(() => {
+    if (!songs)
+      return {
+        rows: [],
+        hybridTotalBpi: null,
+        newTotalBpi: null,
+        comparableCount: 0,
+        playedSongMap: new Map<number, SongWithScore>(),
+      };
 
-      const played = songs.filter(
-        (s): s is typeof s & { exScore: number } => s.exScore !== null,
-      );
-      const playedSongMap = new Map(played.map((s) => [s.songId, s]));
+    const played = songs.filter(
+      (s): s is typeof s & { exScore: number } => s.exScore !== null,
+    );
+    const playedSongMap = new Map(played.map((s) => [s.songId, s]));
 
-      const rows: NewBpiRow[] = played.map((s) => {
-        const newBpi = NewBpiCalculator.calc(s.exScore, {
+    const rows: NewBpiRow[] = played.map((s) => {
+      const newBpi = NewBpiCalculator.calc(s.exScore, {
+        songId: s.songId,
+        notes: s.notes,
+        kaidenAvg: s.kaidenAvg,
+        wrScore: s.wrScore,
+      });
+      return {
+        songId: s.songId,
+        title: s.title,
+        difficulty: s.difficulty,
+        difficultyLevel: s.difficultyLevel,
+        exScore: s.exScore,
+        currentBpi: s.bpi,
+        newBpi,
+        delta: s.bpi !== null && newBpi !== null ? newBpi - s.bpi : null,
+      };
+    });
+
+    // 総合BPI(現行の /stats/totalBpi)は☆12のみを対象にしているため、
+    // 比較用の2種の総合BPIも同じ☆12スコープに揃える。
+    const level12Played = played.filter((s) => s.difficultyLevel === 12);
+    const totalSongCount12 = songs.filter(
+      (s) => s.difficultyLevel === 12,
+    ).length;
+
+    // (B) 単曲BPIだけ新方式に置き換え、総合BPIの集計方法(べき乗平均)は
+    // 現行のまま。issue #299〜303単独の影響を見るためのケース。
+    const newBpisLevel12Desc = level12Played
+      .map((s) =>
+        NewBpiCalculator.calc(s.exScore, {
           songId: s.songId,
           notes: s.notes,
           kaidenAvg: s.kaidenAvg,
           wrScore: s.wrScore,
-        });
-        return {
-          songId: s.songId,
-          title: s.title,
-          difficulty: s.difficulty,
-          difficultyLevel: s.difficultyLevel,
-          exScore: s.exScore,
-          currentBpi: s.bpi,
-          newBpi,
-          delta: s.bpi !== null && newBpi !== null ? newBpi - s.bpi : null,
-        };
-      });
+        }),
+      )
+      .filter((b): b is number => b !== null)
+      .sort((a, b) => b - a);
+    const hybridTotalBpi =
+      totalSongCount12 > 0
+        ? BpiCalculator.calculateTotalBPI(newBpisLevel12Desc, totalSongCount12)
+        : null;
 
-      // 新方式の総合BPI(参考値) = issue #304 の潜在スキル a_i を
-      // 「パラメータのある楽曲かつプレイ済み」の範囲でこの場で直接推定する。
-      let num = 0;
-      let den = 0;
-      let comparableCount = 0;
-      for (const s of played) {
-        const param = newBpiSongParamMap.get(s.songId);
-        if (!param) continue;
-        const m = s.notes * 2;
-        const miss = Math.max(0.5, m - Math.min(s.exScore, m));
-        const t = -Math.log(miss);
-        num += param.sigma * (t - param.mu);
-        den += param.sigma * param.sigma;
-        comparableCount++;
-      }
-      const a = den > 0 ? num / den : null;
-      const newTotalBpi =
-        a !== null
-          ? Math.round(
-              100 * ((a - NEW_BPI_Z0) / (NEW_BPI_Z100 - NEW_BPI_Z0)) * 100,
-            ) / 100
-          : null;
+    // (C) 単曲BPI・総合BPIの導出方法の両方を新方式に置き換える。issue #304の
+    // 潜在スキル a_i を「パラメータのある☆12楽曲かつプレイ済み」の範囲で
+    // この場で直接推定する。
+    let num = 0;
+    let den = 0;
+    let comparableCount = 0;
+    for (const s of level12Played) {
+      const param = newBpiSongParamMap.get(s.songId);
+      if (!param) continue;
+      const m = s.notes * 2;
+      const miss = Math.max(0.5, m - Math.min(s.exScore, m));
+      const t = -Math.log(miss);
+      num += param.sigma * (t - param.mu);
+      den += param.sigma * param.sigma;
+      comparableCount++;
+    }
+    const a = den > 0 ? num / den : null;
+    const newTotalBpi =
+      a !== null
+        ? Math.round(
+            100 * ((a - NEW_BPI_Z0) / (NEW_BPI_Z100 - NEW_BPI_Z0)) * 100,
+          ) / 100
+        : null;
 
-      return { rows, newTotalBpi, comparableCount, playedSongMap };
-    }, [songs]);
+    return {
+      rows,
+      hybridTotalBpi,
+      newTotalBpi,
+      comparableCount,
+      playedSongMap,
+    };
+  }, [songs]);
 
   // 推移グラフで選べるのは新方式パラメータのある楽曲のみ(新方式の曲線が描けないため)
   const curveEligibleRows = useMemo(
@@ -236,6 +274,7 @@ export default function NewBpiComparison({ userId }: Props) {
       sortKey={sortKey}
       onSortKeyChange={setSortKey}
       currentTotalBpi={stats?.totalBpi ?? null}
+      hybridTotalBpi={hybridTotalBpi}
       newTotalBpi={newTotalBpi}
       comparableCount={comparableCount}
       curveEligibleRows={curveEligibleRows}

@@ -50,6 +50,7 @@ interface Props {
   sortKey: SortKey;
   onSortKeyChange: (key: SortKey) => void;
   currentTotalBpi: number | null;
+  hybridTotalBpi: number | null;
   newTotalBpi: number | null;
   comparableCount: number;
   curveEligibleRows: NewBpiRow[];
@@ -77,18 +78,30 @@ const sortRows = (rows: NewBpiRow[], key: SortKey): NewBpiRow[] => {
 
 const SummaryCards = ({
   currentTotalBpi,
+  hybridTotalBpi,
   newTotalBpi,
   comparableCount,
-}: Pick<Props, "currentTotalBpi" | "newTotalBpi" | "comparableCount">) => {
+}: Pick<
+  Props,
+  "currentTotalBpi" | "hybridTotalBpi" | "newTotalBpi" | "comparableCount"
+>) => {
   const { t } = useTranslation();
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <DashCard>
         <div className="text-xs text-muted-foreground">
           {t("newBpi.summary.currentTotal")}
         </div>
         <div className="mt-1 text-2xl font-bold">
           {currentTotalBpi !== null ? currentTotalBpi.toFixed(2) : "—"}
+        </div>
+      </DashCard>
+      <DashCard>
+        <div className="text-xs text-muted-foreground">
+          {t("newBpi.summary.hybridTotal")}
+        </div>
+        <div className="mt-1 text-2xl font-bold">
+          {hybridTotalBpi !== null ? hybridTotalBpi.toFixed(2) : "—"}
         </div>
       </DashCard>
       <DashCard>
@@ -266,6 +279,7 @@ export default function NewBpiComparisonUi(props: Props) {
 
           <SummaryCards
             currentTotalBpi={props.currentTotalBpi}
+            hybridTotalBpi={props.hybridTotalBpi}
             newTotalBpi={props.newTotalBpi}
             comparableCount={props.comparableCount}
           />
