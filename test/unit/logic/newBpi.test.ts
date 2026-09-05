@@ -148,12 +148,13 @@ describe("NewBpiCalculator ロジックテスト（issue #299〜304 検証用）
     it("gammaで曲間の式自体は変えない（同じ計算式・同じ全曲共通定数から算出）", () => {
       const [songId] = [...newBpiSongParamMap.keys()];
       const song = { songId, notes: NOTES, kaidenAvg: KAIDEN_AVG, wrScore: WR_SCORE };
-      // calc/calcFromBPIが相互に整合していること(同じgammaで往復できること)を確認
-      const bpi = NewBpiCalculator.calc(2700, song)!;
-      const backToScore = NewBpiCalculator.calcFromBPI(bpi, song)!;
-      // calc()側の丸め(小数第2位)がgammaの累乗を通って増幅されうるため、
-      // 数点程度のずれは許容する
-      expect(Math.abs(backToScore - 2700)).toBeLessThan(4);
+      // calc/calcFromBPIが相互に整合していること(同じgammaで往復できること)を確認する。
+      // BPI=0近傍だとcalc()側の小数第2位丸めがgammaの累乗を通って増幅され、
+      // 曲パラメータ次第で往復誤差が数十点に達しうるため、BPI値側を基準に往復する。
+      const targetBpi = 40;
+      const score = NewBpiCalculator.calcFromBPI(targetBpi, song)!;
+      const roundTrip = NewBpiCalculator.calc(score, song)!;
+      expect(Math.abs(roundTrip - targetBpi)).toBeLessThan(1);
     });
   });
 
