@@ -12,6 +12,7 @@ import {
   ReferenceDot,
 } from "recharts";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import { useChartColors } from "@/hooks/common/useChartColors";
 
 export interface CurvePoint {
   bpi: number;
@@ -66,6 +67,7 @@ interface CurveChartProps {
  */
 export default function CurveChart({ data, userPoint }: CurveChartProps) {
   const { t } = useTranslation();
+  const colors = useChartColors();
 
   const currentSeries: SeriesPoint[] = useMemo(
     () =>
@@ -142,7 +144,7 @@ export default function CurveChart({ data, userPoint }: CurveChartProps) {
             data={currentSeries}
             dataKey="bpi"
             name={t("newBpi.table.currentBpi")}
-            stroke="var(--bpim-primary, #38bdf8)"
+            stroke={colors.primary}
             strokeWidth={2}
             dot={{ r: 2 }}
             isAnimationActive={false}
@@ -151,7 +153,7 @@ export default function CurveChart({ data, userPoint }: CurveChartProps) {
             data={newSeries}
             dataKey="bpi"
             name={t("newBpi.table.newBpi")}
-            stroke="#f59e0b"
+            stroke={colors.warning}
             strokeWidth={2}
             strokeDasharray="5 4"
             dot={{ r: 2 }}
@@ -164,7 +166,7 @@ export default function CurveChart({ data, userPoint }: CurveChartProps) {
                   x={userPoint.exScore}
                   y={userPoint.currentBpi}
                   r={5}
-                  fill="var(--bpim-primary, #38bdf8)"
+                  fill={colors.primary}
                   stroke="none"
                 />
               )}
@@ -173,7 +175,7 @@ export default function CurveChart({ data, userPoint }: CurveChartProps) {
                   x={userPoint.exScore}
                   y={userPoint.newBpi}
                   r={5}
-                  fill="#f59e0b"
+                  fill={colors.warning}
                   stroke="none"
                 />
               )}

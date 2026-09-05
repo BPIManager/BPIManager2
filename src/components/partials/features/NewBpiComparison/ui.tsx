@@ -20,6 +20,10 @@ import { PageContainer, PageHeader } from "@/components/partials/common/PageChro
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { cn } from "@/lib/utils";
 import CurveChart, { CurvePoint } from "./CurveChart";
+import FormulaCard, { FormulaSongInfo } from "./FormulaCard";
+import ScoreSimulatorCard, {
+  ScoreSimulatorSongInfo,
+} from "./ScoreSimulatorCard";
 
 export type SortKey = "deltaDesc" | "deltaAsc" | "level";
 
@@ -52,6 +56,9 @@ interface Props {
   onSelectedSongIdChange: (songId: number) => void;
   curveData: CurvePoint[] | null;
   selectedSongUserPoint: UserPoint | null;
+  selectedSongFormula: FormulaSongInfo | null;
+  selectedSongSimulator: ScoreSimulatorSongInfo | null;
+  selectedSongInitialScore: number;
 }
 
 const sortRows = (rows: NewBpiRow[], key: SortKey): NewBpiRow[] => {
@@ -189,12 +196,58 @@ const ListTab = ({
   );
 };
 
+const CurveTable = ({ curveData }: { curveData: CurvePoint[] }) => {
+  const { t } = useTranslation();
+  return (
+    <DashCard className="p-0">
+      <h3 className="p-3 text-xs font-bold uppercase tracking-wide text-muted-foreground">
+        {t("newBpi.chart.tableTitle")}
+      </h3>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>{t("newBpi.chart.table.bpi")}</TableHead>
+            <TableHead className="text-right">{t("newBpi.table.currentBpi")}</TableHead>
+            <TableHead className="text-right">{t("newBpi.table.newBpi")}</TableHead>
+            <TableHead className="text-right">{t("newBpi.table.delta")}</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {curveData.map((row) => (
+            <TableRow key={row.bpi}>
+              <TableCell className="font-medium">{row.bpi}</TableCell>
+              <TableCell className="text-right tabular-nums">
+                {row.current !== null ? Math.round(row.current) : "—"}
+              </TableCell>
+              <TableCell className="text-right tabular-nums">
+                {row.new !== null ? Math.round(row.new) : t("newBpi.table.noParam")}
+              </TableCell>
+              <TableCell className="text-right tabular-nums">
+                <DeltaCell
+                  delta={
+                    row.current !== null && row.new !== null
+                      ? row.new - row.current
+                      : null
+                  }
+                />
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </DashCard>
+  );
+};
+
 const ChartTab = ({
   curveEligibleRows,
   selectedSongId,
   onSelectedSongIdChange,
   curveData,
   selectedSongUserPoint,
+  selectedSongFormula,
+  selectedSongSimulator,
+  selectedSongInitialScore,
 }: Pick<
   Props,
   | "curveEligibleRows"
@@ -202,6 +255,9 @@ const ChartTab = ({
   | "onSelectedSongIdChange"
   | "curveData"
   | "selectedSongUserPoint"
+  | "selectedSongFormula"
+  | "selectedSongSimulator"
+  | "selectedSongInitialScore"
 >) => {
   const { t } = useTranslation();
 
@@ -214,30 +270,43 @@ const ChartTab = ({
   }
 
   return (
-    <DashCard>
-      <div className="mb-4 flex flex-col gap-1">
-        <p className="text-xs text-muted-foreground">{t("newBpi.chart.desc")}</p>
-        <Select
-          value={selectedSongId !== null ? String(selectedSongId) : undefined}
-          onValueChange={(v) => onSelectedSongIdChange(Number(v))}
-        >
-          <SelectTrigger size="sm" className="mt-2 w-full sm:w-80">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {curveEligibleRows.map((row) => (
-              <SelectItem key={row.songId} value={String(row.songId)}>
-                {row.title}（{row.difficultyLevel} {row.difficulty}）
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+    <div className="flex flex-col gap-4">
+      <DashCard>
+        <div className="mb-4 flex flex-col gap-1">
+          <p className="text-xs text-muted-foreground">{t("newBpi.chart.desc")}</p>
+          <Select
+            value={selectedSongId !== null ? String(selectedSongId) : undefined}
+            onValueChange={(v) => onSelectedSongIdChange(Number(v))}
+          >
+            <SelectTrigger size="sm" className="mt-2 w-full sm:w-80">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {curveEligibleRows.map((row) => (
+                <SelectItem key={row.songId} value={String(row.songId)}>
+                  {row.title}（{row.difficultyLevel} {row.difficulty}）
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-      {curveData && (
-        <CurveChart data={curveData} userPoint={selectedSongUserPoint} />
+        {curveData && (
+          <CurveChart data={curveData} userPoint={selectedSongUserPoint} />
+        )}
+      </DashCard>
+
+      {curveData && <CurveTable curveData={curveData} />}
+
+      {selectedSongFormula && <FormulaCard {...selectedSongFormula} />}
+
+      {selectedSongSimulator && (
+        <ScoreSimulatorCard
+          {...selectedSongSimulator}
+          initialScore={selectedSongInitialScore}
+        />
       )}
-    </DashCard>
+    </div>
   );
 };
 
@@ -278,6 +347,9 @@ export default function NewBpiComparisonUi(props: Props) {
                 onSelectedSongIdChange={props.onSelectedSongIdChange}
                 curveData={props.curveData}
                 selectedSongUserPoint={props.selectedSongUserPoint}
+                selectedSongFormula={props.selectedSongFormula}
+                selectedSongSimulator={props.selectedSongSimulator}
+                selectedSongInitialScore={props.selectedSongInitialScore}
               />
             </TabsContent>
           </Tabs>

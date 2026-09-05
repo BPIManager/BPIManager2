@@ -13,6 +13,8 @@ import { NewBpiCalculator } from "@/lib/bpi/newBpi";
 import { PageLoader } from "@/components/ui/loading-spinner";
 import NewBpiComparisonUi, { NewBpiRow, SortKey } from "./ui";
 import type { CurvePoint } from "./CurveChart";
+import type { FormulaSongInfo } from "./FormulaCard";
+import type { ScoreSimulatorSongInfo } from "./ScoreSimulatorCard";
 
 interface Props {
   userId: string;
@@ -20,6 +22,9 @@ interface Props {
 
 /** 推移グラフのX軸(BPI)の目盛り。10刻み＋現行の床(-15)。 */
 const BPI_TICKS = [-15, -10, 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+
+/** `coef` 未設定時に本番実装(`BpiCalculator`)が使うデフォルト値。式表示用。 */
+const DEFAULT_POW_COEF = 1.175;
 
 /**
  * issue #299〜304 検証用: 自分のスコアで現行BPIと新方式BPI(分布ベース)を
@@ -130,6 +135,33 @@ export default function NewBpiComparison({ userId }: Props) {
     ? playedSongMap.get(effectiveSongId)
     : undefined;
 
+  const selectedSongFormula: FormulaSongInfo | null = selectedSong
+    ? {
+        m: selectedSong.notes * 2,
+        kaidenAvg: selectedSong.kaidenAvg,
+        wrScore: selectedSong.wrScore,
+        coef:
+          selectedSong.coef && selectedSong.coef > 0
+            ? selectedSong.coef
+            : DEFAULT_POW_COEF,
+        mu: newBpiSongParamMap.get(selectedSong.songId)?.mu ?? null,
+        sigma: newBpiSongParamMap.get(selectedSong.songId)?.sigma ?? null,
+        z0: NEW_BPI_Z0,
+        z100: NEW_BPI_Z100,
+      }
+    : null;
+
+  const selectedSongSimulator: ScoreSimulatorSongInfo | null = selectedSong
+    ? {
+        songId: selectedSong.songId,
+        notes: selectedSong.notes,
+        kaidenAvg: selectedSong.kaidenAvg,
+        wrScore: selectedSong.wrScore,
+        coef: selectedSong.coef ?? null,
+        hasNewParams: NewBpiCalculator.hasParams(selectedSong.songId),
+      }
+    : null;
+
   if (isSongsLoading || isStatsLoading) {
     return <PageLoader />;
   }
@@ -159,6 +191,9 @@ export default function NewBpiComparison({ userId }: Props) {
             }
           : null
       }
+      selectedSongFormula={selectedSongFormula}
+      selectedSongSimulator={selectedSongSimulator}
+      selectedSongInitialScore={selectedSong?.exScore ?? 0}
     />
   );
 }
