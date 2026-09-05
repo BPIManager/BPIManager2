@@ -36,12 +36,22 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
     Math.max(1, Number(req.query.pageSize) || DEFAULT_PAGE_SIZE),
   );
   const version = String(req.query.version ?? latestVersion);
+  const bpiMin =
+    req.query.bpiMin !== undefined && req.query.bpiMin !== ""
+      ? Number(req.query.bpiMin)
+      : undefined;
+  const bpiMax =
+    req.query.bpiMax !== undefined && req.query.bpiMax !== ""
+      ? Number(req.query.bpiMax)
+      : undefined;
 
   const { users, totalCount, songs, scores } =
     await newBpiPlayersAggregateRepo.getPage({
       limit: pageSize,
       offset: (page - 1) * pageSize,
       version,
+      bpiMin: Number.isFinite(bpiMin) ? bpiMin : undefined,
+      bpiMax: Number.isFinite(bpiMax) ? bpiMax : undefined,
     });
 
   const songById = new Map(songs.map((s) => [s.songId, s]));

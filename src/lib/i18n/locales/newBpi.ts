@@ -161,17 +161,11 @@ export const newBpiTranslations = {
     "zh-TW": "使用者",
     ko: "사용자",
   },
-  "newBpi.players.hybridDelta": {
-    ja: "単曲のみ新方式(差分)",
-    en: "New per-song only (Δ)",
-    "zh-TW": "僅單曲新公式(差異)",
-    ko: "단곡만 신규방식(차이)",
-  },
-  "newBpi.players.fullDelta": {
-    ja: "単曲・総合とも新方式(差分)",
-    en: "New per-song & total (Δ)",
-    "zh-TW": "單曲・綜合皆新公式(差異)",
-    ko: "단곡・종합 모두 신규방식(차이)",
+  "newBpi.players.allBpi": {
+    ja: "総合BPI: すべて",
+    en: "Total BPI: All",
+    "zh-TW": "綜合BPI：全部",
+    ko: "종합BPI: 전체",
   },
   "newBpi.players.increaseCount": {
     ja: "単曲上昇曲数",
