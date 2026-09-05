@@ -61,10 +61,12 @@ export default function NewBpiComparison({ userId }: Props) {
       const playedSongMap = new Map(played.map((s) => [s.songId, s]));
 
       const rows: NewBpiRow[] = played.map((s) => {
-        const hasParam = NewBpiCalculator.hasParams(s.songId);
-        const newBpi = hasParam
-          ? NewBpiCalculator.calc(s.exScore, s.songId, s.notes)
-          : null;
+        const newBpi = NewBpiCalculator.calc(s.exScore, {
+          songId: s.songId,
+          notes: s.notes,
+          kaidenAvg: s.kaidenAvg,
+          wrScore: s.wrScore,
+        });
         return {
           songId: s.songId,
           title: s.title,
@@ -127,13 +129,27 @@ export default function NewBpiComparison({ userId }: Props) {
     return BPI_TICKS.map((bpi) => ({
       bpi,
       current: BpiCalculator.calcFromBPI(bpi, basic, false),
-      new: NewBpiCalculator.calcFromBPI(bpi, song.songId, song.notes),
+      new: NewBpiCalculator.calcFromBPI(bpi, {
+        songId: song.songId,
+        notes: song.notes,
+        kaidenAvg: song.kaidenAvg,
+        wrScore: song.wrScore,
+      }),
     }));
   }, [effectiveSongId, playedSongMap]);
 
   const selectedSong = effectiveSongId
     ? playedSongMap.get(effectiveSongId)
     : undefined;
+
+  const selectedSongNewParams = selectedSong
+    ? NewBpiCalculator.getSongParams({
+        songId: selectedSong.songId,
+        notes: selectedSong.notes,
+        kaidenAvg: selectedSong.kaidenAvg,
+        wrScore: selectedSong.wrScore,
+      })
+    : null;
 
   const selectedSongFormula: FormulaSongInfo | null = selectedSong
     ? {
@@ -144,10 +160,10 @@ export default function NewBpiComparison({ userId }: Props) {
           selectedSong.coef && selectedSong.coef > 0
             ? selectedSong.coef
             : DEFAULT_POW_COEF,
-        mu: newBpiSongParamMap.get(selectedSong.songId)?.mu ?? null,
-        sigma: newBpiSongParamMap.get(selectedSong.songId)?.sigma ?? null,
-        z0: NEW_BPI_Z0,
-        z100: NEW_BPI_Z100,
+        mu: selectedSongNewParams?.mu ?? null,
+        sigma: selectedSongNewParams?.sigma ?? null,
+        z0: selectedSongNewParams?.z0 ?? null,
+        z100: selectedSongNewParams?.z100 ?? null,
       }
     : null;
 
@@ -158,7 +174,7 @@ export default function NewBpiComparison({ userId }: Props) {
         kaidenAvg: selectedSong.kaidenAvg,
         wrScore: selectedSong.wrScore,
         coef: selectedSong.coef ?? null,
-        hasNewParams: NewBpiCalculator.hasParams(selectedSong.songId),
+        hasNewParams: selectedSongNewParams !== null,
       }
     : null;
 
@@ -183,11 +199,12 @@ export default function NewBpiComparison({ userId }: Props) {
           ? {
               exScore: selectedSong.exScore,
               currentBpi: selectedSong.bpi,
-              newBpi: NewBpiCalculator.calc(
-                selectedSong.exScore,
-                selectedSong.songId,
-                selectedSong.notes,
-              ),
+              newBpi: NewBpiCalculator.calc(selectedSong.exScore, {
+                songId: selectedSong.songId,
+                notes: selectedSong.notes,
+                kaidenAvg: selectedSong.kaidenAvg,
+                wrScore: selectedSong.wrScore,
+              }),
             }
           : null
       }

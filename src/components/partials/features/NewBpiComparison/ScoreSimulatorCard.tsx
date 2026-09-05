@@ -41,7 +41,7 @@ export default function ScoreSimulatorCard({
     : null;
   const newBpi =
     isValid && hasNewParams
-      ? NewBpiCalculator.calc(exScore, songId, notes)
+      ? NewBpiCalculator.calc(exScore, { songId, notes, kaidenAvg, wrScore })
       : null;
 
   return (

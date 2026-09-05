@@ -8,8 +8,10 @@ export interface FormulaSongInfo {
   coef: number;
   mu: number | null;
   sigma: number | null;
-  z0: number;
-  z100: number;
+  /** この曲の皆伝平均に対応するz値(BPI0のアンカー) */
+  z0: number | null;
+  /** この曲の全一に対応するz値(BPI100のアンカー) */
+  z100: number | null;
 }
 
 /**
@@ -43,16 +45,18 @@ BPI(s) = sign(s−k) × 100 × |ln(PGF(s)/PGF(k)) / ln(PGF(z)/PGF(k))|^coef`}
           <p className="mb-1 text-xs font-semibold text-amber-500">
             {t("newBpi.formula.newTitle")}
           </p>
-          {mu !== null && sigma !== null ? (
+          {mu !== null && sigma !== null && z0 !== null && z100 !== null ? (
             <pre className="overflow-x-auto rounded-md bg-bpim-surface-2 p-3 text-[11px] leading-relaxed whitespace-pre-wrap">
 {`mu = ${mu}
 sigma = ${sigma}
-z0 = ${z0.toFixed(4)}
-z100 = ${z100.toFixed(4)}
+z0 = ${z0.toFixed(4)} (皆伝平均${kaidenAvg}のz値。BPI0のアンカー)
+z100 = ${z100.toFixed(4)} (全一${wrScore}のz値。BPI100のアンカー)
 
 t(s) = −ln(m − s)
 z(s) = (t(s) − mu) / sigma
-BPI(s) = 100 × (z(s) − z0) / (z100 − z0)　※下限−15でクランプ`}
+BPI(s) = 100 × (z(s) − z0) / (z100 − z0)　※下限−15でクランプ
+※ BPI0=皆伝平均・BPI100=全一という原典の定義を崩さないよう、
+　 z0/z100は全曲共通ではなくこの曲自身の値を使っている`}
             </pre>
           ) : (
             <p className="text-xs text-muted-foreground">
