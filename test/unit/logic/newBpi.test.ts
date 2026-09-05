@@ -4,6 +4,7 @@ import {
   newBpiSongParamMap,
   NEW_BPI_ARENA_POPULATION_SIZE,
   NEW_BPI_Z0,
+  NEW_BPI_Z100,
 } from "@/constants/iidx/newBpi/songParams";
 
 const NOTES = 1500;
@@ -121,6 +122,27 @@ describe("NewBpiCalculator ロジックテスト（issue #299〜304 検証用）
       // gamma補正が無ければ(z100−z0)が大きい分BPIはnormalBpiよりずっと低く
       // 圧縮されるはずだが、補正により同程度の水準まで引き上げられる
       expect(extremeBpiCorrected).toBeGreaterThan(normalBpi * 0.5);
+    });
+
+    it("z100が全曲中央値に近い(統計的な外れ値ではない)曲では、gammaはほぼ1になる", () => {
+      // 「地力譜面」のようにsigmaが大きくz100が中央値からやや離れているだけの
+      // 曲にまで強い補正がかかっていた問題(実データで確認)への対策。
+      // z100がちょうど全曲中央値(NEW_BPI_Z100)に一致する曲を人工的に作り、
+      // gammaが1に潰れることを確認する。
+      const [songId] = [...newBpiSongParamMap.keys()];
+      const param = newBpiSongParamMap.get(songId)!;
+      // z100 = (t_wr - mu)/sigma = NEW_BPI_Z100 となるwrScoreを逆算する
+      const tWr = param.mu + param.sigma * NEW_BPI_Z100;
+      const miss = Math.exp(-tWr);
+      const wrScoreAtTypicalZ100 = Math.round(NOTES * 2 - miss);
+      const song = {
+        songId,
+        notes: NOTES,
+        kaidenAvg: KAIDEN_AVG,
+        wrScore: wrScoreAtTypicalZ100,
+      };
+      const params = NewBpiCalculator.getSongParams(song)!;
+      expect(params.gamma).toBeCloseTo(1, 1);
     });
 
     it("gammaで曲間の式自体は変えない（同じ計算式・同じ全曲共通定数から算出）", () => {

@@ -4,6 +4,7 @@ import {
   NEW_BPI_Z100,
   NEW_BPI_Z_REF,
   NEW_BPI_RESIDUAL_RMSE,
+  NEW_BPI_Z100_IQR,
   NEW_BPI_RANK_CURVE,
   NEW_BPI_ARENA_POPULATION_SIZE,
 } from "@/constants/iidx/newBpi/songParams";
@@ -106,6 +107,25 @@ export class NewBpiCalculator {
    * 曲ごとのgamma(カーブ補正指数)を算出する。全曲同じ式・同じ全曲共通定数
    * (z0/z100の全曲中央値/z_ref)から導出し、曲ごとに式そのものを変えることは
    * しない。典型的なgapの曲ではgamma=1(補正なし)になる。
+   *
+   * 素の対数比だけで補正量を決めると、真に外れている曲（issue #299実測:
+   * 対象1,300曲中45曲程度、IQR基準では650曲中36曲）だけでなく、中央値から
+   * 少しでもズレていれば大多数の「普通の曲」にまで補正がかかってしまう
+   * （実測: 650曲中325曲がgamma>1になっていた。地力譜面のように弁別力
+   * sigmaが高い曲でこの副作用が目立った）。
+   *
+   * そこで、この曲のz100が全曲の中央値からどれだけズレているかを、
+   * 曲間の自然なばらつき（z100分布のIQR）を物差しにして測り、
+   * その2乗を信頼度重みとして補正を減衰させる
+   * （w = d² / (d² + 1)、d = |ズレ| / IQR。事後分散のブレンド
+   * （{@link predictUnplayedBpi}）と同じ「効果の大きさ / (効果の大きさ + 1
+   * 単位の疑い)」という考え方の応用）。中央値付近の曲ほどgamma=1に近づき、
+   * 曲間のばらつきに対して明確に外れている曲ほど素のgammaに近づく。
+   *
+   * (曲ごとの観測数から求まる推定誤差を物差しにする案も検討したが、
+   * 観測数が多い曲ほど推定誤差が小さくなり、僅かなズレでも「統計的に
+   * 有意」と判定されてしまうため、曲間の実際の分布の広がりを基準にする
+   * 本方式を採用した。)
    */
   private static gammaFor(z100: number, z0: number): number {
     const gRef = NEW_BPI_Z100 - z0; // 全曲中央値ベースの典型的なgap
@@ -120,9 +140,18 @@ export class NewBpiCalculator {
     ) {
       return 1;
     }
-    const gamma = Math.log(ratioAtRefTypical) / Math.log(ratioAtRefSong);
-    if (!Number.isFinite(gamma)) return 1;
-    return Math.max(this.GAMMA_MIN, Math.min(this.GAMMA_MAX, gamma));
+    const gammaRaw = Math.log(ratioAtRefTypical) / Math.log(ratioAtRefSong);
+    if (!Number.isFinite(gammaRaw)) return 1;
+    const gammaClamped = Math.max(
+      this.GAMMA_MIN,
+      Math.min(this.GAMMA_MAX, gammaRaw),
+    );
+
+    if (NEW_BPI_Z100_IQR <= 0) return gammaClamped;
+    const d = Math.abs(z100 - NEW_BPI_Z100) / NEW_BPI_Z100_IQR;
+    const weight = (d * d) / (d * d + 1);
+
+    return 1 + weight * (gammaClamped - 1);
   }
 
   /**
