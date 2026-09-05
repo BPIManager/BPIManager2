@@ -27,6 +27,23 @@ const formatRate = (rate: number) => {
   return Number.isInteger(rounded) ? `${rounded}` : `${rounded.toFixed(2).replace(/0$/, "")}`;
 };
 
+/**
+ * `getDJRank`の`mode:"current"`だけを単独で使うと、AAA〜MAX間の表記が
+ * AAAに近い側でも"MAX-"、MAXに近い側でも"AAA+"になる区間があり単調に
+ * 見えなくなる(この関数は元々current/nextを両方並べて見せる前提の設計)。
+ * ここでは1列だけ表示したいので、current/nextのうち差分が小さい方
+ * (＝より近いランクからの表記)を選んで単調な見た目にする。
+ */
+const getBestDJRank = (exScore: number, maxScore: number): string => {
+  const modes = ["current", "next"] as const;
+  const candidates = modes.map((mode) => ({
+    label: getDJRank(exScore, maxScore, { mode, output: "label" }),
+    value: Number(getDJRank(exScore, maxScore, { mode, output: "value" })),
+  }));
+  const best = candidates.reduce((a, b) => (b.value < a.value ? b : a));
+  return `${best.label}${best.value}`;
+};
+
 export default function ScoreRateTable({
   rows,
   maxScore,
@@ -64,14 +81,7 @@ export default function ScoreRateTable({
               </TableCell>
               <TableCell className="text-right tabular-nums">{row.exScore}</TableCell>
               <TableCell className="text-right font-mono text-xs tabular-nums text-muted-foreground">
-                {getDJRank(row.exScore, maxScore, {
-                  mode: "current",
-                  output: "label",
-                })}
-                {getDJRank(row.exScore, maxScore, {
-                  mode: "current",
-                  output: "value",
-                })}
+                {getBestDJRank(row.exScore, maxScore)}
               </TableCell>
               <TableCell className="text-right tabular-nums">
                 {row.current !== null ? row.current.toFixed(2) : "—"}
