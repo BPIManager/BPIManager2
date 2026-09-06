@@ -160,5 +160,5 @@ describe.skipIf(!CAN_RUN)("API v1 <-> v2 parity", () => {
       expect(v2.json.error).toBe(true);
       expect(v2.json.body).toBeNull();
     }
-  });
+  }, 30_000); // dev の初回ルートコンパイル + 重い集計クエリで v1/v2 の2連フェッチが数秒かかる
 });
