@@ -46,6 +46,13 @@ function normalize(value: unknown): unknown {
         out[k] = "<masked>";
         continue;
       }
+      // viewerRadar は userRadarCache 由来。v1→v2 の 2 リクエストの間に
+      // 別経路（ログイン時再計算・cron 等）でキャッシュが更新されると値が
+      // ずれるため、キャッシュバック値として比較対象から外す
+      if (k === "viewerRadar") {
+        out[k] = "<cache-backed>";
+        continue;
+      }
       out[k] = normalize(v);
     }
     return out;
@@ -384,5 +391,8 @@ describe.skipIf(!CAN_RUN)("API v1 <-> v2 parity", () => {
         expect(v2.json.body).toBeNull();
       }
     },
+    // dev サーバーのコールドコンパイル + 重いクエリ（notifications 等）で
+    // 既定の 5s を超えることがあるため余裕を持たせる
+    30_000,
   );
 });
