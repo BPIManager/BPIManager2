@@ -4,7 +4,11 @@ import {
   withAuth,
 } from "@/middlewares/api/withAuth";
 import { handleNewBpiPlayers } from "@/lib/subhandlers/newBpiPlayers";
-import { writeV1Result } from "@/middlewares/api/apiResult";
+import {
+  buildMeta,
+  withMeta,
+  writeV2Result,
+} from "@/middlewares/api/apiResult";
 
 async function handler(
   req: AuthenticatedNextApiRequest,
@@ -14,8 +18,8 @@ async function handler(
     res.status(405).end();
     return;
   }
-  const { result } = await handleNewBpiPlayers(req);
-  writeV1Result(res, result);
+  const { result, targetUserId, viewerId } = await handleNewBpiPlayers(req);
+  writeV2Result(res, withMeta(result, buildMeta(viewerId, targetUserId)));
 }
 
 export default withAuth(handler);
