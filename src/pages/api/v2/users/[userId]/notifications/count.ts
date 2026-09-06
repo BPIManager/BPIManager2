@@ -1,5 +1,10 @@
 import { getUnreadCount } from "@/lib/subhandlers/notifications";
-import { err, writeV1Result } from "@/middlewares/api/apiResult";
+import {
+  buildMeta,
+  err,
+  withMeta,
+  writeV2Result,
+} from "@/middlewares/api/apiResult";
 import {
   AuthenticatedNextApiRequest,
   withAuth,
@@ -9,13 +14,18 @@ import type { NextApiResponse } from "next";
 async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
   if (req.method !== "GET") {
     res.setHeader("Allow", ["GET"]);
-    return writeV1Result(res, err(405, `Method ${req.method} Not Allowed`));
+    return writeV2Result(res, err(405, `Method ${req.method} Not Allowed`));
   }
 
+  const userId = req.authUid;
+
   try {
-    writeV1Result(res, await getUnreadCount(req.authUid));
+    writeV2Result(
+      res,
+      withMeta(await getUnreadCount(userId), buildMeta(userId, userId)),
+    );
   } catch (error: unknown) {
-    writeV1Result(
+    writeV2Result(
       res,
       err(
         500,

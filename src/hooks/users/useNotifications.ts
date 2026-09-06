@@ -1,7 +1,7 @@
 ﻿import { useUser } from "@/contexts/users/UserContext";
-import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
-import { useInfiniteList } from "@/services/swr/useInfinite";
+import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
+import { useInfiniteListV2 } from "@/services/swr/useInfinite";
 import { markNotificationsRead } from "@/services/swr/notifications";
 import type {
   NotificationItem,
@@ -20,9 +20,9 @@ export const useNotifications = (
   const { fbUser, isLoading: fbLoading } = useUser();
 
   const { data: countData, mutate: mutateCount } =
-    useAuthedSWR<NotificationCountResponse>(
+    useAuthedSWRV2<NotificationCountResponse>(
       !fbLoading && fbUser
-        ? `${API_PREFIX}/users/${fbUser.uid}/notifications/count`
+        ? `${API_V2_PREFIX}/users/${fbUser.uid}/notifications/count`
         : null,
     );
 
@@ -35,10 +35,10 @@ export const useNotifications = (
     isReachingEnd,
     isError,
     mutate: mutateList,
-  } = useInfiniteList<NotificationItem[], NotificationItem>(
+  } = useInfiniteListV2<NotificationItem[], NotificationItem>(
     (index) => {
       if (fbLoading || !fbUser?.uid) return null;
-      return `${API_PREFIX}/users/${fbUser.uid}/notifications?type=${type}&page=${index}&limit=20`;
+      return `${API_V2_PREFIX}/users/${fbUser.uid}/notifications?type=${type}&page=${index}&limit=20`;
     },
     {
       getItems: (page) => page,

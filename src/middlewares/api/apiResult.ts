@@ -42,6 +42,20 @@ export function buildMeta(
   };
 }
 
+/**
+ * 成功結果に meta を合成する。エラー結果はそのまま返す。
+ * v1 アダプタは meta を無視するため、v2 ルート側で
+ * `writeV2Result(res, withMeta(result, buildMeta(...)))` のように使う。
+ */
+export function withMeta<T>(
+  result: HandlerResult<T>,
+  meta: Partial<ApiMeta>,
+): HandlerResult<T> {
+  return result.ok
+    ? { ...result, meta: { ...result.meta, ...meta } }
+    : result;
+}
+
 /** `HandlerResult.meta`（Partial）をエンベロープの `ApiMeta` へ正規化する */
 function toEnvelopeMeta(meta: Partial<ApiMeta>): ApiMeta {
   return {

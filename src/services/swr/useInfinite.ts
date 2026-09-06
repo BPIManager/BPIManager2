@@ -1,5 +1,6 @@
 import { useUser } from "@/contexts/users/UserContext";
 import { fetcher } from "@/utils/common/fetch";
+import { fetcherV2 } from "@/services/swr/fetchV2";
 import { useMemo } from "react";
 import useSWRInfinite, { SWRInfiniteConfiguration } from "swr/infinite";
 
@@ -36,6 +37,47 @@ export function useInfiniteList<TPage, TItem>(
         return url ? ([url, fbUser?.uid ?? null] as const) : null;
       },
       ([url]) => fetcher([url, fbUser ?? null]),
+      swrOptions,
+    );
+
+  const items = useMemo(
+    () => (data ? data.flatMap(getItems) : []),
+    [data, getItems],
+  );
+  const isLoadingMore = isLoading || (isValidating && size > 1);
+  const isReachingEnd = !!data && isLastPage(data[data.length - 1]);
+
+  return {
+    items,
+    data,
+    size,
+    setSize,
+    isLoading,
+    isLoadingMore,
+    isReachingEnd,
+    isError: error,
+    mutate,
+  };
+}
+
+/**
+ * `useInfiniteList` の API v2 版。各ページを `fetcherV2` で取得し、
+ * 共通エンベロープの `body`（`TPage`）を SWR の各ページデータとして扱う。
+ * v2 へ移行済みの一覧エンドポイントからのみ使う。
+ */
+export function useInfiniteListV2<TPage, TItem>(
+  getUrl: GetPageUrl<TPage>,
+  { getItems, isLastPage, ...swrOptions }: UseInfiniteListOptions<TPage, TItem>,
+) {
+  const { fbUser } = useUser();
+
+  const { data, size, setSize, isLoading, isValidating, error, mutate } =
+    useSWRInfinite<TPage>(
+      (pageIndex, previousPageData: TPage | null) => {
+        const url = getUrl(pageIndex, previousPageData);
+        return url ? ([url, fbUser?.uid ?? null] as const) : null;
+      },
+      ([url]) => fetcherV2<TPage>([url, fbUser ?? null]),
       swrOptions,
     );
 
