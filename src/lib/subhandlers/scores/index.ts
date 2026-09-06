@@ -82,19 +82,23 @@ export async function handleScoresList(
       ? dayjs.tz().utc().toDate()
       : dayjs.tz(asOf).utc().toDate();
 
-  const results = await scoreDetailRepo.getScoresWithDetails(
-    targetUserId,
-    version,
-    { targetTime: time },
-  );
+  try {
+    const results = await scoreDetailRepo.getScoresWithDetails(
+      targetUserId,
+      version,
+      { targetTime: time },
+    );
 
-  const songs = results.map(mapToFlatSong);
-  const processed = sortSongs(
-    filterSongsServerSide(songs, filterParams),
-    filterParams,
-  );
+    const songs = results.map(mapToFlatSong);
+    const processed = sortSongs(
+      filterSongsServerSide(songs, filterParams),
+      filterParams,
+    );
 
-  return { result: ok(processed), targetUserId, viewerId };
+    return { result: ok(processed), targetUserId, viewerId };
+  } catch (error: unknown) {
+    return { result: err(500, toErrorMessage(error)), targetUserId, viewerId };
+  }
 }
 
 /** GET /users/[userId]/scores/[songId]/history */
@@ -117,24 +121,28 @@ export async function handleScoreHistory(
     };
   }
 
-  const history = await scoresRepo.getHistoryForSong(
-    targetUserId,
-    parsed.data.songId,
-  );
+  try {
+    const history = await scoresRepo.getHistoryForSong(
+      targetUserId,
+      parsed.data.songId,
+    );
 
-  const groupedHistory = history.reduce(
-    (acc, record) => {
-      const v = record.version || "unknown";
-      if (!acc[v]) {
-        acc[v] = [];
-      }
-      acc[v].push(record);
-      return acc;
-    },
-    {} as Record<string, typeof history>,
-  );
+    const groupedHistory = history.reduce(
+      (acc, record) => {
+        const v = record.version || "unknown";
+        if (!acc[v]) {
+          acc[v] = [];
+        }
+        acc[v].push(record);
+        return acc;
+      },
+      {} as Record<string, typeof history>,
+    );
 
-  return { result: ok(groupedHistory), targetUserId, viewerId };
+    return { result: ok(groupedHistory), targetUserId, viewerId };
+  } catch (error: unknown) {
+    return { result: err(500, toErrorMessage(error)), targetUserId, viewerId };
+  }
 }
 
 /** GET /users/[userId]/scores/best-ever */
@@ -154,29 +162,33 @@ export async function handleBestEver(
     };
   }
 
-  const rows = await timelineRepo.getBestEverScores({
-    userId: targetUserId,
-    currentVersion,
-    excludeCurrent: excludeCurrent === "true",
-  });
+  try {
+    const rows = await timelineRepo.getBestEverScores({
+      userId: targetUserId,
+      currentVersion,
+      excludeCurrent: excludeCurrent === "true",
+    });
 
-  const result = rows.map((row) => ({
-    songId: Number(row.songId),
-    title: row.title,
-    notes: Number(row.notes),
-    bpm: row.bpm,
-    difficulty: row.difficulty,
-    difficultyLevel: Number(row.difficultyLevel),
-    releasedVersion: row.releasedVersion ? Number(row.releasedVersion) : null,
-    bestExScore: row.bestExScore !== null ? Number(row.bestExScore) : null,
-    bestBpi: row.bestBpi !== null ? Number(row.bestBpi) : null,
-    bestVersion: row.bestVersion ?? null,
-    wrScore: row.wrScore !== null ? Number(row.wrScore) : null,
-    kaidenAvg: row.kaidenAvg !== null ? Number(row.kaidenAvg) : null,
-    coef: row.coef !== null ? Number(row.coef) : null,
-  }));
+    const result = rows.map((row) => ({
+      songId: Number(row.songId),
+      title: row.title,
+      notes: Number(row.notes),
+      bpm: row.bpm,
+      difficulty: row.difficulty,
+      difficultyLevel: Number(row.difficultyLevel),
+      releasedVersion: row.releasedVersion ? Number(row.releasedVersion) : null,
+      bestExScore: row.bestExScore !== null ? Number(row.bestExScore) : null,
+      bestBpi: row.bestBpi !== null ? Number(row.bestBpi) : null,
+      bestVersion: row.bestVersion ?? null,
+      wrScore: row.wrScore !== null ? Number(row.wrScore) : null,
+      kaidenAvg: row.kaidenAvg !== null ? Number(row.kaidenAvg) : null,
+      coef: row.coef !== null ? Number(row.coef) : null,
+    }));
 
-  return { result: ok(result), targetUserId, viewerId };
+    return { result: ok(result), targetUserId, viewerId };
+  } catch (error: unknown) {
+    return { result: err(500, toErrorMessage(error)), targetUserId, viewerId };
+  }
 }
 
 /** GET /users/[userId]/scores/self-version */
@@ -201,11 +213,16 @@ export async function handleSelfVersion(
 
   const { currentVersion, targetVersion } = parsed.data;
 
-  const rows = await timelineRepo.getSelfVersionScores({
-    userId: targetUserId,
-    currentVersion,
-    targetVersion,
-  });
+  let rows: Awaited<ReturnType<typeof timelineRepo.getSelfVersionScores>>;
+  try {
+    rows = await timelineRepo.getSelfVersionScores({
+      userId: targetUserId,
+      currentVersion,
+      targetVersion,
+    });
+  } catch (error: unknown) {
+    return { result: err(500, toErrorMessage(error)), targetUserId, viewerId };
+  }
 
   const result = rows.map((row) => {
     const myEx =
@@ -284,10 +301,17 @@ export async function handleUnplayed(
     };
   }
 
-  const rows = await unplayedSongsAggregateRepo.getUnplayedSongs(
-    targetUserId,
-    version,
-  );
+  let rows: Awaited<
+    ReturnType<typeof unplayedSongsAggregateRepo.getUnplayedSongs>
+  >;
+  try {
+    rows = await unplayedSongsAggregateRepo.getUnplayedSongs(
+      targetUserId,
+      version,
+    );
+  } catch (error: unknown) {
+    return { result: err(500, toErrorMessage(error)), targetUserId, viewerId };
+  }
 
   const songs = rows.map((row) => ({
     songId: Number(row.songId),
