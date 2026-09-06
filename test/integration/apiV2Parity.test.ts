@@ -24,7 +24,7 @@ import "dotenv/config";
 
 const API_KEY = process.env.TEST_API_KEY;
 const FIREBASE_API_KEY = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
-const BASE_URL = process.env.TEST_BASE_URL || "http://localhost:3000";
+const BASE_URL = (process.env.TEST_BASE_URL || "http://localhost:3000").replace(//+$/, "");
 const PUBLIC_USER_ID = process.env.TEST_PUBLIC_USER_ID || "";
 const PRIVATE_USER_ID = process.env.TEST_PRIVATE_USER_ID || "";
 const SONG_ID = process.env.TEST_SONG_ID || "1000";
