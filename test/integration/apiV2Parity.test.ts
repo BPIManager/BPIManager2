@@ -24,7 +24,10 @@ import "dotenv/config";
 
 const API_KEY = process.env.TEST_API_KEY;
 const FIREBASE_API_KEY = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
-const BASE_URL = (process.env.TEST_BASE_URL || "http://localhost:3000").replace(/\/+$/, "");
+const BASE_URL = (process.env.TEST_BASE_URL || "http://localhost:3000").replace(
+  /\/+$/,
+  "",
+);
 const PUBLIC_USER_ID = process.env.TEST_PUBLIC_USER_ID || "";
 const PRIVATE_USER_ID = process.env.TEST_PRIVATE_USER_ID || "";
 const SONG_ID = process.env.TEST_SONG_ID || "1000";
@@ -53,7 +56,10 @@ function normalize(value: unknown): unknown {
 async function getIdToken(): Promise<string> {
   const tokenRes = await fetch(`${BASE_URL}/api/v1/token`, {
     method: "POST",
-    headers: { "X-API-Key": API_KEY as string, "Content-Type": "application/json" },
+    headers: {
+      "X-API-Key": API_KEY as string,
+      "Content-Type": "application/json",
+    },
   });
   const { customToken } = await tokenRes.json();
 
@@ -94,43 +100,248 @@ async function call(pathWithQuery: string, authed: boolean) {
  * 検証対象。`path` は `/users/:self/...` のように `:self` / `:pub` / `:priv` /
  * `:song` を含められる（実行時に置換）。移行が進んだらここに行を足す。
  */
-type Row = { name: string; v1: string; v2: string; authed: boolean; userScoped: boolean };
+type Row = {
+  name: string;
+  v1: string;
+  v2: string;
+  authed: boolean;
+  userScoped: boolean;
+};
 
 const ROWS: Row[] = [
   // notifications (#326)
-  { name: "notifications list", v1: "/api/v1/users/:self/notifications?type=all&page=0&limit=20", v2: "/api/v2/users/:self/notifications?type=all&page=0&limit=20", authed: true, userScoped: true },
-  { name: "notifications count", v1: "/api/v1/users/:self/notifications/count", v2: "/api/v2/users/:self/notifications/count", authed: true, userScoped: true },
+  {
+    name: "notifications list",
+    v1: "/api/v1/users/:self/notifications?type=all&page=0&limit=20",
+    v2: "/api/v2/users/:self/notifications?type=all&page=0&limit=20",
+    authed: true,
+    userScoped: true,
+  },
+  {
+    name: "notifications count",
+    v1: "/api/v1/users/:self/notifications/count",
+    v2: "/api/v2/users/:self/notifications/count",
+    authed: true,
+    userScoped: true,
+  },
   // all-scores (#319)
-  { name: "all-scores list", v1: "/api/v1/users/:self/all-scores/list", v2: "/api/v2/users/:self/all-scores/list", authed: true, userScoped: true },
-  { name: "all-scores history", v1: "/api/v1/users/:self/all-scores/:song/history", v2: "/api/v2/users/:self/all-scores/:song/history", authed: true, userScoped: true },
-  { name: "all-scores ranking", v1: "/api/v1/users/:self/all-scores/:song/ranking", v2: "/api/v2/users/:self/all-scores/:song/ranking", authed: true, userScoped: true },
-  { name: "all-scores rivals", v1: "/api/v1/users/:self/all-scores/:song/rivals", v2: "/api/v2/users/:self/all-scores/:song/rivals", authed: true, userScoped: true },
+  {
+    name: "all-scores list",
+    v1: "/api/v1/users/:self/all-scores/list",
+    v2: "/api/v2/users/:self/all-scores/list",
+    authed: true,
+    userScoped: true,
+  },
+  {
+    name: "all-scores history",
+    v1: "/api/v1/users/:self/all-scores/:song/history",
+    v2: "/api/v2/users/:self/all-scores/:song/history",
+    authed: true,
+    userScoped: true,
+  },
+  {
+    name: "all-scores ranking",
+    v1: "/api/v1/users/:self/all-scores/:song/ranking",
+    v2: "/api/v2/users/:self/all-scores/:song/ranking",
+    authed: true,
+    userScoped: true,
+  },
+  {
+    name: "all-scores rivals",
+    v1: "/api/v1/users/:self/all-scores/:song/rivals",
+    v2: "/api/v2/users/:self/all-scores/:song/rivals",
+    authed: true,
+    userScoped: true,
+  },
   // ranking (#324)
-  { name: "ranking global", v1: "/api/v1/users/:self/ranking/global?category=totalBpi", v2: "/api/v2/users/:self/ranking/global?category=totalBpi", authed: true, userScoped: true },
-  { name: "ranking song", v1: "/api/v1/users/:self/ranking/song/:song", v2: "/api/v2/users/:self/ranking/song/:song", authed: true, userScoped: true },
-  { name: "ranking songs", v1: "/api/v1/users/:self/ranking/songs", v2: "/api/v2/users/:self/ranking/songs", authed: true, userScoped: true },
-  { name: "ranking tower", v1: "/api/v1/users/:self/ranking/tower?period=day", v2: "/api/v2/users/:self/ranking/tower?period=day", authed: true, userScoped: true },
+  {
+    name: "ranking global",
+    v1: "/api/v1/users/:self/ranking/global?category=totalBpi",
+    v2: "/api/v2/users/:self/ranking/global?category=totalBpi",
+    authed: true,
+    userScoped: true,
+  },
+  {
+    name: "ranking song",
+    v1: "/api/v1/users/:self/ranking/song/:song",
+    v2: "/api/v2/users/:self/ranking/song/:song",
+    authed: true,
+    userScoped: true,
+  },
+  {
+    name: "ranking songs",
+    v1: "/api/v1/users/:self/ranking/songs",
+    v2: "/api/v2/users/:self/ranking/songs",
+    authed: true,
+    userScoped: true,
+  },
+  {
+    name: "ranking tower",
+    v1: "/api/v1/users/:self/ranking/tower?period=day",
+    v2: "/api/v2/users/:self/ranking/tower?period=day",
+    authed: true,
+    userScoped: true,
+  },
   // user songs (#327)
-  { name: "user songs list", v1: "/api/v1/users/:self/songs", v2: "/api/v2/users/:self/songs", authed: true, userScoped: true },
+  {
+    name: "user songs list",
+    v1: "/api/v1/users/:self/songs",
+    v2: "/api/v2/users/:self/songs",
+    authed: true,
+    userScoped: true,
+  },
   // scores (#318)
-  { name: "scores list", v1: "/api/v1/users/:self/scores?version=33&asOf=latest", v2: "/api/v2/users/:self/scores?version=33&asOf=latest", authed: true, userScoped: true },
-  { name: "scores history", v1: "/api/v1/users/:self/scores/:song/history", v2: "/api/v2/users/:self/scores/:song/history", authed: true, userScoped: true },
-  { name: "scores best-ever", v1: "/api/v1/users/:self/scores/best-ever?currentVersion=33", v2: "/api/v2/users/:self/scores/best-ever?currentVersion=33", authed: true, userScoped: true },
-  { name: "scores self-version", v1: "/api/v1/users/:self/scores/self-version?currentVersion=33&targetVersion=32", v2: "/api/v2/users/:self/scores/self-version?currentVersion=33&targetVersion=32", authed: true, userScoped: true },
-  { name: "scores unplayed", v1: "/api/v1/users/:self/scores/unplayed?version=33", v2: "/api/v2/users/:self/scores/unplayed?version=33", authed: true, userScoped: true },
+  {
+    name: "scores list",
+    v1: "/api/v1/users/:self/scores?version=33&asOf=latest",
+    v2: "/api/v2/users/:self/scores?version=33&asOf=latest",
+    authed: true,
+    userScoped: true,
+  },
+  {
+    name: "scores history",
+    v1: "/api/v1/users/:self/scores/:song/history",
+    v2: "/api/v2/users/:self/scores/:song/history",
+    authed: true,
+    userScoped: true,
+  },
+  {
+    name: "scores best-ever",
+    v1: "/api/v1/users/:self/scores/best-ever?currentVersion=33",
+    v2: "/api/v2/users/:self/scores/best-ever?currentVersion=33",
+    authed: true,
+    userScoped: true,
+  },
+  {
+    name: "scores self-version",
+    v1: "/api/v1/users/:self/scores/self-version?currentVersion=33&targetVersion=32",
+    v2: "/api/v2/users/:self/scores/self-version?currentVersion=33&targetVersion=32",
+    authed: true,
+    userScoped: true,
+  },
+  {
+    name: "scores unplayed",
+    v1: "/api/v1/users/:self/scores/unplayed?version=33",
+    v2: "/api/v2/users/:self/scores/unplayed?version=33",
+    authed: true,
+    userScoped: true,
+  },
   // batches (#320)
-  { name: "batches list (batch)", v1: "/api/v1/users/:self/batches?version=33&groupedBy=batch", v2: "/api/v2/users/:self/batches?version=33&groupedBy=batch", authed: true, userScoped: true },
-  { name: "batches list (lastPlayed)", v1: "/api/v1/users/:self/batches?version=33&groupedBy=lastPlayed", v2: "/api/v2/users/:self/batches?version=33&groupedBy=lastPlayed", authed: true, userScoped: true },
-  { name: "batches version-summary", v1: "/api/v1/users/:self/batches/version-summary?version=33", v2: "/api/v2/users/:self/batches/version-summary?version=33", authed: true, userScoped: true },
+  {
+    name: "batches list (batch)",
+    v1: "/api/v1/users/:self/batches?version=33&groupedBy=batch",
+    v2: "/api/v2/users/:self/batches?version=33&groupedBy=batch",
+    authed: true,
+    userScoped: true,
+  },
+  {
+    name: "batches list (lastPlayed)",
+    v1: "/api/v1/users/:self/batches?version=33&groupedBy=lastPlayed",
+    v2: "/api/v2/users/:self/batches?version=33&groupedBy=lastPlayed",
+    authed: true,
+    userScoped: true,
+  },
+  {
+    name: "batches version-summary",
+    v1: "/api/v1/users/:self/batches/version-summary?version=33",
+    v2: "/api/v2/users/:self/batches/version-summary?version=33",
+    authed: true,
+    userScoped: true,
+  },
+  // follows (#322)
+  {
+    name: "follows (following)",
+    v1: "/api/v1/users/:self/follows?type=following&page=1&limit=20",
+    v2: "/api/v2/users/:self/follows?type=following&page=1&limit=20",
+    authed: true,
+    userScoped: true,
+  },
+  {
+    name: "follows (followers)",
+    v1: "/api/v1/users/:self/follows?type=followers&page=1&limit=20",
+    v2: "/api/v2/users/:self/follows?type=followers&page=1&limit=20",
+    authed: true,
+    userScoped: true,
+  },
+  {
+    name: "follow-invite",
+    v1: "/api/v1/users/:self/follow-invite",
+    v2: "/api/v2/users/:self/follow-invite",
+    authed: true,
+    userScoped: true,
+  },
+  {
+    name: "follow-lists",
+    v1: "/api/v1/users/:self/follow-lists",
+    v2: "/api/v2/users/:self/follow-lists",
+    authed: true,
+    userScoped: true,
+  },
+  {
+    name: "follow-lists following",
+    v1: "/api/v1/users/:self/follow-lists/following",
+    v2: "/api/v2/users/:self/follow-lists/following",
+    authed: true,
+    userScoped: true,
+  },
+  {
+    name: "follow-requests",
+    v1: "/api/v1/users/:self/follow-requests",
+    v2: "/api/v2/users/:self/follow-requests",
+    authed: true,
+    userScoped: true,
+  },
   // site / supporters (#330)
-  { name: "site stats", v1: "/api/v1/site/stats", v2: "/api/v2/site/stats", authed: false, userScoped: false },
-  { name: "site songs popular", v1: "/api/v1/site/songs/popular?order=top&offset=0&limit=10", v2: "/api/v2/site/songs/popular?order=top&offset=0&limit=10", authed: false, userScoped: false },
-  { name: "site arena official", v1: "/api/v1/site/arena/official", v2: "/api/v2/site/arena/official", authed: false, userScoped: false },
-  { name: "supporters", v1: "/api/v1/supporters", v2: "/api/v2/supporters", authed: false, userScoped: false },
+  {
+    name: "site stats",
+    v1: "/api/v1/site/stats",
+    v2: "/api/v2/site/stats",
+    authed: false,
+    userScoped: false,
+  },
+  {
+    name: "site songs popular",
+    v1: "/api/v1/site/songs/popular?order=top&offset=0&limit=10",
+    v2: "/api/v2/site/songs/popular?order=top&offset=0&limit=10",
+    authed: false,
+    userScoped: false,
+  },
+  {
+    name: "site arena official",
+    v1: "/api/v1/site/arena/official",
+    v2: "/api/v2/site/arena/official",
+    authed: false,
+    userScoped: false,
+  },
+  {
+    name: "supporters",
+    v1: "/api/v1/supporters",
+    v2: "/api/v2/supporters",
+    authed: false,
+    userScoped: false,
+  },
   // profile / me (#321)
-  { name: "profile (public, cross-user)", v1: "/api/v1/users/:pub/profile", v2: "/api/v2/users/:pub/profile", authed: true, userScoped: true },
-  { name: "profile compare (self)", v1: "/api/v1/users/:self/profile?compare=true", v2: "/api/v2/users/:self/profile?compare=true", authed: true, userScoped: true },
-  { name: "me", v1: "/api/v1/me?uid=", v2: "/api/v2/me?uid=", authed: true, userScoped: true },
+  {
+    name: "profile (public, cross-user)",
+    v1: "/api/v1/users/:pub/profile",
+    v2: "/api/v2/users/:pub/profile",
+    authed: true,
+    userScoped: true,
+  },
+  {
+    name: "profile compare (self)",
+    v1: "/api/v1/users/:self/profile?compare=true",
+    v2: "/api/v2/users/:self/profile?compare=true",
+    authed: true,
+    userScoped: true,
+  },
+  {
+    name: "me",
+    v1: "/api/v1/me?uid=",
+    v2: "/api/v2/me?uid=",
+    authed: true,
+    userScoped: true,
+  },
 ];
 
 function resolve(p: string): string {
@@ -142,33 +353,36 @@ function resolve(p: string): string {
 }
 
 describe.skipIf(!CAN_RUN)("API v1 <-> v2 parity", () => {
-  it.each(ROWS)("$name : v2 body は v1 と一致し、エンベロープ形式である", async (row) => {
-    if (row.v1.includes(":pub") && !PUBLIC_USER_ID) return;
-    if (row.v1.includes(":priv") && !PRIVATE_USER_ID) return;
+  it.each(ROWS)(
+    "$name : v2 body は v1 と一致し、エンベロープ形式である",
+    async (row) => {
+      if (row.v1.includes(":pub") && !PUBLIC_USER_ID) return;
+      if (row.v1.includes(":priv") && !PRIVATE_USER_ID) return;
 
-    const v1 = await call(resolve(row.v1), row.authed);
-    const v2 = await call(resolve(row.v2), row.authed);
+      const v1 = await call(resolve(row.v1), row.authed);
+      const v2 = await call(resolve(row.v2), row.authed);
 
-    expect(v2.status).toBe(v1.status);
+      expect(v2.status).toBe(v1.status);
 
-    // エンベロープ構造
-    expect(v2.json).toMatchObject({
-      error: expect.any(Boolean),
-      errorMessage: v1.status < 400 ? null : expect.any(String),
-    });
-    expect(v2.json).toHaveProperty("body");
+      // エンベロープ構造
+      expect(v2.json).toMatchObject({
+        error: expect.any(Boolean),
+        errorMessage: v1.status < 400 ? null : expect.any(String),
+      });
+      expect(v2.json).toHaveProperty("body");
 
-    if (v1.status < 400) {
-      expect(v2.json.error).toBe(false);
-      expect(normalize(v2.json.body)).toEqual(normalize(v1.json));
-      if (row.userScoped) {
-        expect(v2.json.meta).toBeDefined();
-        expect(v2.json.meta).toHaveProperty("viewerId");
-        expect(v2.json.meta).toHaveProperty("isSelf");
+      if (v1.status < 400) {
+        expect(v2.json.error).toBe(false);
+        expect(normalize(v2.json.body)).toEqual(normalize(v1.json));
+        if (row.userScoped) {
+          expect(v2.json.meta).toBeDefined();
+          expect(v2.json.meta).toHaveProperty("viewerId");
+          expect(v2.json.meta).toHaveProperty("isSelf");
+        }
+      } else {
+        expect(v2.json.error).toBe(true);
+        expect(v2.json.body).toBeNull();
       }
-    } else {
-      expect(v2.json.error).toBe(true);
-      expect(v2.json.body).toBeNull();
-    }
-  });
+    },
+  );
 });

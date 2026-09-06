@@ -1,7 +1,8 @@
 import { useUser } from "@/contexts/users/UserContext";
-import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { authFetch } from "@/utils/common/fetch";
+import { unwrapApiResponse } from "@/services/swr/fetchV2";
 import { invalidateFollowListsCache } from "./followListsCache";
 import type { FollowListSummary } from "@/types/users/followList";
 
@@ -21,10 +22,10 @@ export const useFollowLists = (userId?: string | boolean) => {
   const { fbUser } = useUser();
   const url =
     userId && typeof userId === "string"
-      ? `${API_PREFIX}/users/${userId}/follow-lists`
+      ? `${API_V2_PREFIX}/users/${userId}/follow-lists`
       : null;
 
-  const { data, error, isLoading, mutate } = useAuthedSWR<FollowListsResponse>(
+  const { data, error, isLoading, mutate } = useAuthedSWRV2<FollowListsResponse>(
     url,
     { revalidateOnFocus: false },
   );
@@ -35,13 +36,13 @@ export const useFollowLists = (userId?: string | boolean) => {
   ): Promise<number | undefined> => {
     if (!fbUser) return undefined;
     const res = await authFetch(
-      `${API_PREFIX}/users/${fbUser.uid}/follow-lists`,
+      `${API_V2_PREFIX}/users/${fbUser.uid}/follow-lists`,
       "POST",
       fbUser,
       { name, isPublic },
     );
     if (!res.ok) throw new Error("Failed to create follow list");
-    const { id } = (await res.json()) as { id: number };
+    const { id } = await unwrapApiResponse<{ id: number }>(res);
     await invalidateFollowListsCache(fbUser.uid);
     return id;
   };
@@ -49,7 +50,7 @@ export const useFollowLists = (userId?: string | boolean) => {
   const renameList = async (listId: number, name: string) => {
     if (!fbUser) return;
     const res = await authFetch(
-      `${API_PREFIX}/users/${fbUser.uid}/follow-lists/${listId}`,
+      `${API_V2_PREFIX}/users/${fbUser.uid}/follow-lists/${listId}`,
       "PATCH",
       fbUser,
       { name },
@@ -61,7 +62,7 @@ export const useFollowLists = (userId?: string | boolean) => {
   const setListPublic = async (listId: number, isPublic: boolean) => {
     if (!fbUser) return;
     const res = await authFetch(
-      `${API_PREFIX}/users/${fbUser.uid}/follow-lists/${listId}`,
+      `${API_V2_PREFIX}/users/${fbUser.uid}/follow-lists/${listId}`,
       "PATCH",
       fbUser,
       { isPublic },
@@ -73,7 +74,7 @@ export const useFollowLists = (userId?: string | boolean) => {
   const deleteList = async (listId: number) => {
     if (!fbUser) return;
     const res = await authFetch(
-      `${API_PREFIX}/users/${fbUser.uid}/follow-lists/${listId}`,
+      `${API_V2_PREFIX}/users/${fbUser.uid}/follow-lists/${listId}`,
       "DELETE",
       fbUser,
     );

@@ -4,7 +4,11 @@ import {
   withAuth,
 } from "@/middlewares/api/withAuth";
 import { handleFollowRequestsList } from "@/lib/subhandlers/follows";
-import { writeV1Result } from "@/middlewares/api/apiResult";
+import {
+  buildMeta,
+  withMeta,
+  writeV2Result,
+} from "@/middlewares/api/apiResult";
 
 async function handler(
   req: AuthenticatedNextApiRequest,
@@ -12,11 +16,13 @@ async function handler(
 ) {
   if (req.method !== "GET") {
     res.setHeader("Allow", ["GET"]);
-    return res.status(405).json({ message: "Method Not Allowed" });
+    res.status(405).end();
+    return;
   }
 
-  const { result } = await handleFollowRequestsList(req);
-  return writeV1Result(res, result);
+  const { result, targetUserId, viewerId } =
+    await handleFollowRequestsList(req);
+  writeV2Result(res, withMeta(result, buildMeta(viewerId, targetUserId)));
 }
 
 export default withAuth(handler);

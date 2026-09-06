@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useUser } from "@/contexts/users/UserContext";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { authFetch } from "@/utils/common/fetch";
 
 /**
@@ -20,7 +20,7 @@ export const useForceUnfollow = (followerId: string) => {
     setIsUpdating(true);
     try {
       const res = await authFetch(
-        `${API_PREFIX}/users/${fbUser.uid}/followers/${followerId}`,
+        `${API_V2_PREFIX}/users/${fbUser.uid}/followers/${followerId}`,
         "DELETE",
         fbUser,
       );
