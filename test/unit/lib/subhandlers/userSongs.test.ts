@@ -24,7 +24,11 @@ vi.mock("@/lib/db/aggregates/stats/tables", () => ({
 
 const req = (query: Record<string, unknown>) =>
   ({ query }) as unknown as NextApiRequest;
-const access = { hasAccess: true, viewerId: "v", user: { userId: "target" } };
+const access = {
+  hasAccess: true,
+  viewerId: "v",
+  user: { userId: "target", isPublic: 1 },
+};
 
 beforeEach(() => {
   vi.clearAllMocks();
