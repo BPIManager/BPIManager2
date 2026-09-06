@@ -1,9 +1,9 @@
 ﻿import { useSWRConfig } from "swr";
-import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
+import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
 import { useUser } from "@/contexts/users/UserContext";
 import { useFollow } from "./useFollow";
 import { UserProfileResponse } from "@/types/users/profile";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { toast } from "sonner";
 
 /**
@@ -19,9 +19,9 @@ export const useProfile = (userId: string | undefined) => {
   const { mutate: globalMutate } = useSWRConfig();
 
   const url =
-    !fbLoading && userId ? `${API_PREFIX}/users/${userId}/profile` : null;
+    !fbLoading && userId ? `${API_V2_PREFIX}/users/${userId}/profile` : null;
 
-  const { data, error, isLoading, mutate } = useAuthedSWR<UserProfileResponse>(
+  const { data, error, isLoading, mutate } = useAuthedSWRV2<UserProfileResponse>(
     url,
     { revalidateOnFocus: false, shouldRetryOnError: false },
   );
@@ -65,7 +65,7 @@ export const useProfile = (userId: string | undefined) => {
       if (fbUser && userId) {
         // useRivalComparisonが使うSWRキー(useAuthedSWR経由)と一致させる必要がある
         const compareKey = [
-          `${API_PREFIX}/users/${userId}/profile?compare=true`,
+          `${API_V2_PREFIX}/users/${userId}/profile?compare=true`,
           fbUser.uid,
         ];
         await globalMutate(

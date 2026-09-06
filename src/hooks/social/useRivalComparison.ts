@@ -1,6 +1,6 @@
 ﻿import { useUser } from "@/contexts/users/UserContext";
-import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 
 /**
  * ライバルのプロフィールを比較情報付きで取得する。
@@ -11,9 +11,9 @@ import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 export const useRivalComparison = (rivalId: string | null) => {
   const { fbUser } = useUser();
 
-  const { data, error, isLoading, mutate, isValidating } = useAuthedSWR(
+  const { data, error, isLoading, mutate, isValidating } = useAuthedSWRV2(
     fbUser && rivalId
-      ? `${API_PREFIX}/users/${rivalId}/profile?compare=true`
+      ? `${API_V2_PREFIX}/users/${rivalId}/profile?compare=true`
       : null,
   );
 

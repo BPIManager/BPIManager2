@@ -1,5 +1,5 @@
 import { User as FirebaseUser } from "firebase/auth";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { authFetch } from "@/utils/common/fetch";
 
 export async function deleteAccount(
@@ -8,7 +8,7 @@ export async function deleteAccount(
   confirmUserName: string,
 ): Promise<{ ok: boolean; message?: string }> {
   const res = await authFetch(
-    `${API_PREFIX}/users/${userId}/account`,
+    `${API_V2_PREFIX}/users/${userId}/account`,
     "DELETE",
     fbUser,
     { confirmUserName },
@@ -16,7 +16,7 @@ export async function deleteAccount(
 
   if (!res.ok) {
     const data = await res.json().catch(() => ({}));
-    return { ok: false, message: data.message };
+    return { ok: false, message: data.errorMessage ?? data.message };
   }
   return { ok: true };
 }
