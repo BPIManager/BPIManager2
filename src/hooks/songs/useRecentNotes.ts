@@ -1,6 +1,6 @@
 ﻿import { useState } from "react";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
-import { useInfiniteList } from "@/services/swr/useInfinite";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
+import { useInfiniteListV2 } from "@/services/swr/useInfinite";
 
 export interface RecentNote {
   id: number;
@@ -22,8 +22,8 @@ export function useRecentNotes() {
   const [sort, setSort] = useState<RecentNoteSort>("latest");
 
   const { items, isLoading, isLoadingMore, isReachingEnd, isError, setSize } =
-    useInfiniteList<RecentNote[], RecentNote>(
-      (index) => `${API_PREFIX}/songs/notes/recent?sort=${sort}&page=${index}`,
+    useInfiniteListV2<RecentNote[], RecentNote>(
+      (index) => `${API_V2_PREFIX}/songs/notes/recent?sort=${sort}&page=${index}`,
       {
         getItems: (page) => page,
         isLastPage: (page) => page.length < PAGE_SIZE,
