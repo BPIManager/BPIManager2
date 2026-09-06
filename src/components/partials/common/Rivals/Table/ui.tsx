@@ -1,16 +1,16 @@
 ﻿"use client";
 
-import { SongWithRival } from "@/types/songs/score";
+import { SongWithRival, SongWithScore } from "@/types/songs/score";
 import { cn } from "@/lib/utils";
 import { getLampClass } from "@/components/partials/common/Table/ui";
 import { DIFF_COLORS as diffColors } from "@/constants/theme/difficultyColors";
 
-const f = (val: number | null | undefined, p?: number) => {
+export const f = (val: number | null | undefined, p?: number) => {
   if (val === null || val === undefined || !Number.isFinite(val)) return "---";
   return p !== undefined ? val.toFixed(p) : val.toString();
 };
 
-const SongInfo = ({ song }: { song: SongWithRival }) => (
+export const SongInfo = ({ song }: { song: SongWithScore }) => (
   <div className="flex flex-col items-start gap-1 min-w-0 w-full">
     <h3 className="text-sm font-bold text-bpim-text truncate leading-tight w-full">
       {song.title}
@@ -33,13 +33,13 @@ const SongInfo = ({ song }: { song: SongWithRival }) => (
   </div>
 );
 
-interface DiffBoxProps {
+export interface DiffBoxProps {
   exDiff: number | null;
   bpiDiff: number | null;
   isMobile?: boolean;
 }
 
-const DiffBox = ({ exDiff, bpiDiff, isMobile }: DiffBoxProps) => {
+export const DiffBox = ({ exDiff, bpiDiff, isMobile }: DiffBoxProps) => {
   const hasDiff = exDiff !== null && Number.isFinite(exDiff);
   return (
     <div
@@ -82,7 +82,7 @@ const DiffBox = ({ exDiff, bpiDiff, isMobile }: DiffBoxProps) => {
   );
 };
 
-interface ScoreBoxProps {
+export interface ScoreBoxProps {
   label: string;
   ex: number | null;
   bpi: number | null;
@@ -91,7 +91,7 @@ interface ScoreBoxProps {
   isRival?: boolean;
 }
 
-const ScoreBox = ({
+export const ScoreBox = ({
   label,
   ex,
   bpi,
@@ -140,7 +140,7 @@ const ScoreBox = ({
   );
 };
 
-interface MobileScoreViewProps {
+export interface MobileScoreViewProps {
   label: string;
   ex: number | null;
   bpi: number | null;
@@ -148,7 +148,7 @@ interface MobileScoreViewProps {
   align?: string;
 }
 
-const MobileScoreView = ({
+export const MobileScoreView = ({
   label,
   ex,
   bpi,
