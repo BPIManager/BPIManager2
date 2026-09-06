@@ -1,5 +1,5 @@
-﻿import { API_PREFIX } from "@/constants/logic/apiEndpoints";
-import { fetcher } from "@/utils/common/fetch";
+﻿import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
+import { fetcherV2 } from "@/services/swr/fetchV2";
 import { useState } from "react";
 import useSWR from "swr";
 import type { SongPlayerEntry, SongPopulationResponse } from "@/types/siteStats";
@@ -9,9 +9,9 @@ export function useSongPopulation(order: "top" | "bottom") {
   const [offset, setOffset] = useState(0);
   const PAGE = 10;
 
-  const url = `${API_PREFIX}/site/songs/popular?order=${order}&offset=${offset}&limit=${PAGE}`;
+  const url = `${API_V2_PREFIX}/site/songs/popular?order=${order}&offset=${offset}&limit=${PAGE}`;
 
-  const { data, isLoading } = useSWR<SongPopulationResponse>(url, fetcher, {
+  const { data, isLoading } = useSWR<SongPopulationResponse>(url, fetcherV2, {
     revalidateOnFocus: false,
     onSuccess(res) {
       setSongs((prev) => {

@@ -1,6 +1,6 @@
 ﻿import useSWR from "swr";
-import { fetcher } from "@/utils/common/fetch";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { fetcherV2 } from "@/services/swr/fetchV2";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import type { UserRoleInfo } from "@/types/users/profile";
 
 export interface SupporterUser {
@@ -18,8 +18,8 @@ interface SupportersResponse {
 
 export const useSupporters = () => {
   const { data, error, isLoading } = useSWR<SupportersResponse>(
-    `${API_PREFIX}/supporters`,
-    fetcher,
+    `${API_V2_PREFIX}/supporters`,
+    fetcherV2,
     { revalidateOnFocus: false },
   );
 
