@@ -1,5 +1,5 @@
-import { handleSiteStats } from "@/lib/subhandlers/site";
-import { writeV1Result } from "@/middlewares/api/apiResult";
+import { handleOfficialArena } from "@/lib/subhandlers/site";
+import { writeV2Result } from "@/middlewares/api/apiResult";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -8,5 +8,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     "Cache-Control",
     "public, max-age=3600, stale-while-revalidate=86400",
   );
-  writeV1Result(res, await handleSiteStats());
+  writeV2Result(res, await handleOfficialArena(req));
 }

@@ -1,12 +1,12 @@
-﻿import { API_PREFIX } from "@/constants/logic/apiEndpoints";
-import { fetcher } from "@/utils/common/fetch";
+﻿import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
+import { fetcherV2 } from "@/services/swr/fetchV2";
 import useSWR from "swr";
 import type { SiteStatsResponse } from "@/types/siteStats";
 
 export function useSiteStats() {
   const { data, isLoading, error } = useSWR<SiteStatsResponse>(
-    `${API_PREFIX}/site/stats`,
-    fetcher,
+    `${API_V2_PREFIX}/site/stats`,
+    fetcherV2,
     { revalidateOnFocus: false },
   );
   return { data, isLoading, error };

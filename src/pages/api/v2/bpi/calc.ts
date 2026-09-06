@@ -1,10 +1,10 @@
 import { handleBpiCalc } from "@/lib/subhandlers/site";
-import { err, writeV1Result } from "@/middlewares/api/apiResult";
+import { err, writeV2Result } from "@/middlewares/api/apiResult";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "GET") {
-    return writeV1Result(res, err(405, "Method not allowed"));
+    return writeV2Result(res, err(405, "Method not allowed"));
   }
-  writeV1Result(res, await handleBpiCalc(req));
+  writeV2Result(res, await handleBpiCalc(req));
 }
