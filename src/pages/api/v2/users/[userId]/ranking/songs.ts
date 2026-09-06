@@ -3,7 +3,11 @@ import {
   withAuth,
 } from "@/middlewares/api/withAuth";
 import { handleUserSongRankings } from "@/lib/subhandlers/ranking";
-import { writeV1Result } from "@/middlewares/api/apiResult";
+import {
+  buildMeta,
+  withMeta,
+  writeV2Result,
+} from "@/middlewares/api/apiResult";
 import type { NextApiResponse } from "next";
 
 async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
@@ -12,8 +16,8 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
     return;
   }
 
-  const { result } = await handleUserSongRankings(req);
-  writeV1Result(res, result);
+  const { result, targetUserId, viewerId } = await handleUserSongRankings(req);
+  writeV2Result(res, withMeta(result, buildMeta(viewerId, targetUserId)));
 }
 
 export default withAuth(handler);

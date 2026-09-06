@@ -1,6 +1,6 @@
-import { IIDX_VERSIONS, latestVersion } from "@/constants/iidx/iidxVersions";
 import { allScoresAggregateRepo } from "@/lib/db/aggregates/allScores";
 import { allScoresRepo } from "@/lib/db/domains/allScores";
+import { resolveVersion, toErrorMessage } from "@/lib/subhandlers/shared";
 import { accessError, err, ok } from "@/middlewares/api/apiResult";
 import type { AccessResult } from "@/middlewares/api/withApi";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
@@ -20,15 +20,6 @@ export interface HandleOutcome<T> {
   result: HandlerResult<T>;
   targetUserId: string;
   viewerId: string | null;
-}
-
-function resolveVersion(raw: unknown): string {
-  const v = String(raw ?? "");
-  return (IIDX_VERSIONS as readonly string[]).includes(v) ? v : latestVersion;
-}
-
-function toMessage(error: unknown): string {
-  return error instanceof Error ? error.message : "Internal Server Error";
 }
 
 type AllScoresList = Awaited<
@@ -96,7 +87,7 @@ export async function handleAllScoresList(
     };
   } catch (error: unknown) {
     return {
-      result: err(500, toMessage(error)),
+      result: err(500, toErrorMessage(error)),
       targetUserId,
       viewerId: null,
     };
@@ -137,7 +128,7 @@ export async function handleAllScoresHistory(
     };
   } catch (error: unknown) {
     return {
-      result: err(500, toMessage(error)),
+      result: err(500, toErrorMessage(error)),
       targetUserId,
       viewerId: null,
     };
@@ -165,7 +156,7 @@ export async function handleAllSongRanking(
     );
     return { result: ok(result), targetUserId, viewerId };
   } catch (error: unknown) {
-    return { result: err(500, toMessage(error)), targetUserId, viewerId };
+    return { result: err(500, toErrorMessage(error)), targetUserId, viewerId };
   }
 }
 
