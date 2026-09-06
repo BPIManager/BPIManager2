@@ -1,9 +1,9 @@
-﻿import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+﻿import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { BpiCalculator } from "@/lib/bpi";
 import {
   LogsDetailResponse,
 } from "@/types/logs/batchDetail";
-import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
+import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
 import { useMemo } from "react";
 
 /**
@@ -30,12 +30,12 @@ export const useLogsDetail = (
   const typeParam = type && type !== "day" ? `&type=${type}` : "";
 
   const endpoint = batchId
-    ? `${API_PREFIX}/users/${userId}/batches/${batchId}?version=${version}${groupParam}`
+    ? `${API_V2_PREFIX}/users/${userId}/batches/${batchId}?version=${version}${groupParam}`
     : date
-      ? `${API_PREFIX}/users/${userId}/batches/${date}/scores?version=${version}${groupParam}${typeParam}`
+      ? `${API_V2_PREFIX}/users/${userId}/batches/${date}/scores?version=${version}${groupParam}${typeParam}`
       : null;
 
-  const { data, error, isLoading, mutate } = useAuthedSWR<LogsDetailResponse>(
+  const { data, error, isLoading, mutate } = useAuthedSWRV2<LogsDetailResponse>(
     endpoint,
     { revalidateOnFocus: false },
   );

@@ -3,7 +3,11 @@ import {
   handleBatchDetail,
   handleBatchDelete,
 } from "@/lib/subhandlers/batches";
-import { writeV1Result } from "@/middlewares/api/apiResult";
+import {
+  buildMeta,
+  withMeta,
+  writeV2Result,
+} from "@/middlewares/api/apiResult";
 
 export default async function handler(
   req: NextApiRequest,
@@ -11,17 +15,14 @@ export default async function handler(
 ) {
   if (req.method !== "GET" && req.method !== "DELETE") {
     res.setHeader("Allow", ["GET", "DELETE"]);
-    return res
-      .status(405)
-      .json({ message: `Method ${req.method} Not Allowed` });
-  }
-
-  if (req.method === "DELETE") {
-    const { result } = await handleBatchDelete(req);
-    writeV1Result(res, result);
+    res.status(405).end();
     return;
   }
 
-  const { result } = await handleBatchDetail(req);
-  writeV1Result(res, result);
+  const { result, targetUserId, viewerId } =
+    req.method === "DELETE"
+      ? await handleBatchDelete(req)
+      : await handleBatchDetail(req);
+
+  writeV2Result(res, withMeta(result, buildMeta(viewerId, targetUserId)));
 }

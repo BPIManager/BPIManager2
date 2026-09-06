@@ -1,6 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { handleBatchScores } from "@/lib/subhandlers/batches";
-import { writeV1Result } from "@/middlewares/api/apiResult";
+import {
+  buildMeta,
+  withMeta,
+  writeV2Result,
+} from "@/middlewares/api/apiResult";
 
 export default async function handler(
   req: NextApiRequest,
@@ -8,11 +12,10 @@ export default async function handler(
 ) {
   if (req.method !== "GET") {
     res.setHeader("Allow", ["GET"]);
-    return res
-      .status(405)
-      .json({ message: `Method ${req.method} Not Allowed` });
+    res.status(405).end();
+    return;
   }
 
-  const { result } = await handleBatchScores(req);
-  writeV1Result(res, result);
+  const { result, targetUserId, viewerId } = await handleBatchScores(req);
+  writeV2Result(res, withMeta(result, buildMeta(viewerId, targetUserId)));
 }
