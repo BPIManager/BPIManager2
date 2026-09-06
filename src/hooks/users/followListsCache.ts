@@ -1,5 +1,5 @@
 import { mutate as globalMutate } from "swr";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 
 /**
  * フォローリスト関連のSWRキャッシュ(`follow-lists`一覧・
@@ -18,7 +18,7 @@ import { API_PREFIX } from "@/constants/logic/apiEndpoints";
  * @param userId - 対象ユーザー ID
  */
 export function invalidateFollowListsCache(userId: string) {
-  const prefix = `${API_PREFIX}/users/${userId}/follow-lists`;
+  const prefix = `${API_V2_PREFIX}/users/${userId}/follow-lists`;
   return globalMutate(
     (key) => Array.isArray(key) && typeof key[0] === "string" && key[0].startsWith(prefix),
   );

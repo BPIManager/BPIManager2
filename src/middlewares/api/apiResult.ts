@@ -92,9 +92,12 @@ export function writeV1Result<T>(
   res: NextApiResponse,
   result: HandlerResult<T>,
   transform?: (body: T) => unknown,
+  successStatus: number = 200,
 ): void {
   if (result.ok) {
-    res.status(200).json(transform ? transform(result.body) : result.body);
+    res
+      .status(successStatus)
+      .json(transform ? transform(result.body) : result.body);
     return;
   }
   res.status(result.status).json({ message: result.message });

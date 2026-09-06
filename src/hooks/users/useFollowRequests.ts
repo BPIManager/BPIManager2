@@ -1,6 +1,6 @@
 import { useUser } from "@/contexts/users/UserContext";
-import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { authFetch } from "@/utils/common/fetch";
 
 interface PendingFollowRequestBase {
@@ -24,16 +24,16 @@ export type PendingFollowRequest =
 export const useFollowRequests = () => {
   const { fbUser } = useUser();
 
-  const { data, mutate, isLoading } = useAuthedSWR<{
+  const { data, mutate, isLoading } = useAuthedSWRV2<{
     requests: PendingFollowRequest[];
-  }>(fbUser ? `${API_PREFIX}/users/${fbUser.uid}/follow-requests` : null);
+  }>(fbUser ? `${API_V2_PREFIX}/users/${fbUser.uid}/follow-requests` : null);
 
   const approve = async (request: PendingFollowRequest) => {
     if (!fbUser) return;
     const url =
       request.kind === "request"
-        ? `${API_PREFIX}/users/${fbUser.uid}/follow-requests/${request.id}`
-        : `${API_PREFIX}/users/${fbUser.uid}/followers/${request.requesterId}`;
+        ? `${API_V2_PREFIX}/users/${fbUser.uid}/follow-requests/${request.id}`
+        : `${API_V2_PREFIX}/users/${fbUser.uid}/followers/${request.requesterId}`;
     const res = await authFetch(url, "POST", fbUser);
     if (!res.ok) throw new Error("Failed to approve follow request");
     mutate();
@@ -43,8 +43,8 @@ export const useFollowRequests = () => {
     if (!fbUser) return;
     const url =
       request.kind === "request"
-        ? `${API_PREFIX}/users/${fbUser.uid}/follow-requests/${request.id}`
-        : `${API_PREFIX}/users/${fbUser.uid}/followers/${request.requesterId}`;
+        ? `${API_V2_PREFIX}/users/${fbUser.uid}/follow-requests/${request.id}`
+        : `${API_V2_PREFIX}/users/${fbUser.uid}/followers/${request.requesterId}`;
     const res = await authFetch(url, "DELETE", fbUser);
     if (!res.ok) throw new Error("Failed to reject follow request");
     mutate();

@@ -1,6 +1,6 @@
 import { useUser } from "@/contexts/users/UserContext";
-import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { authFetch } from "@/utils/common/fetch";
 import { invalidateFollowListsCache } from "./followListsCache";
 import type { FollowingWithLists } from "@/types/users/followList";
@@ -21,18 +21,18 @@ export const useFollowingWithLists = (userId?: string | boolean) => {
   const { fbUser } = useUser();
   const url =
     userId && typeof userId === "string"
-      ? `${API_PREFIX}/users/${userId}/follow-lists/following`
+      ? `${API_V2_PREFIX}/users/${userId}/follow-lists/following`
       : null;
 
   const { data, error, isLoading, mutate } =
-    useAuthedSWR<FollowingWithListsResponse>(url, {
+    useAuthedSWRV2<FollowingWithListsResponse>(url, {
       revalidateOnFocus: false,
     });
 
   const addToList = async (listId: number, followingId: string) => {
     if (!fbUser) return;
     const res = await authFetch(
-      `${API_PREFIX}/users/${fbUser.uid}/follow-lists/${listId}/members/${followingId}`,
+      `${API_V2_PREFIX}/users/${fbUser.uid}/follow-lists/${listId}/members/${followingId}`,
       "PUT",
       fbUser,
     );
@@ -44,7 +44,7 @@ export const useFollowingWithLists = (userId?: string | boolean) => {
   const removeFromList = async (listId: number, followingId: string) => {
     if (!fbUser) return;
     const res = await authFetch(
-      `${API_PREFIX}/users/${fbUser.uid}/follow-lists/${listId}/members/${followingId}`,
+      `${API_V2_PREFIX}/users/${fbUser.uid}/follow-lists/${listId}/members/${followingId}`,
       "DELETE",
       fbUser,
     );

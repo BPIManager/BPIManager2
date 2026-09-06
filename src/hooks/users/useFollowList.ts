@@ -1,5 +1,5 @@
-﻿import { API_PREFIX } from "@/constants/logic/apiEndpoints";
-import { useInfiniteList } from "@/services/swr/useInfinite";
+﻿import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
+import { useInfiniteListV2 } from "@/services/swr/useInfinite";
 
 import type { FollowUser } from "@/types/users/follow";
 
@@ -21,10 +21,10 @@ export const useFollowList = (
   type: "following" | "followers",
 ) => {
   const { items, data, size, setSize, isLoading, isReachingEnd, isError, mutate } =
-    useInfiniteList<FollowListResponse, FollowUser>(
+    useInfiniteListV2<FollowListResponse, FollowUser>(
       (index) =>
         userId
-          ? `${API_PREFIX}/users/${userId}/follows?type=${type}&page=${index + 1}&limit=20`
+          ? `${API_V2_PREFIX}/users/${userId}/follows?type=${type}&page=${index + 1}&limit=20`
           : null,
       {
         getItems: (page) => page.users,
