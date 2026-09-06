@@ -1,7 +1,7 @@
 ﻿import { useUser } from "@/contexts/users/UserContext";
 import { FilterParamsFrontend } from "@/types/songs/score";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
-import { useInfiniteList } from "@/services/swr/useInfinite";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
+import { useInfiniteListV2 } from "@/services/swr/useInfinite";
 
 import type { TimelineEntry } from "@/types/social/timeline";
 
@@ -31,7 +31,7 @@ export const useTimeline = (
     isLoadingMore,
     isReachingEnd,
     isError,
-  } = useInfiniteList<TimelineResponse, TimelineEntry>(
+  } = useInfiniteListV2<TimelineResponse, TimelineEntry>(
     (pageIndex, previousPageData: TimelineResponse | null) => {
       if (!fbUser) return null;
       if (previousPageData && !previousPageData.nextId) return null;
@@ -49,7 +49,7 @@ export const useTimeline = (
         query.append("lastId", previousPageData.nextId);
       }
 
-      return `${API_PREFIX}/users/${fbUser.uid}/timeline?${query.toString()}`;
+      return `${API_V2_PREFIX}/users/${fbUser.uid}/timeline?${query.toString()}`;
     },
     {
       getItems: (page) => page.timeline,

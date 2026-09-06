@@ -4,11 +4,16 @@ import {
   handleOptimizeMemoList,
   handleCreateOptimizeMemo,
 } from "@/lib/subhandlers/bpiOptimizer";
-import { writeV1Result } from "@/middlewares/api/apiResult";
+import {
+  buildMeta,
+  withMeta,
+  writeV2Result,
+} from "@/middlewares/api/apiResult";
 
 const postHandler = withAuth(async (req, res) => {
-  const { result } = await handleCreateOptimizeMemo(req);
-  writeV1Result(res, result, undefined, 201);
+  const { result, targetUserId, viewerId } =
+    await handleCreateOptimizeMemo(req);
+  writeV2Result(res, withMeta(result, buildMeta(viewerId, targetUserId)));
 });
 
 export default async function handler(
@@ -16,8 +21,12 @@ export default async function handler(
   res: NextApiResponse,
 ) {
   if (req.method === "GET") {
-    const { result } = await handleOptimizeMemoList(req);
-    return writeV1Result(res, result);
+    const { result, targetUserId, viewerId } =
+      await handleOptimizeMemoList(req);
+    return writeV2Result(
+      res,
+      withMeta(result, buildMeta(viewerId, targetUserId)),
+    );
   }
   if (req.method === "POST") {
     return postHandler(req, res);

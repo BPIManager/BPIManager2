@@ -1,15 +1,16 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { withAuth } from "@/middlewares/api/withAuth";
 import { handleDeleteOptimizeMemo } from "@/lib/subhandlers/bpiOptimizer";
-import { writeV1Result } from "@/middlewares/api/apiResult";
+import {
+  buildMeta,
+  withMeta,
+  writeV2Result,
+} from "@/middlewares/api/apiResult";
 
 const deleteHandler = withAuth(async (req, res) => {
-  const { result } = await handleDeleteOptimizeMemo(req);
-  if (result.ok) {
-    res.status(204).end();
-    return;
-  }
-  writeV1Result(res, result);
+  const { result, targetUserId, viewerId } =
+    await handleDeleteOptimizeMemo(req);
+  writeV2Result(res, withMeta(result, buildMeta(viewerId, targetUserId)));
 });
 
 export default async function handler(

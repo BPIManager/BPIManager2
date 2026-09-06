@@ -298,6 +298,36 @@ const ROWS: Row[] = [
     authed: true,
     userScoped: true,
   },
+  // analytics / optimizeMemo / timeline / iidx-tower (#328)
+  {
+    name: "optimizeMemo list",
+    v1: "/api/v1/users/:self/optimizeMemo",
+    v2: "/api/v2/users/:self/optimizeMemo",
+    authed: true,
+    userScoped: true,
+  },
+  {
+    name: "timeline",
+    v1: "/api/v1/users/:self/timeline?mode=all",
+    v2: "/api/v2/users/:self/timeline?mode=all",
+    authed: true,
+    userScoped: true,
+  },
+  {
+    name: "iidx-tower",
+    v1: "/api/v1/users/:self/iidx-tower",
+    v2: "/api/v2/users/:self/iidx-tower",
+    authed: true,
+    userScoped: true,
+  },
+  // new-bpi (#330)
+  {
+    name: "new-bpi players",
+    v1: "/api/v1/new-bpi/players?page=1&pageSize=5",
+    v2: "/api/v2/new-bpi/players?page=1&pageSize=5",
+    authed: true,
+    userScoped: true,
+  },
   // site / supporters (#330)
   {
     name: "site stats",

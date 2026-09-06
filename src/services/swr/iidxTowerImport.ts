@@ -1,6 +1,7 @@
 import { User as FirebaseUser } from "firebase/auth";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { authFetch } from "@/utils/common/fetch";
+import { unwrapApiResponse } from "@/services/swr/fetchV2";
 
 export async function submitTowerImport(
   userId: string,
@@ -9,7 +10,7 @@ export async function submitTowerImport(
   rows: unknown[],
 ) {
   const response = await authFetch(
-    `${API_PREFIX}/users/${userId}/iidx-tower`,
+    `${API_V2_PREFIX}/users/${userId}/iidx-tower`,
     "POST",
     fbUser,
     { version, rows },
@@ -18,5 +19,7 @@ export async function submitTowerImport(
 
   if (!response.ok) throw new Error("サーバーエラーが発生しました。");
 
-  return response.json();
+  return unwrapApiResponse<{ success: boolean; upsertedCount: number }>(
+    response,
+  );
 }
