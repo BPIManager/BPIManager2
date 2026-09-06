@@ -4,6 +4,7 @@
 - スタイルはTailwind CSS v4のユーティリティクラス（`globals.css` はほぼ空）。数値がキャノニカルなスペーシングスケールに乗る場合、`h-[30px]`のような任意値記法ではなく`h-7.5`のようなキャノニカルクラスを使う（`px`値を4で割った数値がそのままクラス名になる）。スペーシングスケールに乗らない値（フォントサイズ・色等）は任意値記法のままでよい
 - UI部品はshadcn/ui (`src/components/ui/`)を優先利用
 - SWRフックは `src/hooks/[ドメイン]/` に配置、フェッチャーは `src/services/swr/` に分離
+- ドメインに紐づくロジックを置くレイヤー（`src/hooks/`・`src/services/swr/`・`src/lib/subhandlers/` 等）は、レイヤー直下にフラットにファイルを置かず `[レイヤー]/[ドメイン]/` のサブフォルダへ分割する。**新規ファイルは必ずドメインフォルダ配下に置く**（例: `src/lib/subhandlers/notifications/index.ts`、`src/services/swr/notifications/index.ts`）。単一ドメインに属さない横断的な共通基盤（`src/services/swr/fetch.ts`・`fetchV2.ts`・`useInfinite.ts`、`src/hooks/common/` 等）はレイヤー直下のままでよい。既存のフラット配置ファイルの移行は #334 で追跡する
 - `src/constants/radars/topElements.json` (~95KB) は大きいので直接読まない
 - コメントは経緯(as-is→to-be、「以前は〜だったが」等の変更差分の語り)ではなく、現在の機能・挙動ベースで記載する。書くべきは「なぜ今この実装が必要か」（隠れた制約、非自明な理由、特定バグの回避策等）であり、「過去どう変わったか」ではない。変更の経緯・理由はcommit messageやPR説明に書き、コード中のコメントには残さない
 - Firebase Authのユーザーオブジェクト（`fbUser`/`User`型）の`displayName`は明示的に使用しない。連携プロバイダ（Google等）側の表示名には本名等の機密情報が含まれることがあり、BPIM上で公開される表示名だと誤認・意図せず公開されるリスクがあるため。ユーザー名として使うべき値は常にDBの`users.userName`（BPIM側でユーザーが明示的に設定した値、`Session.userName`）を使う。新規登録フォームの初期値・フォールバック表示等の用途でも同様に使わない（アバター画像`photoURL`はこの制約の対象外）
