@@ -1,41 +1,19 @@
-import { NextApiResponse } from "next";
 import {
   AuthenticatedNextApiRequest,
   withAuth,
 } from "@/middlewares/api/withAuth";
-import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
-import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
+import { handleRankingSongById } from "@/lib/subhandlers/ranking";
+import { writeV1Result } from "@/middlewares/api/apiResult";
+import type { NextApiResponse } from "next";
 
-async function handler(
-  req: AuthenticatedNextApiRequest,
-  res: NextApiResponse,
-) {
+async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
   if (req.method !== "GET") {
     res.status(405).end();
     return;
   }
 
-  const { songId } = req.query;
-  const viewerId = req.authUid;
-
-  const songIdNum = parseInt(songId as string);
-  if (isNaN(songIdNum)) {
-    return res.status(400).json({ message: "Invalid songId" });
-  }
-
-  const rawVersion = String(req.query.version ?? "");
-  const version = (IIDX_VERSIONS as readonly string[]).includes(rawVersion)
-    ? rawVersion
-    : latestVersion;
-
-  try {
-    const result = await statsTablesRepo.getSongRanking(songIdNum, version, viewerId);
-    return res.status(200).json(result);
-  } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Internal Server Error";
-    return res.status(500).json({ message: errorMessage });
-  }
+  const { result } = await handleRankingSongById(req);
+  writeV1Result(res, result);
 }
 
 export default withAuth(handler);

@@ -1,138 +1,19 @@
-import { NextApiResponse } from "next";
 import {
   AuthenticatedNextApiRequest,
   withAuth,
 } from "@/middlewares/api/withAuth";
-import { userRankingRepo } from "@/lib/db/aggregates/userProfiles/ranking";
-import { radarCacheRepo } from "@/lib/db/domains/radar";
-import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
-import { v4 as uuidv4 } from "uuid";
-import { JAPAN_PREFECTURES } from "@/constants/iidx/rankingPrefectures";
-import { ARENA_RANK_ORDER } from "@/constants/iidx/arenaRanks";
-import { canViewUserData } from "@/lib/db/shared/visibility";
+import { handleGlobalRanking } from "@/lib/subhandlers/ranking";
+import { writeV1Result } from "@/middlewares/api/apiResult";
+import type { NextApiResponse } from "next";
 
-const RADAR_CATEGORIES = [
-  "notes",
-  "chord",
-  "peak",
-  "charge",
-  "scratch",
-  "soflan",
-] as const;
-type RadarCategory = (typeof RADAR_CATEGORIES)[number];
-
-async function handler(
-  req: AuthenticatedNextApiRequest,
-  res: NextApiResponse,
-) {
+async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
   if (req.method !== "GET") {
     res.status(405).end();
     return;
   }
 
-  const viewerId = req.authUid;
-
-  const rawVersion = String(req.query.version ?? "");
-  const version = (IIDX_VERSIONS as readonly string[]).includes(rawVersion)
-    ? rawVersion
-    : latestVersion;
-
-  const rawCategory = String(req.query.category ?? "");
-  const isRadarCategory = (RADAR_CATEGORIES as readonly string[]).includes(
-    rawCategory,
-  );
-  // レーダーカテゴリは最新バージョンのみ（userRadarCache は最新バージョンのみ保持）
-  const category =
-    isRadarCategory && version === latestVersion ? rawCategory : "totalBpi";
-  const effectiveRadarCategory = category !== "totalBpi";
-
-  const rawArea = String(req.query.area ?? "");
-  const filterArea = (JAPAN_PREFECTURES as readonly string[]).includes(rawArea)
-    ? rawArea
-    : undefined;
-
-  const rawArenaClass = String(req.query.arenaClass ?? "");
-  const filterArenaClass = (ARENA_RANK_ORDER as readonly string[]).includes(
-    rawArenaClass,
-  )
-    ? rawArenaClass
-    : undefined;
-
-  // フィルタは totalBpi カテゴリのみ有効
-  const effectiveFilterArea = category === "totalBpi" ? filterArea : undefined;
-  const effectiveFilterArenaClass =
-    category === "totalBpi" ? filterArenaClass : undefined;
-
-  try {
-    const [users, viewerRadarCache] = await Promise.all([
-      userRankingRepo.getGlobalRanking(
-        version,
-        category,
-        effectiveFilterArea,
-        effectiveFilterArenaClass,
-      ),
-      radarCacheRepo.getForUserAndVersion(viewerId, latestVersion),
-    ]);
-
-    const viewerRadar = {
-      NOTES: { totalBpi: Number(viewerRadarCache?.notes ?? -15), songs: [] },
-      CHORD: { totalBpi: Number(viewerRadarCache?.chord ?? -15), songs: [] },
-      PEAK: { totalBpi: Number(viewerRadarCache?.peak ?? -15), songs: [] },
-      CHARGE: { totalBpi: Number(viewerRadarCache?.charge ?? -15), songs: [] },
-      SCRATCH: {
-        totalBpi: Number(viewerRadarCache?.scratch ?? -15),
-        songs: [],
-      },
-      SOFLAN: { totalBpi: Number(viewerRadarCache?.soflan ?? -15), songs: [] },
-    };
-
-    const rankings = users.map((u, i) => {
-      const radarRow = u as typeof u & Partial<Record<RadarCategory, string | null>>;
-      const rankValue = effectiveRadarCategory
-        ? Number(radarRow[category as RadarCategory] ?? -15)
-        : Number(u.totalBpi ?? -15);
-
-      const filteredRow = u as typeof u & {
-        showArea?: number;
-        showArenaClass?: number;
-      };
-      const isAreaPublic = !effectiveFilterArea || filteredRow.showArea === 1;
-      const isArenaClassPublic =
-        !effectiveFilterArenaClass || filteredRow.showArenaClass !== 0;
-      // 匿名の全体ランキングのため、閲覧者に関わらずisPublicのみで判定する(自分自身でも
-      // 非公開ならマスクされる。viewerIdを渡さないことでcanViewUserDataの自分自身
-      // バイパスを無効化している)
-      const isIdentityVisible =
-        canViewUserData({ targetUserId: u.userId, isPublic: u.isPublic }) &&
-        isAreaPublic &&
-        isArenaClassPublic;
-
-      return {
-        rank: i + 1,
-        userId: isIdentityVisible ? u.userId : uuidv4(),
-        userName: isIdentityVisible ? u.userName : "非公開ユーザー",
-        profileImage: isIdentityVisible ? u.profileImage : null,
-        isPublic: u.isPublic,
-        iidxId: isIdentityVisible ? u.iidxId : null,
-        totalBpi: rankValue,
-        arenaClass: isIdentityVisible ? (u.arenaClass ?? null) : null,
-        isSelf: u.userId === viewerId,
-      };
-    });
-
-    const selfEntry = rankings.find((u) => u.isSelf);
-
-    return res.status(200).json({
-      rankings,
-      totalCount: rankings.length,
-      selfRank: selfEntry?.rank ?? 0,
-      viewerRadar,
-    });
-  } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Internal Server Error";
-    return res.status(500).json({ message: errorMessage });
-  }
+  const { result } = await handleGlobalRanking(req);
+  writeV1Result(res, result);
 }
 
 export default withAuth(handler);

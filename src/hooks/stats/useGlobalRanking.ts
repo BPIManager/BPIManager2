@@ -1,6 +1,6 @@
 import { useUser } from "@/contexts/users/UserContext";
-import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import type { GlobalRankingResponse } from "@/types/users/ranking";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 
@@ -16,9 +16,9 @@ export const useGlobalRanking = (
   if (filterArea) params.set("area", filterArea);
   if (filterArenaClass) params.set("arenaClass", filterArenaClass);
 
-  const { data, isLoading, error } = useAuthedSWR<GlobalRankingResponse>(
+  const { data, isLoading, error } = useAuthedSWRV2<GlobalRankingResponse>(
     fbUser
-      ? `${API_PREFIX}/users/${fbUser.uid}/ranking/global?${params.toString()}`
+      ? `${API_V2_PREFIX}/users/${fbUser.uid}/ranking/global?${params.toString()}`
       : null,
     { revalidateOnFocus: false },
   );
