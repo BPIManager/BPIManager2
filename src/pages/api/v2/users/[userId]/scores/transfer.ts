@@ -4,7 +4,11 @@ import {
   withAuth,
 } from "@/middlewares/api/withAuth";
 import { handleScoresTransfer } from "@/lib/subhandlers/scores";
-import { writeV1Result } from "@/middlewares/api/apiResult";
+import {
+  buildMeta,
+  withMeta,
+  writeV2Result,
+} from "@/middlewares/api/apiResult";
 
 const handler = async (
   req: AuthenticatedNextApiRequest,
@@ -12,11 +16,12 @@ const handler = async (
 ) => {
   if (req.method !== "POST") {
     res.setHeader("Allow", ["POST"]);
-    return res.status(405).json({ error: `Method ${req.method} Not Allowed` });
+    res.status(405).end();
+    return;
   }
 
-  const { result } = await handleScoresTransfer(req);
-  writeV1Result(res, result);
+  const { result, targetUserId, viewerId } = await handleScoresTransfer(req);
+  writeV2Result(res, withMeta(result, buildMeta(viewerId, targetUserId)));
 };
 
 export default withAuth(handler);

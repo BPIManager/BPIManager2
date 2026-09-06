@@ -1,6 +1,6 @@
 import { SongWithScore } from "@/types/songs/score";
-import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 
 /**
  * 異なる IIDX バージョン間のスコア比較データを取得する。
@@ -23,9 +23,9 @@ export const useCompareScores = (
     compareVersion !== "none" &&
     compareVersion !== currentVersion;
 
-  const { data, error, isLoading } = useAuthedSWR<SongWithScore[]>(
+  const { data, error, isLoading } = useAuthedSWRV2<SongWithScore[]>(
     shouldFetch
-      ? `${API_PREFIX}/users/${userId}/scores/self-version?currentVersion=${currentVersion}&targetVersion=${compareVersion}`
+      ? `${API_V2_PREFIX}/users/${userId}/scores/self-version?currentVersion=${currentVersion}&targetVersion=${compareVersion}`
       : null,
     {
       revalidateOnFocus: false,

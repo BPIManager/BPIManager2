@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useUser } from "@/contexts/users/UserContext";
 import { useFirestoreDataCheck } from "@/hooks/firestore/checkData";
 import { versionTitles } from "@/constants/iidx/versionTitles";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import ActionConfirmDialog from "@/components/partials/modal/Confirmation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -33,7 +33,7 @@ export default function TransferUi() {
     try {
       const idToken = await fbUser.getIdToken(true);
       const response = await fetch(
-        `${API_PREFIX}/users/${fbUser.uid}/scores/transfer`,
+        `${API_V2_PREFIX}/users/${fbUser.uid}/scores/transfer`,
         {
           method: "POST",
           headers: {

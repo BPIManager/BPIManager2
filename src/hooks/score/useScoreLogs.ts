@@ -1,6 +1,6 @@
-﻿import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+﻿import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { SongHistoryResponse } from "@/types/songs/score";
-import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
+import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
 
 /**
  * 指定楽曲のスコア履歴を取得する。
@@ -10,9 +10,9 @@ import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
  * @returns スコア履歴グループ・ローディング状態・エラー情報
  */
 export const useScoreHistory = (userId: string | undefined, songId: number) => {
-  const { data, error, isLoading } = useAuthedSWR<SongHistoryResponse>(
+  const { data, error, isLoading } = useAuthedSWRV2<SongHistoryResponse>(
     userId && songId
-      ? `${API_PREFIX}/users/${userId}/scores/${songId}/history`
+      ? `${API_V2_PREFIX}/users/${userId}/scores/${songId}/history`
       : null,
   );
 

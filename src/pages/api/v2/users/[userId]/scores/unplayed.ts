@@ -1,6 +1,11 @@
 import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
 import { handleUnplayed } from "@/lib/subhandlers/scores";
-import { writeV1Result } from "@/middlewares/api/apiResult";
+import {
+  accessError,
+  buildMeta,
+  withMeta,
+  writeV2Result,
+} from "@/middlewares/api/apiResult";
 
 export default withUserApiHandler(
   (req, res) => {
@@ -17,7 +22,10 @@ export default withUserApiHandler(
     return { userId };
   },
   async (req, res, _query, access) => {
-    const { result } = await handleUnplayed(req, access);
-    writeV1Result(res, result);
+    const { result, targetUserId, viewerId } = await handleUnplayed(req, access);
+    writeV2Result(res, withMeta(result, buildMeta(viewerId, targetUserId)));
+  },
+  {
+    onReject: (res, access) => writeV2Result(res, accessError(access)!),
   },
 );

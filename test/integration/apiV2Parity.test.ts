@@ -112,6 +112,12 @@ const ROWS: Row[] = [
   { name: "ranking tower", v1: "/api/v1/users/:self/ranking/tower?period=day", v2: "/api/v2/users/:self/ranking/tower?period=day", authed: true, userScoped: true },
   // user songs (#327)
   { name: "user songs list", v1: "/api/v1/users/:self/songs", v2: "/api/v2/users/:self/songs", authed: true, userScoped: true },
+  // scores (#318)
+  { name: "scores list", v1: "/api/v1/users/:self/scores?version=33&asOf=latest", v2: "/api/v2/users/:self/scores?version=33&asOf=latest", authed: true, userScoped: true },
+  { name: "scores history", v1: "/api/v1/users/:self/scores/:song/history", v2: "/api/v2/users/:self/scores/:song/history", authed: true, userScoped: true },
+  { name: "scores best-ever", v1: "/api/v1/users/:self/scores/best-ever?currentVersion=33", v2: "/api/v2/users/:self/scores/best-ever?currentVersion=33", authed: true, userScoped: true },
+  { name: "scores self-version", v1: "/api/v1/users/:self/scores/self-version?currentVersion=33&targetVersion=32", v2: "/api/v2/users/:self/scores/self-version?currentVersion=33&targetVersion=32", authed: true, userScoped: true },
+  { name: "scores unplayed", v1: "/api/v1/users/:self/scores/unplayed?version=33", v2: "/api/v2/users/:self/scores/unplayed?version=33", authed: true, userScoped: true },
   // site / supporters (#330)
   { name: "site stats", v1: "/api/v1/site/stats", v2: "/api/v2/site/stats", authed: false, userScoped: false },
   { name: "site songs popular", v1: "/api/v1/site/songs/popular?order=top&offset=0&limit=10", v2: "/api/v2/site/songs/popular?order=top&offset=0&limit=10", authed: false, userScoped: false },
