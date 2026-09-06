@@ -2,7 +2,12 @@ import {
   getNotifications,
   markNotificationsRead,
 } from "@/lib/subhandlers/notifications";
-import { err, writeV1Result } from "@/middlewares/api/apiResult";
+import {
+  buildMeta,
+  err,
+  withMeta,
+  writeV2Result,
+} from "@/middlewares/api/apiResult";
 import {
   AuthenticatedNextApiRequest,
   withAuth,
@@ -11,20 +16,21 @@ import type { NextApiResponse } from "next";
 
 async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
   const userId = req.authUid;
+  const meta = buildMeta(userId, userId);
 
   try {
     if (req.method === "GET") {
-      writeV1Result(res, await getNotifications(userId, req.query));
+      writeV2Result(res, withMeta(await getNotifications(userId, req.query), meta));
       return;
     }
     if (req.method === "POST") {
-      writeV1Result(res, await markNotificationsRead(userId));
+      writeV2Result(res, withMeta(await markNotificationsRead(userId), meta));
       return;
     }
     res.setHeader("Allow", ["GET", "POST"]);
-    writeV1Result(res, err(405, `Method ${req.method} Not Allowed`));
+    writeV2Result(res, err(405, `Method ${req.method} Not Allowed`));
   } catch (error: unknown) {
-    writeV1Result(
+    writeV2Result(
       res,
       err(
         500,

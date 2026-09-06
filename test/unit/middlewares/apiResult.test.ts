@@ -4,6 +4,7 @@ import {
   ok,
   err,
   buildMeta,
+  withMeta,
   writeV1Result,
   writeV2Result,
 } from "@/middlewares/api/apiResult";
@@ -77,6 +78,38 @@ describe("buildMeta", () => {
       isSelf: true,
       pagination: { total: 100, page: 2, perPage: 20, hasNext: true },
     });
+  });
+});
+
+describe("withMeta", () => {
+  it("成功結果に meta を合成する", () => {
+    expect(withMeta(ok({ a: 1 }), { viewerId: "u1", isSelf: true })).toEqual({
+      ok: true,
+      body: { a: 1 },
+      meta: { viewerId: "u1", isSelf: true },
+    });
+  });
+
+  it("既存の meta にマージする", () => {
+    expect(
+      withMeta(
+        ok([], { pagination: { total: 3, page: 0, perPage: 20, hasNext: false } }),
+        { viewerId: "u1", isSelf: false },
+      ),
+    ).toEqual({
+      ok: true,
+      body: [],
+      meta: {
+        viewerId: "u1",
+        isSelf: false,
+        pagination: { total: 3, page: 0, perPage: 20, hasNext: false },
+      },
+    });
+  });
+
+  it("エラー結果はそのまま返す", () => {
+    const e = err(403, "no");
+    expect(withMeta(e, { viewerId: "u1", isSelf: true })).toBe(e);
   });
 });
 
