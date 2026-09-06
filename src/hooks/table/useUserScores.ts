@@ -1,7 +1,7 @@
 import { SongWithScore } from "@/types/songs/score";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
-import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 
 /**
  * 指定ユーザーの全楽曲スコア一覧を取得する。
@@ -13,9 +13,9 @@ import { API_PREFIX } from "@/constants/logic/apiEndpoints";
 export const useUserScores = (userId: string | undefined, version?: string) => {
   const targetVersion = version || latestVersion;
 
-  const { data, error, isLoading, mutate } = useAuthedSWR<SongWithScore[]>(
+  const { data, error, isLoading, mutate } = useAuthedSWRV2<SongWithScore[]>(
     userId
-      ? `${API_PREFIX}/users/${userId}/scores?version=${targetVersion}&asOf=latest`
+      ? `${API_V2_PREFIX}/users/${userId}/scores?version=${targetVersion}&asOf=latest`
       : null,
     {
       revalidateOnFocus: false,

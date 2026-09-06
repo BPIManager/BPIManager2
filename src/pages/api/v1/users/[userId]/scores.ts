@@ -1,40 +1,6 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import dayjs from "@/lib/dayjs";
-import { scoreDetailRepo } from "@/lib/db/domains/scores/detail";
 import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
-import { mapToFlatSong } from "@/utils/logs/getMapFlatten";
-import { filterSongsServerSide } from "@/utils/songs/filter";
-import { sortSongs } from "@/utils/songs/sort";
-import { parseQuery } from "@/services/nextRequest/parseBody";
-import { scoresQuerySchema } from "@/schemas/scores/query";
-
-async function handleGetScores(
-  req: NextApiRequest,
-  res: NextApiResponse,
-  userId: string,
-) {
-  const body = parseQuery(scoresQuerySchema, req.query, res);
-  if (!body) return;
-
-  const { version, asOf, ...filterParams } = body;
-
-  const time =
-    !asOf || asOf === "latest"
-      ? dayjs.tz().utc().toDate()
-      : dayjs.tz(asOf).utc().toDate();
-
-  const results = await scoreDetailRepo.getScoresWithDetails(userId, version, {
-    targetTime: time,
-  });
-
-  const songs = results.map(mapToFlatSong);
-  const processed = sortSongs(
-    filterSongsServerSide(songs, filterParams),
-    filterParams,
-  );
-
-  return res.status(200).json(processed);
-}
+import { handleScoresList } from "@/lib/subhandlers/scores";
+import { writeV1Result } from "@/middlewares/api/apiResult";
 
 export default withUserApiHandler(
   (req, res) => {
@@ -43,19 +9,16 @@ export default withUserApiHandler(
       res.status(400).json({ message: "Invalid userId" });
       return null;
     }
+    if (req.method !== "GET") {
+      res.setHeader("Allow", ["GET"]);
+      res.status(405).json({ message: `Method ${req.method} Not Allowed` });
+      return null;
+    }
     return { userId };
   },
-  async (req, res, { userId }) => {
-    switch (req.method) {
-      case "GET":
-        return await handleGetScores(req, res, userId);
-
-      default:
-        res.setHeader("Allow", ["GET"]);
-        return res
-          .status(405)
-          .json({ message: `Method ${req.method} Not Allowed` });
-    }
+  async (req, res, _query, access) => {
+    const { result } = await handleScoresList(req, access);
+    writeV1Result(res, result);
   },
   {
     onError: (error, res) => {

@@ -1,7 +1,7 @@
 import { SongWithScore } from "@/types/songs/score";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
-import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 
 /**
  * 指定ユーザーがまだプレイしていない楽曲の一覧を取得する。
@@ -16,9 +16,9 @@ export const useUnplayedScores = (
 ) => {
   const targetVersion = version || latestVersion;
 
-  const { data, error, isLoading, mutate } = useAuthedSWR<SongWithScore[]>(
+  const { data, error, isLoading, mutate } = useAuthedSWRV2<SongWithScore[]>(
     userId
-      ? `${API_PREFIX}/users/${userId}/scores/unplayed?version=${targetVersion}`
+      ? `${API_V2_PREFIX}/users/${userId}/scores/unplayed?version=${targetVersion}`
       : null,
     {
       revalidateOnFocus: false,

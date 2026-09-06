@@ -1,46 +1,6 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { timelineRepo } from "@/lib/db/domains/scores/timeline";
 import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
-
-async function handleGetBestEver(
-  req: NextApiRequest,
-  res: NextApiResponse,
-  userId: string,
-) {
-  const { currentVersion, excludeCurrent } = req.query;
-
-  if (!currentVersion || typeof currentVersion !== "string") {
-    return res
-      .status(400)
-      .json({ message: "Missing or invalid currentVersion parameter." });
-  }
-
-  const shouldExclude = excludeCurrent === "true";
-
-  const rows = await timelineRepo.getBestEverScores({
-    userId,
-    currentVersion,
-    excludeCurrent: shouldExclude,
-  });
-
-  const result = rows.map((row) => ({
-    songId: Number(row.songId),
-    title: row.title,
-    notes: Number(row.notes),
-    bpm: row.bpm,
-    difficulty: row.difficulty,
-    difficultyLevel: Number(row.difficultyLevel),
-    releasedVersion: row.releasedVersion ? Number(row.releasedVersion) : null,
-    bestExScore: row.bestExScore !== null ? Number(row.bestExScore) : null,
-    bestBpi: row.bestBpi !== null ? Number(row.bestBpi) : null,
-    bestVersion: row.bestVersion ?? null,
-    wrScore: row.wrScore !== null ? Number(row.wrScore) : null,
-    kaidenAvg: row.kaidenAvg !== null ? Number(row.kaidenAvg) : null,
-    coef: row.coef !== null ? Number(row.coef) : null,
-  }));
-
-  return res.status(200).json(result);
-}
+import { handleBestEver } from "@/lib/subhandlers/scores";
+import { writeV1Result } from "@/middlewares/api/apiResult";
 
 export default withUserApiHandler(
   (req, res) => {
@@ -49,17 +9,15 @@ export default withUserApiHandler(
       res.status(400).json({ message: "Invalid userId" });
       return null;
     }
+    if (req.method !== "GET") {
+      res.setHeader("Allow", ["GET"]);
+      res.status(405).json({ message: `Method ${req.method} Not Allowed` });
+      return null;
+    }
     return { userId };
   },
-  async (req, res, { userId }) => {
-    switch (req.method) {
-      case "GET":
-        return await handleGetBestEver(req, res, userId);
-      default:
-        res.setHeader("Allow", ["GET"]);
-        return res
-          .status(405)
-          .json({ message: `Method ${req.method} Not Allowed` });
-    }
+  async (req, res, _query, access) => {
+    const { result } = await handleBestEver(req, access);
+    writeV1Result(res, result);
   },
 );
