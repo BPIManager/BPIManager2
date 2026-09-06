@@ -1,6 +1,6 @@
 import { useUser } from "@/contexts/users/UserContext";
-import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 
 export interface WinLossHistoryPoint {
@@ -17,9 +17,9 @@ export const useWinLossHistory = (
 ) => {
   const { fbUser } = useUser();
 
-  const { data, isLoading, error } = useAuthedSWR<WinLossHistoryPoint[]>(
+  const { data, isLoading, error } = useAuthedSWRV2<WinLossHistoryPoint[]>(
     enabled && fbUser && viewerId && rivalId
-      ? `${API_PREFIX}/users/${viewerId}/rivals/${rivalId}/win-loss-history?level=${level}&version=${latestVersion}`
+      ? `${API_V2_PREFIX}/users/${viewerId}/rivals/${rivalId}/win-loss-history?level=${level}&version=${latestVersion}`
       : null,
     { revalidateOnFocus: false },
   );

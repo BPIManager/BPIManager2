@@ -3,8 +3,12 @@ import {
   AuthenticatedNextApiRequest,
   withAuth,
 } from "@/middlewares/api/withAuth";
-import { handleRivalFollowingSummary } from "@/lib/subhandlers/rivals";
-import { writeV1Result } from "@/middlewares/api/apiResult";
+import { handleRivalSuggestions } from "@/lib/subhandlers/rivals";
+import {
+  buildMeta,
+  withMeta,
+  writeV2Result,
+} from "@/middlewares/api/apiResult";
 
 async function handler(
   req: AuthenticatedNextApiRequest,
@@ -14,8 +18,8 @@ async function handler(
     res.status(405).end();
     return;
   }
-  const { result } = await handleRivalFollowingSummary(req);
-  writeV1Result(res, result);
+  const { result, targetUserId, viewerId } = await handleRivalSuggestions(req);
+  writeV2Result(res, withMeta(result, buildMeta(viewerId, targetUserId)));
 }
 
 export default withAuth(handler);

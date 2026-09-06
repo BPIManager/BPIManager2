@@ -350,6 +350,49 @@ const ROWS: Row[] = [
     authed: true,
     userScoped: true,
   },
+  // rivals (#323)
+  {
+    name: "rivals following list",
+    v1: "/api/v1/users/:self/rivals/following/list",
+    v2: "/api/v2/users/:self/rivals/following/list",
+    authed: true,
+    userScoped: true,
+  },
+  {
+    name: "rivals following avg-scores",
+    v1: "/api/v1/users/:self/rivals/following/avg-scores?version=33",
+    v2: "/api/v2/users/:self/rivals/following/avg-scores?version=33",
+    authed: true,
+    userScoped: true,
+  },
+  {
+    name: "rivals following top-scores",
+    v1: "/api/v1/users/:self/rivals/following/top-scores?version=33",
+    v2: "/api/v2/users/:self/rivals/following/top-scores?version=33",
+    authed: true,
+    userScoped: true,
+  },
+  {
+    name: "rivals following summary",
+    v1: "/api/v1/users/:self/rivals/following/summary?version=33",
+    v2: "/api/v2/users/:self/rivals/following/summary?version=33",
+    authed: true,
+    userScoped: true,
+  },
+  {
+    name: "rivals following scores",
+    v1: "/api/v1/users/:self/rivals/following/scores?version=33",
+    v2: "/api/v2/users/:self/rivals/following/scores?version=33",
+    authed: true,
+    userScoped: true,
+  },
+  {
+    name: "rivals monthly-review-summary",
+    v1: "/api/v1/users/:self/rivals/following/monthly-review-summary?month=2024-01&version=33",
+    v2: "/api/v2/users/:self/rivals/following/monthly-review-summary?month=2024-01&version=33",
+    authed: true,
+    userScoped: true,
+  },
   // site / supporters (#330)
   {
     name: "site stats",

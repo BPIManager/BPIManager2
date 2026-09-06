@@ -1,8 +1,8 @@
 import { useUser } from "@/contexts/users/UserContext";
-import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
+import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { SongWithRival } from "@/types/songs/score";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 
 /**
  * 自分とライバルの全楽曲スコアを並べて取得する。
@@ -20,9 +20,9 @@ export const useRivalBothScores = (
   const { fbUser } = useUser();
   const targetVersion = version || latestVersion;
 
-  const { data, error, isLoading, mutate } = useAuthedSWR<SongWithRival[]>(
+  const { data, error, isLoading, mutate } = useAuthedSWRV2<SongWithRival[]>(
     myUserId && rivalUserId && fbUser
-      ? `${API_PREFIX}/users/${myUserId}/rivals/${rivalUserId}/scores?version=${targetVersion}`
+      ? `${API_V2_PREFIX}/users/${myUserId}/rivals/${rivalUserId}/scores?version=${targetVersion}`
       : null,
     {
       revalidateOnFocus: false,

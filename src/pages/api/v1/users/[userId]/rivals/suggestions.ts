@@ -1,13 +1,10 @@
-import { NextApiResponse } from "next";
+import type { NextApiResponse } from "next";
 import {
   AuthenticatedNextApiRequest,
   withAuth,
 } from "@/middlewares/api/withAuth";
-import { latestVersion } from "@/constants/iidx/iidxVersions";
-import { calculateRadar } from "@/lib/radar/calculator";
-import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
-import { navigationRepo } from "@/lib/db/domains/logs/navigation";
-import { userDiscoveryRepo } from "@/lib/db/aggregates/userProfiles/discovery";
+import { handleRivalSuggestions } from "@/lib/subhandlers/rivals";
+import { writeV1Result } from "@/middlewares/api/apiResult";
 
 async function handler(
   req: AuthenticatedNextApiRequest,
@@ -17,78 +14,8 @@ async function handler(
     res.status(405).end();
     return;
   }
-  const { q, p, s, o, seed } = req.query;
-  const currentPage = Math.max(1, Number(p || 1));
-  const orderMode = (o as "distance" | "desc" | "newest" | "supporters") || "distance";
-  const limit = orderMode === "supporters" ? 1000 : 20;
-  const offset = orderMode === "supporters" ? 0 : (currentPage - 1) * limit;
-  const sortKey = (s as string) || "totalBpi";
-  const viewerId = req.authUid;
-
-  try {
-    const version = latestVersion;
-
-    const viewerScores = await statsTablesRepo.getLatestScoresWithMusicData(
-      viewerId,
-      version,
-    );
-    const viewerRadar = calculateRadar(viewerScores);
-
-    let viewerBaseValue: number;
-
-    if (sortKey === "totalBpi") {
-      const record = await navigationRepo.getLatestTotalBpi(viewerId, version);
-      viewerBaseValue = record ? record.totalBpi : -15;
-    } else {
-      const category = sortKey.toUpperCase() as keyof typeof viewerRadar;
-      viewerBaseValue = viewerRadar[category]?.totalBpi ?? -15;
-    }
-    const parsedSeed = seed ? Number(seed) : undefined;
-    const recommendedUsers = await userDiscoveryRepo.getRecommendedUsers({
-      viewerId,
-      viewerValue: viewerBaseValue,
-      version,
-      limit,
-      offset,
-      searchQuery: q as string,
-      sort: sortKey,
-      order: orderMode,
-      seed: parsedSeed,
-    });
-
-    return res.status(200).json({
-      viewer: {
-        userId: viewerId,
-        totalBpi: viewerBaseValue,
-        radar: viewerRadar,
-      },
-      users: recommendedUsers.map((user) => ({
-        userId: user.userId,
-        iidxId: user.iidxId,
-        userName: user.userName,
-        profileImage: user.profileImage,
-        profileText: user.profileText,
-        arenaClass: user.arenaClass ?? null,
-        totalBpi: Number(user.totalBpi),
-        updatedAt: user.createdAt, //バッチidの作成時間が最終更新日時
-        role: user.role
-          ? { role: user.role, description: user.description ?? "", grantedAt: user.grantedAt }
-          : null,
-        radar: {
-          NOTES: Number(user.notes),
-          CHORD: Number(user.chord),
-          PEAK: Number(user.peak),
-          CHARGE: Number(user.charge),
-          SCRATCH: Number(user.scratch),
-          SOFLAN: Number(user.soflan),
-        },
-      })),
-    });
-  } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Internal Server Error";
-    return res.status(500).json({ message: errorMessage });
-  }
+  const { result } = await handleRivalSuggestions(req);
+  writeV1Result(res, result);
 }
 
 export default withAuth(handler);
