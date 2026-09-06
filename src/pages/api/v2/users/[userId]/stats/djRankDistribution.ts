@@ -1,7 +1,12 @@
 import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
 import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
 import { handleStatsDjRankDistribution } from "@/lib/subhandlers/stats";
-import { writeV1Result } from "@/middlewares/api/apiResult";
+import {
+  accessError,
+  buildMeta,
+  withMeta,
+  writeV2Result,
+} from "@/middlewares/api/apiResult";
 
 export default withUserApiHandler(
   (req, res) => {
@@ -17,7 +22,14 @@ export default withUserApiHandler(
     }
     return q;
   },
-  async (req, res, query) => {
-    writeV1Result(res, await handleStatsDjRankDistribution(query));
+  async (req, res, query, access) => {
+    writeV2Result(
+      res,
+      withMeta(
+        await handleStatsDjRankDistribution(query),
+        buildMeta(access.viewerId ?? null, query.userId),
+      ),
+    );
   },
+  { onReject: (res, access) => writeV2Result(res, accessError(access)!) },
 );

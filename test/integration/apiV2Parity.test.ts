@@ -457,6 +457,31 @@ const ROWS: Row[] = [
     authed: false,
     userScoped: false,
   },
+  // stats (#325)
+  ...(
+    [
+      ["stats totalBpi", "stats/totalBpi?version=33"],
+      ["stats activeDates", "stats/activeDates?version=33"],
+      ["stats available-periods", "stats/available-periods?version=33"],
+      ["stats areaRank", "stats/areaRank"],
+      ["stats radar", "stats/radar?version=33&level=12"],
+      ["stats bpmBpiDistribution", "stats/bpmBpiDistribution?version=33&level=12"],
+      ["stats totalBPIhistory", "stats/totalBPIhistory?version=33&level=12"],
+      ["stats djRankDistribution", "stats/djRankDistribution?version=33&level=12"],
+      ["stats scoreRateDistribution", "stats/scoreRateDistribution?version=33&level=12&step=5"],
+      ["stats singleBPIDistribution", "stats/singleBPIDistribution?version=33&level=12&step=5"],
+      ["stats activity", "stats/activity?version=33&level=12"],
+      ["stats bpiBoxStats", "stats/bpiBoxStats?version=33&level=12"],
+      ["stats recommended", "stats/recommended?version=33&level=12"],
+      ["stats aaaDifficulty", "stats/aaaDifficulty?version=33&level=12"],
+    ] as const
+  ).map(([name, suffix]) => ({
+    name,
+    v1: `/api/v1/users/:self/${suffix}`,
+    v2: `/api/v2/users/:self/${suffix}`,
+    authed: true,
+    userScoped: true,
+  })),
   // site / supporters (#330)
   {
     name: "site stats",

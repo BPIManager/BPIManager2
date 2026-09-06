@@ -1,11 +1,12 @@
 import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
 
 import { handleStatsAvailablePeriods } from "@/lib/subhandlers/stats";
-import { writeV1Result } from "@/middlewares/api/apiResult";
-
-export interface AvailablePeriodsData {
-  months: string[]; // YYYY-MM, desc order
-}
+import {
+  accessError,
+  buildMeta,
+  withMeta,
+  writeV2Result,
+} from "@/middlewares/api/apiResult";
 
 export default withUserApiHandler(
   (req, res) => {
@@ -22,7 +23,14 @@ export default withUserApiHandler(
     }
     return { userId, version };
   },
-  async (req, res, query) => {
-    writeV1Result(res, await handleStatsAvailablePeriods(query));
+  async (req, res, query, access) => {
+    writeV2Result(
+      res,
+      withMeta(
+        await handleStatsAvailablePeriods(query),
+        buildMeta(access.viewerId ?? null, query.userId),
+      ),
+    );
   },
+  { onReject: (res, access) => writeV2Result(res, accessError(access)!) },
 );

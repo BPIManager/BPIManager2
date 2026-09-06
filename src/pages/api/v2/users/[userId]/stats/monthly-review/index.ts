@@ -1,13 +1,17 @@
 import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
 import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import { handleStatsMonthlyReview } from "@/lib/subhandlers/stats";
-import { writeV1Result } from "@/middlewares/api/apiResult";
+import {
+  accessError,
+  buildMeta,
+  withMeta,
+  writeV2Result,
+} from "@/middlewares/api/apiResult";
 
 export default withUserApiHandler(
   (req, res) => {
     if (req.method !== "GET") {
-      res.setHeader("Allow", ["GET"]);
-      res.status(405).json({ message: "Method Not Allowed" });
+      res.status(405).end();
       return null;
     }
     const userId = req.query.userId as string;
@@ -29,6 +33,13 @@ export default withUserApiHandler(
     return { userId, version, month };
   },
   async (req, res, query, access) => {
-    writeV1Result(res, await handleStatsMonthlyReview(query, access));
+    writeV2Result(
+      res,
+      withMeta(
+        await handleStatsMonthlyReview(query, access),
+        buildMeta(access.viewerId ?? null, query.userId),
+      ),
+    );
   },
+  { onReject: (res, access) => writeV2Result(res, accessError(access)!) },
 );

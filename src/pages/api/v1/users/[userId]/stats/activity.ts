@@ -1,25 +1,19 @@
-import { statsChartsRepo } from "@/lib/db/aggregates/stats/charts";
 import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
 import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
+import { handleStatsActivity } from "@/lib/subhandlers/stats";
+import { writeV1Result } from "@/middlewares/api/apiResult";
 
 export default withUserApiHandler(
   (req, res) => {
-    const query = parseStatsQuery(req.query, res);
-    if (!query) return null;
-    if (query.levels.length === 0 && query.difficulties.length === 0) {
+    const q = parseStatsQuery(req.query, res);
+    if (!q) return null;
+    if (q.levels.length === 0 && q.difficulties.length === 0) {
       res.status(400).json({ message: "Required parameters are missing" });
       return null;
     }
-    return query;
+    return q;
   },
-  async (req, res, { userId, version, levels, difficulties }) => {
-    const activity = await statsChartsRepo.getActivityData(
-      userId,
-      version,
-      levels,
-      difficulties,
-    );
-
-    return res.status(200).json(activity);
+  async (req, res, query) => {
+    writeV1Result(res, await handleStatsActivity(query));
   },
 );
