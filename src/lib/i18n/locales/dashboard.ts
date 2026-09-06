@@ -956,7 +956,8 @@ export const dashboardTranslations = {
   "dashboard.arenaHistory.active.help.undercount": {
     ja: "負けのみ（ランク変動なし）のプレイヤーは検出されないため、実際のプレイヤー数より少なく表示されます。",
     en: "Players who only lost (no rank change) are not detected, so the count is lower than the actual number.",
-    "zh-TW": "僅負場（無等級變動）的玩家無法被偵測，因此顯示數量會少於實際玩家數。",
+    "zh-TW":
+      "僅負場（無等級變動）的玩家無法被偵測，因此顯示數量會少於實際玩家數。",
     ko: "패배만 한（랭크 변동 없음） 플레이어는 감지되지 않아 실제 플레이어 수보다 적게 표시됩니다.",
   },
   "dashboard.arenaHistory.active.help.wip": {
@@ -1087,5 +1088,37 @@ export const dashboardTranslations = {
     en: "Best Rank",
     "zh-TW": "最高排名",
     ko: "최고 순위",
+  },
+
+  "dashboard.bpiChangeNotice.title": {
+    ja: "BPIの算出方法の変更を予定しています",
+    en: "A change to how BPI is calculated is planned",
+    "zh-TW": "預計變更BPI的計算方式",
+    ko: "BPI 산출 방식 변경을 예정하고 있습니다",
+  },
+  "dashboard.bpiChangeNotice.desc": {
+    ja: "譜面ごとの特性やプレイヤーの分布を反映した新しいBPI算出方式への変更を検討しています。ご意見を募集中です。",
+    en: "We're considering a new BPI formula that better reflects each chart's characteristics and the player score distribution. Your feedback is welcome.",
+    "zh-TW":
+      "我們正在研擬能更貼近各譜面特性與玩家分數分佈的全新BPI計算方式，歡迎提供意見。",
+    ko: "채보별 특성과 플레이어 분포를 반영한 새로운 BPI 산출 방식으로의 변경을 검토하고 있습니다. 의견을 모집 중입니다.",
+  },
+  "dashboard.bpiChangeNotice.detailLink": {
+    ja: "詳細はこちら（X）",
+    en: "Details (X)",
+    "zh-TW": "詳情請見（X）",
+    ko: "자세히 보기 (X)",
+  },
+  "dashboard.bpiChangeNotice.feedbackLink": {
+    ja: "ご意見はこちら",
+    en: "Send feedback",
+    "zh-TW": "意見回饋",
+    ko: "의견 보내기",
+  },
+  "dashboard.bpiChangeNotice.dismiss": {
+    ja: "閉じる",
+    en: "Dismiss",
+    "zh-TW": "關閉",
+    ko: "닫기",
   },
 } as const;
