@@ -4,7 +4,11 @@ import {
   withAuth,
 } from "@/middlewares/api/withAuth";
 import { handleSubmitFollowRequest } from "@/lib/subhandlers/auth";
-import { writeV1Result } from "@/middlewares/api/apiResult";
+import {
+  buildMeta,
+  withMeta,
+  writeV2Result,
+} from "@/middlewares/api/apiResult";
 
 async function handler(
   req: AuthenticatedNextApiRequest,
@@ -12,10 +16,12 @@ async function handler(
 ) {
   if (req.method !== "POST") {
     res.setHeader("Allow", ["POST"]);
-    return res.status(405).json({ message: "Method Not Allowed" });
+    res.status(405).end();
+    return;
   }
-  const { result, successStatus } = await handleSubmitFollowRequest(req);
-  writeV1Result(res, result, undefined, successStatus);
+  const { result, targetUserId, viewerId } =
+    await handleSubmitFollowRequest(req);
+  writeV2Result(res, withMeta(result, buildMeta(viewerId, targetUserId)));
 }
 
 export default withAuth(handler);

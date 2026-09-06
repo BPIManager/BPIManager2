@@ -328,6 +328,28 @@ const ROWS: Row[] = [
     authed: true,
     userScoped: true,
   },
+  // auth (#331)
+  {
+    name: "apiKey get",
+    v1: "/api/v1/apiKey",
+    v2: "/api/v2/apiKey",
+    authed: true,
+    userScoped: true,
+  },
+  {
+    name: "oauthClient get",
+    v1: "/api/v1/oauthClient",
+    v2: "/api/v2/oauthClient",
+    authed: true,
+    userScoped: true,
+  },
+  {
+    name: "username availability",
+    v1: "/api/v1/usernames/zzznonexistentname123/availability",
+    v2: "/api/v2/usernames/zzznonexistentname123/availability",
+    authed: true,
+    userScoped: true,
+  },
   // site / supporters (#330)
   {
     name: "site stats",

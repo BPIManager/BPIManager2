@@ -1,16 +1,20 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { handleResolveInvite } from "@/lib/subhandlers/auth";
-import { writeV1Result } from "@/middlewares/api/apiResult";
+import {
+  buildMeta,
+  withMeta,
+  writeV2Result,
+} from "@/middlewares/api/apiResult";
 import { withRateLimit } from "@/middlewares/api/withRateLimit";
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "GET") {
     res.setHeader("Allow", ["GET"]);
-    return res.status(405).json({ message: "Method Not Allowed" });
+    res.status(405).end();
+    return;
   }
-  const { result } = await handleResolveInvite(req);
-  writeV1Result(res, result);
+  const { result, targetUserId, viewerId } = await handleResolveInvite(req);
+  writeV2Result(res, withMeta(result, buildMeta(viewerId, targetUserId)));
 }
 
-// 認証不要の公開エンドポイントのため、トークン試行によるDB負荷を抑える
 export default withRateLimit(handler, { windowMs: 60_000, max: 30 });

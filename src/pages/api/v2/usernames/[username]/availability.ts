@@ -4,17 +4,21 @@ import {
   withAuth,
 } from "@/middlewares/api/withAuth";
 import { handleUsernameAvailability } from "@/lib/subhandlers/auth";
-import { writeV1Result } from "@/middlewares/api/apiResult";
+import {
+  buildMeta,
+  withMeta,
+  writeV2Result,
+} from "@/middlewares/api/apiResult";
 
 async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
   if (req.method !== "GET") {
     res.setHeader("Allow", ["GET"]);
-    return res
-      .status(405)
-      .json({ message: `Method ${req.method} Not Allowed` });
+    res.status(405).end();
+    return;
   }
-  const { result } = await handleUsernameAvailability(req);
-  writeV1Result(res, result);
+  const { result, targetUserId, viewerId } =
+    await handleUsernameAvailability(req);
+  writeV2Result(res, withMeta(result, buildMeta(viewerId, targetUserId)));
 }
 
 export default withAuth(handler);

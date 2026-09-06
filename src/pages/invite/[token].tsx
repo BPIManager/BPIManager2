@@ -6,8 +6,9 @@ import { useUser } from "@/contexts/users/UserContext";
 import DashboardLayout from "@/components/partials/shell/DashboardLayout";
 import { PageLoader } from "@/components/ui/loading-spinner";
 import { Meta } from "@/components/partials/common/PageChrome/Head";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { authFetch } from "@/utils/common/fetch";
+import { unwrapApiResponse } from "@/services/swr/fetchV2";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import FollowInviteContent from "@/components/partials/features/Invite/FollowInvite";
 
@@ -42,10 +43,10 @@ export default function InvitePage() {
     // 「送信」ボタンが一瞬表示されてしまう)
     if (!token || isLoading) return;
     let cancelled = false;
-    authFetch(`${API_PREFIX}/invite/${token}`, "GET", fbUser ?? null)
+    authFetch(`${API_V2_PREFIX}/invite/${token}`, "GET", fbUser ?? null)
       .then((res) => {
         if (!res.ok) throw new Error("invite lookup failed");
-        return res.json();
+        return unwrapApiResponse<InvitePreviewData>(res);
       })
       .then((data: InvitePreviewData) => {
         if (!cancelled) setPreview(data);
