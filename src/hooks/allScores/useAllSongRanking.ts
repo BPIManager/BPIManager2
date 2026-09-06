@@ -1,5 +1,5 @@
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
-import { useSongRankingQuery } from "@/hooks/common/useSongRankingQuery";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
+import { useSongRankingQueryV2 } from "@/hooks/common/useSongRankingQueryV2";
 
 /**
  * 指定 allSongs 楽曲のグローバルランキングを取得する（allScores テーブル使用）。
@@ -11,6 +11,6 @@ export const useAllSongRanking = (
   songId: number | null,
   version: string | null,
 ) =>
-  useSongRankingQuery(songId, version, (uid, songId, version) =>
-    `${API_PREFIX}/users/${uid}/all-scores/${songId}/ranking?version=${version}`,
+  useSongRankingQueryV2(songId, version, (uid, songId, version) =>
+    `${API_V2_PREFIX}/users/${uid}/all-scores/${songId}/ranking?version=${version}`,
   );

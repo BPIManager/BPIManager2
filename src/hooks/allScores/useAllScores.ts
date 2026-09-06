@@ -1,5 +1,5 @@
-﻿import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+﻿import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { AllScoreFilterParams, AllSongWithScore } from "@/types/songs/allSongs";
 
 /**
@@ -23,9 +23,9 @@ export const useAllScores = (
       ).toString()
     : "";
 
-  const { data, error, isLoading, mutate } = useAuthedSWR<AllSongWithScore[]>(
+  const { data, error, isLoading, mutate } = useAuthedSWRV2<AllSongWithScore[]>(
     userId
-      ? `${API_PREFIX}/users/${userId}/all-scores/list?${queryString}`
+      ? `${API_V2_PREFIX}/users/${userId}/all-scores/list?${queryString}`
       : null,
     { revalidateOnFocus: false, dedupingInterval: 10000 },
   );

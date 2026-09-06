@@ -31,9 +31,11 @@ export function withUserApiHandler<T extends { userId: string }>(
   ) => unknown | Promise<unknown>,
   options?: {
     onError?: (error: unknown, res: NextApiResponse) => unknown;
+    onReject?: (res: NextApiResponse, access: AccessResult) => unknown;
   },
 ): ApiHandler {
   const onError = options?.onError ?? defaultOnError;
+  const onReject = options?.onReject ?? rejectAccess;
 
   return async function (req: NextApiRequest, res: NextApiResponse) {
     const query = parseQuery(req, res);
@@ -41,7 +43,7 @@ export function withUserApiHandler<T extends { userId: string }>(
 
     try {
       const access = await checkUserAccess(req, query.userId);
-      if (!access.hasAccess) return rejectAccess(res, access);
+      if (!access.hasAccess) return onReject(res, access);
 
       return await handler(req, res, query, access);
     } catch (error: unknown) {

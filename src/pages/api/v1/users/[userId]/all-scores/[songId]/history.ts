@@ -1,6 +1,5 @@
-import { allScoresRepo } from "@/lib/db/domains/allScores";
-import { rejectAccess } from "@/middlewares/api/withApi";
-import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
+import { handleAllScoresHistory } from "@/lib/subhandlers/allScores";
+import { err, writeV1Result } from "@/middlewares/api/apiResult";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
@@ -8,25 +7,9 @@ export default async function handler(
   res: NextApiResponse,
 ) {
   if (req.method !== "GET") {
-    return res.status(405).json({ message: "Method not allowed" });
+    return writeV1Result(res, err(405, "Method not allowed"));
   }
 
-  const { userId, songId } = req.query;
-
-  if (!userId || !songId) {
-    return res.status(400).json({ message: "Parameters are missing." });
-  }
-
-  try {
-    const access = await checkProfileAccess(req, userId as string);
-    if (!access.hasAccess) return rejectAccess(res, access);
-
-    return res
-      .status(200)
-      .json(await allScoresRepo.getScoreHistory(userId as string, songId as string));
-  } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Internal Server Error";
-    return res.status(500).json({ message: errorMessage });
-  }
+  const { result } = await handleAllScoresHistory(req);
+  writeV1Result(res, result);
 }

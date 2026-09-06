@@ -1,49 +1,16 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { rejectAccess } from "@/middlewares/api/withApi";
-import { allScoresAggregateRepo } from "@/lib/db/aggregates/allScores";
-import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
+import { handleAllScoresList } from "@/lib/subhandlers/allScores";
+import { err, writeV1Result } from "@/middlewares/api/apiResult";
+import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const { userId } = req.query;
-
-  const params = {
-    search: req.query.search as string,
-    levels: req.query.levels as string,
-    difficulties: req.query.difficulties as string,
-    clearStates: req.query.clearStates as string,
-    sortKey: (req.query.sortKey as string) ?? "level",
-    sortOrder: (req.query.sortOrder as string) ?? "desc",
-  };
-
-  if (!userId || typeof userId !== "string") {
-    return res.status(400).json({ message: "Invalid userId" });
+  if (req.method !== "GET") {
+    res.setHeader("Allow", ["GET"]);
+    return writeV1Result(res, err(405, `Method ${req.method} Not Allowed`));
   }
 
-  try {
-    const access = await checkProfileAccess(req, userId);
-    if (!access.hasAccess) return rejectAccess(res, access);
-
-    switch (req.method) {
-      case "GET":
-        const results = await allScoresAggregateRepo.getAllScoresList(
-          userId,
-          params,
-        );
-        return results && results.length > 0
-          ? res.status(200).json(results)
-          : res.status(404).json({ message: "No data found" });
-      default:
-        res.setHeader("Allow", ["GET"]);
-        return res
-          .status(405)
-          .json({ message: `Method ${req.method} Not Allowed` });
-    }
-  } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Internal Server Error";
-    return res.status(500).json({ message: errorMessage });
-  }
+  const { result } = await handleAllScoresList(req);
+  writeV1Result(res, result);
 }
