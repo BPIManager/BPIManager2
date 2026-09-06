@@ -118,6 +118,10 @@ const ROWS: Row[] = [
   { name: "scores best-ever", v1: "/api/v1/users/:self/scores/best-ever?currentVersion=33", v2: "/api/v2/users/:self/scores/best-ever?currentVersion=33", authed: true, userScoped: true },
   { name: "scores self-version", v1: "/api/v1/users/:self/scores/self-version?currentVersion=33&targetVersion=32", v2: "/api/v2/users/:self/scores/self-version?currentVersion=33&targetVersion=32", authed: true, userScoped: true },
   { name: "scores unplayed", v1: "/api/v1/users/:self/scores/unplayed?version=33", v2: "/api/v2/users/:self/scores/unplayed?version=33", authed: true, userScoped: true },
+  // batches (#320)
+  { name: "batches list (batch)", v1: "/api/v1/users/:self/batches?version=33&groupedBy=batch", v2: "/api/v2/users/:self/batches?version=33&groupedBy=batch", authed: true, userScoped: true },
+  { name: "batches list (lastPlayed)", v1: "/api/v1/users/:self/batches?version=33&groupedBy=lastPlayed", v2: "/api/v2/users/:self/batches?version=33&groupedBy=lastPlayed", authed: true, userScoped: true },
+  { name: "batches version-summary", v1: "/api/v1/users/:self/batches/version-summary?version=33", v2: "/api/v2/users/:self/batches/version-summary?version=33", authed: true, userScoped: true },
   // site / supporters (#330)
   { name: "site stats", v1: "/api/v1/site/stats", v2: "/api/v2/site/stats", authed: false, userScoped: false },
   { name: "site songs popular", v1: "/api/v1/site/songs/popular?order=top&offset=0&limit=10", v2: "/api/v2/site/songs/popular?order=top&offset=0&limit=10", authed: false, userScoped: false },

@@ -1,5 +1,5 @@
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
-import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
+import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
 import type { UpdateLog } from "@/types/logs/batches";
 
 /**
@@ -15,9 +15,9 @@ export const useBatchesList = (
   version: string,
   groupedBy: string,
 ) => {
-  const { data, error, isLoading } = useAuthedSWR<UpdateLog[]>(
+  const { data, error, isLoading } = useAuthedSWRV2<UpdateLog[]>(
     userId
-      ? `${API_PREFIX}/users/${userId}/batches?version=${version}&groupedBy=${groupedBy}`
+      ? `${API_V2_PREFIX}/users/${userId}/batches?version=${version}&groupedBy=${groupedBy}`
       : null,
   );
   return { logs: data || [], isLoading, isError: error };
