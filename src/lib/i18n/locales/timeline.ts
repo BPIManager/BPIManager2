@@ -42,4 +42,16 @@ export const timelineTranslations = {
     "zh-TW": "請嘗試更改篩選條件",
     ko: "필터 조건을 변경해 보세요",
   },
+  "timeline.list.label": {
+    ja: "リスト",
+    en: "List",
+    "zh-TW": "清單",
+    ko: "리스트",
+  },
+  "timeline.list.all": {
+    ja: "すべて",
+    en: "All",
+    "zh-TW": "全部",
+    ko: "전체",
+  },
 } as const;

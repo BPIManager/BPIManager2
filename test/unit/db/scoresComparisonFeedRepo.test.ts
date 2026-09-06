@@ -29,8 +29,9 @@ describe("socialTimelineRepo.getFollowedTimeline", () => {
     });
 
     const ifCalls = callsFor(dbHolder.current.calls, "$if");
-    // 順序: search, levels, difficulties, mode=played, mode=overtaken, lastId
+    // 順序: listId, search, levels, difficulties, mode=played, mode=overtaken, lastId
     expect(ifCalls.map((c) => c.args[0])).toEqual([
+      false,
       true,
       true,
       true,
@@ -61,8 +62,20 @@ describe("socialTimelineRepo.getFollowedTimeline", () => {
       mode: "overtaken",
     });
     const ifCalls = callsFor(dbHolder.current.calls, "$if");
-    expect(ifCalls[3].args[0]).toBe(false); // played
-    expect(ifCalls[4].args[0]).toBe(true); // overtaken
+    expect(ifCalls[4].args[0]).toBe(false); // played
+    expect(ifCalls[5].args[0]).toBe(true); // overtaken
+  });
+
+  it("listIdを指定するとフォローリスト絞り込みの$ifがtrueになること(#278)", async () => {
+    dbHolder.current = createDbSpy([]);
+    await socialTimelineRepo.getFollowedTimeline({
+      viewerId: "user-1",
+      version: "33",
+      limit: 20,
+      listId: 42,
+    });
+    const ifCalls = callsFor(dbHolder.current.calls, "$if");
+    expect(ifCalls[0].args[0]).toBe(true);
   });
 });
 
