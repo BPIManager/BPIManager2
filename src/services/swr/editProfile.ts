@@ -1,6 +1,7 @@
 import { User as FirebaseUser } from "firebase/auth";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
-import { authFetch, fetcher } from "@/utils/common/fetch";
+import { API_PREFIX, API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
+import { authFetch } from "@/utils/common/fetch";
+import { fetcherV2 } from "@/services/swr/fetchV2";
 
 export interface ArenaPrivacySettings {
   showArenaClass: boolean;
@@ -13,7 +14,7 @@ export async function fetchStatsPrivacy(
   fbUid: string,
   fbUser: FirebaseUser,
 ): Promise<{ statsPrivacy?: ArenaPrivacySettings }> {
-  return fetcher([`${API_PREFIX}/users/${fbUid}/profile`, fbUser]);
+  return fetcherV2([`${API_V2_PREFIX}/users/${fbUid}/profile`, fbUser]);
 }
 
 export async function checkUserNameAvailability(
@@ -49,7 +50,7 @@ export async function saveProfile(
   arenaPrivacy: ArenaPrivacySettings,
 ) {
   const res = await authFetch(
-    `${API_PREFIX}/users/${fbUid}/profile`,
+    `${API_V2_PREFIX}/users/${fbUid}/profile`,
     method,
     fbUser,
     {
