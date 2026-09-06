@@ -1,7 +1,7 @@
 import useSWRMutation from "swr/mutation";
-import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
+import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
 import { useUser } from "@/contexts/users/UserContext";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { issueOAuthClient, deleteOAuthClient } from "@/services/swr/oauthClient";
 
 interface OAuthClientInfo {
@@ -19,18 +19,18 @@ interface OAuthClientInfo {
 export const useOAuthClient = () => {
   const { fbUser } = useUser();
 
-  const { data, mutate, isLoading } = useAuthedSWR<OAuthClientInfo>(
-    fbUser ? `${API_PREFIX}/oauthClient` : null,
+  const { data, mutate, isLoading } = useAuthedSWRV2<OAuthClientInfo>(
+    fbUser ? `${API_V2_PREFIX}/oauthClient` : null,
   );
 
   const { trigger: triggerIssue, isMutating: isIssuing } = useSWRMutation(
-    `${API_PREFIX}/oauthClient`,
+    `${API_V2_PREFIX}/oauthClient`,
     (url, { arg }: { arg: { redirectUris: string[] } }) =>
       issueOAuthClient(url, fbUser, arg.redirectUris),
   );
 
   const { trigger: triggerDelete, isMutating: isDeleting } = useSWRMutation(
-    `${API_PREFIX}/oauthClient`,
+    `${API_V2_PREFIX}/oauthClient`,
     (url) => deleteOAuthClient(url, fbUser),
   );
 

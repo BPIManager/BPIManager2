@@ -1,4 +1,4 @@
-﻿import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+﻿import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import useSWR from "swr";
 import { arenaAveragesFetcher } from "@/services/swr/arenaAverages";
 
@@ -17,7 +17,7 @@ export type ArenaAverages = Record<
  */
 export const useArenaAveragesForSong = (songId: number | null) => {
   const { data, isLoading } = useSWR<ArenaAverages | null>(
-    songId != null ? `${API_PREFIX}/songs/${songId}/arena-averages` : null,
+    songId != null ? `${API_V2_PREFIX}/songs/${songId}/arena-averages` : null,
     arenaAveragesFetcher,
   );
 

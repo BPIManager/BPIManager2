@@ -1,7 +1,7 @@
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { useUser } from "@/contexts/users/UserContext";
-import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
+import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
 
 type RivalAvgRow = { songId: number; avgExScore: number | null };
 type RivalTopRow = { songId: number; topExScore: number | null };
@@ -21,17 +21,17 @@ export const useRivalScoresForSong = (
   const shouldFetch = enabled && userId != null && songId != null;
 
   const avgUrl = shouldFetch
-    ? `${API_PREFIX}/users/${userId}/rivals/following/avg-scores?version=${latestVersion}&songIds=${songId}`
+    ? `${API_V2_PREFIX}/users/${userId}/rivals/following/avg-scores?version=${latestVersion}&songIds=${songId}`
     : null;
 
   const topUrl = shouldFetch
-    ? `${API_PREFIX}/users/${userId}/rivals/following/top-scores?version=${latestVersion}&songIds=${songId}`
+    ? `${API_V2_PREFIX}/users/${userId}/rivals/following/top-scores?version=${latestVersion}&songIds=${songId}`
     : null;
 
   const { data: avgData, isLoading: avgLoading } =
-    useAuthedSWR<RivalAvgRow[]>(avgUrl);
+    useAuthedSWRV2<RivalAvgRow[]>(avgUrl);
   const { data: topData, isLoading: topLoading } =
-    useAuthedSWR<RivalTopRow[]>(topUrl);
+    useAuthedSWRV2<RivalTopRow[]>(topUrl);
 
   const rawAvg = avgData?.find((r) => r.songId === songId)?.avgExScore ?? null;
   const rawTop = topData?.find((r) => r.songId === songId)?.topExScore ?? null;

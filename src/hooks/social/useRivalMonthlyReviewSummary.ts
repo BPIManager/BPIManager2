@@ -1,5 +1,5 @@
-﻿import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+﻿import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 
 export interface RivalMonthlyReviewEntry {
   userId: string;
@@ -22,10 +22,10 @@ export const useRivalMonthlyReviewSummary = (params: {
 
   const url =
     userId && month && version
-      ? `${API_PREFIX}/users/${userId}/rivals/following/monthly-review-summary?month=${month}&version=${version}`
+      ? `${API_V2_PREFIX}/users/${userId}/rivals/following/monthly-review-summary?month=${month}&version=${version}`
       : null;
 
-  const { data, error, isLoading } = useAuthedSWR<Response>(url, {
+  const { data, error, isLoading } = useAuthedSWRV2<Response>(url, {
     revalidateOnFocus: false,
     shouldRetryOnError: false,
   });

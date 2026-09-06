@@ -1,5 +1,5 @@
-﻿import { API_PREFIX } from "@/constants/logic/apiEndpoints";
-import { fetcher } from "@/utils/common/fetch";
+﻿import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
+import { fetcherV2 } from "@/services/swr/fetchV2";
 import useSWR from "swr";
 import type { SongDefinitionRecord } from "@/types/songs/definition";
 
@@ -11,8 +11,8 @@ import type { SongDefinitionRecord } from "@/types/songs/definition";
  */
 export const useSongDefinitions = (songId: number | null | undefined) => {
   const { data, error, isLoading } = useSWR<SongDefinitionRecord[]>(
-    songId != null ? `${API_PREFIX}/songs/${songId}/definitions` : null,
-    fetcher,
+    songId != null ? `${API_V2_PREFIX}/songs/${songId}/definitions` : null,
+    fetcherV2,
   );
 
   return {

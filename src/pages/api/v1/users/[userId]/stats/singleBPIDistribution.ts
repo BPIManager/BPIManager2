@@ -1,63 +1,19 @@
 import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
-import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
-import {
-  singleBPIDistributionParamsSchema,
-  type ValidStep,
-} from "@/schemas/stats/singleBPIDistribution";
 import { parseQuery } from "@/services/nextRequest/parseBody";
-
-function buildBuckets(step: ValidStep) {
-  const buckets: { label: string; count: number }[] = [];
-  buckets.push({ label: "<-10", count: 0 });
-  for (let v = -10; v < 100; v += step) {
-    buckets.push({ label: v.toString(), count: 0 });
-  }
-  buckets.push({ label: "100+", count: 0 });
-  return buckets;
-}
+import { singleBPIDistributionParamsSchema } from "@/schemas/stats/singleBPIDistribution";
+import { handleStatsSingleBpiDistribution } from "@/lib/subhandlers/stats";
+import { writeV1Result } from "@/middlewares/api/apiResult";
 
 export default withUserApiHandler(
   (req, res) => {
-    const query = parseStatsQuery(req.query, res);
-    if (!query) return null;
-
+    const q = parseStatsQuery(req.query, res);
+    if (!q) return null;
     const body = parseQuery(singleBPIDistributionParamsSchema, req.query, res);
     if (!body) return null;
-
-    return { ...query, ...body };
+    return { ...q, ...body };
   },
-  async (req, res, { userId, version, levels, difficulties, step }) => {
-    const scores = await statsTablesRepo.getLatestScoresWithMusicData(
-      userId,
-      version,
-    );
-
-    const distribution = buildBuckets(step);
-
-    scores.forEach((s) => {
-      if (!s.exScore || s.exScore <= 0) return;
-      if (levels.length > 0 && !levels.includes(s.difficultyLevel as number))
-        return;
-      if (
-        difficulties.length > 0 &&
-        !difficulties.includes(s.difficulty as string)
-      )
-        return;
-
-      const bpi = s.bpi ?? -15;
-      let idx: number;
-      if (bpi < -10) {
-        idx = 0;
-      } else if (bpi >= 100) {
-        idx = distribution.length - 1;
-      } else {
-        idx = Math.floor((bpi - -10) / step) + 1;
-      }
-
-      if (distribution[idx]) distribution[idx].count++;
-    });
-
-    return res.status(200).json(distribution);
+  async (req, res, query) => {
+    writeV1Result(res, await handleStatsSingleBpiDistribution(query));
   },
 );

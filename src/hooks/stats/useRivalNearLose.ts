@@ -1,6 +1,6 @@
-﻿import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+﻿import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { useUser } from "@/contexts/users/UserContext";
-import { useInfiniteList } from "@/services/swr/useInfinite";
+import { useInfiniteListV2 } from "@/services/swr/useInfinite";
 
 import type { NearLoseSongItem } from "@/types/stats/nearLose";
 
@@ -34,7 +34,7 @@ export const useNearLoseInfinite = (
   const PAGE_SIZE = 20;
 
   const { items, size, setSize, isLoadingMore, isReachingEnd, isError } =
-    useInfiniteList<NearLoseResponse, NearLoseSongItem>(
+    useInfiniteListV2<NearLoseResponse, NearLoseSongItem>(
       (pageIndex, previousPageData: NearLoseResponse | null) => {
         if (!userId || !version || !fbUser) return null;
         if (previousPageData && !previousPageData.nextCursor) return null;
@@ -57,7 +57,7 @@ export const useNearLoseInfinite = (
           params.append("lastRivalId", lastRivalId);
         }
 
-        return `${API_PREFIX}/users/${userId}/rivals/following/scores?${params.toString()}`;
+        return `${API_V2_PREFIX}/users/${userId}/rivals/following/scores?${params.toString()}`;
       },
       {
         getItems: (page) => page?.items ?? [],

@@ -1,7 +1,6 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { adminAuth } from "@/lib/firebase/admin";
-import { apiKeysRepo } from "@/lib/db/domains/apiKeys";
-import { timingSafeEqual } from "@/utils/common/timingSafeEqual";
+import type { NextApiRequest, NextApiResponse } from "next";
+import { handleTokenExchange } from "@/lib/subhandlers/auth";
+import { writeV1Result } from "@/middlewares/api/apiResult";
 import { withRateLimit } from "@/middlewares/api/withRateLimit";
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -9,30 +8,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     res.setHeader("Allow", ["POST"]);
     return res.status(405).json({ message: "Method Not Allowed" });
   }
-
-  const xApiKey = req.headers["x-api-key"];
-
-  if (!xApiKey || typeof xApiKey !== "string") {
-    return res.status(401).json({ message: "API Key is required" });
-  }
-
-  try {
-    const keyRecord = await apiKeysRepo.findByKey(xApiKey);
-
-    if (!keyRecord || !timingSafeEqual(xApiKey, keyRecord.key)) {
-      return res.status(401).json({ message: "Invalid API Key" });
-    }
-
-    const customToken = await adminAuth.createCustomToken(keyRecord.userId);
-
-    return res.status(200).json({
-      customToken,
-      expiresIn: 3600,
-    });
-  } catch (error) {
-    console.error("Token Exchange Error:", error);
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
+  const { result } = await handleTokenExchange(req);
+  writeV1Result(res, result);
 }
 
 export default withRateLimit(handler, { windowMs: 60_000, max: 20 });

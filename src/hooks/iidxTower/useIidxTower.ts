@@ -1,6 +1,6 @@
-﻿import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+﻿import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { useUser } from "@/contexts/users/UserContext";
-import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
+import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
 
 export interface IidxTowerEntry {
   playDate: string;
@@ -9,14 +9,14 @@ export interface IidxTowerEntry {
 }
 
 export function useIidxTower(userId: string | undefined, version?: string) {
-  const base = userId ? `${API_PREFIX}/users/${userId}/iidx-tower` : null;
+  const base = userId ? `${API_V2_PREFIX}/users/${userId}/iidx-tower` : null;
   const url = base
     ? version
       ? `${base}?version=${encodeURIComponent(version)}`
       : base
     : null;
   // 認証トークンは取得できれば付与する（非公開プロフィール向け）
-  return useAuthedSWR<IidxTowerEntry[]>(url);
+  return useAuthedSWRV2<IidxTowerEntry[]>(url);
 }
 
 export interface IidxTowerCompareResult {
@@ -30,12 +30,12 @@ export function useIidxTowerCompare(
 ) {
   const { fbUser } = useUser();
   const base = targetUserId
-    ? `${API_PREFIX}/users/${targetUserId}/iidx-tower`
+    ? `${API_V2_PREFIX}/users/${targetUserId}/iidx-tower`
     : null;
   const url = base
     ? version
       ? `${base}?compare=true&version=${encodeURIComponent(version)}`
       : `${base}?compare=true`
     : null;
-  return useAuthedSWR<IidxTowerCompareResult>(fbUser && url ? url : null);
+  return useAuthedSWRV2<IidxTowerCompareResult>(fbUser && url ? url : null);
 }

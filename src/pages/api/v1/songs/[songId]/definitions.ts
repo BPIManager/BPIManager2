@@ -1,28 +1,12 @@
-import { songsRepo } from "@/lib/db/domains/songs";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { handleSongDefinitions } from "@/lib/subhandlers/songs";
+import { writeV1Result } from "@/middlewares/api/apiResult";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  if (req.method !== "GET") {
-    return res.status(405).json({ message: "Method not allowed" });
-  }
-
-  const { songId } = req.query;
-
-  if (!songId || Array.isArray(songId)) {
-    return res.status(400).json({ message: "songId is required" });
-  }
-
-  try {
-    const definitions = await songsRepo.getDefinitionHistory(Number(songId));
-
-    return res.status(200).json(definitions);
-  } catch (error: unknown) {
-    console.error("Fetch song definitions error:", error);
-    const errorMessage =
-      error instanceof Error ? error.message : "Internal Server Error";
-    return res.status(500).json({ message: errorMessage });
-  }
+  if (req.method !== "GET") return res.status(405).end();
+  const { result } = await handleSongDefinitions(req);
+  writeV1Result(res, result);
 }

@@ -1,42 +1,21 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { songNotesRepo } from "@/lib/db/domains/songNotes";
-import { songNotesAggregateRepo } from "@/lib/db/aggregates/songNotes";
-import { resolveOptionalUid } from "@/middlewares/api/resolveOptionalUid";
-
-function parseSongId(raw: string | string[] | undefined): number | null {
-  if (!raw || Array.isArray(raw)) return null;
-  const n = parseInt(raw, 10);
-  return isNaN(n) ? null : n;
-}
+import {
+  handleSongNotesList,
+  handleCreateSongNote,
+} from "@/lib/subhandlers/songs";
+import { writeV1Result } from "@/middlewares/api/apiResult";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const songId = parseSongId(req.query.songId);
-  if (songId === null) return res.status(400).json({ message: "Invalid songId" });
-
   if (req.method === "GET") {
-    const sort =
-      req.query.sort === "bpi" ? "bpi" : ("latest" as "latest" | "bpi");
-    const viewerId = await resolveOptionalUid(req);
-    const notes = await songNotesAggregateRepo.getNotes(songId, viewerId, sort);
-    return res.status(200).json(notes);
+    const { result } = await handleSongNotesList(req);
+    return writeV1Result(res, result);
   }
-
   if (req.method === "POST") {
-    const uid = await resolveOptionalUid(req);
-    if (!uid) return res.status(401).json({ message: "Unauthorized" });
-
-    const { body } = req.body ?? {};
-    if (typeof body !== "string" || body.trim().length === 0)
-      return res.status(400).json({ message: "body is required" });
-    if (body.trim().length > 2000)
-      return res.status(400).json({ message: "body too long (max 2000)" });
-
-    const id = await songNotesRepo.createNote(songId, uid, body.trim());
-    return res.status(201).json({ id });
+    const { result, successStatus } = await handleCreateSongNote(req);
+    return writeV1Result(res, result, undefined, successStatus ?? 200);
   }
-
   return res.status(405).end();
 }

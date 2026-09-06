@@ -15,8 +15,8 @@ vi.mock("@/contexts/users/UserContext", () => ({
   useUser: () => mockUseUser(),
 }));
 
-vi.mock("@/hooks/common/useAuthedSWR", () => ({
-  useAuthedSWR: (url: string | null, options?: unknown) =>
+vi.mock("@/hooks/common/useAuthedSWRV2", () => ({
+  useAuthedSWRV2: (url: string | null, options?: unknown) =>
     mockUseAuthedSWR(url, options),
 }));
 

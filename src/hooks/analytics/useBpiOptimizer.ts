@@ -1,8 +1,8 @@
 import { useState, useCallback, useEffect } from "react";
 import useSWR from "swr";
 import { useUser } from "@/contexts/users/UserContext";
-import { fetcher } from "@/utils/common/fetch";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { fetcherV2 } from "@/services/swr/fetchV2";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import type {
   OptimizationResult,
@@ -61,7 +61,7 @@ export function useBpiOptimizer() {
       considerCurrentTotalBpi: String(considerCurrentTotalBpi),
     });
     return [
-      `${API_PREFIX}/users/${userId}/analytics/bpi-optimizer?${params}`,
+      `${API_V2_PREFIX}/users/${userId}/analytics/bpi-optimizer?${params}`,
       fbUser,
     ];
   })();
@@ -80,7 +80,7 @@ export function useBpiOptimizer() {
     error,
     isValidating,
     mutate,
-  } = useSWR<OptimizationResult>(swrKey, fetcher, {
+  } = useSWR<OptimizationResult>(swrKey, fetcherV2, {
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
     shouldRetryOnError: false,

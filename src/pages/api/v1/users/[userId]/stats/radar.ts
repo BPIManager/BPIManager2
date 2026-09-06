@@ -1,7 +1,7 @@
 import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
-import { calculateRadar } from "@/lib/radar/calculator";
-import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
+import { handleStatsRadar } from "@/lib/subhandlers/stats";
+import { writeV1Result } from "@/middlewares/api/apiResult";
 
 export default withUserApiHandler(
   (req, res) => {
@@ -11,17 +11,7 @@ export default withUserApiHandler(
     }
     return parseStatsQuery(req.query, res);
   },
-  async (req, res, { userId, version, levels, difficulties }) => {
-    const [scores, validSongKeys] = await Promise.all([
-      statsTablesRepo.getLatestScoresWithMusicData(
-        userId,
-        version,
-        levels,
-        difficulties,
-      ),
-      statsTablesRepo.getFilteredSongKeys(version, levels, difficulties),
-    ]);
-
-    return res.status(200).json(calculateRadar(scores, validSongKeys));
+  async (req, res, query) => {
+    writeV1Result(res, await handleStatsRadar(query));
   },
 );
