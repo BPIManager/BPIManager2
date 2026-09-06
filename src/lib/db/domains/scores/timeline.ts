@@ -59,7 +59,6 @@ class ScoreTimelineRepository {
       .where("bs.userId", "=", userId)
       .select([
         "bs.songId as r_songId",
-        "bs.version as r_version",
         (eb) => eb.fn.max("bs.logId").as("r_logId"),
       ])
       .groupBy("bs.songId")
