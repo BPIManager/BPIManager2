@@ -1,6 +1,12 @@
 import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
 import { handleAllSongRivals } from "@/lib/subhandlers/allScores";
-import { writeV1Result } from "@/middlewares/api/apiResult";
+import {
+  accessError,
+  buildMeta,
+  err,
+  withMeta,
+  writeV2Result,
+} from "@/middlewares/api/apiResult";
 
 export default withUserApiHandler(
   (req, res) => {
@@ -11,20 +17,24 @@ export default withUserApiHandler(
 
     const { userId, songId } = req.query;
     if (!userId || !songId) {
-      res.status(400).json({ message: "Missing required parameters" });
+      writeV2Result(res, err(400, "Missing required parameters"));
       return null;
     }
 
     return { userId: String(userId), songId };
   },
   async (req, res, _query, access) => {
-    const { result } = await handleAllSongRivals(req, access);
-    writeV1Result(res, result);
+    const { result, targetUserId, viewerId } = await handleAllSongRivals(
+      req,
+      access,
+    );
+    writeV2Result(res, withMeta(result, buildMeta(viewerId, targetUserId)));
   },
   {
     onError: (error, res) => {
       console.error("All-Score Rival Scores API Error:", error);
-      return res.status(500).json({ message: "Internal Server Error" });
+      return writeV2Result(res, err(500, "Internal Server Error"));
     },
+    onReject: (res, access) => writeV2Result(res, accessError(access)!),
   },
 );

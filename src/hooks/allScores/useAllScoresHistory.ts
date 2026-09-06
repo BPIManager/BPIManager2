@@ -1,5 +1,5 @@
-﻿import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+﻿import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { SongHistoryResponse } from "@/types/songs/score";
 
 /**
@@ -15,9 +15,9 @@ export const useAllScoreHistory = (
   songId: number | null,
   enabled = true,
 ) => {
-  const { data, error, isLoading } = useAuthedSWR<SongHistoryResponse>(
+  const { data, error, isLoading } = useAuthedSWRV2<SongHistoryResponse>(
     enabled && userId && songId
-      ? `${API_PREFIX}/users/${userId}/all-scores/${songId}/history`
+      ? `${API_V2_PREFIX}/users/${userId}/all-scores/${songId}/history`
       : null,
   );
 

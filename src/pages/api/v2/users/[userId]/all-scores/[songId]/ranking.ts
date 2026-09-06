@@ -3,7 +3,11 @@ import {
   withAuth,
 } from "@/middlewares/api/withAuth";
 import { handleAllSongRanking } from "@/lib/subhandlers/allScores";
-import { writeV1Result } from "@/middlewares/api/apiResult";
+import {
+  buildMeta,
+  withMeta,
+  writeV2Result,
+} from "@/middlewares/api/apiResult";
 import type { NextApiResponse } from "next";
 
 async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
@@ -12,8 +16,8 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
     return;
   }
 
-  const { result } = await handleAllSongRanking(req);
-  writeV1Result(res, result);
+  const { result, targetUserId, viewerId } = await handleAllSongRanking(req);
+  writeV2Result(res, withMeta(result, buildMeta(viewerId, targetUserId)));
 }
 
 export default withAuth(handler);

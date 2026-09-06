@@ -1,7 +1,7 @@
-import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
+import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
 import { useUser } from "@/contexts/users/UserContext";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 
 /**
  * 指定 allSongs 楽曲のフォロー中ライバル全員のスコアを取得する（allScores テーブル使用）。
@@ -16,9 +16,9 @@ export const useAllSongRivalScores = (
   const { fbUser } = useUser();
   const url =
     fbUser && songId
-      ? `${API_PREFIX}/users/${fbUser.uid}/all-scores/${songId}/rivals?version=${version || latestVersion}`
+      ? `${API_V2_PREFIX}/users/${fbUser.uid}/all-scores/${songId}/rivals?version=${version || latestVersion}`
       : null;
-  const { data, error, isLoading, mutate, isValidating } = useAuthedSWR(url);
+  const { data, error, isLoading, mutate, isValidating } = useAuthedSWRV2(url);
 
   return { data, isLoading, error, mutate, isValidating };
 };

@@ -4,6 +4,7 @@ import type {
   ApiResponse,
   HandlerResult,
 } from "@/types/api";
+import type { AccessResult } from "./withApi";
 
 /**
  * API v2 移行の基盤ユーティリティ。
@@ -40,6 +41,22 @@ export function buildMeta(
     isSelf: viewerId !== null && viewerId === targetUserId,
     ...extra,
   };
+}
+
+/**
+ * `checkUserAccess` / `checkProfileAccess` の `AccessResult` を `HandlerResult`
+ * のエラーへ変換する。アクセス許可時は `null` を返す。
+ * `const denied = accessError(access); if (denied) return { result: denied, ... };`
+ * のように使う。
+ */
+export function accessError(
+  access: AccessResult,
+): HandlerResult<never> | null {
+  if (access.hasAccess) return null;
+  return err(
+    access.error?.status ?? 403,
+    access.error?.message ?? "Forbidden",
+  );
 }
 
 /**
