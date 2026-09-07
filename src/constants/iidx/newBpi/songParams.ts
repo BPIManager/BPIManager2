@@ -1,8 +1,8 @@
 /**
- * issue #299〜304（単曲BPIの分布ベース再定義）検証用のパラメータ。
+ * 単曲BPIの分布ベース再定義（新方式BPIプレビュー `/new-bpi`）用のパラメータ。
  *
  * `mu`/`sigma` はDBスキーマ変更を避けるため、`songDef` にカラムを追加せず
- * このJSON経由でのみ供給する（#299以降が未実装の検証段階のため）。
+ * このJSON経由でのみ供給する（本採用前の検証段階のため）。
  * `scripts/generate-new-bpi-params.ts` で
  * BPIM2-AutomatedDefinitionCalculatorのアリーナクロール結果(IIDX ID紐付け)
  * とbpim2自身のスコアを統合した母集団から再生成できる。

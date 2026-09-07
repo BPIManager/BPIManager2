@@ -11,6 +11,8 @@ const DISMISSED_KEY = "bpim2-bpi-change-notice-dismissed-v1";
 const DETAIL_URL = "https://x.com/BPIManager/status/2096290042885120037";
 const FEEDBACK_FORM_URL =
   "https://docs.google.com/forms/d/e/1FAIpQLSekqnyJDaGGNbkW3ERKjeBEnqBtxQmVqrzVAopduto35GPZOA/viewform";
+/** 新方式BPIの理論的な説明（Notion）。 */
+const THEORY_URL = "https://app.notion.com/p/BPI-3d29989ca87a819981a6eb5d742c5bd7";
 
 /**
  * ダッシュボードに常設する、BPI算出方式の変更検討に関する告知バナー。
@@ -60,6 +62,15 @@ function BpiChangeNotice() {
             {t("dashboard.bpiChangeNotice.previewLink")}
             <ArrowRight className="h-3 w-3" />
           </Link>
+          <a
+            href={THEORY_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 font-medium text-bpim-primary hover:underline"
+          >
+            {t("dashboard.bpiChangeNotice.theoryLink")}
+            <ExternalLink className="h-3 w-3" />
+          </a>
           <a
             href={DETAIL_URL}
             target="_blank"

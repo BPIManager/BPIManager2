@@ -35,7 +35,7 @@ const SCORE_RATE_STEPS: number[] = (() => {
 })();
 
 /**
- * issue #299〜304 検証用: 自分のスコアで現行BPIと新方式BPI(分布ベース)を
+ * 分布ベースの新方式BPIの検証用: 自分のスコアで現行BPIと新方式BPIを
  * 楽曲ごとに見比べるための集計ロジック。
  *
  * 新方式のパラメータ(mu/sigma)は `songDef` に持たせず `songParams.json`

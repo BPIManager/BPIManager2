@@ -1,5 +1,5 @@
 import { Fragment, useState } from "react";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, ExternalLink } from "lucide-react";
 import { DashCard } from "@/components/ui/dashcard";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -46,6 +46,41 @@ export type SortKey =
   | "currentBpiDesc"
   | "newBpiDesc";
 export type AccessState = "loading" | "not-found" | "private" | "ok";
+
+/** 新方式BPIの理論的な説明（Notion）。 */
+const THEORY_URL = "https://app.notion.com/p/BPI-3d29989ca87a819981a6eb5d742c5bd7";
+/** 新方式BPIの設計判断・経緯を追跡している GitHub issue。 */
+const DESIGN_ISSUE_URL =
+  "https://github.com/BPIManager/BPIManager2/issues/309";
+
+const NoticeCard = () => {
+  const { t } = useTranslation();
+  return (
+    <DashCard className="border-amber-500/40 bg-amber-500/5 text-sm text-muted-foreground">
+      <p>{t("newBpi.notice")}</p>
+      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+        <a
+          href={THEORY_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 font-medium text-bpim-primary hover:underline"
+        >
+          {t("newBpi.notice.theoryLink")}
+          <ExternalLink className="h-3 w-3" />
+        </a>
+        <a
+          href={DESIGN_ISSUE_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 font-medium text-bpim-primary hover:underline"
+        >
+          {t("newBpi.notice.issueLink")}
+          <ExternalLink className="h-3 w-3" />
+        </a>
+      </div>
+    </DashCard>
+  );
+};
 
 export interface NewBpiRow {
   songId: number;
@@ -523,9 +558,7 @@ export default function NewBpiComparisonUi(props: Props) {
 
           {props.accessState === "ok" && !props.isDataLoading && (
             <>
-              <DashCard className="border-amber-500/40 bg-amber-500/5 text-sm text-muted-foreground">
-                {t("newBpi.notice")}
-              </DashCard>
+              <NoticeCard />
 
               <SummaryCards
                 currentTotalBpi={props.currentTotalBpi}
