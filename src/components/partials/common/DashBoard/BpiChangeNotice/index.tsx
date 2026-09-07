@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ExternalLink, Megaphone, X } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, ExternalLink, Megaphone, X } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
@@ -52,6 +53,13 @@ function BpiChangeNotice() {
       <AlertDescription>
         <p>{t("dashboard.bpiChangeNotice.desc")}</p>
         <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1">
+          <Link
+            href="/new-bpi"
+            className="inline-flex items-center gap-1 font-medium text-bpim-primary hover:underline"
+          >
+            {t("dashboard.bpiChangeNotice.previewLink")}
+            <ArrowRight className="h-3 w-3" />
+          </Link>
           <a
             href={DETAIL_URL}
             target="_blank"
