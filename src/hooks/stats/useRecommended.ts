@@ -1,6 +1,6 @@
 ﻿import { useUser } from "@/contexts/users/UserContext";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
-import { useInfiniteList } from "@/services/swr/useInfinite";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
+import { useInfiniteListV2 } from "@/services/swr/useInfinite";
 
 const PAGE_SIZE = 20;
 
@@ -38,7 +38,7 @@ export const useRecommendedInfinite = (
     isLoadingMore,
     isReachingEnd,
     isError,
-  } = useInfiniteList<RecommendedPage, RecommendedItem>(
+  } = useInfiniteListV2<RecommendedPage, RecommendedItem>(
     (index) => {
       if (!fbUser || !userId) return null;
 
@@ -50,7 +50,7 @@ export const useRecommendedInfinite = (
       levels.forEach((l) => params.append("level", l));
       diffs.forEach((d) => params.append("difficulty", d));
 
-      return `${API_PREFIX}/users/${userId}/stats/recommended?${params.toString()}`;
+      return `${API_V2_PREFIX}/users/${userId}/stats/recommended?${params.toString()}`;
     },
     {
       getItems: (page) => page?.[type]?.data ?? [],

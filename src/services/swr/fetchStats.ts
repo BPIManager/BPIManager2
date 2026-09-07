@@ -1,5 +1,5 @@
-﻿import { API_PREFIX } from "@/constants/logic/apiEndpoints";
-import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
+﻿import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
+import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
 import { SWRConfiguration } from "swr";
 
 interface StatsParams {
@@ -25,7 +25,7 @@ function buildStatsUrl(
   difficulties.forEach((d) => params.append("difficulty", d));
   if (step !== undefined) params.set("step", String(step));
   if (groupBy !== undefined) params.set("groupBy", groupBy);
-  return `${API_PREFIX}/users/${userId}/stats/${endpoint}?${params.toString()}`;
+  return `${API_V2_PREFIX}/users/${userId}/stats/${endpoint}?${params.toString()}`;
 }
 
 interface UseStatsDataOptions extends SWRConfiguration {
@@ -44,5 +44,5 @@ export function useStatsData<T>(
     ? buildStatsUrl(userId, endpoint, version, levels, difficulties, step, groupBy)
     : null;
 
-  return useAuthedSWR<T>(url, swrOptions);
+  return useAuthedSWRV2<T>(url, swrOptions);
 }

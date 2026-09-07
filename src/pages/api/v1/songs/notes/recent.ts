@@ -1,23 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { songNotesAggregateRepo } from "@/lib/db/aggregates/songNotes";
-
-const PAGE_SIZE = 20;
+import { handleRecentSongNotes } from "@/lib/subhandlers/songs";
+import { writeV1Result } from "@/middlewares/api/apiResult";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
   if (req.method !== "GET") return res.status(405).end();
-
-  const sort =
-    req.query.sort === "upvotes" ? "upvotes" : ("latest" as "latest" | "upvotes");
-
-  const page = Math.max(0, parseInt(String(req.query.page ?? "0"), 10) || 0);
-
-  const notes = await songNotesAggregateRepo.getRecentNotes(
-    sort,
-    PAGE_SIZE,
-    page * PAGE_SIZE,
-  );
-  return res.status(200).json(notes);
+  const { result } = await handleRecentSongNotes(req);
+  writeV1Result(res, result);
 }

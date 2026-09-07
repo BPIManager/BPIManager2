@@ -1,5 +1,5 @@
-﻿import { API_PREFIX } from "@/constants/logic/apiEndpoints";
-import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
+﻿import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
+import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
 import type { MonthlyReviewData } from "@/types/stats/monthlyReview";
 
 export const useMonthlyReview = (
@@ -9,10 +9,10 @@ export const useMonthlyReview = (
 ) => {
   const shouldFetch = userId && version && month;
   const url = shouldFetch
-    ? `${API_PREFIX}/users/${userId}/stats/monthly-review?version=${version}&month=${month}`
+    ? `${API_V2_PREFIX}/users/${userId}/stats/monthly-review?version=${version}&month=${month}`
     : null;
 
-  const { data, isLoading, error } = useAuthedSWR<MonthlyReviewData>(url, {
+  const { data, isLoading, error } = useAuthedSWRV2<MonthlyReviewData>(url, {
     revalidateOnFocus: false,
   });
 

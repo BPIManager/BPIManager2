@@ -1,5 +1,5 @@
-﻿import { API_PREFIX } from "@/constants/logic/apiEndpoints";
-import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
+﻿import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
+import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
 import { useCallback, useMemo } from "react";
 
 import type { GroupingMode, GoalType, AAATableItem } from "@/types/metrics/aaa";
@@ -29,15 +29,15 @@ export const useAAATable = (
     if (customGoalOffset) params.set("customGoalOffset", String(customGoalOffset));
   }
   const base = userId
-    ? `${API_PREFIX}/users/${userId}/stats/aaaDifficulty`
-    : `${API_PREFIX}/users/guest/stats/aaaDifficulty`;
+    ? `${API_V2_PREFIX}/users/${userId}/stats/aaaDifficulty`
+    : `${API_V2_PREFIX}/users/guest/stats/aaaDifficulty`;
   const endpoint = `${base}?${params}`;
 
   const isReady =
     !!(version && level) &&
     (goal !== "custom" || customGoalRatio !== undefined);
 
-  const { data, error, isLoading } = useAuthedSWR<AAATableItem[]>(
+  const { data, error, isLoading } = useAuthedSWRV2<AAATableItem[]>(
     isReady ? endpoint : null,
   );
 

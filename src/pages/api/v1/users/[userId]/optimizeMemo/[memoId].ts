@@ -1,14 +1,15 @@
-import { bpiOptimizerRepo } from "@/lib/db/domains/bpiOptimizer";
+import type { NextApiRequest, NextApiResponse } from "next";
 import { withAuth } from "@/middlewares/api/withAuth";
-import { NextApiRequest, NextApiResponse } from "next";
+import { handleDeleteOptimizeMemo } from "@/lib/subhandlers/bpiOptimizer";
+import { writeV1Result } from "@/middlewares/api/apiResult";
 
 const deleteHandler = withAuth(async (req, res) => {
-  const uid = req.authUid;
-  const rid = String(req.query.memoId);
-
-  const success = await bpiOptimizerRepo.deleteMemo(uid, rid);
-  if (!success) return res.status(404).json({ message: "Memo not found" });
-  res.status(204).end();
+  const { result } = await handleDeleteOptimizeMemo(req);
+  if (result.ok) {
+    res.status(204).end();
+    return;
+  }
+  writeV1Result(res, result);
 });
 
 export default async function handler(
@@ -18,6 +19,5 @@ export default async function handler(
   if (req.method === "DELETE") {
     return deleteHandler(req, res);
   }
-
   return res.status(405).end();
 }

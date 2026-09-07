@@ -1,6 +1,6 @@
 ﻿import useSWRInfinite from "swr/infinite";
 import { User as FirebaseUser } from "firebase/auth";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { authFetch } from "@/utils/common/fetch";
 import { fetchSongPatternsPage } from "@/services/swr/songPatterns";
 import type { VoteType } from "@/types/db";
@@ -29,7 +29,7 @@ export function useSongPatterns(
   ): [string, string | null] | null => {
     if (previousPageData && previousPageData.nextCursor === null) return null;
     const cursor = previousPageData?.nextCursor ?? 0;
-    const url = `${API_PREFIX}/songs/${songId}/patterns?cursor=${cursor}&sortBy=${sortBy}`;
+    const url = `${API_V2_PREFIX}/songs/${songId}/patterns?cursor=${cursor}&sortBy=${sortBy}`;
     // キャッシュキーにはFirebase Userオブジェクト全体でなくuidのみを使う
     return [url, fbUser?.uid ?? null];
   };
@@ -50,7 +50,7 @@ export function useSongPatterns(
   async function vote(pattern: string, voteType: VoteType): Promise<void> {
     if (!fbUser) return;
     const res = await authFetch(
-      `${API_PREFIX}/songs/${songId}/patterns/${pattern}/vote`,
+      `${API_V2_PREFIX}/songs/${songId}/patterns/${pattern}/vote`,
       "POST",
       fbUser,
       { voteType },
@@ -62,7 +62,7 @@ export function useSongPatterns(
   async function deleteVote(pattern: string): Promise<void> {
     if (!fbUser) return;
     const res = await authFetch(
-      `${API_PREFIX}/songs/${songId}/patterns/${pattern}/vote`,
+      `${API_V2_PREFIX}/songs/${songId}/patterns/${pattern}/vote`,
       "DELETE",
       fbUser,
     );

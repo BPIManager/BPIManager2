@@ -1,6 +1,7 @@
 import { User as FirebaseUser } from "firebase/auth";
 import type { TicketItem, TicketRecommendResult, ScoreMode } from "@/types/tickets";
-import { authFetch, fetcher } from "@/utils/common/fetch";
+import { authFetch } from "@/utils/common/fetch";
+import { fetcherV2, unwrapApiResponse } from "@/services/swr/fetchV2";
 
 export async function searchTickets(
   url: string,
@@ -9,16 +10,12 @@ export async function searchTickets(
   scoreMode: ScoreMode,
 ): Promise<TicketRecommendResult[]> {
   const res = await authFetch(url, "POST", fbUser, { ticketIds, scoreMode });
-  if (!res.ok) {
-    const data = await res.json().catch(() => ({}));
-    throw new Error((data as { message?: string }).message ?? `HTTPエラー: ${res.status}`);
-  }
-  return res.json();
+  return unwrapApiResponse<TicketRecommendResult[]>(res);
 }
 
 export function loadMoreTicketResults(
   url: string,
   fbUser: FirebaseUser,
 ): Promise<TicketRecommendResult> {
-  return fetcher([url, fbUser]);
+  return fetcherV2([url, fbUser]);
 }

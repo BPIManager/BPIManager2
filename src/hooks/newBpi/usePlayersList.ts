@@ -1,5 +1,5 @@
-import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 
 export interface NewBpiPlayerRow {
   userId: string;
@@ -41,8 +41,8 @@ export const usePlayersList = (
   if (bpiFilter?.min !== undefined) params.set("bpiMin", String(bpiFilter.min));
   if (bpiFilter?.max !== undefined) params.set("bpiMax", String(bpiFilter.max));
 
-  const { data, error, isLoading } = useAuthedSWR<PlayersListResponse>(
-    `${API_PREFIX}/new-bpi/players?${params.toString()}`,
+  const { data, error, isLoading } = useAuthedSWRV2<PlayersListResponse>(
+    `${API_V2_PREFIX}/new-bpi/players?${params.toString()}`,
     { revalidateOnFocus: false, keepPreviousData: true },
   );
 

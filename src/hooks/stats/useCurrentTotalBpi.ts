@@ -1,5 +1,5 @@
-import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 
 export interface TotalBpiStats {
   totalBpi: number;
@@ -21,10 +21,10 @@ export const useTotalBpiStats = (
 
   const url =
     userId && version
-      ? `${API_PREFIX}/users/${userId}/stats/totalBpi?${params.toString()}`
+      ? `${API_V2_PREFIX}/users/${userId}/stats/totalBpi?${params.toString()}`
       : null;
 
-  const { data, error, isLoading } = useAuthedSWR<TotalBpiStats>(url);
+  const { data, error, isLoading } = useAuthedSWRV2<TotalBpiStats>(url);
   return { stats: data, isLoading, isError: error };
 };
 
@@ -34,9 +34,9 @@ export const useActiveDates = (
 ) => {
   const url =
     userId && version
-      ? `${API_PREFIX}/users/${userId}/stats/activeDates?version=${version}`
+      ? `${API_V2_PREFIX}/users/${userId}/stats/activeDates?version=${version}`
       : null;
 
-  const { data, isLoading } = useAuthedSWR<string[]>(url);
+  const { data, isLoading } = useAuthedSWRV2<string[]>(url);
   return { dates: data ?? [], isLoading };
 };

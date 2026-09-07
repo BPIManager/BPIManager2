@@ -1,97 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
-import { followListAggregateRepo } from "@/lib/db/aggregates/followList";
-import { monthlyReviewRepo } from "@/lib/db/aggregates/monthly-review";
-import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
-import { buildBpiTimeline } from "@/lib/monthly-review/bpi";
-import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
-import dayjs from "@/lib/dayjs";
-import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
+import { handleRivalMonthlyReviewSummary } from "@/lib/subhandlers/rivals";
+import { writeV1Result } from "@/middlewares/api/apiResult";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
   if (req.method !== "GET") return res.status(405).end();
-
-  const { userId, month, version } = req.query;
-  if (!userId || !month || !version)
-    return res.status(400).json({ message: "userId, month, version are required" });
-
-  const isYearMode = /^\d{4}$/.test(month as string);
-  const isMonthMode = /^\d{4}-\d{2}$/.test(month as string);
-  const isValidVersion = (IIDX_VERSIONS as readonly string[]).includes(version as string);
-
-  if (!isValidVersion || (!isYearMode && !isMonthMode))
-    return res.status(400).json({ message: "Invalid month or version" });
-
-  const access = await checkUserAccess(req, userId as string);
-  if (!access.hasAccess) return rejectAccess(res, access);
-
-  try {
-    const monthStart = isYearMode
-      ? dayjs.tz(`${month}-01-01`).format("YYYY-MM-DD")
-      : dayjs.tz(`${month as string}-01`).format("YYYY-MM-DD");
-    const monthEnd = isYearMode
-      ? dayjs.tz(`${month}-12-31`).format("YYYY-MM-DD")
-      : dayjs.tz(`${month as string}-01`).endOf("month").format("YYYY-MM-DD");
-
-    const rivalRows = await followListAggregateRepo.getPublicFollowingUsers(
-      userId as string,
-    );
-
-    if (rivalRows.length === 0) return res.status(200).json({ rivals: [] });
-
-    const rivalIds = rivalRows.map((r) => r.userId);
-
-    const [preMonthState, inMonthHistory, totalSongs] = await Promise.all([
-      monthlyReviewRepo.getPreMonthBpiStateForUsers(
-        rivalIds,
-        version as string,
-        monthStart,
-      ),
-      monthlyReviewRepo.getInMonthScoreHistoryForUsers(
-        rivalIds,
-        version as string,
-        monthStart,
-        monthEnd,
-      ),
-      statsTablesRepo.getTotalSongCount([12], [...IIDX_DIFFICULTIES]),
-    ]);
-
-    const preByUser = new Map<string, Map<number, number>>();
-    for (const s of preMonthState) {
-      if (!preByUser.has(s.userId)) preByUser.set(s.userId, new Map());
-      preByUser.get(s.userId)!.set(s.songId, s.bpi != null ? Number(s.bpi) : -15);
-    }
-
-    const historyByUser = new Map<string, typeof inMonthHistory>();
-    for (const s of inMonthHistory) {
-      if (!historyByUser.has(s.userId)) historyByUser.set(s.userId, []);
-      historyByUser.get(s.userId)!.push(s);
-    }
-
-    const rivals = rivalRows.map((r) => {
-      const preMap = preByUser.get(r.userId) ?? new Map<number, number>();
-      const history = historyByUser.get(r.userId) ?? [];
-      const { bpiStart, bpiEnd } = buildBpiTimeline(
-        preMap,
-        history,
-        totalSongs,
-        isYearMode,
-      );
-      return {
-        userId: r.userId,
-        userName: r.userName,
-        profileImage: r.profileImage,
-        bpiStart,
-        bpiEnd,
-      };
-    });
-
-    return res.status(200).json({ rivals });
-  } catch (error) {
-    console.error("Rival monthly review summary Error:", error);
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
+  const { result } = await handleRivalMonthlyReviewSummary(req);
+  writeV1Result(res, result);
 }

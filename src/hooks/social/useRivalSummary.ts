@@ -1,5 +1,5 @@
-﻿import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+﻿import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 
 import type { RivalSummaryResult } from "@/types/social/rival";
 
@@ -33,7 +33,7 @@ export const useRivalSummary = (params: {
   if (listId != null) query.append("listId", String(listId));
 
   const url = userId
-    ? `${API_PREFIX}/users/${userId}/rivals/following/summary?${query.toString()}`
+    ? `${API_V2_PREFIX}/users/${userId}/rivals/following/summary?${query.toString()}`
     : null;
 
   const {
@@ -41,7 +41,7 @@ export const useRivalSummary = (params: {
     error,
     isLoading: swrLoading,
     mutate,
-  } = useAuthedSWR<RivalSummaryResponse>(url, {
+  } = useAuthedSWRV2<RivalSummaryResponse>(url, {
     revalidateOnFocus: false,
     shouldRetryOnError: false,
   });

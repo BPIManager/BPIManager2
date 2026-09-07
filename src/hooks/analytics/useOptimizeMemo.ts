@@ -2,7 +2,7 @@ import useSWR, { useSWRConfig } from "swr";
 import { useCallback, useMemo, useState } from "react";
 import { User as FirebaseUser } from "firebase/auth";
 import type { OptimizationResult } from "@/types/bpi-optimizer";
-import { fetcher } from "@/utils/common/fetch";
+import { fetcherV2 } from "@/services/swr/fetchV2";
 import { saveOptimizeMemo, deleteOptimizeMemo } from "@/services/swr/optimizeMemo";
 
 export interface OptimizeMemo {
@@ -18,7 +18,7 @@ export const useBpiOptimizerMemos = (
   fbUser?: FirebaseUser | null,
 ) => {
   const { mutate } = useSWRConfig();
-  const apiUrl = `/api/v1/users/${userId}/optimizeMemo`;
+  const apiUrl = `/api/v2/users/${userId}/optimizeMemo`;
   // キャッシュキーにはFirebase Userオブジェクト全体でなくuidのみを使う
   // (fbUser自体はクロージャ経由でfetcherに渡す)
   const swrKey = useMemo<[string, string | null] | null>(
@@ -28,7 +28,7 @@ export const useBpiOptimizerMemos = (
 
   const { data: memos, isLoading: isMemosLoading } = useSWR<OptimizeMemo[]>(
     swrKey,
-    () => fetcher([apiUrl, fbUser ?? null]),
+    () => fetcherV2([apiUrl, fbUser ?? null]),
   );
 
   const [isSaving, setIsSaving] = useState(false);

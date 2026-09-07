@@ -52,11 +52,16 @@ export async function checkUserAccess(
     };
   }
 
-  if (canViewUserData({ targetUserId, isPublic: userData.isPublic })) {
-    return { hasAccess: true, user: userData };
+  // 公開プロフィールでも閲覧者を解決しておく（v2 エンベロープの
+  // meta.viewerId / isSelf を正しく埋めるため。認証ヘッダーが無ければ undefined）
+  const viewerId = await authenticateViewer(req);
+
+  if (
+    canViewUserData({ viewerId, targetUserId, isPublic: userData.isPublic })
+  ) {
+    return { hasAccess: true, user: userData, viewerId };
   }
 
-  const viewerId = await authenticateViewer(req);
   const hasFollowAccess =
     !!viewerId &&
     (await followAccessAggregateRepo.hasApprovedFollowAccess(

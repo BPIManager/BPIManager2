@@ -1,7 +1,7 @@
 ﻿import useSWRMutation from "swr/mutation";
-import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
+import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
 import { useUser } from "@/contexts/users/UserContext";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { generateApiKey } from "@/services/swr/apiKey";
 
 /**
@@ -12,12 +12,12 @@ import { generateApiKey } from "@/services/swr/apiKey";
 export const useApiKey = () => {
   const { fbUser } = useUser();
 
-  const { data, mutate, isLoading } = useAuthedSWR(
-    fbUser ? `${API_PREFIX}/apiKey` : null,
+  const { data, mutate, isLoading } = useAuthedSWRV2(
+    fbUser ? `${API_V2_PREFIX}/apiKey` : null,
   );
 
   const { trigger, isMutating } = useSWRMutation(
-    `${API_PREFIX}/apiKey`,
+    `${API_V2_PREFIX}/apiKey`,
     (url) => generateApiKey(url, fbUser),
   );
 

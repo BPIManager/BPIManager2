@@ -1,8 +1,9 @@
 ﻿import useSWR from "swr";
 import { useState } from "react";
 import { User as FirebaseUser } from "firebase/auth";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
-import { authFetch, fetcher } from "@/utils/common/fetch";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
+import { authFetch } from "@/utils/common/fetch";
+import { fetcherV2, unwrapApiResponse } from "@/services/swr/fetchV2";
 
 export interface SongNote {
   id: number;
@@ -20,19 +21,19 @@ export type SongNoteSort = "latest" | "bpi";
 export function useSongNotes(songId: number, fbUser: FirebaseUser | null) {
   const [sort, setSort] = useState<SongNoteSort>("latest");
 
-  const url = `${API_PREFIX}/songs/${songId}/notes?sort=${sort}`;
+  const url = `${API_V2_PREFIX}/songs/${songId}/notes?sort=${sort}`;
   // キャッシュキーにはFirebase Userオブジェクト全体でなくuidのみを使う
   const swrKey: [string, string | null] = [url, fbUser?.uid ?? null];
 
   const { data, isLoading, mutate } = useSWR<SongNote[]>(
     swrKey,
-    () => fetcher([url, fbUser]),
+    () => fetcherV2([url, fbUser]),
     { revalidateOnFocus: false },
   );
 
   async function createNote(body: string): Promise<void> {
     const res = await authFetch(
-      `${API_PREFIX}/songs/${songId}/notes`,
+      `${API_V2_PREFIX}/songs/${songId}/notes`,
       "POST",
       fbUser,
       { body },
@@ -43,7 +44,7 @@ export function useSongNotes(songId: number, fbUser: FirebaseUser | null) {
 
   async function updateNote(noteId: number, body: string): Promise<void> {
     const res = await authFetch(
-      `${API_PREFIX}/songs/${songId}/notes/${noteId}`,
+      `${API_V2_PREFIX}/songs/${songId}/notes/${noteId}`,
       "PATCH",
       fbUser,
       { body },
@@ -54,7 +55,7 @@ export function useSongNotes(songId: number, fbUser: FirebaseUser | null) {
 
   async function deleteNote(noteId: number): Promise<void> {
     const res = await authFetch(
-      `${API_PREFIX}/songs/${songId}/notes/${noteId}`,
+      `${API_V2_PREFIX}/songs/${songId}/notes/${noteId}`,
       "DELETE",
       fbUser,
     );
@@ -68,12 +69,14 @@ export function useSongNotes(songId: number, fbUser: FirebaseUser | null) {
   ): Promise<void> {
     const method = currentlyUpvoted ? "DELETE" : "POST";
     const res = await authFetch(
-      `${API_PREFIX}/songs/${songId}/notes/${noteId}/upvote`,
+      `${API_V2_PREFIX}/songs/${songId}/notes/${noteId}/upvote`,
       method,
       fbUser,
     );
     if (!res.ok) return;
-    const { upvoteCount } = await res.json();
+    const { upvoteCount } = await unwrapApiResponse<{ upvoteCount: number }>(
+      res,
+    );
     await mutate(
       (prev) =>
         prev?.map((n) =>

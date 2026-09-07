@@ -1,7 +1,7 @@
 import { User as FirebaseUser } from "firebase/auth";
-import { API_PREFIX, API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { authFetch } from "@/utils/common/fetch";
-import { fetcherV2 } from "@/services/swr/fetchV2";
+import { fetcherV2, unwrapApiResponse } from "@/services/swr/fetchV2";
 
 export interface ArenaPrivacySettings {
   showArenaClass: boolean;
@@ -24,13 +24,13 @@ export async function checkUserNameAvailability(
 ): Promise<{ available: boolean; message?: string }> {
   const token = await fbUser?.getIdToken();
   const res = await fetch(
-    `${API_PREFIX}/usernames/${encodeURIComponent(userName)}/availability`,
+    `${API_V2_PREFIX}/usernames/${encodeURIComponent(userName)}/availability`,
     {
       headers: { Authorization: `Bearer ${token}` },
       signal,
     },
   );
-  return res.json();
+  return unwrapApiResponse<{ available: boolean; message?: string }>(res);
 }
 
 export interface EditProfileFormData {

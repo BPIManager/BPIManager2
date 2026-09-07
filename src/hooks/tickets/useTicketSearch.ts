@@ -1,7 +1,7 @@
 ﻿import { useState, useCallback } from "react";
 import useSWRMutation from "swr/mutation";
 import { useUser } from "@/contexts/users/UserContext";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import type { TicketItem, TicketRecommendResult, TicketSortKey, ScoreMode } from "@/types/tickets";
 import { searchTickets, loadMoreTicketResults } from "@/services/swr/ticketSearch";
 
@@ -37,7 +37,7 @@ export function useTicketSearch() {
   const [lastTickets, setLastTickets] = useState<TicketItem[]>([]);
   const [parseError, setParseError] = useState<string | null>(null);
 
-  const key = user ? `${API_PREFIX}/users/${user.userId}/tickets/recommend` : null;
+  const key = user ? `${API_V2_PREFIX}/users/${user.userId}/tickets/recommend` : null;
 
   const { trigger, isMutating, error: swrError } = useSWRMutation(
     key,
@@ -109,7 +109,7 @@ export function useTicketSearch() {
           scoreMode,
         });
         const data = await loadMoreTicketResults(
-          `${API_PREFIX}/users/${user.userId}/tickets/recommend?${params}`,
+          `${API_V2_PREFIX}/users/${user.userId}/tickets/recommend?${params}`,
           fbUser,
         );
 

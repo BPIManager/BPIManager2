@@ -1,4 +1,5 @@
 import type { ArenaAverages } from "@/hooks/metrics/useArenaAveragesForSong";
+import { unwrapApiResponse } from "@/services/swr/fetchV2";
 
 export const arenaAveragesFetcher = async (
   url: string,
@@ -6,5 +7,5 @@ export const arenaAveragesFetcher = async (
   const res = await fetch(url);
   if (res.status === 404) return null;
   if (!res.ok) throw new Error("Failed to fetch arena averages");
-  return res.json();
+  return unwrapApiResponse<ArenaAverages | null>(res);
 };

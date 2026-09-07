@@ -1,6 +1,6 @@
 ﻿import { useUser } from "@/contexts/users/UserContext";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
-import { useInfiniteList } from "@/services/swr/useInfinite";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
+import { useInfiniteListV2 } from "@/services/swr/useInfinite";
 import type {
   NeighborRecommendedItem,
   NeighborRecommendedPage,
@@ -28,7 +28,7 @@ export const useNeighborRecommendedInfinite = (
 ) => {
   const { fbUser } = useUser();
 
-  return useInfiniteList<NeighborRecommendedPage, NeighborRecommendedItem>(
+  return useInfiniteListV2<NeighborRecommendedPage, NeighborRecommendedItem>(
     (index) => {
       if (!fbUser || !userId) return null;
 
@@ -41,7 +41,7 @@ export const useNeighborRecommendedInfinite = (
       levels.forEach((l) => params.append("level", l));
       diffs.forEach((d) => params.append("difficulty", d));
 
-      return `${API_PREFIX}/users/${userId}/stats/neighbor-recommended?${params.toString()}`;
+      return `${API_V2_PREFIX}/users/${userId}/stats/neighbor-recommended?${params.toString()}`;
     },
     {
       getItems: (page) => page?.[type]?.data ?? [],

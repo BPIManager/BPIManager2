@@ -6,7 +6,7 @@ import { useUser } from "@/contexts/users/UserContext";
 import { LoginButtons } from "@/components/partials/common/Auth/Buttons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { authFetch } from "@/utils/common/fetch";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
@@ -53,20 +53,20 @@ const FollowInviteContent = ({
     setIsSubmitting(true);
     try {
       const res = await authFetch(
-        `${API_PREFIX}/follow-requests`,
+        `${API_V2_PREFIX}/follow-requests`,
         "POST",
         fbUser,
         { token },
       );
       const data = await res.json();
-      if (!res.ok) {
+      if (!res.ok || data?.error) {
         setResult({
           status: "error",
-          message: data.message ?? t("invite.failed"),
+          message: data?.errorMessage ?? data?.message ?? t("invite.failed"),
         });
         return;
       }
-      setResult({ status: data.status });
+      setResult({ status: data.body?.status ?? data.status });
     } catch {
       setResult({ status: "error", message: t("invite.failed") });
     } finally {
@@ -79,7 +79,7 @@ const FollowInviteContent = ({
     setIsSubmitting(true);
     try {
       const res = await authFetch(
-        `${API_PREFIX}/follow-requests/${preview.userId}`,
+        `${API_V2_PREFIX}/follow-requests/${preview.userId}`,
         "DELETE",
         fbUser,
       );

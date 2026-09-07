@@ -1,9 +1,9 @@
-import { BpiCalculator } from "@/lib/bpi";
-import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
+import type { NextApiRequest, NextApiResponse } from "next";
 import { checkUserAccess, rejectAccess } from "@/middlewares/api/withApi";
 import { aaaDifficultySchema } from "@/schemas/stats/aaaDifficulty";
 import { parseQuery } from "@/services/nextRequest/parseBody";
-import { NextApiRequest, NextApiResponse } from "next";
+import { handleStatsAaaDifficulty } from "@/lib/subhandlers/stats";
+import { writeV1Result } from "@/middlewares/api/apiResult";
 
 export default async function handler(
   req: NextApiRequest,
@@ -12,91 +12,10 @@ export default async function handler(
   const body = parseQuery(aaaDifficultySchema, req.query, res);
   if (!body) return;
 
-  const { userId, version, level, customGoalRatio, customGoalOffset } = body;
-
-  try {
-    if (userId && userId !== "guest") {
-      const access = await checkUserAccess(req, userId);
-      if (!access.hasAccess) return rejectAccess(res, access);
-    }
-
-    const rawData = await statsTablesRepo.getAAATableData(userId, version, level);
-
-    const result = rawData.map((song) => {
-      const maxScore = song.notes * 2;
-      const aaaTarget = Math.ceil(maxScore * (8 / 9));
-      const maxMinusTarget = Math.ceil(maxScore * (17 / 18));
-
-      const songParams = {
-        title: song.title,
-        notes: song.notes,
-        kaidenAvg: song.kaidenAvg,
-        wrScore: song.wrScore,
-        coef: song.coef as number,
-      };
-
-      const aaaTargetBpi = BpiCalculator.calc(aaaTarget, songParams) ?? -15;
-      const maxMinusTargetBpi =
-        BpiCalculator.calc(maxMinusTarget, songParams) ?? -15;
-      const customTarget =
-        customGoalRatio !== undefined
-          ? Math.min(
-              maxScore,
-              Math.max(
-                0,
-                Math.ceil(maxScore * customGoalRatio) + (customGoalOffset ?? 0),
-              ),
-            )
-          : undefined;
-      const customTargetBpi =
-        customTarget !== undefined
-          ? (BpiCalculator.calc(customTarget, songParams) ?? -15)
-          : undefined;
-      const currentExScore = song.userExScore ?? 0;
-      const currentBpi = song.userExScore
-        ? (BpiCalculator.calc(song.userExScore, songParams) ?? -15)
-        : -15;
-
-      return {
-        songId: song.songId,
-        title: song.title,
-        difficulty: song.difficulty,
-        notes: song.notes,
-        releasedVersion: song.releasedVersion,
-        maxScore,
-        targets: {
-          aaa: {
-            exScore: aaaTarget,
-            targetBpi: aaaTargetBpi,
-            diff: currentExScore - aaaTarget,
-          },
-          maxMinus: {
-            exScore: maxMinusTarget,
-            targetBpi: maxMinusTargetBpi,
-            diff: currentExScore - maxMinusTarget,
-          },
-          ...(customTarget !== undefined && customTargetBpi !== undefined
-            ? {
-                custom: {
-                  exScore: customTarget,
-                  targetBpi: customTargetBpi,
-                  diff: currentExScore - customTarget,
-                },
-              }
-            : {}),
-        },
-        user: {
-          exScore: currentExScore,
-          bpi: currentBpi,
-          isAaa: currentExScore >= aaaTarget,
-          isMaxMinus: currentExScore >= maxMinusTarget,
-        },
-      };
-    });
-
-    return res.status(200).json(result);
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Internal Server Error" });
+  if (body.userId && body.userId !== "guest") {
+    const access = await checkUserAccess(req, body.userId);
+    if (!access.hasAccess) return rejectAccess(res, access);
   }
+
+  writeV1Result(res, await handleStatsAaaDifficulty(body));
 }

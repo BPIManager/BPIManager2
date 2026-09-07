@@ -1,6 +1,6 @@
 import { useUser } from "@/contexts/users/UserContext";
-import { useAuthedSWR } from "@/hooks/common/useAuthedSWR";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { SongWithRival, SongWithScore } from "@/types/songs/score";
 import { BpiCalculator } from "@/lib/bpi";
@@ -45,9 +45,9 @@ export const useAnalyticsComparison = (
     data: rivalData,
     error: rivalError,
     isLoading: rivalLoading,
-  } = useAuthedSWR<SongWithRival[]>(
+  } = useAuthedSWRV2<SongWithRival[]>(
     target?.kind === "rival" && myUserId && target.param && fbUser
-      ? `${API_PREFIX}/users/${myUserId}/rivals/${target.param}/scores?version=${targetVersion}`
+      ? `${API_V2_PREFIX}/users/${myUserId}/rivals/${target.param}/scores?version=${targetVersion}`
       : null,
     { revalidateOnFocus: false, dedupingInterval: 10000 },
   );
@@ -56,9 +56,9 @@ export const useAnalyticsComparison = (
     data: selfVersionData,
     error: selfVersionError,
     isLoading: selfVersionLoading,
-  } = useAuthedSWR<SongWithRival[]>(
+  } = useAuthedSWRV2<SongWithRival[]>(
     target?.kind === "self-version" && myUserId && target.param && fbUser
-      ? `${API_PREFIX}/users/${myUserId}/scores/self-version?currentVersion=${targetVersion}&targetVersion=${target.param}`
+      ? `${API_V2_PREFIX}/users/${myUserId}/scores/self-version?currentVersion=${targetVersion}&targetVersion=${target.param}`
       : null,
     { revalidateOnFocus: false, dedupingInterval: 10000 },
   );
@@ -71,9 +71,9 @@ export const useAnalyticsComparison = (
     data: bestEverData,
     error: bestEverError,
     isLoading: bestEverLoading,
-  } = useAuthedSWR<BestEverRow[]>(
+  } = useAuthedSWRV2<BestEverRow[]>(
     needsBestEver && myUserId && fbUser
-      ? `${API_PREFIX}/users/${myUserId}/scores/best-ever?currentVersion=${targetVersion}&excludeCurrent=${excludeCurrent}`
+      ? `${API_V2_PREFIX}/users/${myUserId}/scores/best-ever?currentVersion=${targetVersion}&excludeCurrent=${excludeCurrent}`
       : null,
     { revalidateOnFocus: false, dedupingInterval: 10000 },
   );
@@ -91,9 +91,9 @@ export const useAnalyticsComparison = (
     data: myScores,
     error: myError,
     isLoading: myLoading,
-  } = useAuthedSWR<SongWithScore[]>(
+  } = useAuthedSWRV2<SongWithScore[]>(
     needsMyScores && myUserId && fbUser
-      ? `${API_PREFIX}/users/${myUserId}/scores?version=${targetVersion}`
+      ? `${API_V2_PREFIX}/users/${myUserId}/scores?version=${targetVersion}`
       : null,
     { revalidateOnFocus: false, dedupingInterval: 10000 },
   );
