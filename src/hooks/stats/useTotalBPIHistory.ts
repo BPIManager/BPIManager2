@@ -1,4 +1,4 @@
-import { useStatsData } from "@/services/swr/fetchStats";
+import { useStatsData } from "@/services/swr/stats";
 import type { BpiHistoryItem } from "@/types/stats/bpiHistory";
 import type { StatsGroupBy } from "@/types/stats/bpiBoxStats";
 

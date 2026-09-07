@@ -1,4 +1,4 @@
-import { useStatsData } from "@/services/swr/fetchStats";
+import { useStatsData } from "@/services/swr/stats";
 import type { BpiBoxStatsItem, StatsGroupBy } from "@/types/stats/bpiBoxStats";
 
 export const useBpiBoxStats = (

@@ -1,4 +1,4 @@
-import { useStatsData } from "@/services/swr/fetchStats";
+import { useStatsData } from "@/services/swr/stats";
 import type { BpmBandBpiItem } from "@/types/stats/distribution";
 
 /**
