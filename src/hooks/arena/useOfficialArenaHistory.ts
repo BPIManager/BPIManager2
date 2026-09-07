@@ -1,6 +1,6 @@
 import useSWR from "swr";
 import type { ArenaEventEntry, ArenaVersionMetadata } from "@/lib/cron/arena/types";
-import { arenaJsonFetcher } from "@/services/swr/arenaHistory";
+import { arenaJsonFetcher } from "@/services/swr/arena/arenaHistory";
 import { fetcherV2 } from "@/services/swr/fetchV2";
 
 export type ArenaHistoryRecord = {
