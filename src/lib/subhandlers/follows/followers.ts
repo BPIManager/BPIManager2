@@ -7,7 +7,6 @@ import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { authUidOf, type HandleOutcome } from "./_shared";
 
-
 /** DELETE /users/[userId]/followers/[followerId] */
 export async function handleRemoveFollower(
   req: NextApiRequest,

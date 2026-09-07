@@ -6,8 +6,6 @@ import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { authUidOf, type HandleOutcome } from "./_shared";
 
-
-
 function parseListId(req: NextApiRequest): number | null {
   const { listId } = req.query;
   const id = Number(listId);
@@ -102,4 +100,3 @@ export async function handleRemoveListMember(
 }
 
 /* ---------------------- follow-lists/following.ts ---------------------- */
-

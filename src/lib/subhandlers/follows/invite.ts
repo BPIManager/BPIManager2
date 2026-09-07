@@ -4,7 +4,6 @@ import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { authUidOf, type HandleOutcome } from "./_shared";
 
-
 /** GET /users/[userId]/follow-invite */
 export async function handleGetInviteToken(
   req: NextApiRequest,
@@ -42,4 +41,3 @@ export async function handleRegenerateInvite(
     };
   }
 }
-
