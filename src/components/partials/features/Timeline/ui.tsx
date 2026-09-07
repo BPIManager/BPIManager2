@@ -11,11 +11,12 @@ import { useTranslation } from "@/hooks/common/useTranslation";
 interface TimelineListProps {
   mode: "all" | "played" | "overtaken";
   params: FilterParamsFrontend;
+  version: string;
 }
 
-const TimelineList = ({ mode, params }: TimelineListProps) => {
+const TimelineList = ({ mode, params, version }: TimelineListProps) => {
   const { t } = useTranslation();
-  const res = useTimeline(mode, params);
+  const res = useTimeline(mode, params, version);
 
   return (
     <div

@@ -1,5 +1,4 @@
 import type { NextApiRequest } from "next";
-import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { socialTimelineRepo } from "@/lib/db/aggregates/rivalScores/feed";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
@@ -38,7 +37,7 @@ export async function handleTimeline(
   const query = parsed.data;
 
   const limit = 20;
-  const version = latestVersion;
+  const version = query.version;
 
   try {
     const timeline = await socialTimelineRepo.getFollowedTimeline({

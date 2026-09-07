@@ -5,6 +5,12 @@ export const timelineTranslations = {
     "zh-TW": "顯示模式",
     ko: "표시 모드",
   },
+  "timeline.version.label": {
+    ja: "バージョン",
+    en: "Version",
+    "zh-TW": "版本",
+    ko: "버전",
+  },
   "timeline.mode.all": { ja: "すべて", en: "All", "zh-TW": "全部", ko: "전체" },
   "timeline.mode.played": {
     ja: "自分がプレイ済み",

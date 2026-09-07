@@ -20,6 +20,7 @@ interface TimelineResponse {
 export const useTimeline = (
   mode: "all" | "played" | "overtaken",
   params: FilterParamsFrontend,
+  version: string,
 ) => {
   const { fbUser } = useUser();
 
@@ -38,6 +39,7 @@ export const useTimeline = (
 
       const query = new URLSearchParams();
       query.append("mode", mode);
+      query.append("version", version);
       if (params.search) query.append("search", params.search);
       if (params.levels?.length) {
         params.levels.forEach((lv) => query.append("levels[]", lv.toString()));

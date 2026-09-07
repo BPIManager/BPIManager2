@@ -16,6 +16,14 @@ import { IidxDifficulty } from "@/types/iidx/difficulty";
 import { PageContainer, PageHeader } from "@/components/partials/common/PageChrome/Header";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
+import { versionTitles } from "@/constants/iidx/versionTitles";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const TimelineContainer = () => {
   const { t } = useTranslation();
@@ -23,6 +31,8 @@ const TimelineContainer = () => {
   const {
     mode,
     setMode,
+    version,
+    setVersion,
     filterParams,
     updateParams,
     toggleLevel,
@@ -70,6 +80,28 @@ const TimelineContainer = () => {
                 />
               </div>
 
+              <div className="flex flex-col gap-1">
+                <FilterHeader label={t("timeline.version.label")} />
+                <Select value={version} onValueChange={setVersion}>
+                  <SelectTrigger className="h-8 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {versionTitles
+                      .filter((v) => !v.disabled)
+                      .map((v) => (
+                        <SelectItem
+                          key={v.num}
+                          value={v.num}
+                          className="text-xs"
+                        >
+                          {v.title}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
               <FilterCheckboxGroup
                 label="LEVEL"
                 items={[11, 12]}
@@ -99,7 +131,11 @@ const TimelineContainer = () => {
               />
             </div>
 
-            <TimelineList mode={mode} params={filterParams} />
+            <TimelineList
+              mode={mode}
+              params={filterParams}
+              version={version}
+            />
           </div>
         </div>
       </PageContainer>

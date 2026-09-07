@@ -314,6 +314,13 @@ const ROWS: Row[] = [
     userScoped: true,
   },
   {
+    name: "timeline (versioned)",
+    v1: "/api/v1/users/:self/timeline?mode=all&version=32",
+    v2: "/api/v2/users/:self/timeline?mode=all&version=32",
+    authed: true,
+    userScoped: true,
+  },
+  {
     name: "iidx-tower",
     v1: "/api/v1/users/:self/iidx-tower",
     v2: "/api/v2/users/:self/iidx-tower",
