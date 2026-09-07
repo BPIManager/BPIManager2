@@ -5,7 +5,8 @@ import useSWR, { KeyedMutator } from "swr";
 import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { Session } from "@/types/session";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
+import { unwrapApiResponse } from "@/services/swr/fetchV2";
 import { isRememberedAccountProvider } from "@/types/auth/rememberedAccount";
 import { upsertRememberedAccount } from "@/utils/auth/rememberedAccounts";
 
@@ -33,10 +34,14 @@ const authenticatedFetcher = async (url: string) => {
 
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.message || "Failed to fetch user data");
+    throw new Error(
+      errorData.errorMessage ||
+        errorData.message ||
+        "Failed to fetch user data",
+    );
   }
 
-  return res.json();
+  return unwrapApiResponse<{ user: Session }>(res);
 };
 
 export const UserProvider = ({
@@ -63,7 +68,7 @@ export const UserProvider = ({
   } = useSWR<{ user: Session }>(
     // fbUser.uidをキーに含め、Firebase Authの単一インスタンス上でアカウントを
     // 切り替えた際（URL文字列自体は変わらない）にもSWRが再フェッチするようにする
-    fbUser ? `${API_PREFIX}/me?uid=${fbUser.uid}` : null,
+    fbUser ? `${API_V2_PREFIX}/me?uid=${fbUser.uid}` : null,
     authenticatedFetcher,
     {
       revalidateOnFocus: false,
