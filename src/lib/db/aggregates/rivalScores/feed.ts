@@ -48,15 +48,117 @@ class SocialTimelineRepository {
       difficulties,
     } = params;
 
+    // 2フェーズで取得する。
+    // Phase 1: 表示対象の logId を lastPlayed 降順で limit 件だけ確定する。
+    // Phase 2: 確定した logId に対してのみ全カラム・相関サブクエリを算出する。
+    // 単一クエリだと SELECT 句の相関サブクエリ(prevExScore/prevBpi/myBestExScore)が
+    // JOIN のファンアウト(フォロー中ユーザー × バージョン内全スコア、数万行規模)の
+    // 全行に対して評価され、極端に遅くなるため分割している。
+    // lastPlayed は分単位で同値が頻出するため、決定的な結果を返すよう
+    // 両フェーズとも (lastPlayed DESC, logId DESC) で整列する。
+
     // followsを起点に結合順序をstraight_joinで固定する。scores起点だと
     // フォロー中でない大多数のユーザー分まで走査する非効率な実行計画になりうるため
     // (getOvertakenRivals: commit adef304と同型の問題)。
-    return await db
+    const needsSongJoin =
+      !!search || !!levels?.length || !!difficulties?.length;
+
+    const picked = await db
       .selectFrom("follows as f")
       .modifyFront(sql`straight_join`)
       .innerJoin("scores as s", (join) =>
         join.onRef("s.userId", "=", "f.followingId").on("s.version", "=", version),
       )
+      .innerJoin("users as u", "s.userId", "u.userId")
+      .select(["s.logId", "s.lastPlayed"])
+      .where("f.followerId", "=", viewerId)
+      // 対象が公開、または対象が非公開でも承認記録がある場合のみ表示する。
+      // followsの存在だけでは判定できない(#275フォロー後方修正: 公開時代に
+      // 成立したfollowsには承認記録がないため、承認記録の有無も要求する)
+      .where((eb) =>
+        eb.or([
+          eb("u.isPublic", "=", 1),
+          eb.exists(
+            eb
+              .selectFrom("followApprovalNotifications as fan")
+              .select("fan.id")
+              .where("fan.recipientId", "=", viewerId)
+              .whereRef("fan.actorId", "=", "u.userId"),
+          ),
+        ]),
+      )
+      .$if(needsSongJoin, (qb) => {
+        let q = qb.innerJoin("songs as m", "s.songId", "m.songId");
+        if (search) {
+          q = q.where((eb) =>
+            eb.or([
+              eb("u.userName", "like", `%${search}%`),
+              eb("m.title", "like", `%${search}%`),
+            ]),
+          );
+        }
+        if (levels?.length) {
+          q = q.where("m.difficultyLevel", "in", levels);
+        }
+        if (difficulties?.length) {
+          q = q.where("m.difficulty", "in", difficulties);
+        }
+        return q;
+      })
+      .$if(mode === "played", (qb) =>
+        qb.where(({ exists, selectFrom }) =>
+          exists(
+            selectFrom("scores as v")
+              .select("v.logId")
+              .whereRef("v.songId", "=", "s.songId")
+              .where("v.userId", "=", viewerId)
+              .where("v.version", "=", version),
+          ),
+        ),
+      )
+      .$if(mode === "overtaken", (qb) =>
+        qb.where((eb) =>
+          eb.exists(
+            eb
+              .selectFrom("scores as v")
+              .select(eb.lit(1).as("one"))
+              .whereRef("v.songId", "=", "s.songId")
+              .where("v.userId", "=", viewerId)
+              .where("v.version", "=", version)
+              .having((heb) =>
+                heb.and([
+                  heb(heb.fn.max("v.exScore"), "<", heb.ref("s.exScore")),
+                  heb(
+                    heb.fn.max("v.exScore"),
+                    ">",
+                    heb.fn.coalesce(
+                      heb
+                        .selectFrom("scores as prev")
+                        .select((peb) => peb.fn.max("prev.exScore").as("m"))
+                        .whereRef("prev.userId", "=", "s.userId")
+                        .whereRef("prev.songId", "=", "s.songId")
+                        .whereRef("prev.logId", "<", "s.logId"),
+                      heb.lit(-1),
+                    ),
+                  ),
+                ]),
+              ),
+          ),
+        ),
+      )
+      .$if(!!lastId, (qb) =>
+        qb.where("s.lastPlayed", "<", dayjs.utc(lastId).toDate()),
+      )
+      .orderBy("s.lastPlayed", "desc")
+      .orderBy("s.logId", "desc")
+      .limit(limit)
+      .execute();
+
+    if (picked.length === 0) return [];
+    const pickedLogIds = picked.map((r) => r.logId);
+
+    return await db
+      .selectFrom("scores as s")
       .innerJoin("users as u", "s.userId", "u.userId")
       .innerJoin("songs as m", "s.songId", "m.songId")
       .innerJoin("songDef as d", (join) =>
@@ -106,82 +208,9 @@ class SocialTimelineRepository {
           .where("s4.version", "=", version)
           .as("myBestExScore"),
       ])
-      .where("f.followerId", "=", viewerId)
-      // 対象が公開、または対象が非公開でも承認記録がある場合のみ表示する。
-      // followsの存在だけでは判定できない(#275フォロー後方修正: 公開時代に
-      // 成立したfollowsには承認記録がないため、承認記録の有無も要求する)
-      .where((eb) =>
-        eb.or([
-          eb("u.isPublic", "=", 1),
-          eb.exists(
-            eb
-              .selectFrom("followApprovalNotifications as fan")
-              .select("fan.id")
-              .where("fan.recipientId", "=", viewerId)
-              .whereRef("fan.actorId", "=", "u.userId"),
-          ),
-        ]),
-      )
-      .$if(!!search, (qb) =>
-        qb.where((eb) =>
-          eb.or([
-            eb("u.userName", "like", `%${search}%`),
-            eb("m.title", "like", `%${search}%`),
-          ]),
-        ),
-      )
-      .$if(!!levels?.length, (qb) =>
-        qb.where("m.difficultyLevel", "in", levels!),
-      )
-      .$if(!!difficulties?.length, (qb) =>
-        qb.where("m.difficulty", "in", difficulties!),
-      )
-      .$if(mode === "played", (qb) =>
-        qb.where(({ exists, selectFrom }) =>
-          exists(
-            selectFrom("scores as v")
-              .select("v.logId")
-              .whereRef("v.songId", "=", "s.songId")
-              .where("v.userId", "=", viewerId)
-              .where("v.version", "=", version),
-          ),
-        ),
-      )
-      .$if(mode === "overtaken", (qb) =>
-        qb.where((eb) =>
-          eb.exists(
-            eb
-              .selectFrom("scores as v")
-              .select(eb.lit(1).as("one"))
-              .whereRef("v.songId", "=", "s.songId")
-              .where("v.userId", "=", viewerId)
-              .where("v.version", "=", version)
-              .having((heb) =>
-                heb.and([
-                  heb(heb.fn.max("v.exScore"), "<", heb.ref("s.exScore")),
-                  heb(
-                    heb.fn.max("v.exScore"),
-                    ">",
-                    heb.fn.coalesce(
-                      heb
-                        .selectFrom("scores as prev")
-                        .select((peb) => peb.fn.max("prev.exScore").as("m"))
-                        .whereRef("prev.userId", "=", "s.userId")
-                        .whereRef("prev.songId", "=", "s.songId")
-                        .whereRef("prev.logId", "<", "s.logId"),
-                      heb.lit(-1),
-                    ),
-                  ),
-                ]),
-              ),
-          ),
-        ),
-      )
-      .$if(!!lastId, (qb) =>
-        qb.where("s.lastPlayed", "<", dayjs.utc(lastId).toDate()),
-      )
+      .where("s.logId", "in", pickedLogIds)
       .orderBy("s.lastPlayed", "desc")
-      .limit(limit)
+      .orderBy("s.logId", "desc")
       .execute();
   }
 
