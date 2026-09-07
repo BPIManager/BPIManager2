@@ -569,6 +569,14 @@ describe.skipIf(!CAN_RUN)("API v1 <-> v2 parity", () => {
           expect(v2.json.meta).toBeDefined();
           expect(v2.json.meta).toHaveProperty("viewerId");
           expect(v2.json.meta).toHaveProperty("isSelf");
+          if (row.authed) {
+            // パリティテストは常に「自分」として認証しているので、
+            // 認証付き userScoped ルートでは meta.viewerId が解決されているはず
+            expect(v2.json.meta.viewerId).toBe(SELF_ID);
+            const selfTargeted =
+              !row.v1.includes(":pub") && !row.v1.includes(":priv");
+            expect(v2.json.meta.isSelf).toBe(selfTargeted);
+          }
         }
       } else {
         expect(v2.json.error).toBe(true);
