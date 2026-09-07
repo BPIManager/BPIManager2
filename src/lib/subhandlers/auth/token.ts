@@ -6,7 +6,6 @@ import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { type HandleOutcome } from "./_shared";
 
-
 /** POST /token （X-API-Key → Custom Token。公開・withRateLimit） */
 export async function handleTokenExchange(
   req: NextApiRequest,
@@ -32,4 +31,3 @@ export async function handleTokenExchange(
 }
 
 /* --------------------------- invite/[token].ts --------------------------- */
-

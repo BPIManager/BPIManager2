@@ -1,19 +1,19 @@
-import { allScoresAggregateRepo } from "@/lib/db/aggregates/allScores";
+import { allScoresRepo } from "@/lib/db/domains/allScores";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { accessError, err, ok } from "@/middlewares/api/apiResult";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 import type { NextApiRequest } from "next";
-import type { HandleOutcome, AllScoresList } from "./_shared";
+import type { HandleOutcome, ScoreHistory } from "./_shared";
 
-export async function handleAllScoresList(
+export async function handleAllScoresHistory(
   req: NextApiRequest,
-): Promise<HandleOutcome<AllScoresList>> {
-  const { userId } = req.query;
+): Promise<HandleOutcome<ScoreHistory>> {
+  const { userId, songId } = req.query;
   const targetUserId = typeof userId === "string" ? userId : "";
 
-  if (!targetUserId) {
+  if (!userId || !songId) {
     return {
-      result: err(400, "Invalid userId"),
+      result: err(400, "Parameters are missing."),
       targetUserId,
       viewerId: null,
     };
@@ -30,21 +30,13 @@ export async function handleAllScoresList(
       };
     }
 
-    const results = await allScoresAggregateRepo.getAllScoresList(
+    const history = await allScoresRepo.getScoreHistory(
       targetUserId,
-      {
-        search: req.query.search as string,
-        levels: req.query.levels as string,
-        difficulties: req.query.difficulties as string,
-        clearStates: req.query.clearStates as string,
-        sortKey: (req.query.sortKey as string) ?? "level",
-        sortOrder: (req.query.sortOrder as string) ?? "desc",
-      },
+      songId as string,
     );
 
     return {
-      result:
-        results && results.length > 0 ? ok(results) : err(404, "No data found"),
+      result: ok(history),
       targetUserId,
       viewerId: access.viewerId ?? null,
     };
@@ -57,4 +49,4 @@ export async function handleAllScoresList(
   }
 }
 
-/** GET /users/[userId]/all-scores/[songId]/history */
+/** GET /users/[userId]/all-scores/[songId]/ranking （本人のみ、withAuth） */

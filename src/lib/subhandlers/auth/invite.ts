@@ -60,4 +60,3 @@ export async function handleResolveInvite(
 }
 
 /* ---------------- usernames/[username]/availability.ts ---------------- */
-
