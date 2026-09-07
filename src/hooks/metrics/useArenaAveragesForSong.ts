@@ -1,6 +1,6 @@
 ﻿import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import useSWR from "swr";
-import { arenaAveragesFetcher } from "@/services/swr/arenaAverages";
+import { arenaAveragesFetcher } from "@/services/swr/songs/arenaAverages";
 
 export type ArenaAverages = Record<
   string,

@@ -2,7 +2,7 @@
 import { User as FirebaseUser } from "firebase/auth";
 import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { authFetch } from "@/utils/common/fetch";
-import { fetchSongPatternsPage } from "@/services/swr/songPatterns";
+import { fetchSongPatternsPage } from "@/services/swr/songs/songPatterns";
 import type { VoteType } from "@/types/db";
 
 export interface SongPatternItem {
