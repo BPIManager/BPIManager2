@@ -2,7 +2,7 @@
 import { useUser } from "@/contexts/users/UserContext";
 import { toast } from "sonner";
 import { useRouter } from "next/router";
-import { deleteBatch } from "@/services/swr/batchDelete";
+import { deleteBatch } from "@/services/swr/batches/batchDelete";
 
 export const useBatchDelete = (
   userId: string,
