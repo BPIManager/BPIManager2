@@ -4,7 +4,8 @@
  * ルート系統ごとの分割ファイルにある。
  */
 export type { HandleOutcome } from "./_shared";
-export * from "./rivalId";
+export * from "./rivalScores";
+export * from "./winLossHistory";
 export * from "./following";
 export * from "./followingScores";
 export * from "./monthlyReviewSummary";

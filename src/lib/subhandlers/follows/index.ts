@@ -7,5 +7,6 @@ export type { HandleOutcome } from "./_shared";
 export * from "./follows";
 export * from "./invite";
 export * from "./lists";
+export * from "./listMembers";
 export * from "./requests";
 export * from "./followers";
