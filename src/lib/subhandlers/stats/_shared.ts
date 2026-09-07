@@ -1,6 +1,9 @@
 import type { NextApiRequest } from "next";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 import type { StatsGroupBy } from "@/types/stats/bpiBoxStats";
+import type { StatsQuery } from "@/types/stats/query";
+import type { IIDXVersion } from "@/types/iidx/version";
+import type { ValidStep } from "@/schemas/stats/singleBPIDistribution";
 
 export const L12_DIFFICULTIES = IIDX_DIFFICULTIES;
 
@@ -42,4 +45,25 @@ export const DIFFICULTY_LABELS: Record<string, string> = {
   HYPER: "[H]",
   ANOTHER: "[A]",
   LEGGENDARIA: "[L]",
+};
+
+/* --- ルート別クエリ型（元 index.ts のインライン定義を集約） --- */
+export type StepQuery = StatsQuery & { step: ValidStep };
+export type NeighborQuery = StatsQuery & {
+  limit: number;
+  offset: number;
+  n: number;
+};
+export type RecommendedQuery = StatsQuery & { limit: number; offset: number };
+export type TotalBpiQuery = {
+  userId: string;
+  version: IIDXVersion;
+  asOf?: string;
+};
+export type AaaQuery = {
+  userId: string;
+  version: IIDXVersion;
+  level: number;
+  customGoalRatio?: number;
+  customGoalOffset?: number;
 };

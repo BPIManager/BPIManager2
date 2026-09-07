@@ -1,12 +1,21 @@
 /**
- * stats ドメイン（`users/[userId]/stats/**`）の subhandler 群のバレル。
- * ルート側でクエリ検証（parseStatsQuery / parseQuery）とアクセス制御
- * （withUserApiHandler）を行い、各 handle* は検証済みクエリを受け取り
- * `HandlerResult` を返す。実体は責務ごとの分割ファイルにある。
+ * stats ドメイン（`users/[userId]/stats/**`）の subhandler バレル。
+ * 実体は API ルート単位のファイルにある。共通型・ヘルパーは _shared.ts。
  */
-export * from "./charts";
-export * from "./distributions";
-export * from "./recommendations";
-export * from "./arena";
-export * from "./bpi";
+export * from "./aaaDifficulty";
+export * from "./activeDates";
+export * from "./activity";
+export * from "./areaRank";
+export * from "./arenaHistory";
+export * from "./availablePeriods";
+export * from "./bpiBoxStats";
+export * from "./bpmBpiDistribution";
+export * from "./djRankDistribution";
 export * from "./monthlyReview";
+export * from "./neighborRecommended";
+export * from "./radar";
+export * from "./recommended";
+export * from "./scoreRateDistribution";
+export * from "./singleBPIDistribution";
+export * from "./totalBPIhistory";
+export * from "./totalBpi";

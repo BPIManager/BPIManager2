@@ -1,22 +1,10 @@
 import fs from "fs/promises";
 import path from "path";
-import { usersRepo } from "@/lib/db/domains/users";
-import { monthlyReviewRepo } from "@/lib/db/aggregates/monthly-review";
 import { getArenaStatsHistory } from "@/lib/db/domains/arenaHistory";
-import { getUserAreaRank } from "@/lib/arena/prefectureRankings";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import type { HandlerResult } from "@/types/api";
 
-export async function handleStatsAreaRank(
-  q: { userId: string },
-): Promise<HandlerResult<unknown>> {
-  const user = await usersRepo.getIidxId(q.userId);
-  if (!user) return err(404, "User not found");
-  return ok(getUserAreaRank(user.iidxId) ?? null);
-}
-
-/** GET stats/arenaHistory */
 export async function handleStatsArenaHistory(q: {
   userId: string;
   version: string;
@@ -65,17 +53,3 @@ export async function handleStatsArenaHistory(q: {
 }
 
 /** GET stats/available-periods */
-export async function handleStatsAvailablePeriods(q: {
-  userId: string;
-  version: string;
-}): Promise<HandlerResult<unknown>> {
-  try {
-    const months = await monthlyReviewRepo.getAvailableMonths(
-      q.userId,
-      q.version,
-    );
-    return ok({ months });
-  } catch (error) {
-    return err(500, toErrorMessage(error));
-  }
-}
