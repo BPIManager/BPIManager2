@@ -1,7 +1,5 @@
-/**
- * bpi-optimizer / optimizeMemo の subhandler バレル。
- * 実体は責務ごとの分割ファイルにある。
- */
+/** bpi-optimizer / optimizeMemo の subhandler バレル。実体は API ルート単位ファイルにある。 */
 export type { HandleOutcome } from "./_shared";
 export * from "./optimizer";
-export * from "./memo";
+export * from "./optimizeMemoList";
+export * from "./optimizeMemoDelete";

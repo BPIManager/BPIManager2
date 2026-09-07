@@ -71,7 +71,9 @@ export async function handleVersionSummary(
           ? Number(row.prevExScore)
           : null;
       const myBpi =
-        row.myBpi !== null && row.myBpi !== undefined ? Number(row.myBpi) : null;
+        row.myBpi !== null && row.myBpi !== undefined
+          ? Number(row.myBpi)
+          : null;
       const prevBpi =
         row.prevBpi !== null && row.prevBpi !== undefined
           ? Number(row.prevBpi)

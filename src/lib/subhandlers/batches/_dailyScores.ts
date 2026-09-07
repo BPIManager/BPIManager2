@@ -191,4 +191,3 @@ export async function handleCreatedAtBase(
     },
   };
 }
-

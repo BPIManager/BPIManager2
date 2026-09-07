@@ -56,4 +56,3 @@ export function parsePeriodDates(
   const dateStr = d.format("YYYY-MM-DD");
   return { startDate: dateStr, endDate: dateStr };
 }
-

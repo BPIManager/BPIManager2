@@ -8,8 +8,6 @@ import { accessError, err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { targetOf, type HandleOutcome } from "./_shared";
 
-
-
 const winLossHistoryQuerySchema = z.object({
   userId: z.string().min(1),
   rivalId: z.string().min(1),

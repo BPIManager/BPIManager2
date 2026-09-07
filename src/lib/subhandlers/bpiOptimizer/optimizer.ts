@@ -15,7 +15,6 @@ import type {
   OptimizerOptions,
 } from "@/types/bpi-optimizer";
 
-
 /** GET /users/[userId]/analytics/bpi-optimizer （withUserApiHandler） */
 export async function handleBpiOptimizer(
   req: NextApiRequest,
@@ -174,4 +173,3 @@ export async function handleBpiOptimizer(
     };
   }
 }
-

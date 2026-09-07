@@ -7,4 +7,5 @@ export * from "./oauthClient";
 export * from "./token";
 export * from "./invite";
 export * from "./username";
-export * from "./followRequests";
+export * from "./submitFollowRequest";
+export * from "./withdrawFollowRequest";

@@ -70,4 +70,3 @@ export function createOvertakenMap(
     return acc;
   }, {});
 }
-

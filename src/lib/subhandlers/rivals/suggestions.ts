@@ -19,8 +19,7 @@ export async function handleRivalSuggestions(
   const orderMode =
     (o as "distance" | "desc" | "newest" | "supporters") || "distance";
   const limit = orderMode === "supporters" ? 1000 : 20;
-  const offset =
-    orderMode === "supporters" ? 0 : (currentPage - 1) * limit;
+  const offset = orderMode === "supporters" ? 0 : (currentPage - 1) * limit;
   const sortKey = (s as string) || "totalBpi";
 
   try {
