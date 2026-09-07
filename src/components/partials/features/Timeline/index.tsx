@@ -13,7 +13,10 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useTimelineFilter } from "@/hooks/social/useTimelineFilter";
 import { IidxDifficulty } from "@/types/iidx/difficulty";
-import { PageContainer, PageHeader } from "@/components/partials/common/PageChrome/Header";
+import {
+  PageContainer,
+  PageHeader,
+} from "@/components/partials/common/PageChrome/Header";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 import { versionTitles } from "@/constants/iidx/versionTitles";
@@ -83,7 +86,7 @@ const TimelineContainer = () => {
               <div className="flex flex-col gap-1">
                 <FilterHeader label={t("timeline.version.label")} />
                 <Select value={version} onValueChange={setVersion}>
-                  <SelectTrigger className="h-8 text-xs">
+                  <SelectTrigger className="h-8 text-xs w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -131,11 +134,7 @@ const TimelineContainer = () => {
               />
             </div>
 
-            <TimelineList
-              mode={mode}
-              params={filterParams}
-              version={version}
-            />
+            <TimelineList mode={mode} params={filterParams} version={version} />
           </div>
         </div>
       </PageContainer>
