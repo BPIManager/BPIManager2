@@ -5,7 +5,7 @@ import { detectCsvType, validateCsvTypeForVersion } from "@/utils/csv/detect";
 import { toast } from "sonner";
 import { User as FirebaseUser } from "firebase/auth";
 import { safeClipboardRead, safeClipboardClear } from "@/utils/clipboard";
-import { submitBatchImport } from "@/services/swr/batchImport";
+import { submitBatchImport } from "@/services/swr/batches/batchImport";
 
 /**
  * CSV データのバッチインポート処理を管理するフック。

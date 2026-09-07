@@ -1,4 +1,4 @@
-import { useStatsData } from "@/services/swr/fetchStats";
+import { useStatsData } from "@/services/swr/stats";
 import { RadarResponse } from "@/types/stats/radar";
 
 /**

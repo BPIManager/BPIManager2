@@ -3,7 +3,7 @@ import useSWRMutation from "swr/mutation";
 import { useUser } from "@/contexts/users/UserContext";
 import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import type { TicketItem, TicketRecommendResult, TicketSortKey, ScoreMode } from "@/types/tickets";
-import { searchTickets, loadMoreTicketResults } from "@/services/swr/ticketSearch";
+import { searchTickets, loadMoreTicketResults } from "@/services/swr/tickets";
 
 export interface TicketCardState {
   result: TicketRecommendResult;

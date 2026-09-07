@@ -1,5 +1,5 @@
 import useSWR from "swr";
-import { activeArenaPlayersFetcher } from "@/services/swr/activeArenaPlayers";
+import { activeArenaPlayersFetcher } from "@/services/swr/arena/activeArenaPlayers";
 
 export interface ActiveArenaData {
   generatedAt: string;

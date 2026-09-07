@@ -2,7 +2,7 @@
 import { toast } from "sonner";
 import { User as FirebaseUser } from "firebase/auth";
 import { safeClipboardRead, safeClipboardClear } from "@/utils/clipboard";
-import { submitTowerImport } from "@/services/swr/iidxTowerImport";
+import { submitTowerImport } from "@/services/swr/iidxTower";
 
 type TowerRow = { playDate: string; keyCount: number; scratchCount: number };
 

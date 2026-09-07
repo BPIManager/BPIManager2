@@ -5,7 +5,7 @@ import {
   fetchStatsPrivacy,
   checkUserNameAvailability,
   saveProfile,
-} from "@/services/swr/editProfile";
+} from "@/services/swr/profile/editProfile";
 
 /**
  * プロフィール編集フォームの状態管理・バリデーション・保存処理を行うフック。

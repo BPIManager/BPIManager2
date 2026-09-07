@@ -8,7 +8,7 @@ import type { IIDXVersion } from "@/types/iidx/version";
 import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 import { SongWithScore } from "@/types/songs/score";
 import { useUser } from "@/contexts/users/UserContext";
-import { fetchScoresForVersion } from "@/services/swr/dataExport";
+import { fetchScoresForVersion } from "@/services/swr/scores/dataExport";
 
 export const EXPORT_FIELDS = [
   "version",
