@@ -3,7 +3,7 @@ import { useCallback, useMemo, useState } from "react";
 import { User as FirebaseUser } from "firebase/auth";
 import type { OptimizationResult } from "@/types/bpi-optimizer";
 import { fetcherV2 } from "@/services/swr/fetchV2";
-import { saveOptimizeMemo, deleteOptimizeMemo } from "@/services/swr/optimizeMemo";
+import { saveOptimizeMemo, deleteOptimizeMemo } from "@/services/swr/analytics";
 
 export interface OptimizeMemo {
   reportId: string;
