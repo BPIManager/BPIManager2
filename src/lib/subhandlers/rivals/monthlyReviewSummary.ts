@@ -47,10 +47,14 @@ export async function handleRivalMonthlyReviewSummary(
       : dayjs.tz(`${month as string}-01`).format("YYYY-MM-DD");
     const monthEnd = isYearMode
       ? dayjs.tz(`${month}-12-31`).format("YYYY-MM-DD")
-      : dayjs.tz(`${month as string}-01`).endOf("month").format("YYYY-MM-DD");
+      : dayjs
+          .tz(`${month as string}-01`)
+          .endOf("month")
+          .format("YYYY-MM-DD");
 
-    const rivalRows =
-      await followListAggregateRepo.getPublicFollowingUsers(userId as string);
+    const rivalRows = await followListAggregateRepo.getPublicFollowingUsers(
+      userId as string,
+    );
     if (rivalRows.length === 0) {
       return { result: ok({ rivals: [] }), targetUserId, viewerId };
     }
