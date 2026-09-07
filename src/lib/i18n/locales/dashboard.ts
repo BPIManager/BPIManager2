@@ -1115,6 +1115,18 @@ export const dashboardTranslations = {
     "zh-TW": "意見回饋",
     ko: "의견 보내기",
   },
+  "dashboard.bpiChangeNotice.previewLink": {
+    ja: "新方式で自分のBPIを見る",
+    en: "Preview my new BPI",
+    "zh-TW": "預覽我的新制BPI",
+    ko: "새 방식으로 내 BPI 보기",
+  },
+  "dashboard.bpiChangeNotice.theoryLink": {
+    ja: "理論的な説明（Notion）",
+    en: "Theory & rationale (Notion)",
+    "zh-TW": "理論說明（Notion）",
+    ko: "이론적 설명 (Notion)",
+  },
   "dashboard.bpiChangeNotice.dismiss": {
     ja: "閉じる",
     en: "Dismiss",

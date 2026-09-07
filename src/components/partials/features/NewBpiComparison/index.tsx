@@ -8,11 +8,13 @@ import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { BpiCalculator } from "@/lib/bpi";
 import { NewBpiCalculator } from "@/lib/bpi/newBpi";
 import { calculateRadar, ALL_CATEGORIES } from "@/lib/radar/calculator";
+import { newBpiSongParamMap } from "@/constants/iidx/newBpi/songParams";
 import NewBpiComparisonUi, { NewBpiRow, SortKey } from "./ui";
 import type { CurvePoint } from "./CurveChart";
 import type { FormulaSongInfo } from "./FormulaCard";
 import type { ScoreSimulatorSongInfo } from "./ScoreSimulatorCard";
 import type { ScoreRateRow } from "./ScoreRateTable";
+import type { SongParamsInfo } from "./SongParamsPanel";
 
 interface Props {
   userId: string;
@@ -33,7 +35,7 @@ const SCORE_RATE_STEPS: number[] = (() => {
 })();
 
 /**
- * issue #299〜304 検証用: 自分のスコアで現行BPIと新方式BPI(分布ベース)を
+ * 分布ベースの新方式BPIの検証用: 自分のスコアで現行BPIと新方式BPIを
  * 楽曲ごとに見比べるための集計ロジック。
  *
  * 新方式のパラメータ(mu/sigma)は `songDef` に持たせず `songParams.json`
@@ -49,6 +51,11 @@ export default function NewBpiComparison({ userId }: Props) {
   const [searchInput, setSearchInput] = useState("");
   const [viewedUserId, setViewedUserId] = useState(userId);
   const isViewingSelf = viewedUserId === userId;
+
+  // 「一覧」タブの行アコーディオン。同じ行を再クリックで閉じる（1行ずつ）。
+  const handleToggleSong = (songId: number) => {
+    setSelectedSongId((prev) => (prev === songId ? null : songId));
+  };
 
   const handleSearch = () => {
     const trimmed = searchInput.trim();
@@ -358,6 +365,25 @@ export default function NewBpiComparison({ userId }: Props) {
       }
     : null;
 
+  // 「一覧」タブのアコーディオン用。楽曲固有の数値を一箇所に集約する。
+  const selectedSongParams: SongParamsInfo | null = selectedSong
+    ? {
+        coef:
+          selectedSong.coef && selectedSong.coef > 0
+            ? selectedSong.coef
+            : DEFAULT_POW_COEF,
+        m: selectedSong.notes * 2,
+        kaidenAvg: selectedSong.kaidenAvg,
+        wrScore: selectedSong.wrScore,
+        mu: selectedSongNewParams?.mu ?? null,
+        sigma: selectedSongNewParams?.sigma ?? null,
+        n: newBpiSongParamMap.get(selectedSong.songId)?.n ?? null,
+        z100: selectedSongNewParams?.z100 ?? null,
+        gamma: selectedSongNewParams?.gamma ?? null,
+        z0: selectedSongNewParams?.z0 ?? null,
+      }
+    : null;
+
   const selectedSongSimulator: ScoreSimulatorSongInfo | null = selectedSong
     ? {
         songId: selectedSong.songId,
@@ -393,6 +419,9 @@ export default function NewBpiComparison({ userId }: Props) {
       curveEligibleRows={curveEligibleRows}
       selectedSongId={effectiveSongId}
       onSelectedSongIdChange={setSelectedSongId}
+      listExpandedSongId={selectedSongId}
+      onToggleListSong={handleToggleSong}
+      selectedSongParams={selectedSongParams}
       curveData={curveData}
       scoreRateRows={scoreRateRows}
       selectedSongUserPoint={

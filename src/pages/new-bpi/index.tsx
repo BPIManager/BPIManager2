@@ -7,7 +7,7 @@ import { useTranslation } from "@/hooks/common/useTranslation";
 import NewBpiComparison from "@/components/partials/features/NewBpiComparison";
 
 /**
- * issue #299〜304（単曲BPIの分布ベース再定義）の検証用ページ。
+ * 単曲BPIの分布ベース再定義（新方式BPI）の検証用ページ。
  * 自分のスコアで現行BPIと新方式BPIを楽曲ごとに見比べられる。
  */
 export default function NewBpiPage() {

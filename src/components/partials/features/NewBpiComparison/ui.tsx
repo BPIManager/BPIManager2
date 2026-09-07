@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
+import { ChevronDown, ChevronRight, ExternalLink } from "lucide-react";
 import { DashCard } from "@/components/ui/dashcard";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -32,6 +33,7 @@ import ScoreSimulatorCard, {
   ScoreSimulatorSongInfo,
 } from "./ScoreSimulatorCard";
 import ScoreRateTable, { ScoreRateRow } from "./ScoreRateTable";
+import SongParamsPanel, { SongParamsInfo } from "./SongParamsPanel";
 import DeltaCell from "./DeltaCell";
 import UserSearchBar from "./UserSearchBar";
 import ListSummary from "./ListSummary";
@@ -44,6 +46,41 @@ export type SortKey =
   | "currentBpiDesc"
   | "newBpiDesc";
 export type AccessState = "loading" | "not-found" | "private" | "ok";
+
+/** 新方式BPIの理論的な説明（Notion）。 */
+const THEORY_URL = "https://app.notion.com/p/BPI-3d29989ca87a819981a6eb5d742c5bd7";
+/** 新方式BPIの設計判断・経緯を追跡している GitHub issue。 */
+const DESIGN_ISSUE_URL =
+  "https://github.com/BPIManager/BPIManager2/issues/309";
+
+const NoticeCard = () => {
+  const { t } = useTranslation();
+  return (
+    <DashCard className="border-amber-500/40 bg-amber-500/5 text-sm text-muted-foreground">
+      <p>{t("newBpi.notice")}</p>
+      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+        <a
+          href={THEORY_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 font-medium text-bpim-primary hover:underline"
+        >
+          {t("newBpi.notice.theoryLink")}
+          <ExternalLink className="h-3 w-3" />
+        </a>
+        <a
+          href={DESIGN_ISSUE_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 font-medium text-bpim-primary hover:underline"
+        >
+          {t("newBpi.notice.issueLink")}
+          <ExternalLink className="h-3 w-3" />
+        </a>
+      </div>
+    </DashCard>
+  );
+};
 
 export interface NewBpiRow {
   songId: number;
@@ -86,6 +123,10 @@ interface Props {
   curveEligibleRows: NewBpiRow[];
   selectedSongId: number | null;
   onSelectedSongIdChange: (songId: number) => void;
+  /** 「一覧」タブで現在アコーディオン展開している行（null = 未展開）。 */
+  listExpandedSongId: number | null;
+  onToggleListSong: (songId: number) => void;
+  selectedSongParams: SongParamsInfo | null;
   curveData: CurvePoint[] | null;
   scoreRateRows: ScoreRateRow[] | null;
   scoreRateMaxScore: number | null;
@@ -182,9 +223,27 @@ const ListTab = ({
   onSortKeyChange,
   radarCurrent,
   radarNew,
+  listExpandedSongId,
+  onToggleListSong,
+  selectedSongParams,
+  curveData,
+  scoreRateRows,
+  scoreRateMaxScore,
+  selectedSongUserPoint,
 }: Pick<
   Props,
-  "rows" | "sortKey" | "onSortKeyChange" | "radarCurrent" | "radarNew"
+  | "rows"
+  | "sortKey"
+  | "onSortKeyChange"
+  | "radarCurrent"
+  | "radarNew"
+  | "listExpandedSongId"
+  | "onToggleListSong"
+  | "selectedSongParams"
+  | "curveData"
+  | "scoreRateRows"
+  | "scoreRateMaxScore"
+  | "selectedSongUserPoint"
 >) => {
   const { t } = useTranslation();
   const [levelFilter, setLevelFilter] = useState<LevelFilter>("all");
@@ -275,28 +334,85 @@ const ListTab = ({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sorted.map((row) => (
-                <TableRow key={row.songId}>
-                  <TableCell className="max-w-60 truncate font-medium">
-                    {row.title}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">
-                      {row.difficultyLevel} {row.difficulty}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right tabular-nums">{row.exScore}</TableCell>
-                  <TableCell className="text-right tabular-nums">
-                    {row.currentBpi !== null ? row.currentBpi.toFixed(2) : "—"}
-                  </TableCell>
-                  <TableCell className="text-right tabular-nums">
-                    {row.newBpi !== null ? row.newBpi.toFixed(2) : t("newBpi.table.noParam")}
-                  </TableCell>
-                  <TableCell className="text-right tabular-nums">
-                    <DeltaCell delta={row.delta} />
-                  </TableCell>
-                </TableRow>
-              ))}
+              {sorted.map((row) => {
+                const isExpanded = listExpandedSongId === row.songId;
+                return (
+                  <Fragment key={row.songId}>
+                    <TableRow
+                      aria-expanded={isExpanded}
+                      tabIndex={0}
+                      onClick={() => onToggleListSong(row.songId)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          onToggleListSong(row.songId);
+                        }
+                      }}
+                      className={`cursor-pointer ${
+                        isExpanded ? "bg-bpim-bg/40" : ""
+                      }`}
+                    >
+                      <TableCell className="max-w-60 truncate font-medium">
+                        <span className="mr-1 inline-flex align-middle text-muted-foreground">
+                          {isExpanded ? (
+                            <ChevronDown className="h-3.5 w-3.5" />
+                          ) : (
+                            <ChevronRight className="h-3.5 w-3.5" />
+                          )}
+                        </span>
+                        {row.title}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">
+                          {row.difficultyLevel} {row.difficulty}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums">
+                        {row.exScore}
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums">
+                        {row.currentBpi !== null ? row.currentBpi.toFixed(2) : "—"}
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums">
+                        {row.newBpi !== null
+                          ? row.newBpi.toFixed(2)
+                          : t("newBpi.table.noParam")}
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums">
+                        <DeltaCell delta={row.delta} />
+                      </TableCell>
+                    </TableRow>
+                    {isExpanded && (
+                      <TableRow className="hover:bg-transparent">
+                        <TableCell colSpan={6} className="bg-bpim-bg/40 p-3">
+                          <div className="flex flex-col gap-4">
+                            {selectedSongParams && (
+                              <SongParamsPanel {...selectedSongParams} />
+                            )}
+                            {curveData && (
+                              <DashCard>
+                                <p className="mb-2 text-xs text-muted-foreground">
+                                  {t("newBpi.chart.desc")}
+                                </p>
+                                <CurveChart
+                                  data={curveData}
+                                  userPoint={selectedSongUserPoint}
+                                />
+                              </DashCard>
+                            )}
+                            {scoreRateRows && scoreRateMaxScore !== null && (
+                              <ScoreRateTable
+                                rows={scoreRateRows}
+                                maxScore={scoreRateMaxScore}
+                              />
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </Fragment>
+                );
+              })}
             </TableBody>
           </Table>
         )}
@@ -442,9 +558,7 @@ export default function NewBpiComparisonUi(props: Props) {
 
           {props.accessState === "ok" && !props.isDataLoading && (
             <>
-              <DashCard className="border-amber-500/40 bg-amber-500/5 text-sm text-muted-foreground">
-                {t("newBpi.notice")}
-              </DashCard>
+              <NoticeCard />
 
               <SummaryCards
                 currentTotalBpi={props.currentTotalBpi}
@@ -466,6 +580,13 @@ export default function NewBpiComparisonUi(props: Props) {
                     onSortKeyChange={props.onSortKeyChange}
                     radarCurrent={props.radarCurrent}
                     radarNew={props.radarNew}
+                    listExpandedSongId={props.listExpandedSongId}
+                    onToggleListSong={props.onToggleListSong}
+                    selectedSongParams={props.selectedSongParams}
+                    curveData={props.curveData}
+                    scoreRateRows={props.scoreRateRows}
+                    scoreRateMaxScore={props.scoreRateMaxScore}
+                    selectedSongUserPoint={props.selectedSongUserPoint}
                   />
                 </TabsContent>
                 <TabsContent value="players">
