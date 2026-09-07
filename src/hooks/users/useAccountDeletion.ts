@@ -2,7 +2,7 @@
 import { useUser } from "@/contexts/users/UserContext";
 import { toast } from "sonner";
 import { auth } from "@/lib/firebase";
-import { deleteAccount } from "@/services/swr/accountDeletion";
+import { deleteAccount } from "@/services/swr/profile/accountDeletion";
 
 export const useAccountDeletion = () => {
   const { user, fbUser } = useUser();
