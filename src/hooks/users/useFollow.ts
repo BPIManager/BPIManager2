@@ -1,6 +1,6 @@
 ﻿import { useState } from "react";
 import { useUser } from "@/contexts/users/UserContext";
-import { requestFollowUser } from "@/services/swr/follow";
+import { requestFollowUser } from "@/services/swr/follows";
 
 /**
  * 指定ユーザーへのフォロー / アンフォロー操作を行うフック。
