@@ -6,19 +6,20 @@
 #
 # 使い方: deploy.sh <リリース名（=コミットSHA）>
 #
-# 前提（DEPLOY.md 参照）:
-#   ~/bpim2/shared/.env                 本番環境変数（リリースの外に置く）
-#   ~/bpim2/shared/ecosystem.config.js  pm2 設定（instances: 1）
-#   ~/bpim2/shared/data/                実行時生成物の永続先（public/data の実体）
+# 前提（DEPLOY.md 参照）。<base> は既定で $HOME/bpim2、DEPLOY_ROOT で上書き可:
+#   <base>/shared/.env                 本番環境変数（リリースの外に置く）
+#   <base>/shared/ecosystem.config.js  pm2 設定（instances: 1）
+#   <base>/shared/data/                実行時生成物の永続先（public/data の実体）
 #   node / pnpm / pm2 が PATH にあること
 #
+# 実行ユーザーは問わない（このスクリプトを走らせるユーザーの権限で完結する）。
 # DB マイグレーションはこのスクリプトでは行わない。スキーマ変更は
 # デプロイ前に手動で当てる運用（DEPLOY.md「DB スキーマ変更」を参照）。
 #
 set -euo pipefail
 
 REL="${1:?usage: deploy.sh <release-sha>}"
-BASE="$HOME/bpim2"
+BASE="${DEPLOY_ROOT:-$HOME/bpim2}"
 NEW="$BASE/releases/$REL"
 SHARED="$BASE/shared"
 HEALTH_URL="http://127.0.0.1:3000/api/health"

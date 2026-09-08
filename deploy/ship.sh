@@ -1,19 +1,20 @@
 #!/usr/bin/env bash
 #
 # GitHub Actions ランナー側で実行する。ビルド済みの成果物を VPS の
-# releases/<SHA>/ へ転送し、リモートの deploy.sh を叩いて切り替えさせる。
+# <base>/releases/<SHA>/ へ転送し、リモートの deploy.sh を叩いて切り替えさせる。
 #
-# 必要な環境変数（ci.yml の deploy ジョブが Secret から渡す）:
+# 必要な環境変数（ci.yml の deploy ジョブが Secret / Variable から渡す）:
 #   DEPLOY_SSH_KEY  デプロイ用 SSH 秘密鍵（PEM 全文）
 #   VPS_HOST        接続先ホスト
-#   VPS_USER        接続ユーザー（root 想定。~ がそのユーザーのホーム）
+#   VPS_USER        接続ユーザー
+#   DEPLOY_PATH     （任意）接続ユーザーのホームからの相対パス。既定 "bpim2"
 #
 set -euo pipefail
 
 : "${DEPLOY_SSH_KEY:?}" "${VPS_HOST:?}" "${VPS_USER:?}"
 
 REL="${GITHUB_SHA:?}"
-REMOTE_BASE="bpim2" # ~/bpim2 （VPS_USER のホーム配下）
+REMOTE_BASE="${DEPLOY_PATH:-bpim2}" # 接続ユーザーのホーム配下
 DEST="${VPS_USER}@${VPS_HOST}:~/${REMOTE_BASE}/releases/${REL}/"
 
 KEY_FILE="$(mktemp)"
