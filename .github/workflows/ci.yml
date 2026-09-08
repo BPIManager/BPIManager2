@@ -5,7 +5,8 @@ on:
     branches: [master]
   pull_request:
 
-# 同一ブランチで新しい push があったら進行中の実行をキャンセルする
+# 同一ブランチで新しい push があったら進行中の実行をキャンセルする。
+# ※ deploy ジョブは別 concurrency グループ（下）で直列化するため影響しない。
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
@@ -42,3 +43,54 @@ jobs:
       - run: pnpm test:ci
 
       - run: pnpm build
+
+  # 本番 VPS へのデプロイ。master への push で verify 通過後にのみ実行する。
+  # リポジトリ変数 DEPLOY_ENABLED=true と 3 つの Secret が揃うまでは skip される
+  # （このジョブが無効な間も verify だけは通常どおり動く）。
+  # 手順の全体は DEPLOY.md を参照。
+  deploy:
+    needs: verify
+    if: >-
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/master' &&
+      vars.DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    permissions:
+      contents: write # Release 作成のため
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0 # Release ノート生成に履歴が要る
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # 本番と同じ手順でビルドし、壊れた成果物を VPS に送らないことを保証する
+      - run: pnpm build
+
+      - name: Ship to VPS and restart
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_KEY }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+        run: bash deploy/ship.sh
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="deploy-$(date -u +%Y%m%d-%H%M%S)-${GITHUB_SHA::7}"
+          gh release create "$TAG" \
+            --target "$GITHUB_SHA" \
+            --title "$TAG" \
+            --generate-notes

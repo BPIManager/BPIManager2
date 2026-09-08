@@ -1,0 +1,3 @@
+# シェルスクリプトは実行環境（Linux ランナー / VPS）で必ず LF。
+# CRLF が混ざると shebang や `set -euo pipefail` の行末 \r で bash が失敗する。
+*.sh text eol=lf
