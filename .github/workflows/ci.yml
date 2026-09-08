@@ -1,0 +1,40 @@
+name: ci
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+# 同一ブランチで新しい push があったら進行中の実行をキャンセルする
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # setup-node の cache: pnpm 判定に pnpm 本体が必要なので先に入れる。
+      # バージョンは package.json の packageManager から解決される。
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm exec tsc --noEmit
+
+      - run: pnpm lint
+
+      # integration テストはローカル dev サーバー + DB 前提のため CI では回さない
+      - run: pnpm test:ci
+
+      - run: pnpm build
