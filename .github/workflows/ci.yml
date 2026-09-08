@@ -17,7 +17,11 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
+      # CI では push しないため GITHUB_TOKEN を .git/config に残さない
+      # （PR ブランチのコードから認証情報を読めないようにする）。
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       # setup-node の cache: pnpm 判定に pnpm 本体が必要なので先に入れる。
       # バージョンは package.json の packageManager から解決される。
