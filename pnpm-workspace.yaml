@@ -1,6 +1,20 @@
+# ビルドスクリプト（postinstall 等）の実行を許可する依存の一覧。
+# `.npmrc` の `ignore-scripts=true` により既定では全依存の install スクリプトが
+# 無視されるため、ネイティブバイナリ配置等で build が要るものだけをここで許可する。
+# この一覧に無い依存の build が無視されると pnpm 10+ は
+# `ERR_PNPM_IGNORED_BUILDS` で異常終了する（CI のクリーンインストールで顕在化）。
+# pnpm のバージョン差でどちらのキーが読まれても効くよう両形式で列挙する。
 allowBuilds:
   "@firebase/util": true
+  esbuild: true
   msw: true
   protobufjs: true
   sharp: true
   unrs-resolver: true
+onlyBuiltDependencies:
+  - "@firebase/util"
+  - esbuild
+  - msw
+  - protobufjs
+  - sharp
+  - unrs-resolver
