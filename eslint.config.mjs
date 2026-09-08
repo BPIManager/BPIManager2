@@ -20,6 +20,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // `scripts/` は .gitignore 済みのローカル専用スクリプト置き場。CI の
+    // チェックアウトには存在しないため、ローカルの `pnpm lint` を CI と
+    // 揃える意味でも lint 対象から外す。
+    "scripts/**",
   ]),
 ]);
 
