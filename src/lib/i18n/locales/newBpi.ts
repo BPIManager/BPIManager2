@@ -65,6 +65,12 @@ export const newBpiTranslations = {
     "zh-TW": "難度",
     ko: "난이도",
   },
+  "newBpi.table.radar": {
+    ja: "レーダー",
+    en: "Radar",
+    "zh-TW": "雷達",
+    ko: "레이더",
+  },
   "newBpi.table.exScore": {
     ja: "EXスコア",
     en: "EX Score",

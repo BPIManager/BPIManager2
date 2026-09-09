@@ -9,6 +9,7 @@ import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { BpiCalculator } from "@/lib/bpi";
 import { NewBpiCalculator } from "@/lib/bpi/newBpi";
 import { calculateRadar, ALL_CATEGORIES } from "@/lib/radar/calculator";
+import { topElementMap } from "@/constants/iidx/radars/topElements";
 import { newBpiSongParamMap } from "@/constants/iidx/newBpi/songParams";
 import NewBpiComparisonUi, { NewBpiRow, SortKey } from "./ui";
 import type { CurvePoint } from "./CurveChart";
@@ -26,6 +27,17 @@ const BPI_TICKS = [-15, -10, 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 
 /** `coef` 未設定時に本番実装(`BpiCalculator`)が使うデフォルト値。式表示用。 */
 const DEFAULT_POW_COEF = 1.175;
+
+/** "150" → [150,150]、"75-300" → [75,300]。パースできなければ null。 */
+function parseBpmRange(bpm: string | null): [number, number] | null {
+  if (!bpm) return null;
+  const nums = bpm
+    .split("-")
+    .map((p) => Number(p.trim()))
+    .filter((n) => Number.isFinite(n) && n > 0);
+  if (nums.length === 0) return null;
+  return [Math.min(...nums), Math.max(...nums)];
+}
 
 /** スコアレート内訳テーブルの行(BPI0相当より上): 90〜94%は1%刻み、95%以降は0.5%刻み。 */
 const SCORE_RATE_STEPS: number[] = (() => {
@@ -157,6 +169,7 @@ export default function NewBpiComparison({ userId }: Props) {
         wrScore: s.wrScore,
       });
       const actual = actualRankBySong.get(s.songId) ?? null;
+      const bpmRange = parseBpmRange(s.bpm);
       return {
         songId: s.songId,
         title: s.title,
@@ -172,6 +185,10 @@ export default function NewBpiComparison({ userId }: Props) {
             : null,
         actualRank: actual?.rank ?? null,
         actualTotalPlayers: actual?.totalPlayers ?? null,
+        radarTop: topElementMap.get(`${s.title}___${s.difficulty}`) ?? null,
+        bpm: s.bpm,
+        bpmLo: bpmRange?.[0] ?? null,
+        bpmHi: bpmRange?.[1] ?? null,
       };
     });
 
