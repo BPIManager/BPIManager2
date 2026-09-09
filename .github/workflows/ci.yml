@@ -83,6 +83,8 @@ jobs:
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_KEY }}
           VPS_HOST: ${{ secrets.VPS_HOST }}
           VPS_USER: ${{ secrets.VPS_USER }}
+          # 任意。SSH ポート（未設定なら 22）
+          VPS_PORT: ${{ secrets.VPS_PORT }}
           # 任意。接続ユーザーのホームからの相対パス（未設定なら bpim2）
           DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
         run: bash deploy/ship.sh

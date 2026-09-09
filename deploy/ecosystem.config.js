@@ -13,16 +13,21 @@ module.exports = {
     {
       name: "bpim2",
       cwd: `${BASE}/current`,
-      script: "./node_modules/.bin/next",
-      args: "start -p 3000",
+      // pnpm の node_modules/.bin/next は sh スクリプトの shim で pm2 が
+      // node で実行しようとして失敗する。next 本体の JS エントリを直接指す。
+      script: "node_modules/next/dist/bin/next",
+      args: "start -p 3005",
       instances: 1,
       exec_mode: "fork",
-      max_memory_restart: "1G",
+      // 起動時の instrumentation cron（Radar 全曲再計算 / Arena 集計）が
+      // 一時的に ~1GB 使う。1G だとここで restart ループに入るため余裕を持たせる。
+      // 定常時は ~100MB なので、これを超え続けるのはリークとみなして再起動する。
+      max_memory_restart: "1536M",
       // cron の後始末と Discord gateway の切断に猶予を与える
       kill_timeout: 10000,
       env: {
         NODE_ENV: "production",
-        PORT: "3000",
+        PORT: "3005",
       },
     },
   ],
