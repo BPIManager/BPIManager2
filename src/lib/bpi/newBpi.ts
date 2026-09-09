@@ -119,8 +119,8 @@ export class NewBpiCalculator {
    * （w = d² / (d² + 1)、d = |ズレ| / IQR）。中央値付近の曲ほどgamma=1に
    * 近づき、曲間のばらつきに対して明確に外れている曲ほど素のgammaに近づく。
    *
-   * この w は {@link predictUnplayedBpi} の縮小重み w = den/(den+σε²) と
-   * 同じ関数形をしているが、ベイズ的に導出された量ではない。あちらの den は
+   * この w は {@link predictUnplayedBpi} の縮小重み w = info/(info+1) と
+   * 同じ関数形をしているが、ベイズ的に導出された量ではない。あちらの info は
    * 推定の情報量（事後分散の補数として厳密に出てくる）だが、ここの d は
    * 情報量でも精度でも分散でもなく「IQR何個分ズレているか」という経験的な
    * 物差しで、d²/(d²+1) は縮小推定の式の形を借りただけの減衰関数（d=1で
@@ -260,41 +260,52 @@ export class NewBpiCalculator {
   }
 
   /**
-   * 加重最小二乗解 a_hat と、その情報量 den(= Σ_j sigma_j²) をあわせて返す。
-   * den はそのまま「この推定にどれだけ根拠があるか」を表す量で、
-   * 縮小推定（事後分散の逆数の一部）にも未プレイ曲埋めの信頼度重み
-   * （{@link predictUnplayedBpi}）にも使う。
+   * 逆分散加重の最小二乗解 a_hat と、その情報量 info をあわせて返す
+   * （決定記録0010）。
+   *
+   * 曲ごとの残差分散 `residualVar`（`songParams.json`。ALS残差から実測、
+   * 未収録曲は全曲共通の `NEW_BPI_RESIDUAL_RMSE²` にフォールバック）で
+   * 各観測を重み付けする:
+   *
+   *   info = Σ_j sigma_j² / σε,j²          （精度単位の情報量）
+   *   a_hat = Σ_j sigma_j(t_ij - mu_j)/σε,j² / info
+   *
+   * `info` は「この推定にどれだけ根拠があるか」を表し、縮小推定にも
+   * 未プレイ曲埋めの信頼度重み（{@link predictUnplayedBpi}）にも使う。
+   * 全曲で σε,j² が一定なら、旧実装の `Σσ_j²` ベース（den）と厳密に一致する。
    */
   private static estimateLatentSkillWithConfidence(
     observations: NewBpiScoreObservation[],
-  ): { a: number; den: number } | null {
+  ): { a: number; info: number } | null {
+    const globalVar = NEW_BPI_RESIDUAL_RMSE * NEW_BPI_RESIDUAL_RMSE;
     let num = 0;
-    let den = 0;
+    let info = 0;
     for (const obs of observations) {
       const param = newBpiSongParamMap.get(obs.songId);
       if (!param || obs.notes === 0) continue;
       const m = obs.notes * 2;
       const t = this.tOf(obs.exScore, m);
-      num += param.sigma * (t - param.mu);
-      den += param.sigma * param.sigma;
+      const ev = param.residualVar ?? globalVar;
+      num += (param.sigma * (t - param.mu)) / ev;
+      info += (param.sigma * param.sigma) / ev;
     }
-    if (den === 0) return null;
-    const residualVariance = NEW_BPI_RESIDUAL_RMSE * NEW_BPI_RESIDUAL_RMSE;
-    return { a: num / (den + residualVariance), den };
+    if (info === 0) return null;
+    // 事前 a_i ~ N(0,1) と逆分散加重の尤度をベイズ結合した事後平均。
+    return { a: num / (info + 1), info };
   }
 
   /**
    * プレイヤーの潜在スキル a_i（issue #304）を、そのユーザーが持つスコアから
    * 直接推定する（縮小推定つき）。
    *
-   * 加重最小二乗の解 a_hat = Σ_j sigma_j(t_ij - mu_j) / Σ_j sigma_j² は、
-   * プレイ曲数が少ないユーザーほど分散が大きくなる。事前分布
-   * a_i ~ N(0, 1)（ALS推定時にa_iをこの分布へ正規化しているため、母集団の
-   * 分布そのもの）と、尤度 a_hat ~ N(a_i, residualVariance / den)
-   * （residualVariance = ALS残差の分散、t単位）をベイズ結合した事後平均
-   * が a_shrunk = num / (den + residualVariance) になる（標準的なリッジ型の
-   * 縮小推定）。プレイ曲数が少なく den が小さいユーザーほど 0（母集団平均）
-   * へ強く縮み、多いユーザーほど a_hat に漸近する。
+   * 逆分散加重の最小二乗解 a_hat（曲ごとの残差分散 σε,j² で重み付け、
+   * 決定記録0010）は、プレイ曲数が少ないユーザーほど分散が大きくなる。
+   * 事前分布 a_i ~ N(0, 1)（ALS推定時にa_iをこの分布へ正規化しているため、
+   * 母集団の分布そのもの）と、尤度 a_hat ~ N(a_i, 1 / info)
+   * （info = Σ_j sigma_j²/σε,j²、精度単位の情報量）をベイズ結合した事後平均
+   * が a_shrunk = num / (info + 1) になる（標準的なリッジ型の縮小推定。
+   * 事前分散が1なので分母が info + 1）。プレイ曲数が少なく info が小さい
+   * ユーザーほど 0（母集団平均）へ強く縮み、多いユーザーほど a_hat に漸近する。
    */
   public static estimateLatentSkill(
     observations: NewBpiScoreObservation[],
@@ -313,14 +324,13 @@ export class NewBpiCalculator {
    *
    * そこで、a_i推定の事後分散に基づいて予測値を`BPI_FLOOR`(-15、「その曲を
    * 全く触っていない」という現行の扱い)とブレンドする。
-   * a_i の事後分布は N(a_shrunk, residualVariance/(den+residualVariance))
-   * であり、事後分散は den→0 で1（事前分布の分散、＝何も分かっていない
-   * 状態）に、den→∞ で0（完全に確信できる状態）に連続的に近づく。
-   * この「事後分散の残り具合」の補数をそのまま予測の信頼度重みとして使う
-   * （w = 1 - 事後分散 = den / (den + residualVariance)）。residualVariance
-   * は{@link estimateLatentSkillWithConfidence}で使うものと同じ、ALS残差
-   * から実測した値であり、この予測専用に別途チューニングした自由パラメータ
-   * ではない。
+   * a_i の事後分散は 1/(info+1) であり、info→0 で1（事前分布の分散、＝何も
+   * 分かっていない状態）に、info→∞ で0（完全に確信できる状態）に連続的に
+   * 近づく。この「事後分散の残り具合」の補数をそのまま予測の信頼度重みと
+   * して使う（w = 1 - 事後分散 = info / (info + 1)）。info は
+   * {@link estimateLatentSkillWithConfidence} と同じ、曲ごとの残差分散
+   * （ALS残差から実測）で重み付けした情報量であり、この予測専用に別途
+   * チューニングした自由パラメータではない。
    *
    * なお、この方式では「1曲だけ全一・残りは未プレイ」という原典由来のケース
    * の総合BPIは、旧来の`k=log2(n)`べき乗平均が定義する50ちょうどには
@@ -330,7 +340,7 @@ export class NewBpiCalculator {
    */
   private static predictUnplayedBpi(
     a: number,
-    den: number,
+    info: number,
     song: NewBpiSongBasicData,
   ): number | null {
     const params = this.getSongParams(song);
@@ -338,8 +348,7 @@ export class NewBpiCalculator {
     const { z0, z100, gamma } = params;
     const ratio = (a - z0) / (z100 - z0);
     const rawPrediction = 100 * Math.sign(ratio) * Math.pow(Math.abs(ratio), gamma);
-    const residualVariance = NEW_BPI_RESIDUAL_RMSE * NEW_BPI_RESIDUAL_RMSE;
-    const w = den / (den + residualVariance);
+    const w = info / (info + 1); // 事後分散 1/(info+1) の補数
     const blended = w * rawPrediction + (1 - w) * this.BPI_FLOOR;
     return Math.max(this.BPI_FLOOR, Math.round(blended * 100) / 100);
   }
@@ -401,7 +410,7 @@ export class NewBpiCalculator {
         const measured = this.calc(exScore, song);
         if (measured !== null) bpis.push(measured);
       } else if (skill !== null) {
-        const predicted = this.predictUnplayedBpi(skill.a, skill.den, song);
+        const predicted = this.predictUnplayedBpi(skill.a, skill.info, song);
         if (predicted !== null) bpis.push(predicted);
       }
     }
