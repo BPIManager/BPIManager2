@@ -27,15 +27,27 @@ type NewBpiSongParamsFile = {
   rankCurve: { percentile: number; a: number }[];
   /** rankCurveのパーセンタイルを絶対順位に変換する基準人数(z0と同じアリーナA帯在籍者数)。 */
   arenaPopulationSize: number;
-  /** `n`は各曲の観測数。gamma補正の信頼度重み付け(#308派生)に使う。 */
-  songs: Record<string, { mu: number; sigma: number; n: number }>;
+  /**
+   * `n`は各曲の観測数。`residualVar`は曲ごとのALS残差分散(t単位、決定記録0010)。
+   * `residualVar`未収録の曲はa_i縮小推定で`residualRmse²`にフォールバックする。
+   */
+  songs: Record<
+    string,
+    { mu: number; sigma: number; n: number; residualVar?: number }
+  >;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const newBpiParams: NewBpiSongParamsFile = require("./songParams.json");
 export default newBpiParams;
 
-export type NewBpiSongParam = { mu: number; sigma: number; n: number };
+export type NewBpiSongParam = {
+  mu: number;
+  sigma: number;
+  n: number;
+  /** 曲ごとのALS残差分散(t単位、決定記録0010)。未収録なら`NEW_BPI_RESIDUAL_RMSE²`。 */
+  residualVar?: number;
+};
 
 /** `songId` をキーに mu/sigma を引く共通Map。データが無い楽曲は未収録。 */
 export const newBpiSongParamMap: Map<number, NewBpiSongParam> = new Map(
