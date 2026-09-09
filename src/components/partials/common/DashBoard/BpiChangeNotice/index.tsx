@@ -12,7 +12,7 @@ const DETAIL_URL = "https://x.com/BPIManager/status/2096290042885120037";
 const FEEDBACK_FORM_URL =
   "https://docs.google.com/forms/d/e/1FAIpQLSekqnyJDaGGNbkW3ERKjeBEnqBtxQmVqrzVAopduto35GPZOA/viewform";
 /** 新方式BPIの理論的な説明（Notion）。 */
-const THEORY_URL = "https://app.notion.com/p/BPI-3d29989ca87a819981a6eb5d742c5bd7";
+const THEORY_URL = "https://app.notion.com/p/BPI-3d69989ca87a8187b66dd2345c04f1cb";
 
 /**
  * ダッシュボードに常設する、BPI算出方式の変更検討に関する告知バナー。
