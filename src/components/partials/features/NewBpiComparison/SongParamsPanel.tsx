@@ -21,8 +21,8 @@ export interface SongParamsInfo {
   n: number | null;
   /** 新方式: この曲の全一に対応する z 値（BPI100 アンカー）。 */
   z100: number | null;
-  /** 新方式: 曲間のカーブ歪み補正指数。 */
-  gamma: number | null;
+  /** 新方式: この曲のカーブ指数（BPI↔順位が現行式に乗るようフィットした値）。 */
+  k: number | null;
   /** 新方式: BPI0 アンカー（全曲共通の定数）。 */
   z0: number | null;
 }
@@ -83,7 +83,7 @@ export default function SongParamsPanel({
   sigma,
   n,
   z100,
-  gamma,
+  k,
   z0,
 }: SongParamsInfo) {
   const { t } = useTranslation();
@@ -150,9 +150,9 @@ export default function SongParamsPanel({
           value={fmt(z100)}
         />
         <ParamItem
-          label={t("newBpi.params.gamma.label")}
-          hint={t("newBpi.params.gamma.hint")}
-          value={fmt(gamma)}
+          label={t("newBpi.params.k.label")}
+          hint={t("newBpi.params.k.hint")}
+          value={fmt(k)}
         />
         <ParamItem
           label={t("newBpi.params.z0.label")}

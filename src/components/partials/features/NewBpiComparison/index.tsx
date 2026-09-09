@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import type { SongWithScore } from "@/types/songs/score";
 import { useUserScores } from "@/hooks/table/useUserScores";
+import { useUserSongRankings } from "@/hooks/stats/useUserSongRankings";
 import { useTotalBpiStats } from "@/hooks/stats/useCurrentTotalBpi";
 import { useSongList } from "@/hooks/songs/useSongList";
 import { useProfile } from "@/hooks/users/useProfile";
@@ -105,6 +106,11 @@ export default function NewBpiComparison({ userId }: Props) {
   // 楽曲しか返さないため、曲マスタ自体は別途取得する(閲覧対象ユーザーに
   // 依存しない共通データのため、viewedUserIdとは無関係に取得してよい)。
   const { songs: songMaster } = useSongList(latestVersion);
+  // 「実際の順位(BPIM内)」列用。曲ごとの本人順位 (songRankingCache)。
+  const { data: songRankings } = useUserSongRankings(
+    latestVersion,
+    accessState === "ok" ? viewedUserId : undefined,
+  );
 
   const {
     rows,
@@ -136,6 +142,13 @@ export default function NewBpiComparison({ userId }: Props) {
     );
     const playedSongMap = new Map(played.map((s) => [s.songId, s]));
 
+    const actualRankBySong = new Map(
+      (songRankings?.songs ?? []).map((r) => [
+        r.songId,
+        { rank: r.rank, totalPlayers: r.totalPlayers },
+      ]),
+    );
+
     const rows: NewBpiRow[] = played.map((s) => {
       const newBpi = NewBpiCalculator.calc(s.exScore, {
         songId: s.songId,
@@ -143,6 +156,7 @@ export default function NewBpiComparison({ userId }: Props) {
         kaidenAvg: s.kaidenAvg,
         wrScore: s.wrScore,
       });
+      const actual = actualRankBySong.get(s.songId) ?? null;
       return {
         songId: s.songId,
         title: s.title,
@@ -152,6 +166,12 @@ export default function NewBpiComparison({ userId }: Props) {
         currentBpi: s.bpi,
         newBpi,
         delta: s.bpi !== null && newBpi !== null ? newBpi - s.bpi : null,
+        estimatedRank:
+          newBpi !== null
+            ? NewBpiCalculator.estimateRankFromBpi(newBpi)
+            : null,
+        actualRank: actual?.rank ?? null,
+        actualTotalPlayers: actual?.totalPlayers ?? null,
       };
     });
 
@@ -205,7 +225,7 @@ export default function NewBpiComparison({ userId }: Props) {
       comparableCount,
       playedSongMap,
     };
-  }, [songs, stats?.totalCount, songMaster]);
+  }, [songs, stats?.totalCount, songMaster, songRankings]);
 
   // 既存のノーツレーダー(カテゴリ別総合BPI)と同じカテゴリ分け(topElements.json)
   // を使い、現行/新方式それぞれのカテゴリ別総合BPIを算出する。現行側は既存の
@@ -361,7 +381,7 @@ export default function NewBpiComparison({ userId }: Props) {
         sigma: selectedSongNewParams?.sigma ?? null,
         z0: selectedSongNewParams?.z0 ?? null,
         z100: selectedSongNewParams?.z100 ?? null,
-        gamma: selectedSongNewParams?.gamma ?? null,
+        k: selectedSongNewParams?.k ?? null,
       }
     : null;
 
@@ -379,7 +399,7 @@ export default function NewBpiComparison({ userId }: Props) {
         sigma: selectedSongNewParams?.sigma ?? null,
         n: newBpiSongParamMap.get(selectedSong.songId)?.n ?? null,
         z100: selectedSongNewParams?.z100 ?? null,
-        gamma: selectedSongNewParams?.gamma ?? null,
+        k: selectedSongNewParams?.k ?? null,
         z0: selectedSongNewParams?.z0 ?? null,
       }
     : null;

@@ -91,6 +91,11 @@ export interface NewBpiRow {
   currentBpi: number | null;
   newBpi: number | null;
   delta: number | null;
+  /** 新方式の単曲BPIから引いた推定順位（現行の順位式）。 */
+  estimatedRank: number | null;
+  /** BPIM内での本人の実際の順位（songRankingCache）。 */
+  actualRank: number | null;
+  actualTotalPlayers: number | null;
 }
 
 interface UserPoint {
@@ -331,6 +336,8 @@ const ListTab = ({
                 <TableHead className="text-right">{t("newBpi.table.currentBpi")}</TableHead>
                 <TableHead className="text-right">{t("newBpi.table.newBpi")}</TableHead>
                 <TableHead className="text-right">{t("newBpi.table.delta")}</TableHead>
+                <TableHead className="text-right">{t("newBpi.table.estimatedRank")}</TableHead>
+                <TableHead className="text-right">{t("newBpi.table.actualRank")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -381,10 +388,24 @@ const ListTab = ({
                       <TableCell className="text-right tabular-nums">
                         <DeltaCell delta={row.delta} />
                       </TableCell>
+                      <TableCell className="text-right tabular-nums text-muted-foreground">
+                        {row.estimatedRank !== null
+                          ? `#${row.estimatedRank.toLocaleString()}`
+                          : "—"}
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums text-muted-foreground">
+                        {row.actualRank !== null
+                          ? `#${row.actualRank.toLocaleString()}${
+                              row.actualTotalPlayers !== null
+                                ? ` / ${row.actualTotalPlayers.toLocaleString()}`
+                                : ""
+                            }`
+                          : "—"}
+                      </TableCell>
                     </TableRow>
                     {isExpanded && (
                       <TableRow className="hover:bg-transparent">
-                        <TableCell colSpan={6} className="bg-bpim-bg/40 p-3">
+                        <TableCell colSpan={8} className="bg-bpim-bg/40 p-3">
                           <div className="flex flex-col gap-4">
                             {selectedSongParams && (
                               <SongParamsPanel {...selectedSongParams} />

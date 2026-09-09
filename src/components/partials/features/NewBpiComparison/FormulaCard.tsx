@@ -12,15 +12,15 @@ export interface FormulaSongInfo {
   z0: number | null;
   /** この曲の全一に対応するz値(BPI100のアンカー。原典の定義維持のため曲ごと) */
   z100: number | null;
-  /** 曲間のカーブの歪みを補正する指数。全曲同じ式(gammaFor)で算出する。 */
-  gamma: number | null;
+  /** この曲の実効カーブ指数 k = clamp(gamma × coef)。 */
+  k: number | null;
 }
 
 /**
  * 選択中の楽曲について、現行方式・新方式それぞれの計算式に
- * 実際の定数(m/皆伝平均/全一/coef、mu/sigma/z0/z100/gamma)を当てはめて表示する。
+ * 実際の定数(m/皆伝平均/全一/coef、mu/sigma/z0/z100/k)を当てはめて表示する。
  */
-export default function FormulaCard({ m, kaidenAvg, wrScore, coef, mu, sigma, z0, z100, gamma }: FormulaSongInfo) {
+export default function FormulaCard({ m, kaidenAvg, wrScore, coef, mu, sigma, z0, z100, k }: FormulaSongInfo) {
   const { t } = useTranslation();
 
   return (
@@ -51,22 +51,21 @@ BPI(s) = sign(s−k) × 100 × |ln(PGF(s)/PGF(k)) / ln(PGF(z)/PGF(k))|^coef`}
           sigma !== null &&
           z0 !== null &&
           z100 !== null &&
-          gamma !== null ? (
+          k !== null ? (
             <pre className="overflow-x-auto rounded-md bg-bpim-surface-2 p-3 text-[11px] leading-relaxed whitespace-pre-wrap">
 {`mu = ${mu}
 sigma = ${sigma}
 z0 = ${z0.toFixed(4)} (全曲共通。アリーナA帯在籍者の潜在能力の中央値。BPI0のアンカー)
 z100 = ${z100.toFixed(4)} (この曲の全一${wrScore}のz値。BPI100のアンカー)
-gamma = ${gamma.toFixed(4)} (全曲共通の式で算出。1.0000なら曲間の歪み補正なし)
+k = ${k.toFixed(4)} (実効カーブ指数 = clamp(gamma × coef))
 
 t(s) = −ln(m − s)
 z(s) = (t(s) − mu) / sigma
-BPI(s) = sign(z−z0) × 100 × |(z(s) − z0) / (z100 − z0)|^gamma　※下限−15でクランプ
+BPI(s) = sign(z−z0) × 100 × |(z(s) − z0) / (z100 − z0)|^k　※下限−15でクランプ
 ※ BPI100=全一という原典の定義は曲ごとに維持しつつ、BPI0は全曲共通の定数
-　 (皆伝合格者ではなくアリーナA帯在籍者の実力を基準にした潜在能力の中央値)を
-　 使うハイブリッド。gammaは「全一が曲間で極端に遠い/近い」ことで生じる
-　 カーブの歪みを補正する指数で、全曲同じ式(基準プレイヤーz_refが典型的な曲と
-　 同じBPIになるよう解析的に決定)から算出する。曲ごとに式自体を変えているわけではない`}
+　 (アリーナA帯在籍者の実力を基準にした潜在能力の中央値)を使うハイブリッド。
+　 kは gamma(全一が曲間で極端に遠い/近い曲の歪み補正、全曲同じ式で算出)と
+　 coef(BPI定義 BpiCalculator の per-song カーブ指数)の積`}
             </pre>
           ) : (
             <p className="text-xs text-muted-foreground">
