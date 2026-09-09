@@ -65,6 +65,12 @@ export const newBpiTranslations = {
     "zh-TW": "難度",
     ko: "난이도",
   },
+  "newBpi.table.radar": {
+    ja: "レーダー",
+    en: "Radar",
+    "zh-TW": "雷達",
+    ko: "레이더",
+  },
   "newBpi.table.exScore": {
     ja: "EXスコア",
     en: "EX Score",
@@ -88,6 +94,18 @@ export const newBpiTranslations = {
     en: "Delta",
     "zh-TW": "差異",
     ko: "차이",
+  },
+  "newBpi.table.estimatedRank": {
+    ja: "推定順位(新BPI)",
+    en: "Est. rank (new BPI)",
+    "zh-TW": "推估排名(新BPI)",
+    ko: "추정 순위(신 BPI)",
+  },
+  "newBpi.table.actualRank": {
+    ja: "実際の順位(BPIM内)",
+    en: "Actual rank (in BPIM)",
+    "zh-TW": "實際排名(BPIM內)",
+    ko: "실제 순위(BPIM 내)",
   },
   "newBpi.table.noParam": {
     ja: "算出不可",
@@ -539,17 +557,17 @@ export const newBpiTranslations = {
     "zh-TW": "將此曲全一分數放到 z 尺度（z = (t − μ) / σ）上的值。為新公式的BPI100錨點，依原始定義逐曲嚴格維持「全一＝BPI100」。",
     ko: "이 곡의 전일 스코어를 z 척도(z = (t − μ) / σ)에 올린 값. 신규 방식의 BPI100 기준점으로, 원전대로 '전일＝BPI100'을 곡별로 엄밀히 유지합니다.",
   },
-  "newBpi.params.gamma.label": {
-    ja: "γ (gamma)",
-    en: "γ (gamma)",
-    "zh-TW": "γ (gamma)",
-    ko: "γ (gamma)",
+  "newBpi.params.k.label": {
+    ja: "k (カーブ指数)",
+    en: "k (curve exponent)",
+    "zh-TW": "k (曲線指數)",
+    ko: "k (커브 지수)",
   },
-  "newBpi.params.gamma.hint": {
-    ja: "曲間のカーブの歪みを補正する指数。全一が典型的な曲より極端に遠い／近い曲で、基準プレイヤーのBPIが不自然にズレるのを補正します。全曲同じ式から算出し、1.0000 なら補正なしです。",
-    en: "An exponent that corrects curve distortion between songs. It offsets the unnatural BPI shift for a reference player on songs whose WR is far closer or farther than typical. Derived from one shared formula; 1.0000 means no correction.",
-    "zh-TW": "修正各曲之間曲線扭曲的指數。針對全一比典型曲目極端更遠／更近的曲目，修正基準玩家BPI的不自然偏移。以全曲相同公式算出，1.0000 代表無修正。",
-    ko: "곡 간 곡선 왜곡을 보정하는 지수. 전일이 전형적인 곡보다 극단적으로 멀거나 가까운 곡에서 기준 플레이어의 BPI가 부자연스럽게 어긋나는 것을 보정합니다. 전곡 동일한 식으로 산출하며, 1.0000이면 보정 없음입니다.",
+  "newBpi.params.k.hint": {
+    ja: "この曲の単曲BPIの実効カーブ指数 k = clamp(gamma × coef)。gamma は全一が曲間で極端に遠い／近い曲の歪み補正、coef は BPI 定義（BpiCalculator）の per-song カーブ指数です。",
+    en: "This song's effective BPI curve exponent k = clamp(gamma × coef). gamma corrects curve distortion for songs whose WR is unusually far/close; coef is the per-song curve exponent from the BPI definition (BpiCalculator).",
+    "zh-TW": "此曲單曲BPI的實效曲線指數 k = clamp(gamma × coef)。gamma 修正全一異常遠／近曲目的扭曲；coef 為 BPI 定義（BpiCalculator）的逐曲曲線指數。",
+    ko: "이 곡 단일곡 BPI의 실효 커브 지수 k = clamp(gamma × coef). gamma는 전일이 유난히 멀거나 가까운 곡의 왜곡 보정, coef는 BPI 정의(BpiCalculator)의 곡별 커브 지수입니다.",
   },
   "newBpi.params.z0.label": {
     ja: "z0",

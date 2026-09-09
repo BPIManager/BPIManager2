@@ -156,6 +156,27 @@ describe("NewBpiCalculator ロジックテスト（issue #299〜304 検証用）
       const roundTrip = NewBpiCalculator.calc(score, song)!;
       expect(Math.abs(roundTrip - targetBpi)).toBeLessThan(1);
     });
+
+    it("getSongParamsのk(実効カーブ指数)は[0.3, 3]に収まる", () => {
+      const [songId] = [...newBpiSongParamMap.keys()];
+      const params = NewBpiCalculator.getSongParams({
+        songId,
+        notes: NOTES,
+        kaidenAvg: KAIDEN_AVG,
+        wrScore: WR_SCORE,
+      })!;
+      expect(params.k).toBeGreaterThanOrEqual(0.3);
+      expect(params.k).toBeLessThanOrEqual(3);
+    });
+
+    it("estimateRankFromBpiは単調減少で、BPI100→1位", () => {
+      const r10 = NewBpiCalculator.estimateRankFromBpi(10);
+      const r30 = NewBpiCalculator.estimateRankFromBpi(30);
+      const r50 = NewBpiCalculator.estimateRankFromBpi(50);
+      expect(r30).toBeLessThan(r10);
+      expect(r50).toBeLessThan(r30);
+      expect(NewBpiCalculator.estimateRankFromBpi(100)).toBe(1);
+    });
   });
 
   describe("総合BPI(issue #304: プレイ済み曲は単曲BPIそのまま・未プレイ曲はa_i予測で埋める)", () => {

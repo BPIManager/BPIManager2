@@ -26,6 +26,9 @@ import {
   IIDX_LEVELS,
   IIDX_DIFFICULTIES,
 } from "@/constants/iidx/bpiDifficulties";
+import { RADAR_COLORS } from "@/constants/iidx/radars";
+import RadarSection from "@/components/partials/common/Songs/AdvancedFilter/RadarSection";
+import BpmSection from "@/components/partials/common/Songs/AdvancedFilter/BpmSection";
 import RadarSectionChart from "@/components/partials/common/DashBoard/Radar";
 import CurveChart, { CurvePoint } from "./CurveChart";
 import FormulaCard, { FormulaSongInfo } from "./FormulaCard";
@@ -91,6 +94,18 @@ export interface NewBpiRow {
   currentBpi: number | null;
   newBpi: number | null;
   delta: number | null;
+  /** 新方式の単曲BPIから引いた推定順位（現行の順位式）。 */
+  estimatedRank: number | null;
+  /** BPIM内での本人の実際の順位（songRankingCache）。 */
+  actualRank: number | null;
+  actualTotalPlayers: number | null;
+  /** ノーツレーダーのカテゴリ（topElements.json による分類。未分類は null）。 */
+  radarTop: string | null;
+  /** BPM 表示用の生文字列。 */
+  bpm: string | null;
+  /** BPM 範囲の下端・上端（フィルタ用。パース不可なら null）。 */
+  bpmLo: number | null;
+  bpmHi: number | null;
 }
 
 interface UserPoint {
@@ -249,11 +264,23 @@ const ListTab = ({
   const [levelFilter, setLevelFilter] = useState<LevelFilter>("all");
   const [difficultyFilter, setDifficultyFilter] =
     useState<DifficultyFilter>("all");
+  const [radarCats, setRadarCats] = useState<string[]>([]);
+  const [bpmMin, setBpmMin] = useState<number | undefined>(undefined);
+  const [bpmMax, setBpmMax] = useState<number | undefined>(undefined);
+  const [isSofran, setIsSofran] = useState<boolean | undefined>(undefined);
 
   const filtered = rows.filter(
     (row) =>
       (levelFilter === "all" || row.difficultyLevel === levelFilter) &&
-      (difficultyFilter === "all" || row.difficulty === difficultyFilter),
+      (difficultyFilter === "all" || row.difficulty === difficultyFilter) &&
+      (radarCats.length === 0 ||
+        (row.radarTop !== null && radarCats.includes(row.radarTop))) &&
+      (bpmMin === undefined || (row.bpmHi !== null && row.bpmHi >= bpmMin)) &&
+      (bpmMax === undefined || (row.bpmLo !== null && row.bpmLo <= bpmMax)) &&
+      (!isSofran ||
+        (row.bpmLo !== null &&
+          row.bpmHi !== null &&
+          row.bpmLo !== row.bpmHi)),
   );
   const sorted = sortRows(filtered, sortKey);
 
@@ -317,6 +344,26 @@ const ListTab = ({
           </Select>
         </div>
 
+        <div className="grid gap-4 border-t border-bpim-border/60 p-3 sm:grid-cols-2">
+          <RadarSection
+            radarCategories={radarCats}
+            onChange={(v) => {
+              if (v.radarCategories !== undefined)
+                setRadarCats(v.radarCategories);
+            }}
+          />
+          <BpmSection
+            bpmMin={bpmMin}
+            bpmMax={bpmMax}
+            isSofran={isSofran}
+            onChange={(v) => {
+              if ("bpmMin" in v) setBpmMin(v.bpmMin);
+              if ("bpmMax" in v) setBpmMax(v.bpmMax);
+              if ("isSofran" in v) setIsSofran(v.isSofran);
+            }}
+          />
+        </div>
+
         {sorted.length === 0 ? (
           <div className="p-6 text-center text-sm text-muted-foreground">
             {t("newBpi.empty")}
@@ -326,11 +373,14 @@ const ListTab = ({
             <TableHeader>
               <TableRow>
                 <TableHead>{t("newBpi.table.song")}</TableHead>
+                <TableHead>{t("newBpi.table.radar")}</TableHead>
                 <TableHead>{t("newBpi.table.level")}</TableHead>
                 <TableHead className="text-right">{t("newBpi.table.exScore")}</TableHead>
                 <TableHead className="text-right">{t("newBpi.table.currentBpi")}</TableHead>
                 <TableHead className="text-right">{t("newBpi.table.newBpi")}</TableHead>
                 <TableHead className="text-right">{t("newBpi.table.delta")}</TableHead>
+                <TableHead className="text-right">{t("newBpi.table.estimatedRank")}</TableHead>
+                <TableHead className="text-right">{t("newBpi.table.actualRank")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -363,6 +413,23 @@ const ListTab = ({
                         {row.title}
                       </TableCell>
                       <TableCell>
+                        {row.radarTop ? (
+                          <span
+                            className="text-xs font-bold"
+                            style={{
+                              color:
+                                RADAR_COLORS[
+                                  row.radarTop as keyof typeof RADAR_COLORS
+                                ],
+                            }}
+                          >
+                            {row.radarTop}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">—</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
                         <Badge variant="outline">
                           {row.difficultyLevel} {row.difficulty}
                         </Badge>
@@ -381,10 +448,24 @@ const ListTab = ({
                       <TableCell className="text-right tabular-nums">
                         <DeltaCell delta={row.delta} />
                       </TableCell>
+                      <TableCell className="text-right tabular-nums text-muted-foreground">
+                        {row.estimatedRank !== null
+                          ? `#${row.estimatedRank.toLocaleString()}`
+                          : "—"}
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums text-muted-foreground">
+                        {row.actualRank !== null
+                          ? `#${row.actualRank.toLocaleString()}${
+                              row.actualTotalPlayers !== null
+                                ? ` / ${row.actualTotalPlayers.toLocaleString()}`
+                                : ""
+                            }`
+                          : "—"}
+                      </TableCell>
                     </TableRow>
                     {isExpanded && (
                       <TableRow className="hover:bg-transparent">
-                        <TableCell colSpan={6} className="bg-bpim-bg/40 p-3">
+                        <TableCell colSpan={9} className="bg-bpim-bg/40 p-3">
                           <div className="flex flex-col gap-4">
                             {selectedSongParams && (
                               <SongParamsPanel {...selectedSongParams} />

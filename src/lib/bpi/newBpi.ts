@@ -5,6 +5,7 @@ import {
   NEW_BPI_Z_REF,
   NEW_BPI_RESIDUAL_RMSE,
   NEW_BPI_Z100_IQR,
+  NEW_BPI_COEF_MEDIAN,
   NEW_BPI_RANK_CURVE,
   NEW_BPI_ARENA_POPULATION_SIZE,
 } from "@/constants/iidx/newBpi/songParams";
@@ -90,6 +91,15 @@ export class NewBpiCalculator {
   private static readonly GAMMA_MAX = 3;
 
   /**
+   * 実効カーブ指数 `k = gamma_j * coef_j` の許容範囲。下限 0.62 は、gamma_j
+   * （WR位置の外れ補正）と coef_j がともに1を下回る曲で積が過小になり
+   * BPI0近傍でカーブが不自然に折れるのを抑えつつ、全一が極端に遠い高難度
+   * 譜面（V 等）の推定順位が実測順位に合う水準に較正した値。
+   */
+  private static readonly CURVE_EXP_MIN = 0.62;
+  private static readonly CURVE_EXP_MAX = 3;
+
+  /**
    * 指定楽曲の分布パラメータ（mu/sigma）が用意されているかどうか。
    * 生成元データでプレイ数が少なすぎた楽曲は含まれない。
    */
@@ -159,9 +169,22 @@ export class NewBpiCalculator {
   }
 
   /**
-   * BPI100アンカー（曲ごとの全一のz値）とBPI0アンカー（全曲共通のz0）、
-   * および曲間の歪み補正指数gammaを算出する。全一が未設定の楽曲はnullを
-   * 返す（新方式の計算自体ができない）。
+   * 単曲BPIのカーブ指数 `k = clamp(gamma_j * coef_j, CURVE_EXP_MIN, CURVE_EXP_MAX)`。
+   * `coef_j` は `BpiCalculator` の per-song カーブ指数（`songParams.json` に
+   * 生成時固定、未収録曲は `NEW_BPI_COEF_MEDIAN`）。`ratio=1`（スコア=WR）では
+   * `k` の値に関わらず `1^k = 1` となり BPI100=WR が保たれる。
+   */
+  private static curveExponent(gamma: number, coef: number): number {
+    return Math.max(
+      this.CURVE_EXP_MIN,
+      Math.min(this.CURVE_EXP_MAX, gamma * coef),
+    );
+  }
+
+  /**
+   * BPI100アンカー（曲ごとの全一のz値）、BPI0アンカー（全曲共通のz0）、
+   * 曲間の歪み補正指数`gamma`、カーブ指数`coef`（`songParams.json`、未収録曲は
+   * `NEW_BPI_COEF_MEDIAN`）を算出する。全一が未設定の楽曲はnullを返す。
    */
   private static getAnchors(song: NewBpiSongBasicData): {
     mu: number;
@@ -170,6 +193,7 @@ export class NewBpiCalculator {
     z0: number;
     z100: number;
     gamma: number;
+    coef: number;
   } | null {
     const param = newBpiSongParamMap.get(song.songId);
     if (!param || song.notes === 0) return null;
@@ -183,12 +207,13 @@ export class NewBpiCalculator {
     if (Math.abs(z100 - z0) < 1e-9) return null;
 
     const gamma = this.gammaFor(z100, z0);
-    return { mu: param.mu, sigma: param.sigma, m, z0, z100, gamma };
+    const coef = param.coef ?? NEW_BPI_COEF_MEDIAN;
+    return { mu: param.mu, sigma: param.sigma, m, z0, z100, gamma, coef };
   }
 
   /**
-   * 指定楽曲のmu/sigma、BPI0/100アンカー(z0=全曲共通の定数、z100=曲ごとの
-   * 全一のz値)、および曲間の歪み補正指数gammaを表示用に取得する。
+   * 指定楽曲のmu/sigma、BPI0/100アンカー、曲間の歪み補正指数`gamma`、カーブ指数
+   * `coef`、実効カーブ指数`k = clamp(gamma*coef)`を表示用に取得する。
    * 式表示(FormulaCard等)向け。
    */
   public static getSongParams(song: NewBpiSongBasicData): {
@@ -197,6 +222,8 @@ export class NewBpiCalculator {
     z0: number;
     z100: number;
     gamma: number;
+    coef: number;
+    k: number;
   } | null {
     const anchors = this.getAnchors(song);
     if (!anchors) return null;
@@ -206,6 +233,8 @@ export class NewBpiCalculator {
       z0: anchors.z0,
       z100: anchors.z100,
       gamma: anchors.gamma,
+      coef: anchors.coef,
+      k: this.curveExponent(anchors.gamma, anchors.coef),
     };
   }
 
@@ -224,11 +253,27 @@ export class NewBpiCalculator {
     const anchors = this.getAnchors(song);
     if (!anchors) return null;
 
-    const { mu, sigma, m, z0, z100, gamma } = anchors;
+    const { mu, sigma, m, z0, z100, gamma, coef } = anchors;
+    const k = this.curveExponent(gamma, coef);
     const z = (this.tOf(exScore, m) - mu) / sigma;
     const ratio = (z - z0) / (z100 - z0);
-    const bpi = 100 * Math.sign(ratio) * Math.pow(Math.abs(ratio), gamma);
+    const bpi = 100 * Math.sign(ratio) * Math.pow(Math.abs(ratio), k);
     return Math.max(this.BPI_FLOOR, Math.round(bpi * 100) / 100);
+  }
+
+  /** 単曲BPIの下限の絶対値(順位推定の基準人数)。docs §5 の 2616 と同じ。 */
+  private static readonly RANK_BASE = 2616;
+
+  /**
+   * 単曲BPIから推定順位を引く（現行 `BpiCalculator` と同じ
+   * `rank = RANK_BASE^((100 - BPI) / 100)` 形式。実測順位ではなく現行式の
+   * 順位感に合わせた表示用の値）。
+   */
+  public static estimateRankFromBpi(bpi: number): number {
+    return Math.max(
+      1,
+      Math.ceil(Math.pow(this.RANK_BASE, (100 - bpi) / 100)),
+    );
   }
 
   /**
@@ -246,9 +291,10 @@ export class NewBpiCalculator {
     const anchors = this.getAnchors(song);
     if (!anchors) return null;
 
-    const { mu, sigma, m, z0, z100, gamma } = anchors;
+    const { mu, sigma, m, z0, z100, gamma, coef } = anchors;
+    const k = this.curveExponent(gamma, coef);
     const sign = Math.sign(targetBpi) || 1;
-    const ratio = Math.pow(Math.abs(targetBpi) / 100, 1 / gamma);
+    const ratio = Math.pow(Math.abs(targetBpi) / 100, 1 / k);
     const z = z0 + sign * ratio * (z100 - z0);
     const t = mu + sigma * z;
     const miss = Math.exp(-t);
@@ -345,9 +391,9 @@ export class NewBpiCalculator {
   ): number | null {
     const params = this.getSongParams(song);
     if (!params) return null;
-    const { z0, z100, gamma } = params;
+    const { z0, z100, k } = params;
     const ratio = (a - z0) / (z100 - z0);
-    const rawPrediction = 100 * Math.sign(ratio) * Math.pow(Math.abs(ratio), gamma);
+    const rawPrediction = 100 * Math.sign(ratio) * Math.pow(Math.abs(ratio), k);
     const w = info / (info + 1); // 事後分散 1/(info+1) の補数
     const blended = w * rawPrediction + (1 - w) * this.BPI_FLOOR;
     return Math.max(this.BPI_FLOOR, Math.round(blended * 100) / 100);

@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import type { SongWithScore } from "@/types/songs/score";
 import { useUserScores } from "@/hooks/table/useUserScores";
+import { useUserSongRankings } from "@/hooks/stats/useUserSongRankings";
 import { useTotalBpiStats } from "@/hooks/stats/useCurrentTotalBpi";
 import { useSongList } from "@/hooks/songs/useSongList";
 import { useProfile } from "@/hooks/users/useProfile";
@@ -8,6 +9,7 @@ import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { BpiCalculator } from "@/lib/bpi";
 import { NewBpiCalculator } from "@/lib/bpi/newBpi";
 import { calculateRadar, ALL_CATEGORIES } from "@/lib/radar/calculator";
+import { topElementMap } from "@/constants/iidx/radars/topElements";
 import { newBpiSongParamMap } from "@/constants/iidx/newBpi/songParams";
 import NewBpiComparisonUi, { NewBpiRow, SortKey } from "./ui";
 import type { CurvePoint } from "./CurveChart";
@@ -25,6 +27,17 @@ const BPI_TICKS = [-15, -10, 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 
 /** `coef` 未設定時に本番実装(`BpiCalculator`)が使うデフォルト値。式表示用。 */
 const DEFAULT_POW_COEF = 1.175;
+
+/** "150" → [150,150]、"75-300" → [75,300]。パースできなければ null。 */
+function parseBpmRange(bpm: string | null): [number, number] | null {
+  if (!bpm) return null;
+  const nums = bpm
+    .split("-")
+    .map((p) => Number(p.trim()))
+    .filter((n) => Number.isFinite(n) && n > 0);
+  if (nums.length === 0) return null;
+  return [Math.min(...nums), Math.max(...nums)];
+}
 
 /** スコアレート内訳テーブルの行(BPI0相当より上): 90〜94%は1%刻み、95%以降は0.5%刻み。 */
 const SCORE_RATE_STEPS: number[] = (() => {
@@ -105,6 +118,11 @@ export default function NewBpiComparison({ userId }: Props) {
   // 楽曲しか返さないため、曲マスタ自体は別途取得する(閲覧対象ユーザーに
   // 依存しない共通データのため、viewedUserIdとは無関係に取得してよい)。
   const { songs: songMaster } = useSongList(latestVersion);
+  // 「実際の順位(BPIM内)」列用。曲ごとの本人順位 (songRankingCache)。
+  const { data: songRankings } = useUserSongRankings(
+    latestVersion,
+    accessState === "ok" ? viewedUserId : undefined,
+  );
 
   const {
     rows,
@@ -136,6 +154,13 @@ export default function NewBpiComparison({ userId }: Props) {
     );
     const playedSongMap = new Map(played.map((s) => [s.songId, s]));
 
+    const actualRankBySong = new Map(
+      (songRankings?.songs ?? []).map((r) => [
+        r.songId,
+        { rank: r.rank, totalPlayers: r.totalPlayers },
+      ]),
+    );
+
     const rows: NewBpiRow[] = played.map((s) => {
       const newBpi = NewBpiCalculator.calc(s.exScore, {
         songId: s.songId,
@@ -143,6 +168,8 @@ export default function NewBpiComparison({ userId }: Props) {
         kaidenAvg: s.kaidenAvg,
         wrScore: s.wrScore,
       });
+      const actual = actualRankBySong.get(s.songId) ?? null;
+      const bpmRange = parseBpmRange(s.bpm);
       return {
         songId: s.songId,
         title: s.title,
@@ -152,6 +179,16 @@ export default function NewBpiComparison({ userId }: Props) {
         currentBpi: s.bpi,
         newBpi,
         delta: s.bpi !== null && newBpi !== null ? newBpi - s.bpi : null,
+        estimatedRank:
+          newBpi !== null
+            ? NewBpiCalculator.estimateRankFromBpi(newBpi)
+            : null,
+        actualRank: actual?.rank ?? null,
+        actualTotalPlayers: actual?.totalPlayers ?? null,
+        radarTop: topElementMap.get(`${s.title}___${s.difficulty}`) ?? null,
+        bpm: s.bpm,
+        bpmLo: bpmRange?.[0] ?? null,
+        bpmHi: bpmRange?.[1] ?? null,
       };
     });
 
@@ -205,7 +242,7 @@ export default function NewBpiComparison({ userId }: Props) {
       comparableCount,
       playedSongMap,
     };
-  }, [songs, stats?.totalCount, songMaster]);
+  }, [songs, stats?.totalCount, songMaster, songRankings]);
 
   // 既存のノーツレーダー(カテゴリ別総合BPI)と同じカテゴリ分け(topElements.json)
   // を使い、現行/新方式それぞれのカテゴリ別総合BPIを算出する。現行側は既存の
@@ -361,7 +398,7 @@ export default function NewBpiComparison({ userId }: Props) {
         sigma: selectedSongNewParams?.sigma ?? null,
         z0: selectedSongNewParams?.z0 ?? null,
         z100: selectedSongNewParams?.z100 ?? null,
-        gamma: selectedSongNewParams?.gamma ?? null,
+        k: selectedSongNewParams?.k ?? null,
       }
     : null;
 
@@ -379,7 +416,7 @@ export default function NewBpiComparison({ userId }: Props) {
         sigma: selectedSongNewParams?.sigma ?? null,
         n: newBpiSongParamMap.get(selectedSong.songId)?.n ?? null,
         z100: selectedSongNewParams?.z100 ?? null,
-        gamma: selectedSongNewParams?.gamma ?? null,
+        k: selectedSongNewParams?.k ?? null,
         z0: selectedSongNewParams?.z0 ?? null,
       }
     : null;
