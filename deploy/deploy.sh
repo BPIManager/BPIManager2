@@ -38,10 +38,14 @@ switch_to() {
 }
 
 restart_pm2() {
+  # pm2 は action 後に「同じ pm2 デーモン上の全アプリ」の一覧表を stdout に出す。
+  # このスクリプトは CI から SSH 実行され、その出力がそのまま Actions のログに
+  # 流れる。無関係な常駐プロセスの名前まで露出させないよう stdout は捨て、
+  # 失敗は終了コードと後段の /api/health チェックで検知する（stderr は残す）。
   if pm2 describe bpim2 >/dev/null 2>&1; then
-    pm2 restart "$SHARED/ecosystem.config.js" --update-env
+    pm2 restart "$SHARED/ecosystem.config.js" --update-env >/dev/null
   else
-    pm2 start "$SHARED/ecosystem.config.js" --update-env
+    pm2 start "$SHARED/ecosystem.config.js" --update-env >/dev/null
   fi
 }
 
