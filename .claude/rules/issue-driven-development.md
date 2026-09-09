@@ -8,6 +8,13 @@ AI（issue-runner等のスキル）がissueを消化していく際の運用ル�
 - `feat/`ブランチ（機能追加・仕様issue）は、実装が意図した仕様と一致しているかを人間がレビューできるよう、直接mergeせず必ずPRを作成する。マージ・issueクローズはユーザーのレビュー後に行う
 - 理由: バグ修正・軽微なリファクタは機械的検証（tsc/lint/test/build）で十分だが、機能追加・仕様issueは「意図通りに実装できているか」の判断が機械的検証だけでは担保できないため
 
+## PRの粒度（epic単位でまとめる）
+
+- 親issue（epic）配下の複数subissueを消化する場合、**subissueごとにPRを分けず、epic単位で1本のPR**にまとめてよい（GitHub Actions の無料枠を消費するCIが各PR/pushで走るため、こまめなPRを避ける）。
+- その場合も **1 issue = 1 commit** は維持し、各commitのメッセージに `Refs #<subissue>` / `Closes #<subissue>` を入れて、issueとcommitの紐付けは残す（`git-workflow.md`）。
+- ブランチは epic の内容に合わせて1本切る（例: `docs/<epic-slug>`、`feat/<epic-slug>`）。PR本文に含まれるcommitとsubissue番号の対応表を書く。
+- 単発issue（epicに属さない）は従来どおり1 issue = 1ブランチ = 1 PR。
+
 ## 親子issueの関連付けと粒度
 
 - 複数issueを束ねる親issue（epic的な構造）を作る場合、親issue本文にタスクリスト形式（`- [ ] #123 タイトル`）でsubissueを列挙する。GitHubのTracked issues機能で関連が可視化される
