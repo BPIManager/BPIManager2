@@ -52,6 +52,7 @@ DB マイグレーションは自動化しない（後述）。
   - `DEPLOY_KEY` … デプロイ専用 SSH 秘密鍵（PEM 全文）
   - `VPS_HOST` … 接続先ホスト名 / IP
   - `VPS_USER` … deploy user 名
+  - `VPS_PORT` … （任意）SSH ポート。標準（22）以外なら設定する
 - **Variables**（同 → Variables）
   - `DEPLOY_ENABLED` = `true` … これが `true` になるまで `deploy` ジョブは skip される
     （`verify` は常に動く）
@@ -62,21 +63,26 @@ DB マイグレーションは自動化しない（後述）。
 
 ```bash
 # VPS 側（root で一度だけ。専用ユーザーを作る場合）
-adduser --disabled-password --gecos "" deploy   # 名前は任意。VPS_USER に合わせる
+useradd -m -s /bin/bash bpim               # 名前は任意。VPS_USER に合わせる
+loginctl enable-linger bpim                # ログアウト・再起動をまたいで常駐させる
 
-# 手元で鍵を作る
-ssh-keygen -t ed25519 -f deploy_key -N "" -C "github-actions-deploy"
-#  deploy_key.pub  → deploy user の ~/.ssh/authorized_keys へ追記
-#  deploy_key      → GitHub Secret DEPLOY_KEY へ登録
+# 鍵を作る（VPS 上でも手元でもよい。ここでは deploy user 内で作る例）
+sudo -u bpim ssh-keygen -t ed25519 -f /home/bpim/.ssh/github_actions_deploy -N "" \
+  -C "github-actions-deploy"
+#  *.pub → /home/bpim/.ssh/authorized_keys へ追記（chmod 700 .ssh / 600 authorized_keys）
+#  秘密鍵 → GitHub Secret DEPLOY_KEY へ登録
+#  SSH が標準ポート以外なら GitHub Secret VPS_PORT も設定する
 ```
 
 ### 3. VPS 側（deploy user で）
 
 ```bash
-# ランタイム（バージョンは .nvmrc / package.json に合わせる）
-#   Node 26 系, corepack 経由で pnpm 11 系, pm2
-corepack enable
-npm i -g pm2   # グローバル導入だけ sudo が要ることがある
+# ランタイム。nvm で Node を入れる（バージョンは本番稼働中のものに合わせる）
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+. ~/.nvm/nvm.sh
+nvm install 22          # 本番で動いている系列に合わせる
+corepack enable         # pnpm
+npm i -g pm2
 
 BASE=~/bpim2                       # DEPLOY_PATH を使うなら合わせる
 mkdir -p "$BASE/releases" "$BASE/shared/data"
@@ -97,7 +103,25 @@ cp <repo>/deploy/ecosystem.config.js "$BASE/shared/ecosystem.config.js"
 #   （2回目以降は GitHub Actions が deploy.sh を叩く）
 pm2 start "$BASE/shared/ecosystem.config.js"
 pm2 save
-pm2 startup     # 表示された sudo コマンドを実行してブート時自動起動を有効化
+```
+
+#### ブート時自動起動（SELinux 環境では systemd **ユーザー**サービスにする）
+
+`pm2 startup`（system サービス）は、SELinux Enforcing だと systemd(`init_t`) が
+nvm 配下（`user_home_t`）の node/pm2 を exec できず `203/EXEC` で失敗する。
+deploy user の systemd ユーザーサービス + linger で常駐させる:
+
+```bash
+# root で1度: ログアウト・再起動をまたいでユーザーマネージャを動かす
+loginctl enable-linger <deploy-user>
+
+# deploy user で: ~/.config/systemd/user/pm2-<user>.service を作成（Type=forking,
+#   ExecStart=<nvm>/lib/node_modules/pm2/bin/pm2 resurrect, PM2_HOME=~/.pm2,
+#   Environment=PATH=<nvm/bin>:/usr/bin:/bin, WantedBy=default.target）
+systemctl --user daemon-reload
+systemctl --user enable pm2-<user>
+# 検証: pm2 kill してから
+systemctl --user start pm2-<user>   # dump.pm2 から復帰することを確認
 ```
 
 ### 4. 有効化
@@ -150,7 +174,7 @@ bash ~/bpim2/releases/<戻したいSHA>/deploy/deploy.sh <戻したいSHA>
 
 - **ヘルスチェックが通らずロールバックされる**: `pm2 logs bpim2` を確認。
   `shared/.env` の不足、`pnpm install` 失敗（`pnpm-workspace.yaml` の
-  `allowBuilds` にネイティブ依存が入っているか）、ポート 3000 の競合を疑う。
+  `allowBuilds` にネイティブ依存が入っているか）、ポート 3005 の競合を疑う。
 - **cron が二重に動く / bot が多重接続**: `pm2 describe bpim2` で `instances` が 1 か、
   `ecosystem.config.js` が cluster になっていないか確認。
 - **`public/data` の中身が空**: `<base>/shared/data` が存在し、`current/public/data`

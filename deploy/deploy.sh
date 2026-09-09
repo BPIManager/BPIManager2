@@ -22,7 +22,7 @@ REL="${1:?usage: deploy.sh <release-sha>}"
 BASE="${DEPLOY_ROOT:-$HOME/bpim2}"
 NEW="$BASE/releases/$REL"
 SHARED="$BASE/shared"
-HEALTH_URL="http://127.0.0.1:3000/api/health"
+HEALTH_URL="http://127.0.0.1:3005/api/health"
 
 [ -d "$NEW" ] || { echo "release dir not found: $NEW" >&2; exit 1; }
 
