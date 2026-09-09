@@ -51,7 +51,7 @@ export type SortKey =
 export type AccessState = "loading" | "not-found" | "private" | "ok";
 
 /** 新方式BPIの理論的な説明（Notion）。 */
-const THEORY_URL = "https://app.notion.com/p/BPI-3d29989ca87a819981a6eb5d742c5bd7";
+const THEORY_URL = "https://app.notion.com/p/BPI-3d69989ca87a8187b66dd2345c04f1cb";
 /** 新方式BPIの設計判断・経緯を追跡している GitHub issue。 */
 const DESIGN_ISSUE_URL =
   "https://github.com/BPIManager/BPIManager2/issues/309";
