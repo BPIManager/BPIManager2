@@ -11,6 +11,9 @@ allowBuilds:
   protobufjs: true
   sharp: true
   unrs-resolver: true
+# 自前パッケージは公開直後に取り込むため minimumReleaseAge の隔離対象から除外する。
+minimumReleaseAgeExclude:
+  - "@bpim/bpicalc"
 onlyBuiltDependencies:
   - "@firebase/util"
   - esbuild
