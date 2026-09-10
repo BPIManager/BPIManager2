@@ -1,7 +1,12 @@
+import { BpiV1 } from "@bpim/bpicalc";
 import type { IBpiBasicSongData } from "@/types/songs/bpi";
 
 /**
  * BPI（Beat Power Indicator）計算ロジックを提供する静的クラス。
+ *
+ * 実体は npm パッケージ `@bpim/bpicalc` の {@link BpiV1}（V1 = 現行方式）。
+ * このクラスは呼び出し側の互換のための薄いファサードで、`songDef` 由来の
+ * 楽曲データ（{@link IBpiBasicSongData}）をそのまま `BpiV1` に渡す。
  *
  * - 単曲 BPI の計算（`calc`）
  * - BPI からスコアの逆算（`calcFromBPI`）
@@ -9,13 +14,8 @@ import type { IBpiBasicSongData } from "@/types/songs/bpi";
  * - 順位推定（`estimateRank`）
  */
 export class BpiCalculator {
-  private static readonly DEFAULT_POW_COEF = 1.175;
-  private static readonly AVERAGE_OF_ALL_KAIDENS = 2699;
-
-  private static pgf(j: number, m: number): number {
-    if (j === m) return m * 0.8;
-    return 1 + (j / m - 0.5) / (1 - j / m);
-  }
+  /** デフォルト定数（`defaultPowCoef` 1.175 / `rankBaseTotal` 2699 / `rankBaseSingle` 2616）で共有する。 */
+  private static readonly v1 = new BpiV1();
 
   /**
    * 総合BPIのべき乗平均で使用する指数を計算する。
@@ -23,7 +23,7 @@ export class BpiCalculator {
    * @param totalSongCount - 対象楽曲の総数
    */
   public static totalBpiExponent(totalSongCount: number): number {
-    return Math.max(1, Math.log2(totalSongCount));
+    return this.v1.totalBpiExponent(totalSongCount);
   }
 
   /**
@@ -34,29 +34,7 @@ export class BpiCalculator {
    * @returns BPI 値（-15 〜 理論上限）。スコアが最大値を超える場合は `null`
    */
   public static calc(s: number, song: IBpiBasicSongData): number | null {
-    const { notes, kaidenAvg: k, wrScore: z, coef } = song;
-    if (k === null || z === null || notes === 0) return -15;
-    const m = notes * 2;
-
-    if (s > m) return null;
-    if (s < 0) return -15;
-
-    const _k = this.pgf(k, m);
-    const _s_ = this.pgf(s, m) / _k;
-    const _z_ = this.pgf(z, m) / _k;
-    const p = s >= k;
-    const powCoef = coef && coef > 0 ? coef : this.DEFAULT_POW_COEF;
-
-    const logS = p ? Math.log(_s_) : -Math.log(_s_);
-    const logZ = Math.log(_z_);
-
-    if (Math.abs(logZ) < 0.00001) return 0;
-
-    const res =
-      Math.round(
-        (p ? 100 : -100) * Math.pow(Math.abs(logS / logZ), powCoef) * 100,
-      ) / 100;
-    return isNaN(res) ? null : Math.max(-15, res);
+    return this.v1.chart(song).bpi(s);
   }
 
   /**
@@ -72,26 +50,7 @@ export class BpiCalculator {
     song: IBpiBasicSongData,
     ceiled: boolean = true,
   ): number {
-    const { notes, kaidenAvg, wrScore, coef } = song;
-    if (kaidenAvg === null || wrScore === null || notes === 0) return 0;
-    const m = notes * 2;
-    const powCoef = coef && coef > 0 ? coef : this.DEFAULT_POW_COEF;
-
-    const _k = this.pgf(kaidenAvg, m);
-    const logZ = Math.log(this.pgf(wrScore, m) / _k);
-
-    const inner =
-      (targetBpi >= 0 ? 1 : -1) *
-      Math.pow(Math.abs(targetBpi) / 100, 1 / powCoef) *
-      logZ;
-    const _s = _k * Math.exp(inner);
-
-    const res = m * ((_s - 0.5) / _s);
-
-    if (res > m) return m;
-    if (res < 0) return 0;
-
-    return ceiled ? Math.ceil(res) : res;
+    return this.v1.chart(song).scoreFor(targetBpi, ceiled);
   }
 
   /**
@@ -107,20 +66,7 @@ export class BpiCalculator {
     allBpis: number[],
     totalSongCount: number,
   ): number {
-    if (totalSongCount === 0) return -15;
-
-    const k = this.totalBpiExponent(totalSongCount);
-
-    let sum = 0;
-    for (let i = 0; i < totalSongCount; i++) {
-      //未プレイ楽曲がある（totalSongCountにallBpisが満たない場合）は、-15で埋める
-      const bpi = i < allBpis.length ? allBpis[i] : -15;
-      const m = Math.pow(Math.abs(bpi), k) / totalSongCount;
-      sum += bpi > 0 ? m : -m;
-    }
-
-    const res = Math.round(Math.pow(Math.abs(sum), 1 / k) * 100) / 100;
-    return sum > 0 ? res : -res;
+    return this.v1.total(allBpis, totalSongCount);
   }
 
   /**
@@ -130,7 +76,6 @@ export class BpiCalculator {
    * @returns 推定順位（整数）
    */
   public static estimateRank(totalBpi: number): number {
-    const p = 100;
-    return Math.ceil(Math.pow(this.AVERAGE_OF_ALL_KAIDENS, (p - totalBpi) / p));
+    return this.v1.rankFromTotal(totalBpi);
   }
 }
