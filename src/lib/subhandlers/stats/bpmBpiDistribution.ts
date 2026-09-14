@@ -4,6 +4,7 @@ import { ok } from "@/middlewares/api/apiResult";
 import { BPM_BANDS, getBpmBand } from "./_shared";
 import type { StatsQuery } from "@/types/stats/query";
 import type { HandlerResult } from "@/types/api";
+import type { IBpiBasicSongData, IBpiScoreObservation } from "@/types/songs/bpi";
 
 export async function handleStatsBpmBpiDistribution(
   q: StatsQuery,
@@ -15,11 +16,11 @@ export async function handleStatsBpmBpiDistribution(
     q.difficulties.length > 0 ? q.difficulties : undefined,
   );
   const bandLabels = [...BPM_BANDS.map((b) => b.label), "Soflan"];
-  const bandBpis = new Map<string, number[]>(
+  const bandMaster = new Map<string, (IBpiBasicSongData & { songId: number })[]>(
     bandLabels.map((label) => [label, []]),
   );
-  const bandTotals = new Map<string, number>(
-    bandLabels.map((label) => [label, 0]),
+  const bandObservations = new Map<string, IBpiScoreObservation[]>(
+    bandLabels.map((label) => [label, []]),
   );
   const bandSongs = new Map<
     string,
@@ -34,24 +35,38 @@ export async function handleStatsBpmBpiDistribution(
 
   for (const song of songs) {
     const band = getBpmBand(song.bpm as string | null | undefined);
-    bandTotals.set(band, (bandTotals.get(band) ?? 0) + 1);
+    const notes = Number(song.notes);
+    bandMaster.get(band)?.push({
+      songId: song.songId,
+      notes,
+      kaidenAvg: song.kaidenAvg,
+      wrScore: song.wrScore,
+      coef: song.coef,
+      mu: song.mu,
+      sigma: song.sigma,
+      residualVar: song.residualVar,
+    });
+    const exScore = song.exScore != null ? Number(song.exScore) : null;
+    if (exScore !== null) {
+      bandObservations.get(band)?.push({ songId: song.songId, notes, exScore });
+    }
     const bpi = song.bpi != null ? Number(song.bpi) : -15;
-    bandBpis.get(band)?.push(bpi);
     bandSongs.get(band)?.push({
       title: song.title as string,
       difficulty: song.difficulty as string,
       bpi,
-      exScore: song.exScore != null ? Number(song.exScore) : null,
-      notes: song.notes != null ? Number(song.notes) : null,
+      exScore,
+      notes,
     });
   }
 
   const result = bandLabels.map((label) => {
-    const bpis = bandBpis.get(label) ?? [];
-    const total = bandTotals.get(label) ?? 0;
-    if (total === 0) return { label, totalBpi: null, songs: [] };
-    const sorted = [...bpis].sort((a, b) => b - a);
-    const totalBpi = BpiCalculator.calculateTotalBPI(sorted, total);
+    const master = bandMaster.get(label) ?? [];
+    if (master.length === 0) return { label, totalBpi: null, songs: [] };
+    const totalBpi = BpiCalculator.calculateTotalBPI(
+      bandObservations.get(label) ?? [],
+      master,
+    );
     return {
       label,
       totalBpi: Math.round(totalBpi * 100) / 100,

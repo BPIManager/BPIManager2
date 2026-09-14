@@ -1,6 +1,6 @@
 import type { NextApiRequest } from "next";
+import { BpiV1 } from "@bpim/bpicalc";
 import { newBpiPlayersAggregateRepo } from "@/lib/db/aggregates/newBpiPlayers";
-import { BpiCalculator } from "@/lib/bpi";
 import { NewBpiCalculator } from "@/lib/bpi/newBpi";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { err, ok } from "@/middlewares/api/apiResult";
@@ -16,6 +16,9 @@ export interface HandleOutcome<T> {
 
 const DEFAULT_PAGE_SIZE = 20;
 const MAX_PAGE_SIZE = 50;
+// 集計方式(V1のべき乗平均)自体を比較用に固定で使う。単曲bpiの由来(DB保存値/
+// NewBpiCalculator算出値のどちらか)は問わない、純粋な集約関数として使う。
+const v1 = new BpiV1();
 
 /** GET /new-bpi/players （withAuth） */
 export async function handleNewBpiPlayers(
@@ -92,14 +95,8 @@ export async function handleNewBpiPlayers(
 
       currentBpis.sort((a, b) => b - a);
       newBpis.sort((a, b) => b - a);
-      const currentTotal = BpiCalculator.calculateTotalBPI(
-        currentBpis,
-        totalSongCount,
-      );
-      const hybridTotal = BpiCalculator.calculateTotalBPI(
-        newBpis,
-        totalSongCount,
-      );
+      const currentTotal = v1.total(currentBpis, totalSongCount);
+      const hybridTotal = v1.total(newBpis, totalSongCount);
       const fullNewTotal = NewBpiCalculator.calculateTotalBPI(
         userScores.map((s) => ({
           songId: s.songId,

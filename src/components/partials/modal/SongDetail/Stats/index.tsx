@@ -94,6 +94,7 @@ const StatsTab = ({ song }: { song: SongWithScore }) => {
 
     bpiBasis.forEach((bpiValue) => {
       const targetScore = BpiCalculator.calcFromBPI(bpiValue, song, true);
+      if (targetScore === null) return;
       data.push({ label: String(bpiValue), count: targetScore, bpi: bpiValue });
     });
 

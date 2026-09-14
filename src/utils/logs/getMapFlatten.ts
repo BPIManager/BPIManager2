@@ -24,6 +24,9 @@ interface RawSongScoreRow {
   wrScore: number | null;
   kaidenAvg: number | null;
   coef: number | null;
+  mu?: number | null;
+  sigma?: number | null;
+  residualVar?: number | null;
 }
 
 export const mapToFlatSong = (row: RawSongScoreRow): SongWithScore => {
@@ -44,6 +47,9 @@ export const mapToFlatSong = (row: RawSongScoreRow): SongWithScore => {
     wrScore: row.wrScore,
     kaidenAvg: row.kaidenAvg,
     coef: row.coef,
+    mu: row.mu ?? null,
+    sigma: row.sigma ?? null,
+    residualVar: row.residualVar ?? null,
     radarTop: radarLookup.get(`${row.title}__${row.difficulty}`) ?? null,
   };
 };

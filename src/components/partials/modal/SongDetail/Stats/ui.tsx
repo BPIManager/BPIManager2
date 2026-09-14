@@ -18,6 +18,8 @@ import { SongWithScore } from "@/types/songs/score";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { useChartColors } from "@/hooks/common/useChartColors";
+import { useTranslation } from "@/hooks/common/useTranslation";
+import InfoHint from "@/components/partials/common/InfoHint/ui";
 import {
   Select,
   SelectContent,
@@ -370,7 +372,10 @@ export const StatsTabView = ({
   selectedRef,
   onSelectedRefChange,
   arenaAverages,
-}: StatsTabViewProps) => (
+}: StatsTabViewProps) => {
+  const { t } = useTranslation();
+
+  return (
   <>
     <div className="flex items-center justify-end px-1 gap-2 pt-2">
       <span className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
@@ -464,6 +469,34 @@ export const StatsTabView = ({
             {song.coef ?? -1}
           </span>
         </div>
+        <div className="flex items-center justify-between">
+          <span className="flex items-center gap-1 text-xs font-bold text-bpim-muted uppercase">
+            {t("newBpi.params.mu.label")}
+            <InfoHint
+              label={t("newBpi.params.mu.label")}
+              text={t("newBpi.params.mu.hint")}
+            />
+          </span>
+          <span className="font-mono text-sm font-black text-bpim-text">
+            {song.mu !== null && song.mu !== undefined
+              ? song.mu.toFixed(4)
+              : "—"}
+          </span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="flex items-center gap-1 text-xs font-bold text-bpim-muted uppercase">
+            {t("newBpi.params.sigma.label")}
+            <InfoHint
+              label={t("newBpi.params.sigma.label")}
+              text={t("newBpi.params.sigma.hint")}
+            />
+          </span>
+          <span className="font-mono text-sm font-black text-bpim-text">
+            {song.sigma !== null && song.sigma !== undefined
+              ? song.sigma.toFixed(4)
+              : "—"}
+          </span>
+        </div>
         <Separator className="my-1 bg-bpim-border" />
         <div className="flex items-center justify-between">
           <span className="text-xs font-bold text-bpim-muted uppercase">
@@ -495,4 +528,5 @@ export const StatsTabView = ({
       </div>
     </div>
   </>
-);
+  );
+};

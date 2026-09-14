@@ -1,10 +1,8 @@
 import type { NextApiRequest } from "next";
 import dayjs from "@/lib/dayjs";
 import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
-import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 import { followListAggregateRepo } from "@/lib/db/aggregates/followList";
 import { monthlyReviewRepo } from "@/lib/db/aggregates/monthly-review";
-import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { buildBpiTimeline } from "@/lib/monthly-review/bpi";
 import { checkUserAccess } from "@/middlewares/api/withApi";
 import { accessError, err, ok } from "@/middlewares/api/apiResult";
@@ -60,7 +58,7 @@ export async function handleRivalMonthlyReviewSummary(
     }
     const rivalIds = rivalRows.map((r) => r.userId);
 
-    const [preMonthState, inMonthHistory, totalSongs] = await Promise.all([
+    const [preMonthState, inMonthHistory, allL12SongMeta] = await Promise.all([
       monthlyReviewRepo.getPreMonthBpiStateForUsers(
         rivalIds,
         version as string,
@@ -72,15 +70,14 @@ export async function handleRivalMonthlyReviewSummary(
         monthStart,
         monthEnd,
       ),
-      statsTablesRepo.getTotalSongCount([12], [...IIDX_DIFFICULTIES]),
+      monthlyReviewRepo.getAllL12SongMeta(),
     ]);
 
     const preByUser = new Map<string, Map<number, number>>();
     for (const s of preMonthState) {
+      if (s.exScore == null) continue;
       if (!preByUser.has(s.userId)) preByUser.set(s.userId, new Map());
-      preByUser
-        .get(s.userId)!
-        .set(s.songId, s.bpi != null ? Number(s.bpi) : -15);
+      preByUser.get(s.userId)!.set(s.songId, Number(s.exScore));
     }
     const historyByUser = new Map<string, typeof inMonthHistory>();
     for (const s of inMonthHistory) {
@@ -94,7 +91,7 @@ export async function handleRivalMonthlyReviewSummary(
       const { bpiStart, bpiEnd } = buildBpiTimeline(
         preMap,
         history,
-        totalSongs,
+        allL12SongMeta,
         isYearMode,
       );
       return {

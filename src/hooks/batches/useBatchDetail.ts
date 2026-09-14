@@ -5,6 +5,7 @@ import {
 } from "@/types/logs/batchDetail";
 import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
 import { useMemo } from "react";
+import type { IBpiBasicSongData, IBpiScoreObservation } from "@/types/songs/bpi";
 
 /**
  * バッチ詳細または日付別スコア詳細を取得し、サマリーと抜いた楽曲を付加して返す。
@@ -43,14 +44,29 @@ export const useLogsDetail = (
   const summary = data
     ? {
         batchPerformance: (() => {
-          const lv12Bpis = data.songs
-            .filter((s) => s.difficultyLevel === 12)
-            .map((s) => s.current?.bpi)
-            .filter((b): b is number => typeof b === "number");
+          const lv12Songs = data.songs.filter(
+            (s) => s.difficultyLevel === 12 && s.current?.exScore != null,
+          );
+          if (lv12Songs.length === 0) return -15;
 
-          return lv12Bpis.length > 0
-            ? BpiCalculator.calculateTotalBPI(lv12Bpis, lv12Bpis.length)
-            : -15;
+          const observations: IBpiScoreObservation[] = lv12Songs.map((s) => ({
+            songId: s.songId,
+            notes: s.notes,
+            exScore: s.current!.exScore,
+          }));
+          const master: (IBpiBasicSongData & { songId: number })[] = lv12Songs.map(
+            (s) => ({
+              songId: s.songId,
+              notes: s.notes,
+              kaidenAvg: s.kaidenAvg ?? null,
+              wrScore: s.wrScore ?? null,
+              coef: s.coef,
+              mu: s.mu,
+              sigma: s.sigma,
+              residualVar: s.residualVar,
+            }),
+          );
+          return BpiCalculator.calculateTotalBPI(observations, master);
         })(),
         newRecords: data.songs.filter((item) => !item.previous).length,
         updatedScores: data.songs.filter((item) => item.previous).length,

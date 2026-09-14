@@ -16,6 +16,7 @@ import { useBpiStep } from "@/hooks/common/useBpiStep";
 import { ArrowRightLeft } from "lucide-react";
 import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 import { BpiCalculator } from "@/lib/bpi";
+import type { IBpiBasicSongData, IBpiScoreObservation } from "@/types/songs/bpi";
 import BatchTotalBpiCard from "@/components/partials/common/Logs/TotalBPI/ui";
 import LogRank from "@/components/partials/common/Logs/LogRanking/ui";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
@@ -68,21 +69,35 @@ const VersionCompareContent = ({ userId, version }: Props) => {
   );
 
   const { currentTotalBpi, prevTotalBpi } = useMemo(() => {
-    const currentBpis = songsWithCurrent
-      .map((s) => s.current!.bpi)
-      .filter((b): b is number => typeof b === "number");
-    const prevBpis = songsWithCurrent
-      .filter((s) => s.previous !== null)
-      .map((s) => s.previous!.bpi)
-      .filter((b): b is number => typeof b === "number");
+    const master: (IBpiBasicSongData & { songId: number })[] = songsWithCurrent.map(
+      (s) => ({
+        songId: s.songId,
+        notes: s.notes,
+        kaidenAvg: s.kaidenAvg ?? null,
+        wrScore: s.wrScore ?? null,
+        coef: s.coef,
+        mu: s.mu,
+        sigma: s.sigma,
+        residualVar: s.residualVar,
+      }),
+    );
+    const currentObservations: IBpiScoreObservation[] = songsWithCurrent.map(
+      (s) => ({ songId: s.songId, notes: s.notes, exScore: s.current!.exScore }),
+    );
+    const prevSongs = songsWithCurrent.filter((s) => s.previous !== null);
+    const prevObservations: IBpiScoreObservation[] = prevSongs.map((s) => ({
+      songId: s.songId,
+      notes: s.notes,
+      exScore: s.previous!.exScore,
+    }));
     return {
       currentTotalBpi:
-        currentBpis.length > 0
-          ? BpiCalculator.calculateTotalBPI(currentBpis, currentBpis.length)
+        currentObservations.length > 0
+          ? BpiCalculator.calculateTotalBPI(currentObservations, master)
           : -15,
       prevTotalBpi:
-        prevBpis.length > 0
-          ? BpiCalculator.calculateTotalBPI(prevBpis, prevBpis.length)
+        prevObservations.length > 0
+          ? BpiCalculator.calculateTotalBPI(prevObservations, master)
           : -15,
     };
   }, [songsWithCurrent]);

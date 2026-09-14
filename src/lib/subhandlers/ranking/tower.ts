@@ -5,7 +5,8 @@ import { iidxTowerAggregateRepo } from "@/lib/db/aggregates/iidxTower";
 import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { maskPrivateIdentity } from "@/lib/db/shared/privacyMask";
 import { canViewUserData } from "@/lib/db/shared/visibility";
-import { calculateRadar } from "@/lib/radar/calculator";
+import { calculateRadar, buildRadarSongMaster } from "@/lib/radar/calculator";
+import { songsRepo } from "@/lib/db/domains/songs";
 import { resolveVersion, toErrorMessage } from "@/lib/subhandlers/shared";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { parsePeriodDates, targetOf, type HandleOutcome } from "./_shared";
@@ -27,12 +28,13 @@ export async function handleTowerRanking(
   const { startDate, endDate } = parsePeriodDates(period, date);
 
   try {
-    const [rows, viewerScores] = await Promise.all([
+    const [rows, viewerScores, fullMaster] = await Promise.all([
       iidxTowerAggregateRepo.getTowerRanking({ version, startDate, endDate }),
       statsTablesRepo.getLatestScoresWithMusicData(viewerId, latestVersion),
+      songsRepo.getSongMasterWithDef(),
     ]);
 
-    const viewerRadar = calculateRadar(viewerScores);
+    const viewerRadar = calculateRadar(viewerScores, buildRadarSongMaster(fullMaster));
 
     const rankings = rows.map((u, i) => ({
       rank: i + 1,

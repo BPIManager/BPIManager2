@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { IIDXVersion } from "@/types/iidx/version";
 import { sql } from "kysely";
+import { currentSongDefSubquery } from "@/lib/db/shared/songDef";
 
 /**
  * 統計ダッシュボード向けのチャート用データ（活動ヒートマップ・BPM分布・
@@ -84,13 +85,27 @@ class StatsChartsRepository {
             .as("latest"),
         (join) => join.onRef("latest.songId", "=", "m.songId"),
       )
+      .leftJoin(
+        () =>
+          currentSongDefSubquery()
+            .select(["songId", "wrScore", "kaidenAvg", "coef", "mu", "sigma", "residualVar"])
+            .as("def"),
+        (join) => join.onRef("def.songId", "=", "m.songId"),
+      )
       .select([
+        "m.songId",
         "m.title",
         "m.difficulty",
         "m.bpm",
         "m.notes",
         "latest.bpi",
         "latest.exScore",
+        "def.wrScore",
+        "def.kaidenAvg",
+        "def.coef",
+        "def.mu",
+        "def.sigma",
+        "def.residualVar",
       ])
       .$if(!isInf, (qb) =>
         qb
@@ -125,6 +140,13 @@ class StatsChartsRepository {
     let scoreQuery = db
       .selectFrom("scores as s")
       .innerJoin("songs as m", "s.songId", "m.songId")
+      .leftJoin(
+        () =>
+          currentSongDefSubquery()
+            .select(["songId", "wrScore", "kaidenAvg", "coef", "mu", "sigma", "residualVar"])
+            .as("def"),
+        (join) => join.onRef("def.songId", "=", "m.songId"),
+      )
       .select((eb) => [
         eb
           .fn<string>("DATE", [
@@ -138,6 +160,18 @@ class StatsChartsRepository {
         "s.songId",
         "m.notes",
         eb.fn.max("s.bpi").as("bpi"),
+        // bpi(exScore)は曲ごとに単調増加なので、同じグループ内でmax(bpi)と
+        // max(exScore)は同一行に対応する
+        eb.fn.max("s.exScore").as("exScore"),
+        // def.*はサブクエリ(派生テーブル)経由でsongIdに1:1のため実質集約不要だが、
+        // MySQLのONLY_FULL_GROUP_BYの関数従属性判定が派生テーブルには及ばないため
+        // max()で包んでおく
+        eb.fn.max("def.wrScore").as("wrScore"),
+        eb.fn.max("def.kaidenAvg").as("kaidenAvg"),
+        eb.fn.max("def.coef").as("coef"),
+        eb.fn.max("def.mu").as("mu"),
+        eb.fn.max("def.sigma").as("sigma"),
+        eb.fn.max("def.residualVar").as("residualVar"),
       ])
       .where("s.userId", "=", userId)
       .where("s.version", "=", version)

@@ -72,7 +72,7 @@ const UnplayedSongsTable = ({
 
       {isDetailOpen && selectedSong && (
         <SongDetailView
-          defaultTab="definitions"
+          defaultTab="stats"
           song={selectedSong}
           isOpen={isDetailOpen}
           onClose={() => setIsDetailOpen(false)}

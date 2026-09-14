@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { LineChart, LucideHistory, Users, DatabaseSearch } from "lucide-react";
+import { LineChart, LucideHistory, Users } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -18,14 +18,13 @@ import { getRankDetail } from "@/constants/iidx/rankBorders";
 import SongHistoryTab from "./History/ui";
 import RivalsRanking from "./Rivals";
 import { AppTabsList, AppTabsTrigger } from "@/components/ui/complex/tabs";
-import DefinitionsTab from "./Definitions/ui";
 import StatsTab from "./Stats";
 
 interface SongDetailViewProps {
   song: SongDetailSubject | null;
   isOpen: boolean;
   onClose: () => void;
-  defaultTab?: "stats" | "history" | "rivals" | "definitions";
+  defaultTab?: "stats" | "history" | "rivals";
 }
 
 const SongDetailView = ({
@@ -34,7 +33,7 @@ const SongDetailView = ({
   onClose,
   defaultTab,
 }: SongDetailViewProps) => {
-  // 全難易度スコア(BPI未計算)にはStatistics/Definitionsタブを表示しない
+  // 全難易度スコア(BPI未計算)にはStatisticsタブを表示しない
   const fullSong = song && hasBpiData(song) ? song : null;
   const [tab, setTab] = useState<string>(
     defaultTab || (fullSong ? "stats" : "history"),
@@ -44,7 +43,6 @@ const SongDetailView = ({
         { value: "stats", label: "Statistics", icon: LineChart },
         { value: "history", label: "History", icon: LucideHistory },
         { value: "rivals", label: "Rivals", icon: Users },
-        { value: "definitions", label: "Definitions", icon: DatabaseSearch },
       ]
     : [
         { value: "history", label: "History", icon: LucideHistory },
@@ -64,6 +62,7 @@ const SongDetailView = ({
     if (fullSong.bpi === null) return { next: "-", diff: 0 };
     const nextTargetBpi = Math.ceil((fullSong.bpi + 0.01) / 10) * 10;
     const targetScore = BpiCalculator.calcFromBPI(nextTargetBpi, fullSong, true);
+    if (targetScore === null) return { next: "-", diff: 0 };
     return { next: nextTargetBpi, diff: targetScore - currentEx };
   }, [fullSong, currentEx]);
 
@@ -180,12 +179,6 @@ const SongDetailView = ({
             <TabsContent value="rivals" className="mt-0 outline-none">
               <RivalsRanking song={song} />
             </TabsContent>
-
-            {fullSong && (
-              <TabsContent value="definitions" className="mt-0 outline-none">
-                <DefinitionsTab song={fullSong} />
-              </TabsContent>
-            )}
           </Tabs>
         </div>
       </DialogContent>

@@ -147,6 +147,9 @@ class StatsTablesRepository {
         "d.wrScore",
         "d.kaidenAvg",
         "d.coef",
+        "d.mu",
+        "d.sigma",
+        "d.residualVar",
       ])
       .where("s.userId", "=", userId)
       .where("s.version", "=", version);
@@ -178,6 +181,7 @@ class StatsTablesRepository {
         "s.exScore",
         "s.lastPlayed",
         "m.title",
+        "m.notes",
         "m.difficulty",
         "m.difficultyLevel",
       ])

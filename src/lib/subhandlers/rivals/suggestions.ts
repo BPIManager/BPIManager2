@@ -3,7 +3,8 @@ import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { userDiscoveryRepo } from "@/lib/db/aggregates/userProfiles/discovery";
 import { navigationRepo } from "@/lib/db/domains/logs/navigation";
-import { calculateRadar } from "@/lib/radar/calculator";
+import { songsRepo } from "@/lib/db/domains/songs";
+import { calculateRadar, buildRadarSongMaster } from "@/lib/radar/calculator";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { authUidOf, type HandleOutcome } from "./_shared";
@@ -24,11 +25,11 @@ export async function handleRivalSuggestions(
 
   try {
     const version = latestVersion;
-    const viewerScores = await statsTablesRepo.getLatestScoresWithMusicData(
-      viewerId,
-      version,
-    );
-    const viewerRadar = calculateRadar(viewerScores);
+    const [viewerScores, fullMaster] = await Promise.all([
+      statsTablesRepo.getLatestScoresWithMusicData(viewerId, version),
+      songsRepo.getSongMasterWithDef(),
+    ]);
+    const viewerRadar = calculateRadar(viewerScores, buildRadarSongMaster(fullMaster));
 
     let viewerBaseValue: number;
     if (sortKey === "totalBpi") {

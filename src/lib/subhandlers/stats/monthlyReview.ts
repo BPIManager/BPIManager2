@@ -1,5 +1,4 @@
 import dayjs from "@/lib/dayjs";
-import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { monthlyReviewRepo } from "@/lib/db/aggregates/monthly-review";
 import { buildBpiTimeline } from "@/lib/monthly-review/bpi";
 import { buildTopSongs } from "@/lib/monthly-review/topSongs";
@@ -18,7 +17,6 @@ import {
 } from "@/lib/monthly-review/rivals";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
-import { L12_DIFFICULTIES } from "./_shared";
 import type { AccessResult } from "@/middlewares/api/withApi";
 import type { HandlerResult } from "@/types/api";
 
@@ -46,7 +44,6 @@ export async function handleStatsMonthlyReview(
       arenaRows,
       towerRanking,
       dailyTowerData,
-      totalSongs,
       ownerPreMonthState,
       ownerInMonthHistory,
       breakdownRows,
@@ -84,7 +81,6 @@ export async function handleStatsMonthlyReview(
         monthStart,
         monthEnd,
       ),
-      statsTablesRepo.getTotalSongCount([12], [...L12_DIFFICULTIES]),
       monthlyReviewRepo.getPreMonthBpiStateForUsers(
         [owner],
         version,
@@ -111,19 +107,19 @@ export async function handleStatsMonthlyReview(
     const batchPlayDateMap = new Map(
       scoreBatches.map((b) => [b.batchId, b.playDate]),
     );
-    const ownerPreMonthBpiMap = new Map<number, number>();
+    const ownerPreMonthExScoreMap = new Map<number, number>();
     for (const s of ownerPreMonthState) {
-      ownerPreMonthBpiMap.set(s.songId, s.bpi != null ? Number(s.bpi) : -15);
+      if (s.exScore != null) ownerPreMonthExScoreMap.set(s.songId, Number(s.exScore));
     }
     const {
       history: bpiHistory,
       bpiStart,
       bpiEnd,
-      finalBpiMap: ownerFinalBpiMap,
+      finalExScoreMap: ownerFinalExScoreMap,
     } = buildBpiTimeline(
-      ownerPreMonthBpiMap,
+      ownerPreMonthExScoreMap,
       ownerInMonthHistory,
-      totalSongs,
+      allL12SongMeta,
       isYearMode,
     );
     const bpiDiff = Math.round((bpiEnd - bpiStart) * 100) / 100;
@@ -195,8 +191,8 @@ export async function handleStatsMonthlyReview(
       topImprovedSongs,
       allL12SongMeta,
       songUpdateDateMap,
-      ownerPreMonthBpiMap,
-      ownerFinalBpiMap,
+      ownerPreMonthExScoreMap,
+      ownerFinalExScoreMap,
     );
     const arena = buildArena(arenaRows);
 
@@ -233,7 +229,7 @@ export async function handleStatsMonthlyReview(
       rivals,
       rivalPreMonthState,
       rivalInMonthHistory,
-      totalSongs,
+      allL12SongMeta,
       isYearMode,
     );
     const rivalsGrowthRanking = buildGrowthRanking(

@@ -2,25 +2,34 @@ import type { NextApiRequest } from "next";
 import dayjs from "@/lib/dayjs";
 import { BpiCalculator } from "@/lib/bpi";
 import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
+import { songsRepo } from "@/lib/db/domains/songs";
 import { ok } from "@/middlewares/api/apiResult";
 import { groupByOf, DIFFICULTY_LABELS } from "./_shared";
 import type { StatsQuery } from "@/types/stats/query";
 import type { HandlerResult } from "@/types/api";
+import type { IBpiScoreObservation } from "@/types/songs/bpi";
 
 export async function handleStatsTotalBpiHistory(
   q: StatsQuery,
   req: NextApiRequest,
 ): Promise<HandlerResult<unknown>> {
   const groupBy = groupByOf(req);
-  const [allLogs, totalSongs] = await Promise.all([
+  const [allLogs, fullMaster] = await Promise.all([
     statsTablesRepo.getScoreHistory(
       q.userId,
       q.version,
       q.levels,
       q.difficulties,
     ),
-    statsTablesRepo.getTotalSongCount(q.levels, q.difficulties),
+    songsRepo.getSongMasterWithDef(),
   ]);
+  const scopedMaster = fullMaster.filter(
+    (s) =>
+      (q.levels.length === 0 ||
+        (s.difficultyLevel != null && q.levels.includes(s.difficultyLevel))) &&
+      (q.difficulties.length === 0 ||
+        (s.difficulty != null && q.difficulties.includes(s.difficulty))),
+  );
   if (allLogs.length === 0) return ok([]);
 
   const toJSTDateStr = (date: Date | string): string =>
@@ -34,6 +43,7 @@ export async function handleStatsTotalBpiHistory(
     logsByDate[date].push(log);
   });
 
+  const songById = new Map(scopedMaster.map((s) => [s.songId, s]));
   const trend = [];
   const latestBpisBySong = new Map<number, number>();
   const latestExScoresBySong = new Map<number, number>();
@@ -63,15 +73,18 @@ export async function handleStatsTotalBpiHistory(
           newBpi,
         };
       });
-    const allCurrentBpis = Array.from(latestBpisBySong.values());
-    const totalBpi = BpiCalculator.calculateTotalBPI(
-      allCurrentBpis,
-      totalSongs,
-    );
+    const observations: IBpiScoreObservation[] = Array.from(
+      latestExScoresBySong.entries(),
+    ).map(([songId, exScore]) => ({
+      songId,
+      notes: songById.get(songId)?.notes ?? 0,
+      exScore,
+    }));
+    const totalBpi = BpiCalculator.calculateTotalBPI(observations, scopedMaster);
     trend.push({
       date: dateStr,
       totalBpi,
-      count: allCurrentBpis.length,
+      count: latestBpisBySong.size,
       updatedSongs,
     });
   }

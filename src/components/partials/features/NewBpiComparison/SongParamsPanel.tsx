@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { DashCard } from "@/components/ui/dashcard";
 import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "@/hooks/common/useTranslation";
-import InfoHint from "./InfoHint";
+import InfoHint from "@/components/partials/common/InfoHint/ui";
 
 export interface SongParamsInfo {
   /** 現行方式の譜面係数。未設定曲は本番実装のデフォルト値。 */

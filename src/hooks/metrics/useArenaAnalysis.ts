@@ -1,5 +1,5 @@
 ﻿import { useMemo } from "react";
-import { BpiCalculator } from "@/lib/bpi";
+import { BpiV1 } from "@bpim/bpicalc";
 import { useUser } from "@/contexts/users/UserContext";
 import { useUserScores } from "@/hooks/table/useUserScores";
 import type { ArenaAverageData } from "@/types/metrics/arena";
@@ -8,6 +8,12 @@ import {
   ALL_RADAR_CATEGORIES,
   ARENA_RANK_COLORS,
 } from "@/constants/iidx/radars";
+
+// アリーナ平均BPI(集団の統計値)や複数ユーザーのbpiの寄せ集めに対する集計で、
+// 単一ユーザーの生スコアから潜在スキルを推定するV2の総合BPIは定義できない
+// （何を1人のプレイヤーとして推定するかが無い）ため、純粋な集計関数として
+// V1のべき乗平均をそのまま使う（bpi/index.tsの`calculateTotalBPI`とは無関係）。
+const v1 = new BpiV1();
 
 export const getBpiBarColor = (bpi: number): string => {
   if (bpi >= 50) return "#facc15";
@@ -106,7 +112,7 @@ export function useArenaAnalysis(
   const totalBpi = useMemo(() => {
     if (songsWithArenaBpi.length === 0) return null;
     const sorted = songsWithArenaBpi.map((s) => s.bpi).sort((a, b) => b - a);
-    return BpiCalculator.calculateTotalBPI(sorted, data.length);
+    return v1.total(sorted, data.length);
   }, [songsWithArenaBpi, data.length]);
 
   const avgRate = useMemo(() => {
@@ -161,7 +167,7 @@ export function useArenaAnalysis(
 
       const arenaTotal =
         arenaSongs.length > 0
-          ? BpiCalculator.calculateTotalBPI(
+          ? v1.total(
               arenaSongs.map((s) => s.bpi).sort((a, b) => b - a),
               arenaSongs.length,
             )
@@ -175,7 +181,7 @@ export function useArenaAnalysis(
 
       const userTotal =
         userBpisInCat.length > 0
-          ? BpiCalculator.calculateTotalBPI(
+          ? v1.total(
               [...userBpisInCat].sort((a, b) => b - a),
               arenaSongs.length,
             )

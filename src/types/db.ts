@@ -193,6 +193,9 @@ export interface SongDef {
   defId: Generated<number>;
   isCurrent: Generated<number | null>;
   kaidenAvg: number;
+  mu: number | null;
+  residualVar: number | null;
+  sigma: number | null;
   songId: number;
   updatedAt: Generated<Date>;
   wrScore: number;

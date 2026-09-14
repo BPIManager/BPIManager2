@@ -5,6 +5,7 @@ import { scoresRepo } from "@/lib/db/domains/scores";
 import { allScoresRepo } from "@/lib/db/domains/allScores";
 import { navigationRepo } from "@/lib/db/domains/logs/navigation";
 import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
+import { BpiCalculator } from "@/lib/bpi";
 
 /**
  * スコアインポート結果をトランザクション内で保存する。
@@ -80,16 +81,29 @@ async function executeSaveBpiSystem(
 
   const currentArenaRank = latestLog?.arenaRank ?? null;
   if (params.scoreUpdates.length > 0) {
+    // 総合BPIは既知の最高値を下回らないようラチェットする（V2は未プレイ曲の
+    // 予測が新しい観測で下がりうるため、プレイ済み曲が1曲も下がっていなくても
+    // 総合BPI自体は下がりうる。src/lib/bpi/index.tsのratchetTotalBpi参照）。
+    const previousBest = await userStatusLogsRepo.getMaxTotalBpi(
+      trx,
+      params.userId,
+      params.version,
+    );
+    const totalBpi = BpiCalculator.ratchetTotalBpi(
+      previousBest,
+      params.newTotalBpi,
+    );
+
     await navigationRepo.insert(trx, {
       userId: params.userId,
-      totalBpi: params.newTotalBpi,
+      totalBpi,
       version: params.version,
       batchId: params.batchId,
     });
 
     await userStatusLogsRepo.insert(trx, {
       userId: params.userId,
-      totalBpi: params.newTotalBpi,
+      totalBpi,
       arenaRank: currentArenaRank,
       version: params.version,
       batchId: params.batchId,

@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import { tOf } from "@bpim/bpicalc";
 import {
   toPlayDateStr,
   buildActivityBreakdown,
@@ -8,6 +9,19 @@ import { buildArena } from "@/lib/monthly-review/arena";
 import { buildBpiTimeline } from "@/lib/monthly-review/bpi";
 import { buildRivals, buildGrowthRanking } from "@/lib/monthly-review/rivals";
 import { buildTopSongs } from "@/lib/monthly-review/topSongs";
+import type { IBpiBasicSongData } from "@/types/songs/bpi";
+import { NEW_BPI_Z0 } from "@/constants/iidx/newBpi/songParams";
+
+/** test/unit/logic/bpi.test.ts と同じ、mu/sigmaをkaidenAvg基準で合成するヘルパー。 */
+function withV2Params(
+  songId: number,
+  song: { notes: number; kaidenAvg: number; wrScore: number; coef?: number },
+): IBpiBasicSongData & { songId: number } {
+  const m = song.notes * 2;
+  const sigma = 1;
+  const mu = tOf(song.kaidenAvg, m) - NEW_BPI_Z0;
+  return { songId, ...song, mu, sigma, residualVar: null };
+}
 
 describe("toPlayDateStr", () => {
   it("Dateインスタンスを YYYY-MM-DD に整形すること", () => {
@@ -102,27 +116,32 @@ describe("buildArena", () => {
 });
 
 describe("buildBpiTimeline", () => {
+  const songMaster = [
+    withV2Params(1, { notes: 1000, kaidenAvg: 1500, wrScore: 1900, coef: 1.175 }),
+    withV2Params(2, { notes: 1000, kaidenAvg: 1500, wrScore: 1900, coef: 1.175 }),
+  ];
+
   it("楽曲の月内スコア更新に応じて総合BPI推移を構築すること", () => {
     const preMap = new Map([
-      [1, 10],
-      [2, 20],
+      [1, 1550],
+      [2, 1580],
     ]);
     const result = buildBpiTimeline(
       preMap,
-      [{ songId: 1, bpi: 40, lastPlayed: "2025-06-05T00:00:00Z" }],
-      2,
+      [{ songId: 1, exScore: 1800, lastPlayed: "2025-06-05T00:00:00Z" }],
+      songMaster,
       false,
     );
 
     expect(result.history).toHaveLength(1);
     expect(result.history[0].date).toBe("2025-06-05");
     expect(result.bpiEnd).toBeGreaterThan(result.bpiStart);
-    expect(result.finalBpiMap.get(1)).toBe(40);
+    expect(result.finalExScoreMap.get(1)).toBe(1800);
   });
 
   it("月内エントリがない場合はhistoryが空でbpiStart=bpiEndになること", () => {
-    const preMap = new Map([[1, 10]]);
-    const result = buildBpiTimeline(preMap, [], 1, false);
+    const preMap = new Map([[1, 1550]]);
+    const result = buildBpiTimeline(preMap, [], songMaster, false);
     expect(result.history).toEqual([]);
     expect(result.bpiStart).toBe(result.bpiEnd);
   });

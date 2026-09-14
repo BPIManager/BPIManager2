@@ -6,10 +6,13 @@ import { useTotalBpiStats } from "@/hooks/stats/useCurrentTotalBpi";
 import { useSongList } from "@/hooks/songs/useSongList";
 import { useProfile } from "@/hooks/users/useProfile";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
-import { BpiCalculator } from "@/lib/bpi";
+import { BpiV1 } from "@bpim/bpicalc";
 import { NewBpiCalculator } from "@/lib/bpi/newBpi";
-import { calculateRadar, ALL_CATEGORIES } from "@/lib/radar/calculator";
-import { topElementMap } from "@/constants/iidx/radars/topElements";
+import { ALL_CATEGORIES } from "@/lib/radar/calculator";
+import {
+  topElementMap,
+  topElementsByCategory,
+} from "@/constants/iidx/radars/topElements";
 import { newBpiSongParamMap } from "@/constants/iidx/newBpi/songParams";
 import NewBpiComparisonUi, { NewBpiRow, SortKey } from "./ui";
 import type { CurvePoint } from "./CurveChart";
@@ -21,6 +24,12 @@ import type { SongParamsInfo } from "./SongParamsPanel";
 interface Props {
   userId: string;
 }
+
+// このページは「V1(旧) vs V2(現行)」の比較専用ツールで、V1側は本番実装
+// (BpiCalculator、現在はV2)ではなくレガシーのV1公式を直接使う。V2側は
+// DBのmu/sigmaマイグレーションを待たず検証できるよう、従来通り
+// songParams.json由来のNewBpiCalculatorをそのまま使い続ける。
+const legacyV1 = new BpiV1();
 
 /** 推移グラフのX軸(BPI)の目盛り。10刻み＋現行の床(-15)。 */
 const BPI_TICKS = [-15, -10, 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
@@ -212,7 +221,7 @@ export default function NewBpiComparison({ userId }: Props) {
       .sort((a, b) => b - a);
     const hybridTotalBpi =
       totalSongCount12 > 0
-        ? BpiCalculator.calculateTotalBPI(newBpisLevel12Desc, totalSongCount12)
+        ? legacyV1.total(newBpisLevel12Desc, totalSongCount12)
         : null;
 
     // (C) 単曲BPI・総合BPIの導出方法の両方を新方式に置き換える。issue #304:
@@ -250,55 +259,54 @@ export default function NewBpiComparison({ userId }: Props) {
   // (RadarResponse.songs)を新方式側の計算にも流用することで、両者の対象曲・
   // 分母を完全に一致させる。
   const radarComparison = useMemo(() => {
-    if (!songs || songMaster.length === 0) return null;
+    if (!songs) return null;
     const played = songs.filter(
       (s): s is typeof s & { exScore: number } => s.exScore !== null,
     );
     if (played.length === 0) return null;
 
-    const radarResult = calculateRadar(
-      played.map((s) => ({
-        title: s.title,
-        difficulty: s.difficulty,
-        exScore: s.exScore,
-        notes: s.notes,
-        bpi: s.bpi,
-      })),
-    );
-
-    const songMasterByKey = new Map(
-      songMaster.map((s) => [`${s.title}___${s.difficulty}`, s]),
-    );
-
     const current: Record<string, number> = {};
     const next: Record<string, number> = {};
     for (const category of ALL_CATEGORIES) {
-      const categoryResult = radarResult[category];
-      current[category] = categoryResult.totalBpi;
+      const categorySongs = played.filter(
+        (s) => topElementMap.get(`${s.title}___${s.difficulty}`) === category,
+      );
+      // プレイ済み以外(未プレイ)の分母は topElements.json のカテゴリ定義曲数から補う
+      const totalCount =
+        topElementsByCategory.get(category)?.length ?? categorySongs.length;
 
-      const totalCount = categoryResult.songs.length;
-      const newBpis = categoryResult.songs
-        .filter((s) => s.exScore !== null)
-        .map((s) => {
-          const master = songMasterByKey.get(`${s.title}___${s.difficulty}`);
-          if (!master) return null;
-          return NewBpiCalculator.calc(s.exScore!, {
-            songId: master.songId,
-            notes: master.notes,
-            kaidenAvg: master.kaidenAvg,
-            wrScore: master.wrScore,
-          });
-        })
+      const currentBpis = categorySongs
+        .map((s) =>
+          legacyV1
+            .chart({
+              notes: s.notes,
+              kaidenAvg: s.kaidenAvg,
+              wrScore: s.wrScore,
+              coef: s.coef,
+            })
+            .bpi(s.exScore),
+        )
         .filter((b): b is number => b !== null)
         .sort((a, b) => b - a);
+      current[category] =
+        currentBpis.length > 0 ? legacyV1.total(currentBpis, totalCount) : -15;
 
+      const newBpis = categorySongs
+        .map((s) =>
+          NewBpiCalculator.calc(s.exScore, {
+            songId: s.songId,
+            notes: s.notes,
+            kaidenAvg: s.kaidenAvg,
+            wrScore: s.wrScore,
+          }),
+        )
+        .filter((b): b is number => b !== null)
+        .sort((a, b) => b - a);
       next[category] =
-        newBpis.length > 0
-          ? BpiCalculator.calculateTotalBPI(newBpis, totalCount)
-          : -15;
+        newBpis.length > 0 ? legacyV1.total(newBpis, totalCount) : -15;
     }
     return { current, next };
-  }, [songs, songMaster]);
+  }, [songs]);
 
   // 推移グラフで選べるのは新方式パラメータのある楽曲のみ(新方式の曲線が描けないため)
   const curveEligibleRows = useMemo(
@@ -323,7 +331,7 @@ export default function NewBpiComparison({ userId }: Props) {
     };
     return BPI_TICKS.map((bpi) => ({
       bpi,
-      current: BpiCalculator.calcFromBPI(bpi, basic, false),
+      current: legacyV1.chart(basic).scoreFor(bpi, false),
       new: NewBpiCalculator.calcFromBPI(bpi, {
         songId: song.songId,
         notes: song.notes,
@@ -362,7 +370,7 @@ export default function NewBpiComparison({ userId }: Props) {
       rate,
       isBpi0Anchor,
       exScore,
-      current: BpiCalculator.calc(exScore, basic),
+      current: legacyV1.chart(basic).bpi(exScore),
       new: NewBpiCalculator.calc(exScore, {
         songId: song.songId,
         notes: song.notes,

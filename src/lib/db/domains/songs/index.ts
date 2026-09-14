@@ -35,6 +35,9 @@ class SongsRepository {
         "sd.wrScore",
         "sd.kaidenAvg",
         "sd.coef",
+        "sd.mu",
+        "sd.sigma",
+        "sd.residualVar",
       ])
       .execute();
     return result as SongMaster;
@@ -50,7 +53,7 @@ class SongsRepository {
       .leftJoin(
         () =>
           currentSongDefSubquery()
-            .select(["songId", "wrScore", "kaidenAvg", "coef"])
+            .select(["songId", "wrScore", "kaidenAvg", "coef", "mu", "sigma", "residualVar"])
             .as("def"),
         (join) => join.onRef("def.songId", "=", "s.songId"),
       )
@@ -63,6 +66,9 @@ class SongsRepository {
         "def.wrScore",
         "def.kaidenAvg",
         "def.coef",
+        "def.mu",
+        "def.sigma",
+        "def.residualVar",
       ])
       .where("s.title", "=", title)
       .where("s.difficulty", "=", difficulty)
@@ -294,24 +300,6 @@ class SongsRepository {
       .executeTakeFirst();
   }
 
-  /**
-   * 指定楽曲の曲定義（`songDef`）を新しい順に全件取得する（定義更新履歴表示用）。
-   */
-  async getDefinitionHistory(songId: number) {
-    return await db
-      .selectFrom("songDef")
-      .select([
-        "defId",
-        "wrScore",
-        "kaidenAvg",
-        "coef",
-        "isCurrent",
-        "updatedAt",
-      ])
-      .where("songId", "=", songId)
-      .orderBy("defId", "desc")
-      .execute();
-  }
 
   /**
    * 現在有効な曲定義（`songDef.isCurrent = 1`）とタイトル・難易度・ノーツ数を結合して取得する（メトリクス生成用）。
@@ -351,7 +339,25 @@ class SongsRepository {
   ) {
     return await db
       .selectFrom("songs as m")
-      .select(["m.songId", "m.title", "m.difficulty"])
+      .leftJoin(
+        () =>
+          currentSongDefSubquery()
+            .select(["songId", "wrScore", "kaidenAvg", "coef", "mu", "sigma", "residualVar"])
+            .as("def"),
+        (join) => join.onRef("def.songId", "=", "m.songId"),
+      )
+      .select([
+        "m.songId",
+        "m.title",
+        "m.difficulty",
+        "m.notes",
+        "def.wrScore",
+        "def.kaidenAvg",
+        "def.coef",
+        "def.mu",
+        "def.sigma",
+        "def.residualVar",
+      ])
       .where("m.difficultyLevel", "=", level)
       .where("m.difficulty", "in", difficulties as string[])
       .execute();

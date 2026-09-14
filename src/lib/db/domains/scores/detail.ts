@@ -105,6 +105,9 @@ class LogScoreRepository {
         "sd.wrScore",
         "sd.kaidenAvg",
         "sd.coef",
+        "sd.mu",
+        "sd.sigma",
+        "sd.residualVar",
       ]);
 
     if (batchIds && batchIds.length > 0) {

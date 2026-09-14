@@ -54,6 +54,7 @@ vi.mock("@/lib/db/shared/privacyMask", () => ({
 }));
 vi.mock("@/lib/radar/calculator", () => ({
   calculateRadar: () => ({ NOTES: { totalBpi: 0, songs: [] } }),
+  buildRadarSongMaster: () => new Map(),
 }));
 
 const authReq = (query: Record<string, unknown>) =>
