@@ -75,11 +75,11 @@ function scoreLabelOf(exScore: number, notes: number): string {
   return `${rd.label}+${rd.surplus}`;
 }
 
-const RADAR_SIZE = 220;
-const RADAR_RADIUS = 74;
-const RADAR_LABEL_RADIUS = RADAR_RADIUS + 32;
-const RADAR_PAD_X = 44;
-const RADAR_PAD_Y = 24;
+const RADAR_SIZE = 250;
+const RADAR_RADIUS = 88;
+const RADAR_LABEL_RADIUS = RADAR_RADIUS + 30;
+const RADAR_PAD_X = 42;
+const RADAR_PAD_Y = 14;
 
 /**
  * 現時点の要素別BPI（成長ではなく最終状態）をレーダーチャート（多角形）として描画する。
@@ -236,13 +236,13 @@ export async function generateMonthlyReviewOgpImage(q: {
         flexDirection: "column",
         width: "100%",
         height: "100%",
-        padding: 56,
+        padding: 48,
         background: "linear-gradient(135deg, #0a0a0f 0%, #14141f 100%)",
         fontFamily: "Noto Sans JP",
         color: "white",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 14 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 10 }}>
         {userInfo?.profileImage ? (
           // satori用のJSXで、next/imageではなく生のimg要素を渡す必要がある
           // eslint-disable-next-line @next/next/no-img-element
@@ -280,29 +280,32 @@ export async function generateMonthlyReviewOgpImage(q: {
           display: "flex",
           fontSize: 34,
           fontWeight: 700,
-          marginBottom: 20,
+          marginBottom: 14,
         }}
       >
         {heading}
       </div>
 
-      <div style={{ display: "flex", alignItems: "baseline", gap: 16, marginBottom: 28 }}>
-        <div style={{ display: "flex", fontSize: 22, color: "rgba(255,255,255,0.4)" }}>
+      <div style={{ display: "flex", flexDirection: "column", marginBottom: 16 }}>
+        <div style={{ display: "flex", fontSize: 20, color: "rgba(255,255,255,0.4)", marginBottom: 4 }}>
           総合BPI
         </div>
-        <div style={{ display: "flex", fontSize: 72, fontWeight: 700 }}>
-          {bpiTimeline.bpiEnd.toFixed(2)}
-        </div>
-        <div
-          style={{
-            display: "flex",
-            fontSize: 28,
-            fontWeight: 700,
-            color: bpiTimeline.bpiDiff >= 0 ? "#34d399" : "#f87171",
-          }}
-        >
-          {bpiTimeline.bpiDiff >= 0 ? "+" : ""}
-          {bpiTimeline.bpiDiff.toFixed(2)}
+        <div style={{ display: "flex", alignItems: "flex-end", gap: 16 }}>
+          <div style={{ display: "flex", fontSize: 64, fontWeight: 700, lineHeight: 1 }}>
+            {bpiTimeline.bpiEnd.toFixed(2)}
+          </div>
+          <div
+            style={{
+              display: "flex",
+              fontSize: 26,
+              fontWeight: 700,
+              paddingBottom: 6,
+              color: bpiTimeline.bpiDiff >= 0 ? "#34d399" : "#f87171",
+            }}
+          >
+            {bpiTimeline.bpiDiff >= 0 ? "+" : ""}
+            {bpiTimeline.bpiDiff.toFixed(2)}
+          </div>
         </div>
       </div>
 
@@ -339,7 +342,7 @@ export async function generateMonthlyReviewOgpImage(q: {
                   color: "rgba(255,255,255,0.4)",
                 }}
               >
-                <div style={{ display: "flex" }}>{s.exScore.toLocaleString()}</div>
+                <div style={{ display: "flex" }}>{s.exScore}</div>
                 <div style={{ display: "flex" }}>{scoreLabelOf(s.exScore, s.notes)}</div>
               </div>
             </div>
