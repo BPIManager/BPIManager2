@@ -94,14 +94,20 @@ function RadarPolygonChart({
   const angleOf = (i: number) => -Math.PI / 2 + i * ((2 * Math.PI) / n);
   const pointAt = (i: number, radius: number) => {
     const a = angleOf(i);
-    return { x: center + radius * Math.cos(a), y: center + radius * Math.sin(a) };
+    return {
+      x: center + radius * Math.cos(a),
+      y: center + radius * Math.sin(a),
+    };
   };
   const polygonAt = (ratio: number) =>
     Array.from({ length: n }, (_, i) => pointAt(i, ratio * RADAR_RADIUS))
       .map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`)
       .join(" ");
   const dataPoints = entries.map((e, i) =>
-    pointAt(i, Math.max(0, Math.min(1, (e.bpiEnd - floor) / range)) * RADAR_RADIUS),
+    pointAt(
+      i,
+      Math.max(0, Math.min(1, (e.bpiEnd - floor) / range)) * RADAR_RADIUS,
+    ),
   );
   const dataPointsStr = dataPoints
     .map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`)
@@ -152,7 +158,13 @@ function RadarPolygonChart({
           strokeWidth={2}
         />
         {dataPoints.map((p, i) => (
-          <circle key={entries[i].element} cx={p.x} cy={p.y} r={3.5} fill="#38bdf8" />
+          <circle
+            key={entries[i].element}
+            cx={p.x}
+            cy={p.y}
+            r={3.5}
+            fill="#38bdf8"
+          />
         ))}
       </svg>
       {entries.map((e, i) => {
@@ -205,7 +217,13 @@ interface OgpRenderData {
   userName: string;
   profileImage: string | null;
   bpiEnd: number;
-  topSongs: { songId: number; title: string; bpi: number; exScore: number; notes: number }[];
+  topSongs: {
+    songId: number;
+    title: string;
+    bpi: number;
+    exScore: number;
+    notes: number;
+  }[];
   topRadar: { element: string; bpiEnd: number }[];
 }
 
@@ -226,7 +244,14 @@ async function renderOgpImage(data: OgpRenderData): Promise<Buffer> {
         color: "white",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 10 }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 14,
+          marginBottom: 10,
+        }}
+      >
         {profileImage ? (
           // satori用のJSXで、next/imageではなく生のimg要素を渡す必要がある
           // eslint-disable-next-line @next/next/no-img-element
@@ -235,7 +260,10 @@ async function renderOgpImage(data: OgpRenderData): Promise<Buffer> {
             alt=""
             width={44}
             height={44}
-            style={{ borderRadius: 22, border: "2px solid rgba(255,255,255,0.15)" }}
+            style={{
+              borderRadius: 22,
+              border: "2px solid rgba(255,255,255,0.15)",
+            }}
           />
         ) : (
           <div
@@ -254,7 +282,13 @@ async function renderOgpImage(data: OgpRenderData): Promise<Buffer> {
             {userName.slice(0, 2)}
           </div>
         )}
-        <div style={{ display: "flex", fontSize: 24, color: "rgba(255,255,255,0.55)" }}>
+        <div
+          style={{
+            display: "flex",
+            fontSize: 24,
+            color: "rgba(255,255,255,0.55)",
+          }}
+        >
           {userName}
         </div>
       </div>
@@ -270,12 +304,28 @@ async function renderOgpImage(data: OgpRenderData): Promise<Buffer> {
         {heading}
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", marginBottom: 16 }}>
-        <div style={{ display: "flex", fontSize: 20, color: "rgba(255,255,255,0.4)", marginBottom: 4 }}>
+      <div
+        style={{ display: "flex", flexDirection: "column", marginBottom: 16 }}
+      >
+        <div
+          style={{
+            display: "flex",
+            fontSize: 20,
+            color: "rgba(255,255,255,0.4)",
+            marginBottom: 4,
+          }}
+        >
           総合BPI
         </div>
         <div style={{ display: "flex", alignItems: "flex-end", gap: 16 }}>
-          <div style={{ display: "flex", fontSize: 64, fontWeight: 700, lineHeight: 1 }}>
+          <div
+            style={{
+              display: "flex",
+              fontSize: 64,
+              fontWeight: 700,
+              lineHeight: 1,
+            }}
+          >
             {bpiEnd.toFixed(2)}
           </div>
           <div
@@ -295,14 +345,21 @@ async function renderOgpImage(data: OgpRenderData): Promise<Buffer> {
               color: "#fbbf24",
             }}
           >
-            推定 #{BpiCalculator.estimateRank(bpiEnd).toLocaleString()}位
+            推定 {BpiCalculator.estimateRank(bpiEnd).toLocaleString()}位
           </div>
         </div>
       </div>
 
       <div style={{ display: "flex", flex: 1, gap: 48 }}>
         <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
-          <div style={{ display: "flex", fontSize: 20, color: "rgba(255,255,255,0.4)", marginBottom: 12 }}>
+          <div
+            style={{
+              display: "flex",
+              fontSize: 20,
+              color: "rgba(255,255,255,0.4)",
+              marginBottom: 12,
+            }}
+          >
             BPIトップ{TOP_SONGS_COUNT}
           </div>
           {topSongs.map((s) => (
@@ -318,9 +375,21 @@ async function renderOgpImage(data: OgpRenderData): Promise<Buffer> {
                 borderBottomStyle: "solid",
               }}
             >
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 20 }}>
-                <div style={{ display: "flex", maxWidth: 320, overflow: "hidden" }}>{s.title}</div>
-                <div style={{ display: "flex", fontWeight: 700, color: "#38bdf8" }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  fontSize: 20,
+                }}
+              >
+                <div
+                  style={{ display: "flex", maxWidth: 320, overflow: "hidden" }}
+                >
+                  {s.title}
+                </div>
+                <div
+                  style={{ display: "flex", fontWeight: 700, color: "#38bdf8" }}
+                >
                   {s.bpi.toFixed(2)}
                 </div>
               </div>
@@ -334,13 +403,22 @@ async function renderOgpImage(data: OgpRenderData): Promise<Buffer> {
                 }}
               >
                 <div style={{ display: "flex" }}>{s.exScore}</div>
-                <div style={{ display: "flex" }}>{scoreLabelOf(s.exScore, s.notes)}</div>
+                <div style={{ display: "flex" }}>
+                  {scoreLabelOf(s.exScore, s.notes)}
+                </div>
               </div>
             </div>
           ))}
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", flex: 1, alignItems: "center" }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            flex: 1,
+            alignItems: "center",
+          }}
+        >
           <div
             style={{
               display: "flex",
@@ -373,8 +451,18 @@ async function renderOgpImage(data: OgpRenderData): Promise<Buffer> {
       width: WIDTH,
       height: HEIGHT,
       fonts: [
-        { name: "Noto Sans JP", data: loadFont("regular"), weight: 400, style: "normal" },
-        { name: "Noto Sans JP", data: loadFont("bold"), weight: 700, style: "normal" },
+        {
+          name: "Noto Sans JP",
+          data: loadFont("regular"),
+          weight: 400,
+          style: "normal",
+        },
+        {
+          name: "Noto Sans JP",
+          data: loadFont("bold"),
+          weight: 700,
+          style: "normal",
+        },
       ],
     },
   );
@@ -394,7 +482,13 @@ export async function generateMonthlyReviewOgpImage(q: {
   const [userInfo, bpiTimeline, { latestInMonth, songUpdateDateMap }] =
     await Promise.all([
       usersRepo.getDisplayInfo(q.userId),
-      computeOwnerBpiTimeline(q.userId, q.version, monthStart, monthEnd, useMonthBuckets),
+      computeOwnerBpiTimeline(
+        q.userId,
+        q.version,
+        monthStart,
+        monthEnd,
+        useMonthBuckets,
+      ),
       computeOwnerMonthlyScores(q.userId, q.version, monthStart, monthEnd),
     ]);
   const { topBpiSongs, topImprovedSongs } = await computeOwnerTopSongs(
@@ -434,22 +528,34 @@ export async function generateMonthlyReviewOgpImage(q: {
 export async function generateSampleMonthlyReviewOgpImage(): Promise<Buffer> {
   return renderOgpImage({
     heading: "IIDX 33 Sparkle Showerの振り返り",
-    userName: "あなた",
+    userName: "プレイヤー名",
     profileImage: null,
     bpiEnd: 65.42,
     topSongs: [
-      { songId: -1, title: "冥",  bpi: 92.18, exScore: 1987, notes: 1042 },
-      { songId: -2, title: "Legendary Air",  bpi: 84.05, exScore: 2214, notes: 1180 },
-      { songId: -3, title: "革命",  bpi: 78.63, exScore: 2456, notes: 1320 },
-      { songId: -4, title: "冷たい鉄が触れる時",  bpi: 71.29, exScore: 2601, notes: 1408 },
+      { songId: -1, title: "冥", bpi: 12.34, exScore: 3333, notes: 2000 },
+      {
+        songId: -2,
+        title: "灼熱Beach Side Bunny",
+        bpi: 12.34,
+        exScore: 3000,
+        notes: 1719,
+      },
+      { songId: -3, title: "卑弥呼", bpi: 12.67, exScore: 3333, notes: 2119 },
+      {
+        songId: -4,
+        title: "死神自爆中二妹アイドルももかりん(1歳)",
+        bpi: 23.56,
+        exScore: 2356,
+        notes: 1472,
+      },
     ],
     topRadar: [
-      { element: "SCRATCH", bpiEnd: 60.1 },
-      { element: "CHARGE", bpiEnd: 58.4 },
-      { element: "PEAK", bpiEnd: 55.2 },
-      { element: "CHORD", bpiEnd: 52.8 },
-      { element: "SOFLAN", bpiEnd: 50.5 },
-      { element: "NOTES", bpiEnd: 48.9 },
+      { element: "SCRATCH", bpiEnd: 30.1 },
+      { element: "CHARGE", bpiEnd: 25.4 },
+      { element: "PEAK", bpiEnd: 25.2 },
+      { element: "CHORD", bpiEnd: 22.8 },
+      { element: "SOFLAN", bpiEnd: 30.5 },
+      { element: "NOTES", bpiEnd: 28.9 },
     ],
   });
 }
