@@ -14,6 +14,7 @@ import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { useRouter } from "next/router";
 import { ArrowLeft } from "lucide-react";
+import { useState } from "react";
 
 const orbitStyles = `
   @keyframes orbitA { 0%{transform:rotate(0deg) translateX(30px) rotate(0deg)} 100%{transform:rotate(360deg) translateX(30px) rotate(-360deg)} }
@@ -43,8 +44,21 @@ export default function MonthlyReviewPage() {
       ? "year"
       : "month";
 
+  // 楽曲ハイライト「最も伸びた曲」の比較先バージョン（全期間モードのみ有効・
+  // configボタンから変更可能）。未指定時はサーバー側で既定値（前バージョン）が使われる。
+  // ルート（対象期間）が変わったら選択をリセットする（レンダー中の状態調整）
+  const routeKey = `${userIdStr ?? ""}:${version}:${month ?? ""}`;
+  const [compareVersionRouteKey, setCompareVersionRouteKey] = useState(routeKey);
+  const [compareVersion, setCompareVersion] = useState<string | undefined>(
+    undefined,
+  );
+  if (compareVersionRouteKey !== routeKey) {
+    setCompareVersionRouteKey(routeKey);
+    setCompareVersion(undefined);
+  }
+
   const bpi = useMonthlyReviewBpi(userIdStr, version, month);
-  const topSongs = useMonthlyReviewTopSongs(userIdStr, version, month);
+  const topSongs = useMonthlyReviewTopSongs(userIdStr, version, month, compareVersion);
   const activity = useMonthlyReviewActivity(userIdStr, version, month);
   const rivals = useMonthlyReviewRivals(userIdStr, version, month);
   const arena = useMonthlyReviewArena(userIdStr, version, month);
@@ -67,6 +81,15 @@ export default function MonthlyReviewPage() {
     const status = authStatusOf(s.error);
     return status === 401 || status === 403;
   });
+
+  // 初回ロード完了後は、比較先バージョン変更等による個別セクションの再フェッチで
+  // 画面全体のローディング演出に戻らないよう、ルート（対象期間）単位で
+  // 「初回ロード済みか」を記憶する（レンダー中の状態調整）
+  const [loadedRouteKey, setLoadedRouteKey] = useState<string | null>(null);
+  if (allSettled && loadedRouteKey !== routeKey) {
+    setLoadedRouteKey(routeKey);
+  }
+  const showFullScreenLoading = !router.isReady || loadedRouteKey !== routeKey;
 
   const BackBtn = (
     <button
@@ -105,7 +128,7 @@ export default function MonthlyReviewPage() {
     />
   ) : null;
 
-  if (!router.isReady || !allSettled) {
+  if (showFullScreenLoading) {
     return (
       <div className="fixed inset-0" style={{ background: "#0a0a0f" }}>
         {MetaTag}
@@ -234,6 +257,8 @@ export default function MonthlyReviewPage() {
           arena: arena.data?.arena ?? null,
           radarGrowth: radarGrowth.data?.radarGrowth ?? null,
         }}
+        topSongsLoading={topSongs.isLoading}
+        onCompareVersionChange={setCompareVersion}
       />
     </>
   );

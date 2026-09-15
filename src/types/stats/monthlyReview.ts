@@ -80,6 +80,8 @@ export interface MonthlyReviewBpi {
 export interface MonthlyReviewTopSongs {
   topBpiSongs: TopSong[];
   topImprovedSongs: TopSongImproved[];
+  /** 「最も伸びた曲」の比較先バージョン（全期間モードのみ。月次/年次はnull） */
+  compareVersion: string | null;
 }
 
 export interface MonthlyReviewActivity {

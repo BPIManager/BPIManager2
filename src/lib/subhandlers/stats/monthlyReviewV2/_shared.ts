@@ -3,6 +3,7 @@ import { monthlyReviewRepo } from "@/lib/db/aggregates/monthly-review";
 import { buildBpiTimeline } from "@/lib/monthly-review/bpi";
 import { buildTopSongs } from "@/lib/monthly-review/topSongs";
 import { toPlayDateStr } from "@/lib/monthly-review/activity";
+import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 
 export type MonthlyReviewGranularity = "month" | "year" | "version";
 
@@ -39,6 +40,17 @@ export function resolveMonthlyReviewPeriod(
       ? dayjs.tz(`${month}-12-31`).format("YYYY-MM-DD")
       : dayjs.tz(`${month}-01`).endOf("month").format("YYYY-MM-DD");
   return { granularity, monthStart, monthEnd, useMonthBuckets: isYearMode || isAllMode };
+}
+
+/**
+ * 「全期間（月=all）」モードでの楽曲ハイライト「最も伸びた曲」の既定比較先バージョン
+ * （＝1つ前のバージョン）を返す。`IIDX_VERSIONS`の並び順（26〜34, INF）上での
+ * 直前の要素とする。先頭バージョン（比較対象が無い）の場合は`null`。
+ */
+export function previousVersionOf(version: string): string | null {
+  const idx = (IIDX_VERSIONS as readonly string[]).indexOf(version);
+  if (idx <= 0) return null;
+  return IIDX_VERSIONS[idx - 1];
 }
 
 /** 本人分のBPI推移。radar-growth/activity/rivalsセクションでも使う値のため独立関数にする */
@@ -126,7 +138,16 @@ export async function computeOwnerMonthlyScores(
   return { latestInMonth, songUpdateDateMap };
 }
 
-/** BPIトップ3・改善曲（`rank`はbuildTopSongs内でbpicalcの推定順位関数から算出済み）。radar-growthセクションからも呼ばれる */
+/**
+ * BPIトップ3・改善曲（`rank`はbuildTopSongs内でbpicalcの推定順位関数から算出済み）。
+ * radar-growthセクションからも呼ばれる。
+ *
+ * `compareVersion`省略時は月内比較（`monthStart`より前の直近スコア）を使う。
+ * 「全期間（月=all）」モードは元々の期間開始が2000年固定の便宜上の値で
+ * 「期間開始前のスコア」という比較が意味を持たないため、`compareVersion`に
+ * 比較対象バージョン（既定は前バージョン）を渡し、そのバージョン内での
+ * 最新スコアを比較元として使う。
+ */
 export async function computeOwnerTopSongs(
   owner: string,
   version: string,
@@ -134,15 +155,22 @@ export async function computeOwnerTopSongs(
   latestInMonth: Awaited<
     ReturnType<typeof computeOwnerMonthlyScores>
   >["latestInMonth"],
+  compareVersion?: string,
 ) {
   const songIdsUpdated = latestInMonth.map((s) => s.songId);
 
-  const preScores = await monthlyReviewRepo.getPreMonthScoresByLastPlayed(
-    owner,
-    version,
-    songIdsUpdated,
-    monthStart,
-  );
+  const preScores = compareVersion
+    ? await monthlyReviewRepo.getComparisonVersionScores(
+        owner,
+        compareVersion,
+        songIdsUpdated,
+      )
+    : await monthlyReviewRepo.getPreMonthScoresByLastPlayed(
+        owner,
+        version,
+        songIdsUpdated,
+        monthStart,
+      );
 
   const preScoreMap = new Map<number, { exScore: number; bpi: number | null }>();
   for (const s of preScores) {

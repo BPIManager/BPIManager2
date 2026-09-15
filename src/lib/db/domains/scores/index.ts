@@ -351,6 +351,35 @@ class ScoresRepository {
   }
 
   /**
+   * 指定楽曲群について、指定バージョン内での最新スコア（EXスコア・BPI）を取得する。
+   * `getLatestExScoresForSongsBeforeDate`の日時境界版と異なり、バージョンそのものを
+   * 境界として使う（例: 前バージョンとの比較用）。
+   */
+  async getLatestScoresForVersion(
+    userId: string,
+    version: string,
+    songIds: number[],
+  ) {
+    if (songIds.length === 0) return [];
+    return await db
+      .selectFrom("scores as s")
+      .innerJoin(
+        latestLogIdPerSongSubquery({
+          table: "scores",
+          userId,
+          version,
+          extra: (qb) => qb.where("songId", "in", songIds),
+        }).as("latest"),
+        (join) =>
+          join
+            .onRef("latest.songId", "=", "s.songId")
+            .onRef("latest.maxLogId", "=", "s.logId"),
+      )
+      .select(["s.songId", "s.bpi", "s.exScore"])
+      .execute();
+  }
+
+  /**
    * 指定期間内の最終プレイ日時を曜日・時間帯別に集計する（プレイ済み楽曲数ベース）。
    */
   async getActivityBreakdownByLastPlayed(

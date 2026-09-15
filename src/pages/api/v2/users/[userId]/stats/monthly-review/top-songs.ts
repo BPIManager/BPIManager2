@@ -17,6 +17,7 @@ export default withUserApiHandler(
     const userId = req.query.userId as string;
     const version = req.query.version as string;
     const month = req.query.month as string;
+    const compareVersion = req.query.compareVersion as string | undefined;
     const isYearMode = /^\d{4}$/.test(month ?? "");
     const isMonthMode = /^\d{4}-\d{2}$/.test(month ?? "");
     const isAllMode = month === "all";
@@ -37,7 +38,14 @@ export default withUserApiHandler(
       });
       return null;
     }
-    return { userId, version, month };
+    if (
+      compareVersion !== undefined &&
+      !(IIDX_VERSIONS as readonly string[]).includes(compareVersion)
+    ) {
+      res.status(400).json({ message: "Invalid compareVersion" });
+      return null;
+    }
+    return { userId, version, month, compareVersion };
   },
   async (req, res, query, access) => {
     writeV2Result(

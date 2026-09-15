@@ -8,9 +8,15 @@ const MAX_SPEED = 14;
 
 interface Props {
   data: MonthlyReviewViewSections;
+  topSongsLoading?: boolean;
+  onCompareVersionChange?: (version: string) => void;
 }
 
-const MonthlyReviewView = ({ data }: Props) => {
+const MonthlyReviewView = ({
+  data,
+  topSongsLoading,
+  onCompareVersionChange,
+}: Props) => {
   const speedRef = useRef(BASE_SPEED);
 
   useEffect(() => {
@@ -43,7 +49,14 @@ const MonthlyReviewView = ({ data }: Props) => {
     };
   }, []);
 
-  return <MonthlyReviewViewUI data={data} speedRef={speedRef} />;
+  return (
+    <MonthlyReviewViewUI
+      data={data}
+      speedRef={speedRef}
+      topSongsLoading={topSongsLoading}
+      onCompareVersionChange={onCompareVersionChange}
+    />
+  );
 };
 
 export default MonthlyReviewView;

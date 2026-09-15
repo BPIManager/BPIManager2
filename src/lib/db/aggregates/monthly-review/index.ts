@@ -194,6 +194,15 @@ class MonthlyReviewRepository {
     );
   }
 
+  /** 「前作」等、比較対象バージョン内での最新スコアを取得する（全期間モードの楽曲ハイライト用） */
+  async getComparisonVersionScores(
+    userId: string,
+    compareVersion: string,
+    songIds: number[],
+  ) {
+    return scoresRepo.getLatestScoresForVersion(userId, compareVersion, songIds);
+  }
+
   async getMonthlyActivityBreakdownByLastPlayed(
     userId: string,
     version: string,

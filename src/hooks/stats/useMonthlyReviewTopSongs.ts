@@ -6,10 +6,11 @@ export const useMonthlyReviewTopSongs = (
   userId: string | undefined,
   version: string | undefined,
   month: string | undefined, // YYYY-MM, YYYY or "all"
+  compareVersion?: string,
 ) => {
   const shouldFetch = userId && version && month;
   const url = shouldFetch
-    ? `${API_V2_PREFIX}/users/${userId}/stats/monthly-review/top-songs?version=${version}&month=${month}`
+    ? `${API_V2_PREFIX}/users/${userId}/stats/monthly-review/top-songs?version=${version}&month=${month}${compareVersion ? `&compareVersion=${compareVersion}` : ""}`
     : null;
 
   const { data, isLoading, error } = useAuthedSWRV2<MonthlyReviewTopSongs>(url, {

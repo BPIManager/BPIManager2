@@ -59,6 +59,12 @@ export const monthlyReviewTranslations = {
     "zh-TW": "本月無更新",
     ko: "이번 달 업데이트 없음",
   },
+  "monthlyReview.topSongs.compareVersionLabel": {
+    ja: "比較先バージョン",
+    en: "Compare with",
+    "zh-TW": "比較版本",
+    ko: "비교 대상 버전",
+  },
   "monthlyReview.activity.sectionTitle": {
     ja: "プレイ記録",
     en: "Play Stats",

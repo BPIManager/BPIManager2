@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/router";
 import { useInView } from "@/hooks/common/useInView";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import type { MonthlyReviewData } from "@/types/stats/monthlyReview";
@@ -9,11 +10,20 @@ import TopSongsSectionUI from "./ui";
 interface Props {
   topSongs: MonthlyReviewData["topSongs"];
   granularity: "month" | "year" | "version";
+  isComparing: boolean;
+  onCompareVersionChange?: (version: string) => void;
 }
 
-const TopSongsSection = ({ topSongs, granularity }: Props) => {
+const TopSongsSection = ({
+  topSongs,
+  granularity,
+  isComparing,
+  onCompareVersionChange,
+}: Props) => {
   const [ref, inView] = useInView(0.1);
   const { tFormat } = useTranslation();
+  const router = useRouter();
+  const currentVersion = (router.query.version as string) || undefined;
   const period = usePeriodPhrase(granularity);
   const { topBpiSongs, topImprovedSongs } = topSongs;
 
@@ -41,6 +51,9 @@ const TopSongsSection = ({ topSongs, granularity }: Props) => {
       inView={inView}
       sectionRef={ref as React.RefObject<HTMLDivElement>}
       summary={summary}
+      currentVersion={currentVersion}
+      isComparing={isComparing}
+      onCompareVersionChange={onCompareVersionChange}
     />
   );
 };

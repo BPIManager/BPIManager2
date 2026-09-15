@@ -35,9 +35,16 @@ export interface MonthlyReviewViewSections {
 interface Props {
   data: MonthlyReviewViewSections;
   speedRef: React.RefObject<number>;
+  topSongsLoading?: boolean;
+  onCompareVersionChange?: (version: string) => void;
 }
 
-const MonthlyReviewViewUI = ({ data, speedRef }: Props) => (
+const MonthlyReviewViewUI = ({
+  data,
+  speedRef,
+  topSongsLoading,
+  onCompareVersionChange,
+}: Props) => (
   <div style={{ background: "#0a0a0f" }}>
     <StarfieldBackground
       speedRef={speedRef}
@@ -55,7 +62,12 @@ const MonthlyReviewViewUI = ({ data, speedRef }: Props) => (
       />
       {data.bpi && <HeroSection bpi={data.bpi} granularity={data.granularity} />}
       {data.topSongs && (
-        <TopSongsSection topSongs={data.topSongs} granularity={data.granularity} />
+        <TopSongsSection
+          topSongs={data.topSongs}
+          granularity={data.granularity}
+          isComparing={!!topSongsLoading}
+          onCompareVersionChange={onCompareVersionChange}
+        />
       )}
       {data.activity && (
         <ActivitySection
