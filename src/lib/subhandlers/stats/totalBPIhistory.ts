@@ -47,6 +47,11 @@ export async function handleStatsTotalBpiHistory(
   const trend = [];
   const latestBpisBySong = new Map<number, number>();
   const latestExScoresBySong = new Map<number, number>();
+  // 総合BPIは既知の最高値を下回らないようラチェットする(executeSaveBpiSystem・
+  // recalculateTotalBpi.ts等と同じ理由。src/lib/bpi/index.tsのratchetTotalBpi
+  // 参照)。この推移グラフはDBの`logs`/`userStatusLogs`を経由せず日付ごとの
+  // 生の値をこの場で再計算するため、この関数内のrunning maxを基準にする。
+  let bestTotalBpiSoFar: number | null = null;
   const startDate = dayjs(allLogs[0].lastPlayed).tz().startOf("day");
   const endDate = dayjs(allLogs[allLogs.length - 1].lastPlayed)
     .tz()
@@ -80,7 +85,15 @@ export async function handleStatsTotalBpiHistory(
       notes: songById.get(songId)?.notes ?? 0,
       exScore,
     }));
-    const totalBpi = BpiCalculator.calculateTotalBPI(observations, scopedMaster);
+    const freshTotalBpi = BpiCalculator.calculateTotalBPI(
+      observations,
+      scopedMaster,
+    );
+    const totalBpi = BpiCalculator.ratchetTotalBpi(
+      bestTotalBpiSoFar,
+      freshTotalBpi,
+    );
+    bestTotalBpiSoFar = totalBpi;
     trend.push({
       date: dateStr,
       totalBpi,
