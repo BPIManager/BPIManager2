@@ -164,7 +164,11 @@ const RivalsSectionUI = ({
                   </p>
                   <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                     <GrowthRankList
-                      title={t("monthlyReview.rivals.growthAbsTitle")}
+                      title={t(
+                        granularity === "version"
+                          ? "monthlyReview.rivals.growthAbsTitleVersion"
+                          : "monthlyReview.rivals.growthAbsTitle",
+                      )}
                       entries={ranking.byAbsGrowth}
                       valueKey="bpiGrowth"
                       formatValue={(e) =>
@@ -175,7 +179,11 @@ const RivalsSectionUI = ({
                     />
                     {ranking.byGrowthRate.length > 0 && (
                       <GrowthRankList
-                        title={t("monthlyReview.rivals.growthRateTitle")}
+                        title={t(
+                          granularity === "version"
+                            ? "monthlyReview.rivals.growthRateTitleVersion"
+                            : "monthlyReview.rivals.growthRateTitle",
+                        )}
                         entries={ranking.byGrowthRate}
                         valueKey="growthRate"
                         formatValue={(e) =>

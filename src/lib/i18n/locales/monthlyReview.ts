@@ -532,6 +532,20 @@ export const monthlyReviewTranslations = {
     "zh-TW": "成長率",
     ko: "성장률",
   },
+  // 全期間（バージョン全体）モードは「前バージョン最終値→今バージョン最終値」の
+  // 2点比較であることが伝わるよう、月次/年次と別のラベルを使う
+  "monthlyReview.rivals.growthAbsTitleVersion": {
+    ja: "前バージョンからの伸び（絶対値）",
+    en: "Growth from Prev. Version (Abs.)",
+    "zh-TW": "相較前版本的成長（絕對值）",
+    ko: "이전 버전 대비 성장（절댓값）",
+  },
+  "monthlyReview.rivals.growthRateTitleVersion": {
+    ja: "前バージョンからの伸び率",
+    en: "Growth Rate from Prev. Version",
+    "zh-TW": "相較前版本的成長率",
+    ko: "이전 버전 대비 성장률",
+  },
   "monthlyReview.rivals.seeMoreSongs": {
     ja: "もっとみる ({count}曲)",
     en: "See more ({count} songs)",

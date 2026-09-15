@@ -154,13 +154,6 @@ export function attachRivalBpiTimelines(
     { date: string; value: number }[]
   >();
   for (const r of rivals) {
-    const baseline = baselineByUser.get(r.userId);
-    if (requireBaseline && baseline === undefined) {
-      // このライバルのcompareVersion内データが無い＝比較不能
-      continue;
-    }
-    const bpiStart = baseline ?? -15;
-
     const rawHistory = (logsByUser.get(r.userId) ?? []).sort((a, b) =>
       a.date.localeCompare(b.date),
     );
@@ -173,14 +166,24 @@ export function attachRivalBpiTimelines(
     const history = Array.from(historyMap.entries())
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([key, value]) => ({ date: useMonthBuckets ? `${key}-01` : key, value }));
+    // タイムライン（推移グラフ用）はbaselineの有無に関わらず保持する。
+    // 「前バージョンとの伸び率」比較が不能な場合でも、そのバージョン内での
+    // 純粋な推移自体は表示できるため（buildGrowthTimeline参照）
+    if (history.length > 0) rivalComputedTimeline.set(r.userId, history);
 
+    const baseline = baselineByUser.get(r.userId);
+    if (requireBaseline && baseline === undefined) {
+      // このライバルのcompareVersion内データが無い＝前バージョンとの伸び率比較は不能
+      // （bpiStart/bpiEnd/bpiGrowthはRivalDiff初期値のnullのまま）
+      continue;
+    }
+    const bpiStart = baseline ?? -15;
     // 期間内にログが1件も無ければ「更新なし」＝baselineのまま
     const bpiEnd = history.length > 0 ? history[history.length - 1].value : bpiStart;
 
     r.bpiStart = bpiStart;
     r.bpiEnd = bpiEnd;
     r.bpiGrowth = Math.round((bpiEnd - bpiStart) * 100) / 100;
-    rivalComputedTimeline.set(r.userId, history);
   }
 
   return rivalComputedTimeline;
@@ -239,6 +242,13 @@ export function buildGrowthRanking(
   };
 }
 
+/**
+ * @param usingCompareVersion - `true`（全期間モード）の場合、チャートの起点を
+ *   前バージョンの値で汚さない。「前バージョンからの伸び」は2点比較の
+ *   ランキング側（buildGrowthRanking）だけの概念とし、推移グラフ自体は
+ *   そのバージョン内で実際に記録された最初のログを基準にした自己相対の
+ *   純粋な成長推移として表示する
+ */
 export function buildGrowthTimeline(
   rivals: RivalDiff[],
   rivalComputedTimeline: Map<string, { date: string; value: number }[]>,
@@ -247,8 +257,35 @@ export function buildGrowthTimeline(
   bpiStart: number,
   bpiEnd: number,
   monthStart: string,
+  usingCompareVersion: boolean,
 ): GrowthParticipant[] | null {
   const result: GrowthParticipant[] = [];
+
+  if (usingCompareVersion) {
+    if (bpiHistory.length > 0) {
+      result.push({
+        userId: viewerId,
+        userName: "あなた",
+        isViewer: true,
+        profileImage: null,
+        bpiBase: bpiHistory[0].value,
+        history: bpiHistory.map((h) => ({ date: h.date, bpi: h.value })),
+      });
+    }
+    for (const r of rivals) {
+      const rawHistory = rivalComputedTimeline.get(r.userId) ?? [];
+      if (rawHistory.length === 0) continue;
+      result.push({
+        userId: r.userId,
+        userName: r.userName,
+        isViewer: false,
+        profileImage: r.profileImage,
+        bpiBase: rawHistory[0].value,
+        history: rawHistory.map((h) => ({ date: h.date, bpi: h.value })),
+      });
+    }
+    return result.length > 0 ? result : null;
+  }
 
   if (bpiHistory.length > 0 || bpiStart !== bpiEnd) {
     const viewerHistory = bpiHistory.map((h) => ({ date: h.date, bpi: h.value }));

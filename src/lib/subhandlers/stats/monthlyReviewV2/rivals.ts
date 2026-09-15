@@ -105,6 +105,7 @@ export async function handleStatsMonthlyReviewRivals(
       bpiTimeline.bpiStart,
       bpiTimeline.bpiEnd,
       monthStart,
+      !!compareVersion,
     );
 
     return ok({ rivals, rivalsGrowthRanking, rivalsGrowthTimeline });
