@@ -79,6 +79,30 @@ export class BpiCalculator {
   }
 
   /**
+   * 単曲BPIから推定順位を引く（表示用）。
+   */
+  public static estimateRankFromBpi(bpi: number): number {
+    return this.v2.rankFromSingle(bpi);
+  }
+
+  /**
+   * 指定楽曲のmu/sigma、BPI0/100アンカー、曲間の歪み補正指数`gamma`、カーブ指数
+   * `coef`、実効カーブ指数`k = clamp(gamma*coef)`を表示用に取得する。
+   * 式表示(FormulaCard等)向け。`mu`/`sigma`が無い曲は `null`
+   */
+  public static getSongParams(song: IBpiBasicSongData): {
+    mu: number;
+    sigma: number;
+    z0: number;
+    z100: number;
+    gamma: number;
+    coef: number;
+    k: number;
+  } | null {
+    return this.v2.chart(this.toChart(song)).params;
+  }
+
+  /**
    * 総合 BPI を計算する（シフト法）。
    *
    * 実際にプレイした曲の単曲BPIはそのまま使い、未プレイ曲だけを潜在スキル

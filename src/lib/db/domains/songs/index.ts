@@ -97,7 +97,7 @@ class SongsRepository {
       .leftJoin(
         () =>
           currentSongDefSubquery()
-            .select(["songId", "wrScore", "kaidenAvg"])
+            .select(["songId", "wrScore", "kaidenAvg", "coef", "mu", "sigma", "residualVar"])
             .as("def"),
         (join) => join.onRef("def.songId", "=", "s.songId"),
       )
@@ -112,6 +112,10 @@ class SongsRepository {
         "s.textage",
         "def.wrScore",
         "def.kaidenAvg",
+        "def.coef",
+        "def.mu",
+        "def.sigma",
+        "def.residualVar",
         ...SONG_ATTRIBUTE_SELECT_COLUMNS,
       ])
       .$if(!isInf, (qb) =>

@@ -8,6 +8,11 @@ export interface SongListItem {
   textage: string;
   wrScore: number | null;
   kaidenAvg: number | null;
+  coef: number | null;
+  /** V2(分布ベース)算出用。ALS対象外・未計算の曲は null */
+  mu: number | null;
+  sigma: number | null;
+  residualVar: number | null;
   // songAttributes (Profile 相対評価: 0-100)
   p_scratch: number | null;
   p_soflan: number | null;
