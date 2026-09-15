@@ -135,28 +135,17 @@ export default function NewBpiComparison({ userId }: Props) {
 
   const {
     rows,
-    hybridTotalBpi,
     newTotalBpi,
     comparableCount,
     playedSongMap,
   } = useMemo(() => {
-    const totalCount12 = stats?.totalCount;
-
     if (!songs)
       return {
         rows: [],
-        hybridTotalBpi: null,
         newTotalBpi: null,
         comparableCount: 0,
         playedSongMap: new Map<number, SongWithScore>(),
       };
-
-    // useUserScores(/scores API)はプレイ済み楽曲のみをscores経由のINNER JOINで
-    // 返す(未プレイ楽曲は含まれない)ため、`songs.length`は総曲数ではなく
-    // 比較可能数(プレイ済み数)にしかならない。総合BPIの分母には
-    // /stats/totalBpi と同じ「☆12の現行選曲数」(stats.totalCount、
-    // 未プレイ楽曲を含む)を使う必要がある(揃えないと未プレイ楽曲の
-    // 床(-15)埋めが効かず、総合BPIが本来より高く出てしまう)。
 
     const played = songs.filter(
       (s): s is typeof s & { exScore: number } => s.exScore !== null,
@@ -202,29 +191,10 @@ export default function NewBpiComparison({ userId }: Props) {
     });
 
     // 総合BPI(現行の /stats/totalBpi)は☆12のみを対象にしているため、
-    // 比較用の2種の総合BPIも同じ☆12スコープに揃える。
+    // 比較用の総合BPIも同じ☆12スコープに揃える。
     const level12Played = played.filter((s) => s.difficultyLevel === 12);
-    const totalSongCount12 = totalCount12 ?? level12Played.length;
 
-    // (B) 単曲BPIだけ新方式に置き換え、総合BPIの集計方法(べき乗平均)は
-    // 現行のまま。issue #299〜303単独の影響を見るためのケース。
-    const newBpisLevel12Desc = level12Played
-      .map((s) =>
-        NewBpiCalculator.calc(s.exScore, {
-          songId: s.songId,
-          notes: s.notes,
-          kaidenAvg: s.kaidenAvg,
-          wrScore: s.wrScore,
-        }),
-      )
-      .filter((b): b is number => b !== null)
-      .sort((a, b) => b - a);
-    const hybridTotalBpi =
-      totalSongCount12 > 0
-        ? legacyV1.total(newBpisLevel12Desc, totalSongCount12)
-        : null;
-
-    // (C) 単曲BPI・総合BPIの導出方法の両方を新方式に置き換える。issue #304:
+    // 単曲BPI・総合BPIの導出方法の両方を新方式(V2)に置き換える。issue #304:
     // プレイ済み曲は単曲BPIをそのまま使い、未プレイ曲は潜在スキルa_iからの
     // 予測で埋めたうえで現行と同じべき乗平均にかける（詳細はNewBpiCalculator
     // 参照）。未プレイ曲の判定・予測には☆12全曲のマスタ(songMaster)が要る。
@@ -246,12 +216,11 @@ export default function NewBpiComparison({ userId }: Props) {
 
     return {
       rows,
-      hybridTotalBpi,
       newTotalBpi,
       comparableCount,
       playedSongMap,
     };
-  }, [songs, stats?.totalCount, songMaster, songRankings]);
+  }, [songs, songMaster, songRankings]);
 
   // 既存のノーツレーダー(カテゴリ別総合BPI)と同じカテゴリ分け(topElements.json)
   // を使い、現行/新方式それぞれのカテゴリ別総合BPIを算出する。現行側は既存の
@@ -458,7 +427,6 @@ export default function NewBpiComparison({ userId }: Props) {
       radarCurrent={radarComparison?.current ?? null}
       radarNew={radarComparison?.next ?? null}
       currentTotalBpi={stats?.totalBpi ?? null}
-      hybridTotalBpi={hybridTotalBpi}
       newTotalBpi={newTotalBpi}
       comparableCount={comparableCount}
       curveEligibleRows={curveEligibleRows}
