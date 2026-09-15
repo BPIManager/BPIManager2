@@ -126,7 +126,7 @@ export async function computeOwnerMonthlyScores(
   return { latestInMonth, songUpdateDateMap };
 }
 
-/** BPIトップ3・改善曲。radar-growthセクションからも呼ばれる */
+/** BPIトップ3・改善曲（`rank`はbuildTopSongs内でbpicalcの推定順位関数から算出済み）。radar-growthセクションからも呼ばれる */
 export async function computeOwnerTopSongs(
   owner: string,
   version: string,
@@ -136,17 +136,13 @@ export async function computeOwnerTopSongs(
   >["latestInMonth"],
 ) {
   const songIdsUpdated = latestInMonth.map((s) => s.songId);
-  const allSongIds = Array.from(new Set(songIdsUpdated));
 
-  const [preScores, rankMap] = await Promise.all([
-    monthlyReviewRepo.getPreMonthScoresByLastPlayed(
-      owner,
-      version,
-      songIdsUpdated,
-      monthStart,
-    ),
-    monthlyReviewRepo.getBatchSongRanks(owner, version, allSongIds),
-  ]);
+  const preScores = await monthlyReviewRepo.getPreMonthScoresByLastPlayed(
+    owner,
+    version,
+    songIdsUpdated,
+    monthStart,
+  );
 
   const preScoreMap = new Map<number, { exScore: number; bpi: number | null }>();
   for (const s of preScores) {
@@ -156,12 +152,5 @@ export async function computeOwnerTopSongs(
     });
   }
 
-  const { topBpiSongs, topImprovedSongs } = buildTopSongs(
-    latestInMonth,
-    preScoreMap,
-  );
-  for (const s of topBpiSongs) s.rank = rankMap.get(s.songId) ?? 0;
-  for (const s of topImprovedSongs) s.rank = rankMap.get(s.songId) ?? 0;
-
-  return { topBpiSongs, topImprovedSongs };
+  return buildTopSongs(latestInMonth, preScoreMap);
 }

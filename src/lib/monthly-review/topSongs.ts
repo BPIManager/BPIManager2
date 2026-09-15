@@ -1,3 +1,4 @@
+import { BpiCalculator } from "@/lib/bpi";
 import type { TopSong, TopSongImproved } from "@/types/stats/monthlyReview";
 
 type ScoreRow = {
@@ -21,6 +22,10 @@ export function buildTopSongs(
   for (const s of latestInMonth) {
     const bpi = s.bpi != null ? Number(s.bpi) : null;
     if (bpi == null) continue;
+    // 全ユーザー横断の厳密な順位はDB側でRANK() OVERを使う必要があり非常に重い
+    // （実測: 対象曲が多い期間で数秒〜数十秒）。表示用の目安に過ぎず正確性は
+    // 求められないため、bpicalcの単曲BPI→順位推定関数（統計的な近似値）を使う
+    const rank = BpiCalculator.estimateRankFromBpi(bpi);
     topBpiSongs.push({
       songId: s.songId,
       title: s.title,
@@ -29,7 +34,7 @@ export function buildTopSongs(
       bpi,
       exScore: s.exScore,
       notes: s.notes,
-      rank: 0,
+      rank,
     });
     const pre = preScoreMap.get(s.songId);
     if (pre != null) {
@@ -42,7 +47,7 @@ export function buildTopSongs(
         bpi,
         exScore: s.exScore,
         notes: s.notes,
-        rank: 0,
+        rank,
         bpiBefore,
         bpiAfter: bpi,
         diff: bpi - bpiBefore,

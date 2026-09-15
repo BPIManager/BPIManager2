@@ -194,14 +194,6 @@ class MonthlyReviewRepository {
     );
   }
 
-  async getBatchSongRanks(
-    userId: string,
-    version: string,
-    songIds: number[],
-  ): Promise<Map<number, number>> {
-    return scoresRepo.getSongRanksForSongs(userId, version, songIds);
-  }
-
   async getMonthlyActivityBreakdownByLastPlayed(
     userId: string,
     version: string,

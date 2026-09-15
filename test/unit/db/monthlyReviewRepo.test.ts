@@ -60,17 +60,6 @@ describe("monthlyReviewRepo: 空配列入力での早期return", () => {
     expect(dbHolder.current.calls).toHaveLength(0);
   });
 
-  it("getBatchSongRanksはsongIdsが空なら空のMapを返すこと", async () => {
-    dbHolder.current = createDbSpy([]);
-    const result = await monthlyReviewRepo.getBatchSongRanks(
-      "user-1",
-      "33",
-      [],
-    );
-    expect(result).toEqual(new Map());
-    expect(dbHolder.current.calls).toHaveLength(0);
-  });
-
   it("getRivalsCurrentScoresForSongsはsongIdsが空なら空配列を返すこと", async () => {
     dbHolder.current = createDbSpy([]);
     const result = await monthlyReviewRepo.getRivalsCurrentScoresForSongs({
@@ -206,26 +195,6 @@ describe("monthlyReviewRepo.getMonthlyTowerRanking", () => {
       "2025-06-30",
     );
     expect(result).toEqual({ keysRank: 3, scratchRank: 5, totalUsers: 100 });
-  });
-});
-
-describe("monthlyReviewRepo.getBatchSongRanks", () => {
-  it("行データをsongId->rankのMapに変換すること", async () => {
-    dbHolder.current = createDbSpy([
-      { songId: 1, rnk: "2" },
-      { songId: 2, rnk: "1" },
-    ]);
-    const result = await monthlyReviewRepo.getBatchSongRanks(
-      "user-1",
-      "33",
-      [1, 2],
-    );
-    expect(result).toEqual(
-      new Map([
-        [1, 2],
-        [2, 1],
-      ]),
-    );
   });
 });
 

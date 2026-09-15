@@ -161,17 +161,13 @@ export async function handleStatsMonthlyReview(
     }
     const latestInMonth = Array.from(latestInMonthMap.values());
     const songIdsUpdated = latestInMonth.map((s) => s.songId);
-    const allSongIds = Array.from(new Set(latestInMonth.map((s) => s.songId)));
 
-    const [preScores, rankMap] = await Promise.all([
-      monthlyReviewRepo.getPreMonthScoresByLastPlayed(
-        owner,
-        version,
-        songIdsUpdated,
-        monthStart,
-      ),
-      monthlyReviewRepo.getBatchSongRanks(owner, version, allSongIds),
-    ]);
+    const preScores = await monthlyReviewRepo.getPreMonthScoresByLastPlayed(
+      owner,
+      version,
+      songIdsUpdated,
+      monthStart,
+    );
 
     const preScoreMap = new Map<
       number,
@@ -188,8 +184,6 @@ export async function handleStatsMonthlyReview(
       latestInMonth,
       preScoreMap,
     );
-    for (const s of topBpiSongs) s.rank = rankMap.get(s.songId) ?? 0;
-    for (const s of topImprovedSongs) s.rank = rankMap.get(s.songId) ?? 0;
 
     const { byDayOfWeek, byHour } = buildActivityBreakdown(breakdownRows);
     const bestDays = buildBestDays(dailyTowerData, bpiHistory, bpiStart);

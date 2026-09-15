@@ -351,54 +351,6 @@ class ScoresRepository {
   }
 
   /**
-   * 指定楽曲群について、自分のEXスコアが同バージョンの全ユーザー中で何位かを取得する。
-   */
-  async getSongRanksForSongs(
-    userId: string,
-    version: string,
-    songIds: number[],
-  ): Promise<Map<number, number>> {
-    if (songIds.length === 0) return new Map();
-    const rows = await db
-      .selectFrom((eb) =>
-        eb
-          .selectFrom((qb) =>
-            qb
-              .selectFrom("scores as s")
-              .innerJoin(
-                latestLogIdPerUserSongSubquery({
-                  table: "scores",
-                  version,
-                  songIds,
-                }).as("latest"),
-                (join) => join.onRef("latest.maxLogId", "=", "s.logId"),
-              )
-              .select([
-                "s.songId",
-                "s.userId",
-                (eb2) =>
-                  eb2.fn
-                    .agg<number>("RANK")
-                    .over((ob) =>
-                      ob.partitionBy("s.songId").orderBy("s.exScore", "desc"),
-                    )
-                    .as("rnk"),
-              ])
-              .where("s.songId", "in", songIds)
-              .as("ranked"),
-          )
-          .selectAll()
-          .where("userId", "=", userId)
-          .as("mine"),
-      )
-      .select(["songId", "rnk"])
-      .execute();
-    const map = new Map<number, number>();
-    for (const r of rows) map.set(r.songId, Number(r.rnk));
-    return map;
-  }
-
-  /**
    * 指定期間内の最終プレイ日時を曜日・時間帯別に集計する（プレイ済み楽曲数ベース）。
    */
   async getActivityBreakdownByLastPlayed(
