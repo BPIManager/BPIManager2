@@ -75,6 +75,122 @@ function scoreLabelOf(exScore: number, notes: number): string {
   return `${rd.label}+${rd.surplus}`;
 }
 
+const RADAR_SIZE = 220;
+const RADAR_RADIUS = 74;
+const RADAR_LABEL_RADIUS = RADAR_RADIUS + 32;
+const RADAR_PAD_X = 44;
+const RADAR_PAD_Y = 24;
+
+/**
+ * 現時点の要素別BPI（成長ではなく最終状態）をレーダーチャート（多角形）として描画する。
+ * satoriは`<svg>`配下の基本図形（polygon/circle/line）はサポートするが`<text>`は
+ * 未対応（実機確認: "please convert them to <path>"）のため、ラベルはsvgの外側に
+ * 絶対配置したdivとして重ねる
+ */
+function RadarPolygonChart({
+  entries,
+}: {
+  entries: { element: string; bpiEnd: number }[];
+}) {
+  if (entries.length < 3) return null;
+
+  const n = entries.length;
+  const center = RADAR_SIZE / 2;
+  const maxVal = Math.max(1, ...entries.map((e) => e.bpiEnd + 15));
+  const angleOf = (i: number) => -Math.PI / 2 + i * ((2 * Math.PI) / n);
+  const pointAt = (i: number, radius: number) => {
+    const a = angleOf(i);
+    return { x: center + radius * Math.cos(a), y: center + radius * Math.sin(a) };
+  };
+  const polygonAt = (ratio: number) =>
+    Array.from({ length: n }, (_, i) => pointAt(i, ratio * RADAR_RADIUS))
+      .map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`)
+      .join(" ");
+  const dataPoints = entries.map((e, i) =>
+    pointAt(i, Math.max(0, Math.min(1, (e.bpiEnd + 15) / maxVal)) * RADAR_RADIUS),
+  );
+  const dataPointsStr = dataPoints
+    .map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`)
+    .join(" ");
+
+  return (
+    <div
+      style={{
+        position: "relative",
+        display: "flex",
+        width: RADAR_SIZE + RADAR_PAD_X * 2,
+        height: RADAR_SIZE + RADAR_PAD_Y * 2,
+      }}
+    >
+      <svg
+        width={RADAR_SIZE}
+        height={RADAR_SIZE}
+        viewBox={`0 0 ${RADAR_SIZE} ${RADAR_SIZE}`}
+        style={{ position: "absolute", left: RADAR_PAD_X, top: RADAR_PAD_Y }}
+      >
+        {[0.33, 0.66, 1].map((ratio) => (
+          <polygon
+            key={ratio}
+            points={polygonAt(ratio)}
+            fill="none"
+            stroke="rgba(255,255,255,0.1)"
+            strokeWidth={1}
+          />
+        ))}
+        {entries.map((e, i) => {
+          const p = pointAt(i, RADAR_RADIUS);
+          return (
+            <line
+              key={e.element}
+              x1={center}
+              y1={center}
+              x2={p.x}
+              y2={p.y}
+              stroke="rgba(255,255,255,0.08)"
+              strokeWidth={1}
+            />
+          );
+        })}
+        <polygon
+          points={dataPointsStr}
+          fill="rgba(56,189,248,0.28)"
+          stroke="#38bdf8"
+          strokeWidth={2}
+        />
+        {dataPoints.map((p, i) => (
+          <circle key={entries[i].element} cx={p.x} cy={p.y} r={3.5} fill="#38bdf8" />
+        ))}
+      </svg>
+      {entries.map((e, i) => {
+        const p = pointAt(i, RADAR_LABEL_RADIUS);
+        const lx = RADAR_PAD_X + p.x;
+        const ly = RADAR_PAD_Y + p.y;
+        return (
+          <div
+            key={e.element}
+            style={{
+              position: "absolute",
+              left: lx - 34,
+              top: ly - 14,
+              width: 68,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <div style={{ display: "flex", fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.6)" }}>
+              {e.element}
+            </div>
+            <div style={{ display: "flex", fontSize: 12, color: "#38bdf8" }}>
+              {e.bpiEnd.toFixed(1)}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export async function generateMonthlyReviewOgpImage(q: {
   userId: string;
   version: string;
@@ -111,7 +227,6 @@ export async function generateMonthlyReviewOgpImage(q: {
   const topRadar = [...radarGrowth]
     .sort((a, b) => b.bpiEnd - a.bpiEnd)
     .slice(0, RADAR_ELEMENTS_COUNT);
-  const maxRadarEnd = Math.max(1, ...topRadar.map((r) => r.bpiEnd + 15));
 
   const svg = await satori(
     <div
@@ -231,39 +346,19 @@ export async function generateMonthlyReviewOgpImage(q: {
           ))}
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
-          <div style={{ display: "flex", fontSize: 20, color: "rgba(255,255,255,0.4)", marginBottom: 12 }}>
+        <div style={{ display: "flex", flexDirection: "column", flex: 1, alignItems: "center" }}>
+          <div
+            style={{
+              display: "flex",
+              alignSelf: "flex-start",
+              fontSize: 20,
+              color: "rgba(255,255,255,0.4)",
+              marginBottom: 4,
+            }}
+          >
             ノーツレーダー
           </div>
-          {topRadar.map((r) => (
-            <div key={r.element} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-              <div style={{ display: "flex", width: 70, fontSize: 16, color: "rgba(255,255,255,0.5)" }}>
-                {r.element}
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  width: 160,
-                  height: 10,
-                  background: "rgba(255,255,255,0.08)",
-                  borderRadius: 6,
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    width: `${Math.max(0, Math.min(100, ((r.bpiEnd + 15) / maxRadarEnd) * 100))}%`,
-                    height: "100%",
-                    borderRadius: 6,
-                    background: "#38bdf8",
-                  }}
-                />
-              </div>
-              <div style={{ display: "flex", fontSize: 15, fontWeight: 700, color: "rgba(255,255,255,0.75)" }}>
-                {r.bpiEnd.toFixed(2)}
-              </div>
-            </div>
-          ))}
+          <RadarPolygonChart entries={topRadar} />
         </div>
       </div>
 

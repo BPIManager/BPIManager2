@@ -3,7 +3,8 @@ import dayjs from "@/lib/dayjs";
 import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import { followListAggregateRepo } from "@/lib/db/aggregates/followList";
 import { monthlyReviewRepo } from "@/lib/db/aggregates/monthly-review";
-import { buildBpiTimeline } from "@/lib/monthly-review/bpi";
+import { buildBpiTimeline, calculateTotalBpiForScores } from "@/lib/monthly-review/bpi";
+import { previousVersionOf } from "@/lib/subhandlers/stats/monthlyReviewV2/_shared";
 import { checkUserAccess } from "@/middlewares/api/withApi";
 import { accessError, err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
@@ -55,6 +56,11 @@ export async function handleRivalMonthlyReviewSummary(
             .endOf("month")
             .format("YYYY-MM-DD");
     const useMonthBuckets = isYearMode || isAllMode;
+    // 全期間モードは期間開始前スコアとの比較が意味を持たないため、
+    // monthly-review側の各エンドポイントと同じく前バージョンとの比較に切り替える
+    const compareVersion = isAllMode
+      ? (previousVersionOf(version as string) ?? undefined)
+      : undefined;
 
     const rivalRows = await followListAggregateRepo.getPublicFollowingUsers(
       userId as string,
@@ -64,20 +70,26 @@ export async function handleRivalMonthlyReviewSummary(
     }
     const rivalIds = rivalRows.map((r) => r.userId);
 
-    const [preMonthState, inMonthHistory, allL12SongMeta] = await Promise.all([
-      monthlyReviewRepo.getPreMonthBpiStateForUsers(
-        rivalIds,
-        version as string,
-        monthStart,
-      ),
-      monthlyReviewRepo.getInMonthScoreHistoryForUsers(
-        rivalIds,
-        version as string,
-        monthStart,
-        monthEnd,
-      ),
-      monthlyReviewRepo.getAllL12SongMeta(),
-    ]);
+    const [preMonthState, inMonthHistory, allL12SongMeta, compareVersionState] =
+      await Promise.all([
+        compareVersion
+          ? Promise.resolve([])
+          : monthlyReviewRepo.getPreMonthBpiStateForUsers(
+              rivalIds,
+              version as string,
+              monthStart,
+            ),
+        monthlyReviewRepo.getInMonthScoreHistoryForUsers(
+          rivalIds,
+          version as string,
+          monthStart,
+          monthEnd,
+        ),
+        monthlyReviewRepo.getAllL12SongMeta(),
+        compareVersion
+          ? monthlyReviewRepo.getVersionBpiStateForUsers(rivalIds, compareVersion)
+          : Promise.resolve(undefined),
+      ]);
 
     const preByUser = new Map<string, Map<number, number>>();
     for (const s of preMonthState) {
@@ -85,29 +97,56 @@ export async function handleRivalMonthlyReviewSummary(
       if (!preByUser.has(s.userId)) preByUser.set(s.userId, new Map());
       preByUser.get(s.userId)!.set(s.songId, Number(s.exScore));
     }
+    const compareVersionByUser = new Map<string, Map<number, number>>();
+    for (const s of compareVersionState ?? []) {
+      if (s.exScore == null) continue;
+      if (!compareVersionByUser.has(s.userId))
+        compareVersionByUser.set(s.userId, new Map());
+      compareVersionByUser.get(s.userId)!.set(s.songId, Number(s.exScore));
+    }
     const historyByUser = new Map<string, typeof inMonthHistory>();
     for (const s of inMonthHistory) {
       if (!historyByUser.has(s.userId)) historyByUser.set(s.userId, []);
       historyByUser.get(s.userId)!.push(s);
     }
 
-    const rivals = rivalRows.map((r) => {
-      const preMap = preByUser.get(r.userId) ?? new Map<number, number>();
-      const history = historyByUser.get(r.userId) ?? [];
-      const { bpiStart, bpiEnd } = buildBpiTimeline(
-        preMap,
-        history,
-        allL12SongMeta,
-        useMonthBuckets,
-      );
-      return {
-        userId: r.userId,
-        userName: r.userName,
-        profileImage: r.profileImage,
-        bpiStart,
-        bpiEnd,
-      };
-    });
+    const rivals = rivalRows
+      .map((r) => {
+        const history = historyByUser.get(r.userId) ?? [];
+        if (compareVersion) {
+          const compareMap = compareVersionByUser.get(r.userId);
+          if (!compareMap || compareMap.size === 0) return null;
+          const { bpiEnd } = buildBpiTimeline(
+            new Map(),
+            history,
+            allL12SongMeta,
+            useMonthBuckets,
+          );
+          const bpiStart = calculateTotalBpiForScores(compareMap, allL12SongMeta);
+          return {
+            userId: r.userId,
+            userName: r.userName,
+            profileImage: r.profileImage,
+            bpiStart,
+            bpiEnd,
+          };
+        }
+        const preMap = preByUser.get(r.userId) ?? new Map<number, number>();
+        const { bpiStart, bpiEnd } = buildBpiTimeline(
+          preMap,
+          history,
+          allL12SongMeta,
+          useMonthBuckets,
+        );
+        return {
+          userId: r.userId,
+          userName: r.userName,
+          profileImage: r.profileImage,
+          bpiStart,
+          bpiEnd,
+        };
+      })
+      .filter((r) => r !== null);
 
     return { result: ok({ rivals }), targetUserId, viewerId };
   } catch (error: unknown) {

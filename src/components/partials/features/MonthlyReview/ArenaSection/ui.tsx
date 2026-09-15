@@ -241,18 +241,16 @@ const ArenaSectionUI = ({
                     <span className="flex items-center gap-1.5">
                       <span
                         className="text-xs font-black"
-                        style={{ color: vs.text }}
+                        style={{ color: vs.text, width: 28, textAlign: "right" }}
                       >
                         {v.arenaClass}
                       </span>
-                      {v.arenaRank != null && (
-                        <span
-                          className="text-[10px]"
-                          style={{ color: "rgba(255,255,255,0.3)" }}
-                        >
-                          #{v.arenaRank}
-                        </span>
-                      )}
+                      <span
+                        className="text-[10px] tabular-nums"
+                        style={{ color: "rgba(255,255,255,0.3)", width: 48, textAlign: "right" }}
+                      >
+                        {v.arenaRank != null ? `#${v.arenaRank}` : ""}
+                      </span>
                     </span>
                   </div>
                 );

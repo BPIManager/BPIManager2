@@ -183,7 +183,7 @@ const FooterSectionUI = ({
 
         {showMonthlyLinks && (
           <div
-            className="w-full max-w-sm flex flex-col gap-3"
+            className="w-full max-w-2xl flex flex-col gap-3"
             style={{
               animation: inView ? "footerFade 0.8s ease-out 0.25s both" : "none",
             }}
