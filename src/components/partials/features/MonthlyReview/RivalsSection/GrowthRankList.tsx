@@ -20,8 +20,9 @@ function GrowthRankList({
         {title}
       </p>
       {entries.map((e, i) => {
-        const isPositive = (e[valueKey] ?? 0) >= 0;
-        const accent = isPositive ? "#34d399" : "#f87171";
+        const value = e[valueKey];
+        const accent =
+          value == null ? "rgba(255,255,255,0.3)" : value >= 0 ? "#34d399" : "#f87171";
         return (
           <div
             key={e.userId}

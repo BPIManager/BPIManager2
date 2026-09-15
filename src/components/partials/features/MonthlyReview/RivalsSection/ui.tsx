@@ -5,6 +5,7 @@ import { useTranslation } from "@/hooks/common/useTranslation";
 import { ChevronDown } from "lucide-react";
 import type { MonthlyReviewData } from "@/types/stats/monthlyReview";
 import { SectionCard } from "../SectionCard";
+import { usePeriodPhrase } from "../usePeriodPhrase";
 import { styles, PAGE } from "./constants";
 import GrowthRankList from "./GrowthRankList";
 import RivalCard from "./RivalCard";
@@ -32,7 +33,7 @@ interface Props {
   data: RivalsSectionData;
   chart: RivalsSectionChart;
   rankSummary: RivalsSectionRankSummary;
-  granularity: "month" | "year";
+  granularity: "month" | "year" | "version";
   inView: boolean;
   sectionRef: React.RefObject<HTMLDivElement>;
   isEmpty: boolean;
@@ -85,6 +86,7 @@ const RivalsSectionUI = ({
   const { viewerAbsRank, viewerRateRank, totalParticipants } = rankSummary;
   const [visible, setVisible] = useState(PAGE);
   const { t, tFormat } = useTranslation();
+  const period = usePeriodPhrase(granularity);
 
   const totalWins = rivals.reduce((sum, r) => sum + r.newWins, 0);
   const totalLosses = rivals.reduce((sum, r) => sum + r.newLosses, 0);
@@ -100,7 +102,7 @@ const RivalsSectionUI = ({
       }),
     );
   if (summaryParts.length === 0)
-    summaryParts.push(t("monthlyReview.rivals.summaryNoChange"));
+    summaryParts.push(tFormat("monthlyReview.rivals.summaryNoChange", { period }));
   const rivalsSummary = summaryParts.join(" ");
 
   return (
@@ -162,20 +164,32 @@ const RivalsSectionUI = ({
                   </p>
                   <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                     <GrowthRankList
-                      title={t("monthlyReview.rivals.growthAbsTitle")}
+                      title={t(
+                        granularity === "version"
+                          ? "monthlyReview.rivals.growthAbsTitleVersion"
+                          : "monthlyReview.rivals.growthAbsTitle",
+                      )}
                       entries={ranking.byAbsGrowth}
                       valueKey="bpiGrowth"
                       formatValue={(e) =>
-                        `${e.bpiGrowth >= 0 ? "+" : ""}${e.bpiGrowth.toFixed(2)}`
+                        e.bpiGrowth == null
+                          ? "-"
+                          : `${e.bpiGrowth >= 0 ? "+" : ""}${e.bpiGrowth.toFixed(2)}`
                       }
                     />
                     {ranking.byGrowthRate.length > 0 && (
                       <GrowthRankList
-                        title={t("monthlyReview.rivals.growthRateTitle")}
+                        title={t(
+                          granularity === "version"
+                            ? "monthlyReview.rivals.growthRateTitleVersion"
+                            : "monthlyReview.rivals.growthRateTitle",
+                        )}
                         entries={ranking.byGrowthRate}
                         valueKey="growthRate"
                         formatValue={(e) =>
-                          `${(e.growthRate ?? 0) >= 0 ? "+" : ""}${(e.growthRate ?? 0).toFixed(1)}%`
+                          e.growthRate == null
+                            ? "-"
+                            : `${e.growthRate >= 0 ? "+" : ""}${e.growthRate.toFixed(1)}%`
                         }
                       />
                     )}

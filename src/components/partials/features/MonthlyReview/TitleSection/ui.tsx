@@ -13,6 +13,8 @@ const styles = `
 
 interface Props {
   periodLabel: string;
+  /** バージョン名等、月/年より長くなりがちなラベル向けに文字サイズを抑える */
+  compact?: boolean;
   diffColor: string;
   subtitle: string;
   inView: boolean;
@@ -24,6 +26,7 @@ interface Props {
 
 const TitleSectionUI = ({
   periodLabel,
+  compact = false,
   diffColor,
   subtitle,
   inView,
@@ -71,7 +74,7 @@ const TitleSectionUI = ({
       <h1
         className="text-center font-black leading-none"
         style={{
-          fontSize: "clamp(3rem, 14vw, 10rem)",
+          fontSize: compact ? "clamp(2rem, 8vw, 5rem)" : "clamp(3rem, 14vw, 10rem)",
           color: "rgba(255,255,255,0.92)",
           textShadow: "0 0 120px rgba(255,255,255,0.08)",
           animation: inView

@@ -7,9 +7,23 @@ import RadarSectionUI from "./ui";
 
 interface Props {
   radarGrowth: MonthlyReviewData["radarGrowth"];
+  granularity: "month" | "year" | "version";
+  compareVersion: string | null;
+  usingFallbackComparison: boolean;
+  currentVersion: string;
+  isComparing: boolean;
+  onCompareVersionChange?: (version: string) => void;
 }
 
-const RadarSection = ({ radarGrowth }: Props) => {
+const RadarSection = ({
+  radarGrowth,
+  granularity,
+  compareVersion,
+  usingFallbackComparison,
+  currentVersion,
+  isComparing,
+  onCompareVersionChange,
+}: Props) => {
   const [ref, inView] = useInView(0.1);
   const [activeTab, setActiveTab] = useState(0);
 
@@ -26,6 +40,12 @@ const RadarSection = ({ radarGrowth }: Props) => {
       sortedWithSongs={sortedWithSongs}
       activeTab={activeTab}
       onTabChange={setActiveTab}
+      granularity={granularity}
+      compareVersion={compareVersion}
+      usingFallbackComparison={usingFallbackComparison}
+      currentVersion={currentVersion}
+      isComparing={isComparing}
+      onCompareVersionChange={onCompareVersionChange}
     />
   );
 };

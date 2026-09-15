@@ -351,51 +351,32 @@ class ScoresRepository {
   }
 
   /**
-   * 指定楽曲群について、自分のEXスコアが同バージョンの全ユーザー中で何位かを取得する。
+   * 指定楽曲群について、指定バージョン内での最新スコア（EXスコア・BPI）を取得する。
+   * `getLatestExScoresForSongsBeforeDate`の日時境界版と異なり、バージョンそのものを
+   * 境界として使う（例: 前バージョンとの比較用）。
    */
-  async getSongRanksForSongs(
+  async getLatestScoresForVersion(
     userId: string,
     version: string,
     songIds: number[],
-  ): Promise<Map<number, number>> {
-    if (songIds.length === 0) return new Map();
-    const rows = await db
-      .selectFrom((eb) =>
-        eb
-          .selectFrom((qb) =>
-            qb
-              .selectFrom("scores as s")
-              .innerJoin(
-                latestLogIdPerUserSongSubquery({
-                  table: "scores",
-                  version,
-                  songIds,
-                }).as("latest"),
-                (join) => join.onRef("latest.maxLogId", "=", "s.logId"),
-              )
-              .select([
-                "s.songId",
-                "s.userId",
-                (eb2) =>
-                  eb2.fn
-                    .agg<number>("RANK")
-                    .over((ob) =>
-                      ob.partitionBy("s.songId").orderBy("s.exScore", "desc"),
-                    )
-                    .as("rnk"),
-              ])
-              .where("s.songId", "in", songIds)
-              .as("ranked"),
-          )
-          .selectAll()
-          .where("userId", "=", userId)
-          .as("mine"),
+  ) {
+    if (songIds.length === 0) return [];
+    return await db
+      .selectFrom("scores as s")
+      .innerJoin(
+        latestLogIdPerSongSubquery({
+          table: "scores",
+          userId,
+          version,
+          extra: (qb) => qb.where("songId", "in", songIds),
+        }).as("latest"),
+        (join) =>
+          join
+            .onRef("latest.songId", "=", "s.songId")
+            .onRef("latest.maxLogId", "=", "s.logId"),
       )
-      .select(["songId", "rnk"])
+      .select(["s.songId", "s.bpi", "s.exScore"])
       .execute();
-    const map = new Map<number, number>();
-    for (const r of rows) map.set(r.songId, Number(r.rnk));
-    return map;
   }
 
   /**

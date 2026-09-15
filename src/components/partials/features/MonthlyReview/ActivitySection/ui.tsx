@@ -12,6 +12,7 @@ import {
 import type { MonthlyReviewData } from "@/types/stats/monthlyReview";
 import { formatDate, useCountUp } from "../utils";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import { usePeriodPhrase } from "../usePeriodPhrase";
 
 const styles = `
   @keyframes actFade { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
@@ -20,7 +21,7 @@ const styles = `
 
 interface Props {
   sectionRef: React.RefObject<HTMLDivElement>;
-  granularity: "month" | "year";
+  granularity: "month" | "year" | "version";
   inView: boolean;
   activity: MonthlyReviewData["activity"];
   dowData: { label: string; count: number }[];
@@ -68,6 +69,7 @@ const ActivitySectionUI = ({
   formatHourLabel,
 }: Props) => {
   const { t, tFormat } = useTranslation();
+  const period = usePeriodPhrase(granularity);
   const {
     totalKeys,
     totalScratches,
@@ -287,7 +289,7 @@ const ActivitySectionUI = ({
                 className="mb-4 text-[10px] font-bold tracking-[0.3em] uppercase"
                 style={{ color: "rgba(255,255,255,0.3)" }}
               >
-                {t("monthlyReview.activity.bestDaysTitle")}
+                {tFormat("monthlyReview.activity.bestDaysTitle", { period })}
               </p>
               <div className="flex gap-2">
                 {[

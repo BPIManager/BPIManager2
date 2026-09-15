@@ -1,17 +1,24 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import type { MonthlyReviewData } from "@/types/stats/monthlyReview";
-import MonthlyReviewViewUI from "./ui";
+import MonthlyReviewViewUI, { type MonthlyReviewViewSections } from "./ui";
 
 const BASE_SPEED = 0.6;
 const MAX_SPEED = 14;
 
 interface Props {
-  data: MonthlyReviewData;
+  data: MonthlyReviewViewSections;
+  topSongsLoading?: boolean;
+  radarGrowthLoading?: boolean;
+  onCompareVersionChange?: (version: string) => void;
 }
 
-const MonthlyReviewView = ({ data }: Props) => {
+const MonthlyReviewView = ({
+  data,
+  topSongsLoading,
+  radarGrowthLoading,
+  onCompareVersionChange,
+}: Props) => {
   const speedRef = useRef(BASE_SPEED);
 
   useEffect(() => {
@@ -44,7 +51,15 @@ const MonthlyReviewView = ({ data }: Props) => {
     };
   }, []);
 
-  return <MonthlyReviewViewUI data={data} speedRef={speedRef} />;
+  return (
+    <MonthlyReviewViewUI
+      data={data}
+      speedRef={speedRef}
+      topSongsLoading={topSongsLoading}
+      radarGrowthLoading={radarGrowthLoading}
+      onCompareVersionChange={onCompareVersionChange}
+    />
+  );
 };
 
 export default MonthlyReviewView;

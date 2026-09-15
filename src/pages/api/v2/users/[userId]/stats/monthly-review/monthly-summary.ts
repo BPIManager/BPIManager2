@@ -1,6 +1,6 @@
 import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
 import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
-import { handleStatsMonthlyReview } from "@/lib/subhandlers/stats";
+import { handleStatsMonthlyReviewMonthlySummary } from "@/lib/subhandlers/stats";
 import {
   accessError,
   buildMeta,
@@ -16,27 +16,22 @@ export default withUserApiHandler(
     }
     const userId = req.query.userId as string;
     const version = req.query.version as string;
-    const month = req.query.month as string;
-    const isYearMode = /^\d{4}$/.test(month ?? "");
-    const isMonthMode = /^\d{4}-\d{2}$/.test(month ?? "");
     const isValidVersion = (IIDX_VERSIONS as readonly string[]).includes(version);
     if (!userId || typeof userId !== "string") {
       res.status(400).json({ message: "Invalid userId" });
       return null;
     }
-    if (!version || !isValidVersion || !month || (!isYearMode && !isMonthMode)) {
-      res.status(400).json({
-        message: "Missing or invalid params: version, month (YYYY-MM or YYYY)",
-      });
+    if (!version || !isValidVersion) {
+      res.status(400).json({ message: "Missing or invalid params: version" });
       return null;
     }
-    return { userId, version, month };
+    return { userId, version };
   },
   async (req, res, query, access) => {
     writeV2Result(
       res,
       withMeta(
-        await handleStatsMonthlyReview(query, access),
+        await handleStatsMonthlyReviewMonthlySummary(query),
         buildMeta(access.viewerId ?? null, query.userId),
       ),
     );

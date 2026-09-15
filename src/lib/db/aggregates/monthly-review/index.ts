@@ -8,7 +8,10 @@ import { wherePublicOnly } from "@/lib/db/shared/visibility";
 import { scoresRepo } from "@/lib/db/domains/scores";
 import { iidxTowerRepo } from "@/lib/db/domains/iidxTower";
 import { songsRepo } from "@/lib/db/domains/songs";
-import { getArenaStatsHistory } from "@/lib/db/domains/arenaHistory";
+import {
+  getArenaStatsHistory,
+  getLatestArenaStatsPerVersion,
+} from "@/lib/db/domains/arenaHistory";
 
 const jstDayStart = (jstDate: string): Date =>
   new Date(`${jstDate}T00:00:00+09:00`);
@@ -58,6 +61,11 @@ class MonthlyReviewRepository {
       new Date(`${monthStart}T00:00:00+09:00`),
       new Date(`${monthEnd}T23:59:59+09:00`),
     );
+  }
+
+  /** バージョンごとの最終（そのバージョンで最後に取得された）アリーナ戦績を取得する（全期間振り返りのアリーナ履歴用） */
+  async getArenaVersionHistory(userId: string) {
+    return getLatestArenaStatsPerVersion(userId);
   }
 
   async getMonthlyTowerRanking(
@@ -112,6 +120,39 @@ class MonthlyReviewRepository {
             .where("m2.difficultyLevel", "=", 12)
             .where("m2.difficulty", "in", IIDX_DIFFICULTIES)
             .where("s2.lastPlayed", "<", jstDayStart(monthStart))
+            .groupBy(["s2.userId", "s2.songId"])
+            .as("latest"),
+        (join) =>
+          join
+            .onRef("latest.userId", "=", "s.userId")
+            .onRef("latest.songId", "=", "s.songId")
+            .onRef("latest.maxLogId", "=", "s.logId"),
+      )
+      .select(["s.userId", "s.songId", "s.bpi", "s.exScore"])
+      .execute();
+  }
+
+  // scores・songsを横断JOINした複数ユーザー分のBPI状態一括取得のため、直接参照を維持する。
+  // getPreMonthBpiStateForUsersの日時境界版と異なり、バージョンそのものを境界として使う
+  // （全期間モードでの総合BPI比較・レーダー別成長の「期間前」baseline用）
+  async getVersionBpiStateForUsers(userIds: string[], compareVersion: string) {
+    if (userIds.length === 0) return [];
+    return await db
+      .selectFrom("scores as s")
+      .innerJoin(
+        (qb) =>
+          qb
+            .selectFrom("scores as s2")
+            .innerJoin("songs as m2", "s2.songId", "m2.songId")
+            .select([
+              "s2.userId",
+              "s2.songId",
+              (eb) => eb.fn.max("s2.logId").as("maxLogId"),
+            ])
+            .where("s2.userId", "in", userIds)
+            .where("s2.version", "=", compareVersion)
+            .where("m2.difficultyLevel", "=", 12)
+            .where("m2.difficulty", "in", IIDX_DIFFICULTIES)
             .groupBy(["s2.userId", "s2.songId"])
             .as("latest"),
         (join) =>
@@ -194,12 +235,13 @@ class MonthlyReviewRepository {
     );
   }
 
-  async getBatchSongRanks(
+  /** 「前作」等、比較対象バージョン内での最新スコアを取得する（全期間モードの楽曲ハイライト用） */
+  async getComparisonVersionScores(
     userId: string,
-    version: string,
+    compareVersion: string,
     songIds: number[],
-  ): Promise<Map<number, number>> {
-    return scoresRepo.getSongRanksForSongs(userId, version, songIds);
+  ) {
+    return scoresRepo.getLatestScoresForVersion(userId, compareVersion, songIds);
   }
 
   async getMonthlyActivityBreakdownByLastPlayed(

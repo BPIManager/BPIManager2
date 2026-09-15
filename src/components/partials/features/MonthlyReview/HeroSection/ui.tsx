@@ -10,6 +10,7 @@ import {
 } from "recharts";
 import type { MonthlyReviewData } from "@/types/stats/monthlyReview";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import { usePeriodPhrase } from "../usePeriodPhrase";
 
 const styles = `
   @keyframes heroFade  { from { opacity:0; transform:translateY(24px) } to { opacity:1; transform:translateY(0) } }
@@ -19,6 +20,7 @@ const styles = `
 
 interface Props {
   bpi: MonthlyReviewData["bpi"];
+  granularity: "month" | "year" | "version";
   inView: boolean;
   sectionRef: React.RefObject<HTMLDivElement>;
   accent: string;
@@ -29,6 +31,7 @@ interface Props {
 
 const HeroSectionUI = ({
   bpi,
+  granularity,
   inView,
   sectionRef,
   accent,
@@ -37,6 +40,13 @@ const HeroSectionUI = ({
   spanRef,
 }: Props) => {
   const { t, tFormat } = useTranslation();
+  const period = usePeriodPhrase(granularity);
+  const isVersionMode = granularity === "version";
+  const compareLabel = bpi.compareVersion
+    ? bpi.compareVersion === "INF"
+      ? "INF"
+      : `IIDX${bpi.compareVersion}`
+    : null;
   return (
   <>
     <style>{styles}</style>
@@ -67,7 +77,7 @@ const HeroSectionUI = ({
             animation: inView ? "numPop 0.8s ease-out 0.2s both" : "none",
           }}
         >
-          {isPositive ? "+" : ""}
+          {!isVersionMode && isPositive ? "+" : ""}
           {(0).toFixed(2)}
         </span>
 
@@ -101,11 +111,26 @@ const HeroSectionUI = ({
             animation: inView ? "heroFade 0.6s ease-out 1.2s both" : "none",
           }}
         >
-          {bpi.diff > 0
-            ? tFormat("monthlyReview.bpi.growthText", { start: bpi.start.toFixed(2), end: bpi.end.toFixed(2), diff: bpi.diff.toFixed(2) })
-            : bpi.diff < 0
-              ? tFormat("monthlyReview.bpi.dropText", { start: bpi.start.toFixed(2), end: bpi.end.toFixed(2) })
-              : t("monthlyReview.bpi.noChange")}
+          {isVersionMode && compareLabel
+            ? bpi.diff > 0
+              ? tFormat("monthlyReview.bpi.versionGrowthText", {
+                  compareLabel,
+                  start: bpi.start.toFixed(2),
+                  end: bpi.end.toFixed(2),
+                  diff: bpi.diff.toFixed(2),
+                })
+              : bpi.diff < 0
+                ? tFormat("monthlyReview.bpi.versionDropText", {
+                    compareLabel,
+                    start: bpi.start.toFixed(2),
+                    end: bpi.end.toFixed(2),
+                  })
+                : tFormat("monthlyReview.bpi.versionNoChange", { compareLabel })
+            : bpi.diff > 0
+              ? tFormat("monthlyReview.bpi.growthText", { period, start: bpi.start.toFixed(2), end: bpi.end.toFixed(2), diff: bpi.diff.toFixed(2) })
+              : bpi.diff < 0
+                ? tFormat("monthlyReview.bpi.dropText", { period, start: bpi.start.toFixed(2), end: bpi.end.toFixed(2) })
+                : tFormat("monthlyReview.bpi.noChange", { period })}
         </p>
       </div>
 

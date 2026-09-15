@@ -19,10 +19,11 @@ const PeriodSelector = ({
   const router = useRouter();
   const userId = router.query.userId as string | undefined;
 
-  const isCurrentYearMode = /^\d{4}$/.test(currentPeriod);
+  const isCurrentAllMode = currentPeriod === "all";
+  const isCurrentYearMode = !isCurrentAllMode && /^\d{4}$/.test(currentPeriod);
 
-  const [granularity, setGranularity] = useState<"month" | "year">(
-    isCurrentYearMode ? "year" : "month",
+  const [granularity, setGranularity] = useState<"month" | "year" | "all">(
+    isCurrentAllMode ? "all" : isCurrentYearMode ? "year" : "month",
   );
   const [version, setVersion] = useState(currentVersion);
 
@@ -64,8 +65,10 @@ const PeriodSelector = ({
       version={version}
       isLoading={isLoading}
       isCurrentYearMode={isCurrentYearMode}
+      isCurrentAllMode={isCurrentAllMode}
       onGranularityChange={setGranularity}
       onVersionChange={handleVersionChange}
+      onAllClick={() => onSelect(version, "all")}
       calendarYear={calendarYear}
       canPrevYear={canPrevYear}
       canNextYear={canNextYear}

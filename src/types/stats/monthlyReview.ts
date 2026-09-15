@@ -39,7 +39,8 @@ export interface RivalBpiGrowthEntry {
   userName: string;
   profileImage: string | null;
   isViewer: boolean;
-  bpiGrowth: number;
+  /** 比較先バージョンにデータが無いライバルはnull（「-」表示用） */
+  bpiGrowth: number | null;
   growthRate: number | null;
 }
 
@@ -61,6 +62,13 @@ export interface MonthlyArena {
   maxA1Continue: number | null;
 }
 
+export interface ArenaVersionHistoryEntry {
+  version: string;
+  arenaClass: string;
+  /** そのバージョンで最後に取得された時点の順位（最高到達点ではない） */
+  arenaRank: number | null;
+}
+
 export interface RadarGrowthEntry {
   element: string;
   totalDiff: number;
@@ -70,44 +78,71 @@ export interface RadarGrowthEntry {
   timeline: { date: string; cumDiff: number }[];
 }
 
-export interface MonthlyReviewData {
-  month: string;
-  version: string;
-  granularity: "month" | "year";
-  bpi: {
-    start: number;
-    end: number;
-    diff: number;
-    history: { date: string; value: number }[];
-  };
-  topSongs: {
-    topBpiSongs: TopSong[];
-    topImprovedSongs: TopSongImproved[];
-  };
-  activity: {
-    totalKeys: number;
-    totalScratches: number;
-    playDays: number;
-    updatedSongs: number;
-    byDayOfWeek: { day: number; count: number }[];
-    byHour: { hour: number; count: number }[];
-    towerRanking: {
-      keysRank: number;
-      scratchRank: number;
-      totalUsers: number;
-    } | null;
-    bestDays: {
-      bestGrowthDay: { date: string; bpiDiff: number } | null;
-      bestKeysDay: { date: string; keyCount: number } | null;
-      bestScratchDay: { date: string; scratchCount: number } | null;
-    } | null;
-  };
+export interface MonthlyReviewBpi {
+  start: number;
+  end: number;
+  diff: number;
+  history: { date: string; value: number }[];
+  /** 全期間モードでの比較先バージョン（月次/年次はnull） */
+  compareVersion: string | null;
+}
+
+export interface MonthlyReviewTopSongs {
+  topBpiSongs: TopSong[];
+  topImprovedSongs: TopSongImproved[];
+  /** 「最も伸びた曲」の比較先バージョン（全期間モードのみ。月次/年次はnull） */
+  compareVersion: string | null;
+}
+
+export interface MonthlyReviewActivity {
+  totalKeys: number;
+  totalScratches: number;
+  playDays: number;
+  updatedSongs: number;
+  byDayOfWeek: { day: number; count: number }[];
+  byHour: { hour: number; count: number }[];
+  towerRanking: {
+    keysRank: number;
+    scratchRank: number;
+    totalUsers: number;
+  } | null;
+  bestDays: {
+    bestGrowthDay: { date: string; bpiDiff: number } | null;
+    bestKeysDay: { date: string; keyCount: number } | null;
+    bestScratchDay: { date: string; scratchCount: number } | null;
+  } | null;
+}
+
+export interface MonthlyReviewRivals {
   rivals: RivalDiff[];
   rivalsGrowthRanking: {
     byAbsGrowth: RivalBpiGrowthEntry[];
     byGrowthRate: RivalBpiGrowthEntry[];
   } | null;
   rivalsGrowthTimeline: GrowthParticipant[] | null;
-  arena: MonthlyArena | null;
+}
+
+export interface MonthlyReviewRadarGrowth {
   radarGrowth: RadarGrowthEntry[] | null;
+  /** 全期間モードでの比較先バージョン（月次/年次はnull） */
+  compareVersion: string | null;
+  /** 比較先バージョンにデータが無く、伸び幅ではなくBPI降順の単純なリストにフォールバックしたか */
+  usingFallbackComparison: boolean;
+}
+
+export interface MonthlyReviewArena {
+  arena: MonthlyArena | null;
+  versionHistory: ArenaVersionHistoryEntry[];
+}
+
+export interface MonthlyReviewData
+  extends MonthlyReviewRivals,
+    MonthlyReviewArena,
+    MonthlyReviewRadarGrowth {
+  month: string;
+  version: string;
+  granularity: "month" | "year" | "version";
+  bpi: MonthlyReviewBpi;
+  topSongs: MonthlyReviewTopSongs;
+  activity: MonthlyReviewActivity;
 }

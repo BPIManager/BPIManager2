@@ -10,7 +10,7 @@ export { PALETTE } from "./ui";
 interface Props {
   participants: GrowthParticipant[];
   hiddenKeys?: Set<string>;
-  granularity?: "month" | "year";
+  granularity?: "month" | "year" | "version";
 }
 
 const GrowthChart = ({

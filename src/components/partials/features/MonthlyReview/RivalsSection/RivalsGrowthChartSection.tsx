@@ -20,7 +20,7 @@ function RivalsGrowthChartSection({
   viewerAbsRank: number;
   viewerRateRank: number;
   totalParticipants: number;
-  granularity: "month" | "year";
+  granularity: "month" | "year" | "version";
   inView: boolean;
 }) {
   const { t } = useTranslation();

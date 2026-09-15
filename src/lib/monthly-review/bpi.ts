@@ -12,6 +12,21 @@ function toObservations(exScoreBySong: Map<number, number>): IBpiScoreObservatio
   }));
 }
 
+/** 特定バージョンのスコア群から独立して総合BPIを1件計算する（バージョン間比較のbaseline用） */
+export function calculateTotalBpiForScores(
+  exScoreBySong: Map<number, number>,
+  songMaster: MasterSong[],
+): number {
+  const songById = new Map(songMaster.map((s) => [s.songId, s]));
+  const observations = toObservations(exScoreBySong).map((o) => ({
+    ...o,
+    notes: songById.get(o.songId)?.notes ?? 0,
+  }));
+  return (
+    Math.round(BpiCalculator.calculateTotalBPI(observations, songMaster) * 100) / 100
+  );
+}
+
 export function buildBpiTimeline(
   preMonthExScoreMap: Map<number, number>,
   inMonthEntries: {
@@ -20,7 +35,7 @@ export function buildBpiTimeline(
     lastPlayed: Date | string;
   }[],
   songMaster: MasterSong[],
-  isYearMode: boolean,
+  useMonthBuckets: boolean,
 ): {
   history: { date: string; value: number }[];
   bpiStart: number;
@@ -50,12 +65,17 @@ export function buildBpiTimeline(
     const dateStr = dayjs(entry.lastPlayed as Parameters<typeof dayjs>[0])
       .tz()
       .format("YYYY-MM-DD");
-    const key = isYearMode ? dateStr.slice(0, 7) : dateStr;
+    const key = useMonthBuckets ? dateStr.slice(0, 7) : dateStr;
     const arr = byKey.get(key) ?? [];
     arr.push({ songId: entry.songId, exScore: entry.exScore });
     byKey.set(key, arr);
   }
 
+  // シフト法の総合BPIは、新しい観測で未プレイ曲の潜在スキル予測が下振れすると
+  // プレイ済み曲が1つも下がっていなくても総合BPI自体が下がりうる
+  // （BpiCalculator.ratchetTotalBpiのコメント参照）。推移チャートが実際には
+  // 上がり続けているはずの期間で見かけ上下降しないよう、直近までの最高値との
+  // maxを取りながら積み上げる
   let currentBpi = bpiStart;
   const historyMap = new Map<string, number>();
 
@@ -65,19 +85,20 @@ export function buildBpiTimeline(
         latestExScoreBySong.set(update.songId, Number(update.exScore));
       }
     }
-    currentBpi =
+    const rawBpi =
       Math.round(
         BpiCalculator.calculateTotalBPI(
           notesOf(latestExScoreBySong),
           songMaster,
         ) * 100,
       ) / 100;
+    currentBpi = BpiCalculator.ratchetTotalBpi(currentBpi, rawBpi);
     historyMap.set(key, currentBpi);
   }
 
   const history = Array.from(historyMap.entries())
     .sort(([a], [b]) => a.localeCompare(b))
-    .map(([key, value]) => ({ date: isYearMode ? `${key}-01` : key, value }));
+    .map(([key, value]) => ({ date: useMonthBuckets ? `${key}-01` : key, value }));
 
   return {
     history,

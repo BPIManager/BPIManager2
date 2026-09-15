@@ -1,11 +1,9 @@
-import { buildBpiTimeline } from "./bpi";
 import type {
   RivalDiff,
   RivalSongHighlight,
   RivalBpiGrowthEntry,
   GrowthParticipant,
 } from "@/types/stats/monthlyReview";
-import type { IBpiBasicSongData } from "@/types/songs/bpi";
 
 type RivalScoreRow = {
   userId: string;
@@ -116,66 +114,40 @@ export function buildRivals(
 }
 
 /**
- * DBから受け取ったbpi値(decimal列のため文字列で返る場合を含むunknown)を、
- * 未設定時のフォールバック込みでnumberへ変換する。
+ * `scores.lastPlayed`基準のシフト法再計算結果（{@link recomputeBpiTimelinesForUsers}）を
+ * 各ライバル（`RivalDiff`）に反映し、推移グラフ用のタイムラインMapを組み立てる。
  *
- * `as number`のような無検証キャストだと文字列がそのまま紛れ込んでも
- * 気づけないため、必ずNumber()で変換してから扱う。
+ * @param recomputedByUser - ライバルごとの再計算結果。`bpiStart`が`null`のライバルは
+ *   （`compareVersion`モードでそのバージョンのスコアが無く）前バージョンとの伸び率
+ *   比較が不能なため、ランキング側では除外するが、推移グラフ自体（`bpiEnd`/`history`）
+ *   はそのバージョン内の純粋な推移として引き続き表示する
  */
-function toBpiNumber<T>(bpi: unknown, fallback: T): number | T {
-  return bpi != null ? Number(bpi) : fallback;
-}
-
 export function attachRivalBpiTimelines(
   rivals: RivalDiff[],
-  rivalPreMonthState: { userId: string; songId: number; exScore: unknown }[],
-  rivalInMonthHistory: {
-    userId: string;
-    songId: number;
-    exScore: unknown;
-    lastPlayed: Date | string;
-  }[],
-  songMaster: (IBpiBasicSongData & { songId: number })[],
-  isYearMode: boolean,
+  recomputedByUser: Map<
+    string,
+    { bpiStart: number | null; bpiEnd: number; history: { date: string; value: number }[] }
+  >,
 ): Map<string, { date: string; value: number }[]> {
-  const rivalPreMonthByUser = new Map<string, Map<number, number>>();
-  for (const s of rivalPreMonthState) {
-    if (s.exScore == null) continue;
-    if (!rivalPreMonthByUser.has(s.userId))
-      rivalPreMonthByUser.set(s.userId, new Map());
-    rivalPreMonthByUser.get(s.userId)!.set(s.songId, Number(s.exScore));
-  }
-
-  const rivalInMonthByUser = new Map<string, typeof rivalInMonthHistory>();
-  for (const e of rivalInMonthHistory) {
-    const arr = rivalInMonthByUser.get(e.userId) ?? [];
-    arr.push(e);
-    rivalInMonthByUser.set(e.userId, arr);
-  }
-
   const rivalComputedTimeline = new Map<
     string,
     { date: string; value: number }[]
   >();
   for (const r of rivals) {
-    const preMap =
-      rivalPreMonthByUser.get(r.userId) ?? new Map<number, number>();
-    const rawInMonth = rivalInMonthByUser.get(r.userId) ?? [];
-    const inMonth = rawInMonth.map((e) => ({
-      songId: e.songId,
-      exScore: toBpiNumber(e.exScore, null),
-      lastPlayed: e.lastPlayed,
-    }));
-    const { history, bpiStart: rBpiStart, bpiEnd: rBpiEnd } = buildBpiTimeline(
-      preMap,
-      inMonth,
-      songMaster,
-      isYearMode,
-    );
-    r.bpiStart = rBpiStart;
-    r.bpiEnd = rBpiEnd;
-    r.bpiGrowth = Math.round((rBpiEnd - rBpiStart) * 100) / 100;
-    rivalComputedTimeline.set(r.userId, history);
+    const recomputed = recomputedByUser.get(r.userId);
+    if (!recomputed) continue;
+
+    if (recomputed.history.length > 0)
+      rivalComputedTimeline.set(r.userId, recomputed.history);
+
+    if (recomputed.bpiStart === null) {
+      // 前バージョンとの伸び率比較が不能（bpiStart/bpiEnd/bpiGrowthはRivalDiff
+      // 初期値のnullのまま。「-」として末尾に表示される。buildGrowthRanking参照）
+      continue;
+    }
+    r.bpiStart = recomputed.bpiStart;
+    r.bpiEnd = recomputed.bpiEnd;
+    r.bpiGrowth = Math.round((recomputed.bpiEnd - recomputed.bpiStart) * 100) / 100;
   }
 
   return rivalComputedTimeline;
@@ -202,32 +174,45 @@ export function buildGrowthRanking(
     growthRate: viewerGrowthRate,
   });
 
+  // 比較先バージョンのデータが無いライバル（bpiGrowth/bpiStartがnull）も
+  // 伸び率ランキング側では「-」として末尾に表示するため、ここでは除外しない
   for (const r of rivals) {
-    if (r.bpiGrowth !== null && r.bpiStart !== null) {
-      const growthRate =
-        r.bpiStart > -15
-          ? Math.round((r.bpiGrowth / (r.bpiStart + 15)) * 10000) / 100
-          : null;
-      growthEntries.push({
-        userId: r.userId,
-        userName: r.userName,
-        profileImage: r.profileImage,
-        isViewer: false,
-        bpiGrowth: r.bpiGrowth,
-        growthRate,
-      });
-    }
+    const growthRate =
+      r.bpiGrowth !== null && r.bpiStart !== null && r.bpiStart > -15
+        ? Math.round((r.bpiGrowth / (r.bpiStart + 15)) * 10000) / 100
+        : null;
+    growthEntries.push({
+      userId: r.userId,
+      userName: r.userName,
+      profileImage: r.profileImage,
+      isViewer: false,
+      bpiGrowth: r.bpiGrowth,
+      growthRate,
+    });
   }
 
   if (growthEntries.length === 0) return null;
   return {
-    byAbsGrowth: [...growthEntries].sort((a, b) => b.bpiGrowth - a.bpiGrowth),
-    byGrowthRate: [...growthEntries]
-      .filter((e) => e.growthRate !== null)
-      .sort((a, b) => (b.growthRate ?? 0) - (a.growthRate ?? 0)),
+    byAbsGrowth: [...growthEntries]
+      .filter((e) => e.bpiGrowth !== null)
+      .sort((a, b) => b.bpiGrowth! - a.bpiGrowth!),
+    // growthRateがある者を降順、無い者（比較データ無し＝「-」）は末尾に
+    byGrowthRate: [...growthEntries].sort((a, b) => {
+      if (a.growthRate === null && b.growthRate === null) return 0;
+      if (a.growthRate === null) return 1;
+      if (b.growthRate === null) return -1;
+      return b.growthRate - a.growthRate;
+    }),
   };
 }
 
+/**
+ * @param usingCompareVersion - `true`（全期間モード）の場合、チャートの起点を
+ *   前バージョンの値で汚さない。「前バージョンからの伸び」は2点比較の
+ *   ランキング側（buildGrowthRanking）だけの概念とし、推移グラフ自体は
+ *   そのバージョン内で実際に記録された最初のログを基準にした自己相対の
+ *   純粋な成長推移として表示する
+ */
 export function buildGrowthTimeline(
   rivals: RivalDiff[],
   rivalComputedTimeline: Map<string, { date: string; value: number }[]>,
@@ -236,8 +221,35 @@ export function buildGrowthTimeline(
   bpiStart: number,
   bpiEnd: number,
   monthStart: string,
+  usingCompareVersion: boolean,
 ): GrowthParticipant[] | null {
   const result: GrowthParticipant[] = [];
+
+  if (usingCompareVersion) {
+    if (bpiHistory.length > 0) {
+      result.push({
+        userId: viewerId,
+        userName: "あなた",
+        isViewer: true,
+        profileImage: null,
+        bpiBase: bpiHistory[0].value,
+        history: bpiHistory.map((h) => ({ date: h.date, bpi: h.value })),
+      });
+    }
+    for (const r of rivals) {
+      const rawHistory = rivalComputedTimeline.get(r.userId) ?? [];
+      if (rawHistory.length === 0) continue;
+      result.push({
+        userId: r.userId,
+        userName: r.userName,
+        isViewer: false,
+        profileImage: r.profileImage,
+        bpiBase: rawHistory[0].value,
+        history: rawHistory.map((h) => ({ date: h.date, bpi: h.value })),
+      });
+    }
+    return result.length > 0 ? result : null;
+  }
 
   if (bpiHistory.length > 0 || bpiStart !== bpiEnd) {
     const viewerHistory = bpiHistory.map((h) => ({ date: h.date, bpi: h.value }));
@@ -255,9 +267,12 @@ export function buildGrowthTimeline(
   }
 
   for (const r of rivals) {
+    // 比較先バージョンのデータが無いライバル（bpiStart未計算）はグラフの
+    // baselineが定まらないため描画対象から除外する
+    if (r.bpiStart === null) continue;
     const rawHistory = rivalComputedTimeline.get(r.userId) ?? [];
     const history = rawHistory.map((h) => ({ date: h.date, bpi: h.value }));
-    const base = r.bpiStart ?? history[0]?.bpi ?? 0;
+    const base = r.bpiStart;
     if (history[0]?.date !== monthStart) {
       history.unshift({ date: monthStart, bpi: base });
     }

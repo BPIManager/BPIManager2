@@ -1,10 +1,20 @@
+import { Meta } from "@/components/partials/common/PageChrome/Head";
 import MonthlyReviewView from "@/components/partials/features/MonthlyReview/index";
 import PeriodSelector from "@/components/partials/features/MonthlyReview/PeriodSelector";
+import LoadingChecklist from "@/components/partials/features/MonthlyReview/LoadingChecklist";
 import { StarfieldBackground } from "@/components/ui/starfield-background";
-import { useMonthlyReview } from "@/hooks/stats/useMonthlyReview";
+import { useMonthlyReviewBpi } from "@/hooks/stats/useMonthlyReviewBpi";
+import { useMonthlyReviewTopSongs } from "@/hooks/stats/useMonthlyReviewTopSongs";
+import { useMonthlyReviewActivity } from "@/hooks/stats/useMonthlyReviewActivity";
+import { useMonthlyReviewRivals } from "@/hooks/stats/useMonthlyReviewRivals";
+import { useMonthlyReviewArena } from "@/hooks/stats/useMonthlyReviewArena";
+import { useMonthlyReviewRadarGrowth } from "@/hooks/stats/useMonthlyReviewRadarGrowth";
+import { useTranslation } from "@/hooks/common/useTranslation";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { useRouter } from "next/router";
 import { ArrowLeft } from "lucide-react";
+import { useState } from "react";
 
 const orbitStyles = `
   @keyframes orbitA { 0%{transform:rotate(0deg) translateX(30px) rotate(0deg)} 100%{transform:rotate(360deg) translateX(30px) rotate(-360deg)} }
@@ -15,16 +25,90 @@ const orbitStyles = `
   @keyframes loadingFade { from{opacity:0;letter-spacing:0.6em} to{opacity:1;letter-spacing:0.35em} }
 `;
 
+const authStatusOf = (error: unknown): number | undefined =>
+  (error as { status?: number } | undefined)?.status;
+
 export default function MonthlyReviewPage() {
   const router = useRouter();
-  const { userId, month } = router.query;
+  const { t } = useTranslation();
+  const { userId, month: rawMonth } = router.query;
   const version = (router.query.version as string) || latestVersion;
+  const userIdStr = router.isReady ? (userId as string) : undefined;
+  const month = router.isReady ? (rawMonth as string) : undefined;
 
-  const { data, isLoading, error } = useMonthlyReview(
-    router.isReady ? (userId as string) : undefined,
-    version,
-    router.isReady ? (month as string) : undefined,
+  const isAllMode = month === "all";
+  const isYearMode = !isAllMode && /^\d{4}$/.test(month ?? "");
+  const granularity: "month" | "year" | "version" = isAllMode
+    ? "version"
+    : isYearMode
+      ? "year"
+      : "month";
+
+  // 楽曲ハイライト「最も伸びた曲」の比較先バージョン（全期間モードのみ有効・
+  // configボタンから変更可能）。未指定時はサーバー側で既定値（前バージョン）が使われる。
+  // ルート（対象期間）が変わったら選択をリセットする（レンダー中の状態調整）
+  const routeKey = `${userIdStr ?? ""}:${version}:${month ?? ""}`;
+  const [compareVersionRouteKey, setCompareVersionRouteKey] =
+    useState(routeKey);
+  const [compareVersion, setCompareVersion] = useState<string | undefined>(
+    undefined,
   );
+  if (compareVersionRouteKey !== routeKey) {
+    setCompareVersionRouteKey(routeKey);
+    setCompareVersion(undefined);
+  }
+
+  const bpi = useMonthlyReviewBpi(userIdStr, version, month, compareVersion);
+  const topSongs = useMonthlyReviewTopSongs(
+    userIdStr,
+    version,
+    month,
+    compareVersion,
+  );
+  const activity = useMonthlyReviewActivity(userIdStr, version, month);
+  const rivals = useMonthlyReviewRivals(userIdStr, version, month);
+  const arena = useMonthlyReviewArena(userIdStr, version, month);
+  const radarGrowth = useMonthlyReviewRadarGrowth(
+    userIdStr,
+    version,
+    month,
+    compareVersion,
+  );
+
+  const sections = [
+    { key: "bpi", label: t("monthlyReview.loading.bpi"), ...bpi },
+    {
+      key: "topSongs",
+      label: t("monthlyReview.loading.topSongs"),
+      ...topSongs,
+    },
+    {
+      key: "activity",
+      label: t("monthlyReview.loading.activity"),
+      ...activity,
+    },
+    { key: "rivals", label: t("monthlyReview.loading.rivals"), ...rivals },
+    { key: "arena", label: t("monthlyReview.loading.arena"), ...arena },
+    {
+      key: "radarGrowth",
+      label: t("monthlyReview.loading.radarGrowth"),
+      ...radarGrowth,
+    },
+  ];
+  const allSettled = sections.every((s) => !s.isLoading);
+  const isAuthError = sections.every((s) => {
+    const status = authStatusOf(s.error);
+    return status === 401 || status === 403;
+  });
+
+  // 初回ロード完了後は、比較先バージョン変更等による個別セクションの再フェッチで
+  // 画面全体のローディング演出に戻らないよう、ルート（対象期間）単位で
+  // 「初回ロード済みか」を記憶する（レンダー中の状態調整）
+  const [loadedRouteKey, setLoadedRouteKey] = useState<string | null>(null);
+  if (allSettled && loadedRouteKey !== routeKey) {
+    setLoadedRouteKey(routeKey);
+  }
+  const showFullScreenLoading = !router.isReady || loadedRouteKey !== routeKey;
 
   const BackBtn = (
     <button
@@ -41,6 +125,14 @@ export default function MonthlyReviewPage() {
     </button>
   );
 
+  const MetaTag =
+    router.isReady && userIdStr && month ? (
+      <Meta
+        title={t("page.monthlyReviewShare.title")}
+        ogImage={`https://bpi2.poyashi.me${API_V2_PREFIX}/users/${userIdStr}/stats/monthly-review/ogp?version=${version}&month=${month}`}
+      />
+    ) : null;
+
   const handlePeriodSelect = (newVersion: string, period: string) => {
     router.push(
       `/users/${userId as string}/monthly-review/${period}?version=${newVersion}`,
@@ -55,9 +147,10 @@ export default function MonthlyReviewPage() {
     />
   ) : null;
 
-  if (!router.isReady || isLoading) {
+  if (showFullScreenLoading) {
     return (
       <div className="fixed inset-0" style={{ background: "#0a0a0f" }}>
+        {MetaTag}
         <style>{orbitStyles}</style>
         {BackBtn}
         {CalendarBtn}
@@ -137,14 +230,21 @@ export default function MonthlyReviewPage() {
           >
             LOADING
           </p>
+          {router.isReady && (
+            <LoadingChecklist
+              items={sections.map((s) => ({
+                key: s.key,
+                label: s.label,
+                status: s.isLoading ? "loading" : s.error ? "error" : "done",
+              }))}
+            />
+          )}
         </div>
       </div>
     );
   }
 
-  if (error || !data) {
-    const statusCode = (error as { status?: number } | undefined)?.status;
-    const isAuthError = statusCode === 401 || statusCode === 403;
+  if (isAuthError) {
     return (
       <div
         className="fixed inset-0 flex flex-col items-center justify-center gap-3"
@@ -153,9 +253,7 @@ export default function MonthlyReviewPage() {
         {BackBtn}
         {CalendarBtn}
         <p style={{ color: "rgba(255,255,255,0.25)", fontSize: "0.875rem" }}>
-          {isAuthError
-            ? "このデータを閲覧する権限がありません"
-            : "この期間のデータがありません"}
+          このデータを閲覧する権限がありません
         </p>
       </div>
     );
@@ -163,9 +261,29 @@ export default function MonthlyReviewPage() {
 
   return (
     <>
+      {MetaTag}
       {BackBtn}
       {CalendarBtn}
-      <MonthlyReviewView data={data} />
+      <MonthlyReviewView
+        data={{
+          month: month as string,
+          version,
+          granularity,
+          bpi: bpi.data,
+          topSongs: topSongs.data,
+          activity: activity.data,
+          rivals: rivals.data,
+          arena: arena.data?.arena ?? null,
+          arenaVersionHistory: arena.data?.versionHistory ?? [],
+          radarGrowth: radarGrowth.data?.radarGrowth ?? null,
+          radarGrowthCompareVersion: radarGrowth.data?.compareVersion ?? null,
+          radarGrowthUsingFallback:
+            radarGrowth.data?.usingFallbackComparison ?? false,
+        }}
+        topSongsLoading={topSongs.isLoading}
+        radarGrowthLoading={radarGrowth.isLoading}
+        onCompareVersionChange={setCompareVersion}
+      />
     </>
   );
 }

@@ -11,7 +11,7 @@ export * from "./availablePeriods";
 export * from "./bpiBoxStats";
 export * from "./bpmBpiDistribution";
 export * from "./djRankDistribution";
-export * from "./monthlyReview";
+export * from "./monthlyReviewV2";
 export * from "./neighborRecommended";
 export * from "./radar";
 export * from "./recommended";

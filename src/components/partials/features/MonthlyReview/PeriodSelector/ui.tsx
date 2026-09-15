@@ -12,12 +12,14 @@ import { useTranslation } from "@/hooks/common/useTranslation";
 interface Props {
   currentVersion: string;
   currentPeriod: string;
-  granularity: "month" | "year";
+  granularity: "month" | "year" | "all";
   version: string;
   isLoading: boolean;
   isCurrentYearMode: boolean;
-  onGranularityChange: (g: "month" | "year") => void;
+  isCurrentAllMode: boolean;
+  onGranularityChange: (g: "month" | "year" | "all") => void;
   onVersionChange: (v: string) => void;
+  onAllClick: () => void;
   calendarYear: string;
   canPrevYear: boolean;
   canNextYear: boolean;
@@ -221,6 +223,42 @@ const YearGrid = ({
   );
 };
 
+const AllPanel = ({
+  version,
+  currentVersion,
+  isCurrentAllMode,
+  onAllClick,
+}: {
+  version: string;
+  currentVersion: string;
+  isCurrentAllMode: boolean;
+  onAllClick: () => void;
+}) => {
+  const { tFormat } = useTranslation();
+  const isSelected = isCurrentAllMode && version === currentVersion;
+  return (
+    <div>
+      <button
+        onClick={onAllClick}
+        className="w-full rounded-md py-2 text-xs font-bold transition-all"
+        style={
+          isSelected
+            ? {
+                background: "rgba(52,211,153,0.2)",
+                border: "1px solid rgba(52,211,153,0.4)",
+                color: "#34d399",
+              }
+            : btnBase
+        }
+      >
+        {tFormat("monthlyReview.period.selectAll", {
+          version: version === "INF" ? "INF" : `IIDX${version}`,
+        })}
+      </button>
+    </div>
+  );
+};
+
 const PeriodSelectorUI = ({
   currentVersion,
   currentPeriod,
@@ -228,8 +266,10 @@ const PeriodSelectorUI = ({
   version,
   isLoading,
   isCurrentYearMode,
+  isCurrentAllMode,
   onGranularityChange,
   onVersionChange,
+  onAllClick,
   calendarYear,
   canPrevYear,
   canNextYear,
@@ -274,14 +314,18 @@ const PeriodSelectorUI = ({
           {t("monthlyReview.period.granularity")}
         </p>
         <div className="flex gap-2">
-          {(["month", "year"] as const).map((g) => (
+          {(["month", "year", "all"] as const).map((g) => (
             <button
               key={g}
               onClick={() => onGranularityChange(g)}
               className="flex-1 rounded-lg py-1.5 text-xs font-bold transition-all"
               style={granularity === g ? btnActive : btnBase}
             >
-              {g === "month" ? t("monthlyReview.period.month") : t("monthlyReview.period.year")}
+              {g === "month"
+                ? t("monthlyReview.period.month")
+                : g === "year"
+                  ? t("monthlyReview.period.year")
+                  : t("monthlyReview.period.all")}
             </button>
           ))}
         </div>
@@ -308,7 +352,14 @@ const PeriodSelectorUI = ({
         </div>
       </div>
 
-      {isLoading ? (
+      {granularity === "all" ? (
+        <AllPanel
+          version={version}
+          currentVersion={currentVersion}
+          isCurrentAllMode={isCurrentAllMode}
+          onAllClick={onAllClick}
+        />
+      ) : isLoading ? (
         <div className="flex h-24 items-center justify-center">
           <span
             className="text-[10px]"

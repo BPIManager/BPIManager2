@@ -10,6 +10,8 @@ import { useTranslation } from "@/hooks/common/useTranslation";
 import { getRankDetail } from "@/constants/iidx/rankBorders";
 import { ChevronDown, Trophy, TrendingUp } from "lucide-react";
 import { SectionCard } from "../SectionCard";
+import { Skeleton } from "@/components/ui/skeleton";
+import CompareVersionConfig from "../CompareVersionConfig";
 
 const styles = `
   @keyframes titleIn  { from{opacity:0;letter-spacing:0.6em} to{opacity:1;letter-spacing:0.2em} }
@@ -279,6 +281,16 @@ function BpiRankedList({
   );
 }
 
+function ImprovedRankedListSkeleton() {
+  return (
+    <div className="flex flex-col gap-2">
+      {Array.from({ length: 3 }, (_, i) => (
+        <Skeleton key={i} className="h-16 w-full rounded-xl" />
+      ))}
+    </div>
+  );
+}
+
 function ImprovedRankedList({
   title,
   icon,
@@ -286,6 +298,9 @@ function ImprovedRankedList({
   songs,
   inView,
   colDelay,
+  configSlot,
+  isComparing,
+  emptyMessage,
 }: {
   title: string;
   icon: React.ReactNode;
@@ -293,6 +308,9 @@ function ImprovedRankedList({
   songs: TopSongImproved[];
   inView: boolean;
   colDelay: number;
+  configSlot?: React.ReactNode;
+  isComparing?: boolean;
+  emptyMessage?: string;
 }) {
   const [visible, setVisible] = useState(PAGE);
   const { t } = useTranslation();
@@ -313,19 +331,35 @@ function ImprovedRankedList({
         >
           {title}
         </span>
+        {configSlot}
       </div>
-      <div className="flex flex-col gap-2">
-        {songs.slice(0, visible).map((s, i) => (
-          <ImprovedSongRow
-            key={s.songId}
-            rank={i + 1}
-            song={s}
-            accent={accent}
-            delay={inView ? colDelay + i * 0.04 : 0}
-          />
-        ))}
-      </div>
-      {visible < songs.length && (
+      {isComparing ? (
+        <ImprovedRankedListSkeleton />
+      ) : songs.length === 0 && emptyMessage ? (
+        <p
+          className="rounded-xl px-4 py-6 text-center text-xs leading-relaxed"
+          style={{
+            background: "rgba(255,255,255,0.04)",
+            border: "1px dashed rgba(255,255,255,0.12)",
+            color: "rgba(255,255,255,0.4)",
+          }}
+        >
+          {emptyMessage}
+        </p>
+      ) : (
+        <div className="flex flex-col gap-2">
+          {songs.slice(0, visible).map((s, i) => (
+            <ImprovedSongRow
+              key={s.songId}
+              rank={i + 1}
+              song={s}
+              accent={accent}
+              delay={inView ? colDelay + i * 0.04 : 0}
+            />
+          ))}
+        </div>
+      )}
+      {!isComparing && visible < songs.length && (
         <button
           onClick={() => setVisible((v) => v + PAGE)}
           className="flex items-center justify-center gap-1 rounded-xl py-2 text-xs font-bold transition-colors"
@@ -356,6 +390,9 @@ interface Props {
   inView: boolean;
   sectionRef: React.RefObject<HTMLDivElement>;
   summary: string;
+  currentVersion: string | undefined;
+  isComparing: boolean;
+  onCompareVersionChange?: (version: string) => void;
 }
 
 const TopSongsSectionUI = ({
@@ -363,9 +400,12 @@ const TopSongsSectionUI = ({
   inView,
   sectionRef,
   summary,
+  currentVersion,
+  isComparing,
+  onCompareVersionChange,
 }: Props) => {
-  const { t } = useTranslation();
-  const { topBpiSongs, topImprovedSongs } = topSongs;
+  const { t, tFormat } = useTranslation();
+  const { topBpiSongs, topImprovedSongs, compareVersion } = topSongs;
 
   return (
     <>
@@ -411,6 +451,23 @@ const TopSongsSectionUI = ({
               songs={topImprovedSongs}
               inView={inView}
               colDelay={0.2}
+              isComparing={isComparing}
+              configSlot={
+                compareVersion && onCompareVersionChange ? (
+                  <CompareVersionConfig
+                    currentVersion={currentVersion}
+                    compareVersion={compareVersion}
+                    onChange={onCompareVersionChange}
+                  />
+                ) : undefined
+              }
+              emptyMessage={
+                compareVersion
+                  ? tFormat("monthlyReview.topSongs.noComparisonData", {
+                      compareLabel: compareVersion === "INF" ? "INF" : `IIDX${compareVersion}`,
+                    })
+                  : undefined
+              }
             />
           </div>
 

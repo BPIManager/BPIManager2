@@ -8,7 +8,7 @@ import ActivitySectionUI from "./ui";
 
 interface Props {
   activity: MonthlyReviewData["activity"];
-  granularity: "month" | "year";
+  granularity: "month" | "year" | "version";
 }
 
 const ActivitySection = ({ activity, granularity }: Props) => {
