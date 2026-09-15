@@ -1,3 +1,4 @@
+import { Meta } from "@/components/partials/common/PageChrome/Head";
 import MonthlyReviewView from "@/components/partials/features/MonthlyReview/index";
 import PeriodSelector from "@/components/partials/features/MonthlyReview/PeriodSelector";
 import LoadingChecklist from "@/components/partials/features/MonthlyReview/LoadingChecklist";
@@ -10,6 +11,7 @@ import { useMonthlyReviewArena } from "@/hooks/stats/useMonthlyReviewArena";
 import { useMonthlyReviewRadarGrowth } from "@/hooks/stats/useMonthlyReviewRadarGrowth";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { useRouter } from "next/router";
 import { ArrowLeft } from "lucide-react";
 
@@ -81,6 +83,14 @@ export default function MonthlyReviewPage() {
     </button>
   );
 
+  const MetaTag =
+    router.isReady && userIdStr && month ? (
+      <Meta
+        title={t("page.monthlyReviewShare.title")}
+        ogImage={`${API_V2_PREFIX}/users/${userIdStr}/stats/monthly-review/ogp?version=${version}&month=${month}`}
+      />
+    ) : null;
+
   const handlePeriodSelect = (newVersion: string, period: string) => {
     router.push(
       `/users/${userId as string}/monthly-review/${period}?version=${newVersion}`,
@@ -98,6 +108,7 @@ export default function MonthlyReviewPage() {
   if (!router.isReady || !allSettled) {
     return (
       <div className="fixed inset-0" style={{ background: "#0a0a0f" }}>
+        {MetaTag}
         <style>{orbitStyles}</style>
         {BackBtn}
         {CalendarBtn}
@@ -208,6 +219,7 @@ export default function MonthlyReviewPage() {
 
   return (
     <>
+      {MetaTag}
       {BackBtn}
       {CalendarBtn}
       <MonthlyReviewView

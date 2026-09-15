@@ -4,3 +4,4 @@ export { handleStatsMonthlyReviewRadarGrowth } from "./radarGrowth";
 export { handleStatsMonthlyReviewActivity } from "./activity";
 export { handleStatsMonthlyReviewRivals } from "./rivals";
 export { handleStatsMonthlyReviewArena } from "./arena";
+export { generateMonthlyReviewOgpImage } from "./ogp";
