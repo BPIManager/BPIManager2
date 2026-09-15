@@ -7,11 +7,15 @@ export default withUserApiHandler(
   parseMonthlyReviewQuery,
   async (req, res, query) => {
     try {
-      const png = await generateMonthlyReviewOgpImage(query);
       res.setHeader("Content-Type", "image/png");
       // OGPクローラー・CDNでのキャッシュを許容しつつ、月次データの更新は
       // 反映されるよう短めのs-maxageにする
       res.setHeader("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
+      if (req.method === "HEAD") {
+        res.status(200).end();
+        return;
+      }
+      const png = await generateMonthlyReviewOgpImage(query);
       res.status(200).send(png);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Internal Server Error";

@@ -16,7 +16,8 @@ export function parseMonthlyReviewQuery(
   req: NextApiRequest,
   res: NextApiResponse,
 ): MonthlyReviewRouteQuery | null {
-  if (req.method !== "GET") {
+  // OGPクローラー等がGETの前にHEADで疎通確認することがあるため許可する
+  if (req.method !== "GET" && req.method !== "HEAD") {
     res.status(405).end();
     return null;
   }
