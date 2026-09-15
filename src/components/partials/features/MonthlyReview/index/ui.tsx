@@ -30,6 +30,7 @@ const MonthlyReviewViewUI = ({ data, speedRef }: Props) => (
     <div className="relative z-10">
       <TitleSection
         month={data.month}
+        version={data.version}
         bpiDiff={data.bpi.diff}
         granularity={data.granularity}
       />

@@ -29,14 +29,29 @@ export async function handleStatsMonthlyReview(
   const viewerId = access.viewerId;
 
   try {
-    const isYearMode = /^\d{4}$/.test(month);
-    const granularity: "month" | "year" = isYearMode ? "year" : "month";
-    const monthStart = isYearMode
-      ? dayjs.tz(`${month}-01-01`).format("YYYY-MM-DD")
-      : dayjs.tz(`${month}-01`).format("YYYY-MM-DD");
-    const monthEnd = isYearMode
-      ? dayjs.tz(`${month}-12-31`).format("YYYY-MM-DD")
-      : dayjs.tz(`${month}-01`).endOf("month").format("YYYY-MM-DD");
+    const isAllMode = month === "all";
+    const isYearMode = !isAllMode && /^\d{4}$/.test(month);
+    const granularity: "month" | "year" | "version" = isAllMode
+      ? "version"
+      : isYearMode
+        ? "year"
+        : "month";
+    // "all"（バージョン全体）は、各クエリが既にversion列でも絞り込んでいることを
+    // 利用し、バージョン発売より確実に前の固定日付〜当日を期間として渡すことで
+    // 実現する。バージョンごとの稼働開始/終了日を新たに管理する仕組みは追加しない。
+    const monthStart = isAllMode
+      ? "2000-01-01"
+      : isYearMode
+        ? dayjs.tz(`${month}-01-01`).format("YYYY-MM-DD")
+        : dayjs.tz(`${month}-01`).format("YYYY-MM-DD");
+    const monthEnd = isAllMode
+      ? dayjs.tz().format("YYYY-MM-DD")
+      : isYearMode
+        ? dayjs.tz(`${month}-12-31`).format("YYYY-MM-DD")
+        : dayjs.tz(`${month}-01`).endOf("month").format("YYYY-MM-DD");
+    // BPI推移の日付バケット化は「月」より粗い粒度（年次・バージョン全体）で
+    // まとめて月単位バケットにする
+    const useCoarseBuckets = isYearMode || isAllMode;
 
     const [
       scoreBatches,
@@ -120,7 +135,7 @@ export async function handleStatsMonthlyReview(
       ownerPreMonthExScoreMap,
       ownerInMonthHistory,
       allL12SongMeta,
-      isYearMode,
+      useCoarseBuckets,
     );
     const bpiDiff = Math.round((bpiEnd - bpiStart) * 100) / 100;
     const userL1112SongIds = userCurrentL1112.map((s) => s.songId);
@@ -230,7 +245,7 @@ export async function handleStatsMonthlyReview(
       rivalPreMonthState,
       rivalInMonthHistory,
       allL12SongMeta,
-      isYearMode,
+      useCoarseBuckets,
     );
     const rivalsGrowthRanking = buildGrowthRanking(
       rivals,

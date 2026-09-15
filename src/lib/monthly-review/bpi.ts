@@ -20,7 +20,7 @@ export function buildBpiTimeline(
     lastPlayed: Date | string;
   }[],
   songMaster: MasterSong[],
-  isYearMode: boolean,
+  useMonthBuckets: boolean,
 ): {
   history: { date: string; value: number }[];
   bpiStart: number;
@@ -50,7 +50,7 @@ export function buildBpiTimeline(
     const dateStr = dayjs(entry.lastPlayed as Parameters<typeof dayjs>[0])
       .tz()
       .format("YYYY-MM-DD");
-    const key = isYearMode ? dateStr.slice(0, 7) : dateStr;
+    const key = useMonthBuckets ? dateStr.slice(0, 7) : dateStr;
     const arr = byKey.get(key) ?? [];
     arr.push({ songId: entry.songId, exScore: entry.exScore });
     byKey.set(key, arr);
@@ -77,7 +77,7 @@ export function buildBpiTimeline(
 
   const history = Array.from(historyMap.entries())
     .sort(([a], [b]) => a.localeCompare(b))
-    .map(([key, value]) => ({ date: isYearMode ? `${key}-01` : key, value }));
+    .map(([key, value]) => ({ date: useMonthBuckets ? `${key}-01` : key, value }));
 
   return {
     history,

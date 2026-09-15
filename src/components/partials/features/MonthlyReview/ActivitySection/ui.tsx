@@ -20,7 +20,7 @@ const styles = `
 
 interface Props {
   sectionRef: React.RefObject<HTMLDivElement>;
-  granularity: "month" | "year";
+  granularity: "month" | "year" | "version";
   inView: boolean;
   activity: MonthlyReviewData["activity"];
   dowData: { label: string; count: number }[];

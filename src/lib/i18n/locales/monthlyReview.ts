@@ -179,6 +179,12 @@ export const monthlyReviewTranslations = {
     "zh-TW": "年度回顧",
     ko: "연간 리뷰",
   },
+  "monthlyReview.subtitle.version": {
+    ja: "{version}全体の振り返り",
+    en: "{version} Overall Review",
+    "zh-TW": "{version}全部回顧",
+    ko: "{version} 전체 리뷰",
+  },
   "monthlyReview.rivals.noRivalsTitle": {
     ja: "ライバルが登録されていません",
     en: "No Rivals Added",
@@ -503,6 +509,18 @@ export const monthlyReviewTranslations = {
     en: "Version",
     "zh-TW": "版本",
     ko: "버전",
+  },
+  "monthlyReview.period.all": {
+    ja: "全期間",
+    en: "All",
+    "zh-TW": "全部",
+    ko: "전체",
+  },
+  "monthlyReview.period.selectAll": {
+    ja: "{version}全体を表示",
+    en: "View all of {version}",
+    "zh-TW": "顯示{version}全部",
+    ko: "{version} 전체 보기",
   },
   "monthlyReview.period.loading": {
     ja: "読み込み中...",

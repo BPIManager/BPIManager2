@@ -9,28 +9,38 @@ import TitleSectionUI from "./ui";
 
 interface Props {
   month: string;
+  version: string;
   bpiDiff: number;
-  granularity: "month" | "year";
+  granularity: "month" | "year" | "version";
 }
 
-const TitleSection = ({ month, bpiDiff, granularity }: Props) => {
+const TitleSection = ({ month, version, bpiDiff, granularity }: Props) => {
   const [ref, inView] = useInView(0.1);
-  const { t } = useTranslation();
+  const { t, tFormat } = useTranslation();
   const router = useRouter();
   const userId = router.query.userId as string | undefined;
 
   const { profile } = useProfile(userId);
 
   const isYearMode = granularity === "year";
+  const isAllMode = granularity === "version";
 
-  const periodLabel = isYearMode
-    ? dayjs.tz(`${month}-01-01`).format("YYYY年")
-    : dayjs.tz(`${month}-01`).format("YYYY年M月");
+  const periodLabel = isAllMode
+    ? version === "INF"
+      ? "INF"
+      : `IIDX${version}`
+    : isYearMode
+      ? dayjs.tz(`${month}-01-01`).format("YYYY年")
+      : dayjs.tz(`${month}-01`).format("YYYY年M月");
 
   const diffColor = bpiDiff >= 0 ? "#34d399" : "#f87171";
-  const subtitle = isYearMode
-    ? t("monthlyReview.subtitle.year")
-    : t("monthlyReview.subtitle.month");
+  const subtitle = isAllMode
+    ? tFormat("monthlyReview.subtitle.version", {
+        version: version === "INF" ? "INF" : `IIDX${version}`,
+      })
+    : isYearMode
+      ? t("monthlyReview.subtitle.year")
+      : t("monthlyReview.subtitle.month");
 
   return (
     <TitleSectionUI

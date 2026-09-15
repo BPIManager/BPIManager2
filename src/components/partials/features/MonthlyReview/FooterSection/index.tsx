@@ -22,8 +22,13 @@ const FooterSection = ({ data }: Props) => {
     version: data.version,
   });
 
+  const periodText =
+    data.granularity === "version"
+      ? `${data.version === "INF" ? "INF" : `IIDX${data.version}`}全体`
+      : data.month;
+
   const shareText = [
-    `【${data.month}の振り返り】`,
+    `【${periodText}の振り返り】`,
     `総合BPI: ${data.bpi.start.toFixed(2)} → ${data.bpi.end.toFixed(2)} (${data.bpi.diff >= 0 ? "+" : ""}${data.bpi.diff.toFixed(2)})`,
     data.topSongs.topImprovedSongs[0]
       ? `最伸び: ${data.topSongs.topImprovedSongs[0].title} +${data.topSongs.topImprovedSongs[0].diff.toFixed(2)}`

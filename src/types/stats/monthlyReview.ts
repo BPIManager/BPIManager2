@@ -73,7 +73,7 @@ export interface RadarGrowthEntry {
 export interface MonthlyReviewData {
   month: string;
   version: string;
-  granularity: "month" | "year";
+  granularity: "month" | "year" | "version";
   bpi: {
     start: number;
     end: number;

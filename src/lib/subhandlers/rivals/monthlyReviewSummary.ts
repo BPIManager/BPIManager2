@@ -21,12 +21,13 @@ export async function handleRivalMonthlyReviewSummary(
       viewerId: null,
     };
   }
-  const isYearMode = /^\d{4}$/.test(month as string);
-  const isMonthMode = /^\d{4}-\d{2}$/.test(month as string);
+  const isAllMode = month === "all";
+  const isYearMode = !isAllMode && /^\d{4}$/.test(month as string);
+  const isMonthMode = !isAllMode && /^\d{4}-\d{2}$/.test(month as string);
   const isValidVersion = (IIDX_VERSIONS as readonly string[]).includes(
     version as string,
   );
-  if (!isValidVersion || (!isYearMode && !isMonthMode)) {
+  if (!isValidVersion || (!isYearMode && !isMonthMode && !isAllMode)) {
     return {
       result: err(400, "Invalid month or version"),
       targetUserId,
@@ -40,15 +41,20 @@ export async function handleRivalMonthlyReviewSummary(
     const denied = accessError(access);
     if (denied) return { result: denied, targetUserId, viewerId };
 
-    const monthStart = isYearMode
-      ? dayjs.tz(`${month}-01-01`).format("YYYY-MM-DD")
-      : dayjs.tz(`${month as string}-01`).format("YYYY-MM-DD");
-    const monthEnd = isYearMode
-      ? dayjs.tz(`${month}-12-31`).format("YYYY-MM-DD")
-      : dayjs
-          .tz(`${month as string}-01`)
-          .endOf("month")
-          .format("YYYY-MM-DD");
+    const monthStart = isAllMode
+      ? "2000-01-01"
+      : isYearMode
+        ? dayjs.tz(`${month}-01-01`).format("YYYY-MM-DD")
+        : dayjs.tz(`${month as string}-01`).format("YYYY-MM-DD");
+    const monthEnd = isAllMode
+      ? dayjs.tz().format("YYYY-MM-DD")
+      : isYearMode
+        ? dayjs.tz(`${month}-12-31`).format("YYYY-MM-DD")
+        : dayjs
+            .tz(`${month as string}-01`)
+            .endOf("month")
+            .format("YYYY-MM-DD");
+    const useMonthBuckets = isYearMode || isAllMode;
 
     const rivalRows = await followListAggregateRepo.getPublicFollowingUsers(
       userId as string,
@@ -92,7 +98,7 @@ export async function handleRivalMonthlyReviewSummary(
         preMap,
         history,
         allL12SongMeta,
-        isYearMode,
+        useMonthBuckets,
       );
       return {
         userId: r.userId,

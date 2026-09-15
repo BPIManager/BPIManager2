@@ -32,7 +32,7 @@ interface Props {
   data: RivalsSectionData;
   chart: RivalsSectionChart;
   rankSummary: RivalsSectionRankSummary;
-  granularity: "month" | "year";
+  granularity: "month" | "year" | "version";
   inView: boolean;
   sectionRef: React.RefObject<HTMLDivElement>;
   isEmpty: boolean;

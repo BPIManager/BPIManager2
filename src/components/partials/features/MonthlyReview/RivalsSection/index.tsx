@@ -9,7 +9,7 @@ interface Props {
   rivals: MonthlyReviewData["rivals"];
   ranking: MonthlyReviewData["rivalsGrowthRanking"];
   timeline: MonthlyReviewData["rivalsGrowthTimeline"];
-  granularity?: "month" | "year";
+  granularity?: "month" | "year" | "version";
 }
 
 const RivalsSection = ({

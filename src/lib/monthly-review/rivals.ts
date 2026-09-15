@@ -136,7 +136,7 @@ export function attachRivalBpiTimelines(
     lastPlayed: Date | string;
   }[],
   songMaster: (IBpiBasicSongData & { songId: number })[],
-  isYearMode: boolean,
+  useMonthBuckets: boolean,
 ): Map<string, { date: string; value: number }[]> {
   const rivalPreMonthByUser = new Map<string, Map<number, number>>();
   for (const s of rivalPreMonthState) {
@@ -170,7 +170,7 @@ export function attachRivalBpiTimelines(
       preMap,
       inMonth,
       songMaster,
-      isYearMode,
+      useMonthBuckets,
     );
     r.bpiStart = rBpiStart;
     r.bpiEnd = rBpiEnd;
