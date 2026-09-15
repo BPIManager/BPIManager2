@@ -27,7 +27,8 @@ function PopoverContent({
         align={align}
         sideOffset={sideOffset}
         className={cn(
-          "z-50 flex w-72 origin-(--radix-popover-content-transform-origin) flex-col gap-2.5",
+          // z-1010: Dialog(z-1005)の中で開いても手前に表示されるように
+          "z-1010 flex w-72 origin-(--radix-popover-content-transform-origin) flex-col gap-2.5",
           "rounded-lg bg-bpim-surface-2 p-2.5 text-sm text-bpim-text",
           "shadow-md ring-1 ring-bpim-border outline-hidden duration-100",
           "data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2",

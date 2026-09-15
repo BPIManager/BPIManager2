@@ -80,7 +80,8 @@ function SelectContent({
         data-slot="select-content"
         data-align-trigger={position === "item-aligned"}
         className={cn(
-          "relative z-50 max-h-(--radix-select-content-available-height) min-w-36",
+          // z-1010: Dialog(z-1005)の中で開いても手前に表示されるように
+          "relative z-1010 max-h-(--radix-select-content-available-height) min-w-36",
           "origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto",
           "rounded-lg bg-bpim-surface-2 text-bpim-text",
           "shadow-md ring-1 ring-bpim-border duration-100",
