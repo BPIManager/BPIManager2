@@ -16,8 +16,8 @@ export interface HandleOutcome<T> {
 
 const DEFAULT_PAGE_SIZE = 20;
 const MAX_PAGE_SIZE = 50;
-// 集計方式(V1のべき乗平均)自体を比較用に固定で使う。単曲bpiの由来(DB保存値/
-// NewBpiCalculator算出値のどちらか)は問わない、純粋な集約関数として使う。
+// 「現行(V1)」列用。本番のBpiCalculatorは既にV2へ切り替わっているため、
+// DB保存値ではなくここで単曲BPI・総合BPIとも常にV1で計算し直す。
 const v1 = new BpiV1();
 
 /** GET /new-bpi/players （withAuth） */
@@ -68,7 +68,6 @@ export async function handleNewBpiPlayers(
       const userScores = scoresByUser.get(user.userId) ?? [];
 
       const currentBpis: number[] = [];
-      const newBpis: number[] = [];
       let increaseCount = 0;
       let decreaseCount = 0;
 
@@ -76,7 +75,17 @@ export async function handleNewBpiPlayers(
         const song = songById.get(s.songId);
         if (!song) continue;
 
-        const currentBpi = s.bpi;
+        // s.bpi(DBの保存値)は本番がV2へ全面切り替え済みのため、もはやV1
+        // ではない。この検証ツールの「現行(V1)」列は常にlegacyV1で
+        // 計算し直した真のV1値にする(V2は引き続きNewBpiCalculator)。
+        const currentBpi = v1
+          .chart({
+            notes: song.notes,
+            kaidenAvg: song.kaidenAvg,
+            wrScore: song.wrScore,
+            coef: song.coef,
+          })
+          .bpi(s.exScore);
         if (currentBpi !== null) currentBpis.push(currentBpi);
 
         const newBpi = NewBpiCalculator.calc(s.exScore, {
@@ -85,7 +94,6 @@ export async function handleNewBpiPlayers(
           kaidenAvg: song.kaidenAvg,
           wrScore: song.wrScore,
         });
-        if (newBpi !== null) newBpis.push(newBpi);
 
         if (currentBpi !== null && newBpi !== null) {
           if (newBpi > currentBpi + 0.005) increaseCount++;
@@ -94,9 +102,7 @@ export async function handleNewBpiPlayers(
       }
 
       currentBpis.sort((a, b) => b - a);
-      newBpis.sort((a, b) => b - a);
       const currentTotal = v1.total(currentBpis, totalSongCount);
-      const hybridTotal = v1.total(newBpis, totalSongCount);
       const fullNewTotal = NewBpiCalculator.calculateTotalBPI(
         userScores.map((s) => ({
           songId: s.songId,
@@ -110,7 +116,6 @@ export async function handleNewBpiPlayers(
         userId: user.userId,
         userName: user.userName,
         currentTotal,
-        hybridTotal,
         fullNewTotal,
         increaseCount,
         decreaseCount,

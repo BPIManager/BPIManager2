@@ -71,9 +71,8 @@ interface PlayersTabProps {
 
 /**
  * issue #299〜304検証用「全プレイヤー」一覧。公開ユーザー(☆12のスコアが
- * 1曲以上ある人のみ)を現行総合BPIが高い順にページ単位で列挙し、総合BPI
- * (現行/単曲のみ新方式/単曲・総合とも新方式)の変化と単曲の増減数を
- * 1行1ユーザーで表示する。
+ * 1曲以上ある人のみ)をV1総合BPIが高い順にページ単位で列挙し、総合BPI
+ * (V1/V2)の変化と単曲の増減数を1行1ユーザーで表示する。
  *
  * ページごとにサーバー側でBPIを再計算するため({@link usePlayersList}参照)、
  * 一度に全公開ユーザー分の計算は行わない。
@@ -150,9 +149,6 @@ export default function PlayersTab({ onSelectUser }: PlayersTabProps) {
                   {t("newBpi.summary.currentTotal")}
                 </TableHead>
                 <TableHead className="text-right">
-                  {t("newBpi.summary.hybridTotal")}
-                </TableHead>
-                <TableHead className="text-right">
                   {t("newBpi.summary.newTotal")}
                 </TableHead>
                 <TableHead className="text-right">
@@ -177,12 +173,6 @@ export default function PlayersTab({ onSelectUser }: PlayersTabProps) {
                   </TableCell>
                   <TableCell className="text-right tabular-nums">
                     {p.currentTotal.toFixed(2)}
-                  </TableCell>
-                  <TableCell className="text-right tabular-nums">
-                    <ValueWithDeltaCell
-                      value={p.hybridTotal}
-                      delta={p.hybridTotal - p.currentTotal}
-                    />
                   </TableCell>
                   <TableCell className="text-right tabular-nums">
                     <ValueWithDeltaCell

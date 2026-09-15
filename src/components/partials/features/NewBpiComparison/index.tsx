@@ -160,6 +160,12 @@ export default function NewBpiComparison({ userId }: Props) {
     );
 
     const rows: NewBpiRow[] = played.map((s) => {
+      // s.bpi(DBの保存値)は本番がV2へ全面切り替え済みのため、もはやV1では
+      // ない。この比較ページの「現行(V1)」列は本番の現在値ではなく、常に
+      // legacyV1で計算し直した真のV1値にする(V2は引き続きNewBpiCalculator)。
+      const currentBpi = legacyV1
+        .chart({ notes: s.notes, kaidenAvg: s.kaidenAvg, wrScore: s.wrScore, coef: s.coef })
+        .bpi(s.exScore);
       const newBpi = NewBpiCalculator.calc(s.exScore, {
         songId: s.songId,
         notes: s.notes,
@@ -174,9 +180,9 @@ export default function NewBpiComparison({ userId }: Props) {
         difficulty: s.difficulty,
         difficultyLevel: s.difficultyLevel,
         exScore: s.exScore,
-        currentBpi: s.bpi,
+        currentBpi,
         newBpi,
-        delta: s.bpi !== null && newBpi !== null ? newBpi - s.bpi : null,
+        delta: currentBpi !== null && newBpi !== null ? newBpi - currentBpi : null,
         estimatedRank:
           newBpi !== null
             ? NewBpiCalculator.estimateRankFromBpi(newBpi)
@@ -441,7 +447,14 @@ export default function NewBpiComparison({ userId }: Props) {
         selectedSong && selectedSong.exScore !== null
           ? {
               exScore: selectedSong.exScore,
-              currentBpi: selectedSong.bpi,
+              currentBpi: legacyV1
+                .chart({
+                  notes: selectedSong.notes,
+                  kaidenAvg: selectedSong.kaidenAvg,
+                  wrScore: selectedSong.wrScore,
+                  coef: selectedSong.coef,
+                })
+                .bpi(selectedSong.exScore),
               newBpi: NewBpiCalculator.calc(selectedSong.exScore, {
                 songId: selectedSong.songId,
                 notes: selectedSong.notes,

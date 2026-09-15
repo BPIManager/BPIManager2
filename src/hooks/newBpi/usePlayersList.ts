@@ -5,7 +5,6 @@ export interface NewBpiPlayerRow {
   userId: string;
   userName: string;
   currentTotal: number;
-  hybridTotal: number;
   fullNewTotal: number | null;
   increaseCount: number;
   decreaseCount: number;
