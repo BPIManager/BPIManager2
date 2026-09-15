@@ -383,7 +383,13 @@ async function renderOgpImage(data: OgpRenderData): Promise<Buffer> {
                 }}
               >
                 <div
-                  style={{ display: "flex", maxWidth: 320, overflow: "hidden" }}
+                  style={{
+                    display: "flex",
+                    maxWidth: 320,
+                    overflow: "hidden",
+                    whiteSpace: "nowrap",
+                    textOverflow: "ellipsis",
+                  }}
                 >
                   {s.title}
                 </div>
@@ -530,7 +536,7 @@ export async function generateSampleMonthlyReviewOgpImage(): Promise<Buffer> {
     heading: "IIDX 33 Sparkle Showerの振り返り",
     userName: "プレイヤー名",
     profileImage: null,
-    bpiEnd: 65.42,
+    bpiEnd: 25.42,
     topSongs: [
       { songId: -1, title: "冥", bpi: 12.34, exScore: 3333, notes: 2000 },
       {

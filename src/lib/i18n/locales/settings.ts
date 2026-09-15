@@ -100,7 +100,8 @@ export const settingsTranslations = {
   "settings.profile.privacy.desc2": {
     ja: "公開設定にした場合、シーズン・日付ごとのアリーナクラス・順位などの推移を表示できます(予定)。",
     en: "When enabled, arena class and ranking history by season and date will be visible (coming soon).",
-    "zh-TW": "設為公開時，可顯示每個賽季及日期的競技場等級、排名等推移（預定）。",
+    "zh-TW":
+      "設為公開時，可顯示每個賽季及日期的競技場等級、排名等推移（預定）。",
     ko: "공개 설정 시, 시즌 및 날짜별 아리나 클래스와 순위 추이를 표시할 수 있습니다(예정).",
   },
   "settings.profile.privacy.desc3": {
@@ -329,9 +330,10 @@ export const settingsTranslations = {
     ko: "팔로우 초대 URL",
   },
   "settings.followInvite.desc": {
-    ja: "非公開設定中、このURLを知っている人だけがフォローリクエストを送信できます。受け取ったリクエストは承認/却下できます。",
+    ja: "非公開設定中に特定の人にだけスコアを共有したい場合、このURLを渡してフォローリクエストを受け取ってください。リクエストを受け取ったあとに手動で承認することで、その人にスコアを共有できます。",
     en: "While your profile is private, only people with this link can send you a follow request. You can approve or reject each request.",
-    "zh-TW": "設為非公開時，只有擁有此連結的人可以傳送追蹤請求。你可以核准或拒絕收到的請求。",
+    "zh-TW":
+      "設為非公開時，只有擁有此連結的人可以傳送追蹤請求。你可以核准或拒絕收到的請求。",
     ko: "비공개 상태에서는 이 URL을 아는 사람만 팔로우 요청을 보낼 수 있습니다. 받은 요청은 승인/거절할 수 있습니다.",
   },
   "settings.followInvite.notIssued": {
@@ -404,7 +406,8 @@ export const settingsTranslations = {
   "settings.oauthClient.desc": {
     ja: "Dynamic Client Registrationに対応していないMCPクライアントを接続する際に、Client ID/Secretを手動で発行します。",
     en: "Manually issue a Client ID/Secret for MCP clients that don't support Dynamic Client Registration.",
-    "zh-TW": "為不支援Dynamic Client Registration的MCP客戶端手動發行Client ID/Secret。",
+    "zh-TW":
+      "為不支援Dynamic Client Registration的MCP客戶端手動發行Client ID/Secret。",
     ko: "Dynamic Client Registration을 지원하지 않는 MCP 클라이언트를 위해 Client ID/Secret을 수동으로 발급합니다.",
   },
   "settings.oauthClient.mcpEndpointLabel": {
