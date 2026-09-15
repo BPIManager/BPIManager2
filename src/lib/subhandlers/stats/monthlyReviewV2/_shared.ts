@@ -7,6 +7,12 @@ import { buildTopSongs } from "@/lib/monthly-review/topSongs";
 import { toPlayDateStr } from "@/lib/monthly-review/activity";
 import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 
+type RecomputedBpiTimeline = {
+  bpiStart: number;
+  bpiEnd: number;
+  history: { date: string; value: number }[];
+};
+
 export const jstDayStart = (jstDate: string): Date =>
   new Date(`${jstDate}T00:00:00+09:00`);
 export const jstDayEnd = (jstDate: string): Date =>
@@ -65,17 +71,19 @@ export function previousVersionOf(version: string): string | null {
  *
  * `bpiStart`/`bpiEnd`/`history`（総合BPIの数値・推移）は、シフト法で毎回
  * 再計算するのではなく、スコア取り込み時に{@link BpiCalculator.ratchetTotalBpi}
- * 適用済みで書き込まれる`userStatusLogs.totalBpi`ログをそのまま使う
- * （「更新があればそれを使い、なければ前の期間の値をそのまま使う」）。
+ * 適用済みで書き込まれる`userStatusLogs.totalBpi`ログをそのまま使うのが基本。
  * 独自に再計算すると、シフト法の未プレイ曲予測が新しい観測で下振れした際に
  * 総合BPIが実際には下がっていないのに下がって見える問題が起きるため
  * （{@link BpiCalculator.ratchetTotalBpi}のコメント参照）、既に正しく
  * ratchet済みの記録値をそのまま信頼するほうが安全かつシンプル。
  *
- * `compareVersion`省略時は期間開始前の直近ログをbaselineに使う。
- * 「全期間（月=all）」モードでは`monthStart`が便宜上の固定値のため意味を持たず、
- * `compareVersion`（既定は前バージョン）で指定したバージョンの最終ログを
- * baselineとして使う。
+ * ただし`userStatusLogs.createdAt`は「スコアがBPIMに取り込まれた時刻」であり、
+ * 実際のプレイ日（`scores.lastPlayed`）とは限らない（バックフィル・遅延同期の
+ * ユーザーは、過去分のスコアをまとめて後日インポートするため、その期間には
+ * `createdAt`ベースのログが1件も存在しないことがある）。対象期間にログが
+ * 1件も無い（baseline・期間内更新のどちらも無い）場合に限り、
+ * `scores.lastPlayed`基準（インポート時刻に左右されない）でシフト法により
+ * フォールバック再計算する。
  *
  * なお、レーダー別成長（要素ごとのBPI内訳）は`userStatusLogs`に存在しない
  * （曲群を限定した集計はログとして保存されていない）ため、そちらは従来通り
@@ -117,43 +125,12 @@ export async function computeOwnerBpiTimeline(
       : Promise.resolve(null),
   ]);
 
-  const bpiStart = compareVersion
-    ? (compareVersionLatestLog?.totalBpi != null ? Number(compareVersionLatestLog.totalBpi) : -15)
-    : (latestLogBeforeStart?.totalBpi != null ? Number(latestLogBeforeStart.totalBpi) : -15);
-
-  // 期間内にログが1件も無ければ「更新なし」＝前の期間の値（bpiStart）のまま
-  const bpiEnd =
-    logsInRange.length > 0
-      ? Number(logsInRange[logsInRange.length - 1].totalBpi)
-      : bpiStart;
-  const bpiDiff = Math.round((bpiEnd - bpiStart) * 100) / 100;
-
-  const historyRaw = logsInRange.map((row) => ({
-    date: dayjs(row.createdAt).tz().format("YYYY-MM-DD"),
-    value: Number(row.totalBpi),
-  }));
-  // 年次/全期間モードは日次だと点が多すぎるため月単位に間引く（同月内は最後の値を採用）
-  const historyMap = new Map<string, number>();
-  for (const h of historyRaw) {
-    const key = useMonthBuckets ? h.date.slice(0, 7) : h.date;
-    historyMap.set(key, h.value);
-  }
-  const history = Array.from(historyMap.entries())
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([key, value]) => ({ date: useMonthBuckets ? `${key}-01` : key, value }));
-
   // レーダー別成長（要素ごとのBPI）はuserStatusLogsに存在しないため、
-  // 従来通りexScoreの実測値から独立して再計算する
+  // 従来通りexScoreの実測値から独立して再計算する（ログカバレッジの有無に関わらず必要）
   const ownerPreMonthExScoreMap = new Map<number, number>();
   for (const s of ownerPreMonthState) {
     if (s.exScore != null) ownerPreMonthExScoreMap.set(s.songId, Number(s.exScore));
   }
-  const { finalExScoreMap } = buildBpiTimeline(
-    ownerPreMonthExScoreMap,
-    ownerInMonthHistory,
-    allL12SongMeta,
-    useMonthBuckets,
-  );
   let compareVersionExScoreMap: Map<number, number> | null = null;
   if (compareVersion && compareVersionState) {
     compareVersionExScoreMap = new Map();
@@ -161,6 +138,56 @@ export async function computeOwnerBpiTimeline(
       if (s.exScore != null) compareVersionExScoreMap.set(s.songId, Number(s.exScore));
     }
   }
+  const seedExScoreMap = compareVersionExScoreMap ?? ownerPreMonthExScoreMap;
+  const recomputed = buildBpiTimeline(
+    seedExScoreMap,
+    ownerInMonthHistory,
+    allL12SongMeta,
+    useMonthBuckets,
+  );
+
+  const hasLogCoverage = compareVersion
+    ? compareVersionLatestLog?.totalBpi != null || logsInRange.length > 0
+    : latestLogBeforeStart?.totalBpi != null || logsInRange.length > 0;
+
+  let bpiStart: number;
+  let bpiEnd: number;
+  let history: { date: string; value: number }[];
+
+  if (hasLogCoverage) {
+    bpiStart = compareVersion
+      ? (compareVersionLatestLog?.totalBpi != null ? Number(compareVersionLatestLog.totalBpi) : -15)
+      : (latestLogBeforeStart?.totalBpi != null ? Number(latestLogBeforeStart.totalBpi) : -15);
+
+    // 期間内にログが1件も無ければ「更新なし」＝前の期間の値（bpiStart）のまま
+    bpiEnd =
+      logsInRange.length > 0
+        ? Number(logsInRange[logsInRange.length - 1].totalBpi)
+        : bpiStart;
+
+    const historyRaw = logsInRange.map((row) => ({
+      date: dayjs(row.createdAt).tz().format("YYYY-MM-DD"),
+      value: Number(row.totalBpi),
+    }));
+    // 年次/全期間モードは日次だと点が多すぎるため月単位に間引く（同月内は最後の値を採用）
+    const historyMap = new Map<string, number>();
+    for (const h of historyRaw) {
+      const key = useMonthBuckets ? h.date.slice(0, 7) : h.date;
+      historyMap.set(key, h.value);
+    }
+    history = Array.from(historyMap.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([key, value]) => ({ date: useMonthBuckets ? `${key}-01` : key, value }));
+  } else {
+    // バックフィル等でこの期間に対応するuserStatusLogsが1件も無い場合のみ、
+    // scores.lastPlayed基準のシフト法再計算にフォールバックする
+    // （既にownerPreMonthExScoreMap/ownerInMonthHistoryで計算済みのため追加クエリ不要）
+    bpiStart = recomputed.bpiStart;
+    bpiEnd = recomputed.bpiEnd;
+    history = recomputed.history;
+  }
+
+  const bpiDiff = Math.round((bpiEnd - bpiStart) * 100) / 100;
 
   return {
     history,
@@ -169,13 +196,81 @@ export async function computeOwnerBpiTimeline(
     bpiDiff,
     // レーダー別成長（radarGrowth.ts）の「期間前」baselineにもcompareVersionを
     // 反映させるため、指定時はそちらを返す
-    ownerPreMonthExScoreMap: compareVersionExScoreMap ?? ownerPreMonthExScoreMap,
+    ownerPreMonthExScoreMap: seedExScoreMap,
     // レーダー別成長のフォールバック時の「純粋な成長推移」再計算用に生の
     // スコア更新履歴も返す
     ownerInMonthHistory,
-    finalExScoreMap,
+    finalExScoreMap: recomputed.finalExScoreMap,
     allL12SongMeta,
   };
+}
+
+/**
+ * 複数ユーザー分の総合BPI推移をscores.lastPlayed基準のシフト法でまとめて再計算する。
+ * `computeOwnerBpiTimeline`のバックフィル・フォールバック経路のバッチ版で、
+ * ライバル戦線のうちuserStatusLogsのカバレッジが無いライバルにのみ使う想定
+ * （全ライバルではなく該当者だけに絞って呼び出すことで再計算コストを抑える）。
+ */
+export async function recomputeBpiTimelinesForUsers(
+  userIds: string[],
+  version: string,
+  monthStart: string,
+  monthEnd: string,
+  useMonthBuckets: boolean,
+  compareVersion?: string,
+): Promise<Map<string, RecomputedBpiTimeline>> {
+  if (userIds.length === 0) return new Map();
+
+  const [preMonthState, inMonthHistory, allL12SongMeta, compareVersionState] =
+    await Promise.all([
+      compareVersion
+        ? Promise.resolve([])
+        : monthlyReviewRepo.getPreMonthBpiStateForUsers(userIds, version, monthStart),
+      monthlyReviewRepo.getInMonthScoreHistoryForUsers(
+        userIds,
+        version,
+        monthStart,
+        monthEnd,
+      ),
+      monthlyReviewRepo.getAllL12SongMeta(),
+      compareVersion
+        ? monthlyReviewRepo.getVersionBpiStateForUsers(userIds, compareVersion)
+        : Promise.resolve(undefined),
+    ]);
+
+  const preByUser = new Map<string, Map<number, number>>();
+  for (const s of preMonthState) {
+    if (s.exScore == null) continue;
+    if (!preByUser.has(s.userId)) preByUser.set(s.userId, new Map());
+    preByUser.get(s.userId)!.set(s.songId, Number(s.exScore));
+  }
+  const compareByUser = new Map<string, Map<number, number>>();
+  for (const s of compareVersionState ?? []) {
+    if (s.exScore == null) continue;
+    if (!compareByUser.has(s.userId)) compareByUser.set(s.userId, new Map());
+    compareByUser.get(s.userId)!.set(s.songId, Number(s.exScore));
+  }
+  const historyByUser = new Map<string, typeof inMonthHistory>();
+  for (const s of inMonthHistory) {
+    if (!historyByUser.has(s.userId)) historyByUser.set(s.userId, []);
+    historyByUser.get(s.userId)!.push(s);
+  }
+
+  const result = new Map<string, RecomputedBpiTimeline>();
+  for (const userId of userIds) {
+    const seedMap = compareVersion
+      ? (compareByUser.get(userId) ?? new Map<number, number>())
+      : (preByUser.get(userId) ?? new Map<number, number>());
+    const history = historyByUser.get(userId) ?? [];
+    const { bpiStart, bpiEnd, history: hist } = buildBpiTimeline(
+      seedMap,
+      history,
+      allL12SongMeta,
+      useMonthBuckets,
+    );
+    result.set(userId, { bpiStart, bpiEnd, history: hist });
+  }
+  return result;
 }
 
 /** 月内に更新されたスコア一覧（曲ごとの最新ログ）。top-songs/radar-growth/activityで使う */

@@ -12,6 +12,7 @@ import {
 import {
   resolveMonthlyReviewPeriod,
   computeOwnerBpiTimeline,
+  recomputeBpiTimelinesForUsers,
   previousVersionOf,
   jstDayStart,
   jstDayEnd,
@@ -84,12 +85,32 @@ export async function handleStatsMonthlyReviewRivals(
         : userStatusLogsRepo.getLatestBeforeBatch(db, rivalUserIds, version, startDate),
     ]);
 
+    // userStatusLogsにこの期間のログが1件も無いライバル（バックフィル・遅延同期）
+    // のみ、scores.lastPlayed基準の再計算にフォールバックする。対象を絞ることで
+    // 再計算コストをフォロー中の少数のライバルに限定する
+    const logsCoveredUserIds = new Set(rivalLogsInRange.map((r) => r.userId));
+    const baselineCoveredUserIds = new Set(
+      rivalBaselineLogs.filter((r) => r.totalBpi != null).map((r) => r.userId),
+    );
+    const rivalIdsWithoutCoverage = rivalUserIds.filter(
+      (uid) => !logsCoveredUserIds.has(uid) && !baselineCoveredUserIds.has(uid),
+    );
+    const rivalFallbackTimelines = await recomputeBpiTimelinesForUsers(
+      rivalIdsWithoutCoverage,
+      version,
+      monthStart,
+      monthEnd,
+      useMonthBuckets,
+      compareVersion,
+    );
+
     const rivalComputedTimeline = attachRivalBpiTimelines(
       rivals,
       rivalLogsInRange,
       rivalBaselineLogs,
       useMonthBuckets,
       !!compareVersion,
+      rivalFallbackTimelines,
     );
     const rivalsGrowthRanking = buildGrowthRanking(
       rivals,

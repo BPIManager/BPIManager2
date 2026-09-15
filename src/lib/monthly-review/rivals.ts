@@ -125,6 +125,10 @@ export function buildRivals(
  *   バージョンのデータが無い）は比較不能として除外する（全期間モード用）。
  *   `false`の場合はbaseline無しを`-15`扱いにする（月内比較で期間開始前に
  *   データが無い＝新規ユーザーのケース）
+ * @param fallbackByUser - `userStatusLogs`にこの期間のログが1件も無い（baseline・
+ *   期間内更新のどちらも無い）ライバル向けの、`scores.lastPlayed`基準シフト法
+ *   再計算結果（{@link recomputeBpiTimelinesForUsers}）。バックフィル・遅延同期
+ *   ユーザー対応。該当ライバルにだけ絞って渡す想定
  */
 export function attachRivalBpiTimelines(
   rivals: RivalDiff[],
@@ -132,6 +136,10 @@ export function attachRivalBpiTimelines(
   rivalBaselineLogs: { userId: string; totalBpi: unknown }[],
   useMonthBuckets: boolean,
   requireBaseline: boolean,
+  fallbackByUser?: Map<
+    string,
+    { bpiStart: number; bpiEnd: number; history: { date: string; value: number }[] }
+  >,
 ): Map<string, { date: string; value: number }[]> {
   const logsByUser = new Map<string, { date: string; value: number }[]>();
   for (const row of rivalLogsInRange) {
@@ -166,12 +174,27 @@ export function attachRivalBpiTimelines(
     const history = Array.from(historyMap.entries())
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([key, value]) => ({ date: useMonthBuckets ? `${key}-01` : key, value }));
+
+    const baseline = baselineByUser.get(r.userId);
+    const hasLogCoverage = baseline !== undefined || history.length > 0;
+
+    // バックフィル等でこの期間に対応するログが1件も無いライバルのみ、
+    // scores.lastPlayed基準の再計算結果にフォールバックする
+    const fallback = !hasLogCoverage ? fallbackByUser?.get(r.userId) : undefined;
+    if (fallback) {
+      if (fallback.history.length > 0)
+        rivalComputedTimeline.set(r.userId, fallback.history);
+      r.bpiStart = fallback.bpiStart;
+      r.bpiEnd = fallback.bpiEnd;
+      r.bpiGrowth = Math.round((fallback.bpiEnd - fallback.bpiStart) * 100) / 100;
+      continue;
+    }
+
     // タイムライン（推移グラフ用）はbaselineの有無に関わらず保持する。
     // 「前バージョンとの伸び率」比較が不能な場合でも、そのバージョン内での
     // 純粋な推移自体は表示できるため（buildGrowthTimeline参照）
     if (history.length > 0) rivalComputedTimeline.set(r.userId, history);
 
-    const baseline = baselineByUser.get(r.userId);
     if (requireBaseline && baseline === undefined) {
       // このライバルのcompareVersion内データが無い＝前バージョンとの伸び率比較は不能
       // （bpiStart/bpiEnd/bpiGrowthはRivalDiff初期値のnullのまま）

@@ -8,6 +8,7 @@ import {
   previousVersionOf,
   jstDayStart,
   jstDayEnd,
+  recomputeBpiTimelinesForUsers,
 } from "@/lib/subhandlers/stats/monthlyReviewV2/_shared";
 import { checkUserAccess } from "@/middlewares/api/withApi";
 import { accessError, err, ok } from "@/middlewares/api/apiResult";
@@ -111,16 +112,48 @@ export async function handleRivalMonthlyReviewSummary(
       if (row.totalBpi != null) baselineByUser.set(row.userId, Number(row.totalBpi));
     }
 
+    // userStatusLogsにこの期間のログが1件も無いライバル（バックフィル・遅延同期）
+    // のみ、scores.lastPlayed基準の再計算にフォールバックする
+    const logsCoveredUserIds = new Set(logsInRange.map((r) => r.userId));
+    const baselineCoveredUserIds = new Set(
+      baselineLogs.filter((r) => r.totalBpi != null).map((r) => r.userId),
+    );
+    const rivalIdsWithoutCoverage = rivalIds.filter(
+      (uid) => !logsCoveredUserIds.has(uid) && !baselineCoveredUserIds.has(uid),
+    );
+    const fallbackByUser = await recomputeBpiTimelinesForUsers(
+      rivalIdsWithoutCoverage,
+      version as string,
+      monthStart,
+      monthEnd,
+      isYearMode || isAllMode,
+      compareVersion,
+    );
+
     const rivals = rivalRows
       .map((r) => {
         const baseline = baselineByUser.get(r.userId);
-        // 全期間モードは比較先バージョンのデータが無いライバルを比較不能として除外
-        if (compareVersion && baseline === undefined) return null;
-        const bpiStart = baseline ?? -15;
-
         const rawHistory = (logsByUser.get(r.userId) ?? []).sort((a, b) =>
           a.date.localeCompare(b.date),
         );
+        const hasLogCoverage = baseline !== undefined || rawHistory.length > 0;
+
+        if (!hasLogCoverage) {
+          const fallback = fallbackByUser.get(r.userId);
+          if (fallback) {
+            return {
+              userId: r.userId,
+              userName: r.userName,
+              profileImage: r.profileImage,
+              bpiStart: fallback.bpiStart,
+              bpiEnd: fallback.bpiEnd,
+            };
+          }
+        }
+
+        // 全期間モードは比較先バージョンのデータが無いライバルを比較不能として除外
+        if (compareVersion && baseline === undefined) return null;
+        const bpiStart = baseline ?? -15;
         const bpiEnd =
           rawHistory.length > 0 ? rawHistory[rawHistory.length - 1].value : bpiStart;
 
