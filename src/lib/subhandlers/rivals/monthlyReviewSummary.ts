@@ -1,13 +1,9 @@
 import type { NextApiRequest } from "next";
 import dayjs from "@/lib/dayjs";
 import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
-import { db } from "@/lib/db";
 import { followListAggregateRepo } from "@/lib/db/aggregates/followList";
-import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
 import {
   previousVersionOf,
-  jstDayStart,
-  jstDayEnd,
   recomputeBpiTimelinesForUsers,
 } from "@/lib/subhandlers/stats/monthlyReviewV2/_shared";
 import { checkUserAccess } from "@/middlewares/api/withApi";
@@ -74,55 +70,11 @@ export async function handleRivalMonthlyReviewSummary(
     }
     const rivalIds = rivalRows.map((r) => r.userId);
 
-    // 総合BPIはシフト法で再計算せず、スコア取り込み時に既にratchet適用済みで
-    // 書き込まれる`userStatusLogs.totalBpi`ログをそのまま使う
-    // （computeOwnerBpiTimelineと同じ設計）
-    const startDate = jstDayStart(monthStart);
-    const endDate = jstDayEnd(monthEnd);
-    const [logsInRange, baselineLogs] = await Promise.all([
-      userStatusLogsRepo.getLogsInRangeBatch(
-        db,
-        rivalIds,
-        version as string,
-        startDate,
-        endDate,
-      ),
-      compareVersion
-        ? userStatusLogsRepo.getLatestTotalBpiBatch(db, rivalIds, compareVersion)
-        : userStatusLogsRepo.getLatestBeforeBatch(
-            db,
-            rivalIds,
-            version as string,
-            startDate,
-          ),
-    ]);
-
-    const logsByUser = new Map<string, { date: string; value: number }[]>();
-    for (const row of logsInRange) {
-      if (row.totalBpi == null) continue;
-      const arr = logsByUser.get(row.userId) ?? [];
-      arr.push({
-        date: dayjs(row.createdAt).tz().format("YYYY-MM-DD"),
-        value: Number(row.totalBpi),
-      });
-      logsByUser.set(row.userId, arr);
-    }
-    const baselineByUser = new Map<string, number>();
-    for (const row of baselineLogs) {
-      if (row.totalBpi != null) baselineByUser.set(row.userId, Number(row.totalBpi));
-    }
-
-    // userStatusLogsにこの期間のログが1件も無いライバル（バックフィル・遅延同期）
-    // のみ、scores.lastPlayed基準の再計算にフォールバックする
-    const logsCoveredUserIds = new Set(logsInRange.map((r) => r.userId));
-    const baselineCoveredUserIds = new Set(
-      baselineLogs.filter((r) => r.totalBpi != null).map((r) => r.userId),
-    );
-    const rivalIdsWithoutCoverage = rivalIds.filter(
-      (uid) => !logsCoveredUserIds.has(uid) && !baselineCoveredUserIds.has(uid),
-    );
-    const fallbackByUser = await recomputeBpiTimelinesForUsers(
-      rivalIdsWithoutCoverage,
+    // 総合BPIはscores.lastPlayed（実プレイ日）基準のシフト法で算出する
+    // （computeOwnerBpiTimelineと同じ設計。userStatusLogs.createdAtはスコアの
+    // 取り込み時刻でしかなく実プレイ日と一致しないため使わない）
+    const recomputedByUser = await recomputeBpiTimelinesForUsers(
+      rivalIds,
       version as string,
       monthStart,
       monthEnd,
@@ -132,37 +84,15 @@ export async function handleRivalMonthlyReviewSummary(
 
     const rivals = rivalRows
       .map((r) => {
-        const baseline = baselineByUser.get(r.userId);
-        const rawHistory = (logsByUser.get(r.userId) ?? []).sort((a, b) =>
-          a.date.localeCompare(b.date),
-        );
-        const hasLogCoverage = baseline !== undefined || rawHistory.length > 0;
-
-        if (!hasLogCoverage) {
-          const fallback = fallbackByUser.get(r.userId);
-          if (fallback) {
-            return {
-              userId: r.userId,
-              userName: r.userName,
-              profileImage: r.profileImage,
-              bpiStart: fallback.bpiStart,
-              bpiEnd: fallback.bpiEnd,
-            };
-          }
-        }
-
-        // 全期間モードは比較先バージョンのデータが無いライバルを比較不能として除外
-        if (compareVersion && baseline === undefined) return null;
-        const bpiStart = baseline ?? -15;
-        const bpiEnd =
-          rawHistory.length > 0 ? rawHistory[rawHistory.length - 1].value : bpiStart;
-
+        const recomputed = recomputedByUser.get(r.userId);
+        // compareVersionモードでそのバージョンのスコアが無い＝比較不能として除外
+        if (!recomputed || recomputed.bpiStart === null) return null;
         return {
           userId: r.userId,
           userName: r.userName,
           profileImage: r.profileImage,
-          bpiStart,
-          bpiEnd,
+          bpiStart: recomputed.bpiStart,
+          bpiEnd: recomputed.bpiEnd,
         };
       })
       .filter((r) => r !== null);

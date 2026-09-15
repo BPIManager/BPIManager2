@@ -1,8 +1,6 @@
 import { ok, err } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
-import { db } from "@/lib/db";
 import { monthlyReviewRepo } from "@/lib/db/aggregates/monthly-review";
-import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
 import {
   buildRivals,
   attachRivalBpiTimelines,
@@ -14,8 +12,6 @@ import {
   computeOwnerBpiTimeline,
   recomputeBpiTimelinesForUsers,
   previousVersionOf,
-  jstDayStart,
-  jstDayEnd,
 } from "./_shared";
 import type { AccessResult } from "@/middlewares/api/withApi";
 import type { HandlerResult } from "@/types/api";
@@ -70,33 +66,8 @@ export async function handleStatsMonthlyReviewRivals(
     );
 
     const rivalUserIds = rivals.map((r) => r.userId);
-    const startDate = jstDayStart(monthStart);
-    const endDate = jstDayEnd(monthEnd);
-    const [rivalLogsInRange, rivalBaselineLogs] = await Promise.all([
-      userStatusLogsRepo.getLogsInRangeBatch(
-        db,
-        rivalUserIds,
-        version,
-        startDate,
-        endDate,
-      ),
-      compareVersion
-        ? userStatusLogsRepo.getLatestTotalBpiBatch(db, rivalUserIds, compareVersion)
-        : userStatusLogsRepo.getLatestBeforeBatch(db, rivalUserIds, version, startDate),
-    ]);
-
-    // userStatusLogsにこの期間のログが1件も無いライバル（バックフィル・遅延同期）
-    // のみ、scores.lastPlayed基準の再計算にフォールバックする。対象を絞ることで
-    // 再計算コストをフォロー中の少数のライバルに限定する
-    const logsCoveredUserIds = new Set(rivalLogsInRange.map((r) => r.userId));
-    const baselineCoveredUserIds = new Set(
-      rivalBaselineLogs.filter((r) => r.totalBpi != null).map((r) => r.userId),
-    );
-    const rivalIdsWithoutCoverage = rivalUserIds.filter(
-      (uid) => !logsCoveredUserIds.has(uid) && !baselineCoveredUserIds.has(uid),
-    );
-    const rivalFallbackTimelines = await recomputeBpiTimelinesForUsers(
-      rivalIdsWithoutCoverage,
+    const rivalRecomputed = await recomputeBpiTimelinesForUsers(
+      rivalUserIds,
       version,
       monthStart,
       monthEnd,
@@ -104,14 +75,7 @@ export async function handleStatsMonthlyReviewRivals(
       compareVersion,
     );
 
-    const rivalComputedTimeline = attachRivalBpiTimelines(
-      rivals,
-      rivalLogsInRange,
-      rivalBaselineLogs,
-      useMonthBuckets,
-      !!compareVersion,
-      rivalFallbackTimelines,
-    );
+    const rivalComputedTimeline = attachRivalBpiTimelines(rivals, rivalRecomputed);
     const rivalsGrowthRanking = buildGrowthRanking(
       rivals,
       owner,

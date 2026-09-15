@@ -1,4 +1,3 @@
-import dayjs from "@/lib/dayjs";
 import type {
   RivalDiff,
   RivalSongHighlight,
@@ -115,98 +114,40 @@ export function buildRivals(
 }
 
 /**
- * `userStatusLogs.totalBpi`ログに基づき、各ライバルの総合BPI推移を組み立てる
- * （{@link computeOwnerBpiTimeline}と同じ設計。シフト法での再計算はしない）。
+ * `scores.lastPlayed`基準のシフト法再計算結果（{@link recomputeBpiTimelinesForUsers}）を
+ * 各ライバル（`RivalDiff`）に反映し、推移グラフ用のタイムラインMapを組み立てる。
  *
- * @param rivalLogsInRange - 期間内の全ライバル分totalBpiログ（時系列順である必要はない）
- * @param rivalBaselineLogs - baseline用ログ。`compareVersion`指定時は各ライバルの
- *   そのバージョン内最新ログ、省略時は期間開始前の直近ログ
- * @param requireBaseline - `true`の場合、baselineログが無いライバル（＝比較対象
- *   バージョンのデータが無い）は比較不能として除外する（全期間モード用）。
- *   `false`の場合はbaseline無しを`-15`扱いにする（月内比較で期間開始前に
- *   データが無い＝新規ユーザーのケース）
- * @param fallbackByUser - `userStatusLogs`にこの期間のログが1件も無い（baseline・
- *   期間内更新のどちらも無い）ライバル向けの、`scores.lastPlayed`基準シフト法
- *   再計算結果（{@link recomputeBpiTimelinesForUsers}）。バックフィル・遅延同期
- *   ユーザー対応。該当ライバルにだけ絞って渡す想定
+ * @param recomputedByUser - ライバルごとの再計算結果。`bpiStart`が`null`のライバルは
+ *   （`compareVersion`モードでそのバージョンのスコアが無く）前バージョンとの伸び率
+ *   比較が不能なため、ランキング側では除外するが、推移グラフ自体（`bpiEnd`/`history`）
+ *   はそのバージョン内の純粋な推移として引き続き表示する
  */
 export function attachRivalBpiTimelines(
   rivals: RivalDiff[],
-  rivalLogsInRange: { userId: string; totalBpi: unknown; createdAt: Date | string }[],
-  rivalBaselineLogs: { userId: string; totalBpi: unknown }[],
-  useMonthBuckets: boolean,
-  requireBaseline: boolean,
-  fallbackByUser?: Map<
+  recomputedByUser: Map<
     string,
-    { bpiStart: number; bpiEnd: number; history: { date: string; value: number }[] }
+    { bpiStart: number | null; bpiEnd: number; history: { date: string; value: number }[] }
   >,
 ): Map<string, { date: string; value: number }[]> {
-  const logsByUser = new Map<string, { date: string; value: number }[]>();
-  for (const row of rivalLogsInRange) {
-    if (row.totalBpi == null) continue;
-    const arr = logsByUser.get(row.userId) ?? [];
-    arr.push({
-      date: dayjs(row.createdAt).tz().format("YYYY-MM-DD"),
-      value: Number(row.totalBpi),
-    });
-    logsByUser.set(row.userId, arr);
-  }
-
-  const baselineByUser = new Map<string, number>();
-  for (const row of rivalBaselineLogs) {
-    if (row.totalBpi != null) baselineByUser.set(row.userId, Number(row.totalBpi));
-  }
-
   const rivalComputedTimeline = new Map<
     string,
     { date: string; value: number }[]
   >();
   for (const r of rivals) {
-    const rawHistory = (logsByUser.get(r.userId) ?? []).sort((a, b) =>
-      a.date.localeCompare(b.date),
-    );
-    // 年次/全期間モードは日次だと点が多すぎるため月単位に間引く（同月内は最後の値を採用）
-    const historyMap = new Map<string, number>();
-    for (const h of rawHistory) {
-      const key = useMonthBuckets ? h.date.slice(0, 7) : h.date;
-      historyMap.set(key, h.value);
-    }
-    const history = Array.from(historyMap.entries())
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([key, value]) => ({ date: useMonthBuckets ? `${key}-01` : key, value }));
+    const recomputed = recomputedByUser.get(r.userId);
+    if (!recomputed) continue;
 
-    const baseline = baselineByUser.get(r.userId);
-    const hasLogCoverage = baseline !== undefined || history.length > 0;
+    if (recomputed.history.length > 0)
+      rivalComputedTimeline.set(r.userId, recomputed.history);
 
-    // バックフィル等でこの期間に対応するログが1件も無いライバルのみ、
-    // scores.lastPlayed基準の再計算結果にフォールバックする
-    const fallback = !hasLogCoverage ? fallbackByUser?.get(r.userId) : undefined;
-    if (fallback) {
-      if (fallback.history.length > 0)
-        rivalComputedTimeline.set(r.userId, fallback.history);
-      r.bpiStart = fallback.bpiStart;
-      r.bpiEnd = fallback.bpiEnd;
-      r.bpiGrowth = Math.round((fallback.bpiEnd - fallback.bpiStart) * 100) / 100;
+    if (recomputed.bpiStart === null) {
+      // 前バージョンとの伸び率比較が不能（bpiStart/bpiEnd/bpiGrowthはRivalDiff
+      // 初期値のnullのまま。「-」として末尾に表示される。buildGrowthRanking参照）
       continue;
     }
-
-    // タイムライン（推移グラフ用）はbaselineの有無に関わらず保持する。
-    // 「前バージョンとの伸び率」比較が不能な場合でも、そのバージョン内での
-    // 純粋な推移自体は表示できるため（buildGrowthTimeline参照）
-    if (history.length > 0) rivalComputedTimeline.set(r.userId, history);
-
-    if (requireBaseline && baseline === undefined) {
-      // このライバルのcompareVersion内データが無い＝前バージョンとの伸び率比較は不能
-      // （bpiStart/bpiEnd/bpiGrowthはRivalDiff初期値のnullのまま）
-      continue;
-    }
-    const bpiStart = baseline ?? -15;
-    // 期間内にログが1件も無ければ「更新なし」＝baselineのまま
-    const bpiEnd = history.length > 0 ? history[history.length - 1].value : bpiStart;
-
-    r.bpiStart = bpiStart;
-    r.bpiEnd = bpiEnd;
-    r.bpiGrowth = Math.round((bpiEnd - bpiStart) * 100) / 100;
+    r.bpiStart = recomputed.bpiStart;
+    r.bpiEnd = recomputed.bpiEnd;
+    r.bpiGrowth = Math.round((recomputed.bpiEnd - recomputed.bpiStart) * 100) / 100;
   }
 
   return rivalComputedTimeline;
