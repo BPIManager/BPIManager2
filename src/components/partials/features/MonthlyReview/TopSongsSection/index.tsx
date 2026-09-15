@@ -12,6 +12,8 @@ interface Props {
   granularity: "month" | "year" | "version";
   isComparing: boolean;
   onCompareVersionChange?: (version: string) => void;
+  excludeNewPlays?: boolean;
+  onExcludeNewPlaysChange?: (excludeNewPlays: boolean) => void;
 }
 
 const TopSongsSection = ({
@@ -19,6 +21,8 @@ const TopSongsSection = ({
   granularity,
   isComparing,
   onCompareVersionChange,
+  excludeNewPlays,
+  onExcludeNewPlaysChange,
 }: Props) => {
   const [ref, inView] = useInView(0.1);
   const { tFormat } = useTranslation();
@@ -54,6 +58,8 @@ const TopSongsSection = ({
       currentVersion={currentVersion}
       isComparing={isComparing}
       onCompareVersionChange={onCompareVersionChange}
+      excludeNewPlays={excludeNewPlays}
+      onExcludeNewPlaysChange={onExcludeNewPlaysChange}
     />
   );
 };

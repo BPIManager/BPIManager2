@@ -12,11 +12,15 @@ import { useMonthlyReviewArena } from "@/hooks/stats/useMonthlyReviewArena";
 import { useMonthlyReviewRadarGrowth } from "@/hooks/stats/useMonthlyReviewRadarGrowth";
 import { useProfile } from "@/hooks/users/useProfile";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import ShareFab from "@/components/partials/features/MonthlyReview/ShareFab";
+import { ShareDrawerProvider } from "@/components/partials/features/MonthlyReview/ShareFab/context";
 import { periodHeadingOf } from "@/lib/monthly-review/period";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
-import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
+import { parseOgpSections, type OgpSectionKey } from "@/lib/monthly-review/ogpSections";
+import { buildOgpImageUrl } from "@/lib/monthly-review/ogpUrl";
 import { useRouter } from "next/router";
-import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import { ArrowLeft, User } from "lucide-react";
 import { useState } from "react";
 
 const orbitStyles = `
@@ -38,6 +42,14 @@ export default function MonthlyReviewPage() {
   const version = (router.query.version as string) || latestVersion;
   const userIdStr = router.isReady ? (userId as string) : undefined;
   const month = router.isReady ? (rawMonth as string) : undefined;
+  const ogpSections = parseOgpSections(router.query.ogp as string | undefined);
+  const setOgpSections = (next: [OgpSectionKey, OgpSectionKey]) => {
+    router.replace(
+      { query: { ...router.query, ogp: next.join(",") } },
+      undefined,
+      { shallow: true },
+    );
+  };
 
   const isAllMode = month === "all";
   const isYearMode = !isAllMode && /^\d{4}$/.test(month ?? "");
@@ -56,9 +68,12 @@ export default function MonthlyReviewPage() {
   const [compareVersion, setCompareVersion] = useState<string | undefined>(
     undefined,
   );
+  // 「最も伸びた曲」の「新規プレイを除く」オプション（比較元のexScoreが0の曲を除外）
+  const [excludeNewPlays, setExcludeNewPlays] = useState(false);
   if (compareVersionRouteKey !== routeKey) {
     setCompareVersionRouteKey(routeKey);
     setCompareVersion(undefined);
+    setExcludeNewPlays(false);
   }
 
   const { profile } = useProfile(userIdStr);
@@ -68,6 +83,7 @@ export default function MonthlyReviewPage() {
     version,
     month,
     compareVersion,
+    excludeNewPlays,
   );
   const activity = useMonthlyReviewActivity(userIdStr, version, month);
   const rivals = useMonthlyReviewRivals(userIdStr, version, month);
@@ -115,18 +131,34 @@ export default function MonthlyReviewPage() {
   const showFullScreenLoading = !router.isReady || loadedRouteKey !== routeKey;
 
   const BackBtn = (
-    <button
-      onClick={() => router.back()}
-      className="fixed left-4 top-4 z-50 flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold backdrop-blur-sm transition-colors hover:bg-white/10"
-      style={{
-        background: "rgba(255,255,255,0.05)",
-        border: "1px solid rgba(255,255,255,0.12)",
-        color: "rgba(255,255,255,0.6)",
-      }}
-    >
-      <ArrowLeft className="h-3.5 w-3.5" />
-      Back
-    </button>
+    <div className="fixed left-4 top-4 z-50 flex items-center gap-2">
+      <button
+        onClick={() => router.back()}
+        className="flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold backdrop-blur-sm transition-colors hover:bg-white/10"
+        style={{
+          background: "rgba(255,255,255,0.05)",
+          border: "1px solid rgba(255,255,255,0.12)",
+          color: "rgba(255,255,255,0.6)",
+        }}
+      >
+        <ArrowLeft className="h-3.5 w-3.5" />
+        Back
+      </button>
+      {userIdStr && (
+        <Link
+          href={`/users/${userIdStr}`}
+          className="flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold backdrop-blur-sm transition-colors hover:bg-white/10"
+          style={{
+            background: "rgba(255,255,255,0.05)",
+            border: "1px solid rgba(255,255,255,0.12)",
+            color: "rgba(255,255,255,0.6)",
+          }}
+        >
+          <User className="h-3.5 w-3.5" />
+          {t("monthlyReview.viewThisUsersProfile")}
+        </Link>
+      )}
+    </div>
   );
 
   // タイトル/descriptionを対象ユーザー・期間の実態に即した内容にする
@@ -155,7 +187,13 @@ export default function MonthlyReviewPage() {
       <Meta
         title={pageTitle}
         description={pageDescription}
-        ogImage={`https://bpi2.poyashi.me${API_V2_PREFIX}/users/${userIdStr}/stats/monthly-review/ogp?version=${version}&month=${month}`}
+        ogImage={buildOgpImageUrl({
+          userId: userIdStr,
+          version,
+          month,
+          sections: ogpSections,
+          compareVersion,
+        })}
       />
     ) : null;
 
@@ -286,7 +324,7 @@ export default function MonthlyReviewPage() {
   }
 
   return (
-    <>
+    <ShareDrawerProvider>
       {MetaTag}
       {BackBtn}
       {CalendarBtn}
@@ -309,8 +347,25 @@ export default function MonthlyReviewPage() {
         topSongsLoading={topSongs.isLoading}
         radarGrowthLoading={radarGrowth.isLoading}
         onCompareVersionChange={setCompareVersion}
+        excludeNewPlays={excludeNewPlays}
+        onExcludeNewPlaysChange={setExcludeNewPlays}
       />
-    </>
+      {userIdStr && month && (
+        <ShareFab
+          userId={userIdStr}
+          month={month}
+          version={version}
+          granularity={granularity}
+          bpi={bpi.data}
+          topSongs={topSongs.data}
+          radarGrowth={radarGrowth.data?.radarGrowth ?? null}
+          arena={arena.data?.arena ?? null}
+          compareVersion={compareVersion}
+          sections={ogpSections}
+          onSectionsChange={setOgpSections}
+        />
+      )}
+    </ShareDrawerProvider>
   );
 }
 

@@ -165,6 +165,11 @@ export async function computeOwnerBpiTimeline(
     ownerInMonthHistory,
     finalExScoreMap: seeded.finalExScoreMap,
     allL12SongMeta,
+    // compareVersion指定時、そのバージョンにユーザーのスコアが1件も無いと
+    // bpiStartは「全曲未プレイ」扱いの見かけ上のBPI（floor値、大きくマイナスになりうる）
+    // になり、bpiDiffが実態とかけ離れた値になる。呼び出し側で「比較不能」を
+    // 判定できるようフラグを返す
+    hasCompareData: !compareVersion || (compareVersionExScoreMap?.size ?? 0) > 0,
   };
 }
 
@@ -319,6 +324,7 @@ export async function computeOwnerTopSongs(
     ReturnType<typeof computeOwnerMonthlyScores>
   >["latestInMonth"],
   compareVersion?: string,
+  excludeNewPlays = false,
 ) {
   const songIdsUpdated = latestInMonth.map((s) => s.songId);
 
@@ -346,5 +352,5 @@ export async function computeOwnerTopSongs(
     });
   }
 
-  return buildTopSongs(latestInMonth, preScoreMap);
+  return buildTopSongs(latestInMonth, preScoreMap, excludeNewPlays);
 }

@@ -11,6 +11,8 @@ interface Props {
   topSongsLoading?: boolean;
   radarGrowthLoading?: boolean;
   onCompareVersionChange?: (version: string) => void;
+  excludeNewPlays?: boolean;
+  onExcludeNewPlaysChange?: (excludeNewPlays: boolean) => void;
 }
 
 const MonthlyReviewView = ({
@@ -18,6 +20,8 @@ const MonthlyReviewView = ({
   topSongsLoading,
   radarGrowthLoading,
   onCompareVersionChange,
+  excludeNewPlays,
+  onExcludeNewPlaysChange,
 }: Props) => {
   const speedRef = useRef(BASE_SPEED);
 
@@ -58,6 +62,8 @@ const MonthlyReviewView = ({
       topSongsLoading={topSongsLoading}
       radarGrowthLoading={radarGrowthLoading}
       onCompareVersionChange={onCompareVersionChange}
+      excludeNewPlays={excludeNewPlays}
+      onExcludeNewPlaysChange={onExcludeNewPlaysChange}
     />
   );
 };

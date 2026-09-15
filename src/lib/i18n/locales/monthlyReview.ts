@@ -5,6 +5,24 @@ export const monthlyReviewTranslations = {
     "zh-TW": "{month} 回顧",
     ko: "{month} 월간 리뷰",
   },
+  "monthlyReview.viewProfile": {
+    ja: "{userName}のプロフィールを見る",
+    en: "View {userName}'s Profile",
+    "zh-TW": "查看{userName}的個人資料",
+    ko: "{userName}의 프로필 보기",
+  },
+  "monthlyReview.viewThisUsersProfile": {
+    ja: "このユーザーのプロフィールを見る",
+    en: "View this user's profile",
+    "zh-TW": "查看這位使用者的個人資料",
+    ko: "이 사용자의 프로필 보기",
+  },
+  "monthlyReview.viewMyReview": {
+    ja: "自分のまとめページも見る",
+    en: "Also see my own review",
+    "zh-TW": "也查看自己的回顧",
+    ko: "내 리뷰도 확인하기",
+  },
   "monthlyReview.bpi.sectionTitle": {
     ja: "総合BPI",
     en: "Total BPI",
@@ -64,6 +82,12 @@ export const monthlyReviewTranslations = {
     en: "Compare with",
     "zh-TW": "比較版本",
     ko: "비교 대상 버전",
+  },
+  "monthlyReview.topSongs.excludeNewPlays": {
+    ja: "新規プレイを除く",
+    en: "Exclude new plays",
+    "zh-TW": "排除新遊玩曲目",
+    ko: "신규 플레이 제외",
   },
   "monthlyReview.topSongs.noComparisonData": {
     ja: "{compareLabel}にはデータがありません。別のバージョンを選択してください。",
@@ -571,12 +595,6 @@ export const monthlyReviewTranslations = {
     ko: "{period} 라이벌과의 역학 관계에 변동이 없었습니다.",
   },
   // Footer
-  "monthlyReview.footer.shareX": {
-    ja: "Xでシェア",
-    en: "Share on X",
-    "zh-TW": "分享到X",
-    ko: "X에 공유",
-  },
   "monthlyReview.footer.back": {
     ja: "戻る",
     en: "Back",
@@ -590,7 +608,7 @@ export const monthlyReviewTranslations = {
     ko: "라이벌 리뷰도 확인하기",
   },
   "monthlyReview.footer.checkMonthly": {
-    ja: "自分の月別のデータを確認する",
+    ja: "月別のデータを確認する",
     en: "Check your own monthly data",
     "zh-TW": "查看自己各月份的資料",
     ko: "내 월별 데이터 확인하기",
@@ -600,6 +618,79 @@ export const monthlyReviewTranslations = {
     en: "Total BPI {start} → {end}",
     "zh-TW": "綜合BPI {start} → {end}",
     ko: "종합 BPI {start} → {end}",
+  },
+  // Share FAB
+  "monthlyReview.shareFab.fabLabel": {
+    ja: "シェアする",
+    en: "Share",
+    "zh-TW": "分享",
+    ko: "공유하기",
+  },
+  "monthlyReview.shareFab.title": {
+    ja: "シェアする",
+    en: "Share",
+    "zh-TW": "分享",
+    ko: "공유하기",
+  },
+  "monthlyReview.shareFab.previewLabel": {
+    ja: "OGPプレビュー",
+    en: "OGP Preview",
+    "zh-TW": "OGP預覽",
+    ko: "OGP 미리보기",
+  },
+  "monthlyReview.shareFab.leftSlot": {
+    ja: "左側",
+    en: "Left",
+    "zh-TW": "左側",
+    ko: "왼쪽",
+  },
+  "monthlyReview.shareFab.rightSlot": {
+    ja: "右側",
+    en: "Right",
+    "zh-TW": "右側",
+    ko: "오른쪽",
+  },
+  "monthlyReview.shareFab.sectionTopSongs": {
+    ja: "BPIトップ5",
+    en: "Top 5 BPI",
+    "zh-TW": "BPI前5名",
+    ko: "BPI 톱5",
+  },
+  "monthlyReview.shareFab.sectionRadar": {
+    ja: "ノーツレーダー",
+    en: "Notes Radar",
+    "zh-TW": "音符雷達圖",
+    ko: "노트 레이더",
+  },
+  "monthlyReview.shareFab.sectionGrowth": {
+    ja: "期間の総合BPI推移",
+    en: "Total BPI Trend",
+    "zh-TW": "期間總合BPI趨勢",
+    ko: "기간 종합 BPI 추이",
+  },
+  "monthlyReview.shareFab.sectionArena": {
+    ja: "アリーナ戦績",
+    en: "Arena Record",
+    "zh-TW": "競技場戰績",
+    ko: "아레나 전적",
+  },
+  "monthlyReview.shareFab.shareX": {
+    ja: "Xでシェア",
+    en: "Share on X",
+    "zh-TW": "分享到X",
+    ko: "X에 공유",
+  },
+  "monthlyReview.shareFab.copyUrl": {
+    ja: "コピー",
+    en: "Copy",
+    "zh-TW": "複製",
+    ko: "복사",
+  },
+  "monthlyReview.shareFab.copied": {
+    ja: "URLをコピーしました",
+    en: "URL copied",
+    "zh-TW": "已複製URL",
+    ko: "URL을 복사했습니다",
   },
   // Period Selector
   "monthlyReview.period.granularity": {

@@ -15,6 +15,8 @@ type ScoreRow = {
 export function buildTopSongs(
   latestInMonth: ScoreRow[],
   preScoreMap: Map<number, { exScore: number; bpi: number | null }>,
+  /** trueの場合、比較元のexScoreが0（実質新規プレイ）の曲を「最も伸びた曲」から除外する */
+  excludeNewPlays = false,
 ): { topBpiSongs: TopSong[]; topImprovedSongs: TopSongImproved[] } {
   const topBpiSongs: TopSong[] = [];
   const topImprovedSongs: TopSongImproved[] = [];
@@ -37,7 +39,7 @@ export function buildTopSongs(
       rank,
     });
     const pre = preScoreMap.get(s.songId);
-    if (pre != null) {
+    if (pre != null && !(excludeNewPlays && pre.exScore === 0)) {
       const bpiBefore = pre.bpi ?? -15;
       topImprovedSongs.push({
         songId: s.songId,

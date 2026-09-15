@@ -393,6 +393,8 @@ interface Props {
   currentVersion: string | undefined;
   isComparing: boolean;
   onCompareVersionChange?: (version: string) => void;
+  excludeNewPlays?: boolean;
+  onExcludeNewPlaysChange?: (excludeNewPlays: boolean) => void;
 }
 
 const TopSongsSectionUI = ({
@@ -403,6 +405,8 @@ const TopSongsSectionUI = ({
   currentVersion,
   isComparing,
   onCompareVersionChange,
+  excludeNewPlays,
+  onExcludeNewPlaysChange,
 }: Props) => {
   const { t, tFormat } = useTranslation();
   const { topBpiSongs, topImprovedSongs, compareVersion } = topSongs;
@@ -453,11 +457,14 @@ const TopSongsSectionUI = ({
               colDelay={0.2}
               isComparing={isComparing}
               configSlot={
-                compareVersion && onCompareVersionChange ? (
+                (compareVersion && onCompareVersionChange) ||
+                onExcludeNewPlaysChange ? (
                   <CompareVersionConfig
                     currentVersion={currentVersion}
-                    compareVersion={compareVersion}
+                    compareVersion={compareVersion ?? undefined}
                     onChange={onCompareVersionChange}
+                    excludeNewPlays={excludeNewPlays}
+                    onExcludeNewPlaysChange={onExcludeNewPlaysChange}
                   />
                 ) : undefined
               }
