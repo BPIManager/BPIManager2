@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Share2, Users, CalendarDays } from "lucide-react";
+import { ArrowLeft, Share2, User, Users, CalendarDays } from "lucide-react";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import Link from "next/link";
 import {
@@ -21,13 +21,16 @@ const styles = `
 interface Props {
   inView: boolean;
   sectionRef: React.RefObject<HTMLDivElement>;
-  twitterUrl: string;
   onBack: () => void;
+  onOpenShare: () => void;
   rivals: RivalMonthlyReviewEntry[];
   rivalsLoading: boolean;
   currentMonth: string | undefined;
   currentVersion: string;
   userId: string | undefined;
+  profileUserName: string | undefined;
+  isOwnProfile: boolean;
+  myUserId: string | undefined;
   monthlyLinks: { month: string; start: number; end: number }[];
 }
 
@@ -91,13 +94,16 @@ function RivalCard({
 const FooterSectionUI = ({
   inView,
   sectionRef,
-  twitterUrl,
   onBack,
+  onOpenShare,
   rivals,
   rivalsLoading,
   currentMonth,
   currentVersion,
   userId,
+  profileUserName,
+  isOwnProfile,
+  myUserId,
   monthlyLinks,
 }: Props) => {
   const { t, tFormat } = useTranslation();
@@ -118,22 +124,47 @@ const FooterSectionUI = ({
             animation: inView ? "footerFade 0.6s ease-out both" : "none",
           }}
         >
-          <div className="flex flex-col items-center gap-4 sm:flex-row">
-            <a
-              href={twitterUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+          <div className="flex flex-col items-center gap-4">
+            <button
+              onClick={onOpenShare}
               className="flex items-center gap-2 rounded-full px-6 py-3 text-sm font-bold transition-all hover:scale-105"
               style={{
-                background: "rgba(29,161,242,0.15)",
-                border: "1px solid rgba(29,161,242,0.4)",
-                color: "#1da1f2",
+                background: "rgba(56,189,248,0.15)",
+                border: "1px solid rgba(56,189,248,0.4)",
+                color: "#38bdf8",
               }}
             >
               <Share2 className="h-4 w-4" />
-              {t("monthlyReview.footer.shareX")}
-            </a>
-
+              {t("monthlyReview.shareFab.fabLabel")}
+            </button>
+            {userId && profileUserName && (
+              <Link
+                href={`/users/${userId}`}
+                className="flex items-center gap-2 rounded-full px-6 py-3 text-sm font-bold transition-all hover:scale-105"
+                style={{
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(255,255,255,0.12)",
+                  color: "rgba(255,255,255,0.55)",
+                }}
+              >
+                <User className="h-4 w-4" />
+                {tFormat("monthlyReview.viewProfile", { userName: profileUserName })}
+              </Link>
+            )}
+            {!isOwnProfile && myUserId && currentMonth && (
+              <Link
+                href={`/users/${myUserId}/monthly-review/${currentMonth}?version=${currentVersion}`}
+                className="flex items-center gap-2 rounded-full px-6 py-3 text-sm font-bold transition-all hover:scale-105"
+                style={{
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(255,255,255,0.12)",
+                  color: "rgba(255,255,255,0.55)",
+                }}
+              >
+                <User className="h-4 w-4" />
+                {t("monthlyReview.viewMyReview")}
+              </Link>
+            )}
             <button
               onClick={onBack}
               className="flex items-center gap-2 rounded-full px-6 py-3 text-sm font-bold transition-all hover:scale-105"
