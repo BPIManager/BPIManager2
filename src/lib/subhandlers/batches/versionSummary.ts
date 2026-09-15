@@ -132,6 +132,9 @@ export async function handleVersionSummary(
         wrScore: row.wrScore !== null ? Number(row.wrScore) : null,
         kaidenAvg: row.kaidenAvg !== null ? Number(row.kaidenAvg) : null,
         coef: row.coef !== null ? Number(row.coef) : null,
+        mu: row.mu !== null ? Number(row.mu) : null,
+        sigma: row.sigma !== null ? Number(row.sigma) : null,
+        residualVar: row.residualVar !== null ? Number(row.residualVar) : null,
         overtaken: [],
         rivalRankInfo: null,
       };

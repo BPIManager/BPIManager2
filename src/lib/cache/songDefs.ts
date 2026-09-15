@@ -11,6 +11,9 @@ export type CachedSongWithDef = {
   wrScore: number | null;
   kaidenAvg: number | null;
   coef: number | null;
+  mu: number | null;
+  sigma: number | null;
+  residualVar: number | null;
 };
 
 type CacheEntry = {
@@ -28,7 +31,7 @@ async function loadCache(): Promise<Map<string, CachedSongWithDef>> {
       (qb) =>
         qb
           .selectFrom("songDef")
-          .select(["songId", "wrScore", "kaidenAvg", "coef"])
+          .select(["songId", "wrScore", "kaidenAvg", "coef", "mu", "sigma", "residualVar"])
           .where("isCurrent", "=", 1)
           .as("def"),
       (join) => join.onRef("def.songId", "=", "s.songId"),
@@ -42,6 +45,9 @@ async function loadCache(): Promise<Map<string, CachedSongWithDef>> {
       "def.wrScore",
       "def.kaidenAvg",
       "def.coef",
+      "def.mu",
+      "def.sigma",
+      "def.residualVar",
     ])
     .where((eb) =>
       eb.or([
