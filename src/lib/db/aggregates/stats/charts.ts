@@ -143,7 +143,7 @@ class StatsChartsRepository {
       .leftJoin(
         () =>
           currentSongDefSubquery()
-            .select(["songId", "wrScore", "kaidenAvg", "coef", "mu", "sigma", "residualVar"])
+            .select(["songId", "wrScore", "kaidenAvg", "coef"])
             .as("def"),
         (join) => join.onRef("def.songId", "=", "m.songId"),
       )
@@ -159,7 +159,6 @@ class StatsChartsRepository {
           .as("date"),
         "s.songId",
         "m.notes",
-        eb.fn.max("s.bpi").as("bpi"),
         // bpi(exScore)は曲ごとに単調増加なので、同じグループ内でmax(bpi)と
         // max(exScore)は同一行に対応する
         eb.fn.max("s.exScore").as("exScore"),
@@ -169,9 +168,6 @@ class StatsChartsRepository {
         eb.fn.max("def.wrScore").as("wrScore"),
         eb.fn.max("def.kaidenAvg").as("kaidenAvg"),
         eb.fn.max("def.coef").as("coef"),
-        eb.fn.max("def.mu").as("mu"),
-        eb.fn.max("def.sigma").as("sigma"),
-        eb.fn.max("def.residualVar").as("residualVar"),
       ])
       .where("s.userId", "=", userId)
       .where("s.version", "=", version)

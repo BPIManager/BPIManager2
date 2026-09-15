@@ -1,32 +1,39 @@
 import type { NextApiRequest } from "next";
+import { BpiV1 } from "@bpim/bpicalc";
 import dayjs from "@/lib/dayjs";
-import { BpiCalculator } from "@/lib/bpi";
 import { statsChartsRepo } from "@/lib/db/aggregates/stats/charts";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { groupByOf, percentile } from "./_shared";
 import type { StatsQuery } from "@/types/stats/query";
 import type { HandlerResult } from "@/types/api";
-import type { IBpiBasicSongData, IBpiScoreObservation } from "@/types/songs/bpi";
 
 /** 日付グループ内の1曲ぶん（その時点までのベストexScore時点の値）。 */
-interface BoxStatsSong extends IBpiBasicSongData {
+interface BoxStatsSong {
   songId: number;
+  notes: number;
+  kaidenAvg: number | null;
+  wrScore: number | null;
+  coef: number | null;
   bpi: number;
   exScore: number;
 }
 
+// mu/sigma(V2)を必要としないV1で統一する。top75/top25のような曲の部分
+// 集合に対してmu/sigma依存のシフト法(潜在スキル推定)を使うと、集合が
+// 偏っているほど推定が歪み、上位%総合が意図通りの値にならないため。
+const legacyV1 = new BpiV1();
+
 /**
- * 曲の部分集合に対する総合BPI(V2)。この集合を丸ごと1つの「対象楽曲」として
+ * 曲の部分集合に対する総合BPI(V1)。この集合を丸ごと1つの「対象楽曲」として
  * 扱う（top75/top25のような固定集合の総合値で、未プレイ曲の穴埋めは無い）。
  */
 function totalOf(songs: BoxStatsSong[]): number {
-  const observations: IBpiScoreObservation[] = songs.map((s) => ({
-    songId: s.songId,
-    notes: s.notes,
-    exScore: s.exScore,
-  }));
-  return BpiCalculator.calculateTotalBPI(observations, songs);
+  const bpisDesc = songs
+    .map((s) => s.bpi)
+    .sort((a, b) => b - a);
+  if (bpisDesc.length === 0) return -15;
+  return legacyV1.total(bpisDesc, bpisDesc.length);
 }
 
 export async function handleStatsBpiBoxStats(
@@ -66,20 +73,27 @@ export async function handleStatsBpiBoxStats(
             : d.format("YYYY-MM-DD");
       const current = grouped.get(dateKey) ?? new Map<number, BoxStatsSong>();
       const songId = Number(row.songId);
-      const bpi = Number(row.bpi);
+      const notes = Number(row.notes);
+      const exScore = Number(row.exScore);
+      const bpi = legacyV1
+        .chart({
+          notes,
+          kaidenAvg: row.kaidenAvg,
+          wrScore: row.wrScore,
+          coef: row.coef,
+        })
+        .bpi(exScore);
+      if (bpi === null) continue;
       const existing = current.get(songId);
       if (!existing || existing.bpi < bpi) {
         current.set(songId, {
           songId,
           bpi,
-          notes: Number(row.notes),
-          exScore: Number(row.exScore),
+          notes,
+          exScore,
           kaidenAvg: row.kaidenAvg,
           wrScore: row.wrScore,
           coef: row.coef,
-          mu: row.mu,
-          sigma: row.sigma,
-          residualVar: row.residualVar,
         });
       }
       grouped.set(dateKey, current);
