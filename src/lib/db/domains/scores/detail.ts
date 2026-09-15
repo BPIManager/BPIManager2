@@ -81,20 +81,10 @@ class LogScoreRepository {
           }),
       )
       .leftJoin(
-        () => latestSongDefIdSubquery(targetTime).as("latest_sd"),
+        () => latestSongDefIdSubquery().as("latest_sd"),
         (join) => join.onRef("latest_sd.l_defSongId", "=", "s.songId"),
       )
       .leftJoin("songDef as sd", "sd.defId", "latest_sd.maxDefId")
-      // mu/sigma/residualVar(V2のALS推定パラメータ)は、wrScore/kaidenAvgと
-      // 違って「その時点でどうだったか」という時間軸を持たない、現時点で最良の
-      // モデル推定値。targetTime時点のsongDef(sd)だと、そのモデル推定を
-      // 行う前の古い定義行に当たってmu/sigma未収録(null)になってしまうため、
-      // 常に最新(isCurrent=1)のsongDefから別途取得する。
-      .leftJoin(
-        () => latestSongDefIdSubquery().as("current_sd_ref"),
-        (join) => join.onRef("current_sd_ref.l_defSongId", "=", "s.songId"),
-      )
-      .leftJoin("songDef as current_sd", "current_sd.defId", "current_sd_ref.maxDefId")
       .select([
         "s.songId",
         "s.title",
@@ -115,9 +105,9 @@ class LogScoreRepository {
         "sd.wrScore",
         "sd.kaidenAvg",
         "sd.coef",
-        "current_sd.mu",
-        "current_sd.sigma",
-        "current_sd.residualVar",
+        "sd.mu",
+        "sd.sigma",
+        "sd.residualVar",
       ]);
 
     if (batchIds && batchIds.length > 0) {
