@@ -36,6 +36,7 @@ rsync -az --delete \
   -e "ssh ${SSH_OPTS[*]}" \
   --exclude 'public/data' \
   .next \
+  src/assets/fonts \
   public \
   package.json \
   pnpm-lock.yaml \
