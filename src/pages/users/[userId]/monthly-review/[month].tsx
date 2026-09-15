@@ -1,3 +1,4 @@
+import type { GetServerSideProps } from "next";
 import { Meta } from "@/components/partials/common/PageChrome/Head";
 import MonthlyReviewView from "@/components/partials/features/MonthlyReview/index";
 import PeriodSelector from "@/components/partials/features/MonthlyReview/PeriodSelector";
@@ -9,7 +10,9 @@ import { useMonthlyReviewActivity } from "@/hooks/stats/useMonthlyReviewActivity
 import { useMonthlyReviewRivals } from "@/hooks/stats/useMonthlyReviewRivals";
 import { useMonthlyReviewArena } from "@/hooks/stats/useMonthlyReviewArena";
 import { useMonthlyReviewRadarGrowth } from "@/hooks/stats/useMonthlyReviewRadarGrowth";
+import { useProfile } from "@/hooks/users/useProfile";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import { periodHeadingOf } from "@/lib/monthly-review/period";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { useRouter } from "next/router";
@@ -58,6 +61,7 @@ export default function MonthlyReviewPage() {
     setCompareVersion(undefined);
   }
 
+  const { profile } = useProfile(userIdStr);
   const bpi = useMonthlyReviewBpi(userIdStr, version, month, compareVersion);
   const topSongs = useMonthlyReviewTopSongs(
     userIdStr,
@@ -125,10 +129,32 @@ export default function MonthlyReviewPage() {
     </button>
   );
 
+  // タイトル/descriptionを対象ユーザー・期間の実態に即した内容にする
+  // （「先月のまとめ」固定文言ではなく「{ユーザー名}の{期間}の振り返り」等）
+  const periodHeading =
+    router.isReady && month ? periodHeadingOf(month, version, granularity) : null;
+  const pageTitle = periodHeading
+    ? profile?.userName
+      ? `${profile.userName}の${periodHeading}`
+      : periodHeading
+    : t("page.monthlyReviewShare.title");
+  const pageDescription = periodHeading
+    ? `${profile?.userName ? `${profile.userName}の` : ""}${periodHeading}${
+        bpi.data
+          ? `。総合BPI ${bpi.data.end.toFixed(2)}${
+              bpi.data.diff !== 0
+                ? `（${bpi.data.diff >= 0 ? "+" : ""}${bpi.data.diff.toFixed(2)}）`
+                : ""
+            }`
+          : ""
+      }`
+    : undefined;
+
   const MetaTag =
     router.isReady && userIdStr && month ? (
       <Meta
-        title={t("page.monthlyReviewShare.title")}
+        title={pageTitle}
+        description={pageDescription}
         ogImage={`https://bpi2.poyashi.me${API_V2_PREFIX}/users/${userIdStr}/stats/monthly-review/ogp?version=${version}&month=${month}`}
       />
     ) : null;
@@ -287,3 +313,9 @@ export default function MonthlyReviewPage() {
     </>
   );
 }
+
+// getServerSideProps無しだと自動静的最適化されrouter.isReadyが初回レンダーで
+// falseになり、クローラ向けHTMLにMeta（title/og:image）が載らない（[userId].tsxと同様）。
+export const getServerSideProps: GetServerSideProps = async () => {
+  return { props: {} };
+};

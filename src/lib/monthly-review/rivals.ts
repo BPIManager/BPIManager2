@@ -114,13 +114,9 @@ export function buildRivals(
 }
 
 /**
- * `scores.lastPlayed`基準のシフト法再計算結果（{@link recomputeBpiTimelinesForUsers}）を
- * 各ライバル（`RivalDiff`）に反映し、推移グラフ用のタイムラインMapを組み立てる。
- *
- * @param recomputedByUser - ライバルごとの再計算結果。`bpiStart`が`null`のライバルは
- *   （`compareVersion`モードでそのバージョンのスコアが無く）前バージョンとの伸び率
- *   比較が不能なため、ランキング側では除外するが、推移グラフ自体（`bpiEnd`/`history`）
- *   はそのバージョン内の純粋な推移として引き続き表示する
+ * `recomputeBpiTimelinesForUsers`の結果を各`RivalDiff`に反映し、推移グラフ用の
+ * タイムラインMapを組み立てる。`bpiStart: null`（比較不能）のライバルもグラフには
+ * 表示するが、ランキング側の数値（`r.bpiStart`等）は初期値nullのまま残す。
  */
 export function attachRivalBpiTimelines(
   rivals: RivalDiff[],
@@ -140,11 +136,7 @@ export function attachRivalBpiTimelines(
     if (recomputed.history.length > 0)
       rivalComputedTimeline.set(r.userId, recomputed.history);
 
-    if (recomputed.bpiStart === null) {
-      // 前バージョンとの伸び率比較が不能（bpiStart/bpiEnd/bpiGrowthはRivalDiff
-      // 初期値のnullのまま。「-」として末尾に表示される。buildGrowthRanking参照）
-      continue;
-    }
+    if (recomputed.bpiStart === null) continue; // 比較不能。「-」として末尾表示（buildGrowthRanking）
     r.bpiStart = recomputed.bpiStart;
     r.bpiEnd = recomputed.bpiEnd;
     r.bpiGrowth = Math.round((recomputed.bpiEnd - recomputed.bpiStart) * 100) / 100;

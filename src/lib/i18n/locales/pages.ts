@@ -180,6 +180,12 @@ export const pagesTranslations = {
     "zh-TW": "上月回顧",
     ko: "지난달 리뷰",
   },
+  "page.monthlyReviewShare.desc": {
+    ja: "あなたのbeatmania IIDXスコアを振り返る「先月のまとめ」をBPIM2で確認",
+    en: "Check your beatmania IIDX Monthly Review on BPIM2",
+    "zh-TW": "在 BPIM2 查看你的 beatmania IIDX「上月回顧」",
+    ko: "BPIM2에서 beatmania IIDX '지난달 리뷰'를 확인하세요",
+  },
 
   "page.support.title": {
     ja: "ご支援のお願い",
