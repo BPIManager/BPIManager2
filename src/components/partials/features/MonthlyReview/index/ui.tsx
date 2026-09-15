@@ -42,6 +42,8 @@ interface Props {
   topSongsLoading?: boolean;
   radarGrowthLoading?: boolean;
   onCompareVersionChange?: (version: string) => void;
+  excludeNewPlays?: boolean;
+  onExcludeNewPlaysChange?: (excludeNewPlays: boolean) => void;
 }
 
 const MonthlyReviewViewUI = ({
@@ -50,6 +52,8 @@ const MonthlyReviewViewUI = ({
   topSongsLoading,
   radarGrowthLoading,
   onCompareVersionChange,
+  excludeNewPlays,
+  onExcludeNewPlaysChange,
 }: Props) => (
   <div style={{ background: "#0a0a0f" }}>
     <StarfieldBackground
@@ -73,6 +77,8 @@ const MonthlyReviewViewUI = ({
           granularity={data.granularity}
           isComparing={!!topSongsLoading}
           onCompareVersionChange={onCompareVersionChange}
+          excludeNewPlays={excludeNewPlays}
+          onExcludeNewPlaysChange={onExcludeNewPlaysChange}
         />
       )}
       {data.activity && (
@@ -107,13 +113,7 @@ const MonthlyReviewViewUI = ({
           granularity={data.granularity}
         />
       )}
-      <FooterSection
-        month={data.month}
-        version={data.version}
-        granularity={data.granularity}
-        bpi={data.bpi}
-        topSongs={data.topSongs}
-      />
+      <FooterSection version={data.version} />
     </div>
   </div>
 );

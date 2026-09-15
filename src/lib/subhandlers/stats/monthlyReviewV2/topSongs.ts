@@ -13,6 +13,7 @@ export async function handleStatsMonthlyReviewTopSongs(q: {
   version: string;
   month: string;
   compareVersion?: string;
+  excludeNewPlays?: boolean;
 }): Promise<HandlerResult<unknown>> {
   try {
     const { granularity, monthStart, monthEnd } = resolveMonthlyReviewPeriod(
@@ -38,6 +39,7 @@ export async function handleStatsMonthlyReviewTopSongs(q: {
       monthStart,
       latestInMonth,
       compareVersion,
+      q.excludeNewPlays ?? false,
     );
     return ok({ topBpiSongs, topImprovedSongs, compareVersion: compareVersion ?? null });
   } catch (error) {
