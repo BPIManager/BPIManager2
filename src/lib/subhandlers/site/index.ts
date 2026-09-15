@@ -146,6 +146,9 @@ export async function handleBpiCalc(
       kaidenAvg: song.kaidenAvg ?? null,
       wrScore: song.wrScore ?? null,
       coef: song.coef ?? null,
+      mu: song.mu ?? null,
+      sigma: song.sigma ?? null,
+      residualVar: song.residualVar ?? null,
     });
 
     const estimatedRankByFormula =

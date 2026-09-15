@@ -319,6 +319,9 @@ class SongsRepository {
         "sd.kaidenAvg",
         "sd.wrScore",
         "sd.coef",
+        "sd.mu",
+        "sd.sigma",
+        "sd.residualVar",
       ])
       .where("sd.isCurrent", "=", 1)
       .execute();

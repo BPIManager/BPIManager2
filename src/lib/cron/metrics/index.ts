@@ -101,6 +101,9 @@ export async function generateArenaJson() {
                   kaidenAvg: def.kaidenAvg,
                   wrScore: def.wrScore,
                   coef: def.coef,
+                  mu: def.mu,
+                  sigma: def.sigma,
+                  residualVar: def.residualVar,
                 })
               : null;
 

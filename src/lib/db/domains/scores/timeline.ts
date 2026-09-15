@@ -161,6 +161,9 @@ class ScoreTimelineRepository {
         "sd.wrScore",
         "sd.kaidenAvg",
         "sd.coef",
+        "sd.mu",
+        "sd.sigma",
+        "sd.residualVar",
       ])
       .$if(!isInf, (qb) =>
         qb.where((eb) =>
