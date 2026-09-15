@@ -216,10 +216,10 @@ export const monthlyReviewTranslations = {
     ko: "아레나",
   },
   "monthlyReview.subtitle.version": {
-    ja: "{version}全体の振り返り",
-    en: "{version} Overall Review",
-    "zh-TW": "{version}全部回顧",
-    ko: "{version} 전체 리뷰",
+    ja: "全期間の振り返り",
+    en: "All-time Review",
+    "zh-TW": "全期間回顧",
+    ko: "전체 기간 리뷰",
   },
   "monthlyReview.rivals.noRivalsTitle": {
     ja: "ライバルが登録されていません",
