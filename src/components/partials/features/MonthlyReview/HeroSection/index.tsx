@@ -8,9 +8,10 @@ import HeroSectionUI from "./ui";
 
 interface Props {
   bpi: MonthlyReviewData["bpi"];
+  granularity: "month" | "year" | "version";
 }
 
-const HeroSection = ({ bpi }: Props) => {
+const HeroSection = ({ bpi, granularity }: Props) => {
   const [ref, inView] = useInView(0.15);
   const rafRef = useRef<number | null>(null);
   const spanRef = useRef<HTMLSpanElement>(null);
@@ -44,6 +45,7 @@ const HeroSection = ({ bpi }: Props) => {
   return (
     <HeroSectionUI
       bpi={bpi}
+      granularity={granularity}
       inView={inView}
       sectionRef={ref as React.RefObject<HTMLDivElement>}
       accent={accent}

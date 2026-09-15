@@ -53,8 +53,10 @@ const MonthlyReviewViewUI = ({ data, speedRef }: Props) => (
         bpiDiff={data.bpi?.diff}
         granularity={data.granularity}
       />
-      {data.bpi && <HeroSection bpi={data.bpi} />}
-      {data.topSongs && <TopSongsSection topSongs={data.topSongs} />}
+      {data.bpi && <HeroSection bpi={data.bpi} granularity={data.granularity} />}
+      {data.topSongs && (
+        <TopSongsSection topSongs={data.topSongs} granularity={data.granularity} />
+      )}
       {data.activity && (
         <ActivitySection
           activity={data.activity}
@@ -62,7 +64,7 @@ const MonthlyReviewViewUI = ({ data, speedRef }: Props) => (
         />
       )}
       {data.radarGrowth && data.radarGrowth.length > 0 && (
-        <RadarSection radarGrowth={data.radarGrowth} />
+        <RadarSection radarGrowth={data.radarGrowth} granularity={data.granularity} />
       )}
       {data.rivals && (
         <RivalsSection
@@ -72,7 +74,7 @@ const MonthlyReviewViewUI = ({ data, speedRef }: Props) => (
           granularity={data.granularity}
         />
       )}
-      {data.arena && <ArenaSection arena={data.arena} />}
+      {data.arena && <ArenaSection arena={data.arena} granularity={data.granularity} />}
       <FooterSection
         month={data.month}
         version={data.version}

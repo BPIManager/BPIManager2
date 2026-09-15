@@ -3,6 +3,7 @@
 import type { MonthlyReviewData } from "@/types/stats/monthlyReview";
 import { SectionCard } from "../SectionCard";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import { usePeriodPhrase } from "../usePeriodPhrase";
 
 const styles = `
   @keyframes arenaPop  { 0%{opacity:0;transform:scale(0.6) rotate(-8deg)} 70%{transform:scale(1.08) rotate(1deg)} 100%{opacity:1;transform:scale(1) rotate(0)} }
@@ -79,13 +80,15 @@ const CLASS_STYLES: Record<
 
 interface Props {
   arena: NonNullable<MonthlyReviewData["arena"]>;
+  granularity: "month" | "year" | "version";
   inView: boolean;
   sectionRef: React.RefObject<HTMLDivElement>;
   a1Ref: React.RefObject<HTMLSpanElement | null>;
 }
 
-const ArenaSectionUI = ({ arena, inView, sectionRef, a1Ref }: Props) => {
+const ArenaSectionUI = ({ arena, granularity, inView, sectionRef, a1Ref }: Props) => {
   const { t, tFormat } = useTranslation();
+  const period = usePeriodPhrase(granularity);
   const s = CLASS_STYLES[arena.bestClass] ?? CLASS_STYLES["B5"];
 
   return (
@@ -182,7 +185,7 @@ const ArenaSectionUI = ({ arena, inView, sectionRef, a1Ref }: Props) => {
             }}
           >
             {[
-              tFormat("monthlyReview.arena.summaryText", { class: arena.bestClass }),
+              tFormat("monthlyReview.arena.summaryText", { period, class: arena.bestClass }),
               arena.bestRank != null ? tFormat("monthlyReview.arena.summaryRank", { rank: String(arena.bestRank) }) : null,
               arena.maxA1Continue != null && arena.maxA1Continue > 0
                 ? tFormat("monthlyReview.arena.summaryA1", { count: String(arena.maxA1Continue) })

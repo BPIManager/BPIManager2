@@ -5,6 +5,7 @@ import { useTranslation } from "@/hooks/common/useTranslation";
 import { ChevronDown } from "lucide-react";
 import type { MonthlyReviewData } from "@/types/stats/monthlyReview";
 import { SectionCard } from "../SectionCard";
+import { usePeriodPhrase } from "../usePeriodPhrase";
 import { styles, PAGE } from "./constants";
 import GrowthRankList from "./GrowthRankList";
 import RivalCard from "./RivalCard";
@@ -85,6 +86,7 @@ const RivalsSectionUI = ({
   const { viewerAbsRank, viewerRateRank, totalParticipants } = rankSummary;
   const [visible, setVisible] = useState(PAGE);
   const { t, tFormat } = useTranslation();
+  const period = usePeriodPhrase(granularity);
 
   const totalWins = rivals.reduce((sum, r) => sum + r.newWins, 0);
   const totalLosses = rivals.reduce((sum, r) => sum + r.newLosses, 0);
@@ -100,7 +102,7 @@ const RivalsSectionUI = ({
       }),
     );
   if (summaryParts.length === 0)
-    summaryParts.push(t("monthlyReview.rivals.summaryNoChange"));
+    summaryParts.push(tFormat("monthlyReview.rivals.summaryNoChange", { period }));
   const rivalsSummary = summaryParts.join(" ");
 
   return (

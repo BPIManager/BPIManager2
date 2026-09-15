@@ -7,9 +7,10 @@ import RadarSectionUI from "./ui";
 
 interface Props {
   radarGrowth: MonthlyReviewData["radarGrowth"];
+  granularity: "month" | "year" | "version";
 }
 
-const RadarSection = ({ radarGrowth }: Props) => {
+const RadarSection = ({ radarGrowth, granularity }: Props) => {
   const [ref, inView] = useInView(0.1);
   const [activeTab, setActiveTab] = useState(0);
 
@@ -26,6 +27,7 @@ const RadarSection = ({ radarGrowth }: Props) => {
       sortedWithSongs={sortedWithSongs}
       activeTab={activeTab}
       onTabChange={setActiveTab}
+      granularity={granularity}
     />
   );
 };

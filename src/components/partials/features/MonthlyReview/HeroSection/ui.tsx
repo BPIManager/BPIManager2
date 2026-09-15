@@ -10,6 +10,7 @@ import {
 } from "recharts";
 import type { MonthlyReviewData } from "@/types/stats/monthlyReview";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import { usePeriodPhrase } from "../usePeriodPhrase";
 
 const styles = `
   @keyframes heroFade  { from { opacity:0; transform:translateY(24px) } to { opacity:1; transform:translateY(0) } }
@@ -19,6 +20,7 @@ const styles = `
 
 interface Props {
   bpi: MonthlyReviewData["bpi"];
+  granularity: "month" | "year" | "version";
   inView: boolean;
   sectionRef: React.RefObject<HTMLDivElement>;
   accent: string;
@@ -29,6 +31,7 @@ interface Props {
 
 const HeroSectionUI = ({
   bpi,
+  granularity,
   inView,
   sectionRef,
   accent,
@@ -37,6 +40,7 @@ const HeroSectionUI = ({
   spanRef,
 }: Props) => {
   const { t, tFormat } = useTranslation();
+  const period = usePeriodPhrase(granularity);
   return (
   <>
     <style>{styles}</style>
@@ -102,10 +106,10 @@ const HeroSectionUI = ({
           }}
         >
           {bpi.diff > 0
-            ? tFormat("monthlyReview.bpi.growthText", { start: bpi.start.toFixed(2), end: bpi.end.toFixed(2), diff: bpi.diff.toFixed(2) })
+            ? tFormat("monthlyReview.bpi.growthText", { period, start: bpi.start.toFixed(2), end: bpi.end.toFixed(2), diff: bpi.diff.toFixed(2) })
             : bpi.diff < 0
-              ? tFormat("monthlyReview.bpi.dropText", { start: bpi.start.toFixed(2), end: bpi.end.toFixed(2) })
-              : t("monthlyReview.bpi.noChange")}
+              ? tFormat("monthlyReview.bpi.dropText", { period, start: bpi.start.toFixed(2), end: bpi.end.toFixed(2) })
+              : tFormat("monthlyReview.bpi.noChange", { period })}
         </p>
       </div>
 

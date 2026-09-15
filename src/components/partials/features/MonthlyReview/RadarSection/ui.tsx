@@ -3,6 +3,7 @@
 import { useTranslation } from "@/hooks/common/useTranslation";
 import type { RadarGrowthEntry } from "@/types/stats/monthlyReview";
 import { SectionCard } from "../SectionCard";
+import { usePeriodPhrase } from "../usePeriodPhrase";
 import { styles, ELEMENT_COLORS, ELEMENT_LABELS } from "./constants";
 import ElementPanel from "./ElementPanel";
 import RadarComparisonChart from "./RadarComparisonChart";
@@ -14,6 +15,7 @@ interface Props {
   sortedWithSongs: RadarGrowthEntry[];
   activeTab: number;
   onTabChange: (i: number) => void;
+  granularity: "month" | "year" | "version";
 }
 
 const RadarSectionUI = ({
@@ -23,8 +25,10 @@ const RadarSectionUI = ({
   sortedWithSongs,
   activeTab,
   onTabChange,
+  granularity,
 }: Props) => {
-  const { t } = useTranslation();
+  const { t, tFormat } = useTranslation();
+  const period = usePeriodPhrase(granularity);
   const currentEntry = sortedWithSongs[activeTab] ?? sortedWithSongs[0];
 
   return (
@@ -51,7 +55,7 @@ const RadarSectionUI = ({
             animation: inView ? "radarFade 0.6s ease-out 0.1s both" : "none",
           }}
         >
-          {t("monthlyReview.radar.sectionDesc")}
+          {tFormat("monthlyReview.radar.sectionDesc", { period })}
         </p>
 
         <SectionCard

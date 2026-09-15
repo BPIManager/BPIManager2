@@ -47,6 +47,12 @@ export const monthlyReviewTranslations = {
     "zh-TW": "貢獻最大",
     ko: "가장 기여한 곡",
   },
+  "monthlyReview.topSongs.summaryTop": {
+    ja: "{period}の最高BPI曲は「{title}」で {bpi} を記録。",
+    en: "Your highest BPI song ({period}) was “{title}” at {bpi}.",
+    "zh-TW": "{period}最高BPI曲目為「{title}」，記錄 {bpi}。",
+    ko: "{period} 최고 BPI 곡은 「{title}」로 {bpi}을 기록했습니다.",
+  },
   "monthlyReview.topSongs.noneThisMonth": {
     ja: "今月の更新なし",
     en: "No updates this month",
@@ -90,10 +96,10 @@ export const monthlyReviewTranslations = {
     ko: "IIDX Tower 데이터 없음",
   },
   "monthlyReview.activity.bestDaysTitle": {
-    ja: "今月のベスト日",
-    en: "Best Days This Month",
-    "zh-TW": "本月最佳日",
-    ko: "이번 달 베스트 데이",
+    ja: "{period}のベスト日",
+    en: "Best Days ({period})",
+    "zh-TW": "{period}最佳日",
+    ko: "{period} 베스트 데이",
   },
   "monthlyReview.activity.bestGrowthDay": {
     ja: "一番伸びた日",
@@ -319,22 +325,22 @@ export const monthlyReviewTranslations = {
   },
   // BPI section
   "monthlyReview.bpi.growthText": {
-    ja: "今月は {start} から {end} へ上昇し、+{diff} の成長を遂げました。",
-    en: "This month your BPI grew from {start} to {end} (+{diff}).",
-    "zh-TW": "本月BPI從 {start} 升至 {end}（+{diff}）。",
-    ko: "이번 달 BPI가 {start}에서 {end}로 성장했습니다（+{diff}）.",
+    ja: "{period}は {start} から {end} へ上昇し、+{diff} の成長を遂げました。",
+    en: "{period} your BPI grew from {start} to {end} (+{diff}).",
+    "zh-TW": "{period}BPI從 {start} 升至 {end}（+{diff}）。",
+    ko: "{period} BPI가 {start}에서 {end}로 성장했습니다（+{diff}）.",
   },
   "monthlyReview.bpi.dropText": {
-    ja: "今月は {start} から {end} へ変動しました。",
-    en: "This month your BPI changed from {start} to {end}.",
-    "zh-TW": "本月BPI從 {start} 變動至 {end}。",
-    ko: "이번 달 BPI가 {start}에서 {end}로 변동되었습니다.",
+    ja: "{period}は {start} から {end} へ変動しました。",
+    en: "{period} your BPI changed from {start} to {end}.",
+    "zh-TW": "{period}BPI從 {start} 變動至 {end}。",
+    ko: "{period} BPI가 {start}에서 {end}로 변동되었습니다.",
   },
   "monthlyReview.bpi.noChange": {
-    ja: "今月の総合BPIに変動はありませんでした。",
-    en: "No change in total BPI this month.",
-    "zh-TW": "本月總合BPI無變動。",
-    ko: "이번 달 총합 BPI에 변동이 없었습니다.",
+    ja: "{period}の総合BPIに変動はありませんでした。",
+    en: "No change in total BPI ({period}).",
+    "zh-TW": "{period}總合BPI無變動。",
+    ko: "{period} 총합 BPI에 변동이 없었습니다.",
   },
   // Arena
   "monthlyReview.arena.sectionHeading": {
@@ -344,10 +350,10 @@ export const monthlyReviewTranslations = {
     ko: "아레나 전적",
   },
   "monthlyReview.arena.summaryText": {
-    ja: "今月のアリーナ最高クラスは {class} でした。",
-    en: "Your best arena class this month was {class}.",
-    "zh-TW": "本月最高競技場級別為 {class}。",
-    ko: "이번 달 아레나 최고 클래스는 {class}였습니다.",
+    ja: "{period}のアリーナ最高クラスは {class} でした。",
+    en: "Your best arena class ({period}) was {class}.",
+    "zh-TW": "{period}最高競技場級別為 {class}。",
+    ko: "{period} 아레나 최고 클래스는 {class}였습니다.",
   },
   "monthlyReview.arena.summaryRank": {
     ja: "最高順位は {rank} 位。",
@@ -382,10 +388,10 @@ export const monthlyReviewTranslations = {
     ko: "레이더별 성장",
   },
   "monthlyReview.radar.sectionDesc": {
-    ja: "今月伸びた曲をレーダー要素別に集計しました",
-    en: "Songs improved this month, grouped by radar element",
-    "zh-TW": "本月進步的曲目，依雷達要素分類",
-    ko: "이번 달 향상된 곡을 레이더 요소별로 집계했습니다",
+    ja: "{period}伸びた曲をレーダー要素別に集計しました",
+    en: "Songs improved ({period}), grouped by radar element",
+    "zh-TW": "{period}進步的曲目，依雷達要素分類",
+    ko: "{period} 향상된 곡을 레이더 요소별로 집계했습니다",
   },
   "monthlyReview.radar.elementGrowth": {
     ja: "各要素の成長",
@@ -497,10 +503,10 @@ export const monthlyReviewTranslations = {
     ko: "이번 기간 동안 총 {count}곡에서 라이벌에 뒤졌습니다.",
   },
   "monthlyReview.rivals.summaryNoChange": {
-    ja: "今月のライバルとの力関係に変動はありませんでした。",
-    en: "No changes in rival standings this month.",
-    "zh-TW": "本月與對手之間無力量對比變動。",
-    ko: "이번 달 라이벌과의 역학 관계에 변동이 없었습니다.",
+    ja: "{period}のライバルとの力関係に変動はありませんでした。",
+    en: "No changes in rival standings ({period}).",
+    "zh-TW": "{period}與對手之間無力量對比變動。",
+    ko: "{period} 라이벌과의 역학 관계에 변동이 없었습니다.",
   },
   // Footer
   "monthlyReview.footer.shareX": {
@@ -551,6 +557,24 @@ export const monthlyReviewTranslations = {
     en: "All",
     "zh-TW": "全部",
     ko: "전체",
+  },
+  "monthlyReview.period.thisMonth": {
+    ja: "今月",
+    en: "This month",
+    "zh-TW": "本月",
+    ko: "이번 달",
+  },
+  "monthlyReview.period.thisYear": {
+    ja: "今年",
+    en: "This year",
+    "zh-TW": "今年",
+    ko: "올해",
+  },
+  "monthlyReview.period.allTime": {
+    ja: "全期間",
+    en: "Overall",
+    "zh-TW": "全期間",
+    ko: "전체 기간",
   },
   "monthlyReview.period.selectAll": {
     ja: "{version}全体を表示",
