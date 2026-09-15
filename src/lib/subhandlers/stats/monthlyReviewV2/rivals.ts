@@ -7,7 +7,11 @@ import {
   buildGrowthRanking,
   buildGrowthTimeline,
 } from "@/lib/monthly-review/rivals";
-import { resolveMonthlyReviewPeriod, computeOwnerBpiTimeline } from "./_shared";
+import {
+  resolveMonthlyReviewPeriod,
+  computeOwnerBpiTimeline,
+  previousVersionOf,
+} from "./_shared";
 import type { AccessResult } from "@/middlewares/api/withApi";
 import type { HandlerResult } from "@/types/api";
 
@@ -20,14 +24,24 @@ export async function handleStatsMonthlyReviewRivals(
   const viewerId = access.viewerId;
 
   try {
-    const { monthStart, monthEnd, useMonthBuckets } = resolveMonthlyReviewPeriod(
-      month,
-    );
+    const { granularity, monthStart, monthEnd, useMonthBuckets } =
+      resolveMonthlyReviewPeriod(month);
+    // 「全期間」モードは期間開始前スコアとの比較が意味を持たないため
+    // 前バージョンとの比較に切り替える（top-songs/radar-growthと同じ既定値）
+    const compareVersion =
+      granularity === "version" ? (previousVersionOf(version) ?? undefined) : undefined;
 
     const [userCurrentL1112, preL1112, bpiTimeline] = await Promise.all([
       monthlyReviewRepo.getUserCurrentL1112Scores(owner, version),
       monthlyReviewRepo.getUserPreMonthL1112Scores(owner, version, monthStart),
-      computeOwnerBpiTimeline(owner, version, monthStart, monthEnd, useMonthBuckets),
+      computeOwnerBpiTimeline(
+        owner,
+        version,
+        monthStart,
+        monthEnd,
+        useMonthBuckets,
+        compareVersion,
+      ),
     ]);
 
     const userL1112SongIds = userCurrentL1112.map((s) => s.songId);
@@ -50,19 +64,26 @@ export async function handleStatsMonthlyReviewRivals(
       userPreL1112Map,
     );
 
-    const [rivalPreMonthState, rivalInMonthHistory] = await Promise.all([
-      monthlyReviewRepo.getPreMonthBpiStateForUsers(
-        rivals.map((r) => r.userId),
-        version,
-        monthStart,
-      ),
-      monthlyReviewRepo.getInMonthScoreHistoryForUsers(
-        rivals.map((r) => r.userId),
-        version,
-        monthStart,
-        monthEnd,
-      ),
-    ]);
+    const rivalUserIds = rivals.map((r) => r.userId);
+    const [rivalPreMonthState, rivalInMonthHistory, rivalCompareVersionState] =
+      await Promise.all([
+        compareVersion
+          ? Promise.resolve([])
+          : monthlyReviewRepo.getPreMonthBpiStateForUsers(
+              rivalUserIds,
+              version,
+              monthStart,
+            ),
+        monthlyReviewRepo.getInMonthScoreHistoryForUsers(
+          rivalUserIds,
+          version,
+          monthStart,
+          monthEnd,
+        ),
+        compareVersion
+          ? monthlyReviewRepo.getVersionBpiStateForUsers(rivalUserIds, compareVersion)
+          : Promise.resolve(undefined),
+      ]);
 
     const rivalComputedTimeline = attachRivalBpiTimelines(
       rivals,
@@ -70,6 +91,7 @@ export async function handleStatsMonthlyReviewRivals(
       rivalInMonthHistory,
       bpiTimeline.allL12SongMeta,
       useMonthBuckets,
+      rivalCompareVersionState,
     );
     const rivalsGrowthRanking = buildGrowthRanking(
       rivals,

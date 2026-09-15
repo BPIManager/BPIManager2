@@ -54,6 +54,7 @@ export async function handleStatsMonthlyReviewRadarGrowth(q: {
       bpiTimeline.ownerPreMonthExScoreMap,
       bpiTimeline.finalExScoreMap,
       topBpiSongs,
+      bpiTimeline.ownerInMonthHistory,
     );
     return ok({
       radarGrowth: radarGrowth.length > 0 ? radarGrowth : null,

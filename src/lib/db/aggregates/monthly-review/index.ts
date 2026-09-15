@@ -8,7 +8,10 @@ import { wherePublicOnly } from "@/lib/db/shared/visibility";
 import { scoresRepo } from "@/lib/db/domains/scores";
 import { iidxTowerRepo } from "@/lib/db/domains/iidxTower";
 import { songsRepo } from "@/lib/db/domains/songs";
-import { getArenaStatsHistory } from "@/lib/db/domains/arenaHistory";
+import {
+  getArenaStatsHistory,
+  getLatestArenaStatsPerVersion,
+} from "@/lib/db/domains/arenaHistory";
 
 const jstDayStart = (jstDate: string): Date =>
   new Date(`${jstDate}T00:00:00+09:00`);
@@ -58,6 +61,11 @@ class MonthlyReviewRepository {
       new Date(`${monthStart}T00:00:00+09:00`),
       new Date(`${monthEnd}T23:59:59+09:00`),
     );
+  }
+
+  /** バージョンごとの最終（そのバージョンで最後に取得された）アリーナ戦績を取得する（全期間振り返りのアリーナ履歴用） */
+  async getArenaVersionHistory(userId: string) {
+    return getLatestArenaStatsPerVersion(userId);
   }
 
   async getMonthlyTowerRanking(

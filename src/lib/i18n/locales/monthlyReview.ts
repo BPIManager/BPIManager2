@@ -299,6 +299,18 @@ export const monthlyReviewTranslations = {
     "zh-TW": "最高A1維持次數",
     ko: "최고 A1 유지 횟수",
   },
+  "monthlyReview.arena.versionHistoryTitle": {
+    ja: "バージョン別 最終戦績",
+    en: "Final Standing by Version",
+    "zh-TW": "各版本 最終戰績",
+    ko: "버전별 최종 전적",
+  },
+  "monthlyReview.arena.versionHistoryNote": {
+    ja: "※ 各バージョンで最後に記録された時点のクラス・順位です。そのバージョン内での最高到達点ではありません。",
+    en: "※ Class and rank as of the last recorded snapshot for each version — not the peak reached during that version.",
+    "zh-TW": "※ 為各版本最後一次記錄時的級別與排名，並非該版本內的最高紀錄。",
+    ko: "※ 각 버전에서 마지막으로 기록된 시점의 클래스・순위입니다. 해당 버전 내 최고 도달점이 아닙니다.",
+  },
   "monthlyReview.banner.title": {
     ja: "月次まとめで振り返る",
     en: "Check your monthly review",

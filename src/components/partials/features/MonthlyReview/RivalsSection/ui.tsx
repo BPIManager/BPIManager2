@@ -168,7 +168,9 @@ const RivalsSectionUI = ({
                       entries={ranking.byAbsGrowth}
                       valueKey="bpiGrowth"
                       formatValue={(e) =>
-                        `${e.bpiGrowth >= 0 ? "+" : ""}${e.bpiGrowth.toFixed(2)}`
+                        e.bpiGrowth == null
+                          ? "-"
+                          : `${e.bpiGrowth >= 0 ? "+" : ""}${e.bpiGrowth.toFixed(2)}`
                       }
                     />
                     {ranking.byGrowthRate.length > 0 && (
@@ -177,7 +179,9 @@ const RivalsSectionUI = ({
                         entries={ranking.byGrowthRate}
                         valueKey="growthRate"
                         formatValue={(e) =>
-                          `${(e.growthRate ?? 0) >= 0 ? "+" : ""}${(e.growthRate ?? 0).toFixed(1)}%`
+                          e.growthRate == null
+                            ? "-"
+                            : `${e.growthRate >= 0 ? "+" : ""}${e.growthRate.toFixed(1)}%`
                         }
                       />
                     )}

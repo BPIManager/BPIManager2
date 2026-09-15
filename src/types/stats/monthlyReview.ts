@@ -39,7 +39,8 @@ export interface RivalBpiGrowthEntry {
   userName: string;
   profileImage: string | null;
   isViewer: boolean;
-  bpiGrowth: number;
+  /** 比較先バージョンにデータが無いライバルはnull（「-」表示用） */
+  bpiGrowth: number | null;
   growthRate: number | null;
 }
 
@@ -59,6 +60,13 @@ export interface MonthlyArena {
   bestClass: string;
   bestRank: number | null;
   maxA1Continue: number | null;
+}
+
+export interface ArenaVersionHistoryEntry {
+  version: string;
+  arenaClass: string;
+  /** そのバージョンで最後に取得された時点の順位（最高到達点ではない） */
+  arenaRank: number | null;
 }
 
 export interface RadarGrowthEntry {
@@ -124,6 +132,7 @@ export interface MonthlyReviewRadarGrowth {
 
 export interface MonthlyReviewArena {
   arena: MonthlyArena | null;
+  versionHistory: ArenaVersionHistoryEntry[];
 }
 
 export interface MonthlyReviewData

@@ -1,4 +1,6 @@
 import { BpiCalculator } from "@/lib/bpi";
+import { calculateTotalBpiForScores } from "./bpi";
+import dayjs from "@/lib/dayjs";
 import { ALL_CATEGORIES } from "@/lib/radar/calculator";
 import { topElementMap } from "@/constants/iidx/radars/topElements";
 import type {
@@ -25,6 +27,50 @@ function observationsFor(
   }));
 }
 
+/**
+ * フォールバック時（比較先バージョンのデータが無く曲ごとのdiffが定義できない）の
+ * 「成長推移」。songごとのdiffを積み上げる方式が使えないため、実際のスコア更新
+ * 履歴を時系列に再生し、この要素の曲群だけで-15基準から総合BPIを逐次計算する
+ * （Hero側のbuildBpiTimelineと同じ考え方をこの要素の曲集合に限定して適用する）。
+ */
+function buildElementTimelineFromHistory(
+  ownerInMonthHistory: {
+    songId: number;
+    exScore: number | null;
+    lastPlayed: Date | string;
+  }[],
+  elementSongIds: Set<number>,
+  elementSongs: SongMeta[],
+  elementBpiStart: number,
+): { date: string; cumDiff: number }[] {
+  const filtered = ownerInMonthHistory.filter((e) => elementSongIds.has(e.songId));
+  if (filtered.length === 0) return [];
+
+  const byDate = new Map<string, typeof filtered>();
+  for (const entry of filtered) {
+    const dateStr = dayjs(entry.lastPlayed as Parameters<typeof dayjs>[0])
+      .tz()
+      .format("YYYY-MM-DD");
+    const arr = byDate.get(dateStr) ?? [];
+    arr.push(entry);
+    byDate.set(dateStr, arr);
+  }
+
+  const scoreMap = new Map<number, number>();
+  const timeline: { date: string; cumDiff: number }[] = [];
+  for (const date of Array.from(byDate.keys()).sort()) {
+    for (const update of byDate.get(date)!) {
+      if (update.exScore != null) scoreMap.set(update.songId, Number(update.exScore));
+    }
+    const currentBpi = calculateTotalBpiForScores(scoreMap, elementSongs);
+    timeline.push({
+      date,
+      cumDiff: Math.round((currentBpi - elementBpiStart) * 100) / 100,
+    });
+  }
+  return timeline;
+}
+
 export function buildRadarGrowth(
   topImprovedSongs: TopSongImproved[],
   allL12SongMeta: SongMeta[],
@@ -38,6 +84,8 @@ export function buildRadarGrowth(
    * （diff/bpiBefore/bpiAfterは意味を持たないダミー値になる）
    */
   fallbackTopSongs?: TopSong[],
+  /** フォールバック時の「純粋な成長推移」再計算用（省略時は空扱い） */
+  ownerInMonthHistory?: { songId: number; exScore: number | null; lastPlayed: Date | string }[],
 ): RadarGrowthEntry[] {
   const songById = new Map(allL12SongMeta.map((s) => [s.songId, s]));
   const elementSongsMap = new Map<string, TopSongImproved[]>();
@@ -100,18 +148,29 @@ export function buildRadarGrowth(
     const totalDiff =
       Math.round((elementBpiEnd - elementBpiStart) * 100) / 100;
 
-    const dailyDiffMap = new Map<string, number>();
-    for (const song of songs) {
-      const date = songUpdateDateMap.get(song.songId);
-      if (date)
-        dailyDiffMap.set(date, (dailyDiffMap.get(date) ?? 0) + song.diff);
-    }
-    const sortedDates = Array.from(dailyDiffMap.keys()).sort();
-    let cumDiff = 0;
-    const timeline: { date: string; cumDiff: number }[] = [];
-    for (const date of sortedDates) {
-      cumDiff += dailyDiffMap.get(date) ?? 0;
-      timeline.push({ date, cumDiff: Math.round(cumDiff * 100) / 100 });
+    let timeline: { date: string; cumDiff: number }[];
+    if (usingFallback) {
+      const elementSongIds = new Set(elementSongs.map((s) => s.songId));
+      timeline = buildElementTimelineFromHistory(
+        ownerInMonthHistory ?? [],
+        elementSongIds,
+        elementSongs,
+        elementBpiStart,
+      );
+    } else {
+      const dailyDiffMap = new Map<string, number>();
+      for (const song of songs) {
+        const date = songUpdateDateMap.get(song.songId);
+        if (date)
+          dailyDiffMap.set(date, (dailyDiffMap.get(date) ?? 0) + song.diff);
+      }
+      const sortedDates = Array.from(dailyDiffMap.keys()).sort();
+      let cumDiff = 0;
+      timeline = [];
+      for (const date of sortedDates) {
+        cumDiff += dailyDiffMap.get(date) ?? 0;
+        timeline.push({ date, cumDiff: Math.round(cumDiff * 100) / 100 });
+      }
     }
 
     radarGrowth.push({

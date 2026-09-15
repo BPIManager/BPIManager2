@@ -124,6 +124,9 @@ export async function computeOwnerBpiTimeline(
     // レーダー別成長（radarGrowth.ts）の「期間前」baselineにもcompareVersionを
     // 反映させるため、指定時はそちらを返す
     ownerPreMonthExScoreMap: compareVersionExScoreMap ?? ownerPreMonthExScoreMap,
+    // レーダー別成長のフォールバック時の「純粋な成長推移」再計算用に生の
+    // スコア更新履歴も返す
+    ownerInMonthHistory,
     finalExScoreMap,
     allL12SongMeta,
   };

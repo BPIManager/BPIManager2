@@ -260,6 +260,7 @@ export default function MonthlyReviewPage() {
           activity: activity.data,
           rivals: rivals.data,
           arena: arena.data?.arena ?? null,
+          arenaVersionHistory: arena.data?.versionHistory ?? [],
           radarGrowth: radarGrowth.data?.radarGrowth ?? null,
           radarGrowthCompareVersion: radarGrowth.data?.compareVersion ?? null,
           radarGrowthUsingFallback: radarGrowth.data?.usingFallbackComparison ?? false,

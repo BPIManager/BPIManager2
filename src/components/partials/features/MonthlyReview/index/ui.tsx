@@ -15,6 +15,7 @@ import type {
   MonthlyReviewActivity,
   MonthlyReviewRivals,
   MonthlyArena,
+  ArenaVersionHistoryEntry,
   RadarGrowthEntry,
 } from "@/types/stats/monthlyReview";
 
@@ -29,6 +30,7 @@ export interface MonthlyReviewViewSections {
   activity: MonthlyReviewActivity | undefined;
   rivals: MonthlyReviewRivals | undefined;
   arena: MonthlyArena | null;
+  arenaVersionHistory: ArenaVersionHistoryEntry[];
   radarGrowth: RadarGrowthEntry[] | null;
   radarGrowthCompareVersion: string | null;
   radarGrowthUsingFallback: boolean;
@@ -98,7 +100,13 @@ const MonthlyReviewViewUI = ({
           granularity={data.granularity}
         />
       )}
-      {data.arena && <ArenaSection arena={data.arena} granularity={data.granularity} />}
+      {(data.arena || data.arenaVersionHistory.length > 0) && (
+        <ArenaSection
+          arena={data.arena}
+          versionHistory={data.arenaVersionHistory}
+          granularity={data.granularity}
+        />
+      )}
       <FooterSection
         month={data.month}
         version={data.version}
