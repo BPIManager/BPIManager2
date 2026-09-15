@@ -89,16 +89,38 @@ export async function updateAllUserRadarCache() {
           }));
         const totalBpi = BpiCalculator.calculateTotalBPI(observations, master);
 
+        const values = {
+          notes: radar.NOTES.totalBpi,
+          chord: radar.CHORD.totalBpi,
+          peak: radar.PEAK.totalBpi,
+          charge: radar.CHARGE.totalBpi,
+          scratch: radar.SCRATCH.totalBpi,
+          soflan: radar.SOFLAN.totalBpi,
+          totalBpi,
+        };
+        // BPI計算ライブラリ側で不正なチャートデータ（mu/sigma欠損等）に当たると
+        // NaNを返すことがある。`NaN.toFixed(2)`は例外を投げず文字列"NaN"になり、
+        // decimal列への一括INSERTがバッチ全体失敗するため、書き込み前に弾く
+        const invalidKey = Object.entries(values).find(
+          ([, v]) => !Number.isFinite(v),
+        )?.[0];
+        if (invalidKey) {
+          console.error(
+            `[Radar] Skipped user ${user.userId}: non-finite ${invalidKey} (${values[invalidKey as keyof typeof values]})`,
+          );
+          return;
+        }
+
         pendingRows.push({
           userId: user.userId,
           version,
-          notes: radar.NOTES.totalBpi.toFixed(2),
-          chord: radar.CHORD.totalBpi.toFixed(2),
-          peak: radar.PEAK.totalBpi.toFixed(2),
-          charge: radar.CHARGE.totalBpi.toFixed(2),
-          scratch: radar.SCRATCH.totalBpi.toFixed(2),
-          soflan: radar.SOFLAN.totalBpi.toFixed(2),
-          totalBpi: totalBpi.toFixed(2),
+          notes: values.notes.toFixed(2),
+          chord: values.chord.toFixed(2),
+          peak: values.peak.toFixed(2),
+          charge: values.charge.toFixed(2),
+          scratch: values.scratch.toFixed(2),
+          soflan: values.soflan.toFixed(2),
+          totalBpi: values.totalBpi.toFixed(2),
         });
       }
     } catch (e) {
