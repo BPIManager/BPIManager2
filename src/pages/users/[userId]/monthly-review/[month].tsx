@@ -48,7 +48,8 @@ export default function MonthlyReviewPage() {
   // configボタンから変更可能）。未指定時はサーバー側で既定値（前バージョン）が使われる。
   // ルート（対象期間）が変わったら選択をリセットする（レンダー中の状態調整）
   const routeKey = `${userIdStr ?? ""}:${version}:${month ?? ""}`;
-  const [compareVersionRouteKey, setCompareVersionRouteKey] = useState(routeKey);
+  const [compareVersionRouteKey, setCompareVersionRouteKey] =
+    useState(routeKey);
   const [compareVersion, setCompareVersion] = useState<string | undefined>(
     undefined,
   );
@@ -58,7 +59,12 @@ export default function MonthlyReviewPage() {
   }
 
   const bpi = useMonthlyReviewBpi(userIdStr, version, month, compareVersion);
-  const topSongs = useMonthlyReviewTopSongs(userIdStr, version, month, compareVersion);
+  const topSongs = useMonthlyReviewTopSongs(
+    userIdStr,
+    version,
+    month,
+    compareVersion,
+  );
   const activity = useMonthlyReviewActivity(userIdStr, version, month);
   const rivals = useMonthlyReviewRivals(userIdStr, version, month);
   const arena = useMonthlyReviewArena(userIdStr, version, month);
@@ -71,8 +77,16 @@ export default function MonthlyReviewPage() {
 
   const sections = [
     { key: "bpi", label: t("monthlyReview.loading.bpi"), ...bpi },
-    { key: "topSongs", label: t("monthlyReview.loading.topSongs"), ...topSongs },
-    { key: "activity", label: t("monthlyReview.loading.activity"), ...activity },
+    {
+      key: "topSongs",
+      label: t("monthlyReview.loading.topSongs"),
+      ...topSongs,
+    },
+    {
+      key: "activity",
+      label: t("monthlyReview.loading.activity"),
+      ...activity,
+    },
     { key: "rivals", label: t("monthlyReview.loading.rivals"), ...rivals },
     { key: "arena", label: t("monthlyReview.loading.arena"), ...arena },
     {
@@ -115,7 +129,7 @@ export default function MonthlyReviewPage() {
     router.isReady && userIdStr && month ? (
       <Meta
         title={t("page.monthlyReviewShare.title")}
-        ogImage={`${API_V2_PREFIX}/users/${userIdStr}/stats/monthly-review/ogp?version=${version}&month=${month}`}
+        ogImage={`https://bpi2.poyashi.me${API_V2_PREFIX}/users/${userIdStr}/stats/monthly-review/ogp?version=${version}&month=${month}`}
       />
     ) : null;
 
@@ -263,7 +277,8 @@ export default function MonthlyReviewPage() {
           arenaVersionHistory: arena.data?.versionHistory ?? [],
           radarGrowth: radarGrowth.data?.radarGrowth ?? null,
           radarGrowthCompareVersion: radarGrowth.data?.compareVersion ?? null,
-          radarGrowthUsingFallback: radarGrowth.data?.usingFallbackComparison ?? false,
+          radarGrowthUsingFallback:
+            radarGrowth.data?.usingFallbackComparison ?? false,
         }}
         topSongsLoading={topSongs.isLoading}
         radarGrowthLoading={radarGrowth.isLoading}
