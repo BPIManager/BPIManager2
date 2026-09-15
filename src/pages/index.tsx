@@ -30,6 +30,7 @@ import { useLayoutConfig } from "@/hooks/dashboard/useLayoutConfig";
 import { WidgetId } from "@/types/dashboard/layout";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 
 function WidgetRenderer({
   id,
@@ -78,7 +79,18 @@ export default function DashboardPage() {
   const { t } = useTranslation();
 
   if (isUserLoading) {
-    return <PageLoader size="lg" />;
+    // 未認証判定が終わる前の初回レンダー（＝クローラが見る静的HTML）でも
+    // マーケティング用のMeta（LoginPageと同内容）が出るようにする
+    return (
+      <>
+        <Meta
+          title=""
+          description={t("login.subTitle")}
+          ogImage={`https://bpi2.poyashi.me${API_V2_PREFIX}/site/ogp-sample`}
+        />
+        <PageLoader size="lg" />
+      </>
+    );
   }
 
   if (!fbUser) return <LoginPage />;

@@ -2,11 +2,10 @@ import { readFileSync } from "fs";
 import path from "path";
 import satori from "satori";
 import { Resvg } from "@resvg/resvg-js";
-import dayjs from "@/lib/dayjs";
 import { usersRepo } from "@/lib/db/domains/users";
 import { buildRadarGrowth } from "@/lib/monthly-review/radar";
+import { periodHeadingOf } from "@/lib/monthly-review/period";
 import { getRankDetail } from "@/constants/iidx/rankBorders";
-import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 import {
   resolveMonthlyReviewPeriod,
   computeOwnerBpiTimeline,
@@ -40,20 +39,6 @@ function loadFont(weight: "regular" | "bold"): Buffer {
   return regularFontCache;
 }
 
-function periodHeadingOf(
-  month: string,
-  version: string,
-  granularity: "month" | "year" | "version",
-): string {
-  if (granularity === "version") {
-    const versionName =
-      version === "INF" ? "INFINITAS" : `IIDX ${getVersionNameFromNumber(version)}`;
-    return `${versionName}の振り返り`;
-  }
-  if (granularity === "year") return `${dayjs.tz(`${month}-01-01`).format("YYYY年")}の振り返り`;
-  return `${dayjs.tz(`${month}-01`).format("YYYY年M月")}の振り返り`;
-}
-
 /**
  * satoriはSVGパーサーが弱く、dicebearのSVGアバター(identicon等)を読み込めない
  * （実機確認: "Failed to parse SVG image"で画像だけ無言で欠落する）ため、
@@ -75,11 +60,11 @@ function scoreLabelOf(exScore: number, notes: number): string {
   return `${rd.label}+${rd.surplus}`;
 }
 
-const RADAR_SIZE = 250;
-const RADAR_RADIUS = 88;
+const RADAR_SIZE = 316;
+const RADAR_RADIUS = 111;
 const RADAR_LABEL_RADIUS = RADAR_RADIUS + 30;
-const RADAR_PAD_X = 42;
-const RADAR_PAD_Y = 14;
+const RADAR_PAD_X = 52;
+const RADAR_PAD_Y = 10;
 
 /**
  * 現時点の要素別BPI（成長ではなく最終状態）をレーダーチャート（多角形）として描画する。
@@ -191,42 +176,18 @@ function RadarPolygonChart({
   );
 }
 
-export async function generateMonthlyReviewOgpImage(q: {
-  userId: string;
-  version: string;
-  month: string;
-}): Promise<Buffer> {
-  const { monthStart, monthEnd, useMonthBuckets, granularity } =
-    resolveMonthlyReviewPeriod(q.month);
+interface OgpRenderData {
+  heading: string;
+  userName: string;
+  profileImage: string | null;
+  bpiEnd: number;
+  bpiDiff: number;
+  topSongs: { songId: number; title: string; bpi: number; exScore: number; notes: number }[];
+  topRadar: { element: string; bpiEnd: number }[];
+}
 
-  const [userInfo, bpiTimeline, { latestInMonth, songUpdateDateMap }] =
-    await Promise.all([
-      usersRepo.getDisplayInfo(q.userId),
-      computeOwnerBpiTimeline(q.userId, q.version, monthStart, monthEnd, useMonthBuckets),
-      computeOwnerMonthlyScores(q.userId, q.version, monthStart, monthEnd),
-    ]);
-  const { topBpiSongs, topImprovedSongs } = await computeOwnerTopSongs(
-    q.userId,
-    q.version,
-    monthStart,
-    latestInMonth,
-  );
-  // OGPのノーツレーダーは「伸び」ではなく現時点の最終状態を見せるため、
-  // buildRadarGrowthの結果からbpiEnd（現在の要素別BPI）だけを使う
-  const radarGrowth = buildRadarGrowth(
-    topImprovedSongs,
-    bpiTimeline.allL12SongMeta,
-    songUpdateDateMap,
-    bpiTimeline.ownerPreMonthExScoreMap,
-    bpiTimeline.finalExScoreMap,
-    topBpiSongs,
-  );
-
-  const heading = periodHeadingOf(q.month, q.version, granularity);
-  const topSongs = topBpiSongs.slice(0, TOP_SONGS_COUNT);
-  const topRadar = [...radarGrowth]
-    .sort((a, b) => b.bpiEnd - a.bpiEnd)
-    .slice(0, RADAR_ELEMENTS_COUNT);
+async function renderOgpImage(data: OgpRenderData): Promise<Buffer> {
+  const { heading, userName, profileImage, bpiEnd, bpiDiff, topSongs, topRadar } = data;
 
   const svg = await satori(
     <div
@@ -243,11 +204,11 @@ export async function generateMonthlyReviewOgpImage(q: {
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 10 }}>
-        {userInfo?.profileImage ? (
+        {profileImage ? (
           // satori用のJSXで、next/imageではなく生のimg要素を渡す必要がある
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={toSatoriSafeImageUrl(userInfo.profileImage)}
+            src={toSatoriSafeImageUrl(profileImage)}
             alt=""
             width={44}
             height={44}
@@ -267,11 +228,11 @@ export async function generateMonthlyReviewOgpImage(q: {
               color: "rgba(255,255,255,0.6)",
             }}
           >
-            {(userInfo?.userName ?? q.userId).slice(0, 2)}
+            {userName.slice(0, 2)}
           </div>
         )}
         <div style={{ display: "flex", fontSize: 24, color: "rgba(255,255,255,0.55)" }}>
-          {userInfo?.userName ?? q.userId}
+          {userName}
         </div>
       </div>
 
@@ -292,7 +253,7 @@ export async function generateMonthlyReviewOgpImage(q: {
         </div>
         <div style={{ display: "flex", alignItems: "flex-end", gap: 16 }}>
           <div style={{ display: "flex", fontSize: 64, fontWeight: 700, lineHeight: 1 }}>
-            {bpiTimeline.bpiEnd.toFixed(2)}
+            {bpiEnd.toFixed(2)}
           </div>
           <div
             style={{
@@ -300,11 +261,11 @@ export async function generateMonthlyReviewOgpImage(q: {
               fontSize: 26,
               fontWeight: 700,
               paddingBottom: 6,
-              color: bpiTimeline.bpiDiff >= 0 ? "#34d399" : "#f87171",
+              color: bpiDiff >= 0 ? "#34d399" : "#f87171",
             }}
           >
-            {bpiTimeline.bpiDiff >= 0 ? "+" : ""}
-            {bpiTimeline.bpiDiff.toFixed(2)}
+            {bpiDiff >= 0 ? "+" : ""}
+            {bpiDiff.toFixed(2)}
           </div>
         </div>
       </div>
@@ -390,4 +351,77 @@ export async function generateMonthlyReviewOgpImage(q: {
 
   const resvg = new Resvg(svg, { fitTo: { mode: "width", value: WIDTH } });
   return resvg.render().asPng();
+}
+
+export async function generateMonthlyReviewOgpImage(q: {
+  userId: string;
+  version: string;
+  month: string;
+}): Promise<Buffer> {
+  const { monthStart, monthEnd, useMonthBuckets, granularity } =
+    resolveMonthlyReviewPeriod(q.month);
+
+  const [userInfo, bpiTimeline, { latestInMonth, songUpdateDateMap }] =
+    await Promise.all([
+      usersRepo.getDisplayInfo(q.userId),
+      computeOwnerBpiTimeline(q.userId, q.version, monthStart, monthEnd, useMonthBuckets),
+      computeOwnerMonthlyScores(q.userId, q.version, monthStart, monthEnd),
+    ]);
+  const { topBpiSongs, topImprovedSongs } = await computeOwnerTopSongs(
+    q.userId,
+    q.version,
+    monthStart,
+    latestInMonth,
+  );
+  // OGPのノーツレーダーは「伸び」ではなく現時点の最終状態を見せるため、
+  // buildRadarGrowthの結果からbpiEnd（現在の要素別BPI）だけを使う
+  const radarGrowth = buildRadarGrowth(
+    topImprovedSongs,
+    bpiTimeline.allL12SongMeta,
+    songUpdateDateMap,
+    bpiTimeline.ownerPreMonthExScoreMap,
+    bpiTimeline.finalExScoreMap,
+    topBpiSongs,
+  );
+
+  return renderOgpImage({
+    heading: periodHeadingOf(q.month, q.version, granularity),
+    userName: userInfo?.userName ?? q.userId,
+    profileImage: userInfo?.profileImage ?? null,
+    bpiEnd: bpiTimeline.bpiEnd,
+    bpiDiff: bpiTimeline.bpiDiff,
+    topSongs: topBpiSongs.slice(0, TOP_SONGS_COUNT),
+    topRadar: [...radarGrowth]
+      .sort((a, b) => b.bpiEnd - a.bpiEnd)
+      .slice(0, RADAR_ELEMENTS_COUNT),
+  });
+}
+
+/**
+ * Twitter等でBPIM2自体を紹介するランディングページ用のサンプル画像。
+ * 実データに紐づかない架空の値を使う（実在ユーザーの実データを恒久的な
+ * マーケティング素材に使わないため）。
+ */
+export async function generateSampleMonthlyReviewOgpImage(): Promise<Buffer> {
+  return renderOgpImage({
+    heading: "IIDX 33 Sparkle Showerの振り返り",
+    userName: "あなた",
+    profileImage: null,
+    bpiEnd: 65.42,
+    bpiDiff: 8.31,
+    topSongs: [
+      { songId: -1, title: "冥",  bpi: 92.18, exScore: 1987, notes: 1042 },
+      { songId: -2, title: "Legendary Air",  bpi: 84.05, exScore: 2214, notes: 1180 },
+      { songId: -3, title: "革命",  bpi: 78.63, exScore: 2456, notes: 1320 },
+      { songId: -4, title: "冷たい鉄が触れる時",  bpi: 71.29, exScore: 2601, notes: 1408 },
+    ],
+    topRadar: [
+      { element: "SCRATCH", bpiEnd: 60.1 },
+      { element: "CHARGE", bpiEnd: 58.4 },
+      { element: "PEAK", bpiEnd: 55.2 },
+      { element: "CHORD", bpiEnd: 52.8 },
+      { element: "SOFLAN", bpiEnd: 50.5 },
+      { element: "NOTES", bpiEnd: 48.9 },
+    ],
+  });
 }
