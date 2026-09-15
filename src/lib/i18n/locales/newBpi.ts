@@ -527,18 +527,6 @@ export const newBpiTranslations = {
     "zh-TW": "此曲分數分佈的離散（鑑別力）參數。數值越小，表示玩家間分數差距很小卻會使BPI大幅變動。",
     ko: "이 곡 스코어 분포의 퍼짐(변별력) 파라미터. 값이 작을수록 플레이어 간 스코어 차이가 작아도 BPI가 크게 움직이는 곡임을 뜻합니다.",
   },
-  "newBpi.params.n.label": {
-    ja: "観測数 n",
-    en: "Samples n",
-    "zh-TW": "觀測數 n",
-    ko: "관측 수 n",
-  },
-  "newBpi.params.n.hint": {
-    ja: "μ・σ の推定に使えたスコアの件数。少ないほど推定の不確かさが大きく、暫定値の信頼度も下がります。",
-    en: "The number of scores available to estimate μ and σ. Fewer samples mean a more uncertain estimate and lower confidence in the provisional values.",
-    "zh-TW": "可用於推算 μ・σ 的分數筆數。筆數越少，推算的不確定性越大，暫定值的可信度也越低。",
-    ko: "μ・σ 추정에 사용한 스코어 건수. 적을수록 추정의 불확실성이 크고 잠정값의 신뢰도도 낮아집니다.",
-  },
   "newBpi.params.z100.label": {
     ja: "z100",
     en: "z100",

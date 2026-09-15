@@ -12,7 +12,6 @@ import {
   topElementMap,
   topElementsByCategory,
 } from "@/constants/iidx/radars/topElements";
-import { newBpiSongParamMap } from "@/constants/iidx/newBpi/songParams";
 import NewBpiComparisonUi, { NewBpiRow, SortKey } from "./ui";
 import type { CurvePoint } from "./CurveChart";
 import type { FormulaSongInfo } from "./FormulaCard";
@@ -384,7 +383,6 @@ export default function NewBpiComparison({ userId }: Props) {
         wrScore: selectedSong.wrScore,
         mu: selectedSongNewParams?.mu ?? null,
         sigma: selectedSongNewParams?.sigma ?? null,
-        n: newBpiSongParamMap.get(selectedSong.songId)?.n ?? null,
         z100: selectedSongNewParams?.z100 ?? null,
         k: selectedSongNewParams?.k ?? null,
         z0: selectedSongNewParams?.z0 ?? null,

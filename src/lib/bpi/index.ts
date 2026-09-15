@@ -12,7 +12,7 @@ import {
   NEW_BPI_COEF_MEDIAN,
   NEW_BPI_RANK_CURVE,
   NEW_BPI_ARENA_POPULATION_SIZE,
-} from "@/constants/iidx/newBpi/songParams";
+} from "@/constants/iidx/newBpi/modelConstants";
 
 /**
  * BPI（Beat Power Indicator）計算ロジックを提供する静的クラス。
@@ -153,8 +153,7 @@ export class BpiCalculator {
    *
    * V1・V2の間でモデルは変わったが、「総合BPIの値をおおよその順位に変換する」
    * という表示用の目安としての位置づけは変わらないため、原典と同形の
-   * べき乗カーブ（`rank = RANK_BASE_TOTAL^((100-totalBpi)/100)`）をそのまま使う
-   * （V2固有の潜在スキルベースの順位推定 `NewBpiCalculator.estimateRank` とは別物）。
+   * べき乗カーブ（`rank = RANK_BASE_TOTAL^((100-totalBpi)/100)`）をそのまま使う。
    *
    * @param totalBpi - 総合 BPI 値
    * @returns 推定順位（整数）

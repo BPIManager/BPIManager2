@@ -10,7 +10,7 @@ import { buildBpiTimeline } from "@/lib/monthly-review/bpi";
 import { buildRivals, buildGrowthRanking } from "@/lib/monthly-review/rivals";
 import { buildTopSongs } from "@/lib/monthly-review/topSongs";
 import type { IBpiBasicSongData } from "@/types/songs/bpi";
-import { NEW_BPI_Z0 } from "@/constants/iidx/newBpi/songParams";
+import { NEW_BPI_Z0 } from "@/constants/iidx/newBpi/modelConstants";
 
 /** test/unit/logic/bpi.test.ts と同じ、mu/sigmaをkaidenAvg基準で合成するヘルパー。 */
 function withV2Params(

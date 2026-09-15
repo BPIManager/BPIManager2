@@ -3,7 +3,7 @@ import { tOf } from "@bpim/bpicalc";
 import definitions from "../../resources/definitions.json";
 import { BpiCalculator } from "@/lib/bpi";
 import { IBpiBasicSongData, IBpiScoreObservation } from "@/types/songs/bpi";
-import { NEW_BPI_Z0 } from "@/constants/iidx/newBpi/songParams";
+import { NEW_BPI_Z0 } from "@/constants/iidx/newBpi/modelConstants";
 
 /**
  * V2(分布ベース)のmu/sigmaは本来ALS推定で得られる値だが、テストでは

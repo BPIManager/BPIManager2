@@ -11,7 +11,7 @@ import topElements, {
   topElementsByCategory,
 } from "@/constants/iidx/radars/topElements";
 import type { RadarCategory } from "@/types/stats/radar";
-import { NEW_BPI_Z0 } from "@/constants/iidx/newBpi/songParams";
+import { NEW_BPI_Z0 } from "@/constants/iidx/newBpi/modelConstants";
 
 const NOTES = 1000;
 const KAIDEN_AVG = 1500;
