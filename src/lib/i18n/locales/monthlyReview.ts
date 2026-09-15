@@ -575,6 +575,18 @@ export const monthlyReviewTranslations = {
     "zh-TW": "也查看對手的回顧",
     ko: "라이벌 리뷰도 확인하기",
   },
+  "monthlyReview.footer.checkMonthly": {
+    ja: "自分の月別のデータを確認する",
+    en: "Check your own monthly data",
+    "zh-TW": "查看自己各月份的資料",
+    ko: "내 월별 데이터 확인하기",
+  },
+  "monthlyReview.footer.monthlyBpiLine": {
+    ja: "総合BPI {start} → {end}",
+    en: "Total BPI {start} → {end}",
+    "zh-TW": "綜合BPI {start} → {end}",
+    ko: "종합 BPI {start} → {end}",
+  },
   // Period Selector
   "monthlyReview.period.granularity": {
     ja: "粒度",

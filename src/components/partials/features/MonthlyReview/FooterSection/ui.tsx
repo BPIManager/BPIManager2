@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Share2, Users } from "lucide-react";
+import { ArrowLeft, Share2, Users, CalendarDays } from "lucide-react";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import Link from "next/link";
 import {
@@ -27,6 +27,8 @@ interface Props {
   rivalsLoading: boolean;
   currentMonth: string | undefined;
   currentVersion: string;
+  userId: string | undefined;
+  monthlyLinks: { month: string; start: number; end: number }[];
 }
 
 function BpiDiff({ start, end }: { start: number; end: number }) {
@@ -95,10 +97,13 @@ const FooterSectionUI = ({
   rivalsLoading,
   currentMonth,
   currentVersion,
+  userId,
+  monthlyLinks,
 }: Props) => {
-  const { t } = useTranslation();
+  const { t, tFormat } = useTranslation();
   const showRivals = !rivalsLoading && rivals.length > 0 && !!currentMonth;
   const doubled = showRivals ? [...rivals, ...rivals] : [];
+  const showMonthlyLinks = !!userId && monthlyLinks.length > 0;
 
   return (
     <>
@@ -172,6 +177,53 @@ const FooterSectionUI = ({
                   />
                 ))}
               </div>
+            </div>
+          </div>
+        )}
+
+        {showMonthlyLinks && (
+          <div
+            className="w-full max-w-sm flex flex-col gap-3"
+            style={{
+              animation: inView ? "footerFade 0.8s ease-out 0.25s both" : "none",
+            }}
+          >
+            <div className="flex items-center gap-2 px-1">
+              <CalendarDays
+                className="h-3.5 w-3.5"
+                style={{ color: "rgba(255,255,255,0.3)" }}
+              />
+              <span
+                className="text-xs font-semibold"
+                style={{ color: "rgba(255,255,255,0.3)" }}
+              >
+                {t("monthlyReview.footer.checkMonthly")}
+              </span>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              {monthlyLinks.map((m) => (
+                <Link
+                  key={m.month}
+                  href={`/users/${userId}/monthly-review/${m.month}?version=${currentVersion}`}
+                  className="flex items-center justify-between rounded-lg px-3 py-2 text-xs transition-colors hover:bg-white/5"
+                  style={{
+                    background: "rgba(255,255,255,0.03)",
+                    border: "1px solid rgba(255,255,255,0.06)",
+                    color: "rgba(255,255,255,0.55)",
+                  }}
+                >
+                  <span className="font-semibold">
+                    {m.month.replace("-", "/")}
+                  </span>
+                  <span className="font-mono" style={{ color: "rgba(255,255,255,0.4)" }}>
+                    {tFormat("monthlyReview.footer.monthlyBpiLine", {
+                      start: m.start.toFixed(2),
+                      end: m.end.toFixed(2),
+                    })}
+                  </span>
+                </Link>
+              ))}
             </div>
           </div>
         )}

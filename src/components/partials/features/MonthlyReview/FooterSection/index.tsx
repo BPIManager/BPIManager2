@@ -7,6 +7,7 @@ import type {
   MonthlyReviewTopSongs,
 } from "@/types/stats/monthlyReview";
 import { useRivalMonthlyReviewSummary } from "@/hooks/social/useRivalMonthlyReviewSummary";
+import { useMonthlyReviewMonthlySummary } from "@/hooks/stats/useMonthlyReviewMonthlySummary";
 import FooterSectionUI from "./ui";
 
 interface Props {
@@ -28,6 +29,11 @@ const FooterSection = ({ month, version, granularity, bpi, topSongs }: Props) =>
     month: routeMonth,
     version,
   });
+
+  const { data: monthlySummary } = useMonthlyReviewMonthlySummary(userId, version);
+  const monthlyLinks = (monthlySummary?.months ?? []).filter(
+    (m) => m.month !== routeMonth,
+  );
 
   const periodText =
     granularity === "version"
@@ -59,6 +65,8 @@ const FooterSection = ({ month, version, granularity, bpi, topSongs }: Props) =>
       rivalsLoading={rivalsLoading}
       currentMonth={routeMonth}
       currentVersion={version}
+      userId={userId}
+      monthlyLinks={monthlyLinks}
     />
   );
 };
