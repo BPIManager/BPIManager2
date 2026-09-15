@@ -1,10 +1,14 @@
 import type { NextApiRequest } from "next";
 import dayjs from "@/lib/dayjs";
 import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
+import { db } from "@/lib/db";
 import { followListAggregateRepo } from "@/lib/db/aggregates/followList";
-import { monthlyReviewRepo } from "@/lib/db/aggregates/monthly-review";
-import { buildBpiTimeline, calculateTotalBpiForScores } from "@/lib/monthly-review/bpi";
-import { previousVersionOf } from "@/lib/subhandlers/stats/monthlyReviewV2/_shared";
+import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
+import {
+  previousVersionOf,
+  jstDayStart,
+  jstDayEnd,
+} from "@/lib/subhandlers/stats/monthlyReviewV2/_shared";
 import { checkUserAccess } from "@/middlewares/api/withApi";
 import { accessError, err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
@@ -55,7 +59,6 @@ export async function handleRivalMonthlyReviewSummary(
             .tz(`${month as string}-01`)
             .endOf("month")
             .format("YYYY-MM-DD");
-    const useMonthBuckets = isYearMode || isAllMode;
     // 全期間モードは期間開始前スコアとの比較が意味を持たないため、
     // monthly-review側の各エンドポイントと同じく前バージョンとの比較に切り替える
     const compareVersion = isAllMode
@@ -70,74 +73,57 @@ export async function handleRivalMonthlyReviewSummary(
     }
     const rivalIds = rivalRows.map((r) => r.userId);
 
-    const [preMonthState, inMonthHistory, allL12SongMeta, compareVersionState] =
-      await Promise.all([
-        compareVersion
-          ? Promise.resolve([])
-          : monthlyReviewRepo.getPreMonthBpiStateForUsers(
-              rivalIds,
-              version as string,
-              monthStart,
-            ),
-        monthlyReviewRepo.getInMonthScoreHistoryForUsers(
-          rivalIds,
-          version as string,
-          monthStart,
-          monthEnd,
-        ),
-        monthlyReviewRepo.getAllL12SongMeta(),
-        compareVersion
-          ? monthlyReviewRepo.getVersionBpiStateForUsers(rivalIds, compareVersion)
-          : Promise.resolve(undefined),
-      ]);
+    // 総合BPIはシフト法で再計算せず、スコア取り込み時に既にratchet適用済みで
+    // 書き込まれる`userStatusLogs.totalBpi`ログをそのまま使う
+    // （computeOwnerBpiTimelineと同じ設計）
+    const startDate = jstDayStart(monthStart);
+    const endDate = jstDayEnd(monthEnd);
+    const [logsInRange, baselineLogs] = await Promise.all([
+      userStatusLogsRepo.getLogsInRangeBatch(
+        db,
+        rivalIds,
+        version as string,
+        startDate,
+        endDate,
+      ),
+      compareVersion
+        ? userStatusLogsRepo.getLatestTotalBpiBatch(db, rivalIds, compareVersion)
+        : userStatusLogsRepo.getLatestBeforeBatch(
+            db,
+            rivalIds,
+            version as string,
+            startDate,
+          ),
+    ]);
 
-    const preByUser = new Map<string, Map<number, number>>();
-    for (const s of preMonthState) {
-      if (s.exScore == null) continue;
-      if (!preByUser.has(s.userId)) preByUser.set(s.userId, new Map());
-      preByUser.get(s.userId)!.set(s.songId, Number(s.exScore));
+    const logsByUser = new Map<string, { date: string; value: number }[]>();
+    for (const row of logsInRange) {
+      if (row.totalBpi == null) continue;
+      const arr = logsByUser.get(row.userId) ?? [];
+      arr.push({
+        date: dayjs(row.createdAt).tz().format("YYYY-MM-DD"),
+        value: Number(row.totalBpi),
+      });
+      logsByUser.set(row.userId, arr);
     }
-    const compareVersionByUser = new Map<string, Map<number, number>>();
-    for (const s of compareVersionState ?? []) {
-      if (s.exScore == null) continue;
-      if (!compareVersionByUser.has(s.userId))
-        compareVersionByUser.set(s.userId, new Map());
-      compareVersionByUser.get(s.userId)!.set(s.songId, Number(s.exScore));
-    }
-    const historyByUser = new Map<string, typeof inMonthHistory>();
-    for (const s of inMonthHistory) {
-      if (!historyByUser.has(s.userId)) historyByUser.set(s.userId, []);
-      historyByUser.get(s.userId)!.push(s);
+    const baselineByUser = new Map<string, number>();
+    for (const row of baselineLogs) {
+      if (row.totalBpi != null) baselineByUser.set(row.userId, Number(row.totalBpi));
     }
 
     const rivals = rivalRows
       .map((r) => {
-        const history = historyByUser.get(r.userId) ?? [];
-        if (compareVersion) {
-          const compareMap = compareVersionByUser.get(r.userId);
-          if (!compareMap || compareMap.size === 0) return null;
-          const { bpiEnd } = buildBpiTimeline(
-            new Map(),
-            history,
-            allL12SongMeta,
-            useMonthBuckets,
-          );
-          const bpiStart = calculateTotalBpiForScores(compareMap, allL12SongMeta);
-          return {
-            userId: r.userId,
-            userName: r.userName,
-            profileImage: r.profileImage,
-            bpiStart,
-            bpiEnd,
-          };
-        }
-        const preMap = preByUser.get(r.userId) ?? new Map<number, number>();
-        const { bpiStart, bpiEnd } = buildBpiTimeline(
-          preMap,
-          history,
-          allL12SongMeta,
-          useMonthBuckets,
+        const baseline = baselineByUser.get(r.userId);
+        // 全期間モードは比較先バージョンのデータが無いライバルを比較不能として除外
+        if (compareVersion && baseline === undefined) return null;
+        const bpiStart = baseline ?? -15;
+
+        const rawHistory = (logsByUser.get(r.userId) ?? []).sort((a, b) =>
+          a.date.localeCompare(b.date),
         );
+        const bpiEnd =
+          rawHistory.length > 0 ? rawHistory[rawHistory.length - 1].value : bpiStart;
+
         return {
           userId: r.userId,
           userName: r.userName,

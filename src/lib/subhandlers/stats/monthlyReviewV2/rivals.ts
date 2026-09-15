@@ -1,6 +1,8 @@
 import { ok, err } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
+import { db } from "@/lib/db";
 import { monthlyReviewRepo } from "@/lib/db/aggregates/monthly-review";
+import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
 import {
   buildRivals,
   attachRivalBpiTimelines,
@@ -11,6 +13,8 @@ import {
   resolveMonthlyReviewPeriod,
   computeOwnerBpiTimeline,
   previousVersionOf,
+  jstDayStart,
+  jstDayEnd,
 } from "./_shared";
 import type { AccessResult } from "@/middlewares/api/withApi";
 import type { HandlerResult } from "@/types/api";
@@ -65,33 +69,27 @@ export async function handleStatsMonthlyReviewRivals(
     );
 
     const rivalUserIds = rivals.map((r) => r.userId);
-    const [rivalPreMonthState, rivalInMonthHistory, rivalCompareVersionState] =
-      await Promise.all([
-        compareVersion
-          ? Promise.resolve([])
-          : monthlyReviewRepo.getPreMonthBpiStateForUsers(
-              rivalUserIds,
-              version,
-              monthStart,
-            ),
-        monthlyReviewRepo.getInMonthScoreHistoryForUsers(
-          rivalUserIds,
-          version,
-          monthStart,
-          monthEnd,
-        ),
-        compareVersion
-          ? monthlyReviewRepo.getVersionBpiStateForUsers(rivalUserIds, compareVersion)
-          : Promise.resolve(undefined),
-      ]);
+    const startDate = jstDayStart(monthStart);
+    const endDate = jstDayEnd(monthEnd);
+    const [rivalLogsInRange, rivalBaselineLogs] = await Promise.all([
+      userStatusLogsRepo.getLogsInRangeBatch(
+        db,
+        rivalUserIds,
+        version,
+        startDate,
+        endDate,
+      ),
+      compareVersion
+        ? userStatusLogsRepo.getLatestTotalBpiBatch(db, rivalUserIds, compareVersion)
+        : userStatusLogsRepo.getLatestBeforeBatch(db, rivalUserIds, version, startDate),
+    ]);
 
     const rivalComputedTimeline = attachRivalBpiTimelines(
       rivals,
-      rivalPreMonthState,
-      rivalInMonthHistory,
-      bpiTimeline.allL12SongMeta,
+      rivalLogsInRange,
+      rivalBaselineLogs,
       useMonthBuckets,
-      rivalCompareVersionState,
+      !!compareVersion,
     );
     const rivalsGrowthRanking = buildGrowthRanking(
       rivals,

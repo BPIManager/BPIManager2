@@ -1,11 +1,10 @@
-import { buildBpiTimeline, calculateTotalBpiForScores } from "./bpi";
+import dayjs from "@/lib/dayjs";
 import type {
   RivalDiff,
   RivalSongHighlight,
   RivalBpiGrowthEntry,
   GrowthParticipant,
 } from "@/types/stats/monthlyReview";
-import type { IBpiBasicSongData } from "@/types/songs/bpi";
 
 type RivalScoreRow = {
   userId: string;
@@ -116,107 +115,72 @@ export function buildRivals(
 }
 
 /**
- * DBから受け取ったbpi値(decimal列のため文字列で返る場合を含むunknown)を、
- * 未設定時のフォールバック込みでnumberへ変換する。
+ * `userStatusLogs.totalBpi`ログに基づき、各ライバルの総合BPI推移を組み立てる
+ * （{@link computeOwnerBpiTimeline}と同じ設計。シフト法での再計算はしない）。
  *
- * `as number`のような無検証キャストだと文字列がそのまま紛れ込んでも
- * 気づけないため、必ずNumber()で変換してから扱う。
- */
-function toBpiNumber<T>(bpi: unknown, fallback: T): number | T {
-  return bpi != null ? Number(bpi) : fallback;
-}
-
-/**
- * @param rivalPreMonthState - 月内比較（`compareVersion`省略時）用の「期間開始前の
- *   直近スコア」。`compareVersion`指定時は使わない
- * @param rivalCompareVersionState - 全期間モード用、各ライバルの`compareVersion`内
- *   での最新スコア。渡された場合はこちらをbaselineとして使い、かつ`bpiEnd`/`history`
- *   の計算には（ratchet+baseline混在によるdiff固定化を避けるため）常に空のseedを使う
- *   （computeOwnerBpiTimelineと同じ設計）。該当ライバルにこのバージョンのデータが
- *   1件も無い場合は`bpiStart`/`bpiEnd`/`bpiGrowth`を`null`のままにする
- *   （＝比較不能として除外する）
+ * @param rivalLogsInRange - 期間内の全ライバル分totalBpiログ（時系列順である必要はない）
+ * @param rivalBaselineLogs - baseline用ログ。`compareVersion`指定時は各ライバルの
+ *   そのバージョン内最新ログ、省略時は期間開始前の直近ログ
+ * @param requireBaseline - `true`の場合、baselineログが無いライバル（＝比較対象
+ *   バージョンのデータが無い）は比較不能として除外する（全期間モード用）。
+ *   `false`の場合はbaseline無しを`-15`扱いにする（月内比較で期間開始前に
+ *   データが無い＝新規ユーザーのケース）
  */
 export function attachRivalBpiTimelines(
   rivals: RivalDiff[],
-  rivalPreMonthState: { userId: string; songId: number; exScore: unknown }[],
-  rivalInMonthHistory: {
-    userId: string;
-    songId: number;
-    exScore: unknown;
-    lastPlayed: Date | string;
-  }[],
-  songMaster: (IBpiBasicSongData & { songId: number })[],
+  rivalLogsInRange: { userId: string; totalBpi: unknown; createdAt: Date | string }[],
+  rivalBaselineLogs: { userId: string; totalBpi: unknown }[],
   useMonthBuckets: boolean,
-  rivalCompareVersionState?: { userId: string; songId: number; exScore: unknown }[],
+  requireBaseline: boolean,
 ): Map<string, { date: string; value: number }[]> {
-  const rivalPreMonthByUser = new Map<string, Map<number, number>>();
-  for (const s of rivalPreMonthState) {
-    if (s.exScore == null) continue;
-    if (!rivalPreMonthByUser.has(s.userId))
-      rivalPreMonthByUser.set(s.userId, new Map());
-    rivalPreMonthByUser.get(s.userId)!.set(s.songId, Number(s.exScore));
+  const logsByUser = new Map<string, { date: string; value: number }[]>();
+  for (const row of rivalLogsInRange) {
+    if (row.totalBpi == null) continue;
+    const arr = logsByUser.get(row.userId) ?? [];
+    arr.push({
+      date: dayjs(row.createdAt).tz().format("YYYY-MM-DD"),
+      value: Number(row.totalBpi),
+    });
+    logsByUser.set(row.userId, arr);
   }
 
-  const rivalCompareVersionByUser = new Map<string, Map<number, number>>();
-  for (const s of rivalCompareVersionState ?? []) {
-    if (s.exScore == null) continue;
-    if (!rivalCompareVersionByUser.has(s.userId))
-      rivalCompareVersionByUser.set(s.userId, new Map());
-    rivalCompareVersionByUser.get(s.userId)!.set(s.songId, Number(s.exScore));
+  const baselineByUser = new Map<string, number>();
+  for (const row of rivalBaselineLogs) {
+    if (row.totalBpi != null) baselineByUser.set(row.userId, Number(row.totalBpi));
   }
-
-  const rivalInMonthByUser = new Map<string, typeof rivalInMonthHistory>();
-  for (const e of rivalInMonthHistory) {
-    const arr = rivalInMonthByUser.get(e.userId) ?? [];
-    arr.push(e);
-    rivalInMonthByUser.set(e.userId, arr);
-  }
-
-  const usingCompareVersion = !!rivalCompareVersionState;
 
   const rivalComputedTimeline = new Map<
     string,
     { date: string; value: number }[]
   >();
   for (const r of rivals) {
-    const rawInMonth = rivalInMonthByUser.get(r.userId) ?? [];
-    const inMonth = rawInMonth.map((e) => ({
-      songId: e.songId,
-      exScore: toBpiNumber(e.exScore, null),
-      lastPlayed: e.lastPlayed,
-    }));
-
-    if (usingCompareVersion) {
-      const compareMap = rivalCompareVersionByUser.get(r.userId);
-      if (!compareMap || compareMap.size === 0) {
-        // このライバルのcompareVersion内データが無い＝比較不能
-        continue;
-      }
-      const { history, bpiEnd: rBpiEnd } = buildBpiTimeline(
-        new Map(),
-        inMonth,
-        songMaster,
-        useMonthBuckets,
-      );
-      const rBpiStart = calculateTotalBpiForScores(compareMap, songMaster);
-      r.bpiStart = rBpiStart;
-      r.bpiEnd = rBpiEnd;
-      r.bpiGrowth = Math.round((rBpiEnd - rBpiStart) * 100) / 100;
-      rivalComputedTimeline.set(r.userId, history);
-    } else {
-      const preMap =
-        rivalPreMonthByUser.get(r.userId) ?? new Map<number, number>();
-      const { history, bpiStart: rBpiStart, bpiEnd: rBpiEnd } = buildBpiTimeline(
-        preMap,
-        inMonth,
-        songMaster,
-        useMonthBuckets,
-      );
-      r.bpiStart = rBpiStart;
-      r.bpiEnd = rBpiEnd;
-      r.bpiGrowth = Math.round((rBpiEnd - rBpiStart) * 100) / 100;
-      rivalComputedTimeline.set(r.userId, history);
+    const baseline = baselineByUser.get(r.userId);
+    if (requireBaseline && baseline === undefined) {
+      // このライバルのcompareVersion内データが無い＝比較不能
+      continue;
     }
+    const bpiStart = baseline ?? -15;
+
+    const rawHistory = (logsByUser.get(r.userId) ?? []).sort((a, b) =>
+      a.date.localeCompare(b.date),
+    );
+    // 年次/全期間モードは日次だと点が多すぎるため月単位に間引く（同月内は最後の値を採用）
+    const historyMap = new Map<string, number>();
+    for (const h of rawHistory) {
+      const key = useMonthBuckets ? h.date.slice(0, 7) : h.date;
+      historyMap.set(key, h.value);
+    }
+    const history = Array.from(historyMap.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([key, value]) => ({ date: useMonthBuckets ? `${key}-01` : key, value }));
+
+    // 期間内にログが1件も無ければ「更新なし」＝baselineのまま
+    const bpiEnd = history.length > 0 ? history[history.length - 1].value : bpiStart;
+
+    r.bpiStart = bpiStart;
+    r.bpiEnd = bpiEnd;
+    r.bpiGrowth = Math.round((bpiEnd - bpiStart) * 100) / 100;
+    rivalComputedTimeline.set(r.userId, history);
   }
 
   return rivalComputedTimeline;
