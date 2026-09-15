@@ -1,21 +1,21 @@
 export const newBpiTranslations = {
   "page.newBpi.title": {
-    ja: "新BPI比較（検証中）",
-    en: "New BPI Comparison (Experimental)",
-    "zh-TW": "新BPI比較（實驗性）",
-    ko: "새 BPI 비교(실험적)",
+    ja: "新旧BPI比較",
+    en: "V1/V2 BPI Comparison",
+    "zh-TW": "新舊BPI比較",
+    ko: "신구 BPI 비교",
   },
   "page.newBpi.desc": {
-    ja: "分布ベースで再定義した新方式BPIと、現行方式のBPIを楽曲ごとに見比べられます。",
-    en: "Compare your current BPI against the redefined, distribution-based new formula, song by song.",
-    "zh-TW": "可依樂曲比較目前的BPI與以分佈為基礎重新定義的新公式BPI。",
-    ko: "분포 기반으로 재정의한 신규 방식 BPI와 현행 방식의 BPI를 곡별로 비교할 수 있습니다.",
+    ja: "V1(旧)方式と、分布ベースで再定義したV2(現行)方式のBPIを楽曲ごとに見比べられます。",
+    en: "Compare V1 (legacy) BPI against V2 (current), the redefined distribution-based formula, song by song.",
+    "zh-TW": "可依樂曲比較V1（舊）與以分佈為基礎重新定義的V2（現行）BPI。",
+    ko: "V1(구) 방식과 분포 기반으로 재정의한 V2(현행) 방식의 BPI를 곡별로 비교할 수 있습니다.",
   },
   "newBpi.notice": {
-    ja: "この画面は分布ベースの新方式BPIの検証用です。新方式のmu/sigmaはBPIM2登録ユーザー等の実データから暫定算出した値で、正式な本番パラメータではありません。表示されるBPIは今後変更される可能性があります。",
-    en: "This page is a verification tool for the distribution-based new BPI formula. Its mu/sigma values are provisional estimates from real data (BPIM2 users and others), not the final production parameters. Displayed values may change.",
-    "zh-TW": "此頁面為分佈式新公式BPI的驗證工具。新公式的mu/sigma是根據實際資料（BPIM2使用者等）暫定推算的數值，並非正式的正式參數。顯示的數值今後可能變更。",
-    ko: "이 화면은 분포 기반 신규 방식 BPI의 검증용입니다. 신규 방식의 mu/sigma는 실제 데이터(BPIM2 등록 사용자 등)로 잠정 산출한 값이며 정식 프로덕션 파라미터가 아닙니다. 표시되는 BPI는 향후 변경될 수 있습니다.",
+    ja: "このページはV1(旧)・V2(現行)それぞれの方式でBPIを算出し、楽曲ごとに見比べられるツールです。V2は本番で実際に使用している値と同じです。",
+    en: "This page computes BPI under both the V1 (legacy) and V2 (current) formulas so you can compare them song by song. V2 uses the same values as production.",
+    "zh-TW": "此頁面可分別以V1（舊）・V2（現行）公式計算BPI，並依樂曲比較。V2使用與正式環境相同的數值。",
+    ko: "이 페이지는 V1(구)·V2(현행) 방식으로 각각 BPI를 계산해 곡별로 비교할 수 있는 도구입니다. V2는 실제 운영 환경과 동일한 값을 사용합니다.",
   },
   "newBpi.notice.theoryLink": {
     ja: "理論的な説明（Notion）",
@@ -108,10 +108,10 @@ export const newBpiTranslations = {
     ko: "산출 불가",
   },
   "newBpi.table.noParamTooltip": {
-    ja: "この楽曲はプレイヤー数が少なく、新方式のパラメータ(mu/sigma)を推定できませんでした",
-    en: "Too few players on this song to estimate the new formula's parameters (mu/sigma).",
-    "zh-TW": "此樂曲的玩家人數過少，無法推算新公式的參數(mu/sigma)。",
-    ko: "이 곡은 플레이어 수가 적어 신규 방식의 파라미터(mu/sigma)를 추정할 수 없었습니다.",
+    ja: "この楽曲はプレイヤー数が少なく、V2のパラメータ(mu/sigma)を推定できませんでした",
+    en: "Too few players on this song to estimate V2's parameters (mu/sigma).",
+    "zh-TW": "此樂曲的玩家人數過少，無法推算V2的參數(mu/sigma)。",
+    ko: "이 곡은 플레이어 수가 적어 V2의 파라미터(mu/sigma)를 추정할 수 없었습니다.",
   },
   "newBpi.empty": {
     ja: "比較できるスコアがまだありません。まずはスコアを取り込んでください。",
@@ -222,10 +222,10 @@ export const newBpiTranslations = {
     ko: "불러오기에 실패했습니다.",
   },
   "newBpi.chart.desc": {
-    ja: "楽曲を選ぶと、BPIを10刻みで達成するために必要なEXスコアを現行方式・新方式それぞれで結んだ曲線を表示します。●は現在のスコア位置です。",
-    en: "Pick a song to see the EX score needed to reach each BPI (in steps of 10) as a curve for both the current and new formulas. ● marks your current score.",
-    "zh-TW": "選擇樂曲後，會顯示以10為單位達成各BPI所需EX分數的曲線（現行公式與新公式）。●為目前分數的位置。",
-    ko: "곡을 선택하면 BPI를 10단위로 달성하는 데 필요한 EX스코어를 현행 방식과 신규 방식 각각의 곡선으로 표시합니다. ●는 현재 스코어 위치입니다.",
+    ja: "楽曲を選ぶと、BPIを10刻みで達成するために必要なEXスコアをV1・V2それぞれで結んだ曲線を表示します。●は現在のスコア位置です。",
+    en: "Pick a song to see the EX score needed to reach each BPI (in steps of 10) as a curve for both V1 and V2. ● marks your current score.",
+    "zh-TW": "選擇樂曲後，會顯示以10為單位達成各BPI所需EX分數的曲線（V1與V2）。●為目前分數的位置。",
+    ko: "곡을 선택하면 BPI를 10단위로 달성하는 데 필요한 EX스코어를 V1과 V2 각각의 곡선으로 표시합니다. ●는 현재 스코어 위치입니다.",
   },
   "newBpi.chart.songSearchPlaceholder": {
     ja: "楽曲名で検索",
@@ -234,10 +234,10 @@ export const newBpiTranslations = {
     ko: "곡 이름으로 검색",
   },
   "newBpi.radar.desc": {
-    ja: "既存のノーツレーダーと同じカテゴリ分けで、現行方式（青）と新方式（黄）のカテゴリ別総合BPIを比較します。",
-    en: "Compares category-wise total BPI between the current formula (blue) and the new formula (yellow), using the same categories as the existing notes radar.",
-    "zh-TW": "使用與現有音符雷達相同的分類，比較現行公式（藍）與新公式（黃）各分類的綜合BPI。",
-    ko: "기존 노트 레이더와 같은 카테고리 분류로, 현행 방식(파랑)과 신규 방식(노랑)의 카테고리별 종합BPI를 비교합니다.",
+    ja: "既存のノーツレーダーと同じカテゴリ分けで、V1（青）とV2（黄）のカテゴリ別総合BPIを比較します。",
+    en: "Compares category-wise total BPI between V1 (blue) and V2 (yellow), using the same categories as the existing notes radar.",
+    "zh-TW": "使用與現有音符雷達相同的分類，比較V1（藍）與V2（黃）各分類的綜合BPI。",
+    ko: "기존 노트 레이더와 같은 카테고리 분류로, V1(파랑)과 V2(노랑)의 카테고리별 종합BPI를 비교합니다.",
   },
   "newBpi.listSummary.increase": {
     ja: "上昇",
@@ -336,10 +336,10 @@ export const newBpiTranslations = {
     ko: "V2(현행)",
   },
   "newBpi.formula.noParam": {
-    ja: "この楽曲は新方式のパラメータ(mu/sigma)が未整備のため式を表示できません。",
-    en: "This song has no new-formula parameters (mu/sigma) yet, so the formula can't be shown.",
-    "zh-TW": "此樂曲尚未備妥新公式的參數(mu/sigma)，因此無法顯示公式。",
-    ko: "이 곡은 신규 방식의 파라미터(mu/sigma)가 아직 없어 식을 표시할 수 없습니다.",
+    ja: "この楽曲はV2のパラメータ(mu/sigma)が未整備のため式を表示できません。",
+    en: "This song has no V2 parameters (mu/sigma) yet, so the formula can't be shown.",
+    "zh-TW": "此樂曲尚未備妥V2的參數(mu/sigma)，因此無法顯示公式。",
+    ko: "이 곡은 V2의 파라미터(mu/sigma)가 아직 없어 식을 표시할 수 없습니다.",
   },
   "newBpi.simulator.title": {
     ja: "EXスコアシミュレーター",
@@ -462,10 +462,10 @@ export const newBpiTranslations = {
     ko: "채보 계수 coef",
   },
   "newBpi.params.coef.hint": {
-    ja: "現行方式のべき指数。BPIカーブの立ち上がりの鋭さを曲ごとに調整する係数で、未設定の曲は 1.175 が使われます。",
-    en: "The current formula's exponent. A per-song factor tuning how steeply the BPI curve rises; songs without a value use 1.175.",
-    "zh-TW": "現行公式的次方指數。逐曲調整BPI曲線上升陡度的係數，未設定的曲目使用 1.175。",
-    ko: "현행 방식의 거듭제곱 지수. BPI 곡선이 얼마나 가파르게 상승하는지를 곡별로 조정하는 계수이며, 미설정 곡은 1.175를 사용합니다.",
+    ja: "V1のべき指数。BPIカーブの立ち上がりの鋭さを曲ごとに調整する係数で、未設定の曲は 1.175 が使われます。",
+    en: "V1's exponent. A per-song factor tuning how steeply the BPI curve rises; songs without a value use 1.175.",
+    "zh-TW": "V1公式的次方指數。逐曲調整BPI曲線上升陡度的係數，未設定的曲目使用 1.175。",
+    ko: "V1 방식의 거듭제곱 지수. BPI 곡선이 얼마나 가파르게 상승하는지를 곡별로 조정하는 계수이며, 미설정 곡은 1.175를 사용합니다.",
   },
   "newBpi.params.m.label": {
     ja: "m（ノーツ数×2）",
@@ -474,10 +474,10 @@ export const newBpiTranslations = {
     ko: "m(노트 수×2)",
   },
   "newBpi.params.m.hint": {
-    ja: "その譜面の理論値（MAX）EXスコア。ノーツ数の2倍で、両方式ともスコアレートの基準に使います。",
-    en: "The chart's theoretical max EX score (twice the note count). Both formulas use it as the score-rate denominator.",
-    "zh-TW": "該譜面的理論值（MAX）EX分數，為音符數的兩倍，兩種公式都以此作為分數率基準。",
-    ko: "해당 채보의 이론치(MAX) EX스코어. 노트 수의 2배이며, 두 방식 모두 스코어레이트 기준으로 사용합니다.",
+    ja: "その譜面の理論値（MAX）EXスコア。ノーツ数の2倍で、V1・V2ともスコアレートの基準に使います。",
+    en: "The chart's theoretical max EX score (twice the note count). Both V1 and V2 use it as the score-rate denominator.",
+    "zh-TW": "該譜面的理論值（MAX）EX分數，為音符數的兩倍，V1・V2都以此作為分數率基準。",
+    ko: "해당 채보의 이론치(MAX) EX스코어. 노트 수의 2배이며, V1・V2 모두 스코어레이트 기준으로 사용합니다.",
   },
   "newBpi.params.kaidenAvg.label": {
     ja: "皆伝平均 k",
@@ -486,10 +486,10 @@ export const newBpiTranslations = {
     ko: "황단 평균 k",
   },
   "newBpi.params.kaidenAvg.hint": {
-    ja: "皆伝取得者の平均EXスコア。現行方式のBPI0アンカーです。新方式ではBPI0の基準には使いません（新方式のBPI0は z0）。このページのスコアレート表では、表の下端行の目安としてのみ使っています。",
-    en: "The average EX score among Kaiden-rank players. It is the current formula's BPI-0 anchor. The new formula does not use it for BPI 0 (the new formula's BPI 0 is z0). On this page it only marks the bottom row of the score-rate table.",
-    "zh-TW": "取得皆傳者的平均EX分數。為現行公式的BPI0錨點。新公式不以此作為BPI0基準（新公式的BPI0是 z0）。本頁僅用它作為分數率表最下方一列的參考。",
-    ko: "황단 취득자의 평균 EX스코어. 현행 방식의 BPI0 기준점입니다. 신규 방식에서는 BPI0 기준으로 사용하지 않습니다(신규 방식의 BPI0은 z0). 이 페이지에서는 스코어레이트 표의 맨 아래 행 기준으로만 사용합니다.",
+    ja: "皆伝取得者の平均EXスコア。V1のBPI0アンカーです。V2ではBPI0の基準には使いません（V2のBPI0は z0）。このページのスコアレート表では、表の下端行の目安としてのみ使っています。",
+    en: "The average EX score among Kaiden-rank players. It is V1's BPI-0 anchor. V2 does not use it for BPI 0 (V2's BPI 0 is z0). On this page it only marks the bottom row of the score-rate table.",
+    "zh-TW": "取得皆傳者的平均EX分數。為V1的BPI0錨點。V2不以此作為BPI0基準（V2的BPI0是 z0）。本頁僅用它作為分數率表最下方一列的參考。",
+    ko: "황단 취득자의 평균 EX스코어. V1의 BPI0 기준점입니다. V2에서는 BPI0 기준으로 사용하지 않습니다(V2의 BPI0은 z0). 이 페이지에서는 스코어레이트 표의 맨 아래 행 기준으로만 사용합니다.",
   },
   "newBpi.params.wrScore.label": {
     ja: "全一 z",
@@ -498,10 +498,10 @@ export const newBpiTranslations = {
     ko: "전일 z",
   },
   "newBpi.params.wrScore.hint": {
-    ja: "歴代1位のEXスコア。両方式ともBPI100のアンカーです（新方式では z100 の算出に使います）。",
-    en: "The all-time best EX score. Both formulas anchor BPI 100 here (the new formula derives z100 from it).",
-    "zh-TW": "歷代第一的EX分數。兩種公式都以此作為BPI100錨點（新公式用它推算 z100）。",
-    ko: "역대 1위 EX스코어. 두 방식 모두 BPI100의 기준점입니다(신규 방식에서는 z100 산출에 사용).",
+    ja: "歴代1位のEXスコア。V1・V2ともBPI100のアンカーです（V2では z100 の算出に使います）。",
+    en: "The all-time best EX score. Both V1 and V2 anchor BPI 100 here (V2 derives z100 from it).",
+    "zh-TW": "歷代第一的EX分數。V1・V2都以此作為BPI100錨點（V2用它推算 z100）。",
+    ko: "역대 1위 EX스코어. V1・V2 모두 BPI100의 기준점입니다(V2에서는 z100 산출에 사용).",
   },
   "newBpi.params.mu.label": {
     ja: "μ (mu)",
@@ -510,10 +510,10 @@ export const newBpiTranslations = {
     ko: "μ (mu)",
   },
   "newBpi.params.mu.hint": {
-    ja: "この曲のスコア分布の位置パラメータ。t = −ln(m − EXスコア) に変換した尺度上での、プレイヤー分布の中心です。BPIM2ユーザーの実データから推定した暫定値です。",
-    en: "The location parameter of this song's score distribution — the centre of the player distribution on the transformed scale t = −ln(m − EX). A provisional estimate from BPIM2 users' data.",
-    "zh-TW": "此曲分數分佈的位置參數。在 t = −ln(m − EX分數) 轉換尺度上，玩家分佈的中心。為根據BPIM2使用者實際資料推算的暫定值。",
-    ko: "이 곡 스코어 분포의 위치 파라미터. t = −ln(m − EX스코어)로 변환한 척도에서 플레이어 분포의 중심입니다. BPIM2 사용자 실데이터로 추정한 잠정값입니다.",
+    ja: "この曲のスコア分布の位置パラメータ。t = −ln(m − EXスコア) に変換した尺度上での、プレイヤー分布の中心です。実際のプレイヤーデータから推定した値です。",
+    en: "The location parameter of this song's score distribution — the centre of the player distribution on the transformed scale t = −ln(m − EX). Estimated from real player data.",
+    "zh-TW": "此曲分數分佈的位置參數。在 t = −ln(m − EX分數) 轉換尺度上，玩家分佈的中心。為根據實際玩家資料推算的數值。",
+    ko: "이 곡 스코어 분포의 위치 파라미터. t = −ln(m − EX스코어)로 변환한 척도에서 플레이어 분포의 중심입니다. 실제 플레이어 데이터로 추정한 값입니다.",
   },
   "newBpi.params.sigma.label": {
     ja: "σ (sigma)",
