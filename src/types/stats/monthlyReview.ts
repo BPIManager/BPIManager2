@@ -70,44 +70,62 @@ export interface RadarGrowthEntry {
   timeline: { date: string; cumDiff: number }[];
 }
 
-export interface MonthlyReviewData {
-  month: string;
-  version: string;
-  granularity: "month" | "year" | "version";
-  bpi: {
-    start: number;
-    end: number;
-    diff: number;
-    history: { date: string; value: number }[];
-  };
-  topSongs: {
-    topBpiSongs: TopSong[];
-    topImprovedSongs: TopSongImproved[];
-  };
-  activity: {
-    totalKeys: number;
-    totalScratches: number;
-    playDays: number;
-    updatedSongs: number;
-    byDayOfWeek: { day: number; count: number }[];
-    byHour: { hour: number; count: number }[];
-    towerRanking: {
-      keysRank: number;
-      scratchRank: number;
-      totalUsers: number;
-    } | null;
-    bestDays: {
-      bestGrowthDay: { date: string; bpiDiff: number } | null;
-      bestKeysDay: { date: string; keyCount: number } | null;
-      bestScratchDay: { date: string; scratchCount: number } | null;
-    } | null;
-  };
+export interface MonthlyReviewBpi {
+  start: number;
+  end: number;
+  diff: number;
+  history: { date: string; value: number }[];
+}
+
+export interface MonthlyReviewTopSongs {
+  topBpiSongs: TopSong[];
+  topImprovedSongs: TopSongImproved[];
+}
+
+export interface MonthlyReviewActivity {
+  totalKeys: number;
+  totalScratches: number;
+  playDays: number;
+  updatedSongs: number;
+  byDayOfWeek: { day: number; count: number }[];
+  byHour: { hour: number; count: number }[];
+  towerRanking: {
+    keysRank: number;
+    scratchRank: number;
+    totalUsers: number;
+  } | null;
+  bestDays: {
+    bestGrowthDay: { date: string; bpiDiff: number } | null;
+    bestKeysDay: { date: string; keyCount: number } | null;
+    bestScratchDay: { date: string; scratchCount: number } | null;
+  } | null;
+}
+
+export interface MonthlyReviewRivals {
   rivals: RivalDiff[];
   rivalsGrowthRanking: {
     byAbsGrowth: RivalBpiGrowthEntry[];
     byGrowthRate: RivalBpiGrowthEntry[];
   } | null;
   rivalsGrowthTimeline: GrowthParticipant[] | null;
-  arena: MonthlyArena | null;
+}
+
+export interface MonthlyReviewRadarGrowth {
   radarGrowth: RadarGrowthEntry[] | null;
+}
+
+export interface MonthlyReviewArena {
+  arena: MonthlyArena | null;
+}
+
+export interface MonthlyReviewData
+  extends MonthlyReviewRivals,
+    MonthlyReviewArena,
+    MonthlyReviewRadarGrowth {
+  month: string;
+  version: string;
+  granularity: "month" | "year" | "version";
+  bpi: MonthlyReviewBpi;
+  topSongs: MonthlyReviewTopSongs;
+  activity: MonthlyReviewActivity;
 }

@@ -9,12 +9,31 @@ import RivalsSection from "../RivalsSection";
 import ArenaSection from "../ArenaSection";
 import RadarSection from "../RadarSection";
 import FooterSection from "../FooterSection";
-import type { MonthlyReviewData } from "@/types/stats/monthlyReview";
+import type {
+  MonthlyReviewBpi,
+  MonthlyReviewTopSongs,
+  MonthlyReviewActivity,
+  MonthlyReviewRivals,
+  MonthlyArena,
+  RadarGrowthEntry,
+} from "@/types/stats/monthlyReview";
 
 const BASE_SPEED = 0.6;
 
+export interface MonthlyReviewViewSections {
+  month: string;
+  version: string;
+  granularity: "month" | "year" | "version";
+  bpi: MonthlyReviewBpi | undefined;
+  topSongs: MonthlyReviewTopSongs | undefined;
+  activity: MonthlyReviewActivity | undefined;
+  rivals: MonthlyReviewRivals | undefined;
+  arena: MonthlyArena | null;
+  radarGrowth: RadarGrowthEntry[] | null;
+}
+
 interface Props {
-  data: MonthlyReviewData;
+  data: MonthlyReviewViewSections;
   speedRef: React.RefObject<number>;
 }
 
@@ -31,26 +50,36 @@ const MonthlyReviewViewUI = ({ data, speedRef }: Props) => (
       <TitleSection
         month={data.month}
         version={data.version}
-        bpiDiff={data.bpi.diff}
+        bpiDiff={data.bpi?.diff}
         granularity={data.granularity}
       />
-      <HeroSection bpi={data.bpi} />
-      <TopSongsSection topSongs={data.topSongs} />
-      <ActivitySection
-        activity={data.activity}
-        granularity={data.granularity}
-      />
+      {data.bpi && <HeroSection bpi={data.bpi} />}
+      {data.topSongs && <TopSongsSection topSongs={data.topSongs} />}
+      {data.activity && (
+        <ActivitySection
+          activity={data.activity}
+          granularity={data.granularity}
+        />
+      )}
       {data.radarGrowth && data.radarGrowth.length > 0 && (
         <RadarSection radarGrowth={data.radarGrowth} />
       )}
-      <RivalsSection
-        rivals={data.rivals}
-        ranking={data.rivalsGrowthRanking}
-        timeline={data.rivalsGrowthTimeline}
-        granularity={data.granularity}
-      />
+      {data.rivals && (
+        <RivalsSection
+          rivals={data.rivals.rivals}
+          ranking={data.rivals.rivalsGrowthRanking}
+          timeline={data.rivals.rivalsGrowthTimeline}
+          granularity={data.granularity}
+        />
+      )}
       {data.arena && <ArenaSection arena={data.arena} />}
-      <FooterSection data={data} />
+      <FooterSection
+        month={data.month}
+        version={data.version}
+        granularity={data.granularity}
+        bpi={data.bpi}
+        topSongs={data.topSongs}
+      />
     </div>
   </div>
 );

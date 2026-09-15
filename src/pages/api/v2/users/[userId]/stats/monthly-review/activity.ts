@@ -1,6 +1,6 @@
 import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
 import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
-import { handleStatsMonthlyReview } from "@/lib/subhandlers/stats";
+import { handleStatsMonthlyReviewActivity } from "@/lib/subhandlers/stats";
 import {
   accessError,
   buildMeta,
@@ -43,7 +43,7 @@ export default withUserApiHandler(
     writeV2Result(
       res,
       withMeta(
-        await handleStatsMonthlyReview(query, access),
+        await handleStatsMonthlyReviewActivity(query),
         buildMeta(access.viewerId ?? null, query.userId),
       ),
     );

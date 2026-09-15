@@ -10,7 +10,7 @@ import TitleSectionUI from "./ui";
 interface Props {
   month: string;
   version: string;
-  bpiDiff: number;
+  bpiDiff: number | undefined;
   granularity: "month" | "year" | "version";
 }
 
@@ -33,7 +33,8 @@ const TitleSection = ({ month, version, bpiDiff, granularity }: Props) => {
       ? dayjs.tz(`${month}-01-01`).format("YYYY年")
       : dayjs.tz(`${month}-01`).format("YYYY年M月");
 
-  const diffColor = bpiDiff >= 0 ? "#34d399" : "#f87171";
+  const diffColor =
+    bpiDiff === undefined ? "rgba(255,255,255,0.4)" : bpiDiff >= 0 ? "#34d399" : "#f87171";
   const subtitle = isAllMode
     ? tFormat("monthlyReview.subtitle.version", {
         version: version === "INF" ? "INF" : `IIDX${version}`,

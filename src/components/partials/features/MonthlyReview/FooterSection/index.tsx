@@ -2,36 +2,45 @@
 
 import { useRouter } from "next/router";
 import { useInView } from "@/hooks/common/useInView";
-import type { MonthlyReviewData } from "@/types/stats/monthlyReview";
+import type {
+  MonthlyReviewBpi,
+  MonthlyReviewTopSongs,
+} from "@/types/stats/monthlyReview";
 import { useRivalMonthlyReviewSummary } from "@/hooks/social/useRivalMonthlyReviewSummary";
 import FooterSectionUI from "./ui";
 
 interface Props {
-  data: MonthlyReviewData;
+  month: string;
+  version: string;
+  granularity: "month" | "year" | "version";
+  bpi: MonthlyReviewBpi | undefined;
+  topSongs: MonthlyReviewTopSongs | undefined;
 }
 
-const FooterSection = ({ data }: Props) => {
+const FooterSection = ({ month, version, granularity, bpi, topSongs }: Props) => {
   const router = useRouter();
   const [ref, inView] = useInView(0.1);
   const userId = router.query.userId as string | undefined;
-  const month = router.query.month as string | undefined;
+  const routeMonth = router.query.month as string | undefined;
 
   const { rivals, isLoading: rivalsLoading } = useRivalMonthlyReviewSummary({
     userId,
-    month,
-    version: data.version,
+    month: routeMonth,
+    version,
   });
 
   const periodText =
-    data.granularity === "version"
-      ? `${data.version === "INF" ? "INF" : `IIDX${data.version}`}全体`
-      : data.month;
+    granularity === "version"
+      ? `${version === "INF" ? "INF" : `IIDX${version}`}全体`
+      : month;
 
   const shareText = [
     `【${periodText}の振り返り】`,
-    `総合BPI: ${data.bpi.start.toFixed(2)} → ${data.bpi.end.toFixed(2)} (${data.bpi.diff >= 0 ? "+" : ""}${data.bpi.diff.toFixed(2)})`,
-    data.topSongs.topImprovedSongs[0]
-      ? `最伸び: ${data.topSongs.topImprovedSongs[0].title} +${data.topSongs.topImprovedSongs[0].diff.toFixed(2)}`
+    bpi
+      ? `総合BPI: ${bpi.start.toFixed(2)} → ${bpi.end.toFixed(2)} (${bpi.diff >= 0 ? "+" : ""}${bpi.diff.toFixed(2)})`
+      : null,
+    topSongs?.topImprovedSongs[0]
+      ? `最伸び: ${topSongs.topImprovedSongs[0].title} +${topSongs.topImprovedSongs[0].diff.toFixed(2)}`
       : null,
     "#IIDX #BPIM2",
   ]
@@ -48,8 +57,8 @@ const FooterSection = ({ data }: Props) => {
       onBack={() => router.back()}
       rivals={rivals}
       rivalsLoading={rivalsLoading}
-      currentMonth={month}
-      currentVersion={data.version}
+      currentMonth={routeMonth}
+      currentVersion={version}
     />
   );
 };

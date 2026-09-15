@@ -179,6 +179,42 @@ export const monthlyReviewTranslations = {
     "zh-TW": "年度回顧",
     ko: "연간 리뷰",
   },
+  "monthlyReview.loading.bpi": {
+    ja: "総合BPI推移",
+    en: "Overall BPI Trend",
+    "zh-TW": "綜合BPI趨勢",
+    ko: "종합 BPI 추이",
+  },
+  "monthlyReview.loading.topSongs": {
+    ja: "BPIトップ・改善曲",
+    en: "Top / Improved Songs",
+    "zh-TW": "BPI排行・進步曲目",
+    ko: "BPI 상위・향상곡",
+  },
+  "monthlyReview.loading.radarGrowth": {
+    ja: "ノーツレーダー成長",
+    en: "Notes Radar Growth",
+    "zh-TW": "音符雷達成長",
+    ko: "노츠 레이더 성장",
+  },
+  "monthlyReview.loading.activity": {
+    ja: "活動状況",
+    en: "Activity",
+    "zh-TW": "活動狀況",
+    ko: "활동 현황",
+  },
+  "monthlyReview.loading.rivals": {
+    ja: "ライバル",
+    en: "Rivals",
+    "zh-TW": "對手",
+    ko: "라이벌",
+  },
+  "monthlyReview.loading.arena": {
+    ja: "アリーナ",
+    en: "Arena",
+    "zh-TW": "競技場",
+    ko: "아레나",
+  },
   "monthlyReview.subtitle.version": {
     ja: "{version}全体の振り返り",
     en: "{version} Overall Review",
