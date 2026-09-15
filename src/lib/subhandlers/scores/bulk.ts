@@ -14,6 +14,7 @@ import { err, ok } from "@/middlewares/api/apiResult";
 import { type HandleOutcome } from "./_shared";
 import type { AuthenticatedNextApiRequest } from "@/middlewares/api/withAuth";
 import type { NewScore, NewAllScores } from "@/types/db";
+import type { IBpiScoreObservation } from "@/types/songs/bpi";
 export async function handleScoresBulk(
   req: AuthenticatedNextApiRequest,
 ): Promise<HandleOutcome<unknown>> {
@@ -124,20 +125,26 @@ export async function handleScoresBulk(
     }
 
     const twelves = bpiSongMaster.filter((s) => s.difficultyLevel === 12);
-    const updatedBpiMap = new Map(scoreUpdates.map((s) => [s.songId, s.bpi]));
-
-    const allBpisForTotal = twelves.map((song) => {
-      if (updatedBpiMap.has(song.songId))
-        return updatedBpiMap.get(song.songId)!;
-      return bpiScoreMap.get(song.songId)?.bpi ?? -15;
-    });
-
-    const newTotalBpi = BpiCalculator.calculateTotalBPI(
-      allBpisForTotal,
-      twelves.length,
+    const updatedExScoreMap = new Map(
+      scoreUpdates.map((s) => [s.songId, s.exScore]),
     );
 
-    await saveImportResults({
+    // 総合BPI(V2)は単曲BPIの配列ではなく実測観測(songId+exScore)から潜在
+    // スキルを推定する必要があるため、この曲マスタ全体で「今回の更新後の
+    // ベストEXスコア」をsongIdごとに突き合わせる（更新分優先、無ければ既存）。
+    const observations: IBpiScoreObservation[] = bpiSongMaster.flatMap(
+      (song) => {
+        const exScore =
+          updatedExScoreMap.get(song.songId) ??
+          bpiScoreMap.get(song.songId)?.exScore;
+        return exScore != null
+          ? [{ songId: song.songId, notes: song.notes, exScore }]
+          : [];
+      });
+
+    const newTotalBpi = BpiCalculator.calculateTotalBPI(observations, twelves);
+
+    const { totalBpi: savedTotalBpi } = await saveImportResults({
       userId,
       version,
       batchId,
@@ -153,7 +160,7 @@ export async function handleScoresBulk(
         updatedAllCount: allScoreUpdates.length,
         updatedBpiCount: scoreUpdates.length,
         previousTotalBpi,
-        newTotalBpi,
+        newTotalBpi: savedTotalBpi,
         details: { notFound },
       }),
       ...base,

@@ -46,6 +46,9 @@ class BpiOptimizerAggregateRepository {
         "d.wrScore",
         "d.kaidenAvg",
         "d.coef",
+        "d.mu",
+        "d.sigma",
+        "d.residualVar",
         "userScore.exScore",
         "userScore.bpi",
       ])

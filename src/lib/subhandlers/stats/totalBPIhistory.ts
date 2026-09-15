@@ -2,25 +2,34 @@ import type { NextApiRequest } from "next";
 import dayjs from "@/lib/dayjs";
 import { BpiCalculator } from "@/lib/bpi";
 import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
+import { songsRepo } from "@/lib/db/domains/songs";
 import { ok } from "@/middlewares/api/apiResult";
 import { groupByOf, DIFFICULTY_LABELS } from "./_shared";
 import type { StatsQuery } from "@/types/stats/query";
 import type { HandlerResult } from "@/types/api";
+import type { IBpiScoreObservation } from "@/types/songs/bpi";
 
 export async function handleStatsTotalBpiHistory(
   q: StatsQuery,
   req: NextApiRequest,
 ): Promise<HandlerResult<unknown>> {
   const groupBy = groupByOf(req);
-  const [allLogs, totalSongs] = await Promise.all([
+  const [allLogs, fullMaster] = await Promise.all([
     statsTablesRepo.getScoreHistory(
       q.userId,
       q.version,
       q.levels,
       q.difficulties,
     ),
-    statsTablesRepo.getTotalSongCount(q.levels, q.difficulties),
+    songsRepo.getSongMasterWithDef(),
   ]);
+  const scopedMaster = fullMaster.filter(
+    (s) =>
+      (q.levels.length === 0 ||
+        (s.difficultyLevel != null && q.levels.includes(s.difficultyLevel))) &&
+      (q.difficulties.length === 0 ||
+        (s.difficulty != null && q.difficulties.includes(s.difficulty))),
+  );
   if (allLogs.length === 0) return ok([]);
 
   const toJSTDateStr = (date: Date | string): string =>
@@ -34,9 +43,15 @@ export async function handleStatsTotalBpiHistory(
     logsByDate[date].push(log);
   });
 
+  const songById = new Map(scopedMaster.map((s) => [s.songId, s]));
   const trend = [];
   const latestBpisBySong = new Map<number, number>();
   const latestExScoresBySong = new Map<number, number>();
+  // 総合BPIは既知の最高値を下回らないようラチェットする(executeSaveBpiSystem・
+  // recalculateTotalBpi.ts等と同じ理由。src/lib/bpi/index.tsのratchetTotalBpi
+  // 参照)。この推移グラフはDBの`logs`/`userStatusLogs`を経由せず日付ごとの
+  // 生の値をこの場で再計算するため、この関数内のrunning maxを基準にする。
+  let bestTotalBpiSoFar: number | null = null;
   const startDate = dayjs(allLogs[0].lastPlayed).tz().startOf("day");
   const endDate = dayjs(allLogs[allLogs.length - 1].lastPlayed)
     .tz()
@@ -63,15 +78,26 @@ export async function handleStatsTotalBpiHistory(
           newBpi,
         };
       });
-    const allCurrentBpis = Array.from(latestBpisBySong.values());
-    const totalBpi = BpiCalculator.calculateTotalBPI(
-      allCurrentBpis,
-      totalSongs,
+    const observations: IBpiScoreObservation[] = Array.from(
+      latestExScoresBySong.entries(),
+    ).map(([songId, exScore]) => ({
+      songId,
+      notes: songById.get(songId)?.notes ?? 0,
+      exScore,
+    }));
+    const freshTotalBpi = BpiCalculator.calculateTotalBPI(
+      observations,
+      scopedMaster,
     );
+    const totalBpi = BpiCalculator.ratchetTotalBpi(
+      bestTotalBpiSoFar,
+      freshTotalBpi,
+    );
+    bestTotalBpiSoFar = totalBpi;
     trend.push({
       date: dateStr,
       totalBpi,
-      count: allCurrentBpis.length,
+      count: latestBpisBySong.size,
       updatedSongs,
     });
   }

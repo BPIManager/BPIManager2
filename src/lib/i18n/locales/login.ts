@@ -50,10 +50,10 @@ export const loginPageTranslations = {
     ko: "BPI로 실력을 시각화하기",
   },
   "login.bpi.milestone.kaiden": {
-    ja: "皆伝平均(約2699位)",
-    en: "Kaiden Avg (~Top 2699)",
-    "zh-TW": "皆傳平均 (約2699名)",
-    ko: "개전 평균 (약 2699위)",
+    ja: "皆伝平均(約3000位)",
+    en: "Kaiden Avg (~Top 3000)",
+    "zh-TW": "皆傳平均 (約3000名)",
+    ko: "개전 평균 (약 3000위)",
   },
   "login.bpi.milestone.top50": {
     ja: "約50位",

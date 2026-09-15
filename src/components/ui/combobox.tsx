@@ -107,7 +107,8 @@ function ComboboxContent({
         align={align}
         alignOffset={alignOffset}
         anchor={anchor}
-        className="isolate z-50"
+        // z-1010: Dialog(z-1005)の中で開いても手前に表示されるように
+        className="isolate z-1010"
       >
         <ComboboxPrimitive.Popup
           data-slot="combobox-content"

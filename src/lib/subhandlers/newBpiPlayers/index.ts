@@ -1,7 +1,7 @@
 import type { NextApiRequest } from "next";
+import { BpiV1 } from "@bpim/bpicalc";
 import { newBpiPlayersAggregateRepo } from "@/lib/db/aggregates/newBpiPlayers";
 import { BpiCalculator } from "@/lib/bpi";
-import { NewBpiCalculator } from "@/lib/bpi/newBpi";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
@@ -16,6 +16,9 @@ export interface HandleOutcome<T> {
 
 const DEFAULT_PAGE_SIZE = 20;
 const MAX_PAGE_SIZE = 50;
+// 「現行(V1)」列用。本番のBpiCalculatorは既にV2へ切り替わっているため、
+// DB保存値ではなくここで単曲BPI・総合BPIとも常にV1で計算し直す。
+const v1 = new BpiV1();
 
 /** GET /new-bpi/players （withAuth） */
 export async function handleNewBpiPlayers(
@@ -65,7 +68,6 @@ export async function handleNewBpiPlayers(
       const userScores = scoresByUser.get(user.userId) ?? [];
 
       const currentBpis: number[] = [];
-      const newBpis: number[] = [];
       let increaseCount = 0;
       let decreaseCount = 0;
 
@@ -73,16 +75,20 @@ export async function handleNewBpiPlayers(
         const song = songById.get(s.songId);
         if (!song) continue;
 
-        const currentBpi = s.bpi;
+        // s.bpi(DBの保存値)は本番がV2へ全面切り替え済みのため、もはやV1
+        // ではない。この検証ツールの「現行(V1)」列は常にlegacyV1で
+        // 計算し直した真のV1値にする(V2は本番と同じBpiCalculator)。
+        const currentBpi = v1
+          .chart({
+            notes: song.notes,
+            kaidenAvg: song.kaidenAvg,
+            wrScore: song.wrScore,
+            coef: song.coef,
+          })
+          .bpi(s.exScore);
         if (currentBpi !== null) currentBpis.push(currentBpi);
 
-        const newBpi = NewBpiCalculator.calc(s.exScore, {
-          songId: s.songId,
-          notes: song.notes,
-          kaidenAvg: song.kaidenAvg,
-          wrScore: song.wrScore,
-        });
-        if (newBpi !== null) newBpis.push(newBpi);
+        const newBpi = BpiCalculator.calc(s.exScore, song);
 
         if (currentBpi !== null && newBpi !== null) {
           if (newBpi > currentBpi + 0.005) increaseCount++;
@@ -91,16 +97,8 @@ export async function handleNewBpiPlayers(
       }
 
       currentBpis.sort((a, b) => b - a);
-      newBpis.sort((a, b) => b - a);
-      const currentTotal = BpiCalculator.calculateTotalBPI(
-        currentBpis,
-        totalSongCount,
-      );
-      const hybridTotal = BpiCalculator.calculateTotalBPI(
-        newBpis,
-        totalSongCount,
-      );
-      const fullNewTotal = NewBpiCalculator.calculateTotalBPI(
+      const currentTotal = v1.total(currentBpis, totalSongCount);
+      const fullNewTotal = BpiCalculator.calculateTotalBPI(
         userScores.map((s) => ({
           songId: s.songId,
           notes: songById.get(s.songId)?.notes ?? 0,
@@ -113,7 +111,6 @@ export async function handleNewBpiPlayers(
         userId: user.userId,
         userName: user.userName,
         currentTotal,
-        hybridTotal,
         fullNewTotal,
         increaseCount,
         decreaseCount,

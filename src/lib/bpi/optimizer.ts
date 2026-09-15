@@ -1,4 +1,12 @@
-import { BpiCalculator } from "@/lib/bpi";
+import { BpiV1 } from "@bpim/bpicalc";
+
+// このオプティマイザの探索アルゴリズムはV1のべき乗平均総合BPI（`BpiMath`、
+// 下記 `totalBpiExponent` 由来の指数）を前提に組まれている。issue #380で
+// `BpiCalculator`(V1→V2)を切り替えても、V2の総合BPI（シフト法＋潜在スキル
+// からの未プレイ曲予測）はこの探索アルゴリズムの前提と別物のため、
+// ここだけ独立してV1のまま固定する（V2対応はアルゴリズム自体の再設計が
+// 必要な別タスク）。
+const legacyV1 = new BpiV1();
 import type {
   SongOptimizerInput,
   OptimizationResult,
@@ -180,7 +188,7 @@ class BpiOptimizer {
   ) {
     this.sourceData = sourceData;
     this.n = totalCount;
-    const exponent = BpiCalculator.totalBpiExponent(totalCount);
+    const exponent = legacyV1.totalBpiExponent(totalCount);
     this.targetTotalValue = targetTotalValue;
     this.options = options;
     this.maxSteps = maxSteps;
@@ -409,12 +417,12 @@ class BpiOptimizer {
         this.math.contribution(fromBpi),
     );
 
-    const estimatedToEx = BpiCalculator.calcFromBPI(estimatedTargetBpi, {
+    const estimatedToEx = legacyV1.chart({
       notes: c.notes,
       kaidenAvg: c.kaidenAvg,
       wrScore: c.wrScore,
       coef: c.coef,
-    });
+    }).scoreFor(estimatedTargetBpi);
     const currentEx = c.currentExScore ?? 0;
     const estimatedExGain = Math.max(1, estimatedToEx - currentEx);
     const estimatedBpiGain = estimatedTargetBpi - fromBpi;
@@ -639,12 +647,12 @@ class BpiOptimizer {
   ): { toExScore: number; newCarryError: number } {
     const { MIN_EX_GAIN } = BpiOptimizer;
     const rawToExFloat =
-      BpiCalculator.calcFromBPI(theoreticalBpi, {
+      legacyV1.chart({
         notes: pickedSong.notes,
         kaidenAvg: pickedSong.kaidenAvg,
         wrScore: pickedSong.wrScore,
         coef: pickedSong.coef,
-      }) + carryError;
+      }).scoreFor(theoreticalBpi) + carryError;
 
     let toExScore = Math.round(rawToExFloat);
     let newCarryError = rawToExFloat - toExScore;
@@ -747,12 +755,12 @@ class BpiOptimizer {
     state.carryError = newCarryError;
 
     const exGain = toExScore - currentEx;
-    const actualNextBpiRaw = BpiCalculator.calc(toExScore, {
+    const actualNextBpiRaw = legacyV1.chart({
       notes: pickedSong.notes,
       kaidenAvg: pickedSong.kaidenAvg,
       wrScore: pickedSong.wrScore,
       coef: pickedSong.coef,
-    });
+    }).bpi(toExScore);
     const actualNextBpi = actualNextBpiRaw ?? fromBpi;
 
     if (

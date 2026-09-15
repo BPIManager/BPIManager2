@@ -18,6 +18,9 @@ export interface BatchDetailItem {
   wrScore?: number | null;
   kaidenAvg?: number | null;
   coef?: number | null;
+  mu?: number | null;
+  sigma?: number | null;
+  residualVar?: number | null;
   current: {
     exScore: number;
     bpi: number;

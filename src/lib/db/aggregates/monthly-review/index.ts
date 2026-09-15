@@ -120,7 +120,7 @@ class MonthlyReviewRepository {
             .onRef("latest.songId", "=", "s.songId")
             .onRef("latest.maxLogId", "=", "s.logId"),
       )
-      .select(["s.userId", "s.songId", "s.bpi"])
+      .select(["s.userId", "s.songId", "s.bpi", "s.exScore"])
       .execute();
   }
 
@@ -135,7 +135,7 @@ class MonthlyReviewRepository {
     return await db
       .selectFrom("scores as s")
       .innerJoin("songs as m", "s.songId", "m.songId")
-      .select(["s.userId", "s.songId", "s.bpi", "s.lastPlayed"])
+      .select(["s.userId", "s.songId", "s.bpi", "s.exScore", "s.lastPlayed"])
       .where("s.userId", "in", userIds)
       .where("s.version", "=", version)
       .where("m.difficultyLevel", "=", 12)

@@ -39,7 +39,8 @@ function TooltipContent({
         data-slot="tooltip-content"
         sideOffset={sideOffset}
         className={cn(
-          "z-50 inline-flex w-fit max-w-xs items-center gap-1.5 rounded-md",
+          // z-1010: Dialog(z-1005)の中で開いても手前に表示されるように
+          "z-1010 inline-flex w-fit max-w-xs items-center gap-1.5 rounded-md",
           "origin-(--radix-tooltip-content-transform-origin)",
           "bg-bpim-surface-2 text-bpim-text ring-1 ring-bpim-border shadow-md",
           "px-3 py-1.5 text-xs",

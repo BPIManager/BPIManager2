@@ -10,12 +10,15 @@ import {
   ResponsiveContainer,
   Brush,
 } from "recharts";
+import { ExternalLink } from "lucide-react";
 import type { StatsGroupBy, BpiBoxStatsItem } from "@/types/stats/bpiBoxStats";
 import BpiBoxStatsSkeleton from "./skeleton";
 import { DashCard } from "@/components/ui/dashcard";
 import { useChartColors } from "@/hooks/common/useChartColors";
 import { HelpTooltip } from "@/components/ui/tooltip";
 import { useTranslation } from "@/hooks/common/useTranslation";
+
+const BPICALC_NPM_URL = "https://www.npmjs.com/package/@bpim/bpicalc";
 
 interface ExtendedBpiBoxStatsItem extends BpiBoxStatsItem {
   efficiency?: number;
@@ -59,6 +62,15 @@ const BpiBoxHelpContent = () => {
               {t("dashboard.bpiBoxStats.help.periodBpiLabel")}
             </span>
             :{t("dashboard.bpiBoxStats.help.periodBpiDesc")}
+            <a
+              href={BPICALC_NPM_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-1 flex w-fit items-center gap-1 font-medium text-bpim-primary hover:underline"
+            >
+              {t("common.bpicalcLink")}
+              <ExternalLink className="h-3 w-3" />
+            </a>
           </li>
           <li>
             <span className="font-bold text-bpim-primary">

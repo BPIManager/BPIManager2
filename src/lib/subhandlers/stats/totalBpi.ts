@@ -1,12 +1,15 @@
 import dayjs from "@/lib/dayjs";
 import { BpiCalculator } from "@/lib/bpi";
+import { db } from "@/lib/db";
 import { scoreDetailRepo } from "@/lib/db/domains/scores/detail";
-import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
+import { songsRepo } from "@/lib/db/domains/songs";
 import { usersRepo } from "@/lib/db/domains/users";
+import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
 import { getUserAreaRank } from "@/lib/arena/prefectureRankings";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { ok } from "@/middlewares/api/apiResult";
 import type { HandlerResult } from "@/types/api";
+import type { IBpiScoreObservation } from "@/types/songs/bpi";
 import type { TotalBpiQuery } from "./_shared";
 
 export async function handleStatsTotalBpi(
@@ -17,20 +20,36 @@ export async function handleStatsTotalBpi(
       ? dayjs.tz().utc().toDate()
       : dayjs.tz(q.asOf).endOf("day").utc().toDate();
 
-  const [scores, totalCount, user] = await Promise.all([
+  const [scores, songMaster, user] = await Promise.all([
     scoreDetailRepo.getScoresWithDetails(q.userId, q.version, {
       targetTime,
       onlyLastPlayedInRange: { start: new Date(0), end: targetTime },
     }),
-    statsTablesRepo.getTotalSongCount([12], []),
+    songsRepo.getSongMasterWithDef(),
     usersRepo.getIidxId(q.userId),
   ]);
 
+  const level12Master = songMaster.filter((s) => s.difficultyLevel === 12);
+  const totalCount = level12Master.length;
   const level12Scores = scores.filter((s) => Number(s.difficultyLevel) === 12);
-  const bpis = level12Scores.map((s) =>
-    s.bpi !== null && s.bpi !== undefined ? Number(s.bpi) : -15,
+  const observations: IBpiScoreObservation[] = level12Scores
+    .filter((s) => s.exScore !== null && s.exScore !== undefined)
+    .map((s) => ({ songId: s.songId, notes: s.notes, exScore: Number(s.exScore) }));
+  const freshTotalBpi = BpiCalculator.calculateTotalBPI(
+    observations,
+    level12Master,
   );
-  const totalBpi = BpiCalculator.calculateTotalBPI(bpis, totalCount);
+  // 「今の」総合BPI(asOf省略/"latest")に限り、既知の最高値を下回らないよう
+  // ラチェットする。過去日付を指定したasOfクエリは「その時点の生の値」を
+  // 見る用途のため、未来の記録を混ぜ込まないよう対象外にする
+  // （bpiImport.tsのexecuteSaveBpiSystemと同じ理由。src/lib/bpi/index.ts参照）。
+  const isLatest = !q.asOf || q.asOf === "latest";
+  const previousBest = isLatest
+    ? await userStatusLogsRepo.getMaxTotalBpi(db, q.userId, q.version)
+    : null;
+  const totalBpi = isLatest
+    ? BpiCalculator.ratchetTotalBpi(previousBest, freshTotalBpi)
+    : freshTotalBpi;
   const estimatedRank = BpiCalculator.estimateRank(totalBpi);
   const areaRank =
     q.version === latestVersion ? getUserAreaRank(user?.iidxId ?? null) : null;

@@ -1091,23 +1091,17 @@ export const dashboardTranslations = {
   },
 
   "dashboard.bpiChangeNotice.title": {
-    ja: "BPIの算出方法の変更を予定しています",
-    en: "A change to how BPI is calculated is planned",
-    "zh-TW": "預計變更BPI的計算方式",
-    ko: "BPI 산출 방식 변경을 예정하고 있습니다",
+    ja: "BPIの算出方法が新しくなりました",
+    en: "BPI is now calculated with a new formula",
+    "zh-TW": "BPI的計算方式已更新",
+    ko: "BPI 산출 방식이 새로워졌습니다",
   },
   "dashboard.bpiChangeNotice.desc": {
-    ja: "譜面ごとの特性やプレイヤーの分布を反映した新しいBPI算出方式への変更を検討しています。ご意見を募集中です。",
-    en: "We're considering a new BPI formula that better reflects each chart's characteristics and the player score distribution. Your feedback is welcome.",
+    ja: "譜面ごとの特性やプレイヤーの分布を反映した新しいBPI算出方式に切り替わりました。旧方式との違いを見比べられます。",
+    en: "BPI now uses a new formula that reflects each chart's characteristics and the player score distribution. You can compare it against the old formula.",
     "zh-TW":
-      "我們正在研擬能更貼近各譜面特性與玩家分數分佈的全新BPI計算方式，歡迎提供意見。",
-    ko: "채보별 특성과 플레이어 분포를 반영한 새로운 BPI 산출 방식으로의 변경을 검토하고 있습니다. 의견을 모집 중입니다.",
-  },
-  "dashboard.bpiChangeNotice.detailLink": {
-    ja: "詳細はこちら（X）",
-    en: "Details (X)",
-    "zh-TW": "詳情請見（X）",
-    ko: "자세히 보기 (X)",
+      "BPI已切換為能更貼近各譜面特性與玩家分數分佈的全新計算方式，可與舊制比較差異。",
+    ko: "채보별 특성과 플레이어 분포를 반영한 새로운 BPI 산출 방식으로 전환되었습니다. 기존 방식과의 차이를 비교해 볼 수 있습니다.",
   },
   "dashboard.bpiChangeNotice.feedbackLink": {
     ja: "ご意見はこちら",
@@ -1116,10 +1110,10 @@ export const dashboardTranslations = {
     ko: "의견 보내기",
   },
   "dashboard.bpiChangeNotice.previewLink": {
-    ja: "新方式で自分のBPIを見る",
-    en: "Preview my new BPI",
-    "zh-TW": "預覽我的新制BPI",
-    ko: "새 방식으로 내 BPI 보기",
+    ja: "新旧比較を見る",
+    en: "Compare old vs new",
+    "zh-TW": "查看新舊比較",
+    ko: "신구 비교 보기",
   },
   "dashboard.bpiChangeNotice.theoryLink": {
     ja: "理論的な説明（Notion）",

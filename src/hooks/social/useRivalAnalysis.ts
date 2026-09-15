@@ -1,9 +1,14 @@
 ﻿import { useMemo } from "react";
-import { BpiCalculator } from "@/lib/bpi";
+import { BpiV1 } from "@bpim/bpicalc";
 import type { SongWithRival } from "@/types/songs/score";
 import type { RadarCategory } from "@/types/stats/radar";
 import { ALL_RADAR_CATEGORIES } from "@/constants/iidx/radars";
 import type { ScatterPoint } from "@/hooks/metrics/useArenaAnalysis";
+
+// 自分とライバル、2人分の既知bpi値をカテゴリ別に集計するだけの比較用途。
+// ライバル側の生スコア全体を持っていないためV2の潜在スキル推定は組めず、
+// 純粋な集計関数としてV1のべき乗平均をそのまま使う。
+const v1 = new BpiV1();
 
 export interface RivalDiffPoint {
   title: string;
@@ -129,13 +134,9 @@ export function useRivalAnalysis(
           .map((s) => s.rival!.bpi!)
           .sort((a, b) => b - a);
         const myTotal =
-          myBpis.length > 0
-            ? BpiCalculator.calculateTotalBPI(myBpis, myBpis.length)
-            : null;
+          myBpis.length > 0 ? v1.total(myBpis, myBpis.length) : null;
         const rivalTotal =
-          rivalBpis.length > 0
-            ? BpiCalculator.calculateTotalBPI(rivalBpis, rivalBpis.length)
-            : null;
+          rivalBpis.length > 0 ? v1.total(rivalBpis, rivalBpis.length) : null;
         return { cat, myTotal, rivalTotal, songCount: catSongs.length };
       }),
     [eligibleSongs],

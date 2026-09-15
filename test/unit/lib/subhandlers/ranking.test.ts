@@ -13,6 +13,7 @@ const getSongRankingMock = vi.fn();
 const getUserSongRankingsMock = vi.fn();
 const getTowerRankingMock = vi.fn();
 const getLatestScoresWithMusicDataMock = vi.fn();
+const getSongMasterWithDefMock = vi.fn();
 
 vi.mock("@/lib/db/aggregates/userProfiles/ranking", () => ({
   userRankingRepo: {
@@ -37,6 +38,11 @@ vi.mock("@/lib/db/aggregates/iidxTower", () => ({
     getTowerRanking: (...a: unknown[]) => getTowerRankingMock(...a),
   },
 }));
+vi.mock("@/lib/db/domains/songs", () => ({
+  songsRepo: {
+    getSongMasterWithDef: (...a: unknown[]) => getSongMasterWithDefMock(...a),
+  },
+}));
 vi.mock("@/lib/db/shared/visibility", () => ({
   canViewUserData: (p: { isPublic?: number }) => p.isPublic === 1,
 }));
@@ -54,6 +60,7 @@ vi.mock("@/lib/db/shared/privacyMask", () => ({
 }));
 vi.mock("@/lib/radar/calculator", () => ({
   calculateRadar: () => ({ NOTES: { totalBpi: 0, songs: [] } }),
+  buildRadarSongMaster: () => new Map(),
 }));
 
 const authReq = (query: Record<string, unknown>) =>
@@ -61,6 +68,7 @@ const authReq = (query: Record<string, unknown>) =>
 
 beforeEach(() => {
   vi.clearAllMocks();
+  getSongMasterWithDefMock.mockResolvedValue([]);
 });
 
 describe("handleRankingSongById", () => {

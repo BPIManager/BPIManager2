@@ -13,7 +13,10 @@ export interface RivalScore {
 }
 
 export interface SongWithScore
-  extends Pick<IBpiBasicSongData, "notes" | "kaidenAvg" | "wrScore" | "coef"> {
+  extends Pick<
+    IBpiBasicSongData,
+    "notes" | "kaidenAvg" | "wrScore" | "coef" | "mu" | "sigma" | "residualVar"
+  > {
   // 楽曲基本情報
   songId: number;
   title: string;

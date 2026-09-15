@@ -26,5 +26,11 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    // scripts/ は.gitignore済みのローカル専用スクリプト置き場（eslint.config.mjs
+    // 参照）。CIのチェックアウトには存在しないため、tscの対象からも外し
+    // ローカルの型チェックをCIと揃える。
+    "scripts/**"
+  ]
 }

@@ -1,16 +1,19 @@
 import { useState } from "react";
+import { BpiV1 } from "@bpim/bpicalc";
 import { DashCard } from "@/components/ui/dashcard";
 import { Input } from "@/components/ui/input";
 import { BpiCalculator } from "@/lib/bpi";
-import { NewBpiCalculator } from "@/lib/bpi/newBpi";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 export interface ScoreSimulatorSongInfo {
-  songId: number;
   notes: number;
   kaidenAvg: number | null;
   wrScore: number | null;
   coef: number | null;
+  /** V2(分布ベース)算出用。ALS対象外・未計算の曲は null */
+  mu: number | null;
+  sigma: number | null;
+  residualVar: number | null;
   hasNewParams: boolean;
 }
 
@@ -18,15 +21,21 @@ interface Props extends ScoreSimulatorSongInfo {
   initialScore: number;
 }
 
+// 「現行(V1)」は本番実装(BpiCalculator、現在はV2)ではなくレガシーのV1公式を
+// 直接使う（比較ページの他の箇所と同じ理由。index.tsx参照）。
+const legacyV1 = new BpiV1();
+
 /**
  * EXスコアを入力すると、この楽曲の現行BPI・新BPIをその場で計算して表示する。
  */
 export default function ScoreSimulatorCard({
-  songId,
   notes,
   kaidenAvg,
   wrScore,
   coef,
+  mu,
+  sigma,
+  residualVar,
   hasNewParams,
   initialScore,
 }: Props) {
@@ -37,11 +46,11 @@ export default function ScoreSimulatorCard({
   const isValid = input !== "" && Number.isFinite(exScore) && exScore >= 0;
 
   const currentBpi = isValid
-    ? BpiCalculator.calc(exScore, { notes, kaidenAvg, wrScore, coef })
+    ? legacyV1.chart({ notes, kaidenAvg, wrScore, coef }).bpi(exScore)
     : null;
   const newBpi =
     isValid && hasNewParams
-      ? NewBpiCalculator.calc(exScore, { songId, notes, kaidenAvg, wrScore })
+      ? BpiCalculator.calc(exScore, { notes, kaidenAvg, wrScore, coef, mu, sigma, residualVar })
       : null;
 
   return (

@@ -53,7 +53,7 @@ vi.mock("@/lib/db/domains/allSongs", () => ({
   allSongsRepo: { getAllLevelMaster: vi.fn().mockResolvedValue([]) },
 }));
 vi.mock("@/lib/db/orchestrators/bpiImport", () => ({
-  saveImportResults: vi.fn().mockResolvedValue(undefined),
+  saveImportResults: vi.fn().mockResolvedValue({ totalBpi: 0 }),
 }));
 vi.mock("@/lib/bpi", () => ({
   BpiCalculator: { calc: () => 0, calculateTotalBPI: () => 0 },

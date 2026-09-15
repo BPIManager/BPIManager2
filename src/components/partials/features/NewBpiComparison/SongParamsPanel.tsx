@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { DashCard } from "@/components/ui/dashcard";
 import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "@/hooks/common/useTranslation";
-import InfoHint from "./InfoHint";
+import InfoHint from "@/components/partials/common/InfoHint/ui";
 
 export interface SongParamsInfo {
   /** 現行方式の譜面係数。未設定曲は本番実装のデフォルト値。 */
@@ -17,8 +17,6 @@ export interface SongParamsInfo {
   mu: number | null;
   /** 新方式: この曲のスコア分布の弁別力パラメータ。 */
   sigma: number | null;
-  /** 新方式: mu/sigma の推定に使った観測数。 */
-  n: number | null;
   /** 新方式: この曲の全一に対応する z 値（BPI100 アンカー）。 */
   z100: number | null;
   /** 新方式: この曲のカーブ指数（BPI↔順位が現行式に乗るようフィットした値）。 */
@@ -81,7 +79,6 @@ export default function SongParamsPanel({
   wrScore,
   mu,
   sigma,
-  n,
   z100,
   k,
   z0,
@@ -138,11 +135,6 @@ export default function SongParamsPanel({
           label={t("newBpi.params.sigma.label")}
           hint={t("newBpi.params.sigma.hint")}
           value={fmt(sigma)}
-        />
-        <ParamItem
-          label={t("newBpi.params.n.label")}
-          hint={t("newBpi.params.n.hint")}
-          value={fmt(n)}
         />
         <ParamItem
           label={t("newBpi.params.z100.label")}

@@ -5,6 +5,7 @@ import { songsRepo } from "../db/domains/songs";
 import { SongLookup } from "./songLookup";
 import { v4 as uuidv4 } from "uuid";
 
+import type { IBpiScoreObservation } from "@/types/songs/bpi";
 import type {
   BpimScoreData,
   BpimScoreHistoryItem,
@@ -16,7 +17,7 @@ interface ScoreUpdate {
   songId: number;
   definitionId: number;
   exScore: number;
-  bpi: number;
+  bpi: number | null;
   clearState: string;
   missCount: number | null;
   version: string;
@@ -137,10 +138,9 @@ export class BpiImportService {
     }
 
     const sortedDates = Array.from(dailyGroups.keys()).sort();
-    const currentProfileBpis = new Map<number, number>();
-    const totalLevel12Count = songMaster.filter(
-      (s) => s.difficultyLevel === 12,
-    ).length;
+    const currentProfileExScores = new Map<number, number>();
+    const level12Master = songMaster.filter((s) => s.difficultyLevel === 12);
+    const songById = new Map(songMaster.map((s) => [s.songId, s]));
 
     for (const date of sortedDates) {
       const batchId = uuidv4();
@@ -150,35 +150,45 @@ export class BpiImportService {
         const songDef = lookup.find(item.title, item.difficulty);
         if (!songDef) continue;
 
+        // mu/sigma未計算（ALS対象外）の曲はbpiがnullになるが、スコア自体の
+        // 記録は落とさない（bulk.tsの取り込みと同じ扱い）
         const bpi = BpiCalculator.calc(item.exScore, songDef);
-        if (bpi !== null) {
-          allScoreUpdates.push({
-            userId,
-            songId: songDef.songId,
-            definitionId: songDef.defId,
-            exScore: item.exScore,
-            bpi: bpi,
-            clearState: this.mapClearState(meta?.clearState),
-            missCount:
-              meta?.missCount == null || isNaN(Number(meta.missCount))
-                ? null
-                : Number(meta.missCount),
-            version: version,
-            batchId: batchId,
-            lastPlayed: dayjs.tz(item.updatedAt).toDate(),
-          });
+        allScoreUpdates.push({
+          userId,
+          songId: songDef.songId,
+          definitionId: songDef.defId,
+          exScore: item.exScore,
+          bpi,
+          clearState: this.mapClearState(meta?.clearState),
+          missCount:
+            meta?.missCount == null || isNaN(Number(meta.missCount))
+              ? null
+              : Number(meta.missCount),
+          version: version,
+          batchId: batchId,
+          lastPlayed: dayjs.tz(item.updatedAt).toDate(),
+        });
 
-          if (songDef.difficultyLevel === 12) {
-            currentProfileBpis.set(songDef.songId, bpi);
-          }
+        if (songDef.difficultyLevel === 12) {
+          currentProfileExScores.set(songDef.songId, item.exScore);
         }
       }
 
-      const allCurrentBpis = Array.from(currentProfileBpis.values());
-      const totalBpi = BpiCalculator.calculateTotalBPI(
-        allCurrentBpis,
-        totalLevel12Count,
+      const observations: IBpiScoreObservation[] = Array.from(
+        currentProfileExScores.entries(),
+      ).map(([songId, exScore]) => ({
+        songId,
+        notes: songById.get(songId)?.notes ?? 0,
+        exScore,
+      }));
+      const freshTotalBpi = BpiCalculator.calculateTotalBPI(
+        observations,
+        level12Master,
       );
+      // 総合BPIは既知の最高値を下回らないようラチェットする（bpiImport.tsの
+      // executeSaveBpiSystemと同じ理由。ここは日付昇順ループでの一括再構築
+      // のため、DBの前回値ではなくこのループ内のrunning maxを基準にする）。
+      const totalBpi = BpiCalculator.ratchetTotalBpi(latestBpi, freshTotalBpi);
 
       latestBpi = totalBpi;
 

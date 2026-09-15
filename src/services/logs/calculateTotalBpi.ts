@@ -1,9 +1,12 @@
 import { BpiCalculator } from "@/lib/bpi";
 import dayjs from "@/lib/dayjs";
+import type { IBpiBasicSongData, IBpiScoreObservation } from "@/types/songs/bpi";
 
 interface ScoreEntry {
   songId: number;
   bpi: number | null;
+  exScore: number;
+  notes: number;
   difficultyLevel: number;
   title: string;
   clearState?: string | null;
@@ -28,14 +31,17 @@ interface TimelineEntry {
 
 export const calculateTotalBpi = (
   allScores: ScoreEntry[],
-  totalSongs: number,
+  allSongs: (IBpiBasicSongData & { songId: number })[],
   version: string,
   topN: number,
 ): TimelineEntry[] => {
   if (allScores.length === 0) return [];
 
   const timeline: TimelineEntry[] = [];
-  const currentPBs = new Map<number, { bpi: number; level: number }>();
+  const currentPBs = new Map<
+    number,
+    { bpi: number; level: number; exScore: number; notes: number }
+  >();
   const dailyGroups = new Map<string, ScoreEntry[]>();
 
   // 日付情報が欠損したスコアを「今日」として扱うと実際の推移を歪めるため、
@@ -66,15 +72,16 @@ export const calculateTotalBpi = (
       currentPBs.set(s.songId, {
         bpi: s.bpi ?? -15,
         level: s.difficultyLevel,
+        exScore: s.exScore,
+        notes: s.notes,
       });
     });
 
-    const bpis12 = Array.from(currentPBs.values())
-      .filter((v) => v.level === 12)
-      .map((v) => v.bpi)
-      .sort((a, b) => b - a);
+    const observations: IBpiScoreObservation[] = Array.from(
+      currentPBs.entries(),
+    ).map(([songId, v]) => ({ songId, notes: v.notes, exScore: v.exScore }));
 
-    const totalBpi = BpiCalculator.calculateTotalBPI(bpis12, totalSongs);
+    const totalBpi = BpiCalculator.calculateTotalBPI(observations, allSongs);
 
     timeline.push({
       id: dayKey,

@@ -53,6 +53,32 @@ class UserStatusLogsRepository {
   }
 
   /**
+   * 指定ユーザー・バージョンでこれまでに記録された総合BPIの最高値を取得する。
+   * 総合BPIの「下がらないラチェット」（{@link BpiCalculator.ratchetTotalBpi}）の
+   * 基準値として使う。`getLatestTotalBpi`（最新1件）とは異なり、途中に
+   * ラチェット導入前の下振れがあっても影響されない。
+   *
+   * @param trx - 呼び出し元が管理するトランザクション（トランザクション外から
+   *   呼ぶ場合は `db` をそのまま渡す）
+   * @param userId - ユーザー ID
+   * @param version - バージョン番号
+   * @returns 記録が無ければ `null`
+   */
+  async getMaxTotalBpi(
+    trx: Kysely<Database> | Transaction<Database>,
+    userId: string,
+    version: string,
+  ): Promise<number | null> {
+    const row = await trx
+      .selectFrom("userStatusLogs")
+      .select((eb) => eb.fn.max("totalBpi").as("maxTotalBpi"))
+      .where("userId", "=", userId)
+      .where("version", "=", version)
+      .executeTakeFirst();
+    return row?.maxTotalBpi != null ? Number(row.maxTotalBpi) : null;
+  }
+
+  /**
    * 指定バージョンにおける各ユーザーの最新 `userStatusLogs` 行の ID を取得するサブクエリを組み立てる。
    *
    * @param version - バージョン番号

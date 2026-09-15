@@ -207,10 +207,12 @@ issue #297 は現行 `BpiCalculator` への適用を `feat/total-bpi-cliff-fix` 
 bpim2の`estimateRank`（総合BPI版）は
 
 ```
-順位 = ceil( AVERAGE_OF_ALL_KAIDENS ^ ((100 - 総合BPI) / 100) )
+順位 = ceil( RANK_BASE_TOTAL ^ ((100 - 総合BPI) / 100) )
 ```
 
-（`AVERAGE_OF_ALL_KAIDENS = 2699`。原典は総合BPI版の基準点をDOLCE.氏の実測総合BPI≈95から経験的に求めていたが、bpim2実装は単曲BPI版と同じ指数系を流用している）。
+（元々`RANK_BASE_TOTAL = 2699`。原典は総合BPI版の基準点をDOLCE.氏の実測総合BPI≈95から経験的に求めていたが、bpim2実装は単曲BPI版と同じ指数系を流用していた。この`2699`は「皆伝取得者数の半分」という定義であり、「皆伝内順位」を表していた。
+
+issue #380（BPI V1→V2移行）に伴い、この定義を「皆伝内順位」から「全体（アリーナ上位母集団）に対するおおよその順位」へ変更し、`RANK_BASE_TOTAL = 3000`（直近のアリーナクロール＝A帯上位6,000人の半数）に置き換えた。皆伝取得者数ベースの値を使い続けるなら本来は約1,790（クロール6,000人中の皆伝人数3,580人の半数）が定義に忠実だが、母集団の定義自体を「皆伝のみ」から「アリーナ上位全体」に広げたことに伴い3,000を採用している）。
 
 ### 5.1 新方式の順位推定（`NewBpiCalculator.estimateRank`）
 

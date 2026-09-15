@@ -2,10 +2,23 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import dayjs from "@/lib/dayjs";
 import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { rivalRepo } from "@/lib/db/aggregates/rivalScores/rival";
+import { songsRepo } from "@/lib/db/domains/songs";
 import { BpiCalculator } from "@/lib/bpi";
 import { dashboardSchema } from "@/lib/mcp/schemas";
+import type { IBpiBasicSongData, IBpiScoreObservation } from "@/types/songs/bpi";
 
 type HistoryRow = Awaited<ReturnType<typeof statsTablesRepo.getScoreHistory>>[number];
+type MasterSong = IBpiBasicSongData & { songId: number };
+
+function toObservations(rows: HistoryRow[]): IBpiScoreObservation[] {
+  return rows
+    .filter((r) => r.songId != null && r.exScore != null)
+    .map((r) => ({
+      songId: r.songId as number,
+      notes: Number(r.notes),
+      exScore: Number(r.exScore),
+    }));
+}
 
 function toJSTDateStr(date: Date | string) {
   return dayjs(date).tz().format("YYYY-MM-DD");
@@ -22,7 +35,7 @@ function latestBySong(history: HistoryRow[]) {
 
 function buildBpiTrend(
   history: HistoryRow[],
-  totalSongCount: number,
+  allSongs: MasterSong[],
   historyDays: number,
 ) {
   const logsByDate = new Map<string, HistoryRow[]>();
@@ -36,38 +49,54 @@ function buildBpiTrend(
 
   const dateKeys = Array.from(logsByDate.keys()).sort();
   const recentDateKeys = new Set(dateKeys.slice(-historyDays));
+  const songById = new Map(allSongs.map((s) => [s.songId, s]));
 
-  const cumulativeBpiBySong = new Map<number, number>();
+  const cumulativeExScoreBySong = new Map<number, number>();
   const totalBpiHistory: { date: string; totalBpi: number }[] = [];
   const dailyBpi: { date: string; totalBpi: number; count: number }[] = [];
 
   for (const date of dateKeys) {
     const dayRows = logsByDate.get(date)!;
-    const dayBestBpiBySong = new Map<number, number>();
+    const dayBestExScoreBySong = new Map<number, number>();
     for (const row of dayRows) {
-      const songId = row.songId as number;
-      const bpi = row.bpi ?? -15;
-      cumulativeBpiBySong.set(songId, bpi);
-      if (!dayBestBpiBySong.has(songId) || dayBestBpiBySong.get(songId)! < bpi) {
-        dayBestBpiBySong.set(songId, bpi);
+      if (row.songId == null || row.exScore == null) continue;
+      const songId = row.songId;
+      const ex = Number(row.exScore);
+      cumulativeExScoreBySong.set(songId, ex);
+      if (!dayBestExScoreBySong.has(songId) || dayBestExScoreBySong.get(songId)! < ex) {
+        dayBestExScoreBySong.set(songId, ex);
       }
     }
 
     if (!recentDateKeys.has(date)) continue;
 
+    const cumulativeObservations: IBpiScoreObservation[] = Array.from(
+      cumulativeExScoreBySong.entries(),
+    ).map(([songId, exScore]) => ({
+      songId,
+      notes: songById.get(songId)?.notes ?? 0,
+      exScore,
+    }));
     totalBpiHistory.push({
       date,
-      totalBpi: BpiCalculator.calculateTotalBPI(
-        Array.from(cumulativeBpiBySong.values()),
-        totalSongCount,
-      ),
+      totalBpi: BpiCalculator.calculateTotalBPI(cumulativeObservations, allSongs),
     });
 
-    const dayBpis = Array.from(dayBestBpiBySong.values());
+    // その日プレイした曲だけの自己完結した集合（未プレイ曲の穴埋めは無い）
+    const dayObservations: IBpiScoreObservation[] = Array.from(
+      dayBestExScoreBySong.entries(),
+    ).map(([songId, exScore]) => ({
+      songId,
+      notes: songById.get(songId)?.notes ?? 0,
+      exScore,
+    }));
+    const daySongs = dayObservations
+      .map((o) => songById.get(o.songId))
+      .filter((s): s is MasterSong => s != null);
     dailyBpi.push({
       date,
-      totalBpi: BpiCalculator.calculateTotalBPI(dayBpis, dayBpis.length),
-      count: dayBpis.length,
+      totalBpi: BpiCalculator.calculateTotalBPI(dayObservations, daySongs),
+      count: dayObservations.length,
     });
   }
 
@@ -95,12 +124,11 @@ export function registerGetMyDashboard(server: McpServer, userId: string) {
     async ({ version, levels, difficulties, historyDays, topSongsLimit }) => {
       const numericLevels = levels.map(Number);
 
-      const [canonicalHistory, canonicalCount, filteredHistory, filteredCount, closeRivalRows] =
+      const [canonicalHistory, filteredHistory, fullMaster, closeRivalRows] =
         await Promise.all([
           statsTablesRepo.getScoreHistory(userId, version, [12], []),
-          statsTablesRepo.getTotalSongCount([12], []),
           statsTablesRepo.getScoreHistory(userId, version, numericLevels, difficulties),
-          statsTablesRepo.getTotalSongCount(numericLevels, difficulties),
+          songsRepo.getSongMasterWithDef(),
           rivalRepo.getScoreComparisonList({
             userId,
             version,
@@ -111,6 +139,20 @@ export function registerGetMyDashboard(server: McpServer, userId: string) {
             diffArray: difficulties,
           }),
         ]);
+
+      const canonicalMaster: MasterSong[] = fullMaster.filter(
+        (s) => s.difficultyLevel === 12,
+      );
+      const canonicalCount = canonicalMaster.length;
+      const filteredMaster: MasterSong[] = fullMaster.filter(
+        (s) =>
+          (numericLevels.length === 0 ||
+            (s.difficultyLevel != null && numericLevels.includes(s.difficultyLevel))) &&
+          (difficulties.length === 0 ||
+            (s.difficulty != null &&
+              (difficulties as string[]).includes(s.difficulty))),
+      );
+      const filteredCount = filteredMaster.length;
 
       if (canonicalHistory.length === 0 && filteredHistory.length === 0) {
         return {
@@ -123,8 +165,8 @@ export function registerGetMyDashboard(server: McpServer, userId: string) {
       // 総合BPI本体は常にレベル12全曲基準（levels/difficultiesの影響を受けない）
       const canonicalLatest = latestBySong(canonicalHistory);
       const totalBpi = BpiCalculator.calculateTotalBPI(
-        canonicalLatest.map((s) => s.bpi ?? -15),
-        canonicalCount,
+        toObservations(canonicalLatest),
+        canonicalMaster,
       );
       const estimatedRank = BpiCalculator.estimateRank(totalBpi);
 
@@ -132,7 +174,7 @@ export function registerGetMyDashboard(server: McpServer, userId: string) {
       const filteredLatest = latestBySong(filteredHistory);
       const { totalBpiHistory, dailyBpi } = buildBpiTrend(
         filteredHistory,
-        filteredCount,
+        filteredMaster,
         historyDays,
       );
 

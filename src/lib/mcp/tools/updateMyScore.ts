@@ -9,6 +9,7 @@ import { saveImportResults } from "@/lib/db/orchestrators/bpiImport";
 import { BpiCalculator } from "@/lib/bpi";
 import { isScoreImproved } from "@/lib/scores/evaluateImprovement";
 import { NewAllScores, NewScore } from "@/types/db";
+import type { IBpiScoreObservation } from "@/types/songs/bpi";
 import { updateMyScoreSchema } from "@/lib/mcp/schemas";
 
 export function registerUpdateMyScore(server: McpServer, userId: string) {
@@ -117,17 +118,19 @@ export function registerUpdateMyScore(server: McpServer, userId: string) {
       }
 
       const twelves = bpiSongMaster.filter((s) => s.difficultyLevel === 12);
-      const allBpisForTotal = twelves.map((s) =>
-        s.songId === song.songId
-          ? (bpi ?? -15)
-          : (currentScores.find((cs) => cs.songId === s.songId)?.bpi ?? -15),
+      const currentExScoreMap = new Map(
+        currentScores.map((s) => [s.songId, s.exScore]),
       );
-      const newTotalBpi = BpiCalculator.calculateTotalBPI(
-        allBpisForTotal,
-        twelves.length,
+      const observations: IBpiScoreObservation[] = bpiSongMaster.flatMap(
+        (s) => {
+          const ex =
+            s.songId === song.songId ? exScore : currentExScoreMap.get(s.songId);
+          return ex != null ? [{ songId: s.songId, notes: s.notes, exScore: ex }] : [];
+        },
       );
+      const newTotalBpi = BpiCalculator.calculateTotalBPI(observations, twelves);
 
-      await saveImportResults({
+      const { totalBpi: savedTotalBpi } = await saveImportResults({
         userId,
         version,
         batchId,
@@ -145,7 +148,7 @@ export function registerUpdateMyScore(server: McpServer, userId: string) {
             text:
               `更新しました。${song.title} [${song.difficulty}] exScore=${exScore}, ` +
               `clearState=${clearState}, bpi=${bpi ?? "計算不可"}。` +
-              `総合BPI: ${previousTotalBpi} → ${newTotalBpi}` +
+              `総合BPI: ${previousTotalBpi} → ${savedTotalBpi}` +
               (allScoreUpdates.length > 0
                 ? "（全難易度履歴も合わせて更新しました）"
                 : ""),

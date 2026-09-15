@@ -5,6 +5,7 @@ import type {
   RivalBpiGrowthEntry,
   GrowthParticipant,
 } from "@/types/stats/monthlyReview";
+import type { IBpiBasicSongData } from "@/types/songs/bpi";
 
 type RivalScoreRow = {
   userId: string;
@@ -127,23 +128,22 @@ function toBpiNumber<T>(bpi: unknown, fallback: T): number | T {
 
 export function attachRivalBpiTimelines(
   rivals: RivalDiff[],
-  rivalPreMonthState: { userId: string; songId: number; bpi: unknown }[],
+  rivalPreMonthState: { userId: string; songId: number; exScore: unknown }[],
   rivalInMonthHistory: {
     userId: string;
     songId: number;
-    bpi: unknown;
+    exScore: unknown;
     lastPlayed: Date | string;
   }[],
-  totalSongs: number,
+  songMaster: (IBpiBasicSongData & { songId: number })[],
   isYearMode: boolean,
 ): Map<string, { date: string; value: number }[]> {
   const rivalPreMonthByUser = new Map<string, Map<number, number>>();
   for (const s of rivalPreMonthState) {
+    if (s.exScore == null) continue;
     if (!rivalPreMonthByUser.has(s.userId))
       rivalPreMonthByUser.set(s.userId, new Map());
-    rivalPreMonthByUser
-      .get(s.userId)!
-      .set(s.songId, toBpiNumber(s.bpi, -15));
+    rivalPreMonthByUser.get(s.userId)!.set(s.songId, Number(s.exScore));
   }
 
   const rivalInMonthByUser = new Map<string, typeof rivalInMonthHistory>();
@@ -163,13 +163,13 @@ export function attachRivalBpiTimelines(
     const rawInMonth = rivalInMonthByUser.get(r.userId) ?? [];
     const inMonth = rawInMonth.map((e) => ({
       songId: e.songId,
-      bpi: toBpiNumber(e.bpi, null),
+      exScore: toBpiNumber(e.exScore, null),
       lastPlayed: e.lastPlayed,
     }));
     const { history, bpiStart: rBpiStart, bpiEnd: rBpiEnd } = buildBpiTimeline(
       preMap,
       inMonth,
-      totalSongs,
+      songMaster,
       isYearMode,
     );
     r.bpiStart = rBpiStart;

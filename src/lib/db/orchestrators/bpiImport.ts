@@ -5,6 +5,7 @@ import { scoresRepo } from "@/lib/db/domains/scores";
 import { allScoresRepo } from "@/lib/db/domains/allScores";
 import { navigationRepo } from "@/lib/db/domains/logs/navigation";
 import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
+import { BpiCalculator } from "@/lib/bpi";
 
 /**
  * スコアインポート結果をトランザクション内で保存する。
@@ -17,6 +18,9 @@ import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
  * @param params.scoreUpdates - 保存する BPI スコアの配列
  * @param params.allScoreUpdates - 保存する全難易度スコアの配列
  * @param params.newTotalBpi - 今回算出した総合 BPI
+ * @returns 実際に保存した総合BPI（`newTotalBpi`にラチェットを適用した後の値。
+ *   呼び出し元の応答にはこちらを使う。`newTotalBpi`をそのまま返すと、
+ *   ラチェットで下回りが吸収された場合に応答値と保存値がずれるため）
  */
 export async function saveImportResults(params: {
   userId: string;
@@ -25,10 +29,11 @@ export async function saveImportResults(params: {
   scoreUpdates: NewScore[];
   allScoreUpdates: NewAllScores[];
   newTotalBpi: number;
-}) {
+}): Promise<{ totalBpi: number }> {
   return await db.transaction().execute(async (trx) => {
-    await executeSaveBpiSystem(trx, params);
+    const totalBpi = await executeSaveBpiSystem(trx, params);
     await executeSaveAllLevelHistory(trx, params);
+    return { totalBpi };
   });
 }
 
@@ -71,7 +76,7 @@ async function executeSaveBpiSystem(
     scoreUpdates: NewScore[];
     newTotalBpi: number;
   },
-) {
+): Promise<number> {
   const latestLog = await userStatusLogsRepo.getLatestArenaRank(
     trx,
     params.userId,
@@ -79,24 +84,39 @@ async function executeSaveBpiSystem(
   );
 
   const currentArenaRank = latestLog?.arenaRank ?? null;
-  if (params.scoreUpdates.length > 0) {
-    await navigationRepo.insert(trx, {
-      userId: params.userId,
-      totalBpi: params.newTotalBpi,
-      version: params.version,
-      batchId: params.batchId,
-    });
+  if (params.scoreUpdates.length === 0) return params.newTotalBpi;
 
-    await userStatusLogsRepo.insert(trx, {
-      userId: params.userId,
-      totalBpi: params.newTotalBpi,
-      arenaRank: currentArenaRank,
-      version: params.version,
-      batchId: params.batchId,
-    });
+  // 総合BPIは既知の最高値を下回らないようラチェットする（V2は未プレイ曲の
+  // 予測が新しい観測で下がりうるため、プレイ済み曲が1曲も下がっていなくても
+  // 総合BPI自体は下がりうる。src/lib/bpi/index.tsのratchetTotalBpi参照）。
+  const previousBest = await userStatusLogsRepo.getMaxTotalBpi(
+    trx,
+    params.userId,
+    params.version,
+  );
+  const totalBpi = BpiCalculator.ratchetTotalBpi(
+    previousBest,
+    params.newTotalBpi,
+  );
 
-    await scoresRepo.insert(trx, params.scoreUpdates);
-  }
+  await navigationRepo.insert(trx, {
+    userId: params.userId,
+    totalBpi,
+    version: params.version,
+    batchId: params.batchId,
+  });
+
+  await userStatusLogsRepo.insert(trx, {
+    userId: params.userId,
+    totalBpi,
+    arenaRank: currentArenaRank,
+    version: params.version,
+    batchId: params.batchId,
+  });
+
+  await scoresRepo.insert(trx, params.scoreUpdates);
+
+  return totalBpi;
 }
 
 async function executeSaveAllLevelHistory(

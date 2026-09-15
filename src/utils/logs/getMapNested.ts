@@ -20,6 +20,9 @@ interface RawScoreRow {
   wrScore: number | null;
   kaidenAvg: number | null;
   coef: number | null;
+  mu?: number | null;
+  sigma?: number | null;
+  residualVar?: number | null;
 }
 
 export const mapToLogNested = (row: RawScoreRow): MappedBatchScore => {
@@ -63,5 +66,8 @@ export const mapToLogNested = (row: RawScoreRow): MappedBatchScore => {
     wrScore: row.wrScore,
     kaidenAvg: row.kaidenAvg,
     coef: row.coef,
+    mu: row.mu ?? null,
+    sigma: row.sigma ?? null,
+    residualVar: row.residualVar ?? null,
   };
 };

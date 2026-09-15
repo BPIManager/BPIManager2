@@ -2,15 +2,16 @@ import { useMemo, useState } from "react";
 import type { SongWithScore } from "@/types/songs/score";
 import { useUserScores } from "@/hooks/table/useUserScores";
 import { useUserSongRankings } from "@/hooks/stats/useUserSongRankings";
-import { useTotalBpiStats } from "@/hooks/stats/useCurrentTotalBpi";
 import { useSongList } from "@/hooks/songs/useSongList";
 import { useProfile } from "@/hooks/users/useProfile";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
+import { BpiV1 } from "@bpim/bpicalc";
 import { BpiCalculator } from "@/lib/bpi";
-import { NewBpiCalculator } from "@/lib/bpi/newBpi";
-import { calculateRadar, ALL_CATEGORIES } from "@/lib/radar/calculator";
-import { topElementMap } from "@/constants/iidx/radars/topElements";
-import { newBpiSongParamMap } from "@/constants/iidx/newBpi/songParams";
+import { ALL_CATEGORIES } from "@/lib/radar/calculator";
+import {
+  topElementMap,
+  topElementsByCategory,
+} from "@/constants/iidx/radars/topElements";
 import NewBpiComparisonUi, { NewBpiRow, SortKey } from "./ui";
 import type { CurvePoint } from "./CurveChart";
 import type { FormulaSongInfo } from "./FormulaCard";
@@ -21,6 +22,12 @@ import type { SongParamsInfo } from "./SongParamsPanel";
 interface Props {
   userId: string;
 }
+
+// このページは「V1(旧) vs V2(現行)」の比較専用ツールで、V1側は本番実装
+// (BpiCalculator、現在はV2)ではなくレガシーのV1公式を直接使う。V2側は
+// 本番と同じBpiCalculator(songDefのmu/sigmaをDBから読む)を使い、本番の
+// 総合BPIと値がずれないようにする。
+const legacyV1 = new BpiV1();
 
 /** 推移グラフのX軸(BPI)の目盛り。10刻み＋現行の床(-15)。 */
 const BPI_TICKS = [-15, -10, 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
@@ -51,8 +58,8 @@ const SCORE_RATE_STEPS: number[] = (() => {
  * 分布ベースの新方式BPIの検証用: 自分のスコアで現行BPIと新方式BPIを
  * 楽曲ごとに見比べるための集計ロジック。
  *
- * 新方式のパラメータ(mu/sigma)は `songDef` に持たせず `songParams.json`
- * （DBに追加しない）から読む。
+ * 新方式(V2)のパラメータ(mu/sigma)は本番と同じ `songDef` (DB)から読む
+ * （`BpiCalculator` 経由）。
  */
 export default function NewBpiComparison({ userId }: Props) {
   const [sortKey, setSortKey] = useState<SortKey>("deltaDesc");
@@ -109,10 +116,6 @@ export default function NewBpiComparison({ userId }: Props) {
     accessState === "ok" ? viewedUserId : undefined,
     latestVersion,
   );
-  const { stats, isLoading: isStatsLoading } = useTotalBpiStats(
-    accessState === "ok" ? viewedUserId : undefined,
-    latestVersion,
-  );
   // 総合BPI(issue #304, 未プレイ曲をa_iからの予測で埋める方式)には
   // 未プレイ曲を含む☆12全曲の一覧が要る。useUserScores(/scores)はプレイ済み
   // 楽曲しか返さないため、曲マスタ自体は別途取得する(閲覧対象ユーザーに
@@ -126,28 +129,19 @@ export default function NewBpiComparison({ userId }: Props) {
 
   const {
     rows,
-    hybridTotalBpi,
+    currentTotalBpi,
     newTotalBpi,
     comparableCount,
     playedSongMap,
   } = useMemo(() => {
-    const totalCount12 = stats?.totalCount;
-
     if (!songs)
       return {
         rows: [],
-        hybridTotalBpi: null,
+        currentTotalBpi: null,
         newTotalBpi: null,
         comparableCount: 0,
         playedSongMap: new Map<number, SongWithScore>(),
       };
-
-    // useUserScores(/scores API)はプレイ済み楽曲のみをscores経由のINNER JOINで
-    // 返す(未プレイ楽曲は含まれない)ため、`songs.length`は総曲数ではなく
-    // 比較可能数(プレイ済み数)にしかならない。総合BPIの分母には
-    // /stats/totalBpi と同じ「☆12の現行選曲数」(stats.totalCount、
-    // 未プレイ楽曲を含む)を使う必要がある(揃えないと未プレイ楽曲の
-    // 床(-15)埋めが効かず、総合BPIが本来より高く出てしまう)。
 
     const played = songs.filter(
       (s): s is typeof s & { exScore: number } => s.exScore !== null,
@@ -162,12 +156,13 @@ export default function NewBpiComparison({ userId }: Props) {
     );
 
     const rows: NewBpiRow[] = played.map((s) => {
-      const newBpi = NewBpiCalculator.calc(s.exScore, {
-        songId: s.songId,
-        notes: s.notes,
-        kaidenAvg: s.kaidenAvg,
-        wrScore: s.wrScore,
-      });
+      // s.bpi(DBの保存値)は本番がV2へ全面切り替え済みのため、もはやV1では
+      // ない。この比較ページの「現行(V1)」列は本番の現在値ではなく、常に
+      // legacyV1で計算し直した真のV1値にする(V2は本番と同じBpiCalculator)。
+      const currentBpi = legacyV1
+        .chart({ notes: s.notes, kaidenAvg: s.kaidenAvg, wrScore: s.wrScore, coef: s.coef })
+        .bpi(s.exScore);
+      const newBpi = BpiCalculator.calc(s.exScore, s);
       const actual = actualRankBySong.get(s.songId) ?? null;
       const bpmRange = parseBpmRange(s.bpm);
       return {
@@ -176,13 +171,11 @@ export default function NewBpiComparison({ userId }: Props) {
         difficulty: s.difficulty,
         difficultyLevel: s.difficultyLevel,
         exScore: s.exScore,
-        currentBpi: s.bpi,
+        currentBpi,
         newBpi,
-        delta: s.bpi !== null && newBpi !== null ? newBpi - s.bpi : null,
+        delta: currentBpi !== null && newBpi !== null ? newBpi - currentBpi : null,
         estimatedRank:
-          newBpi !== null
-            ? NewBpiCalculator.estimateRankFromBpi(newBpi)
-            : null,
+          newBpi !== null ? BpiCalculator.estimateRankFromBpi(newBpi) : null,
         actualRank: actual?.rank ?? null,
         actualTotalPlayers: actual?.totalPlayers ?? null,
         radarTop: topElementMap.get(`${s.title}___${s.difficulty}`) ?? null,
@@ -192,40 +185,39 @@ export default function NewBpiComparison({ userId }: Props) {
       };
     });
 
-    // 総合BPI(現行の /stats/totalBpi)は☆12のみを対象にしているため、
-    // 比較用の2種の総合BPIも同じ☆12スコープに揃える。
+    // 総合BPIは☆12のみを対象にする。V1/V2どちらも同じ☆12スコープに揃える。
     const level12Played = played.filter((s) => s.difficultyLevel === 12);
-    const totalSongCount12 = totalCount12 ?? level12Played.length;
+    const allLevel12Songs = songMaster.filter((s) => s.difficultyLevel === 12);
 
-    // (B) 単曲BPIだけ新方式に置き換え、総合BPIの集計方法(べき乗平均)は
-    // 現行のまま。issue #299〜303単独の影響を見るためのケース。
-    const newBpisLevel12Desc = level12Played
+    // 「V1 総合BPI」は/stats/totalBpi(本番、今はV2)の現在値ではなく、
+    // 常にlegacyV1で計算し直す(単曲BPIの列と同じ理由)。V1は未プレイ曲を
+    // 一律-15固定で扱うべき乗平均のため、対象曲数はallLevel12Songs.length
+    // (V2側の分母と揃える)を渡す。
+    const currentBpisLevel12Desc = level12Played
       .map((s) =>
-        NewBpiCalculator.calc(s.exScore, {
-          songId: s.songId,
-          notes: s.notes,
-          kaidenAvg: s.kaidenAvg,
-          wrScore: s.wrScore,
-        }),
+        legacyV1
+          .chart({ notes: s.notes, kaidenAvg: s.kaidenAvg, wrScore: s.wrScore, coef: s.coef })
+          .bpi(s.exScore),
       )
       .filter((b): b is number => b !== null)
       .sort((a, b) => b - a);
-    const hybridTotalBpi =
-      totalSongCount12 > 0
-        ? BpiCalculator.calculateTotalBPI(newBpisLevel12Desc, totalSongCount12)
+    const currentTotalBpi =
+      allLevel12Songs.length > 0
+        ? legacyV1.total(currentBpisLevel12Desc, allLevel12Songs.length)
         : null;
 
-    // (C) 単曲BPI・総合BPIの導出方法の両方を新方式に置き換える。issue #304:
-    // プレイ済み曲は単曲BPIをそのまま使い、未プレイ曲は潜在スキルa_iからの
-    // 予測で埋めたうえで現行と同じべき乗平均にかける（詳細はNewBpiCalculator
-    // 参照）。未プレイ曲の判定・予測には☆12全曲のマスタ(songMaster)が要る。
-    const comparableCount = level12Played.filter((s) =>
-      NewBpiCalculator.hasParams(s.songId),
+    // 「V2 総合BPI」は本番(/stats/totalBpi)と同じBpiCalculatorで計算する
+    // （songDefのmu/sigmaをDBから読む。ラチェットは表示上の「記録」を保つ
+    // ためのDB書き込み境界の責務なので、ここでは適用しない生値を出す）。
+    // プレイ済み曲は単曲BPIをそのまま使い、未プレイ曲は潜在スキルa_iから
+    // の予測で埋める。未プレイ曲の判定・予測には☆12全曲のマスタ
+    // (songMaster、mu/sigma込み)が要る。
+    const comparableCount = level12Played.filter(
+      (s) => s.mu !== null && s.mu !== undefined && s.sigma !== null && s.sigma !== undefined,
     ).length;
-    const allLevel12Songs = songMaster.filter((s) => s.difficultyLevel === 12);
     const newTotalBpi =
       allLevel12Songs.length > 0
-        ? NewBpiCalculator.calculateTotalBPI(
+        ? BpiCalculator.calculateTotalBPI(
             level12Played.map((s) => ({
               songId: s.songId,
               notes: s.notes,
@@ -237,12 +229,12 @@ export default function NewBpiComparison({ userId }: Props) {
 
     return {
       rows,
-      hybridTotalBpi,
+      currentTotalBpi,
       newTotalBpi,
       comparableCount,
       playedSongMap,
     };
-  }, [songs, stats?.totalCount, songMaster, songRankings]);
+  }, [songs, songMaster, songRankings]);
 
   // 既存のノーツレーダー(カテゴリ別総合BPI)と同じカテゴリ分け(topElements.json)
   // を使い、現行/新方式それぞれのカテゴリ別総合BPIを算出する。現行側は既存の
@@ -250,55 +242,47 @@ export default function NewBpiComparison({ userId }: Props) {
   // (RadarResponse.songs)を新方式側の計算にも流用することで、両者の対象曲・
   // 分母を完全に一致させる。
   const radarComparison = useMemo(() => {
-    if (!songs || songMaster.length === 0) return null;
+    if (!songs) return null;
     const played = songs.filter(
       (s): s is typeof s & { exScore: number } => s.exScore !== null,
     );
     if (played.length === 0) return null;
 
-    const radarResult = calculateRadar(
-      played.map((s) => ({
-        title: s.title,
-        difficulty: s.difficulty,
-        exScore: s.exScore,
-        notes: s.notes,
-        bpi: s.bpi,
-      })),
-    );
-
-    const songMasterByKey = new Map(
-      songMaster.map((s) => [`${s.title}___${s.difficulty}`, s]),
-    );
-
     const current: Record<string, number> = {};
     const next: Record<string, number> = {};
     for (const category of ALL_CATEGORIES) {
-      const categoryResult = radarResult[category];
-      current[category] = categoryResult.totalBpi;
+      const categorySongs = played.filter(
+        (s) => topElementMap.get(`${s.title}___${s.difficulty}`) === category,
+      );
+      // プレイ済み以外(未プレイ)の分母は topElements.json のカテゴリ定義曲数から補う
+      const totalCount =
+        topElementsByCategory.get(category)?.length ?? categorySongs.length;
 
-      const totalCount = categoryResult.songs.length;
-      const newBpis = categoryResult.songs
-        .filter((s) => s.exScore !== null)
-        .map((s) => {
-          const master = songMasterByKey.get(`${s.title}___${s.difficulty}`);
-          if (!master) return null;
-          return NewBpiCalculator.calc(s.exScore!, {
-            songId: master.songId,
-            notes: master.notes,
-            kaidenAvg: master.kaidenAvg,
-            wrScore: master.wrScore,
-          });
-        })
+      const currentBpis = categorySongs
+        .map((s) =>
+          legacyV1
+            .chart({
+              notes: s.notes,
+              kaidenAvg: s.kaidenAvg,
+              wrScore: s.wrScore,
+              coef: s.coef,
+            })
+            .bpi(s.exScore),
+        )
         .filter((b): b is number => b !== null)
         .sort((a, b) => b - a);
+      current[category] =
+        currentBpis.length > 0 ? legacyV1.total(currentBpis, totalCount) : -15;
 
+      const newBpis = categorySongs
+        .map((s) => BpiCalculator.calc(s.exScore, s))
+        .filter((b): b is number => b !== null)
+        .sort((a, b) => b - a);
       next[category] =
-        newBpis.length > 0
-          ? BpiCalculator.calculateTotalBPI(newBpis, totalCount)
-          : -15;
+        newBpis.length > 0 ? legacyV1.total(newBpis, totalCount) : -15;
     }
     return { current, next };
-  }, [songs, songMaster]);
+  }, [songs]);
 
   // 推移グラフで選べるのは新方式パラメータのある楽曲のみ(新方式の曲線が描けないため)
   const curveEligibleRows = useMemo(
@@ -323,13 +307,8 @@ export default function NewBpiComparison({ userId }: Props) {
     };
     return BPI_TICKS.map((bpi) => ({
       bpi,
-      current: BpiCalculator.calcFromBPI(bpi, basic, false),
-      new: NewBpiCalculator.calcFromBPI(bpi, {
-        songId: song.songId,
-        notes: song.notes,
-        kaidenAvg: song.kaidenAvg,
-        wrScore: song.wrScore,
-      }),
+      current: legacyV1.chart(basic).scoreFor(bpi, false),
+      new: BpiCalculator.calcFromBPI(bpi, song),
     }));
   }, [effectiveSongId, playedSongMap]);
 
@@ -362,13 +341,8 @@ export default function NewBpiComparison({ userId }: Props) {
       rate,
       isBpi0Anchor,
       exScore,
-      current: BpiCalculator.calc(exScore, basic),
-      new: NewBpiCalculator.calc(exScore, {
-        songId: song.songId,
-        notes: song.notes,
-        kaidenAvg: song.kaidenAvg,
-        wrScore: song.wrScore,
-      }),
+      current: legacyV1.chart(basic).bpi(exScore),
+      new: BpiCalculator.calc(exScore, song),
     }));
   }, [effectiveSongId, playedSongMap]);
 
@@ -377,12 +351,7 @@ export default function NewBpiComparison({ userId }: Props) {
     : undefined;
 
   const selectedSongNewParams = selectedSong
-    ? NewBpiCalculator.getSongParams({
-        songId: selectedSong.songId,
-        notes: selectedSong.notes,
-        kaidenAvg: selectedSong.kaidenAvg,
-        wrScore: selectedSong.wrScore,
-      })
+    ? BpiCalculator.getSongParams(selectedSong)
     : null;
 
   const selectedSongFormula: FormulaSongInfo | null = selectedSong
@@ -414,7 +383,6 @@ export default function NewBpiComparison({ userId }: Props) {
         wrScore: selectedSong.wrScore,
         mu: selectedSongNewParams?.mu ?? null,
         sigma: selectedSongNewParams?.sigma ?? null,
-        n: newBpiSongParamMap.get(selectedSong.songId)?.n ?? null,
         z100: selectedSongNewParams?.z100 ?? null,
         k: selectedSongNewParams?.k ?? null,
         z0: selectedSongNewParams?.z0 ?? null,
@@ -423,11 +391,13 @@ export default function NewBpiComparison({ userId }: Props) {
 
   const selectedSongSimulator: ScoreSimulatorSongInfo | null = selectedSong
     ? {
-        songId: selectedSong.songId,
         notes: selectedSong.notes,
         kaidenAvg: selectedSong.kaidenAvg,
         wrScore: selectedSong.wrScore,
         coef: selectedSong.coef ?? null,
+        mu: selectedSong.mu ?? null,
+        sigma: selectedSong.sigma ?? null,
+        residualVar: selectedSong.residualVar ?? null,
         hasNewParams: selectedSongNewParams !== null,
       }
     : null;
@@ -442,15 +412,14 @@ export default function NewBpiComparison({ userId }: Props) {
       isViewingSelf={isViewingSelf}
       viewedUserName={profile?.userName ?? null}
       accessState={accessState}
-      isDataLoading={isSongsLoading || isStatsLoading}
+      isDataLoading={isSongsLoading}
       scoreRateMaxScore={selectedSong ? selectedSong.notes * 2 : null}
       rows={rows}
       sortKey={sortKey}
       onSortKeyChange={setSortKey}
       radarCurrent={radarComparison?.current ?? null}
       radarNew={radarComparison?.next ?? null}
-      currentTotalBpi={stats?.totalBpi ?? null}
-      hybridTotalBpi={hybridTotalBpi}
+      currentTotalBpi={currentTotalBpi}
       newTotalBpi={newTotalBpi}
       comparableCount={comparableCount}
       curveEligibleRows={curveEligibleRows}
@@ -465,13 +434,18 @@ export default function NewBpiComparison({ userId }: Props) {
         selectedSong && selectedSong.exScore !== null
           ? {
               exScore: selectedSong.exScore,
-              currentBpi: selectedSong.bpi,
-              newBpi: NewBpiCalculator.calc(selectedSong.exScore, {
-                songId: selectedSong.songId,
-                notes: selectedSong.notes,
-                kaidenAvg: selectedSong.kaidenAvg,
-                wrScore: selectedSong.wrScore,
-              }),
+              currentBpi: legacyV1
+                .chart({
+                  notes: selectedSong.notes,
+                  kaidenAvg: selectedSong.kaidenAvg,
+                  wrScore: selectedSong.wrScore,
+                  coef: selectedSong.coef,
+                })
+                .bpi(selectedSong.exScore),
+              newBpi: BpiCalculator.calc(
+                selectedSong.exScore,
+                selectedSong,
+              ),
             }
           : null
       }

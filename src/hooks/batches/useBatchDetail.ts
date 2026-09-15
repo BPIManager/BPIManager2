@@ -1,10 +1,18 @@
-﻿import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
+﻿import { BpiV1 } from "@bpim/bpicalc";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { BpiCalculator } from "@/lib/bpi";
 import {
   LogsDetailResponse,
 } from "@/types/logs/batchDetail";
 import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
 import { useMemo } from "react";
+
+// 今回更新したV2単曲BPIの集合を丸ごと1つの「対象楽曲」として扱う
+// べき乗平均(総曲数=集合のサイズなので未プレイ曲の穴埋めは発生しない。
+// bpiBoxStats.tsのtotalOfと同じ考え方)。少数の観測から潜在スキルを推定する
+// シフト法(BpiCalculator.calculateTotalBPI)は使わない
+// (縮小推定で実力より大幅に低く出るため)。
+const v1Aggregator = new BpiV1();
 
 /**
  * バッチ詳細または日付別スコア詳細を取得し、サマリーと抜いた楽曲を付加して返す。
@@ -43,14 +51,28 @@ export const useLogsDetail = (
   const summary = data
     ? {
         batchPerformance: (() => {
-          const lv12Bpis = data.songs
-            .filter((s) => s.difficultyLevel === 12)
-            .map((s) => s.current?.bpi)
-            .filter((b): b is number => typeof b === "number");
+          const lv12Played = data.songs.filter(
+            (s) => s.difficultyLevel === 12 && s.current?.exScore != null,
+          );
+          if (lv12Played.length === 0) return null;
 
-          return lv12Bpis.length > 0
-            ? BpiCalculator.calculateTotalBPI(lv12Bpis, lv12Bpis.length)
-            : -15;
+          const bpisDesc = lv12Played
+            .map((s) =>
+              BpiCalculator.calc(s.current!.exScore, {
+                notes: s.notes,
+                kaidenAvg: s.kaidenAvg ?? null,
+                wrScore: s.wrScore ?? null,
+                coef: s.coef,
+                mu: s.mu,
+                sigma: s.sigma,
+                residualVar: s.residualVar,
+              }),
+            )
+            .filter((b): b is number => b !== null)
+            .sort((a, b) => b - a);
+          if (bpisDesc.length === 0) return null;
+
+          return v1Aggregator.total(bpisDesc, bpisDesc.length);
         })(),
         newRecords: data.songs.filter((item) => !item.previous).length,
         updatedScores: data.songs.filter((item) => item.previous).length,

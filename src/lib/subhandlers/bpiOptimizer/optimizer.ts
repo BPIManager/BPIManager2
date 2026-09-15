@@ -1,7 +1,7 @@
 import type { NextApiRequest } from "next";
 import { bpiOptimizerAggregateRepo } from "@/lib/db/aggregates/bpiOptimizer";
 import { findOptimalBpiPath } from "@/lib/bpi/optimizer";
-import { calculateRadar } from "@/lib/radar/calculator";
+import { calculateRadar, buildRadarSongMaster } from "@/lib/radar/calculator";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { topElementMap } from "@/constants/iidx/radars/topElements";
 import { ALL_RADAR_CATEGORIES } from "@/constants/iidx/radars";
@@ -89,7 +89,7 @@ export async function handleBpiOptimizer(
       }));
 
     if (playedScores.length > 0) {
-      const radarResult = calculateRadar(playedScores);
+      const radarResult = calculateRadar(playedScores, buildRadarSongMaster(rawRows));
       for (const cat of ALL_RADAR_CATEGORIES) {
         radarCategoryBpis[cat] = radarResult[cat].totalBpi;
       }

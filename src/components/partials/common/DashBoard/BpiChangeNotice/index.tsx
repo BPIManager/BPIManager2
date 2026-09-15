@@ -7,15 +7,14 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 /** 一度閉じたら再表示しないためのキー。文言を刷新して再告知したくなったら接尾辞を上げる。 */
-const DISMISSED_KEY = "bpim2-bpi-change-notice-dismissed-v1";
-const DETAIL_URL = "https://x.com/BPIManager/status/2096290042885120037";
+const DISMISSED_KEY = "bpim2-bpi-change-notice-dismissed-v2";
 const FEEDBACK_FORM_URL =
   "https://docs.google.com/forms/d/e/1FAIpQLSekqnyJDaGGNbkW3ERKjeBEnqBtxQmVqrzVAopduto35GPZOA/viewform";
-/** 新方式BPIの理論的な説明（Notion）。 */
+/** V2 BPIの理論的な説明（Notion）。 */
 const THEORY_URL = "https://app.notion.com/p/BPI-3d69989ca87a8187b66dd2345c04f1cb";
 
 /**
- * ダッシュボードに常設する、BPI算出方式の変更検討に関する告知バナー。
+ * ダッシュボードに常設する、BPI算出方式の切り替えに関する告知バナー。
  * 閉じるとlocalStorageに記録し、以降は表示しない。
  */
 function BpiChangeNotice() {
@@ -69,15 +68,6 @@ function BpiChangeNotice() {
             className="inline-flex items-center gap-1 font-medium text-bpim-primary hover:underline"
           >
             {t("dashboard.bpiChangeNotice.theoryLink")}
-            <ExternalLink className="h-3 w-3" />
-          </a>
-          <a
-            href={DETAIL_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 font-medium text-bpim-primary hover:underline"
-          >
-            {t("dashboard.bpiChangeNotice.detailLink")}
             <ExternalLink className="h-3 w-3" />
           </a>
           <a

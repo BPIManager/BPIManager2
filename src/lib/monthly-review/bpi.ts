@@ -1,40 +1,58 @@
 import { BpiCalculator } from "@/lib/bpi";
 import dayjs from "@/lib/dayjs";
+import type { IBpiBasicSongData, IBpiScoreObservation } from "@/types/songs/bpi";
+
+type MasterSong = IBpiBasicSongData & { songId: number };
+
+function toObservations(exScoreBySong: Map<number, number>): IBpiScoreObservation[] {
+  return Array.from(exScoreBySong.entries()).map(([songId, exScore]) => ({
+    songId,
+    notes: 0,
+    exScore,
+  }));
+}
 
 export function buildBpiTimeline(
-  preMonthBpiMap: Map<number, number>,
+  preMonthExScoreMap: Map<number, number>,
   inMonthEntries: {
     songId: number;
-    bpi: number | null;
+    exScore: number | null;
     lastPlayed: Date | string;
   }[],
-  totalSongs: number,
+  songMaster: MasterSong[],
   isYearMode: boolean,
 ): {
   history: { date: string; value: number }[];
   bpiStart: number;
   bpiEnd: number;
-  finalBpiMap: Map<number, number>;
+  finalExScoreMap: Map<number, number>;
 } {
-  const latestBpisBySong = new Map(preMonthBpiMap);
+  const songById = new Map(songMaster.map((s) => [s.songId, s]));
+  const notesOf = (exScoreBySong: Map<number, number>): IBpiScoreObservation[] =>
+    toObservations(exScoreBySong).map((o) => ({
+      ...o,
+      notes: songById.get(o.songId)?.notes ?? 0,
+    }));
+
+  const latestExScoreBySong = new Map(preMonthExScoreMap);
 
   const bpiStart =
     Math.round(
       BpiCalculator.calculateTotalBPI(
-        Array.from(latestBpisBySong.values()),
-        totalSongs,
+        notesOf(latestExScoreBySong),
+        songMaster,
       ) * 100,
     ) / 100;
 
   // entries は (lastPlayed ASC, logId ASC) 順 → 同日・同曲は後のエントリが勝つ
-  const byKey = new Map<string, { songId: number; bpi: number | null }[]>();
+  const byKey = new Map<string, { songId: number; exScore: number | null }[]>();
   for (const entry of inMonthEntries) {
     const dateStr = dayjs(entry.lastPlayed as Parameters<typeof dayjs>[0])
       .tz()
       .format("YYYY-MM-DD");
     const key = isYearMode ? dateStr.slice(0, 7) : dateStr;
     const arr = byKey.get(key) ?? [];
-    arr.push({ songId: entry.songId, bpi: entry.bpi });
+    arr.push({ songId: entry.songId, exScore: entry.exScore });
     byKey.set(key, arr);
   }
 
@@ -43,16 +61,15 @@ export function buildBpiTimeline(
 
   for (const key of Array.from(byKey.keys()).sort()) {
     for (const update of byKey.get(key)!) {
-      latestBpisBySong.set(
-        update.songId,
-        update.bpi != null ? Number(update.bpi) : -15,
-      );
+      if (update.exScore != null) {
+        latestExScoreBySong.set(update.songId, Number(update.exScore));
+      }
     }
     currentBpi =
       Math.round(
         BpiCalculator.calculateTotalBPI(
-          Array.from(latestBpisBySong.values()),
-          totalSongs,
+          notesOf(latestExScoreBySong),
+          songMaster,
         ) * 100,
       ) / 100;
     historyMap.set(key, currentBpi);
@@ -66,6 +83,6 @@ export function buildBpiTimeline(
     history,
     bpiStart,
     bpiEnd: currentBpi,
-    finalBpiMap: new Map(latestBpisBySong),
+    finalExScoreMap: new Map(latestExScoreBySong),
   };
 }
