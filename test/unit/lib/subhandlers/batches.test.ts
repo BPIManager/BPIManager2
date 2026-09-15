@@ -25,6 +25,7 @@ const getOvertakenRivalsMock = vi.fn();
 const deleteBatchMock = vi.fn();
 const getPreviousVersionWithScoresMock = vi.fn();
 const getSelfVersionScoresMock = vi.fn();
+const getSongMasterWithDefMock = vi.fn();
 
 vi.mock("@/middlewares/api/withApiOnProfile", () => ({
   checkProfileAccess: (...a: unknown[]) => checkProfileAccessMock(...a),
@@ -71,6 +72,11 @@ vi.mock("@/lib/db/domains/scores", () => ({
       getPreviousVersionWithScoresMock(...a),
   },
 }));
+vi.mock("@/lib/db/domains/songs", () => ({
+  songsRepo: {
+    getSongMasterWithDef: (...a: unknown[]) => getSongMasterWithDefMock(...a),
+  },
+}));
 vi.mock("@/lib/db/domains/scores/timeline", () => ({
   timelineRepo: {
     getSelfVersionScores: (...a: unknown[]) => getSelfVersionScoresMock(...a),
@@ -99,6 +105,7 @@ beforeEach(() => {
     label: "2024-01-01",
   });
   getRangeNavigationMock.mockResolvedValue({ prevDate: null, nextDate: null });
+  getSongMasterWithDefMock.mockResolvedValue([]);
 });
 
 describe("handleBatchesList", () => {

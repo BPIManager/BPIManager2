@@ -13,6 +13,7 @@ const getSongRankingMock = vi.fn();
 const getUserSongRankingsMock = vi.fn();
 const getTowerRankingMock = vi.fn();
 const getLatestScoresWithMusicDataMock = vi.fn();
+const getSongMasterWithDefMock = vi.fn();
 
 vi.mock("@/lib/db/aggregates/userProfiles/ranking", () => ({
   userRankingRepo: {
@@ -35,6 +36,11 @@ vi.mock("@/lib/db/aggregates/stats/tables", () => ({
 vi.mock("@/lib/db/aggregates/iidxTower", () => ({
   iidxTowerAggregateRepo: {
     getTowerRanking: (...a: unknown[]) => getTowerRankingMock(...a),
+  },
+}));
+vi.mock("@/lib/db/domains/songs", () => ({
+  songsRepo: {
+    getSongMasterWithDef: (...a: unknown[]) => getSongMasterWithDefMock(...a),
   },
 }));
 vi.mock("@/lib/db/shared/visibility", () => ({
@@ -62,6 +68,7 @@ const authReq = (query: Record<string, unknown>) =>
 
 beforeEach(() => {
   vi.clearAllMocks();
+  getSongMasterWithDefMock.mockResolvedValue([]);
 });
 
 describe("handleRankingSongById", () => {
