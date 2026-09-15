@@ -41,6 +41,12 @@ const HeroSectionUI = ({
 }: Props) => {
   const { t, tFormat } = useTranslation();
   const period = usePeriodPhrase(granularity);
+  const isVersionMode = granularity === "version";
+  const compareLabel = bpi.compareVersion
+    ? bpi.compareVersion === "INF"
+      ? "INF"
+      : `IIDX${bpi.compareVersion}`
+    : null;
   return (
   <>
     <style>{styles}</style>
@@ -71,7 +77,7 @@ const HeroSectionUI = ({
             animation: inView ? "numPop 0.8s ease-out 0.2s both" : "none",
           }}
         >
-          {isPositive ? "+" : ""}
+          {!isVersionMode && isPositive ? "+" : ""}
           {(0).toFixed(2)}
         </span>
 
@@ -105,11 +111,26 @@ const HeroSectionUI = ({
             animation: inView ? "heroFade 0.6s ease-out 1.2s both" : "none",
           }}
         >
-          {bpi.diff > 0
-            ? tFormat("monthlyReview.bpi.growthText", { period, start: bpi.start.toFixed(2), end: bpi.end.toFixed(2), diff: bpi.diff.toFixed(2) })
-            : bpi.diff < 0
-              ? tFormat("monthlyReview.bpi.dropText", { period, start: bpi.start.toFixed(2), end: bpi.end.toFixed(2) })
-              : tFormat("monthlyReview.bpi.noChange", { period })}
+          {isVersionMode && compareLabel
+            ? bpi.diff > 0
+              ? tFormat("monthlyReview.bpi.versionGrowthText", {
+                  compareLabel,
+                  start: bpi.start.toFixed(2),
+                  end: bpi.end.toFixed(2),
+                  diff: bpi.diff.toFixed(2),
+                })
+              : bpi.diff < 0
+                ? tFormat("monthlyReview.bpi.versionDropText", {
+                    compareLabel,
+                    start: bpi.start.toFixed(2),
+                    end: bpi.end.toFixed(2),
+                  })
+                : tFormat("monthlyReview.bpi.versionNoChange", { compareLabel })
+            : bpi.diff > 0
+              ? tFormat("monthlyReview.bpi.growthText", { period, start: bpi.start.toFixed(2), end: bpi.end.toFixed(2), diff: bpi.diff.toFixed(2) })
+              : bpi.diff < 0
+                ? tFormat("monthlyReview.bpi.dropText", { period, start: bpi.start.toFixed(2), end: bpi.end.toFixed(2) })
+                : tFormat("monthlyReview.bpi.noChange", { period })}
         </p>
       </div>
 

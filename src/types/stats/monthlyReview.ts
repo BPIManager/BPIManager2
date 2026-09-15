@@ -75,6 +75,8 @@ export interface MonthlyReviewBpi {
   end: number;
   diff: number;
   history: { date: string; value: number }[];
+  /** 全期間モードでの比較先バージョン（月次/年次はnull） */
+  compareVersion: string | null;
 }
 
 export interface MonthlyReviewTopSongs {
@@ -114,6 +116,10 @@ export interface MonthlyReviewRivals {
 
 export interface MonthlyReviewRadarGrowth {
   radarGrowth: RadarGrowthEntry[] | null;
+  /** 全期間モードでの比較先バージョン（月次/年次はnull） */
+  compareVersion: string | null;
+  /** 比較先バージョンにデータが無く、伸び幅ではなくBPI降順の単純なリストにフォールバックしたか */
+  usingFallbackComparison: boolean;
 }
 
 export interface MonthlyReviewArena {

@@ -23,7 +23,7 @@ export async function handleStatsMonthlyReviewActivity(q: {
       towerRanking,
       dailyTowerData,
       breakdownRows,
-      { latestInMonth },
+      { latestInMonth, songUpdateDateMap },
       bpiTimeline,
     ] = await Promise.all([
       monthlyReviewRepo.getMonthlyTowerStats(q.userId, q.version, monthStart, monthEnd),
@@ -42,8 +42,14 @@ export async function handleStatsMonthlyReviewActivity(q: {
     const { byDayOfWeek, byHour } = buildActivityBreakdown(breakdownRows);
     const bestDays = buildBestDays(dailyTowerData, bpiTimeline.history, bpiTimeline.bpiStart);
 
+    // IIDX Tower未連携のユーザーはtowerStats.playDaysが常に0になるため、
+    // スコア更新のあったユニーク日数をフォールバック（両者の大きい方）として使う
+    const playDaysFromScoreUpdates = new Set(songUpdateDateMap.values()).size;
+    const playDays = Math.max(towerStats.playDays, playDaysFromScoreUpdates);
+
     return ok({
       ...towerStats,
+      playDays,
       updatedSongs: latestInMonth.length,
       byDayOfWeek,
       byHour,

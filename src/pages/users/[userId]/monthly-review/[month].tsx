@@ -57,12 +57,17 @@ export default function MonthlyReviewPage() {
     setCompareVersion(undefined);
   }
 
-  const bpi = useMonthlyReviewBpi(userIdStr, version, month);
+  const bpi = useMonthlyReviewBpi(userIdStr, version, month, compareVersion);
   const topSongs = useMonthlyReviewTopSongs(userIdStr, version, month, compareVersion);
   const activity = useMonthlyReviewActivity(userIdStr, version, month);
   const rivals = useMonthlyReviewRivals(userIdStr, version, month);
   const arena = useMonthlyReviewArena(userIdStr, version, month);
-  const radarGrowth = useMonthlyReviewRadarGrowth(userIdStr, version, month);
+  const radarGrowth = useMonthlyReviewRadarGrowth(
+    userIdStr,
+    version,
+    month,
+    compareVersion,
+  );
 
   const sections = [
     { key: "bpi", label: t("monthlyReview.loading.bpi"), ...bpi },
@@ -256,8 +261,11 @@ export default function MonthlyReviewPage() {
           rivals: rivals.data,
           arena: arena.data?.arena ?? null,
           radarGrowth: radarGrowth.data?.radarGrowth ?? null,
+          radarGrowthCompareVersion: radarGrowth.data?.compareVersion ?? null,
+          radarGrowthUsingFallback: radarGrowth.data?.usingFallbackComparison ?? false,
         }}
         topSongsLoading={topSongs.isLoading}
+        radarGrowthLoading={radarGrowth.isLoading}
         onCompareVersionChange={setCompareVersion}
       />
     </>

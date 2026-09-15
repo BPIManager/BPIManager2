@@ -65,6 +65,12 @@ export const monthlyReviewTranslations = {
     "zh-TW": "比較版本",
     ko: "비교 대상 버전",
   },
+  "monthlyReview.topSongs.noComparisonData": {
+    ja: "{compareLabel}にはデータがありません。別のバージョンを選択してください。",
+    en: "No data found for {compareLabel}. Try selecting a different version.",
+    "zh-TW": "{compareLabel}沒有這些曲目的資料。請選擇其他版本。",
+    ko: "{compareLabel}에는 데이터가 없습니다. 다른 버전을 선택해 주세요.",
+  },
   "monthlyReview.activity.sectionTitle": {
     ja: "プレイ記録",
     en: "Play Stats",
@@ -348,6 +354,24 @@ export const monthlyReviewTranslations = {
     "zh-TW": "{period}總合BPI無變動。",
     ko: "{period} 총합 BPI에 변동이 없었습니다.",
   },
+  "monthlyReview.bpi.versionGrowthText": {
+    ja: "{compareLabel}の{start}から{end}へ上昇し、+{diff}の成長を遂げました。",
+    en: "Your BPI grew from {compareLabel}'s {start} to {end} (+{diff}).",
+    "zh-TW": "從{compareLabel}的 {start} 升至 {end}（+{diff}）。",
+    ko: "{compareLabel}의 {start}에서 {end}로 성장했습니다（+{diff}）.",
+  },
+  "monthlyReview.bpi.versionDropText": {
+    ja: "{compareLabel}の{start}から{end}へ変動しました。",
+    en: "Your BPI changed from {compareLabel}'s {start} to {end}.",
+    "zh-TW": "從{compareLabel}的 {start} 變動至 {end}。",
+    ko: "{compareLabel}의 {start}에서 {end}로 변동되었습니다.",
+  },
+  "monthlyReview.bpi.versionNoChange": {
+    ja: "{compareLabel}から総合BPIに変動はありませんでした。",
+    en: "No change in total BPI since {compareLabel}.",
+    "zh-TW": "自{compareLabel}以來總合BPI無變動。",
+    ko: "{compareLabel} 이후 총합 BPI에 변동이 없었습니다.",
+  },
   // Arena
   "monthlyReview.arena.sectionHeading": {
     ja: "アリーナ戦績",
@@ -398,6 +422,12 @@ export const monthlyReviewTranslations = {
     en: "Songs improved ({period}), grouped by radar element",
     "zh-TW": "{period}進步的曲目，依雷達要素分類",
     ko: "{period} 향상된 곡을 레이더 요소별로 집계했습니다",
+  },
+  "monthlyReview.radar.fallbackDesc": {
+    ja: "比較先バージョンにデータが無いため、BPIが高い順のランキングを表示しています",
+    en: "No data for the comparison version — showing songs ranked by BPI instead",
+    "zh-TW": "比較版本沒有資料，改為顯示BPI排行榜",
+    ko: "비교 버전에 데이터가 없어 BPI 순위로 표시하고 있습니다",
   },
   "monthlyReview.radar.elementGrowth": {
     ja: "各要素の成長",

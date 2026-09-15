@@ -8,15 +8,10 @@ import type {
 } from "@/types/stats/monthlyReview";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { getRankDetail } from "@/constants/iidx/rankBorders";
-import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
-import { ChevronDown, Trophy, TrendingUp, Settings } from "lucide-react";
+import { ChevronDown, Trophy, TrendingUp } from "lucide-react";
 import { SectionCard } from "../SectionCard";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import CompareVersionConfig from "../CompareVersionConfig";
 
 const styles = `
   @keyframes titleIn  { from{opacity:0;letter-spacing:0.6em} to{opacity:1;letter-spacing:0.2em} }
@@ -286,77 +281,6 @@ function BpiRankedList({
   );
 }
 
-function CompareVersionConfig({
-  currentVersion,
-  compareVersion,
-  onChange,
-}: {
-  currentVersion: string | undefined;
-  compareVersion: string;
-  onChange: (version: string) => void;
-}) {
-  const { t } = useTranslation();
-  const options = (IIDX_VERSIONS as readonly string[]).filter(
-    (v) => v !== currentVersion,
-  );
-  return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <button
-          className="ml-auto flex items-center justify-center rounded-full p-1 transition-colors hover:bg-white/10"
-          style={{ color: "rgba(255,255,255,0.4)" }}
-          aria-label={t("monthlyReview.topSongs.compareVersionLabel")}
-        >
-          <Settings className="h-3.5 w-3.5" />
-        </button>
-      </PopoverTrigger>
-      <PopoverContent
-        align="end"
-        className="w-40 p-2"
-        style={{
-          background: "rgba(14,14,22,0.97)",
-          border: "1px solid rgba(255,255,255,0.12)",
-          backdropFilter: "blur(20px)",
-          WebkitBackdropFilter: "blur(20px)",
-        }}
-      >
-        <p
-          className="mb-2 px-1 text-[10px] font-bold tracking-[0.2em] uppercase"
-          style={{ color: "rgba(255,255,255,0.3)" }}
-        >
-          {t("monthlyReview.topSongs.compareVersionLabel")}
-        </p>
-        <div className="flex max-h-64 flex-col gap-1 overflow-y-auto">
-          {options.map((v) => {
-            const isSelected = v === compareVersion;
-            return (
-              <button
-                key={v}
-                onClick={() => onChange(v)}
-                className="rounded-md px-2 py-1.5 text-left text-xs font-bold transition-all"
-                style={
-                  isSelected
-                    ? {
-                        background: "rgba(52,211,153,0.2)",
-                        border: "1px solid rgba(52,211,153,0.4)",
-                        color: "#34d399",
-                      }
-                    : {
-                        border: "1px solid transparent",
-                        color: "rgba(255,255,255,0.6)",
-                      }
-                }
-              >
-                {v === "INF" ? "INF" : `IIDX${v}`}
-              </button>
-            );
-          })}
-        </div>
-      </PopoverContent>
-    </Popover>
-  );
-}
-
 function ImprovedRankedListSkeleton() {
   return (
     <div className="flex flex-col gap-2">
@@ -376,6 +300,7 @@ function ImprovedRankedList({
   colDelay,
   configSlot,
   isComparing,
+  emptyMessage,
 }: {
   title: string;
   icon: React.ReactNode;
@@ -385,6 +310,7 @@ function ImprovedRankedList({
   colDelay: number;
   configSlot?: React.ReactNode;
   isComparing?: boolean;
+  emptyMessage?: string;
 }) {
   const [visible, setVisible] = useState(PAGE);
   const { t } = useTranslation();
@@ -409,6 +335,17 @@ function ImprovedRankedList({
       </div>
       {isComparing ? (
         <ImprovedRankedListSkeleton />
+      ) : songs.length === 0 && emptyMessage ? (
+        <p
+          className="rounded-xl px-4 py-6 text-center text-xs leading-relaxed"
+          style={{
+            background: "rgba(255,255,255,0.04)",
+            border: "1px dashed rgba(255,255,255,0.12)",
+            color: "rgba(255,255,255,0.4)",
+          }}
+        >
+          {emptyMessage}
+        </p>
       ) : (
         <div className="flex flex-col gap-2">
           {songs.slice(0, visible).map((s, i) => (
@@ -467,7 +404,7 @@ const TopSongsSectionUI = ({
   isComparing,
   onCompareVersionChange,
 }: Props) => {
-  const { t } = useTranslation();
+  const { t, tFormat } = useTranslation();
   const { topBpiSongs, topImprovedSongs, compareVersion } = topSongs;
 
   return (
@@ -523,6 +460,13 @@ const TopSongsSectionUI = ({
                     onChange={onCompareVersionChange}
                   />
                 ) : undefined
+              }
+              emptyMessage={
+                compareVersion
+                  ? tFormat("monthlyReview.topSongs.noComparisonData", {
+                      compareLabel: compareVersion === "INF" ? "INF" : `IIDX${compareVersion}`,
+                    })
+                  : undefined
               }
             />
           </div>

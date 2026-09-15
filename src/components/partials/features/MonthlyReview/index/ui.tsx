@@ -30,12 +30,15 @@ export interface MonthlyReviewViewSections {
   rivals: MonthlyReviewRivals | undefined;
   arena: MonthlyArena | null;
   radarGrowth: RadarGrowthEntry[] | null;
+  radarGrowthCompareVersion: string | null;
+  radarGrowthUsingFallback: boolean;
 }
 
 interface Props {
   data: MonthlyReviewViewSections;
   speedRef: React.RefObject<number>;
   topSongsLoading?: boolean;
+  radarGrowthLoading?: boolean;
   onCompareVersionChange?: (version: string) => void;
 }
 
@@ -43,6 +46,7 @@ const MonthlyReviewViewUI = ({
   data,
   speedRef,
   topSongsLoading,
+  radarGrowthLoading,
   onCompareVersionChange,
 }: Props) => (
   <div style={{ background: "#0a0a0f" }}>
@@ -76,7 +80,15 @@ const MonthlyReviewViewUI = ({
         />
       )}
       {data.radarGrowth && data.radarGrowth.length > 0 && (
-        <RadarSection radarGrowth={data.radarGrowth} granularity={data.granularity} />
+        <RadarSection
+          radarGrowth={data.radarGrowth}
+          granularity={data.granularity}
+          compareVersion={data.radarGrowthCompareVersion}
+          usingFallbackComparison={data.radarGrowthUsingFallback}
+          currentVersion={data.version}
+          isComparing={!!radarGrowthLoading}
+          onCompareVersionChange={onCompareVersionChange}
+        />
       )}
       {data.rivals && (
         <RivalsSection

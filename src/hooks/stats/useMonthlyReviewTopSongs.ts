@@ -15,6 +15,9 @@ export const useMonthlyReviewTopSongs = (
 
   const { data, isLoading, error } = useAuthedSWRV2<MonthlyReviewTopSongs>(url, {
     revalidateOnFocus: false,
+    // config UIでの比較先バージョン変更時、再フェッチ中に前のデータを保持して
+    // セクション全体が一瞬消えるのを防ぐ（isLoadingで個別にスケルトン表示する）
+    keepPreviousData: true,
   });
 
   return { data, isLoading, error };

@@ -1,6 +1,6 @@
 import dayjs from "@/lib/dayjs";
 import { monthlyReviewRepo } from "@/lib/db/aggregates/monthly-review";
-import { buildBpiTimeline } from "@/lib/monthly-review/bpi";
+import { buildBpiTimeline, calculateTotalBpiForScores } from "@/lib/monthly-review/bpi";
 import { buildTopSongs } from "@/lib/monthly-review/topSongs";
 import { toPlayDateStr } from "@/lib/monthly-review/activity";
 import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
@@ -53,15 +53,32 @@ export function previousVersionOf(version: string): string | null {
   return IIDX_VERSIONS[idx - 1];
 }
 
-/** 本人分のBPI推移。radar-growth/activity/rivalsセクションでも使う値のため独立関数にする */
+/**
+ * 本人分のBPI推移。radar-growth/activity/rivalsセクションでも使う値のため独立関数にする。
+ *
+ * `compareVersion`省略時は月内比較（`monthStart`より前の直近スコア）をbaselineに使う。
+ * 「全期間（月=all）」モードでは`monthStart`が便宜上の固定値のため意味を持たず、
+ * `compareVersion`（既定は前バージョン）で指定したバージョン内での最新スコアを
+ * baselineとして使う。
+ *
+ * `bpiEnd`/`history`（現在の総合BPI推移）は常に`version`単体のデータのみから
+ * 計算し、`compareVersion`のスコアは絶対に混ぜない。混ぜてしまうと、
+ * `compareVersion`側のスコアが高い曲ほど「未プレイのまま`compareVersion`の
+ * スコアが居座り続ける」ことになり、`version`側での実際の成長と無関係な値に
+ * なってしまう（Ratchet処理と組み合わさると`bpiEnd`が`bpiStart`に張り付き、
+ * 常にdiff>=0になってしまう不具合が実際にあった）。`compareVersion`が
+ * 指定された場合の`bpiStart`は、`compareVersion`単体のスコアから独立して
+ * 計算した別の値に差し替える。
+ */
 export async function computeOwnerBpiTimeline(
   owner: string,
   version: string,
   monthStart: string,
   monthEnd: string,
   useMonthBuckets: boolean,
+  compareVersion?: string,
 ) {
-  const [ownerPreMonthState, ownerInMonthHistory, allL12SongMeta] =
+  const [ownerPreMonthState, ownerInMonthHistory, allL12SongMeta, compareVersionState] =
     await Promise.all([
       monthlyReviewRepo.getPreMonthBpiStateForUsers([owner], version, monthStart),
       monthlyReviewRepo.getInMonthScoreHistoryForUsers(
@@ -71,6 +88,9 @@ export async function computeOwnerBpiTimeline(
         monthEnd,
       ),
       monthlyReviewRepo.getAllL12SongMeta(),
+      compareVersion
+        ? monthlyReviewRepo.getVersionBpiStateForUsers([owner], compareVersion)
+        : Promise.resolve(null),
     ]);
 
   const ownerPreMonthExScoreMap = new Map<number, number>();
@@ -78,12 +98,22 @@ export async function computeOwnerBpiTimeline(
     if (s.exScore != null) ownerPreMonthExScoreMap.set(s.songId, Number(s.exScore));
   }
 
-  const { history, bpiStart, bpiEnd, finalExScoreMap } = buildBpiTimeline(
+  const { history, bpiStart: rawBpiStart, bpiEnd, finalExScoreMap } = buildBpiTimeline(
     ownerPreMonthExScoreMap,
     ownerInMonthHistory,
     allL12SongMeta,
     useMonthBuckets,
   );
+
+  let bpiStart = rawBpiStart;
+  let compareVersionExScoreMap: Map<number, number> | null = null;
+  if (compareVersion && compareVersionState) {
+    compareVersionExScoreMap = new Map();
+    for (const s of compareVersionState) {
+      if (s.exScore != null) compareVersionExScoreMap.set(s.songId, Number(s.exScore));
+    }
+    bpiStart = calculateTotalBpiForScores(compareVersionExScoreMap, allL12SongMeta);
+  }
   const bpiDiff = Math.round((bpiEnd - bpiStart) * 100) / 100;
 
   return {
@@ -91,7 +121,9 @@ export async function computeOwnerBpiTimeline(
     bpiStart,
     bpiEnd,
     bpiDiff,
-    ownerPreMonthExScoreMap,
+    // レーダー別成長（radarGrowth.ts）の「期間前」baselineにもcompareVersionを
+    // 反映させるため、指定時はそちらを返す
+    ownerPreMonthExScoreMap: compareVersionExScoreMap ?? ownerPreMonthExScoreMap,
     finalExScoreMap,
     allL12SongMeta,
   };

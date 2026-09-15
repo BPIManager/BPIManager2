@@ -1,7 +1,11 @@
 import { BpiCalculator } from "@/lib/bpi";
 import { ALL_CATEGORIES } from "@/lib/radar/calculator";
 import { topElementMap } from "@/constants/iidx/radars/topElements";
-import type { TopSongImproved, RadarGrowthEntry } from "@/types/stats/monthlyReview";
+import type {
+  TopSong,
+  TopSongImproved,
+  RadarGrowthEntry,
+} from "@/types/stats/monthlyReview";
 import type { IBpiBasicSongData, IBpiScoreObservation } from "@/types/songs/bpi";
 
 type SongMeta = IBpiBasicSongData & {
@@ -27,16 +31,44 @@ export function buildRadarGrowth(
   songUpdateDateMap: Map<number, string>,
   viewerPreMonthExScoreMap: Map<number, number>,
   viewerFinalExScoreMap: Map<number, number>,
+  /**
+   * 比較先バージョンにそのユーザーのデータが1件も無く伸び幅を計算できない場合の
+   * フォールバック用リスト（通常はtopBpiSongs）。`topImprovedSongs`が空の
+   * ときだけ使い、BPI降順の単純なランキングとして各要素に振り分ける
+   * （diff/bpiBefore/bpiAfterは意味を持たないダミー値になる）
+   */
+  fallbackTopSongs?: TopSong[],
 ): RadarGrowthEntry[] {
   const songById = new Map(allL12SongMeta.map((s) => [s.songId, s]));
   const elementSongsMap = new Map<string, TopSongImproved[]>();
   ALL_CATEGORIES.forEach((cat) => elementSongsMap.set(cat, []));
 
-  for (const song of topImprovedSongs) {
-    if (song.diff <= 0 || song.difficultyLevel !== 12) continue;
-    const key = `${song.title}___${song.difficulty}`;
-    const cat = topElementMap.get(key);
-    if (cat) elementSongsMap.get(cat)!.push(song);
+  const usingFallback = topImprovedSongs.length === 0 && !!fallbackTopSongs?.length;
+
+  if (usingFallback) {
+    for (const song of fallbackTopSongs!) {
+      if (song.difficultyLevel !== 12) continue;
+      const key = `${song.title}___${song.difficulty}`;
+      const cat = topElementMap.get(key);
+      if (cat) {
+        elementSongsMap.get(cat)!.push({
+          ...song,
+          bpiBefore: song.bpi,
+          bpiAfter: song.bpi,
+          diff: 0,
+        });
+      }
+    }
+    for (const cat of ALL_CATEGORIES) {
+      elementSongsMap.get(cat)!.sort((a, b) => b.bpi - a.bpi);
+    }
+  } else {
+    for (const song of topImprovedSongs) {
+      if (song.diff <= 0 || song.difficultyLevel !== 12) continue;
+      const key = `${song.title}___${song.difficulty}`;
+      const cat = topElementMap.get(key);
+      if (cat) elementSongsMap.get(cat)!.push(song);
+    }
   }
 
   const elementSongsMetaMap = new Map<string, SongMeta[]>();

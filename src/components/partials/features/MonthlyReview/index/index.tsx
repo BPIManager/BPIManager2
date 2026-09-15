@@ -9,12 +9,14 @@ const MAX_SPEED = 14;
 interface Props {
   data: MonthlyReviewViewSections;
   topSongsLoading?: boolean;
+  radarGrowthLoading?: boolean;
   onCompareVersionChange?: (version: string) => void;
 }
 
 const MonthlyReviewView = ({
   data,
   topSongsLoading,
+  radarGrowthLoading,
   onCompareVersionChange,
 }: Props) => {
   const speedRef = useRef(BASE_SPEED);
@@ -54,6 +56,7 @@ const MonthlyReviewView = ({
       data={data}
       speedRef={speedRef}
       topSongsLoading={topSongsLoading}
+      radarGrowthLoading={radarGrowthLoading}
       onCompareVersionChange={onCompareVersionChange}
     />
   );
