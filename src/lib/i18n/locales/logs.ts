@@ -218,10 +218,10 @@ export const logsTranslations = {
     ko: "세션 BPI",
   },
   "logs.summary.batchBpi.tooltip": {
-    ja: "今回更新した☆12のみを対象とした総合BPI",
-    en: "Total BPI calculated from ☆12 songs updated this session.",
-    "zh-TW": "以本次更新的☆12曲目為對象計算的綜合BPI",
-    ko: "이번 세션에서 업데이트한 ☆12 곡만을 대상으로 한 종합 BPI",
+    ja: "今回更新した☆12のスコアだけを反映した総合BPI。☆12の更新が無い日は算出できません(—表示)。",
+    en: "Total BPI reflecting only the ☆12 scores updated this session. Not available (—) on days without a ☆12 update.",
+    "zh-TW": "僅反映本次更新的☆12分數的綜合BPI。當天若無☆12更新則無法計算(顯示—)。",
+    ko: "이번에 업데이트한 ☆12 스코어만 반영한 종합 BPI. ☆12 업데이트가 없는 날은 산출할 수 없습니다(— 표시).",
   },
   "logs.summary.updated": {
     ja: "更新",

@@ -1,11 +1,18 @@
-﻿import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
+﻿import { BpiV1 } from "@bpim/bpicalc";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { BpiCalculator } from "@/lib/bpi";
 import {
   LogsDetailResponse,
 } from "@/types/logs/batchDetail";
 import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
+import { useSongList } from "@/hooks/songs/useSongList";
 import { useMemo } from "react";
-import type { IBpiBasicSongData, IBpiScoreObservation } from "@/types/songs/bpi";
+
+// 未プレイ曲を「潜在スキルからの予測」ではなく固定の床(-15)で埋める
+// 集計(V1由来のべき乗平均)。今回更新したごく少数の観測から潜在スキルを
+// 推定すると縮小推定で実力より大幅に低く出るため(BpiCalculator.
+// calculateTotalBPIのシフト法は使わない)。
+const v1Aggregator = new BpiV1();
 
 /**
  * バッチ詳細または日付別スコア詳細を取得し、サマリーと抜いた楽曲を付加して返す。
@@ -41,32 +48,38 @@ export const useLogsDetail = (
     { revalidateOnFocus: false },
   );
 
+  // 「今日のBPI」は今回更新した☆12スコアのBPI(V2)を、☆12全曲数(songMaster)
+  // を分母にべき乗平均で集計する。未プレイ曲は固定の床(-15)で埋める
+  // (V1同様)。少数の観測から潜在スキルを推定するシフト法
+  // (BpiCalculator.calculateTotalBPI)は使わない。
+  const { songs: songMaster } = useSongList(version ?? "");
+
   const summary = data
     ? {
         batchPerformance: (() => {
-          const lv12Songs = data.songs.filter(
+          const lv12Master = songMaster.filter((s) => s.difficultyLevel === 12);
+          const lv12Played = data.songs.filter(
             (s) => s.difficultyLevel === 12 && s.current?.exScore != null,
           );
-          if (lv12Songs.length === 0) return -15;
+          if (lv12Played.length === 0 || lv12Master.length === 0) return null;
 
-          const observations: IBpiScoreObservation[] = lv12Songs.map((s) => ({
-            songId: s.songId,
-            notes: s.notes,
-            exScore: s.current!.exScore,
-          }));
-          const master: (IBpiBasicSongData & { songId: number })[] = lv12Songs.map(
-            (s) => ({
-              songId: s.songId,
-              notes: s.notes,
-              kaidenAvg: s.kaidenAvg ?? null,
-              wrScore: s.wrScore ?? null,
-              coef: s.coef,
-              mu: s.mu,
-              sigma: s.sigma,
-              residualVar: s.residualVar,
-            }),
-          );
-          return BpiCalculator.calculateTotalBPI(observations, master);
+          const bpisDesc = lv12Played
+            .map((s) =>
+              BpiCalculator.calc(s.current!.exScore, {
+                notes: s.notes,
+                kaidenAvg: s.kaidenAvg ?? null,
+                wrScore: s.wrScore ?? null,
+                coef: s.coef,
+                mu: s.mu,
+                sigma: s.sigma,
+                residualVar: s.residualVar,
+              }),
+            )
+            .filter((b): b is number => b !== null)
+            .sort((a, b) => b - a);
+          if (bpisDesc.length === 0) return null;
+
+          return v1Aggregator.total(bpisDesc, lv12Master.length);
         })(),
         newRecords: data.songs.filter((item) => !item.previous).length,
         updatedScores: data.songs.filter((item) => item.previous).length,

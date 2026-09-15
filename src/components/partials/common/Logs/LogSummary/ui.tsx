@@ -36,7 +36,7 @@ export const BatchSummaryCards = ({
   isSharing,
 }: {
   summary: {
-    batchPerformance: number;
+    batchPerformance: number | null;
     newRecords: number;
     updatedScores: number;
   };
@@ -46,7 +46,10 @@ export const BatchSummaryCards = ({
   const stats = [
     {
       label: t("logs.summary.batchBpi"),
-      value: summary.batchPerformance,
+      value:
+        summary.batchPerformance !== null
+          ? summary.batchPerformance.toFixed(2)
+          : "—",
       icon: PlusCircle,
       color: "text-bpim-primary",
       tooltip: t("logs.summary.batchBpi.tooltip"),
