@@ -15,7 +15,13 @@ export default withUserApiHandler(
         res.status(200).end();
         return;
       }
-      const png = await generateMonthlyReviewOgpImage(query);
+      const png = await generateMonthlyReviewOgpImage({
+        userId: query.userId,
+        version: query.version,
+        month: query.month,
+        sections: query.sections,
+        compareVersion: query.compareVersion,
+      });
       res.status(200).send(png);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Internal Server Error";

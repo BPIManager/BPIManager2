@@ -1,11 +1,14 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
+import { parseOgpSections, type OgpSectionKey } from "@/lib/monthly-review/ogpSections";
 
 export interface MonthlyReviewRouteQuery {
   userId: string;
   version: string;
   month: string;
   compareVersion?: string;
+  sections: [OgpSectionKey, OgpSectionKey];
+  excludeNewPlays?: boolean;
 }
 
 /**
@@ -51,5 +54,7 @@ export function parseMonthlyReviewQuery(
     res.status(400).json({ message: "Invalid compareVersion" });
     return null;
   }
-  return { userId, version, month, compareVersion };
+  const sections = parseOgpSections(req.query.ogp as string | undefined);
+  const excludeNewPlays = req.query.excludeNewPlays === "true";
+  return { userId, version, month, compareVersion, sections, excludeNewPlays };
 }
