@@ -68,6 +68,9 @@ class StatsTablesRepository {
         "d.wrScore",
         "d.kaidenAvg",
         "d.coef",
+        "d.mu",
+        "d.sigma",
+        "d.residualVar",
         "s.exScore as userExScore",
         "s.bpi as userBpi",
       ])

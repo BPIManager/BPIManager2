@@ -24,6 +24,9 @@ export async function handleStatsAaaDifficulty(
         kaidenAvg: song.kaidenAvg,
         wrScore: song.wrScore,
         coef: song.coef as number,
+        mu: song.mu,
+        sigma: song.sigma,
+        residualVar: song.residualVar,
       };
       const aaaTargetBpi = BpiCalculator.calc(aaaTarget, songParams) ?? -15;
       const maxMinusTargetBpi =
