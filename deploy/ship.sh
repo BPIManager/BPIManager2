@@ -32,7 +32,10 @@ ssh "${SSH_OPTS[@]}" "${VPS_USER}@${VPS_HOST}" "mkdir -p ~/${REMOTE_BASE}/releas
 # next start に必要な最小構成だけ送る。node_modules は VPS 側で pnpm install する
 # （ネイティブ依存を実行環境で解決するため）。public/data は shared/ を symlink する
 # ので送らない（deploy.sh が張り替える）。
-rsync -az --delete \
+# -R (--relative) が無いと src/assets/fonts のような多階層パスは basename
+# （fonts/）だけが転送先直下に置かれ、process.cwd() 起点で読むコードと
+# パスがずれて ENOENT になる。
+rsync -az --delete -R \
   -e "ssh ${SSH_OPTS[*]}" \
   --exclude 'public/data' \
   .next \
