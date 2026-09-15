@@ -174,6 +174,13 @@ export const pagesTranslations = {
     ko: "목표 종합 BPI에 도달하기 위한 트레이닝 세트를 찾습니다.",
   },
 
+  "page.monthlyReviewShare.title": {
+    ja: "先月のまとめ",
+    en: "Monthly Review",
+    "zh-TW": "上月回顧",
+    ko: "지난달 리뷰",
+  },
+
   "page.support.title": {
     ja: "ご支援のお願い",
     en: "Support BPIM2",
