@@ -5,13 +5,13 @@ import {
   LogsDetailResponse,
 } from "@/types/logs/batchDetail";
 import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
-import { useSongList } from "@/hooks/songs/useSongList";
 import { useMemo } from "react";
 
-// 未プレイ曲を「潜在スキルからの予測」ではなく固定の床(-15)で埋める
-// 集計(V1由来のべき乗平均)。今回更新したごく少数の観測から潜在スキルを
-// 推定すると縮小推定で実力より大幅に低く出るため(BpiCalculator.
-// calculateTotalBPIのシフト法は使わない)。
+// 今回更新したV2単曲BPIの集合を丸ごと1つの「対象楽曲」として扱う
+// べき乗平均(総曲数=集合のサイズなので未プレイ曲の穴埋めは発生しない。
+// bpiBoxStats.tsのtotalOfと同じ考え方)。少数の観測から潜在スキルを推定する
+// シフト法(BpiCalculator.calculateTotalBPI)は使わない
+// (縮小推定で実力より大幅に低く出るため)。
 const v1Aggregator = new BpiV1();
 
 /**
@@ -48,20 +48,13 @@ export const useLogsDetail = (
     { revalidateOnFocus: false },
   );
 
-  // 「今日のBPI」は今回更新した☆12スコアのBPI(V2)を、☆12全曲数(songMaster)
-  // を分母にべき乗平均で集計する。未プレイ曲は固定の床(-15)で埋める
-  // (V1同様)。少数の観測から潜在スキルを推定するシフト法
-  // (BpiCalculator.calculateTotalBPI)は使わない。
-  const { songs: songMaster } = useSongList(version ?? "");
-
   const summary = data
     ? {
         batchPerformance: (() => {
-          const lv12Master = songMaster.filter((s) => s.difficultyLevel === 12);
           const lv12Played = data.songs.filter(
             (s) => s.difficultyLevel === 12 && s.current?.exScore != null,
           );
-          if (lv12Played.length === 0 || lv12Master.length === 0) return null;
+          if (lv12Played.length === 0) return null;
 
           const bpisDesc = lv12Played
             .map((s) =>
@@ -79,7 +72,7 @@ export const useLogsDetail = (
             .sort((a, b) => b - a);
           if (bpisDesc.length === 0) return null;
 
-          return v1Aggregator.total(bpisDesc, lv12Master.length);
+          return v1Aggregator.total(bpisDesc, bpisDesc.length);
         })(),
         newRecords: data.songs.filter((item) => !item.previous).length,
         updatedScores: data.songs.filter((item) => item.previous).length,

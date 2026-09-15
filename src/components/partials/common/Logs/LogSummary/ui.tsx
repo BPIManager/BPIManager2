@@ -1,8 +1,11 @@
-﻿import { PlusCircle, MusicIcon } from "lucide-react";
+﻿import { ReactNode } from "react";
+import { PlusCircle, MusicIcon, ExternalLink } from "lucide-react";
 import { HelpTooltip } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { DashCard } from "@/components/ui/dashcard";
 import { useTranslation } from "@/hooks/common/useTranslation";
+
+const BPICALC_NPM_URL = "https://www.npmjs.com/package/@bpim/bpicalc";
 
 export const LabelWithTooltip = ({
   label,
@@ -10,7 +13,7 @@ export const LabelWithTooltip = ({
   isSharing,
 }: {
   label: string;
-  tooltipText?: string;
+  tooltipText?: ReactNode;
   isSharing: boolean;
 }) => {
   if (!tooltipText) {
@@ -52,7 +55,20 @@ export const BatchSummaryCards = ({
           : "—",
       icon: PlusCircle,
       color: "text-bpim-primary",
-      tooltip: t("logs.summary.batchBpi.tooltip"),
+      tooltip: (
+        <>
+          <p>{t("logs.summary.batchBpi.tooltip")}</p>
+          <a
+            href={BPICALC_NPM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-1 inline-flex items-center gap-1 font-medium text-bpim-primary hover:underline"
+          >
+            {t("common.bpicalcLink")}
+            <ExternalLink className="h-3 w-3" />
+          </a>
+        </>
+      ),
     },
     {
       label: t("logs.summary.updated"),

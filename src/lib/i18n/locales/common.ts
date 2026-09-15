@@ -77,6 +77,12 @@ export const commonTranslations = {
     ko: "로딩 중...",
   },
   "common.note": { ja: "注意", en: "Note", "zh-TW": "注意", ko: "주의" },
+  "common.bpicalcLink": {
+    ja: "BPI計算ロジック（npm: @bpim/bpicalc）",
+    en: "BPI calculation logic (npm: @bpim/bpicalc)",
+    "zh-TW": "BPI計算邏輯（npm: @bpim/bpicalc）",
+    ko: "BPI 계산 로직 (npm: @bpim/bpicalc)",
+  },
   "common.lastUpdated": {
     ja: "最終更新: ",
     en: "Last updated: ",
