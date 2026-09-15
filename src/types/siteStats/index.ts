@@ -56,6 +56,12 @@ export interface AreaEntry {
   count: number;
 }
 
+export interface TotalBpiHistogramBucket {
+  bucketStart: number;
+  bucketEnd: number;
+  count: number;
+}
+
 export interface SiteStatsResponse {
   summary: SiteStatsSummary;
   dailyRegistrations: DailyRegistration[];
@@ -64,6 +70,8 @@ export interface SiteStatsResponse {
   versionScoreDistribution: VersionScoreDistribution;
   hourlyDistribution: Record<SiteStatsPeriod, HourlyEntry[]>;
   weekdayDistribution: Record<SiteStatsPeriod, WeekdayEntry[]>;
+  /** バージョン番号 → 5刻みバケット配列（-15〜100）。データが無いバージョンはキー自体が無い */
+  totalBpiHistogram: Record<string, TotalBpiHistogramBucket[]>;
   generatedAt?: string;
 }
 
