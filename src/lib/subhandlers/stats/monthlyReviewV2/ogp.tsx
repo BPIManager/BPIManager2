@@ -2,6 +2,7 @@ import { readFileSync } from "fs";
 import path from "path";
 import satori from "satori";
 import { Resvg } from "@resvg/resvg-js";
+import { BpiCalculator } from "@/lib/bpi";
 import { usersRepo } from "@/lib/db/domains/users";
 import { buildRadarGrowth } from "@/lib/monthly-review/radar";
 import { periodHeadingOf } from "@/lib/monthly-review/period";
@@ -81,7 +82,15 @@ function RadarPolygonChart({
 
   const n = entries.length;
   const center = RADAR_SIZE / 2;
-  const maxVal = Math.max(1, ...entries.map((e) => e.bpiEnd + 15));
+  // 固定値(-15)を床にすると、実際の値が近い場合にどの要素が得意か見えづらい
+  // （全点が外周付近に固まる）ため、実際の最小値の少し下を床にして、要素間の
+  // 凹凸が視覚的に強調されるようにスケールする
+  const values = entries.map((e) => e.bpiEnd);
+  const minVal = Math.min(...values);
+  const maxVal = Math.max(...values);
+  const floor = minVal - Math.max(2, (maxVal - minVal) * 0.15 || 2);
+  const range = Math.max(1, maxVal - floor);
+  const bestElement = entries[values.indexOf(maxVal)]?.element;
   const angleOf = (i: number) => -Math.PI / 2 + i * ((2 * Math.PI) / n);
   const pointAt = (i: number, radius: number) => {
     const a = angleOf(i);
@@ -92,7 +101,7 @@ function RadarPolygonChart({
       .map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`)
       .join(" ");
   const dataPoints = entries.map((e, i) =>
-    pointAt(i, Math.max(0, Math.min(1, (e.bpiEnd + 15) / maxVal)) * RADAR_RADIUS),
+    pointAt(i, Math.max(0, Math.min(1, (e.bpiEnd - floor) / range)) * RADAR_RADIUS),
   );
   const dataPointsStr = dataPoints
     .map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`)
@@ -150,6 +159,7 @@ function RadarPolygonChart({
         const p = pointAt(i, RADAR_LABEL_RADIUS);
         const lx = RADAR_PAD_X + p.x;
         const ly = RADAR_PAD_Y + p.y;
+        const isBest = e.element === bestElement;
         return (
           <div
             key={e.element}
@@ -163,10 +173,24 @@ function RadarPolygonChart({
               alignItems: "center",
             }}
           >
-            <div style={{ display: "flex", fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.6)" }}>
+            <div
+              style={{
+                display: "flex",
+                fontSize: 13,
+                fontWeight: 700,
+                color: isBest ? "#fbbf24" : "rgba(255,255,255,0.6)",
+              }}
+            >
               {e.element}
             </div>
-            <div style={{ display: "flex", fontSize: 12, color: "#38bdf8" }}>
+            <div
+              style={{
+                display: "flex",
+                fontSize: 12,
+                fontWeight: isBest ? 700 : 400,
+                color: isBest ? "#fbbf24" : "#38bdf8",
+              }}
+            >
               {e.bpiEnd.toFixed(1)}
             </div>
           </div>
@@ -181,13 +205,12 @@ interface OgpRenderData {
   userName: string;
   profileImage: string | null;
   bpiEnd: number;
-  bpiDiff: number;
   topSongs: { songId: number; title: string; bpi: number; exScore: number; notes: number }[];
   topRadar: { element: string; bpiEnd: number }[];
 }
 
 async function renderOgpImage(data: OgpRenderData): Promise<Buffer> {
-  const { heading, userName, profileImage, bpiEnd, bpiDiff, topSongs, topRadar } = data;
+  const { heading, userName, profileImage, bpiEnd, topSongs, topRadar } = data;
 
   const svg = await satori(
     <div
@@ -258,14 +281,21 @@ async function renderOgpImage(data: OgpRenderData): Promise<Buffer> {
           <div
             style={{
               display: "flex",
-              fontSize: 26,
-              fontWeight: 700,
+              alignItems: "center",
+              paddingLeft: 14,
+              paddingRight: 14,
+              paddingTop: 6,
               paddingBottom: 6,
-              color: bpiDiff >= 0 ? "#34d399" : "#f87171",
+              marginBottom: 6,
+              borderRadius: 999,
+              background: "rgba(251,191,36,0.12)",
+              border: "1px solid rgba(251,191,36,0.35)",
+              fontSize: 20,
+              fontWeight: 700,
+              color: "#fbbf24",
             }}
           >
-            {bpiDiff >= 0 ? "+" : ""}
-            {bpiDiff.toFixed(2)}
+            推定 #{BpiCalculator.estimateRank(bpiEnd).toLocaleString()}位
           </div>
         </div>
       </div>
@@ -389,7 +419,6 @@ export async function generateMonthlyReviewOgpImage(q: {
     userName: userInfo?.userName ?? q.userId,
     profileImage: userInfo?.profileImage ?? null,
     bpiEnd: bpiTimeline.bpiEnd,
-    bpiDiff: bpiTimeline.bpiDiff,
     topSongs: topBpiSongs.slice(0, TOP_SONGS_COUNT),
     topRadar: [...radarGrowth]
       .sort((a, b) => b.bpiEnd - a.bpiEnd)
@@ -408,7 +437,6 @@ export async function generateSampleMonthlyReviewOgpImage(): Promise<Buffer> {
     userName: "あなた",
     profileImage: null,
     bpiEnd: 65.42,
-    bpiDiff: 8.31,
     topSongs: [
       { songId: -1, title: "冥",  bpi: 92.18, exScore: 1987, notes: 1042 },
       { songId: -2, title: "Legendary Air",  bpi: 84.05, exScore: 2214, notes: 1180 },
