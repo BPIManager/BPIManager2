@@ -24,17 +24,22 @@ import type { TotalBpiHistogramBucket } from "@/types/siteStats";
 function TotalBpiHistogramChart({
   data,
 }: {
-  data: Record<string, TotalBpiHistogramBucket[]>;
+  data: Record<string, TotalBpiHistogramBucket[]> | undefined;
 }) {
   const c = useChartColors();
+  // cronが未再生成のstats.jsonにはこのキー自体が無いことがあるため、型上は必須でも
+  // 実行時は無いものとして扱う
+  const histogramByVersion = data ?? {};
   const availableVersions = versionsNonDisabledCollection.filter(
-    (v) => data[v.value]?.some((b) => b.count > 0),
+    (v) => histogramByVersion[v.value]?.some((b) => b.count > 0),
   );
   const [version, setVersion] = useState<string>(
-    data[latestVersion] ? latestVersion : (availableVersions[0]?.value ?? latestVersion),
+    histogramByVersion[latestVersion]
+      ? latestVersion
+      : (availableVersions[0]?.value ?? latestVersion),
   );
 
-  const buckets = data[version] ?? [];
+  const buckets = histogramByVersion[version] ?? [];
   const total = buckets.reduce((s, b) => s + b.count, 0);
   const chartData = buckets.map((b) => ({
     ...b,
