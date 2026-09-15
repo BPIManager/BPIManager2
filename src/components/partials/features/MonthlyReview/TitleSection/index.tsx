@@ -3,8 +3,7 @@
 import { useInView } from "@/hooks/common/useInView";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { useProfile } from "@/hooks/users/useProfile";
-import dayjs from "@/lib/dayjs";
-import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
+import { periodLabelOf } from "@/lib/monthly-review/period";
 import { useRouter } from "next/router";
 import TitleSectionUI from "./ui";
 
@@ -26,13 +25,7 @@ const TitleSection = ({ month, version, bpiDiff, granularity }: Props) => {
   const isYearMode = granularity === "year";
   const isAllMode = granularity === "version";
 
-  const periodLabel = isAllMode
-    ? version === "INF"
-      ? "INFINITAS"
-      : `IIDX ${getVersionNameFromNumber(version)}`
-    : isYearMode
-      ? dayjs.tz(`${month}-01-01`).format("YYYY年")
-      : dayjs.tz(`${month}-01`).format("YYYY年M月");
+  const periodLabel = periodLabelOf(month, version, granularity);
 
   const diffColor =
     bpiDiff === undefined ? "rgba(255,255,255,0.4)" : bpiDiff >= 0 ? "#34d399" : "#f87171";

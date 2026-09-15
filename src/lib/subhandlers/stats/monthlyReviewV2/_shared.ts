@@ -8,11 +8,7 @@ import { buildTopSongs } from "@/lib/monthly-review/topSongs";
 import { toPlayDateStr } from "@/lib/monthly-review/activity";
 import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 
-/**
- * `bpiStart`が`null`なのは、`compareVersion`モードでそのバージョンのスコアが
- * 1件も無い（比較不能）ケースのみ。それ以外は必ず数値が入る
- * （データが無ければ`-15`が算出される）。
- */
+/** `bpiStart`が`null`＝`compareVersion`側にスコアが無く比較不能。それ以外は必ず数値。 */
 type RecomputedBpiTimeline = {
   bpiStart: number | null;
   bpiEnd: number;
@@ -74,22 +70,12 @@ export function previousVersionOf(version: string): string | null {
 
 /**
  * 本人分のBPI推移。radar-growth/activity/rivalsセクションでも使う値のため独立関数にする。
+ * `scores.lastPlayed`基準のシフト法で算出する（`userStatusLogs.createdAt`は
+ * インポート時刻であり実プレイ日と一致しないため使わない）。
  *
- * `bpiStart`/`bpiEnd`/`history`（総合BPIの数値・推移）は、`scores.lastPlayed`
- * （実プレイ日）を基準にシフト法で算出する。`userStatusLogs.totalBpi`ログは
- * 使わない ── `createdAt`は「スコアがBPIMに取り込まれた時刻」であり、実際の
- * プレイ日とは限らないため（バックフィル・遅延同期のユーザーは過去分のスコアを
- * まとめて後日インポートするので、ログの日付では実プレイ期間を正しく表現できない）。
- *
- * `compareVersion`指定時（全期間モード）は、`bpiStart`（2点比較用）と
- * `bpiEnd`/`history`（推移そのもの）を独立して計算する。前バージョンの
- * baselineをそのままシフト法のseedにすると、ratchetにより現バージョンの
- * 実際の進捗より高いまま下限固定され、下降が消えてしまうため
- * （{@link BpiCalculator.ratchetTotalBpi}のコメント参照）。
- *
- * なお、レーダー別成長（要素ごとのBPI内訳）用の`finalExScoreMap`は、ratchetの
- * 対象外（曲ごとの最新exScoreをマージするだけ）のため、baseline混在の問題は
- * 起きず、通常通りseedから計算してよい。
+ * `compareVersion`指定時は、前バージョンのbaselineをシフト法のseedに混ぜると
+ * ratchetで現バージョンの下降が消えるため、`bpiStart`と`bpiEnd`/`history`を
+ * 独立して計算する。
  */
 export async function computeOwnerBpiTimeline(
   owner: string,
@@ -184,11 +170,10 @@ export async function computeOwnerBpiTimeline(
 
 /**
  * 複数ユーザー分の総合BPI推移をscores.lastPlayed基準のシフト法でまとめて再計算する。
- * ライバル戦線・フォロー中ライバルのカルーセル等、複数ユーザーを一括で扱う箇所から使う。
+ * ライバル戦線等、複数ユーザーを一括で扱う箇所から使う。
  *
- * `compareVersion`指定時、対象バージョンのスコアが1件も無いユーザーは
- * `bpiStart: null`を返す（前バージョンとの伸び率比較が不能なことを示す。
- * `bpiEnd`/`history`自体はそのバージョン内の純粋な推移として引き続き返す）。
+ * `compareVersion`指定時、対象バージョンのスコアが無いユーザーは`bpiStart: null`
+ * （比較不能。`bpiEnd`/`history`はそのバージョン内の推移として引き続き返す）。
  */
 export async function recomputeBpiTimelinesForUsers(
   userIds: string[],
