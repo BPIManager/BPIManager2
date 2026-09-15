@@ -144,7 +144,7 @@ export async function handleScoresBulk(
 
     const newTotalBpi = BpiCalculator.calculateTotalBPI(observations, twelves);
 
-    await saveImportResults({
+    const { totalBpi: savedTotalBpi } = await saveImportResults({
       userId,
       version,
       batchId,
@@ -160,7 +160,7 @@ export async function handleScoresBulk(
         updatedAllCount: allScoreUpdates.length,
         updatedBpiCount: scoreUpdates.length,
         previousTotalBpi,
-        newTotalBpi,
+        newTotalBpi: savedTotalBpi,
         details: { notFound },
       }),
       ...base,

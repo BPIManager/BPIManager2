@@ -41,6 +41,33 @@ describe("bpiImportOrchestrator.saveImportResults", () => {
     ]);
   });
 
+  it("新しい算出値が既知の最高値を下回る場合、書き込み・戻り値ともに既知の最高値を使うこと（ラチェット）", async () => {
+    // getLatestArenaRank/getMaxTotalBpiは同じtrxResultを共有するため、
+    // 両方が参照する列(arenaRank/maxTotalBpi)を1つのオブジェクトに含める
+    const spy = createTransactionalDbSpy({ arenaRank: 5, maxTotalBpi: 50 });
+    dbHolder.current = spy;
+
+    const { totalBpi } = await saveImportResults({
+      userId: "user-1",
+      version: "33",
+      batchId: "batch-1",
+      scoreUpdates: [{ songId: 1 } as never],
+      allScoreUpdates: [],
+      newTotalBpi: 30, // 既知の最高値(50)を下回る算出値
+    });
+
+    // 戻り値(呼び出し元の応答に使われる)がラチェット後の値であること
+    expect(totalBpi).toBe(50);
+
+    // 実際にDBへ書き込んだ値もラチェット後の値であること(未ラチェットの30ではない)
+    const insertValues = callsFor(spy.calls, "values").map((c) => c.args[0]);
+    for (const v of insertValues) {
+      if (v && typeof v === "object" && "totalBpi" in v) {
+        expect((v as { totalBpi: number }).totalBpi).toBe(50);
+      }
+    }
+  });
+
   it("scoreUpdatesが空の場合、logs系への書き込みをスキップすること", async () => {
     const spy = createTransactionalDbSpy(undefined);
     dbHolder.current = spy;

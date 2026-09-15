@@ -130,7 +130,7 @@ export function registerUpdateMyScore(server: McpServer, userId: string) {
       );
       const newTotalBpi = BpiCalculator.calculateTotalBPI(observations, twelves);
 
-      await saveImportResults({
+      const { totalBpi: savedTotalBpi } = await saveImportResults({
         userId,
         version,
         batchId,
@@ -148,7 +148,7 @@ export function registerUpdateMyScore(server: McpServer, userId: string) {
             text:
               `更新しました。${song.title} [${song.difficulty}] exScore=${exScore}, ` +
               `clearState=${clearState}, bpi=${bpi ?? "計算不可"}。` +
-              `総合BPI: ${previousTotalBpi} → ${newTotalBpi}` +
+              `総合BPI: ${previousTotalBpi} → ${savedTotalBpi}` +
               (allScoreUpdates.length > 0
                 ? "（全難易度履歴も合わせて更新しました）"
                 : ""),

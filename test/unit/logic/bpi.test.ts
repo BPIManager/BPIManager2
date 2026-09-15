@@ -256,4 +256,23 @@ describe("BpiCalculator ロジックテスト", () => {
       );
     });
   });
+
+  // 6. ラチェット（総合BPIが既知の最高値を下回らないこと）の検証
+  describe("ratchetTotalBpi の検証", () => {
+    it("既知の記録が無ければ、新しい算出値をそのまま返すこと", () => {
+      expect(BpiCalculator.ratchetTotalBpi(null, 30)).toBe(30);
+    });
+
+    it("新しい算出値が既知の最高値を下回る場合、最高値を維持すること（ユーザー体験の保護）", () => {
+      expect(BpiCalculator.ratchetTotalBpi(50, 30)).toBe(50);
+    });
+
+    it("新しい算出値が既知の最高値を上回る場合、新しい値（新記録）を返すこと", () => {
+      expect(BpiCalculator.ratchetTotalBpi(30, 50)).toBe(50);
+    });
+
+    it("新しい算出値が既知の最高値と同値の場合、その値を維持すること", () => {
+      expect(BpiCalculator.ratchetTotalBpi(40, 40)).toBe(40);
+    });
+  });
 });
