@@ -11,6 +11,12 @@ const DATE_EXPR = sql<string>`DATE_FORMAT(CONVERT_TZ(createdAt, '+00:00', '+09:0
 
 const JST_TODAY_START = sql<Date>`CONVERT_TZ(CONCAT(DATE(CONVERT_TZ(NOW(), '+00:00', '+09:00')), ' 00:00:00'), '+09:00', '+00:00')`;
 
+const BPI_HISTOGRAM_MIN = -15;
+const BPI_HISTOGRAM_MAX = 100;
+const BPI_HISTOGRAM_BUCKET_SIZE = 5;
+const BPI_HISTOGRAM_BUCKET_COUNT =
+  (BPI_HISTOGRAM_MAX - BPI_HISTOGRAM_MIN) / BPI_HISTOGRAM_BUCKET_SIZE;
+
 /**
  * サイト統計ダッシュボードのサマリカウンター・日次登録推移・分布集計
  * （アリーナランク/エリア/バージョン別）を担当するリポジトリクラス。
@@ -283,6 +289,42 @@ class SiteStatsSummaryRepository {
     }));
     const total = versions.reduce((s, r) => s + r.count, 0);
     return { versions, total };
+  }
+
+  /**
+   * バージョンごとの総合BPIレンジ別（5刻み、-15〜100の23バケット）ユーザー数分布。
+   * `navigationRepo`（`logs`）が持つ、ダッシュボード等でも使う「現在の総合BPI」の
+   * 正本を使う。
+   */
+  async getTotalBpiHistogramByVersion() {
+    const rows = await navigationRepo.getLatestTotalBpiPerUserAllVersions();
+
+    const byVersion = new Map<string, number[]>();
+    for (const r of rows) {
+      if (r.totalBpi == null || !r.version) continue;
+      const counts =
+        byVersion.get(r.version) ?? new Array(BPI_HISTOGRAM_BUCKET_COUNT).fill(0);
+      byVersion.set(r.version, counts);
+      const idx = Math.min(
+        BPI_HISTOGRAM_BUCKET_COUNT - 1,
+        Math.max(
+          0,
+          Math.floor((Number(r.totalBpi) - BPI_HISTOGRAM_MIN) / BPI_HISTOGRAM_BUCKET_SIZE),
+        ),
+      );
+      counts[idx]++;
+    }
+
+    const result: Record<string, { bucketStart: number; bucketEnd: number; count: number }[]> =
+      {};
+    for (const [version, counts] of byVersion) {
+      result[version] = counts.map((count, i) => ({
+        bucketStart: BPI_HISTOGRAM_MIN + i * BPI_HISTOGRAM_BUCKET_SIZE,
+        bucketEnd: BPI_HISTOGRAM_MIN + (i + 1) * BPI_HISTOGRAM_BUCKET_SIZE,
+        count,
+      }));
+    }
+    return result;
   }
 }
 

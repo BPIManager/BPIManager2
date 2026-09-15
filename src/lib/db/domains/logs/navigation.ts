@@ -213,6 +213,24 @@ class LogNavigationRepository {
   }
 
   /**
+   * 全ユーザー・全バージョンの最新totalBpiを一括取得する（サイト統計の
+   * バージョン別ヒストグラム集計用）。
+   */
+  async getLatestTotalBpiPerUserAllVersions() {
+    return await db
+      .with("latest", (eb) =>
+        eb
+          .selectFrom("logs")
+          .select(["userId", "version", (e) => e.fn.max("id").as("maxId")])
+          .groupBy(["userId", "version"]),
+      )
+      .selectFrom("logs as l")
+      .innerJoin("latest", (join) => join.onRef("latest.maxId", "=", "l.id"))
+      .select(["l.version", "l.totalBpi"])
+      .execute();
+  }
+
+  /**
    * 指定されたJSTの期間内に含まれる全てのバッチを取得します
    */
   async findBatchesInRange(

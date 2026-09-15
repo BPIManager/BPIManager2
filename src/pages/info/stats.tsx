@@ -8,6 +8,7 @@ import {
   RegistrationTrendChart,
   ArenaRankComparison,
   VersionScoreChart,
+  TotalBpiHistogramChart,
   HourlyChart,
   WeekdayChart,
   SongPopulationTable,
@@ -94,6 +95,7 @@ export default function SiteStatsPage() {
             <RegistrationTrendChart data={data.dailyRegistrations} />
             <ArenaRankComparison selfReported={data.arenaRankDistribution} />
             <VersionScoreChart data={data.versionScoreDistribution} />
+            <TotalBpiHistogramChart data={data.totalBpiHistogram} />
 
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
               <HourlyChart data={data.hourlyDistribution} />

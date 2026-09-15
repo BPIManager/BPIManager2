@@ -20,16 +20,25 @@ export async function generateInfoJson() {
 
   await fs.mkdir(OUTPUT_DIR, { recursive: true });
 
-  const [summary, dailyRegistrations, arenaRankDistribution, areaDistribution, versionScoreDistribution, hourlyDistribution, weekdayDistribution] =
-    await Promise.all([
-      siteStatsSummaryRepo.getSummary(),
-      siteStatsSummaryRepo.getDailyRegistrations(90),
-      siteStatsSummaryRepo.getArenaRankDistribution(),
-      siteStatsSummaryRepo.getAreaDistribution(),
-      siteStatsSummaryRepo.getVersionScoreDistribution(),
-      siteStatsActivityDistributionRepo.getHourlyDistribution(),
-      siteStatsActivityDistributionRepo.getWeekdayDistribution(),
-    ]);
+  const [
+    summary,
+    dailyRegistrations,
+    arenaRankDistribution,
+    areaDistribution,
+    versionScoreDistribution,
+    hourlyDistribution,
+    weekdayDistribution,
+    totalBpiHistogram,
+  ] = await Promise.all([
+    siteStatsSummaryRepo.getSummary(),
+    siteStatsSummaryRepo.getDailyRegistrations(90),
+    siteStatsSummaryRepo.getArenaRankDistribution(),
+    siteStatsSummaryRepo.getAreaDistribution(),
+    siteStatsSummaryRepo.getVersionScoreDistribution(),
+    siteStatsActivityDistributionRepo.getHourlyDistribution(),
+    siteStatsActivityDistributionRepo.getWeekdayDistribution(),
+    siteStatsSummaryRepo.getTotalBpiHistogramByVersion(),
+  ]);
 
   await fs.writeFile(
     STATS_FILE,
@@ -41,6 +50,7 @@ export async function generateInfoJson() {
       versionScoreDistribution,
       hourlyDistribution,
       weekdayDistribution,
+      totalBpiHistogram,
       generatedAt: new Date().toISOString(),
     }),
   );
