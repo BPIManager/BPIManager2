@@ -1,21 +1,25 @@
 import { createHash, randomBytes } from "crypto";
 import dayjs from "@/lib/dayjs";
 
-/** userIdを8桁hexに短縮する。batchIdの可読性より短さを優先するための一方向変換。 */
+/**
+ * userIdを16桁hex(64bit)に短縮する。batchIdの可読性より短さを優先するための
+ * 一方向変換だが、`findBatchById`（logs/navigation.ts）・
+ * `getScoresWithDetails`の`batchIds`絞り込み（scores/detail.ts）等、
+ * batchIdだけで検索しuserIdを併用しないクエリが既存コードに存在するため、
+ * 短くしすぎると別ユーザーとbatchIdが衝突しデータが混在するリスクが
+ * 現実的になる（CSVインポート側のランダムUUIDは122bitあるため実質衝突
+ * しないのに対し、桁を削ったハッシュだとその前提が崩れる）。64bitは
+ * UUIDと同程度に衝突確率を無視できる水準として選んでいる。
+ */
 function shortUserHash(userId: string): string {
-  return createHash("sha256").update(userId).digest("hex").slice(0, 8);
+  return createHash("sha256").update(userId).digest("hex").slice(0, 16);
 }
 
 /**
- * 手動スコア編集用batchIdの当日分プレフィックス。ユーザー（8桁hexに短縮）・
+ * 手動スコア編集用batchIdの当日分プレフィックス。ユーザー（16桁hexに短縮）・
  * バージョン・当日日付(JST, YYYYMMDD)から決定的に定まる。「現在の最新batchId
  * がこのプレフィックスで始まるか」で「今日の手動編集セッションが継続中か」を
  * 判定する（{@link mintManualBatchId}参照）。
- *
- * userIdをハッシュ化しているため、別ユーザーのプレフィックスと衝突する
- * 可能性は理論上ゼロではないが、`userId`カラム自体で常に絞り込まれる
- * ため実害は無い（batchIdはグルーピング用のタグであり、所有者の判定には
- * 使わない）。
  *
  * CSVインポート・MCPツール（`updateMyScore.ts`）はランダムUUIDを使うため、
  * この形式のIDと衝突しない。
@@ -38,6 +42,6 @@ export function getManualBatchPrefix(userId: string, version: string): string {
  * （`saveManualScoreUpdate`がプレフィックス一致を見て使い回すかどうかを判断する）。
  */
 export function mintManualBatchId(userId: string, version: string): string {
-  const suffix = randomBytes(2).toString("hex");
+  const suffix = randomBytes(3).toString("hex");
   return `${getManualBatchPrefix(userId, version)}-${suffix}`;
 }
