@@ -171,6 +171,46 @@ export const rivalsTranslations = {
     ko: "정렬 선택",
   },
 
+  // Version select (find rivals page)
+  "rivals.version.label": {
+    ja: "対象バージョン",
+    en: "Version",
+    "zh-TW": "對象版本",
+    ko: "대상 버전",
+  },
+
+  // Range filter modal (find rivals page)
+  "rivals.rangeFilter.button": {
+    ja: "詳細条件",
+    en: "Filters",
+    "zh-TW": "詳細條件",
+    ko: "상세 조건",
+  },
+  "rivals.rangeFilter.buttonActive": {
+    ja: "詳細条件（{count}）",
+    en: "Filters ({count})",
+    "zh-TW": "詳細條件（{count}）",
+    ko: "상세 조건 ({count})",
+  },
+  "rivals.rangeFilter.title": {
+    ja: "詳細条件で絞り込む",
+    en: "Filter by range",
+    "zh-TW": "依範圍篩選",
+    ko: "상세 조건으로 좁히기",
+  },
+  "rivals.rangeFilter.totalBpi": {
+    ja: "総合BPI",
+    en: "Total BPI",
+    "zh-TW": "綜合BPI",
+    ko: "종합BPI",
+  },
+  "rivals.rangeFilter.desc": {
+    ja: "各項目にmin/maxを指定すると、すべての条件を満たすユーザーのみに絞り込みます（AND条件）。",
+    en: "Set a min/max for any item to narrow results to users matching every condition (AND).",
+    "zh-TW": "為各項目設定min/max後，將只顯示同時符合所有條件的使用者（AND）。",
+    ko: "각 항목에 min/max를 지정하면 모든 조건을 충족하는 사용자만 표시됩니다(AND).",
+  },
+
   // Rival songs filter (RIVAL_SORT_LABELS)
   "rivals.filter.winDesc": {
     ja: "勝ち越しが多い順",
