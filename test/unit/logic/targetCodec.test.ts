@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { encodeTarget, decodeTarget } from "@/hooks/analytics/targetCodec";
+import {
+  encodeTarget,
+  decodeTarget,
+  encodeTargets,
+  decodeTargets,
+} from "@/hooks/analytics/targetCodec";
 import type { AnalyticsTarget } from "@/types/analytics";
 
 describe("encodeTarget/decodeTarget", () => {
@@ -39,5 +44,42 @@ describe("encodeTarget/decodeTarget", () => {
 
   it("decodeURIComponentが失敗する不正な文字列を渡すとnullを返すこと", () => {
     expect(decodeTarget("%")).toBeNull();
+  });
+});
+
+describe("encodeTargets/decodeTargets(#287: 複数ターゲット比較)", () => {
+  it("複数ターゲットをラウンドトリップできること", () => {
+    const targets: AnalyticsTarget[] = [
+      { kind: "rival", param: "user-1", label: "ライバル太郎" },
+      { kind: "wr", param: undefined, label: "WR" },
+      { kind: "arena", param: "A1", label: "アリーナ平均 A1" },
+    ];
+
+    expect(decodeTargets(encodeTargets(targets))).toEqual(targets);
+  });
+
+  it("ラベルにカンマを含んでいても、個々のターゲットの区切りを誤らないこと", () => {
+    const targets: AnalyticsTarget[] = [
+      { kind: "rival", param: "user-1", label: "太郎, 二郎" },
+      { kind: "aaa", param: undefined, label: "AAA" },
+    ];
+
+    expect(decodeTargets(encodeTargets(targets))).toEqual(targets);
+  });
+
+  it("空配列はエンコードすると空文字列になり、デコードすると空配列に戻ること", () => {
+    expect(encodeTargets([])).toBe("");
+    expect(decodeTargets("")).toEqual([]);
+  });
+
+  it("undefinedを渡すと空配列を返すこと", () => {
+    expect(decodeTargets(undefined)).toEqual([]);
+  });
+
+  it("一部の要素のデコードに失敗しても、残りの要素は読み飛ばして返すこと", () => {
+    const valid = encodeTarget({ kind: "wr", label: "WR" });
+    expect(decodeTargets(`${valid},%`)).toEqual([
+      { kind: "wr", param: undefined, label: "WR" },
+    ]);
   });
 });

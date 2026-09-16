@@ -31,3 +31,31 @@ export function decodeTarget(raw: string): AnalyticsTarget | null {
     return null;
   }
 }
+
+/**
+ * 複数の{@link AnalyticsTarget}をURLクエリに埋め込める1つの文字列に
+ * エンコードする（#287、複数ターゲット比較用）。
+ *
+ * 各ターゲットは{@link encodeTarget}で個別にエンコード済み（コロン・カンマ
+ * を含め`encodeURIComponent`で escape 済み）なので、`,`で単純に連結して
+ * 区切って問題ない。
+ *
+ * @param targets - エンコード対象のターゲット配列
+ */
+export function encodeTargets(targets: AnalyticsTarget[]): string {
+  return targets.map(encodeTarget).join(",");
+}
+
+/**
+ * {@link encodeTargets} でエンコードされた文字列を{@link AnalyticsTarget}の
+ * 配列にデコードする。個別のデコードに失敗した要素は読み飛ばす。
+ *
+ * @param raw - エンコード済み文字列
+ */
+export function decodeTargets(raw: string | undefined): AnalyticsTarget[] {
+  if (!raw) return [];
+  return raw
+    .split(",")
+    .map(decodeTarget)
+    .filter((t): t is AnalyticsTarget => t !== null);
+}
