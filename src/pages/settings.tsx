@@ -15,6 +15,7 @@ import ThemeSettingsUi from "@/components/partials/features/Settings/ThemeSettin
 import DataExportUi from "@/components/partials/features/Settings/DataExport";
 import LayoutSettingsUi from "@/components/partials/features/Settings/LayoutSettings/ui";
 import LanguageSettingsUi from "@/components/partials/features/Settings/LanguageSettings/ui";
+import LogCompareSettingsUi from "@/components/partials/features/Settings/LogCompareSettings/ui";
 import RequireAuth from "@/components/partials/shell/RequireAuth";
 
 export default function SettingsPage() {
@@ -45,6 +46,7 @@ export default function SettingsPage() {
             <OAuthClientUi />
 
             <LayoutSettingsUi />
+            <LogCompareSettingsUi />
             <ThemeSettingsUi />
             <DataExportUi />
             <AccountDeletionUi />
