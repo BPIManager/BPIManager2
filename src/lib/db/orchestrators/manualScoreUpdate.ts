@@ -56,7 +56,43 @@ export async function saveManualScoreUpdate(params: {
   const lastPlayed = new Date();
 
   return await db.transaction().execute(async (trx) => {
+    let totalBpi: number | null = null;
+
+    // `scores.batchId`は`logs.batchId`への外部キーのため、`logs`側の行を
+    // 先に用意してから`scores`へ書き込む必要がある（CSVインポート
+    // `executeSaveBpiSystem`と同じ順序）。
     if (score) {
+      const latestLog = await userStatusLogsRepo.getLatestArenaRank(
+        trx,
+        userId,
+        version,
+      );
+      const currentArenaRank = latestLog?.arenaRank ?? null;
+
+      const previousBest = await userStatusLogsRepo.getMaxTotalBpi(
+        trx,
+        userId,
+        version,
+      );
+      totalBpi = BpiCalculator.ratchetTotalBpi(
+        previousBest,
+        newTotalBpi ?? previousBest ?? -15,
+      );
+
+      await navigationRepo.upsertManualBatch(trx, {
+        userId,
+        version,
+        batchId,
+        totalBpi,
+      });
+      await userStatusLogsRepo.upsertManualBatch(trx, {
+        userId,
+        version,
+        batchId,
+        totalBpi,
+        arenaRank: currentArenaRank,
+      });
+
       await scoresRepo.upsertManual(trx, {
         userId,
         songId: score.songId,
@@ -84,41 +120,6 @@ export async function saveManualScoreUpdate(params: {
         lastPlayed,
       });
     }
-
-    if (!score) {
-      return { totalBpi: null, batchId };
-    }
-
-    const latestLog = await userStatusLogsRepo.getLatestArenaRank(
-      trx,
-      userId,
-      version,
-    );
-    const currentArenaRank = latestLog?.arenaRank ?? null;
-
-    const previousBest = await userStatusLogsRepo.getMaxTotalBpi(
-      trx,
-      userId,
-      version,
-    );
-    const totalBpi = BpiCalculator.ratchetTotalBpi(
-      previousBest,
-      newTotalBpi ?? previousBest ?? -15,
-    );
-
-    await navigationRepo.upsertManualBatch(trx, {
-      userId,
-      version,
-      batchId,
-      totalBpi,
-    });
-    await userStatusLogsRepo.upsertManualBatch(trx, {
-      userId,
-      version,
-      batchId,
-      totalBpi,
-      arenaRank: currentArenaRank,
-    });
 
     return { totalBpi, batchId };
   });
