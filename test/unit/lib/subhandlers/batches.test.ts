@@ -86,8 +86,12 @@ vi.mock("@/lib/db/domains/scores/timeline", () => ({
     getVersionComparisons: (...a: unknown[]) => getVersionComparisonsMock(...a),
   },
 }));
+const { MockBatchNotLatestError } = vi.hoisted(() => ({
+  MockBatchNotLatestError: class extends Error {},
+}));
 vi.mock("@/lib/db/orchestrators/batchDeletion", () => ({
   deleteBatch: (...a: unknown[]) => deleteBatchMock(...a),
+  BatchNotLatestError: MockBatchNotLatestError,
 }));
 vi.mock("@/services/logs/calculateTotalBpi", () => ({
   calculateTotalBpi: (...a: unknown[]) => calculateTotalBpiMock(...a),
@@ -236,7 +240,18 @@ describe("handleBatchDelete", () => {
       ok: true,
       body: { message: "Batch deleted successfully." },
     });
-    expect(deleteBatchMock).toHaveBeenCalledWith("u1", "b1");
+    expect(deleteBatchMock).toHaveBeenCalledWith("u1", "b1", "31");
+  });
+
+  it("トランザクション内の再判定で最新でなくなっていた場合(BatchNotLatestError)はerr(400)(#448)", async () => {
+    authenticateViewerMock.mockResolvedValue("u1");
+    findBatchByIdAndUserMock.mockResolvedValue({ batchId: "b1", version: "31" });
+    getLatestBatchIdMock.mockResolvedValue("b1");
+    deleteBatchMock.mockRejectedValue(new MockBatchNotLatestError());
+    const { result } = await handleBatchDelete(
+      req({ userId: "u1", batchId: "b1" }),
+    );
+    expect(result).toMatchObject({ ok: false, status: 400 });
   });
 });
 

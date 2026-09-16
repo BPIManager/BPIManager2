@@ -163,6 +163,32 @@ class LogNavigationRepository {
   }
 
   /**
+   * トランザクション内で対象行をロックしつつ最新バッチIDを判定する。
+   * バッチ削除の「最新バッチか」判定と削除をアトミックに行うために使う
+   * （判定後・削除前に新しいバッチが割り込むTOCTOU競合を防ぐ、#448）。
+   *
+   * @param trx - 呼び出し元が管理するトランザクション
+   * @param userId - ユーザー ID
+   * @param version - バージョン番号
+   */
+  async getLatestBatchIdForUpdate(
+    trx: Transaction<Database>,
+    userId: string,
+    version: string,
+  ): Promise<string | undefined> {
+    const row = await trx
+      .selectFrom("logs")
+      .select("batchId")
+      .where("userId", "=", userId)
+      .where("version", "=", version)
+      .orderBy("id", "desc")
+      .limit(1)
+      .forUpdate()
+      .executeTakeFirst();
+    return row?.batchId;
+  }
+
+  /**
    * ユーザーの全ログレコードを削除する。
    *
    * @param trx - 呼び出し元が管理するトランザクション
