@@ -3,6 +3,7 @@ import { sql } from "kysely";
 import { latestPerUserSubquery as latestArenaPerUserSubquery } from "@/lib/db/domains/arenaHistory";
 import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
 import { wherePublicOnly } from "@/lib/db/shared/visibility";
+import type { RadarFilterKey, RadarFilterRange } from "@/types/users/list";
 
 /**
  * おすすめユーザー発見・検索を担当するリポジトリクラス。
@@ -27,6 +28,7 @@ class UserDiscoveryRepository {
    * @param params.searchQuery - ユーザー名または IIDX ID の部分一致検索文字列
    * @param params.sort - ソート列名（`"totalBpi"` | `"notes"` | ... レーダーカテゴリ）
    * @param params.order - ソート方向
+   * @param params.filters - レーダーカテゴリ・総合BPIのmin/max範囲絞り込み（全条件AND）
    */
   async getRecommendedUsers(params: {
     viewerId: string;
@@ -38,6 +40,7 @@ class UserDiscoveryRepository {
     sort?: string;
     order?: "distance" | "desc" | "newest" | "supporters";
     seed?: number;
+    filters?: Partial<Record<RadarFilterKey, RadarFilterRange>>;
   }) {
     const {
       viewerId,
@@ -49,6 +52,7 @@ class UserDiscoveryRepository {
       sort,
       order,
       seed,
+      filters,
     } = params;
     const columnMap: Record<string, string> = {
       totalBpi: "usl.totalBpi",
@@ -69,8 +73,8 @@ class UserDiscoveryRepository {
     let query = db
       .selectFrom("users as u")
       .innerJoin("userRadarCache as r", "u.userId", "r.userId")
-      .leftJoin(latestStatusSubquery.as("ls"), "u.userId", "ls.userId")
-      .leftJoin("userStatusLogs as usl", "ls.maxId", "usl.id")
+      .innerJoin(latestStatusSubquery.as("ls"), "u.userId", "ls.userId")
+      .innerJoin("userStatusLogs as usl", "ls.maxId", "usl.id")
       .leftJoin(latestArenaSubquery.as("la"), "u.userId", "la.userId")
       .leftJoin("officialArenaStats as oas", "la.maxId", "oas.id")
       .leftJoin("userRoles as ur", "ur.userId", "u.userId")
@@ -108,6 +112,23 @@ class UserDiscoveryRepository {
           eb("u.iidxId", "like", searchPattern),
         ]),
       );
+    }
+
+    if (filters) {
+      for (const [key, range] of Object.entries(filters) as [
+        RadarFilterKey,
+        RadarFilterRange | undefined,
+      ][]) {
+        if (!range) continue;
+        const column = columnMap[key];
+        if (!column) continue;
+        if (range.min !== undefined) {
+          query = query.where(sql.ref(column), ">=", range.min);
+        }
+        if (range.max !== undefined) {
+          query = query.where(sql.ref(column), "<=", range.max);
+        }
+      }
     }
 
     if (order === "supporters") {

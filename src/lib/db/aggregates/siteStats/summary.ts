@@ -205,24 +205,34 @@ class SiteStatsSummaryRepository {
     );
   }
 
-  async getArenaRankDistribution() {
+  /**
+   * バージョンごとのアリーナランク別登録者数分布。
+   */
+  async getArenaRankDistributionByVersion() {
     const rows = await db
-      .with("latest_per_user", () => latestArenaStatsPerUserSubquery(latestVersion))
+      .with("latest_per_user", () => latestArenaStatsPerUserAllVersionsSubquery())
       .selectFrom("officialArenaStats as oas")
       .innerJoin("latest_per_user as lpu", "lpu.maxId", "oas.id")
-      .select(["oas.arenaClass", sql<number>`COUNT(*)`.as("count")])
-      .groupBy("oas.arenaClass")
+      .select(["oas.version", "oas.arenaClass", sql<number>`COUNT(*)`.as("count")])
+      .groupBy(["oas.version", "oas.arenaClass"])
       .execute();
 
-    const countOf = (rank: string) =>
-      rows
-        .filter((r) => r.arenaClass === rank)
-        .reduce((s, r) => s + Number(r.count), 0);
+    const byVersion = new Map<string, Map<string, number>>();
+    for (const r of rows) {
+      if (!r.version) continue;
+      const counts = byVersion.get(r.version) ?? new Map<string, number>();
+      byVersion.set(r.version, counts);
+      counts.set(r.arenaClass, (counts.get(r.arenaClass) ?? 0) + Number(r.count));
+    }
 
-    return (ARENA_RANK_ORDER as readonly string[]).map((r) => ({
-      rank: r,
-      count: countOf(r),
-    }));
+    const result: Record<string, { rank: string; count: number }[]> = {};
+    for (const [version, counts] of byVersion) {
+      result[version] = (ARENA_RANK_ORDER as readonly string[]).map((r) => ({
+        rank: r,
+        count: counts.get(r) ?? 0,
+      }));
+    }
+    return result;
   }
 
   /**

@@ -32,7 +32,7 @@ export async function generateInfoJson() {
   ] = await Promise.all([
     siteStatsSummaryRepo.getSummary(),
     siteStatsSummaryRepo.getDailyRegistrations(90),
-    siteStatsSummaryRepo.getArenaRankDistribution(),
+    siteStatsSummaryRepo.getArenaRankDistributionByVersion(),
     siteStatsSummaryRepo.getAreaDistributionByVersion(),
     siteStatsSummaryRepo.getVersionScoreDistribution(),
     siteStatsActivityDistributionRepo.getHourlyDistribution(),

@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { versionsOptions } from "@/constants/iidx/versionTitles";
+import { towerDownloadUrl } from "@/constants/iidx/eamusementUrls";
 import BookmarkletAccordion from "@/components/partials/common/Bookmarklet";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
@@ -45,8 +46,6 @@ const TowerImportView = ({
 }: TowerImportProps) => {
   const { t } = useTranslation();
   const isValid = csvData.trim() ? isValidTowerCsv(csvData) : null;
-  const towerDownloadUrl =
-    "https://p.eagate.573.jp/game/2dx/33/djdata/score_download.html?style=tower";
 
   return (
     <div className="flex flex-col gap-6">
