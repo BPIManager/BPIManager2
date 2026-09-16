@@ -347,7 +347,7 @@ const AAATableFilter = ({
       id: "radar",
       label: t("filter.radarCategory"),
       render: () => (
-        <div className="grid grid-cols-3 gap-2">
+        <div className="flex flex-wrap gap-x-4 gap-y-2">
           {ALL_RADAR_CATEGORIES.map((cat) => {
             const toggle = () => {
               const next = radarCategories.includes(cat)
