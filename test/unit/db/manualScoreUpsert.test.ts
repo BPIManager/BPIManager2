@@ -81,7 +81,7 @@ describe("getManualBatchPrefix", () => {
     const id1 = getManualBatchPrefix("user-1", "34");
     const id2 = getManualBatchPrefix("user-1", "34");
     expect(id1).toBe(id2);
-    expect(id1).toMatch(/^manual-user-1-34-\d{4}-\d{2}-\d{2}$/);
+    expect(id1).toMatch(/^m-[0-9a-f]{8}-34-\d{8}$/);
   });
 
   it("userId・versionが異なれば別のプレフィックスになること", () => {
