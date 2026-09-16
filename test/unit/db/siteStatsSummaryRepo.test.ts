@@ -41,22 +41,25 @@ describe("siteStatsSummaryRepo.getSummary", () => {
   });
 });
 
-describe("siteStatsSummaryRepo.getArenaRankDistribution", () => {
-  it("ARENA_RANK_ORDER全ランクを含み、該当データのないランクは0になること", async () => {
+describe("siteStatsSummaryRepo.getArenaRankDistributionByVersion", () => {
+  it("バージョンごとにARENA_RANK_ORDER全ランクを含み、該当データのないランクは0になること", async () => {
     dbHolder.current = createDbSpy([
-      { arenaClass: "A1", count: 10 },
-      { arenaClass: "A1", count: 5 },
-      { arenaClass: "B3", count: 3 },
+      { version: "33", arenaClass: "A1", count: 10 },
+      { version: "33", arenaClass: "A1", count: 5 },
+      { version: "33", arenaClass: "B3", count: 3 },
+      { version: "32", arenaClass: "A1", count: 2 },
     ]);
 
-    const result = await siteStatsSummaryRepo.getArenaRankDistribution();
+    const result = await siteStatsSummaryRepo.getArenaRankDistributionByVersion();
 
-    const a1 = result.find((r) => r.rank === "A1");
-    const b3 = result.find((r) => r.rank === "B3");
-    const b1 = result.find((r) => r.rank === "B1");
-    expect(a1?.count).toBe(15);
-    expect(b3?.count).toBe(3);
-    expect(b1?.count).toBe(0);
+    const v33a1 = result["33"].find((r) => r.rank === "A1");
+    const v33b3 = result["33"].find((r) => r.rank === "B3");
+    const v33b1 = result["33"].find((r) => r.rank === "B1");
+    const v32a1 = result["32"].find((r) => r.rank === "A1");
+    expect(v33a1?.count).toBe(15);
+    expect(v33b3?.count).toBe(3);
+    expect(v33b1?.count).toBe(0);
+    expect(v32a1?.count).toBe(2);
   });
 });
 

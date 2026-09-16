@@ -65,7 +65,8 @@ export interface TotalBpiHistogramBucket {
 export interface SiteStatsResponse {
   summary: SiteStatsSummary;
   dailyRegistrations: DailyRegistration[];
-  arenaRankDistribution: ArenaRankEntry[];
+  /** バージョン番号 → ランク別カウント配列。データが無いバージョンはキー自体が無い */
+  arenaRankDistribution: Record<string, ArenaRankEntry[]>;
   areaDistribution: AreaEntry[];
   versionScoreDistribution: VersionScoreDistribution;
   hourlyDistribution: Record<SiteStatsPeriod, HourlyEntry[]>;

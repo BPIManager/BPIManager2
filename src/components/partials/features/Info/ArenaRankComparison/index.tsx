@@ -1,15 +1,40 @@
+import { useState } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { DashCard } from "@/components/ui/dashcard";
 import { useOfficialArena } from "@/hooks/siteStats/useOfficialArena";
 import { getArenaClassColor } from "@/utils/arenaClass";
+import { latestVersion } from "@/constants/iidx/iidxVersions";
+import { versionsNonDisabledCollection } from "@/constants/iidx/versionTitles";
 import type { ArenaRankEntry } from "@/types/siteStats";
 import { AlertCircleIcon } from "lucide-react";
+
+// 公式アリーナデータの取得元(eAMUSEMENT公式サイト)がまだ最新バージョンに対応して
+// おらず、直近で実データが揃っているのがv33のため暫定的にデフォルト表示に固定する
+const DEFAULT_VERSION = "33";
 
 function ArenaRankComparison({
   selfReported,
 }: {
-  selfReported: ArenaRankEntry[];
+  selfReported: Record<string, ArenaRankEntry[]> | undefined;
 }) {
-  const { data: official, isLoading, isError } = useOfficialArena();
+  const selfReportedByVersion = selfReported ?? {};
+  const availableVersions = versionsNonDisabledCollection.filter(
+    (v) => selfReportedByVersion[v.value]?.some((e) => e.count > 0),
+  );
+  const [version, setVersion] = useState<string>(
+    selfReportedByVersion[DEFAULT_VERSION]
+      ? DEFAULT_VERSION
+      : (availableVersions[0]?.value ?? latestVersion),
+  );
+
+  const entries = selfReportedByVersion[version] ?? [];
+  const { data: official, isLoading, isError } = useOfficialArena(version);
 
   const officialMap = new Map(
     (official?.distribution ?? []).map((e) => [e.rank, e.count]),
@@ -26,6 +51,18 @@ function ArenaRankComparison({
         <h3 className="text-sm font-bold uppercase text-bpim-muted">
           アリーナランク別登録者数
         </h3>
+        <Select value={version} onValueChange={setVersion}>
+          <SelectTrigger className="h-7 w-28 border-bpim-border bg-bpim-surface-2/60 text-xs hover:bg-bpim-overlay focus:ring-0">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent className="border-bpim-border bg-bpim-bg">
+            {versionsNonDisabledCollection.map((v) => (
+              <SelectItem key={v.value} value={v.value} className="text-xs">
+                {v.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {isError ? (
@@ -49,7 +86,7 @@ function ArenaRankComparison({
               カバー率
             </span>
           </div>
-          {selfReported.map((entry) => {
+          {entries.map((entry) => {
             const bpim2 = entry.count;
             const off = officialMap.get(entry.rank) ?? 0;
             const coverage = off > 0 ? (bpim2 / off) * 100 : null;
