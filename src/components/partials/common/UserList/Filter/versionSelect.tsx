@@ -21,7 +21,7 @@ const VersionSelect = ({
 
   return (
     <Select value={version} onValueChange={onChange}>
-      <SelectTrigger className="h-9 w-full border-none bg-bpim-bg/50 text-bpim-text focus:ring-blue-500 sm:w-40">
+      <SelectTrigger className="h-9 w-full border-none bg-bpim-bg/50 text-bpim-text focus:ring-blue-500">
         <SelectValue placeholder={t("rivals.version.label")} />
       </SelectTrigger>
       <SelectContent className="border-bpim-border bg-bpim-bg text-bpim-text">

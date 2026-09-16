@@ -53,6 +53,12 @@ const UserRecommendationList = () => {
       <PageContainer>
         <div className="flex w-full flex-col gap-6">
           <div className="rounded-xl border border-bpim-border bg-bpim-bg/40 p-4 shadow-sm">
+            <div className="mb-3">
+              <VersionSelect
+                version={v}
+                onChange={(value) => updateParams({ v: value, p: 1, seed: null })}
+              />
+            </div>
             <div className="mb-3 flex items-center gap-2">
               <div className="flex-1 min-w-0">
                 <SortSelector
@@ -89,18 +95,10 @@ const UserRecommendationList = () => {
                   {t("rivals.search.shuffle")}
                 </button>
               )}
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <div className="w-full sm:w-40">
-                <VersionSelect
-                  version={v}
-                  onChange={(value) => updateParams({ v: value, p: 1, seed: null })}
-                />
-              </div>
               <Button
                 variant="outline"
                 size="sm"
-                className="h-9 border-bpim-border bg-bpim-bg/50 text-bpim-text hover:bg-bpim-border"
+                className="h-9 shrink-0 border-bpim-border bg-bpim-bg/50 text-bpim-text hover:bg-bpim-border"
                 onClick={() => setIsFilterModalOpen(true)}
               >
                 <SlidersHorizontal className="mr-1.5 h-3.5 w-3.5" />
@@ -109,7 +107,7 @@ const UserRecommendationList = () => {
                   : t("rivals.rangeFilter.button")}
               </Button>
             </div>
-            <div className="mt-3 flex gap-4">
+            <div className="flex gap-4">
               <SearchInput
                 initialValue={q}
                 onSearch={(val) => updateParams({ q: val, p: 1 })}
