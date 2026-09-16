@@ -149,7 +149,10 @@ class AllScoresAggregateRepository {
       bpm: r.bpm ?? null,
       difficulty: r.difficulty as AllDifficulties,
       difficultyLevel: r.difficultyLevel,
-      releasedVersion: r.releasedVersion ?? null,
+      // allSongs.releasedVersionはDB上varchar(3)（songs側はint）のため、
+      // フロントの「楽曲バージョン」フィルタ(数値配列との完全一致)に
+      // 合わせて明示的にNumberへキャストする
+      releasedVersion: r.releasedVersion ? Number(r.releasedVersion) : null,
       logId: r.logId ?? null,
       exScore: r.exScore ?? null,
       clearState: r.clearState ?? null,
@@ -252,7 +255,7 @@ class AllScoresAggregateRepository {
         bpm: row.bpm ?? null,
         difficulty: row.difficulty as AllDifficulties,
         difficultyLevel: row.difficultyLevel,
-        releasedVersion: row.releasedVersion ?? null,
+        releasedVersion: row.releasedVersion ? Number(row.releasedVersion) : null,
         logId: null,
         exScore: myEx,
         clearState: row.myClearState ?? null,
