@@ -21,6 +21,7 @@ import { PageLoader } from "@/components/ui/loading-spinner";
 import { useState } from "react";
 import { NoDataAlert } from "@/components/partials/common/DashBoard/NoData";
 import BpiChangeNotice from "@/components/partials/common/DashBoard/BpiChangeNotice";
+import MonthlyReviewNotice from "@/components/partials/common/DashBoard/MonthlyReviewNotice";
 import IidxTowerSection from "@/components/partials/common/DashBoard/IidxTowerCard";
 import OfficialArenaHistorySection from "@/components/partials/common/DashBoard/OfficialArenaHistoryCard";
 import { Settings2 } from "lucide-react";
@@ -135,6 +136,7 @@ export default function DashboardPage() {
 
         <PageContainer>
           <div className="flex flex-col gap-6">
+            <MonthlyReviewNotice />
             <BpiChangeNotice />
             <DashBoardFilter withCompare />
             {nodata && <NoDataAlert />}
