@@ -34,7 +34,7 @@ const LogRank = ({
   const [selectedSong, setSelectedSong] = useState<SongWithScore | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState<boolean>(false);
   const [selectedRivalId, setSelectedRivalId] = useState<string>("");
-  const [showAllDiffs, setShowAllDiffs] = useState<boolean>(false);
+  const [newOnly, setNewOnly] = useState<boolean>(false);
 
   const RANK_CONFIG = {
     growth: {
@@ -135,7 +135,7 @@ const LogRank = ({
           </div>
         </div>
 
-        {type !== "top" && !isSharing && (
+        {type !== "top" && type !== "versionOvertake" && !isSharing && (
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-bold text-bpim-muted">
               {t("logs.rank.hideNew")}
@@ -149,16 +149,16 @@ const LogRank = ({
             />
           </div>
         )}
-      </div>
 
-      {type === "versionOvertake" && !isSharing && (
-        <div className="flex items-center justify-end gap-2">
-          <span className="text-[10px] font-bold text-bpim-muted">
-            {t("logs.rank.versionOvertake.showAllDiffs")}
-          </span>
-          <Switch checked={showAllDiffs} onCheckedChange={setShowAllDiffs} />
-        </div>
-      )}
+        {type === "versionOvertake" && !isSharing && (
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-bold text-bpim-muted">
+              {t("logs.rank.versionOvertake.newOnly")}
+            </span>
+            <Switch checked={newOnly} onCheckedChange={setNewOnly} />
+          </div>
+        )}
+      </div>
 
       {type === "overtake" && allRivals.length > 0 && (
         <Select
@@ -201,7 +201,7 @@ const LogRank = ({
               ) : type === "versionOvertake" ? (
                 <VersionOvertakeRankItem
                   item={item}
-                  showAllDiffs={showAllDiffs}
+                  showAllDiffs={!newOnly}
                   onClick={() => handleOpenDetail(item)}
                 />
               ) : (
