@@ -64,6 +64,8 @@ export async function handleScoresBulk(
     const scoreUpdates: NewScore[] = [];
     const allScoreUpdates: NewAllScores[] = [];
     const notFound: { title: string; difficulty: string }[] = [];
+    const invalidScore: { title: string; difficulty: string; exScore: number }[] =
+      [];
     const previousTotalBpi = lastLog?.totalBpi ?? -15;
 
     const lastPlayedDate = (dateStr: string | null) =>
@@ -77,6 +79,15 @@ export async function handleScoresBulk(
 
       if (!song) {
         notFound.push({ title: row.title, difficulty: row.difficulty });
+        continue;
+      }
+
+      if (row.exScore > song.notes * 2) {
+        invalidScore.push({
+          title: row.title,
+          difficulty: row.difficulty,
+          exScore: row.exScore,
+        });
         continue;
       }
 
@@ -106,6 +117,7 @@ export async function handleScoresBulk(
     for (const row of csvRows) {
       const song = bpiMasterMap.get(`${row.title}_${row.difficulty}`);
       if (!song) continue;
+      if (row.exScore > song.notes * 2) continue;
 
       const current = bpiScoreMap.get(song.songId);
       if (isScoreImproved(row, current)) {
@@ -161,7 +173,7 @@ export async function handleScoresBulk(
         updatedBpiCount: scoreUpdates.length,
         previousTotalBpi,
         newTotalBpi: savedTotalBpi,
-        details: { notFound },
+        details: { notFound, invalidScore },
       }),
       ...base,
     };
