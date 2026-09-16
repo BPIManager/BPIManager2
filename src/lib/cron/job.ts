@@ -86,8 +86,8 @@ async function printArenaStatus() {
  * - 毎日 04:00 UTC に `generateArenaJson`
  * - 毎日 16:00 UTC に `generateInfoJson`
  * - 毎日 UTC 16:30（JST 01:30）に `fetchOfficialArenaDistribution`
- * - 12 時間ごとに `updateAllUserRadarCache`
- * - 12 時間ごと（radarキャッシュとは6時間ずらして）に `updateAllSongRankingCache`
+ * - 1 時間ごとに `updateAllUserRadarCache`
+ * - 12 時間ごとに `updateAllSongRankingCache`
  * - アリーナ開催期間中は JST 07:00〜翌00:59（UTC 22:00〜15:59）の間、
  *   30 分ごとに `fetchOfficialArenaDistribution` を追加実行
  */
@@ -139,7 +139,7 @@ export async function setupArenaService() {
     }
   });
 
-  cron.schedule("0 */12 * * *", () => {
+  cron.schedule("0 * * * *", () => {
     runCronJob("updateAllUserRadarCache", updateAllUserRadarCache);
   });
 
