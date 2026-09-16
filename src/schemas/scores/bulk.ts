@@ -4,7 +4,7 @@ import { z } from "zod";
 const csvRowSchema = z.object({
   title: z.string().min(1),
   difficulty: z.string().min(1),
-  exScore: z.number(),
+  exScore: z.number().int().min(0),
   clearState: z.string().min(1),
   missCount: z.number().nullable(),
   lastPlayed: z.string().nullable(),

@@ -40,17 +40,27 @@ vi.mock("@/lib/db/aggregates/unplayedSongs", () => ({
     getUnplayedSongs: (...a: unknown[]) => getUnplayedSongsMock(...a),
   },
 }));
+const getLatestAllScoresMock = vi.fn().mockResolvedValue([]);
+const getSongMasterWithDefMock = vi.fn().mockResolvedValue([]);
+const getAllLevelMasterMock = vi.fn().mockResolvedValue([]);
+
 vi.mock("@/lib/db/domains/allScores", () => ({
-  allScoresRepo: { getLatestAllScores: vi.fn().mockResolvedValue([]) },
+  allScoresRepo: {
+    getLatestAllScores: (...a: unknown[]) => getLatestAllScoresMock(...a),
+  },
 }));
 vi.mock("@/lib/db/domains/logs/navigation", () => ({
   navigationRepo: { getLatestTotalBpi: vi.fn().mockResolvedValue(null) },
 }));
 vi.mock("@/lib/db/domains/songs", () => ({
-  songsRepo: { getSongMasterWithDef: vi.fn().mockResolvedValue([]) },
+  songsRepo: {
+    getSongMasterWithDef: (...a: unknown[]) => getSongMasterWithDefMock(...a),
+  },
 }));
 vi.mock("@/lib/db/domains/allSongs", () => ({
-  allSongsRepo: { getAllLevelMaster: vi.fn().mockResolvedValue([]) },
+  allSongsRepo: {
+    getAllLevelMaster: (...a: unknown[]) => getAllLevelMasterMock(...a),
+  },
 }));
 vi.mock("@/lib/db/orchestrators/bpiImport", () => ({
   saveImportResults: vi.fn().mockResolvedValue({ totalBpi: 0 }),
@@ -294,6 +304,40 @@ describe("handleScoresBulk", () => {
       authReq({ version: "31", csvRows: [] }),
     );
     expect(result).toMatchObject({ ok: true, body: { success: true } });
+  });
+
+  it("notes*2(理論値)を超える行は取り込まずinvalidScoreに含める(#439)", async () => {
+    getAllLevelMasterMock.mockResolvedValueOnce([
+      { songId: 1, title: "t", difficulty: "ANOTHER", notes: 500 },
+    ]);
+    getSongMasterWithDefMock.mockResolvedValueOnce([]);
+    getLatestAllScoresMock.mockResolvedValueOnce([]);
+
+    const { result } = await handleScoresBulk(
+      authReq({
+        version: "31",
+        csvRows: [
+          {
+            title: "t",
+            difficulty: "ANOTHER",
+            exScore: 1001, // notes*2=1000を超える
+            clearState: "HARD",
+            missCount: null,
+            lastPlayed: null,
+          },
+        ],
+      }),
+    );
+
+    expect(result).toMatchObject({
+      ok: true,
+      body: {
+        updatedAllCount: 0,
+        details: {
+          invalidScore: [{ title: "t", difficulty: "ANOTHER", exScore: 1001 }],
+        },
+      },
+    });
   });
 });
 
