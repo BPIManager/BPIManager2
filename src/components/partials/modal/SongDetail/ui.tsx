@@ -33,6 +33,13 @@ interface SongDetailViewProps {
   /** EXスコアの手動編集を有効にする場合、対象ユーザーIDとバージョンを渡す */
   userId?: string;
   version?: string;
+  /**
+   * `song.songId`がどちらの楽曲ドメイン由来か。`songs`/`songDef`ドメイン
+   * （BPI計算対象、☆11/12）は`"bpi"`、`allSongs`ドメイン（全難易度、
+   * ☆1-12）は`"allSongs"`を渡す。両ドメインで`songId`の値が異なるため、
+   * 手動編集を有効にするにはこの指定が必須。
+   */
+  songDomain?: "bpi" | "allSongs";
   /** 手動保存が成功した際に呼ばれる（呼び出し元でのデータ再取得等に使う） */
   onSaved?: () => void;
 }
@@ -44,6 +51,7 @@ const SongDetailView = ({
   defaultTab,
   userId,
   version,
+  songDomain,
   onSaved,
 }: SongDetailViewProps) => {
   // 全難易度スコア(BPI未計算)にはStatisticsタブを表示しない
@@ -67,10 +75,11 @@ const SongDetailView = ({
   const [isEditing, setIsEditing] = useState(false);
   const [draftExScore, setDraftExScore] = useState<number | null>(null);
 
-  // 手動編集を許可するのは、EXスコア入力が意味を持つBPI計算対象曲を、
-  // 自分自身のプロフィールで見ている場合のみ
+  // 手動編集を許可するのは、呼び出し元がsongDomainを指定しており
+  // （☆10以下の全難易度曲も編集対象になり得るため`fullSong`は問わない）、
+  // 自分自身のプロフィールを見ている場合のみ
   const canEdit =
-    !!fullSong && !!userId && !!version && fbUser?.uid === userId;
+    !!userId && !!version && !!songDomain && fbUser?.uid === userId;
 
   const maxScore = song ? song.notes * 2 : 0;
   const currentEx = song ? song.exScore || 0 : 0;
@@ -113,8 +122,13 @@ const SongDetailView = ({
     draftExScore <= maxScore;
 
   const handleSave = async () => {
-    if (!canSave || !song || !version || draftExScore == null) return;
-    const result = await save({ songId: song.songId, version, exScore: draftExScore });
+    if (!canSave || !song || !version || !songDomain || draftExScore == null) return;
+    const result = await save({
+      songId: song.songId,
+      songDomain,
+      version,
+      exScore: draftExScore,
+    });
     if (result) {
       setIsEditing(false);
       setDraftExScore(null);

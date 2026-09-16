@@ -12,13 +12,39 @@ import type { AuthenticatedNextApiRequest } from "@/middlewares/api/withAuth";
 import type { IBpiScoreObservation } from "@/types/songs/bpi";
 import { type HandleOutcome } from "./_shared";
 
+interface ImprovementCurrent {
+  exScore: number;
+  clearState: string | null;
+  missCount: number | null;
+}
+
+/**
+ * 指定テーブルの現在値に対して改善判定を行い、改善していれば書き込み用の
+ * 値（現在のclearState/missCountをそのまま引き継いだもの）を返す。
+ * `scores`・`allScores`それぞれ独立に判定する（CSVバッチインポートと同じ方針）。
+ */
+function evaluateImprovement(exScore: number, current: ImprovementCurrent | undefined) {
+  const clearState = current?.clearState ?? "NO PLAY";
+  const missCount = current?.missCount ?? null;
+  const improved = isScoreImproved(
+    { exScore, clearState, missCount },
+    current ? { exScore: current.exScore, clearState: current.clearState, missCount: current.missCount } : undefined,
+  );
+  return { improved, clearState, missCount };
+}
+
 /**
  * 画面上でのEXスコア手動入力・保存を扱う。
  *
+ * `songId`は`songs`/`songDef`ドメイン（BPI計算対象、☆11/12）と`allSongs`
+ * ドメイン（全難易度、☆1-12）のどちらかであり得るため、`songDomain`で
+ * どちらの空間かを明示させ、title+difficultyでもう一方のドメインの楽曲を
+ * 解決する（`updateMyScore.ts`と同じブリッジ方式）。両ドメインに存在する
+ * 楽曲（☆11/12）は`scores`・`allScores`双方への書き込みを試みる
+ * （それぞれ独立に改善判定）。
+ *
  * CSVインポートとは別の保存経路（`saveManualScoreUpdate`）を通り、決定的
- * batchIdにより同日内の複数回の手動保存を1レコードにまとめる。既存の自己
- * ベストを上回らない入力は保存しない（`isScoreImproved`、CSV/MCPツールと
- * 同じ判定）。
+ * batchIdにより同日内の複数回の手動保存を1レコードにまとめる。
  */
 export async function handleScoreManualUpdate(
   req: AuthenticatedNextApiRequest,
@@ -33,7 +59,7 @@ export async function handleScoreManualUpdate(
       ...base,
     };
   }
-  const { songId, version, exScore } = parsed.data;
+  const { songId, songDomain, version, exScore } = parsed.data;
   const userId = viewerId;
 
   try {
@@ -45,44 +71,40 @@ export async function handleScoreManualUpdate(
         allScoresRepo.getLatestAllScores(userId, version),
       ]);
 
-    const song = bpiSongMaster.find((s) => s.songId === songId);
-    if (!song) {
-      return {
-        result: err(
-          404,
-          "現在BPI定義のある楽曲として見つかりませんでした。",
-        ),
-        ...base,
-      };
+    let bpiSong: (typeof bpiSongMaster)[number] | undefined;
+    let allSong: (typeof allLevelMaster)[number] | undefined;
+
+    if (songDomain === "bpi") {
+      bpiSong = bpiSongMaster.find((s) => s.songId === songId);
+      if (bpiSong) {
+        allSong = allLevelMaster.find(
+          (s) => s.title === bpiSong!.title && s.difficulty === bpiSong!.difficulty,
+        );
+      }
+    } else {
+      allSong = allLevelMaster.find((s) => s.songId === songId);
+      if (allSong) {
+        bpiSong = bpiSongMaster.find(
+          (s) => s.title === allSong!.title && s.difficulty === allSong!.difficulty,
+        );
+      }
     }
 
-    const current = currentScores.find((s) => s.songId === songId);
-    const currentClearState = current?.clearState ?? "NO PLAY";
-    const currentMissCount = current?.missCount ?? null;
-
-    const improved = isScoreImproved(
-      { exScore, clearState: currentClearState, missCount: currentMissCount },
-      current
-        ? {
-            exScore: current.exScore,
-            clearState: current.clearState,
-            missCount: current.missCount,
-          }
-        : undefined,
-    );
-    if (!improved) {
-      return {
-        result: err(400, "現在の自己ベストを上回っていません。"),
-        ...base,
-      };
+    if (!bpiSong && !allSong) {
+      return { result: err(404, "楽曲が見つかりませんでした。"), ...base };
     }
 
-    const bpi = BpiCalculator.calc(exScore, song);
-
-    const allSong = allLevelMaster.find(
-      (s) => s.title === song.title && s.difficulty === song.difficulty,
-    );
-    let allScore:
+    let scoreInput:
+      | {
+          songId: number;
+          definitionId: number;
+          exScore: number;
+          bpi: number | null;
+          clearState: string | null;
+          missCount: number | null;
+        }
+      | undefined;
+    let allScoreInput:
       | {
           songId: number;
           exScore: number;
@@ -91,59 +113,70 @@ export async function handleScoreManualUpdate(
           missCount: number | null;
         }
       | undefined;
-    if (allSong) {
-      const currentAllScore = currentAllScores.find(
-        (s) => s.songId === allSong.songId,
-      );
-      const allImproved = isScoreImproved(
-        { exScore, clearState: currentClearState, missCount: currentMissCount },
-        currentAllScore
-          ? {
-              exScore: currentAllScore.exScore,
-              clearState: currentAllScore.clearState,
-              missCount: currentAllScore.missCount,
-            }
-          : undefined,
-      );
-      if (allImproved) {
-        allScore = {
-          songId: allSong.songId,
+
+    if (bpiSong) {
+      const current = currentScores.find((s) => s.songId === bpiSong!.songId);
+      const { improved, clearState, missCount } = evaluateImprovement(exScore, current);
+      if (improved) {
+        scoreInput = {
+          songId: bpiSong.songId,
+          definitionId: bpiSong.defId,
           exScore,
-          bpi,
-          clearState: currentClearState,
-          missCount: currentMissCount,
+          bpi: BpiCalculator.calc(exScore, bpiSong),
+          clearState,
+          missCount,
         };
       }
     }
 
-    const twelves = bpiSongMaster.filter((s) => s.difficultyLevel === 12);
-    const currentExScoreMap = new Map(
-      currentScores.map((s) => [s.songId, s.exScore]),
-    );
-    const observations: IBpiScoreObservation[] = bpiSongMaster.flatMap((s) => {
-      const ex =
-        s.songId === song.songId ? exScore : currentExScoreMap.get(s.songId);
-      return ex != null ? [{ songId: s.songId, notes: s.notes, exScore: ex }] : [];
-    });
-    const newTotalBpi = BpiCalculator.calculateTotalBPI(observations, twelves);
+    if (allSong) {
+      const current = currentAllScores.find((s) => s.songId === allSong!.songId);
+      const { improved, clearState, missCount } = evaluateImprovement(exScore, current);
+      if (improved) {
+        allScoreInput = {
+          songId: allSong.songId,
+          exScore,
+          bpi: bpiSong ? BpiCalculator.calc(exScore, bpiSong) : null,
+          clearState,
+          missCount,
+        };
+      }
+    }
+
+    if (!scoreInput && !allScoreInput) {
+      return { result: err(400, "現在の自己ベストを上回っていません。"), ...base };
+    }
+
+    let newTotalBpi: number | undefined;
+    if (scoreInput) {
+      const twelves = bpiSongMaster.filter((s) => s.difficultyLevel === 12);
+      const currentExScoreMap = new Map(currentScores.map((s) => [s.songId, s.exScore]));
+      const observations: IBpiScoreObservation[] = bpiSongMaster.flatMap((s) => {
+        const ex =
+          s.songId === bpiSong!.songId ? exScore : currentExScoreMap.get(s.songId);
+        return ex != null ? [{ songId: s.songId, notes: s.notes, exScore: ex }] : [];
+      });
+      newTotalBpi = BpiCalculator.calculateTotalBPI(observations, twelves);
+    }
 
     const { totalBpi, batchId } = await saveManualScoreUpdate({
       userId,
       version,
-      score: {
-        songId: song.songId,
-        definitionId: song.defId,
-        exScore,
-        bpi,
-        clearState: currentClearState,
-        missCount: currentMissCount,
-      },
-      allScore,
+      score: scoreInput,
+      allScore: allScoreInput,
       newTotalBpi,
     });
 
     return {
-      result: ok({ songId: song.songId, exScore, bpi, totalBpi, batchId }),
+      result: ok({
+        songId,
+        exScore,
+        bpi: scoreInput?.bpi ?? allScoreInput?.bpi ?? null,
+        totalBpi,
+        batchId,
+        scoresSaved: !!scoreInput,
+        allScoresSaved: !!allScoreInput,
+      }),
       ...base,
     };
   } catch (error: unknown) {

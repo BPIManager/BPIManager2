@@ -79,6 +79,7 @@ const BatchSongsTable = ({
           onClose={() => setIsDetailOpen(false)}
           userId={userId}
           version={version}
+          songDomain="bpi"
           onSaved={onScoreSaved}
         />
       )}

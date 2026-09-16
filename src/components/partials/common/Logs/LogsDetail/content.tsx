@@ -228,11 +228,20 @@ const LogsDetailContent = ({
               isModalOpen ? "p-4" : "p-0",
             )}
           >
-            <LogRank details={details.songs} type="top" />
+            <LogRank
+              details={details.songs}
+              type="top"
+              userId={userId}
+              version={version}
+              onScoreSaved={() => mutate()}
+            />
             <LogRank
               isSharing={isModalOpen}
               details={details.songs}
               type="growth"
+              userId={userId}
+              version={version}
+              onScoreSaved={() => mutate()}
             />
           </div>
           {overtakenSongs && overtakenSongs.length > 0 && (
@@ -241,6 +250,9 @@ const LogsDetailContent = ({
                 isSharing={isModalOpen}
                 details={details.songs}
                 type="overtake"
+                userId={userId}
+                version={version}
+                onScoreSaved={() => mutate()}
               />
             </div>
           )}
@@ -250,6 +262,9 @@ const LogsDetailContent = ({
                 isSharing={isModalOpen}
                 details={details.songs}
                 type="versionOvertake"
+                userId={userId}
+                version={version}
+                onScoreSaved={() => mutate()}
               />
             </div>
           )}

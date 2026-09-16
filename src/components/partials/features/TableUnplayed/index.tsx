@@ -25,7 +25,10 @@ const UnplayedSongsTable = ({
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
 
-  const { songs, error, isLoading } = useUnplayedScores(userId, version);
+  const { songs, error, isLoading, currentVersion, refresh } = useUnplayedScores(
+    userId,
+    version,
+  );
 
   const { params, updateParams, page, setPage, visibleSongs, totalCount } =
     useSongFilter(songs);
@@ -76,6 +79,10 @@ const UnplayedSongsTable = ({
           song={selectedSong}
           isOpen={isDetailOpen}
           onClose={() => setIsDetailOpen(false)}
+          userId={userId}
+          version={currentVersion}
+          songDomain="bpi"
+          onSaved={() => refresh()}
         />
       )}
 

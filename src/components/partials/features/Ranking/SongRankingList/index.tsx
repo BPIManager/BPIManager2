@@ -4,6 +4,7 @@ import { useState, useMemo, useCallback, useRef, memo } from "react";
 import { List } from "react-window";
 import type { RowComponentProps } from "react-window";
 import { useUserSongRankings } from "@/hooks/stats/useUserSongRankings";
+import { useUser } from "@/contexts/users/UserContext";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import {
@@ -91,6 +92,10 @@ function toAllSongWithScore(entry: SongRankEntry): SongWithScore {
     scoreAt: entry.lastPlayed,
     kaidenAvg: null,
     wrScore: null,
+    // BPI算出対象外の楽曲(☆10以下等)ではキー自体を省略する(hasBpiDataの判定に使われるため)
+    ...((entry.difficultyLevel === 11 || entry.difficultyLevel === 12) && {
+      bpi: entry.bpi,
+    }),
   };
 }
 
@@ -170,7 +175,8 @@ interface SongRankingListProps {
 }
 
 const SongRankingList = ({ version }: SongRankingListProps) => {
-  const { data, isLoading, isError } = useUserSongRankings(version);
+  const { fbUser } = useUser();
+  const { data, isLoading, isError, refresh } = useUserSongRankings(version);
   const [sort, setSort] = useState<SortKey>("pct_asc");
   const [levelFilter, setLevelFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -334,6 +340,10 @@ const SongRankingList = ({ version }: SongRankingListProps) => {
         song={selectedSong}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        userId={fbUser?.uid}
+        version={version}
+        songDomain="allSongs"
+        onSaved={() => refresh()}
       />
     </>
   );

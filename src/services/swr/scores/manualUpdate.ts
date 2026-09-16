@@ -6,13 +6,20 @@ export interface ManualScoreUpdateResult {
   songId: number;
   exScore: number;
   bpi: number | null;
-  totalBpi: number;
+  totalBpi: number | null;
   batchId: string;
+  scoresSaved: boolean;
+  allScoresSaved: boolean;
 }
 
 export async function saveManualScore(
   userId: string,
-  params: { songId: number; version: string; exScore: number },
+  params: {
+    songId: number;
+    songDomain: "bpi" | "allSongs";
+    version: string;
+    exScore: number;
+  },
   fbUser: FirebaseUser,
 ): Promise<{ ok: boolean; message?: string; data?: ManualScoreUpdateResult }> {
   const res = await authFetch(

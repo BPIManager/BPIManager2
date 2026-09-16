@@ -30,7 +30,7 @@ const AllSongsTable = ({
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
 
-  const { songs, error, isLoading, currentVersion } = useAllScores(
+  const { songs, error, isLoading, currentVersion, refresh } = useAllScores(
     userId,
     version,
   );
@@ -135,6 +135,10 @@ const AllSongsTable = ({
           song={selected}
           isOpen={isDetailOpen}
           onClose={() => setIsDetailOpen(false)}
+          userId={userId}
+          version={currentVersion}
+          songDomain="allSongs"
+          onSaved={() => refresh()}
         />
       )}
 

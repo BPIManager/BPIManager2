@@ -17,6 +17,7 @@ export const useManualScoreUpdate = (userId: string) => {
 
   const save = async (params: {
     songId: number;
+    songDomain: "bpi" | "allSongs";
     version: string;
     exScore: number;
   }): Promise<ManualScoreUpdateResult | null> => {

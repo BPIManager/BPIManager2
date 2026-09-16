@@ -11,12 +11,12 @@ export const useUserSongRankings = (
   const { fbUser } = useUser();
   const targetUserId = userId ?? fbUser?.uid;
 
-  const { data, isLoading, error } = useAuthedSWRV2<UserSongRankingsResponse>(
+  const { data, isLoading, error, mutate } = useAuthedSWRV2<UserSongRankingsResponse>(
     targetUserId
       ? `${API_V2_PREFIX}/users/${targetUserId}/ranking/songs?version=${version}`
       : null,
     { revalidateOnFocus: false },
   );
 
-  return { data, isLoading, isError: error };
+  return { data, isLoading, isError: error, refresh: mutate };
 };

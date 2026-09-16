@@ -32,44 +32,44 @@ interface ManualAllScoreInput {
  * レコード増加を抑える（各`upsertManual`/`upsertManualBatch`が
  * 「現在も最新の行である場合のみUPDATE」を判定する）。
  *
+ * `score`（BPI計算対象、☆11/12）・`allScore`（全難易度履歴）はそれぞれ
+ * 独立に「改善時のみ」呼び出し元が渡す（CSVバッチインポートと同じ方針）。
+ * `score`が無い場合（☆10以下の楽曲）は`logs`/`userStatusLogs`（総合BPI）
+ * には一切触れない。
+ *
  * @param params.userId - ユーザー ID
  * @param params.version - バージョン番号
- * @param params.score - 保存する単曲スコア
- * @param params.allScore - 全難易度履歴側にも書き込む場合のスコア（改善時のみ呼び出し元が渡す）
- * @param params.newTotalBpi - 今回算出した総合BPI（ratchet適用前）
- * @returns 実際に保存した総合BPIと、使用したbatchId
+ * @param params.score - 保存する単曲スコア（改善が無ければ呼び出し元は渡さない）
+ * @param params.allScore - 全難易度履歴側のスコア（改善が無ければ呼び出し元は渡さない）
+ * @param params.newTotalBpi - 今回算出した総合BPI（`score`がある場合のみ必須、ratchet適用前）
+ * @returns 実際に保存した総合BPI（`score`が無ければ`null`）と、使用したbatchId
  */
 export async function saveManualScoreUpdate(params: {
   userId: string;
   version: string;
-  score: ManualScoreInput;
+  score?: ManualScoreInput;
   allScore?: ManualAllScoreInput;
-  newTotalBpi: number;
-}): Promise<{ totalBpi: number; batchId: string }> {
+  newTotalBpi?: number;
+}): Promise<{ totalBpi: number | null; batchId: string }> {
   const { userId, version, score, allScore, newTotalBpi } = params;
   const batchId = getManualBatchId(userId, version);
   const lastPlayed = new Date();
 
   return await db.transaction().execute(async (trx) => {
-    const latestLog = await userStatusLogsRepo.getLatestArenaRank(
-      trx,
-      userId,
-      version,
-    );
-    const currentArenaRank = latestLog?.arenaRank ?? null;
-
-    await scoresRepo.upsertManual(trx, {
-      userId,
-      songId: score.songId,
-      definitionId: score.definitionId,
-      version,
-      batchId,
-      exScore: score.exScore,
-      bpi: score.bpi,
-      clearState: score.clearState,
-      missCount: score.missCount,
-      lastPlayed,
-    });
+    if (score) {
+      await scoresRepo.upsertManual(trx, {
+        userId,
+        songId: score.songId,
+        definitionId: score.definitionId,
+        version,
+        batchId,
+        exScore: score.exScore,
+        bpi: score.bpi,
+        clearState: score.clearState,
+        missCount: score.missCount,
+        lastPlayed,
+      });
+    }
 
     if (allScore) {
       await allScoresRepo.upsertManual(trx, {
@@ -85,12 +85,26 @@ export async function saveManualScoreUpdate(params: {
       });
     }
 
+    if (!score) {
+      return { totalBpi: null, batchId };
+    }
+
+    const latestLog = await userStatusLogsRepo.getLatestArenaRank(
+      trx,
+      userId,
+      version,
+    );
+    const currentArenaRank = latestLog?.arenaRank ?? null;
+
     const previousBest = await userStatusLogsRepo.getMaxTotalBpi(
       trx,
       userId,
       version,
     );
-    const totalBpi = BpiCalculator.ratchetTotalBpi(previousBest, newTotalBpi);
+    const totalBpi = BpiCalculator.ratchetTotalBpi(
+      previousBest,
+      newTotalBpi ?? previousBest ?? -15,
+    );
 
     await navigationRepo.upsertManualBatch(trx, {
       userId,

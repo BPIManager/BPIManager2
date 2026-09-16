@@ -25,7 +25,7 @@ vi.mock("@/lib/db/orchestrators/manualScoreUpdate", () => ({
 
 const { handleScoreManualUpdate } = await import("@/lib/subhandlers/scores/manual");
 
-const song = {
+const bpiSong = {
   songId: 1,
   defId: 10,
   title: "Test Song",
@@ -40,49 +40,79 @@ const song = {
   residualVar: null,
 };
 
+// 同じ楽曲・難易度のallSongsドメイン側（songIdの値は別物）
+const allSongForBpiSong = {
+  songId: 501,
+  title: "Test Song",
+  difficulty: "ANOTHER",
+  difficultyLevel: 12,
+  notes: 1000,
+  bpm: "150",
+  textage: "",
+};
+
+// ☆10以下の楽曲（BPIドメインには存在しない）
+const nonBpiAllSong = {
+  songId: 900,
+  title: "Easy Song",
+  difficulty: "NORMAL",
+  difficultyLevel: 5,
+  notes: 300,
+  bpm: "120",
+  textage: "",
+};
+
 function req(body: Record<string, unknown>): AuthenticatedNextApiRequest {
   return { body, authUid: "user-1", headers: {} } as unknown as AuthenticatedNextApiRequest;
 }
 
 beforeEach(() => {
   vi.clearAllMocks();
-  getAllLevelMasterMock.mockResolvedValue([]);
-  getLatestAllScoresMock.mockResolvedValue([]);
 });
 
 describe("handleScoreManualUpdate", () => {
   it("バリデーション失敗はerr(400)", async () => {
     const { result } = await handleScoreManualUpdate(
-      req({ songId: -1, version: "34", exScore: 900 }),
+      req({ songId: -1, songDomain: "bpi", version: "34", exScore: 900 }),
     );
     expect(result).toMatchObject({ ok: false, status: 400 });
   });
 
-  it("BPI定義の無い曲はerr(404)", async () => {
+  it("songDomain=bpiで楽曲が見つからなければerr(404)", async () => {
     getSongMasterWithDefMock.mockResolvedValue([]);
+    getAllLevelMasterMock.mockResolvedValue([]);
     getLatestScoresMock.mockResolvedValue([]);
+    getLatestAllScoresMock.mockResolvedValue([]);
     const { result } = await handleScoreManualUpdate(
-      req({ songId: 1, version: "34", exScore: 900 }),
+      req({ songId: 1, songDomain: "bpi", version: "34", exScore: 900 }),
     );
     expect(result).toMatchObject({ ok: false, status: 404 });
   });
 
-  it("既存の自己ベストを上回らない場合はerr(400)、保存しない", async () => {
-    getSongMasterWithDefMock.mockResolvedValue([song]);
+  it("songDomain=bpiで改善が無ければerr(400)、保存しない", async () => {
+    getSongMasterWithDefMock.mockResolvedValue([bpiSong]);
+    getAllLevelMasterMock.mockResolvedValue([allSongForBpiSong]);
     getLatestScoresMock.mockResolvedValue([
       { songId: 1, exScore: 950, clearState: "HARD", missCount: 0 },
     ]);
+    getLatestAllScoresMock.mockResolvedValue([
+      { songId: 501, exScore: 950, clearState: "HARD", missCount: 0 },
+    ]);
     const { result } = await handleScoreManualUpdate(
-      req({ songId: 1, version: "34", exScore: 900 }),
+      req({ songId: 1, songDomain: "bpi", version: "34", exScore: 900 }),
     );
     expect(result).toMatchObject({ ok: false, status: 400 });
     expect(saveManualScoreUpdateMock).not.toHaveBeenCalled();
   });
 
-  it("自己ベスト更新時は保存してok", async () => {
-    getSongMasterWithDefMock.mockResolvedValue([song]);
+  it("☆11/12をsongDomain=bpiで編集した場合、scores/allScores両方の改善を試みて両方保存する", async () => {
+    getSongMasterWithDefMock.mockResolvedValue([bpiSong]);
+    getAllLevelMasterMock.mockResolvedValue([allSongForBpiSong]);
     getLatestScoresMock.mockResolvedValue([
       { songId: 1, exScore: 800, clearState: "HARD", missCount: 3 },
+    ]);
+    getLatestAllScoresMock.mockResolvedValue([
+      { songId: 501, exScore: 700, clearState: "HARD", missCount: 3 },
     ]);
     saveManualScoreUpdateMock.mockResolvedValue({
       totalBpi: 55.5,
@@ -90,33 +120,73 @@ describe("handleScoreManualUpdate", () => {
     });
 
     const { result } = await handleScoreManualUpdate(
-      req({ songId: 1, version: "34", exScore: 900 }),
+      req({ songId: 1, songDomain: "bpi", version: "34", exScore: 900 }),
     );
 
     expect(result.ok).toBe(true);
     expect(saveManualScoreUpdateMock).toHaveBeenCalledTimes(1);
     const call = saveManualScoreUpdateMock.mock.calls[0][0];
-    expect(call.userId).toBe("user-1");
-    expect(call.version).toBe("34");
-    expect(call.score.exScore).toBe(900);
+    expect(call.score).toMatchObject({ songId: 1, exScore: 900 });
+    expect(call.allScore).toMatchObject({ songId: 501, exScore: 900 });
+    expect(call.newTotalBpi).toBeDefined();
     if (result.ok) {
-      expect(result.body).toMatchObject({ totalBpi: 55.5, songId: 1, exScore: 900 });
+      expect(result.body).toMatchObject({
+        totalBpi: 55.5,
+        scoresSaved: true,
+        allScoresSaved: true,
+      });
     }
   });
 
-  it("未プレイ曲を新規保存する場合もok", async () => {
-    getSongMasterWithDefMock.mockResolvedValue([song]);
+  it("☆11/12をsongDomain=allSongsで編集した場合も、scores/allScores両方を試みる", async () => {
+    getSongMasterWithDefMock.mockResolvedValue([bpiSong]);
+    getAllLevelMasterMock.mockResolvedValue([allSongForBpiSong]);
     getLatestScoresMock.mockResolvedValue([]);
+    getLatestAllScoresMock.mockResolvedValue([]);
     saveManualScoreUpdateMock.mockResolvedValue({
       totalBpi: 10,
       batchId: "manual-user-1-34-2026-09-17",
     });
 
     const { result } = await handleScoreManualUpdate(
-      req({ songId: 1, version: "34", exScore: 500 }),
+      req({ songId: 501, songDomain: "allSongs", version: "34", exScore: 500 }),
     );
 
     expect(result.ok).toBe(true);
-    expect(saveManualScoreUpdateMock).toHaveBeenCalledTimes(1);
+    const call = saveManualScoreUpdateMock.mock.calls[0][0];
+    expect(call.score).toMatchObject({ songId: 1 });
+    expect(call.allScore).toMatchObject({ songId: 501 });
+  });
+
+  it("☆10以下の楽曲(songDomain=allSongs)はallScoresのみ保存し、総合BPIは再計算しない", async () => {
+    getSongMasterWithDefMock.mockResolvedValue([]);
+    getAllLevelMasterMock.mockResolvedValue([nonBpiAllSong]);
+    getLatestScoresMock.mockResolvedValue([]);
+    getLatestAllScoresMock.mockResolvedValue([]);
+    saveManualScoreUpdateMock.mockResolvedValue({ totalBpi: null, batchId: "manual-user-1-34-2026-09-17" });
+
+    const { result } = await handleScoreManualUpdate(
+      req({ songId: 900, songDomain: "allSongs", version: "34", exScore: 200 }),
+    );
+
+    expect(result.ok).toBe(true);
+    const call = saveManualScoreUpdateMock.mock.calls[0][0];
+    expect(call.score).toBeUndefined();
+    expect(call.allScore).toMatchObject({ songId: 900, exScore: 200 });
+    expect(call.newTotalBpi).toBeUndefined();
+    if (result.ok) {
+      expect(result.body).toMatchObject({ scoresSaved: false, allScoresSaved: true, totalBpi: null });
+    }
+  });
+
+  it("songDomain=allSongsで楽曲が見つからなければerr(404)", async () => {
+    getSongMasterWithDefMock.mockResolvedValue([]);
+    getAllLevelMasterMock.mockResolvedValue([]);
+    getLatestScoresMock.mockResolvedValue([]);
+    getLatestAllScoresMock.mockResolvedValue([]);
+    const { result } = await handleScoreManualUpdate(
+      req({ songId: 999, songDomain: "allSongs", version: "34", exScore: 900 }),
+    );
+    expect(result).toMatchObject({ ok: false, status: 404 });
   });
 });
