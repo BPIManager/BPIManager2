@@ -89,6 +89,23 @@ describe("handleScoreManualUpdate", () => {
     expect(result).toMatchObject({ ok: false, status: 404 });
   });
 
+  it("notes*2(理論値)を超えるexScoreはerr(400)、保存しない(#437)", async () => {
+    getSongMasterWithDefMock.mockResolvedValue([bpiSong]);
+    getAllLevelMasterMock.mockResolvedValue([allSongForBpiSong]);
+    getLatestScoresMock.mockResolvedValue([
+      { songId: 1, exScore: 950, clearState: "HARD", missCount: 0 },
+    ]);
+    getLatestAllScoresMock.mockResolvedValue([
+      { songId: 501, exScore: 950, clearState: "HARD", missCount: 0 },
+    ]);
+    // bpiSong.notes=1000のため理論上の最大値は2000
+    const { result } = await handleScoreManualUpdate(
+      req({ songId: 1, songDomain: "bpi", version: "34", exScore: 2001 }),
+    );
+    expect(result).toMatchObject({ ok: false, status: 400 });
+    expect(saveManualScoreUpdateMock).not.toHaveBeenCalled();
+  });
+
   it("songDomain=bpiで改善が無ければerr(400)、保存しない", async () => {
     getSongMasterWithDefMock.mockResolvedValue([bpiSong]);
     getAllLevelMasterMock.mockResolvedValue([allSongForBpiSong]);
