@@ -305,6 +305,49 @@ describe("timelineRepo.getBestEverScores", () => {
   });
 });
 
+describe("timelineRepo.getVersionComparisons", () => {
+  it("batchId指定時は曲ごとの集約(groupBy songId)を経てbatchIdで絞り込むこと", async () => {
+    dbHolder.current = createDbSpy([]);
+    await timelineRepo.getVersionComparisons({
+      userId: "user-1",
+      currentVersion: "33",
+      batchId: "batch-1",
+    });
+    const whereCalls = callsFor(dbHolder.current.calls, "where");
+    const groupByCalls = callsFor(dbHolder.current.calls, "groupBy");
+    expect(
+      whereCalls.some((c) => c.args[0] === "batchId" && c.args[2] === "batch-1"),
+    ).toBe(true);
+    // 期間/バッチ内で複数回更新された曲を1件に集約するためのgroupBy(songId)が
+    // 存在すること(#430: 集約しないと更新イベントの数だけ比較行が重複する)
+    expect(
+      groupByCalls.some(
+        (c) => c.args[0] === "songId" || c.args[0] === "sc.songId",
+      ),
+    ).toBe(true);
+  });
+
+  it("range指定時は曲ごとの集約を経て期間で絞り込むこと", async () => {
+    dbHolder.current = createDbSpy([]);
+    await timelineRepo.getVersionComparisons({
+      userId: "user-1",
+      currentVersion: "33",
+      range: {
+        start: new Date("2025-06-01"),
+        end: new Date("2025-06-30"),
+        basis: "createdAt",
+      },
+    });
+    const whereCalls = callsFor(dbHolder.current.calls, "where");
+    expect(
+      whereCalls.some((c) => c.args[0] === "createdAt" && c.args[1] === ">="),
+    ).toBe(true);
+    expect(
+      whereCalls.some((c) => c.args[0] === "createdAt" && c.args[1] === "<="),
+    ).toBe(true);
+  });
+});
+
 describe("timelineRepo.getSelfVersionScores", () => {
   it("currentVersionがINFの場合$ifにfalseを渡すこと", async () => {
     dbHolder.current = createDbSpy([]);

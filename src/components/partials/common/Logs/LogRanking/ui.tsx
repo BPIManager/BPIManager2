@@ -41,6 +41,8 @@ const LogRank = ({
   const [selectedSong, setSelectedSong] = useState<SongWithScore | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState<boolean>(false);
   const [selectedRivalId, setSelectedRivalId] = useState<string>("");
+  const [selectedTargetVersion, setSelectedTargetVersion] =
+    useState<string>("");
   const [newOnly, setNewOnly] = useState<boolean>(false);
 
   const RANK_CONFIG = {
@@ -91,15 +93,38 @@ const LogRank = ({
     return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
   }, [details, type]);
 
+  const allTargetVersions = useMemo(() => {
+    if (type !== "versionOvertake") return [];
+    const map = new Map<string, string>();
+    for (const d of details) {
+      for (const v of d.versionOvertaken ?? []) {
+        map.set(v.targetVersion, v.targetVersionLabel);
+      }
+    }
+    return Array.from(map.entries())
+      .map(([targetVersion, label]) => ({ targetVersion, label }))
+      .sort((a, b) => Number(b.targetVersion) - Number(a.targetVersion));
+  }, [details, type]);
+
   const filteredDetails = useMemo(() => {
-    if (type !== "overtake" || !selectedRivalId) return details;
-    return details.map((d) => ({
-      ...d,
-      overtaken: (d.overtaken ?? []).filter(
-        (r) => r.rivalUserId === selectedRivalId,
-      ),
-    }));
-  }, [details, type, selectedRivalId]);
+    if (type === "overtake" && selectedRivalId) {
+      return details.map((d) => ({
+        ...d,
+        overtaken: (d.overtaken ?? []).filter(
+          (r) => r.rivalUserId === selectedRivalId,
+        ),
+      }));
+    }
+    if (type === "versionOvertake" && selectedTargetVersion) {
+      return details.map((d) => ({
+        ...d,
+        versionOvertaken: (d.versionOvertaken ?? []).filter(
+          (v) => v.targetVersion === selectedTargetVersion,
+        ),
+      }));
+    }
+    return details;
+  }, [details, type, selectedRivalId, selectedTargetVersion]);
 
   const {
     visibleSongs,
@@ -186,6 +211,35 @@ const LogRank = ({
             {allRivals.map((r) => (
               <SelectItem key={r.id} value={r.id} className="text-xs">
                 {r.name}{tFormat("logs.rank.countSuffix", { count: details.filter((d) => (d.overtaken ?? []).some((o) => o.rivalUserId === r.id)).length })}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
+
+      {type === "versionOvertake" && allTargetVersions.length > 0 && (
+        <Select
+          value={selectedTargetVersion}
+          onValueChange={(v) => {
+            const isAll = v === "all";
+            setSelectedTargetVersion(isAll ? "" : v);
+            setDisplayLimit(isAll ? 5 : 99999);
+          }}
+        >
+          <SelectTrigger className="h-8 w-full text-xs bg-bpim-surface-2 border-bpim-border text-bpim-text">
+            <SelectValue placeholder={t("logs.rank.all")} />
+          </SelectTrigger>
+          <SelectContent className="bg-bpim-surface-2 border-bpim-border text-bpim-text">
+            <SelectItem value="all" className="text-xs">
+              {t("logs.rank.all")}{tFormat("logs.rank.countSuffix", { count: details.filter((d) => (d.versionOvertaken ?? []).length > 0).length })}
+            </SelectItem>
+            {allTargetVersions.map((v) => (
+              <SelectItem
+                key={v.targetVersion}
+                value={v.targetVersion}
+                className="text-xs"
+              >
+                {v.label}{tFormat("logs.rank.countSuffix", { count: details.filter((d) => (d.versionOvertaken ?? []).some((o) => o.targetVersion === v.targetVersion)).length })}
               </SelectItem>
             ))}
           </SelectContent>
