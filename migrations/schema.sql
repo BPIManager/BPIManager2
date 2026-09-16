@@ -195,9 +195,8 @@ CREATE TABLE IF NOT EXISTS `iidxTower` (
   `scratchCount` int(10) unsigned NOT NULL DEFAULT 0,
   `updatedAt` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `version` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  PRIMARY KEY (`userId`,`playDate`),
+  PRIMARY KEY (`userId`,`version`,`playDate`),
   KEY `idx_iidxTower_userId` (`userId`),
-  KEY `idx_iidxTower_userId_version` (`userId`,`version`),
   KEY `idx_iidxTower_version_playDate` (`version`,`playDate`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
