@@ -47,7 +47,7 @@ const VirtualRow = ({
       }}
       {...ariaAttributes}
     >
-      <RankingRow entry={entry} onClick={() => onRowClick(entry.userId)} />
+      <RankingRow entry={entry} onClick={onRowClick} />
     </div>
   );
 };

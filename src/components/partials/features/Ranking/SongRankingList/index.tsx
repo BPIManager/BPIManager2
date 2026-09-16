@@ -101,7 +101,7 @@ function toAllSongWithScore(entry: SongRankEntry): SongWithScore {
 
 interface SongRankRowProps {
   entry: SongRankEntry;
-  onClick: () => void;
+  onClick: (entry: SongRankEntry) => void;
 }
 
 const SongRankRowComponent = ({ entry, onClick }: SongRankRowProps) => {
@@ -109,7 +109,11 @@ const SongRankRowComponent = ({ entry, onClick }: SongRankRowProps) => {
   const pctColor = getPctColor(p);
 
   return (
-    <button type="button" className="w-full text-left" onClick={onClick}>
+    <button
+      type="button"
+      className="w-full text-left"
+      onClick={() => onClick(entry)}
+    >
       <div className="flex items-center gap-3 rounded-lg border border-bpim-border bg-bpim-surface-2/40 px-3 py-2.5 hover:bg-bpim-overlay/50 transition-colors">
         <div className="min-w-0 flex-1">
           <span className="block truncate text-xs font-bold text-bpim-text">
@@ -165,7 +169,7 @@ const VirtualRow = ({
       }}
       {...ariaAttributes}
     >
-      <SongRankRow entry={entry} onClick={() => onRowClick(entry)} />
+      <SongRankRow entry={entry} onClick={onRowClick} />
     </div>
   );
 };
