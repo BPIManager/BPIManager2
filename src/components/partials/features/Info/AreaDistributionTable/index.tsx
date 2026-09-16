@@ -57,7 +57,7 @@ function AreaDistributionTable({
             <SelectValue />
           </SelectTrigger>
           <SelectContent className="border-bpim-border bg-bpim-bg">
-            {versionsNonDisabledCollection.map((v) => (
+            {availableVersions.map((v) => (
               <SelectItem key={v.value} value={v.value} className="text-xs">
                 {v.label}
               </SelectItem>
