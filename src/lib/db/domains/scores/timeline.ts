@@ -216,8 +216,41 @@ class ScoreTimelineRepository {
       .where("userId", "=", userId)
       .groupBy(["songId", "version"]);
 
-    let query = db
-      .selectFrom("scores as current")
+    // `batchId`/`range`で絞り込んだ範囲内で、閲覧中バージョンにおける曲ごとの
+    // 最良スコア（同点なら最新のログ）1件に集約する。集約しないと、範囲内で
+    // 同じ曲を複数回更新した場合に更新イベントの数だけ比較行が重複してしまう
+    let scopedCurrent = db
+      .selectFrom("scores")
+      .select(["songId", "exScore", "logId"])
+      .where("userId", "=", userId)
+      .where("version", "=", currentVersion);
+
+    if (batchId) {
+      scopedCurrent = scopedCurrent.where("batchId", "=", batchId);
+    } else if (range) {
+      scopedCurrent = scopedCurrent
+        .where(`${timeCol}`, ">=", range.start)
+        .where(`${timeCol}`, "<=", range.end);
+    }
+
+    const bestExScorePerSong = db
+      .selectFrom(scopedCurrent.as("sc"))
+      .select(["sc.songId", (eb) => eb.fn.max("sc.exScore").as("bestExScore")])
+      .groupBy("sc.songId");
+
+    const bestCurrentPerSong = db
+      .selectFrom(scopedCurrent.as("sc"))
+      .innerJoin(bestExScorePerSong.as("best"), (join) =>
+        join
+          .onRef("best.songId", "=", "sc.songId")
+          .onRef("best.bestExScore", "=", "sc.exScore"),
+      )
+      .select(["sc.songId", (eb) => eb.fn.max("sc.logId").as("logId")])
+      .groupBy("sc.songId");
+
+    const query = db
+      .selectFrom(bestCurrentPerSong.as("currentPick"))
+      .innerJoin("scores as current", "current.logId", "currentPick.logId")
       .innerJoin(latestPerSongVersion.as("latest"), (join) =>
         join.onRef("latest.songId", "=", "current.songId"),
       )
@@ -246,17 +279,7 @@ class ScoreTimelineRepository {
         "past.version as targetVersion",
         "past.exScore as targetScore",
       ])
-      .where("current.userId", "=", userId)
-      .where("current.version", "=", currentVersion)
       .where("past.version", "!=", currentVersion);
-
-    if (batchId) {
-      query = query.where("current.batchId", "=", batchId);
-    } else if (range) {
-      query = query
-        .where(`current.${timeCol}`, ">=", range.start)
-        .where(`current.${timeCol}`, "<=", range.end);
-    }
 
     return await query.execute();
   }
