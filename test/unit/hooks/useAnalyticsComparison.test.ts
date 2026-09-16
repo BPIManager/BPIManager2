@@ -51,7 +51,12 @@ function buildScore(overrides: Partial<SongWithScore> = {}): SongWithScore {
   };
 }
 
-const EMPTY_SWR = { data: undefined, error: undefined, isLoading: false };
+const EMPTY_SWR = {
+  data: undefined,
+  error: undefined,
+  isLoading: false,
+  mutate: vi.fn(),
+};
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -66,12 +71,13 @@ describe("useAnalyticsComparison", () => {
   it("targetがnullの場合は何もフェッチせず空のレスポンスを返すこと", () => {
     const { result } = renderHook(() => useAnalyticsComparison(null));
 
-    expect(result.current).toEqual({
+    expect(result.current).toMatchObject({
       songs: undefined,
       isLoading: false,
       error: undefined,
       rivalLabel: "",
     });
+    expect(typeof result.current.refresh).toBe("function");
     expect(mockUseAuthedSWR).not.toHaveBeenCalledWith(
       expect.stringContaining("rivals"),
       expect.anything(),

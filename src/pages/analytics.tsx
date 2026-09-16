@@ -98,10 +98,8 @@ export default function AnalyticsPage() {
 
   const version = (router.query.version as string) || latestVersion;
 
-  const { songs, isLoading, error, rivalLabel } = useAnalyticsComparison(
-    target,
-    version,
-  );
+  const { songs, isLoading, error, rivalLabel, refresh } =
+    useAnalyticsComparison(target, version);
 
   return (
     <RequireAuth
@@ -146,6 +144,7 @@ export default function AnalyticsPage() {
                 error={error}
                 rivalLabel={rivalLabel}
                 version={version}
+                onScoreSaved={refresh}
               />
             </div>
           )}

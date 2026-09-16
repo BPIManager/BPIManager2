@@ -12,6 +12,7 @@ import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { AppTabsGroup } from "@/components/ui/complex/tabs";
 import { HelpTooltip } from "@/components/ui/tooltip";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import { invalidateDashboardRankingCache } from "@/hooks/stats/dashboardRankingCache";
 
 const RankingCardHelpContent = () => {
   const { t } = useTranslation();
@@ -195,6 +196,7 @@ const RankingTabsCard = ({ userId }: { userId: string }) => {
           userId={userId}
           version={version}
           songDomain="bpi"
+          onSaved={() => invalidateDashboardRankingCache(userId)}
         />
       )}
     </DashCard>
