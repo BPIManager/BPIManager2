@@ -5,7 +5,10 @@ import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { usersRepo } from "@/lib/db/domains/users";
 import { navigationRepo } from "@/lib/db/domains/logs/navigation";
 import { scoresRepo } from "@/lib/db/domains/scores";
-import { latestPerUserSubquery as latestArenaStatsPerUserSubquery } from "@/lib/db/domains/arenaHistory";
+import {
+  latestPerUserSubquery as latestArenaStatsPerUserSubquery,
+  latestPerUserAllVersionsSubquery as latestArenaStatsPerUserAllVersionsSubquery,
+} from "@/lib/db/domains/arenaHistory";
 
 const DATE_EXPR = sql<string>`DATE_FORMAT(CONVERT_TZ(createdAt, '+00:00', '+09:00'), '%Y-%m-%d')`;
 
@@ -222,20 +225,32 @@ class SiteStatsSummaryRepository {
     }));
   }
 
-  async getAreaDistribution() {
+  /**
+   * バージョンごとの県別利用者数分布。
+   */
+  async getAreaDistributionByVersion() {
     const rows = await db
-      .with("latest_per_user", () => latestArenaStatsPerUserSubquery(latestVersion))
+      .with("latest_per_user", () => latestArenaStatsPerUserAllVersionsSubquery())
       .selectFrom("officialArenaStats as oas")
       .innerJoin("latest_per_user as lpu", "lpu.maxId", "oas.id")
       .where("oas.area", "is not", null)
-      .select(["oas.area", sql<number>`COUNT(*)`.as("count")])
-      .groupBy("oas.area")
-      .orderBy(sql`COUNT(*)`, "desc")
+      .select(["oas.version", "oas.area", sql<number>`COUNT(*)`.as("count")])
+      .groupBy(["oas.version", "oas.area"])
       .execute();
 
-    return rows
-      .filter((r) => r.area != null)
-      .map((r) => ({ area: r.area as string, count: Number(r.count) }));
+    const byVersion = new Map<string, { area: string; count: number }[]>();
+    for (const r of rows) {
+      if (!r.version || r.area == null) continue;
+      const list = byVersion.get(r.version) ?? [];
+      byVersion.set(r.version, list);
+      list.push({ area: r.area, count: Number(r.count) });
+    }
+
+    const result: Record<string, { area: string; count: number }[]> = {};
+    for (const [version, list] of byVersion) {
+      result[version] = list.sort((a, b) => b.count - a.count);
+    }
+    return result;
   }
 
   // bkScores・scores・allScores×allSongsを横断するバージョン別集計のため、直接参照を維持する。

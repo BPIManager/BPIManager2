@@ -14,6 +14,17 @@ export function latestPerUserSubquery(version: string) {
     .groupBy("userId");
 }
 
+/**
+ * 全バージョン分をまとめて取得するサブクエリ。`idx_oas_userId_version_id_desc`
+ * を活かせるよう `(userId, version)` 単位でグルーピングする。
+ */
+export function latestPerUserAllVersionsSubquery() {
+  return db
+    .selectFrom("officialArenaStats")
+    .select((eb) => ["userId", "version", eb.fn.max("id").as("maxId")])
+    .groupBy(["userId", "version"]);
+}
+
 export async function getLatestArenaStatsPerVersion(userId: string) {
   return await db
     .selectFrom("officialArenaStats as oas")
