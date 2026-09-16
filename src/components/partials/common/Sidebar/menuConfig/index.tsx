@@ -57,7 +57,7 @@ export const getAnalyticsMenuItems = (t: T) => [
   {
     label: t("nav.arenaAverage"),
     icon: Swords,
-    href: `/metrics/arenaAverage/${latestVersion}?difficultyLevel=12`,
+    href: `/metrics/arenaAverage/${Number(latestVersion) - 1}?difficultyLevel=12`,
   },
 ];
 
