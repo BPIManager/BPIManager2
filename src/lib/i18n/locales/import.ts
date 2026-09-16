@@ -387,4 +387,28 @@ export const importTranslations = {
     ko: "왼쪽 버튼을 툴바로 드래그하세요.",
   },
   "import.bookmarklet.button": { ja: "スコア取得", en: "Get Scores", "zh-TW": "取得成績", ko: "점수 가져오기" },
+
+  // Legacy version confirm dialog
+  "import.legacyConfirm.title": { ja: "確認", en: "Confirmation", "zh-TW": "確認", ko: "확인" },
+  "import.legacyConfirm.description": {
+    ja: "最終プレー日時が{date}より前のスコアが含まれています。過去作バージョンのCSVである可能性があります。続行しますか？",
+    en: "This CSV contains scores last played before {date}. It may be from a previous version. Continue anyway?",
+    "zh-TW": "此CSV中含有最終遊玩時間早於{date}的成績，可能是舊版本的CSV。是否仍要繼續？",
+    ko: "최종 플레이 일시가 {date} 이전인 점수가 포함되어 있습니다. 이전 버전의 CSV일 가능성이 있습니다. 계속하시겠습니까?",
+  },
+  "import.legacyConfirm.deleteHintPrefix": {
+    ja: "誤って登録してしまった場合の削除方法は",
+    en: "If you import this by mistake, see ",
+    "zh-TW": "若不慎誤登，刪除方法請參考",
+    ko: "실수로 등록한 경우 삭제 방법은",
+  },
+  "import.legacyConfirm.deleteHintLinkText": { ja: "こちら", en: "here", "zh-TW": "此處", ko: "여기" },
+  "import.legacyConfirm.deleteHintSuffix": {
+    ja: "をご確認ください。",
+    en: " for how to delete it.",
+    "zh-TW": "。",
+    ko: "를 확인해 주세요.",
+  },
+  "import.legacyConfirm.confirm": { ja: "続行する", en: "Continue", "zh-TW": "繼續", ko: "계속" },
+  "import.legacyConfirm.cancel": { ja: "キャンセル", en: "Cancel", "zh-TW": "取消", ko: "취소" },
 } as const;

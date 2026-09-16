@@ -3,7 +3,10 @@ import { useTranslation } from "@/hooks/common/useTranslation";
 import ImportSuccessModal from "@/components/partials/features/Import/SuccessModal/ui";
 import ImportView from "@/components/partials/features/Import/View";
 import { dummyCsv } from "@/constants/ui/dummyCsv";
-import { latestVersion } from "@/constants/iidx/iidxVersions";
+import {
+  latestVersion,
+  latestVersionReleaseDate,
+} from "@/constants/iidx/iidxVersions";
 import { useUser } from "@/contexts/users/UserContext";
 import { useBatchImport } from "@/hooks/import/useBatchImport";
 import { useIidxTowerImport } from "@/hooks/import/useIidxTowerImport";
@@ -12,12 +15,17 @@ import { useRouter } from "next/router";
 import { PageLoader } from "@/components/ui/loading-spinner";
 import { detectCsvType, type CsvType } from "@/utils/csv/detect";
 import TowerImportSuccessModal from "@/components/partials/features/Import/TowerSuccessModal/ui";
+import ActionConfirmDialog from "@/components/partials/modal/Confirmation";
+
+/** 誤って旧バージョンCSVを取り込んでしまった場合の削除方法を案内するツイート */
+const LEGACY_IMPORT_DELETE_GUIDE_URL =
+  "https://x.com/BPIManager/status/2046212431773602001";
 
 export default function ImportPage() {
   const router = useRouter();
   const defaultTab = router.query.tab === "tower" ? "tower" : "score";
   const { user, isLoading, fbUser, refresh } = useUser();
-  const { t } = useTranslation();
+  const { t, tFormat } = useTranslation();
   const [csvData, setCsvData] = useState(dummyCsv);
   const [detectedType, setDetectedType] = useState<CsvType>("unknown");
   const [selectedVersion, setSelectedVersion] = useState<string[]>([
@@ -39,6 +47,9 @@ export default function ImportPage() {
     processStatus,
     importResult,
     setImportResult,
+    pendingLegacyConfirm,
+    confirmLegacyImport,
+    cancelLegacyImport,
   } = useBatchImport(fbUser, refresh);
 
   const {
@@ -51,6 +62,11 @@ export default function ImportPage() {
 
   const onStartImport = async () => {
     const success = await runImport(csvData, selectedVersion[0]);
+    if (success) handleSetCsvData("");
+  };
+
+  const onConfirmLegacyImport = async () => {
+    const success = await confirmLegacyImport();
     if (success) handleSetCsvData("");
   };
 
@@ -98,6 +114,37 @@ export default function ImportPage() {
       <TowerImportSuccessModal
         result={towerImportResult}
         onClose={() => setTowerImportResult(null)}
+      />
+
+      <ActionConfirmDialog
+        isOpen={!!pendingLegacyConfirm}
+        onClose={cancelLegacyImport}
+        onConfirm={onConfirmLegacyImport}
+        isLoading={isProcessing}
+        title={t("import.legacyConfirm.title")}
+        confirmLabel={t("import.legacyConfirm.confirm")}
+        cancelLabel={t("import.legacyConfirm.cancel")}
+        description={
+          <div className="space-y-2">
+            <p>
+              {tFormat("import.legacyConfirm.description", {
+                date: latestVersionReleaseDate,
+              })}
+            </p>
+            <p className="text-bpim-muted">
+              {t("import.legacyConfirm.deleteHintPrefix")}
+              <a
+                href={LEGACY_IMPORT_DELETE_GUIDE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-bpim-primary hover:underline"
+              >
+                {t("import.legacyConfirm.deleteHintLinkText")}
+              </a>
+              {t("import.legacyConfirm.deleteHintSuffix")}
+            </p>
+          </div>
+        }
       />
     </>
   );

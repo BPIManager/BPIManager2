@@ -1127,4 +1127,23 @@ export const dashboardTranslations = {
     "zh-TW": "關閉",
     ko: "닫기",
   },
+
+  "dashboard.monthlyReviewNotice.title": {
+    ja: "スパークルシャワーを振り返ろう",
+    en: "Look back at Sparkle Shower",
+    "zh-TW": "回顧 Sparkle Shower",
+    ko: "스파클 샤워를 돌아보세요",
+  },
+  "dashboard.monthlyReviewNotice.linkText": {
+    ja: "振り返りを見る",
+    en: "View your review",
+    "zh-TW": "查看回顧",
+    ko: "리뷰 보기",
+  },
+  "dashboard.monthlyReviewNotice.dismiss": {
+    ja: "閉じる",
+    en: "Dismiss",
+    "zh-TW": "關閉",
+    ko: "닫기",
+  },
 } as const;
