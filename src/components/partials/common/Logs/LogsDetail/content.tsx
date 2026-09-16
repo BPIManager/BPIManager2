@@ -268,7 +268,7 @@ const LogsDetailContent = ({
         </TabsContent>
       </Tabs>
 
-      {!isPublicPage && type === "batch" && (
+      {!isPublicPage && type === "batch" && !details.pagination.next && (
         <BatchDeleteSection
           userId={userId ?? ""}
           batchId={batchId ?? ""}

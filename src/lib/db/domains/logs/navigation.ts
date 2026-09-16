@@ -137,10 +137,29 @@ class LogNavigationRepository {
   async findBatchByIdAndUser(batchId: string, userId: string) {
     return await db
       .selectFrom("logs")
-      .select(["batchId"])
+      .select(["batchId", "version"])
       .where("batchId", "=", batchId)
       .where("userId", "=", userId)
       .executeTakeFirst();
+  }
+
+  /**
+   * 指定ユーザー・バージョンの最新バッチIDを取得する。
+   * バッチ削除を最新バッチのみに制限するための判定に使う。
+   */
+  async getLatestBatchId(
+    userId: string,
+    version: string,
+  ): Promise<string | undefined> {
+    const row = await db
+      .selectFrom("logs")
+      .select("batchId")
+      .where("userId", "=", userId)
+      .where("version", "=", version)
+      .orderBy("id", "desc")
+      .limit(1)
+      .executeTakeFirst();
+    return row?.batchId;
   }
 
   /**
