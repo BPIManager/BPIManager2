@@ -275,6 +275,30 @@ describe("handleBatchScores", () => {
       expect(result.body).toHaveProperty("range");
     }
   });
+
+  it("該当期間にデータが無ければ(createdAt)err(404)を返し、500にしない", async () => {
+    checkProfileAccessMock.mockResolvedValue({ hasAccess: true, viewerId: "u1" });
+    findBatchesInRangeMock.mockResolvedValue([]);
+    const { result } = await handleBatchScores(
+      req({ userId: "u1", batchId: "2024-01-01", version: "31" }),
+    );
+    expect(result).toMatchObject({ ok: false, status: 404 });
+  });
+
+  it("該当期間にデータが無ければ(lastPlayed)err(404)を返し、500にしない", async () => {
+    checkProfileAccessMock.mockResolvedValue({ hasAccess: true, viewerId: "u1" });
+    getScoreHistoryMock.mockResolvedValue([]);
+    getSongMasterWithDefMock.mockResolvedValue([]);
+    const { result } = await handleBatchScores(
+      req({
+        userId: "u1",
+        batchId: "2024-01-01",
+        version: "31",
+        groupedBy: "lastPlayed",
+      }),
+    );
+    expect(result).toMatchObject({ ok: false, status: 404 });
+  });
 });
 
 describe("handleVersionSummary", () => {
