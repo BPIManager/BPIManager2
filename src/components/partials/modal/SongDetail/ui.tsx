@@ -74,6 +74,25 @@ const SongDetailView = ({
   const { save, isSaving } = useManualScoreUpdate(userId ?? "");
   const [isEditing, setIsEditing] = useState(false);
   const [draftExScore, setDraftExScore] = useState<number | null>(null);
+  // 保存成功後の表示用。`song` propは呼び出し元の一覧データがそのまま
+  // 渡ってくるだけで、保存後に呼び出し元がmutateしてもこのモーダル自身の
+  // propは（再オープンするまで）更新されないため、保存直後の値をここに
+  // 保持して表示する
+  const [savedOverride, setSavedOverride] = useState<{
+    exScore: number;
+    bpi: number | null;
+  } | null>(null);
+
+  // 別の曲に切り替わったら編集状態・保存済みオーバーライドをリセットする
+  // (レンダー中にstateを直接調整するReact推奨パターン。useEffectだと
+  // 一瞬前の曲のオーバーライドが残ったまま描画されてしまう)
+  const [lastSongId, setLastSongId] = useState(song?.songId);
+  if (song?.songId !== lastSongId) {
+    setLastSongId(song?.songId);
+    setIsEditing(false);
+    setDraftExScore(null);
+    setSavedOverride(null);
+  }
 
   // 手動編集を許可するのは、呼び出し元がsongDomainを指定しており
   // （☆10以下の全難易度曲も編集対象になり得るため`fullSong`は問わない）、
@@ -82,7 +101,7 @@ const SongDetailView = ({
     !!userId && !!version && !!songDomain && fbUser?.uid === userId;
 
   const maxScore = song ? song.notes * 2 : 0;
-  const currentEx = song ? song.exScore || 0 : 0;
+  const currentEx = savedOverride?.exScore ?? (song ? song.exScore || 0 : 0);
   const displayEx = isEditing && draftExScore != null ? draftExScore : currentEx;
 
   const rankInfo = useMemo(
@@ -91,9 +110,11 @@ const SongDetailView = ({
   );
 
   const draftBpi = useMemo(() => {
-    if (!fullSong || !isEditing || draftExScore == null) return fullSong?.bpi ?? null;
-    return BpiCalculator.calc(draftExScore, fullSong);
-  }, [fullSong, isEditing, draftExScore]);
+    if (isEditing && fullSong && draftExScore != null) {
+      return BpiCalculator.calc(draftExScore, fullSong);
+    }
+    return savedOverride?.bpi ?? fullSong?.bpi ?? null;
+  }, [fullSong, isEditing, draftExScore, savedOverride]);
 
   const bpiInfo = useMemo(() => {
     if (!fullSong) return { next: 0 as number | string, diff: 0 };
@@ -130,6 +151,7 @@ const SongDetailView = ({
       exScore: draftExScore,
     });
     if (result) {
+      setSavedOverride({ exScore: result.exScore, bpi: result.bpi });
       setIsEditing(false);
       setDraftExScore(null);
       onSaved?.();
@@ -219,7 +241,7 @@ const SongDetailView = ({
                   )}
                   onClick={startEditing}
                 >
-                  {song.exScore ?? 0}
+                  {displayEx}
                 </span>
               )}
               <span className="mt-1 font-mono text-[10px] font-bold text-bpim-muted">
