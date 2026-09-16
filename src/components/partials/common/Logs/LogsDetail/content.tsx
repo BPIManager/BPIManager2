@@ -264,6 +264,7 @@ const LogsDetailContent = ({
             userId={userId}
             version={version}
             listRef={listRef}
+            onScoreSaved={() => mutate()}
           />
         </TabsContent>
       </Tabs>

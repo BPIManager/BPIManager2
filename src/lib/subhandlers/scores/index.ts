@@ -9,4 +9,5 @@ export * from "./bestEver";
 export * from "./selfVersion";
 export * from "./unplayed";
 export * from "./bulk";
+export * from "./manual";
 export * from "./transfer";
