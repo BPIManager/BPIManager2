@@ -268,10 +268,16 @@ export const logsTranslations = {
     ko: "과거 버전 역전",
   },
   "logs.rank.versionOvertake.tooltip": {
-    ja: "このスコアを出した瞬間に、過去バージョンでの自分のスコアを上回っていたものを表示しています。（その後に更新されても、この時の更新結果は変わりません）",
-    en: "Shows your own past-version scores you surpassed at the moment this score was recorded. Results are not updated even if later updated further.",
-    "zh-TW": "顯示在取得此分數瞬間超越的過去版本自己分數。（即使之後有更新，此次的更新結果也不會改變）",
-    ko: "이 스코어를 달성한 순간 과거 버전의 자신의 스코어를 앞선 결과를 표시합니다. (이후 업데이트되어도 이 업데이트 결과는 변하지 않습니다)",
+    ja: "このスコアを出した瞬間に、他バージョンでの自分のスコアを上回っていたものを表示しています。（その後に更新されても、この時の更新結果は変わりません）「全差分表示」をオンにすると、勝敗に関わらずプレイ済みの他バージョンとの差分をすべて表示します。",
+    en: "Shows your own scores in other versions that you surpassed at the moment this score was recorded. Results are not updated even if later updated further. Turn on \"Show all diffs\" to see every diff against played versions, win or lose.",
+    "zh-TW": "顯示在取得此分數瞬間超越的其他版本自己分數。（即使之後有更新，此次的更新結果也不會改變）開啟「顯示所有差異」可查看與已遊玩版本的所有差異，無論勝負。",
+    ko: "이 스코어를 달성한 순간 다른 버전의 자신의 스코어를 앞선 결과를 표시합니다. (이후 업데이트되어도 이 업데이트 결과는 변하지 않습니다) \"모든 차이 표시\"를 켜면 승패와 관계없이 플레이한 다른 버전과의 모든 차이를 표시합니다.",
+  },
+  "logs.rank.versionOvertake.showAllDiffs": {
+    ja: "全差分表示",
+    en: "Show all diffs",
+    "zh-TW": "顯示所有差異",
+    ko: "모든 차이 표시",
   },
   "logs.rank.hideNew": {
     ja: "新規除外",

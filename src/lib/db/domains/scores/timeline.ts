@@ -187,19 +187,19 @@ class ScoreTimelineRepository {
   }
 
   /**
-   * バッチ（または期間）内で更新したスコアのうち、過去バージョン（閲覧中バージョンを
-   * 除く自分がプレイ済みの全バージョン）での自分のスコアを新たに上回った楽曲を検出する。
-   * `rivalScores/rival.ts`の`getOvertakenRivals`と同じ「このバッチで初めて追い抜いた」
-   * 判定パターン（バッチ内の直前ベストと比較）を、ライバルではなく別バージョンの
-   * 自分のスコアに適用したもの。1曲について複数バージョンを追い抜いた場合は
-   * バージョンごとに1行返る（`getOvertakenRivals`が1ライバルごとに1行返すのと同型）。
+   * バッチ（または期間）内で更新したスコアを、他バージョン（閲覧中バージョンを除く
+   * 自分がプレイ済みの全バージョン。INFやそれより後のバージョンも対象に含む）での
+   * 自分のスコアと突き合わせる。勝敗・既存の追い抜き済みかどうかに関わらず、
+   * プレイ済みの組み合わせは全件返す（勝敗判定・「このバッチで新たに追い抜いたか」の
+   * 判定は呼び出し元で`myNewScore`/`myOldScore`/`targetScore`から行う）。
+   * 1曲について複数バージョンと比較可能な場合はバージョンごとに1行返る。
    *
    * @param params.userId - 対象ユーザーID
    * @param params.currentVersion - 閲覧中バージョン（バッチ・スコア更新が記録されたバージョン）
    * @param params.batchId - 単一バッチに絞り込む場合（`range`と排他）
    * @param params.range - 期間で絞り込む場合（日次/週次/月次集計向け、`batchId`と排他）
    */
-  async getVersionOvertaken(params: {
+  async getVersionComparisons(params: {
     userId: string;
     currentVersion: string;
     batchId?: string;
@@ -258,15 +258,7 @@ class ScoreTimelineRepository {
         .where(`current.${timeCol}`, "<=", range.end);
     }
 
-    return await query
-      .whereRef("current.exScore", ">", "past.exScore")
-      .where((eb) =>
-        eb.or([
-          eb("prevBest.exScore", "is", null),
-          eb("prevBest.exScore", "<=", eb.ref("past.exScore")),
-        ]),
-      )
-      .execute();
+    return await query.execute();
   }
 }
 

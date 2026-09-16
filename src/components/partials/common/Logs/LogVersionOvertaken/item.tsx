@@ -1,20 +1,32 @@
 import type { BatchDetailItem } from "@/types/logs/batchDetail";
 import { ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface RankItemProps {
   item: BatchDetailItem;
+  /** true: 勝敗・追い抜き済みかに関わらず全差分を表示。false: このバッチで新たに追い抜いたものだけ表示 */
+  showAllDiffs: boolean;
   onClick: () => void;
 }
 
-const VersionOvertakeRankItem = ({ item, onClick }: RankItemProps) => {
+const VersionOvertakeRankItem = ({
+  item,
+  showAllDiffs,
+  onClick,
+}: RankItemProps) => {
   const { current, previous, versionOvertaken = [] } = item;
 
   const scoreDiff = current.exScore - (previous?.exScore || 0);
-  const hasOvertaken = versionOvertaken.length > 0;
+  const rows = showAllDiffs
+    ? versionOvertaken
+    : versionOvertaken.filter((v) => v.isNewOvertake);
 
-  if (!hasOvertaken) return null;
+  if (rows.length === 0) return null;
 
   const isNew = !previous;
+  const sortedRows = rows
+    .slice()
+    .sort((a, b) => Number(a.targetVersion) - Number(b.targetVersion));
 
   return (
     <div
@@ -56,28 +68,34 @@ const VersionOvertakeRankItem = ({ item, onClick }: RankItemProps) => {
       </div>
 
       <div className="flex flex-col gap-1 pl-3 py-2 border-l-2 border-yellow-600/50 bg-yellow-950/10 rounded-r-sm">
-        {versionOvertaken
-          .slice()
-          .sort((a, b) => Number(a.targetVersion) - Number(b.targetVersion))
-          .map((v) => (
-            <div
-              key={v.targetVersion}
-              className="flex items-center justify-between pr-2"
-            >
-              <span className="text-xs font-medium text-bpim-text">
-                {v.targetVersionLabel}
-              </span>
-              <div className="flex items-center gap-3 font-mono">
-                <span className="text-xs text-bpim-muted">
-                  {v.targetScore}
-                </span>
-                <div className="text-xs font-bold text-yellow-400 min-w-10 text-right">
+        {sortedRows.map((v) => (
+          <div
+            key={v.targetVersion}
+            className="flex items-center justify-between pr-2"
+          >
+            <span className="text-xs font-medium text-bpim-text">
+              {v.targetVersionLabel}
+            </span>
+            <div className="flex items-center gap-3 font-mono">
+              <span className="text-xs text-bpim-muted">{v.targetScore}</span>
+              <div
+                className={cn(
+                  "text-xs font-bold min-w-10 text-right",
+                  v.diff > 0
+                    ? "text-yellow-400"
+                    : v.diff < 0
+                      ? "text-bpim-danger"
+                      : "text-bpim-muted",
+                )}
+              >
+                {v.diff > 0 && (
                   <span className="text-[10px] mr-0.5 opacity-80">+</span>
-                  {current.exScore - v.targetScore}
-                </div>
+                )}
+                {v.diff}
               </div>
             </div>
-          ))}
+          </div>
+        ))}
       </div>
     </div>
   );

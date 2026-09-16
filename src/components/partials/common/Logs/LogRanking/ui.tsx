@@ -34,6 +34,7 @@ const LogRank = ({
   const [selectedSong, setSelectedSong] = useState<SongWithScore | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState<boolean>(false);
   const [selectedRivalId, setSelectedRivalId] = useState<string>("");
+  const [showAllDiffs, setShowAllDiffs] = useState<boolean>(false);
 
   const RANK_CONFIG = {
     growth: {
@@ -150,6 +151,15 @@ const LogRank = ({
         )}
       </div>
 
+      {type === "versionOvertake" && !isSharing && (
+        <div className="flex items-center justify-end gap-2">
+          <span className="text-[10px] font-bold text-bpim-muted">
+            {t("logs.rank.versionOvertake.showAllDiffs")}
+          </span>
+          <Switch checked={showAllDiffs} onCheckedChange={setShowAllDiffs} />
+        </div>
+      )}
+
       {type === "overtake" && allRivals.length > 0 && (
         <Select
           value={selectedRivalId}
@@ -191,6 +201,7 @@ const LogRank = ({
               ) : type === "versionOvertake" ? (
                 <VersionOvertakeRankItem
                   item={item}
+                  showAllDiffs={showAllDiffs}
                   onClick={() => handleOpenDetail(item)}
                 />
               ) : (

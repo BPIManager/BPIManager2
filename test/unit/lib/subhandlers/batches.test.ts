@@ -25,7 +25,7 @@ const getOvertakenRivalsMock = vi.fn();
 const deleteBatchMock = vi.fn();
 const getPreviousVersionWithScoresMock = vi.fn();
 const getSelfVersionScoresMock = vi.fn();
-const getVersionOvertakenMock = vi.fn();
+const getVersionComparisonsMock = vi.fn();
 const getSongMasterWithDefMock = vi.fn();
 
 vi.mock("@/middlewares/api/withApiOnProfile", () => ({
@@ -81,7 +81,7 @@ vi.mock("@/lib/db/domains/songs", () => ({
 vi.mock("@/lib/db/domains/scores/timeline", () => ({
   timelineRepo: {
     getSelfVersionScores: (...a: unknown[]) => getSelfVersionScoresMock(...a),
-    getVersionOvertaken: (...a: unknown[]) => getVersionOvertakenMock(...a),
+    getVersionComparisons: (...a: unknown[]) => getVersionComparisonsMock(...a),
   },
 }));
 vi.mock("@/lib/db/orchestrators/batchDeletion", () => ({
@@ -101,7 +101,7 @@ const access = { hasAccess: true, viewerId: "u1" };
 
 beforeEach(() => {
   vi.clearAllMocks();
-  getVersionOvertakenMock.mockResolvedValue([]);
+  getVersionComparisonsMock.mockResolvedValue([]);
   getJstRangeMock.mockReturnValue({
     start: new Date("2024-01-01"),
     end: new Date("2024-01-02"),
