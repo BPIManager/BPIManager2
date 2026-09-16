@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { LineChart, LucideHistory, Users } from "lucide-react";
 import type { SongDetailSubject } from "@/utils/songs/songDetailMode";
 import { hasBpiData } from "@/utils/songs/songDetailMode";
@@ -142,15 +142,31 @@ const SongDetailView = ({
     draftExScore > currentEx &&
     draftExScore <= maxScore;
 
+  // 保存中に対象(曲・ユーザー・バージョン等)が切り替わった場合、非同期結果を
+  // 誤って現在表示中の対象へ適用しないようにするための最新値の参照(#446)
+  const targetRef = useRef({ userId, version, songDomain, songId: song?.songId });
+  useEffect(() => {
+    targetRef.current = { userId, version, songDomain, songId: song?.songId };
+  });
+
   const handleSave = async () => {
     if (!canSave || !song || !version || !songDomain || draftExScore == null)
       return;
+    const requestedTarget = targetRef.current;
     const result = await save({
       songId: song.songId,
       songDomain,
       version,
       exScore: draftExScore,
     });
+    if (
+      requestedTarget.userId !== targetRef.current.userId ||
+      requestedTarget.version !== targetRef.current.version ||
+      requestedTarget.songDomain !== targetRef.current.songDomain ||
+      requestedTarget.songId !== targetRef.current.songId
+    ) {
+      return;
+    }
     if (result) {
       setSavedOverride({ exScore: result.exScore, bpi: result.bpi });
       setIsEditing(false);
