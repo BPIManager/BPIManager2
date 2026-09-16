@@ -179,6 +179,36 @@ describe("handleScoreManualUpdate", () => {
     }
   });
 
+  it("編集元(songDomain=bpi)側さえ改善していれば、allScores側の現在値がそれより高くても無条件でミラーする", async () => {
+    getSongMasterWithDefMock.mockResolvedValue([bpiSong]);
+    getAllLevelMasterMock.mockResolvedValue([allSongForBpiSong]);
+    getLatestScoresMock.mockResolvedValue([
+      { songId: 1, exScore: 400, clearState: "HARD", missCount: 3 },
+    ]);
+    // allScores側は既に900より高い自己ベストを持っている（scores側とズレているエッジケース）
+    getLatestAllScoresMock.mockResolvedValue([
+      { songId: 501, exScore: 950, clearState: "HARD", missCount: 0 },
+    ]);
+    saveManualScoreUpdateMock.mockResolvedValue({
+      totalBpi: 30,
+      batchId: "manual-user-1-34-2026-09-17",
+    });
+
+    const { result } = await handleScoreManualUpdate(
+      req({ songId: 1, songDomain: "bpi", version: "34", exScore: 900 }),
+    );
+
+    expect(result.ok).toBe(true);
+    const call = saveManualScoreUpdateMock.mock.calls[0][0];
+    // 「見ている画面(scores)」の改善だけで両方が保存される。allScoresは900に
+    // 無条件で揃えられ、独立判定によるスキップは起きない
+    expect(call.score).toMatchObject({ songId: 1, exScore: 900 });
+    expect(call.allScore).toMatchObject({ songId: 501, exScore: 900 });
+    if (result.ok) {
+      expect(result.body).toMatchObject({ scoresSaved: true, allScoresSaved: true });
+    }
+  });
+
   it("songDomain=allSongsで楽曲が見つからなければerr(404)", async () => {
     getSongMasterWithDefMock.mockResolvedValue([]);
     getAllLevelMasterMock.mockResolvedValue([]);
