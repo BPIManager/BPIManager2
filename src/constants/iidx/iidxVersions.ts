@@ -14,4 +14,4 @@ export const IIDX_VERSIONS = [
   "INF",
 ] as const;
 
-export const latestVersion: IIDXVersion = "33";
+export const latestVersion: IIDXVersion = "34";
