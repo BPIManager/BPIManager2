@@ -37,6 +37,7 @@ const AAATableContent = ({
     undefined,
   );
   const [cardDisplay, setCardDisplay] = useState<CardDisplay>("bpi");
+  const [radarCategories, setRadarCategories] = useState<string[]>([]);
   const [customGoal, setCustomGoal] = useState<CustomGoalConfig | null>(() => {
     try {
       const raw = localStorage.getItem("bpim2_aaa_custom_goal");
@@ -82,13 +83,18 @@ const AAATableContent = ({
         if (!isAbove && !showBelow) return false;
         if (maxDiffFilter !== undefined && (isAbove || diff < -maxDiffFilter))
           return false;
+        if (
+          radarCategories.length > 0 &&
+          (!item.radarTop || !radarCategories.includes(item.radarTop))
+        )
+          return false;
         return true;
       });
       if (filtered.length > 0) acc[Number(key)] = filtered;
       return acc;
     }, {});
     return entries;
-  }, [groupedData, goal, showAbove, showBelow, maxDiffFilter]);
+  }, [groupedData, goal, showAbove, showBelow, maxDiffFilter, radarCategories]);
 
   if (isError) {
     return <FetchErrorState error={isError} />;
@@ -147,6 +153,7 @@ const AAATableContent = ({
           onMaxDiffFilterChange: setMaxDiffFilter,
         }}
         cardDisplay={{ value: cardDisplay, onChange: setCardDisplay }}
+        radar={{ value: radarCategories, onChange: setRadarCategories }}
       />
 
       {isLoading ? (
