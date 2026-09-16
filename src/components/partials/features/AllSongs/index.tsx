@@ -8,6 +8,7 @@ import SongFilterBar from "@/components/partials/common/Songs/Filter/ui";
 import AdvancedFilterModal from "@/components/partials/common/Songs/AdvancedFilter/ui";
 import { AllSongList } from "./Table";
 import SongDetailView from "@/components/partials/modal/SongDetail/ui";
+import { NoDataAlert } from "@/components/partials/common/DashBoard/NoData";
 import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
 import { useAllScores } from "@/hooks/allScores/useAllScores";
 import { useAllScoresCompare } from "@/hooks/allScores/useAllScoresCompare";
@@ -62,7 +63,7 @@ const AllSongsTable = ({
     params.compareVersion,
   );
 
-  if (!isLoading && error) {
+  if (!isLoading && (error || !songs)) {
     return <FetchErrorState error={error} />;
   }
 
@@ -87,6 +88,12 @@ const AllSongsTable = ({
         difficultyItems={ALL_DIFFICULTIES}
         excludeSortKeys={["bpi"]}
       />
+
+      {!isLoading && songs && songs.length === 0 && (
+        <div className="p-4">
+          <NoDataAlert />
+        </div>
+      )}
 
       {showCompareLoading && (
         <div className="flex items-center justify-center gap-2 py-2 text-xs text-bpim-muted border-b border-bpim-border">

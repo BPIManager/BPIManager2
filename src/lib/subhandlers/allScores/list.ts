@@ -50,8 +50,7 @@ export async function handleAllScoresList(
     }));
 
     return {
-      result:
-        results && results.length > 0 ? ok(results) : err(404, "No data found"),
+      result: ok(results),
       targetUserId,
       viewerId: access.viewerId ?? null,
     };
