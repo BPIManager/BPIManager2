@@ -285,7 +285,12 @@ const LogsDetailContent = ({
           value="songs"
           className="mt-4 p-0 focus-visible:outline-none"
         >
-          <BatchSongsTable songs={details.songs} listRef={listRef} />
+          <BatchSongsTable
+            songs={details.songs}
+            userId={userId}
+            version={version}
+            listRef={listRef}
+          />
         </TabsContent>
       </Tabs>
 
