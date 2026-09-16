@@ -28,7 +28,7 @@ export const getLampClass = (clearState: string | null | undefined) => {
   }
 };
 
-const DiffBadge = ({
+export const DiffBadge = ({
   diff,
   unit = "",
 }: {
@@ -174,7 +174,7 @@ const SongItem = ({
                 BPI
               </span>
               <span className="text-sm lg:text-lg font-bold text-bpim-text leading-none">
-                {song.bpi !== null ? song.bpi.toFixed(2) : "---"}
+                {song.bpi != null ? song.bpi.toFixed(2) : "---"}
               </span>
               {showCompare && (
                 <div className="flex flex-col items-end">

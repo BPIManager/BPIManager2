@@ -7,7 +7,6 @@ import { getMaxBpm, getMinBpm, isSoflanBpm } from "./getMaxBPM";
 import dayjs from "@/lib/dayjs";
 import type { FilterParams } from "@/types/songs/filter";
 import isBetween from "dayjs/plugin/isBetween";
-import { IidxDifficulty } from "@/types/iidx/difficulty";
 dayjs.extend(isBetween);
 
 export const filterSongsServerSide = (
@@ -60,8 +59,7 @@ export const filterSongsFrontend = (
     }
 
     if (params.difficulties && params.difficulties.length > 0) {
-      if (!params.difficulties.includes(song.difficulty as IidxDifficulty))
-        return false;
+      if (!params.difficulties.includes(song.difficulty)) return false;
     }
 
     if (params.clearStates && params.clearStates.length > 0) {

@@ -4,3 +4,4 @@ export * from "./list";
 export * from "./history";
 export * from "./ranking";
 export * from "./rivals";
+export * from "./selfVersion";

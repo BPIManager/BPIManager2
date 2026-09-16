@@ -1,9 +1,9 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { getLampClass } from "@/components/partials/common/Table/ui";
+import { DiffBadge, getLampClass } from "@/components/partials/common/Table/ui";
 import { DIFF_COLORS as diffColors } from "@/constants/theme/difficultyColors";
-import { AllSongWithScore } from "@/types/songs/allSongs";
+import { SongWithScore } from "@/types/songs/score";
 
 const diffShort: Record<string, string> = {
   BEGINNER: "B",
@@ -20,11 +20,14 @@ const diffColorAll: Record<string, string> = {
 
 export const AllSongItem = ({
   song,
+  compareVersion,
   onClick,
 }: {
-  song: AllSongWithScore;
+  song: SongWithScore;
+  compareVersion?: string;
   onClick: () => void;
 }) => {
+  const showCompare = compareVersion && compareVersion !== "none";
   const lampClass = getLampClass(song.clearState);
   const rate =
     song.exScore !== null
@@ -81,6 +84,7 @@ export const AllSongItem = ({
               <span className="text-sm font-bold text-bpim-text leading-none">
                 {song.exScore !== null ? song.exScore : "---"}
               </span>
+              {showCompare && <DiffBadge diff={song.exDiff} />}
             </div>
             <div className="flex flex-col items-end min-w-10">
               <span className="text-[10px] text-bpim-muted leading-none mb-0.5 uppercase">
@@ -110,16 +114,19 @@ export const AllSongItem = ({
 
 export const AllSongList = ({
   songs,
+  compareVersion,
   onSongSelect,
 }: {
-  songs: AllSongWithScore[];
-  onSongSelect: (s: AllSongWithScore) => void;
+  songs: SongWithScore[];
+  compareVersion?: string;
+  onSongSelect: (s: SongWithScore) => void;
 }) => (
   <div className="w-full p-2 flex flex-col">
     {songs.map((song) => (
       <AllSongItem
         key={`${song.songId}-${song.difficulty}`}
         song={song}
+        compareVersion={compareVersion}
         onClick={() => onSongSelect(song)}
       />
     ))}

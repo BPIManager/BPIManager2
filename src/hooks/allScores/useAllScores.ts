@@ -1,6 +1,6 @@
 ﻿import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
 import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
-import { AllScoreFilterParams, AllSongWithScore } from "@/types/songs/allSongs";
+import { FilterParamsFrontend, SongWithScore } from "@/types/songs/score";
 
 /**
  * 全バージョンのスコア一覧を取得する。
@@ -11,7 +11,10 @@ import { AllScoreFilterParams, AllSongWithScore } from "@/types/songs/allSongs";
  */
 export const useAllScores = (
   userId: string | undefined,
-  params?: AllScoreFilterParams,
+  params?: Pick<
+    FilterParamsFrontend,
+    "search" | "levels" | "difficulties" | "clearStates" | "sortKey" | "sortOrder"
+  >,
 ) => {
   const queryString = params
     ? new URLSearchParams(
@@ -23,7 +26,7 @@ export const useAllScores = (
       ).toString()
     : "";
 
-  const { data, error, isLoading, mutate } = useAuthedSWRV2<AllSongWithScore[]>(
+  const { data, error, isLoading, mutate } = useAuthedSWRV2<SongWithScore[]>(
     userId
       ? `${API_V2_PREFIX}/users/${userId}/all-scores/list?${queryString}`
       : null,

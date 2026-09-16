@@ -14,7 +14,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { SongRankEntry } from "@/types/users/ranking";
-import type { AllSongWithScore, AllDifficulties } from "@/types/songs/allSongs";
+import type { AllDifficulties } from "@/types/songs/allSongs";
+import type { SongWithScore } from "@/types/songs/score";
 import SongDetailView from "@/components/partials/modal/SongDetail/ui";
 import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
 import { ALL_LEVELS } from "@/constants/iidx/songLevels";
@@ -72,7 +73,7 @@ function getPctColor(p: number): { text: string; border: string; bg: string } {
   return { text: "#f87171", border: "#f87171", bg: "#f8717122" }; // red
 }
 
-function toAllSongWithScore(entry: SongRankEntry): AllSongWithScore {
+function toAllSongWithScore(entry: SongRankEntry): SongWithScore {
   return {
     songId: entry.songId,
     title: entry.title,
@@ -87,7 +88,9 @@ function toAllSongWithScore(entry: SongRankEntry): AllSongWithScore {
     exScore: entry.exScore,
     clearState: entry.clearState,
     missCount: entry.missCount,
-    lastPlayed: entry.lastPlayed,
+    scoreAt: entry.lastPlayed,
+    kaidenAvg: null,
+    wrScore: null,
   };
 }
 
@@ -173,7 +176,7 @@ const SongRankingList = ({ version }: SongRankingListProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [debouncedQuery, setDebouncedQuery] = useState("");
-  const [selectedSong, setSelectedSong] = useState<AllSongWithScore | null>(
+  const [selectedSong, setSelectedSong] = useState<SongWithScore | null>(
     null,
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
