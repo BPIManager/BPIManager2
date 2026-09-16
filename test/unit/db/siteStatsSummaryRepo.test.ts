@@ -60,16 +60,22 @@ describe("siteStatsSummaryRepo.getArenaRankDistribution", () => {
   });
 });
 
-describe("siteStatsSummaryRepo.getAreaDistribution", () => {
-  it("areaがnullの行を除外して返すこと", async () => {
+describe("siteStatsSummaryRepo.getAreaDistributionByVersion", () => {
+  it("areaがnullの行を除外し、バージョンごとにcount降順で返すこと", async () => {
     dbHolder.current = createDbSpy([
-      { area: "東京都", count: 10 },
-      { area: null, count: 5 },
+      { version: "34", area: "東京都", count: 10 },
+      { version: "34", area: null, count: 5 },
+      { version: "34", area: "大阪府", count: 20 },
+      { version: "33", area: "福岡県", count: 3 },
     ]);
 
-    const result = await siteStatsSummaryRepo.getAreaDistribution();
+    const result = await siteStatsSummaryRepo.getAreaDistributionByVersion();
 
-    expect(result).toEqual([{ area: "東京都", count: 10 }]);
+    expect(result["34"]).toEqual([
+      { area: "大阪府", count: 20 },
+      { area: "東京都", count: 10 },
+    ]);
+    expect(result["33"]).toEqual([{ area: "福岡県", count: 3 }]);
   });
 });
 
