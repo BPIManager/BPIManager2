@@ -59,7 +59,7 @@ const SongDetailView = ({
 
   const bpiInfo = useMemo(() => {
     if (!fullSong) return { next: 0 as number | string, diff: 0 };
-    if (fullSong.bpi === null) return { next: "-", diff: 0 };
+    if (fullSong.bpi == null) return { next: "-", diff: 0 };
     const nextTargetBpi = Math.ceil((fullSong.bpi + 0.01) / 10) * 10;
     const targetScore = BpiCalculator.calcFromBPI(nextTargetBpi, fullSong, true);
     if (targetScore === null) return { next: "-", diff: 0 };
@@ -104,10 +104,10 @@ const SongDetailView = ({
                   BPI
                 </span>
                 <span className="font-mono text-lg font-black text-bpim-primary leading-none">
-                  {fullSong.bpi !== null ? fullSong.bpi.toFixed(2) : "-"}
+                  {fullSong.bpi != null ? fullSong.bpi.toFixed(2) : "-"}
                 </span>
                 <span className="mt-1 text-[10px] font-bold text-bpim-primary/60">
-                  {fullSong.bpi !== null
+                  {fullSong.bpi != null
                     ? `BPI${bpiInfo.next}まで +${bpiInfo.diff}`
                     : "-"}
                 </span>

@@ -72,7 +72,10 @@ describe("handleAllScoresList", () => {
     const { result, targetUserId, viewerId } = await handleAllScoresList(
       req({ userId: "target" }),
     );
-    expect(result).toEqual({ ok: true, body: [{ songId: 1 }] });
+    expect(result).toEqual({
+      ok: true,
+      body: [{ songId: 1, radarTop: null }],
+    });
     expect(targetUserId).toBe("target");
     expect(viewerId).toBe("target");
   });

@@ -59,7 +59,7 @@ describe("allScoresAggregateRepo.getAllScoresList", () => {
     ]);
   });
 
-  it("行データをAllSongWithScore形式に変換すること(null合体を含む)", async () => {
+  it("行データをSongWithScore形式に変換すること(null合体を含む)", async () => {
     dbHolder.current = createDbSpy([
       {
         songId: 1,
@@ -97,7 +97,9 @@ describe("allScoresAggregateRepo.getAllScoresList", () => {
         exScore: 1800,
         clearState: "HARD CLEAR",
         missCount: 5,
-        lastPlayed: "2025-01-01",
+        scoreAt: "2025-01-01",
+        kaidenAvg: null,
+        wrScore: null,
       },
     ]);
   });

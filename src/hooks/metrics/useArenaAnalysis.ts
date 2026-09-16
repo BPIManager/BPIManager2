@@ -68,7 +68,7 @@ export function useArenaAnalysis(
     for (const s of userSongs) {
       const key = `${s.title}[${s.difficulty}]`;
       if ((songIdsByTitleKey.get(key)?.size ?? 0) > 1) continue;
-      map.set(key, s.bpi);
+      map.set(key, s.bpi ?? null);
     }
     return map;
   }, [userSongs]);

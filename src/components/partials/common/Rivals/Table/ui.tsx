@@ -212,7 +212,7 @@ const RivalSongItem = ({
         <ScoreBox
           label="YOU"
           ex={song.exScore}
-          bpi={song.bpi}
+          bpi={song.bpi ?? null}
           clearState={song.clearState}
           colorClass="text-bpim-primary"
         />
@@ -235,7 +235,7 @@ const RivalSongItem = ({
           <MobileScoreView
             label="YOU"
             ex={song.exScore}
-            bpi={song.bpi}
+            bpi={song.bpi ?? null}
             clearState={song.clearState}
             align="start"
           />

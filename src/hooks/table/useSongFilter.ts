@@ -10,7 +10,6 @@ import { filterSongsFrontend } from "@/utils/songs/filter";
 import { sortSongs } from "@/utils/songs/sort";
 
 import { PAGE_SIZE } from "@/constants/logic/pagination";
-import { IidxDifficulty } from "@/types/iidx/difficulty";
 
 const toFilterKey = (q: ParsedUrlQuery) => {
   const { page: _page, ...rest } = q;
@@ -26,24 +25,45 @@ const toFilterKey = (q: ParsedUrlQuery) => {
  */
 export const useSongFilter = (
   data: SongWithScore[] | undefined,
-  defaults?: Pick<FilterParamsFrontend, "isMyPlayed" | "isRivalPlayed">,
+  defaults?: Pick<
+    FilterParamsFrontend,
+    | "isMyPlayed"
+    | "isRivalPlayed"
+    | "levels"
+    | "difficulties"
+    | "sortKey"
+    | "sortOrder"
+  >,
 ) => {
   const router = useRouter();
   const { query, isReady } = router;
 
   const params = useMemo((): FilterParamsFrontend => {
-    if (!isReady) return { search: "", sortKey: "bpi", sortOrder: "desc" };
+    if (!isReady)
+      return {
+        search: "",
+        sortKey: defaults?.sortKey ?? "bpi",
+        sortOrder: defaults?.sortOrder ?? "desc",
+      };
 
     const q = query as Record<string, string | undefined>;
     return {
       search: q.search || "",
-      sortKey: (q.sortKey as FilterParamsFrontend["sortKey"]) || "bpi",
-      sortOrder: (q.sortOrder as FilterParamsFrontend["sortOrder"]) || "desc",
+      sortKey:
+        (q.sortKey as FilterParamsFrontend["sortKey"]) ||
+        defaults?.sortKey ||
+        "bpi",
+      sortOrder:
+        (q.sortOrder as FilterParamsFrontend["sortOrder"]) ||
+        defaults?.sortOrder ||
+        "desc",
       compareVersion: q.compareVersion || undefined,
-      levels: q.levels ? q.levels.split(",").map(Number) : [],
+      levels: q.levels
+        ? q.levels.split(",").map(Number)
+        : defaults?.levels ?? [],
       difficulties: q.difficulties
-        ? (q.difficulties.split(",") as IidxDifficulty[])
-        : [],
+        ? q.difficulties.split(",")
+        : defaults?.difficulties ?? [],
       bpmMin: q.bpmMin ? Number(q.bpmMin) : undefined,
       bpmMax: q.bpmMax ? Number(q.bpmMax) : undefined,
       isSofran: q.isSofran === "true",
