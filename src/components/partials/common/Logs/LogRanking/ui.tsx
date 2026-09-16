@@ -11,7 +11,7 @@ import {
 import RankItem from "./item";
 import { useLogRank } from "@/hooks/batches/useLogRank";
 import { useMemo, useState } from "react";
-import SongDetailView from "@/components/partials/modal/SongDetail/ui";
+import SongDetailView from "@/components/partials/modal/SongDetail";
 import OvertakeRankItem from "../LogOvertaken/item";
 import VersionOvertakeRankItem from "../LogVersionOvertaken/item";
 import type { BatchDetailItem } from "@/types/logs/batchDetail";

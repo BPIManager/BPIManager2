@@ -4,7 +4,7 @@ import { useCompareScores } from "@/hooks/table/useCompareScores";
 import { useMergedCompareSongs } from "@/hooks/table/useMergedCompareSongs";
 import { PAGE_SIZE } from "@/constants/logic/pagination";
 import { mapBatchToSongs } from "@/utils/logs/getSongTable";
-import SongDetailView from "@/components/partials/modal/SongDetail/ui";
+import SongDetailView from "@/components/partials/modal/SongDetail";
 import CustomPagination from "@/components/partials/common/ListControls/Pagination/ui";
 import AdvancedFilterModal from "@/components/partials/common/Songs/AdvancedFilter/ui";
 import SongFilterBar from "@/components/partials/common/Songs/Filter/ui";
