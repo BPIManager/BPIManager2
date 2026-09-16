@@ -7,7 +7,7 @@ import { PAGE_SIZE } from "@/constants/logic/pagination";
 import { useUnplayedScores } from "@/hooks/table/useUnplayedScores";
 import { NoDataAlert } from "@/components/partials/common/DashBoard/NoData";
 import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
-import SongDetailView from "@/components/partials/modal/SongDetail/ui";
+import SongDetailView from "@/components/partials/modal/SongDetail";
 import CustomPagination from "@/components/partials/common/ListControls/Pagination/ui";
 import AdvancedFilterModal from "@/components/partials/common/Songs/AdvancedFilter/ui";
 import SongFilterBar from "@/components/partials/common/Songs/Filter/ui";
@@ -25,7 +25,10 @@ const UnplayedSongsTable = ({
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
 
-  const { songs, error, isLoading } = useUnplayedScores(userId, version);
+  const { songs, error, isLoading, currentVersion, refresh } = useUnplayedScores(
+    userId,
+    version,
+  );
 
   const { params, updateParams, page, setPage, visibleSongs, totalCount } =
     useSongFilter(songs);
@@ -76,6 +79,10 @@ const UnplayedSongsTable = ({
           song={selectedSong}
           isOpen={isDetailOpen}
           onClose={() => setIsDetailOpen(false)}
+          userId={userId}
+          version={currentVersion}
+          songDomain="bpi"
+          onSaved={() => refresh()}
         />
       )}
 

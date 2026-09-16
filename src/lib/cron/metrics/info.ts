@@ -33,7 +33,7 @@ export async function generateInfoJson() {
     siteStatsSummaryRepo.getSummary(),
     siteStatsSummaryRepo.getDailyRegistrations(90),
     siteStatsSummaryRepo.getArenaRankDistributionByVersion(),
-    siteStatsSummaryRepo.getAreaDistribution(),
+    siteStatsSummaryRepo.getAreaDistributionByVersion(),
     siteStatsSummaryRepo.getVersionScoreDistribution(),
     siteStatsActivityDistributionRepo.getHourlyDistribution(),
     siteStatsActivityDistributionRepo.getWeekdayDistribution(),

@@ -10,7 +10,10 @@ export interface BatchImportResult {
   updatedBpiCount: number;
   previousTotalBpi: number;
   newTotalBpi: number;
-  details: { notFound: { title: string; difficulty: string }[] };
+  details: {
+    notFound: { title: string; difficulty: string }[];
+    invalidScore: { title: string; difficulty: string; exScore: number }[];
+  };
 }
 
 export async function submitBatchImport(

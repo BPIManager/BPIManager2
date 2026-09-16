@@ -3,7 +3,7 @@ import dayjs from "@/lib/dayjs";
 import { navigationRepo } from "@/lib/db/domains/logs/navigation";
 import { scoreDetailRepo } from "@/lib/db/domains/scores/detail";
 import { rivalRepo } from "@/lib/db/aggregates/rivalScores/rival";
-import { deleteBatch } from "@/lib/db/orchestrators/batchDeletion";
+import { deleteBatch, BatchNotLatestError } from "@/lib/db/orchestrators/batchDeletion";
 import { mapToLogNested } from "@/utils/logs/getMapNested";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 import { authenticateViewer } from "@/middlewares/api/withApi";
@@ -157,7 +157,19 @@ export async function handleBatchDelete(
       };
     }
 
-    await deleteBatch(uid, bid);
+    const latestBatchId = await navigationRepo.getLatestBatchId(
+      uid,
+      targetBatch.version,
+    );
+    if (latestBatchId !== bid) {
+      return {
+        result: err(400, "最新のバッチのみ削除できます。"),
+        targetUserId: uid,
+        viewerId,
+      };
+    }
+
+    await deleteBatch(uid, bid, targetBatch.version);
 
     return {
       result: ok({ message: "Batch deleted successfully." }),
@@ -165,6 +177,13 @@ export async function handleBatchDelete(
       viewerId,
     };
   } catch (error: unknown) {
+    if (error instanceof BatchNotLatestError) {
+      return {
+        result: err(400, "最新のバッチのみ削除できます。"),
+        targetUserId: uid,
+        viewerId: null,
+      };
+    }
     return {
       result: err(500, toErrorMessage(error)),
       targetUserId: uid,

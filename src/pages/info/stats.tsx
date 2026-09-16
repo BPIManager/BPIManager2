@@ -113,7 +113,7 @@ export default function SiteStatsPage() {
               />
             </div>
 
-            <AreaDistributionTable data={data.areaDistribution ?? []} />
+            <AreaDistributionTable data={data.areaDistribution} />
           </div>
         )}
       </PageContainer>

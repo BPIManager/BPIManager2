@@ -4,7 +4,7 @@ import { useCompareScores } from "@/hooks/table/useCompareScores";
 import { useMergedCompareSongs } from "@/hooks/table/useMergedCompareSongs";
 import { PAGE_SIZE } from "@/constants/logic/pagination";
 import { mapBatchToSongs } from "@/utils/logs/getSongTable";
-import SongDetailView from "@/components/partials/modal/SongDetail/ui";
+import SongDetailView from "@/components/partials/modal/SongDetail";
 import CustomPagination from "@/components/partials/common/ListControls/Pagination/ui";
 import AdvancedFilterModal from "@/components/partials/common/Songs/AdvancedFilter/ui";
 import SongFilterBar from "@/components/partials/common/Songs/Filter/ui";
@@ -17,11 +17,14 @@ const BatchSongsTable = ({
   userId,
   version,
   listRef,
+  onScoreSaved,
 }: {
   songs: BatchDetailItem[];
   userId?: string;
   version?: string;
   listRef?: RefObject<HTMLDivElement | null>;
+  /** モーダル上でのEXスコア手動保存が成功した際に呼ばれる */
+  onScoreSaved?: () => void;
 }) => {
   const mappedSongs = useMemo(() => mapBatchToSongs(songs), [songs]);
 
@@ -74,6 +77,10 @@ const BatchSongsTable = ({
           song={selectedSong}
           isOpen={isDetailOpen}
           onClose={() => setIsDetailOpen(false)}
+          userId={userId}
+          version={version}
+          songDomain="bpi"
+          onSaved={onScoreSaved}
         />
       )}
 

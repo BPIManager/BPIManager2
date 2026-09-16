@@ -18,7 +18,7 @@ import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 import { BpiCalculator } from "@/lib/bpi";
 import type { IBpiBasicSongData, IBpiScoreObservation } from "@/types/songs/bpi";
 import BatchTotalBpiCard from "@/components/partials/common/Logs/TotalBPI/ui";
-import LogRank from "@/components/partials/common/Logs/LogRanking/ui";
+import LogRank from "@/components/partials/common/Logs/LogRanking";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { AppTabsList, AppTabsTrigger } from "@/components/ui/complex/tabs";
 

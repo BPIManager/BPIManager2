@@ -1,22 +1,70 @@
 import { useState } from "react";
 import { DashCard } from "@/components/ui/dashcard";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { latestVersion } from "@/constants/iidx/iidxVersions";
+import { versionsNonDisabledCollection } from "@/constants/iidx/versionTitles";
 import type { AreaEntry } from "@/types/siteStats";
 
 const PAGE_SIZE = 10;
 
-function AreaDistributionTable({ data }: { data: AreaEntry[] }) {
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+// 公式アリーナデータの取得元(eAMUSEMENT公式サイト)がまだ最新バージョンに対応して
+// おらず、直近で実データが揃っているのがv33のため暫定的にデフォルト表示に固定する
+// (ArenaRankComparisonと同じ方針)
+const DEFAULT_VERSION = "33";
 
-  const visible = data.slice(0, visibleCount);
-  const hasMore = visibleCount < data.length;
-  const max = data[0]?.count ?? 1;
+function AreaDistributionTable({
+  data,
+}: {
+  data: Record<string, AreaEntry[]> | undefined;
+}) {
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const areaByVersion = data ?? {};
+  const availableVersions = versionsNonDisabledCollection.filter(
+    (v) => areaByVersion[v.value]?.some((e) => e.count > 0),
+  );
+  const [version, setVersion] = useState<string>(
+    areaByVersion[DEFAULT_VERSION]
+      ? DEFAULT_VERSION
+      : (availableVersions[0]?.value ?? latestVersion),
+  );
+
+  const entries = areaByVersion[version] ?? [];
+  const visible = entries.slice(0, visibleCount);
+  const hasMore = visibleCount < entries.length;
+  const max = entries[0]?.count ?? 1;
 
   return (
     <DashCard>
-      <h3 className="mb-3 text-sm font-bold uppercase text-bpim-muted">
-        県別利用者数
-      </h3>
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <h3 className="text-sm font-bold uppercase text-bpim-muted">
+          県別利用者数
+        </h3>
+        <Select
+          value={version}
+          onValueChange={(v) => {
+            setVersion(v);
+            setVisibleCount(PAGE_SIZE);
+          }}
+        >
+          <SelectTrigger className="h-7 w-28 border-bpim-border bg-bpim-surface-2/60 text-xs hover:bg-bpim-overlay focus:ring-0">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent className="border-bpim-border bg-bpim-bg">
+            {availableVersions.map((v) => (
+              <SelectItem key={v.value} value={v.value} className="text-xs">
+                {v.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
       <div className="flex flex-col gap-1.5">
         {visible.map((entry, i) => (
@@ -49,7 +97,7 @@ function AreaDistributionTable({ data }: { data: AreaEntry[] }) {
           className="mt-3 w-full text-xs text-bpim-muted hover:text-bpim-text"
           onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
         >
-          さらに表示 ({data.length - visibleCount} 件)
+          さらに表示 ({entries.length - visibleCount} 件)
         </Button>
       )}
     </DashCard>

@@ -11,7 +11,7 @@ import { NoDataAlert } from "@/components/partials/common/DashBoard/NoData";
 import { LoginRequiredCard } from "@/components/partials/common/Auth/LoginRequired/ui";
 import CustomPagination from "@/components/partials/common/ListControls/Pagination/ui";
 import AdvancedFilterModal from "@/components/partials/common/Songs/AdvancedFilter/ui";
-import SongDetailView from "@/components/partials/modal/SongDetail/ui";
+import SongDetailView from "@/components/partials/modal/SongDetail";
 import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
 import RivalSongItem from "@/components/partials/common/Rivals/Table/ui";
 import RivalAnalysis from "@/components/partials/common/Rivals/Analysis/ui";
@@ -67,6 +67,9 @@ interface AnalyticsComparisonTableProps {
   isLoading: boolean;
   error: Error | undefined;
   rivalLabel?: string;
+  version?: string;
+  /** モーダル上でのEXスコア手動保存が成功した際に呼ばれる */
+  onScoreSaved?: () => void;
 }
 
 const AnalyticsComparisonTable = ({
@@ -74,6 +77,8 @@ const AnalyticsComparisonTable = ({
   isLoading,
   error,
   rivalLabel,
+  version,
+  onScoreSaved,
 }: AnalyticsComparisonTableProps) => {
   const { fbUser } = useUser();
   const [selectedSong, setSelectedSong] = useState<SongWithScore | null>(null);
@@ -172,6 +177,10 @@ const AnalyticsComparisonTable = ({
           song={selectedSong}
           isOpen={isDetailOpen}
           onClose={() => setIsDetailOpen(false)}
+          userId={fbUser?.uid}
+          version={version}
+          songDomain="bpi"
+          onSaved={onScoreSaved}
         />
       )}
 

@@ -67,7 +67,8 @@ export interface SiteStatsResponse {
   dailyRegistrations: DailyRegistration[];
   /** バージョン番号 → ランク別カウント配列。データが無いバージョンはキー自体が無い */
   arenaRankDistribution: Record<string, ArenaRankEntry[]>;
-  areaDistribution: AreaEntry[];
+  /** バージョン番号 → 県別カウント配列。データが無いバージョンはキー自体が無い */
+  areaDistribution: Record<string, AreaEntry[]>;
   versionScoreDistribution: VersionScoreDistribution;
   hourlyDistribution: Record<SiteStatsPeriod, HourlyEntry[]>;
   weekdayDistribution: Record<SiteStatsPeriod, WeekdayEntry[]>;

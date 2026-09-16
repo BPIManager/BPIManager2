@@ -50,6 +50,17 @@ export function registerUpdateMyScore(server: McpServer, userId: string) {
         };
       }
 
+      if (exScore > song.notes * 2) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `exScore=${exScore}はこの楽曲の理論上の最大値（notes=${song.notes} × 2 = ${song.notes * 2}）を超えています。更新しませんでした。`,
+            },
+          ],
+        };
+      }
+
       const current = currentScores.find((s) => s.songId === songId);
       const improved = isScoreImproved({ exScore, clearState, missCount }, current);
 

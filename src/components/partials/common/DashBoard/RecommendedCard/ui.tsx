@@ -4,7 +4,7 @@ import { NeighborRecommendedItem } from "@/types/stats/neighborRecommended";
 import SimpleRankItem from "./simpleRankItem";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { SongWithScore } from "@/types/songs/score";
-import SongDetailView from "@/components/partials/modal/SongDetail/ui";
+import SongDetailView from "@/components/partials/modal/SongDetail";
 import NearLoseList from "./NearLose";
 import { DashCard } from "@/components/ui/dashcard";
 import InfiniteScrollContainer from "@/components/partials/common/ListControls/InfiniteScroll/ui";
@@ -12,6 +12,7 @@ import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { AppTabsGroup } from "@/components/ui/complex/tabs";
 import { HelpTooltip } from "@/components/ui/tooltip";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import { invalidateDashboardRankingCache } from "@/hooks/stats/dashboardRankingCache";
 
 const RankingCardHelpContent = () => {
   const { t } = useTranslation();
@@ -107,6 +108,7 @@ const NeighborInfiniteList = ({
 
 const RankingTabsCard = ({ userId }: { userId: string }) => {
   const { t } = useTranslation();
+  const { version } = useStatsFilter();
   const [selectedSong, setSelectedSong] = useState<SongWithScore | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [tab, setTab] = useState<string>("weapons");
@@ -191,6 +193,10 @@ const RankingTabsCard = ({ userId }: { userId: string }) => {
           isOpen={isDetailOpen}
           onClose={() => setIsDetailOpen(false)}
           defaultTab={tab === "nearLose" ? "rivals" : "stats"}
+          userId={userId}
+          version={version}
+          songDomain="bpi"
+          onSaved={() => invalidateDashboardRankingCache(userId)}
         />
       )}
     </DashCard>

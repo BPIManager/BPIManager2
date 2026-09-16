@@ -40,7 +40,7 @@ async function fetchRivalScoresForOvertaken(
     : [];
 }
 
-/** プレイ日時ベースの詳細取得 */
+/** プレイ日時ベースの詳細取得。該当期間にデータが無ければ`null`を返す */
 export async function handleLastPlayedBase(
   uid: string,
   ver: IIDXVersion,
@@ -82,7 +82,7 @@ export async function handleLastPlayedBase(
     ]);
 
   if (dailyScores.length === 0) {
-    throw new Error("No activity found for this period.");
+    return null;
   }
 
   const overtakenMap = createOvertakenMap(overtaken);
@@ -141,7 +141,7 @@ export async function handleLastPlayedBase(
   };
 }
 
-/** インポート日時(バッチ)ベースの詳細取得 */
+/** インポート日時(バッチ)ベースの詳細取得。該当期間にデータが無ければ`null`を返す */
 export async function handleCreatedAtBase(
   uid: string,
   ver: IIDXVersion,
@@ -156,7 +156,7 @@ export async function handleCreatedAtBase(
     range.start,
     range.end,
   );
-  if (batches.length === 0) throw new Error("No logs found.");
+  if (batches.length === 0) return null;
 
   const overtakenPromise = isOwnLog
     ? rivalRepo.getOvertakenRivals(uid, ver, {

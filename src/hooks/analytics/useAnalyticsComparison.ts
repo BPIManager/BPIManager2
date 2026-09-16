@@ -36,6 +36,8 @@ export const useAnalyticsComparison = (
   isLoading: boolean;
   error: Error | undefined;
   rivalLabel: string;
+  /** 手動EXスコア保存成功時などに、比較データを再検証する */
+  refresh: () => void;
 } => {
   const { user, fbUser } = useUser();
   const myUserId = user?.userId;
@@ -45,6 +47,7 @@ export const useAnalyticsComparison = (
     data: rivalData,
     error: rivalError,
     isLoading: rivalLoading,
+    mutate: mutateRival,
   } = useAuthedSWRV2<SongWithRival[]>(
     target?.kind === "rival" && myUserId && target.param && fbUser
       ? `${API_V2_PREFIX}/users/${myUserId}/rivals/${target.param}/scores?version=${targetVersion}`
@@ -56,6 +59,7 @@ export const useAnalyticsComparison = (
     data: selfVersionData,
     error: selfVersionError,
     isLoading: selfVersionLoading,
+    mutate: mutateSelfVersion,
   } = useAuthedSWRV2<SongWithRival[]>(
     target?.kind === "self-version" && myUserId && target.param && fbUser
       ? `${API_V2_PREFIX}/users/${myUserId}/scores/self-version?currentVersion=${targetVersion}&targetVersion=${target.param}`
@@ -71,6 +75,7 @@ export const useAnalyticsComparison = (
     data: bestEverData,
     error: bestEverError,
     isLoading: bestEverLoading,
+    mutate: mutateBestEver,
   } = useAuthedSWRV2<BestEverRow[]>(
     needsBestEver && myUserId && fbUser
       ? `${API_V2_PREFIX}/users/${myUserId}/scores/best-ever?currentVersion=${targetVersion}&excludeCurrent=${excludeCurrent}`
@@ -91,12 +96,23 @@ export const useAnalyticsComparison = (
     data: myScores,
     error: myError,
     isLoading: myLoading,
+    mutate: mutateMyScores,
   } = useAuthedSWRV2<SongWithScore[]>(
     needsMyScores && myUserId && fbUser
       ? `${API_V2_PREFIX}/users/${myUserId}/scores?version=${targetVersion}`
       : null,
     { revalidateOnFocus: false, dedupingInterval: 10000 },
   );
+
+  // 手動EXスコア保存後、表示中の比較ターゲットに対応するキャッシュのみを
+  // 再検証すればよいが、判定を複雑にしないため4種すべてを呼ぶ(未使用の
+  // ものはキーがnullのため無害)
+  const refresh = () => {
+    void mutateRival();
+    void mutateSelfVersion();
+    void mutateBestEver();
+    void mutateMyScores();
+  };
 
   const arenaRank = target?.kind === "arena" ? (target.param ?? "A1") : "A1";
   const { rows: arenaRows, isLoading: arenaLoading } = useArenaJson(
@@ -128,6 +144,7 @@ export const useAnalyticsComparison = (
       isLoading: false,
       error: undefined,
       rivalLabel: "",
+      refresh,
     };
   }
 
@@ -137,6 +154,7 @@ export const useAnalyticsComparison = (
       isLoading: rivalLoading,
       error: rivalError,
       rivalLabel: target.label,
+      refresh,
     };
   }
 
@@ -146,6 +164,7 @@ export const useAnalyticsComparison = (
       isLoading: selfVersionLoading,
       error: selfVersionError,
       rivalLabel: target.label,
+      refresh,
     };
   }
 
@@ -156,6 +175,7 @@ export const useAnalyticsComparison = (
         isLoading: true,
         error: undefined,
         rivalLabel: target.label,
+        refresh,
       };
     }
 
@@ -178,6 +198,7 @@ export const useAnalyticsComparison = (
       isLoading: false,
       error: bestEverError ?? myError,
       rivalLabel: target.label,
+      refresh,
     };
   }
 
@@ -187,6 +208,7 @@ export const useAnalyticsComparison = (
       isLoading: true,
       error: undefined,
       rivalLabel: target.label,
+      refresh,
     };
   }
   if (!myScores) {
@@ -195,6 +217,7 @@ export const useAnalyticsComparison = (
       isLoading: false,
       error: myError,
       rivalLabel: target.label,
+      refresh,
     };
   }
 
@@ -240,6 +263,7 @@ export const useAnalyticsComparison = (
       isLoading: false,
       error: undefined,
       rivalLabel: target.label,
+      refresh,
     };
   }
 
@@ -250,6 +274,7 @@ export const useAnalyticsComparison = (
         isLoading: true,
         error: undefined,
         rivalLabel: target.label,
+        refresh,
       };
     }
 
@@ -270,6 +295,7 @@ export const useAnalyticsComparison = (
       isLoading: false,
       error: rivalAvgError,
       rivalLabel: target.label,
+      refresh,
     };
   }
 
@@ -280,6 +306,7 @@ export const useAnalyticsComparison = (
         isLoading: true,
         error: undefined,
         rivalLabel: target.label,
+        refresh,
       };
     }
 
@@ -300,6 +327,7 @@ export const useAnalyticsComparison = (
       isLoading: false,
       error: rivalTopError,
       rivalLabel: target.label,
+      refresh,
     };
   }
 
@@ -328,6 +356,7 @@ export const useAnalyticsComparison = (
       isLoading: false,
       error: undefined,
       rivalLabel: target.label,
+      refresh,
     };
   }
 
@@ -336,5 +365,6 @@ export const useAnalyticsComparison = (
     isLoading: false,
     error: undefined,
     rivalLabel: "",
+    refresh,
   };
 };

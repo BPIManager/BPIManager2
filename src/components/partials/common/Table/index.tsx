@@ -7,7 +7,7 @@ import { useMergedCompareSongs } from "@/hooks/table/useMergedCompareSongs";
 import SongFilterBar from "@/components/partials/common/Songs/Filter/ui";
 import SongList from "./ui";
 import CustomPagination from "@/components/partials/common/ListControls/Pagination/ui";
-import SongDetailView from "@/components/partials/modal/SongDetail/ui";
+import SongDetailView from "@/components/partials/modal/SongDetail";
 import { useUserScores } from "@/hooks/table/useUserScores";
 import { useCompareScores } from "@/hooks/table/useCompareScores";
 import { NoDataAlert } from "@/components/partials/common/DashBoard/NoData";
@@ -29,7 +29,7 @@ const SongsTable = ({
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
 
-  const { songs, error, isLoading, currentVersion } = useUserScores(
+  const { songs, error, isLoading, currentVersion, refresh } = useUserScores(
     userId,
     version,
   );
@@ -129,6 +129,10 @@ const SongsTable = ({
           song={selectedSong}
           isOpen={isDetailOpen}
           onClose={() => setIsDetailOpen(false)}
+          userId={userId}
+          version={currentVersion}
+          songDomain="bpi"
+          onSaved={() => refresh()}
         />
       )}
 

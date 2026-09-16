@@ -20,6 +20,7 @@ const findBatchesInRangeMock = vi.fn();
 const getBatchNavigationMock = vi.fn();
 const getRangeNavigationMock = vi.fn();
 const getJstRangeMock = vi.fn();
+const getLatestBatchIdMock = vi.fn();
 const getScoresWithDetailsMock = vi.fn();
 const getOvertakenRivalsMock = vi.fn();
 const deleteBatchMock = vi.fn();
@@ -59,6 +60,7 @@ vi.mock("@/lib/db/domains/logs/navigation", () => ({
     getBatchNavigation: (...a: unknown[]) => getBatchNavigationMock(...a),
     getRangeNavigation: (...a: unknown[]) => getRangeNavigationMock(...a),
     getJstRange: (...a: unknown[]) => getJstRangeMock(...a),
+    getLatestBatchId: (...a: unknown[]) => getLatestBatchIdMock(...a),
   },
 }));
 vi.mock("@/lib/db/domains/scores/detail", () => ({
@@ -84,8 +86,12 @@ vi.mock("@/lib/db/domains/scores/timeline", () => ({
     getVersionComparisons: (...a: unknown[]) => getVersionComparisonsMock(...a),
   },
 }));
+const { MockBatchNotLatestError } = vi.hoisted(() => ({
+  MockBatchNotLatestError: class extends Error {},
+}));
 vi.mock("@/lib/db/orchestrators/batchDeletion", () => ({
   deleteBatch: (...a: unknown[]) => deleteBatchMock(...a),
+  BatchNotLatestError: MockBatchNotLatestError,
 }));
 vi.mock("@/services/logs/calculateTotalBpi", () => ({
   calculateTotalBpi: (...a: unknown[]) => calculateTotalBpiMock(...a),
@@ -211,9 +217,21 @@ describe("handleBatchDelete", () => {
     expect(result).toMatchObject({ ok: false, status: 404 });
   });
 
+  it("最新バッチでなければ err(400)", async () => {
+    authenticateViewerMock.mockResolvedValue("u1");
+    findBatchByIdAndUserMock.mockResolvedValue({ batchId: "b1", version: "31" });
+    getLatestBatchIdMock.mockResolvedValue("b2");
+    const { result } = await handleBatchDelete(
+      req({ userId: "u1", batchId: "b1" }),
+    );
+    expect(result).toMatchObject({ ok: false, status: 400 });
+    expect(deleteBatchMock).not.toHaveBeenCalled();
+  });
+
   it("正常時は削除して ok", async () => {
     authenticateViewerMock.mockResolvedValue("u1");
-    findBatchByIdAndUserMock.mockResolvedValue({ batchId: "b1" });
+    findBatchByIdAndUserMock.mockResolvedValue({ batchId: "b1", version: "31" });
+    getLatestBatchIdMock.mockResolvedValue("b1");
     deleteBatchMock.mockResolvedValue(undefined);
     const { result } = await handleBatchDelete(
       req({ userId: "u1", batchId: "b1" }),
@@ -222,7 +240,18 @@ describe("handleBatchDelete", () => {
       ok: true,
       body: { message: "Batch deleted successfully." },
     });
-    expect(deleteBatchMock).toHaveBeenCalledWith("u1", "b1");
+    expect(deleteBatchMock).toHaveBeenCalledWith("u1", "b1", "31");
+  });
+
+  it("トランザクション内の再判定で最新でなくなっていた場合(BatchNotLatestError)はerr(400)(#448)", async () => {
+    authenticateViewerMock.mockResolvedValue("u1");
+    findBatchByIdAndUserMock.mockResolvedValue({ batchId: "b1", version: "31" });
+    getLatestBatchIdMock.mockResolvedValue("b1");
+    deleteBatchMock.mockRejectedValue(new MockBatchNotLatestError());
+    const { result } = await handleBatchDelete(
+      req({ userId: "u1", batchId: "b1" }),
+    );
+    expect(result).toMatchObject({ ok: false, status: 400 });
   });
 });
 
@@ -260,6 +289,30 @@ describe("handleBatchScores", () => {
       expect(result.body).toHaveProperty("songs");
       expect(result.body).toHaveProperty("range");
     }
+  });
+
+  it("該当期間にデータが無ければ(createdAt)err(404)を返し、500にしない", async () => {
+    checkProfileAccessMock.mockResolvedValue({ hasAccess: true, viewerId: "u1" });
+    findBatchesInRangeMock.mockResolvedValue([]);
+    const { result } = await handleBatchScores(
+      req({ userId: "u1", batchId: "2024-01-01", version: "31" }),
+    );
+    expect(result).toMatchObject({ ok: false, status: 404 });
+  });
+
+  it("該当期間にデータが無ければ(lastPlayed)err(404)を返し、500にしない", async () => {
+    checkProfileAccessMock.mockResolvedValue({ hasAccess: true, viewerId: "u1" });
+    getScoreHistoryMock.mockResolvedValue([]);
+    getSongMasterWithDefMock.mockResolvedValue([]);
+    const { result } = await handleBatchScores(
+      req({
+        userId: "u1",
+        batchId: "2024-01-01",
+        version: "31",
+        groupedBy: "lastPlayed",
+      }),
+    );
+    expect(result).toMatchObject({ ok: false, status: 404 });
   });
 });
 

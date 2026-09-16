@@ -7,7 +7,7 @@ import {
 import { useRouter } from "next/router";
 import DailyBatchNotice from "../DailyBatchNotice/ui";
 import { BatchSummaryCards } from "../LogSummary/ui";
-import LogRank from "../LogRanking/ui";
+import LogRank from "../LogRanking";
 import BatchSongsTable from "../LogTable/ui";
 import LogNavigator from "../LogsNav/ui";
 import BatchTotalBpiCard from "../TotalBPI/ui";
@@ -228,11 +228,20 @@ const LogsDetailContent = ({
               isModalOpen ? "p-4" : "p-0",
             )}
           >
-            <LogRank details={details.songs} type="top" />
+            <LogRank
+              details={details.songs}
+              type="top"
+              userId={userId}
+              version={version}
+              onScoreSaved={() => mutate()}
+            />
             <LogRank
               isSharing={isModalOpen}
               details={details.songs}
               type="growth"
+              userId={userId}
+              version={version}
+              onScoreSaved={() => mutate()}
             />
           </div>
           {overtakenSongs && overtakenSongs.length > 0 && (
@@ -241,6 +250,9 @@ const LogsDetailContent = ({
                 isSharing={isModalOpen}
                 details={details.songs}
                 type="overtake"
+                userId={userId}
+                version={version}
+                onScoreSaved={() => mutate()}
               />
             </div>
           )}
@@ -250,6 +262,9 @@ const LogsDetailContent = ({
                 isSharing={isModalOpen}
                 details={details.songs}
                 type="versionOvertake"
+                userId={userId}
+                version={version}
+                onScoreSaved={() => mutate()}
               />
             </div>
           )}
@@ -264,6 +279,7 @@ const LogsDetailContent = ({
             userId={userId}
             version={version}
             listRef={listRef}
+            onScoreSaved={() => mutate()}
           />
         </TabsContent>
       </Tabs>
@@ -273,6 +289,7 @@ const LogsDetailContent = ({
           userId={userId ?? ""}
           batchId={batchId ?? ""}
           version={version ?? ""}
+          isLatest={!details.pagination.next}
         />
       )}
     </div>

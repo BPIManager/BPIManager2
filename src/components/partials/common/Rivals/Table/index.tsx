@@ -13,7 +13,7 @@ import { NoDataAlert } from "@/components/partials/common/DashBoard/NoData";
 import { LoginRequiredCard } from "@/components/partials/common/Auth/LoginRequired/ui";
 import CustomPagination from "@/components/partials/common/ListControls/Pagination/ui";
 import AdvancedFilterModal from "@/components/partials/common/Songs/AdvancedFilter/ui";
-import SongDetailView from "@/components/partials/modal/SongDetail/ui";
+import SongDetailView from "@/components/partials/modal/SongDetail";
 import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
 import RivalSongItem from "./ui";
 import RivalAnalysis from "@/components/partials/common/Rivals/Analysis/ui";
@@ -74,7 +74,7 @@ const RivalSongsTable = ({
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
   const [subTab, setSubTab] = useState<SubTab>("list");
 
-  const { songs, error, isLoading } = useRivalBothScores(
+  const { songs, error, isLoading, currentVersion, refresh } = useRivalBothScores(
     myUserId,
     rivalUserId,
     version,
@@ -158,6 +158,10 @@ const RivalSongsTable = ({
           song={selectedSong}
           isOpen={isDetailOpen}
           onClose={() => setIsDetailOpen(false)}
+          userId={myUserId}
+          version={currentVersion}
+          songDomain="bpi"
+          onSaved={() => refresh()}
         />
       )}
 

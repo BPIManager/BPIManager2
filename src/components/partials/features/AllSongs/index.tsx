@@ -7,7 +7,7 @@ import { SongWithScore } from "@/types/songs/score";
 import SongFilterBar from "@/components/partials/common/Songs/Filter/ui";
 import AdvancedFilterModal from "@/components/partials/common/Songs/AdvancedFilter/ui";
 import { AllSongList } from "./Table";
-import SongDetailView from "@/components/partials/modal/SongDetail/ui";
+import SongDetailView from "@/components/partials/modal/SongDetail";
 import { NoDataAlert } from "@/components/partials/common/DashBoard/NoData";
 import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
 import { useAllScores } from "@/hooks/allScores/useAllScores";
@@ -30,7 +30,7 @@ const AllSongsTable = ({
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
 
-  const { songs, error, isLoading, currentVersion } = useAllScores(
+  const { songs, error, isLoading, currentVersion, refresh } = useAllScores(
     userId,
     version,
   );
@@ -135,6 +135,10 @@ const AllSongsTable = ({
           song={selected}
           isOpen={isDetailOpen}
           onClose={() => setIsDetailOpen(false)}
+          userId={userId}
+          version={currentVersion}
+          songDomain="allSongs"
+          onSaved={() => refresh()}
         />
       )}
 
