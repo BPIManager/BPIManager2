@@ -7,7 +7,7 @@ import {
 import { useRouter } from "next/router";
 import DailyBatchNotice from "../DailyBatchNotice/ui";
 import { BatchSummaryCards } from "../LogSummary/ui";
-import LogRank from "../LogRanking/ui";
+import LogRank from "../LogRanking";
 import BatchSongsTable from "../LogTable/ui";
 import LogNavigator from "../LogsNav/ui";
 import BatchTotalBpiCard from "../TotalBPI/ui";

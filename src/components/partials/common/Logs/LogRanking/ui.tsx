@@ -1,4 +1,4 @@
-﻿import { Switch } from "@/components/ui/switch";
+import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -9,152 +9,92 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import RankItem from "./item";
-import { useLogRank } from "@/hooks/batches/useLogRank";
-import { useMemo, useState } from "react";
 import SongDetailView from "@/components/partials/modal/SongDetail";
 import OvertakeRankItem from "../LogOvertaken/item";
 import VersionOvertakeRankItem from "../LogVersionOvertaken/item";
 import type { BatchDetailItem } from "@/types/logs/batchDetail";
-import { SongWithScore } from "@/types/songs/score";
-import { LabelWithTooltip } from "../LogSummary/ui";
+import type { SongWithScore } from "@/types/songs/score";
 import { cn } from "@/lib/utils";
-import { Swords, TrendingUp, Trophy } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import type { ReactNode } from "react";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
-const LogRank = ({
-  details,
-  type,
-  isSharing,
-  userId,
-  version,
-  onScoreSaved,
-}: {
-  details: BatchDetailItem[];
-  type: "growth" | "top" | "overtake" | "versionOvertake";
-  isSharing?: boolean;
+export interface FilterOption {
+  value: string;
+  label: string;
+  count: number;
+}
+
+interface FilterSelect {
+  value: string;
+  onChange: (v: string) => void;
+  allCount: number;
+  options: FilterOption[];
+}
+
+interface DetailModalProps {
+  song: SongWithScore | null;
+  isOpen: boolean;
+  onClose: () => void;
   userId?: string;
   version?: string;
-  /** モーダル上でのEXスコア手動保存が成功した際に呼ばれる */
-  onScoreSaved?: () => void;
-}) => {
+  onSaved?: () => void;
+}
+
+interface LogRankViewProps {
+  type: "growth" | "top" | "overtake" | "versionOvertake";
+  isSharing?: boolean;
+  config: { title: ReactNode; icon: LucideIcon; accentColor: string };
+  hideNew: { visible: boolean; value: boolean; onChange: (v: boolean) => void };
+  newOnly: { visible: boolean; value: boolean; onChange: (v: boolean) => void };
+  rivalFilter?: FilterSelect;
+  versionFilter?: FilterSelect;
+  visibleSongs: BatchDetailItem[];
+  onItemClick: (item: BatchDetailItem) => void;
+  pagination: { hasMore: boolean; remainingCount: number; onLoadMore: () => void };
+  detailModal: DetailModalProps;
+}
+
+const FilterSelectField = ({ filter }: { filter: FilterSelect }) => {
   const { t, tFormat } = useTranslation();
-  const [selectedSong, setSelectedSong] = useState<SongWithScore | null>(null);
-  const [isDetailOpen, setIsDetailOpen] = useState<boolean>(false);
-  const [selectedRivalId, setSelectedRivalId] = useState<string>("");
-  const [selectedTargetVersion, setSelectedTargetVersion] =
-    useState<string>("");
-  const [newOnly, setNewOnly] = useState<boolean>(false);
+  return (
+    <Select
+      value={filter.value}
+      onValueChange={(v) => filter.onChange(v === "all" ? "" : v)}
+    >
+      <SelectTrigger className="h-8 w-full text-xs bg-bpim-surface-2 border-bpim-border text-bpim-text">
+        <SelectValue placeholder={t("logs.rank.all")} />
+      </SelectTrigger>
+      <SelectContent className="bg-bpim-surface-2 border-bpim-border text-bpim-text">
+        <SelectItem value="all" className="text-xs">
+          {t("logs.rank.all")}
+          {tFormat("logs.rank.countSuffix", { count: filter.allCount })}
+        </SelectItem>
+        {filter.options.map((o) => (
+          <SelectItem key={o.value} value={o.value} className="text-xs">
+            {o.label}
+            {tFormat("logs.rank.countSuffix", { count: o.count })}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+};
 
-  const RANK_CONFIG = {
-    growth: {
-      title: t("logs.rank.growth.title"),
-      icon: TrendingUp,
-      accentColor: "text-bpim-success",
-    },
-    top: {
-      title: t("logs.rank.top.title"),
-      icon: Trophy,
-      accentColor: "text-yellow-400",
-    },
-    overtake: {
-      title: (
-        <LabelWithTooltip
-          label={t("logs.rank.overtake.title")}
-          isSharing={false}
-          tooltipText={t("logs.rank.overtake.tooltip")}
-        />
-      ),
-      icon: Swords,
-      accentColor: "text-bpim-warning",
-    },
-    versionOvertake: {
-      title: (
-        <LabelWithTooltip
-          label={t("logs.rank.versionOvertake.title")}
-          isSharing={false}
-          tooltipText={t("logs.rank.versionOvertake.tooltip")}
-        />
-      ),
-      icon: Swords,
-      accentColor: "text-bpim-warning",
-    },
-  };
-
-  const config = RANK_CONFIG[type];
-
-  const allRivals = useMemo(() => {
-    if (type !== "overtake") return [];
-    const map = new Map<string, string>();
-    for (const d of details) {
-      for (const r of d.overtaken ?? []) {
-        map.set(r.rivalUserId, r.rivalName);
-      }
-    }
-    return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
-  }, [details, type]);
-
-  const allTargetVersions = useMemo(() => {
-    if (type !== "versionOvertake") return [];
-    const map = new Map<string, string>();
-    for (const d of details) {
-      for (const v of d.versionOvertaken ?? []) {
-        map.set(v.targetVersion, v.targetVersionLabel);
-      }
-    }
-    return Array.from(map.entries())
-      .map(([targetVersion, label]) => ({ targetVersion, label }))
-      .sort((a, b) => Number(b.targetVersion) - Number(a.targetVersion));
-  }, [details, type]);
-
-  const filteredDetails = useMemo(() => {
-    if (type === "overtake" && selectedRivalId) {
-      return details.map((d) => ({
-        ...d,
-        overtaken: (d.overtaken ?? []).filter(
-          (r) => r.rivalUserId === selectedRivalId,
-        ),
-      }));
-    }
-    if (type === "versionOvertake" && selectedTargetVersion) {
-      return details.map((d) => ({
-        ...d,
-        versionOvertaken: (d.versionOvertaken ?? []).filter(
-          (v) => v.targetVersion === selectedTargetVersion,
-        ),
-      }));
-    }
-    return details;
-  }, [details, type, selectedRivalId, selectedTargetVersion]);
-
-  const {
-    visibleSongs,
-    hasMore,
-    remainingCount,
-    loadMore,
-    hideNewRecords,
-    setHideNewRecords,
-    setDisplayLimit,
-  } = useLogRank(filteredDetails, type);
-
-  const handleOpenDetail = (item: BatchDetailItem) => {
-    const mappedSong = {
-      ...item,
-      logId: null,
-      scoreAt: null,
-      bpm: item.bpm ?? null,
-      releasedVersion: item.releasedVersion ?? null,
-      wrScore: item.wrScore ?? null,
-      kaidenAvg: item.kaidenAvg ?? null,
-      coef: item.coef ?? null,
-      exScore: item.current.exScore,
-      bpi: item.current.bpi,
-      clearState: item.current.clearState,
-      missCount: item.current.missCount,
-    };
-    setSelectedSong(mappedSong);
-    setIsDetailOpen(true);
-  };
-
+const LogRankView = ({
+  type,
+  isSharing,
+  config,
+  hideNew,
+  newOnly,
+  rivalFilter,
+  versionFilter,
+  visibleSongs,
+  onItemClick,
+  pagination,
+  detailModal,
+}: LogRankViewProps) => {
+  const { t, tFormat } = useTranslation();
   const Icon = config.icon;
 
   return (
@@ -167,83 +107,31 @@ const LogRank = ({
           </div>
         </div>
 
-        {type !== "top" && type !== "versionOvertake" && !isSharing && (
+        {hideNew.visible && (
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-bold text-bpim-muted">
               {t("logs.rank.hideNew")}
             </span>
-            <Switch
-              checked={hideNewRecords}
-              onCheckedChange={(checked) => {
-                setHideNewRecords(checked);
-                setDisplayLimit(5);
-              }}
-            />
+            <Switch checked={hideNew.value} onCheckedChange={hideNew.onChange} />
           </div>
         )}
 
-        {type === "versionOvertake" && !isSharing && (
+        {newOnly.visible && (
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-bold text-bpim-muted">
               {t("logs.rank.versionOvertake.newOnly")}
             </span>
-            <Switch checked={newOnly} onCheckedChange={setNewOnly} />
+            <Switch checked={newOnly.value} onCheckedChange={newOnly.onChange} />
           </div>
         )}
       </div>
 
-      {type === "overtake" && allRivals.length > 0 && (
-        <Select
-          value={selectedRivalId}
-          onValueChange={(v) => {
-            const isAll = v === "all";
-            setSelectedRivalId(isAll ? "" : v);
-            setDisplayLimit(isAll ? 5 : 99999);
-          }}
-        >
-          <SelectTrigger className="h-8 w-full text-xs bg-bpim-surface-2 border-bpim-border text-bpim-text">
-            <SelectValue placeholder={t("logs.rank.all")} />
-          </SelectTrigger>
-          <SelectContent className="bg-bpim-surface-2 border-bpim-border text-bpim-text">
-            <SelectItem value="all" className="text-xs">
-              {t("logs.rank.all")}{tFormat("logs.rank.countSuffix", { count: details.filter((d) => (d.overtaken ?? []).length > 0).length })}
-            </SelectItem>
-            {allRivals.map((r) => (
-              <SelectItem key={r.id} value={r.id} className="text-xs">
-                {r.name}{tFormat("logs.rank.countSuffix", { count: details.filter((d) => (d.overtaken ?? []).some((o) => o.rivalUserId === r.id)).length })}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      {rivalFilter && rivalFilter.options.length > 0 && (
+        <FilterSelectField filter={rivalFilter} />
       )}
 
-      {type === "versionOvertake" && allTargetVersions.length > 0 && (
-        <Select
-          value={selectedTargetVersion}
-          onValueChange={(v) => {
-            const isAll = v === "all";
-            setSelectedTargetVersion(isAll ? "" : v);
-            setDisplayLimit(isAll ? 5 : 99999);
-          }}
-        >
-          <SelectTrigger className="h-8 w-full text-xs bg-bpim-surface-2 border-bpim-border text-bpim-text">
-            <SelectValue placeholder={t("logs.rank.all")} />
-          </SelectTrigger>
-          <SelectContent className="bg-bpim-surface-2 border-bpim-border text-bpim-text">
-            <SelectItem value="all" className="text-xs">
-              {t("logs.rank.all")}{tFormat("logs.rank.countSuffix", { count: details.filter((d) => (d.versionOvertaken ?? []).length > 0).length })}
-            </SelectItem>
-            {allTargetVersions.map((v) => (
-              <SelectItem
-                key={v.targetVersion}
-                value={v.targetVersion}
-                className="text-xs"
-              >
-                {v.label}{tFormat("logs.rank.countSuffix", { count: details.filter((d) => (d.versionOvertaken ?? []).some((o) => o.targetVersion === v.targetVersion)).length })}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      {versionFilter && versionFilter.options.length > 0 && (
+        <FilterSelectField filter={versionFilter} />
       )}
 
       <div className="flex flex-col overflow-hidden rounded-xl border border-bpim-border bg-bpim-bg">
@@ -255,15 +143,12 @@ const LogRank = ({
           visibleSongs.map((item, index) => (
             <div key={item.songId}>
               {type === "overtake" ? (
-                <OvertakeRankItem
-                  item={item}
-                  onClick={() => handleOpenDetail(item)}
-                />
+                <OvertakeRankItem item={item} onClick={() => onItemClick(item)} />
               ) : type === "versionOvertake" ? (
                 <VersionOvertakeRankItem
                   item={item}
-                  showAllDiffs={!newOnly}
-                  onClick={() => handleOpenDetail(item)}
+                  showAllDiffs={!newOnly.value}
+                  onClick={() => onItemClick(item)}
                 />
               ) : (
                 <RankItem
@@ -271,7 +156,7 @@ const LogRank = ({
                   item={item}
                   rank={index + 1}
                   type={type}
-                  onClick={() => handleOpenDetail(item)}
+                  onClick={() => onItemClick(item)}
                 />
               )}
               {index !== visibleSongs.length - 1 && (
@@ -282,30 +167,30 @@ const LogRank = ({
         )}
       </div>
 
-      {hasMore && (
+      {pagination.hasMore && (
         <Button
           variant="ghost"
           size="sm"
           className="text-bpim-muted hover:bg-bpim-overlay/50 hover:text-bpim-text"
-          onClick={loadMore}
+          onClick={pagination.onLoadMore}
         >
-          {tFormat("logs.rank.loadMore", { count: remainingCount })}
+          {tFormat("logs.rank.loadMore", { count: pagination.remainingCount })}
         </Button>
       )}
 
-      {selectedSong && (
+      {detailModal.song && (
         <SongDetailView
-          song={selectedSong}
-          isOpen={isDetailOpen}
-          onClose={() => setIsDetailOpen(false)}
-          userId={userId}
-          version={version}
+          song={detailModal.song}
+          isOpen={detailModal.isOpen}
+          onClose={detailModal.onClose}
+          userId={detailModal.userId}
+          version={detailModal.version}
           songDomain="bpi"
-          onSaved={onScoreSaved}
+          onSaved={detailModal.onSaved}
         />
       )}
     </div>
   );
 };
 
-export default LogRank;
+export default LogRankView;
