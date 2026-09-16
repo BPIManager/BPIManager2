@@ -261,6 +261,24 @@ export const logsTranslations = {
     "zh-TW": "顯示在取得此分數瞬間超越的對手。（即使之後被對手反超，此次的更新結果也不會改變）",
     ko: "이 스코어를 달성한 순간 라이벌을 앞선 결과를 표시합니다. (이후 라이벌에게 역전당해도 이 업데이트 결과는 변하지 않습니다)",
   },
+  "logs.rank.versionOvertake.title": {
+    ja: "過去の自分に勝利",
+    en: "Past Self Overtaken",
+    "zh-TW": "超越過去的自己",
+    ko: "과거의 나를 역전",
+  },
+  "logs.rank.versionOvertake.tooltip": {
+    ja: "この期間にプレイした楽曲について、他バージョンでの自分のスコアとの差分を勝敗問わず表示しています。「新規勝ち越しのみ表示」をオンにすると、このスコアを出した瞬間に新たに上回ったものだけに絞り込みます（その後に更新されても、この時の判定結果は変わりません）。",
+    en: "Shows diffs against your own scores in other versions for songs played in this period, win or lose. Turn on \"New wins only\" to narrow down to versions you newly surpassed at the moment this score was recorded (not affected by later updates).",
+    "zh-TW": "顯示此期間內遊玩樂曲與其他版本自己分數的差異，無論勝負。開啟「僅顯示新超越」可篩選為僅顯示取得此分數瞬間新超越的版本（即使之後有更新，此判定結果也不會改變）。",
+    ko: "이 기간에 플레이한 곡에 대해 다른 버전의 자신의 스코어와의 차이를 승패와 관계없이 표시합니다. \"신규 역전만 표시\"를 켜면 이 스코어를 달성한 순간 새로 앞선 것만으로 좁힙니다 (이후 업데이트되어도 이 판정 결과는 변하지 않습니다).",
+  },
+  "logs.rank.versionOvertake.newOnly": {
+    ja: "新規勝ち越しのみ表示",
+    en: "New wins only",
+    "zh-TW": "僅顯示新超越",
+    ko: "신규 역전만 표시",
+  },
   "logs.rank.hideNew": {
     ja: "新規除外",
     en: "Exclude New",

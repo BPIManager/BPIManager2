@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { SongWithScore } from "@/types/songs/score";
 import { useSongFilter } from "@/hooks/table/useSongFilter";
+import { useMergedCompareSongs } from "@/hooks/table/useMergedCompareSongs";
 import SongFilterBar from "@/components/partials/common/Songs/Filter/ui";
 import SongList from "./ui";
 import CustomPagination from "@/components/partials/common/ListControls/Pagination/ui";
@@ -49,48 +50,12 @@ const SongsTable = ({
     params.compareVersion,
   );
 
-  const mergedSongs = useMemo(() => {
-    if (
-      !songs ||
-      !compareData ||
-      !params.compareVersion ||
-      params.compareVersion === "none"
-    ) {
-      return songs;
-    }
-    const compareMap = new Map(
-      compareData.map((s) => [`${s.songId}-${s.difficulty}`, s]),
-    );
-    return songs.map((song) => {
-      const key = `${song.songId}-${song.difficulty}`;
-      const cmp = compareMap.get(key);
-      if (!cmp) return song;
-      const prevEx = cmp.rival?.exScore ?? null;
-      const prevBpi = cmp.rival?.bpi ?? null;
-      return {
-        ...song,
-        rival: cmp.rival ?? null,
-        exDiff:
-          song.exScore !== null && prevEx !== null
-            ? song.exScore - prevEx
-            : undefined,
-        bpiDiff:
-          song.bpi !== null && prevBpi !== null
-            ? Math.round((song.bpi - prevBpi) * 100) / 100
-            : undefined,
-      };
-    });
-  }, [songs, compareData, params.compareVersion]);
-
-  const mergedVisible = useMemo(() => {
-    if (!mergedSongs) return rawVisible;
-    const mergedMap = new Map(
-      mergedSongs.map((s) => [`${s.songId}-${s.difficulty}`, s]),
-    );
-    return rawVisible.map(
-      (s) => mergedMap.get(`${s.songId}-${s.difficulty}`) ?? s,
-    );
-  }, [rawVisible, mergedSongs]);
+  const { mergedVisible } = useMergedCompareSongs(
+    songs,
+    rawVisible,
+    compareData,
+    params.compareVersion,
+  );
 
   if (!isLoading && (error || !songs)) {
     return <FetchErrorState error={error} />;

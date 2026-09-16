@@ -1,5 +1,6 @@
 import { allScoresAggregateRepo } from "@/lib/db/aggregates/allScores";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
+import { radarLookup } from "@/lib/subhandlers/scores/_shared";
 import { accessError, err, ok } from "@/middlewares/api/apiResult";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 import type { NextApiRequest } from "next";
@@ -30,7 +31,7 @@ export async function handleAllScoresList(
       };
     }
 
-    const results = await allScoresAggregateRepo.getAllScoresList(
+    const rawResults = await allScoresAggregateRepo.getAllScoresList(
       targetUserId,
       {
         search: req.query.search as string,
@@ -39,12 +40,17 @@ export async function handleAllScoresList(
         clearStates: req.query.clearStates as string,
         sortKey: (req.query.sortKey as string) ?? "level",
         sortOrder: (req.query.sortOrder as string) ?? "desc",
+        version: req.query.version as string | undefined,
       },
     );
 
+    const results = rawResults.map((song) => ({
+      ...song,
+      radarTop: radarLookup.get(`${song.title}__${song.difficulty}`) ?? null,
+    }));
+
     return {
-      result:
-        results && results.length > 0 ? ok(results) : err(404, "No data found"),
+      result: ok(results),
       targetUserId,
       viewerId: access.viewerId ?? null,
     };

@@ -36,6 +36,12 @@ interface SongFilterBarProps {
   withSelfCompare?: boolean;
   withScoreRate?: boolean;
   currentVersion?: string;
+  /** LEVELチェックボックスの選択肢（既定: ☆11/12。全曲ページでは☆1〜12を渡す） */
+  levelItems?: number[];
+  /** DIFFICULTYチェックボックスの選択肢（既定: HYPER/ANOTHER/LEGGENDARIA。全曲ページではBEGINNER/NORMALも渡す） */
+  difficultyItems?: string[];
+  /** ソート選択肢から除外するsortKey（BPI算出対象外の全曲ページで"bpi"を除く場合等） */
+  excludeSortKeys?: string[];
 }
 
 const SongFilterBar = ({
@@ -48,6 +54,9 @@ const SongFilterBar = ({
   withSelfCompare = false,
   withScoreRate = false,
   currentVersion,
+  levelItems = [11, 12],
+  difficultyItems = IIDX_DIFFICULTIES,
+  excludeSortKeys = [],
 }: SongFilterBarProps) => {
   const { t } = useTranslation();
   const router = useRouter();
@@ -75,12 +84,16 @@ const SongFilterBar = ({
           ...(withScoreRate ? translateOpts([scoreRateSortOption]) : []),
           ...translateOpts(sortOptions),
         ];
-    if (hasCompare) return [...base];
-    return base;
+    const filtered =
+      excludeSortKeys.length > 0
+        ? base.filter((o) => !excludeSortKeys.includes(o.value))
+        : base;
+    if (hasCompare) return [...filtered];
+    return filtered;
     // translateOptsは毎レンダー再生成される関数だが、その挙動はt(依存に含めている)
     // だけで決まるため、関数自体を依存に含めると無意味な再計算を招くので除外する
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [withRivals, withScoreRate, hasCompare, t]);
+  }, [withRivals, withScoreRate, hasCompare, excludeSortKeys, t]);
 
   return (
     <FilterBarContainer totalCount={totalCount}>
@@ -157,7 +170,7 @@ const SongFilterBar = ({
       <div className="flex gap-6 flex-wrap items-center">
         <FilterCheckboxGroup
           label="LEVEL"
-          items={[11, 12]}
+          items={levelItems}
           selected={params.levels}
           onToggle={(v) =>
             onParamsChange({ levels: toggleArrayItem(params.levels, v) })
@@ -166,7 +179,7 @@ const SongFilterBar = ({
         />
         <FilterCheckboxGroup
           label="DIFFICULTY"
-          items={IIDX_DIFFICULTIES}
+          items={difficultyItems}
           selected={params.difficulties}
           onToggle={(v) =>
             onParamsChange({

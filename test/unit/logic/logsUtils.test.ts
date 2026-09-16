@@ -30,6 +30,7 @@ const baseItem: BatchDetailItem = {
   previous: null,
   diff: { exScore: 0, bpi: 0 },
   overtaken: [],
+  versionOvertaken: [],
 };
 
 describe("getBpiDistribution", () => {

@@ -13,6 +13,7 @@ import { useLogRank } from "@/hooks/batches/useLogRank";
 import { useMemo, useState } from "react";
 import SongDetailView from "@/components/partials/modal/SongDetail/ui";
 import OvertakeRankItem from "../LogOvertaken/item";
+import VersionOvertakeRankItem from "../LogVersionOvertaken/item";
 import type { BatchDetailItem } from "@/types/logs/batchDetail";
 import { SongWithScore } from "@/types/songs/score";
 import { LabelWithTooltip } from "../LogSummary/ui";
@@ -26,13 +27,14 @@ const LogRank = ({
   isSharing,
 }: {
   details: BatchDetailItem[];
-  type: "growth" | "top" | "overtake";
+  type: "growth" | "top" | "overtake" | "versionOvertake";
   isSharing?: boolean;
 }) => {
   const { t, tFormat } = useTranslation();
   const [selectedSong, setSelectedSong] = useState<SongWithScore | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState<boolean>(false);
   const [selectedRivalId, setSelectedRivalId] = useState<string>("");
+  const [newOnly, setNewOnly] = useState<boolean>(false);
 
   const RANK_CONFIG = {
     growth: {
@@ -51,6 +53,17 @@ const LogRank = ({
           label={t("logs.rank.overtake.title")}
           isSharing={false}
           tooltipText={t("logs.rank.overtake.tooltip")}
+        />
+      ),
+      icon: Swords,
+      accentColor: "text-bpim-warning",
+    },
+    versionOvertake: {
+      title: (
+        <LabelWithTooltip
+          label={t("logs.rank.versionOvertake.title")}
+          isSharing={false}
+          tooltipText={t("logs.rank.versionOvertake.tooltip")}
         />
       ),
       icon: Swords,
@@ -122,7 +135,7 @@ const LogRank = ({
           </div>
         </div>
 
-        {type !== "top" && !isSharing && (
+        {type !== "top" && type !== "versionOvertake" && !isSharing && (
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-bold text-bpim-muted">
               {t("logs.rank.hideNew")}
@@ -134,6 +147,15 @@ const LogRank = ({
                 setDisplayLimit(5);
               }}
             />
+          </div>
+        )}
+
+        {type === "versionOvertake" && !isSharing && (
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-bold text-bpim-muted">
+              {t("logs.rank.versionOvertake.newOnly")}
+            </span>
+            <Switch checked={newOnly} onCheckedChange={setNewOnly} />
           </div>
         )}
       </div>
@@ -174,6 +196,12 @@ const LogRank = ({
               {type === "overtake" ? (
                 <OvertakeRankItem
                   item={item}
+                  onClick={() => handleOpenDetail(item)}
+                />
+              ) : type === "versionOvertake" ? (
+                <VersionOvertakeRankItem
+                  item={item}
+                  showAllDiffs={!newOnly}
                   onClick={() => handleOpenDetail(item)}
                 />
               ) : (

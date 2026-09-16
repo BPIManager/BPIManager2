@@ -2,6 +2,7 @@ import { BpiCalculator } from "@/lib/bpi";
 import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
+import { radarLookup } from "@/lib/subhandlers/scores/_shared";
 import type { HandlerResult } from "@/types/api";
 import type { AaaQuery } from "./_shared";
 
@@ -57,6 +58,7 @@ export async function handleStatsAaaDifficulty(
         notes: song.notes,
         releasedVersion: song.releasedVersion,
         maxScore,
+        radarTop: radarLookup.get(`${song.title}__${song.difficulty}`) ?? null,
         targets: {
           aaa: {
             exScore: aaaTarget,

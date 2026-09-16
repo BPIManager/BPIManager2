@@ -72,16 +72,19 @@ describe("handleAllScoresList", () => {
     const { result, targetUserId, viewerId } = await handleAllScoresList(
       req({ userId: "target" }),
     );
-    expect(result).toEqual({ ok: true, body: [{ songId: 1 }] });
+    expect(result).toEqual({
+      ok: true,
+      body: [{ songId: 1, radarTop: null }],
+    });
     expect(targetUserId).toBe("target");
     expect(viewerId).toBe("target");
   });
 
-  it("結果が空なら err(404)", async () => {
+  it("結果が空でもok([])を返す(バージョン切り替え時に空配列をエラー扱いしない)", async () => {
     checkProfileAccessMock.mockResolvedValue(grant("target"));
     getAllScoresListMock.mockResolvedValue([]);
     const { result } = await handleAllScoresList(req({ userId: "target" }));
-    expect(result).toMatchObject({ ok: false, status: 404 });
+    expect(result).toEqual({ ok: true, body: [] });
   });
 
   it("リポジトリが投げたら err(500)", async () => {

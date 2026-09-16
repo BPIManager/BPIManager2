@@ -1,7 +1,9 @@
 import { ALL_DIFFICULTIES } from "@/constants/iidx/songLevels";
 import { db } from "@/lib/db";
-import { AllDifficulties, AllSongWithScore } from "@/types/songs/allSongs";
+import { AllDifficulties } from "@/types/songs/allSongs";
+import { SongWithScore } from "@/types/songs/score";
 import {
+  correlatedLatestLogId,
   latestLogIdPerSongSubquery,
   latestLogIdPerUserSongScalarSubquery,
 } from "@/lib/db/shared/latestScore";
@@ -30,6 +32,7 @@ class AllScoresAggregateRepository {
    * @param params.clearStates - カンマ区切りのクリア種別（例: `"CLEAR,HARD CLEAR"`）
    * @param params.sortKey - ソートキー（`"level"` | `"title"` | `"exScore"` | `"updatedAt"` | `"clearState"`）
    * @param params.sortOrder - ソート方向（`"asc"` | `"desc"`）
+   * @param params.version - 対象バージョン（省略時はバージョン絞り込みなし＝全バージョン中の最新スコア）
    * @returns スコア情報付きの楽曲リスト
    */
   async getAllScoresList(
@@ -41,6 +44,7 @@ class AllScoresAggregateRepository {
       clearStates: string;
       sortKey: string;
       sortOrder: string;
+      version?: string;
     },
   ) {
     const {
@@ -50,6 +54,7 @@ class AllScoresAggregateRepository {
       clearStates,
       sortKey = "level",
       sortOrder = "desc",
+      version,
     } = params;
 
     let query = db
@@ -58,6 +63,7 @@ class AllScoresAggregateRepository {
         latestLogIdPerSongSubquery({
           table: "allScores",
           userId,
+          version,
         }).as("latest"),
         (join) => join.onRef("latest.songId", "=", "s.songId"),
       )
@@ -136,22 +142,138 @@ class AllScoresAggregateRepository {
 
     const rows = await query.execute();
 
-    const results: AllSongWithScore[] = rows.map((r) => ({
+    const results: SongWithScore[] = rows.map((r) => ({
       songId: r.songId,
       title: r.title,
       notes: r.notes,
       bpm: r.bpm ?? null,
-      difficulty: r.difficulty as AllSongWithScore["difficulty"],
+      difficulty: r.difficulty as AllDifficulties,
       difficultyLevel: r.difficultyLevel,
-      releasedVersion: r.releasedVersion ?? null,
+      // allSongs.releasedVersionはDB上varchar(3)（songs側はint）のため、
+      // フロントの「楽曲バージョン」フィルタ(数値配列との完全一致)に
+      // 合わせて明示的にNumberへキャストする
+      releasedVersion: r.releasedVersion ? Number(r.releasedVersion) : null,
       logId: r.logId ?? null,
       exScore: r.exScore ?? null,
       clearState: r.clearState ?? null,
       missCount: r.missCount ?? null,
-      lastPlayed: r.lastPlayed ?? null,
+      scoreAt: r.lastPlayed ?? null,
+      kaidenAvg: null,
+      wrScore: null,
     }));
 
     return results;
+  }
+
+  /**
+   * 全難易度楽曲について、`currentVersion`時点のスコアと`targetVersion`時点の
+   * スコアを比較する。`/my/[version]`の`getSelfVersionScores`
+   * （`songs`/`scores`テーブル対象）と同一の相関サブクエリパターンを
+   * `allSongs`/`allScores`テーブル向けに適用する。
+   * ☆10以下含む全曲がBPI算出対象外のため、BPI差分は扱わずexScore差分のみ返す。
+   *
+   * @param params.userId - 対象ユーザーID
+   * @param params.currentVersion - 表示中バージョン
+   * @param params.targetVersion - 比較対象バージョン
+   * @returns `currentVersion`時点・`targetVersion`時点のスコアを併記した楽曲リスト
+   */
+  async getSelfVersionScores(params: {
+    userId: string;
+    currentVersion: string;
+    targetVersion: string;
+  }) {
+    const { userId, currentVersion, targetVersion } = params;
+
+    const rows = await db
+      .selectFrom("allSongs as s")
+      .leftJoin("allScores as cur", (join) =>
+        join
+          .onRef("cur.songId", "=", "s.songId")
+          .on("cur.userId", "=", userId)
+          .on("cur.version", "=", currentVersion)
+          .on("cur.logId", "=", (eb) =>
+            correlatedLatestLogId(eb, {
+              table: "allScores",
+              alias: "c2",
+              songIdRef: "s.songId",
+              version: currentVersion,
+              userId,
+            }),
+          ),
+      )
+      .leftJoin("allScores as prev", (join) =>
+        join
+          .onRef("prev.songId", "=", "s.songId")
+          .on("prev.userId", "=", userId)
+          .on("prev.version", "=", targetVersion)
+          .on("prev.logId", "=", (eb) =>
+            correlatedLatestLogId(eb, {
+              table: "allScores",
+              alias: "p2",
+              songIdRef: "s.songId",
+              version: targetVersion,
+              userId,
+            }),
+          ),
+      )
+      .select([
+        "s.songId",
+        "s.title",
+        "s.notes",
+        "s.bpm",
+        "s.difficulty",
+        "s.difficultyLevel",
+        "s.releasedVersion",
+        "cur.exScore as myExScore",
+        "cur.clearState as myClearState",
+        "cur.missCount as myMissCount",
+        "cur.lastPlayed as myLastPlayed",
+        "prev.exScore as prevExScore",
+        "prev.clearState as prevClearState",
+        "prev.missCount as prevMissCount",
+        "prev.lastPlayed as prevLastPlayed",
+      ])
+      .where((eb) => eb.or([eb("s.deletedAt", "is", null)]))
+      .where((eb) =>
+        eb.or([
+          eb("cur.exScore", "is not", null),
+          eb("prev.exScore", "is not", null),
+        ]),
+      )
+      .orderBy("s.difficultyLevel", "desc")
+      .orderBy("s.title", "asc")
+      .execute();
+
+    return rows.map((row) => {
+      const myEx = row.myExScore ?? null;
+      const prevEx = row.prevExScore ?? null;
+
+      const result: SongWithScore = {
+        songId: row.songId,
+        title: row.title,
+        notes: row.notes,
+        bpm: row.bpm ?? null,
+        difficulty: row.difficulty as AllDifficulties,
+        difficultyLevel: row.difficultyLevel,
+        releasedVersion: row.releasedVersion ? Number(row.releasedVersion) : null,
+        logId: null,
+        exScore: myEx,
+        clearState: row.myClearState ?? null,
+        missCount: row.myMissCount ?? null,
+        scoreAt: row.myLastPlayed ?? null,
+        kaidenAvg: null,
+        wrScore: null,
+        rival: {
+          exScore: prevEx,
+          bpi: null,
+          clearState: row.prevClearState ?? null,
+          missCount: row.prevMissCount ?? null,
+          lastPlayed: row.prevLastPlayed ?? null,
+        },
+        exDiff: myEx !== null && prevEx !== null ? myEx - prevEx : undefined,
+      };
+      return result;
+    });
   }
 
   /**

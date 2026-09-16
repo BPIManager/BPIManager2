@@ -1,4 +1,3 @@
-import { IidxDifficulty } from "../iidx/difficulty";
 import { Score } from "@/types/db";
 import type { IBpiBasicSongData } from "@/types/songs/bpi";
 
@@ -28,7 +27,8 @@ export interface SongWithScore
   // 自分のスコア詳細
   logId: number | null;
   exScore: number | null;
-  bpi: number | null;
+  /** BPI算出対象外の楽曲（全曲ページの☆10以下等）ではキー自体を省略する */
+  bpi?: number | null;
   clearState: string | null;
   missCount: number | null;
   scoreAt: Date | string | null;
@@ -62,7 +62,8 @@ export interface ScoreFilterCondition {
 }
 
 export interface FilterParamsFrontend {
-  difficulties?: IidxDifficulty[];
+  /** BPI対象の`IidxDifficulty`に加え、全曲ページ用の`AllDifficulties`（BEGINNER/NORMAL）も許容する */
+  difficulties?: string[];
   levels?: number[];
   clearStates?: string[];
   versions?: number[];

@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils";
 import CustomGoalModal from "./CustomGoalModal";
 import { CustomGoalConfig, GoalType, CardDisplay } from "@/types/metrics/aaa";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import { ALL_RADAR_CATEGORIES, RADAR_COLORS } from "@/constants/iidx/radars";
 
 function useDistToGoalDraft(
   maxDiffFilter: number | undefined,
@@ -68,6 +69,7 @@ interface Props {
     onMaxDiffFilterChange: (v: number | undefined) => void;
   };
   cardDisplay: { value: CardDisplay; onChange: (v: CardDisplay) => void };
+  radar: { value: string[]; onChange: (v: string[]) => void };
 }
 
 const AAATableFilter = ({
@@ -78,6 +80,7 @@ const AAATableFilter = ({
   achievement,
   distToGoal,
   cardDisplay: cardDisplayProp,
+  radar,
 }: Props) => {
   const { value: version, onChange: onVersionChange } = versionProp;
   const { value: level, onChange: onLevelChange } = levelProp;
@@ -93,6 +96,7 @@ const AAATableFilter = ({
   const { maxDiffFilter, onMaxDiffFilterChange } = distToGoal;
   const { value: cardDisplay, onChange: onCardDisplayChange } =
     cardDisplayProp;
+  const { value: radarCategories, onChange: onRadarCategoriesChange } = radar;
   const { t } = useTranslation();
   const [modalOpen, setModalOpen] = useState(false);
   const { draftDiff, setDraftDiff, isPending } = useDistToGoalDraft(
@@ -339,6 +343,39 @@ const AAATableFilter = ({
         </RadioGroup>
       ),
     },
+    {
+      id: "radar",
+      label: t("filter.radarCategory"),
+      render: () => (
+        <div className="flex flex-wrap gap-x-4 gap-y-2">
+          {ALL_RADAR_CATEGORIES.map((cat) => {
+            const toggle = () => {
+              const next = radarCategories.includes(cat)
+                ? radarCategories.filter((c) => c !== cat)
+                : [...radarCategories, cat];
+              onRadarCategoriesChange(next);
+            };
+            return (
+              <div key={cat} className="flex items-center gap-1.5">
+                <Checkbox
+                  id={`aaa-radar-${cat}`}
+                  checked={radarCategories.includes(cat)}
+                  onCheckedChange={toggle}
+                  className="border-bpim-primary data-[state=checked]:bg-bpim-primary data-[state=checked]:border-bpim-primary"
+                />
+                <Label
+                  htmlFor={`aaa-radar-${cat}`}
+                  className="text-xs font-bold cursor-pointer"
+                  style={{ color: RADAR_COLORS[cat] }}
+                >
+                  {cat}
+                </Label>
+              </div>
+            );
+          })}
+        </div>
+      ),
+    },
   ];
 
   const renderSection = (id: string) => {
@@ -371,6 +408,7 @@ const AAATableFilter = ({
           {renderSection("distToGoal")}
           {renderSection("cardDisplay")}
         </div>
+        <div>{renderSection("radar")}</div>
       </div>
       <div className="hidden md:flex md:flex-wrap md:items-start md:gap-x-10 md:gap-y-6">
         {sections.map((section) => (
