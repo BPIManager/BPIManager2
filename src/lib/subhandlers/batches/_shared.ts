@@ -1,7 +1,9 @@
 import type { NextApiRequest } from "next";
 import { rivalRepo } from "@/lib/db/aggregates/rivalScores/rival";
+import { timelineRepo } from "@/lib/db/domains/scores/timeline";
+import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 import type { HandlerResult } from "@/types/api";
-import type { OvertakenMap } from "@/types/logs/overtaken";
+import type { OvertakenMap, VersionOvertakenMap } from "@/types/logs/overtaken";
 
 /**
  * batches ドメインの subhandler 共通型・ヘルパー。
@@ -69,4 +71,52 @@ export function createOvertakenMap(
     });
     return acc;
   }, {});
+}
+
+function createVersionOvertakenMap(
+  rows: Awaited<ReturnType<typeof timelineRepo.getVersionComparisons>>,
+): VersionOvertakenMap {
+  return rows.reduce<VersionOvertakenMap>((acc, curr) => {
+    if (!curr.songId || curr.targetScore === null || !curr.targetVersion)
+      return acc;
+    if (!acc[curr.songId]) acc[curr.songId] = [];
+    const isNewOvertake =
+      curr.myNewScore > curr.targetScore &&
+      (curr.myOldScore === null || curr.myOldScore <= curr.targetScore);
+    acc[curr.songId].push({
+      targetVersion: curr.targetVersion,
+      targetVersionLabel: getVersionNameFromNumber(curr.targetVersion),
+      targetScore: curr.targetScore,
+      myNewScore: curr.myNewScore,
+      myOldScore: curr.myOldScore,
+      diff: curr.myNewScore - curr.targetScore,
+      isNewOvertake,
+    });
+    return acc;
+  }, {});
+}
+
+/**
+ * バッチ（または期間）内で更新したスコアと、他バージョンでの自分のスコアとの
+ * 比較情報一覧を取得する。勝敗・新規追い抜きかどうかに関わらず全件返す
+ * （`isNewOvertake`で判定できる）。自分以外のログ閲覧時は空マップを返す
+ * （ライバル追い抜きと同様、他人のログでは非公開の比較情報を出さない）。
+ */
+export async function fetchVersionOvertakenMap(params: {
+  userId: string;
+  currentVersion: string;
+  isOwnLog: boolean;
+  batchId?: string;
+  range?: { start: Date; end: Date; basis: "lastPlayed" | "createdAt" };
+}): Promise<VersionOvertakenMap> {
+  const { userId, currentVersion, isOwnLog, batchId, range } = params;
+  if (!isOwnLog) return {};
+
+  const rows = await timelineRepo.getVersionComparisons({
+    userId,
+    currentVersion,
+    batchId,
+    range,
+  });
+  return createVersionOvertakenMap(rows);
 }

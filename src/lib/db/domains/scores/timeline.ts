@@ -185,6 +185,81 @@ class ScoreTimelineRepository {
 
     return rows;
   }
+
+  /**
+   * バッチ（または期間）内で更新したスコアを、他バージョン（閲覧中バージョンを除く
+   * 自分がプレイ済みの全バージョン。INFやそれより後のバージョンも対象に含む）での
+   * 自分のスコアと突き合わせる。勝敗・既存の追い抜き済みかどうかに関わらず、
+   * プレイ済みの組み合わせは全件返す（勝敗判定・「このバッチで新たに追い抜いたか」の
+   * 判定は呼び出し元で`myNewScore`/`myOldScore`/`targetScore`から行う）。
+   * 1曲について複数バージョンと比較可能な場合はバージョンごとに1行返る。
+   *
+   * @param params.userId - 対象ユーザーID
+   * @param params.currentVersion - 閲覧中バージョン（バッチ・スコア更新が記録されたバージョン）
+   * @param params.batchId - 単一バッチに絞り込む場合（`range`と排他）
+   * @param params.range - 期間で絞り込む場合（日次/週次/月次集計向け、`batchId`と排他）
+   */
+  async getVersionComparisons(params: {
+    userId: string;
+    currentVersion: string;
+    batchId?: string;
+    range?: { start: Date; end: Date; basis: "lastPlayed" | "createdAt" };
+  }) {
+    const { userId, currentVersion, batchId, range } = params;
+    const timeCol = range?.basis ?? "lastPlayed";
+
+    // 自分の全バージョンにおける曲ごとの最新スコア（過去バージョン1件ずつとの
+    // 比較対象。バージョンが概念上時系列に閉じているため、時刻境界は不要）
+    const latestPerSongVersion = db
+      .selectFrom("scores")
+      .select(["songId", "version", (eb) => eb.fn.max("logId").as("maxLogId")])
+      .where("userId", "=", userId)
+      .groupBy(["songId", "version"]);
+
+    let query = db
+      .selectFrom("scores as current")
+      .innerJoin(latestPerSongVersion.as("latest"), (join) =>
+        join.onRef("latest.songId", "=", "current.songId"),
+      )
+      .innerJoin("scores as past", (join) =>
+        join.onRef("past.logId", "=", "latest.maxLogId"),
+      )
+      .leftJoin("scores as prevBest", (join) =>
+        join
+          .onRef("prevBest.songId", "=", "current.songId")
+          .on("prevBest.userId", "=", userId)
+          .on("prevBest.version", "=", currentVersion)
+          .on("prevBest.logId", "=", (eb) =>
+            eb
+              .selectFrom("scores as pb")
+              .select((s) => s.fn.max("logId").as("m"))
+              .where("pb.userId", "=", userId)
+              .where("pb.version", "=", currentVersion)
+              .whereRef("pb.songId", "=", "current.songId")
+              .whereRef(`pb.${timeCol}`, "<", `current.${timeCol}`),
+          ),
+      )
+      .select([
+        "current.songId",
+        "current.exScore as myNewScore",
+        "prevBest.exScore as myOldScore",
+        "past.version as targetVersion",
+        "past.exScore as targetScore",
+      ])
+      .where("current.userId", "=", userId)
+      .where("current.version", "=", currentVersion)
+      .where("past.version", "!=", currentVersion);
+
+    if (batchId) {
+      query = query.where("current.batchId", "=", batchId);
+    } else if (range) {
+      query = query
+        .where(`current.${timeCol}`, ">=", range.start)
+        .where(`current.${timeCol}`, "<=", range.end);
+    }
+
+    return await query.execute();
+  }
 }
 
 export const timelineRepo = new ScoreTimelineRepository();

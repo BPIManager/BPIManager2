@@ -46,12 +46,14 @@ const LogsDetailContent = ({
   const groupedBy = (router.query.groupedBy as string) || "createdAt";
   const apiType =
     type === "weekly" ? "week" : type === "monthly" ? "month" : "day";
+
   const {
     details,
     summary,
     isLoading: isl,
     isError,
     overtakenSongs,
+    versionOvertakenSongs,
     mutate,
   } = useLogsDetail(userId, version, {
     batchId,
@@ -242,13 +244,27 @@ const LogsDetailContent = ({
               />
             </div>
           )}
+          {versionOvertakenSongs && versionOvertakenSongs.length > 0 && (
+            <div className={cn("mt-4", isModalOpen ? "p-4" : "p-0")}>
+              <LogRank
+                isSharing={isModalOpen}
+                details={details.songs}
+                type="versionOvertake"
+              />
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent
           value="songs"
           className="mt-4 p-0 focus-visible:outline-none"
         >
-          <BatchSongsTable songs={details.songs} listRef={listRef} />
+          <BatchSongsTable
+            songs={details.songs}
+            userId={userId}
+            version={version}
+            listRef={listRef}
+          />
         </TabsContent>
       </Tabs>
 

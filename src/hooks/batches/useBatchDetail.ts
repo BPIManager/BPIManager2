@@ -32,7 +32,12 @@ export const useLogsDetail = (
     date,
     groupedBy,
     type,
-  }: { batchId?: string; date?: string; groupedBy?: string; type?: "day" | "week" | "month" },
+  }: {
+    batchId?: string;
+    date?: string;
+    groupedBy?: string;
+    type?: "day" | "week" | "month";
+  },
 ) => {
   const groupParam = groupedBy ? `&groupedBy=${groupedBy}` : "";
   const typeParam = type && type !== "day" ? `&type=${type}` : "";
@@ -84,9 +89,17 @@ export const useLogsDetail = (
     return data.songs.filter((s) => s.overtaken && s.overtaken.length > 0);
   }, [data]);
 
+  const versionOvertakenSongs = useMemo(() => {
+    if (!data?.songs) return [];
+    return data.songs.filter(
+      (s) => s.versionOvertaken && s.versionOvertaken.length > 0,
+    );
+  }, [data]);
+
   return {
     details: data || null,
     overtakenSongs,
+    versionOvertakenSongs,
     summary,
     isLoading,
     isError: error,

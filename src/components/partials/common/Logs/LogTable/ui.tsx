@@ -1,5 +1,7 @@
-import { useState, useMemo, RefObject } from "react";
+import { useMemo, useState, RefObject } from "react";
 import { useSongFilter } from "@/hooks/table/useSongFilter";
+import { useCompareScores } from "@/hooks/table/useCompareScores";
+import { useMergedCompareSongs } from "@/hooks/table/useMergedCompareSongs";
 import { PAGE_SIZE } from "@/constants/logic/pagination";
 import { mapBatchToSongs } from "@/utils/logs/getSongTable";
 import SongDetailView from "@/components/partials/modal/SongDetail/ui";
@@ -12,9 +14,13 @@ import type { SongWithScore } from "@/types/songs/score";
 
 const BatchSongsTable = ({
   songs,
+  userId,
+  version,
   listRef,
 }: {
   songs: BatchDetailItem[];
+  userId?: string;
+  version?: string;
   listRef?: RefObject<HTMLDivElement | null>;
 }) => {
   const mappedSongs = useMemo(() => mapBatchToSongs(songs), [songs]);
@@ -23,13 +29,28 @@ const BatchSongsTable = ({
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
 
+  // デフォルトの比較対象は「比較しない」
   const { params, updateParams, page, setPage, visibleSongs, totalCount } =
     useSongFilter(mappedSongs);
+
+  const { compareData } = useCompareScores(
+    userId,
+    version,
+    params.compareVersion,
+  );
+  const { mergedVisible } = useMergedCompareSongs(
+    mappedSongs,
+    visibleSongs,
+    compareData,
+    params.compareVersion,
+  );
 
   return (
     <div className="flex w-full flex-col gap-4">
       <SongFilterBar
         disableVersionSelect
+        withSelfCompare
+        currentVersion={version}
         params={params}
         onParamsChange={updateParams}
         totalCount={totalCount}
@@ -38,7 +59,8 @@ const BatchSongsTable = ({
 
       <div className="min-h-100">
         <SongList
-          songs={visibleSongs}
+          songs={mergedVisible}
+          compareVersion={params.compareVersion}
           onSongSelect={(song) => {
             setSelectedSong(song);
             setIsDetailOpen(true);

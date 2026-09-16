@@ -16,6 +16,7 @@ import {
 import {
   createOvertakenMap,
   computeRivalRankMap,
+  fetchVersionOvertakenMap,
   targetOf,
   type HandleOutcome,
 } from "./_shared";
@@ -55,22 +56,29 @@ export async function handleBatchDetail(
     const dayRange = navigationRepo.getJstRange(jstDate, "day");
     const isOwnLog = access.viewerId === uid;
 
-    const [nav, sameDay, scores, overtaken] = await Promise.all([
-      navigationRepo.getBatchNavigation(
-        uid,
-        v,
-        targetBatch.createdAt,
-        dayRange,
-      ),
-      navigationRepo.findBatchesInRange(uid, v, dayRange.start, dayRange.end),
-      scoreDetailRepo.getScoresWithDetails(uid, v, { batchIds: [bid] }),
-      isOwnLog
-        ? rivalRepo.getOvertakenRivals(uid, v, {
-            batchId: bid,
-            range: { ...dayRange, basis: "createdAt" },
-          })
-        : [],
-    ]);
+    const [nav, sameDay, scores, overtaken, versionOvertakenMap] =
+      await Promise.all([
+        navigationRepo.getBatchNavigation(
+          uid,
+          v,
+          targetBatch.createdAt,
+          dayRange,
+        ),
+        navigationRepo.findBatchesInRange(uid, v, dayRange.start, dayRange.end),
+        scoreDetailRepo.getScoresWithDetails(uid, v, { batchIds: [bid] }),
+        isOwnLog
+          ? rivalRepo.getOvertakenRivals(uid, v, {
+              batchId: bid,
+              range: { ...dayRange, basis: "createdAt" },
+            })
+          : [],
+        fetchVersionOvertakenMap({
+          userId: uid,
+          currentVersion: v,
+          isOwnLog,
+          batchId: bid,
+        }),
+      ]);
 
     const overtakenMap = createOvertakenMap(overtaken);
     const overtakenSongIds = Object.keys(overtakenMap)
@@ -93,6 +101,9 @@ export async function handleBatchDetail(
           return {
             ...mapped,
             overtaken: s.songId ? overtakenMap[s.songId] || [] : [],
+            versionOvertaken: s.songId
+              ? versionOvertakenMap[s.songId] || []
+              : [],
             rivalRankInfo: s.songId ? (rivalRankMap[s.songId] ?? null) : null,
           };
         }),

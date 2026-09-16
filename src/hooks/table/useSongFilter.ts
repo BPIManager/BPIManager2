@@ -33,6 +33,7 @@ export const useSongFilter = (
     | "difficulties"
     | "sortKey"
     | "sortOrder"
+    | "compareVersion"
   >,
 ) => {
   const router = useRouter();
@@ -57,7 +58,7 @@ export const useSongFilter = (
         (q.sortOrder as FilterParamsFrontend["sortOrder"]) ||
         defaults?.sortOrder ||
         "desc",
-      compareVersion: q.compareVersion || undefined,
+      compareVersion: q.compareVersion || defaults?.compareVersion,
       levels: q.levels
         ? q.levels.split(",").map(Number)
         : defaults?.levels ?? [],
