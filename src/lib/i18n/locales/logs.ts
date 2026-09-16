@@ -262,10 +262,10 @@ export const logsTranslations = {
     ko: "이 스코어를 달성한 순간 라이벌을 앞선 결과를 표시합니다. (이후 라이벌에게 역전당해도 이 업데이트 결과는 변하지 않습니다)",
   },
   "logs.rank.versionOvertake.title": {
-    ja: "過去バージョンに勝利",
-    en: "Past Version Overtaken",
-    "zh-TW": "超越過去版本",
-    ko: "과거 버전 역전",
+    ja: "過去の自分に勝利",
+    en: "Past Self Overtaken",
+    "zh-TW": "超越過去的自己",
+    ko: "과거의 나를 역전",
   },
   "logs.rank.versionOvertake.tooltip": {
     ja: "この期間にプレイした楽曲について、他バージョンでの自分のスコアとの差分を勝敗問わず表示しています。「新規勝ち越しのみ表示」をオンにすると、このスコアを出した瞬間に新たに上回ったものだけに絞り込みます（その後に更新されても、この時の判定結果は変わりません）。",
