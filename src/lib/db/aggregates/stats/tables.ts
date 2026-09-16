@@ -1,6 +1,10 @@
 import { db } from "@/lib/db";
 import { IIDXVersion } from "@/types/iidx/version";
-import { correlatedLatestLogId, latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore";
+import {
+  correlatedLatestLogId,
+  latestLogIdPerSongSubquery,
+  latestLogIdPerUserSongSubquery,
+} from "@/lib/db/shared/latestScore";
 import { getSongRankingFromTable } from "@/lib/db/aggregates/songRanking";
 import { navigationRepo } from "@/lib/db/domains/logs/navigation";
 import { songsRepo } from "@/lib/db/domains/songs";
@@ -165,6 +169,59 @@ class StatsTablesRepository {
     }
 
     return await query.execute();
+  }
+
+  /**
+   * {@link getLatestScoresWithMusicData}の全ユーザー版。
+   *
+   * radarキャッシュ更新クロン(`src/lib/cron/radar/index.ts`)のように、全ユーザー分の
+   * 最新スコア＋楽曲データが必要な場合に、ユーザーごとに都度クエリを発行する
+   * N+1を避けるため、1回のクエリで全ユーザー分をまとめて取得する
+   * （`songRankingCache.calculateForVersion`と同じ考え方）。
+   * 呼び出し側で`userId`ごとにグルーピングして利用する。
+   *
+   * @param version - バージョン番号
+   */
+  async getLatestScoresWithMusicDataForAllUsers(version: string) {
+    return await db
+      .selectFrom("scores as s")
+      .innerJoin("songs as m", "s.songId", "m.songId")
+      .innerJoin("songDef as d", (join) =>
+        join.onRef("d.songId", "=", "m.songId").on("d.isCurrent", "=", 1),
+      )
+      .innerJoin(
+        latestLogIdPerUserSongSubquery({ table: "scores", version }).as(
+          "latest",
+        ),
+        (join) =>
+          join
+            .onRef("latest.maxLogId", "=", "s.logId")
+            .onRef("latest.userId", "=", "s.userId")
+            .onRef("latest.songId", "=", "s.songId"),
+      )
+      .select([
+        "s.userId",
+        "s.songId",
+        "s.exScore",
+        "s.bpi",
+        "s.clearState",
+        "s.missCount",
+        "s.lastPlayed",
+        "m.title",
+        "m.notes",
+        "m.bpm",
+        "m.difficulty",
+        "m.difficultyLevel",
+        "m.releasedVersion",
+        "d.wrScore",
+        "d.kaidenAvg",
+        "d.coef",
+        "d.mu",
+        "d.sigma",
+        "d.residualVar",
+      ])
+      .where("s.version", "=", version)
+      .execute();
   }
 
   // scores・songsを横断JOINしたスコア推移集計のため、直接クエリを維持する。
