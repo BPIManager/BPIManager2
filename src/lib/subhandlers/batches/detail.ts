@@ -35,12 +35,7 @@ export async function handleBatchDetail(
       viewerId: null,
     };
   }
-  const {
-    userId: uid,
-    batchId: bid,
-    version: v,
-    compareVersion,
-  } = parsed.data;
+  const { userId: uid, batchId: bid, version: v } = parsed.data;
 
   try {
     const access = await checkProfileAccess(req, uid);
@@ -80,7 +75,6 @@ export async function handleBatchDetail(
         fetchVersionOvertakenMap({
           userId: uid,
           currentVersion: v,
-          compareVersion,
           isOwnLog,
           batchId: bid,
         }),

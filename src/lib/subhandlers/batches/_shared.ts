@@ -75,15 +75,14 @@ export function createOvertakenMap(
 
 function createVersionOvertakenMap(
   rows: Awaited<ReturnType<typeof timelineRepo.getVersionOvertaken>>,
-  targetVersion: string,
 ): VersionOvertakenMap {
-  const targetVersionLabel = getVersionNameFromNumber(targetVersion);
   return rows.reduce<VersionOvertakenMap>((acc, curr) => {
-    if (!curr.songId || curr.targetScore === null) return acc;
+    if (!curr.songId || curr.targetScore === null || !curr.targetVersion)
+      return acc;
     if (!acc[curr.songId]) acc[curr.songId] = [];
     acc[curr.songId].push({
-      targetVersion,
-      targetVersionLabel,
+      targetVersion: curr.targetVersion,
+      targetVersionLabel: getVersionNameFromNumber(curr.targetVersion),
       targetScore: curr.targetScore,
       myNewScore: curr.myNewScore,
       myOldScore: curr.myOldScore,
@@ -93,28 +92,25 @@ function createVersionOvertakenMap(
 }
 
 /**
- * バッチ（または期間）内で別バージョンの自分のスコアを新たに追い抜いた楽曲一覧を取得する。
- * `compareVersion`未指定、または自分以外のログ閲覧時は空マップを返す
- * （ライバル追い抜きと同様、他人のログでは非公開の比較情報を出さない）。
+ * バッチ（または期間）内で過去バージョンの自分のスコアを新たに追い抜いた楽曲一覧を
+ * 取得する。自分以外のログ閲覧時は空マップを返す（ライバル追い抜きと同様、
+ * 他人のログでは非公開の比較情報を出さない）。
  */
 export async function fetchVersionOvertakenMap(params: {
   userId: string;
   currentVersion: string;
-  compareVersion?: string;
   isOwnLog: boolean;
   batchId?: string;
   range?: { start: Date; end: Date; basis: "lastPlayed" | "createdAt" };
 }): Promise<VersionOvertakenMap> {
-  const { userId, currentVersion, compareVersion, isOwnLog, batchId, range } =
-    params;
-  if (!compareVersion || !isOwnLog) return {};
+  const { userId, currentVersion, isOwnLog, batchId, range } = params;
+  if (!isOwnLog) return {};
 
   const rows = await timelineRepo.getVersionOvertaken({
     userId,
     currentVersion,
-    targetVersion: compareVersion,
     batchId,
     range,
   });
-  return createVersionOvertakenMap(rows, compareVersion);
+  return createVersionOvertakenMap(rows);
 }

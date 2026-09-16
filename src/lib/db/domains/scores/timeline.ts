@@ -187,43 +187,42 @@ class ScoreTimelineRepository {
   }
 
   /**
-   * バッチ（または期間）内で更新したスコアのうち、`targetVersion`時点の自分のスコアを
-   * 新たに上回った楽曲を検出する。`rivalScores/rival.ts`の`getOvertakenRivals`と同じ
-   * 「このバッチで初めて追い抜いた」判定パターン（バッチ内の直前ベストと比較）を、
-   * ライバルではなく別バージョンの自分のスコアに適用したもの。
+   * バッチ（または期間）内で更新したスコアのうち、過去バージョン（閲覧中バージョンを
+   * 除く自分がプレイ済みの全バージョン）での自分のスコアを新たに上回った楽曲を検出する。
+   * `rivalScores/rival.ts`の`getOvertakenRivals`と同じ「このバッチで初めて追い抜いた」
+   * 判定パターン（バッチ内の直前ベストと比較）を、ライバルではなく別バージョンの
+   * 自分のスコアに適用したもの。1曲について複数バージョンを追い抜いた場合は
+   * バージョンごとに1行返る（`getOvertakenRivals`が1ライバルごとに1行返すのと同型）。
    *
    * @param params.userId - 対象ユーザーID
    * @param params.currentVersion - 閲覧中バージョン（バッチ・スコア更新が記録されたバージョン）
-   * @param params.targetVersion - 比較対象バージョン
    * @param params.batchId - 単一バッチに絞り込む場合（`range`と排他）
    * @param params.range - 期間で絞り込む場合（日次/週次/月次集計向け、`batchId`と排他）
    */
   async getVersionOvertaken(params: {
     userId: string;
     currentVersion: string;
-    targetVersion: string;
     batchId?: string;
     range?: { start: Date; end: Date; basis: "lastPlayed" | "createdAt" };
   }) {
-    const { userId, currentVersion, targetVersion, batchId, range } = params;
+    const { userId, currentVersion, batchId, range } = params;
     const timeCol = range?.basis ?? "lastPlayed";
+
+    // 自分の全バージョンにおける曲ごとの最新スコア（過去バージョン1件ずつとの
+    // 比較対象。バージョンが概念上時系列に閉じているため、時刻境界は不要）
+    const latestPerSongVersion = db
+      .selectFrom("scores")
+      .select(["songId", "version", (eb) => eb.fn.max("logId").as("maxLogId")])
+      .where("userId", "=", userId)
+      .groupBy(["songId", "version"]);
 
     let query = db
       .selectFrom("scores as current")
-      .leftJoin("scores as target", (join) =>
-        join
-          .onRef("target.songId", "=", "current.songId")
-          .on("target.userId", "=", userId)
-          .on("target.version", "=", targetVersion)
-          .on("target.logId", "=", (eb) =>
-            correlatedLatestLogId(eb, {
-              table: "scores",
-              alias: "t2",
-              songIdRef: "current.songId",
-              version: targetVersion,
-              userId,
-            }),
-          ),
+      .innerJoin(latestPerSongVersion.as("latest"), (join) =>
+        join.onRef("latest.songId", "=", "current.songId"),
+      )
+      .innerJoin("scores as past", (join) =>
+        join.onRef("past.logId", "=", "latest.maxLogId"),
       )
       .leftJoin("scores as prevBest", (join) =>
         join
@@ -243,11 +242,13 @@ class ScoreTimelineRepository {
       .select([
         "current.songId",
         "current.exScore as myNewScore",
-        "target.exScore as targetScore",
         "prevBest.exScore as myOldScore",
+        "past.version as targetVersion",
+        "past.exScore as targetScore",
       ])
       .where("current.userId", "=", userId)
-      .where("current.version", "=", currentVersion);
+      .where("current.version", "=", currentVersion)
+      .where("past.version", "!=", currentVersion);
 
     if (batchId) {
       query = query.where("current.batchId", "=", batchId);
@@ -258,12 +259,11 @@ class ScoreTimelineRepository {
     }
 
     return await query
-      .where("target.exScore", "is not", null)
-      .whereRef("current.exScore", ">", "target.exScore")
+      .whereRef("current.exScore", ">", "past.exScore")
       .where((eb) =>
         eb.or([
           eb("prevBest.exScore", "is", null),
-          eb("prevBest.exScore", "<=", eb.ref("target.exScore")),
+          eb("prevBest.exScore", "<=", eb.ref("past.exScore")),
         ]),
       )
       .execute();

@@ -48,7 +48,6 @@ export async function handleLastPlayedBase(
   nav: Awaited<ReturnType<typeof navigationRepo.getRangeNavigation>>,
   isOwnLog: boolean,
   type: string = "day",
-  compareVersion?: string,
 ) {
   const overtakenPromise = isOwnLog
     ? rivalRepo.getOvertakenRivals(uid, ver, {
@@ -64,7 +63,6 @@ export async function handleLastPlayedBase(
   const versionOvertakenMapPromise = fetchVersionOvertakenMap({
     userId: uid,
     currentVersion: ver,
-    compareVersion,
     isOwnLog,
     range: { ...range, basis: "lastPlayed" },
   });
@@ -151,7 +149,6 @@ export async function handleCreatedAtBase(
   nav: Awaited<ReturnType<typeof navigationRepo.getRangeNavigation>>,
   isOwnLog: boolean,
   type: string = "day",
-  compareVersion?: string,
 ) {
   const batches = await navigationRepo.findBatchesInRange(
     uid,
@@ -175,7 +172,6 @@ export async function handleCreatedAtBase(
   const versionOvertakenMapPromise = fetchVersionOvertakenMap({
     userId: uid,
     currentVersion: ver,
-    compareVersion,
     isOwnLog,
     range: { ...range, basis: "createdAt" },
   });

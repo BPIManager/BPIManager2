@@ -22,7 +22,6 @@ const v1Aggregator = new BpiV1();
  * @param options.batchId - 特定バッチの ID（指定時はバッチ単位で取得）
  * @param options.date - 日付文字列（batchId 未指定かつ date 指定時は日付単位で取得）
  * @param options.groupedBy - グループ化単位
- * @param options.compareVersion - 「vs バージョンn」セクション用の比較対象バージョン（未指定なら取得しない）
  * @returns 楽曲詳細・サマリー・抜いた楽曲一覧・ローディング状態
  */
 export const useLogsDetail = (
@@ -33,23 +32,20 @@ export const useLogsDetail = (
     date,
     groupedBy,
     type,
-    compareVersion,
   }: {
     batchId?: string;
     date?: string;
     groupedBy?: string;
     type?: "day" | "week" | "month";
-    compareVersion?: string;
   },
 ) => {
   const groupParam = groupedBy ? `&groupedBy=${groupedBy}` : "";
   const typeParam = type && type !== "day" ? `&type=${type}` : "";
-  const compareParam = compareVersion ? `&compareVersion=${compareVersion}` : "";
 
   const endpoint = batchId
-    ? `${API_V2_PREFIX}/users/${userId}/batches/${batchId}?version=${version}${groupParam}${compareParam}`
+    ? `${API_V2_PREFIX}/users/${userId}/batches/${batchId}?version=${version}${groupParam}`
     : date
-      ? `${API_V2_PREFIX}/users/${userId}/batches/${date}/scores?version=${version}${groupParam}${typeParam}${compareParam}`
+      ? `${API_V2_PREFIX}/users/${userId}/batches/${date}/scores?version=${version}${groupParam}${typeParam}`
       : null;
 
   const { data, error, isLoading, mutate } = useAuthedSWRV2<LogsDetailResponse>(

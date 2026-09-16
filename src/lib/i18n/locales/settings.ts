@@ -716,31 +716,6 @@ export const settingsTranslations = {
     ko: "한국어",
   },
 
-  "settings.logCompare.title": {
-    ja: "更新ログの比較対象バージョン",
-    en: "Update log comparison version",
-    "zh-TW": "更新紀錄的比較版本",
-    ko: "업데이트 로그 비교 버전",
-  },
-  "settings.logCompare.desc": {
-    ja: "ログ詳細・楽曲タブでの別バージョン比較の初期選択値を設定します。",
-    en: "Sets the default comparison version used on the log detail and song tabs.",
-    "zh-TW": "設定紀錄詳情與樂曲分頁中版本比較的預設選項。",
-    ko: "로그 상세 및 악곡 탭에서 사용할 버전 비교의 기본값을 설정합니다.",
-  },
-  "settings.logCompare.mode.previous": {
-    ja: "前作",
-    en: "Previous version",
-    "zh-TW": "前一版本",
-    ko: "이전 버전",
-  },
-  "settings.logCompare.mode.fixed": {
-    ja: "特定バージョン固定",
-    en: "Fixed version",
-    "zh-TW": "固定版本",
-    ko: "특정 버전 고정",
-  },
-
   "dashLayout.title": {
     ja: "レイアウト設定",
     en: "Layout Settings",

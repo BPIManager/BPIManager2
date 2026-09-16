@@ -262,16 +262,16 @@ export const logsTranslations = {
     ko: "이 스코어를 달성한 순간 라이벌을 앞선 결과를 표시합니다. (이후 라이벌에게 역전당해도 이 업데이트 결과는 변하지 않습니다)",
   },
   "logs.rank.versionOvertake.title": {
-    ja: "vs {version}",
-    en: "vs {version}",
-    "zh-TW": "vs {version}",
-    ko: "vs {version}",
+    ja: "過去バージョンに勝利",
+    en: "Past Version Overtaken",
+    "zh-TW": "超越過去版本",
+    ko: "과거 버전 역전",
   },
-  "logs.rank.versionOvertake.select": {
-    ja: "比較バージョンを選択",
-    en: "Select version to compare",
-    "zh-TW": "選擇比較版本",
-    ko: "비교 버전 선택",
+  "logs.rank.versionOvertake.tooltip": {
+    ja: "このスコアを出した瞬間に、過去バージョンでの自分のスコアを上回っていたものを表示しています。（その後に更新されても、この時の更新結果は変わりません）",
+    en: "Shows your own past-version scores you surpassed at the moment this score was recorded. Results are not updated even if later updated further.",
+    "zh-TW": "顯示在取得此分數瞬間超越的過去版本自己分數。（即使之後有更新，此次的更新結果也不會改變）",
+    ko: "이 스코어를 달성한 순간 과거 버전의 자신의 스코어를 앞선 결과를 표시합니다. (이후 업데이트되어도 이 업데이트 결과는 변하지 않습니다)",
   },
   "logs.rank.hideNew": {
     ja: "新規除外",

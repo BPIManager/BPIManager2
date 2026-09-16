@@ -2,10 +2,6 @@ import { useMemo, useState, RefObject } from "react";
 import { useSongFilter } from "@/hooks/table/useSongFilter";
 import { useCompareScores } from "@/hooks/table/useCompareScores";
 import { useMergedCompareSongs } from "@/hooks/table/useMergedCompareSongs";
-import {
-  useLogCompareDefault,
-  resolveLogCompareVersion,
-} from "@/hooks/logs/useLogCompareDefault";
 import { PAGE_SIZE } from "@/constants/logic/pagination";
 import { mapBatchToSongs } from "@/utils/logs/getSongTable";
 import SongDetailView from "@/components/partials/modal/SongDetail/ui";
@@ -33,16 +29,9 @@ const BatchSongsTable = ({
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
 
-  // デフォルトの比較対象は「比較しない」。設定画面のデフォルトが指定されている
-  // 場合のみ、その値を初期選択値として反映する（ユーザーがSelectで明示的に
-  // 選んだ値はURLクエリに載るため、以後はそちらが優先される）
-  const { config: logCompareConfig } = useLogCompareDefault();
-  const defaultCompareVersion = version
-    ? resolveLogCompareVersion(logCompareConfig, version)
-    : undefined;
-
+  // デフォルトの比較対象は「比較しない」
   const { params, updateParams, page, setPage, visibleSongs, totalCount } =
-    useSongFilter(mappedSongs, { compareVersion: defaultCompareVersion });
+    useSongFilter(mappedSongs);
 
   const { compareData } = useCompareScores(
     userId,

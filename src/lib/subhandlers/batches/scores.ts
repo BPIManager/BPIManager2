@@ -25,7 +25,6 @@ export async function handleBatchScores(
     userId: uid,
     batchId: dateStr,
     version: ver,
-    compareVersion,
     type,
     groupedBy,
   } = parsed.data;
@@ -46,24 +45,8 @@ export async function handleBatchScores(
 
     const responseData =
       groupedBy === "lastPlayed"
-        ? await handleLastPlayedBase(
-            uid,
-            ver,
-            range,
-            nav,
-            isOwnLog,
-            type,
-            compareVersion,
-          )
-        : await handleCreatedAtBase(
-            uid,
-            ver,
-            range,
-            nav,
-            isOwnLog,
-            type,
-            compareVersion,
-          );
+        ? await handleLastPlayedBase(uid, ver, range, nav, isOwnLog, type)
+        : await handleCreatedAtBase(uid, ver, range, nav, isOwnLog, type);
 
     return {
       result: ok({

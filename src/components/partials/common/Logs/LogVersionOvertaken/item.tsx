@@ -1,4 +1,3 @@
-import { VersionOvertakenInfo } from "@/types/logs/overtaken";
 import type { BatchDetailItem } from "@/types/logs/batchDetail";
 import { ChevronRight } from "lucide-react";
 
@@ -16,7 +15,6 @@ const VersionOvertakeRankItem = ({ item, onClick }: RankItemProps) => {
   if (!hasOvertaken) return null;
 
   const isNew = !previous;
-  const target: VersionOvertakenInfo = versionOvertaken[0];
 
   return (
     <div
@@ -57,21 +55,29 @@ const VersionOvertakeRankItem = ({ item, onClick }: RankItemProps) => {
         </div>
       </div>
 
-      <div className="flex flex-col gap-2 pl-3 py-2 border-l-2 border-yellow-600/50 bg-yellow-950/10 rounded-r-sm">
-        <div className="flex items-center justify-between pr-2">
-          <span className="text-xs font-medium text-bpim-text">
-            vs {target.targetVersionLabel}
-          </span>
-          <div className="flex items-center gap-3 font-mono">
-            <span className="text-xs text-bpim-muted">
-              {target.targetScore}
-            </span>
-            <div className="text-xs font-bold text-yellow-400 min-w-10 text-right">
-              <span className="text-[10px] mr-0.5 opacity-80">+</span>
-              {current.exScore - target.targetScore}
+      <div className="flex flex-col gap-1 pl-3 py-2 border-l-2 border-yellow-600/50 bg-yellow-950/10 rounded-r-sm">
+        {versionOvertaken
+          .slice()
+          .sort((a, b) => Number(a.targetVersion) - Number(b.targetVersion))
+          .map((v) => (
+            <div
+              key={v.targetVersion}
+              className="flex items-center justify-between pr-2"
+            >
+              <span className="text-xs font-medium text-bpim-text">
+                {v.targetVersionLabel}
+              </span>
+              <div className="flex items-center gap-3 font-mono">
+                <span className="text-xs text-bpim-muted">
+                  {v.targetScore}
+                </span>
+                <div className="text-xs font-bold text-yellow-400 min-w-10 text-right">
+                  <span className="text-[10px] mr-0.5 opacity-80">+</span>
+                  {current.exScore - v.targetScore}
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          ))}
       </div>
     </div>
   );

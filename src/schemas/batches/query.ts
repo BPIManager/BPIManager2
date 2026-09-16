@@ -9,7 +9,6 @@ const batchPathSchema = z.object({
 
 export const batchDetailGetQuerySchema = batchPathSchema.extend({
   version: z.enum(IIDX_VERSIONS),
-  compareVersion: z.enum(IIDX_VERSIONS).optional(),
 });
 
 export const batchDetailDeleteQuerySchema = batchPathSchema;
@@ -19,7 +18,6 @@ export type BatchDetailDeleteQueryOutput = z.output<typeof batchDetailDeleteQuer
 
 export const batchScoresQuerySchema = batchPathSchema.extend({
   version: z.enum(IIDX_VERSIONS),
-  compareVersion: z.enum(IIDX_VERSIONS).optional(),
   type: z.enum(["day", "week", "month"]).default("day"),
   groupedBy: z.enum(["lastPlayed", "createdAt"]).default("createdAt"),
 });
