@@ -130,6 +130,59 @@ class UserStatusLogsRepository {
   }
 
   /**
+   * 手動スコア編集用に、その日の総合BPI・アリーナランクスナップショットを
+   * upsertする。`navigationRepo.upsertManualBatch`と同じ「現在の最新行が
+   * 同じbatchIdの場合のみUPDATE、それ以外はINSERT」方針。
+   *
+   * @param trx - 呼び出し元が管理するトランザクション
+   * @param params - upsertする内容（`batchId`は手動編集用の決定的ID）
+   */
+  async upsertManualBatch(
+    trx: Transaction<Database>,
+    params: {
+      userId: string;
+      version: string;
+      batchId: string;
+      totalBpi: number;
+      arenaRank: string | null;
+    },
+  ) {
+    const latest = await trx
+      .selectFrom("userStatusLogs")
+      .select(["id", "batchId"])
+      .where("userId", "=", params.userId)
+      .where("version", "=", params.version)
+      .orderBy("id", "desc")
+      .limit(1)
+      .executeTakeFirst();
+
+    if (latest && latest.batchId === params.batchId) {
+      await trx
+        .updateTable("userStatusLogs")
+        .set({
+          totalBpi: params.totalBpi.toFixed(2),
+          arenaRank: params.arenaRank,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .where("id", "=", latest.id)
+        .execute();
+      return;
+    }
+
+    await trx
+      .insertInto("userStatusLogs")
+      .values({
+        userId: params.userId,
+        totalBpi: params.totalBpi,
+        arenaRank: params.arenaRank,
+        version: params.version,
+        batchId: params.batchId,
+      })
+      .execute();
+  }
+
+  /**
    * ステータスログを1件以上挿入する。
    *
    * @param trx - 呼び出し元が管理するトランザクション

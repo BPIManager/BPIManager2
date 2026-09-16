@@ -107,6 +107,7 @@ const NeighborInfiniteList = ({
 
 const RankingTabsCard = ({ userId }: { userId: string }) => {
   const { t } = useTranslation();
+  const { version } = useStatsFilter();
   const [selectedSong, setSelectedSong] = useState<SongWithScore | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [tab, setTab] = useState<string>("weapons");
@@ -191,6 +192,9 @@ const RankingTabsCard = ({ userId }: { userId: string }) => {
           isOpen={isDetailOpen}
           onClose={() => setIsDetailOpen(false)}
           defaultTab={tab === "nearLose" ? "rivals" : "stats"}
+          userId={userId}
+          version={version}
+          songDomain="bpi"
         />
       )}
     </DashCard>

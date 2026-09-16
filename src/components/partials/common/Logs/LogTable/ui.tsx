@@ -17,11 +17,14 @@ const BatchSongsTable = ({
   userId,
   version,
   listRef,
+  onScoreSaved,
 }: {
   songs: BatchDetailItem[];
   userId?: string;
   version?: string;
   listRef?: RefObject<HTMLDivElement | null>;
+  /** モーダル上でのEXスコア手動保存が成功した際に呼ばれる */
+  onScoreSaved?: () => void;
 }) => {
   const mappedSongs = useMemo(() => mapBatchToSongs(songs), [songs]);
 
@@ -74,6 +77,10 @@ const BatchSongsTable = ({
           song={selectedSong}
           isOpen={isDetailOpen}
           onClose={() => setIsDetailOpen(false)}
+          userId={userId}
+          version={version}
+          songDomain="bpi"
+          onSaved={onScoreSaved}
         />
       )}
 

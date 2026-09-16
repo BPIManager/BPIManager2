@@ -25,10 +25,17 @@ const LogRank = ({
   details,
   type,
   isSharing,
+  userId,
+  version,
+  onScoreSaved,
 }: {
   details: BatchDetailItem[];
   type: "growth" | "top" | "overtake" | "versionOvertake";
   isSharing?: boolean;
+  userId?: string;
+  version?: string;
+  /** モーダル上でのEXスコア手動保存が成功した際に呼ばれる */
+  onScoreSaved?: () => void;
 }) => {
   const { t, tFormat } = useTranslation();
   const [selectedSong, setSelectedSong] = useState<SongWithScore | null>(null);
@@ -237,6 +244,10 @@ const LogRank = ({
           song={selectedSong}
           isOpen={isDetailOpen}
           onClose={() => setIsDetailOpen(false)}
+          userId={userId}
+          version={version}
+          songDomain="bpi"
+          onSaved={onScoreSaved}
         />
       )}
     </div>

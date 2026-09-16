@@ -145,6 +145,7 @@ export default function AnalyticsPage() {
                 isLoading={isLoading}
                 error={error}
                 rivalLabel={rivalLabel}
+                version={version}
               />
             </div>
           )}

@@ -74,7 +74,7 @@ const RivalSongsTable = ({
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
   const [subTab, setSubTab] = useState<SubTab>("list");
 
-  const { songs, error, isLoading } = useRivalBothScores(
+  const { songs, error, isLoading, currentVersion, refresh } = useRivalBothScores(
     myUserId,
     rivalUserId,
     version,
@@ -158,6 +158,10 @@ const RivalSongsTable = ({
           song={selectedSong}
           isOpen={isDetailOpen}
           onClose={() => setIsDetailOpen(false)}
+          userId={myUserId}
+          version={currentVersion}
+          songDomain="bpi"
+          onSaved={() => refresh()}
         />
       )}
 

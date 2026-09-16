@@ -67,6 +67,9 @@ interface AnalyticsComparisonTableProps {
   isLoading: boolean;
   error: Error | undefined;
   rivalLabel?: string;
+  version?: string;
+  /** モーダル上でのEXスコア手動保存が成功した際に呼ばれる */
+  onScoreSaved?: () => void;
 }
 
 const AnalyticsComparisonTable = ({
@@ -74,6 +77,8 @@ const AnalyticsComparisonTable = ({
   isLoading,
   error,
   rivalLabel,
+  version,
+  onScoreSaved,
 }: AnalyticsComparisonTableProps) => {
   const { fbUser } = useUser();
   const [selectedSong, setSelectedSong] = useState<SongWithScore | null>(null);
@@ -172,6 +177,10 @@ const AnalyticsComparisonTable = ({
           song={selectedSong}
           isOpen={isDetailOpen}
           onClose={() => setIsDetailOpen(false)}
+          userId={fbUser?.uid}
+          version={version}
+          songDomain="bpi"
+          onSaved={onScoreSaved}
         />
       )}
 

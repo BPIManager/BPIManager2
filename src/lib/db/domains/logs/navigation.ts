@@ -205,6 +205,50 @@ class LogNavigationRepository {
   }
 
   /**
+   * 手動スコア編集用に、その日の総合BPIスナップショットをupsertする。
+   *
+   * 現在の最新バッチ（`id`最大）が同じ`batchId`であれば、その行をUPDATEする
+   * （同日内の複数回の手動編集を1行にまとめる）。最新バッチが別のbatchId
+   * （間にCSVインポート等が挟まった場合）であれば、`id`基準の「最新」判定と
+   * 矛盾しないよう新規INSERTにフォールバックする。
+   *
+   * @param trx - 呼び出し元が管理するトランザクション
+   * @param params - upsertする内容（`batchId`は手動編集用の決定的ID）
+   */
+  async upsertManualBatch(
+    trx: Transaction<Database>,
+    params: { userId: string; version: string; batchId: string; totalBpi: number },
+  ) {
+    const latest = await trx
+      .selectFrom("logs")
+      .select(["id", "batchId"])
+      .where("userId", "=", params.userId)
+      .where("version", "=", params.version)
+      .orderBy("id", "desc")
+      .limit(1)
+      .executeTakeFirst();
+
+    if (latest && latest.batchId === params.batchId) {
+      await trx
+        .updateTable("logs")
+        .set({ totalBpi: params.totalBpi, createdAt: new Date() })
+        .where("id", "=", latest.id)
+        .execute();
+      return;
+    }
+
+    await trx
+      .insertInto("logs")
+      .values({
+        userId: params.userId,
+        totalBpi: params.totalBpi,
+        version: params.version,
+        batchId: params.batchId,
+      })
+      .execute();
+  }
+
+  /**
    * ログレコードを1件以上挿入する。
    *
    * @param trx - 呼び出し元が管理するトランザクション

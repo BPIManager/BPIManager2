@@ -96,6 +96,69 @@ class allScoresRepository {
   }
 
   /**
+   * 手動スコア編集用に、指定曲の行をupsertする。`scoresRepo.upsertManual`と
+   * 同じ「現在の最新行が同じbatchIdの場合のみUPDATE、それ以外はINSERT」方針。
+   *
+   * @param trx - 呼び出し元が管理するトランザクション
+   * @param params - upsertするスコア内容（`batchId`は手動編集用の決定的ID）
+   */
+  async upsertManual(
+    trx: Transaction<Database>,
+    params: {
+      userId: string;
+      songId: number;
+      version: string;
+      batchId: string;
+      exScore: number;
+      bpi: number | null;
+      clearState: string | null;
+      missCount: number | null;
+      lastPlayed: Date;
+    },
+  ) {
+    const latest = await trx
+      .selectFrom("allScores")
+      .select(["logId", "batchId"])
+      .where("userId", "=", params.userId)
+      .where("songId", "=", params.songId)
+      .where("version", "=", params.version)
+      .orderBy("logId", "desc")
+      .limit(1)
+      .executeTakeFirst();
+
+    if (latest && latest.batchId === params.batchId) {
+      await trx
+        .updateTable("allScores")
+        .set({
+          exScore: params.exScore,
+          bpi: params.bpi,
+          clearState: params.clearState,
+          missCount: params.missCount,
+          lastPlayed: params.lastPlayed,
+        })
+        .where("logId", "=", latest.logId)
+        .execute();
+      return;
+    }
+
+    await trx
+      .insertInto("allScores")
+      .values({
+        userId: params.userId,
+        songId: params.songId,
+        definitionId: null,
+        version: params.version,
+        batchId: params.batchId,
+        exScore: params.exScore,
+        bpi: params.bpi,
+        clearState: params.clearState,
+        missCount: params.missCount,
+        lastPlayed: params.lastPlayed,
+      } as NewAllScores)
+      .execute();
+  }
+
+  /**
    * 指定バッチに紐づく全難易度スコアレコードを削除する。
    *
    * @param trx - 呼び出し元が管理するトランザクション

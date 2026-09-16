@@ -1,7 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { LineChart, LucideHistory, Users } from "lucide-react";
+import {
+  LineChart,
+  LucideHistory,
+  Users,
+  PencilIcon,
+  XIcon,
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -9,12 +15,17 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { cn } from "@/lib/utils";
 
 import type { SongDetailSubject } from "@/utils/songs/songDetailMode";
 import { hasBpiData } from "@/utils/songs/songDetailMode";
 import { BpiCalculator } from "@/lib/bpi";
 import { getRankDetail } from "@/constants/iidx/rankBorders";
+import { useUser } from "@/contexts/users/UserContext";
+import { useManualScoreUpdate } from "@/hooks/scores/useManualScoreUpdate";
 import SongHistoryTab from "./History/ui";
 import RivalsRanking from "./Rivals";
 import { AppTabsList, AppTabsTrigger } from "@/components/ui/complex/tabs";
@@ -25,6 +36,18 @@ interface SongDetailViewProps {
   isOpen: boolean;
   onClose: () => void;
   defaultTab?: "stats" | "history" | "rivals";
+  /** EXスコアの手動編集を有効にする場合、対象ユーザーIDとバージョンを渡す */
+  userId?: string;
+  version?: string;
+  /**
+   * `song.songId`がどちらの楽曲ドメイン由来か。`songs`/`songDef`ドメイン
+   * （BPI計算対象、☆11/12）は`"bpi"`、`allSongs`ドメイン（全難易度、
+   * ☆1-12）は`"allSongs"`を渡す。両ドメインで`songId`の値が異なるため、
+   * 手動編集を有効にするにはこの指定が必須。
+   */
+  songDomain?: "bpi" | "allSongs";
+  /** 手動保存が成功した際に呼ばれる（呼び出し元でのデータ再取得等に使う） */
+  onSaved?: () => void;
 }
 
 const SongDetailView = ({
@@ -32,6 +55,10 @@ const SongDetailView = ({
   isOpen,
   onClose,
   defaultTab,
+  userId,
+  version,
+  songDomain,
+  onSaved,
 }: SongDetailViewProps) => {
   // 全難易度スコア(BPI未計算)にはStatisticsタブを表示しない
   const fullSong = song && hasBpiData(song) ? song : null;
@@ -49,27 +76,110 @@ const SongDetailView = ({
         { value: "rivals", label: "Rivals", icon: Users },
       ];
 
+  const { fbUser } = useUser();
+  const { save, isSaving } = useManualScoreUpdate(userId ?? "");
+  const [isEditing, setIsEditing] = useState(false);
+  const [draftExScore, setDraftExScore] = useState<number | null>(null);
+  // 保存成功後の表示用。`song` propは呼び出し元の一覧データがそのまま
+  // 渡ってくるだけで、保存後に呼び出し元がmutateしてもこのモーダル自身の
+  // propは（再オープンするまで）更新されないため、保存直後の値をここに
+  // 保持して表示する
+  const [savedOverride, setSavedOverride] = useState<{
+    exScore: number;
+    bpi: number | null;
+  } | null>(null);
+
+  // 別の曲に切り替わったら編集状態・保存済みオーバーライドをリセットする
+  const [lastSongId, setLastSongId] = useState(song?.songId);
+  if (song?.songId !== lastSongId) {
+    setLastSongId(song?.songId);
+    setIsEditing(false);
+    setDraftExScore(null);
+    setSavedOverride(null);
+  }
+
+  // 手動編集を許可するのは、呼び出し元がsongDomainを指定しており
+  // （☆10以下の全難易度曲も編集対象になり得るため`fullSong`は問わない）、
+  // 自分自身のプロフィールを見ている場合のみ
+  const canEdit =
+    !!userId && !!version && !!songDomain && fbUser?.uid === userId;
+
   const maxScore = song ? song.notes * 2 : 0;
-  const currentEx = song ? song.exScore || 0 : 0;
+  const currentEx = savedOverride?.exScore ?? (song ? song.exScore || 0 : 0);
+  const displayEx =
+    isEditing && draftExScore != null ? draftExScore : currentEx;
 
   const rankInfo = useMemo(
-    () => getRankDetail(currentEx, maxScore),
-    [currentEx, maxScore],
+    () => getRankDetail(displayEx, maxScore),
+    [displayEx, maxScore],
   );
+
+  const draftBpi = useMemo(() => {
+    if (isEditing && fullSong && draftExScore != null) {
+      return BpiCalculator.calc(draftExScore, fullSong);
+    }
+    return savedOverride?.bpi ?? fullSong?.bpi ?? null;
+  }, [fullSong, isEditing, draftExScore, savedOverride]);
 
   const bpiInfo = useMemo(() => {
     if (!fullSong) return { next: 0 as number | string, diff: 0 };
-    if (fullSong.bpi == null) return { next: "-", diff: 0 };
-    const nextTargetBpi = Math.ceil((fullSong.bpi + 0.01) / 10) * 10;
-    const targetScore = BpiCalculator.calcFromBPI(nextTargetBpi, fullSong, true);
+    if (draftBpi == null) return { next: "-", diff: 0 };
+    const nextTargetBpi = Math.ceil((draftBpi + 0.01) / 10) * 10;
+    const targetScore = BpiCalculator.calcFromBPI(
+      nextTargetBpi,
+      fullSong,
+      true,
+    );
     if (targetScore === null) return { next: "-", diff: 0 };
-    return { next: nextTargetBpi, diff: targetScore - currentEx };
-  }, [fullSong, currentEx]);
+    return { next: nextTargetBpi, diff: targetScore - displayEx };
+  }, [fullSong, draftBpi, displayEx]);
+
+  const startEditing = () => {
+    if (!canEdit) return;
+    setDraftExScore(currentEx);
+    setIsEditing(true);
+  };
+
+  const cancelEditing = () => {
+    setIsEditing(false);
+    setDraftExScore(null);
+  };
+
+  const canSave =
+    isEditing &&
+    draftExScore != null &&
+    draftExScore > currentEx &&
+    draftExScore <= maxScore;
+
+  const handleSave = async () => {
+    if (!canSave || !song || !version || !songDomain || draftExScore == null)
+      return;
+    const result = await save({
+      songId: song.songId,
+      songDomain,
+      version,
+      exScore: draftExScore,
+    });
+    if (result) {
+      setSavedOverride({ exScore: result.exScore, bpi: result.bpi });
+      setIsEditing(false);
+      setDraftExScore(null);
+      onSaved?.();
+    }
+  };
 
   if (!song) return null;
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) {
+          cancelEditing();
+          onClose();
+        }
+      }}
+    >
       <DialogContent
         placement="bottom-sheet"
         disableScrollWrapper
@@ -82,19 +192,72 @@ const SongDetailView = ({
               [{song.difficulty.charAt(0)}]
             </span>
           </DialogTitle>
+          {isEditing && (
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 px-2 text-bpim-muted hover:text-bpim-text"
+                onClick={cancelEditing}
+                disabled={isSaving}
+              >
+                <XIcon className="h-4 w-4" />
+              </Button>
+              <Button
+                size="sm"
+                className="h-8 bg-bpim-primary px-4 font-bold hover:bg-bpim-primary"
+                onClick={handleSave}
+                disabled={!canSave || isSaving}
+              >
+                {isSaving ? <LoadingSpinner size="sm" /> : "保存"}
+              </Button>
+            </div>
+          )}
         </DialogHeader>
 
         <div className="flex min-h-0 flex-col overflow-y-auto p-2 custom-scrollbar">
           <div className="mb-4 grid grid-cols-3 gap-4 text-center">
             <div className="flex flex-col gap-1">
-              <span className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
+              <span className="flex items-center justify-center gap-1 text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
                 EX Score
+                {canEdit && !isEditing && (
+                  <button
+                    type="button"
+                    onClick={startEditing}
+                    className="text-bpim-muted hover:text-bpim-primary"
+                    aria-label="EXスコアを編集"
+                  >
+                    <PencilIcon className="h-3 w-3" />
+                  </button>
+                )}
               </span>
-              <span className="font-mono text-lg font-black text-bpim-text leading-none">
-                {song.exScore ?? 0}
-              </span>
+              {isEditing ? (
+                <Input
+                  type="number"
+                  autoFocus
+                  min={0}
+                  max={maxScore}
+                  value={draftExScore ?? ""}
+                  onChange={(e) =>
+                    setDraftExScore(
+                      e.target.value ? Number(e.target.value) : null,
+                    )
+                  }
+                  className="h-8 font-mono text-lg font-black"
+                />
+              ) : (
+                <span
+                  className={cn(
+                    "font-mono text-lg font-black text-bpim-text leading-none",
+                    canEdit && "cursor-pointer hover:text-bpim-primary",
+                  )}
+                  onClick={startEditing}
+                >
+                  {displayEx}
+                </span>
+              )}
               <span className="mt-1 font-mono text-[10px] font-bold text-bpim-muted">
-                {(((song.exScore ?? 0) / maxScore) * 100).toFixed(2)}%
+                {((displayEx / maxScore) * 100).toFixed(2)}%
               </span>
             </div>
 
@@ -103,11 +266,16 @@ const SongDetailView = ({
                 <span className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
                   BPI
                 </span>
-                <span className="font-mono text-lg font-black text-bpim-primary leading-none">
-                  {fullSong.bpi != null ? fullSong.bpi.toFixed(2) : "-"}
+                <span
+                  className={cn(
+                    "font-mono text-lg font-black leading-none",
+                    isEditing ? "text-bpim-success" : "text-bpim-primary",
+                  )}
+                >
+                  {draftBpi != null ? draftBpi.toFixed(2) : "-"}
                 </span>
                 <span className="mt-1 text-[10px] font-bold text-bpim-primary/60">
-                  {fullSong.bpi != null
+                  {draftBpi != null
                     ? `BPI${bpiInfo.next}まで +${bpiInfo.diff}`
                     : "-"}
                 </span>
@@ -138,7 +306,7 @@ const SongDetailView = ({
               </span>
               <span className="font-mono text-lg font-black text-yellow-500 leading-none">
                 {rankInfo.label === "MAX-"
-                  ? `MAX - ${maxScore - currentEx}`
+                  ? `MAX - ${maxScore - displayEx}`
                   : `${rankInfo.label} + ${rankInfo.surplus}`}
               </span>
               <span className="mt-1 text-[10px] font-bold text-bpim-danger/80">
