@@ -261,6 +261,18 @@ export const logsTranslations = {
     "zh-TW": "顯示在取得此分數瞬間超越的對手。（即使之後被對手反超，此次的更新結果也不會改變）",
     ko: "이 스코어를 달성한 순간 라이벌을 앞선 결과를 표시합니다. (이후 라이벌에게 역전당해도 이 업데이트 결과는 변하지 않습니다)",
   },
+  "logs.rank.versionOvertake.title": {
+    ja: "vs {version}",
+    en: "vs {version}",
+    "zh-TW": "vs {version}",
+    ko: "vs {version}",
+  },
+  "logs.rank.versionOvertake.select": {
+    ja: "比較バージョンを選択",
+    en: "Select version to compare",
+    "zh-TW": "選擇比較版本",
+    ko: "비교 버전 선택",
+  },
   "logs.rank.hideNew": {
     ja: "新規除外",
     en: "Exclude New",

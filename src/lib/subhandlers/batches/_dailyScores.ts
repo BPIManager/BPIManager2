@@ -6,7 +6,11 @@ import { navigationRepo } from "@/lib/db/domains/logs/navigation";
 import { songsRepo } from "@/lib/db/domains/songs";
 import { calculateTotalBpi } from "@/services/logs/calculateTotalBpi";
 import { mapToLogNested } from "@/utils/logs/getMapNested";
-import { createOvertakenMap, computeRivalRankMap } from "./_shared";
+import {
+  createOvertakenMap,
+  computeRivalRankMap,
+  fetchVersionOvertakenMap,
+} from "./_shared";
 import type { IIDXVersion } from "@/types/iidx/version";
 
 /**
@@ -44,6 +48,7 @@ export async function handleLastPlayedBase(
   nav: Awaited<ReturnType<typeof navigationRepo.getRangeNavigation>>,
   isOwnLog: boolean,
   type: string = "day",
+  compareVersion?: string,
 ) {
   const overtakenPromise = isOwnLog
     ? rivalRepo.getOvertakenRivals(uid, ver, {
@@ -56,8 +61,15 @@ export async function handleLastPlayedBase(
     ver,
     isOwnLog,
   );
+  const versionOvertakenMapPromise = fetchVersionOvertakenMap({
+    userId: uid,
+    currentVersion: ver,
+    compareVersion,
+    isOwnLog,
+    range: { ...range, basis: "lastPlayed" },
+  });
 
-  const [history, fullMaster, dailyScores, overtaken, rivalScores] =
+  const [history, fullMaster, dailyScores, overtaken, rivalScores, versionOvertakenMap] =
     await Promise.all([
       statsTablesRepo.getScoreHistory(uid, ver, [], []),
       songsRepo.getSongMasterWithDef(),
@@ -68,6 +80,7 @@ export async function handleLastPlayedBase(
           }),
       overtakenPromise,
       rivalScoresPromise,
+      versionOvertakenMapPromise,
     ]);
 
   if (dailyScores.length === 0) {
@@ -102,6 +115,7 @@ export async function handleLastPlayedBase(
       return {
         ...mapped,
         overtaken: overtakenMap[s.songId] || [],
+        versionOvertaken: versionOvertakenMap[s.songId] || [],
         rivalRankInfo: rivalRankMap[s.songId] ?? null,
       };
     }),
@@ -137,6 +151,7 @@ export async function handleCreatedAtBase(
   nav: Awaited<ReturnType<typeof navigationRepo.getRangeNavigation>>,
   isOwnLog: boolean,
   type: string = "day",
+  compareVersion?: string,
 ) {
   const batches = await navigationRepo.findBatchesInRange(
     uid,
@@ -157,8 +172,15 @@ export async function handleCreatedAtBase(
     ver,
     isOwnLog,
   );
+  const versionOvertakenMapPromise = fetchVersionOvertakenMap({
+    userId: uid,
+    currentVersion: ver,
+    compareVersion,
+    isOwnLog,
+    range: { ...range, basis: "createdAt" },
+  });
 
-  const [scores, overtaken, rivalScores] = await Promise.all([
+  const [scores, overtaken, rivalScores, versionOvertakenMap] = await Promise.all([
     type === "day"
       ? scoreDetailRepo.getScoresWithDetails(uid, ver, {
           batchIds: batches.map((b) => b.batchId),
@@ -169,6 +191,7 @@ export async function handleCreatedAtBase(
         }),
     overtakenPromise,
     rivalScoresPromise,
+    versionOvertakenMapPromise,
   ]);
   const overtakenMap = createOvertakenMap(overtaken);
   const rivalRankMap = computeRivalRankMap(overtakenMap, rivalScores);
@@ -179,6 +202,7 @@ export async function handleCreatedAtBase(
       return {
         ...mapped,
         overtaken: s.songId ? overtakenMap[s.songId] || [] : [],
+        versionOvertaken: s.songId ? versionOvertakenMap[s.songId] || [] : [],
         rivalRankInfo: s.songId ? (rivalRankMap[s.songId] ?? null) : null,
       };
     }),

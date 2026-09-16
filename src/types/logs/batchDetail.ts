@@ -1,4 +1,4 @@
-import { OvertakenRivalInfo } from "./overtaken";
+import { OvertakenRivalInfo, VersionOvertakenInfo } from "./overtaken";
 
 export interface BatchRef {
   batchId: string;
@@ -40,6 +40,7 @@ export interface BatchDetailItem {
     isRankUp?: boolean;
   };
   overtaken: OvertakenRivalInfo[];
+  versionOvertaken: VersionOvertakenInfo[];
   rivalRankInfo?: {
     myRankBefore: number;
     myRankAfter: number;

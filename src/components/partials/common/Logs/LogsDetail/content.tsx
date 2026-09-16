@@ -1,6 +1,10 @@
 ﻿import { useTranslation } from "@/hooks/common/useTranslation";
 import { useLogsDetail } from "@/hooks/batches/useBatchDetail";
 import {
+  useLogCompareDefault,
+  resolveLogCompareVersion,
+} from "@/hooks/logs/useLogCompareDefault";
+import {
   getBpiDistribution,
   getRankDistribution,
 } from "@/utils/logs/getDistribution";
@@ -8,6 +12,7 @@ import { useRouter } from "next/router";
 import DailyBatchNotice from "../DailyBatchNotice/ui";
 import { BatchSummaryCards } from "../LogSummary/ui";
 import LogRank from "../LogRanking/ui";
+import LogVersionOvertaken from "../LogVersionOvertaken/ui";
 import BatchSongsTable from "../LogTable/ui";
 import LogNavigator from "../LogsNav/ui";
 import BatchTotalBpiCard from "../TotalBPI/ui";
@@ -16,7 +21,7 @@ import FetchErrorState from "@/components/partials/common/ErrorStates/FetchError
 import type { LogsDetailViewProps } from "@/types/logs/detail";
 import { XIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import BatchDeleteSection from "./BatchDeleteSection";
 import { useShareResult } from "@/hooks/share/useShare";
 import ShareResultModal from "@/components/partials/modal/Share/ui";
@@ -46,18 +51,34 @@ const LogsDetailContent = ({
   const groupedBy = (router.query.groupedBy as string) || "createdAt";
   const apiType =
     type === "weekly" ? "week" : type === "monthly" ? "month" : "day";
+
+  const { config: logCompareConfig } = useLogCompareDefault();
+  const [compareVersion, setCompareVersion] = useState<string | undefined>(
+    undefined,
+  );
+  const hasManualCompareVersion = useRef(false);
+
+  useEffect(() => {
+    if (hasManualCompareVersion.current || !version) return;
+    // localStorageの比較対象デフォルト設定（hydration後に確定）から初期値を導出する
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setCompareVersion(resolveLogCompareVersion(logCompareConfig, version));
+  }, [logCompareConfig, version]);
+
   const {
     details,
     summary,
     isLoading: isl,
     isError,
     overtakenSongs,
+    versionOvertakenSongs,
     mutate,
   } = useLogsDetail(userId, version, {
     batchId,
     date,
     groupedBy,
     type: apiType,
+    compareVersion,
   });
   const isLoading = isl || (!details && !isError);
 
@@ -242,6 +263,22 @@ const LogsDetailContent = ({
               />
             </div>
           )}
+          {versionOvertakenSongs &&
+            versionOvertakenSongs.length > 0 &&
+            version && (
+              <div className={cn("mt-4", isModalOpen ? "p-4" : "p-0")}>
+                <LogVersionOvertaken
+                  isSharing={isModalOpen}
+                  details={details.songs}
+                  currentVersion={version}
+                  compareVersion={compareVersion}
+                  onCompareVersionChange={(v) => {
+                    hasManualCompareVersion.current = true;
+                    setCompareVersion(v);
+                  }}
+                />
+              </div>
+            )}
         </TabsContent>
 
         <TabsContent
