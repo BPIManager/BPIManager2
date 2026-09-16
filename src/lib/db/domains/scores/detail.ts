@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { sql } from "kysely";
 import { IIDXVersion } from "@/types/iidx/version";
 import {
   latestLogIdPerSongScalarSubquery,
@@ -39,6 +40,9 @@ class LogScoreRepository {
    * @param options.targetTime 特定時点（スナップショット）のスコアを取得する場合
    * @param options.comparisonTime 比較対象とする過去時点（この時刻より前の最新スコアを prev として取得）
    * @param options.onlyLastPlayedInRange 最終プレイ日時（lastPlayed）が指定範囲内のスコアを取得する場合
+   * @param options.clearState クリア状況で絞り込む場合（`current.clearState`完全一致）
+   * @param options.bpiMin/bpiMax BPI範囲で絞り込む場合（未プレイは`-15`扱い、`filterSongsServerSide`と同じ既定値）
+   * @param options.notesMin/notesMax notes数範囲で絞り込む場合（`s.notes`）
    */
   async getScoresWithDetails(
     userId: string,
@@ -48,10 +52,24 @@ class LogScoreRepository {
       targetTime?: Date;
       comparisonTime?: Date;
       onlyLastPlayedInRange?: { start: Date; end: Date };
+      clearState?: string;
+      bpiMin?: number;
+      bpiMax?: number;
+      notesMin?: number;
+      notesMax?: number;
     },
   ) {
-    const { batchIds, targetTime, comparisonTime, onlyLastPlayedInRange } =
-      options;
+    const {
+      batchIds,
+      targetTime,
+      comparisonTime,
+      onlyLastPlayedInRange,
+      clearState,
+      bpiMin,
+      bpiMax,
+      notesMin,
+      notesMax,
+    } = options;
     const isInf = version === "INF";
 
     let query = db
@@ -162,6 +180,21 @@ class LogScoreRepository {
             eb("s.deletedAt", ">", version),
           ]),
         ),
+      )
+      .$if(clearState !== undefined, (qb) =>
+        qb.where("current.clearState", "=", clearState!),
+      )
+      .$if(bpiMin !== undefined, (qb) =>
+        qb.where(sql<number>`COALESCE(current.bpi, -15)`, ">=", bpiMin!),
+      )
+      .$if(bpiMax !== undefined, (qb) =>
+        qb.where(sql<number>`COALESCE(current.bpi, -15)`, "<=", bpiMax!),
+      )
+      .$if(notesMin !== undefined, (qb) =>
+        qb.where("s.notes", ">=", notesMin!),
+      )
+      .$if(notesMax !== undefined, (qb) =>
+        qb.where("s.notes", "<=", notesMax!),
       )
       .orderBy("s.difficultyLevel", "desc")
       .orderBy("s.title", "asc")

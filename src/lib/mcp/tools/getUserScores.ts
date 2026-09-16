@@ -43,7 +43,14 @@ export function registerGetUserScores(server: McpServer, userId: string) {
       const results = await scoreDetailRepo.getScoresWithDetails(
         targetUserId,
         version,
-        { targetTime: time },
+        {
+          targetTime: time,
+          clearState: filterParams.clearState,
+          bpiMin: filterParams.bpiMin,
+          bpiMax: filterParams.bpiMax,
+          notesMin: filterParams.notesMin,
+          notesMax: filterParams.notesMax,
+        },
       );
 
       const songs = results.map(mapToFlatSong);
