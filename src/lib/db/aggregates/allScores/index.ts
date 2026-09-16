@@ -32,6 +32,7 @@ class AllScoresAggregateRepository {
    * @param params.clearStates - カンマ区切りのクリア種別（例: `"CLEAR,HARD CLEAR"`）
    * @param params.sortKey - ソートキー（`"level"` | `"title"` | `"exScore"` | `"updatedAt"` | `"clearState"`）
    * @param params.sortOrder - ソート方向（`"asc"` | `"desc"`）
+   * @param params.version - 対象バージョン（省略時はバージョン絞り込みなし＝全バージョン中の最新スコア）
    * @returns スコア情報付きの楽曲リスト
    */
   async getAllScoresList(
@@ -43,6 +44,7 @@ class AllScoresAggregateRepository {
       clearStates: string;
       sortKey: string;
       sortOrder: string;
+      version?: string;
     },
   ) {
     const {
@@ -52,6 +54,7 @@ class AllScoresAggregateRepository {
       clearStates,
       sortKey = "level",
       sortOrder = "desc",
+      version,
     } = params;
 
     let query = db
@@ -60,6 +63,7 @@ class AllScoresAggregateRepository {
         latestLogIdPerSongSubquery({
           table: "allScores",
           userId,
+          version,
         }).as("latest"),
         (join) => join.onRef("latest.songId", "=", "s.songId"),
       )
@@ -159,29 +163,40 @@ class AllScoresAggregateRepository {
   }
 
   /**
-   * 全難易度楽曲について、現在の最新スコアと指定バージョン時点のスコアを比較する。
-   * `/my/[version]`の`getSelfVersionScores`（`songs`/`scores`テーブル対象）と同様の
-   * 相関サブクエリパターンを`allSongs`/`allScores`テーブル向けに適用する。
+   * 全難易度楽曲について、`currentVersion`時点のスコアと`targetVersion`時点の
+   * スコアを比較する。`/my/[version]`の`getSelfVersionScores`
+   * （`songs`/`scores`テーブル対象）と同一の相関サブクエリパターンを
+   * `allSongs`/`allScores`テーブル向けに適用する。
    * ☆10以下含む全曲がBPI算出対象外のため、BPI差分は扱わずexScore差分のみ返す。
    *
    * @param params.userId - 対象ユーザーID
+   * @param params.currentVersion - 表示中バージョン
    * @param params.targetVersion - 比較対象バージョン
-   * @returns 現在の最新スコアと`targetVersion`時点のスコアを併記した楽曲リスト
+   * @returns `currentVersion`時点・`targetVersion`時点のスコアを併記した楽曲リスト
    */
-  async getSelfVersionScores(params: { userId: string; targetVersion: string }) {
-    const { userId, targetVersion } = params;
+  async getSelfVersionScores(params: {
+    userId: string;
+    currentVersion: string;
+    targetVersion: string;
+  }) {
+    const { userId, currentVersion, targetVersion } = params;
 
     const rows = await db
       .selectFrom("allSongs as s")
-      .innerJoin(
-        latestLogIdPerSongSubquery({ table: "allScores", userId }).as("latest"),
-        (join) => join.onRef("latest.songId", "=", "s.songId"),
-      )
-      .innerJoin("allScores as cur", (join) =>
+      .leftJoin("allScores as cur", (join) =>
         join
           .onRef("cur.songId", "=", "s.songId")
           .on("cur.userId", "=", userId)
-          .onRef("cur.logId", "=", "latest.maxLogId"),
+          .on("cur.version", "=", currentVersion)
+          .on("cur.logId", "=", (eb) =>
+            correlatedLatestLogId(eb, {
+              table: "allScores",
+              alias: "c2",
+              songIdRef: "s.songId",
+              version: currentVersion,
+              userId,
+            }),
+          ),
       )
       .leftJoin("allScores as prev", (join) =>
         join
@@ -216,6 +231,12 @@ class AllScoresAggregateRepository {
         "prev.lastPlayed as prevLastPlayed",
       ])
       .where((eb) => eb.or([eb("s.deletedAt", "is", null)]))
+      .where((eb) =>
+        eb.or([
+          eb("cur.exScore", "is not", null),
+          eb("prev.exScore", "is not", null),
+        ]),
+      )
       .orderBy("s.difficultyLevel", "desc")
       .orderBy("s.title", "asc")
       .execute();

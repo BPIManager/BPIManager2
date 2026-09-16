@@ -40,6 +40,7 @@ export async function handleAllScoresList(
         clearStates: req.query.clearStates as string,
         sortKey: (req.query.sortKey as string) ?? "level",
         sortOrder: (req.query.sortOrder as string) ?? "desc",
+        version: req.query.version as string | undefined,
       },
     );
 

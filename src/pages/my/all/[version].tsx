@@ -8,7 +8,9 @@ export default function MyScoresByVersion() {
   return (
     <MyScoresPageShell
       titlePrefix={t("page.myScores.title")}
-      renderTable={({ userId }) => <AllSongsTable userId={userId} />}
+      renderTable={({ userId, version }) => (
+        <AllSongsTable userId={userId} version={version} />
+      )}
     />
   );
 }

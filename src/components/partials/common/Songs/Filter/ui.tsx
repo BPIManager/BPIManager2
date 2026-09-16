@@ -34,8 +34,6 @@ interface SongFilterBarProps {
   disableVersionSelect?: boolean;
   withRivals?: "full" | "score-only" | false;
   withSelfCompare?: boolean;
-  /** compareVersionの選択肢から現在表示中バージョンを除外するか（既定true）。全曲ページのように「現在」が特定バージョンに紐付かない場合はfalseにする */
-  excludeCurrentVersionFromCompare?: boolean;
   withScoreRate?: boolean;
   currentVersion?: string;
   /** LEVELチェックボックスの選択肢（既定: ☆11/12。全曲ページでは☆1〜12を渡す） */
@@ -54,7 +52,6 @@ const SongFilterBar = ({
   disableVersionSelect,
   withRivals,
   withSelfCompare = false,
-  excludeCurrentVersionFromCompare = true,
   withScoreRate = false,
   currentVersion,
   levelItems = [11, 12],
@@ -69,15 +66,13 @@ const SongFilterBar = ({
     opts.map((o) => ({ ...o, label: t(`sort.${o.value}` as TranslationKey) }));
 
   const compareVersionOptions = useMemo(() => {
-    const base = excludeCurrentVersionFromCompare
-      ? versionsNonDisabledCollection.filter(
-          (v) =>
-            v.value !==
-            (currentVersion ?? String(currentStoreVersion ?? latestVersion)),
-        )
-      : versionsNonDisabledCollection;
+    const base = versionsNonDisabledCollection.filter(
+      (v) =>
+        v.value !==
+        (currentVersion ?? String(currentStoreVersion ?? latestVersion)),
+    );
     return [{ label: t("filter.noCompare"), value: "none" }, ...base];
-  }, [currentVersion, currentStoreVersion, excludeCurrentVersionFromCompare, t]);
+  }, [currentVersion, currentStoreVersion, t]);
 
   const hasCompare = params.compareVersion && params.compareVersion !== "none";
 

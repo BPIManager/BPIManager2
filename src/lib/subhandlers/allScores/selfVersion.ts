@@ -30,6 +30,7 @@ export async function handleAllScoresSelfVersion(
   try {
     const rows = await allScoresAggregateRepo.getSelfVersionScores({
       userId: targetUserId,
+      currentVersion: parsed.data.currentVersion,
       targetVersion: parsed.data.targetVersion,
     });
 

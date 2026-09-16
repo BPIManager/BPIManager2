@@ -17,13 +17,22 @@ import { ALL_DIFFICULTIES, ALL_LEVELS } from "@/constants/iidx/songLevels";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
-const AllSongsTable = ({ userId }: { userId: string | undefined }) => {
+const AllSongsTable = ({
+  userId,
+  version,
+}: {
+  userId: string | undefined;
+  version?: string;
+}) => {
   const { t } = useTranslation();
   const [selected, setSelected] = useState<SongWithScore | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
 
-  const { songs, error, isLoading } = useAllScores(userId);
+  const { songs, error, isLoading, currentVersion } = useAllScores(
+    userId,
+    version,
+  );
 
   const {
     params,
@@ -42,6 +51,7 @@ const AllSongsTable = ({ userId }: { userId: string | undefined }) => {
 
   const { compareData, compareError, isCompareLoading } = useAllScoresCompare(
     userId,
+    currentVersion,
     params.compareVersion,
   );
 
@@ -71,9 +81,8 @@ const AllSongsTable = ({ userId }: { userId: string | undefined }) => {
         onParamsChange={updateParams}
         totalCount={totalCount}
         onOpenAdvancedFilter={() => setIsAdvancedOpen(true)}
-        disableVersionSelect
         withSelfCompare
-        excludeCurrentVersionFromCompare={false}
+        currentVersion={currentVersion}
         levelItems={ALL_LEVELS}
         difficultyItems={ALL_DIFFICULTIES}
         excludeSortKeys={["bpi"]}
