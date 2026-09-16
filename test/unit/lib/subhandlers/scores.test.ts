@@ -232,6 +232,9 @@ describe("handleUnplayed", () => {
         wrScore: null,
         kaidenAvg: null,
         coef: null,
+        mu: null,
+        sigma: null,
+        residualVar: null,
       },
     ]);
     const { result } = await handleUnplayed(
@@ -241,6 +244,34 @@ describe("handleUnplayed", () => {
     expect(result).toMatchObject({
       ok: true,
       body: [{ songId: 1, exScore: null, bpi: null }],
+    });
+  });
+
+  it("mu/sigma/residualVarもBPI計算に必要な値として返すこと", async () => {
+    getUnplayedSongsMock.mockResolvedValue([
+      {
+        songId: "1",
+        title: "t",
+        notes: "500",
+        bpm: "150",
+        difficulty: "ANOTHER",
+        difficultyLevel: "12",
+        releasedVersion: "20",
+        wrScore: 3800,
+        kaidenAvg: 3000,
+        coef: 1.0,
+        mu: -6.5,
+        sigma: 0.45,
+        residualVar: 0.12,
+      },
+    ]);
+    const { result } = await handleUnplayed(
+      req({ userId: "target", version: "31" }),
+      access,
+    );
+    expect(result).toMatchObject({
+      ok: true,
+      body: [{ mu: -6.5, sigma: 0.45, residualVar: 0.12 }],
     });
   });
 });

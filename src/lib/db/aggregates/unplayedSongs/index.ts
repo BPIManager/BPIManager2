@@ -68,6 +68,9 @@ class UnplayedSongsAggregateRepository {
         "sd.wrScore",
         "sd.kaidenAvg",
         "sd.coef",
+        "sd.mu",
+        "sd.sigma",
+        "sd.residualVar",
       ])
       .where("my.sc_songId", "is", null)
       .where((eb) =>
