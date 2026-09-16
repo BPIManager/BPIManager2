@@ -14,6 +14,11 @@ import type { AreaEntry } from "@/types/siteStats";
 
 const PAGE_SIZE = 10;
 
+// 公式アリーナデータの取得元(eAMUSEMENT公式サイト)がまだ最新バージョンに対応して
+// おらず、直近で実データが揃っているのがv33のため暫定的にデフォルト表示に固定する
+// (ArenaRankComparisonと同じ方針)
+const DEFAULT_VERSION = "33";
+
 function AreaDistributionTable({
   data,
 }: {
@@ -25,8 +30,8 @@ function AreaDistributionTable({
     (v) => areaByVersion[v.value]?.some((e) => e.count > 0),
   );
   const [version, setVersion] = useState<string>(
-    areaByVersion[latestVersion]
-      ? latestVersion
+    areaByVersion[DEFAULT_VERSION]
+      ? DEFAULT_VERSION
       : (availableVersions[0]?.value ?? latestVersion),
   );
 
