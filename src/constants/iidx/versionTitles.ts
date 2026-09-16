@@ -9,8 +9,8 @@ export const versionTitles: VersionTitle[] = [
   { num: "30", title: "30 RESIDENT" },
   { num: "31", title: "31 EPOLIS" },
   { num: "32", title: "32 Pinky Crush" },
-  { num: "33", title: "33 Sparkle Shower", default: true },
-  { num: "34", title: "34 ZINRAI" },
+  { num: "33", title: "33 Sparkle Shower" },
+  { num: "34", title: "34 ZINRAI", default: true },
   { num: "INF", title: "INFINITAS" },
 ];
 
