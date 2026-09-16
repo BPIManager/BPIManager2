@@ -91,6 +91,13 @@ export async function handleScoreManualUpdate(
       return { result: err(404, "楽曲が見つかりませんでした。"), ...base };
     }
 
+    if (exScore > primarySong.notes * 2) {
+      return {
+        result: err(400, "EXスコアが理論上の最大値を超えています。"),
+        ...base,
+      };
+    }
+
     const primaryCurrent =
       songDomain === "bpi"
         ? currentScores.find((s) => s.songId === bpiSong!.songId)
