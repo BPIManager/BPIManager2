@@ -20,6 +20,7 @@ const findBatchesInRangeMock = vi.fn();
 const getBatchNavigationMock = vi.fn();
 const getRangeNavigationMock = vi.fn();
 const getJstRangeMock = vi.fn();
+const getLatestBatchIdMock = vi.fn();
 const getScoresWithDetailsMock = vi.fn();
 const getOvertakenRivalsMock = vi.fn();
 const deleteBatchMock = vi.fn();
@@ -59,6 +60,7 @@ vi.mock("@/lib/db/domains/logs/navigation", () => ({
     getBatchNavigation: (...a: unknown[]) => getBatchNavigationMock(...a),
     getRangeNavigation: (...a: unknown[]) => getRangeNavigationMock(...a),
     getJstRange: (...a: unknown[]) => getJstRangeMock(...a),
+    getLatestBatchId: (...a: unknown[]) => getLatestBatchIdMock(...a),
   },
 }));
 vi.mock("@/lib/db/domains/scores/detail", () => ({
@@ -211,9 +213,21 @@ describe("handleBatchDelete", () => {
     expect(result).toMatchObject({ ok: false, status: 404 });
   });
 
+  it("最新バッチでなければ err(400)", async () => {
+    authenticateViewerMock.mockResolvedValue("u1");
+    findBatchByIdAndUserMock.mockResolvedValue({ batchId: "b1", version: "31" });
+    getLatestBatchIdMock.mockResolvedValue("b2");
+    const { result } = await handleBatchDelete(
+      req({ userId: "u1", batchId: "b1" }),
+    );
+    expect(result).toMatchObject({ ok: false, status: 400 });
+    expect(deleteBatchMock).not.toHaveBeenCalled();
+  });
+
   it("正常時は削除して ok", async () => {
     authenticateViewerMock.mockResolvedValue("u1");
-    findBatchByIdAndUserMock.mockResolvedValue({ batchId: "b1" });
+    findBatchByIdAndUserMock.mockResolvedValue({ batchId: "b1", version: "31" });
+    getLatestBatchIdMock.mockResolvedValue("b1");
     deleteBatchMock.mockResolvedValue(undefined);
     const { result } = await handleBatchDelete(
       req({ userId: "u1", batchId: "b1" }),

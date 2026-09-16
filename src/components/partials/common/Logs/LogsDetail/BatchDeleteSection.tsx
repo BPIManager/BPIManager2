@@ -8,9 +8,10 @@ interface Props {
   userId: string;
   batchId: string;
   version: string;
+  isLatest: boolean;
 }
 
-const BatchDeleteSection = ({ userId, batchId, version }: Props) => {
+const BatchDeleteSection = ({ userId, batchId, version, isLatest }: Props) => {
   const { t } = useTranslation();
   const { isOpen, setIsOpen, isDeleting, handleDelete } = useBatchDelete(
     userId,
@@ -36,10 +37,19 @@ const BatchDeleteSection = ({ userId, batchId, version }: Props) => {
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         onConfirm={handleDelete}
-        title={t("logs.detail.delete.title")}
-        description={t("logs.detail.delete.desc")}
+        title={
+          isLatest
+            ? t("logs.detail.delete.title")
+            : t("logs.detail.delete.notLatestTitle")
+        }
+        description={
+          isLatest
+            ? t("logs.detail.delete.desc")
+            : t("logs.detail.delete.notLatestDesc")
+        }
         confirmLabel={t("logs.detail.delete.confirm")}
-        isDestructive
+        isDestructive={isLatest}
+        isConfirmDisabled={!isLatest}
         isLoading={isDeleting}
       />
     </>

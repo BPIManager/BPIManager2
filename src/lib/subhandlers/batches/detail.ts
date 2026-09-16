@@ -157,6 +157,18 @@ export async function handleBatchDelete(
       };
     }
 
+    const latestBatchId = await navigationRepo.getLatestBatchId(
+      uid,
+      targetBatch.version,
+    );
+    if (latestBatchId !== bid) {
+      return {
+        result: err(400, "最新のバッチのみ削除できます。"),
+        targetUserId: uid,
+        viewerId,
+      };
+    }
+
     await deleteBatch(uid, bid);
 
     return {

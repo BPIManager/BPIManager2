@@ -273,6 +273,7 @@ const LogsDetailContent = ({
           userId={userId ?? ""}
           batchId={batchId ?? ""}
           version={version ?? ""}
+          isLatest={!details.pagination.next}
         />
       )}
     </div>
