@@ -196,6 +196,18 @@ export const logsTranslations = {
     "zh-TW": "刪除",
     ko: "삭제",
   },
+  "logs.detail.delete.notLatestTitle": {
+    ja: "このバッチは削除できません",
+    en: "This update can't be deleted",
+    "zh-TW": "此更新無法刪除",
+    ko: "이 업데이트는 삭제할 수 없습니다",
+  },
+  "logs.detail.delete.notLatestDesc": {
+    ja: "総合BPIの整合性を保つため、削除できるのは最新のバッチのみです。このバッチより新しい更新が存在するため削除できません。",
+    en: "Only the most recent update can be deleted, to keep your Total BPI consistent. This update has newer updates after it, so it can't be deleted.",
+    "zh-TW": "為保持綜合BPI的一致性，僅能刪除最新的更新。此更新之後還有更新的紀錄，因此無法刪除。",
+    ko: "종합 BPI의 일관성을 유지하기 위해 가장 최근 업데이트만 삭제할 수 있습니다. 이 업데이트보다 최신 업데이트가 존재하므로 삭제할 수 없습니다.",
+  },
   // BatchTotalBpiCard
   "logs.totalBpi.cardLabel": {
     ja: "総合BPI (☆12)",
