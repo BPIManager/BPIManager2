@@ -96,6 +96,31 @@ class allScoresRepository {
   }
 
   /**
+   * 指定ユーザー・バージョンの`allScores`テーブルにおける最新の`batchId`を取得する。
+   *
+   * ☆10以下の楽曲（`allScores`ドメインのみ）の手動編集では`logs`テーブルに
+   * 一切書き込まれず`navigationRepo.getLatestBatchId`で既存の手動バッチを
+   * 検出できないため、`allScores`自体から直接判定する（#447）。
+   *
+   * @param userId - ユーザー ID
+   * @param version - バージョン番号
+   */
+  async getLatestBatchId(
+    userId: string,
+    version: string,
+  ): Promise<string | undefined> {
+    const row = await db
+      .selectFrom("allScores")
+      .select("batchId")
+      .where("userId", "=", userId)
+      .where("version", "=", version)
+      .orderBy("logId", "desc")
+      .limit(1)
+      .executeTakeFirst();
+    return row?.batchId ?? undefined;
+  }
+
+  /**
    * 手動スコア編集用に、指定曲の行をupsertする。`scoresRepo.upsertManual`と
    * 同じ「現在の最新行が同じbatchIdの場合のみUPDATE、それ以外はINSERT」方針。
    *

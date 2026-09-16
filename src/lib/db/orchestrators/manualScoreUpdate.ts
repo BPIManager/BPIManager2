@@ -61,10 +61,12 @@ export async function saveManualScoreUpdate(params: {
   const { userId, version, score, allScore, newTotalBpi } = params;
 
   const prefix = getManualBatchPrefix(userId, version);
-  const currentLatestBatchId = await navigationRepo.getLatestBatchId(
-    userId,
-    version,
-  );
+  // `score`(scores/songDefドメイン、☆11/12)がある更新は`logs`に書き込まれる
+  // ため`logs`側から判定できるが、`allScore`のみ(☆10以下)の更新は`logs`に
+  // 一切触れないため、`allScores`自体から最新の手動batchIdを判定する(#447)
+  const currentLatestBatchId = score
+    ? await navigationRepo.getLatestBatchId(userId, version)
+    : await allScoresRepo.getLatestBatchId(userId, version);
   const batchId = currentLatestBatchId?.startsWith(prefix)
     ? currentLatestBatchId
     : mintManualBatchId(userId, version);

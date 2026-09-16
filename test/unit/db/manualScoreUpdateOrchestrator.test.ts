@@ -119,4 +119,31 @@ describe("manualScoreUpdateOrchestrator.saveManualScoreUpdate", () => {
     const insertCalls = callsFor(spy.calls, "insertInto").map((c) => c.args[0]);
     expect(insertCalls).toEqual(["allScores"]);
   });
+
+  it("allScoreのみの場合、allScores自体から最新の手動batchIdを判定し再利用すること(#447)", async () => {
+    const prefix = getManualBatchPrefix("user-1", "34");
+    const spy = createTransactionalDbSpy(undefined, { batchId: prefix });
+    dbHolder.current = spy;
+
+    const { batchId } = await saveManualScoreUpdate({
+      userId: "user-1",
+      version: "34",
+      allScore: {
+        songId: 900,
+        exScore: 200,
+        bpi: null,
+        clearState: "EASY",
+        missCount: 1,
+      },
+    });
+
+    // logsテーブルには一切触れていないので、allScores側の最新batchId
+    // (直接db参照のdirectResultとして与えたもの)がそのまま再利用される
+    expect(batchId).toBe(prefix);
+    const selectFromCalls = callsFor(spy.calls, "selectFrom").map(
+      (c) => c.args[0],
+    );
+    expect(selectFromCalls).toContain("allScores");
+    expect(selectFromCalls).not.toContain("logs");
+  });
 });
