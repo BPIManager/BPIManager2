@@ -1,14 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import { SlidersHorizontal } from "lucide-react";
 import UserRecommendationCard from "./Card/ui";
 import SortSelector from "./Filter/sortInput";
 import SearchInput from "./Filter/searchInput";
+import VersionSelect from "./Filter/versionSelect";
+import RangeFilterModal from "./Filter/RangeFilterModal/ui";
 import Pagination from "./pagination";
 import UserRecommendationCardSkeleton from "./Card/skeleton";
 import UserRecommendationEmpty from "./Card/empty";
 import RivalComparisonModal from "@/components/partials/modal/RivalComparison";
 import { LoginRequiredCard } from "@/components/partials/common/Auth/LoginRequired/ui";
+import { Button } from "@/components/ui/button";
 import { useUser } from "@/contexts/users/UserContext";
 import { useUserList } from "@/hooks/users/useUserList";
 import { useUserListParams } from "@/hooks/users/useUserListParams";
@@ -17,13 +21,15 @@ import FetchErrorState from "@/components/partials/common/ErrorStates/FetchError
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 const UserRecommendationList = () => {
-  const { t } = useTranslation();
+  const { t, tFormat } = useTranslation();
   const { user, isLoading: isCredentialLoading } = useUser();
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
 
-  const { q, p, s, o, seed, updateParams, handleReset } = useUserListParams();
-  const { data, isLoading, isError } = useUserList(q, p, s, o, seed);
+  const { q, p, s, o, v, seed, filters, updateParams, handleReset } = useUserListParams();
+  const { data, isLoading, isError } = useUserList(q, p, s, o, seed, v, filters);
+  const activeFilterCount = Object.values(filters).filter(Boolean).length;
 
   const handleShuffle = () => {
     updateParams({ seed: Math.floor(Math.random() * 1_000_000), p: 1 });
@@ -84,13 +90,39 @@ const UserRecommendationList = () => {
                 </button>
               )}
             </div>
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-2">
+              <div className="w-full sm:w-40">
+                <VersionSelect
+                  version={v}
+                  onChange={(value) => updateParams({ v: value, p: 1, seed: null })}
+                />
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-9 border-bpim-border bg-bpim-bg/50 text-bpim-text hover:bg-bpim-border"
+                onClick={() => setIsFilterModalOpen(true)}
+              >
+                <SlidersHorizontal className="mr-1.5 h-3.5 w-3.5" />
+                {activeFilterCount > 0
+                  ? tFormat("rivals.rangeFilter.buttonActive", { count: activeFilterCount })
+                  : t("rivals.rangeFilter.button")}
+              </Button>
+            </div>
+            <div className="mt-3 flex gap-4">
               <SearchInput
                 initialValue={q}
                 onSearch={(val) => updateParams({ q: val, p: 1 })}
               />
             </div>
           </div>
+
+          <RangeFilterModal
+            isOpen={isFilterModalOpen}
+            onClose={() => setIsFilterModalOpen(false)}
+            filters={filters}
+            onFiltersChange={(next) => updateParams({ filters: next, p: 1 })}
+          />
 
           {isLoading ? (
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">

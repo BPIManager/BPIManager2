@@ -1,13 +1,36 @@
 import type { NextApiRequest } from "next";
-import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { userDiscoveryRepo } from "@/lib/db/aggregates/userProfiles/discovery";
 import { navigationRepo } from "@/lib/db/domains/logs/navigation";
 import { songsRepo } from "@/lib/db/domains/songs";
 import { calculateRadar, buildRadarSongMaster } from "@/lib/radar/calculator";
 import { err, ok } from "@/middlewares/api/apiResult";
-import { toErrorMessage } from "@/lib/subhandlers/shared";
+import { resolveVersion, toErrorMessage } from "@/lib/subhandlers/shared";
+import {
+  RADAR_FILTER_KEYS,
+  type RadarFilterKey,
+  type RadarFilterRange,
+} from "@/types/users/list";
 import { authUidOf, type HandleOutcome } from "./_shared";
+
+function parseFilters(
+  query: NextApiRequest["query"],
+): Partial<Record<RadarFilterKey, RadarFilterRange>> {
+  const filters: Partial<Record<RadarFilterKey, RadarFilterRange>> = {};
+  for (const key of RADAR_FILTER_KEYS) {
+    const minRaw = query[`${key}Min`];
+    const maxRaw = query[`${key}Max`];
+    const min = minRaw !== undefined ? Number(minRaw) : undefined;
+    const max = maxRaw !== undefined ? Number(maxRaw) : undefined;
+    if ((min !== undefined && !Number.isNaN(min)) || (max !== undefined && !Number.isNaN(max))) {
+      filters[key] = {
+        ...(min !== undefined && !Number.isNaN(min) ? { min } : {}),
+        ...(max !== undefined && !Number.isNaN(max) ? { max } : {}),
+      };
+    }
+  }
+  return filters;
+}
 
 export async function handleRivalSuggestions(
   req: NextApiRequest,
@@ -15,7 +38,7 @@ export async function handleRivalSuggestions(
   const viewerId = authUidOf(req);
   const base = { targetUserId: viewerId, viewerId };
 
-  const { q, p, s, o, seed } = req.query;
+  const { q, p, s, o, v, seed } = req.query;
   const currentPage = Math.max(1, Number(p || 1));
   const orderMode =
     (o as "distance" | "desc" | "newest" | "supporters") || "distance";
@@ -24,7 +47,8 @@ export async function handleRivalSuggestions(
   const sortKey = (s as string) || "totalBpi";
 
   try {
-    const version = latestVersion;
+    const version = resolveVersion(v);
+    const filters = parseFilters(req.query);
     const [viewerScores, fullMaster] = await Promise.all([
       statsTablesRepo.getLatestScoresWithMusicData(viewerId, version),
       songsRepo.getSongMasterWithDef(),
@@ -49,6 +73,7 @@ export async function handleRivalSuggestions(
       searchQuery: q as string,
       sort: sortKey,
       order: orderMode,
+      filters,
       seed: parsedSeed,
     });
 
@@ -56,6 +81,7 @@ export async function handleRivalSuggestions(
       result: ok({
         viewer: {
           userId: viewerId,
+          version,
           totalBpi: viewerBaseValue,
           radar: viewerRadar,
         },
