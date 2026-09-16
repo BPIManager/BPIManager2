@@ -48,6 +48,14 @@ export async function handleBatchScores(
         ? await handleLastPlayedBase(uid, ver, range, nav, isOwnLog, type)
         : await handleCreatedAtBase(uid, ver, range, nav, isOwnLog, type);
 
+    if (!responseData) {
+      return {
+        result: err(404, "指定された期間のデータが見つかりませんでした。"),
+        targetUserId: uid,
+        viewerId,
+      };
+    }
+
     return {
       result: ok({
         ...responseData,
