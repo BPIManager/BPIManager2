@@ -29,6 +29,8 @@ export interface AAATableItem {
   notes: number;
   /** 最大スコア（notes × 2） */
   maxScore: number;
+  /** ノーツレーダーの主要カテゴリ。未分類の楽曲は`null` */
+  radarTop: string | null;
   /** AAA / Max- / カスタム それぞれの目標スコア情報 */
   targets: {
     aaa: AAATableTarget;
