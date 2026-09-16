@@ -112,11 +112,13 @@ class LogScoreRepository {
 
     if (batchIds && batchIds.length > 0) {
       query = query
+        .where("current.userId", "=", userId)
         .where("current.batchId", "in", batchIds)
         .where("current.logId", "in", (qb) =>
           qb
             .selectFrom("scores")
             .select((eb) => eb.fn.max("logId").as("logId"))
+            .where("userId", "=", userId)
             .where("batchId", "in", batchIds)
             .groupBy("songId"),
         );

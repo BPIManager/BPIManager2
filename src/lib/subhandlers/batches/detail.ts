@@ -43,7 +43,7 @@ export async function handleBatchDetail(
     const denied = accessError(access);
     if (denied) return { result: denied, targetUserId: uid, viewerId };
 
-    const targetBatch = await navigationRepo.findBatchById(bid);
+    const targetBatch = await navigationRepo.findBatchById(bid, uid);
     if (!targetBatch) {
       return {
         result: err(404, "Batch not found."),
