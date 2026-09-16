@@ -7,7 +7,7 @@ import { useMergedCompareSongs } from "@/hooks/table/useMergedCompareSongs";
 import SongFilterBar from "@/components/partials/common/Songs/Filter/ui";
 import SongList from "./ui";
 import CustomPagination from "@/components/partials/common/ListControls/Pagination/ui";
-import SongDetailView from "@/components/partials/modal/SongDetail/ui";
+import SongDetailView from "@/components/partials/modal/SongDetail";
 import { useUserScores } from "@/hooks/table/useUserScores";
 import { useCompareScores } from "@/hooks/table/useCompareScores";
 import { NoDataAlert } from "@/components/partials/common/DashBoard/NoData";

@@ -7,7 +7,7 @@ import { SongWithScore } from "@/types/songs/score";
 import SongFilterBar from "@/components/partials/common/Songs/Filter/ui";
 import AdvancedFilterModal from "@/components/partials/common/Songs/AdvancedFilter/ui";
 import { AllSongList } from "./Table";
-import SongDetailView from "@/components/partials/modal/SongDetail/ui";
+import SongDetailView from "@/components/partials/modal/SongDetail";
 import { NoDataAlert } from "@/components/partials/common/DashBoard/NoData";
 import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
 import { useAllScores } from "@/hooks/allScores/useAllScores";
