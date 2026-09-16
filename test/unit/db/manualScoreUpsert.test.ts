@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { scoresRepo } from "@/lib/db/domains/scores";
 import { navigationRepo } from "@/lib/db/domains/logs/navigation";
-import { getManualBatchId } from "@/lib/scores/manualBatchId";
+import { getManualBatchPrefix, mintManualBatchId } from "@/lib/scores/manualBatchId";
 
 /**
  * `selectFrom` の結果だけ差し替えられる簡易trxモック。
@@ -76,21 +76,32 @@ function createTrxMock(latestRow: unknown) {
   return { trx, calls };
 }
 
-describe("getManualBatchId", () => {
-  it("userId・version・当日日付(JST)から決定的なIDを生成すること", () => {
-    const id1 = getManualBatchId("user-1", "34");
-    const id2 = getManualBatchId("user-1", "34");
+describe("getManualBatchPrefix", () => {
+  it("userId・version・当日日付(JST)から決定的なプレフィックスを生成すること", () => {
+    const id1 = getManualBatchPrefix("user-1", "34");
+    const id2 = getManualBatchPrefix("user-1", "34");
     expect(id1).toBe(id2);
     expect(id1).toMatch(/^manual-user-1-34-\d{4}-\d{2}-\d{2}$/);
   });
 
-  it("userId・versionが異なれば別のIDになること", () => {
-    expect(getManualBatchId("user-1", "34")).not.toBe(
-      getManualBatchId("user-2", "34"),
+  it("userId・versionが異なれば別のプレフィックスになること", () => {
+    expect(getManualBatchPrefix("user-1", "34")).not.toBe(
+      getManualBatchPrefix("user-2", "34"),
     );
-    expect(getManualBatchId("user-1", "34")).not.toBe(
-      getManualBatchId("user-1", "33"),
+    expect(getManualBatchPrefix("user-1", "34")).not.toBe(
+      getManualBatchPrefix("user-1", "33"),
     );
+  });
+});
+
+describe("mintManualBatchId", () => {
+  it("プレフィックスを含み、呼び出すたびに一意なIDを発行すること", () => {
+    const prefix = getManualBatchPrefix("user-1", "34");
+    const id1 = mintManualBatchId("user-1", "34");
+    const id2 = mintManualBatchId("user-1", "34");
+    expect(id1.startsWith(prefix)).toBe(true);
+    expect(id2.startsWith(prefix)).toBe(true);
+    expect(id1).not.toBe(id2);
   });
 });
 

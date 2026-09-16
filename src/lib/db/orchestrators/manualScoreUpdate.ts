@@ -4,7 +4,7 @@ import { allScoresRepo } from "@/lib/db/domains/allScores";
 import { navigationRepo } from "@/lib/db/domains/logs/navigation";
 import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
 import { BpiCalculator } from "@/lib/bpi";
-import { getManualBatchId } from "@/lib/scores/manualBatchId";
+import { getManualBatchPrefix, mintManualBatchId } from "@/lib/scores/manualBatchId";
 
 interface ManualScoreInput {
   songId: number;
@@ -26,11 +26,18 @@ interface ManualAllScoreInput {
 /**
  * 画面からの手動スコア編集をトランザクション内で保存する。
  *
- * CSVインポート（`saveImportResults`）とは別の経路。決定的batchId
- * （{@link getManualBatchId}）を使い、同日内の複数回の手動保存を
+ * CSVインポート（`saveImportResults`）とは別の経路。`logs`の現在の最新
+ * batchIdが当日の手動編集プレフィックス（{@link getManualBatchPrefix}）と
+ * 一致する場合はそれをそのまま使い回し、同日内の複数回の手動保存を
  * `logs`/`userStatusLogs`/`scores`/`allScores`それぞれ1行にまとめて
  * レコード増加を抑える（各`upsertManual`/`upsertManualBatch`が
  * 「現在も最新の行である場合のみUPDATE」を判定する）。
+ *
+ * 一致しない場合（間にCSVインポート等が挟まった場合）は
+ * {@link mintManualBatchId} で新しい一意なbatchIdを発行する。
+ * `logs.batchId`にはUNIQUE制約があるため、決定的な（サフィックス無しの）
+ * IDをそのまま使い回してINSERTすると、既に別の行で使用済みの場合に
+ * 重複キーエラーになるため。
  *
  * `score`（BPI計算対象、☆11/12）・`allScore`（全難易度履歴）はそれぞれ
  * 独立に「改善時のみ」呼び出し元が渡す（CSVバッチインポートと同じ方針）。
@@ -52,7 +59,16 @@ export async function saveManualScoreUpdate(params: {
   newTotalBpi?: number;
 }): Promise<{ totalBpi: number | null; batchId: string }> {
   const { userId, version, score, allScore, newTotalBpi } = params;
-  const batchId = getManualBatchId(userId, version);
+
+  const prefix = getManualBatchPrefix(userId, version);
+  const currentLatestBatchId = await navigationRepo.getLatestBatchId(
+    userId,
+    version,
+  );
+  const batchId = currentLatestBatchId?.startsWith(prefix)
+    ? currentLatestBatchId
+    : mintManualBatchId(userId, version);
+
   const lastPlayed = new Date();
 
   return await db.transaction().execute(async (trx) => {

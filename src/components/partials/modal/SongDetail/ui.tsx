@@ -1,7 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { LineChart, LucideHistory, Users, PencilIcon, XIcon } from "lucide-react";
+import {
+  LineChart,
+  LucideHistory,
+  Users,
+  PencilIcon,
+  XIcon,
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -84,8 +90,6 @@ const SongDetailView = ({
   } | null>(null);
 
   // 別の曲に切り替わったら編集状態・保存済みオーバーライドをリセットする
-  // (レンダー中にstateを直接調整するReact推奨パターン。useEffectだと
-  // 一瞬前の曲のオーバーライドが残ったまま描画されてしまう)
   const [lastSongId, setLastSongId] = useState(song?.songId);
   if (song?.songId !== lastSongId) {
     setLastSongId(song?.songId);
@@ -102,7 +106,8 @@ const SongDetailView = ({
 
   const maxScore = song ? song.notes * 2 : 0;
   const currentEx = savedOverride?.exScore ?? (song ? song.exScore || 0 : 0);
-  const displayEx = isEditing && draftExScore != null ? draftExScore : currentEx;
+  const displayEx =
+    isEditing && draftExScore != null ? draftExScore : currentEx;
 
   const rankInfo = useMemo(
     () => getRankDetail(displayEx, maxScore),
@@ -120,7 +125,11 @@ const SongDetailView = ({
     if (!fullSong) return { next: 0 as number | string, diff: 0 };
     if (draftBpi == null) return { next: "-", diff: 0 };
     const nextTargetBpi = Math.ceil((draftBpi + 0.01) / 10) * 10;
-    const targetScore = BpiCalculator.calcFromBPI(nextTargetBpi, fullSong, true);
+    const targetScore = BpiCalculator.calcFromBPI(
+      nextTargetBpi,
+      fullSong,
+      true,
+    );
     if (targetScore === null) return { next: "-", diff: 0 };
     return { next: nextTargetBpi, diff: targetScore - displayEx };
   }, [fullSong, draftBpi, displayEx]);
@@ -143,7 +152,8 @@ const SongDetailView = ({
     draftExScore <= maxScore;
 
   const handleSave = async () => {
-    if (!canSave || !song || !version || !songDomain || draftExScore == null) return;
+    if (!canSave || !song || !version || !songDomain || draftExScore == null)
+      return;
     const result = await save({
       songId: song.songId,
       songDomain,
@@ -229,7 +239,9 @@ const SongDetailView = ({
                   max={maxScore}
                   value={draftExScore ?? ""}
                   onChange={(e) =>
-                    setDraftExScore(e.target.value ? Number(e.target.value) : null)
+                    setDraftExScore(
+                      e.target.value ? Number(e.target.value) : null,
+                    )
                   }
                   className="h-8 font-mono text-lg font-black"
                 />
