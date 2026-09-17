@@ -781,6 +781,12 @@ export const analyticsTranslations = {
     "zh-TW": "目前",
     ko: "현재",
   },
+  "optimizer.bpiJourney.currentTotalBpi": {
+    ja: "総合BPI",
+    en: "Total BPI",
+    "zh-TW": "總合BPI",
+    ko: "종합 BPI",
+  },
   "optimizer.bpiJourney.target": {
     ja: "目標",
     en: "Target",

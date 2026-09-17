@@ -230,25 +230,21 @@ export const GoalBpiJourney = ({
   return (
     <div
       className={cn(
-        "flex flex-col gap-3 rounded-xl bg-bpim-surface p-4",
+        "flex flex-col gap-2 rounded-xl bg-bpim-surface p-3",
         isExpanded && "border-2 border-bpim-primary/30",
       )}
     >
-      <div className="flex items-center justify-between">
-        <span className="text-sm font-bold text-bpim-text">
-          {t("dashboard.optimizerProgress.title")}
-        </span>
-        <HighlightBadge highlight={highlight} />
-      </div>
-
       {steps.length > 0 && (
-        <div className="flex flex-col gap-1.5 rounded-lg bg-bpim-bg p-2.5">
-          <span className="text-xs font-black text-bpim-text">
-            {tFormat("optimizer.bpiJourney.songsAchieved", {
-              achieved: achievedCount,
-              total: steps.length,
-            })}
-          </span>
+        <div className="flex flex-col gap-1 rounded-lg bg-bpim-bg p-2">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-xs font-black text-bpim-text">
+              {tFormat("optimizer.bpiJourney.songsAchieved", {
+                achieved: achievedCount,
+                total: steps.length,
+              })}
+            </span>
+            <HighlightBadge highlight={highlight} />
+          </div>
           <SongStatusBar steps={steps} />
         </div>
       )}
@@ -260,7 +256,7 @@ export const GoalBpiJourney = ({
           </JourneyColumn>
         )}
         <JourneyColumn
-          label={t("optimizer.bpiJourney.current")}
+          label={t("optimizer.bpiJourney.currentTotalBpi")}
           emphasize
           highlight={highlight}
         >
