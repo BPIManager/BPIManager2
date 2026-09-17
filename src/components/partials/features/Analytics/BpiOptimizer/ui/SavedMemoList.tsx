@@ -204,13 +204,13 @@ const GoalDetailDrawer = ({
         }
       }}
     >
-      <DrawerContent className="flex max-h-[85vh] flex-col">
-        <DrawerHeader className="shrink-0 text-left">
-          <DrawerTitle className="flex items-center gap-2">
+      <DrawerContent className="flex min-h-0 flex-col">
+        <DrawerHeader className="flex-row shrink-0 items-center justify-between gap-2 text-left">
+          <DrawerTitle className="flex min-w-0 items-center gap-2">
             <Badge
               variant="secondary"
               className={cn(
-                "text-xs",
+                "shrink-0 text-xs",
                 isAuto
                   ? "bg-bpim-overlay"
                   : "bg-bpim-primary/15 text-bpim-primary",
@@ -220,33 +220,33 @@ const GoalDetailDrawer = ({
                 ? t("optimizer.memo.kind.auto")
                 : t("optimizer.memo.kind.custom")}
             </Badge>
-            <span className="flex items-center gap-1 text-xs font-normal text-bpim-subtle">
+            <span className="flex shrink-0 items-center gap-1 text-xs font-normal text-bpim-subtle">
               <Calendar className="h-3 w-3" />
               {new Date(memo.createdAt).toLocaleDateString()}
             </span>
           </DrawerTitle>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="shrink-0 gap-1.5"
+            onClick={onShare}
+          >
+            <Share2 className="h-3.5 w-3.5" />
+            {t("optimizer.memo.shareShort")}
+          </Button>
         </DrawerHeader>
 
-        <div className="flex shrink-0 flex-col gap-2 border-b border-bpim-border px-4 pb-3">
+        <div className="shrink-0 border-b border-bpim-border px-4 pb-3">
           <GoalBpiJourney
             memo={memo}
             liveCurrentTotalBpi={liveCurrentTotalBpi}
             steps={steps}
             isExpanded
           />
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="w-full gap-1.5"
-            onClick={onShare}
-          >
-            <Share2 className="h-3.5 w-3.5" />
-            {t("optimizer.memo.share")}
-          </Button>
         </div>
 
-        <div className="flex flex-1 flex-col gap-1.5 overflow-y-auto px-4 py-3 custom-scrollbar">
+        <div className="flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto px-4 py-3 custom-scrollbar">
           {steps.length > 1 && (
             <div className="flex min-w-0 gap-1 rounded-lg bg-bpim-overlay/30 p-1">
               {STEP_SORT_ORDERS.map((order) => (

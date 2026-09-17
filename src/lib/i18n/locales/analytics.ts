@@ -580,6 +580,12 @@ export const analyticsTranslations = {
     "zh-TW": "分享曲目",
     ko: "곡 목록 공유",
   },
+  "optimizer.memo.shareShort": {
+    ja: "共有",
+    en: "Share",
+    "zh-TW": "分享",
+    ko: "공유",
+  },
   "optimizer.memo.shareTitle": {
     ja: "曲目をシェア",
     en: "Share song list",
