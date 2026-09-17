@@ -13,6 +13,7 @@ export const ALL_WIDGET_IDS = [
   "iidxTower",
   "officialArenaHistory",
   "rankingTabs",
+  "optimizerProgress",
 ] as const;
 
 export type WidgetId = (typeof ALL_WIDGET_IDS)[number];
@@ -84,6 +85,11 @@ export const WIDGET_META: Record<
     label: "widget.rankingTabs",
     defaultWidth: "full",
     defaultSection: "sidebar",
+  },
+  optimizerProgress: {
+    label: "widget.optimizerProgress",
+    defaultWidth: "half",
+    defaultSection: "main",
   },
 };
 

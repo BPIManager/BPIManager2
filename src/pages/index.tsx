@@ -24,6 +24,7 @@ import BpiChangeNotice from "@/components/partials/common/DashBoard/BpiChangeNot
 import MonthlyReviewNotice from "@/components/partials/common/DashBoard/MonthlyReviewNotice";
 import IidxTowerSection from "@/components/partials/common/DashBoard/IidxTowerCard";
 import OfficialArenaHistorySection from "@/components/partials/common/DashBoard/OfficialArenaHistoryCard";
+import OptimizerProgressSection from "@/components/partials/common/DashBoard/OptimizerProgress";
 import { Settings2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import DashboardLayoutSettingsModal from "@/components/partials/common/DashBoard/LayoutSettings";
@@ -67,6 +68,8 @@ function WidgetRenderer({
       return <RankingTabsCard userId={userId} />;
     case "officialArenaHistory":
       return <OfficialArenaHistorySection userId={userId} showActivePlayers />;
+    case "optimizerProgress":
+      return <OptimizerProgressSection userId={userId} />;
     default:
       return null;
   }

@@ -135,16 +135,16 @@ const OptimizationSummary = ({
 
           {onSave && (
             <Button
-              variant="outline"
+              variant="default"
               size="sm"
               onClick={onSave}
               disabled={isSaving || isSaved}
-              className="border-bpim-primary/40 text-bpim-primary hover:bg-bpim-primary/10 gap-2 h-8 text-xs font-bold disabled:opacity-50"
+              className="gap-2 h-9 text-xs font-bold shadow-sm shadow-bpim-primary/30 disabled:opacity-50"
             >
               {isSaving ? (
-                <CircleDashed className="h-3.5 w-3.5 animate-spin" />
+                <CircleDashed className="h-4 w-4 animate-spin" />
               ) : (
-                <Save className="h-3.5 w-3.5" />
+                <Save className="h-4 w-4" />
               )}
               {isSaved ? t("optimizer.summary.saved") : t("optimizer.summary.save")}
             </Button>

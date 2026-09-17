@@ -500,4 +500,37 @@ export const WIDGET_PREVIEWS: Record<WidgetId, React.ReactNode> = {
       </svg>
     </MiniPreview>
   ),
+
+  // Optimizerメモ達成状況 – 曲ごとの目標EXスコア進捗バー
+  optimizerProgress: (
+    <MiniPreview>
+      <svg viewBox="0 0 56 36" className="w-full h-full">
+        <text x="3" y="6" fontSize="4" fontWeight="700" fill={P}>
+          目標BPI 12.00
+        </text>
+        {([9, 18, 27] as number[]).map((y, i) => (
+          <g key={i}>
+            <rect
+              x="3"
+              y={y}
+              width="50"
+              height="3"
+              rx="1.5"
+              fill={M}
+              fillOpacity={0.15}
+            />
+            <rect
+              x="3"
+              y={y}
+              width={[38, 24, 12][i]}
+              height="3"
+              rx="1.5"
+              fill={i === 0 ? S : P}
+              fillOpacity={0.75}
+            />
+          </g>
+        ))}
+      </svg>
+    </MiniPreview>
+  ),
 };
