@@ -3,7 +3,7 @@ import { PageContainer, PageHeader } from "@/components/partials/common/PageChro
 import { Meta } from "@/components/partials/common/PageChrome/Head";
 import ReusableMenuItem from "@/components/partials/features/Metrics/Menu/ui";
 import { Swords, Table } from "lucide-react";
-import { latestVersion } from "@/constants/iidx/iidxVersions";
+import { arenaDataVersion } from "@/constants/iidx/iidxVersions";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 export default function SettingsPage() {
@@ -28,11 +28,7 @@ export default function SettingsPage() {
           iconColor="blue.400"
         />
         <ReusableMenuItem
-          href={
-            "/metrics/arenaAverage/" +
-            String(Number(latestVersion) - 1) +
-            "?difficultyLevel=12"
-          }
+          href={`/metrics/arenaAverage/${arenaDataVersion}?difficultyLevel=12`}
           icon={Swords}
           title={t("page.metrics.arenaAverage")}
           subtitle={<>{t("page.metrics.arenaAverageDesc")}</>}

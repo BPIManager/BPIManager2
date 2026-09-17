@@ -20,7 +20,7 @@ import {
   Plug,
   LucideIcon,
 } from "lucide-react";
-import { latestVersion } from "@/constants/iidx/iidxVersions";
+import { latestVersion, arenaDataVersion } from "@/constants/iidx/iidxVersions";
 import type { TranslationKey } from "@/lib/i18n/translations";
 import { XIcon } from "@/components/partials/common/Auth/Buttons";
 
@@ -57,7 +57,7 @@ export const getAnalyticsMenuItems = (t: T) => [
   {
     label: t("nav.arenaAverage"),
     icon: Swords,
-    href: `/metrics/arenaAverage/${Number(latestVersion) - 1}?difficultyLevel=12`,
+    href: `/metrics/arenaAverage/${arenaDataVersion}?difficultyLevel=12`,
   },
 ];
 
