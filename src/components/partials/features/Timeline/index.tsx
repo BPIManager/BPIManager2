@@ -75,6 +75,28 @@ const TimelineContainer = () => {
           <aside className="lg:sticky lg:top-20 z-10">
             <div className="flex flex-col gap-6 rounded-xl border border-bpim-border bg-bpim-bg/40 p-4 backdrop-blur-sm">
               <div className="flex flex-col gap-1">
+                <FilterHeader label={t("timeline.version.label")} />
+                <Select value={version} onValueChange={setVersion}>
+                  <SelectTrigger className="h-8 text-xs w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {versionTitles
+                      .filter((v) => !v.disabled)
+                      .map((v) => (
+                        <SelectItem
+                          key={v.num}
+                          value={v.num}
+                          className="text-xs"
+                        >
+                          {v.title}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex flex-col gap-1">
                 <FilterHeader label={t("timeline.mode.label")} />
                 <MenuButton
                   isActive={mode === "all"}
@@ -117,28 +139,6 @@ const TimelineContainer = () => {
                   ))}
                 </div>
               )}
-
-              <div className="flex flex-col gap-1">
-                <FilterHeader label={t("timeline.version.label")} />
-                <Select value={version} onValueChange={setVersion}>
-                  <SelectTrigger className="h-8 text-xs w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {versionTitles
-                      .filter((v) => !v.disabled)
-                      .map((v) => (
-                        <SelectItem
-                          key={v.num}
-                          value={v.num}
-                          className="text-xs"
-                        >
-                          {v.title}
-                        </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
-              </div>
 
               <FilterCheckboxGroup
                 label="LEVEL"
