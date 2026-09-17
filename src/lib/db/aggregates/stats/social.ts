@@ -86,6 +86,9 @@ class StatsSocialRepository {
         "d.wrScore",
         "d.kaidenAvg",
         "d.coef",
+        "d.mu",
+        "d.sigma",
+        "d.residualVar",
         "neighbors.neighborAvgBpi",
         "neighbors.neighborCount",
       ])
