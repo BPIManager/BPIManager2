@@ -172,17 +172,24 @@ class StatsTablesRepository {
   }
 
   /**
-   * {@link getLatestScoresWithMusicData}の全ユーザー版。
-   *
-   * radarキャッシュ更新クロン(`src/lib/cron/radar/index.ts`)のように、全ユーザー分の
-   * 最新スコア＋楽曲データが必要な場合に、ユーザーごとに都度クエリを発行する
-   * N+1を避けるため、1回のクエリで全ユーザー分をまとめて取得する
-   * （`songRankingCache.calculateForVersion`と同じ考え方）。
+   * {@link getLatestScoresWithMusicData}の複数ユーザー版。
+   * radarキャッシュ更新クロン(`src/lib/cron/radar/index.ts`)のように、複数ユーザー分の
+   * 最新スコア＋楽曲データが必要な場合に、ユーザーごとに個別クエリを発行せず
+   * 1回のクエリでまとめて取得する（`songRankingCache.calculateForVersion`と同じ考え方）。
    * 呼び出し側で`userId`ごとにグルーピングして利用する。
    *
+   * `userIds`未指定（全ユーザー対象）で呼ぶと、ユーザー数・スコア数に比例して
+   * 結果セット全体をメモリ上に保持することになりPM2の`max_memory_restart`を
+   * 超過しうる。ユーザー数が多い呼び出し元は`userIds`でページ単位に絞り込んで
+   * 呼び出すこと（`updateAllUserRadarCache`参照）。
+   *
    * @param version - バージョン番号
+   * @param userIds - 指定時、このユーザーID群のみに絞り込む（省略時は全ユーザー）
    */
-  async getLatestScoresWithMusicDataForAllUsers(version: string) {
+  async getLatestScoresWithMusicDataForAllUsers(
+    version: string,
+    userIds?: string[],
+  ) {
     return await db
       .selectFrom("scores as s")
       .innerJoin("songs as m", "s.songId", "m.songId")
@@ -190,9 +197,11 @@ class StatsTablesRepository {
         join.onRef("d.songId", "=", "m.songId").on("d.isCurrent", "=", 1),
       )
       .innerJoin(
-        latestLogIdPerUserSongSubquery({ table: "scores", version }).as(
-          "latest",
-        ),
+        latestLogIdPerUserSongSubquery({
+          table: "scores",
+          version,
+          userIds,
+        }).as("latest"),
         (join) =>
           join
             .onRef("latest.maxLogId", "=", "s.logId")
@@ -221,6 +230,9 @@ class StatsTablesRepository {
         "d.residualVar",
       ])
       .where("s.version", "=", version)
+      .$if(!!userIds && userIds.length > 0, (qb) =>
+        qb.where("s.userId", "in", userIds!),
+      )
       .execute();
   }
 
