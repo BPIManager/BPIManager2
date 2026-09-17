@@ -319,6 +319,86 @@ export const loginPageTranslations = {
     ko: "팔로우한 라이벌로부터 매일의 점수 업데이트 알림을 받아 서로 자극을 받을 수 있을 뿐만 아니라, 점수 비교 및 역전·격차 벌리기도 한눈에 파악할 수 있습니다.",
   },
 
+  // Showcase Section 5: Arena Average
+  "login.showcase.arena.tag": {
+    ja: "ARENA AVERAGE",
+    en: "ARENA AVERAGE",
+    "zh-TW": "ARENA AVERAGE",
+    ko: "ARENA AVERAGE",
+  },
+  "login.showcase.arena.title": {
+    ja: "全プレイヤー平均と比較する",
+    en: "Compare Against the Arena Average",
+    "zh-TW": "與全體玩家平均比較",
+    ko: "전체 플레이어 평균과 비교하다",
+  },
+  "login.showcase.arena.chartTitle": {
+    ja: "アリーナ平均比較",
+    en: "Arena Average Comparison",
+    "zh-TW": "競技場平均比較",
+    ko: "아레나 평균 비교",
+  },
+  "login.showcase.arena.myScore": {
+    ja: "自分のスコア",
+    en: "Your Score",
+    "zh-TW": "自己的成績",
+    ko: "내 점수",
+  },
+  "login.showcase.arena.avgScore": {
+    ja: "アリーナ平均",
+    en: "Arena Average",
+    "zh-TW": "競技場平均",
+    ko: "아레나 평균",
+  },
+  "login.showcase.arena.desc1": {
+    ja: "各楽曲・難易度ごとに、全ユーザーのスコアから算出したアリーナ平均と自分のスコアを比較できます。今の自分が平均より上か下か、一目で把握できます。",
+    en: "Compare your score on every song and difficulty against the arena average, calculated from all registered users' scores. See at a glance whether you're above or below the curve.",
+    "zh-TW":
+      "可將自己在各樂曲、難易度上的成績，與根據全體用戶成績計算出的競技場平均進行比較。一眼掌握目前的自己是高於還是低於平均水準。",
+    ko: "각 악곡・난이도별로 전체 유저의 점수로 산출한 아레나 평균과 자신의 점수를 비교할 수 있습니다. 지금의 자신이 평균보다 위인지 아래인지 한눈에 파악할 수 있습니다.",
+  },
+  "login.showcase.arena.desc2": {
+    ja: "アリーナランク（A1〜A9等）別の平均も参照できるため、自分と同じ実力帯のプレイヤーと比べてどうかという、より精度の高い比較が可能です。",
+    en: "Averages are also available broken down by Arena Rank (A1–A9, etc.), enabling a more precise comparison against players in your own skill bracket.",
+    "zh-TW":
+      "還可依競技場階級（A1~A9等）分別查看平均值，因此能與同實力層級的玩家進行更精準的比較。",
+    ko: "아레나 랭크(A1~A9 등)별 평균도 참조할 수 있어, 자신과 비슷한 실력대의 플레이어와 비교하는 더 정밀한 비교가 가능합니다.",
+  },
+
+  // Showcase Section 6: AAA Difficulty Table
+  "login.showcase.aaa.tag": {
+    ja: "AAA DIFFICULTY TABLE",
+    en: "AAA DIFFICULTY TABLE",
+    "zh-TW": "AAA DIFFICULTY TABLE",
+    ko: "AAA DIFFICULTY TABLE",
+  },
+  "login.showcase.aaa.title": {
+    ja: "AAA達成難易度表で次の目標を見つける",
+    en: "Find Your Next Goal with the AAA Difficulty Table",
+    "zh-TW": "透過 AAA 達成難易度表尋找下一個目標",
+    ko: "AAA 달성 난이도표로 다음 목표를 찾다",
+  },
+  "login.showcase.aaa.chartTitle": {
+    ja: "AAA達成難易度表",
+    en: "AAA Difficulty Table",
+    "zh-TW": "AAA 達成難易度表",
+    ko: "AAA 달성 난이도표",
+  },
+  "login.showcase.aaa.desc1": {
+    ja: "AAAやMAX-の達成に必要なBPI帯ごとに楽曲がグループ化された難易度表です。自分の実力に対してどの曲を狙えばよいか、次の目標が一目でわかります。",
+    en: "Songs are grouped by the BPI range required to achieve AAA or MAX−. Instantly see which songs to target next based on your current skill level.",
+    "zh-TW":
+      "這是一張依達成 AAA 或 MAX- 所需 BPI 區間將樂曲分組的難易度表。能一目瞭然地知道以自己目前的實力該挑戰哪首曲子作為下一個目標。",
+    ko: "AAA나 MAX- 달성에 필요한 BPI 구간별로 악곡이 그룹화된 난이도표입니다. 자신의 실력에 맞춰 어떤 곡을 노려야 할지 다음 목표를 한눈에 알 수 있습니다.",
+  },
+  "login.showcase.aaa.desc2": {
+    ja: "ログインすると自分のスコアが反映され、達成済みの楽曲と未達成の楽曲が色分けされます。目標までのスコア差分もすぐに確認できます。",
+    en: "Sign in to see your own scores reflected, with cleared and uncleared songs color-coded. Instantly check the score gap to your next goal.",
+    "zh-TW":
+      "登入後會反映自己的成績，已達成與未達成的樂曲會以顏色區分。也能立即確認距離目標所需的分數差。",
+    ko: "로그인하면 자신의 점수가 반영되어 달성한 악곡과 미달성 악곡이 색으로 구분됩니다. 목표까지의 점수 차이도 바로 확인할 수 있습니다.",
+  },
+
   // API Section
   "login.api.tag": {
     ja: "Developer API",

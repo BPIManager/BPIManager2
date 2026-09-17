@@ -13,6 +13,8 @@ import {
   MockBpiDistribution,
   MockActivityCalendar,
   MockRivalBars,
+  MockArenaAverage,
+  MockAaaTable,
 } from "./ShowcaseSection/ui";
 import ApiSection from "./ApiSection/ui";
 import PrivacySection from "./PrivacySection/ui";
@@ -114,6 +116,29 @@ const LoginPageBody = ({
         >
           <p>{t("login.showcase.rivals.desc1")}</p>
           <p>{t("login.showcase.rivals.desc2")}</p>
+        </ShowcaseSection>
+
+        <Separator className="my-20 bg-bpim-overlay/30" />
+
+        <ShowcaseSection
+          tag={t("login.showcase.arena.tag")}
+          title={t("login.showcase.arena.title")}
+          visual={<MockArenaAverage />}
+        >
+          <p>{t("login.showcase.arena.desc1")}</p>
+          <p>{t("login.showcase.arena.desc2")}</p>
+        </ShowcaseSection>
+
+        <Separator className="my-20 bg-bpim-overlay/30" />
+
+        <ShowcaseSection
+          tag={t("login.showcase.aaa.tag")}
+          title={t("login.showcase.aaa.title")}
+          flip
+          visual={<MockAaaTable />}
+        >
+          <p>{t("login.showcase.aaa.desc1")}</p>
+          <p>{t("login.showcase.aaa.desc2")}</p>
         </ShowcaseSection>
 
         <Separator className="my-20 bg-bpim-overlay/30" />
