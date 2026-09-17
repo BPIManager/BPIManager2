@@ -1,12 +1,8 @@
+import { useState } from "react";
 import { CircleDashed, Trash2, History, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import ActionConfirmDialog from "@/components/partials/modal/Confirmation";
 import type { OptimizationResult } from "@/types/bpi-optimizer";
 import type { OptimizeMemo } from "@/hooks/analytics/useOptimizeMemo";
 import { useTranslation } from "@/hooks/common/useTranslation";
@@ -23,16 +19,16 @@ const SavedMemoList = ({
   onSelect: (result: OptimizationResult) => void;
 }) => {
   const { t, tFormat } = useTranslation();
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+
   return (
-  <Accordion type="single" collapsible className="w-full mt-4">
-    <AccordionItem value="memos" className="border-bpim-border">
-      <AccordionTrigger className="text-sm font-bold text-bpim-muted hover:text-bpim-text py-3">
-        <div className="flex items-center gap-2">
+    <>
+      <div className="flex flex-col gap-2 w-full">
+        <div className="flex items-center gap-2 text-sm font-bold text-bpim-muted py-1">
           <History className="h-4 w-4" />
           {tFormat("optimizer.memo.header", { count: memos.length })}
         </div>
-      </AccordionTrigger>
-      <AccordionContent className="flex flex-col gap-2 pt-1 pb-4">
+
         {memos.length === 0 && (
           <p className="text-xs text-center py-8 text-bpim-subtle border border-dashed border-bpim-border rounded-lg">
             {t("optimizer.memo.empty")}
@@ -60,10 +56,10 @@ const SavedMemoList = ({
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-7 w-7 text-bpim-muted hover:text-bpim-danger hover:bg-bpim-danger/10 opacity-0 group-hover:opacity-100 transition-opacity"
+                className="h-7 w-7 text-bpim-muted hover:text-bpim-danger hover:bg-bpim-danger/10"
                 onClick={(e) => {
                   e.stopPropagation();
-                  onDelete(memo.reportId);
+                  setDeleteTargetId(memo.reportId);
                 }}
                 disabled={isDeletingId === memo.reportId}
               >
@@ -79,9 +75,21 @@ const SavedMemoList = ({
             </p>
           </div>
         ))}
-      </AccordionContent>
-    </AccordionItem>
-  </Accordion>
+      </div>
+
+      <ActionConfirmDialog
+        isOpen={deleteTargetId !== null}
+        onClose={() => setDeleteTargetId(null)}
+        onConfirm={() => {
+          if (deleteTargetId) onDelete(deleteTargetId);
+          setDeleteTargetId(null);
+        }}
+        title={t("optimizer.memo.deleteTitle")}
+        description={t("optimizer.memo.deleteDesc")}
+        confirmLabel={t("optimizer.memo.deleteConfirm")}
+        isDestructive
+      />
+    </>
   );
 };
 

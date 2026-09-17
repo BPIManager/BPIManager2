@@ -520,6 +520,37 @@ export const analyticsTranslations = {
     "zh-TW": "{count}首曲計畫",
     ko: "{count}곡 플랜",
   },
+  "optimizer.memo.deleteTitle": {
+    ja: "このメモを削除しますか？",
+    en: "Delete this plan?",
+    "zh-TW": "確定刪除此計畫？",
+    ko: "이 메모를 삭제하시겠습니까?",
+  },
+  "optimizer.memo.deleteDesc": {
+    ja: "削除すると元に戻せません。",
+    en: "This action cannot be undone.",
+    "zh-TW": "刪除後無法復原。",
+    ko: "삭제하면 되돌릴 수 없습니다.",
+  },
+  "optimizer.memo.deleteConfirm": {
+    ja: "削除する",
+    en: "Delete",
+    "zh-TW": "刪除",
+    ko: "삭제",
+  },
+
+  "optimizer.tabs.create": {
+    ja: "新規作成",
+    en: "New Plan",
+    "zh-TW": "新增計畫",
+    ko: "새로 만들기",
+  },
+  "optimizer.tabs.manage": {
+    ja: "メモ管理",
+    en: "Manage Plans",
+    "zh-TW": "計畫管理",
+    ko: "메모 관리",
+  },
 
   // OptimizerGuide
   "optimizer.guide.title": {
