@@ -92,7 +92,7 @@ const StepProgressRow = ({ step }: { step: StepProgress }) => {
                 })}
         </span>
       </div>
-      <div className="h-1.5 w-full overflow-hidden rounded-full bg-bpim-surface-3">
+      <div className="h-1.5 w-full overflow-hidden rounded-full bg-bpim-muted/15">
         <div
           className={cn(
             "h-full rounded-full transition-all duration-500",
