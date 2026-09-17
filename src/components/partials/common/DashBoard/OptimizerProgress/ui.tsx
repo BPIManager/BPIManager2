@@ -82,7 +82,7 @@ const StepProgressRow = ({
     <button
       type="button"
       onClick={onClick}
-      className="flex flex-col gap-1 rounded-lg text-left transition-opacity hover:opacity-80"
+      className="flex cursor-pointer flex-col gap-1 rounded-lg text-left transition-opacity hover:opacity-80"
     >
       <div className="flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-1.5">
