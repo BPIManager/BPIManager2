@@ -298,4 +298,32 @@ describe("findOptimalBpiPath", () => {
     expect(fastest.steps[0]?.title).toBe("elite");
     expect(flexible.steps[0]?.title).toBe("average");
   });
+
+  it("flexibleモードは、実規模(n=648・目標ギャップが小さい)相当のケースでも目標に収束しつつ複数曲へ分散すること", () => {
+    // 実行結果で報告された規模を再現: 30曲がBPI24〜42程度に固まって並び、
+    // 残り618曲は未収録(mu/sigma無し)のフィラー。目標ギャップは+1.01(実測相当)。
+    const real = Array.from({ length: 30 }, (_, i) =>
+      makeSong({ songId: i + 1, currentExScore: 1845 + i * 2 }),
+    );
+    const fillers = Array.from({ length: 618 }, (_, i) => makeFillerSong(1000 + i));
+    const allSongs = [...real, ...fillers];
+
+    const observations = real.map((s) => ({
+      songId: s.songId,
+      notes: s.notes,
+      exScore: s.currentExScore!,
+    }));
+    const currentTotal = BpiCalculator.calculateTotalBPI(observations, allSongs);
+
+    const result = findOptimalBpiPath(
+      allSongs,
+      currentTotal + 1.01,
+      { ...baseOptions, includeUnplayed: false, includePlayed: true, searchMode: "flexible", maxRetries: 3 },
+      30,
+    );
+
+    expect(result.achievable).toBe(true);
+    const distinctSongs = new Set(result.steps.map((s) => s.songId));
+    expect(distinctSongs.size).toBeGreaterThan(3);
+  });
 });
