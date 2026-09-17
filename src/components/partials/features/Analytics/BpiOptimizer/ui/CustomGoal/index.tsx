@@ -15,12 +15,15 @@ const CustomGoalCreator = ({
   initialTargets,
   onBack,
   onSaved,
+  onDirtyChange,
 }: {
   currentScores: Map<number, number | null>;
   /** 「曲目をインポート」で他ユーザーの共有reportIdから読み込んだ初期値。 */
   initialTargets?: CustomGoalTargetInput[];
   onBack: () => void;
   onSaved: () => void;
+  /** 未保存の曲目が1つでもあるかを親へ伝える（離脱時の確認に使う）。 */
+  onDirtyChange?: (isDirty: boolean) => void;
 }) => {
   const { t } = useTranslation();
   const { user, fbUser } = useUser();
@@ -38,7 +41,6 @@ const CustomGoalCreator = ({
 
   useEffect(() => {
     if (!user?.userId || targets.length === 0) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPreview(null);
       return;
     }
@@ -59,6 +61,13 @@ const CustomGoalCreator = ({
         if (requestIdRef.current === requestId) setIsPreviewLoading(false);
       });
   }, [targets, user?.userId, fbUser]);
+
+  useEffect(() => {
+    onDirtyChange?.(targets.length > 0);
+    // 離脱時にも「未保存の曲目は無い」ことを親へ伝える
+    return () => onDirtyChange?.(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [targets.length]);
 
   const handleAddClick = () => {
     setEditingIndex(null);

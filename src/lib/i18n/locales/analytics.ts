@@ -715,6 +715,24 @@ export const analyticsTranslations = {
     "zh-TW": "重新選擇建立方式",
     ko: "만드는 방법 다시 선택",
   },
+  "optimizer.unsavedChanges.title": {
+    ja: "未保存の変更は失われます",
+    en: "Unsaved changes will be lost",
+    "zh-TW": "未儲存的變更將會遺失",
+    ko: "저장하지 않은 변경 사항이 사라집니다",
+  },
+  "optimizer.unsavedChanges.desc": {
+    ja: "作成中の目標はまだ保存されていません。このまま移動すると入力内容は失われます。",
+    en: "This goal hasn't been saved yet. If you leave now, your changes will be lost.",
+    "zh-TW": "此目標尚未儲存。若現在離開，已輸入的內容將會遺失。",
+    ko: "만들고 있는 목표가 아직 저장되지 않았습니다. 지금 이동하면 입력한 내용이 사라집니다.",
+  },
+  "optimizer.unsavedChanges.confirm": {
+    ja: "移動する",
+    en: "Leave anyway",
+    "zh-TW": "仍要離開",
+    ko: "그래도 이동",
+  },
   "optimizer.customGoal.empty": {
     ja: "曲がまだ追加されていません",
     en: "No songs added yet.",

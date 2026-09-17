@@ -11,6 +11,7 @@ import ImportGoalModal from "./ui/ImportGoalModal";
 import CustomGoalCreator from "./ui/CustomGoal";
 import type { ImportedGoalTarget } from "@/services/swr/analytics";
 import BpiOptimizerSkeleton from "./skeleton";
+import ActionConfirmDialog from "@/components/partials/modal/Confirmation";
 import { useUser } from "@/contexts/users/UserContext";
 import { useUserScores } from "@/hooks/table/useUserScores";
 import { useTotalBpiStats } from "@/hooks/stats/useCurrentTotalBpi";
@@ -106,8 +107,30 @@ const BpiOptimizerSection = () => {
   const [importedTargets, setImportedTargets] = useState<
     ImportedGoalTarget[] | undefined
   >(undefined);
+  const [isCustomDirty, setIsCustomDirty] = useState(false);
+  const [pendingNavigation, setPendingNavigation] = useState<
+    (() => void) | null
+  >(null);
 
   const currentTotalBpi = result?.currentTotalBpi ?? liveCurrentTotalBpi;
+
+  // 作成中の内容を保存せずに離脱しようとした場合に確認を挟む
+  // （タブ切り替え・「作成方法を選び直す」ボタンの両方が対象）。
+  const autoHasUnsavedChanges =
+    creationMode === "auto" && !!result && savedResult !== result;
+  const customHasUnsavedChanges = creationMode === "custom" && isCustomDirty;
+  const hasUnsavedCreation = autoHasUnsavedChanges || customHasUnsavedChanges;
+
+  const guardNavigation = useCallback(
+    (action: () => void) => {
+      if (hasUnsavedCreation) {
+        setPendingNavigation(() => action);
+      } else {
+        action();
+      }
+    },
+    [hasUnsavedCreation],
+  );
 
   const handleSave = useCallback(async () => {
     if (!result || !targetBpiInput) return;
@@ -130,7 +153,10 @@ const BpiOptimizerSection = () => {
   return (
     <Tabs
       value={tab}
-      onValueChange={(v) => setTab(v as "create" | "manage")}
+      onValueChange={(v) => {
+        if (v === tab) return;
+        guardNavigation(() => setTab(v as "create" | "manage"));
+      }}
       className="flex flex-col gap-6"
     >
       <TabsList className="w-full">
@@ -149,7 +175,7 @@ const BpiOptimizerSection = () => {
         {creationMode === "auto" && (
           <div className="flex flex-col gap-4">
             <button
-              onClick={() => setCreationMode("select")}
+              onClick={() => guardNavigation(() => setCreationMode("select"))}
               className="flex items-center gap-1 self-start text-xs text-bpim-muted hover:text-bpim-text"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
@@ -195,10 +221,13 @@ const BpiOptimizerSection = () => {
           <CustomGoalCreator
             currentScores={currentScores}
             initialTargets={importedTargets}
-            onBack={() => {
-              setCreationMode("select");
-              setImportedTargets(undefined);
-            }}
+            onDirtyChange={setIsCustomDirty}
+            onBack={() =>
+              guardNavigation(() => {
+                setCreationMode("select");
+                setImportedTargets(undefined);
+              })
+            }
             onSaved={() => {
               setCreationMode("select");
               setImportedTargets(undefined);
@@ -218,6 +247,19 @@ const BpiOptimizerSection = () => {
           setIsImportModalOpen(false);
           setCreationMode("custom");
         }}
+      />
+
+      <ActionConfirmDialog
+        isOpen={pendingNavigation !== null}
+        onClose={() => setPendingNavigation(null)}
+        onConfirm={() => {
+          pendingNavigation?.();
+          setPendingNavigation(null);
+        }}
+        title={t("optimizer.unsavedChanges.title")}
+        description={t("optimizer.unsavedChanges.desc")}
+        confirmLabel={t("optimizer.unsavedChanges.confirm")}
+        isDestructive
       />
 
       <TabsContent value="manage">
