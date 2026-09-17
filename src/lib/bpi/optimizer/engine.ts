@@ -166,6 +166,7 @@ class BpiOptimizerEngine {
         currentTotal,
         this.targetTotalValue,
         this.options.considerCurrentTotalBpi !== false,
+        this.options.searchMode,
       );
       if (scored.length === 0) break;
 
