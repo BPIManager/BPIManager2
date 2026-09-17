@@ -261,10 +261,10 @@ export const analyticsTranslations = {
 
   // BPI Optimizer
   "optimizer.savedPlan": {
-    ja: "プランを保存しました",
-    en: "Plan saved.",
-    "zh-TW": "計畫已儲存",
-    ko: "플랜이 저장되었습니다",
+    ja: "目標を保存しました",
+    en: "Goal saved.",
+    "zh-TW": "目標已儲存",
+    ko: "목표가 저장되었습니다",
   },
 
   // OptimizerForm
@@ -496,29 +496,11 @@ export const analyticsTranslations = {
   },
 
   // SavedMemoList
-  "optimizer.memo.header": {
-    ja: "保存済みのプラン ({count})",
-    en: "Saved Plans ({count})",
-    "zh-TW": "已儲存計畫 ({count})",
-    ko: "저장된 플랜 ({count})",
-  },
   "optimizer.memo.empty": {
-    ja: "保存された履歴はありません",
-    en: "No saved plans.",
-    "zh-TW": "尚無儲存紀錄",
-    ko: "저장된 기록이 없습니다",
-  },
-  "optimizer.memo.target": {
-    ja: "目標 {bpi}",
-    en: "Target {bpi}",
-    "zh-TW": "目標 {bpi}",
-    ko: "목표 {bpi}",
-  },
-  "optimizer.memo.songCount": {
-    ja: "{count} 曲のプラン",
-    en: "{count}-song plan",
-    "zh-TW": "{count}首曲計畫",
-    ko: "{count}곡 플랜",
+    ja: "保存された目標はありません",
+    en: "No saved goals.",
+    "zh-TW": "尚無儲存的目標",
+    ko: "저장된 목표가 없습니다",
   },
   "optimizer.memo.kind.auto": {
     ja: "自動",
@@ -1064,23 +1046,23 @@ export const analyticsTranslations = {
     ko: '카드 내 파란 게이지는 "종합BPI에 대한 기여도"입니다. 게이지가 긴 곡일수록 달성 시 종합BPI 상승폭이 큽니다.',
   },
   "optimizer.guide.saveTitle": {
-    ja: "プランの保存",
-    en: "Saving plans",
-    "zh-TW": "計畫儲存",
-    ko: "플랜 저장",
+    ja: "目標の保存",
+    en: "Saving goals",
+    "zh-TW": "目標儲存",
+    ko: "목표 저장",
   },
   "optimizer.guide.saveDesc": {
-    ja: "計算結果の右上にある「結果を保存」ボタンを押すと、現在の強化メニューをサーバーに保存できます。保存したプランはページ下部の「保存済みのプラン」セクションに一覧表示され、クリックするといつでも結果を呼び出せます。不要になったプランはゴミ箱アイコンから削除できます。",
-    en: 'Click "Save Result" (top-right of the result card) to save your current training plan. Saved plans appear in the "Saved Plans" section at the bottom of the page; click any plan to reload it. Delete unwanted plans with the trash icon.',
+    ja: "計算結果の右上にある「結果を保存」ボタンを押すと、現在の強化メニューをサーバーに保存できます。保存した目標は「目標管理」タブに一覧表示され、タップするといつでも詳細を確認できます。不要になった目標はゴミ箱アイコンから削除できます。",
+    en: 'Click "Save Result" (top-right of the result card) to save your current training menu as a goal. Saved goals appear in the "Goal Management" tab; tap any goal to see its details. Delete unwanted goals with the trash icon.',
     "zh-TW":
-      "點擊計算結果右上角的「儲存結果」按鈕，可將目前的強化菜單儲存至伺服器。已儲存的計畫會列於頁面下方的「已儲存計畫」區，點擊即可隨時重新載入。不需要的計畫可透過垃圾桶圖示刪除。",
-    ko: '계산 결과 우측 상단의 "결과 저장" 버튼을 누르면 현재 강화 메뉴를 서버에 저장할 수 있습니다. 저장된 플랜은 페이지 하단의 "저장된 플랜" 섹션에 목록으로 표시되며, 클릭하면 언제든지 결과를 불러올 수 있습니다. 불필요한 플랜은 쓰레기통 아이콘으로 삭제할 수 있습니다.',
+      "點擊計算結果右上角的「儲存結果」按鈕，可將目前的強化菜單以目標形式儲存至伺服器。已儲存的目標會列於「目標管理」分頁，點擊即可隨時查看詳情。不需要的目標可透過垃圾桶圖示刪除。",
+    ko: '계산 결과 우측 상단의 "결과 저장" 버튼을 누르면 현재 강화 메뉴를 목표로 서버에 저장할 수 있습니다. 저장된 목표는 "목표 관리" 탭에 목록으로 표시되며, 탭하면 언제든지 상세 내용을 확인할 수 있습니다. 불필요한 목표는 쓰레기통 아이콘으로 삭제할 수 있습니다.',
   },
   "optimizer.guide.multiPlanNote": {
-    ja: "目標BPIごとに複数のプランを保存しておくことで、段階的な成長計画を管理できます。",
-    en: "Save multiple plans per target BPI to manage your step-by-step growth strategy.",
-    "zh-TW": "可依目標BPI保存多個計畫，管理你的分階段成長計畫。",
-    ko: "목표 BPI별로 여러 플랜을 저장해 두면 단계적 성장 계획을 관리할 수 있습니다.",
+    ja: "目標BPIごとに複数の目標を保存しておくことで、段階的な成長計画を管理できます。",
+    en: "Save multiple goals per target BPI to manage your step-by-step growth strategy.",
+    "zh-TW": "可依目標BPI保存多個目標，管理你的分階段成長計畫。",
+    ko: "목표 BPI별로 여러 목표를 저장해 두면 단계적 성장 계획을 관리할 수 있습니다.",
   },
   "optimizer.guide.tipTitle": {
     ja: "おすすめの設定",

@@ -132,6 +132,9 @@ const OptimizerProgressEmpty = () => {
   const { t } = useTranslation();
   return (
     <DashCard>
+      <span className="text-sm font-bold text-bpim-muted">
+        {t("dashboard.optimizerProgress.title")}
+      </span>
       <div className="flex flex-col items-center gap-3 py-6 text-center">
         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-bpim-primary/10 text-bpim-primary">
           <Target className="h-6 w-6" />
