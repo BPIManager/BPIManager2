@@ -195,10 +195,12 @@ export const GoalBpiJourney = ({
   memo,
   liveCurrentTotalBpi,
   steps,
+  isExpanded,
 }: {
   memo: OptimizeMemo;
   liveCurrentTotalBpi: number | null;
   steps: GoalSongStep[];
+  isExpanded?: boolean;
 }) => {
   const { t, tFormat } = useTranslation();
   const createdTotalBpi = memo.reportData.currentTotalBpi;
@@ -226,7 +228,12 @@ export const GoalBpiJourney = ({
   const highlight: Highlight = isAchieved ? "achieved" : undefined;
 
   return (
-    <div className="flex flex-col gap-3 rounded-xl border-2 border-bpim-primary/30 bg-bpim-surface p-4">
+    <div
+      className={cn(
+        "flex flex-col gap-3 rounded-xl bg-bpim-surface p-4",
+        isExpanded && "border-2 border-bpim-primary/30",
+      )}
+    >
       <div className="flex items-center justify-between">
         <span className="text-sm font-bold text-bpim-text">
           {t("dashboard.optimizerProgress.title")}

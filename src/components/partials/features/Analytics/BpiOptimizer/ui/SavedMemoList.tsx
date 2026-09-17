@@ -88,15 +88,11 @@ const SavedMemoList = ({
 }) => {
   const { t } = useTranslation();
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
-  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  // 同時に開けるのは1つまで（アコーディオン形式）
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const toggleExpanded = (id: string) => {
-    setExpandedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+    setExpandedId((prev) => (prev === id ? null : id));
   };
 
   return (
@@ -109,17 +105,26 @@ const SavedMemoList = ({
         )}
         {memos.map((memo) => {
           const isAuto = memo.kind !== "custom";
-          const isExpanded = expandedIds.has(memo.reportId);
+          const isExpanded = expandedId === memo.reportId;
           const steps = buildStepProgress(memo, currentScores, currentBpis);
           return (
             <div
               key={memo.reportId}
-              className="rounded-lg border border-bpim-border bg-bpim-bg overflow-hidden"
+              className={cn(
+                "rounded-lg border border-bpim-border bg-bpim-bg overflow-hidden",
+                !isExpanded && "cursor-pointer",
+              )}
+              onClick={() => {
+                if (!isExpanded) toggleExpanded(memo.reportId);
+              }}
             >
               <div className="flex items-center gap-1 p-3">
                 <button
                   type="button"
-                  onClick={() => toggleExpanded(memo.reportId)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleExpanded(memo.reportId);
+                  }}
                   className="flex min-w-0 flex-1 items-center gap-2 text-left"
                 >
                   <Badge
@@ -149,7 +154,10 @@ const SavedMemoList = ({
                   variant="ghost"
                   size="icon"
                   className="h-7 w-7 text-bpim-muted hover:text-bpim-danger hover:bg-bpim-danger/10 shrink-0"
-                  onClick={() => setDeleteTargetId(memo.reportId)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setDeleteTargetId(memo.reportId);
+                  }}
                   disabled={isDeletingId === memo.reportId}
                 >
                   {isDeletingId === memo.reportId ? (
@@ -165,6 +173,7 @@ const SavedMemoList = ({
                   memo={memo}
                   liveCurrentTotalBpi={liveCurrentTotalBpi}
                   steps={steps}
+                  isExpanded={isExpanded}
                 />
               </div>
 

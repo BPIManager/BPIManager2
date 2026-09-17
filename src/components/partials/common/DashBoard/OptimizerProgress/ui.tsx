@@ -4,14 +4,12 @@ import {
   ChevronRight,
   Target,
   Sparkles,
-  ArrowRight,
+  ArrowUpRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { DashCard } from "@/components/ui/dashcard";
 import { cn } from "@/lib/utils";
 import { DIFF_COLORS } from "@/constants/theme/difficultyColors";
-import { getBpiColorStyle } from "@/constants/theme/bpiColor";
 import type { OptimizeMemo } from "@/hooks/analytics/useOptimizeMemo";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import OptimizerProgressSkeleton from "./skeleton";
@@ -32,18 +30,6 @@ interface OptimizerProgressCardProps {
   selectedIndex: number;
   onSelectIndex: (index: number) => void;
 }
-
-const MiniBpiChip = ({ bpi }: { bpi: number }) => {
-  const { bg, color } = getBpiColorStyle(bpi);
-  return (
-    <span
-      className="inline-flex items-center justify-center rounded px-1.5 py-0.5 font-mono text-xs font-bold"
-      style={{ backgroundColor: bg, color }}
-    >
-      {bpi.toFixed(2)}
-    </span>
-  );
-};
 
 /**
  * 0点始まりの絶対値だと大半の曲でバーが常にほぼ満タンになり差が見えないため、
@@ -150,13 +136,6 @@ const OptimizerProgressCard = ({
 
   const clampedIndex = Math.min(selectedIndex, memos.length - 1);
   const memo = memos[clampedIndex];
-  // v2リビルド以前に保存されたメモはreportDataの形が異なりcurrentTotalBpi/
-  // targetTotalBpiを持たない場合があるため、無い場合はヘッダー表示を省略する
-  const currentTotalBpi = memo.reportData.currentTotalBpi;
-  const targetTotalBpi = memo.reportData.targetTotalBpi ?? memo.targetBpi;
-  const hasBpiProgress =
-    typeof currentTotalBpi === "number" && typeof targetTotalBpi === "number";
-  const bpiGap = hasBpiProgress ? targetTotalBpi - currentTotalBpi : 0;
   const steps: StepProgress[] = (memo.reportData.steps ?? []).map((step) => ({
     songId: step.songId,
     title: step.title,
@@ -168,62 +147,48 @@ const OptimizerProgressCard = ({
 
   return (
     <DashCard>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2">
         <span className="text-sm font-bold text-bpim-muted">
           {t("dashboard.optimizerProgress.title")}
         </span>
-        {memos.length > 1 && (
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              disabled={clampedIndex === 0}
-              onClick={() => onSelectIndex(clampedIndex - 1)}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <span className="min-w-11 text-center font-mono text-[11px] font-bold text-bpim-muted">
-              {tFormat("dashboard.optimizerProgress.pager", {
-                current: clampedIndex + 1,
-                total: memos.length,
-              })}
-            </span>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              disabled={clampedIndex === memos.length - 1}
-              onClick={() => onSelectIndex(clampedIndex + 1)}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        )}
-      </div>
-
-      <div className="mt-3 flex items-center gap-2 flex-wrap">
-        {hasBpiProgress ? (
-          <>
-            <MiniBpiChip bpi={currentTotalBpi} />
-            <ArrowRight className="h-3.5 w-3.5 text-bpim-muted shrink-0" />
-            <MiniBpiChip bpi={targetTotalBpi} />
-            {bpiGap > 0 ? (
-              <Badge
-                variant="outline"
-                className="border-bpim-warning/50 text-bpim-warning text-xs"
+        <div className="flex items-center gap-1">
+          {memos.length > 1 && (
+            <>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                disabled={clampedIndex === 0}
+                onClick={() => onSelectIndex(clampedIndex - 1)}
               >
-                {tFormat("dashboard.optimizerProgress.bpiRemaining", {
-                  diff: bpiGap.toFixed(2),
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <span className="min-w-11 text-center font-mono text-[11px] font-bold text-bpim-muted">
+                {tFormat("dashboard.optimizerProgress.pager", {
+                  current: clampedIndex + 1,
+                  total: memos.length,
                 })}
-              </Badge>
-            ) : (
-              <Badge className="bg-bpim-success/20 text-bpim-success border-bpim-success/30 text-xs">
-                {t("dashboard.optimizerProgress.achieved")}
-              </Badge>
-            )}
-          </>
-        ) : (
-          <MiniBpiChip bpi={targetTotalBpi} />
-        )}
+              </span>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                disabled={clampedIndex === memos.length - 1}
+                onClick={() => onSelectIndex(clampedIndex + 1)}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </>
+          )}
+          <NextLink href="/optimizer">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              title={t("dashboard.optimizerProgress.cta")}
+              aria-label={t("dashboard.optimizerProgress.cta")}
+            >
+              <ArrowUpRight className="h-4 w-4" />
+            </Button>
+          </NextLink>
+        </div>
       </div>
 
       <div className="mt-4 flex max-h-56 flex-col gap-3 overflow-y-auto custom-scrollbar pr-1">

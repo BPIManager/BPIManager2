@@ -827,9 +827,9 @@ export const settingsTranslations = {
     ko: "ARENA 모드 기록",
   },
   "widget.optimizerProgress": {
-    ja: "Optimizerプラン達成状況",
-    en: "Optimizer Plan Progress",
-    "zh-TW": "Optimizer計畫達成狀況",
-    ko: "Optimizer 플랜 달성 현황",
+    ja: "目標達成状況",
+    en: "Goal Progress",
+    "zh-TW": "目標達成狀況",
+    ko: "목표 달성 현황",
   },
 } as const;

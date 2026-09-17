@@ -1148,10 +1148,10 @@ export const dashboardTranslations = {
   },
 
   "dashboard.optimizerProgress.title": {
-    ja: "Optimizerプラン達成状況",
-    en: "Optimizer Plan Progress",
-    "zh-TW": "Optimizer計畫達成狀況",
-    ko: "Optimizer 플랜 달성 현황",
+    ja: "目標達成状況",
+    en: "Goal Progress",
+    "zh-TW": "目標達成狀況",
+    ko: "목표 달성 현황",
   },
   "dashboard.optimizerProgress.emptyTitle": {
     ja: "保存済みのプランがありません",
@@ -1160,22 +1160,16 @@ export const dashboardTranslations = {
     ko: "저장된 플랜이 없습니다",
   },
   "dashboard.optimizerProgress.emptyDesc": {
-    ja: "BPIオプティマイザで目標BPIまでのプランを立てて保存すると、ここで日々の進捗を確認できます。",
-    en: "Plan and save a route to your target BPI in the BPI Optimizer to track your daily progress here.",
-    "zh-TW": "在BPI Optimizer中規劃並儲存達成目標BPI的計畫後，即可在此確認每日進度。",
-    ko: "BPI 옵티마이저에서 목표 BPI까지의 플랜을 세우고 저장하면 여기서 일일 진행 상황을 확인할 수 있습니다.",
+    ja: "目標管理で目標BPIまでのプランを立てて保存すると、ここで日々の進捗を確認できます。",
+    en: "Plan and save a route to your target BPI in Goal Management to track your daily progress here.",
+    "zh-TW": "在目標管理中規劃並儲存達成目標BPI的計畫後，即可在此確認每日進度。",
+    ko: "목표 관리에서 목표 BPI까지의 플랜을 세우고 저장하면 여기서 일일 진행 상황을 확인할 수 있습니다.",
   },
   "dashboard.optimizerProgress.cta": {
-    ja: "Optimizerを開く",
-    en: "Open Optimizer",
-    "zh-TW": "開啟Optimizer",
-    ko: "옵티마이저 열기",
-  },
-  "dashboard.optimizerProgress.bpiRemaining": {
-    ja: "あと{diff}",
-    en: "{diff} to go",
-    "zh-TW": "還差{diff}",
-    ko: "앞으로 {diff}",
+    ja: "目標管理を開く",
+    en: "Open Goal Management",
+    "zh-TW": "開啟目標管理",
+    ko: "목표 관리 열기",
   },
   "dashboard.optimizerProgress.remaining": {
     ja: "あと{diff}点",
