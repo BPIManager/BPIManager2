@@ -4,16 +4,24 @@ AI（issue-runner等のスキル）がissueを消化していく際の運用ル�
 
 ## マージ方式（直接merge / PR経由）
 
-- `fix/`・`refactor/`・`docs/`ブランチ（バグ修正・挙動不変のリファクタ・ドキュメント）は、検証通過後に直接`staging`へff-only mergeしてよい
-- `feat/`ブランチ（機能追加・仕様issue）は、実装が意図した仕様と一致しているかを人間がレビューできるよう、直接mergeせず必ず`staging`宛にPRを作成する（`gh pr create --base staging`）。マージ・issueクローズはユーザーのレビュー後に行う
+- すべての作業ブランチ（`fix/`・`refactor/`・`docs/`・`feat/`）は、**master へ直接マージしない**。まず `staging` へマージし、`staging` → `master` は別段階（後述）でまとめて行う
+  - 理由: `master` への push が本番デプロイをトリガーする（`.github/workflows/ci.yml` の `deploy` ジョブ）。issueごとに逐次masterへマージするとデプロイが都度走ってしまうため、`staging` に一旦集約してからまとめてリリースする
+- `fix/`・`refactor/`・`docs/`ブランチ（バグ修正・挙動不変のリファクタ・ドキュメント）は、検証通過後に直接 `staging` へff-only mergeしてよい
+- `feat/`ブランチ（機能追加・仕様issue）は、実装が意図した仕様と一致しているかを人間がレビューできるよう、直接mergeせず必ず `staging` 宛のPRを作成する（`gh pr create --base staging`）。マージ・issueクローズはユーザーのレビュー後に行う
 - 理由: バグ修正・軽微なリファクタは機械的検証（tsc/lint/test/build）で十分だが、機能追加・仕様issueは「意図通りに実装できているか」の判断が機械的検証だけでは担保できないため
+
+## staging → master のリリースPR
+
+- `staging` に取り込んだ変更をいつ `master` へ反映するか（＝いつ本番デプロイするか）はユーザーが決める。AIは複数epicが `staging` に溜まったからといって自発的に `staging` → `master` のPRを作成しない
+- ユーザーから明示的な指示（「そろそろリリースして」「staging を master に上げて」等）を受けたときに、その時点の `staging` を対象に `master` 宛のPRを作成する
+- PR本文には、そのリリースに含まれるepic/issueの一覧（番号・タイトル）を書き、レビューしやすくする
 
 ## PRの粒度（epic単位でまとめる）
 
-- 親issue（epic）配下の複数subissueを消化する場合、**subissueごとにPRを分けず、epic単位で1本のPR**にまとめてよい（GitHub Actions の無料枠を消費するCIが各PR/pushで走るため、こまめなPRを避ける）。
+- 親issue（epic）配下の複数subissueを消化する場合、**subissueごとにPRを分けず、epic単位で `staging` 宛の1本のPR**にまとめてよい（GitHub Actions の無料枠を消費するCIが各PR/pushで走るため、こまめなPRを避ける）。
 - その場合も **1 issue = 1 commit** は維持し、各commitのメッセージに `Refs #<subissue>` / `Closes #<subissue>` を入れて、issueとcommitの紐付けは残す（`git-workflow.md`）。
 - ブランチは epic の内容に合わせて1本切る（例: `docs/<epic-slug>`、`feat/<epic-slug>`）。PR本文に含まれるcommitとsubissue番号の対応表を書く。
-- 単発issue（epicに属さない）は従来どおり1 issue = 1ブランチ = 1 PR。
+- 単発issue（epicに属さない）は従来どおり1 issue = 1ブランチ = 1 PR（宛先は `staging`）。
 
 ## 親子issueの関連付けと粒度
 
