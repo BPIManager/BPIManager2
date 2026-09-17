@@ -39,7 +39,7 @@ const OptimizationStepList = ({
           <div className="flex items-center gap-2 px-2">
             <Badge
               variant="outline"
-              className="text-[10px] border-bpim-border text-bpim-subtle"
+              className="text-xs border-bpim-border text-bpim-subtle"
             >
               {t("optimizer.steps.routeLabel")}
             </Badge>

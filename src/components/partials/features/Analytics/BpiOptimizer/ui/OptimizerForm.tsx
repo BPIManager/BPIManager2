@@ -112,7 +112,7 @@ const AlgorithmSection = ({
   const { t } = useTranslation();
   return (
     <div className="space-y-3">
-      <Label className="text-[10px] font-black text-bpim-muted uppercase tracking-widest">
+      <Label className="text-xs font-black text-bpim-muted uppercase tracking-widest">
         {t("optimizer.algorithmLabel")}
       </Label>
       <div className="flex p-1 bg-bpim-bg rounded-xl border border-bpim-border">
@@ -133,7 +133,7 @@ const AlgorithmSection = ({
             )}
           >
             <span>{mode.label}</span>
-            <span className="text-[9px] opacity-60 font-normal">
+            <span className="text-xs opacity-60 font-normal">
               {mode.desc}
             </span>
           </button>
@@ -176,7 +176,7 @@ const PlayStyleSection = ({
   const { t } = useTranslation();
   return (
     <div className="space-y-3">
-      <Label className="text-[10px] font-black text-bpim-muted uppercase tracking-widest">
+      <Label className="text-xs font-black text-bpim-muted uppercase tracking-widest">
         {t("optimizer.playStyleLabel")}
       </Label>
       <div className="grid grid-cols-1 gap-2">
@@ -233,10 +233,10 @@ const RadarFilterSection = ({
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2">
-        <Label className="text-[10px] font-black text-bpim-muted uppercase tracking-widest">
+        <Label className="text-xs font-black text-bpim-muted uppercase tracking-widest">
           {t("optimizer.radarFilterLabel")}
         </Label>
-        <span className="text-[9px] text-bpim-subtle">
+        <span className="text-xs text-bpim-subtle">
           {t("optimizer.radarFilterHint")}
         </span>
       </div>
@@ -269,12 +269,12 @@ const RadarFilterSection = ({
                 {RADAR_LABELS[cat]}
               </span>
               {isStrong && (
-                <Badge className="text-[9px] h-4 px-1.5 ml-auto bg-bpim-warning/15 text-bpim-warning border border-bpim-warning/30 font-bold">
+                <Badge className="text-xs h-4 px-1.5 ml-auto bg-bpim-warning/15 text-bpim-warning border border-bpim-warning/30 font-bold">
                   {t("optimizer.strong")}
                 </Badge>
               )}
               {isWeak && !isStrong && (
-                <Badge className="text-[9px] h-4 px-1.5 ml-auto bg-bpim-info/15 text-bpim-info border border-bpim-info/30 font-bold">
+                <Badge className="text-xs h-4 px-1.5 ml-auto bg-bpim-info/15 text-bpim-info border border-bpim-info/30 font-bold">
                   {t("optimizer.weak")}
                 </Badge>
               )}
@@ -311,7 +311,7 @@ const OptimizerForm = ({
     <div className="flex items-center justify-between border-b border-bpim-border pb-2">
       <h2 className="text-sm font-bold flex items-center gap-2">{t("optimizer.form.settings")}</h2>
       {currentTotalBpi !== null && (
-        <div className="flex items-center gap-2 text-[11px] font-bold text-bpim-muted bg-bpim-bg px-2 py-2 rounded-full">
+        <div className="flex items-center gap-2 text-xs font-bold text-bpim-muted bg-bpim-bg px-2 py-2 rounded-full">
           {t("optimizer.currentBpiLabel")}: <BpiChip bpi={currentTotalBpi} size="xs" />
         </div>
       )}

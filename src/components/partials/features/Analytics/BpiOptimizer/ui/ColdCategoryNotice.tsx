@@ -33,13 +33,13 @@ const ColdCategoryNotice = ({ coldCategories }: ColdCategoryNoticeProps) => {
               <span className="text-xs font-bold">
                 {RADAR_LABELS[advisory.category]}
               </span>
-              <span className="text-[10px] text-bpim-subtle">
+              <span className="text-xs text-bpim-subtle">
                 {tFormat("optimizer.coldStart.playedCount", { count: advisory.playedCount })}
               </span>
             </div>
             {advisory.suggestions.length > 0 && (
               <div className="flex flex-col gap-0.5">
-                <span className="text-[10px] text-bpim-subtle">
+                <span className="text-xs text-bpim-subtle">
                   {t("optimizer.coldStart.suggestionsLabel")}
                 </span>
                 <ul className="text-xs text-bpim-text list-disc list-inside">
