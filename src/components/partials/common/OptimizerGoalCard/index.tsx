@@ -50,10 +50,12 @@ export const BpiJourneyBar = ({
   from,
   current,
   to,
+  showAchievedState = true,
 }: {
   from?: number;
   current: number;
   to: number;
+  showAchievedState?: boolean;
 }) => {
   const { t } = useTranslation();
   const start = from ?? current;
@@ -64,7 +66,7 @@ export const BpiJourneyBar = ({
         ? 100
         : 0
       : Math.min(100, Math.max(0, ((current - start) / span) * 100));
-  const isAchieved = current >= to;
+  const isAchieved = showAchievedState && current >= to;
 
   return (
     <div className="flex w-full flex-col gap-1.5">
@@ -94,7 +96,9 @@ export const BpiJourneyBar = ({
             )}
           >
             {t("optimizer.bpiJourney.current")}
-            {isAchieved ? ` (${t("dashboard.optimizerProgress.achieved")})` : ""}
+            {isAchieved
+              ? ` (${t("dashboard.optimizerProgress.achieved")})`
+              : ""}
           </span>
           <MiniBpiChip bpi={current} />
         </div>

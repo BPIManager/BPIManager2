@@ -173,6 +173,7 @@ const CustomGoalCreatorUi = ({
             <BpiJourneyBar
               current={preview.currentTotalBpi}
               to={preview.targetTotalBpi}
+              showAchievedState={false}
             />
           )}
         </div>

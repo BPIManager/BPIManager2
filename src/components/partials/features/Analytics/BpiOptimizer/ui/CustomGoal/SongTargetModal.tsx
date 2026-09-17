@@ -174,17 +174,18 @@ const SongTargetModal = ({
 
   const maxScore = selectedSong ? selectedSong.notes * 2 : null;
   const exScoreNum = parseInt(exScoreInput, 10);
+  const currentExScore = selectedSong
+    ? (currentScores.get(selectedSong.songId) ?? null)
+    : null;
   const isExScoreValid =
     !isNaN(exScoreNum) &&
     exScoreNum >= 0 &&
-    (maxScore == null || exScoreNum <= maxScore);
+    (maxScore == null || exScoreNum <= maxScore) &&
+    (currentExScore == null || exScoreNum >= currentExScore);
   const enteredRate =
     selectedSong && !isNaN(exScoreNum)
       ? scoreRate(exScoreNum, selectedSong.notes)
       : null;
-  const currentExScore = selectedSong
-    ? (currentScores.get(selectedSong.songId) ?? null)
-    : null;
   const rankDetail =
     selectedSong && !isNaN(exScoreNum)
       ? getRankDetail(exScoreNum, selectedSong.notes * 2)
