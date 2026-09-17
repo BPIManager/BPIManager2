@@ -18,6 +18,7 @@ import {
 } from "./ShowcaseSection/ui";
 import ApiSection from "./ApiSection/ui";
 import PrivacySection from "./PrivacySection/ui";
+import AccessibleSection from "./AccessibleSection/ui";
 
 const LoginPageBody = ({
   requiredMessage,
@@ -140,6 +141,10 @@ const LoginPageBody = ({
           <p>{t("login.showcase.aaa.desc1")}</p>
           <p>{t("login.showcase.aaa.desc2")}</p>
         </ShowcaseSection>
+
+        <Separator className="my-20 bg-bpim-overlay/30" />
+
+        <AccessibleSection />
 
         <Separator className="my-20 bg-bpim-overlay/30" />
 

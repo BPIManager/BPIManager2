@@ -6,7 +6,7 @@ export const loginPageTranslations = {
     ko: "BPIM2",
   },
   "login.subTitle": {
-    ja: "beatmania IIDX 上級者のためのスコアマネジメントツール",
+    ja: "beatmania IIDX 上級者のためのスコア管理ツール",
     en: "Score management tool for advanced beatmania IIDX players",
     "zh-TW": "專為 beatmania IIDX 高級玩家打造的成績管理工具",
     ko: "beatmania IIDX 상급자를 위한 점수 관리 도구",
@@ -397,6 +397,65 @@ export const loginPageTranslations = {
     "zh-TW":
       "登入後會反映自己的成績，已達成與未達成的樂曲會以顏色區分。也能立即確認距離目標所需的分數差。",
     ko: "로그인하면 자신의 점수가 반영되어 달성한 악곡과 미달성 악곡이 색으로 구분됩니다. 목표까지의 점수 차이도 바로 확인할 수 있습니다.",
+  },
+
+  // Accessible Section
+  "login.accessible.tag": {
+    ja: "NOT JUST FOR EXPERTS",
+    en: "NOT JUST FOR EXPERTS",
+    "zh-TW": "NOT JUST FOR EXPERTS",
+    ko: "NOT JUST FOR EXPERTS",
+  },
+  "login.accessible.title": {
+    ja: "上級者でなくても使えます",
+    en: "Built for Every Skill Level",
+    "zh-TW": "並非只有高手才能使用",
+    ko: "상급자가 아니어도 사용할 수 있습니다",
+  },
+  "login.accessible.desc": {
+    ja: "BPIM2は皆伝・上級者向けの機能だけではありません。☆12に挑戦し始めたばかりの方や、スコア狙いに少し興味を持ち始めた方にも役立つ機能を用意しています。",
+    en: "BPIM2 isn't just for Kaiden-level players. It's just as useful if you've only just started tackling ★12s, or are only beginning to get interested in chasing scores.",
+    "zh-TW":
+      "BPIM2 並非僅限皆傳、高手專用的功能。對於剛開始挑戰 ☆12 的玩家，或剛開始對追分產生興趣的玩家，也同樣實用。",
+    ko: "BPIM2는 개전·상급자만을 위한 기능이 아닙니다. ☆12에 막 도전하기 시작한 분이나, 스코어 경신에 조금씩 흥미를 갖기 시작한 분에게도 유용한 기능을 갖추고 있습니다.",
+  },
+  "login.accessible.feature1.title": {
+    ja: "ライバルとスコアを競う",
+    en: "Compete with Rivals",
+    "zh-TW": "與對手較量成績",
+    ko: "라이벌과 점수를 겨루다",
+  },
+  "login.accessible.feature1.desc": {
+    ja: "実力を問わず、フォローしたライバルとスコアを比較して切磋琢磨できます。",
+    en: "Follow rivals at any skill level and compare scores to push each other forward.",
+    "zh-TW": "無論實力高低，都能與追蹤的對手比較成績、互相切磋。",
+    ko: "실력에 상관없이 팔로우한 라이벌과 점수를 비교하며 서로 자극을 주고받을 수 있습니다.",
+  },
+  "login.accessible.feature2.title": {
+    ja: "スコア・クリアランプ管理",
+    en: "Score & Clear Lamp Tracking",
+    "zh-TW": "成績・通關燈號管理",
+    ko: "점수・클리어 램프 관리",
+  },
+  "login.accessible.feature2.desc": {
+    ja: "☆11・☆12だけでなく、☆10以下を含む全難易度のスコア・クリアランプを記録・管理できます。複数バージョンをまたいだ管理も可能です。",
+    en: "Track and manage scores and clear lamps across every difficulty, not just ★11 and ★12 — including ★10 and below, spanning multiple game versions.",
+    "zh-TW":
+      "不僅限於 ☆11、☆12，☆10 以下等所有難易度的成績・通關燈號也能記錄與管理，並可跨多個版本進行管理。",
+    ko: "☆11・☆12뿐만 아니라 ☆10 이하를 포함한 모든 난이도의 점수・클리어 램프를 기록・관리할 수 있습니다. 여러 버전에 걸친 관리도 가능합니다.",
+  },
+  "login.accessible.feature3.title": {
+    ja: "ランダムレーンチケット当たり検索",
+    en: "Random Lane Ticket Finder",
+    "zh-TW": "隨機路線票券中獎搜尋",
+    ko: "랜덤 레인 티켓 당첨 검색",
+  },
+  "login.accessible.feature3.desc": {
+    ja: "所持しているランダムレーンチケットが最も活きる譜面を検索し、クリアランプ更新を狙えます。",
+    en: "Find the chart where your Random Lane Ticket pattern works best, and aim for a new clear lamp.",
+    "zh-TW":
+      "搜尋最能活用您持有隨機路線票券的譜面，瞄準更新通關燈號。",
+    ko: "보유한 랜덤 레인 티켓이 가장 잘 통하는 채보를 검색하여 클리어 램프 갱신을 노릴 수 있습니다.",
   },
 
   // API Section
