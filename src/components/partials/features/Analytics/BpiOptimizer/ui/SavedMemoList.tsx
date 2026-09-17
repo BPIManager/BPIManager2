@@ -14,21 +14,24 @@ import { useTranslation } from "@/hooks/common/useTranslation";
 type StatusFilter = "all" | "unachieved" | "achieved";
 const STATUS_FILTERS: StatusFilter[] = ["all", "unachieved", "achieved"];
 
-/** GoalBpiJourneyの達成判定（現在の総合BPI >= 目標総合BPI）と同じ基準で目標全体の達成状況を判定する。 */
+/**
+ * 目標全体の達成判定。総合BPI(べき乗平均)が目標を超えたかではなく、
+ * 目標に含めた曲が全曲達成したかで決める（GoalBpiJourneyと同じ基準）。
+ * 一部の曲の超過達成だけで総合BPIが目標を超えることがあり、それを
+ * 「達成」扱いにするのは実態と合わないため。
+ */
 const isMemoAchieved = (
   memo: OptimizeMemo,
-  liveCurrentTotalBpi: number | null,
+  currentScores: Map<number, number | null>,
+  currentBpis: Map<number, number | null>,
 ): boolean => {
-  const targetTotalBpi = memo.reportData.targetTotalBpi ?? memo.targetBpi;
-  const currentTotalBpi =
-    liveCurrentTotalBpi ?? memo.reportData.currentTotalBpi;
-  if (
-    typeof currentTotalBpi !== "number" ||
-    typeof targetTotalBpi !== "number"
-  ) {
-    return false;
-  }
-  return currentTotalBpi >= targetTotalBpi;
+  const steps = buildStepProgress(memo, currentScores, currentBpis);
+  return (
+    steps.length > 0 &&
+    steps.every(
+      (s) => s.currentExScore != null && s.currentExScore >= s.toExScore,
+    )
+  );
 };
 
 const SavedMemoList = ({
@@ -57,7 +60,7 @@ const SavedMemoList = ({
 
   const visibleMemos = memos.filter((memo) => {
     if (statusFilter === "all") return true;
-    const achieved = isMemoAchieved(memo, liveCurrentTotalBpi);
+    const achieved = isMemoAchieved(memo, currentScores, currentBpis);
     return statusFilter === "achieved" ? achieved : !achieved;
   });
 
@@ -102,6 +105,7 @@ const SavedMemoList = ({
           const achievedCount = steps.filter(
             (s) => s.currentExScore != null && s.currentExScore >= s.toExScore,
           ).length;
+          const isAchieved = steps.length > 0 && achievedCount === steps.length;
           return (
             <div
               key={memo.reportId}
@@ -127,7 +131,7 @@ const SavedMemoList = ({
                   {new Date(memo.createdAt).toLocaleDateString()}
                 </span>
                 <div className="ml-auto flex shrink-0 items-center gap-1">
-                  {isMemoAchieved(memo, liveCurrentTotalBpi) && (
+                  {isAchieved && (
                     <Badge className="bg-bpim-success text-[10px] font-black uppercase tracking-wide text-white">
                       {t("dashboard.optimizerProgress.achieved")}
                     </Badge>

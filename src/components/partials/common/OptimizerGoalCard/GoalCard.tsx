@@ -228,7 +228,8 @@ export const GoalBpiJourney = ({
 
   const start = hasCreated ? createdTotalBpi : currentTotalBpi;
   const pct = journeyPct(start, currentTotalBpi, targetTotalBpi);
-  const isAchieved = currentTotalBpi >= targetTotalBpi;
+  // 達成判定は総合BPが目標を超えたかではなく、目標に含めた曲が全曲達成したかで決める
+  const isAchieved = steps.length > 0 && achievedCount === steps.length;
   const highlight: Highlight = isAchieved ? "achieved" : undefined;
 
   return (
