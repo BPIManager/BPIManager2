@@ -826,4 +826,10 @@ export const settingsTranslations = {
     "zh-TW": "ARENA模式歷史",
     ko: "ARENA 모드 기록",
   },
+  "widget.optimizerProgress": {
+    ja: "目標達成状況",
+    en: "Goal Progress",
+    "zh-TW": "目標達成狀況",
+    ko: "목표 달성 현황",
+  },
 } as const;

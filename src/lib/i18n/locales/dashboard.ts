@@ -1146,4 +1146,53 @@ export const dashboardTranslations = {
     "zh-TW": "關閉",
     ko: "닫기",
   },
+
+  "dashboard.optimizerProgress.title": {
+    ja: "目標達成状況",
+    en: "Goal Progress",
+    "zh-TW": "目標達成狀況",
+    ko: "목표 달성 현황",
+  },
+  "dashboard.optimizerProgress.emptyTitle": {
+    ja: "保存済みの目標がありません",
+    en: "No saved goals yet",
+    "zh-TW": "尚無已儲存的目標",
+    ko: "저장된 목표가 없습니다",
+  },
+  "dashboard.optimizerProgress.emptyDesc": {
+    ja: "目標管理で目標BPIまでの目標を立てて保存すると、ここで日々の進捗を確認できます。",
+    en: "Create and save a goal toward your target BPI in Goal Management to track your daily progress here.",
+    "zh-TW": "在目標管理中設定並儲存達成目標BPI的目標後，即可在此確認每日進度。",
+    ko: "목표 관리에서 목표 BPI까지의 목표를 세우고 저장하면 여기서 일일 진행 상황을 확인할 수 있습니다.",
+  },
+  "dashboard.optimizerProgress.cta": {
+    ja: "目標管理を開く",
+    en: "Open Goal Management",
+    "zh-TW": "開啟目標管理",
+    ko: "목표 관리 열기",
+  },
+  "dashboard.optimizerProgress.remaining": {
+    ja: "あと{diff}点",
+    en: "{diff} EX to go",
+    "zh-TW": "還差{diff}分",
+    ko: "앞으로 {diff}점",
+  },
+  "dashboard.optimizerProgress.remainingUnplayed": {
+    ja: "未プレイ・あと{diff}点",
+    en: "Unplayed, {diff} EX to go",
+    "zh-TW": "未遊玩・還差{diff}分",
+    ko: "미플레이・앞으로 {diff}점",
+  },
+  "dashboard.optimizerProgress.achieved": {
+    ja: "達成",
+    en: "Achieved",
+    "zh-TW": "已達成",
+    ko: "달성",
+  },
+  "dashboard.optimizerProgress.pager": {
+    ja: "{current} / {total}",
+    en: "{current} of {total}",
+    "zh-TW": "{current} / {total}",
+    ko: "{current} / {total}",
+  },
 } as const;

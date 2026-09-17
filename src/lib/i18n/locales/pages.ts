@@ -162,16 +162,16 @@ export const pagesTranslations = {
   },
 
   "page.optimizer.title": {
-    ja: "総合BPIを伸ばす",
-    en: "Boost Total BPI",
-    "zh-TW": "提升總合 BPI",
-    ko: "종합 BPI 올리기",
+    ja: "目標管理",
+    en: "Goal Management",
+    "zh-TW": "目標管理",
+    ko: "목표 관리",
   },
   "page.optimizer.desc": {
-    ja: "目標総合BPIに到達するためのトレーニングセットを見つける",
-    en: "Find a training set to hit your target total BPI.",
-    "zh-TW": "找到能達到目標總合 BPI 的練習曲組合。",
-    ko: "목표 종합 BPI에 도달하기 위한 트레이닝 세트를 찾습니다.",
+    ja: "目標総合BPIに到達するためのトレーニングセットを見つける、または自分で目標を作成する",
+    en: "Find a training set to hit your target total BPI, or create your own goal.",
+    "zh-TW": "找到能達到目標總合 BPI 的練習曲組合，或自行建立目標。",
+    ko: "목표 종합 BPI에 도달하기 위한 트레이닝 세트를 찾거나, 직접 목표를 만듭니다.",
   },
 
   "page.monthlyReviewShare.title": {

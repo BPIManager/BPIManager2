@@ -196,6 +196,7 @@ class BpiOptimizerEngine {
         title: picked.song.title,
         difficulty: picked.song.difficulty,
         difficultyLevel: picked.song.difficultyLevel,
+        notes: picked.song.notes,
         fromBpi,
         toBpi: roundBpi(picked.actualToBpi),
         fromExScore: picked.song.currentExScore,

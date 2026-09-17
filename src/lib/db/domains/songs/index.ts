@@ -156,6 +156,12 @@ class SongsRepository {
 
     let query = db
       .selectFrom("songs as s")
+      .leftJoin(
+        currentSongDefSubquery()
+          .select(["songId", "wrScore", "kaidenAvg", "coef", "mu", "sigma", "residualVar"])
+          .as("d"),
+        (join) => join.onRef("d.songId", "=", "s.songId"),
+      )
       .select([
         "s.songId",
         "s.title",
@@ -164,6 +170,12 @@ class SongsRepository {
         "s.notes",
         "s.bpm",
         "s.releasedVersion",
+        "d.wrScore",
+        "d.kaidenAvg",
+        "d.coef",
+        "d.mu",
+        "d.sigma",
+        "d.residualVar",
       ])
       .$if(!isInf, (qb) =>
         qb

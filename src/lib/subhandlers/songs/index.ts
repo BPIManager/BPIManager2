@@ -4,6 +4,7 @@
  */
 export type { HandleOutcome } from "./_shared";
 export * from "./songsList";
+export * from "./songSearch";
 export * from "./songById";
 export * from "./arenaAverages";
 export * from "./songRanking";

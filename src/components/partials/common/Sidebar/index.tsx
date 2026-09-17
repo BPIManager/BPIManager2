@@ -10,6 +10,7 @@ import {
   HeartHandshake,
   PanelLeftClose,
   PanelLeftOpen,
+  Target,
 } from "lucide-react";
 
 import { useUser } from "@/contexts/users/UserContext";
@@ -118,6 +119,15 @@ const SidebarContent = ({
             label: t("nav.scoreLog"),
             icon: ScrollText,
             href: `/users/${user?.userId}/logs/${latestVersion}`,
+          }}
+          expanded={expanded}
+          onClose={onClose}
+        />
+        <MenuItemButton
+          item={{
+            label: t("nav.goalManagement"),
+            icon: Target,
+            href: "/optimizer",
           }}
           expanded={expanded}
           onClose={onClose}

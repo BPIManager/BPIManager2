@@ -11,7 +11,6 @@ import {
   CircleCheck,
   CircleDashed,
   Trophy,
-  Target,
   Music,
   Table,
   Swords,
@@ -62,7 +61,6 @@ export const getAnalyticsMenuItems = (t: T) => [
 ];
 
 export const getBetaMenuItems = (t: T) => [
-  { label: t("nav.assistant"), icon: Target, href: "/optimizer" },
   { label: t("nav.songs"), icon: Music, href: "/songs" },
   {
     label: t("nav.allSongs"),

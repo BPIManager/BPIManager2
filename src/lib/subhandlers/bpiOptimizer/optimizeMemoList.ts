@@ -48,6 +48,7 @@ export async function handleCreateOptimizeMemo(
       uid,
       parsed.data.targetBpi,
       parsed.data.reportData,
+      parsed.data.kind ?? "auto",
     );
     return { result: ok({ reportId }), targetUserId: uid, viewerId: uid };
   } catch (error: unknown) {

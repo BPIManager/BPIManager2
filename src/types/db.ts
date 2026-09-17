@@ -312,6 +312,7 @@ export interface OptimizeMemoTable {
   userId: string;
   reportData: string;
   targetBpi: number | null;
+  kind: Generated<string>;
   createdAt: Generated<Date>;
 }
 

@@ -12,6 +12,7 @@ const optimizationStepSchema = z.object({
   title: z.string(),
   difficulty: z.string(),
   difficultyLevel: z.number(),
+  notes: z.number(),
   fromBpi: z.number(),
   toBpi: z.number(),
   fromExScore: z.number().nullable(),
@@ -52,6 +53,7 @@ const optimizationResultSchema = z.object({
 export const createOptimizeMemoBodySchema = z.object({
   targetBpi: z.number(),
   reportData: optimizationResultSchema,
+  kind: z.enum(["auto", "custom"]).optional(),
 });
 
 export type CreateOptimizeMemoBodyInput = z.output<

@@ -66,11 +66,11 @@ export const navTranslations = {
     "zh-TW": "競技場等級平均",
     ko: "아레나 랭크 평균",
   },
-  "nav.assistant": {
-    ja: "アシスタント",
-    en: "Assistant",
-    "zh-TW": "助手",
-    ko: "어시스턴트",
+  "nav.goalManagement": {
+    ja: "目標管理",
+    en: "Goal Management",
+    "zh-TW": "目標管理",
+    ko: "목표 관리",
   },
   "nav.songs": {
     ja: "楽曲情報",
