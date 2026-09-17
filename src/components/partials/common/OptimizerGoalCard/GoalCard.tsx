@@ -161,7 +161,7 @@ export interface GoalSongStep {
  * 1曲1ドットだと自動生成プラン（最大400曲）で表示が破綻するため、
  * 曲数に関わらずスケールする比率ベースの表現にする。
  */
-const SongStatusBar = ({ steps }: { steps: GoalSongStep[] }) => {
+export const SongStatusBar = ({ steps }: { steps: GoalSongStep[] }) => {
   const total = steps.length;
   if (total === 0) return null;
 

@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import ActionConfirmDialog from "@/components/partials/modal/Confirmation";
+import { buildStepProgress } from "@/components/partials/common/OptimizerGoalCard";
+import { SongStatusBar } from "@/components/partials/common/OptimizerGoalCard/GoalCard";
 import { GoalDetailDrawer } from "@/components/partials/common/OptimizerGoalCard/GoalDetailDrawer";
 import type { OptimizeMemo } from "@/hooks/analytics/useOptimizeMemo";
 import { useTranslation } from "@/hooks/common/useTranslation";
@@ -48,7 +50,7 @@ const SavedMemoList = ({
   onDelete: (id: string) => void;
   isDeletingId: string | null;
 }) => {
-  const { t } = useTranslation();
+  const { t, tFormat } = useTranslation();
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [openMemoId, setOpenMemoId] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
@@ -96,53 +98,73 @@ const SavedMemoList = ({
         )}
         {visibleMemos.map((memo) => {
           const isAuto = memo.kind !== "custom";
+          const steps = buildStepProgress(memo, currentScores, currentBpis);
+          const achievedCount = steps.filter(
+            (s) => s.currentExScore != null && s.currentExScore >= s.toExScore,
+          ).length;
           return (
             <div
               key={memo.reportId}
               onClick={() => setOpenMemoId(memo.reportId)}
-              className="flex cursor-pointer items-center gap-2 rounded-lg border border-bpim-border bg-bpim-bg p-3 transition-colors hover:border-bpim-primary/40"
+              className="flex cursor-pointer flex-col gap-2 rounded-lg border border-bpim-border bg-bpim-bg p-3 transition-colors hover:border-bpim-primary/40"
             >
-              <Badge
-                variant="secondary"
-                className={cn(
-                  "text-xs shrink-0",
-                  isAuto
-                    ? "bg-bpim-overlay"
-                    : "bg-bpim-primary/15 text-bpim-primary",
-                )}
-              >
-                {isAuto
-                  ? t("optimizer.memo.kind.auto")
-                  : t("optimizer.memo.kind.custom")}
-              </Badge>
-              <span className="text-xs text-bpim-subtle flex items-center gap-1 shrink-0">
-                <Calendar className="h-3 w-3" />
-                {new Date(memo.createdAt).toLocaleDateString()}
-              </span>
-              <div className="ml-auto flex shrink-0 items-center gap-1">
-                {isMemoAchieved(memo, liveCurrentTotalBpi) && (
-                  <Badge className="bg-bpim-success text-[10px] font-black uppercase tracking-wide text-white">
-                    {t("dashboard.optimizerProgress.achieved")}
-                  </Badge>
-                )}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7 text-bpim-muted hover:text-bpim-danger hover:bg-bpim-danger/10"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setDeleteTargetId(memo.reportId);
-                  }}
-                  disabled={isDeletingId === memo.reportId}
-                >
-                  {isDeletingId === memo.reportId ? (
-                    <CircleDashed className="h-3.5 w-3.5 animate-spin" />
-                  ) : (
-                    <Trash2 className="h-3.5 w-3.5" />
+              <div className="flex items-center gap-2">
+                <Badge
+                  variant="secondary"
+                  className={cn(
+                    "text-xs shrink-0",
+                    isAuto
+                      ? "bg-bpim-overlay"
+                      : "bg-bpim-primary/15 text-bpim-primary",
                   )}
-                </Button>
-                <ChevronRight className="h-4 w-4 text-bpim-muted" />
+                >
+                  {isAuto
+                    ? t("optimizer.memo.kind.auto")
+                    : t("optimizer.memo.kind.custom")}
+                </Badge>
+                <span className="text-xs text-bpim-subtle flex items-center gap-1 shrink-0">
+                  <Calendar className="h-3 w-3" />
+                  {new Date(memo.createdAt).toLocaleDateString()}
+                </span>
+                <div className="ml-auto flex shrink-0 items-center gap-1">
+                  {isMemoAchieved(memo, liveCurrentTotalBpi) && (
+                    <Badge className="bg-bpim-success text-[10px] font-black uppercase tracking-wide text-white">
+                      {t("dashboard.optimizerProgress.achieved")}
+                    </Badge>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 text-bpim-muted hover:text-bpim-danger hover:bg-bpim-danger/10"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDeleteTargetId(memo.reportId);
+                    }}
+                    disabled={isDeletingId === memo.reportId}
+                  >
+                    {isDeletingId === memo.reportId ? (
+                      <CircleDashed className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-3.5 w-3.5" />
+                    )}
+                  </Button>
+                  <ChevronRight className="h-4 w-4 text-bpim-muted" />
+                </div>
               </div>
+
+              {steps.length > 0 && (
+                <div className="flex items-center gap-2">
+                  <span className="shrink-0 font-mono text-[11px] font-bold text-bpim-muted">
+                    {tFormat("optimizer.bpiJourney.songsAchieved", {
+                      achieved: achievedCount,
+                      total: steps.length,
+                    })}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <SongStatusBar steps={steps} />
+                  </div>
+                </div>
+              )}
             </div>
           );
         })}
