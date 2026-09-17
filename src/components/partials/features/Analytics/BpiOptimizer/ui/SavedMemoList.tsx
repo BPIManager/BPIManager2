@@ -1,39 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { User as FirebaseUser } from "firebase/auth";
-import {
-  CircleDashed,
-  Trash2,
-  Calendar,
-  ChevronRight,
-  Share2,
-  Copy,
-  Check,
-} from "lucide-react";
+import { CircleDashed, Trash2, Calendar, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
 import { cn } from "@/lib/utils";
 import ActionConfirmDialog from "@/components/partials/modal/Confirmation";
-import {
-  buildStepProgress,
-  sortStepsByOrder,
-  STEP_SORT_ORDERS,
-  type StepSortOrder,
-} from "@/components/partials/common/OptimizerGoalCard";
-import { fetchSongContribution } from "@/services/swr/analytics";
-import { GoalBpiJourney, GoalSongCard, type GoalSongStep } from "./GoalCard";
+import { GoalDetailDrawer } from "@/components/partials/common/OptimizerGoalCard/GoalDetailDrawer";
 import type { OptimizeMemo } from "@/hooks/analytics/useOptimizeMemo";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
@@ -55,220 +27,6 @@ const isMemoAchieved = (
     return false;
   }
   return currentTotalBpi >= targetTotalBpi;
-};
-
-/** reportIdをコピーして他ユーザーに共有するためのモーダル（曲目のインポートに使う）。 */
-const ShareGoalModal = ({
-  reportId,
-  isOpen,
-  onClose,
-}: {
-  reportId: string | null;
-  isOpen: boolean;
-  onClose: () => void;
-}) => {
-  const { t } = useTranslation();
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = async () => {
-    if (!reportId) return;
-    try {
-      await navigator.clipboard.writeText(reportId);
-      setCopied(true);
-    } catch {
-      setCopied(false);
-    }
-  };
-
-  return (
-    <Dialog
-      open={isOpen}
-      onOpenChange={(open) => {
-        if (!open) {
-          setCopied(false);
-          onClose();
-        }
-      }}
-    >
-      <DialogContent className="max-w-[90vw] sm:max-w-md border-bpim-border bg-bpim-bg">
-        <DialogHeader>
-          <DialogTitle>{t("optimizer.memo.shareTitle")}</DialogTitle>
-        </DialogHeader>
-        <p className="text-xs leading-relaxed text-bpim-muted">
-          {t("optimizer.memo.shareDesc")}
-        </p>
-        <div className="flex min-w-0 items-center gap-2 rounded-lg border border-bpim-border bg-bpim-surface p-2">
-          <code className="min-w-0 flex-1 truncate font-mono text-xs text-bpim-text">
-            {reportId}
-          </code>
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            className="shrink-0 gap-1.5"
-            onClick={handleCopy}
-          >
-            {copied ? (
-              <Check className="h-3.5 w-3.5" />
-            ) : (
-              <Copy className="h-3.5 w-3.5" />
-            )}
-            {copied ? t("optimizer.memo.copied") : t("optimizer.memo.copy")}
-          </Button>
-        </div>
-        <DialogFooter>
-          <Button variant="ghost" onClick={onClose}>
-            {t("optimizer.customGoal.cancel")}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-};
-
-/**
- * 目標1件の詳細（達成状況＋曲一覧）をVaulドロワーで表示する。
- * 達成状況＋シェアボタンはスクロール領域の外に置き、曲一覧だけが
- * スクロールする（達成状況を常に見せておきたいという要望への対応）。
- */
-const GoalDetailDrawer = ({
-  memo,
-  steps,
-  isOpen,
-  onClose,
-  liveCurrentTotalBpi,
-  userId,
-  fbUser,
-  onShare,
-}: {
-  memo: OptimizeMemo | null;
-  steps: GoalSongStep[];
-  isOpen: boolean;
-  onClose: () => void;
-  liveCurrentTotalBpi: number | null;
-  userId?: string;
-  fbUser?: FirebaseUser | null;
-  onShare: () => void;
-}) => {
-  const { t } = useTranslation();
-  const [contributions, setContributions] = useState<Map<
-    number,
-    number
-  > | null>(null);
-  const [sortOrder, setSortOrder] = useState<StepSortOrder>("added");
-
-  useEffect(() => {
-    const reportId = memo?.reportId;
-    if (!isOpen || !userId || !reportId || steps.length === 0) return;
-    let cancelled = false;
-    fetchSongContribution(
-      userId,
-      fbUser,
-      steps.map((s) => ({ songId: s.songId, baselineExScore: s.fromExScore })),
-    )
-      .then((res) => {
-        if (cancelled) return;
-        setContributions(
-          new Map(res.contributions.map((c) => [c.songId, c.contribution])),
-        );
-      })
-      .catch(() => {
-        if (!cancelled) setContributions(null);
-      });
-    return () => {
-      cancelled = true;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, memo?.reportId, userId]);
-
-  if (!memo) return null;
-  const isAuto = memo.kind !== "custom";
-  const sortedSteps = sortStepsByOrder(steps, sortOrder);
-
-  return (
-    <Drawer
-      open={isOpen}
-      onOpenChange={(open) => {
-        if (!open) {
-          setContributions(null);
-          setSortOrder("added");
-          onClose();
-        }
-      }}
-    >
-      <DrawerContent className="flex min-h-0 flex-col">
-        <DrawerHeader className="flex-row shrink-0 items-center justify-between gap-2 text-left">
-          <DrawerTitle className="flex min-w-0 items-center gap-2">
-            <Badge
-              variant="secondary"
-              className={cn(
-                "shrink-0 text-xs",
-                isAuto
-                  ? "bg-bpim-overlay"
-                  : "bg-bpim-primary/15 text-bpim-primary",
-              )}
-            >
-              {isAuto
-                ? t("optimizer.memo.kind.auto")
-                : t("optimizer.memo.kind.custom")}
-            </Badge>
-            <span className="flex shrink-0 items-center gap-1 text-xs font-normal text-bpim-subtle">
-              <Calendar className="h-3 w-3" />
-              {new Date(memo.createdAt).toLocaleDateString()}
-            </span>
-          </DrawerTitle>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="shrink-0 gap-1.5"
-            onClick={onShare}
-          >
-            <Share2 className="h-3.5 w-3.5" />
-            {t("optimizer.memo.shareShort")}
-          </Button>
-        </DrawerHeader>
-
-        <div className="shrink-0 border-b border-bpim-border px-4 pb-3">
-          <GoalBpiJourney
-            memo={memo}
-            liveCurrentTotalBpi={liveCurrentTotalBpi}
-            steps={steps}
-            isExpanded
-          />
-        </div>
-
-        <div className="flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto px-4 py-3 custom-scrollbar">
-          {steps.length > 1 && (
-            <div className="flex min-w-0 gap-1 rounded-lg bg-bpim-overlay/30 p-1">
-              {STEP_SORT_ORDERS.map((order) => (
-                <button
-                  key={order}
-                  type="button"
-                  onClick={() => setSortOrder(order)}
-                  className={cn(
-                    "flex-1 truncate rounded-md py-1.5 text-[11px] font-bold transition-colors",
-                    sortOrder === order
-                      ? "bg-bpim-primary text-white"
-                      : "text-bpim-muted hover:text-bpim-text",
-                  )}
-                >
-                  {t(`optimizer.memo.stepSort.${order}`)}
-                </button>
-              ))}
-            </div>
-          )}
-          {sortedSteps.map((step) => (
-            <GoalSongCard
-              key={step.songId}
-              step={step}
-              contribution={contributions?.get(step.songId) ?? null}
-            />
-          ))}
-        </div>
-      </DrawerContent>
-    </Drawer>
-  );
 };
 
 const SavedMemoList = ({
@@ -294,7 +52,6 @@ const SavedMemoList = ({
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [openMemoId, setOpenMemoId] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
-  const [shareTargetId, setShareTargetId] = useState<string | null>(null);
 
   const visibleMemos = memos.filter((memo) => {
     if (statusFilter === "all") return true;
@@ -303,9 +60,6 @@ const SavedMemoList = ({
   });
 
   const openMemo = memos.find((memo) => memo.reportId === openMemoId) ?? null;
-  const openMemoSteps = openMemo
-    ? buildStepProgress(openMemo, currentScores, currentBpis)
-    : [];
 
   return (
     <>
@@ -396,15 +150,13 @@ const SavedMemoList = ({
 
       <GoalDetailDrawer
         memo={openMemo}
-        steps={openMemoSteps}
+        currentScores={currentScores}
+        currentBpis={currentBpis}
+        liveCurrentTotalBpi={liveCurrentTotalBpi}
         isOpen={openMemo !== null}
         onClose={() => setOpenMemoId(null)}
-        liveCurrentTotalBpi={liveCurrentTotalBpi}
         userId={userId}
         fbUser={fbUser}
-        onShare={() => {
-          if (openMemo) setShareTargetId(openMemo.reportId);
-        }}
       />
 
       <ActionConfirmDialog
@@ -418,12 +170,6 @@ const SavedMemoList = ({
         description={t("optimizer.memo.deleteDesc")}
         confirmLabel={t("optimizer.memo.deleteConfirm")}
         isDestructive
-      />
-
-      <ShareGoalModal
-        reportId={shareTargetId}
-        isOpen={shareTargetId !== null}
-        onClose={() => setShareTargetId(null)}
       />
     </>
   );

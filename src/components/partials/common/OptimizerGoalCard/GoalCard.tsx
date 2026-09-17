@@ -6,25 +6,14 @@ import type { OptimizeMemo } from "@/hooks/analytics/useOptimizeMemo";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 /**
- * 「目標管理」タブ専用のBPI推移・曲別進捗表示。
- *
- * 「作成時・現在・目標」を3カラムで並べ、各カラムに必ず「何の値か」の
- * ラベルを添える。「現在」は実際の達成度が一番気になる値のため、枠線と
- * 拡大表示で視覚的に主役だと分かるようにする。BPIの色付きチップ自体は
- * 維持しつつ、必ず「BPI」という文字ラベルとセットで出し、単なる色付き
- * 数字だけにならないようにする。目標を超えて達成した場合も特別扱いせず
- * 「達成」と同じ色・ラベルにする（超過を警告的な専用色にすると、良い
- * 結果なのに不穏な見た目になってしまうため）。
- *
- * 目標全体(GoalBpiJourney)と曲別(GoalSongCard)の見た目が同じだと
- * どちらが概観でどちらが詳細か分かりづらいため、目標全体側だけ
- * 「n/m曲達成」の達成率と比率バーを追加し、一覧性のある概観として
- * 差別化する。
+ * 目標の詳細表示（ダッシュボードウィジェット・「目標管理」タブ双方の
+ * ドロワーから利用）で使うBPI推移・曲別進捗表示。
  */
 
 type Highlight = "achieved" | undefined;
 
-const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
+const clamp = (v: number, lo: number, hi: number) =>
+  Math.min(hi, Math.max(lo, v));
 
 const journeyPct = (from: number, current: number, to: number) => {
   const span = to - from;
@@ -105,7 +94,12 @@ const BpiTag = ({ bpi, size = "sm" }: { bpi: number; size?: "sm" | "lg" }) => {
       )}
       style={{ backgroundColor: bg, color }}
     >
-      <span className={cn("font-bold opacity-80", size === "lg" ? "text-xs" : "text-[10px]")}>
+      <span
+        className={cn(
+          "font-bold opacity-80",
+          size === "lg" ? "text-xs" : "text-[10px]",
+        )}
+      >
         BPI
       </span>
       {bpi.toFixed(2)}
@@ -131,7 +125,10 @@ const JourneyColumn = ({
       emphasize
         ? "border-2 bg-bpim-bg"
         : "border border-bpim-border/60 bg-bpim-bg/60",
-      emphasize && (highlight === "achieved" ? "border-bpim-success" : "border-bpim-primary/60"),
+      emphasize &&
+        (highlight === "achieved"
+          ? "border-bpim-success"
+          : "border-bpim-primary/60"),
     )}
   >
     <span
@@ -169,7 +166,8 @@ const SongStatusBar = ({ steps }: { steps: GoalSongStep[] }) => {
   if (total === 0) return null;
 
   const achievedCount = steps.filter(
-    (step) => step.currentExScore != null && step.currentExScore >= step.toExScore,
+    (step) =>
+      step.currentExScore != null && step.currentExScore >= step.toExScore,
   ).length;
   const remainingCount = total - achievedCount;
   const achievedPct = (achievedCount / total) * 100;
@@ -181,7 +179,10 @@ const SongStatusBar = ({ steps }: { steps: GoalSongStep[] }) => {
         <div className="bg-bpim-success" style={{ width: `${achievedPct}%` }} />
       )}
       {remainingPct > 0 && (
-        <div className="bg-bpim-muted/30" style={{ width: `${remainingPct}%` }} />
+        <div
+          className="bg-bpim-muted/30"
+          style={{ width: `${remainingPct}%` }}
+        />
       )}
     </div>
   );
@@ -211,7 +212,10 @@ export const GoalBpiJourney = ({
     (s) => s.currentExScore != null && s.currentExScore >= s.toExScore,
   ).length;
 
-  if (typeof currentTotalBpi !== "number" || typeof targetTotalBpi !== "number") {
+  if (
+    typeof currentTotalBpi !== "number" ||
+    typeof targetTotalBpi !== "number"
+  ) {
     return (
       <div className="flex flex-col items-center gap-2 rounded-xl border border-bpim-border bg-bpim-surface p-4">
         <span className="text-xs font-bold text-bpim-muted">
@@ -317,13 +321,17 @@ export const GoalSongCard = ({
   const { t, tFormat } = useTranslation();
   const current = step.currentExScore;
   const baseline = step.fromExScore ?? 0;
-  const pct = current == null ? 0 : journeyPct(baseline, current, step.toExScore);
+  const pct =
+    current == null ? 0 : journeyPct(baseline, current, step.toExScore);
   const isAchieved = current != null && current >= step.toExScore;
   const highlight: Highlight = isAchieved ? "achieved" : undefined;
 
   const gained =
-    current != null && step.fromExScore != null ? current - step.fromExScore : null;
-  const remaining = current != null ? Math.max(0, step.toExScore - current) : null;
+    current != null && step.fromExScore != null
+      ? current - step.fromExScore
+      : null;
+  const remaining =
+    current != null ? Math.max(0, step.toExScore - current) : null;
   const hasImproved = step.fromExScore != null && gained != null && gained > 0;
 
   return (
@@ -366,7 +374,9 @@ export const GoalSongCard = ({
           {current != null ? (
             <>
               <ExValue exScore={current} notes={step.notes} emphasize />
-              {step.currentBpi != null && <BpiTag bpi={step.currentBpi} size="lg" />}
+              {step.currentBpi != null && (
+                <BpiTag bpi={step.currentBpi} size="lg" />
+              )}
             </>
           ) : (
             <span className="py-2 text-xs font-bold text-bpim-subtle">
@@ -390,7 +400,9 @@ export const GoalSongCard = ({
         }
         auxRight={
           remaining != null && remaining > 0
-            ? tFormat("dashboard.optimizerProgress.remaining", { diff: remaining })
+            ? tFormat("dashboard.optimizerProgress.remaining", {
+                diff: remaining,
+              })
             : undefined
         }
       />

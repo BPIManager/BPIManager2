@@ -1,4 +1,5 @@
 import NextLink from "next/link";
+import { User as FirebaseUser } from "firebase/auth";
 import {
   ChevronLeft,
   ChevronRight,
@@ -23,6 +24,7 @@ import {
   STEP_SORT_ORDERS,
   type StepSortOrder,
 } from "@/components/partials/common/OptimizerGoalCard";
+import { GoalDetailDrawer } from "@/components/partials/common/OptimizerGoalCard/GoalDetailDrawer";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import OptimizerProgressSkeleton from "./skeleton";
 
@@ -39,10 +41,17 @@ interface OptimizerProgressCardProps {
   isLoading: boolean;
   memos?: OptimizeMemo[];
   currentScores: Map<number, number | null>;
+  currentBpis: Map<number, number | null>;
+  liveCurrentTotalBpi: number | null;
   selectedIndex: number;
   onSelectIndex: (index: number) => void;
   sortOrder: StepSortOrder;
   onSortOrderChange: (order: StepSortOrder) => void;
+  isDetailOpen: boolean;
+  onOpenDetail: () => void;
+  onCloseDetail: () => void;
+  userId?: string;
+  fbUser?: FirebaseUser | null;
 }
 
 /**
@@ -50,7 +59,13 @@ interface OptimizerProgressCardProps {
  * プラン算出時点のスコア(fromExScore、未プレイ時はnull=0点扱い)を起点とした
  * 相対進捗で表示する。
  */
-const StepProgressRow = ({ step }: { step: StepProgress }) => {
+const StepProgressRow = ({
+  step,
+  onClick,
+}: {
+  step: StepProgress;
+  onClick: () => void;
+}) => {
   const { t, tFormat } = useTranslation();
   const current = step.currentExScore;
   const baseline = step.fromExScore ?? 0;
@@ -64,7 +79,11 @@ const StepProgressRow = ({ step }: { step: StepProgress }) => {
   const remaining = Math.max(0, step.toExScore - (current ?? 0));
 
   return (
-    <div className="flex flex-col gap-1">
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex flex-col gap-1 rounded-lg text-left transition-opacity hover:opacity-80"
+    >
       <div className="flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-1.5">
           <span
@@ -105,7 +124,7 @@ const StepProgressRow = ({ step }: { step: StepProgress }) => {
           style={{ width: `${Math.max(pct, 3)}%` }}
         />
       </div>
-    </div>
+    </button>
   );
 };
 
@@ -140,10 +159,17 @@ const OptimizerProgressCard = ({
   isLoading,
   memos,
   currentScores,
+  currentBpis,
+  liveCurrentTotalBpi,
   selectedIndex,
   onSelectIndex,
   sortOrder,
   onSortOrderChange,
+  isDetailOpen,
+  onOpenDetail,
+  onCloseDetail,
+  userId,
+  fbUser,
 }: OptimizerProgressCardProps) => {
   const { t, tFormat } = useTranslation();
 
@@ -237,9 +263,20 @@ const OptimizerProgressCard = ({
 
       <div className="mt-4 flex max-h-56 flex-col gap-3 overflow-y-auto custom-scrollbar pr-1">
         {steps.map((step) => (
-          <StepProgressRow key={step.songId} step={step} />
+          <StepProgressRow key={step.songId} step={step} onClick={onOpenDetail} />
         ))}
       </div>
+
+      <GoalDetailDrawer
+        memo={memo}
+        currentScores={currentScores}
+        currentBpis={currentBpis}
+        liveCurrentTotalBpi={liveCurrentTotalBpi}
+        isOpen={isDetailOpen}
+        onClose={onCloseDetail}
+        userId={userId}
+        fbUser={fbUser}
+      />
     </DashCard>
   );
 };

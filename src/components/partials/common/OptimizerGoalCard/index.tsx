@@ -18,15 +18,11 @@ interface StepProgress {
 }
 
 /**
- * Optimizer関連の表示で共有する最小限のユーティリティ。
- * ダッシュボードの達成状況ウィジェットと「目標管理」タブは見た目を揃える
- * 必要が無いため、それぞれ独自のレイアウト（`OptimizerProgress/ui.tsx`・
- * `BpiOptimizer/ui/GoalCard.tsx`）を持つ。ここには両方・カスタム目標作成
- * プレビューから再利用する小さな部品だけを置く。
- *
- * 目標を超えて達成した場合も、達成そのもの(色・ラベルとも「達成」)として
- * 扱う。超過を専用の色・ラベルで特別扱いすると「良いことをしたのに
- * 警告のような見た目になる」ため区別しない。
+ * Optimizer関連の表示で共有するユーティリティ・部品。
+ * ダッシュボードの達成状況ウィジェットは一覧性重視の簡易表示
+ * （`OptimizerProgress/ui.tsx`）を持つ一方、目標1件をタップした先の詳細
+ * （達成状況＋曲一覧）は`GoalDetailDrawer`としてダッシュボード・
+ * 「目標管理」タブの双方から共有する。
  */
 
 export const MiniBpiChip = ({ bpi }: { bpi: number }) => {
@@ -163,10 +159,4 @@ export function sortStepsByOrder<T extends SortableStep>(
     (a, b) => remainingToTarget(a) - remainingToTarget(b),
   );
   return order === "nearest" ? sorted : sorted.reverse();
-}
-
-/** 並び替えボタンを一巡りさせる（追加した順→近い順→遠い順→…）。 */
-export function cycleStepSortOrder(current: StepSortOrder): StepSortOrder {
-  const index = STEP_SORT_ORDERS.indexOf(current);
-  return STEP_SORT_ORDERS[(index + 1) % STEP_SORT_ORDERS.length];
 }
