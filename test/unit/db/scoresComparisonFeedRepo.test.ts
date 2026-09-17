@@ -30,11 +30,17 @@ describe("socialTimelineRepo.getFollowedTimeline", () => {
 
     const ifCalls = callsFor(dbHolder.current.calls, "$if");
     // 2フェーズ化後の Phase 1 の $if 順序:
-    //   [0] needsSongJoin(search/levels/difficulties のいずれか), [1] mode=played,
-    //   [2] mode=overtaken, [3] lastId
+    //   [0] listId, [1] needsSongJoin(search/levels/difficulties のいずれか),
+    //   [2] mode=played, [3] mode=overtaken, [4] lastId
     // （search/levels/difficulties 個別の絞り込みは needsSongJoin の $if 内で
     //   通常の if 分岐にまとめている）
-    expect(ifCalls.map((c) => c.args[0])).toEqual([true, true, false, true]);
+    expect(ifCalls.map((c) => c.args[0])).toEqual([
+      false,
+      true,
+      true,
+      false,
+      true,
+    ]);
   });
 
   it("何も指定しない場合すべての$ifがfalseになること", async () => {
@@ -58,9 +64,22 @@ describe("socialTimelineRepo.getFollowedTimeline", () => {
       mode: "overtaken",
     });
     const ifCalls = callsFor(dbHolder.current.calls, "$if");
-    expect(ifCalls[0].args[0]).toBe(false); // needsSongJoin
-    expect(ifCalls[1].args[0]).toBe(false); // played
-    expect(ifCalls[2].args[0]).toBe(true); // overtaken
+    expect(ifCalls[0].args[0]).toBe(false); // listId
+    expect(ifCalls[1].args[0]).toBe(false); // needsSongJoin
+    expect(ifCalls[2].args[0]).toBe(false); // played
+    expect(ifCalls[3].args[0]).toBe(true); // overtaken
+  });
+
+  it("listIdを指定するとフォローリスト絞り込みの$ifがtrueになること(#278)", async () => {
+    dbHolder.current = createDbSpy([]);
+    await socialTimelineRepo.getFollowedTimeline({
+      viewerId: "user-1",
+      version: "33",
+      limit: 20,
+      listId: 42,
+    });
+    const ifCalls = callsFor(dbHolder.current.calls, "$if");
+    expect(ifCalls[0].args[0]).toBe(true); // listId
   });
 });
 

@@ -12,11 +12,12 @@ interface TimelineListProps {
   mode: "all" | "played" | "overtaken";
   params: FilterParamsFrontend;
   version: string;
+  listId?: number | null;
 }
 
-const TimelineList = ({ mode, params, version }: TimelineListProps) => {
+const TimelineList = ({ mode, params, version, listId }: TimelineListProps) => {
   const { t } = useTranslation();
-  const res = useTimeline(mode, params, version);
+  const res = useTimeline(mode, params, version, listId);
 
   return (
     <div

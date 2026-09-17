@@ -1,5 +1,6 @@
 import type { NextApiRequest } from "next";
 import { socialTimelineRepo } from "@/lib/db/aggregates/rivalScores/feed";
+import { followListsRepo } from "@/lib/db/domains/followLists";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { timelineQuerySchema } from "@/schemas/timeline/query";
@@ -40,6 +41,13 @@ export async function handleTimeline(
   const version = query.version;
 
   try {
+    if (query.listId !== undefined) {
+      const list = await followListsRepo.getById(query.listId);
+      if (!list || list.userId !== viewerId) {
+        return { result: err(404, "List not found"), ...base };
+      }
+    }
+
     const timeline = await socialTimelineRepo.getFollowedTimeline({
       viewerId,
       version,
@@ -49,6 +57,7 @@ export async function handleTimeline(
       search: query.search,
       levels: query.levels,
       difficulties: query.difficulties?.length ? query.difficulties : undefined,
+      listId: query.listId,
     });
 
     if (timeline.length === 0) {
