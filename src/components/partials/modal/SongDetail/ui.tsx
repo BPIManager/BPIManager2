@@ -139,7 +139,7 @@ const SongDetailModalView = ({
                   onChange={(e) =>
                     edit.onDraftExScoreChange(
                       e.target.value
-                        ? Math.max(0, Number(e.target.value))
+                        ? Math.min(maxScore, Math.max(0, Number(e.target.value)))
                         : null,
                     )
                   }
