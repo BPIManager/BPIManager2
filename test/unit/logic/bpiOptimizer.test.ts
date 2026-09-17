@@ -325,5 +325,12 @@ describe("findOptimalBpiPath", () => {
     expect(result.achievable).toBe(true);
     const distinctSongs = new Set(result.steps.map((s) => s.songId));
     expect(distinctSongs.size).toBeGreaterThan(3);
+
+    // ペース配分により、1ステップの寄与が残りギャップに対して突出しないこと
+    // （1曲が総合BPIの伸びをほぼ独占する、という回帰の防止）
+    const totalGap = 1.01;
+    for (const step of result.steps) {
+      expect(step.bpiGain).toBeLessThan(totalGap * 0.5);
+    }
   });
 });
