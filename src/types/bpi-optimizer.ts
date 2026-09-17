@@ -6,7 +6,7 @@ export type OptimizerStrategy = "unplayed" | "played";
 export interface SongOptimizerInput
   extends Pick<
     IBpiBasicSongData,
-    "notes" | "kaidenAvg" | "wrScore" | "coef"
+    "notes" | "kaidenAvg" | "wrScore" | "coef" | "mu" | "sigma" | "residualVar"
   > {
   songId: number;
   title: string;
@@ -36,6 +36,15 @@ export interface OptimizationStep {
   isRadarStrength: boolean;
 }
 
+/** `ColdStartGuard`が候補から除外したカテゴリの案内（曲を数曲プレイしてもらうための情報）。 */
+export interface ColdCategoryAdvisory {
+  category: RadarCategory;
+  /** 現時点でこのカテゴリに属する曲のプレイ済み件数。 */
+  playedCount: number;
+  /** まずプレイしてほしい、このカテゴリの未プレイ曲（数曲）。 */
+  suggestions: { songId: number; title: string; difficulty: string }[];
+}
+
 export interface OptimizationResult {
   steps: OptimizationStep[];
   currentTotalBpi: number;
@@ -46,13 +55,14 @@ export interface OptimizationResult {
   totalSongCount: number;
   autoAdjustmentNote?: string;
   maxAchievableBpi?: number;
+  /** データが薄く推定を見送ったレーダーカテゴリ（`ColdStartGuard`）。無ければ省略。 */
+  coldCategories?: ColdCategoryAdvisory[];
 }
 
 export interface OptimizerOptions {
   includeUnplayed: boolean;
   includePlayed: boolean;
   radarElementFilter: RadarCategory[] | null;
-  radarCategoryBpis: Partial<Record<RadarCategory, number>>;
   candidateLevels: number[];
   candidateDifficulties: string[];
   considerCurrentTotalBpi?: boolean;
@@ -60,28 +70,6 @@ export interface OptimizerOptions {
 
 export type ExecuteOptions = OptimizerOptions & {
   searchMode?: "fastest" | "flexible";
+  maxRetries?: number;
   rng?: () => number;
-};
-
-export type ScoredCandidate = {
-  song: SongOptimizerInput;
-  score: number;
-  estimatedTargetBpi: number;
-};
-
-export type ResolvedTarget = {
-  effectiveTarget: number;
-  autoAdjustmentNote?: string;
-  originalTarget?: number;
-};
-
-export type ExecutionState = {
-  steps: OptimizationStep[];
-  currentAccumulatedSum: number;
-  currentTotalBpi: number;
-  carryError: number;
-  effectiveTarget: number;
-  totalTargetSum: number;
-  candidates: SongOptimizerInput[];
-  strongCategories: Set<RadarCategory>;
 };

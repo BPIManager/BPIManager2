@@ -31,20 +31,20 @@ const OptimizationStepCard = ({
             <div className="flex items-center gap-2">
               <div
                 className={cn(
-                  "px-1.5 py-0.5 rounded text-[9px] font-black text-white",
+                  "px-1.5 py-0.5 rounded text-xs font-black text-white",
                   DIFF_COLORS[step.difficulty],
                 )}
               >
                 {step.difficultyLevel} {step.difficulty.charAt(0)}
               </div>
               {step.radarCategory && (
-                <span className="text-[10px] font-bold text-bpim-subtle px-2 py-0.5 bg-bpim-bg rounded-full border border-bpim-border">
+                <span className="text-xs font-bold text-bpim-subtle px-2 py-0.5 bg-bpim-bg rounded-full border border-bpim-border">
                   {RADAR_LABELS[step.radarCategory]}
                 </span>
               )}
               {step.isRadarStrength && (
-                <Badge className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20 text-[9px] h-4">
-                  <Star className="h-2 w-2 mr-1 fill-yellow-500" /> {t("optimizer.step.mightBeStrong")}
+                <Badge className="bg-bpim-warning/15 text-bpim-warning border-bpim-warning/30 text-xs h-4">
+                  <Star className="h-2 w-2 mr-1 fill-bpim-warning" /> {t("optimizer.step.mightBeStrong")}
                 </Badge>
               )}
             </div>
@@ -55,7 +55,7 @@ const OptimizationStepCard = ({
           <div className="text-xs font-black text-bpim-primary">
             EX +{step.exScoreGap}
           </div>
-          <div className="text-[10px] text-bpim-muted font-bold">
+          <div className="text-xs text-bpim-muted font-bold">
             {t("optimizer.step.targetLabel")}: {step.toExScore}
           </div>
         </div>
@@ -63,10 +63,10 @@ const OptimizationStepCard = ({
 
       <div className="space-y-1.5">
         <div className="flex justify-between items-end">
-          <span className="text-[9px] font-black text-bpim-subtle uppercase tracking-widest">
+          <span className="text-xs font-black text-bpim-subtle uppercase tracking-widest">
             {t("optimizer.step.impact")}
           </span>
-          <span className="text-[10px] font-mono font-bold text-bpim-primary">
+          <span className="text-xs font-mono font-bold text-bpim-primary">
             +{step.bpiGain.toFixed(2)}
           </span>
         </div>
@@ -79,7 +79,7 @@ const OptimizationStepCard = ({
       </div>
       <div className="flex items-center justify-between pt-2 border-t border-bpim-border/50">
         <div className="flex flex-col gap-1">
-          <span className="text-[9px] font-black text-bpim-subtle uppercase tracking-widest leading-none">
+          <span className="text-xs font-black text-bpim-subtle uppercase tracking-widest leading-none">
             {t("optimizer.step.bpiChange")}
           </span>
           <div className="flex items-center gap-2">
@@ -90,14 +90,14 @@ const OptimizationStepCard = ({
             <div className="flex flex-col items-center">
               <BpiChip bpi={step.toBpi} size="xs" />
             </div>
-            <span className="text-[10px] font-bold text-bpim-primary ml-1">
+            <span className="text-xs font-bold text-bpim-primary ml-1">
               (+{(step.toBpi - step.fromBpi).toFixed(1)})
             </span>
           </div>
         </div>
 
         <div className="text-right flex flex-col justify-end">
-          <span className="text-[9px] font-black text-bpim-subtle uppercase tracking-widest leading-none">
+          <span className="text-xs font-black text-bpim-subtle uppercase tracking-widest leading-none">
             {t("optimizer.step.totalBpiAfter")}
           </span>
           <div className="text-sm font-black text-bpim-text font-mono leading-tight mt-1">

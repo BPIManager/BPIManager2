@@ -50,7 +50,6 @@ class BpiOptimizerAggregateRepository {
         "d.sigma",
         "d.residualVar",
         "userScore.exScore",
-        "userScore.bpi",
       ])
       .where("m.difficultyLevel", "=", 12)
       .where("m.difficulty", "in", IIDX_DIFFICULTIES)
