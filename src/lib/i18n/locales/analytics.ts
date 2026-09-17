@@ -552,6 +552,128 @@ export const analyticsTranslations = {
     ko: "메모 관리",
   },
 
+  "optimizer.mode.autoCard.title": {
+    ja: "自動的に目標を作成",
+    en: "Create automatically",
+    "zh-TW": "自動建立目標",
+    ko: "자동으로 목표 만들기",
+  },
+  "optimizer.mode.autoCard.desc": {
+    ja: "目標BPIを入力すると、そこに届くための曲・スコアの組み合わせをアルゴリズムが提案します。",
+    en: "Enter a target BPI and the algorithm suggests songs and scores to reach it.",
+    "zh-TW": "輸入目標BPI後，演算法會提出達成所需的曲目與分數組合。",
+    ko: "목표 BPI를 입력하면 알고리즘이 도달하기 위한 곡・스코어 조합을 제안합니다.",
+  },
+  "optimizer.mode.customCard.title": {
+    ja: "自分で曲を選んで作成",
+    en: "Pick songs yourself",
+    "zh-TW": "自行選擇樂曲建立",
+    ko: "직접 곡을 선택해서 만들기",
+  },
+  "optimizer.mode.customCard.desc": {
+    ja: "好きな曲を検索して、自分で目標EXスコアを設定します。複数曲をまとめて1つの目標として保存できます。",
+    en: "Search for any song and set your own target EX score. Bundle multiple songs into a single goal.",
+    "zh-TW": "搜尋喜歡的樂曲，自行設定目標EX分數。可將多首曲目整合為一個目標保存。",
+    ko: "원하는 곡을 검색해 직접 목표 EX스코어를 설정합니다. 여러 곡을 하나의 목표로 묶어 저장할 수 있습니다.",
+  },
+
+  "optimizer.customGoal.backToSelect": {
+    ja: "作成方法を選び直す",
+    en: "Choose a different method",
+    "zh-TW": "重新選擇建立方式",
+    ko: "만드는 방법 다시 선택",
+  },
+  "optimizer.customGoal.empty": {
+    ja: "曲がまだ追加されていません",
+    en: "No songs added yet.",
+    "zh-TW": "尚未加入任何樂曲",
+    ko: "아직 추가된 곡이 없습니다",
+  },
+  "optimizer.customGoal.addSong": {
+    ja: "曲を追加",
+    en: "Add a song",
+    "zh-TW": "新增樂曲",
+    ko: "곡 추가",
+  },
+  "optimizer.customGoal.bpiImpact": {
+    ja: "総合BPIへのインパクト",
+    en: "Impact on Total BPI",
+    "zh-TW": "對綜合BPI的影響",
+    ko: "종합BPI에 미치는 영향",
+  },
+  "optimizer.customGoal.calculating": {
+    ja: "計算中...",
+    en: "Calculating...",
+    "zh-TW": "計算中...",
+    ko: "계산 중...",
+  },
+  "optimizer.customGoal.save": {
+    ja: "この目標を保存",
+    en: "Save this goal",
+    "zh-TW": "儲存此目標",
+    ko: "이 목표 저장",
+  },
+  "optimizer.customGoal.saved": {
+    ja: "カスタム目標を保存しました",
+    en: "Custom goal saved",
+    "zh-TW": "已儲存自訂目標",
+    ko: "커스텀 목표를 저장했습니다",
+  },
+  "optimizer.customGoal.searchStepTitle": {
+    ja: "曲を検索",
+    en: "Search for a song",
+    "zh-TW": "搜尋樂曲",
+    ko: "곡 검색",
+  },
+  "optimizer.customGoal.scoreStepTitle": {
+    ja: "目標EXスコアを入力",
+    en: "Set target EX score",
+    "zh-TW": "輸入目標EX分數",
+    ko: "목표 EX스코어 입력",
+  },
+  "optimizer.customGoal.searchPlaceholder": {
+    ja: "曲名で検索",
+    en: "Search by song title",
+    "zh-TW": "以曲名搜尋",
+    ko: "곡명으로 검색",
+  },
+  "optimizer.customGoal.noResults": {
+    ja: "該当する曲が見つかりません",
+    en: "No matching songs found.",
+    "zh-TW": "找不到符合的樂曲",
+    ko: "일치하는 곡을 찾을 수 없습니다",
+  },
+  "optimizer.customGoal.changeSong": {
+    ja: "曲を変更",
+    en: "Change song",
+    "zh-TW": "變更樂曲",
+    ko: "곡 변경",
+  },
+  "optimizer.customGoal.targetExScore": {
+    ja: "目標EXスコア",
+    en: "Target EX Score",
+    "zh-TW": "目標EX分數",
+    ko: "목표 EX스코어",
+  },
+  "optimizer.customGoal.cancel": {
+    ja: "キャンセル",
+    en: "Cancel",
+    "zh-TW": "取消",
+    ko: "취소",
+  },
+  "optimizer.customGoal.addTarget": {
+    ja: "追加",
+    en: "Add",
+    "zh-TW": "新增",
+    ko: "추가",
+  },
+  "optimizer.customGoal.updateTarget": {
+    ja: "更新",
+    en: "Update",
+    "zh-TW": "更新",
+    ko: "업데이트",
+  },
+
   // OptimizerGuide
   "optimizer.guide.title": {
     ja: "この機能の使い方",
