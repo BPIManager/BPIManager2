@@ -1,0 +1,182 @@
+import NextLink from "next/link";
+import { ChevronLeft, ChevronRight, Target, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { DashCard } from "@/components/ui/dashcard";
+import { cn } from "@/lib/utils";
+import { DIFF_COLORS } from "@/constants/theme/difficultyColors";
+import type { OptimizeMemo } from "@/hooks/analytics/useOptimizeMemo";
+import { useTranslation } from "@/hooks/common/useTranslation";
+import OptimizerProgressSkeleton from "./skeleton";
+
+interface StepProgress {
+  songId: number;
+  title: string;
+  difficulty: string;
+  difficultyLevel: number;
+  toExScore: number;
+  currentExScore: number | null;
+}
+
+interface OptimizerProgressCardProps {
+  isLoading: boolean;
+  memos?: OptimizeMemo[];
+  currentScores: Map<number, number | null>;
+  selectedIndex: number;
+  onSelectIndex: (index: number) => void;
+}
+
+const StepProgressRow = ({ step }: { step: StepProgress }) => {
+  const { t } = useTranslation();
+  const current = step.currentExScore;
+  const isAchieved = current != null && current >= step.toExScore;
+  const pct =
+    current == null
+      ? 0
+      : Math.min(100, Math.max(0, (current / step.toExScore) * 100));
+
+  return (
+    <div className="flex flex-col gap-1">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex min-w-0 items-center gap-1.5">
+          <span
+            className={cn(
+              "shrink-0 rounded px-1 py-0.5 text-[10px] font-black text-white",
+              DIFF_COLORS[step.difficulty],
+            )}
+          >
+            {step.difficultyLevel}
+            {step.difficulty.charAt(0)}
+          </span>
+          <span className="truncate text-xs font-bold text-bpim-text">
+            {step.title}
+          </span>
+        </div>
+        <span
+          className={cn(
+            "shrink-0 font-mono text-[11px] font-bold",
+            isAchieved ? "text-bpim-success" : "text-bpim-muted",
+          )}
+        >
+          {isAchieved
+            ? t("dashboard.optimizerProgress.achieved")
+            : current == null
+              ? t("dashboard.optimizerProgress.unplayed")
+              : `${current} / ${step.toExScore}`}
+        </span>
+      </div>
+      <div className="h-1.5 w-full overflow-hidden rounded-full bg-bpim-surface-3">
+        <div
+          className={cn(
+            "h-full rounded-full transition-all duration-500",
+            isAchieved ? "bg-bpim-success" : "bg-bpim-primary",
+          )}
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+    </div>
+  );
+};
+
+const OptimizerProgressEmpty = () => {
+  const { t } = useTranslation();
+  return (
+    <DashCard>
+      <div className="flex flex-col items-center gap-3 py-6 text-center">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-bpim-primary/10 text-bpim-primary">
+          <Target className="h-6 w-6" />
+        </div>
+        <div className="flex flex-col gap-1">
+          <span className="text-sm font-bold text-bpim-text">
+            {t("dashboard.optimizerProgress.emptyTitle")}
+          </span>
+          <span className="max-w-xs text-xs leading-relaxed text-bpim-muted">
+            {t("dashboard.optimizerProgress.emptyDesc")}
+          </span>
+        </div>
+        <NextLink href="/optimizer">
+          <Button size="sm" className="mt-1 gap-1.5">
+            <Sparkles className="h-3.5 w-3.5" />
+            {t("dashboard.optimizerProgress.cta")}
+          </Button>
+        </NextLink>
+      </div>
+    </DashCard>
+  );
+};
+
+const OptimizerProgressCard = ({
+  isLoading,
+  memos,
+  currentScores,
+  selectedIndex,
+  onSelectIndex,
+}: OptimizerProgressCardProps) => {
+  const { t, tFormat } = useTranslation();
+
+  if (isLoading) return <OptimizerProgressSkeleton />;
+  if (!memos || memos.length === 0) return <OptimizerProgressEmpty />;
+
+  const clampedIndex = Math.min(selectedIndex, memos.length - 1);
+  const memo = memos[clampedIndex];
+  const steps: StepProgress[] = memo.reportData.steps.map((step) => ({
+    songId: step.songId,
+    title: step.title,
+    difficulty: step.difficulty,
+    difficultyLevel: step.difficultyLevel,
+    toExScore: step.toExScore,
+    currentExScore: currentScores.get(step.songId) ?? null,
+  }));
+
+  return (
+    <DashCard>
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-bold text-bpim-muted">
+          {t("dashboard.optimizerProgress.title")}
+        </span>
+        {memos.length > 1 && (
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              disabled={clampedIndex === 0}
+              onClick={() => onSelectIndex(clampedIndex - 1)}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <span className="min-w-11 text-center font-mono text-[11px] font-bold text-bpim-muted">
+              {tFormat("dashboard.optimizerProgress.pager", {
+                current: clampedIndex + 1,
+                total: memos.length,
+              })}
+            </span>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              disabled={clampedIndex === memos.length - 1}
+              onClick={() => onSelectIndex(clampedIndex + 1)}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
+      </div>
+
+      <div className="mt-3 flex items-center gap-2">
+        <Badge variant="secondary" className="bg-bpim-overlay font-mono text-xs">
+          {tFormat("dashboard.optimizerProgress.target", {
+            bpi: memo.targetBpi.toFixed(2),
+          })}
+        </Badge>
+      </div>
+
+      <div className="mt-4 flex max-h-56 flex-col gap-3 overflow-y-auto custom-scrollbar pr-1">
+        {steps.map((step) => (
+          <StepProgressRow key={step.songId} step={step} />
+        ))}
+      </div>
+    </DashCard>
+  );
+};
+
+export default OptimizerProgressCard;

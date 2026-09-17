@@ -1146,4 +1146,59 @@ export const dashboardTranslations = {
     "zh-TW": "關閉",
     ko: "닫기",
   },
+
+  "dashboard.optimizerProgress.title": {
+    ja: "Optimizerプラン達成状況",
+    en: "Optimizer Plan Progress",
+    "zh-TW": "Optimizer計畫達成狀況",
+    ko: "Optimizer 플랜 달성 현황",
+  },
+  "dashboard.optimizerProgress.emptyTitle": {
+    ja: "保存済みのプランがありません",
+    en: "No saved plans yet",
+    "zh-TW": "尚無已儲存的計畫",
+    ko: "저장된 플랜이 없습니다",
+  },
+  "dashboard.optimizerProgress.emptyDesc": {
+    ja: "BPIオプティマイザで目標BPIまでのプランを立てて保存すると、ここで日々の進捗を確認できます。",
+    en: "Plan and save a route to your target BPI in the BPI Optimizer to track your daily progress here.",
+    "zh-TW": "在BPI Optimizer中規劃並儲存達成目標BPI的計畫後，即可在此確認每日進度。",
+    ko: "BPI 옵티마이저에서 목표 BPI까지의 플랜을 세우고 저장하면 여기서 일일 진행 상황을 확인할 수 있습니다.",
+  },
+  "dashboard.optimizerProgress.cta": {
+    ja: "Optimizerを開く",
+    en: "Open Optimizer",
+    "zh-TW": "開啟Optimizer",
+    ko: "옵티마이저 열기",
+  },
+  "dashboard.optimizerProgress.target": {
+    ja: "目標BPI {bpi}",
+    en: "Target BPI {bpi}",
+    "zh-TW": "目標BPI {bpi}",
+    ko: "목표 BPI {bpi}",
+  },
+  "dashboard.optimizerProgress.remaining": {
+    ja: "あと{diff}点",
+    en: "{diff} EX to go",
+    "zh-TW": "還差{diff}分",
+    ko: "앞으로 {diff}점",
+  },
+  "dashboard.optimizerProgress.achieved": {
+    ja: "達成",
+    en: "Achieved",
+    "zh-TW": "已達成",
+    ko: "달성",
+  },
+  "dashboard.optimizerProgress.unplayed": {
+    ja: "未プレイ",
+    en: "Unplayed",
+    "zh-TW": "未遊玩",
+    ko: "미플레이",
+  },
+  "dashboard.optimizerProgress.pager": {
+    ja: "{current} / {total}",
+    en: "{current} of {total}",
+    "zh-TW": "{current} / {total}",
+    ko: "{current} / {total}",
+  },
 } as const;
