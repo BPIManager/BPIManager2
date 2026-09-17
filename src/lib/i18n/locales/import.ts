@@ -285,6 +285,96 @@ export const importTranslations = {
     ko: "앱 다운로드",
   },
 
+  // Registration methods section header (Bookmarklet / Android app / Manual entry / MCP)
+  "import.registrationMethods.title": {
+    ja: "スコアの登録方法",
+    en: "Ways to Register Scores",
+    "zh-TW": "成績登錄方法",
+    ko: "점수 등록 방법",
+  },
+
+  // MCP accordion
+  "import.mcp.accordionTitle": {
+    ja: "MCP経由でAIに登録してもらう",
+    en: "Register via MCP (AI Assistant)",
+    "zh-TW": "透過 MCP 讓 AI 登錄",
+    ko: "MCP를 통해 AI에게 등록시키기",
+  },
+  "import.mcp.desc": {
+    ja: "BPIM2はMCP(Model Context Protocol)サーバーを公開しています。Claude等のMCP対応AIクライアントと連携すると、リザルト画面のスクリーンショットを渡して「このスコアで更新して」と伝えるだけでスコアを登録できます。",
+    en: "BPIM2 exposes an MCP (Model Context Protocol) server. Connect an MCP-compatible AI client such as Claude, then just share a screenshot of your result screen and ask it to update your score.",
+    "zh-TW": "BPIM2 提供 MCP (Model Context Protocol) 伺服器。連接 Claude 等支援 MCP 的 AI 用戶端後，只需提供成績畫面截圖並要求「用這個成績更新」即可登錄成績。",
+    ko: "BPIM2는 MCP(Model Context Protocol) 서버를 공개하고 있습니다. Claude 등 MCP 지원 AI 클라이언트와 연동하면, 리절트 화면 스크린샷을 전달하고 \"이 점수로 업데이트해줘\"라고 말하는 것만으로 점수를 등록할 수 있습니다.",
+  },
+  "import.mcp.step1": {
+    ja: "MCP対応クライアント(Claude等)にBPIM2のMCPエンドポイントを登録します。",
+    en: "Register BPIM2's MCP endpoint in an MCP-compatible client (e.g. Claude).",
+    "zh-TW": "在支援 MCP 的用戶端(如 Claude)中登錄 BPIM2 的 MCP 端點。",
+    ko: "MCP 지원 클라이언트(Claude 등)에 BPIM2의 MCP 엔드포인트를 등록합니다.",
+  },
+  "import.mcp.step2": {
+    ja: "OAuth認証でBPIM2アカウントと連携します(DCR対応クライアントなら追加設定は不要です)。",
+    en: "Authorize via OAuth to link your BPIM2 account (no extra setup needed for DCR-compatible clients).",
+    "zh-TW": "透過 OAuth 認證與 BPIM2 帳號連結(若用戶端支援 DCR，則無需額外設定)。",
+    ko: "OAuth 인증으로 BPIM2 계정과 연동합니다(DCR 지원 클라이언트라면 추가 설정이 필요 없습니다).",
+  },
+  "import.mcp.step3": {
+    ja: "「このスコアで更新して」のように話しかけると、AIがスコアを検索・更新します。",
+    en: 'Just ask, e.g. "update this score", and the AI will look up and update it for you.',
+    "zh-TW": '只需說「用這個成績更新」，AI 就會為您搜尋並更新成績。',
+    ko: '"이 점수로 업데이트해줘"처럼 말하면 AI가 점수를 검색·업데이트합니다.',
+  },
+  "import.mcp.infoLinkText": {
+    ja: "MCPエンドポイントの詳細はこちら",
+    en: "MCP endpoint details",
+    "zh-TW": "MCP 端點詳情請點此",
+    ko: "MCP 엔드포인트 상세 정보",
+  },
+  "import.mcp.settingsLinkText": {
+    ja: "設定ページでクライアントを管理",
+    en: "Manage clients in settings",
+    "zh-TW": "在設定頁面管理用戶端",
+    ko: "설정 페이지에서 클라이언트 관리",
+  },
+
+  // Manual entry accordion
+  "import.manualEntry.accordionTitle": {
+    ja: "手動で入力する",
+    en: "Enter Manually",
+    "zh-TW": "手動輸入",
+    ko: "수동으로 입력",
+  },
+  "import.manualEntry.desc": {
+    ja: "1曲ずつスコアを手入力して更新することもできます。まとめて取り込みたい場合は上記のCSVインポートをご利用ください。",
+    en: "You can also update scores one song at a time by entering them manually. Use the CSV import above if you want to update many scores at once.",
+    "zh-TW": "您也可以逐曲手動輸入成績來更新。若要一次匯入大量成績，請使用上方的 CSV 匯入功能。",
+    ko: "곡별로 점수를 직접 입력하여 업데이트할 수도 있습니다. 한 번에 여러 곡을 갱신하려면 위의 CSV 임포트를 이용하세요.",
+  },
+  "import.manualEntry.step1": {
+    ja: "「未プレイ」「プレイ済み」などの一覧ページから、更新したい楽曲を開きます。",
+    en: 'Open the song you want to update from a list page such as "Unplayed" or "Played".',
+    "zh-TW": "從「未遊玩」「已遊玩」等清單頁面開啟想要更新的樂曲。",
+    ko: '"미플레이", "플레이 완료" 등의 목록 페이지에서 업데이트할 곡을 엽니다.',
+  },
+  "import.manualEntry.step2": {
+    ja: "曲詳細に表示されるEXスコアの編集アイコンから、新しいスコアを入力します。",
+    en: "Tap the edit icon next to the EX score in the song detail view and enter the new score.",
+    "zh-TW": "點擊曲目詳情中 EX 分數旁的編輯圖示，輸入新的分數。",
+    ko: "곡 상세 화면에 표시되는 EX 점수의 편집 아이콘에서 새 점수를 입력합니다.",
+  },
+  "import.manualEntry.step3": {
+    ja: "保存すると、その楽曲のスコアだけが更新されます。",
+    en: "Once saved, only that song's score will be updated.",
+    "zh-TW": "儲存後，僅該樂曲的成績會被更新。",
+    ko: "저장하면 해당 곡의 점수만 업데이트됩니다.",
+  },
+  "import.manualEntry.guideLinkText": {
+    ja: "使い方はこちら",
+    en: "See usage guide",
+    "zh-TW": "使用方法請點此",
+    ko: "사용법 보기",
+  },
+
   // Bookmarklet accordion
   "import.bookmarklet.accordionTitle": {
     ja: "ブックマークレット経由で登録",
