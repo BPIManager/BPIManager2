@@ -14,6 +14,8 @@ import { versionsOptions } from "@/constants/iidx/versionTitles";
 import { iidxUrl } from "@/constants/iidx/eamusementUrls";
 import BookmarkletAccordion from "@/components/partials/common/Bookmarklet";
 import AndroidAppAccordion from "../AndroidApp";
+import ManualEntryAccordion from "../ManualEntry";
+import McpEntryAccordion from "../McpEntry";
 import InstructionSection from "../Instruction";
 import {
   type CsvType,
@@ -92,8 +94,6 @@ const ScoreImportView = (props: ScoreImportProps) => {
               </span>
             </div>
           )}
-          <BookmarkletAccordion />
-          <AndroidAppAccordion />
         </div>
 
         <div className="space-y-2">
@@ -155,6 +155,16 @@ const ScoreImportView = (props: ScoreImportProps) => {
               </>
             )}
           </Button>
+        </div>
+
+        <div className="space-y-2">
+          <Label className="text-sm font-bold text-bpim-text">
+            {t("import.registrationMethods.title")}
+          </Label>
+          <BookmarkletAccordion />
+          <AndroidAppAccordion />
+          <ManualEntryAccordion />
+          <McpEntryAccordion />
         </div>
 
         <Separator className="bg-bpim-overlay/60" />
