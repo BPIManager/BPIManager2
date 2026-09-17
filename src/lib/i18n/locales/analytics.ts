@@ -550,6 +550,30 @@ export const analyticsTranslations = {
     "zh-TW": "刪除",
     ko: "삭제",
   },
+  "optimizer.memo.statusFilter.all": {
+    ja: "すべて",
+    en: "All",
+    "zh-TW": "全部",
+    ko: "전체",
+  },
+  "optimizer.memo.statusFilter.unachieved": {
+    ja: "未達成",
+    en: "In progress",
+    "zh-TW": "未達成",
+    ko: "미달성",
+  },
+  "optimizer.memo.statusFilter.achieved": {
+    ja: "達成済み",
+    en: "Achieved",
+    "zh-TW": "已達成",
+    ko: "달성 완료",
+  },
+  "optimizer.memo.noMatch": {
+    ja: "該当する目標がありません",
+    en: "No goals match this filter.",
+    "zh-TW": "沒有符合的目標",
+    ko: "해당하는 목표가 없습니다",
+  },
 
   "optimizer.tabs.create": {
     ja: "新規作成",
@@ -756,6 +780,18 @@ export const analyticsTranslations = {
     en: "Fast (170~)",
     "zh-TW": "快速 (170~)",
     ko: "고속 (170~)",
+  },
+  "optimizer.customGoal.bpmBand.soflan": {
+    ja: "SOFLAN",
+    en: "SOFLAN",
+    "zh-TW": "SOFLAN",
+    ko: "SOFLAN",
+  },
+  "optimizer.customGoal.filterByTitle": {
+    ja: "曲名で絞り込み",
+    en: "Filter by title",
+    "zh-TW": "以曲名篩選",
+    ko: "곡명으로 필터",
   },
   "optimizer.customGoal.changeSong": {
     ja: "曲を変更",

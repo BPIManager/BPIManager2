@@ -11,6 +11,22 @@ import { GoalBpiJourney, GoalSongCard, type GoalSongStep } from "./GoalCard";
 import type { OptimizeMemo } from "@/hooks/analytics/useOptimizeMemo";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
+type StatusFilter = "all" | "unachieved" | "achieved";
+const STATUS_FILTERS: StatusFilter[] = ["all", "unachieved", "achieved"];
+
+/** GoalBpiJourneyの達成判定（現在の総合BPI >= 目標総合BPI）と同じ基準で目標全体の達成状況を判定する。 */
+const isMemoAchieved = (
+  memo: OptimizeMemo,
+  liveCurrentTotalBpi: number | null,
+): boolean => {
+  const targetTotalBpi = memo.reportData.targetTotalBpi ?? memo.targetBpi;
+  const currentTotalBpi = liveCurrentTotalBpi ?? memo.reportData.currentTotalBpi;
+  if (typeof currentTotalBpi !== "number" || typeof targetTotalBpi !== "number") {
+    return false;
+  }
+  return currentTotalBpi >= targetTotalBpi;
+};
+
 /**
  * 展開時のみ、保存時点からの実際のスコア更新が現在の総合BPIにどれだけ
  * 効いているかをAPIから取得する（折りたたみ中の全メモ分を一括で叩かない
@@ -90,20 +106,52 @@ const SavedMemoList = ({
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   // 同時に開けるのは1つまで（アコーディオン形式）
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
 
   const toggleExpanded = (id: string) => {
     setExpandedId((prev) => (prev === id ? null : id));
   };
 
+  const visibleMemos = memos.filter((memo) => {
+    if (statusFilter === "all") return true;
+    const achieved = isMemoAchieved(memo, liveCurrentTotalBpi);
+    return statusFilter === "achieved" ? achieved : !achieved;
+  });
+
   return (
     <>
+      {memos.length > 0 && (
+        <div className="flex min-w-0 gap-1 rounded-lg bg-bpim-overlay/30 p-1">
+          {STATUS_FILTERS.map((filter) => (
+            <button
+              key={filter}
+              type="button"
+              onClick={() => setStatusFilter(filter)}
+              className={cn(
+                "flex-1 truncate rounded-md py-1.5 text-xs font-bold transition-colors",
+                statusFilter === filter
+                  ? "bg-bpim-primary text-white"
+                  : "text-bpim-muted hover:text-bpim-text",
+              )}
+            >
+              {t(`optimizer.memo.statusFilter.${filter}`)}
+            </button>
+          ))}
+        </div>
+      )}
+
       <div className="flex flex-col gap-2 w-full">
+        {memos.length > 0 && visibleMemos.length === 0 && (
+          <p className="text-xs text-center py-8 text-bpim-subtle border border-dashed border-bpim-border rounded-lg">
+            {t("optimizer.memo.noMatch")}
+          </p>
+        )}
         {memos.length === 0 && (
           <p className="text-xs text-center py-8 text-bpim-subtle border border-dashed border-bpim-border rounded-lg">
             {t("optimizer.memo.empty")}
           </p>
         )}
-        {memos.map((memo) => {
+        {visibleMemos.map((memo) => {
           const isAuto = memo.kind !== "custom";
           const isExpanded = expandedId === memo.reportId;
           const steps = buildStepProgress(memo, currentScores, currentBpis);

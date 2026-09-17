@@ -27,7 +27,7 @@ import { useTranslation } from "@/hooks/common/useTranslation";
 
 type SearchMode = "title" | "radar" | "bpm";
 const SEARCH_MODES: SearchMode[] = ["title", "radar", "bpm"];
-const BPM_BANDS: BpmBand[] = ["slow", "mid", "fast"];
+const BPM_BANDS: BpmBand[] = ["slow", "mid", "fast", "soflan"];
 
 export interface CustomGoalTargetInput {
   songId: number;
@@ -166,6 +166,11 @@ const SongTargetModal = ({
       : searchMode === "radar"
         ? radarCategory != null
         : bpmBand != null;
+  const titleFilter = debouncedQuery.trim().toLowerCase();
+  const displaySongs =
+    searchMode === "title" || titleFilter.length === 0
+      ? songs
+      : songs.filter((song) => song.title.toLowerCase().includes(titleFilter));
 
   const maxScore = selectedSong ? selectedSong.notes * 2 : null;
   const exScoreNum = parseInt(exScoreInput, 10);
@@ -261,34 +266,60 @@ const SongTargetModal = ({
             )}
 
             {searchMode === "radar" && (
-              <div className="flex min-w-0 flex-wrap gap-1.5">
-                {ALL_RADAR_CATEGORIES.map((cat) => (
-                  <Button
-                    key={cat}
-                    type="button"
-                    variant={radarCategory === cat ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setRadarCategory(cat)}
-                  >
-                    {RADAR_LABELS[cat]}
-                  </Button>
-                ))}
+              <div className="flex min-w-0 flex-col gap-2">
+                <div className="flex min-w-0 flex-wrap gap-1.5">
+                  {ALL_RADAR_CATEGORIES.map((cat) => (
+                    <Button
+                      key={cat}
+                      type="button"
+                      variant={radarCategory === cat ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setRadarCategory(cat)}
+                    >
+                      {RADAR_LABELS[cat]}
+                    </Button>
+                  ))}
+                </div>
+                {radarCategory != null && (
+                  <div className="relative">
+                    <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-bpim-muted" />
+                    <Input
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                      placeholder={t("optimizer.customGoal.filterByTitle")}
+                      className="pl-8 h-9"
+                    />
+                  </div>
+                )}
               </div>
             )}
 
             {searchMode === "bpm" && (
-              <div className="flex min-w-0 flex-wrap gap-1.5">
-                {BPM_BANDS.map((band) => (
-                  <Button
-                    key={band}
-                    type="button"
-                    variant={bpmBand === band ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setBpmBand(band)}
-                  >
-                    {t(`optimizer.customGoal.bpmBand.${band}`)}
-                  </Button>
-                ))}
+              <div className="flex min-w-0 flex-col gap-2">
+                <div className="flex min-w-0 flex-wrap gap-1.5">
+                  {BPM_BANDS.map((band) => (
+                    <Button
+                      key={band}
+                      type="button"
+                      variant={bpmBand === band ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setBpmBand(band)}
+                    >
+                      {t(`optimizer.customGoal.bpmBand.${band}`)}
+                    </Button>
+                  ))}
+                </div>
+                {bpmBand != null && (
+                  <div className="relative">
+                    <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-bpim-muted" />
+                    <Input
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                      placeholder={t("optimizer.customGoal.filterByTitle")}
+                      className="pl-8 h-9"
+                    />
+                  </div>
+                )}
               </div>
             )}
 
@@ -298,12 +329,12 @@ const SongTargetModal = ({
                   <CircleDashed className="h-4 w-4 animate-spin text-bpim-muted" />
                 </div>
               )}
-              {!isLoading && hasBrowseSelection && songs.length === 0 && (
+              {!isLoading && hasBrowseSelection && displaySongs.length === 0 && (
                 <p className="py-8 text-center text-xs text-bpim-subtle">
                   {t("optimizer.customGoal.noResults")}
                 </p>
               )}
-              {songs.map((song) => (
+              {displaySongs.map((song) => (
                 <button
                   key={`${song.songId}`}
                   onClick={() => setSelectedSong(song)}

@@ -12,24 +12,21 @@ const SEARCH_LIMIT = 20;
 const BROWSE_FETCH_LIMIT = 1000;
 const BROWSE_DISPLAY_LIMIT = 150;
 
-export type BpmBand = "slow" | "mid" | "fast";
-const BPM_BANDS: BpmBand[] = ["slow", "mid", "fast"];
+export type BpmBand = "slow" | "mid" | "fast" | "soflan";
+const BPM_BANDS: BpmBand[] = ["slow", "mid", "fast", "soflan"];
 
 /**
- * 曲のBPM表記（"150"のような単一値・"120-180"のような可変速）から、
- * 平均値を代表値として低速(~135)/中速(135~170)/高速(170~)に分類する。
+ * 曲のBPM表記から低速(~135)/中速(135~170)/高速(170~)/SOFLANに分類する。
+ * "120-180"のようなハイフン等区切りの可変速表記は、平均値で速度帯に
+ * 丸めてしまうと実際の体感速度と乖離するため、速度帯とは別にSOFLANとして
+ * 扱う（単一BPM値の曲のみ低速/中速/高速で分類する）。
  */
 function bpmBandOf(bpm: string): BpmBand {
-  const parts = bpm
-    .split(/[-〜~]/)
-    .map((p) => Number(p.trim()))
-    .filter((n) => !Number.isNaN(n));
-  const avg =
-    parts.length >= 2
-      ? (parts[0] + parts[parts.length - 1]) / 2
-      : (parts[0] ?? 0);
-  if (avg < 135) return "slow";
-  if (avg < 170) return "mid";
+  if (/[-〜~]/.test(bpm)) return "soflan";
+  const value = Number(bpm.trim());
+  if (Number.isNaN(value)) return "soflan";
+  if (value < 135) return "slow";
+  if (value < 170) return "mid";
   return "fast";
 }
 

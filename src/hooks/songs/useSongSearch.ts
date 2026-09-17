@@ -19,7 +19,7 @@ export interface SongSearchResult {
   residualVar: number | null;
 }
 
-export type BpmBand = "slow" | "mid" | "fast";
+export type BpmBand = "slow" | "mid" | "fast" | "soflan";
 
 /**
  * 楽曲を検索・一覧表示する。`query`が空文字でも`radarCategory`/`bpmBand`
