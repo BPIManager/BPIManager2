@@ -116,7 +116,6 @@ export const useAnalyticsComparison = (
 
   const arenaRank = target?.kind === "arena" ? (target.param ?? "A1") : "A1";
   const { rows: arenaRows, isLoading: arenaLoading } = useArenaJson(
-    targetVersion,
     target?.kind === "arena" ? [11, 12] : [],
   );
 

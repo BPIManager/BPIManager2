@@ -2,7 +2,7 @@ import type { NextApiRequest } from "next";
 import fs from "fs/promises";
 import path from "path";
 import { songsRepo } from "@/lib/db/domains/songs";
-import { latestVersion } from "@/constants/iidx/iidxVersions";
+import { arenaDataVersion } from "@/constants/iidx/iidxVersions";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { type HandleOutcome } from "./_shared";
@@ -29,7 +29,7 @@ export async function handleSongArenaAverages(
       "data",
       "metrics",
       "arena",
-      `${latestVersion}_${difficultyLevel}.json`,
+      `${arenaDataVersion}_${difficultyLevel}.json`,
     );
     const raw = await fs.readFile(filePath, "utf-8");
     const entries: Array<{
