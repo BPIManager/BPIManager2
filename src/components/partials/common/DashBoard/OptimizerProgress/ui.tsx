@@ -146,9 +146,14 @@ const OptimizerProgressCard = ({
 
   const clampedIndex = Math.min(selectedIndex, memos.length - 1);
   const memo = memos[clampedIndex];
-  const { currentTotalBpi, targetTotalBpi } = memo.reportData;
-  const bpiGap = targetTotalBpi - currentTotalBpi;
-  const steps: StepProgress[] = memo.reportData.steps.map((step) => ({
+  // v2リビルド以前に保存されたメモはreportDataの形が異なりcurrentTotalBpi/
+  // targetTotalBpiを持たない場合があるため、無い場合はヘッダー表示を省略する
+  const currentTotalBpi = memo.reportData.currentTotalBpi;
+  const targetTotalBpi = memo.reportData.targetTotalBpi ?? memo.targetBpi;
+  const hasBpiProgress =
+    typeof currentTotalBpi === "number" && typeof targetTotalBpi === "number";
+  const bpiGap = hasBpiProgress ? targetTotalBpi - currentTotalBpi : 0;
+  const steps: StepProgress[] = (memo.reportData.steps ?? []).map((step) => ({
     songId: step.songId,
     title: step.title,
     difficulty: step.difficulty,
@@ -193,22 +198,28 @@ const OptimizerProgressCard = ({
       </div>
 
       <div className="mt-3 flex items-center gap-2 flex-wrap">
-        <MiniBpiChip bpi={currentTotalBpi} />
-        <ArrowRight className="h-3.5 w-3.5 text-bpim-muted shrink-0" />
-        <MiniBpiChip bpi={targetTotalBpi} />
-        {bpiGap > 0 ? (
-          <Badge
-            variant="outline"
-            className="border-bpim-warning/50 text-bpim-warning text-xs"
-          >
-            {tFormat("dashboard.optimizerProgress.bpiRemaining", {
-              diff: bpiGap.toFixed(2),
-            })}
-          </Badge>
+        {hasBpiProgress ? (
+          <>
+            <MiniBpiChip bpi={currentTotalBpi} />
+            <ArrowRight className="h-3.5 w-3.5 text-bpim-muted shrink-0" />
+            <MiniBpiChip bpi={targetTotalBpi} />
+            {bpiGap > 0 ? (
+              <Badge
+                variant="outline"
+                className="border-bpim-warning/50 text-bpim-warning text-xs"
+              >
+                {tFormat("dashboard.optimizerProgress.bpiRemaining", {
+                  diff: bpiGap.toFixed(2),
+                })}
+              </Badge>
+            ) : (
+              <Badge className="bg-bpim-success/20 text-bpim-success border-bpim-success/30 text-xs">
+                {t("dashboard.optimizerProgress.achieved")}
+              </Badge>
+            )}
+          </>
         ) : (
-          <Badge className="bg-bpim-success/20 text-bpim-success border-bpim-success/30 text-xs">
-            {t("dashboard.optimizerProgress.achieved")}
-          </Badge>
+          <MiniBpiChip bpi={targetTotalBpi} />
         )}
       </div>
 
