@@ -6,16 +6,22 @@ import { useRadar } from "@/hooks/stats/useRadar";
 import OptimizerForm from "./ui/OptimizerForm";
 import OptimizationStepList from "./ui/OptimizationStepList";
 import SavedMemoList from "./ui/SavedMemoList";
+import CreationModeSelect from "./ui/CreationModeSelect";
+import CustomGoalCreator from "./ui/CustomGoal";
 import BpiOptimizerSkeleton from "./skeleton";
 import { useUser } from "@/contexts/users/UserContext";
+import { useUserScores } from "@/hooks/table/useUserScores";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { OptimizationResult } from "@/types/bpi-optimizer";
 import type { RadarCategory } from "@/types/stats/radar";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { toast } from "sonner";
+import { ArrowLeft } from "lucide-react";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+
+type CreationMode = "select" | "auto" | "custom";
 
 const BpiOptimizerSection = () => {
   const { t } = useTranslation();
@@ -44,6 +50,15 @@ const BpiOptimizerSection = () => {
   const { memos, saveMemo, deleteMemo, isSaving, isDeleting } =
     useBpiOptimizerMemos(user?.userId, fbUser);
 
+  const { songs } = useUserScores(user?.userId);
+  const currentScores = useMemo(() => {
+    const map = new Map<number, number | null>();
+    songs?.forEach((song) => {
+      map.set(song.songId, song.exScore);
+    });
+    return map;
+  }, [songs]);
+
   const { radar } = useRadar(
     fbUser?.uid,
     ["11", "12"],
@@ -71,6 +86,7 @@ const BpiOptimizerSection = () => {
     null,
   );
   const [tab, setTab] = useState<"create" | "manage">("create");
+  const [creationMode, setCreationMode] = useState<CreationMode>("select");
 
   const currentTotalBpi =
     result?.currentTotalBpi ??
@@ -78,10 +94,11 @@ const BpiOptimizerSection = () => {
 
   const handleSave = useCallback(async () => {
     if (!result || !targetBpiInput) return;
-    await saveMemo(parseFloat(targetBpiInput), result);
+    await saveMemo(parseFloat(targetBpiInput), result, "auto");
     setSavedResult(result);
     toast.success(t("optimizer.savedPlan"));
     setTab("manage");
+    setCreationMode("select");
   }, [result, targetBpiInput, saveMemo, t]);
 
   const resultRef = useRef<HTMLDivElement>(null);
@@ -105,52 +122,78 @@ const BpiOptimizerSection = () => {
       </TabsList>
 
       <TabsContent value="create">
-        <div className="flex flex-col gap-4">
-          <OptimizerForm
-            targetBpiInput={targetBpiInput}
-            onTargetBpiChange={setTargetBpiInput}
-            maxStepsInput={maxStepsInput}
-            onMaxStepsChange={setMaxStepsInput}
-            searchMode={searchMode}
-            onSearchModeChange={setSearchMode}
-            onKeyDown={handleKeyDown}
-            onSubmit={handleSubmit}
-            inputError={inputError}
-            isLoading={isLoading}
-            strategies={{ value: strategies, onToggle: toggleStrategy }}
-            radarElements={{ value: radarElements, onToggle: toggleRadarElement }}
-            strongRadarCategories={strongRadarCategories}
-            weakRadarCategories={weakRadarCategories}
-            currentTotalBpi={currentTotalBpi}
-            considerCurrentTotalBpi={considerCurrentTotalBpi}
-            onConsiderCurrentTotalBpiChange={setConsiderCurrentTotalBpi}
-          />
+        {creationMode === "select" && (
+          <CreationModeSelect onSelect={setCreationMode} />
+        )}
 
-          <div ref={resultRef}>
-            {isLoading && <BpiOptimizerSkeleton />}
+        {creationMode === "auto" && (
+          <div className="flex flex-col gap-4">
+            <button
+              onClick={() => setCreationMode("select")}
+              className="flex items-center gap-1 self-start text-xs text-bpim-muted hover:text-bpim-text"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              {t("optimizer.customGoal.backToSelect")}
+            </button>
 
-            {!isLoading && result && (
-              <OptimizationStepList
-                result={result}
-                onSave={handleSave}
-                isSaving={isSaving}
-                isSaved={savedResult === result}
-              />
-            )}
+            <OptimizerForm
+              targetBpiInput={targetBpiInput}
+              onTargetBpiChange={setTargetBpiInput}
+              maxStepsInput={maxStepsInput}
+              onMaxStepsChange={setMaxStepsInput}
+              searchMode={searchMode}
+              onSearchModeChange={setSearchMode}
+              onKeyDown={handleKeyDown}
+              onSubmit={handleSubmit}
+              inputError={inputError}
+              isLoading={isLoading}
+              strategies={{ value: strategies, onToggle: toggleStrategy }}
+              radarElements={{ value: radarElements, onToggle: toggleRadarElement }}
+              strongRadarCategories={strongRadarCategories}
+              weakRadarCategories={weakRadarCategories}
+              currentTotalBpi={currentTotalBpi}
+              considerCurrentTotalBpi={considerCurrentTotalBpi}
+              onConsiderCurrentTotalBpiChange={setConsiderCurrentTotalBpi}
+            />
+
+            <div ref={resultRef}>
+              {isLoading && <BpiOptimizerSkeleton />}
+
+              {!isLoading && result && (
+                <OptimizationStepList
+                  result={result}
+                  onSave={handleSave}
+                  isSaving={isSaving}
+                  isSaved={savedResult === result}
+                />
+              )}
+            </div>
           </div>
-        </div>
+        )}
+
+        {creationMode === "custom" && (
+          <CustomGoalCreator
+            onBack={() => setCreationMode("select")}
+            onSaved={() => {
+              setCreationMode("select");
+              setTab("manage");
+            }}
+          />
+        )}
       </TabsContent>
 
       <TabsContent value="manage">
         {memos && (
           <SavedMemoList
             memos={memos}
+            currentScores={currentScores}
             onDelete={deleteMemo}
             isDeletingId={isDeleting}
             onSelect={(historyResult) => {
               setResult(historyResult);
               setSavedResult(historyResult);
               setTargetBpiInput(historyResult.targetTotalBpi.toString());
+              setCreationMode("auto");
               setTab("create");
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}

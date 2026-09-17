@@ -10,6 +10,7 @@ export interface OptimizeMemo {
   userId: string;
   targetBpi: number;
   reportData: OptimizationResult;
+  kind: "auto" | "custom";
   createdAt: string;
 }
 
@@ -33,11 +34,15 @@ export const useBpiOptimizerMemos = (
 
   const [isSaving, setIsSaving] = useState(false);
   const saveMemo = useCallback(
-    async (targetBpi: number, reportData: OptimizationResult) => {
+    async (
+      targetBpi: number,
+      reportData: OptimizationResult,
+      kind: "auto" | "custom" = "auto",
+    ) => {
       if (!userId) return;
       setIsSaving(true);
       try {
-        await saveOptimizeMemo(apiUrl, fbUser, targetBpi, reportData);
+        await saveOptimizeMemo(apiUrl, fbUser, targetBpi, reportData, kind);
         await mutate(swrKey);
       } finally {
         setIsSaving(false);
