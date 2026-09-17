@@ -48,11 +48,11 @@ const SavedMemoList = ({
               <div className="flex items-center gap-2">
                 <Badge
                   variant="secondary"
-                  className="font-mono text-[10px] bg-bpim-overlay"
+                  className="font-mono text-xs bg-bpim-overlay"
                 >
                   {tFormat("optimizer.memo.target", { bpi: memo.targetBpi.toFixed(2) })}
                 </Badge>
-                <span className="text-[10px] text-bpim-subtle flex items-center gap-1">
+                <span className="text-xs text-bpim-subtle flex items-center gap-1">
                   <Calendar className="h-3 w-3" />
                   {new Date(memo.createdAt).toLocaleDateString()}
                 </span>
@@ -74,7 +74,7 @@ const SavedMemoList = ({
                 )}
               </Button>
             </div>
-            <p className="text-[11px] text-bpim-muted">
+            <p className="text-xs text-bpim-muted">
               {tFormat("optimizer.memo.songCount", { count: memo.reportData.steps.length })}
             </p>
           </div>

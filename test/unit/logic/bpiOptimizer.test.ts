@@ -1,41 +1,90 @@
 import { describe, it, expect } from "vitest";
 import { findOptimalBpiPath } from "@/lib/bpi/optimizer";
-import type {
-  OptimizerOptions,
-  SongOptimizerInput,
-} from "@/types/bpi-optimizer";
+import { diversityMultiplier } from "@/lib/bpi/optimizer/candidateScorer";
+import { BpiCalculator } from "@/lib/bpi";
+import type { ExecuteOptions, SongOptimizerInput } from "@/types/bpi-optimizer";
 
-const baseSong: SongOptimizerInput = {
-  songId: 1,
-  title: "冥",
-  difficulty: "ANOTHER",
-  difficultyLevel: 12,
-  notes: 1000,
-  kaidenAvg: 1000,
-  wrScore: 1900,
-  coef: 1.175,
-  currentBpi: -15,
-  currentExScore: 0,
-  isUnplayed: true,
-  radarCategory: null,
-};
+/**
+ * 実際のBPI(V2)本番定数(`@/constants/iidx/newBpi/modelConstants`)に対して
+ * 現実的なBPIカーブを描くよう校正したフィクスチャ用のmu/sigma
+ * （scripts/generate-new-bpi-params.tsの生成物ではなく、テスト用に手動算出した値）。
+ * notes=1000, kaidenAvg=1750, wrScore=1980のときkaidenAvg付近でBPI≈0、
+ * wrScore付近でBPI≈100になるよう校正している。
+ */
+const FIXTURE_MU = -5.521460917862246;
+const FIXTURE_SIGMA = 0.3157160805385319;
 
-const baseOptions: OptimizerOptions = {
+function makeSong(overrides: Partial<SongOptimizerInput> = {}): SongOptimizerInput {
+  const notes = 1000;
+  const kaidenAvg = 1750;
+  const wrScore = 1980;
+  const coef = 1;
+  const mu = FIXTURE_MU;
+  const sigma = FIXTURE_SIGMA;
+  const currentExScore = overrides.currentExScore ?? null;
+
+  return {
+    songId: 1,
+    title: "テスト曲",
+    difficulty: "ANOTHER",
+    difficultyLevel: 12,
+    notes,
+    kaidenAvg,
+    wrScore,
+    coef,
+    mu,
+    sigma,
+    residualVar: null,
+    currentBpi:
+      currentExScore != null
+        ? (BpiCalculator.calc(currentExScore, { notes, kaidenAvg, wrScore, coef, mu, sigma }) ?? -15)
+        : -15,
+    currentExScore,
+    isUnplayed: currentExScore == null,
+    radarCategory: null,
+    ...overrides,
+  };
+}
+
+/**
+ * 総合BPIのシフト法べき乗平均は対象曲数n=1だと再校正指数k'=ln(1)/ln(...)=0となり
+ * 定義上NaNになる（本番では常にn≈648なので起きない、n=1特有の退化ケース）。
+ * テストではnを2以上に保つため、計算に影響しないフィラー曲（mu/sigma無し＝V2の
+ * スコープ外、候補にも潜在スキル推定にもならない）を添える。
+ */
+function makeFillerSong(songId: number): SongOptimizerInput {
+  return {
+    songId,
+    title: "フィラー曲",
+    difficulty: "ANOTHER",
+    difficultyLevel: 12,
+    notes: 1000,
+    kaidenAvg: null,
+    wrScore: null,
+    coef: null,
+    mu: null,
+    sigma: null,
+    residualVar: null,
+    currentBpi: -15,
+    currentExScore: null,
+    isUnplayed: true,
+    radarCategory: null,
+  };
+}
+
+const baseOptions: ExecuteOptions = {
   includeUnplayed: true,
   includePlayed: true,
   radarElementFilter: null,
-  radarCategoryBpis: {},
   candidateLevels: [],
   candidateDifficulties: [],
+  searchMode: "fastest",
+  rng: () => 0.5,
 };
 
 describe("findOptimalBpiPath", () => {
   it("対象楽曲数が0の場合、達成不可・ステップなしの結果を返すこと", () => {
-    const result = findOptimalBpiPath([], 0, 20, {
-      ...baseOptions,
-      searchMode: "fastest",
-      rng: () => 0.5,
-    });
+    const result = findOptimalBpiPath([], 20, baseOptions);
 
     expect(result.totalSongCount).toBe(0);
     expect(result.steps).toEqual([]);
@@ -44,26 +93,17 @@ describe("findOptimalBpiPath", () => {
   });
 
   it("既に現在の総合BPIが目標を上回っている場合、alreadyAchievedになりステップは生成されないこと", () => {
-    const song: SongOptimizerInput = { ...baseSong, currentBpi: 30 };
-    const result = findOptimalBpiPath([song], 1, 20, {
-      ...baseOptions,
-      searchMode: "fastest",
-      rng: () => 0.5,
-    });
+    const song = makeSong({ currentExScore: 1950 });
+    const result = findOptimalBpiPath([song, makeFillerSong(99)], -10, baseOptions);
 
     expect(result.alreadyAchieved).toBe(true);
     expect(result.achievable).toBe(true);
     expect(result.steps).toEqual([]);
-    expect(result.currentTotalBpi).toBe(30);
   });
 
   it("到達可能な目標に対して、BPIが向上するステップを生成すること", () => {
-    const song: SongOptimizerInput = { ...baseSong, currentBpi: -15 };
-    const result = findOptimalBpiPath([song], 1, -5, {
-      ...baseOptions,
-      searchMode: "fastest",
-      rng: () => 0.5,
-    });
+    const song = makeSong({ currentExScore: null });
+    const result = findOptimalBpiPath([song, makeFillerSong(99)], -5, baseOptions);
 
     expect(result.steps.length).toBeGreaterThan(0);
     const lastStep = result.steps[result.steps.length - 1];
@@ -72,18 +112,34 @@ describe("findOptimalBpiPath", () => {
     expect(lastStep.toExScore).toBeLessThanOrEqual(song.notes * 2);
   });
 
+  it("currentTotalBpiは、同じ観測をBpiCalculator.calculateTotalBPIに直接渡した場合と一致すること（アプリ他画面との整合性）", () => {
+    const song = makeSong({ currentExScore: 1850, songId: 1 });
+    const song2 = makeSong({ currentExScore: null, songId: 2 });
+    const result = findOptimalBpiPath([song, song2], -5, baseOptions);
+
+    const expected = BpiCalculator.calculateTotalBPI(
+      [{ songId: 1, notes: song.notes, exScore: 1850 }],
+      [song, song2],
+    );
+    expect(result.currentTotalBpi).toBeCloseTo(expected, 2);
+  });
+
+  it("各ステップのtoBpiは、提案されたtoExScoreを実際にプレイした場合にV2モデルが返す単曲BPIと一致すること", () => {
+    const song = makeSong({ currentExScore: null });
+    const result = findOptimalBpiPath([song, makeFillerSong(99)], -5, baseOptions);
+
+    for (const step of result.steps) {
+      const actual = BpiCalculator.calc(step.toExScore, song);
+      expect(step.toBpi).toBeCloseTo(actual ?? -15, 2);
+    }
+  });
+
   it("includeUnplayedがfalseで候補が未プレイ曲のみの場合、候補なしとなり進展しないこと", () => {
-    const song: SongOptimizerInput = { ...baseSong, isUnplayed: true };
+    const song = makeSong({ currentExScore: null });
     const result = findOptimalBpiPath(
       [song],
-      1,
       20,
-      {
-        ...baseOptions,
-        includeUnplayed: false,
-        searchMode: "fastest",
-        rng: () => 0.5,
-      },
+      { ...baseOptions, includeUnplayed: false },
       5,
     );
 
@@ -93,17 +149,11 @@ describe("findOptimalBpiPath", () => {
   });
 
   it("candidateLevelsで対象レベルを絞り込めること", () => {
-    const song: SongOptimizerInput = { ...baseSong, difficultyLevel: 12 };
+    const song = makeSong({ currentExScore: null, difficultyLevel: 12 });
     const result = findOptimalBpiPath(
       [song],
-      1,
       20,
-      {
-        ...baseOptions,
-        candidateLevels: [11],
-        searchMode: "fastest",
-        rng: () => 0.5,
-      },
+      { ...baseOptions, candidateLevels: [11] },
       5,
     );
 
@@ -111,74 +161,21 @@ describe("findOptimalBpiPath", () => {
   });
 
   it("searchMode: flexibleでも到達可能な目標に対してBPIが向上するステップを生成すること", () => {
-    const songs: SongOptimizerInput[] = [
-      { ...baseSong, songId: 1, currentBpi: -15 },
-      { ...baseSong, songId: 2, currentBpi: -15 },
-      { ...baseSong, songId: 3, currentBpi: -15 },
-    ];
-    const result = findOptimalBpiPath(songs, 3, -5, {
-      ...baseOptions,
-      searchMode: "flexible",
-      rng: () => 0.5,
-    });
+    const songs = [1, 2, 3].map((songId) => makeSong({ songId, currentExScore: null }));
+    const result = findOptimalBpiPath(songs, -5, { ...baseOptions, searchMode: "flexible" });
 
     expect(result.steps.length).toBeGreaterThan(0);
     const lastStep = result.steps[result.steps.length - 1];
     expect(lastStep.cumulativeTotalBpi).toBeGreaterThan(result.currentTotalBpi);
   });
 
-  it("resolveTargetによる目標自動引き上げ: 目標までのギャップが小さくステップ数に対して割安な場合、targetTotalBpiが引き上げられoriginalTargetTotalBpi/autoAdjustmentNoteが設定されること", () => {
-    const song: SongOptimizerInput = { ...baseSong, currentBpi: -15 };
-    const requestedTarget = -14.9;
+  it("到達不可能な目標に対しても、最も到達点が高い結果を返すこと", () => {
+    const song = makeSong({ currentExScore: null });
     const result = findOptimalBpiPath(
-      [song],
-      1,
-      requestedTarget,
-      {
-        ...baseOptions,
-        searchMode: "fastest",
-        rng: () => 0.5,
-      },
-      30,
-    );
-
-    expect(result.originalTargetTotalBpi).toBe(requestedTarget);
-    expect(result.targetTotalBpi).toBeGreaterThan(requestedTarget);
-    expect(result.autoAdjustmentNote).toBeDefined();
-  });
-
-  it("resolveTargetが働かないケース: maxStepsが1以下の場合は目標自動引き上げをスキップしoriginalTargetTotalBpiが設定されないこと", () => {
-    const song: SongOptimizerInput = { ...baseSong, currentBpi: -15 };
-    const result = findOptimalBpiPath(
-      [song],
-      1,
-      -5,
-      {
-        ...baseOptions,
-        searchMode: "fastest",
-        rng: () => 0.5,
-      },
-      1,
-    );
-
-    expect(result.originalTargetTotalBpi).toBeUndefined();
-    expect(result.autoAdjustmentNote).toBeUndefined();
-  });
-
-  it("findOptimalPathのリトライ: 到達不可能な目標に対しても複数回試行し、最も到達点が高い結果を返すこと", () => {
-    const song: SongOptimizerInput = { ...baseSong, currentBpi: -15 };
-    // 1曲のみでは到達不可能な、非常に高い目標値
-    const result = findOptimalBpiPath(
-      [song],
-      1,
+      [song, makeFillerSong(99)],
       100,
-      {
-        ...baseOptions,
-        searchMode: "fastest",
-        rng: () => 0.5,
-        maxRetries: 5,
-      },
-      5,
+      { ...baseOptions, maxRetries: 3 },
+      3,
     );
 
     expect(result.alreadyAchieved).toBe(false);
@@ -187,26 +184,195 @@ describe("findOptimalBpiPath", () => {
     expect(result.maxAchievableBpi!).toBeGreaterThan(result.currentTotalBpi);
   });
 
-  it("opsBudgetRemainingの安全弁: 候補数×ステップ数×リトライ数が多い場合でも演算量の上限で打ち切られ、有限時間で結果を返すこと", () => {
-    const manySongs: SongOptimizerInput[] = Array.from(
-      { length: 500 },
-      (_, i) => ({ ...baseSong, songId: i + 1, currentBpi: -15 }),
+  it("considerCurrentTotalBpi=falseの場合、目標値まで見込んだ高い目標BPIで曲を狙うため、trueの場合よりtoExScoreが大きくなること", () => {
+    const song = makeSong({ currentExScore: null });
+    const withCurrent = findOptimalBpiPath([song, makeFillerSong(99)], 40, {
+      ...baseOptions,
+      considerCurrentTotalBpi: true,
+      maxRetries: 1,
+    }, 1);
+    const withoutCurrent = findOptimalBpiPath([{ ...song }, makeFillerSong(99)], 40, {
+      ...baseOptions,
+      considerCurrentTotalBpi: false,
+      maxRetries: 1,
+    }, 1);
+
+    expect(withoutCurrent.steps[0].toExScore).toBeGreaterThanOrEqual(
+      withCurrent.steps[0].toExScore,
+    );
+  });
+
+  it("ColdStartGuard: レーダーカテゴリのプレイ実績が薄い場合、そのカテゴリの未プレイ曲は候補から除外され、coldCategoriesに案内が含まれること", () => {
+    const playedElsewhere = makeSong({
+      songId: 1,
+      currentExScore: 1850,
+      radarCategory: "CHORD",
+    });
+    const coldCategorySong = makeSong({
+      songId: 2,
+      currentExScore: null,
+      radarCategory: "NOTES",
+    });
+    const result = findOptimalBpiPath(
+      [playedElsewhere, coldCategorySong],
+      50,
+      { ...baseOptions, radarElementFilter: ["NOTES"] },
+      5,
     );
 
+    expect(result.coldCategories).toBeDefined();
+    expect(result.coldCategories!.some((c) => c.category === "NOTES")).toBe(true);
+    expect(result.steps.find((s) => s.songId === 2)).toBeUndefined();
+  });
+
+  it("ColdStartGuard: 案内対象のカテゴリでも、プレイ済み曲の上振れ狙い（includePlayed）は継続して提案されること", () => {
+    const playedInColdCategory = makeSong({
+      songId: 1,
+      currentExScore: 1600,
+      radarCategory: "NOTES",
+      // 精度重みsigma^2/ev_jが小さくなるよう分散を大きく設定し、
+      // 1曲プレイしただけではinfo_cの信頼度閾値に届かない(コールドなまま)ようにする
+      residualVar: 100,
+    });
     const result = findOptimalBpiPath(
-      manySongs,
-      500,
-      100,
-      {
-        ...baseOptions,
-        searchMode: "fastest",
-        rng: () => 0.5,
-        maxRetries: 200,
-      },
+      [playedInColdCategory, makeFillerSong(99)],
+      -5,
+      { ...baseOptions, includeUnplayed: false, includePlayed: true, radarElementFilter: ["NOTES"] },
+      5,
+    );
+
+    expect(result.coldCategories?.some((c) => c.category === "NOTES")).toBe(true);
+    expect(result.steps.length).toBeGreaterThan(0);
+  });
+
+  describe("diversityMultiplier（既に得意な曲ばかりが選ばれ続ける偏りへの対策）", () => {
+    it("未プレイ曲は倍率が上乗せされること", () => {
+      const unplayed = makeSong({ currentExScore: null });
+      const played = makeSong({ currentExScore: 1900 });
+
+      expect(diversityMultiplier(unplayed, -15, 30)).toBeGreaterThan(
+        diversityMultiplier(played, 40, 30),
+      );
+    });
+
+    it("現在の総合BPIをまだ下回っている曲は倍率が上乗せされること", () => {
+      const song = makeSong({ currentExScore: 1900 });
+      const belowTotal = diversityMultiplier(song, 20, 30);
+      const aboveTotal = diversityMultiplier(song, 40, 30);
+
+      expect(belowTotal).toBeGreaterThan(aboveTotal);
+    });
+
+    it("未プレイかつ総合BPI未満の場合、両方のボーナスが重なること", () => {
+      const song = makeSong({ currentExScore: null });
+      expect(diversityMultiplier(song, -15, 30)).toBeCloseTo(2.0, 5);
+    });
+  });
+
+  it("fastestは1曲で足りれば1曲だけ、flexibleは足りていても複数曲に分散すること（同じ候補集合で比較）", () => {
+    const elite = makeSong({ songId: 1, title: "elite", currentExScore: 1960 });
+    const average = makeSong({ songId: 2, title: "average", currentExScore: 1800 });
+    const options: ExecuteOptions = {
+      ...baseOptions,
+      includeUnplayed: false,
+      includePlayed: true,
+      maxRetries: 1,
+    };
+    const songs = [elite, average, makeFillerSong(99)];
+
+    const fastest = findOptimalBpiPath(songs, 42, { ...options, searchMode: "fastest" }, 5);
+    const flexible = findOptimalBpiPath(songs, 42, { ...options, searchMode: "flexible" }, 5);
+
+    expect(fastest.steps.map((s) => s.title)).toEqual(["elite"]);
+    expect(flexible.steps.map((s) => s.title)).toEqual(
+      expect.arrayContaining(["elite", "average"]),
+    );
+  });
+
+  it("flexibleモードは、実規模(n=648・目標ギャップが小さい)相当のケースでも目標に収束しつつ複数曲へ分散すること", () => {
+    // 実行結果で報告された規模を再現: 30曲がBPI24〜42程度に固まって並び、
+    // 残り618曲は未収録(mu/sigma無し)のフィラー。目標ギャップは+1.01(実測相当)。
+    const real = Array.from({ length: 30 }, (_, i) =>
+      makeSong({ songId: i + 1, currentExScore: 1845 + i * 2 }),
+    );
+    const fillers = Array.from({ length: 618 }, (_, i) => makeFillerSong(1000 + i));
+    const allSongs = [...real, ...fillers];
+
+    const observations = real.map((s) => ({
+      songId: s.songId,
+      notes: s.notes,
+      exScore: s.currentExScore!,
+    }));
+    const currentTotal = BpiCalculator.calculateTotalBPI(observations, allSongs);
+
+    const result = findOptimalBpiPath(
+      allSongs,
+      currentTotal + 1.01,
+      { ...baseOptions, includeUnplayed: false, includePlayed: true, searchMode: "flexible", maxRetries: 3 },
       30,
     );
 
-    expect(result).toBeDefined();
-    expect(result.totalSongCount).toBe(500);
+    expect(result.achievable).toBe(true);
+    const distinctSongs = new Set(result.steps.map((s) => s.songId));
+    expect(distinctSongs.size).toBeGreaterThan(3);
+
+    // ペース配分により、1ステップの寄与が残りギャップに対して突出しないこと
+    // （1曲が総合BPIの伸びをほぼ独占する、という回帰の防止）
+    const totalGap = 1.01;
+    for (const step of result.steps) {
+      expect(step.bpiGain).toBeLessThan(totalGap * 0.5);
+    }
+  });
+
+  it("目標間際でペース配分の要求量が小さくなっても、MIN_BPI_GAINの下限により候補切れで早期終了しないこと", () => {
+    // 30曲の候補全てを使わないと目標に届かない、絶妙にタイトなギャップを用意する。
+    // ペース配分後の下限floorが無いと、目標間際でdesiredStepGainが縮小し、
+    // MIN_EX_GAIN/MIN_BPI_GAINの「増分が小さすぎる」判定で残り候補が弾かれ、
+    // 候補が残っているのに探索が早期終了する（今回の回帰対象）。
+    const real = Array.from({ length: 30 }, (_, i) =>
+      makeSong({ songId: i + 1, currentExScore: 1845 + i * 2 }),
+    );
+    const fillers = Array.from({ length: 618 }, (_, i) => makeFillerSong(1000 + i));
+    const allSongs = [...real, ...fillers];
+
+    const observations = real.map((s) => ({
+      songId: s.songId,
+      notes: s.notes,
+      exScore: s.currentExScore!,
+    }));
+    const currentTotal = BpiCalculator.calculateTotalBPI(observations, allSongs);
+
+    const result = findOptimalBpiPath(
+      allSongs,
+      currentTotal + 1.01,
+      { ...baseOptions, includeUnplayed: false, includePlayed: true, searchMode: "flexible", maxRetries: 3 },
+      30,
+    );
+
+    expect(result.achievable).toBe(true);
+  });
+
+  it("considerCurrentTotalBpi=trueでも、現在の実力からある程度離れた目標まで届くこと（現在の実力に縛られ即座に頭打ちにならない）", () => {
+    const real = Array.from({ length: 60 }, (_, i) =>
+      makeSong({ songId: i + 1, currentExScore: 1780 + ((i * 7) % 90) }),
+    );
+    const fillers = Array.from({ length: 588 }, (_, i) => makeFillerSong(1000 + i));
+    const allSongs = [...real, ...fillers];
+
+    const observations = real.map((s) => ({
+      songId: s.songId,
+      notes: s.notes,
+      exScore: s.currentExScore!,
+    }));
+    const currentTotal = BpiCalculator.calculateTotalBPI(observations, allSongs);
+
+    const modestGapResult = findOptimalBpiPath(
+      allSongs,
+      currentTotal + 3,
+      { ...baseOptions, includeUnplayed: false, includePlayed: true, searchMode: "flexible", considerCurrentTotalBpi: true, maxRetries: 3 },
+      30,
+    );
+
+    expect(modestGapResult.achievable).toBe(true);
   });
 });

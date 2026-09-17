@@ -469,6 +469,32 @@ export const analyticsTranslations = {
     ko: "추천 루트（효율순）",
   },
 
+  // ColdCategoryNotice
+  "optimizer.coldStart.title": {
+    ja: "データが少ないカテゴリがあります",
+    en: "Not enough data in some categories",
+    "zh-TW": "部分類別的資料不足",
+    ko: "데이터가 적은 카테고리가 있습니다",
+  },
+  "optimizer.coldStart.description": {
+    ja: "以下のカテゴリはプレイ実績が少なく、精度の高い提案ができません。まずはいくつかの曲をプレイしてみてください。",
+    en: "These categories don't have enough play history for a reliable suggestion. Try playing a few of the songs below first.",
+    "zh-TW": "以下類別的遊玩紀錄不足，無法提供準確的建議。請先遊玩以下幾首曲目。",
+    ko: "아래 카테고리는 플레이 기록이 적어 정확한 제안을 할 수 없습니다. 먼저 아래 곡을 몇 곡 플레이해 보세요.",
+  },
+  "optimizer.coldStart.playedCount": {
+    ja: "プレイ済み {count} 曲",
+    en: "{count} songs played",
+    "zh-TW": "已遊玩 {count} 首",
+    ko: "플레이 완료 {count}곡",
+  },
+  "optimizer.coldStart.suggestionsLabel": {
+    ja: "おすすめの未プレイ曲",
+    en: "Suggested unplayed songs",
+    "zh-TW": "推薦的未遊玩曲目",
+    ko: "추천 미플레이 곡",
+  },
+
   // SavedMemoList
   "optimizer.memo.header": {
     ja: "保存済みのプラン ({count})",
