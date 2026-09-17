@@ -7,11 +7,16 @@ import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
  *
  * @param userId - 対象ユーザー ID（未定義の場合はフェッチしない）
  * @param songId - 楽曲 ID
+ * @param enabled - false の場合はフェッチしない（デフォルト: true）
  * @returns スコア履歴グループ・ローディング状態・エラー情報
  */
-export const useScoreHistory = (userId: string | undefined, songId: number) => {
+export const useScoreHistory = (
+  userId: string | undefined,
+  songId: number,
+  enabled = true,
+) => {
   const { data, error, isLoading } = useAuthedSWRV2<SongHistoryResponse>(
-    userId && songId
+    enabled && userId && songId
       ? `${API_V2_PREFIX}/users/${userId}/scores/${songId}/history`
       : null,
   );
