@@ -6,10 +6,10 @@ export const loginPageTranslations = {
     ko: "BPIM2",
   },
   "login.subTitle": {
-    ja: "beatmania IIDX 上級者のためのスコア管理ツール",
-    en: "Score management tool for advanced beatmania IIDX players",
-    "zh-TW": "專為 beatmania IIDX 高級玩家打造的成績管理工具",
-    ko: "beatmania IIDX 상급자를 위한 점수 관리 도구",
+    ja: "beatmania IIDX プレイヤーのためのスコア管理ツール",
+    en: "Score management tool for beatmania IIDX players",
+    "zh-TW": "專為 beatmania IIDX 玩家打造的成績管理工具",
+    ko: "beatmania IIDX 플레이어를 위한 점수 관리 도구",
   },
   "login.btnGoogle": {
     ja: "Googleでログイン",
