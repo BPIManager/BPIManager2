@@ -43,8 +43,8 @@ const OptimizationStepCard = ({
                 </span>
               )}
               {step.isRadarStrength && (
-                <Badge className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20 text-[9px] h-4">
-                  <Star className="h-2 w-2 mr-1 fill-yellow-500" /> {t("optimizer.step.mightBeStrong")}
+                <Badge className="bg-bpim-warning/15 text-bpim-warning border-bpim-warning/30 text-[9px] h-4">
+                  <Star className="h-2 w-2 mr-1 fill-bpim-warning" /> {t("optimizer.step.mightBeStrong")}
                 </Badge>
               )}
             </div>

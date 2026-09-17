@@ -269,12 +269,12 @@ const RadarFilterSection = ({
                 {RADAR_LABELS[cat]}
               </span>
               {isStrong && (
-                <Badge className="text-[9px] h-4 px-1.5 ml-auto bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold">
+                <Badge className="text-[9px] h-4 px-1.5 ml-auto bg-bpim-warning/15 text-bpim-warning border border-bpim-warning/30 font-bold">
                   {t("optimizer.strong")}
                 </Badge>
               )}
               {isWeak && !isStrong && (
-                <Badge className="text-[9px] h-4 px-1.5 ml-auto bg-blue-500/20 text-blue-400 border border-blue-500/30 font-bold">
+                <Badge className="text-[9px] h-4 px-1.5 ml-auto bg-bpim-info/15 text-bpim-info border border-bpim-info/30 font-bold">
                   {t("optimizer.weak")}
                 </Badge>
               )}
