@@ -88,7 +88,7 @@ export const WIDGET_META: Record<
   },
   optimizerProgress: {
     label: "widget.optimizerProgress",
-    defaultWidth: "half",
+    defaultWidth: "full",
     defaultSection: "main",
   },
 };
