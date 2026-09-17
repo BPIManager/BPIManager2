@@ -7,3 +7,5 @@ export type {
   SongContributionTarget,
   SongContributionResponse,
 } from "./songContribution";
+export { fetchImportOptimizeMemo } from "./importOptimizeMemo";
+export type { ImportedGoalTarget } from "./importOptimizeMemo";

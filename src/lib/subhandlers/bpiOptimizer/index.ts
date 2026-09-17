@@ -5,3 +5,4 @@ export * from "./optimizeMemoList";
 export * from "./optimizeMemoDelete";
 export * from "./customPreview";
 export * from "./songContribution";
+export * from "./importMemo";

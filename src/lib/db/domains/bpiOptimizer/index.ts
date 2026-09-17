@@ -52,6 +52,27 @@ class BpiOptimizerRepository {
   }
 
   /**
+   * reportId(UUID)からユーザーを問わずメモ1件を取得する。
+   * 「曲目をシェア」機能でreportIdを受け取った側が、共有元のuserIdを
+   * 知らなくても曲目をインポートできるようにするため。
+   */
+  async getMemoByReportId(reportId: string) {
+    const row = await db
+      .selectFrom("optimizeMemo")
+      .select(["reportId", "userId", "targetBpi", "reportData", "kind", "createdAt"])
+      .where("reportId", "=", reportId)
+      .executeTakeFirst();
+
+    if (!row) return null;
+
+    return {
+      ...row,
+      kind: (row.kind || "auto") as "auto" | "custom",
+      reportData: JSON.parse(row.reportData) as OptimizationResult,
+    };
+  }
+
+  /**
    * 特定のメモを削除する
    */
   async deleteMemo(userId: string, reportId: string) {

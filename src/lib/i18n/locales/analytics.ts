@@ -574,6 +574,54 @@ export const analyticsTranslations = {
     "zh-TW": "沒有符合的目標",
     ko: "해당하는 목표가 없습니다",
   },
+  "optimizer.memo.share": {
+    ja: "曲目をシェア",
+    en: "Share song list",
+    "zh-TW": "分享曲目",
+    ko: "곡 목록 공유",
+  },
+  "optimizer.memo.shareTitle": {
+    ja: "曲目をシェア",
+    en: "Share song list",
+    "zh-TW": "分享曲目",
+    ko: "곡 목록 공유",
+  },
+  "optimizer.memo.shareDesc": {
+    ja: "下のIDを相手に伝えると、「新規作成」タブの「曲目をインポート」からこの目標の曲目（曲と目標EXスコア）を自分の目標として取り込めます。あなたのスコアやBPIは共有されません。",
+    en: "Share the ID below. The recipient can pull this goal's song list (songs and target EX scores) into their own goal via \"Import songs\" on the Create tab. Your scores and BPI are not shared.",
+    "zh-TW": "將下方ID告訴對方，對方可以在「新規作成」分頁的「匯入曲目」中，將此目標的曲目（曲目與目標EX分數）匯入成自己的目標。你的成績與BPI不會被分享。",
+    ko: "아래 ID를 상대방에게 전달하면 \"새로 만들기\" 탭의 \"곡 목록 가져오기\"에서 이 목표의 곡 목록(곡과 목표 EX스코어)을 자신의 목표로 가져올 수 있습니다. 당신의 스코어와 BPI는 공유되지 않습니다.",
+  },
+  "optimizer.memo.copy": {
+    ja: "コピー",
+    en: "Copy",
+    "zh-TW": "複製",
+    ko: "복사",
+  },
+  "optimizer.memo.copied": {
+    ja: "コピーしました",
+    en: "Copied",
+    "zh-TW": "已複製",
+    ko: "복사됨",
+  },
+  "optimizer.memo.stepSort.added": {
+    ja: "追加した順",
+    en: "Order added",
+    "zh-TW": "新增順序",
+    ko: "추가한 순서",
+  },
+  "optimizer.memo.stepSort.nearest": {
+    ja: "目標が近い順",
+    en: "Closest to goal",
+    "zh-TW": "接近目標排序",
+    ko: "목표에 가까운 순",
+  },
+  "optimizer.memo.stepSort.farthest": {
+    ja: "目標が遠い順",
+    en: "Furthest from goal",
+    "zh-TW": "遠離目標排序",
+    ko: "목표에서 먼 순",
+  },
 
   "optimizer.tabs.create": {
     ja: "新規作成",
@@ -611,6 +659,54 @@ export const analyticsTranslations = {
     en: "Search for any song and set your own target EX score. Bundle multiple songs into a single goal.",
     "zh-TW": "搜尋喜歡的樂曲，自行設定目標EX分數。可將多首曲目整合為一個目標保存。",
     ko: "원하는 곡을 검색해 직접 목표 EX스코어를 설정합니다. 여러 곡을 하나의 목표로 묶어 저장할 수 있습니다.",
+  },
+  "optimizer.mode.importCard.title": {
+    ja: "曲目をインポート",
+    en: "Import songs",
+    "zh-TW": "匯入曲目",
+    ko: "곡 목록 가져오기",
+  },
+  "optimizer.mode.importCard.desc": {
+    ja: "他のユーザーから共有されたIDを入力して、曲目と目標EXスコアを自分の目標として取り込みます。",
+    en: "Enter an ID shared by another user to import their song list and target EX scores as your own goal.",
+    "zh-TW": "輸入其他使用者分享的ID，將曲目與目標EX分數匯入成自己的目標。",
+    ko: "다른 사용자가 공유한 ID를 입력해 곡 목록과 목표 EX스코어를 자신의 목표로 가져옵니다.",
+  },
+  "optimizer.import.title": {
+    ja: "曲目をインポート",
+    en: "Import songs",
+    "zh-TW": "匯入曲目",
+    ko: "곡 목록 가져오기",
+  },
+  "optimizer.import.desc": {
+    ja: "「目標管理」の「曲目をシェア」で共有されたIDを入力してください。曲と目標EXスコアが自分で曲を選んで作成する画面に読み込まれます。",
+    en: "Enter the ID shared via \"Share song list\" on the Goal Management tab. The songs and target EX scores will be loaded into the custom goal screen.",
+    "zh-TW": "請輸入透過「目標管理」的「分享曲目」取得的ID。曲目與目標EX分數會載入到自行建立目標的畫面。",
+    ko: "\"목표 관리\"의 \"곡 목록 공유\"로 공유받은 ID를 입력하세요. 곡과 목표 EX스코어가 직접 만들기 화면에 불러와집니다.",
+  },
+  "optimizer.import.placeholder": {
+    ja: "共有されたIDを貼り付け",
+    en: "Paste the shared ID",
+    "zh-TW": "貼上分享的ID",
+    ko: "공유받은 ID 붙여넣기",
+  },
+  "optimizer.import.submit": {
+    ja: "インポート",
+    en: "Import",
+    "zh-TW": "匯入",
+    ko: "가져오기",
+  },
+  "optimizer.import.notFound": {
+    ja: "指定されたIDの目標が見つかりませんでした",
+    en: "No goal was found for that ID.",
+    "zh-TW": "找不到該ID對應的目標",
+    ko: "해당 ID의 목표를 찾을 수 없습니다",
+  },
+  "optimizer.import.empty": {
+    ja: "インポートできる曲がありませんでした",
+    en: "No importable songs were found.",
+    "zh-TW": "沒有可匯入的曲目",
+    ko: "가져올 수 있는 곡이 없습니다",
   },
 
   "optimizer.customGoal.backToSelect": {

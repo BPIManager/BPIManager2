@@ -174,7 +174,8 @@ const SongTargetModal = ({
     searchMode === "title" ? debouncedQuery : "",
     {
       difficultyLevel,
-      radarCategory: searchMode === "radar" ? (radarCategory ?? undefined) : undefined,
+      radarCategory:
+        searchMode === "radar" ? (radarCategory ?? undefined) : undefined,
       bpmBand: searchMode === "bpm" ? (bpmBand ?? undefined) : undefined,
     },
   );
@@ -348,11 +349,13 @@ const SongTargetModal = ({
                   <CircleDashed className="h-4 w-4 animate-spin text-bpim-muted" />
                 </div>
               )}
-              {!isLoading && hasBrowseSelection && displaySongs.length === 0 && (
-                <p className="py-8 text-center text-xs text-bpim-subtle">
-                  {t("optimizer.customGoal.noResults")}
-                </p>
-              )}
+              {!isLoading &&
+                hasBrowseSelection &&
+                displaySongs.length === 0 && (
+                  <p className="py-8 text-center text-xs text-bpim-subtle">
+                    {t("optimizer.customGoal.noResults")}
+                  </p>
+                )}
               {displaySongs.map((song) => (
                 <button
                   key={`${song.songId}`}
@@ -365,7 +368,6 @@ const SongTargetModal = ({
                       DIFF_COLORS[song.difficulty],
                     )}
                   >
-                    {song.difficultyLevel}
                     {song.difficulty.charAt(0)}
                   </span>
                   <span className="min-w-0 flex-1 truncate text-sm text-bpim-text">
@@ -393,7 +395,6 @@ const SongTargetModal = ({
                     DIFF_COLORS[selectedSong.difficulty],
                   )}
                 >
-                  {selectedSong.difficultyLevel}
                   {selectedSong.difficulty.charAt(0)}
                 </span>
                 <span className="min-w-0 flex-1 truncate text-sm font-bold text-bpim-text">
@@ -404,7 +405,10 @@ const SongTargetModal = ({
                 {currentExScore != null
                   ? tFormat("optimizer.customGoal.currentScore", {
                       score: currentExScore,
-                      rate: scoreRate(currentExScore, selectedSong.notes).toFixed(2),
+                      rate: scoreRate(
+                        currentExScore,
+                        selectedSong.notes,
+                      ).toFixed(2),
                     })
                   : t("optimizer.customGoal.unplayed")}
               </span>

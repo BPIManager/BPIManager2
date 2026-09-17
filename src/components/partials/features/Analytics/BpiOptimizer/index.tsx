@@ -7,7 +7,9 @@ import OptimizerForm from "./ui/OptimizerForm";
 import OptimizationStepList from "./ui/OptimizationStepList";
 import SavedMemoList from "./ui/SavedMemoList";
 import CreationModeSelect from "./ui/CreationModeSelect";
+import ImportGoalModal from "./ui/ImportGoalModal";
 import CustomGoalCreator from "./ui/CustomGoal";
+import type { ImportedGoalTarget } from "@/services/swr/analytics";
 import BpiOptimizerSkeleton from "./skeleton";
 import { useUser } from "@/contexts/users/UserContext";
 import { useUserScores } from "@/hooks/table/useUserScores";
@@ -100,6 +102,10 @@ const BpiOptimizerSection = () => {
   );
   const [tab, setTab] = useState<"create" | "manage">("create");
   const [creationMode, setCreationMode] = useState<CreationMode>("select");
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [importedTargets, setImportedTargets] = useState<
+    ImportedGoalTarget[] | undefined
+  >(undefined);
 
   const currentTotalBpi = result?.currentTotalBpi ?? liveCurrentTotalBpi;
 
@@ -134,7 +140,10 @@ const BpiOptimizerSection = () => {
 
       <TabsContent value="create">
         {creationMode === "select" && (
-          <CreationModeSelect onSelect={setCreationMode} />
+          <CreationModeSelect
+            onSelect={setCreationMode}
+            onImportClick={() => setIsImportModalOpen(true)}
+          />
         )}
 
         {creationMode === "auto" && (
@@ -185,14 +194,31 @@ const BpiOptimizerSection = () => {
         {creationMode === "custom" && (
           <CustomGoalCreator
             currentScores={currentScores}
-            onBack={() => setCreationMode("select")}
+            initialTargets={importedTargets}
+            onBack={() => {
+              setCreationMode("select");
+              setImportedTargets(undefined);
+            }}
             onSaved={() => {
               setCreationMode("select");
+              setImportedTargets(undefined);
               setTab("manage");
             }}
           />
         )}
       </TabsContent>
+
+      <ImportGoalModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        userId={user?.userId}
+        fbUser={fbUser}
+        onImported={(targets) => {
+          setImportedTargets(targets);
+          setIsImportModalOpen(false);
+          setCreationMode("custom");
+        }}
+      />
 
       <TabsContent value="manage">
         {memos && (

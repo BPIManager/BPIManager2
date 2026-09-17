@@ -12,10 +12,13 @@ import type { CustomGoalTargetInput } from "./SongTargetModal";
 
 const CustomGoalCreator = ({
   currentScores,
+  initialTargets,
   onBack,
   onSaved,
 }: {
   currentScores: Map<number, number | null>;
+  /** 「曲目をインポート」で他ユーザーの共有reportIdから読み込んだ初期値。 */
+  initialTargets?: CustomGoalTargetInput[];
   onBack: () => void;
   onSaved: () => void;
 }) => {
@@ -23,7 +26,9 @@ const CustomGoalCreator = ({
   const { user, fbUser } = useUser();
   const { saveMemo, isSaving } = useBpiOptimizerMemos(user?.userId, fbUser);
 
-  const [targets, setTargets] = useState<CustomGoalTargetInput[]>([]);
+  const [targets, setTargets] = useState<CustomGoalTargetInput[]>(
+    initialTargets ?? [],
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
 

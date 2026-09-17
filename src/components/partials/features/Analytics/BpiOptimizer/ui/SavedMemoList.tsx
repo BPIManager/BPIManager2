@@ -1,8 +1,24 @@
 import { useEffect, useState } from "react";
 import { User as FirebaseUser } from "firebase/auth";
-import { CircleDashed, Trash2, Calendar, ChevronDown, ChevronUp } from "lucide-react";
+import {
+  CircleDashed,
+  Trash2,
+  Calendar,
+  ChevronDown,
+  ChevronUp,
+  Share2,
+  Copy,
+  Check,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import ActionConfirmDialog from "@/components/partials/modal/Confirmation";
 import { buildStepProgress } from "@/components/partials/common/OptimizerGoalCard";
@@ -27,6 +43,24 @@ const isMemoAchieved = (
   return currentTotalBpi >= targetTotalBpi;
 };
 
+type StepSortOrder = "added" | "nearest" | "farthest";
+const STEP_SORT_ORDERS: StepSortOrder[] = ["added", "nearest", "farthest"];
+
+/** 目標EXスコアまでの残り(未プレイは目標スコアそのものを最大距離として扱う)。 */
+const remainingOf = (step: GoalSongStep) =>
+  step.currentExScore == null
+    ? step.toExScore
+    : Math.max(0, step.toExScore - step.currentExScore);
+
+const sortSteps = (
+  steps: GoalSongStep[],
+  order: StepSortOrder,
+): GoalSongStep[] => {
+  if (order === "added") return steps;
+  const sorted = [...steps].sort((a, b) => remainingOf(a) - remainingOf(b));
+  return order === "nearest" ? sorted : sorted.reverse();
+};
+
 /**
  * 展開時のみ、保存時点からの実際のスコア更新が現在の総合BPIにどれだけ
  * 効いているかをAPIから取得する（折りたたみ中の全メモ分を一括で叩かない
@@ -43,9 +77,11 @@ const ExpandedSteps = ({
   userId?: string;
   fbUser?: FirebaseUser | null;
 }) => {
+  const { t } = useTranslation();
   const [contributions, setContributions] = useState<Map<number, number> | null>(
     null,
   );
+  const [sortOrder, setSortOrder] = useState<StepSortOrder>("added");
 
   useEffect(() => {
     if (!userId || steps.length === 0) return;
@@ -70,9 +106,33 @@ const ExpandedSteps = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [memo.reportId, userId]);
 
+  const sortedSteps = sortSteps(steps, sortOrder);
+
   return (
     <div className="flex flex-col gap-3 border-t border-bpim-border p-3">
-      {steps.map((step) => (
+      {steps.length > 1 && (
+        <div className="flex min-w-0 gap-1 rounded-lg bg-bpim-overlay/30 p-1">
+          {STEP_SORT_ORDERS.map((order) => (
+            <button
+              key={order}
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setSortOrder(order);
+              }}
+              className={cn(
+                "flex-1 truncate rounded-md py-1.5 text-[11px] font-bold transition-colors",
+                sortOrder === order
+                  ? "bg-bpim-primary text-white"
+                  : "text-bpim-muted hover:text-bpim-text",
+              )}
+            >
+              {t(`optimizer.memo.stepSort.${order}`)}
+            </button>
+          ))}
+        </div>
+      )}
+      {sortedSteps.map((step) => (
         <GoalSongCard
           key={step.songId}
           step={step}
@@ -80,6 +140,75 @@ const ExpandedSteps = ({
         />
       ))}
     </div>
+  );
+};
+
+/** reportIdをコピーして他ユーザーに共有するためのモーダル（曲目のインポートに使う）。 */
+const ShareGoalModal = ({
+  reportId,
+  isOpen,
+  onClose,
+}: {
+  reportId: string | null;
+  isOpen: boolean;
+  onClose: () => void;
+}) => {
+  const { t } = useTranslation();
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    if (!reportId) return;
+    try {
+      await navigator.clipboard.writeText(reportId);
+      setCopied(true);
+    } catch {
+      setCopied(false);
+    }
+  };
+
+  return (
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) {
+          setCopied(false);
+          onClose();
+        }
+      }}
+    >
+      <DialogContent className="max-w-[90vw] sm:max-w-md border-bpim-border bg-bpim-bg">
+        <DialogHeader>
+          <DialogTitle>{t("optimizer.memo.shareTitle")}</DialogTitle>
+        </DialogHeader>
+        <p className="text-xs leading-relaxed text-bpim-muted">
+          {t("optimizer.memo.shareDesc")}
+        </p>
+        <div className="flex min-w-0 items-center gap-2 rounded-lg border border-bpim-border bg-bpim-surface p-2">
+          <code className="min-w-0 flex-1 truncate font-mono text-xs text-bpim-text">
+            {reportId}
+          </code>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            className="shrink-0 gap-1.5"
+            onClick={handleCopy}
+          >
+            {copied ? (
+              <Check className="h-3.5 w-3.5" />
+            ) : (
+              <Copy className="h-3.5 w-3.5" />
+            )}
+            {copied ? t("optimizer.memo.copied") : t("optimizer.memo.copy")}
+          </Button>
+        </div>
+        <DialogFooter>
+          <Button variant="ghost" onClick={onClose}>
+            {t("optimizer.customGoal.cancel")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 
@@ -107,6 +236,7 @@ const SavedMemoList = ({
   // 同時に開けるのは1つまで（アコーディオン形式）
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [shareTargetId, setShareTargetId] = useState<string | null>(null);
 
   const toggleExpanded = (id: string) => {
     setExpandedId((prev) => (prev === id ? null : id));
@@ -216,13 +346,28 @@ const SavedMemoList = ({
                 </Button>
               </div>
 
-              <div className="px-3 pb-3">
+              <div className="flex flex-col gap-2 px-3 pb-3">
                 <GoalBpiJourney
                   memo={memo}
                   liveCurrentTotalBpi={liveCurrentTotalBpi}
                   steps={steps}
                   isExpanded={isExpanded}
                 />
+                {isExpanded && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="w-full gap-1.5"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShareTargetId(memo.reportId);
+                    }}
+                  >
+                    <Share2 className="h-3.5 w-3.5" />
+                    {t("optimizer.memo.share")}
+                  </Button>
+                )}
               </div>
 
               {isExpanded && (
@@ -249,6 +394,12 @@ const SavedMemoList = ({
         description={t("optimizer.memo.deleteDesc")}
         confirmLabel={t("optimizer.memo.deleteConfirm")}
         isDestructive
+      />
+
+      <ShareGoalModal
+        reportId={shareTargetId}
+        isOpen={shareTargetId !== null}
+        onClose={() => setShareTargetId(null)}
       />
     </>
   );

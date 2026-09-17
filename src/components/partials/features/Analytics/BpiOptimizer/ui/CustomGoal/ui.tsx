@@ -1,9 +1,22 @@
-import { ArrowLeft, ArrowRight, CircleDashed, Pencil, Plus, Trash2 } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  CircleDashed,
+  Pencil,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { DIFF_COLORS } from "@/constants/theme/difficultyColors";
-import type { OptimizationResult, OptimizationStep } from "@/types/bpi-optimizer";
-import { BpiJourneyBar, MiniBpiChip } from "@/components/partials/common/OptimizerGoalCard";
+import type {
+  OptimizationResult,
+  OptimizationStep,
+} from "@/types/bpi-optimizer";
+import {
+  BpiJourneyBar,
+  MiniBpiChip,
+} from "@/components/partials/common/OptimizerGoalCard";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import SongTargetModal, { type CustomGoalTargetInput } from "./SongTargetModal";
 
@@ -30,16 +43,21 @@ const scoreRate = (score: number, notes: number) =>
 const TargetRow = ({
   target,
   step,
+  currentScores,
   onEdit,
   onRemove,
 }: {
   target: CustomGoalTargetInput;
   step?: OptimizationStep;
+  currentScores: Map<number, number | null>;
   onEdit: () => void;
   onRemove: () => void;
 }) => {
   const { t } = useTranslation();
-  const currentEx = step?.fromExScore ?? null;
+  // プレビュー計算(server)が未取得・失敗している間も自分のスコアは既に
+  // 手元にあるため、そちらへフォールバックしてプレイ済みの曲が常に
+  // 「未プレイ」表示にならないようにする。
+  const currentEx = step?.fromExScore ?? currentScores.get(target.songId) ?? null;
 
   return (
     <div className="flex flex-col gap-2 rounded-lg border border-bpim-border bg-bpim-surface p-3">
@@ -51,7 +69,6 @@ const TargetRow = ({
               DIFF_COLORS[target.difficulty],
             )}
           >
-            {target.difficultyLevel}
             {target.difficulty.charAt(0)}
           </span>
           <span className="truncate text-sm font-bold text-bpim-text">
@@ -81,7 +98,8 @@ const TargetRow = ({
         </span>
         <ArrowRight className="h-3.5 w-3.5 text-bpim-muted shrink-0" />
         <span className="font-bold text-bpim-text">
-          {target.toExScore} ({scoreRate(target.toExScore, target.notes).toFixed(2)}%)
+          {target.toExScore} (
+          {scoreRate(target.toExScore, target.notes).toFixed(2)}%)
         </span>
       </div>
 
@@ -148,6 +166,7 @@ const CustomGoalCreatorUi = ({
             key={`${target.songId}-${index}`}
             target={target}
             step={preview?.steps[index]}
+            currentScores={currentScores}
             onEdit={() => onEditClick(index)}
             onRemove={() => onRemove(index)}
           />
@@ -167,7 +186,9 @@ const CustomGoalCreatorUi = ({
           {isPreviewLoading || !preview ? (
             <div className="flex items-center gap-2 text-bpim-muted">
               <CircleDashed className="h-4 w-4 animate-spin" />
-              <span className="text-xs">{t("optimizer.customGoal.calculating")}</span>
+              <span className="text-xs">
+                {t("optimizer.customGoal.calculating")}
+              </span>
             </div>
           ) : (
             <BpiJourneyBar
