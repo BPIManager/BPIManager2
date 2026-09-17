@@ -78,3 +78,69 @@ export const RIVAL_ROWS = [
   { name: "ライバルB", win: 98, draw: 31, lose: 125, total: 254 },
   { name: "ライバルC", win: 187, draw: 18, lose: 49, total: 254 },
 ];
+
+/**
+ * notes・maxScore(=notes*2)は実在楽曲(ANOTHER譜面)のsongsテーブルの値と一致させている。
+ * you/ranksのスコアはアリーナ平均比較の見た目のための仮値。
+ */
+export const ARENA_MOCK_DATA = [
+  {
+    title: "冥",
+    difficulty: "ANOTHER",
+    maxScore: 4000, // notes: 2000
+    you: 3802,
+    ranks: { A1: 3720, A3: 3540, A5: 3280 },
+  },
+  {
+    title: "PARADISE LOST",
+    difficulty: "ANOTHER",
+    maxScore: 3436, // notes: 1718
+    you: 3265,
+    ranks: { A1: 3190, A3: 3030, A5: 2810 },
+  },
+  {
+    title: "MAX 300",
+    difficulty: "ANOTHER",
+    maxScore: 2858, // notes: 1429
+    you: 2705,
+    ranks: { A1: 2640, A3: 2500, A5: 2310 },
+  },
+  {
+    title: "Verflucht",
+    difficulty: "ANOTHER",
+    maxScore: 3610, // notes: 1805
+    you: 3428,
+    ranks: { A1: 3350, A3: 3175, A5: 2940 },
+  },
+];
+
+/**
+ * notes・maxScore(=notes*2)は実在楽曲(ANOTHER譜面)のsongsテーブルの値と一致させている。
+ * target(AAAボーダー ≒ maxScore*8/9)・my(自分のスコア)は表示バリエーションのための仮値。
+ */
+export const AAA_TABLE_MOCK = [
+  { title: "冥", difficulty: "A", maxScore: 4000, target: 3556, my: 3802 },
+  {
+    title: "PARADISE LOST",
+    difficulty: "A",
+    maxScore: 3436,
+    target: 3055,
+    my: 3265,
+  },
+  { title: "MAX 300", difficulty: "A", maxScore: 2858, target: 2540, my: 2705 },
+  {
+    title: "Verflucht",
+    difficulty: "A",
+    maxScore: 3610,
+    target: 3209,
+    my: 3055,
+  },
+  {
+    title: "灼熱Beach Side Bunny",
+    difficulty: "A",
+    maxScore: 3438,
+    target: 3056,
+    my: 2820,
+  },
+  { title: "INSOMNIA", difficulty: "A", maxScore: 3322, target: 2953, my: 0 },
+];

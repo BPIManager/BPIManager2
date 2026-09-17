@@ -8,6 +8,8 @@ export { MockBpmBars } from "./mocks/MockBpmBars";
 export { MockBpiDistribution } from "./mocks/MockBpiDistribution";
 export { MockActivityCalendar } from "./mocks/MockActivityCalendar";
 export { MockRivalBars } from "./mocks/MockRivalBars";
+export { MockArenaAverage } from "./mocks/MockArenaAverage";
+export { MockAaaTable } from "./mocks/MockAaaTable";
 
 export const ShowcaseSection = ({
   tag,
