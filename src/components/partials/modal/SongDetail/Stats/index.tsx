@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import { useUser } from "@/contexts/users/UserContext";
 import { useArenaAveragesForSong } from "@/hooks/metrics/useArenaAveragesForSong";
 import { useRivalScoresForSong } from "@/hooks/metrics/useRivalScoresForSong";
-import { useAllScoreHistory } from "@/hooks/allScores/useAllScoresHistory";
+import { useScoreHistory } from "@/hooks/scores/useScoreLogs";
 import { BpiCalculator } from "@/lib/bpi";
 import type { SongWithScore } from "@/types/songs/score";
 import { StatsTabView } from "./ui";
@@ -36,7 +36,7 @@ const StatsTab = ({ song }: { song: SongWithScore }) => {
     song.songId,
     needsRivalData,
   );
-  const { historyGroups } = useAllScoreHistory(
+  const { historyGroups } = useScoreHistory(
     user?.userId,
     song.songId,
     effectiveRef === "personal-best",
