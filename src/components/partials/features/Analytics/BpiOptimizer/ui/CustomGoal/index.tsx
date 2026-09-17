@@ -11,9 +11,11 @@ import CustomGoalCreatorUi from "./ui";
 import type { CustomGoalTargetInput } from "./SongTargetModal";
 
 const CustomGoalCreator = ({
+  currentScores,
   onBack,
   onSaved,
 }: {
+  currentScores: Map<number, number | null>;
   onBack: () => void;
   onSaved: () => void;
 }) => {
@@ -97,6 +99,7 @@ const CustomGoalCreator = ({
   return (
     <CustomGoalCreatorUi
       targets={targets}
+      currentScores={currentScores}
       onBack={onBack}
       onAddClick={handleAddClick}
       onEditClick={handleEditClick}

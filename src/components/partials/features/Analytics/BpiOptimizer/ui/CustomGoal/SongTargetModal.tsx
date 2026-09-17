@@ -11,7 +11,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { DIFF_COLORS } from "@/constants/theme/difficultyColors";
-import { RANK_TABLE } from "@/constants/iidx/rankBorders";
+import { RANK_TABLE, getRankDetail } from "@/constants/iidx/rankBorders";
+import { BpiCalculator } from "@/lib/bpi";
+import type { IBpiBasicSongData } from "@/types/songs/bpi";
+import { MiniBpiChip } from "@/components/partials/common/OptimizerGoalCard";
 import { useSongSearch, type SongSearchResult } from "@/hooks/songs/useSongSearch";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
@@ -22,37 +25,72 @@ export interface CustomGoalTargetInput {
   difficultyLevel: number;
   notes: number;
   toExScore: number;
+  wrScore: number | null;
+  kaidenAvg: number | null;
+  coef: number | null;
+  mu: number | null;
+  sigma: number | null;
+  residualVar: number | null;
 }
+
+const toBpiSongData = (
+  song: Pick<
+    CustomGoalTargetInput,
+    "notes" | "kaidenAvg" | "wrScore" | "coef" | "mu" | "sigma" | "residualVar"
+  >,
+): IBpiBasicSongData => ({
+  notes: song.notes,
+  kaidenAvg: song.kaidenAvg,
+  wrScore: song.wrScore,
+  coef: song.coef,
+  mu: song.mu,
+  sigma: song.sigma,
+  residualVar: song.residualVar,
+});
 
 const QUICK_SCORE_LABELS = ["A", "AA", "AAA", "MAX-"] as const;
 
-function quickScoreOptions(notes: number): { label: string; score: number }[] {
-  const maxScore = notes * 2;
+function quickScoreOptions(
+  song: Pick<
+    CustomGoalTargetInput,
+    "notes" | "kaidenAvg" | "wrScore" | "coef" | "mu" | "sigma" | "residualVar"
+  >,
+): { label: string; score: number; bpi: number | null }[] {
+  const maxScore = song.notes * 2;
   const ratioByLabel = new Map(RANK_TABLE.map((r) => [r.label, r.ratio]));
-  const options: { label: string; score: number }[] = QUICK_SCORE_LABELS.map(
-    (label) => ({
+  const bpiSong = toBpiSongData(song);
+  const scores = [
+    ...QUICK_SCORE_LABELS.map((label) => ({
       label,
       score: Math.ceil(maxScore * (ratioByLabel.get(label) ?? 0)),
-    }),
-  );
-  options.push({ label: "MAX", score: maxScore });
-  return options;
+    })),
+    { label: "MAX", score: maxScore },
+  ];
+  return scores.map((opt) => ({
+    ...opt,
+    bpi: BpiCalculator.calc(opt.score, bpiSong),
+  }));
 }
+
+const scoreRate = (score: number, notes: number) =>
+  notes > 0 ? (score / (notes * 2)) * 100 : 0;
 
 const SongTargetModal = ({
   isOpen,
   onClose,
   onConfirm,
   initialTarget,
+  currentScores,
   difficultyLevel = 12,
 }: {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: (target: CustomGoalTargetInput) => void;
   initialTarget?: CustomGoalTargetInput;
+  currentScores: Map<number, number | null>;
   difficultyLevel?: number;
 }) => {
-  const { t } = useTranslation();
+  const { t, tFormat } = useTranslation();
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [selectedSong, setSelectedSong] = useState<SongSearchResult | null>(
@@ -73,6 +111,12 @@ const SongTargetModal = ({
         notes: initialTarget.notes,
         bpm: null,
         releasedVersion: null,
+        wrScore: initialTarget.wrScore,
+        kaidenAvg: initialTarget.kaidenAvg,
+        coef: initialTarget.coef,
+        mu: initialTarget.mu,
+        sigma: initialTarget.sigma,
+        residualVar: initialTarget.residualVar,
       });
       setExScoreInput(String(initialTarget.toExScore));
     } else {
@@ -99,6 +143,30 @@ const SongTargetModal = ({
     !isNaN(exScoreNum) &&
     exScoreNum >= 0 &&
     (maxScore == null || exScoreNum <= maxScore);
+  const enteredRate =
+    selectedSong && !isNaN(exScoreNum)
+      ? scoreRate(exScoreNum, selectedSong.notes)
+      : null;
+  const currentExScore = selectedSong
+    ? (currentScores.get(selectedSong.songId) ?? null)
+    : null;
+  const rankDetail =
+    selectedSong && !isNaN(exScoreNum)
+      ? getRankDetail(exScoreNum, selectedSong.notes * 2)
+      : null;
+  const rankDetailText = rankDetail
+    ? rankDetail.label === "MAX-"
+      ? `MAX - ${rankDetail.shortage}`
+      : `${rankDetail.label} + ${rankDetail.surplus}`
+    : null;
+  const enteredBpi =
+    selectedSong && !isNaN(exScoreNum)
+      ? BpiCalculator.calc(exScoreNum, toBpiSongData(selectedSong))
+      : null;
+  const diffFromCurrent =
+    selectedSong && !isNaN(exScoreNum)
+      ? exScoreNum - (currentExScore ?? 0)
+      : null;
 
   const handleConfirm = () => {
     if (!selectedSong || !isExScoreValid) return;
@@ -109,6 +177,12 @@ const SongTargetModal = ({
       difficultyLevel: selectedSong.difficultyLevel,
       notes: selectedSong.notes,
       toExScore: exScoreNum,
+      wrScore: selectedSong.wrScore,
+      kaidenAvg: selectedSong.kaidenAvg,
+      coef: selectedSong.coef,
+      mu: selectedSong.mu,
+      sigma: selectedSong.sigma,
+      residualVar: selectedSong.residualVar,
     });
   };
 
@@ -124,7 +198,7 @@ const SongTargetModal = ({
         </DialogHeader>
 
         {!selectedSong ? (
-          <div className="flex flex-col gap-3">
+          <div className="flex min-w-0 flex-col gap-3">
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-bpim-muted" />
               <Input
@@ -135,7 +209,7 @@ const SongTargetModal = ({
                 className="pl-8 h-9"
               />
             </div>
-            <div className="flex max-h-72 flex-col gap-1 overflow-y-auto custom-scrollbar">
+            <div className="flex min-w-0 max-h-72 flex-col gap-1 overflow-x-hidden overflow-y-auto custom-scrollbar">
               {isLoading && (
                 <div className="flex items-center justify-center py-8">
                   <CircleDashed className="h-4 w-4 animate-spin text-bpim-muted" />
@@ -150,7 +224,7 @@ const SongTargetModal = ({
                 <button
                   key={`${song.songId}`}
                   onClick={() => setSelectedSong(song)}
-                  className="flex items-center gap-2 rounded-lg px-2 py-2 text-left hover:bg-bpim-overlay/50 transition-colors"
+                  className="flex w-full min-w-0 items-center gap-2 rounded-lg px-2 py-2 text-left hover:bg-bpim-overlay/50 transition-colors"
                 >
                   <span
                     className={cn(
@@ -161,7 +235,7 @@ const SongTargetModal = ({
                     {song.difficultyLevel}
                     {song.difficulty.charAt(0)}
                   </span>
-                  <span className="truncate text-sm text-bpim-text">
+                  <span className="min-w-0 flex-1 truncate text-sm text-bpim-text">
                     {song.title}
                   </span>
                 </button>
@@ -169,7 +243,7 @@ const SongTargetModal = ({
             </div>
           </div>
         ) : (
-          <div className="flex flex-col gap-4">
+          <div className="flex min-w-0 flex-col gap-4">
             <button
               onClick={() => setSelectedSong(null)}
               className="flex items-center gap-1 self-start text-xs text-bpim-muted hover:text-bpim-text"
@@ -178,45 +252,119 @@ const SongTargetModal = ({
               {t("optimizer.customGoal.changeSong")}
             </button>
 
-            <div className="flex items-center gap-2 rounded-lg border border-bpim-border bg-bpim-surface p-3">
-              <span
-                className={cn(
-                  "shrink-0 rounded px-1.5 py-0.5 text-xs font-black text-white",
-                  DIFF_COLORS[selectedSong.difficulty],
-                )}
-              >
-                {selectedSong.difficultyLevel}
-                {selectedSong.difficulty.charAt(0)}
-              </span>
-              <span className="truncate text-sm font-bold text-bpim-text">
-                {selectedSong.title}
+            <div className="flex min-w-0 flex-col gap-1 rounded-lg border border-bpim-border bg-bpim-surface p-3">
+              <div className="flex min-w-0 items-center gap-2">
+                <span
+                  className={cn(
+                    "shrink-0 rounded px-1.5 py-0.5 text-xs font-black text-white",
+                    DIFF_COLORS[selectedSong.difficulty],
+                  )}
+                >
+                  {selectedSong.difficultyLevel}
+                  {selectedSong.difficulty.charAt(0)}
+                </span>
+                <span className="min-w-0 flex-1 truncate text-sm font-bold text-bpim-text">
+                  {selectedSong.title}
+                </span>
+              </div>
+              <span className="text-xs text-bpim-muted">
+                {currentExScore != null
+                  ? tFormat("optimizer.customGoal.currentScore", {
+                      score: currentExScore,
+                      rate: scoreRate(currentExScore, selectedSong.notes).toFixed(2),
+                    })
+                  : t("optimizer.customGoal.unplayed")}
               </span>
             </div>
 
-            <div className="flex flex-col gap-2">
-              <label className="text-xs font-bold text-bpim-muted">
-                {t("optimizer.customGoal.targetExScore")}
-              </label>
-              <Input
-                type="number"
-                inputMode="numeric"
-                min={0}
-                max={maxScore ?? undefined}
-                value={exScoreInput}
-                onChange={(e) => setExScoreInput(e.target.value)}
-                className="h-9 font-mono"
-              />
+            <div className="flex min-w-0 flex-col gap-2">
+              <div className="flex min-w-0 items-center justify-between gap-2">
+                <label className="text-xs font-bold text-bpim-muted">
+                  {t("optimizer.customGoal.targetExScore")}
+                </label>
+                <div className="flex items-center gap-1.5">
+                  {rankDetailText && (
+                    <span className="font-mono text-xs font-bold text-bpim-primary">
+                      {rankDetailText}
+                    </span>
+                  )}
+                  {enteredBpi != null && (
+                    <span className="flex items-center gap-1 text-[10px] font-bold text-bpim-subtle">
+                      BPI
+                      <MiniBpiChip bpi={enteredBpi} />
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <div className="h-2 flex-1 overflow-hidden rounded-full bg-bpim-muted/15">
+                  <div
+                    className="h-full rounded-full bg-bpim-primary transition-all"
+                    style={{
+                      width: `${Math.min(100, Math.max(0, enteredRate ?? 0))}%`,
+                    }}
+                  />
+                </div>
+                <span className="w-16 shrink-0 text-right font-mono text-xs font-bold text-bpim-muted">
+                  {enteredRate != null ? `${enteredRate.toFixed(2)}%` : "-"}
+                </span>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <Input
+                  type="number"
+                  inputMode="numeric"
+                  min={0}
+                  max={maxScore ?? undefined}
+                  value={exScoreInput}
+                  onChange={(e) => setExScoreInput(e.target.value)}
+                  className="h-9 font-mono"
+                />
+                <span className="shrink-0 font-mono text-xs text-bpim-muted">
+                  MAX {maxScore}
+                </span>
+                {diffFromCurrent != null && (
+                  <span className="flex shrink-0 items-center gap-1 text-xs">
+                    <span className="text-[10px] font-bold text-bpim-subtle">
+                      {t("optimizer.customGoal.diffFromCurrent")}
+                    </span>
+                    <span
+                      className={cn(
+                        "font-mono font-bold",
+                        diffFromCurrent > 0
+                          ? "text-bpim-primary"
+                          : diffFromCurrent < 0
+                            ? "text-bpim-danger"
+                            : "text-bpim-muted",
+                      )}
+                    >
+                      {diffFromCurrent > 0 ? "+" : ""}
+                      {diffFromCurrent}
+                    </span>
+                  </span>
+                )}
+              </div>
+
               <div className="flex flex-wrap gap-1.5">
-                {quickScoreOptions(selectedSong.notes).map((opt) => (
+                {quickScoreOptions(selectedSong).map((opt) => (
                   <Button
                     key={opt.label}
                     type="button"
                     variant="outline"
                     size="sm"
-                    className="h-7 px-2 text-xs font-bold"
+                    className="h-auto flex-col gap-0 px-2 py-1"
                     onClick={() => setExScoreInput(String(opt.score))}
                   >
-                    {opt.label}
+                    <span className="text-xs font-bold">{opt.label}</span>
+                    <span className="font-mono text-[10px] text-bpim-muted">
+                      {opt.score}
+                    </span>
+                    {opt.bpi != null && (
+                      <span className="font-mono text-[10px] text-bpim-primary">
+                        BPI {opt.bpi.toFixed(1)}
+                      </span>
+                    )}
                   </Button>
                 ))}
               </div>

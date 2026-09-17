@@ -74,23 +74,19 @@ export async function handleCustomGoalPreview(
         exScore: Number(r.exScore),
       }));
 
-    const targetBySongId = new Map(
-      parsed.data.targets.map((t) => [t.songId, t.toExScore]),
-    );
-    const observationsAfter: IBpiScoreObservation[] = rawRows.map((r) => ({
-      songId: r.songId,
-      notes: r.notes,
-      exScore: targetBySongId.get(r.songId) ?? (r.exScore != null ? Number(r.exScore) : NaN),
-    })).filter((o) => !Number.isNaN(o.exScore));
-
     const currentTotalBpi = BpiCalculator.calculateTotalBPI(
       observationsBefore,
       allSongs,
     );
-    const targetTotalBpi = BpiCalculator.calculateTotalBPI(
-      observationsAfter,
-      allSongs,
+
+    // 各曲は同時に適用されるが、「この曲1曲が総合BPIにどれだけ効くか」を
+    // 見せるため、追加した順に1曲ずつ適用していった場合の総合BPIを都度
+    // 再計算する（＝アルゴリズム生成プランのcumulativeTotalBpi/bpiGainと
+    // 同じ定義: 単曲BPIの差分ではなく総合BPIの差分）。
+    const workingScores = new Map<number, number>(
+      observationsBefore.map((o) => [o.songId, o.exScore]),
     );
+    let cumulativeBpi = currentTotalBpi;
 
     const steps: OptimizationStep[] = parsed.data.targets.map(
       (target, index) => {
@@ -109,25 +105,43 @@ export async function handleCustomGoalPreview(
           fromExScore != null ? (BpiCalculator.calc(fromExScore, song) ?? -15) : -15;
         const toBpi = BpiCalculator.calc(target.toExScore, song) ?? -15;
 
+        workingScores.set(target.songId, target.toExScore);
+        const observationsSoFar: IBpiScoreObservation[] = allSongs
+          .filter((s) => workingScores.has(s.songId))
+          .map((s) => ({
+            songId: s.songId,
+            notes: s.notes,
+            exScore: workingScores.get(s.songId)!,
+          }));
+        const newCumulativeBpi = BpiCalculator.calculateTotalBPI(
+          observationsSoFar,
+          allSongs,
+        );
+        const bpiGain = newCumulativeBpi - cumulativeBpi;
+        cumulativeBpi = newCumulativeBpi;
+
         return {
           rank: index + 1,
           songId: target.songId,
           title: row.title,
           difficulty: row.difficulty,
           difficultyLevel: row.difficultyLevel,
+          notes: row.notes,
           fromBpi,
           toBpi,
           fromExScore,
           toExScore: target.toExScore,
           exScoreGap: target.toExScore - (fromExScore ?? 0),
-          bpiGain: toBpi - fromBpi,
-          cumulativeTotalBpi: targetTotalBpi,
+          bpiGain,
+          cumulativeTotalBpi: cumulativeBpi,
           isUnplayed: fromExScore == null,
           radarCategory: topElementMap.get(`${row.title}___${row.difficulty}`) ?? null,
           isRadarStrength: false,
         };
       },
     );
+
+    const targetTotalBpi = cumulativeBpi;
 
     const result: OptimizationResult = {
       steps,

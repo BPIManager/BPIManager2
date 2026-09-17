@@ -4,3 +4,4 @@ export * from "./optimizer";
 export * from "./optimizeMemoList";
 export * from "./optimizeMemoDelete";
 export * from "./customPreview";
+export * from "./songContribution";

@@ -106,6 +106,45 @@ describe("handleCustomGoalPreview", () => {
     expect(step.isUnplayed).toBe(true);
   });
 
+  it("複数曲を追加した場合、各stepのcumulativeTotalBpi/bpiGainが「その曲を追加した時点での総合BPI」の逐次差分になること（単曲BPIの差分ではない）", async () => {
+    dbHolder.current = createDbSpy([
+      makeRow({ songId: 1, title: "曲1", exScore: 1800 }),
+      makeRow({ songId: 2, title: "曲2", exScore: 1750 }),
+    ]);
+
+    const { result } = await handleCustomGoalPreview(
+      makeReq({
+        targets: [
+          { songId: 1, toExScore: 1900 },
+          { songId: 2, toExScore: 1950 },
+        ],
+      }),
+      {},
+    );
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const { currentTotalBpi, targetTotalBpi, steps } = result.body;
+
+    // 各stepのbpiGainは単曲BPIの差分(toBpi-fromBpi)そのものではなく、
+    // 総合BPIの逐次差分であるため、両者は一致しないはず
+    expect(steps[0].bpiGain).not.toBeCloseTo(
+      steps[0].toBpi - steps[0].fromBpi,
+      5,
+    );
+
+    // bpiGainの合計はcurrentTotalBpiからtargetTotalBpiへの差分に一致する
+    // (途中のcumulativeTotalBpiの差分をテレスコーピングした合計)
+    const gainSum = steps.reduce((sum, s) => sum + s.bpiGain, 0);
+    expect(gainSum).toBeCloseTo(targetTotalBpi - currentTotalBpi, 5);
+
+    // 最後のstepのcumulativeTotalBpiは全曲適用後のtargetTotalBpiと一致する
+    expect(steps[steps.length - 1].cumulativeTotalBpi).toBeCloseTo(
+      targetTotalBpi,
+      5,
+    );
+  });
+
   it("目標適用後の総合BPI(targetTotalBpi)が現在の総合BPI(currentTotalBpi)以上になること", async () => {
     dbHolder.current = createDbSpy([
       makeRow({ songId: 1, exScore: 1800 }),

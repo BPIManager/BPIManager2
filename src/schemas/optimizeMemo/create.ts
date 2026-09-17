@@ -12,6 +12,7 @@ const optimizationStepSchema = z.object({
   title: z.string(),
   difficulty: z.string(),
   difficultyLevel: z.number(),
+  notes: z.number(),
   fromBpi: z.number(),
   toBpi: z.number(),
   fromExScore: z.number().nullable(),

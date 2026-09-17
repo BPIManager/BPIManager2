@@ -11,6 +11,7 @@ import CustomGoalCreator from "./ui/CustomGoal";
 import BpiOptimizerSkeleton from "./skeleton";
 import { useUser } from "@/contexts/users/UserContext";
 import { useUserScores } from "@/hooks/table/useUserScores";
+import { useTotalBpiStats } from "@/hooks/stats/useCurrentTotalBpi";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { OptimizationResult } from "@/types/bpi-optimizer";
 import type { RadarCategory } from "@/types/stats/radar";
@@ -40,7 +41,6 @@ const BpiOptimizerSection = () => {
     toggleStrategy,
     toggleRadarElement,
     result,
-    setResult,
     isLoading,
     inputError,
     considerCurrentTotalBpi,
@@ -58,6 +58,19 @@ const BpiOptimizerSection = () => {
     });
     return map;
   }, [songs]);
+  const currentBpis = useMemo(() => {
+    const map = new Map<number, number | null>();
+    songs?.forEach((song) => {
+      map.set(song.songId, song.bpi ?? null);
+    });
+    return map;
+  }, [songs]);
+
+  const { stats: liveTotalBpiStats } = useTotalBpiStats(
+    user?.userId,
+    latestVersion,
+  );
+  const liveCurrentTotalBpi = liveTotalBpiStats?.totalBpi ?? null;
 
   const { radar } = useRadar(
     fbUser?.uid,
@@ -88,9 +101,7 @@ const BpiOptimizerSection = () => {
   const [tab, setTab] = useState<"create" | "manage">("create");
   const [creationMode, setCreationMode] = useState<CreationMode>("select");
 
-  const currentTotalBpi =
-    result?.currentTotalBpi ??
-    (user?.totalBpi !== undefined ? Number(user.totalBpi) : null);
+  const currentTotalBpi = result?.currentTotalBpi ?? liveCurrentTotalBpi;
 
   const handleSave = useCallback(async () => {
     if (!result || !targetBpiInput) return;
@@ -173,6 +184,7 @@ const BpiOptimizerSection = () => {
 
         {creationMode === "custom" && (
           <CustomGoalCreator
+            currentScores={currentScores}
             onBack={() => setCreationMode("select")}
             onSaved={() => {
               setCreationMode("select");
@@ -187,16 +199,12 @@ const BpiOptimizerSection = () => {
           <SavedMemoList
             memos={memos}
             currentScores={currentScores}
+            currentBpis={currentBpis}
+            liveCurrentTotalBpi={liveCurrentTotalBpi}
+            userId={user?.userId}
+            fbUser={fbUser}
             onDelete={deleteMemo}
             isDeletingId={isDeleting}
-            onSelect={(historyResult) => {
-              setResult(historyResult);
-              setSavedResult(historyResult);
-              setTargetBpiInput(historyResult.targetTotalBpi.toString());
-              setCreationMode("auto");
-              setTab("create");
-              window.scrollTo({ top: 0, behavior: "smooth" });
-            }}
           />
         )}
       </TabsContent>

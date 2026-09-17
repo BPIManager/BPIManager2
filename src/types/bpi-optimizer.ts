@@ -24,6 +24,7 @@ export interface OptimizationStep {
   title: string;
   difficulty: string;
   difficultyLevel: number;
+  notes: number;
   fromBpi: number;
   toBpi: number;
   fromExScore: number | null;

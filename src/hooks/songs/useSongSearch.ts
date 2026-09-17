@@ -10,6 +10,12 @@ export interface SongSearchResult {
   notes: number;
   bpm: string | null;
   releasedVersion: number | null;
+  wrScore: number | null;
+  kaidenAvg: number | null;
+  coef: number | null;
+  mu: number | null;
+  sigma: number | null;
+  residualVar: number | null;
 }
 
 /**
