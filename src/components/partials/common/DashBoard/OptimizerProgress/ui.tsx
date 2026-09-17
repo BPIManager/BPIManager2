@@ -1,5 +1,11 @@
 import NextLink from "next/link";
-import { ChevronLeft, ChevronRight, Target, Sparkles, ArrowRight } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Target,
+  Sparkles,
+  ArrowRight,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DashCard } from "@/components/ui/dashcard";
@@ -14,7 +20,6 @@ interface StepProgress {
   songId: number;
   title: string;
   difficulty: string;
-  difficultyLevel: number;
   toExScore: number;
   fromExScore: number | null;
   currentExScore: number | null;
@@ -68,10 +73,9 @@ const StepProgressRow = ({ step }: { step: StepProgress }) => {
               DIFF_COLORS[step.difficulty],
             )}
           >
-            {step.difficultyLevel}
             {step.difficulty.charAt(0)}
           </span>
-          <span className="truncate text-xs font-bold text-bpim-text">
+          <span className="min-w-0 flex-1 truncate text-xs font-bold text-bpim-text">
             {step.title}
           </span>
         </div>
@@ -98,7 +102,7 @@ const StepProgressRow = ({ step }: { step: StepProgress }) => {
             "h-full rounded-full transition-all duration-500",
             isAchieved ? "bg-bpim-success" : "bg-bpim-primary",
           )}
-          style={{ width: `${pct}%` }}
+          style={{ width: `${Math.max(pct, 3)}%` }}
         />
       </div>
     </div>
@@ -157,7 +161,6 @@ const OptimizerProgressCard = ({
     songId: step.songId,
     title: step.title,
     difficulty: step.difficulty,
-    difficultyLevel: step.difficultyLevel,
     toExScore: step.toExScore,
     fromExScore: step.fromExScore,
     currentExScore: currentScores.get(step.songId) ?? null,
