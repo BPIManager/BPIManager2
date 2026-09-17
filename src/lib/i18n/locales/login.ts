@@ -438,11 +438,11 @@ export const loginPageTranslations = {
     ko: "점수・클리어 램프 관리",
   },
   "login.accessible.feature2.desc": {
-    ja: "☆11・☆12だけでなく、☆10以下を含む全難易度のスコア・クリアランプを記録・管理できます。複数バージョンをまたいだ管理も可能です。",
-    en: "Track and manage scores and clear lamps across every difficulty, not just ★11 and ★12 — including ★10 and below, spanning multiple game versions.",
+    ja: "☆11・☆12だけでなく、☆10以下を含む全難易度のスコア・クリアランプを記録・管理できます。1バージョン内での短期的な成長も、バージョンをまたいだ長期的な成長も、BPIM2ひとつで管理が完結します。",
+    en: "Track and manage scores and clear lamps across every difficulty, not just ★11 and ★12 — including ★10 and below. Whether it's short-term growth within a single version or long-term growth across versions, BPIM2 has you covered.",
     "zh-TW":
-      "不僅限於 ☆11、☆12，☆10 以下等所有難易度的成績・通關燈號也能記錄與管理，並可跨多個版本進行管理。",
-    ko: "☆11・☆12뿐만 아니라 ☆10 이하를 포함한 모든 난이도의 점수・클리어 램프를 기록・관리할 수 있습니다. 여러 버전에 걸친 관리도 가능합니다.",
+      "不僅限於 ☆11、☆12，☆10 以下等所有難易度的成績・通關燈號也能記錄與管理。無論是單一版本內的短期成長，還是跨版本的長期成長，BPIM2 都能一站式管理。",
+    ko: "☆11・☆12뿐만 아니라 ☆10 이하를 포함한 모든 난이도의 점수・클리어 램프를 기록・관리할 수 있습니다. 한 버전 내의 단기적인 성장도, 버전을 넘나드는 장기적인 성장도 BPIM2 하나로 관리가 완결됩니다.",
   },
   "login.accessible.feature3.title": {
     ja: "ランダムレーンチケット当たり検索",
