@@ -12,11 +12,22 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { DIFF_COLORS } from "@/constants/theme/difficultyColors";
 import { RANK_TABLE, getRankDetail } from "@/constants/iidx/rankBorders";
+import { ALL_RADAR_CATEGORIES } from "@/constants/iidx/radars";
 import { BpiCalculator } from "@/lib/bpi";
 import type { IBpiBasicSongData } from "@/types/songs/bpi";
+import type { RadarCategory } from "@/types/stats/radar";
 import { MiniBpiChip } from "@/components/partials/common/OptimizerGoalCard";
-import { useSongSearch, type SongSearchResult } from "@/hooks/songs/useSongSearch";
+import { RADAR_LABELS } from "../shared";
+import {
+  useSongSearch,
+  type SongSearchResult,
+  type BpmBand,
+} from "@/hooks/songs/useSongSearch";
 import { useTranslation } from "@/hooks/common/useTranslation";
+
+type SearchMode = "title" | "radar" | "bpm";
+const SEARCH_MODES: SearchMode[] = ["title", "radar", "bpm"];
+const BPM_BANDS: BpmBand[] = ["slow", "mid", "fast"];
 
 export interface CustomGoalTargetInput {
   songId: number;
@@ -93,6 +104,11 @@ const SongTargetModal = ({
   const { t, tFormat } = useTranslation();
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
+  const [searchMode, setSearchMode] = useState<SearchMode>("title");
+  const [radarCategory, setRadarCategory] = useState<RadarCategory | null>(
+    null,
+  );
+  const [bpmBand, setBpmBand] = useState<BpmBand | null>(null);
   const [selectedSong, setSelectedSong] = useState<SongSearchResult | null>(
     null,
   );
@@ -125,6 +141,9 @@ const SongTargetModal = ({
     }
     setQuery("");
     setDebouncedQuery("");
+    setSearchMode("title");
+    setRadarCategory(null);
+    setBpmBand(null);
   }, [isOpen, initialTarget]);
   /* eslint-enable react-hooks/set-state-in-effect */
 
@@ -133,9 +152,20 @@ const SongTargetModal = ({
     return () => clearTimeout(timer);
   }, [query]);
 
-  const { songs, isLoading } = useSongSearch(debouncedQuery, {
-    difficultyLevel,
-  });
+  const { songs, isLoading } = useSongSearch(
+    searchMode === "title" ? debouncedQuery : "",
+    {
+      difficultyLevel,
+      radarCategory: searchMode === "radar" ? (radarCategory ?? undefined) : undefined,
+      bpmBand: searchMode === "bpm" ? (bpmBand ?? undefined) : undefined,
+    },
+  );
+  const hasBrowseSelection =
+    searchMode === "title"
+      ? debouncedQuery.length > 0
+      : searchMode === "radar"
+        ? radarCategory != null
+        : bpmBand != null;
 
   const maxScore = selectedSong ? selectedSong.notes * 2 : null;
   const exScoreNum = parseInt(exScoreInput, 10);
@@ -199,23 +229,76 @@ const SongTargetModal = ({
 
         {!selectedSong ? (
           <div className="flex min-w-0 flex-col gap-3">
-            <div className="relative">
-              <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-bpim-muted" />
-              <Input
-                autoFocus
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder={t("optimizer.customGoal.searchPlaceholder")}
-                className="pl-8 h-9"
-              />
+            <div className="flex min-w-0 gap-1 rounded-lg bg-bpim-overlay/30 p-1">
+              {SEARCH_MODES.map((mode) => (
+                <button
+                  key={mode}
+                  type="button"
+                  onClick={() => setSearchMode(mode)}
+                  className={cn(
+                    "flex-1 truncate rounded-md py-1.5 text-[11px] font-bold transition-colors",
+                    searchMode === mode
+                      ? "bg-bpim-primary text-white"
+                      : "text-bpim-muted hover:text-bpim-text",
+                  )}
+                >
+                  {t(`optimizer.customGoal.searchMode.${mode}`)}
+                </button>
+              ))}
             </div>
+
+            {searchMode === "title" && (
+              <div className="relative">
+                <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-bpim-muted" />
+                <Input
+                  autoFocus
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder={t("optimizer.customGoal.searchPlaceholder")}
+                  className="pl-8 h-9"
+                />
+              </div>
+            )}
+
+            {searchMode === "radar" && (
+              <div className="flex min-w-0 flex-wrap gap-1.5">
+                {ALL_RADAR_CATEGORIES.map((cat) => (
+                  <Button
+                    key={cat}
+                    type="button"
+                    variant={radarCategory === cat ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setRadarCategory(cat)}
+                  >
+                    {RADAR_LABELS[cat]}
+                  </Button>
+                ))}
+              </div>
+            )}
+
+            {searchMode === "bpm" && (
+              <div className="flex min-w-0 flex-wrap gap-1.5">
+                {BPM_BANDS.map((band) => (
+                  <Button
+                    key={band}
+                    type="button"
+                    variant={bpmBand === band ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setBpmBand(band)}
+                  >
+                    {t(`optimizer.customGoal.bpmBand.${band}`)}
+                  </Button>
+                ))}
+              </div>
+            )}
+
             <div className="flex min-w-0 max-h-72 flex-col gap-1 overflow-x-hidden overflow-y-auto custom-scrollbar">
               {isLoading && (
                 <div className="flex items-center justify-center py-8">
                   <CircleDashed className="h-4 w-4 animate-spin text-bpim-muted" />
                 </div>
               )}
-              {!isLoading && debouncedQuery && songs.length === 0 && (
+              {!isLoading && hasBrowseSelection && songs.length === 0 && (
                 <p className="py-8 text-center text-xs text-bpim-subtle">
                   {t("optimizer.customGoal.noResults")}
                 </p>

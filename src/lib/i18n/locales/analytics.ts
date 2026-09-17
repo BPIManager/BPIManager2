@@ -721,6 +721,42 @@ export const analyticsTranslations = {
     "zh-TW": "找不到符合的樂曲",
     ko: "일치하는 곡을 찾을 수 없습니다",
   },
+  "optimizer.customGoal.searchMode.title": {
+    ja: "曲名検索",
+    en: "By title",
+    "zh-TW": "曲名搜尋",
+    ko: "곡명 검색",
+  },
+  "optimizer.customGoal.searchMode.radar": {
+    ja: "レーダー項目別",
+    en: "By radar",
+    "zh-TW": "依雷達項目",
+    ko: "레이더 항목별",
+  },
+  "optimizer.customGoal.searchMode.bpm": {
+    ja: "BPM帯別",
+    en: "By BPM",
+    "zh-TW": "依BPM範圍",
+    ko: "BPM 대역별",
+  },
+  "optimizer.customGoal.bpmBand.slow": {
+    ja: "低速 (~135)",
+    en: "Slow (~135)",
+    "zh-TW": "慢速 (~135)",
+    ko: "저속 (~135)",
+  },
+  "optimizer.customGoal.bpmBand.mid": {
+    ja: "中速 (135~170)",
+    en: "Mid (135~170)",
+    "zh-TW": "中速 (135~170)",
+    ko: "중속 (135~170)",
+  },
+  "optimizer.customGoal.bpmBand.fast": {
+    ja: "高速 (170~)",
+    en: "Fast (170~)",
+    "zh-TW": "快速 (170~)",
+    ko: "고속 (170~)",
+  },
   "optimizer.customGoal.changeSong": {
     ja: "曲を変更",
     en: "Change song",
