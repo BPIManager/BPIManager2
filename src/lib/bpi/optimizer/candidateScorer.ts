@@ -102,10 +102,14 @@ export class CandidateScorer {
 
       // ペース配分: この曲だけでdesiredStepGain分を稼ぐのに必要な自曲BPI増分を、
       // 解析的勾配(gradient = ∂T/∂BPI_i)の逆数で見積もり、marginCeilingを上限にする。
+      // 残りギャップが小さくなるほどdesiredStepGainも縮むため、下限をMIN_BPI_GAINで
+      // 確保しておく（そうしないと目標間際でどの候補も「増分が小さすぎる」として
+      // 下のMIN_EX_GAIN/MIN_BPI_GAINチェックに弾かれ、候補が残っているのに
+      // 探索が早期終了してしまう）。
       const pacedOwnDelta = gradient > 0 ? desiredStepGain / gradient : Infinity;
-      const ceilingBpi = paced
-        ? Math.min(marginCeilingBpi, currentSongBpi + pacedOwnDelta)
-        : marginCeilingBpi;
+      const pacedTarget =
+        currentSongBpi + Math.max(BpiOptimizerConstants.MIN_BPI_GAIN, pacedOwnDelta);
+      const ceilingBpi = paced ? Math.min(marginCeilingBpi, pacedTarget) : marginCeilingBpi;
 
       const toExScore = BpiCalculator.calcFromBPI(ceilingBpi, song) ?? song.notes * 2;
       const currentExScore = song.currentExScore ?? 0;

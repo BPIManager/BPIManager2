@@ -333,4 +333,56 @@ describe("findOptimalBpiPath", () => {
       expect(step.bpiGain).toBeLessThan(totalGap * 0.5);
     }
   });
+
+  it("目標間際でペース配分の要求量が小さくなっても、MIN_BPI_GAINの下限により候補切れで早期終了しないこと", () => {
+    // 30曲の候補全てを使わないと目標に届かない、絶妙にタイトなギャップを用意する。
+    // ペース配分後の下限floorが無いと、目標間際でdesiredStepGainが縮小し、
+    // MIN_EX_GAIN/MIN_BPI_GAINの「増分が小さすぎる」判定で残り候補が弾かれ、
+    // 候補が残っているのに探索が早期終了する（今回の回帰対象）。
+    const real = Array.from({ length: 30 }, (_, i) =>
+      makeSong({ songId: i + 1, currentExScore: 1845 + i * 2 }),
+    );
+    const fillers = Array.from({ length: 618 }, (_, i) => makeFillerSong(1000 + i));
+    const allSongs = [...real, ...fillers];
+
+    const observations = real.map((s) => ({
+      songId: s.songId,
+      notes: s.notes,
+      exScore: s.currentExScore!,
+    }));
+    const currentTotal = BpiCalculator.calculateTotalBPI(observations, allSongs);
+
+    const result = findOptimalBpiPath(
+      allSongs,
+      currentTotal + 1.01,
+      { ...baseOptions, includeUnplayed: false, includePlayed: true, searchMode: "flexible", maxRetries: 3 },
+      30,
+    );
+
+    expect(result.achievable).toBe(true);
+  });
+
+  it("considerCurrentTotalBpi=trueでも、現在の実力からある程度離れた目標まで届くこと（現在の実力に縛られ即座に頭打ちにならない）", () => {
+    const real = Array.from({ length: 60 }, (_, i) =>
+      makeSong({ songId: i + 1, currentExScore: 1780 + ((i * 7) % 90) }),
+    );
+    const fillers = Array.from({ length: 588 }, (_, i) => makeFillerSong(1000 + i));
+    const allSongs = [...real, ...fillers];
+
+    const observations = real.map((s) => ({
+      songId: s.songId,
+      notes: s.notes,
+      exScore: s.currentExScore!,
+    }));
+    const currentTotal = BpiCalculator.calculateTotalBPI(observations, allSongs);
+
+    const modestGapResult = findOptimalBpiPath(
+      allSongs,
+      currentTotal + 3,
+      { ...baseOptions, includeUnplayed: false, includePlayed: true, searchMode: "flexible", considerCurrentTotalBpi: true, maxRetries: 3 },
+      30,
+    );
+
+    expect(modestGapResult.achievable).toBe(true);
+  });
 });
