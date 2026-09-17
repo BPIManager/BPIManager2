@@ -1171,11 +1171,11 @@ export const dashboardTranslations = {
     "zh-TW": "開啟Optimizer",
     ko: "옵티마이저 열기",
   },
-  "dashboard.optimizerProgress.target": {
-    ja: "目標BPI {bpi}",
-    en: "Target BPI {bpi}",
-    "zh-TW": "目標BPI {bpi}",
-    ko: "목표 BPI {bpi}",
+  "dashboard.optimizerProgress.bpiRemaining": {
+    ja: "あと{diff}",
+    en: "{diff} to go",
+    "zh-TW": "還差{diff}",
+    ko: "앞으로 {diff}",
   },
   "dashboard.optimizerProgress.remaining": {
     ja: "あと{diff}点",
@@ -1183,17 +1183,17 @@ export const dashboardTranslations = {
     "zh-TW": "還差{diff}分",
     ko: "앞으로 {diff}점",
   },
+  "dashboard.optimizerProgress.remainingUnplayed": {
+    ja: "未プレイ・あと{diff}点",
+    en: "Unplayed, {diff} EX to go",
+    "zh-TW": "未遊玩・還差{diff}分",
+    ko: "미플레이・앞으로 {diff}점",
+  },
   "dashboard.optimizerProgress.achieved": {
     ja: "達成",
     en: "Achieved",
     "zh-TW": "已達成",
     ko: "달성",
-  },
-  "dashboard.optimizerProgress.unplayed": {
-    ja: "未プレイ",
-    en: "Unplayed",
-    "zh-TW": "未遊玩",
-    ko: "미플레이",
   },
   "dashboard.optimizerProgress.pager": {
     ja: "{current} / {total}",
