@@ -127,7 +127,7 @@ const JourneyColumn = ({
 }) => (
   <div
     className={cn(
-      "flex flex-1 flex-col items-center gap-1.5 rounded-lg p-2.5 text-center",
+      "flex flex-1 flex-col items-center gap-1 rounded-lg p-2 text-center",
       emphasize
         ? "border-2 bg-bpim-bg"
         : "border border-bpim-border/60 bg-bpim-bg/60",
@@ -291,7 +291,7 @@ const ExValue = ({
       <span
         className={cn(
           "font-mono font-black text-bpim-text",
-          emphasize ? "text-xl" : "text-sm",
+          emphasize ? "text-lg" : "text-sm",
         )}
       >
         {exScore}
@@ -331,7 +331,7 @@ export const GoalSongCard = ({
   const hasImproved = step.fromExScore != null && gained != null && gained > 0;
 
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-bpim-border bg-bpim-surface p-3">
+    <div className="flex flex-col gap-2 rounded-xl border border-bpim-border bg-bpim-surface p-2.5">
       <div className="flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-1.5">
           <span
@@ -349,7 +349,7 @@ export const GoalSongCard = ({
         <HighlightBadge highlight={highlight} />
       </div>
 
-      <div className="flex items-stretch gap-2">
+      <div className="flex items-stretch gap-1.5">
         <JourneyColumn label={t("optimizer.bpiJourney.created")}>
           {step.fromExScore != null ? (
             <>
@@ -400,7 +400,7 @@ export const GoalSongCard = ({
       />
 
       {hasImproved && contribution != null && contribution > 0.001 && (
-        <div className="rounded-lg bg-bpim-primary/10 px-2.5 py-1.5 text-xs font-bold text-bpim-primary">
+        <div className="rounded-lg bg-bpim-primary/10 px-2.5 py-1 text-xs font-bold text-bpim-primary">
           {tFormat("optimizer.bpiJourney.contribution", {
             value: contribution.toFixed(2),
           })}

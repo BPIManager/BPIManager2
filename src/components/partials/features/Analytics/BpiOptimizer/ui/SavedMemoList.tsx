@@ -4,8 +4,7 @@ import {
   CircleDashed,
   Trash2,
   Calendar,
-  ChevronDown,
-  ChevronUp,
+  ChevronRight,
   Share2,
   Copy,
   Check,
@@ -19,6 +18,12 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import { cn } from "@/lib/utils";
 import ActionConfirmDialog from "@/components/partials/modal/Confirmation";
 import { buildStepProgress } from "@/components/partials/common/OptimizerGoalCard";
@@ -59,88 +64,6 @@ const sortSteps = (
   if (order === "added") return steps;
   const sorted = [...steps].sort((a, b) => remainingOf(a) - remainingOf(b));
   return order === "nearest" ? sorted : sorted.reverse();
-};
-
-/**
- * 展開時のみ、保存時点からの実際のスコア更新が現在の総合BPIにどれだけ
- * 効いているかをAPIから取得する（折りたたみ中の全メモ分を一括で叩かない
- * ように、展開されたメモ単位で遅延フェッチする）。
- */
-const ExpandedSteps = ({
-  memo,
-  steps,
-  userId,
-  fbUser,
-}: {
-  memo: OptimizeMemo;
-  steps: GoalSongStep[];
-  userId?: string;
-  fbUser?: FirebaseUser | null;
-}) => {
-  const { t } = useTranslation();
-  const [contributions, setContributions] = useState<Map<number, number> | null>(
-    null,
-  );
-  const [sortOrder, setSortOrder] = useState<StepSortOrder>("added");
-
-  useEffect(() => {
-    if (!userId || steps.length === 0) return;
-    let cancelled = false;
-    fetchSongContribution(
-      userId,
-      fbUser,
-      steps.map((s) => ({ songId: s.songId, baselineExScore: s.fromExScore })),
-    )
-      .then((res) => {
-        if (cancelled) return;
-        setContributions(
-          new Map(res.contributions.map((c) => [c.songId, c.contribution])),
-        );
-      })
-      .catch(() => {
-        if (!cancelled) setContributions(null);
-      });
-    return () => {
-      cancelled = true;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [memo.reportId, userId]);
-
-  const sortedSteps = sortSteps(steps, sortOrder);
-
-  return (
-    <div className="flex flex-col gap-3 border-t border-bpim-border p-3">
-      {steps.length > 1 && (
-        <div className="flex min-w-0 gap-1 rounded-lg bg-bpim-overlay/30 p-1">
-          {STEP_SORT_ORDERS.map((order) => (
-            <button
-              key={order}
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setSortOrder(order);
-              }}
-              className={cn(
-                "flex-1 truncate rounded-md py-1.5 text-[11px] font-bold transition-colors",
-                sortOrder === order
-                  ? "bg-bpim-primary text-white"
-                  : "text-bpim-muted hover:text-bpim-text",
-              )}
-            >
-              {t(`optimizer.memo.stepSort.${order}`)}
-            </button>
-          ))}
-        </div>
-      )}
-      {sortedSteps.map((step) => (
-        <GoalSongCard
-          key={step.songId}
-          step={step}
-          contribution={contributions?.get(step.songId) ?? null}
-        />
-      ))}
-    </div>
-  );
 };
 
 /** reportIdをコピーして他ユーザーに共有するためのモーダル（曲目のインポートに使う）。 */
@@ -212,6 +135,150 @@ const ShareGoalModal = ({
   );
 };
 
+/**
+ * 目標1件の詳細（達成状況＋曲一覧）をVaulドロワーで表示する。
+ * 達成状況＋シェアボタンはスクロール領域の外に置き、曲一覧だけが
+ * スクロールする（達成状況を常に見せておきたいという要望への対応）。
+ */
+const GoalDetailDrawer = ({
+  memo,
+  steps,
+  isOpen,
+  onClose,
+  liveCurrentTotalBpi,
+  userId,
+  fbUser,
+  onShare,
+}: {
+  memo: OptimizeMemo | null;
+  steps: GoalSongStep[];
+  isOpen: boolean;
+  onClose: () => void;
+  liveCurrentTotalBpi: number | null;
+  userId?: string;
+  fbUser?: FirebaseUser | null;
+  onShare: () => void;
+}) => {
+  const { t } = useTranslation();
+  const [contributions, setContributions] = useState<Map<number, number> | null>(
+    null,
+  );
+  const [sortOrder, setSortOrder] = useState<StepSortOrder>("added");
+
+  useEffect(() => {
+    const reportId = memo?.reportId;
+    if (!isOpen || !userId || !reportId || steps.length === 0) return;
+    let cancelled = false;
+    fetchSongContribution(
+      userId,
+      fbUser,
+      steps.map((s) => ({ songId: s.songId, baselineExScore: s.fromExScore })),
+    )
+      .then((res) => {
+        if (cancelled) return;
+        setContributions(
+          new Map(res.contributions.map((c) => [c.songId, c.contribution])),
+        );
+      })
+      .catch(() => {
+        if (!cancelled) setContributions(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, memo?.reportId, userId]);
+
+  if (!memo) return null;
+  const isAuto = memo.kind !== "custom";
+  const sortedSteps = sortSteps(steps, sortOrder);
+
+  return (
+    <Drawer
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) {
+          setContributions(null);
+          setSortOrder("added");
+          onClose();
+        }
+      }}
+    >
+      <DrawerContent className="flex max-h-[85vh] flex-col">
+        <DrawerHeader className="shrink-0 text-left">
+          <DrawerTitle className="flex items-center gap-2">
+            <Badge
+              variant="secondary"
+              className={cn(
+                "text-xs",
+                isAuto
+                  ? "bg-bpim-overlay"
+                  : "bg-bpim-primary/15 text-bpim-primary",
+              )}
+            >
+              {isAuto
+                ? t("optimizer.memo.kind.auto")
+                : t("optimizer.memo.kind.custom")}
+            </Badge>
+            <span className="flex items-center gap-1 text-xs font-normal text-bpim-subtle">
+              <Calendar className="h-3 w-3" />
+              {new Date(memo.createdAt).toLocaleDateString()}
+            </span>
+          </DrawerTitle>
+        </DrawerHeader>
+
+        <div className="flex shrink-0 flex-col gap-2 border-b border-bpim-border px-4 pb-3">
+          <GoalBpiJourney
+            memo={memo}
+            liveCurrentTotalBpi={liveCurrentTotalBpi}
+            steps={steps}
+            isExpanded
+          />
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="w-full gap-1.5"
+            onClick={onShare}
+          >
+            <Share2 className="h-3.5 w-3.5" />
+            {t("optimizer.memo.share")}
+          </Button>
+        </div>
+
+        <div className="flex flex-1 flex-col gap-1.5 overflow-y-auto px-4 py-3 custom-scrollbar">
+          {steps.length > 1 && (
+            <div className="flex min-w-0 gap-1 rounded-lg bg-bpim-overlay/30 p-1">
+              {STEP_SORT_ORDERS.map((order) => (
+                <button
+                  key={order}
+                  type="button"
+                  onClick={() => setSortOrder(order)}
+                  className={cn(
+                    "flex-1 truncate rounded-md py-1.5 text-[11px] font-bold transition-colors",
+                    sortOrder === order
+                      ? "bg-bpim-primary text-white"
+                      : "text-bpim-muted hover:text-bpim-text",
+                  )}
+                >
+                  {t(`optimizer.memo.stepSort.${order}`)}
+                </button>
+              ))}
+            </div>
+          )}
+          {sortedSteps.map((step) => (
+            <GoalSongCard
+              key={step.songId}
+              step={step}
+              contribution={contributions?.get(step.songId) ?? null}
+            />
+          ))}
+        </div>
+      </DrawerContent>
+    </Drawer>
+  );
+};
+
 const SavedMemoList = ({
   memos,
   currentScores,
@@ -233,20 +300,20 @@ const SavedMemoList = ({
 }) => {
   const { t } = useTranslation();
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
-  // 同時に開けるのは1つまで（アコーディオン形式）
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [openMemoId, setOpenMemoId] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [shareTargetId, setShareTargetId] = useState<string | null>(null);
-
-  const toggleExpanded = (id: string) => {
-    setExpandedId((prev) => (prev === id ? null : id));
-  };
 
   const visibleMemos = memos.filter((memo) => {
     if (statusFilter === "all") return true;
     const achieved = isMemoAchieved(memo, liveCurrentTotalBpi);
     return statusFilter === "achieved" ? achieved : !achieved;
   });
+
+  const openMemo = memos.find((memo) => memo.reportId === openMemoId) ?? null;
+  const openMemoSteps = openMemo
+    ? buildStepProgress(openMemo, currentScores, currentBpis)
+    : [];
 
   return (
     <>
@@ -283,55 +350,39 @@ const SavedMemoList = ({
         )}
         {visibleMemos.map((memo) => {
           const isAuto = memo.kind !== "custom";
-          const isExpanded = expandedId === memo.reportId;
-          const steps = buildStepProgress(memo, currentScores, currentBpis);
           return (
             <div
               key={memo.reportId}
-              className={cn(
-                "rounded-lg border border-bpim-border bg-bpim-bg overflow-hidden",
-                !isExpanded && "cursor-pointer",
-              )}
-              onClick={() => {
-                if (!isExpanded) toggleExpanded(memo.reportId);
-              }}
+              onClick={() => setOpenMemoId(memo.reportId)}
+              className="flex cursor-pointer items-center gap-2 rounded-lg border border-bpim-border bg-bpim-bg p-3 transition-colors hover:border-bpim-primary/40"
             >
-              <div className="flex items-center gap-1 p-3">
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleExpanded(memo.reportId);
-                  }}
-                  className="flex min-w-0 flex-1 items-center gap-2 text-left"
-                >
-                  <Badge
-                    variant="secondary"
-                    className={cn(
-                      "text-xs shrink-0",
-                      isAuto
-                        ? "bg-bpim-overlay"
-                        : "bg-bpim-primary/15 text-bpim-primary",
-                    )}
-                  >
-                    {isAuto
-                      ? t("optimizer.memo.kind.auto")
-                      : t("optimizer.memo.kind.custom")}
+              <Badge
+                variant="secondary"
+                className={cn(
+                  "text-xs shrink-0",
+                  isAuto
+                    ? "bg-bpim-overlay"
+                    : "bg-bpim-primary/15 text-bpim-primary",
+                )}
+              >
+                {isAuto
+                  ? t("optimizer.memo.kind.auto")
+                  : t("optimizer.memo.kind.custom")}
+              </Badge>
+              <span className="text-xs text-bpim-subtle flex items-center gap-1 shrink-0">
+                <Calendar className="h-3 w-3" />
+                {new Date(memo.createdAt).toLocaleDateString()}
+              </span>
+              <div className="ml-auto flex shrink-0 items-center gap-1">
+                {isMemoAchieved(memo, liveCurrentTotalBpi) && (
+                  <Badge className="bg-bpim-success text-[10px] font-black uppercase tracking-wide text-white">
+                    {t("dashboard.optimizerProgress.achieved")}
                   </Badge>
-                  <span className="text-xs text-bpim-subtle flex items-center gap-1 shrink-0">
-                    <Calendar className="h-3 w-3" />
-                    {new Date(memo.createdAt).toLocaleDateString()}
-                  </span>
-                  {isExpanded ? (
-                    <ChevronUp className="h-4 w-4 text-bpim-muted ml-auto shrink-0" />
-                  ) : (
-                    <ChevronDown className="h-4 w-4 text-bpim-muted ml-auto shrink-0" />
-                  )}
-                </button>
+                )}
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-7 w-7 text-bpim-muted hover:text-bpim-danger hover:bg-bpim-danger/10 shrink-0"
+                  className="h-7 w-7 text-bpim-muted hover:text-bpim-danger hover:bg-bpim-danger/10"
                   onClick={(e) => {
                     e.stopPropagation();
                     setDeleteTargetId(memo.reportId);
@@ -344,44 +395,25 @@ const SavedMemoList = ({
                     <Trash2 className="h-3.5 w-3.5" />
                   )}
                 </Button>
+                <ChevronRight className="h-4 w-4 text-bpim-muted" />
               </div>
-
-              <div className="flex flex-col gap-2 px-3 pb-3">
-                <GoalBpiJourney
-                  memo={memo}
-                  liveCurrentTotalBpi={liveCurrentTotalBpi}
-                  steps={steps}
-                  isExpanded={isExpanded}
-                />
-                {isExpanded && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="w-full gap-1.5"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShareTargetId(memo.reportId);
-                    }}
-                  >
-                    <Share2 className="h-3.5 w-3.5" />
-                    {t("optimizer.memo.share")}
-                  </Button>
-                )}
-              </div>
-
-              {isExpanded && (
-                <ExpandedSteps
-                  memo={memo}
-                  steps={steps}
-                  userId={userId}
-                  fbUser={fbUser}
-                />
-              )}
             </div>
           );
         })}
       </div>
+
+      <GoalDetailDrawer
+        memo={openMemo}
+        steps={openMemoSteps}
+        isOpen={openMemo !== null}
+        onClose={() => setOpenMemoId(null)}
+        liveCurrentTotalBpi={liveCurrentTotalBpi}
+        userId={userId}
+        fbUser={fbUser}
+        onShare={() => {
+          if (openMemo) setShareTargetId(openMemo.reportId);
+        }}
+      />
 
       <ActionConfirmDialog
         isOpen={deleteTargetId !== null}
