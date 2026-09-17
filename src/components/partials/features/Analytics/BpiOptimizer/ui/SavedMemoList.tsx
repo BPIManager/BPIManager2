@@ -2,18 +2,22 @@ import { useState } from "react";
 import { CircleDashed, Trash2, History, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 import ActionConfirmDialog from "@/components/partials/modal/Confirmation";
+import { OptimizerGoalContent } from "@/components/partials/common/OptimizerGoalCard";
 import type { OptimizationResult } from "@/types/bpi-optimizer";
 import type { OptimizeMemo } from "@/hooks/analytics/useOptimizeMemo";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 const SavedMemoList = ({
   memos,
+  currentScores,
   onDelete,
   isDeletingId,
   onSelect,
 }: {
   memos: OptimizeMemo[];
+  currentScores: Map<number, number | null>;
   onDelete: (id: string) => void;
   isDeletingId: string | null;
   onSelect: (result: OptimizationResult) => void;
@@ -34,47 +38,62 @@ const SavedMemoList = ({
             {t("optimizer.memo.empty")}
           </p>
         )}
-        {memos.map((memo) => (
-          <div
-            key={memo.reportId}
-            className="group relative flex flex-col gap-2 rounded-lg border border-bpim-border bg-bpim-bg p-3 hover:border-bpim-primary/40 transition-all cursor-pointer"
-            onClick={() => onSelect(memo.reportData)}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Badge
-                  variant="secondary"
-                  className="font-mono text-xs bg-bpim-overlay"
+        {memos.map((memo) => {
+          const isAuto = memo.kind !== "custom";
+          return (
+            <div
+              key={memo.reportId}
+              className={cn(
+                "group relative flex flex-col gap-3 rounded-lg border border-bpim-border bg-bpim-bg p-3 transition-all",
+                isAuto && "hover:border-bpim-primary/40 cursor-pointer",
+              )}
+              onClick={() => isAuto && onSelect(memo.reportData)}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Badge
+                    variant="secondary"
+                    className={cn(
+                      "text-xs",
+                      isAuto
+                        ? "bg-bpim-overlay"
+                        : "bg-bpim-primary/15 text-bpim-primary",
+                    )}
+                  >
+                    {isAuto
+                      ? t("optimizer.memo.kind.auto")
+                      : t("optimizer.memo.kind.custom")}
+                  </Badge>
+                  <span className="text-xs text-bpim-subtle flex items-center gap-1">
+                    <Calendar className="h-3 w-3" />
+                    {new Date(memo.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 text-bpim-muted hover:text-bpim-danger hover:bg-bpim-danger/10"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setDeleteTargetId(memo.reportId);
+                  }}
+                  disabled={isDeletingId === memo.reportId}
                 >
-                  {tFormat("optimizer.memo.target", { bpi: memo.targetBpi.toFixed(2) })}
-                </Badge>
-                <span className="text-xs text-bpim-subtle flex items-center gap-1">
-                  <Calendar className="h-3 w-3" />
-                  {new Date(memo.createdAt).toLocaleDateString()}
-                </span>
+                  {isDeletingId === memo.reportId ? (
+                    <CircleDashed className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-3.5 w-3.5" />
+                  )}
+                </Button>
               </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7 text-bpim-muted hover:text-bpim-danger hover:bg-bpim-danger/10"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setDeleteTargetId(memo.reportId);
-                }}
-                disabled={isDeletingId === memo.reportId}
-              >
-                {isDeletingId === memo.reportId ? (
-                  <CircleDashed className="h-3.5 w-3.5 animate-spin" />
-                ) : (
-                  <Trash2 className="h-3.5 w-3.5" />
-                )}
-              </Button>
+
+              <OptimizerGoalContent
+                memo={memo}
+                currentScores={currentScores}
+              />
             </div>
-            <p className="text-xs text-bpim-muted">
-              {tFormat("optimizer.memo.songCount", { count: memo.reportData.steps.length })}
-            </p>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <ActionConfirmDialog

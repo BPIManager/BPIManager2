@@ -10,6 +10,7 @@ import CreationModeSelect from "./ui/CreationModeSelect";
 import CustomGoalCreator from "./ui/CustomGoal";
 import BpiOptimizerSkeleton from "./skeleton";
 import { useUser } from "@/contexts/users/UserContext";
+import { useUserScores } from "@/hooks/table/useUserScores";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { OptimizationResult } from "@/types/bpi-optimizer";
 import type { RadarCategory } from "@/types/stats/radar";
@@ -48,6 +49,15 @@ const BpiOptimizerSection = () => {
 
   const { memos, saveMemo, deleteMemo, isSaving, isDeleting } =
     useBpiOptimizerMemos(user?.userId, fbUser);
+
+  const { songs } = useUserScores(user?.userId);
+  const currentScores = useMemo(() => {
+    const map = new Map<number, number | null>();
+    songs?.forEach((song) => {
+      map.set(song.songId, song.exScore);
+    });
+    return map;
+  }, [songs]);
 
   const { radar } = useRadar(
     fbUser?.uid,
@@ -176,6 +186,7 @@ const BpiOptimizerSection = () => {
         {memos && (
           <SavedMemoList
             memos={memos}
+            currentScores={currentScores}
             onDelete={deleteMemo}
             isDeletingId={isDeleting}
             onSelect={(historyResult) => {

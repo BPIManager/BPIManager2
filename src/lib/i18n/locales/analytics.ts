@@ -520,6 +520,18 @@ export const analyticsTranslations = {
     "zh-TW": "{count}首曲計畫",
     ko: "{count}곡 플랜",
   },
+  "optimizer.memo.kind.auto": {
+    ja: "自動",
+    en: "Auto",
+    "zh-TW": "自動",
+    ko: "자동",
+  },
+  "optimizer.memo.kind.custom": {
+    ja: "カスタム",
+    en: "Custom",
+    "zh-TW": "自訂",
+    ko: "커스텀",
+  },
   "optimizer.memo.deleteTitle": {
     ja: "このメモを削除しますか？",
     en: "Delete this plan?",
@@ -546,10 +558,10 @@ export const analyticsTranslations = {
     ko: "새로 만들기",
   },
   "optimizer.tabs.manage": {
-    ja: "メモ管理",
-    en: "Manage Plans",
-    "zh-TW": "計畫管理",
-    ko: "메모 관리",
+    ja: "目標管理",
+    en: "Manage Goals",
+    "zh-TW": "目標管理",
+    ko: "목표 관리",
   },
 
   "optimizer.mode.autoCard.title": {
