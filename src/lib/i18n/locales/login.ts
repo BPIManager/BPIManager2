@@ -426,10 +426,11 @@ export const loginPageTranslations = {
     ko: "라이벌과 점수를 겨루다",
   },
   "login.accessible.feature1.desc": {
-    ja: "実力を問わず、フォローしたライバルとスコアを比較して切磋琢磨できます。",
-    en: "Follow rivals at any skill level and compare scores to push each other forward.",
-    "zh-TW": "無論實力高低，都能與追蹤的對手比較成績、互相切磋。",
-    ko: "실력에 상관없이 팔로우한 라이벌과 점수를 비교하며 서로 자극을 주고받을 수 있습니다.",
+    ja: "累計10,000ユーザー以上のBPIM2登録ユーザーから新しいライバルを見つけましょう。実力を問わず、フォローしたライバルとスコアを比較して切磋琢磨できます。",
+    en: "Find new rivals among BPIM2's 10,000+ registered users. Follow rivals at any skill level and compare scores to push each other forward.",
+    "zh-TW":
+      "從累計超過 10,000 名的 BPIM2 註冊用戶中尋找新的對手。無論實力高低，都能與追蹤的對手比較成績、互相切磋。",
+    ko: "누적 10,000명 이상의 BPIM2 등록 유저 중에서 새로운 라이벌을 찾아보세요. 실력에 상관없이 팔로우한 라이벌과 점수를 비교하며 서로 자극을 주고받을 수 있습니다.",
   },
   "login.accessible.feature2.title": {
     ja: "スコア・クリアランプ管理",
