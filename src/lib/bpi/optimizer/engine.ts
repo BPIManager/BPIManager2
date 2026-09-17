@@ -28,7 +28,11 @@ function matchesFilters(song: SongOptimizerInput, options: ExecuteOptions): bool
   return levelOk && diffOk;
 }
 
-/** スコア付けされた候補のプールから、探索モードに応じた重み付き乱択で1曲決定する。 */
+/**
+ * スコア付けされた候補のプールから、上位ほど選ばれやすい重み付き乱択で1曲決定する。
+ * flexibleを完全一様乱択にすると寄与ほぼ0の候補まで選ばれうるため、両モードとも
+ * `POOL_PICK_POWER`で上位寄りに偏らせ、プールサイズの違いだけでモード差を表す。
+ */
 function pickFromPool(
   scored: ScoredCandidate[],
   searchMode: "fastest" | "flexible" | undefined,
@@ -40,9 +44,7 @@ function pickFromPool(
   const topPool = scored.slice(0, Math.min(scored.length, poolSize));
   const pickIndex =
     topPool.length > 1
-      ? isFastest
-        ? Math.floor(Math.pow(rng(), POOL_PICK_POWER) * topPool.length)
-        : Math.floor(rng() * topPool.length)
+      ? Math.floor(Math.pow(rng(), POOL_PICK_POWER) * topPool.length)
       : 0;
   return topPool[pickIndex];
 }

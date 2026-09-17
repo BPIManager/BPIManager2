@@ -32,30 +32,14 @@ export function diversityMultiplier(song: SongOptimizerInput, currentSongBpi: nu
 /**
  * 候補曲を2段階で評価する（提案書§3.5）。
  *
- * **ペース配分（flexibleモードの核）**: 1曲の目標BPIを`achievementCeiling`が返す
- * 「この曲でどこまで伸ばせるか」の上限（marginCeiling）にそのまま張り付かせると、
- * 総合BPIへの寄与が一番大きい1曲だけがその上限まで刻まれ続け、(a) 他の曲が選ばれない
- * （多様性ボーナス程度では上位曲支配の桁違いのスケール差を覆せない）、
- * (b) 逆にmarginCeilingを軽視すると総合BPIへの寄与がほぼ無い曲ばかりになり
- * maxSteps以内に目標へ収束しない、という状態を両方とも実測で確認した
- * （`docs/proposals/bpi-optimizer-v2-rebuild.md`のユーザーフィードバック参照）。
+ * flexibleは各曲の目標BPIを`achievementCeiling`の上限までではなく、残りギャップを
+ * 残りステップで均等割りした分（`desiredStepGain`）に頭打ちする（ペース配分）。
+ * これで1曲に寄与が集中せず、かつ毎ステップ着実に進むので収束もする。fastestは
+ * ペース配分せず上限まで狙う（最短到達優先）。
  *
- * 解決策は「残りの目標ギャップを残りステップ数で均等割りした量」を1ステップの
- * 目標寄与（`desiredStepGain`）とし、各候補の目標BPIをそれで賄える分だけに
- * ペース配分すること（V1時代の`estimateTargetBpi`のremainingSumGap/remainingSteps
- * ペース配分と同じ発想を、V1のべき乗平均ではなく実際のV2総合BPIの解析的勾配で行う）。
- * これにより:
- * - どの曲を選んでも1ステップあたりの総合BPIへの寄与がほぼ`desiredStepGain`に揃うため、
- *   1曲だけに寄与が集中しなくなる（自然にmaxSteps曲程度に分散する）
- * - 毎ステップ「残りギャップ／残りステップ」だけ確実に進むため、候補が尽きない限り
- *   maxSteps以内に目標へ到達する
- *
- * fastest（スパルタ/最短経路）はペース配分せず、`achievementCeiling`の上限まで
- * そのまま狙う（最少曲数での最短到達を優先する、というモードの意味通り）。
- *
- * 1. 安価な一次選抜（候補全件、O(候補数)）: 見積もり効率で上位`CANDIDATE_POOL_SIZE`件に絞る
- * 2. 厳密評価（上位K件のみ、O(K×n log n)）: 実際に観測へ仮想プレイを追加して
- *    `TotalBpiEvaluator.exact`を呼び、真の総合BPI増分で並べ替える
+ * 1. 安価な一次選抜（候補全件）: 見積もり効率で上位`CANDIDATE_POOL_SIZE`件に絞る
+ * 2. 厳密評価（上位K件のみ）: 実際に観測へ反映して`TotalBpiEvaluator.exact`で
+ *    真の総合BPI増分を求め、並べ替える
  */
 export class CandidateScorer {
   constructor(

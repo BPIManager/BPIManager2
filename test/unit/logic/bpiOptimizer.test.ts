@@ -269,10 +269,7 @@ describe("findOptimalBpiPath", () => {
     });
   });
 
-  it("fastestは既に高BPIな曲を、flexibleは伸びしろのある曲を優先すること（同じ候補集合で比較）", () => {
-    // 同じ譜面形状で、現在のスコアだけが違う2曲。eliteは既に全一級（EX伸びしろがわずか
-    // だが総合BPIへの寄与は大きい）、averageはまだ皆伝平均寄り（EX伸びしろは大きいが
-    // 総合BPIへの直接寄与は小さい）。
+  it("fastestは1曲で足りれば1曲だけ、flexibleは足りていても複数曲に分散すること（同じ候補集合で比較）", () => {
     const elite = makeSong({ songId: 1, title: "elite", currentExScore: 1960 });
     const average = makeSong({ songId: 2, title: "average", currentExScore: 1800 });
     const options: ExecuteOptions = {
@@ -281,22 +278,15 @@ describe("findOptimalBpiPath", () => {
       includePlayed: true,
       maxRetries: 1,
     };
+    const songs = [elite, average, makeFillerSong(99)];
 
-    const fastest = findOptimalBpiPath(
-      [elite, average, makeFillerSong(99)],
-      42,
-      { ...options, searchMode: "fastest" },
-      1,
-    );
-    const flexible = findOptimalBpiPath(
-      [elite, average, makeFillerSong(99)],
-      42,
-      { ...options, searchMode: "flexible" },
-      1,
-    );
+    const fastest = findOptimalBpiPath(songs, 42, { ...options, searchMode: "fastest" }, 5);
+    const flexible = findOptimalBpiPath(songs, 42, { ...options, searchMode: "flexible" }, 5);
 
-    expect(fastest.steps[0]?.title).toBe("elite");
-    expect(flexible.steps[0]?.title).toBe("average");
+    expect(fastest.steps.map((s) => s.title)).toEqual(["elite"]);
+    expect(flexible.steps.map((s) => s.title)).toEqual(
+      expect.arrayContaining(["elite", "average"]),
+    );
   });
 
   it("flexibleモードは、実規模(n=648・目標ギャップが小さい)相当のケースでも目標に収束しつつ複数曲へ分散すること", () => {
