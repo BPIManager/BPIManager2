@@ -3,7 +3,11 @@ import { useCallback, useMemo, useState } from "react";
 import { User as FirebaseUser } from "firebase/auth";
 import type { OptimizationResult } from "@/types/bpi-optimizer";
 import { fetcherV2 } from "@/services/swr/fetchV2";
-import { saveOptimizeMemo, deleteOptimizeMemo } from "@/services/swr/analytics";
+import {
+  saveOptimizeMemo,
+  deleteOptimizeMemo,
+  updateOptimizeMemo,
+} from "@/services/swr/analytics";
 
 export interface OptimizeMemo {
   reportId: string;
@@ -51,6 +55,33 @@ export const useBpiOptimizerMemos = (
     [userId, apiUrl, fbUser, swrKey, mutate],
   );
 
+  const [isUpdating, setIsUpdating] = useState(false);
+  const updateMemo = useCallback(
+    async (
+      reportId: string,
+      targetBpi: number,
+      reportData: OptimizationResult,
+      kind: "auto" | "custom" = "auto",
+    ) => {
+      if (!userId) return;
+      setIsUpdating(true);
+      try {
+        await updateOptimizeMemo(
+          apiUrl,
+          fbUser,
+          reportId,
+          targetBpi,
+          reportData,
+          kind,
+        );
+        await mutate(swrKey);
+      } finally {
+        setIsUpdating(false);
+      }
+    },
+    [userId, apiUrl, fbUser, swrKey, mutate],
+  );
+
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const deleteMemo = useCallback(
     async (reportId: string) => {
@@ -77,7 +108,9 @@ export const useBpiOptimizerMemos = (
     isMemosLoading,
     isSaving,
     isDeleting,
+    isUpdating,
     saveMemo,
     deleteMemo,
+    updateMemo,
   };
 };

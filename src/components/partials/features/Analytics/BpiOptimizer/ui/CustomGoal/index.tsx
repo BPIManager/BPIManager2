@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useUser } from "@/contexts/users/UserContext";
-import { useBpiOptimizerMemos } from "@/hooks/analytics/useOptimizeMemo";
+import { useBpiOptimizerMemos, type OptimizeMemo } from "@/hooks/analytics/useOptimizeMemo";
 import { fetchCustomGoalPreview } from "@/services/swr/analytics";
 import type { OptimizationResult } from "@/types/bpi-optimizer";
 import { toast } from "sonner";
@@ -13,6 +13,7 @@ import type { CustomGoalTargetInput } from "./SongTargetModal";
 const CustomGoalCreator = ({
   currentScores,
   initialTargets,
+  editingMemo,
   onBack,
   onSaved,
   onDirtyChange,
@@ -20,6 +21,8 @@ const CustomGoalCreator = ({
   currentScores: Map<number, number | null>;
   /** 「曲目をインポート」で他ユーザーの共有reportIdから読み込んだ初期値。 */
   initialTargets?: CustomGoalTargetInput[];
+  /** 指定されている場合は新規保存ではなく、このメモを上書き更新する（編集モード）。 */
+  editingMemo?: OptimizeMemo | null;
   onBack: () => void;
   onSaved: () => void;
   /** 未保存の曲目が1つでもあるかを親へ伝える（離脱時の確認に使う）。 */
@@ -27,7 +30,10 @@ const CustomGoalCreator = ({
 }) => {
   const { t } = useTranslation();
   const { user, fbUser } = useUser();
-  const { saveMemo, isSaving } = useBpiOptimizerMemos(user?.userId, fbUser);
+  const { saveMemo, updateMemo, isSaving, isUpdating } = useBpiOptimizerMemos(
+    user?.userId,
+    fbUser,
+  );
 
   const [targets, setTargets] = useState<CustomGoalTargetInput[]>(
     initialTargets ?? [],
@@ -105,8 +111,18 @@ const CustomGoalCreator = ({
 
   const handleSave = async () => {
     if (!preview) return;
-    await saveMemo(preview.targetTotalBpi, preview, "custom");
-    toast.success(t("optimizer.customGoal.saved"));
+    if (editingMemo) {
+      await updateMemo(
+        editingMemo.reportId,
+        preview.targetTotalBpi,
+        preview,
+        editingMemo.kind,
+      );
+      toast.success(t("optimizer.customGoal.updated"));
+    } else {
+      await saveMemo(preview.targetTotalBpi, preview, "custom");
+      toast.success(t("optimizer.customGoal.saved"));
+    }
     onSaved();
   };
 
@@ -114,6 +130,7 @@ const CustomGoalCreator = ({
     <CustomGoalCreatorUi
       targets={targets}
       currentScores={currentScores}
+      isEditing={!!editingMemo}
       onBack={onBack}
       onAddClick={handleAddClick}
       onEditClick={handleEditClick}
@@ -128,7 +145,7 @@ const CustomGoalCreator = ({
       preview={preview}
       isPreviewLoading={isPreviewLoading}
       onSave={handleSave}
-      isSaving={isSaving}
+      isSaving={isSaving || isUpdating}
     />
   );
 };

@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { User as FirebaseUser } from "firebase/auth";
-import { CircleDashed, Trash2, Calendar, ChevronRight } from "lucide-react";
+import {
+  CircleDashed,
+  Trash2,
+  Pencil,
+  Calendar,
+  ChevronRight,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -43,6 +49,8 @@ const SavedMemoList = ({
   fbUser,
   onDelete,
   isDeletingId,
+  onEdit,
+  isEditLoadingId,
 }: {
   memos: OptimizeMemo[];
   currentScores: Map<number, number | null>;
@@ -52,6 +60,8 @@ const SavedMemoList = ({
   fbUser?: FirebaseUser | null;
   onDelete: (id: string) => void;
   isDeletingId: string | null;
+  onEdit: (memo: OptimizeMemo) => void;
+  isEditLoadingId?: string | null;
 }) => {
   const { t, tFormat } = useTranslation();
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
@@ -136,6 +146,22 @@ const SavedMemoList = ({
                       {t("dashboard.optimizerProgress.achieved")}
                     </Badge>
                   )}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 text-bpim-muted hover:text-bpim-primary hover:bg-bpim-primary/10"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEdit(memo);
+                    }}
+                    disabled={isEditLoadingId === memo.reportId}
+                  >
+                    {isEditLoadingId === memo.reportId ? (
+                      <CircleDashed className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Pencil className="h-3.5 w-3.5" />
+                    )}
+                  </Button>
                   <Button
                     variant="ghost"
                     size="icon"

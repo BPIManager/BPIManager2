@@ -73,6 +73,31 @@ class BpiOptimizerRepository {
   }
 
   /**
+   * 既存のメモを上書き更新する（保存済みの目標の編集）。
+   * 対象がuserIdの所有物でない場合は何もせず`false`を返す。
+   */
+  async updateMemo(
+    userId: string,
+    reportId: string,
+    targetBpi: number,
+    reportData: OptimizationResult,
+    kind: "auto" | "custom",
+  ) {
+    const result = await db
+      .updateTable("optimizeMemo")
+      .set({
+        targetBpi,
+        reportData: JSON.stringify(reportData),
+        kind,
+      })
+      .where("userId", "=", userId)
+      .where("reportId", "=", reportId)
+      .executeTakeFirst();
+
+    return Number(result.numUpdatedRows) > 0;
+  }
+
+  /**
    * 特定のメモを削除する
    */
   async deleteMemo(userId: string, reportId: string) {

@@ -574,6 +574,12 @@ export const analyticsTranslations = {
     "zh-TW": "沒有符合的目標",
     ko: "해당하는 목표가 없습니다",
   },
+  "optimizer.memo.editFailed": {
+    ja: "目標の読み込みに失敗しました",
+    en: "Failed to load the goal for editing.",
+    "zh-TW": "載入目標失敗",
+    ko: "목표를 불러오지 못했습니다",
+  },
   "optimizer.memo.share": {
     ja: "曲目をシェア",
     en: "Share song list",
@@ -846,6 +852,18 @@ export const analyticsTranslations = {
     en: "Custom goal saved",
     "zh-TW": "已儲存自訂目標",
     ko: "커스텀 목표를 저장했습니다",
+  },
+  "optimizer.customGoal.update": {
+    ja: "この目標を更新",
+    en: "Update this goal",
+    "zh-TW": "更新此目標",
+    ko: "이 목표 업데이트",
+  },
+  "optimizer.customGoal.updated": {
+    ja: "目標を更新しました",
+    en: "Goal updated",
+    "zh-TW": "已更新目標",
+    ko: "목표를 업데이트했습니다",
   },
   "optimizer.customGoal.searchStepTitle": {
     ja: "曲を検索",

@@ -9,7 +9,11 @@ import SavedMemoList from "./ui/SavedMemoList";
 import CreationModeSelect from "./ui/CreationModeSelect";
 import ImportGoalModal from "./ui/ImportGoalModal";
 import CustomGoalCreator from "./ui/CustomGoal";
-import type { ImportedGoalTarget } from "@/services/swr/analytics";
+import {
+  fetchImportOptimizeMemo,
+  type ImportedGoalTarget,
+} from "@/services/swr/analytics";
+import type { OptimizeMemo } from "@/hooks/analytics/useOptimizeMemo";
 import BpiOptimizerSkeleton from "./skeleton";
 import ActionConfirmDialog from "@/components/partials/modal/Confirmation";
 import { useUser } from "@/contexts/users/UserContext";
@@ -111,6 +115,35 @@ const BpiOptimizerSection = () => {
   const [pendingNavigation, setPendingNavigation] = useState<
     (() => void) | null
   >(null);
+  const [editingMemo, setEditingMemo] = useState<OptimizeMemo | null>(null);
+  const [editingLoadingId, setEditingLoadingId] = useState<string | null>(
+    null,
+  );
+
+  const resetCustomCreationState = () => {
+    setImportedTargets(undefined);
+    setEditingMemo(null);
+  };
+
+  const handleEditMemo = async (memo: OptimizeMemo) => {
+    if (!user?.userId || editingLoadingId) return;
+    setEditingLoadingId(memo.reportId);
+    try {
+      const targets = await fetchImportOptimizeMemo(
+        user.userId,
+        fbUser,
+        memo.reportId,
+      );
+      setImportedTargets(targets);
+      setEditingMemo(memo);
+      setCreationMode("custom");
+      setTab("create");
+    } catch {
+      toast.error(t("optimizer.memo.editFailed"));
+    } finally {
+      setEditingLoadingId(null);
+    }
+  };
 
   const currentTotalBpi = result?.currentTotalBpi ?? liveCurrentTotalBpi;
 
@@ -221,16 +254,17 @@ const BpiOptimizerSection = () => {
           <CustomGoalCreator
             currentScores={currentScores}
             initialTargets={importedTargets}
+            editingMemo={editingMemo}
             onDirtyChange={setIsCustomDirty}
             onBack={() =>
               guardNavigation(() => {
                 setCreationMode("select");
-                setImportedTargets(undefined);
+                resetCustomCreationState();
               })
             }
             onSaved={() => {
               setCreationMode("select");
-              setImportedTargets(undefined);
+              resetCustomCreationState();
               setTab("manage");
             }}
           />
@@ -273,6 +307,8 @@ const BpiOptimizerSection = () => {
             fbUser={fbUser}
             onDelete={deleteMemo}
             isDeletingId={isDeleting}
+            onEdit={handleEditMemo}
+            isEditLoadingId={editingLoadingId}
           />
         )}
       </TabsContent>

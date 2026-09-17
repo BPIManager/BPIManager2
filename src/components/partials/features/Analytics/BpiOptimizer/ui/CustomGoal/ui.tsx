@@ -23,6 +23,7 @@ import SongTargetModal, { type CustomGoalTargetInput } from "./SongTargetModal";
 interface CustomGoalCreatorUiProps {
   targets: CustomGoalTargetInput[];
   currentScores: Map<number, number | null>;
+  isEditing?: boolean;
   onBack: () => void;
   onAddClick: () => void;
   onEditClick: (index: number) => void;
@@ -130,6 +131,7 @@ const TargetRow = ({
 const CustomGoalCreatorUi = ({
   targets,
   currentScores,
+  isEditing,
   onBack,
   onAddClick,
   onEditClick,
@@ -206,7 +208,9 @@ const CustomGoalCreatorUi = ({
         className="w-full gap-2"
       >
         {isSaving && <CircleDashed className="h-4 w-4 animate-spin" />}
-        {t("optimizer.customGoal.save")}
+        {isEditing
+          ? t("optimizer.customGoal.update")
+          : t("optimizer.customGoal.save")}
       </Button>
 
       <SongTargetModal
