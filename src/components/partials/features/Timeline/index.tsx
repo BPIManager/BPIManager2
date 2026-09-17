@@ -96,6 +96,27 @@ const TimelineContainer = () => {
                 </Select>
               </div>
 
+              {lists.length > 0 && (
+                <div className="flex flex-col gap-1">
+                  <FilterHeader label={t("timeline.list.label")} />
+                  <MenuButton
+                    isActive={listId === null}
+                    icon={Users}
+                    label={t("timeline.list.all")}
+                    onClick={() => setListId(null)}
+                  />
+                  {lists.map((list) => (
+                    <MenuButton
+                      key={list.id}
+                      isActive={listId === list.id}
+                      icon={ListChecks}
+                      label={list.name}
+                      onClick={() => setListId(list.id)}
+                    />
+                  ))}
+                </div>
+              )}
+
               <div className="flex flex-col gap-1">
                 <FilterHeader label={t("timeline.mode.label")} />
                 <MenuButton
@@ -118,27 +139,6 @@ const TimelineContainer = () => {
                   onClick={() => setMode("overtaken")}
                 />
               </div>
-
-              {lists.length > 0 && (
-                <div className="flex flex-col gap-1">
-                  <FilterHeader label={t("timeline.list.label")} />
-                  <MenuButton
-                    isActive={listId === null}
-                    icon={Users}
-                    label={t("timeline.list.all")}
-                    onClick={() => setListId(null)}
-                  />
-                  {lists.map((list) => (
-                    <MenuButton
-                      key={list.id}
-                      isActive={listId === list.id}
-                      icon={ListChecks}
-                      label={list.name}
-                      onClick={() => setListId(list.id)}
-                    />
-                  ))}
-                </div>
-              )}
 
               <FilterCheckboxGroup
                 label="LEVEL"
