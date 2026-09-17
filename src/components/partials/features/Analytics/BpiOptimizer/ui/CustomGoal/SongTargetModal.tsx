@@ -83,6 +83,24 @@ function quickScoreOptions(
   }));
 }
 
+const BPI_QUICK_TARGETS = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+
+/** BPI 0/10/.../100を達成するのに必要なEXスコアの早見表（mu/sigmaが無い曲では逆算できないため空になる）。 */
+function bpiQuickOptions(
+  song: Pick<
+    CustomGoalTargetInput,
+    "notes" | "kaidenAvg" | "wrScore" | "coef" | "mu" | "sigma" | "residualVar"
+  >,
+): { bpi: number; score: number }[] {
+  const maxScore = song.notes * 2;
+  const bpiSong = toBpiSongData(song);
+  return BPI_QUICK_TARGETS.map((bpi) => {
+    const rawScore = BpiCalculator.calcFromBPI(bpi, bpiSong);
+    if (rawScore == null) return null;
+    return { bpi, score: Math.min(maxScore, Math.max(0, rawScore)) };
+  }).filter((opt): opt is { bpi: number; score: number } => opt != null);
+}
+
 const scoreRate = (score: number, notes: number) =>
   notes > 0 ? (score / (notes * 2)) * 100 : 0;
 
@@ -480,6 +498,24 @@ const SongTargetModal = ({
                         BPI {opt.bpi.toFixed(1)}
                       </span>
                     )}
+                  </Button>
+                ))}
+              </div>
+
+              <div className="flex flex-wrap gap-1.5">
+                {bpiQuickOptions(selectedSong).map((opt) => (
+                  <Button
+                    key={opt.bpi}
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-auto flex-col gap-0 px-2 py-1"
+                    onClick={() => setExScoreInput(String(opt.score))}
+                  >
+                    <span className="text-xs font-bold">BPI {opt.bpi}</span>
+                    <span className="font-mono text-[10px] text-bpim-muted">
+                      {opt.score}
+                    </span>
                   </Button>
                 ))}
               </div>
