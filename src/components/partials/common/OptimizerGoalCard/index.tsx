@@ -130,3 +130,43 @@ export const buildStepProgress = (
     toBpi: step.toBpi,
     notes: step.notes ?? null,
   }));
+
+/**
+ * ダッシュボードウィジェット・「目標管理」タブ双方の曲一覧で共有する
+ * 並び替え。「追加した順」はプラン保存時の順序をそのまま維持し、
+ * 「近い順/遠い順」は目標EXスコアまでの残り(未プレイは目標スコアそのもの
+ * を最大距離として扱う)で並べ替える。
+ */
+export type StepSortOrder = "added" | "nearest" | "farthest";
+export const STEP_SORT_ORDERS: StepSortOrder[] = [
+  "added",
+  "nearest",
+  "farthest",
+];
+
+interface SortableStep {
+  toExScore: number;
+  currentExScore: number | null;
+}
+
+const remainingToTarget = (step: SortableStep) =>
+  step.currentExScore == null
+    ? step.toExScore
+    : Math.max(0, step.toExScore - step.currentExScore);
+
+export function sortStepsByOrder<T extends SortableStep>(
+  steps: T[],
+  order: StepSortOrder,
+): T[] {
+  if (order === "added") return steps;
+  const sorted = [...steps].sort(
+    (a, b) => remainingToTarget(a) - remainingToTarget(b),
+  );
+  return order === "nearest" ? sorted : sorted.reverse();
+}
+
+/** 並び替えボタンを一巡りさせる（追加した順→近い順→遠い順→…）。 */
+export function cycleStepSortOrder(current: StepSortOrder): StepSortOrder {
+  const index = STEP_SORT_ORDERS.indexOf(current);
+  return STEP_SORT_ORDERS[(index + 1) % STEP_SORT_ORDERS.length];
+}

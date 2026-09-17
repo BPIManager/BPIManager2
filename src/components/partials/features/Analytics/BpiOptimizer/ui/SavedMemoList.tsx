@@ -26,7 +26,12 @@ import {
 } from "@/components/ui/drawer";
 import { cn } from "@/lib/utils";
 import ActionConfirmDialog from "@/components/partials/modal/Confirmation";
-import { buildStepProgress } from "@/components/partials/common/OptimizerGoalCard";
+import {
+  buildStepProgress,
+  sortStepsByOrder,
+  STEP_SORT_ORDERS,
+  type StepSortOrder,
+} from "@/components/partials/common/OptimizerGoalCard";
 import { fetchSongContribution } from "@/services/swr/analytics";
 import { GoalBpiJourney, GoalSongCard, type GoalSongStep } from "./GoalCard";
 import type { OptimizeMemo } from "@/hooks/analytics/useOptimizeMemo";
@@ -41,29 +46,15 @@ const isMemoAchieved = (
   liveCurrentTotalBpi: number | null,
 ): boolean => {
   const targetTotalBpi = memo.reportData.targetTotalBpi ?? memo.targetBpi;
-  const currentTotalBpi = liveCurrentTotalBpi ?? memo.reportData.currentTotalBpi;
-  if (typeof currentTotalBpi !== "number" || typeof targetTotalBpi !== "number") {
+  const currentTotalBpi =
+    liveCurrentTotalBpi ?? memo.reportData.currentTotalBpi;
+  if (
+    typeof currentTotalBpi !== "number" ||
+    typeof targetTotalBpi !== "number"
+  ) {
     return false;
   }
   return currentTotalBpi >= targetTotalBpi;
-};
-
-type StepSortOrder = "added" | "nearest" | "farthest";
-const STEP_SORT_ORDERS: StepSortOrder[] = ["added", "nearest", "farthest"];
-
-/** 目標EXスコアまでの残り(未プレイは目標スコアそのものを最大距離として扱う)。 */
-const remainingOf = (step: GoalSongStep) =>
-  step.currentExScore == null
-    ? step.toExScore
-    : Math.max(0, step.toExScore - step.currentExScore);
-
-const sortSteps = (
-  steps: GoalSongStep[],
-  order: StepSortOrder,
-): GoalSongStep[] => {
-  if (order === "added") return steps;
-  const sorted = [...steps].sort((a, b) => remainingOf(a) - remainingOf(b));
-  return order === "nearest" ? sorted : sorted.reverse();
 };
 
 /** reportIdをコピーして他ユーザーに共有するためのモーダル（曲目のインポートに使う）。 */
@@ -160,9 +151,10 @@ const GoalDetailDrawer = ({
   onShare: () => void;
 }) => {
   const { t } = useTranslation();
-  const [contributions, setContributions] = useState<Map<number, number> | null>(
-    null,
-  );
+  const [contributions, setContributions] = useState<Map<
+    number,
+    number
+  > | null>(null);
   const [sortOrder, setSortOrder] = useState<StepSortOrder>("added");
 
   useEffect(() => {
@@ -191,7 +183,7 @@ const GoalDetailDrawer = ({
 
   if (!memo) return null;
   const isAuto = memo.kind !== "custom";
-  const sortedSteps = sortSteps(steps, sortOrder);
+  const sortedSteps = sortStepsByOrder(steps, sortOrder);
 
   return (
     <Drawer
@@ -318,7 +310,7 @@ const SavedMemoList = ({
   return (
     <>
       {memos.length > 0 && (
-        <div className="flex min-w-0 gap-1 rounded-lg bg-bpim-overlay/30 p-1">
+        <div className="flex min-w-0 gap-1 mb-4 rounded-lg bg-bpim-overlay/30 p-1">
           {STATUS_FILTERS.map((filter) => (
             <button
               key={filter}

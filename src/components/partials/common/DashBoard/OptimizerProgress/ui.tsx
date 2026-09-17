@@ -5,12 +5,24 @@ import {
   Target,
   Sparkles,
   ArrowUpRight,
+  ArrowUpDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DashCard } from "@/components/ui/dashcard";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuCheckboxItem,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { DIFF_COLORS } from "@/constants/theme/difficultyColors";
 import type { OptimizeMemo } from "@/hooks/analytics/useOptimizeMemo";
+import {
+  sortStepsByOrder,
+  STEP_SORT_ORDERS,
+  type StepSortOrder,
+} from "@/components/partials/common/OptimizerGoalCard";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import OptimizerProgressSkeleton from "./skeleton";
 
@@ -29,6 +41,8 @@ interface OptimizerProgressCardProps {
   currentScores: Map<number, number | null>;
   selectedIndex: number;
   onSelectIndex: (index: number) => void;
+  sortOrder: StepSortOrder;
+  onSortOrderChange: (order: StepSortOrder) => void;
 }
 
 /**
@@ -128,6 +142,8 @@ const OptimizerProgressCard = ({
   currentScores,
   selectedIndex,
   onSelectIndex,
+  sortOrder,
+  onSortOrderChange,
 }: OptimizerProgressCardProps) => {
   const { t, tFormat } = useTranslation();
 
@@ -136,14 +152,17 @@ const OptimizerProgressCard = ({
 
   const clampedIndex = Math.min(selectedIndex, memos.length - 1);
   const memo = memos[clampedIndex];
-  const steps: StepProgress[] = (memo.reportData.steps ?? []).map((step) => ({
-    songId: step.songId,
-    title: step.title,
-    difficulty: step.difficulty,
-    toExScore: step.toExScore,
-    fromExScore: step.fromExScore,
-    currentExScore: currentScores.get(step.songId) ?? null,
-  }));
+  const steps: StepProgress[] = sortStepsByOrder(
+    (memo.reportData.steps ?? []).map((step) => ({
+      songId: step.songId,
+      title: step.title,
+      difficulty: step.difficulty,
+      toExScore: step.toExScore,
+      fromExScore: step.fromExScore,
+      currentExScore: currentScores.get(step.songId) ?? null,
+    })),
+    sortOrder,
+  );
 
   return (
     <DashCard>
@@ -177,6 +196,31 @@ const OptimizerProgressCard = ({
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </>
+          )}
+          {steps.length > 1 && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  title={t(`optimizer.memo.stepSort.${sortOrder}`)}
+                  aria-label={t(`optimizer.memo.stepSort.${sortOrder}`)}
+                >
+                  <ArrowUpDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {STEP_SORT_ORDERS.map((order) => (
+                  <DropdownMenuCheckboxItem
+                    key={order}
+                    checked={sortOrder === order}
+                    onCheckedChange={() => onSortOrderChange(order)}
+                  >
+                    {t(`optimizer.memo.stepSort.${order}`)}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
           <NextLink href="/optimizer">
             <Button
