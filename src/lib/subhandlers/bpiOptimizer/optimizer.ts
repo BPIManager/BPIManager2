@@ -1,19 +1,16 @@
 import type { NextApiRequest } from "next";
 import { bpiOptimizerAggregateRepo } from "@/lib/db/aggregates/bpiOptimizer";
 import { findOptimalBpiPath } from "@/lib/bpi/optimizer";
-import { calculateRadar, buildRadarSongMaster } from "@/lib/radar/calculator";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { topElementMap } from "@/constants/iidx/radars/topElements";
 import { ALL_RADAR_CATEGORIES } from "@/constants/iidx/radars";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
+import { BpiCalculator } from "@/lib/bpi";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { targetOf, type HandleOutcome } from "./_shared";
 import type { RadarCategory } from "@/types/stats/radar";
-import type {
-  SongOptimizerInput,
-  OptimizerOptions,
-} from "@/types/bpi-optimizer";
+import type { SongOptimizerInput, ExecuteOptions } from "@/types/bpi-optimizer";
 
 /** GET /users/[userId]/analytics/bpi-optimizer （withUserApiHandler） */
 export async function handleBpiOptimizer(
@@ -77,54 +74,45 @@ export async function handleBpiOptimizer(
       };
     }
 
-    const radarCategoryBpis: Partial<Record<RadarCategory, number>> = {};
-    const playedScores = rawRows
-      .filter((r) => r.exScore !== null && r.bpi !== null)
-      .map((r) => ({
-        title: r.title,
-        difficulty: r.difficulty,
-        exScore: Number(r.exScore),
-        notes: r.notes,
-        bpi: r.bpi,
-      }));
-
-    if (playedScores.length > 0) {
-      const radarResult = calculateRadar(playedScores, buildRadarSongMaster(rawRows));
-      for (const cat of ALL_RADAR_CATEGORIES) {
-        radarCategoryBpis[cat] = radarResult[cat].totalBpi;
-      }
-    }
-
     const validDifficulties = new Set<string>(IIDX_DIFFICULTIES);
     const candidateDifficulties = difficultiesParam
       .split(",")
       .filter((d) => validDifficulties.has(d));
 
-    const songs: SongOptimizerInput[] = rawRows.map((r) => ({
-      songId: r.songId,
-      title: r.title,
-      difficulty: r.difficulty,
-      difficultyLevel: r.difficultyLevel,
-      notes: r.notes,
-      kaidenAvg: r.kaidenAvg != null ? Number(r.kaidenAvg) : null,
-      wrScore: r.wrScore != null ? Number(r.wrScore) : null,
-      coef: r.coef != null ? Number(r.coef) : null,
-      currentBpi: r.bpi != null ? Number(r.bpi) : -15,
-      currentExScore: r.exScore != null ? Number(r.exScore) : null,
-      isUnplayed: r.bpi == null,
-      radarCategory: topElementMap.get(`${r.title}___${r.difficulty}`) ?? null,
-    }));
+    // BPI(V2)ネイティブの探索エンジンはBPI計算式を再実装せず`BpiCalculator`（V2）に
+    // 一貫して委譲するため、ここでの`currentBpi`もV2の単曲BPI（`BpiCalculator.calc`）を
+    // そのまま使う（DBの`scores.bpi`もV2で書き込まれた値なので一致する）。
+    const songs: SongOptimizerInput[] = rawRows.map((r) => {
+      const exScore = r.exScore != null ? Number(r.exScore) : null;
+      const song = {
+        notes: r.notes,
+        kaidenAvg: r.kaidenAvg != null ? Number(r.kaidenAvg) : null,
+        wrScore: r.wrScore != null ? Number(r.wrScore) : null,
+        coef: r.coef != null ? Number(r.coef) : null,
+        mu: r.mu != null ? Number(r.mu) : null,
+        sigma: r.sigma != null ? Number(r.sigma) : null,
+        residualVar: r.residualVar != null ? Number(r.residualVar) : null,
+      };
+      return {
+        songId: r.songId,
+        title: r.title,
+        difficulty: r.difficulty,
+        difficultyLevel: r.difficultyLevel,
+        ...song,
+        currentBpi: exScore != null ? (BpiCalculator.calc(exScore, song) ?? -15) : -15,
+        currentExScore: exScore,
+        isUnplayed: exScore == null,
+        radarCategory: topElementMap.get(`${r.title}___${r.difficulty}`) ?? null,
+      };
+    });
 
     const strategies = strategiesParam.split(",").filter(Boolean);
     const isFiltered = selectedElements.length < ALL_RADAR_CATEGORIES.length;
     const radarElementFilter = isFiltered ? selectedElements : null;
 
-    const baseOptions: OptimizerOptions & {
-      searchMode: "fastest" | "flexible";
-    } = {
+    const baseOptions: ExecuteOptions = {
       includeUnplayed: strategies.includes("unplayed"),
       includePlayed: strategies.includes("played"),
-      radarCategoryBpis,
       radarElementFilter,
       candidateLevels: [12],
       candidateDifficulties,
@@ -132,23 +120,11 @@ export async function handleBpiOptimizer(
       considerCurrentTotalBpi,
     };
 
-    let result = findOptimalBpiPath(
-      songs,
-      songs.length,
-      targetBpi,
-      baseOptions,
-      maxSteps,
-    );
+    let result = findOptimalBpiPath(songs, targetBpi, baseOptions, maxSteps);
 
     if (!result.achievable && !result.alreadyAchieved && isFiltered) {
-      const fallbackOptions = { ...baseOptions, radarElementFilter: null };
-      const fallbackResult = findOptimalBpiPath(
-        songs,
-        songs.length,
-        targetBpi,
-        fallbackOptions,
-        maxSteps,
-      );
+      const fallbackOptions: ExecuteOptions = { ...baseOptions, radarElementFilter: null };
+      const fallbackResult = findOptimalBpiPath(songs, targetBpi, fallbackOptions, maxSteps);
       if (
         fallbackResult.achievable ||
         fallbackResult.steps.length > result.steps.length

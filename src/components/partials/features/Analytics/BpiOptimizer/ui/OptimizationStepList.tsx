@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import type { OptimizationResult } from "@/types/bpi-optimizer";
 import OptimizationSummary from "./OptimizationSummary";
 import OptimizationStepCard from "./OptimizationStepCard";
+import ColdCategoryNotice from "./ColdCategoryNotice";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface OptimizationStepListProps {
@@ -28,6 +29,10 @@ const OptimizationStepList = ({
         isSaving={isSaving}
         isSaved={isSaved}
       />
+
+      {result.coldCategories && result.coldCategories.length > 0 && (
+        <ColdCategoryNotice coldCategories={result.coldCategories} />
+      )}
 
       {result.steps.length > 0 && (
         <div className="grid grid-cols-1 gap-3">

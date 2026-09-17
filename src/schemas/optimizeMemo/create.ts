@@ -24,6 +24,18 @@ const optimizationStepSchema = z.object({
   isRadarStrength: z.boolean(),
 });
 
+const coldCategoryAdvisorySchema = z.object({
+  category: radarCategorySchema,
+  playedCount: z.number(),
+  suggestions: z.array(
+    z.object({
+      songId: z.number(),
+      title: z.string(),
+      difficulty: z.string(),
+    }),
+  ),
+});
+
 const optimizationResultSchema = z.object({
   steps: z.array(optimizationStepSchema).max(1000),
   currentTotalBpi: z.number(),
@@ -34,6 +46,7 @@ const optimizationResultSchema = z.object({
   totalSongCount: z.number(),
   autoAdjustmentNote: z.string().optional(),
   maxAchievableBpi: z.number().optional(),
+  coldCategories: z.array(coldCategoryAdvisorySchema).optional(),
 });
 
 export const createOptimizeMemoBodySchema = z.object({
