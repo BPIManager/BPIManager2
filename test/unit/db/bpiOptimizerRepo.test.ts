@@ -28,9 +28,36 @@ describe("bpiOptimizerRepo.saveMemo", () => {
 
     expect(typeof reportId).toBe("string");
     const valuesCall = callsFor(dbHolder.current.calls, "values")[0];
-    const values = valuesCall.args[0] as { reportData: string; userId: string };
+    const values = valuesCall.args[0] as {
+      reportData: string;
+      userId: string;
+      kind: string;
+    };
     expect(values.userId).toBe("user-1");
+    expect(values.kind).toBe("auto");
     expect(JSON.parse(values.reportData)).toMatchObject({ targetTotalBpi: 30 });
+  });
+
+  it("kindを指定した場合はそのまま保存すること", async () => {
+    dbHolder.current = createDbSpy(undefined);
+
+    await bpiOptimizerRepo.saveMemo(
+      "user-1",
+      30,
+      {
+        steps: [],
+        currentTotalBpi: 20,
+        targetTotalBpi: 30,
+        achievable: true,
+        alreadyAchieved: false,
+        totalSongCount: 100,
+      },
+      "custom",
+    );
+
+    const valuesCall = callsFor(dbHolder.current.calls, "values")[0];
+    const values = valuesCall.args[0] as { kind: string };
+    expect(values.kind).toBe("custom");
   });
 });
 
@@ -41,6 +68,7 @@ describe("bpiOptimizerRepo.getMemosByUserId", () => {
         reportId: "r1",
         targetBpi: 30,
         reportData: JSON.stringify({ achievable: true }),
+        kind: "custom",
         createdAt: "2025-01-01",
       },
     ]);
@@ -48,6 +76,23 @@ describe("bpiOptimizerRepo.getMemosByUserId", () => {
     const result = await bpiOptimizerRepo.getMemosByUserId("user-1");
 
     expect(result[0].reportData).toEqual({ achievable: true });
+    expect(result[0].kind).toBe("custom");
+  });
+
+  it("kind列が空/未設定の過去データはautoにフォールバックすること", async () => {
+    dbHolder.current = createDbSpy([
+      {
+        reportId: "r1",
+        targetBpi: 30,
+        reportData: JSON.stringify({ achievable: true }),
+        kind: "",
+        createdAt: "2025-01-01",
+      },
+    ]);
+
+    const result = await bpiOptimizerRepo.getMemosByUserId("user-1");
+
+    expect(result[0].kind).toBe("auto");
   });
 
   it("作成日時の降順でソートすること", async () => {

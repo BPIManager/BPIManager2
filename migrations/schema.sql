@@ -227,6 +227,7 @@ CREATE TABLE IF NOT EXISTS `optimizeMemo` (
   `userId` varchar(128) NOT NULL,
   `reportData` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '計算結果のJSON' CHECK (json_valid(`reportData`)),
   `targetBpi` float DEFAULT NULL COMMENT '検索性のための目標BPI（任意）',
+  `kind` varchar(10) NOT NULL DEFAULT 'auto' COMMENT '自動生成プラン(auto)かユーザーが曲・目標を選ぶカスタム目標(custom)か',
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_reportId_unique` (`reportId`),

@@ -7,10 +7,12 @@ export async function saveOptimizeMemo(
   fbUser: FirebaseUser | null | undefined,
   targetBpi: number,
   reportData: OptimizationResult,
+  kind: "auto" | "custom" = "auto",
 ) {
   const res = await authFetch(apiUrl, "POST", fbUser ?? null, {
     targetBpi,
     reportData,
+    kind,
   });
   if (!res.ok) throw new Error("Failed to save memo");
 }

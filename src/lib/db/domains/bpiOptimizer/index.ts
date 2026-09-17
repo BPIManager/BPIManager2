@@ -13,6 +13,7 @@ class BpiOptimizerRepository {
     userId: string,
     targetBpi: number,
     reportData: OptimizationResult,
+    kind: "auto" | "custom" = "auto",
   ) {
     const reportId = uuidv4();
 
@@ -23,6 +24,7 @@ class BpiOptimizerRepository {
         userId,
         targetBpi,
         reportData: JSON.stringify(reportData),
+        kind,
       })
       .execute();
 
@@ -35,13 +37,16 @@ class BpiOptimizerRepository {
   async getMemosByUserId(userId: string) {
     const rows = await db
       .selectFrom("optimizeMemo")
-      .select(["reportId", "targetBpi", "reportData", "createdAt"])
+      .select(["reportId", "targetBpi", "reportData", "kind", "createdAt"])
       .where("userId", "=", userId)
       .orderBy("createdAt", "desc")
       .execute();
 
     return rows.map((row) => ({
       ...row,
+      // kind列追加(#472)前に保存された行はkindが空文字/未設定のことがあるため、
+      // 読み取り側でも自動生成プラン扱いにフォールバックする
+      kind: (row.kind || "auto") as "auto" | "custom",
       reportData: JSON.parse(row.reportData) as OptimizationResult,
     }));
   }
