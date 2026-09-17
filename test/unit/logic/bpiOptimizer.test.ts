@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { findOptimalBpiPath } from "@/lib/bpi/optimizer";
+import { diversityMultiplier } from "@/lib/bpi/optimizer/candidateScorer";
 import { BpiCalculator } from "@/lib/bpi";
 import type { ExecuteOptions, SongOptimizerInput } from "@/types/bpi-optimizer";
 
@@ -242,5 +243,29 @@ describe("findOptimalBpiPath", () => {
 
     expect(result.coldCategories?.some((c) => c.category === "NOTES")).toBe(true);
     expect(result.steps.length).toBeGreaterThan(0);
+  });
+
+  describe("diversityMultiplier（既に得意な曲ばかりが選ばれ続ける偏りへの対策）", () => {
+    it("未プレイ曲は倍率が上乗せされること", () => {
+      const unplayed = makeSong({ currentExScore: null });
+      const played = makeSong({ currentExScore: 1900 });
+
+      expect(diversityMultiplier(unplayed, -15, 30)).toBeGreaterThan(
+        diversityMultiplier(played, 40, 30),
+      );
+    });
+
+    it("現在の総合BPIをまだ下回っている曲は倍率が上乗せされること", () => {
+      const song = makeSong({ currentExScore: 1900 });
+      const belowTotal = diversityMultiplier(song, 20, 30);
+      const aboveTotal = diversityMultiplier(song, 40, 30);
+
+      expect(belowTotal).toBeGreaterThan(aboveTotal);
+    });
+
+    it("未プレイかつ総合BPI未満の場合、両方のボーナスが重なること", () => {
+      const song = makeSong({ currentExScore: null });
+      expect(diversityMultiplier(song, -15, 30)).toBeCloseTo(2.0, 5);
+    });
   });
 });
