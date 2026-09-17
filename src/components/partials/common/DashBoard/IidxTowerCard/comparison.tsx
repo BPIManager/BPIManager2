@@ -1,9 +1,8 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useIidxTowerCompare } from "@/hooks/iidxTower/useIidxTower";
 import { DashCard } from "@/components/ui/dashcard";
 import IidxTowerCardSkeleton from "@/components/partials/common/DashBoard/IidxTowerCard/skeleton";
 import { LordiconAnimation } from "@/components/ui/lordicon-animation";
-import dayjs from "@/lib/dayjs";
 import {
   BarChart,
   Bar,
@@ -17,6 +16,8 @@ import {
 } from "recharts";
 import type { Formatter } from "recharts/types/component/DefaultTooltipContent";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import { useComparisonChartData } from "./useComparisonChartData";
+import CompareBar from "./CompareBar";
 
 const fmt = (n: number) => n.toLocaleString("ja-JP");
 
@@ -87,86 +88,8 @@ function IidxTowerComparisonCard({
   const keyLabel = t("dashboard.iidxTower.key");
   const scratchLabel = t("dashboard.iidxTower.scratch");
 
-  const { myTotals, rivalTotals, chartData, scratchScale } = useMemo(() => {
-    const filterAndGroup = (
-      arr: { playDate: string; keyCount: number; scratchCount: number }[],
-    ) => {
-      const filtered =
-        periodDays === 0
-          ? arr
-          : arr.filter((d) =>
-              dayjs(d.playDate).isAfter(dayjs().subtract(periodDays, "day")),
-            );
-
-      const groups = new Map<string, { key: number; scr: number }>();
-      filtered.forEach((d) => {
-        const dateKey = dayjs(d.playDate)
-          .startOf(granularity)
-          .format("YYYY-MM-DD");
-        const existing = groups.get(dateKey) || { key: 0, scr: 0 };
-        groups.set(dateKey, {
-          key: existing.key + d.keyCount,
-          scr: existing.scr + d.scratchCount,
-        });
-      });
-      return groups;
-    };
-
-    const myGroups = filterAndGroup(myData);
-    const rivalGroups = filterAndGroup(rivalData);
-
-    const myTotals = { key: 0, scratch: 0 };
-    myGroups.forEach((v) => {
-      myTotals.key += v.key;
-      myTotals.scratch += v.scr;
-    });
-    const rivalTotals = { key: 0, scratch: 0 };
-    rivalGroups.forEach((v) => {
-      rivalTotals.key += v.key;
-      rivalTotals.scratch += v.scr;
-    });
-
-    const allDateKeys = Array.from(
-      new Set([...myGroups.keys(), ...rivalGroups.keys()]),
-    ).sort();
-
-    const maxKey = Math.max(
-      ...allDateKeys.map((d) =>
-        Math.max(myGroups.get(d)?.key || 0, rivalGroups.get(d)?.key || 0),
-      ),
-    );
-    const maxScr = Math.max(
-      ...allDateKeys.map((d) =>
-        Math.max(myGroups.get(d)?.scr || 0, rivalGroups.get(d)?.scr || 0),
-      ),
-    );
-
-    const scratchScale = maxKey > 0 && maxScr > 0 ? maxKey / maxScr : 1;
-
-    const chartData = allDateKeys.map((dateKey) => {
-      const myVal = myGroups.get(dateKey);
-      const rivalVal = rivalGroups.get(dateKey);
-
-      let label = dayjs(dateKey).format("MM/DD");
-      if (granularity === "month") label = dayjs(dateKey).format("YY/MM");
-      if (granularity === "week") label = `${dayjs(dateKey).format("MM/DD")}~`;
-
-      const rawMyScr = myVal?.scr || 0;
-      const rawRivalScr = rivalVal?.scr || 0;
-
-      return {
-        date: label,
-        myKey: myVal?.key || 0,
-        rivalKey: rivalVal?.key || 0,
-        myScr: rawMyScr > 0 ? -(rawMyScr * scratchScale) : 0,
-        rivalScr: rawRivalScr > 0 ? -(rawRivalScr * scratchScale) : 0,
-        rawMyScr,
-        rawRivalScr,
-      };
-    });
-
-    return { myTotals, rivalTotals, chartData, scratchScale };
-  }, [myData, rivalData, periodDays, granularity]);
+  const { myTotals, rivalTotals, chartData, scratchScale } =
+    useComparisonChartData(myData, rivalData, periodDays, granularity);
 
   const bothEmpty = myData.length === 0 && rivalData.length === 0;
 
@@ -384,62 +307,6 @@ function IidxTowerComparisonCard({
         )}
       </div>
     </DashCard>
-  );
-}
-
-function CompareBar({
-  label,
-  myValue,
-  rivalValue,
-  myName,
-  rivalName,
-  myColor,
-  rivalColor,
-}: {
-  label: string;
-  myValue: number;
-  rivalValue: number;
-  myName: string;
-  rivalName: string;
-  myColor: string;
-  rivalColor: string;
-}) {
-  const total = myValue + rivalValue || 1;
-  const myPct = Math.round((myValue / total) * 100);
-  const rivalPct = 100 - myPct;
-
-  return (
-    <div>
-      <div className="mb-1 flex items-center justify-between text-[10px] font-bold text-bpim-muted">
-        <span>{label}</span>
-      </div>
-      <div className="flex items-center gap-2 text-[11px]">
-        <span className="tabular-nums w-16 truncate text-right font-bold text-bpim-text">
-          {fmt(myValue)}
-        </span>
-        <div className="flex h-2 flex-1 overflow-hidden rounded-full bg-bpim-surface-3">
-          <div
-            className="transition-all duration-500"
-            style={{ width: `${myPct}%`, backgroundColor: myColor }}
-          />
-          <div
-            className="transition-all duration-500"
-            style={{ width: `${rivalPct}%`, backgroundColor: rivalColor }}
-          />
-        </div>
-        <span className="tabular-nums w-16 truncate font-bold text-bpim-text">
-          {fmt(rivalValue)}
-        </span>
-      </div>
-      <div className="mt-0.5 flex items-center justify-between text-[9px]">
-        <span style={{ color: myColor }}>
-          {myName} ({myPct}%)
-        </span>
-        <span style={{ color: rivalColor }}>
-          ({rivalPct}%) {rivalName}
-        </span>
-      </div>
-    </div>
   );
 }
 

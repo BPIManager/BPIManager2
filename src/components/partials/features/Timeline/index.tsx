@@ -1,6 +1,7 @@
 "use client";
 
-import { Activity, LucideIcon, Swords, UserCheck } from "lucide-react";
+import { useEffect } from "react";
+import { Activity, ListChecks, LucideIcon, Swords, UserCheck, Users } from "lucide-react";
 import { SectionLoader } from "@/components/ui/loading-spinner";
 import TimelineList from "./ui";
 import {
@@ -12,6 +13,7 @@ import { LoginRequiredCard } from "@/components/partials/common/Auth/LoginRequir
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useTimelineFilter } from "@/hooks/social/useTimelineFilter";
+import { useFollowLists } from "@/hooks/users/useFollowLists";
 import { IidxDifficulty } from "@/types/iidx/difficulty";
 import {
   PageContainer,
@@ -40,7 +42,19 @@ const TimelineContainer = () => {
     updateParams,
     toggleLevel,
     toggleDifficulty,
+    listId,
+    setListId,
   } = useTimelineFilter();
+  const { lists } = useFollowLists(user?.userId || false);
+
+  // 選択中のリストが削除された場合、フィルタを「すべて」に戻す
+  // (#277のRivalListContainerと同じ理由: listIdを保持したままだと、
+  // 存在しないリストへの絞り込みリクエストが送られ続ける)
+  useEffect(() => {
+    if (listId != null && !lists.some((l) => l.id === listId)) {
+      setListId(null);
+    }
+  }, [listId, lists, setListId]);
 
   if (isLoading) {
     return <SectionLoader className="h-64 w-full" />;
@@ -60,6 +74,49 @@ const TimelineContainer = () => {
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[260px_1fr] items-start">
           <aside className="lg:sticky lg:top-20 z-10">
             <div className="flex flex-col gap-6 rounded-xl border border-bpim-border bg-bpim-bg/40 p-4 backdrop-blur-sm">
+              <div className="flex flex-col gap-1">
+                <FilterHeader label={t("timeline.version.label")} />
+                <Select value={version} onValueChange={setVersion}>
+                  <SelectTrigger className="h-8 text-xs w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {versionTitles
+                      .filter((v) => !v.disabled)
+                      .map((v) => (
+                        <SelectItem
+                          key={v.num}
+                          value={v.num}
+                          className="text-xs"
+                        >
+                          {v.title}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {lists.length > 0 && (
+                <div className="flex flex-col gap-1">
+                  <FilterHeader label={t("timeline.list.label")} />
+                  <MenuButton
+                    isActive={listId === null}
+                    icon={Users}
+                    label={t("timeline.list.all")}
+                    onClick={() => setListId(null)}
+                  />
+                  {lists.map((list) => (
+                    <MenuButton
+                      key={list.id}
+                      isActive={listId === list.id}
+                      icon={ListChecks}
+                      label={list.name}
+                      onClick={() => setListId(list.id)}
+                    />
+                  ))}
+                </div>
+              )}
+
               <div className="flex flex-col gap-1">
                 <FilterHeader label={t("timeline.mode.label")} />
                 <MenuButton
@@ -81,28 +138,6 @@ const TimelineContainer = () => {
                   activeVariant="destructive"
                   onClick={() => setMode("overtaken")}
                 />
-              </div>
-
-              <div className="flex flex-col gap-1">
-                <FilterHeader label={t("timeline.version.label")} />
-                <Select value={version} onValueChange={setVersion}>
-                  <SelectTrigger className="h-8 text-xs w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {versionTitles
-                      .filter((v) => !v.disabled)
-                      .map((v) => (
-                        <SelectItem
-                          key={v.num}
-                          value={v.num}
-                          className="text-xs"
-                        >
-                          {v.title}
-                        </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
               </div>
 
               <FilterCheckboxGroup
@@ -134,7 +169,12 @@ const TimelineContainer = () => {
               />
             </div>
 
-            <TimelineList mode={mode} params={filterParams} version={version} />
+            <TimelineList
+              mode={mode}
+              params={filterParams}
+              version={version}
+              listId={listId}
+            />
           </div>
         </div>
       </PageContainer>

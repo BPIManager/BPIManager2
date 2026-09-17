@@ -8,7 +8,7 @@ import ArenaClassBadge from "@/components/partials/common/Badge/ArenaClassBadge"
 
 interface RankingRowProps {
   entry: RankingEntry;
-  onClick?: () => void;
+  onClick?: (userId: string) => void;
   style?: React.CSSProperties;
 }
 
@@ -83,7 +83,7 @@ const RankingRowComponent = ({ entry, onClick, style }: RankingRowProps) => {
       type="button"
       className="w-full text-left"
       style={style}
-      onClick={onClick}
+      onClick={onClick ? () => onClick(entry.userId) : undefined}
     >
       {inner}
     </button>

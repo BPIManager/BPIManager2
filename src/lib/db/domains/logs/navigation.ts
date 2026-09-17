@@ -121,13 +121,14 @@ class LogNavigationRepository {
   }
 
   /**
-   * 特定のバッチIDからログ情報を取得します
+   * 特定のユーザーの特定のバッチIDからログ情報を取得します
    */
-  async findBatchById(batchId: string) {
+  async findBatchById(batchId: string, userId: string) {
     return await db
       .selectFrom("logs")
       .select(["batchId", "createdAt", "totalBpi"])
       .where("batchId", "=", batchId)
+      .where("userId", "=", userId)
       .executeTakeFirst();
   }
 

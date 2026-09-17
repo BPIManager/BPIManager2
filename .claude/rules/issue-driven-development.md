@@ -7,7 +7,7 @@ AI（issue-runner等のスキル）がissueを消化していく際の運用ル�
 - すべての作業ブランチ（`fix/`・`refactor/`・`docs/`・`feat/`）は、**master へ直接マージしない**。まず `staging` へマージし、`staging` → `master` は別段階（後述）でまとめて行う
   - 理由: `master` への push が本番デプロイをトリガーする（`.github/workflows/ci.yml` の `deploy` ジョブ）。issueごとに逐次masterへマージするとデプロイが都度走ってしまうため、`staging` に一旦集約してからまとめてリリースする
 - `fix/`・`refactor/`・`docs/`ブランチ（バグ修正・挙動不変のリファクタ・ドキュメント）は、検証通過後に直接 `staging` へff-only mergeしてよい
-- `feat/`ブランチ（機能追加・仕様issue）は、実装が意図した仕様と一致しているかを人間がレビューできるよう、直接mergeせず必ず `staging` 宛のPRを作成する。マージ・issueクローズはユーザーのレビュー後に行う
+- `feat/`ブランチ（機能追加・仕様issue）は、実装が意図した仕様と一致しているかを人間がレビューできるよう、直接mergeせず必ず `staging` 宛のPRを作成する（`gh pr create --base staging`）。マージ・issueクローズはユーザーのレビュー後に行う
 - 理由: バグ修正・軽微なリファクタは機械的検証（tsc/lint/test/build）で十分だが、機能追加・仕様issueは「意図通りに実装できているか」の判断が機械的検証だけでは担保できないため
 
 ## staging → master のリリースPR

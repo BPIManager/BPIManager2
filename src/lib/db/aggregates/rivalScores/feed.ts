@@ -26,6 +26,9 @@ class SocialTimelineRepository {
    * @param params.search - ユーザー名または曲名の部分一致検索
    * @param params.levels - 対象難易度レベルの配列
    * @param params.difficulties - 対象難易度文字列の配列
+   * @param params.listId - 指定時、`viewerId`が所有するこのフォローリストの
+   *   所属ユーザーだけに絞り込む（呼び出し元で所有権を確認済みであること。
+   *   #278）
    */
   async getFollowedTimeline(params: {
     viewerId: string;
@@ -36,6 +39,7 @@ class SocialTimelineRepository {
     search?: string;
     levels?: number[];
     difficulties?: string[];
+    listId?: number;
   }) {
     const {
       viewerId,
@@ -46,6 +50,7 @@ class SocialTimelineRepository {
       search,
       levels,
       difficulties,
+      listId,
     } = params;
 
     // 2フェーズで取得する。
@@ -86,6 +91,16 @@ class SocialTimelineRepository {
               .whereRef("fan.actorId", "=", "u.userId"),
           ),
         ]),
+      )
+      .$if(listId !== undefined, (qb) =>
+        qb.where(
+          "f.followingId",
+          "in",
+          db
+            .selectFrom("followListMembers")
+            .select("followingId")
+            .where("listId", "=", listId as number),
+        ),
       )
       .$if(needsSongJoin, (qb) => {
         let q = qb.innerJoin("songs as m", "s.songId", "m.songId");

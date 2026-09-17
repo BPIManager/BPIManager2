@@ -63,7 +63,7 @@ GitHubのopen issueを順序立てて解消する。1issue = 1ブランチ = 1�
 1. `gh issue view <番号>` で内容を熟読する。背景・再現手順・期待動作を正確に理解する。曖昧なら質問する
 2. **ブランチを切る**: `git checkout -b <種別>/<内容を表す短い英語名>`
    - 種別は `fix/`（バグ修正）, `refactor/`（構造変更、挙動不変）, `feat/`（新機能）, `docs/` を状況に応じて使う
-   - 既存のmasterが未pushの変更を持っていないか事前に確認する（`git status`, `git log origin/master..master`）
+   - 既存の`staging`が未pushの変更を持っていないか事前に確認する（`git status`, `git log origin/staging..staging`）
 3. **実装**: コーディング規約（`.claude/rules/`配下、該当パスで自動読み込み）に従う。挙動を変えないリファクタは「絶対に挙動が変わらないこと」を強く意識し、既存コードを注意深く読んでから着手する。途中で仕様が変わった場合はissue本文を更新する（`.claude/rules/issue-driven-development.md`の「仕様変更の記録」参照）
 4. **検証**（プロジェクトに応じて存在するものを実行。全部揃っているとは限らない）:
    - `pnpm exec tsc --noEmit -p .`（型エラーなし）
@@ -80,10 +80,10 @@ GitHubのopen issueを順序立てて解消する。1issue = 1ブランチ = 1�
 6. **マージ方式の分岐**: ブランチ種別（手順2で選んだプレフィックス）で分岐する。詳細は `.claude/rules/issue-driven-development.md` を参照
    - `fix/`・`refactor/`・`docs/`（バグ修正・挙動不変のリファクタ・ドキュメント）→ **6A. 直接merge**
    - `feat/`（機能追加・仕様issue）→ **6B. PR経由**
-   - 6A: 確認ありモードはユーザーに「マージ・pushしますか」と確認、全自動モードは検証通過後すぐ進める。`git checkout master && git merge <branch> --ff-only`（fast-forward不可なら理由を確認してrebaseを検討）してから `git push origin master`。Windows環境でフォルダ名の大文字小文字だけを変えるリネームを含む場合、`git checkout` がcase-insensitiveなファイルシステムの衝突でuntracked-file-would-be-overwrittenエラーを出すことがある。その場合は `git branch -f master <branch>` でrefだけ進めてから `git checkout master` する（作業木の実体は既に同じツリーなので安全）。push後、コミットメッセージに `Closes #N` を含めていればissueが自動クローズされる。念のため `gh issue view <番号> --json state` で確認する
-   - 6B: `git push origin <branch>` でリモートへpushし、`gh pr create --title ... --body ...` でPRを作成する。PR本文に対応issueへの`Closes #N`を含める。全自動モードでもここでは自動マージまで進めず、**PR作成をもって当該issueの処理完了とする**（マージ・issueクローズはユーザーのレビュー後）
+   - 6A: 確認ありモードはユーザーに「マージ・pushしますか」と確認、全自動モードは検証通過後すぐ進める。`git checkout staging && git merge <branch> --ff-only`（fast-forward不可なら理由を確認してrebaseを検討）してから `git push origin staging`。Windows環境でフォルダ名の大文字小文字だけを変えるリネームを含む場合、`git checkout` がcase-insensitiveなファイルシステムの衝突でuntracked-file-would-be-overwrittenエラーを出すことがある。その場合は `git branch -f staging <branch>` でrefだけ進めてから `git checkout staging` する（作業木の実体は既に同じツリーなので安全）。`staging`はリポジトリのデフォルトブランチではないため、コミットメッセージに `Closes #N` を含めていても**この時点ではissueは自動クローズされない**（GitHubのissue自動クローズはデフォルトブランチへのマージ時のみ発火する）。issueは`staging`→`master`のリリースPRがmasterへマージされた時点でまとめてクローズされる想定のため、ここでは`gh issue view <番号> --json state`で確認する必要はない
+   - 6B: `git push origin <branch>` でリモートへpushし、`gh pr create --base staging --title ... --body ...` でPRを作成する。PR本文に対応issueへの`Closes #N`を含める。全自動モードでもここでは自動マージまで進めず、**PR作成をもって当該issueの処理完了とする**（マージ・issueクローズはユーザーのレビュー後）
 7. **ブランチ削除**（6Aのみ）: マージ後、ローカル・リモート双方の作業ブランチを削除する。確認ありモードは削除してよいか確認してから、全自動モードは確認せず削除して次のissueへ進む。6B（PR経由）はPRがマージされるまでブランチを残す
-8. **完了報告**: 全自動モードでは、この時点で1〜2文の完了報告（6Aは何をClosesしたか、6BはPR URL）だけ出して次issueへ。確認や感想を求める文で終わらせない（会話が止まる原因になる）
+8. **完了報告**: 全自動モードでは、この時点で1〜2文の完了報告（6Aは`staging`へ何をmergeしたか、6BはPR URL）だけ出して次issueへ。issueのクローズは`staging`→`master`リリース時点であることを踏まえた文言にする。確認や感想を求める文で終わらせない（会話が止まる原因になる）
 
 ## 安全策
 

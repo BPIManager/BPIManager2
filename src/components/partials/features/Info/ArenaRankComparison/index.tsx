@@ -9,14 +9,10 @@ import {
 import { DashCard } from "@/components/ui/dashcard";
 import { useOfficialArena } from "@/hooks/siteStats/useOfficialArena";
 import { getArenaClassColor } from "@/utils/arenaClass";
-import { latestVersion } from "@/constants/iidx/iidxVersions";
+import { latestVersion, arenaDataVersion } from "@/constants/iidx/iidxVersions";
 import { versionsNonDisabledCollection } from "@/constants/iidx/versionTitles";
 import type { ArenaRankEntry } from "@/types/siteStats";
 import { AlertCircleIcon } from "lucide-react";
-
-// 公式アリーナデータの取得元(eAMUSEMENT公式サイト)がまだ最新バージョンに対応して
-// おらず、直近で実データが揃っているのがv33のため暫定的にデフォルト表示に固定する
-const DEFAULT_VERSION = "33";
 
 function ArenaRankComparison({
   selfReported,
@@ -28,8 +24,8 @@ function ArenaRankComparison({
     (v) => selfReportedByVersion[v.value]?.some((e) => e.count > 0),
   );
   const [version, setVersion] = useState<string>(
-    selfReportedByVersion[DEFAULT_VERSION]
-      ? DEFAULT_VERSION
+    selfReportedByVersion[arenaDataVersion]
+      ? arenaDataVersion
       : (availableVersions[0]?.value ?? latestVersion),
   );
 

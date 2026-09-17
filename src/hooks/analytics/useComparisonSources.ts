@@ -2,6 +2,7 @@ import useSWR from "swr";
 import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
 import { fetcherV2 } from "@/services/swr/fetchV2";
 import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
+import { arenaDataVersion } from "@/constants/iidx/iidxVersions";
 import type { ArenaAverageRow, RivalAvgRow, RivalTopRow } from "./comparisonRows";
 
 /**
@@ -34,15 +35,14 @@ export const useRivalTopScores = (
   return { data, error, isLoading };
 };
 
-export const useArenaJson = (version: string, levels: number[]) => {
-  const v = "32";
+export const useArenaJson = (levels: number[]) => {
   const { data: data11, isLoading: l11 } = useSWR<ArenaAverageRow[]>(
-    levels.includes(11) ? `/data/metrics/arena/${v}_11.json` : null,
+    levels.includes(11) ? `/data/metrics/arena/${arenaDataVersion}_11.json` : null,
     fetcherV2,
     { revalidateOnFocus: false },
   );
   const { data: data12, isLoading: l12 } = useSWR<ArenaAverageRow[]>(
-    levels.includes(12) ? `/data/metrics/arena/${v}_12.json` : null,
+    levels.includes(12) ? `/data/metrics/arena/${arenaDataVersion}_12.json` : null,
     fetcherV2,
     { revalidateOnFocus: false },
   );

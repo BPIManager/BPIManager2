@@ -22,6 +22,9 @@ export function useTimelineFilter() {
     difficulties: [...IIDX_DIFFICULTIES],
     search: "",
   });
+  // フォローリストによる絞り込み(#278)。未選択(null)時は既存挙動どおり
+  // フォロー中全ユーザーが対象になる。
+  const [listId, setListId] = useState<number | null>(null);
 
   const updateParams = (newParams: Partial<FilterParamsFrontend>) => {
     setFilterParams((prev) => ({ ...prev, ...newParams }));
@@ -44,5 +47,7 @@ export function useTimelineFilter() {
     updateParams,
     toggleLevel,
     toggleDifficulty,
+    listId,
+    setListId,
   };
 }

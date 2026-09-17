@@ -1,11 +1,1 @@
-import { User as FirebaseUser } from "firebase/auth";
-import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
-import { authFetch } from "@/utils/common/fetch";
-
-export async function markNotificationsRead(fbUser: FirebaseUser) {
-  await authFetch(
-    `${API_V2_PREFIX}/users/${fbUser.uid}/notifications`,
-    "POST",
-    fbUser,
-  );
-}
+export { markNotificationsRead } from "./markNotificationsRead";

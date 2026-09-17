@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { useUser } from "@/contexts/users/UserContext";
-import { useScoreHistory } from "@/hooks/score/useScoreLogs";
+import { useScoreHistory } from "@/hooks/scores/useScoreLogs";
 import { useAllScoreHistory } from "@/hooks/allScores/useAllScoresHistory";
 import { versionTitles } from "@/constants/iidx/versionTitles";
 import { Separator } from "@/components/ui/separator";

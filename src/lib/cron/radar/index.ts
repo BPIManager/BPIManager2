@@ -10,32 +10,12 @@ import {
 } from "@/lib/db/domains/radar";
 import type { IBpiBasicSongData, IBpiScoreObservation } from "@/types/songs/bpi";
 
-/** 同時に処理するユーザー数の上限。DB・イベントループへの負荷とジョブ実行時間のバランスを取る。 */
-const CONCURRENCY = 10;
-
 /**
- * 各アイテムに対する非同期処理を、指定した同時実行数を超えないよう実行する。
- *
- * @param items - 処理対象の配列
- * @param limit - 同時実行数の上限
- * @param worker - 各アイテムに対する非同期処理
+ * {@link statsTablesRepo.getLatestScoresWithMusicDataForAllUsers}を1回呼ぶ際に
+ * 対象とするユーザー数の上限。PM2の`max_memory_restart`（deploy/ecosystem.config.js）を
+ * 超えないよう、スコア行をメモリ上に保持する範囲をこのページ単位に抑える。
  */
-async function runWithConcurrency<T>(
-  items: T[],
-  limit: number,
-  worker: (item: T, index: number) => Promise<void>,
-): Promise<void> {
-  let cursor = 0;
-  async function runNext(): Promise<void> {
-    while (cursor < items.length) {
-      const index = cursor++;
-      await worker(items[index], index);
-    }
-  }
-  await Promise.all(
-    Array.from({ length: Math.min(limit, items.length) }, runNext),
-  );
-}
+const USER_PAGE_SIZE = 200;
 
 /**
  * 全ユーザーのレーダーキャッシュ（`userRadarCache` テーブル）を最新スコアで更新する。
@@ -44,8 +24,9 @@ async function runWithConcurrency<T>(
  * 総合 BPI とともに算出結果をメモリ上に集約したうえで、最後にbulk UPSERTで
  * まとめて書き込むことでDBラウンドトリップ数を削減する。
  * スコアが存在しないユーザーはスキップされる。
- * ユーザー数の増加に伴う実行時間の線形増大を避けるため、
- * 読み取り・計算部分は{@link CONCURRENCY}件ずつ並列処理する。
+ * ユーザーIDを{@link USER_PAGE_SIZE}件ずつのページに区切り、ページ単位で
+ * `getLatestScoresWithMusicDataForAllUsers`を1回だけ呼んでスコア行を取得・集計してから
+ * 次のページへ進む。
  */
 export async function updateAllUserRadarCache() {
   const version = latestVersion;
@@ -58,79 +39,101 @@ export async function updateAllUserRadarCache() {
   let done = 0;
   const pendingRows: NewUserRadarCache[] = [];
 
-  await runWithConcurrency(users, CONCURRENCY, async (user) => {
-    try {
-      const scores = await statsTablesRepo.getLatestScoresWithMusicData(
-        user.userId,
+  for (
+    let pageStart = 0;
+    pageStart < users.length;
+    pageStart += USER_PAGE_SIZE
+  ) {
+    const userPage = users.slice(pageStart, pageStart + USER_PAGE_SIZE);
+    const pageScores =
+      await statsTablesRepo.getLatestScoresWithMusicDataForAllUsers(
         version,
+        userPage.map((u) => u.userId),
       );
 
-      if (scores.length > 0) {
-        const radar = calculateRadar(scores, radarSongMaster);
-
-        const master: (IBpiBasicSongData & { songId: number })[] = scores.map(
-          (s) => ({
-            songId: s.songId,
-            notes: Number(s.notes),
-            kaidenAvg: s.kaidenAvg,
-            wrScore: s.wrScore,
-            coef: s.coef,
-            mu: s.mu,
-            sigma: s.sigma,
-            residualVar: s.residualVar,
-          }),
-        );
-        const observations: IBpiScoreObservation[] = scores
-          .filter((s) => s.exScore != null)
-          .map((s) => ({
-            songId: s.songId,
-            notes: Number(s.notes),
-            exScore: Number(s.exScore),
-          }));
-        const totalBpi = BpiCalculator.calculateTotalBPI(observations, master);
-
-        const values = {
-          notes: radar.NOTES.totalBpi,
-          chord: radar.CHORD.totalBpi,
-          peak: radar.PEAK.totalBpi,
-          charge: radar.CHARGE.totalBpi,
-          scratch: radar.SCRATCH.totalBpi,
-          soflan: radar.SOFLAN.totalBpi,
-          totalBpi,
-        };
-        // BPI計算ライブラリ側で不正なチャートデータ（mu/sigma欠損等）に当たると
-        // NaNを返すことがある。`NaN.toFixed(2)`は例外を投げず文字列"NaN"になり、
-        // decimal列への一括INSERTがバッチ全体失敗するため、書き込み前に弾く
-        const invalidKey = Object.entries(values).find(
-          ([, v]) => !Number.isFinite(v),
-        )?.[0];
-        if (invalidKey) {
-          console.error(
-            `[Radar] Skipped user ${user.userId}: non-finite ${invalidKey} (${values[invalidKey as keyof typeof values]})`,
-          );
-          return;
-        }
-
-        pendingRows.push({
-          userId: user.userId,
-          version,
-          notes: values.notes.toFixed(2),
-          chord: values.chord.toFixed(2),
-          peak: values.peak.toFixed(2),
-          charge: values.charge.toFixed(2),
-          scratch: values.scratch.toFixed(2),
-          soflan: values.soflan.toFixed(2),
-          totalBpi: values.totalBpi.toFixed(2),
-        });
+    const scoresByUser = new Map<string, typeof pageScores>();
+    for (const row of pageScores) {
+      const list = scoresByUser.get(row.userId);
+      if (list) {
+        list.push(row);
+      } else {
+        scoresByUser.set(row.userId, [row]);
       }
-    } catch (e) {
-      process.stdout.write("\r\x1b[K");
-      console.error(`[Radar] Failed for user ${user.userId}:`, e);
-    } finally {
-      done++;
-      process.stdout.write(`\r\x1b[K[Radar] Calculating... ${done}/${total}`);
     }
-  });
+
+    for (const user of userPage) {
+      try {
+        const scores = scoresByUser.get(user.userId) ?? [];
+
+        if (scores.length > 0) {
+          const radar = calculateRadar(scores, radarSongMaster);
+
+          const master: (IBpiBasicSongData & { songId: number })[] =
+            scores.map((s) => ({
+              songId: s.songId,
+              notes: Number(s.notes),
+              kaidenAvg: s.kaidenAvg,
+              wrScore: s.wrScore,
+              coef: s.coef,
+              mu: s.mu,
+              sigma: s.sigma,
+              residualVar: s.residualVar,
+            }));
+          const observations: IBpiScoreObservation[] = scores
+            .filter((s) => s.exScore != null)
+            .map((s) => ({
+              songId: s.songId,
+              notes: Number(s.notes),
+              exScore: Number(s.exScore),
+            }));
+          const totalBpi = BpiCalculator.calculateTotalBPI(
+            observations,
+            master,
+          );
+
+          const values = {
+            notes: radar.NOTES.totalBpi,
+            chord: radar.CHORD.totalBpi,
+            peak: radar.PEAK.totalBpi,
+            charge: radar.CHARGE.totalBpi,
+            scratch: radar.SCRATCH.totalBpi,
+            soflan: radar.SOFLAN.totalBpi,
+            totalBpi,
+          };
+          // BPI計算ライブラリ側で不正なチャートデータ（mu/sigma欠損等）に当たると
+          // NaNを返すことがある。`NaN.toFixed(2)`は例外を投げず文字列"NaN"になり、
+          // decimal列への一括INSERTがバッチ全体失敗するため、書き込み前に弾く
+          const invalidKey = Object.entries(values).find(
+            ([, v]) => !Number.isFinite(v),
+          )?.[0];
+          if (invalidKey) {
+            console.error(
+              `[Radar] Skipped user ${user.userId}: non-finite ${invalidKey} (${values[invalidKey as keyof typeof values]})`,
+            );
+            continue;
+          }
+
+          pendingRows.push({
+            userId: user.userId,
+            version,
+            notes: values.notes.toFixed(2),
+            chord: values.chord.toFixed(2),
+            peak: values.peak.toFixed(2),
+            charge: values.charge.toFixed(2),
+            scratch: values.scratch.toFixed(2),
+            soflan: values.soflan.toFixed(2),
+            totalBpi: values.totalBpi.toFixed(2),
+          });
+        }
+      } catch (e) {
+        process.stdout.write("\r\x1b[K");
+        console.error(`[Radar] Failed for user ${user.userId}:`, e);
+      } finally {
+        done++;
+        process.stdout.write(`\r\x1b[K[Radar] Calculating... ${done}/${total}`);
+      }
+    }
+  }
 
   process.stdout.write("\r\x1b[K");
   console.log(`[Radar] Writing cache for ${pendingRows.length} users...`);
