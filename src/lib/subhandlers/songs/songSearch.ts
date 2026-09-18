@@ -5,21 +5,22 @@ import { ALL_RADAR_CATEGORIES } from "@/constants/iidx/radars";
 import type { RadarCategory } from "@/types/stats/radar";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
-import { num, resolveVersion, type HandleOutcome, type IIDXVersion } from "./_shared";
+import {
+  num,
+  resolveVersion,
+  type HandleOutcome,
+  type IIDXVersion,
+} from "./_shared";
 
 const SEARCH_LIMIT = 20;
-/** 曲名指定なしで一覧表示する場合(レーダー項目/BPM帯)のDB取得上限・表示上限 */
-const BROWSE_FETCH_LIMIT = 1000;
-const BROWSE_DISPLAY_LIMIT = 150;
+/** 曲名指定なしで一覧表示する場合(楽曲一覧・レーダー項目/BPM帯)のDB取得上限。全件返す */
+const BROWSE_FETCH_LIMIT = 2000;
 
 export type BpmBand = "slow" | "mid" | "fast" | "soflan";
 const BPM_BANDS: BpmBand[] = ["slow", "mid", "fast", "soflan"];
 
 /**
  * 曲のBPM表記から低速(~135)/中速(135~170)/高速(170~)/SOFLANに分類する。
- * "120-180"のようなハイフン等区切りの可変速表記は、平均値で速度帯に
- * 丸めてしまうと実際の体感速度と乖離するため、速度帯とは別にSOFLANとして
- * 扱う（単一BPM値の曲のみ低速/中速/高速で分類する）。
  */
 function bpmBandOf(bpm: string): BpmBand {
   if (/[-〜~]/.test(bpm)) return "soflan";
@@ -34,31 +35,29 @@ function bpmBandOf(bpm: string): BpmBand {
  * GET /songs/search?title=...&version=...&difficultyLevel=12
  *   &radarCategory=NOTES&bpmBand=slow
  *
- * title・radarCategory・bpmBandはいずれか1つ以上を指定する想定。titleは
- * 部分一致の絞り込み検索、radarCategory/bpmBandは曲名を介さない一覧表示
- * （ノーツレーダー項目別・BPM帯別）に使う。
  */
 export async function handleSongSearch(
   req: NextApiRequest,
 ): Promise<HandleOutcome<unknown>> {
   const base = { targetUserId: "", viewerId: null };
-  const title = typeof req.query.title === "string" ? req.query.title.trim() : "";
+  const title =
+    typeof req.query.title === "string" ? req.query.title.trim() : "";
   const radarCategoryRaw =
     typeof req.query.radarCategory === "string" ? req.query.radarCategory : "";
-  const radarCategory = (ALL_RADAR_CATEGORIES as string[]).includes(radarCategoryRaw)
+  const radarCategory = (ALL_RADAR_CATEGORIES as string[]).includes(
+    radarCategoryRaw,
+  )
     ? (radarCategoryRaw as RadarCategory)
     : undefined;
-  const bpmBandRaw = typeof req.query.bpmBand === "string" ? req.query.bpmBand : "";
+  const bpmBandRaw =
+    typeof req.query.bpmBand === "string" ? req.query.bpmBand : "";
   const bpmBand = (BPM_BANDS as string[]).includes(bpmBandRaw)
     ? (bpmBandRaw as BpmBand)
     : undefined;
 
-  if (title.length === 0 && !radarCategory && !bpmBand) {
-    return { result: ok([]), ...base };
-  }
-
   try {
-    const isBrowsing = title.length === 0 && (radarCategory || bpmBand);
+    // 曲名未指定は、レーダー項目/BPM帯別のブラウズに限らず「楽曲一覧」表示としても使う
+    const isBrowsing = title.length === 0;
     const songs = await songsRepo.searchSongs({
       version: resolveVersion(req.query.version) as IIDXVersion,
       title: title || undefined,
@@ -69,7 +68,8 @@ export async function handleSongSearch(
     let filtered = songs;
     if (radarCategory) {
       filtered = filtered.filter(
-        (s) => topElementMap.get(`${s.title}___${s.difficulty}`) === radarCategory,
+        (s) =>
+          topElementMap.get(`${s.title}___${s.difficulty}`) === radarCategory,
       );
     }
     if (bpmBand) {
@@ -77,7 +77,7 @@ export async function handleSongSearch(
     }
 
     return {
-      result: ok(isBrowsing ? filtered.slice(0, BROWSE_DISPLAY_LIMIT) : filtered),
+      result: ok(filtered),
       ...base,
     };
   } catch (error: unknown) {
