@@ -10,7 +10,7 @@ export const songContributionBodySchema = z.object({
       }),
     )
     .min(1)
-    .max(50),
+    .max(2000),
 });
 
 export type SongContributionBodyInput = z.output<

@@ -48,15 +48,11 @@ export async function handleSongContribution(
     );
     const rowBySongId = new Map(rawRows.map((r) => [r.songId, r]));
 
-    for (const target of parsed.data.targets) {
-      if (!rowBySongId.has(target.songId)) {
-        return {
-          result: err(400, `Unknown songId: ${target.songId}`),
-          targetUserId: userId,
-          viewerId,
-        };
-      }
-    }
+    // 存在しない曲（曲データ削除等）はリクエスト全体を失敗させず、
+    // その曲だけ無視して残りを処理する
+    const validTargets = parsed.data.targets.filter((target) =>
+      rowBySongId.has(target.songId),
+    );
 
     const allSongs: (IBpiBasicSongData & { songId: number })[] = rawRows.map(
       (r) => ({
@@ -89,7 +85,7 @@ export async function handleSongContribution(
       allSongs,
     );
 
-    const contributions = parsed.data.targets.map((target) => {
+    const contributions = validTargets.map((target) => {
       const revertedScores = new Map(currentScoreBySongId);
       if (target.baselineExScore == null) {
         revertedScores.delete(target.songId);
