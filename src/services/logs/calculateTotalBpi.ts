@@ -65,6 +65,12 @@ export const calculateTotalBpi = (
 
   const sortedDayKeys = Array.from(dailyGroups.keys()).sort();
 
+  // 総合BPIは既知の最高値を下回らないようラチェットする（他の総合BPI算出箇所と
+  // 同じ理由。src/lib/bpi/index.tsのratchetTotalBpi参照）。この関数はDBの
+  // userStatusLogsを経由せず生スコアから日別に再計算するため、ループ内の
+  // running maxを基準にする
+  let bestTotalBpiSoFar: number | null = null;
+
   for (const dayKey of sortedDayKeys) {
     const dayScores = dailyGroups.get(dayKey)!;
 
@@ -81,7 +87,12 @@ export const calculateTotalBpi = (
       currentPBs.entries(),
     ).map(([songId, v]) => ({ songId, notes: v.notes, exScore: v.exScore }));
 
-    const totalBpi = BpiCalculator.calculateTotalBPI(observations, allSongs);
+    const freshTotalBpi = BpiCalculator.calculateTotalBPI(observations, allSongs);
+    const totalBpi = BpiCalculator.ratchetTotalBpi(
+      bestTotalBpiSoFar,
+      freshTotalBpi,
+    );
+    bestTotalBpiSoFar = totalBpi;
 
     timeline.push({
       id: dayKey,
