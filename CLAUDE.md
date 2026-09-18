@@ -48,6 +48,7 @@ beatmania IIDXのスコア管理Webアプリ。技術スタック・セットア
 - `coding-conventions.md` — 全般のコーディング規約（常時読み込み）
 - `db-layer.md` — `src/lib/db/`・`src/pages/api/`・`src/lib/mcp/tools/`・`src/lib/cron/` を触るとき
 - `components.md` — `src/components/` を触るとき
+- `design-guidelines.md` — `src/components/` を触るとき（余白・角丸・アイコンサイズ・タイポグラフィ等のビジュアル規約）
 - `git-workflow.md` — commit作成・issueとの紐付けのとき（常時読み込み）
 - `issue-driven-development.md` — issue駆動開発の運用（`spec-ready`ラベル等、常時読み込み）
 - `spec-documentation.md` — 仕様提案書・設計判断を書く/参照するとき（`docs/proposals/`・`docs/decisions/`、常時読み込み）

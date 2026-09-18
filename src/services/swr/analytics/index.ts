@@ -10,3 +10,5 @@ export type {
 } from "./songContribution";
 export { fetchImportOptimizeMemo } from "./importOptimizeMemo";
 export type { ImportedGoalTarget } from "./importOptimizeMemo";
+export { fetchBpiOptimizerDataset } from "./dataset";
+export type { BpiOptimizerDatasetRow } from "./dataset";

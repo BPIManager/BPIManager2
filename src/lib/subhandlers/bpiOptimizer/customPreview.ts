@@ -43,15 +43,11 @@ export async function handleCustomGoalPreview(
     );
     const rowBySongId = new Map(rawRows.map((r) => [r.songId, r]));
 
-    for (const target of parsed.data.targets) {
-      if (!rowBySongId.has(target.songId)) {
-        return {
-          result: err(400, `Unknown songId: ${target.songId}`),
-          targetUserId: userId,
-          viewerId,
-        };
-      }
-    }
+    // 存在しない曲（曲データ削除・データセット取得後に削除された等）は
+    // リクエスト全体を失敗させず、その曲だけ無視して残りを処理する
+    const validTargets = parsed.data.targets.filter((target) =>
+      rowBySongId.has(target.songId),
+    );
 
     const allSongs: (IBpiBasicSongData & { songId: number })[] = rawRows.map(
       (r) => ({
@@ -88,7 +84,7 @@ export async function handleCustomGoalPreview(
     );
     let cumulativeBpi = currentTotalBpi;
 
-    const steps: OptimizationStep[] = parsed.data.targets.map(
+    const steps: OptimizationStep[] = validTargets.map(
       (target, index) => {
         const row = rowBySongId.get(target.songId)!;
         const song: IBpiBasicSongData = {

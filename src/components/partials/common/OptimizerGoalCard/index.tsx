@@ -131,7 +131,9 @@ export const buildStepProgress = (
  * ダッシュボードウィジェット・「目標管理」タブ双方の曲一覧で共有する
  * 並び替え。「追加した順」はプラン保存時の順序をそのまま維持し、
  * 「近い順/遠い順」は目標EXスコアまでの残り(未プレイは目標スコアそのもの
- * を最大距離として扱う)で並べ替える。
+ * を最大距離として扱う)で並べ替える。達成済みの曲は残り0として並び替えの
+ * 対象にすると常に「近い順」の先頭に来てしまうため、並び替え対象からは
+ * 除外し常に末尾へ固定する。
  */
 export type StepSortOrder = "added" | "nearest" | "farthest";
 export const STEP_SORT_ORDERS: StepSortOrder[] = [
@@ -145,6 +147,9 @@ interface SortableStep {
   currentExScore: number | null;
 }
 
+const isAchieved = (step: SortableStep) =>
+  step.currentExScore != null && step.currentExScore >= step.toExScore;
+
 const remainingToTarget = (step: SortableStep) =>
   step.currentExScore == null
     ? step.toExScore
@@ -155,8 +160,11 @@ export function sortStepsByOrder<T extends SortableStep>(
   order: StepSortOrder,
 ): T[] {
   if (order === "added") return steps;
-  const sorted = [...steps].sort(
+  const unachieved = steps.filter((s) => !isAchieved(s));
+  const achieved = steps.filter(isAchieved);
+  const sorted = unachieved.sort(
     (a, b) => remainingToTarget(a) - remainingToTarget(b),
   );
-  return order === "nearest" ? sorted : sorted.reverse();
+  const ordered = order === "nearest" ? sorted : sorted.reverse();
+  return [...ordered, ...achieved];
 }
