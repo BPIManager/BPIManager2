@@ -34,8 +34,6 @@ function DrawerOverlay({
     <DrawerPrimitive.Overlay
       data-slot="drawer-overlay"
       className={cn(
-        // z-1000: サイドバー(DashboardLayout)がz-1000のため、それより
-        // 手前に表示する必要がある(ResultModalShellと同じ理由)
         "fixed inset-0 z-1000 bg-bpim-bg/60 backdrop-blur-sm",
         "data-open:animate-in data-open:fade-in-0",
         "data-closed:animate-out data-closed:fade-out-0",
@@ -48,12 +46,15 @@ function DrawerOverlay({
 
 function DrawerContent({
   className,
+  overlayClassName,
   children,
   ...props
-}: React.ComponentProps<typeof DrawerPrimitive.Content>) {
+}: React.ComponentProps<typeof DrawerPrimitive.Content> & {
+  overlayClassName?: string;
+}) {
   return (
     <DrawerPortal data-slot="drawer-portal">
-      <DrawerOverlay />
+      <DrawerOverlay className={overlayClassName} />
       <DrawerPrimitive.Content
         data-slot="drawer-content"
         className={cn(

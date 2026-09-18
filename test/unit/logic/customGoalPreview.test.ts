@@ -47,7 +47,26 @@ function makeReq(body: unknown, userId = "user-1") {
 }
 
 describe("handleCustomGoalPreview", () => {
-  it("未知のsongIdが含まれる場合は400エラーを返すこと", async () => {
+  it("未知のsongIdが含まれる場合はその曲だけ無視し、残りの曲で結果を返すこと", async () => {
+    dbHolder.current = createDbSpy([makeRow({ songId: 1, exScore: 1800 })]);
+
+    const { result } = await handleCustomGoalPreview(
+      makeReq({
+        targets: [
+          { songId: 999, toExScore: 1900 },
+          { songId: 1, toExScore: 1900 },
+        ],
+      }),
+      {},
+    );
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.body.steps).toHaveLength(1);
+    expect(result.body.steps[0].songId).toBe(1);
+  });
+
+  it("未知のsongIdしか含まれない場合は空のstepsで結果を返すこと", async () => {
     dbHolder.current = createDbSpy([makeRow({ songId: 1 })]);
 
     const { result } = await handleCustomGoalPreview(
@@ -55,8 +74,9 @@ describe("handleCustomGoalPreview", () => {
       {},
     );
 
-    expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.status).toBe(400);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.body.steps).toHaveLength(0);
   });
 
   it("各曲のfromBpi/toBpiがBpiCalculator.calcと一致すること", async () => {

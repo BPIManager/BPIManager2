@@ -17,6 +17,7 @@ const CustomGoalCreator = ({
   onBack,
   onSaved,
   onDirtyChange,
+  onFooterStateChange,
 }: {
   currentScores: Map<number, number | null>;
   /** 「曲目をインポート」で他ユーザーの共有reportIdから読み込んだ初期値。 */
@@ -27,6 +28,13 @@ const CustomGoalCreator = ({
   onSaved: () => void;
   /** 未保存の曲目が1つでもあるかを親へ伝える（離脱時の確認に使う）。 */
   onDirtyChange?: (isDirty: boolean) => void;
+  /**
+   * 保存ボタンをDrawer下部に固定表示するため、保存の実行可否・処理中フラグ・
+   * 保存関数を親（Drawerのフッター）へ渡す。
+   */
+  onFooterStateChange?: (
+    state: { canSave: boolean; isSaving: boolean; onSave: () => void } | null,
+  ) => void;
 }) => {
   const { t } = useTranslation();
   const { user, fbUser } = useUser();
@@ -43,15 +51,18 @@ const CustomGoalCreator = ({
 
   const [preview, setPreview] = useState<OptimizationResult | null>(null);
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
+  const [previewError, setPreviewError] = useState(false);
   const requestIdRef = useRef(0);
 
   useEffect(() => {
     if (!user?.userId || targets.length === 0) {
       setPreview(null);
+      setPreviewError(false);
       return;
     }
     const requestId = ++requestIdRef.current;
     setIsPreviewLoading(true);
+    setPreviewError(false);
     fetchCustomGoalPreview(
       user.userId,
       fbUser,
@@ -61,11 +72,17 @@ const CustomGoalCreator = ({
         if (requestIdRef.current === requestId) setPreview(result);
       })
       .catch(() => {
-        if (requestIdRef.current === requestId) setPreview(null);
+        if (requestIdRef.current === requestId) {
+          setPreview(null);
+          setPreviewError(true);
+          toast.error(t("optimizer.customGoal.previewFailed"));
+        }
       })
       .finally(() => {
         if (requestIdRef.current === requestId) setIsPreviewLoading(false);
       });
+    // t()はcatch内でのみ使う（依存に含めると毎レンダー新しい関数参照になり無限リクエストの原因になる）
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [targets, user?.userId, fbUser]);
 
   useEffect(() => {
@@ -126,6 +143,17 @@ const CustomGoalCreator = ({
     onSaved();
   };
 
+  const isSavingMemo = isSaving || isUpdating;
+  useEffect(() => {
+    onFooterStateChange?.({
+      canSave: !!preview && !isPreviewLoading,
+      isSaving: isSavingMemo,
+      onSave: handleSave,
+    });
+    return () => onFooterStateChange?.(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preview, isPreviewLoading, isSavingMemo]);
+
   return (
     <CustomGoalCreatorUi
       targets={targets}
@@ -144,8 +172,7 @@ const CustomGoalCreator = ({
       onModalConfirm={handleConfirm}
       preview={preview}
       isPreviewLoading={isPreviewLoading}
-      onSave={handleSave}
-      isSaving={isSaving || isUpdating}
+      previewError={previewError}
     />
   );
 };

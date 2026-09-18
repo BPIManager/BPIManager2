@@ -19,7 +19,7 @@ import { useTranslation } from "@/hooks/common/useTranslation";
 const OptimizerGuide = () => {
   const { t } = useTranslation();
   return (
-  <Accordion type="single" collapsible className="w-full mt-4">
+  <Accordion type="single" collapsible className="w-full">
     <AccordionItem
       value="guide"
       className="border border-bpim-border bg-bpim-surface/50 rounded-xl px-4 overflow-hidden"

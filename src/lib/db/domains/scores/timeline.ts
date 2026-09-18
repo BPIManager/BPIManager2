@@ -9,13 +9,16 @@ class ScoreTimelineRepository {
    * @param userId ユーザーID
    * @param currentVersion 今作のバージョン番号 (excludeCurrent=true のとき除外対象)
    * @param excludeCurrent true のとき今作バージョンを除外する
+   * @param difficultyLevel 指定すると、その難易度レベルの楽曲のみに絞り込む
+   *   （絞り込みは最初の集計段階で行い、対象外の楽曲のスコアを走査しない）
    */
   async getBestEverScores(params: {
     userId: string;
     currentVersion: string;
     excludeCurrent: boolean;
+    difficultyLevel?: number;
   }) {
-    const { userId, currentVersion, excludeCurrent } = params;
+    const { userId, currentVersion, excludeCurrent, difficultyLevel } = params;
     let latestPerVersionSub = db
       .selectFrom("scores as sc")
       .select([
@@ -30,6 +33,18 @@ class ScoreTimelineRepository {
         "sc.version",
         "!=",
         currentVersion,
+      );
+    }
+
+    if (difficultyLevel !== undefined) {
+      latestPerVersionSub = latestPerVersionSub.where(
+        "sc.songId",
+        "in",
+        (eb) =>
+          eb
+            .selectFrom("songs")
+            .select("songId")
+            .where("difficultyLevel", "=", difficultyLevel),
       );
     }
 
@@ -89,6 +104,9 @@ class ScoreTimelineRepository {
         "sd.wrScore",
         "sd.kaidenAvg",
         "sd.coef",
+        "sd.mu",
+        "sd.sigma",
+        "sd.residualVar",
       ])
       .execute();
 

@@ -48,6 +48,9 @@ export interface BestEverRow {
   wrScore: number | null;
   kaidenAvg: number | null;
   coef: number | null;
+  mu: number | null;
+  sigma: number | null;
+  residualVar: number | null;
 }
 
 export function toBpiParams(s: SongWithScore): IBpiBasicSongData {
