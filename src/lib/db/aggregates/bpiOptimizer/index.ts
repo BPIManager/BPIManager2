@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { IIDXVersion } from "@/types/iidx/version";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
+import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore";
 
 /**
@@ -62,6 +63,55 @@ class BpiOptimizerAggregateRepository {
               eb("m.deletedAt", ">", version),
             ]),
           ),
+      )
+      .execute();
+  }
+
+  /**
+   * 全BPI対象楽曲について、バージョンを横断したユーザーの自己歴代最高EXスコアを
+   * LEFT JOINで取得する（「自己歴代のみを参照」オプション向け）。
+   *
+   * 未プレイ楽曲もNULLスコアとして含まれる。現行バージョンで既に削除された楽曲は除く。
+   *
+   * @param userId - ユーザーID
+   */
+  async getAllSongsWithSelfBestScores(userId: string) {
+    const bestPerSong = db
+      .selectFrom("scores as sc")
+      .select(["sc.songId", (eb) => eb.fn.max("sc.exScore").as("bestExScore")])
+      .where("sc.userId", "=", userId)
+      .groupBy("sc.songId")
+      .as("best");
+
+    return db
+      .selectFrom("songs as m")
+      .innerJoin("songDef as d", (join) =>
+        join.onRef("d.songId", "=", "m.songId").on("d.isCurrent", "=", 1),
+      )
+      .leftJoin(bestPerSong, (join) =>
+        join.onRef("best.songId", "=", "m.songId"),
+      )
+      .select([
+        "m.songId",
+        "m.title",
+        "m.notes",
+        "m.difficulty",
+        "m.difficultyLevel",
+        "d.wrScore",
+        "d.kaidenAvg",
+        "d.coef",
+        "d.mu",
+        "d.sigma",
+        "d.residualVar",
+        "best.bestExScore as exScore",
+      ])
+      .where("m.difficultyLevel", "=", 12)
+      .where("m.difficulty", "in", IIDX_DIFFICULTIES)
+      .where((eb) =>
+        eb.or([
+          eb("m.deletedAt", "is", null),
+          eb("m.deletedAt", ">", latestVersion),
+        ]),
       )
       .execute();
   }

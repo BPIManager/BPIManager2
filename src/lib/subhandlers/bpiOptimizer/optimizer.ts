@@ -1,7 +1,7 @@
 import type { NextApiRequest } from "next";
 import { bpiOptimizerAggregateRepo } from "@/lib/db/aggregates/bpiOptimizer";
 import { findOptimalBpiPath } from "@/lib/bpi/optimizer";
-import { latestVersion } from "@/constants/iidx/iidxVersions";
+import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import { topElementMap } from "@/constants/iidx/radars/topElements";
 import { ALL_RADAR_CATEGORIES } from "@/constants/iidx/radars";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
@@ -10,6 +10,7 @@ import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { targetOf, type HandleOutcome } from "./_shared";
 import type { RadarCategory } from "@/types/stats/radar";
+import type { IIDXVersion } from "@/types/iidx/version";
 import type { SongOptimizerInput, ExecuteOptions } from "@/types/bpi-optimizer";
 
 /** GET /users/[userId]/analytics/bpi-optimizer （withUserApiHandler） */
@@ -53,11 +54,24 @@ export async function handleBpiOptimizer(
       ALL_RADAR_CATEGORIES.includes(e as RadarCategory),
     ) as RadarCategory[];
 
+  const datasetVersionParam =
+    typeof req.query.datasetVersion === "string"
+      ? req.query.datasetVersion
+      : latestVersion;
+  const useSelfBest = datasetVersionParam === "self-best";
+  const resolvedDatasetVersion: IIDXVersion = (
+    IIDX_VERSIONS as readonly string[]
+  ).includes(datasetVersionParam)
+    ? (datasetVersionParam as IIDXVersion)
+    : latestVersion;
+
   try {
-    const rawRows = await bpiOptimizerAggregateRepo.getAllSongsWithUserScores(
-      userId,
-      latestVersion,
-    );
+    const rawRows = useSelfBest
+      ? await bpiOptimizerAggregateRepo.getAllSongsWithSelfBestScores(userId)
+      : await bpiOptimizerAggregateRepo.getAllSongsWithUserScores(
+          userId,
+          resolvedDatasetVersion,
+        );
 
     if (rawRows.length === 0) {
       return {
