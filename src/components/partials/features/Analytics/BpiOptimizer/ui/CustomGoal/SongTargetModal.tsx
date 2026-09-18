@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Search, CircleDashed, ArrowLeft } from "lucide-react";
 import {
   Dialog,
@@ -10,7 +10,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { DIFF_COLORS } from "@/constants/theme/difficultyColors";
 import { RANK_TABLE, getRankDetail } from "@/constants/iidx/rankBorders";
 import { ALL_RADAR_CATEGORIES } from "@/constants/iidx/radars";
 import { BpiCalculator } from "@/lib/bpi";
@@ -18,6 +17,7 @@ import type { IBpiBasicSongData } from "@/types/songs/bpi";
 import type { RadarCategory } from "@/types/stats/radar";
 import { MiniBpiChip } from "@/components/partials/common/OptimizerGoalCard";
 import { RADAR_LABELS } from "../shared";
+import DifficultyBadge from "../DifficultyBadge";
 import {
   useSongSearch,
   type SongSearchResult,
@@ -28,6 +28,9 @@ import { useTranslation } from "@/hooks/common/useTranslation";
 type SearchMode = "title" | "radar" | "bpm";
 const SEARCH_MODES: SearchMode[] = ["title", "radar", "bpm"];
 const BPM_BANDS: BpmBand[] = ["slow", "mid", "fast", "soflan"];
+
+type SongSortOrder = "title" | "bpiDesc" | "bpiAsc";
+const SONG_SORT_ORDERS: SongSortOrder[] = ["title", "bpiDesc", "bpiAsc"];
 
 export interface CustomGoalTargetInput {
   songId: number;
@@ -127,6 +130,7 @@ const SongTargetModal = ({
     null,
   );
   const [bpmBand, setBpmBand] = useState<BpmBand | null>(null);
+  const [sortOrder, setSortOrder] = useState<SongSortOrder>("title");
   const [selectedSong, setSelectedSong] = useState<SongSearchResult | null>(
     null,
   );
@@ -162,6 +166,7 @@ const SongTargetModal = ({
     setSearchMode("title");
     setRadarCategory(null);
     setBpmBand(null);
+    setSortOrder("title");
   }, [isOpen, initialTarget]);
   /* eslint-enable react-hooks/set-state-in-effect */
 
@@ -177,19 +182,39 @@ const SongTargetModal = ({
       radarCategory:
         searchMode === "radar" ? (radarCategory ?? undefined) : undefined,
       bpmBand: searchMode === "bpm" ? (bpmBand ?? undefined) : undefined,
+      enabled: isOpen,
     },
   );
   const hasBrowseSelection =
     searchMode === "title"
-      ? debouncedQuery.length > 0
+      ? true
       : searchMode === "radar"
         ? radarCategory != null
         : bpmBand != null;
   const titleFilter = debouncedQuery.trim().toLowerCase();
-  const displaySongs =
+  const filteredSongs =
     searchMode === "title" || titleFilter.length === 0
       ? songs
       : songs.filter((song) => song.title.toLowerCase().includes(titleFilter));
+
+  const displaySongRows = useMemo(() => {
+    const rows = filteredSongs.map((song) => {
+      const currentEx = currentScores.get(song.songId) ?? null;
+      const currentBpi =
+        currentEx != null ? BpiCalculator.calc(currentEx, toBpiSongData(song)) : null;
+      return { song, currentEx, currentBpi };
+    });
+    if (sortOrder === "title") return rows;
+    // 未プレイ曲(currentBpi=null)は順位が付けられないため並び替え対象外にし、常に末尾へ
+    return rows.sort((a, b) => {
+      if (a.currentBpi == null && b.currentBpi == null) return 0;
+      if (a.currentBpi == null) return 1;
+      if (b.currentBpi == null) return -1;
+      return sortOrder === "bpiDesc"
+        ? b.currentBpi - a.currentBpi
+        : a.currentBpi - b.currentBpi;
+    });
+  }, [filteredSongs, sortOrder, currentScores]);
 
   const maxScore = selectedSong ? selectedSong.notes * 2 : null;
   const exScoreNum = parseInt(exScoreInput, 10);
@@ -343,6 +368,22 @@ const SongTargetModal = ({
               </div>
             )}
 
+            {hasBrowseSelection && (
+              <div className="flex min-w-0 flex-wrap gap-1.5">
+                {SONG_SORT_ORDERS.map((order) => (
+                  <Button
+                    key={order}
+                    type="button"
+                    variant={sortOrder === order ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setSortOrder(order)}
+                  >
+                    {t(`optimizer.customGoal.sortOrder.${order}`)}
+                  </Button>
+                ))}
+              </div>
+            )}
+
             <div className="flex min-w-0 max-h-72 flex-col gap-1 overflow-x-hidden overflow-y-auto custom-scrollbar">
               {isLoading && (
                 <div className="flex items-center justify-center py-8">
@@ -351,47 +392,31 @@ const SongTargetModal = ({
               )}
               {!isLoading &&
                 hasBrowseSelection &&
-                displaySongs.length === 0 && (
+                displaySongRows.length === 0 && (
                   <p className="py-8 text-center text-xs text-bpim-subtle">
                     {t("optimizer.customGoal.noResults")}
                   </p>
                 )}
-              {displaySongs.map((song) => {
-                const rowCurrentEx = currentScores.get(song.songId) ?? null;
-                const rowCurrentBpi =
-                  rowCurrentEx != null
-                    ? BpiCalculator.calc(rowCurrentEx, toBpiSongData(song))
-                    : null;
-                return (
-                  <button
-                    key={`${song.songId}`}
-                    onClick={() => setSelectedSong(song)}
-                    className="flex w-full min-w-0 items-center gap-2 rounded-lg px-2 py-2 text-left hover:bg-bpim-overlay/50 transition-colors"
-                  >
-                    <span
-                      className={cn(
-                        "shrink-0 rounded px-1 py-0.5 text-[10px] font-black text-white",
-                        DIFF_COLORS[song.difficulty],
-                      )}
-                    >
-                      {song.difficulty.charAt(0)}
+              {displaySongRows.map(({ song, currentEx, currentBpi }) => (
+                <button
+                  key={`${song.songId}`}
+                  onClick={() => setSelectedSong(song)}
+                  className="flex w-full min-w-0 items-center gap-2 rounded-lg px-2 py-2 text-left hover:bg-bpim-overlay/50 transition-colors"
+                >
+                  <DifficultyBadge difficulty={song.difficulty} size="xs" />
+                  <span className="min-w-0 flex-1 truncate text-sm text-bpim-text">
+                    {song.title}
+                  </span>
+                  <div className="flex w-14 shrink-0 flex-col items-end gap-0.5">
+                    <span className="font-mono text-xs font-bold text-bpim-text">
+                      {currentEx != null ? currentEx : "-"}
                     </span>
-                    <span className="min-w-0 flex-1 truncate text-sm text-bpim-text">
-                      {song.title}
+                    <span className="font-mono text-[10px] text-bpim-muted">
+                      {currentBpi != null ? `BPI ${currentBpi.toFixed(2)}` : "-"}
                     </span>
-                    <div className="flex w-14 shrink-0 flex-col items-end gap-0.5">
-                      <span className="font-mono text-xs font-bold text-bpim-text">
-                        {rowCurrentEx != null ? rowCurrentEx : "-"}
-                      </span>
-                      <span className="font-mono text-[10px] text-bpim-muted">
-                        {rowCurrentBpi != null
-                          ? `BPI ${rowCurrentBpi.toFixed(2)}`
-                          : "-"}
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
+                  </div>
+                </button>
+              ))}
             </div>
           </div>
         ) : (
@@ -406,14 +431,7 @@ const SongTargetModal = ({
 
             <div className="flex min-w-0 flex-col gap-1 rounded-lg border border-bpim-border bg-bpim-surface p-3">
               <div className="flex min-w-0 items-center gap-2">
-                <span
-                  className={cn(
-                    "shrink-0 rounded px-1.5 py-0.5 text-xs font-black text-white",
-                    DIFF_COLORS[selectedSong.difficulty],
-                  )}
-                >
-                  {selectedSong.difficulty.charAt(0)}
-                </span>
+                <DifficultyBadge difficulty={selectedSong.difficulty} />
                 <span className="min-w-0 flex-1 truncate text-sm font-bold text-bpim-text">
                   {selectedSong.title}
                 </span>
