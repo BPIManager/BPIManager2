@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { User as FirebaseUser } from "firebase/auth";
 import {
   CircleDashed,
@@ -6,6 +6,10 @@ import {
   Pencil,
   Calendar,
   ChevronRight,
+  ListChecks,
+  Target,
+  CheckCircle2,
+  type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,9 +20,15 @@ import { SongStatusBar } from "@/components/partials/common/OptimizerGoalCard/Go
 import { GoalDetailDrawer } from "@/components/partials/common/OptimizerGoalCard/GoalDetailDrawer";
 import type { OptimizeMemo } from "@/hooks/analytics/useOptimizeMemo";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import OptimizerIntro from "./OptimizerIntro";
 
 type StatusFilter = "all" | "unachieved" | "achieved";
 const STATUS_FILTERS: StatusFilter[] = ["all", "unachieved", "achieved"];
+const STATUS_FILTER_ICONS: Record<StatusFilter, LucideIcon> = {
+  all: ListChecks,
+  unachieved: Target,
+  achieved: CheckCircle2,
+};
 
 /**
  * 目標全体の達成判定。総合BPI(べき乗平均)が目標を超えたかではなく、
@@ -51,6 +61,7 @@ const SavedMemoList = ({
   isDeletingId,
   onEdit,
   isEditLoadingId,
+  headerAction,
 }: {
   memos: OptimizeMemo[];
   currentScores: Map<number, number | null>;
@@ -62,6 +73,8 @@ const SavedMemoList = ({
   isDeletingId: string | null;
   onEdit: (memo: OptimizeMemo) => void;
   isEditLoadingId?: string | null;
+  /** 一覧上部、ステータスタブの下に右寄せで表示するアクション（「新規作成」ボタン等） */
+  headerAction?: ReactNode;
 }) => {
   const { t, tFormat } = useTranslation();
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
@@ -77,38 +90,37 @@ const SavedMemoList = ({
   const openMemo = memos.find((memo) => memo.reportId === openMemoId) ?? null;
 
   return (
-    <>
-      {memos.length > 0 && (
-        <div className="flex min-w-0 gap-1 mb-4 rounded-lg bg-bpim-overlay/30 p-1">
-          {STATUS_FILTERS.map((filter) => (
+    <div className="flex min-w-0 flex-col gap-3">
+      <div className="flex min-w-0 gap-1 rounded-lg bg-bpim-overlay/30 p-1">
+        {STATUS_FILTERS.map((filter) => {
+          const Icon = STATUS_FILTER_ICONS[filter];
+          return (
             <button
               key={filter}
               type="button"
               onClick={() => setStatusFilter(filter)}
               className={cn(
-                "flex-1 truncate rounded-md py-1.5 text-xs font-bold transition-colors",
+                "flex flex-1 items-center justify-center gap-1.5 truncate rounded-md py-1.5 text-xs font-bold transition-colors",
                 statusFilter === filter
                   ? "bg-bpim-primary text-white"
                   : "text-bpim-muted hover:text-bpim-text",
               )}
             >
+              <Icon className="h-3.5 w-3.5 shrink-0" />
               {t(`optimizer.memo.statusFilter.${filter}`)}
             </button>
-          ))}
-        </div>
-      )}
+          );
+        })}
+      </div>
+      {headerAction && <div className="flex justify-end">{headerAction}</div>}
 
-      <div className="flex flex-col gap-2 w-full">
+      <div className="flex w-full flex-col gap-2">
         {memos.length > 0 && visibleMemos.length === 0 && (
           <p className="text-xs text-center py-8 text-bpim-subtle border border-dashed border-bpim-border rounded-lg">
             {t("optimizer.memo.noMatch")}
           </p>
         )}
-        {memos.length === 0 && (
-          <p className="text-xs text-center py-8 text-bpim-subtle border border-dashed border-bpim-border rounded-lg">
-            {t("optimizer.memo.empty")}
-          </p>
-        )}
+        {memos.length === 0 && <OptimizerIntro />}
         {visibleMemos.map((memo) => {
           const isAuto = memo.kind !== "custom";
           const steps = buildStepProgress(memo, currentScores, currentBpis);
@@ -223,7 +235,7 @@ const SavedMemoList = ({
         confirmLabel={t("optimizer.memo.deleteConfirm")}
         isDestructive
       />
-    </>
+    </div>
   );
 };
 

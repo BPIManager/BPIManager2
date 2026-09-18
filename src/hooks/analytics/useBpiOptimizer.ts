@@ -9,6 +9,9 @@ import type {
   OptimizerStrategy,
 } from "@/types/bpi-optimizer";
 import type { RadarCategory } from "@/types/stats/radar";
+import type { IIDXVersion } from "@/types/iidx/version";
+
+export type BpiOptimizerDatasetVersion = IIDXVersion | "self-best";
 import { IIDX_LEVELS, IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 import { ALL_RADAR_CATEGORIES as ALL_RADAR_ELEMENTS } from "@/constants/iidx/radars";
 import { toast } from "sonner";
@@ -45,6 +48,8 @@ export function useBpiOptimizer() {
     useState<RadarCategory[]>(ALL_RADAR_ELEMENTS);
   const [maxStepsInput, setMaxStepsInput] = useState<string>("30");
   const [considerCurrentTotalBpi, setConsiderCurrentTotalBpi] = useState(true);
+  const [datasetVersion, setDatasetVersionState] =
+    useState<BpiOptimizerDatasetVersion>(latestVersion);
 
   const userId = fbUser?.uid;
 
@@ -59,6 +64,7 @@ export function useBpiOptimizer() {
       difficulties: difficulties.join(","),
       radarElements: radarElements.join(","),
       considerCurrentTotalBpi: String(considerCurrentTotalBpi),
+      datasetVersion,
     });
     return [
       `${API_V2_PREFIX}/users/${userId}/analytics/bpi-optimizer?${params}`,
@@ -143,6 +149,11 @@ export function useBpiOptimizer() {
     setCommittedTargetBpi(null);
   }, []);
 
+  const setDatasetVersion = useCallback((v: BpiOptimizerDatasetVersion) => {
+    setDatasetVersionState(v);
+    setCommittedTargetBpi(null);
+  }, []);
+
   const inputError =
     targetBpiInput !== "" &&
     (isNaN(parseFloat(targetBpiInput)) ||
@@ -175,5 +186,7 @@ export function useBpiOptimizer() {
     version: latestVersion,
     considerCurrentTotalBpi,
     setConsiderCurrentTotalBpi,
+    datasetVersion,
+    setDatasetVersion,
   };
 }

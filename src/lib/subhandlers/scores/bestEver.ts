@@ -13,7 +13,7 @@ export async function handleBestEver(
   const targetUserId = targetOf(req);
   const viewerId = access.viewerId ?? null;
 
-  const { currentVersion, excludeCurrent } = req.query;
+  const { currentVersion, excludeCurrent, difficultyLevel } = req.query;
   if (!currentVersion || typeof currentVersion !== "string") {
     return {
       result: err(400, "Missing or invalid currentVersion parameter."),
@@ -21,12 +21,19 @@ export async function handleBestEver(
       viewerId,
     };
   }
+  const parsedDifficultyLevel =
+    typeof difficultyLevel === "string" && difficultyLevel !== ""
+      ? Number(difficultyLevel)
+      : undefined;
 
   try {
     const rows = await timelineRepo.getBestEverScores({
       userId: targetUserId,
       currentVersion,
       excludeCurrent: excludeCurrent === "true",
+      difficultyLevel: Number.isFinite(parsedDifficultyLevel)
+        ? parsedDifficultyLevel
+        : undefined,
     });
 
     const result = rows.map((row) => ({
@@ -43,6 +50,9 @@ export async function handleBestEver(
       wrScore: row.wrScore !== null ? Number(row.wrScore) : null,
       kaidenAvg: row.kaidenAvg !== null ? Number(row.kaidenAvg) : null,
       coef: row.coef !== null ? Number(row.coef) : null,
+      mu: row.mu !== null ? Number(row.mu) : null,
+      sigma: row.sigma !== null ? Number(row.sigma) : null,
+      residualVar: row.residualVar !== null ? Number(row.residualVar) : null,
     }));
 
     return { result: ok(result), targetUserId, viewerId };

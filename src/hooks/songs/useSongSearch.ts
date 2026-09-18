@@ -22,9 +22,9 @@ export interface SongSearchResult {
 export type BpmBand = "slow" | "mid" | "fast" | "soflan";
 
 /**
- * 楽曲を検索・一覧表示する。`query`が空文字でも`radarCategory`/`bpmBand`
- * のいずれかが指定されていればフェッチする（曲名を介さない一覧表示）。
- * 全て未指定の間はフェッチしない。
+ * 楽曲を検索・一覧表示する。`query`が空文字でも常にフェッチする
+ * （曲名を介さない一覧表示。`difficultyLevel`・`radarCategory`・`bpmBand`で
+ * 絞り込める）。`enabled`が`false`の間はフェッチしない。
  */
 export const useSongSearch = (
   query: string,
@@ -33,11 +33,12 @@ export const useSongSearch = (
     version?: string;
     radarCategory?: RadarCategory;
     bpmBand?: BpmBand;
+    enabled?: boolean;
   },
 ) => {
   const trimmed = query.trim();
   const version = options?.version ?? latestVersion;
-  const hasQuery = trimmed.length > 0 || !!options?.radarCategory || !!options?.bpmBand;
+  const hasQuery = options?.enabled ?? true;
 
   const params = new URLSearchParams({ version });
   if (trimmed.length > 0) params.set("title", trimmed);

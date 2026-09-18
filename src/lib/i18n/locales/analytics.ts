@@ -286,6 +286,24 @@ export const analyticsTranslations = {
     "zh-TW": "預計練習曲數（參考）",
     ko: "개선할 곡 수（목표）",
   },
+  "optimizer.datasetLabel": {
+    ja: "参照するスコアデータ",
+    en: "Reference score data",
+    "zh-TW": "參考的分數資料",
+    ko: "참조할 점수 데이터",
+  },
+  "optimizer.datasetSelfBestLabel": {
+    ja: "自己歴代のみを参照",
+    en: "Personal best only",
+    "zh-TW": "僅參考自己歷史最高",
+    ko: "내 역대 최고만 참조",
+  },
+  "optimizer.datasetHint": {
+    ja: "目標を作成する際の基準となるデータセットを選択してください。",
+    en: "Choose the dataset to base your goal on.",
+    "zh-TW": "請選擇建立目標時要參考的資料集。",
+    ko: "목표를 만들 때 기준이 될 데이터셋을 선택하세요.",
+  },
   "optimizer.algorithmLabel": {
     ja: "アルゴリズムの性格",
     en: "Algorithm Mode",
@@ -416,19 +434,6 @@ export const analyticsTranslations = {
     "zh-TW": "達成目標",
     ko: "목표 달성",
   },
-  "optimizer.summary.saved": {
-    ja: "保存済み",
-    en: "Saved",
-    "zh-TW": "已保存",
-    ko: "저장됨",
-  },
-  "optimizer.summary.save": {
-    ja: "結果を保存",
-    en: "Save Result",
-    "zh-TW": "儲存結果",
-    ko: "결과 저장",
-  },
-
   // OptimizationStepCard
   "optimizer.step.mightBeStrong": {
     ja: "得意曲かも?",
@@ -479,7 +484,8 @@ export const analyticsTranslations = {
   "optimizer.coldStart.description": {
     ja: "以下のカテゴリはプレイ実績が少なく、精度の高い提案ができません。まずはいくつかの曲をプレイしてみてください。",
     en: "These categories don't have enough play history for a reliable suggestion. Try playing a few of the songs below first.",
-    "zh-TW": "以下類別的遊玩紀錄不足，無法提供準確的建議。請先遊玩以下幾首曲目。",
+    "zh-TW":
+      "以下類別的遊玩紀錄不足，無法提供準確的建議。請先遊玩以下幾首曲目。",
     ko: "아래 카테고리는 플레이 기록이 적어 정확한 제안을 할 수 없습니다. 먼저 아래 곡을 몇 곡 플레이해 보세요.",
   },
   "optimizer.coldStart.playedCount": {
@@ -496,12 +502,6 @@ export const analyticsTranslations = {
   },
 
   // SavedMemoList
-  "optimizer.memo.empty": {
-    ja: "保存された目標はありません",
-    en: "No saved goals.",
-    "zh-TW": "尚無儲存的目標",
-    ko: "저장된 목표가 없습니다",
-  },
   "optimizer.memo.kind.auto": {
     ja: "自動",
     en: "Auto",
@@ -582,9 +582,10 @@ export const analyticsTranslations = {
   },
   "optimizer.memo.shareDesc": {
     ja: "下のIDを相手に伝えると、「新規作成」タブの「曲目をインポート」からこの目標の曲目（曲と目標EXスコア）を自分の目標として取り込めます。あなたのスコアやBPIは共有されません。",
-    en: "Share the ID below. The recipient can pull this goal's song list (songs and target EX scores) into their own goal via \"Import songs\" on the Create tab. Your scores and BPI are not shared.",
-    "zh-TW": "將下方ID告訴對方，對方可以在「新規作成」分頁的「匯入曲目」中，將此目標的曲目（曲目與目標EX分數）匯入成自己的目標。你的成績與BPI不會被分享。",
-    ko: "아래 ID를 상대방에게 전달하면 \"새로 만들기\" 탭의 \"곡 목록 가져오기\"에서 이 목표의 곡 목록(곡과 목표 EX스코어)을 자신의 목표로 가져올 수 있습니다. 당신의 스코어와 BPI는 공유되지 않습니다.",
+    en: 'Share the ID below. The recipient can pull this goal\'s song list (songs and target EX scores) into their own goal via "Import songs" on the Create tab. Your scores and BPI are not shared.',
+    "zh-TW":
+      "將下方ID告訴對方，對方可以在「新規作成」分頁的「匯入曲目」中，將此目標的曲目（曲目與目標EX分數）匯入成自己的目標。你的成績與BPI不會被分享。",
+    ko: '아래 ID를 상대방에게 전달하면 "새로 만들기" 탭의 "곡 목록 가져오기"에서 이 목표의 곡 목록(곡과 목표 EX스코어)을 자신의 목표로 가져올 수 있습니다. 당신의 스코어와 BPI는 공유되지 않습니다.',
   },
   "optimizer.memo.copy": {
     ja: "コピー",
@@ -623,13 +624,56 @@ export const analyticsTranslations = {
     "zh-TW": "新增計畫",
     ko: "새로 만들기",
   },
-  "optimizer.tabs.manage": {
-    ja: "目標管理",
-    en: "Manage Goals",
-    "zh-TW": "目標管理",
-    ko: "목표 관리",
-  },
 
+  "optimizer.intro.title": {
+    ja: "使い方はかんたん3ステップ",
+    en: "Three simple steps",
+    "zh-TW": "簡單3步驟",
+    ko: "간단한 3단계",
+  },
+  "optimizer.intro.desc": {
+    ja: "目標の総合BPIやスコアを設定すると、それを達成するための曲・スコアの組み合わせを提案・記録できます。作成した目標は保存でき、「目標管理」タブから達成状況を確認できます。",
+    en: 'Set a target total BPI or score, and get a suggested combination of songs and scores to reach it—or record your own. Saved goals can be tracked from the "Manage Goals" tab.',
+    "zh-TW":
+      "設定目標綜合BPI或分數後，即可取得達成所需的曲目・分數組合建議，或自行記錄。建立的目標可儲存，並可在「目標管理」分頁確認達成狀況。",
+    ko: "목표 종합BPI나 점수를 설정하면 달성을 위한 곡・점수 조합을 제안받거나 직접 기록할 수 있습니다. 만든 목표는 저장할 수 있으며 「목표 관리」탭에서 달성 상황을 확인할 수 있습니다.",
+  },
+  "optimizer.intro.step1Title": {
+    ja: "目標を決める",
+    en: "Set a target",
+    "zh-TW": "設定目標",
+    ko: "목표 정하기",
+  },
+  "optimizer.intro.step1Desc": {
+    ja: "総合BPIやスコアの目標値を入力",
+    en: "Enter a target total BPI or score",
+    "zh-TW": "輸入綜合BPI或分數目標值",
+    ko: "종합BPI나 점수 목표값 입력",
+  },
+  "optimizer.intro.step2Title": {
+    ja: "曲を選ぶ",
+    en: "Pick songs",
+    "zh-TW": "選擇曲目",
+    ko: "곡 선택하기",
+  },
+  "optimizer.intro.step2Desc": {
+    ja: "自動提案、または自分で曲とスコアを選択",
+    en: "Get algorithm suggestions, or pick songs and scores yourself",
+    "zh-TW": "由演算法推薦，或自行選擇曲目與分數",
+    ko: "알고리즘 추천 또는 직접 곡과 점수 선택",
+  },
+  "optimizer.intro.step3Title": {
+    ja: "保存して管理",
+    en: "Save and track",
+    "zh-TW": "儲存並管理",
+    ko: "저장하고 관리하기",
+  },
+  "optimizer.intro.step3Desc": {
+    ja: "作成した目標を保存し、達成状況を確認",
+    en: "Save your goal and track your progress",
+    "zh-TW": "儲存建立的目標，確認達成狀況",
+    ko: "만든 목표를 저장하고 달성 상황 확인",
+  },
   "optimizer.mode.autoCard.title": {
     ja: "自動的に目標を作成",
     en: "Create automatically",
@@ -651,7 +695,8 @@ export const analyticsTranslations = {
   "optimizer.mode.customCard.desc": {
     ja: "好きな曲を検索して、自分で目標EXスコアを設定します。複数曲をまとめて1つの目標として保存できます。",
     en: "Search for any song and set your own target EX score. Bundle multiple songs into a single goal.",
-    "zh-TW": "搜尋喜歡的樂曲，自行設定目標EX分數。可將多首曲目整合為一個目標保存。",
+    "zh-TW":
+      "搜尋喜歡的樂曲，自行設定目標EX分數。可將多首曲目整合為一個目標保存。",
     ko: "원하는 곡을 검색해 직접 목표 EX스코어를 설정합니다. 여러 곡을 하나의 목표로 묶어 저장할 수 있습니다.",
   },
   "optimizer.mode.importCard.title": {
@@ -666,6 +711,30 @@ export const analyticsTranslations = {
     "zh-TW": "輸入其他使用者分享的ID，將曲目與目標EX分數匯入成自己的目標。",
     ko: "다른 사용자가 공유한 ID를 입력해 곡 목록과 목표 EX스코어를 자신의 목표로 가져옵니다.",
   },
+  "optimizer.mode.selfBestSetCard.title": {
+    ja: "自己べストを目指す",
+    en: "Aim for your best",
+    "zh-TW": "以自己最高分為目標",
+    ko: "내 역대 최고를 목표로",
+  },
+  "optimizer.mode.selfBestSetCard.desc": {
+    ja: "対象バージョンまたは自己歴代の記録から、そのまま目標を一括で作成します。",
+    en: "Bulk-create a goal directly from a specific version's scores, or your all-time best per song.",
+    "zh-TW": "從指定版本或自己歷史最高的記錄，直接批次建立為目標。",
+    ko: "대상 버전 또는 내 역대 최고 기록으로 목표를 일괄 생성합니다.",
+  },
+  "optimizer.selfBestSet.empty": {
+    ja: "目標にできるスコアが見つかりませんでした",
+    en: "No scores were found to use as a goal.",
+    "zh-TW": "找不到可作為目標的分數",
+    ko: "목표로 삼을 점수를 찾지 못했습니다",
+  },
+  "optimizer.selfBestSet.failed": {
+    ja: "目標セットの作成に失敗しました",
+    en: "Failed to create the goal set.",
+    "zh-TW": "建立目標組合失敗",
+    ko: "목표 세트 생성에 실패했습니다",
+  },
   "optimizer.import.title": {
     ja: "曲目をインポート",
     en: "Import songs",
@@ -674,9 +743,10 @@ export const analyticsTranslations = {
   },
   "optimizer.import.desc": {
     ja: "「目標管理」の「曲目をシェア」で共有されたIDを入力してください。曲と目標EXスコアが自分で曲を選んで作成する画面に読み込まれます。",
-    en: "Enter the ID shared via \"Share song list\" on the Goal Management tab. The songs and target EX scores will be loaded into the custom goal screen.",
-    "zh-TW": "請輸入透過「目標管理」的「分享曲目」取得的ID。曲目與目標EX分數會載入到自行建立目標的畫面。",
-    ko: "\"목표 관리\"의 \"곡 목록 공유\"로 공유받은 ID를 입력하세요. 곡과 목표 EX스코어가 직접 만들기 화면에 불러와집니다.",
+    en: 'Enter the ID shared via "Share song list" on the Goal Management tab. The songs and target EX scores will be loaded into the custom goal screen.',
+    "zh-TW":
+      "請輸入透過「目標管理」的「分享曲目」取得的ID。曲目與目標EX分數會載入到自行建立目標的畫面。",
+    ko: '"목표 관리"의 "곡 목록 공유"로 공유받은 ID를 입력하세요. 곡과 목표 EX스코어가 직접 만들기 화면에 불러와집니다.',
   },
   "optimizer.import.placeholder": {
     ja: "共有されたIDを貼り付け",
@@ -823,6 +893,12 @@ export const analyticsTranslations = {
     "zh-TW": "計算中...",
     ko: "계산 중...",
   },
+  "optimizer.customGoal.previewFailed": {
+    ja: "BPIの計算に失敗しました。曲数を減らして再度お試しください。",
+    en: "Failed to calculate BPI. Try reducing the number of songs and try again.",
+    "zh-TW": "BPI計算失敗，請減少曲目數量後再試一次。",
+    ko: "BPI 계산에 실패했습니다. 곡 수를 줄이고 다시 시도해 주세요.",
+  },
   "optimizer.customGoal.save": {
     ja: "この目標を保存",
     en: "Save this goal",
@@ -835,17 +911,29 @@ export const analyticsTranslations = {
     "zh-TW": "已儲存自訂目標",
     ko: "커스텀 목표를 저장했습니다",
   },
-  "optimizer.customGoal.update": {
-    ja: "この目標を更新",
-    en: "Update this goal",
-    "zh-TW": "更新此目標",
-    ko: "이 목표 업데이트",
-  },
   "optimizer.customGoal.updated": {
     ja: "目標を更新しました",
     en: "Goal updated",
     "zh-TW": "已更新目標",
     ko: "목표를 업데이트했습니다",
+  },
+  "optimizer.customGoal.saveHint": {
+    ja: "目標はいつでも編集できます",
+    en: "You can edit your goal anytime",
+    "zh-TW": "目標隨時都可以編輯",
+    ko: "목표는 언제든지 수정할 수 있습니다",
+  },
+  "optimizer.customGoal.editTitle": {
+    ja: "目標を編集",
+    en: "Edit goal",
+    "zh-TW": "編輯目標",
+    ko: "목표 편집",
+  },
+  "optimizer.customGoal.updateAndClose": {
+    ja: "更新して閉じる",
+    en: "Update and close",
+    "zh-TW": "更新並關閉",
+    ko: "업데이트하고 닫기",
   },
   "optimizer.customGoal.searchStepTitle": {
     ja: "曲を検索",
@@ -872,10 +960,10 @@ export const analyticsTranslations = {
     ko: "일치하는 곡을 찾을 수 없습니다",
   },
   "optimizer.customGoal.searchMode.title": {
-    ja: "曲名検索",
-    en: "By title",
-    "zh-TW": "曲名搜尋",
-    ko: "곡명 검색",
+    ja: "楽曲一覧",
+    en: "Song list",
+    "zh-TW": "樂曲清單",
+    ko: "곡 목록",
   },
   "optimizer.customGoal.searchMode.radar": {
     ja: "レーダー項目別",
@@ -912,6 +1000,24 @@ export const analyticsTranslations = {
     en: "SOFLAN",
     "zh-TW": "SOFLAN",
     ko: "SOFLAN",
+  },
+  "optimizer.customGoal.sortOrder.title": {
+    ja: "名前順",
+    en: "By name",
+    "zh-TW": "依曲名",
+    ko: "이름순",
+  },
+  "optimizer.customGoal.sortOrder.bpiDesc": {
+    ja: "BPIが高い順",
+    en: "My BPI: high to low",
+    "zh-TW": "自己BPI由高到低",
+    ko: "내 BPI 높은 순",
+  },
+  "optimizer.customGoal.sortOrder.bpiAsc": {
+    ja: "BPIが低い順",
+    en: "My BPI: low to high",
+    "zh-TW": "自己BPI由低到高",
+    ko: "내 BPI 낮은 순",
   },
   "optimizer.customGoal.filterByTitle": {
     ja: "曲名で絞り込み",

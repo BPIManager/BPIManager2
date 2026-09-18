@@ -7,28 +7,15 @@ import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface OptimizationStepListProps {
   result: OptimizationResult;
-  onSave?: () => void;
-  isSaving?: boolean;
-  isSaved?: boolean;
 }
 
-const OptimizationStepList = ({
-  result,
-  onSave,
-  isSaving,
-  isSaved,
-}: OptimizationStepListProps) => {
+const OptimizationStepList = ({ result }: OptimizationStepListProps) => {
   const { t } = useTranslation();
   const maxGain = Math.max(...result.steps.map((s) => s.bpiGain), 0.01);
 
   return (
     <div className="flex flex-col gap-4">
-      <OptimizationSummary
-        result={result}
-        onSave={onSave}
-        isSaving={isSaving}
-        isSaved={isSaved}
-      />
+      <OptimizationSummary result={result} />
 
       {result.coldCategories && result.coldCategories.length > 0 && (
         <ColdCategoryNotice coldCategories={result.coldCategories} />

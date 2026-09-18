@@ -105,7 +105,26 @@ describe("handleSongContribution", () => {
     expect(withBaseline.result.body.contributions[0].contribution).toBeLessThan(soloBpi);
   });
 
-  it("未知のsongIdが含まれる場合は400エラーを返すこと", async () => {
+  it("未知のsongIdが含まれる場合はその曲だけ無視し、残りの曲で結果を返すこと", async () => {
+    dbHolder.current = createDbSpy([makeRow({ songId: 1, exScore: 1850 })]);
+
+    const { result } = await handleSongContribution(
+      makeReq({
+        targets: [
+          { songId: 999, baselineExScore: 1000 },
+          { songId: 1, baselineExScore: 1850 },
+        ],
+      }),
+      {},
+    );
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.body.contributions).toHaveLength(1);
+    expect(result.body.contributions[0].songId).toBe(1);
+  });
+
+  it("未知のsongIdしか含まれない場合は空のcontributionsで結果を返すこと", async () => {
     dbHolder.current = createDbSpy([makeRow({ songId: 1 })]);
 
     const { result } = await handleSongContribution(
@@ -113,7 +132,8 @@ describe("handleSongContribution", () => {
       {},
     );
 
-    expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.status).toBe(400);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.body.contributions).toHaveLength(0);
   });
 });

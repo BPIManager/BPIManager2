@@ -1,4 +1,5 @@
-import { CircleDashed, TrendingUp } from "lucide-react";
+import { useState } from "react";
+import { ChevronRight, CircleDashed, History, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -7,8 +8,11 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import type { OptimizerStrategy } from "@/types/bpi-optimizer";
 import type { RadarCategory } from "@/types/stats/radar";
+import type { BpiOptimizerDatasetVersion } from "@/hooks/analytics/useBpiOptimizer";
+import { versionTitles } from "@/constants/iidx/versionTitles";
 import BpiChip from "./BpiChip";
 import OptimizerGuide from "./OptimizerGuide";
+import DatasetPickerDrawer from "./DatasetPickerDrawer";
 import { RADAR_LABELS } from "./shared";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
@@ -44,6 +48,8 @@ interface OptimizerFormProps {
   onSearchModeChange: (mode: "fastest" | "flexible") => void;
   considerCurrentTotalBpi: boolean;
   onConsiderCurrentTotalBpiChange: (v: boolean) => void;
+  datasetVersion: BpiOptimizerDatasetVersion;
+  onDatasetVersionChange: (v: BpiOptimizerDatasetVersion) => void;
 }
 
 const TargetInputSection = ({
@@ -94,6 +100,47 @@ const TargetInputSection = ({
           className="h-12 text-lg font-mono bg-bpim-bg border-2 border-bpim-border focus:border-bpim-primary"
         />
       </div>
+    </div>
+  );
+};
+
+const DatasetSection = ({
+  datasetVersion,
+  onDatasetVersionChange,
+}: {
+  datasetVersion: BpiOptimizerDatasetVersion;
+  onDatasetVersionChange: (v: BpiOptimizerDatasetVersion) => void;
+}) => {
+  const { t } = useTranslation();
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const isSelfBest = datasetVersion === "self-best";
+  const label = isSelfBest
+    ? t("optimizer.datasetSelfBestLabel")
+    : (versionTitles.find((v) => v.num === datasetVersion)?.title ??
+      datasetVersion);
+
+  return (
+    <div className="space-y-3">
+      <Label className="text-xs font-black text-bpim-muted uppercase tracking-widest">
+        {t("optimizer.datasetLabel")}
+      </Label>
+      <button
+        type="button"
+        onClick={() => setPickerOpen(true)}
+        className="flex w-full items-center justify-between gap-2 rounded-lg border border-bpim-border bg-bpim-bg px-3 py-2.5 text-left transition-colors hover:bg-bpim-overlay"
+      >
+        <span className="flex items-center gap-2 text-xs font-bold text-bpim-text">
+          {isSelfBest && <History className="h-3.5 w-3.5 text-bpim-primary" />}
+          {label}
+        </span>
+        <ChevronRight className="h-4 w-4 shrink-0 text-bpim-subtle" />
+      </button>
+      <DatasetPickerDrawer
+        open={pickerOpen}
+        onOpenChange={setPickerOpen}
+        value={datasetVersion}
+        onPick={onDatasetVersionChange}
+      />
     </div>
   );
 };
@@ -304,6 +351,8 @@ const OptimizerForm = ({
   radarElements,
   strongRadarCategories,
   weakRadarCategories,
+  datasetVersion,
+  onDatasetVersionChange,
 }: OptimizerFormProps) => {
   const { t } = useTranslation();
   return (
@@ -324,6 +373,11 @@ const OptimizerForm = ({
       inputError={inputError}
       maxStepsInput={maxStepsInput}
       onMaxStepsChange={onMaxStepsChange}
+    />
+
+    <DatasetSection
+      datasetVersion={datasetVersion}
+      onDatasetVersionChange={onDatasetVersionChange}
     />
 
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

@@ -38,7 +38,7 @@ const coldCategoryAdvisorySchema = z.object({
 });
 
 const optimizationResultSchema = z.object({
-  steps: z.array(optimizationStepSchema).max(1000),
+  steps: z.array(optimizationStepSchema).max(2000),
   currentTotalBpi: z.number(),
   targetTotalBpi: z.number(),
   originalTargetTotalBpi: z.number().optional(),

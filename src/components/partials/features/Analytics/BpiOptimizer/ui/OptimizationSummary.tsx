@@ -1,12 +1,4 @@
-import {
-  ArrowRight,
-  Sparkles,
-  AlertTriangle,
-  Info,
-  CircleDashed,
-  Save,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ArrowRight, Sparkles, AlertTriangle, Info } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { OptimizationResult } from "@/types/bpi-optimizer";
 import BpiChip from "./BpiChip";
@@ -14,17 +6,9 @@ import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface OptimizationSummaryProps {
   result: OptimizationResult;
-  onSave?: () => void;
-  isSaving?: boolean;
-  isSaved?: boolean;
 }
 
-const OptimizationSummary = ({
-  result,
-  onSave,
-  isSaving,
-  isSaved,
-}: OptimizationSummaryProps) => {
+const OptimizationSummary = ({ result }: OptimizationSummaryProps) => {
   const { t, tFormat } = useTranslation();
   const {
     currentTotalBpi,
@@ -114,40 +98,21 @@ const OptimizationSummary = ({
         </div>
       )}
       <div className="rounded-xl border border-bpim-border bg-bpim-surface p-4 flex flex-col gap-4">
-        <div className="flex items-center justify-between gap-2 flex-wrap">
-          <div className="flex items-center gap-2">
-            <BpiChip bpi={currentTotalBpi} />
-            <ArrowRight className="h-4 w-4 text-bpim-muted shrink-0" />
-            <BpiChip bpi={finalBpi} />
-            {finalBpi >= targetTotalBpi ? (
-              <Badge className="bg-bpim-success/20 text-bpim-success border-bpim-success/30 text-xs">
-                {t("optimizer.summary.achieved")}
-              </Badge>
-            ) : (
-              <Badge
-                variant="outline"
-                className="border-bpim-warning/50 text-bpim-warning text-xs"
-              >
-                {tFormat("optimizer.summary.remaining", { diff: (targetTotalBpi - finalBpi).toFixed(2) })}
-              </Badge>
-            )}
-          </div>
-
-          {onSave && (
-            <Button
-              variant="default"
-              size="sm"
-              onClick={onSave}
-              disabled={isSaving || isSaved}
-              className="gap-2 h-9 text-xs font-bold shadow-sm shadow-bpim-primary/30 disabled:opacity-50"
+        <div className="flex items-center gap-2 flex-wrap">
+          <BpiChip bpi={currentTotalBpi} />
+          <ArrowRight className="h-4 w-4 text-bpim-muted shrink-0" />
+          <BpiChip bpi={finalBpi} />
+          {finalBpi >= targetTotalBpi ? (
+            <Badge className="bg-bpim-success/20 text-bpim-success border-bpim-success/30 text-xs">
+              {t("optimizer.summary.achieved")}
+            </Badge>
+          ) : (
+            <Badge
+              variant="outline"
+              className="border-bpim-warning/50 text-bpim-warning text-xs"
             >
-              {isSaving ? (
-                <CircleDashed className="h-4 w-4 animate-spin" />
-              ) : (
-                <Save className="h-4 w-4" />
-              )}
-              {isSaved ? t("optimizer.summary.saved") : t("optimizer.summary.save")}
-            </Button>
+              {tFormat("optimizer.summary.remaining", { diff: (targetTotalBpi - finalBpi).toFixed(2) })}
+            </Badge>
           )}
         </div>
         <p className="text-xs text-bpim-muted">

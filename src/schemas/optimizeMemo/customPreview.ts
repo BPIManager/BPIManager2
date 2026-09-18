@@ -9,7 +9,7 @@ export const customGoalPreviewBodySchema = z.object({
       }),
     )
     .min(1)
-    .max(50),
+    .max(2000),
 });
 
 export type CustomGoalPreviewBodyInput = z.output<
