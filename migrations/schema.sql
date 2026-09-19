@@ -221,19 +221,46 @@ CREATE TABLE IF NOT EXISTS `notifications` (
   CONSTRAINT `fk_notifications_user_id` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `optimizeMemo` (
+CREATE TABLE IF NOT EXISTS `optimizeGoals` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `reportId` varchar(36) NOT NULL COMMENT '一意のUUID',
   `userId` varchar(128) NOT NULL,
-  `reportData` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '計算結果のJSON' CHECK (json_valid(`reportData`)),
   `targetBpi` float DEFAULT NULL COMMENT '検索性のための目標BPI（任意）',
   `kind` varchar(10) NOT NULL DEFAULT 'auto' COMMENT '自動生成プラン(auto)かユーザーが曲・目標を選ぶカスタム目標(custom)か',
+  `currentTotalBpi` float NOT NULL,
+  `targetTotalBpi` float NOT NULL,
+  `achievable` tinyint(1) NOT NULL,
+  `alreadyAchieved` tinyint(1) NOT NULL,
+  `totalSongCount` int(11) NOT NULL,
+  `originalTargetTotalBpi` float DEFAULT NULL,
+  `autoAdjustmentNote` varchar(255) DEFAULT NULL,
+  `maxAchievableBpi` float DEFAULT NULL,
+  `coldCategories` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'データが薄く推定を見送ったレーダーカテゴリ(ColdCategoryAdvisory[])のJSON' CHECK (`coldCategories` is null or json_valid(`coldCategories`)),
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
-  UNIQUE KEY `idx_reportId_unique` (`reportId`),
-  KEY `idx_report_userId_createdAt` (`userId`,`createdAt` DESC),
-  CONSTRAINT `fk_reports_users` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  UNIQUE KEY `idx_optimizeGoals_reportId_unique` (`reportId`),
+  KEY `idx_optimizeGoals_userId_createdAt` (`userId`,`createdAt` DESC),
+  CONSTRAINT `fk_optimizeGoals_users` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `optimizeGoalSteps` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `reportId` varchar(36) NOT NULL,
+  `rank` int(11) NOT NULL,
+  `songId` int(11) NOT NULL,
+  `fromExScore` int(11) DEFAULT NULL,
+  `toExScore` int(11) NOT NULL,
+  `exScoreGap` int(11) NOT NULL,
+  `bpiGain` float NOT NULL,
+  `cumulativeTotalBpi` float NOT NULL,
+  `isUnplayed` tinyint(1) NOT NULL,
+  `radarCategory` varchar(20) DEFAULT NULL,
+  `isRadarStrength` tinyint(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_optimizeGoalSteps_reportId_rank_unique` (`reportId`,`rank`),
+  KEY `idx_optimizeGoalSteps_songId` (`songId`),
+  CONSTRAINT `fk_optimizeGoalSteps_reportId` FOREIGN KEY (`reportId`) REFERENCES `optimizeGoals` (`reportId`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `scores` (
   `logId` bigint(20) NOT NULL AUTO_INCREMENT,
