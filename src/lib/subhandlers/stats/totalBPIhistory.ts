@@ -14,13 +14,8 @@ export async function handleStatsTotalBpiHistory(
   req: NextApiRequest,
 ): Promise<HandlerResult<unknown>> {
   const groupBy = groupByOf(req);
-  const [allLogs, fullMaster] = await Promise.all([
-    statsTablesRepo.getScoreHistory(
-      q.userId,
-      q.version,
-      q.levels,
-      q.difficulties,
-    ),
+  const [fullLogs, fullMaster] = await Promise.all([
+    statsTablesRepo.getScoreHistory(q.userId, q.version, [], []),
     songsRepo.getSongMasterWithDef(),
   ]);
   const scopedMaster = fullMaster.filter(
@@ -30,46 +25,104 @@ export async function handleStatsTotalBpiHistory(
       (q.difficulties.length === 0 ||
         (s.difficulty != null && q.difficulties.includes(s.difficulty))),
   );
-  if (allLogs.length === 0) return ok([]);
+  const scopedSongIds = new Set(scopedMaster.map((s) => s.songId));
+  const scopedLogs = fullLogs.filter(
+    (log) => log.songId != null && scopedSongIds.has(log.songId),
+  );
+  if (scopedLogs.length === 0) return ok([]);
 
   const toJSTDateStr = (date: Date | string): string =>
     dayjs(date).tz().format("YYYY-MM-DD");
 
-  const logsByDate: Record<string, typeof allLogs> = {};
-  allLogs.forEach((log) => {
+  const scopedLogsByDate: Record<string, typeof scopedLogs> = {};
+  scopedLogs.forEach((log) => {
     if (!log.songId || !log.lastPlayed) return;
     const date = toJSTDateStr(log.lastPlayed);
-    if (!logsByDate[date]) logsByDate[date] = [];
-    logsByDate[date].push(log);
+    if (!scopedLogsByDate[date]) scopedLogsByDate[date] = [];
+    scopedLogsByDate[date].push(log);
   });
 
-  const songById = new Map(scopedMaster.map((s) => [s.songId, s]));
+  const songNotesById = new Map(fullMaster.map((s) => [s.songId, s.notes]));
   const trend = [];
-  const latestBpisBySong = new Map<number, number>();
-  const latestExScoresBySong = new Map<number, number>();
-  // 総合BPIは既知の最高値を下回らないようラチェットする(executeSaveBpiSystem・
-  // recalculateTotalBpi.ts等と同じ理由。src/lib/bpi/index.tsのratchetTotalBpi
-  // 参照)。この推移グラフはDBの`logs`/`userStatusLogs`を経由せず日付ごとの
-  // 生の値をこの場で再計算するため、この関数内のrunning maxを基準にする。
-  let bestTotalBpiSoFar: number | null = null;
-  const startDate = dayjs(allLogs[0].lastPlayed).tz().startOf("day");
-  const endDate = dayjs(allLogs[allLogs.length - 1].lastPlayed)
+  // 表示用(prevExScore/prevBpiの差分レポート)はscopedLogsのみを対象に、日単位
+  // で従来通り追跡する。observations(潜在スキル推定)側とは別管理にする
+  const reportBpisBySong = new Map<number, number>();
+  const reportExScoresBySong = new Map<number, number>();
+  const startDate = dayjs(scopedLogs[0].lastPlayed).tz().startOf("day");
+  const endDate = dayjs(scopedLogs[scopedLogs.length - 1].lastPlayed)
     .tz()
     .startOf("day");
 
+  // observations(潜在スキル推定用、level11等スコープ外も含む全体)はstartDate
+  // より前に反映済みの状態から始める
+  const latestExScoresBySong = new Map<number, number>();
+  fullLogs.forEach((log) => {
+    if (!log.songId || !log.lastPlayed) return;
+    if (dayjs(log.lastPlayed).tz().startOf("day").isBefore(startDate)) {
+      latestExScoresBySong.set(log.songId, log.exScore);
+    }
+  });
+
+  // 総合BPIは既知の最高値を下回らないようラチェットする(executeSaveBpiSystem・
+  // recalculateTotalBpi.ts等と同じ理由。src/lib/bpi/index.tsのratchetTotalBpi
+  // 参照)。同一バッチ内の更新は同一(またはごく近い)lastPlayedを持つため、
+  // これをステップの単位としてratchetする。日単位でまとめて一括反映すると、
+  // 同日内で一時的に上振れしたピークが最終状態に上書きされて失われてしまう
+  // (executeSaveBpiSystemはバッチ単位でratchetするため、この再計算もそれに
+  // 合わせた粒度で行う必要がある。calculateTotalBpi.tsと同じ理由)
+  const logsInRange = fullLogs.filter((log) => {
+    if (!log.songId || !log.lastPlayed) return false;
+    const day = dayjs(log.lastPlayed).tz().startOf("day");
+    return !day.isBefore(startDate) && !day.isAfter(endDate);
+  });
+  const stepGroups = new Map<string, typeof fullLogs>();
+  logsInRange.forEach((log) => {
+    const stepKey = dayjs(log.lastPlayed).toISOString();
+    if (!stepGroups.has(stepKey)) stepGroups.set(stepKey, []);
+    stepGroups.get(stepKey)!.push(log);
+  });
+  const sortedStepKeys = Array.from(stepGroups.keys()).sort();
+
+  let bestTotalBpiSoFar: number | null = null;
+  const dayTotalBpi = new Map<string, number>();
+  for (const stepKey of sortedStepKeys) {
+    const stepLogs = stepGroups.get(stepKey)!;
+    stepLogs.forEach((log) => {
+      if (log.songId != null) latestExScoresBySong.set(log.songId, log.exScore);
+    });
+    const observations: IBpiScoreObservation[] = Array.from(
+      latestExScoresBySong.entries(),
+    ).map(([songId, exScore]) => ({
+      songId,
+      notes: songNotesById.get(songId) ?? 0,
+      exScore,
+    }));
+    const freshTotalBpi = BpiCalculator.calculateTotalBPI(
+      observations,
+      scopedMaster,
+    );
+    bestTotalBpiSoFar = BpiCalculator.ratchetTotalBpi(
+      bestTotalBpiSoFar,
+      freshTotalBpi,
+    );
+    const dateStr = toJSTDateStr(stepLogs[0].lastPlayed as Date | string);
+    dayTotalBpi.set(dateStr, bestTotalBpiSoFar);
+  }
+
+  let lastKnownTotalBpi: number | null = null;
   for (let d = startDate; !d.isAfter(endDate); d = d.add(1, "day")) {
     const dateStr = d.format("YYYY-MM-DD");
-    const updatedOnThisDay = logsByDate[dateStr] || [];
+    const updatedOnThisDay = scopedLogsByDate[dateStr] || [];
     const updatedSongs = updatedOnThisDay
       .filter((s) => s.songId != null)
       .map((s) => {
         const songId = s.songId as number;
         const suffix = DIFFICULTY_LABELS[s.difficulty as string] || "";
-        const prevExScore = latestExScoresBySong.get(songId) ?? null;
-        const prevBpi = latestBpisBySong.get(songId) ?? null;
+        const prevExScore = reportExScoresBySong.get(songId) ?? null;
+        const prevBpi = reportBpisBySong.get(songId) ?? null;
         const newBpi = s.bpi ?? -15;
-        latestBpisBySong.set(songId, newBpi);
-        latestExScoresBySong.set(songId, s.exScore);
+        reportBpisBySong.set(songId, newBpi);
+        reportExScoresBySong.set(songId, s.exScore);
         return {
           title: `${s.title}${suffix}`,
           prevExScore,
@@ -78,26 +131,11 @@ export async function handleStatsTotalBpiHistory(
           newBpi,
         };
       });
-    const observations: IBpiScoreObservation[] = Array.from(
-      latestExScoresBySong.entries(),
-    ).map(([songId, exScore]) => ({
-      songId,
-      notes: songById.get(songId)?.notes ?? 0,
-      exScore,
-    }));
-    const freshTotalBpi = BpiCalculator.calculateTotalBPI(
-      observations,
-      scopedMaster,
-    );
-    const totalBpi = BpiCalculator.ratchetTotalBpi(
-      bestTotalBpiSoFar,
-      freshTotalBpi,
-    );
-    bestTotalBpiSoFar = totalBpi;
+    if (dayTotalBpi.has(dateStr)) lastKnownTotalBpi = dayTotalBpi.get(dateStr)!;
     trend.push({
       date: dateStr,
-      totalBpi,
-      count: latestBpisBySong.size,
+      totalBpi: lastKnownTotalBpi as number,
+      count: reportBpisBySong.size,
       updatedSongs,
     });
   }

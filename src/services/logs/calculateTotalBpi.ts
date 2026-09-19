@@ -42,7 +42,6 @@ export const calculateTotalBpi = (
     number,
     { bpi: number; level: number; exScore: number; notes: number }
   >();
-  const dailyGroups = new Map<string, ScoreEntry[]>();
 
   // 日付情報が欠損したスコアを「今日」として扱うと実際の推移を歪めるため、
   // 既知の日付の中で最も古いバケットに寄せる
@@ -54,27 +53,48 @@ export const calculateTotalBpi = (
     .sort();
   const fallbackDayKey = knownDayKeys[0] ?? dayjs(0).format("YYYY-MM-DD");
 
-  allScores.forEach((score) => {
-    const dayKey =
-      score.playDay || score.lastPlayed
-        ? dayjs(score.playDay || score.lastPlayed).format("YYYY-MM-DD")
-        : fallbackDayKey;
-    if (!dailyGroups.has(dayKey)) dailyGroups.set(dayKey, []);
-    dailyGroups.get(dayKey)!.push(score);
+  const dayKeyOf = (score: ScoreEntry) =>
+    score.playDay || score.lastPlayed
+      ? dayjs(score.playDay || score.lastPlayed).format("YYYY-MM-DD")
+      : fallbackDayKey;
+
+  // 同一バッチ内の更新は同一(またはごく近い)lastPlayedを持つため、これを
+  // ステップの単位とする。日単位でまとめて一括反映すると、同日内で一時的に
+  // 上振れしたピーク(ratchet対象)が最終状態に上書きされて失われてしまう
+  // (executeSaveBpiSystemはバッチ単位でratchetするため、同日でも複数バッチ
+  // あれば都度ratchetが効く。ここでの再計算もそれに合わせて同じ粒度で行う
+  // 必要がある)
+  const sortedScores = [...allScores].sort((a, b) => {
+    const at = a.playDay || a.lastPlayed ? dayjs(a.playDay || a.lastPlayed).valueOf() : 0;
+    const bt = b.playDay || b.lastPlayed ? dayjs(b.playDay || b.lastPlayed).valueOf() : 0;
+    return at - bt;
   });
 
-  const sortedDayKeys = Array.from(dailyGroups.keys()).sort();
+  // 日付欠損分は最古バケット扱いにするため、ISO文字列より辞書順で必ず前に来る
+  // キーにする
+  const stepGroups = new Map<string, ScoreEntry[]>();
+  sortedScores.forEach((score) => {
+    const stepKey = score.playDay || score.lastPlayed
+      ? dayjs(score.playDay || score.lastPlayed).toISOString()
+      : "0000-unknown";
+    if (!stepGroups.has(stepKey)) stepGroups.set(stepKey, []);
+    stepGroups.get(stepKey)!.push(score);
+  });
+  const sortedStepKeys = Array.from(stepGroups.keys()).sort();
 
   // 総合BPIは既知の最高値を下回らないようラチェットする（他の総合BPI算出箇所と
   // 同じ理由。src/lib/bpi/index.tsのratchetTotalBpi参照）。この関数はDBの
-  // userStatusLogsを経由せず生スコアから日別に再計算するため、ループ内の
-  // running maxを基準にする
+  // userStatusLogsを経由せず生スコアから再計算するため、ループ内の running max
+  // を基準にする
   let bestTotalBpiSoFar: number | null = null;
+  const dayTotalBpi = new Map<string, number>();
+  const dayScoresMap = new Map<string, ScoreEntry[]>();
 
-  for (const dayKey of sortedDayKeys) {
-    const dayScores = dailyGroups.get(dayKey)!;
+  for (const stepKey of sortedStepKeys) {
+    const stepScores = stepGroups.get(stepKey)!;
+    const dayKey = dayKeyOf(stepScores[0]);
 
-    dayScores.forEach((s) => {
+    stepScores.forEach((s) => {
       currentPBs.set(s.songId, {
         bpi: s.bpi ?? -15,
         level: s.difficultyLevel,
@@ -88,17 +108,25 @@ export const calculateTotalBpi = (
     ).map(([songId, v]) => ({ songId, notes: v.notes, exScore: v.exScore }));
 
     const freshTotalBpi = BpiCalculator.calculateTotalBPI(observations, allSongs);
-    const totalBpi = BpiCalculator.ratchetTotalBpi(
+    bestTotalBpiSoFar = BpiCalculator.ratchetTotalBpi(
       bestTotalBpiSoFar,
       freshTotalBpi,
     );
-    bestTotalBpiSoFar = totalBpi;
+    dayTotalBpi.set(dayKey, bestTotalBpiSoFar);
 
+    if (!dayScoresMap.has(dayKey)) dayScoresMap.set(dayKey, []);
+    dayScoresMap.get(dayKey)!.push(...stepScores);
+  }
+
+  const sortedDayKeys = Array.from(dayScoresMap.keys()).sort();
+
+  for (const dayKey of sortedDayKeys) {
+    const dayScores = dayScoresMap.get(dayKey)!;
     timeline.push({
       id: dayKey,
       batchId: dayKey,
       version: version,
-      totalBpi,
+      totalBpi: dayTotalBpi.get(dayKey)!,
       songCount: dayScores.length,
       createdAt: dayScores[dayScores.length - 1].lastPlayed,
       topScores: [...dayScores]

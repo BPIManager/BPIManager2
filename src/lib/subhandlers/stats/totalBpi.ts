@@ -32,17 +32,20 @@ export async function handleStatsTotalBpi(
   const level12Master = songMaster.filter((s) => s.difficultyLevel === 12);
   const totalCount = level12Master.length;
   const level12Scores = scores.filter((s) => Number(s.difficultyLevel) === 12);
-  const observations: IBpiScoreObservation[] = level12Scores
+  // 総合BPI(V2)の潜在スキル推定はlevel11+12の全観測を使う必要があるため、
+  // 集計母集団(level12Master)とは別にscores全体からobservationsを作る
+  // （bulk.ts/manual.tsのbpiSongMaster由来observationsと同じ理由）
+  const observations: IBpiScoreObservation[] = scores
     .filter((s) => s.exScore !== null && s.exScore !== undefined)
-    .map((s) => ({ songId: s.songId, notes: s.notes, exScore: Number(s.exScore) }));
+    .map((s) => ({
+      songId: s.songId,
+      notes: s.notes,
+      exScore: Number(s.exScore),
+    }));
   const freshTotalBpi = BpiCalculator.calculateTotalBPI(
     observations,
     level12Master,
   );
-  // 「今の」総合BPI(asOf省略/"latest")に限り、既知の最高値を下回らないよう
-  // ラチェットする。過去日付を指定したasOfクエリは「その時点の生の値」を
-  // 見る用途のため、未来の記録を混ぜ込まないよう対象外にする
-  // （bpiImport.tsのexecuteSaveBpiSystemと同じ理由。src/lib/bpi/index.ts参照）。
   const isLatest = !q.asOf || q.asOf === "latest";
   const previousBest = isLatest
     ? await userStatusLogsRepo.getMaxTotalBpi(db, q.userId, q.version)
