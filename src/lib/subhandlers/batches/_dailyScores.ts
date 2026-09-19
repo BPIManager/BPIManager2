@@ -3,6 +3,7 @@ import { rivalRepo } from "@/lib/db/aggregates/rivalScores/rival";
 import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { scoreDetailRepo } from "@/lib/db/domains/scores/detail";
 import { navigationRepo } from "@/lib/db/domains/logs/navigation";
+import { songsRepo } from "@/lib/db/domains/songs";
 import { calculateTotalBpi } from "@/services/logs/calculateTotalBpi";
 import { mapToLogNested } from "@/utils/logs/getMapNested";
 import {
@@ -66,10 +67,10 @@ export async function handleLastPlayedBase(
     range: { ...range, basis: "lastPlayed" },
   });
 
-  const [history, batchTotalBpis, dailyScores, overtaken, rivalScores, versionOvertakenMap] =
+  const [history, fullMaster, dailyScores, overtaken, rivalScores, versionOvertakenMap] =
     await Promise.all([
       statsTablesRepo.getScoreHistory(uid, ver, [], []),
-      navigationRepo.getBatchTotalBpiHistory(uid, ver),
+      songsRepo.getSongMasterWithDef(),
       type === "day"
         ? scoreDetailRepo.getScoresByLastPlayedRange(uid, ver, range)
         : scoreDetailRepo.getScoresWithDetails(uid, ver, {
@@ -87,7 +88,8 @@ export async function handleLastPlayedBase(
   const overtakenMap = createOvertakenMap(overtaken);
   const rivalRankMap = computeRivalRankMap(overtakenMap, rivalScores);
 
-  const timeline = calculateTotalBpi(history, batchTotalBpis, ver, 0);
+  const level12Master = fullMaster.filter((s) => s.difficultyLevel === 12);
+  const timeline = calculateTotalBpi(history, level12Master, ver, 0);
   const currentSnapshot = timeline.find((t) => t.id === range.label);
   const currentIndex = timeline.findIndex((t) => t.id === range.label);
   const nextSnapshot = timeline[currentIndex - 1];
