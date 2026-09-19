@@ -12,6 +12,7 @@ import { targetOf, type HandleOutcome } from "./_shared";
 import type { RadarCategory } from "@/types/stats/radar";
 import type { IIDXVersion } from "@/types/iidx/version";
 import type { SongOptimizerInput, ExecuteOptions } from "@/types/bpi-optimizer";
+import type { IBpiBasicSongData } from "@/types/songs/bpi";
 
 /** GET /users/[userId]/analytics/bpi-optimizer （withUserApiHandler） */
 export async function handleBpiOptimizer(
@@ -65,13 +66,30 @@ export async function handleBpiOptimizer(
     ? (datasetVersionParam as IIDXVersion)
     : latestVersion;
 
+  const usesNonCurrentDataset =
+    useSelfBest || resolvedDatasetVersion !== latestVersion;
+
   try {
-    const rawRows = useSelfBest
-      ? await bpiOptimizerAggregateRepo.getAllSongsWithSelfBestScores(userId)
-      : await bpiOptimizerAggregateRepo.getAllSongsWithUserScores(
-          userId,
-          resolvedDatasetVersion,
-        );
+    const [rawRows, actualCurrentRows] = await Promise.all([
+      useSelfBest
+        ? bpiOptimizerAggregateRepo.getAllSongsWithSelfBestScores(userId)
+        : bpiOptimizerAggregateRepo.getAllSongsWithUserScores(
+            userId,
+            resolvedDatasetVersion,
+          ),
+      usesNonCurrentDataset
+        ? bpiOptimizerAggregateRepo.getAllSongsWithUserScores(
+            userId,
+            latestVersion,
+          )
+        : Promise.resolve(null),
+    ]);
+    const actualCurrentExScoreBySongId = new Map<number, number | null>(
+      (actualCurrentRows ?? []).map((r) => [
+        r.songId,
+        r.exScore != null ? Number(r.exScore) : null,
+      ]),
+    );
 
     if (rawRows.length === 0) {
       return {
@@ -96,6 +114,7 @@ export async function handleBpiOptimizer(
     // BPI(V2)ネイティブの探索エンジンはBPI計算式を再実装せず`BpiCalculator`（V2）に
     // 一貫して委譲するため、ここでの`currentBpi`もV2の単曲BPI（`BpiCalculator.calc`）を
     // そのまま使う（DBの`scores.bpi`もV2で書き込まれた値なので一致する）。
+    const songDataById = new Map<number, IBpiBasicSongData>();
     const songs: SongOptimizerInput[] = rawRows.map((r) => {
       const exScore = r.exScore != null ? Number(r.exScore) : null;
       const song = {
@@ -107,16 +126,19 @@ export async function handleBpiOptimizer(
         sigma: r.sigma != null ? Number(r.sigma) : null,
         residualVar: r.residualVar != null ? Number(r.residualVar) : null,
       };
+      songDataById.set(r.songId, song);
       return {
         songId: r.songId,
         title: r.title,
         difficulty: r.difficulty,
         difficultyLevel: r.difficultyLevel,
         ...song,
-        currentBpi: exScore != null ? (BpiCalculator.calc(exScore, song) ?? -15) : -15,
+        currentBpi:
+          exScore != null ? (BpiCalculator.calc(exScore, song) ?? -15) : -15,
         currentExScore: exScore,
         isUnplayed: exScore == null,
-        radarCategory: topElementMap.get(`${r.title}___${r.difficulty}`) ?? null,
+        radarCategory:
+          topElementMap.get(`${r.title}___${r.difficulty}`) ?? null,
       };
     });
 
@@ -137,8 +159,16 @@ export async function handleBpiOptimizer(
     let result = findOptimalBpiPath(songs, targetBpi, baseOptions, maxSteps);
 
     if (!result.achievable && !result.alreadyAchieved && isFiltered) {
-      const fallbackOptions: ExecuteOptions = { ...baseOptions, radarElementFilter: null };
-      const fallbackResult = findOptimalBpiPath(songs, targetBpi, fallbackOptions, maxSteps);
+      const fallbackOptions: ExecuteOptions = {
+        ...baseOptions,
+        radarElementFilter: null,
+      };
+      const fallbackResult = findOptimalBpiPath(
+        songs,
+        targetBpi,
+        fallbackOptions,
+        maxSteps,
+      );
       if (
         fallbackResult.achievable ||
         fallbackResult.steps.length > result.steps.length
@@ -152,6 +182,31 @@ export async function handleBpiOptimizer(
             : note,
         };
       }
+    }
+
+    // 自己べ/過去バージョンのデータセットで探索した場合、各ステップの`fromExScore`
+    // (=保存される「登録当初のスコア」)は探索起点(データセット値)ではなく、
+    // 実際に今作で保存し直したときの比較基準になる今作時点の実スコアに置き換える
+    if (usesNonCurrentDataset && result.steps.length > 0) {
+      result = {
+        ...result,
+        steps: result.steps.map((step) => {
+          const actualExScore =
+            actualCurrentExScoreBySongId.get(step.songId) ?? null;
+          const songData = songDataById.get(step.songId);
+          const fromBpi =
+            actualExScore != null && songData
+              ? (BpiCalculator.calc(actualExScore, songData) ?? -15)
+              : -15;
+          return {
+            ...step,
+            fromExScore: actualExScore,
+            fromBpi,
+            exScoreGap: step.toExScore - (actualExScore ?? 0),
+            isUnplayed: actualExScore == null,
+          };
+        }),
+      };
     }
 
     return { result: ok(result), targetUserId: userId, viewerId };
