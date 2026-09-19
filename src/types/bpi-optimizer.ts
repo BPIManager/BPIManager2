@@ -3,11 +3,10 @@ import type { IBpiBasicSongData } from "@/types/songs/bpi";
 
 export type OptimizerStrategy = "unplayed" | "played";
 
-export interface SongOptimizerInput
-  extends Pick<
-    IBpiBasicSongData,
-    "notes" | "kaidenAvg" | "wrScore" | "coef" | "mu" | "sigma" | "residualVar"
-  > {
+export interface SongOptimizerInput extends Pick<
+  IBpiBasicSongData,
+  "notes" | "kaidenAvg" | "wrScore" | "coef" | "mu" | "sigma" | "residualVar"
+> {
   songId: number;
   title: string;
   difficulty: string;
@@ -73,4 +72,5 @@ export type ExecuteOptions = OptimizerOptions & {
   searchMode?: "fastest" | "flexible";
   maxRetries?: number;
   rng?: () => number;
+  previousBestTotalBpi?: number | null;
 };

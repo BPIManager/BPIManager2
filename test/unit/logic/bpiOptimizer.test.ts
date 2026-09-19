@@ -124,6 +124,27 @@ describe("findOptimalBpiPath", () => {
     expect(result.currentTotalBpi).toBeCloseTo(expected, 2);
   });
 
+  it("previousBestTotalBpi指定時、生の総合BPIがそれを下回っても下回らないようラチェットされること（他画面の「現在の総合BPI」との整合性）", () => {
+    const song = makeSong({ currentExScore: 1850, songId: 1 });
+    const song2 = makeSong({ currentExScore: null, songId: 2 });
+    const rawTotal = BpiCalculator.calculateTotalBPI(
+      [{ songId: 1, notes: song.notes, exScore: 1850 }],
+      [song, song2],
+    );
+
+    const previousBestTotalBpi = rawTotal + 20;
+    const result = findOptimalBpiPath([song, song2], previousBestTotalBpi - 5, {
+      ...baseOptions,
+      previousBestTotalBpi,
+    });
+
+    // 既知の最高値の方が生の値より高いため、その値まで押し上げられ、
+    // 結果として目標(previousBestTotalBpiよりわずかに低い)は既に達成扱いになる
+    expect(result.currentTotalBpi).toBeCloseTo(previousBestTotalBpi, 2);
+    expect(result.alreadyAchieved).toBe(true);
+    expect(result.steps).toEqual([]);
+  });
+
   it("各ステップのtoBpiは、提案されたtoExScoreを実際にプレイした場合にV2モデルが返す単曲BPIと一致すること", () => {
     const song = makeSong({ currentExScore: null });
     const result = findOptimalBpiPath([song, makeFillerSong(99)], -5, baseOptions);
