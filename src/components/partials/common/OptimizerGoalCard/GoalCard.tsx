@@ -321,10 +321,14 @@ export const GoalSongCard = ({
 }) => {
   const { t, tFormat } = useTranslation();
   const current = step.currentExScore;
-  const baseline = step.fromExScore ?? 0;
-  const pct =
-    current == null ? 0 : journeyPct(baseline, current, step.toExScore);
   const isAchieved = current != null && current >= step.toExScore;
+  // EXスコアの絶対差ではなくBPI空間の相対位置で進捗を出す（理由は
+  // OptimizerProgress/ui.tsxのStepProgressRow内コメント参照）
+  const pct = isAchieved
+    ? 100
+    : step.currentBpi == null
+      ? 0
+      : journeyPct(step.fromBpi, step.currentBpi, step.toBpi);
   const highlight: Highlight = isAchieved ? "achieved" : undefined;
 
   const gained =

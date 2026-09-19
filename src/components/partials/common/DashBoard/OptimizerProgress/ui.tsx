@@ -35,6 +35,9 @@ interface StepProgress {
   toExScore: number;
   fromExScore: number | null;
   currentExScore: number | null;
+  fromBpi: number;
+  toBpi: number;
+  currentBpi: number | null;
 }
 
 interface OptimizerProgressCardProps {
@@ -54,11 +57,6 @@ interface OptimizerProgressCardProps {
   fbUser?: FirebaseUser | null;
 }
 
-/**
- * 0点始まりの絶対値だと大半の曲でバーが常にほぼ満タンになり差が見えないため、
- * プラン算出時点のスコア(fromExScore、未プレイ時はnull=0点扱い)を起点とした
- * 相対進捗で表示する。
- */
 const StepProgressRow = ({
   step,
   onClick,
@@ -68,14 +66,19 @@ const StepProgressRow = ({
 }) => {
   const { t, tFormat } = useTranslation();
   const current = step.currentExScore;
-  const baseline = step.fromExScore ?? 0;
+  const currentBpi = step.currentBpi;
+  const baseline = step.fromBpi;
+  const target = step.toBpi;
   const isAchieved = current != null && current >= step.toExScore;
-  const span = step.toExScore - baseline;
+  const span = target - baseline;
+  // EXスコアの絶対差ではなくBPI空間の相対位置で進捗を出す。EXスコアは終盤ほど
+  // 1点の重みが跳ね上がるため、未プレイ(0点)起点だと序盤の伸びがほぼ見えず
+  // 終盤で急に埋まる。BPIは難易度正規化済みの指標なので曲ごとにスケールが揃う。
   const pct = isAchieved
     ? 100
-    : current == null || span <= 0
+    : currentBpi == null || span <= 0
       ? 0
-      : Math.min(100, Math.max(0, ((current - baseline) / span) * 100));
+      : Math.min(100, Math.max(0, ((currentBpi - baseline) / span) * 100));
   const remaining = Math.max(0, step.toExScore - (current ?? 0));
 
   return (
@@ -189,6 +192,9 @@ const OptimizerProgressCard = ({
       toExScore: step.toExScore,
       fromExScore: step.fromExScore,
       currentExScore: currentScores.get(step.songId) ?? null,
+      fromBpi: step.fromBpi,
+      toBpi: step.toBpi,
+      currentBpi: currentBpis.get(step.songId) ?? null,
     })),
     sortOrder,
   );
@@ -266,7 +272,11 @@ const OptimizerProgressCard = ({
 
       <div className="mt-4 flex max-h-56 flex-col gap-3 overflow-y-auto custom-scrollbar pr-1">
         {steps.map((step) => (
-          <StepProgressRow key={step.songId} step={step} onClick={onOpenDetail} />
+          <StepProgressRow
+            key={step.songId}
+            step={step}
+            onClick={onOpenDetail}
+          />
         ))}
       </div>
 
