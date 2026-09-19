@@ -23,6 +23,10 @@ export interface Database {
   allSongs: AllSongsTable;
   allScores: AllScoresTable;
   discordLinks: DiscordLinks;
+  // 曲別データを正規化した新テーブル(#optimize-memo-normalized-tables)。
+  // optimizeMemoは移行用バックフィルスクリプトが読み取るため、テーブル削除まで残す
+  optimizeGoals: OptimizeGoalsTable;
+  optimizeGoalSteps: OptimizeGoalStepsTable;
   optimizeMemo: OptimizeMemoTable;
   songNotes: SongNotesTable;
   songNoteUpvotes: SongNoteUpvotesTable;
@@ -316,6 +320,48 @@ export interface OptimizeMemoTable {
   createdAt: Generated<Date>;
 }
 
+export interface OptimizeGoalsTable {
+  id: Generated<number>;
+  /**
+   * 一意のUUID
+   */
+  reportId: string;
+  userId: string;
+  /**
+   * 検索性のための目標BPI（任意）
+   */
+  targetBpi: Generated<number | null>;
+  /**
+   * 自動生成プラン(auto)かユーザーが曲・目標を選ぶカスタム目標(custom)か
+   */
+  kind: Generated<string>;
+  currentTotalBpi: number;
+  targetTotalBpi: number;
+  achievable: number;
+  alreadyAchieved: number;
+  totalSongCount: number;
+  originalTargetTotalBpi: Generated<number | null>;
+  autoAdjustmentNote: Generated<string | null>;
+  maxAchievableBpi: Generated<number | null>;
+  coldCategories: Generated<string | null>;
+  createdAt: Generated<Date>;
+}
+
+export interface OptimizeGoalStepsTable {
+  id: Generated<number>;
+  reportId: string;
+  rank: number;
+  songId: number;
+  fromExScore: Generated<number | null>;
+  toExScore: number;
+  exScoreGap: number;
+  bpiGain: number;
+  cumulativeTotalBpi: number;
+  isUnplayed: number;
+  radarCategory: Generated<string | null>;
+  isRadarStrength: Generated<number>;
+}
+
 export interface SongAttributes {
   songId: number;
   // Profile (相対評価: 0-100)
@@ -381,6 +427,12 @@ export type UserRoleUpdate = Updateable<UserRoles>;
 export type OptimizeMemo = Selectable<OptimizeMemoTable>;
 export type NewOptimizeMemo = Insertable<OptimizeMemoTable>;
 export type OptimizeMemoUpdate = Updateable<OptimizeMemoTable>;
+export type OptimizeGoal = Selectable<OptimizeGoalsTable>;
+export type NewOptimizeGoal = Insertable<OptimizeGoalsTable>;
+export type OptimizeGoalUpdate = Updateable<OptimizeGoalsTable>;
+export type OptimizeGoalStep = Selectable<OptimizeGoalStepsTable>;
+export type NewOptimizeGoalStep = Insertable<OptimizeGoalStepsTable>;
+export type OptimizeGoalStepUpdate = Updateable<OptimizeGoalStepsTable>;
 export type SongAttribute = Selectable<SongAttributes>;
 export type NewSongAttribute = Insertable<SongAttributes>;
 export type SongAttributeUpdate = Updateable<SongAttributes>;
