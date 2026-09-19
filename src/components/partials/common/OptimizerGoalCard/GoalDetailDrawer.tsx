@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { User as FirebaseUser } from "firebase/auth";
-import { Calendar, Share2, Copy, Check } from "lucide-react";
+import { Calendar, Share2, Copy, Check, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -16,6 +16,12 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuCheckboxItem,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { fetchSongContribution } from "@/services/swr/analytics";
 import { GoalBpiJourney, GoalSongCard } from "./GoalCard";
@@ -215,22 +221,31 @@ export const GoalDetailDrawer = ({
 
           <div className="flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto px-4 py-3 custom-scrollbar">
             {steps.length > 1 && (
-              <div className="flex min-w-0 gap-1 rounded-lg bg-bpim-overlay/30 p-1">
-                {STEP_SORT_ORDERS.map((order) => (
-                  <button
-                    key={order}
-                    type="button"
-                    onClick={() => setSortOrder(order)}
-                    className={cn(
-                      "flex-1 truncate rounded-md py-1.5 text-[11px] font-bold transition-colors",
-                      sortOrder === order
-                        ? "bg-bpim-primary text-white"
-                        : "text-bpim-muted hover:text-bpim-text",
-                    )}
-                  >
-                    {t(`optimizer.memo.stepSort.${order}`)}
-                  </button>
-                ))}
+              <div className="flex justify-end">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-1.5"
+                      title={t(`optimizer.memo.stepSort.${sortOrder}`)}
+                    >
+                      <ArrowUpDown className="h-3.5 w-3.5" />
+                      {t(`optimizer.memo.stepSort.${sortOrder}`)}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    {STEP_SORT_ORDERS.map((order) => (
+                      <DropdownMenuCheckboxItem
+                        key={order}
+                        checked={sortOrder === order}
+                        onCheckedChange={() => setSortOrder(order)}
+                      >
+                        {t(`optimizer.memo.stepSort.${order}`)}
+                      </DropdownMenuCheckboxItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             )}
             {sortedSteps.map((step) => (

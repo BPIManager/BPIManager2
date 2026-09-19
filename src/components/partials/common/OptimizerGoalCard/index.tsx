@@ -17,14 +17,6 @@ interface StepProgress {
   notes: number | null;
 }
 
-/**
- * Optimizer関連の表示で共有するユーティリティ・部品。
- * ダッシュボードの達成状況ウィジェットは一覧性重視の簡易表示
- * （`OptimizerProgress/ui.tsx`）を持つ一方、目標1件をタップした先の詳細
- * （達成状況＋曲一覧）は`GoalDetailDrawer`としてダッシュボード・
- * 「目標管理」タブの双方から共有する。
- */
-
 export const MiniBpiChip = ({ bpi }: { bpi: number }) => {
   const { bg, color } = getBpiColorStyle(bpi);
   return (
@@ -37,11 +29,6 @@ export const MiniBpiChip = ({ bpi }: { bpi: number }) => {
   );
 };
 
-/**
- * 総合BPIの推移をfull widthのバーで見せる。`from`（作成時のBPI）を渡さない
- * 場合は2点表示（現在→目標）になり、その場合`current`=`from`扱いのため
- * バーは常に0%（＝まだ何も達成していないプレビュー）になる。
- */
 export const BpiJourneyBar = ({
   from,
   current,
@@ -127,33 +114,50 @@ export const buildStepProgress = (
     notes: step.notes ?? null,
   }));
 
-/**
- * ダッシュボードウィジェット・「目標管理」タブ双方の曲一覧で共有する
- * 並び替え。「追加した順」はプラン保存時の順序をそのまま維持し、
- * 「近い順/遠い順」は目標EXスコアまでの残り(未プレイは目標スコアそのもの
- * を最大距離として扱う)で並べ替える。達成済みの曲は残り0として並び替えの
- * 対象にすると常に「近い順」の先頭に来てしまうため、並び替え対象からは
- * 除外し常に末尾へ固定する。
- */
-export type StepSortOrder = "added" | "nearest" | "farthest";
+export type StepSortOrder =
+  | "added"
+  | "scoreNearest"
+  | "scoreFarthest"
+  | "bpiNearest"
+  | "bpiFarthest";
 export const STEP_SORT_ORDERS: StepSortOrder[] = [
   "added",
-  "nearest",
-  "farthest",
+  "scoreNearest",
+  "scoreFarthest",
+  "bpiNearest",
+  "bpiFarthest",
 ];
 
 interface SortableStep {
   toExScore: number;
   currentExScore: number | null;
+  fromBpi: number;
+  toBpi: number;
+  currentBpi: number | null;
 }
 
 const isAchieved = (step: SortableStep) =>
   step.currentExScore != null && step.currentExScore >= step.toExScore;
 
-const remainingToTarget = (step: SortableStep) =>
+const remainingScoreToTarget = (step: SortableStep) =>
   step.currentExScore == null
     ? step.toExScore
     : Math.max(0, step.toExScore - step.currentExScore);
+
+const remainingBpiToTarget = (step: SortableStep) =>
+  step.currentBpi == null
+    ? step.toBpi - step.fromBpi
+    : Math.max(0, step.toBpi - step.currentBpi);
+
+const SORT_METRIC_BY_ORDER: Record<
+  Exclude<StepSortOrder, "added">,
+  { metric: (step: SortableStep) => number; direction: 1 | -1 }
+> = {
+  scoreNearest: { metric: remainingScoreToTarget, direction: 1 },
+  scoreFarthest: { metric: remainingScoreToTarget, direction: -1 },
+  bpiNearest: { metric: remainingBpiToTarget, direction: 1 },
+  bpiFarthest: { metric: remainingBpiToTarget, direction: -1 },
+};
 
 export function sortStepsByOrder<T extends SortableStep>(
   steps: T[],
@@ -162,9 +166,9 @@ export function sortStepsByOrder<T extends SortableStep>(
   if (order === "added") return steps;
   const unachieved = steps.filter((s) => !isAchieved(s));
   const achieved = steps.filter(isAchieved);
-  const sorted = unachieved.sort(
-    (a, b) => remainingToTarget(a) - remainingToTarget(b),
+  const { metric, direction } = SORT_METRIC_BY_ORDER[order];
+  const sorted = [...unachieved].sort(
+    (a, b) => direction * (metric(a) - metric(b)),
   );
-  const ordered = order === "nearest" ? sorted : sorted.reverse();
-  return [...ordered, ...achieved];
+  return [...sorted, ...achieved];
 }
