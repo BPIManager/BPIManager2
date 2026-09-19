@@ -1,5 +1,7 @@
 import type { NextApiRequest } from "next";
+import { db } from "@/lib/db";
 import { bpiOptimizerAggregateRepo } from "@/lib/db/aggregates/bpiOptimizer";
+import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
 import { findOptimalBpiPath } from "@/lib/bpi/optimizer";
 import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import { topElementMap } from "@/constants/iidx/radars/topElements";
@@ -70,20 +72,24 @@ export async function handleBpiOptimizer(
     useSelfBest || resolvedDatasetVersion !== latestVersion;
 
   try {
-    const [rawRows, actualCurrentRows] = await Promise.all([
-      useSelfBest
-        ? bpiOptimizerAggregateRepo.getAllSongsWithSelfBestScores(userId)
-        : bpiOptimizerAggregateRepo.getAllSongsWithUserScores(
-            userId,
-            resolvedDatasetVersion,
-          ),
-      usesNonCurrentDataset
-        ? bpiOptimizerAggregateRepo.getAllSongsWithUserScores(
-            userId,
-            latestVersion,
-          )
-        : Promise.resolve(null),
-    ]);
+    const [rawRows, actualCurrentRows, previousBestTotalBpi] =
+      await Promise.all([
+        useSelfBest
+          ? bpiOptimizerAggregateRepo.getAllSongsWithSelfBestScores(userId)
+          : bpiOptimizerAggregateRepo.getAllSongsWithUserScores(
+              userId,
+              resolvedDatasetVersion,
+            ),
+        usesNonCurrentDataset
+          ? bpiOptimizerAggregateRepo.getAllSongsWithUserScores(
+              userId,
+              latestVersion,
+            )
+          : Promise.resolve(null),
+        usesNonCurrentDataset
+          ? Promise.resolve(null)
+          : userStatusLogsRepo.getMaxTotalBpi(db, userId, latestVersion),
+      ]);
     const actualCurrentExScoreBySongId = new Map<number, number | null>(
       (actualCurrentRows ?? []).map((r) => [
         r.songId,
@@ -154,6 +160,7 @@ export async function handleBpiOptimizer(
       candidateDifficulties,
       searchMode: searchModeParam === "fastest" ? "fastest" : "flexible",
       considerCurrentTotalBpi,
+      previousBestTotalBpi,
     };
 
     let result = findOptimalBpiPath(songs, targetBpi, baseOptions, maxSteps);

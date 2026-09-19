@@ -1,5 +1,7 @@
 import type { NextApiRequest } from "next";
+import { db } from "@/lib/db";
 import { bpiOptimizerAggregateRepo } from "@/lib/db/aggregates/bpiOptimizer";
+import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { BpiCalculator } from "@/lib/bpi";
 import { err, ok } from "@/middlewares/api/apiResult";
@@ -35,17 +37,23 @@ export async function handleSongContribution(
   const parsed = songContributionBodySchema.safeParse(req.body);
   if (!parsed.success) {
     return {
-      result: err(400, parsed.error.issues[0]?.message ?? "Invalid request body"),
+      result: err(
+        400,
+        parsed.error.issues[0]?.message ?? "Invalid request body",
+      ),
       targetUserId: userId,
       viewerId,
     };
   }
 
   try {
-    const rawRows = await bpiOptimizerAggregateRepo.getAllSongsWithUserScores(
-      userId,
-      latestVersion,
-    );
+    const [rawRows, previousBestTotalBpi] = await Promise.all([
+      bpiOptimizerAggregateRepo.getAllSongsWithUserScores(
+        userId,
+        latestVersion,
+      ),
+      userStatusLogsRepo.getMaxTotalBpi(db, userId, latestVersion),
+    ]);
     const rowBySongId = new Map(rawRows.map((r) => [r.songId, r]));
 
     // 存在しない曲（曲データ削除等）はリクエスト全体を失敗させず、
@@ -80,9 +88,13 @@ export async function handleSongContribution(
         notes: s.notes,
         exScore: currentScoreBySongId.get(s.songId)!,
       }));
-    const currentTotalBpi = BpiCalculator.calculateTotalBPI(
+    const rawCurrentTotalBpi = BpiCalculator.calculateTotalBPI(
       currentObservations,
       allSongs,
+    );
+    const currentTotalBpi = BpiCalculator.ratchetTotalBpi(
+      previousBestTotalBpi,
+      rawCurrentTotalBpi,
     );
 
     const contributions = validTargets.map((target) => {
@@ -105,7 +117,7 @@ export async function handleSongContribution(
       );
       return {
         songId: target.songId,
-        contribution: currentTotalBpi - revertedTotalBpi,
+        contribution: rawCurrentTotalBpi - revertedTotalBpi,
       };
     });
 

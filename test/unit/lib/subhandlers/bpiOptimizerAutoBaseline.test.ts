@@ -6,6 +6,9 @@ import type { OptimizationResult } from "@/types/bpi-optimizer";
 const getAllSongsWithSelfBestScoresMock = vi.fn();
 const getAllSongsWithUserScoresMock = vi.fn();
 const findOptimalBpiPathMock = vi.fn();
+const getMaxTotalBpiMock = vi.fn();
+
+vi.mock("@/lib/db", () => ({ db: {} }));
 
 vi.mock("@/lib/db/aggregates/bpiOptimizer", () => ({
   bpiOptimizerAggregateRepo: {
@@ -13,6 +16,12 @@ vi.mock("@/lib/db/aggregates/bpiOptimizer", () => ({
       getAllSongsWithSelfBestScoresMock(...a),
     getAllSongsWithUserScores: (...a: unknown[]) =>
       getAllSongsWithUserScoresMock(...a),
+  },
+}));
+
+vi.mock("@/lib/db/domains/userStatusLogs", () => ({
+  userStatusLogsRepo: {
+    getMaxTotalBpi: (...a: unknown[]) => getMaxTotalBpiMock(...a),
   },
 }));
 
@@ -101,6 +110,7 @@ beforeEach(() => {
   getAllSongsWithSelfBestScoresMock.mockReset();
   getAllSongsWithUserScoresMock.mockReset();
   findOptimalBpiPathMock.mockReset();
+  getMaxTotalBpiMock.mockReset().mockResolvedValue(null);
 });
 
 describe("handleBpiOptimizer / 自己べ・過去バージョンデータセット時の登録当初スコア", () => {

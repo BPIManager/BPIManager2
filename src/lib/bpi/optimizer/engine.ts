@@ -1,4 +1,5 @@
 import { ALL_RADAR_CATEGORIES } from "@/constants/iidx/radars";
+import { BpiCalculator } from "@/lib/bpi";
 import { BpiOptimizerConstants } from "./constants";
 import { LatentSkillModel } from "./latentSkillModel";
 import { TotalBpiEvaluator } from "./totalBpiEvaluator";
@@ -97,9 +98,13 @@ class BpiOptimizerEngine {
       };
     }
 
-    const initialTotal = this.totalEvaluator.exact(
-      [...this.observations.values()],
-      this.allSongs,
+    // シフト法の総合BPIは、未プレイ曲の潜在スキル予測が新しい観測で下振れすると
+    // プレイ済み曲が1つも下がっていなくても下がりうるため、探索の起点をユーザーの
+    // 既知の最高値（previousBestTotalBpi）でラチェットする（他画面の「現在の総合BPI」
+    // と整合させる。BpiCalculator.ratchetTotalBpiのコメント参照）
+    const initialTotal = BpiCalculator.ratchetTotalBpi(
+      this.options.previousBestTotalBpi ?? null,
+      this.totalEvaluator.exact([...this.observations.values()], this.allSongs),
     );
 
     if (initialTotal >= this.targetTotalValue) {
@@ -187,7 +192,13 @@ class BpiOptimizerEngine {
         exScore: picked.toExScore,
       });
 
-      const newTotal = this.totalEvaluator.exact([...this.observations.values()], this.allSongs);
+      // 前ステップまでの到達値(currentTotal)を下回らないよう連鎖的にラチェットする
+      // （initialTotal起点で既にprevious BestTotalBpi以上のため、これで全ステップが
+      // 単調非減少になり、bpiGainが見かけ上マイナスになることもなくなる）
+      const newTotal = BpiCalculator.ratchetTotalBpi(
+        currentTotal,
+        this.totalEvaluator.exact([...this.observations.values()], this.allSongs),
+      );
       const fromBpi = picked.song.currentExScore != null ? picked.song.currentBpi : BpiOptimizerConstants.BPI_FLOOR;
 
       steps.push({

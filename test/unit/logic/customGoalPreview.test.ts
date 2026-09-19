@@ -12,6 +12,13 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
+const getMaxTotalBpiMock = vi.fn().mockResolvedValue(null);
+vi.mock("@/lib/db/domains/userStatusLogs", () => ({
+  userStatusLogsRepo: {
+    getMaxTotalBpi: (...a: unknown[]) => getMaxTotalBpiMock(...a),
+  },
+}));
+
 const { handleCustomGoalPreview } = await import(
   "@/lib/subhandlers/bpiOptimizer/customPreview"
 );
@@ -77,6 +84,24 @@ describe("handleCustomGoalPreview", () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.body.steps).toHaveLength(0);
+  });
+
+  it("previousBestTotalBpiが生の総合BPIより高い場合、currentTotalBpiはそれ以上にラチェットされること", async () => {
+    dbHolder.current = createDbSpy([
+      makeRow({ songId: 1, exScore: 1850 }),
+      makeRow({ songId: 2, title: "フィラー", mu: null, sigma: null, exScore: null }),
+    ]);
+    getMaxTotalBpiMock.mockResolvedValueOnce(90);
+
+    const { result } = await handleCustomGoalPreview(
+      makeReq({ targets: [{ songId: 1, toExScore: 1900 }] }),
+      {},
+    );
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.body.currentTotalBpi).toBe(90);
+    expect(result.body.alreadyAchieved).toBe(true);
   });
 
   it("各曲のfromBpi/toBpiがBpiCalculator.calcと一致すること", async () => {

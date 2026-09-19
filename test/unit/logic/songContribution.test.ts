@@ -12,6 +12,13 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
+const getMaxTotalBpiMock = vi.fn().mockResolvedValue(null);
+vi.mock("@/lib/db/domains/userStatusLogs", () => ({
+  userStatusLogsRepo: {
+    getMaxTotalBpi: (...a: unknown[]) => getMaxTotalBpiMock(...a),
+  },
+}));
+
 const { handleSongContribution } = await import(
   "@/lib/subhandlers/bpiOptimizer/songContribution"
 );
@@ -56,6 +63,25 @@ describe("handleSongContribution", () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.body.contributions[0].contribution).toBeCloseTo(0, 6);
+  });
+
+  it("previousBestTotalBpiが生の総合BPIより高い場合、返り値のcurrentTotalBpiはそれ以上にラチェットされ、寄与度の計算は生の値で行われること", async () => {
+    dbHolder.current = createDbSpy([
+      makeRow({ songId: 1, exScore: 1900 }),
+      makeRow({ songId: 2, title: "フィラー", exScore: 1800 }),
+    ]);
+    getMaxTotalBpiMock.mockResolvedValueOnce(90);
+
+    const { result } = await handleSongContribution(
+      makeReq({ targets: [{ songId: 1, baselineExScore: 1850 }] }),
+      {},
+    );
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.body.currentTotalBpi).toBe(90);
+    // 寄与度自体はラチェットの影響を受けず、生の値同士の差分のまま
+    expect(result.body.contributions[0].contribution).toBeGreaterThan(0);
   });
 
   it("スコアを更新した曲を保存時点(baseline)に戻すと総合BPIが下がり、その差分が正の寄与になること", async () => {
