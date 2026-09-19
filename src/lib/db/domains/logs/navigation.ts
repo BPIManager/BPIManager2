@@ -303,21 +303,6 @@ class LogNavigationRepository {
   }
 
   /**
-   * 指定ユーザー・バージョンのバッチ別totalBpiを処理順(id昇順)で取得する。
-   * executeSaveBpiSystemが既にratchet(既知の最高値を下回らない補正)を
-   * 適用した結果をそのまま返すため、呼び出し側で再計算する必要が無い。
-   */
-  async getBatchTotalBpiHistory(userId: string, version: string) {
-    return await db
-      .selectFrom("logs")
-      .select(["batchId", "totalBpi"])
-      .where("userId", "=", userId)
-      .where("version", "=", version)
-      .orderBy("id", "asc")
-      .execute();
-  }
-
-  /**
    * 全ユーザー・全バージョンの最新totalBpiを一括取得する（サイト統計の
    * バージョン別ヒストグラム集計用）。
    */

@@ -21,7 +21,6 @@ const getBatchNavigationMock = vi.fn();
 const getRangeNavigationMock = vi.fn();
 const getJstRangeMock = vi.fn();
 const getLatestBatchIdMock = vi.fn();
-const getBatchTotalBpiHistoryMock = vi.fn();
 const getScoresWithDetailsMock = vi.fn();
 const getOvertakenRivalsMock = vi.fn();
 const deleteBatchMock = vi.fn();
@@ -62,8 +61,6 @@ vi.mock("@/lib/db/domains/logs/navigation", () => ({
     getRangeNavigation: (...a: unknown[]) => getRangeNavigationMock(...a),
     getJstRange: (...a: unknown[]) => getJstRangeMock(...a),
     getLatestBatchId: (...a: unknown[]) => getLatestBatchIdMock(...a),
-    getBatchTotalBpiHistory: (...a: unknown[]) =>
-      getBatchTotalBpiHistoryMock(...a),
   },
 }));
 vi.mock("@/lib/db/domains/scores/detail", () => ({
@@ -118,7 +115,6 @@ beforeEach(() => {
   });
   getRangeNavigationMock.mockResolvedValue({ prevDate: null, nextDate: null });
   getSongMasterWithDefMock.mockResolvedValue([]);
-  getBatchTotalBpiHistoryMock.mockResolvedValue([]);
 });
 
 describe("handleBatchesList", () => {
