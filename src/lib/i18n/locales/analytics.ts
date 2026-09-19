@@ -304,6 +304,36 @@ export const analyticsTranslations = {
     "zh-TW": "請選擇建立目標時要參考的資料集。",
     ko: "목표를 만들 때 기준이 될 데이터셋을 선택하세요.",
   },
+  "optimizer.datasetFilterLabel": {
+    ja: "対象曲をフィルタ",
+    en: "Filter target songs",
+    "zh-TW": "篩選目標曲目",
+    ko: "대상 곡 필터",
+  },
+  "optimizer.datasetFilterHint": {
+    ja: "何も選択しない場合はすべての曲が対象になります。",
+    en: "If nothing is selected, all songs are included.",
+    "zh-TW": "若未選擇任何項目，將包含所有曲目。",
+    ko: "아무것도 선택하지 않으면 모든 곡이 대상이 됩니다.",
+  },
+  "optimizer.datasetFilterBpmLabel": {
+    ja: "BPM帯",
+    en: "BPM range",
+    "zh-TW": "BPM範圍",
+    ko: "BPM 대역",
+  },
+  "optimizer.datasetFilterRadarLabel": {
+    ja: "ノーツレーダー",
+    en: "Notes radar",
+    "zh-TW": "音符雷達",
+    ko: "노트 레이더",
+  },
+  "optimizer.datasetFilterApply": {
+    ja: "この条件で反映",
+    en: "Apply",
+    "zh-TW": "以此條件套用",
+    ko: "이 조건으로 적용",
+  },
   "optimizer.algorithmLabel": {
     ja: "アルゴリズムの性格",
     en: "Algorithm Mode",

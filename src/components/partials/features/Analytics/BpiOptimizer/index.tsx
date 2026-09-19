@@ -17,6 +17,7 @@ import {
 } from "@/services/swr/analytics";
 import DatasetPickerDrawer, {
   type DatasetSource,
+  type DatasetFilters,
 } from "./ui/DatasetPickerDrawer";
 import type { OptimizeMemo } from "@/hooks/analytics/useOptimizeMemo";
 import BpiOptimizerSkeleton from "./skeleton";
@@ -172,7 +173,10 @@ const BpiOptimizerSection = () => {
     }
   };
 
-  const handleApplyDataset = async (source: DatasetSource) => {
+  const handleApplyDataset = async (
+    source: DatasetSource,
+    filters: DatasetFilters,
+  ) => {
     if (!user?.userId || isDatasetApplying) return;
     setIsDatasetApplying(true);
     try {
@@ -192,7 +196,12 @@ const BpiOptimizerSection = () => {
             r.coef != null &&
             r.mu != null &&
             r.sigma != null &&
-            r.residualVar != null,
+            r.residualVar != null &&
+            (filters.bpmBands.length === 0 ||
+              filters.bpmBands.includes(r.bpmBand)) &&
+            (filters.radarCategories.length === 0 ||
+              (r.radarCategory != null &&
+                filters.radarCategories.includes(r.radarCategory))),
         )
         .map((r) => ({
           songId: r.songId,
@@ -446,6 +455,7 @@ const BpiOptimizerSection = () => {
         open={isDatasetPickerOpen}
         onOpenChange={setIsDatasetPickerOpen}
         onPick={handleApplyDataset}
+        withFilterStep
       />
 
       <ImportGoalModal

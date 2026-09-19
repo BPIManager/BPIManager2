@@ -2,6 +2,7 @@ import type { NextApiRequest } from "next";
 import { songsRepo } from "@/lib/db/domains/songs";
 import { topElementMap } from "@/constants/iidx/radars/topElements";
 import { ALL_RADAR_CATEGORIES } from "@/constants/iidx/radars";
+import { BPM_BANDS, bpmBandOf, type BpmBand } from "@/constants/iidx/bpm";
 import type { RadarCategory } from "@/types/stats/radar";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
@@ -16,20 +17,7 @@ const SEARCH_LIMIT = 20;
 /** 曲名指定なしで一覧表示する場合(楽曲一覧・レーダー項目/BPM帯)のDB取得上限。全件返す */
 const BROWSE_FETCH_LIMIT = 2000;
 
-export type BpmBand = "slow" | "mid" | "fast" | "soflan";
-const BPM_BANDS: BpmBand[] = ["slow", "mid", "fast", "soflan"];
-
-/**
- * 曲のBPM表記から低速(~135)/中速(135~170)/高速(170~)/SOFLANに分類する。
- */
-function bpmBandOf(bpm: string): BpmBand {
-  if (/[-〜~]/.test(bpm)) return "soflan";
-  const value = Number(bpm.trim());
-  if (Number.isNaN(value)) return "soflan";
-  if (value < 135) return "slow";
-  if (value < 170) return "mid";
-  return "fast";
-}
+export type { BpmBand };
 
 /**
  * GET /songs/search?title=...&version=...&difficultyLevel=12

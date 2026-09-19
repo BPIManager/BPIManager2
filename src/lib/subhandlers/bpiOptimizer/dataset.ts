@@ -1,6 +1,8 @@
 import type { NextApiRequest } from "next";
 import { bpiOptimizerAggregateRepo } from "@/lib/db/aggregates/bpiOptimizer";
 import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
+import { bpmBandOf } from "@/constants/iidx/bpm";
+import { topElementMap } from "@/constants/iidx/radars/topElements";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { targetOf, type HandleOutcome } from "./_shared";
@@ -50,6 +52,8 @@ export async function handleBpiOptimizerDataset(
       mu: r.mu !== null ? Number(r.mu) : null,
       sigma: r.sigma !== null ? Number(r.sigma) : null,
       residualVar: r.residualVar !== null ? Number(r.residualVar) : null,
+      bpmBand: bpmBandOf(r.bpm),
+      radarCategory: topElementMap.get(`${r.title}___${r.difficulty}`) ?? null,
     }));
 
     return { result: ok(result), targetUserId: userId, viewerId };

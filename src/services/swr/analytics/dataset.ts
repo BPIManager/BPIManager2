@@ -2,6 +2,8 @@ import { User as FirebaseUser } from "firebase/auth";
 import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { authFetch } from "@/utils/common/fetch";
 import { unwrapApiResponse } from "@/services/swr/fetchV2";
+import type { BpmBand } from "@/constants/iidx/bpm";
+import type { RadarCategory } from "@/types/stats/radar";
 
 export interface BpiOptimizerDatasetRow {
   songId: number;
@@ -16,6 +18,8 @@ export interface BpiOptimizerDatasetRow {
   mu: number | null;
   sigma: number | null;
   residualVar: number | null;
+  bpmBand: BpmBand;
+  radarCategory: RadarCategory | null;
 }
 
 /**

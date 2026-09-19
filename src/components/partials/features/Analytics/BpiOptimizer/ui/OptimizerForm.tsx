@@ -139,7 +139,7 @@ const DatasetSection = ({
         open={pickerOpen}
         onOpenChange={setPickerOpen}
         value={datasetVersion}
-        onPick={onDatasetVersionChange}
+        onPick={(source) => onDatasetVersionChange(source)}
       />
     </div>
   );
