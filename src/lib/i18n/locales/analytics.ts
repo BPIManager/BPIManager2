@@ -605,17 +605,29 @@ export const analyticsTranslations = {
     "zh-TW": "新增順序",
     ko: "추가한 순서",
   },
-  "optimizer.memo.stepSort.nearest": {
-    ja: "目標が近い順",
-    en: "Closest to goal",
-    "zh-TW": "接近目標排序",
-    ko: "목표에 가까운 순",
+  "optimizer.memo.stepSort.scoreNearest": {
+    ja: "スコアが近い順",
+    en: "Closest by score",
+    "zh-TW": "分數接近排序",
+    ko: "스코어가 가까운 순",
   },
-  "optimizer.memo.stepSort.farthest": {
-    ja: "目標が遠い順",
-    en: "Furthest from goal",
-    "zh-TW": "遠離目標排序",
-    ko: "목표에서 먼 순",
+  "optimizer.memo.stepSort.scoreFarthest": {
+    ja: "スコアが遠い順",
+    en: "Furthest by score",
+    "zh-TW": "分數遠離排序",
+    ko: "스코어가 먼 순",
+  },
+  "optimizer.memo.stepSort.bpiNearest": {
+    ja: "BPIが近い順",
+    en: "Closest by BPI",
+    "zh-TW": "BPI接近排序",
+    ko: "BPI가 가까운 순",
+  },
+  "optimizer.memo.stepSort.bpiFarthest": {
+    ja: "BPIが遠い順",
+    en: "Furthest by BPI",
+    "zh-TW": "BPI遠離排序",
+    ko: "BPI가 먼 순",
   },
 
   "optimizer.tabs.create": {
