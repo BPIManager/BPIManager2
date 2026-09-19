@@ -252,6 +252,7 @@ class StatsTablesRepository {
         "s.bpi",
         "s.exScore",
         "s.lastPlayed",
+        "s.batchId",
         "m.title",
         "m.notes",
         "m.difficulty",

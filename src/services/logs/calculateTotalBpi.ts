@@ -1,6 +1,9 @@
 import { BpiCalculator } from "@/lib/bpi";
 import dayjs from "@/lib/dayjs";
-import type { IBpiBasicSongData, IBpiScoreObservation } from "@/types/songs/bpi";
+import type {
+  IBpiBasicSongData,
+  IBpiScoreObservation,
+} from "@/types/songs/bpi";
 
 interface ScoreEntry {
   songId: number;
@@ -12,6 +15,7 @@ interface ScoreEntry {
   clearState?: string | null;
   playDay?: string | null;
   lastPlayed?: string | Date | null;
+  batchId?: string | null;
 }
 
 interface TimelineEntry {
@@ -58,29 +62,27 @@ export const calculateTotalBpi = (
       ? dayjs(score.playDay || score.lastPlayed).format("YYYY-MM-DD")
       : fallbackDayKey;
 
-  // 同一バッチ内の更新は同一(またはごく近い)lastPlayedを持つため、これを
-  // ステップの単位とする。日単位でまとめて一括反映すると、同日内で一時的に
-  // 上振れしたピーク(ratchet対象)が最終状態に上書きされて失われてしまう
-  // (executeSaveBpiSystemはバッチ単位でratchetするため、同日でも複数バッチ
-  // あれば都度ratchetが効く。ここでの再計算もそれに合わせて同じ粒度で行う
-  // 必要がある)
   const sortedScores = [...allScores].sort((a, b) => {
-    const at = a.playDay || a.lastPlayed ? dayjs(a.playDay || a.lastPlayed).valueOf() : 0;
-    const bt = b.playDay || b.lastPlayed ? dayjs(b.playDay || b.lastPlayed).valueOf() : 0;
+    const at =
+      a.playDay || a.lastPlayed
+        ? dayjs(a.playDay || a.lastPlayed).valueOf()
+        : 0;
+    const bt =
+      b.playDay || b.lastPlayed
+        ? dayjs(b.playDay || b.lastPlayed).valueOf()
+        : 0;
     return at - bt;
   });
 
-  // 日付欠損分は最古バケット扱いにするため、ISO文字列より辞書順で必ず前に来る
-  // キーにする
   const stepGroups = new Map<string, ScoreEntry[]>();
-  sortedScores.forEach((score) => {
-    const stepKey = score.playDay || score.lastPlayed
-      ? dayjs(score.playDay || score.lastPlayed).toISOString()
-      : "0000-unknown";
+  sortedScores.forEach((score, index) => {
+    const stepKey = score.batchId ? `batch:${score.batchId}` : `row:${index}`;
     if (!stepGroups.has(stepKey)) stepGroups.set(stepKey, []);
     stepGroups.get(stepKey)!.push(score);
   });
-  const sortedStepKeys = Array.from(stepGroups.keys()).sort();
+  // sortedScoresは時系列順であり、Mapはキーの初出順を保持するため、
+  // ここでの反復順がそのままステップの時系列順になる
+  const sortedStepKeys = Array.from(stepGroups.keys());
 
   // 総合BPIは既知の最高値を下回らないようラチェットする（他の総合BPI算出箇所と
   // 同じ理由。src/lib/bpi/index.tsのratchetTotalBpi参照）。この関数はDBの
@@ -107,7 +109,10 @@ export const calculateTotalBpi = (
       currentPBs.entries(),
     ).map(([songId, v]) => ({ songId, notes: v.notes, exScore: v.exScore }));
 
-    const freshTotalBpi = BpiCalculator.calculateTotalBPI(observations, allSongs);
+    const freshTotalBpi = BpiCalculator.calculateTotalBPI(
+      observations,
+      allSongs,
+    );
     bestTotalBpiSoFar = BpiCalculator.ratchetTotalBpi(
       bestTotalBpiSoFar,
       freshTotalBpi,

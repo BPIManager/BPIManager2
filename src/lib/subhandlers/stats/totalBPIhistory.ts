@@ -63,25 +63,20 @@ export async function handleStatsTotalBpiHistory(
     }
   });
 
-  // 総合BPIは既知の最高値を下回らないようラチェットする(executeSaveBpiSystem・
-  // recalculateTotalBpi.ts等と同じ理由。src/lib/bpi/index.tsのratchetTotalBpi
-  // 参照)。同一バッチ内の更新は同一(またはごく近い)lastPlayedを持つため、
-  // これをステップの単位としてratchetする。日単位でまとめて一括反映すると、
-  // 同日内で一時的に上振れしたピークが最終状態に上書きされて失われてしまう
-  // (executeSaveBpiSystemはバッチ単位でratchetするため、この再計算もそれに
-  // 合わせた粒度で行う必要がある。calculateTotalBpi.tsと同じ理由)
   const logsInRange = fullLogs.filter((log) => {
     if (!log.songId || !log.lastPlayed) return false;
     const day = dayjs(log.lastPlayed).tz().startOf("day");
     return !day.isBefore(startDate) && !day.isAfter(endDate);
   });
   const stepGroups = new Map<string, typeof fullLogs>();
-  logsInRange.forEach((log) => {
-    const stepKey = dayjs(log.lastPlayed).toISOString();
+  logsInRange.forEach((log, index) => {
+    const stepKey = log.batchId ? `batch:${log.batchId}` : `row:${index}`;
     if (!stepGroups.has(stepKey)) stepGroups.set(stepKey, []);
     stepGroups.get(stepKey)!.push(log);
   });
-  const sortedStepKeys = Array.from(stepGroups.keys()).sort();
+  // logsInRangeはlastPlayed昇順であり、Mapはキーの初出順を保持するため、
+  // ここでの反復順がそのままステップの時系列順になる
+  const sortedStepKeys = Array.from(stepGroups.keys());
 
   let bestTotalBpiSoFar: number | null = null;
   const dayTotalBpi = new Map<string, number>();
