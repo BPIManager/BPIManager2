@@ -13,7 +13,7 @@ A web application for tracking and analyzing **BPI (Beat Power Indicator)** scor
 | Auth             | Firebase Authentication                                               |
 | Backend Services | Firebase Admin SDK                                                    |
 | Data Fetching    | SWR                                                                   |
-| Cron Jobs        | node-cron (Sitemap generation, Arena metrics & Radar cache)           |
+| Cron Jobs        | node-cron (sitemap, Arena metrics/distribution, Radar & song ranking caches) |
 | Testing          | Vitest                                                                |
 
 ## Features
@@ -26,11 +26,11 @@ A web application for tracking and analyzing **BPI (Beat Power Indicator)** scor
 - **Profile** — Public user profiles with BPI history and radar charts
 - **Settings** — Account settings, theme settings, API key management, data transfer, account deletion
 - **Notifications** — In-app notifications
-- **Automated Jobs** — Daily sitemap generation (02:00 UTC), daily Arena JSON generation (04:00 UTC), and 12-hour Radar cache refresh via cron
+- **Automated Jobs** — Scheduled sitemap, Arena metrics/distribution, Radar cache, and song ranking cache generation via cron (see [Background Jobs](#background-jobs))
 
 ## Prerequisites
 
-- Node.js 20+
+- Node.js 26+
 - MySQL 8.0+
 - A Firebase project (for authentication)
 
@@ -59,13 +59,14 @@ Copy `.env.example` to `.env.local` and fill in all values:
 cp .env.example .env.local
 ```
 
-| Variable                               | Description                                            |
-| -------------------------------------- | ------------------------------------------------------ |
+| Variable                               | Description                                                                 |
+| -------------------------------------- | ---------------------------------------------------------------------------- |
+| `BASEURL`                              | Public base URL of the deployment (used for sitemaps, OAuth metadata, etc.) |
 | `DB_HOST`                              | MySQL host (e.g. `localhost`)                          |
+| `DB_PORT`                              | MySQL port (defaults to `3306` if unset)               |
 | `DB_DATABASE`                          | Database name (e.g. `beatmaniaBpi`)                    |
 | `DB_USER`                              | MySQL username                                         |
 | `DB_PW`                                | MySQL password                                         |
-| `DATABASE_URL`                         | Full connection URL (used by kysely-codegen)           |
 | `FIREBASE_PROJECT_ID`                  | Firebase project ID                                    |
 | `FIREBASE_PRIVATE_KEY_ID`              | Service account private key ID                         |
 | `FIREBASE_PRIVATE_KEY`                 | Service account private key (include `\n` line breaks) |
@@ -76,6 +77,12 @@ cp .env.example .env.local
 | `FIREBASE_AUTH_PROVIDER_X509_CERT_URL` | Auth provider cert URL                                 |
 | `FIREBASE_CLIENT_X509_CERT_URL`        | Client cert URL                                        |
 | `FIREBASE_UNIVERSE_DOMAIN`             | Usually `googleapis.com`                               |
+| `DISCORD_BOT_TOKEN`                    | (optional) Discord bot token; enables the Discord bot integration |
+| `DISCORD_GUILD_ID`                     | (optional) Discord guild ID the bot operates in        |
+| `DISCORD_COFFEE_ROLE_ID`               | (optional) Discord role ID granted to a supporter tier |
+| `DISCORD_SABA_ROLE_ID`                 | (optional) Discord role ID granted to a supporter tier |
+| `DISCORD_SPARKLE_ROLE_ID`              | (optional) Discord role ID granted to a supporter tier |
+| `USER_DELETION_BACKUP_DIR`             | (optional) Directory for pre-deletion user data backups (defaults under the OS home directory) |
 
 ### 4. Set up the database
 
@@ -85,7 +92,7 @@ Apply the schema to your MySQL instance:
 mysql -u <user> -p < migrations/schema.sql
 ```
 
-This creates the `beatmaniaBpi` database and all required tables (`users`, `scores`, `bkScores`, `songs`, `songDef`, `follows`, `logs`, `notifications`, `userRadarCache`, `userStatusLogs`, `apiKeys`, etc.).
+This creates the `beatmaniaBpi` database and all required tables (`users`, `scores`, `bkScores`, `songs`, `songDef`, `follows`, `logs`, `notifications`, `userRadarCache`, `userStatusLogs`, `apiKeys`, etc.). The schema is managed as a single SQL file (using `CREATE TABLE IF NOT EXISTS`, safe to re-run) rather than through a migration framework; schema changes are applied manually to existing environments. Kysely's type definitions (`src/types/db.ts`) are maintained by hand alongside schema changes, not generated.
 
 ### 5. Run the development server
 
@@ -110,20 +117,6 @@ Open [https://localhost:3000](https://localhost:3000) in your browser. Accept th
 | `pnpm test:integration`      | Run integration tests (requires a running dev server etc.)    |
 | `pnpm test:ui`               | Run tests with the Vitest UI                                  |
 | `pnpm fetch-arena-metadata`  | Fetch Arena metadata via `scripts/fetchArenaMetadata.ts`      |
-
-## Database Migrations
-
-The `migrations/schema.sql` file contains the full database schema. It uses `CREATE TABLE IF NOT EXISTS`, so it is safe to re-run.
-
-> **Note:** This project uses a single SQL file for schema management rather than a migration framework. When making schema changes, update `migrations/schema.sql` and apply the diff manually to existing environments. If you need incremental migrations in the future, consider adopting a tool like [Flyway](https://flywaydb.org/) or [golang-migrate](https://github.com/golang-migrate/migrate).
-
-After schema changes, apply `migrations/schema.sql` to the database pointed at by `DATABASE_URL` first, then regenerate the Kysely type definitions:
-
-```bash
-npx kysely-codegen --url "$DATABASE_URL" --out-file src/types/db.ts
-```
-
-`kysely-codegen` introspects the live database, so regenerating against a database that hasn't received the latest schema changes will drop the types for any newly added tables/columns.
 
 ## Project Structure
 
@@ -162,16 +155,18 @@ src/
 │   ├── mcp/              # MCP server tools
 │   ├── monthly-review/   # Monthly review generation
 │   ├── radar/            # Radar chart cache calculation
+│   ├── scores/           # Score evaluation helpers (improvement diff, manual batch IDs)
 │   ├── subhandlers/      # API sub-handlers
-│   ├── transfer/         # Data transfer / migration utilities
+│   ├── transfer/         # Data transfer / account export-import utilities
 │   └── utils.ts          # Shared utilities
 ├── middlewares/api/      # Next.js API middlewares (auth guards, profile access, etc.)
 ├── pages/                # Next.js Pages Router (screens & API routes)
 │   └── api/v1/users/[userId]/  # REST API: scores, batches, stats, rivals,
 │                                #   all-scores, ranking, notifications, iidx-tower, tickets, ...
+├── schemas/              # Zod request/response schemas, grouped by domain
 ├── services/             # SWR fetchers / Next.js API request helpers
 ├── styles/               # Global styles (Tailwind CSS v4)
-├── types/                # Type definitions (db.ts is kysely-codegen generated)
+├── types/                # Type definitions (db.ts is maintained by hand alongside schema changes)
 └── utils/                # Pure function utilities
 public/
 └── data/metrics/arena/   # Auto-generated Arena metric JSON files
@@ -184,11 +179,15 @@ test/
 
 ## Background Jobs
 
-On server startup, three cron jobs are registered automatically via `src/instrumentation.ts`:
+On server startup, `src/instrumentation.ts` starts the Arena/cron service (`src/lib/cron/job.ts`) and the Discord bot. Each cron task also runs once immediately on startup:
 
-- **Sitemap generation** — Runs once on startup and daily at **02:00 UTC**. Generates the user sitemap under `public/`.
-- **Arena JSON generation** — Runs daily at **04:00 UTC**. Generates aggregated Arena rank metric files under `public/data/metrics/arena/`. Also runs once on startup if the output directory is empty.
-- **Radar cache update** — Runs every **12 hours**. Pre-computes radar chart data for all users. Also runs once on startup.
+- **Sitemap generation** — Daily at **02:00 UTC**. Generates the user sitemap under `public/`.
+- **Arena JSON generation** — Daily at **04:00 UTC**. Generates aggregated Arena rank metric files under `public/data/metrics/arena/` and invalidates the Arena averages cache.
+- **Info JSON generation** — Daily at **16:00 UTC**.
+- **Official Arena distribution fetch** — Daily at **16:30 UTC** (JST 01:30). During an active Arena event period, also runs every **30 minutes** between JST 07:00 and 00:59 the following day.
+- **Radar cache update** — Every **hour**. Pre-computes radar chart data for all users.
+- **Song ranking cache update** — Twice daily, at **06:00 and 18:00 UTC**.
+- **Discord bot** — Connects on startup (requires `DISCORD_BOT_TOKEN`) for supporter role sync and related integrations.
 
 ## Firebase Setup
 
@@ -199,7 +198,7 @@ On server startup, three cron jobs are registered automatically via `src/instrum
 
 ## Contributing
 
-1. Create a feature branch from `main`
+1. Create a branch from `staging` (not `master` — a push to `master` triggers a production deploy)
 2. Make your changes
 3. Run `pnpm test` and `pnpm lint` to verify
-4. Open a pull request
+4. Merge (or open a pull request) into `staging`; `staging` → `master` release PRs are cut separately
