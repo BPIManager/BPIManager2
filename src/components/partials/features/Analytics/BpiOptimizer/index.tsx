@@ -18,6 +18,8 @@ import {
 import DatasetPickerDrawer, {
   type DatasetSource,
 } from "./ui/DatasetPickerDrawer";
+import SingleBpiTargetDrawer from "./ui/SingleBpiTargetDrawer";
+import { BpiCalculator } from "@/lib/bpi";
 import type { OptimizeMemo } from "@/hooks/analytics/useOptimizeMemo";
 import BpiOptimizerSkeleton from "./skeleton";
 import ActionConfirmDialog from "@/components/partials/modal/Confirmation";
@@ -140,6 +142,9 @@ const BpiOptimizerSection = () => {
   } | null>(null);
   const [isDatasetApplying, setIsDatasetApplying] = useState(false);
   const [isDatasetPickerOpen, setIsDatasetPickerOpen] = useState(false);
+  const [isSingleBpiTargetOpen, setIsSingleBpiTargetOpen] = useState(false);
+  const [isSingleBpiTargetApplying, setIsSingleBpiTargetApplying] =
+    useState(false);
 
   const resetCustomCreationState = () => {
     setImportedTargets(undefined);
@@ -221,6 +226,53 @@ const BpiOptimizerSection = () => {
       toast.error(t("optimizer.selfBestSet.failed"));
     } finally {
       setIsDatasetApplying(false);
+    }
+  };
+
+  const handleApplySingleBpiTarget = async (targetBpi: number) => {
+    if (!user?.userId || isSingleBpiTargetApplying) return;
+    setIsSingleBpiTargetApplying(true);
+    try {
+      // BPI計算パラメータ入りの曲一覧が欲しいだけでexScoreは使わないためsourceは何でもよい
+      const rows = await fetchBpiOptimizerDataset(
+        user.userId,
+        fbUser,
+        "self-best",
+      );
+      const targets: ImportedGoalTarget[] = rows
+        .map((r) => {
+          const toExScore = BpiCalculator.calcFromBPI(targetBpi, r);
+          if (toExScore == null) return null;
+          return {
+            songId: r.songId,
+            title: r.title,
+            difficulty: r.difficulty,
+            difficultyLevel: r.difficultyLevel,
+            notes: r.notes,
+            toExScore,
+            wrScore: r.wrScore,
+            kaidenAvg: r.kaidenAvg,
+            coef: r.coef,
+            mu: r.mu,
+            sigma: r.sigma,
+            residualVar: r.residualVar,
+          };
+        })
+        .filter((t): t is ImportedGoalTarget => t !== null);
+
+      if (targets.length === 0) {
+        toast.info(t("optimizer.selfBestSet.empty"));
+        return;
+      }
+      setImportedTargets(targets);
+      setEditingMemo(null);
+      setCreationMode("custom");
+      setIsDrawerOpen(true);
+      setIsSingleBpiTargetOpen(false);
+    } catch {
+      toast.error(t("optimizer.selfBestSet.failed"));
+    } finally {
+      setIsSingleBpiTargetApplying(false);
     }
   };
 
@@ -323,6 +375,7 @@ const BpiOptimizerSection = () => {
                   onImportClick={() => setIsImportModalOpen(true)}
                   onSelfBestSetClick={() => setIsDatasetPickerOpen(true)}
                   isSelfBestSetLoading={isDatasetApplying}
+                  onSingleBpiTargetClick={() => setIsSingleBpiTargetOpen(true)}
                 />
                 <OptimizerIntro />
               </>
@@ -446,6 +499,13 @@ const BpiOptimizerSection = () => {
         open={isDatasetPickerOpen}
         onOpenChange={setIsDatasetPickerOpen}
         onPick={handleApplyDataset}
+      />
+
+      <SingleBpiTargetDrawer
+        open={isSingleBpiTargetOpen}
+        onOpenChange={setIsSingleBpiTargetOpen}
+        onSubmit={handleApplySingleBpiTarget}
+        isLoading={isSingleBpiTargetApplying}
       />
 
       <ImportGoalModal

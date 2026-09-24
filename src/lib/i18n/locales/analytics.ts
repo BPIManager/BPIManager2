@@ -747,6 +747,42 @@ export const analyticsTranslations = {
     "zh-TW": "建立目標組合失敗",
     ko: "목표 세트 생성에 실패했습니다",
   },
+  "optimizer.mode.singleBpiTargetCard.title": {
+    ja: "単曲BPIを指定して目指す",
+    en: "Target a single-song BPI",
+    "zh-TW": "指定單曲BPI為目標",
+    ko: "단곡 BPI를 지정해 목표로",
+  },
+  "optimizer.mode.singleBpiTargetCard.desc": {
+    ja: "目指す単曲BPIを1つ入力すると、その値から逆算したEXスコアを全曲ぶん目標として一括作成します。",
+    en: "Enter one target single-song BPI and it back-calculates the required EX score for every song at once.",
+    "zh-TW": "輸入一個目標單曲BPI，即可依此反推所有樂曲的目標EX分數並一次建立。",
+    ko: "목표로 할 단곡 BPI를 하나 입력하면, 그 값으로 역산한 EX스코어를 전곡 목표로 한 번에 생성합니다.",
+  },
+  "optimizer.singleBpiTarget.drawerTitle": {
+    ja: "目指す単曲BPIを入力",
+    en: "Enter target single-song BPI",
+    "zh-TW": "輸入目標單曲BPI",
+    ko: "목표 단곡 BPI 입력",
+  },
+  "optimizer.singleBpiTarget.inputLabel": {
+    ja: "目標の単曲BPI",
+    en: "Target single-song BPI",
+    "zh-TW": "目標單曲BPI",
+    ko: "목표 단곡 BPI",
+  },
+  "optimizer.singleBpiTarget.submit": {
+    ja: "この値で目標を作成",
+    en: "Create goal with this value",
+    "zh-TW": "以此數值建立目標",
+    ko: "이 값으로 목표 생성",
+  },
+  "optimizer.singleBpiTarget.invalidInput": {
+    ja: "有効なBPIの値を入力してください",
+    en: "Please enter a valid BPI value.",
+    "zh-TW": "請輸入有效的BPI數值",
+    ko: "유효한 BPI 값을 입력해 주세요",
+  },
   "optimizer.import.title": {
     ja: "曲目をインポート",
     en: "Import songs",
