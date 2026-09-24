@@ -9,6 +9,9 @@ import type { StatsQuery } from "@/types/stats/query";
 import type { HandlerResult } from "@/types/api";
 import type { IBpiScoreObservation } from "@/types/songs/bpi";
 
+// 曲単位の厳密な内訳(rawTotalBpiAfter等)を計算する対象を直近この件数に絞り、履歴が長いユーザーでの計算量爆発を防ぐ
+const DETAIL_WINDOW_SIZE = 300;
+
 export async function handleStatsTotalBpiHistory(
   q: StatsQuery,
   req: NextApiRequest,
@@ -44,8 +47,7 @@ export async function handleStatsTotalBpiHistory(
 
   const songNotesById = new Map(fullMaster.map((s) => [s.songId, s.notes]));
   const trend = [];
-  // 表示用(prevExScore/prevBpiの差分レポート)はscopedLogsのみを対象に、日単位
-  // で従来通り追跡する。observations(潜在スキル推定)側とは別管理にする
+  // 表示用の差分レポートはscopedLogsのみ対象。observations(潜在スキル推定)側とは別管理
   const reportBpisBySong = new Map<number, number>();
   const reportExScoresBySong = new Map<number, number>();
   const startDate = dayjs(scopedLogs[0].lastPlayed).tz().startOf("day");
@@ -53,8 +55,7 @@ export async function handleStatsTotalBpiHistory(
     .tz()
     .startOf("day");
 
-  // observations(潜在スキル推定用、level11等スコープ外も含む全体)はstartDate
-  // より前に反映済みの状態から始める
+  // observations(スコープ外含む全体)はstartDateより前に反映済みの状態から始める
   const latestExScoresBySong = new Map<number, number>();
   fullLogs.forEach((log) => {
     if (!log.songId || !log.lastPlayed) return;
@@ -68,18 +69,28 @@ export async function handleStatsTotalBpiHistory(
     const day = dayjs(log.lastPlayed).tz().startOf("day");
     return !day.isBefore(startDate) && !day.isAfter(endDate);
   });
-  const stepGroups = new Map<string, typeof fullLogs>();
+
+  // Pass 1: バッチ単位で全期間を安く計算する(日単位だと同日内の境界が拾えずPass2の起点がズレる)
+  const stepGroups = new Map<string, typeof logsInRange>();
   logsInRange.forEach((log, index) => {
     const stepKey = log.batchId ? `batch:${log.batchId}` : `row:${index}`;
     if (!stepGroups.has(stepKey)) stepGroups.set(stepKey, []);
     stepGroups.get(stepKey)!.push(log);
   });
-  // logsInRangeはlastPlayed昇順であり、Mapはキーの初出順を保持するため、
-  // ここでの反復順がそのままステップの時系列順になる
+  // logsInRangeはlastPlayed昇順・Mapは初出順保持なので、この反復順がそのまま時系列順になる
   const sortedStepKeys = Array.from(stepGroups.keys());
 
   let bestTotalBpiSoFar: number | null = null;
   const dayTotalBpi = new Map<string, number>();
+  const dayRawTotalBpi = new Map<string, number>();
+  const dayLatentSkill = new Map<string, number | null>();
+  // ステップごとの結果を保持し、Pass2の起点を正確にシークするのに使う
+  const stepResults: {
+    rawAfter: number;
+    bestAfter: number;
+    latentSkillAfter: number | null;
+    scopedCount: number;
+  }[] = [];
   for (const stepKey of sortedStepKeys) {
     const stepLogs = stepGroups.get(stepKey)!;
     stepLogs.forEach((log) => {
@@ -96,15 +107,133 @@ export async function handleStatsTotalBpiHistory(
       observations,
       scopedMaster,
     );
+    const latentSkill = BpiCalculator.estimateLatentSkill(
+      observations,
+      scopedMaster,
+    );
     bestTotalBpiSoFar = BpiCalculator.ratchetTotalBpi(
       bestTotalBpiSoFar,
       freshTotalBpi,
     );
     const dateStr = toJSTDateStr(stepLogs[0].lastPlayed as Date | string);
     dayTotalBpi.set(dateStr, bestTotalBpiSoFar);
+    dayRawTotalBpi.set(dateStr, freshTotalBpi);
+    dayLatentSkill.set(dateStr, latentSkill);
+    const scopedCount = stepLogs.filter(
+      (log) => log.songId != null && scopedSongIds.has(log.songId),
+    ).length;
+    stepResults.push({
+      rawAfter: freshTotalBpi,
+      bestAfter: bestTotalBpiSoFar,
+      latentSkillAfter: latentSkill,
+      scopedCount,
+    });
+  }
+
+  // Pass 2: 曲単位の内訳。末尾からスコープ内プレイ数を積み上げ、ステップ境界でウィンドウを区切る
+  let accumulatedScopedCount = 0;
+  let windowStartStepIdx = stepResults.length;
+  for (let i = stepResults.length - 1; i >= 0; i--) {
+    accumulatedScopedCount += stepResults[i].scopedCount;
+    windowStartStepIdx = i;
+    if (accumulatedScopedCount >= DETAIL_WINDOW_SIZE) break;
+  }
+  // 起点が先頭ステップ=実質的な初回プレイなので、そこだけ比較対象がなく差分を出さない
+  const windowCoversFullHistory = windowStartStepIdx === 0;
+
+  const rowResultByLogId = new Map<
+    number,
+    {
+      rawAfter: number;
+      rawDelta: number | null;
+      bestAfter: number;
+      bestDelta: number | null;
+      latentSkillAfter: number | null;
+      latentSkillDelta: number | null;
+    }
+  >();
+
+  if (windowStartStepIdx < stepResults.length) {
+    const windowStartLog = stepGroups.get(sortedStepKeys[windowStartStepIdx])![0];
+    const windowStart = dayjs(windowStartLog.lastPlayed as Date | string).tz();
+
+    const seededExScoresBySong = new Map<number, number>();
+    fullLogs.forEach((log) => {
+      if (!log.songId || !log.lastPlayed) return;
+      if (dayjs(log.lastPlayed).tz().isBefore(windowStart)) {
+        seededExScoresBySong.set(log.songId, log.exScore);
+      }
+    });
+
+    const seedStep = stepResults[windowStartStepIdx - 1];
+    let prevRawTotalBpi =
+      seedStep?.rawAfter ??
+      BpiCalculator.calculateTotalBPI(
+        Array.from(seededExScoresBySong.entries()).map(
+          ([songId, exScore]) => ({
+            songId,
+            notes: songNotesById.get(songId) ?? 0,
+            exScore,
+          }),
+        ),
+        scopedMaster,
+      );
+    let prevBestTotalBpi: number | null = seedStep?.bestAfter ?? null;
+    let prevLatentSkill: number | null = seedStep?.latentSkillAfter ?? null;
+
+    const windowLogsInOrder = sortedStepKeys
+      .slice(windowStartStepIdx)
+      .flatMap((key) => stepGroups.get(key)!);
+    let isFirstScopedRowInWindow = true;
+    for (const log of windowLogsInOrder) {
+      if (log.songId != null) seededExScoresBySong.set(log.songId, log.exScore);
+      const observations: IBpiScoreObservation[] = Array.from(
+        seededExScoresBySong.entries(),
+      ).map(([songId, exScore]) => ({
+        songId,
+        notes: songNotesById.get(songId) ?? 0,
+        exScore,
+      }));
+      const freshTotalBpi = BpiCalculator.calculateTotalBPI(
+        observations,
+        scopedMaster,
+      );
+      const latentSkill = BpiCalculator.estimateLatentSkill(
+        observations,
+        scopedMaster,
+      );
+      const newBestTotalBpi = BpiCalculator.ratchetTotalBpi(
+        prevBestTotalBpi,
+        freshTotalBpi,
+      );
+
+      if (log.songId != null && scopedSongIds.has(log.songId)) {
+        const noBaseline = windowCoversFullHistory && isFirstScopedRowInWindow;
+        rowResultByLogId.set(log.logId, {
+          rawAfter: freshTotalBpi,
+          rawDelta: noBaseline ? null : freshTotalBpi - prevRawTotalBpi,
+          bestAfter: newBestTotalBpi,
+          bestDelta:
+            noBaseline || prevBestTotalBpi === null
+              ? null
+              : newBestTotalBpi - prevBestTotalBpi,
+          latentSkillAfter: latentSkill,
+          latentSkillDelta:
+            noBaseline || prevLatentSkill === null || latentSkill === null
+              ? null
+              : latentSkill - prevLatentSkill,
+        });
+        isFirstScopedRowInWindow = false;
+      }
+      prevRawTotalBpi = freshTotalBpi;
+      prevBestTotalBpi = newBestTotalBpi;
+      prevLatentSkill = latentSkill;
+    }
   }
 
   let lastKnownTotalBpi: number | null = null;
+  let lastKnownRawTotalBpi: number | null = null;
+  let lastKnownLatentSkill: number | null = null;
   for (let d = startDate; !d.isAfter(endDate); d = d.add(1, "day")) {
     const dateStr = d.format("YYYY-MM-DD");
     const updatedOnThisDay = scopedLogsByDate[dateStr] || [];
@@ -118,18 +247,31 @@ export async function handleStatsTotalBpiHistory(
         const newBpi = s.bpi ?? -15;
         reportBpisBySong.set(songId, newBpi);
         reportExScoresBySong.set(songId, s.exScore);
+        const rowResult = rowResultByLogId.get(s.logId);
         return {
           title: `${s.title}${suffix}`,
           prevExScore,
           newExScore: s.exScore,
           prevBpi,
           newBpi,
+          rawTotalBpiAfter: rowResult?.rawAfter,
+          rawTotalBpiDelta: rowResult?.rawDelta,
+          totalBpiAfter: rowResult?.bestAfter,
+          totalBpiDelta: rowResult?.bestDelta,
+          latentSkillAfter: rowResult?.latentSkillAfter,
+          latentSkillDelta: rowResult?.latentSkillDelta,
         };
       });
     if (dayTotalBpi.has(dateStr)) lastKnownTotalBpi = dayTotalBpi.get(dateStr)!;
+    if (dayRawTotalBpi.has(dateStr))
+      lastKnownRawTotalBpi = dayRawTotalBpi.get(dateStr)!;
+    if (dayLatentSkill.has(dateStr))
+      lastKnownLatentSkill = dayLatentSkill.get(dateStr)!;
     trend.push({
       date: dateStr,
       totalBpi: lastKnownTotalBpi as number,
+      rawTotalBpi: lastKnownRawTotalBpi as number,
+      latentSkill: lastKnownLatentSkill,
       count: reportBpisBySong.size,
       updatedSongs,
     });
@@ -153,11 +295,15 @@ export async function handleStatsTotalBpiHistory(
       grouped.set(key, {
         date: key,
         totalBpi: item.totalBpi,
+        rawTotalBpi: item.rawTotalBpi,
+        latentSkill: item.latentSkill,
         count: item.count,
         updatedSongs: [...item.updatedSongs],
       });
     } else {
       existing.totalBpi = item.totalBpi;
+      existing.rawTotalBpi = item.rawTotalBpi;
+      existing.latentSkill = item.latentSkill;
       existing.count = item.count;
       existing.updatedSongs.push(...item.updatedSongs);
     }

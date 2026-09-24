@@ -20,6 +20,8 @@ const BpiHistorySection = ({
 }) => {
   const { levels, diffs, version, compareVersion } = useStatsFilter();
   const [groupBy, setGroupBy] = useState<StatsGroupBy>("day");
+  const [isRatchetHistoryOpen, setIsRatchetHistoryOpen] = useState(false);
+  const [ratchetGroupBy, setRatchetGroupBy] = useState<StatsGroupBy>("day");
 
   const isCompareMode = !rivalUserId && !!compareVersion;
   const effectiveRivalUserId = rivalUserId ?? (isCompareMode ? myUserId : undefined);
@@ -41,6 +43,15 @@ const BpiHistorySection = ({
     groupBy,
   );
 
+  const { history: ratchetHistory, isLoading: isRatchetHistoryLoading } =
+    useTotalBpiHistory(
+      isRatchetHistoryOpen ? myUserId : undefined,
+      levels,
+      diffs,
+      version,
+      ratchetGroupBy,
+    );
+
   if (myError) {
     return (
       <DashCard>
@@ -58,6 +69,14 @@ const BpiHistorySection = ({
       rivalName={effectiveRivalName}
       groupBy={groupBy}
       onGroupByChange={setGroupBy}
+      ratchetHistory={{
+        isOpen: isRatchetHistoryOpen,
+        onOpenChange: setIsRatchetHistoryOpen,
+        data: ratchetHistory,
+        isLoading: isRatchetHistoryLoading,
+        groupBy: ratchetGroupBy,
+        onGroupByChange: setRatchetGroupBy,
+      }}
     />
   );
 };

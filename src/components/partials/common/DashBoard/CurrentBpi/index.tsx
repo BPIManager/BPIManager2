@@ -6,6 +6,8 @@ import {
   useTotalBpiStats,
   useActiveDates,
 } from "@/hooks/stats/useCurrentTotalBpi";
+import { useTotalBpiHistory } from "@/hooks/stats/useTotalBPIHistory";
+import type { StatsGroupBy } from "@/types/stats/bpiBoxStats";
 import CurrentBpiCard from "./ui";
 
 function calcDefaultCompareDate(activeDates: string[]): string | undefined {
@@ -23,8 +25,10 @@ function calcDefaultCompareDate(activeDates: string[]): string | undefined {
 }
 
 const CurrentBpiSection = ({ userId }: { userId: string }) => {
-  const { version, compareVersion } = useStatsFilter();
+  const { version, compareVersion, levels, diffs } = useStatsFilter();
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [isRatchetHistoryOpen, setIsRatchetHistoryOpen] = useState(false);
+  const [ratchetGroupBy, setRatchetGroupBy] = useState<StatsGroupBy>("day");
 
   const versionKey = `${version}:${compareVersion ?? ""}`;
   const [prevVersionKey, setPrevVersionKey] = useState(versionKey);
@@ -55,6 +59,15 @@ const CurrentBpiSection = ({ userId }: { userId: string }) => {
       compareDate,
     );
 
+  const { history: ratchetHistory, isLoading: isRatchetHistoryLoading } =
+    useTotalBpiHistory(
+      isRatchetHistoryOpen ? userId : undefined,
+      levels,
+      diffs,
+      version,
+      ratchetGroupBy,
+    );
+
   return (
     <CurrentBpiCard
       currentStats={currentStats}
@@ -69,6 +82,14 @@ const CurrentBpiSection = ({ userId }: { userId: string }) => {
         defaultCompareDate,
       }}
       areaRank={currentStats}
+      ratchetHistory={{
+        isOpen: isRatchetHistoryOpen,
+        onOpenChange: setIsRatchetHistoryOpen,
+        data: ratchetHistory,
+        isLoading: isRatchetHistoryLoading,
+        groupBy: ratchetGroupBy,
+        onGroupByChange: setRatchetGroupBy,
+      }}
     />
   );
 };

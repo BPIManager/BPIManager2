@@ -7,6 +7,7 @@ import {
   TrendingUpIcon,
   TrendingDownIcon,
   HistoryIcon,
+  ChartSplineIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,8 +22,11 @@ import type { TotalBpiStats } from "@/hooks/stats/useCurrentTotalBpi";
 import { AreaRankBadge } from "@/components/ui/area-rank-badge";
 import CurrentBpiSkeleton from "./skeleton";
 import CalendarPicker from "./calendar";
+import RatchetHistoryDialog from "../Dialogs/ratchetHistoryDialog";
 import dayjs from "@/lib/dayjs";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import type { BpiHistoryItem } from "@/types/stats/bpiHistory";
+import type { StatsGroupBy } from "@/types/stats/bpiBoxStats";
 
 interface HistoricalComparisonData {
   stats?: TotalBpiStats;
@@ -43,6 +47,14 @@ interface CurrentBpiCardProps {
     areaRank: number | null;
     totalInArea: number | null;
   } | null;
+  ratchetHistory: {
+    isOpen: boolean;
+    onOpenChange: (open: boolean) => void;
+    data?: BpiHistoryItem[];
+    isLoading: boolean;
+    groupBy: StatsGroupBy;
+    onGroupByChange: (g: StatsGroupBy) => void;
+  };
 }
 
 const HistoricalComparison = ({
@@ -140,6 +152,7 @@ const CurrentBpiCard = ({
   onDateSelect,
   historicalComparison,
   areaRank,
+  ratchetHistory,
 }: CurrentBpiCardProps) => {
   const [calendarOpen, setCalendarOpen] = useState(false);
   const { t } = useTranslation();
@@ -179,46 +192,58 @@ const CurrentBpiCard = ({
           {t("dashboard.currentBpi.label")}
         </span>
 
-        <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
-          <PopoverTrigger asChild>
-            <Button
-              variant={selectedDate ? "default" : "ghost"}
-              size="icon-sm"
-              className={cn(
-                "transition-transform active:scale-90",
-                selectedDate && "shadow-sm shadow-bpim-primary/20",
-              )}
-            >
-              <CalendarIcon className="size-4" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent align="end" className="w-auto p-1 shadow-xl">
-            {isActiveDatesLoading ? (
-              <div className="flex h-40 items-center justify-center px-8">
-                <Skeleton className="h-3 w-24" />
-              </div>
-            ) : (
-              <div className="flex flex-col">
-                <div className="mb-2 flex items-center gap-1.5 border-b border-bpim-border px-1 pb-2">
-                  <HistoryIcon className="size-3 text-bpim-primary" />
-                  <span className="text-xs font-bold text-bpim-text uppercase tracking-tight">
-                    {t("dashboard.currentBpi.compareHistory")}
-                  </span>
-                </div>
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="transition-transform active:scale-90"
+            title={t("dashboard.currentBpi.ratchetHistory.trigger")}
+            onClick={() => ratchetHistory.onOpenChange(true)}
+          >
+            <ChartSplineIcon className="size-4" />
+          </Button>
 
-                <CalendarPicker
-                  activeDates={activeDateSet}
-                  selectedDate={selectedDate}
-                  onSelect={(date) => {
-                    onDateSelect(date === selectedDate ? null : date);
-                    setCalendarOpen(false);
-                  }}
-                  initialMonth={initialMonth}
-                />
-              </div>
-            )}
-          </PopoverContent>
-        </Popover>
+          <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant={selectedDate ? "default" : "ghost"}
+                size="icon-sm"
+                className={cn(
+                  "transition-transform active:scale-90",
+                  selectedDate && "shadow-sm shadow-bpim-primary/20",
+                )}
+              >
+                <CalendarIcon className="size-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-auto p-1 shadow-xl">
+              {isActiveDatesLoading ? (
+                <div className="flex h-40 items-center justify-center px-8">
+                  <Skeleton className="h-3 w-24" />
+                </div>
+              ) : (
+                <div className="flex flex-col">
+                  <div className="mb-2 flex items-center gap-1.5 border-b border-bpim-border px-1 pb-2">
+                    <HistoryIcon className="size-3 text-bpim-primary" />
+                    <span className="text-xs font-bold text-bpim-text uppercase tracking-tight">
+                      {t("dashboard.currentBpi.compareHistory")}
+                    </span>
+                  </div>
+
+                  <CalendarPicker
+                    activeDates={activeDateSet}
+                    selectedDate={selectedDate}
+                    onSelect={(date) => {
+                      onDateSelect(date === selectedDate ? null : date);
+                      setCalendarOpen(false);
+                    }}
+                    initialMonth={initialMonth}
+                  />
+                </div>
+              )}
+            </PopoverContent>
+          </Popover>
+        </div>
       </div>
 
       <div className="mt-4 flex flex-row items-start gap-4">
@@ -259,6 +284,15 @@ const CurrentBpiCard = ({
         selectedDate={selectedDate}
         onDateSelect={onDateSelect}
         comparison={historicalComparison}
+      />
+
+      <RatchetHistoryDialog
+        isOpen={ratchetHistory.isOpen}
+        onOpenChange={ratchetHistory.onOpenChange}
+        data={ratchetHistory.data}
+        isLoading={ratchetHistory.isLoading}
+        groupBy={ratchetHistory.groupBy}
+        onGroupByChange={ratchetHistory.onGroupByChange}
       />
     </DashCard>
   );

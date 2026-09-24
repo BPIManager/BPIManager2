@@ -11,9 +11,12 @@ import {
   Brush,
   Rectangle,
 } from "recharts";
+import { ChartSplineIcon } from "lucide-react";
 import { BpiHistoryItem, BpiHistoryUpdatedSong } from "@/types/stats/bpiHistory";
 import type { StatsGroupBy } from "@/types/stats/bpiBoxStats";
 import TotalBpiHistorySkeleton from "@/components/partials/common/DashBoard/TotalBPIHistory/skeleton";
+import RatchetHistoryDialog from "@/components/partials/common/DashBoard/Dialogs/ratchetHistoryDialog";
+import { Button } from "@/components/ui/button";
 import { DashCard } from "@/components/ui/dashcard";
 import { cn } from "@/lib/utils";
 import { useChartColors } from "@/hooks/common/useChartColors";
@@ -171,6 +174,15 @@ const DEFAULT_WINDOW: Record<StatsGroupBy, number> = {
   month: 12,
 };
 
+interface RatchetHistoryProps {
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  data?: BpiHistoryItem[];
+  isLoading: boolean;
+  groupBy: StatsGroupBy;
+  onGroupByChange: (g: StatsGroupBy) => void;
+}
+
 interface UnifiedBpiHistoryChartProps {
   myData?: BpiHistoryItem[];
   rivalData?: BpiHistoryItem[];
@@ -179,6 +191,7 @@ interface UnifiedBpiHistoryChartProps {
   rivalName?: string;
   groupBy: StatsGroupBy;
   onGroupByChange: (g: StatsGroupBy) => void;
+  ratchetHistory: RatchetHistoryProps;
 }
 
 const TotalBpiHistoryChart = ({
@@ -189,6 +202,7 @@ const TotalBpiHistoryChart = ({
   rivalName,
   groupBy,
   onGroupByChange,
+  ratchetHistory,
 }: UnifiedBpiHistoryChartProps) => {
   const c = useChartColors();
   const { t } = useTranslation();
@@ -275,6 +289,15 @@ const TotalBpiHistoryChart = ({
           {TITLE_MAP[groupBy]}
         </h3>
         <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="transition-transform active:scale-90"
+            title={t("dashboard.currentBpi.ratchetHistory.trigger")}
+            onClick={() => ratchetHistory.onOpenChange(true)}
+          >
+            <ChartSplineIcon className="size-4" />
+          </Button>
           <div className="flex overflow-hidden rounded border border-bpim-border text-[10px]">
             {GROUP_BY_OPTIONS.map(({ value, label }) => (
               <button
@@ -406,6 +429,15 @@ const TotalBpiHistoryChart = ({
           </ComposedChart>
         </ResponsiveContainer>
       </div>
+
+      <RatchetHistoryDialog
+        isOpen={ratchetHistory.isOpen}
+        onOpenChange={ratchetHistory.onOpenChange}
+        data={ratchetHistory.data}
+        isLoading={ratchetHistory.isLoading}
+        groupBy={ratchetHistory.groupBy}
+        onGroupByChange={ratchetHistory.onGroupByChange}
+      />
     </DashCard>
   );
 };
