@@ -55,3 +55,6 @@ public/data/
 examples/
 scripts/
 .skills/
+
+# 本番DBダンプ(手元での復元用、PIIを含むためコミット厳禁)
+backup_*.sql

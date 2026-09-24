@@ -269,7 +269,10 @@ class StatsTablesRepository {
       query = query.where("m.difficulty", "in", difficulties);
     }
 
-    return await query.orderBy("s.lastPlayed", "asc").execute();
+    return await query
+      .orderBy("s.lastPlayed", "asc")
+      .orderBy("s.logId", "asc")
+      .execute();
   }
 
   async getSongRanking(songId: number, version: string, viewerId: string) {

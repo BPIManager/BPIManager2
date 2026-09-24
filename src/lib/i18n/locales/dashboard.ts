@@ -82,6 +82,109 @@ export const dashboardTranslations = {
     "zh-TW": "設定日期以顯示比較",
     ko: "날짜를 설정하여 비교 표시",
   },
+  "dashboard.currentBpi.ratchetHistory.trigger": {
+    ja: "推定値の推移を見る",
+    en: "View estimate history",
+    "zh-TW": "查看推估值走勢",
+    ko: "추정값 추이 보기",
+  },
+  "dashboard.currentBpi.ratchetHistory.title": {
+    ja: "総合BPI: 推定値とベスト値の推移",
+    en: "Total BPI: estimate vs. best",
+    "zh-TW": "綜合BPI：推估值與最佳值走勢",
+    ko: "종합BPI: 추정값과 베스트값 추이",
+  },
+  "dashboard.currentBpi.ratchetHistory.alert": {
+    ja: "未プレイ曲は「実力指標(a)」から予測したBPIで埋められています。この値を下回るスコアを取ると推定値・実力指標(a)は下がりますが、ベスト値は過去の最高値のまま変わりません。",
+    en: 'Unplayed charts are filled with a BPI predicted from your "skill index (a)". Score below that index and the estimate/skill index can drop — but "Best" stays at your past peak.',
+    "zh-TW":
+      "未遊玩的譜面會用「實力指標（a）」推算出的BPI來補上。分數低於該指標時，推估值／實力指標會下降，但「最佳值」仍維持過去最高值不變。",
+    ko: "미플레이 채보는 '실력 지표(a)'로 예측한 BPI로 채워집니다. 이 값보다 낮은 스코어를 기록하면 추정값・실력 지표가 내려가지만, 베스트값은 과거 최고치 그대로 유지됩니다.",
+  },
+  "dashboard.currentBpi.ratchetHistory.raw": {
+    ja: "推定値",
+    en: "Estimate",
+    "zh-TW": "推估值",
+    ko: "추정값",
+  },
+  "dashboard.currentBpi.ratchetHistory.ratcheted": {
+    ja: "ベスト値(表示値)",
+    en: "Best (displayed)",
+    "zh-TW": "最佳值（顯示值）",
+    ko: "베스트값(표시값)",
+  },
+  "dashboard.currentBpi.ratchetHistory.rawDelta": {
+    ja: "推定値の増減",
+    en: "Estimate change",
+    "zh-TW": "推估值增減",
+    ko: "추정값 증감",
+  },
+  "dashboard.currentBpi.ratchetHistory.rawTotal": {
+    ja: "総合BPI推定値",
+    en: "Total BPI estimate",
+    "zh-TW": "綜合BPI推估值",
+    ko: "종합BPI 추정값",
+  },
+  "dashboard.currentBpi.ratchetHistory.latentSkill": {
+    ja: "実力指標(a)",
+    en: "Skill index (a)",
+    "zh-TW": "實力指標（a）",
+    ko: "실력 지표(a)",
+  },
+  "dashboard.currentBpi.ratchetHistory.currentGap": {
+    ja: "現在の乖離",
+    en: "Current gap",
+    "zh-TW": "目前落差",
+    ko: "현재 차이",
+  },
+  "dashboard.currentBpi.ratchetHistory.noGap": {
+    ja: "現在は乖離なし",
+    en: "No gap right now",
+    "zh-TW": "目前無落差",
+    ko: "현재 차이 없음",
+  },
+  "dashboard.currentBpi.ratchetHistory.contributionTitle": {
+    ja: "更新ごとの推定値・ベスト値の推移",
+    en: "Estimate & best value after each update",
+    "zh-TW": "每次更新後的推估值與最佳值走勢",
+    ko: "갱신마다의 추정값・베스트값 추이",
+  },
+  "dashboard.currentBpi.ratchetHistory.contributionEmpty": {
+    ja: "この期間に更新データはありません",
+    en: "No update data in this period",
+    "zh-TW": "此期間沒有更新資料",
+    ko: "이 기간에 갱신 데이터가 없습니다",
+  },
+  "dashboard.currentBpi.ratchetHistory.initialEntry": {
+    ja: "",
+    en: "",
+    "zh-TW": "",
+    ko: "",
+  },
+  "dashboard.currentBpi.ratchetHistory.contributionTruncated": {
+    ja: "直近{count}件のみ表示しています",
+    en: "Showing only the most recent {count} entries",
+    "zh-TW": "僅顯示最近{count}筆",
+    ko: "최근 {count}건만 표시하고 있습니다",
+  },
+  "dashboard.currentBpi.ratchetHistory.granularitySong": {
+    ja: "曲単位",
+    en: "By song",
+    "zh-TW": "依樂曲",
+    ko: "곡 단위",
+  },
+  "dashboard.currentBpi.ratchetHistory.granularityDate": {
+    ja: "日付単位",
+    en: "By date",
+    "zh-TW": "依日期",
+    ko: "날짜 단위",
+  },
+  "dashboard.currentBpi.ratchetHistory.andMoreSongs": {
+    ja: "{titles} 他{count}曲",
+    en: "{titles} +{count} more",
+    "zh-TW": "{titles} 另{count}首",
+    ko: "{titles} 외 {count}곡",
+  },
 
   "dashboard.activity.title": {
     ja: "最近の更新",
@@ -1162,7 +1265,8 @@ export const dashboardTranslations = {
   "dashboard.optimizerProgress.emptyDesc": {
     ja: "目標管理で目標BPIまでの目標を立てて保存すると、ここで日々の進捗を確認できます。",
     en: "Create and save a goal toward your target BPI in Goal Management to track your daily progress here.",
-    "zh-TW": "在目標管理中設定並儲存達成目標BPI的目標後，即可在此確認每日進度。",
+    "zh-TW":
+      "在目標管理中設定並儲存達成目標BPI的目標後，即可在此確認每日進度。",
     ko: "목표 관리에서 목표 BPI까지의 목표를 세우고 저장하면 여기서 일일 진행 상황을 확인할 수 있습니다.",
   },
   "dashboard.optimizerProgress.cta": {

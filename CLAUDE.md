@@ -46,6 +46,7 @@ beatmania IIDXのスコア管理Webアプリ。技術スタック・セットア
 該当パスを触るファイルが開かれると自動で読み込まれる。どの状況でどのファイルが効くかの一覧:
 
 - `coding-conventions.md` — 全般のコーディング規約（常時読み込み）
+- `iidx-domain-knowledge.md` — beatmania IIDX特有のドメイン知識（BPI・皆伝・アリーナ・レーダーチャート等、常時読み込み）
 - `db-layer.md` — `src/lib/db/`・`src/pages/api/`・`src/lib/mcp/tools/`・`src/lib/cron/` を触るとき
 - `components.md` — `src/components/` を触るとき
 - `design-guidelines.md` — `src/components/` を触るとき（余白・角丸・アイコンサイズ・タイポグラフィ等のビジュアル規約）

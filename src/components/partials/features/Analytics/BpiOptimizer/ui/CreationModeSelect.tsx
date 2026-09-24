@@ -3,6 +3,7 @@ import {
   ListChecks,
   History,
   Download,
+  Target,
   CircleDashed,
   type LucideIcon,
 } from "lucide-react";
@@ -10,7 +11,7 @@ import { useTranslation } from "@/hooks/common/useTranslation";
 import type { TranslationKey } from "@/lib/i18n/translations";
 
 const MODE_CARDS: {
-  key: "auto" | "custom" | "selfBestSet" | "import";
+  key: "auto" | "custom" | "selfBestSet" | "import" | "singleBpiTarget";
   icon: LucideIcon;
   titleKey: TranslationKey;
   descKey: TranslationKey;
@@ -34,6 +35,12 @@ const MODE_CARDS: {
     descKey: "optimizer.mode.selfBestSetCard.desc",
   },
   {
+    key: "singleBpiTarget",
+    icon: Target,
+    titleKey: "optimizer.mode.singleBpiTargetCard.title",
+    descKey: "optimizer.mode.singleBpiTargetCard.desc",
+  },
+  {
     key: "import",
     icon: Download,
     titleKey: "optimizer.mode.importCard.title",
@@ -46,11 +53,13 @@ const CreationModeSelect = ({
   onImportClick,
   onSelfBestSetClick,
   isSelfBestSetLoading,
+  onSingleBpiTargetClick,
 }: {
   onSelect: (mode: "auto" | "custom") => void;
   onImportClick: () => void;
   onSelfBestSetClick: () => void;
   isSelfBestSetLoading?: boolean;
+  onSingleBpiTargetClick: () => void;
 }) => {
   const { t } = useTranslation();
 
@@ -65,6 +74,8 @@ const CreationModeSelect = ({
             onClick={() => {
               if (card.key === "import") return onImportClick();
               if (card.key === "selfBestSet") return onSelfBestSetClick();
+              if (card.key === "singleBpiTarget")
+                return onSingleBpiTargetClick();
               return onSelect(card.key);
             }}
             className="group flex flex-col items-start gap-2 rounded-xl border border-bpim-border bg-bpim-surface p-4 text-left transition-all hover:border-bpim-primary/50 hover:ring-2 hover:ring-bpim-primary/20 disabled:opacity-50"

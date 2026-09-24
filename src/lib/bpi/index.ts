@@ -103,6 +103,30 @@ export class BpiCalculator {
   }
 
   /**
+   * プレイヤーの潜在スキル a（ベイズ縮小推定後、z尺度）を取得する。未プレイ曲の予測BPIはこの値から逆算される
+   *
+   * @param observations - そのユーザーが実際にプレイしたスコア
+   * @param allSongs - mu/sigma込みの曲データ（`calculateTotalBPI`と同様songId突き合わせに使う）
+   */
+  public static estimateLatentSkill(
+    observations: IBpiScoreObservation[],
+    allSongs: (IBpiBasicSongData & { songId: number })[],
+  ): number | null {
+    const songById = new Map(allSongs.map((s) => [s.songId, s]));
+    const played: PlayedScoreV2[] = observations.map((o) => ({
+      chart: this.toChart(
+        songById.get(o.songId) ?? {
+          notes: o.notes,
+          kaidenAvg: null,
+          wrScore: null,
+        },
+      ),
+      exScore: o.exScore,
+    }));
+    return this.v2.player(played).latentSkill;
+  }
+
+  /**
    * 総合 BPI を計算する（シフト法）。
    *
    * 実際にプレイした曲の単曲BPIはそのまま使い、未プレイ曲だけを潜在スキル
