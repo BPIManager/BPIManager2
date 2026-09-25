@@ -22,7 +22,7 @@ export function useTimelineFilter() {
     difficulties: [...IIDX_DIFFICULTIES],
     search: "",
   });
-  // フォローリストによる絞り込み(#278)。未選択(null)時は既存挙動どおり
+  // フォローリストによる絞り込み。未選択(null)時は
   // フォロー中全ユーザーが対象になる。
   const [listId, setListId] = useState<number | null>(null);
 

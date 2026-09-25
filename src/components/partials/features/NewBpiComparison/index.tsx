@@ -116,7 +116,7 @@ export default function NewBpiComparison({ userId }: Props) {
     accessState === "ok" ? viewedUserId : undefined,
     latestVersion,
   );
-  // 総合BPI(issue #304, 未プレイ曲をa_iからの予測で埋める方式)には
+  // 総合BPI(未プレイ曲をa_iからの予測で埋める方式)には
   // 未プレイ曲を含む☆12全曲の一覧が要る。useUserScores(/scores)はプレイ済み
   // 楽曲しか返さないため、曲マスタ自体は別途取得する(閲覧対象ユーザーに
   // 依存しない共通データのため、viewedUserIdとは無関係に取得してよい)。

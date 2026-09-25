@@ -1,5 +1,5 @@
 /**
- * BPI V2（分布ベース再定義、issue #380で本番採用）のグローバルモデル定数。
+ * BPI V2（分布ベース再定義）のグローバルモデル定数。
  *
  * BPIM2-AutomatedDefinitionCalculatorのアリーナクロール結果とbpim2登録
  * ユーザーの実スコアを統合した母集団でALS推定した結果（生成日時
@@ -8,7 +8,7 @@
  *
  * z0はアリーナA帯(a1〜a5)在籍者の潜在能力a_iの中央値(全曲共通)。
  * zRef/z100Iqrはgamma補正用。residualRmseはALS残差の標準偏差(t単位)で
- * 潜在スキルa_iの縮小推定(#304)の事前分散との重み付けに使う。coefMedian
+ * 潜在スキルa_iの縮小推定の事前分散との重み付けに使う。coefMedian
  * は per-song カーブ指数`coef`未収録曲のフォールバック。rankCurveは実
  * アリーナ順位×a_iの経験カーブ。arenaPopulationSizeはrankCurveの
  * パーセンタイルを絶対順位に変換する基準人数。

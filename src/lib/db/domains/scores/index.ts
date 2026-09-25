@@ -246,7 +246,7 @@ class ScoresRepository {
 
   /**
    * 複数ユーザー×複数楽曲の最新スコアをまとめて取得する
-   * (issue #299〜304検証用「全プレイヤー」一覧のページ単位バッチ取得用)。
+   * (BPI V2検証ツール(NewBpiComparison)の「全プレイヤー」一覧のページ単位バッチ取得用)。
    *
    * @param userIds - 対象ユーザー ID の配列
    * @param version - バージョン番号

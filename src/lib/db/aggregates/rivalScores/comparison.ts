@@ -166,8 +166,7 @@ class SocialComparisonRepository {
    * @param params.levels - 対象難易度レベルの配列（空の場合は全レベル）
    * @param params.difficulties - 対象難易度文字列の配列（空の場合は全難易度）
    * @param params.listId - 指定時、`viewerId`が所有するこのフォローリストの
-   *   所属ユーザーだけに絞り込む（呼び出し元で所有権を確認済みであること。
-   *   #277）
+   *   所属ユーザーだけに絞り込む（呼び出し元で所有権を確認済みであること）
    */
   // follows・users・userStatusLogs・officialArenaStats・userRadarCache・
   // userRoles・songs・songDef・scores(自分/ライバル)を横断JOINした
@@ -337,8 +336,8 @@ class SocialComparisonRepository {
       ])
       .where("f.followerId", "=", viewerId)
       // 対象が公開、または対象が非公開でも承認記録がある場合のみ表示する。
-      // followsの存在だけでは判定できない(#275フォロー後方修正: 公開時代に
-      // 成立したfollowsには承認記録がないため、承認記録の有無も要求する)
+      // followsの存在だけでは判定できない(公開時代に成立したfollowsには
+      // 承認記録がないため、承認記録の有無も要求する)
       .where((eb) =>
         eb.or([
           eb("u.isPublic", "=", 1),

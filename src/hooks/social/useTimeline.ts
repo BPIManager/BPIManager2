@@ -15,8 +15,8 @@ interface TimelineResponse {
  *
  * @param mode - 表示モード。`"all"` 全件、`"played"` 閲覧者もプレイ済み、`"overtaken"` 抜かれた楽曲
  * @param params - レベル・難易度・検索キーワードなどのフィルター条件
- * @param version - 表示バージョン（#344）
- * @param listId - 指定時、このフォローリストの所属ユーザーだけに絞り込む（#278）
+ * @param version - 表示バージョン
+ * @param listId - 指定時、このフォローリストの所属ユーザーだけに絞り込む
  * @returns タイムライン配列・ローディング状態・ページング操作
  */
 export const useTimeline = (

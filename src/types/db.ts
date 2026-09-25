@@ -38,15 +38,15 @@ export interface Database {
   oauthClients: OauthClients;
   oauthAuthorizationCodes: OauthAuthorizationCodes;
   oauthAccessTokens: OauthAccessTokens;
-  // 追加: 暫定/バックアップ用テーブル
+  // 暫定/バックアップ用テーブル
   bkScores: BkScores;
   bkUsers: BkUsers;
-  // 追加: 非公開ユーザーへのフォロー承認制(#275)。kysely-codegenは使わず、
+  // 非公開ユーザーへのフォロー承認制用のテーブル。kysely-codegenは使わず、
   // 既存の生成済み型のスタイルに合わせて手動で追加している
   followInviteLinks: FollowInviteLinks;
   followApprovalNotifications: FollowApprovalNotifications;
   followRequests: FollowRequests;
-  // 追加: フォロー中ユーザーを分類するリスト(#277)。kysely-codegenは使わず、
+  // フォロー中ユーザーを分類するリスト用のテーブル。kysely-codegenは使わず、
   // 既存の生成済み型のスタイルに合わせて手動で追加している
   followLists: FollowLists;
   followListMembers: FollowListMembers;

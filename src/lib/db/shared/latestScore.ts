@@ -39,9 +39,8 @@ function applyUserIdsOrFollowersFilter<O>(
   const { userIds, followersOf } = params;
 
   if (followersOf) {
-    // follows行の存在だけでは判定できない(#275フォロー後方修正: 公開時代に
-    // 成立したfollowsには承認記録がないため、対象が非公開の場合は承認記録の
-    // 有無も要求する)
+    // follows行の存在だけでは判定できない(公開時代に成立したfollowsには
+    // 承認記録がないため、対象が非公開の場合は承認記録の有無も要求する)
     return qb.where("userId", "in", (sub) =>
       sub
         .selectFrom("follows as f")
@@ -321,7 +320,7 @@ export function correlatedLatestLogId(
   if (userId) {
     sub = sub.where(sql.ref(`${alias}.userId`), "=", userId);
   } else if (followersOf) {
-    // follows行の存在だけでは判定できない(#275フォロー後方修正)。
+    // follows行の存在だけでは判定できない。
     // shared/latestScore.tsのapplyUserIdsOrFollowersFilterと同じ理由で
     // 承認記録の有無も要求する
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

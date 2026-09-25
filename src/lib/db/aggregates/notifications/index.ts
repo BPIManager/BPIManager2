@@ -63,8 +63,8 @@ function overtakenScoresBaseQuery(params: {
     )
     .where("f.followerId", "=", userId)
     // フォロー対象が公開、または対象が非公開でも承認記録がある場合のみ通知する。
-    // followsの存在だけでは判定できない(#275フォロー後方修正: 公開時代に成立した
-    // followsには承認記録がないため、承認記録の有無も要求する / #295)。
+    // followsの存在だけでは判定できない(公開時代に成立したfollowsには
+    // 承認記録がないため、承認記録の有無も要求する)。
     .where((eb) =>
       eb.or([
         eb("fu.isPublic", "=", 1),

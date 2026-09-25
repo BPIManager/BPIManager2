@@ -23,7 +23,7 @@ export function useRivalListFilter() {
     ...IIDX_DIFFICULTIES,
   ]);
   const [sortOrder, setSortOrder] = useState<RivalSortOrder>("win_desc");
-  // フォローリストによる絞り込み(#277)。未選択(null)時は既存挙動どおり
+  // フォローリストによる絞り込み。未選択(null)時は
   // フォロー中全ユーザーが対象になる。
   const [listId, setListId] = useState<number | null>(null);
 

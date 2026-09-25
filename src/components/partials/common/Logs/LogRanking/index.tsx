@@ -93,7 +93,7 @@ const LogRank = ({
   }, [details, type]);
 
   // 期間移動・再取得等でdetailsが変わり、選択中の絞り込み対象(ライバル/
-  // バージョン)が選択肢から消えた場合は未選択(すべて)扱いにする(#444)。
+  // バージョン)が選択肢から消えた場合は未選択(すべて)扱いにする。
   // stateを直接補正せずrender時に導出することで、effect無しで解決する
   const effectiveRivalId = allRivals.some((r) => r.id === selectedRivalId)
     ? selectedRivalId

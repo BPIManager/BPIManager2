@@ -100,7 +100,7 @@ class allScoresRepository {
    *
    * ☆10以下の楽曲（`allScores`ドメインのみ）の手動編集では`logs`テーブルに
    * 一切書き込まれず`navigationRepo.getLatestBatchId`で既存の手動バッチを
-   * 検出できないため、`allScores`自体から直接判定する（#447）。
+   * 検出できないため、`allScores`自体から直接判定する。
    *
    * @param userId - ユーザー ID
    * @param version - バージョン番号

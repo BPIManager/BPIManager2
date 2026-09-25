@@ -81,7 +81,7 @@ export async function handleFollow(
     if (denied) return { result: denied, targetUserId, viewerId };
 
     // 非公開ユーザーへの直接フォローは checkProfileAccess が既に 403 で弾く
-    // (#275: 非公開ユーザーへのフォローは招待URL経由のリクエスト承認でのみ成立)
+    // (非公開ユーザーへのフォローは招待URL経由のリクエスト承認でのみ成立)
     if (!access.viewerId) {
       return { result: err(401, "Unauthorized"), targetUserId, viewerId };
     }

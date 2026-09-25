@@ -16,7 +16,7 @@ interface RivalSummaryResponse {
  * @param params.difficulties - フィルタリングする難易度配列
  * @param params.version - IIDX バージョン文字列
  * @param params.listId - 指定時、このフォローリストの所属ユーザーだけに
- *   絞り込む（#277）。`null`/未指定なら従来通りフォロー中全ユーザーが対象
+ *   絞り込む。`null`/未指定ならフォロー中全ユーザーが対象
  * @returns ライバルサマリー配列・閲覧者BPI・ローディング状態・エラー・更新関数
  */
 export const useRivalSummary = (params: {
