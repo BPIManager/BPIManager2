@@ -94,12 +94,23 @@ export const dashboardTranslations = {
     "zh-TW": "綜合BPI：推估值與最佳值走勢",
     ko: "종합BPI: 추정값과 베스트값 추이",
   },
-  "dashboard.currentBpi.ratchetHistory.alert": {
-    ja: "未プレイ曲は「実力指標(a)」から予測したBPIで埋められています。この値を下回るスコアを取ると推定値・実力指標(a)は下がりますが、ベスト値は過去の最高値のまま変わりません。",
-    en: 'Unplayed charts are filled with a BPI predicted from your "skill index (a)". Score below that index and the estimate/skill index can drop — but "Best" stays at your past peak.',
-    "zh-TW":
-      "未遊玩的譜面會用「實力指標（a）」推算出的BPI來補上。分數低於該指標時，推估值／實力指標會下降，但「最佳值」仍維持過去最高值不變。",
-    ko: "미플레이 채보는 '실력 지표(a)'로 예측한 BPI로 채워집니다. 이 값보다 낮은 스코어를 기록하면 추정값・실력 지표가 내려가지만, 베스트값은 과거 최고치 그대로 유지됩니다.",
+  "dashboard.currentBpi.ratchetHistory.sortDate": {
+    ja: "日付順",
+    en: "By date",
+    "zh-TW": "依日期",
+    ko: "날짜순",
+  },
+  "dashboard.currentBpi.ratchetHistory.sortImpactPositive": {
+    ja: "上昇幅が大きい順",
+    en: "Biggest gain first",
+    "zh-TW": "漲幅最大優先",
+    ko: "상승폭이 큰 순",
+  },
+  "dashboard.currentBpi.ratchetHistory.sortImpactNegative": {
+    ja: "下降幅が大きい順",
+    en: "Biggest drop first",
+    "zh-TW": "跌幅最大優先",
+    ko: "하락폭이 큰 순",
   },
   "dashboard.currentBpi.ratchetHistory.raw": {
     ja: "推定値",

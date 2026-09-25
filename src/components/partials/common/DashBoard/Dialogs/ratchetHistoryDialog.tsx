@@ -1,5 +1,11 @@
 import { useMemo, useState } from "react";
-import { InfoIcon, ListMusicIcon, CalendarDaysIcon } from "lucide-react";
+import {
+  ListMusicIcon,
+  CalendarDaysIcon,
+  ArrowDownWideNarrowIcon,
+  TrendingUpIcon,
+  TrendingDownIcon,
+} from "lucide-react";
 import {
   ComposedChart,
   Line,
@@ -18,7 +24,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useChartColors } from "@/hooks/common/useChartColors";
@@ -173,6 +178,7 @@ interface HistoryStep {
 }
 
 type ListGranularity = "song" | "date";
+type ContributionSortOrder = "date" | "impactDesc" | "impactAsc";
 
 const MAX_HISTORY_STEPS = 300;
 
@@ -187,6 +193,7 @@ const RatchetHistoryDialog = ({
   const c = useChartColors();
   const { t, tFormat } = useTranslation();
   const [granularity, setGranularity] = useState<ListGranularity>("song");
+  const [sortOrder, setSortOrder] = useState<ContributionSortOrder>("date");
 
   const rawLabel = t("dashboard.currentBpi.ratchetHistory.raw");
   const rawTotalLabel = t("dashboard.currentBpi.ratchetHistory.rawTotal");
@@ -316,6 +323,20 @@ const RatchetHistoryDialog = ({
     maxAbsRawDelta,
   } = granularity === "song" ? songStepsResult : dateStepsResult;
 
+  // 日付順(既定、historySteps自体が新しい→古い順)以外は総合BPIへの影響(rawDelta)で
+  // 並べ替える。影響なし(rawDelta === null、初回スコープ内プレイ等)は常に末尾に残す
+  const displaySteps = useMemo(() => {
+    if (sortOrder === "date") return historySteps;
+    const withDelta = historySteps.filter((s) => s.rawDelta !== null);
+    const withoutDelta = historySteps.filter((s) => s.rawDelta === null);
+    const sorted = [...withDelta].sort((a, b) =>
+      sortOrder === "impactDesc"
+        ? (b.rawDelta as number) - (a.rawDelta as number)
+        : (a.rawDelta as number) - (b.rawDelta as number),
+    );
+    return [...sorted, ...withoutDelta];
+  }, [historySteps, sortOrder]);
+
   const formatDate = (value: string, index: number) => {
     if (groupBy === "month") {
       const [year, month] = value.split("-");
@@ -343,15 +364,6 @@ const RatchetHistoryDialog = ({
             {t("dashboard.currentBpi.ratchetHistory.title")}
           </DialogTitle>
         </DialogHeader>
-
-        <div className="shrink-0 px-4 pt-3">
-          <Alert variant="info">
-            <InfoIcon />
-            <AlertDescription>
-              {t("dashboard.currentBpi.ratchetHistory.alert")}
-            </AlertDescription>
-          </Alert>
-        </div>
 
         <div className="shrink-0 px-4 pt-3 flex flex-wrap items-center justify-between gap-2">
           <div className="flex overflow-hidden rounded border border-bpim-border text-[10px]">
@@ -558,41 +570,76 @@ const RatchetHistoryDialog = ({
           </div>
 
           <div className="px-4 pb-4 pt-1">
-            <div className="mb-2 flex items-center justify-between gap-2 border-t border-bpim-border pt-3">
+            <div className="mb-2 flex flex-wrap items-center justify-between gap-2 border-t border-bpim-border pt-3">
               <h4 className="text-xs font-bold text-bpim-text">
                 {t("dashboard.currentBpi.ratchetHistory.contributionTitle")}
               </h4>
-              <div className="flex overflow-hidden rounded border border-bpim-border">
-                <Button
-                  variant={granularity === "song" ? "default" : "ghost"}
-                  size="icon-sm"
-                  className="rounded-none"
-                  title={t("dashboard.currentBpi.ratchetHistory.granularitySong")}
-                  onClick={() => setGranularity("song")}
-                >
-                  <ListMusicIcon className="size-3.5" />
-                </Button>
-                <Button
-                  variant={granularity === "date" ? "default" : "ghost"}
-                  size="icon-sm"
-                  className="rounded-none"
-                  title={t("dashboard.currentBpi.ratchetHistory.granularityDate")}
-                  onClick={() => setGranularity("date")}
-                >
-                  <CalendarDaysIcon className="size-3.5" />
-                </Button>
+              <div className="flex items-center gap-2">
+                <div className="flex overflow-hidden rounded border border-bpim-border">
+                  <Button
+                    variant={sortOrder === "date" ? "default" : "ghost"}
+                    size="icon-sm"
+                    className="rounded-none"
+                    title={t("dashboard.currentBpi.ratchetHistory.sortDate")}
+                    onClick={() => setSortOrder("date")}
+                  >
+                    <ArrowDownWideNarrowIcon className="size-3.5" />
+                  </Button>
+                  <Button
+                    variant={sortOrder === "impactDesc" ? "default" : "ghost"}
+                    size="icon-sm"
+                    className="rounded-none"
+                    title={t(
+                      "dashboard.currentBpi.ratchetHistory.sortImpactPositive",
+                    )}
+                    onClick={() => setSortOrder("impactDesc")}
+                  >
+                    <TrendingUpIcon className="size-3.5" />
+                  </Button>
+                  <Button
+                    variant={sortOrder === "impactAsc" ? "default" : "ghost"}
+                    size="icon-sm"
+                    className="rounded-none"
+                    title={t(
+                      "dashboard.currentBpi.ratchetHistory.sortImpactNegative",
+                    )}
+                    onClick={() => setSortOrder("impactAsc")}
+                  >
+                    <TrendingDownIcon className="size-3.5" />
+                  </Button>
+                </div>
+                <div className="flex overflow-hidden rounded border border-bpim-border">
+                  <Button
+                    variant={granularity === "song" ? "default" : "ghost"}
+                    size="icon-sm"
+                    className="rounded-none"
+                    title={t("dashboard.currentBpi.ratchetHistory.granularitySong")}
+                    onClick={() => setGranularity("song")}
+                  >
+                    <ListMusicIcon className="size-3.5" />
+                  </Button>
+                  <Button
+                    variant={granularity === "date" ? "default" : "ghost"}
+                    size="icon-sm"
+                    className="rounded-none"
+                    title={t("dashboard.currentBpi.ratchetHistory.granularityDate")}
+                    onClick={() => setGranularity("date")}
+                  >
+                    <CalendarDaysIcon className="size-3.5" />
+                  </Button>
+                </div>
               </div>
             </div>
 
             {isLoading ? (
               <Skeleton className="h-24 w-full" />
-            ) : historySteps.length === 0 ? (
+            ) : displaySteps.length === 0 ? (
               <p className="text-xs text-bpim-muted">
                 {t("dashboard.currentBpi.ratchetHistory.contributionEmpty")}
               </p>
             ) : (
               <div className="flex flex-col gap-1.5">
-                {historySteps.map((step, i) => {
+                {displaySteps.map((step, i) => {
                   const hasDelta = step.rawDelta !== null;
                   // 線形幅だと外れ値1件に他が埋もれるため平方根スケールで圧縮する
                   const barPct =
