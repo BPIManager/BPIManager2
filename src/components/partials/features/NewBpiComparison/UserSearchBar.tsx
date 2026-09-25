@@ -14,7 +14,7 @@ interface Props {
 }
 
 /**
- * issue #299〜304 検証用: ユーザーIDで他ユーザーのデータを検索・表示するための
+ * BPI V2検証ツール(NewBpiComparison)内: ユーザーIDで他ユーザーのデータを検索・表示するための
  * 検索バー。アクセス可否のチェック自体はAPI側(withUserApiHandler経由の
  * checkUserAccess)に委ね、ここでは検索UIと現在の閲覧対象の表示のみを担う。
  */

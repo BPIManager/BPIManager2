@@ -322,7 +322,7 @@ class MonthlyReviewRepository {
   // 閲覧しているか(viewerId)で可視範囲が変わる:
   // - viewerId === ownerId(本人が自分のまとめを見る): 公開 + 所有者が承認済みの非公開
   // - それ以外(第三者が所有者のまとめを見る): 公開フォローのみ。所有者が承認した
-  //   だけの非公開ライバルを第三者に晒さない(#296 / #275フォロー後方修正)。
+  //   だけの非公開ライバルを第三者に晒さない。
   async getRivalsCurrentScoresForSongs(params: {
     ownerId: string;
     viewerId: string | undefined;

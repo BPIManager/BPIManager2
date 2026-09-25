@@ -17,8 +17,8 @@ import {
 /**
  * BPI（Beat Power Indicator）計算ロジックを提供する静的クラス。
  *
- * 実体は npm パッケージ `@bpim/bpicalc` の {@link BpiV2}（分布ベース再定義、
- * issue #380 でV1から本番切り替え）。`songDef` 由来の楽曲データ
+ * 実体は npm パッケージ `@bpim/bpicalc` の {@link BpiV2}（分布ベース再定義）。
+ * `songDef` 由来の楽曲データ
  * （{@link IBpiBasicSongData}、`mu`/`sigma`/`residualVar` 込み）を `BpiV2` に渡す。
  *
  * - 単曲 BPI の計算（`calc`）

@@ -281,7 +281,7 @@ class AllScoresAggregateRepository {
    */
   // 呼び出し元(all-scores/[songId]/rivals.ts)は`viewerId`にURLの[userId]
   // (第三者が閲覧している可能性のある対象ユーザー)をそのまま渡すため、
-  // 「followsの存在=閲覧者本人への閲覧許可」の前提(#275)が成立しない。
+  // 「followsの存在=閲覧者本人への閲覧許可」の前提が成立しない。
   // isPublicによる絞り込みを維持する
   async getRivalScoresForAllSong(params: {
     viewerId: string;

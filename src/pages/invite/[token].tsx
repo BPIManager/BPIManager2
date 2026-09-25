@@ -16,7 +16,7 @@ import FollowInviteContent from "@/components/partials/features/Invite/FollowInv
  * 招待URL(`/invite/[token]`)共通ページ。
  *
  * `/api/v1/invite/[token]`が返す`type`によって表示内容を出し分ける
- * （現時点では`"follow"`のみ。チーム招待(#276)等、他の招待種別を
+ * （現時点では`"follow"`のみ。チーム招待等、他の招待種別を
  * 追加する際は同じURL形式のままこのswitchに分岐を追加する）。
  */
 type InvitePreviewData = {

@@ -13,7 +13,7 @@ interface StepProgress {
   fromBpi: number;
   currentBpi: number | null;
   toBpi: number;
-  /** #474以前に保存されたメモには無いため、無い場合はレート表示を省略する */
+  /** 古い保存済みメモには存在しない場合があるため、無い場合はレート表示を省略する */
   notes: number | null;
 }
 

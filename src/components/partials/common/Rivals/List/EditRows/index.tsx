@@ -18,7 +18,7 @@ interface Props {
 
 /**
  * `/rivals`編集モードの行リスト。フォロー中ユーザーを1行1人で表示し、
- * 右カラムの`ListMultiSelect`で所属リストを切り替えられる（#277）。
+ * 右カラムの`ListMultiSelect`で所属リストを切り替えられる。
  */
 const RivalListEditRows = ({ userId, lists }: Props) => {
   const { following, isLoading, addToList, removeFromList } =

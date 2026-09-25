@@ -71,9 +71,9 @@ class RivalRepository {
               .innerJoin("users as fu", "fu.userId", "f.followingId")
               .select("f.followingId")
               .where("f.followerId", "=", viewerId)
-              // follows行の存在だけでは判定できない(#275フォロー後方修正:
-              // 公開時代に成立したfollowsには承認記録がないため、対象が
-              // 非公開の場合は承認記録の有無も要求する)
+              // follows行の存在だけでは判定できない(公開時代に成立した
+              // followsには承認記録がないため、対象が非公開の場合は
+              // 承認記録の有無も要求する)
               .where((eb) =>
                 eb.or([
                   eb("fu.isPublic", "=", 1),
@@ -191,9 +191,9 @@ class RivalRepository {
               .innerJoin("users as fu", "fu.userId", "f.followingId")
               .select("f.followingId")
               .where("f.followerId", "=", userId)
-              // follows行の存在だけでは判定できない(#275フォロー後方修正:
-              // 公開時代に成立したfollowsには承認記録がないため、対象が
-              // 非公開の場合は承認記録の有無も要求する)
+              // follows行の存在だけでは判定できない(公開時代に成立した
+              // followsには承認記録がないため、対象が非公開の場合は
+              // 承認記録の有無も要求する)
               .where((eb) =>
                 eb.or([
                   eb("fu.isPublic", "=", 1),
@@ -306,7 +306,6 @@ class RivalRepository {
     // `batchId`/`range`で絞り込んだ範囲内で、閲覧中バージョンにおける曲ごとの
     // 最良スコア（同点なら最新のログ）1件に集約する。集約しないと、範囲内で
     // 同じ曲を複数回更新した場合に更新イベントの数だけ比較行が重複してしまう
-    // (#430と同根の不具合、#431)
     let scopedCurrent = db
       .selectFrom("scores")
       .select(["songId", "exScore", "logId"])
@@ -385,8 +384,8 @@ class RivalRepository {
       .where("current.userId", "=", userId)
       .where("current.version", "=", version)
       // 対象が公開、または対象が非公開でも承認記録がある場合のみ表示する。
-      // followsの存在だけでは判定できない(#275フォロー後方修正: 公開時代に
-      // 成立したfollowsには承認記録がないため、承認記録の有無も要求する)
+      // followsの存在だけでは判定できない(公開時代に成立したfollowsには
+      // 承認記録がないため、承認記録の有無も要求する)
       .where((eb) =>
         eb.or([
           eb("ru.isPublic", "=", 1),
@@ -492,7 +491,7 @@ class RivalRepository {
   // ため、直接クエリを維持する。
   // 呼び出し元(rivals/following/scores/[songId].ts)は`viewerId`にURLの[userId]
   // (第三者が閲覧している可能性のある対象ユーザー)をそのまま渡すため、
-  // 「followsの存在=閲覧者本人への閲覧許可」の前提(#275)が成立しない。
+  // 「followsの存在=閲覧者本人への閲覧許可」の前提が成立しない。
   // isPublicによる絞り込みを維持する
   async getFollowedScoresForSong(params: {
     viewerId: string;

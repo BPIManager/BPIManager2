@@ -202,7 +202,7 @@ class UsersRepository {
 
   /**
    * 公開ユーザーを userId 順にページ単位で取得する
-   * (issue #299〜304検証用「全プレイヤー」一覧のページング用)。
+   * (BPI V2検証ツール(NewBpiComparison)の「全プレイヤー」一覧のページング用)。
    */
   async getPublicUsersPage(limit: number, offset: number) {
     return await db

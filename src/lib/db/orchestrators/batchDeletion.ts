@@ -7,7 +7,7 @@ import { navigationRepo } from "@/lib/db/domains/logs/navigation";
 /**
  * トランザクション内での再判定時に対象バッチが最新でなくなっていた場合に
  * 投げるエラー（呼び出し元判定後、削除前に新しいバッチが割り込むTOCTOU
- * 競合を検出するため、#448）。
+ * 競合を検出するため）。
  */
 export class BatchNotLatestError extends Error {
   constructor() {

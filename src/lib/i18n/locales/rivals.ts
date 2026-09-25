@@ -344,7 +344,7 @@ export const rivalsTranslations = {
     ko: "해제에 실패했습니다",
   },
 
-  // Follow lists (#277)
+  // Follow lists
   "rivals.list.editEnter": {
     ja: "編集",
     en: "Edit",

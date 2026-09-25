@@ -143,7 +143,7 @@ const SongDetailView = ({
     draftExScore <= maxScore;
 
   // 保存中に対象(曲・ユーザー・バージョン等)が切り替わった場合、非同期結果を
-  // 誤って現在表示中の対象へ適用しないようにするための最新値の参照(#446)
+  // 誤って現在表示中の対象へ適用しないようにするための最新値の参照
   const targetRef = useRef({ userId, version, songDomain, songId: song?.songId });
   useEffect(() => {
     targetRef.current = { userId, version, songDomain, songId: song?.songId };
