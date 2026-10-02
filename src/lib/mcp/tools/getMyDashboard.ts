@@ -3,6 +3,8 @@ import dayjs from "@/lib/dayjs";
 import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { rivalRepo } from "@/lib/db/aggregates/rivalScores/rival";
 import { songsRepo } from "@/lib/db/domains/songs";
+import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
+import { db } from "@/lib/db";
 import { BpiCalculator } from "@/lib/bpi";
 import { dashboardSchema } from "@/lib/mcp/schemas";
 import type { IBpiBasicSongData, IBpiScoreObservation } from "@/types/songs/bpi";
@@ -164,10 +166,13 @@ export function registerGetMyDashboard(server: McpServer, userId: string) {
 
       // 総合BPI本体は常にレベル12全曲基準（levels/difficultiesの影響を受けない）
       const canonicalLatest = latestBySong(canonicalHistory);
-      const totalBpi = BpiCalculator.calculateTotalBPI(
+      const freshTotalBpi = BpiCalculator.calculateTotalBPI(
         toObservations(canonicalLatest),
         canonicalMaster,
       );
+      // 他のtotalBpi算出箇所（stats/totalBpi.ts等）と同様、過去最高値を下回らないラチェットを適用する
+      const previousBest = await userStatusLogsRepo.getMaxTotalBpi(db, userId, version);
+      const totalBpi = BpiCalculator.ratchetTotalBpi(previousBest, freshTotalBpi);
       const estimatedRank = BpiCalculator.estimateRank(totalBpi);
 
       // 以下はlevels/difficultiesで絞り込んだデータセットを使用
