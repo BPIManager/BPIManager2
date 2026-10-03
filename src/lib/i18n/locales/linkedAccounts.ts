@@ -36,7 +36,7 @@ export const linkedAccountsTranslations = {
     ko: "확인 링크를 보내드립니다. 링크를 열면 연결됩니다.",
   },
   "email.modal.desc.change": {
-    ja: "新しいアドレスに確認リンクを送信します。リンクを開くと変更されます。",
+    ja: "新しいアドレスに確認リンクを送信します。リンクを開くと変更されます。変更には直近のログインが必要です。エラーになる場合は、ログインし直してから再度お試しください。",
     en: "We'll send a confirmation link to the new address. Opening it changes your address.",
     "zh-TW": "我們會將確認連結寄送至新信箱，開啟後即完成變更。",
     ko: "새 주소로 확인 링크를 보내드립니다. 링크를 열면 주소가 변경됩니다.",
