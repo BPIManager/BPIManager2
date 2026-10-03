@@ -87,12 +87,16 @@ export async function computeOwnerBpiTimeline(
   useMonthBuckets: boolean,
   compareVersion?: string,
 ) {
+  const monthStartDate = dayjs.tz(monthStart).toDate();
+  const monthEndDate = dayjs.tz(monthEnd).endOf("day").toDate();
+
   const [
     ownerPreMonthState,
     ownerInMonthHistory,
     allL12SongMeta,
     compareVersionState,
     priorRecordedMax,
+    inRangeRecordedLogs,
   ] = await Promise.all([
     monthlyReviewRepo.getPreMonthBpiStateForUsers([owner], version, monthStart),
     monthlyReviewRepo.getInMonthScoreHistoryForUsers(
@@ -107,11 +111,14 @@ export async function computeOwnerBpiTimeline(
       : Promise.resolve(null),
     compareVersion
       ? Promise.resolve(null)
-      : userStatusLogsRepo.getMaxTotalBpiAsOf(
-          db,
+      : userStatusLogsRepo.getMaxTotalBpiAsOf(db, owner, version, monthStartDate),
+    compareVersion
+      ? Promise.resolve([])
+      : userStatusLogsRepo.getTotalBpiLogsInRange(
           owner,
           version,
-          dayjs.tz(monthStart).toDate(),
+          monthStartDate,
+          monthEndDate,
         ),
   ]);
 
@@ -137,6 +144,7 @@ export async function computeOwnerBpiTimeline(
     allL12SongMeta,
     useMonthBuckets,
     priorRecordedMax,
+    inRangeRecordedLogs,
   );
 
   let bpiStart: number;
@@ -202,12 +210,16 @@ export async function recomputeBpiTimelinesForUsers(
 ): Promise<Map<string, RecomputedBpiTimeline>> {
   if (userIds.length === 0) return new Map();
 
+  const monthStartDate = dayjs.tz(monthStart).toDate();
+  const monthEndDate = dayjs.tz(monthEnd).endOf("day").toDate();
+
   const [
     preMonthState,
     inMonthHistory,
     allL12SongMeta,
     compareVersionState,
     priorRecordedMaxByUser,
+    inRangeRecordedLogsByUser,
   ] = await Promise.all([
     compareVersion
       ? Promise.resolve([])
@@ -231,7 +243,15 @@ export async function recomputeBpiTimelinesForUsers(
       : userStatusLogsRepo.getMaxTotalBpiAsOfForUsers(
           userIds,
           version,
-          dayjs.tz(monthStart).toDate(),
+          monthStartDate,
+        ),
+    compareVersion
+      ? Promise.resolve(new Map<string, { createdAt: Date; totalBpi: number }[]>())
+      : userStatusLogsRepo.getTotalBpiLogsInRangeForUsers(
+          userIds,
+          version,
+          monthStartDate,
+          monthEndDate,
         ),
   ]);
 
@@ -278,6 +298,7 @@ export async function recomputeBpiTimelinesForUsers(
     } else {
       const preMap = preByUser.get(userId) ?? new Map<number, number>();
       const priorRecordedMax = priorRecordedMaxByUser.get(userId) ?? null;
+      const inRangeRecordedLogs = inRangeRecordedLogsByUser.get(userId) ?? [];
       const {
         bpiStart,
         bpiEnd,
@@ -288,6 +309,7 @@ export async function recomputeBpiTimelinesForUsers(
         allL12SongMeta,
         useMonthBuckets,
         priorRecordedMax,
+        inRangeRecordedLogs,
       );
       result.set(userId, { bpiStart, bpiEnd, history: hist });
     }
