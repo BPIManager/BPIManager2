@@ -16,6 +16,10 @@ export function mapIdentityToolkitError(error: unknown): HandlerResult<never> {
     if (error.code === "INVALID_EMAIL") {
       return err(400, "メールアドレスの形式が正しくありません");
     }
+    if (error.code === "CREDENTIAL_TOO_OLD_LOGIN_AGAIN") {
+      // アドレス変更は直近のサインインが必要。ログインし直せば再試行できる
+      return err(401, "セキュリティのため、再ログインしてからもう一度お試しください");
+    }
     if (error.code === "EMAIL_EXISTS") {
       return err(409, "このメールアドレスは既に使用されています");
     }

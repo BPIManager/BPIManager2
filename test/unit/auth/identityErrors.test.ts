@@ -17,6 +17,11 @@ describe("mapIdentityToolkitError", () => {
     expect(mapIdentityToolkitError(new IdentityToolkitError(400, "EMAIL_EXISTS"))).toMatchObject({ status: 409 });
   });
 
+  it("直近のサインインが必要な場合は 401 で再ログインを促す", () => {
+    const result = mapIdentityToolkitError(new IdentityToolkitError(400, "CREDENTIAL_TOO_OLD_LOGIN_AGAIN"));
+    expect(result).toMatchObject({ ok: false, status: 401 });
+  });
+
   it("未知のエラーは 500 とし、メッセージに詳細を含めない", () => {
     const result = mapIdentityToolkitError(new Error("connect ECONNRESET user@example.com"));
     expect(result).toEqual({ ok: false, status: 500, message: "Internal Server Error" });
