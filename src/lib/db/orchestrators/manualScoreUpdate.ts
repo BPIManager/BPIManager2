@@ -26,32 +26,19 @@ interface ManualAllScoreInput {
 }
 
 /**
- * 画面からの手動スコア編集をトランザクション内で保存する。
+ * 手動スコア編集を1トランザクションで保存する。
  *
- * CSVインポート（`saveImportResults`）とは別の経路。`logs`の現在の最新
- * batchIdが当日の手動編集プレフィックス（{@link getManualBatchPrefix}）と
- * 一致する場合はそれをそのまま使い回し、同日内の複数回の手動保存を
- * `logs`/`userStatusLogs`/`scores`/`allScores`それぞれ1行にまとめて
- * レコード増加を抑える（各`upsertManual`/`upsertManualBatch`が
- * 「現在も最新の行である場合のみUPDATE」を判定する）。
- *
- * 一致しない場合（間にCSVインポート等が挟まった場合）は
- * {@link mintManualBatchId} で新しい一意なbatchIdを発行する。
- * `logs.batchId`にはUNIQUE制約があるため、決定的な（サフィックス無しの）
- * IDをそのまま使い回してINSERTすると、既に別の行で使用済みの場合に
- * 重複キーエラーになるため。
- *
- * `score`（BPI計算対象、☆11/12）・`allScore`（全難易度履歴）はそれぞれ
- * 独立に「改善時のみ」呼び出し元が渡す（CSVバッチインポートと同じ方針）。
- * `score`が無い場合（☆10以下の楽曲）は`logs`/`userStatusLogs`（総合BPI）
- * には一切触れない。
+ * 同日内の複数回の保存は、当日の手動プレフィックスを持つ batchId に集約する。最新の batchId が
+ * プレフィックスと一致しない場合は新しい batchId を発行する（`logs.batchId` は UNIQUE のため）。
+ * `score`（☆11/12）と `allScore`（☆10以下の全難易度履歴）はそれぞれ独立に保存し、
+ * `score` が無い場合は `logs` / `userStatusLogs` に触れない。
  *
  * @param params.userId - ユーザー ID
  * @param params.version - バージョン番号
- * @param params.score - 保存する単曲スコア（改善が無ければ呼び出し元は渡さない）
- * @param params.allScore - 全難易度履歴側のスコア（改善が無ければ呼び出し元は渡さない）
- * @param params.newTotalBpi - 今回算出した総合BPI（`score`がある場合のみ必須、ratchet適用前）
- * @returns 実際に保存した総合BPI（`score`が無ければ`null`）と、使用したbatchId
+ * @param params.score - 保存する単曲スコア（改善が無ければ渡さない）
+ * @param params.allScore - 全難易度履歴側のスコア（改善が無ければ渡さない）
+ * @param params.newTotalBpi - 今回算出した総合BPI（`score` がある場合は必須、ラチェット適用前）
+ * @returns 保存した総合BPI（`score` が無ければ `null`）と使用した batchId
  */
 export async function saveManualScoreUpdate(params: {
   userId: string;
