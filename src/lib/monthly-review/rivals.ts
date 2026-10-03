@@ -145,6 +145,23 @@ export function attachRivalBpiTimelines(
   return rivalComputedTimeline;
 }
 
+/**
+ * BPI伸び率(%) = bpiGrowth / (bpiStart + 15) * 100。
+ * 分母はBPIが -15（下限）に近いほど 0 へ近づき、伸び率が極端に膨らむため、
+ * 分母が MIN_GROWTH_DENOMINATOR 未満の場合は算出しない（null）。
+ */
+const MIN_GROWTH_DENOMINATOR = 1;
+
+function calcGrowthRate(
+  bpiGrowth: number | null,
+  bpiStart: number | null,
+): number | null {
+  if (bpiGrowth === null || bpiStart === null) return null;
+  const denominator = bpiStart + 15;
+  if (denominator < MIN_GROWTH_DENOMINATOR) return null;
+  return Math.round((bpiGrowth / denominator) * 10000) / 100;
+}
+
 export function buildGrowthRanking(
   rivals: RivalDiff[],
   viewerId: string,
@@ -153,10 +170,7 @@ export function buildGrowthRanking(
 ) {
   const growthEntries: RivalBpiGrowthEntry[] = [];
 
-  const viewerGrowthRate =
-    bpiStart > -15
-      ? Math.round((bpiDiff / (bpiStart + 15)) * 10000) / 100
-      : null;
+  const viewerGrowthRate = calcGrowthRate(bpiDiff, bpiStart);
   growthEntries.push({
     userId: viewerId,
     userName: "あなた",
@@ -169,10 +183,7 @@ export function buildGrowthRanking(
   // 比較先バージョンのデータが無いライバル（bpiGrowth/bpiStartがnull）も
   // 伸び率ランキング側では「-」として末尾に表示するため、ここでは除外しない
   for (const r of rivals) {
-    const growthRate =
-      r.bpiGrowth !== null && r.bpiStart !== null && r.bpiStart > -15
-        ? Math.round((r.bpiGrowth / (r.bpiStart + 15)) * 10000) / 100
-        : null;
+    const growthRate = calcGrowthRate(r.bpiGrowth, r.bpiStart);
     growthEntries.push({
       userId: r.userId,
       userName: r.userName,
