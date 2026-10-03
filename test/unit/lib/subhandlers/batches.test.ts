@@ -46,9 +46,13 @@ vi.mock("@/lib/db/aggregates/stats/tables", () => ({
     getTotalSongCount: (...a: unknown[]) => getTotalSongCountMock(...a),
   },
 }));
-vi.mock("@/lib/db/aggregates/rivalScores/rival", () => ({
-  rivalRepo: {
+vi.mock("@/lib/db/aggregates/rivalScores/overtaken", () => ({
+  rivalOvertakenRepo: {
     getOvertakenRivals: (...a: unknown[]) => getOvertakenRivalsMock(...a),
+  },
+}));
+vi.mock("@/lib/db/aggregates/rivalScores/aggregate", () => ({
+  rivalAggregateRepo: {
     getRivalLatestScoresBySong: vi.fn().mockResolvedValue([]),
   },
 }));
