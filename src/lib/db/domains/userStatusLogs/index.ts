@@ -79,6 +79,133 @@ class UserStatusLogsRepository {
   }
 
   /**
+   * 指定ユーザー・バージョンで、指定時点(`asOf`)までに記録された総合BPIの最高値を取得する。
+   * {@link getMaxTotalBpi}の時点限定版。月間振り返りのように過去の一時点を基準に
+   * ラチェットの下限を求める場合は、全期間の最大値ではなくこちらを使う
+   * （全期間の最大値を使うと、その時点より後に記録された最高値で過去の値が
+   * 不自然に引き上げられてしまう）。
+   *
+   * @param trx - 呼び出し元が管理するトランザクション（トランザクション外から
+   *   呼ぶ場合は `db` をそのまま渡す）
+   * @param userId - ユーザー ID
+   * @param version - バージョン番号
+   * @param asOf - この時点（`createdAt`基準）までの記録に限定する
+   * @returns 記録が無ければ `null`
+   */
+  async getMaxTotalBpiAsOf(
+    trx: Kysely<Database> | Transaction<Database>,
+    userId: string,
+    version: string,
+    asOf: Date,
+  ): Promise<number | null> {
+    const row = await trx
+      .selectFrom("userStatusLogs")
+      .select((eb) => eb.fn.max("totalBpi").as("maxTotalBpi"))
+      .where("userId", "=", userId)
+      .where("version", "=", version)
+      .where("createdAt", "<=", asOf)
+      .executeTakeFirst();
+    return row?.maxTotalBpi != null ? Number(row.maxTotalBpi) : null;
+  }
+
+  /**
+   * {@link getMaxTotalBpiAsOf}の複数ユーザー一括版。ライバル戦線等で複数ユーザーの
+   * 総合BPI推移をまとめて再計算する際に使う。
+   *
+   * @param userIds - ユーザーIDの配列
+   * @param version - バージョン番号
+   * @param asOf - この時点（`createdAt`基準）までの記録に限定する
+   * @returns userId→記録された最高値のMap（記録が無いユーザーは含まれない）
+   */
+  async getMaxTotalBpiAsOfForUsers(
+    userIds: string[],
+    version: string,
+    asOf: Date,
+  ): Promise<Map<string, number>> {
+    if (userIds.length === 0) return new Map();
+    const rows = await db
+      .selectFrom("userStatusLogs")
+      .select((eb) => ["userId", eb.fn.max("totalBpi").as("maxTotalBpi")])
+      .where("userId", "in", userIds)
+      .where("version", "=", version)
+      .where("createdAt", "<=", asOf)
+      .groupBy("userId")
+      .execute();
+    return new Map(
+      rows
+        .filter((r) => r.maxTotalBpi != null)
+        .map((r) => [r.userId, Number(r.maxTotalBpi)]),
+    );
+  }
+
+  /**
+   * 指定ユーザー・バージョンで、`createdAt`が[from, to]の範囲にある総合BPI記録を取得する。
+   * 月間振り返りの再計算（{@link buildBpiTimeline}）で、月内に実際に記録された
+   * （記録時点でラチェット済みの）値を下限として合流させるために使う
+   * （{@link getMaxTotalBpiAsOf}は期間開始時点の下限のみで、期間中のBPIモデル再推定
+   * による下振れはカバーしない）。
+   *
+   * @param userId - ユーザー ID
+   * @param version - バージョン番号
+   * @param from - この時点（`createdAt`基準）より後の記録に限定する
+   * @param to - この時点（`createdAt`基準）以前の記録に限定する
+   */
+  async getTotalBpiLogsInRange(
+    userId: string,
+    version: string,
+    from: Date,
+    to: Date,
+  ): Promise<{ createdAt: Date; totalBpi: number }[]> {
+    const rows = await db
+      .selectFrom("userStatusLogs")
+      .select(["createdAt", "totalBpi"])
+      .where("userId", "=", userId)
+      .where("version", "=", version)
+      .where("createdAt", ">", from)
+      .where("createdAt", "<=", to)
+      .orderBy("id", "asc")
+      .execute();
+    return rows.map((r) => ({
+      createdAt: r.createdAt,
+      totalBpi: Number(r.totalBpi),
+    }));
+  }
+
+  /**
+   * {@link getTotalBpiLogsInRange}の複数ユーザー一括版。
+   *
+   * @param userIds - ユーザーIDの配列
+   * @param version - バージョン番号
+   * @param from - この時点（`createdAt`基準）より後の記録に限定する
+   * @param to - この時点（`createdAt`基準）以前の記録に限定する
+   * @returns userId→記録一覧のMap
+   */
+  async getTotalBpiLogsInRangeForUsers(
+    userIds: string[],
+    version: string,
+    from: Date,
+    to: Date,
+  ): Promise<Map<string, { createdAt: Date; totalBpi: number }[]>> {
+    if (userIds.length === 0) return new Map();
+    const rows = await db
+      .selectFrom("userStatusLogs")
+      .select(["userId", "createdAt", "totalBpi"])
+      .where("userId", "in", userIds)
+      .where("version", "=", version)
+      .where("createdAt", ">", from)
+      .where("createdAt", "<=", to)
+      .orderBy("id", "asc")
+      .execute();
+    const result = new Map<string, { createdAt: Date; totalBpi: number }[]>();
+    for (const r of rows) {
+      const arr = result.get(r.userId) ?? [];
+      arr.push({ createdAt: r.createdAt, totalBpi: Number(r.totalBpi) });
+      result.set(r.userId, arr);
+    }
+    return result;
+  }
+
+  /**
    * 指定バージョンにおける各ユーザーの最新 `userStatusLogs` 行の ID を取得するサブクエリを組み立てる。
    *
    * @param version - バージョン番号
@@ -202,7 +329,10 @@ class UserStatusLogsRepository {
    * @param userId - ユーザー ID
    */
   async deleteByUser(trx: Transaction<Database>, userId: string) {
-    await trx.deleteFrom("userStatusLogs").where("userId", "=", userId).execute();
+    await trx
+      .deleteFrom("userStatusLogs")
+      .where("userId", "=", userId)
+      .execute();
   }
 
   /**

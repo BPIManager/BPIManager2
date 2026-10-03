@@ -1243,10 +1243,10 @@ export const dashboardTranslations = {
   },
 
   "dashboard.monthlyReviewNotice.title": {
-    ja: "スパークルシャワーを振り返ろう",
-    en: "Look back at Sparkle Shower",
-    "zh-TW": "回顧 Sparkle Shower",
-    ko: "스파클 샤워를 돌아보세요",
+    ja: "{year}年{month}月のプレーを振り返る",
+    en: "Look back at your {year}/{month} plays",
+    "zh-TW": "回顧 {year}年{month}月的遊玩紀錄",
+    ko: "{year}년 {month}월 플레이 돌아보기",
   },
   "dashboard.monthlyReviewNotice.linkText": {
     ja: "振り返りを見る",
