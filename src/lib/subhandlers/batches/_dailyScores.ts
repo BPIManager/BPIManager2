@@ -3,7 +3,7 @@ import { rivalRepo } from "@/lib/db/aggregates/rivalScores/rival";
 import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { scoreDetailRepo } from "@/lib/db/domains/scores/detail";
 import { navigationRepo } from "@/lib/db/domains/logs/navigation";
-import { songsRepo } from "@/lib/db/domains/songs";
+import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { calculateTotalBpi } from "@/services/logs/calculateTotalBpi";
 import { mapToLogNested } from "@/utils/logs/getMapNested";
 import {
@@ -70,7 +70,7 @@ export async function handleLastPlayedBase(
   const [history, fullMaster, dailyScores, overtaken, rivalScores, versionOvertakenMap] =
     await Promise.all([
       statsTablesRepo.getScoreHistory(uid, ver, [], []),
-      songsRepo.getSongMasterWithDef(),
+      songMasterRepo.getSongMasterWithDef(),
       type === "day"
         ? scoreDetailRepo.getScoresByLastPlayedRange(uid, ver, range)
         : scoreDetailRepo.getScoresWithDetails(uid, ver, {

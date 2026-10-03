@@ -1,5 +1,5 @@
 import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
-import { songsRepo } from "@/lib/db/domains/songs";
+import { songSearchRepo } from "@/lib/db/domains/songs/search";
 import { resolveVersion } from "@/lib/subhandlers/shared";
 import { err, ok } from "@/middlewares/api/apiResult";
 import type { AccessResult } from "@/middlewares/api/withApi";
@@ -28,7 +28,7 @@ export async function handleSongList(
   access: AccessResult,
 ): Promise<HandleOutcome<unknown>> {
   const version = resolveVersion(req.query.version) as IIDXVersion;
-  const songs = await songsRepo.getSongList(version);
+  const songs = await songSearchRepo.getSongList(version);
   return {
     result: ok(songs),
     targetUserId: targetOf(req),
@@ -77,7 +77,7 @@ export async function handleUserSongSimilar(
 
   const mode = req.query.mode === "global" ? "global" : "profile";
 
-  const result = await songsRepo.getSimilarSongs(
+  const result = await songSearchRepo.getSimilarSongs(
     songIdNum,
     version,
     limit,

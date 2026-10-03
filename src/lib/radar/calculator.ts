@@ -25,7 +25,7 @@ export type RadarSongMaster = Map<
   IBpiBasicSongData & { songId: number }
 >;
 
-/** `songsRepo.getSongMasterWithDef()` 等の結果から {@link RadarSongMaster} を組み立てる。 */
+/** `songMasterRepo.getSongMasterWithDef()` 等の結果から {@link RadarSongMaster} を組み立てる。 */
 export function buildRadarSongMaster(
   songs: {
     songId: number;

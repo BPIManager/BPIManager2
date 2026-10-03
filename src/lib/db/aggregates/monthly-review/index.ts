@@ -8,7 +8,7 @@ import { wherePublicOnly } from "@/lib/db/shared/visibility";
 import { scoreActivityRepo } from "@/lib/db/domains/scores/activity";
 import { latestScoresRepo } from "@/lib/db/domains/scores/latest";
 import { iidxTowerRepo } from "@/lib/db/domains/iidxTower";
-import { songsRepo } from "@/lib/db/domains/songs";
+import { songSearchRepo } from "@/lib/db/domains/songs/search";
 import {
   getArenaStatsHistory,
   getLatestArenaStatsPerVersion,
@@ -381,7 +381,7 @@ class MonthlyReviewRepository {
   }
 
   async getAllL12SongMeta() {
-    return songsRepo.getMetaByLevelAndDifficulties(12, IIDX_DIFFICULTIES);
+    return songSearchRepo.getMetaByLevelAndDifficulties(12, IIDX_DIFFICULTIES);
   }
 
   async getAvailableMonths(userId: string, version: string) {

@@ -7,7 +7,7 @@ import {
 } from "@/lib/db/shared/latestScore";
 import { getSongRankingFromTable } from "@/lib/db/aggregates/songRanking";
 import { navigationRepo } from "@/lib/db/domains/logs/navigation";
-import { songsRepo } from "@/lib/db/domains/songs";
+import { songMasterRepo } from "@/lib/db/domains/songs/master";
 
 /**
  * {@link StatsTablesRepository.getLatestScoresWithMusicData}の結果をキャッシュする
@@ -288,7 +288,7 @@ class StatsTablesRepository {
     levels: number[],
     difficulties: string[],
   ): Promise<number> {
-    return songsRepo.getCount(levels, difficulties);
+    return songMasterRepo.getCount(levels, difficulties);
   }
 
   async getFilteredSongKeys(
@@ -296,7 +296,7 @@ class StatsTablesRepository {
     levels?: number[],
     difficulties?: string[],
   ): Promise<Set<string>> {
-    const rows = await songsRepo.getFilteredTitleDifficultyPairs(
+    const rows = await songMasterRepo.getFilteredTitleDifficultyPairs(
       version,
       levels,
       difficulties,

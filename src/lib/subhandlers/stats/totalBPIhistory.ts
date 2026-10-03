@@ -2,7 +2,7 @@ import type { NextApiRequest } from "next";
 import dayjs from "@/lib/dayjs";
 import { BpiCalculator } from "@/lib/bpi";
 import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
-import { songsRepo } from "@/lib/db/domains/songs";
+import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
 import { ok } from "@/middlewares/api/apiResult";
 import { groupByOf, DIFFICULTY_LABELS } from "./_shared";
@@ -20,7 +20,7 @@ export async function handleStatsTotalBpiHistory(
   const groupBy = groupByOf(req);
   const [fullLogs, fullMaster] = await Promise.all([
     statsTablesRepo.getScoreHistory(q.userId, q.version, [], []),
-    songsRepo.getSongMasterWithDef(),
+    songMasterRepo.getSongMasterWithDef(),
   ]);
   const scopedMaster = fullMaster.filter(
     (s) =>

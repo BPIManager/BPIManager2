@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { songsRepo } from "@/lib/db/domains/songs";
+import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { latestScoresRepo } from "@/lib/db/domains/scores/latest";
 import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
 
@@ -36,7 +36,7 @@ export const newBpiPlayersAggregateRepo = {
   async getPage(params: GetPageParams) {
     const { limit, offset, version, bpiMin, bpiMax } = params;
 
-    const songMaster = await songsRepo.getSongMasterWithDef();
+    const songMaster = await songMasterRepo.getSongMasterWithDef();
     const level12Songs = songMaster.filter((s) => s.difficultyLevel === 12);
     const songIds = level12Songs.map((s) => s.songId);
 

@@ -2,7 +2,7 @@ import type { NextApiRequest } from "next";
 import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { userDiscoveryRepo } from "@/lib/db/aggregates/userProfiles/discovery";
 import { navigationRepo } from "@/lib/db/domains/logs/navigation";
-import { songsRepo } from "@/lib/db/domains/songs";
+import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { calculateRadar, buildRadarSongMaster } from "@/lib/radar/calculator";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { resolveVersion, toErrorMessage } from "@/lib/subhandlers/shared";
@@ -51,7 +51,7 @@ export async function handleRivalSuggestions(
     const filters = parseFilters(req.query);
     const [viewerScores, fullMaster] = await Promise.all([
       statsTablesRepo.getLatestScoresWithMusicData(viewerId, version),
-      songsRepo.getSongMasterWithDef(),
+      songMasterRepo.getSongMasterWithDef(),
     ]);
     const viewerRadar = calculateRadar(viewerScores, buildRadarSongMaster(fullMaster));
 

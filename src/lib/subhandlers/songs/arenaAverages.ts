@@ -1,7 +1,7 @@
 import type { NextApiRequest } from "next";
 import fs from "fs/promises";
 import path from "path";
-import { songsRepo } from "@/lib/db/domains/songs";
+import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { arenaDataVersion } from "@/constants/iidx/iidxVersions";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
@@ -15,7 +15,7 @@ export async function handleSongArenaAverages(
     return { result: err(400, "songId is required"), ...base };
   }
   try {
-    const song = await songsRepo.getTitleDifficultyLevel(Number(songId));
+    const song = await songMasterRepo.getTitleDifficultyLevel(Number(songId));
     if (!song) return { result: err(404, "Song not found"), ...base };
 
     const { difficultyLevel } = song;

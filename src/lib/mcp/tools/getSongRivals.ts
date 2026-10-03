@@ -1,5 +1,5 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { songsRepo } from "@/lib/db/domains/songs";
+import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { latestScoresRepo } from "@/lib/db/domains/scores/latest";
 import { rivalRepo } from "@/lib/db/aggregates/rivalScores/rival";
 import { songRivalsSchema } from "@/lib/mcp/schemas";
@@ -17,7 +17,7 @@ export function registerGetSongRivals(server: McpServer, userId: string) {
     },
     async ({ songId, version }) => {
       const [song, myScore, rivals] = await Promise.all([
-        songsRepo.getSongById(songId),
+        songMasterRepo.getSongById(songId),
         latestScoresRepo.getLatestScoreForSong(userId, songId, version),
         rivalRepo.getFollowedScoresForSong({
           viewerId: userId,

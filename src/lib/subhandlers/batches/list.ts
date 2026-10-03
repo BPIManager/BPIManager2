@@ -1,7 +1,7 @@
 import type { NextApiRequest } from "next";
 import { scoreTimelineRepo } from "@/lib/db/aggregates/scoreTimeline";
 import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
-import { songsRepo } from "@/lib/db/domains/songs";
+import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { calculateTotalBpi } from "@/services/logs/calculateTotalBpi";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
@@ -35,7 +35,7 @@ export async function handleBatchesList(
     if (groupedBy === "lastPlayed") {
       const [history, fullMaster] = await Promise.all([
         statsTablesRepo.getScoreHistory(userId, version, [], []),
-        songsRepo.getSongMasterWithDef(),
+        songMasterRepo.getSongMasterWithDef(),
       ]);
       const level12Master = fullMaster.filter((s) => s.difficultyLevel === 12);
       const timeline = calculateTotalBpi(history, level12Master, version, topN);

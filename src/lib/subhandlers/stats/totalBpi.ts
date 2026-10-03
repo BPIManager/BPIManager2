@@ -1,7 +1,7 @@
 import dayjs from "@/lib/dayjs";
 import { BpiCalculator } from "@/lib/bpi";
 import { scoreDetailRepo } from "@/lib/db/domains/scores/detail";
-import { songsRepo } from "@/lib/db/domains/songs";
+import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { usersRepo } from "@/lib/db/domains/users";
 import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
 import { getUserAreaRank } from "@/lib/arena/prefectureRankings";
@@ -24,7 +24,7 @@ export async function handleStatsTotalBpi(
       targetTime,
       onlyLastPlayedInRange: { start: new Date(0), end: targetTime },
     }),
-    songsRepo.getSongMasterWithDef(),
+    songMasterRepo.getSongMasterWithDef(),
     usersRepo.getIidxId(q.userId),
   ]);
 

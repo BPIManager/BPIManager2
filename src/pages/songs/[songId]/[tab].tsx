@@ -3,7 +3,7 @@ import DashboardLayout from "@/components/partials/shell/DashboardLayout";
 import { PageContainer } from "@/components/partials/common/PageChrome/Header";
 import { Meta, JsonLd } from "@/components/partials/common/PageChrome/Head";
 import SongDetailContent from "@/components/partials/features/Songs/SongDetail";
-import { songsRepo } from "@/lib/db/domains/songs";
+import { songMasterRepo } from "@/lib/db/domains/songs/master";
 
 const VALID_TABS = ["ranking", "similar", "notes", "pattern"] as const;
 type Tab = (typeof VALID_TABS)[number];
@@ -136,7 +136,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ params }) 
 
   let songMeta: SongMeta | null = null;
   try {
-    const song = await songsRepo.getSongById(songId);
+    const song = await songMasterRepo.getSongById(songId);
     if (song) {
       songMeta = {
         title: song.title,

@@ -2,7 +2,7 @@ import { calculateRadar, buildRadarSongMaster } from "@/lib/radar/calculator";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { BpiCalculator } from "@/lib/bpi";
 import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
-import { songsRepo } from "@/lib/db/domains/songs";
+import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { usersRepo } from "@/lib/db/domains/users";
 import {
   radarCacheRepo,
@@ -32,7 +32,7 @@ export async function updateAllUserRadarCache() {
   const version = latestVersion;
   const [users, fullMaster] = await Promise.all([
     usersRepo.getAllUserIds(),
-    songsRepo.getSongMasterWithDef(),
+    songMasterRepo.getSongMasterWithDef(),
   ]);
   const radarSongMaster = buildRadarSongMaster(fullMaster);
   const total = users.length;

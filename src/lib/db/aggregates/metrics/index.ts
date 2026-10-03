@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { sql } from "kysely";
-import { songsRepo } from "@/lib/db/domains/songs";
+import { songMasterRepo } from "@/lib/db/domains/songs/master";
 
 /**
  * Arena メトリクス生成に使用する集計クエリを担当するリポジトリクラス。
@@ -12,7 +12,7 @@ class MetricsRepository {
    * @returns タイトル・難易度・ノーツ数・皆伝平均・WR スコア・補正係数の配列
    */
   async getSongDefs() {
-    return songsRepo.getCurrentDefsWithSongInfo();
+    return songMasterRepo.getCurrentDefsWithSongInfo();
   }
 
   /**
@@ -21,7 +21,7 @@ class MetricsRepository {
    * @returns `{ title, difficulty, notes }` の配列
    */
   async getAllSongs() {
-    return songsRepo.getAllTitleDifficultyNotes();
+    return songMasterRepo.getAllTitleDifficultyNotes();
   }
 
   /**
