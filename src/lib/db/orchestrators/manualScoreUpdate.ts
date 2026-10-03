@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { lockUserForWrite } from "@/lib/db/shared/userWriteLock";
 import { scoreWriteRepo } from "@/lib/db/domains/scores/write";
 import { allScoresRepo } from "@/lib/db/domains/allScores";
 import { logBatchRepo } from "@/lib/db/domains/logs/batch";
@@ -65,6 +66,7 @@ export async function saveManualScoreUpdate(params: {
   const lastPlayed = new Date();
 
   return await db.transaction().execute(async (trx) => {
+    await lockUserForWrite(trx, userId);
     // 判定と書き込みの間に別のインポートが割り込むと古いbatchIdを再利用するため、
     // 判定時に logs の最新行をFOR UPDATEで行ロックし、同一ユーザーの保存を直列化する
     // `score`(scores/songDefドメイン、☆11/12)がある更新は`logs`側から判定・ロックできる。

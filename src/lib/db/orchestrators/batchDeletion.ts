@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { lockUserForWrite } from "@/lib/db/shared/userWriteLock";
 import { scoreWriteRepo } from "@/lib/db/domains/scores/write";
 import { allScoresRepo } from "@/lib/db/domains/allScores";
 import { userStatusLogsWriteRepo } from "@/lib/db/domains/userStatusLogs/write";
@@ -31,6 +32,7 @@ export async function deleteBatch(
   version: string,
 ) {
   return await db.transaction().execute(async (trx) => {
+    await lockUserForWrite(trx, userId);
     const latestBatchId = await logBatchRepo.getLatestBatchIdForUpdate(
       trx,
       userId,

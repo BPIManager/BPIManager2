@@ -6,6 +6,8 @@ import { logTotalBpiRepo } from "@/lib/db/domains/logs/totalBpi";
 import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { allSongsRepo } from "@/lib/db/domains/allSongs";
 import { saveImportResults } from "@/lib/db/orchestrators/bpiImport";
+import { db } from "@/lib/db";
+import { lockUserForWrite } from "@/lib/db/shared/userWriteLock";
 import { BpiCalculator } from "@/lib/bpi";
 import { isScoreImproved } from "@/lib/scores/evaluateImprovement";
 import { scoresBulkBodySchema } from "@/schemas/scores/bulk";
@@ -37,6 +39,10 @@ export async function handleScoresBulk(
   const batchId = uuidv4();
 
   try {
+    // 読み取りから保存までを、ユーザーの書き込みロックを取った1つのトランザクションで行う。
+    // ロック取得後に読むため、並行する保存（手動・MCP・インポート）の結果を必ず基準にできる
+    return await db.transaction().execute(async (trx) => {
+      await lockUserForWrite(trx, userId);
     const [
       bpiSongMaster,
       allLevelMaster,
@@ -163,7 +169,7 @@ export async function handleScoresBulk(
       scoreUpdates,
       allScoreUpdates,
       newTotalBpi,
-    });
+    }, trx);
 
     return {
       result: ok({
@@ -177,6 +183,7 @@ export async function handleScoresBulk(
       }),
       ...base,
     };
+    });
   } catch (error: unknown) {
     return { result: err(500, toErrorMessage(error)), ...base };
   }

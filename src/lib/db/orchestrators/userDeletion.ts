@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { lockUserForWrite } from "@/lib/db/shared/userWriteLock";
 import { usersRepo } from "@/lib/db/domains/users";
 import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
 import { userStatusLogsWriteRepo } from "@/lib/db/domains/userStatusLogs/write";
@@ -25,6 +26,11 @@ import * as os from "os";
  * FK制約を考慮した順序で物理削除を行う。
  */
 export async function backupAndDeleteUser(userId: string): Promise<void> {
+  // バックアップの読み取り・ファイル書き出し・物理削除を、ユーザーの書き込みロックを取った1つの
+  // トランザクションで行う。書き出しに失敗すれば削除もロールバックされ、読み取り後の書き込みは
+  // ロック待ちになるため、バックアップに含まれない行が削除されることはない
+  await db.transaction().execute(async (trx) => {
+  await lockUserForWrite(trx, userId);
   const [
     user,
     follows,
@@ -111,7 +117,7 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
   // このオーケストレーターは各ドメインリポジトリのdeleteByUser/getAllForUser
   // メソッドを呼び出す役に徹し、他ドメインが所有するテーブルへ直接クエリを
   // 発行しない(usersテーブル自身の削除を除く)。
-  await db.transaction().execute(async (trx) => {
+  {
     // allScores: FK to logs(SET NULL), users(CASCADE)
     await allScoresRepo.deleteByUser(trx, userId);
 
@@ -161,5 +167,6 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
 
     // users: メインレコード
     await usersRepo.deleteByUser(trx, userId);
+  }
   });
 }

@@ -6,6 +6,8 @@ import { logTotalBpiRepo } from "@/lib/db/domains/logs/totalBpi";
 import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { allSongsRepo } from "@/lib/db/domains/allSongs";
 import { saveImportResults } from "@/lib/db/orchestrators/bpiImport";
+import { db } from "@/lib/db";
+import { lockUserForWrite } from "@/lib/db/shared/userWriteLock";
 import { BpiCalculator } from "@/lib/bpi";
 import { isScoreImproved } from "@/lib/scores/evaluateImprovement";
 import { NewAllScores, NewScore } from "@/types/db";
@@ -27,6 +29,9 @@ export function registerUpdateMyScore(server: McpServer, userId: string) {
       inputSchema: updateMyScoreSchema.shape,
     },
     async ({ songId, version, exScore, clearState, missCount }) => {
+      // 読み取りから保存までを、ユーザーの書き込みロックを取った1つのトランザクションで行う
+      return await db.transaction().execute(async (trx) => {
+      await lockUserForWrite(trx, userId);
       const [bpiSongMaster, allLevelMaster, currentScores, currentAllScores, lastLog] =
         await Promise.all([
           songMasterRepo.getSongMasterWithDef(),
@@ -148,7 +153,7 @@ export function registerUpdateMyScore(server: McpServer, userId: string) {
         scoreUpdates,
         allScoreUpdates,
         newTotalBpi,
-      });
+      }, trx);
 
       const previousTotalBpi = lastLog?.totalBpi ?? -15;
 
@@ -166,6 +171,7 @@ export function registerUpdateMyScore(server: McpServer, userId: string) {
           },
         ],
       };
+      });
     },
   );
 }

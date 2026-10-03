@@ -18,6 +18,18 @@ const getSelfVersionScoresMock = vi.fn();
 const getUnplayedSongsMock = vi.fn();
 const collectionMock = vi.fn();
 
+// bulk はトランザクションを開き、ユーザーの書き込みロックを取る。DB に接続せずに実行できるよう、
+// トランザクションはそのまま callback を呼ぶ形にし、ロックは何もしない
+vi.mock("@/lib/db", () => ({
+  db: {
+    transaction: () => ({
+      execute: (fn: (trx: unknown) => unknown) => fn({}),
+    }),
+  },
+}));
+vi.mock("@/lib/db/shared/userWriteLock", () => ({
+  lockUserForWrite: vi.fn(),
+}));
 vi.mock("@/lib/db/domains/scores/detail", () => ({
   scoreDetailRepo: {
     getScoresWithDetails: (...a: unknown[]) => getScoresWithDetailsMock(...a),
