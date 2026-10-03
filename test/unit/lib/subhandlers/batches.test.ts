@@ -40,8 +40,8 @@ vi.mock("@/lib/db/aggregates/scoreTimeline", () => ({
     getTimelineByBatches: (...a: unknown[]) => getTimelineByBatchesMock(...a),
   },
 }));
-vi.mock("@/lib/db/aggregates/stats/tables", () => ({
-  statsTablesRepo: {
+vi.mock("@/lib/db/aggregates/stats/songTables", () => ({
+  statsSongTablesRepo: {
     getScoreHistory: (...a: unknown[]) => getScoreHistoryMock(...a),
     getTotalSongCount: (...a: unknown[]) => getTotalSongCountMock(...a),
   },

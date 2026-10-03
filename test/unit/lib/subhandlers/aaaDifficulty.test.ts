@@ -3,8 +3,8 @@ import { handleStatsAaaDifficulty } from "@/lib/subhandlers/stats/aaaDifficulty"
 
 const getAAATableDataMock = vi.fn();
 
-vi.mock("@/lib/db/aggregates/stats/tables", () => ({
-  statsTablesRepo: {
+vi.mock("@/lib/db/aggregates/stats/songTables", () => ({
+  statsSongTablesRepo: {
     getAAATableData: (...a: unknown[]) => getAAATableDataMock(...a),
   },
 }));

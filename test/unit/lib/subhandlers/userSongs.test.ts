@@ -16,8 +16,8 @@ vi.mock("@/lib/db/domains/songs/search", () => ({
     getSimilarSongs: (...a: unknown[]) => getSimilarSongsMock(...a),
   },
 }));
-vi.mock("@/lib/db/aggregates/stats/tables", () => ({
-  statsTablesRepo: {
+vi.mock("@/lib/db/aggregates/stats/songTables", () => ({
+  statsSongTablesRepo: {
     getSongRanking: (...a: unknown[]) => getSongRankingMock(...a),
   },
 }));
