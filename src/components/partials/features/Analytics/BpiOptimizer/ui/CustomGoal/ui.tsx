@@ -8,7 +8,8 @@ import { BpiJourneyBar } from "@/components/partials/common/OptimizerGoalCard";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import DifficultyBadge from "../DifficultyBadge";
 import OptimizationStepCard from "../OptimizationStepCard";
-import SongTargetModal, { type CustomGoalTargetInput } from "./SongTargetModal";
+import SongTargetModal from "./SongTargetModal";
+import type { CustomGoalTargetInput } from "./SongTargetModal/types";
 
 interface CustomGoalCreatorUiProps {
   targets: CustomGoalTargetInput[];

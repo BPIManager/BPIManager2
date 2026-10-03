@@ -22,7 +22,7 @@ import type { TotalBpiStats } from "@/hooks/stats/useCurrentTotalBpi";
 import { AreaRankBadge } from "@/components/ui/area-rank-badge";
 import CurrentBpiSkeleton from "./skeleton";
 import CalendarPicker from "./calendar";
-import RatchetHistoryDialog from "../Dialogs/ratchetHistoryDialog";
+import RatchetHistoryDialog from "../Dialogs/RatchetHistory";
 import dayjs from "@/lib/dayjs";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import type { BpiHistoryItem } from "@/types/stats/bpiHistory";
