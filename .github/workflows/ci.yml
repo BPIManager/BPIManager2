@@ -76,7 +76,11 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       # 本番と同じ手順でビルドし、壊れた成果物を VPS に送らないことを保証する
-      - run: pnpm build
+      # NEXT_PUBLIC_ 変数はビルド時に埋め込まれるため、VPS 側の .env ではなくここで渡す（サイトキーは公開値）
+      - name: Build
+        env:
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
+        run: pnpm build
 
       - name: Ship to VPS and restart
         env:
