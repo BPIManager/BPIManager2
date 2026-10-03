@@ -19,7 +19,7 @@ AI（issue-runner等のスキル）がissueを消化していく際の運用ル�
 ## PRの粒度（epic単位でまとめる）
 
 - 親issue（epic）配下の複数subissueを消化する場合、**subissueごとにPRを分けず、epic単位で `staging` 宛の1本のPR**にまとめてよい（GitHub Actions の無料枠を消費するCIが各PR/pushで走るため、こまめなPRを避ける）。
-- その場合も **1 issue = 1 PR** は維持する。PR内のコミットは作業粒度で分けてよく、各commitのメッセージに `Refs #<subissue>` / `Closes #<subissue>` を入れて、issueとcommitの紐付けは残す（`git-workflow.md`）。
+- epic の PR 1本の中で、subissue ごとに複数コミット（作業粒度）を積む。構成は **epic 1つ = subissue n個 = コミット n×m 個**（subissue を個別の PR には分けない）。各コミットのメッセージに `Refs #<subissue>` / `Closes #<subissue>` を入れて、issueとcommitの紐付けは残す（`git-workflow.md`）。
 - ブランチは epic の内容に合わせて1本切る（例: `docs/<epic-slug>`、`feat/<epic-slug>`）。PR本文に含まれるcommitとsubissue番号の対応表を書く。
 - 単発issue（epicに属さない）は従来どおり1 issue = 1ブランチ = 1 PR（宛先は `staging`）。
 
