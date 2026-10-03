@@ -1,7 +1,8 @@
 import { db } from "@/lib/db";
 
 import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
-import { latestLogIdPerSongSubquery, latestLogIdPerUserSongSubquery } from "@/lib/db/shared/latestScore";
+import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore/perSong";
+import { latestLogIdPerUserSongSubquery } from "@/lib/db/shared/latestScore/perUser";
 /**
  * `scores` テーブルから曲ごとの最新スコアを取得するリポジトリクラス。
  */

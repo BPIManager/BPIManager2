@@ -53,11 +53,13 @@ vi.mock("@/lib/db/domains/allScores", () => ({
     getLatestAllScores: (...a: unknown[]) => getLatestAllScoresMock(...a),
   },
 }));
-vi.mock("@/lib/db/domains/logs/navigation", () => ({
-  navigationRepo: { getLatestTotalBpi: vi.fn().mockResolvedValue(null) },
+vi.mock("@/lib/db/domains/logs/totalBpi", () => ({
+  logTotalBpiRepo: {
+    getLatestTotalBpi: vi.fn().mockResolvedValue(null),
+  },
 }));
-vi.mock("@/lib/db/domains/songs", () => ({
-  songsRepo: {
+vi.mock("@/lib/db/domains/songs/master", () => ({
+  songMasterRepo: {
     getSongMasterWithDef: (...a: unknown[]) => getSongMasterWithDefMock(...a),
   },
 }));

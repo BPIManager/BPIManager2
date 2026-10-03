@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { IIDXVersion } from "@/types/iidx/version";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
-import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore";
+import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore/perSong";
 
 /**
  * BPI最適化機能向けに、`songs`・`songDef`・`scores` を横断してBPI対象楽曲一覧と

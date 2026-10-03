@@ -16,8 +16,8 @@ vi.mock("@/lib/db/aggregates/userProfiles/profile", () => ({
     getMe: (...a: unknown[]) => getMeMock(...a),
   },
 }));
-vi.mock("@/lib/db/aggregates/rivalScores/comparison", () => ({
-  socialComparisonRepo: {
+vi.mock("@/lib/db/aggregates/rivalScores/winLoss", () => ({
+  socialWinLossRepo: {
     getWinLossStats: (...a: unknown[]) => getWinLossStatsMock(...a),
     getUserRadar: (...a: unknown[]) => getUserRadarMock(...a),
   },

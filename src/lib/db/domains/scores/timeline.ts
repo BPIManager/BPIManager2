@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { IIDXVersion } from "@/types/iidx/version";
-import { correlatedLatestLogId } from "@/lib/db/shared/latestScore";
+import { correlatedLatestLogId } from "@/lib/db/shared/latestScore/correlated";
 import { latestSongDefIdSubquery } from "@/lib/db/shared/songDef";
 
 class ScoreTimelineRepository {

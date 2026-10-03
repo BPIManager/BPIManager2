@@ -1,5 +1,5 @@
 import type { NextApiRequest } from "next";
-import { rivalRepo } from "@/lib/db/aggregates/rivalScores/rival";
+import { rivalPairwiseRepo } from "@/lib/db/aggregates/rivalScores/pairwise";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 import { accessError, err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
@@ -26,7 +26,7 @@ export async function handleRivalScoreDetail(
     const denied = accessError(rivalAccess);
     if (denied) return { result: denied, targetUserId, viewerId };
 
-    const result = await rivalRepo.getRivalComparisonScores({
+    const result = await rivalPairwiseRepo.getRivalComparisonScores({
       viewerId: String(userId),
       rivalId: String(rivalId),
       version,

@@ -1,4 +1,4 @@
-import { allScoresAggregateRepo } from "@/lib/db/aggregates/allScores";
+import { allScoresListRepo } from "@/lib/db/aggregates/allScores/list";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { radarLookup } from "@/lib/subhandlers/scores/_shared";
 import { accessError, err, ok } from "@/middlewares/api/apiResult";
@@ -31,7 +31,7 @@ export async function handleAllScoresList(
       };
     }
 
-    const rawResults = await allScoresAggregateRepo.getAllScoresList(
+    const rawResults = await allScoresListRepo.getAllScoresList(
       targetUserId,
       {
         search: req.query.search as string,

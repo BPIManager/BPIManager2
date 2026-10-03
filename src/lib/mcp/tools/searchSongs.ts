@@ -1,5 +1,5 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { songsRepo } from "@/lib/db/domains/songs";
+import { songSearchRepo } from "@/lib/db/domains/songs/search";
 import { searchSongsSchema, MCP_LIST_DEFAULT_LIMIT } from "@/lib/mcp/schemas";
 
 export function registerSearchSongs(server: McpServer) {
@@ -17,7 +17,7 @@ export function registerSearchSongs(server: McpServer) {
       inputSchema: searchSongsSchema.shape,
     },
     async ({ version, title, difficulty, difficultyLevel, limit }) => {
-      const rows = await songsRepo.searchSongs({
+      const rows = await songSearchRepo.searchSongs({
         version,
         title,
         difficulty,

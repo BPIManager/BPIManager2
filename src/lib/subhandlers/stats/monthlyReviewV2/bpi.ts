@@ -1,10 +1,7 @@
 import { ok, err } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
-import {
-  resolveMonthlyReviewPeriod,
-  computeOwnerBpiTimeline,
-  previousVersionOf,
-} from "./_shared";
+import { resolveMonthlyReviewPeriod, previousVersionOf } from "@/lib/subhandlers/stats/monthlyReviewV2/period";
+import { computeOwnerBpiTimeline } from "@/lib/subhandlers/stats/monthlyReviewV2/timeline";
 import type { HandlerResult } from "@/types/api";
 
 export async function handleStatsMonthlyReviewBpi(q: {

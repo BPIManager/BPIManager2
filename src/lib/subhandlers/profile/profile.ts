@@ -7,7 +7,7 @@ import { err, ok } from "@/middlewares/api/apiResult";
 import { getUserAreaRank } from "@/lib/arena/prefectureRankings";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { profileUpsertSchema } from "@/schemas/profile/upsert";
-import { socialComparisonRepo } from "@/lib/db/aggregates/rivalScores/comparison";
+import { socialWinLossRepo } from "@/lib/db/aggregates/rivalScores/winLoss";
 import { upsertStatsPrivacy } from "@/lib/db/domains/arenaPrivacy";
 import { upsertUserProfile } from "@/lib/db/orchestrators/userProfileUpsert";
 import { userProfileRepo } from "@/lib/db/aggregates/userProfiles/profile";
@@ -27,9 +27,9 @@ export async function getProfile(
   const [profile, winLoss, radar] = await Promise.all([
     userProfileRepo.getUserProfileSummary(uid, viewerId ?? undefined),
     isCompare && viewerId
-      ? socialComparisonRepo.getWinLossStats(viewerId, uid, version)
+      ? socialWinLossRepo.getWinLossStats(viewerId, uid, version)
       : null,
-    isCompare ? socialComparisonRepo.getUserRadar(uid, version) : null,
+    isCompare ? socialWinLossRepo.getUserRadar(uid, version) : null,
   ]);
 
   if (!profile) {

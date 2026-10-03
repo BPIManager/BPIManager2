@@ -1,8 +1,9 @@
 import { db } from "@/lib/db";
 import { scoreWriteRepo } from "@/lib/db/domains/scores/write";
 import { allScoresRepo } from "@/lib/db/domains/allScores";
-import { navigationRepo } from "@/lib/db/domains/logs/navigation";
-import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
+import { logBatchRepo } from "@/lib/db/domains/logs/batch";
+import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
+import { userStatusLogsWriteRepo } from "@/lib/db/domains/userStatusLogs/write";
 import { BpiCalculator } from "@/lib/bpi";
 import { getManualBatchPrefix, mintManualBatchId } from "@/lib/scores/manualBatchId";
 
@@ -69,7 +70,7 @@ export async function saveManualScoreUpdate(params: {
     // `score`(scores/songDefドメイン、☆11/12)がある更新は`logs`側から判定・ロックできる。
     // `allScore`のみ(☆10以下)の更新は`logs`に一切触れないため、`allScores`自体から判定する
     const currentLatestBatchId = score
-      ? await navigationRepo.getLatestBatchIdForUpdate(trx, userId, version)
+      ? await logBatchRepo.getLatestBatchIdForUpdate(trx, userId, version)
       : await allScoresRepo.getLatestBatchId(userId, version);
     const batchId = currentLatestBatchId?.startsWith(prefix)
       ? currentLatestBatchId
@@ -81,14 +82,14 @@ export async function saveManualScoreUpdate(params: {
     // 先に用意してから`scores`へ書き込む必要がある（CSVインポート
     // `executeSaveBpiSystem`と同じ順序）。
     if (score) {
-      const latestLog = await userStatusLogsRepo.getLatestArenaRank(
+      const latestLog = await userStatusLogsReadRepo.getLatestArenaRank(
         trx,
         userId,
         version,
       );
       const currentArenaRank = latestLog?.arenaRank ?? null;
 
-      const previousBest = await userStatusLogsRepo.getMaxTotalBpi(
+      const previousBest = await userStatusLogsReadRepo.getMaxTotalBpi(
         trx,
         userId,
         version,
@@ -98,13 +99,13 @@ export async function saveManualScoreUpdate(params: {
         newTotalBpi ?? previousBest ?? -15,
       );
 
-      await navigationRepo.upsertManualBatch(trx, {
+      await logBatchRepo.upsertManualBatch(trx, {
         userId,
         version,
         batchId,
         totalBpi,
       });
-      await userStatusLogsRepo.upsertManualBatch(trx, {
+      await userStatusLogsWriteRepo.upsertManualBatch(trx, {
         userId,
         version,
         batchId,

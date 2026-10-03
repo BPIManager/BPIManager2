@@ -16,9 +16,9 @@ vi.mock("@/lib/db/domains/scores/history", () => ({
   scoreHistoryRepo: scoresRepoMock,
 }));
 
-const { navigationRepo } = await import("@/lib/db/domains/logs/navigation");
+const { logRangeRepo } = await import("@/lib/db/domains/logs/range");
 
-describe("navigationRepo.getRangeNavigation", () => {
+describe("logRangeRepo.getRangeNavigation", () => {
   afterEach(() => {
     vi.clearAllMocks();
   });
@@ -30,7 +30,7 @@ describe("navigationRepo.getRangeNavigation", () => {
     });
     const range = { start: new Date("2025-01-10"), end: new Date("2025-01-20"), unit: "day" };
 
-    const result = await navigationRepo.getRangeNavigation(
+    const result = await logRangeRepo.getRangeNavigation(
       "user-1",
       "33",
       range,
@@ -50,7 +50,7 @@ describe("navigationRepo.getRangeNavigation", () => {
     dbHolder.current = spy;
     const range = { start: new Date("2025-01-10"), end: new Date("2025-01-20"), unit: "day" };
 
-    await navigationRepo.getRangeNavigation("user-1", "33", range);
+    await logRangeRepo.getRangeNavigation("user-1", "33", range);
 
     expect(scoresRepoMock.getLastPlayedNavigation).not.toHaveBeenCalled();
     expect(callsFor(spy.calls, "selectFrom")[0].args).toEqual(["logs"]);

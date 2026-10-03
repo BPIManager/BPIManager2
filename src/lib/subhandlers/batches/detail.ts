@@ -1,8 +1,10 @@
 import type { NextApiRequest } from "next";
 import dayjs from "@/lib/dayjs";
-import { navigationRepo } from "@/lib/db/domains/logs/navigation";
+import { logRangeRepo } from "@/lib/db/domains/logs/range";
+import { logBatchRepo } from "@/lib/db/domains/logs/batch";
 import { scoreDetailRepo } from "@/lib/db/domains/scores/detail";
-import { rivalRepo } from "@/lib/db/aggregates/rivalScores/rival";
+import { rivalOvertakenRepo } from "@/lib/db/aggregates/rivalScores/overtaken";
+import { rivalAggregateRepo } from "@/lib/db/aggregates/rivalScores/aggregate";
 import { deleteBatch, BatchNotLatestError } from "@/lib/db/orchestrators/batchDeletion";
 import { mapToLogNested } from "@/utils/logs/getMapNested";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
@@ -43,7 +45,7 @@ export async function handleBatchDetail(
     const denied = accessError(access);
     if (denied) return { result: denied, targetUserId: uid, viewerId };
 
-    const targetBatch = await navigationRepo.findBatchById(bid, uid);
+    const targetBatch = await logRangeRepo.findBatchById(bid, uid);
     if (!targetBatch) {
       return {
         result: err(404, "Batch not found."),
@@ -53,21 +55,21 @@ export async function handleBatchDetail(
     }
 
     const jstDate = dayjs.utc(targetBatch.createdAt).tz().format("YYYY-MM-DD");
-    const dayRange = navigationRepo.getJstRange(jstDate, "day");
+    const dayRange = logRangeRepo.getJstRange(jstDate, "day");
     const isOwnLog = access.viewerId === uid;
 
     const [nav, sameDay, scores, overtaken, versionOvertakenMap] =
       await Promise.all([
-        navigationRepo.getBatchNavigation(
+        logRangeRepo.getBatchNavigation(
           uid,
           v,
           targetBatch.createdAt,
           dayRange,
         ),
-        navigationRepo.findBatchesInRange(uid, v, dayRange.start, dayRange.end),
+        logRangeRepo.findBatchesInRange(uid, v, dayRange.start, dayRange.end),
         scoreDetailRepo.getScoresWithDetails(uid, v, { batchIds: [bid] }),
         isOwnLog
-          ? rivalRepo.getOvertakenRivals(uid, v, {
+          ? rivalOvertakenRepo.getOvertakenRivals(uid, v, {
               batchId: bid,
               range: { ...dayRange, basis: "createdAt" },
             })
@@ -86,7 +88,7 @@ export async function handleBatchDetail(
       .filter(Boolean);
     const rivalScores =
       isOwnLog && overtakenSongIds.length > 0
-        ? await rivalRepo.getRivalLatestScoresBySong({
+        ? await rivalAggregateRepo.getRivalLatestScoresBySong({
             userId: uid,
             version: v,
             songIds: overtakenSongIds,
@@ -148,7 +150,7 @@ export async function handleBatchDelete(
       return { result: err(403, "Forbidden"), targetUserId: uid, viewerId };
     }
 
-    const targetBatch = await navigationRepo.findBatchByIdAndUser(bid, uid);
+    const targetBatch = await logRangeRepo.findBatchByIdAndUser(bid, uid);
     if (!targetBatch) {
       return {
         result: err(404, "Batch not found."),
@@ -157,7 +159,7 @@ export async function handleBatchDelete(
       };
     }
 
-    const latestBatchId = await navigationRepo.getLatestBatchId(
+    const latestBatchId = await logBatchRepo.getLatestBatchId(
       uid,
       targetBatch.version,
     );

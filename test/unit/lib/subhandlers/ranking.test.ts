@@ -25,10 +25,14 @@ vi.mock("@/lib/db/domains/radar", () => ({
     getForUserAndVersion: (...a: unknown[]) => getForUserAndVersionMock(...a),
   },
 }));
-vi.mock("@/lib/db/aggregates/stats/tables", () => ({
-  statsTablesRepo: {
+vi.mock("@/lib/db/aggregates/stats/songTables", () => ({
+  statsSongTablesRepo: {
     getSongRanking: (...a: unknown[]) => getSongRankingMock(...a),
     getUserSongRankings: (...a: unknown[]) => getUserSongRankingsMock(...a),
+  },
+}));
+vi.mock("@/lib/db/aggregates/stats/latestScores", () => ({
+  statsLatestScoresRepo: {
     getLatestScoresWithMusicData: (...a: unknown[]) =>
       getLatestScoresWithMusicDataMock(...a),
   },
@@ -38,8 +42,8 @@ vi.mock("@/lib/db/aggregates/iidxTower", () => ({
     getTowerRanking: (...a: unknown[]) => getTowerRankingMock(...a),
   },
 }));
-vi.mock("@/lib/db/domains/songs", () => ({
-  songsRepo: {
+vi.mock("@/lib/db/domains/songs/master", () => ({
+  songMasterRepo: {
     getSongMasterWithDef: (...a: unknown[]) => getSongMasterWithDefMock(...a),
   },
 }));

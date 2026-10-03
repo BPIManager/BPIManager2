@@ -1,10 +1,11 @@
 import { db } from "@/lib/db";
 import { usersRepo } from "@/lib/db/domains/users";
-import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
+import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
+import { userStatusLogsWriteRepo } from "@/lib/db/domains/userStatusLogs/write";
 import { scoreHistoryRepo } from "@/lib/db/domains/scores/history";
 import { scoreWriteRepo } from "@/lib/db/domains/scores/write";
 import { allScoresRepo } from "@/lib/db/domains/allScores";
-import { navigationRepo } from "@/lib/db/domains/logs/navigation";
+import { logBatchRepo } from "@/lib/db/domains/logs/batch";
 import { followsRepo } from "@/lib/db/domains/follow";
 import { apiKeysRepo } from "@/lib/db/domains/apiKeys";
 import { notificationsRepo } from "@/lib/db/domains/notifications";
@@ -44,10 +45,10 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
     usersRepo.getAllForUser(userId),
     followsRepo.getAllForUser(userId),
     scoreHistoryRepo.getAllForUser(userId),
-    navigationRepo.getAllForUser(userId),
+    logBatchRepo.getAllForUser(userId),
     radarCacheRepo.getAllForUser(userId),
     notificationsRepo.getAllForUser(userId),
-    userStatusLogsRepo.getAllForUser(userId),
+    userStatusLogsReadRepo.getAllForUser(userId),
     discordLinksRepo.getRolesForUser(userId),
     apiKeysRepo.getAllForUser(userId),
     allScoresRepo.getAllForUser(userId),
@@ -118,7 +119,7 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
     await scoreWriteRepo.deleteByUser(trx, userId);
 
     // logs: FK to users(CASCADE)
-    await navigationRepo.deleteByUser(trx, userId);
+    await logBatchRepo.deleteByUser(trx, userId);
 
     // follows: FK to users(CASCADE) for both sides
     await followsRepo.deleteByUser(trx, userId);
@@ -144,7 +145,7 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
     await discordLinksRepo.deleteRoleByUser(trx, userId);
 
     // userStatusLogs: FK to users(CASCADE)
-    await userStatusLogsRepo.deleteByUser(trx, userId);
+    await userStatusLogsWriteRepo.deleteByUser(trx, userId);
 
     // discordLinks: FK to users(CASCADE)
     await discordLinksRepo.deleteLinkByUser(trx, userId);

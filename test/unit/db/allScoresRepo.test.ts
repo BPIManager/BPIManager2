@@ -12,7 +12,7 @@ vi.mock("@/lib/db", () => ({
 }));
 
 const { allScoresRepo } = await import("@/lib/db/domains/allScores");
-const { allScoresAggregateRepo } = await import("@/lib/db/aggregates/allScores");
+const { allScoresSelfRivalRepo } = await import("@/lib/db/aggregates/allScores/selfAndRivals");
 
 describe("allScoresRepo.getLatestAllScores", () => {
   it("allScoresテーブルから最新スコアを取得すること", async () => {
@@ -45,7 +45,7 @@ describe("allScoresRepo.getAllSongRanking", () => {
       },
     ]);
 
-    const result = await allScoresAggregateRepo.getAllSongRanking(1, "33", "viewer-1");
+    const result = await allScoresSelfRivalRepo.getAllSongRanking(1, "33", "viewer-1");
 
     expect(result.totalCount).toBe(2);
     expect(result.rankings[0]).toMatchObject({
@@ -77,7 +77,7 @@ describe("allScoresRepo.getAllSongRanking", () => {
       },
     ]);
 
-    const result = await allScoresAggregateRepo.getAllSongRanking(1, "33", "viewer-1");
+    const result = await allScoresSelfRivalRepo.getAllSongRanking(1, "33", "viewer-1");
     expect(result.selfRank).toBe(0);
   });
 });

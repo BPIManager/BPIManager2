@@ -11,12 +11,12 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-const { navigationRepo } = await import("@/lib/db/domains/logs/navigation");
+const { logTotalBpiRepo } = await import("@/lib/db/domains/logs/totalBpi");
 
-describe("navigationRepo.getLatestTotalBpi", () => {
+describe("logTotalBpiRepo.getLatestTotalBpi", () => {
   it("userId/versionで絞り込み最新1件を取得すること", async () => {
     dbHolder.current = createDbSpy({ totalBpi: 30 });
-    const result = await navigationRepo.getLatestTotalBpi("user-1", "33");
+    const result = await logTotalBpiRepo.getLatestTotalBpi("user-1", "33");
     expect(result).toEqual({ totalBpi: 30 });
     expect(callsFor(dbHolder.current.calls, "limit")[0].args).toEqual([1]);
     expect(callsFor(dbHolder.current.calls, "orderBy")[0].args).toEqual([

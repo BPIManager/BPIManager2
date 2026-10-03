@@ -19,8 +19,8 @@ vi.mock("@/lib/db/aggregates/bpiOptimizer", () => ({
   },
 }));
 
-vi.mock("@/lib/db/domains/userStatusLogs", () => ({
-  userStatusLogsRepo: {
+vi.mock("@/lib/db/domains/userStatusLogs/read", () => ({
+  userStatusLogsReadRepo: {
     findMaxTotalBpi: (...a: unknown[]) => getMaxTotalBpiMock(...a),
   },
 }));

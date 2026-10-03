@@ -1,5 +1,5 @@
 import type { NextApiRequest } from "next";
-import { navigationRepo } from "@/lib/db/domains/logs/navigation";
+import { logRangeRepo } from "@/lib/db/domains/logs/range";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 import { accessError, err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
@@ -38,8 +38,8 @@ export async function handleBatchScores(
     const basis: "lastPlayed" | "createdAt" =
       groupedBy === "lastPlayed" ? "lastPlayed" : "createdAt";
 
-    const range = navigationRepo.getJstRange(dateStr, type);
-    const nav = await navigationRepo.getRangeNavigation(uid, ver, range, basis);
+    const range = logRangeRepo.getJstRange(dateStr, type);
+    const nav = await logRangeRepo.getRangeNavigation(uid, ver, range, basis);
 
     const isOwnLog = access.viewerId === uid;
 

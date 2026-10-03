@@ -1,6 +1,6 @@
 import { latestScoresRepo } from "@/lib/db/domains/scores/latest";
 import { allScoresRepo } from "@/lib/db/domains/allScores";
-import { songsRepo } from "@/lib/db/domains/songs";
+import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { allSongsRepo } from "@/lib/db/domains/allSongs";
 import { saveManualScoreUpdate } from "@/lib/db/orchestrators/manualScoreUpdate";
 import { BpiCalculator } from "@/lib/bpi";
@@ -59,7 +59,7 @@ export async function handleScoreManualUpdate(
   try {
     const [bpiSongMaster, allLevelMaster, currentScores, currentAllScores] =
       await Promise.all([
-        songsRepo.getSongMasterWithDef(),
+        songMasterRepo.getSongMasterWithDef(),
         allSongsRepo.getAllLevelMaster(),
         latestScoresRepo.getLatestScores(userId, version),
         allScoresRepo.getLatestAllScores(userId, version),

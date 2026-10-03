@@ -1,5 +1,5 @@
 import type { NextApiRequest } from "next";
-import { rivalRepo } from "@/lib/db/aggregates/rivalScores/rival";
+import { rivalPairwiseRepo } from "@/lib/db/aggregates/rivalScores/pairwise";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { scoreComparisonQuerySchema } from "@/schemas/rivals/following/scores/query";
@@ -49,7 +49,7 @@ export async function handleRivalFollowingScoresList(
           }
         : undefined;
 
-    const rawResults = await rivalRepo.getScoreComparisonList({
+    const rawResults = await rivalPairwiseRepo.getScoreComparisonList({
       userId: String(userId),
       version,
       limit: nLimit,

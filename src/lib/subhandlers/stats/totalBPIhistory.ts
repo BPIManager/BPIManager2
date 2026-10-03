@@ -1,9 +1,9 @@
 import type { NextApiRequest } from "next";
 import dayjs from "@/lib/dayjs";
 import { BpiCalculator } from "@/lib/bpi";
-import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
-import { songsRepo } from "@/lib/db/domains/songs";
-import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
+import { statsSongTablesRepo } from "@/lib/db/aggregates/stats/songTables";
+import { songMasterRepo } from "@/lib/db/domains/songs/master";
+import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
 import { ok } from "@/middlewares/api/apiResult";
 import { groupByOf, DIFFICULTY_LABELS } from "./_shared";
 import type { StatsQuery } from "@/types/stats/query";
@@ -19,8 +19,8 @@ export async function handleStatsTotalBpiHistory(
 ): Promise<HandlerResult<unknown>> {
   const groupBy = groupByOf(req);
   const [fullLogs, fullMaster] = await Promise.all([
-    statsTablesRepo.getScoreHistory(q.userId, q.version, [], []),
-    songsRepo.getSongMasterWithDef(),
+    statsSongTablesRepo.getScoreHistory(q.userId, q.version, [], []),
+    songMasterRepo.getSongMasterWithDef(),
   ]);
   const scopedMaster = fullMaster.filter(
     (s) =>
@@ -150,7 +150,7 @@ export async function handleStatsTotalBpiHistory(
   // BPIモデルの再推定等により、同じ時点を再計算しても過去にuserStatusLogsへ
   // 記録された値より低く出ることがある（monthly-review/bpi.tsのbuildBpiTimeline
   // と同じ理由）。記録済みの値を日付ごとの下限として合流させる
-  const recordedLogs = await userStatusLogsRepo.getTotalBpiLogsInRange(
+  const recordedLogs = await userStatusLogsReadRepo.getTotalBpiLogsInRange(
     q.userId,
     q.version,
     new Date(0),

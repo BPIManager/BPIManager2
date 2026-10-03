@@ -1,5 +1,5 @@
 import type { NextApiRequest } from "next";
-import { songsRepo } from "@/lib/db/domains/songs";
+import { songSearchRepo } from "@/lib/db/domains/songs/search";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { resolveVersion, type HandleOutcome } from "./_shared";
@@ -10,7 +10,7 @@ export async function handleSongsList(
 ): Promise<HandleOutcome<unknown>> {
   const base = { targetUserId: "", viewerId: null };
   try {
-    const songs = await songsRepo.getSongList(
+    const songs = await songSearchRepo.getSongList(
       resolveVersion(req.query.version) as IIDXVersion,
     );
     return { result: ok(songs), ...base };

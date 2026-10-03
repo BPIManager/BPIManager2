@@ -18,9 +18,13 @@ vi.mock("@/middlewares/api/withApiOnProfile", () => ({
   checkProfileAccess: (...a: unknown[]) => checkProfileAccessMock(...a),
 }));
 
-vi.mock("@/lib/db/aggregates/allScores", () => ({
-  allScoresAggregateRepo: {
+vi.mock("@/lib/db/aggregates/allScores/list", () => ({
+  allScoresListRepo: {
     getAllScoresList: (...a: unknown[]) => getAllScoresListMock(...a),
+  },
+}));
+vi.mock("@/lib/db/aggregates/allScores/selfAndRivals", () => ({
+  allScoresSelfRivalRepo: {
     getRivalScoresForAllSong: (...a: unknown[]) =>
       getRivalScoresForAllSongMock(...a),
     getAllSongRanking: (...a: unknown[]) => getAllSongRankingMock(...a),

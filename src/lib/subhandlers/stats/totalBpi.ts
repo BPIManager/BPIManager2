@@ -1,9 +1,9 @@
 import dayjs from "@/lib/dayjs";
 import { BpiCalculator } from "@/lib/bpi";
 import { scoreDetailRepo } from "@/lib/db/domains/scores/detail";
-import { songsRepo } from "@/lib/db/domains/songs";
+import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { usersRepo } from "@/lib/db/domains/users";
-import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
+import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
 import { getUserAreaRank } from "@/lib/arena/prefectureRankings";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { ok } from "@/middlewares/api/apiResult";
@@ -24,7 +24,7 @@ export async function handleStatsTotalBpi(
       targetTime,
       onlyLastPlayedInRange: { start: new Date(0), end: targetTime },
     }),
-    songsRepo.getSongMasterWithDef(),
+    songMasterRepo.getSongMasterWithDef(),
     usersRepo.getIidxId(q.userId),
   ]);
 
@@ -49,7 +49,7 @@ export async function handleStatsTotalBpi(
   // 低く出ることがある（monthly-review/bpi.tsのbuildBpiTimelineと同じ理由）。
   // asOf指定時（過去のある日との比較）も含め、その時点までに実際に記録された
   // 最高値を下限として使う
-  const previousBest = await userStatusLogsRepo.findMaxTotalBpiAsOf(q.userId, q.version, targetTime,);
+  const previousBest = await userStatusLogsReadRepo.findMaxTotalBpiAsOf(q.userId, q.version, targetTime,);
   const totalBpi = BpiCalculator.ratchetTotalBpi(previousBest, freshTotalBpi);
   const estimatedRank = BpiCalculator.estimateRank(totalBpi);
   const areaRank =

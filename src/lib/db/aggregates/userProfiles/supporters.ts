@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
+import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
 import { wherePublicOnly } from "@/lib/db/shared/visibility";
 
 /**
@@ -11,7 +11,7 @@ import { wherePublicOnly } from "@/lib/db/shared/visibility";
 class SupportersRepository {
   async getSupporters(version: string) {
     const latestStatusSubquery =
-      userStatusLogsRepo.latestPerUserSubquery(version);
+      userStatusLogsReadRepo.latestPerUserSubquery(version);
 
     return await db
       .selectFrom("users as u")

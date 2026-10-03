@@ -1,30 +1,19 @@
 import { db } from "@/lib/db";
 import { sql } from "kysely";
-import { ARENA_RANK_ORDER } from "@/constants/iidx/arenaRanks";
-import { latestVersion } from "@/constants/iidx/iidxVersions";
+
 import { usersRepo } from "@/lib/db/domains/users";
-import { navigationRepo } from "@/lib/db/domains/logs/navigation";
+import { logTotalBpiRepo } from "@/lib/db/domains/logs/totalBpi";
 import { scoreActivityRepo } from "@/lib/db/domains/scores/activity";
-import {
-  latestPerUserSubquery as latestArenaStatsPerUserSubquery,
-  latestPerUserAllVersionsSubquery as latestArenaStatsPerUserAllVersionsSubquery,
-} from "@/lib/db/domains/arenaHistory";
 
 const DATE_EXPR = sql<string>`DATE_FORMAT(CONVERT_TZ(createdAt, '+00:00', '+09:00'), '%Y-%m-%d')`;
 
 const JST_TODAY_START = sql<Date>`CONVERT_TZ(CONCAT(DATE(CONVERT_TZ(NOW(), '+00:00', '+09:00')), ' 00:00:00'), '+09:00', '+00:00')`;
 
-const BPI_HISTOGRAM_MIN = -15;
-const BPI_HISTOGRAM_MAX = 100;
-const BPI_HISTOGRAM_BUCKET_SIZE = 5;
-const BPI_HISTOGRAM_BUCKET_COUNT =
-  (BPI_HISTOGRAM_MAX - BPI_HISTOGRAM_MIN) / BPI_HISTOGRAM_BUCKET_SIZE;
 
 /**
- * サイト統計ダッシュボードのサマリカウンター・日次登録推移・分布集計
- * （アリーナランク/エリア/バージョン別）を担当するリポジトリクラス。
+ * サイト全体の概要（件数・日別登録数）を担当するリポジトリクラス。
  */
-class SiteStatsSummaryRepository {
+class SiteStatsOverviewRepository {
   async getSummary() {
     const yesterday = sql`DATE_SUB(DATE(CONVERT_TZ(NOW(), '+00:00', '+09:00')), INTERVAL 1 DAY)`;
 
@@ -47,8 +36,8 @@ class SiteStatsSummaryRepository {
       usersRepo.getCount(),
       usersRepo.getCount(yesterday),
 
-      navigationRepo.getCount(),
-      navigationRepo.getCount(yesterday),
+      logTotalBpiRepo.getCount(),
+      logTotalBpiRepo.getCount(yesterday),
 
       // bkScoresは所有ドメインが存在しない旧バージョンスコアの集計専用テーブルのため、直接参照を維持する。
       db
@@ -109,6 +98,7 @@ class SiteStatsSummaryRepository {
   }
 
   // users・logs・scores・allScores×allSongsを横断する日次集計を1つの日付軸にマージするため、直接参照を維持する。
+
   async getDailyRegistrations(days: number = 90) {
     const interval = sql<Date>`DATE_SUB(NOW(), INTERVAL ${days} DAY)`;
     const scoreDateExpr = sql<string>`DATE_FORMAT(CONVERT_TZ(s.createdAt, '+00:00', '+09:00'), '%Y-%m-%d')`;
@@ -204,153 +194,6 @@ class SiteStatsSummaryRepository {
       String(a.date).localeCompare(String(b.date)),
     );
   }
-
-  /**
-   * バージョンごとのアリーナランク別登録者数分布。
-   */
-  async getArenaRankDistributionByVersion() {
-    const rows = await db
-      .with("latest_per_user", () => latestArenaStatsPerUserAllVersionsSubquery())
-      .selectFrom("officialArenaStats as oas")
-      .innerJoin("latest_per_user as lpu", "lpu.maxId", "oas.id")
-      .select(["oas.version", "oas.arenaClass", sql<number>`COUNT(*)`.as("count")])
-      .groupBy(["oas.version", "oas.arenaClass"])
-      .execute();
-
-    const byVersion = new Map<string, Map<string, number>>();
-    for (const r of rows) {
-      if (!r.version) continue;
-      const counts = byVersion.get(r.version) ?? new Map<string, number>();
-      byVersion.set(r.version, counts);
-      counts.set(r.arenaClass, (counts.get(r.arenaClass) ?? 0) + Number(r.count));
-    }
-
-    const result: Record<string, { rank: string; count: number }[]> = {};
-    for (const [version, counts] of byVersion) {
-      result[version] = (ARENA_RANK_ORDER as readonly string[]).map((r) => ({
-        rank: r,
-        count: counts.get(r) ?? 0,
-      }));
-    }
-    return result;
-  }
-
-  /**
-   * バージョンごとの県別利用者数分布。
-   */
-  async getAreaDistributionByVersion() {
-    const rows = await db
-      .with("latest_per_user", () => latestArenaStatsPerUserAllVersionsSubquery())
-      .selectFrom("officialArenaStats as oas")
-      .innerJoin("latest_per_user as lpu", "lpu.maxId", "oas.id")
-      .where("oas.area", "is not", null)
-      .select(["oas.version", "oas.area", sql<number>`COUNT(*)`.as("count")])
-      .groupBy(["oas.version", "oas.area"])
-      .execute();
-
-    const byVersion = new Map<string, { area: string; count: number }[]>();
-    for (const r of rows) {
-      if (!r.version || r.area == null) continue;
-      const list = byVersion.get(r.version) ?? [];
-      byVersion.set(r.version, list);
-      list.push({ area: r.area, count: Number(r.count) });
-    }
-
-    const result: Record<string, { area: string; count: number }[]> = {};
-    for (const [version, list] of byVersion) {
-      result[version] = list.sort((a, b) => b.count - a.count);
-    }
-    return result;
-  }
-
-  // bkScores・scores・allScores×allSongsを横断するバージョン別集計のため、直接参照を維持する。
-  async getVersionScoreDistribution() {
-    const BK_VERSIONS = ["26", "27", "28", "29", "30", "31", "32"] as const;
-    const EXCLUDE_FROM_CURRENT = [...BK_VERSIONS, "INF"];
-
-    const [bkRows, scoresRows, allScoresRows] = await Promise.all([
-      db
-        .selectFrom("bkScores")
-        .select(["version", sql<number>`COUNT(*)`.as("count")])
-        .where("version", "in", BK_VERSIONS)
-        .groupBy("version")
-        .execute(),
-
-      db
-        .selectFrom("scores")
-        .select(["version", sql<number>`COUNT(*)`.as("count")])
-        .where("version", "not in", EXCLUDE_FROM_CURRENT)
-        .groupBy("version")
-        .execute(),
-
-      db
-        .selectFrom("allScores as s")
-        .innerJoin("allSongs as sg", "sg.songId", "s.songId")
-        .select(["s.version", sql<number>`COUNT(*)`.as("count")])
-        .where("sg.difficultyLevel", "not in", [11, 12])
-        .where("s.version", "not in", EXCLUDE_FROM_CURRENT)
-        .groupBy("s.version")
-        .execute(),
-    ]);
-
-    const map = new Map<string, number>();
-    const add = (v: string | null | undefined, n: number) => {
-      if (!v) return;
-      map.set(v, (map.get(v) ?? 0) + n);
-    };
-    bkRows.forEach((r) => add(r.version, Number(r.count)));
-    scoresRows.forEach((r) => add(r.version, Number(r.count)));
-    allScoresRows.forEach((r) => add(r.version, Number(r.count)));
-
-    const bkSet = new Set<string>(BK_VERSIONS);
-    const others = [...map.keys()]
-      .filter((v) => !bkSet.has(v) && v !== "INF")
-      .sort((a, b) => Number(a) - Number(b));
-    const ordered = [...BK_VERSIONS, ...others];
-
-    const versions = ordered.map((v) => ({
-      version: v,
-      count: map.get(v) ?? 0,
-    }));
-    const total = versions.reduce((s, r) => s + r.count, 0);
-    return { versions, total };
-  }
-
-  /**
-   * バージョンごとの総合BPIレンジ別（5刻み、-15〜100の23バケット）ユーザー数分布。
-   * `navigationRepo`（`logs`）が持つ、ダッシュボード等でも使う「現在の総合BPI」の
-   * 正本を使う。
-   */
-  async getTotalBpiHistogramByVersion() {
-    const rows = await navigationRepo.getLatestTotalBpiPerUserAllVersions();
-
-    const byVersion = new Map<string, number[]>();
-    for (const r of rows) {
-      if (r.totalBpi == null || !r.version) continue;
-      const counts =
-        byVersion.get(r.version) ?? new Array(BPI_HISTOGRAM_BUCKET_COUNT).fill(0);
-      byVersion.set(r.version, counts);
-      const idx = Math.min(
-        BPI_HISTOGRAM_BUCKET_COUNT - 1,
-        Math.max(
-          0,
-          Math.floor((Number(r.totalBpi) - BPI_HISTOGRAM_MIN) / BPI_HISTOGRAM_BUCKET_SIZE),
-        ),
-      );
-      counts[idx]++;
-    }
-
-    const result: Record<string, { bucketStart: number; bucketEnd: number; count: number }[]> =
-      {};
-    for (const [version, counts] of byVersion) {
-      result[version] = counts.map((count, i) => ({
-        bucketStart: BPI_HISTOGRAM_MIN + i * BPI_HISTOGRAM_BUCKET_SIZE,
-        bucketEnd: BPI_HISTOGRAM_MIN + (i + 1) * BPI_HISTOGRAM_BUCKET_SIZE,
-        count,
-      }));
-    }
-    return result;
-  }
 }
 
-export const siteStatsSummaryRepo = new SiteStatsSummaryRepository();
+export const siteStatsOverviewRepo = new SiteStatsOverviewRepository();

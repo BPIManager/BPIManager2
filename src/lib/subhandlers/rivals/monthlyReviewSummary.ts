@@ -2,10 +2,8 @@ import type { NextApiRequest } from "next";
 import dayjs from "@/lib/dayjs";
 import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import { followListAggregateRepo } from "@/lib/db/aggregates/followList";
-import {
-  previousVersionOf,
-  recomputeBpiTimelinesForUsers,
-} from "@/lib/subhandlers/stats/monthlyReviewV2/_shared";
+import { previousVersionOf } from "@/lib/subhandlers/stats/monthlyReviewV2/period";
+import { recomputeBpiTimelinesForUsers } from "@/lib/subhandlers/stats/monthlyReviewV2/timeline";
 import { checkUserAccess } from "@/middlewares/api/withApi";
 import { accessError, err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";

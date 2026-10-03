@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll } from "vitest";
 import "dotenv/config";
 import dayjs from "@/lib/dayjs";
 import { db } from "@/lib/db";
-import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
+import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { dashboardSchema } from "@/lib/mcp/schemas";
 import { registerGetMyDashboard } from "@/lib/mcp/tools/getMyDashboard";
@@ -43,7 +43,7 @@ describe("総合BPI算出ロジックの一貫性", () => {
 
   beforeAll(async () => {
     if (!USER_ID) return;
-    groundTruth = await userStatusLogsRepo.getMaxTotalBpi(db, USER_ID, VERSION);
+    groundTruth = await userStatusLogsReadRepo.getMaxTotalBpi(db, USER_ID, VERSION);
   });
 
   it("前提: テスト対象ユーザーにDB記録済みの総合BPIが存在する", () => {

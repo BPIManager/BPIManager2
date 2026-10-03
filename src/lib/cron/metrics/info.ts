@@ -1,6 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
-import { siteStatsSummaryRepo } from "@/lib/db/aggregates/siteStats/summary";
+import { siteStatsOverviewRepo } from "@/lib/db/aggregates/siteStats/overview";
+import { siteStatsDistributionRepo } from "@/lib/db/aggregates/siteStats/distribution";
 import { siteStatsActivityDistributionRepo } from "@/lib/db/aggregates/siteStats/activityDistribution";
 import { siteStatsSongPopulationRepo } from "@/lib/db/aggregates/siteStats/songPopulation";
 
@@ -30,14 +31,14 @@ export async function generateInfoJson() {
     weekdayDistribution,
     totalBpiHistogram,
   ] = await Promise.all([
-    siteStatsSummaryRepo.getSummary(),
-    siteStatsSummaryRepo.getDailyRegistrations(90),
-    siteStatsSummaryRepo.getArenaRankDistributionByVersion(),
-    siteStatsSummaryRepo.getAreaDistributionByVersion(),
-    siteStatsSummaryRepo.getVersionScoreDistribution(),
+    siteStatsOverviewRepo.getSummary(),
+    siteStatsOverviewRepo.getDailyRegistrations(90),
+    siteStatsDistributionRepo.getArenaRankDistributionByVersion(),
+    siteStatsDistributionRepo.getAreaDistributionByVersion(),
+    siteStatsDistributionRepo.getVersionScoreDistribution(),
     siteStatsActivityDistributionRepo.getHourlyDistribution(),
     siteStatsActivityDistributionRepo.getWeekdayDistribution(),
-    siteStatsSummaryRepo.getTotalBpiHistogramByVersion(),
+    siteStatsDistributionRepo.getTotalBpiHistogramByVersion(),
   ]);
 
   await fs.writeFile(

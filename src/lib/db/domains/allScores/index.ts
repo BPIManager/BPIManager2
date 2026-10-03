@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { Database, NewAllScores } from "@/types/db";
 import { Transaction } from "kysely";
-import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore";
+import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore/perSong";
 
 /**
  * 全難易度スコア（`allScores` テーブル）の参照を担当するリポジトリクラス。
@@ -80,7 +80,7 @@ class allScoresRepository {
    * 指定ユーザー・バージョンの`allScores`テーブルにおける最新の`batchId`を取得する。
    *
    * ☆10以下の楽曲（`allScores`ドメインのみ）の手動編集では`logs`テーブルに
-   * 一切書き込まれず`navigationRepo.getLatestBatchId`で既存の手動バッチを
+   * 一切書き込まれず`logBatchRepo.getLatestBatchId`で既存の手動バッチを
    * 検出できないため、`allScores`自体から直接判定する。
    *
    * @param userId - ユーザー ID

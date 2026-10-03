@@ -1,4 +1,4 @@
-import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
+import { statsLatestScoresRepo } from "@/lib/db/aggregates/stats/latestScores";
 import { ok } from "@/middlewares/api/apiResult";
 import type { HandlerResult } from "@/types/api";
 import type { StepQuery } from "./_shared";
@@ -7,7 +7,7 @@ export async function handleStatsSingleBpiDistribution(
   q: StepQuery,
 ): Promise<HandlerResult<unknown>> {
   const { userId, version, levels, difficulties, step } = q;
-  const scores = await statsTablesRepo.getLatestScoresWithMusicData(
+  const scores = await statsLatestScoresRepo.getLatestScoresWithMusicData(
     userId,
     version,
   );

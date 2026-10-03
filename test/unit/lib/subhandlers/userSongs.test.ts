@@ -10,14 +10,14 @@ const getSongListMock = vi.fn();
 const getSimilarSongsMock = vi.fn();
 const getSongRankingMock = vi.fn();
 
-vi.mock("@/lib/db/domains/songs", () => ({
-  songsRepo: {
+vi.mock("@/lib/db/domains/songs/search", () => ({
+  songSearchRepo: {
     getSongList: (...a: unknown[]) => getSongListMock(...a),
     getSimilarSongs: (...a: unknown[]) => getSimilarSongsMock(...a),
   },
 }));
-vi.mock("@/lib/db/aggregates/stats/tables", () => ({
-  statsTablesRepo: {
+vi.mock("@/lib/db/aggregates/stats/songTables", () => ({
+  statsSongTablesRepo: {
     getSongRanking: (...a: unknown[]) => getSongRankingMock(...a),
   },
 }));

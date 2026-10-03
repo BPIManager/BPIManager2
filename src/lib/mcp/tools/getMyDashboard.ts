@@ -1,14 +1,14 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import dayjs from "@/lib/dayjs";
-import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
-import { rivalRepo } from "@/lib/db/aggregates/rivalScores/rival";
-import { songsRepo } from "@/lib/db/domains/songs";
-import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
+import { statsSongTablesRepo } from "@/lib/db/aggregates/stats/songTables";
+import { rivalPairwiseRepo } from "@/lib/db/aggregates/rivalScores/pairwise";
+import { songMasterRepo } from "@/lib/db/domains/songs/master";
+import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
 import { BpiCalculator } from "@/lib/bpi";
 import { dashboardSchema } from "@/lib/mcp/schemas";
 import type { IBpiBasicSongData, IBpiScoreObservation } from "@/types/songs/bpi";
 
-type HistoryRow = Awaited<ReturnType<typeof statsTablesRepo.getScoreHistory>>[number];
+type HistoryRow = Awaited<ReturnType<typeof statsSongTablesRepo.getScoreHistory>>[number];
 type MasterSong = IBpiBasicSongData & { songId: number };
 
 function toObservations(rows: HistoryRow[]): IBpiScoreObservation[] {
@@ -127,10 +127,10 @@ export function registerGetMyDashboard(server: McpServer, userId: string) {
 
       const [canonicalHistory, filteredHistory, fullMaster, closeRivalRows] =
         await Promise.all([
-          statsTablesRepo.getScoreHistory(userId, version, [12], []),
-          statsTablesRepo.getScoreHistory(userId, version, numericLevels, difficulties),
-          songsRepo.getSongMasterWithDef(),
-          rivalRepo.getScoreComparisonList({
+          statsSongTablesRepo.getScoreHistory(userId, version, [12], []),
+          statsSongTablesRepo.getScoreHistory(userId, version, numericLevels, difficulties),
+          songMasterRepo.getSongMasterWithDef(),
+          rivalPairwiseRepo.getScoreComparisonList({
             userId,
             version,
             limit: 200,
@@ -170,7 +170,7 @@ export function registerGetMyDashboard(server: McpServer, userId: string) {
         canonicalMaster,
       );
       // 他のtotalBpi算出箇所（stats/totalBpi.ts等）と同様、過去最高値を下回らないラチェットを適用する
-      const previousBest = await userStatusLogsRepo.findMaxTotalBpi(userId, version);
+      const previousBest = await userStatusLogsReadRepo.findMaxTotalBpi(userId, version);
       const totalBpi = BpiCalculator.ratchetTotalBpi(previousBest, freshTotalBpi);
       const estimatedRank = BpiCalculator.estimateRank(totalBpi);
 

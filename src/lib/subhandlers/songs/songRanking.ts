@@ -1,5 +1,5 @@
 import type { NextApiRequest } from "next";
-import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
+import { statsSongTablesRepo } from "@/lib/db/aggregates/stats/songTables";
 import { resolveOptionalUid } from "@/middlewares/api/resolveOptionalUid";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
@@ -18,7 +18,7 @@ export async function handleSongRanking(
   const version = resolveVersion(req.query.version);
   try {
     const viewerId = (await resolveOptionalUid(req)) ?? null;
-    const result = await statsTablesRepo.getSongRanking(
+    const result = await statsSongTablesRepo.getSongRanking(
       songIdNum,
       version,
       viewerId ?? undefined,
