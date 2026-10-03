@@ -51,3 +51,13 @@ export async function unlinkProvider(
   );
   return unwrapApiResponse<{ removed: string }>(res);
 }
+
+/**
+ * 連携状態を取得する。メールアドレス連携の完了直後に呼び、サーバー側のメールハッシュを Firebase の状態に揃える。
+ *
+ * @param fbUser - 対象ユーザー
+ */
+export async function syncLinkedAccounts(fbUser: FirebaseUser): Promise<void> {
+  const res = await authFetch(`${AUTH_PATH}/linked-accounts`, "GET", fbUser);
+  await unwrapApiResponse(res);
+}
