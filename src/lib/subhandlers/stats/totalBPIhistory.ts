@@ -1,8 +1,10 @@
 import type { NextApiRequest } from "next";
 import dayjs from "@/lib/dayjs";
 import { BpiCalculator } from "@/lib/bpi";
+import { db } from "@/lib/db";
 import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { songsRepo } from "@/lib/db/domains/songs";
+import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
 import { ok } from "@/middlewares/api/apiResult";
 import { groupByOf, DIFFICULTY_LABELS } from "./_shared";
 import type { StatsQuery } from "@/types/stats/query";
@@ -93,41 +95,72 @@ export async function handleStatsTotalBpiHistory(
   }[] = [];
   for (const stepKey of sortedStepKeys) {
     const stepLogs = stepGroups.get(stepKey)!;
-    stepLogs.forEach((log) => {
-      if (log.songId != null) latestExScoresBySong.set(log.songId, log.exScore);
-    });
-    const observations: IBpiScoreObservation[] = Array.from(
-      latestExScoresBySong.entries(),
-    ).map(([songId, exScore]) => ({
-      songId,
-      notes: songNotesById.get(songId) ?? 0,
-      exScore,
-    }));
-    const freshTotalBpi = BpiCalculator.calculateTotalBPI(
-      observations,
-      scopedMaster,
-    );
-    const latentSkill = BpiCalculator.estimateLatentSkill(
-      observations,
-      scopedMaster,
-    );
-    bestTotalBpiSoFar = BpiCalculator.ratchetTotalBpi(
-      bestTotalBpiSoFar,
-      freshTotalBpi,
-    );
-    const dateStr = toJSTDateStr(stepLogs[0].lastPlayed as Date | string);
-    dayTotalBpi.set(dateStr, bestTotalBpiSoFar);
-    dayRawTotalBpi.set(dateStr, freshTotalBpi);
-    dayLatentSkill.set(dateStr, latentSkill);
+
+    // 1回のバッチ（CSV同期等）が複数日分のプレイをまとめて含むことがある
+    // （例: 同期を数日空けた場合）。バッチ全体適用後の最終値を先頭ログの日付に
+    // 丸めて記録すると、実際にはまだ記録されていなかった日付に総合BPIの伸びが
+    // 先行して現れてしまうため、日付が切り替わるたびに段階的に反映する。
+    // Pass2のシーク(stepResults)にはバッチ単位のまま影響しない
+    let idx = 0;
+    let freshTotalBpi = 0;
+    let latentSkill: number | null = null;
+    while (idx < stepLogs.length) {
+      const subDateStr = toJSTDateStr(stepLogs[idx].lastPlayed as Date | string);
+      while (
+        idx < stepLogs.length &&
+        toJSTDateStr(stepLogs[idx].lastPlayed as Date | string) === subDateStr
+      ) {
+        const log = stepLogs[idx];
+        if (log.songId != null) latestExScoresBySong.set(log.songId, log.exScore);
+        idx++;
+      }
+      const observations: IBpiScoreObservation[] = Array.from(
+        latestExScoresBySong.entries(),
+      ).map(([songId, exScore]) => ({
+        songId,
+        notes: songNotesById.get(songId) ?? 0,
+        exScore,
+      }));
+      freshTotalBpi = BpiCalculator.calculateTotalBPI(observations, scopedMaster);
+      latentSkill = BpiCalculator.estimateLatentSkill(observations, scopedMaster);
+      bestTotalBpiSoFar = BpiCalculator.ratchetTotalBpi(
+        bestTotalBpiSoFar,
+        freshTotalBpi,
+      );
+      dayTotalBpi.set(subDateStr, bestTotalBpiSoFar);
+      dayRawTotalBpi.set(subDateStr, freshTotalBpi);
+      dayLatentSkill.set(subDateStr, latentSkill);
+    }
+
     const scopedCount = stepLogs.filter(
       (log) => log.songId != null && scopedSongIds.has(log.songId),
     ).length;
     stepResults.push({
       rawAfter: freshTotalBpi,
-      bestAfter: bestTotalBpiSoFar,
+      // stepLogsは必ず1件以上あるため、while内で最低1回はratchetTotalBpiが
+      // 実行されbestTotalBpiSoFarはnumberになっている
+      bestAfter: bestTotalBpiSoFar as number,
       latentSkillAfter: latentSkill,
       scopedCount,
     });
+  }
+
+  // BPIモデルの再推定等により、同じ時点を再計算しても過去にuserStatusLogsへ
+  // 記録された値より低く出ることがある（monthly-review/bpi.tsのbuildBpiTimeline
+  // と同じ理由）。記録済みの値を日付ごとの下限として合流させる
+  const recordedLogs = await userStatusLogsRepo.getTotalBpiLogsInRange(
+    q.userId,
+    q.version,
+    new Date(0),
+    endDate.endOf("day").toDate(),
+  );
+  const recordedFloorByDate = new Map<string, number>();
+  for (const log of recordedLogs) {
+    const dateStr = toJSTDateStr(log.createdAt);
+    const existing = recordedFloorByDate.get(dateStr);
+    if (existing === undefined || log.totalBpi > existing) {
+      recordedFloorByDate.set(dateStr, log.totalBpi);
+    }
   }
 
   // Pass 2: 曲単位の内訳。末尾からスコープ内プレイ数を積み上げ、ステップ境界でウィンドウを区切る
@@ -234,6 +267,7 @@ export async function handleStatsTotalBpiHistory(
   let lastKnownTotalBpi: number | null = null;
   let lastKnownRawTotalBpi: number | null = null;
   let lastKnownLatentSkill: number | null = null;
+  let recordedFloorSoFar: number | null = null;
   for (let d = startDate; !d.isAfter(endDate); d = d.add(1, "day")) {
     const dateStr = d.format("YYYY-MM-DD");
     const updatedOnThisDay = scopedLogsByDate[dateStr] || [];
@@ -267,9 +301,22 @@ export async function handleStatsTotalBpiHistory(
       lastKnownRawTotalBpi = dayRawTotalBpi.get(dateStr)!;
     if (dayLatentSkill.has(dateStr))
       lastKnownLatentSkill = dayLatentSkill.get(dateStr)!;
+    const recordedFloorToday = recordedFloorByDate.get(dateStr);
+    if (
+      recordedFloorToday !== undefined &&
+      (recordedFloorSoFar === null || recordedFloorToday > recordedFloorSoFar)
+    ) {
+      recordedFloorSoFar = recordedFloorToday;
+    }
+    const flooredTotalBpi =
+      recordedFloorSoFar === null
+        ? lastKnownTotalBpi
+        : lastKnownTotalBpi === null
+          ? recordedFloorSoFar
+          : Math.max(lastKnownTotalBpi, recordedFloorSoFar);
     trend.push({
       date: dateStr,
-      totalBpi: lastKnownTotalBpi as number,
+      totalBpi: flooredTotalBpi as number,
       rawTotalBpi: lastKnownRawTotalBpi as number,
       latentSkill: lastKnownLatentSkill,
       count: reportBpisBySong.size,
