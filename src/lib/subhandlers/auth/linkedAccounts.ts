@@ -121,12 +121,11 @@ export async function handleRequestEmailLink(
     }
 
     const owner = await userEmailHashesRepo.findUserIdByHash(hashEmail(normalized));
-    if (owner && owner.userId !== uid) {
-      return { result: err(409, "このメールアドレスは既に使用されています"), ...base };
-    }
     const takenUid = await findUidByEmail(normalized);
-    if (takenUid && takenUid !== uid) {
-      return { result: err(409, "このメールアドレスは既に使用されています"), ...base };
+    const usedByOther = (owner && owner.userId !== uid) || (takenUid !== null && takenUid !== uid);
+    if (usedByOther) {
+      // 他のユーザーが使用中かを応答で区別しない（登録済みアドレスの列挙を防ぐ）。確認メールは送らない
+      return { result: ok({ sent: true as const }), ...base };
     }
 
     if (hasEmailProvider) {
