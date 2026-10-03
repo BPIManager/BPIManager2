@@ -63,6 +63,7 @@ export interface ApiKeys {
   createdAt: Generated<Date>;
   id: Generated<number>;
   key: string;
+  keyLast4: Generated<string | null>;
   userId: string;
 }
 
@@ -72,6 +73,7 @@ export interface OauthClients {
   clientName: Generated<string | null>;
   redirectUris: string;
   clientSecret: Generated<string | null>;
+  secretLast4: Generated<string | null>;
   createdAt: Generated<Date>;
 }
 

@@ -16,8 +16,8 @@ export async function handleGetOauthClient(
       result: ok({
         exists: !!client,
         clientId: client?.clientId ?? null,
-        maskedSecret: client?.clientSecret
-          ? `****${client.clientSecret.slice(-4)}`
+        maskedSecret: client?.secretLast4
+          ? `****${client.secretLast4}`
           : null,
         redirectUris: client?.redirectUris ?? null,
       }),

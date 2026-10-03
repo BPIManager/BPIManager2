@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { createDbSpy, callsFor } from "../helpers/dbQuerySpy";
+import { hashCredential } from "@/utils/common/hashCredential";
 
 const { dbHolder } = vi.hoisted(() => ({
   dbHolder: { current: null as ReturnType<typeof import("../helpers/dbQuerySpy")["createDbSpy"]> | null },
@@ -27,18 +28,18 @@ describe("apiKeysRepo.findByKey", () => {
     expect(callsFor(dbHolder.current.calls, "where")[0].args).toEqual([
       "key",
       "=",
-      "secret-key",
+      hashCredential("secret-key"),
     ]);
   });
 });
 
 describe("apiKeysRepo.findByUserId", () => {
   it("userIdでapiKeysテーブルを検索すること", async () => {
-    dbHolder.current = createDbSpy({ key: "secret-key" });
+    dbHolder.current = createDbSpy({ keyLast4: "-key" });
 
     const result = await apiKeysRepo.findByUserId("user-1");
 
-    expect(result).toEqual({ key: "secret-key" });
+    expect(result).toEqual({ keyLast4: "-key" });
     expect(callsFor(dbHolder.current.calls, "where")[0].args).toEqual([
       "userId",
       "=",
@@ -48,7 +49,7 @@ describe("apiKeysRepo.findByUserId", () => {
 });
 
 describe("apiKeysRepo.upsert", () => {
-  it("重複時はkeyを更新するupsertを実行すること", async () => {
+  it("平文ではなくハッシュと末尾4文字を保存し、重複時は両方を更新すること", async () => {
     dbHolder.current = createDbSpy(undefined);
 
     await apiKeysRepo.upsert("user-1", "new-key");
@@ -59,10 +60,11 @@ describe("apiKeysRepo.upsert", () => {
     const valuesCall = callsFor(dbHolder.current.calls, "values")[0];
     expect(valuesCall.args[0]).toMatchObject({
       userId: "user-1",
-      key: "new-key",
+      key: hashCredential("new-key"),
+      keyLast4: "-key",
     });
     expect(
       callsFor(dbHolder.current.calls, "onDuplicateKeyUpdate")[0].args,
-    ).toEqual([{ key: "new-key" }]);
+    ).toEqual([{ key: hashCredential("new-key"), keyLast4: "-key" }]);
   });
 });
