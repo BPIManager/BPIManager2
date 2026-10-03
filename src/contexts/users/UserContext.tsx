@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import React, { createContext, useContext, useEffect, useRef, useState } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import useSWR, { KeyedMutator } from "swr";
 import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
 import { auth } from "@/lib/firebase";
@@ -103,16 +103,20 @@ export const UserProvider = ({
     );
   }, [fbUser, data?.user]);
 
+  // value を毎レンダー新規オブジェクトにすると、利用者すべてが再レンダーされるため固定する
+  const contextValue = useMemo(
+    () => ({
+      user: data?.user || null,
+      isLoading: combinedLoading,
+      error,
+      refresh: mutate,
+      fbUser,
+    }),
+    [data?.user, combinedLoading, error, mutate, fbUser],
+  );
+
   return (
-    <UserContext.Provider
-      value={{
-        user: data?.user || null,
-        isLoading: combinedLoading,
-        error,
-        refresh: mutate,
-        fbUser,
-      }}
-    >
+    <UserContext.Provider value={contextValue}>
       {children}
     </UserContext.Provider>
   );
