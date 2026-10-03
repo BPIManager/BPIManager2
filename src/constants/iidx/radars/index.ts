@@ -1,5 +1,6 @@
 /** レーダーチャートのカテゴリ・カラー定数 */
 import type { RadarCategory } from "@/types/stats/radar";
+import { ARENA_CLASS_COLORS } from "@/constants/iidx/arenaClassColors";
 
 export const ALL_RADAR_CATEGORIES: RadarCategory[] = [
   "NOTES",
@@ -19,10 +20,8 @@ export const RADAR_COLORS: Record<RadarCategory, string> = {
   SOFLAN: "#facc15",
 };
 
-export const ARENA_RANK_COLORS: Record<string, string> = {
-  A1: "#fbbf24",
-  A2: "#f59e0b",
-  A3: "#fb923c",
-  A4: "#f97316",
-  A5: "#ef4444",
-};
+export const ARENA_RANK_COLORS: Record<string, string> = Object.fromEntries(
+  Object.entries(ARENA_CLASS_COLORS)
+    .filter(([rank]) => rank.startsWith("A"))
+    .map(([rank, color]) => [rank, color.text]),
+);

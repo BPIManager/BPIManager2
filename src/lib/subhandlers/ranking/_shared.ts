@@ -12,6 +12,12 @@ export interface HandleOutcome<T> {
   viewerId: string | null;
 }
 
+import type { RadarCategory as CanonicalRadarCategory } from "@/types/stats/radar";
+
+/**
+ * API のクエリ値（小文字）。レーダーカテゴリの正規の型（大文字）から導出し、
+ * 網羅性は下の型チェックで担保する（値そのものは API 形式として変えない）。
+ */
 export const RADAR_CATEGORIES = [
   "notes",
   "chord",
@@ -20,7 +26,14 @@ export const RADAR_CATEGORIES = [
   "scratch",
   "soflan",
 ] as const;
-export type RadarCategory = (typeof RADAR_CATEGORIES)[number];
+export type RadarCategory = Lowercase<CanonicalRadarCategory>;
+type _AllRadarCategoriesListed = Exclude<
+  RadarCategory,
+  (typeof RADAR_CATEGORIES)[number]
+> extends never
+  ? true
+  : never;
+const _allRadarCategoriesListed: _AllRadarCategoriesListed = true;
 
 export function targetOf(req: AuthenticatedNextApiRequest): string {
   return typeof req.query.userId === "string" ? req.query.userId : req.authUid;
