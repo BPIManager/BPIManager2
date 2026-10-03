@@ -9,7 +9,7 @@ import AccountSettingsUi from "@/components/partials/features/Settings/AccountSe
 import LinkedAccountsUi from "@/components/partials/features/Settings/LinkedAccounts";
 import AccountDeletionUi from "@/components/partials/features/Settings/AccountDeletion/ui";
 import ApiKeyUi from "@/components/partials/features/Settings/APIKey/ui";
-import OAuthClientUi from "@/components/partials/features/Settings/OAuthClient/ui";
+import OAuthClientUi from "@/components/partials/features/Settings/OAuthClient";
 import { Meta } from "@/components/partials/common/PageChrome/Head";
 import { PageLoader } from "@/components/ui/loading-spinner";
 import ThemeSettingsUi from "@/components/partials/features/Settings/ThemeSettings/ui";

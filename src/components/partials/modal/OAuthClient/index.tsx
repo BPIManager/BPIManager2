@@ -8,6 +8,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { KeyRound, Copy, RefreshCw, Trash2 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
@@ -20,7 +27,40 @@ function parseRedirectUris(raw: string) {
     .filter(Boolean);
 }
 
-export default function OAuthClientUi() {
+interface Props {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+/**
+ * MCP接続（OAuth）の管理モーダル。Client ID / Secret の発行・再発行・削除を扱う。
+ */
+export default function OAuthClientModal({ open, onOpenChange }: Props) {
+  const { t } = useTranslation();
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="flex max-h-[90vh] sm:max-w-2xl flex-col overflow-hidden rounded-2xl border-bpim-border bg-bpim-bg p-0 shadow-2xl">
+        <DialogHeader className="shrink-0 border-b border-bpim-border px-6 py-4">
+          <div className="flex items-center gap-3">
+            <KeyRound className="h-5 w-5 text-bpim-muted" />
+            <DialogTitle className="text-lg font-bold tracking-tight text-bpim-text">
+              {t("settings.oauthClient.title")}
+            </DialogTitle>
+          </div>
+          <DialogDescription className="text-sm text-bpim-muted">
+            {t("settings.oauthClient.desc")}
+          </DialogDescription>
+        </DialogHeader>
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
+          <OAuthClientContent />
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function OAuthClientContent() {
   const { clientInfo, issue, remove, isLoading } = useOAuthClient();
   const [redirectUrisInput, setRedirectUrisInput] = useState("");
   const [issuedSecret, setIssuedSecret] = useState<string | null>(null);
@@ -71,17 +111,7 @@ export default function OAuthClientUi() {
   };
 
   return (
-    <div className="mt-4 flex flex-col gap-6 rounded-xl border border-bpim-border bg-bpim-bg p-6">
-      <div className="flex flex-col gap-1">
-        <div className="flex items-center gap-2 text-bpim-primary">
-          <KeyRound className="h-4 w-4" />
-          <span className="font-bold">{t("settings.oauthClient.title")}</span>
-        </div>
-        <p className="text-sm text-bpim-muted">
-          {t("settings.oauthClient.desc")}
-        </p>
-      </div>
-
+    <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
         <span className="text-xs font-bold text-bpim-muted">
           {t("settings.oauthClient.mcpEndpointLabel")}
