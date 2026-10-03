@@ -23,13 +23,13 @@ vi.mock("@/lib/db/aggregates/allScores", () => ({
     getAllScoresList: (...a: unknown[]) => getAllScoresListMock(...a),
     getRivalScoresForAllSong: (...a: unknown[]) =>
       getRivalScoresForAllSongMock(...a),
+    getAllSongRanking: (...a: unknown[]) => getAllSongRankingMock(...a),
   },
 }));
 
 vi.mock("@/lib/db/domains/allScores", () => ({
   allScoresRepo: {
     getScoreHistory: (...a: unknown[]) => getScoreHistoryMock(...a),
-    getAllSongRanking: (...a: unknown[]) => getAllSongRankingMock(...a),
   },
 }));
 

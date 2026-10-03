@@ -19,7 +19,7 @@ export type ScoreHistory = Awaited<
   ReturnType<typeof allScoresRepo.getScoreHistory>
 >;
 export type AllSongRanking = Awaited<
-  ReturnType<typeof allScoresRepo.getAllSongRanking>
+  ReturnType<typeof allScoresAggregateRepo.getAllSongRanking>
 >;
 
 export interface AllSongRivalsBody {

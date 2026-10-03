@@ -2,7 +2,6 @@ import { db } from "@/lib/db";
 import { Database, NewAllScores } from "@/types/db";
 import { Transaction } from "kysely";
 import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore";
-import { getSongRankingFromTable } from "@/lib/db/aggregates/songRanking";
 
 /**
  * 全難易度スコア（`allScores` テーブル）の参照を担当するリポジトリクラス。
@@ -27,24 +26,6 @@ class allScoresRepository {
       )
       .selectAll("allScores")
       .execute();
-  }
-
-  /**
-   * 指定楽曲のグローバルランキングを取得する（allScores テーブル使用）
-   *
-   * `users`と横断する集計のため、実体は`aggregates/songRanking`に委譲する。
-   *
-   * @param songId - 楽曲 ID
-   * @param version - バージョン番号
-   * @param viewerId - 閲覧者のユーザー ID（自分自身の判定に使用）
-   */
-  async getAllSongRanking(songId: number, version: string, viewerId: string) {
-    return getSongRankingFromTable({
-      table: "allScores",
-      songId,
-      version,
-      viewerId,
-    });
   }
 
   /**
