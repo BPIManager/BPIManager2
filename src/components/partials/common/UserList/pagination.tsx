@@ -17,6 +17,7 @@ const Pagination = ({ p, hasMore, onPageChange }: Props) => {
         <Button
           variant="ghost"
           size="icon"
+          aria-label={t("common.pagination.first")}
           onClick={() => onPageChange(1)}
           className="h-9 w-9"
         >
@@ -27,6 +28,7 @@ const Pagination = ({ p, hasMore, onPageChange }: Props) => {
         variant="outline"
         size="sm"
         disabled={p <= 1}
+        aria-label={t("common.pagination.prev")}
         onClick={() => onPageChange(p - 1)}
         className="gap-1 px-3"
       >
@@ -44,6 +46,7 @@ const Pagination = ({ p, hasMore, onPageChange }: Props) => {
         variant="outline"
         size="sm"
         disabled={!hasMore}
+        aria-label={t("common.pagination.next")}
         onClick={() => onPageChange(p + 1)}
         className="gap-1 px-3"
       >

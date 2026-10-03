@@ -102,7 +102,9 @@ export const FilterStickyToggle = ({
 }: {
   isSticky: boolean;
   onToggle: (val: boolean) => void;
-}) => (
+}) => {
+  const { t } = useTranslation();
+  return (
   <Button
     variant="ghost"
     size="icon"
@@ -112,11 +114,14 @@ export const FilterStickyToggle = ({
         ? "text-bpim-primary bg-bpim-primary/10"
         : "text-bpim-muted hover:text-bpim-text hover:bg-bpim-overlay/50",
     )}
+    aria-label={isSticky ? t("common.sticky.unpin") : t("common.sticky.pin")}
+    aria-pressed={isSticky}
     onClick={() => onToggle(!isSticky)}
   >
     {isSticky ? <Pin size={14} /> : <PinOff size={14} />}
   </Button>
 );
+}
 
 export const FilterBarContainer = ({
   totalCount,

@@ -1,4 +1,10 @@
 export const notificationsTranslations = {
+  "notifications.trigger.label": {
+    ja: "通知",
+    en: "Notifications",
+    "zh-TW": "通知",
+    ko: "알림",
+  },
   "notifications.tab.all": {
     ja: "すべて",
     en: "All",
