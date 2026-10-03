@@ -91,7 +91,7 @@ describe("handleAllScoresList", () => {
     checkProfileAccessMock.mockResolvedValue(grant("target"));
     getAllScoresListMock.mockRejectedValue(new Error("db down"));
     const { result } = await handleAllScoresList(req({ userId: "target" }));
-    expect(result).toEqual({ ok: false, status: 500, message: "db down" });
+    expect(result).toEqual({ ok: false, status: 500, message: "Internal Server Error" });
   });
 });
 

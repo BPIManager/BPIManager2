@@ -15,11 +15,12 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
   try {
     writeV1Result(res, await getUnreadCount(req.authUid));
   } catch (error: unknown) {
+    console.error(error);
     writeV1Result(
       res,
       err(
         500,
-        error instanceof Error ? error.message : "Internal Server Error",
+        "Internal Server Error",
       ),
     );
   }

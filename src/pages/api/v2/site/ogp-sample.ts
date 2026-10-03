@@ -10,7 +10,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const png = await generateSampleMonthlyReviewOgpImage();
     res.status(200).send(png);
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Internal Server Error";
+    console.error(error);
+    const message = "Internal Server Error";
     res.status(500).json({ message });
   }
 }

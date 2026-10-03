@@ -52,7 +52,7 @@ async function handler(
   } catch (error: unknown) {
     console.error("OAuth Consent Error:", error);
     const errorMessage =
-      error instanceof Error ? error.message : "Internal Server Error";
+      "Internal Server Error";
     return res.status(500).json({ message: errorMessage });
   }
 }
