@@ -205,7 +205,6 @@ export class BpiImportService {
       userId,
       scoreUpdates: allScoreUpdates,
       statusLogs: allStatusLogs,
-      finalTotalBpi: latestBpi,
     });
 
     return { totalProcessed: allScoreUpdates.length };

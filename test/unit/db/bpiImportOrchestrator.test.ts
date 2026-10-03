@@ -120,7 +120,6 @@ describe("bpiImportOrchestrator.importFromBPIM", () => {
       userId: "user-1",
       scoreUpdates: [],
       statusLogs: [],
-      finalTotalBpi: -15,
     });
 
     const deleteCalls = callsFor(spy.calls, "deleteFrom");
@@ -140,7 +139,6 @@ describe("bpiImportOrchestrator.importFromBPIM", () => {
       userId: "user-1",
       scoreUpdates: [{ songId: 1 } as never],
       statusLogs: [{ userId: "user-1" } as never],
-      finalTotalBpi: 30,
     });
 
     const insertCalls = callsFor(spy.calls, "insertInto");
@@ -163,7 +161,6 @@ describe("bpiImportOrchestrator.importFromBPIM", () => {
       userId: "user-1",
       scoreUpdates,
       statusLogs: [],
-      finalTotalBpi: 30,
     });
 
     const insertCalls = callsFor(spy.calls, "insertInto").filter(
