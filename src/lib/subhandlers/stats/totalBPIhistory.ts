@@ -53,7 +53,10 @@ export async function handleStatsTotalBpiHistory(
   const reportBpisBySong = new Map<number, number>();
   const reportExScoresBySong = new Map<number, number>();
   const startDate = dayjs(scopedLogs[0].lastPlayed).tz().startOf("day");
-  const endDate = dayjs(scopedLogs[scopedLogs.length - 1].lastPlayed)
+  // プレイ記録と無関係にuserStatusLogsへ記録が追加されるケース(プロフィール編集等、
+  // userProfileUpsert参照)があるため、最終プレイ日より後の記録日がある場合は
+  // 下記recordedLogs取得後にendDateを延長する
+  let endDate = dayjs(scopedLogs[scopedLogs.length - 1].lastPlayed)
     .tz()
     .startOf("day");
 
@@ -152,11 +155,13 @@ export async function handleStatsTotalBpiHistory(
     q.userId,
     q.version,
     new Date(0),
-    endDate.endOf("day").toDate(),
+    new Date(),
   );
   const recordedFloorByDate = new Map<string, number>();
   for (const log of recordedLogs) {
     const dateStr = toJSTDateStr(log.createdAt);
+    const recordedDay = dayjs.tz(dateStr);
+    if (recordedDay.isAfter(endDate)) endDate = recordedDay;
     const existing = recordedFloorByDate.get(dateStr);
     if (existing === undefined || log.totalBpi > existing) {
       recordedFloorByDate.set(dateStr, log.totalBpi);
