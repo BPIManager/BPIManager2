@@ -13,8 +13,8 @@ vi.mock("@/lib/db", () => ({
 }));
 
 const getMaxTotalBpiMock = vi.fn().mockResolvedValue(null);
-vi.mock("@/lib/db/domains/userStatusLogs", () => ({
-  userStatusLogsRepo: {
+vi.mock("@/lib/db/domains/userStatusLogs/read", () => ({
+  userStatusLogsReadRepo: {
     findMaxTotalBpi: (...a: unknown[]) => getMaxTotalBpiMock(...a),
   },
 }));
