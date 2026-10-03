@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 import { v4 as uuidv4 } from "uuid";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { iidxTowerAggregateRepo } from "@/lib/db/aggregates/iidxTower";
-import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
+import { statsLatestScoresRepo } from "@/lib/db/aggregates/stats/latestScores";
 import { maskPrivateIdentity } from "@/lib/db/shared/privacyMask";
 import { canViewUserData } from "@/lib/db/shared/visibility";
 import { calculateRadar, buildRadarSongMaster } from "@/lib/radar/calculator";
@@ -30,7 +30,7 @@ export async function handleTowerRanking(
   try {
     const [rows, viewerScores, fullMaster] = await Promise.all([
       iidxTowerAggregateRepo.getTowerRanking({ version, startDate, endDate }),
-      statsTablesRepo.getLatestScoresWithMusicData(viewerId, latestVersion),
+      statsLatestScoresRepo.getLatestScoresWithMusicData(viewerId, latestVersion),
       songMasterRepo.getSongMasterWithDef(),
     ]);
 

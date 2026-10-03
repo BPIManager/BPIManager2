@@ -1,4 +1,4 @@
-import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
+import { statsLatestScoresRepo } from "@/lib/db/aggregates/stats/latestScores";
 import { RANK_TABLE } from "@/constants/iidx/rankBorders";
 import { ok } from "@/middlewares/api/apiResult";
 import type { StatsQuery } from "@/types/stats/query";
@@ -7,7 +7,7 @@ import type { HandlerResult } from "@/types/api";
 export async function handleStatsDjRankDistribution(
   q: StatsQuery,
 ): Promise<HandlerResult<unknown>> {
-  const scores = await statsTablesRepo.getLatestScoresWithMusicData(
+  const scores = await statsLatestScoresRepo.getLatestScoresWithMusicData(
     q.userId,
     q.version,
   );

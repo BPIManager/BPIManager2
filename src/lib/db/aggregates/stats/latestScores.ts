@@ -1,13 +1,9 @@
 import { db } from "@/lib/db";
-import { IIDXVersion } from "@/types/iidx/version";
-import {
-  correlatedLatestLogId,
-  latestLogIdPerSongSubquery,
-  latestLogIdPerUserSongSubquery,
-} from "@/lib/db/shared/latestScore";
-import { getSongRankingFromTable } from "@/lib/db/aggregates/songRanking";
+
+import { latestLogIdPerSongSubquery, latestLogIdPerUserSongSubquery } from "@/lib/db/shared/latestScore";
+
 import { logTotalBpiRepo } from "@/lib/db/domains/logs/totalBpi";
-import { songMasterRepo } from "@/lib/db/domains/songs/master";
+
 
 /**
  * {@link StatsTablesRepository.getLatestScoresWithMusicData}の結果をキャッシュする
@@ -18,15 +14,14 @@ import { songMasterRepo } from "@/lib/db/domains/songs/master";
 const LATEST_SCORES_CACHE_TTL_MS = 5000;
 
 /**
- * 統計ダッシュボード向けの表形式データ（AAA表・スコア履歴・楽曲ランキング等）を
- * 担当するリポジトリクラス。
+ * 統計テーブル向けの最新スコア（音楽情報付き）と総合BPIの参照を担当するリポジトリクラス。
  */
-class StatsTablesRepository {
+class StatsLatestScoresRepository {
   private latestScoresWithMusicDataCache = new Map<
     string,
     {
       data: Awaited<
-        ReturnType<StatsTablesRepository["fetchLatestScoresWithMusicData"]>
+        ReturnType<StatsLatestScoresRepository["fetchLatestScoresWithMusicData"]>
       >;
       expiresAt: number;
     }
@@ -38,53 +33,7 @@ class StatsTablesRepository {
   }
 
   // songs・scores・songDefを横断JOINしたAAA表データ集計のため、直接クエリを維持する。
-  async getAAATableData(userId: string, version: IIDXVersion, level: number) {
-    const isInf = version === "INF";
-    const versionNum = isInf ? null : parseInt(version);
 
-    return await db
-      .selectFrom("songs as m")
-      .innerJoin("songDef as d", (join) =>
-        join.onRef("d.songId", "=", "m.songId").on("d.isCurrent", "=", 1),
-      )
-      .leftJoin("scores as s", (join) =>
-        join
-          .onRef("s.songId", "=", "m.songId")
-          .on("s.userId", "=", userId)
-          .on("s.version", "=", version)
-          .on("s.logId", "=", (eb) =>
-            correlatedLatestLogId(eb, {
-              table: "scores",
-              alias: "s2",
-              songIdRef: "m.songId",
-              version,
-              userId,
-            }),
-          ),
-      )
-      .select([
-        "m.songId",
-        "m.title",
-        "m.notes",
-        "m.difficulty",
-        "m.difficultyLevel",
-        "m.releasedVersion",
-        "d.wrScore",
-        "d.kaidenAvg",
-        "d.coef",
-        "d.mu",
-        "d.sigma",
-        "d.residualVar",
-        "s.exScore as userExScore",
-        "s.bpi as userBpi",
-      ])
-      .where("m.difficultyLevel", "=", level)
-      .$if(!isInf, (qb) => qb.where("m.releasedVersion", "<=", versionNum!))
-      .orderBy("m.title", "asc")
-      .execute();
-  }
-
-  // scores・songs・songDefを横断JOINした一覧取得のため、直接クエリを維持する。
   async getLatestScoresWithMusicData(
     userId: string,
     version: string,
@@ -237,124 +186,6 @@ class StatsTablesRepository {
   }
 
   // scores・songsを横断JOINしたスコア推移集計のため、直接クエリを維持する。
-  async getScoreHistory(
-    userId: string,
-    version: string,
-    levels: number[],
-    difficulties: string[],
-  ) {
-    let query = db
-      .selectFrom("scores as s")
-      .innerJoin("songs as m", "s.songId", "m.songId")
-      .select([
-        "s.logId",
-        "s.songId",
-        "s.bpi",
-        "s.exScore",
-        "s.lastPlayed",
-        "s.batchId",
-        "m.title",
-        "m.notes",
-        "m.difficulty",
-        "m.difficultyLevel",
-      ])
-      .where("s.userId", "=", userId)
-      .where("s.version", "=", version)
-      .where("s.songId", "is not", null);
-
-    if (levels.length > 0) {
-      query = query.where("m.difficultyLevel", "in", levels);
-    }
-    if (difficulties.length > 0) {
-      query = query.where("m.difficulty", "in", difficulties);
-    }
-
-    return await query
-      .orderBy("s.lastPlayed", "asc")
-      .orderBy("s.logId", "asc")
-      .execute();
-  }
-
-  async getSongRanking(songId: number, version: string, viewerId: string) {
-    return getSongRankingFromTable({
-      table: "scores",
-      songId,
-      version,
-      viewerId,
-    });
-  }
-
-  async getTotalSongCount(
-    levels: number[],
-    difficulties: string[],
-  ): Promise<number> {
-    return songMasterRepo.getCount(levels, difficulties);
-  }
-
-  async getFilteredSongKeys(
-    version: IIDXVersion,
-    levels?: number[],
-    difficulties?: string[],
-  ): Promise<Set<string>> {
-    const rows = await songMasterRepo.getFilteredTitleDifficultyPairs(
-      version,
-      levels,
-      difficulties,
-    );
-    return new Set(rows.map((r) => `${r.title}___${r.difficulty}`));
-  }
-
-  // 曲ごとの全ユーザー順位・総プレイヤー数は songRankingCache（cronで事前算出）から取得し、
-  // ユーザー自身の最新スコアのみその場でJOINする。allSongsとの横断JOINのため直接クエリを維持する。
-  async getUserSongRankings(userId: string, version: string) {
-    const rows = await db
-      .selectFrom("allScores as s")
-      .innerJoin(
-        (qb) =>
-          qb
-            .selectFrom("allScores")
-            .select(["songId", (eb) => eb.fn.max("logId").as("maxLogId")])
-            .where("userId", "=", userId)
-            .where("version", "=", version)
-            .groupBy("songId")
-            .as("m"),
-        (join) => join.onRef("m.maxLogId", "=", "s.logId"),
-      )
-      .innerJoin("songRankingCache as src", (join) =>
-        join
-          .onRef("src.songId", "=", "s.songId")
-          .on("src.userId", "=", userId)
-          .on("src.version", "=", version),
-      )
-      .innerJoin("allSongs as sg", "sg.songId", "s.songId")
-      .where("s.userId", "=", userId)
-      .select([
-        "s.songId",
-        "sg.title",
-        "sg.notes",
-        "sg.bpm",
-        "sg.difficulty",
-        "sg.difficultyLevel",
-        "sg.releasedVersion",
-        "s.logId",
-        "s.exScore",
-        "s.bpi",
-        "s.clearState",
-        "s.missCount",
-        "s.lastPlayed",
-        "src.rank",
-        "src.totalPlayers",
-      ])
-      .orderBy("src.rank", "asc")
-      .execute();
-
-    return rows.map((r) => ({
-      ...r,
-      rank: Number(r.rank),
-      totalPlayers: Number(r.totalPlayers),
-      bpi: r.bpi !== null && r.bpi !== undefined ? Number(r.bpi) : null,
-    }));
-  }
 }
 
-export const statsTablesRepo = new StatsTablesRepository();
+export const statsLatestScoresRepo = new StatsLatestScoresRepository();

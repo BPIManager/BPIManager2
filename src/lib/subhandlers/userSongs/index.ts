@@ -1,4 +1,4 @@
-import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
+import { statsSongTablesRepo } from "@/lib/db/aggregates/stats/songTables";
 import { songSearchRepo } from "@/lib/db/domains/songs/search";
 import { resolveVersion } from "@/lib/subhandlers/shared";
 import { err, ok } from "@/middlewares/api/apiResult";
@@ -49,7 +49,7 @@ export async function handleUserSongRanking(
     return { result: err(400, "Invalid songId"), targetUserId, viewerId };
   }
 
-  const result = await statsTablesRepo.getSongRanking(
+  const result = await statsSongTablesRepo.getSongRanking(
     songIdNum,
     resolveVersion(req.query.version),
     access.user!.userId,

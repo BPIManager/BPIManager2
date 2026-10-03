@@ -1,6 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import dayjs from "@/lib/dayjs";
-import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
+import { statsSongTablesRepo } from "@/lib/db/aggregates/stats/songTables";
 import { rivalPairwiseRepo } from "@/lib/db/aggregates/rivalScores/pairwise";
 import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
@@ -8,7 +8,7 @@ import { BpiCalculator } from "@/lib/bpi";
 import { dashboardSchema } from "@/lib/mcp/schemas";
 import type { IBpiBasicSongData, IBpiScoreObservation } from "@/types/songs/bpi";
 
-type HistoryRow = Awaited<ReturnType<typeof statsTablesRepo.getScoreHistory>>[number];
+type HistoryRow = Awaited<ReturnType<typeof statsSongTablesRepo.getScoreHistory>>[number];
 type MasterSong = IBpiBasicSongData & { songId: number };
 
 function toObservations(rows: HistoryRow[]): IBpiScoreObservation[] {
@@ -127,8 +127,8 @@ export function registerGetMyDashboard(server: McpServer, userId: string) {
 
       const [canonicalHistory, filteredHistory, fullMaster, closeRivalRows] =
         await Promise.all([
-          statsTablesRepo.getScoreHistory(userId, version, [12], []),
-          statsTablesRepo.getScoreHistory(userId, version, numericLevels, difficulties),
+          statsSongTablesRepo.getScoreHistory(userId, version, [12], []),
+          statsSongTablesRepo.getScoreHistory(userId, version, numericLevels, difficulties),
           songMasterRepo.getSongMasterWithDef(),
           rivalPairwiseRepo.getScoreComparisonList({
             userId,

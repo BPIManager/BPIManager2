@@ -1,7 +1,7 @@
 import dayjs from "@/lib/dayjs";
 import { rivalOvertakenRepo } from "@/lib/db/aggregates/rivalScores/overtaken";
 import { rivalAggregateRepo } from "@/lib/db/aggregates/rivalScores/aggregate";
-import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
+import { statsSongTablesRepo } from "@/lib/db/aggregates/stats/songTables";
 import { scoreDetailRepo } from "@/lib/db/domains/scores/detail";
 import { logRangeRepo } from "@/lib/db/domains/logs/range";
 import { songMasterRepo } from "@/lib/db/domains/songs/master";
@@ -70,7 +70,7 @@ export async function handleLastPlayedBase(
 
   const [history, fullMaster, dailyScores, overtaken, rivalScores, versionOvertakenMap] =
     await Promise.all([
-      statsTablesRepo.getScoreHistory(uid, ver, [], []),
+      statsSongTablesRepo.getScoreHistory(uid, ver, [], []),
       songMasterRepo.getSongMasterWithDef(),
       type === "day"
         ? scoreDetailRepo.getScoresByLastPlayedRange(uid, ver, range)

@@ -1,7 +1,7 @@
 import { calculateRadar, buildRadarSongMaster } from "@/lib/radar/calculator";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { BpiCalculator } from "@/lib/bpi";
-import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
+import { statsLatestScoresRepo } from "@/lib/db/aggregates/stats/latestScores";
 import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { usersRepo } from "@/lib/db/domains/users";
 import {
@@ -11,7 +11,7 @@ import {
 import type { IBpiBasicSongData, IBpiScoreObservation } from "@/types/songs/bpi";
 
 /**
- * {@link statsTablesRepo.getLatestScoresWithMusicDataForAllUsers}を1回呼ぶ際に
+ * {@link statsLatestScoresRepo.getLatestScoresWithMusicDataForAllUsers}を1回呼ぶ際に
  * 対象とするユーザー数の上限。PM2の`max_memory_restart`（deploy/ecosystem.config.js）を
  * 超えないよう、スコア行をメモリ上に保持する範囲をこのページ単位に抑える。
  */
@@ -47,7 +47,7 @@ export async function updateAllUserRadarCache() {
   ) {
     const userPage = users.slice(pageStart, pageStart + USER_PAGE_SIZE);
     const pageScores =
-      await statsTablesRepo.getLatestScoresWithMusicDataForAllUsers(
+      await statsLatestScoresRepo.getLatestScoresWithMusicDataForAllUsers(
         version,
         userPage.map((u) => u.userId),
       );

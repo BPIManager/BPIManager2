@@ -1,5 +1,5 @@
 import type { NextApiRequest } from "next";
-import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
+import { statsLatestScoresRepo } from "@/lib/db/aggregates/stats/latestScores";
 import { userDiscoveryRepo } from "@/lib/db/aggregates/userProfiles/discovery";
 import { logTotalBpiRepo } from "@/lib/db/domains/logs/totalBpi";
 import { songMasterRepo } from "@/lib/db/domains/songs/master";
@@ -50,7 +50,7 @@ export async function handleRivalSuggestions(
     const version = resolveVersion(v);
     const filters = parseFilters(req.query);
     const [viewerScores, fullMaster] = await Promise.all([
-      statsTablesRepo.getLatestScoresWithMusicData(viewerId, version),
+      statsLatestScoresRepo.getLatestScoresWithMusicData(viewerId, version),
       songMasterRepo.getSongMasterWithDef(),
     ]);
     const viewerRadar = calculateRadar(viewerScores, buildRadarSongMaster(fullMaster));
