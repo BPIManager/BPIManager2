@@ -1,21 +1,22 @@
 import { useEffect, useMemo, useState } from "react";
-import { Search, CircleDashed, ArrowLeft } from "lucide-react";
+import { SongSearchStep } from "./search";
+import { SongEditStep } from "./edit";
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+
 import { getRankDetail } from "@/constants/iidx/rankBorders";
-import { ALL_RADAR_CATEGORIES } from "@/constants/iidx/radars";
+
 import { BpiCalculator } from "@/lib/bpi";
 
 import type { RadarCategory } from "@/types/stats/radar";
-import { MiniBpiChip } from "@/components/partials/common/OptimizerGoalCard";
-import { RADAR_LABELS } from "../../shared";
-import DifficultyBadge from "../../DifficultyBadge";
+
+
 import { useSongSearch, type SongSearchResult, type BpmBand } from "@/hooks/songs/useSongSearch";
 import { useTranslation } from "@/hooks/common/useTranslation";
-import { SearchMode, SEARCH_MODES, BPM_BANDS, SongSortOrder, SONG_SORT_ORDERS, CustomGoalTargetInput } from "@/components/partials/features/Analytics/BpiOptimizer/ui/CustomGoal/SongTargetModal/types";
-import { toBpiSongData, quickScoreOptions, bpiQuickOptions, scoreRate } from "@/components/partials/features/Analytics/BpiOptimizer/ui/CustomGoal/SongTargetModal/quickOptions";
+import { SearchMode, SongSortOrder, CustomGoalTargetInput } from "@/components/partials/features/Analytics/BpiOptimizer/ui/CustomGoal/SongTargetModal/types";
+import { toBpiSongData, scoreRate } from "@/components/partials/features/Analytics/BpiOptimizer/ui/CustomGoal/SongTargetModal/quickOptions";
 
 export const SongTargetModal = ({
   isOpen,
@@ -188,288 +189,38 @@ export const SongTargetModal = ({
         </DialogHeader>
 
         {!selectedSong ? (
-          <div className="flex min-w-0 flex-col gap-3">
-            <div className="flex min-w-0 gap-1 rounded-lg bg-bpim-overlay/30 p-1">
-              {SEARCH_MODES.map((mode) => (
-                <button
-                  key={mode}
-                  type="button"
-                  onClick={() => setSearchMode(mode)}
-                  className={cn(
-                    "flex-1 truncate rounded-md py-1.5 text-[11px] font-bold transition-colors",
-                    searchMode === mode
-                      ? "bg-bpim-primary text-white"
-                      : "text-bpim-muted hover:text-bpim-text",
-                  )}
-                >
-                  {t(`optimizer.customGoal.searchMode.${mode}`)}
-                </button>
-              ))}
-            </div>
-
-            {searchMode === "title" && (
-              <div className="relative">
-                <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-bpim-muted" />
-                <Input
-                  autoFocus
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder={t("optimizer.customGoal.searchPlaceholder")}
-                  className="pl-8 h-9"
-                />
-              </div>
-            )}
-
-            {searchMode === "radar" && (
-              <div className="flex min-w-0 flex-col gap-2">
-                <div className="flex min-w-0 flex-wrap gap-1.5">
-                  {ALL_RADAR_CATEGORIES.map((cat) => (
-                    <Button
-                      key={cat}
-                      type="button"
-                      variant={radarCategory === cat ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setRadarCategory(cat)}
-                    >
-                      {RADAR_LABELS[cat]}
-                    </Button>
-                  ))}
-                </div>
-                {radarCategory != null && (
-                  <div className="relative">
-                    <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-bpim-muted" />
-                    <Input
-                      value={query}
-                      onChange={(e) => setQuery(e.target.value)}
-                      placeholder={t("optimizer.customGoal.filterByTitle")}
-                      className="pl-8 h-9"
-                    />
-                  </div>
-                )}
-              </div>
-            )}
-
-            {searchMode === "bpm" && (
-              <div className="flex min-w-0 flex-col gap-2">
-                <div className="flex min-w-0 flex-wrap gap-1.5">
-                  {BPM_BANDS.map((band) => (
-                    <Button
-                      key={band}
-                      type="button"
-                      variant={bpmBand === band ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setBpmBand(band)}
-                    >
-                      {t(`optimizer.customGoal.bpmBand.${band}`)}
-                    </Button>
-                  ))}
-                </div>
-                {bpmBand != null && (
-                  <div className="relative">
-                    <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-bpim-muted" />
-                    <Input
-                      value={query}
-                      onChange={(e) => setQuery(e.target.value)}
-                      placeholder={t("optimizer.customGoal.filterByTitle")}
-                      className="pl-8 h-9"
-                    />
-                  </div>
-                )}
-              </div>
-            )}
-
-            {hasBrowseSelection && (
-              <div className="flex min-w-0 flex-wrap gap-1.5">
-                {SONG_SORT_ORDERS.map((order) => (
-                  <Button
-                    key={order}
-                    type="button"
-                    variant={sortOrder === order ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setSortOrder(order)}
-                  >
-                    {t(`optimizer.customGoal.sortOrder.${order}`)}
-                  </Button>
-                ))}
-              </div>
-            )}
-
-            <div className="flex min-w-0 max-h-72 flex-col gap-1 overflow-x-hidden overflow-y-auto custom-scrollbar">
-              {isLoading && (
-                <div className="flex items-center justify-center py-8">
-                  <CircleDashed className="h-4 w-4 animate-spin text-bpim-muted" />
-                </div>
-              )}
-              {!isLoading &&
-                hasBrowseSelection &&
-                displaySongRows.length === 0 && (
-                  <p className="py-8 text-center text-xs text-bpim-subtle">
-                    {t("optimizer.customGoal.noResults")}
-                  </p>
-                )}
-              {displaySongRows.map(({ song, currentEx, currentBpi }) => (
-                <button
-                  key={`${song.songId}`}
-                  onClick={() => setSelectedSong(song)}
-                  className="flex w-full min-w-0 items-center gap-2 rounded-lg px-2 py-2 text-left hover:bg-bpim-overlay/50 transition-colors"
-                >
-                  <DifficultyBadge difficulty={song.difficulty} size="xs" />
-                  <span className="min-w-0 flex-1 truncate text-sm text-bpim-text">
-                    {song.title}
-                  </span>
-                  <div className="flex w-14 shrink-0 flex-col items-end gap-0.5">
-                    <span className="font-mono text-xs font-bold text-bpim-text">
-                      {currentEx != null ? currentEx : "-"}
-                    </span>
-                    <span className="font-mono text-[10px] text-bpim-muted">
-                      {currentBpi != null ? `BPI ${currentBpi.toFixed(2)}` : "-"}
-                    </span>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
+          <SongSearchStep
+            query={query}
+            setQuery={setQuery}
+            searchMode={searchMode}
+            setSearchMode={setSearchMode}
+            radarCategory={radarCategory}
+            setRadarCategory={setRadarCategory}
+            bpmBand={bpmBand}
+            setBpmBand={setBpmBand}
+            sortOrder={sortOrder}
+            setSortOrder={setSortOrder}
+            hasBrowseSelection={hasBrowseSelection}
+            isLoading={isLoading}
+            displaySongRows={displaySongRows}
+            setSelectedSong={setSelectedSong}
+            t={t}
+          />
         ) : (
-          <div className="flex min-w-0 flex-col gap-4">
-            <button
-              onClick={() => setSelectedSong(null)}
-              className="flex items-center gap-1 self-start text-xs text-bpim-muted hover:text-bpim-text"
-            >
-              <ArrowLeft className="h-3.5 w-3.5" />
-              {t("optimizer.customGoal.changeSong")}
-            </button>
-
-            <div className="flex min-w-0 flex-col gap-1 rounded-lg border border-bpim-border bg-bpim-surface p-3">
-              <div className="flex min-w-0 items-center gap-2">
-                <DifficultyBadge difficulty={selectedSong.difficulty} />
-                <span className="min-w-0 flex-1 truncate text-sm font-bold text-bpim-text">
-                  {selectedSong.title}
-                </span>
-              </div>
-              <span className="text-xs text-bpim-muted">
-                {currentExScore != null
-                  ? tFormat("optimizer.customGoal.currentScore", {
-                      score: currentExScore,
-                      rate: scoreRate(
-                        currentExScore,
-                        selectedSong.notes,
-                      ).toFixed(2),
-                    })
-                  : t("optimizer.customGoal.unplayed")}
-              </span>
-            </div>
-
-            <div className="flex min-w-0 flex-col gap-2">
-              <div className="flex min-w-0 items-center justify-between gap-2">
-                <label className="text-xs font-bold text-bpim-muted">
-                  {t("optimizer.customGoal.targetExScore")}
-                </label>
-                <div className="flex items-center gap-1.5">
-                  {rankDetailText && (
-                    <span className="font-mono text-xs font-bold text-bpim-primary">
-                      {rankDetailText}
-                    </span>
-                  )}
-                  {enteredBpi != null && (
-                    <span className="flex items-center gap-1 text-[10px] font-bold text-bpim-subtle">
-                      BPI
-                      <MiniBpiChip bpi={enteredBpi} />
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <div className="h-2 flex-1 overflow-hidden rounded-full bg-bpim-muted/15">
-                  <div
-                    className="h-full rounded-full bg-bpim-primary transition-all"
-                    style={{
-                      width: `${Math.min(100, Math.max(0, enteredRate ?? 0))}%`,
-                    }}
-                  />
-                </div>
-                <span className="w-16 shrink-0 text-right font-mono text-xs font-bold text-bpim-muted">
-                  {enteredRate != null ? `${enteredRate.toFixed(2)}%` : "-"}
-                </span>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2">
-                <Input
-                  type="number"
-                  inputMode="numeric"
-                  min={0}
-                  max={maxScore ?? undefined}
-                  value={exScoreInput}
-                  onChange={(e) => setExScoreInput(e.target.value)}
-                  className="h-9 font-mono"
-                />
-                <span className="shrink-0 font-mono text-xs text-bpim-muted">
-                  MAX {maxScore}
-                </span>
-                {diffFromCurrent != null && (
-                  <span className="flex shrink-0 items-center gap-1 text-xs">
-                    <span className="text-[10px] font-bold text-bpim-subtle">
-                      {t("optimizer.customGoal.diffFromCurrent")}
-                    </span>
-                    <span
-                      className={cn(
-                        "font-mono font-bold",
-                        diffFromCurrent > 0
-                          ? "text-bpim-primary"
-                          : diffFromCurrent < 0
-                            ? "text-bpim-danger"
-                            : "text-bpim-muted",
-                      )}
-                    >
-                      {diffFromCurrent > 0 ? "+" : ""}
-                      {diffFromCurrent}
-                    </span>
-                  </span>
-                )}
-              </div>
-
-              <div className="flex flex-wrap gap-1.5">
-                {quickScoreOptions(selectedSong).map((opt) => (
-                  <Button
-                    key={opt.label}
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="h-auto flex-col gap-0 px-2 py-1"
-                    onClick={() => setExScoreInput(String(opt.score))}
-                  >
-                    <span className="text-xs font-bold">{opt.label}</span>
-                    <span className="font-mono text-[10px] text-bpim-muted">
-                      {opt.score}
-                    </span>
-                    {opt.bpi != null && (
-                      <span className="font-mono text-[10px] text-bpim-primary">
-                        BPI {opt.bpi.toFixed(1)}
-                      </span>
-                    )}
-                  </Button>
-                ))}
-              </div>
-
-              <div className="flex flex-wrap gap-1.5">
-                {bpiQuickOptions(selectedSong).map((opt) => (
-                  <Button
-                    key={opt.bpi}
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="h-auto flex-col gap-0 px-2 py-1"
-                    onClick={() => setExScoreInput(String(opt.score))}
-                  >
-                    <span className="text-xs font-bold">BPI {opt.bpi}</span>
-                    <span className="font-mono text-[10px] text-bpim-muted">
-                      {opt.score}
-                    </span>
-                  </Button>
-                ))}
-              </div>
-            </div>
-          </div>
+          <SongEditStep
+            selectedSong={selectedSong}
+            setSelectedSong={setSelectedSong}
+            exScoreInput={exScoreInput}
+            setExScoreInput={setExScoreInput}
+            currentExScore={currentExScore}
+            maxScore={maxScore}
+            enteredRate={enteredRate}
+            enteredBpi={enteredBpi}
+            diffFromCurrent={diffFromCurrent}
+            rankDetailText={rankDetailText}
+            t={t}
+            tFormat={tFormat}
+          />
         )}
 
         <DialogFooter>

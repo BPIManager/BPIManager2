@@ -1,4 +1,5 @@
 import type { BpmBand } from "@/hooks/songs/useSongSearch";
+import type { SongSearchResult } from "@/hooks/songs/useSongSearch";
 
 
 
@@ -26,3 +27,10 @@ export interface CustomGoalTargetInput {
   sigma: number | null;
   residualVar: number | null;
 }
+
+/** 曲一覧の1行（並び替え後の表示用）。 */
+export type SongRow = {
+  song: SongSearchResult;
+  currentEx: number | null;
+  currentBpi: number | null;
+};
