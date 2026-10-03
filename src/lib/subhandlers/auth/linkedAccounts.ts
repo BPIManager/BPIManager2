@@ -114,6 +114,12 @@ export async function handleRequestEmailLink(
       return { result: err(409, "このメールアドレスは既に連携されています"), ...base };
     }
 
+    // 連携中の SNS アカウント（Google など）が持つメールアドレスは、別のログイン手段として追加させない
+    const ownProviderEmails = user.providerData.map((p) => p.email?.toLowerCase()).filter(Boolean);
+    if (ownProviderEmails.includes(normalized)) {
+      return { result: err(409, "このメールアドレスは、連携中のアカウントで既に使用されています"), ...base };
+    }
+
     const owner = await userEmailHashesRepo.findUserIdByHash(hashEmail(normalized));
     if (owner && owner.userId !== uid) {
       return { result: err(409, "このメールアドレスは既に使用されています"), ...base };
