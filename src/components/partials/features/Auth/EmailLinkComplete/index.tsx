@@ -114,6 +114,8 @@ export default function EmailLinkComplete() {
             fail("email.complete.notSignedIn");
             return;
           }
+          // 解除済みのメール連携が端末に古い状態で残っていると provider-already-linked になるため、連携前に最新化する
+          await auth.currentUser.reload();
           await linkWithCredential(
             auth.currentUser,
             EmailAuthProvider.credentialWithLink(email, href),
