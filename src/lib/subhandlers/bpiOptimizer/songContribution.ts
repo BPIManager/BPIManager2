@@ -1,5 +1,4 @@
 import type { NextApiRequest } from "next";
-import { db } from "@/lib/db";
 import { bpiOptimizerAggregateRepo } from "@/lib/db/aggregates/bpiOptimizer";
 import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
@@ -52,7 +51,7 @@ export async function handleSongContribution(
         userId,
         latestVersion,
       ),
-      userStatusLogsRepo.getMaxTotalBpi(db, userId, latestVersion),
+      userStatusLogsRepo.findMaxTotalBpi(userId, latestVersion),
     ]);
     const rowBySongId = new Map(rawRows.map((r) => [r.songId, r]));
 

@@ -1,5 +1,4 @@
 import type { NextApiRequest } from "next";
-import { db } from "@/lib/db";
 import { bpiOptimizerAggregateRepo } from "@/lib/db/aggregates/bpiOptimizer";
 import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
 import { findOptimalBpiPath } from "@/lib/bpi/optimizer";
@@ -88,7 +87,7 @@ export async function handleBpiOptimizer(
           : Promise.resolve(null),
         usesNonCurrentDataset
           ? Promise.resolve(null)
-          : userStatusLogsRepo.getMaxTotalBpi(db, userId, latestVersion),
+          : userStatusLogsRepo.findMaxTotalBpi(userId, latestVersion),
       ]);
     const actualCurrentExScoreBySongId = new Map<number, number | null>(
       (actualCurrentRows ?? []).map((r) => [

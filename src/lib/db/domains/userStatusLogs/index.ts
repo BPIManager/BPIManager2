@@ -117,6 +117,25 @@ class UserStatusLogsRepository {
    * @param asOf - この時点（`createdAt`基準）までの記録に限定する
    * @returns userId→記録された最高値のMap（記録が無いユーザーは含まれない）
    */
+  /**
+   * {@link getMaxTotalBpi} の非トランザクション版。呼び出し元が `db` を import せずに
+   * 記録済みの最高値を参照するためのもの。
+   */
+  async findMaxTotalBpi(userId: string, version: string): Promise<number | null> {
+    return this.getMaxTotalBpi(db, userId, version);
+  }
+
+  /**
+   * {@link getMaxTotalBpiAsOf} の非トランザクション版（呼び出し元が `db` を import しないため）。
+   */
+  async findMaxTotalBpiAsOf(
+    userId: string,
+    version: string,
+    asOf: Date,
+  ): Promise<number | null> {
+    return this.getMaxTotalBpiAsOf(db, userId, version, asOf);
+  }
+
   async getMaxTotalBpiAsOfForUsers(
     userIds: string[],
     version: string,

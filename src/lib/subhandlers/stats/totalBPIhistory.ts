@@ -1,7 +1,6 @@
 import type { NextApiRequest } from "next";
 import dayjs from "@/lib/dayjs";
 import { BpiCalculator } from "@/lib/bpi";
-import { db } from "@/lib/db";
 import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { songsRepo } from "@/lib/db/domains/songs";
 import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
