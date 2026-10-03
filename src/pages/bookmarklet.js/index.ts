@@ -16,13 +16,23 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     return { props: {} };
   }
 
-  const script = await fetch(
-    `https://raw.githubusercontent.com/BPIManager/IIDX-Scraping-Bookmarklet/${BOOKMARKLET_SOURCE_COMMIT}/dist/bookmarklet.min.js`,
-  );
-  const body = await script.text();
-
-  res.write(body);
-  res.end();
+  try {
+    const script = await fetch(
+      `https://raw.githubusercontent.com/BPIManager/IIDX-Scraping-Bookmarklet/${BOOKMARKLET_SOURCE_COMMIT}/dist/bookmarklet.min.js`,
+    );
+    if (!script.ok) {
+      console.error("bookmarklet source fetch failed:", script.status);
+      res.statusCode = 502;
+      res.end();
+      return { props: {} };
+    }
+    res.write(await script.text());
+    res.end();
+  } catch (error: unknown) {
+    console.error("bookmarklet source fetch error:", error);
+    res.statusCode = 502;
+    res.end();
+  }
 
   return { props: {} };
 };
