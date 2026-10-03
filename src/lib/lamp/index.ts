@@ -1,17 +1,14 @@
+import { CLEAR_STATES } from "@/constants/iidx/clearLamps";
 /**
  * クリアランプ種別を数値ランクにマッピングする定数。
  * 値が大きいほど上位のクリア種別を示す。
  */
-export const LAMP_RANK: Record<string, number> = {
-  "NO PLAY": 0,
-  FAILED: 1,
-  "ASSIST CLEAR": 2,
-  "EASY CLEAR": 3,
-  CLEAR: 4,
-  "HARD CLEAR": 5,
-  "EX HARD CLEAR": 6,
-  "FULLCOMBO CLEAR": 7,
-};
+export const LAMP_RANK: Record<string, number> = Object.fromEntries(
+  ["NO PLAY", ...CLEAR_STATES.map((s) => s.value)].map((value, rank) => [
+    value,
+    rank,
+  ]),
+);
 
 /**
  * 新しいランプ種別が旧ランプより上位かどうかを返す。

@@ -1,7 +1,7 @@
 import { BpiCalculator } from "@/lib/bpi";
 import { calculateTotalBpiForScores } from "./bpi";
 import dayjs from "@/lib/dayjs";
-import { ALL_CATEGORIES } from "@/lib/radar/calculator";
+import { ALL_RADAR_CATEGORIES } from "@/constants/iidx/radars";
 import { topElementMap } from "@/constants/iidx/radars/topElements";
 import type {
   TopSong,
@@ -89,7 +89,7 @@ export function buildRadarGrowth(
 ): RadarGrowthEntry[] {
   const songById = new Map(allL12SongMeta.map((s) => [s.songId, s]));
   const elementSongsMap = new Map<string, TopSongImproved[]>();
-  ALL_CATEGORIES.forEach((cat) => elementSongsMap.set(cat, []));
+  ALL_RADAR_CATEGORIES.forEach((cat) => elementSongsMap.set(cat, []));
 
   const usingFallback = topImprovedSongs.length === 0 && !!fallbackTopSongs?.length;
 
@@ -107,7 +107,7 @@ export function buildRadarGrowth(
         });
       }
     }
-    for (const cat of ALL_CATEGORIES) {
+    for (const cat of ALL_RADAR_CATEGORIES) {
       elementSongsMap.get(cat)!.sort((a, b) => b.bpi - a.bpi);
     }
   } else {
@@ -120,7 +120,7 @@ export function buildRadarGrowth(
   }
 
   const elementSongsMetaMap = new Map<string, SongMeta[]>();
-  ALL_CATEGORIES.forEach((cat) => elementSongsMetaMap.set(cat, []));
+  ALL_RADAR_CATEGORIES.forEach((cat) => elementSongsMetaMap.set(cat, []));
   for (const s of allL12SongMeta) {
     const key = `${s.title}___${s.difficulty}`;
     const cat = topElementMap.get(key);
@@ -132,7 +132,7 @@ export function buildRadarGrowth(
   const finalObservations = observationsFor(viewerFinalExScoreMap, songById);
 
   const radarGrowth: RadarGrowthEntry[] = [];
-  for (const element of ALL_CATEGORIES) {
+  for (const element of ALL_RADAR_CATEGORIES) {
     const songs = elementSongsMap.get(element) ?? [];
     const elementSongs = elementSongsMetaMap.get(element) ?? [];
     if (elementSongs.length === 0) continue;
