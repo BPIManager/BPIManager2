@@ -397,6 +397,13 @@ export const settingsTranslations = {
     ko: "복사에 실패했습니다",
   },
 
+  "settings.oauthClient.manage": {
+    ja: "管理する",
+    en: "Manage",
+    "zh-TW": "管理",
+    ko: "관리",
+  },
+
   "settings.oauthClient.title": {
     ja: "MCP接続 (OAuth)",
     en: "MCP Connection (OAuth)",

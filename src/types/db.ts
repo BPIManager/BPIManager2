@@ -23,6 +23,7 @@ export interface Database {
   allSongs: AllSongsTable;
   allScores: AllScoresTable;
   discordLinks: DiscordLinks;
+  userEmailHashes: UserEmailHashes;
   // 曲別データを正規化した新テーブル(#optimize-memo-normalized-tables)。
   // optimizeMemoは移行用バックフィルスクリプトが読み取るため、テーブル削除まで残す
   optimizeGoals: OptimizeGoalsTable;
@@ -251,6 +252,12 @@ export interface DiscordLinks {
   discordUserId: string;
   userId: string;
   linkedAt: Generated<Date>;
+}
+
+export interface UserEmailHashes {
+  emailHash: string;
+  linkedAt: Generated<Date>;
+  userId: string;
 }
 
 export interface UserRoles {
