@@ -1,4 +1,4 @@
-import { socialComparisonRepo } from "@/lib/db/aggregates/rivalScores/comparison";
+import { socialWinLossRepo } from "@/lib/db/aggregates/rivalScores/winLoss";
 import { userProfileRepo } from "@/lib/db/aggregates/userProfiles/profile";
 import type { AreaRankInfo } from "@/lib/arena/prefectureRankings";
 import type { HandlerResult } from "@/types/api";
@@ -21,7 +21,7 @@ export interface ProfileResponse {
   profile: ProfileWithAreaRank | null;
   compare?: {
     winLoss: Awaited<
-      ReturnType<typeof socialComparisonRepo.getWinLossStats>
+      ReturnType<typeof socialWinLossRepo.getWinLossStats>
     > | null;
     radar: Record<string, number> | null;
   };

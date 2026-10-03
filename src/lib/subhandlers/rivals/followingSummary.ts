@@ -1,5 +1,5 @@
 import type { NextApiRequest } from "next";
-import { socialComparisonRepo } from "@/lib/db/aggregates/rivalScores/comparison";
+import { socialFollowedWinLossRepo } from "@/lib/db/aggregates/rivalScores/followedWinLoss";
 import { navigationRepo } from "@/lib/db/domains/logs/navigation";
 import { followListsRepo } from "@/lib/db/domains/followLists";
 import { err, ok } from "@/middlewares/api/apiResult";
@@ -35,7 +35,7 @@ export async function handleRivalFollowingSummary(
     }
 
     const [summary, viewerBpiRecord] = await Promise.all([
-      socialComparisonRepo.getFollowedWinLossSummary({
+      socialFollowedWinLossRepo.getFollowedWinLossSummary({
         viewerId,
         version: version as string,
         levels: levelArray,
