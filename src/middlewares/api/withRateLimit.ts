@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { isIP } from "net";
 
 interface RateLimitOptions {
   /** 制限をカウントする時間窓（ミリ秒） */
@@ -18,10 +19,16 @@ const MAX_TRACKED_CLIENTS = 5000;
 const buckets = new Map<string, Bucket>();
 
 function getClientIp(req: NextApiRequest): string {
-  // Cloudflare経由の構成のため、クライアントが偽装できるX-Forwarded-Forではなく
-  // Cloudflareがエッジで上書き設定するCF-Connecting-IPを信頼する
+  // CF-Connecting-IP は Cloudflare がエッジで付与する。CF-Ray も Cloudflare 経由でのみ付くため、
+  // 両方が揃い IP 形式として妥当な場合のみ信頼する。どちらも無い場合はソケットのアドレスを使う。
+  // 注: オリジンに直接接続するクライアントは両ヘッダを偽装できるため、完全な防御には
+  // オリジンをCloudflareからのみ到達可能にする設定（Authenticated Origin Pulls等）が別途必要。
+  const cfRay = req.headers["cf-ray"];
   const cfConnectingIp = req.headers["cf-connecting-ip"];
-  if (typeof cfConnectingIp === "string") return cfConnectingIp.trim();
+  if (typeof cfRay === "string" && typeof cfConnectingIp === "string") {
+    const ip = cfConnectingIp.trim();
+    if (isIP(ip)) return ip;
+  }
   return req.socket.remoteAddress ?? "unknown";
 }
 
