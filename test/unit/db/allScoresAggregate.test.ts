@@ -11,12 +11,13 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-const { allScoresAggregateRepo } = await import("@/lib/db/aggregates/allScores");
+const { allScoresListRepo } = await import("@/lib/db/aggregates/allScores/list");
+const { allScoresSelfRivalRepo } = await import("@/lib/db/aggregates/allScores/selfAndRivals");
 
-describe("allScoresAggregateRepo.getAllScoresList", () => {
+describe("allScoresListRepo.getAllScoresList", () => {
   it("フィルタなしの場合、ベースのwhere(deletedAt)のみが適用されること", async () => {
     dbHolder.current = createDbSpy([]);
-    await allScoresAggregateRepo.getAllScoresList("user-1", {
+    await allScoresListRepo.getAllScoresList("user-1", {
       search: "",
       levels: "",
       difficulties: "",
@@ -30,7 +31,7 @@ describe("allScoresAggregateRepo.getAllScoresList", () => {
 
   it("search/levels/difficulties/clearStatesを指定するとwhere呼び出しが増えること", async () => {
     dbHolder.current = createDbSpy([]);
-    await allScoresAggregateRepo.getAllScoresList("user-1", {
+    await allScoresListRepo.getAllScoresList("user-1", {
       search: "冥",
       levels: "11,12",
       difficulties: "ANOTHER,HYPER",
@@ -44,7 +45,7 @@ describe("allScoresAggregateRepo.getAllScoresList", () => {
 
   it("sortKeyに応じたorderByカラムが指定されること", async () => {
     dbHolder.current = createDbSpy([]);
-    await allScoresAggregateRepo.getAllScoresList("user-1", {
+    await allScoresListRepo.getAllScoresList("user-1", {
       search: "",
       levels: "",
       difficulties: "",
@@ -76,7 +77,7 @@ describe("allScoresAggregateRepo.getAllScoresList", () => {
         lastPlayed: "2025-01-01",
       },
     ]);
-    const results = await allScoresAggregateRepo.getAllScoresList("user-1", {
+    const results = await allScoresListRepo.getAllScoresList("user-1", {
       search: "",
       levels: "",
       difficulties: "",
@@ -105,12 +106,12 @@ describe("allScoresAggregateRepo.getAllScoresList", () => {
   });
 });
 
-describe("allScoresAggregateRepo.getRivalScoresForAllSong", () => {
+describe("allScoresSelfRivalRepo.getRivalScoresForAllSong", () => {
   it("followsとallScoresを結合したクエリを実行し結果をそのまま返すこと", async () => {
     const rows = [{ userId: "rival-1", exScore: 1800 }];
     dbHolder.current = createDbSpy(rows);
 
-    const result = await allScoresAggregateRepo.getRivalScoresForAllSong({
+    const result = await allScoresSelfRivalRepo.getRivalScoresForAllSong({
       viewerId: "viewer-1",
       songId: 1,
       version: "33",
