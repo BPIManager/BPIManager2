@@ -1,6 +1,6 @@
 import type { NextApiRequest } from "next";
 import { err, ok } from "@/middlewares/api/apiResult";
-import { isValidEmail, normalizeEmail } from "@/lib/auth/emailHash";
+import { isValidEmail, normalizeEmail } from "@/utils/common/email";
 import { verifyTurnstileToken } from "@/lib/turnstile/verify";
 import { sendEmailSignInLink } from "@/lib/firebase/identityToolkit";
 import { mapIdentityToolkitError } from "./_errors";

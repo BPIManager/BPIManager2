@@ -2,7 +2,8 @@ import type { NextApiRequest } from "next";
 import type { UserRecord } from "firebase-admin/auth";
 import { adminAuth } from "@/lib/firebase/admin";
 import { err, ok } from "@/middlewares/api/apiResult";
-import { hashEmail, isValidEmail, normalizeEmail } from "@/lib/auth/emailHash";
+import { hashEmail } from "@/lib/auth/emailHash";
+import { isValidEmail, normalizeEmail } from "@/utils/common/email";
 import { verifyTurnstileToken } from "@/lib/turnstile/verify";
 import {
   deleteProviderFromUser,
