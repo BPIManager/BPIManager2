@@ -1,4 +1,4 @@
-import { RANK_TABLE } from "@/constants/iidx/rankBorders";
+import { RANK_TABLE, getRankDetail } from "@/constants/iidx/rankBorders";
 
 interface DJRankOptions {
   mode: "current" | "next";
@@ -10,47 +10,33 @@ export const getRankIndex = (percentage: number): number => {
   return index === -1 ? 0 : index;
 };
 
+/**
+ * DJランクの表示ラベルと差分を返す。境界の定義は `getRankDetail` に一本化しており、
+ * 表示（`getDJRank`）と差分計算（`getRankDetail`）で値がずれないようにする。
+ *
+ * - `current`: 現在ランクからの超過分（例: `AAA+`）。MAX-帯は `MAX-` の超過分
+ * - `next`: 次ランクまでの不足分（例: `D-`）。最上位帯は満点までの不足分
+ */
 export const getDJRank = (
   exScore: number,
   maxScore: number,
   options: DJRankOptions,
 ): string => {
   const { mode, output } = options;
-  const percentage = exScore / maxScore;
-  const currentIdx = getRankIndex(percentage);
-
-  const isHighAAA = percentage >= 17 / 18;
-  const isNormalAAA = percentage >= 8 / 9 && percentage < 17 / 18;
+  const detail = getRankDetail(exScore, maxScore);
 
   let label: string;
   let scoreDiff: number;
 
-  if (isNormalAAA || isHighAAA) {
-    const distToMax = maxScore - exScore;
-    const distFromAAA = exScore - Math.ceil(maxScore * (8 / 9));
-
-    const showMaxMinus =
-      (isNormalAAA && mode === "current") || (isHighAAA && mode === "next");
-
-    if (showMaxMinus) {
-      label = "MAX-";
-      scoreDiff = distToMax;
-    } else {
-      label = "AAA+";
-      scoreDiff = distFromAAA;
-    }
+  if (mode === "current") {
+    label = detail.label === "MAX-" ? "MAX-" : `${detail.label}+`;
+    scoreDiff = detail.surplus;
   } else {
-    const currentRank = RANK_TABLE[currentIdx];
-    const nextRank =
-      RANK_TABLE[currentIdx + 1] || RANK_TABLE[RANK_TABLE.length - 1];
-
-    if (mode === "current") {
-      label = `${currentRank.label}+`;
-      scoreDiff = exScore - Math.ceil(maxScore * currentRank.ratio);
-    } else {
-      label = `${nextRank.label}-`;
-      scoreDiff = Math.ceil(maxScore * nextRank.ratio) - exScore;
-    }
+    // 次ランク名は表の表記（例: MAX-）の場合と、最上位後の "MAX"（満点）の場合がある
+    label = detail.nextLabel.endsWith("-")
+      ? detail.nextLabel
+      : `${detail.nextLabel}-`;
+    scoreDiff = detail.shortage;
   }
 
   return output === "value" ? `${Math.ceil(scoreDiff)}` : label;
