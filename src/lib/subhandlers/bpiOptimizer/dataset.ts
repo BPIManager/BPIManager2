@@ -7,12 +7,8 @@ import { targetOf, type HandleOutcome } from "./_shared";
 import type { IIDXVersion } from "@/types/iidx/version";
 
 /**
- * GET /users/[userId]/analytics/bpi-optimizer/dataset?source=self-best|<version>
- *
- * BPI最適化対象楽曲（☆12）について、指定したデータセット（特定バージョンでの
- * スコア、または全バージョンを横断した自己歴代ベスト）での曲ごとのEXスコアを
- * 返す。「自己べを目指す」（自己ベスト・過去バージョンをそのまま目標にする）
- * 機能向け。未プレイ楽曲もNULLスコアとして含まれる。
+ * BPI最適化対象（☆12）の曲ごとのEXスコアを、指定データセット（特定バージョン or 全バージョン横断の自己歴代ベスト）で返す。
+ * 「自己べを目指す」用途向け。未プレイ曲も NULL スコアとして含める。
  */
 export async function handleBpiOptimizerDataset(
   req: NextApiRequest,

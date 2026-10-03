@@ -3,26 +3,13 @@ import { userDisplayColumns } from "@/lib/db/shared/userDisplay";
 import { canViewUserData, wherePublicOnly } from "@/lib/db/shared/visibility";
 
 /**
- * フォロー中/フォロワー一覧を、プロフィール表示用の複合データ
- * （`users`の表示カラム・`userStatusLogs`の最新totalBpi・
- * `officialArenaStats`の最新arenaClass・閲覧者からのフォロー状態）と
- * 結合して組み立てるリポジトリクラス。
- *
- * `follows`ドメイン本来の責務（フォロー関係の読み書き）を超えた
- * クロスドメイン参照のため、`domains/follow`ではなくここに置く。
+ * フォロー中/フォロワー一覧をプロフィール表示用の複合データ（users・最新totalBpi・arenaClass・閲覧者のフォロー状態）と結合する。
+ * follows ドメインの責務を超えるクロスドメイン参照のため、domains ではなくここに置く。
  */
 class FollowListAggregateRepository {
   /**
-   * フォロー中の公開ユーザー一覧を取得する（ライバル選択・月次レビュー集計用の軽量版）。
-   *
-   * ページネーションなし。非公開ユーザーは除外する。
-   *
-   * 呼び出し元は`userId`本人ではなく第三者が閲覧するケースがあるため
-   * （例: `checkUserAccess`で`userId`のプロフィール閲覧権を確認した別の
-   * 閲覧者がここを呼ぶ）、「`follows`が存在する = 閲覧者本人に閲覧許可がある」
-   * という判定は使えない。`userId`が
-   * フォローしている非公開ユーザーの閲覧許可は`userId`本人にしかないため、
-   * 引き続きisPublicで一律除外する。
+   * フォロー中の公開ユーザー一覧を取得する（ライバル選択・月次レビュー集計用の軽量版）。非公開は一律除外する。
+   * 閲覧者が第三者の場合もあるため、follows の存在を閲覧許可の根拠にはしない。
    *
    * @param userId - フォローしている側のユーザー ID
    */

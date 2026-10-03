@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { IIDXVersion } from "@/types/iidx/version";
-import { correlatedLatestLogId } from "@/lib/db/shared/latestScore";
+import { correlatedLatestLogId } from "@/lib/db/shared/latestScore/correlated";
 import { latestSongDefIdSubquery } from "@/lib/db/shared/songDef";
 
 class ScoreTimelineRepository {
@@ -205,17 +205,13 @@ class ScoreTimelineRepository {
   }
 
   /**
-   * バッチ（または期間）内で更新したスコアを、他バージョン（閲覧中バージョンを除く
-   * 自分がプレイ済みの全バージョン。INFやそれより後のバージョンも対象に含む）での
-   * 自分のスコアと突き合わせる。勝敗・既存の追い抜き済みかどうかに関わらず、
-   * プレイ済みの組み合わせは全件返す（勝敗判定・「このバッチで新たに追い抜いたか」の
-   * 判定は呼び出し元で`myNewScore`/`myOldScore`/`targetScore`から行う）。
-   * 1曲について複数バージョンと比較可能な場合はバージョンごとに1行返る。
+   * バッチ（または期間）内で更新したスコアを、閲覧中バージョン以外で自分がプレイ済みの全バージョンのスコアと突き合わせる。
+   * 勝敗や追い抜き済みかは問わず全件返し、判定は呼び出し元で行う。1曲について複数バージョンがあればバージョンごとに1行返る。
    *
    * @param params.userId - 対象ユーザーID
    * @param params.currentVersion - 閲覧中バージョン（バッチ・スコア更新が記録されたバージョン）
-   * @param params.batchId - 単一バッチに絞り込む場合（`range`と排他）
-   * @param params.range - 期間で絞り込む場合（日次/週次/月次集計向け、`batchId`と排他）
+   * @param params.batchId - 単一バッチに絞る場合（range と排他）
+   * @param params.range - 期間で絞る場合（batchId と排他）
    */
   async getVersionComparisons(params: {
     userId: string;
@@ -234,9 +230,7 @@ class ScoreTimelineRepository {
       .where("userId", "=", userId)
       .groupBy(["songId", "version"]);
 
-    // `batchId`/`range`で絞り込んだ範囲内で、閲覧中バージョンにおける曲ごとの
-    // 最良スコア（同点なら最新のログ）1件に集約する。集約しないと、範囲内で
-    // 同じ曲を複数回更新した場合に更新イベントの数だけ比較行が重複してしまう
+    // 範囲内で同じ曲を複数回更新しても比較行が重複しないよう、閲覧中バージョンの曲ごとの最良（同点なら最新）1件に集約する。
     let scopedCurrent = db
       .selectFrom("scores")
       .select(["songId", "exScore", "logId"])

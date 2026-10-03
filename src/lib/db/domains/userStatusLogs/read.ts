@@ -1,0 +1,280 @@
+import { db } from "@/lib/db";
+import { Database } from "@/types/db";
+import { Kysely, Transaction } from "kysely";
+
+/**
+ * `userStatusLogs` の総合BPI・アリーナランク履歴の参照（最高値・期間・バージョン別推移）を担当するリポジトリクラス。
+ */
+class UserStatusLogsReadRepository {
+  /**
+   * 指定ユーザー・バージョンの最新行から `arenaRank` を取得する。
+   *
+   * @param trx - 呼び出し元が管理するトランザクション
+   * @param userId - ユーザー ID
+   * @param version - バージョン番号
+   */
+  async getLatestArenaRank(
+    trx: Transaction<Database>,
+    userId: string,
+    version: string,
+  ) {
+    return await trx
+      .selectFrom("userStatusLogs")
+      .select("arenaRank")
+      .where("userId", "=", userId)
+      .where("version", "=", version)
+      .orderBy("id", "desc")
+      .limit(1)
+      .executeTakeFirst();
+  }
+
+  /**
+   * 指定ユーザー・バージョンの最新行から `totalBpi` を取得する。
+   *
+   * @param trx - 呼び出し元が管理するトランザクション（トランザクション外から
+   *   呼ぶ場合は `db` をそのまま渡す）
+   * @param userId - ユーザー ID
+   * @param version - バージョン番号
+   */
+  async getLatestTotalBpi(
+    trx: Kysely<Database> | Transaction<Database>,
+    userId: string,
+    version: string,
+  ) {
+    return await trx
+      .selectFrom("userStatusLogs")
+      .select("totalBpi")
+      .where("userId", "=", userId)
+      .where("version", "=", version)
+      .orderBy("id", "desc")
+      .limit(1)
+      .executeTakeFirst();
+  }
+
+  /**
+   * 指定ユーザー・バージョンで記録済みの総合BPIの最高値。ラチェットの基準値として使う。
+   * 最新1件（getLatestTotalBpi）と異なり、過去の下振れに影響されない。
+   *
+   * @param trx - 呼び出し元が管理するトランザクション（外から呼ぶ場合は db を渡す）
+   * @param userId - ユーザー ID
+   * @param version - バージョン番号
+   * @returns 記録が無ければ null
+   */
+  async getMaxTotalBpi(
+    trx: Kysely<Database> | Transaction<Database>,
+    userId: string,
+    version: string,
+  ): Promise<number | null> {
+    const row = await trx
+      .selectFrom("userStatusLogs")
+      .select((eb) => eb.fn.max("totalBpi").as("maxTotalBpi"))
+      .where("userId", "=", userId)
+      .where("version", "=", version)
+      .executeTakeFirst();
+    return row?.maxTotalBpi != null ? Number(row.maxTotalBpi) : null;
+  }
+
+  /**
+   * 指定時点（asOf）までに記録された総合BPIの最高値。過去の一時点を基準にラチェットの下限を求める場合に使う。
+   * 全期間の最大値を使うとその時点より後の記録で過去値が引き上げられてしまうため、時点限定版を使う。
+   *
+   * @param trx - 呼び出し元が管理するトランザクション（外から呼ぶ場合は db を渡す）
+   * @param userId - ユーザー ID
+   * @param version - バージョン番号
+   * @param asOf - この時点（createdAt 基準）までの記録に限定する
+   * @returns 記録が無ければ null
+   */
+  async getMaxTotalBpiAsOf(
+    trx: Kysely<Database> | Transaction<Database>,
+    userId: string,
+    version: string,
+    asOf: Date,
+  ): Promise<number | null> {
+    const row = await trx
+      .selectFrom("userStatusLogs")
+      .select((eb) => eb.fn.max("totalBpi").as("maxTotalBpi"))
+      .where("userId", "=", userId)
+      .where("version", "=", version)
+      .where("createdAt", "<=", asOf)
+      .executeTakeFirst();
+    return row?.maxTotalBpi != null ? Number(row.maxTotalBpi) : null;
+  }
+
+  /**
+   * {@link getMaxTotalBpiAsOf}の複数ユーザー一括版。ライバル戦線等で複数ユーザーの
+   * 総合BPI推移をまとめて再計算する際に使う。
+   *
+   * @param userIds - ユーザーIDの配列
+   * @param version - バージョン番号
+   * @param asOf - この時点（`createdAt`基準）までの記録に限定する
+   * @returns userId→記録された最高値のMap（記録が無いユーザーは含まれない）
+   */
+  /**
+   * {@link getMaxTotalBpi} の非トランザクション版。呼び出し元が `db` を import せずに
+   * 記録済みの最高値を参照するためのもの。
+   */
+  async findMaxTotalBpi(userId: string, version: string): Promise<number | null> {
+    return this.getMaxTotalBpi(db, userId, version);
+  }
+
+  /**
+   * {@link getMaxTotalBpiAsOf} の非トランザクション版（呼び出し元が `db` を import しないため）。
+   */
+  async findMaxTotalBpiAsOf(
+    userId: string,
+    version: string,
+    asOf: Date,
+  ): Promise<number | null> {
+    return this.getMaxTotalBpiAsOf(db, userId, version, asOf);
+  }
+
+  async getMaxTotalBpiAsOfForUsers(
+    userIds: string[],
+    version: string,
+    asOf: Date,
+  ): Promise<Map<string, number>> {
+    if (userIds.length === 0) return new Map();
+    const rows = await db
+      .selectFrom("userStatusLogs")
+      .select((eb) => ["userId", eb.fn.max("totalBpi").as("maxTotalBpi")])
+      .where("userId", "in", userIds)
+      .where("version", "=", version)
+      .where("createdAt", "<=", asOf)
+      .groupBy("userId")
+      .execute();
+    return new Map(
+      rows
+        .filter((r) => r.maxTotalBpi != null)
+        .map((r) => [r.userId, Number(r.maxTotalBpi)]),
+    );
+  }
+
+  /**
+   * 指定期間（createdAt の from〜to）内に記録された総合BPIを取得する。月間振り返りの再計算で、期間中に記録済みの値を下限として合流させる。
+   *
+   * @param userId - ユーザー ID
+   * @param version - バージョン番号
+   * @param from - この時点（createdAt 基準）より後の記録に限定する
+   * @param to - この時点（createdAt 基準）以前の記録に限定する
+   */
+  async getTotalBpiLogsInRange(
+    userId: string,
+    version: string,
+    from: Date,
+    to: Date,
+  ): Promise<{ createdAt: Date; totalBpi: number }[]> {
+    const rows = await db
+      .selectFrom("userStatusLogs")
+      .select(["createdAt", "totalBpi"])
+      .where("userId", "=", userId)
+      .where("version", "=", version)
+      .where("createdAt", ">", from)
+      .where("createdAt", "<=", to)
+      .orderBy("id", "asc")
+      .execute();
+    return rows.map((r) => ({
+      createdAt: r.createdAt,
+      totalBpi: Number(r.totalBpi),
+    }));
+  }
+
+  /**
+   * {@link getTotalBpiLogsInRange}の複数ユーザー一括版。
+   *
+   * @param userIds - ユーザーIDの配列
+   * @param version - バージョン番号
+   * @param from - この時点（`createdAt`基準）より後の記録に限定する
+   * @param to - この時点（`createdAt`基準）以前の記録に限定する
+   * @returns userId→記録一覧のMap
+   */
+  async getTotalBpiLogsInRangeForUsers(
+    userIds: string[],
+    version: string,
+    from: Date,
+    to: Date,
+  ): Promise<Map<string, { createdAt: Date; totalBpi: number }[]>> {
+    if (userIds.length === 0) return new Map();
+    const rows = await db
+      .selectFrom("userStatusLogs")
+      .select(["userId", "createdAt", "totalBpi"])
+      .where("userId", "in", userIds)
+      .where("version", "=", version)
+      .where("createdAt", ">", from)
+      .where("createdAt", "<=", to)
+      .orderBy("id", "asc")
+      .execute();
+    const result = new Map<string, { createdAt: Date; totalBpi: number }[]>();
+    for (const r of rows) {
+      const arr = result.get(r.userId) ?? [];
+      arr.push({ createdAt: r.createdAt, totalBpi: Number(r.totalBpi) });
+      result.set(r.userId, arr);
+    }
+    return result;
+  }
+
+  /**
+   * 指定ユーザーの全バージョンのBPI履歴（バージョンごとの最新1件）を取得する。
+   *
+   * @param userId - ユーザー ID
+   */
+  async getBpiHistoryByVersion(userId: string) {
+    return await db
+      .selectFrom("userStatusLogs as usl")
+      .innerJoin(
+        (eb) =>
+          eb
+            .selectFrom("userStatusLogs")
+            .select(["version", (sub) => sub.fn.max("id").as("maxId")])
+            .where("userId", "=", userId)
+            .groupBy("version")
+            .as("latest"),
+        (join) => join.onRef("usl.id", "=", "latest.maxId"),
+      )
+      .select(["usl.version", "usl.totalBpi"])
+      .execute();
+  }
+
+  /**
+   * バックアップ用にユーザーの全ステータスログを取得する。
+   *
+   * @param userId - ユーザー ID
+   */
+  async getAllForUser(userId: string) {
+    return await db
+      .selectFrom("userStatusLogs")
+      .selectAll()
+      .where("userId", "=", userId)
+      .execute();
+  }
+
+  /**
+   * 指定バージョンにおける各ユーザーの最新 `userStatusLogs` 行の ID を取得するサブクエリを組み立てる。
+   *
+   * @param version - バージョン番号
+   */
+  latestPerUserSubquery(version: string) {
+    return db
+      .selectFrom("userStatusLogs")
+      .select((eb) => ["userId", eb.fn.max("id").as("maxId")])
+      .where("version", "=", version)
+      .groupBy("userId");
+  }
+
+  /**
+   * 指定ユーザー・バージョンの最新1件をJOIN用サブクエリとして組み立てる。
+   *
+   * @param userId - ユーザー ID
+   * @param version - バージョン番号
+   */
+  latestRowSubquery(userId: string, version: string) {
+    return db
+      .selectFrom("userStatusLogs")
+      .select(["userId", "totalBpi", "arenaRank", "id"])
+      .where("userId", "=", userId)
+      .where("version", "=", version)
+      .orderBy("id", "desc")
+      .limit(1);
+  }
+}
+
+export const userStatusLogsReadRepo = new UserStatusLogsReadRepository();

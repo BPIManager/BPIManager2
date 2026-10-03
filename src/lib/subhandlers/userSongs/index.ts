@@ -1,5 +1,5 @@
-import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
-import { songsRepo } from "@/lib/db/domains/songs";
+import { statsSongTablesRepo } from "@/lib/db/aggregates/stats/songTables";
+import { songSearchRepo } from "@/lib/db/domains/songs/search";
 import { resolveVersion } from "@/lib/subhandlers/shared";
 import { err, ok } from "@/middlewares/api/apiResult";
 import type { AccessResult } from "@/middlewares/api/withApi";
@@ -8,9 +8,7 @@ import type { IIDXVersion } from "@/types/iidx/version";
 import type { NextApiRequest } from "next";
 
 /**
- * user songs ドメイン（`users/[userId]/songs/**`）の subhandler 群。
- * 全エンドポイント `withUserApiHandler`。ルートは `withUserApiHandler` の
- * ラッパーを維持しつつ、handler 本体をこれに委譲する。
+ * user songs ドメインの subhandler 群。全エンドポイントは withUserApiHandler を使い、ルートはラッパーを維持したまま本体を委譲する。
  */
 export interface HandleOutcome<T> {
   result: HandlerResult<T>;
@@ -28,7 +26,7 @@ export async function handleSongList(
   access: AccessResult,
 ): Promise<HandleOutcome<unknown>> {
   const version = resolveVersion(req.query.version) as IIDXVersion;
-  const songs = await songsRepo.getSongList(version);
+  const songs = await songSearchRepo.getSongList(version);
   return {
     result: ok(songs),
     targetUserId: targetOf(req),
@@ -49,7 +47,7 @@ export async function handleUserSongRanking(
     return { result: err(400, "Invalid songId"), targetUserId, viewerId };
   }
 
-  const result = await statsTablesRepo.getSongRanking(
+  const result = await statsSongTablesRepo.getSongRanking(
     songIdNum,
     resolveVersion(req.query.version),
     access.user!.userId,
@@ -77,7 +75,7 @@ export async function handleUserSongSimilar(
 
   const mode = req.query.mode === "global" ? "global" : "profile";
 
-  const result = await songsRepo.getSimilarSongs(
+  const result = await songSearchRepo.getSimilarSongs(
     songIdNum,
     version,
     limit,

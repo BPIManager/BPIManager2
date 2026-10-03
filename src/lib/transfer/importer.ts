@@ -1,7 +1,7 @@
 import { BpiCalculator } from "../bpi";
 import dayjs from "../dayjs";
 import { importFromBPIM } from "../db/orchestrators/bpiImport";
-import { songsRepo } from "../db/domains/songs";
+import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { SongLookup } from "./songLookup";
 import { v4 as uuidv4 } from "uuid";
 
@@ -68,10 +68,8 @@ export class BpiImportService {
   };
 
   /**
-   * 複数バージョンの BPIManager スコアデータを BPIManager2 の DB にインポートする。
-   *
-   * 日付ごとに最新スコアを集約してバッチを生成し、トランザクション内で一括保存する。
-   * 既存データはすべて削除してから再インポートされる。
+   * 複数バージョンの BPIManager スコアを BPIManager2 の DB へインポートする。日付ごとの最新スコアでバッチを生成し、トランザクションで一括保存する。
+   * 既存データは全て削除してから再インポートする。
    *
    * @param userId - インポート先のユーザー ID
    * @param payloads - バージョンと BPIManager スコアデータのペア配列
@@ -81,7 +79,7 @@ export class BpiImportService {
     userId: string,
     payloads: { version: string; data: BpimScoreData }[],
   ) {
-    const songMaster = await songsRepo.getSongMasterWithDef();
+    const songMaster = await songMasterRepo.getSongMasterWithDef();
     const lookup = new SongLookup(songMaster);
 
     const allScoreUpdates: ScoreUpdate[] = [];
@@ -185,9 +183,7 @@ export class BpiImportService {
         observations,
         level12Master,
       );
-      // 総合BPIは既知の最高値を下回らないようラチェットする（bpiImport.tsの
-      // executeSaveBpiSystemと同じ理由。ここは日付昇順ループでの一括再構築
-      // のため、DBの前回値ではなくこのループ内のrunning maxを基準にする）。
+      // 総合BPIは既知の最高値を下回らないようラチェットする。日付昇順の一括再構築のため、DB の前回値ではなくこのループ内の running max を基準にする。
       const totalBpi = BpiCalculator.ratchetTotalBpi(latestBpi, freshTotalBpi);
 
       latestBpi = totalBpi;
@@ -205,7 +201,6 @@ export class BpiImportService {
       userId,
       scoreUpdates: allScoreUpdates,
       statusLogs: allStatusLogs,
-      finalTotalBpi: latestBpi,
     });
 
     return { totalProcessed: allScoreUpdates.length };

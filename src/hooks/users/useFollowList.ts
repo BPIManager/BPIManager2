@@ -16,6 +16,8 @@ interface FollowListResponse {
  * @param type - `"following"` フォロー中一覧、`"followers"` フォロワー一覧
  * @returns ユーザー配列・ローディング状態・次ページ読み込み関数・更新関数
  */
+const getFollowUsers = (page: FollowListResponse) => page.users;
+
 export const useFollowList = (
   userId: string,
   type: "following" | "followers",
@@ -27,7 +29,7 @@ export const useFollowList = (
           ? `${API_V2_PREFIX}/users/${userId}/follows?type=${type}&page=${index + 1}&limit=20`
           : null,
       {
-        getItems: (page) => page.users,
+        getItems: getFollowUsers,
         isLastPage: (page) => !page?.hasMore,
         revalidateFirstPage: false,
       },

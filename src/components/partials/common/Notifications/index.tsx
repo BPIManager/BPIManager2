@@ -44,20 +44,23 @@ const NotificationBell = () => {
   return (
     <Popover onOpenChange={(open) => open && markAsRead()}>
       <PopoverTrigger asChild>
-        <div className="relative cursor-pointer">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-9 w-9 text-bpim-muted hover:text-bpim-text"
-          >
-            <Bell size={20} />
-          </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="relative h-9 w-9 cursor-pointer text-bpim-muted hover:text-bpim-text"
+          aria-label={
+            unreadCount > 0
+              ? `${t("notifications.trigger.label")} (${unreadCount > 99 ? "99+" : unreadCount})`
+              : t("notifications.trigger.label")
+          }
+        >
+          <Bell size={20} />
           {unreadCount > 0 && (
             <span className="absolute -top-0.5 -right-0.5 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-bpim-danger px-1 font-mono text-[10px] font-bold text-bpim-text ring-2 ring-bpim-bg">
               {unreadCount > 99 ? "99+" : unreadCount}
             </span>
           )}
-        </div>
+        </Button>
       </PopoverTrigger>
       <PopoverContent
         align="end"

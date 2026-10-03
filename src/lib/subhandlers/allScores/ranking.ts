@@ -1,4 +1,4 @@
-import { allScoresRepo } from "@/lib/db/domains/allScores";
+import { allScoresSelfRivalRepo } from "@/lib/db/aggregates/allScores/selfAndRivals";
 import { resolveVersion, toErrorMessage } from "@/lib/subhandlers/shared";
 import { err, ok } from "@/middlewares/api/apiResult";
 import type { AuthenticatedNextApiRequest } from "@/middlewares/api/withAuth";
@@ -17,7 +17,7 @@ export async function handleAllSongRanking(
   }
 
   try {
-    const result = await allScoresRepo.getAllSongRanking(
+    const result = await allScoresSelfRivalRepo.getAllSongRanking(
       songIdNum,
       resolveVersion(req.query.version),
       viewerId,

@@ -1,17 +1,14 @@
 import { db } from "@/lib/db";
-import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
+import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
 import { wherePublicOnly } from "@/lib/db/shared/visibility";
 
 /**
- * サポーター一覧を担当するリポジトリクラス。
- *
- * users・userStatusLogs・userRolesを横断してユーザー向けの複合ビューを
- * 組み立てる。
+ * サポーター一覧。users・userStatusLogs・userRoles を横断する複合ビューを組み立てる。
  */
 class SupportersRepository {
   async getSupporters(version: string) {
     const latestStatusSubquery =
-      userStatusLogsRepo.latestPerUserSubquery(version);
+      userStatusLogsReadRepo.latestPerUserSubquery(version);
 
     return await db
       .selectFrom("users as u")

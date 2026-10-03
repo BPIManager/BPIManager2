@@ -1,8 +1,8 @@
 import { calculateRadar, buildRadarSongMaster } from "@/lib/radar/calculator";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { BpiCalculator } from "@/lib/bpi";
-import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
-import { songsRepo } from "@/lib/db/domains/songs";
+import { statsLatestScoresRepo } from "@/lib/db/aggregates/stats/latestScores";
+import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { usersRepo } from "@/lib/db/domains/users";
 import {
   radarCacheRepo,
@@ -11,33 +11,26 @@ import {
 import type { IBpiBasicSongData, IBpiScoreObservation } from "@/types/songs/bpi";
 
 /**
- * {@link statsTablesRepo.getLatestScoresWithMusicDataForAllUsers}を1回呼ぶ際に
- * 対象とするユーザー数の上限。PM2の`max_memory_restart`（deploy/ecosystem.config.js）を
- * 超えないよう、スコア行をメモリ上に保持する範囲をこのページ単位に抑える。
+ * getLatestScoresWithMusicDataForAllUsers を1回で呼ぶユーザー数の上限。
+ * PM2 の max_memory_restart（deploy/ecosystem.config.js）を超えないよう、メモリに保持するスコア行をページ単位に抑える。
  */
 const USER_PAGE_SIZE = 200;
 
 /**
- * 全ユーザーのレーダーキャッシュ（`userRadarCache` テーブル）を最新スコアで更新する。
- *
- * 各ユーザーの最新スコアから `calculateRadar` でカテゴリ別 BPI を算出し、
- * 総合 BPI とともに算出結果をメモリ上に集約したうえで、最後にbulk UPSERTで
- * まとめて書き込むことでDBラウンドトリップ数を削減する。
- * スコアが存在しないユーザーはスキップされる。
- * ユーザーIDを{@link USER_PAGE_SIZE}件ずつのページに区切り、ページ単位で
- * `getLatestScoresWithMusicDataForAllUsers`を1回だけ呼んでスコア行を取得・集計してから
- * 次のページへ進む。
+ * 全ユーザーのレーダーキャッシュを最新スコアから算出し、bulk UPSERTでまとめて書き込む。
+ * ユーザーを USER_PAGE_SIZE ごとのページに区切り、ページ単位でスコアを取得してDBラウンドトリップを抑える。
  */
 export async function updateAllUserRadarCache() {
   const version = latestVersion;
   const [users, fullMaster] = await Promise.all([
     usersRepo.getAllUserIds(),
-    songsRepo.getSongMasterWithDef(),
+    songMasterRepo.getSongMasterWithDef(),
   ]);
   const radarSongMaster = buildRadarSongMaster(fullMaster);
   const total = users.length;
   let done = 0;
   const pendingRows: NewUserRadarCache[] = [];
+  const staleUserIds: string[] = [];
 
   for (
     let pageStart = 0;
@@ -46,7 +39,7 @@ export async function updateAllUserRadarCache() {
   ) {
     const userPage = users.slice(pageStart, pageStart + USER_PAGE_SIZE);
     const pageScores =
-      await statsTablesRepo.getLatestScoresWithMusicDataForAllUsers(
+      await statsLatestScoresRepo.getLatestScoresWithMusicDataForAllUsers(
         version,
         userPage.map((u) => u.userId),
       );
@@ -100,9 +93,7 @@ export async function updateAllUserRadarCache() {
             soflan: radar.SOFLAN.totalBpi,
             totalBpi,
           };
-          // BPI計算ライブラリ側で不正なチャートデータ（mu/sigma欠損等）に当たると
-          // NaNを返すことがある。`NaN.toFixed(2)`は例外を投げず文字列"NaN"になり、
-          // decimal列への一括INSERTがバッチ全体失敗するため、書き込み前に弾く
+          // mu/sigma 欠損などの不正なチャートでは NaN になりうる。NaN.toFixed は文字列 "NaN" を返し decimal 列の一括 INSERT が全体失敗するため、書き込み前に弾く。
           const invalidKey = Object.entries(values).find(
             ([, v]) => !Number.isFinite(v),
           )?.[0];
@@ -124,6 +115,8 @@ export async function updateAllUserRadarCache() {
             soflan: values.soflan.toFixed(2),
             totalBpi: values.totalBpi.toFixed(2),
           });
+        } else {
+          staleUserIds.push(user.userId);
         }
       } catch (e) {
         process.stdout.write("\r\x1b[K");
@@ -138,6 +131,7 @@ export async function updateAllUserRadarCache() {
   process.stdout.write("\r\x1b[K");
   console.log(`[Radar] Writing cache for ${pendingRows.length} users...`);
   await radarCacheRepo.bulkUpsert(pendingRows);
+  await radarCacheRepo.deleteForUsers(staleUserIds, version);
 
   console.log(
     `[Radar] Cache update done: ${pendingRows.length}/${total} users updated`,

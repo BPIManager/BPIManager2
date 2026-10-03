@@ -4,6 +4,7 @@ import { oauthRepo } from "@/lib/db/domains/oauth";
 import { withRateLimit } from "@/middlewares/api/withRateLimit";
 import { tokenRequestSchema } from "@/schemas/oauth";
 import { timingSafeEqual } from "@/utils/common/timingSafeEqual";
+import { hashCredential } from "@/utils/common/hashCredential";
 import { verifyPkce } from "@/utils/oauth/pkce";
 
 const ACCESS_TOKEN_TTL_MS = 90 * 24 * 60 * 60 * 1000;
@@ -76,14 +77,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     const client = await oauthRepo.findClientById(client_id);
 
-    // userIdが設定されているクライアント(Settings画面から手動発行)はconfidential
-    // client扱いとし、client_secretの一致を必須にする。DCR発行のpublic clientは
-    // userIdがnullのままなのでPKCEのみで完結する(現状維持)。
+    // userId が設定された（Settings から手動発行の）クライアントは confidential とし client_secret の一致を必須にする。DCR の public クライアントは PKCE のみで完結する。
     if (client?.userId) {
       if (
         !client_secret ||
         !client.clientSecret ||
-        !timingSafeEqual(client_secret, client.clientSecret)
+        !timingSafeEqual(hashCredential(client_secret), client.clientSecret)
       ) {
         return res.status(401).json({ error: "invalid_client" });
       }

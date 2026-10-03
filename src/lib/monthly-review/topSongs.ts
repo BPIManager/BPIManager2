@@ -24,9 +24,7 @@ export function buildTopSongs(
   for (const s of latestInMonth) {
     const bpi = s.bpi != null ? Number(s.bpi) : null;
     if (bpi == null) continue;
-    // 全ユーザー横断の厳密な順位はDB側でRANK() OVERを使う必要があり非常に重い
-    // （実測: 対象曲が多い期間で数秒〜数十秒）。表示用の目安に過ぎず正確性は
-    // 求められないため、bpicalcの単曲BPI→順位推定関数（統計的な近似値）を使う
+    // 全ユーザー横断の厳密な順位は RANK() OVER で重くなる（数秒〜数十秒）。表示の目安で正確性は不要なため、単曲 BPI からの順位推定関数を使う。
     const rank = BpiCalculator.estimateRankFromBpi(bpi);
     topBpiSongs.push({
       songId: s.songId,

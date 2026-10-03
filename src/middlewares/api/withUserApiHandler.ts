@@ -13,13 +13,8 @@ function defaultOnError(error: unknown, res: NextApiResponse) {
 }
 
 /**
- * `checkUserAccess` によるアクセス権チェック・クエリのパース・try-catchによる
- * エラーハンドリングをまとめる共通ラッパー。
- *
- * `parseQuery` はクエリのバリデーションに加え、メソッドチェック等
- * アクセス権チェックより前に行うべき検証を含めてよい（失敗時は自身で
- * レスポンスを返し `null` を返すこと）。アクセス権チェック後のメソッド
- * ルーティングやビジネスロジックは `handler` 側で行う。
+ * checkUserAccess によるアクセス権チェック・クエリパース・エラーハンドリングをまとめる共通ラッパー。
+ * parseQuery はアクセス権チェックより前に行う検証も含めてよい（失敗時は自身でレスポンスを返し null を返す）。
  */
 export function withUserApiHandler<T extends { userId: string }>(
   parseQuery: (req: NextApiRequest, res: NextApiResponse) => T | null,

@@ -57,9 +57,8 @@ export function useSongListFilter() {
     setDifficulties(parseDiff(q.diff));
     setSortKey(parseSortKey(q.sort));
     setSortDir(parseSortDir(q.dir));
-    // router.isReadyがtrueになった最初の1回だけURLからの初期化を行いたいため、
-    // router自体(毎レンダーで参照が変わりうる)は依存に含めない(initializedRefで二重実行も防止)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // router.isReady 後の最初の1回だけURLから初期化する。router は依存に含めず、initializedRef で二重実行も防ぐ。
+     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.isReady]);
 
   useEffect(() => {
@@ -71,10 +70,8 @@ export function useSongListFilter() {
     newQuery.sort = sortKey;
     newQuery.dir = sortDir;
     router.replace({ query: newQuery }, undefined, { shallow: true });
-    // router/versionをフィルタ状態の変化だけで反映させたいため依存に含めない。
-    // routerを含めるとrouter.replace自体が引き起こすrouter変化で再実行される
-    // フィードバックループになりうる
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // router・version は依存に含めない（フィルタ状態の変化だけで反映するため）。router を含めると replace 自身の変化で再実行されるループになる。
+     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [committedSearch, difficulties, sortKey, sortDir]);
 
   const { songs, isLoading, isError } = useSongList(version);

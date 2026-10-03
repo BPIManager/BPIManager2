@@ -1,9 +1,12 @@
 import { db } from "@/lib/db";
+import { lockUserForWrite } from "@/lib/db/shared/userWriteLock";
 import { usersRepo } from "@/lib/db/domains/users";
-import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
-import { scoresRepo } from "@/lib/db/domains/scores";
+import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
+import { userStatusLogsWriteRepo } from "@/lib/db/domains/userStatusLogs/write";
+import { scoreHistoryRepo } from "@/lib/db/domains/scores/history";
+import { scoreWriteRepo } from "@/lib/db/domains/scores/write";
 import { allScoresRepo } from "@/lib/db/domains/allScores";
-import { navigationRepo } from "@/lib/db/domains/logs/navigation";
+import { logBatchRepo } from "@/lib/db/domains/logs/batch";
 import { followsRepo } from "@/lib/db/domains/follow";
 import { apiKeysRepo } from "@/lib/db/domains/apiKeys";
 import { notificationsRepo } from "@/lib/db/domains/notifications";
@@ -23,6 +26,9 @@ import * as os from "os";
  * FK制約を考慮した順序で物理削除を行う。
  */
 export async function backupAndDeleteUser(userId: string): Promise<void> {
+  // バックアップ読み取り・書き出し・物理削除を、書き込みロックを取った1トランザクションで行う。書き出し失敗時は削除もロールバックされる。
+  await db.transaction().execute(async (trx) => {
+  await lockUserForWrite(trx, userId);
   const [
     user,
     follows,
@@ -42,11 +48,11 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
   ] = await Promise.all([
     usersRepo.getAllForUser(userId),
     followsRepo.getAllForUser(userId),
-    scoresRepo.getAllForUser(userId),
-    navigationRepo.getAllForUser(userId),
+    scoreHistoryRepo.getAllForUser(userId),
+    logBatchRepo.getAllForUser(userId),
     radarCacheRepo.getAllForUser(userId),
     notificationsRepo.getAllForUser(userId),
-    userStatusLogsRepo.getAllForUser(userId),
+    userStatusLogsReadRepo.getAllForUser(userId),
     discordLinksRepo.getRolesForUser(userId),
     apiKeysRepo.getAllForUser(userId),
     allScoresRepo.getAllForUser(userId),
@@ -90,10 +96,7 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
     followListMembers,
   };
 
-  // 2. バックアップをファイルに書き出す
-  // コンテナ/サーバーレス環境ではos.homedir()配下が書き込み不可・非永続の
-  // 場合があるため、USER_DELETION_BACKUP_DIRで永続ストレージ上のパスを
-  // 指定できるようにする(未指定時は従来通りos.homedir()配下を使う)。
+  // バックアップをファイルへ書き出す。コンテナ等で os.homedir() 配下が非永続の場合があるため、USER_DELETION_BACKUP_DIR で保存先を指定できる。
   const backupDir =
     process.env.USER_DELETION_BACKUP_DIR ??
     path.join(os.homedir(), "backups", "delete");
@@ -105,19 +108,16 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
     "utf-8",
   );
 
-  // 3. FK制約を考慮した順序で物理削除(トランザクション)。
-  // このオーケストレーターは各ドメインリポジトリのdeleteByUser/getAllForUser
-  // メソッドを呼び出す役に徹し、他ドメインが所有するテーブルへ直接クエリを
-  // 発行しない(usersテーブル自身の削除を除く)。
-  await db.transaction().execute(async (trx) => {
+  // FK 順で物理削除する（トランザクション）。他ドメインのテーブルへ直接クエリを発行せず、各リポジトリの deleteByUser に委譲する（users 自身を除く）。
+  {
     // allScores: FK to logs(SET NULL), users(CASCADE)
     await allScoresRepo.deleteByUser(trx, userId);
 
     // scores: FK to logs(SET NULL), users(CASCADE)
-    await scoresRepo.deleteByUser(trx, userId);
+    await scoreWriteRepo.deleteByUser(trx, userId);
 
     // logs: FK to users(CASCADE)
-    await navigationRepo.deleteByUser(trx, userId);
+    await logBatchRepo.deleteByUser(trx, userId);
 
     // follows: FK to users(CASCADE) for both sides
     await followsRepo.deleteByUser(trx, userId);
@@ -143,7 +143,7 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
     await discordLinksRepo.deleteRoleByUser(trx, userId);
 
     // userStatusLogs: FK to users(CASCADE)
-    await userStatusLogsRepo.deleteByUser(trx, userId);
+    await userStatusLogsWriteRepo.deleteByUser(trx, userId);
 
     // discordLinks: FK to users(CASCADE)
     await discordLinksRepo.deleteLinkByUser(trx, userId);
@@ -159,5 +159,6 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
 
     // users: メインレコード
     await usersRepo.deleteByUser(trx, userId);
+  }
   });
 }

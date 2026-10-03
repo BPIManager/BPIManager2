@@ -2,17 +2,8 @@ import { mutate as globalMutate } from "swr";
 import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 
 /**
- * フォローリスト関連のSWRキャッシュ(`follow-lists`一覧・
- * `follow-lists/following`所属状況)をまとめて再検証する。
- *
- * 両エンドポイントは別々のSWRキーで管理されているが、リストの作成・
- * 削除はユーザーの所属状況(`following`)に、メンバーの追加・削除は
- * リストのメンバー数(`follow-lists`一覧)に、互いに影響する。個別の
- * フックが自分の`mutate()`だけを呼ぶと相手側が古いままになるため、
- * どちらの操作後もこのヘルパーで両方再検証する。
- *
- * `useAuthedSWR`のキーは`[url, fbUserUid]`の配列のため、URLの前方一致で
- * 該当キー全てにマッチさせる。
+ * フォローリスト一覧（follow-lists）と所属状況（following）のSWRキャッシュを両方再検証する。
+ * 作成・削除・メンバー変更は互いのキーに影響するため、どちらの操作後もこのヘルパーで両方を更新する。
  *
  * @param userId - 対象ユーザー ID
  */

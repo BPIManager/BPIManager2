@@ -11,12 +11,14 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-const { monthlyReviewRepo } = await import("@/lib/db/aggregates/monthly-review");
+const { monthlyActivityRepo } = await import("@/lib/db/aggregates/monthly-review/activity");
+const { monthlyBpiStateRepo } = await import("@/lib/db/aggregates/monthly-review/bpiState");
+const { monthlyL1112Repo } = await import("@/lib/db/aggregates/monthly-review/l1112");
 
 describe("monthlyReviewRepo: 空配列入力での早期return", () => {
   it("getPreMonthBpiStateForUsersはuserIdsが空ならDBに問い合わせず空配列を返すこと", async () => {
     dbHolder.current = createDbSpy([]);
-    const result = await monthlyReviewRepo.getPreMonthBpiStateForUsers(
+    const result = await monthlyBpiStateRepo.getPreMonthBpiStateForUsers(
       [],
       "33",
       "2025-06-01",
@@ -27,7 +29,7 @@ describe("monthlyReviewRepo: 空配列入力での早期return", () => {
 
   it("getInMonthScoreHistoryForUsersはuserIdsが空なら空配列を返すこと", async () => {
     dbHolder.current = createDbSpy([]);
-    const result = await monthlyReviewRepo.getInMonthScoreHistoryForUsers(
+    const result = await monthlyBpiStateRepo.getInMonthScoreHistoryForUsers(
       [],
       "33",
       "2025-06-01",
@@ -39,7 +41,7 @@ describe("monthlyReviewRepo: 空配列入力での早期return", () => {
 
   it("getScoresForBatchesはbatchIdsが空なら空配列を返すこと", async () => {
     dbHolder.current = createDbSpy([]);
-    const result = await monthlyReviewRepo.getScoresForBatches(
+    const result = await monthlyBpiStateRepo.getScoresForBatches(
       "user-1",
       "33",
       [],
@@ -50,7 +52,7 @@ describe("monthlyReviewRepo: 空配列入力での早期return", () => {
 
   it("getPreMonthScoresByLastPlayedはsongIdsが空なら空配列を返すこと", async () => {
     dbHolder.current = createDbSpy([]);
-    const result = await monthlyReviewRepo.getPreMonthScoresByLastPlayed(
+    const result = await monthlyBpiStateRepo.getPreMonthScoresByLastPlayed(
       "user-1",
       "33",
       [],
@@ -62,7 +64,7 @@ describe("monthlyReviewRepo: 空配列入力での早期return", () => {
 
   it("getRivalsCurrentScoresForSongsはsongIdsが空なら空配列を返すこと", async () => {
     dbHolder.current = createDbSpy([]);
-    const result = await monthlyReviewRepo.getRivalsCurrentScoresForSongs({
+    const result = await monthlyL1112Repo.getRivalsCurrentScoresForSongs({
       ownerId: "owner-1",
       viewerId: "owner-1",
       version: "33",
@@ -73,10 +75,10 @@ describe("monthlyReviewRepo: 空配列入力での早期return", () => {
   });
 });
 
-describe("monthlyReviewRepo.getRivalsCurrentScoresForSongs: 閲覧者別の可視範囲 (#296)", () => {
+describe("monthlyL1112Repo.getRivalsCurrentScoresForSongs: 閲覧者別の可視範囲 (#296)", () => {
   it("所有者のフォローを f.followerId = ownerId で絞ること", async () => {
     dbHolder.current = createDbSpy([]);
-    await monthlyReviewRepo.getRivalsCurrentScoresForSongs({
+    await monthlyL1112Repo.getRivalsCurrentScoresForSongs({
       ownerId: "owner-1",
       viewerId: "viewer-2",
       version: "33",
@@ -92,7 +94,7 @@ describe("monthlyReviewRepo.getRivalsCurrentScoresForSongs: 閲覧者別の可�
 
   it("第三者閲覧時(viewerId !== ownerId)は公開フォローのみ (u.isPublic = 1) に絞ること", async () => {
     dbHolder.current = createDbSpy([]);
-    await monthlyReviewRepo.getRivalsCurrentScoresForSongs({
+    await monthlyL1112Repo.getRivalsCurrentScoresForSongs({
       ownerId: "owner-1",
       viewerId: "viewer-2",
       version: "33",
@@ -107,7 +109,7 @@ describe("monthlyReviewRepo.getRivalsCurrentScoresForSongs: 閲覧者別の可�
 
   it("未ログイン閲覧(viewerId undefined)も公開フォローのみに絞ること", async () => {
     dbHolder.current = createDbSpy([]);
-    await monthlyReviewRepo.getRivalsCurrentScoresForSongs({
+    await monthlyL1112Repo.getRivalsCurrentScoresForSongs({
       ownerId: "owner-1",
       viewerId: undefined,
       version: "33",
@@ -121,7 +123,7 @@ describe("monthlyReviewRepo.getRivalsCurrentScoresForSongs: 閲覧者別の可�
 
   it("本人閲覧時(viewerId === ownerId)は承認記録を含む or 条件で絞ること(公開限定にしない)", async () => {
     dbHolder.current = createDbSpy([]);
-    await monthlyReviewRepo.getRivalsCurrentScoresForSongs({
+    await monthlyL1112Repo.getRivalsCurrentScoresForSongs({
       ownerId: "owner-1",
       viewerId: "owner-1",
       version: "33",
@@ -138,14 +140,14 @@ describe("monthlyReviewRepo.getRivalsCurrentScoresForSongs: 閲覧者別の可�
   });
 });
 
-describe("monthlyReviewRepo.getMonthlyTowerStats", () => {
+describe("monthlyActivityRepo.getMonthlyTowerStats", () => {
   it("結果を数値に変換して返すこと", async () => {
     dbHolder.current = createDbSpy({
       totalKeys: "1000",
       totalScratches: "100",
       playDays: "10",
     });
-    const result = await monthlyReviewRepo.getMonthlyTowerStats(
+    const result = await monthlyActivityRepo.getMonthlyTowerStats(
       "user-1",
       "33",
       "2025-06-01",
@@ -160,7 +162,7 @@ describe("monthlyReviewRepo.getMonthlyTowerStats", () => {
 
   it("結果がundefinedの場合すべて0を返すこと", async () => {
     dbHolder.current = createDbSpy(undefined);
-    const result = await monthlyReviewRepo.getMonthlyTowerStats(
+    const result = await monthlyActivityRepo.getMonthlyTowerStats(
       "user-1",
       "33",
       "2025-06-01",
@@ -170,10 +172,10 @@ describe("monthlyReviewRepo.getMonthlyTowerStats", () => {
   });
 });
 
-describe("monthlyReviewRepo.getMonthlyTowerRanking", () => {
+describe("monthlyActivityRepo.getMonthlyTowerRanking", () => {
   it("結果がない場合nullを返すこと", async () => {
     dbHolder.current = createDbSpy(undefined);
-    const result = await monthlyReviewRepo.getMonthlyTowerRanking(
+    const result = await monthlyActivityRepo.getMonthlyTowerRanking(
       "user-1",
       "33",
       "2025-06-01",
@@ -188,7 +190,7 @@ describe("monthlyReviewRepo.getMonthlyTowerRanking", () => {
       scratchRank: "5",
       totalUsers: "100",
     });
-    const result = await monthlyReviewRepo.getMonthlyTowerRanking(
+    const result = await monthlyActivityRepo.getMonthlyTowerRanking(
       "user-1",
       "33",
       "2025-06-01",
@@ -198,13 +200,13 @@ describe("monthlyReviewRepo.getMonthlyTowerRanking", () => {
   });
 });
 
-describe("monthlyReviewRepo.getAvailableMonths", () => {
+describe("monthlyActivityRepo.getAvailableMonths", () => {
   it("month列だけを抽出した配列を返すこと", async () => {
     dbHolder.current = createDbSpy([
       { month: "2025-06" },
       { month: "2025-05" },
     ]);
-    const result = await monthlyReviewRepo.getAvailableMonths(
+    const result = await monthlyActivityRepo.getAvailableMonths(
       "user-1",
       "33",
     );

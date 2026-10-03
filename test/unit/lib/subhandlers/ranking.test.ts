@@ -25,10 +25,14 @@ vi.mock("@/lib/db/domains/radar", () => ({
     getForUserAndVersion: (...a: unknown[]) => getForUserAndVersionMock(...a),
   },
 }));
-vi.mock("@/lib/db/aggregates/stats/tables", () => ({
-  statsTablesRepo: {
+vi.mock("@/lib/db/aggregates/stats/songTables", () => ({
+  statsSongTablesRepo: {
     getSongRanking: (...a: unknown[]) => getSongRankingMock(...a),
     getUserSongRankings: (...a: unknown[]) => getUserSongRankingsMock(...a),
+  },
+}));
+vi.mock("@/lib/db/aggregates/stats/latestScores", () => ({
+  statsLatestScoresRepo: {
     getLatestScoresWithMusicData: (...a: unknown[]) =>
       getLatestScoresWithMusicDataMock(...a),
   },
@@ -38,8 +42,8 @@ vi.mock("@/lib/db/aggregates/iidxTower", () => ({
     getTowerRanking: (...a: unknown[]) => getTowerRankingMock(...a),
   },
 }));
-vi.mock("@/lib/db/domains/songs", () => ({
-  songsRepo: {
+vi.mock("@/lib/db/domains/songs/master", () => ({
+  songMasterRepo: {
     getSongMasterWithDef: (...a: unknown[]) => getSongMasterWithDefMock(...a),
   },
 }));
@@ -91,7 +95,7 @@ describe("handleRankingSongById", () => {
   it("リポジトリが投げたら err(500)", async () => {
     getSongRankingMock.mockRejectedValue(new Error("boom"));
     const { result } = await handleRankingSongById(authReq({ songId: "5" }));
-    expect(result).toEqual({ ok: false, status: 500, message: "boom" });
+    expect(result).toEqual({ ok: false, status: 500, message: "Internal Server Error" });
   });
 });
 
@@ -156,7 +160,7 @@ describe("handleGlobalRanking", () => {
     getGlobalRankingMock.mockRejectedValue(new Error("db"));
     getForUserAndVersionMock.mockResolvedValue(null);
     const { result } = await handleGlobalRanking(authReq({}));
-    expect(result).toMatchObject({ ok: false, status: 500, message: "db" });
+    expect(result).toMatchObject({ ok: false, status: 500, message: "Internal Server Error" });
   });
 });
 

@@ -1,4 +1,4 @@
-import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
+import { statsLatestScoresRepo } from "@/lib/db/aggregates/stats/latestScores";
 import { ok } from "@/middlewares/api/apiResult";
 import type { HandlerResult } from "@/types/api";
 import type { RecommendedQuery } from "./_shared";
@@ -7,8 +7,8 @@ export async function handleStatsRecommended(
   q: RecommendedQuery,
 ): Promise<HandlerResult<unknown>> {
   const { userId, version, levels, difficulties, limit, offset } = q;
-  const totalBpi = await statsTablesRepo.getLatestTotalBpi(userId, version);
-  const allScores = await statsTablesRepo.getLatestScoresWithMusicData(
+  const totalBpi = await statsLatestScoresRepo.getLatestTotalBpi(userId, version);
+  const allScores = await statsLatestScoresRepo.getLatestScoresWithMusicData(
     userId,
     version,
     levels,

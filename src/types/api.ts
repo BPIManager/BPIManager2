@@ -1,7 +1,5 @@
 /**
- * API v2 共通レスポンスエンベロープの型定義。
- * 全エンドポイントで厳密に共通のレスポンス形状を持たせるための1箇所集約先。
- * 移行方式・背景は docs/decisions/0009-api-v2-common-envelope.md を参照。
+ * API v2 共通レスポンスエンベロープの型。全エンドポイントの共通形状を1箇所で定義する（docs/decisions/0009-api-v2-common-envelope.md）。
  */
 
 /** 一覧系エンドポイントのページネーション情報 */
@@ -32,9 +30,7 @@ export interface ApiResponse<T> {
 }
 
 /**
- * ビジネスロジックのハンドラが返す正規化結果。
- * ハンドラは `res` に直接書き込まず本型を返し、実際の書き込みは
- * v1/v2 アダプタ（`src/middlewares/api/apiResult.ts`）が行う。
+ * ビジネスロジックのハンドラが返す正規化結果。res へは直接書かず、v1/v2 アダプタ（apiResult.ts）が書き込む。
  */
 export type HandlerResult<T> =
   | { ok: true; body: T; meta?: Partial<ApiMeta> }

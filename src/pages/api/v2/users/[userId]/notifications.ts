@@ -30,11 +30,12 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
     res.setHeader("Allow", ["GET", "POST"]);
     writeV2Result(res, err(405, `Method ${req.method} Not Allowed`));
   } catch (error: unknown) {
+    console.error(error);
     writeV2Result(
       res,
       err(
         500,
-        error instanceof Error ? error.message : "Internal Server Error",
+        "Internal Server Error",
       ),
     );
   }

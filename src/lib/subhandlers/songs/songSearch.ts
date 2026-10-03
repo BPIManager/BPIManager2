@@ -1,5 +1,5 @@
 import type { NextApiRequest } from "next";
-import { songsRepo } from "@/lib/db/domains/songs";
+import { songSearchRepo } from "@/lib/db/domains/songs/search";
 import { topElementMap } from "@/constants/iidx/radars/topElements";
 import { ALL_RADAR_CATEGORIES } from "@/constants/iidx/radars";
 import type { RadarCategory } from "@/types/stats/radar";
@@ -58,7 +58,7 @@ export async function handleSongSearch(
   try {
     // 曲名未指定は、レーダー項目/BPM帯別のブラウズに限らず「楽曲一覧」表示としても使う
     const isBrowsing = title.length === 0;
-    const songs = await songsRepo.searchSongs({
+    const songs = await songSearchRepo.searchSongs({
       version: resolveVersion(req.query.version) as IIDXVersion,
       title: title || undefined,
       difficultyLevel: num(req.query.difficultyLevel) ?? undefined,

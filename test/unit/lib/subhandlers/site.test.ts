@@ -114,7 +114,7 @@ describe("handleSupporters", () => {
     expect(await handleSupporters()).toEqual({
       ok: false,
       status: 500,
-      message: "db",
+      message: "Internal Server Error",
     });
   });
 });

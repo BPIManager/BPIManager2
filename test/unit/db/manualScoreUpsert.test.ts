@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { scoresRepo } from "@/lib/db/domains/scores";
-import { navigationRepo } from "@/lib/db/domains/logs/navigation";
+import { scoreWriteRepo } from "@/lib/db/domains/scores/write";
+import { logBatchRepo } from "@/lib/db/domains/logs/batch";
 import { getManualBatchPrefix, mintManualBatchId } from "@/lib/scores/manualBatchId";
 
 /**
@@ -105,7 +105,7 @@ describe("mintManualBatchId", () => {
   });
 });
 
-describe("scoresRepo.upsertManual", () => {
+describe("scoreWriteRepo.upsertManual", () => {
   const baseParams = {
     userId: "user-1",
     songId: 1,
@@ -125,7 +125,7 @@ describe("scoresRepo.upsertManual", () => {
       batchId: baseParams.batchId,
     });
 
-    await scoresRepo.upsertManual(trx as never, baseParams);
+    await scoreWriteRepo.upsertManual(trx as never, baseParams);
 
     expect(calls.some((c) => c.method === "updateTable.execute")).toBe(true);
     expect(calls.some((c) => c.method === "insertInto.execute")).toBe(false);
@@ -137,7 +137,7 @@ describe("scoresRepo.upsertManual", () => {
       batchId: "csv-some-other-batch",
     });
 
-    await scoresRepo.upsertManual(trx as never, baseParams);
+    await scoreWriteRepo.upsertManual(trx as never, baseParams);
 
     expect(calls.some((c) => c.method === "insertInto.execute")).toBe(true);
     expect(calls.some((c) => c.method === "updateTable.execute")).toBe(false);
@@ -146,14 +146,14 @@ describe("scoresRepo.upsertManual", () => {
   it("最新行が存在しない（未プレイ曲）ならINSERTすること", async () => {
     const { trx, calls } = createTrxMock(undefined);
 
-    await scoresRepo.upsertManual(trx as never, baseParams);
+    await scoreWriteRepo.upsertManual(trx as never, baseParams);
 
     expect(calls.some((c) => c.method === "insertInto.execute")).toBe(true);
     expect(calls.some((c) => c.method === "updateTable.execute")).toBe(false);
   });
 });
 
-describe("navigationRepo.upsertManualBatch", () => {
+describe("logBatchRepo.upsertManualBatch", () => {
   const baseParams = {
     userId: "user-1",
     version: "34",
@@ -164,7 +164,7 @@ describe("navigationRepo.upsertManualBatch", () => {
   it("最新バッチが同じbatchIdならUPDATEすること", async () => {
     const { trx, calls } = createTrxMock({ id: 1, batchId: baseParams.batchId });
 
-    await navigationRepo.upsertManualBatch(trx as never, baseParams);
+    await logBatchRepo.upsertManualBatch(trx as never, baseParams);
 
     expect(calls.some((c) => c.method === "updateTable.execute")).toBe(true);
     expect(calls.some((c) => c.method === "insertInto.execute")).toBe(false);
@@ -173,7 +173,7 @@ describe("navigationRepo.upsertManualBatch", () => {
   it("最新バッチが別のbatchIdならINSERTにフォールバックすること", async () => {
     const { trx, calls } = createTrxMock({ id: 1, batchId: "csv-some-other-batch" });
 
-    await navigationRepo.upsertManualBatch(trx as never, baseParams);
+    await logBatchRepo.upsertManualBatch(trx as never, baseParams);
 
     expect(calls.some((c) => c.method === "insertInto.execute")).toBe(true);
     expect(calls.some((c) => c.method === "updateTable.execute")).toBe(false);

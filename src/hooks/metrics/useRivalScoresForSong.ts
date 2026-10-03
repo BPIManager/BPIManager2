@@ -7,9 +7,7 @@ type RivalAvgRow = { songId: number; avgExScore: number | null };
 type RivalTopRow = { songId: number; topExScore: number | null };
 
 /**
- * 指定楽曲のライバル平均・ライバルTOPスコアを取得する。
- * enabled=false の場合はフェッチしない。
- * songId をクエリパラメータで渡すことで当該楽曲のみ取得する。
+ * 指定楽曲のライバル平均・ライバルTOPスコアを取得する。songId をクエリで渡し当該楽曲のみ取得する。enabled=false の場合はフェッチしない。
  */
 export const useRivalScoresForSong = (
   songId: number | null,

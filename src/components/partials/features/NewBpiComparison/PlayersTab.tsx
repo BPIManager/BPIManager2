@@ -70,12 +70,8 @@ interface PlayersTabProps {
 }
 
 /**
- * BPI V2検証ツール(NewBpiComparison)の「全プレイヤー」一覧。公開ユーザー(☆12のスコアが
- * 1曲以上ある人のみ)をV1総合BPIが高い順にページ単位で列挙し、総合BPI
- * (V1/V2)の変化と単曲の増減数を1行1ユーザーで表示する。
- *
- * ページごとにサーバー側でBPIを再計算するため({@link usePlayersList}参照)、
- * 一度に全公開ユーザー分の計算は行わない。
+ * BPI V2 検証ツールの全プレイヤー一覧。☆12のスコアがある公開ユーザーをV1総合BPI順にページ単位で列挙する。
+ * BPI再計算はページごとにサーバーで行うため、全公開ユーザー分は一度に計算しない（usePlayersList 参照）。
  */
 export default function PlayersTab({ onSelectUser }: PlayersTabProps) {
   const { t } = useTranslation();

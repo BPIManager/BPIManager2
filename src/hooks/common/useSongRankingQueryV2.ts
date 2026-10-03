@@ -4,9 +4,7 @@ import { latestVersion } from "@/constants/iidx/iidxVersions";
 import type { SongRankingResponse } from "@/types/users/ranking";
 
 /**
- * `useSongRankingQuery` の API v2 版。共通エンベロープを unwrap した `body`
- * （`SongRankingResponse`）を返す。v2 へ移行済みのランキングエンドポイント
- * （現状 all-scores ドメイン）からのみ使う。
+ * useSongRankingQuery の API v2 版。body（SongRankingResponse）を返し、v2 移行済みのランキングエンドポイントでのみ使う。
  *
  * @param songId - 楽曲 ID（null の場合はフェッチしない）
  * @param version - IIDX バージョン（null の場合は最新バージョン）

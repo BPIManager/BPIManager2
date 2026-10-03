@@ -5,13 +5,10 @@ import { useUser } from "@/contexts/users/UserContext";
 import { fetcherV2 } from "@/services/swr/fetchV2";
 
 /**
- * `useAuthedSWR` の API v2 版。共通エンベロープ（`ApiResponse<T>`）を
- * `fetcherV2` で unwrap し、`data` にはエンベロープの `body`（`T`）が入る。
+ * useAuthedSWR の API v2 版。共通エンベロープを fetcherV2 で unwrap し、data には body（T）が入る。
+ * v2 へ移行済みのエンドポイントからのみ使う。キーの組み立ては useAuthedSWR と同じ。
  *
- * キーの組み立て（`fbUser?.uid` のみを使いオブジェクト全体をハッシュ化しない）
- * は `useAuthedSWR` と同じ。v2 へ移行済みのエンドポイントからのみ使う。
- *
- * @param url - フェッチ対象URL（フェッチしない場合は`null`）
+ * @param url - フェッチ対象URL（フェッチしない場合は null）
  * @param options - SWRの追加オプション
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -1,10 +1,9 @@
 import dayjs from "@/lib/dayjs";
 import { BpiCalculator } from "@/lib/bpi";
-import { db } from "@/lib/db";
 import { scoreDetailRepo } from "@/lib/db/domains/scores/detail";
-import { songsRepo } from "@/lib/db/domains/songs";
+import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { usersRepo } from "@/lib/db/domains/users";
-import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
+import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
 import { getUserAreaRank } from "@/lib/arena/prefectureRankings";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { ok } from "@/middlewares/api/apiResult";
@@ -25,16 +24,14 @@ export async function handleStatsTotalBpi(
       targetTime,
       onlyLastPlayedInRange: { start: new Date(0), end: targetTime },
     }),
-    songsRepo.getSongMasterWithDef(),
+    songMasterRepo.getSongMasterWithDef(),
     usersRepo.getIidxId(q.userId),
   ]);
 
   const level12Master = songMaster.filter((s) => s.difficultyLevel === 12);
   const totalCount = level12Master.length;
   const level12Scores = scores.filter((s) => Number(s.difficultyLevel) === 12);
-  // 総合BPI(V2)の潜在スキル推定はlevel11+12の全観測を使う必要があるため、
-  // 集計母集団(level12Master)とは別にscores全体からobservationsを作る
-  // （bulk.ts/manual.tsのbpiSongMaster由来observationsと同じ理由）
+  // 潜在スキル推定は level 11+12 の全観測が必要なため、集計母集団（level12Master）とは別に scores 全体から observations を作る。
   const observations: IBpiScoreObservation[] = scores
     .filter((s) => s.exScore !== null && s.exScore !== undefined)
     .map((s) => ({
@@ -46,16 +43,9 @@ export async function handleStatsTotalBpi(
     observations,
     level12Master,
   );
-  // BPIモデルの再推定等により、同じ時点を再計算しても過去に記録された値より
-  // 低く出ることがある（monthly-review/bpi.tsのbuildBpiTimelineと同じ理由）。
-  // asOf指定時（過去のある日との比較）も含め、その時点までに実際に記録された
-  // 最高値を下限として使う
-  const previousBest = await userStatusLogsRepo.getMaxTotalBpiAsOf(
-    db,
-    q.userId,
-    q.version,
-    targetTime,
-  );
+  // モデル再推定等で同じ時点の再計算値が過去の記録より低く出うるため、asOf 指定時を含め、その時点までの記録済み最高値を下限にする。
+   // monthly-review の buildBpiTimeline と同じ理由。
+  const previousBest = await userStatusLogsReadRepo.findMaxTotalBpiAsOf(q.userId, q.version, targetTime,);
   const totalBpi = BpiCalculator.ratchetTotalBpi(previousBest, freshTotalBpi);
   const estimatedRank = BpiCalculator.estimateRank(totalBpi);
   const areaRank =

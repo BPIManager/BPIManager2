@@ -1,7 +1,6 @@
 import type { NextApiRequest } from "next";
-import { db } from "@/lib/db";
 import { bpiOptimizerAggregateRepo } from "@/lib/db/aggregates/bpiOptimizer";
-import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
+import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
 import { findOptimalBpiPath } from "@/lib/bpi/optimizer";
 import { latestVersion, IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import { topElementMap } from "@/constants/iidx/radars/topElements";
@@ -88,7 +87,7 @@ export async function handleBpiOptimizer(
           : Promise.resolve(null),
         usesNonCurrentDataset
           ? Promise.resolve(null)
-          : userStatusLogsRepo.getMaxTotalBpi(db, userId, latestVersion),
+          : userStatusLogsReadRepo.findMaxTotalBpi(userId, latestVersion),
       ]);
     const actualCurrentExScoreBySongId = new Map<number, number | null>(
       (actualCurrentRows ?? []).map((r) => [
@@ -117,9 +116,7 @@ export async function handleBpiOptimizer(
       .split(",")
       .filter((d) => validDifficulties.has(d));
 
-    // BPI(V2)ネイティブの探索エンジンはBPI計算式を再実装せず`BpiCalculator`（V2）に
-    // 一貫して委譲するため、ここでの`currentBpi`もV2の単曲BPI（`BpiCalculator.calc`）を
-    // そのまま使う（DBの`scores.bpi`もV2で書き込まれた値なので一致する）。
+    // 探索エンジンは計算式を再実装せず BpiCalculator（V2）に委譲するため、currentBpi も V2 の単曲 BPI をそのまま使う（scores.bpi と一致する）。
     const songDataById = new Map<number, IBpiBasicSongData>();
     const songs: SongOptimizerInput[] = rawRows.map((r) => {
       const exScore = r.exScore != null ? Number(r.exScore) : null;
@@ -191,9 +188,7 @@ export async function handleBpiOptimizer(
       }
     }
 
-    // 自己べ/過去バージョンのデータセットで探索した場合、各ステップの`fromExScore`
-    // (=保存される「登録当初のスコア」)は探索起点(データセット値)ではなく、
-    // 実際に今作で保存し直したときの比較基準になる今作時点の実スコアに置き換える
+    // 自己べ・過去バージョンのデータセットで探索した場合、保存される fromExScore は探索起点ではなく今作時点の実スコアに置き換える（比較基準のため）。
     if (usesNonCurrentDataset && result.steps.length > 0) {
       result = {
         ...result,

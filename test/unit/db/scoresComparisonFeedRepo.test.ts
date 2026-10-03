@@ -12,7 +12,8 @@ vi.mock("@/lib/db", () => ({
 }));
 
 const { socialTimelineRepo } = await import("@/lib/db/aggregates/rivalScores/feed");
-const { socialComparisonRepo } = await import("@/lib/db/aggregates/rivalScores/comparison");
+const { socialWinLossRepo } = await import("@/lib/db/aggregates/rivalScores/winLoss");
+const { socialFollowedWinLossRepo } = await import("@/lib/db/aggregates/rivalScores/followedWinLoss");
 
 describe("socialTimelineRepo.getFollowedTimeline", () => {
   it("search/levels/difficulties/lastIdを指定すると対応する$ifがtrueになること", async () => {
@@ -96,12 +97,12 @@ describe("socialTimelineRepo.getViewerScoresForSongs", () => {
   });
 });
 
-describe("socialComparisonRepo.getWinLossStats", () => {
+describe("socialWinLossRepo.getWinLossStats", () => {
   it("行データを数値化して返すこと", async () => {
     dbHolder.current = createDbSpy([
       { level: 12, win: "5", lose: "3", draw: "1" },
     ]);
-    const result = await socialComparisonRepo.getWinLossStats(
+    const result = await socialWinLossRepo.getWinLossStats(
       "viewer-1",
       "rival-1",
       "33",
@@ -110,19 +111,19 @@ describe("socialComparisonRepo.getWinLossStats", () => {
   });
 });
 
-describe("socialComparisonRepo.getUserRadar", () => {
+describe("socialWinLossRepo.getUserRadar", () => {
   it("userId/versionでuserRadarCacheを検索すること", async () => {
     const row = { userId: "user-1", version: "33", notes: 10 };
     dbHolder.current = createDbSpy(row);
-    const result = await socialComparisonRepo.getUserRadar("user-1", "33");
+    const result = await socialWinLossRepo.getUserRadar("user-1", "33");
     expect(result).toEqual(row);
   });
 });
 
-describe("socialComparisonRepo.getWinLossHistory", () => {
+describe("socialWinLossRepo.getWinLossHistory", () => {
   it("対象レベルの楽曲が存在しない場合、空配列を返すこと", async () => {
     dbHolder.current = createDbSpy([]);
-    const result = await socialComparisonRepo.getWinLossHistory(
+    const result = await socialWinLossRepo.getWinLossHistory(
       "viewer-1",
       "rival-1",
       "33",
@@ -132,10 +133,10 @@ describe("socialComparisonRepo.getWinLossHistory", () => {
   });
 });
 
-describe("socialComparisonRepo.getFollowedWinLossSummary", () => {
+describe("socialFollowedWinLossRepo.getFollowedWinLossSummary", () => {
   it("levels/difficultiesを指定すると対応する$ifがtrueになること", async () => {
     dbHolder.current = createDbSpy([]);
-    await socialComparisonRepo.getFollowedWinLossSummary({
+    await socialFollowedWinLossRepo.getFollowedWinLossSummary({
       viewerId: "user-1",
       version: "33",
       levels: [12],
@@ -144,13 +145,13 @@ describe("socialComparisonRepo.getFollowedWinLossSummary", () => {
     const ifCalls = callsFor(dbHolder.current.calls, "$if");
     expect(ifCalls[0].args[0]).toBe(true);
     expect(ifCalls[1].args[0]).toBe(true);
-    // listId未指定時は絞り込み$ifがfalseのまま(#277導入前の既存挙動を維持)
+    // listId未指定時は絞り込み$ifがfalseのまま
     expect(ifCalls[2].args[0]).toBe(false);
   });
 
   it("listIdを指定するとフォローリスト絞り込みの$ifがtrueになること(#277)", async () => {
     dbHolder.current = createDbSpy([]);
-    await socialComparisonRepo.getFollowedWinLossSummary({
+    await socialFollowedWinLossRepo.getFollowedWinLossSummary({
       viewerId: "user-1",
       version: "33",
       levels: [],
@@ -193,7 +194,7 @@ describe("socialComparisonRepo.getFollowedWinLossSummary", () => {
       },
     ]);
 
-    const [result] = await socialComparisonRepo.getFollowedWinLossSummary({
+    const [result] = await socialFollowedWinLossRepo.getFollowedWinLossSummary({
       viewerId: "user-1",
       version: "33",
       levels: [],
@@ -249,7 +250,7 @@ describe("socialComparisonRepo.getFollowedWinLossSummary", () => {
       },
     ]);
 
-    const [result] = await socialComparisonRepo.getFollowedWinLossSummary({
+    const [result] = await socialFollowedWinLossRepo.getFollowedWinLossSummary({
       viewerId: "user-1",
       version: "33",
       levels: [],

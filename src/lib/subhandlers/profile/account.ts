@@ -24,7 +24,9 @@ export async function deleteAccount(
 
   const userName = await usersRepo.getUserName(uid);
   if (userName === null) {
-    return { result: err(404, "User not found"), ...base };
+    // DB削除は済んだが Firebase 削除が失敗して再試行されたケース。DBには無いが認証は
+    // 残っているため、認証側の削除だけを完了させる（呼び出し元は本人のトークンで認証済み）
+    return await deleteAuthOnly(uid, base);
   }
   if (parsed.data.confirmUserName !== userName) {
     return {
@@ -40,6 +42,25 @@ export async function deleteAccount(
     await adminAuth.deleteUser(uid);
     return { result: ok({ message: "アカウントを削除しました" }), ...base };
   } catch (error) {
+    console.error("Account deletion error:", error);
+    return {
+      result: err(500, "アカウントの削除に失敗しました"),
+      ...base,
+    };
+  }
+}
+
+async function deleteAuthOnly(
+  uid: string,
+  base: { targetUserId: string; viewerId: string },
+): Promise<HandleOutcome<{ message: string }>> {
+  try {
+    await adminAuth.deleteUser(uid);
+    return { result: ok({ message: "アカウントを削除しました" }), ...base };
+  } catch (error: unknown) {
+    if ((error as { code?: string }).code === "auth/user-not-found") {
+      return { result: err(404, "User not found"), ...base };
+    }
     console.error("Account deletion error:", error);
     return {
       result: err(500, "アカウントの削除に失敗しました"),

@@ -2,7 +2,7 @@ import type { NextApiRequest } from "next";
 import { z } from "zod";
 import dayjs from "@/lib/dayjs";
 import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
-import { socialComparisonRepo } from "@/lib/db/aggregates/rivalScores/comparison";
+import { socialWinLossRepo } from "@/lib/db/aggregates/rivalScores/winLoss";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 import { accessError, err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
@@ -58,7 +58,7 @@ export async function handleRivalWinLossHistory(
     const rivalDenied = accessError(rivalAccess);
     if (rivalDenied) return { result: rivalDenied, targetUserId, viewerId };
 
-    const rows = await socialComparisonRepo.getWinLossHistory(
+    const rows = await socialWinLossRepo.getWinLossHistory(
       userId,
       rivalId,
       version,

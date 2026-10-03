@@ -18,18 +18,22 @@ vi.mock("@/middlewares/api/withApiOnProfile", () => ({
   checkProfileAccess: (...a: unknown[]) => checkProfileAccessMock(...a),
 }));
 
-vi.mock("@/lib/db/aggregates/allScores", () => ({
-  allScoresAggregateRepo: {
+vi.mock("@/lib/db/aggregates/allScores/list", () => ({
+  allScoresListRepo: {
     getAllScoresList: (...a: unknown[]) => getAllScoresListMock(...a),
+  },
+}));
+vi.mock("@/lib/db/aggregates/allScores/selfAndRivals", () => ({
+  allScoresSelfRivalRepo: {
     getRivalScoresForAllSong: (...a: unknown[]) =>
       getRivalScoresForAllSongMock(...a),
+    getAllSongRanking: (...a: unknown[]) => getAllSongRankingMock(...a),
   },
 }));
 
 vi.mock("@/lib/db/domains/allScores", () => ({
   allScoresRepo: {
     getScoreHistory: (...a: unknown[]) => getScoreHistoryMock(...a),
-    getAllSongRanking: (...a: unknown[]) => getAllSongRankingMock(...a),
   },
 }));
 
@@ -91,7 +95,7 @@ describe("handleAllScoresList", () => {
     checkProfileAccessMock.mockResolvedValue(grant("target"));
     getAllScoresListMock.mockRejectedValue(new Error("db down"));
     const { result } = await handleAllScoresList(req({ userId: "target" }));
-    expect(result).toEqual({ ok: false, status: 500, message: "db down" });
+    expect(result).toEqual({ ok: false, status: 500, message: "Internal Server Error" });
   });
 });
 

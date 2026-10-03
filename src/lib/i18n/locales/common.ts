@@ -149,6 +149,11 @@ export const commonTranslations = {
     "zh-TW": "已載入全部資料",
     ko: "모든 데이터를 불러왔습니다",
   },
+  "common.pagination.first": { ja: "最初のページ", en: "First page", "zh-TW": "第一頁", ko: "첫 페이지" },
+  "common.pagination.prev": { ja: "前のページ", en: "Previous page", "zh-TW": "上一頁", ko: "이전 페이지" },
+  "common.pagination.next": { ja: "次のページ", en: "Next page", "zh-TW": "下一頁", ko: "다음 페이지" },
+  "common.sticky.pin": { ja: "固定表示する", en: "Pin", "zh-TW": "固定顯示", ko: "고정 표시" },
+  "common.sticky.unpin": { ja: "固定表示を解除", en: "Unpin", "zh-TW": "取消固定", ko: "고정 해제" },
   "common.prev": { ja: "前へ", en: "Prev", "zh-TW": "上一頁", ko: "이전" },
   "common.next": { ja: "次へ", en: "Next", "zh-TW": "下一頁", ko: "다음" },
   "format.monthYear": {

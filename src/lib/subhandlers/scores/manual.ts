@@ -1,6 +1,6 @@
-import { scoresRepo } from "@/lib/db/domains/scores";
+import { latestScoresRepo } from "@/lib/db/domains/scores/latest";
 import { allScoresRepo } from "@/lib/db/domains/allScores";
-import { songsRepo } from "@/lib/db/domains/songs";
+import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { allSongsRepo } from "@/lib/db/domains/allSongs";
 import { saveManualScoreUpdate } from "@/lib/db/orchestrators/manualScoreUpdate";
 import { BpiCalculator } from "@/lib/bpi";
@@ -27,15 +27,8 @@ function currentClearMiss(current: ImprovementCurrent | undefined) {
 }
 
 /**
- * 画面上でのEXスコア手動入力・保存を扱う。
- *
- * `songId`は`songs`/`songDef`ドメイン（BPI計算対象、☆11/12）と`allSongs`
- * ドメイン（全難易度、☆1-12）のどちらかであり得るため、`songDomain`で
- * どちらの空間かを明示させ、title+difficultyでもう一方のドメインの楽曲を
- * 解決する（`updateMyScore.ts`と同じブリッジ方式）。
- *
- * CSVインポートとは別の保存経路（`saveManualScoreUpdate`）を通り、決定的
- * batchIdにより同日内の複数回の手動保存を1レコードにまとめる。
+ * 画面からのEXスコア手動入力・保存。songId は songDomain で空間を明示し、もう一方のドメインは title+difficulty で解決する。
+ * CSVインポートとは別経路（saveManualScoreUpdate）で、決定的 batchId により同日の複数回保存を1レコードにまとめる。
  */
 export async function handleScoreManualUpdate(
   req: AuthenticatedNextApiRequest,
@@ -59,9 +52,9 @@ export async function handleScoreManualUpdate(
   try {
     const [bpiSongMaster, allLevelMaster, currentScores, currentAllScores] =
       await Promise.all([
-        songsRepo.getSongMasterWithDef(),
+        songMasterRepo.getSongMasterWithDef(),
         allSongsRepo.getAllLevelMaster(),
-        scoresRepo.getLatestScores(userId, version),
+        latestScoresRepo.getLatestScores(userId, version),
         allScoresRepo.getLatestAllScores(userId, version),
       ]);
 

@@ -7,11 +7,8 @@ import {
 import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
 import { useMemo } from "react";
 
-// 今回更新したV2単曲BPIの集合を丸ごと1つの「対象楽曲」として扱う
-// べき乗平均(総曲数=集合のサイズなので未プレイ曲の穴埋めは発生しない。
-// bpiBoxStats.tsのtotalOfと同じ考え方)。少数の観測から潜在スキルを推定する
-// シフト法(BpiCalculator.calculateTotalBPI)は使わない
-// (縮小推定で実力より大幅に低く出るため)。
+// 今回更新したV2単曲BPIの集合を1つの対象楽曲として扱い、べき乗平均で集約する（未プレイの穴埋めは発生しない）。
+ // 少数の観測では縮小推定でシフト法（calculateTotalBPI）が実力より低く出るため使わない。
 const v1Aggregator = new BpiV1();
 
 /**

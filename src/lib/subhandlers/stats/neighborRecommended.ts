@@ -1,4 +1,4 @@
-import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
+import { statsLatestScoresRepo } from "@/lib/db/aggregates/stats/latestScores";
 import { statsSocialRepo } from "@/lib/db/aggregates/stats/social";
 import { ok } from "@/middlewares/api/apiResult";
 import type { HandlerResult } from "@/types/api";
@@ -8,7 +8,7 @@ export async function handleStatsNeighborRecommended(
   q: NeighborQuery,
 ): Promise<HandlerResult<unknown>> {
   const { userId, version, levels, difficulties, limit, offset, n } = q;
-  const userTotalBpi = await statsTablesRepo.getLatestTotalBpi(userId, version);
+  const userTotalBpi = await statsLatestScoresRepo.getLatestTotalBpi(userId, version);
   const neighborIds = await statsSocialRepo.getNeighborIds(
     userTotalBpi,
     userId,

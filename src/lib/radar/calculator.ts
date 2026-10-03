@@ -1,3 +1,4 @@
+import { ALL_RADAR_CATEGORIES } from "@/constants/iidx/radars";
 import { BpiCalculator } from "@/lib/bpi";
 import {
   topElementMap,
@@ -9,19 +10,6 @@ import {
   RadarSongEntry,
 } from "@/types/stats/radar";
 import type { IBpiBasicSongData, IBpiScoreObservation } from "@/types/songs/bpi";
-
-/**
- * レーダーチャートで使用する全カテゴリの一覧。
- * 各楽曲は `topElements.json` によっていずれか 1 つのカテゴリに分類される。
- */
-export const ALL_CATEGORIES: RadarCategory[] = [
-  "NOTES",
-  "CHORD",
-  "PEAK",
-  "CHARGE",
-  "SCRATCH",
-  "SOFLAN",
-];
 
 interface RadarScoreInput {
   title: string;
@@ -37,7 +25,7 @@ export type RadarSongMaster = Map<
   IBpiBasicSongData & { songId: number }
 >;
 
-/** `songsRepo.getSongMasterWithDef()` 等の結果から {@link RadarSongMaster} を組み立てる。 */
+/** `songMasterRepo.getSongMasterWithDef()` 等の結果から {@link RadarSongMaster} を組み立てる。 */
 export function buildRadarSongMaster(
   songs: {
     songId: number;
@@ -70,12 +58,8 @@ export function buildRadarSongMaster(
 }
 
 /**
- * スコアリストからレーダーチャートデータを計算する。
- *
- * `topElements.json` を参照して各楽曲をカテゴリに分類し、
- * カテゴリごとに {@link BpiCalculator.calculateTotalBPI} を適用した総合 BPI を算出する。
- * 未プレイ曲を潜在スキルから予測するV2の仕様上、プレイ済み・未プレイ問わず
- * `songMaster` から songId・mu・sigma 等を引けることが必要。
+ * スコアリストからレーダーチャートデータを計算する。各楽曲を topElements.json でカテゴリに分類し、カテゴリごとに総合BPIを算出する。
+ * 未プレイ曲を潜在スキルから予測するため、songMaster から songId・mu・sigma 等を引けること（プレイ済み・未プレイ問わず）が必要。
  *
  * @param scores - 計算対象のスコア配列（タイトル・難易度・EX スコア・BPI）
  * @param songMaster - `${title}___${difficulty}` キーの曲マスタ（mu/sigma込み）
@@ -87,7 +71,7 @@ export function calculateRadar(
   validSongKeys?: Set<string>,
 ): RadarResponse {
   const categoryGroup = new Map<RadarCategory, RadarScoreInput[]>();
-  ALL_CATEGORIES.forEach((cat) => categoryGroup.set(cat, []));
+  ALL_RADAR_CATEGORIES.forEach((cat) => categoryGroup.set(cat, []));
 
   const playedKeys = new Set(
     scores.map((s) => `${s.title}___${s.difficulty}`),
@@ -111,7 +95,7 @@ export function calculateRadar(
 
   const result = {} as RadarResponse;
 
-  for (const category of ALL_CATEGORIES) {
+  for (const category of ALL_RADAR_CATEGORIES) {
     const categoryScores = categoryGroup.get(category)!;
 
     const unplayedSongs = (topElementsByCategory.get(category) ?? []).filter(

@@ -67,9 +67,8 @@ export const useChartColors = (): ChartColors => {
   const [colors, setColors] = useState<ChartColors>(read);
 
   useEffect(() => {
-    // SSR時はgetComputedStyleが使えずサーバー/クライアントで結果が変わるため、
-    // hydration後に実際のCSS変数値で再読込してハイドレーションミスマッチを避ける
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+    // getComputedStyle は SSR で使えないため、hydration 後に実際の CSS 変数値で再読込してミスマッチを避ける。
+     // eslint-disable-next-line react-hooks/set-state-in-effect
     setColors(read());
     const observer = new MutationObserver(() => setColors(read()));
     observer.observe(document.documentElement, {

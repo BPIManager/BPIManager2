@@ -51,9 +51,7 @@ const RivalListEditRows = ({ userId, lists }: Props) => {
     }
   };
 
-  // Select内の「リストがありません」から直接作成したとき、作成した
-  // リストへその場でこの行のユーザーを追加する(作成する動機は大抵
-  // 「このユーザーを入れるリストが無い」ことのため)
+  // Select 内の「リストがありません」から作成した場合、作成したリストへこの行のユーザーをその場で追加する。
   const handleCreateAndAssign = async (followingId: string, name: string) => {
     const newListId = await createList(name, false);
     if (newListId != null) {

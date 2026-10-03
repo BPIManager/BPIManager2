@@ -5,9 +5,7 @@ import type { RadarCategory } from "@/types/stats/radar";
 import { ALL_RADAR_CATEGORIES } from "@/constants/iidx/radars";
 import type { ScatterPoint } from "@/hooks/metrics/useArenaAnalysis";
 
-// 自分とライバル、2人分の既知bpi値をカテゴリ別に集計するだけの比較用途。
-// ライバル側の生スコア全体を持っていないためV2の潜在スキル推定は組めず、
-// 純粋な集計関数としてV1のべき乗平均をそのまま使う。
+// 自分とライバルの既知 bpi をカテゴリ別に集計するだけのため、V2 の潜在スキル推定は組めず V1 のべき乗平均を使う。
 const v1 = new BpiV1();
 
 export interface RivalDiffPoint {

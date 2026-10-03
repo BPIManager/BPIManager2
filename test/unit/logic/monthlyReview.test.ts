@@ -245,6 +245,16 @@ describe("buildGrowthRanking", () => {
     expect(result?.byAbsGrowth).toHaveLength(1);
     expect(result?.byAbsGrowth[0].isViewer).toBe(true);
   });
+
+  it("BPIが-15直上（分母が小さい）では伸び率を算出せずnullにすること", () => {
+    const result = buildGrowthRanking([], "viewer-1", 5, -14.9);
+    expect(result?.byAbsGrowth[0].growthRate).toBeNull();
+  });
+
+  it("通常の分母では伸び率(%)を算出すること", () => {
+    const result = buildGrowthRanking([], "viewer-1", 5, 0);
+    expect(result?.byAbsGrowth[0].growthRate).toBeCloseTo(33.33, 2);
+  });
 });
 
 describe("buildTopSongs", () => {

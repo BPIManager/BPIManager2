@@ -18,14 +18,30 @@ const getSelfVersionScoresMock = vi.fn();
 const getUnplayedSongsMock = vi.fn();
 const collectionMock = vi.fn();
 
+// bulk はトランザクションを開き、ユーザーの書き込みロックを取る。DB に接続せずに実行できるよう、
+// トランザクションはそのまま callback を呼ぶ形にし、ロックは何もしない
+vi.mock("@/lib/db", () => ({
+  db: {
+    transaction: () => ({
+      execute: (fn: (trx: unknown) => unknown) => fn({}),
+    }),
+  },
+}));
+vi.mock("@/lib/db/shared/userWriteLock", () => ({
+  lockUserForWrite: vi.fn(),
+}));
 vi.mock("@/lib/db/domains/scores/detail", () => ({
   scoreDetailRepo: {
     getScoresWithDetails: (...a: unknown[]) => getScoresWithDetailsMock(...a),
   },
 }));
-vi.mock("@/lib/db/domains/scores", () => ({
-  scoresRepo: {
+vi.mock("@/lib/db/domains/scores/history", () => ({
+  scoreHistoryRepo: {
     getHistoryForSong: (...a: unknown[]) => getHistoryForSongMock(...a),
+  },
+}));
+vi.mock("@/lib/db/domains/scores/latest", () => ({
+  latestScoresRepo: {
     getLatestScores: vi.fn().mockResolvedValue([]),
   },
 }));
@@ -49,11 +65,13 @@ vi.mock("@/lib/db/domains/allScores", () => ({
     getLatestAllScores: (...a: unknown[]) => getLatestAllScoresMock(...a),
   },
 }));
-vi.mock("@/lib/db/domains/logs/navigation", () => ({
-  navigationRepo: { getLatestTotalBpi: vi.fn().mockResolvedValue(null) },
+vi.mock("@/lib/db/domains/logs/totalBpi", () => ({
+  logTotalBpiRepo: {
+    getLatestTotalBpi: vi.fn().mockResolvedValue(null),
+  },
 }));
-vi.mock("@/lib/db/domains/songs", () => ({
-  songsRepo: {
+vi.mock("@/lib/db/domains/songs/master", () => ({
+  songMasterRepo: {
     getSongMasterWithDef: (...a: unknown[]) => getSongMasterWithDefMock(...a),
   },
 }));

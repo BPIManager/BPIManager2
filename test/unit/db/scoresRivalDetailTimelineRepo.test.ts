@@ -11,15 +11,18 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-const { rivalRepo } = await import("@/lib/db/aggregates/rivalScores/rival");
+
+const { rivalPairwiseRepo } = await import("@/lib/db/aggregates/rivalScores/pairwise");
+const { rivalOvertakenRepo } = await import("@/lib/db/aggregates/rivalScores/overtaken");
+const { rivalAggregateRepo } = await import("@/lib/db/aggregates/rivalScores/aggregate");
 const { scoreDetailRepo } = await import("@/lib/db/domains/scores/detail");
 const { timelineRepo } = await import("@/lib/db/domains/scores/timeline");
 const { scoreTimelineRepo } = await import("@/lib/db/aggregates/scoreTimeline");
 
-describe("rivalRepo.getRivalComparisonScores", () => {
+describe("rivalPairwiseRepo.getRivalComparisonScores", () => {
   it("limit/offsetが指定された場合のみ適用されること", async () => {
     dbHolder.current = createDbSpy([]);
-    await rivalRepo.getRivalComparisonScores({
+    await rivalPairwiseRepo.getRivalComparisonScores({
       viewerId: "user-1",
       version: "33",
       limit: 20,
@@ -31,7 +34,7 @@ describe("rivalRepo.getRivalComparisonScores", () => {
 
   it("limit/offset未指定の場合は適用されないこと", async () => {
     dbHolder.current = createDbSpy([]);
-    await rivalRepo.getRivalComparisonScores({
+    await rivalPairwiseRepo.getRivalComparisonScores({
       viewerId: "user-1",
       version: "33",
     });
@@ -40,10 +43,10 @@ describe("rivalRepo.getRivalComparisonScores", () => {
   });
 });
 
-describe("rivalRepo.getScoreComparisonList", () => {
+describe("rivalPairwiseRepo.getScoreComparisonList", () => {
   it("levelArray/diffArray/cursorが指定された場合、追加のwhereが適用されること", async () => {
     dbHolder.current = createDbSpy([]);
-    await rivalRepo.getScoreComparisonList({
+    await rivalPairwiseRepo.getScoreComparisonList({
       userId: "user-1",
       version: "33",
       limit: 20,
@@ -59,7 +62,7 @@ describe("rivalRepo.getScoreComparisonList", () => {
 
   it("levelArray/diffArray/cursorが空の場合、ベースのwhereのみになること", async () => {
     dbHolder.current = createDbSpy([]);
-    await rivalRepo.getScoreComparisonList({
+    await rivalPairwiseRepo.getScoreComparisonList({
       userId: "user-1",
       version: "33",
       limit: 20,
@@ -72,17 +75,17 @@ describe("rivalRepo.getScoreComparisonList", () => {
   });
 });
 
-describe("rivalRepo.getOvertakenRivals", () => {
+describe("rivalOvertakenRepo.getOvertakenRivals", () => {
   it("batchId指定時は曲ごとの集約(groupBy songId)を経てbatchIdで絞り込むこと", async () => {
     dbHolder.current = createDbSpy([]);
-    await rivalRepo.getOvertakenRivals("user-1", "33", { batchId: "batch-1" });
+    await rivalOvertakenRepo.getOvertakenRivals("user-1", "33", { batchId: "batch-1" });
     const whereCalls = callsFor(dbHolder.current.calls, "where");
     const groupByCalls = callsFor(dbHolder.current.calls, "groupBy");
     expect(
       whereCalls.some((c) => c.args[0] === "batchId" && c.args[2] === "batch-1"),
     ).toBe(true);
     // 期間/バッチ内で複数回更新された曲を1件に集約するためのgroupBy(songId)が
-    // 存在すること(#430と同根の不具合、#431)
+    // 存在すること
     expect(
       groupByCalls.some(
         (c) => c.args[0] === "songId" || c.args[0] === "sc.songId",
@@ -92,7 +95,7 @@ describe("rivalRepo.getOvertakenRivals", () => {
 
   it("range指定時は曲ごとの集約を経て期間で絞り込むこと", async () => {
     dbHolder.current = createDbSpy([]);
-    await rivalRepo.getOvertakenRivals("user-1", "33", {
+    await rivalOvertakenRepo.getOvertakenRivals("user-1", "33", {
       range: {
         start: new Date("2025-06-01"),
         end: new Date("2025-06-30"),
@@ -110,24 +113,23 @@ describe("rivalRepo.getOvertakenRivals", () => {
 
   it("公開または承認済みのライバルのみに絞り込むwhere条件(コールバック形式)を追加すること(#275フォロー後方修正)", async () => {
     dbHolder.current = createDbSpy([]);
-    await rivalRepo.getOvertakenRivals("user-1", "33", { batchId: "batch-1" });
+    await rivalOvertakenRepo.getOvertakenRivals("user-1", "33", { batchId: "batch-1" });
     const whereCalls = callsFor(dbHolder.current.calls, "where");
-    // isPublic単純フィルタ(#274/#275初期実装)ではなく、
+    // isPublicの単純フィルタではなく、
     // isPublic OR 承認記録の存在、をコールバック形式のwhereで判定する
-    // (公開時代に成立したfollowsを自動承認扱いにしないため)
+    // (承認記録のない既存followsを自動承認扱いにしないため)
     expect(whereCalls.some((c) => typeof c.args[0] === "function")).toBe(
       true,
     );
-    // 退行防止: コールバック形式と併存/置き換えで"ru.isPublic"への単純な
-    // 文字列where(#274/#275初期実装の再混入)が残っていないことを保証する
+    // "ru.isPublic"への単純な文字列whereが残っていないことを保証する
     expect(whereCalls.some((c) => c.args[0] === "ru.isPublic")).toBe(false);
   });
 });
 
-describe("rivalRepo.getRivalLatestScoresBySong", () => {
+describe("rivalAggregateRepo.getRivalLatestScoresBySong", () => {
   it("songIdsが空の場合、DBに問い合わせず空配列を返すこと", async () => {
     dbHolder.current = createDbSpy([]);
-    const result = await rivalRepo.getRivalLatestScoresBySong({
+    const result = await rivalAggregateRepo.getRivalLatestScoresBySong({
       userId: "user-1",
       version: "33",
       songIds: [],
@@ -137,12 +139,12 @@ describe("rivalRepo.getRivalLatestScoresBySong", () => {
   });
 });
 
-describe("rivalRepo.getFollowedScoresForSong", () => {
+describe("rivalAggregateRepo.getFollowedScoresForSong", () => {
   it("followsとscoresを結合したクエリを実行し結果をそのまま返すこと", async () => {
     const rows = [{ userId: "rival-1", exScore: 1800 }];
     dbHolder.current = createDbSpy(rows);
 
-    const result = await rivalRepo.getFollowedScoresForSong({
+    const result = await rivalAggregateRepo.getFollowedScoresForSong({
       viewerId: "viewer-1",
       songId: 1,
       version: "33",
@@ -155,10 +157,10 @@ describe("rivalRepo.getFollowedScoresForSong", () => {
   });
 });
 
-describe("rivalRepo.getRivalAvgScores / getRivalTopScores", () => {
+describe("rivalAggregateRepo.getRivalAvgScores / getRivalTopScores", () => {
   it("getRivalAvgScoresはsongIds指定時にsongIdでのwhere絞り込みが含まれること", async () => {
     dbHolder.current = createDbSpy([]);
-    await rivalRepo.getRivalAvgScores({
+    await rivalAggregateRepo.getRivalAvgScores({
       userId: "user-1",
       version: "33",
       songIds: [1, 2],
@@ -173,7 +175,7 @@ describe("rivalRepo.getRivalAvgScores / getRivalTopScores", () => {
 
   it("getRivalTopScoresはsongIds未指定時にsongIdでのwhere絞り込みが含まれないこと", async () => {
     dbHolder.current = createDbSpy([]);
-    await rivalRepo.getRivalTopScores({ userId: "user-1", version: "33" });
+    await rivalAggregateRepo.getRivalTopScores({ userId: "user-1", version: "33" });
     const whereCalls = callsFor(dbHolder.current.calls, "where");
     expect(whereCalls.some((c) => c.args[0] === "songId")).toBe(false);
   });
@@ -330,7 +332,7 @@ describe("timelineRepo.getVersionComparisons", () => {
       whereCalls.some((c) => c.args[0] === "batchId" && c.args[2] === "batch-1"),
     ).toBe(true);
     // 期間/バッチ内で複数回更新された曲を1件に集約するためのgroupBy(songId)が
-    // 存在すること(#430: 集約しないと更新イベントの数だけ比較行が重複する)
+    // 存在すること（集約しないと更新イベントの数だけ比較行が重複する）
     expect(
       groupByCalls.some(
         (c) => c.args[0] === "songId" || c.args[0] === "sc.songId",

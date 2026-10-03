@@ -31,9 +31,8 @@ function LocaleDetectionModal() {
 
     const primaryLang = navigator.languages?.[0] ?? navigator.language ?? "ja";
     if (!primaryLang.startsWith("ja")) {
-      // SSR時はnavigator/localStorageが無くサーバー/クライアントで結果が変わるため、
-      // hydration後にのみ判定してハイドレーションミスマッチを避ける
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+      // navigator・localStorage は SSR で無いため、hydration 後にのみ判定してハイドレーションミスマッチを避ける。
+       // eslint-disable-next-line react-hooks/set-state-in-effect
       setOpen(true);
     }
   }, []);

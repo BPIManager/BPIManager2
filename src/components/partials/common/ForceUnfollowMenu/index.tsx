@@ -17,12 +17,8 @@ import { useTranslation } from "@/hooks/common/useTranslation";
 import { UserRelationship } from "@/types/users/profile";
 
 /**
- * 「強制フォロー解除」用の三点メニュー。
- *
- * 閲覧中のプロフィールの相手が自分をフォローしている場合のみ表示する
- * （それ以外のケースでは解除する対象の`follows`関係がないため）。
- * 自分が公開設定かどうかは問わない（非公開ユーザーに限らず、任意の
- * フォロワーを外したいケースがあるため）。
+ * 「強制フォロー解除」の三点メニュー。相手が自分をフォローしている場合のみ表示する（解除対象の follows が無ければ出さない）。
+ * 公開設定は問わず、任意のフォロワーを外せるようにする。
  */
 const ForceUnfollowMenu = ({
   userId,

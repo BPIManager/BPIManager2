@@ -1,13 +1,8 @@
 /**
- * ランキング・一覧系クエリで繰り返し使われる「表示用ユーザー情報」の
- * SELECTカラムリストを組み立てる。
+ * ランキング・一覧系で使う表示用ユーザー情報の SELECT カラムを組み立てる。
+ * userId/userName/profileImage/isPublic は非公開マスク（maskPrivateIdentity）に必要な最小セット。追加列は呼び出し側で足す。
  *
- * `userId`/`userName`/`profileImage`/`isPublic`の4列は、非公開ユーザーの
- * マスク処理（`shared/privacyMask.ts`の`maskPrivateIdentity`）に必要な
- * 最小セットのため、この4列を返す用途に限定している。ドメインごとに追加で必要な列
- * （`profileText`/`iidxId`等）は呼び出し側で個別に足す。
- *
- * @param alias - `users` テーブルのJOINエイリアス（例: `"u"`）
+ * @param alias - users テーブルの JOIN エイリアス（例: u）
  */
 export function userDisplayColumns<Alias extends string>(alias: Alias) {
   return [

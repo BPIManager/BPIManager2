@@ -20,7 +20,7 @@ const PAGE_SIZE = 100;
 class SongPatternsRepository {
   async getPatterns(
     songId: number,
-    cursor: number,
+    offset: number,
     viewerId: string,
     sortBy: "score" | "upvote" = "score",
   ): Promise<PatternsPage> {
@@ -45,8 +45,10 @@ class SongPatternsRepository {
           : sql`sp.score`,
         "desc",
       )
+      // 同順位の行を毎回同じ順で返すため、ソートキーに pattern をタイブレーカーとして加える
+      .orderBy("sp.pattern", "asc")
       .limit(PAGE_SIZE + 1)
-      .offset(cursor)
+      .offset(offset)
       .execute();
 
     const hasMore = rows.length > PAGE_SIZE;
@@ -60,7 +62,7 @@ class SongPatternsRepository {
         downvoteCount: Number(r.downvoteCount),
         myVote: r.myVote ?? null,
       })),
-      nextCursor: hasMore ? cursor + PAGE_SIZE : null,
+      nextCursor: hasMore ? offset + PAGE_SIZE : null,
     };
   }
 

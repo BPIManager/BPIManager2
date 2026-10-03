@@ -7,7 +7,7 @@ import { useProfile } from "@/hooks/users/useProfile";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { BpiV1 } from "@bpim/bpicalc";
 import { BpiCalculator } from "@/lib/bpi";
-import { ALL_CATEGORIES } from "@/lib/radar/calculator";
+import { ALL_RADAR_CATEGORIES } from "@/constants/iidx/radars";
 import {
   topElementMap,
   topElementsByCategory,
@@ -23,10 +23,7 @@ interface Props {
   userId: string;
 }
 
-// このページは「V1(旧) vs V2(現行)」の比較専用ツールで、V1側は本番実装
-// (BpiCalculator、現在はV2)ではなくレガシーのV1公式を直接使う。V2側は
-// 本番と同じBpiCalculator(songDefのmu/sigmaをDBから読む)を使い、本番の
-// 総合BPIと値がずれないようにする。
+// V1（旧）の比較専用ツールのため、V1側はレガシーの V1 公式を直接使う。V2側は本番と同じ BpiCalculator を使い、値のズレを防ぐ。
 const legacyV1 = new BpiV1();
 
 /** 推移グラフのX軸(BPI)の目盛り。10刻み＋現行の床(-15)。 */
@@ -55,19 +52,14 @@ const SCORE_RATE_STEPS: number[] = (() => {
 })();
 
 /**
- * 分布ベースの新方式BPIの検証用: 自分のスコアで現行BPIと新方式BPIを
- * 楽曲ごとに見比べるための集計ロジック。
- *
- * 新方式(V2)のパラメータ(mu/sigma)は本番と同じ `songDef` (DB)から読む
- * （`BpiCalculator` 経由）。
+ * 分布ベースの新方式 BPI の検証用に、自分のスコアで現行と新方式の BPI を曲ごとに見比べる集計ロジック。
+ * 新方式の mu/sigma は本番と同じ songDef（DB）から BpiCalculator 経由で読む。
  */
 export default function NewBpiComparison({ userId }: Props) {
   const [sortKey, setSortKey] = useState<SortKey>("deltaDesc");
   const [selectedSongId, setSelectedSongId] = useState<number | null>(null);
 
-  // 他ユーザーのデータをユーザーIDで検索して閲覧する機能。アクセス可否の
-  // 判定自体はAPI側(checkUserAccess: 公開プロフィール or 承認済みフォロー)
-  // に委ね、ここでは検索状態と結果表示のみを担う。
+  // 他ユーザーのデータをIDで閲覧する検索状態と結果表示のみを担う。アクセス可否は API（checkUserAccess）に委ねる。
   const [searchInput, setSearchInput] = useState("");
   const [viewedUserId, setViewedUserId] = useState(userId);
   const isViewingSelf = viewedUserId === userId;
@@ -116,10 +108,8 @@ export default function NewBpiComparison({ userId }: Props) {
     accessState === "ok" ? viewedUserId : undefined,
     latestVersion,
   );
-  // 総合BPI(未プレイ曲をa_iからの予測で埋める方式)には
-  // 未プレイ曲を含む☆12全曲の一覧が要る。useUserScores(/scores)はプレイ済み
-  // 楽曲しか返さないため、曲マスタ自体は別途取得する(閲覧対象ユーザーに
-  // 依存しない共通データのため、viewedUserIdとは無関係に取得してよい)。
+  // 総合BPIの未プレイ埋めには未プレイ曲を含む☆12全曲の一覧が要る。useUserScores はプレイ済みしか返さないため曲マスタを別途取得する。
+   // 曲マスタは閲覧対象ユーザーに依存しない共通データのため viewedUserId とは無関係に取得してよい。
   const { songs: songMaster } = useSongList(latestVersion);
   // 「実際の順位(BPIM内)」列用。曲ごとの本人順位 (songRankingCache)。
   const { data: songRankings } = useUserSongRankings(
@@ -156,9 +146,7 @@ export default function NewBpiComparison({ userId }: Props) {
     );
 
     const rows: NewBpiRow[] = played.map((s) => {
-      // s.bpi(DBの保存値)は本番がV2へ全面切り替え済みのため、もはやV1では
-      // ない。この比較ページの「現行(V1)」列は本番の現在値ではなく、常に
-      // legacyV1で計算し直した真のV1値にする(V2は本番と同じBpiCalculator)。
+      // 本番は V2 へ全面切り替え済みのため s.bpi は V1 ではない。「現行(V1)」列は常に legacyV1 で計算し直した値にする。
       const currentBpi = legacyV1
         .chart({ notes: s.notes, kaidenAvg: s.kaidenAvg, wrScore: s.wrScore, coef: s.coef })
         .bpi(s.exScore);
@@ -189,10 +177,8 @@ export default function NewBpiComparison({ userId }: Props) {
     const level12Played = played.filter((s) => s.difficultyLevel === 12);
     const allLevel12Songs = songMaster.filter((s) => s.difficultyLevel === 12);
 
-    // 「V1 総合BPI」は/stats/totalBpi(本番、今はV2)の現在値ではなく、
-    // 常にlegacyV1で計算し直す(単曲BPIの列と同じ理由)。V1は未プレイ曲を
-    // 一律-15固定で扱うべき乗平均のため、対象曲数はallLevel12Songs.length
-    // (V2側の分母と揃える)を渡す。
+    // 「V1 総合BPI」は現在値ではなく常に legacyV1 で計算し直す（単曲BPI列と同じ理由）。
+     // V1 は未プレイ曲を一律 -15 固定で扱うため、対象曲数は V2 側の分母と揃えて allLevel12Songs.length を渡す。
     const currentBpisLevel12Desc = level12Played
       .map((s) =>
         legacyV1
@@ -206,12 +192,8 @@ export default function NewBpiComparison({ userId }: Props) {
         ? legacyV1.total(currentBpisLevel12Desc, allLevel12Songs.length)
         : null;
 
-    // 「V2 総合BPI」は本番(/stats/totalBpi)と同じBpiCalculatorで計算する
-    // （songDefのmu/sigmaをDBから読む。ラチェットは表示上の「記録」を保つ
-    // ためのDB書き込み境界の責務なので、ここでは適用しない生値を出す）。
-    // プレイ済み曲は単曲BPIをそのまま使い、未プレイ曲は潜在スキルa_iから
-    // の予測で埋める。未プレイ曲の判定・予測には☆12全曲のマスタ
-    // (songMaster、mu/sigma込み)が要る。
+    // V2総合BPIは本番と同じ BpiCalculator で計算し、ラチェットは書き込み境界の責務のため適用しない生値を出す。
+     // 未プレイ曲は潜在スキル a_i からの予測で埋めるため、☆12全曲のマスタ（songMaster）が必要。
     const comparableCount = level12Played.filter(
       (s) => s.mu !== null && s.mu !== undefined && s.sigma !== null && s.sigma !== undefined,
     ).length;
@@ -236,11 +218,8 @@ export default function NewBpiComparison({ userId }: Props) {
     };
   }, [songs, songMaster, songRankings]);
 
-  // 既存のノーツレーダー(カテゴリ別総合BPI)と同じカテゴリ分け(topElements.json)
-  // を使い、現行/新方式それぞれのカテゴリ別総合BPIを算出する。現行側は既存の
-  // calculateRadar をそのまま使い、カテゴリごとの played/unplayed 内訳
-  // (RadarResponse.songs)を新方式側の計算にも流用することで、両者の対象曲・
-  // 分母を完全に一致させる。
+  // 既存のノーツレーダーと同じカテゴリ分け（topElements.json）で、現行/新方式それぞれのカテゴリ別総合BPIを算出する。
+   // 現行側の played/unplayed 内訳を新方式にも流用し、両者の対象曲と分母を一致させる。
   const radarComparison = useMemo(() => {
     if (!songs) return null;
     const played = songs.filter(
@@ -250,7 +229,7 @@ export default function NewBpiComparison({ userId }: Props) {
 
     const current: Record<string, number> = {};
     const next: Record<string, number> = {};
-    for (const category of ALL_CATEGORIES) {
+    for (const category of ALL_RADAR_CATEGORIES) {
       const categorySongs = played.filter(
         (s) => topElementMap.get(`${s.title}___${s.difficulty}`) === category,
       );

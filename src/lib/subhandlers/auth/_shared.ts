@@ -3,9 +3,7 @@ import type { AuthenticatedNextApiRequest } from "@/middlewares/api/withAuth";
 import type { HandlerResult } from "@/types/api";
 
 /**
- * auth 系（apiKey / oauthClient / token / invite/[token] /
- * usernames/[username]/availability / トップレベル follow-requests/**）の
- * subhandler 共通型・ヘルパー。ユーザースコープ外。
+ * auth 系 subhandler の共通型・ヘルパー。ユーザースコープ外のルートで使う。
  */
 export interface HandleOutcome<T> {
   result: HandlerResult<T>;

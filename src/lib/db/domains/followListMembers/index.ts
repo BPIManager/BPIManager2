@@ -3,12 +3,7 @@ import { Database } from "@/types/db";
 import { Transaction } from "kysely";
 
 /**
- * フォローリストへのユーザー所属（`followListMembers` テーブル）の
- * 読み書きを担当するリポジトリクラス。
- *
- * `listId`の所有者チェック（呼び出し元が本当にそのリストの持ち主か）は
- * このリポジトリの責務外。呼び出し元（APIルート）が`followListsRepo`で
- * 事前に確認してから呼び出す。
+ * フォローリストへのユーザー所属（followListMembers）の読み書き。listId の所有者確認は呼び出し元（APIルート）が followListsRepo で事前に行う。
  */
 class FollowListMembersRepository {
   /**
@@ -74,13 +69,8 @@ class FollowListMembersRepository {
   }
 
   /**
-   * アカウント削除時に、このユーザーが所属している全てのリスト所属
-   * （他人が作成したリストへの所属も含む）を削除する。
-   *
-   * 所有者自身のリスト削除（`followListsRepo.deleteByUser`）は`listId`側の
-   * `ON DELETE CASCADE`で連動するが、他人のリストに追加されている場合の
-   * `followingId`側は別途明示的に削除する必要がある（`follows`テーブルの
-   * `deleteByUser`が双方向を削除するのと同じ理由）。
+   * アカウント削除時に、このユーザーが所属する全リスト所属（他人のリストへの所属を含む）を削除する。
+   * 自分のリストは listId 側の ON DELETE CASCADE で連動するが、他人のリストは followingId 側を明示削除する必要がある。
    *
    * @param trx - 呼び出し元が管理するトランザクション
    * @param followingId - 削除対象ユーザー ID
@@ -93,12 +83,7 @@ class FollowListMembersRepository {
   }
 
   /**
-   * フォロー解除時に、解除した相手を`ownerId`本人の全リストから外す。
-   *
-   * リストへの所属は「フォロー中であること」を前提にしているため
-   * （追加時は`followsRepo.isFollowing`で確認済み）、フォロー解除後も
-   * 所属レコードが残ると孤立データになる。`orchestrators/unfollow`から
-   * `follows`削除と同一トランザクションで呼ばれる。
+   * フォロー解除時に解除相手を ownerId 本人の全リストから外す。所属はフォロー中を前提とするため、残すと孤立データになる。
    *
    * @param trx - 呼び出し元が管理するトランザクション
    * @param ownerId - リスト所有者（フォローを解除した側）のユーザー ID

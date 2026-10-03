@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { sql } from "kysely";
-import { songsRepo } from "@/lib/db/domains/songs";
+import { songMasterRepo } from "@/lib/db/domains/songs/master";
 
 /**
  * Arena メトリクス生成に使用する集計クエリを担当するリポジトリクラス。
@@ -12,7 +12,7 @@ class MetricsRepository {
    * @returns タイトル・難易度・ノーツ数・皆伝平均・WR スコア・補正係数の配列
    */
   async getSongDefs() {
-    return songsRepo.getCurrentDefsWithSongInfo();
+    return songMasterRepo.getCurrentDefsWithSongInfo();
   }
 
   /**
@@ -21,14 +21,11 @@ class MetricsRepository {
    * @returns `{ title, difficulty, notes }` の配列
    */
   async getAllSongs() {
-    return songsRepo.getAllTitleDifficultyNotes();
+    return songMasterRepo.getAllTitleDifficultyNotes();
   }
 
   /**
-   * 指定バージョン・難易度レベルにおけるアリーナランク別の平均スコアを集計する。
-   *
-   * 対象ランクは A1〜A5。`bkScores`・`bkUsers` テーブル（バックアップデータ）を使用する。
-   * 過去バージョンのデータ生成に使用する。
+   * 指定バージョン・難易度レベルのアリーナランク別平均スコアを集計する（A1〜A5）。過去バージョンのデータ生成用で、bkScores・bkUsers（バックアップ）を使う。
    *
    * @param version - バージョン番号
    * @param difficultyLevel - 難易度レベル（11 または 12）
@@ -42,10 +39,7 @@ class MetricsRepository {
   }
 
   /**
-   * 指定バージョン・難易度レベルにおけるアリーナランク別の平均スコアを集計する。
-   *
-   * 対象ランクは A1〜A5。`scores`・`songs`・`bkUsers` テーブルを使用する。
-   * 最新バージョンのデータ生成に使用する。
+   * 指定バージョン・難易度レベルのアリーナランク別平均スコアを集計する（A1〜A5）。最新バージョンのデータ生成用。
    *
    * @param version - バージョン番号
    * @param difficultyLevel - 難易度レベル（11 または 12）

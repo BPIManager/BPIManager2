@@ -157,9 +157,7 @@ export interface GoalSongStep {
 }
 
 /**
- * 曲ごとの達成状況を面積比の積み上げバーで示す（目標全体カードの概観用）。
- * 1曲1ドットだと自動生成プラン（最大400曲）で表示が破綻するため、
- * 曲数に関わらずスケールする比率ベースの表現にする。
+ * 曲ごとの達成状況を面積比の積み上げバーで示す。1曲1ドットだと自動生成プラン（最大400曲）で破綻するため、曲数に依らない比率表現にする。
  */
 export const SongStatusBar = ({ steps }: { steps: GoalSongStep[] }) => {
   const total = steps.length;

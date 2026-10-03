@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { isIP } from "net";
 
 interface RateLimitOptions {
   /** 制限をカウントする時間窓（ミリ秒） */
@@ -18,20 +19,21 @@ const MAX_TRACKED_CLIENTS = 5000;
 const buckets = new Map<string, Bucket>();
 
 function getClientIp(req: NextApiRequest): string {
-  // Cloudflare経由の構成のため、クライアントが偽装できるX-Forwarded-Forではなく
-  // Cloudflareがエッジで上書き設定するCF-Connecting-IPを信頼する
+  // CF-Connecting-IP と CF-Ray は両方揃い IP 形式として妥当な場合のみ信頼し、無ければソケットのアドレスを使う。
+   // 注: オリジンに直接接続するクライアントはヘッダを偽装できるため、完全な防御には Authenticated Origin Pulls 等が別途必要。
+  const cfRay = req.headers["cf-ray"];
   const cfConnectingIp = req.headers["cf-connecting-ip"];
-  if (typeof cfConnectingIp === "string") return cfConnectingIp.trim();
+  if (typeof cfRay === "string" && typeof cfConnectingIp === "string") {
+    const ip = cfConnectingIp.trim();
+    if (isIP(ip)) return ip;
+  }
   return req.socket.remoteAddress ?? "unknown";
 }
 
 /**
- * IPアドレス単位の簡易レート制限を行うAPIミドルウェア。
+ * IP 単位の簡易レート制限。インスタンス内メモリでカウントするため、複数インスタンスでは別々にカウントされる（多層防御の簡易実装）。
  *
- * インスタンス内メモリでカウントするため、複数インスタンス構成では
- * インスタンスごとに別カウントになる（多層防御としての簡易実装）。
- *
- * @param handler - ラップ対象のAPIハンドラー
+ * @param handler - ラップ対象の API ハンドラー
  * @param options.windowMs - 制限をカウントする時間窓（ミリ秒）
  * @param options.max - 時間窓内に許可するリクエスト数
  */

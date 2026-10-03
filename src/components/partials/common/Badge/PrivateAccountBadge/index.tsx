@@ -9,14 +9,9 @@ import { useTranslation } from "@/hooks/common/useTranslation";
 import { cn } from "@/lib/utils";
 
 /**
- * 非公開アカウントであることを示す鍵アイコン。
+ * 非公開アカウントを示す鍵アイコン。表示名の横に添えるインラインバッジで、アバターを置き換えるマスク表示とは別物。
  *
- * マスク表示（`Ranking/row.tsx`等の`Lock`アイコンはアバター自体を
- * 置き換える）とは異なり、こちらは表示名の横に添えるインラインの
- * ステータスバッジ。表示名自体は既に閲覧許可がある（プロフィール
- * ページ本人表示・承認済みフォロワー等）ことが前提。
- *
- * @param size - アイコンサイズ（px相当のTailwindクラス切り替え）
+ * @param size - アイコンサイズ（Tailwind クラスの切り替え）
  */
 const PrivateAccountBadge = ({
   size = "sm",

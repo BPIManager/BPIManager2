@@ -1,4 +1,4 @@
-import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
+import { statsSongTablesRepo } from "@/lib/db/aggregates/stats/songTables";
 import { resolveVersion, toErrorMessage } from "@/lib/subhandlers/shared";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { targetOf, type HandleOutcome } from "./_shared";
@@ -16,7 +16,7 @@ export async function handleRankingSongById(
   }
 
   try {
-    const result = await statsTablesRepo.getSongRanking(
+    const result = await statsSongTablesRepo.getSongRanking(
       songIdNum,
       resolveVersion(req.query.version),
       viewerId,

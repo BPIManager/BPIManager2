@@ -1,8 +1,10 @@
 import { db } from "@/lib/db";
-import { scoresRepo } from "@/lib/db/domains/scores";
+import { lockUserForWrite } from "@/lib/db/shared/userWriteLock";
+import { scoreWriteRepo } from "@/lib/db/domains/scores/write";
 import { allScoresRepo } from "@/lib/db/domains/allScores";
-import { navigationRepo } from "@/lib/db/domains/logs/navigation";
-import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
+import { logBatchRepo } from "@/lib/db/domains/logs/batch";
+import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
+import { userStatusLogsWriteRepo } from "@/lib/db/domains/userStatusLogs/write";
 import { BpiCalculator } from "@/lib/bpi";
 import { getManualBatchPrefix, mintManualBatchId } from "@/lib/scores/manualBatchId";
 
@@ -24,32 +26,15 @@ interface ManualAllScoreInput {
 }
 
 /**
- * 画面からの手動スコア編集をトランザクション内で保存する。
- *
- * CSVインポート（`saveImportResults`）とは別の経路。`logs`の現在の最新
- * batchIdが当日の手動編集プレフィックス（{@link getManualBatchPrefix}）と
- * 一致する場合はそれをそのまま使い回し、同日内の複数回の手動保存を
- * `logs`/`userStatusLogs`/`scores`/`allScores`それぞれ1行にまとめて
- * レコード増加を抑える（各`upsertManual`/`upsertManualBatch`が
- * 「現在も最新の行である場合のみUPDATE」を判定する）。
- *
- * 一致しない場合（間にCSVインポート等が挟まった場合）は
- * {@link mintManualBatchId} で新しい一意なbatchIdを発行する。
- * `logs.batchId`にはUNIQUE制約があるため、決定的な（サフィックス無しの）
- * IDをそのまま使い回してINSERTすると、既に別の行で使用済みの場合に
- * 重複キーエラーになるため。
- *
- * `score`（BPI計算対象、☆11/12）・`allScore`（全難易度履歴）はそれぞれ
- * 独立に「改善時のみ」呼び出し元が渡す（CSVバッチインポートと同じ方針）。
- * `score`が無い場合（☆10以下の楽曲）は`logs`/`userStatusLogs`（総合BPI）
- * には一切触れない。
+ * 手動スコア編集を1トランザクションで保存する。同日の保存は当日プレフィックスの batchId に集約し、一致しなければ新規発行する。
+ * score（☆11/12）と allScore（☆10以下）は独立に保存し、score が無ければ logs/userStatusLogs には触れない。
  *
  * @param params.userId - ユーザー ID
  * @param params.version - バージョン番号
- * @param params.score - 保存する単曲スコア（改善が無ければ呼び出し元は渡さない）
- * @param params.allScore - 全難易度履歴側のスコア（改善が無ければ呼び出し元は渡さない）
- * @param params.newTotalBpi - 今回算出した総合BPI（`score`がある場合のみ必須、ratchet適用前）
- * @returns 実際に保存した総合BPI（`score`が無ければ`null`）と、使用したbatchId
+ * @param params.score - 保存する単曲スコア（改善が無ければ渡さない）
+ * @param params.allScore - 全難易度履歴側のスコア（改善が無ければ渡さない）
+ * @param params.newTotalBpi - 今回算出した総合BPI（score がある場合は必須、ラチェット適用前）
+ * @returns 保存した総合BPI（score が無ければ null）と使用した batchId
  */
 export async function saveManualScoreUpdate(params: {
   userId: string;
@@ -61,33 +46,31 @@ export async function saveManualScoreUpdate(params: {
   const { userId, version, score, allScore, newTotalBpi } = params;
 
   const prefix = getManualBatchPrefix(userId, version);
-  // `score`(scores/songDefドメイン、☆11/12)がある更新は`logs`に書き込まれる
-  // ため`logs`側から判定できるが、`allScore`のみ(☆10以下)の更新は`logs`に
-  // 一切触れないため、`allScores`自体から最新の手動batchIdを判定する
-  const currentLatestBatchId = score
-    ? await navigationRepo.getLatestBatchId(userId, version)
-    : await allScoresRepo.getLatestBatchId(userId, version);
-  const batchId = currentLatestBatchId?.startsWith(prefix)
-    ? currentLatestBatchId
-    : mintManualBatchId(userId, version);
-
   const lastPlayed = new Date();
 
   return await db.transaction().execute(async (trx) => {
+    await lockUserForWrite(trx, userId);
+    // 判定と書き込みの間に別インポートが割り込むと古い batchId を再利用するため、判定時に logs 最新行を FOR UPDATE でロックして直列化する。
+     // score（☆11/12）は logs 側で判定・ロックし、allScore のみ（☆10以下）は logs に触れないため allScores から判定する。
+    const currentLatestBatchId = score
+      ? await logBatchRepo.getLatestBatchIdForUpdate(trx, userId, version)
+      : await allScoresRepo.getLatestBatchId(userId, version);
+    const batchId = currentLatestBatchId?.startsWith(prefix)
+      ? currentLatestBatchId
+      : mintManualBatchId(userId, version);
+
     let totalBpi: number | null = null;
 
-    // `scores.batchId`は`logs.batchId`への外部キーのため、`logs`側の行を
-    // 先に用意してから`scores`へ書き込む必要がある（CSVインポート
-    // `executeSaveBpiSystem`と同じ順序）。
+    // scores.batchId は logs.batchId への外部キーのため、logs の行を先に用意してから scores へ書き込む（CSV インポートと同じ順序）。
     if (score) {
-      const latestLog = await userStatusLogsRepo.getLatestArenaRank(
+      const latestLog = await userStatusLogsReadRepo.getLatestArenaRank(
         trx,
         userId,
         version,
       );
       const currentArenaRank = latestLog?.arenaRank ?? null;
 
-      const previousBest = await userStatusLogsRepo.getMaxTotalBpi(
+      const previousBest = await userStatusLogsReadRepo.getMaxTotalBpi(
         trx,
         userId,
         version,
@@ -97,13 +80,13 @@ export async function saveManualScoreUpdate(params: {
         newTotalBpi ?? previousBest ?? -15,
       );
 
-      await navigationRepo.upsertManualBatch(trx, {
+      await logBatchRepo.upsertManualBatch(trx, {
         userId,
         version,
         batchId,
         totalBpi,
       });
-      await userStatusLogsRepo.upsertManualBatch(trx, {
+      await userStatusLogsWriteRepo.upsertManualBatch(trx, {
         userId,
         version,
         batchId,
@@ -111,7 +94,7 @@ export async function saveManualScoreUpdate(params: {
         arenaRank: currentArenaRank,
       });
 
-      await scoresRepo.upsertManual(trx, {
+      await scoreWriteRepo.upsertManual(trx, {
         userId,
         songId: score.songId,
         definitionId: score.definitionId,

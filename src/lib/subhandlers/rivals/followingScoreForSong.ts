@@ -1,5 +1,5 @@
 import type { NextApiRequest } from "next";
-import { rivalRepo } from "@/lib/db/aggregates/rivalScores/rival";
+import { rivalAggregateRepo } from "@/lib/db/aggregates/rivalScores/aggregate";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { rivalFollowingScoresQuerySchema } from "@/schemas/rivals/following/scores/query";
@@ -20,7 +20,7 @@ export async function handleRivalFollowingScoresForSong(
   const { userId, songId, version } = parsed.data;
 
   try {
-    const rivalsScores = await rivalRepo.getFollowedScoresForSong({
+    const rivalsScores = await rivalAggregateRepo.getFollowedScoresForSong({
       viewerId: String(userId),
       songId: Number(songId),
       version,
@@ -44,7 +44,7 @@ export async function handleRivalFollowingScoresForSong(
 }
 
 export const formatRivalScore = (
-  r: Awaited<ReturnType<typeof rivalRepo.getFollowedScoresForSong>>[number],
+  r: Awaited<ReturnType<typeof rivalAggregateRepo.getFollowedScoresForSong>>[number],
 ) => ({
   userId: r.userId,
   userName: r.userName,

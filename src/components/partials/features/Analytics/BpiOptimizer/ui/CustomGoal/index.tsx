@@ -8,7 +8,7 @@ import type { OptimizationResult } from "@/types/bpi-optimizer";
 import { toast } from "sonner";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import CustomGoalCreatorUi from "./ui";
-import type { CustomGoalTargetInput } from "./SongTargetModal";
+import type { CustomGoalTargetInput } from "./SongTargetModal/types";
 
 const CustomGoalCreator = ({
   currentScores,
@@ -144,14 +144,22 @@ const CustomGoalCreator = ({
   };
 
   const isSavingMemo = isSaving || isUpdating;
+
+  // フッターへ渡すコールバックは最新のレンダーの値を参照させる。effect の依存には
+  // 状態値のみを置き、親の再レンダーで effect が連鎖的に再実行されないようにする
+  const handleSaveRef = useRef(handleSave);
+  const footerStateChangeRef = useRef(onFooterStateChange);
   useEffect(() => {
-    onFooterStateChange?.({
+    handleSaveRef.current = handleSave;
+    footerStateChangeRef.current = onFooterStateChange;
+  });
+  useEffect(() => {
+    footerStateChangeRef.current?.({
       canSave: !!preview && !isPreviewLoading,
       isSaving: isSavingMemo,
-      onSave: handleSave,
+      onSave: () => handleSaveRef.current(),
     });
-    return () => onFooterStateChange?.(null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => footerStateChangeRef.current?.(null);
   }, [preview, isPreviewLoading, isSavingMemo]);
 
   return (

@@ -1,10 +1,7 @@
 import { ok, err } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
-import {
-  resolveMonthlyReviewPeriod,
-  computeOwnerBpiTimeline,
-  previousVersionOf,
-} from "./_shared";
+import { resolveMonthlyReviewPeriod, previousVersionOf } from "@/lib/subhandlers/stats/monthlyReviewV2/period";
+import { computeOwnerBpiTimeline } from "@/lib/subhandlers/stats/monthlyReviewV2/timeline";
 import type { HandlerResult } from "@/types/api";
 
 export async function handleStatsMonthlyReviewBpi(q: {
@@ -16,9 +13,7 @@ export async function handleStatsMonthlyReviewBpi(q: {
   try {
     const { granularity, monthStart, monthEnd, useMonthBuckets } =
       resolveMonthlyReviewPeriod(q.month);
-    // 「全期間」モードは期間開始（monthStart）が便宜上の固定値のため
-    // 「期間開始前のスコア」という比較が意味を持たない。前バージョン
-    // （既定）またはユーザーが選択したバージョンとの比較に切り替える
+    // 全期間モードは期間開始が便宜上の固定値のため「期間開始前のスコア」比較は成立しない。前バージョン（既定）または選択バージョンとの比較に切り替える。
     const compareVersion =
       granularity === "version"
         ? (q.compareVersion ?? previousVersionOf(q.version) ?? undefined)

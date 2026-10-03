@@ -1,27 +1,18 @@
 import { db } from "@/lib/db";
 import { sql } from "kysely";
 import { latestPerUserSubquery as latestArenaPerUserSubquery } from "@/lib/db/domains/arenaHistory";
-import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
+import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
 
 /**
- * グローバルBPI/レーダーランキングを担当するリポジトリクラス。
- *
- * users・userStatusLogs・officialArenaStats・userRadarCache・statsPrivacy等を
- * 横断してユーザー向けの複合ビューを組み立てる。
+ * グローバル BPI・レーダーランキング。users・userStatusLogs・officialArenaStats・userRadarCache・statsPrivacy を横断する複合ビュー。
  */
 class UserRankingRepository {
   /**
-   * 全ユーザーの BPI ランキングデータを取得する。
-   *
-   * `category` が radar カテゴリ（notes/chord/peak/charge/scratch/soflan）の場合は
-   * `userRadarCache` を INNER JOIN してそのカテゴリ値で降順ソートする（最新バージョンのみ）。
-   * それ以外は `userStatusLogs.totalBpi` で降順ソートする。
-   *
-   * `filterArea` を指定すると指定エリアのユーザーのみ表示（非公開ユーザーはマスク）。
-   * `filterArenaClass` を指定すると指定アリーナクラスのユーザーのみ表示（非公開ユーザーはマスク）。
+   * 全ユーザーの BPI ランキング。radar カテゴリ指定時は userRadarCache を INNER JOIN し（最新バージョンのみ）、それ以外は userStatusLogs.totalBpi で降順にする。
+   * filterArea・filterArenaClass は該当ユーザーのみ表示し、非公開ユーザーはマスクする。
    *
    * @param version - バージョン番号
-   * @param category - ソート対象カテゴリ（デフォルト: "totalBpi"）
+   * @param category - ソート対象カテゴリ（デフォルト: totalBpi）
    * @param filterArea - 地域フィルタ（県名）
    * @param filterArenaClass - アリーナクラスフィルタ
    */
@@ -48,7 +39,7 @@ class UserRankingRepository {
     const hasFilter = hasAreaFilter || hasArenaClassFilter;
 
     const latestStatusSubquery =
-      userStatusLogsRepo.latestPerUserSubquery(version);
+      userStatusLogsReadRepo.latestPerUserSubquery(version);
     const latestArenaSubquery = latestArenaPerUserSubquery(version);
 
     if (isRadarCategory) {

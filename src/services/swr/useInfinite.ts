@@ -18,11 +18,7 @@ type GetPageUrl<TPage> = (
 ) => string | null;
 
 /**
- * ページごとのURLだけを返す`getUrl`から無限スクロールリストを組み立てる。
- *
- * SWRのキャッシュキーにFirebase `User`オブジェクト全体を含めると無駄な
- * ハッシュ化コストがかかるため、キーには`fbUser?.uid`のみを使い、
- * `fbUser`自体はクロージャ経由でfetcherに渡す。
+ * ページごとのURLを返す getUrl から無限スクロールリストを組み立てる。キーには fbUser.uid のみを使い、User 全体のハッシュ化を避ける。
  */
 export function useInfiniteList<TPage, TItem>(
   getUrl: GetPageUrl<TPage>,
@@ -61,9 +57,7 @@ export function useInfiniteList<TPage, TItem>(
 }
 
 /**
- * `useInfiniteList` の API v2 版。各ページを `fetcherV2` で取得し、
- * 共通エンベロープの `body`（`TPage`）を SWR の各ページデータとして扱う。
- * v2 へ移行済みの一覧エンドポイントからのみ使う。
+ * useInfiniteList の API v2 版。各ページを fetcherV2 で取得し、共通エンベロープの body（TPage）を各ページデータとして扱う。
  */
 export function useInfiniteListV2<TPage, TItem>(
   getUrl: GetPageUrl<TPage>,

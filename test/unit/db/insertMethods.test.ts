@@ -1,8 +1,8 @@
 import { describe, it, expect } from "vitest";
 
-import { scoresRepo } from "@/lib/db/domains/scores";
+import { scoreWriteRepo } from "@/lib/db/domains/scores/write";
 import { allScoresRepo } from "@/lib/db/domains/allScores";
-import { navigationRepo } from "@/lib/db/domains/logs/navigation";
+import { logBatchRepo } from "@/lib/db/domains/logs/batch";
 
 function createTrxSpy() {
   const calls: { table: string; values: unknown }[] = [];
@@ -22,12 +22,12 @@ function createTrxSpy() {
 }
 
 describe("insert系メソッド", () => {
-  describe("scoresRepo.insert", () => {
+  describe("scoreWriteRepo.insert", () => {
     it("scores テーブルへ挿入すること", async () => {
       const { trx, calls } = createTrxSpy();
       const values = [{ userId: "user-1", songId: 1 }];
 
-      await scoresRepo.insert(trx as never, values as never);
+      await scoreWriteRepo.insert(trx as never, values as never);
 
       expect(calls).toEqual([{ table: "scores", values }]);
     });
@@ -67,12 +67,12 @@ describe("insert系メソッド", () => {
     });
   });
 
-  describe("navigationRepo.insert", () => {
+  describe("logBatchRepo.insert", () => {
     it("logs テーブルへ挿入すること", async () => {
       const { trx, calls } = createTrxSpy();
       const values = { userId: "user-1", totalBpi: 50, version: "32" };
 
-      await navigationRepo.insert(trx as never, values as never);
+      await logBatchRepo.insert(trx as never, values as never);
 
       expect(calls).toEqual([{ table: "logs", values }]);
     });

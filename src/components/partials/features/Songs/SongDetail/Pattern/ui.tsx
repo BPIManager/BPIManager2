@@ -50,9 +50,8 @@ export interface PatternRowProps {
 function PatternSentinelRow({ style, onLoadMore }: { style: React.CSSProperties; onLoadMore: () => void }) {
   useEffect(() => {
     onLoadMore();
-    // このセンチネル行がマウントされた瞬間にのみ読み込みをトリガーしたいため、
-    // onLoadMoreの参照が変わっても再実行しないよう意図的に空配列にする
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // センチネルのマウント時にのみ読み込みを発火させるため、onLoadMore の参照変化では再実行しない（空配列）。
+     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <div style={style} className="flex items-center justify-center text-xs text-bpim-muted">

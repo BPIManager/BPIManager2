@@ -59,9 +59,7 @@ export default function MonthlyReviewPage() {
       ? "year"
       : "month";
 
-  // 楽曲ハイライト「最も伸びた曲」の比較先バージョン（全期間モードのみ有効・
-  // configボタンから変更可能）。未指定時はサーバー側で既定値（前バージョン）が使われる。
-  // ルート（対象期間）が変わったら選択をリセットする（レンダー中の状態調整）
+  // 比較先バージョンは全期間モードのみ有効。未指定時はサーバー側で既定（前バージョン）を使う。ルート（期間）が変わったら選択をリセットする。
   const routeKey = `${userIdStr ?? ""}:${version}:${month ?? ""}`;
   const [compareVersionRouteKey, setCompareVersionRouteKey] =
     useState(routeKey);
@@ -121,9 +119,7 @@ export default function MonthlyReviewPage() {
     return status === 401 || status === 403;
   });
 
-  // 初回ロード完了後は、比較先バージョン変更等による個別セクションの再フェッチで
-  // 画面全体のローディング演出に戻らないよう、ルート（対象期間）単位で
-  // 「初回ロード済みか」を記憶する（レンダー中の状態調整）
+  // 初回ロード完了後は、セクション単位の再フェッチで全体のローディングに戻らないよう、期間単位で初回ロード済みかを記憶する（レンダー中の状態調整）。
   const [loadedRouteKey, setLoadedRouteKey] = useState<string | null>(null);
   if (allSettled && loadedRouteKey !== routeKey) {
     setLoadedRouteKey(routeKey);

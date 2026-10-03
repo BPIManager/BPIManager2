@@ -1,7 +1,5 @@
 /**
- * follows ドメイン（`follows`・`follow-invite`・`follow-lists/**`・
- * `follow-requests/**`・`followers/[followerId]`）の subhandler バレル。
- * 実体は API ルート単位のファイルにある。
+ * follows ドメインの subhandler バレル。実体は API ルート単位のファイルにある。
  */
 export type { HandleOutcome } from "./_shared";
 export * from "./follows";

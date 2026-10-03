@@ -2,13 +2,13 @@ import { db } from "@/lib/db";
 import { sql } from "kysely";
 import type { TicketSongResult } from "@/types/tickets";
 import type { VoteType } from "@/types/db";
-import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
+import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
 
 const PAGE_SIZE = 10;
 
 class TicketsRepository {
   async getLatestTotalBpi(userId: string, version: string): Promise<number | null> {
-    const row = await userStatusLogsRepo.getLatestTotalBpi(db, userId, version);
+    const row = await userStatusLogsReadRepo.getLatestTotalBpi(db, userId, version);
     return row ? Number(row.totalBpi) : null;
   }
 

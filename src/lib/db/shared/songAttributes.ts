@@ -1,9 +1,6 @@
 /**
- * `songAttributes`（プロフィール属性/グローバル属性）の全26カラムを、
- * `songAttributes as a` エイリアス経由で参照するための共通SELECTリスト。
- *
- * 呼び出し側は `.leftJoin("songAttributes as a", ...)`（または `innerJoin`）
- * した上で `.select([...SONG_ATTRIBUTE_SELECT_COLUMNS])` を使う。
+ * songAttributes の全カラムを as a エイリアス経由で参照する共通 SELECT リスト。
+ * 呼び出し側は leftJoin/innerJoin（"songAttributes as a"）した上で select に展開する。
  */
 export const SONG_ATTRIBUTE_SELECT_COLUMNS = [
   "a.p_scratch",

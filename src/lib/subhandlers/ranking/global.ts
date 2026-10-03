@@ -86,9 +86,7 @@ export async function handleGlobalRanking(
       const isAreaPublic = !effectiveFilterArea || filteredRow.showArea === 1;
       const isArenaClassPublic =
         !effectiveFilterArenaClass || filteredRow.showArenaClass !== 0;
-      // 匿名の全体ランキングのため、閲覧者に関わらずisPublicのみで判定する(自分自身でも
-      // 非公開ならマスクされる。viewerIdを渡さないことでcanViewUserDataの自分自身
-      // バイパスを無効化している)
+      // 匿名の全体ランキングのため、閲覧者に関わらず isPublic のみで判定する（viewerId を渡さず自分自身のバイパスを無効化する）。
       const isIdentityVisible =
         canViewUserData({ targetUserId: u.userId, isPublic: u.isPublic }) &&
         isAreaPublic &&

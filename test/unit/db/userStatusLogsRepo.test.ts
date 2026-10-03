@@ -11,12 +11,12 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-const { userStatusLogsRepo } = await import("@/lib/db/domains/userStatusLogs");
+const { userStatusLogsReadRepo } = await import("@/lib/db/domains/userStatusLogs/read");
 
-describe("userStatusLogsRepo.latestPerUserSubquery", () => {
+describe("userStatusLogsReadRepo.latestPerUserSubquery", () => {
   it("versionで絞り込みuserIdごとにグループ化するクエリを組み立てること", () => {
     dbHolder.current = createDbSpy(undefined);
-    userStatusLogsRepo.latestPerUserSubquery("33");
+    userStatusLogsReadRepo.latestPerUserSubquery("33");
     expect(callsFor(dbHolder.current.calls, "where")[0].args).toEqual([
       "version",
       "=",
@@ -28,10 +28,10 @@ describe("userStatusLogsRepo.latestPerUserSubquery", () => {
   });
 });
 
-describe("userStatusLogsRepo.latestRowSubquery", () => {
+describe("userStatusLogsReadRepo.latestRowSubquery", () => {
   it("userId/versionで絞り込み最新1件に絞るクエリを組み立てること", () => {
     dbHolder.current = createDbSpy(undefined);
-    userStatusLogsRepo.latestRowSubquery("user-1", "33");
+    userStatusLogsReadRepo.latestRowSubquery("user-1", "33");
     const whereCalls = callsFor(dbHolder.current.calls, "where");
     expect(whereCalls[0].args).toEqual(["userId", "=", "user-1"]);
     expect(whereCalls[1].args).toEqual(["version", "=", "33"]);
@@ -39,11 +39,11 @@ describe("userStatusLogsRepo.latestRowSubquery", () => {
   });
 });
 
-describe("userStatusLogsRepo.getBpiHistoryByVersion", () => {
+describe("userStatusLogsReadRepo.getBpiHistoryByVersion", () => {
   it("バージョンごとの最新1件を結合して取得すること", async () => {
     const rows = [{ version: "33", totalBpi: 30 }];
     dbHolder.current = createDbSpy(rows);
-    const result = await userStatusLogsRepo.getBpiHistoryByVersion("user-1");
+    const result = await userStatusLogsReadRepo.getBpiHistoryByVersion("user-1");
     expect(result).toEqual(rows);
     expect(callsFor(dbHolder.current.calls, "selectFrom")[0].args).toEqual([
       "userStatusLogs as usl",

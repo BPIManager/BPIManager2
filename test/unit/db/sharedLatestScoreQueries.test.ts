@@ -15,13 +15,9 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-const {
-  latestLogIdPerSongSubquery,
-  latestLogIdPerUserSongSubquery,
-  latestLogIdPerSongScalarSubquery,
-  latestLogIdPerUserSongScalarSubquery,
-  correlatedLatestLogId,
-} = await import("@/lib/db/shared/latestScore");
+const { latestLogIdPerSongSubquery, latestLogIdPerSongScalarSubquery } = await import("@/lib/db/shared/latestScore/perSong");
+const { latestLogIdPerUserSongSubquery, latestLogIdPerUserSongScalarSubquery } = await import("@/lib/db/shared/latestScore/perUser");
+const { correlatedLatestLogId } = await import("@/lib/db/shared/latestScore/correlated");
 
 describe("latestLogIdPerSongSubquery", () => {
   it("table/userId/versionでのwhereとsongIdでのgroupByを組み立てること", () => {

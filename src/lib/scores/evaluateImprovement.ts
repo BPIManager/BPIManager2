@@ -13,15 +13,11 @@ export interface CurrentScoreForImprovement {
 }
 
 /**
- * 新しい記録が既存の自己ベスト（EXスコア・クリアランプ・ミスカウント）の
- * いずれかを上回っているか判定する。
- *
- * 誤って過去の記録で上書きしてしまう事故を防ぐため、CSVバッチインポート
- * (`scores/bulk.ts`)・MCPツール(`updateMyScore.ts`)双方のスコア更新経路で
- * 書き込み前に必ずこの判定を通す。
+ * 新しい記録が既存の自己ベスト（EXスコア・クリアランプ・ミスカウント）のいずれかを上回るかを判定する。
+ * 過去の記録での誤上書きを防ぐため、CSV（scores/bulk.ts）・MCP（updateMyScore.ts）双方の書き込み前に必ず通す。
  *
  * @param candidate - 判定対象の新しい記録
- * @param current - 既存の自己ベスト（未プレイの場合は`undefined`）
+ * @param current - 既存の自己ベスト（未プレイの場合は undefined）
  */
 export function isScoreImproved(
   candidate: ScoreImprovementCandidate,

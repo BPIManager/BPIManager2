@@ -1,17 +1,6 @@
 /**
- * リザルト手帳 CSV → 標準インポート行フォーマット 変換アダプタ。
- *
- * クリアタイプマッピング (リザルト手帳 → DB値):
- *   EXH-CLEAR → EX HARD CLEAR
- *   F-COMBO   → FULLCOMBO CLEAR
- *   H-CLEAR   → HARD CLEAR
- *   A-CLEAR   → ASSIST CLEAR
- *   E-CLEAR   → EASY CLEAR
- *   CLEAR     → CLEAR
- *   FAILED    → FAILED
- *   NO PLAY   → スキップ
- *
- * 日付フォーマット: YYYYMMDD-HHmmss → YYYY-MM-DD HH:mm:ss
+ * リザルト手帳CSVを標準インポート行へ変換する。クリアタイプ表記をDB値へ写像し、NO PLAYは行ごとスキップする。
+ * 日付は YYYYMMDD-HHmmss を YYYY-MM-DD HH:mm:ss へ変換する。
  */
 
 import Papa from "papaparse";

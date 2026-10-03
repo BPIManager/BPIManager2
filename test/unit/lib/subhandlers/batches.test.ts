@@ -40,26 +40,34 @@ vi.mock("@/lib/db/aggregates/scoreTimeline", () => ({
     getTimelineByBatches: (...a: unknown[]) => getTimelineByBatchesMock(...a),
   },
 }));
-vi.mock("@/lib/db/aggregates/stats/tables", () => ({
-  statsTablesRepo: {
+vi.mock("@/lib/db/aggregates/stats/songTables", () => ({
+  statsSongTablesRepo: {
     getScoreHistory: (...a: unknown[]) => getScoreHistoryMock(...a),
     getTotalSongCount: (...a: unknown[]) => getTotalSongCountMock(...a),
   },
 }));
-vi.mock("@/lib/db/aggregates/rivalScores/rival", () => ({
-  rivalRepo: {
+vi.mock("@/lib/db/aggregates/rivalScores/overtaken", () => ({
+  rivalOvertakenRepo: {
     getOvertakenRivals: (...a: unknown[]) => getOvertakenRivalsMock(...a),
+  },
+}));
+vi.mock("@/lib/db/aggregates/rivalScores/aggregate", () => ({
+  rivalAggregateRepo: {
     getRivalLatestScoresBySong: vi.fn().mockResolvedValue([]),
   },
 }));
-vi.mock("@/lib/db/domains/logs/navigation", () => ({
-  navigationRepo: {
+vi.mock("@/lib/db/domains/logs/range", () => ({
+  logRangeRepo: {
     findBatchById: (...a: unknown[]) => findBatchByIdMock(...a),
     findBatchByIdAndUser: (...a: unknown[]) => findBatchByIdAndUserMock(...a),
     findBatchesInRange: (...a: unknown[]) => findBatchesInRangeMock(...a),
     getBatchNavigation: (...a: unknown[]) => getBatchNavigationMock(...a),
     getRangeNavigation: (...a: unknown[]) => getRangeNavigationMock(...a),
     getJstRange: (...a: unknown[]) => getJstRangeMock(...a),
+  },
+}));
+vi.mock("@/lib/db/domains/logs/batch", () => ({
+  logBatchRepo: {
     getLatestBatchId: (...a: unknown[]) => getLatestBatchIdMock(...a),
   },
 }));
@@ -69,14 +77,14 @@ vi.mock("@/lib/db/domains/scores/detail", () => ({
     getScoresByLastPlayedRange: vi.fn().mockResolvedValue([]),
   },
 }));
-vi.mock("@/lib/db/domains/scores", () => ({
-  scoresRepo: {
+vi.mock("@/lib/db/domains/scores/latest", () => ({
+  latestScoresRepo: {
     getPreviousVersionWithScores: (...a: unknown[]) =>
       getPreviousVersionWithScoresMock(...a),
   },
 }));
-vi.mock("@/lib/db/domains/songs", () => ({
-  songsRepo: {
+vi.mock("@/lib/db/domains/songs/master", () => ({
+  songMasterRepo: {
     getSongMasterWithDef: (...a: unknown[]) => getSongMasterWithDefMock(...a),
   },
 }));

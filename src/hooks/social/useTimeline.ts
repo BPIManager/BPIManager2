@@ -19,6 +19,8 @@ interface TimelineResponse {
  * @param listId - 指定時、このフォローリストの所属ユーザーだけに絞り込む
  * @returns タイムライン配列・ローディング状態・ページング操作
  */
+const getTimelineItems = (page: TimelineResponse) => page.timeline;
+
 export const useTimeline = (
   mode: "all" | "played" | "overtaken",
   params: FilterParamsFrontend,
@@ -58,7 +60,7 @@ export const useTimeline = (
       return `${API_V2_PREFIX}/users/${fbUser.uid}/timeline?${query.toString()}`;
     },
     {
-      getItems: (page) => page.timeline,
+      getItems: getTimelineItems,
       isLastPage: (page) => page?.nextId === null,
       revalidateFirstPage: false,
       revalidateOnFocus: false,

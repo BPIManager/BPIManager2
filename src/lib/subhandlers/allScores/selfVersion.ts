@@ -1,5 +1,5 @@
 import type { NextApiRequest } from "next";
-import { allScoresAggregateRepo } from "@/lib/db/aggregates/allScores";
+import { allScoresSelfRivalRepo } from "@/lib/db/aggregates/allScores/selfAndRivals";
 import { radarLookup, targetOf } from "@/lib/subhandlers/scores/_shared";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { err, ok } from "@/middlewares/api/apiResult";
@@ -28,7 +28,7 @@ export async function handleAllScoresSelfVersion(
   }
 
   try {
-    const rows = await allScoresAggregateRepo.getSelfVersionScores({
+    const rows = await allScoresSelfRivalRepo.getSelfVersionScores({
       userId: targetUserId,
       currentVersion: parsed.data.currentVersion,
       targetVersion: parsed.data.targetVersion,

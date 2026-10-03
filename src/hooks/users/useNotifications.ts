@@ -14,6 +14,8 @@ import type {
  * @param type - 取得する通知種別（デフォルト: `"all"`）
  * @returns 通知配列・未読件数・ローディング状態・既読化関数・ページング操作
  */
+const getNotificationItems = (page: NotificationItem[]) => page;
+
 export const useNotifications = (
   type: "all" | "follow" | "overtaken" | "followApproved" = "all",
 ) => {
@@ -41,7 +43,7 @@ export const useNotifications = (
       return `${API_V2_PREFIX}/users/${fbUser.uid}/notifications?type=${type}&page=${index}&limit=20`;
     },
     {
-      getItems: (page) => page,
+      getItems: getNotificationItems,
       isLastPage: (page) => page.length < 20,
       revalidateOnFocus: false,
     },
@@ -51,9 +53,7 @@ export const useNotifications = (
     if (!fbUser) return;
     try {
       await markNotificationsRead(fbUser);
-      // 未読件数には承認待ちリクエスト数(既読/未読の概念を持たず、対応
-      // されるまで常にカウントされる)も含まれるため、既読化後もtotal:0に
-      // 決め打ちせず再取得する
+      // 未読件数には対応待ちの承認リクエストも含まれ既読概念が無いため、既読化後に total:0 と決め打ちせず再取得する。
       mutateCount();
     } catch (e) {
       console.error(e);

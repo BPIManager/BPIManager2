@@ -2,9 +2,7 @@ import { z } from "zod";
 import { scoresQuerySchema } from "@/schemas/scores/query";
 import { IIDX_LEVELS, IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 
-// MCP経由の応答はそのままLLMの会話コンテキストに載ってトークンを消費するため、
-// REST API (scores.ts) とは別にMCP側だけデフォルトの件数上限を設ける。
-// (明示的にlimitを大きく指定した場合はそれを尊重し、強制的な上限は設けない)
+// MCP の応答は LLM の会話コンテキストを消費するため、MCP 側のみ既定の件数上限を設ける（limit を明示された場合はそれを尊重する）。
 export const MCP_SCORES_DEFAULT_LIMIT = 100;
 export const MCP_LIST_DEFAULT_LIMIT = 50;
 export const DASHBOARD_DEFAULT_HISTORY_DAYS = 30;

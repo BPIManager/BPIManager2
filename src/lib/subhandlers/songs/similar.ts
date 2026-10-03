@@ -1,5 +1,5 @@
 import type { NextApiRequest } from "next";
-import { songsRepo } from "@/lib/db/domains/songs";
+import { songSearchRepo } from "@/lib/db/domains/songs/search";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { num, resolveVersion, type HandleOutcome } from "./_shared";
@@ -18,7 +18,7 @@ export async function handleSongSimilar(
   const limit = isNaN(rawLimit) || rawLimit < 1 ? 10 : Math.min(rawLimit, 50);
   const mode = req.query.mode === "global" ? "global" : "profile";
   try {
-    const result = await songsRepo.getSimilarSongs(
+    const result = await songSearchRepo.getSimilarSongs(
       songIdNum,
       version,
       limit,

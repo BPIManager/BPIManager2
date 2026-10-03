@@ -35,6 +35,27 @@ describe("getRankIndex / getDJRank", () => {
   it("getRankIndexは0%のときF(index 0)を返すこと", () => {
     expect(getRankIndex(0)).toBe(0);
   });
+
+  // maxScore=1800 のとき AAA境界=ceil(1800*8/9)=1600、MAX-境界=ceil(1800*17/18)=1700
+  it("AAA帯のcurrentはAAA+とAAA境界からの超過分を返すこと", () => {
+    expect(getDJRank(1600, 1800, { mode: "current", output: "label" })).toBe("AAA+");
+    expect(getDJRank(1650, 1800, { mode: "current", output: "value" })).toBe("50");
+  });
+
+  it("AAA帯のnextはMAX-境界までの不足分を返すこと（100%までの距離ではない）", () => {
+    expect(getDJRank(1600, 1800, { mode: "next", output: "label" })).toBe("MAX-");
+    expect(getDJRank(1600, 1800, { mode: "next", output: "value" })).toBe("100");
+  });
+
+  it("MAX-帯のcurrentはMAX-と表示し、MAX-境界からの超過分を返すこと", () => {
+    expect(getDJRank(1700, 1800, { mode: "current", output: "label" })).toBe("MAX-");
+    expect(getDJRank(1700, 1800, { mode: "current", output: "value" })).toBe("0");
+  });
+
+  it("満点のnextはMAX-と表示し、不足分は0になること", () => {
+    expect(getDJRank(1800, 1800, { mode: "next", output: "label" })).toBe("MAX-");
+    expect(getDJRank(1800, 1800, { mode: "next", output: "value" })).toBe("0");
+  });
 });
 
 describe("getMaxBpm", () => {

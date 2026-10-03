@@ -9,9 +9,7 @@ export interface CustomGoalTarget {
 }
 
 /**
- * ユーザーが選んだ曲＋目標EXスコアの組から、現在→目標の総合BPIと
- * 各曲のfromBpi/toBpiを計算する。返り値はそのまま`saveMemo`(kind: "custom")
- * に渡せる`OptimizationResult`の形。
+ * 選んだ曲＋目標EXスコアから、現在→目標の総合BPIと各曲の fromBpi/toBpi を計算する。返り値は saveMemo（kind: custom）に渡せる OptimizationResult。
  */
 export async function fetchCustomGoalPreview(
   userId: string,

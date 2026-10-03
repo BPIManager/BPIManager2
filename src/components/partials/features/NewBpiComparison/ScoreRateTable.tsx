@@ -28,11 +28,8 @@ const formatRate = (rate: number) => {
 };
 
 /**
- * `getDJRank`の`mode:"current"`だけを単独で使うと、AAA〜MAX間の表記が
- * AAAに近い側でも"MAX-"、MAXに近い側でも"AAA+"になる区間があり単調に
- * 見えなくなる(この関数は元々current/nextを両方並べて見せる前提の設計)。
- * ここでは1列だけ表示したいので、current/nextのうち差分が小さい方
- * (＝より近いランクからの表記)を選んで単調な見た目にする。
+ * getDJRank の mode:"current" 単独だとAAA〜MAX間の表記が単調に見えない区間があるため、current/next のうち差分が小さい方を選ぶ。
+ * 1列表示で単調な表記にするための選択であり、データの意味は変えない。
  */
 const getBestDJRank = (exScore: number, maxScore: number): string => {
   const modes = ["current", "next"] as const;

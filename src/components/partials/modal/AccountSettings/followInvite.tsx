@@ -11,10 +11,7 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 /**
- * 非公開設定中のみ表示する、フォロー招待URLの発行/再発行セクション。
- *
- * `AccountSettings`モーダルの「プロフィールを公開」トグルの直下に置く
- * （表示可否はトグルの現在値=`formData.isPublic`で呼び出し元が判断する）。
+ * 非公開設定中のみ表示する、フォロー招待URLの発行・再発行セクション。プロフィール公開トグルの直下に置き、表示可否は呼び出し元が判断する。
  */
 export default function FollowInviteSection() {
   const { token, regenerate, isLoading } = useFollowInvite();

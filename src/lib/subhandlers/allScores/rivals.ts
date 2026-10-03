@@ -1,4 +1,4 @@
-import { allScoresAggregateRepo } from "@/lib/db/aggregates/allScores";
+import { allScoresSelfRivalRepo } from "@/lib/db/aggregates/allScores/selfAndRivals";
 import { resolveVersion } from "@/lib/subhandlers/shared";
 import { err, ok } from "@/middlewares/api/apiResult";
 import type { AccessResult } from "@/middlewares/api/withApi";
@@ -23,7 +23,7 @@ export async function handleAllSongRivals(
   }
 
   const version = resolveVersion(req.query.version);
-  const rivalsScores = await allScoresAggregateRepo.getRivalScoresForAllSong({
+  const rivalsScores = await allScoresSelfRivalRepo.getRivalScoresForAllSong({
     viewerId: targetUserId,
     songId: Number(songId),
     version,

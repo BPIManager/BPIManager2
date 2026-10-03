@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
 import { useIidxTowerRanking } from "@/hooks/stats/useIidxTowerRanking";
+import { useTranslation } from "@/hooks/common/useTranslation";
 import TowerRankingRow from "./row";
 import { Skeleton } from "@/components/ui/skeleton";
 import RivalComparisonModal from "@/components/partials/modal/RivalComparison";
@@ -116,6 +117,7 @@ interface TowerRankingProps {
 }
 
 const TowerRanking = ({ version }: TowerRankingProps) => {
+  const { t: translate } = useTranslation();
   const router = useRouter();
   const today = dayjs().format("YYYY-MM-DD");
 
@@ -275,6 +277,7 @@ const TowerRanking = ({ version }: TowerRankingProps) => {
           variant="outline"
           size="icon"
           className="h-8 w-8 shrink-0 border-bpim-border bg-bpim-surface-2/40"
+          aria-label={translate("common.pagination.prev")}
           onClick={handlePrev}
         >
           <ChevronLeft className="h-4 w-4" />
@@ -298,6 +301,7 @@ const TowerRanking = ({ version }: TowerRankingProps) => {
           variant="outline"
           size="icon"
           className="h-8 w-8 shrink-0 border-bpim-border bg-bpim-surface-2/40"
+          aria-label={translate("common.pagination.next")}
           onClick={handleNext}
           disabled={isNextDisabled(period, selectedDate)}
         >

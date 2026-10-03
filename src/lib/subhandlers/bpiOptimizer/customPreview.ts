@@ -1,7 +1,6 @@
 import type { NextApiRequest } from "next";
-import { db } from "@/lib/db";
 import { bpiOptimizerAggregateRepo } from "@/lib/db/aggregates/bpiOptimizer";
-import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
+import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { topElementMap } from "@/constants/iidx/radars/topElements";
 import { BpiCalculator } from "@/lib/bpi";
@@ -19,12 +18,8 @@ import type {
 } from "@/types/bpi-optimizer";
 
 /**
- * POST /users/[userId]/analytics/bpi-optimizer/custom-preview （withUserApiHandler）
- *
- * ユーザーが自分で選んだ曲＋目標EXスコアの組から、アルゴリズム生成プランと
- * 同じ`OptimizationResult`形状の結果（各曲のfromBpi/toBpiと、適用前後の
- * 総合BPI）を計算する。返り値はそのまま`optimizeMemo`への保存
- * （`kind: "custom"`）に使える。
+ * ユーザーが選んだ曲＋目標EXスコアから、アルゴリズム生成プランと同じ OptimizationResult 形状の結果を計算する。
+ * 返り値はそのまま optimizeMemo への保存（kind: custom）に使える。
  */
 export async function handleCustomGoalPreview(
   req: NextApiRequest,
@@ -50,7 +45,7 @@ export async function handleCustomGoalPreview(
         userId,
         latestVersion,
       ),
-      userStatusLogsRepo.getMaxTotalBpi(db, userId, latestVersion),
+      userStatusLogsReadRepo.findMaxTotalBpi(userId, latestVersion),
     ]);
     const rowBySongId = new Map(rawRows.map((r) => [r.songId, r]));
 

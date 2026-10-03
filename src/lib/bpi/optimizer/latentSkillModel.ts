@@ -20,16 +20,8 @@ interface Contribution {
 }
 
 /**
- * プレイヤーの潜在スキル`a_shrunk`（全体・レーダーカテゴリ別）を、観測の追加/更新に
- * あわせてO(1)で増分管理する。
- *
- * 数式は`docs/bpi-math.md` §7.5、原典実装は`@bpim/bpicalc`の`PlayerBpiV2`
- * （`v2.ts`のコンストラクタ）と一字一句対応させている（独自の近似を混ぜない）。
- * カテゴリ別バイアス`categoryBias_c`は`docs/proposals/bpi-optimizer-v2-rebuild.md` §2.5
- * の縮小推定（`a_shrunk`と同型）を、`num`/`info`の代わりにカテゴリ内の生の重み付き和
- * （`a_shrunk`に依存しない量）で保持し、参照時に現在の`a_shrunk`を使って組み立てる。
- * こうすることで、カテゴリ外の観測が追加されて全体の`a_shrunk`が動いても、
- * 保持している値を作り直さずに正しい`categoryBias_c`を返せる。
+ * プレイヤーの潜在スキル a_shrunk（全体・カテゴリ別）を観測追加ごとにO(1)で増分更新する。
+ * 数式は docs/bpi-math.md §7.5 と @bpim/bpicalc の PlayerBpiV2 に一字一句対応させる。categoryBias は生の重み付き和を保持し、参照時に組み立てる。
  */
 export class LatentSkillModel {
   private num = 0;
@@ -40,9 +32,8 @@ export class LatentSkillModel {
   private readonly contributions = new Map<number, Contribution>();
 
   /**
-   * 曲`song`の観測（実測 or 仮想プレイのEXスコア）を追加/更新する。
-   * 既に同じ`songId`の観測があれば、その寄与を差し引いてから新しい寄与を加える。
-   * `mu`/`sigma`が無い・`notes=0`の曲はV2のスコープ外として無視する（`@bpim/bpicalc`と同じ扱い）。
+   * 曲の観測（実測 or 仮想プレイの EX スコア）を追加・更新する。同じ songId の既存観測は寄与を差し引いてから新しい寄与を加える。
+   * mu/sigma が無い・notes=0 の曲は V2 のスコープ外として無視する（@bpim/bpicalc と同じ扱い）。
    */
   upsert(song: VarianceSong, exScore: number): void {
     const { mu, sigma, notes, songId } = song;

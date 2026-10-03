@@ -15,17 +15,8 @@ import {
 } from "@/constants/iidx/newBpi/modelConstants";
 
 /**
- * BPI（Beat Power Indicator）計算ロジックを提供する静的クラス。
- *
- * 実体は npm パッケージ `@bpim/bpicalc` の {@link BpiV2}（分布ベース再定義）。
- * `songDef` 由来の楽曲データ
- * （{@link IBpiBasicSongData}、`mu`/`sigma`/`residualVar` 込み）を `BpiV2` に渡す。
- *
- * - 単曲 BPI の計算（`calc`）
- * - BPI からスコアの逆算（`calcFromBPI`）
- * - 総合 BPI の計算（`calculateTotalBPI`、シフト法。実測観測から潜在スキルを
- *   推定し、未プレイ曲を予測で埋めて集約する）
- * - 順位推定（`estimateRank`）
+ * BPI（Beat Power Indicator）計算の静的クラス。実体は @bpim/bpicalc の BpiV2（分布ベース）。
+ * 単曲BPI・逆算・総合BPI（シフト法）・推定順位を提供する。
  */
 export class BpiCalculator {
   private static readonly v2 = new BpiV2({
@@ -86,9 +77,8 @@ export class BpiCalculator {
   }
 
   /**
-   * 指定楽曲のmu/sigma、BPI0/100アンカー、曲間の歪み補正指数`gamma`、カーブ指数
-   * `coef`、実効カーブ指数`k = clamp(gamma*coef)`を表示用に取得する。
-   * 式表示(FormulaCard等)向け。`mu`/`sigma`が無い曲は `null`
+   * 楽曲の mu/sigma・BPI0/100 アンカー・補正指数 gamma・カーブ指数 coef・実効指数 k を式表示（FormulaCard 等）用に取得する。
+   * mu/sigma が無い曲は null。
    */
   public static getSongParams(song: IBpiBasicSongData): {
     mu: number;
@@ -127,13 +117,10 @@ export class BpiCalculator {
   }
 
   /**
-   * 総合 BPI を計算する（シフト法）。
-   *
-   * 実際にプレイした曲の単曲BPIはそのまま使い、未プレイ曲だけを潜在スキル
-   * （`observations` 全体から推定）からの予測値で埋めたうえで集約する。
+   * 総合 BPI をシフト法で計算する。プレイ済み曲は単曲 BPI をそのまま使い、未プレイ曲のみ潜在スキル（observations から推定）で予測値を埋める。
    *
    * @param observations - そのユーザーが実際にプレイしたスコア
-   * @param allSongs - 集計対象の全楽曲（`songId` 必須。未プレイ曲の判定・予測に使う）
+   * @param allSongs - 集計対象の全楽曲（songId 必須。未プレイ曲の判定・予測に使う）
    * @returns 総合 BPI 値。有効な観測が1件も無ければ床（-15）
    */
   public static calculateTotalBPI(
@@ -164,7 +151,7 @@ export class BpiCalculator {
       })),
       allSongs.length,
     );
-    return total ?? -15;
+    return typeof total === "number" && Number.isFinite(total) ? total : -15;
   }
 
   /**
@@ -173,11 +160,8 @@ export class BpiCalculator {
   private static readonly RANK_BASE_TOTAL = 3000;
 
   /**
-   * 総合 BPI から、アリーナ上位母集団内でのおおよその順位を推定する。
-   *
-   * V1・V2の間でモデルは変わったが、「総合BPIの値をおおよその順位に変換する」
-   * という表示用の目安としての位置づけは変わらないため、原典と同形の
-   * べき乗カーブ（`rank = RANK_BASE_TOTAL^((100-totalBpi)/100)`）をそのまま使う。
+   * 総合 BPI から、アリーナ上位母集団内のおおよその順位を推定する（表示用の目安）。
+   * 原典と同形のべき乗カーブ（rank = RANK_BASE_TOTAL^((100-totalBpi)/100)）を使う。
    *
    * @param totalBpi - 総合 BPI 値
    * @returns 推定順位（整数）
@@ -187,24 +171,20 @@ export class BpiCalculator {
   }
 
   /**
-   * 総合BPIの表示値に「既知の最高値を下回らない」ラチェットを適用する。
+   * 総合BPIの表示値に既知の最高値を下回らないラチェットを適用する。書き込み経路（呼び出し元）の責務とする。
+   * 未プレイ曲の予測で総合BPIが下がりうるため、記録としての体験を保つよう max を取る。
    *
-   * V2の総合BPI（シフト法）は、未プレイ曲の予測に使う潜在スキル`a_i`が
-   * 新しい観測(特に初見の低い実力のプレイ)で下がりうるため、プレイ済み曲の
-   * BPIが1つも下がっていなくても、総合BPIそのものが下がることがある
-   * （V1は未プレイ曲を一律-15固定だったためこの効果が無く、単調非減少だった）。
-   * 表示上の「記録」としての体験を保つため、書き込み時に過去の最高値との
-   * `max`を取る。`calculateTotalBPI`自体は「今の状態を計算する」役割に
-   * とどめ、ラチェットは呼び出し元（DB書き込み経路）の責務とする。
-   *
-   * @param previousBest - これまでに記録された最高の総合BPI（記録が無ければ`null`）
+   * @param previousBest - これまでに記録された最高の総合BPI（記録が無ければ null）
    * @param freshValue - 今回新しく算出した総合BPI
-   * @returns 書き込むべき総合BPI（`previousBest`と`freshValue`のうち大きい方）
+   * @returns 書き込むべき総合BPI（previousBest と freshValue のうち大きい方）
    */
   public static ratchetTotalBpi(
     previousBest: number | null,
     freshValue: number,
   ): number {
+    // NaN（sigma=0 等の異常譜面が混ざった場合）を Math.max に通すと NaN が保存されるため、
+    // 有限でない新値は採用せず既存の最高値（無ければ -15）を維持する
+    if (!Number.isFinite(freshValue)) return previousBest ?? -15;
     return previousBest !== null
       ? Math.max(previousBest, freshValue)
       : freshValue;

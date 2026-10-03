@@ -1,9 +1,10 @@
 import dayjs from "@/lib/dayjs";
-import { rivalRepo } from "@/lib/db/aggregates/rivalScores/rival";
-import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
+import { rivalOvertakenRepo } from "@/lib/db/aggregates/rivalScores/overtaken";
+import { rivalAggregateRepo } from "@/lib/db/aggregates/rivalScores/aggregate";
+import { statsSongTablesRepo } from "@/lib/db/aggregates/stats/songTables";
 import { scoreDetailRepo } from "@/lib/db/domains/scores/detail";
-import { navigationRepo } from "@/lib/db/domains/logs/navigation";
-import { songsRepo } from "@/lib/db/domains/songs";
+import { logRangeRepo } from "@/lib/db/domains/logs/range";
+import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { calculateTotalBpi } from "@/services/logs/calculateTotalBpi";
 import { mapToLogNested } from "@/utils/logs/getMapNested";
 import {
@@ -14,13 +15,12 @@ import {
 import type { IIDXVersion } from "@/types/iidx/version";
 
 /**
- * 追い抜きライバル取得の完了を待ってから、その楽曲群のライバル最新スコアを取得する。
- * overtakenPromise 自体は他のクエリと独立なため、呼び出し元で Promise.all に含めることで
- * history/totalSongs/scores 取得と並行させ、直列 await を避ける。
+ * 追い抜きライバルの取得完了を待ってから、その楽曲群のライバル最新スコアを取得する。
+ * overtakenPromise は独立しているため呼び出し元で Promise.all に含め、直列 await を避ける。
  */
 async function fetchRivalScoresForOvertaken(
   overtakenPromise: Promise<
-    Awaited<ReturnType<typeof rivalRepo.getOvertakenRivals>>
+    Awaited<ReturnType<typeof rivalOvertakenRepo.getOvertakenRivals>>
   >,
   uid: string,
   ver: IIDXVersion,
@@ -32,7 +32,7 @@ async function fetchRivalScoresForOvertaken(
     .filter(Boolean);
 
   return isOwnLog && overtakenSongIds.length > 0
-    ? rivalRepo.getRivalLatestScoresBySong({
+    ? rivalAggregateRepo.getRivalLatestScoresBySong({
         userId: uid,
         version: ver,
         songIds: overtakenSongIds,
@@ -44,13 +44,13 @@ async function fetchRivalScoresForOvertaken(
 export async function handleLastPlayedBase(
   uid: string,
   ver: IIDXVersion,
-  range: ReturnType<typeof navigationRepo.getJstRange>,
-  nav: Awaited<ReturnType<typeof navigationRepo.getRangeNavigation>>,
+  range: ReturnType<typeof logRangeRepo.getJstRange>,
+  nav: Awaited<ReturnType<typeof logRangeRepo.getRangeNavigation>>,
   isOwnLog: boolean,
   type: string = "day",
 ) {
   const overtakenPromise = isOwnLog
-    ? rivalRepo.getOvertakenRivals(uid, ver, {
+    ? rivalOvertakenRepo.getOvertakenRivals(uid, ver, {
         range: { ...range, basis: "lastPlayed" },
       })
     : Promise.resolve([]);
@@ -69,8 +69,8 @@ export async function handleLastPlayedBase(
 
   const [history, fullMaster, dailyScores, overtaken, rivalScores, versionOvertakenMap] =
     await Promise.all([
-      statsTablesRepo.getScoreHistory(uid, ver, [], []),
-      songsRepo.getSongMasterWithDef(),
+      statsSongTablesRepo.getScoreHistory(uid, ver, [], []),
+      songMasterRepo.getSongMasterWithDef(),
       type === "day"
         ? scoreDetailRepo.getScoresByLastPlayedRange(uid, ver, range)
         : scoreDetailRepo.getScoresWithDetails(uid, ver, {
@@ -145,12 +145,12 @@ export async function handleLastPlayedBase(
 export async function handleCreatedAtBase(
   uid: string,
   ver: IIDXVersion,
-  range: ReturnType<typeof navigationRepo.getJstRange>,
-  nav: Awaited<ReturnType<typeof navigationRepo.getRangeNavigation>>,
+  range: ReturnType<typeof logRangeRepo.getJstRange>,
+  nav: Awaited<ReturnType<typeof logRangeRepo.getRangeNavigation>>,
   isOwnLog: boolean,
   type: string = "day",
 ) {
-  const batches = await navigationRepo.findBatchesInRange(
+  const batches = await logRangeRepo.findBatchesInRange(
     uid,
     ver,
     range.start,
@@ -159,7 +159,7 @@ export async function handleCreatedAtBase(
   if (batches.length === 0) return null;
 
   const overtakenPromise = isOwnLog
-    ? rivalRepo.getOvertakenRivals(uid, ver, {
+    ? rivalOvertakenRepo.getOvertakenRivals(uid, ver, {
         range: { ...range, basis: "createdAt" },
       })
     : Promise.resolve([]);

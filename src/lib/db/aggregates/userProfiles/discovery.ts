@@ -1,34 +1,26 @@
 import { db } from "@/lib/db";
 import { sql } from "kysely";
 import { latestPerUserSubquery as latestArenaPerUserSubquery } from "@/lib/db/domains/arenaHistory";
-import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
+import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
 import { wherePublicOnly } from "@/lib/db/shared/visibility";
 import type { RadarFilterKey, RadarFilterRange } from "@/types/users/list";
 
 /**
- * おすすめユーザー発見・検索を担当するリポジトリクラス。
- *
- * users・userStatusLogs・officialArenaStats・userRadarCache・userRoles等を
- * 横断してユーザー向けの複合ビューを組み立てる。
+ * おすすめユーザーの発見・検索。users・userStatusLogs・officialArenaStats・userRadarCache・userRoles を横断する複合ビューを組み立てる。
  */
 class UserDiscoveryRepository {
   /**
-   * おすすめユーザーの一覧をページネーション付きで取得する。
-   *
-   * `order` によりソート方法を制御できる:
-   * - `"distance"`: 閲覧者の BPI との差が小さい順
-   * - `"desc"`: `sortColumn` 降順
-   * - `"newest"`: 最新スコア登録順
+   * おすすめユーザーをページネーション付きで取得する。order で distance（BPI差が小さい順）・desc（sortColumn 降順）・newest（登録順）を切り替える。
    *
    * @param params.viewerId - 閲覧者のユーザー ID（自分自身は除外）
-   * @param params.viewerValue - 閲覧者の基準値（"distance" ソート時に使用）
+   * @param params.viewerValue - 閲覧者の基準値（distance ソート時に使用）
    * @param params.version - バージョン番号
    * @param params.limit - 取得件数
    * @param params.offset - オフセット
    * @param params.searchQuery - ユーザー名または IIDX ID の部分一致検索文字列
-   * @param params.sort - ソート列名（`"totalBpi"` | `"notes"` | ... レーダーカテゴリ）
+   * @param params.sort - ソート列名（totalBpi またはレーダーカテゴリ）
    * @param params.order - ソート方向
-   * @param params.filters - レーダーカテゴリ・総合BPIのmin/max範囲絞り込み（全条件AND）
+   * @param params.filters - レーダーカテゴリ・総合BPIの min/max 範囲絞り込み（全条件AND）
    */
   async getRecommendedUsers(params: {
     viewerId: string;
@@ -67,7 +59,7 @@ class UserDiscoveryRepository {
       sort && columnMap[sort] ? columnMap[sort] : "usl.totalBpi";
 
     const latestStatusSubquery =
-      userStatusLogsRepo.latestPerUserSubquery(version);
+      userStatusLogsReadRepo.latestPerUserSubquery(version);
     const latestArenaSubquery = latestArenaPerUserSubquery(version);
 
     let query = db
@@ -176,7 +168,7 @@ class UserDiscoveryRepository {
     const { query, arenaClass, version, limit } = params;
 
     const latestStatusSubquery =
-      userStatusLogsRepo.latestPerUserSubquery(version);
+      userStatusLogsReadRepo.latestPerUserSubquery(version);
     const latestArenaSubquery = latestArenaPerUserSubquery(version);
 
     let dbQuery = db

@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { IIDXVersion } from "@/types/iidx/version";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
-import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore";
+import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore/perSong";
 
 /**
  * BPI最適化機能向けに、`songs`・`songDef`・`scores` を横断してBPI対象楽曲一覧と
@@ -10,10 +10,7 @@ import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore";
  */
 class BpiOptimizerAggregateRepository {
   /**
-   * 指定バージョンの全BPI対象楽曲（☆11/☆12、HYPER/ANOTHER/LEGGENDARIA）と
-   * ユーザーの最新スコアをLEFT JOINで取得する。
-   *
-   * 未プレイ楽曲もNULLスコアとして含まれる。
+   * 指定バージョンの全 BPI 対象楽曲（☆11/☆12）とユーザーの最新スコアを LEFT JOIN で取得する。未プレイ曲は NULL スコアとして含める。
    *
    * @param userId - ユーザーID
    * @param version - バージョン番号
@@ -68,10 +65,8 @@ class BpiOptimizerAggregateRepository {
   }
 
   /**
-   * 全BPI対象楽曲について、バージョンを横断したユーザーの自己歴代最高EXスコアを
-   * LEFT JOINで取得する（「自己歴代のみを参照」オプション向け）。
-   *
-   * 未プレイ楽曲もNULLスコアとして含まれる。現行バージョンで既に削除された楽曲は除く。
+   * 全 BPI 対象楽曲について、バージョンを横断した自己歴代最高 EX スコアを LEFT JOIN で取得する（自己歴代のみ参照するオプション向け）。
+   * 現行バージョンで既に削除された楽曲は除く。未プレイ曲は NULL スコアとして含める。
    *
    * @param userId - ユーザーID
    */

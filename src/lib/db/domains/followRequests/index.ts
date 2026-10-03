@@ -3,20 +3,12 @@ import { Database } from "@/types/db";
 import { Transaction } from "kysely";
 
 /**
- * 非公開ユーザーへのフォローリクエスト（`followRequests` テーブル）の
- * 読み書きを担当するリポジトリクラス。
- *
- * このテーブルは保留中のリクエストのみを保持する。承認/却下されたリクエストは
- * 行ごと削除する（`follows`自体に取り消し済み行を置かないのと同じ設計）。
- * 承認時のみ`domains/followApprovalNotifications`に通知ログを残す
- * （却下は角が立つため通知・履歴のどちらも残さない）。
+ * 非公開ユーザーへのフォローリクエスト（followRequests）の読み書き。保留中のみを保持し、承認・却下された行は削除する。
+ * 承認時のみ followApprovalNotifications に通知を残す（却下は角が立つため通知・履歴を残さない）。
  */
 class FollowRequestsRepository {
   /**
-   * フォローリクエストを送信する（保留状態で作成）。
-   *
-   * 既に同じ相手への保留中リクエストがある場合は何もしない
-   * （招待URLの再クリック等での重複送信に対応）。
+   * フォローリクエストを保留状態で作成する。同じ相手への保留中リクエストがあれば何もしない（招待URLの再クリック等の重複送信対策）。
    *
    * @param requesterId - リクエストを送る側のユーザー ID
    * @param targetUserId - リクエスト先（非公開ユーザー）の ID
@@ -43,10 +35,7 @@ class FollowRequestsRepository {
   }
 
   /**
-   * 指定の送信者→リクエスト先の組み合わせで、保留中のリクエストがあるかを確認する。
-   *
-   * 招待ページで「送信」ボタンではなく「取り下げる」ボタンを最初から
-   * 出し分けるために使う。
+   * 送信者→リクエスト先の組み合わせで保留中のリクエストがあるかを確認する。招待ページで「送信」か「取り下げ」かを最初から出し分けるために使う。
    *
    * @param requesterId - リクエストを送った側のユーザー ID
    * @param targetUserId - リクエスト先ユーザー ID
@@ -83,16 +72,11 @@ class FollowRequestsRepository {
   }
 
   /**
-   * フォローリクエストを取り消す/承認・却下により解決する。
-   *
-   * 呼び出し元（`orchestrators/followRequestApproval`）は返り値で実際に
-   * 行が削除されたかを確認し、他リクエストとの競合（同一リクエストへの
-   * 却下・取り下げとの同時実行）で既に消費済みだった場合に後続の
-   * `follows`作成・承認通知記録をスキップする。
+   * フォローリクエストを承認・却下・取り下げにより解決する。呼び出し元は返り値で実削除を確認し、消費済みなら後続処理をスキップする。
    *
    * @param trx - 呼び出し元が管理するトランザクション
    * @param id - フォローリクエストID
-   * @returns 削除対象の行が存在した場合は `true`
+   * @returns 削除対象の行が存在した場合は true
    */
   async deleteById(trx: Transaction<Database>, id: number): Promise<boolean> {
     const result = await trx

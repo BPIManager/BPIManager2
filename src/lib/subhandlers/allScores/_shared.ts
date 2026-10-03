@@ -1,4 +1,5 @@
-import { allScoresAggregateRepo } from "@/lib/db/aggregates/allScores";
+import { allScoresListRepo } from "@/lib/db/aggregates/allScores/list";
+import { allScoresSelfRivalRepo } from "@/lib/db/aggregates/allScores/selfAndRivals";
 import { allScoresRepo } from "@/lib/db/domains/allScores";
 import type { HandlerResult } from "@/types/api";
 
@@ -13,13 +14,13 @@ export interface HandleOutcome<T> {
 }
 
 export type AllScoresList = Awaited<
-  ReturnType<typeof allScoresAggregateRepo.getAllScoresList>
+  ReturnType<typeof allScoresListRepo.getAllScoresList>
 >;
 export type ScoreHistory = Awaited<
   ReturnType<typeof allScoresRepo.getScoreHistory>
 >;
 export type AllSongRanking = Awaited<
-  ReturnType<typeof allScoresRepo.getAllSongRanking>
+  ReturnType<typeof allScoresSelfRivalRepo.getAllSongRanking>
 >;
 
 export interface AllSongRivalsBody {

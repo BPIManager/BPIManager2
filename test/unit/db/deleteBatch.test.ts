@@ -19,7 +19,7 @@ const { createTrxSpy, dbMock } = vi.hoisted(() => {
         };
         return builder;
       },
-      // #448: deleteBatchが削除直前に行ロック付きで最新バッチを再判定するための
+      // deleteBatchが削除直前に行ロック付きで最新バッチを再判定するための
       // selectFromチェーン。テストでは常に`latestBatchRow`をそのまま返す
       selectFrom: () => {
         const builder = {
@@ -55,7 +55,7 @@ const { createTrxSpy, dbMock } = vi.hoisted(() => {
 
 vi.mock("@/lib/db", () => ({ db: dbMock }));
 
-import { scoresRepo } from "@/lib/db/domains/scores";
+import { scoreWriteRepo } from "@/lib/db/domains/scores/write";
 import { allScoresRepo } from "@/lib/db/domains/allScores";
 import {
   deleteBatch,
@@ -68,11 +68,11 @@ describe("バッチ削除まわりのリポジトリ", () => {
     dbMock.nextLatestBatchRow = undefined;
   });
 
-  describe("scoresRepo.deleteByBatch", () => {
+  describe("scoreWriteRepo.deleteByBatch", () => {
     it("scores テーブルを batchId と userId で絞り込んで削除すること", async () => {
       const { trx, calls } = createTrxSpy();
 
-      await scoresRepo.deleteByBatch(
+      await scoreWriteRepo.deleteByBatch(
         trx as never,
         "user-1",
         "batch-1",
@@ -115,7 +115,7 @@ describe("バッチ削除まわりのリポジトリ", () => {
   describe("batchDeletion.deleteBatch", () => {
     it("scoresRepo/allScoresRepoに委譲しつつ、logs系テーブルは自身で削除すること", async () => {
       const scoresSpy = vi
-        .spyOn(scoresRepo, "deleteByBatch")
+        .spyOn(scoreWriteRepo, "deleteByBatch")
         .mockResolvedValue(undefined);
       const allScoresSpy = vi
         .spyOn(allScoresRepo, "deleteByBatch")
@@ -148,7 +148,7 @@ describe("バッチ削除まわりのリポジトリ", () => {
     it("トランザクション内の再判定で対象バッチが最新でなくなっていた場合、削除せずBatchNotLatestErrorを投げること(#448)", async () => {
       dbMock.nextLatestBatchRow = { batchId: "batch-2" };
       const scoresSpy = vi
-        .spyOn(scoresRepo, "deleteByBatch")
+        .spyOn(scoreWriteRepo, "deleteByBatch")
         .mockResolvedValue(undefined);
 
       await expect(

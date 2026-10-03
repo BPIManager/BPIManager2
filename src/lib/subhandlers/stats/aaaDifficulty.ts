@@ -1,5 +1,5 @@
 import { BpiCalculator } from "@/lib/bpi";
-import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
+import { statsSongTablesRepo } from "@/lib/db/aggregates/stats/songTables";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { radarLookup } from "@/lib/subhandlers/scores/_shared";
@@ -10,7 +10,7 @@ export async function handleStatsAaaDifficulty(
   q: AaaQuery,
 ): Promise<HandlerResult<unknown>> {
   try {
-    const rawData = await statsTablesRepo.getAAATableData(
+    const rawData = await statsSongTablesRepo.getAAATableData(
       q.userId,
       q.version,
       q.level,

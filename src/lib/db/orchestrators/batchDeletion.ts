@@ -1,13 +1,12 @@
 import { db } from "@/lib/db";
-import { scoresRepo } from "@/lib/db/domains/scores";
+import { lockUserForWrite } from "@/lib/db/shared/userWriteLock";
+import { scoreWriteRepo } from "@/lib/db/domains/scores/write";
 import { allScoresRepo } from "@/lib/db/domains/allScores";
-import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
-import { navigationRepo } from "@/lib/db/domains/logs/navigation";
+import { userStatusLogsWriteRepo } from "@/lib/db/domains/userStatusLogs/write";
+import { logBatchRepo } from "@/lib/db/domains/logs/batch";
 
 /**
- * トランザクション内での再判定時に対象バッチが最新でなくなっていた場合に
- * 投げるエラー（呼び出し元判定後、削除前に新しいバッチが割り込むTOCTOU
- * 競合を検出するため）。
+ * トランザクション内の再判定で対象バッチが最新でなくなっていた場合に投げる（判定後・削除前の割り込み＝TOCTOU 競合を検出する）。
  */
 export class BatchNotLatestError extends Error {
   constructor() {
@@ -17,11 +16,8 @@ export class BatchNotLatestError extends Error {
 }
 
 /**
- * 指定バッチに紐づくスコア・全難易度スコア・ステータスログ・ログレコードをトランザクションで削除する。
- *
- * 呼び出し元（`handleBatchDelete`）はトランザクション外で「最新バッチか」を
- * 事前判定しているが、判定と削除の間に新しいバッチが割り込むTOCTOU競合を
- * 防ぐため、削除直前にトランザクション内で行ロックを取得して再判定する。
+ * 指定バッチのスコア・全難易度スコア・ステータスログ・ログをトランザクションで削除する。
+ * 最新バッチ判定は外で行うが、判定と削除の間の割り込み（TOCTOU）を防ぐため、トランザクション内で行ロック後に再判定する。
  *
  * @param version - 最新バッチ判定に使うバージョン番号
  */
@@ -31,7 +27,8 @@ export async function deleteBatch(
   version: string,
 ) {
   return await db.transaction().execute(async (trx) => {
-    const latestBatchId = await navigationRepo.getLatestBatchIdForUpdate(
+    await lockUserForWrite(trx, userId);
+    const latestBatchId = await logBatchRepo.getLatestBatchIdForUpdate(
       trx,
       userId,
       version,
@@ -40,9 +37,9 @@ export async function deleteBatch(
       throw new BatchNotLatestError();
     }
 
-    await scoresRepo.deleteByBatch(trx, userId, batchId);
+    await scoreWriteRepo.deleteByBatch(trx, userId, batchId);
     await allScoresRepo.deleteByBatch(trx, userId, batchId);
-    await userStatusLogsRepo.deleteByBatch(trx, userId, batchId);
-    await navigationRepo.deleteByBatch(trx, userId, batchId);
+    await userStatusLogsWriteRepo.deleteByBatch(trx, userId, batchId);
+    await logBatchRepo.deleteByBatch(trx, userId, batchId);
   });
 }

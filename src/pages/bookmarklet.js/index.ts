@@ -1,8 +1,7 @@
 import type { GetServerSideProps } from "next";
 
-// IIDX-Scraping-Bookmarklet の main ブランチ最新コミットに追従すると、
-// 参照先リポジトリが侵害された場合に未検証のコードを配信してしまうため、
-// 特定コミットに固定する。更新する場合はこのSHAを明示的に書き換えること。
+// 参照先は特定コミットに固定する。main 追従だと参照先リポジトリが侵害された場合に未検証のコードを配信してしまうため。
+ // 更新時はこの SHA を明示的に書き換える。
 const BOOKMARKLET_SOURCE_COMMIT = "4bed7f19317d5b1c98037b60eac8b5b72f71d6c1";
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
@@ -16,13 +15,23 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     return { props: {} };
   }
 
-  const script = await fetch(
-    `https://raw.githubusercontent.com/BPIManager/IIDX-Scraping-Bookmarklet/${BOOKMARKLET_SOURCE_COMMIT}/dist/bookmarklet.min.js`,
-  );
-  const body = await script.text();
-
-  res.write(body);
-  res.end();
+  try {
+    const script = await fetch(
+      `https://raw.githubusercontent.com/BPIManager/IIDX-Scraping-Bookmarklet/${BOOKMARKLET_SOURCE_COMMIT}/dist/bookmarklet.min.js`,
+    );
+    if (!script.ok) {
+      console.error("bookmarklet source fetch failed:", script.status);
+      res.statusCode = 502;
+      res.end();
+      return { props: {} };
+    }
+    res.write(await script.text());
+    res.end();
+  } catch (error: unknown) {
+    console.error("bookmarklet source fetch error:", error);
+    res.statusCode = 502;
+    res.end();
+  }
 
   return { props: {} };
 };

@@ -24,9 +24,7 @@ export interface PlayersListBpiFilter {
 }
 
 /**
- * BPI V2検証ツール(NewBpiComparison)向けの「全プレイヤー」一覧。ページ単位でのみサーバー側の
- * BPI再計算を行う(計算量を抑えるため、全公開ユーザー分を一度に読み込まない)。
- * 現行総合BPI(userRadarCacheキャッシュ値)が高い順に固定でソートされる。
+ * NewBpiComparison の全プレイヤー一覧。ページ単位でのみサーバー側の BPI 再計算を行い、現行総合BPI（キャッシュ値）の高い順に固定ソートする。
  */
 export const usePlayersList = (
   page: number,

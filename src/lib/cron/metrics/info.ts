@@ -1,6 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
-import { siteStatsSummaryRepo } from "@/lib/db/aggregates/siteStats/summary";
+import { siteStatsOverviewRepo } from "@/lib/db/aggregates/siteStats/overview";
+import { siteStatsDistributionRepo } from "@/lib/db/aggregates/siteStats/distribution";
 import { siteStatsActivityDistributionRepo } from "@/lib/db/aggregates/siteStats/activityDistribution";
 import { siteStatsSongPopulationRepo } from "@/lib/db/aggregates/siteStats/songPopulation";
 
@@ -9,11 +10,8 @@ const STATS_FILE = path.join(OUTPUT_DIR, "stats.json");
 const SONGS_FILE = path.join(OUTPUT_DIR, "songs.json");
 
 /**
- * サイト統計データを集計し、静的 JSON ファイルとして出力する。
- *
- * 出力先:
- * - `public/data/info/stats.json`  - サマリー・日別推移・アリーナランク分布・時間帯別・曜日別
- * - `public/data/info/songs.json`  - ☆12 楽曲別プレイ人口（playerCount 降順の全件）
+ * サイト統計を集計し静的 JSON として出力する。stats.json（サマリー・推移・分布等）と songs.json（☆12 楽曲別プレイ人口）。
+ * 出力先は public/data/info/ 配下。
  */
 export async function generateInfoJson() {
   console.log("[Info] Starting site stats JSON generation...");
@@ -30,14 +28,14 @@ export async function generateInfoJson() {
     weekdayDistribution,
     totalBpiHistogram,
   ] = await Promise.all([
-    siteStatsSummaryRepo.getSummary(),
-    siteStatsSummaryRepo.getDailyRegistrations(90),
-    siteStatsSummaryRepo.getArenaRankDistributionByVersion(),
-    siteStatsSummaryRepo.getAreaDistributionByVersion(),
-    siteStatsSummaryRepo.getVersionScoreDistribution(),
+    siteStatsOverviewRepo.getSummary(),
+    siteStatsOverviewRepo.getDailyRegistrations(90),
+    siteStatsDistributionRepo.getArenaRankDistributionByVersion(),
+    siteStatsDistributionRepo.getAreaDistributionByVersion(),
+    siteStatsDistributionRepo.getVersionScoreDistribution(),
     siteStatsActivityDistributionRepo.getHourlyDistribution(),
     siteStatsActivityDistributionRepo.getWeekdayDistribution(),
-    siteStatsSummaryRepo.getTotalBpiHistogramByVersion(),
+    siteStatsDistributionRepo.getTotalBpiHistogramByVersion(),
   ]);
 
   await fs.writeFile(

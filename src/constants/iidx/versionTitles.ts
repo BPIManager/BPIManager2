@@ -37,9 +37,8 @@ export const versionsNonDisabledCollection = versionTitles.map((v) => ({
   value: v.num,
 }));
 
-// versionTitlesに定義の無い過去バージョン（3rd style〜25 CANNON BALLERS）の
-// タイトルは他に管理元が無いため、配列インデックス=バージョン番号のまま
-// ここに直接保持する。26以降はversionTitlesを正としてそこから導出する。
+// versionTitles に無い過去バージョン（3rd style〜25 CANNON BALLERS）は管理元が無いため、配列インデックス＝バージョン番号で直接保持する。
+ // 26 以降は versionTitles を正として導出する。
 const HISTORICAL_VERSION_TITLES: readonly string[] = [
   "",
   "",

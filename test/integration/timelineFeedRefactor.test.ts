@@ -12,13 +12,13 @@ dayjs.extend(utc);
  * `SocialTimelineRepository.getFollowedTimeline` の2フェーズ化リファクタ（fix/timeline-followed-two-phase）の
  * 等価性テスト。
  *
- * リファクタ前の単一クエリ実装を `legacyGetFollowedTimeline` としてこのファイルに再現し、
+ * 単一クエリによる参照実装 `legacyGetFollowedTimeline` をこのファイルに置き、
  * 現行の2フェーズ実装と全フィルタ条件（mode / search / levels / difficulties / cursor）の
  * 組み合わせで結果が完全一致することを検証する。
  *
  * 唯一の意図的な差異は「lastPlayed が同値の行の並び順を logId 降順で決定的にした」点であり、
  * legacy 側にも同じタイブレーク (`order by s.lastPlayed desc, s.logId desc`) を入れて比較する
- * （リファクタ前は同値行の順序が不定だった）。
+ * （同値行の順序はタイブレークで決定的にしている）。
  *
  * 前提: `.env` の DB 接続情報（DB_HOST 等）と TEST_PUBLIC_USER_ID。
  */
@@ -26,7 +26,7 @@ dayjs.extend(utc);
 const VIEWER_ID = process.env.TEST_PUBLIC_USER_ID || "";
 const CAN_RUN = !!process.env.DB_HOST && !!VIEWER_ID;
 
-/** リファクタ前の単一クエリ実装（タイブレークのみ追加） */
+/** 単一クエリによる参照実装（タイブレークを含む） */
 async function legacyGetFollowedTimeline(params: {
   viewerId: string;
   version: string;

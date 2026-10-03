@@ -43,7 +43,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     console.error("MCP Server Error:", error);
     if (!res.headersSent) {
       const errorMessage =
-        error instanceof Error ? error.message : "Internal Server Error";
+        "Internal Server Error";
       res.status(500).json({ message: errorMessage });
     }
   }

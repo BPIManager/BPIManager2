@@ -3,9 +3,7 @@ import { BpiOptimizerConstants } from "./constants";
 import { bpiFromZ } from "./zScale";
 
 /**
- * 未プレイ曲の「現在の」予測BPI（`@bpim/bpicalc`の`PlayerBpiV2.predictUnplayed`と同じ式）。
- * カテゴリ補正は含めない（グローバルな`a_shrunk`のみ）——「今の総合BPI」の算出に使う値と
- * 一致させるため（カテゴリ補正はあくまで目標設定用。`achievementCeiling.ts`参照）。
+ * 未プレイ曲の現在の予測 BPI（@bpim/bpicalc の predictUnplayed と同式）。今の総合BPIと一致させるためカテゴリ補正は含めない（achievementCeiling.ts 参照）。
  */
 export function predictUnplayedBpi(
   chartParams: ChartParamsV2,

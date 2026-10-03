@@ -1,11 +1,13 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { v4 as uuidv4 } from "uuid";
-import { scoresRepo } from "@/lib/db/domains/scores";
+import { latestScoresRepo } from "@/lib/db/domains/scores/latest";
 import { allScoresRepo } from "@/lib/db/domains/allScores";
-import { navigationRepo } from "@/lib/db/domains/logs/navigation";
-import { songsRepo } from "@/lib/db/domains/songs";
+import { logTotalBpiRepo } from "@/lib/db/domains/logs/totalBpi";
+import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { allSongsRepo } from "@/lib/db/domains/allSongs";
 import { saveImportResults } from "@/lib/db/orchestrators/bpiImport";
+import { db } from "@/lib/db";
+import { lockUserForWrite } from "@/lib/db/shared/userWriteLock";
 import { BpiCalculator } from "@/lib/bpi";
 import { isScoreImproved } from "@/lib/scores/evaluateImprovement";
 import { NewAllScores, NewScore } from "@/types/db";
@@ -27,13 +29,16 @@ export function registerUpdateMyScore(server: McpServer, userId: string) {
       inputSchema: updateMyScoreSchema.shape,
     },
     async ({ songId, version, exScore, clearState, missCount }) => {
+      // 読み取りから保存までを、ユーザーの書き込みロックを取った1つのトランザクションで行う
+      return await db.transaction().execute(async (trx) => {
+      await lockUserForWrite(trx, userId);
       const [bpiSongMaster, allLevelMaster, currentScores, currentAllScores, lastLog] =
         await Promise.all([
-          songsRepo.getSongMasterWithDef(),
+          songMasterRepo.getSongMasterWithDef(),
           allSongsRepo.getAllLevelMaster(),
-          scoresRepo.getLatestScores(userId, version),
+          latestScoresRepo.getLatestScores(userId, version),
           allScoresRepo.getLatestAllScores(userId, version),
-          navigationRepo.getLatestTotalBpi(userId, version),
+          logTotalBpiRepo.getLatestTotalBpi(userId, version),
         ]);
 
       const song = bpiSongMaster.find((s) => s.songId === songId);
@@ -96,9 +101,7 @@ export function registerUpdateMyScore(server: McpServer, userId: string) {
         },
       ];
 
-      // songs/songDefドメインと同じ楽曲がallSongsドメインにも存在する場合、
-      // 全難易度履歴(allScores)側が更新から取り残されないよう、こちらも独立して改善判定の上で書き込む
-      // (CSVバッチインポート `scores/bulk.ts` と同じ二重書き込みパターン)
+      // songs と allSongs の両方に同じ楽曲がある場合、allScores 側も独立に改善判定して書き込む（CSV の scores/bulk.ts と同じ二重書き込み）。
       const allSong = allLevelMaster.find(
         (s) => s.title === song.title && s.difficulty === song.difficulty,
       );
@@ -148,7 +151,7 @@ export function registerUpdateMyScore(server: McpServer, userId: string) {
         scoreUpdates,
         allScoreUpdates,
         newTotalBpi,
-      });
+      }, trx);
 
       const previousTotalBpi = lastLog?.totalBpi ?? -15;
 
@@ -166,6 +169,7 @@ export function registerUpdateMyScore(server: McpServer, userId: string) {
           },
         ],
       };
+      });
     },
   );
 }

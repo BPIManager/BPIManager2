@@ -18,7 +18,7 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-const { bpiOptimizerRepo } = await import("@/lib/db/domains/bpiOptimizer");
+const { bpiOptimizerRepo } = await import("@/lib/db/domains/bpiOptimizer/memos");
 
 /**
  * `optimizeGoals`/`optimizeGoalSteps`と呼び出しテーブルごとに異なる結果を

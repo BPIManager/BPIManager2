@@ -24,12 +24,8 @@ interface Props {
 }
 
 /**
- * フォローリストの作成・改名・削除を行うVaulドロワー。
- *
- * `/rivals`編集モードから開く。リストは本人以外に共有されない前提のため、
- * ここでの操作は常に本人（`userId`）のリストのみを対象にする。公開設定
- * (`isPublic`)は第三者への公開経路が存在しない現状ではUIから操作できる
- * 意味がないため、あえて表示しない（DB・APIには温存済み）。
+ * フォローリストの作成・改名・削除を行う Vaul ドロワー。操作は常に本人のリストのみが対象。
+ * isPublic は第三者への公開経路が無いためUIには出さない（DB・APIには温存済み）。
  */
 const ListManageDrawer = ({ userId, open, onOpenChange }: Props) => {
   const { lists, createList, renameList, deleteList } = useFollowLists(

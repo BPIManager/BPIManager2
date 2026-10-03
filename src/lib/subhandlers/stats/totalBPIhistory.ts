@@ -1,10 +1,9 @@
 import type { NextApiRequest } from "next";
 import dayjs from "@/lib/dayjs";
 import { BpiCalculator } from "@/lib/bpi";
-import { db } from "@/lib/db";
-import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
-import { songsRepo } from "@/lib/db/domains/songs";
-import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
+import { statsSongTablesRepo } from "@/lib/db/aggregates/stats/songTables";
+import { songMasterRepo } from "@/lib/db/domains/songs/master";
+import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
 import { ok } from "@/middlewares/api/apiResult";
 import { groupByOf, DIFFICULTY_LABELS } from "./_shared";
 import type { StatsQuery } from "@/types/stats/query";
@@ -20,8 +19,8 @@ export async function handleStatsTotalBpiHistory(
 ): Promise<HandlerResult<unknown>> {
   const groupBy = groupByOf(req);
   const [fullLogs, fullMaster] = await Promise.all([
-    statsTablesRepo.getScoreHistory(q.userId, q.version, [], []),
-    songsRepo.getSongMasterWithDef(),
+    statsSongTablesRepo.getScoreHistory(q.userId, q.version, [], []),
+    songMasterRepo.getSongMasterWithDef(),
   ]);
   const scopedMaster = fullMaster.filter(
     (s) =>
@@ -53,9 +52,7 @@ export async function handleStatsTotalBpiHistory(
   const reportBpisBySong = new Map<number, number>();
   const reportExScoresBySong = new Map<number, number>();
   const startDate = dayjs(scopedLogs[0].lastPlayed).tz().startOf("day");
-  // プレイ記録と無関係にuserStatusLogsへ記録が追加されるケース(プロフィール編集等、
-  // userProfileUpsert参照)があるため、最終プレイ日より後の記録日がある場合は
-  // 下記recordedLogs取得後にendDateを延長する
+  // プレイと無関係に userStatusLogs へ記録が追加される（プロフィール編集等）ため、最終プレイ日より後の記録日があれば endDate を延長する。
   let endDate = dayjs(scopedLogs[scopedLogs.length - 1].lastPlayed)
     .tz()
     .startOf("day");
@@ -99,11 +96,8 @@ export async function handleStatsTotalBpiHistory(
   for (const stepKey of sortedStepKeys) {
     const stepLogs = stepGroups.get(stepKey)!;
 
-    // 1回のバッチ（CSV同期等）が複数日分のプレイをまとめて含むことがある
-    // （例: 同期を数日空けた場合）。バッチ全体適用後の最終値を先頭ログの日付に
-    // 丸めて記録すると、実際にはまだ記録されていなかった日付に総合BPIの伸びが
-    // 先行して現れてしまうため、日付が切り替わるたびに段階的に反映する。
-    // Pass2のシーク(stepResults)にはバッチ単位のまま影響しない
+    // バッチが複数日分のプレイをまとめて含む場合、最終値を先頭ログの日付に丸めると未記録の日に伸びが先行するため、日付が変わるごとに段階的に反映する。
+     // Pass2 のシーク（stepResults）はバッチ単位のまま。
     let idx = 0;
     let freshTotalBpi = 0;
     let latentSkill: number | null = null;
@@ -148,10 +142,8 @@ export async function handleStatsTotalBpiHistory(
     });
   }
 
-  // BPIモデルの再推定等により、同じ時点を再計算しても過去にuserStatusLogsへ
-  // 記録された値より低く出ることがある（monthly-review/bpi.tsのbuildBpiTimeline
-  // と同じ理由）。記録済みの値を日付ごとの下限として合流させる
-  const recordedLogs = await userStatusLogsRepo.getTotalBpiLogsInRange(
+  // 再推定で同じ時点の再計算値が記録済みより低く出うるため（monthly-review の buildBpiTimeline と同じ理由）、記録済みの値を日付ごとの下限として合流させる。
+  const recordedLogs = await userStatusLogsReadRepo.getTotalBpiLogsInRange(
     q.userId,
     q.version,
     new Date(0),

@@ -31,10 +31,8 @@ const STATUS_FILTER_ICONS: Record<StatusFilter, LucideIcon> = {
 };
 
 /**
- * 目標全体の達成判定。総合BPI(べき乗平均)が目標を超えたかではなく、
- * 目標に含めた曲が全曲達成したかで決める（GoalBpiJourneyと同じ基準）。
- * 一部の曲の超過達成だけで総合BPIが目標を超えることがあり、それを
- * 「達成」扱いにするのは実態と合わないため。
+ * 目標の達成判定。総合BPIが目標を超えたかではなく、目標に含めた曲が全曲達成したかで決める（GoalBpiJourney と同じ基準）。
+ * 一部曲の超過達成だけで総合BPIが超えることがあり、それを達成扱いにすると実態と合わないため。
  */
 const isMemoAchieved = (
   memo: OptimizeMemo,
@@ -166,6 +164,7 @@ const SavedMemoList = ({
                       e.stopPropagation();
                       onEdit(memo);
                     }}
+                    aria-label={t("common.edit")}
                     disabled={isEditLoadingId === memo.reportId}
                   >
                     {isEditLoadingId === memo.reportId ? (
@@ -182,6 +181,7 @@ const SavedMemoList = ({
                       e.stopPropagation();
                       setDeleteTargetId(memo.reportId);
                     }}
+                    aria-label={t("common.delete")}
                     disabled={isDeletingId === memo.reportId}
                   >
                     {isDeletingId === memo.reportId ? (

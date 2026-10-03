@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useCallback, useContext, useMemo, useState, ReactNode } from "react";
 import {
   IIDX_LEVELS,
   IIDX_DIFFICULTIES,
@@ -29,16 +29,17 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
   const [version, setVersion] = useState<string>(latestVersion);
   const [compareVersion, setCompareVersion] = useState<string>("");
 
-  const toggle = <T extends string>(
-    val: T,
-    set: React.Dispatch<React.SetStateAction<T[]>>,
-  ) => {
-    set((prev) =>
-      prev.includes(val) ? prev.filter((i) => i !== val) : [...prev, val],
-    );
-  };
+  const toggle = useCallback(
+    <T extends string>(val: T, set: React.Dispatch<React.SetStateAction<T[]>>) => {
+      set((prev) =>
+        prev.includes(val) ? prev.filter((i) => i !== val) : [...prev, val],
+      );
+    },
+    [],
+  );
 
-  const value = {
+  const value = useMemo(
+    () => ({
     levels,
     diffs,
     version,
@@ -54,7 +55,9 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
       setVersion(latestVersion);
       setCompareVersion("");
     },
-  };
+    }),
+    [levels, diffs, version, compareVersion, toggle],
+  );
 
   return (
     <FilterContext.Provider value={value}>{children}</FilterContext.Provider>

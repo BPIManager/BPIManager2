@@ -41,11 +41,8 @@ const getVersions = () => {
 };
 
 /**
- * アリーナランク別の平均スコアを集計し、バージョン・レベルごとの JSON ファイルを生成する。
- *
- * 出力先: `public/data/metrics/arena/<version>_<level>.json`
- * 対象バージョン: v26 〜 最新バージョン
- * 対象レベル: 11・12
+ * アリーナランク別の平均スコアを集計し、バージョン・レベルごとの JSON（public/data/metrics/arena/）を生成する。
+ * 対象は v26 〜 最新バージョン、レベル 11・12。
  */
 export async function generateArenaJson() {
   const versions = getVersions();

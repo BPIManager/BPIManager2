@@ -18,9 +18,8 @@ export function zOf(mu: number, sigma: number, notes: number, exScore: number): 
 }
 
 /**
- * z尺度の値を曲固有のカーブ（z0・z100・k）でBPIへ変換する（100%z_ij用ではなく汎用）。
- * `ChartBpiV2.bpi`/`rawFromSkill`と同じ式（`100 * sign(ratio) * |ratio|^k`）。
- * 下限・上限のクランプは呼び出し元の責務とする（用途により異なるため）。
+ * z 尺度の値を曲固有のカーブ（z0・z100・k）で BPI へ変換する。式は ChartBpiV2.bpi と同じ。
+ * 上下限のクランプは用途ごとに異なるため呼び出し元が行う。
  */
 export function bpiFromZ(z: number, z0: number, z100: number, k: number): number {
   const ratio = (z - z0) / (z100 - z0);

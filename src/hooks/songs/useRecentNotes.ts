@@ -2,6 +2,8 @@
 import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { useInfiniteListV2 } from "@/services/swr/useInfinite";
 
+const getRecentNoteItems = (page: RecentNote[]) => page;
+
 export interface RecentNote {
   id: number;
   songId: number;
@@ -25,7 +27,7 @@ export function useRecentNotes() {
     useInfiniteListV2<RecentNote[], RecentNote>(
       (index) => `${API_V2_PREFIX}/songs/notes/recent?sort=${sort}&page=${index}`,
       {
-        getItems: (page) => page,
+        getItems: getRecentNoteItems,
         isLastPage: (page) => page.length < PAGE_SIZE,
         revalidateOnFocus: false,
       },

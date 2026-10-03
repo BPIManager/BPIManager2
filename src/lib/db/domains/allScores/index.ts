@@ -1,8 +1,7 @@
 import { db } from "@/lib/db";
 import { Database, NewAllScores } from "@/types/db";
 import { Transaction } from "kysely";
-import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore";
-import { getSongRankingFromTable } from "@/lib/db/aggregates/songRanking";
+import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore/perSong";
 
 /**
  * 全難易度スコア（`allScores` テーブル）の参照を担当するリポジトリクラス。
@@ -27,24 +26,6 @@ class allScoresRepository {
       )
       .selectAll("allScores")
       .execute();
-  }
-
-  /**
-   * 指定楽曲のグローバルランキングを取得する（allScores テーブル使用）
-   *
-   * `users`と横断する集計のため、実体は`aggregates/songRanking`に委譲する。
-   *
-   * @param songId - 楽曲 ID
-   * @param version - バージョン番号
-   * @param viewerId - 閲覧者のユーザー ID（自分自身の判定に使用）
-   */
-  async getAllSongRanking(songId: number, version: string, viewerId: string) {
-    return getSongRankingFromTable({
-      table: "allScores",
-      songId,
-      version,
-      viewerId,
-    });
   }
 
   /**
@@ -96,11 +77,8 @@ class allScoresRepository {
   }
 
   /**
-   * 指定ユーザー・バージョンの`allScores`テーブルにおける最新の`batchId`を取得する。
-   *
-   * ☆10以下の楽曲（`allScores`ドメインのみ）の手動編集では`logs`テーブルに
-   * 一切書き込まれず`navigationRepo.getLatestBatchId`で既存の手動バッチを
-   * 検出できないため、`allScores`自体から直接判定する。
+   * 指定ユーザー・バージョンの allScores における最新の batchId を取得する。
+   * ☆10以下の手動編集は logs に書かれないため、logBatchRepo では既存の手動バッチを検出できず、allScores から直接判定する。
    *
    * @param userId - ユーザー ID
    * @param version - バージョン番号
@@ -121,7 +99,7 @@ class allScoresRepository {
   }
 
   /**
-   * 手動スコア編集用に、指定曲の行をupsertする。`scoresRepo.upsertManual`と
+   * 手動スコア編集用に、指定曲の行をupsertする。`scoreWriteRepo.upsertManual`と
    * 同じ「現在の最新行が同じbatchIdの場合のみUPDATE、それ以外はINSERT」方針。
    *
    * @param trx - 呼び出し元が管理するトランザクション

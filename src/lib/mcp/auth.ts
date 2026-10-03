@@ -1,5 +1,5 @@
 import { NextApiRequest } from "next";
-import { db } from "@/lib/db";
+import { usersRepo } from "@/lib/db/domains/users";
 import { oauthRepo } from "@/lib/db/domains/oauth";
 import { canViewUserData } from "@/lib/db/shared/visibility";
 import { followAccessAggregateRepo } from "@/lib/db/aggregates/followAccess";
@@ -21,10 +21,8 @@ export async function resolveUserIdFromBearerToken(
 }
 
 /**
- * MCP経由のリクエストはFirebase IDトークンではなくOAuthアクセストークンでuserIdを解決済みのため、
- * REST APIの checkUserAccess はそのまま使えない（Firebaseトークン検証を前提としているため）。
- * 自分自身は無条件許可、他人は公開プロフィール(isPublic=1)または承認済み
- * フォロー関係がある場合のみ許可する軽量版。
+ * MCP 経由のリクエスト用の軽量なアクセス判定。OAuth で userId を解決済みのため REST の checkUserAccess（Firebase 前提）は使えない。
+ * 自分は無条件許可、他人は公開（isPublic=1）または承認済みフォローがある場合のみ許可する。
  */
 export async function checkSelfOrPublicAccess(
   selfUserId: string,
@@ -32,11 +30,7 @@ export async function checkSelfOrPublicAccess(
 ) {
   if (targetUserId === selfUserId) return { allowed: true as const };
 
-  const target = await db
-    .selectFrom("users")
-    .select(["userId", "isPublic"])
-    .where("userId", "=", targetUserId)
-    .executeTakeFirst();
+  const target = await usersRepo.getAccessInfo(targetUserId);
 
   if (!target) {
     return { allowed: false as const, message: "指定されたユーザーが見つかりません。" };
