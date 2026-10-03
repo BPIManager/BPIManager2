@@ -1,6 +1,6 @@
 import { ok, err } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
-import { monthlyReviewRepo } from "@/lib/db/aggregates/monthly-review";
+import { monthlyActivityRepo } from "@/lib/db/aggregates/monthly-review/activity";
 import { buildArena } from "@/lib/monthly-review/arena";
 import { resolveMonthlyReviewPeriod } from "./_shared";
 import type { HandlerResult } from "@/types/api";
@@ -13,8 +13,8 @@ export async function handleStatsMonthlyReviewArena(q: {
   try {
     const { monthStart, monthEnd } = resolveMonthlyReviewPeriod(q.month);
     const [arenaRows, versionHistoryRows] = await Promise.all([
-      monthlyReviewRepo.getMonthlyArenaStats(q.userId, q.version, monthStart, monthEnd),
-      monthlyReviewRepo.getArenaVersionHistory(q.userId),
+      monthlyActivityRepo.getMonthlyArenaStats(q.userId, q.version, monthStart, monthEnd),
+      monthlyActivityRepo.getArenaVersionHistory(q.userId),
     ]);
     // 「現在」カードと重複しないよう対象バージョン自身は履歴から除く。
     // あくまで各バージョンで最後に取得された時点のスナップショットであり、

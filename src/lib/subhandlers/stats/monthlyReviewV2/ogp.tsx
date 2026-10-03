@@ -4,7 +4,7 @@ import satori from "satori";
 import { Resvg } from "@resvg/resvg-js";
 import { BpiCalculator } from "@/lib/bpi";
 import { usersRepo } from "@/lib/db/domains/users";
-import { monthlyReviewRepo } from "@/lib/db/aggregates/monthly-review";
+import { monthlyActivityRepo } from "@/lib/db/aggregates/monthly-review/activity";
 import { buildRadarGrowth } from "@/lib/monthly-review/radar";
 import { buildArena } from "@/lib/monthly-review/arena";
 import { periodHeadingOf } from "@/lib/monthly-review/period";
@@ -1003,7 +1003,7 @@ export async function generateMonthlyReviewOgpImage(q: {
     ),
     computeOwnerMonthlyScores(q.userId, q.version, monthStart, monthEnd),
     needsArena && q.version !== "INF"
-      ? monthlyReviewRepo.getMonthlyArenaStats(
+      ? monthlyActivityRepo.getMonthlyArenaStats(
           q.userId,
           q.version,
           monthStart,
@@ -1011,7 +1011,7 @@ export async function generateMonthlyReviewOgpImage(q: {
         )
       : Promise.resolve([]),
     needsArena
-      ? monthlyReviewRepo.getArenaVersionHistory(q.userId)
+      ? monthlyActivityRepo.getArenaVersionHistory(q.userId)
       : Promise.resolve([]),
     compareVersion
       ? computeOwnerBpiTimeline(

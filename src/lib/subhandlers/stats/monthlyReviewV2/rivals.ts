@@ -1,6 +1,6 @@
 import { ok, err } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
-import { monthlyReviewRepo } from "@/lib/db/aggregates/monthly-review";
+import { monthlyL1112Repo } from "@/lib/db/aggregates/monthly-review/l1112";
 import {
   buildRivals,
   attachRivalBpiTimelines,
@@ -33,8 +33,8 @@ export async function handleStatsMonthlyReviewRivals(
       granularity === "version" ? (previousVersionOf(version) ?? undefined) : undefined;
 
     const [userCurrentL1112, preL1112, bpiTimeline] = await Promise.all([
-      monthlyReviewRepo.getUserCurrentL1112Scores(owner, version),
-      monthlyReviewRepo.getUserPreMonthL1112Scores(owner, version, monthStart),
+      monthlyL1112Repo.getUserCurrentL1112Scores(owner, version),
+      monthlyL1112Repo.getUserPreMonthL1112Scores(owner, version, monthStart),
       computeOwnerBpiTimeline(
         owner,
         version,
@@ -48,7 +48,7 @@ export async function handleStatsMonthlyReviewRivals(
     const userL1112SongIds = userCurrentL1112.map((s) => s.songId);
     const rivalL1112Scores =
       userL1112SongIds.length > 0
-        ? await monthlyReviewRepo.getRivalsCurrentScoresForSongs({
+        ? await monthlyL1112Repo.getRivalsCurrentScoresForSongs({
             ownerId: owner,
             viewerId,
             version,

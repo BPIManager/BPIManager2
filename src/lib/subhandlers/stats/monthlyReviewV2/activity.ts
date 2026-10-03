@@ -1,6 +1,6 @@
 import { ok, err } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
-import { monthlyReviewRepo } from "@/lib/db/aggregates/monthly-review";
+import { monthlyActivityRepo } from "@/lib/db/aggregates/monthly-review/activity";
 import { buildActivityBreakdown, buildBestDays } from "@/lib/monthly-review/activity";
 import {
   resolveMonthlyReviewPeriod,
@@ -26,10 +26,10 @@ export async function handleStatsMonthlyReviewActivity(q: {
       { latestInMonth, songUpdateDateMap },
       bpiTimeline,
     ] = await Promise.all([
-      monthlyReviewRepo.getMonthlyTowerStats(q.userId, q.version, monthStart, monthEnd),
-      monthlyReviewRepo.getMonthlyTowerRanking(q.userId, q.version, monthStart, monthEnd),
-      monthlyReviewRepo.getMonthlyDailyTowerData(q.userId, q.version, monthStart, monthEnd),
-      monthlyReviewRepo.getMonthlyActivityBreakdownByLastPlayed(
+      monthlyActivityRepo.getMonthlyTowerStats(q.userId, q.version, monthStart, monthEnd),
+      monthlyActivityRepo.getMonthlyTowerRanking(q.userId, q.version, monthStart, monthEnd),
+      monthlyActivityRepo.getMonthlyDailyTowerData(q.userId, q.version, monthStart, monthEnd),
+      monthlyActivityRepo.getMonthlyActivityBreakdownByLastPlayed(
         q.userId,
         q.version,
         monthStart,

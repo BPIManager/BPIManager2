@@ -1,5 +1,6 @@
 import dayjs from "@/lib/dayjs";
-import { monthlyReviewRepo } from "@/lib/db/aggregates/monthly-review";
+import { monthlyBpiStateRepo } from "@/lib/db/aggregates/monthly-review/bpiState";
+import { monthlyActivityRepo } from "@/lib/db/aggregates/monthly-review/activity";
 import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
 import {
   buildBpiTimeline,
@@ -97,16 +98,16 @@ export async function computeOwnerBpiTimeline(
     priorRecordedMax,
     inRangeRecordedLogs,
   ] = await Promise.all([
-    monthlyReviewRepo.getPreMonthBpiStateForUsers([owner], version, monthStart),
-    monthlyReviewRepo.getInMonthScoreHistoryForUsers(
+    monthlyBpiStateRepo.getPreMonthBpiStateForUsers([owner], version, monthStart),
+    monthlyBpiStateRepo.getInMonthScoreHistoryForUsers(
       [owner],
       version,
       monthStart,
       monthEnd,
     ),
-    monthlyReviewRepo.getAllL12SongMeta(),
+    monthlyBpiStateRepo.getAllL12SongMeta(),
     compareVersion
-      ? monthlyReviewRepo.getVersionBpiStateForUsers([owner], compareVersion)
+      ? monthlyBpiStateRepo.getVersionBpiStateForUsers([owner], compareVersion)
       : Promise.resolve(null),
     // compareVersionの有無に関わらず、`version`自体の記録済み下限は常に取得する
     // （compareVersionはbaseline取得元を切り替えるだけで、`version`側の
@@ -223,20 +224,20 @@ export async function recomputeBpiTimelinesForUsers(
   ] = await Promise.all([
     compareVersion
       ? Promise.resolve([])
-      : monthlyReviewRepo.getPreMonthBpiStateForUsers(
+      : monthlyBpiStateRepo.getPreMonthBpiStateForUsers(
           userIds,
           version,
           monthStart,
         ),
-    monthlyReviewRepo.getInMonthScoreHistoryForUsers(
+    monthlyBpiStateRepo.getInMonthScoreHistoryForUsers(
       userIds,
       version,
       monthStart,
       monthEnd,
     ),
-    monthlyReviewRepo.getAllL12SongMeta(),
+    monthlyBpiStateRepo.getAllL12SongMeta(),
     compareVersion
-      ? monthlyReviewRepo.getVersionBpiStateForUsers(userIds, compareVersion)
+      ? monthlyBpiStateRepo.getVersionBpiStateForUsers(userIds, compareVersion)
       : Promise.resolve(undefined),
     // compareVersionの有無に関わらず、`version`自体の記録済み下限は常に取得する
     // （computeOwnerBpiTimelineと同じ理由）
@@ -326,7 +327,7 @@ export async function computeOwnerMonthlyScores(
   monthStart: string,
   monthEnd: string,
 ) {
-  const scoreBatches = await monthlyReviewRepo.getMonthlyScoreBatches(
+  const scoreBatches = await monthlyActivityRepo.getMonthlyScoreBatches(
     owner,
     version,
     monthStart,
@@ -337,7 +338,7 @@ export async function computeOwnerMonthlyScores(
     scoreBatches.map((b) => [b.batchId, b.playDate]),
   );
 
-  const monthlyScores = await monthlyReviewRepo.getScoresForBatches(
+  const monthlyScores = await monthlyBpiStateRepo.getScoresForBatches(
     owner,
     version,
     monthlyBatchIds,
@@ -384,12 +385,12 @@ export async function computeOwnerTopSongs(
   const songIdsUpdated = latestInMonth.map((s) => s.songId);
 
   const preScores = compareVersion
-    ? await monthlyReviewRepo.getComparisonVersionScores(
+    ? await monthlyBpiStateRepo.getComparisonVersionScores(
         owner,
         compareVersion,
         songIdsUpdated,
       )
-    : await monthlyReviewRepo.getPreMonthScoresByLastPlayed(
+    : await monthlyBpiStateRepo.getPreMonthScoresByLastPlayed(
         owner,
         version,
         songIdsUpdated,

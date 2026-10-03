@@ -1,6 +1,6 @@
 import { ok, err } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
-import { monthlyReviewRepo } from "@/lib/db/aggregates/monthly-review";
+import { monthlyActivityRepo } from "@/lib/db/aggregates/monthly-review/activity";
 import { resolveMonthlyReviewPeriod, computeOwnerBpiTimeline } from "./_shared";
 import type { HandlerResult } from "@/types/api";
 
@@ -13,7 +13,7 @@ export async function handleStatsMonthlyReviewMonthlySummary(q: {
   version: string;
 }): Promise<HandlerResult<unknown>> {
   try {
-    const availableMonths = await monthlyReviewRepo.getAvailableMonths(
+    const availableMonths = await monthlyActivityRepo.getAvailableMonths(
       q.userId,
       q.version,
     );
