@@ -1,5 +1,5 @@
 import { UserProfileData } from "@/types/users/profile";
-import { createContext, useContext, ReactNode } from "react";
+import { createContext, useContext, useMemo, ReactNode } from "react";
 
 interface ProfileContextValue {
   profile: UserProfileData;
@@ -16,8 +16,9 @@ export const ProfileProvider = ({
   profile: UserProfileData;
   children: ReactNode;
 }) => {
+  const value = useMemo(() => ({ profile }), [profile]);
   return (
-    <ProfileContext.Provider value={{ profile }}>
+    <ProfileContext.Provider value={value}>
       {children}
     </ProfileContext.Provider>
   );
