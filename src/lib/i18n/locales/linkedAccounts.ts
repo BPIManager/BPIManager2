@@ -150,7 +150,7 @@ export const linkedAccountsTranslations = {
     ko: "연결된 계정",
   },
   "settings.linked.manage": {
-    ja: "管理する",
+    ja: "管理",
     en: "Manage",
     "zh-TW": "管理",
     ko: "관리",
@@ -160,6 +160,18 @@ export const linkedAccountsTranslations = {
     en: "You can register multiple sign-in methods. At least one must remain.",
     "zh-TW": "可登錄多種登入方式，但至少需保留一種。",
     ko: "여러 로그인 수단을 등록할 수 있습니다. 최소 하나는 남겨야 합니다.",
+  },
+  "settings.linked.security.title": {
+    ja: "メールアドレスの安全性について",
+    en: "About email address security",
+    "zh-TW": "關於電子郵件的安全性",
+    ko: "이메일 주소의 안전성에 대하여",
+  },
+  "settings.linked.security.body": {
+    ja: "BPIMのデータベースには、メールアドレスそのものは保存していません。照合に使うのは鍵付きハッシュ（元に戻せない変換値）のみです。メールアドレスは、ログイン基盤であるFirebase Authenticationで管理しています。",
+    en: "BPIM's database does not store email addresses in plain text. Only a keyed hash (a one-way value that cannot be reversed) is kept for matching. Email addresses are managed by Firebase Authentication, our sign-in provider.",
+    "zh-TW": "BPIM 的資料庫不會以明文儲存電子郵件。僅保存用於比對的加鍵雜湊值（無法還原的單向值）。電子郵件由登入基礎設施 Firebase Authentication 管理。",
+    ko: "BPIM 데이터베이스에는 이메일 주소를 평문으로 저장하지 않습니다. 대조에 사용하는 키가 적용된 해시(되돌릴 수 없는 값)만 보관합니다. 이메일 주소는 로그인 기반인 Firebase Authentication에서 관리합니다.",
   },
   "settings.linked.provider.google": {
     ja: "Google",

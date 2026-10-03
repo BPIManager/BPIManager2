@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { Link2, Mail } from "lucide-react";
+import { Link2, Mail, ShieldCheck } from "lucide-react";
 import {
   GoogleIcon,
   LineIcon,
@@ -245,6 +245,14 @@ function LinkedAccountsList() {
             </div>
           );
         })}
+
+        <div className="flex flex-col gap-2 rounded-lg border border-bpim-border bg-bpim-surface-2/40 px-4 py-3">
+          <div className="flex items-center gap-2 text-bpim-primary">
+            <ShieldCheck className="h-4 w-4" />
+            <span className="text-sm font-bold">{t("settings.linked.security.title")}</span>
+          </div>
+          <p className="text-xs leading-relaxed text-bpim-muted">{t("settings.linked.security.body")}</p>
+        </div>
       </div>
 
       {emailModal && (
