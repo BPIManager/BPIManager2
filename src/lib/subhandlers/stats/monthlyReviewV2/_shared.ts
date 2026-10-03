@@ -109,17 +109,16 @@ export async function computeOwnerBpiTimeline(
     compareVersion
       ? monthlyReviewRepo.getVersionBpiStateForUsers([owner], compareVersion)
       : Promise.resolve(null),
-    compareVersion
-      ? Promise.resolve(null)
-      : userStatusLogsRepo.getMaxTotalBpiAsOf(db, owner, version, monthStartDate),
-    compareVersion
-      ? Promise.resolve([])
-      : userStatusLogsRepo.getTotalBpiLogsInRange(
-          owner,
-          version,
-          monthStartDate,
-          monthEndDate,
-        ),
+    // compareVersionの有無に関わらず、`version`自体の記録済み下限は常に取得する
+    // （compareVersionはbaseline取得元を切り替えるだけで、`version`側の
+    // ラチェット下限とは無関係）
+    userStatusLogsRepo.getMaxTotalBpiAsOf(db, owner, version, monthStartDate),
+    userStatusLogsRepo.getTotalBpiLogsInRange(
+      owner,
+      version,
+      monthStartDate,
+      monthEndDate,
+    ),
   ]);
 
   const ownerPreMonthExScoreMap = new Map<number, number>();
@@ -161,6 +160,8 @@ export async function computeOwnerBpiTimeline(
       ownerInMonthHistory,
       allL12SongMeta,
       useMonthBuckets,
+      priorRecordedMax,
+      inRangeRecordedLogs,
     );
     bpiEnd = pure.bpiEnd;
     history = pure.history;
@@ -238,21 +239,19 @@ export async function recomputeBpiTimelinesForUsers(
     compareVersion
       ? monthlyReviewRepo.getVersionBpiStateForUsers(userIds, compareVersion)
       : Promise.resolve(undefined),
-    compareVersion
-      ? Promise.resolve(new Map<string, number>())
-      : userStatusLogsRepo.getMaxTotalBpiAsOfForUsers(
-          userIds,
-          version,
-          monthStartDate,
-        ),
-    compareVersion
-      ? Promise.resolve(new Map<string, { createdAt: Date; totalBpi: number }[]>())
-      : userStatusLogsRepo.getTotalBpiLogsInRangeForUsers(
-          userIds,
-          version,
-          monthStartDate,
-          monthEndDate,
-        ),
+    // compareVersionの有無に関わらず、`version`自体の記録済み下限は常に取得する
+    // （computeOwnerBpiTimelineと同じ理由）
+    userStatusLogsRepo.getMaxTotalBpiAsOfForUsers(
+      userIds,
+      version,
+      monthStartDate,
+    ),
+    userStatusLogsRepo.getTotalBpiLogsInRangeForUsers(
+      userIds,
+      version,
+      monthStartDate,
+      monthEndDate,
+    ),
   ]);
 
   const preByUser = new Map<string, Map<number, number>>();
@@ -280,11 +279,15 @@ export async function recomputeBpiTimelinesForUsers(
       // baseline（前バージョン最終値）とhistory/bpiEnd（現バージョンの純粋な推移）を
       // 独立して計算する（computeOwnerBpiTimelineと同じ理由）
       const compareMap = compareByUser.get(userId);
+      const priorRecordedMax = priorRecordedMaxByUser.get(userId) ?? null;
+      const inRangeRecordedLogs = inRangeRecordedLogsByUser.get(userId) ?? [];
       const pure = buildBpiTimeline(
         new Map(),
         history,
         allL12SongMeta,
         useMonthBuckets,
+        priorRecordedMax,
+        inRangeRecordedLogs,
       );
       const bpiStart =
         compareMap && compareMap.size > 0
