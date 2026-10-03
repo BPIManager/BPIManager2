@@ -11,25 +11,14 @@ import {
 } from "@/lib/firebase/identityToolkit";
 import { userEmailHashesRepo } from "@/lib/db/domains/userEmailHashes";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
+import {
+  EMAIL_PROVIDER_ID,
+  LINKABLE_PROVIDER_IDS,
+  type LinkedAccount,
+} from "@/types/auth/linkedAccounts";
 import { authUidOf, type HandleOutcome } from "./_shared";
 import { mapIdentityToolkitError } from "./_errors";
 import { emailLinkContinueUrl } from "./emailLogin";
-
-/** 連携解除・表示の対象にするログインプロバイダ。Firebase の providerId と一致させる。 */
-export const LINKABLE_PROVIDER_IDS = [
-  "google.com",
-  "twitter.com",
-  "oidc.line",
-  "password",
-] as const;
-
-export interface LinkedAccount {
-  providerId: string;
-  /** password（メールアドレス）のみ値を持つ。SNS 連携は表示名等を返さない */
-  email: string | null;
-}
-
-const EMAIL_PROVIDER_ID = "password";
 
 function toLinkedAccounts(user: UserRecord): LinkedAccount[] {
   return user.providerData
