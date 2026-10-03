@@ -2,9 +2,7 @@ import { ALL_DIFFICULTIES } from "@/constants/iidx/songLevels";
 import { db } from "@/lib/db";
 import { AllDifficulties } from "@/types/songs/allSongs";
 import { SongWithScore } from "@/types/songs/score";
-
 import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore/perSong";
-
 
 /**
  * 全難易度スコアの一覧（フィルタ・ページング付き）を担当するリポジトリクラス。

@@ -1,9 +1,7 @@
-
 import { db } from "@/lib/db";
 import { AllDifficulties } from "@/types/songs/allSongs";
 import { SongWithScore } from "@/types/songs/score";
 import { correlatedLatestLogId } from "@/lib/db/shared/latestScore/correlated";
-
 import { latestLogIdPerUserSongScalarSubquery } from "@/lib/db/shared/latestScore/perUser";
 import { userDisplayColumns } from "@/lib/db/shared/userDisplay";
 import { wherePublicOnly } from "@/lib/db/shared/visibility";
