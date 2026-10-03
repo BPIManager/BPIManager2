@@ -166,7 +166,7 @@ function LinkedAccountsList() {
     <Button
       variant="outline"
       size="sm"
-      className="h-8 rounded-lg px-3 text-xs"
+      className="h-8 rounded-lg border-bpim-danger px-3 text-xs text-bpim-danger"
       disabled={isLastMethod || busyProviderId !== null}
       title={isLastMethod ? t("settings.linked.lastMethodHint") : undefined}
       onClick={() => handleUnlink(providerId)}
@@ -195,7 +195,7 @@ function LinkedAccountsList() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="h-8 rounded-lg px-3 text-xs"
+                  className="h-8 rounded-lg border-bpim-primary px-3 text-xs"
                   disabled={busyProviderId !== null}
                   onClick={() => setEmailModal("change")}
                 >
@@ -207,7 +207,7 @@ function LinkedAccountsList() {
               <Button
                 variant="outline"
                 size="sm"
-                className="h-8 rounded-lg px-3 text-xs"
+                className="h-8 rounded-lg border-bpim-primary px-3 text-xs"
                 disabled={isLoading || !fbUser}
                 onClick={() => setEmailModal("link")}
               >
@@ -235,7 +235,7 @@ function LinkedAccountsList() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="h-8 rounded-lg px-3 text-xs"
+                    className="h-8 rounded-lg border-bpim-primary px-3 text-xs"
                     disabled={isLoading || busyProviderId !== null}
                     onClick={() => handleLinkSocial(provider)}
                   >
