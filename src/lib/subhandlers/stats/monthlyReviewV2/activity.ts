@@ -2,11 +2,9 @@ import { ok, err } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { monthlyActivityRepo } from "@/lib/db/aggregates/monthly-review/activity";
 import { buildActivityBreakdown, buildBestDays } from "@/lib/monthly-review/activity";
-import {
-  resolveMonthlyReviewPeriod,
-  computeOwnerBpiTimeline,
-  computeOwnerMonthlyScores,
-} from "./_shared";
+import { resolveMonthlyReviewPeriod } from "@/lib/subhandlers/stats/monthlyReviewV2/period";
+import { computeOwnerBpiTimeline } from "@/lib/subhandlers/stats/monthlyReviewV2/timeline";
+import { computeOwnerMonthlyScores } from "@/lib/subhandlers/stats/monthlyReviewV2/scores";
 import type { HandlerResult } from "@/types/api";
 
 export async function handleStatsMonthlyReviewActivity(q: {

@@ -16,13 +16,9 @@ import {
   type OgpSectionKey,
 } from "@/lib/monthly-review/ogpSections";
 import type { ArenaVersionHistoryEntry } from "@/types/stats/monthlyReview";
-import {
-  resolveMonthlyReviewPeriod,
-  computeOwnerBpiTimeline,
-  computeOwnerMonthlyScores,
-  computeOwnerTopSongs,
-  previousVersionOf,
-} from "./_shared";
+import { resolveMonthlyReviewPeriod, previousVersionOf } from "@/lib/subhandlers/stats/monthlyReviewV2/period";
+import { computeOwnerBpiTimeline } from "@/lib/subhandlers/stats/monthlyReviewV2/timeline";
+import { computeOwnerMonthlyScores, computeOwnerTopSongs } from "@/lib/subhandlers/stats/monthlyReviewV2/scores";
 
 const WIDTH = 1200;
 const HEIGHT = 630;

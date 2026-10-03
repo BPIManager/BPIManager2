@@ -7,12 +7,8 @@ import {
   buildGrowthRanking,
   buildGrowthTimeline,
 } from "@/lib/monthly-review/rivals";
-import {
-  resolveMonthlyReviewPeriod,
-  computeOwnerBpiTimeline,
-  recomputeBpiTimelinesForUsers,
-  previousVersionOf,
-} from "./_shared";
+import { resolveMonthlyReviewPeriod, previousVersionOf } from "@/lib/subhandlers/stats/monthlyReviewV2/period";
+import { computeOwnerBpiTimeline, recomputeBpiTimelinesForUsers } from "@/lib/subhandlers/stats/monthlyReviewV2/timeline";
 import type { AccessResult } from "@/middlewares/api/withApi";
 import type { HandlerResult } from "@/types/api";
 

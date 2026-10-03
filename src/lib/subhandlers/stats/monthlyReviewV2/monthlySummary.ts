@@ -1,7 +1,8 @@
 import { ok, err } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { monthlyActivityRepo } from "@/lib/db/aggregates/monthly-review/activity";
-import { resolveMonthlyReviewPeriod, computeOwnerBpiTimeline } from "./_shared";
+import { resolveMonthlyReviewPeriod } from "@/lib/subhandlers/stats/monthlyReviewV2/period";
+import { computeOwnerBpiTimeline } from "@/lib/subhandlers/stats/monthlyReviewV2/timeline";
 import type { HandlerResult } from "@/types/api";
 
 /**

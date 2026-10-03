@@ -1,13 +1,9 @@
 import { ok, err } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { buildRadarGrowth } from "@/lib/monthly-review/radar";
-import {
-  resolveMonthlyReviewPeriod,
-  computeOwnerBpiTimeline,
-  computeOwnerMonthlyScores,
-  computeOwnerTopSongs,
-  previousVersionOf,
-} from "./_shared";
+import { resolveMonthlyReviewPeriod, previousVersionOf } from "@/lib/subhandlers/stats/monthlyReviewV2/period";
+import { computeOwnerBpiTimeline } from "@/lib/subhandlers/stats/monthlyReviewV2/timeline";
+import { computeOwnerMonthlyScores, computeOwnerTopSongs } from "@/lib/subhandlers/stats/monthlyReviewV2/scores";
 import type { HandlerResult } from "@/types/api";
 
 export async function handleStatsMonthlyReviewRadarGrowth(q: {

@@ -2,7 +2,7 @@ import { ok, err } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { monthlyActivityRepo } from "@/lib/db/aggregates/monthly-review/activity";
 import { buildArena } from "@/lib/monthly-review/arena";
-import { resolveMonthlyReviewPeriod } from "./_shared";
+import { resolveMonthlyReviewPeriod } from "@/lib/subhandlers/stats/monthlyReviewV2/period";
 import type { HandlerResult } from "@/types/api";
 
 export async function handleStatsMonthlyReviewArena(q: {
