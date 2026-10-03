@@ -11,6 +11,8 @@ import {
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { CheckCircle2, XCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { PENDING_EMAIL_STORAGE_KEY } from "@/components/partials/modal/EmailLogin";
@@ -166,9 +168,12 @@ export default function EmailLinkComplete() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-bpim-bg px-4 text-bpim-text">
-      <div className="flex w-full max-w-sm flex-col gap-5 rounded-2xl border border-bpim-border bg-bpim-surface p-6 text-center">
+      <div className="flex w-full max-w-sm flex-col items-center gap-5 rounded-2xl border border-bpim-border bg-bpim-surface p-6 text-center">
         {phase === "processing" && (
-          <p className="text-sm text-bpim-muted">{t("email.complete.processing")}</p>
+          <div className="flex flex-col items-center gap-3">
+            <LoadingSpinner size="lg" className="text-bpim-text" />
+            <p className="text-sm text-bpim-muted">{t("email.complete.processing")}</p>
+          </div>
         )}
 
         {phase === "needEmail" && (
@@ -189,11 +194,15 @@ export default function EmailLinkComplete() {
         )}
 
         {phase === "done" && (
-          <p className="text-sm font-bold text-bpim-success">{t(DONE_KEYS[intent])}</p>
+          <div className="flex flex-col items-center gap-3">
+            <CheckCircle2 className="h-10 w-10 text-bpim-success" />
+            <p className="text-sm font-bold text-bpim-success">{t(DONE_KEYS[intent])}</p>
+          </div>
         )}
 
         {phase === "error" && (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col items-center gap-4">
+            <XCircle className="h-10 w-10 text-bpim-danger" />
             <p className="text-sm font-bold text-bpim-danger">{t(errorKey)}</p>
             <Button variant="outline" className="h-10 rounded-xl" onClick={() => router.replace("/")}>
               {t("common.error.backHome")}
