@@ -1,5 +1,5 @@
 import { NextApiRequest } from "next";
-import { db } from "@/lib/db";
+import { usersRepo } from "@/lib/db/domains/users";
 import { oauthRepo } from "@/lib/db/domains/oauth";
 import { canViewUserData } from "@/lib/db/shared/visibility";
 import { followAccessAggregateRepo } from "@/lib/db/aggregates/followAccess";
@@ -32,11 +32,7 @@ export async function checkSelfOrPublicAccess(
 ) {
   if (targetUserId === selfUserId) return { allowed: true as const };
 
-  const target = await db
-    .selectFrom("users")
-    .select(["userId", "isPublic"])
-    .where("userId", "=", targetUserId)
-    .executeTakeFirst();
+  const target = await usersRepo.getAccessInfo(targetUserId);
 
   if (!target) {
     return { allowed: false as const, message: "指定されたユーザーが見つかりません。" };
