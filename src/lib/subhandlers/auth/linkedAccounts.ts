@@ -11,6 +11,7 @@ import {
   sendEmailSignInLink,
 } from "@/lib/firebase/identityToolkit";
 import { userEmailHashesRepo } from "@/lib/db/domains/userEmailHashes";
+import { usersRepo } from "@/lib/db/domains/users";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import {
   EMAIL_PROVIDER_ID,
@@ -40,6 +41,9 @@ async function syncEmailHash(uid: string, user: UserRecord): Promise<void> {
     await userEmailHashesRepo.deleteByUserId(uid);
     return;
   }
+
+  // users 行が無い（プロフィール未登録）間は外部キーに違反するため、登録後の同期に任せる
+  if (!(await usersRepo.getAccessInfo(uid))) return;
 
   const emailHash = hashEmail(user.email);
   const owner = await userEmailHashesRepo.findUserIdByHash(emailHash);

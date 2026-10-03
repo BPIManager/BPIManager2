@@ -76,7 +76,12 @@ export default function EmailLinkComplete() {
 
       const finish = async () => {
         clearPendingEmail();
-        if (auth.currentUser) await syncLinkedAccounts(auth.currentUser);
+        // 同期は補助的な処理のため、失敗してもサインイン・連携の完了は取り消さない
+        if (auth.currentUser) {
+          await syncLinkedAccounts(auth.currentUser).catch((e: unknown) =>
+            console.error("Linked accounts sync failed:", e),
+          );
+        }
         setPhase("done");
         router.replace(currentIntent === "login" ? "/" : "/settings");
       };
