@@ -37,6 +37,23 @@ class RadarCacheRepository {
   }
 
   /**
+   * 指定ユーザーの指定バージョンのレーダーキャッシュ行を削除する。
+   * スコアが全消去されたユーザーの古い集計が残り続けないようにするために使う。
+   *
+   * @param userIds - 対象ユーザー ID の配列
+   * @param version - 対象バージョン
+   */
+  async deleteForUsers(userIds: string[], version: string): Promise<void> {
+    for (let i = 0; i < userIds.length; i += UPSERT_CHUNK_SIZE) {
+      await db
+        .deleteFrom("userRadarCache")
+        .where("userId", "in", userIds.slice(i, i + UPSERT_CHUNK_SIZE))
+        .where("version", "=", version)
+        .execute();
+    }
+  }
+
+  /**
    * ユーザーのレーダーキャッシュレコードを削除する。
    *
    * @param trx - 呼び出し元が管理するトランザクション

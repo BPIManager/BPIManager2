@@ -133,11 +133,13 @@ export const filterSongsFrontend = (
 
     if (params.scoreFilters && params.scoreFilters.length > 0) {
       const rate =
-        song.exScore !== null
+        song.exScore !== null && song.notes > 0
           ? (song.exScore / (song.notes * 2)) * 100
           : null;
       const ratio =
-        song.exScore !== null ? song.exScore / (song.notes * 2) : null;
+        song.exScore !== null && song.notes > 0
+          ? song.exScore / (song.notes * 2)
+          : null;
 
       for (const f of params.scoreFilters) {
         if (!f.value) continue;

@@ -44,7 +44,6 @@ export async function importFromBPIM(params: {
   userId: string;
   scoreUpdates: NewScore[];
   statusLogs: NewTotalBPILog[];
-  finalTotalBpi: number;
 }) {
   return await db.transaction().execute(async (trx) => {
     await scoresRepo.deleteByUser(trx, params.userId);
@@ -84,11 +83,6 @@ async function executeSaveBpiSystem(
   );
 
   const currentArenaRank = latestLog?.arenaRank ?? null;
-  if (params.scoreUpdates.length === 0) return params.newTotalBpi;
-
-  // 総合BPIは既知の最高値を下回らないようラチェットする（V2は未プレイ曲の
-  // 予測が新しい観測で下がりうるため、プレイ済み曲が1曲も下がっていなくても
-  // 総合BPI自体は下がりうる。src/lib/bpi/index.tsのratchetTotalBpi参照）。
   const previousBest = await userStatusLogsRepo.getMaxTotalBpi(
     trx,
     params.userId,
@@ -98,6 +92,12 @@ async function executeSaveBpiSystem(
     previousBest,
     params.newTotalBpi,
   );
+  // 書き込むものが無い場合も、応答値は保存されるはずだった値（ラチェット後）と一致させる
+  if (params.scoreUpdates.length === 0) return totalBpi;
+
+  // 総合BPIは既知の最高値を下回らないようラチェットする（V2は未プレイ曲の
+  // 予測が新しい観測で下がりうるため、プレイ済み曲が1曲も下がっていなくても
+  // 総合BPI自体は下がりうる。src/lib/bpi/index.tsのratchetTotalBpi参照）。
 
   await navigationRepo.insert(trx, {
     userId: params.userId,

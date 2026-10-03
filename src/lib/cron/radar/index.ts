@@ -38,6 +38,7 @@ export async function updateAllUserRadarCache() {
   const total = users.length;
   let done = 0;
   const pendingRows: NewUserRadarCache[] = [];
+  const staleUserIds: string[] = [];
 
   for (
     let pageStart = 0;
@@ -124,6 +125,8 @@ export async function updateAllUserRadarCache() {
             soflan: values.soflan.toFixed(2),
             totalBpi: values.totalBpi.toFixed(2),
           });
+        } else {
+          staleUserIds.push(user.userId);
         }
       } catch (e) {
         process.stdout.write("\r\x1b[K");
@@ -138,6 +141,7 @@ export async function updateAllUserRadarCache() {
   process.stdout.write("\r\x1b[K");
   console.log(`[Radar] Writing cache for ${pendingRows.length} users...`);
   await radarCacheRepo.bulkUpsert(pendingRows);
+  await radarCacheRepo.deleteForUsers(staleUserIds, version);
 
   console.log(
     `[Radar] Cache update done: ${pendingRows.length}/${total} users updated`,
