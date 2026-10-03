@@ -17,7 +17,7 @@ export async function handleGetApiKey(
     return {
       result: ok({
         exists: !!record,
-        key: record ? `****${record.key.slice(-4)}` : null,
+        key: record?.keyLast4 ? `****${record.keyLast4}` : null,
       }),
       targetUserId: uid,
       viewerId: uid,

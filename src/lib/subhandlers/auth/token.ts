@@ -1,7 +1,6 @@
 import type { NextApiRequest } from "next";
 import { apiKeysRepo } from "@/lib/db/domains/apiKeys";
 import { adminAuth } from "@/lib/firebase/admin";
-import { timingSafeEqual } from "@/utils/common/timingSafeEqual";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { type HandleOutcome } from "./_shared";
@@ -17,7 +16,7 @@ export async function handleTokenExchange(
   }
   try {
     const keyRecord = await apiKeysRepo.findByKey(xApiKey);
-    if (!keyRecord || !timingSafeEqual(xApiKey, keyRecord.key)) {
+    if (!keyRecord) {
       return { result: err(401, "Invalid API Key"), ...base };
     }
     const customToken = await adminAuth.createCustomToken(keyRecord.userId);

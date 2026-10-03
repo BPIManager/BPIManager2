@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { hashCredential } from "@/utils/common/hashCredential";
 
 interface CreateAuthorizationCodeInput {
   code: string;
@@ -81,18 +82,22 @@ class OAuthRepository {
    * 既存行を上書きする(`apiKeysRepo.upsert`と同じ思想)。
    */
   async upsertUserClient(input: UpsertUserClientInput) {
+    const hashed = hashCredential(input.clientSecret);
+    const secretLast4 = input.clientSecret.slice(-4);
     await db
       .insertInto("oauthClients")
       .values({
         clientId: input.clientId,
         userId: input.userId,
-        clientSecret: input.clientSecret,
+        clientSecret: hashed,
+        secretLast4,
         redirectUris: JSON.stringify(input.redirectUris),
         createdAt: new Date(),
       })
       .onDuplicateKeyUpdate({
         clientId: input.clientId,
-        clientSecret: input.clientSecret,
+        clientSecret: hashed,
+        secretLast4,
         redirectUris: JSON.stringify(input.redirectUris),
       })
       .execute();

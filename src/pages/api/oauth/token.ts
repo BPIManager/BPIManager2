@@ -4,6 +4,7 @@ import { oauthRepo } from "@/lib/db/domains/oauth";
 import { withRateLimit } from "@/middlewares/api/withRateLimit";
 import { tokenRequestSchema } from "@/schemas/oauth";
 import { timingSafeEqual } from "@/utils/common/timingSafeEqual";
+import { hashCredential } from "@/utils/common/hashCredential";
 import { verifyPkce } from "@/utils/oauth/pkce";
 
 const ACCESS_TOKEN_TTL_MS = 90 * 24 * 60 * 60 * 1000;
@@ -83,7 +84,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       if (
         !client_secret ||
         !client.clientSecret ||
-        !timingSafeEqual(client_secret, client.clientSecret)
+        !timingSafeEqual(hashCredential(client_secret), client.clientSecret)
       ) {
         return res.status(401).json({ error: "invalid_client" });
       }
