@@ -29,12 +29,8 @@ type BpimLogoProps = {
 
 const hsl = (v: string) => `hsl(var(${v}))`;
 
-// Circle: cx=16 cy=16 r=13
-// Bars must fit fully inside — corners verified against circle equation:
-//   (x-16)² + (y-16)² ≤ 169
-//
-// BAR_W=3.5  GAP=1.5  totalW=18.5  startX=6.75  bottom=25
-// Max safe height for outermost bars ≈ 18  (corner at x=6.75,y=7 → 166.6 < 169)
+// 円（cx=16, cy=16, r=13）に内接するバーの配置。最外バーの最大高さは約18（角が円周内に収まる上限）。
+ // 各バー幅3.5・間隔1.5・startX=6.75・bottom=25 はこの前提で決めている。
 
 const CX = 16;
 

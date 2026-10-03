@@ -1,13 +1,8 @@
 import { db } from "@/lib/db";
 
 /**
- * フォローリスト（`followLists`）を、所属メンバー数やフォロー中ユーザーの
- * 所属状況といった複合データと組み合わせて組み立てるリポジトリクラス。
- *
- * `followLists`ドメイン本来の責務（単一テーブルの読み書き）を超えた
- * クロスドメイン参照のため、`domains/followLists`ではなくここに置く。
- * どのメソッドも本人（リスト所有者）専用の集計であり、第三者への公開は
- * 想定していない。
+ * フォローリストをメンバー数・フォロー中ユーザーの所属状況などの複合データと組み合わせて組み立てる。
+ * クロスドメイン参照のため domains ではなくここに置く。どのメソッドも本人（リスト所有者）専用で第三者への公開は想定しない。
  */
 class FollowListsAggregateRepository {
   /**
@@ -43,19 +38,13 @@ class FollowListsAggregateRepository {
   }
 
   /**
-   * 指定ユーザーがフォロー中の全ユーザーを、それぞれが所属する
-   * （このユーザー自身が作成した）リストID一覧付きで取得する。
-   *
-   * `/rivals`編集モードの行リスト（ユーザー×所属リストのSelect）に使う。
+   * 指定ユーザーがフォロー中の全ユーザーを、各ユーザーが所属する自分のリストID一覧付きで取得する。/rivals の行リストで使う。
    *
    * @param userId - フォローしている側のユーザー ID
    */
   async getFollowingWithListMembership(userId: string) {
-    // 先にuserId本人が所有するリストへの所属だけに絞ったfollowListMembers
-    // を組み立ててからfollowingIdでJOINする。先にfollowingIdだけでJOIN
-    // すると、対象ユーザーが他人のリストに所属している行まで結合されて
-    // しまい(所有者フィルタは結果を捨てるだけで結合行数は減らない)、
-    // 人気ユーザーほど無駄な結合行数が増えてしまうため
+    // 先に本人所有リストへの所属だけに絞った followListMembers を作ってから following で JOIN する。
+    // 逆順だと他人のリスト所属まで結合され、人気ユーザーほど無駄な結合行数が増えるため。
     const ownedMembers = db
       .selectFrom("followListMembers as flm")
       .innerJoin("followLists as fl", "fl.id", "flm.listId")

@@ -20,9 +20,7 @@ import {
 } from "./useComparisonSources";
 
 /**
- * アナリティクス比較ターゲット（ライバル / 旧バージョン自己 / アリーナ / AAA 目標など）に
- * 対応したスコア比較データを返すフック。
- * ターゲット種別に応じて必要な API を選択的にフェッチし、自スコアと合成して返す。
+ * 比較ターゲット（ライバル・旧バージョン自己・アリーナ・AAA目標等）に応じて必要な API を選択的にフェッチし、自スコアと合成して返す。
  *
  * @param target - 比較ターゲット（null の場合は何もフェッチしない）
  * @param version - IIDX バージョン（省略時は最新バージョン）
@@ -104,9 +102,7 @@ export const useAnalyticsComparison = (
     { revalidateOnFocus: false, dedupingInterval: 10000 },
   );
 
-  // 手動EXスコア保存後、表示中の比較ターゲットに対応するキャッシュのみを
-  // 再検証すればよいが、判定を複雑にしないため4種すべてを呼ぶ(未使用の
-  // ものはキーがnullのため無害)
+  // 表示中のターゲットのキャッシュだけを再検証すれば足りるが、判定を単純に保つため4種すべてを呼ぶ（未使用はキーが null で無害）。
   const refresh = () => {
     void mutateRival();
     void mutateSelfVersion();
@@ -235,10 +231,8 @@ export const useAnalyticsComparison = (
       }
     }
 
-    // アリーナ集計データはsongIdを持たずtitleでしか突合できないため、
-    // 同名リメイク曲(同じtitle__difficultyで異なるsongId)がmyScoresに
-    // 混在する場合は誤ったアリーナ平均と静かにマージされてしまう。
-    // そのようなキーは安全側に倒して突合自体をスキップする。
+    // アリーナ集計は songId を持たず title でしか突合できないため、同名リメイク曲が混在すると誤った平均とマージされる。
+     // そのようなキーは安全側に倒して突合をスキップする。
     const songIdsByTitleKey = new Map<string, Set<number>>();
     for (const s of myScores) {
       const key = `${s.title}__${s.difficulty}`;

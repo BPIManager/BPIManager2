@@ -3,25 +3,15 @@ import { db } from "@/lib/db";
 import { LatestScoreTable, LatestScoreQueryBuilder } from "@/lib/db/shared/latestScore/types";
 
 /**
- * 「最新スコア取得」パターンの共通クエリビルダー群。
- *
- * `scores`/`allScores` の両テーブルで繰り返し実装されていた
- * 「ユーザー(群)×バージョンごとの曲別最新スコア」を求めるサブクエリを集約する。
- *
- * ここに集約するのはあくまで「基準時刻を指定しない、単純な最新スコア」パターンのみ。
- * 「ある基準時刻より前の最新スコア」(追い抜き判定などの時刻境界付き相関サブクエリ)は
- * 意味的に別物のため、意図的にここには含めない
- * ({@link "@/lib/db/domains/scores/rival"}の`getOvertakenRivals`、
- * {@link "@/lib/db/domains/notifications"}の追い抜き通知検出ロジックを参照)。
+ * 最新スコア取得（基準時刻を指定しない単純な最新）のクエリビルダー群。scores/allScores の両テーブルで共通化する。
+ * 基準時刻付きの追い抜き判定は意味が異なるため含めない（scores/rival の getOvertakenRivals を参照）。
  */
 
 /**
- * 「フォロー中ユーザー群」または「明示的な userId 配列」による `userId IN (...)` 絞り込みを
- * 適用する。{@link latestLogIdPerUserSongSubquery}/{@link latestLogIdPerUserSongScalarSubquery}
- * で同一の分岐がそれぞれ個別実装されていたため共通化した。
+ * フォロー中ユーザー群、または明示的な userId 配列による userId IN (...) 絞り込みを適用する。両サブクエリで共通化した分岐。
  *
- * @param qb - 絞り込みを適用するクエリビルダー（`userId` カラムを持つテーブルが対象）
- * @param params.userIds - 対象ユーザー ID の明示的な配列（`followersOf` と排他）
+ * @param qb - 絞り込みを適用するクエリビルダー（userId 列を持つテーブル）
+ * @param params.userIds - 対象ユーザー ID の配列（followersOf と排他）
  * @param params.followersOf - このユーザーがフォローしているユーザー群を対象にする場合の viewerId
  */
 export function applyUserIdsOrFollowersFilter<O>(
@@ -69,21 +59,14 @@ export function baseLatestLogIdPerUserSongQuery(
 }
 
 /**
- * 複数ユーザー（フォロー中ユーザー群、または明示的な userId 配列）×バージョンの
- * 「ユーザー・曲ごとの最新 logId」を集計するサブクエリを組み立てる。
+ * 複数ユーザー×バージョンの「ユーザー・曲ごとの最新 logId」を集計するサブクエリ（userId, songId, maxLogId の3列）。
+ * songId を1件に固定すると「1曲の全ユーザー最新スコア」（ランキング用途）としても使える。
  *
- * 返り値は `userId, songId, maxLogId` の3列を持つ。呼び出し側は
- * `s.logId = latest.maxLogId AND s.userId = latest.userId AND s.songId = latest.songId`
- * で結合する。
- *
- * `songId` を固定1件のみ指定した場合、実質的に「1曲についての全ユーザー最新スコア」
- * （ランキング系クエリ）としても使える。
- *
- * @param params.table - 対象テーブル（`scores` | `allScores`）
+ * @param params.table - 対象テーブル（scores | allScores）
  * @param params.version - バージョン番号
- * @param params.userIds - 対象ユーザー ID の明示的な配列（`followersOf` と排他、両方省略時は全ユーザー対象）
+ * @param params.userIds - 対象ユーザー ID の配列（followersOf と排他、両方省略時は全ユーザー）
  * @param params.followersOf - このユーザーがフォローしているユーザー群を対象にする場合の viewerId
- * @param params.songIds - 対象楽曲 ID を絞り込む場合（省略時は全曲対象）
+ * @param params.songIds - 対象楽曲 ID（省略時は全曲）
  * @param params.extra - 追加の絞り込みを差し込むコールバック
  */
 export function latestLogIdPerUserSongSubquery(params: {
@@ -124,19 +107,14 @@ export function baseLatestLogIdPerUserSongScalarQuery(
 }
 
 /**
- * `WHERE <table>.logId IN (...)` の形で使うための、複数ユーザー（フォロー中ユーザー群、
- * または明示的な userId 配列）×バージョンの「ユーザー・曲ごとの最新 logId」列（1列のみ）を
- * 返すサブクエリを組み立てる。
+ * WHERE logId IN (...) で使う、複数ユーザー×バージョンの「ユーザー・曲ごとの最新 logId」列（1列）のサブクエリ。
+ * latestLogIdPerUserSongSubquery の IN 版。songIds を1件に固定すると1曲の全ユーザー最新として使える。
  *
- * {@link latestLogIdPerUserSongSubquery} の `IN` サブクエリ版。`songIds` を固定1件のみ
- * 指定した場合、「1曲についての全ユーザー最新スコア」（`userId` のみでグルーピングするのと等価）
- * としても使える。
- *
- * @param params.table - 対象テーブル（`scores` | `allScores`）
+ * @param params.table - 対象テーブル（scores | allScores）
  * @param params.version - バージョン番号
- * @param params.userIds - 対象ユーザー ID の明示的な配列（`followersOf` と排他）
+ * @param params.userIds - 対象ユーザー ID の配列（followersOf と排他）
  * @param params.followersOf - このユーザーがフォローしているユーザー群を対象にする場合の viewerId
- * @param params.songIds - 対象楽曲 ID を絞り込む場合（省略時は全曲対象）
+ * @param params.songIds - 対象楽曲 ID（省略時は全曲）
  * @param params.extra - 追加の絞り込みを差し込むコールバック
  */
 export function latestLogIdPerUserSongScalarSubquery(params: {

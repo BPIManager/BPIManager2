@@ -18,14 +18,8 @@ export interface SongContributionResult {
 }
 
 /**
- * POST /users/[userId]/analytics/bpi-optimizer/song-contribution （withUserApiHandler）
- *
- * 保存済みの目標について、「プラン保存時点からの実際のスコア更新が、現在の
- * 総合BPIにどれだけ効いているか」を曲ごとに算出する。
- *
- * 総合BPIはべき乗平均のため単曲BPIの差分をそのまま足せないので、各曲について
- * 「現在の総合BPI」と「その曲だけを保存時点(baselineExScore)のスコアに
- * 戻した場合の総合BPI」を比較した差分を寄与度とする。
+ * 保存済み目標について、プラン保存時点からのスコア更新が現在の総合BPIへ効いている寄与を曲ごとに算出する。
+ * べき乗平均で単曲差分を足せないため、現在値と「その曲だけ baselineExScore に戻した場合」の総合BPI差を寄与度とする。
  */
 export async function handleSongContribution(
   req: NextApiRequest,

@@ -20,9 +20,7 @@ interface LogsSummaryPageShellProps {
 }
 
 /**
- * `users/[userId]/logs/[version]/summary/**` および `[batchId]` ページで共通の
- * 「router準備待ち → 本人/他人の判定」までをまとめたシェル。
- * 本人/他人それぞれで実際に描画する内容はrender propとして呼び出し側が持つ。
+ * ログ要約ページ（summary・[batchId]）共通の「router 準備待ち → 本人/他人の判定」シェル。本人・他人の描画内容は render prop で渡す。
  */
 const LogsSummaryPageShell = ({
   ownProfile,

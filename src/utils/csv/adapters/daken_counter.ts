@@ -1,23 +1,5 @@
 /**
- * 打鍵カウンタ CSV → 標準インポート行フォーマット 変換アダプタ (INFINITAS専用)
- *
- * ヘッダー: LV,Title,mode,Lamp,Score,(rate),BP,Opt(best score),Opt(min bp),Last Played
- *
- * mode → difficulty マッピング:
- *   SPA → ANOTHER
- *   SPH → HYPER
- *   SPL → LEGGENDARIA
- *   SPN → NORMAL
- *   SPB → BEGINNER
- *
- * Lamp マッピング:
- *   F-COMBO   → FULLCOMBO CLEAR
- *   EXH-CLEAR → EX HARD CLEAR
- *   H-CLEAR   → HARD CLEAR
- *   A-CLEAR   → ASSIST CLEAR
- *   E-CLEAR   → EASY CLEAR
- *   CLEAR     → CLEAR
- *   FAILED    → FAILED
+ * 打鍵カウンタCSV（INFINITAS専用）を標準インポート行へ変換する。mode・Lampの表記をDB値へ写像する。
  */
 
 import Papa from "papaparse";

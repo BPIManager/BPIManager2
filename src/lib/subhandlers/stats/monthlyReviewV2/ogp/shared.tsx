@@ -66,9 +66,7 @@ export function loadFont(weight: "regular" | "bold"): Buffer {
 }
 
 /**
- * satoriはSVGパーサーが弱く、dicebearのSVGアバター(identicon等)を読み込めない
- * （実機確認: "Failed to parse SVG image"で画像だけ無言で欠落する）ため、
- * dicebear URLに限りPNG形式へ変換する
+ * satori は SVG パーサーが弱く dicebear の SVG アバターを読み込めない（無言で欠落する）ため、dicebear の URL のみ PNG に変換する。
  */
 export function toSatoriSafeImageUrl(url: string): string {
   if (url.includes("api.dicebear.com") && url.includes("/svg")) {

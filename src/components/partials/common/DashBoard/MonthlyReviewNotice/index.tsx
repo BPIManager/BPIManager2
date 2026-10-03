@@ -12,9 +12,7 @@ import dayjs from "@/lib/dayjs";
 const DISMISSED_KEY_PREFIX = "bpim2-monthly-review-notice-dismissed-v1";
 
 /**
- * ダッシュボードに常設する、先月分の月間振り返りへの導線バナー。
- * 毎月自動的に「先月」を指すよう動的に組み立てる（バージョンは常に最新）。
- * 閉じるとlocalStorageに記録し、同じ対象月の間は以降表示しない（月が変われば再表示される）。
+ * ダッシュボード常設の先月分の月間振り返り導線。対象月は動的に先月を指し、閉じると localStorage に記録して同月中は再表示しない。
  */
 function MonthlyReviewNotice() {
   const { t, tFormat } = useTranslation();

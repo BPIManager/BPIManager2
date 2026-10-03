@@ -8,10 +8,7 @@ import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
 import { followsRepo } from "@/lib/db/domains/follow";
 
 /**
- * 公開プロフィールページ・自分のダッシュボード用の複合ビューを担当するリポジトリクラス。
- *
- * users・userStatusLogs・officialArenaStats・userRoles・follows・statsPrivacy等を
- * 横断してユーザー向けの複合ビューを組み立てる。
+ * 公開プロフィールと自分のダッシュボード用の複合ビュー。users・userStatusLogs・officialArenaStats・userRoles・follows・statsPrivacy を横断する。
  */
 class UserProfileRepository {
   /**

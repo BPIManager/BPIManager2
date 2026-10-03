@@ -6,10 +6,8 @@ import { getSongRankingFromTable } from "@/lib/db/aggregates/songRanking";
 import { songMasterRepo } from "@/lib/db/domains/songs/master";
 
 /**
- * {@link StatsTablesRepository.getLatestScoresWithMusicData}の結果をキャッシュする
- * 有効期間(ms)。ダッシュボードの複数ウィジェットが同一ページロード内で
- * 同じuserId/versionのデータをほぼ同時に要求するケースでDBラウンドトリップを
- * 削減するための短時間キャッシュであり、データ鮮度を犠牲にする長期キャッシュではない。
+ * getLatestScoresWithMusicData の結果を保持する短時間キャッシュの有効期間（ms）。
+ * 同一ページロード内の複数ウィジェットの重複 DB アクセスを減らすためで、長期キャッシュではない。
  */
 
 /**

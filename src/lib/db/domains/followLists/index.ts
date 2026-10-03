@@ -3,12 +3,8 @@ import { Database } from "@/types/db";
 import { Transaction } from "kysely";
 
 /**
- * フォロー中ユーザーを分類するリスト（`followLists` テーブル）の
- * 読み書きを担当するリポジトリクラス。
- *
- * リストは常に本人のみが読み書きできる（`isPublic`は将来の第三者閲覧用に
- * 保持するだけの値で、現時点ではどのAPIも第三者への公開判定には使わない）。
- * そのため各メソッドは`userId`を必須の所有者チェック条件として受け取る。
+ * フォローリスト（followLists）の読み書き。リストは本人のみが読み書きでき、各メソッドは userId を必須の所有者条件として受け取る。
+ * isPublic は将来の第三者閲覧用に保持するだけで、現状どのAPIも公開判定には使わない。
  */
 class FollowListsRepository {
   /**
@@ -60,16 +56,13 @@ class FollowListsRepository {
   }
 
   /**
-   * リスト名・公開設定を更新する（指定したフィールドのみ）。
-   *
-   * 改名と公開設定変更を別々のUPDATE文にすると、片方が失敗した場合に
-   * 中途半端な状態のまま確定してしまうため、1つのUPDATE文にまとめて
-   * 原子的に反映する。
+   * リスト名・公開設定を1つの UPDATE 文で原子的に更新する（指定したフィールドのみ）。
+   * 別々の UPDATE にすると片方の失敗で中途半端な状態が確定するため。
    *
    * @param id - リスト ID
    * @param userId - 操作者のユーザー ID（所有者本人であることの確認に使う）
-   * @param fields - 更新するフィールド（`undefined`のフィールドは更新しない）
-   * @returns 対象のリストが存在し、所有者が一致した場合は `true`
+   * @param fields - 更新するフィールド（undefined のフィールドは更新しない）
+   * @returns 対象のリストが存在し所有者が一致した場合は true
    */
   async update(
     id: number,

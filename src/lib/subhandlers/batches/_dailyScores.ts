@@ -15,9 +15,8 @@ import {
 import type { IIDXVersion } from "@/types/iidx/version";
 
 /**
- * 追い抜きライバル取得の完了を待ってから、その楽曲群のライバル最新スコアを取得する。
- * overtakenPromise 自体は他のクエリと独立なため、呼び出し元で Promise.all に含めることで
- * history/totalSongs/scores 取得と並行させ、直列 await を避ける。
+ * 追い抜きライバルの取得完了を待ってから、その楽曲群のライバル最新スコアを取得する。
+ * overtakenPromise は独立しているため呼び出し元で Promise.all に含め、直列 await を避ける。
  */
 async function fetchRivalScoresForOvertaken(
   overtakenPromise: Promise<

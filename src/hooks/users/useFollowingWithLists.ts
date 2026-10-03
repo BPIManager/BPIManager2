@@ -10,12 +10,10 @@ interface FollowingWithListsResponse {
 }
 
 /**
- * フォロー中の全ユーザーを、それぞれが所属する自分のリストID一覧付きで取得し、
- * リスト所属の追加・削除を管理するフック。
+ * フォロー中の全ユーザーと、各ユーザーが所属する自分のリストID一覧を取得し、所属の追加・削除を管理する。
+ * /rivals 編集モードの行リストで使う。
  *
- * `/rivals`編集モードの行リスト（ユーザー×所属リストのSelect）に使う。
- *
- * @param userId - 自分のユーザー ID（未ログイン時は `false`）
+ * @param userId - 自分のユーザー ID（未ログイン時は false）
  */
 export const useFollowingWithLists = (userId?: string | boolean) => {
   const { fbUser } = useUser();

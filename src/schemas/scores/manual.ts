@@ -2,12 +2,8 @@ import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import { z } from "zod";
 
 /**
- * `songId` がどちらの楽曲ドメイン由来かを示す。
- * - `bpi`: `songs`/`songDef`ドメイン（BPI計算対象、☆11/12）
- * - `allSongs`: `allSongs`ドメイン（全難易度、☆1-12）
- *
- * 同じ楽曲・難易度でも両ドメインで`songId`の値が異なるため、どちらの
- * `songId`空間かをクライアント側で明示する。
+ * songId がどちらの楽曲ドメイン由来かを示す。bpi は songs/songDef（☆11/12）、allSongs は allSongs（全難易度）。
+ * 同じ楽曲でも両ドメインで songId が異なるため、クライアントが songId 空間を明示する。
  */
 export const scoresManualBodySchema = z.object({
   songId: z.coerce.number().int().positive(),

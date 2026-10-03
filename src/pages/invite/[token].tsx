@@ -13,11 +13,8 @@ import { useTranslation } from "@/hooks/common/useTranslation";
 import FollowInviteContent from "@/components/partials/features/Invite/FollowInvite";
 
 /**
- * 招待URL(`/invite/[token]`)共通ページ。
- *
- * `/api/v1/invite/[token]`が返す`type`によって表示内容を出し分ける
- * （現時点では`"follow"`のみ。チーム招待等、他の招待種別を
- * 追加する際は同じURL形式のままこのswitchに分岐を追加する）。
+ * 招待URL（/invite/[token]）の共通ページ。API の type によって表示を出し分ける（現時点では follow のみ）。
+ * 他の招待種別を追加する場合は、同じ URL 形式のまま switch に分岐を足す。
  */
 type InvitePreviewData = {
   type: "follow";
@@ -38,9 +35,7 @@ export default function InvitePage() {
   const [lookupFailed, setLookupFailed] = useState(false);
 
   useEffect(() => {
-    // fbUserの認証状態が確定してから取得する(認証ヘッダー付きでisFollowing等を
-    // 一緒に取得するため。先に未認証でフェッチすると承認済みでも
-    // 「送信」ボタンが一瞬表示されてしまう)
+    // fbUser の認証確定後に取得する（認証ヘッダー付きで isFollowing 等を取るため）。未認証で先に取ると承認済みでも「送信」が一瞬出る。
     if (!token || isLoading) return;
     let cancelled = false;
     authFetch(`${API_V2_PREFIX}/invite/${token}`, "GET", fbUser ?? null)

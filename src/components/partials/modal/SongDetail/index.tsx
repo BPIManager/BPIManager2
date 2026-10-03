@@ -19,10 +19,8 @@ interface SongDetailViewProps {
   userId?: string;
   version?: string;
   /**
-   * `song.songId`がどちらの楽曲ドメイン由来か。`songs`/`songDef`ドメイン
-   * （BPI計算対象、☆11/12）は`"bpi"`、`allSongs`ドメイン（全難易度、
-   * ☆1-12）は`"allSongs"`を渡す。両ドメインで`songId`の値が異なるため、
-   * 手動編集を有効にするにはこの指定が必須。
+   * song.songId がどちらの楽曲ドメイン由来かを示す。bpi（songs/songDef, ☆11/12）か allSongs（全難易度, ☆1-12）を渡す。
+   * 両ドメインで songId の値が異なるため、手動編集を有効にするにはこの指定が必須。
    */
   songDomain?: "bpi" | "allSongs";
   /** 手動保存が成功した際に呼ばれる（呼び出し元でのデータ再取得等に使う） */
@@ -59,10 +57,7 @@ const SongDetailView = ({
   const { save, isSaving } = useManualScoreUpdate(userId ?? "");
   const [isEditing, setIsEditing] = useState(false);
   const [draftExScore, setDraftExScore] = useState<number | null>(null);
-  // 保存成功後の表示用。`song` propは呼び出し元の一覧データがそのまま
-  // 渡ってくるだけで、保存後に呼び出し元がmutateしてもこのモーダル自身の
-  // propは（再オープンするまで）更新されないため、保存直後の値をここに
-  // 保持して表示する
+  // 保存成功後の表示用に、保存直後の値をこのモーダル内に保持する。song prop は再オープンまで更新されないため。
   const [savedOverride, setSavedOverride] = useState<{
     exScore: number;
     bpi: number | null;
@@ -77,9 +72,7 @@ const SongDetailView = ({
     setSavedOverride(null);
   }
 
-  // 手動編集を許可するのは、呼び出し元がsongDomainを指定しており
-  // （☆10以下の全難易度曲も編集対象になり得るため`fullSong`は問わない）、
-  // 自分自身のプロフィールを見ている場合のみ
+  // 手動編集は、呼び出し元が songDomain を指定し、かつ自分のプロフィールを見ている場合のみ許可する（fullSong は問わない）。
   const canEdit =
     !!userId && !!version && !!songDomain && fbUser?.uid === userId;
 

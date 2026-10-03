@@ -7,11 +7,7 @@ const PERIODS = { all: null, d90: 90, d30: 30, d7: 7 } as const;
 type Period = keyof typeof PERIODS;
 
 /**
- * サイト統計ダッシュボードの時間帯別・曜日別サイト活動集計を担当する
- * リポジトリクラス。
- *
- * `getHourly*`/`getWeekday*`の4つのprivateヘルパーはJST変換ロジックを
- * 共有する密結合したペアのため、同一ファイルにまとめている。
+ * サイト統計の時間帯別・曜日別活動集計。4つの private ヘルパーは JST 変換を共有する密結合のため同一ファイルにまとめる。
  */
 class SiteStatsActivityDistributionRepository {
   // getHourlyAllScoresとペアで時間帯別サイト活動を集計するため、直接参照を維持する（JST時間帯式を共有）。

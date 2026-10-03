@@ -21,9 +21,7 @@ interface FetchErrorStateProps {
 }
 
 /**
- * データ取得失敗時の表示を共通化したプレゼンテーションコンポーネント。
- * error.status(403/404)に応じてデフォルトの文言・アイコンを切り替え、
- * title/description/iconで各画面固有の文言に上書きできる。
+ * データ取得失敗時の表示を共通化する。error.status（403/404）に応じた既定の文言・アイコンを使い、title 等で上書きできる。
  */
 const FetchErrorState = ({
   error,

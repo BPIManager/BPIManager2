@@ -22,12 +22,8 @@ export interface ImportedGoalTarget {
 }
 
 /**
- * GET /users/[userId]/analytics/bpi-optimizer/import/[reportId]
- *
- * 他ユーザーが共有したreportIdの曲目(songId+目標EXスコア)を読み取り、
- * インポートする側(userId)から見た最新の曲データ(BPIカーブ係数等)で
- * 引き直して返す。共有元のreportDataに含まれるfromBpi等はインポート先の
- * プレイ状況とは無関係なため使わず、songIdとtoExScoreのみを引き継ぐ。
+ * 他ユーザーが共有した reportId の曲目（songId＋目標EXスコア）を、インポート先の視点で最新の曲データから引き直して返す。
+ * 共有元の fromBpi 等はインポート先のプレイ状況と無関係なため使わず、songId と toExScore のみ引き継ぐ。
  */
 export async function handleImportOptimizeMemo(
   req: NextApiRequest,

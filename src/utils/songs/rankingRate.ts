@@ -1,7 +1,5 @@
 /**
- * ランキング行の「EX / BPI」列に表示する値を算出する。
- * notes が渡された場合（BPI未計算の全難易度スコア用）は notes 基準の%表記、
- * それ以外は事前計算済みの bpi をそのまま表示する。
+ * ランキング行の「EX / BPI」列の表示値を算出する。notes が渡された場合（BPI 未計算の全難易度）は notes 基準の%、それ以外は事前計算済みの bpi を表示する。
  */
 export const formatRankingRate = (
   row: { exScore: number | null; bpi?: number | null },

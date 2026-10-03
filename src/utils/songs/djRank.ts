@@ -11,11 +11,8 @@ export const getRankIndex = (percentage: number): number => {
 };
 
 /**
- * DJランクの表示ラベルと差分を返す。境界の定義は `getRankDetail` に一本化しており、
- * 表示（`getDJRank`）と差分計算（`getRankDetail`）で値がずれないようにする。
- *
- * - `current`: 現在ランクからの超過分（例: `AAA+`）。MAX-帯は `MAX-` の超過分
- * - `next`: 次ランクまでの不足分（例: `D-`）。最上位帯は満点までの不足分
+ * DJランクの表示ラベルと差分を返す。境界定義は getRankDetail に一本化し、表示と差分の値がずれないようにする。
+ * current は現在ランクからの超過分、next は次ランクまでの不足分（最上位帯は満点までの不足分）。
  */
 export const getDJRank = (
   exScore: number,

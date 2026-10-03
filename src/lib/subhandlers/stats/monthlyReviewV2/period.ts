@@ -12,9 +12,8 @@ export interface ResolvedMonthlyReviewPeriod {
 }
 
 /**
- * "all"（バージョン全体）は、各クエリが既にversion列でも絞り込んでいることを
- * 利用し、バージョン発売より確実に前の固定日付〜当日を期間として渡すことで
- * 実現する。バージョンごとの稼働開始/終了日を新たに管理する仕組みは追加しない。
+ * "all"（バージョン全体）は、各クエリが version 列でも絞り込むことを利用し、発売より確実に前の固定日付〜当日を期間として渡す。
+ * バージョンごとの稼働開始・終了日は管理しない。
  */
 export function resolveMonthlyReviewPeriod(
   month: string,
@@ -45,9 +44,7 @@ export function resolveMonthlyReviewPeriod(
 }
 
 /**
- * 「全期間（月=all）」モードでの楽曲ハイライト「最も伸びた曲」の既定比較先バージョン
- * （＝1つ前のバージョン）を返す。`IIDX_VERSIONS`の並び順（26〜34, INF）上での
- * 直前の要素とする。先頭バージョン（比較対象が無い）の場合は`null`。
+ * 全期間モードの「最も伸びた曲」の既定比較先（IIDX_VERSIONS 上で1つ前のバージョン）を返す。先頭バージョンは比較対象が無いため null。
  */
 export function previousVersionOf(version: string): string | null {
   const idx = (IIDX_VERSIONS as readonly string[]).indexOf(version);

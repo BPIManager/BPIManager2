@@ -8,12 +8,8 @@ function isSameRoleSet(a: string[], b: string[]): boolean {
 }
 
 /**
- * メンバーのロールが変化したとき:
- * - Coffee/Saba/Sparkle を新たに取得（Ci-en が付与）→ 未リンクならリンク案内 DM を送る、リンク済みならロールを付与
- * - Coffee/Saba/Sparkle を全て失った（Ci-en メンバーシップ終了）→ 紐付けと userRoles を削除する
- * - ロール変更（coffee→saba 等）→ リンク済みなら userRoles を更新する
- *
- * ロールの付与・削除は Ci-en Bot が管理するため、本 Bot は行わない。
+ * ロール変化に応じて DM 案内・紐付け削除・userRoles 更新を行う。ロールの付与・削除自体は Ci-en Bot が管理するため本 Bot は行わない。
+ * Coffee/Saba/Sparkle を全て失った場合（Ci-en メンバーシップ終了）は紐付けと userRoles を削除する。
  */
 export async function handleGuildMemberUpdate(
   oldMember: GuildMember | PartialGuildMember,
@@ -55,9 +51,7 @@ export async function handleGuildMemberUpdate(
     return;
   }
 
-  // 両方 managed role を持っている場合: ロール変更（coffee→saba 等）
-  // managed role の集合が変わっていなければ、ニックネーム変更等の
-  // 無関係なイベント発火のため何もしない
+  // 両方に managed role がある場合は、ロールの集合が変わっていなければ（ニックネーム変更等の無関係なイベント）何もしない。
   if (
     hadManagedRole &&
     hasManagedRole &&

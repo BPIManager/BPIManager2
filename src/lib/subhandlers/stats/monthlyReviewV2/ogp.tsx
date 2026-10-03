@@ -301,11 +301,8 @@ export async function generateMonthlyReviewOgpImage(q: {
       arenaRank: r.arenaRank,
     }));
 
-  // バッジのdiffは「現在の総合BPI（画像上部に出ている実数値）− 前バージョンの
-  // baseline」。compareBpiTimeline.bpiEnd（compareVersion指定時は"純粋な伸び"に
-  // 差し替わる値）ではなく、常に表示中のbpiTimeline.bpiEndを基準にする。
-  // 比較先バージョンにスコアが1件も無い場合、baselineは「全曲未プレイ」扱いの
-  // 見かけ上のBPI（大きくマイナスになりうる）になり実態と乖離するため出さない
+  // バッジの diff は「現在の総合BPI − 前バージョンの baseline」で、常に表示中の bpiTimeline.bpiEnd を基準にする。
+   // 比較先にスコアが無い場合 baseline は全曲未プレイ扱いの見かけ上の値になるため、差分は出さない。
   const compareBadge =
     compareVersion && compareBpiTimeline && compareBpiTimeline.hasCompareData
       ? {
@@ -334,9 +331,7 @@ export async function generateMonthlyReviewOgpImage(q: {
 }
 
 /**
- * Twitter等でBPIM2自体を紹介するランディングページ用のサンプル画像。
- * 実データに紐づかない架空の値を使う（実在ユーザーの実データを恒久的な
- * マーケティング素材に使わないため）。
+ * BPIM2 紹介用のサンプル画像。実在ユーザーの実データを恒久的な素材に使わないため、架空の値を使う。
  */
 export async function generateSampleMonthlyReviewOgpImage(): Promise<Buffer> {
   return renderOgpImage({

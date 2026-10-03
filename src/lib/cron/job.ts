@@ -79,17 +79,8 @@ async function printArenaStatus() {
 }
 
 /**
- * サーバー起動時に呼び出す Cron ジョブのセットアップ関数。
- *
- * 以下のタスクを登録する:
- * - 毎日 02:00 UTC に `performDailyTask`（ユーザーサイトマップ生成）
- * - 毎日 04:00 UTC に `generateArenaJson`
- * - 毎日 16:00 UTC に `generateInfoJson`
- * - 毎日 UTC 16:30（JST 01:30）に `fetchOfficialArenaDistribution`
- * - 1 時間ごとに `updateAllUserRadarCache`
- * - 12 時間ごとに `updateAllSongRankingCache`
- * - アリーナ開催期間中は JST 07:00〜翌00:59（UTC 22:00〜15:59）の間、
- *   30 分ごとに `fetchOfficialArenaDistribution` を追加実行
+ * サーバー起動時にCronジョブを登録する。日次（サイトマップ・arena・info）、1時間ごと（レーダー）、12時間ごと（曲ランキング）等。
+ * アリーナ開催期間中（JST 07:00〜翌00:59）は公式アリーナ分布の取得を30分ごとに追加実行する。
  */
 export async function setupArenaService() {
   // 起動時バックグラウンドタスク

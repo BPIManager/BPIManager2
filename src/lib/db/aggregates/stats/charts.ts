@@ -162,9 +162,7 @@ class StatsChartsRepository {
         // bpi(exScore)は曲ごとに単調増加なので、同じグループ内でmax(bpi)と
         // max(exScore)は同一行に対応する
         eb.fn.max("s.exScore").as("exScore"),
-        // def.*はサブクエリ(派生テーブル)経由でsongIdに1:1のため実質集約不要だが、
-        // MySQLのONLY_FULL_GROUP_BYの関数従属性判定が派生テーブルには及ばないため
-        // max()で包んでおく
+        // def.* は派生テーブル経由で songId に1:1のため実質集約不要だが、ONLY_FULL_GROUP_BY の関数従属性判定は派生テーブルに及ばないため max() で包む。
         eb.fn.max("def.wrScore").as("wrScore"),
         eb.fn.max("def.kaidenAvg").as("kaidenAvg"),
         eb.fn.max("def.coef").as("coef"),

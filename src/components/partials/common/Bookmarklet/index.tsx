@@ -28,9 +28,8 @@ const BookmarkletAccordion = ({ lastStep }: BookmarkletAccordionProps = {}) => {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    // SSR時はnavigatorが無くサーバー/クライアントで結果が変わるため、
-    // hydration後にのみ判定してハイドレーションミスマッチを避ける
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+    // navigator は SSR で無いため、hydration 後にのみ判定してハイドレーションミスマッチを避ける。
+     // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsMobile(/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
   }, []);
 

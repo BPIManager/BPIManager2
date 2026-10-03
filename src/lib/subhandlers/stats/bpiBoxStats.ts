@@ -19,9 +19,7 @@ interface BoxStatsSong {
   exScore: number;
 }
 
-// mu/sigma(V2)を必要としないV1で統一する。top75/top25のような曲の部分
-// 集合に対してmu/sigma依存のシフト法(潜在スキル推定)を使うと、集合が
-// 偏っているほど推定が歪み、上位%総合が意図通りの値にならないため。
+// top75/top25 のような部分集合には mu/sigma 依存のシフト法を使わず V1 で統一する（偏った集合では潜在スキル推定が歪み、上位%の値が意図通りにならないため）。
 const legacyV1 = new BpiV1();
 
 /**
@@ -106,9 +104,7 @@ export async function handleStatsBpiBoxStats(
       const count = songs.length;
       const registeredNotes = songs.reduce((a, s) => a + s.notes, 0);
       const totalPhysicalNotes = groupedTower.get(date) || 0;
-      // 段位(iidxTower)データが同期されていない日はtotalPhysicalNotes=0になり、
-      // 「効率0%」と「未計測」を区別できなくなる。前者は実際に何も打鍵していない
-      // ことを意味してしまうため、未計測の場合はnullにしてグラフ上は欠測として扱う
+      // iidxTower が未同期の日は totalPhysicalNotes=0 になり「効率0%」と区別できない。未計測は null にしてグラフ上は欠測として扱う。
       const efficiency =
         totalPhysicalNotes > 0
           ? Math.min((registeredNotes / totalPhysicalNotes) * 100, 100)

@@ -12,13 +12,8 @@ type RecomputedBpiTimeline = {
 };
 
 /**
- * 本人分のBPI推移。radar-growth/activity/rivalsセクションでも使う値のため独立関数にする。
- * `scores.lastPlayed`基準のシフト法で算出する（`userStatusLogs.createdAt`は
- * インポート時刻であり実プレイ日と一致しないため使わない）。
- *
- * `compareVersion`指定時は、前バージョンのbaselineをシフト法のseedに混ぜると
- * ratchetで現バージョンの下降が消えるため、`bpiStart`と`bpiEnd`/`history`を
- * 独立して計算する。
+ * 本人のBPI推移。scores.lastPlayed 基準のシフト法で算出する（userStatusLogs.createdAt はインポート時刻のため使わない）。
+ * compareVersion 指定時は前バージョンの baseline を seed に混ぜると現バージョンの下降が ratchet で消えるため、bpiStart と bpiEnd/history を独立に計算する。
  */
 export async function computeOwnerBpiTimeline(
   owner: string,
@@ -50,9 +45,7 @@ export async function computeOwnerBpiTimeline(
     compareVersion
       ? monthlyBpiStateRepo.getVersionBpiStateForUsers([owner], compareVersion)
       : Promise.resolve(null),
-    // compareVersionの有無に関わらず、`version`自体の記録済み下限は常に取得する
-    // （compareVersionはbaseline取得元を切り替えるだけで、`version`側の
-    // ラチェット下限とは無関係）
+    // compareVersion の有無に関わらず version 自身の記録済み下限は取得する。compareVersion は baseline 取得元を切り替えるだけのため。
     userStatusLogsReadRepo.findMaxTotalBpiAsOf(owner, version, monthStartDate),
     userStatusLogsReadRepo.getTotalBpiLogsInRange(
       owner,
@@ -127,20 +120,15 @@ export async function computeOwnerBpiTimeline(
     ownerInMonthHistory,
     finalExScoreMap: seeded.finalExScoreMap,
     allL12SongMeta,
-    // compareVersion指定時、そのバージョンにユーザーのスコアが1件も無いと
-    // bpiStartは「全曲未プレイ」扱いの見かけ上のBPI（floor値、大きくマイナスになりうる）
-    // になり、bpiDiffが実態とかけ離れた値になる。呼び出し側で「比較不能」を
-    // 判定できるようフラグを返す
+    // compareVersion 指定時にそのバージョンのスコアが無いと bpiStart は全曲未プレイ扱いの見かけ上の値になり比較不能になる。
+     // 呼び出し側で比較不能を判定できるよう、フラグを返す。
     hasCompareData: !compareVersion || (compareVersionExScoreMap?.size ?? 0) > 0,
   };
 }
 
 /**
- * 複数ユーザー分の総合BPI推移をscores.lastPlayed基準のシフト法でまとめて再計算する。
- * ライバル戦線等、複数ユーザーを一括で扱う箇所から使う。
- *
- * `compareVersion`指定時、対象バージョンのスコアが無いユーザーは`bpiStart: null`
- * （比較不能。`bpiEnd`/`history`はそのバージョン内の推移として引き続き返す）。
+ * 複数ユーザー分の総合BPI推移を scores.lastPlayed 基準のシフト法でまとめて再計算する（ライバル戦線等で使う）。
+ * compareVersion 指定時、対象バージョンのスコアが無いユーザーは bpiStart を null（比較不能）にする。
  */
 export async function recomputeBpiTimelinesForUsers(
   userIds: string[],

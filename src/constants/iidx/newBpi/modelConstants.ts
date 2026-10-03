@@ -1,21 +1,6 @@
 /**
- * BPI V2（分布ベース再定義）のグローバルモデル定数。
- *
- * BPIM2-AutomatedDefinitionCalculatorのアリーナクロール結果とbpim2登録
- * ユーザーの実スコアを統合した母集団でALS推定した結果（生成日時
- * 2026-09-09、対象バージョン33、playerCount=5113人、
- * minSongsPerPlayer=10）から得た値をハードコードしている。
- *
- * z0はアリーナA帯(a1〜a5)在籍者の潜在能力a_iの中央値(全曲共通)。
- * zRef/z100Iqrはgamma補正用。residualRmseはALS残差の標準偏差(t単位)で
- * 潜在スキルa_iの縮小推定の事前分散との重み付けに使う。coefMedian
- * は per-song カーブ指数`coef`未収録曲のフォールバック。rankCurveは実
- * アリーナ順位×a_iの経験カーブ。arenaPopulationSizeはrankCurveの
- * パーセンタイルを絶対順位に変換する基準人数。
- *
- * 曲ごとのmu/sigma/residualVar/coefは本番同様`songDef`(DB)から読む
- * （`BpiCalculator.toChart`参照）。再生成する場合は
- * `scripts/generate-new-bpi-params.ts`の出力からここの値を更新する。
+ * BPI V2（分布ベース再定義）のグローバルモデル定数。アリーナクロールとユーザー実スコアを統合したALS推定値。
+ * 再生成は scripts/generate-new-bpi-params.ts の出力からこの値を更新する。
  */
 export const NEW_BPI_Z0 = -0.19383932671707751;
 export const NEW_BPI_Z100 = 6.516395340703802;

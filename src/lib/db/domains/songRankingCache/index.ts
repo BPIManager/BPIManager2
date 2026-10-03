@@ -12,11 +12,8 @@ export type NewSongRankingCache = Insertable<Database["songRankingCache"]>;
  */
 class SongRankingCacheRepository {
   /**
-   * 指定バージョンの楽曲別ランキング（各ユーザーの最新スコアに基づく曲ごとの順位・総プレイヤー数）を
-   * `allScores`の最新ログから全ユーザー分まとめて1回のクエリで算出する。
-   *
-   * `songRankingCache`はリクエストしたユーザーに依存しない全ユーザー共通のデータのため、
-   * ユーザーごとに都度算出するのではなく、ここで全ユーザー分を一括算出する。
+   * 指定バージョンの楽曲別ランキング（曲ごとの順位・総プレイヤー数）を、全ユーザー分まとめて1クエリで算出する。
+   * ユーザー非依存の共通データのため、リクエストごとではなくここで一括算出する。
    *
    * @param version - バージョン番号
    */

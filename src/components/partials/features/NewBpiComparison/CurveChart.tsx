@@ -58,12 +58,8 @@ interface CurveChartProps {
 }
 
 /**
- * 楽曲1曲について、現行方式・新方式それぞれの「目標BPIに必要なEXスコア」を
- * BPI10刻みで結んだ推移グラフ（横軸: EXスコア, 縦軸: BPI）。
- *
- * 現行・新方式の差はEXスコア換算だと数点程度しかない楽曲が多いため、
- * X軸(EXスコア)は0〜満点ではなく実際に描画する値の範囲に合わせて
- * 自動でズームする（そうしないと差が潰れて片方の線が隠れて見える）。
+ * 1曲について現行・新方式の「目標BPIに必要なEXスコア」をBPI10刻みで結ぶ推移グラフ。
+ * 差が数点程度のため X 軸は描画値の範囲に自動ズームし、片方の線が潰れないようにする。
  */
 export default function CurveChart({ data, userPoint }: CurveChartProps) {
   const { t } = useTranslation();

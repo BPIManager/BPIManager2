@@ -1,9 +1,5 @@
 /**
- * BPIオプティマイザ（BPI(V2)ネイティブ探索エンジン）固有の定数。
- * BPI計算式そのものの定数（z0/z100/coefMedian等）は含まない
- * （それらは`@/constants/iidx/newBpi/modelConstants`が持ち、`BpiCalculator`経由で使う）。
- * ここにあるのは「探索戦略・ヒューリスティクス」という製品判断の定数のみ。
- *
+ * BPIオプティマイザの探索戦略・ヒューリスティクスの定数。BPI計算式の定数（z0・coefMedian等）は modelConstants 側が持つ。
  * 参照: docs/proposals/bpi-optimizer-v2-rebuild.md
  */
 export const BpiOptimizerConstants = {
@@ -13,18 +9,13 @@ export const BpiOptimizerConstants = {
   MAX_BPI: 100,
 
   /**
-   * 曲の目標BPI（ceiling）を見積もる際、z値（潜在能力スケール）に足す上振れ幅
-   * （「モデルが説明しない伸びしろ」の唯一の裁量パラメータ、提案書§3.4）。
-   * 実測較正: `0.3`は小さな目標ギャップ(+3)すら未達成になるほど過小、`3.0`は
-   * 個々の曲にBPI=100(WR相当)という非現実的な目標を要求した。`1.2`が両立点。
+   * 曲の目標BPI（ceiling）を見積もる際にz値へ足す上振れ幅。モデルが説明しない伸びしろを表す唯一の裁量パラメータ（提案書§3.4）。
+   * 実測較正で 1.2 が両立点（0.3 は目標に届かず、3.0 は BPI=100 の非現実的な目標を要求した）。
    */
   GROWTH_MARGIN_Z: 1.2,
 
   /**
-   * カテゴリ別の得意・不得意バイアス`categoryBias_c`を採用してよいと判断する信頼度の下限。
-   * `w_c = info_c/(info_c+1)`（事後分散の補数）が`0.5`未満＝「そのカテゴリの推定の半分以上が
-   * 事前分布（＝カテゴリ差なし）由来」の場合はコールドとみなし、無理に推定しない
-   * （`ColdStartGuard`、提案書§3.7）。
+   * カテゴリ別バイアスを採用してよい信頼度の下限。w_c < 0.5 は事前分布由来が過半のためコールドとみなし推定しない（ColdStartGuard、提案書§3.7）。
    */
   CATEGORY_CONFIDENCE_THRESHOLD: 0.5,
 
@@ -35,9 +26,8 @@ export const BpiOptimizerConstants = {
   CANDIDATE_POOL_SIZE: 20,
 
   /**
-   * flexibleモードの候補選択で、効率が同点付近のときに「未プレイ曲」「現在の
-   * 総合BPI未満の曲」を優先するタイブレーク用倍率ボーナス（fastestでは使わない）。
-   * 主たる分散の仕組みは`candidateScorer.ts`のペース配分。
+   * flexible の候補選択で効率が同点付近のとき、未プレイ曲・現在の総合BPI未満の曲を優先するタイブレーク倍率（fastest では使わない）。
+   * 主たる分散は candidateScorer.ts のペース配分が担う。
    */
   /** 未プレイ曲への効率ランキングの倍率ボーナス（+50%）。 */
   DIVERSITY_UNPLAYED_BONUS: 0.5,
@@ -56,10 +46,7 @@ export const BpiOptimizerConstants = {
   ABSOLUTE_MAX_STEPS: 600,
 
   /**
-   * findOptimalBpiPathの既定リトライ回数。
-   * 厳密な総合BPI差分に基づく貪欲選択（`CandidateScorer`）を使うため、V1時代のような
-   * 「ノイズの多いヒューリスティクスを数十〜百回試して良い方を拾う」目的のリトライは不要になった。
-   * ここでのリトライは「毎回同じ経路にならない」多様性確保のみが目的なので少数で十分。
+   * findOptimalBpiPath の既定リトライ回数。貪欲選択は厳密な差分で行うため、リトライは経路の多様性確保のみが目的で少数で足りる。
    */
   DEFAULT_MAX_RETRIES: 3,
 

@@ -10,9 +10,7 @@ import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
 import { BpiCalculator } from "@/lib/bpi";
 
 /**
- * スコアインポート結果をトランザクション内で保存する。
- *
- * `scores`・`logs`・`userStatusLogs` の更新と、`allScores` の追記を一括で行う。
+ * スコアインポート結果を1トランザクションで保存する（scores・logs・userStatusLogs の更新と allScores の追記）。
  *
  * @param params.userId - ユーザー ID
  * @param params.version - バージョン番号
@@ -20,9 +18,7 @@ import { BpiCalculator } from "@/lib/bpi";
  * @param params.scoreUpdates - 保存する BPI スコアの配列
  * @param params.allScoreUpdates - 保存する全難易度スコアの配列
  * @param params.newTotalBpi - 今回算出した総合 BPI
- * @returns 実際に保存した総合BPI（`newTotalBpi`にラチェットを適用した後の値。
- *   呼び出し元の応答にはこちらを使う。`newTotalBpi`をそのまま返すと、
- *   ラチェットで下回りが吸収された場合に応答値と保存値がずれるため）
+ * @returns ラチェット適用後に実際に保存した総合BPI（応答にはこちらを使う。newTotalBpi と保存値がずれるため）
  */
 export async function saveImportResults(params: {
   userId: string;
@@ -102,9 +98,8 @@ async function executeSaveBpiSystem(
   // 書き込むものが無い場合も、応答値は保存されるはずだった値（ラチェット後）と一致させる
   if (params.scoreUpdates.length === 0) return totalBpi;
 
-  // 総合BPIは既知の最高値を下回らないようラチェットする（V2は未プレイ曲の
-  // 予測が新しい観測で下がりうるため、プレイ済み曲が1曲も下がっていなくても
-  // 総合BPI自体は下がりうる。src/lib/bpi/index.tsのratchetTotalBpi参照）。
+  // 総合BPIは既知の最高値を下回らないようラチェットする。V2 は未プレイ曲の予測が下がりうるため、プレイ済み曲が下がらなくても総合BPIは下がりうる。
+   // src/lib/bpi/index.ts の ratchetTotalBpi 参照。
 
   await logBatchRepo.insert(trx, {
     userId: params.userId,

@@ -8,10 +8,8 @@ export const DEFAULT_OGP_SECTIONS: [OgpSectionKey, OgpSectionKey] = [
 ];
 
 /**
- * OGP画像に載せる2項目の選択をURLクエリ（カンマ区切り）からパースする。
- * OGPはSNSクローラー向けのエンドポイントで、不正な入力で画像生成自体を
- * 落とすより既定の組み合わせにフォールバックする方が安全なため、
- * 不正/未指定時は常に`DEFAULT_OGP_SECTIONS`を返す（エラーを投げない）。
+ * OGP画像に載せる2項目をURLクエリ（カンマ区切り）からパースする。不正・未指定は既定の組み合わせにフォールバックし、エラーは投げない。
+ * SNSクローラーが叩くため、不正入力で画像生成自体を落とさないようにする。
  */
 export function parseOgpSections(
   raw: string | undefined,

@@ -12,10 +12,7 @@ export const RADAR_PAD_X = 52;
 export const RADAR_PAD_Y = 10;
 
 /**
- * 現時点の要素別BPI（成長ではなく最終状態）をレーダーチャート（多角形）として描画する。
- * satoriは`<svg>`配下の基本図形（polygon/circle/line）はサポートするが`<text>`は
- * 未対応（実機確認: "please convert them to <path>"）のため、ラベルはsvgの外側に
- * 絶対配置したdivとして重ねる
+ * 要素別BPI（最終状態）をレーダーチャート（多角形）として描画する。satori は svg 内の text 未対応のため、ラベルは外側に絶対配置した div で重ねる。
  */
 export function RadarPolygonChart({
   entries,
@@ -26,9 +23,7 @@ export function RadarPolygonChart({
 
   const n = entries.length;
   const center = RADAR_SIZE / 2;
-  // 固定値(-15)を床にすると、実際の値が近い場合にどの要素が得意か見えづらい
-  // （全点が外周付近に固まる）ため、実際の最小値の少し下を床にして、要素間の
-  // 凹凸が視覚的に強調されるようにスケールする
+  // 固定の床（-15）だと全点が外周に固まり得意要素が見えにくいため、実際の最小値の少し下を床にして凹凸を強調する。
   const values = entries.map((e) => e.bpiEnd);
   const minVal = Math.min(...values);
   const maxVal = Math.max(...values);

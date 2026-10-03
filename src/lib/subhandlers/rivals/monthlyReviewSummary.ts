@@ -68,9 +68,8 @@ export async function handleRivalMonthlyReviewSummary(
     }
     const rivalIds = rivalRows.map((r) => r.userId);
 
-    // 総合BPIはscores.lastPlayed（実プレイ日）基準のシフト法で算出する
-    // （computeOwnerBpiTimelineと同じ設計。userStatusLogs.createdAtはスコアの
-    // 取り込み時刻でしかなく実プレイ日と一致しないため使わない）
+    // 総合BPIは scores.lastPlayed（実プレイ日）基準のシフト法で算出する（computeOwnerBpiTimeline と同じ設計）。
+     // userStatusLogs.createdAt は取り込み時刻のため使わない。
     const recomputedByUser = await recomputeBpiTimelinesForUsers(
       rivalIds,
       version as string,

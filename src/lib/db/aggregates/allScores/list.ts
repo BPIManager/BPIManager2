@@ -9,19 +9,16 @@ import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore/perSong"
  */
 class AllScoresListRepository {
   /**
-   * 全難易度の楽曲一覧を、ユーザーの最新スコアと結合して取得する。
-   *
-   * 検索・レベル・難易度・クリア状態でフィルタリングでき、
-   * `sortKey` と `sortOrder` によるソートに対応する。
+   * 全難易度の楽曲一覧をユーザーの最新スコアと結合して取得する。検索・レベル・難易度・クリア状態で絞り込み、sortKey と sortOrder でソートする。
    *
    * @param userId - ユーザー ID
    * @param params.search - タイトルの部分一致検索文字列
-   * @param params.levels - カンマ区切りの難易度レベル番号（例: `"11,12"`）
-   * @param params.difficulties - カンマ区切りの難易度文字列（例: `"ANOTHER,HYPER"`）
-   * @param params.clearStates - カンマ区切りのクリア種別（例: `"CLEAR,HARD CLEAR"`）
-   * @param params.sortKey - ソートキー（`"level"` | `"title"` | `"exScore"` | `"updatedAt"` | `"clearState"`）
-   * @param params.sortOrder - ソート方向（`"asc"` | `"desc"`）
-   * @param params.version - 対象バージョン（省略時はバージョン絞り込みなし＝全バージョン中の最新スコア）
+   * @param params.levels - カンマ区切りの難易度レベル（例: 11,12）
+   * @param params.difficulties - カンマ区切りの難易度文字列（例: ANOTHER,HYPER）
+   * @param params.clearStates - カンマ区切りのクリア種別（例: CLEAR,HARD CLEAR）
+   * @param params.sortKey - ソートキー（level | title | exScore | updatedAt | clearState）
+   * @param params.sortOrder - ソート方向（asc | desc）
+   * @param params.version - 対象バージョン（省略時は全バージョン中の最新スコア）
    * @returns スコア情報付きの楽曲リスト
    */
   async getAllScoresList(
@@ -138,9 +135,7 @@ class AllScoresListRepository {
       bpm: r.bpm ?? null,
       difficulty: r.difficulty as AllDifficulties,
       difficultyLevel: r.difficultyLevel,
-      // allSongs.releasedVersionはDB上varchar(3)（songs側はint）のため、
-      // フロントの「楽曲バージョン」フィルタ(数値配列との完全一致)に
-      // 合わせて明示的にNumberへキャストする
+      // allSongs.releasedVersion は DB 上 varchar のため、フロントの数値配列との完全一致フィルタに合わせて Number へキャストする。
       releasedVersion: r.releasedVersion ? Number(r.releasedVersion) : null,
       logId: r.logId ?? null,
       exScore: r.exScore ?? null,

@@ -4,10 +4,7 @@ import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { authFetch } from "@/utils/common/fetch";
 
 /**
- * 任意のフォロワーを強制的にフォロー解除するフック。
- *
- * 恒久的なブロックではないため、相手は招待URLがあれば再度リクエストを
- * 送信できる。
+ * 任意のフォロワーを強制的にフォロー解除する。恒久的なブロックではないため、相手は招待URLで再度リクエストできる。
  *
  * @param followerId - 解除対象のフォロワーのユーザー ID
  */

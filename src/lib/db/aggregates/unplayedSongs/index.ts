@@ -1,11 +1,8 @@
 import { db } from "@/lib/db";
 
 /**
- * `songs`・`songDef`・`scores`を横断し、指定ユーザーがまだプレイしていない楽曲を
- * 曲定義（WRスコア・皆伝平均・補正係数）付きで取得するリポジトリクラス。
- *
- * `domains/songs`・`domains/scores`いずれの単一責務にも収まらないクロスドメイン
- * 参照のため、`aggregates/`に配置する。
+ * 指定ユーザーが未プレイの楽曲を、曲定義（WRスコア・皆伝平均・補正係数）付きで songs/songDef/scores を横断して取得する。
+ * 単一ドメインに収まらないため aggregates に置く。
  */
 class UnplayedSongsAggregateRepository {
   /**

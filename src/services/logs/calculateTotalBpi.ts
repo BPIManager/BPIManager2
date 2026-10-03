@@ -59,15 +59,8 @@ export const calculateTotalBpi = (
       ? dayjs(score.playDay || score.lastPlayed).format("YYYY-MM-DD")
       : fallbackDayKey;
 
-  // ステップは(日付, batchId)の組で区切る。executeSaveBpiSystemはバッチ単位で
-  // ratchetするため、同日内に複数バッチがあれば都度ratchetが効く(=同日内の
-  // ピークを取りこぼさない)。一方、1バッチ内の各曲のlastPlayedは実際の
-  // プレイ時刻でバラバラ(かつ複数日にまたがることもある。例えば初回に
-  // 過去の全スコアを1回のCSVで一括インポートするケース)なので、同一バッチ
-  // ×同一日の更新はまとめて1ステップとして扱い、バッチ完了前の実在しな
-  // かった中間状態を偽のピークとしてratchetしないようにする。逆に同一バッチ
-  // が複数日にまたがる場合は日ごとに分けることで、一括インポートされた
-  // 過去の推移も(実際にプレイされた日付ベースで)再現できるようにする
+  // ステップは（日付, batchId）の組で区切る。executeSaveBpiSystem はバッチ単位で ratchet するため、
+   // 同一バッチ×同一日をまとめて1ステップにし、バッチ完了前の中間状態を偽のピークにしない。
   const stepGroups = new Map<string, ScoreEntry[]>();
   allScores.forEach((score, index) => {
     const dayKey = dayKeyOf(score);
@@ -77,9 +70,7 @@ export const calculateTotalBpi = (
     stepGroups.get(stepKey)!.push(score);
   });
 
-  // ステップの処理順は、日付を主キー(昇順)、同日内はバッチの書き込み順
-  // (logId最小値昇順)を副キーにする。groupedBy=lastPlayedは実プレイ日付
-  // ベースの推移表示のため、日付を優先して並べる
+  // ステップは日付（昇順）を主キー、同日内はバッチの書き込み順（logId 最小値昇順）を副キーにする。実プレイ日付ベースの推移表示のため。
   const stepEntries = Array.from(stepGroups.values()).map((scores) => ({
     dayKey: dayKeyOf(scores[0]),
     minLogId: Math.min(
@@ -91,10 +82,8 @@ export const calculateTotalBpi = (
     (a, b) => a.dayKey.localeCompare(b.dayKey) || a.minLogId - b.minLogId,
   );
 
-  // 総合BPIは既知の最高値を下回らないようラチェットする（他の総合BPI算出箇所と
-  // 同じ理由。src/lib/bpi/index.tsのratchetTotalBpi参照）。この関数はDBの
-  // userStatusLogsを経由せず生スコアから再計算するため、ループ内の running max
-  // を基準にする
+  // 総合BPIは既知の最高値を下回らないようラチェットする（running max を基準にする）。
+   // DBの userStatusLogs を経由せず生スコアから再計算するため。src/lib/bpi/index.ts の ratchetTotalBpi 参照。
   let bestTotalBpiSoFar: number | null = null;
   const dayTotalBpi = new Map<string, number>();
   const dayScoresMap = new Map<string, ScoreEntry[]>();

@@ -5,14 +5,12 @@ import { db } from "@/lib/db";
  */
 class ScoreHistoryRepository {
   /**
-   * 指定範囲の前後に存在する`lastPlayed`基準のスコアレコードを取得する
-   * （日付ナビゲーション用。`logs`ドメインの`getRangeNavigation`から
-   * `groupedBy === "lastPlayed"`の場合に委譲される）。
+   * 指定範囲の前後にある lastPlayed 基準のスコアレコードを取得する（日付ナビゲーション用）。logs の getRangeNavigation から委譲される。
    *
    * @param userId - ユーザー ID
    * @param version - バージョン番号
    * @param range - ナビゲーション基準となる UTC 範囲
-   * @returns `{ prevDate, nextDate }`（前後のレコード）
+   * @returns { prevDate, nextDate }（前後のレコード）
    */
   async getLastPlayedNavigation(
     userId: string,

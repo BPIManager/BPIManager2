@@ -12,16 +12,13 @@ import { getSongRankingFromTable } from "@/lib/db/aggregates/songRanking";
  */
 class AllScoresSelfRivalRepository {
   /**
-   * 全難易度楽曲について、`currentVersion`時点のスコアと`targetVersion`時点の
-   * スコアを比較する。`/my/[version]`の`getSelfVersionScores`
-   * （`songs`/`scores`テーブル対象）と同一の相関サブクエリパターンを
-   * `allSongs`/`allScores`テーブル向けに適用する。
-   * ☆10以下含む全曲がBPI算出対象外のため、BPI差分は扱わずexScore差分のみ返す。
+   * 全難易度楽曲について currentVersion 時点と targetVersion 時点のスコアを比較する。getSelfVersionScores と同じ相関パターンを allSongs/allScores に適用する。
+   * ☆10以下を含め全曲BPI算出対象外のため、BPI差分ではなく exScore 差分のみ返す。
    *
    * @param params.userId - 対象ユーザーID
    * @param params.currentVersion - 表示中バージョン
    * @param params.targetVersion - 比較対象バージョン
-   * @returns `currentVersion`時点・`targetVersion`時点のスコアを併記した楽曲リスト
+   * @returns currentVersion・targetVersion 時点のスコアを併記した楽曲リスト
    */
   async getSelfVersionScores(params: {
     userId: string;
@@ -125,10 +122,8 @@ class AllScoresSelfRivalRepository {
   /**
    * 指定楽曲におけるフォロー中ユーザーの最新スコアリストを取得（allScores テーブル使用）
    */
-  // 呼び出し元(all-scores/[songId]/rivals.ts)は`viewerId`にURLの[userId]
-  // (第三者が閲覧している可能性のある対象ユーザー)をそのまま渡すため、
-  // 「followsの存在=閲覧者本人への閲覧許可」の前提が成立しない。
-  // isPublicによる絞り込みを維持する
+  // viewerId に第三者閲覧の対象（URLの userId）が入りうるため、follows の存在を閲覧許可とみなせない。
+   // isPublic による絞り込みを維持する。
 
   async getRivalScoresForAllSong(params: {
     viewerId: string;

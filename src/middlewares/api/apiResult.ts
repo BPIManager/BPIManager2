@@ -7,9 +7,7 @@ import type {
 import type { AccessResult } from "./withApi";
 
 /**
- * API v2 移行の基盤ユーティリティ。
- * ハンドラは `HandlerResult` を返し、ここの `writeV1Result` / `writeV2Result` が
- * 実際に `res` へ書き込む。詳細は docs/decisions/0009-api-v2-common-envelope.md。
+ * API v2 移行の基盤。ハンドラは HandlerResult を返し、writeV1Result / writeV2Result が res へ書き込む（docs/decisions/0009-api-v2-common-envelope.md）。
  */
 
 /** 成功結果を組み立てる */
@@ -26,10 +24,8 @@ export function err(status: number, message: string): HandlerResult<never> {
 }
 
 /**
- * meta の共通欄（viewerId / isSelf）を組み立てる。
- * `viewerId` は認証済み閲覧者の uid、未ログインは null を渡す。
- * `isSelf` は viewerId が閲覧対象 userId と一致するかで決まる。
- * `extra` で pagination 等を合成できる。
+ * meta の共通欄（viewerId・isSelf）を組み立てる。isSelf は viewerId が対象 userId と一致するかで決まる。
+ * extra で pagination 等を合成できる。未ログインの viewerId は null。
  */
 export function buildMeta(
   viewerId: string | null,
@@ -44,10 +40,8 @@ export function buildMeta(
 }
 
 /**
- * `checkUserAccess` / `checkProfileAccess` の `AccessResult` を `HandlerResult`
- * のエラーへ変換する。アクセス許可時は `null` を返す。
- * `const denied = accessError(access); if (denied) return { result: denied, ... };`
- * のように使う。
+ * checkUserAccess / checkProfileAccess の AccessResult を HandlerResult のエラーへ変換する（許可時は null）。
+ * `const denied = accessError(access); if (denied) return { result: denied, ... };` の形で使う。
  */
 export function accessError(
   access: AccessResult,
@@ -60,9 +54,7 @@ export function accessError(
 }
 
 /**
- * 成功結果に meta を合成する。エラー結果はそのまま返す。
- * v1 アダプタは meta を無視するため、v2 ルート側で
- * `writeV2Result(res, withMeta(result, buildMeta(...)))` のように使う。
+ * 成功結果に meta を合成する（エラー結果はそのまま返す）。v1 アダプタは meta を無視するため、v2 ルートで writeV2Result と組み合わせて使う。
  */
 export function withMeta<T>(
   result: HandlerResult<T>,
@@ -83,10 +75,8 @@ function toEnvelopeMeta(meta: Partial<ApiMeta>): ApiMeta {
 }
 
 /**
- * `HandlerResult` を現行 v1 形式で `res` に書き込む薄いアダプタ。
- * 成功時は body をそのまま `json()` に渡し、既存エンドポイントの生形状
- * （配列 / 単発オブジェクト等）をそのまま維持する。`transform` を渡すと
- * 成功 body を整形してから書き込む。エラー時は `{ message }` を返す。
+ * HandlerResult を v1 形式で res に書く薄いアダプタ。成功時は body をそのまま json() に渡し、既存の生形状を維持する。
+ * transform を渡すと成功 body を整形してから書く。エラー時は { message } を返す。
  */
 export function writeV1Result<T>(
   res: NextApiResponse,
@@ -104,9 +94,7 @@ export function writeV1Result<T>(
 }
 
 /**
- * `HandlerResult` を v2 共通エンベロープ形式で `res` に書き込むアダプタ。
- * HTTP ステータスコード（4xx/5xx）は従来通り維持しつつ、body 側にも
- * `error` / `errorMessage` を持たせる。
+ * HandlerResult を v2 共通エンベロープで res に書き込む。HTTP ステータスは維持しつつ、body にも error / errorMessage を持たせる。
  */
 export function writeV2Result<T>(
   res: NextApiResponse,

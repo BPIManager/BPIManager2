@@ -20,14 +20,10 @@ export interface SongRankingResult {
 }
 
 /**
- * 指定楽曲における全ユーザーの最新スコアランキングを取得する。
+ * 指定楽曲の全ユーザー最新スコアランキング。scores と allScores で実装がほぼ同一だったため共通化した。
+ * 非公開ユーザーは anon-{index} に匿名化してマスクする。
  *
- * `statsRepo.getSongRanking`（`scores`テーブル）と
- * `allScoresSelfRivalRepo.getAllSongRanking`（`allScores`テーブル）はテーブル名以外
- * ほぼ同一実装だったため、こちらに共通化している。
- * 非公開ユーザーは `anon-{index}` に匿名化してマスクする。
- *
- * @param params.table - 対象テーブル（`scores` | `allScores`）
+ * @param params.table - 対象テーブル（scores | allScores）
  * @param params.songId - 楽曲 ID
  * @param params.version - バージョン番号
  * @param params.viewerId - 閲覧者のユーザー ID（自分自身の判定に使用）

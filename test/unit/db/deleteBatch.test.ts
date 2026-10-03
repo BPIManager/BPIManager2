@@ -19,7 +19,7 @@ const { createTrxSpy, dbMock } = vi.hoisted(() => {
         };
         return builder;
       },
-      // #448: deleteBatchが削除直前に行ロック付きで最新バッチを再判定するための
+      // deleteBatchが削除直前に行ロック付きで最新バッチを再判定するための
       // selectFromチェーン。テストでは常に`latestBatchRow`をそのまま返す
       selectFrom: () => {
         const builder = {

@@ -20,9 +20,7 @@ import {
 } from "@/hooks/analytics/useTargetSelector";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 
-// ---------------------------------------------------------------------------
-// KindCard — target-type selection button
-// ---------------------------------------------------------------------------
+// KindCard: 目標種別を選ぶボタン
 
 interface KindCardProps {
   icon: React.ElementType;
@@ -71,9 +69,7 @@ export const KindCard = ({
   </button>
 );
 
-// ---------------------------------------------------------------------------
-// KindStep — full list of target-type cards
-// ---------------------------------------------------------------------------
+// KindStep: 目標種別カードの一覧
 
 export const KindStep = ({
   kindOptions,
@@ -98,9 +94,7 @@ export const KindStep = ({
   </>
 );
 
-// ---------------------------------------------------------------------------
-// RivalPickStep — rival search list
-// ---------------------------------------------------------------------------
+// RivalPickStep: ライバル検索の一覧
 
 export const RivalPickStep = ({
   onSelect,
@@ -192,9 +186,7 @@ export const RivalPickStep = ({
   );
 };
 
-// ---------------------------------------------------------------------------
-// ArenaRankStep — arena rank picker
-// ---------------------------------------------------------------------------
+// ArenaRankStep: アリーナランクの選択
 
 export const ArenaRankStep = ({
   selected,
@@ -222,9 +214,7 @@ export const ArenaRankStep = ({
   </div>
 );
 
-// ---------------------------------------------------------------------------
-// SelfVersionPickStep — past-version picker
-// ---------------------------------------------------------------------------
+// SelfVersionPickStep: 過去バージョンの選択
 
 export const SelfVersionPickStep = ({
   selected,

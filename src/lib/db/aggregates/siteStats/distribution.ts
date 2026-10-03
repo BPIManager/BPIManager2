@@ -129,9 +129,7 @@ class SiteStatsDistributionRepository {
   }
 
   /**
-   * バージョンごとの総合BPIレンジ別（5刻み、-15〜100の23バケット）ユーザー数分布。
-   * `navigationRepo`（`logs`）が持つ、ダッシュボード等でも使う「現在の総合BPI」の
-   * 正本を使う。
+   * バージョンごとの総合BPIレンジ別（5刻み・-15〜100の23バケット）のユーザー数分布。ダッシュボードと同じ正本（logs の現在の総合BPI）を使う。
    */
   async getTotalBpiHistogramByVersion() {
     const rows = await logTotalBpiRepo.getLatestTotalBpiPerUserAllVersions();

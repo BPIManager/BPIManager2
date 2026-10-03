@@ -7,13 +7,8 @@ import { NotificationOvertakenRow } from "@/types/users/notifications";
 import { sql } from "kysely";
 
 /**
- * フォロー中ユーザーに「追い抜かれた」スコアを検出する3-way self join
- * （`s2`: 追い抜いたスコア, `r`: 追い抜かれた側の直前のスコア,
- * `prevRival`: 追い抜いた側のさらに前のスコア）の共通部分を組み立てる。
- *
- * `getUnreadCount`/`getNotifications`双方が同じ検出ロジックを必要とするため
- * 共通部分を関数化している。呼び出し側は必要な`.select()`/
- * 追加の`.where()`/`.innerJoin()`を続けて使う。
+ * 「追い抜かれた」スコアを検出する3-way self join（s2: 追い抜いたスコア, r: 追い抜かれた側の直前, prevRival: 追い抜いた側の更に前）の共通部分。
+ * getUnreadCount と getNotifications が同じ検出ロジックを使うため関数化している。
  */
 function overtakenScoresBaseQuery(params: {
   userId: string;
@@ -21,9 +16,7 @@ function overtakenScoresBaseQuery(params: {
 }) {
   const { userId, latestVersion } = params;
 
-  // followsを起点に結合順序をstraight_joinで固定する。s2(scores)起点だと
-  // フォロー中でない大多数のユーザー分まで走査する非効率な実行計画になりうるため
-  // (getOvertakenRivals: commit adef304と同型の問題)。
+  // follows を起点に straight_join で結合順序を固定する。scores 起点だとフォロー外の大多数まで走査するため（getOvertakenRivals と同型）。
   return db
     .selectFrom("follows as f")
     .modifyFront(sql`straight_join`)
@@ -62,9 +55,7 @@ function overtakenScoresBaseQuery(params: {
         ),
     )
     .where("f.followerId", "=", userId)
-    // フォロー対象が公開、または対象が非公開でも承認記録がある場合のみ通知する。
-    // followsの存在だけでは判定できない(公開時代に成立したfollowsには
-    // 承認記録がないため、承認記録の有無も要求する)。
+    // 公開、または非公開でも承認記録がある場合のみ通知する。follows の存在だけでは公開時代の行を判別できないため。
     .where((eb) =>
       eb.or([
         eb("fu.isPublic", "=", 1),
@@ -87,22 +78,16 @@ function overtakenScoresBaseQuery(params: {
 }
 
 /**
- * フォロー通知・追い抜き通知（`follows`/`scores`/`users`/`songs`を横断する
- * 複合ビュー）の集計・一覧取得を担当するリポジトリクラス。
- *
- * `notifications`テーブル自体の読み書きは`domains/notifications`が担う。
+ * フォロー通知・追い抜き通知の集計・一覧取得（follows/scores/users/songs を横断）。notifications 自体の読み書きは domains/notifications が担う。
  */
 class NotificationsAggregateRepository {
   /**
-   * 未読通知数（フォロー通知 + 追い抜き通知 + 承認通知 + 保留中フォローリクエスト）を取得する。
-   *
-   * `notifications` テーブルの `lastReadAt` を基準に、それ以降の件数を集計する。
-   * 保留中フォローリクエストは「既読/未読」ではなく対応が必要な件数のため、
-   * 対応（承認/却下）されるまで常にカウントに含める。
+   * 未読通知数（フォロー・追い抜き・承認通知と保留中フォローリクエスト）の合計を取得する。
+   * 通知は notifications.lastReadAt 以降を数え、保留中リクエストは対応されるまで常に含める。
    *
    * @param userId - ユーザー ID
    * @param latestVersion - 追い抜き通知の対象バージョン
-   * @returns `{ total }` 未読件数の合計
+   * @returns { total } 未読件数の合計
    */
   async getUnreadCount(userId: string, latestVersion: string) {
     const lastRead = (await notificationsRepo.getLastReadAt(userId)) || new Date(0);

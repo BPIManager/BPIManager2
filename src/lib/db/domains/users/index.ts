@@ -3,11 +3,7 @@ import { sql, Expression, Transaction } from "kysely";
 import { Database } from "@/types/db";
 
 /**
- * `users` テーブル自体の参照・作成・更新を担当するリポジトリクラス。
- *
- * 他ドメインを横断してユーザー向けの複合ビューを組み立てる処理
- * （おすすめユーザー一覧・検索・ランキング・プロフィール取得等）は
- * `db/aggregates/userProfiles/` に切り出している。
+ * users テーブルの参照・作成・更新。他ドメインを横断する複合ビュー（おすすめ・検索・ランキング等）は aggregates/userProfiles に置く。
  */
 class UsersRepository {
   /**
@@ -25,11 +21,8 @@ class UsersRepository {
   }
 
   /**
-   * ユーザープロフィールを作成または更新する（UPSERT）。
-   *
-   * ユーザー名の重複チェックを行った上で `users` テーブルを UPSERT する。
-   * `userStatusLogs` への追加書き込みを含む複数ドメインへのトランザクション
-   * 制御は呼び出し元（`orchestrators/userProfileUpsert`）の責務とする。
+   * ユーザープロフィールを UPSERT する。ユーザー名の重複チェックを含む。
+   * userStatusLogs への書き込みを含む複数ドメインのトランザクション制御は orchestrators/userProfileUpsert の責務。
    *
    * @param trx - 呼び出し元が管理するトランザクション
    * @param params.userId - ユーザー ID
@@ -37,8 +30,8 @@ class UsersRepository {
    * @param params.iidxId - IIDX プレイヤー ID
    * @param params.profileText - プロフィールテキスト
    * @param params.profileImage - プロフィール画像 URL
-   * @param params.isPublic - 公開設定（`1`: 公開、`0`: 非公開）
-   * @throws ユーザー名が重複する場合は `status: 409` を持つエラー
+   * @param params.isPublic - 公開設定（1: 公開、0: 非公開）
+   * @throws ユーザー名が重複する場合は status: 409 を持つエラー
    */
   async upsertUserProfile(
     trx: Transaction<Database>,

@@ -2,10 +2,8 @@ import { mutate as globalMutate } from "swr";
 import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 
 /**
- * ダッシュボードのランキングカード(近傍おすすめ・僅差ライバル)のSWR
- * キャッシュをまとめて再検証する。両者は別々のエンドポイント・SWRキーで
- * 管理されているため、手動EXスコア保存後にどちらの一覧も更新されるよう
- * ここで一括再検証する(`invalidateFollowListsCache`と同じ方式)。
+ * ダッシュボードのランキングカード（近傍おすすめ・僅差ライバル）の SWR キャッシュをまとめて再検証する。
+ * 手動スコア保存後に両方が更新されるよう、invalidateFollowListsCache と同じ方式で一括再検証する。
  *
  * @param userId - 対象ユーザー ID
  */

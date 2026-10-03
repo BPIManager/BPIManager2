@@ -13,12 +13,8 @@ const isValidPeriod = (value: string) =>
   value === "all" || /^\d{4}$/.test(value) || /^\d{4}-\d{2}$/.test(value);
 
 /**
- * userIdを含まない告知用の汎用URL（/monthly-review/share）の実体。
- * ログイン中セッションからuserIdを読み取り、本人の対象期間のまとめページへ
- * 自動遷移する。サーバーサイドセッション読み取り機構が本リポジトリに無い
- * ため、クライアントコンポーネントとして実装する。
- * `version`・`month`（`range`はエイリアス）をクエリで受け取れば遷移先に
- * 反映し、指定が無ければ最新バージョン・先月をデフォルトにする。
+ * userId を含まない告知用URL（/monthly-review/share）の実体。ログイン中セッションの本人のまとめページへ自動遷移する。
+ * version・month（range はエイリアス）のクエリがあればそれを遷移先に反映し、無ければ最新バージョン・先月を既定とする。
  */
 const MonthlyReviewShare = () => {
   const router = useRouter();

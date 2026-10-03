@@ -10,13 +10,8 @@ dayjs.extend(utc);
  */
 class SocialTimelineRepository {
   /**
-   * フォロー中ユーザーのスコア更新フィードを取得する。
-   *
-   * `mode` で絞り込みができる:
-   * - `"played"`: 自分もプレイしている楽曲のみ
-   * - `"overtaken"`: 自分のベストを超えているスコアのみ
-   *
-   * カーソルページネーション（`lastId` = lastPlayed の ISO 文字列）に対応する。
+   * フォロー中ユーザーのスコア更新フィード。mode で played（自分もプレイ済み）/ overtaken（自分のベストを超えた）を絞り込む。
+   * カーソルは lastPlayed の ISO 文字列。listId 指定時は所有者確認済みのフォローリスト所属ユーザーに絞る。
    *
    * @param params.viewerId - 閲覧者のユーザー ID
    * @param params.version - バージョン番号
@@ -26,8 +21,7 @@ class SocialTimelineRepository {
    * @param params.search - ユーザー名または曲名の部分一致検索
    * @param params.levels - 対象難易度レベルの配列
    * @param params.difficulties - 対象難易度文字列の配列
-   * @param params.listId - 指定時、`viewerId`が所有するこのフォローリストの
-   *   所属ユーザーだけに絞り込む（呼び出し元で所有権を確認済みであること）
+   * @param params.listId - 指定時、viewerId が所有するこのフォローリストの所属ユーザーに絞る
    */
   async getFollowedTimeline(params: {
     viewerId: string;
@@ -52,18 +46,10 @@ class SocialTimelineRepository {
       listId,
     } = params;
 
-    // 2フェーズで取得する。
-    // Phase 1: 表示対象の logId を lastPlayed 降順で limit 件だけ確定する。
-    // Phase 2: 確定した logId に対してのみ全カラム・相関サブクエリを算出する。
-    // 単一クエリだと SELECT 句の相関サブクエリ(prevExScore/prevBpi/myBestExScore)が
-    // JOIN のファンアウト(フォロー中ユーザー × バージョン内全スコア、数万行規模)の
-    // 全行に対して評価され、極端に遅くなるため分割している。
-    // lastPlayed は分単位で同値が頻出するため、決定的な結果を返すよう
-    // 両フェーズとも (lastPlayed DESC, logId DESC) で整列する。
+    // Phase 1 で表示対象の logId を lastPlayed 降順に limit 件確定し、Phase 2 でそれだけ相関サブクエリを評価する。
+     // 単一クエリだと JOIN のファンアウト全行に相関サブクエリが走り極端に遅いため分割する。両フェーズとも同値タイブレークを入れる。
 
-    // followsを起点に結合順序をstraight_joinで固定する。scores起点だと
-    // フォロー中でない大多数のユーザー分まで走査する非効率な実行計画になりうるため
-    // (getOvertakenRivals: commit adef304と同型の問題)。
+    // follows を起点に straight_join で結合順序を固定する。scores 起点だとフォロー外の大多数まで走査するため（getOvertakenRivals と同型）。
     const needsSongJoin =
       !!search || !!levels?.length || !!difficulties?.length;
 
@@ -76,9 +62,7 @@ class SocialTimelineRepository {
       .innerJoin("users as u", "s.userId", "u.userId")
       .select(["s.logId", "s.lastPlayed"])
       .where("f.followerId", "=", viewerId)
-      // 対象が公開、または対象が非公開でも承認記録がある場合のみ表示する。
-      // followsの存在だけでは判定できない(公開時代に成立したfollowsには
-      // 承認記録がないため、承認記録の有無も要求する)
+      // 公開、または非公開でも承認記録がある場合のみ表示する。follows の存在だけでは公開時代の行を判別できないため。
       .where((eb) =>
         eb.or([
           eb("u.isPublic", "=", 1),

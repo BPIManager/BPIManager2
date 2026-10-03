@@ -8,15 +8,12 @@ import { sql } from "kysely";
  */
 class RivalOvertakenRepository {
   /**
-   * 指定バッチまたは期間内に追い抜いたライバルとその楽曲を取得する。
-   *
-   * 「追い抜き」とは、今回のスコアがライバルの直前スコアを上回り、
-   * かつ自分の直前スコアはライバルを下回っていた楽曲を指す。
+   * 指定バッチまたは期間内に追い抜いたライバルとその楽曲を取得する。追い抜きは、今回のスコアがライバルの直前を上回り、自分の直前は下回っていた場合。
    *
    * @param userId - ユーザー ID
    * @param version - バージョン番号
-   * @param options.range - 期間指定（`start`, `end`, 基準列 `basis`）
-   * @param options.batchId - バッチ ID（`range` と排他）
+   * @param options.range - 期間指定（start, end, 基準列 basis）
+   * @param options.batchId - バッチ ID（range と排他）
    */
   async getOvertakenRivals(
     userId: string,
@@ -30,9 +27,7 @@ class RivalOvertakenRepository {
 
     const timeCol = range?.basis ?? "lastPlayed";
 
-    // `batchId`/`range`で絞り込んだ範囲内で、閲覧中バージョンにおける曲ごとの
-    // 最良スコア（同点なら最新のログ）1件に集約する。集約しないと、範囲内で
-    // 同じ曲を複数回更新した場合に更新イベントの数だけ比較行が重複してしまう
+    // 範囲内で同じ曲を複数回更新した場合に比較行が重複しないよう、曲ごとの最良スコア（同点なら最新）1件に集約する。
     let scopedCurrent = db
       .selectFrom("scores")
       .select(["songId", "exScore", "logId"])
@@ -110,9 +105,7 @@ class RivalOvertakenRepository {
       ])
       .where("current.userId", "=", userId)
       .where("current.version", "=", version)
-      // 対象が公開、または対象が非公開でも承認記録がある場合のみ表示する。
-      // followsの存在だけでは判定できない(公開時代に成立したfollowsには
-      // 承認記録がないため、承認記録の有無も要求する)
+      // 公開、または非公開でも承認記録がある場合のみ表示する。follows の存在だけでは公開時代の行を判別できないため。
       .where((eb) =>
         eb.or([
           eb("ru.isPublic", "=", 1),

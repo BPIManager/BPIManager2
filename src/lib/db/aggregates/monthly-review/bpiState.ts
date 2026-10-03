@@ -46,9 +46,7 @@ class MonthlyBpiStateRepository {
       .execute();
   }
 
-  // scores・songsを横断JOINした複数ユーザー分のBPI状態一括取得のため、直接参照を維持する。
-  // getPreMonthBpiStateForUsersの日時境界版と異なり、バージョンそのものを境界として使う
-  // （全期間モードでの総合BPI比較・レーダー別成長の「期間前」baseline用）
+  // scores・songs を横断する複数ユーザーのBPI状態取得のため直接参照を維持する。全期間モードの baseline は日時ではなくバージョンを境界にする。
 
   async getVersionBpiStateForUsers(userIds: string[], compareVersion: string) {
     if (userIds.length === 0) return [];

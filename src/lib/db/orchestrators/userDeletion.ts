@@ -26,9 +26,7 @@ import * as os from "os";
  * FK制約を考慮した順序で物理削除を行う。
  */
 export async function backupAndDeleteUser(userId: string): Promise<void> {
-  // バックアップの読み取り・ファイル書き出し・物理削除を、ユーザーの書き込みロックを取った1つの
-  // トランザクションで行う。書き出しに失敗すれば削除もロールバックされ、読み取り後の書き込みは
-  // ロック待ちになるため、バックアップに含まれない行が削除されることはない
+  // バックアップ読み取り・書き出し・物理削除を、書き込みロックを取った1トランザクションで行う。書き出し失敗時は削除もロールバックされる。
   await db.transaction().execute(async (trx) => {
   await lockUserForWrite(trx, userId);
   const [
@@ -98,10 +96,7 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
     followListMembers,
   };
 
-  // 2. バックアップをファイルに書き出す
-  // コンテナ/サーバーレス環境ではos.homedir()配下が書き込み不可・非永続の
-  // 場合があるため、USER_DELETION_BACKUP_DIRで永続ストレージ上のパスを
-  // 指定できるようにする(未指定時は従来通りos.homedir()配下を使う)。
+  // バックアップをファイルへ書き出す。コンテナ等で os.homedir() 配下が非永続の場合があるため、USER_DELETION_BACKUP_DIR で保存先を指定できる。
   const backupDir =
     process.env.USER_DELETION_BACKUP_DIR ??
     path.join(os.homedir(), "backups", "delete");
@@ -113,10 +108,7 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
     "utf-8",
   );
 
-  // 3. FK制約を考慮した順序で物理削除(トランザクション)。
-  // このオーケストレーターは各ドメインリポジトリのdeleteByUser/getAllForUser
-  // メソッドを呼び出す役に徹し、他ドメインが所有するテーブルへ直接クエリを
-  // 発行しない(usersテーブル自身の削除を除く)。
+  // FK 順で物理削除する（トランザクション）。他ドメインのテーブルへ直接クエリを発行せず、各リポジトリの deleteByUser に委譲する（users 自身を除く）。
   {
     // allScores: FK to logs(SET NULL), users(CASCADE)
     await allScoresRepo.deleteByUser(trx, userId);

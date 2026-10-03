@@ -4,13 +4,10 @@ import type { ColdCategoryAdvisory, SongOptimizerInput } from "@/types/bpi-optim
 import type { RadarCategory } from "@/types/stats/radar";
 
 /**
- * レーダーカテゴリ別の得意・不得意バイアス`categoryBias_c`は`info_c`が小さいと
- * 自動的に0へ縮小されるが、それは「静かにグローバル予測へフォールバックする」だけで
- * 終わる。データが薄いカテゴリについては、無理な推定で弱いプランを出すより
- * 先に数曲プレイしてもらう方が誠実、というユーザー指摘に基づくガード（提案書§3.7）。
+ * 信頼度の低いカテゴリ（データが薄い）では無理に推定して弱いプランを出さず、先に数曲プレイを促すガード（提案書§3.7）。
  *
- * @param categories - 判定対象のレーダーカテゴリ（`radarElementFilter`適用後）
- * @param latentSkill - 信頼度`w_c = info_c/(info_c+1)`の参照元
+ * @param categories - 判定対象のレーダーカテゴリ（radarElementFilter 適用後）
+ * @param latentSkill - 信頼度 w_c = info_c/(info_c+1) の参照元
  * @param allSongs - 曲候補の探索対象。プレイ数の集計・提案曲の抽出に使う
  * @returns 信頼度が閾値未満の「コールド」なカテゴリの案内一覧
  */

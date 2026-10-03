@@ -29,9 +29,7 @@ export const notificationsTranslations = {
     "zh-TW": "沒有通知",
     ko: "알림이 없습니다",
   },
-  // Overtaken message: "{name}{pre}{song}{post}"
-  // ja: "田中 さんが Song[A] であなたを上回りました"
-  // en: "John beat your score on Song[A]"
+  // 追い抜き通知の文面例: ja「田中 さんが Song[A] であなたを上回りました」 / en「John beat your score on Song[A]」
   "notifications.overtaken.pre": {
     ja: " さんが ",
     en: " beat your score on ",

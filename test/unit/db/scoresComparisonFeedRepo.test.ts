@@ -145,7 +145,7 @@ describe("socialFollowedWinLossRepo.getFollowedWinLossSummary", () => {
     const ifCalls = callsFor(dbHolder.current.calls, "$if");
     expect(ifCalls[0].args[0]).toBe(true);
     expect(ifCalls[1].args[0]).toBe(true);
-    // listId未指定時は絞り込み$ifがfalseのまま(#277導入前の既存挙動を維持)
+    // listId未指定時は絞り込み$ifがfalseのまま
     expect(ifCalls[2].args[0]).toBe(false);
   });
 

@@ -2,10 +2,8 @@ import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import { songRankingCacheRepo } from "@/lib/db/domains/songRankingCache";
 
 /**
- * 全バージョンの楽曲別ランキングキャッシュ（`songRankingCache` テーブル）を最新スコアで更新する。
- *
- * バージョンごとに全ユーザー分の順位・総プレイヤー数を1回のクエリでまとめて算出し、
- * bulk UPSERTで書き込む。スコアが存在しないバージョンはスキップする。
+ * 全バージョンの楽曲別ランキングキャッシュ（songRankingCache）を最新スコアで更新する。
+ * バージョンごとに全ユーザー分の順位・総プレイヤー数を1クエリで算出して bulk UPSERT する。スコアが無いバージョンはスキップする。
  */
 export async function updateAllSongRankingCache() {
   for (const version of IIDX_VERSIONS) {

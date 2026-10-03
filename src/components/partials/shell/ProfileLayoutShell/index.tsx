@@ -19,9 +19,8 @@ interface ProfileLayoutShellProps {
 }
 
 /**
- * ユーザー本人/ライバルのプロフィールページで共通の
- * 「ローディング → 非公開/未発見/エラー → サイドバー+タブのグリッド」までを丸ごとまとめたシェル。
- * サイドバー隣に表示するタブ本体だけをchildren(render prop)側に残す。
+ * 本人・ライバルのプロフィールで共通の「ローディング → 非公開/未発見/エラー → サイドバー＋タブのグリッド」シェル。
+ * サイドバー隣のタブ本体のみ children（render prop）で渡す。
  */
 const ProfileLayoutShell = ({
   userId,

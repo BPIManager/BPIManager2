@@ -2,14 +2,13 @@ import { useMemo } from "react";
 import { SongWithScore } from "@/types/songs/score";
 
 /**
- * `useCompareScores`系フックが返す別バージョンの比較データを、表示中の楽曲一覧へ
- * `songId-difficulty`をキーにマージする。`/my/[version]`・`/my/all/[version]`の
- * 両方で同一のマージロジックが必要なため共通化する。
+ * useCompareScores 系が返す別バージョンの比較データを、表示中の楽曲へ songId-difficulty をキーにマージする。
+ * /my/[version] と /my/all/[version] で共通のため切り出す。
  *
  * @param songs - フィルタ前の全楽曲配列
  * @param visibleSongs - ページング後の表示対象楽曲配列
  * @param compareData - 比較先バージョンのスコア配列
- * @param compareVersion - 比較先バージョン（`"none"`または未指定ならマージしない）
+ * @param compareVersion - 比較先バージョン（"none" または未指定ならマージしない）
  */
 export const useMergedCompareSongs = (
   songs: SongWithScore[] | undefined,
