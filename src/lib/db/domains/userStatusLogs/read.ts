@@ -54,8 +54,7 @@ class UserStatusLogsReadRepository {
   /**
    * 指定ユーザー・バージョンでこれまでに記録された総合BPIの最高値を取得する。
    * 総合BPIの「下がらないラチェット」（{@link BpiCalculator.ratchetTotalBpi}）の
-   * 基準値として使う。`getLatestTotalBpi`（最新1件）とは異なり、途中に
-   * ラチェット導入前の下振れがあっても影響されない。
+   * 基準値として使う。`getLatestTotalBpi`（最新1件）とは異なり、過去の下振れに影響されない。
    *
    * @param trx - 呼び出し元が管理するトランザクション（トランザクション外から
    *   呼ぶ場合は `db` をそのまま渡す）

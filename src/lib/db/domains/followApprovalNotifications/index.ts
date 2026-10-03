@@ -29,8 +29,7 @@ class FollowApprovalNotificationsRepository {
   /**
    * 承認通知を記録する（トランザクション不要の単独呼び出し版）。
    *
-   * 「以前は公開だったが非公開に変わったユーザー」の既存フォロワーを
-   * 事後承認する場合など、`follows`行が既に存在し他テーブルへの
+   * 非公開のユーザーの、承認記録のない既存フォロワーを事後承認する場合など、`follows`行が既に存在し他テーブルへの
    * 書き込みを伴わないケースで使う。
    *
    * @param recipientId - 通知の受信者（フォロワー）
@@ -46,8 +45,7 @@ class FollowApprovalNotificationsRepository {
   /**
    * 指定の組み合わせで、過去に承認記録があるかを確認する。
    *
-   * `follows`行の存在だけでは「承認制導入前(公開時代)からフォローして
-   * いた」ケースと区別できないため、`hasFollowAccess`の判定に使う
+   * `follows`行の存在だけでは「承認記録のない既存フォロー」と区別できないため、`hasFollowAccess`の判定に使う
    * （follows存在 AND この承認記録存在、の両方を要求する）。
    *
    * @param recipientId - リクエスト送信者（フォロワー）側のユーザー ID

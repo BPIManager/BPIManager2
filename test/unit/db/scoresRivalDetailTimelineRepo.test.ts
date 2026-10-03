@@ -85,7 +85,7 @@ describe("rivalOvertakenRepo.getOvertakenRivals", () => {
       whereCalls.some((c) => c.args[0] === "batchId" && c.args[2] === "batch-1"),
     ).toBe(true);
     // 期間/バッチ内で複数回更新された曲を1件に集約するためのgroupBy(songId)が
-    // 存在すること(#430と同根の不具合、#431)
+    // 存在すること
     expect(
       groupByCalls.some(
         (c) => c.args[0] === "songId" || c.args[0] === "sc.songId",
@@ -115,14 +115,13 @@ describe("rivalOvertakenRepo.getOvertakenRivals", () => {
     dbHolder.current = createDbSpy([]);
     await rivalOvertakenRepo.getOvertakenRivals("user-1", "33", { batchId: "batch-1" });
     const whereCalls = callsFor(dbHolder.current.calls, "where");
-    // isPublic単純フィルタ(#274/#275初期実装)ではなく、
+    // isPublicの単純フィルタではなく、
     // isPublic OR 承認記録の存在、をコールバック形式のwhereで判定する
-    // (公開時代に成立したfollowsを自動承認扱いにしないため)
+    // (承認記録のない既存followsを自動承認扱いにしないため)
     expect(whereCalls.some((c) => typeof c.args[0] === "function")).toBe(
       true,
     );
-    // 退行防止: コールバック形式と併存/置き換えで"ru.isPublic"への単純な
-    // 文字列where(#274/#275初期実装の再混入)が残っていないことを保証する
+    // "ru.isPublic"への単純な文字列whereが残っていないことを保証する
     expect(whereCalls.some((c) => c.args[0] === "ru.isPublic")).toBe(false);
   });
 });
@@ -333,7 +332,7 @@ describe("timelineRepo.getVersionComparisons", () => {
       whereCalls.some((c) => c.args[0] === "batchId" && c.args[2] === "batch-1"),
     ).toBe(true);
     // 期間/バッチ内で複数回更新された曲を1件に集約するためのgroupBy(songId)が
-    // 存在すること(#430: 集約しないと更新イベントの数だけ比較行が重複する)
+    // 存在すること（集約しないと更新イベントの数だけ比較行が重複する）
     expect(
       groupByCalls.some(
         (c) => c.args[0] === "songId" || c.args[0] === "sc.songId",

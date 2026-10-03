@@ -46,10 +46,9 @@ export async function submitFollowRequest(
     return { status: "followed" };
   }
 
-  // 対象が非公開の場合、follows行の有無だけでなく承認記録も確認する。
-  // 承認制導入前(公開時代)に成立した未承認のfollowsは「既にフォロー済み」
-  // として扱わない(招待URL再送信をきっかけに正規のリクエストとして
-  // 再送信できるようにする。承認されればlegacyの仮想エントリも自動解消する)
+  // 対象が非公開の場合は、follows行の有無に加えて承認記録も確認する。
+  // 承認記録のない既存のfollowsは「既にフォロー済み」として扱わず、正規のリクエストとして
+  // 再送信できるようにする（承認されれば承認記録が作られ、以後は通常のフォローとして扱われる）
   const hasApprovedAccess =
     await followAccessAggregateRepo.hasApprovedFollowAccess(
       requesterId,

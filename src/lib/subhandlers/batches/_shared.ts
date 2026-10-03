@@ -6,8 +6,7 @@ import type { HandlerResult } from "@/types/api";
 import type { OvertakenMap, VersionOvertakenMap } from "@/types/logs/overtaken";
 
 /**
- * batches ドメインの subhandler 共通型・ヘルパー。
- * 追い抜きライバル関連ヘルパーは旧 batches/[batchId]/scores.ts から移設。
+ * batches ドメインの subhandler 共通型・ヘルパー（追い抜きライバル関連を含む）。
  */
 export interface HandleOutcome<T> {
   result: HandlerResult<T>;

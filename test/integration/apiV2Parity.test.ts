@@ -116,7 +116,7 @@ type Row = {
 };
 
 const ROWS: Row[] = [
-  // notifications (#326)
+  // notifications
   {
     name: "notifications list",
     v1: "/api/v1/users/:self/notifications?type=all&page=0&limit=20",
@@ -131,7 +131,7 @@ const ROWS: Row[] = [
     authed: true,
     userScoped: true,
   },
-  // all-scores (#319)
+  // all-scores
   {
     name: "all-scores list",
     v1: "/api/v1/users/:self/all-scores/list",
@@ -160,7 +160,7 @@ const ROWS: Row[] = [
     authed: true,
     userScoped: true,
   },
-  // ranking (#324)
+  // ranking
   {
     name: "ranking global",
     v1: "/api/v1/users/:self/ranking/global?category=totalBpi",
@@ -189,7 +189,7 @@ const ROWS: Row[] = [
     authed: true,
     userScoped: true,
   },
-  // user songs (#327)
+  // user songs
   {
     name: "user songs list",
     v1: "/api/v1/users/:self/songs",
@@ -197,7 +197,7 @@ const ROWS: Row[] = [
     authed: true,
     userScoped: true,
   },
-  // scores (#318)
+  // scores
   {
     name: "scores list",
     v1: "/api/v1/users/:self/scores?version=33&asOf=latest",
@@ -233,7 +233,7 @@ const ROWS: Row[] = [
     authed: true,
     userScoped: true,
   },
-  // batches (#320)
+  // batches
   {
     name: "batches list (batch)",
     v1: "/api/v1/users/:self/batches?version=33&groupedBy=batch",
@@ -255,7 +255,7 @@ const ROWS: Row[] = [
     authed: true,
     userScoped: true,
   },
-  // follows (#322)
+  // follows
   {
     name: "follows (following)",
     v1: "/api/v1/users/:self/follows?type=following&page=1&limit=20",
@@ -298,7 +298,7 @@ const ROWS: Row[] = [
     authed: true,
     userScoped: true,
   },
-  // analytics / optimizeMemo / timeline / iidx-tower (#328)
+  // analytics / optimizeMemo / timeline / iidx-tower
   {
     name: "optimizeMemo list",
     v1: "/api/v1/users/:self/optimizeMemo",
@@ -327,7 +327,7 @@ const ROWS: Row[] = [
     authed: true,
     userScoped: true,
   },
-  // new-bpi (#330)
+  // new-bpi
   {
     name: "new-bpi players",
     v1: "/api/v1/new-bpi/players?page=1&pageSize=5",
@@ -335,7 +335,7 @@ const ROWS: Row[] = [
     authed: true,
     userScoped: true,
   },
-  // auth (#331)
+  // auth
   {
     name: "apiKey get",
     v1: "/api/v1/apiKey",
@@ -357,7 +357,7 @@ const ROWS: Row[] = [
     authed: true,
     userScoped: true,
   },
-  // rivals (#323)
+  // rivals
   {
     name: "rivals following list",
     v1: "/api/v1/users/:self/rivals/following/list",
@@ -400,7 +400,7 @@ const ROWS: Row[] = [
     authed: true,
     userScoped: true,
   },
-  // songs 全般 (#329)
+  // songs 全般
   {
     name: "songs list",
     v1: "/api/v1/songs?version=33",
@@ -464,7 +464,7 @@ const ROWS: Row[] = [
     authed: false,
     userScoped: false,
   },
-  // stats (#325)
+  // stats
   ...(
     [
       ["stats totalBpi", "stats/totalBpi?version=33"],
@@ -489,7 +489,7 @@ const ROWS: Row[] = [
     authed: true,
     userScoped: true,
   })),
-  // site / supporters (#330)
+  // site / supporters
   {
     name: "site stats",
     v1: "/api/v1/site/stats",
@@ -518,7 +518,7 @@ const ROWS: Row[] = [
     authed: false,
     userScoped: false,
   },
-  // profile / me (#321)
+  // profile / me
   {
     name: "profile (public, cross-user)",
     v1: "/api/v1/users/:pub/profile",
