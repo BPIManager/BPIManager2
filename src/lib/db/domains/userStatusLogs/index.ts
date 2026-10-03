@@ -79,6 +79,66 @@ class UserStatusLogsRepository {
   }
 
   /**
+   * 指定ユーザー・バージョンで、指定時点(`asOf`)までに記録された総合BPIの最高値を取得する。
+   * {@link getMaxTotalBpi}の時点限定版。月間振り返りのように過去の一時点を基準に
+   * ラチェットの下限を求める場合は、全期間の最大値ではなくこちらを使う
+   * （全期間の最大値を使うと、その時点より後に記録された最高値で過去の値が
+   * 不自然に引き上げられてしまう）。
+   *
+   * @param trx - 呼び出し元が管理するトランザクション（トランザクション外から
+   *   呼ぶ場合は `db` をそのまま渡す）
+   * @param userId - ユーザー ID
+   * @param version - バージョン番号
+   * @param asOf - この時点（`createdAt`基準）までの記録に限定する
+   * @returns 記録が無ければ `null`
+   */
+  async getMaxTotalBpiAsOf(
+    trx: Kysely<Database> | Transaction<Database>,
+    userId: string,
+    version: string,
+    asOf: Date,
+  ): Promise<number | null> {
+    const row = await trx
+      .selectFrom("userStatusLogs")
+      .select((eb) => eb.fn.max("totalBpi").as("maxTotalBpi"))
+      .where("userId", "=", userId)
+      .where("version", "=", version)
+      .where("createdAt", "<=", asOf)
+      .executeTakeFirst();
+    return row?.maxTotalBpi != null ? Number(row.maxTotalBpi) : null;
+  }
+
+  /**
+   * {@link getMaxTotalBpiAsOf}の複数ユーザー一括版。ライバル戦線等で複数ユーザーの
+   * 総合BPI推移をまとめて再計算する際に使う。
+   *
+   * @param userIds - ユーザーIDの配列
+   * @param version - バージョン番号
+   * @param asOf - この時点（`createdAt`基準）までの記録に限定する
+   * @returns userId→記録された最高値のMap（記録が無いユーザーは含まれない）
+   */
+  async getMaxTotalBpiAsOfForUsers(
+    userIds: string[],
+    version: string,
+    asOf: Date,
+  ): Promise<Map<string, number>> {
+    if (userIds.length === 0) return new Map();
+    const rows = await db
+      .selectFrom("userStatusLogs")
+      .select((eb) => ["userId", eb.fn.max("totalBpi").as("maxTotalBpi")])
+      .where("userId", "in", userIds)
+      .where("version", "=", version)
+      .where("createdAt", "<=", asOf)
+      .groupBy("userId")
+      .execute();
+    return new Map(
+      rows
+        .filter((r) => r.maxTotalBpi != null)
+        .map((r) => [r.userId, Number(r.maxTotalBpi)]),
+    );
+  }
+
+  /**
    * 指定バージョンにおける各ユーザーの最新 `userStatusLogs` 行の ID を取得するサブクエリを組み立てる。
    *
    * @param version - バージョン番号

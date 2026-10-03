@@ -36,6 +36,7 @@ export function buildBpiTimeline(
   }[],
   songMaster: MasterSong[],
   useMonthBuckets: boolean,
+  priorRecordedMax: number | null = null,
 ): {
   history: { date: string; value: number }[];
   bpiStart: number;
@@ -51,13 +52,18 @@ export function buildBpiTimeline(
 
   const latestExScoreBySong = new Map(preMonthExScoreMap);
 
-  const bpiStart =
+  const rawBpiStart =
     Math.round(
       BpiCalculator.calculateTotalBPI(
         notesOf(latestExScoreBySong),
         songMaster,
       ) * 100,
     ) / 100;
+  // BPIモデルの再推定等により、同じ時点を再計算しても過去に記録された値より
+  // 低く出ることがある。月をまたいで見たときに前月末より今月初が下がって見える
+  // （ラチェットが効いていないように見える）のを防ぐため、その時点までに実際に
+  // 記録された最高値を下限として使う
+  const bpiStart = BpiCalculator.ratchetTotalBpi(priorRecordedMax, rawBpiStart);
 
   // entries は (lastPlayed ASC, logId ASC) 順 → 同日・同曲は後のエントリが勝つ
   const byKey = new Map<string, { songId: number; exScore: number | null }[]>();

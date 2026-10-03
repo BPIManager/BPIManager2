@@ -1,5 +1,7 @@
 import dayjs from "@/lib/dayjs";
+import { db } from "@/lib/db";
 import { monthlyReviewRepo } from "@/lib/db/aggregates/monthly-review";
+import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
 import {
   buildBpiTimeline,
   calculateTotalBpiForScores,
@@ -90,6 +92,7 @@ export async function computeOwnerBpiTimeline(
     ownerInMonthHistory,
     allL12SongMeta,
     compareVersionState,
+    priorRecordedMax,
   ] = await Promise.all([
     monthlyReviewRepo.getPreMonthBpiStateForUsers([owner], version, monthStart),
     monthlyReviewRepo.getInMonthScoreHistoryForUsers(
@@ -102,6 +105,14 @@ export async function computeOwnerBpiTimeline(
     compareVersion
       ? monthlyReviewRepo.getVersionBpiStateForUsers([owner], compareVersion)
       : Promise.resolve(null),
+    compareVersion
+      ? Promise.resolve(null)
+      : userStatusLogsRepo.getMaxTotalBpiAsOf(
+          db,
+          owner,
+          version,
+          dayjs.tz(monthStart).toDate(),
+        ),
   ]);
 
   const ownerPreMonthExScoreMap = new Map<number, number>();
@@ -125,6 +136,7 @@ export async function computeOwnerBpiTimeline(
     ownerInMonthHistory,
     allL12SongMeta,
     useMonthBuckets,
+    priorRecordedMax,
   );
 
   let bpiStart: number;
@@ -190,26 +202,38 @@ export async function recomputeBpiTimelinesForUsers(
 ): Promise<Map<string, RecomputedBpiTimeline>> {
   if (userIds.length === 0) return new Map();
 
-  const [preMonthState, inMonthHistory, allL12SongMeta, compareVersionState] =
-    await Promise.all([
-      compareVersion
-        ? Promise.resolve([])
-        : monthlyReviewRepo.getPreMonthBpiStateForUsers(
-            userIds,
-            version,
-            monthStart,
-          ),
-      monthlyReviewRepo.getInMonthScoreHistoryForUsers(
-        userIds,
-        version,
-        monthStart,
-        monthEnd,
-      ),
-      monthlyReviewRepo.getAllL12SongMeta(),
-      compareVersion
-        ? monthlyReviewRepo.getVersionBpiStateForUsers(userIds, compareVersion)
-        : Promise.resolve(undefined),
-    ]);
+  const [
+    preMonthState,
+    inMonthHistory,
+    allL12SongMeta,
+    compareVersionState,
+    priorRecordedMaxByUser,
+  ] = await Promise.all([
+    compareVersion
+      ? Promise.resolve([])
+      : monthlyReviewRepo.getPreMonthBpiStateForUsers(
+          userIds,
+          version,
+          monthStart,
+        ),
+    monthlyReviewRepo.getInMonthScoreHistoryForUsers(
+      userIds,
+      version,
+      monthStart,
+      monthEnd,
+    ),
+    monthlyReviewRepo.getAllL12SongMeta(),
+    compareVersion
+      ? monthlyReviewRepo.getVersionBpiStateForUsers(userIds, compareVersion)
+      : Promise.resolve(undefined),
+    compareVersion
+      ? Promise.resolve(new Map<string, number>())
+      : userStatusLogsRepo.getMaxTotalBpiAsOfForUsers(
+          userIds,
+          version,
+          dayjs.tz(monthStart).toDate(),
+        ),
+  ]);
 
   const preByUser = new Map<string, Map<number, number>>();
   for (const s of preMonthState) {
@@ -253,11 +277,18 @@ export async function recomputeBpiTimelinesForUsers(
       });
     } else {
       const preMap = preByUser.get(userId) ?? new Map<number, number>();
+      const priorRecordedMax = priorRecordedMaxByUser.get(userId) ?? null;
       const {
         bpiStart,
         bpiEnd,
         history: hist,
-      } = buildBpiTimeline(preMap, history, allL12SongMeta, useMonthBuckets);
+      } = buildBpiTimeline(
+        preMap,
+        history,
+        allL12SongMeta,
+        useMonthBuckets,
+        priorRecordedMax,
+      );
       result.set(userId, { bpiStart, bpiEnd, history: hist });
     }
   }
