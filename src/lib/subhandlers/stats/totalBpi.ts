@@ -46,13 +46,17 @@ export async function handleStatsTotalBpi(
     observations,
     level12Master,
   );
-  const isLatest = !q.asOf || q.asOf === "latest";
-  const previousBest = isLatest
-    ? await userStatusLogsRepo.getMaxTotalBpi(db, q.userId, q.version)
-    : null;
-  const totalBpi = isLatest
-    ? BpiCalculator.ratchetTotalBpi(previousBest, freshTotalBpi)
-    : freshTotalBpi;
+  // BPIモデルの再推定等により、同じ時点を再計算しても過去に記録された値より
+  // 低く出ることがある（monthly-review/bpi.tsのbuildBpiTimelineと同じ理由）。
+  // asOf指定時（過去のある日との比較）も含め、その時点までに実際に記録された
+  // 最高値を下限として使う
+  const previousBest = await userStatusLogsRepo.getMaxTotalBpiAsOf(
+    db,
+    q.userId,
+    q.version,
+    targetTime,
+  );
+  const totalBpi = BpiCalculator.ratchetTotalBpi(previousBest, freshTotalBpi);
   const estimatedRank = BpiCalculator.estimateRank(totalBpi);
   const areaRank =
     q.version === latestVersion ? getUserAreaRank(user?.iidxId ?? null) : null;
