@@ -11,14 +11,15 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-const { songsRepo } = await import("@/lib/db/domains/songs");
+const { songMasterRepo } = await import("@/lib/db/domains/songs/master");
+const { songSearchRepo } = await import("@/lib/db/domains/songs/search");
 
-describe("songsRepo.getSongMasterWithDef", () => {
+describe("songMasterRepo.getSongMasterWithDef", () => {
   it("songsとsongDefを結合したクエリを実行し結果を返すこと", async () => {
     const rows = [{ songId: 1, title: "冥" }];
     dbHolder.current = createDbSpy(rows);
 
-    const result = await songsRepo.getSongMasterWithDef();
+    const result = await songMasterRepo.getSongMasterWithDef();
 
     expect(result).toEqual(rows);
     expect(callsFor(dbHolder.current.calls, "selectFrom")[0].args).toEqual([
@@ -27,10 +28,10 @@ describe("songsRepo.getSongMasterWithDef", () => {
   });
 });
 
-describe("songsRepo.getSongWithDefByTitleDifficulty", () => {
+describe("songMasterRepo.getSongWithDefByTitleDifficulty", () => {
   it("title/difficultyで楽曲を検索すること", async () => {
     dbHolder.current = createDbSpy({ songId: 1 });
-    const result = await songsRepo.getSongWithDefByTitleDifficulty(
+    const result = await songMasterRepo.getSongWithDefByTitleDifficulty(
       "冥",
       "ANOTHER",
     );
@@ -41,33 +42,33 @@ describe("songsRepo.getSongWithDefByTitleDifficulty", () => {
   });
 });
 
-describe("songsRepo.getSongList", () => {
+describe("songSearchRepo.getSongList", () => {
   it("INF以外のバージョンでは$ifにtrueを渡すこと", async () => {
     dbHolder.current = createDbSpy([]);
-    await songsRepo.getSongList("33");
+    await songSearchRepo.getSongList("33");
     expect(callsFor(dbHolder.current.calls, "$if")[0].args[0]).toBe(true);
   });
 
   it("INFバージョンでは$ifにfalseを渡すこと", async () => {
     dbHolder.current = createDbSpy([]);
-    await songsRepo.getSongList("INF");
+    await songSearchRepo.getSongList("INF");
     expect(callsFor(dbHolder.current.calls, "$if")[0].args[0]).toBe(false);
   });
 
   it("title→difficulty順でソートされること", async () => {
     dbHolder.current = createDbSpy([]);
-    await songsRepo.getSongList("33");
+    await songSearchRepo.getSongList("33");
     const orderByCalls = callsFor(dbHolder.current.calls, "orderBy");
     expect(orderByCalls[0].args).toEqual(["s.title", "asc"]);
     expect(orderByCalls[1].args).toEqual(["s.difficulty", "asc"]);
   });
 });
 
-describe("songsRepo.getSongById", () => {
+describe("songMasterRepo.getSongById", () => {
   it("songIdで楽曲を検索すること", async () => {
     const row = { songId: 1, title: "冥" };
     dbHolder.current = createDbSpy(row);
-    const result = await songsRepo.getSongById(1);
+    const result = await songMasterRepo.getSongById(1);
     expect(result).toEqual(row);
     expect(callsFor(dbHolder.current.calls, "where")[0].args).toEqual([
       "s.songId",
@@ -77,7 +78,7 @@ describe("songsRepo.getSongById", () => {
   });
 });
 
-describe("songsRepo.getSimilarSongs", () => {
+describe("songSearchRepo.getSimilarSongs", () => {
   const baseSong = {
     songId: 0,
     title: "",
@@ -100,7 +101,7 @@ describe("songsRepo.getSimilarSongs", () => {
 
   it("基準楽曲が見つからない場合、空配列を返すこと", async () => {
     dbHolder.current = createDbSpy([{ ...baseSong, songId: 2, title: "他の曲" }]);
-    const result = await songsRepo.getSimilarSongs(999, "33");
+    const result = await songSearchRepo.getSimilarSongs(999, "33");
     expect(result).toEqual([]);
   });
 
@@ -111,7 +112,7 @@ describe("songsRepo.getSimilarSongs", () => {
       { ...baseSong, songId: 3, title: "遠い曲", p_scratch: 10 },
     ]);
 
-    const result = await songsRepo.getSimilarSongs(1, "33");
+    const result = await songSearchRepo.getSimilarSongs(1, "33");
 
     expect(result.map((r) => r.songId)).toEqual([2, 3]);
     expect(result[0].distance).toBeLessThan(result[1].distance);
@@ -125,7 +126,7 @@ describe("songsRepo.getSimilarSongs", () => {
       { ...baseSong, songId: 4, title: "曲4", p_scratch: 3 },
     ]);
 
-    const result = await songsRepo.getSimilarSongs(1, "33", 2);
+    const result = await songSearchRepo.getSimilarSongs(1, "33", 2);
 
     expect(result).toHaveLength(2);
   });

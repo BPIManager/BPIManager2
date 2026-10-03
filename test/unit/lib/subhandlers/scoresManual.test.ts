@@ -7,8 +7,8 @@ const getLatestScoresMock = vi.fn();
 const getLatestAllScoresMock = vi.fn();
 const saveManualScoreUpdateMock = vi.fn();
 
-vi.mock("@/lib/db/domains/songs", () => ({
-  songsRepo: { getSongMasterWithDef: (...a: unknown[]) => getSongMasterWithDefMock(...a) },
+vi.mock("@/lib/db/domains/songs/master", () => ({
+  songMasterRepo: { getSongMasterWithDef: (...a: unknown[]) => getSongMasterWithDefMock(...a) },
 }));
 vi.mock("@/lib/db/domains/allSongs", () => ({
   allSongsRepo: { getAllLevelMaster: (...a: unknown[]) => getAllLevelMasterMock(...a) },

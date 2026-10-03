@@ -75,8 +75,8 @@ vi.mock("@/lib/db/domains/scores/latest", () => ({
       getPreviousVersionWithScoresMock(...a),
   },
 }));
-vi.mock("@/lib/db/domains/songs", () => ({
-  songsRepo: {
+vi.mock("@/lib/db/domains/songs/master", () => ({
+  songMasterRepo: {
     getSongMasterWithDef: (...a: unknown[]) => getSongMasterWithDefMock(...a),
   },
 }));

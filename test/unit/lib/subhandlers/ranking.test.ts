@@ -38,8 +38,8 @@ vi.mock("@/lib/db/aggregates/iidxTower", () => ({
     getTowerRanking: (...a: unknown[]) => getTowerRankingMock(...a),
   },
 }));
-vi.mock("@/lib/db/domains/songs", () => ({
-  songsRepo: {
+vi.mock("@/lib/db/domains/songs/master", () => ({
+  songMasterRepo: {
     getSongMasterWithDef: (...a: unknown[]) => getSongMasterWithDefMock(...a),
   },
 }));
