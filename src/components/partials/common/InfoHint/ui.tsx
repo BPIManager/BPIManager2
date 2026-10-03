@@ -6,9 +6,7 @@ import {
 } from "@/components/ui/popover";
 
 /**
- * ラベル横に置く `?` アイコン。クリック（タップ）でその項目が何を表すかの
- * 説明をポップオーバーで表示する。ホバーではなくクリック起点にすることで
- * モバイルでも開ける。
+ * ラベル横の ? アイコン。クリック（タップ）で説明をポップオーバー表示する。モバイルでも開けるようホバーではなくクリック起点にする。
  */
 export default function InfoHint({ label, text }: { label: string; text: string }) {
   return (

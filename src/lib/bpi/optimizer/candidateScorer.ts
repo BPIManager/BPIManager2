@@ -30,16 +30,8 @@ export function diversityMultiplier(song: SongOptimizerInput, currentSongBpi: nu
 }
 
 /**
- * 候補曲を2段階で評価する（提案書§3.5）。
- *
- * flexibleは各曲の目標BPIを`achievementCeiling`の上限までではなく、残りギャップを
- * 残りステップで均等割りした分（`desiredStepGain`）に頭打ちする（ペース配分）。
- * これで1曲に寄与が集中せず、かつ毎ステップ着実に進むので収束もする。fastestは
- * ペース配分せず上限まで狙う（最短到達優先）。
- *
- * 1. 安価な一次選抜（候補全件）: 見積もり効率で上位`CANDIDATE_POOL_SIZE`件に絞る
- * 2. 厳密評価（上位K件のみ）: 実際に観測へ反映して`TotalBpiEvaluator.exact`で
- *    真の総合BPI増分を求め、並べ替える
+ * 候補曲を2段階で評価する（提案書§3.5）。1段目は見積もり効率で上位K件に絞り、2段目で実観測を反映して厳密に並べ替える。
+ * flexible は残りギャップを残りステップで均等割りした分に頭打ちし（ペース配分）、fastest は上限まで狙う。
  */
 export class CandidateScorer {
   constructor(
@@ -84,12 +76,8 @@ export class CandidateScorer {
 
       const gradient = this.totalEvaluator.marginalGainEstimate(currentTotal, currentSongBpi, kPrime);
 
-      // ペース配分: この曲だけでdesiredStepGain分を稼ぐのに必要な自曲BPI増分を、
-      // 解析的勾配(gradient = ∂T/∂BPI_i)の逆数で見積もり、marginCeilingを上限にする。
-      // 残りギャップが小さくなるほどdesiredStepGainも縮むため、下限をMIN_BPI_GAINで
-      // 確保しておく（そうしないと目標間際でどの候補も「増分が小さすぎる」として
-      // 下のMIN_EX_GAIN/MIN_BPI_GAINチェックに弾かれ、候補が残っているのに
-      // 探索が早期終了してしまう）。
+      // ペース配分: この曲だけで desiredStepGain を稼ぐのに必要な BPI 増分を解析的勾配の逆数で見積もり、marginCeiling を上限にする。
+       // 目標間際で候補が探索から早期除外されないよう、下限を MIN_BPI_GAIN で確保する。
       const pacedOwnDelta = gradient > 0 ? desiredStepGain / gradient : Infinity;
       const pacedTarget =
         currentSongBpi + Math.max(BpiOptimizerConstants.MIN_BPI_GAIN, pacedOwnDelta);

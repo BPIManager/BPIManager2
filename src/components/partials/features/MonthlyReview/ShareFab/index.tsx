@@ -47,9 +47,8 @@ const ShareFab = ({
   const router = useRouter();
   const { t } = useTranslation();
   const { open, setOpen } = useShareDrawer();
-  // 選択が変わって新しい組み合わせのPNGを取りに行くたびスケルトンに戻すため、
-  // 「どのURLの読み込みが完了したか」をstateにしてレンダー中に比較する
-  // （useEffect+setStateは無駄な再レンダーを招くため避ける）
+  // 新しい組み合わせのPNGを取りに行くたびスケルトンに戻さないよう、読み込み完了したURLを state にしてレンダー中に比較する。
+   // useEffect+setState は無駄な再レンダーを招くため避ける。
   const [loadedPreviewUrl, setLoadedPreviewUrl] = useState<string | null>(null);
 
   const pageUrl =
@@ -105,9 +104,7 @@ const ShareFab = ({
   });
   const previewLoaded = loadedPreviewUrl === ogpPreviewUrl;
 
-  // 左右それぞれの枠で独立にラジオ選択する。同じ項目を両方に選べないよう、
-  // 各枠のバッジ一覧は「もう片方の枠が今選んでいる項目」を候補から除外して渡す
-  // （ui.tsx側）ため、ここでは選び直すだけでよい
+  // 左右の枠は独立にラジオ選択する。同じ項目を両方に選べないよう、各枠の候補からもう片方の選択を除外して渡す（ui.tsx 側）。
   const handleSelectLeft = (key: OgpSectionKey) => {
     onSectionsChange([key, sections[1]]);
   };

@@ -61,9 +61,7 @@ class RivalPairwiseRepository {
               .innerJoin("users as fu", "fu.userId", "f.followingId")
               .select("f.followingId")
               .where("f.followerId", "=", viewerId)
-              // follows行の存在だけでは判定できない(公開時代に成立した
-              // followsには承認記録がないため、対象が非公開の場合は
-              // 承認記録の有無も要求する)
+              // 対象が非公開なら承認記録の有無も要求する。公開時代に成立した follows には承認記録が無いため、follows の存在だけでは判定できない。
               .where((eb) =>
                 eb.or([
                   eb("fu.isPublic", "=", 1),
@@ -184,9 +182,7 @@ class RivalPairwiseRepository {
               .innerJoin("users as fu", "fu.userId", "f.followingId")
               .select("f.followingId")
               .where("f.followerId", "=", userId)
-              // follows行の存在だけでは判定できない(公開時代に成立した
-              // followsには承認記録がないため、対象が非公開の場合は
-              // 承認記録の有無も要求する)
+              // 対象が非公開なら承認記録の有無も要求する。公開時代に成立した follows には承認記録が無いため、follows の存在だけでは判定できない。
               .where((eb) =>
                 eb.or([
                   eb("fu.isPublic", "=", 1),

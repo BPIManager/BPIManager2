@@ -1,9 +1,5 @@
 /**
- * 楽曲属性マスタ定義。
- *
- * 要素の追加・削除はこのファイルのみを編集すればよい。
- * ただし DB スキーマ (songAttributes テーブル) と
- * Kysely クエリの SELECT リスト (src/lib/db/songs/index.ts) は別途変更が必要。
+ * 楽曲属性マスタ定義。要素の追加・削除はこのファイルで行うが、songAttributes テーブルと src/lib/db/songs/index.ts の SELECT リストも別途変更が必要。
  */
 
 export interface SongAttributeDef {

@@ -85,12 +85,8 @@ class RivalAggregateRepository {
    * 特定楽曲におけるフォロー中ユーザーの最新スコア一覧を取得する
    * （ユーザー表示情報・楽曲情報付き）。単曲のライバル比較表示用。
    */
-  // follows・users・scores・songs・songDefを横断JOINした単曲比較データの
-  // ため、直接クエリを維持する。
-  // 呼び出し元(rivals/following/scores/[songId].ts)は`viewerId`にURLの[userId]
-  // (第三者が閲覧している可能性のある対象ユーザー)をそのまま渡すため、
-  // 「followsの存在=閲覧者本人への閲覧許可」の前提が成立しない。
-  // isPublicによる絞り込みを維持する
+  // 単曲比較は複数テーブルを横断JOINするため直接クエリを維持する。viewerId に第三者閲覧の対象が入りうるため、
+   // follows の存在を閲覧許可とみなさず isPublic による絞り込みを残す。
 
   async getFollowedScoresForSong(params: {
     viewerId: string;

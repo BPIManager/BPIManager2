@@ -101,9 +101,7 @@ export function registerUpdateMyScore(server: McpServer, userId: string) {
         },
       ];
 
-      // songs/songDefドメインと同じ楽曲がallSongsドメインにも存在する場合、
-      // 全難易度履歴(allScores)側が更新から取り残されないよう、こちらも独立して改善判定の上で書き込む
-      // (CSVバッチインポート `scores/bulk.ts` と同じ二重書き込みパターン)
+      // songs と allSongs の両方に同じ楽曲がある場合、allScores 側も独立に改善判定して書き込む（CSV の scores/bulk.ts と同じ二重書き込み）。
       const allSong = allLevelMaster.find(
         (s) => s.title === song.title && s.difficulty === song.difficulty,
       );

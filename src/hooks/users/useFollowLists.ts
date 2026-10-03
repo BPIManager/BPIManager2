@@ -11,12 +11,9 @@ interface FollowListsResponse {
 }
 
 /**
- * 自分が作成したフォローリストの一覧取得・作成・改名・公開設定変更・削除を
- * 管理するフック。
+ * 自分が作成したフォローリストの取得・作成・改名・公開設定変更・削除を管理する。Vaul ドロワーと /rivals のフィルタ選択肢で使う。
  *
- * Vaulドロワーでのリスト管理・`/rivals`のリストフィルタ選択肢に使う。
- *
- * @param userId - 自分のユーザー ID（未ログイン時は `false`）
+ * @param userId - 自分のユーザー ID（未ログイン時は false）
  */
 export const useFollowLists = (userId?: string | boolean) => {
   const { fbUser } = useUser();

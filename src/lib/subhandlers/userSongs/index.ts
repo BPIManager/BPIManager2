@@ -8,9 +8,7 @@ import type { IIDXVersion } from "@/types/iidx/version";
 import type { NextApiRequest } from "next";
 
 /**
- * user songs ドメイン（`users/[userId]/songs/**`）の subhandler 群。
- * 全エンドポイント `withUserApiHandler`。ルートは `withUserApiHandler` の
- * ラッパーを維持しつつ、handler 本体をこれに委譲する。
+ * user songs ドメインの subhandler 群。全エンドポイントは withUserApiHandler を使い、ルートはラッパーを維持したまま本体を委譲する。
  */
 export interface HandleOutcome<T> {
   result: HandlerResult<T>;

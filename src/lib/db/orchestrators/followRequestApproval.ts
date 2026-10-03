@@ -4,19 +4,12 @@ import { followsRepo } from "@/lib/db/domains/follow";
 import { followApprovalNotificationsRepo } from "@/lib/db/domains/followApprovalNotifications";
 
 /**
- * フォローリクエストを承認する。
- *
- * `followRequests`行の削除・`follows`行の作成・承認通知の記録を
- * 1トランザクションで行う。トランザクション開始前に確認した行が、
- * 実行時には既に却下/取り下げ等で消費済みになっている競合状態があり
- * 得るため、削除が実際に行われたか（`deleteById`の返り値）を確認して
- * からのみ後続の`follows`作成・通知記録を行う。
+ * フォローリクエストを承認し、リクエスト削除・follows作成・承認通知記録を1トランザクションで行う。
+ * 確認後に既に消費済みの競合があり得るため、削除が実際に行われた場合のみ後続処理を行う。
  *
  * @param requestId - フォローリクエストID
- * @param targetUserId - 承認操作を行うユーザー ID（リクエスト先本人であることの確認に使う）
- * @returns 承認したリクエストの送信者ID。リクエストが存在しない、
- *   `targetUserId`がリクエスト先と一致しない、または承認直前に他の操作で
- *   消費済みだった場合は`null`
+ * @param targetUserId - 承認操作を行うユーザー ID（リクエスト先本人の確認に使う）
+ * @returns 承認したリクエストの送信者ID。存在しない・不一致・既に消費済みの場合は null
  */
 export async function approveFollowRequest(
   requestId: number,

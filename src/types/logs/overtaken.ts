@@ -10,9 +10,7 @@ export interface OvertakenRivalInfo {
 export type OvertakenMap = Record<number, OvertakenRivalInfo[]>;
 
 /**
- * ライバルではなく別バージョンの自分自身のスコアとの比較情報。
- * 勝敗・新規追い抜きかどうかに関わらず、プレイ済みの組み合わせは全件このshapeで返る
- * （`isNewOvertake`でこのバッチで新たに追い抜いたかどうかを判定できる）。
+ * 別バージョンの自分自身のスコアとの比較情報。プレイ済みの組み合わせは全件返り、isNewOvertake で今回新たに追い抜いたかを判定する。
  */
 export interface VersionOvertakenInfo {
   targetVersion: string;

@@ -12,9 +12,8 @@ interface OAuthClientInfo {
 }
 
 /**
- * MCPサーバー(/api/mcp)向けOAuthクライアント(client_id/client_secret)の
- * 発行・再発行・削除を行うフック。ChatGPT等、Dynamic Client Registrationに
- * 対応していないMCPクライアントへ手動で設定するためのもの。
+ * MCP サーバー（/api/mcp）向け OAuth クライアントの発行・再発行・削除を行う。
+ * Dynamic Client Registration 非対応の MCP クライアント（ChatGPT 等）へ手動設定するためのもの。
  */
 export const useOAuthClient = () => {
   const { fbUser } = useUser();

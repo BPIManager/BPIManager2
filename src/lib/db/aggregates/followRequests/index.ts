@@ -1,19 +1,12 @@
 import { db } from "@/lib/db";
 
 /**
- * フォローリクエストを、送信者のプロフィール表示用データと結合して
- * 組み立てるリポジトリクラス。
- *
- * `followRequests`ドメイン本来の責務（リクエストの読み書き）を超えた
- * クロスドメイン参照のため、`domains/followRequests`ではなくここに置く。
+ * フォローリクエストを送信者の表示情報と結合して組み立てる。domains/followRequests の責務を超えるためここに置く。
  */
 class FollowRequestsAggregateRepository {
   /**
-   * 指定ユーザー宛の保留中フォローリクエストを、送信者の表示情報付きで取得する。
-   *
-   * 通知ベルでの一覧表示用のため、大量のリクエストが滞留していても
-   * 表示件数を上限で打ち切る（未読件数のバッジ表示は`domains/followRequests`の
-   * `countPendingForTarget`を別途使うため、ここでの上限打ち切りの影響を受けない）。
+   * 指定ユーザー宛の保留中フォローリクエストを送信者の表示情報付きで取得する。通知ベルの一覧用のため件数は上限で打ち切る。
+   * 未読バッジは countPendingForTarget を別途使うため、この打ち切りの影響を受けない。
    *
    * @param targetUserId - リクエスト先ユーザー ID
    */

@@ -13,11 +13,8 @@ export type SubmitFollowRequestResult =
   | { status: "target_not_found" };
 
 /**
- * 招待URLのトークンからフォローリクエストを送信する。
- *
- * 対象ユーザーが（招待発行後に）公開設定に変わっていた場合は、承認を待たず
- * 通常のフォローと同様に即時`follows`を作成する（招待URLが古くなっていても
- * 迷子の保留リクエストを残さないため）。
+ * 招待URLのトークンからフォローリクエストを送信する。発行後に公開設定へ変わっていた場合は承認を待たず即時 follows を作る。
+ * 古い招待URLでも保留リクエストが迷子にならないようにするため。
  *
  * @param requesterId - リクエストを送るユーザー ID
  * @param token - 招待URLのトークン
@@ -36,19 +33,15 @@ export async function submitFollowRequest(
   if (!target) return { status: "target_not_found" };
 
   if (target.isPublic) {
-    // isFollowingの事前チェック+toggleFollow(反転)の組み合わせは、招待URLの
-    // 連打等で同時に複数回呼ばれた場合にフォロー状態を意図せず反転(解除)
-    // させてしまう競合を招く。ここでは常にフォロー成立のみを意図するため、
-    // 事前チェックを介さない冪等なcreate(upsert)を使う
+    // isFollowing の事前チェック＋toggleFollow（反転）は連打等の同時呼び出しで解除に反転しうるため使わない。
+     // 常にフォロー成立のみを意図するので、冪等な create（upsert）で成立させる。
     await db
       .transaction()
       .execute((trx) => followsRepo.create(trx, requesterId, targetUserId));
     return { status: "followed" };
   }
 
-  // 対象が非公開の場合は、follows行の有無に加えて承認記録も確認する。
-  // 承認記録のない既存のfollowsは「既にフォロー済み」として扱わず、正規のリクエストとして
-  // 再送信できるようにする（承認されれば承認記録が作られ、以後は通常のフォローとして扱われる）
+  // 非公開なら follows 行に加えて承認記録も確認する。承認記録の無い既存 follows は既フォロー扱いにせず、正規のリクエストとして再送信できるようにする。
   const hasApprovedAccess =
     await followAccessAggregateRepo.hasApprovedFollowAccess(
       requesterId,

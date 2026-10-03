@@ -25,11 +25,8 @@ export interface SongNoteRow {
 }
 
 /**
- * `songNotes`（投稿ノート）に、投稿者の表示用情報（`userStatusLogs`の
- * 最新totalBpi）や楽曲情報（`songs`）を結合した複合ビューを組み立てる。
- *
- * `songNotes`ドメイン本来の責務（ノートの読み書き）を超えたクロスドメイン
- * 参照のため、`domains/songNotes`ではなくここに置く。
+ * songNotes に投稿者の表示情報（最新 totalBpi）と楽曲情報（songs）を結合した複合ビューを組み立てる。
+ * domains/songNotes の責務を超えるクロスドメイン参照のためここに置く。
  */
 class SongNotesAggregateRepository {
   async getNotes(

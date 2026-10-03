@@ -23,10 +23,8 @@ function saveRememberedAccounts(accounts: RememberedAccount[]) {
 }
 
 /**
- * サインイン成功時に呼び出す。`bumpLastSwitchedAt`がfalseの場合は既存の
- * lastSwitchedAtを保持したままdisplayName/avatarUrl/isPublicのみ更新する
- * （プロフィール編集による再フェッチ等、実際のアカウント切り替えを伴わない
- * 更新で一覧の並び順が変わらないようにするため）。
+ * サインイン成功時に呼ぶ。bumpLastSwitchedAt が false の場合は lastSwitchedAt を保持し、表示情報のみ更新する。
+ * プロフィール編集による再フェッチで一覧の並び順が変わらないようにするため。
  */
 export function upsertRememberedAccount(
   account: Omit<RememberedAccount, "lastSwitchedAt">,

@@ -45,9 +45,7 @@ const RivalListContainer = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  // 選択中のリストが削除された場合、フィルタを「すべて」に戻す
-  // (listIdを保持したままだと、存在しないリストへの絞り込みリクエストが
-  // 送られ続けエラー状態から抜けられなくなる)
+  // 選択中のリストが削除されたらフィルタを「すべて」に戻す。listId を保持すると存在しないリストへの絞り込みが送られ続けるため。
   useEffect(() => {
     if (listId != null && !lists.some((l) => l.id === listId)) {
       setListId(null);

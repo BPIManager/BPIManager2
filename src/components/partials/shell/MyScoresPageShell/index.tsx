@@ -16,9 +16,7 @@ interface MyScoresPageShellProps {
 }
 
 /**
- * `/my/[version]`, `/my/all/[version]`, `/my/unplayed/[version]` で共通の
- * 「router準備待ち → LoginRequiredCard分岐」をまとめたページシェル。
- * 表示するテーブル本体だけを呼び出し側が渡す。
+ * /my 系ページ共通の「router 準備待ち → LoginRequiredCard 分岐」シェル。表示するテーブル本体のみ呼び出し側が渡す。
  */
 const MyScoresPageShell = ({
   titlePrefix,

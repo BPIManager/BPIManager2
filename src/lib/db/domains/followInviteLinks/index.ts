@@ -4,11 +4,8 @@ import { Transaction } from "kysely";
 import { randomUUID } from "crypto";
 
 /**
- * 非公開ユーザーのフォローリクエスト受付用招待URL（`followInviteLinks`
- * テーブル）の読み書きを担当するリポジトリクラス。
- *
- * ユーザーごとに常に1件のみ有効なトークンを持つ（1:1）。再発行は
- * 既存行の`token`を上書きするだけでよく、旧トークンは自動的に無効化される。
+ * 非公開ユーザーのフォローリクエスト受付用招待URL（followInviteLinks）の読み書き。ユーザーごとに有効なトークンは1件のみ（1:1）。
+ * 再発行は既存行の token を上書きするだけで、旧トークンは自動的に無効になる。
  */
 class FollowInviteLinksRepository {
   /**

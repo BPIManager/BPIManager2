@@ -67,9 +67,7 @@ async function getStepsByReportIds(
 }
 
 /**
- * BPI最適化機能の保存目標（`optimizeGoals`・曲別の`optimizeGoalSteps`）の
- * 読み書きを担当するリポジトリクラス。曲別データは正規化テーブルに持つが、
- * 呼び出し元へは従来通り`reportData: OptimizationResult`の形にまとめて返す。
+ * 保存目標（optimizeGoals・曲別の optimizeGoalSteps）の読み書き。曲別データは正規化テーブルに持つが、呼び出し元へは reportData: OptimizationResult の形で返す。
  */
 class BpiOptimizerRepository {
   /**
@@ -113,9 +111,7 @@ class BpiOptimizerRepository {
   }
 
   /**
-   * reportId(UUID)からユーザーを問わず目標1件を取得する。
-   * 「曲目をシェア」機能でreportIdを受け取った側が、共有元のuserIdを
-   * 知らなくても曲目をインポートできるようにするため。
+   * reportId（UUID）からユーザーを問わず目標1件を取得する。共有された曲目を、共有元の userId を知らずにインポートできるようにするため。
    */
   async getMemoByReportId(
     reportId: string,

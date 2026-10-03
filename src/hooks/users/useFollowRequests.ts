@@ -15,11 +15,8 @@ export type PendingFollowRequest =
   | (PendingFollowRequestBase & { kind: "legacy" });
 
 /**
- * 自分宛の「承認待ち」一覧・承認/却下操作を管理するフック。
- *
- * `kind: "request"`(招待URL経由の本物のリクエスト)と`kind: "legacy"`
- * (承認記録を持たない既存フォロワー。自分が公開だった時代に成立)を
- * 統合して扱う。承認/却下の実行先エンドポイントはkindによって異なる。
+ * 自分宛の承認待ち一覧と承認・却下操作を管理する。招待URL経由の request と、承認記録を持たない legacy を統合して扱う。
+ * 承認・却下の実行先エンドポイントは kind によって異なる。
  */
 export const useFollowRequests = () => {
   const { fbUser } = useUser();

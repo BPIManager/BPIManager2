@@ -28,10 +28,8 @@ function observationsFor(
 }
 
 /**
- * フォールバック時（比較先バージョンのデータが無く曲ごとのdiffが定義できない）の
- * 「成長推移」。songごとのdiffを積み上げる方式が使えないため、実際のスコア更新
- * 履歴を時系列に再生し、この要素の曲群だけで-15基準から総合BPIを逐次計算する
- * （Hero側のbuildBpiTimelineと同じ考え方をこの要素の曲集合に限定して適用する）。
+ * 比較先バージョンのデータが無く曲ごとの diff を定義できない場合の成長推移。実スコア更新履歴を時系列に再生し、この要素の曲群だけで総合BPIを逐次計算する。
+ * buildBpiTimeline と同じ考え方を、この要素の曲集合に限定して適用する。
  */
 function buildElementTimelineFromHistory(
   ownerInMonthHistory: {
@@ -78,10 +76,8 @@ export function buildRadarGrowth(
   viewerPreMonthExScoreMap: Map<number, number>,
   viewerFinalExScoreMap: Map<number, number>,
   /**
-   * 比較先バージョンにそのユーザーのデータが1件も無く伸び幅を計算できない場合の
-   * フォールバック用リスト（通常はtopBpiSongs）。`topImprovedSongs`が空の
-   * ときだけ使い、BPI降順の単純なランキングとして各要素に振り分ける
-   * （diff/bpiBefore/bpiAfterは意味を持たないダミー値になる）
+   * 伸び幅を計算できない場合のフォールバック用リスト（通常は topBpiSongs）。topImprovedSongs が空のときのみ使う。
+   * BPI 降順の単純ランキングのため、diff/bpiBefore/bpiAfter は意味を持たないダミー値になる。
    */
   fallbackTopSongs?: TopSong[],
   /** フォールバック時の「純粋な成長推移」再計算用（省略時は空扱い） */

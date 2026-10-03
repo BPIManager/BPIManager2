@@ -3,11 +3,7 @@ import { Transaction } from "kysely";
 import { Database } from "@/types/db";
 
 /**
- * `notifications` テーブル（通知既読状態）自体の読み書きを担当するリポジトリクラス。
- *
- * フォロー通知・追い抜き通知の集計・一覧取得は`follows`/`scores`/`users`/
- * `songs`を横断する複合ビューのため、`aggregates/notifications/`に
- * 切り出している。
+ * notifications テーブル（通知の既読状態）の読み書き。集計・一覧は follows/scores/users/songs を横断するため aggregates/notifications に置く。
  */
 export class NotificationsRepository {
   /**

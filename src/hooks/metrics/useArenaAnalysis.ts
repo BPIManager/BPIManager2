@@ -9,10 +9,8 @@ import {
   ARENA_RANK_COLORS,
 } from "@/constants/iidx/radars";
 
-// アリーナ平均BPI(集団の統計値)や複数ユーザーのbpiの寄せ集めに対する集計で、
-// 単一ユーザーの生スコアから潜在スキルを推定するV2の総合BPIは定義できない
-// （何を1人のプレイヤーとして推定するかが無い）ため、純粋な集計関数として
-// V1のべき乗平均をそのまま使う（bpi/index.tsの`calculateTotalBPI`とは無関係）。
+// アリーナ平均や複数ユーザーの寄せ集めは単一プレイヤーの潜在スキルを持たないため、V2の総合BPIは定義できない。
+ // そのため純粋な集計として V1 のべき乗平均を使う（bpi/index.ts の calculateTotalBPI とは無関係）。
 const v1 = new BpiV1();
 
 export const getBpiBarColor = (bpi: number): string => {
@@ -53,10 +51,8 @@ export function useArenaAnalysis(
   const userBpiMap = useMemo(() => {
     if (!userSongs) return new Map<string, number | null>();
 
-    // アリーナ集計データはsongIdを持たずtitleでしか突合できないため、
-    // 同名リメイク曲(同じtitle[difficulty]で異なるsongId)がuserSongsに
-    // 混在する場合、どちらのスコアかを区別できず誤集計になりうる。
-    // そのようなキーは安全側に倒してマップから除外する。
+    // アリーナ集計は songId を持たず title でしか突合できないため、同名リメイク曲が混在すると誤集計になる。
+     // そのようなキーは安全側に倒してマップから除外する。
     const songIdsByTitleKey = new Map<string, Set<number>>();
     for (const s of userSongs) {
       const key = `${s.title}[${s.difficulty}]`;

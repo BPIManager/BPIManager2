@@ -25,10 +25,7 @@ class FollowRepository {
   }
 
   /**
-   * フォロー関係を作成する（呼び出し元のトランザクションに参加する版）。
-   *
-   * フォローリクエスト承認時など、複数ドメインへの書き込みを1トランザクションで
-   * 行うオーケストレーターから呼ばれる。既に存在する場合はそのまま成功する。
+   * フォロー関係を作成する（呼び出し元のトランザクションに参加する）。既に存在する場合はそのまま成功する。
    *
    * @param trx - 呼び出し元が管理するトランザクション
    * @param followerId - フォローする側のユーザー ID
@@ -47,15 +44,11 @@ class FollowRepository {
   }
 
   /**
-   * フォロー関係を確実に削除する（トグルではなく一方向の削除）。
-   *
-   * 「強制フォロー解除」のように、操作者(対象ユーザー)と`followerId`(削除対象の
-   * フォロワー)が異なる場合に使う。`toggleFollow`は呼び出し元自身の
-   * フォロー状態を反転する用途のため、この非対称な操作には使えない。
+   * フォロー関係を一方向に削除する（トグルではない）。強制フォロー解除のように操作者と followerId が異なる場合に使う。
    *
    * @param followerId - フォローしている側のユーザー ID
    * @param followingId - フォローされている側のユーザー ID
-   * @returns 削除対象が存在した場合は `true`
+   * @returns 削除対象が存在した場合は true
    */
   async remove(followerId: string, followingId: string): Promise<boolean> {
     const result = await db
@@ -68,15 +61,12 @@ class FollowRepository {
   }
 
   /**
-   * フォロー関係を確実に削除する（`remove`のトランザクション参加版）。
-   *
-   * フォロー解除時に`followListMembers`の連動削除を同一トランザクションで
-   * 行う`orchestrators/unfollow`から呼ばれる。
+   * フォロー関係を確実に削除する（トランザクション参加版）。followListMembers の連動削除を同一トランザクションで行う orchestrators/unfollow から呼ばれる。
    *
    * @param trx - 呼び出し元が管理するトランザクション
    * @param followerId - フォローしている側のユーザー ID
    * @param followingId - フォローされている側のユーザー ID
-   * @returns 削除対象が存在した場合は `true`
+   * @returns 削除対象が存在した場合は true
    */
   async removeInTransaction(
     trx: Transaction<Database>,

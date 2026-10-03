@@ -40,9 +40,7 @@ function useDistToGoalDraft(
       setIsPending(false);
     }, 400);
     return () => clearTimeout(timer);
-    // onMaxDiffFilterChangeを依存に含めると、親の再レンダーで関数の参照が変わる
-    // たびにデバウンスタイマーがリセットされてしまうため、draftDiffの変化時のみ
-    // 再実行したく意図的に除外する
+    // onMaxDiffFilterChangeを依存に含めると親の再レンダーでデバウンスが毎回リセットされるため、draftDiffの変化時のみ再実行する
   }, [draftDiff]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return { draftDiff, setDraftDiff, isPending };

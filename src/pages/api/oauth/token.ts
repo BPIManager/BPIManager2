@@ -77,9 +77,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     const client = await oauthRepo.findClientById(client_id);
 
-    // userIdが設定されているクライアント(Settings画面から手動発行)はconfidential
-    // client扱いとし、client_secretの一致を必須にする。DCR発行のpublic clientは
-    // userIdがnullのままなのでPKCEのみで完結する(現状維持)。
+    // userId が設定された（Settings から手動発行の）クライアントは confidential とし client_secret の一致を必須にする。DCR の public クライアントは PKCE のみで完結する。
     if (client?.userId) {
       if (
         !client_secret ||

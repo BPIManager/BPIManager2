@@ -16,9 +16,8 @@ class SocialWinLossRepository {
    * @returns `{ level, win, lose, draw }[]`
    */
   async getWinLossStats(viewerId: string, rivalId: string, version: string) {
-    // songs をドライバーにして level 11/12 のみを対象とし、
-    // 相関サブクエリで最新 logId を取得しながら1クエリで集計まで完結させる。
-    // 相関サブクエリは idx_scores_version_user_song_log(version,userId,songId,logId DESC) を点引きするので高速。
+    // songs をドライバーに level 11/12 のみ対象とし、相関サブクエリの最新 logId 取得まで1クエリで完結させる。
+     // 相関サブクエリは idx_scores_version_user_song_log の点引きで高速。
     const rows = await db
       .selectFrom("songs as m")
       .innerJoin("scores as v", (join) =>
@@ -152,25 +151,16 @@ class SocialWinLossRepository {
   }
 
   /**
-   * フォロー中の全ユーザーに対する勝敗サマリーを一括取得する。
-   *
-   * 各フォローユーザーとの勝ち・負け・引き分け件数、レーダーデータ（自分・相手）、
-   * アリーナランク・総合 BPI を含む。
+   * フォロー中の全ユーザーに対する勝敗サマリーを一括取得する（勝敗・引き分け件数、レーダー、アリーナランク、総合 BPI を含む）。
    *
    * @param params.viewerId - 閲覧者のユーザー ID
    * @param params.version - バージョン番号
    * @param params.levels - 対象難易度レベルの配列（空の場合は全レベル）
    * @param params.difficulties - 対象難易度文字列の配列（空の場合は全難易度）
-   * @param params.listId - 指定時、`viewerId`が所有するこのフォローリストの
-   *   所属ユーザーだけに絞り込む（呼び出し元で所有権を確認済みであること）
+   * @param params.listId - 指定時、viewerId が所有するこのフォローリストの所属ユーザーに絞る（所有権確認済みであること）
    */
-  // follows・users・userStatusLogs・officialArenaStats・userRadarCache・
-  // userRoles・songs・songDef・scores(自分/ライバル)を横断JOINした
-  // 勝敗サマリー集計のため、直接クエリを維持する。aggregates/内で最も
-  // 重いクエリである。勝敗集計はrivalsLatest×myLatest(実際にスコアが
-  // 両者に存在する組み合わせのみ)側で先に集約したwl小テーブルとして
-  // 求め、外側のfollows一覧とは1:1のLEFT JOINで結合することで行数の
-  // 爆発を防いでいる。
+  // 複数テーブルを横断JOINする最重量の集計のため直接クエリを維持する。勝敗は rivalsLatest×myLatest 側で先に集約した小テーブルとし、
+   // 外側の follows 一覧と1:1のLEFT JOINで結合して行数の爆発を防ぐ。
 }
 
 export const socialWinLossRepo = new SocialWinLossRepository();

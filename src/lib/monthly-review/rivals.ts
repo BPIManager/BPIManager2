@@ -114,9 +114,8 @@ export function buildRivals(
 }
 
 /**
- * `recomputeBpiTimelinesForUsers`の結果を各`RivalDiff`に反映し、推移グラフ用の
- * タイムラインMapを組み立てる。`bpiStart: null`（比較不能）のライバルもグラフには
- * 表示するが、ランキング側の数値（`r.bpiStart`等）は初期値nullのまま残す。
+ * recomputeBpiTimelinesForUsers の結果を各 RivalDiff に反映し、推移グラフ用のタイムライン Map を組み立てる。
+ * bpiStart が null（比較不能）のライバルもグラフには表示し、ランキング側の値は null のまま残す。
  */
 export function attachRivalBpiTimelines(
   rivals: RivalDiff[],
@@ -146,9 +145,7 @@ export function attachRivalBpiTimelines(
 }
 
 /**
- * BPI伸び率(%) = bpiGrowth / (bpiStart + 15) * 100。
- * 分母はBPIが -15（下限）に近いほど 0 へ近づき、伸び率が極端に膨らむため、
- * 分母が MIN_GROWTH_DENOMINATOR 未満の場合は算出しない（null）。
+ * BPI 伸び率（%）= bpiGrowth / (bpiStart + 15) * 100。分母が MIN_GROWTH_DENOMINATOR 未満（BPI が下限 -15 に近い）は伸び率が膨らむため null。
  */
 const MIN_GROWTH_DENOMINATOR = 1;
 
@@ -210,11 +207,9 @@ export function buildGrowthRanking(
 }
 
 /**
- * @param usingCompareVersion - `true`（全期間モード）の場合、チャートの起点を
- *   前バージョンの値で汚さない。「前バージョンからの伸び」は2点比較の
- *   ランキング側（buildGrowthRanking）だけの概念とし、推移グラフ自体は
- *   そのバージョン内で実際に記録された最初のログを基準にした自己相対の
- *   純粋な成長推移として表示する
+ * 全期間モード（usingCompareVersion）では、チャートの起点を前バージョンの値で汚さず、そのバージョン内で最初に記録されたログを基準にする。
+ * 「前バージョンからの伸び」は buildGrowthRanking だけの概念とする。
+ * @param usingCompareVersion - true の場合に上記の起点を使う
  */
 export function buildGrowthTimeline(
   rivals: RivalDiff[],

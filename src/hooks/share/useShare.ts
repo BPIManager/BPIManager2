@@ -53,9 +53,8 @@ export const useShareResult = () => {
         el.style.transform = "scaleY(1)";
       });
 
-      // html-to-image accesses cssRules on every stylesheet including cross-origin
-      // ones, which throws a SecurityError. Patch the prototype getter to return
-      // an empty CSSRuleList instead of throwing, then restore it afterward.
+      // html-to-image は cross-origin を含む全 stylesheet の cssRules を読むため SecurityError になる。
+       // cssRules getter を空の CSSRuleList を返すようパッチし、後で元に戻す。
       const cssRulesDescriptor = Object.getOwnPropertyDescriptor(
         CSSStyleSheet.prototype,
         "cssRules",

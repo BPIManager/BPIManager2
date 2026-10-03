@@ -113,9 +113,7 @@ class LatestScoresRepository {
   }
 
   /**
-   * 指定楽曲群について、指定バージョン内での最新スコア（EXスコア・BPI）を取得する。
-   * `getLatestExScoresForSongsBeforeDate`の日時境界版と異なり、バージョンそのものを
-   * 境界として使う（例: 前バージョンとの比較用）。
+   * 指定楽曲群の、指定バージョン内の最新スコア（EX・BPI）を取得する。バージョンそのものを境界にする（前バージョンとの比較用）。
    */
   async getLatestScoresForVersion(
     userId: string,

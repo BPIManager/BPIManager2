@@ -4,11 +4,7 @@ import { latestVersion } from "@/constants/iidx/iidxVersions";
 import type { SongRankingResponse } from "@/types/users/ranking";
 
 /**
- * 楽曲別ランキング取得フックの共通実装。
- *
- * `useSongRanking`(scoresドメイン)・`useAllSongRanking`(allScoresドメイン)は
- * 参照先エンドポイントのパスのみが異なりロジックがほぼ同一のため、
- * URL組み立てを`buildUrl`として引数化しここに集約する。
+ * 楽曲別ランキング取得フックの共通実装。scores・allScores はURLのみ異なるため、URL組み立てを buildUrl として引数化する。
  *
  * @param songId - 楽曲 ID（null の場合はフェッチしない）
  * @param version - IIDX バージョン（null の場合は最新バージョン）

@@ -26,19 +26,15 @@ interface ManualAllScoreInput {
 }
 
 /**
- * 手動スコア編集を1トランザクションで保存する。
- *
- * 同日内の複数回の保存は、当日の手動プレフィックスを持つ batchId に集約する。最新の batchId が
- * プレフィックスと一致しない場合は新しい batchId を発行する（`logs.batchId` は UNIQUE のため）。
- * `score`（☆11/12）と `allScore`（☆10以下の全難易度履歴）はそれぞれ独立に保存し、
- * `score` が無い場合は `logs` / `userStatusLogs` に触れない。
+ * 手動スコア編集を1トランザクションで保存する。同日の保存は当日プレフィックスの batchId に集約し、一致しなければ新規発行する。
+ * score（☆11/12）と allScore（☆10以下）は独立に保存し、score が無ければ logs/userStatusLogs には触れない。
  *
  * @param params.userId - ユーザー ID
  * @param params.version - バージョン番号
  * @param params.score - 保存する単曲スコア（改善が無ければ渡さない）
  * @param params.allScore - 全難易度履歴側のスコア（改善が無ければ渡さない）
- * @param params.newTotalBpi - 今回算出した総合BPI（`score` がある場合は必須、ラチェット適用前）
- * @returns 保存した総合BPI（`score` が無ければ `null`）と使用した batchId
+ * @param params.newTotalBpi - 今回算出した総合BPI（score がある場合は必須、ラチェット適用前）
+ * @returns 保存した総合BPI（score が無ければ null）と使用した batchId
  */
 export async function saveManualScoreUpdate(params: {
   userId: string;
@@ -54,10 +50,8 @@ export async function saveManualScoreUpdate(params: {
 
   return await db.transaction().execute(async (trx) => {
     await lockUserForWrite(trx, userId);
-    // 判定と書き込みの間に別のインポートが割り込むと古いbatchIdを再利用するため、
-    // 判定時に logs の最新行をFOR UPDATEで行ロックし、同一ユーザーの保存を直列化する
-    // `score`(scores/songDefドメイン、☆11/12)がある更新は`logs`側から判定・ロックできる。
-    // `allScore`のみ(☆10以下)の更新は`logs`に一切触れないため、`allScores`自体から判定する
+    // 判定と書き込みの間に別インポートが割り込むと古い batchId を再利用するため、判定時に logs 最新行を FOR UPDATE でロックして直列化する。
+     // score（☆11/12）は logs 側で判定・ロックし、allScore のみ（☆10以下）は logs に触れないため allScores から判定する。
     const currentLatestBatchId = score
       ? await logBatchRepo.getLatestBatchIdForUpdate(trx, userId, version)
       : await allScoresRepo.getLatestBatchId(userId, version);
@@ -67,9 +61,7 @@ export async function saveManualScoreUpdate(params: {
 
     let totalBpi: number | null = null;
 
-    // `scores.batchId`は`logs.batchId`への外部キーのため、`logs`側の行を
-    // 先に用意してから`scores`へ書き込む必要がある（CSVインポート
-    // `executeSaveBpiSystem`と同じ順序）。
+    // scores.batchId は logs.batchId への外部キーのため、logs の行を先に用意してから scores へ書き込む（CSV インポートと同じ順序）。
     if (score) {
       const latestLog = await userStatusLogsReadRepo.getLatestArenaRank(
         trx,

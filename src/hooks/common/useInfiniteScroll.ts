@@ -10,9 +10,7 @@ interface UseInfiniteScrollProps {
 }
 
 /**
- * IntersectionObserver を使った無限スクロールフック。
- * 返却した ref をスクロール末尾のセンチネル要素に付与することで、
- * 要素が画面内に入ったタイミングで `onIntersect` を呼び出す。
+ * IntersectionObserver による無限スクロールフック。返す ref を末尾のセンチネルに付けると、画面内に入った時に onIntersect を呼ぶ。
  *
  * @param props - {@link UseInfiniteScrollProps}
  * @returns センチネル要素に付与する ref オブジェクト

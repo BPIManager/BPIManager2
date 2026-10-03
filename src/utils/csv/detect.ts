@@ -52,9 +52,7 @@ const INF_ALLOWED: CsvType[] = ["reflux", "result_techo", "daken_counter"];
 const NORMAL_ALLOWED: CsvType[] = ["official"];
 
 /**
- * 選択中バージョンとCSV種別の組み合わせが有効かを検証する。
- * 問題がある場合はエラーメッセージ文字列を、問題なければ null を返す。
- * `type === "unknown"` の場合は入力なしとみなし null を返す。
+ * 選択中バージョンと CSV 種別の組み合わせを検証する。問題があればエラーメッセージ、無ければ null を返す（type が unknown なら null）。
  */
 export const validateCsvTypeForVersion = (
   type: CsvType,

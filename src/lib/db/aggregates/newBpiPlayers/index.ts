@@ -14,23 +14,8 @@ interface GetPageParams {
 }
 
 /**
- * BPI V2検証ツール(NewBpiComparison)の「全プレイヤー」一覧のためのページ単位データ取得。
- *
- * 都度の計算量を抑えるため、対象を「そのページに含まれる公開ユーザーのみ」に
- * 絞ってスコアを取得する(全公開ユーザー分を一度に読み込まない)。
- * BPIの実計算(現行/新方式/差分)は呼び出し元(APIハンドラ)が
- * `@/lib/bpi` を使って行う(このファイルはDB集約のみ)。
- *
- * ソート・フィルタ・除外は「表示対象を絞り込む」段階の話で、ライブスコアからの
- * 逐次計算(currentTotal等)とは独立して成立させる必要があるため、
- * `userStatusLogs.totalBpi`(バッチ更新のたびに記録される総合BPIログの最新値。
- * `userProfiles/ranking.ts`のグローバルランキングと同じデータ源)を
- * ソートキー・フィルタ条件として使う。ライブ計算のcurrentTotalとは
- * 更新タイミングの違いで多少ズレうる。users・userStatusLogs・scores(EXISTS)の
- * 3テーブルを跨ぐ1つのSQLでORDER BY/WHERE/LIMITを一体で行う必要があり
- * (ページングの正しさはDB側の絞り込みと表示件数が一致して初めて保証される)、
- * ドメイン別メソッドの組み合わせに分解するとページングが壊れるため、
- * この集約内に直接クエリを書く。
+ * BPI V2検証ツールの全プレイヤー一覧のページ単位データ取得。BPI計算は呼び出し元が行い、ここはDB集約のみ。
+ * ソート・フィルタは userStatusLogs.totalBpi を使い、ページングを壊さないよう1つのSQLで完結させる。
  */
 export const newBpiPlayersAggregateRepo = {
   async getPage(params: GetPageParams) {

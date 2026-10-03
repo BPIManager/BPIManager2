@@ -53,9 +53,7 @@ export const useNotifications = (
     if (!fbUser) return;
     try {
       await markNotificationsRead(fbUser);
-      // 未読件数には承認待ちリクエスト数(既読/未読の概念を持たず、対応
-      // されるまで常にカウントされる)も含まれるため、既読化後もtotal:0に
-      // 決め打ちせず再取得する
+      // 未読件数には対応待ちの承認リクエストも含まれ既読概念が無いため、既読化後に total:0 と決め打ちせず再取得する。
       mutateCount();
     } catch (e) {
       console.error(e);

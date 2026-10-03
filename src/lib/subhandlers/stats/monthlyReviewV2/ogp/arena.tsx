@@ -7,9 +7,7 @@ import { ARENA_HISTORY_COUNT, versionLabelOf } from "@/lib/subhandlers/stats/mon
 
 
 /**
- * 対象バージョンの現在の戦績を大きく、過去バージョンを最大3件バージョン・クラス・
- * 順位を列ぞろえして表示する。INF（アリーナランク自体が存在しない）は呼び出し元
- * （generateMonthlyReviewOgpImage）側で常に除外済みの前提
+ * 対象バージョンの戦績を大きく、過去バージョンを最大3件、バージョン・クラス・順位を列ぞろえして表示する。INF は呼び出し元で除外済み。
  */
 export function ArenaBlock({
   current,

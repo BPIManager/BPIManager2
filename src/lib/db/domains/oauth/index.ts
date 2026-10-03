@@ -77,9 +77,8 @@ class OAuthRepository {
   }
 
   /**
-   * Settings画面から手動発行されるconfidential client(client_secret検証あり)を
-   * 1ユーザーにつき1つ登録・再発行する。`userId`のUNIQUE制約により再発行時は
-   * 既存行を上書きする(`apiKeysRepo.upsert`と同じ思想)。
+   * Settings 画面から手動発行される confidential client（client_secret 検証あり）を1ユーザー1件で登録・再発行する。
+   * userId の UNIQUE 制約により再発行は既存行を上書きする（apiKeysRepo.upsert と同じ方針）。
    */
   async upsertUserClient(input: UpsertUserClientInput) {
     const hashed = hashCredential(input.clientSecret);

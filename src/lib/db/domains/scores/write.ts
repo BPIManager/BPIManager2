@@ -17,15 +17,10 @@ class ScoreWriteRepository {
   }
 
   /**
-   * 手動スコア編集用に、指定曲の行をupsertする。
-   *
-   * 対象曲の現在の最新行（`MAX(logId)`）が同じ`batchId`であれば、その行を
-   * そのままUPDATEする（同日内の手動編集を1行にまとめ、レコード増加を抑える）。
-   * 最新行が別のbatchId（CSVインポート等が間に挟まった場合）であれば、
-   * `logId`基準の「最新」判定と矛盾しないよう新規INSERTにフォールバックする。
+   * 手動スコア編集用に指定曲の行を upsert する。最新行が同じ batchId なら UPDATE、別なら INSERT にフォールバックする。
    *
    * @param trx - 呼び出し元が管理するトランザクション
-   * @param params - upsertするスコア内容（`batchId`は手動編集用の決定的ID）
+   * @param params - upsert するスコア内容（batchId は手動編集用の決定的 ID）
    */
   async upsertManual(
     trx: Transaction<Database>,

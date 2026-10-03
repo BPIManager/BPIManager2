@@ -7,12 +7,10 @@ import { Transaction } from "kysely";
  */
 class UserStatusLogsWriteRepository {
   /**
-   * 手動スコア編集用に、その日の総合BPI・アリーナランクスナップショットを
-   * upsertする。`logBatchRepo.upsertManualBatch`と同じ「現在の最新行が
-   * 同じbatchIdの場合のみUPDATE、それ以外はINSERT」方針。
+   * 手動スコア編集用に、その日の総合BPI・アリーナランクのスナップショットを upsert する（最新行が同じ batchId なら UPDATE、それ以外は INSERT）。
    *
    * @param trx - 呼び出し元が管理するトランザクション
-   * @param params - upsertする内容（`batchId`は手動編集用の決定的ID）
+   * @param params - upsert する内容（batchId は手動編集用の決定的 ID）
    */
   async upsertManualBatch(
     trx: Transaction<Database>,

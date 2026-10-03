@@ -7,10 +7,8 @@ import { logTotalBpiRepo } from "@/lib/db/domains/logs/totalBpi";
 
 
 /**
- * {@link StatsTablesRepository.getLatestScoresWithMusicData}の結果をキャッシュする
- * 有効期間(ms)。ダッシュボードの複数ウィジェットが同一ページロード内で
- * 同じuserId/versionのデータをほぼ同時に要求するケースでDBラウンドトリップを
- * 削減するための短時間キャッシュであり、データ鮮度を犠牲にする長期キャッシュではない。
+ * getLatestScoresWithMusicData の結果を保持する短時間キャッシュの有効期間（ms）。
+ * 同一ページロード内の複数ウィジェットの重複 DB アクセスを減らすためで、長期キャッシュではない。
  */
 const LATEST_SCORES_CACHE_TTL_MS = 5000;
 
@@ -122,16 +120,8 @@ class StatsLatestScoresRepository {
   }
 
   /**
-   * {@link getLatestScoresWithMusicData}の複数ユーザー版。
-   * radarキャッシュ更新クロン(`src/lib/cron/radar/index.ts`)のように、複数ユーザー分の
-   * 最新スコア＋楽曲データが必要な場合に、ユーザーごとに個別クエリを発行せず
-   * 1回のクエリでまとめて取得する（`songRankingCache.calculateForVersion`と同じ考え方）。
-   * 呼び出し側で`userId`ごとにグルーピングして利用する。
-   *
-   * `userIds`未指定（全ユーザー対象）で呼ぶと、ユーザー数・スコア数に比例して
-   * 結果セット全体をメモリ上に保持することになりPM2の`max_memory_restart`を
-   * 超過しうる。ユーザー数が多い呼び出し元は`userIds`でページ単位に絞り込んで
-   * 呼び出すこと（`updateAllUserRadarCache`参照）。
+   * getLatestScoresWithMusicData の複数ユーザー版。ユーザーごとのクエリを避け1回でまとめて取得する。
+   * userIds 未指定の全件取得はメモリを大量消費するため、呼び出し元はページ単位で絞ること。
    *
    * @param version - バージョン番号
    * @param userIds - 指定時、このユーザーID群のみに絞り込む（省略時は全ユーザー）

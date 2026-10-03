@@ -147,9 +147,7 @@ export async function handleScoresBulk(
       scoreUpdates.map((s) => [s.songId, s.exScore]),
     );
 
-    // 総合BPI(V2)は単曲BPIの配列ではなく実測観測(songId+exScore)から潜在
-    // スキルを推定する必要があるため、この曲マスタ全体で「今回の更新後の
-    // ベストEXスコア」をsongIdごとに突き合わせる（更新分優先、無ければ既存）。
+    // 総合BPI(V2)は実測観測（songId+exScore）から潜在スキルを推定するため、曲マスタ全体で songId ごとの今回更新後のベスト EX を突き合わせる（更新分優先）。
     const observations: IBpiScoreObservation[] = bpiSongMaster.flatMap(
       (song) => {
         const exScore =

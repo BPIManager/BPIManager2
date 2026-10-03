@@ -52,15 +52,13 @@ class UserStatusLogsReadRepository {
   }
 
   /**
-   * 指定ユーザー・バージョンでこれまでに記録された総合BPIの最高値を取得する。
-   * 総合BPIの「下がらないラチェット」（{@link BpiCalculator.ratchetTotalBpi}）の
-   * 基準値として使う。`getLatestTotalBpi`（最新1件）とは異なり、過去の下振れに影響されない。
+   * 指定ユーザー・バージョンで記録済みの総合BPIの最高値。ラチェットの基準値として使う。
+   * 最新1件（getLatestTotalBpi）と異なり、過去の下振れに影響されない。
    *
-   * @param trx - 呼び出し元が管理するトランザクション（トランザクション外から
-   *   呼ぶ場合は `db` をそのまま渡す）
+   * @param trx - 呼び出し元が管理するトランザクション（外から呼ぶ場合は db を渡す）
    * @param userId - ユーザー ID
    * @param version - バージョン番号
-   * @returns 記録が無ければ `null`
+   * @returns 記録が無ければ null
    */
   async getMaxTotalBpi(
     trx: Kysely<Database> | Transaction<Database>,
@@ -77,18 +75,14 @@ class UserStatusLogsReadRepository {
   }
 
   /**
-   * 指定ユーザー・バージョンで、指定時点(`asOf`)までに記録された総合BPIの最高値を取得する。
-   * {@link getMaxTotalBpi}の時点限定版。月間振り返りのように過去の一時点を基準に
-   * ラチェットの下限を求める場合は、全期間の最大値ではなくこちらを使う
-   * （全期間の最大値を使うと、その時点より後に記録された最高値で過去の値が
-   * 不自然に引き上げられてしまう）。
+   * 指定時点（asOf）までに記録された総合BPIの最高値。過去の一時点を基準にラチェットの下限を求める場合に使う。
+   * 全期間の最大値を使うとその時点より後の記録で過去値が引き上げられてしまうため、時点限定版を使う。
    *
-   * @param trx - 呼び出し元が管理するトランザクション（トランザクション外から
-   *   呼ぶ場合は `db` をそのまま渡す）
+   * @param trx - 呼び出し元が管理するトランザクション（外から呼ぶ場合は db を渡す）
    * @param userId - ユーザー ID
    * @param version - バージョン番号
-   * @param asOf - この時点（`createdAt`基準）までの記録に限定する
-   * @returns 記録が無ければ `null`
+   * @param asOf - この時点（createdAt 基準）までの記録に限定する
+   * @returns 記録が無ければ null
    */
   async getMaxTotalBpiAsOf(
     trx: Kysely<Database> | Transaction<Database>,
@@ -156,16 +150,12 @@ class UserStatusLogsReadRepository {
   }
 
   /**
-   * 指定ユーザー・バージョンで、`createdAt`が[from, to]の範囲にある総合BPI記録を取得する。
-   * 月間振り返りの再計算（{@link buildBpiTimeline}）で、月内に実際に記録された
-   * （記録時点でラチェット済みの）値を下限として合流させるために使う
-   * （{@link getMaxTotalBpiAsOf}は期間開始時点の下限のみで、期間中のBPIモデル再推定
-   * による下振れはカバーしない）。
+   * 指定期間（createdAt の from〜to）内に記録された総合BPIを取得する。月間振り返りの再計算で、期間中に記録済みの値を下限として合流させる。
    *
    * @param userId - ユーザー ID
    * @param version - バージョン番号
-   * @param from - この時点（`createdAt`基準）より後の記録に限定する
-   * @param to - この時点（`createdAt`基準）以前の記録に限定する
+   * @param from - この時点（createdAt 基準）より後の記録に限定する
+   * @param to - この時点（createdAt 基準）以前の記録に限定する
    */
   async getTotalBpiLogsInRange(
     userId: string,

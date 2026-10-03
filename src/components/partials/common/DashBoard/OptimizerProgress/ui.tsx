@@ -71,9 +71,8 @@ const StepProgressRow = ({
   const target = step.toBpi;
   const isAchieved = current != null && current >= step.toExScore;
   const span = target - baseline;
-  // EXスコアの絶対差ではなくBPI空間の相対位置で進捗を出す。EXスコアは終盤ほど
-  // 1点の重みが跳ね上がるため、未プレイ(0点)起点だと序盤の伸びがほぼ見えず
-  // 終盤で急に埋まる。BPIは難易度正規化済みの指標なので曲ごとにスケールが揃う。
+  // 進捗は EX スコアではなく BPI 空間の相対位置で出す。EX は終盤ほど1点の重みが跳ね上がり序盤の伸びが見えないため。
+   // BPI は難易度正規化済みのため曲ごとのスケールが揃う。
   const pct = isAchieved
     ? 100
     : currentBpi == null || span <= 0

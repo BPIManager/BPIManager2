@@ -1,11 +1,8 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
 /**
- * デプロイのヘルスチェック用エンドポイント。
- *
- * `deploy/deploy.sh` が切り替え後にこの応答を待ってからリリースを確定する。
- * DB・Firebase・認証には一切触れず、プロセスが起動して HTTP を返せることだけを
- * 確認する（依存先の一時不調でデプロイがロールバックされるのを避けるため）。
+ * デプロイのヘルスチェック用。deploy/deploy.sh が切り替え後にこの応答を待ってからリリースを確定する。
+ * DB・Firebase・認証には触れず、依存先の一時不調でロールバックされないよう起動と HTTP 応答のみ確認する。
  */
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "GET") {

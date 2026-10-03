@@ -6,13 +6,8 @@ const OUTPUT_DIR = path.join(process.cwd(), "public/data/sitemaps");
 const BASE_URL = process.env.BASEURL + "users";
 
 /**
- * 全ユーザープロフィールページの XML サイトマップを生成し、ファイルに書き出す。
- *
- * 出力先: `public/data/sitemaps/users.xml`
- * ベース URL は環境変数 `BASEURL` + `"users"` を使用する。
- *
- * エラーハンドリングは呼び出し元のcronジョブ実行ラッパー(`runCronJob`)に
- * 委ねるため、ここでは握りつぶさずそのままthrowする。
+ * 全ユーザープロフィールの XML サイトマップを public/data/sitemaps/users.xml へ書き出す。
+ * エラーは握りつぶさず throw し、cron 実行ラッパー（runCronJob）に委ねる。
  *
  * @throws ファイル書き出しや DB アクセスに失敗した場合
  */

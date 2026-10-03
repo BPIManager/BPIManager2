@@ -75,9 +75,7 @@ export async function handleNewBpiPlayers(
         const song = songById.get(s.songId);
         if (!song) continue;
 
-        // s.bpi(DBの保存値)は本番がV2へ全面切り替え済みのため、もはやV1
-        // ではない。この検証ツールの「現行(V1)」列は常にlegacyV1で
-        // 計算し直した真のV1値にする(V2は本番と同じBpiCalculator)。
+        // 検証ツールの「現行(V1)」列は本番の現在値ではなく、常に legacyV1 で計算し直した V1 値にする（V2 は本番と同じ BpiCalculator）。
         const currentBpi = v1
           .chart({
             notes: song.notes,

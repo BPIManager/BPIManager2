@@ -96,10 +96,8 @@ function createVersionOvertakenMap(
 }
 
 /**
- * バッチ（または期間）内で更新したスコアと、他バージョンでの自分のスコアとの
- * 比較情報一覧を取得する。勝敗・新規追い抜きかどうかに関わらず全件返す
- * （`isNewOvertake`で判定できる）。自分以外のログ閲覧時は空マップを返す
- * （ライバル追い抜きと同様、他人のログでは非公開の比較情報を出さない）。
+ * バッチ（または期間）内で更新したスコアと、他バージョンの自分のスコアとの比較情報を全件返す（isNewOvertake で新規追い抜きを判定できる）。
+ * 自分以外のログ閲覧時は空マップを返し、他人の非公開な比較情報を出さない。
  */
 export async function fetchVersionOvertakenMap(params: {
   userId: string;

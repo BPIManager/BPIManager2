@@ -3,13 +3,8 @@ import { Database } from "@/types/db";
 import { Transaction } from "kysely";
 
 /**
- * フォローリクエスト承認通知（`followApprovalNotifications` テーブル）の
- * 読み書きを担当するリポジトリクラス。
- *
- * 却下・強制解除は相手に通知しない（角が立つため）。承認のみ通知する。
- * `follow`/`overtaken`通知(`aggregates/notifications`)と同じ`notifications`
- * テーブルの`lastReadAt`基準で既読を判定する（この行自体は削除されない
- * 恒久ログのため、`createdAt > lastReadAt`の絞り込みが機能する）。
+ * フォローリクエスト承認通知（followApprovalNotifications）の読み書き。承認のみ通知し、却下・強制解除は相手に通知しない。
+ * 既読は notifications テーブルの lastReadAt 基準で判定する（この行は恒久ログのため createdAt > lastReadAt が機能する）。
  */
 class FollowApprovalNotificationsRepository {
   /**
@@ -27,10 +22,7 @@ class FollowApprovalNotificationsRepository {
   }
 
   /**
-   * 承認通知を記録する（トランザクション不要の単独呼び出し版）。
-   *
-   * 非公開のユーザーの、承認記録のない既存フォロワーを事後承認する場合など、`follows`行が既に存在し他テーブルへの
-   * 書き込みを伴わないケースで使う。
+   * 承認通知を単独で記録する。承認記録の無い既存フォロワーを事後承認する場合など、follows は既に存在し他テーブルへの書き込みを伴わないケースで使う。
    *
    * @param recipientId - 通知の受信者（フォロワー）
    * @param actorId - 承認したユーザー
@@ -43,10 +35,7 @@ class FollowApprovalNotificationsRepository {
   }
 
   /**
-   * 指定の組み合わせで、過去に承認記録があるかを確認する。
-   *
-   * `follows`行の存在だけでは「承認記録のない既存フォロー」と区別できないため、`hasFollowAccess`の判定に使う
-   * （follows存在 AND この承認記録存在、の両方を要求する）。
+   * 指定の組み合わせに承認記録があるかを確認する。follows だけでは承認記録の無い既存フォローと区別できないため hasFollowAccess の判定に使う。
    *
    * @param recipientId - リクエスト送信者（フォロワー）側のユーザー ID
    * @param actorId - 承認した（された）側のユーザー ID

@@ -30,9 +30,8 @@ function matchesFilters(song: SongOptimizerInput, options: ExecuteOptions): bool
 }
 
 /**
- * スコア付けされた候補のプールから、上位ほど選ばれやすい重み付き乱択で1曲決定する。
- * flexibleを完全一様乱択にすると寄与ほぼ0の候補まで選ばれうるため、両モードとも
- * `POOL_PICK_POWER`で上位寄りに偏らせ、プールサイズの違いだけでモード差を表す。
+ * 候補プールから、上位ほど選ばれやすい重み付き乱択で1曲を決める。
+ * 完全一様乱択だと寄与ほぼ0の候補も選ばれうるため、両モードとも POOL_PICK_POWER で上位寄りに偏らせる。
  */
 function pickFromPool(
   scored: ScoredCandidate[],
@@ -51,11 +50,8 @@ function pickFromPool(
 }
 
 /**
- * BPI(V2)ネイティブの探索エンジン本体。
- * BPI計算式は一切再実装せず、`TotalBpiEvaluator`（＝`BpiCalculator`）と
- * `LatentSkillModel`（`@bpim/bpicalc`の`PlayerBpiV2`と同式の増分実装）にのみ依存する。
- * 責務は「ループを回し、`CandidateScorer`が選んだ曲を状態へ確定反映する」ことに絞る
- * （スコアリングの中身は`CandidateScorer`、目標BPIの見積もりは`achievementCeiling`が持つ）。
+ * BPI(V2)ネイティブの探索エンジン本体。計算式は再実装せず TotalBpiEvaluator と LatentSkillModel に依存する。
+ * 責務はループを回し CandidateScorer が選んだ曲を状態へ確定反映することのみ（スコアリングは CandidateScorer が担う）。
  */
 class BpiOptimizerEngine {
   private readonly latentSkill = new LatentSkillModel();
@@ -98,10 +94,8 @@ class BpiOptimizerEngine {
       };
     }
 
-    // シフト法の総合BPIは、未プレイ曲の潜在スキル予測が新しい観測で下振れすると
-    // プレイ済み曲が1つも下がっていなくても下がりうるため、探索の起点をユーザーの
-    // 既知の最高値（previousBestTotalBpi）でラチェットする（他画面の「現在の総合BPI」
-    // と整合させる。BpiCalculator.ratchetTotalBpiのコメント参照）
+    // 総合BPIは未プレイ曲の予測が新しい観測で下振れすると下がりうるため、探索の起点を既知の最高値（previousBestTotalBpi）でラチェットする。
+     // 他画面の「現在の総合BPI」と整合させるため。BpiCalculator.ratchetTotalBpi 参照。
     const initialTotal = BpiCalculator.ratchetTotalBpi(
       this.options.previousBestTotalBpi ?? null,
       this.totalEvaluator.exact([...this.observations.values()], this.allSongs),
@@ -119,9 +113,7 @@ class BpiOptimizerEngine {
     }
 
     const relevantCategories = this.options.radarElementFilter ?? ALL_RADAR_CATEGORIES;
-    // コールド判定自体は常に行う（プレイ済み曲狙い主体の探索でも「このカテゴリは
-    // データが薄い」という案内自体は有用なため）。候補からの除外（フィルタリング）
-    // は未プレイ曲にのみ影響するので、includeUnplayedがfalseのときは実質無害。
+    // コールド判定は常に行う（プレイ済み曲狙いでも「データが薄い」案内は有用）。除外は未プレイ曲のみに影響するため、includeUnplayed=false なら実質無害。
     const coldCategories = detectColdCategories(
       relevantCategories as RadarCategory[],
       this.latentSkill,
@@ -192,9 +184,7 @@ class BpiOptimizerEngine {
         exScore: picked.toExScore,
       });
 
-      // 前ステップまでの到達値(currentTotal)を下回らないよう連鎖的にラチェットする
-      // （initialTotal起点で既にprevious BestTotalBpi以上のため、これで全ステップが
-      // 単調非減少になり、bpiGainが見かけ上マイナスになることもなくなる）
+      // 前ステップまでの到達値を下回らないよう連鎖的にラチェットする。全ステップが単調非減少になり bpiGain がマイナスにならない。
       const newTotal = BpiCalculator.ratchetTotalBpi(
         currentTotal,
         this.totalEvaluator.exact([...this.observations.values()], this.allSongs),

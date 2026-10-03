@@ -24,9 +24,7 @@ type CacheEntry = {
 const cache = new MemoryCache<string, CacheEntry>();
 
 /**
- * バージョン + レベルのアリーナ平均データを返す。
- * ローカルの public/data/metrics/arena/<version>_<level>.json を読み込み、
- * 同日内はメモリキャッシュから返す。
+ * バージョン＋レベルのアリーナ平均データを返す。public/data/metrics/arena/ の静的 JSON を読み、同日内はメモリキャッシュから返す。
  */
 export async function getArenaAverages(
   version: string,

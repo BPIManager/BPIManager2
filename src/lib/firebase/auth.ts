@@ -26,19 +26,13 @@ const twitterProvider = new TwitterAuthProvider();
 const lineProvider = new OAuthProvider("oidc.line");
 
 /**
- * A utility object providing methods for Firebase Authentication actions.
- * * @remarks
- * This utility uses `signInWithRedirect`, which will cause the browser to navigate
- * away from the current page to the provider's login portal.
+ * Firebase Authentication の操作をまとめたユーティリティ。signInWithRedirect を使うため、ブラウザはプロバイダのログインページへ遷移する。
  */
 export const authActions = {
   /**
-   * Initiates the Google sign-in flow via a page redirect.
-   * * @returns A promise that resolves when the redirect is initiated.
-   * @example
-   * ```ts
-   * await authActions.signInWithGoogle();
-   * ```
+   * Google のリダイレクト方式でサインインを開始する。Promise はリダイレクトの開始時点で解決する。
+   *
+   * @returns リダイレクト開始時に解決する Promise
    */
   signInWithGoogle: (loginHint?: string): Promise<UserCredential> => {
     googleProvider.setCustomParameters(
@@ -66,11 +60,10 @@ export const authActions = {
   },
 
   /**
-   * Signs out the current user and clears local session data.
-   * * @remarks
-   * This method specifically removes the 'social' key from `localStorage`
-   * before calling the Firebase `signOut` method.
-   * * @returns A promise that resolves when the user has been successfully signed out.
+   * 現在のユーザーをサインアウトし、ローカルのセッションデータを削除する。
+   * Firebase の signOut を呼ぶ前に localStorage の 'social' キーを削除する。
+   *
+   * @returns サインアウト完了時に解決する Promise
    */
   logout: async (): Promise<void> => {
     return signOut(auth);

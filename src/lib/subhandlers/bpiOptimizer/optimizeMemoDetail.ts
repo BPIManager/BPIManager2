@@ -35,10 +35,7 @@ export async function handleDeleteOptimizeMemo(
 }
 
 /**
- * PUT /users/[userId]/optimizeMemo/[memoId] （withAuth）
- *
- * 保存済みの目標（自動生成・カスタムのどちらも）の曲目・目標BPIを
- * 上書き更新する。「目標管理」の編集機能から使う。
+ * 保存済み目標（自動生成・カスタム共通）の曲目・目標BPIを上書き更新する。「目標管理」の編集機能から使う。
  */
 export async function handleUpdateOptimizeMemo(
   req: NextApiRequest,

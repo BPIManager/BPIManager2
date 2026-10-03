@@ -47,9 +47,7 @@ const TimelineContainer = () => {
   } = useTimelineFilter();
   const { lists } = useFollowLists(user?.userId || false);
 
-  // 選択中のリストが削除された場合、フィルタを「すべて」に戻す
-  // (RivalListContainerと同じ理由: listIdを保持したままだと、
-  // 存在しないリストへの絞り込みリクエストが送られ続ける)
+  // 選択中のリストが削除されたらフィルタを「すべて」に戻す（listId を保持すると存在しないリストへの絞り込みが送られ続けるため）。
   useEffect(() => {
     if (listId != null && !lists.some((l) => l.id === listId)) {
       setListId(null);

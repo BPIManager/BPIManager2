@@ -27,9 +27,7 @@ class LogBatchRepository {
   }
 
   /**
-   * トランザクション内で対象行をロックしつつ最新バッチIDを判定する。
-   * バッチ削除の「最新バッチか」判定と削除をアトミックに行うために使う
-   * （判定後・削除前に新しいバッチが割り込むTOCTOU競合を防ぐ）。
+   * トランザクション内で対象行をロックしつつ最新バッチIDを判定する。判定と削除をアトミックにし、間に割り込む TOCTOU 競合を防ぐ。
    *
    * @param trx - 呼び出し元が管理するトランザクション
    * @param userId - ユーザー ID
@@ -95,15 +93,10 @@ class LogBatchRepository {
   }
 
   /**
-   * 手動スコア編集用に、その日の総合BPIスナップショットをupsertする。
-   *
-   * 現在の最新バッチ（`id`最大）が同じ`batchId`であれば、その行をUPDATEする
-   * （同日内の複数回の手動編集を1行にまとめる）。最新バッチが別のbatchId
-   * （間にCSVインポート等が挟まった場合）であれば、`id`基準の「最新」判定と
-   * 矛盾しないよう新規INSERTにフォールバックする。
+   * 手動スコア編集用の総合BPIスナップショットを upsert する。最新バッチが同じ batchId なら UPDATE、別なら INSERT にフォールバックする。
    *
    * @param trx - 呼び出し元が管理するトランザクション
-   * @param params - upsertする内容（`batchId`は手動編集用の決定的ID）
+   * @param params - upsert する内容（batchId は手動編集用の決定的 ID）
    */
   async upsertManualBatch(
     trx: Transaction<Database>,

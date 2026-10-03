@@ -11,10 +11,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 
 /**
- * 「最も伸びた曲」「レーダー別成長」で共通の設定UI（歯車アイコン→Popover）。
- * 全期間モードの比較先バージョン選択（`compareVersion`/`onChange`省略時は非表示）と、
- * 「最も伸びた曲」限定の「新規プレイを除く」チェックボックス
- * （`onExcludeNewPlaysChange`省略時は非表示）を、必要な方だけ出し分ける。
+ * 「最も伸びた曲」「レーダー別成長」共通の設定UI（歯車→Popover）。比較先バージョン選択と「新規プレイを除く」を、渡されたprop に応じて出し分ける。
  */
 const CompareVersionConfig = ({
   currentVersion,

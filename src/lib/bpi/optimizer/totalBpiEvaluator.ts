@@ -3,13 +3,8 @@ import { BpiCalculator } from "@/lib/bpi";
 import type { IBpiBasicSongData, IBpiScoreObservation } from "@/types/songs/bpi";
 
 /**
- * 総合BPIの計算を担う。数式（シフト法べき乗平均）は一切再実装せず、
- * `BpiCalculator.calculateTotalBPI`（＝アプリの他画面と共通のV2実装）へ委譲する。
- * これにより、オプティマイザが返す`currentTotalBpi`は常にダッシュボード等が
- * 表示する値と一致する（V1延命実装が抱えていた不整合の再発を防ぐ）。
- *
- * シフト量`c`は`BpiCalculator`が使う`BpiV2`インスタンスと同じ`V2_DEFAULTS.totalBpiShift`
- * （`bpiFloor`/`totalBpiShift`等は`BpiCalculator`のコンストラクタでも上書きしていないため既定値のまま）。
+ * 総合BPIの計算を BpiCalculator.calculateTotalBPI へ委譲し、数式を再実装しない。ダッシュボード等の表示値と一致させるため。
+ * シフト量は BpiCalculator の BpiV2 と同じ V2_DEFAULTS.totalBpiShift を使う（上書きしていないため既定値のまま）。
  */
 export class TotalBpiEvaluator {
   private static readonly SHIFT = V2_DEFAULTS.totalBpiShift;
@@ -34,9 +29,7 @@ export class TotalBpiEvaluator {
   }
 
   /**
-   * 総合BPI T = (Σ(BPI_i+c)^k'/n)^(1/k') - c を1曲のBPI_iについて偏微分した
-   * 解析的勾配 ∂T/∂BPI_i = ((BPI_i+c)/(T+c))^(k'-1) / n（提案書§2.4）。
-   * 候補の一次選抜（足切り）専用の近似であり、最終判定には`exact`を使う。
+   * 総合BPI T の BPI_i に関する解析的勾配 ∂T/∂BPI_i（提案書§2.4）。候補の一次選抜（足切り）専用の近似で、最終判定には exact を使う。
    */
   marginalGainEstimate(currentTotal: number, songBpi: number, kPrime: number): number {
     const c = TotalBpiEvaluator.SHIFT;

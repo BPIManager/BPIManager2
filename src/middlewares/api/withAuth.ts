@@ -10,16 +10,8 @@ type ApiHandler = (
 ) => Promise<void> | void;
 
 /**
- * Firebase IDトークンを検証し、`req.authUid` を設定するAPIミドルウェア。
- *
- * 本人確認（ownership check）は `req.query.userId` または `req.body.userId`
- * が存在する場合にのみ副次的に行われる。`withAuth` を付けただけでは
- * 「他人のuserIdへのアクセスを防ぐ」ことは保証されない —
- * ルートが `userId` パラメータを持たない場合（例: apiKey.ts）、この
- * チェックは何もせずスキップされ、`req.authUid` によるトークン検証のみが
- * 行われる。userIdパラメータを持つルートを新設する際は、`query.userId`
- * または `body.userId` に対象ユーザーIDを含めることで本人確認が働く点に
- * 注意すること。
+ * Firebase IDトークンを検証し req.authUid を設定する。本人確認は query/body の userId がある場合のみ行われる。
+ * userId を持たないルートは検証のみとなるため、userId パラメータを持つルートは query または body に含めること。
  */
 export const withAuth = (handler: ApiHandler) => {
   return async (req: NextApiRequest, res: NextApiResponse) => {

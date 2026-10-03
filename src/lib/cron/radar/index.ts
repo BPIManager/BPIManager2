@@ -11,22 +11,14 @@ import {
 import type { IBpiBasicSongData, IBpiScoreObservation } from "@/types/songs/bpi";
 
 /**
- * {@link statsLatestScoresRepo.getLatestScoresWithMusicDataForAllUsers}を1回呼ぶ際に
- * 対象とするユーザー数の上限。PM2の`max_memory_restart`（deploy/ecosystem.config.js）を
- * 超えないよう、スコア行をメモリ上に保持する範囲をこのページ単位に抑える。
+ * getLatestScoresWithMusicDataForAllUsers を1回で呼ぶユーザー数の上限。
+ * PM2 の max_memory_restart（deploy/ecosystem.config.js）を超えないよう、メモリに保持するスコア行をページ単位に抑える。
  */
 const USER_PAGE_SIZE = 200;
 
 /**
- * 全ユーザーのレーダーキャッシュ（`userRadarCache` テーブル）を最新スコアで更新する。
- *
- * 各ユーザーの最新スコアから `calculateRadar` でカテゴリ別 BPI を算出し、
- * 総合 BPI とともに算出結果をメモリ上に集約したうえで、最後にbulk UPSERTで
- * まとめて書き込むことでDBラウンドトリップ数を削減する。
- * スコアが存在しないユーザーはスキップされる。
- * ユーザーIDを{@link USER_PAGE_SIZE}件ずつのページに区切り、ページ単位で
- * `getLatestScoresWithMusicDataForAllUsers`を1回だけ呼んでスコア行を取得・集計してから
- * 次のページへ進む。
+ * 全ユーザーのレーダーキャッシュを最新スコアから算出し、bulk UPSERTでまとめて書き込む。
+ * ユーザーを USER_PAGE_SIZE ごとのページに区切り、ページ単位でスコアを取得してDBラウンドトリップを抑える。
  */
 export async function updateAllUserRadarCache() {
   const version = latestVersion;
@@ -101,9 +93,7 @@ export async function updateAllUserRadarCache() {
             soflan: radar.SOFLAN.totalBpi,
             totalBpi,
           };
-          // BPI計算ライブラリ側で不正なチャートデータ（mu/sigma欠損等）に当たると
-          // NaNを返すことがある。`NaN.toFixed(2)`は例外を投げず文字列"NaN"になり、
-          // decimal列への一括INSERTがバッチ全体失敗するため、書き込み前に弾く
+          // mu/sigma 欠損などの不正なチャートでは NaN になりうる。NaN.toFixed は文字列 "NaN" を返し decimal 列の一括 INSERT が全体失敗するため、書き込み前に弾く。
           const invalidKey = Object.entries(values).find(
             ([, v]) => !Number.isFinite(v),
           )?.[0];

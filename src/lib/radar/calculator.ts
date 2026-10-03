@@ -58,12 +58,8 @@ export function buildRadarSongMaster(
 }
 
 /**
- * スコアリストからレーダーチャートデータを計算する。
- *
- * `topElements.json` を参照して各楽曲をカテゴリに分類し、
- * カテゴリごとに {@link BpiCalculator.calculateTotalBPI} を適用した総合 BPI を算出する。
- * 未プレイ曲を潜在スキルから予測するV2の仕様上、プレイ済み・未プレイ問わず
- * `songMaster` から songId・mu・sigma 等を引けることが必要。
+ * スコアリストからレーダーチャートデータを計算する。各楽曲を topElements.json でカテゴリに分類し、カテゴリごとに総合BPIを算出する。
+ * 未プレイ曲を潜在スキルから予測するため、songMaster から songId・mu・sigma 等を引けること（プレイ済み・未プレイ問わず）が必要。
  *
  * @param scores - 計算対象のスコア配列（タイトル・難易度・EX スコア・BPI）
  * @param songMaster - `${title}___${difficulty}` キーの曲マスタ（mu/sigma込み）

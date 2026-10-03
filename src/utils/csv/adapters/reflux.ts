@@ -1,15 +1,5 @@
 /**
- * Reflux TSV → 標準インポート行フォーマット 変換アダプタ
- *
- * ランプ値マッピング:
- *   FC  → FULLCOMBO CLEAR
- *   EXH / EX → EX HARD CLEAR
- *   HC  → HARD CLEAR
- *   NC  → CLEAR
- *   AC  → ASSIST CLEAR
- *   EC  → EASY CLEAR
- *   FAILED / F → FAILED
- *   NP / '' → スキップ (未プレイ)
+ * Reflux TSVを標準インポート行へ変換する。ランプ表記をDB値へ写像し、未プレイ（NP・空）行はスキップする。
  */
 
 import type { ParsedCsvRow } from "../types";

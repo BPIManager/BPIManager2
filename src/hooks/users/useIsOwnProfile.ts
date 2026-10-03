@@ -1,13 +1,10 @@
 import { useUser } from "@/contexts/users/UserContext";
 
 /**
- * 閲覧中のプロフィールが自分自身のものかどうかを判定する。
+ * 閲覧中のプロフィールが自分自身かを判定する。router.query.userId は配列になりうるため正規化してから Firebase uid と比較する。
  *
- * `router.query.userId` は `string | string[] | undefined` になり得るため、
- * ここで正規化した上で Firebase の uid と比較する。
- *
- * @param userId - 比較対象のユーザー ID（`router.query.userId` 等）
- * @returns 自分自身のプロフィールであれば `true`
+ * @param userId - 比較対象のユーザー ID（router.query.userId 等）
+ * @returns 自分自身のプロフィールであれば true
  */
 export const useIsOwnProfile = (
   userId: string | string[] | undefined,

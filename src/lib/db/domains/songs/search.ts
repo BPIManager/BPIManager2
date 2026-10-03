@@ -135,15 +135,12 @@ class SongSearchRepository {
   }
 
   /**
-   * 指定楽曲に属性ベクトルが最も近い楽曲を返す。
+   * 指定楽曲に属性ベクトルが最も近い楽曲を、6次元（scratch・soflan・cn・chord・intensity・udeoshi）のユークリッド距離順で返す。
+   * 属性データが無い楽曲は対象外。
    *
-   * 6次元ベクトル [p_scratch, p_soflan, p_cn, p_chord, p_intensity, p_udeoshi] を用いて
-   * ユークリッド距離を計算し、距離が近い順に返す。
-   * 属性データが存在しない楽曲は対象外。
-   *
-   * @param songId  - 基準楽曲 ID
+   * @param songId - 基準楽曲 ID
    * @param version - バージョン番号文字列
-   * @param limit   - 返す件数（デフォルト 10）
+   * @param limit - 返す件数（デフォルト 10）
    */
   async getSimilarSongs(
     songId: number,

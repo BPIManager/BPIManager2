@@ -19,9 +19,7 @@ export interface BpiOptimizerDatasetRow {
 }
 
 /**
- * BPI最適化対象楽曲（☆12）について、指定したデータセット
- * （特定バージョンでのスコア、または全バージョン横断の自己歴代ベスト）での
- * 曲ごとのEXスコア一覧を取得する。「自己べを目指す」機能向け。
+ * ☆12 の曲ごとのEXスコアを、指定データセット（特定バージョン or 全バージョン横断の自己歴代ベスト）で取得する。「自己べを目指す」機能向け。
  */
 export async function fetchBpiOptimizerDataset(
   userId: string,

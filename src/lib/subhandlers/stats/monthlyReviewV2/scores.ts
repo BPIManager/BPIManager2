@@ -47,14 +47,8 @@ export async function computeOwnerMonthlyScores(
 }
 
 /**
- * BPIトップ3・改善曲（`rank`はbuildTopSongs内でbpicalcの推定順位関数から算出済み）。
- * radar-growthセクションからも呼ばれる。
- *
- * `compareVersion`省略時は月内比較（`monthStart`より前の直近スコア）を使う。
- * 「全期間（月=all）」モードは元々の期間開始が2000年固定の便宜上の値で
- * 「期間開始前のスコア」という比較が意味を持たないため、`compareVersion`に
- * 比較対象バージョン（既定は前バージョン）を渡し、そのバージョン内での
- * 最新スコアを比較元として使う。
+ * BPIトップ3・改善曲。compareVersion 省略時は月内比較、「全期間（月=all）」では比較対象バージョン（既定は前バージョン）の最新を使う。
+ * 全期間の期間開始は2000年固定の便宜値のため、期間開始前のスコアという比較は意味を持たない。
  */
 export async function computeOwnerTopSongs(
   owner: string,

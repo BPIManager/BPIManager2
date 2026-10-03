@@ -1,13 +1,8 @@
 import type { ApiResponse } from "@/types/api";
 
 /**
- * API v2 共通エンベロープ（`ApiResponse<T>`）を解釈する SWR フェッチャー。
- * v1 用の `fetcher`（`@/utils/common/fetch`）とは別物で、v2 へ移行済みの
- * エンドポイントを叩くフックからのみ使う。
- *
- * - HTTP エラー、レスポンスがエンベロープ形式でない、または `error: true` の
- *   とき、`info` / `status` 付きの Error を throw する（v1 `fetcher` と同じ形）
- * - 正常時は unwrap した `body`（`T`）を返す
+ * API v2 共通エンベロープ（ApiResponse<T>）を解釈する SWR フェッチャー。v1 の fetcher とは別で、v2 移行済みエンドポイント専用。
+ * HTTP エラー・エンベロープ外・error: true は info/status 付きの Error を throw し、正常時は body を返す。
  */
 
 type FetcherUser = { getIdToken: () => Promise<string> } | null;

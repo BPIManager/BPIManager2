@@ -166,9 +166,7 @@ class SocialFollowedWinLossRepository {
           eb.fn.coalesce(eb.ref("wl.totalCount"), eb.lit(0)).as("totalCount"),
       ])
       .where("f.followerId", "=", viewerId)
-      // 対象が公開、または対象が非公開でも承認記録がある場合のみ表示する。
-      // followsの存在だけでは判定できない(公開時代に成立したfollowsには
-      // 承認記録がないため、承認記録の有無も要求する)
+      // 公開、または非公開でも承認記録がある場合のみ表示する。follows の存在だけでは公開時代の行を判別できないため。
       .where((eb) =>
         eb.or([
           eb("u.isPublic", "=", 1),

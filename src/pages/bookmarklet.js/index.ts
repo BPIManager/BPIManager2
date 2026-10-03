@@ -1,8 +1,7 @@
 import type { GetServerSideProps } from "next";
 
-// IIDX-Scraping-Bookmarklet の main ブランチ最新コミットに追従すると、
-// 参照先リポジトリが侵害された場合に未検証のコードを配信してしまうため、
-// 特定コミットに固定する。更新する場合はこのSHAを明示的に書き換えること。
+// 参照先は特定コミットに固定する。main 追従だと参照先リポジトリが侵害された場合に未検証のコードを配信してしまうため。
+ // 更新時はこの SHA を明示的に書き換える。
 const BOOKMARKLET_SOURCE_COMMIT = "4bed7f19317d5b1c98037b60eac8b5b72f71d6c1";
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {

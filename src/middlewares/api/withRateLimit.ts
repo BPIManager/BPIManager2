@@ -19,10 +19,8 @@ const MAX_TRACKED_CLIENTS = 5000;
 const buckets = new Map<string, Bucket>();
 
 function getClientIp(req: NextApiRequest): string {
-  // CF-Connecting-IP は Cloudflare がエッジで付与する。CF-Ray も Cloudflare 経由でのみ付くため、
-  // 両方が揃い IP 形式として妥当な場合のみ信頼する。どちらも無い場合はソケットのアドレスを使う。
-  // 注: オリジンに直接接続するクライアントは両ヘッダを偽装できるため、完全な防御には
-  // オリジンをCloudflareからのみ到達可能にする設定（Authenticated Origin Pulls等）が別途必要。
+  // CF-Connecting-IP と CF-Ray は両方揃い IP 形式として妥当な場合のみ信頼し、無ければソケットのアドレスを使う。
+   // 注: オリジンに直接接続するクライアントはヘッダを偽装できるため、完全な防御には Authenticated Origin Pulls 等が別途必要。
   const cfRay = req.headers["cf-ray"];
   const cfConnectingIp = req.headers["cf-connecting-ip"];
   if (typeof cfRay === "string" && typeof cfConnectingIp === "string") {
@@ -33,12 +31,9 @@ function getClientIp(req: NextApiRequest): string {
 }
 
 /**
- * IPアドレス単位の簡易レート制限を行うAPIミドルウェア。
+ * IP 単位の簡易レート制限。インスタンス内メモリでカウントするため、複数インスタンスでは別々にカウントされる（多層防御の簡易実装）。
  *
- * インスタンス内メモリでカウントするため、複数インスタンス構成では
- * インスタンスごとに別カウントになる（多層防御としての簡易実装）。
- *
- * @param handler - ラップ対象のAPIハンドラー
+ * @param handler - ラップ対象の API ハンドラー
  * @param options.windowMs - 制限をカウントする時間窓（ミリ秒）
  * @param options.max - 時間窓内に許可するリクエスト数
  */
