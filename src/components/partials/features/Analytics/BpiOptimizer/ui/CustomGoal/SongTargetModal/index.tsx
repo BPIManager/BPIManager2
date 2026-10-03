@@ -1,113 +1,23 @@
 import { useEffect, useMemo, useState } from "react";
 import { Search, CircleDashed, ArrowLeft } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { RANK_TABLE, getRankDetail } from "@/constants/iidx/rankBorders";
+import { getRankDetail } from "@/constants/iidx/rankBorders";
 import { ALL_RADAR_CATEGORIES } from "@/constants/iidx/radars";
 import { BpiCalculator } from "@/lib/bpi";
-import type { IBpiBasicSongData } from "@/types/songs/bpi";
+
 import type { RadarCategory } from "@/types/stats/radar";
 import { MiniBpiChip } from "@/components/partials/common/OptimizerGoalCard";
-import { RADAR_LABELS } from "../shared";
-import DifficultyBadge from "../DifficultyBadge";
-import {
-  useSongSearch,
-  type SongSearchResult,
-  type BpmBand,
-} from "@/hooks/songs/useSongSearch";
+import { RADAR_LABELS } from "../../shared";
+import DifficultyBadge from "../../DifficultyBadge";
+import { useSongSearch, type SongSearchResult, type BpmBand } from "@/hooks/songs/useSongSearch";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import { SearchMode, SEARCH_MODES, BPM_BANDS, SongSortOrder, SONG_SORT_ORDERS, CustomGoalTargetInput } from "@/components/partials/features/Analytics/BpiOptimizer/ui/CustomGoal/SongTargetModal/types";
+import { toBpiSongData, quickScoreOptions, bpiQuickOptions, scoreRate } from "@/components/partials/features/Analytics/BpiOptimizer/ui/CustomGoal/SongTargetModal/quickOptions";
 
-type SearchMode = "title" | "radar" | "bpm";
-const SEARCH_MODES: SearchMode[] = ["title", "radar", "bpm"];
-const BPM_BANDS: BpmBand[] = ["slow", "mid", "fast", "soflan"];
-
-type SongSortOrder = "title" | "bpiDesc" | "bpiAsc";
-const SONG_SORT_ORDERS: SongSortOrder[] = ["title", "bpiDesc", "bpiAsc"];
-
-export interface CustomGoalTargetInput {
-  songId: number;
-  title: string;
-  difficulty: string;
-  difficultyLevel: number;
-  notes: number;
-  toExScore: number;
-  wrScore: number | null;
-  kaidenAvg: number | null;
-  coef: number | null;
-  mu: number | null;
-  sigma: number | null;
-  residualVar: number | null;
-}
-
-const toBpiSongData = (
-  song: Pick<
-    CustomGoalTargetInput,
-    "notes" | "kaidenAvg" | "wrScore" | "coef" | "mu" | "sigma" | "residualVar"
-  >,
-): IBpiBasicSongData => ({
-  notes: song.notes,
-  kaidenAvg: song.kaidenAvg,
-  wrScore: song.wrScore,
-  coef: song.coef,
-  mu: song.mu,
-  sigma: song.sigma,
-  residualVar: song.residualVar,
-});
-
-const QUICK_SCORE_LABELS = ["A", "AA", "AAA", "MAX-"] as const;
-
-function quickScoreOptions(
-  song: Pick<
-    CustomGoalTargetInput,
-    "notes" | "kaidenAvg" | "wrScore" | "coef" | "mu" | "sigma" | "residualVar"
-  >,
-): { label: string; score: number; bpi: number | null }[] {
-  const maxScore = song.notes * 2;
-  const ratioByLabel = new Map(RANK_TABLE.map((r) => [r.label, r.ratio]));
-  const bpiSong = toBpiSongData(song);
-  const scores = [
-    ...QUICK_SCORE_LABELS.map((label) => ({
-      label,
-      score: Math.ceil(maxScore * (ratioByLabel.get(label) ?? 0)),
-    })),
-    { label: "MAX", score: maxScore },
-  ];
-  return scores.map((opt) => ({
-    ...opt,
-    bpi: BpiCalculator.calc(opt.score, bpiSong),
-  }));
-}
-
-const BPI_QUICK_TARGETS = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
-
-/** BPI 0/10/.../100を達成するのに必要なEXスコアの早見表（mu/sigmaが無い曲では逆算できないため空になる）。 */
-function bpiQuickOptions(
-  song: Pick<
-    CustomGoalTargetInput,
-    "notes" | "kaidenAvg" | "wrScore" | "coef" | "mu" | "sigma" | "residualVar"
-  >,
-): { bpi: number; score: number }[] {
-  const maxScore = song.notes * 2;
-  const bpiSong = toBpiSongData(song);
-  return BPI_QUICK_TARGETS.map((bpi) => {
-    const rawScore = BpiCalculator.calcFromBPI(bpi, bpiSong);
-    if (rawScore == null) return null;
-    return { bpi, score: Math.min(maxScore, Math.max(0, rawScore)) };
-  }).filter((opt): opt is { bpi: number; score: number } => opt != null);
-}
-
-const scoreRate = (score: number, notes: number) =>
-  notes > 0 ? (score / (notes * 2)) * 100 : 0;
-
-const SongTargetModal = ({
+export const SongTargetModal = ({
   isOpen,
   onClose,
   onConfirm,

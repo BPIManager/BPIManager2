@@ -8,7 +8,7 @@ import type { OptimizationResult } from "@/types/bpi-optimizer";
 import { toast } from "sonner";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import CustomGoalCreatorUi from "./ui";
-import type { CustomGoalTargetInput } from "./SongTargetModal";
+import type { CustomGoalTargetInput } from "./SongTargetModal/types";
 
 const CustomGoalCreator = ({
   currentScores,
