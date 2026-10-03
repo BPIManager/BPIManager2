@@ -1,6 +1,10 @@
 ﻿"use client";
 
+import { useState } from "react";
+import { Mail } from "lucide-react";
 import { authActions } from "@/lib/firebase/auth";
+import EmailLoginModal from "@/components/partials/modal/EmailLogin";
+import { useTranslation } from "@/hooks/common/useTranslation";
 import { Button } from "@/components/ui/button";
 import { ChevronRightIcon } from "lucide-react";
 import Link from "next/link";
@@ -68,6 +72,8 @@ export const LoginButtons = ({
   /** サインイン成功時に呼び出す（LINEはリダイレクト遷移するため呼ばれない） */
   onSuccess?: () => void;
 } = {}) => {
+  const { t } = useTranslation();
+  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
   const handleClick = async (action: () => Promise<unknown>) => {
     try {
       await action();
@@ -94,7 +100,7 @@ export const LoginButtons = ({
                   hover:z-10 hover:bg-bpim-overlay/40
                   active:scale-[0.98]
                   ${index === 0 ? "rounded-t-xl! rounded-b-none" : ""}
-                  ${index === LOGIN_PROVIDERS.length - 1 ? "rounded-b-xl rounded-t-none" : "rounded-none"}
+                  ${"rounded-none"}
                 `}
               >
                 <Icon className="h-5 w-5 shrink-0 transition-transform group-hover:scale-110" />
@@ -107,7 +113,21 @@ export const LoginButtons = ({
               </Button>
             );
           })}
+          <Button
+            variant="outline"
+            onClick={() => setIsEmailModalOpen(true)}
+            className="group relative flex h-13 w-full items-center justify-start gap-4 rounded-b-xl rounded-t-none px-6 border-bpim-border bg-transparent transition-all duration-200 hover:z-10 hover:bg-bpim-overlay/40 active:scale-[0.98]"
+          >
+            <Mail className="h-5 w-5 shrink-0 transition-transform group-hover:scale-110" />
+            <span className="flex-1 text-left text-sm font-semibold text-bpim-text">
+              {t("login.btnEmail")}
+            </span>
+            <div className="opacity-0 transition-opacity group-hover:opacity-100">
+              <ChevronRightIcon className="h-4 w-4 text-bpim-muted" />
+            </div>
+          </Button>
         </div>
+        <EmailLoginModal open={isEmailModalOpen} onOpenChange={setIsEmailModalOpen} mode="login" />
 
         <p className="px-4 text-center text-xs leading-relaxed text-bpim-muted">
           続行することで、
