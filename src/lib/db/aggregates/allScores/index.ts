@@ -9,6 +9,7 @@ import {
 } from "@/lib/db/shared/latestScore";
 import { userDisplayColumns } from "@/lib/db/shared/userDisplay";
 import { wherePublicOnly } from "@/lib/db/shared/visibility";
+import { getSongRankingFromTable } from "@/lib/db/aggregates/songRanking";
 
 /**
  * `allScores`/`allSongs`（全難易度スコア・楽曲マスタ）をまたぐ複合ビューを
@@ -321,6 +322,22 @@ class AllScoresAggregateRepository {
       )
       .orderBy("s.exScore", "desc")
       .execute();
+  }
+  /**
+   * 指定楽曲のユーザー別ランキング（allScoresテーブル）を取得する。
+   * 非公開ユーザーの匿名化・閲覧者自身の判定は `getSongRankingFromTable` が行う。
+   *
+   * @param songId - 楽曲 ID
+   * @param version - バージョン番号
+   * @param viewerId - 閲覧者のユーザー ID（自分自身の判定に使用）
+   */
+  async getAllSongRanking(songId: number, version: string, viewerId: string) {
+    return getSongRankingFromTable({
+      table: "allScores",
+      songId,
+      version,
+      viewerId,
+    });
   }
 }
 
