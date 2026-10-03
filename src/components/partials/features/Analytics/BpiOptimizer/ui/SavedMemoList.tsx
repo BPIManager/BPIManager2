@@ -166,6 +166,7 @@ const SavedMemoList = ({
                       e.stopPropagation();
                       onEdit(memo);
                     }}
+                    aria-label={t("common.edit")}
                     disabled={isEditLoadingId === memo.reportId}
                   >
                     {isEditLoadingId === memo.reportId ? (
@@ -182,6 +183,7 @@ const SavedMemoList = ({
                       e.stopPropagation();
                       setDeleteTargetId(memo.reportId);
                     }}
+                    aria-label={t("common.delete")}
                     disabled={isDeletingId === memo.reportId}
                   >
                     {isDeletingId === memo.reportId ? (
