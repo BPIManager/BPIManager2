@@ -1,4 +1,4 @@
-import { scoresRepo } from "@/lib/db/domains/scores";
+import { latestScoresRepo } from "@/lib/db/domains/scores/latest";
 import { allScoresRepo } from "@/lib/db/domains/allScores";
 import { songsRepo } from "@/lib/db/domains/songs";
 import { allSongsRepo } from "@/lib/db/domains/allSongs";
@@ -61,7 +61,7 @@ export async function handleScoreManualUpdate(
       await Promise.all([
         songsRepo.getSongMasterWithDef(),
         allSongsRepo.getAllLevelMaster(),
-        scoresRepo.getLatestScores(userId, version),
+        latestScoresRepo.getLatestScores(userId, version),
         allScoresRepo.getLatestAllScores(userId, version),
       ]);
 

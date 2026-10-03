@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { songsRepo } from "@/lib/db/domains/songs";
-import { scoresRepo } from "@/lib/db/domains/scores";
+import { latestScoresRepo } from "@/lib/db/domains/scores/latest";
 import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
 
 interface GetPageParams {
@@ -85,7 +85,7 @@ export const newBpiPlayersAggregateRepo = {
     const totalCount = Number(countRow?.count ?? 0);
 
     const userIds = users.map((u) => u.userId);
-    const scores = await scoresRepo.getLatestScoresForUsers(
+    const scores = await latestScoresRepo.getLatestScoresForUsers(
       userIds,
       version,
       songIds,

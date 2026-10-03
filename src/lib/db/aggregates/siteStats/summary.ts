@@ -4,7 +4,7 @@ import { ARENA_RANK_ORDER } from "@/constants/iidx/arenaRanks";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { usersRepo } from "@/lib/db/domains/users";
 import { navigationRepo } from "@/lib/db/domains/logs/navigation";
-import { scoresRepo } from "@/lib/db/domains/scores";
+import { scoreActivityRepo } from "@/lib/db/domains/scores/activity";
 import {
   latestPerUserSubquery as latestArenaStatsPerUserSubquery,
   latestPerUserAllVersionsSubquery as latestArenaStatsPerUserAllVersionsSubquery,
@@ -67,8 +67,8 @@ class SiteStatsSummaryRepository {
         )
         .executeTakeFirst(),
 
-      scoresRepo.getCountExcludingVersions(EXCLUDE_FROM_CURRENT),
-      scoresRepo.getCountExcludingVersions(EXCLUDE_FROM_CURRENT, yesterday),
+      scoreActivityRepo.getCountExcludingVersions(EXCLUDE_FROM_CURRENT),
+      scoreActivityRepo.getCountExcludingVersions(EXCLUDE_FROM_CURRENT, yesterday),
 
       // allScores×allSongsの横断JOIN（難易度絞り込み）のため、直接参照を維持する。
       db

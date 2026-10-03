@@ -1,7 +1,8 @@
 import { db } from "@/lib/db";
 import { usersRepo } from "@/lib/db/domains/users";
 import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
-import { scoresRepo } from "@/lib/db/domains/scores";
+import { scoreHistoryRepo } from "@/lib/db/domains/scores/history";
+import { scoreWriteRepo } from "@/lib/db/domains/scores/write";
 import { allScoresRepo } from "@/lib/db/domains/allScores";
 import { navigationRepo } from "@/lib/db/domains/logs/navigation";
 import { followsRepo } from "@/lib/db/domains/follow";
@@ -42,7 +43,7 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
   ] = await Promise.all([
     usersRepo.getAllForUser(userId),
     followsRepo.getAllForUser(userId),
-    scoresRepo.getAllForUser(userId),
+    scoreHistoryRepo.getAllForUser(userId),
     navigationRepo.getAllForUser(userId),
     radarCacheRepo.getAllForUser(userId),
     notificationsRepo.getAllForUser(userId),
@@ -114,7 +115,7 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
     await allScoresRepo.deleteByUser(trx, userId);
 
     // scores: FK to logs(SET NULL), users(CASCADE)
-    await scoresRepo.deleteByUser(trx, userId);
+    await scoreWriteRepo.deleteByUser(trx, userId);
 
     // logs: FK to users(CASCADE)
     await navigationRepo.deleteByUser(trx, userId);

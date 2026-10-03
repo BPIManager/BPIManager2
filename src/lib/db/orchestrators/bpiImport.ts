@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { Database, NewAllScores, NewScore, NewTotalBPILog } from "@/types/db";
 import { Transaction } from "kysely";
-import { scoresRepo } from "@/lib/db/domains/scores";
+import { scoreWriteRepo } from "@/lib/db/domains/scores/write";
 import { allScoresRepo } from "@/lib/db/domains/allScores";
 import { navigationRepo } from "@/lib/db/domains/logs/navigation";
 import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
@@ -49,7 +49,7 @@ export async function importFromBPIM(params: {
   statusLogs: NewTotalBPILog[];
 }) {
   return await db.transaction().execute(async (trx) => {
-    await scoresRepo.deleteByUser(trx, params.userId);
+    await scoreWriteRepo.deleteByUser(trx, params.userId);
     await navigationRepo.deleteByUser(trx, params.userId);
     await userStatusLogsRepo.deleteByUser(trx, params.userId);
 
@@ -60,7 +60,7 @@ export async function importFromBPIM(params: {
 
     if (params.scoreUpdates.length > 0) {
       for (let i = 0; i < params.scoreUpdates.length; i += 1000) {
-        await scoresRepo.insert(trx, params.scoreUpdates.slice(i, i + 1000));
+        await scoreWriteRepo.insert(trx, params.scoreUpdates.slice(i, i + 1000));
       }
     }
   });
@@ -117,7 +117,7 @@ async function executeSaveBpiSystem(
     batchId: params.batchId,
   });
 
-  await scoresRepo.insert(trx, params.scoreUpdates);
+  await scoreWriteRepo.insert(trx, params.scoreUpdates);
 
   return totalBpi;
 }

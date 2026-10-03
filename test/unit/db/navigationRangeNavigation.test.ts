@@ -12,8 +12,8 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-vi.mock("@/lib/db/domains/scores", () => ({
-  scoresRepo: scoresRepoMock,
+vi.mock("@/lib/db/domains/scores/history", () => ({
+  scoreHistoryRepo: scoresRepoMock,
 }));
 
 const { navigationRepo } = await import("@/lib/db/domains/logs/navigation");

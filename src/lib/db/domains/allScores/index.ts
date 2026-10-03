@@ -102,7 +102,7 @@ class allScoresRepository {
   }
 
   /**
-   * 手動スコア編集用に、指定曲の行をupsertする。`scoresRepo.upsertManual`と
+   * 手動スコア編集用に、指定曲の行をupsertする。`scoreWriteRepo.upsertManual`と
    * 同じ「現在の最新行が同じbatchIdの場合のみUPDATE、それ以外はINSERT」方針。
    *
    * @param trx - 呼び出し元が管理するトランザクション
