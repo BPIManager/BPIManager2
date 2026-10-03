@@ -6,11 +6,11 @@ import { hashEmail } from "@/lib/auth/emailHash";
 import { isValidEmail, normalizeEmail } from "@/utils/common/email";
 import { verifyTurnstileToken } from "@/lib/turnstile/verify";
 import {
-  deleteProviderFromUser,
   sendEmailChangeLink,
   sendEmailSignInLink,
 } from "@/lib/firebase/identityToolkit";
 import { userEmailHashesRepo } from "@/lib/db/domains/userEmailHashes";
+import { removeLinkedProvider } from "@/lib/db/orchestrators/linkedAccountRemoval";
 import { usersRepo } from "@/lib/db/domains/users";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import {
@@ -156,19 +156,8 @@ export async function handleUnlinkProvider(
   }
 
   try {
-    const user = await adminAuth.getUser(uid);
-    const providerIds = user.providerData.map((p) => p.providerId);
-    if (!providerIds.includes(providerId)) {
-      return { result: err(404, "連携されていないログイン手段です"), ...base };
-    }
-    if (providerIds.length <= 1) {
-      return { result: err(409, "最後のログイン手段は削除できません"), ...base };
-    }
-
-    await deleteProviderFromUser(uid, providerId);
-    if (providerId === EMAIL_PROVIDER_ID) {
-      await userEmailHashesRepo.deleteByUserId(uid);
-    }
+    const outcome = await removeLinkedProvider(uid, providerId);
+    if (!outcome.ok) return { result: err(outcome.status, outcome.message), ...base };
     return { result: ok({ removed: providerId }), ...base };
   } catch (error: unknown) {
     return { result: mapIdentityToolkitError(error), ...base };

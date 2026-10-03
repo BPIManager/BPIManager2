@@ -1,4 +1,6 @@
 import { db } from "@/lib/db";
+import type { Transaction } from "kysely";
+import type { Database } from "@/types/db";
 
 /**
  * メールアドレスのハッシュ（HMAC、平文は保存しない）の参照・更新。
@@ -37,9 +39,10 @@ class UserEmailHashesRepository {
    * ユーザーのメールハッシュを削除する（メールアドレスの連携解除時）。
    *
    * @param userId - ユーザー ID
+   * @param trx - 呼び出し元のトランザクション（省略時は単独実行）
    */
-  async deleteByUserId(userId: string) {
-    await db
+  async deleteByUserId(userId: string, trx?: Transaction<Database>) {
+    await (trx ?? db)
       .deleteFrom("userEmailHashes")
       .where("userId", "=", userId)
       .execute();
