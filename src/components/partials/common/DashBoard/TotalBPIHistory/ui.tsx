@@ -15,7 +15,7 @@ import { ChartSplineIcon } from "lucide-react";
 import { BpiHistoryItem, BpiHistoryUpdatedSong } from "@/types/stats/bpiHistory";
 import type { StatsGroupBy } from "@/types/stats/bpiBoxStats";
 import TotalBpiHistorySkeleton from "@/components/partials/common/DashBoard/TotalBPIHistory/skeleton";
-import RatchetHistoryDialog from "@/components/partials/common/DashBoard/Dialogs/ratchetHistoryDialog";
+import RatchetHistoryDialog from "@/components/partials/common/DashBoard/Dialogs/RatchetHistory";
 import { Button } from "@/components/ui/button";
 import { DashCard } from "@/components/ui/dashcard";
 import { cn } from "@/lib/utils";
