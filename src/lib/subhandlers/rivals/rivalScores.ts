@@ -63,6 +63,9 @@ export async function handleRivalScores(
           wrScore: row.wrScore || null,
           kaidenAvg: row.kaidenAvg || null,
           coef: row.coef || null,
+          mu: row.mu ?? null,
+          sigma: row.sigma ?? null,
+          residualVar: row.residualVar ?? null,
 
           logId: row.myLogId ? Number(row.myLogId) : null,
           exScore: myEx,
