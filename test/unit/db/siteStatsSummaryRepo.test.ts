@@ -11,16 +11,15 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-const { siteStatsSummaryRepo } = await import(
-  "@/lib/db/aggregates/siteStats/summary"
-);
+const { siteStatsOverviewRepo } = await import("@/lib/db/aggregates/siteStats/overview");
+const { siteStatsDistributionRepo } = await import("@/lib/db/aggregates/siteStats/distribution");
 
-describe("siteStatsSummaryRepo.getSummary", () => {
+describe("siteStatsOverviewRepo.getSummary", () => {
   it("totalAllScores/newAllScoresTodayはbk+scores+allLowの合算になること", async () => {
     // executeTakeFirstは常に同じcanned値を返すため、3系統(bk/scores/allLow)を
     // 合算するtotalAllScoresは count*3 になる
     dbHolder.current = createDbSpy({ count: 5 });
-    const result = await siteStatsSummaryRepo.getSummary();
+    const result = await siteStatsOverviewRepo.getSummary();
 
     expect(result.totalUsers).toBe(5);
     expect(result.totalAllScores).toBe(15);
@@ -29,7 +28,7 @@ describe("siteStatsSummaryRepo.getSummary", () => {
 
   it("結果がundefinedの場合すべて0になること", async () => {
     dbHolder.current = createDbSpy(undefined);
-    const result = await siteStatsSummaryRepo.getSummary();
+    const result = await siteStatsOverviewRepo.getSummary();
     expect(result).toEqual({
       totalUsers: 0,
       newUsersToday: 0,
@@ -41,7 +40,7 @@ describe("siteStatsSummaryRepo.getSummary", () => {
   });
 });
 
-describe("siteStatsSummaryRepo.getArenaRankDistributionByVersion", () => {
+describe("siteStatsDistributionRepo.getArenaRankDistributionByVersion", () => {
   it("バージョンごとにARENA_RANK_ORDER全ランクを含み、該当データのないランクは0になること", async () => {
     dbHolder.current = createDbSpy([
       { version: "33", arenaClass: "A1", count: 10 },
@@ -50,7 +49,7 @@ describe("siteStatsSummaryRepo.getArenaRankDistributionByVersion", () => {
       { version: "32", arenaClass: "A1", count: 2 },
     ]);
 
-    const result = await siteStatsSummaryRepo.getArenaRankDistributionByVersion();
+    const result = await siteStatsDistributionRepo.getArenaRankDistributionByVersion();
 
     const v33a1 = result["33"].find((r) => r.rank === "A1");
     const v33b3 = result["33"].find((r) => r.rank === "B3");
@@ -63,7 +62,7 @@ describe("siteStatsSummaryRepo.getArenaRankDistributionByVersion", () => {
   });
 });
 
-describe("siteStatsSummaryRepo.getAreaDistributionByVersion", () => {
+describe("siteStatsDistributionRepo.getAreaDistributionByVersion", () => {
   it("areaがnullの行を除外し、バージョンごとにcount降順で返すこと", async () => {
     dbHolder.current = createDbSpy([
       { version: "34", area: "東京都", count: 10 },
@@ -72,7 +71,7 @@ describe("siteStatsSummaryRepo.getAreaDistributionByVersion", () => {
       { version: "33", area: "福岡県", count: 3 },
     ]);
 
-    const result = await siteStatsSummaryRepo.getAreaDistributionByVersion();
+    const result = await siteStatsDistributionRepo.getAreaDistributionByVersion();
 
     expect(result["34"]).toEqual([
       { area: "大阪府", count: 20 },
@@ -82,7 +81,7 @@ describe("siteStatsSummaryRepo.getAreaDistributionByVersion", () => {
   });
 });
 
-describe("siteStatsSummaryRepo.getVersionScoreDistribution", () => {
+describe("siteStatsDistributionRepo.getVersionScoreDistribution", () => {
   it("BK版数を先頭に、それ以外を数値昇順で並べ件数を合算すること", async () => {
     // bkRows/scoresRows/allScoresRowsはすべて同じcanned配列を返す
     dbHolder.current = createDbSpy([
@@ -90,7 +89,7 @@ describe("siteStatsSummaryRepo.getVersionScoreDistribution", () => {
       { version: "26", count: 5 },
     ]);
 
-    const result = await siteStatsSummaryRepo.getVersionScoreDistribution();
+    const result = await siteStatsDistributionRepo.getVersionScoreDistribution();
 
     const versionOrder = result.versions.map((v) => v.version);
     expect(versionOrder[0]).toBe("26"); // BK_VERSIONSの先頭
