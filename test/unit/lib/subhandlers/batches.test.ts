@@ -56,14 +56,18 @@ vi.mock("@/lib/db/aggregates/rivalScores/aggregate", () => ({
     getRivalLatestScoresBySong: vi.fn().mockResolvedValue([]),
   },
 }));
-vi.mock("@/lib/db/domains/logs/navigation", () => ({
-  navigationRepo: {
+vi.mock("@/lib/db/domains/logs/range", () => ({
+  logRangeRepo: {
     findBatchById: (...a: unknown[]) => findBatchByIdMock(...a),
     findBatchByIdAndUser: (...a: unknown[]) => findBatchByIdAndUserMock(...a),
     findBatchesInRange: (...a: unknown[]) => findBatchesInRangeMock(...a),
     getBatchNavigation: (...a: unknown[]) => getBatchNavigationMock(...a),
     getRangeNavigation: (...a: unknown[]) => getRangeNavigationMock(...a),
     getJstRange: (...a: unknown[]) => getJstRangeMock(...a),
+  },
+}));
+vi.mock("@/lib/db/domains/logs/batch", () => ({
+  logBatchRepo: {
     getLatestBatchId: (...a: unknown[]) => getLatestBatchIdMock(...a),
   },
 }));
