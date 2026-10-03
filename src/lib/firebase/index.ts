@@ -6,10 +6,11 @@ import { GoogleAuthProvider, TwitterAuthProvider } from "firebase/auth";
 import { getAuth } from "firebase/auth";
 import "firebase/functions";
 import { getFirestore } from "firebase/firestore";
+import { FIREBASE_WEB_API_KEY } from "@/constants/firebase/webApiKey";
 
 /** Firebase アプリインスタンス（クライアントサイド共通） */
 export const fb = initializeApp({
-  apiKey: "AIzaSyAIlzzxI0kZtIe4vvjSIiRwfqSQVZtbluM",
+  apiKey: FIREBASE_WEB_API_KEY,
   authDomain: "bpimv2.firebaseapp.com",
   projectId: "bpimv2",
   storageBucket: "bpimv2.appspot.com",

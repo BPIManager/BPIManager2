@@ -9,3 +9,5 @@ export * from "./invite";
 export * from "./username";
 export * from "./submitFollowRequest";
 export * from "./withdrawFollowRequest";
+export * from "./emailLogin";
+export * from "./linkedAccounts";

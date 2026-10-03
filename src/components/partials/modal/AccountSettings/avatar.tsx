@@ -1,9 +1,9 @@
 ﻿"use client";
 
-import { auth } from "@/lib/firebase";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
+import ProviderAvatarPicker from "@/components/partials/modal/ProviderAvatarPicker";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface AvatarSectionProps {
@@ -18,10 +18,7 @@ const AvatarSection = ({
   setIsImageModalOpen,
 }: AvatarSectionProps) => {
   const { t } = useTranslation();
-  const useServiceIcon = () => {
-    const photoURL = auth.currentUser?.photoURL;
-    if (photoURL) onChange(photoURL);
-  };
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
 
   const useDiceBearIcon = () => {
     const seed = Math.random().toString(36).substring(7);
@@ -29,6 +26,7 @@ const AvatarSection = ({
   };
 
   return (
+    <>
     <div className="flex items-center gap-6 py-2">
       <Avatar className="h-18 w-18 border-2 border-bpim-primary shadow-lg shadow-bpim-primary/20">
         <AvatarImage
@@ -45,7 +43,7 @@ const AvatarSection = ({
         <Button
           variant="outline"
           size="xs"
-          onClick={useServiceIcon}
+          onClick={() => setIsPickerOpen(true)}
           className="h-7 border-bpim-border px-3 text-[10px] font-bold hover:bg-bpim-overlay/50 hover:text-bpim-primary"
         >
           {t("settings.profile.avatar.useService")}
@@ -68,6 +66,13 @@ const AvatarSection = ({
         </Button>
       </div>
     </div>
+
+    <ProviderAvatarPicker
+      open={isPickerOpen}
+      onOpenChange={setIsPickerOpen}
+      onSelect={onChange}
+    />
+    </>
   );
 };
 

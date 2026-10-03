@@ -1,6 +1,8 @@
-import { ChevronRight } from "lucide-react";
+import { useState } from "react";
+import { ChevronRight, Mail } from "lucide-react";
 import Link from "next/link";
 import { authActions } from "@/lib/firebase/auth";
+import EmailLoginModal from "@/components/partials/modal/EmailLogin";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 const GoogleIcon = ({ className }: { className?: string }) => (
@@ -44,6 +46,7 @@ const LineProviderIcon = ({ className }: { className?: string }) => (
 
 const LoginSection = () => {
   const { t } = useTranslation();
+  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
   return (
     <div className="mx-auto w-full max-w-sm">
       <button
@@ -80,7 +83,20 @@ const LoginSection = () => {
           <LineProviderIcon className="h-4 w-4 text-[#4ade80]" />
           <span className="text-sm font-semibold text-[#4ade80]">LINE</span>
         </button>
+        <button
+          onClick={() => setIsEmailModalOpen(true)}
+          className="group col-span-2 flex h-12 items-center justify-center gap-2.5 rounded-xl border border-bpim-border bg-bpim-surface px-4 transition-all duration-200 hover:border-white/30 hover:bg-bpim-overlay active:scale-[0.98]"
+        >
+          <Mail className="h-4 w-4 text-bpim-text" />
+          <span className="text-sm font-semibold text-bpim-text">{t("login.btnEmail")}</span>
+        </button>
       </div>
+
+      <EmailLoginModal
+        open={isEmailModalOpen}
+        onOpenChange={setIsEmailModalOpen}
+        mode="login"
+      />
 
       <p className="mt-5 text-center text-[11px] leading-relaxed text-bpim-muted/60">
         {t("login.policyNote").split(t("login.policyLinkText"))[0]}

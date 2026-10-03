@@ -6,9 +6,10 @@ import DashboardLayout from "@/components/partials/shell/DashboardLayout";
 import { PageContainer, PageHeader } from "@/components/partials/common/PageChrome/Header";
 import TransferUi from "@/components/partials/features/Settings/Transfer/ui";
 import AccountSettingsUi from "@/components/partials/features/Settings/AccountSettings/ui";
+import LinkedAccountsUi from "@/components/partials/features/Settings/LinkedAccounts";
 import AccountDeletionUi from "@/components/partials/features/Settings/AccountDeletion/ui";
 import ApiKeyUi from "@/components/partials/features/Settings/APIKey/ui";
-import OAuthClientUi from "@/components/partials/features/Settings/OAuthClient/ui";
+import OAuthClientUi from "@/components/partials/features/Settings/OAuthClient";
 import { Meta } from "@/components/partials/common/PageChrome/Head";
 import { PageLoader } from "@/components/ui/loading-spinner";
 import ThemeSettingsUi from "@/components/partials/features/Settings/ThemeSettings/ui";
@@ -38,6 +39,7 @@ export default function SettingsPage() {
         <PageContainer>
           <div className="flex flex-col gap-6">
             <AccountSettingsUi />
+            <LinkedAccountsUi />
             <LanguageSettingsUi />
             <TransferUi />
 

@@ -110,6 +110,15 @@ CREATE TABLE IF NOT EXISTS `discordLinks` (
   CONSTRAINT `fk_discordlinks_user` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `userEmailHashes` (
+  `userId` varchar(128) NOT NULL,
+  `emailHash` char(64) NOT NULL,
+  `linkedAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`userId`),
+  UNIQUE KEY `emailHash` (`emailHash`),
+  CONSTRAINT `fk_useremailhashes_user` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `followInviteLinks` (
   `userId` varchar(128) NOT NULL,
   `token` varchar(64) NOT NULL,
