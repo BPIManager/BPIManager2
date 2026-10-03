@@ -164,7 +164,7 @@ export class BpiCalculator {
       })),
       allSongs.length,
     );
-    return total ?? -15;
+    return typeof total === "number" && Number.isFinite(total) ? total : -15;
   }
 
   /**
@@ -205,6 +205,9 @@ export class BpiCalculator {
     previousBest: number | null,
     freshValue: number,
   ): number {
+    // NaN（sigma=0 等の異常譜面が混ざった場合）を Math.max に通すと NaN が保存されるため、
+    // 有限でない新値は採用せず既存の最高値（無ければ -15）を維持する
+    if (!Number.isFinite(freshValue)) return previousBest ?? -15;
     return previousBest !== null
       ? Math.max(previousBest, freshValue)
       : freshValue;
