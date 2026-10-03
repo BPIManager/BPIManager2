@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { lockUserForWrite } from "@/lib/db/shared/userWriteLock";
 import { Database, NewAllScores, NewScore, NewTotalBPILog } from "@/types/db";
 import { Transaction } from "kysely";
 import { scoreWriteRepo } from "@/lib/db/domains/scores/write";
@@ -30,15 +31,17 @@ export async function saveImportResults(params: {
   scoreUpdates: NewScore[];
   allScoreUpdates: NewAllScores[];
   newTotalBpi: number;
-}): Promise<{ totalBpi: number }> {
-  return await db.transaction().execute(async (trx) => {
-    // ラチェットの基準値(previousBest)を読む前に最新logsを行ロックし、同一ユーザーの
-    // 並行保存を直列化する。ロック取得後に読むことで、先行トランザクションの結果を必ず参照する
+}, existingTrx?: Transaction<Database>): Promise<{ totalBpi: number }> {
+  const run = async (trx: Transaction<Database>) => {
+    // 同一ユーザーの書き込みを直列化してから、ラチェット基準値などを読む
+    await lockUserForWrite(trx, params.userId);
     await logBatchRepo.getLatestBatchIdForUpdate(trx, params.userId, params.version);
     const totalBpi = await executeSaveBpiSystem(trx, params);
     await executeSaveAllLevelHistory(trx, params);
     return { totalBpi };
-  });
+  };
+  // 呼び出し元が読み取りを同じトランザクションで行う場合は、そのトランザクションに参加する
+  return existingTrx ? await run(existingTrx) : await db.transaction().execute(run);
 }
 
 /**
