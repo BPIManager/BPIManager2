@@ -156,7 +156,7 @@ export const linkedAccountsTranslations = {
     ko: "관리",
   },
   "settings.linked.desc": {
-    ja: "ログイン手段を複数登録できます。最低1つは残す必要があります。",
+    ja: "1つ以上のログイン手段を用いてアカウントへのアクセス手段を確保できます。",
     en: "You can register multiple sign-in methods. At least one must remain.",
     "zh-TW": "可登錄多種登入方式，但至少需保留一種。",
     ko: "여러 로그인 수단을 등록할 수 있습니다. 최소 하나는 남겨야 합니다.",
