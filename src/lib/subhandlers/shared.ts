@@ -10,7 +10,11 @@ export function resolveVersion(raw: unknown): string {
   return (IIDX_VERSIONS as readonly string[]).includes(v) ? v : latestVersion;
 }
 
-/** unknown な例外から 500 レスポンス用のメッセージを取り出す */
+/**
+ * 500 応答に載せる汎用メッセージを返す。例外の詳細（DBエラーの断片・接続先など）は
+ * クライアントに返さず、サーバーログにのみ出す。
+ */
 export function toErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : "Internal Server Error";
+  console.error(error);
+  return "Internal Server Error";
 }

@@ -24,7 +24,7 @@ export default withUserApiHandler(
     onError: (error, res) => {
       console.error("Scores API Error:", error);
       const errorMessage =
-        error instanceof Error ? error.message : "Internal Server Error";
+        "Internal Server Error";
       return res.status(500).json({ message: errorMessage });
     },
   },

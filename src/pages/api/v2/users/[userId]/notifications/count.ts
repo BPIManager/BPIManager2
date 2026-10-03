@@ -25,11 +25,12 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
       withMeta(await getUnreadCount(userId), buildMeta(userId, userId)),
     );
   } catch (error: unknown) {
+    console.error(error);
     writeV2Result(
       res,
       err(
         500,
-        error instanceof Error ? error.message : "Internal Server Error",
+        "Internal Server Error",
       ),
     );
   }
