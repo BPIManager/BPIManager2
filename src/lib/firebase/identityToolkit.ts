@@ -1,17 +1,8 @@
 import { FIREBASE_WEB_API_KEY } from "@/constants/firebase/webApiKey";
 import { adminAuth } from "@/lib/firebase/admin";
+import { IdentityToolkitError } from "@/lib/firebase/identityToolkitError";
 
 const IDENTITY_TOOLKIT_URL = "https://identitytoolkit.googleapis.com/v1";
-
-/** Identity Toolkit REST が返したエラー。メールアドレス等の入力値は含めない。 */
-export class IdentityToolkitError extends Error {
-  constructor(
-    readonly status: number,
-    readonly code: string,
-  ) {
-    super(`Identity Toolkit request failed: ${code}`);
-  }
-}
 
 async function postIdentityToolkit(
   path: string,

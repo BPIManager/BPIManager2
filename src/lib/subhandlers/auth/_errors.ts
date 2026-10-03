@@ -1,5 +1,5 @@
 import { err } from "@/middlewares/api/apiResult";
-import { IdentityToolkitError } from "@/lib/firebase/identityToolkit";
+import { IdentityToolkitError } from "@/lib/firebase/identityToolkitError";
 import type { HandlerResult } from "@/types/api";
 
 /**
