@@ -1,7 +1,8 @@
 import { db } from "@/lib/db";
 import { jstDayStart } from "./dates";
 
-import { latestLogIdPerSongSubquery, latestLogIdPerUserSongSubquery } from "@/lib/db/shared/latestScore";
+import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore/perSong";
+import { latestLogIdPerUserSongSubquery } from "@/lib/db/shared/latestScore/perUser";
 import { wherePublicOnly } from "@/lib/db/shared/visibility";
 
 /**

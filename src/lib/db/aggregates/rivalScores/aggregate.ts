@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 
-import { latestLogIdPerUserSongSubquery, latestLogIdPerUserSongScalarSubquery } from "@/lib/db/shared/latestScore";
+import { latestLogIdPerUserSongSubquery, latestLogIdPerUserSongScalarSubquery } from "@/lib/db/shared/latestScore/perUser";
 import { userDisplayColumns } from "@/lib/db/shared/userDisplay";
 import { wherePublicOnly } from "@/lib/db/shared/visibility";
 

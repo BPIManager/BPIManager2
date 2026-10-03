@@ -1,10 +1,7 @@
 import { db } from "@/lib/db";
 import { sql } from "kysely";
 import { IIDXVersion } from "@/types/iidx/version";
-import {
-  latestLogIdPerSongScalarSubquery,
-  latestLogIdPerSongSubquery,
-} from "@/lib/db/shared/latestScore";
+import { latestLogIdPerSongScalarSubquery, latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore/perSong";
 import { latestSongDefIdSubquery } from "@/lib/db/shared/songDef";
 
 /**

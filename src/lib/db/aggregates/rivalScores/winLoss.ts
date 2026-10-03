@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { correlatedLatestLogId } from "@/lib/db/shared/latestScore";
+import { correlatedLatestLogId } from "@/lib/db/shared/latestScore/correlated";
 
 /**
  * 自分とライバルの勝敗統計・勝敗履歴・レーダー（カテゴリ別BPI）を担当するリポジトリクラス。

@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 
-import { latestLogIdPerSongSubquery, latestLogIdPerUserSongSubquery } from "@/lib/db/shared/latestScore";
+import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore/perSong";
+import { latestLogIdPerUserSongSubquery } from "@/lib/db/shared/latestScore/perUser";
 
 import { logTotalBpiRepo } from "@/lib/db/domains/logs/totalBpi";
 

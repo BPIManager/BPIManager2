@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { IIDXVersion } from "@/types/iidx/version";
 import { sql } from "kysely";
-import { correlatedLatestLogId } from "@/lib/db/shared/latestScore";
+import { correlatedLatestLogId } from "@/lib/db/shared/latestScore/correlated";
 
 
 /**

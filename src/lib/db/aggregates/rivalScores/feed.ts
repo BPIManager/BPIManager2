@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { sql } from "kysely";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
-import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore";
+import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore/perSong";
 dayjs.extend(utc);
 
 /**

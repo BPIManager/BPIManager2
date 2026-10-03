@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { Database, NewAllScores } from "@/types/db";
 import { Transaction } from "kysely";
-import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore";
+import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore/perSong";
 
 /**
  * 全難易度スコア（`allScores` テーブル）の参照を担当するリポジトリクラス。

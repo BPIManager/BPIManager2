@@ -1,8 +1,6 @@
 import { db } from "@/lib/db";
-import {
-  LatestScoreTable,
-  latestLogIdPerUserSongSubquery,
-} from "@/lib/db/shared/latestScore";
+import { LatestScoreTable } from "@/lib/db/shared/latestScore/types";
+import { latestLogIdPerUserSongSubquery } from "@/lib/db/shared/latestScore/perUser";
 import { maskPrivateIdentity } from "@/lib/db/shared/privacyMask";
 
 export interface SongRankingEntry {

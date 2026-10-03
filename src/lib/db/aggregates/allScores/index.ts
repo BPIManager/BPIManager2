@@ -2,11 +2,9 @@ import { ALL_DIFFICULTIES } from "@/constants/iidx/songLevels";
 import { db } from "@/lib/db";
 import { AllDifficulties } from "@/types/songs/allSongs";
 import { SongWithScore } from "@/types/songs/score";
-import {
-  correlatedLatestLogId,
-  latestLogIdPerSongSubquery,
-  latestLogIdPerUserSongScalarSubquery,
-} from "@/lib/db/shared/latestScore";
+import { correlatedLatestLogId } from "@/lib/db/shared/latestScore/correlated";
+import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore/perSong";
+import { latestLogIdPerUserSongScalarSubquery } from "@/lib/db/shared/latestScore/perUser";
 import { userDisplayColumns } from "@/lib/db/shared/userDisplay";
 import { wherePublicOnly } from "@/lib/db/shared/visibility";
 import { getSongRankingFromTable } from "@/lib/db/aggregates/songRanking";

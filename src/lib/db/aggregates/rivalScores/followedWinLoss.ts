@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
-import { latestLogIdPerSongScalarSubquery, latestLogIdPerUserSongScalarSubquery } from "@/lib/db/shared/latestScore";
+import { latestLogIdPerSongScalarSubquery } from "@/lib/db/shared/latestScore/perSong";
+import { latestLogIdPerUserSongScalarSubquery } from "@/lib/db/shared/latestScore/perUser";
 
 /**
  * フォロー中ライバル全員に対する勝敗サマリーを担当するリポジトリクラス。

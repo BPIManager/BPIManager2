@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 
 import { Expression, sql } from "kysely";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
-import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore";
+import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore/perSong";
 /**
  * `scores` テーブルの期間別・バッチ別の集計（活動量・ランキング用）を担当するリポジトリクラス。
  */

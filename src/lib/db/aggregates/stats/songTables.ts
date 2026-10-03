@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { IIDXVersion } from "@/types/iidx/version";
-import { correlatedLatestLogId } from "@/lib/db/shared/latestScore";
+import { correlatedLatestLogId } from "@/lib/db/shared/latestScore/correlated";
 import { getSongRankingFromTable } from "@/lib/db/aggregates/songRanking";
 
 import { songMasterRepo } from "@/lib/db/domains/songs/master";
