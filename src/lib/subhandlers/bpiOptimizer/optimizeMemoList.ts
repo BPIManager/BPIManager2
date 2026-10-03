@@ -1,5 +1,5 @@
 import type { NextApiRequest } from "next";
-import { bpiOptimizerRepo } from "@/lib/db/domains/bpiOptimizer";
+import { bpiOptimizerRepo } from "@/lib/db/domains/bpiOptimizer/memos";
 import { checkUserAccess } from "@/middlewares/api/withApi";
 import { accessError, err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";

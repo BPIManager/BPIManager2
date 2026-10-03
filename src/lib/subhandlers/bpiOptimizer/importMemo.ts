@@ -1,5 +1,5 @@
 import type { NextApiRequest } from "next";
-import { bpiOptimizerRepo } from "@/lib/db/domains/bpiOptimizer";
+import { bpiOptimizerRepo } from "@/lib/db/domains/bpiOptimizer/memos";
 import { bpiOptimizerAggregateRepo } from "@/lib/db/aggregates/bpiOptimizer";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { err, ok } from "@/middlewares/api/apiResult";
