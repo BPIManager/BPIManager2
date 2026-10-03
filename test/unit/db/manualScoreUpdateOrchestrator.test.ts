@@ -50,7 +50,7 @@ describe("manualScoreUpdateOrchestrator.saveManualScoreUpdate", () => {
 
   it("logsの現在最新batchIdが今日の手動プレフィックスと一致する場合、そのbatchIdをそのまま使い回すこと", async () => {
     const prefix = getManualBatchPrefix("user-1", "34");
-    const spy = createTransactionalDbSpy(undefined, { batchId: prefix });
+    const spy = createTransactionalDbSpy({ batchId: prefix });
     dbHolder.current = spy;
 
     const { batchId } = await saveManualScoreUpdate({

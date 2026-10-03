@@ -31,6 +31,9 @@ export async function saveImportResults(params: {
   newTotalBpi: number;
 }): Promise<{ totalBpi: number }> {
   return await db.transaction().execute(async (trx) => {
+    // ラチェットの基準値(previousBest)を読む前に最新logsを行ロックし、同一ユーザーの
+    // 並行保存を直列化する。ロック取得後に読むことで、先行トランザクションの結果を必ず参照する
+    await navigationRepo.getLatestBatchIdForUpdate(trx, params.userId, params.version);
     const totalBpi = await executeSaveBpiSystem(trx, params);
     await executeSaveAllLevelHistory(trx, params);
     return { totalBpi };
