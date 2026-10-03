@@ -2,7 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { v4 as uuidv4 } from "uuid";
 import { latestScoresRepo } from "@/lib/db/domains/scores/latest";
 import { allScoresRepo } from "@/lib/db/domains/allScores";
-import { navigationRepo } from "@/lib/db/domains/logs/navigation";
+import { logTotalBpiRepo } from "@/lib/db/domains/logs/totalBpi";
 import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { allSongsRepo } from "@/lib/db/domains/allSongs";
 import { saveImportResults } from "@/lib/db/orchestrators/bpiImport";
@@ -33,7 +33,7 @@ export function registerUpdateMyScore(server: McpServer, userId: string) {
           allSongsRepo.getAllLevelMaster(),
           latestScoresRepo.getLatestScores(userId, version),
           allScoresRepo.getLatestAllScores(userId, version),
-          navigationRepo.getLatestTotalBpi(userId, version),
+          logTotalBpiRepo.getLatestTotalBpi(userId, version),
         ]);
 
       const song = bpiSongMaster.find((s) => s.songId === songId);

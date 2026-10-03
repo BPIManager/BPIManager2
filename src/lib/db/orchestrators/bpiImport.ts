@@ -3,7 +3,7 @@ import { Database, NewAllScores, NewScore, NewTotalBPILog } from "@/types/db";
 import { Transaction } from "kysely";
 import { scoreWriteRepo } from "@/lib/db/domains/scores/write";
 import { allScoresRepo } from "@/lib/db/domains/allScores";
-import { navigationRepo } from "@/lib/db/domains/logs/navigation";
+import { logBatchRepo } from "@/lib/db/domains/logs/batch";
 import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
 import { BpiCalculator } from "@/lib/bpi";
 
@@ -33,7 +33,7 @@ export async function saveImportResults(params: {
   return await db.transaction().execute(async (trx) => {
     // ラチェットの基準値(previousBest)を読む前に最新logsを行ロックし、同一ユーザーの
     // 並行保存を直列化する。ロック取得後に読むことで、先行トランザクションの結果を必ず参照する
-    await navigationRepo.getLatestBatchIdForUpdate(trx, params.userId, params.version);
+    await logBatchRepo.getLatestBatchIdForUpdate(trx, params.userId, params.version);
     const totalBpi = await executeSaveBpiSystem(trx, params);
     await executeSaveAllLevelHistory(trx, params);
     return { totalBpi };
@@ -50,12 +50,12 @@ export async function importFromBPIM(params: {
 }) {
   return await db.transaction().execute(async (trx) => {
     await scoreWriteRepo.deleteByUser(trx, params.userId);
-    await navigationRepo.deleteByUser(trx, params.userId);
+    await logBatchRepo.deleteByUser(trx, params.userId);
     await userStatusLogsRepo.deleteByUser(trx, params.userId);
 
     if (params.statusLogs.length > 0) {
       await userStatusLogsRepo.insert(trx, params.statusLogs);
-      await navigationRepo.insert(trx, params.statusLogs);
+      await logBatchRepo.insert(trx, params.statusLogs);
     }
 
     if (params.scoreUpdates.length > 0) {
@@ -102,7 +102,7 @@ async function executeSaveBpiSystem(
   // 予測が新しい観測で下がりうるため、プレイ済み曲が1曲も下がっていなくても
   // 総合BPI自体は下がりうる。src/lib/bpi/index.tsのratchetTotalBpi参照）。
 
-  await navigationRepo.insert(trx, {
+  await logBatchRepo.insert(trx, {
     userId: params.userId,
     totalBpi,
     version: params.version,

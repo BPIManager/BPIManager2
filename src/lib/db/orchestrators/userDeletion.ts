@@ -4,7 +4,7 @@ import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
 import { scoreHistoryRepo } from "@/lib/db/domains/scores/history";
 import { scoreWriteRepo } from "@/lib/db/domains/scores/write";
 import { allScoresRepo } from "@/lib/db/domains/allScores";
-import { navigationRepo } from "@/lib/db/domains/logs/navigation";
+import { logBatchRepo } from "@/lib/db/domains/logs/batch";
 import { followsRepo } from "@/lib/db/domains/follow";
 import { apiKeysRepo } from "@/lib/db/domains/apiKeys";
 import { notificationsRepo } from "@/lib/db/domains/notifications";
@@ -44,7 +44,7 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
     usersRepo.getAllForUser(userId),
     followsRepo.getAllForUser(userId),
     scoreHistoryRepo.getAllForUser(userId),
-    navigationRepo.getAllForUser(userId),
+    logBatchRepo.getAllForUser(userId),
     radarCacheRepo.getAllForUser(userId),
     notificationsRepo.getAllForUser(userId),
     userStatusLogsRepo.getAllForUser(userId),
@@ -118,7 +118,7 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
     await scoreWriteRepo.deleteByUser(trx, userId);
 
     // logs: FK to users(CASCADE)
-    await navigationRepo.deleteByUser(trx, userId);
+    await logBatchRepo.deleteByUser(trx, userId);
 
     // follows: FK to users(CASCADE) for both sides
     await followsRepo.deleteByUser(trx, userId);

@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { scoreWriteRepo } from "@/lib/db/domains/scores/write";
 import { allScoresRepo } from "@/lib/db/domains/allScores";
-import { navigationRepo } from "@/lib/db/domains/logs/navigation";
+import { logBatchRepo } from "@/lib/db/domains/logs/batch";
 import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
 import { BpiCalculator } from "@/lib/bpi";
 import { getManualBatchPrefix, mintManualBatchId } from "@/lib/scores/manualBatchId";
@@ -69,7 +69,7 @@ export async function saveManualScoreUpdate(params: {
     // `score`(scores/songDefドメイン、☆11/12)がある更新は`logs`側から判定・ロックできる。
     // `allScore`のみ(☆10以下)の更新は`logs`に一切触れないため、`allScores`自体から判定する
     const currentLatestBatchId = score
-      ? await navigationRepo.getLatestBatchIdForUpdate(trx, userId, version)
+      ? await logBatchRepo.getLatestBatchIdForUpdate(trx, userId, version)
       : await allScoresRepo.getLatestBatchId(userId, version);
     const batchId = currentLatestBatchId?.startsWith(prefix)
       ? currentLatestBatchId
@@ -98,7 +98,7 @@ export async function saveManualScoreUpdate(params: {
         newTotalBpi ?? previousBest ?? -15,
       );
 
-      await navigationRepo.upsertManualBatch(trx, {
+      await logBatchRepo.upsertManualBatch(trx, {
         userId,
         version,
         batchId,

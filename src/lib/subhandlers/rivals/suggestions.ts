@@ -1,7 +1,7 @@
 import type { NextApiRequest } from "next";
 import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { userDiscoveryRepo } from "@/lib/db/aggregates/userProfiles/discovery";
-import { navigationRepo } from "@/lib/db/domains/logs/navigation";
+import { logTotalBpiRepo } from "@/lib/db/domains/logs/totalBpi";
 import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { calculateRadar, buildRadarSongMaster } from "@/lib/radar/calculator";
 import { err, ok } from "@/middlewares/api/apiResult";
@@ -57,7 +57,7 @@ export async function handleRivalSuggestions(
 
     let viewerBaseValue: number;
     if (sortKey === "totalBpi") {
-      const record = await navigationRepo.getLatestTotalBpi(viewerId, version);
+      const record = await logTotalBpiRepo.getLatestTotalBpi(viewerId, version);
       viewerBaseValue = record ? record.totalBpi : -15;
     } else {
       const category = sortKey.toUpperCase() as keyof typeof viewerRadar;

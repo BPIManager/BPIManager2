@@ -6,7 +6,7 @@ import {
   latestLogIdPerUserSongSubquery,
 } from "@/lib/db/shared/latestScore";
 import { getSongRankingFromTable } from "@/lib/db/aggregates/songRanking";
-import { navigationRepo } from "@/lib/db/domains/logs/navigation";
+import { logTotalBpiRepo } from "@/lib/db/domains/logs/totalBpi";
 import { songMasterRepo } from "@/lib/db/domains/songs/master";
 
 /**
@@ -33,7 +33,7 @@ class StatsTablesRepository {
   >();
 
   async getLatestTotalBpi(userId: string, version: string): Promise<number> {
-    const result = await navigationRepo.getLatestTotalBpi(userId, version);
+    const result = await logTotalBpiRepo.getLatestTotalBpi(userId, version);
     return result ? Number(result.totalBpi) : -15;
   }
 

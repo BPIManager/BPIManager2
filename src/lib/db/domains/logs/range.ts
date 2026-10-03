@@ -1,0 +1,203 @@
+import dayjs from "@/lib/dayjs";
+import { db } from "@/lib/db";
+
+import { sql } from "kysely";
+import { scoreHistoryRepo } from "@/lib/db/domains/scores/history";
+
+/**
+ * ログ（logs）の期間・ユーザー横断のナビゲーション参照（範囲・バッチ検索・BPI距離順）を担当するリポジトリクラス。
+ */
+class LogRangeRepository {
+  /**
+   * 指定した JST 日付文字列から指定単位の UTC 範囲を計算する。
+   *
+   * @param dateString - JST の日付文字列（例: `"2024-01-15"`）
+   * @param unit - 範囲の単位（`"day"` | `"week"` | `"month"`、デフォルト: `"day"`）
+   * @returns `{ start, end, label, unit }` の UTC 範囲オブジェクト
+   */
+  getJstRange(dateString: string, unit: "day" | "week" | "month" = "day") {
+    const baseDate = dayjs.tz(dateString);
+    const startFn = unit === "week" ? "isoWeek" : unit;
+    const endFn = unit === "week" ? "isoWeek" : unit;
+
+    return {
+      start: baseDate.startOf(startFn as Parameters<typeof baseDate.startOf>[0]).utc().toDate(),
+      end: baseDate.endOf(endFn as Parameters<typeof baseDate.endOf>[0]).utc().toDate(),
+      label: baseDate.format("YYYY-MM-DD"),
+      unit,
+    };
+  }
+
+  /**
+   * 指定範囲の前後に存在するログまたはスコアレコードを取得する（日付ナビゲーション用）。
+   *
+   * @param userId - ユーザー ID
+   * @param version - バージョン番号
+   * @param range - ナビゲーション基準となる UTC 範囲
+   * @param groupedBy - 日付列の基準（`"createdAt"`: ログ、`"lastPlayed"`: スコア）
+   * @returns `{ prevDate, nextDate }`（前後のレコード）
+   */
+  async getRangeNavigation(
+    userId: string,
+    version: string,
+    range: { start: Date; end: Date; unit: string },
+    groupedBy: "createdAt" | "lastPlayed" = "createdAt",
+  ) {
+    if (groupedBy === "lastPlayed") {
+      return scoreHistoryRepo.getLastPlayedNavigation(userId, version, range);
+    }
+
+    const { start, end } = range;
+
+    const [prevRow, nextRow] = await Promise.all([
+      db
+        .selectFrom("logs")
+        .select(["createdAt", "totalBpi"])
+        .where("userId", "=", userId)
+        .where("version", "=", version)
+        .where("createdAt", "<", start)
+        .orderBy("createdAt", "desc")
+        .executeTakeFirst(),
+      db
+        .selectFrom("logs")
+        .select(["createdAt", "totalBpi"])
+        .where("userId", "=", userId)
+        .where("version", "=", version)
+        .where("createdAt", ">", end)
+        .orderBy("createdAt", "asc")
+        .executeTakeFirst(),
+    ]);
+
+    return {
+      prevDate: prevRow,
+      nextDate: nextRow,
+    };
+  }
+
+  /**
+   * 現在のバッチの前後に存在するバッチを取得する（バッチナビゲーション用）。
+   *
+   * `range` を指定した場合は `getRangeNavigation` も同時に取得する。
+   *
+   * @param userId - ユーザー ID
+   * @param version - バージョン番号
+   * @param currentCreatedAt - 現在のバッチの作成日時
+   * @param range - 範囲ナビゲーション用の UTC 範囲（省略可）
+   * @returns `{ prev, next, prevDate?, nextDate? }`
+   */
+  async getBatchNavigation(
+    userId: string,
+    version: string,
+    currentCreatedAt: Date,
+    range?: { start: Date; end: Date; unit: "day" | "week" | "month" },
+  ) {
+    const [prevBatch, nextBatch, rangeNav] = await Promise.all([
+      db
+        .selectFrom("logs")
+        .select(["batchId", "createdAt", "totalBpi"])
+        .where("userId", "=", userId)
+        .where("version", "=", version)
+        .where("createdAt", "<", currentCreatedAt)
+        .orderBy("createdAt", "desc")
+        .executeTakeFirst(),
+      db
+        .selectFrom("logs")
+        .select(["batchId", "createdAt", "totalBpi"])
+        .where("userId", "=", userId)
+        .where("version", "=", version)
+        .where("createdAt", ">", currentCreatedAt)
+        .orderBy("createdAt", "asc")
+        .executeTakeFirst(),
+      range
+        ? this.getRangeNavigation(userId, version, range)
+        : Promise.resolve({ prevDate: null, nextDate: null }),
+    ]);
+
+    return {
+      prev: prevBatch || null,
+      next: nextBatch || null,
+      ...rangeNav,
+    };
+  }
+
+  /**
+   * 特定のユーザーの特定のバッチIDからログ情報を取得します
+   */
+  async findBatchById(batchId: string, userId: string) {
+    return await db
+      .selectFrom("logs")
+      .select(["batchId", "createdAt", "totalBpi"])
+      .where("batchId", "=", batchId)
+      .where("userId", "=", userId)
+      .executeTakeFirst();
+  }
+
+  /**
+   * 特定のバッチIDとユーザーIDからログ情報を取得します（所有者確認用）
+   */
+  async findBatchByIdAndUser(batchId: string, userId: string) {
+    return await db
+      .selectFrom("logs")
+      .select(["batchId", "version"])
+      .where("batchId", "=", batchId)
+      .where("userId", "=", userId)
+      .executeTakeFirst();
+  }
+
+  /**
+   * 指定されたJSTの期間内に含まれる全てのバッチを取得します
+   */
+  async findBatchesInRange(
+    userId: string,
+    version: string,
+    start: Date,
+    end: Date,
+  ) {
+    return await db
+      .selectFrom("logs")
+      .select(["batchId", "createdAt", "totalBpi"])
+      .where("userId", "=", userId)
+      .where("version", "=", version)
+      .where("createdAt", ">=", start)
+      .where("createdAt", "<=", end)
+      .orderBy("createdAt", "asc")
+      .execute();
+  }
+
+  /**
+   * 指定バージョンの最新バッチログを基準に、目標BPIとの差が近い順にユーザーIDを取得する。
+   *
+   * @param version - バージョン番号
+   * @param excludeUserId - 除外するユーザーID（基準ユーザー自身）
+   * @param targetBpi - 比較対象の総合BPI
+   * @param limit - 取得件数上限
+   */
+  async getUserIdsOrderedByBpiDistance(
+    version: string,
+    excludeUserId: string,
+    targetBpi: number,
+    limit: number,
+  ): Promise<string[]> {
+    const rows = await db
+      .selectFrom("logs as l")
+      .innerJoin(
+        (qb) =>
+          qb
+            .selectFrom("logs")
+            .select(["userId", (eb) => eb.fn.max("id").as("maxId")])
+            .where("version", "=", version)
+            .groupBy("userId")
+            .as("latest"),
+        (join) => join.onRef("latest.maxId", "=", "l.id"),
+      )
+      .select("l.userId")
+      .where("l.userId", "!=", excludeUserId)
+      .orderBy(sql<number>`ABS(l.totalBpi - ${targetBpi})`, "asc")
+      .limit(limit)
+      .execute();
+
+    return rows.map((r) => r.userId);
+  }
+}
+
+export const logRangeRepo = new LogRangeRepository();

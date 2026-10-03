@@ -3,7 +3,7 @@ import { rivalOvertakenRepo } from "@/lib/db/aggregates/rivalScores/overtaken";
 import { rivalAggregateRepo } from "@/lib/db/aggregates/rivalScores/aggregate";
 import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { scoreDetailRepo } from "@/lib/db/domains/scores/detail";
-import { navigationRepo } from "@/lib/db/domains/logs/navigation";
+import { logRangeRepo } from "@/lib/db/domains/logs/range";
 import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { calculateTotalBpi } from "@/services/logs/calculateTotalBpi";
 import { mapToLogNested } from "@/utils/logs/getMapNested";
@@ -45,8 +45,8 @@ async function fetchRivalScoresForOvertaken(
 export async function handleLastPlayedBase(
   uid: string,
   ver: IIDXVersion,
-  range: ReturnType<typeof navigationRepo.getJstRange>,
-  nav: Awaited<ReturnType<typeof navigationRepo.getRangeNavigation>>,
+  range: ReturnType<typeof logRangeRepo.getJstRange>,
+  nav: Awaited<ReturnType<typeof logRangeRepo.getRangeNavigation>>,
   isOwnLog: boolean,
   type: string = "day",
 ) {
@@ -146,12 +146,12 @@ export async function handleLastPlayedBase(
 export async function handleCreatedAtBase(
   uid: string,
   ver: IIDXVersion,
-  range: ReturnType<typeof navigationRepo.getJstRange>,
-  nav: Awaited<ReturnType<typeof navigationRepo.getRangeNavigation>>,
+  range: ReturnType<typeof logRangeRepo.getJstRange>,
+  nav: Awaited<ReturnType<typeof logRangeRepo.getRangeNavigation>>,
   isOwnLog: boolean,
   type: string = "day",
 ) {
-  const batches = await navigationRepo.findBatchesInRange(
+  const batches = await logRangeRepo.findBatchesInRange(
     uid,
     ver,
     range.start,

@@ -277,7 +277,7 @@ class UserStatusLogsRepository {
 
   /**
    * 手動スコア編集用に、その日の総合BPI・アリーナランクスナップショットを
-   * upsertする。`navigationRepo.upsertManualBatch`と同じ「現在の最新行が
+   * upsertする。`logBatchRepo.upsertManualBatch`と同じ「現在の最新行が
    * 同じbatchIdの場合のみUPDATE、それ以外はINSERT」方針。
    *
    * @param trx - 呼び出し元が管理するトランザクション

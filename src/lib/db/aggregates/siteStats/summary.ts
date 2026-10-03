@@ -3,7 +3,7 @@ import { sql } from "kysely";
 import { ARENA_RANK_ORDER } from "@/constants/iidx/arenaRanks";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { usersRepo } from "@/lib/db/domains/users";
-import { navigationRepo } from "@/lib/db/domains/logs/navigation";
+import { logTotalBpiRepo } from "@/lib/db/domains/logs/totalBpi";
 import { scoreActivityRepo } from "@/lib/db/domains/scores/activity";
 import {
   latestPerUserSubquery as latestArenaStatsPerUserSubquery,
@@ -47,8 +47,8 @@ class SiteStatsSummaryRepository {
       usersRepo.getCount(),
       usersRepo.getCount(yesterday),
 
-      navigationRepo.getCount(),
-      navigationRepo.getCount(yesterday),
+      logTotalBpiRepo.getCount(),
+      logTotalBpiRepo.getCount(yesterday),
 
       // bkScoresは所有ドメインが存在しない旧バージョンスコアの集計専用テーブルのため、直接参照を維持する。
       db
@@ -322,7 +322,7 @@ class SiteStatsSummaryRepository {
    * 正本を使う。
    */
   async getTotalBpiHistogramByVersion() {
-    const rows = await navigationRepo.getLatestTotalBpiPerUserAllVersions();
+    const rows = await logTotalBpiRepo.getLatestTotalBpiPerUserAllVersions();
 
     const byVersion = new Map<string, number[]>();
     for (const r of rows) {
