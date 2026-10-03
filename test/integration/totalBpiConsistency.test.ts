@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import "dotenv/config";
+import dayjs from "@/lib/dayjs";
 import { db } from "@/lib/db";
 import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
@@ -87,5 +88,96 @@ describe("総合BPI算出ロジックの一貫性", () => {
     const payload = JSON.parse(result.content[1].text);
 
     expect(payload.totalBpi).toBe(groundTruth);
+  });
+});
+
+/**
+ * 「現在」だけでなく、過去の全ての日付断面でも各ロジックが一致することを検証する。
+ * `userStatusLogs`に実際に記録された日(=何らかの理由で記録済み最高値が更新された日)
+ * を基準点(チェックポイント)として、その日までの累積最高値(=ground truth)を
+ * 日毎に算出し、各ロジックの同じ日付に対する出力と比較する。
+ *
+ * 対象ロジック:
+ * - GET /stats/totalBpi?asOf=<date>（過去日との比較機能が使う過去断面の算出）
+ * - GET /stats/totalBPIhistory（dashboardの日別総合BPI推移グラフ）
+ * - GET /stats/monthly-review/bpi?month=<date月>（月間振り返りの日別推移）
+ */
+describe("総合BPI算出ロジックの一貫性（全日付断面）", () => {
+  let checkpoints: { date: string; groundTruth: number }[] = [];
+
+  beforeAll(async () => {
+    if (!USER_ID) return;
+    const rows = await db
+      .selectFrom("userStatusLogs")
+      .select(["createdAt", "totalBpi"])
+      .where("userId", "=", USER_ID)
+      .where("version", "=", VERSION)
+      .orderBy("id", "asc")
+      .execute();
+
+    const maxByDate = new Map<string, number>();
+    for (const r of rows) {
+      const dateStr = dayjs(r.createdAt).tz().format("YYYY-MM-DD");
+      const val = Number(r.totalBpi);
+      const existing = maxByDate.get(dateStr);
+      if (existing === undefined || val > existing) maxByDate.set(dateStr, val);
+    }
+
+    let running: number | null = null;
+    checkpoints = Array.from(maxByDate.keys())
+      .sort()
+      .map((date) => {
+        const val = maxByDate.get(date)!;
+        running = running === null ? val : Math.max(running, val);
+        return { date, groundTruth: running as number };
+      });
+  });
+
+  it("前提: DB記録済みのチェックポイントが1件以上存在する", () => {
+    expect(USER_ID, "TEST_PUBLIC_USER_ID(またはTEST_USER_ID)が未設定").not.toBe("");
+    expect(checkpoints.length, `userId=${USER_ID}, version=${VERSION}`).toBeGreaterThan(
+      0,
+    );
+  });
+
+  it("GET /stats/totalBpi(asOf=各チェックポイント) が一致する", async () => {
+    for (const { date, groundTruth } of checkpoints) {
+      const res = await fetch(
+        `${BASE_URL}/api/v2/users/${USER_ID}/stats/totalBpi?version=${VERSION}&asOf=${date}`,
+      );
+      const data = await res.json();
+      expect(data.body.totalBpi, `asOf=${date}`).toBe(groundTruth);
+    }
+  });
+
+  it("GET /stats/totalBPIhistory(level=12) の各チェックポイント日のtotalBpiが一致する", async () => {
+    const res = await fetch(
+      `${BASE_URL}/api/v2/users/${USER_ID}/stats/totalBPIhistory?version=${VERSION}&level=12`,
+    );
+    const data = await res.json();
+    const byDate = new Map<string, number>(
+      data.body.map((r: { date: string; totalBpi: number }) => [r.date, r.totalBpi]),
+    );
+    for (const { date, groundTruth } of checkpoints) {
+      expect(byDate.get(date), `date=${date}`).toBe(groundTruth);
+    }
+  });
+
+  it("GET /stats/monthly-review/bpi(month=該当月) の各チェックポイント日のhistory値が一致する", async () => {
+    const cache = new Map<string, { date: string; value: number }[]>();
+    for (const { date, groundTruth } of checkpoints) {
+      const month = date.slice(0, 7);
+      if (!cache.has(month)) {
+        const res = await fetch(
+          `${BASE_URL}/api/v2/users/${USER_ID}/stats/monthly-review/bpi?version=${VERSION}&month=${month}`,
+        );
+        const data = await res.json();
+        cache.set(month, data.body.history);
+      }
+      const history = cache.get(month)!;
+      const entry = history.find((h) => h.date === date);
+      expect(entry, `date=${date}のhistoryエントリ`).toBeDefined();
+      expect(entry!.value, `date=${date}`).toBe(groundTruth);
+    }
   });
 });
