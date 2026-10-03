@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+﻿import { useState, useEffect, useRef } from "react";
 import { useUser } from "@/contexts/users/UserContext";
 import { toast } from "sonner";
 import {
@@ -41,17 +41,20 @@ export const useEditProfile = (onClose?: () => void) => {
     available: true,
   });
 
+  // 入力中の内容を保つため、フォームの初期化はユーザーIDが変わったときに1回だけ行う。
+  // SWRの再取得で user の参照が変わっても（同じユーザーなら）入力値は上書きしない
+  const initializedUserIdRef = useRef<string | null>(null);
   useEffect(() => {
-    if (user) {
-      setFormData({
-        userName: user.userName || "",
-        iidxId: user.iidxId || "",
-        bio: user.profileText || "",
-        isPublic: !!user.isPublic,
-        xId: user.xId || "",
-        profileImage: user.profileImage || "",
-      });
-    }
+    if (!user || initializedUserIdRef.current === user.userId) return;
+    initializedUserIdRef.current = user.userId;
+    setFormData({
+      userName: user.userName || "",
+      iidxId: user.iidxId || "",
+      bio: user.profileText || "",
+      isPublic: !!user.isPublic,
+      xId: user.xId || "",
+      profileImage: user.profileImage || "",
+    });
   }, [user]);
 
   useEffect(() => {
