@@ -4,7 +4,8 @@ import { Transaction } from "kysely";
 import { scoreWriteRepo } from "@/lib/db/domains/scores/write";
 import { allScoresRepo } from "@/lib/db/domains/allScores";
 import { logBatchRepo } from "@/lib/db/domains/logs/batch";
-import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
+import { userStatusLogsWriteRepo } from "@/lib/db/domains/userStatusLogs/write";
+import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
 import { BpiCalculator } from "@/lib/bpi";
 
 /**
@@ -51,10 +52,10 @@ export async function importFromBPIM(params: {
   return await db.transaction().execute(async (trx) => {
     await scoreWriteRepo.deleteByUser(trx, params.userId);
     await logBatchRepo.deleteByUser(trx, params.userId);
-    await userStatusLogsRepo.deleteByUser(trx, params.userId);
+    await userStatusLogsWriteRepo.deleteByUser(trx, params.userId);
 
     if (params.statusLogs.length > 0) {
-      await userStatusLogsRepo.insert(trx, params.statusLogs);
+      await userStatusLogsWriteRepo.insert(trx, params.statusLogs);
       await logBatchRepo.insert(trx, params.statusLogs);
     }
 
@@ -79,14 +80,14 @@ async function executeSaveBpiSystem(
     newTotalBpi: number;
   },
 ): Promise<number> {
-  const latestLog = await userStatusLogsRepo.getLatestArenaRank(
+  const latestLog = await userStatusLogsReadRepo.getLatestArenaRank(
     trx,
     params.userId,
     params.version,
   );
 
   const currentArenaRank = latestLog?.arenaRank ?? null;
-  const previousBest = await userStatusLogsRepo.getMaxTotalBpi(
+  const previousBest = await userStatusLogsReadRepo.getMaxTotalBpi(
     trx,
     params.userId,
     params.version,
@@ -109,7 +110,7 @@ async function executeSaveBpiSystem(
     batchId: params.batchId,
   });
 
-  await userStatusLogsRepo.insert(trx, {
+  await userStatusLogsWriteRepo.insert(trx, {
     userId: params.userId,
     totalBpi,
     arenaRank: currentArenaRank,

@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { usersRepo } from "@/lib/db/domains/users";
-import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
+import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
+import { userStatusLogsWriteRepo } from "@/lib/db/domains/userStatusLogs/write";
 
 /**
  * ユーザープロフィールを作成または更新し、`userStatusLogs` に新規ログを追加する。
@@ -34,7 +35,7 @@ export async function upsertUserProfile(params: {
   const { userId, version, batchId, ...profileFields } = params;
 
   return await db.transaction().execute(async (trx) => {
-    const lastStatus = await userStatusLogsRepo.getLatestTotalBpi(
+    const lastStatus = await userStatusLogsReadRepo.getLatestTotalBpi(
       trx,
       userId,
       version,
@@ -42,7 +43,7 @@ export async function upsertUserProfile(params: {
 
     await usersRepo.upsertUserProfile(trx, { userId, ...profileFields });
 
-    await userStatusLogsRepo.insert(trx, {
+    await userStatusLogsWriteRepo.insert(trx, {
       userId,
       totalBpi: lastStatus?.totalBpi ?? -15,
       version,

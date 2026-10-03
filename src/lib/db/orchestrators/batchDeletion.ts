@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { scoreWriteRepo } from "@/lib/db/domains/scores/write";
 import { allScoresRepo } from "@/lib/db/domains/allScores";
-import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
+import { userStatusLogsWriteRepo } from "@/lib/db/domains/userStatusLogs/write";
 import { logBatchRepo } from "@/lib/db/domains/logs/batch";
 
 /**
@@ -42,7 +42,7 @@ export async function deleteBatch(
 
     await scoreWriteRepo.deleteByBatch(trx, userId, batchId);
     await allScoresRepo.deleteByBatch(trx, userId, batchId);
-    await userStatusLogsRepo.deleteByBatch(trx, userId, batchId);
+    await userStatusLogsWriteRepo.deleteByBatch(trx, userId, batchId);
     await logBatchRepo.deleteByBatch(trx, userId, batchId);
   });
 }

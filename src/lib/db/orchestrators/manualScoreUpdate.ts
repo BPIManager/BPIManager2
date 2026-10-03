@@ -2,7 +2,8 @@ import { db } from "@/lib/db";
 import { scoreWriteRepo } from "@/lib/db/domains/scores/write";
 import { allScoresRepo } from "@/lib/db/domains/allScores";
 import { logBatchRepo } from "@/lib/db/domains/logs/batch";
-import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
+import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
+import { userStatusLogsWriteRepo } from "@/lib/db/domains/userStatusLogs/write";
 import { BpiCalculator } from "@/lib/bpi";
 import { getManualBatchPrefix, mintManualBatchId } from "@/lib/scores/manualBatchId";
 
@@ -81,14 +82,14 @@ export async function saveManualScoreUpdate(params: {
     // 先に用意してから`scores`へ書き込む必要がある（CSVインポート
     // `executeSaveBpiSystem`と同じ順序）。
     if (score) {
-      const latestLog = await userStatusLogsRepo.getLatestArenaRank(
+      const latestLog = await userStatusLogsReadRepo.getLatestArenaRank(
         trx,
         userId,
         version,
       );
       const currentArenaRank = latestLog?.arenaRank ?? null;
 
-      const previousBest = await userStatusLogsRepo.getMaxTotalBpi(
+      const previousBest = await userStatusLogsReadRepo.getMaxTotalBpi(
         trx,
         userId,
         version,
@@ -104,7 +105,7 @@ export async function saveManualScoreUpdate(params: {
         batchId,
         totalBpi,
       });
-      await userStatusLogsRepo.upsertManualBatch(trx, {
+      await userStatusLogsWriteRepo.upsertManualBatch(trx, {
         userId,
         version,
         batchId,

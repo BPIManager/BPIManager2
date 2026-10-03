@@ -1,6 +1,6 @@
 import dayjs from "@/lib/dayjs";
 import { monthlyReviewRepo } from "@/lib/db/aggregates/monthly-review";
-import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
+import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
 import {
   buildBpiTimeline,
   calculateTotalBpiForScores,
@@ -111,8 +111,8 @@ export async function computeOwnerBpiTimeline(
     // compareVersionの有無に関わらず、`version`自体の記録済み下限は常に取得する
     // （compareVersionはbaseline取得元を切り替えるだけで、`version`側の
     // ラチェット下限とは無関係）
-    userStatusLogsRepo.findMaxTotalBpiAsOf(owner, version, monthStartDate),
-    userStatusLogsRepo.getTotalBpiLogsInRange(
+    userStatusLogsReadRepo.findMaxTotalBpiAsOf(owner, version, monthStartDate),
+    userStatusLogsReadRepo.getTotalBpiLogsInRange(
       owner,
       version,
       monthStartDate,
@@ -240,12 +240,12 @@ export async function recomputeBpiTimelinesForUsers(
       : Promise.resolve(undefined),
     // compareVersionの有無に関わらず、`version`自体の記録済み下限は常に取得する
     // （computeOwnerBpiTimelineと同じ理由）
-    userStatusLogsRepo.getMaxTotalBpiAsOfForUsers(
+    userStatusLogsReadRepo.getMaxTotalBpiAsOfForUsers(
       userIds,
       version,
       monthStartDate,
     ),
-    userStatusLogsRepo.getTotalBpiLogsInRangeForUsers(
+    userStatusLogsReadRepo.getTotalBpiLogsInRangeForUsers(
       userIds,
       version,
       monthStartDate,

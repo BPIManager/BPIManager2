@@ -4,7 +4,7 @@ import {
   getBestArenaClassPerVersion,
 } from "@/lib/db/domains/arenaHistory";
 import { getStatsPrivacy } from "@/lib/db/domains/arenaPrivacy";
-import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
+import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
 import { followsRepo } from "@/lib/db/domains/follow";
 
 /**
@@ -56,7 +56,7 @@ class UserProfileRepository {
 
     const [bpiHistory, rawArenaStats, bestArenaStats, privacy] =
       await Promise.all([
-        userStatusLogsRepo.getBpiHistoryByVersion(userId),
+        userStatusLogsReadRepo.getBpiHistoryByVersion(userId),
         getLatestArenaStatsPerVersion(userId),
         getBestArenaClassPerVersion(userId),
         getStatsPrivacy(userId),
@@ -134,7 +134,7 @@ class UserProfileRepository {
     const user = await db
       .selectFrom("users as u")
       .leftJoin(
-        userStatusLogsRepo.latestRowSubquery(userId, version).as("latest"),
+        userStatusLogsReadRepo.latestRowSubquery(userId, version).as("latest"),
         (join) => join.onRef("u.userId", "=", "latest.userId"),
       )
       .leftJoin("userRoles as ur", "ur.userId", "u.userId")

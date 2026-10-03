@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { sql } from "kysely";
 import { latestPerUserSubquery as latestArenaPerUserSubquery } from "@/lib/db/domains/arenaHistory";
-import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
+import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
 
 /**
  * グローバルBPI/レーダーランキングを担当するリポジトリクラス。
@@ -48,7 +48,7 @@ class UserRankingRepository {
     const hasFilter = hasAreaFilter || hasArenaClassFilter;
 
     const latestStatusSubquery =
-      userStatusLogsRepo.latestPerUserSubquery(version);
+      userStatusLogsReadRepo.latestPerUserSubquery(version);
     const latestArenaSubquery = latestArenaPerUserSubquery(version);
 
     if (isRadarCategory) {

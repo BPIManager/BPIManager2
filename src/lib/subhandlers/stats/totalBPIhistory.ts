@@ -3,7 +3,7 @@ import dayjs from "@/lib/dayjs";
 import { BpiCalculator } from "@/lib/bpi";
 import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { songMasterRepo } from "@/lib/db/domains/songs/master";
-import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
+import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
 import { ok } from "@/middlewares/api/apiResult";
 import { groupByOf, DIFFICULTY_LABELS } from "./_shared";
 import type { StatsQuery } from "@/types/stats/query";
@@ -150,7 +150,7 @@ export async function handleStatsTotalBpiHistory(
   // BPIモデルの再推定等により、同じ時点を再計算しても過去にuserStatusLogsへ
   // 記録された値より低く出ることがある（monthly-review/bpi.tsのbuildBpiTimeline
   // と同じ理由）。記録済みの値を日付ごとの下限として合流させる
-  const recordedLogs = await userStatusLogsRepo.getTotalBpiLogsInRange(
+  const recordedLogs = await userStatusLogsReadRepo.getTotalBpiLogsInRange(
     q.userId,
     q.version,
     new Date(0),

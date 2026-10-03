@@ -3,7 +3,7 @@ import dayjs from "@/lib/dayjs";
 import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { rivalPairwiseRepo } from "@/lib/db/aggregates/rivalScores/pairwise";
 import { songMasterRepo } from "@/lib/db/domains/songs/master";
-import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
+import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
 import { BpiCalculator } from "@/lib/bpi";
 import { dashboardSchema } from "@/lib/mcp/schemas";
 import type { IBpiBasicSongData, IBpiScoreObservation } from "@/types/songs/bpi";
@@ -170,7 +170,7 @@ export function registerGetMyDashboard(server: McpServer, userId: string) {
         canonicalMaster,
       );
       // 他のtotalBpi算出箇所（stats/totalBpi.ts等）と同様、過去最高値を下回らないラチェットを適用する
-      const previousBest = await userStatusLogsRepo.findMaxTotalBpi(userId, version);
+      const previousBest = await userStatusLogsReadRepo.findMaxTotalBpi(userId, version);
       const totalBpi = BpiCalculator.ratchetTotalBpi(previousBest, freshTotalBpi);
       const estimatedRank = BpiCalculator.estimateRank(totalBpi);
 

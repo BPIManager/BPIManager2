@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { usersRepo } from "@/lib/db/domains/users";
-import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
+import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
+import { userStatusLogsWriteRepo } from "@/lib/db/domains/userStatusLogs/write";
 import { scoreHistoryRepo } from "@/lib/db/domains/scores/history";
 import { scoreWriteRepo } from "@/lib/db/domains/scores/write";
 import { allScoresRepo } from "@/lib/db/domains/allScores";
@@ -47,7 +48,7 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
     logBatchRepo.getAllForUser(userId),
     radarCacheRepo.getAllForUser(userId),
     notificationsRepo.getAllForUser(userId),
-    userStatusLogsRepo.getAllForUser(userId),
+    userStatusLogsReadRepo.getAllForUser(userId),
     discordLinksRepo.getRolesForUser(userId),
     apiKeysRepo.getAllForUser(userId),
     allScoresRepo.getAllForUser(userId),
@@ -144,7 +145,7 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
     await discordLinksRepo.deleteRoleByUser(trx, userId);
 
     // userStatusLogs: FK to users(CASCADE)
-    await userStatusLogsRepo.deleteByUser(trx, userId);
+    await userStatusLogsWriteRepo.deleteByUser(trx, userId);
 
     // discordLinks: FK to users(CASCADE)
     await discordLinksRepo.deleteLinkByUser(trx, userId);

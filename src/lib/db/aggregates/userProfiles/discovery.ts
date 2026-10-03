@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { sql } from "kysely";
 import { latestPerUserSubquery as latestArenaPerUserSubquery } from "@/lib/db/domains/arenaHistory";
-import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
+import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
 import { wherePublicOnly } from "@/lib/db/shared/visibility";
 import type { RadarFilterKey, RadarFilterRange } from "@/types/users/list";
 
@@ -67,7 +67,7 @@ class UserDiscoveryRepository {
       sort && columnMap[sort] ? columnMap[sort] : "usl.totalBpi";
 
     const latestStatusSubquery =
-      userStatusLogsRepo.latestPerUserSubquery(version);
+      userStatusLogsReadRepo.latestPerUserSubquery(version);
     const latestArenaSubquery = latestArenaPerUserSubquery(version);
 
     let query = db
@@ -176,7 +176,7 @@ class UserDiscoveryRepository {
     const { query, arenaClass, version, limit } = params;
 
     const latestStatusSubquery =
-      userStatusLogsRepo.latestPerUserSubquery(version);
+      userStatusLogsReadRepo.latestPerUserSubquery(version);
     const latestArenaSubquery = latestArenaPerUserSubquery(version);
 
     let dbQuery = db

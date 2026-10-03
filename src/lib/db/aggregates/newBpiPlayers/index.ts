@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { latestScoresRepo } from "@/lib/db/domains/scores/latest";
-import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
+import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
 
 interface GetPageParams {
   limit: number;
@@ -44,7 +44,7 @@ export const newBpiPlayersAggregateRepo = {
       return { users: [], totalCount: 0, songs: level12Songs, scores: [] };
     }
 
-    const latestStatus = userStatusLogsRepo.latestPerUserSubquery(version);
+    const latestStatus = userStatusLogsReadRepo.latestPerUserSubquery(version);
 
     let base = db
       .selectFrom("users as u")
