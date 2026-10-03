@@ -186,6 +186,36 @@ export const linkedAccountsTranslations = {
     "zh-TW": "隱私權政策",
     ko: "개인정보 처리방침",
   },
+  "settings.profile.avatar.picker.title": {
+    ja: "アイコンを選択",
+    en: "Choose an icon",
+    "zh-TW": "選擇圖示",
+    ko: "아이콘 선택",
+  },
+  "settings.profile.avatar.picker.empty": {
+    ja: "画像を提供している連携先がありません。",
+    en: "No linked account provides an image.",
+    "zh-TW": "沒有提供圖片的連結帳號。",
+    ko: "이미지를 제공하는 연결 계정이 없습니다.",
+  },
+  "settings.profile.avatar.picker.preview": {
+    ja: "プレビュー",
+    en: "Preview",
+    "zh-TW": "預覽",
+    ko: "미리보기",
+  },
+  "settings.profile.avatar.picker.apply": {
+    ja: "決定",
+    en: "Apply",
+    "zh-TW": "套用",
+    ko: "적용",
+  },
+  "settings.profile.avatar.picker.cancel": {
+    ja: "キャンセル",
+    en: "Cancel",
+    "zh-TW": "取消",
+    ko: "취소",
+  },
   "settings.linked.provider.google": {
     ja: "Google",
     en: "Google",
