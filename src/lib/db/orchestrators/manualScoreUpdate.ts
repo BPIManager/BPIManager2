@@ -61,19 +61,20 @@ export async function saveManualScoreUpdate(params: {
   const { userId, version, score, allScore, newTotalBpi } = params;
 
   const prefix = getManualBatchPrefix(userId, version);
-  // `score`(scores/songDefドメイン、☆11/12)がある更新は`logs`に書き込まれる
-  // ため`logs`側から判定できるが、`allScore`のみ(☆10以下)の更新は`logs`に
-  // 一切触れないため、`allScores`自体から最新の手動batchIdを判定する
-  const currentLatestBatchId = score
-    ? await navigationRepo.getLatestBatchId(userId, version)
-    : await allScoresRepo.getLatestBatchId(userId, version);
-  const batchId = currentLatestBatchId?.startsWith(prefix)
-    ? currentLatestBatchId
-    : mintManualBatchId(userId, version);
-
   const lastPlayed = new Date();
 
   return await db.transaction().execute(async (trx) => {
+    // 判定と書き込みの間に別のインポートが割り込むと古いbatchIdを再利用するため、
+    // 判定時に logs の最新行をFOR UPDATEで行ロックし、同一ユーザーの保存を直列化する
+    // `score`(scores/songDefドメイン、☆11/12)がある更新は`logs`側から判定・ロックできる。
+    // `allScore`のみ(☆10以下)の更新は`logs`に一切触れないため、`allScores`自体から判定する
+    const currentLatestBatchId = score
+      ? await navigationRepo.getLatestBatchIdForUpdate(trx, userId, version)
+      : await allScoresRepo.getLatestBatchId(userId, version);
+    const batchId = currentLatestBatchId?.startsWith(prefix)
+      ? currentLatestBatchId
+      : mintManualBatchId(userId, version);
+
     let totalBpi: number | null = null;
 
     // `scores.batchId`は`logs.batchId`への外部キーのため、`logs`側の行を
