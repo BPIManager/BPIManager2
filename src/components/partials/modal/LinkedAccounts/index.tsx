@@ -108,6 +108,7 @@ function LinkedAccountsList() {
   const { accounts, isLoading, refresh } = useLinkedAccounts();
   const [busyProviderId, setBusyProviderId] = useState<string | null>(null);
   const [emailModal, setEmailModal] = useState<EmailModalMode | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const linkedIds = new Set(accounts.map((a) => a.providerId));
   const emailAccount: LinkedAccount | undefined = accounts.find(
@@ -119,6 +120,7 @@ function LinkedAccountsList() {
     const currentUser = auth.currentUser;
     if (!currentUser) return;
     setBusyProviderId(provider.providerId);
+    setErrorMessage(null);
     try {
       await linkWithPopup(currentUser, provider.create());
       await refresh();
@@ -127,10 +129,10 @@ function LinkedAccountsList() {
       const code = (error as { code?: string }).code ?? "";
       if (IGNORED_ERROR_CODES.includes(code)) return;
       if (code === "auth/credential-already-in-use") {
-        toast.error(t("settings.linked.inUse"));
+        setErrorMessage(t("settings.linked.inUse"));
       } else {
         console.error("Link provider failed:", code);
-        toast.error(t("settings.linked.failed"));
+        setErrorMessage(t("settings.linked.failed"));
       }
     } finally {
       setBusyProviderId(null);
@@ -140,6 +142,7 @@ function LinkedAccountsList() {
   const handleUnlink = async (providerId: string) => {
     if (!fbUser) return;
     setBusyProviderId(providerId);
+    setErrorMessage(null);
     try {
       await unlinkProvider(fbUser, providerId);
       // 連携解除はサーバー側で行われるため、ローカルのユーザー情報を取り直して表示を揃える
@@ -148,7 +151,7 @@ function LinkedAccountsList() {
       toast.success(t("settings.linked.unlinked"));
     } catch (error: unknown) {
       const apiStatus = (error as { status?: number }).status;
-      toast.error(
+      setErrorMessage(
         apiStatus && apiStatus < 500 && error instanceof Error
           ? error.message
           : t("settings.linked.failed"),
@@ -173,6 +176,7 @@ function LinkedAccountsList() {
 
   return (
     <>
+      {errorMessage && <div role="alert" className="rounded-xl border border-bpim-danger/30 bg-bpim-danger/8 px-4 py-3 text-xs font-medium text-bpim-danger">{errorMessage}</div>}
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between gap-4 rounded-lg border border-bpim-border bg-bpim-surface-2/40 px-4 py-3">
           <div className="flex min-w-0 flex-col">

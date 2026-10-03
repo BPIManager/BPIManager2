@@ -166,7 +166,7 @@ export default function EmailLoginModal({ open, onOpenChange, mode }: Props) {
             <Turnstile key={widgetKey} onVerify={setTurnstileToken} />
 
             {errorMessage && (
-              <p className="text-[11px] font-bold text-bpim-danger">{errorMessage}</p>
+              <div role="alert" className="rounded-xl border border-bpim-danger/30 bg-bpim-danger/8 px-4 py-3 text-xs font-medium text-bpim-danger">{errorMessage}</div>
             )}
 
             <Button
