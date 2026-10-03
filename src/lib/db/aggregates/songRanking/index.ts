@@ -23,7 +23,7 @@ export interface SongRankingResult {
  * 指定楽曲における全ユーザーの最新スコアランキングを取得する。
  *
  * `statsRepo.getSongRanking`（`scores`テーブル）と
- * `allScoresAggregateRepo.getAllSongRanking`（`allScores`テーブル）はテーブル名以外
+ * `allScoresSelfRivalRepo.getAllSongRanking`（`allScores`テーブル）はテーブル名以外
  * ほぼ同一実装だったため、こちらに共通化している。
  * 非公開ユーザーは `anon-{index}` に匿名化してマスクする。
  *
