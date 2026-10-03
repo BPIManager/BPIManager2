@@ -137,6 +137,12 @@ export const linkedAccountsTranslations = {
     "zh-TW": "請在登入狀態下開啟連結以完成連結",
     ko: "연결하려면 로그인한 상태에서 링크를 열어주세요",
   },
+  "email.complete.alreadyLinked": {
+    ja: "このアカウントには既にメールアドレスが連携されています。解除済みなのにこの表示が出る場合は、一度ログアウトして再度ログインしてから、もう一度お試しください。",
+    en: "An email address is already linked to this account. If you already removed it, sign out, sign back in, and try again.",
+    "zh-TW": "此帳號已連結電子郵件。若已解除卻仍出現此訊息，請先登出、重新登入後再試一次。",
+    ko: "이 계정에는 이미 이메일 주소가 연결되어 있습니다. 이미 해제했다면 로그아웃 후 다시 로그인하고 시도해 주세요.",
+  },
   "email.complete.error": {
     ja: "処理に失敗しました。時間をおいて再度お試しください",
     en: "Something went wrong. Please try again later.",

@@ -116,6 +116,7 @@ export default function EmailLinkComplete() {
           }
           // 解除済みのメール連携が端末に古い状態で残っていると provider-already-linked になるため、連携前に最新化する
           await auth.currentUser.reload();
+          await auth.currentUser.getIdToken(true);
           await linkWithCredential(
             auth.currentUser,
             EmailAuthProvider.credentialWithLink(email, href),
@@ -128,6 +129,8 @@ export default function EmailLinkComplete() {
         const code = (error as { code?: string }).code ?? "";
         if (code === "auth/email-already-in-use" || code === "auth/credential-already-in-use") {
           fail("email.complete.emailInUse");
+        } else if (code === "auth/provider-already-linked") {
+          fail("email.complete.alreadyLinked");
         } else if (code.startsWith("auth/invalid-action-code") || code.startsWith("auth/expired-action-code")) {
           fail("email.complete.invalidLink");
         } else {
