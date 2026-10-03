@@ -23,6 +23,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(404).json({ message: "Unknown client_id" });
   }
 
+  const redirectUri = typeof req.query.redirect_uri === "string" ? req.query.redirect_uri : undefined;
+  const redirectUriRegistered = redirectUri !== undefined && client.redirectUris.includes(redirectUri);
+
   const redirectHosts = client.redirectUris
     .map((uri) => {
       try {
@@ -36,6 +39,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json({
     clientName: client.clientName ?? null,
     redirectHosts,
+    redirectUriRegistered,
   });
 }
 

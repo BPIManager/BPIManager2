@@ -16,6 +16,7 @@ function getStringParam(value: string | string[] | undefined) {
 interface ClientIdentity {
   clientName: string | null;
   redirectHosts: string[];
+  redirectUriRegistered: boolean;
 }
 
 export default function OAuthAuthorizePage() {
@@ -48,7 +49,9 @@ export default function OAuthAuthorizePage() {
     if (!paramsAreValid || !clientId) return;
 
     let cancelled = false;
-    fetch(`/api/oauth/client?client_id=${encodeURIComponent(clientId)}`)
+    fetch(
+      `/api/oauth/client?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri ?? "")}`,
+    )
       .then((res) => {
         if (!res.ok) throw new Error("client lookup failed");
         return res.json();
@@ -63,7 +66,7 @@ export default function OAuthAuthorizePage() {
     return () => {
       cancelled = true;
     };
-  }, [paramsAreValid, clientId]);
+  }, [paramsAreValid, clientId, redirectUri]);
 
   if (isLoading || !router.isReady) {
     return <PageLoader size="lg" />;
@@ -98,7 +101,12 @@ export default function OAuthAuthorizePage() {
   }
 
   const handleDeny = () => {
-    const url = new URL(redirectUri!);
+    // 登録済みのリダイレクト先以外へは遷移させない（open redirect防止）
+    if (!redirectUri || !clientIdentity?.redirectUriRegistered) {
+      setError("リダイレクト先が登録されていないため、拒否を通知できません");
+      return;
+    }
+    const url = new URL(redirectUri);
     url.searchParams.set("error", "access_denied");
     if (state) url.searchParams.set("state", state);
     window.location.href = url.toString();
