@@ -68,6 +68,8 @@ export default function EmailLinkComplete() {
 
   const complete = useCallback(
     async (email: string | null) => {
+      // ページ読み込み直後は認証状態の復元が終わっておらず currentUser が null になるため、確定を待つ
+      await auth.authStateReady();
       const href = window.location.href;
       const currentIntent = readIntent(href);
       setIntent(currentIntent);
