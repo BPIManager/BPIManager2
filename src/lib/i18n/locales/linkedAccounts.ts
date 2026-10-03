@@ -168,10 +168,23 @@ export const linkedAccountsTranslations = {
     ko: "이메일 주소의 안전성에 대하여",
   },
   "settings.linked.security.body": {
-    ja: "BPIMのデータベースには、メールアドレスそのものは保存していません。照合に使うのは鍵付きハッシュ（元に戻せない変換値）のみです。メールアドレスは、ログイン基盤であるFirebase Authenticationで管理しています。",
+    ja: "BPIMではメールアドレスは保存せず、照合のために鍵付きハッシュのみを保管します。メールアドレスは、ログイン基盤であるFirebase Authenticationに分離されて管理されます。",
     en: "BPIM's database does not store email addresses in plain text. Only a keyed hash (a one-way value that cannot be reversed) is kept for matching. Email addresses are managed by Firebase Authentication, our sign-in provider.",
-    "zh-TW": "BPIM 的資料庫不會以明文儲存電子郵件。僅保存用於比對的加鍵雜湊值（無法還原的單向值）。電子郵件由登入基礎設施 Firebase Authentication 管理。",
+    "zh-TW":
+      "BPIM 的資料庫不會以明文儲存電子郵件。僅保存用於比對的加鍵雜湊值（無法還原的單向值）。電子郵件由登入基礎設施 Firebase Authentication 管理。",
     ko: "BPIM 데이터베이스에는 이메일 주소를 평문으로 저장하지 않습니다. 대조에 사용하는 키가 적용된 해시(되돌릴 수 없는 값)만 보관합니다. 이메일 주소는 로그인 기반인 Firebase Authentication에서 관리합니다.",
+  },
+  "settings.linked.security.terms": {
+    ja: "利用規約",
+    en: "Terms of Service",
+    "zh-TW": "使用條款",
+    ko: "이용약관",
+  },
+  "settings.linked.security.privacy": {
+    ja: "プライバシーポリシー",
+    en: "Privacy Policy",
+    "zh-TW": "隱私權政策",
+    ko: "개인정보 처리방침",
   },
   "settings.linked.provider.google": {
     ja: "Google",

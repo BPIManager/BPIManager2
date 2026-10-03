@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
+import Link from "next/link";
 import { Link2, Mail, ShieldCheck } from "lucide-react";
 import {
   GoogleIcon,
@@ -252,6 +253,22 @@ function LinkedAccountsList() {
             <span className="text-sm font-bold">{t("settings.linked.security.title")}</span>
           </div>
           <p className="text-xs leading-relaxed text-bpim-muted">{t("settings.linked.security.body")}</p>
+          <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
+            <Link
+              href="https://app.notion.com/p/3289989ca87a80dd9a57de3c63c71e50"
+              target="_blank"
+              className="underline underline-offset-2 text-bpim-muted hover:text-bpim-text"
+            >
+              {t("settings.linked.security.terms")}
+            </Link>
+            <Link
+              href="https://app.notion.com/p/3289989ca87a80b9b020edb6cb664261"
+              target="_blank"
+              className="underline underline-offset-2 text-bpim-muted hover:text-bpim-text"
+            >
+              {t("settings.linked.security.privacy")}
+            </Link>
+          </div>
         </div>
       </div>
 
