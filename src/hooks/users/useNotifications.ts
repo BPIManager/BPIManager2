@@ -14,6 +14,8 @@ import type {
  * @param type - 取得する通知種別（デフォルト: `"all"`）
  * @returns 通知配列・未読件数・ローディング状態・既読化関数・ページング操作
  */
+const getNotificationItems = (page: NotificationItem[]) => page;
+
 export const useNotifications = (
   type: "all" | "follow" | "overtaken" | "followApproved" = "all",
 ) => {
@@ -41,7 +43,7 @@ export const useNotifications = (
       return `${API_V2_PREFIX}/users/${fbUser.uid}/notifications?type=${type}&page=${index}&limit=20`;
     },
     {
-      getItems: (page) => page,
+      getItems: getNotificationItems,
       isLastPage: (page) => page.length < 20,
       revalidateOnFocus: false,
     },

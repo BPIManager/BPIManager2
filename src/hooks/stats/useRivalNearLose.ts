@@ -23,6 +23,8 @@ interface NearLoseResponse {
  * @param threshold - スコア差分の最小/最大閾値（デフォルト: 1〜100）
  * @returns 楽曲配列・ページング操作・ローディング状態
  */
+const getNearLoseItems = (page: NearLoseResponse) => page?.items ?? [];
+
 export const useNearLoseInfinite = (
   userId: string,
   version: string,
@@ -60,7 +62,7 @@ export const useNearLoseInfinite = (
         return `${API_V2_PREFIX}/users/${userId}/rivals/following/scores?${params.toString()}`;
       },
       {
-        getItems: (page) => page?.items ?? [],
+        getItems: getNearLoseItems,
         isLastPage: (page) => !page?.nextCursor,
         revalidateOnFocus: false,
       },

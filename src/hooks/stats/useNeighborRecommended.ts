@@ -1,4 +1,5 @@
 ﻿import { useUser } from "@/contexts/users/UserContext";
+import { useCallback } from "react";
 import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { useInfiniteListV2 } from "@/services/swr/useInfinite";
 import type {
@@ -44,7 +45,10 @@ export const useNeighborRecommendedInfinite = (
       return `${API_V2_PREFIX}/users/${userId}/stats/neighbor-recommended?${params.toString()}`;
     },
     {
-      getItems: (page) => page?.[type]?.data ?? [],
+      getItems: useCallback(
+        (page: NeighborRecommendedPage) => page?.[type]?.data ?? [],
+        [type],
+      ),
       isLastPage: (page) => {
         const section = page?.[type];
         if (!section) return true;
