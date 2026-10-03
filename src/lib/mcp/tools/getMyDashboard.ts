@@ -1,7 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import dayjs from "@/lib/dayjs";
 import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
-import { rivalRepo } from "@/lib/db/aggregates/rivalScores/rival";
+import { rivalPairwiseRepo } from "@/lib/db/aggregates/rivalScores/pairwise";
 import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
 import { BpiCalculator } from "@/lib/bpi";
@@ -130,7 +130,7 @@ export function registerGetMyDashboard(server: McpServer, userId: string) {
           statsTablesRepo.getScoreHistory(userId, version, [12], []),
           statsTablesRepo.getScoreHistory(userId, version, numericLevels, difficulties),
           songMasterRepo.getSongMasterWithDef(),
-          rivalRepo.getScoreComparisonList({
+          rivalPairwiseRepo.getScoreComparisonList({
             userId,
             version,
             limit: 200,

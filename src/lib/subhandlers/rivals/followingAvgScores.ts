@@ -1,5 +1,5 @@
 import type { NextApiRequest } from "next";
-import { rivalRepo } from "@/lib/db/aggregates/rivalScores/rival";
+import { rivalAggregateRepo } from "@/lib/db/aggregates/rivalScores/aggregate";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { authUidOf, type HandleOutcome } from "./_shared";
@@ -26,7 +26,7 @@ export async function handleRivalFollowingAvgScores(
       : undefined;
 
   try {
-    const rows = await rivalRepo.getRivalAvgScores({
+    const rows = await rivalAggregateRepo.getRivalAvgScores({
       userId,
       version,
       songIds,

@@ -1,5 +1,5 @@
 import type { NextApiRequest } from "next";
-import { rivalRepo } from "@/lib/db/aggregates/rivalScores/rival";
+import { rivalOvertakenRepo } from "@/lib/db/aggregates/rivalScores/overtaken";
 import { timelineRepo } from "@/lib/db/domains/scores/timeline";
 import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 import type { HandlerResult } from "@/types/api";
@@ -56,7 +56,7 @@ export function computeRivalRankMap(
 }
 
 export function createOvertakenMap(
-  overtakenList: Awaited<ReturnType<typeof rivalRepo.getOvertakenRivals>>,
+  overtakenList: Awaited<ReturnType<typeof rivalOvertakenRepo.getOvertakenRivals>>,
 ): OvertakenMap {
   return overtakenList.reduce<OvertakenMap>((acc, curr) => {
     if (!curr.songId) return acc;

@@ -1,5 +1,6 @@
 import dayjs from "@/lib/dayjs";
-import { rivalRepo } from "@/lib/db/aggregates/rivalScores/rival";
+import { rivalOvertakenRepo } from "@/lib/db/aggregates/rivalScores/overtaken";
+import { rivalAggregateRepo } from "@/lib/db/aggregates/rivalScores/aggregate";
 import { statsTablesRepo } from "@/lib/db/aggregates/stats/tables";
 import { scoreDetailRepo } from "@/lib/db/domains/scores/detail";
 import { navigationRepo } from "@/lib/db/domains/logs/navigation";
@@ -20,7 +21,7 @@ import type { IIDXVersion } from "@/types/iidx/version";
  */
 async function fetchRivalScoresForOvertaken(
   overtakenPromise: Promise<
-    Awaited<ReturnType<typeof rivalRepo.getOvertakenRivals>>
+    Awaited<ReturnType<typeof rivalOvertakenRepo.getOvertakenRivals>>
   >,
   uid: string,
   ver: IIDXVersion,
@@ -32,7 +33,7 @@ async function fetchRivalScoresForOvertaken(
     .filter(Boolean);
 
   return isOwnLog && overtakenSongIds.length > 0
-    ? rivalRepo.getRivalLatestScoresBySong({
+    ? rivalAggregateRepo.getRivalLatestScoresBySong({
         userId: uid,
         version: ver,
         songIds: overtakenSongIds,
@@ -50,7 +51,7 @@ export async function handleLastPlayedBase(
   type: string = "day",
 ) {
   const overtakenPromise = isOwnLog
-    ? rivalRepo.getOvertakenRivals(uid, ver, {
+    ? rivalOvertakenRepo.getOvertakenRivals(uid, ver, {
         range: { ...range, basis: "lastPlayed" },
       })
     : Promise.resolve([]);
@@ -159,7 +160,7 @@ export async function handleCreatedAtBase(
   if (batches.length === 0) return null;
 
   const overtakenPromise = isOwnLog
-    ? rivalRepo.getOvertakenRivals(uid, ver, {
+    ? rivalOvertakenRepo.getOvertakenRivals(uid, ver, {
         range: { ...range, basis: "createdAt" },
       })
     : Promise.resolve([]);

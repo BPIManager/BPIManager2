@@ -2,7 +2,8 @@ import type { NextApiRequest } from "next";
 import dayjs from "@/lib/dayjs";
 import { navigationRepo } from "@/lib/db/domains/logs/navigation";
 import { scoreDetailRepo } from "@/lib/db/domains/scores/detail";
-import { rivalRepo } from "@/lib/db/aggregates/rivalScores/rival";
+import { rivalOvertakenRepo } from "@/lib/db/aggregates/rivalScores/overtaken";
+import { rivalAggregateRepo } from "@/lib/db/aggregates/rivalScores/aggregate";
 import { deleteBatch, BatchNotLatestError } from "@/lib/db/orchestrators/batchDeletion";
 import { mapToLogNested } from "@/utils/logs/getMapNested";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
@@ -67,7 +68,7 @@ export async function handleBatchDetail(
         navigationRepo.findBatchesInRange(uid, v, dayRange.start, dayRange.end),
         scoreDetailRepo.getScoresWithDetails(uid, v, { batchIds: [bid] }),
         isOwnLog
-          ? rivalRepo.getOvertakenRivals(uid, v, {
+          ? rivalOvertakenRepo.getOvertakenRivals(uid, v, {
               batchId: bid,
               range: { ...dayRange, basis: "createdAt" },
             })
@@ -86,7 +87,7 @@ export async function handleBatchDetail(
       .filter(Boolean);
     const rivalScores =
       isOwnLog && overtakenSongIds.length > 0
-        ? await rivalRepo.getRivalLatestScoresBySong({
+        ? await rivalAggregateRepo.getRivalLatestScoresBySong({
             userId: uid,
             version: v,
             songIds: overtakenSongIds,
