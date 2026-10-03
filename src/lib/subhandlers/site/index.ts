@@ -4,7 +4,7 @@ import { z } from "zod";
 import { BpiCalculator } from "@/lib/bpi";
 import { getArenaAverages } from "@/lib/cache/arenaAverages";
 import { getSongWithDefCached } from "@/lib/cache/songDefs";
-import { scoresRepo } from "@/lib/db/domains/scores";
+import { scoreActivityRepo } from "@/lib/db/domains/scores/activity";
 import { supportersRepo } from "@/lib/db/aggregates/userProfiles/supporters";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 import { IIDX_VERSIONS, latestVersion } from "@/constants/iidx/iidxVersions";
@@ -155,7 +155,7 @@ export async function handleBpiCalc(
       bpi !== null ? BpiCalculator.estimateRank(bpi) : null;
 
     const { rank: bpimRank, total: bpimTotal } = includeRank
-      ? await scoresRepo.getSongBpimRank(song.songId, exScore, version)
+      ? await scoreActivityRepo.getSongBpimRank(song.songId, exScore, version)
       : { rank: null, total: null };
 
     let arenaAverages = null;

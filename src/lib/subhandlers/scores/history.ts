@@ -1,5 +1,5 @@
 import type { NextApiRequest } from "next";
-import { scoresRepo } from "@/lib/db/domains/scores";
+import { scoreHistoryRepo } from "@/lib/db/domains/scores/history";
 import { songHistoryQuerySchema } from "@/schemas/scores/query";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { err, ok } from "@/middlewares/api/apiResult";
@@ -26,7 +26,7 @@ export async function handleScoreHistory(
   }
 
   try {
-    const history = await scoresRepo.getHistoryForSong(
+    const history = await scoreHistoryRepo.getHistoryForSong(
       targetUserId,
       parsed.data.songId,
     );

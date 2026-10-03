@@ -23,9 +23,13 @@ vi.mock("@/lib/db/domains/scores/detail", () => ({
     getScoresWithDetails: (...a: unknown[]) => getScoresWithDetailsMock(...a),
   },
 }));
-vi.mock("@/lib/db/domains/scores", () => ({
-  scoresRepo: {
+vi.mock("@/lib/db/domains/scores/history", () => ({
+  scoreHistoryRepo: {
     getHistoryForSong: (...a: unknown[]) => getHistoryForSongMock(...a),
+  },
+}));
+vi.mock("@/lib/db/domains/scores/latest", () => ({
+  latestScoresRepo: {
     getLatestScores: vi.fn().mockResolvedValue([]),
   },
 }));

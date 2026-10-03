@@ -2,7 +2,7 @@ import type { NextApiRequest } from "next";
 import { z } from "zod";
 import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
-import { scoresRepo } from "@/lib/db/domains/scores";
+import { latestScoresRepo } from "@/lib/db/domains/scores/latest";
 import { timelineRepo } from "@/lib/db/domains/scores/timeline";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 import { accessError, err, ok } from "@/middlewares/api/apiResult";
@@ -37,7 +37,7 @@ export async function handleVersionSummary(
     const denied = accessError(access);
     if (denied) return { result: denied, targetUserId: userId, viewerId };
 
-    const compareVersion = await scoresRepo.getPreviousVersionWithScores(
+    const compareVersion = await latestScoresRepo.getPreviousVersionWithScores(
       userId,
       version,
     );

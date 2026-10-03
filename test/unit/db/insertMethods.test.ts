@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 
-import { scoresRepo } from "@/lib/db/domains/scores";
+import { scoreWriteRepo } from "@/lib/db/domains/scores/write";
 import { allScoresRepo } from "@/lib/db/domains/allScores";
 import { navigationRepo } from "@/lib/db/domains/logs/navigation";
 
@@ -22,12 +22,12 @@ function createTrxSpy() {
 }
 
 describe("insert系メソッド", () => {
-  describe("scoresRepo.insert", () => {
+  describe("scoreWriteRepo.insert", () => {
     it("scores テーブルへ挿入すること", async () => {
       const { trx, calls } = createTrxSpy();
       const values = [{ userId: "user-1", songId: 1 }];
 
-      await scoresRepo.insert(trx as never, values as never);
+      await scoreWriteRepo.insert(trx as never, values as never);
 
       expect(calls).toEqual([{ table: "scores", values }]);
     });

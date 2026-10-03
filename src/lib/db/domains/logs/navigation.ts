@@ -2,7 +2,7 @@ import dayjs from "@/lib/dayjs";
 import { db } from "@/lib/db";
 import { Database, NewTotalBPILog } from "@/types/db";
 import { Transaction, sql, Expression } from "kysely";
-import { scoresRepo } from "@/lib/db/domains/scores";
+import { scoreHistoryRepo } from "@/lib/db/domains/scores/history";
 
 /**
  * スコアログの日付ナビゲーション・バッチ検索を担当するリポジトリクラス。
@@ -44,7 +44,7 @@ class LogNavigationRepository {
     groupedBy: "createdAt" | "lastPlayed" = "createdAt",
   ) {
     if (groupedBy === "lastPlayed") {
-      return scoresRepo.getLastPlayedNavigation(userId, version, range);
+      return scoreHistoryRepo.getLastPlayedNavigation(userId, version, range);
     }
 
     const { start, end } = range;

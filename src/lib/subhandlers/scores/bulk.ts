@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import dayjs from "@/lib/dayjs";
-import { scoresRepo } from "@/lib/db/domains/scores";
+import { latestScoresRepo } from "@/lib/db/domains/scores/latest";
 import { allScoresRepo } from "@/lib/db/domains/allScores";
 import { navigationRepo } from "@/lib/db/domains/logs/navigation";
 import { songsRepo } from "@/lib/db/domains/songs";
@@ -46,7 +46,7 @@ export async function handleScoresBulk(
     ] = await Promise.all([
       songsRepo.getSongMasterWithDef(),
       allSongsRepo.getAllLevelMaster(),
-      scoresRepo.getLatestScores(userId, version),
+      latestScoresRepo.getLatestScores(userId, version),
       allScoresRepo.getLatestAllScores(userId, version),
       navigationRepo.getLatestTotalBpi(userId, version),
     ]);

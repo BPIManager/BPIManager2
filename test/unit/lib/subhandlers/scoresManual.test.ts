@@ -13,8 +13,8 @@ vi.mock("@/lib/db/domains/songs", () => ({
 vi.mock("@/lib/db/domains/allSongs", () => ({
   allSongsRepo: { getAllLevelMaster: (...a: unknown[]) => getAllLevelMasterMock(...a) },
 }));
-vi.mock("@/lib/db/domains/scores", () => ({
-  scoresRepo: { getLatestScores: (...a: unknown[]) => getLatestScoresMock(...a) },
+vi.mock("@/lib/db/domains/scores/latest", () => ({
+  latestScoresRepo: { getLatestScores: (...a: unknown[]) => getLatestScoresMock(...a) },
 }));
 vi.mock("@/lib/db/domains/allScores", () => ({
   allScoresRepo: { getLatestAllScores: (...a: unknown[]) => getLatestAllScoresMock(...a) },

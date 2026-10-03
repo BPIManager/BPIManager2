@@ -69,8 +69,8 @@ vi.mock("@/lib/db/domains/scores/detail", () => ({
     getScoresByLastPlayedRange: vi.fn().mockResolvedValue([]),
   },
 }));
-vi.mock("@/lib/db/domains/scores", () => ({
-  scoresRepo: {
+vi.mock("@/lib/db/domains/scores/latest", () => ({
+  latestScoresRepo: {
     getPreviousVersionWithScores: (...a: unknown[]) =>
       getPreviousVersionWithScoresMock(...a),
   },

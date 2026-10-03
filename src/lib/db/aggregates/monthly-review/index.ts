@@ -5,7 +5,8 @@ import {
   latestLogIdPerUserSongSubquery,
 } from "@/lib/db/shared/latestScore";
 import { wherePublicOnly } from "@/lib/db/shared/visibility";
-import { scoresRepo } from "@/lib/db/domains/scores";
+import { scoreActivityRepo } from "@/lib/db/domains/scores/activity";
+import { latestScoresRepo } from "@/lib/db/domains/scores/latest";
 import { iidxTowerRepo } from "@/lib/db/domains/iidxTower";
 import { songsRepo } from "@/lib/db/domains/songs";
 import {
@@ -27,7 +28,7 @@ class MonthlyReviewRepository {
     monthStart: string,
     monthEnd: string,
   ) {
-    return scoresRepo.getBatchesWithLastPlayedInRange(
+    return scoreActivityRepo.getBatchesWithLastPlayedInRange(
       userId,
       version,
       jstDayStart(monthStart),
@@ -227,7 +228,7 @@ class MonthlyReviewRepository {
     songIds: number[],
     monthStart: string,
   ) {
-    return scoresRepo.getLatestExScoresForSongsBeforeDate(
+    return scoreActivityRepo.getLatestExScoresForSongsBeforeDate(
       userId,
       version,
       songIds,
@@ -241,7 +242,7 @@ class MonthlyReviewRepository {
     compareVersion: string,
     songIds: number[],
   ) {
-    return scoresRepo.getLatestScoresForVersion(userId, compareVersion, songIds);
+    return latestScoresRepo.getLatestScoresForVersion(userId, compareVersion, songIds);
   }
 
   async getMonthlyActivityBreakdownByLastPlayed(
@@ -250,7 +251,7 @@ class MonthlyReviewRepository {
     monthStart: string,
     monthEnd: string,
   ) {
-    return scoresRepo.getActivityBreakdownByLastPlayed(
+    return scoreActivityRepo.getActivityBreakdownByLastPlayed(
       userId,
       version,
       jstDayStart(monthStart),
@@ -384,7 +385,7 @@ class MonthlyReviewRepository {
   }
 
   async getAvailableMonths(userId: string, version: string) {
-    return scoresRepo.getAvailableMonths(userId, version);
+    return scoreActivityRepo.getAvailableMonths(userId, version);
   }
 }
 

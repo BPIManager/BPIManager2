@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { scoresRepo } from "@/lib/db/domains/scores";
+import { scoreWriteRepo } from "@/lib/db/domains/scores/write";
 import { allScoresRepo } from "@/lib/db/domains/allScores";
 import { navigationRepo } from "@/lib/db/domains/logs/navigation";
 import { userStatusLogsRepo } from "@/lib/db/domains/userStatusLogs";
@@ -112,7 +112,7 @@ export async function saveManualScoreUpdate(params: {
         arenaRank: currentArenaRank,
       });
 
-      await scoresRepo.upsertManual(trx, {
+      await scoreWriteRepo.upsertManual(trx, {
         userId,
         songId: score.songId,
         definitionId: score.definitionId,
