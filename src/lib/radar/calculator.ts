@@ -1,3 +1,4 @@
+import { ALL_RADAR_CATEGORIES } from "@/constants/iidx/radars";
 import { BpiCalculator } from "@/lib/bpi";
 import {
   topElementMap,
@@ -9,19 +10,6 @@ import {
   RadarSongEntry,
 } from "@/types/stats/radar";
 import type { IBpiBasicSongData, IBpiScoreObservation } from "@/types/songs/bpi";
-
-/**
- * レーダーチャートで使用する全カテゴリの一覧。
- * 各楽曲は `topElements.json` によっていずれか 1 つのカテゴリに分類される。
- */
-export const ALL_CATEGORIES: RadarCategory[] = [
-  "NOTES",
-  "CHORD",
-  "PEAK",
-  "CHARGE",
-  "SCRATCH",
-  "SOFLAN",
-];
 
 interface RadarScoreInput {
   title: string;
@@ -87,7 +75,7 @@ export function calculateRadar(
   validSongKeys?: Set<string>,
 ): RadarResponse {
   const categoryGroup = new Map<RadarCategory, RadarScoreInput[]>();
-  ALL_CATEGORIES.forEach((cat) => categoryGroup.set(cat, []));
+  ALL_RADAR_CATEGORIES.forEach((cat) => categoryGroup.set(cat, []));
 
   const playedKeys = new Set(
     scores.map((s) => `${s.title}___${s.difficulty}`),
@@ -111,7 +99,7 @@ export function calculateRadar(
 
   const result = {} as RadarResponse;
 
-  for (const category of ALL_CATEGORIES) {
+  for (const category of ALL_RADAR_CATEGORIES) {
     const categoryScores = categoryGroup.get(category)!;
 
     const unplayedSongs = (topElementsByCategory.get(category) ?? []).filter(

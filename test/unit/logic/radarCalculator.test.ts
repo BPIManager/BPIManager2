@@ -1,8 +1,8 @@
+import { ALL_RADAR_CATEGORIES } from "@/constants/iidx/radars";
 import { describe, it, expect } from "vitest";
 import { tOf } from "@bpim/bpicalc";
 import {
   calculateRadar,
-  ALL_CATEGORIES,
   buildRadarSongMaster,
   type RadarSongMaster,
 } from "@/lib/radar/calculator";
@@ -50,7 +50,7 @@ const emptyMaster: RadarSongMaster = new Map();
 describe("calculateRadar", () => {
   it("スコアが空の場合、全カテゴリのtotalBpiが-15になること", () => {
     const result = calculateRadar([], emptyMaster);
-    for (const category of ALL_CATEGORIES) {
+    for (const category of ALL_RADAR_CATEGORIES) {
       expect(result[category].totalBpi).toBe(-15);
     }
   });
@@ -69,7 +69,7 @@ describe("calculateRadar", () => {
       emptyMaster,
     );
 
-    for (const category of ALL_CATEGORIES) {
+    for (const category of ALL_RADAR_CATEGORIES) {
       const played = result[category].songs.filter((s) => s.exScore !== null);
       expect(played).toHaveLength(0);
       expect(result[category].totalBpi).toBe(-15);
@@ -123,7 +123,7 @@ describe("calculateRadar", () => {
 
   it("songsはbpi降順でソートされること", () => {
     const result = calculateRadar([], emptyMaster);
-    for (const category of ALL_CATEGORIES) {
+    for (const category of ALL_RADAR_CATEGORIES) {
       const bpis = result[category].songs.map((s) => s.bpi);
       const sorted = [...bpis].sort((a, b) => b - a);
       expect(bpis).toEqual(sorted);
@@ -176,7 +176,7 @@ describe("calculateRadar", () => {
     const withoutFilter = calculateRadar([], emptyMaster);
     const withEmptyFilter = calculateRadar([], emptyMaster, new Set());
 
-    const category = ALL_CATEGORIES.find(
+    const category = ALL_RADAR_CATEGORIES.find(
       (c) => withoutFilter[c].songs.length > 0,
     )!;
     expect(withEmptyFilter[category].songs).toHaveLength(0);

@@ -7,7 +7,7 @@ import { useProfile } from "@/hooks/users/useProfile";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { BpiV1 } from "@bpim/bpicalc";
 import { BpiCalculator } from "@/lib/bpi";
-import { ALL_CATEGORIES } from "@/lib/radar/calculator";
+import { ALL_RADAR_CATEGORIES } from "@/constants/iidx/radars";
 import {
   topElementMap,
   topElementsByCategory,
@@ -250,7 +250,7 @@ export default function NewBpiComparison({ userId }: Props) {
 
     const current: Record<string, number> = {};
     const next: Record<string, number> = {};
-    for (const category of ALL_CATEGORIES) {
+    for (const category of ALL_RADAR_CATEGORIES) {
       const categorySongs = played.filter(
         (s) => topElementMap.get(`${s.title}___${s.difficulty}`) === category,
       );
