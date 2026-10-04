@@ -1,6 +1,7 @@
 import type { NextApiRequest } from "next";
+import { radarTopOf } from "@/constants/iidx/radars/topElements";
 import { allScoresSelfRivalRepo } from "@/lib/db/aggregates/allScores/selfAndRivals";
-import { radarLookup, targetOf } from "@/lib/subhandlers/scores/_shared";
+import { targetOf } from "@/lib/subhandlers/scores/_shared";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { err, ok } from "@/middlewares/api/apiResult";
 import type { AccessResult } from "@/middlewares/api/withApi";
@@ -36,7 +37,7 @@ export async function handleAllScoresSelfVersion(
 
     const result = rows.map((row) => ({
       ...row,
-      radarTop: radarLookup.get(`${row.title}__${row.difficulty}`) ?? null,
+      radarTop: radarTopOf(row.title, row.difficulty),
     }));
 
     return { result: ok(result), targetUserId, viewerId };

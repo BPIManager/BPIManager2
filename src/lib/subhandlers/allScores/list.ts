@@ -1,6 +1,6 @@
 import { allScoresListRepo } from "@/lib/db/aggregates/allScores/list";
+import { radarTopOf } from "@/constants/iidx/radars/topElements";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
-import { radarLookup } from "@/lib/subhandlers/scores/_shared";
 import { accessError, err, ok } from "@/middlewares/api/apiResult";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 import type { NextApiRequest } from "next";
@@ -46,7 +46,7 @@ export async function handleAllScoresList(
 
     const results = rawResults.map((song) => ({
       ...song,
-      radarTop: radarLookup.get(`${song.title}__${song.difficulty}`) ?? null,
+      radarTop: radarTopOf(song.title, song.difficulty),
     }));
 
     return {

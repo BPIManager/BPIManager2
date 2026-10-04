@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CLEAR_STATES } from "@/constants/iidx/clearLamps";
 import { scoresQuerySchema } from "@/schemas/scores/query";
 import { IIDX_LEVELS, IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 
@@ -76,15 +77,10 @@ export const searchSongsSchema = z.object({
     .describe(`返却する最大件数（デフォルト${MCP_LIST_DEFAULT_LIMIT}件）`),
 });
 
-export const LAMP_STATES = [
-  "FAILED",
-  "ASSIST CLEAR",
-  "EASY CLEAR",
-  "CLEAR",
-  "HARD CLEAR",
-  "EX HARD CLEAR",
-  "FULLCOMBO CLEAR",
-] as const;
+export const LAMP_STATES = CLEAR_STATES.map((s) => s.value) as [
+  string,
+  ...string[],
+];
 
 export const updateMyScoreSchema = z.object({
   songId: z

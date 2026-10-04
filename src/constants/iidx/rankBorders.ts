@@ -13,6 +13,17 @@ export const RANK_TABLE: RankConfig[] = [
   { label: "MAX-", ratio: 17 / 18 },
 ];
 
+const ratioOf = (label: string): number => {
+  const rank = RANK_TABLE.find((r) => r.label === label);
+  if (!rank) throw new Error(`${label} rank is missing from RANK_TABLE`);
+  return rank.ratio;
+};
+
+/** AAA の境界比率（AAA+ の超過分を求めるために使う） */
+export const AAA_RATIO = ratioOf("AAA");
+/** MAX- の境界比率 */
+export const MAX_MINUS_RATIO = ratioOf("MAX-");
+
 export const getRankDetail = (currentEx: number, maxScore: number) => {
   let currentRank = RANK_TABLE[0];
   let nextRank = RANK_TABLE[1];

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useEffect, useState } from "react";
+import { AAA_RATIO, MAX_MINUS_RATIO } from "@/constants/iidx/rankBorders";
 import {
   BarChart,
   Bar,
@@ -232,8 +233,8 @@ export const BPIChart = ({
 
   const borders = useMemo(() => {
     const ranks = [
-      { label: "MAX-", ratio: 17 / 18 },
-      { label: "AAA", ratio: 8 / 9 },
+      { label: "MAX-", ratio: MAX_MINUS_RATIO },
+      { label: "AAA", ratio: AAA_RATIO },
       { label: "AA", ratio: 7 / 9 },
       { label: "A", ratio: 6 / 9 },
     ];

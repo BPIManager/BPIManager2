@@ -1,10 +1,11 @@
 import type { NextApiRequest } from "next";
+import { radarTopOf } from "@/constants/iidx/radars/topElements";
 import { unplayedSongsAggregateRepo } from "@/lib/db/aggregates/unplayedSongs";
 import { filterSongsServerSide } from "@/utils/songs/filter";
 import { sortSongs } from "@/utils/songs/sort";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { err, ok } from "@/middlewares/api/apiResult";
-import { radarLookup, targetOf, type HandleOutcome } from "./_shared";
+import { targetOf, type HandleOutcome } from "./_shared";
 import type { AccessResult } from "@/middlewares/api/withApi";
 
 export async function handleUnplayed(
@@ -55,7 +56,7 @@ export async function handleUnplayed(
     mu: row.mu !== null ? Number(row.mu) : null,
     sigma: row.sigma !== null ? Number(row.sigma) : null,
     residualVar: row.residualVar !== null ? Number(row.residualVar) : null,
-    radarTop: radarLookup.get(`${row.title}__${row.difficulty}`) ?? null,
+    radarTop: radarTopOf(row.title, row.difficulty),
   }));
 
   const processed = sortSongs(

@@ -14,6 +14,10 @@ export const topElementMap: Map<string, RadarCategory> = new Map(
   topElements.map((e) => [`${e.title}___${e.difficulty}`, e.top]),
 );
 
+/** 楽曲のレーダーカテゴリ（`topElements` 上に無ければ null） */
+export const radarTopOf = (title: string, difficulty: string | null): RadarCategory | null =>
+  topElementMap.get(`${title}___${difficulty}`) ?? null;
+
 /**
  * レーダーカテゴリ別に楽曲をグルーピングした共通Map。
  * カテゴリごとに`topElements`全体をfilterする代わりにこちらを参照する。

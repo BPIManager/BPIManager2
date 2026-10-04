@@ -2,7 +2,7 @@ import { readFileSync } from "fs";
 import path from "path";
 import type { OgpSectionKey } from "@/lib/monthly-review/ogpSections";
 
-import { getRankDetail } from "@/constants/iidx/rankBorders";
+import { getRankDetail, AAA_RATIO } from "@/constants/iidx/rankBorders";
 import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 
 import type { ArenaVersionHistoryEntry } from "@/types/stats/monthlyReview";
@@ -78,7 +78,7 @@ export function toSatoriSafeImageUrl(url: string): string {
 /** TopSongsSection/ScoreSublineと同じロジック（AAA以上はAAA+n、それ未満は現ランク+n） */
 export function scoreLabelOf(exScore: number, notes: number): string {
   const maxEx = notes * 2;
-  const aboveAaa = exScore - Math.ceil(maxEx * (8 / 9));
+  const aboveAaa = exScore - Math.ceil(maxEx * AAA_RATIO);
   if (aboveAaa >= 0) return `AAA+${aboveAaa}`;
   const rd = getRankDetail(exScore, maxEx);
   return `${rd.label}+${rd.surplus}`;

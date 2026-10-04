@@ -1,16 +1,9 @@
-import { RANK_TABLE, getRankDetail } from "@/constants/iidx/rankBorders";
+import { AAA_RATIO, getRankDetail } from "@/constants/iidx/rankBorders";
 
 interface DJRankOptions {
   mode: "current" | "next";
   output: "label" | "value";
 }
-
-/** AAA の境界比率（AAA+ の超過分を求めるために使う） */
-const AAA_RATIO = (() => {
-  const aaa = RANK_TABLE.find((r) => r.label === "AAA");
-  if (!aaa) throw new Error("AAA rank is missing from RANK_TABLE");
-  return aaa.ratio;
-})();
 
 /**
  * DJランクの表示ラベルと差分を返す。境界定義は getRankDetail に一本化し、表示と差分の値がずれないようにする。

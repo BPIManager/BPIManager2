@@ -1,4 +1,5 @@
 import { SongWithRival, SongWithScore, RivalScore } from "@/types/songs/score";
+import { AAA_RATIO, MAX_MINUS_RATIO } from "@/constants/iidx/rankBorders";
 import type { IBpiBasicSongData } from "@/types/songs/bpi";
 
 /**
@@ -86,6 +87,6 @@ export function mergeFixedTarget(
 }
 
 export const SCORE_RATE: Record<"aaa" | "max-", number> = {
-  aaa: 8 / 9,
-  "max-": 17 / 18,
+  aaa: AAA_RATIO,
+  "max-": MAX_MINUS_RATIO,
 };

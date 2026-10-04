@@ -1,6 +1,6 @@
 import type { TopSong, TopSongImproved } from "@/types/stats/monthlyReview";
 import { useTranslation } from "@/hooks/common/useTranslation";
-import { getRankDetail } from "@/constants/iidx/rankBorders";
+import { getRankDetail, AAA_RATIO } from "@/constants/iidx/rankBorders";
 
 export const styles = `
   @keyframes titleIn  { from{opacity:0;letter-spacing:0.6em} to{opacity:1;letter-spacing:0.2em} }
@@ -42,7 +42,7 @@ export function ScoreSubline({
 }) {
   const maxEx = song.notes * 2;
   const rd = getRankDetail(song.exScore, maxEx);
-  const aboveAaa = song.exScore - Math.ceil(maxEx * (8 / 9));
+  const aboveAaa = song.exScore - Math.ceil(maxEx * AAA_RATIO);
   const isAaaOrAbove = aboveAaa >= 0;
   return (
     <div className="flex items-center gap-2 pl-7 flex-wrap">
