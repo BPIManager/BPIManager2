@@ -1,6 +1,7 @@
 import type { NextApiRequest } from "next";
 import { apiKeysRepo } from "@/lib/db/domains/apiKeys";
 import { adminAuth } from "@/lib/firebase/admin";
+import { API_KEY_SESSION_CLAIM } from "@/middlewares/api/withAuth";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { type HandleOutcome } from "./_shared";
@@ -19,7 +20,10 @@ export async function handleTokenExchange(
     if (!keyRecord) {
       return { result: err(401, "Invalid API Key"), ...base };
     }
-    const customToken = await adminAuth.createCustomToken(keyRecord.userId);
+    const customToken = await adminAuth.createCustomToken(
+      keyRecord.userId,
+      { [API_KEY_SESSION_CLAIM]: true },
+    );
     return {
       result: ok({ customToken, expiresIn: 3600 }),
       ...base,

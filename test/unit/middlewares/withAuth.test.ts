@@ -92,6 +92,35 @@ describe("withAuth", () => {
     expect(JSON.stringify(res.body ?? res)).not.toContain("secret-project");
   });
 
+  it("rejectApiKeySession指定時、APIキー由来のセッションは403で拒否されること", async () => {
+    vi.mocked(adminAuth.verifyIdToken).mockResolvedValue({
+      uid: "u1",
+      viaApiKey: true,
+    } as never);
+    const handler = vi.fn();
+    const wrapped = withAuth(handler, { rejectApiKeySession: true });
+    const { req, res } = createMockReqRes({ authorization: "Bearer t" });
+
+    await wrapped(req, res as never);
+
+    expect(res.statusCode).toBe(403);
+    expect(handler).not.toHaveBeenCalled();
+  });
+
+  it("rejectApiKeySession未指定ならAPIキー由来のセッションも通ること", async () => {
+    vi.mocked(adminAuth.verifyIdToken).mockResolvedValue({
+      uid: "u1",
+      viaApiKey: true,
+    } as never);
+    const handler = vi.fn();
+    const wrapped = withAuth(handler);
+    const { req, res } = createMockReqRes({ authorization: "Bearer t" });
+
+    await wrapped(req, res as never);
+
+    expect(handler).toHaveBeenCalled();
+  });
+
   it("queryのuserIdが認証済みユーザーと一致しない場合は403を返しハンドラーを呼び出さないこと", async () => {
     vi.mocked(adminAuth.verifyIdToken).mockResolvedValue({
       uid: "real-caller-uid",
