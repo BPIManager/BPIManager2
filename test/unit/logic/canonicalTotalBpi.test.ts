@@ -1,5 +1,4 @@
 import { describe, it, expect } from "vitest";
-import { BpiCalculator } from "@/lib/bpi";
 import { computeCanonicalTotalBpi } from "@/lib/bpi/canonicalTotalBpi";
 import { NEW_BPI_Z0 } from "@/constants/iidx/newBpi/modelConstants";
 
@@ -17,12 +16,11 @@ describe("computeCanonicalTotalBpi", () => {
     { songId: 3, notes: 1000, exScore: 1500 },
   ];
 
-  it("☆11+12の観測を使い、☆12のみを母数にすること", () => {
-    const expected = BpiCalculator.calculateTotalBPI(
-      scores.map((s) => ({ songId: s.songId, notes: s.notes, exScore: s.exScore })),
-      master.filter((s) => s.difficultyLevel === 12),
+  it("☆12のみを観測・母数にし、☆11のスコアは結果に影響しないこと", () => {
+    const level12Only = [scores[0]];
+    expect(computeCanonicalTotalBpi(scores, master)).toBe(
+      computeCanonicalTotalBpi(level12Only, master),
     );
-    expect(computeCanonicalTotalBpi(scores, master)).toBe(expected);
   });
 
   it("exScoreがnullの行は観測から除外すること", () => {

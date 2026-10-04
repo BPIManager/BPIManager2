@@ -118,7 +118,7 @@ export function registerGetMyDashboard(server: McpServer, userId: string) {
 
       const [canonicalHistory, filteredHistory, fullMaster, closeRivalRows] =
         await Promise.all([
-          statsSongTablesRepo.getScoreHistory(userId, version, [11, 12], []),
+          statsSongTablesRepo.getScoreHistory(userId, version, [12], []),
           statsSongTablesRepo.getScoreHistory(userId, version, numericLevels, difficulties),
           songMasterRepo.getSongMasterWithDef(),
           rivalPairwiseRepo.getScoreComparisonList({
@@ -155,13 +155,9 @@ export function registerGetMyDashboard(server: McpServer, userId: string) {
       }
 
       // 総合BPI本体は常にレベル12全曲基準（levels/difficultiesの影響を受けない）
-      // 潜在スキル推定は☆11+12の全観測を使う（Webの総合BPIと同じ定義）
       const canonicalLatest = latestBySong(canonicalHistory);
       const freshTotalBpi = computeCanonicalTotalBpi(canonicalLatest, fullMaster);
-      const level12SongIds = new Set(canonicalMaster.map((s) => s.songId));
-      const canonicalPlayedCount = canonicalLatest.filter(
-        (r) => r.songId != null && level12SongIds.has(r.songId),
-      ).length;
+      const canonicalPlayedCount = canonicalLatest.length;
       // 他のtotalBpi算出箇所（stats/totalBpi.ts等）と同様、過去最高値を下回らないラチェットを適用する
       const previousBest = await userStatusLogsReadRepo.findMaxTotalBpi(userId, version);
       const totalBpi = BpiCalculator.ratchetTotalBpi(previousBest, freshTotalBpi);
