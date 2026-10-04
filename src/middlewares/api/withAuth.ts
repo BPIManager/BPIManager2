@@ -23,37 +23,33 @@ export const withAuth = (handler: ApiHandler) => {
 
     const idToken = authHeader.split("Bearer ")[1];
 
+    let authUid: string;
     try {
       const decodedToken = await adminAuth.verifyIdToken(idToken);
-      const authUid = decodedToken.uid;
-
-      const userIdFromQuery = req.query.userId as string;
-      const userIdFromBody = req.body?.userId;
-
-      if (
-        (userIdFromQuery && authUid !== userIdFromQuery) ||
-        (userIdFromBody && authUid !== userIdFromBody)
-      ) {
-        return res.status(403).json({ message: "Forbidden: User ID mismatch" });
-      }
-
-      (req as AuthenticatedNextApiRequest).authUid = authUid;
-
-      return handler(req as AuthenticatedNextApiRequest, res);
+      authUid = decodedToken.uid;
     } catch (error: unknown) {
       console.error("Auth Middleware Error:", error);
-      const isExpired =
-        typeof error === "object" &&
-        error !== null &&
-        (error as { code?: string }).code === "auth/id-token-expired";
-      const message =
-        typeof error === "object" &&
-        error !== null &&
-        (error as { message?: string }).message;
-      const status = isExpired ? 401 : 500;
-      return res
-        .status(status)
-        .json({ message: message || "Internal Server Error" });
+      return res.status(401).json({ message: "Invalid or expired token" });
+    }
+
+    const userIdFromQuery = req.query.userId as string;
+    const userIdFromBody = req.body?.userId;
+
+    if (
+      (userIdFromQuery && authUid !== userIdFromQuery) ||
+      (userIdFromBody && authUid !== userIdFromBody)
+    ) {
+      return res.status(403).json({ message: "Forbidden: User ID mismatch" });
+    }
+
+    (req as AuthenticatedNextApiRequest).authUid = authUid;
+
+    try {
+      return await handler(req as AuthenticatedNextApiRequest, res);
+    } catch (error: unknown) {
+      console.error("Auth Middleware Error:", error);
+      if (res.headersSent) return;
+      return res.status(500).json({ message: "Internal Server Error" });
     }
   };
 };

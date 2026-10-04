@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { checkUserAccess, rejectAccess, type AccessResult } from "./withApi";
 
 type ApiHandler = (
@@ -7,9 +8,7 @@ type ApiHandler = (
 ) => unknown | Promise<unknown>;
 
 function defaultOnError(error: unknown, res: NextApiResponse) {
-  const errorMessage =
-    error instanceof Error ? error.message : "Internal Server Error";
-  return res.status(500).json({ message: errorMessage });
+  return res.status(500).json({ message: toErrorMessage(error) });
 }
 
 /**

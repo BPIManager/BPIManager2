@@ -79,6 +79,19 @@ describe("withAuth", () => {
     expect(handler).not.toHaveBeenCalled();
   });
 
+  it("検証エラーの生メッセージを返さず、汎用メッセージの401を返すこと", async () => {
+    vi.mocked(adminAuth.verifyIdToken).mockRejectedValue(
+      new Error('incorrect "aud" claim. Expected "secret-project"'),
+    );
+    const wrapped = withAuth(vi.fn());
+    const { req, res } = createMockReqRes({ authorization: "Bearer bad-token" });
+
+    await wrapped(req, res as never);
+
+    expect(res.statusCode).toBe(401);
+    expect(JSON.stringify(res.body ?? res)).not.toContain("secret-project");
+  });
+
   it("queryのuserIdが認証済みユーザーと一致しない場合は403を返しハンドラーを呼び出さないこと", async () => {
     vi.mocked(adminAuth.verifyIdToken).mockResolvedValue({
       uid: "real-caller-uid",
