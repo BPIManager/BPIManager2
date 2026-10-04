@@ -21,10 +21,9 @@ import type { SongWithScore } from "@/types/songs/score";
 import type { SongListItem } from "@/types/songs/songInfo";
 
 describe("getRankIndex / getDJRank", () => {
-  it("MAX-の割合ではラベルがAAA+または MAX- になること", () => {
-    // ちょうど8/9 (=AAAボーダー) の割合
-    const label = getDJRank(1778, 2000, { mode: "current", output: "label" });
-    expect(["AAA+", "MAX-"]).toContain(label);
+  it("AAA帯（MAX-境界未満）のcurrentはAAA+を表示すること", () => {
+    // 1778/2000 は約0.889で、MAX-境界（17/18）より下
+    expect(getDJRank(1778, 2000, { mode: "current", output: "label" })).toBe("AAA+");
   });
 
   it("50%スコアではcurrentモードでC+ランクになること", () => {
@@ -42,19 +41,25 @@ describe("getRankIndex / getDJRank", () => {
     expect(getDJRank(1650, 1800, { mode: "current", output: "value" })).toBe("50");
   });
 
-  it("AAA帯のnextはMAX-境界までの不足分を返すこと（100%までの距離ではない）", () => {
+  it("AAA帯のnextはMAX-と、100%までの不足分を返すこと", () => {
     expect(getDJRank(1600, 1800, { mode: "next", output: "label" })).toBe("MAX-");
-    expect(getDJRank(1600, 1800, { mode: "next", output: "value" })).toBe("100");
+    expect(getDJRank(1600, 1800, { mode: "next", output: "value" })).toBe("200");
   });
 
-  it("MAX-帯のcurrentはMAX-と表示し、MAX-境界からの超過分を返すこと", () => {
-    expect(getDJRank(1700, 1800, { mode: "current", output: "label" })).toBe("MAX-");
-    expect(getDJRank(1700, 1800, { mode: "current", output: "value" })).toBe("0");
+  // maxScore=1800 のとき MAX-境界=1700, AAA境界=1600
+  it("MAX-帯のcurrentはMAX-と、MAX-境界からの超過分を返すこと", () => {
+    expect(getDJRank(1750, 1800, { mode: "current", output: "label" })).toBe("MAX-");
+    expect(getDJRank(1750, 1800, { mode: "current", output: "value" })).toBe("50");
   });
 
-  it("満点のnextはMAX-と表示し、不足分は0になること", () => {
-    expect(getDJRank(1800, 1800, { mode: "next", output: "label" })).toBe("MAX-");
-    expect(getDJRank(1800, 1800, { mode: "next", output: "value" })).toBe("0");
+  it("MAX-帯のnextはAAA+と、AAA境界からの超過分を返すこと", () => {
+    expect(getDJRank(1750, 1800, { mode: "next", output: "label" })).toBe("AAA+");
+    expect(getDJRank(1750, 1800, { mode: "next", output: "value" })).toBe("150");
+  });
+
+  it("満点のcurrentはMAX-と、100%からの不足（0点）を返すこと", () => {
+    expect(getDJRank(1800, 1800, { mode: "current", output: "label" })).toBe("MAX-");
+    expect(getDJRank(1800, 1800, { mode: "current", output: "value" })).toBe("0");
   });
 });
 
