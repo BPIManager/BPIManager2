@@ -22,7 +22,7 @@ export async function handleStatsMonthlyReviewRadarGrowth(q: {
         ? (q.compareVersion ?? previousVersionOf(q.version) ?? undefined)
         : undefined;
 
-    const [{ latestInMonth, songUpdateDateMap }, bpiTimeline] = await Promise.all([
+    const [{ latestInMonth }, bpiTimeline] = await Promise.all([
       computeOwnerMonthlyScores(q.userId, q.version, monthStart, monthEnd),
       computeOwnerBpiTimeline(
         q.userId,
@@ -46,7 +46,6 @@ export async function handleStatsMonthlyReviewRadarGrowth(q: {
     const radarGrowth = buildRadarGrowth(
       topImprovedSongs,
       bpiTimeline.allL12SongMeta,
-      songUpdateDateMap,
       bpiTimeline.ownerPreMonthExScoreMap,
       bpiTimeline.finalExScoreMap,
       topBpiSongs,
