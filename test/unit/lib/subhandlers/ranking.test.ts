@@ -27,6 +27,7 @@ vi.mock("@/lib/db/domains/radar", () => ({
 }));
 vi.mock("@/lib/db/aggregates/stats/songTables", () => ({
   statsSongTablesRepo: {
+    getFilteredSongKeys: () => Promise.resolve(new Set<string>()),
     getSongRanking: (...a: unknown[]) => getSongRankingMock(...a),
     getUserSongRankings: (...a: unknown[]) => getUserSongRankingsMock(...a),
   },

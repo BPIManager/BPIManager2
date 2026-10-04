@@ -63,12 +63,13 @@ export function buildRadarSongMaster(
  *
  * @param scores - 計算対象のスコア配列（タイトル・難易度・EX スコア・BPI）
  * @param songMaster - `${title}___${difficulty}` キーの曲マスタ（mu/sigma込み）
+ * @param validSongKeys - 対象バージョンで有効な譜面キー。未プレイ予測の母数を削除済み・未収録譜面から守る
  * @returns 6 カテゴリそれぞれの総合 BPI と楽曲リストを含むレーダーデータ
  */
 export function calculateRadar(
   scores: RadarScoreInput[],
   songMaster: RadarSongMaster,
-  validSongKeys?: Set<string>,
+  validSongKeys: Set<string>,
 ): RadarResponse {
   const categoryGroup = new Map<RadarCategory, RadarScoreInput[]>();
   ALL_RADAR_CATEGORIES.forEach((cat) => categoryGroup.set(cat, []));
@@ -101,7 +102,7 @@ export function calculateRadar(
     const unplayedSongs = (topElementsByCategory.get(category) ?? []).filter(
       (e) =>
         !playedKeys.has(`${e.title}___${e.difficulty}`) &&
-        (validSongKeys === undefined || validSongKeys.has(`${e.title}___${e.difficulty}`)),
+        validSongKeys.has(`${e.title}___${e.difficulty}`),
     );
 
     // このカテゴリの総合BPIの対象楽曲（プレイ済み+未プレイ）。songMasterに
