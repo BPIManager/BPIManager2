@@ -398,7 +398,7 @@ export const settingsTranslations = {
   },
 
   "settings.oauthClient.manage": {
-    ja: "管理する",
+    ja: "管理",
     en: "Manage",
     "zh-TW": "管理",
     ko: "관리",
