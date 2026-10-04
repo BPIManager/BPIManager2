@@ -101,6 +101,16 @@ describe("buildArena", () => {
     expect(result).toEqual({ bestClass: "A1", bestRank: 2, maxA1Continue: 5 });
   });
 
+  it("同一クラス内では最も小さい（良い）順位を返すこと", () => {
+    const result = buildArena([
+      { arenaClass: "A2", arenaRank: 30, a1continue: null },
+      { arenaClass: "A2", arenaRank: 5, a1continue: null },
+      { arenaClass: "A2", arenaRank: 12, a1continue: null },
+    ]);
+
+    expect(result).toEqual({ bestClass: "A2", bestRank: 5, maxA1Continue: null });
+  });
+
   it("空配列の場合はnullを返すこと", () => {
     expect(buildArena([])).toBeNull();
   });
