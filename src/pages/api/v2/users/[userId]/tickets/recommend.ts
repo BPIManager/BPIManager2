@@ -1,3 +1,4 @@
+import { withRateLimit } from "@/middlewares/api/withRateLimit";
 import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
 import {
   handleTicketRecommendGet,
@@ -10,23 +11,26 @@ import {
   writeV2Result,
 } from "@/middlewares/api/apiResult";
 
-export default withUserApiHandler(
-  (req) => {
-    const { userId } = req.query as { userId: string };
-    return { userId };
-  },
-  async (req, res, _query, access) => {
-    if (req.method !== "GET" && req.method !== "POST") {
-      res.status(405).end();
-      return;
-    }
-    const { result, targetUserId, viewerId } =
-      req.method === "POST"
-        ? await handleTicketRecommendPost(req, access)
-        : await handleTicketRecommendGet(req, access);
-    writeV2Result(res, withMeta(result, buildMeta(viewerId, targetUserId)));
-  },
-  {
-    onReject: (res, access) => writeV2Result(res, accessError(access)!),
-  },
+export default withRateLimit(
+  withUserApiHandler(
+    (req) => {
+      const { userId } = req.query as { userId: string };
+      return { userId };
+    },
+    async (req, res, _query, access) => {
+      if (req.method !== "GET" && req.method !== "POST") {
+        res.status(405).end();
+        return;
+      }
+      const { result, targetUserId, viewerId } =
+        req.method === "POST"
+          ? await handleTicketRecommendPost(req, access)
+          : await handleTicketRecommendGet(req, access);
+      writeV2Result(res, withMeta(result, buildMeta(viewerId, targetUserId)));
+    },
+    {
+      onReject: (res, access) => writeV2Result(res, accessError(access)!),
+    },
+  ),
+  { windowMs: 60_000, max: 30, name: "tickets-recommend" },
 );
