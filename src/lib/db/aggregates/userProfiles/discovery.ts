@@ -1,6 +1,10 @@
 import { db } from "@/lib/db";
 import { sql } from "kysely";
 import { latestPerUserSubquery as latestArenaPerUserSubquery } from "@/lib/db/domains/arenaHistory";
+import {
+  arenaClassIsPublic,
+  maskedArenaClass,
+} from "@/lib/db/shared/arenaClassVisibility";
 import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
 import { wherePublicOnly } from "@/lib/db/shared/visibility";
 import type { RadarFilterKey, RadarFilterRange } from "@/types/users/list";
@@ -69,6 +73,7 @@ class UserDiscoveryRepository {
       .innerJoin("userStatusLogs as usl", "ls.maxId", "usl.id")
       .leftJoin(latestArenaSubquery.as("la"), "u.userId", "la.userId")
       .leftJoin("officialArenaStats as oas", "la.maxId", "oas.id")
+      .leftJoin("statsPrivacy as sp", "sp.userId", "u.userId")
       .leftJoin("userRoles as ur", "ur.userId", "u.userId")
       .select([
         "u.userId",
@@ -76,7 +81,7 @@ class UserDiscoveryRepository {
         "u.iidxId",
         "u.profileImage",
         "u.profileText",
-        "oas.arenaClass",
+        maskedArenaClass.as("arenaClass"),
         "usl.totalBpi",
         "usl.createdAt",
         "r.notes",
@@ -177,13 +182,14 @@ class UserDiscoveryRepository {
       .leftJoin("userStatusLogs as usl", "ls.maxId", "usl.id")
       .leftJoin(latestArenaSubquery.as("la"), "u.userId", "la.userId")
       .leftJoin("officialArenaStats as oas", "la.maxId", "oas.id")
+      .leftJoin("statsPrivacy as sp", "sp.userId", "u.userId")
       .select([
         "u.userId",
         "u.userName",
         "u.iidxId",
         "u.profileImage",
         "u.profileText",
-        "oas.arenaClass",
+        maskedArenaClass.as("arenaClass"),
         "usl.totalBpi",
       ])
       .$call((qb) => wherePublicOnly(qb, "u.isPublic"));
@@ -199,7 +205,9 @@ class UserDiscoveryRepository {
     }
 
     if (arenaClass) {
-      dbQuery = dbQuery.where("oas.arenaClass", "=", arenaClass);
+      dbQuery = dbQuery
+        .where("oas.arenaClass", "=", arenaClass)
+        .where(arenaClassIsPublic);
     }
 
     return await dbQuery.limit(limit).execute();

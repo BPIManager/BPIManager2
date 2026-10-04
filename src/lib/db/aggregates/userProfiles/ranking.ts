@@ -1,6 +1,10 @@
 import { db } from "@/lib/db";
 import { sql } from "kysely";
 import { latestPerUserSubquery as latestArenaPerUserSubquery } from "@/lib/db/domains/arenaHistory";
+import {
+  arenaClassIsPublic,
+  maskedArenaClass,
+} from "@/lib/db/shared/arenaClassVisibility";
 import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
 
 /**
@@ -52,6 +56,7 @@ class UserRankingRepository {
         .leftJoin("userStatusLogs as usl", "ls.maxId", "usl.id")
         .leftJoin(latestArenaSubquery.as("la"), "u.userId", "la.userId")
         .leftJoin("officialArenaStats as oas", "la.maxId", "oas.id")
+        .leftJoin("statsPrivacy as sp", "sp.userId", "u.userId")
         .select([
           "u.userId",
           "u.userName",
@@ -59,7 +64,7 @@ class UserRankingRepository {
           "u.isPublic",
           "u.iidxId",
           "usl.totalBpi",
-          "oas.arenaClass",
+          maskedArenaClass.as("arenaClass"),
           "r.notes",
           "r.chord",
           "r.peak",
@@ -86,7 +91,7 @@ class UserRankingRepository {
           "u.isPublic",
           "u.iidxId",
           "usl.totalBpi",
-          "oas.arenaClass",
+          maskedArenaClass.as("arenaClass"),
           "oas.area",
           sql<number>`COALESCE(sp.showArea, 0)`.as("showArea"),
           sql<number>`COALESCE(sp.showArenaClass, 1)`.as("showArenaClass"),
@@ -98,11 +103,9 @@ class UserRankingRepository {
         filteredQuery = filteredQuery.where("oas.area", "=", filterArea!);
       }
       if (hasArenaClassFilter) {
-        filteredQuery = filteredQuery.where(
-          "oas.arenaClass",
-          "=",
-          filterArenaClass!,
-        );
+        filteredQuery = filteredQuery
+          .where("oas.arenaClass", "=", filterArenaClass!)
+          .where(arenaClassIsPublic);
       }
 
       return await filteredQuery.execute();
@@ -114,6 +117,7 @@ class UserRankingRepository {
       .leftJoin("userStatusLogs as usl", "ls.maxId", "usl.id")
       .leftJoin(latestArenaSubquery.as("la"), "u.userId", "la.userId")
       .leftJoin("officialArenaStats as oas", "la.maxId", "oas.id")
+      .leftJoin("statsPrivacy as sp", "sp.userId", "u.userId")
       .select([
         "u.userId",
         "u.userName",
@@ -121,7 +125,7 @@ class UserRankingRepository {
         "u.isPublic",
         "u.iidxId",
         "usl.totalBpi",
-        "oas.arenaClass",
+        maskedArenaClass.as("arenaClass"),
       ])
       .where("usl.id", "is not", null)
       .orderBy(sql`COALESCE(usl.totalBpi, -15)`, "desc")
