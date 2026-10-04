@@ -5,8 +5,9 @@ import SongListContent from "@/components/partials/features/Songs/SongList";
 import RecentNotesList from "@/components/partials/features/Songs/RecentNotesList";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import { SITE_URL } from "@/constants/site/url";
 
-const BASE_URL = "https://bpi2.poyashi.me";
+const BASE_URL = SITE_URL;
 
 const SONGS_JSONLD = {
   "@context": "https://schema.org",

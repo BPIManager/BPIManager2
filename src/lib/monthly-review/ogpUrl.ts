@@ -1,5 +1,6 @@
 import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import type { OgpSectionKey } from "./ogpSections";
+import { SITE_URL } from "@/constants/site/url";
 
 /**
  * monthly-review のOGP画像URLを組み立てる。ページの ogImage とシェアパネルのプレビューで共用する。
@@ -19,7 +20,7 @@ export function buildOgpImageUrl(params: {
     version,
     month,
     sections,
-    origin = "https://bpi2.poyashi.me",
+    origin = SITE_URL,
     compareVersion,
   } = params;
   const compareParam = compareVersion

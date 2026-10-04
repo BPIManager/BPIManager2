@@ -3,6 +3,7 @@ import DashboardLayout from "@/components/partials/shell/DashboardLayout";
 import MonthlyReviewShare from "@/components/partials/features/MonthlyReviewShare";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
+import { SITE_URL } from "@/constants/site/url";
 
 /**
  * 告知用の userId を含まない共有URL。アクセスしたユーザー自身の先月のまとめへリダイレクトする。
@@ -16,7 +17,7 @@ export default function MonthlyReviewSharePage() {
         noIndex
         title={t("page.monthlyReviewShare.title")}
         description={t("page.monthlyReviewShare.desc")}
-        ogImage={`https://bpi2.poyashi.me${API_V2_PREFIX}/site/ogp-sample`}
+        ogImage={`${SITE_URL}${API_V2_PREFIX}/site/ogp-sample`}
       />
       <DashboardLayout>
         <MonthlyReviewShare />

@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import type { UserRoleInfo } from "@/types/users/profile";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import { SITE_URL } from "@/constants/site/url";
 
 type RoleKey = "coffee" | "saba" | "iidx" | "developer" | "pro";
 
@@ -136,7 +137,7 @@ const RoleBadge = ({
           <Button
             size="xs"
             className="mt-1"
-            onClick={() => window.open("https://bpi2.poyashi.me/support")}
+            onClick={() => window.open(`${SITE_URL}/support`)}
           >
             {t("role.whatIsSupporter")}
           </Button>
