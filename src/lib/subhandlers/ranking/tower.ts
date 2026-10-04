@@ -1,4 +1,4 @@
-import dayjs from "dayjs";
+import { todayJst } from "@/lib/dayjs";
 import { v4 as uuidv4 } from "uuid";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { iidxTowerAggregateRepo } from "@/lib/db/aggregates/iidxTower";
@@ -21,7 +21,7 @@ export async function handleTowerRanking(
   const version = resolveVersion(req.query.version);
 
   const period = String(req.query.period ?? "day");
-  const today = dayjs().format("YYYY-MM-DD");
+  const today = todayJst();
   const rawDate = String(req.query.date ?? today);
   const date = rawDate > today ? today : rawDate;
 
