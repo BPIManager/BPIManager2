@@ -9,7 +9,7 @@ import {
   updateOptimizeMemo,
 } from "@/services/swr/analytics";
 
-export interface OptimizeMemo {
+export interface OptimizeMemoResponse {
   reportId: string;
   userId: string;
   targetBpi: number;
@@ -31,7 +31,7 @@ export const useBpiOptimizerMemos = (
     [userId, apiUrl, fbUser],
   );
 
-  const { data: memos, isLoading: isMemosLoading } = useSWR<OptimizeMemo[]>(
+  const { data: memos, isLoading: isMemosLoading } = useSWR<OptimizeMemoResponse[]>(
     swrKey,
     () => fetcherV2([apiUrl, fbUser ?? null]),
   );
@@ -91,7 +91,7 @@ export const useBpiOptimizerMemos = (
         await deleteOptimizeMemo(apiUrl, fbUser, reportId);
         await mutate(
           swrKey,
-          (currentMemos: OptimizeMemo[] | undefined) => {
+          (currentMemos: OptimizeMemoResponse[] | undefined) => {
             return currentMemos?.filter((m) => m.reportId !== reportId);
           },
           false,

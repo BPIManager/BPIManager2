@@ -2,9 +2,13 @@ import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { useUser } from "@/contexts/users/UserContext";
 import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
+import type {
+  RivalAvgRow as ComparisonRivalAvgRow,
+  RivalTopRow as ComparisonRivalTopRow,
+} from "@/hooks/analytics/comparisonRows";
 
-type RivalAvgRow = { songId: number; avgExScore: number | null };
-type RivalTopRow = { songId: number; topExScore: number | null };
+type RivalAvgRow = Pick<ComparisonRivalAvgRow, "songId" | "avgExScore">;
+type RivalTopRow = Pick<ComparisonRivalTopRow, "songId" | "topExScore">;
 
 /**
  * 指定楽曲のライバル平均・ライバルTOPスコアを取得する。songId をクエリで渡し当該楽曲のみ取得する。enabled=false の場合はフェッチしない。

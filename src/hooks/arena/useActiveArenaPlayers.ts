@@ -1,11 +1,6 @@
 import useSWR from "swr";
+import type { ActiveArenaData } from "@/types/arena/activeArena";
 import { activeArenaPlayersFetcher } from "@/services/swr/arena/activeArenaPlayers";
-
-export interface ActiveArenaData {
-  generatedAt: string;
-  prevFetchedAt: string | null;
-  byClass: Record<string, number>;
-}
 
 export function useActiveArenaPlayers(version: string, isLive: boolean) {
   return useSWR<ActiveArenaData>(

@@ -3,7 +3,7 @@ import { ExternalLink, ThumbsDown, ThumbsUp } from "lucide-react";
 import type { RowComponentProps } from "react-window";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import type { SongPatternItem } from "@/hooks/songs/useSongPatterns";
+import type { SongPatternItem } from "@/types/songs/patterns";
 import type { SongListItem } from "@/types/songs/songInfo";
 import type { VoteType } from "@/types/db";
 import {

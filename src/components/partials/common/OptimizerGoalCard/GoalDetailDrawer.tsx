@@ -31,7 +31,7 @@ import {
   STEP_SORT_ORDERS,
   type StepSortOrder,
 } from "./index";
-import type { OptimizeMemo } from "@/hooks/analytics/useOptimizeMemo";
+import type { OptimizeMemoResponse } from "@/hooks/analytics/useOptimizeMemo";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 /** reportIdをコピーして他ユーザーに共有するためのモーダル（曲目のインポートに使う）。 */
@@ -116,7 +116,7 @@ export const GoalDetailDrawer = ({
   userId,
   fbUser,
 }: {
-  memo: OptimizeMemo | null;
+  memo: OptimizeMemoResponse | null;
   currentScores: Map<number, number | null>;
   currentBpis: Map<number, number | null>;
   liveCurrentTotalBpi: number | null;

@@ -1,4 +1,4 @@
-import type { ActiveArenaData } from "@/hooks/arena/useActiveArenaPlayers";
+import type { ActiveArenaData } from "@/types/arena/activeArena";
 
 export const activeArenaPlayersFetcher = async (
   url: string,

@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import dayjs from "@/lib/dayjs";
-import type { ArenaAverages } from "@/hooks/metrics/useArenaAveragesForSong";
+import type { ArenaAverages } from "@/types/songs/arenaAverages";
 import { BPIChart } from "./BPIChart";
 
 interface ChartDataPoint {

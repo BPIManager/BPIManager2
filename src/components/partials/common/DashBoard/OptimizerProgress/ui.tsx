@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { DIFF_COLORS } from "@/constants/theme/difficultyColors";
-import type { OptimizeMemo } from "@/hooks/analytics/useOptimizeMemo";
+import type { OptimizeMemoResponse } from "@/hooks/analytics/useOptimizeMemo";
 import {
   sortStepsByOrder,
   STEP_SORT_ORDERS,
@@ -42,7 +42,7 @@ interface StepProgress {
 
 interface OptimizerProgressCardProps {
   isLoading: boolean;
-  memos?: OptimizeMemo[];
+  memos?: OptimizeMemoResponse[];
   currentScores: Map<number, number | null>;
   currentBpis: Map<number, number | null>;
   liveCurrentTotalBpi: number | null;

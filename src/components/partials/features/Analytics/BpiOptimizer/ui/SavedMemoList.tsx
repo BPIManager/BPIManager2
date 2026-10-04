@@ -18,7 +18,7 @@ import ActionConfirmDialog from "@/components/partials/modal/Confirmation";
 import { buildStepProgress } from "@/components/partials/common/OptimizerGoalCard";
 import { SongStatusBar } from "@/components/partials/common/OptimizerGoalCard/GoalCard";
 import { GoalDetailDrawer } from "@/components/partials/common/OptimizerGoalCard/GoalDetailDrawer";
-import type { OptimizeMemo } from "@/hooks/analytics/useOptimizeMemo";
+import type { OptimizeMemoResponse } from "@/hooks/analytics/useOptimizeMemo";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import OptimizerIntro from "./OptimizerIntro";
 
@@ -35,7 +35,7 @@ const STATUS_FILTER_ICONS: Record<StatusFilter, LucideIcon> = {
  * 一部曲の超過達成だけで総合BPIが超えることがあり、それを達成扱いにすると実態と合わないため。
  */
 const isMemoAchieved = (
-  memo: OptimizeMemo,
+  memo: OptimizeMemoResponse,
   currentScores: Map<number, number | null>,
   currentBpis: Map<number, number | null>,
 ): boolean => {
@@ -61,7 +61,7 @@ const SavedMemoList = ({
   isEditLoadingId,
   headerAction,
 }: {
-  memos: OptimizeMemo[];
+  memos: OptimizeMemoResponse[];
   currentScores: Map<number, number | null>;
   currentBpis: Map<number, number | null>;
   liveCurrentTotalBpi: number | null;
@@ -69,7 +69,7 @@ const SavedMemoList = ({
   fbUser?: FirebaseUser | null;
   onDelete: (id: string) => void;
   isDeletingId: string | null;
-  onEdit: (memo: OptimizeMemo) => void;
+  onEdit: (memo: OptimizeMemoResponse) => void;
   isEditLoadingId?: string | null;
   /** 一覧上部、ステータスタブの下に右寄せで表示するアクション（「新規作成」ボタン等） */
   headerAction?: ReactNode;

@@ -6,7 +6,7 @@ import { useRadar } from "@/hooks/stats/useRadar";
 import { fetchImportOptimizeMemo, fetchBpiOptimizerDataset, type ImportedGoalTarget } from "@/services/swr/analytics";
 import type { DatasetSource } from "./ui/DatasetPickerDrawer";
 import { BpiCalculator } from "@/lib/bpi";
-import type { OptimizeMemo } from "@/hooks/analytics/useOptimizeMemo";
+import type { OptimizeMemoResponse } from "@/hooks/analytics/useOptimizeMemo";
 
 import { useUser } from "@/contexts/users/UserContext";
 import { useUserScores } from "@/hooks/table/useUserScores";
@@ -108,7 +108,7 @@ const [isCustomDirty, setIsCustomDirty] = useState(false);
 const [pendingNavigation, setPendingNavigation] = useState<
   (() => void) | null
 >(null);
-const [editingMemo, setEditingMemo] = useState<OptimizeMemo | null>(null);
+const [editingMemo, setEditingMemo] = useState<OptimizeMemoResponse | null>(null);
 const [editingLoadingId, setEditingLoadingId] = useState<string | null>(
   null,
 );
@@ -134,7 +134,7 @@ const closeDrawer = useCallback(() => {
   resetCustomCreationState();
 }, []);
 
-const handleEditMemo = async (memo: OptimizeMemo) => {
+const handleEditMemo = async (memo: OptimizeMemoResponse) => {
   if (!user?.userId || editingLoadingId) return;
   setEditingLoadingId(memo.reportId);
   try {
