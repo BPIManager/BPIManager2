@@ -1,7 +1,16 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  ReactNode,
+} from "react";
 import type { Locale } from "@/lib/i18n/translations";
+import { safeGetItem, safeSetItem } from "@/utils/common/safeStorage";
 
 const STORAGE_KEY = "bpim2-locale";
 
@@ -19,7 +28,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>("ja");
 
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY) as Locale | null;
+    const saved = safeGetItem(STORAGE_KEY) as Locale | null;
     if (saved === "en" || saved === "ja" || saved === "zh-TW" || saved === "ko") {
       // localStorage は SSR で無いため、hydration 後にのみ読み込んでハイドレーションミスマッチを避ける。
        // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -27,13 +36,15 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const setLocale = (l: Locale) => {
+  const setLocale = useCallback((l: Locale) => {
     setLocaleState(l);
-    localStorage.setItem(STORAGE_KEY, l);
-  };
+    safeSetItem(STORAGE_KEY, l);
+  }, []);
+
+  const value = useMemo(() => ({ locale, setLocale }), [locale, setLocale]);
 
   return (
-    <LocaleContext.Provider value={{ locale, setLocale }}>
+    <LocaleContext.Provider value={value}>
       {children}
     </LocaleContext.Provider>
   );

@@ -1,4 +1,5 @@
 import type { FontId, FontDef } from "@/types/ui/font";
+import { safeGetItem, safeSetItem } from "@/utils/common/safeStorage";
 
 export const FONTS: FontDef[] = [
   {
@@ -45,7 +46,7 @@ export const DEFAULT_FONT: FontId = "default";
  */
 export function getStoredFont(): FontId {
   if (typeof window === "undefined") return DEFAULT_FONT;
-  const v = localStorage.getItem(FONT_STORAGE_KEY);
+  const v = safeGetItem(FONT_STORAGE_KEY);
   if (v && FONTS.find((f) => f.id === v)) return v as FontId;
   return DEFAULT_FONT;
 }
@@ -76,5 +77,5 @@ export function applyFont(id: FontId) {
   const def = FONTS.find((f) => f.id === id)!;
   loadGoogleFont(def);
   document.documentElement.style.setProperty("--bpim-font-family", def.cssFamily);
-  localStorage.setItem(FONT_STORAGE_KEY, id);
+  safeSetItem(FONT_STORAGE_KEY, id);
 }

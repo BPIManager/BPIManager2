@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { safeGetItem, safeSetItem } from "@/utils/common/safeStorage";
 import { Menu } from "lucide-react";
 import SidebarContent from "@/components/partials/common/Sidebar";
 import NotificationBell from "@/components/partials/common/Notifications";
@@ -23,15 +24,13 @@ const DashboardLayout = ({
   useEffect(() => {
     // localStorage は SSR で無いため、hydration 後にのみ読み込んでハイドレーションミスマッチを避ける。
      // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSidebarPinned(localStorage.getItem("sidebar-pinned") === "true");
+    setSidebarPinned(safeGetItem("sidebar-pinned") === "true");
   }, []);
 
   const togglePin = () => {
-    setSidebarPinned((prev) => {
-      const next = !prev;
-      localStorage.setItem("sidebar-pinned", String(next));
-      return next;
-    });
+    const next = !sidebarPinned;
+    setSidebarPinned(next);
+    safeSetItem("sidebar-pinned", String(next));
   };
 
   const isExpanded = sidebarPinned || sidebarHovered;
