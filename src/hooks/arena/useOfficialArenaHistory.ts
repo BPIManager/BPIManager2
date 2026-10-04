@@ -1,7 +1,7 @@
 import useSWR from "swr";
 import type { ArenaEventEntry, ArenaVersionMetadata } from "@/lib/cron/arena/types";
 import { arenaJsonFetcher } from "@/services/swr/arena/arenaHistory";
-import { fetcherV2 } from "@/services/swr/fetchV2";
+import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
 
 export type ArenaHistoryRecord = {
   fetchedAt: string;
@@ -30,5 +30,7 @@ export function useOfficialArenaHistory(
     userId && event
       ? `/api/v2/users/${userId}/stats/arenaHistory?version=${version}&start=${encodeURIComponent(event.start)}&end=${encodeURIComponent(event.end)}`
       : null;
-  return useSWR<ArenaHistoryRecord[]>(url, (u: string) => fetcherV2<ArenaHistoryRecord[]>(u), { revalidateOnFocus: false });
+  return useAuthedSWRV2<ArenaHistoryRecord[]>(url, {
+    revalidateOnFocus: false,
+  });
 }

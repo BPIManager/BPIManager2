@@ -16,7 +16,7 @@ import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { fetcher } from "@/utils/common/fetch";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { API_PREFIX, API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { toast } from "sonner";
 
@@ -81,7 +81,10 @@ const RivalComparisonModal = ({
         { optimisticData, rollbackOnError: true, populateCache: true, revalidate: true },
       );
       // plain profile キャッシュも同期
-      const plainKey = [`${API_PREFIX}/users/${rivalId}/profile`, fbUser];
+      const plainKey = [
+        `${API_V2_PREFIX}/users/${rivalId}/profile`,
+        fbUser?.uid ?? null,
+      ];
       globalMutate(plainKey, (cur: typeof optimisticData | undefined) => {
         if (!cur) return cur;
         return { ...cur, profile: { ...cur.profile, follows: optimisticData.profile.follows, relationship: updatedRelationship } };
