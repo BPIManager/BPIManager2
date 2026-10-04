@@ -187,6 +187,34 @@ describe("filterSongsFrontend", () => {
   });
 });
 
+describe("可変BPM曲のbpmMax判定（サーバー・クライアント共通）", () => {
+  const song = {
+    songId: 1,
+    title: "可変",
+    notes: 1000,
+    bpm: "100-200",
+    difficulty: "ANOTHER",
+    difficultyLevel: 12,
+    releasedVersion: 27,
+    logId: 1,
+    exScore: 1800,
+    bpi: 30,
+    clearState: "HARD CLEAR",
+    missCount: 5,
+    scoreAt: "2025-06-01T00:00:00Z",
+  } as unknown as SongWithScore;
+
+  it("最大BPMが上限を超える場合は両方で除外されること", () => {
+    expect(filterSongsServerSide([song], { bpmMax: 150 })).toHaveLength(0);
+    expect(filterSongsFrontend([song], { bpmMax: 150 })).toHaveLength(0);
+  });
+
+  it("最大BPMが上限以下なら両方で残ること", () => {
+    expect(filterSongsServerSide([song], { bpmMax: 200 })).toHaveLength(1);
+    expect(filterSongsFrontend([song], { bpmMax: 200 })).toHaveLength(1);
+  });
+});
+
 describe("links: buildTextageUrl / buildChartViewerUrl", () => {
   it("textageがnullのときnullを返すこと", () => {
     expect(buildTextageUrl(null, 1)).toBeNull();
