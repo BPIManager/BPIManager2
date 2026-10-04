@@ -1,6 +1,6 @@
 import { calculateRadar, buildRadarSongMaster } from "@/lib/radar/calculator";
+import { computeCanonicalTotalBpi } from "@/lib/bpi/canonicalTotalBpi";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
-import { BpiCalculator } from "@/lib/bpi";
 import { statsLatestScoresRepo } from "@/lib/db/aggregates/stats/latestScores";
 import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { usersRepo } from "@/lib/db/domains/users";
@@ -8,7 +8,6 @@ import {
   radarCacheRepo,
   type NewUserRadarCache,
 } from "@/lib/db/domains/radar";
-import type { IBpiBasicSongData, IBpiScoreObservation } from "@/types/songs/bpi";
 
 /**
  * getLatestScoresWithMusicDataForAllUsers を1回で呼ぶユーザー数の上限。
@@ -61,28 +60,7 @@ export async function updateAllUserRadarCache() {
         if (scores.length > 0) {
           const radar = calculateRadar(scores, radarSongMaster);
 
-          const master: (IBpiBasicSongData & { songId: number })[] =
-            scores.map((s) => ({
-              songId: s.songId,
-              notes: Number(s.notes),
-              kaidenAvg: s.kaidenAvg,
-              wrScore: s.wrScore,
-              coef: s.coef,
-              mu: s.mu,
-              sigma: s.sigma,
-              residualVar: s.residualVar,
-            }));
-          const observations: IBpiScoreObservation[] = scores
-            .filter((s) => s.exScore != null)
-            .map((s) => ({
-              songId: s.songId,
-              notes: Number(s.notes),
-              exScore: Number(s.exScore),
-            }));
-          const totalBpi = BpiCalculator.calculateTotalBPI(
-            observations,
-            master,
-          );
+          const totalBpi = computeCanonicalTotalBpi(scores, fullMaster);
 
           const values = {
             notes: radar.NOTES.totalBpi,

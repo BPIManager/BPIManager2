@@ -4,22 +4,13 @@ import { statsSongTablesRepo } from "@/lib/db/aggregates/stats/songTables";
 import { rivalPairwiseRepo } from "@/lib/db/aggregates/rivalScores/pairwise";
 import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
+import { computeCanonicalTotalBpi } from "@/lib/bpi/canonicalTotalBpi";
 import { BpiCalculator } from "@/lib/bpi";
 import { dashboardSchema } from "@/lib/mcp/schemas";
 import type { IBpiBasicSongData, IBpiScoreObservation } from "@/types/songs/bpi";
 
 type HistoryRow = Awaited<ReturnType<typeof statsSongTablesRepo.getScoreHistory>>[number];
 type MasterSong = IBpiBasicSongData & { songId: number };
-
-function toObservations(rows: HistoryRow[]): IBpiScoreObservation[] {
-  return rows
-    .filter((r) => r.songId != null && r.exScore != null)
-    .map((r) => ({
-      songId: r.songId as number,
-      notes: Number(r.notes),
-      exScore: Number(r.exScore),
-    }));
-}
 
 function toJSTDateStr(date: Date | string) {
   return dayjs(date).tz().format("YYYY-MM-DD");
@@ -127,7 +118,7 @@ export function registerGetMyDashboard(server: McpServer, userId: string) {
 
       const [canonicalHistory, filteredHistory, fullMaster, closeRivalRows] =
         await Promise.all([
-          statsSongTablesRepo.getScoreHistory(userId, version, [12], []),
+          statsSongTablesRepo.getScoreHistory(userId, version, [11, 12], []),
           statsSongTablesRepo.getScoreHistory(userId, version, numericLevels, difficulties),
           songMasterRepo.getSongMasterWithDef(),
           rivalPairwiseRepo.getScoreComparisonList({
@@ -164,11 +155,13 @@ export function registerGetMyDashboard(server: McpServer, userId: string) {
       }
 
       // 総合BPI本体は常にレベル12全曲基準（levels/difficultiesの影響を受けない）
+      // 潜在スキル推定は☆11+12の全観測を使う（Webの総合BPIと同じ定義）
       const canonicalLatest = latestBySong(canonicalHistory);
-      const freshTotalBpi = BpiCalculator.calculateTotalBPI(
-        toObservations(canonicalLatest),
-        canonicalMaster,
-      );
+      const freshTotalBpi = computeCanonicalTotalBpi(canonicalLatest, fullMaster);
+      const level12SongIds = new Set(canonicalMaster.map((s) => s.songId));
+      const canonicalPlayedCount = canonicalLatest.filter(
+        (r) => r.songId != null && level12SongIds.has(r.songId),
+      ).length;
       // 他のtotalBpi算出箇所（stats/totalBpi.ts等）と同様、過去最高値を下回らないラチェットを適用する
       const previousBest = await userStatusLogsReadRepo.findMaxTotalBpi(userId, version);
       const totalBpi = BpiCalculator.ratchetTotalBpi(previousBest, freshTotalBpi);
@@ -220,7 +213,7 @@ export function registerGetMyDashboard(server: McpServer, userId: string) {
           {
             type: "text",
             text:
-              `総合BPI: ${totalBpi}（推定順位: ${estimatedRank ?? "圏外"}、プレイ済み${canonicalLatest.length}/${canonicalCount}曲）。` +
+              `総合BPI: ${totalBpi}（推定順位: ${estimatedRank ?? "圏外"}、プレイ済み${canonicalPlayedCount}/${canonicalCount}曲）。` +
               `絞り込み対象(level=${levels.join(",")}${difficulties.length ? `, difficulty=${difficulties.join(",")}` : ""})の` +
               `得意曲/苦手曲/ライバル僅差曲、および直近${totalBpiHistory.length}日分のBPI推移を返却しました。`,
           },
@@ -229,7 +222,7 @@ export function registerGetMyDashboard(server: McpServer, userId: string) {
             text: JSON.stringify({
               totalBpi,
               estimatedRank,
-              playedCount: canonicalLatest.length,
+              playedCount: canonicalPlayedCount,
               totalCount: canonicalCount,
               filter: { levels, difficulties },
               filteredPlayedCount: filteredLatest.length,

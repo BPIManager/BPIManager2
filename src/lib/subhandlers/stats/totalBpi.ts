@@ -1,5 +1,6 @@
 import dayjs from "@/lib/dayjs";
 import { BpiCalculator } from "@/lib/bpi";
+import { computeCanonicalTotalBpi } from "@/lib/bpi/canonicalTotalBpi";
 import { scoreDetailRepo } from "@/lib/db/domains/scores/detail";
 import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { usersRepo } from "@/lib/db/domains/users";
@@ -8,7 +9,6 @@ import { getUserAreaRank } from "@/lib/arena/prefectureRankings";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { ok } from "@/middlewares/api/apiResult";
 import type { HandlerResult } from "@/types/api";
-import type { IBpiScoreObservation } from "@/types/songs/bpi";
 import type { TotalBpiQuery } from "./_shared";
 
 export async function handleStatsTotalBpi(
@@ -31,18 +31,7 @@ export async function handleStatsTotalBpi(
   const level12Master = songMaster.filter((s) => s.difficultyLevel === 12);
   const totalCount = level12Master.length;
   const level12Scores = scores.filter((s) => Number(s.difficultyLevel) === 12);
-  // 潜在スキル推定は level 11+12 の全観測が必要なため、集計母集団（level12Master）とは別に scores 全体から observations を作る。
-  const observations: IBpiScoreObservation[] = scores
-    .filter((s) => s.exScore !== null && s.exScore !== undefined)
-    .map((s) => ({
-      songId: s.songId,
-      notes: s.notes,
-      exScore: Number(s.exScore),
-    }));
-  const freshTotalBpi = BpiCalculator.calculateTotalBPI(
-    observations,
-    level12Master,
-  );
+  const freshTotalBpi = computeCanonicalTotalBpi(scores, songMaster);
   // モデル再推定等で同じ時点の再計算値が過去の記録より低く出うるため、asOf 指定時を含め、その時点までの記録済み最高値を下限にする。
    // monthly-review の buildBpiTimeline と同じ理由。
   const previousBest = await userStatusLogsReadRepo.findMaxTotalBpiAsOf(q.userId, q.version, targetTime,);
