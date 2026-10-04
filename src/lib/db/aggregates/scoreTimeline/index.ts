@@ -60,6 +60,7 @@ class ScoreTimelineAggregateRepository {
               (eb) => eb.fn.count("logId").as("songCount"),
             ])
             .where("userId", "=", userId)
+            .where("version", "=", version)
             .groupBy("batchId")
             .as("counts"),
         (join) => join.onRef("counts.sc_batchId", "=", "l_with_lag.l_batchId"),
@@ -82,6 +83,7 @@ class ScoreTimelineAggregateRepository {
                 .as("rn"),
             ])
             .where("sc.userId", "=", userId)
+            .where("sc.version", "=", version)
             .as("ranked_scores"),
         (join) =>
           join.onRef("ranked_scores.ts_batchId", "=", "l_with_lag.l_batchId"),
@@ -92,8 +94,9 @@ class ScoreTimelineAggregateRepository {
       .orderBy("ts_bpi", "desc")
       .execute();
 
-    return rows.reduce((acc, row) => {
-      let log = acc.find((l) => l.batchId === row.l_batchId);
+    const logsByBatchId = new Map<string, TimelineLogEntry>();
+    for (const row of rows) {
+      let log = logsByBatchId.get(row.l_batchId);
       if (!log) {
         const currentBpi = Number(row.l_totalBpi);
         const prevBpi =
@@ -111,7 +114,7 @@ class ScoreTimelineAggregateRepository {
           createdAt: row.l_createdAt,
           topScores: [],
         };
-        acc.push(log);
+        logsByBatchId.set(row.l_batchId, log);
       }
       if (row.ts_title) {
         log.topScores.push({
@@ -120,8 +123,8 @@ class ScoreTimelineAggregateRepository {
           clearState: row.ts_clearState,
         });
       }
-      return acc;
-    }, [] as TimelineLogEntry[]);
+    }
+    return Array.from(logsByBatchId.values());
   }
 }
 
