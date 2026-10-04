@@ -50,6 +50,44 @@ class SongMasterRepository {
   }
 
   /**
+   * 現行の楽曲（`deletedAt` が未設定または最新バージョンより後）を、現在有効な songDef があれば結合して全件取得する。
+   * songDef が無い楽曲も含む（LEFT JOIN）。日次キャッシュの元データ用。
+   */
+  async getAllSongsWithCurrentDef() {
+    return await db
+      .selectFrom("songs as s")
+      .leftJoin(
+        (qb) =>
+          qb
+            .selectFrom("songDef")
+            .select(["songId", "wrScore", "kaidenAvg", "coef", "mu", "sigma", "residualVar"])
+            .where("isCurrent", "=", 1)
+            .as("def"),
+        (join) => join.onRef("def.songId", "=", "s.songId"),
+      )
+      .select([
+        "s.songId",
+        "s.title",
+        "s.difficulty",
+        "s.difficultyLevel",
+        "s.notes",
+        "def.wrScore",
+        "def.kaidenAvg",
+        "def.coef",
+        "def.mu",
+        "def.sigma",
+        "def.residualVar",
+      ])
+      .where((eb) =>
+        eb.or([
+          eb("s.deletedAt", "is", null),
+          eb("s.deletedAt", ">", latestVersion),
+        ]),
+      )
+      .execute();
+  }
+
+  /**
    * title + difficulty で楽曲と最新 songDef を取得する（BPI計算用）。
    * 削除済み楽曲は除外。
    */

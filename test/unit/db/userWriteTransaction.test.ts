@@ -23,7 +23,7 @@ const { withUserWriteLock } = await import(
 describe("withUserWriteLock", () => {
   it("同じトランザクションで先にロックを取り、その後に処理を実行して結果を返すこと", async () => {
     const result = await withUserWriteLock("u1", async (t) => {
-      order.push(`work:${t === trx}`);
+      order.push(`work:${(t as unknown) === trx}`);
       return 42;
     });
     expect(result).toBe(42);

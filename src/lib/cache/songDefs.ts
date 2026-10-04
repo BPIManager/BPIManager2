@@ -1,5 +1,4 @@
-import { db } from "@/lib/db";
-import { latestVersion } from "@/constants/iidx/iidxVersions";
+import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { todayJst } from "@/lib/dayjs";
 
 export type CachedSongWithDef = {
@@ -25,37 +24,7 @@ let cache: CacheEntry | null = null;
 let loadingPromise: Promise<CacheEntry> | null = null;
 
 async function loadCache(): Promise<Map<string, CachedSongWithDef>> {
-  const rows = await db
-    .selectFrom("songs as s")
-    .leftJoin(
-      (qb) =>
-        qb
-          .selectFrom("songDef")
-          .select(["songId", "wrScore", "kaidenAvg", "coef", "mu", "sigma", "residualVar"])
-          .where("isCurrent", "=", 1)
-          .as("def"),
-      (join) => join.onRef("def.songId", "=", "s.songId"),
-    )
-    .select([
-      "s.songId",
-      "s.title",
-      "s.difficulty",
-      "s.difficultyLevel",
-      "s.notes",
-      "def.wrScore",
-      "def.kaidenAvg",
-      "def.coef",
-      "def.mu",
-      "def.sigma",
-      "def.residualVar",
-    ])
-    .where((eb) =>
-      eb.or([
-        eb("s.deletedAt", "is", null),
-        eb("s.deletedAt", ">", latestVersion),
-      ]),
-    )
-    .execute();
+  const rows = await songMasterRepo.getAllSongsWithCurrentDef();
 
   return new Map(
     rows.map((row) => [
