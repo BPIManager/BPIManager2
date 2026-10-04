@@ -17,6 +17,7 @@ import { followInviteLinksRepo } from "@/lib/db/domains/followInviteLinks";
 import { followApprovalNotificationsRepo } from "@/lib/db/domains/followApprovalNotifications";
 import { followListsRepo } from "@/lib/db/domains/followLists";
 import { followListMembersRepo } from "@/lib/db/domains/followListMembers";
+import { iidxTowerRepo } from "@/lib/db/domains/iidxTower";
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
@@ -45,6 +46,7 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
     followInviteLinks,
     followApprovalNotifications,
     followLists,
+    iidxTower,
   ] = await Promise.all([
     usersRepo.getAllForUser(userId),
     followsRepo.getAllForUser(userId),
@@ -61,6 +63,7 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
     followInviteLinksRepo.getByUserId(userId),
     followApprovalNotificationsRepo.getAllForUser(userId),
     followListsRepo.getAllForUser(userId),
+    iidxTowerRepo.getAllForUser(userId),
   ]);
 
   // followListsの取得結果(id)に依存するため、上のPromise.allとは別に取得する
@@ -94,6 +97,7 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
     followApprovalNotifications,
     followLists,
     followListMembers,
+    iidxTower,
   };
 
   // バックアップをファイルへ書き出す。コンテナ等で os.homedir() 配下が非永続の場合があるため、USER_DELETION_BACKUP_DIR で保存先を指定できる。
@@ -156,6 +160,9 @@ export async function backupAndDeleteUser(userId: string): Promise<void> {
 
     // followApprovalNotifications: FK to users(CASCADE) for both recipientId/actorId
     await followApprovalNotificationsRepo.deleteByUser(trx, userId);
+
+    // iidxTower: users への FK が無いため CASCADE されず、明示的に削除する
+    await iidxTowerRepo.deleteByUser(trx, userId);
 
     // users: メインレコード
     await usersRepo.deleteByUser(trx, userId);

@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
-import { sql } from "kysely";
+import { sql, type Transaction } from "kysely";
+import type { Database } from "@/types/db";
 
 type TowerRow = { playDate: string; keyCount: number; scratchCount: number };
 
@@ -20,6 +21,20 @@ export const iidxTowerRepo = {
       })
       .execute();
     return rows.length;
+  },
+
+  /** アカウント削除用。`users` へのFKが無くCASCADEされないため明示的に削除する */
+  async deleteByUser(trx: Transaction<Database>, userId: string) {
+    await trx.deleteFrom("iidxTower").where("userId", "=", userId).execute();
+  },
+
+  /** バックアップ用にユーザーの全日別記録を取得する */
+  async getAllForUser(userId: string) {
+    return db
+      .selectFrom("iidxTower")
+      .selectAll()
+      .where("userId", "=", userId)
+      .execute();
   },
 
   async getByUser(userId: string, version?: string) {
