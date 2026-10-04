@@ -35,6 +35,12 @@ class SongMasterRepository {
         "sd.sigma",
         "sd.residualVar",
       ])
+      .where((eb) =>
+        eb.or([
+          eb("s.deletedAt", "is", null),
+          eb("s.deletedAt", ">", latestVersion),
+        ]),
+      )
       .execute();
     return result as SongMaster;
   }
