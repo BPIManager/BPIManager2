@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { PageLoader } from "@/components/ui/loading-spinner";
 import { Meta } from "@/components/partials/common/PageChrome/Head";
+import { isSafeRedirectUri } from "@/schemas/oauth";
 
 function getStringParam(value: string | string[] | undefined) {
   return typeof value === "string" ? value : undefined;
@@ -102,7 +103,11 @@ export default function OAuthAuthorizePage() {
 
   const handleDeny = () => {
     // 登録済みのリダイレクト先以外へは遷移させない（open redirect防止）
-    if (!redirectUri || !clientIdentity?.redirectUriRegistered) {
+    if (
+      !redirectUri ||
+      !clientIdentity?.redirectUriRegistered ||
+      !isSafeRedirectUri(redirectUri)
+    ) {
       setError("リダイレクト先が登録されていないため、拒否を通知できません");
       return;
     }
@@ -144,6 +149,11 @@ export default function OAuthAuthorizePage() {
         return;
       }
 
+      if (!isSafeRedirectUri(data.redirectUrl)) {
+        setError("許可処理に失敗しました。");
+        setIsSubmitting(false);
+        return;
+      }
       window.location.href = data.redirectUrl;
     } catch {
       setError("許可処理に失敗しました。");

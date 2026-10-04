@@ -5,7 +5,7 @@ import {
   AuthenticatedNextApiRequest,
   withAuth,
 } from "@/middlewares/api/withAuth";
-import { consentSchema } from "@/schemas/oauth";
+import { consentSchema, isSafeRedirectUri } from "@/schemas/oauth";
 import { parseBody } from "@/services/nextRequest/parseBody";
 
 const CODE_TTL_MS = 60_000;
@@ -28,7 +28,10 @@ async function handler(
       return res.status(400).json({ message: "Unknown client_id" });
     }
 
-    if (!client.redirectUris.includes(body.redirect_uri)) {
+    if (
+      !isSafeRedirectUri(body.redirect_uri) ||
+      !client.redirectUris.includes(body.redirect_uri)
+    ) {
       return res.status(400).json({ message: "redirect_uri not registered" });
     }
 
