@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Menu } from "lucide-react";
 import SidebarContent from "@/components/partials/common/Sidebar";
 import NotificationBell from "@/components/partials/common/Notifications";
+import AnnouncementBell from "@/components/partials/common/Announcements";
 import UserMenu from "@/components/partials/common/UserMenu";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -97,6 +98,7 @@ const DashboardLayout = ({
 
           <div className="flex items-center gap-2">
             <NotificationBell />
+            <AnnouncementBell />
             <UserMenu />
           </div>
         </header>
