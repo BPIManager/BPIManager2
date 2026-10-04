@@ -5,6 +5,13 @@ interface DJRankOptions {
   output: "label" | "value";
 }
 
+/** AAA の境界比率（AAA+ の超過分を求めるために使う） */
+const AAA_RATIO = (() => {
+  const aaa = RANK_TABLE.find((r) => r.label === "AAA");
+  if (!aaa) throw new Error("AAA rank is missing from RANK_TABLE");
+  return aaa.ratio;
+})();
+
 export const getRankIndex = (percentage: number): number => {
   const index = RANK_TABLE.findLastIndex((r) => percentage >= r.ratio);
   return index === -1 ? 0 : index;
@@ -25,8 +32,25 @@ export const getDJRank = (
   let label: string;
   let scoreDiff: number;
 
-  if (mode === "current") {
-    label = detail.label === "MAX-" ? "MAX-" : `${detail.label}+`;
+  // AAA 帯と MAX- 帯は、左に現在ランク、右に「100%までの不足」か「AAA からの超過」を出す（MAX- 境界との差は使わない）
+  if (detail.label === "MAX-") {
+    if (mode === "current") {
+      label = "MAX-";
+      scoreDiff = maxScore - exScore;
+    } else {
+      label = "AAA+";
+      scoreDiff = exScore - Math.ceil(maxScore * AAA_RATIO);
+    }
+  } else if (detail.label === "AAA") {
+    if (mode === "current") {
+      label = "AAA+";
+      scoreDiff = exScore - Math.ceil(maxScore * AAA_RATIO);
+    } else {
+      label = "MAX-";
+      scoreDiff = maxScore - exScore;
+    }
+  } else if (mode === "current") {
+    label = `${detail.label}+`;
     scoreDiff = detail.surplus;
   } else {
     // 次ランク名は表の表記（例: MAX-）の場合と、最上位後の "MAX"（満点）の場合がある
