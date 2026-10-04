@@ -121,9 +121,9 @@ describe("BpiCalculator ロジックテスト", () => {
         wrScore: 1500,
         coef: 1.175,
       });
-      const result = BpiCalculator.calc(1700, brokenSong);
-      expect(result).not.toBeNull();
-      expect(result).not.toBeNaN();
+      // 皆伝平均(=BPI 0のアンカー)を基準に計算され、WR(1500)の異常値には引きずられない
+      expect(BpiCalculator.calc(1700, brokenSong)).toBe(63.85);
+      expect(BpiCalculator.calc(1900, brokenSong)).toBe(0);
     });
 
     it("Notesが0の場合、計算不能としてnullを返すこと", () => {

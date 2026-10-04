@@ -32,7 +32,11 @@ const PUBLIC_USER_ID = process.env.TEST_PUBLIC_USER_ID || "";
 const PRIVATE_USER_ID = process.env.TEST_PRIVATE_USER_ID || "";
 const SONG_ID = process.env.TEST_SONG_ID || "1000";
 
-const CAN_RUN = !!API_KEY && !!FIREBASE_API_KEY;
+/** devサーバーが起動していない場合はスイート全体を skip する */
+const SERVER_UP = await fetch(BASE_URL, { signal: AbortSignal.timeout(2000) })
+  .then(() => true)
+  .catch(() => false);
+const CAN_RUN = !!API_KEY && !!FIREBASE_API_KEY && SERVER_UP;
 
 /** マスク等で毎回変わる値を吸収してから比較する */
 function normalize(value: unknown): unknown {
