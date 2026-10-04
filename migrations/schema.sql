@@ -110,6 +110,27 @@ CREATE TABLE IF NOT EXISTS `discordLinks` (
   CONSTRAINT `fk_discordlinks_user` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `announcements` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `title` varchar(200) NOT NULL,
+  `body` text NOT NULL,
+  `linkUrl` varchar(500) DEFAULT NULL,
+  `publishedAt` datetime NOT NULL,
+  `isPublished` tinyint(1) NOT NULL DEFAULT 1,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `publishedAt` (`publishedAt`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `announcementReads` (
+  `userId` varchar(128) NOT NULL,
+  `announcementId` int NOT NULL,
+  `readAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`userId`,`announcementId`),
+  CONSTRAINT `fk_announcementreads_user` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE,
+  CONSTRAINT `fk_announcementreads_announcement` FOREIGN KEY (`announcementId`) REFERENCES `announcements` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `userEmailHashes` (
   `userId` varchar(128) NOT NULL,
   `emailHash` char(64) NOT NULL,

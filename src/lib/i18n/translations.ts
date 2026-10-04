@@ -18,6 +18,7 @@ import { loginPageTranslations } from "./locales/login";
 import { monthlyReviewTranslations } from "./locales/monthlyReview";
 import { newBpiTranslations } from "./locales/newBpi";
 import { linkedAccountsTranslations } from "./locales/linkedAccounts";
+import { announcementsTranslations } from "./locales/announcements";
 
 export type Locale = "ja" | "en" | "zh-TW" | "ko";
 
@@ -42,6 +43,7 @@ export const translations = {
   ...monthlyReviewTranslations,
   ...newBpiTranslations,
   ...linkedAccountsTranslations,
+  ...announcementsTranslations,
 } as const;
 
 export type TranslationKey = keyof typeof translations;
