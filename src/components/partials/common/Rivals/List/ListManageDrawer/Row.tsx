@@ -59,6 +59,7 @@ const ListManageDrawerRow = ({
               variant="ghost"
               onClick={handleSaveName}
               disabled={isSaving}
+              aria-label={t("common.save")}
             >
               <Check className="h-3.5 w-3.5" />
             </Button>
@@ -70,6 +71,7 @@ const ListManageDrawerRow = ({
                 setDraftName(list.name);
               }}
               disabled={isSaving}
+              aria-label={t("common.cancel")}
             >
               <X className="h-3.5 w-3.5" />
             </Button>

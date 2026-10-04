@@ -161,6 +161,7 @@ const SongFilterBar = ({
           size="icon"
           className="h-9 w-9 shrink-0 border-bpim-border hover:bg-bpim-overlay"
           onClick={onOpenAdvancedFilter}
+          aria-label={t("filter.advancedFilter")}
         >
           <SlidersHorizontal size={18} />
         </Button>

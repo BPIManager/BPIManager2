@@ -500,6 +500,18 @@ export const dashboardTranslations = {
     "zh-TW": "得分率分布",
     ko: "스코어 레이트 분포",
   },
+  "dashboard.distribution.chartBar": {
+    ja: "棒グラフ",
+    en: "Bar chart",
+    "zh-TW": "長條圖",
+    ko: "막대 그래프",
+  },
+  "dashboard.distribution.chartPie": {
+    ja: "円グラフ",
+    en: "Pie chart",
+    "zh-TW": "圓餅圖",
+    ko: "원형 그래프",
+  },
   "dashboard.distribution.modeRank": {
     ja: "DJRANK表示",
     en: "Show DJ Rank",

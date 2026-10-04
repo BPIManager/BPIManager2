@@ -208,6 +208,7 @@ const CurrentBpiCard = ({
               <Button
                 variant={selectedDate ? "default" : "ghost"}
                 size="icon-sm"
+                aria-label={t("common.openCalendar")}
                 className={cn(
                   "transition-transform active:scale-90",
                   selectedDate && "shadow-sm shadow-bpim-primary/20",

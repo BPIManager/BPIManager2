@@ -5,6 +5,18 @@ export const commonTranslations = {
     "zh-TW": "取消",
     ko: "취소",
   },
+  "common.openCalendar": {
+    ja: "カレンダーを開く",
+    en: "Open calendar",
+    "zh-TW": "開啟日曆",
+    ko: "달력 열기",
+  },
+  "common.moreActions": {
+    ja: "その他の操作",
+    en: "More actions",
+    "zh-TW": "更多操作",
+    ko: "더 보기",
+  },
   "common.save": { ja: "保存", en: "Save", "zh-TW": "儲存", ko: "저장" },
   "common.close": { ja: "閉じる", en: "Close", "zh-TW": "關閉", ko: "닫기" },
   "common.back": { ja: "戻る", en: "Back", "zh-TW": "返回", ko: "뒤로" },

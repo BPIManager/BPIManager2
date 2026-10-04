@@ -212,6 +212,7 @@ const OptimizerProgressCard = ({
                 size="icon-sm"
                 disabled={clampedIndex === 0}
                 onClick={() => onSelectIndex(clampedIndex - 1)}
+                aria-label={t("common.prev")}
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
@@ -226,6 +227,7 @@ const OptimizerProgressCard = ({
                 size="icon-sm"
                 disabled={clampedIndex === memos.length - 1}
                 onClick={() => onSelectIndex(clampedIndex + 1)}
+                aria-label={t("common.next")}
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>

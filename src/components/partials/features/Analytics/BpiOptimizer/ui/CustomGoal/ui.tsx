@@ -42,6 +42,7 @@ const TargetRow = ({
   onEdit: () => void;
   onRemove: () => void;
 }) => {
+  const { t } = useTranslation();
   if (!step) {
     return (
       <div className="flex items-center justify-between gap-2 rounded-2xl border border-bpim-border bg-bpim-surface p-4">
@@ -52,7 +53,12 @@ const TargetRow = ({
           </span>
         </div>
         <div className="flex shrink-0 items-center gap-1">
-          <Button variant="ghost" size="icon-sm" onClick={onEdit}>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={onEdit}
+            aria-label={t("common.edit")}
+          >
             <Pencil className="h-3.5 w-3.5" />
           </Button>
           <Button
@@ -60,6 +66,7 @@ const TargetRow = ({
             size="icon-sm"
             className="text-bpim-muted hover:text-bpim-danger hover:bg-bpim-danger/10"
             onClick={onRemove}
+            aria-label={t("common.delete")}
           >
             <Trash2 className="h-3.5 w-3.5" />
           </Button>

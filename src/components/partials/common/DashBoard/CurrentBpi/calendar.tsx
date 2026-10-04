@@ -5,6 +5,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import dayjs from "@/lib/dayjs";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 const WEEKDAYS = ["月", "火", "水", "木", "金", "土", "日"];
 
@@ -21,6 +22,7 @@ const CalendarPicker = ({
   onSelect,
   initialMonth,
 }: CalendarPickerProps) => {
+  const { t } = useTranslation();
   const today = dayjs();
   const todayStr = today.format("YYYY-MM-DD");
 
@@ -67,13 +69,23 @@ const CalendarPicker = ({
   return (
     <div className="select-none p-2">
       <div className="mb-3 flex items-center justify-between gap-2">
-        <Button variant="ghost" size="icon-sm" onClick={prevMonth}>
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          onClick={prevMonth}
+          aria-label={t("common.prev")}
+        >
           <ChevronLeftIcon className="size-4" />
         </Button>
         <span className="text-xs font-semibold text-bpim-text">
           {view.format("YYYY年M月")}
         </span>
-        <Button variant="ghost" size="icon-sm" onClick={nextMonth}>
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          onClick={nextMonth}
+          aria-label={t("common.next")}
+        >
           <ChevronRightIcon className="size-4" />
         </Button>
       </div>
