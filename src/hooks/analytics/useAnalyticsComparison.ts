@@ -111,7 +111,11 @@ export const useAnalyticsComparison = (
   };
 
   const arenaRank = target?.kind === "arena" ? (target.param ?? "A1") : "A1";
-  const { rows: arenaRows, isLoading: arenaLoading } = useArenaJson(
+  const {
+    rows: arenaRows,
+    isLoading: arenaLoading,
+    error: arenaError,
+  } = useArenaJson(
     target?.kind === "arena" ? [11, 12] : [],
   );
 
@@ -254,7 +258,7 @@ export const useAnalyticsComparison = (
     return {
       songs,
       isLoading: false,
-      error: undefined,
+      error: arenaError,
       rivalLabel: target.label,
       refresh,
     };
