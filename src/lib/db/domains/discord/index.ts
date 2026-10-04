@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import type { Database, UserRole } from "@/types/db";
-import { sql, type Transaction } from "kysely";
+import type { Transaction } from "kysely";
 
 /** Discord 連携で付与される BPI ロール（手動付与の developer/pro は対象外） */
 const DISCORD_MANAGED_ROLES: UserRole[] = ["coffee", "saba", "iidx"];
@@ -29,14 +29,11 @@ class DiscordLinksRepository {
       .execute();
   }
 
-  /** 既存ロールが手動付与（developer/pro）の場合は上書きしない */
   async upsertUserRole(userId: string, role: UserRole) {
     await db
       .insertInto("userRoles")
       .values({ userId, role })
-      .onDuplicateKeyUpdate({
-        role: sql`IF(role IN (${sql.join(DISCORD_MANAGED_ROLES)}), ${role}, role)`,
-      })
+      .onDuplicateKeyUpdate({ role })
       .execute();
   }
 

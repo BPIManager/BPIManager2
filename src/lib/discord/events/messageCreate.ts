@@ -72,10 +72,6 @@ export async function handleMessageCreate(message: Message, client: Client) {
     return;
   }
 
-  const previous = await discordLinksRepo.findByDiscordUserId(message.author.id);
-  if (previous && previous.userId !== bpiUserId) {
-    await discordLinksRepo.deleteDiscordUserRole(previous.userId);
-  }
   await discordLinksRepo.upsert(message.author.id, bpiUserId);
 
   const userRole = resolveUserRoleFromMember(
