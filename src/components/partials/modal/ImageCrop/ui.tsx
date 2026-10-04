@@ -21,6 +21,7 @@ import { storage } from "@/lib/firebase";
 import { toast } from "sonner";
 import { Upload } from "lucide-react";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { clickableProps } from "@/utils/common/clickableProps";
 
 interface Props {
   uid: string;
@@ -39,6 +40,7 @@ const ImageUploadModal = ({
   const [crop, setCrop] = useState<Crop>();
   const [isUploading, setIsUploading] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const clearSelection = () => {
     setImgSrc("");
@@ -129,7 +131,7 @@ const ImageUploadModal = ({
         <div className="flex flex-col items-center justify-center gap-4 py-4">
           {!imgSrc ? (
             <div
-              onClick={() => document.getElementById("file-input")?.click()}
+              {...clickableProps(() => fileInputRef.current?.click())}
               className="flex w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-bpim-border bg-bpim-surface-2/60 p-12 transition-colors hover:bg-bpim-overlay"
             >
               <Upload className="h-8 w-8 text-bpim-muted" />
@@ -137,7 +139,7 @@ const ImageUploadModal = ({
                 クリックして画像を選択
               </p>
               <input
-                id="file-input"
+                ref={fileInputRef}
                 type="file"
                 accept="image/*"
                 onChange={onSelectFile}

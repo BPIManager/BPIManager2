@@ -21,6 +21,7 @@ import { GoalDetailDrawer } from "@/components/partials/common/OptimizerGoalCard
 import type { OptimizeMemoResponse } from "@/hooks/analytics/useOptimizeMemo";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import OptimizerIntro from "./OptimizerIntro";
+import { clickableProps } from "@/utils/common/clickableProps";
 
 type StatusFilter = "all" | "unachieved" | "achieved";
 const STATUS_FILTERS: StatusFilter[] = ["all", "unachieved", "achieved"];
@@ -129,7 +130,7 @@ const SavedMemoList = ({
           return (
             <div
               key={memo.reportId}
-              onClick={() => setOpenMemoId(memo.reportId)}
+              {...clickableProps(() => setOpenMemoId(memo.reportId))}
               className="flex cursor-pointer flex-col gap-2 rounded-lg border border-bpim-border bg-bpim-bg p-3 transition-colors hover:border-bpim-primary/40"
             >
               <div className="flex items-center gap-2">

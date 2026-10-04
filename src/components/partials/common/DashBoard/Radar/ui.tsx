@@ -11,6 +11,7 @@ import { DashCard } from "@/components/ui/dashcard";
 import { cn } from "@/lib/utils";
 import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import { clickableProps } from "@/utils/common/clickableProps";
 
 interface RadarSectionProps {
   userId?: string;
@@ -103,7 +104,7 @@ const RadarSection = ({
             return (
               <div
                 key={key}
-                onClick={() => setSelectedCat(key)}
+                {...clickableProps(() => setSelectedCat(key))}
                 className={cn(
                   "flex items-center justify-between p-2.5 rounded-md",
                   "bg-bpim-surface-2/60 border border-bpim-border cursor-pointer transition-all duration-200",
