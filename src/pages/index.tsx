@@ -1,5 +1,3 @@
-"use client";
-
 import { useUser } from "@/contexts/users/UserContext";
 import DashboardLayout from "@/components/partials/shell/DashboardLayout";
 import { Meta } from "@/components/partials/common/PageChrome/Head";

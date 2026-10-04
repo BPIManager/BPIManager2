@@ -1,5 +1,3 @@
-"use client";
-
 import DashboardLayout from "@/components/partials/shell/DashboardLayout";
 import { Meta } from "@/components/partials/common/PageChrome/Head";
 import RivalListContainer from "@/components/partials/common/Rivals/List";

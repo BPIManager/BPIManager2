@@ -12,11 +12,6 @@ const AAA_RATIO = (() => {
   return aaa.ratio;
 })();
 
-export const getRankIndex = (percentage: number): number => {
-  const index = RANK_TABLE.findLastIndex((r) => percentage >= r.ratio);
-  return index === -1 ? 0 : index;
-};
-
 /**
  * DJランクの表示ラベルと差分を返す。境界定義は getRankDetail に一本化し、表示と差分の値がずれないようにする。
  * current は現在ランクからの超過分、next は次ランクまでの不足分（最上位帯は満点までの不足分）。

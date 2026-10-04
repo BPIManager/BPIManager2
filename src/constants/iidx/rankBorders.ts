@@ -37,6 +37,5 @@ export const getRankDetail = (currentEx: number, maxScore: number) => {
     nextLabel,
     surplus: currentEx - currentBorder,
     shortage: nextBorder - currentEx,
-    isMaxSide: currentEx >= Math.ceil(maxScore * (8 / 9)),
   };
 };

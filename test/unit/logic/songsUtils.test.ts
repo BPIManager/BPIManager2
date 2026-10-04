@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { getDJRank, getRankIndex } from "@/utils/songs/djRank";
+import { getDJRank } from "@/utils/songs/djRank";
 import {
   filterSongsFrontend,
   filterSongsServerSide,
@@ -20,7 +20,7 @@ import {
 import type { SongWithScore } from "@/types/songs/score";
 import type { SongListItem } from "@/types/songs/songInfo";
 
-describe("getRankIndex / getDJRank", () => {
+describe("getDJRank", () => {
   it("AAA帯（MAX-境界未満）のcurrentはAAA+を表示すること", () => {
     // 1778/2000 は約0.889で、MAX-境界（17/18）より下
     expect(getDJRank(1778, 2000, { mode: "current", output: "label" })).toBe("AAA+");
@@ -29,10 +29,6 @@ describe("getRankIndex / getDJRank", () => {
   it("50%スコアではcurrentモードでC+ランクになること", () => {
     const label = getDJRank(1000, 2000, { mode: "current", output: "label" });
     expect(label).toBe("C+");
-  });
-
-  it("getRankIndexは0%のときF(index 0)を返すこと", () => {
-    expect(getRankIndex(0)).toBe(0);
   });
 
   // maxScore=1800 のとき AAA境界=ceil(1800*8/9)=1600、MAX-境界=ceil(1800*17/18)=1700

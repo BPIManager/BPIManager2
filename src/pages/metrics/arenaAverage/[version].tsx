@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/router";
 import { useArenaAverages } from "@/hooks/metrics/useArenaAverage";
