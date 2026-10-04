@@ -36,7 +36,7 @@ describe("manualScoreUpdateOrchestrator.saveManualScoreUpdate", () => {
         clearState: "HARD",
         missCount: 0,
       },
-      newTotalBpi: 50,
+      computeTotalBpi: () => 50,
     });
 
     const insertCalls = callsFor(spy.calls, "insertInto").map((c) => c.args[0]);
@@ -64,7 +64,7 @@ describe("manualScoreUpdateOrchestrator.saveManualScoreUpdate", () => {
         clearState: "HARD",
         missCount: 0,
       },
-      newTotalBpi: 50,
+      computeTotalBpi: () => 50,
     });
 
     expect(batchId).toBe(prefix);
@@ -89,7 +89,7 @@ describe("manualScoreUpdateOrchestrator.saveManualScoreUpdate", () => {
         clearState: "HARD",
         missCount: 0,
       },
-      newTotalBpi: 50,
+      computeTotalBpi: () => 50,
     });
 
     // プレフィックスは維持しつつ、bareなプレフィックス自体（既にlogsで使用済みの
@@ -122,7 +122,7 @@ describe("manualScoreUpdateOrchestrator.saveManualScoreUpdate", () => {
 
   it("allScoreのみの場合、allScores自体から最新の手動batchIdを判定し再利用すること(#447)", async () => {
     const prefix = getManualBatchPrefix("user-1", "34");
-    const spy = createTransactionalDbSpy(undefined, { batchId: prefix });
+    const spy = createTransactionalDbSpy({ batchId: prefix });
     dbHolder.current = spy;
 
     const { batchId } = await saveManualScoreUpdate({
@@ -138,7 +138,7 @@ describe("manualScoreUpdateOrchestrator.saveManualScoreUpdate", () => {
     });
 
     // logsテーブルには一切触れていないので、allScores側の最新batchId
-    // (直接db参照のdirectResultとして与えたもの)がそのまま再利用される
+    // (トランザクション内で読み取ったもの)がそのまま再利用される
     expect(batchId).toBe(prefix);
     const selectFromCalls = callsFor(spy.calls, "selectFrom").map(
       (c) => c.args[0],

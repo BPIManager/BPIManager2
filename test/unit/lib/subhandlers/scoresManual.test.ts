@@ -145,7 +145,7 @@ describe("handleScoreManualUpdate", () => {
     const call = saveManualScoreUpdateMock.mock.calls[0][0];
     expect(call.score).toMatchObject({ songId: 1, exScore: 900 });
     expect(call.allScore).toMatchObject({ songId: 501, exScore: 900 });
-    expect(call.newTotalBpi).toBeDefined();
+    expect(call.computeTotalBpi).toBeTypeOf("function");
     if (result.ok) {
       expect(result.body).toMatchObject({
         totalBpi: 55.5,
@@ -190,7 +190,7 @@ describe("handleScoreManualUpdate", () => {
     const call = saveManualScoreUpdateMock.mock.calls[0][0];
     expect(call.score).toBeUndefined();
     expect(call.allScore).toMatchObject({ songId: 900, exScore: 200 });
-    expect(call.newTotalBpi).toBeUndefined();
+    expect(call.computeTotalBpi).toBeUndefined();
     if (result.ok) {
       expect(result.body).toMatchObject({ scoresSaved: false, allScoresSaved: true, totalBpi: null });
     }

@@ -156,11 +156,11 @@ export async function handleScoreManualUpdate(
       };
     }
 
-    let newTotalBpi: number | undefined;
-    if (scoreInput) {
+    // 総合BPIはロック取得後の最新スコアから算出する（同時書き込みの更新分を取りこぼさない）
+    const computeTotalBpi = (lockedScores: typeof currentScores) => {
       const twelves = bpiSongMaster.filter((s) => s.difficultyLevel === 12);
       const currentExScoreMap = new Map(
-        currentScores.map((s) => [s.songId, s.exScore]),
+        lockedScores.map((s) => [s.songId, s.exScore]),
       );
       const observations: IBpiScoreObservation[] = bpiSongMaster.flatMap(
         (s) => {
@@ -173,15 +173,15 @@ export async function handleScoreManualUpdate(
             : [];
         },
       );
-      newTotalBpi = BpiCalculator.calculateTotalBPI(observations, twelves);
-    }
+      return BpiCalculator.calculateTotalBPI(observations, twelves);
+    };
 
     const { totalBpi, batchId } = await saveManualScoreUpdate({
       userId,
       version,
       score: scoreInput,
       allScore: allScoreInput,
-      newTotalBpi,
+      computeTotalBpi: scoreInput ? computeTotalBpi : undefined,
     });
 
     return {

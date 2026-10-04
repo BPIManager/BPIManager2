@@ -1,12 +1,15 @@
 import { db } from "@/lib/db";
 import { lockUserForWrite } from "@/lib/db/shared/userWriteLock";
 import { scoreWriteRepo } from "@/lib/db/domains/scores/write";
+import { latestScoresRepo } from "@/lib/db/domains/scores/latest";
 import { allScoresRepo } from "@/lib/db/domains/allScores";
 import { logBatchRepo } from "@/lib/db/domains/logs/batch";
 import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
 import { userStatusLogsWriteRepo } from "@/lib/db/domains/userStatusLogs/write";
 import { BpiCalculator } from "@/lib/bpi";
 import { getManualBatchPrefix, mintManualBatchId } from "@/lib/scores/manualBatchId";
+
+type ScoreRow = Awaited<ReturnType<typeof latestScoresRepo.getLatestScores>>[number];
 
 interface ManualScoreInput {
   songId: number;
@@ -33,7 +36,7 @@ interface ManualAllScoreInput {
  * @param params.version - バージョン番号
  * @param params.score - 保存する単曲スコア（改善が無ければ渡さない）
  * @param params.allScore - 全難易度履歴側のスコア（改善が無ければ渡さない）
- * @param params.newTotalBpi - 今回算出した総合BPI（score がある場合は必須、ラチェット適用前）
+ * @param params.computeTotalBpi - ロック取得後の最新スコアから総合BPIを算出する関数（score がある場合は必須、ラチェット適用前）
  * @returns 保存した総合BPI（score が無ければ null）と使用した batchId
  */
 export async function saveManualScoreUpdate(params: {
@@ -41,9 +44,9 @@ export async function saveManualScoreUpdate(params: {
   version: string;
   score?: ManualScoreInput;
   allScore?: ManualAllScoreInput;
-  newTotalBpi?: number;
+  computeTotalBpi?: (currentScores: ScoreRow[]) => number;
 }): Promise<{ totalBpi: number | null; batchId: string }> {
-  const { userId, version, score, allScore, newTotalBpi } = params;
+  const { userId, version, score, allScore, computeTotalBpi } = params;
 
   const prefix = getManualBatchPrefix(userId, version);
   const lastPlayed = new Date();
@@ -54,7 +57,7 @@ export async function saveManualScoreUpdate(params: {
      // score（☆11/12）は logs 側で判定・ロックし、allScore のみ（☆10以下）は logs に触れないため allScores から判定する。
     const currentLatestBatchId = score
       ? await logBatchRepo.getLatestBatchIdForUpdate(trx, userId, version)
-      : await allScoresRepo.getLatestBatchId(userId, version);
+      : await allScoresRepo.getLatestBatchId(userId, version, trx);
     const batchId = currentLatestBatchId?.startsWith(prefix)
       ? currentLatestBatchId
       : mintManualBatchId(userId, version);
@@ -75,9 +78,14 @@ export async function saveManualScoreUpdate(params: {
         userId,
         version,
       );
+      const lockedScores = await latestScoresRepo.getLatestScores(
+        userId,
+        version,
+        trx,
+      );
       totalBpi = BpiCalculator.ratchetTotalBpi(
         previousBest,
-        newTotalBpi ?? previousBest ?? -15,
+        computeTotalBpi?.(lockedScores) ?? previousBest ?? -15,
       );
 
       await logBatchRepo.upsertManualBatch(trx, {

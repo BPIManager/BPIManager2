@@ -86,8 +86,9 @@ class allScoresRepository {
   async getLatestBatchId(
     userId: string,
     version: string,
+    trx?: Transaction<Database>,
   ): Promise<string | undefined> {
-    const row = await db
+    const row = await (trx ?? db)
       .selectFrom("allScores")
       .select("batchId")
       .where("userId", "=", userId)
