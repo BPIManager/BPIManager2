@@ -8,7 +8,6 @@ export default topElements;
 
 /**
  * `title___difficulty` をキーに楽曲のレーダーカテゴリを引く共通Map。
- * 各モジュールが独自に再構築していたものをここに一本化している。
  */
 export const topElementMap: Map<string, RadarCategory> = new Map(
   topElements.map((e) => [`${e.title}___${e.difficulty}`, e.top]),
