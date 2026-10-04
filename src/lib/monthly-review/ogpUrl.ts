@@ -22,6 +22,8 @@ export function buildOgpImageUrl(params: {
     origin = "https://bpi2.poyashi.me",
     compareVersion,
   } = params;
-  const compareParam = compareVersion ? `&compareVersion=${compareVersion}` : "";
-  return `${origin}${API_V2_PREFIX}/users/${userId}/stats/monthly-review/ogp?version=${version}&month=${month}&ogp=${sections.join(",")}${compareParam}`;
+  const compareParam = compareVersion
+    ? `&compareVersion=${encodeURIComponent(compareVersion)}`
+    : "";
+  return `${origin}${API_V2_PREFIX}/users/${encodeURIComponent(userId)}/stats/monthly-review/ogp?version=${encodeURIComponent(version)}&month=${encodeURIComponent(month)}&ogp=${sections.join(",")}${compareParam}`;
 }

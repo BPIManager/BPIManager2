@@ -137,15 +137,14 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ params }) 
   let songMeta: SongMeta | null = null;
   try {
     const song = await songMasterRepo.getSongById(songId);
-    if (song) {
-      songMeta = {
-        title: song.title,
-        difficulty: song.difficulty,
-        difficultyLevel: song.difficultyLevel,
-        notes: song.notes,
-        bpm: song.bpm,
-      };
-    }
+    if (!song) return { notFound: true };
+    songMeta = {
+      title: song.title,
+      difficulty: song.difficulty,
+      difficultyLevel: song.difficultyLevel,
+      notes: song.notes,
+      bpm: song.bpm,
+    };
   } catch (error) {
     console.error("Song meta fetch error:", error);
   }
