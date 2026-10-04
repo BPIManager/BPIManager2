@@ -1,4 +1,4 @@
-import type { ArenaAverages } from "@/hooks/metrics/useArenaAveragesForSong";
+import type { ArenaAverages } from "@/types/songs/arenaAverages";
 import { unwrapApiResponse } from "@/services/swr/fetchV2";
 
 export const arenaAveragesFetcher = async (

@@ -20,6 +20,7 @@ import { useChartColors } from "@/hooks/common/useChartColors";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { versionsNonDisabledCollection } from "@/constants/iidx/versionTitles";
 import type { TotalBpiHistogramBucket } from "@/types/siteStats";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 function TotalBpiHistogramChart({
   data,
@@ -27,6 +28,7 @@ function TotalBpiHistogramChart({
   data: Record<string, TotalBpiHistogramBucket[]> | undefined;
 }) {
   const c = useChartColors();
+  const { t, tFormat } = useTranslation();
   // cronが未再生成のstats.jsonにはこのキー自体が無いことがあるため、型上は必須でも
   // 実行時は無いものとして扱う
   const histogramByVersion = data ?? {};
@@ -50,11 +52,11 @@ function TotalBpiHistogramChart({
     <DashCard className="flex flex-col">
       <div className="mb-3 flex items-center justify-between shrink-0 gap-2">
         <h3 className="text-sm font-bold uppercase text-bpim-muted">
-          総合BPI分布
+          {t("siteInfo.histogram.title")}
         </h3>
         <div className="flex items-center gap-2">
           <span className="text-[10px] text-bpim-muted">
-            全{total.toLocaleString()}人
+            {tFormat("siteInfo.histogram.total", { total: total.toLocaleString() })}
           </span>
           <Select value={version} onValueChange={setVersion}>
             <SelectTrigger className="h-7 w-28 border-bpim-border bg-bpim-surface-2/60 text-xs hover:bg-bpim-overlay focus:ring-0">
@@ -94,9 +96,17 @@ function TotalBpiHistogramChart({
                 const b = payload?.[0]?.payload as TotalBpiHistogramBucket | undefined;
                 return b ? `${b.bucketStart}〜${b.bucketEnd}` : "";
               }}
-              formatter={(v) => [Number(v).toLocaleString(), "人数"]}
+              formatter={(v) => [
+                Number(v).toLocaleString(),
+                t("siteInfo.histogram.users"),
+              ]}
             />
-            <Bar dataKey="count" name="人数" fill={c.primary} radius={[2, 2, 0, 0]} />
+            <Bar
+              dataKey="count"
+              name={t("siteInfo.histogram.users")}
+              fill={c.primary}
+              radius={[2, 2, 0, 0]}
+            />
           </BarChart>
         </ResponsiveContainer>
       </div>

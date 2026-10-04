@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useUser } from "@/contexts/users/UserContext";
-import { useBpiOptimizerMemos, type OptimizeMemo } from "@/hooks/analytics/useOptimizeMemo";
+import { useBpiOptimizerMemos, type OptimizeMemoResponse } from "@/hooks/analytics/useOptimizeMemo";
 import { fetchCustomGoalPreview } from "@/services/swr/analytics";
 import type { OptimizationResult } from "@/types/bpi-optimizer";
 import { toast } from "sonner";
@@ -23,7 +23,7 @@ const CustomGoalCreator = ({
   /** 「曲目をインポート」で他ユーザーの共有reportIdから読み込んだ初期値。 */
   initialTargets?: CustomGoalTargetInput[];
   /** 指定されている場合は新規保存ではなく、このメモを上書き更新する（編集モード）。 */
-  editingMemo?: OptimizeMemo | null;
+  editingMemo?: OptimizeMemoResponse | null;
   onBack: () => void;
   onSaved: () => void;
   /** 未保存の曲目が1つでもあるかを親へ伝える（離脱時の確認に使う）。 */

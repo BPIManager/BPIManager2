@@ -52,7 +52,7 @@ export const useNeighborRecommendedInfinite = (
       isLastPage: (page) => {
         const section = page?.[type];
         if (!section) return true;
-        return section.data.length >= section.total;
+        return section.data.length < PAGE_SIZE;
       },
       revalidateOnFocus: false,
     },

@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import { todayJst } from "@/lib/dayjs";
 import type { AuthenticatedNextApiRequest } from "@/middlewares/api/withAuth";
 import type { HandlerResult } from "@/types/api";
 
@@ -45,7 +46,7 @@ export function parsePeriodDates(
 ): { startDate: string; endDate: string } {
   const d = dayjs(date);
   if (!d.isValid()) {
-    const today = dayjs().format("YYYY-MM-DD");
+    const today = todayJst();
     return { startDate: today, endDate: today };
   }
 

@@ -1,4 +1,5 @@
 import type { ThemeId, ThemeDef } from "@/types/ui/theme";
+import { safeGetItem, safeSetItem } from "@/utils/common/safeStorage";
 
 export const THEMES: ThemeDef[] = [
   {
@@ -218,7 +219,7 @@ export const DEFAULT_THEME: ThemeId = "dark-blue";
  */
 export function getStoredTheme(): ThemeId {
   if (typeof window === "undefined") return DEFAULT_THEME;
-  const v = localStorage.getItem(STORAGE_KEY);
+  const v = safeGetItem(STORAGE_KEY);
   if (v && THEMES.find((t) => t.id === v)) return v as ThemeId;
   return DEFAULT_THEME;
 }
@@ -237,5 +238,5 @@ export function applyTheme(id: ThemeId) {
 
   html.setAttribute("data-theme", id);
 
-  localStorage.setItem(STORAGE_KEY, id);
+  safeSetItem(STORAGE_KEY, id);
 }

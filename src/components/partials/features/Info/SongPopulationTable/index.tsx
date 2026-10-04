@@ -1,6 +1,7 @@
 import { DashCard } from "@/components/ui/dashcard";
 import { Button } from "@/components/ui/button";
 import { useSongPopulation } from "@/hooks/siteStats/useSongPopulation";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 function SongPopulationTable({
   order,
@@ -10,13 +11,14 @@ function SongPopulationTable({
   title: string;
 }) {
   const { songs, isLoading, loadMore, hasMore, total } = useSongPopulation(order);
+  const { t, tFormat } = useTranslation();
 
   return (
     <DashCard>
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-sm font-bold uppercase text-bpim-muted">{title}</h3>
         <span className="text-[10px] text-bpim-muted">
-          全{total.toLocaleString()}曲
+          {tFormat("siteInfo.songPop.total", { total: total.toLocaleString() })}
         </span>
       </div>
       <div className="overflow-x-auto">
@@ -24,9 +26,15 @@ function SongPopulationTable({
           <thead>
             <tr className="border-b border-bpim-border">
               <th className="pb-2 text-left font-bold text-bpim-muted">#</th>
-              <th className="pb-2 text-left font-bold text-bpim-muted">楽曲名</th>
-              <th className="pb-2 text-left font-bold text-bpim-muted">難易度</th>
-              <th className="pb-2 text-right font-bold text-bpim-muted">プレイ人数</th>
+              <th className="pb-2 text-left font-bold text-bpim-muted">
+                {t("siteInfo.songPop.song")}
+              </th>
+              <th className="pb-2 text-left font-bold text-bpim-muted">
+                {t("siteInfo.songPop.difficulty")}
+              </th>
+              <th className="pb-2 text-right font-bold text-bpim-muted">
+                {t("siteInfo.songPop.players")}
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -53,7 +61,7 @@ function SongPopulationTable({
           onClick={loadMore}
           disabled={isLoading}
         >
-          {isLoading ? "読み込み中..." : "もっと表示 (+10件)"}
+          {isLoading ? t("common.loading") : t("siteInfo.songPop.showMore")}
         </Button>
       )}
     </DashCard>

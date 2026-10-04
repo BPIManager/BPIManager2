@@ -3,11 +3,23 @@ import {
   SongWithScore,
 } from "@/types/songs/score";
 import { RANK_TABLE } from "@/constants/iidx/rankBorders";
-import { getMaxBpm, getMinBpm, isSoflanBpm } from "./getMaxBPM";
+import { getMaxBpm, isSoflanBpm } from "./getMaxBPM";
 import dayjs from "@/lib/dayjs";
 import type { FilterParams } from "@/types/songs/filter";
 import isBetween from "dayjs/plugin/isBetween";
 dayjs.extend(isBetween);
+
+/** bpmMin は最大BPMが下限以上、bpmMax は最大BPMが上限以下（可変BPMは範囲全体が上限内）で判定する。サーバー・クライアント共通 */
+export const matchesBpmRange = (
+  bpm: string | null | undefined,
+  bpmMin?: number,
+  bpmMax?: number,
+): boolean => {
+  const maxBpm = getMaxBpm(bpm ?? null);
+  if (bpmMin && maxBpm < bpmMin) return false;
+  if (bpmMax && maxBpm > bpmMax) return false;
+  return true;
+};
 
 export const filterSongsServerSide = (
   songs: SongWithScore[],
@@ -23,9 +35,14 @@ export const filterSongsServerSide = (
 
     if (p.version && s.releasedVersion !== Number(p.version)) return false;
 
-    const maxBpm = getMaxBpm(s.bpm);
-    if (p.bpmMin && maxBpm < Number(p.bpmMin)) return false;
-    if (p.bpmMax && maxBpm > Number(p.bpmMax)) return false;
+    if (
+      !matchesBpmRange(
+        s.bpm,
+        p.bpmMin ? Number(p.bpmMin) : undefined,
+        p.bpmMax ? Number(p.bpmMax) : undefined,
+      )
+    )
+      return false;
     if (p.isSofran && !isSoflanBpm(s.bpm ?? null)) return false;
 
     if (p.notesMin && s.notes < Number(p.notesMin)) return false;
@@ -77,13 +94,7 @@ export const filterSongsFrontend = (
 
     if (params.isSofran && !isSoflanBpm(song.bpm ?? null)) return false;
 
-    if (params.bpmMin || params.bpmMax) {
-      const minBpm = getMinBpm(song.bpm ?? null);
-      const maxBpm = getMaxBpm(song.bpm ?? null);
-
-      if (params.bpmMin && maxBpm < params.bpmMin) return false;
-      if (params.bpmMax && minBpm > params.bpmMax) return false;
-    }
+    if (!matchesBpmRange(song.bpm, params.bpmMin, params.bpmMax)) return false;
 
     if (params.since) {
       if (!song.scoreAt) return false;

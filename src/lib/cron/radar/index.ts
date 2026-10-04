@@ -1,14 +1,14 @@
 import { calculateRadar, buildRadarSongMaster } from "@/lib/radar/calculator";
+import { computeCanonicalTotalBpi } from "@/lib/bpi/canonicalTotalBpi";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
-import { BpiCalculator } from "@/lib/bpi";
 import { statsLatestScoresRepo } from "@/lib/db/aggregates/stats/latestScores";
+import { statsSongTablesRepo } from "@/lib/db/aggregates/stats/songTables";
 import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { usersRepo } from "@/lib/db/domains/users";
 import {
   radarCacheRepo,
   type NewUserRadarCache,
 } from "@/lib/db/domains/radar";
-import type { IBpiBasicSongData, IBpiScoreObservation } from "@/types/songs/bpi";
 
 /**
  * getLatestScoresWithMusicDataForAllUsers を1回で呼ぶユーザー数の上限。
@@ -22,9 +22,10 @@ const USER_PAGE_SIZE = 200;
  */
 export async function updateAllUserRadarCache() {
   const version = latestVersion;
-  const [users, fullMaster] = await Promise.all([
+  const [users, fullMaster, validSongKeys] = await Promise.all([
     usersRepo.getAllUserIds(),
     songMasterRepo.getSongMasterWithDef(),
+    statsSongTablesRepo.getFilteredSongKeys(version),
   ]);
   const radarSongMaster = buildRadarSongMaster(fullMaster);
   const total = users.length;
@@ -59,30 +60,9 @@ export async function updateAllUserRadarCache() {
         const scores = scoresByUser.get(user.userId) ?? [];
 
         if (scores.length > 0) {
-          const radar = calculateRadar(scores, radarSongMaster);
+          const radar = calculateRadar(scores, radarSongMaster, validSongKeys);
 
-          const master: (IBpiBasicSongData & { songId: number })[] =
-            scores.map((s) => ({
-              songId: s.songId,
-              notes: Number(s.notes),
-              kaidenAvg: s.kaidenAvg,
-              wrScore: s.wrScore,
-              coef: s.coef,
-              mu: s.mu,
-              sigma: s.sigma,
-              residualVar: s.residualVar,
-            }));
-          const observations: IBpiScoreObservation[] = scores
-            .filter((s) => s.exScore != null)
-            .map((s) => ({
-              songId: s.songId,
-              notes: Number(s.notes),
-              exScore: Number(s.exScore),
-            }));
-          const totalBpi = BpiCalculator.calculateTotalBPI(
-            observations,
-            master,
-          );
+          const totalBpi = computeCanonicalTotalBpi(scores, fullMaster);
 
           const values = {
             notes: radar.NOTES.totalBpi,

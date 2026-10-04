@@ -15,9 +15,9 @@ import {
 import { iidxUrl } from "@/constants/iidx/eamusementUrls";
 import { toast } from "sonner";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import { SITE_URL } from "@/constants/site/url";
 
-const BOOKMARKLET_CODE =
-  "javascript:(function(){var s=document.createElement('script');s.src='https://bpi2.poyashi.me/bookmarklet.js?t='+Date.now();document.body.appendChild(s);})();";
+const BOOKMARKLET_CODE = `javascript:(function(){var s=document.createElement('script');s.src='${SITE_URL}/bookmarklet.js?t='+Date.now();document.body.appendChild(s);})();`;
 
 interface BookmarkletAccordionProps {
   lastStep?: React.ReactNode;

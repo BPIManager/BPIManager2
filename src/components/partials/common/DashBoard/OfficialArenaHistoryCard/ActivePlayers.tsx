@@ -2,7 +2,7 @@
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { getArenaClassColor } from "@/utils/arenaClass";
 import { HelpTooltip } from "@/components/ui/tooltip";
-import type { ActiveArenaData } from "@/hooks/arena/useActiveArenaPlayers";
+import type { ActiveArenaData } from "@/types/arena/activeArena";
 
 const COUNT_COLOR: [number, string][] = [
   [0, "text-bpim-muted"],

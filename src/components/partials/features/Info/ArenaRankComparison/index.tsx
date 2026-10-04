@@ -13,6 +13,7 @@ import { latestVersion, arenaDataVersion } from "@/constants/iidx/iidxVersions";
 import { versionsNonDisabledCollection } from "@/constants/iidx/versionTitles";
 import type { ArenaRankEntry } from "@/types/siteStats";
 import { AlertCircleIcon } from "lucide-react";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 function ArenaRankComparison({
   selfReported,
@@ -20,6 +21,7 @@ function ArenaRankComparison({
   selfReported: Record<string, ArenaRankEntry[]> | undefined;
 }) {
   const selfReportedByVersion = selfReported ?? {};
+  const { t } = useTranslation();
   const availableVersions = versionsNonDisabledCollection.filter(
     (v) => selfReportedByVersion[v.value]?.some((e) => e.count > 0),
   );
@@ -45,7 +47,7 @@ function ArenaRankComparison({
     <DashCard>
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-sm font-bold uppercase text-bpim-muted">
-          アリーナランク別登録者数
+          {t("siteInfo.arenaRank.title")}
         </h3>
         <Select value={version} onValueChange={setVersion}>
           <SelectTrigger className="h-7 w-28 border-bpim-border bg-bpim-surface-2/60 text-xs hover:bg-bpim-overlay focus:ring-0">
@@ -63,23 +65,23 @@ function ArenaRankComparison({
 
       {isError ? (
         <p className="text-xs text-bpim-muted">
-          公式データが未生成です。生成されるまでしばらくお待ちください。
+          {t("siteInfo.arenaCompare.notGenerated")}
         </p>
       ) : (
         <div className="flex flex-col gap-2">
           <div className="grid grid-cols-[48px_1fr_52px_52px_52px] gap-x-3 px-1">
             <span className="text-[8px] font-bold uppercase text-bpim-muted">
-              ランク
+              {t("siteInfo.arenaCompare.rank")}
             </span>
             <span className="text-[9px] font-bold uppercase text-bpim-muted" />
             <span className="text-right text-[8px] font-bold uppercase text-bpim-muted">
               BPIM2
             </span>
             <span className="text-right text-[8px] font-bold uppercase text-bpim-muted">
-              全プレイヤー
+              {t("siteInfo.arenaCompare.allPlayers")}
             </span>
             <span className="text-right text-[8px] font-bold uppercase text-bpim-muted">
-              カバー率
+              {t("siteInfo.arenaCompare.coverage")}
             </span>
           </div>
           {entries.map((entry) => {
@@ -146,7 +148,7 @@ function ArenaRankComparison({
       <div className="flex items-center gap-2 rounded-lg border border-bpim-border bg-bpim-surface px-3 py-2 text-xs text-bpim-muted mt-2">
         <AlertCircleIcon size={12} className="shrink-0" />
         <span>
-          eAMUSEMENTサイトの制約により上位6,000名のデータのみ取得できるため、B1以降の実人数データは不正確です。
+          {t("siteInfo.arenaCompare.note")}
         </span>
       </div>
     </DashCard>

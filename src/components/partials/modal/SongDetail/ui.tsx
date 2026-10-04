@@ -19,6 +19,7 @@ import SongHistoryTab from "./History/ui";
 import RivalsRanking from "./Rivals";
 import { AppTabsList, AppTabsTrigger } from "@/components/ui/complex/tabs";
 import StatsTab from "./Stats";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface RankInfo {
   label: string;
@@ -74,6 +75,7 @@ const SongDetailModalView = ({
   edit,
   display,
 }: SongDetailModalViewProps) => {
+  const { t, tFormat } = useTranslation();
   const { maxScore, displayEx, rankInfo, draftBpi, bpiInfo } = display;
 
   return (
@@ -107,7 +109,7 @@ const SongDetailModalView = ({
                 onClick={edit.onSave}
                 disabled={!edit.canSave || edit.isSaving}
               >
-                {edit.isSaving ? <LoadingSpinner size="sm" /> : "保存"}
+                {edit.isSaving ? <LoadingSpinner size="sm" /> : t("common.save")}
               </Button>
             </div>
           )}
@@ -123,7 +125,7 @@ const SongDetailModalView = ({
                     type="button"
                     onClick={edit.onStartEditing}
                     className="text-bpim-muted hover:text-bpim-primary"
-                    aria-label="EXスコアを編集"
+                    aria-label={t("songDetail.editExScore")}
                   >
                     <PencilIcon className="h-3 w-3" />
                   </button>
@@ -176,7 +178,10 @@ const SongDetailModalView = ({
                 </span>
                 <span className="mt-1 text-[10px] font-bold text-bpim-primary/60">
                   {draftBpi != null
-                    ? `BPI${bpiInfo.next}まで +${bpiInfo.diff}`
+                    ? tFormat("songDetail.bpiToNext", {
+                        next: bpiInfo.next,
+                        diff: bpiInfo.diff,
+                      })
                     : "-"}
                 </span>
               </div>
@@ -210,7 +215,9 @@ const SongDetailModalView = ({
                   : `${rankInfo.label} + ${rankInfo.surplus}`}
               </span>
               <span className="mt-1 text-[10px] font-bold text-bpim-danger/80">
-                {rankInfo.label === "MAX-" ? "MAX" : rankInfo.nextLabel}まで{" "}
+                {tFormat("songDetail.untilRank", {
+                  label: rankInfo.label === "MAX-" ? "MAX" : rankInfo.nextLabel,
+                })}{" "}
                 {rankInfo.shortage}
               </span>
             </div>

@@ -10,6 +10,7 @@ import ProfileSideBar from "@/components/partials/common/Profile/Sidebar/ui";
 import { ProfileProvider } from "@/contexts/profile/ProfileContext";
 import { FilterProvider } from "@/contexts/stats/FilterContext";
 import { PageLoader } from "@/components/ui/loading-spinner";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface ProfileLayoutShellProps {
   userId: string;
@@ -27,6 +28,7 @@ const ProfileLayoutShell = ({
   bannerType,
   children,
 }: ProfileLayoutShellProps) => {
+  const { t } = useTranslation();
   const { user } = useUser();
   const {
     profile,
@@ -55,16 +57,16 @@ const ProfileLayoutShell = ({
             error={isError}
             title={
               isPrivate
-                ? "非公開のプロフィール"
+                ? t("profileShell.privateTitle")
                 : isNotFound
-                  ? "ユーザーが見つかりません"
+                  ? t("profileShell.notFoundTitle")
                   : undefined
             }
             description={
               isPrivate
-                ? "このユーザーはプロフィールを非公開に設定しています。"
+                ? t("profileShell.privateDesc")
                 : isNotFound
-                  ? "指定されたIDのユーザーは存在しないか、退会した可能性があります。"
+                  ? t("profileShell.notFoundDesc")
                   : undefined
             }
             icon={

@@ -1,9 +1,10 @@
 import type { NextApiRequest } from "next";
+import { radarTopOf } from "@/constants/iidx/radars/topElements";
 import { timelineRepo } from "@/lib/db/domains/scores/timeline";
 import { selfVersionComparisonQuerySchema } from "@/schemas/scores/query";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { err, ok } from "@/middlewares/api/apiResult";
-import { radarLookup, targetOf, type HandleOutcome } from "./_shared";
+import { targetOf, type HandleOutcome } from "./_shared";
 import type { AccessResult } from "@/middlewares/api/withApi";
 
 export async function handleSelfVersion(
@@ -91,7 +92,7 @@ export async function handleSelfVersion(
         myBpi !== null && prevBpi !== null
           ? Math.round((myBpi - prevBpi) * 100) / 100
           : undefined,
-      radarTop: radarLookup.get(`${row.title}__${row.difficulty}`) ?? null,
+      radarTop: radarTopOf(row.title, row.difficulty),
     };
   });
 

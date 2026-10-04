@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { DIFF_COLORS as diffColors } from "@/constants/theme/difficultyColors";
+import { clickableProps } from "@/utils/common/clickableProps";
 
 export const getLampClass = (clearState: string | null | undefined) => {
   if (!clearState || clearState === "NO PLAY") return "bg-bpim-overlay";
@@ -81,7 +82,7 @@ const SongItem = ({
 
   return (
     <div
-      onClick={onClick}
+      {...clickableProps(onClick)}
       className={cn(
         "relative w-full mb-2 cursor-pointer transition-colors duration-200 overflow-hidden rounded-sm",
         "bg-bpim-surface hover:bg-bpim-overlay",

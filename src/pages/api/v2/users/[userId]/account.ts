@@ -23,4 +23,4 @@ const handler = async (
   writeV2Result(res, withMeta(result, buildMeta(viewerId, targetUserId)));
 };
 
-export default withAuth(handler);
+export default withAuth(handler, { rejectApiKeySession: true });

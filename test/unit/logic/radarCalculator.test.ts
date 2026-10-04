@@ -47,9 +47,21 @@ function buildMasterForCategory(category: RadarCategory): RadarSongMaster {
 
 const emptyMaster: RadarSongMaster = new Map();
 
+/** topElements 上の全譜面キー（バージョンで絞り込まない場合の validSongKeys） */
+function allKeysOf(
+  byCategory: Map<RadarCategory, { title: string; difficulty: string }[]>,
+): Set<string> {
+  return new Set(
+    Array.from(byCategory.values())
+      .flat()
+      .map((e) => `${e.title}___${e.difficulty}`),
+  );
+}
+const allKeys = allKeysOf(topElementsByCategory);
+
 describe("calculateRadar", () => {
   it("スコアが空の場合、全カテゴリのtotalBpiが-15になること", () => {
-    const result = calculateRadar([], emptyMaster);
+    const result = calculateRadar([], emptyMaster, allKeys);
     for (const category of ALL_RADAR_CATEGORIES) {
       expect(result[category].totalBpi).toBe(-15);
     }
@@ -67,6 +79,7 @@ describe("calculateRadar", () => {
         },
       ],
       emptyMaster,
+      allKeys,
     );
 
     for (const category of ALL_RADAR_CATEGORIES) {
@@ -90,6 +103,7 @@ describe("calculateRadar", () => {
         },
       ],
       master,
+      allKeys,
     );
 
     const category = result[sample.top as RadarCategory];
@@ -114,6 +128,7 @@ describe("calculateRadar", () => {
         },
       ],
       emptyMaster,
+      allKeys,
     );
     const entry = result[sample.top as RadarCategory].songs.find(
       (s) => s.title === sample.title && s.difficulty === sample.difficulty,
@@ -122,7 +137,7 @@ describe("calculateRadar", () => {
   });
 
   it("songsはbpi降順でソートされること", () => {
-    const result = calculateRadar([], emptyMaster);
+    const result = calculateRadar([], emptyMaster, allKeys);
     for (const category of ALL_RADAR_CATEGORIES) {
       const bpis = result[category].songs.map((s) => s.bpi);
       const sorted = [...bpis].sort((a, b) => b - a);
@@ -145,6 +160,7 @@ describe("calculateRadar", () => {
         },
       ],
       master,
+      allKeys,
     );
 
     const category = result[category0];
@@ -173,7 +189,7 @@ describe("calculateRadar", () => {
   });
 
   it("validSongKeysを指定すると、未プレイ曲のうち含まれないものが除外されること", () => {
-    const withoutFilter = calculateRadar([], emptyMaster);
+    const withoutFilter = calculateRadar([], emptyMaster, allKeysOf(topElementsByCategory));
     const withEmptyFilter = calculateRadar([], emptyMaster, new Set());
 
     const category = ALL_RADAR_CATEGORIES.find(

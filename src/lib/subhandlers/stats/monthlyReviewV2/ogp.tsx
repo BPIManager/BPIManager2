@@ -230,7 +230,7 @@ export async function generateMonthlyReviewOgpImage(q: {
   const [
     userInfo,
     bpiTimeline,
-    { latestInMonth, songUpdateDateMap },
+    { latestInMonth },
     arenaRows,
     versionHistoryRows,
     compareBpiTimeline,
@@ -277,7 +277,6 @@ export async function generateMonthlyReviewOgpImage(q: {
   const radarGrowth = buildRadarGrowth(
     topImprovedSongs,
     bpiTimeline.allL12SongMeta,
-    songUpdateDateMap,
     bpiTimeline.ownerPreMonthExScoreMap,
     bpiTimeline.finalExScoreMap,
     topBpiSongs,

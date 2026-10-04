@@ -63,7 +63,7 @@ export const useProfile = (userId: string | undefined) => {
       );
 
       if (fbUser && userId) {
-        // useRivalComparisonが使うSWRキー(useAuthedSWR経由)と一致させる必要がある
+        // useRivalComparisonが使うSWRキー(useAuthedSWRV2経由)と一致させる必要がある
         const compareKey = [
           `${API_V2_PREFIX}/users/${userId}/profile?compare=true`,
           fbUser.uid,

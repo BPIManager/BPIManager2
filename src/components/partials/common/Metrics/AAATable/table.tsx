@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/tooltip";
 import AAATableTooltip from "./tooltip";
 import { cn } from "@/lib/utils";
+import { clickableProps } from "@/utils/common/clickableProps";
 
 const AAAGridItem = ({
   item,
@@ -52,10 +53,10 @@ const AAAGridItem = ({
       <Tooltip open={open} onOpenChange={setOpen} delayDuration={0}>
         <TooltipTrigger asChild>
           <div
-            onClick={(e) => {
+            {...clickableProps((e) => {
               e.stopPropagation();
               setOpen(!open);
-            }}
+            })}
             className={cn(
               "group relative flex cursor-help flex-col gap-2 rounded-md p-3 transition-all duration-150 ease-out border select-none",
               bgColorClass,

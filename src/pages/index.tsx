@@ -1,5 +1,3 @@
-"use client";
-
 import { useUser } from "@/contexts/users/UserContext";
 import DashboardLayout from "@/components/partials/shell/DashboardLayout";
 import { Meta } from "@/components/partials/common/PageChrome/Head";
@@ -33,6 +31,7 @@ import { WidgetId } from "@/types/dashboard/layout";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
+import { SITE_URL } from "@/constants/site/url";
 
 function WidgetRenderer({
   id,
@@ -90,7 +89,7 @@ export default function DashboardPage() {
         <Meta
           title=""
           description={t("login.subTitle")}
-          ogImage={`https://bpi2.poyashi.me${API_V2_PREFIX}/site/ogp-sample`}
+          ogImage={`${SITE_URL}${API_V2_PREFIX}/site/ogp-sample`}
         />
         <PageLoader size="lg" />
       </>

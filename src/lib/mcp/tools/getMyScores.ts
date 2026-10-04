@@ -1,10 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import dayjs from "@/lib/dayjs";
-import { scoreDetailRepo } from "@/lib/db/domains/scores/detail";
-import { mapToFlatSong } from "@/utils/logs/getMapFlatten";
-import { filterSongsServerSide } from "@/utils/songs/filter";
-import { sortSongs } from "@/utils/songs/sort";
 import { mcpScoresQuerySchema, MCP_SCORES_DEFAULT_LIMIT } from "@/lib/mcp/schemas";
+import { buildScoresResponse } from "./_scoresResponse";
 
 export function registerGetMyScores(server: McpServer, userId: string) {
   server.registerTool(
@@ -23,43 +19,6 @@ export function registerGetMyScores(server: McpServer, userId: string) {
         `該当件数がlimitを超える場合は先頭からlimit件のみ返し、全体件数を通知する。`,
       inputSchema: mcpScoresQuerySchema.shape,
     },
-    async ({ version, asOf, limit, ...filterParams }) => {
-      const time =
-        !asOf || asOf === "latest"
-          ? dayjs.tz().utc().toDate()
-          : dayjs.tz(asOf).utc().toDate();
-
-      const results = await scoreDetailRepo.getScoresWithDetails(userId, version, {
-        targetTime: time,
-        clearState: filterParams.clearState,
-        bpiMin: filterParams.bpiMin,
-        bpiMax: filterParams.bpiMax,
-        notesMin: filterParams.notesMin,
-        notesMax: filterParams.notesMax,
-      });
-
-      const songs = results.map(mapToFlatSong);
-      const processed = sortSongs(
-        filterSongsServerSide(songs, filterParams),
-        filterParams,
-      );
-
-      const totalCount = processed.length;
-      const truncated = totalCount > limit;
-      const items = truncated ? processed.slice(0, limit) : processed;
-
-      const notice = truncated
-        ? `該当${totalCount}件中、先頭${limit}件のみ返却しました。` +
-          `残りを見るには limit を増やすか、` +
-          `clearState/bpiMin/bpiMax/bpmMin/bpmMax/notesMin/notesMax/isSofran/search 等で絞り込んでください。`
-        : `該当${totalCount}件を返却しました。`;
-
-      return {
-        content: [
-          { type: "text", text: notice },
-          { type: "text", text: JSON.stringify(items) },
-        ],
-      };
-    },
+    async (query) => buildScoresResponse(userId, query),
   );
 }

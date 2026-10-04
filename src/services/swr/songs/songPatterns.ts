@@ -1,5 +1,5 @@
 import { User as FirebaseUser } from "firebase/auth";
-import type { PatternsPage } from "@/hooks/songs/useSongPatterns";
+import type { PatternsPage } from "@/types/songs/patterns";
 import { fetcherV2 } from "@/services/swr/fetchV2";
 
 export function fetchSongPatternsPage(

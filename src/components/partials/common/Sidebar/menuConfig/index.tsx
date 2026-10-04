@@ -22,6 +22,7 @@ import {
 import { latestVersion, arenaDataVersion } from "@/constants/iidx/iidxVersions";
 import type { TranslationKey } from "@/lib/i18n/translations";
 import { XIcon } from "@/components/partials/common/Auth/Buttons";
+import { SITE_URL } from "@/constants/site/url";
 
 type T = (key: TranslationKey) => string;
 
@@ -80,7 +81,7 @@ export const getInfoMenuItems = (t: T) => [
   {
     label: "MCP Server",
     icon: Plug,
-    href: "https://bpi2.poyashi.me/api/mcp",
+    href: `${SITE_URL}/api/mcp`,
     isExternal: true,
   },
   {

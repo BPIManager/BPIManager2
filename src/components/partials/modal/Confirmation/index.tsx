@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { AlertTriangle } from "lucide-react";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface Props {
   isOpen: boolean;
@@ -33,12 +34,13 @@ const ActionConfirmDialog = ({
   onConfirm,
   title,
   description,
-  confirmLabel = "実行",
-  cancelLabel = "キャンセル",
+  confirmLabel,
+  cancelLabel,
   isDestructive = false,
   isConfirmDisabled = false,
   isLoading = false,
 }: Props) => {
+  const { t } = useTranslation();
   return (
     <Dialog
       open={isOpen}
@@ -71,7 +73,7 @@ const ActionConfirmDialog = ({
             disabled={isLoading}
             className="h-9 px-4 text-bpim-muted hover:text-bpim-text hover:bg-bpim-overlay/50"
           >
-            {cancelLabel}
+            {cancelLabel ?? t("common.cancel")}
           </Button>
           <Button
             onClick={onConfirm}
@@ -83,7 +85,11 @@ const ActionConfirmDialog = ({
                 : "bg-bpim-primary hover:bg-bpim-primary text-bpim-text",
             )}
           >
-            {isLoading ? <LoadingSpinner size="sm" /> : confirmLabel}
+            {isLoading ? (
+                <LoadingSpinner size="sm" />
+              ) : (
+                (confirmLabel ?? t("common.execute"))
+              )}
           </Button>
         </DialogFooter>
       </DialogContent>

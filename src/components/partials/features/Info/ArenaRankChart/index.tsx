@@ -9,13 +9,15 @@ import {
 } from "recharts";
 import { DashCard } from "@/components/ui/dashcard";
 import { useChartColors } from "@/hooks/common/useChartColors";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 function ArenaRankChart({ data }: { data: { rank: string; count: number }[] }) {
   const c = useChartColors();
+  const { t } = useTranslation();
   return (
     <DashCard className="h-80 flex flex-col">
       <h3 className="mb-3 text-sm font-bold uppercase text-bpim-muted shrink-0">
-        アリーナランク別登録者数
+        {t("siteInfo.arenaRank.title")}
       </h3>
       <div className="flex-1 min-h-0">
         <ResponsiveContainer width="100%" height="100%">
@@ -49,7 +51,12 @@ function ArenaRankChart({ data }: { data: { rank: string; count: number }[] }) {
                 fontSize: 11,
               }}
             />
-            <Bar dataKey="count" name="登録者数" fill={c.primary} radius={[0, 2, 2, 0]} />
+            <Bar
+              dataKey="count"
+              name={t("siteInfo.arenaRank.registered")}
+              fill={c.primary}
+              radius={[0, 2, 2, 0]}
+            />
           </BarChart>
         </ResponsiveContainer>
       </div>

@@ -12,6 +12,7 @@ import { LoginRequiredCard } from "@/components/partials/common/Auth/LoginRequir
 import AccountSettings from "@/components/partials/modal/AccountSettings";
 import { cn } from "@/lib/utils";
 import { UserRelationship } from "@/types/users/profile";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 const FollowSection = ({
   relationship,
@@ -29,6 +30,7 @@ const FollowSection = ({
   onModal?: boolean;
 }) => {
   const { fbUser } = useUser();
+  const { t } = useTranslation();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const isLoggedIn = !!fbUser?.uid;
   const isMe = useIsOwnProfile(userId);
@@ -42,7 +44,7 @@ const FollowSection = ({
           className={cn("w-full rounded-full font-bold h-9", className)}
         >
           <Settings2 className="mr-2 h-4 w-4" />
-          編集
+          {t("common.edit")}
         </Button>
         <AccountSettings
           isOpen={isSettingsOpen}
@@ -61,7 +63,9 @@ const FollowSection = ({
       ) : (
         <Plus className="mr-2 h-4 w-4" />
       )}
-      {relationship.isFollowing ? "フォロー中" : "フォロー"}
+      {relationship.isFollowing
+        ? t("followSection.following")
+        : t("followSection.follow")}
     </>
   );
 
@@ -107,14 +111,14 @@ const FollowSection = ({
               variant="secondary"
               className="bg-bpim-primary/10 text-bpim-primary border-bpim-border px-2 py-0 text-[10px]"
             >
-              相互フォロー
+              {t("followSection.mutual")}
             </Badge>
           ) : relationship.isFollowedBy ? (
             <Badge
               variant="secondary"
               className="bg-bpim-primary/10 text-bpim-primary border-bpim-border px-2 py-0 text-[10px]"
             >
-              フォローされています
+              {t("followSection.followedBy")}
             </Badge>
           ) : null}
         </div>

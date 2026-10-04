@@ -6,6 +6,8 @@ interface RateLimitOptions {
   windowMs: number;
   /** 時間窓内に許可するリクエスト数 */
   max: number;
+  /** 指定するとルート単位の独立したカウンタになる（未指定は共有カウンタ） */
+  name?: string;
 }
 
 interface Bucket {
@@ -20,7 +22,7 @@ const buckets = new Map<string, Bucket>();
 
 function getClientIp(req: NextApiRequest): string {
   // CF-Connecting-IP と CF-Ray は両方揃い IP 形式として妥当な場合のみ信頼し、無ければソケットのアドレスを使う。
-   // 注: オリジンに直接接続するクライアントはヘッダを偽装できるため、完全な防御には Authenticated Origin Pulls 等が別途必要。
+  // 注: オリジンに直接接続するクライアントはヘッダを偽装できるため、完全な防御には Authenticated Origin Pulls 等が別途必要。
   const cfRay = req.headers["cf-ray"];
   const cfConnectingIp = req.headers["cf-connecting-ip"];
   if (typeof cfRay === "string" && typeof cfConnectingIp === "string") {
@@ -38,11 +40,11 @@ function getClientIp(req: NextApiRequest): string {
  * @param options.max - 時間窓内に許可するリクエスト数
  */
 export const withRateLimit = (
-  handler: (req: NextApiRequest, res: NextApiResponse) => Promise<void> | void,
+  handler: (req: NextApiRequest, res: NextApiResponse) => unknown,
   options: RateLimitOptions,
 ) => {
   return async (req: NextApiRequest, res: NextApiResponse) => {
-    const ip = getClientIp(req);
+    const ip = `${options.name ?? ""}:${getClientIp(req)}`;
     const now = Date.now();
 
     if (buckets.size > MAX_TRACKED_CLIENTS) {

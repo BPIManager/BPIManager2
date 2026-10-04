@@ -23,6 +23,12 @@ export function buildArena(arenaRows: ArenaRow[]): MonthlyArena | null {
       bestClassIdx = idx;
       bestClass = row.arenaClass;
       bestRank = row.arenaRank;
+    } else if (
+      idx === bestClassIdx &&
+      row.arenaRank != null &&
+      (bestRank == null || row.arenaRank < bestRank)
+    ) {
+      bestRank = row.arenaRank;
     }
     const a1c = row.a1continue != null ? Number(row.a1continue) : null;
     if (a1c != null && (maxA1Continue == null || a1c > maxA1Continue)) {

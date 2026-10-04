@@ -1,4 +1,4 @@
-import { useStatsData } from "@/services/swr/stats";
+import { useStatsData } from "@/hooks/stats/useStatsData";
 
 /**
  * ユーザーのスコア更新アクティビティ（日別件数）を取得する。

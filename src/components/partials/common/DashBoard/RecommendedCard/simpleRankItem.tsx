@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { getLampClass } from "@/components/partials/common/Table/ui";
 import { DIFF_COLORS as diffColors } from "@/constants/theme/difficultyColors";
 import { RecommendedItem } from "@/types/stats/recommended";
+import { clickableProps } from "@/utils/common/clickableProps";
 
 interface SimpleRankItemProps {
   item: RecommendedItem;
@@ -24,7 +25,7 @@ const SimpleRankItem = ({
 
   return (
     <div
-      onClick={onClick}
+      {...clickableProps(onClick)}
       className={cn(
         "group relative flex items-center justify-between gap-3 p-3 pl-4 transition-colors duration-200",
         "border-b border-bpim-border cursor-pointer hover:bg-bpim-overlay/50",

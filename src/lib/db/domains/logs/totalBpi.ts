@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 
-import { sql, Expression } from "kysely";
+import { sql, Expression, type Transaction } from "kysely";
+import type { Database } from "@/types/db";
 
 
 /**
@@ -10,8 +11,12 @@ class LogTotalBpiRepository {
   /**
    * 指定したユーザー・バージョンの最新のバッチログを取得する
    */
-  async getLatestTotalBpi(userId: string, version: string) {
-    return await db
+  async getLatestTotalBpi(
+    userId: string,
+    version: string,
+    trx?: Transaction<Database>,
+  ) {
+    return await (trx ?? db)
       .selectFrom("logs")
       .select("totalBpi")
       .where("userId", "=", userId)

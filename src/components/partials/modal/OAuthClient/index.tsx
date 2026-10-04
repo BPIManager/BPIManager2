@@ -17,8 +17,9 @@ import {
 } from "@/components/ui/dialog";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import { SITE_URL } from "@/constants/site/url";
 
-const MCP_ENDPOINT_URL = "https://bpi2.poyashi.me/api/mcp";
+const MCP_ENDPOINT_URL = `${SITE_URL}/api/mcp`;
 
 function parseRedirectUris(raw: string) {
   return raw

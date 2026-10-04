@@ -39,7 +39,7 @@
       "post": {
         "summary": "カスタムトークン取得",
         "deprecated": false,
-        "description": "API キーを使用して Firebase Custom Token を取得します。\n取得した `customToken` は、そのままでは Bearer トークンとして使用できません。\nGoogleapis の Firebase REST API (`https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken`) に渡して **Firebase ID Token** (`idToken`) に交換してから `Authorization: Bearer <idToken>` として使用してください。\n\nCustom Token の有効期限は **1時間** です。\n",
+        "description": "API キーを使用して Firebase Custom Token を取得します。\n取得した `customToken` は、そのままでは Bearer トークンとして使用できません。\nGoogleapis の Firebase REST API (`https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken`) に渡して **Firebase ID Token** (`idToken`) に交換してから `Authorization: Bearer <idToken>` として使用してください。\n\nCustom Token の有効期限は **1時間** です。\n\nこのトークン由来のセッションには `viaApiKey` クレームが付き、アカウント削除・連携アカウント変更・API キーの取得/再発行は拒否されます（スコア読み書きなどのインポート用途のみ）。\n",
         "tags": [
           "Auth"
         ],
@@ -259,7 +259,7 @@
       "get": {
         "summary": "API キー確認",
         "deprecated": false,
-        "description": "現在ログイン中のユーザーの API キーが存在するかを確認します。\nセキュリティのため末尾 4 桁のみ返します。\n",
+        "description": "現在ログイン中のユーザーの API キーが存在するかを確認します。\nセキュリティのため末尾 4 桁のみ返します。\n\n**注意:** API キー（`POST /token` で取得した Custom Token 由来）のセッションでは利用できません（403 Forbidden）。通常ログインの Firebase ID Token でのみ呼び出せます。\n",
         "tags": [
           "Auth"
         ],
@@ -318,7 +318,7 @@
       "put": {
         "summary": "API キー発行 / 再発行",
         "deprecated": false,
-        "description": "新しい API キーを発行します。既存のキーは上書きされます。\n発行されたキーは **この一度しか平文で返されません**。安全に保管してください。\n",
+        "description": "新しい API キーを発行します。既存のキーは上書きされます。\n発行されたキーは **この一度しか平文で返されません**。安全に保管してください。\n\n**注意:** API キー（`POST /token` で取得した Custom Token 由来）のセッションでは利用できません（403 Forbidden）。通常ログインの Firebase ID Token でのみ呼び出せます。\n",
         "tags": [
           "Auth"
         ],
@@ -11270,6 +11270,7 @@
     "/users/{userId}/account": {
       "delete": {
         "summary": "アカウント削除",
+        "description": "アカウントと関連データを削除します。\n**注意:** API キー（`POST /token` で取得した Custom Token 由来）のセッションでは利用できません（403 Forbidden）。通常ログインの Firebase ID Token でのみ呼び出せます。\n",
         "deprecated": false,
         "tags": [
           "Profile"

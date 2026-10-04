@@ -21,6 +21,8 @@ import { storage } from "@/lib/firebase";
 import { toast } from "sonner";
 import { Upload } from "lucide-react";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { clickableProps } from "@/utils/common/clickableProps";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface Props {
   uid: string;
@@ -35,10 +37,12 @@ const ImageUploadModal = ({
   onClose,
   onSuccess,
 }: Props) => {
+  const { t } = useTranslation();
   const [imgSrc, setImgSrc] = useState("");
   const [crop, setCrop] = useState<Crop>();
   const [isUploading, setIsUploading] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const clearSelection = () => {
     setImgSrc("");
@@ -110,10 +114,10 @@ const ImageUploadModal = ({
 
       onSuccess(downloadURL);
       handleClose();
-      toast.success("画像をアップロードしました");
+      toast.success(t("imageCrop.uploaded"));
     } catch (error) {
       console.error(error);
-      toast.error("アップロードに失敗しました");
+      toast.error(t("imageCrop.uploadFailed"));
     } finally {
       setIsUploading(false);
     }
@@ -123,21 +127,23 @@ const ImageUploadModal = ({
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent className="sm:max-w-md border-bpim-border bg-bpim-bg p-4">
         <DialogHeader>
-          <DialogTitle className="text-bpim-text">画像を選択</DialogTitle>
+          <DialogTitle className="text-bpim-text">
+            {t("imageCrop.title")}
+          </DialogTitle>
         </DialogHeader>
 
         <div className="flex flex-col items-center justify-center gap-4 py-4">
           {!imgSrc ? (
             <div
-              onClick={() => document.getElementById("file-input")?.click()}
+              {...clickableProps(() => fileInputRef.current?.click())}
               className="flex w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-bpim-border bg-bpim-surface-2/60 p-12 transition-colors hover:bg-bpim-overlay"
             >
               <Upload className="h-8 w-8 text-bpim-muted" />
               <p className="text-sm text-bpim-muted font-medium">
-                クリックして画像を選択
+                {t("imageCrop.clickToSelect")}
               </p>
               <input
-                id="file-input"
+                ref={fileInputRef}
                 type="file"
                 accept="image/*"
                 onChange={onSelectFile}
@@ -173,7 +179,7 @@ const ImageUploadModal = ({
               onClick={clearSelection}
               className="h-9"
             >
-              再選択
+              {t("imageCrop.reselect")}
             </Button>
           )}
           <Button
@@ -182,7 +188,7 @@ const ImageUploadModal = ({
             disabled={isUploading}
             className="h-9 text-bpim-muted"
           >
-            キャンセル
+            {t("common.cancel")}
           </Button>
           {imgSrc && (
             <Button
@@ -190,7 +196,7 @@ const ImageUploadModal = ({
               disabled={isUploading}
               className="h-9 min-w-20 bg-bpim-primary hover:bg-bpim-primary"
             >
-              {isUploading ? <LoadingSpinner size="sm" /> : "保存"}
+              {isUploading ? <LoadingSpinner size="sm" /> : t("common.save")}
             </Button>
           )}
         </DialogFooter>

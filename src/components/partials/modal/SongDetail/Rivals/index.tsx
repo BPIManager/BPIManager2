@@ -18,8 +18,10 @@ import { AppTabsGroup } from "@/components/ui/complex/tabs";
 import RivalComparisonModal from "@/components/partials/modal/RivalComparison";
 import { useRadar } from "@/hooks/stats/useRadar";
 import { useUser } from "@/contexts/users/UserContext";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export default function RivalsRanking({ song }: { song: SongDetailSubject }) {
+  const { t } = useTranslation();
   const { fbUser } = useUser();
   const [version, setVersion] = useState<string>(latestVersion);
   const [tab, setTab] = useState<"rivals" | "global">("rivals");
@@ -59,8 +61,8 @@ export default function RivalsRanking({ song }: { song: SongDetailSubject }) {
         <AppTabsGroup
           visual="flat"
           tabs={[
-            { value: "rivals", label: "ライバル内" },
-            { value: "global", label: "グローバル" },
+            { value: "rivals", label: t("songDetail.rivals.tabRivals") },
+            { value: "global", label: t("songDetail.rivals.tabGlobal") },
           ]}
         />
 

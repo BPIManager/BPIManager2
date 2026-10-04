@@ -1,8 +1,9 @@
 import { BpiCalculator } from "@/lib/bpi";
+import { AAA_RATIO, MAX_MINUS_RATIO } from "@/constants/iidx/rankBorders";
 import { statsSongTablesRepo } from "@/lib/db/aggregates/stats/songTables";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
-import { radarLookup } from "@/lib/subhandlers/scores/_shared";
+import { radarTopOf } from "@/constants/iidx/radars/topElements";
 import type { HandlerResult } from "@/types/api";
 import type { AaaQuery } from "./_shared";
 
@@ -17,8 +18,8 @@ export async function handleStatsAaaDifficulty(
     );
     const result = rawData.map((song) => {
       const maxScore = song.notes * 2;
-      const aaaTarget = Math.ceil(maxScore * (8 / 9));
-      const maxMinusTarget = Math.ceil(maxScore * (17 / 18));
+      const aaaTarget = Math.ceil(maxScore * AAA_RATIO);
+      const maxMinusTarget = Math.ceil(maxScore * MAX_MINUS_RATIO);
       const songParams = {
         title: song.title,
         notes: song.notes,
@@ -58,7 +59,7 @@ export async function handleStatsAaaDifficulty(
         notes: song.notes,
         releasedVersion: song.releasedVersion,
         maxScore,
-        radarTop: radarLookup.get(`${song.title}__${song.difficulty}`) ?? null,
+        radarTop: radarTopOf(song.title, song.difficulty),
         targets: {
           aaa: {
             exScore: aaaTarget,

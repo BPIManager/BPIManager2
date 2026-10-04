@@ -29,7 +29,12 @@ const OptimizationStepCard = ({
           {onEdit || onRemove ? (
             <div className="flex shrink-0 items-start gap-1">
               {onEdit && (
-                <Button variant="ghost" size="icon-sm" onClick={onEdit}>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={onEdit}
+                  aria-label={t("common.edit")}
+                >
                   <Pencil className="h-3.5 w-3.5" />
                 </Button>
               )}
@@ -39,6 +44,7 @@ const OptimizationStepCard = ({
                   size="icon-sm"
                   className="text-bpim-muted hover:text-bpim-danger hover:bg-bpim-danger/10"
                   onClick={onRemove}
+                  aria-label={t("common.delete")}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </Button>

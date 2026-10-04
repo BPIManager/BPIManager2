@@ -1,4 +1,8 @@
-import type { NextApiRequest, NextApiResponse } from "next";
+import type { NextApiResponse } from "next";
+import {
+  AuthenticatedNextApiRequest,
+  withAuth,
+} from "@/middlewares/api/withAuth";
 import { handleRivalFollowingScoresForSong } from "@/lib/subhandlers/rivals";
 import {
   buildMeta,
@@ -6,8 +10,8 @@ import {
   writeV2Result,
 } from "@/middlewares/api/apiResult";
 
-export default async function handler(
-  req: NextApiRequest,
+async function handler(
+  req: AuthenticatedNextApiRequest,
   res: NextApiResponse,
 ) {
   if (req.method !== "GET") {
@@ -17,3 +21,5 @@ export default async function handler(
   const { result, targetUserId, viewerId } = await handleRivalFollowingScoresForSong(req);
   writeV2Result(res, withMeta(result, buildMeta(viewerId, targetUserId)));
 }
+
+export default withAuth(handler);

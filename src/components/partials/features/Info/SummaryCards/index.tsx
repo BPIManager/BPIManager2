@@ -1,4 +1,5 @@
 import { DashCard } from "@/components/ui/dashcard";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export function SummaryCard({
   label,
@@ -11,6 +12,7 @@ export function SummaryCard({
   today: number;
   color: string;
 }) {
+  const { t } = useTranslation();
   return (
     <DashCard>
       <p className="text-[11px] font-bold uppercase tracking-wider text-bpim-muted">
@@ -20,7 +22,7 @@ export function SummaryCard({
         {total.toLocaleString()}
       </p>
       <p className="mt-1 text-xs text-bpim-muted">
-        前日:{" "}
+        {t("siteInfo.summary.prevDay")}:{" "}
         <span className="font-bold text-bpim-text">
           +{today.toLocaleString()}
         </span>

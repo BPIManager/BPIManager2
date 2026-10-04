@@ -4,6 +4,7 @@ import { PageContainer } from "@/components/partials/common/PageChrome/Header";
 import { Meta, JsonLd } from "@/components/partials/common/PageChrome/Head";
 import SongDetailContent from "@/components/partials/features/Songs/SongDetail";
 import { songMasterRepo } from "@/lib/db/domains/songs/master";
+import { SITE_URL } from "@/constants/site/url";
 
 const VALID_TABS = ["ranking", "similar", "notes", "pattern"] as const;
 type Tab = (typeof VALID_TABS)[number];
@@ -45,7 +46,7 @@ interface Props {
   songMeta: SongMeta | null;
 }
 
-const BASE_URL = "https://bpi2.poyashi.me";
+const BASE_URL = SITE_URL;
 
 export default function SongDetailPage({ tab, songId, songMeta }: Props) {
   const { label, descSuffix, schemaType } = TAB_META[tab];
@@ -137,15 +138,14 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ params }) 
   let songMeta: SongMeta | null = null;
   try {
     const song = await songMasterRepo.getSongById(songId);
-    if (song) {
-      songMeta = {
-        title: song.title,
-        difficulty: song.difficulty,
-        difficultyLevel: song.difficultyLevel,
-        notes: song.notes,
-        bpm: song.bpm,
-      };
-    }
+    if (!song) return { notFound: true };
+    songMeta = {
+      title: song.title,
+      difficulty: song.difficulty,
+      difficultyLevel: song.difficultyLevel,
+      notes: song.notes,
+      bpm: song.bpm,
+    };
   } catch (error) {
     console.error("Song meta fetch error:", error);
   }

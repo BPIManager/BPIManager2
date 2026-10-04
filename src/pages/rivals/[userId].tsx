@@ -1,5 +1,3 @@
-"use client";
-
 import { useRouter } from "next/router";
 import { useUser } from "@/contexts/users/UserContext";
 import { latestVersion } from "@/constants/iidx/iidxVersions";

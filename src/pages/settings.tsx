@@ -1,6 +1,4 @@
-﻿"use client";
-
-import { useUser } from "@/contexts/users/UserContext";
+﻿import { useUser } from "@/contexts/users/UserContext";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import DashboardLayout from "@/components/partials/shell/DashboardLayout";
 import { PageContainer, PageHeader } from "@/components/partials/common/PageChrome/Header";

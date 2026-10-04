@@ -1,8 +1,9 @@
-import dayjs from "dayjs";
+import { todayJst } from "@/lib/dayjs";
 import { v4 as uuidv4 } from "uuid";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { iidxTowerAggregateRepo } from "@/lib/db/aggregates/iidxTower";
 import { statsLatestScoresRepo } from "@/lib/db/aggregates/stats/latestScores";
+import { statsSongTablesRepo } from "@/lib/db/aggregates/stats/songTables";
 import { maskPrivateIdentity } from "@/lib/db/shared/privacyMask";
 import { canViewUserData } from "@/lib/db/shared/visibility";
 import { calculateRadar, buildRadarSongMaster } from "@/lib/radar/calculator";
@@ -21,20 +22,25 @@ export async function handleTowerRanking(
   const version = resolveVersion(req.query.version);
 
   const period = String(req.query.period ?? "day");
-  const today = dayjs().format("YYYY-MM-DD");
+  const today = todayJst();
   const rawDate = String(req.query.date ?? today);
   const date = rawDate > today ? today : rawDate;
 
   const { startDate, endDate } = parsePeriodDates(period, date);
 
   try {
-    const [rows, viewerScores, fullMaster] = await Promise.all([
+    const [rows, viewerScores, fullMaster, validSongKeys] = await Promise.all([
       iidxTowerAggregateRepo.getTowerRanking({ version, startDate, endDate }),
       statsLatestScoresRepo.getLatestScoresWithMusicData(viewerId, latestVersion),
       songMasterRepo.getSongMasterWithDef(),
+      statsSongTablesRepo.getFilteredSongKeys(latestVersion),
     ]);
 
-    const viewerRadar = calculateRadar(viewerScores, buildRadarSongMaster(fullMaster));
+    const viewerRadar = calculateRadar(
+      viewerScores,
+      buildRadarSongMaster(fullMaster),
+      validSongKeys,
+    );
 
     const rankings = rows.map((u, i) => ({
       rank: i + 1,

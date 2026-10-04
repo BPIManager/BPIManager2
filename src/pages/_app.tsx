@@ -6,7 +6,7 @@ import { LocaleProvider } from "@/contexts/locale/LocaleContext";
 import type { AppProps } from "next/app";
 import { PagesProgressBar as ProgressBar } from "next-nprogress-bar";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { Toaster } from "sonner";
+import { Toaster } from "@/components/ui/sonner";
 import LocaleDetectionModal from "@/components/partials/common/LocaleDetectionModal";
 import AccountSettings from "@/components/partials/modal/AccountSettings";
 import { updateFavicon } from "@/components/ui/bpim-logo";

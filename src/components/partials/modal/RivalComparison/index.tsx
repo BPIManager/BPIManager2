@@ -16,9 +16,10 @@ import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { fetcher } from "@/utils/common/fetch";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { API_PREFIX, API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { toast } from "sonner";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 const RivalComparisonModal = ({
   rivalId,
@@ -33,6 +34,7 @@ const RivalComparisonModal = ({
   viewerRadar: Record<string, number | { totalBpi: number }>;
   version?: string;
 }) => {
+  const { t } = useTranslation();
   const { fbUser, user } = useUser();
 
   // ログイン時: compare エンドポイントで profile + 勝敗データを1本で取得
@@ -81,15 +83,18 @@ const RivalComparisonModal = ({
         { optimisticData, rollbackOnError: true, populateCache: true, revalidate: true },
       );
       // plain profile キャッシュも同期
-      const plainKey = [`${API_PREFIX}/users/${rivalId}/profile`, fbUser];
+      const plainKey = [
+        `${API_V2_PREFIX}/users/${rivalId}/profile`,
+        fbUser?.uid ?? null,
+      ];
       globalMutate(plainKey, (cur: typeof optimisticData | undefined) => {
         if (!cur) return cur;
         return { ...cur, profile: { ...cur.profile, follows: optimisticData.profile.follows, relationship: updatedRelationship } };
       }, { revalidate: true });
     } catch {
-      toast.error("操作が完了しませんでした");
+      toast.error(t("common.actionFailed"));
     }
-  }, [data, isUpdating, requestFollow, mutateCompare, globalMutate, rivalId, fbUser]);
+  }, [data, isUpdating, requestFollow, mutateCompare, globalMutate, rivalId, fbUser, t]);
 
   // 未ログイン時にライバルのレーダーを公開エンドポイントで取得
   const v = version ?? latestVersion;
@@ -158,7 +163,9 @@ const RivalComparisonModal = ({
                 <Link href={`/users/${rivalId}`}>
                   <div className="flex items-center justify-center gap-2">
                     <User className="h-4.5 w-4.5" />
-                    <span className="text-sm">詳細プロフィールを見る</span>
+                    <span className="text-sm">
+                      {t("rivalComparison.viewProfile")}
+                    </span>
                     <ChevronRight className="h-4.5 w-4.5" />
                   </div>
                 </Link>
@@ -187,7 +194,9 @@ const RivalComparisonModal = ({
                 <Link href={`/users/${rivalId}`}>
                   <div className="flex items-center justify-center gap-2">
                     <User className="h-4.5 w-4.5" />
-                    <span className="text-sm">詳細プロフィールを見る</span>
+                    <span className="text-sm">
+                      {t("rivalComparison.viewProfile")}
+                    </span>
                     <ChevronRight className="h-4.5 w-4.5" />
                   </div>
                 </Link>

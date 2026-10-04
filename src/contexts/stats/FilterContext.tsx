@@ -1,6 +1,5 @@
 import React, { createContext, useCallback, useContext, useMemo, useState, ReactNode } from "react";
 import {
-  IIDX_LEVELS,
   IIDX_DIFFICULTIES,
   BPI_CALCABLE_LEVELS,
   BPI_CALCABLE_DIFFICULTIES,
@@ -16,7 +15,6 @@ interface FilterContextType {
   toggleDiff: (val: string) => void;
   setVersion: (val: string) => void;
   setCompareVersion: (val: string) => void;
-  resetFilters: () => void;
 }
 
 const FilterContext = createContext<FilterContextType | undefined>(undefined);
@@ -49,12 +47,6 @@ export const FilterProvider = ({ children }: { children: ReactNode }) => {
       toggle(val as BPI_CALCABLE_DIFFICULTIES, setDiffs),
     setVersion,
     setCompareVersion,
-    resetFilters: () => {
-      setLevels(IIDX_LEVELS as unknown as BPI_CALCABLE_LEVELS[]);
-      setDiffs(IIDX_DIFFICULTIES as BPI_CALCABLE_DIFFICULTIES[]);
-      setVersion(latestVersion);
-      setCompareVersion("");
-    },
     }),
     [levels, diffs, version, compareVersion, toggle],
   );

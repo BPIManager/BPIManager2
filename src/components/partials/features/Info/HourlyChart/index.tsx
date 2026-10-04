@@ -13,6 +13,7 @@ import { DashCard } from "@/components/ui/dashcard";
 import { useChartColors } from "@/hooks/common/useChartColors";
 import PeriodTabs from "../PeriodTabs";
 import type { SiteStatsPeriod, HourlyEntry } from "@/types/siteStats";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 function HourlyChart({
   data,
@@ -20,13 +21,14 @@ function HourlyChart({
   data: Record<SiteStatsPeriod, HourlyEntry[]>;
 }) {
   const c = useChartColors();
+  const { t, tFormat } = useTranslation();
   const [period, setPeriod] = useState<SiteStatsPeriod>("d7");
 
   return (
     <DashCard className="h-80 flex flex-col">
       <div className="mb-3 flex items-center justify-between shrink-0">
         <h3 className="text-sm font-bold uppercase text-bpim-muted">
-          時間帯別登録数 (JST)
+          {t("siteInfo.hourly.title")}
         </h3>
         <PeriodTabs value={period} onChange={setPeriod} />
       </div>
@@ -47,7 +49,9 @@ function HourlyChart({
               fontSize={9}
               tickLine={false}
               axisLine={false}
-              tickFormatter={(v: number) => `${v}時`}
+              tickFormatter={(v: number) =>
+                tFormat("siteInfo.hourly.tick", { hour: v })
+              }
             />
             <YAxis
               yAxisId="left"
@@ -77,7 +81,7 @@ function HourlyChart({
             <Bar
               yAxisId="left"
               dataKey="allScores"
-              name="全スコア"
+              name={t("siteInfo.series.allScores")}
               fill={c.warning}
               opacity={0.85}
               radius={[2, 2, 0, 0]}
@@ -85,7 +89,7 @@ function HourlyChart({
             <Bar
               yAxisId="right"
               dataKey="logs"
-              name="バッチログ"
+              name={t("siteInfo.series.batchLogs")}
               fill={c.primary}
               opacity={0.85}
               radius={[2, 2, 0, 0]}

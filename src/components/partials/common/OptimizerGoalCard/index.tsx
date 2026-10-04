@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { getBpiColorStyle } from "@/constants/theme/bpiColor";
-import type { OptimizeMemo } from "@/hooks/analytics/useOptimizeMemo";
+import type { OptimizeMemoResponse } from "@/hooks/analytics/useOptimizeMemo";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface StepProgress {
@@ -97,7 +97,7 @@ export const BpiJourneyBar = ({
 };
 
 export const buildStepProgress = (
-  memo: OptimizeMemo,
+  memo: OptimizeMemoResponse,
   currentScores: Map<number, number | null>,
   currentBpis: Map<number, number | null>,
 ): StepProgress[] =>

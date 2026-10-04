@@ -1,5 +1,7 @@
 import type { NextApiRequest } from "next";
 import { statsLatestScoresRepo } from "@/lib/db/aggregates/stats/latestScores";
+import type { IIDXVersion } from "@/types/iidx/version";
+import { statsSongTablesRepo } from "@/lib/db/aggregates/stats/songTables";
 import { userDiscoveryRepo } from "@/lib/db/aggregates/userProfiles/discovery";
 import { logTotalBpiRepo } from "@/lib/db/domains/logs/totalBpi";
 import { songMasterRepo } from "@/lib/db/domains/songs/master";
@@ -49,11 +51,16 @@ export async function handleRivalSuggestions(
   try {
     const version = resolveVersion(v);
     const filters = parseFilters(req.query);
-    const [viewerScores, fullMaster] = await Promise.all([
+    const [viewerScores, fullMaster, validSongKeys] = await Promise.all([
       statsLatestScoresRepo.getLatestScoresWithMusicData(viewerId, version),
       songMasterRepo.getSongMasterWithDef(),
+      statsSongTablesRepo.getFilteredSongKeys(version as IIDXVersion),
     ]);
-    const viewerRadar = calculateRadar(viewerScores, buildRadarSongMaster(fullMaster));
+    const viewerRadar = calculateRadar(
+      viewerScores,
+      buildRadarSongMaster(fullMaster),
+      validSongKeys,
+    );
 
     let viewerBaseValue: number;
     if (sortKey === "totalBpi") {

@@ -4,19 +4,7 @@ import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { authFetch } from "@/utils/common/fetch";
 import { fetchSongPatternsPage } from "@/services/swr/songs/songPatterns";
 import type { VoteType } from "@/types/db";
-
-export interface SongPatternItem {
-  pattern: string;
-  score: number;
-  upvoteCount: number;
-  downvoteCount: number;
-  myVote: VoteType | null;
-}
-
-export interface PatternsPage {
-  items: SongPatternItem[];
-  nextCursor: number | null;
-}
+import type { PatternsPage, SongPatternItem } from "@/types/songs/patterns";
 
 export function useSongPatterns(
   songId: number,

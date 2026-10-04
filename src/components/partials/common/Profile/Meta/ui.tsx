@@ -19,13 +19,18 @@ const ProfileMeta = ({
 
   const ogImage = profile.profileImage || "/ogp-default.png";
 
+  const iidxId = formatIIDXId(profile.iidxId || "");
+  const profileHeading = [profile.userName, iidxId ? `(${iidxId})` : ""]
+    .filter(Boolean)
+    .join(" ");
+
   const defaultDescription =
     profile.profileText ||
     `${profile.userName}${t("profile.meta.defaultDescSuffix")}`;
 
   return (
     <Meta
-      title={`${profile.userName || "undefined"} (${formatIIDXId(profile.iidxId || "")})${t("profile.meta.titleConnector")}${title}`}
+      title={`${profileHeading}${t("profile.meta.titleConnector")}${title}`}
       description={
         (description || "")
           ?.replace("$userName$", profile.userName)

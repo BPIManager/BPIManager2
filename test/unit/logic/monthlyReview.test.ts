@@ -6,6 +6,8 @@ import {
   buildBestDays,
 } from "@/lib/monthly-review/activity";
 import { buildArena } from "@/lib/monthly-review/arena";
+import { buildRadarGrowth } from "@/lib/monthly-review/radar";
+import { topElementMap } from "@/constants/iidx/radars/topElements";
 import { buildBpiTimeline } from "@/lib/monthly-review/bpi";
 import { buildRivals, buildGrowthRanking } from "@/lib/monthly-review/rivals";
 import { buildTopSongs } from "@/lib/monthly-review/topSongs";
@@ -101,6 +103,16 @@ describe("buildArena", () => {
     expect(result).toEqual({ bestClass: "A1", bestRank: 2, maxA1Continue: 5 });
   });
 
+  it("同一クラス内では最も小さい（良い）順位を返すこと", () => {
+    const result = buildArena([
+      { arenaClass: "A2", arenaRank: 30, a1continue: null },
+      { arenaClass: "A2", arenaRank: 5, a1continue: null },
+      { arenaClass: "A2", arenaRank: 12, a1continue: null },
+    ]);
+
+    expect(result).toEqual({ bestClass: "A2", bestRank: 5, maxA1Continue: null });
+  });
+
   it("空配列の場合はnullを返すこと", () => {
     expect(buildArena([])).toBeNull();
   });
@@ -112,6 +124,36 @@ describe("buildArena", () => {
     ]);
 
     expect(result).toEqual({ bestClass: "A2", bestRank: 5, maxA1Continue: null });
+  });
+});
+
+describe("buildRadarGrowth timeline", () => {
+  it("月初スコアから再生した推移の最終点が totalDiff と一致すること", () => {
+    const [key, category] = Array.from(topElementMap.entries())[0];
+    const [title, difficulty] = key.split("___");
+    const song = {
+      ...withV2Params(1, { notes: 1000, kaidenAvg: 1500, wrScore: 1900, coef: 1.175 }),
+      title,
+      difficulty,
+    };
+    const result = buildRadarGrowth(
+      [],
+      [song],
+      new Map([[1, 1400]]),
+      new Map([[1, 1700]]),
+      [],
+      [
+        { songId: 1, exScore: 1500, lastPlayed: "2025-06-02T03:00:00Z" },
+        { songId: 1, exScore: 1700, lastPlayed: "2025-06-10T03:00:00Z" },
+      ],
+    );
+
+    const entry = result.find((r) => r.element === category)!;
+    expect(entry.timeline).toHaveLength(2);
+    expect(entry.timeline[entry.timeline.length - 1].cumDiff).toBeCloseTo(
+      entry.totalDiff,
+      2,
+    );
   });
 });
 

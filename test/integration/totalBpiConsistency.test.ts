@@ -12,6 +12,13 @@ const BASE_URL = process.env.TEST_BASE_URL || "http://localhost:3000";
 const USER_ID = process.env.TEST_PUBLIC_USER_ID || process.env.TEST_USER_ID || "";
 const VERSION = latestVersion;
 
+/** devサーバーが起動していない場合はスイート全体を skip する */
+const SERVER_UP = await fetch(BASE_URL, { signal: AbortSignal.timeout(2000) })
+  .then(() => true)
+  .catch(() => false);
+/** 対象ユーザー・DB・devサーバーが揃っていない場合はスイート全体を skip する */
+const CAN_RUN = !!USER_ID && !!process.env.DB_HOST && SERVER_UP;
+
 type DashboardHandler = (
   input: unknown,
 ) => Promise<{ content: { type: string; text: string }[] }>;
@@ -38,7 +45,7 @@ type DashboardHandler = (
  * 記録済み最高値が変動し失敗することがある（README記載の通りintegrationテストの
  * 特性として許容する）。
  */
-describe("総合BPI算出ロジックの一貫性", () => {
+describe.skipIf(!CAN_RUN)("総合BPI算出ロジックの一貫性", () => {
   let groundTruth: number | null = null;
 
   beforeAll(async () => {
@@ -108,7 +115,7 @@ describe("総合BPI算出ロジックの一貫性", () => {
  * - GET /stats/totalBPIhistory（dashboardの日別総合BPI推移グラフ）
  * - GET /stats/monthly-review/bpi?month=<date月>（月間振り返りの日別推移）
  */
-describe("総合BPI算出ロジックの一貫性（全日付断面）", () => {
+describe.skipIf(!CAN_RUN)("総合BPI算出ロジックの一貫性（全日付断面）", () => {
   let checkpoints: { date: string; groundTruth: number }[] = [];
 
   beforeAll(async () => {

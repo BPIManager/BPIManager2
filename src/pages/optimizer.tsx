@@ -1,5 +1,3 @@
-"use client";
-
 import DashboardLayout from "@/components/partials/shell/DashboardLayout";
 import { PageContainer, PageHeader } from "@/components/partials/common/PageChrome/Header";
 import { Meta } from "@/components/partials/common/PageChrome/Head";

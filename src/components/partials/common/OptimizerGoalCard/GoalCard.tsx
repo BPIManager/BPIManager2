@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import { DIFF_COLORS } from "@/constants/theme/difficultyColors";
 import { getBpiColorStyle } from "@/constants/theme/bpiColor";
 import { getRankDetail } from "@/constants/iidx/rankBorders";
-import type { OptimizeMemo } from "@/hooks/analytics/useOptimizeMemo";
+import type { OptimizeMemoResponse } from "@/hooks/analytics/useOptimizeMemo";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 /**
@@ -196,7 +196,7 @@ export const GoalBpiJourney = ({
   steps,
   isExpanded,
 }: {
-  memo: OptimizeMemo;
+  memo: OptimizeMemoResponse;
   liveCurrentTotalBpi: number | null;
   steps: GoalSongStep[];
   isExpanded?: boolean;

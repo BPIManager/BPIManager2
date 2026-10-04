@@ -6,8 +6,9 @@ import {
 } from "@/components/ui/accordion";
 import { Sparkles, ExternalLink } from "lucide-react";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import { SITE_URL } from "@/constants/site/url";
 
-const MCP_INFO_URL = "https://bpi2.poyashi.me/api/mcp";
+const MCP_INFO_URL = `${SITE_URL}/api/mcp`;
 const MCP_SETTINGS_URL = "/settings";
 
 const McpEntryAccordion = () => {

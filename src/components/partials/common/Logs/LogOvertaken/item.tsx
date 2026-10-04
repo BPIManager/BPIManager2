@@ -3,6 +3,7 @@ import type { BatchDetailItem } from "@/types/logs/batchDetail";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChevronRight } from "lucide-react";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import { clickableProps } from "@/utils/common/clickableProps";
 
 interface RankItemProps {
   item: BatchDetailItem;
@@ -22,7 +23,7 @@ const OvertakeRankItem = ({ item, onClick }: RankItemProps) => {
 
   return (
     <div
-      onClick={onClick}
+      {...clickableProps(onClick)}
       className="w-full p-4 cursor-pointer hover:bg-bpim-overlay/50 transition-colors flex flex-col gap-3 group"
     >
       <div className="flex items-center justify-between w-full">

@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { DashCard } from "@/components/ui/dashcard";
 import { Badge } from "@/components/ui/badge";
@@ -89,20 +89,24 @@ const ListTab = ({
   const [bpmMax, setBpmMax] = useState<number | undefined>(undefined);
   const [isSofran, setIsSofran] = useState<boolean | undefined>(undefined);
 
-  const filtered = rows.filter(
-    (row) =>
-      (levelFilter === "all" || row.difficultyLevel === levelFilter) &&
-      (difficultyFilter === "all" || row.difficulty === difficultyFilter) &&
-      (radarCats.length === 0 ||
-        (row.radarTop !== null && radarCats.includes(row.radarTop))) &&
-      (bpmMin === undefined || (row.bpmHi !== null && row.bpmHi >= bpmMin)) &&
-      (bpmMax === undefined || (row.bpmLo !== null && row.bpmLo <= bpmMax)) &&
-      (!isSofran ||
-        (row.bpmLo !== null &&
-          row.bpmHi !== null &&
-          row.bpmLo !== row.bpmHi)),
+  const filtered = useMemo(
+    () =>
+      rows.filter(
+        (row) =>
+          (levelFilter === "all" || row.difficultyLevel === levelFilter) &&
+          (difficultyFilter === "all" || row.difficulty === difficultyFilter) &&
+          (radarCats.length === 0 ||
+            (row.radarTop !== null && radarCats.includes(row.radarTop))) &&
+          (bpmMin === undefined || (row.bpmHi !== null && row.bpmHi >= bpmMin)) &&
+          (bpmMax === undefined || (row.bpmLo !== null && row.bpmLo <= bpmMax)) &&
+          (!isSofran ||
+            (row.bpmLo !== null &&
+              row.bpmHi !== null &&
+              row.bpmLo !== row.bpmHi)),
+      ),
+    [rows, levelFilter, difficultyFilter, radarCats, bpmMin, bpmMax, isSofran],
   );
-  const sorted = sortRows(filtered, sortKey);
+  const sorted = useMemo(() => sortRows(filtered, sortKey), [filtered, sortKey]);
 
   return (
     <div className="flex flex-col gap-4">

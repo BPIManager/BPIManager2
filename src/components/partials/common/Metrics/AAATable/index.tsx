@@ -187,8 +187,8 @@ const AAATableContent = ({
       {isSelf ? (
         <>
           <PageHeader
-            title="AAA達成難易度表"
-            description="BPIに基づくAAAまたはMAX-達成の難易度"
+            title={t("aaaTable.title")}
+            description={t("aaaTable.description")}
           />
 
           <PageContainer>{body}</PageContainer>

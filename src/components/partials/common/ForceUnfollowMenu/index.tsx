@@ -60,6 +60,7 @@ const ForceUnfollowMenu = ({
             variant="outline"
             size="icon"
             className="h-8 w-8 shrink-0 rounded-full"
+            aria-label={t("common.moreActions")}
           >
             <MoreVertical className="h-4 w-4" />
           </Button>

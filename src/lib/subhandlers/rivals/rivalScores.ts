@@ -1,11 +1,12 @@
 import type { NextApiRequest } from "next";
+import { radarTopOf } from "@/constants/iidx/radars/topElements";
 import { rivalPairwiseRepo } from "@/lib/db/aggregates/rivalScores/pairwise";
 import { sortSongs } from "@/utils/songs/sort";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 import { accessError, err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { rivalScoresQuerySchema } from "@/schemas/rivals/query";
-import { radarLookup, targetOf, type HandleOutcome } from "./_shared";
+import { targetOf, type HandleOutcome } from "./_shared";
 
 export async function handleRivalScores(
   req: NextApiRequest,
@@ -93,7 +94,7 @@ export async function handleRivalScores(
                 ? row.myLastPlayed
                 : row.rivalLastPlayed
               : row.myLastPlayed || row.rivalLastPlayed || null,
-          radarTop: radarLookup.get(`${row.title}__${row.difficulty}`) ?? null,
+          radarTop: radarTopOf(row.title, row.difficulty),
         };
       })
       .filter((song) => song.exScore !== null || song.rival.exScore !== null);

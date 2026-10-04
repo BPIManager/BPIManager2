@@ -1,4 +1,6 @@
 ﻿import { db } from "@/lib/db";
+import type { Transaction } from "kysely";
+import type { Database } from "@/types/db";
 
 import { IIDXVersion } from "@/types/iidx/version";
 import { SongMaster } from "@/types/songs/master";
@@ -6,17 +8,54 @@ import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { currentSongDefSubquery } from "@/lib/db/shared/songDef";
 import { SONG_ATTRIBUTE_SELECT_COLUMNS } from "@/lib/db/shared/songAttributes";
 
+/** 楽曲マスタのプロセス内キャッシュの有効期間。定義更新（外部の計算ジョブがDBを書く）の反映遅延の上限 */
+const SONG_MASTER_TTL_MS = 10 * 60 * 1000;
+
+let songMasterCache: { data: SongMaster; at: number } | null = null;
+let songMasterLoading: Promise<SongMaster> | null = null;
+
 /**
  * `songs` / `songDef` テーブルの楽曲マスタ・現行定義の参照を担当するリポジトリクラス。
  */
 class SongMasterRepository {
   /**
    * 現在有効な曲定義（`songDef.isCurrent = 1`）を結合した楽曲マスタを取得する（BPI計算用）。
+   * trx 無しの呼び出しはプロセス内で {@link SONG_MASTER_TTL_MS} だけキャッシュする。trx 指定時はロック中の一貫性のため直接読む。
    *
+   * @param trx - 呼び出し元のトランザクション（指定時はキャッシュを使わない）
    * @returns 楽曲 ID・タイトル・ノーツ数・難易度・皆伝平均・WR スコア・補正係数を含む配列
    */
-  async getSongMasterWithDef(): Promise<SongMaster> {
-    const result = await db
+  async getSongMasterWithDef(
+    trx?: Transaction<Database>,
+  ): Promise<SongMaster> {
+    if (trx) return await this.querySongMasterWithDef(trx);
+
+    const now = Date.now();
+    if (songMasterCache && now - songMasterCache.at < SONG_MASTER_TTL_MS) {
+      return [...songMasterCache.data];
+    }
+    if (!songMasterLoading) {
+      songMasterLoading = this.querySongMasterWithDef(db)
+        .then((data) => {
+          songMasterCache = { data, at: Date.now() };
+          return data;
+        })
+        .finally(() => {
+          songMasterLoading = null;
+        });
+    }
+    return [...(await songMasterLoading)];
+  }
+
+  /** 楽曲マスタのプロセス内キャッシュを破棄する（定義更新の即時反映・テスト用） */
+  invalidateSongMasterCache(): void {
+    songMasterCache = null;
+  }
+
+  private async querySongMasterWithDef(
+    executor: Transaction<Database> | typeof db,
+  ): Promise<SongMaster> {
+    const result = await executor
       .selectFrom("songs as s")
       .innerJoin("songDef as sd", (join) =>
         join.onRef("sd.songId", "=", "s.songId").on("sd.isCurrent", "=", 1),
@@ -35,8 +74,52 @@ class SongMasterRepository {
         "sd.sigma",
         "sd.residualVar",
       ])
+      .where((eb) =>
+        eb.or([
+          eb("s.deletedAt", "is", null),
+          eb("s.deletedAt", ">", latestVersion),
+        ]),
+      )
       .execute();
     return result as SongMaster;
+  }
+
+  /**
+   * 現行の楽曲（`deletedAt` が未設定または最新バージョンより後）を、現在有効な songDef があれば結合して全件取得する。
+   * songDef が無い楽曲も含む（LEFT JOIN）。日次キャッシュの元データ用。
+   */
+  async getAllSongsWithCurrentDef() {
+    return await db
+      .selectFrom("songs as s")
+      .leftJoin(
+        (qb) =>
+          qb
+            .selectFrom("songDef")
+            .select(["songId", "wrScore", "kaidenAvg", "coef", "mu", "sigma", "residualVar"])
+            .where("isCurrent", "=", 1)
+            .as("def"),
+        (join) => join.onRef("def.songId", "=", "s.songId"),
+      )
+      .select([
+        "s.songId",
+        "s.title",
+        "s.difficulty",
+        "s.difficultyLevel",
+        "s.notes",
+        "def.wrScore",
+        "def.kaidenAvg",
+        "def.coef",
+        "def.mu",
+        "def.sigma",
+        "def.residualVar",
+      ])
+      .where((eb) =>
+        eb.or([
+          eb("s.deletedAt", "is", null),
+          eb("s.deletedAt", ">", latestVersion),
+        ]),
+      )
+      .execute();
   }
 
   /**

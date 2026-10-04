@@ -6,8 +6,7 @@ import { logTotalBpiRepo } from "@/lib/db/domains/logs/totalBpi";
 import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { allSongsRepo } from "@/lib/db/domains/allSongs";
 import { saveImportResults } from "@/lib/db/orchestrators/bpiImport";
-import { db } from "@/lib/db";
-import { lockUserForWrite } from "@/lib/db/shared/userWriteLock";
+import { withUserWriteLock } from "@/lib/db/orchestrators/userWriteTransaction";
 import { BpiCalculator } from "@/lib/bpi";
 import { isScoreImproved } from "@/lib/scores/evaluateImprovement";
 import { NewAllScores, NewScore } from "@/types/db";
@@ -30,15 +29,14 @@ export function registerUpdateMyScore(server: McpServer, userId: string) {
     },
     async ({ songId, version, exScore, clearState, missCount }) => {
       // 読み取りから保存までを、ユーザーの書き込みロックを取った1つのトランザクションで行う
-      return await db.transaction().execute(async (trx) => {
-      await lockUserForWrite(trx, userId);
+      return await withUserWriteLock(userId, async (trx) => {
       const [bpiSongMaster, allLevelMaster, currentScores, currentAllScores, lastLog] =
         await Promise.all([
-          songMasterRepo.getSongMasterWithDef(),
-          allSongsRepo.getAllLevelMaster(),
-          latestScoresRepo.getLatestScores(userId, version),
-          allScoresRepo.getLatestAllScores(userId, version),
-          logTotalBpiRepo.getLatestTotalBpi(userId, version),
+          songMasterRepo.getSongMasterWithDef(trx),
+          allSongsRepo.getAllLevelMaster(trx),
+          latestScoresRepo.getLatestScores(userId, version, trx),
+          allScoresRepo.getLatestAllScores(userId, version, trx),
+          logTotalBpiRepo.getLatestTotalBpi(userId, version, trx),
         ]);
 
       const song = bpiSongMaster.find((s) => s.songId === songId);

@@ -1,4 +1,6 @@
 import { db } from "@/lib/db";
+import type { Transaction } from "kysely";
+import type { Database } from "@/types/db";
 
 import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore/perSong";
@@ -48,8 +50,12 @@ class LatestScoresRepository {
    * @param userId - ユーザー ID
    * @param version - バージョン番号
    */
-  async getLatestScores(userId: string, version: string) {
-    return await db
+  async getLatestScores(
+    userId: string,
+    version: string,
+    trx?: Transaction<Database>,
+  ) {
+    return await (trx ?? db)
       .selectFrom("scores")
       .innerJoin(
         latestLogIdPerSongSubquery({

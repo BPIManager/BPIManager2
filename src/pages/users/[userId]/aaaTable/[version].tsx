@@ -27,7 +27,7 @@ export default function UserAAATablePage() {
     return (
       <DashboardLayout>
         <Meta title={t("page.aaaTable.title")} noIndex />
-        <AAATableContent userId={uid} />
+        <AAATableContent userId={uid} defaultVersion={v} />
       </DashboardLayout>
     );
   }

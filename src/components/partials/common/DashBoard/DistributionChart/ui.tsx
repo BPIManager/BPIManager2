@@ -127,6 +127,7 @@ const DistributionChart = ({
                   displayMode.mode === "rank" && "bg-bpim-overlay",
                 )}
                 aria-pressed={displayMode.mode === "rank"}
+                aria-label={t("dashboard.distribution.modeRank")}
                 title={t("dashboard.distribution.modeRank")}
               >
                 <Medal />
@@ -140,6 +141,7 @@ const DistributionChart = ({
                   displayMode.mode === "scoreRate" && "bg-bpim-overlay",
                 )}
                 aria-pressed={displayMode.mode === "scoreRate"}
+                aria-label={t("dashboard.distribution.modeScoreRate")}
                 title={t("dashboard.distribution.modeScoreRate")}
               >
                 <Percent />
@@ -157,6 +159,7 @@ const DistributionChart = ({
                 chartType === "bar" && "bg-bpim-overlay",
               )}
               aria-pressed={chartType === "bar"}
+              aria-label={t("dashboard.distribution.chartBar")}
             >
               <BarChart2 />
             </Button>
@@ -169,6 +172,7 @@ const DistributionChart = ({
                 chartType === "pie" && "bg-bpim-overlay",
               )}
               aria-pressed={chartType === "pie"}
+              aria-label={t("dashboard.distribution.chartPie")}
             >
               <PieChartIcon />
             </Button>

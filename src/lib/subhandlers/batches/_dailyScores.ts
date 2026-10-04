@@ -120,7 +120,7 @@ export async function handleLastPlayedBase(
     pagination: {
       prev: {
         batchId: prevNavDate
-          ? dayjs(prevNavDate).format("YYYY-MM-DD")
+          ? dayjs(prevNavDate).tz().format("YYYY-MM-DD")
           : "previous",
         createdAt: prevNavDate ?? prevSnapshot?.createdAt ?? null,
         totalBpi: prevSnapshot?.totalBpi ?? -15,
@@ -132,7 +132,7 @@ export async function handleLastPlayedBase(
         label: `${range.label} のプレイ履歴`,
       },
       next: {
-        batchId: nextNavDate ? dayjs(nextNavDate).format("YYYY-MM-DD") : "next",
+        batchId: nextNavDate ? dayjs(nextNavDate).tz().format("YYYY-MM-DD") : "next",
         createdAt: nextNavDate ?? nextSnapshot?.createdAt ?? null,
         totalBpi: nextSnapshot?.totalBpi ?? -15,
       },

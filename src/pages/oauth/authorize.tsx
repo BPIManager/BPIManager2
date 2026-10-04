@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useUser } from "@/contexts/users/UserContext";
@@ -171,9 +169,9 @@ export default function OAuthAuthorizePage() {
           からの接続
         </h1>
         <p className="mb-1 text-sm text-bpim-muted">
-          上記のアプリケーションが、あなたのBPIM2データの読み取りを
-          リクエストしています。許可すると、そのアプリケーションはあなた自身の
-          スコア情報を取得できるようになります。
+          上記のアプリケーションが、あなたのBPIM2データの読み取りと
+          スコアの更新をリクエストしています。許可すると、そのアプリケーションは
+          あなた自身のスコア情報を取得・更新できるようになります。
         </p>
         {clientIdentity.redirectHosts.length > 0 && (
           <p className="mb-6 text-xs text-bpim-muted">

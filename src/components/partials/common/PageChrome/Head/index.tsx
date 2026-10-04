@@ -1,5 +1,6 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
+import { SITE_URL } from "@/constants/site/url";
 
 interface MetaProps {
   title?: string;
@@ -19,7 +20,7 @@ export const Meta = ({
   const router = useRouter();
   const siteName = "BPIM2";
   const fullTitle = title ? `${title} | ${siteName}` : siteName;
-  const url = `https://bpi2.poyashi.me${router.asPath}`;
+  const url = `${SITE_URL}${router.asPath}`;
 
   return (
     <Head>

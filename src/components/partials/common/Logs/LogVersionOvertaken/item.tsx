@@ -1,6 +1,7 @@
 import type { BatchDetailItem } from "@/types/logs/batchDetail";
 import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { clickableProps } from "@/utils/common/clickableProps";
 
 interface RankItemProps {
   item: BatchDetailItem;
@@ -30,7 +31,7 @@ const VersionOvertakeRankItem = ({
 
   return (
     <div
-      onClick={onClick}
+      {...clickableProps(onClick)}
       className="w-full p-4 cursor-pointer hover:bg-bpim-overlay/50 transition-colors flex flex-col gap-3 group"
     >
       <div className="flex items-center justify-between w-full">

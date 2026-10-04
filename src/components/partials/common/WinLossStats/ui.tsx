@@ -14,6 +14,7 @@ import {
 } from "recharts";
 import WinLossHistoryChartSkeleton from "./skeleton";
 import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface WinLossEntry {
   level: number;
@@ -60,6 +61,7 @@ const WinLossHistoryChart = ({
   myName?: string;
   rivalName?: string;
 }) => {
+  const { t, locale } = useTranslation();
   const { data, isLoading, error } = useWinLossHistory(
     viewerId,
     rivalId,
@@ -127,12 +129,12 @@ const WinLossHistoryChart = ({
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-1">
           <div className="h-2 w-2 rounded-sm bg-red-400/70" />
-          <span className="text-[9px] text-bpim-muted">{myName ?? "自分"}</span>
+          <span className="text-[9px] text-bpim-muted">{myName ?? t("winLoss.me")}</span>
         </div>
         <div className="flex items-center gap-1">
           <div className="h-2 w-2 rounded-sm bg-blue-400/70" />
           <span className="text-[9px] text-bpim-muted">
-            {rivalName ?? "相手"}
+            {rivalName ?? t("winLoss.rival")}
           </span>
         </div>
       </div>
@@ -140,7 +142,7 @@ const WinLossHistoryChart = ({
       {chartData.length === 0 ? (
         <div className="flex h-36 items-center justify-center">
           <span className="text-[10px] text-bpim-muted">
-            データがありません
+            {t("winLoss.noData")}
           </span>
         </div>
       ) : (
@@ -186,7 +188,10 @@ const WinLossHistoryChart = ({
                 ticks={xMonthTicks}
                 tickFormatter={(v: string) => {
                   const d = new Date(v);
-                  return `${d.getUTCMonth() + 1}月`;
+                  return new Intl.DateTimeFormat(locale, {
+                    month: "short",
+                    timeZone: "UTC",
+                  }).format(d);
                 }}
                 tickLine={false}
                 axisLine={false}
@@ -221,11 +226,11 @@ const WinLossHistoryChart = ({
                           d.cumulative >= 0 ? "text-red-400" : "text-blue-400",
                         )}
                       >
-                        累計: {d.cumulative > 0 ? "+" : ""}
+                        {t("winLoss.cumulative")}: {d.cumulative > 0 ? "+" : ""}
                         {d.cumulative}
                       </p>
                       <p className="text-bpim-muted">
-                        当日: {d.delta > 0 ? "+" : ""}
+                        {t("winLoss.daily")}: {d.delta > 0 ? "+" : ""}
                         {d.delta}
                       </p>
                     </div>
@@ -258,6 +263,7 @@ const WinLossStats = ({
   myName,
   rivalName,
 }: WinLossStatsProps) => {
+  const { t } = useTranslation();
   const [expandedLevels, setExpandedLevels] = useState<Set<number>>(new Set());
 
   const toggleLevel = (lv: number) =>
@@ -336,7 +342,11 @@ const WinLossStats = ({
                   <button
                     onClick={() => toggleLevel(lv)}
                     className="flex items-center justify-center rounded-md border border-bpim-border bg-bpim-overlay/30 p-1 text-bpim-muted transition-colors hover:bg-bpim-overlay/60"
-                    aria-label={isExpanded ? "履歴を閉じる" : "履歴を表示"}
+                    aria-label={
+                      isExpanded
+                        ? t("winLoss.hideHistory")
+                        : t("winLoss.showHistory")
+                    }
                   >
                     {isExpanded ? (
                       <ChevronUp className="h-3.5 w-3.5" />

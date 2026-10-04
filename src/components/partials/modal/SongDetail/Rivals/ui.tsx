@@ -16,6 +16,7 @@ import {
   SongRankingTableHeader,
 } from "@/components/partials/common/Songs/SongRankingListRow";
 import type { SongRankingEntry } from "@/types/users/ranking";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface RivalRankingProps {
   version: string;
@@ -127,6 +128,7 @@ export const GlobalRankingBody = ({
   notes,
   onNavigate,
 }: RivalRankingProps) => {
+  const { t } = useTranslation();
   const isAllScores = notes != null;
   const {
     data: mainData,
@@ -178,13 +180,21 @@ export const GlobalRankingBody = ({
         <div className="rounded-xl border border-bpim-muted/20 bg-bpim-overlay/40 p-4 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-md text-bpim-muted">全 {totalCount} 人中</p>
+              <p className="text-md text-bpim-muted">
+                {t("ranking.selfRank.outOf")}
+                {totalCount}
+                {t("ranking.selfRank.people")}
+              </p>
             </div>
             <div className="text-right">
-              <span className="text-xs text-bpim-muted">現在の順位</span>
+              <span className="text-xs text-bpim-muted">
+                {t("ranking.selfRank.label")}
+              </span>
               <div className="font-mono text-xl font-bold text-bpim-text">
                 <span className="text-bpim-primary">{selfRank}</span>
-                <span className="ml-0.5 text-sm">位</span>
+                <span className="ml-0.5 text-sm">
+                  {t("ranking.selfRank.suffix")}
+                </span>
               </div>
             </div>
           </div>

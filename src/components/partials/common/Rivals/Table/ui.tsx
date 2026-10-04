@@ -4,6 +4,7 @@ import { SongWithRival } from "@/types/songs/score";
 import { cn } from "@/lib/utils";
 import { getLampClass } from "@/components/partials/common/Table/ui";
 import { DIFF_COLORS as diffColors } from "@/constants/theme/difficultyColors";
+import { clickableProps } from "@/utils/common/clickableProps";
 
 const f = (val: number | null | undefined, p?: number) => {
   if (val === null || val === undefined || !Number.isFinite(val)) return "---";
@@ -202,7 +203,7 @@ const RivalSongItem = ({
 
   return (
     <div
-      onClick={onClick}
+      {...clickableProps(onClick)}
       className="group relative w-full cursor-pointer border-b border-bpim-border bg-white/2 transition-colors hover:bg-bpim-overlay/50"
     >
       <div className="hidden lg:grid h-17 grid-cols-[1fr_140px_100px_140px] items-stretch">

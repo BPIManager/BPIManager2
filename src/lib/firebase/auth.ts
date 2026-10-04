@@ -26,13 +26,13 @@ const twitterProvider = new TwitterAuthProvider();
 const lineProvider = new OAuthProvider("oidc.line");
 
 /**
- * Firebase Authentication の操作をまとめたユーティリティ。signInWithRedirect を使うため、ブラウザはプロバイダのログインページへ遷移する。
+ * Firebase Authentication の操作をまとめたユーティリティ。Google/X はポップアップ、LINE はリダイレクトでサインインする。
  */
 export const authActions = {
   /**
-   * Google のリダイレクト方式でサインインを開始する。Promise はリダイレクトの開始時点で解決する。
+   * Google のポップアップ方式でサインインする。
    *
-   * @returns リダイレクト開始時に解決する Promise
+   * @returns サインイン完了時に解決する Promise
    */
   signInWithGoogle: (loginHint?: string): Promise<UserCredential> => {
     googleProvider.setCustomParameters(
@@ -42,8 +42,9 @@ export const authActions = {
   },
 
   /**
-   * Initiates the X (formerly Twitter) sign-in flow via a page redirect.
-   * * @returns A promise that resolves when the redirect is initiated.
+   * X (旧 Twitter) のポップアップ方式でサインインする。
+   *
+   * @returns サインイン完了時に解決する Promise
    */
   signInWithTwitter: (): Promise<UserCredential> =>
     signInWithPopup(auth, twitterProvider),
@@ -60,8 +61,7 @@ export const authActions = {
   },
 
   /**
-   * 現在のユーザーをサインアウトし、ローカルのセッションデータを削除する。
-   * Firebase の signOut を呼ぶ前に localStorage の 'social' キーを削除する。
+   * 現在のユーザーを Firebase からサインアウトする。
    *
    * @returns サインアウト完了時に解決する Promise
    */
