@@ -13,8 +13,12 @@ class allScoresRepository {
    * @param userId - ユーザー ID
    * @param version - バージョン番号
    */
-  async getLatestAllScores(userId: string, version: string) {
-    return await db
+  async getLatestAllScores(
+    userId: string,
+    version: string,
+    trx?: Transaction<Database>,
+  ) {
+    return await (trx ?? db)
       .selectFrom("allScores")
       .innerJoin(
         latestLogIdPerSongSubquery({

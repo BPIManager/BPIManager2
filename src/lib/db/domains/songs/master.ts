@@ -1,4 +1,6 @@
 ﻿import { db } from "@/lib/db";
+import type { Transaction } from "kysely";
+import type { Database } from "@/types/db";
 
 import { IIDXVersion } from "@/types/iidx/version";
 import { SongMaster } from "@/types/songs/master";
@@ -15,8 +17,10 @@ class SongMasterRepository {
    *
    * @returns 楽曲 ID・タイトル・ノーツ数・難易度・皆伝平均・WR スコア・補正係数を含む配列
    */
-  async getSongMasterWithDef(): Promise<SongMaster> {
-    const result = await db
+  async getSongMasterWithDef(
+    trx?: Transaction<Database>,
+  ): Promise<SongMaster> {
+    const result = await (trx ?? db)
       .selectFrom("songs as s")
       .innerJoin("songDef as sd", (join) =>
         join.onRef("sd.songId", "=", "s.songId").on("sd.isCurrent", "=", 1),

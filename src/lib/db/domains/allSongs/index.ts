@@ -1,4 +1,6 @@
 import { db } from "@/lib/db";
+import type { Transaction } from "kysely";
+import type { Database } from "@/types/db";
 
 /**
  * `allSongs` テーブル（全難易度楽曲マスタ、`allScores` のFK親）の参照を担当するリポジトリクラス。
@@ -11,7 +13,7 @@ class AllSongsRepository {
    *
    * @returns 楽曲 ID・タイトル・ノーツ数・難易度・BPM・textage を含む配列
    */
-  async getAllLevelMaster(): Promise<
+  async getAllLevelMaster(trx?: Transaction<Database>): Promise<
     {
       songId: number;
       title: string;
@@ -22,7 +24,7 @@ class AllSongsRepository {
       textage: string;
     }[]
   > {
-    return await db
+    return await (trx ?? db)
       .selectFrom("allSongs")
       .select([
         "songId",
