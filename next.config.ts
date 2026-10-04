@@ -4,10 +4,10 @@ const cspHeader = [
   "default-src 'self'",
   // Next.js requires unsafe-inline for its runtime inline scripts
   "script-src 'self' https://www.googletagmanager.com https://apis.google.com https://static.cloudflareinsights.com https://challenges.cloudflare.com 'unsafe-inline'",
-  "style-src 'self' 'unsafe-inline'",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "img-src 'self' data: https:",
-  "font-src 'self'",
-  "connect-src 'self' https://*.googleapis.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.google-analytics.com https://www.google.com",
+  "font-src 'self' https://fonts.gstatic.com",
+  "connect-src 'self' https://*.googleapis.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.google-analytics.com https://region1.google-analytics.com https://*.analytics.google.com https://www.google.com",
   "frame-src 'self' https://bpimv2.firebaseapp.com https://challenges.cloudflare.com",
   "object-src 'none'",
   "base-uri 'self'",
