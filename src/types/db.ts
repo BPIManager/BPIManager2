@@ -24,6 +24,8 @@ export interface Database {
   allScores: AllScoresTable;
   discordLinks: DiscordLinks;
   userEmailHashes: UserEmailHashes;
+  announcements: Announcements;
+  announcementReads: AnnouncementReads;
   // 曲別データを正規化した新テーブル(#optimize-memo-normalized-tables)。
   // optimizeMemoは移行用バックフィルスクリプトが読み取るため、テーブル削除まで残す
   optimizeGoals: OptimizeGoalsTable;
@@ -252,6 +254,22 @@ export interface DiscordLinks {
   discordUserId: string;
   userId: string;
   linkedAt: Generated<Date>;
+}
+
+export interface Announcements {
+  id: Generated<number>;
+  title: string;
+  body: string;
+  linkUrl: Generated<string | null>;
+  publishedAt: Date;
+  isPublished: Generated<number>;
+  createdAt: Generated<Date>;
+}
+
+export interface AnnouncementReads {
+  userId: string;
+  announcementId: number;
+  readAt: Generated<Date>;
 }
 
 export interface UserEmailHashes {
