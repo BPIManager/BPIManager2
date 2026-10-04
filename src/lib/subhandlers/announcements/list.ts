@@ -27,7 +27,7 @@ export async function handleListAnnouncements(req: NextApiRequest): Promise<{
     id: r.id,
     title: r.title,
     body: r.body,
-    linkUrl: r.linkUrl ?? null,
+    linkUrl: r.linkUrl && /^https?:\/\//i.test(r.linkUrl) ? r.linkUrl : null,
     publishedAt: r.publishedAt.toISOString(),
     isRead: readIds.has(r.id),
   }));

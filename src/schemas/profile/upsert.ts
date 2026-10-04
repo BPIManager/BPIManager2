@@ -22,11 +22,16 @@ export const arenaPrivacySchema = z.object({
 
 export const profileUpsertSchema = z.object({
   userName: userNameSchema,
-  iidxId: z.string().nullable().default(null),
-  profileText: z.string().nullable().default(null),
-  profileImage: z.string().nullable().default(null),
+  iidxId: z.string().max(12).nullable().default(null),
+  profileText: z.string().max(2000).nullable().default(null),
+  profileImage: z
+    .string()
+    .max(1024)
+    .refine((v) => v === "" || /^https:\/\//.test(v), "https のURLのみ指定できます")
+    .nullable()
+    .default(null),
   isPublic: z.number().int().min(0).max(1),
-  xId: z.string().nullable().default(null),
+  xId: z.string().max(20).nullable().default(null),
   arenaPrivacy: arenaPrivacySchema.optional(),
 });
 
