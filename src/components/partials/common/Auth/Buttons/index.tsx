@@ -50,17 +50,17 @@ export const XIcon = ({ className }: { className?: string }) => (
 
 const LOGIN_PROVIDERS = [
   {
-    label: "Googleでログイン",
+    labelKey: "login.btnGoogle",
     icon: GoogleIcon,
     onClick: () => authActions.signInWithGoogle(),
   },
   {
-    label: "X (Twitter) でログイン",
+    labelKey: "login.btnX",
     icon: XIcon,
     onClick: () => authActions.signInWithTwitter(),
   },
   {
-    label: "LINEでログイン",
+    labelKey: "login.btnLine",
     icon: LineIcon,
     onClick: () => authActions.signInWithLINE(),
   },
@@ -105,7 +105,7 @@ export const LoginButtons = ({
               >
                 <Icon className="h-5 w-5 shrink-0 transition-transform group-hover:scale-110" />
                 <span className="flex-1 text-left text-sm font-semibold text-bpim-text">
-                  {provider.label}
+                  {t(provider.labelKey)}
                 </span>
                 <div className="opacity-0 transition-opacity group-hover:opacity-100">
                   <ChevronRightIcon className="h-4 w-4 text-bpim-muted" />
@@ -130,15 +130,15 @@ export const LoginButtons = ({
         <EmailLoginModal open={isEmailModalOpen} onOpenChange={setIsEmailModalOpen} mode="login" />
 
         <p className="px-4 text-center text-xs leading-relaxed text-bpim-muted">
-          続行することで、
+          {t("loginTerms.prefix")}
           <Link
             target="_blank"
             className="underline"
             href="https://www.notion.so/BPIM2-3239989ca87a809f8058dc9736f0e197"
           >
-            利用規約・プライバシーポリシー・データポリシー
+            {t("loginTerms.link")}
           </Link>
-          に同意したものとみなされます。
+          {t("loginTerms.suffix")}
         </p>
       </div>
     </div>

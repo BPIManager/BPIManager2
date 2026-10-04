@@ -4,6 +4,7 @@ import { AAATableItem } from "@/types/metrics/aaa";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface Props {
   item: AAATableItem;
@@ -74,6 +75,7 @@ const TargetSection = ({
 };
 
 const AAATableTooltip = ({ item }: Props) => {
+  const { t } = useTranslation();
   const diffChar = item.difficulty.slice(0, 1).toUpperCase();
   const maxScore = item.notes * 2;
   const scoreRate = ((item.user.exScore / maxScore) * 100).toFixed(2);
@@ -93,7 +95,7 @@ const AAATableTooltip = ({ item }: Props) => {
         {item.targets.custom && (
           <>
             <TargetSection
-              label="カスタム"
+              label={t("common.custom")}
               data={item.targets.custom}
               colorClass="text-bpim-primary"
               maxScore={maxScore}
@@ -114,7 +116,7 @@ const AAATableTooltip = ({ item }: Props) => {
         />
         <div className="flex flex-col gap-2">
           <span className="text-[10px] font-black tracking-widest text-bpim-primary uppercase">
-            あなた
+            {t("common.you")}
           </span>
           <div className="grid grid-cols-3 gap-1 text-center">
             <div className="flex flex-col">

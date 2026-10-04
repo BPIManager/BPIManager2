@@ -10,18 +10,22 @@ import {
 import { DashCard } from "@/components/ui/dashcard";
 import { useChartColors } from "@/hooks/common/useChartColors";
 import type { VersionScoreDistribution } from "@/types/siteStats";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 function VersionScoreChart({ data }: { data: VersionScoreDistribution }) {
+  const { t, tFormat } = useTranslation();
   const c = useChartColors();
 
   return (
     <DashCard className="flex flex-col">
       <div className="mb-3 flex items-center justify-between shrink-0">
         <h3 className="text-sm font-bold uppercase text-bpim-muted">
-          バージョン別スコア登録数
+          {t("siteInfo.versionScore.title")}
         </h3>
         <span className="text-[10px] text-bpim-muted">
-          全{data.total.toLocaleString()}件
+          {tFormat("siteInfo.versionScore.total", {
+            total: data.total.toLocaleString(),
+          })}
         </span>
       </div>
       <div className="h-56">
@@ -62,11 +66,14 @@ function VersionScoreChart({ data }: { data: VersionScoreDistribution }) {
                 borderRadius: 6,
                 fontSize: 11,
               }}
-              formatter={(v) => [Number(v).toLocaleString(), "スコア数"]}
+              formatter={(v) => [
+                Number(v).toLocaleString(),
+                t("siteInfo.versionScore.count"),
+              ]}
             />
             <Bar
               dataKey="count"
-              name="スコア数"
+              name={t("siteInfo.versionScore.count")}
               fill={c.primary}
               radius={[0, 2, 2, 0]}
             />

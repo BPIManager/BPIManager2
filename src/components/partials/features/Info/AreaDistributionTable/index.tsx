@@ -11,6 +11,7 @@ import {
 import { latestVersion, arenaDataVersion } from "@/constants/iidx/iidxVersions";
 import { versionsNonDisabledCollection } from "@/constants/iidx/versionTitles";
 import type { AreaEntry } from "@/types/siteStats";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 const PAGE_SIZE = 10;
 
@@ -20,6 +21,7 @@ function AreaDistributionTable({
   data: Record<string, AreaEntry[]> | undefined;
 }) {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const { t, tFormat } = useTranslation();
   const areaByVersion = data ?? {};
   const availableVersions = versionsNonDisabledCollection.filter(
     (v) => areaByVersion[v.value]?.some((e) => e.count > 0),
@@ -39,7 +41,7 @@ function AreaDistributionTable({
     <DashCard>
       <div className="mb-3 flex items-center justify-between gap-2">
         <h3 className="text-sm font-bold uppercase text-bpim-muted">
-          県別利用者数
+          {t("siteInfo.areaDist.title")}
         </h3>
         <Select
           value={version}
@@ -92,7 +94,9 @@ function AreaDistributionTable({
           className="mt-3 w-full text-xs text-bpim-muted hover:text-bpim-text"
           onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
         >
-          さらに表示 ({entries.length - visibleCount} 件)
+          {tFormat("siteInfo.areaDist.showMore", {
+            count: entries.length - visibleCount,
+          })}
         </Button>
       )}
     </DashCard>

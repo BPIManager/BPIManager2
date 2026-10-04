@@ -22,6 +22,7 @@ import { toast } from "sonner";
 import { Upload } from "lucide-react";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { clickableProps } from "@/utils/common/clickableProps";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface Props {
   uid: string;
@@ -36,6 +37,7 @@ const ImageUploadModal = ({
   onClose,
   onSuccess,
 }: Props) => {
+  const { t } = useTranslation();
   const [imgSrc, setImgSrc] = useState("");
   const [crop, setCrop] = useState<Crop>();
   const [isUploading, setIsUploading] = useState(false);
@@ -112,10 +114,10 @@ const ImageUploadModal = ({
 
       onSuccess(downloadURL);
       handleClose();
-      toast.success("画像をアップロードしました");
+      toast.success(t("imageCrop.uploaded"));
     } catch (error) {
       console.error(error);
-      toast.error("アップロードに失敗しました");
+      toast.error(t("imageCrop.uploadFailed"));
     } finally {
       setIsUploading(false);
     }
@@ -125,7 +127,9 @@ const ImageUploadModal = ({
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent className="sm:max-w-md border-bpim-border bg-bpim-bg p-4">
         <DialogHeader>
-          <DialogTitle className="text-bpim-text">画像を選択</DialogTitle>
+          <DialogTitle className="text-bpim-text">
+            {t("imageCrop.title")}
+          </DialogTitle>
         </DialogHeader>
 
         <div className="flex flex-col items-center justify-center gap-4 py-4">
@@ -136,7 +140,7 @@ const ImageUploadModal = ({
             >
               <Upload className="h-8 w-8 text-bpim-muted" />
               <p className="text-sm text-bpim-muted font-medium">
-                クリックして画像を選択
+                {t("imageCrop.clickToSelect")}
               </p>
               <input
                 ref={fileInputRef}
@@ -175,7 +179,7 @@ const ImageUploadModal = ({
               onClick={clearSelection}
               className="h-9"
             >
-              再選択
+              {t("imageCrop.reselect")}
             </Button>
           )}
           <Button
@@ -184,7 +188,7 @@ const ImageUploadModal = ({
             disabled={isUploading}
             className="h-9 text-bpim-muted"
           >
-            キャンセル
+            {t("common.cancel")}
           </Button>
           {imgSrc && (
             <Button
@@ -192,7 +196,7 @@ const ImageUploadModal = ({
               disabled={isUploading}
               className="h-9 min-w-20 bg-bpim-primary hover:bg-bpim-primary"
             >
-              {isUploading ? <LoadingSpinner size="sm" /> : "保存"}
+              {isUploading ? <LoadingSpinner size="sm" /> : t("common.save")}
             </Button>
           )}
         </DialogFooter>

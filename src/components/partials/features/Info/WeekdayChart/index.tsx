@@ -13,8 +13,13 @@ import { DashCard } from "@/components/ui/dashcard";
 import { useChartColors } from "@/hooks/common/useChartColors";
 import PeriodTabs from "../PeriodTabs";
 import type { SiteStatsPeriod, WeekdayEntry } from "@/types/siteStats";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
-const WEEKDAY_LABELS = ["日", "月", "火", "水", "木", "金", "土"];
+/** weekday は 1=日曜 〜 7=土曜。2024-01-07 は日曜日 */
+const weekdayLabel = (locale: string, weekday: number) =>
+  new Intl.DateTimeFormat(locale, { weekday: "narrow", timeZone: "UTC" }).format(
+    new Date(Date.UTC(2024, 0, 6 + weekday)),
+  );
 
 function WeekdayChart({
   data,
@@ -22,18 +27,19 @@ function WeekdayChart({
   data: Record<SiteStatsPeriod, WeekdayEntry[]>;
 }) {
   const c = useChartColors();
+  const { t, locale } = useTranslation();
   const [period, setPeriod] = useState<SiteStatsPeriod>("d7");
 
   const chartData = data[period].map((d) => ({
     ...d,
-    label: WEEKDAY_LABELS[d.weekday - 1] ?? String(d.weekday),
+    label: weekdayLabel(locale, d.weekday),
   }));
 
   return (
     <DashCard className="h-80 flex flex-col">
       <div className="mb-3 flex items-center justify-between shrink-0">
         <h3 className="text-sm font-bold uppercase text-bpim-muted">
-          曜日別登録数 (JST)
+          {t("siteInfo.weekday.title")}
         </h3>
         <PeriodTabs value={period} onChange={setPeriod} />
       </div>
@@ -82,7 +88,7 @@ function WeekdayChart({
             <Bar
               yAxisId="left"
               dataKey="allScores"
-              name="全スコア"
+              name={t("siteInfo.series.allScores")}
               fill={c.warning}
               opacity={0.85}
               radius={[2, 2, 0, 0]}
@@ -90,7 +96,7 @@ function WeekdayChart({
             <Bar
               yAxisId="right"
               dataKey="logs"
-              name="バッチログ"
+              name={t("siteInfo.series.batchLogs")}
               fill={c.primary}
               opacity={0.85}
               radius={[2, 2, 0, 0]}

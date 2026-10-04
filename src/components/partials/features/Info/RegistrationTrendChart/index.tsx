@@ -11,6 +11,7 @@ import {
 } from "recharts";
 import { DashCard } from "@/components/ui/dashcard";
 import { useChartColors } from "@/hooks/common/useChartColors";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 type TrendEntry = {
   date: string;
@@ -28,6 +29,7 @@ function getWeekKey(dateStr: string): string {
 }
 
 function RegistrationTrendChart({ data }: { data: TrendEntry[] }) {
+  const { t } = useTranslation();
   const c = useChartColors();
   const [groupBy, setGroupBy] = useState<"day" | "week" | "month">("day");
 
@@ -51,7 +53,7 @@ function RegistrationTrendChart({ data }: { data: TrendEntry[] }) {
     <DashCard className="h-80 flex flex-col">
       <div className="mb-3 flex items-center justify-between shrink-0">
         <h3 className="text-sm font-bold uppercase text-bpim-muted">
-          登録数推移 (直近90日)
+          {t("siteInfo.registration.title")}
         </h3>
         <div className="flex overflow-hidden rounded border border-bpim-border text-[10px]">
           {(["day", "week", "month"] as const).map((g) => (
@@ -64,7 +66,13 @@ function RegistrationTrendChart({ data }: { data: TrendEntry[] }) {
                   : "text-bpim-muted hover:bg-bpim-overlay"
               }`}
             >
-              {g === "day" ? "日" : g === "week" ? "週" : "月"}
+              {t(
+                g === "day"
+                  ? "siteInfo.registration.day"
+                  : g === "week"
+                    ? "siteInfo.registration.week"
+                    : "siteInfo.registration.month",
+              )}
             </button>
           ))}
         </div>
@@ -117,7 +125,7 @@ function RegistrationTrendChart({ data }: { data: TrendEntry[] }) {
               yAxisId="left"
               type="monotone"
               dataKey="allScores"
-              name="全難易度スコア"
+              name={t("siteInfo.registration.allDifficultyScores")}
               stroke={c.warning}
               strokeWidth={1.5}
               dot={false}
@@ -126,7 +134,7 @@ function RegistrationTrendChart({ data }: { data: TrendEntry[] }) {
               yAxisId="left"
               type="monotone"
               dataKey="scores"
-              name="☆11,☆12スコア"
+              name={t("siteInfo.registration.level1112Scores")}
               stroke={c.danger}
               strokeWidth={1.5}
               dot={false}
@@ -135,7 +143,7 @@ function RegistrationTrendChart({ data }: { data: TrendEntry[] }) {
               yAxisId="right"
               type="monotone"
               dataKey="logs"
-              name="バッチログ"
+              name={t("siteInfo.series.batchLogs")}
               stroke={c.primary}
               strokeWidth={1.5}
               dot={false}

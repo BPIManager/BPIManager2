@@ -9,8 +9,10 @@ import { useScoreHistory } from "@/hooks/scores/useScoreLogs";
 import { BpiCalculator } from "@/lib/bpi";
 import type { SongWithScore } from "@/types/songs/score";
 import { StatsTabView } from "./ui";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 const StatsTab = ({ song }: { song: SongWithScore }) => {
+  const { t, tFormat } = useTranslation();
   const router = useRouter();
   const { user } = useUser();
 
@@ -79,14 +81,16 @@ const StatsTab = ({ song }: { song: SongWithScore }) => {
 
   const refLabel = useMemo(() => {
     if (!effectiveRef || effectiveRef === "none") return undefined;
-    if (effectiveRef === "rival-avg") return "ライバル平均";
-    if (effectiveRef === "rival-top") return "ライバルトップ";
+    if (effectiveRef === "rival-avg") return t("songDetail.ref.rivalAvg");
+    if (effectiveRef === "rival-top") return t("songDetail.ref.rivalTop");
     if (effectiveRef === "personal-best")
       return personalBest
-        ? `自己歴代(IIDX ${personalBest.version})`
-        : "自己歴代";
-    return effectiveRef + "平均";
-  }, [effectiveRef, personalBest]);
+        ? tFormat("songDetail.ref.personalBestVersion", {
+            version: personalBest.version,
+          })
+        : t("songDetail.ref.personalBest");
+    return tFormat("songDetail.ref.average", { name: effectiveRef });
+  }, [effectiveRef, personalBest, t, tFormat]);
 
   const chartData = useMemo(() => {
     const data: { label: string; count: number; bpi: number }[] = [];

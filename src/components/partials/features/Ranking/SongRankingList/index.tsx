@@ -21,6 +21,8 @@ import SongDetailView from "@/components/partials/modal/SongDetail";
 import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
 import { ALL_LEVELS } from "@/constants/iidx/songLevels";
 import { Search } from "lucide-react";
+import { useTranslation } from "@/hooks/common/useTranslation";
+import type { TranslationKey } from "@/lib/i18n/translations";
 
 type SortKey =
   | "pct_asc"
@@ -32,13 +34,13 @@ type SortKey =
 
 const ITEM_SIZE = 58;
 
-const SORT_OPTIONS: { value: SortKey; label: string }[] = [
-  { value: "pct_asc", label: "上位%が高い順" },
-  { value: "pct_desc", label: "上位%が低い順" },
-  { value: "rank_asc", label: "順位が高い順" },
-  { value: "rank_desc", label: "順位が低い順" },
-  { value: "title", label: "楽曲名順" },
-  { value: "updated", label: "最近更新した順" },
+const SORT_OPTIONS: { value: SortKey; labelKey: TranslationKey }[] = [
+  { value: "pct_asc", labelKey: "songRankingList.sort.pctAsc" },
+  { value: "pct_desc", labelKey: "songRankingList.sort.pctDesc" },
+  { value: "rank_asc", labelKey: "songRankingList.sort.rankAsc" },
+  { value: "rank_desc", labelKey: "songRankingList.sort.rankDesc" },
+  { value: "title", labelKey: "songRankingList.sort.title" },
+  { value: "updated", labelKey: "songRankingList.sort.updated" },
 ];
 
 function pct(entry: SongRankEntry): number {
@@ -105,6 +107,7 @@ interface SongRankRowProps {
 }
 
 const SongRankRowComponent = ({ entry, onClick }: SongRankRowProps) => {
+  const { tFormat } = useTranslation();
   const p = pct(entry);
   const pctColor = getPctColor(p);
 
@@ -126,8 +129,10 @@ const SongRankRowComponent = ({ entry, onClick }: SongRankRowProps) => {
 
         <div className="flex shrink-0 items-center gap-2">
           <span className="text-[10px] text-bpim-muted whitespace-nowrap">
-            <b className="text-bpim-text">{entry.rank}位</b> /{" "}
-            {entry.totalPlayers}人中
+            <b className="text-bpim-text">
+              {tFormat("songRankingList.rankValue", { rank: entry.rank })}
+            </b>{" "}
+            {tFormat("songRankingList.ofTotal", { total: entry.totalPlayers })}
           </span>
           <div
             className="inline-flex min-w-15 items-center justify-center rounded-sm border px-2 py-0.5 font-mono text-xs font-bold"
@@ -137,7 +142,7 @@ const SongRankRowComponent = ({ entry, onClick }: SongRankRowProps) => {
               color: pctColor.text,
             }}
           >
-            上位{p.toFixed(1)}%
+            {tFormat("songRankingList.topPct", { pct: p.toFixed(1) })}
           </div>
         </div>
       </div>
@@ -179,6 +184,7 @@ interface SongRankingListProps {
 }
 
 const SongRankingList = ({ version }: SongRankingListProps) => {
+  const { t } = useTranslation();
   const { fbUser } = useUser();
   const { data, isLoading, isError, refresh } = useUserSongRankings(version);
   const [sort, setSort] = useState<SortKey>("pct_asc");
@@ -257,7 +263,7 @@ const SongRankingList = ({ version }: SongRankingListProps) => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="border-bpim-border bg-bpim-bg text-bpim-text">
-                <SelectItem value="all">すべて</SelectItem>
+                <SelectItem value="all">{t("common.all")}</SelectItem>
                 {ALL_LEVELS.map((lv) => (
                   <SelectItem key={lv} value={String(lv)}>
                     ☆{lv}
@@ -278,7 +284,7 @@ const SongRankingList = ({ version }: SongRankingListProps) => {
               <SelectContent className="border-bpim-border bg-bpim-bg text-bpim-text">
                 {SORT_OPTIONS.map((o) => (
                   <SelectItem key={o.value} value={o.value}>
-                    {o.label}
+                    {t(o.labelKey)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -294,7 +300,7 @@ const SongRankingList = ({ version }: SongRankingListProps) => {
               <Input
                 value={searchQuery}
                 onChange={handleSearchChange}
-                placeholder="楽曲名で検索"
+                placeholder={t("songRankingList.searchPlaceholder")}
                 className="h-9 pl-8 border-bpim-border bg-bpim-bg text-bpim-text placeholder:text-bpim-muted focus-visible:ring-blue-500"
               />
             </div>
@@ -304,15 +310,15 @@ const SongRankingList = ({ version }: SongRankingListProps) => {
         <div className="flex items-center gap-3 px-3 py-1">
           <div className="min-w-0 flex-1">
             <span className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
-              楽曲名
+              {t("songRankingList.colTitle")}
             </span>
           </div>
           <div className="flex shrink-0 items-center gap-2">
             <span className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase whitespace-nowrap">
-              順位
+              {t("songRankingList.colRank")}
             </span>
             <span className="inline-flex min-w-15 items-center justify-center text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
-              上位%
+              {t("songRankingList.colPct")}
             </span>
           </div>
         </div>
@@ -323,8 +329,8 @@ const SongRankingList = ({ version }: SongRankingListProps) => {
             style={{ height: "calc(100svh - 440px)", minHeight: "300px" }}
           >
             {debouncedQuery || levelFilter !== "all"
-              ? "該当する楽曲がありません"
-              : "データがありません"}
+              ? t("songRankingList.noMatch")
+              : t("songRankingList.noData")}
           </div>
         ) : (
           <List

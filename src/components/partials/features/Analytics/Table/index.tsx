@@ -18,6 +18,7 @@ import RivalAnalysis from "@/components/partials/common/Rivals/Analysis/ui";
 import { useUser } from "@/contexts/users/UserContext";
 import { List, BarChart2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 type SubTab = "list" | "analysis";
 
@@ -33,34 +34,38 @@ const SubTabBar = ({
   songs: SongWithRival[] | undefined;
   subTab: SubTab;
   onTabChange: (tab: SubTab) => void;
-}) => (
-  <div className="flex items-center gap-1 border-b border-bpim-border px-3 py-2">
-    {rivalLabel && !isLoading && songs && (
-      <span className="mr-3 text-[10px] font-bold uppercase tracking-widest text-bpim-warning">
-        vs {rivalLabel}
-      </span>
-    )}
-    {(["list", "analysis"] as SubTab[]).map((tab) => {
-      const Icon = tab === "list" ? List : BarChart2;
-      const label = tab === "list" ? "楽曲一覧" : "分析";
-      return (
-        <button
-          key={tab}
-          onClick={() => onTabChange(tab)}
-          className={cn(
-            "flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-colors",
-            subTab === tab
-              ? "bg-bpim-primary/15 text-bpim-primary"
-              : "text-bpim-muted hover:bg-bpim-overlay/50 hover:text-bpim-text",
-          )}
-        >
-          <Icon className="h-3.5 w-3.5" />
-          {label}
-        </button>
-      );
-    })}
-  </div>
-);
+}) => {
+  const { t } = useTranslation();
+  return (
+    <div className="flex items-center gap-1 border-b border-bpim-border px-3 py-2">
+      {rivalLabel && !isLoading && songs && (
+        <span className="mr-3 text-[10px] font-bold uppercase tracking-widest text-bpim-warning">
+          vs {rivalLabel}
+        </span>
+      )}
+      {(["list", "analysis"] as SubTab[]).map((tab) => {
+        const Icon = tab === "list" ? List : BarChart2;
+        const label =
+          tab === "list" ? t("analyticsTable.songList") : t("analyticsTable.analysis");
+        return (
+          <button
+            key={tab}
+            onClick={() => onTabChange(tab)}
+            className={cn(
+              "flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-colors",
+              subTab === tab
+                ? "bg-bpim-primary/15 text-bpim-primary"
+                : "text-bpim-muted hover:bg-bpim-overlay/50 hover:text-bpim-text",
+            )}
+          >
+            <Icon className="h-3.5 w-3.5" />
+            {label}
+          </button>
+        );
+      })}
+    </div>
+  );
+};
 
 interface AnalyticsComparisonTableProps {
   songs: SongWithRival[] | undefined;
@@ -80,6 +85,7 @@ const AnalyticsComparisonTable = ({
   version,
   onScoreSaved,
 }: AnalyticsComparisonTableProps) => {
+  const { t: translate } = useTranslation();
   const { fbUser } = useUser();
   const [selectedSong, setSelectedSong] = useState<SongWithScore | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -107,7 +113,7 @@ const AnalyticsComparisonTable = ({
         />
         {isLoading ? (
           <div className="flex h-40 items-center justify-center text-xs text-bpim-muted">
-            読み込み中...
+            {translate("common.loading")}
           </div>
         ) : (
           <RivalAnalysis

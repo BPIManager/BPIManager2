@@ -11,26 +11,30 @@ import {
   getPatternBadge,
   type PatternBadge,
 } from "@/utils/songs/patternUtils";
+import { useTranslation } from "@/hooks/common/useTranslation";
+import type { TranslationKey } from "@/lib/i18n/translations";
 
 const BADGE_CLASS: Record<NonNullable<PatternBadge>, string> = {
   normal: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
   mirror: "bg-sky-500/20 text-sky-400 border-sky-500/30",
   "r-ran": "bg-orange-500/20 text-orange-400 border-orange-500/30",
 };
-const BADGE_LABEL: Record<NonNullable<PatternBadge>, string> = {
-  normal: "正規",
-  mirror: "ミラー",
-  "r-ran": "R-RAN",
+const BADGE_LABEL_KEY: Record<NonNullable<PatternBadge>, TranslationKey | null> = {
+  normal: "songPattern.normal",
+  mirror: "songPattern.mirror",
+  "r-ran": null,
 };
 
 export function PatternBadgeLabel({ badge }: { badge: PatternBadge }) {
+  const { t } = useTranslation();
   if (!badge) return null;
+  const labelKey = BADGE_LABEL_KEY[badge];
   return (
     <Badge
       variant="outline"
       className={`text-[10px] px-1.5 py-0 ${BADGE_CLASS[badge]}`}
     >
-      {BADGE_LABEL[badge]}
+      {labelKey ? t(labelKey) : "R-RAN"}
     </Badge>
   );
 }
@@ -48,6 +52,7 @@ export interface PatternRowProps {
 }
 
 function PatternSentinelRow({ style, onLoadMore }: { style: React.CSSProperties; onLoadMore: () => void }) {
+  const { t } = useTranslation();
   useEffect(() => {
     onLoadMore();
     // センチネルのマウント時にのみ読み込みを発火させるため、onLoadMore の参照変化では再実行しない（空配列）。
@@ -55,7 +60,7 @@ function PatternSentinelRow({ style, onLoadMore }: { style: React.CSSProperties;
   }, []);
   return (
     <div style={style} className="flex items-center justify-center text-xs text-bpim-muted">
-      読み込み中...
+      {t("common.loading")}
     </div>
   );
 }
@@ -167,13 +172,14 @@ export function PatternListRow({
 }
 
 export function PatternTableHeader() {
+  const { t } = useTranslation();
   return (
     <div className="flex items-center gap-2 px-3 text-[10px] text-bpim-muted uppercase tracking-wide border-b border-bpim-border bg-bpim-surface-2 py-2">
       <span className="w-7 shrink-0 text-right">#</span>
-      <span className="w-14.5 shrink-0">配置(1P基準)</span>
-      <span className="w-13.5 shrink-0">種別</span>
-      <span className="flex-1 text-right">スコア</span>
-      <span className="w-22 shrink-0 text-center">投票</span>
+      <span className="w-14.5 shrink-0">{t("songPattern.colPattern")}</span>
+      <span className="w-13.5 shrink-0">{t("songPattern.colType")}</span>
+      <span className="flex-1 text-right">{t("songPattern.colScore")}</span>
+      <span className="w-22 shrink-0 text-center">{t("songPattern.colVote")}</span>
       <span className="w-17 shrink-0 text-center">TEXTAGE</span>
     </div>
   );
@@ -196,6 +202,7 @@ export function PatternSearchBar({
   onChange,
   result,
 }: PatternSearchBarProps) {
+  const { t, tFormat } = useTranslation();
   const badge = value.length === 7 ? getPatternBadge(value) : null;
   const isReady = value.length === 7;
 
@@ -207,7 +214,7 @@ export function PatternSearchBar({
           onChange={(e) =>
             onChange(e.target.value.replace(/[^1-7]/g, "").slice(0, 7))
           }
-          placeholder="配置を入力 (例: 2345671)"
+          placeholder={t("songPattern.placeholder")}
           className="font-mono tracking-widest h-8 text-sm"
           maxLength={7}
         />
@@ -217,18 +224,18 @@ export function PatternSearchBar({
         <p className="text-xs text-bpim-muted">
           {result.score !== null ? (
             <>
-              スコア:{" "}
+              {t("songPattern.resultScore")}{" "}
               <span className="text-bpim-text font-semibold tabular-nums">
                 {result.score.toFixed(2)}
               </span>
-              　順位:{" "}
+              　{t("songPattern.resultRank")}{" "}
               <span className="text-bpim-text font-semibold tabular-nums">
-                {result.rank}位
+                {tFormat("songPattern.resultRankValue", { rank: result.rank ?? "" })}
               </span>
-              　/ {result.total}件中
+              　{tFormat("songPattern.resultTotal", { total: result.total ?? "" })}
             </>
           ) : (
-            "このパターンはリストにありません"
+            t("songPattern.notInList")
           )}
         </p>
       )}

@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { formatRankingRate } from "@/utils/songs/rankingRate";
 import type { SongRankingEntry } from "@/types/users/ranking";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
 export const RANKING_ROW_HEIGHT = 48;
 
@@ -57,6 +58,7 @@ export function SongRankingListRow({
   onNavigate,
   notes,
 }: RowComponentProps<SongRankingRowProps>) {
+  const { t } = useTranslation();
   const row = rankings[index];
   if (!row) return null;
 
@@ -123,11 +125,11 @@ export function SongRankingListRow({
               isSelf ? "font-bold" : "font-medium",
             )}
           >
-            {isPrivate ? "非公開ユーザー" : row.userName}
+            {isPrivate ? t("common.privateUser") : row.userName}
           </p>
           {isSelf && (
             <p className="text-[9px] font-bold leading-none text-bpim-primary">
-              あなた
+              {t("common.you")}
             </p>
           )}
         </div>

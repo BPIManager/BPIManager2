@@ -1,10 +1,12 @@
 import type { SiteStatsPeriod } from "@/types/siteStats";
+import type { TranslationKey } from "@/lib/i18n/translations";
+import { useTranslation } from "@/hooks/common/useTranslation";
 
-const PERIOD_LABELS: Record<SiteStatsPeriod, string> = {
-  all: "全期間",
-  d90: "過去90日",
-  d30: "過去30日",
-  d7: "過去7日",
+const PERIOD_LABEL_KEYS: Record<SiteStatsPeriod, TranslationKey> = {
+  all: "siteInfo.period.all",
+  d90: "siteInfo.period.d90",
+  d30: "siteInfo.period.d30",
+  d7: "siteInfo.period.d7",
 };
 const PERIODS: SiteStatsPeriod[] = ["all", "d90", "d30", "d7"];
 
@@ -15,6 +17,7 @@ function PeriodTabs({
   value: SiteStatsPeriod;
   onChange: (p: SiteStatsPeriod) => void;
 }) {
+  const { t } = useTranslation();
   return (
     <div className="flex overflow-hidden rounded border border-bpim-border text-[10px]">
       {PERIODS.map((p) => (
@@ -27,7 +30,7 @@ function PeriodTabs({
               : "text-bpim-muted hover:bg-bpim-overlay"
           }`}
         >
-          {PERIOD_LABELS[p]}
+          {t(PERIOD_LABEL_KEYS[p])}
         </button>
       ))}
     </div>

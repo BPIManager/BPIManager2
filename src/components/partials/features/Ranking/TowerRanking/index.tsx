@@ -19,24 +19,26 @@ import type {
   TowerType,
   TowerRankingEntry,
 } from "@/types/users/ranking";
+import type { TranslationKey } from "@/lib/i18n/translations";
 
 const ITEM_SIZE = 58;
 
-const PERIODS: { value: TowerPeriod; label: string }[] = [
-  { value: "day", label: "日別" },
-  { value: "week", label: "週別" },
-  { value: "month", label: "月別" },
+const PERIODS: { value: TowerPeriod; labelKey: TranslationKey }[] = [
+  { value: "day", labelKey: "towerRanking.period.day" },
+  { value: "week", labelKey: "towerRanking.period.week" },
+  { value: "month", labelKey: "towerRanking.period.month" },
 ];
 
-const TOWER_TYPES: { value: TowerType; label: string }[] = [
-  { value: "total", label: "総合" },
-  { value: "key", label: "鍵盤" },
-  { value: "scratch", label: "スクラッチ" },
+const TOWER_TYPES: { value: TowerType; labelKey: TranslationKey }[] = [
+  { value: "total", labelKey: "towerRanking.kind.total" },
+  { value: "key", labelKey: "towerRanking.kind.key" },
+  { value: "scratch", labelKey: "towerRanking.kind.scratch" },
 ];
 
 function getPeriodRange(
   period: TowerPeriod,
   date: string,
+  locale = "ja",
 ): { startDate: string; endDate: string; label: string } {
   const d = dayjs(date);
   if (period === "week") {
@@ -54,7 +56,10 @@ function getPeriodRange(
     return {
       startDate: d.startOf("month").format("YYYY-MM-DD"),
       endDate: d.endOf("month").format("YYYY-MM-DD"),
-      label: `${d.format("YYYY年M月")}`,
+      label: new Intl.DateTimeFormat(locale, {
+        year: "numeric",
+        month: "long",
+      }).format(d.toDate()),
     };
   }
   return {
@@ -117,7 +122,7 @@ interface TowerRankingProps {
 }
 
 const TowerRanking = ({ version }: TowerRankingProps) => {
-  const { t: translate } = useTranslation();
+  const { t: translate, locale } = useTranslation();
   const router = useRouter();
   const today = dayjs().format("YYYY-MM-DD");
 
@@ -126,7 +131,7 @@ const TowerRanking = ({ version }: TowerRankingProps) => {
     "total") as TowerType;
   const selectedDate = (router.query.towerDate as string) || today;
 
-  const { label } = getPeriodRange(period, selectedDate);
+  const { label } = getPeriodRange(period, selectedDate, locale);
 
   const { data, isLoading, isError } = useIidxTowerRanking({
     version,
@@ -242,7 +247,7 @@ const TowerRanking = ({ version }: TowerRankingProps) => {
                   : "bg-bpim-surface-2/40 text-bpim-muted hover:bg-bpim-overlay/50",
               )}
             >
-              {p.label}
+              {translate(p.labelKey)}
             </button>
           ))}
         </div>
@@ -266,7 +271,7 @@ const TowerRanking = ({ version }: TowerRankingProps) => {
                   : "bg-bpim-surface-2/40 text-bpim-muted hover:bg-bpim-overlay/50",
               )}
             >
-              {t.label}
+              {translate(t.labelKey)}
             </button>
           ))}
         </div>
@@ -313,13 +318,19 @@ const TowerRanking = ({ version }: TowerRankingProps) => {
         <div className="rounded-xl border border-bpim-muted/20 bg-bpim-overlay/40 p-4 shadow-sm">
           <div className="flex items-center justify-between">
             <p className="text-md text-bpim-muted">
-              全 {data?.totalCount ?? 0} 人中
+              {translate("ranking.selfRank.outOf")}
+              {data?.totalCount ?? 0}
+              {translate("ranking.selfRank.people")}
             </p>
             <div className="text-right">
-              <span className="text-xs text-bpim-muted">現在の順位</span>
+              <span className="text-xs text-bpim-muted">
+                {translate("ranking.selfRank.label")}
+              </span>
               <div className="font-mono text-xl font-bold text-bpim-text">
                 <span className="text-bpim-primary">{selfRank}</span>
-                <span className="ml-0.5 text-sm">位</span>
+                <span className="ml-0.5 text-sm">
+                  {translate("ranking.selfRank.suffix")}
+                </span>
               </div>
             </div>
           </div>
@@ -336,7 +347,7 @@ const TowerRanking = ({ version }: TowerRankingProps) => {
         <FetchErrorState error={isError} />
       ) : sortedRankings.length === 0 ? (
         <div className="flex items-center justify-center rounded-xl border border-bpim-border py-12 text-sm text-bpim-muted">
-          この期間のデータはありません
+          {translate("towerRanking.noData")}
         </div>
       ) : (
         <List

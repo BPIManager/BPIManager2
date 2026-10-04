@@ -7,7 +7,14 @@ import { cn } from "@/lib/utils";
 import dayjs from "@/lib/dayjs";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
-const WEEKDAYS = ["月", "火", "水", "木", "金", "土", "日"];
+/** 月曜始まりの曜日ラベル（ロケールの短縮表記）。2024-01-01 は月曜日 */
+const weekdayLabels = (locale: string) =>
+  Array.from({ length: 7 }, (_, i) =>
+    new Intl.DateTimeFormat(locale, {
+      weekday: "narrow",
+      timeZone: "UTC",
+    }).format(new Date(Date.UTC(2024, 0, 1 + i))),
+  );
 
 interface CalendarPickerProps {
   activeDates: Set<string>;
@@ -22,7 +29,7 @@ const CalendarPicker = ({
   onSelect,
   initialMonth,
 }: CalendarPickerProps) => {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const today = dayjs();
   const todayStr = today.format("YYYY-MM-DD");
 
@@ -78,7 +85,11 @@ const CalendarPicker = ({
           <ChevronLeftIcon className="size-4" />
         </Button>
         <span className="text-xs font-semibold text-bpim-text">
-          {view.format("YYYY年M月")}
+          {new Intl.DateTimeFormat(locale, {
+            year: "numeric",
+            month: "long",
+            timeZone: "UTC",
+          }).format(new Date(Date.UTC(view.year(), view.month(), 1)))}
         </span>
         <Button
           variant="ghost"
@@ -91,9 +102,9 @@ const CalendarPicker = ({
       </div>
 
       <div className="mb-1 grid grid-cols-7 gap-0.5">
-        {WEEKDAYS.map((d) => (
+        {weekdayLabels(locale).map((d, i) => (
           <div
-            key={d}
+            key={i}
             className="flex h-6 items-center justify-center text-[10px] font-medium text-bpim-muted"
           >
             {d}
