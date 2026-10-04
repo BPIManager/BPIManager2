@@ -7,12 +7,13 @@
 #   DEPLOY_SSH_KEY  デプロイ用 SSH 秘密鍵（PEM 全文）
 #   VPS_HOST        接続先ホスト
 #   VPS_USER        接続ユーザー
+#   VPS_HOST_KEY    接続先のホスト鍵（known_hosts 形式。ssh-keyscan -p <port> <host> の出力）
 #   VPS_PORT        （任意）SSH ポート。既定 22
 #   DEPLOY_PATH     （任意）接続ユーザーのホームからの相対パス。既定 "bpim2"
 #
 set -euo pipefail
 
-: "${DEPLOY_SSH_KEY:?}" "${VPS_HOST:?}" "${VPS_USER:?}"
+: "${DEPLOY_SSH_KEY:?}" "${VPS_HOST:?}" "${VPS_USER:?}" "${VPS_HOST_KEY:?}"
 
 REL="${GITHUB_SHA:?}"
 REMOTE_BASE="${DEPLOY_PATH:-bpim2}" # 接続ユーザーのホーム配下
@@ -20,12 +21,14 @@ VPS_PORT="${VPS_PORT:-22}"
 DEST="${VPS_USER}@${VPS_HOST}:~/${REMOTE_BASE}/releases/${REL}/"
 
 KEY_FILE="$(mktemp)"
-trap 'rm -f "$KEY_FILE"' EXIT
+KNOWN_HOSTS_FILE="$(mktemp)"
+trap 'rm -f "$KEY_FILE" "$KNOWN_HOSTS_FILE"' EXIT
 printf '%s\n' "$DEPLOY_SSH_KEY" > "$KEY_FILE"
 chmod 600 "$KEY_FILE"
+printf '%s\n' "$VPS_HOST_KEY" > "$KNOWN_HOSTS_FILE"
 
 # -p は ssh でも rsync の -e "ssh ..." 文字列でもそのまま効く
-SSH_OPTS=(-i "$KEY_FILE" -p "$VPS_PORT" -o StrictHostKeyChecking=accept-new -o BatchMode=yes)
+SSH_OPTS=(-i "$KEY_FILE" -p "$VPS_PORT" -o UserKnownHostsFile="$KNOWN_HOSTS_FILE" -o StrictHostKeyChecking=yes -o BatchMode=yes)
 
 ssh "${SSH_OPTS[@]}" "${VPS_USER}@${VPS_HOST}" "mkdir -p ~/${REMOTE_BASE}/releases/${REL}"
 

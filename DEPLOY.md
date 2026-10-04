@@ -52,6 +52,7 @@ DB マイグレーションは自動化しない（後述）。
   - `DEPLOY_KEY` … デプロイ専用 SSH 秘密鍵（PEM 全文）
   - `VPS_HOST` … 接続先ホスト名 / IP
   - `VPS_USER` … deploy user 名
+  - `VPS_HOST_KEY` … 接続先のホスト鍵（known_hosts 形式）。信頼できる経路で `ssh-keyscan -p <port> <VPS_HOST>` を実行した出力を貼る。VPS を再構築したら更新する
   - `VPS_PORT` … （任意）SSH ポート。標準（22）以外なら設定する
 - **Variables**（同 → Variables）
   - `DEPLOY_ENABLED` = `true` … これが `true` になるまで `deploy` ジョブは skip される
