@@ -1,9 +1,9 @@
 import { useEffect, useRef } from "react";
 import { useCurrentThemeId } from "@/hooks/common/useTheme";
 import {
-  ZINRAI_BG_SPEED_FACTOR,
-  useZinraiBgSettings,
-} from "@/hooks/zinrai/useZinraiBackground";
+  V34_BG_SPEED_FACTOR,
+  useV34BgSettings,
+} from "@/hooks/v34/useV34Background";
 import {
   PIXEL_SIZE,
   createGlitchBars,
@@ -14,7 +14,7 @@ import {
   stepPetals,
   type GlitchBar,
   type Petal,
-} from "@/lib/zinrai/sakura";
+} from "@/lib/v34/sakura";
 
 const CANVAS_CLASS =
   "pointer-events-none fixed inset-0 -z-1 h-full w-full [image-rendering:pixelated]";
@@ -22,14 +22,14 @@ const GLITCH_MIN_MS = 4000;
 const GLITCH_MAX_MS = 9000;
 const SMALL_SCREEN_PX = 640;
 
-function ZinraiCanvas() {
+function V34Canvas() {
   const stillRef = useRef<HTMLCanvasElement>(null);
   const rainRef = useRef<HTMLCanvasElement>(null);
-  const { enabled, speed } = useZinraiBgSettings();
+  const { enabled, speed } = useV34BgSettings();
   // 速度変更でアニメーションを作り直さないよう ref 経由で毎フレーム読む
-  const speedRef = useRef(ZINRAI_BG_SPEED_FACTOR[speed]);
+  const speedRef = useRef(V34_BG_SPEED_FACTOR[speed]);
   useEffect(() => {
-    speedRef.current = ZINRAI_BG_SPEED_FACTOR[speed];
+    speedRef.current = V34_BG_SPEED_FACTOR[speed];
   }, [speed]);
 
   useEffect(() => {
@@ -75,10 +75,10 @@ function ZinraiCanvas() {
           speedRef.current;
         glitchTimer = window.setTimeout(() => {
           if (!document.hidden) {
-            still.classList.add("zinrai-glitch");
+            still.classList.add("v34-glitch");
             glitchBars = createGlitchBars(rain.height);
             glitchEndTimer = window.setTimeout(() => {
-              still.classList.remove("zinrai-glitch");
+              still.classList.remove("v34-glitch");
               glitchBars = [];
             }, 60 + Math.random() * 60);
           }
@@ -92,7 +92,7 @@ function ZinraiCanvas() {
       cancelAnimationFrame(frame);
       clearTimeout(glitchTimer);
       clearTimeout(glitchEndTimer);
-      still.classList.remove("zinrai-glitch");
+      still.classList.remove("v34-glitch");
       window.removeEventListener("resize", resize);
     };
   }, [enabled]);
@@ -109,8 +109,8 @@ function ZinraiCanvas() {
   );
 }
 
-export default function ZinraiBackground() {
+export default function V34Background() {
   const themeId = useCurrentThemeId();
-  if (themeId !== "dark-zinrai") return null;
-  return <ZinraiCanvas />;
+  if (themeId !== "dark-v34") return null;
+  return <V34Canvas />;
 }

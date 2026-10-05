@@ -160,10 +160,10 @@ export const THEMES: ThemeDef[] = [
     },
   },
   {
-    id: "dark-zinrai",
-    label: "ZINRAI",
+    id: "dark-v34",
+    label: "V34",
     mode: "dark",
-    accent: "zinrai",
+    accent: "v34",
     preview: {
       bg: "linear-gradient(135deg, #0A0416 0%, #1A0838 50%, #2A0B5A 100%)",
       surface: "#160A2C",

@@ -1,39 +1,39 @@
 import { useSyncExternalStore } from "react";
 import { safeGetItem, safeSetItem } from "@/utils/common/safeStorage";
 
-export type ZinraiBgSpeed = "slow" | "normal" | "fast";
+export type V34BgSpeed = "slow" | "normal" | "fast";
 
-export interface ZinraiBgSettings {
+export interface V34BgSettings {
   enabled: boolean;
-  speed: ZinraiBgSpeed;
+  speed: V34BgSpeed;
 }
 
-export const ZINRAI_BG_SPEEDS: ZinraiBgSpeed[] = ["slow", "normal", "fast"];
-export const ZINRAI_BG_SPEED_FACTOR: Record<ZinraiBgSpeed, number> = {
+export const V34_BG_SPEEDS: V34BgSpeed[] = ["slow", "normal", "fast"];
+export const V34_BG_SPEED_FACTOR: Record<V34BgSpeed, number> = {
   slow: 0.5,
   normal: 1,
   fast: 2,
 };
 
-const ENABLED_KEY = "bpim2-zinrai-bg-enabled";
-const SPEED_KEY = "bpim2-zinrai-bg-speed";
-const SERVER_SNAPSHOT: ZinraiBgSettings = { enabled: false, speed: "normal" };
+const ENABLED_KEY = "bpim2-v34-bg-enabled";
+const SPEED_KEY = "bpim2-v34-bg-speed";
+const SERVER_SNAPSHOT: V34BgSettings = { enabled: false, speed: "normal" };
 
 const listeners = new Set<() => void>();
-let cache: ZinraiBgSettings | null = null;
+let cache: V34BgSettings | null = null;
 
 // 未設定時は OS の「視差効果を減らす」に従い、有効化は明示的な操作に限る
-function readSettings(): ZinraiBgSettings {
+function readSettings(): V34BgSettings {
   const storedEnabled = safeGetItem(ENABLED_KEY);
   const storedSpeed = safeGetItem(SPEED_KEY);
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   return {
     enabled: storedEnabled === null ? !reduced : storedEnabled === "true",
-    speed: ZINRAI_BG_SPEEDS.find((s) => s === storedSpeed) ?? "normal",
+    speed: V34_BG_SPEEDS.find((s) => s === storedSpeed) ?? "normal",
   };
 }
 
-function getSnapshot(): ZinraiBgSettings {
+function getSnapshot(): V34BgSettings {
   cache ??= readSettings();
   return cache;
 }
@@ -46,11 +46,11 @@ function subscribe(onChange: () => void) {
 }
 
 /**
- * ZINRAI テーマの背景アニメーション設定を localStorage に保存し、購読中の全コンポーネントへ反映する。
+ * V34 テーマの背景アニメーション設定を localStorage に保存し、購読中の全コンポーネントへ反映する。
  *
  * @param patch - 変更する項目
  */
-export function setZinraiBgSettings(patch: Partial<ZinraiBgSettings>) {
+export function setV34BgSettings(patch: Partial<V34BgSettings>) {
   const next = { ...getSnapshot(), ...patch };
   cache = next;
   safeSetItem(ENABLED_KEY, String(next.enabled));
@@ -59,10 +59,10 @@ export function setZinraiBgSettings(patch: Partial<ZinraiBgSettings>) {
 }
 
 /**
- * ZINRAI テーマの背景アニメーション設定（有効/無効・速度）を返す。
+ * V34 テーマの背景アニメーション設定（有効/無効・速度）を返す。
  *
  * @returns 現在の設定
  */
-export function useZinraiBgSettings(): ZinraiBgSettings {
+export function useV34BgSettings(): V34BgSettings {
   return useSyncExternalStore(subscribe, getSnapshot, () => SERVER_SNAPSHOT);
 }

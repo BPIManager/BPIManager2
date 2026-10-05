@@ -16,7 +16,7 @@
   &:is([data-theme="dark-forest"] *),
   &:is([data-theme="dark-ember"] *),
   &:is([data-theme="dark-onsen"] *),
-  &:is([data-theme="dark-zinrai"] *)
+  &:is([data-theme="dark-v34"] *)
 );
 
 @layer base {
@@ -372,7 +372,7 @@
     --activity-4: #a8e6a3;
   }
 
-  [data-theme="dark-zinrai"] {
+  [data-theme="dark-v34"] {
     --bpim-bg: 260 69% 5%;
     --bpim-bg-gradient: linear-gradient(
       135deg,
@@ -519,7 +519,7 @@
 [data-theme="dark-forest"] input[type="date"],
 [data-theme="dark-ember"] input[type="date"],
 [data-theme="dark-onsen"] input[type="date"],
-[data-theme="dark-zinrai"] input[type="date"] {
+[data-theme="dark-v34"] input[type="date"] {
   color-scheme: dark;
 }
 
@@ -731,8 +731,8 @@ body {
   }
 }
 
-/* ZINRAI: 麻の葉風タイルの固定背景。操作を妨げないよう pointer-events を無効にする */
-[data-theme="dark-zinrai"] body::before {
+/* V34: 麻の葉風タイルの固定背景。操作を妨げないよう pointer-events を無効にする */
+[data-theme="dark-v34"] body::before {
   content: "";
   position: fixed;
   inset: 0;
@@ -742,21 +742,21 @@ body {
   background-size: 48px 83px;
 }
 
-/* ZINRAI: 枠付きカードをピンクのネオン枠にする（面は不透明のまま） */
-[data-theme="dark-zinrai"] .rounded-xl.border-bpim-border,
-[data-theme="dark-zinrai"] .rounded-2xl.border-bpim-border {
+/* V34: 枠付きカードをピンクのネオン枠にする（面は不透明のまま） */
+[data-theme="dark-v34"] .rounded-xl.border-bpim-border,
+[data-theme="dark-v34"] .rounded-2xl.border-bpim-border {
   border-color: hsl(var(--bpim-primary) / 0.5);
   box-shadow: 0 0 18px hsl(var(--bpim-primary) / 0.18);
 }
 
-/* ZINRAI: グリッチ発火中の背景キャンバスにRGBずれを与える */
-.zinrai-glitch {
+/* V34: グリッチ発火中の背景キャンバスにRGBずれを与える */
+.v34-glitch {
   transform: translateX(2px);
   filter: drop-shadow(2px 0 rgb(0 229 255 / 0.6))
     drop-shadow(-2px 0 rgb(255 43 214 / 0.6));
 }
 
-/* ZINRAI: 半透明のパネル越しに背景が透けても文字が読めるよう、透過背景の要素をぼかす */
-[data-theme="dark-zinrai"] [class*=" bg-bpim-"][class*="/"] {
+/* V34: 半透明のパネル越しに背景が透けても文字が読めるよう、透過背景の要素をぼかす */
+[data-theme="dark-v34"] [class*=" bg-bpim-"][class*="/"] {
   backdrop-filter: blur(6px);
 }

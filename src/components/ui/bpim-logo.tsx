@@ -3,7 +3,7 @@ import {
   PETAL_LOGO_GRID,
   PETAL_LOGO_PIXELS,
   petalLogoSvgString,
-} from "@/lib/zinrai/petalLogo";
+} from "@/lib/v34/petalLogo";
 
 const BAR_SVG = (color: string) =>
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">` +
@@ -18,7 +18,7 @@ export function updateFavicon() {
   const hsl = getComputedStyle(html).getPropertyValue("--bpim-primary").trim();
   if (!hsl) return;
   const svg =
-    html.getAttribute("data-theme") === "dark-zinrai"
+    html.getAttribute("data-theme") === "dark-v34"
       ? petalLogoSvgString()
       : BAR_SVG(`hsl(${hsl})`);
   const url = `data:image/svg+xml,${encodeURIComponent(svg)}`;
@@ -81,7 +81,7 @@ const PetalLogo = ({ size, className }: Required<BpimLogoProps>) => (
 
 export const BpimLogo = ({ size = 32, className = "" }: BpimLogoProps) => {
   const themeId = useCurrentThemeId();
-  if (themeId === "dark-zinrai") {
+  if (themeId === "dark-v34") {
     return <PetalLogo size={size} className={className} />;
   }
   return <BarLogo size={size} className={className} />;

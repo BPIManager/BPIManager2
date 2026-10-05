@@ -15,7 +15,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useTranslation } from "@/hooks/common/useTranslation";
-import ZinraiBackgroundSettings from "./ZinraiBackgroundSettings";
+import V34BackgroundSettings from "./V34BackgroundSettings";
 
 const GAMING_THEME_IDS: ThemeId[] = [
   "dark-abyss",
@@ -25,7 +25,7 @@ const GAMING_THEME_IDS: ThemeId[] = [
   "dark-onsen",
 ];
 
-const HOMAGE_THEME_IDS: ThemeId[] = ["dark-zinrai"];
+const HOMAGE_THEME_IDS: ThemeId[] = ["dark-v34"];
 
 export default function ThemeSettingsUi() {
   const [isOpen, setIsOpen] = useState(false);
@@ -118,7 +118,7 @@ export default function ThemeSettingsUi() {
             <ThemeGroup label={t("settings.theme.gaming")} themes={darkVivid} current={current} onSelect={handleSelect} />
             <ThemeGroup label={t("settings.theme.homage")} themes={homageThemes} current={current} onSelect={handleSelect} />
 
-            {current === "dark-zinrai" && <ZinraiBackgroundSettings />}
+            {current === "dark-v34" && <V34BackgroundSettings />}
 
             <div className="border-t border-bpim-border pt-6 flex flex-col gap-4">
               <div className="flex flex-col gap-1">
