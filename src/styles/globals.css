@@ -748,3 +748,10 @@ body {
   border-color: hsl(var(--bpim-primary) / 0.5);
   box-shadow: 0 0 18px hsl(var(--bpim-primary) / 0.18);
 }
+
+/* ZINRAI: グリッチ発火中の背景キャンバスにRGBずれを与える */
+.zinrai-glitch {
+  transform: translateX(2px);
+  filter: drop-shadow(2px 0 rgb(0 229 255 / 0.6))
+    drop-shadow(-2px 0 rgb(255 43 214 / 0.6));
+}

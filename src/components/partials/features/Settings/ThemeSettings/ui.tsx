@@ -15,6 +15,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import ZinraiBackgroundSettings from "./ZinraiBackgroundSettings";
 
 const GAMING_THEME_IDS: ThemeId[] = [
   "dark-abyss",
@@ -110,6 +111,8 @@ export default function ThemeSettingsUi() {
             <ThemeGroup label={t("settings.theme.dark")} themes={darkStandard} current={current} onSelect={handleSelect} />
             <ThemeGroup label={t("settings.theme.light")} themes={lightThemes} current={current} onSelect={handleSelect} />
             <ThemeGroup label={t("settings.theme.gaming")} themes={darkVivid} current={current} onSelect={handleSelect} />
+
+            {current === "dark-zinrai" && <ZinraiBackgroundSettings />}
 
             <div className="border-t border-bpim-border pt-6 flex flex-col gap-4">
               <div className="flex flex-col gap-1">

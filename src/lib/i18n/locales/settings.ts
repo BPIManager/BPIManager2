@@ -617,6 +617,48 @@ export const settingsTranslations = {
     "zh-TW": "遊戲",
     ko: "게이밍",
   },
+  "settings.theme.zinraiBg.title": {
+    ja: "背景アニメーション",
+    en: "Background animation",
+    "zh-TW": "背景動畫",
+    ko: "배경 애니메이션",
+  },
+  "settings.theme.zinraiBg.desc": {
+    ja: "ZINRAIテーマの桜とグリッチの動きを調整します。",
+    en: "Adjust the sakura and glitch effects of the ZINRAI theme.",
+    "zh-TW": "調整ZINRAI主題的櫻花與故障效果。",
+    ko: "ZINRAI 테마의 벚꽃과 글리치 효과를 조정합니다.",
+  },
+  "settings.theme.zinraiBg.enabled": {
+    ja: "背景アニメーションを有効にする",
+    en: "Enable background animation",
+    "zh-TW": "啟用背景動畫",
+    ko: "배경 애니메이션 사용",
+  },
+  "settings.theme.zinraiBg.speed": {
+    ja: "速度",
+    en: "Speed",
+    "zh-TW": "速度",
+    ko: "속도",
+  },
+  "settings.theme.zinraiBg.speed.slow": {
+    ja: "遅い",
+    en: "Slow",
+    "zh-TW": "慢",
+    ko: "느림",
+  },
+  "settings.theme.zinraiBg.speed.normal": {
+    ja: "標準",
+    en: "Normal",
+    "zh-TW": "標準",
+    ko: "보통",
+  },
+  "settings.theme.zinraiBg.speed.fast": {
+    ja: "速い",
+    en: "Fast",
+    "zh-TW": "快",
+    ko: "빠름",
+  },
   "settings.theme.font": {
     ja: "フォント設定",
     en: "Font",
