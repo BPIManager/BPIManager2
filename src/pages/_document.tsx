@@ -41,8 +41,8 @@ const themeScript = `
   var valid = [
     'dark-blue','dark-green','dark-red','dark-orange','dark-yellow',
     'dark-purple','dark-pink','dark-cyan',
-    'dark-abyss','dark-midnight','dark-forest','dark-ember','dark-onsen',
-    'light-blue','light-green','light-rose','light-purple'
+    'dark-abyss','dark-midnight','dark-forest','dark-ember','dark-onsen','dark-v34',
+    'light-blue','light-green','light-rose','light-purple','light-v20'
   ];
   var stored = localStorage.getItem(STORAGE_KEY);
   var theme = valid.indexOf(stored) !== -1 ? stored : DEFAULT;

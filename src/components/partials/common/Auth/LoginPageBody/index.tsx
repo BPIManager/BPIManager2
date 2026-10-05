@@ -28,7 +28,7 @@ const LoginPageBody = ({
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen bg-bpim-bg py-16 text-bpim-text">
+    <div className="min-h-screen py-16 text-bpim-text">
       <PageContainer>
         {requiredMessage && (
           <div className="mb-10 flex items-start gap-3 rounded-xl border border-bpim-primary/30 bg-bpim-primary/8 px-4 py-3 text-bpim-primary">

@@ -172,7 +172,7 @@ export default function EmailLinkComplete() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-bpim-bg px-4 text-bpim-text">
+    <div className="flex min-h-screen items-center justify-center px-4 text-bpim-text">
       <div className="flex w-full max-w-sm flex-col items-center gap-5 rounded-2xl border border-bpim-border bg-bpim-surface p-6 text-center">
         {phase === "processing" && (
           <div className="flex flex-col items-center gap-3">

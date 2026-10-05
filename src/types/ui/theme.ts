@@ -13,10 +13,12 @@ export type ThemeId =
   | "dark-forest"
   | "dark-ember"
   | "dark-onsen"
+  | "dark-v34"
   | "light-blue"
   | "light-green"
   | "light-rose"
-  | "light-purple";
+  | "light-purple"
+  | "light-v20";
 
 /** テーマの定義情報 */
 export interface ThemeDef {

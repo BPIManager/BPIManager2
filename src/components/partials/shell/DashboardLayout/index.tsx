@@ -36,10 +36,7 @@ const DashboardLayout = ({
   const isExpanded = sidebarPinned || sidebarHovered;
 
   return (
-    <div
-      className="flex h-svh w-full overflow-hidden"
-      style={{ background: "var(--bpim-bg-gradient, hsl(var(--bpim-bg)))" }}
-    >
+    <div className="flex h-svh w-full overflow-hidden">
       <aside
         className={cn(
           "relative hidden shrink-0 md:block",
@@ -63,7 +60,9 @@ const DashboardLayout = ({
       </aside>
 
       <div className="flex flex-1 flex-col overflow-hidden">
-        <header className="flex h-16 shrink-0 items-center justify-between border-b border-bpim-border bg-bpim-surface px-4">
+        <header
+          data-slot="app-header"
+          className="flex h-16 shrink-0 items-center justify-between border-b border-bpim-border bg-bpim-surface px-4">
           <div className="flex items-center gap-4">
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>

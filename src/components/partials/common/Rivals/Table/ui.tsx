@@ -204,7 +204,7 @@ const RivalSongItem = ({
   return (
     <div
       {...clickableProps(onClick)}
-      className="group relative w-full cursor-pointer border-b border-bpim-border bg-white/2 transition-colors hover:bg-bpim-overlay/50"
+      className="group relative w-full cursor-pointer border-b border-bpim-border bg-bpim-surface transition-colors hover:bg-bpim-overlay/50"
     >
       <div className="hidden lg:grid h-17 grid-cols-[1fr_140px_100px_140px] items-stretch">
         <div className="flex items-center px-4 min-w-0">

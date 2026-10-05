@@ -21,7 +21,7 @@ const TowerImportSuccessModal = ({ result, onClose }: Props) => {
   return (
     <ResultModalShell
       showFireworks
-      icon={<LordiconAnimation src="/lottie/trending-up.json" trigger="loop" />}
+      icon={<LordiconAnimation src="/lottie/trending-up.json" trigger="loop" colorToken="primary" />}
       title={t("import.towerSuccess.title")}
       subtitle={`${result.upsertedCount} ${t("import.towerSuccess.updated")}`}
       actions={

@@ -15,6 +15,20 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import ThemeBackgroundSettings from "./ThemeBackgroundSettings";
+import { v34BgStore } from "@/hooks/v34/useV34Background";
+import { v20BgStore } from "@/hooks/v20/useV20Background";
+
+const GAMING_THEME_IDS: ThemeId[] = [
+  "dark-abyss",
+  "dark-midnight",
+  "dark-forest",
+  "dark-ember",
+  "dark-onsen",
+];
+
+// 表示順（元ネタのバージョンが若い順）
+const HOMAGE_THEME_IDS: ThemeId[] = ["light-v20", "dark-v34"];
 
 export default function ThemeSettingsUi() {
   const [isOpen, setIsOpen] = useState(false);
@@ -45,12 +59,16 @@ export default function ThemeSettingsUi() {
   const darkStandard = THEMES.filter(
     (t) =>
       t.mode === "dark" &&
-      !["dark-abyss", "dark-midnight", "dark-forest", "dark-ember", "dark-onsen"].includes(t.id),
+      !GAMING_THEME_IDS.includes(t.id) &&
+      !HOMAGE_THEME_IDS.includes(t.id),
   );
-  const darkVivid = THEMES.filter((t) =>
-    ["dark-abyss", "dark-midnight", "dark-forest", "dark-ember", "dark-onsen"].includes(t.id),
+  const darkVivid = THEMES.filter((t) => GAMING_THEME_IDS.includes(t.id));
+  const homageThemes = HOMAGE_THEME_IDS.flatMap((id) =>
+    THEMES.filter((t) => t.id === id),
   );
-  const lightThemes = THEMES.filter((t) => t.mode === "light");
+  const lightThemes = THEMES.filter(
+    (t) => t.mode === "light" && !HOMAGE_THEME_IDS.includes(t.id),
+  );
 
   return (
     <>
@@ -105,6 +123,20 @@ export default function ThemeSettingsUi() {
             <ThemeGroup label={t("settings.theme.dark")} themes={darkStandard} current={current} onSelect={handleSelect} />
             <ThemeGroup label={t("settings.theme.light")} themes={lightThemes} current={current} onSelect={handleSelect} />
             <ThemeGroup label={t("settings.theme.gaming")} themes={darkVivid} current={current} onSelect={handleSelect} />
+            <ThemeGroup label={t("settings.theme.homage")} themes={homageThemes} current={current} onSelect={handleSelect} />
+
+            {current === "dark-v34" && (
+              <ThemeBackgroundSettings
+                store={v34BgStore}
+                descKey="settings.theme.v34Bg.desc"
+              />
+            )}
+            {current === "light-v20" && (
+              <ThemeBackgroundSettings
+                store={v20BgStore}
+                descKey="settings.theme.v20Bg.desc"
+              />
+            )}
 
             <div className="border-t border-bpim-border pt-6 flex flex-col gap-4">
               <div className="flex flex-col gap-1">
