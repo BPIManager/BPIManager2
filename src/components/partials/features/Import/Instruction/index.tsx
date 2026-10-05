@@ -1,35 +1,11 @@
-import { iidxUrl } from "@/constants/iidx/eamusementUrls";
 import {
   HelpCircle,
   AlertTriangle,
-  Monitor,
-  Gamepad2,
 } from "lucide-react";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 const InstructionSection = () => {
   const { t } = useTranslation();
-
-  const acSteps = [
-    {
-      step: 1,
-      text: (
-        <>
-          <a
-            href={iidxUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-bpim-primary underline decoration-bpim-primary/30 underline-offset-4 transition-colors hover:text-bpim-primary hover:decoration-bpim-primary"
-          >
-            {t("import.instruction.iidxSiteLink")}
-          </a>{" "}
-          {t("import.instruction.ac.step1.suffix")}
-        </>
-      ),
-    },
-    { step: 2, text: t("import.instruction.ac.step2") },
-    { step: 3, text: t("import.instruction.ac.step3") },
-  ];
 
   const infinitasSteps = [
     {
@@ -73,7 +49,7 @@ const InstructionSection = () => {
   ];
 
   return (
-    <div className="flex flex-col gap-6 rounded-xl border border-bpim-border bg-bpim-surface/40 p-6 backdrop-blur-sm shadow-xl">
+    <div className="flex flex-col gap-6 rounded-2xl border border-bpim-border bg-bpim-surface p-4 md:p-6">
       <div className="flex items-center gap-3 border-b border-bpim-border pb-4">
         <HelpCircle className="h-6 w-6 text-bpim-primary" />
         <h3 className="text-xl font-bold text-bpim-text">
@@ -81,37 +57,19 @@ const InstructionSection = () => {
         </h3>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-2">
-        <div className="space-y-4">
-          <div className="flex items-center gap-2 text-bpim-primary">
-            <Monitor className="h-5 w-5" />
-            <h4 className="font-bold">{t("import.instruction.ac.title")}</h4>
-          </div>
-          <ul className="flex flex-col gap-3">
-            {acSteps.map((item) => (
-              <StepItem key={item.step} step={item.step} text={item.text} />
-            ))}
-          </ul>
-        </div>
+      <div className="flex flex-col gap-4">
+        <ul className="flex flex-col gap-3">
+          {infinitasSteps.map((item) => (
+            <StepItem key={item.step} step={item.step} text={item.text} />
+          ))}
+        </ul>
 
-        <div className="space-y-4">
-          <div className="flex items-center gap-2 text-bpim-info">
-            <Gamepad2 className="h-5 w-5" />
-            <h4 className="font-bold font-sans">INFINITAS</h4>
-          </div>
-          <ul className="flex flex-col gap-3">
-            {infinitasSteps.map((item) => (
-              <StepItem key={item.step} step={item.step} text={item.text} />
-            ))}
-          </ul>
-
-          <div className="mt-4 space-y-2 rounded-lg border border-bpim-info/20 bg-bpim-info/5 p-4 text-[13px] leading-relaxed">
-            <div className="flex items-start gap-2 text-bpim-warning">
-              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
-              <p className="text-bpim-muted text-xs">
-                {t("import.instruction.infinitas.note")}
-              </p>
-            </div>
+        <div className="rounded-lg border border-bpim-info/20 bg-bpim-info/5 p-4 text-[13px] leading-relaxed">
+          <div className="flex items-start gap-2 text-bpim-warning">
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+            <p className="text-xs text-bpim-muted">
+              {t("import.instruction.infinitas.note")}
+            </p>
           </div>
         </div>
       </div>

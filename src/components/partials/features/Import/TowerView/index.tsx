@@ -13,6 +13,7 @@ import { versionsOptions } from "@/constants/iidx/versionTitles";
 import { towerDownloadUrl } from "@/constants/iidx/eamusementUrls";
 import BookmarkletAccordion from "@/components/partials/common/Bookmarklet";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import StepCard from "../StepCard";
 
 export interface TowerImportProps {
   csvData: string;
@@ -49,19 +50,26 @@ const TowerImportView = ({
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="space-y-2">
-        <Label htmlFor="tower-csv" className="text-sm font-bold text-bpim-text">
-          {t("import.towerCsv.label")}(
-          <a
-            href={towerDownloadUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-bpim-primary underline decoration-blue-400/30 underline-offset-4 transition-colors hover:text-bpim-primary hover:decoration-blue-300"
+      <StepCard
+        step={1}
+        title={
+          <Label
+            htmlFor="tower-csv"
+            className="text-sm font-bold text-bpim-text"
           >
-            {t("import.csv.officialDownload")}
-          </a>
-          )
-        </Label>
+            {t("import.towerCsv.label")}(
+            <a
+              href={towerDownloadUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-bpim-primary underline decoration-bpim-primary/30 underline-offset-4 transition-colors hover:decoration-bpim-primary"
+            >
+              {t("import.csv.officialDownload")}
+            </a>
+            )
+          </Label>
+        }
+      >
         <p className="text-[10px] text-bpim-muted">
           {t("import.csv.pasteHint")}
           <br />
@@ -72,20 +80,20 @@ const TowerImportView = ({
           placeholder={
             "プレー日,鍵盤,スクラッチ\n2026/04/20,14419,1296\n2026/04/18,85630,7091"
           }
-          className="max-h-12.5 border-bpim-border bg-bpim-surface-2/60 p-4 font-mono text-sm transition-colors focus:border-bpim-primary focus:ring-0"
+          className="max-h-12.5 border-bpim-border bg-bpim-surface-2 p-4 font-mono text-sm transition-colors focus:border-bpim-primary focus:ring-0"
           value={csvData}
           onChange={(e) => setCsvData(e.target.value)}
         />
         {csvData.trim() && (
           <div className="flex items-center gap-1.5">
             {isValid ? (
-              <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-green-500" />
+              <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-bpim-success" />
             ) : (
               <AlertCircle className="h-3.5 w-3.5 shrink-0 text-bpim-danger" />
             )}
             <span
               className={`text-xs font-medium ${
-                isValid ? "text-green-500" : "text-bpim-danger"
+                isValid ? "text-bpim-success" : "text-bpim-danger"
               }`}
             >
               {isValid
@@ -94,14 +102,10 @@ const TowerImportView = ({
             </span>
           </div>
         )}
-
         <BookmarkletAccordion />
-      </div>
+      </StepCard>
 
-      <div className="space-y-2">
-        <Label className="text-sm font-bold text-bpim-text">
-          {t("import.version.label")}
-        </Label>
+      <StepCard step={2} title={t("import.version.label")}>
         <p className="text-[10px] text-bpim-muted">
           {t("import.version.desc")}
         </p>
@@ -109,7 +113,7 @@ const TowerImportView = ({
           value={selectedVersion[0]}
           onValueChange={(value) => setSelectedVersion([value])}
         >
-          <SelectTrigger className="w-full border-bpim-border bg-bpim-surface-2/60 text-sm md:w-75">
+          <SelectTrigger className="w-full border-bpim-border bg-bpim-surface-2 text-sm md:w-75">
             <SelectValue placeholder={t("import.version.placeholder")} />
           </SelectTrigger>
           <SelectContent className="border-bpim-border bg-bpim-bg text-bpim-text">
@@ -120,39 +124,41 @@ const TowerImportView = ({
             ))}
           </SelectContent>
         </Select>
-      </div>
+      </StepCard>
 
-      <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-        <Button
-          variant="ghost"
-          className="w-full text-bpim-danger hover:bg-bpim-danger/10 hover:text-bpim-danger sm:w-auto"
-          onClick={() => setCsvData("")}
-          disabled={!csvData || isProcessing}
-        >
-          <Trash2 className="mr-2 h-4 w-4" /> {t("import.button.clear")}
-        </Button>
-        <Button
-          className="w-full bg-bpim-primary px-8 font-bold text-white hover:bg-bpim-primary sm:w-auto"
-          size="lg"
-          disabled={
-            isProcessing ||
-            !selectedVersion[0] ||
-            (!!csvData.trim() && !isValid)
-          }
-          onClick={onStartImport}
-        >
-          {isProcessing ? (
-            <>
-              <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-bpim-border border-t-white" />
-              {processStatus}
-            </>
-          ) : (
-            <>
-              <Upload className="mr-2 h-4 w-4" /> {t("import.button.start")}
-            </>
-          )}
-        </Button>
-      </div>
+      <StepCard step={3} title={t("import.step.run.title")}>
+        <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
+          <Button
+            variant="ghost"
+            className="w-full text-bpim-danger hover:bg-bpim-danger/10 hover:text-bpim-danger sm:w-auto"
+            onClick={() => setCsvData("")}
+            disabled={!csvData || isProcessing}
+          >
+            <Trash2 className="mr-2 h-4 w-4" /> {t("import.button.clear")}
+          </Button>
+          <Button
+            className="w-full bg-bpim-primary px-8 font-bold text-white hover:bg-bpim-primary sm:w-auto"
+            size="lg"
+            disabled={
+              isProcessing ||
+              !selectedVersion[0] ||
+              (!!csvData.trim() && !isValid)
+            }
+            onClick={onStartImport}
+          >
+            {isProcessing ? (
+              <>
+                <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-bpim-border border-t-white" />
+                {processStatus}
+              </>
+            ) : (
+              <>
+                <Upload className="mr-2 h-4 w-4" /> {t("import.button.start")}
+              </>
+            )}
+          </Button>
+        </div>
+      </StepCard>
     </div>
   );
 };

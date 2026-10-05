@@ -150,40 +150,27 @@ export const importTranslations = {
   },
 
   // Buttons (shared)
+  "import.step.run.title": {
+    ja: "取り込み",
+    en: "Import",
+    "zh-TW": "匯入",
+    ko: "가져오기",
+  },
   "import.button.clear": { ja: "入力をクリア", en: "Clear Input", "zh-TW": "清除輸入", ko: "입력 초기화" },
   "import.button.start": { ja: "インポートを開始", en: "Start Import", "zh-TW": "開始匯入", ko: "임포트 시작" },
 
   // Instruction section
   "import.instruction.title": {
-    ja: "データインポート方法",
-    en: "How to Import",
-    "zh-TW": "資料匯入方法",
-    ko: "데이터 임포트 방법",
+    ja: "INFINITASプレーデータの登録について",
+    en: "About registering INFINITAS play data",
+    "zh-TW": "關於登錄 INFINITAS 遊玩資料",
+    ko: "INFINITAS 플레이 데이터 등록 안내",
   },
   "import.instruction.iidxSiteLink": {
     ja: "IIDX公式サイト",
     en: "IIDX Official Site",
     "zh-TW": "IIDX 官方網站",
     ko: "IIDX 공식 사이트",
-  },
-  "import.instruction.ac.title": { ja: "アーケード版", en: "Arcade", "zh-TW": "街機版", ko: "아케이드" },
-  "import.instruction.ac.step1.suffix": {
-    ja: "にアクセスしてCSVをダウンロードします。",
-    en: ": Download your CSV data from the website.",
-    "zh-TW": ": 從網站下載您的 CSV 資料。",
-    ko: ": 웹사이트에서 CSV 데이터를 다운로드합니다.",
-  },
-  "import.instruction.ac.step2": {
-    ja: "入力エリアにCSVデータを直接貼り付けてください。",
-    en: "Paste the CSV data directly into the input area.",
-    "zh-TW": "將 CSV 資料直接貼入輸入區域。",
-    ko: "입력 영역에 CSV 데이터를 직접 붙여넣으세요.",
-  },
-  "import.instruction.ac.step3": {
-    ja: "「インポートを開始」ボタンを押して完了を待ちます。",
-    en: 'Click "Start Import" and wait for completion.',
-    "zh-TW": '點擊「開始匯入」並等待完成。',
-    ko: '"임포트 시작" 버튼을 누르고 완료될 때까지 기다립니다.',
   },
   "import.instruction.infinitas.step1.suffix": {
     ja: "から出力されるCSVまたはTSVを用意します。",
@@ -294,6 +281,42 @@ export const importTranslations = {
   },
 
   // MCP accordion
+  "import.deleteGuide.accordionTitle": {
+    ja: "誤ったデータを登録したときは？",
+    en: "Registered the wrong data?",
+    "zh-TW": "誤登錄了資料時？",
+    ko: "잘못된 데이터를 등록했다면?",
+  },
+  "import.deleteGuide.desc": {
+    ja: "インポートした単位でまとめて削除できます。",
+    en: "You can delete each import as a whole.",
+    "zh-TW": "可依匯入單位一併刪除。",
+    ko: "가져온 단위로 한꺼번에 삭제할 수 있습니다.",
+  },
+  "import.deleteGuide.step1": {
+    ja: "スコア更新ログを開き、表示を「インポート日単位」に切り替えます。",
+    en: 'Open the score update log and switch the view to "By import date".',
+    "zh-TW": "開啟分數更新紀錄，並將顯示切換為「依匯入日期」。",
+    ko: '스코어 업데이트 로그를 열고 표시를 "가져온 날짜 기준"으로 전환합니다.',
+  },
+  "import.deleteGuide.step2": {
+    ja: "削除したいデータ（インポート）を開きます。",
+    en: "Open the import you want to delete.",
+    "zh-TW": "開啟要刪除的資料（匯入紀錄）。",
+    ko: "삭제하려는 데이터(가져오기)를 엽니다.",
+  },
+  "import.deleteGuide.step3": {
+    ja: "ページの一番下にある「この更新を削除」ボタンを押します。",
+    en: 'Click the "Delete This Update" button at the bottom of the page.',
+    "zh-TW": "點擊頁面最下方的「刪除此更新」按鈕。",
+    ko: '페이지 맨 아래의 "이 업데이트 삭제" 버튼을 누릅니다.',
+  },
+  "import.deleteGuide.linkText": {
+    ja: "スコア更新ログを開く",
+    en: "Open the score update log",
+    "zh-TW": "開啟分數更新紀錄",
+    ko: "스코어 업데이트 로그 열기",
+  },
   "import.mcp.accordionTitle": {
     ja: "MCP経由でAIに登録してもらう",
     en: "Register via MCP (AI Assistant)",
