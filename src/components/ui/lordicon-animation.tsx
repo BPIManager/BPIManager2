@@ -1,5 +1,10 @@
 import { useEffect, useRef } from "react";
 import type { Element as LordiconElement } from "@lordicon/element";
+import { useCurrentThemeId } from "@/hooks/common/useTheme";
+import { hslTripletToHex } from "@/utils/common/color";
+
+/** アイコンの `primary` スロットに適用するテーマ色（`--bpim-*` のトークン名） */
+type ColorToken = "primary" | "danger" | "warning" | "success" | "text-muted";
 
 type Props = {
   src: string;
@@ -13,6 +18,7 @@ type Props = {
     | "once";
   size?: number;
   colors?: string;
+  colorToken?: ColorToken;
   className?: string;
 };
 
@@ -21,8 +27,10 @@ export const LordiconAnimation = ({
   trigger = "loop",
   size = 48,
   colors,
+  colorToken,
   className,
 }: Props) => {
+  const themeId = useCurrentThemeId();
   const initialized = useRef(false);
   const iconRef = useRef<LordiconElement>(null);
 
@@ -38,6 +46,17 @@ export const LordiconAnimation = ({
       }
     });
   }, [trigger]);
+
+  // テーマ切替に追従して色を差し替える（SSR との属性不一致を避けるため DOM を直接更新する）
+  useEffect(() => {
+    const el = iconRef.current;
+    if (!el || !colorToken || colors) return;
+    const hsl = getComputedStyle(document.documentElement).getPropertyValue(
+      `--bpim-${colorToken}`,
+    );
+    const hex = hslTripletToHex(hsl);
+    if (hex) el.setAttribute("colors", `primary:${hex}`);
+  }, [colorToken, colors, themeId]);
 
   return (
     <lord-icon
