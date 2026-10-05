@@ -755,3 +755,8 @@ body {
   filter: drop-shadow(2px 0 rgb(0 229 255 / 0.6))
     drop-shadow(-2px 0 rgb(255 43 214 / 0.6));
 }
+
+/* ZINRAI: 半透明のパネル越しに背景が透けても文字が読めるよう、透過背景の要素をぼかす */
+[data-theme="dark-zinrai"] [class*=" bg-bpim-"][class*="/"] {
+  backdrop-filter: blur(6px);
+}

@@ -11,9 +11,9 @@ export function drawBlossoms(
 ) {
   const base = Math.min(w, h);
   const blobs = [
-    { x: w * 0.08, y: h * 0.92, r: base * 0.42 },
-    { x: w * 0.97, y: h * 0.06, r: base * 0.3 },
-    { x: w * 0.55, y: h * 1.02, r: base * 0.18 },
+    { x: w * 0.08, y: h * 0.92, r: base * 0.32 },
+    { x: w * 0.97, y: h * 0.06, r: base * 0.22 },
+    { x: w * 0.55, y: h * 1.02, r: base * 0.14 },
   ];
   ctx.clearRect(0, 0, w, h);
   for (let y = 0; y < h; y++) {
@@ -21,7 +21,7 @@ export function drawBlossoms(
       let density = 0;
       for (const b of blobs) {
         const d = Math.hypot(x - b.x, (y - b.y) * 1.1) / b.r;
-        if (d < 1) density = Math.max(density, (1 - d) * 1.4);
+        if (d < 1) density = Math.max(density, (1 - d) * 1.1);
       }
       if (density <= 0 || Math.random() >= Math.min(0.95, density)) continue;
       const k = Math.random();

@@ -99,7 +99,11 @@ function ZinraiCanvas() {
 
   return (
     <>
-      <canvas ref={stillRef} className={CANVAS_CLASS} aria-hidden="true" />
+      <canvas
+        ref={stillRef}
+        className={`${CANVAS_CLASS} opacity-60`}
+        aria-hidden="true"
+      />
       <canvas ref={rainRef} className={CANVAS_CLASS} aria-hidden="true" />
     </>
   );
