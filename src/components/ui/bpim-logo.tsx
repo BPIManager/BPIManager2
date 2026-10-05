@@ -4,6 +4,11 @@ import {
   PETAL_LOGO_PIXELS,
   petalLogoSvgString,
 } from "@/lib/v34/petalLogo";
+import {
+  TRI_BAR_LOGO_GRID,
+  TRI_BAR_LOGO_PIXELS,
+  triBarLogoSvgString,
+} from "@/lib/v20/triBarLogo";
 
 const BAR_SVG = (color: string) =>
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">` +
@@ -17,10 +22,13 @@ export function updateFavicon() {
   const html = document.documentElement;
   const hsl = getComputedStyle(html).getPropertyValue("--bpim-primary").trim();
   if (!hsl) return;
+  const themeId = html.getAttribute("data-theme");
   const svg =
-    html.getAttribute("data-theme") === "dark-v34"
+    themeId === "dark-v34"
       ? petalLogoSvgString()
-      : BAR_SVG(`hsl(${hsl})`);
+      : themeId === "light-v20"
+        ? triBarLogoSvgString()
+        : BAR_SVG(`hsl(${hsl})`);
   const url = `data:image/svg+xml,${encodeURIComponent(svg)}`;
   let link = document.querySelector<HTMLLinkElement>('link[rel="icon"][type="image/svg+xml"]');
   if (!link) {
@@ -56,17 +64,25 @@ const bars = [
   { h: 4, you: false },
 ];
 
-const PetalLogo = ({ size, className }: Required<BpimLogoProps>) => (
+type LogoPixel = { x: number; y: number; color: string };
+
+// テーマ固有のドット絵ロゴ。1ドット=1rect で描き、拡大してもにじまない
+const PixelLogo = ({
+  pixels,
+  grid,
+  size,
+  className,
+}: Required<BpimLogoProps> & { pixels: LogoPixel[]; grid: number }) => (
   <svg
     width={size}
     height={size}
-    viewBox={`0 0 ${PETAL_LOGO_GRID} ${PETAL_LOGO_GRID}`}
+    viewBox={`0 0 ${grid} ${grid}`}
     shapeRendering="crispEdges"
     xmlns="http://www.w3.org/2000/svg"
     className={className}
     aria-hidden="true"
   >
-    {PETAL_LOGO_PIXELS.map(({ x, y, color }) => (
+    {pixels.map(({ x, y, color }) => (
       <rect
         key={`${x}-${y}`}
         x={x}
@@ -82,7 +98,24 @@ const PetalLogo = ({ size, className }: Required<BpimLogoProps>) => (
 export const BpimLogo = ({ size = 32, className = "" }: BpimLogoProps) => {
   const themeId = useCurrentThemeId();
   if (themeId === "dark-v34") {
-    return <PetalLogo size={size} className={className} />;
+    return (
+      <PixelLogo
+        pixels={PETAL_LOGO_PIXELS}
+        grid={PETAL_LOGO_GRID}
+        size={size}
+        className={className}
+      />
+    );
+  }
+  if (themeId === "light-v20") {
+    return (
+      <PixelLogo
+        pixels={TRI_BAR_LOGO_PIXELS}
+        grid={TRI_BAR_LOGO_GRID}
+        size={size}
+        className={className}
+      />
+    );
   }
   return <BarLogo size={size} className={className} />;
 };

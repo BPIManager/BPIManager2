@@ -1,9 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useCurrentThemeId } from "@/hooks/common/useTheme";
-import {
-  V34_BG_SPEED_FACTOR,
-  useV34BgSettings,
-} from "@/hooks/v34/useV34Background";
+import { BG_SPEED_FACTOR } from "@/hooks/themeBackground/createBgSettingsStore";
+import { useV34BgSettings } from "@/hooks/v34/useV34Background";
 import {
   PIXEL_SIZE,
   createGlitchBars,
@@ -27,9 +25,9 @@ function V34Canvas() {
   const rainRef = useRef<HTMLCanvasElement>(null);
   const { enabled, speed } = useV34BgSettings();
   // 速度変更でアニメーションを作り直さないよう ref 経由で毎フレーム読む
-  const speedRef = useRef(V34_BG_SPEED_FACTOR[speed]);
+  const speedRef = useRef(BG_SPEED_FACTOR[speed]);
   useEffect(() => {
-    speedRef.current = V34_BG_SPEED_FACTOR[speed];
+    speedRef.current = BG_SPEED_FACTOR[speed];
   }, [speed]);
 
   useEffect(() => {

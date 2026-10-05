@@ -403,6 +403,36 @@
     --activity-4: #ff6be0;
   }
 
+  [data-theme="light-v20"] {
+    --bpim-bg: 210 13% 94%;
+    --bpim-bg-gradient: radial-gradient(
+      circle at 20% 30%,
+      #ffffff 0%,
+      #f4f5f7 38%,
+      #d3d8de 100%
+    );
+    --bpim-surface: 0 0% 100%;
+    --bpim-surface-2: 210 17% 95%;
+    --bpim-overlay: 210 15% 90%;
+    --bpim-primary: 199 100% 35%;
+    --bpim-primary-dim: 199 100% 27%;
+    --bpim-border: 212 11% 77%;
+    --bpim-border-dim: 210 13% 88%;
+    --bpim-chart-grid: 213 12% 69%;
+    --bpim-text: 218 22% 7%;
+    --bpim-text-muted: 213 11% 33%;
+    --bpim-text-subtle: 214 9% 46%;
+    --bpim-success: 148 68% 37%;
+    --bpim-danger: 2 68% 50%;
+    --bpim-warning: 44 100% 36%;
+    --bpim-info: 197 100% 39%;
+    --activity-0: #edf0f3;
+    --activity-1: #c9e8f5;
+    --activity-2: #7ccdeb;
+    --activity-3: #18aee0;
+    --activity-4: #0077a8;
+  }
+
   [data-theme="light-blue"] {
     --bpim-bg: 220 40% 96%;
     --bpim-surface: 220 30% 100%;
@@ -759,4 +789,94 @@ body {
 /* V34: 半透明のパネル越しに背景が透けても文字が読めるよう、透過背景の要素をぼかす（装飾用の pointer-events-none 要素は除く） */
 [data-theme="dark-v34"] [class*=" bg-bpim-"][class*="/"]:not(.pointer-events-none) {
   backdrop-filter: blur(6px);
+}
+
+/* V20: 六角形グリッドの固定背景。操作を妨げないよう pointer-events を無効にする */
+[data-theme="light-v20"] body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.7;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49' fill='none' stroke='%23C9CFD6' stroke-width='1'%3E%3Cpath d='M14 2.2L25.8 9v13.6L14 29.4 2.2 22.6V9zM14 29.4v13.8M2.2 22.6L0 24M25.8 22.6L28 24M14 43.2L2.2 50M14 43.2L25.8 50'/%3E%3C/svg%3E");
+  background-size: 28px 49px;
+}
+
+/* V20: 角丸を無効化する。円形が本来の形のアバター・スイッチ・ラジオ・スピナーは除外 */
+[data-theme="light-v20"]
+  *:not(
+    [data-slot^="avatar"],
+    [data-slot^="switch"],
+    [data-slot^="radio-group"],
+    .animate-spin
+  ) {
+  border-radius: 0;
+}
+
+/* V20: 枠付きカードの左上・右下を斜めに切る。切り口の枠線は角の背景グラデーションで描く（ring/影が切れるモーダル等の *-content は除外） */
+[data-theme="light-v20"] .rounded-xl.border-bpim-border:not([data-slot$="-content"]),
+[data-theme="light-v20"] .rounded-2xl.border-bpim-border:not([data-slot$="-content"]) {
+  --cut: 10px;
+  --edge: hsl(var(--bpim-border));
+  clip-path: polygon(
+    var(--cut) 0,
+    100% 0,
+    100% calc(100% - var(--cut)),
+    calc(100% - var(--cut)) 100%,
+    0 100%,
+    0 var(--cut)
+  );
+  background-image:
+    linear-gradient(
+      135deg,
+      transparent calc(50% - 1px),
+      var(--edge) calc(50% - 1px) calc(50% + 1px),
+      transparent calc(50% + 1px)
+    ),
+    linear-gradient(
+      135deg,
+      transparent calc(50% - 1px),
+      var(--edge) calc(50% - 1px) calc(50% + 1px),
+      transparent calc(50% + 1px)
+    );
+  background-size: var(--cut) var(--cut);
+  background-position:
+    top left,
+    bottom right;
+  background-repeat: no-repeat;
+}
+
+/* V20: ヘッダー。上端と下端に黒線、左上にシアン・黄・赤の横並びの帯 */
+[data-theme="light-v20"] [data-slot="app-header"] {
+  position: relative;
+  border-top: 4px solid hsl(var(--bpim-text));
+  border-bottom: 3px solid hsl(var(--bpim-text));
+}
+
+[data-theme="light-v20"] [data-slot="app-header"]::before {
+  content: "";
+  position: absolute;
+  top: -4px;
+  left: 0;
+  width: 84px;
+  height: 6px;
+  background: linear-gradient(
+    90deg,
+    #00b4f0 0 28px,
+    #f2c400 28px 56px,
+    #e5322d 56px 84px
+  );
+}
+
+/* V20: モーダル・ポップアップは ring で縁取るため、白地でも輪郭が分かるよう灰色を濃くする */
+[data-theme="light-v20"] :is(
+    [data-slot="dialog-content"],
+    [data-slot="sheet-content"],
+    [data-slot="drawer-content"],
+    [data-slot="popover-content"],
+    [data-slot="dropdown-menu-content"],
+    [data-slot="select-content"]
+  ) {
+  --tw-ring-color: hsl(var(--bpim-text-subtle));
 }
