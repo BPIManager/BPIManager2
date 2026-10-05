@@ -17,7 +17,8 @@ export type ThemeId =
   | "light-blue"
   | "light-green"
   | "light-rose"
-  | "light-purple";
+  | "light-purple"
+  | "light-v20";
 
 /** テーマの定義情報 */
 export interface ThemeDef {

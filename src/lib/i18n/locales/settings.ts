@@ -617,7 +617,13 @@ export const settingsTranslations = {
     "zh-TW": "遊戲",
     ko: "게이밍",
   },
-  "settings.theme.v34Bg.title": {
+  "settings.theme.v20Bg.desc": {
+    ja: "V20テーマの同心円リングの動きを調整します。",
+    en: "Adjust the concentric ring animation of the V20 theme.",
+    "zh-TW": "調整V20主題的同心圓環動畫。",
+    ko: "V20 테마의 동심원 링 애니메이션을 조정합니다.",
+  },
+  "settings.theme.bgAnim.title": {
     ja: "背景アニメーション",
     en: "Background animation",
     "zh-TW": "背景動畫",
@@ -629,31 +635,31 @@ export const settingsTranslations = {
     "zh-TW": "調整V34主題的櫻花與故障效果。",
     ko: "V34 테마의 벚꽃과 글리치 효과를 조정합니다.",
   },
-  "settings.theme.v34Bg.enabled": {
+  "settings.theme.bgAnim.enabled": {
     ja: "背景アニメーションを有効にする",
     en: "Enable background animation",
     "zh-TW": "啟用背景動畫",
     ko: "배경 애니메이션 사용",
   },
-  "settings.theme.v34Bg.speed": {
+  "settings.theme.bgAnim.speed": {
     ja: "速度",
     en: "Speed",
     "zh-TW": "速度",
     ko: "속도",
   },
-  "settings.theme.v34Bg.speed.slow": {
+  "settings.theme.bgAnim.speed.slow": {
     ja: "遅い",
     en: "Slow",
     "zh-TW": "慢",
     ko: "느림",
   },
-  "settings.theme.v34Bg.speed.normal": {
+  "settings.theme.bgAnim.speed.normal": {
     ja: "標準",
     en: "Normal",
     "zh-TW": "標準",
     ko: "보통",
   },
-  "settings.theme.v34Bg.speed.fast": {
+  "settings.theme.bgAnim.speed.fast": {
     ja: "速い",
     en: "Fast",
     "zh-TW": "快",

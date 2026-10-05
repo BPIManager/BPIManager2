@@ -60,7 +60,9 @@ const DashboardLayout = ({
       </aside>
 
       <div className="flex flex-1 flex-col overflow-hidden">
-        <header className="flex h-16 shrink-0 items-center justify-between border-b border-bpim-border bg-bpim-surface px-4">
+        <header
+          data-slot="app-header"
+          className="flex h-16 shrink-0 items-center justify-between border-b border-bpim-border bg-bpim-surface px-4">
           <div className="flex items-center gap-4">
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>

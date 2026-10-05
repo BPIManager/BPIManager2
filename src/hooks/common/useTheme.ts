@@ -219,6 +219,18 @@ export const THEMES: ThemeDef[] = [
       text: "#3b0764",
     },
   },
+  {
+    id: "light-v20",
+    label: "V20",
+    mode: "light",
+    accent: "v20",
+    preview: {
+      bg: "radial-gradient(circle at 20% 30%, #ffffff 0%, #f4f5f7 38%, #d3d8de 100%)",
+      surface: "#ffffff",
+      primary: "#007DB5",
+      text: "#0E1116",
+    },
+  },
 ];
 
 export const STORAGE_KEY = "bpim2-theme";
