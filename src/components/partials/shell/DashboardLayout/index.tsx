@@ -36,10 +36,7 @@ const DashboardLayout = ({
   const isExpanded = sidebarPinned || sidebarHovered;
 
   return (
-    <div
-      className="flex h-svh w-full overflow-hidden"
-      style={{ background: "var(--bpim-bg-gradient, hsl(var(--bpim-bg)))" }}
-    >
+    <div className="flex h-svh w-full overflow-hidden">
       <aside
         className={cn(
           "relative hidden shrink-0 md:block",

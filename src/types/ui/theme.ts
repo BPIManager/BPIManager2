@@ -13,6 +13,7 @@ export type ThemeId =
   | "dark-forest"
   | "dark-ember"
   | "dark-onsen"
+  | "dark-zinrai"
   | "light-blue"
   | "light-green"
   | "light-rose"

@@ -15,7 +15,8 @@
   &:is([data-theme="dark-midnight"] *),
   &:is([data-theme="dark-forest"] *),
   &:is([data-theme="dark-ember"] *),
-  &:is([data-theme="dark-onsen"] *)
+  &:is([data-theme="dark-onsen"] *),
+  &:is([data-theme="dark-zinrai"] *)
 );
 
 @layer base {
@@ -371,6 +372,37 @@
     --activity-4: #a8e6a3;
   }
 
+  [data-theme="dark-zinrai"] {
+    --bpim-bg: 260 69% 5%;
+    --bpim-bg-gradient: linear-gradient(
+      135deg,
+      #0a0416 0%,
+      #1a0838 40%,
+      #2a0b5a 70%,
+      #0a0416 100%
+    );
+    --bpim-surface: 261 63% 11%;
+    --bpim-surface-2: 262 63% 15%;
+    --bpim-overlay: 264 63% 24%;
+    --bpim-primary: 313 100% 65%;
+    --bpim-primary-dim: 311 68% 47%;
+    --bpim-border: 269 60% 37%;
+    --bpim-border-dim: 264 66% 21%;
+    --bpim-chart-grid: 272 57% 46%;
+    --bpim-text: 280 100% 97%;
+    --bpim-text-muted: 267 38% 70%;
+    --bpim-text-subtle: 264 26% 49%;
+    --bpim-success: 146 64% 52%;
+    --bpim-danger: 6 100% 64%;
+    --bpim-warning: 41 100% 63%;
+    --bpim-info: 197 100% 63%;
+    --activity-0: #12062a;
+    --activity-1: #3a0f7a;
+    --activity-2: #6a1bd0;
+    --activity-3: #b030f0;
+    --activity-4: #ff6be0;
+  }
+
   [data-theme="light-blue"] {
     --bpim-bg: 220 40% 96%;
     --bpim-surface: 220 30% 100%;
@@ -486,7 +518,8 @@
 [data-theme="dark-midnight"] input[type="date"],
 [data-theme="dark-forest"] input[type="date"],
 [data-theme="dark-ember"] input[type="date"],
-[data-theme="dark-onsen"] input[type="date"] {
+[data-theme="dark-onsen"] input[type="date"],
+[data-theme="dark-zinrai"] input[type="date"] {
   color-scheme: dark;
 }
 
@@ -696,4 +729,22 @@ body {
   to {
     transform: scaleY(1);
   }
+}
+
+/* ZINRAI: 麻の葉風タイルの固定背景。操作を妨げないよう pointer-events を無効にする */
+[data-theme="dark-zinrai"] body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='83' viewBox='0 0 48 83' fill='none' stroke='%233A107A' stroke-width='1.5'%3E%3Cpath d='M24 0v27.7M24 27.7L0 41.5M24 27.7L48 41.5M0 41.5h48M24 55.3V83M24 55.3L0 41.5M24 55.3L48 41.5M0 0l24 27.7M48 0L24 27.7M0 83l24-27.8M48 83L24 55.2M0 13.8v27.7M48 13.8v27.7'/%3E%3C/svg%3E");
+  background-size: 48px 83px;
+}
+
+/* ZINRAI: 枠付きカードをピンクのネオン枠にする（面は不透明のまま） */
+[data-theme="dark-zinrai"] .rounded-xl.border-bpim-border,
+[data-theme="dark-zinrai"] .rounded-2xl.border-bpim-border {
+  border-color: hsl(var(--bpim-primary) / 0.5);
+  box-shadow: 0 0 18px hsl(var(--bpim-primary) / 0.18);
 }

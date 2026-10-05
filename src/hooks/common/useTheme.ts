@@ -159,6 +159,18 @@ export const THEMES: ThemeDef[] = [
     },
   },
   {
+    id: "dark-zinrai",
+    label: "ZINRAI",
+    mode: "dark",
+    accent: "zinrai",
+    preview: {
+      bg: "linear-gradient(135deg, #0A0416 0%, #1A0838 50%, #2A0B5A 100%)",
+      surface: "#160A2C",
+      primary: "#FF4FD8",
+      text: "#FAF0FF",
+    },
+  },
+  {
     id: "light-blue",
     label: "Light Blue",
     mode: "light",

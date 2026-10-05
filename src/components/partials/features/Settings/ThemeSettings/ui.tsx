@@ -16,6 +16,15 @@ import {
 } from "@/components/ui/dialog";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
+const GAMING_THEME_IDS: ThemeId[] = [
+  "dark-abyss",
+  "dark-midnight",
+  "dark-forest",
+  "dark-ember",
+  "dark-onsen",
+  "dark-zinrai",
+];
+
 export default function ThemeSettingsUi() {
   const [isOpen, setIsOpen] = useState(false);
   const [current, setCurrent] = useState<ThemeId>("dark-blue");
@@ -43,13 +52,9 @@ export default function ThemeSettingsUi() {
   const currentFontLabel = FONTS.find((f) => f.id === currentFont)?.label;
 
   const darkStandard = THEMES.filter(
-    (t) =>
-      t.mode === "dark" &&
-      !["dark-abyss", "dark-midnight", "dark-forest", "dark-ember", "dark-onsen"].includes(t.id),
+    (t) => t.mode === "dark" && !GAMING_THEME_IDS.includes(t.id),
   );
-  const darkVivid = THEMES.filter((t) =>
-    ["dark-abyss", "dark-midnight", "dark-forest", "dark-ember", "dark-onsen"].includes(t.id),
-  );
+  const darkVivid = THEMES.filter((t) => GAMING_THEME_IDS.includes(t.id));
   const lightThemes = THEMES.filter((t) => t.mode === "light");
 
   return (
