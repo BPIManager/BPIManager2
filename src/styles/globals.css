@@ -756,7 +756,7 @@ body {
     drop-shadow(-2px 0 rgb(255 43 214 / 0.6));
 }
 
-/* V34: 半透明のパネル越しに背景が透けても文字が読めるよう、透過背景の要素をぼかす */
-[data-theme="dark-v34"] [class*=" bg-bpim-"][class*="/"] {
+/* V34: 半透明のパネル越しに背景が透けても文字が読めるよう、透過背景の要素をぼかす（装飾用の pointer-events-none 要素は除く） */
+[data-theme="dark-v34"] [class*=" bg-bpim-"][class*="/"]:not(.pointer-events-none) {
   backdrop-filter: blur(6px);
 }
