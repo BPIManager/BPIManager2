@@ -49,7 +49,7 @@ const OssSection = ({ data, isLoading, isError }: UseSupportersResult) => {
         </h2>
       </div>
 
-      <div className="relative overflow-hidden rounded-2xl border border-bpim-border bg-bpim-surface-2/30 p-6 backdrop-blur-sm md:p-8">
+      <div className="relative overflow-hidden rounded-2xl border border-bpim-border bg-bpim-surface p-6 md:p-8">
         <Sparkles className="absolute -right-4 -top-4 h-24 w-24 opacity-[0.03] text-emerald-400" />
 
         <div className="grid gap-8 lg:grid-cols-2">

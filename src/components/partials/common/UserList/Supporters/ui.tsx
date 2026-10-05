@@ -19,7 +19,8 @@ const ROLE_CONFIG: Record<
     label: string;
     icon: LucideIcon;
     color: string;
-    headerBg: string;
+    tint: string;
+    border: string;
     divider: string;
   }
 > = {
@@ -27,35 +28,40 @@ const ROLE_CONFIG: Record<
     label: "Pro",
     icon: Trophy,
     color: "text-yellow-400",
-    headerBg: "bg-yellow-400/10 border-yellow-400/30",
+    tint: "bg-yellow-400/10",
+    border: "border-yellow-400/30",
     divider: "border-yellow-400/20",
   },
   iidx: {
     label: "Sparkle",
     icon: Sparkle,
     color: "text-violet-300",
-    headerBg: "bg-violet-500/10 border-violet-400/40",
+    tint: "bg-violet-500/10",
+    border: "border-violet-400/40",
     divider: "border-violet-400/20",
   },
   saba: {
     label: "Saba",
     icon: Fish,
     color: "text-cyan-400",
-    headerBg: "bg-cyan-400/10 border-cyan-400/30",
+    tint: "bg-cyan-400/10",
+    border: "border-cyan-400/30",
     divider: "border-cyan-400/20",
   },
   developer: {
     label: "Developer",
     icon: Code2,
     color: "text-emerald-400",
-    headerBg: "bg-emerald-400/10 border-emerald-400/30",
+    tint: "bg-emerald-400/10",
+    border: "border-emerald-400/30",
     divider: "border-emerald-400/20",
   },
   coffee: {
     label: "Coffee",
     icon: Coffee,
     color: "text-amber-400",
-    headerBg: "bg-amber-400/10 border-amber-400/30",
+    tint: "bg-amber-400/10",
+    border: "border-amber-400/30",
     divider: "border-amber-400/20",
   },
 };
@@ -88,9 +94,19 @@ const RoleGroup = ({
   users: SupporterUser[];
 }) => {
   if (users.length === 0) return null;
-  const { label, icon: Icon, color, headerBg, divider } = ROLE_CONFIG[roleKey];
+  const { label, icon: Icon, color, tint, border, divider } =
+    ROLE_CONFIG[roleKey];
   return (
-    <div className={cn("rounded-xl border", headerBg)}>
+    <div
+      className={cn(
+        "relative isolate overflow-hidden rounded-xl border bg-bpim-surface",
+        border,
+      )}
+    >
+      <div
+        aria-hidden="true"
+        className={cn("pointer-events-none absolute inset-0 -z-10", tint)}
+      />
       <div
         className={cn("flex items-center gap-2 border-b px-4 py-2.5", divider)}
       >
