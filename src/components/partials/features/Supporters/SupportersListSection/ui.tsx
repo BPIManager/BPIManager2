@@ -21,7 +21,7 @@ const SupportersListSection = ({
           {t("support.supportersTitle")}
         </p>
       </div>
-      <div className="flex items-start gap-3 rounded-xl border border-bpim-info/20 bg-bpim-info/5 p-4 text-sm leading-relaxed text-bpim-muted shadow-sm">
+      <div className="flex items-start gap-3 rounded-xl border border-bpim-info/30 bg-bpim-surface p-4 text-sm leading-relaxed text-bpim-muted shadow-sm">
         <Info className="mt-0.5 h-4 w-4 shrink-0 text-bpim-info" />
         <p>
           {t("support.supportersInfoPart1")}

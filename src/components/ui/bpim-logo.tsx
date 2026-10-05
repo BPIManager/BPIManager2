@@ -1,3 +1,10 @@
+import { useCurrentThemeId } from "@/hooks/common/useTheme";
+import {
+  PETAL_LOGO_GRID,
+  PETAL_LOGO_PIXELS,
+  petalLogoSvgString,
+} from "@/lib/v34/petalLogo";
+
 const BAR_SVG = (color: string) =>
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">` +
   `<rect x="2"  y="4"  width="4" height="24" rx="0.75" fill="${color}" opacity="0.35"/>` +
@@ -7,11 +14,14 @@ const BAR_SVG = (color: string) =>
   `</svg>`;
 
 export function updateFavicon() {
-  const hsl = getComputedStyle(document.documentElement)
-    .getPropertyValue("--bpim-primary")
-    .trim();
+  const html = document.documentElement;
+  const hsl = getComputedStyle(html).getPropertyValue("--bpim-primary").trim();
   if (!hsl) return;
-  const url = `data:image/svg+xml,${encodeURIComponent(BAR_SVG(`hsl(${hsl})`))}`;
+  const svg =
+    html.getAttribute("data-theme") === "dark-v34"
+      ? petalLogoSvgString()
+      : BAR_SVG(`hsl(${hsl})`);
+  const url = `data:image/svg+xml,${encodeURIComponent(svg)}`;
   let link = document.querySelector<HTMLLinkElement>('link[rel="icon"][type="image/svg+xml"]');
   if (!link) {
     link = document.createElement("link");
@@ -46,7 +56,38 @@ const bars = [
   { h: 4, you: false },
 ];
 
-export const BpimLogo = ({ size = 32, className = "" }: BpimLogoProps) => (
+const PetalLogo = ({ size, className }: Required<BpimLogoProps>) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox={`0 0 ${PETAL_LOGO_GRID} ${PETAL_LOGO_GRID}`}
+    shapeRendering="crispEdges"
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+    aria-hidden="true"
+  >
+    {PETAL_LOGO_PIXELS.map(({ x, y, color }) => (
+      <rect
+        key={`${x}-${y}`}
+        x={x}
+        y={y}
+        width={1.02}
+        height={1.02}
+        fill={color}
+      />
+    ))}
+  </svg>
+);
+
+export const BpimLogo = ({ size = 32, className = "" }: BpimLogoProps) => {
+  const themeId = useCurrentThemeId();
+  if (themeId === "dark-v34") {
+    return <PetalLogo size={size} className={className} />;
+  }
+  return <BarLogo size={size} className={className} />;
+};
+
+const BarLogo = ({ size, className }: Required<BpimLogoProps>) => (
   <svg
     width={size}
     height={size}

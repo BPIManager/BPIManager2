@@ -29,6 +29,8 @@ const BatchTotalBpiCard = ({
       : bpiDiff < 0
         ? "text-bpim-danger"
         : "text-bpim-muted";
+  const bpiIconToken =
+    bpiDiff > 0 ? "primary" : bpiDiff < 0 ? "danger" : "text-muted";
   const bpiBgClass =
     bpiDiff > 0
       ? "bg-bpim-primary/10"
@@ -47,7 +49,11 @@ const BatchTotalBpiCard = ({
           <div
             className={cn("rounded-xl p-3 shrink-0", bpiBgClass, bpiColorClass)}
           >
-            <LordiconAnimation src="/lottie/trending-up.json" trigger="once" />
+            <LordiconAnimation
+              src="/lottie/trending-up.json"
+              trigger="once"
+              colorToken={bpiIconToken}
+            />
           </div>
         </div>
 

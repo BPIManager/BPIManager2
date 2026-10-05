@@ -34,7 +34,7 @@ export const LogsGroupSkeleton = () => {
 
       <div
         className={cn(
-          "rounded-lg border border-bpim-border bg-white/[0.02] p-4 mb-4",
+          "rounded-lg border border-bpim-border bg-bpim-surface p-4 mb-4",
           "md:ml-8",
         )}
       >

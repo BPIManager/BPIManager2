@@ -138,7 +138,7 @@ const DonationSection = () => {
           </a>
         </div>
 
-        <div className="rounded-2xl border border-bpim-border bg-bpim-surface-2/20 p-6 backdrop-blur-sm md:p-8">
+        <div className="rounded-2xl border border-bpim-border bg-bpim-surface p-6 md:p-8">
           <p className="mb-6 text-xs text-bpim-muted text-center">
             {t("support.otherMethods")}
           </p>

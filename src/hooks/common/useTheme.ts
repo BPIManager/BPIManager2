@@ -1,3 +1,4 @@
+import { useSyncExternalStore } from "react";
 import type { ThemeId, ThemeDef } from "@/types/ui/theme";
 import { safeGetItem, safeSetItem } from "@/utils/common/safeStorage";
 
@@ -159,6 +160,18 @@ export const THEMES: ThemeDef[] = [
     },
   },
   {
+    id: "dark-v34",
+    label: "V34",
+    mode: "dark",
+    accent: "v34",
+    preview: {
+      bg: "linear-gradient(135deg, #0A0416 0%, #1A0838 50%, #2A0B5A 100%)",
+      surface: "#160A2C",
+      primary: "#FF4FD8",
+      text: "#FAF0FF",
+    },
+  },
+  {
     id: "light-blue",
     label: "Light Blue",
     mode: "light",
@@ -239,4 +252,26 @@ export function applyTheme(id: ThemeId) {
   html.setAttribute("data-theme", id);
 
   safeSetItem(STORAGE_KEY, id);
+}
+
+function subscribeThemeAttr(onChange: () => void) {
+  const observer = new MutationObserver(onChange);
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["data-theme"],
+  });
+  return () => observer.disconnect();
+}
+
+/**
+ * `<html data-theme>` に適用中のテーマ ID を購読して返す。SSR 中・未適用時は null。
+ *
+ * @returns 適用中のテーマ ID
+ */
+export function useCurrentThemeId(): ThemeId | null {
+  return useSyncExternalStore(
+    subscribeThemeAttr,
+    () => document.documentElement.getAttribute("data-theme") as ThemeId | null,
+    () => null,
+  );
 }

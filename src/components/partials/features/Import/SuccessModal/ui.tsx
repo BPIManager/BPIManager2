@@ -67,7 +67,7 @@ const ImportSuccessModal = ({ result, version, onClose }: Props) => {
       showFireworks={isImproved}
       icon={
         isImproved ? (
-          <LordiconAnimation src="/lottie/trending-up.json" trigger="loop" />
+          <LordiconAnimation src="/lottie/trending-up.json" trigger="loop" colorToken="primary" />
         ) : (
           <ScrollText size={32} />
         )
