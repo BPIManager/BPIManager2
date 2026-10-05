@@ -659,6 +659,12 @@ export const settingsTranslations = {
     "zh-TW": "快",
     ko: "빠름",
   },
+  "settings.theme.homage": {
+    ja: "オマージュ",
+    en: "Homage",
+    "zh-TW": "致敬",
+    ko: "오마주",
+  },
   "settings.theme.font": {
     ja: "フォント設定",
     en: "Font",

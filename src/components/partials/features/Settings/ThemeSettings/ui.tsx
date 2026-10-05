@@ -23,8 +23,9 @@ const GAMING_THEME_IDS: ThemeId[] = [
   "dark-forest",
   "dark-ember",
   "dark-onsen",
-  "dark-zinrai",
 ];
+
+const HOMAGE_THEME_IDS: ThemeId[] = ["dark-zinrai"];
 
 export default function ThemeSettingsUi() {
   const [isOpen, setIsOpen] = useState(false);
@@ -53,9 +54,13 @@ export default function ThemeSettingsUi() {
   const currentFontLabel = FONTS.find((f) => f.id === currentFont)?.label;
 
   const darkStandard = THEMES.filter(
-    (t) => t.mode === "dark" && !GAMING_THEME_IDS.includes(t.id),
+    (t) =>
+      t.mode === "dark" &&
+      !GAMING_THEME_IDS.includes(t.id) &&
+      !HOMAGE_THEME_IDS.includes(t.id),
   );
   const darkVivid = THEMES.filter((t) => GAMING_THEME_IDS.includes(t.id));
+  const homageThemes = THEMES.filter((t) => HOMAGE_THEME_IDS.includes(t.id));
   const lightThemes = THEMES.filter((t) => t.mode === "light");
 
   return (
@@ -111,6 +116,7 @@ export default function ThemeSettingsUi() {
             <ThemeGroup label={t("settings.theme.dark")} themes={darkStandard} current={current} onSelect={handleSelect} />
             <ThemeGroup label={t("settings.theme.light")} themes={lightThemes} current={current} onSelect={handleSelect} />
             <ThemeGroup label={t("settings.theme.gaming")} themes={darkVivid} current={current} onSelect={handleSelect} />
+            <ThemeGroup label={t("settings.theme.homage")} themes={homageThemes} current={current} onSelect={handleSelect} />
 
             {current === "dark-zinrai" && <ZinraiBackgroundSettings />}
 
