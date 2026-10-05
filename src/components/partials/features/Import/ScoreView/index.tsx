@@ -1,6 +1,5 @@
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -16,7 +15,9 @@ import BookmarkletAccordion from "@/components/partials/common/Bookmarklet";
 import AndroidAppAccordion from "../AndroidApp";
 import ManualEntryAccordion from "../ManualEntry";
 import McpEntryAccordion from "../McpEntry";
+import DeleteGuideAccordion from "../DeleteGuide";
 import InstructionSection from "../Instruction";
+import StepCard from "../StepCard";
 import {
   type CsvType,
   CSV_TYPE_LABELS,
@@ -44,9 +45,10 @@ const ScoreImportView = (props: ScoreImportProps) => {
       : null;
 
   return (
-    <div className="relative">
-      <div className="flex flex-col gap-6">
-        <div className="space-y-2">
+    <div className="flex flex-col gap-6">
+      <StepCard
+        step={1}
+        title={
           <Label
             htmlFor="csv-data"
             className="text-sm font-bold text-bpim-text"
@@ -56,70 +58,67 @@ const ScoreImportView = (props: ScoreImportProps) => {
               href={iidxUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-bpim-primary underline decoration-blue-400/30 underline-offset-4 transition-colors hover:text-bpim-primary hover:decoration-blue-300"
+              className="text-bpim-primary underline decoration-bpim-primary/30 underline-offset-4 transition-colors hover:decoration-bpim-primary"
             >
               {t("import.csv.officialDownload")}
             </a>
             )
           </Label>
-          <p className="text-[10px] text-bpim-muted">
-            {t("import.csv.pasteHint")}
-            <br />
-            {t("import.csv.clipboardHint")}
-          </p>
-          <Textarea
-            id="csv-data"
-            placeholder={t("import.csv.placeholder")}
-            className="max-h-12.5 border-bpim-border bg-bpim-surface-2/60 p-4 font-mono text-sm transition-colors focus:border-bpim-primary focus:ring-0"
-            value={props.csvData}
-            onChange={(e) => props.setCsvData(e.target.value)}
-          />
-          {props.csvData && (
-            <div className="flex items-center gap-1.5">
-              {props.detectedType !== "unknown" ? (
-                <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-green-500" />
-              ) : (
-                <AlertCircle className="h-3.5 w-3.5 shrink-0 text-bpim-danger" />
-              )}
-              <span
-                className={`text-xs font-medium ${
-                  props.detectedType !== "unknown"
-                    ? "text-green-500"
-                    : "text-bpim-danger"
-                }`}
-              >
-                {props.detectedType !== "unknown"
-                  ? `${t("import.csv.detectedPrefix")}${CSV_TYPE_LABELS[props.detectedType]}`
-                  : t("import.csv.unsupported")}
-              </span>
-            </div>
-          )}
-        </div>
+        }
+      >
+        <p className="text-[10px] text-bpim-muted">
+          {t("import.csv.pasteHint")}
+          <br />
+          {t("import.csv.clipboardHint")}
+        </p>
+        <Textarea
+          id="csv-data"
+          placeholder={t("import.csv.placeholder")}
+          className="max-h-12.5 border-bpim-border bg-bpim-surface-2 p-4 font-mono text-sm transition-colors focus:border-bpim-primary focus:ring-0"
+          value={props.csvData}
+          onChange={(e) => props.setCsvData(e.target.value)}
+        />
+        {props.csvData && (
+          <div className="flex items-center gap-1.5">
+            {props.detectedType !== "unknown" ? (
+              <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-bpim-success" />
+            ) : (
+              <AlertCircle className="h-3.5 w-3.5 shrink-0 text-bpim-danger" />
+            )}
+            <span
+              className={`text-xs font-medium ${
+                props.detectedType !== "unknown"
+                  ? "text-bpim-success"
+                  : "text-bpim-danger"
+              }`}
+            >
+              {props.detectedType !== "unknown"
+                ? `${t("import.csv.detectedPrefix")}${CSV_TYPE_LABELS[props.detectedType]}`
+                : t("import.csv.unsupported")}
+            </span>
+          </div>
+        )}
+      </StepCard>
 
-        <div className="space-y-2">
-          <Label className="text-sm font-bold text-bpim-text">
-            {t("import.version.label")}
-          </Label>
-          <p className="text-[10px] text-bpim-muted">
-            {t("import.version.desc")}
-          </p>
-          <Select
-            value={props.selectedVersion[0]}
-            onValueChange={(value) => props.setSelectedVersion([value])}
-          >
-            <SelectTrigger className="w-full border-bpim-border bg-bpim-surface-2/60 text-sm md:w-75">
-              <SelectValue placeholder={t("import.version.placeholder")} />
-            </SelectTrigger>
-            <SelectContent className="border-bpim-border bg-bpim-bg text-bpim-text">
-              {versionsOptions.map((v) => (
-                <SelectItem key={v.value} value={v.value} disabled={v.disabled}>
-                  {v.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
+      <StepCard step={2} title={t("import.version.label")}>
+        <p className="text-[10px] text-bpim-muted">
+          {t("import.version.desc")}
+        </p>
+        <Select
+          value={props.selectedVersion[0]}
+          onValueChange={(value) => props.setSelectedVersion([value])}
+        >
+          <SelectTrigger className="w-full border-bpim-border bg-bpim-surface-2 text-sm md:w-75">
+            <SelectValue placeholder={t("import.version.placeholder")} />
+          </SelectTrigger>
+          <SelectContent className="border-bpim-border bg-bpim-bg text-bpim-text">
+            {versionsOptions.map((v) => (
+              <SelectItem key={v.value} value={v.value} disabled={v.disabled}>
+                {v.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         {csvVersionError && (
           <div className="flex items-start gap-2 rounded-lg border border-bpim-danger/40 bg-bpim-danger/10 px-4 py-3">
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-bpim-danger" />
@@ -128,7 +127,9 @@ const ScoreImportView = (props: ScoreImportProps) => {
             </p>
           </div>
         )}
+      </StepCard>
 
+      <StepCard step={3} title={t("import.step.run.title")}>
         <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
           <Button
             variant="ghost"
@@ -156,20 +157,17 @@ const ScoreImportView = (props: ScoreImportProps) => {
             )}
           </Button>
         </div>
+      </StepCard>
 
-        <div className="space-y-2">
-          <Label className="text-sm font-bold text-bpim-text">
-            {t("import.registrationMethods.title")}
-          </Label>
-          <BookmarkletAccordion />
-          <AndroidAppAccordion />
-          <ManualEntryAccordion />
-          <McpEntryAccordion />
-        </div>
+      <StepCard title={t("import.registrationMethods.title")}>
+        <BookmarkletAccordion />
+        <AndroidAppAccordion />
+        <ManualEntryAccordion />
+        <McpEntryAccordion />
+        <DeleteGuideAccordion />
+      </StepCard>
 
-        <Separator className="bg-bpim-overlay/60" />
-        <InstructionSection />
-      </div>
+      <InstructionSection />
     </div>
   );
 };
