@@ -10,6 +10,7 @@ import { Toaster } from "@/components/ui/sonner";
 import LocaleDetectionModal from "@/components/partials/common/LocaleDetectionModal";
 import AccountSettings from "@/components/partials/modal/AccountSettings";
 import { updateFavicon } from "@/components/ui/bpim-logo";
+import ZinraiBackground from "@/components/partials/shell/ZinraiBackground";
 
 export default function App({ Component, pageProps }: AppProps) {
   useEffect(() => {
@@ -30,6 +31,7 @@ export default function App({ Component, pageProps }: AppProps) {
         options={{ showSpinner: true }}
         shallowRouting
       />
+      <ZinraiBackground />
       <LocaleProvider>
         <UserProvider>
           <TooltipProvider>
