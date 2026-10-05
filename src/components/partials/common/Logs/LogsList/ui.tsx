@@ -181,7 +181,7 @@ const LogsList = ({
                   >
                     <div
                       className={cn(
-                        "rounded-xl border border-bpim-border bg-white/2 p-4",
+                        "rounded-xl border border-bpim-border bg-bpim-surface p-4",
                         "transition-colors hover:bg-bpim-overlay/30 cursor-pointer",
                       )}
                     >
@@ -220,7 +220,7 @@ const LogsList = ({
                   <>
                     <div
                       className={cn(
-                        "mb-4 rounded-xl border border-bpim-border bg-white/2 p-4",
+                        "mb-4 rounded-xl border border-bpim-border bg-bpim-surface p-4",
                         "md:ml-12",
                       )}
                     >
