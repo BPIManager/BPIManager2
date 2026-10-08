@@ -843,6 +843,72 @@ export const pagesTranslations = {
     "zh-TW": "AAA 達成表",
     ko: "AAA 달성표",
   },
+  "profile.tab.topRankers": {
+    ja: "歴代県別",
+    en: "Area Records",
+    "zh-TW": "歷代縣別",
+    ko: "역대 지역별",
+  },
+  "page.topRankers.title": {
+    ja: "歴代県別",
+    en: "Area Records",
+    "zh-TW": "歷代縣別",
+    ko: "역대 지역별",
+  },
+  "topRankers.summary.title": {
+    ja: "マイ歴代県別",
+    en: "Area #1 Records",
+    "zh-TW": "各縣第 1 名數",
+    ko: "지역별 1위 획득 수",
+  },
+  "topRankers.summary.area": {
+    ja: "エリア",
+    en: "Area",
+    "zh-TW": "地區",
+    ko: "지역",
+  },
+  "topRankers.summary.total": {
+    ja: "累計",
+    en: "Total",
+    "zh-TW": "累計",
+    ko: "누계",
+  },
+  "topRankers.summary.bestVersion": {
+    ja: "最多バージョン",
+    en: "Best Version",
+    "zh-TW": "最多版本",
+    ko: "최다 버전",
+  },
+  "topRankers.summary.unit": {
+    ja: "件",
+    en: "",
+    "zh-TW": "件",
+    ko: "건",
+  },
+  "topRankers.summary.empty": {
+    ja: "1位を獲得した記録はまだありません",
+    en: "No #1 records yet",
+    "zh-TW": "尚無第 1 名紀錄",
+    ko: "아직 1위 기록이 없습니다",
+  },
+  "topRankers.noIidxId": {
+    ja: "IIDX IDが未設定のため、歴代県別は表示できません",
+    en: "Area records are unavailable because no IIDX ID is set",
+    "zh-TW": "尚未設定 IIDX ID，無法顯示歷代縣別",
+    ko: "IIDX ID가 설정되지 않아 역대 지역별을 표시할 수 없습니다",
+  },
+  "topRankers.version.label": {
+    ja: "バージョン",
+    en: "Version",
+    "zh-TW": "版本",
+    ko: "버전",
+  },
+  "topRankers.list.empty": {
+    ja: "このバージョンで1位を獲得した記録はありません",
+    en: "No #1 records in this version",
+    "zh-TW": "此版本沒有第 1 名紀錄",
+    ko: "이 버전에는 1위 기록이 없습니다",
+  },
 
   // ProfileSideBar
   "profile.sidebar.currentArenaClass": {
