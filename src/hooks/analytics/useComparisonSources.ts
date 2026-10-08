@@ -3,6 +3,7 @@ import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
 import { fetcher } from "@/utils/common/fetch";
 import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { arenaDataVersion } from "@/constants/iidx/iidxVersions";
+import type { TopRankerAreaScoreRow } from "@/lib/subhandlers/topRankers";
 import type { ArenaAverageRow, RivalAvgRow, RivalTopRow } from "./comparisonRows";
 
 /**
@@ -29,6 +30,20 @@ export const useRivalTopScores = (
   const { data, error, isLoading } = useAuthedSWRV2<RivalTopRow[]>(
     userId
       ? `${API_V2_PREFIX}/users/${userId}/rivals/following/top-scores?version=${version}`
+      : null,
+    { revalidateOnFocus: false, dedupingInterval: 10000 },
+  );
+  return { data, error, isLoading };
+};
+
+export const useTopRankerAreaScores = (
+  userId: string | undefined,
+  version: string,
+  areaId: number | undefined,
+) => {
+  const { data, error, isLoading } = useAuthedSWRV2<TopRankerAreaScoreRow[]>(
+    userId && areaId !== undefined
+      ? `${API_V2_PREFIX}/users/${userId}/top-rankers/area-scores?version=${version}&areaId=${areaId}`
       : null,
     { revalidateOnFocus: false, dedupingInterval: 10000 },
   );

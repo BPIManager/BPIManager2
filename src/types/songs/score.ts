@@ -35,6 +35,9 @@ export interface SongWithScore
 
   radarTop?: string | null;
 
+  /** 歴代県別タブ: 1位を獲得したエリア(eagateのpref_id)。通常のスコア一覧では未設定 */
+  areaId?: number;
+
   rival?: RivalScore | null;
 
   exDiff?: number;
@@ -50,7 +53,24 @@ export interface SongWithScore
 
 export interface SongWithRival extends SongWithScore {
   rival: RivalScore;
+  /** 複数ターゲット比較時のみ。ターゲットごとの比較結果（先頭が`rival`/`exDiff`/`bpiDiff`と同じ） */
+  targets?: TargetComparison[];
 }
+
+/** 1ターゲット分の比較結果（自分とのEX差・BPI差を含む） */
+export interface TargetComparison {
+  rival: RivalScore | null;
+  exDiff?: number;
+  bpiDiff?: number;
+}
+
+/** ライバル(比較ターゲット)に紐づくソートキー。複数ターゲット時は`<key>#<ターゲットindex>`で2件目以降を指す */
+export type RivalSortKey =
+  | "rivalBpi"
+  | "rivalRate"
+  | "exGap"
+  | "bpiGap"
+  | "rivalUpdated";
 
 export type SongForSort = SongWithScore;
 
@@ -98,19 +118,10 @@ export interface FilterParamsFrontend {
     | "bpm"
     | "updatedAt"
     | "version"
-    | "rivalBpi"
+    | RivalSortKey
+    | `${RivalSortKey}#${number}`
     | "myBpi"
-    | "rivalRate"
     | "myRate"
-    | "winGapAsc"
-    | "winGapDesc"
-    | "loseGapAsc"
-    | "loseGapDesc"
-    | "winBpiGapAsc"
-    | "winBpiGapDesc"
-    | "loseBpiGapAsc"
-    | "loseBpiGapDesc"
-    | "rivalUpdated"
     | "myUpdated"
     | "scoreRate";
   sortOrder?: "asc" | "desc";

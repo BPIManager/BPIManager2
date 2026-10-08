@@ -455,6 +455,17 @@ CREATE TABLE IF NOT EXISTS `songRankingCache` (
   CONSTRAINT `fk_src_songId` FOREIGN KEY (`songId`) REFERENCES `allSongs` (`songId`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `topRankers` (
+  `version` varchar(10) NOT NULL,
+  `areaId` tinyint(3) unsigned NOT NULL COMMENT 'eagateのpref_id(0=全国, 1-47=都道府県, 48以降=海外)',
+  `songId` int(11) NOT NULL COMMENT 'allSongs.songId',
+  `iidxId` varchar(12) DEFAULT NULL COMMENT 'ハイフン無しのIIDX ID。1位のプレイヤーを特定できない場合はNULL',
+  `djName` varchar(16) NOT NULL,
+  `exScore` int(11) NOT NULL,
+  PRIMARY KEY (`version`,`areaId`,`songId`),
+  KEY `idx_topRankers_iidxId` (`iidxId`,`version`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `userRadarCache` (
   `userId` varchar(128) NOT NULL,
   `version` varchar(20) NOT NULL,

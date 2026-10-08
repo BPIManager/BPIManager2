@@ -18,6 +18,8 @@ interface RankingFiltersProps {
     options: { value: string; label: string }[];
     /** 最新バージョン以外ではtotalBpi/songs以外の選択肢を隠す */
     isLatestVersion: boolean;
+    /** topranker(県別保持数)のデータがあるバージョンのときだけ県別保持数の選択肢を出す */
+    hasTopRankers: boolean;
   };
   /** 指定した場合のみエリア/アリーナクラスの絞り込み行を表示する(totalBpiカテゴリ専用) */
   areaArenaFilter?: {
@@ -70,11 +72,12 @@ const RankingFilters = ({
             </SelectTrigger>
             <SelectContent className="border-bpim-border bg-bpim-bg text-bpim-text">
               {category.options
-                .filter(
-                  (c) =>
-                    category.isLatestVersion ||
-                    c.value === "totalBpi" ||
-                    c.value === "songs",
+                .filter((c) =>
+                  c.value === "topRankers"
+                    ? category.hasTopRankers
+                    : category.isLatestVersion ||
+                      c.value === "totalBpi" ||
+                      c.value === "songs",
                 )
                 .map((c) => (
                   <SelectItem key={c.value} value={c.value}>

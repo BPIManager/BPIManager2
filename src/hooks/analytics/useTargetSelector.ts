@@ -7,14 +7,23 @@ import {
   History,
   Star,
   UserStar,
+  Crown,
 } from "lucide-react";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import type { TranslationKey } from "@/lib/i18n/translations";
 import type { AnalyticsTarget, AnalyticsTargetKind } from "@/types/analytics";
 import { versionTitles } from "@/constants/iidx/versionTitles";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
+import { getTopRankerAreaName } from "@/constants/iidx/topRankerAreas";
+import { decodeTopRankerParam, encodeTopRankerParam } from "./topRankerParam";
 
-export type Step = "kind" | "rival-pick" | "arena-rank" | "self-version-pick";
+export type Step =
+  | "kind"
+  | "rival-pick"
+  | "arena-rank"
+  | "self-version-pick"
+  | "top-ranker-version"
+  | "top-ranker-area";
 
 export type KindOption = {
   kind: AnalyticsTargetKind;
@@ -59,6 +68,13 @@ export const buildKindOptions = (
     label: t("analytics.kind.rivalTop"),
     description: t("analytics.kind.rivalTopDesc"),
     nextStep: "kind",
+  },
+  {
+    kind: "top-ranker",
+    icon: Crown,
+    label: t("analytics.kind.topRanker"),
+    description: t("analytics.kind.topRankerDesc"),
+    nextStep: "top-ranker-version",
   },
   {
     kind: "arena",
@@ -138,6 +154,16 @@ export function useTargetSelector({
     current?.kind === "self-version" ? (current.param ?? "") : "",
   );
 
+  const currentTopRanker =
+    current?.kind === "top-ranker"
+      ? decodeTopRankerParam(current.param)
+      : { version: "", areaId: null };
+  const [selectedTopRankerVersion, setSelectedTopRankerVersion] =
+    useState<string>(currentTopRanker.version);
+  const [selectedTopRankerArea, setSelectedTopRankerArea] = useState<
+    number | null
+  >(currentTopRanker.areaId);
+
   // モーダルを開いた瞬間、またはモーダルが開いている間にcurrentが変わった時だけ
   // 選択状態を確定済みcurrentからrender中に同期的にリセットする
   const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
@@ -153,6 +179,8 @@ export function useTargetSelector({
     setSelectedSelfVersion(
       current?.kind === "self-version" ? (current.param ?? "") : "",
     );
+    setSelectedTopRankerVersion(currentTopRanker.version);
+    setSelectedTopRankerArea(currentTopRanker.areaId);
   } else if (!isOpen && prevIsOpen) {
     setPrevIsOpen(false);
   }
@@ -194,11 +222,31 @@ export function useTargetSelector({
     onClose();
   };
 
+  const handleTopRankerVersionPick = (versionNum: string) => {
+    setSelectedTopRankerVersion(versionNum);
+    setStep("top-ranker-area");
+  };
+
+  const handleTopRankerAreaPick = (areaId: number) => {
+    setSelectedTopRankerArea(areaId);
+    const versionTitle =
+      versionTitles.find((v) => v.num === selectedTopRankerVersion)?.title ??
+      selectedTopRankerVersion;
+    onSelect({
+      kind: "top-ranker",
+      param: encodeTopRankerParam(selectedTopRankerVersion, areaId),
+      label: `${t("analytics.kind.topRanker")} ${versionTitle} ${getTopRankerAreaName(areaId)}`,
+    });
+    onClose();
+  };
+
   const stepTitle: Record<Step, string> = {
     kind: t("analytics.selectTarget"),
     "rival-pick": t("analytics.selectRival"),
     "arena-rank": t("analytics.selectArenaRank"),
     "self-version-pick": t("analytics.selectVersion"),
+    "top-ranker-version": t("analytics.selectTopRankerVersion"),
+    "top-ranker-area": t("analytics.selectTopRankerArea"),
   };
 
   return {
@@ -208,11 +256,15 @@ export function useTargetSelector({
     selectedArenaRank,
     setSelectedArenaRank,
     selectedSelfVersion,
+    selectedTopRankerVersion,
+    selectedTopRankerArea,
     kindOptions,
     stepTitle,
     handleKindClick,
     handleRivalPick,
     handleArenaConfirm,
     handleSelfVersionPick,
+    handleTopRankerVersionPick,
+    handleTopRankerAreaPick,
   };
 }

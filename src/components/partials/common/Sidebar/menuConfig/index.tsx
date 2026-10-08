@@ -14,12 +14,14 @@ import {
   Music,
   Table,
   Swords,
+  Crown,
   BarChart2,
   Ticket,
   Plug,
   LucideIcon,
 } from "lucide-react";
 import { latestVersion, arenaDataVersion } from "@/constants/iidx/iidxVersions";
+import { TOP_RANKER_VERSIONS } from "@/constants/iidx/topRankerAreas";
 import type { TranslationKey } from "@/lib/i18n/translations";
 import { XIcon } from "@/components/partials/common/Auth/Buttons";
 import { SITE_URL } from "@/constants/site/url";
@@ -47,7 +49,7 @@ export const getRivalMenuItems = (t: T) => [
   { label: t("nav.globalRanking"), icon: Trophy, href: "/ranking/global" },
 ];
 
-export const getAnalyticsMenuItems = (t: T) => [
+export const getAnalyticsMenuItems = (t: T, userId?: string) => [
   { label: t("nav.compare"), icon: ChartArea, href: "/analytics" },
   {
     label: t("nav.aaaChart"),
@@ -59,6 +61,15 @@ export const getAnalyticsMenuItems = (t: T) => [
     icon: Swords,
     href: `/metrics/arenaAverage/${arenaDataVersion}?difficultyLevel=12`,
   },
+  ...(userId
+    ? [
+        {
+          label: t("nav.myTopRankers"),
+          icon: Crown,
+          href: `/users/${userId}/top-rankers/${TOP_RANKER_VERSIONS[TOP_RANKER_VERSIONS.length - 1]}`,
+        },
+      ]
+    : []),
 ];
 
 export const getBetaMenuItems = (t: T) => [

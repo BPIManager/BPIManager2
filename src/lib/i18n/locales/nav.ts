@@ -66,6 +66,12 @@ export const navTranslations = {
     "zh-TW": "競技場等級平均",
     ko: "아레나 랭크 평균",
   },
+  "nav.myTopRankers": {
+    ja: "マイ歴代県別",
+    en: "My Area Records",
+    "zh-TW": "我的歷代縣別",
+    ko: "내 역대 지역별",
+  },
   "nav.goalManagement": {
     ja: "目標管理",
     en: "Goal Management",

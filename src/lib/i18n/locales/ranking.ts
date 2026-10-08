@@ -53,6 +53,24 @@ export const rankingTranslations = {
     "zh-TW": "IIDX塔",
     ko: "IIDX타워",
   },
+  "ranking.category.topRankers": {
+    ja: "県別保持数",
+    en: "Area #1 Count",
+    "zh-TW": "各縣第 1 名數",
+    ko: "지역별 1위 보유 수",
+  },
+  "ranking.topRankers.holdCount": {
+    ja: "保持数",
+    en: "Count",
+    "zh-TW": "保持數",
+    ko: "보유 수",
+  },
+  "ranking.topRankers.noData": {
+    ja: "条件に合うランキングがありません",
+    en: "No ranking matches the conditions",
+    "zh-TW": "沒有符合條件的排名",
+    ko: "조건에 맞는 랭킹이 없습니다",
+  },
   "ranking.filter.area": {
     ja: "地域",
     en: "Area",

@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { useRouter } from "next/router";
-import { Settings2, ChevronDown } from "lucide-react";
+import { Settings2, ChevronDown, Plus, X } from "lucide-react";
 
 import DashboardLayout from "@/components/partials/shell/DashboardLayout";
 import { PageContainer, PageHeader } from "@/components/partials/common/PageChrome/Header";
@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button";
 import RequireAuth from "@/components/partials/shell/RequireAuth";
 import { useUser } from "@/contexts/users/UserContext";
 
-import { useAnalyticsComparison } from "@/hooks/analytics/useAnalyticsComparison";
+import { useMultiAnalyticsComparison } from "@/hooks/analytics/useMultiAnalyticsComparison";
+import { MAX_ANALYTICS_TARGETS } from "@/constants/logic/analyticsComparison";
 import { decodeTarget, encodeTarget } from "@/hooks/analytics/targetCodec";
 import type { AnalyticsTarget } from "@/types/analytics";
 import TargetSelectorModal from "@/components/partials/features/Analytics/TargetSelector";
@@ -42,22 +43,50 @@ const EmptyState = ({ onOpen }: { onOpen: () => void }) => {
 
 const TargetBadge = ({
   target,
+  indexLabel,
   onClick,
+  onRemove,
 }: {
   target: AnalyticsTarget;
+  /** 複数ターゲット時の列名(RIVAL1...)。単一ターゲットでは出さない */
+  indexLabel?: string;
   onClick: () => void;
+  /** 指定時のみ「外す」ボタンを出す（ターゲットが2件以上のとき） */
+  onRemove?: () => void;
 }) => {
+  const { t } = useTranslation();
   return (
-    <button
-      onClick={onClick}
+    <div
       className={cn(
-        "flex items-center gap-2 rounded-full border border-bpim-border bg-bpim-surface px-4 py-1.5",
+        "flex items-center rounded-full border border-bpim-border bg-bpim-surface",
         "text-sm font-bold text-bpim-text transition-all hover:border-bpim-primary/60 hover:bg-bpim-overlay",
       )}
     >
-      <span className="text-bpim-text">{target.label}</span>
-      <ChevronDown className="h-3.5 w-3.5 text-bpim-muted" />
-    </button>
+      <button
+        onClick={onClick}
+        className={cn(
+          "flex items-center gap-2 py-1.5 pl-4",
+          onRemove ? "pr-2" : "pr-4",
+        )}
+      >
+        {indexLabel && (
+          <span className="text-[10px] font-bold tracking-widest text-bpim-warning">
+            {indexLabel}
+          </span>
+        )}
+        <span className="text-bpim-text">{target.label}</span>
+        <ChevronDown className="h-3.5 w-3.5 text-bpim-muted" />
+      </button>
+      {onRemove && (
+        <button
+          onClick={onRemove}
+          aria-label={t("page.analytics.removeTarget")}
+          className="mr-2 flex h-5 w-5 items-center justify-center rounded-full text-bpim-muted transition-colors duration-200 hover:bg-bpim-overlay hover:text-bpim-text"
+        >
+          <X className="h-3 w-3" />
+        </button>
+      )}
+    </div>
   );
 };
 
@@ -66,22 +95,30 @@ export default function AnalyticsPage() {
   const { isLoading: isUserLoading, fbUser } = useUser();
   const { t } = useTranslation();
 
-  const [isSelectorOpen, setIsSelectorOpen] = useState(false);
+  /** セレクタの対象: 追加(new) / 既存ターゲットの差し替え(index) / 閉じている(null) */
+  const [editing, setEditing] = useState<number | "new" | null>(null);
 
-  const target: AnalyticsTarget | null = (() => {
-    if (!router.isReady) return null;
-    const raw = router.query.target as string | undefined;
-    if (!raw) return null;
-    return decodeTarget(raw);
+  // `target`クエリは複数指定(?target=a&target=b)に対応。1件のときは従来の単一指定と同じ形になる
+  const targets: AnalyticsTarget[] = (() => {
+    if (!router.isReady) return [];
+    const raw = router.query.target;
+    const list = Array.isArray(raw) ? raw : raw ? [raw] : [];
+    return list
+      .map((r) => decodeTarget(r))
+      .filter((t): t is AnalyticsTarget => t !== null)
+      .slice(0, MAX_ANALYTICS_TARGETS);
   })();
 
-  const handleTargetSelect = useCallback(
-    (newTarget: AnalyticsTarget) => {
+  const pushTargets = useCallback(
+    (next: AnalyticsTarget[]) => {
+      const encoded = next.map(encodeTarget);
       router.push(
         {
           pathname: "/analytics",
           query: {
-            target: encodeTarget(newTarget),
+            ...(encoded.length > 0 && {
+              target: encoded.length === 1 ? encoded[0] : encoded,
+            }),
             levels: "11,12",
             difficulties: "ANOTHER,LEGGENDARIA,HYPER",
             page: "1",
@@ -94,10 +131,20 @@ export default function AnalyticsPage() {
     [router],
   );
 
+  const handleTargetSelect = useCallback(
+    (newTarget: AnalyticsTarget) => {
+      if (editing === "new") pushTargets([...targets, newTarget]);
+      else if (editing !== null)
+        pushTargets(targets.map((t, i) => (i === editing ? newTarget : t)));
+    },
+    [editing, targets, pushTargets],
+  );
+
   const version = (router.query.version as string) || latestVersion;
 
-  const { songs, isLoading, error, rivalLabel, refresh } =
-    useAnalyticsComparison(target, version);
+  const { songs, isLoading, error, labels, refresh } =
+    useMultiAnalyticsComparison(targets, version);
+  const canAdd = targets.length < MAX_ANALYTICS_TARGETS;
 
   return (
     <RequireAuth
@@ -111,48 +158,71 @@ export default function AnalyticsPage() {
           title={t("page.analytics.title")}
           description={t("page.analytics.desc")}
           rightElement={
-            target ? (
-              <div className="flex items-center gap-2">
-                <TargetBadge
-                  target={target}
-                  onClick={() => setIsSelectorOpen(true)}
-                />
-              </div>
-            ) : (
+            targets.length === 0 ? (
               <Button
-                onClick={() => setIsSelectorOpen(true)}
+                onClick={() => setEditing("new")}
                 variant="outline"
                 className="border-bpim-border bg-bpim-surface text-bpim-text hover:bg-bpim-overlay"
               >
                 <Settings2 className="mr-2 h-4 w-4" />
                 {t("page.analytics.setTarget")}
               </Button>
-            )
+            ) : undefined
           }
         />
 
         <PageContainer>
-          {!target ? (
-            <EmptyState onOpen={() => setIsSelectorOpen(true)} />
+          {targets.length === 0 ? (
+            <EmptyState onOpen={() => setEditing("new")} />
           ) : (
-            <div className="rounded-2xl border border-bpim-border bg-bpim-bg/40 p-1 shadow-xl backdrop-blur-md overflow-hidden">
-              <AnalyticsComparisonTable
-                songs={songs}
-                isLoading={isLoading}
-                error={error}
-                rivalLabel={rivalLabel}
-                version={version}
-                onScoreSaved={refresh}
-              />
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-wrap items-center gap-2">
+                {targets.map((target, i) => (
+                  <TargetBadge
+                    key={`${target.kind}-${target.param ?? ""}-${i}`}
+                    target={target}
+                    indexLabel={targets.length > 1 ? `RIVAL${i + 1}` : undefined}
+                    onClick={() => setEditing(i)}
+                    onRemove={
+                      targets.length > 1
+                        ? () => pushTargets(targets.filter((_, j) => j !== i))
+                        : undefined
+                    }
+                  />
+                ))}
+                <Button
+                  onClick={() => setEditing("new")}
+                  disabled={!canAdd}
+                  title={canAdd ? undefined : t("page.analytics.addTargetLimit")}
+                  variant="outline"
+                  size="sm"
+                  className="rounded-full border-bpim-border bg-bpim-surface text-bpim-text hover:bg-bpim-overlay"
+                >
+                  <Plus className="mr-1 h-4 w-4" />
+                  {t("page.analytics.addTarget")}
+                </Button>
+              </div>
+
+              <div className="rounded-2xl border border-bpim-border bg-bpim-bg/40 p-1 shadow-xl backdrop-blur-md overflow-hidden">
+                <AnalyticsComparisonTable
+                  songs={songs}
+                  isLoading={isLoading}
+                  error={error}
+                  rivalLabel={labels.join(" / ")}
+                  labels={labels}
+                  version={version}
+                  onScoreSaved={refresh}
+                />
+              </div>
             </div>
           )}
         </PageContainer>
 
         <TargetSelectorModal
-          isOpen={isSelectorOpen}
-          current={target}
+          isOpen={editing !== null}
+          current={typeof editing === "number" ? (targets[editing] ?? null) : null}
           onSelect={handleTargetSelect}
-          onClose={() => setIsSelectorOpen(false)}
+          onClose={() => setEditing(null)}
         />
       </DashboardLayout>
     </RequireAuth>

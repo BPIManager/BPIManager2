@@ -5,13 +5,14 @@ import { useRouter } from "next/router";
 import ProfileLayoutShell from "@/components/partials/shell/ProfileLayoutShell";
 import { Tabs } from "@/components/ui/tabs";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
-import { LayoutDashboard, Music, Table, History } from "lucide-react";
+import { TOP_RANKER_VERSIONS } from "@/constants/iidx/topRankerAreas";
+import { LayoutDashboard, Music, Table, History, Crown } from "lucide-react";
 import { AppTabsList, AppTabsTrigger } from "@/components/ui/complex/tabs";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface UserProfileLayoutProps {
   userId: string;
-  currentTab: "overview" | "songs" | "logs" | "aaaTable" | "";
+  currentTab: "overview" | "songs" | "logs" | "aaaTable" | "topRankers" | "";
   children: ReactNode;
 }
 
@@ -33,7 +34,7 @@ const UserProfileLayout = ({
     <ProfileLayoutShell userId={userId} bannerType="user">
       {() => (
         <Tabs value={currentTab} className="w-full">
-          <AppTabsList visual="card" cols={4} className="mb-4 mx-auto">
+          <AppTabsList visual="card" cols={5} className="mb-4 mx-auto">
             {[
               {
                 value: "overview",
@@ -58,6 +59,12 @@ const UserProfileLayout = ({
                 href: `/users/${userId}/aaaTable/${version}`,
                 label: t("profile.tab.aaaTable"),
                 icon: Table,
+              },
+              {
+                value: "topRankers",
+                href: `/users/${userId}/top-rankers/${TOP_RANKER_VERSIONS[TOP_RANKER_VERSIONS.length - 1]}`,
+                label: t("profile.tab.topRankers"),
+                icon: Crown,
               },
             ].map((tab) => (
               <AppTabsTrigger

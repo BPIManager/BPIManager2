@@ -14,6 +14,8 @@ import type { RankingEntry } from "@/types/users/ranking";
 import { useState } from "react";
 import SongRankingList from "./SongRankingList";
 import TowerRanking from "./TowerRanking";
+import TopRankersRanking from "./TopRankersRanking";
+import { TOP_RANKER_VERSIONS } from "@/constants/iidx/topRankerAreas";
 import { LoginRequiredCard } from "@/components/partials/common/Auth/LoginRequired/ui";
 import { useUser } from "@/contexts/users/UserContext";
 import { PageContainer, PageHeader } from "@/components/partials/common/PageChrome/Header";
@@ -67,13 +69,21 @@ const GlobalRankingContainer = () => {
     { value: "soflan", label: t("ranking.category.soflan") },
     { value: "songs", label: t("ranking.category.songs") },
     { value: "iidxTower", label: t("ranking.category.iidxTower") },
+    { value: "topRankers", label: t("ranking.category.topRankers") },
   ];
   const version = (router.query.version as string) || latestVersion;
   const category = (router.query.category as string) || "totalBpi";
   const isSongsCategory = category === "songs";
   const isTowerCategory = category === "iidxTower";
+  const isTopRankersCategory = category === "topRankers";
+  const hasTopRankers = (TOP_RANKER_VERSIONS as readonly string[]).includes(
+    version,
+  );
+  // 自前でデータ取得するカテゴリ（グローバルランキングAPIは叩かない）
+  const hasOwnData =
+    isSongsCategory || isTowerCategory || isTopRankersCategory;
   const isRadarCategory =
-    category !== "totalBpi" && !isSongsCategory && !isTowerCategory;
+    category !== "totalBpi" && !hasOwnData;
   const isLatestVersion = version === latestVersion;
   const isTotalBpiCategory = category === "totalBpi";
 
@@ -86,7 +96,7 @@ const GlobalRankingContainer = () => {
 
   const { data, isLoading, isError } = useGlobalRanking(
     version,
-    isSongsCategory || isTowerCategory ? "totalBpi" : category,
+    hasOwnData ? "totalBpi" : category,
     filterArea || undefined,
     filterArenaClass || undefined,
   );
@@ -117,7 +127,11 @@ const GlobalRankingContainer = () => {
     const newVersion = v;
     const isNewVersionLatest = newVersion === latestVersion;
     const keepCategory =
-      category === "songs" || isNewVersionLatest || category === "totalBpi";
+      category === "songs" ||
+      isNewVersionLatest ||
+      category === "totalBpi" ||
+      (category === "topRankers" &&
+        (TOP_RANKER_VERSIONS as readonly string[]).includes(newVersion));
     router.push(
       {
         query: {
@@ -136,10 +150,11 @@ const GlobalRankingContainer = () => {
       ...(router.query as Record<string, string>),
       category: c,
     };
-    if (c !== "totalBpi") {
-      delete newQuery.area;
-      delete newQuery.arenaClass;
-    }
+    // area は totalBpi（県名）と topRankers（pref_id）で意味が異なるため、カテゴリ切替では必ず消す
+    delete newQuery.area;
+    delete newQuery.arenaClass;
+    delete newQuery.levels;
+    delete newQuery.difficulties;
     router.push({ query: newQuery }, undefined, { shallow: true });
   };
 
@@ -179,7 +194,7 @@ const GlobalRankingContainer = () => {
     [data?.rankings, handleRowClick],
   );
 
-  if (!isSongsCategory && !isTowerCategory && isLoading) {
+  if (!hasOwnData && isLoading) {
     return (
       <>
         <PageHeader
@@ -201,7 +216,7 @@ const GlobalRankingContainer = () => {
     return <LoginRequiredCard />;
   }
 
-  if (!isSongsCategory && !isTowerCategory && isError) {
+  if (!hasOwnData && isError) {
     return (
       <>
         <PageHeader
@@ -215,7 +230,7 @@ const GlobalRankingContainer = () => {
     );
   }
 
-  if (!isSongsCategory && !isTowerCategory && !data) return null;
+  if (!hasOwnData && !data) return null;
 
   return (
     <>
@@ -231,6 +246,7 @@ const GlobalRankingContainer = () => {
             onChange: handleCategoryChange,
             options: radarCategories,
             isLatestVersion,
+            hasTopRankers,
           }}
           areaArenaFilter={
             isTotalBpiCategory
@@ -244,7 +260,9 @@ const GlobalRankingContainer = () => {
           }
         />
 
-        {isTowerCategory ? (
+        {isTopRankersCategory ? (
+          <TopRankersRanking version={version} />
+        ) : isTowerCategory ? (
           <TowerRanking version={version} />
         ) : isSongsCategory ? (
           <>

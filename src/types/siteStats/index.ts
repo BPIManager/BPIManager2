@@ -62,6 +62,18 @@ export interface TotalBpiHistogramBucket {
   count: number;
 }
 
+export interface TotalBpiVersionStats {
+  version: string;
+  userCount: number;
+  mean: number;
+  median: number;
+  max: number;
+  min: number;
+  p25: number;
+  p75: number;
+  p90: number;
+}
+
 export interface SiteStatsResponse {
   summary: SiteStatsSummary;
   dailyRegistrations: DailyRegistration[];
@@ -74,6 +86,8 @@ export interface SiteStatsResponse {
   weekdayDistribution: Record<SiteStatsPeriod, WeekdayEntry[]>;
   /** バージョン番号 → 5刻みバケット配列（-15〜100）。データが無いバージョンはキー自体が無い */
   totalBpiHistogram: Record<string, TotalBpiHistogramBucket[]>;
+  /** バージョンごとの総合BPI統計。ユーザーがいないバージョンは含まれない */
+  totalBpiVersionStats: TotalBpiVersionStats[];
   generatedAt?: string;
 }
 

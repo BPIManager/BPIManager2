@@ -27,6 +27,7 @@ export async function generateInfoJson() {
     hourlyDistribution,
     weekdayDistribution,
     totalBpiHistogram,
+    totalBpiVersionStats,
   ] = await Promise.all([
     siteStatsOverviewRepo.getSummary(),
     siteStatsOverviewRepo.getDailyRegistrations(90),
@@ -36,6 +37,7 @@ export async function generateInfoJson() {
     siteStatsActivityDistributionRepo.getHourlyDistribution(),
     siteStatsActivityDistributionRepo.getWeekdayDistribution(),
     siteStatsDistributionRepo.getTotalBpiHistogramByVersion(),
+    siteStatsDistributionRepo.getTotalBpiStatsByVersion(),
   ]);
 
   await fs.writeFile(
@@ -49,6 +51,7 @@ export async function generateInfoJson() {
       hourlyDistribution,
       weekdayDistribution,
       totalBpiHistogram,
+      totalBpiVersionStats,
       generatedAt: new Date().toISOString(),
     }),
   );

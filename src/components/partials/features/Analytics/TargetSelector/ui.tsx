@@ -19,6 +19,11 @@ import {
   type KindOption,
 } from "@/hooks/analytics/useTargetSelector";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
+import {
+  TOP_RANKER_AREA_NAMES,
+  TOP_RANKER_VERSIONS,
+} from "@/constants/iidx/topRankerAreas";
+import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 
 // KindCard: 目標種別を選ぶボタン
 
@@ -246,9 +251,6 @@ export const SelfVersionPickStep = ({
               <span className="font-bold text-sm text-bpim-text">
                 {v.title}
               </span>
-              <span className="ml-2 text-[10px] font-mono text-bpim-muted">
-                ver.{v.num}
-              </span>
             </div>
             {selected === v.num && (
               <Check className="h-4 w-4 text-bpim-primary shrink-0" />
@@ -259,3 +261,75 @@ export const SelfVersionPickStep = ({
     </div>
   );
 };
+
+// TopRankerVersionStep / TopRankerAreaStep: 県別1位の比較先（バージョン→エリア）
+
+const OptionButton = ({
+  label,
+  sub,
+  selected,
+  onClick,
+}: {
+  label: string;
+  sub?: string;
+  selected: boolean;
+  onClick: () => void;
+}) => (
+  <button
+    onClick={onClick}
+    className={cn(
+      "flex items-center justify-between rounded-xl border-2 px-4 py-3 text-left transition-all hover:scale-[1.01]",
+      selected
+        ? "border-bpim-primary bg-bpim-surface shadow-[0_0_0_3px] shadow-bpim-primary/20"
+        : "border-bpim-border bg-bpim-surface hover:border-bpim-primary/50",
+    )}
+  >
+    <div>
+      <span className="font-bold text-sm text-bpim-text">{label}</span>
+      {sub && (
+        <span className="ml-2 text-[10px] font-mono text-bpim-muted">
+          {sub}
+        </span>
+      )}
+    </div>
+    {selected && <Check className="h-4 w-4 text-bpim-primary shrink-0" />}
+  </button>
+);
+
+export const TopRankerVersionStep = ({
+  selected,
+  onSelect,
+}: {
+  selected: string;
+  onSelect: (version: string) => void;
+}) => (
+  <div className="flex max-h-80 flex-col gap-2 overflow-y-auto pr-1">
+    {[...TOP_RANKER_VERSIONS].reverse().map((v) => (
+      <OptionButton
+        key={v}
+        label={getVersionNameFromNumber(v)}
+        selected={selected === v}
+        onClick={() => onSelect(v)}
+      />
+    ))}
+  </div>
+);
+
+export const TopRankerAreaStep = ({
+  selected,
+  onSelect,
+}: {
+  selected: number | null;
+  onSelect: (areaId: number) => void;
+}) => (
+  <div className="flex max-h-80 flex-col gap-2 overflow-y-auto pr-1">
+    {TOP_RANKER_AREA_NAMES.map((name, areaId) => (
+      <OptionButton
+        key={areaId}
+        label={name}
+        selected={selected === areaId}
+        onClick={() => onSelect(areaId)}
+      />
+    ))}
+  </div>
+);
