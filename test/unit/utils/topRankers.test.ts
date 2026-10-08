@@ -8,20 +8,28 @@ import { decodeTarget, encodeTarget } from "@/hooks/analytics/targetCodec";
 describe("summarizeByArea", () => {
   it("エリアごとに累計と最多バージョンを求め、累計の多い順に並べる", () => {
     const rows = summarizeByArea([
-      { version: "32", areaId: 27, count: 3 },
-      { version: "33", areaId: 27, count: 10 },
-      { version: "33", areaId: 13, count: 20 },
+      { version: "32", areaId: 27, difficulty: "ANOTHER", difficultyLevel: 12, count: 3 },
+      { version: "33", areaId: 27, difficulty: "ANOTHER", difficultyLevel: 12, count: 6 },
+      { version: "33", areaId: 27, difficulty: "HYPER", difficultyLevel: 11, count: 4 },
+      { version: "33", areaId: 13, difficulty: "NORMAL", difficultyLevel: 7, count: 20 },
     ]);
-    expect(rows).toEqual([
-      { areaId: 13, total: 20, bestVersion: "33", bestCount: 20, byVersion: { "33": 20 } },
-      {
-        areaId: 27,
-        total: 13,
-        bestVersion: "33",
-        bestCount: 10,
-        byVersion: { "32": 3, "33": 10 },
-      },
+    expect(rows.map((r) => [r.areaId, r.total, r.bestVersion, r.bestCount])).toEqual([
+      [13, 20, "33", 20],
+      [27, 13, "33", 10],
     ]);
+    expect(rows[1].byVersion).toEqual({ "32": 3, "33": 10 });
+  });
+
+  it("レベル別・難易度別の内訳を全体とバージョン別に集計する", () => {
+    const [row] = summarizeByArea([
+      { version: "32", areaId: 27, difficulty: "ANOTHER", difficultyLevel: 12, count: 3 },
+      { version: "33", areaId: 27, difficulty: "ANOTHER", difficultyLevel: 12, count: 6 },
+      { version: "33", areaId: 27, difficulty: "HYPER", difficultyLevel: 11, count: 4 },
+    ]);
+    expect(row.breakdown.byLevel).toEqual({ 11: 4, 12: 9 });
+    expect(row.breakdown.byDifficulty).toEqual({ ANOTHER: 9, HYPER: 4 });
+    expect(row.breakdownByVersion["33"].byLevel).toEqual({ 11: 4, 12: 6 });
+    expect(row.breakdownByVersion["32"].byDifficulty).toEqual({ ANOTHER: 3 });
   });
 
   it("空配列は空配列を返す", () => {

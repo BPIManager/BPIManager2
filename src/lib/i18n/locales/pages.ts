@@ -903,6 +903,18 @@ export const pagesTranslations = {
     "zh-TW": "件",
     ko: "건",
   },
+  "topRankers.breakdown.level": {
+    ja: "レベル",
+    en: "Level",
+    "zh-TW": "等級",
+    ko: "레벨",
+  },
+  "topRankers.breakdown.difficulty": {
+    ja: "難易度",
+    en: "Difficulty",
+    "zh-TW": "難度",
+    ko: "난이도",
+  },
   "topRankers.summary.empty": {
     ja: "1位を獲得した記録はまだありません",
     en: "No #1 records yet",

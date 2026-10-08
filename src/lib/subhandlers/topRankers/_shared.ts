@@ -1,6 +1,6 @@
 import type { NextApiRequest } from "next";
 import type { HandlerResult } from "@/types/api";
-import type { TopRankerAreaCount } from "@/lib/db/domains/topRankers";
+import type { TopRankerAreaCount } from "@/lib/db/aggregates/topRankers/summary";
 
 export interface HandleOutcome<T> {
   result: HandlerResult<T>;
