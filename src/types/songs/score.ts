@@ -35,6 +35,9 @@ export interface SongWithScore
 
   radarTop?: string | null;
 
+  /** 歴代県別タブ: 1位を獲得したエリア(eagateのpref_id)。通常のスコア一覧では未設定 */
+  areaId?: number;
+
   rival?: RivalScore | null;
 
   exDiff?: number;

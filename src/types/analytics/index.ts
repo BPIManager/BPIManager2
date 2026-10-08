@@ -2,6 +2,7 @@ export type AnalyticsTargetKind =
   | "rival"
   | "rival-avg"
   | "rival-top"
+  | "top-ranker"
   | "arena"
   | "aaa"
   | "max-"

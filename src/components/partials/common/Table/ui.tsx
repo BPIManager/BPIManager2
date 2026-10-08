@@ -221,7 +221,7 @@ const SongList = ({
     <div className="w-full p-2 flex flex-col" ref={listRef}>
       {songs.map((song) => (
         <SongItem
-          key={`${song.songId}-${song.difficulty}`}
+          key={`${song.songId}-${song.difficulty}-${song.areaId ?? ""}`}
           song={song}
           compareVersion={compareVersion}
           onClick={() => onSongSelect(song)}

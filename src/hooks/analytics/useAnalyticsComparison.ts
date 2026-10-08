@@ -5,6 +5,8 @@ import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { SongWithRival, SongWithScore } from "@/types/songs/score";
 import { BpiCalculator } from "@/lib/bpi";
 import { AnalyticsTarget } from "@/types/analytics";
+import { decodeTopRankerParam } from "./topRankerParam";
+import type { TopRankerAreaScoreRow } from "@/lib/subhandlers/topRankers";
 import {
   BestEverRow,
   RivalAvgRow,
@@ -17,6 +19,7 @@ import {
   useArenaJson,
   useRivalAvgScores,
   useRivalTopScores,
+  useTopRankerAreaScores,
 } from "./useComparisonSources";
 
 /**
@@ -88,6 +91,7 @@ export const useAnalyticsComparison = (
     target?.kind === "wr" ||
     target?.kind === "rival-avg" ||
     target?.kind === "rival-top" ||
+    target?.kind === "top-ranker" ||
     needsBestEver;
 
   const {
@@ -135,6 +139,18 @@ export const useAnalyticsComparison = (
   } = useRivalTopScores(
     target?.kind === "rival-top" ? myUserId : undefined,
     targetVersion,
+  );
+
+  const { version: topRankerVersion, areaId: topRankerAreaId } =
+    decodeTopRankerParam(target?.kind === "top-ranker" ? target.param : undefined);
+  const {
+    data: topRankerData,
+    error: topRankerError,
+    isLoading: topRankerLoading,
+  } = useTopRankerAreaScores(
+    target?.kind === "top-ranker" ? myUserId : undefined,
+    topRankerVersion,
+    topRankerAreaId ?? undefined,
   );
 
   if (!target) {
@@ -323,6 +339,36 @@ export const useAnalyticsComparison = (
       songs,
       isLoading: false,
       error: rivalTopError,
+      rivalLabel: target.label,
+      refresh,
+    };
+  }
+
+  if (target.kind === "top-ranker") {
+    if (topRankerLoading) {
+      return {
+        songs: undefined,
+        isLoading: true,
+        error: undefined,
+        rivalLabel: target.label,
+        refresh,
+      };
+    }
+
+    const topMap = new Map<string, TopRankerAreaScoreRow>();
+    for (const row of topRankerData ?? []) {
+      topMap.set(`${row.songId}__${row.difficulty}`, row);
+    }
+
+    const songs = myScores.map((s) => {
+      const top = topMap.get(`${s.songId}__${s.difficulty}`);
+      return mergeFixedTarget(s, top?.topExScore ?? null, top?.topBpi ?? null);
+    });
+
+    return {
+      songs,
+      isLoading: false,
+      error: topRankerError,
       rivalLabel: target.label,
       refresh,
     };

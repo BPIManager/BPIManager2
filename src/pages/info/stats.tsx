@@ -9,6 +9,7 @@ import {
   ArenaRankComparison,
   VersionScoreChart,
   TotalBpiHistogramChart,
+  TotalBpiVersionStatsTable,
   HourlyChart,
   WeekdayChart,
   SongPopulationTable,
@@ -96,6 +97,7 @@ export default function SiteStatsPage() {
             <ArenaRankComparison selfReported={data.arenaRankDistribution} />
             <VersionScoreChart data={data.versionScoreDistribution} />
             <TotalBpiHistogramChart data={data.totalBpiHistogram} />
+            <TotalBpiVersionStatsTable data={data.totalBpiVersionStats} />
 
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
               <HourlyChart data={data.hourlyDistribution} />
