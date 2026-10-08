@@ -3,6 +3,7 @@ import { sql } from "kysely";
 import { ARENA_RANK_ORDER } from "@/constants/iidx/arenaRanks";
 
 import { logTotalBpiRepo } from "@/lib/db/domains/logs/totalBpi";
+import type { TotalBpiVersionStats } from "@/types/siteStats";
 
 import { latestPerUserAllVersionsSubquery as latestArenaStatsPerUserAllVersionsSubquery } from "@/lib/db/domains/arenaHistory";
 
@@ -160,6 +161,46 @@ class SiteStatsDistributionRepository {
       }));
     }
     return result;
+  }
+
+  /**
+   * バージョンごとの総合BPI統計（人数・平均・中央値・最大/最小・四分位等）。ヒストグラムと同じ正本を使う。
+   */
+  async getTotalBpiStatsByVersion(): Promise<TotalBpiVersionStats[]> {
+    const rows = await logTotalBpiRepo.getLatestTotalBpiPerUserAllVersions();
+
+    const byVersion = new Map<string, number[]>();
+    for (const r of rows) {
+      if (r.totalBpi == null || !r.version) continue;
+      const list = byVersion.get(r.version) ?? [];
+      byVersion.set(r.version, list);
+      list.push(Number(r.totalBpi));
+    }
+
+    // 線形補間によるパーセンタイル（sorted は昇順）
+    const percentile = (sorted: number[], p: number) => {
+      const pos = (sorted.length - 1) * p;
+      const lo = Math.floor(pos);
+      const hi = Math.ceil(pos);
+      return sorted[lo] + (sorted[hi] - sorted[lo]) * (pos - lo);
+    };
+
+    return [...byVersion.entries()]
+      .map(([version, values]) => {
+        const sorted = [...values].sort((a, b) => a - b);
+        return {
+          version,
+          userCount: sorted.length,
+          mean: sorted.reduce((s, v) => s + v, 0) / sorted.length,
+          median: percentile(sorted, 0.5),
+          max: sorted[sorted.length - 1],
+          min: sorted[0],
+          p25: percentile(sorted, 0.25),
+          p75: percentile(sorted, 0.75),
+          p90: percentile(sorted, 0.9),
+        };
+      })
+      .sort((a, b) => Number(b.version) - Number(a.version));
   }
 }
 
