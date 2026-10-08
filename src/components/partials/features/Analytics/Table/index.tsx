@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { useSongFilter } from "@/hooks/table/useSongFilter";
 import { PAGE_SIZE } from "@/constants/logic/pagination";
 import { SongWithRival, SongWithScore } from "@/types/songs/score";
@@ -13,7 +13,9 @@ import CustomPagination from "@/components/partials/common/ListControls/Paginati
 import AdvancedFilterModal from "@/components/partials/common/Songs/AdvancedFilter/ui";
 import SongDetailView from "@/components/partials/modal/SongDetail";
 import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
-import RivalSongItem from "@/components/partials/common/Rivals/Table/ui";
+import RivalSongItem, {
+  rivalRowMinWidth,
+} from "@/components/partials/common/Rivals/Table/ui";
 import RivalAnalysis from "@/components/partials/common/Rivals/Analysis/ui";
 import { useUser } from "@/contexts/users/UserContext";
 import { List, BarChart2 } from "lucide-react";
@@ -23,27 +25,19 @@ import { useTranslation } from "@/hooks/common/useTranslation";
 type SubTab = "list" | "analysis";
 
 const SubTabBar = ({
-  rivalLabel,
-  isLoading,
-  songs,
   subTab,
   onTabChange,
+  tabs,
 }: {
-  rivalLabel?: string;
-  isLoading: boolean;
-  songs: SongWithRival[] | undefined;
   subTab: SubTab;
   onTabChange: (tab: SubTab) => void;
+  /** 表示するタブ（複数ターゲット時は分析タブを出さない） */
+  tabs: SubTab[];
 }) => {
   const { t } = useTranslation();
   return (
     <div className="flex items-center gap-1 border-b border-bpim-border px-3 py-2">
-      {rivalLabel && !isLoading && songs && (
-        <span className="mr-3 text-[10px] font-bold uppercase tracking-widest text-bpim-warning">
-          vs {rivalLabel}
-        </span>
-      )}
-      {(["list", "analysis"] as SubTab[]).map((tab) => {
+      {tabs.map((tab) => {
         const Icon = tab === "list" ? List : BarChart2;
         const label =
           tab === "list" ? t("analyticsTable.songList") : t("analyticsTable.analysis");
@@ -72,6 +66,8 @@ interface AnalyticsComparisonTableProps {
   isLoading: boolean;
   error: Error | undefined;
   rivalLabel?: string;
+  /** 複数ターゲット比較時の各ターゲット名。2件以上のとき比較列が RIVAL1, RIVAL2... に増える */
+  labels?: string[];
   version?: string;
   /** モーダル上でのEXスコア手動保存が成功した際に呼ばれる */
   onScoreSaved?: () => void;
@@ -82,6 +78,7 @@ const AnalyticsComparisonTable = ({
   isLoading,
   error,
   rivalLabel,
+  labels,
   version,
   onScoreSaved,
 }: AnalyticsComparisonTableProps) => {
@@ -91,6 +88,9 @@ const AnalyticsComparisonTable = ({
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
   const [subTab, setSubTab] = useState<SubTab>("list");
+  const isMulti = (labels?.length ?? 0) > 1;
+  const tabs: SubTab[] = isMulti ? ["list"] : ["list", "analysis"];
+  const activeTab: SubTab = isMulti ? "list" : subTab;
 
   const { params, updateParams, page, setPage, visibleSongs, totalCount } =
     useSongFilter(songs, { isMyPlayed: true, isRivalPlayed: true });
@@ -101,15 +101,13 @@ const AnalyticsComparisonTable = ({
     return <FetchErrorState error={error} />;
   }
 
-  if (subTab === "analysis") {
+  if (activeTab === "analysis") {
     return (
       <div className="mx-auto w-full min-h-svh flex flex-col bg-background">
         <SubTabBar
-          rivalLabel={rivalLabel}
-          isLoading={isLoading}
-          songs={songs}
-          subTab={subTab}
+          subTab={activeTab}
           onTabChange={setSubTab}
+          tabs={tabs}
         />
         {isLoading ? (
           <div className="flex h-40 items-center justify-center text-xs text-bpim-muted">
@@ -128,15 +126,14 @@ const AnalyticsComparisonTable = ({
   return (
     <div className="mx-auto w-full min-h-svh flex flex-col bg-background">
       <SubTabBar
-        rivalLabel={rivalLabel}
-        isLoading={isLoading}
-        songs={songs}
-        subTab={subTab}
+        subTab={activeTab}
         onTabChange={setSubTab}
+        tabs={tabs}
       />
 
       <SongFilterBar
         withRivals={"full"}
+        rivalLabels={labels}
         params={params}
         onParamsChange={updateParams}
         totalCount={totalCount}
@@ -153,20 +150,36 @@ const AnalyticsComparisonTable = ({
         {isLoading ? (
           <SongListSkeleton />
         ) : (
-          <div className="w-full p-2 flex flex-col">
-            {visibleSongs.map((song) => {
-              const s = song as SongWithRival;
-              return (
-                <RivalSongItem
-                  key={`${s.songId}-${s.difficulty}`}
-                  song={s}
-                  onClick={() => {
-                    setSelectedSong(s);
-                    setIsDetailOpen(true);
-                  }}
-                />
-              );
-            })}
+          <div className={cn(isMulti && "overflow-x-auto")}>
+            <div
+              className={cn(
+                "w-full p-2 flex flex-col",
+                isMulti && "min-w-(--rival-min-sm) lg:min-w-(--rival-min-lg)",
+              )}
+              style={
+                isMulti
+                  ? ({
+                      "--rival-min-sm": `${rivalRowMinWidth(labels!.length).mobile}px`,
+                      "--rival-min-lg": `${rivalRowMinWidth(labels!.length).desktop}px`,
+                    } as CSSProperties)
+                  : undefined
+              }
+            >
+              {visibleSongs.map((song) => {
+                const s = song as SongWithRival;
+                return (
+                  <RivalSongItem
+                    key={`${s.songId}-${s.difficulty}`}
+                    song={s}
+                    labels={labels}
+                    onClick={() => {
+                      setSelectedSong(s);
+                      setIsDetailOpen(true);
+                    }}
+                  />
+                );
+              })}
+            </div>
           </div>
         )}
       </main>

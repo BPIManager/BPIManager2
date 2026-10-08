@@ -1,6 +1,8 @@
 ﻿"use client";
 
-import { SongWithRival } from "@/types/songs/score";
+import { Fragment } from "react";
+
+import { SongWithRival, TargetComparison } from "@/types/songs/score";
 import { cn } from "@/lib/utils";
 import { getLampClass } from "@/components/partials/common/Table/ui";
 import { DIFF_COLORS as diffColors } from "@/constants/theme/difficultyColors";
@@ -192,21 +194,43 @@ const MobileScoreView = ({
   );
 };
 
+const DESKTOP_YOU_COL = "140px";
+const DESKTOP_TARGET_COLS = "100px 140px";
+const MOBILE_TARGET_COLS = "80px minmax(0,1fr)";
+
+/** ターゲット数に応じた、行の最小幅(px)。これより画面が狭いと呼び出し側で横スクロールさせる */
+export const rivalRowMinWidth = (targetCount: number) => ({
+  desktop: 180 + 140 + 240 * targetCount,
+  mobile: 120 + 120 * targetCount + 80 * targetCount,
+});
+
 const RivalSongItem = ({
   song,
   onClick,
+  labels,
 }: {
   song: SongWithRival;
   onClick: () => void;
+  /** 複数ターゲット比較時の各ターゲット名（2件以上で RIVAL1, RIVAL2... 表示になる） */
+  labels?: string[];
 }) => {
-  const { exDiff, bpiDiff } = song;
+  const isMulti = !!labels && labels.length > 1 && !!song.targets;
+  const comparisons: TargetComparison[] = isMulti
+    ? song.targets!
+    : [{ rival: song.rival, exDiff: song.exDiff, bpiDiff: song.bpiDiff }];
+  const labelOf = (i: number) => (isMulti ? `RIVAL${i + 1}` : "RIVAL");
+  const desktopCols = `minmax(180px,1fr) ${DESKTOP_YOU_COL}${comparisons.map(() => ` ${DESKTOP_TARGET_COLS}`).join("")}`;
+  const mobileCols = `minmax(0,1fr)${comparisons.map(() => ` ${MOBILE_TARGET_COLS}`).join("")}`;
 
   return (
     <div
       {...clickableProps(onClick)}
       className="group relative w-full cursor-pointer border-b border-bpim-border bg-bpim-surface transition-colors hover:bg-bpim-overlay/50"
     >
-      <div className="hidden lg:grid h-17 grid-cols-[1fr_140px_100px_140px] items-stretch">
+      <div
+        className="hidden lg:grid h-17 items-stretch"
+        style={{ gridTemplateColumns: desktopCols }}
+      >
         <div className="flex items-center px-4 min-w-0">
           <SongInfo song={song} />
         </div>
@@ -217,22 +241,29 @@ const RivalSongItem = ({
           clearState={song.clearState}
           colorClass="text-bpim-primary"
         />
-        <DiffBox exDiff={exDiff ?? null} bpiDiff={bpiDiff ?? null} />
-        <ScoreBox
-          label="RIVAL"
-          ex={song.rival?.exScore ?? null}
-          bpi={song.rival?.bpi ?? null}
-          clearState={song.rival?.clearState}
-          colorClass="text-bpim-warning"
-          isRival
-        />
+        {comparisons.map((c, i) => (
+          <Fragment key={i}>
+            <DiffBox exDiff={c.exDiff ?? null} bpiDiff={c.bpiDiff ?? null} />
+            <ScoreBox
+              label={labelOf(i)}
+              ex={c.rival?.exScore ?? null}
+              bpi={c.rival?.bpi ?? null}
+              clearState={c.rival?.clearState ?? null}
+              colorClass="text-bpim-warning"
+              isRival
+            />
+          </Fragment>
+        ))}
       </div>
 
       <div className="flex flex-col gap-0 py-4 px-3 lg:hidden">
         <div className="mb-3">
           <SongInfo song={song} />
         </div>
-        <div className="grid grid-cols-[1fr_80px_1fr] items-center gap-2">
+        <div
+          className="grid items-center gap-2"
+          style={{ gridTemplateColumns: mobileCols }}
+        >
           <MobileScoreView
             label="YOU"
             ex={song.exScore}
@@ -240,14 +271,22 @@ const RivalSongItem = ({
             clearState={song.clearState}
             align="start"
           />
-          <DiffBox exDiff={exDiff ?? null} bpiDiff={bpiDiff ?? null} isMobile />
-          <MobileScoreView
-            label="RIVAL"
-            ex={song.rival?.exScore ?? null}
-            bpi={song.rival?.bpi ?? null}
-            clearState={song.rival?.clearState}
-            align="end"
-          />
+          {comparisons.map((c, i) => (
+            <Fragment key={i}>
+              <DiffBox
+                exDiff={c.exDiff ?? null}
+                bpiDiff={c.bpiDiff ?? null}
+                isMobile
+              />
+              <MobileScoreView
+                label={labelOf(i)}
+                ex={c.rival?.exScore ?? null}
+                bpi={c.rival?.bpi ?? null}
+                clearState={c.rival?.clearState ?? null}
+                align="end"
+              />
+            </Fragment>
+          ))}
         </div>
       </div>
     </div>

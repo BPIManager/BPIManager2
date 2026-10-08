@@ -4,6 +4,7 @@ import type { ParsedUrlQuery } from "querystring";
 import {
   FilterParamsFrontend,
   ScoreFilterCondition,
+  SongWithRival,
   SongWithScore,
 } from "@/types/songs/score";
 import { filterSongsFrontend } from "@/utils/songs/filter";
@@ -149,6 +150,12 @@ export const useSongFilter = (
 
     if (params.isRivalPlayed !== undefined) {
       filtered = filtered.filter((s) => {
+        // 複数ターゲット時は全ターゲットがプレー済みの譜面だけを「プレー済み」とみなす
+        const targets = (s as SongWithRival).targets;
+        if (targets) {
+          const allPlayed = targets.every((t) => t.rival?.exScore != null);
+          return params.isRivalPlayed ? allPlayed : !allPlayed;
+        }
         return params.isRivalPlayed
           ? s.rival?.exScore !== null
           : s.rival?.exScore === null;
