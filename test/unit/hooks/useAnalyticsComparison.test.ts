@@ -10,6 +10,7 @@ const mockUseAuthedSWR = vi.fn();
 const mockUseRivalAvgScores = vi.fn();
 const mockUseRivalTopScores = vi.fn();
 const mockUseArenaJson = vi.fn();
+const mockUseTopRankerAreaScores = vi.fn();
 
 vi.mock("@/contexts/users/UserContext", () => ({
   useUser: () => mockUseUser(),
@@ -27,6 +28,11 @@ vi.mock("@/hooks/analytics/useComparisonSources", () => ({
     mockUseRivalTopScores(userId, version),
   useArenaJson: (version: string, levels: number[]) =>
     mockUseArenaJson(version, levels),
+  useTopRankerAreaScores: (
+    userId: string | undefined,
+    version: string,
+    areaId: number | undefined,
+  ) => mockUseTopRankerAreaScores(userId, version, areaId),
 }));
 
 function buildScore(overrides: Partial<SongWithScore> = {}): SongWithScore {
@@ -65,9 +71,45 @@ beforeEach(() => {
   mockUseRivalAvgScores.mockReturnValue(EMPTY_SWR);
   mockUseRivalTopScores.mockReturnValue(EMPTY_SWR);
   mockUseArenaJson.mockReturnValue({ rows: [], isLoading: false });
+  mockUseTopRankerAreaScores.mockReturnValue(EMPTY_SWR);
 });
 
 describe("useAnalyticsComparison", () => {
+  it("kind=top-rankerの場合、paramのバージョン・エリアで取得したエリア1位スコアを自スコアにマージすること", () => {
+    const target: AnalyticsTarget = {
+      kind: "top-ranker",
+      param: "33_27",
+      label: "県別1位 33 大阪府",
+    };
+    const myScores = [buildScore({ songId: 1, difficulty: "ANOTHER", exScore: 1800, bpi: 50 })];
+    mockUseAuthedSWR.mockImplementation((url: string | null) =>
+      url?.includes("/scores?version=")
+        ? { data: myScores, error: undefined, isLoading: false }
+        : EMPTY_SWR,
+    );
+    mockUseTopRankerAreaScores.mockReturnValue({
+      data: [
+        {
+          songId: 1,
+          title: "TEST SONG",
+          difficulty: "ANOTHER",
+          difficultyLevel: 12,
+          topExScore: 1900,
+          topBpi: 60,
+        },
+      ],
+      error: undefined,
+      isLoading: false,
+    });
+
+    const { result } = renderHook(() => useAnalyticsComparison(target));
+
+    expect(mockUseTopRankerAreaScores).toHaveBeenCalledWith("u1", "33", 27);
+    expect(result.current.rivalLabel).toBe("県別1位 33 大阪府");
+    expect(result.current.songs?.[0].rival).toMatchObject({ exScore: 1900, bpi: 60 });
+    expect(result.current.songs?.[0].exDiff).toBe(-100);
+  });
+
   it("targetがnullの場合は何もフェッチせず空のレスポンスを返すこと", () => {
     const { result } = renderHook(() => useAnalyticsComparison(null));
 
