@@ -25,14 +25,17 @@ function buildSong(overrides: Partial<SongWithScore> = {}): SongWithScore {
 }
 
 describe("toBpiParams", () => {
-  it("BPI計算に必要な4項目のみを抽出すること", () => {
-    const song = buildSong();
+  it("BPI計算に必要な項目(mu/sigma/residualVar含む)のみを抽出すること", () => {
+    const song = buildSong({ mu: -5.5, sigma: 0.5, residualVar: 0.07 });
 
     expect(toBpiParams(song)).toEqual({
       notes: 1000,
       kaidenAvg: 1500,
       wrScore: 1900,
       coef: 1.175,
+      mu: -5.5,
+      sigma: 0.5,
+      residualVar: 0.07,
     });
   });
 });
