@@ -474,6 +474,12 @@ export const componentsTranslations = {
     "zh-TW": "曲目列表",
     ko: "곡 목록",
   },
+  "analyticsTable.downloadCsv": {
+    ja: "CSV出力",
+    en: "Export CSV",
+    "zh-TW": "匯出 CSV",
+    ko: "CSV 내보내기",
+  },
   "analyticsTable.analysis": {
     ja: "分析",
     en: "Analysis",
