@@ -18,7 +18,9 @@ import RivalSongItem, {
 } from "@/components/partials/common/Rivals/Table/ui";
 import RivalAnalysis from "@/components/partials/common/Rivals/Analysis/ui";
 import { useUser } from "@/contexts/users/UserContext";
-import { List, BarChart2 } from "lucide-react";
+import { buildComparisonCsv } from "@/utils/analytics/comparisonCsv";
+import { downloadTextFile } from "@/utils/common/downloadTextFile";
+import { List, BarChart2, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
@@ -28,11 +30,14 @@ const SubTabBar = ({
   subTab,
   onTabChange,
   tabs,
+  onDownloadCsv,
 }: {
   subTab: SubTab;
   onTabChange: (tab: SubTab) => void;
   /** 表示するタブ（複数ターゲット時は分析タブを出さない） */
   tabs: SubTab[];
+  /** 指定時のみ右端にCSV出力ボタンを出す（一覧タブでの表示中の絞り込み・並び順をそのまま出力する） */
+  onDownloadCsv?: () => void;
 }) => {
   const { t } = useTranslation();
   return (
@@ -57,6 +62,15 @@ const SubTabBar = ({
           </button>
         );
       })}
+      {onDownloadCsv && (
+        <button
+          onClick={onDownloadCsv}
+          className="ml-auto flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold text-bpim-muted transition-colors hover:bg-bpim-overlay/50 hover:text-bpim-text"
+        >
+          <Download className="h-3.5 w-3.5" />
+          {t("analyticsTable.downloadCsv")}
+        </button>
+      )}
     </div>
   );
 };
@@ -92,8 +106,23 @@ const AnalyticsComparisonTable = ({
   const tabs: SubTab[] = isMulti ? ["list"] : ["list", "analysis"];
   const activeTab: SubTab = isMulti ? "list" : subTab;
 
-  const { params, updateParams, page, setPage, visibleSongs, totalCount } =
-    useSongFilter(songs, { isMyPlayed: true, isRivalPlayed: true });
+  const {
+    params,
+    updateParams,
+    page,
+    setPage,
+    displaySongs,
+    visibleSongs,
+    totalCount,
+  } = useSongFilter(songs, { isMyPlayed: true, isRivalPlayed: true });
+
+  const handleDownloadCsv = () => {
+    const today = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+    downloadTextFile(
+      `bpim2_compare_${version ?? "latest"}_${today}.csv`,
+      buildComparisonCsv(displaySongs as SongWithRival[], labels ?? []),
+    );
+  };
 
   if (!fbUser) return <LoginRequiredCard />;
 
@@ -129,6 +158,9 @@ const AnalyticsComparisonTable = ({
         subTab={activeTab}
         onTabChange={setSubTab}
         tabs={tabs}
+        onDownloadCsv={
+          !isLoading && totalCount > 0 ? handleDownloadCsv : undefined
+        }
       />
 
       <SongFilterBar
