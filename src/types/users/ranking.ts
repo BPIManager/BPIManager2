@@ -55,6 +55,25 @@ export interface UserSongRankingsResponse {
   songs: SongRankEntry[];
 }
 
+export interface TopRankersRankingEntry {
+  rank: number;
+  userId: string;
+  userName: string;
+  profileImage: string | null;
+  isPublic: number;
+  arenaClass: string | null;
+  /** 1位を獲得している譜面数 */
+  holdCount: number;
+  isSelf: boolean;
+}
+
+export interface TopRankersRankingResponse {
+  rankings: TopRankersRankingEntry[];
+  totalCount: number;
+  selfRank: number;
+  viewerRadar: Record<string, { totalBpi: number; songs: unknown[] }>;
+}
+
 export type TowerPeriod = "day" | "week" | "month";
 export type TowerType = "total" | "key" | "scratch";
 
