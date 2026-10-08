@@ -60,6 +60,10 @@ export function toBpiParams(s: SongWithScore): IBpiBasicSongData {
     kaidenAvg: s.kaidenAvg,
     wrScore: s.wrScore,
     coef: s.coef,
+    // V2のBPI計算は譜面ごとのALSパラメータ(mu/sigma)が無いとnullを返す
+    mu: s.mu,
+    sigma: s.sigma,
+    residualVar: s.residualVar,
   };
 }
 

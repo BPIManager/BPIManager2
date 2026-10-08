@@ -133,23 +133,49 @@ describe("sortSongs - Comprehensive Test", () => {
     expect(res[0].songId).toBe(3);
   });
 
-  // --- 比較 (Gap) 系 ---
-  it("winGapAsc: 自分勝ちの中で、EX差が小さい順（接戦）が上に来ること", () => {
-    const res = sortSongs(mockSongs, { sortKey: "winGapAsc" });
-    expect(res[0].songId).toBe(3);
-    expect(res[1].songId).toBe(1);
-    expect(res[2].songId).toBe(2);
+  // --- 比較 (Gap) 系: 自分−ライバルの符号付き差を昇順/降順で並べる ---
+  it("exGap desc: 自分が大きく勝っている順に並ぶこと", () => {
+    const res = sortSongs(mockSongs, { sortKey: "exGap", sortOrder: "desc" });
+    expect(res.map((s) => s.songId)).toEqual([1, 3, 2]);
   });
 
-  it("loseGapDesc: ライバル勝ちの中で、EX差が大きい順（完敗）が上に来ること", () => {
-    const res = sortSongs(mockSongs, { sortKey: "loseGapDesc" });
-    expect(res[0].songId).toBe(2);
+  it("exGap asc: ライバルが大きく勝っている順に並ぶこと", () => {
+    const res = sortSongs(mockSongs, { sortKey: "exGap", sortOrder: "asc" });
+    expect(res.map((s) => s.songId)).toEqual([2, 3, 1]);
   });
 
-  it("winBpiGapDesc: 自分勝ちの中で、BPIの差が大きい順（格下撃破）が上に来ること", () => {
-    const res = sortSongs(mockSongs, { sortKey: "winBpiGapDesc" });
-    expect(res[0].songId).toBe(1);
-    expect(res[1].songId).toBe(3);
+  it("bpiGap desc: BPI差が大きい順に並ぶこと", () => {
+    const res = sortSongs(mockSongs, { sortKey: "bpiGap", sortOrder: "desc" });
+    expect(res.map((s) => s.songId)).toEqual([1, 3, 2]);
+  });
+
+  // --- 複数ターゲット: `<key>#<index>` で2件目以降のターゲットを基準にする ---
+  it("rivalBpi#1: 2件目のターゲットのBPI降順で並ぶこと", () => {
+    const withTargets = mockSongs.map((s, i) => ({
+      ...s,
+      targets: [
+        { rival: s.rival ?? null, exDiff: s.exDiff, bpiDiff: s.bpiDiff },
+        {
+          rival: { ...s.rival!, bpi: [5, 70, 40][i] },
+          exDiff: [0, 0, 0][i],
+          bpiDiff: [0, 0, 0][i],
+        },
+      ],
+    }));
+    const res = sortSongs(withTargets, { sortKey: "rivalBpi#1", sortOrder: "desc" });
+    expect(res.map((s) => s.songId)).toEqual([2, 3, 1]);
+  });
+
+  it("exGap#1: 2件目のターゲットとのEX差で並ぶこと", () => {
+    const withTargets = mockSongs.map((s, i) => ({
+      ...s,
+      targets: [
+        { rival: s.rival ?? null, exDiff: s.exDiff, bpiDiff: s.bpiDiff },
+        { rival: s.rival ?? null, exDiff: [-5, 200, 10][i] },
+      ],
+    }));
+    const res = sortSongs(withTargets, { sortKey: "exGap#1", sortOrder: "desc" });
+    expect(res.map((s) => s.songId)).toEqual([2, 3, 1]);
   });
 
   // --- 更新日時 ---

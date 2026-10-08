@@ -1,19 +1,24 @@
+import type { RivalSortKey } from "@/types/songs/score";
+
 /** ソートオプション定数（ドロップダウン用） */
 export const rivalSortOptions = [
-  { label: "ライバルのBPIが高い順", value: "rivalBpi" },
-  { label: "自分のBPIが高い順", value: "myBpi" },
-  { label: "ライバルのスコアレート順", value: "rivalRate" },
-  { label: "自分のスコアレート順", value: "myRate" },
-  { label: "EX:差が小さい順（自分勝ち）", value: "winGapAsc" },
-  { label: "EX:差が大きい順（自分勝ち）", value: "winGapDesc" },
-  { label: "EX:差が小さい順（ライバル勝ち）", value: "loseGapAsc" },
-  { label: "EX:差が大きい順（ライバル勝ち）", value: "loseGapDesc" },
-  { label: "BPI:差が小さい順（自分勝ち）", value: "winBpiGapAsc" },
-  { label: "BPI:差が大きい順（自分勝ち）", value: "winBpiGapDesc" },
-  { label: "BPI:差が小さい順（ライバル勝ち）", value: "loseBpiGapAsc" },
-  { label: "BPI:差が大きい順（ライバル勝ち）", value: "loseBpiGapDesc" },
-  { label: "ライバルの更新時間順", value: "rivalUpdated" },
-  { label: "自分の更新時間順", value: "myUpdated" },
+  { label: "ライバルのBPI", value: "rivalBpi" },
+  { label: "自分のBPI", value: "myBpi" },
+  { label: "ライバルのスコアレート", value: "rivalRate" },
+  { label: "自分のスコアレート", value: "myRate" },
+  { label: "EX差", value: "exGap" },
+  { label: "BPI差", value: "bpiGap" },
+  { label: "ライバルの更新時間", value: "rivalUpdated" },
+  { label: "自分の更新時間", value: "myUpdated" },
+];
+
+/** 比較ターゲットごとに選択肢を増やすソートキー（2件目以降は`<key>#<index>`） */
+export const PER_TARGET_SORT_KEYS: readonly RivalSortKey[] = [
+  "rivalBpi",
+  "rivalRate",
+  "exGap",
+  "bpiGap",
+  "rivalUpdated",
 ];
 
 export const soleSortOptions = [

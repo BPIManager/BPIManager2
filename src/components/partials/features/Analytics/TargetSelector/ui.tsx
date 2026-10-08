@@ -251,9 +251,6 @@ export const SelfVersionPickStep = ({
               <span className="font-bold text-sm text-bpim-text">
                 {v.title}
               </span>
-              <span className="ml-2 text-[10px] font-mono text-bpim-muted">
-                ver.{v.num}
-              </span>
             </div>
             {selected === v.num && (
               <Check className="h-4 w-4 text-bpim-primary shrink-0" />
@@ -311,7 +308,6 @@ export const TopRankerVersionStep = ({
       <OptionButton
         key={v}
         label={getVersionNameFromNumber(v)}
-        sub={`ver.${v}`}
         selected={selected === v}
         onClick={() => onSelect(v)}
       />

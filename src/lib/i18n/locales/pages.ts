@@ -141,6 +141,24 @@ export const pagesTranslations = {
     "zh-TW": "選擇比較對象",
     ko: "비교 대상 선택",
   },
+  "page.analytics.addTarget": {
+    ja: "追加",
+    en: "Add",
+    "zh-TW": "新增",
+    ko: "추가",
+  },
+  "page.analytics.addTargetLimit": {
+    ja: "比較ターゲットは最大5件までです",
+    en: "You can compare up to 5 targets",
+    "zh-TW": "比較對象最多 5 個",
+    ko: "비교 대상은 최대 5개입니다",
+  },
+  "page.analytics.removeTarget": {
+    ja: "このターゲットを外す",
+    en: "Remove this target",
+    "zh-TW": "移除此對象",
+    ko: "이 대상 제거",
+  },
   "page.analytics.setTarget": {
     ja: "比較対象を設定",
     en: "Set comparison target",

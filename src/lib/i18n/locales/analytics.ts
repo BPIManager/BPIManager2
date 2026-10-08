@@ -99,7 +99,7 @@ export const analyticsTranslations = {
     ko: "팔로우 중인 라이벌 중 가장 높은 점수와 비교합니다",
   },
   "analytics.kind.topRanker": {
-    ja: "県別1位",
+    ja: "県別",
     en: "Area #1",
     "zh-TW": "各縣第 1 名",
     ko: "지역별 1위",
@@ -780,7 +780,8 @@ export const analyticsTranslations = {
   "optimizer.mode.singleBpiTargetCard.desc": {
     ja: "目指す単曲BPIを1つ入力すると、その値から逆算したEXスコアを全曲ぶん目標として一括作成します。",
     en: "Enter one target single-song BPI and it back-calculates the required EX score for every song at once.",
-    "zh-TW": "輸入一個目標單曲BPI，即可依此反推所有樂曲的目標EX分數並一次建立。",
+    "zh-TW":
+      "輸入一個目標單曲BPI，即可依此反推所有樂曲的目標EX分數並一次建立。",
     ko: "목표로 할 단곡 BPI를 하나 입력하면, 그 값으로 역산한 EX스코어를 전곡 목표로 한 번에 생성합니다.",
   },
   "optimizer.singleBpiTarget.drawerTitle": {

@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
+  PER_TARGET_SORT_KEYS,
   rivalSortOptions,
   scoreRateSortOption,
   soleSortOptions,
@@ -42,6 +43,8 @@ interface SongFilterBarProps {
   difficultyItems?: string[];
   /** ソート選択肢から除外するsortKey（BPI算出対象外の全曲ページで"bpi"を除く場合等） */
   excludeSortKeys?: string[];
+  /** 複数ターゲット比較時の各ターゲット名。2件以上のとき、ライバル系のソート選択肢をターゲットごとに増やす */
+  rivalLabels?: string[];
 }
 
 const SongFilterBar = ({
@@ -57,6 +60,7 @@ const SongFilterBar = ({
   levelItems = [11, 12],
   difficultyItems = IIDX_DIFFICULTIES,
   excludeSortKeys = [],
+  rivalLabels,
 }: SongFilterBarProps) => {
   const { t } = useTranslation();
   const router = useRouter();
@@ -76,9 +80,27 @@ const SongFilterBar = ({
 
   const hasCompare = params.compareVersion && params.compareVersion !== "none";
 
+  const targetCount = rivalLabels?.length ?? 0;
+
+  // ライバル系のソートは、複数ターゲット時に「<項目> (RIVAL1)」「<項目> (RIVAL2)」…と選択肢を増やす
+  const expandRivalSortOptions = (opts: { label: string; value: string }[]) =>
+    targetCount < 2
+      ? opts
+      : opts.flatMap((o) =>
+          (PER_TARGET_SORT_KEYS as readonly string[]).includes(o.value)
+            ? Array.from({ length: targetCount }, (_, i) => ({
+                label: `${o.label} (RIVAL${i + 1})`,
+                value: i === 0 ? o.value : `${o.value}#${i}`,
+              }))
+            : [o],
+        );
+
   const combinedSortOptions = useMemo(() => {
     const base = withRivals
-      ? [...translateOpts(sortOptions), ...translateOpts(rivalSortOptions)]
+      ? [
+          ...translateOpts(sortOptions),
+          ...expandRivalSortOptions(translateOpts(rivalSortOptions)),
+        ]
       : [
           ...translateOpts(soleSortOptions),
           ...(withScoreRate ? translateOpts([scoreRateSortOption]) : []),
@@ -92,7 +114,7 @@ const SongFilterBar = ({
     return filtered;
     // translateOpts は毎レンダー生成されるが挙動は t だけで決まるため、依存から除外して無意味な再計算を防ぐ。
      // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [withRivals, withScoreRate, hasCompare, excludeSortKeys, t]);
+  }, [withRivals, withScoreRate, hasCompare, excludeSortKeys, targetCount, t]);
 
   return (
     <FilterBarContainer totalCount={totalCount}>

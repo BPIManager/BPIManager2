@@ -1,15 +1,33 @@
 import {
   FilterParamsFrontend,
+  RivalScore,
   SongForSort,
+  SongWithRival,
   SongWithScore,
+  TargetComparison,
 } from "@/types/songs/score";
 import { getMaxBpm } from "./getMaxBPM";
+
+/** `<key>#<index>` 形式のソートキーを基底キーとターゲットindexに分解する */
+const parseSortKey = (sortKey: string): [string, number] => {
+  const [base, idx] = sortKey.split("#");
+  return [base, idx === undefined ? 0 : Number(idx)];
+};
+
+/** 指定indexのターゲット比較結果を取り出す（index 0 は従来の rival/exDiff/bpiDiff） */
+const targetOf = (s: SongForSort, index: number): TargetComparison => {
+  if (index === 0) {
+    return { rival: s.rival ?? null, exDiff: s.exDiff, bpiDiff: s.bpiDiff };
+  }
+  return (s as SongWithRival).targets?.[index] ?? { rival: null };
+};
 
 export const sortSongs = (
   songs: SongWithScore[],
   p: FilterParamsFrontend,
 ): SongWithScore[] => {
-  const { sortKey = "level", sortOrder = "desc", search } = p;
+  const { sortKey: rawSortKey = "level", sortOrder = "desc", search } = p;
+  const [sortKey, targetIndex] = parseSortKey(rawSortKey);
   const isAsc = sortOrder === "asc";
 
   const getRate = (ex: number | null | undefined, notes: number) => {
@@ -34,8 +52,8 @@ export const sortSongs = (
 
     switch (sortKey) {
       case "rivalBpi":
-        vA = a.rival?.bpi ?? -15;
-        vB = b.rival?.bpi ?? -15;
+        vA = (targetOf(a, targetIndex).rival as RivalScore | null)?.bpi ?? -15;
+        vB = (targetOf(b, targetIndex).rival as RivalScore | null)?.bpi ?? -15;
         break;
       case "myBpi":
       case "bpi":
@@ -43,8 +61,8 @@ export const sortSongs = (
         vB = b.bpi ?? -15;
         break;
       case "rivalRate":
-        vA = getRate(a.rival?.exScore, a.notes);
-        vB = getRate(b.rival?.exScore, b.notes);
+        vA = getRate(targetOf(a, targetIndex).rival?.exScore, a.notes);
+        vB = getRate(targetOf(b, targetIndex).rival?.exScore, b.notes);
         break;
       case "myRate":
       case "scoreRate":
@@ -55,43 +73,24 @@ export const sortSongs = (
         vA = a.exScore ?? -1;
         vB = b.exScore ?? -1;
         break;
-      case "winGapAsc":
-      case "winGapDesc":
-      case "loseGapAsc":
-      case "loseGapDesc": {
-        const isWinSort = sortKey.startsWith("win");
-        vA = a.exDiff ?? -9999;
-        vB = b.exDiff ?? -9999;
+      // 自分−ライバルの符号付き差。降順=自分が大きく勝っている順、昇順=ライバルが大きく勝っている順
+      case "exGap":
+        vA = targetOf(a, targetIndex).exDiff ?? Number.NEGATIVE_INFINITY;
+        vB = targetOf(b, targetIndex).exDiff ?? Number.NEGATIVE_INFINITY;
+        break;
 
-        if (isWinSort) {
-          if (vA > 0 !== vB > 0) return vA > 0 ? -1 : 1;
-          return sortKey.endsWith("Asc") ? vA - vB : vB - vA;
-        } else {
-          if (vA < 0 !== vB < 0) return vA < 0 ? -1 : 1;
-          return sortKey.endsWith("Asc") ? vB - vA : vA - vB;
-        }
-      }
-
-      case "winBpiGapAsc":
-      case "winBpiGapDesc":
-      case "loseBpiGapAsc":
-      case "loseBpiGapDesc": {
-        const isWinSort = sortKey.startsWith("winBpi");
-        vA = a.bpiDiff ?? -999;
-        vB = b.bpiDiff ?? -999;
-
-        if (isWinSort) {
-          if (vA > 0 !== vB > 0) return vA > 0 ? -1 : 1;
-          return sortKey.endsWith("Asc") ? vA - vB : vB - vA;
-        } else {
-          if (vA < 0 !== vB < 0) return vA < 0 ? -1 : 1;
-          return sortKey.endsWith("Asc") ? vB - vA : vA - vB;
-        }
-      }
+      case "bpiGap":
+        vA = targetOf(a, targetIndex).bpiDiff ?? Number.NEGATIVE_INFINITY;
+        vB = targetOf(b, targetIndex).bpiDiff ?? Number.NEGATIVE_INFINITY;
+        break;
 
       case "rivalUpdated":
-        vA = a.rival?.lastPlayed ? new Date(a.rival.lastPlayed).getTime() : 0;
-        vB = b.rival?.lastPlayed ? new Date(b.rival.lastPlayed).getTime() : 0;
+        {
+          const lpA = targetOf(a, targetIndex).rival?.lastPlayed;
+          const lpB = targetOf(b, targetIndex).rival?.lastPlayed;
+          vA = lpA ? new Date(lpA).getTime() : 0;
+          vB = lpB ? new Date(lpB).getTime() : 0;
+        }
         break;
       case "myUpdated":
         vA = a.scoreAt ? new Date(a.scoreAt).getTime() : 0;
