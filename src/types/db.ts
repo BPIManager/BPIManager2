@@ -36,6 +36,7 @@ export interface Database {
   songPatterns: SongPatternsTable;
   songPatternVotes: SongPatternVotesTable;
   iidxTower: IidxTowerTable;
+  topRankers: TopRankersTable;
   officialArenaStats: OfficialArenaStats;
   statsPrivacy: StatsPrivacy;
   oauthClients: OauthClients;
@@ -518,6 +519,20 @@ export interface IidxTowerTable {
 
 export type IidxTowerRecord = Selectable<IidxTowerTable>;
 export type NewIidxTowerRecord = Insertable<IidxTowerTable>;
+
+/** 作品×エリア×譜面ごとの1位プレイヤー（eagateのtopranker由来、IIDX IDを確定できたもののみ） */
+export interface TopRankersTable {
+  version: string;
+  areaId: number;
+  songId: number;
+  /** 1位のプレイヤーを特定できない場合は null（スコアだけを比較に使う） */
+  iidxId: string | null;
+  djName: string;
+  exScore: number;
+}
+
+export type TopRanker= Selectable<TopRankersTable>;
+export type NewTopRanker = Insertable<TopRankersTable>;
 
 export interface OfficialArenaStats {
   id: Generated<number>;
