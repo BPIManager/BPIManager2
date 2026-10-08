@@ -879,6 +879,30 @@ export const pagesTranslations = {
     "zh-TW": "各縣第 1 名數",
     ko: "지역별 1위 획득 수",
   },
+  "topRankers.help.source": {
+    ja: "IIDX公式サイトから取得したデータです",
+    en: "Data retrieved from the official IIDX website",
+    "zh-TW": "取自 IIDX 官方網站的資料",
+    ko: "IIDX 공식 사이트에서 가져온 데이터입니다",
+  },
+  "topRankers.help.matching": {
+    ja: "各バージョンのアリーナ上位6000名のエリアとDJ NAMEを突き合わせて、IIDX IDを特定しています",
+    en: "IIDX IDs are identified by matching the area and DJ NAME against each version's top 6000 arena players",
+    "zh-TW": "以各版本競技場前 6000 名的地區與 DJ NAME 比對，以辨識 IIDX ID",
+    ko: "각 버전 아레나 상위 6000명의 지역과 DJ NAME을 대조하여 IIDX ID를 특정합니다",
+  },
+  "topRankers.help.duplicate": {
+    ja: "同じエリアに同じDJ NAMEの人が複数いる場合は、BPIM2に登録されたスコアが1位のスコアと完全一致したときだけ本人と判定します",
+    en: "If several players in the same area share a DJ NAME, a record is attributed to you only when your score registered in BPIM2 exactly matches the #1 score",
+    "zh-TW": "同一地區有多位相同 DJ NAME 時，僅當 BPIM2 登錄的分數與第 1 名分數完全一致才會判定為本人",
+    ko: "같은 지역에 같은 DJ NAME이 여러 명 있는 경우, BPIM2에 등록된 점수가 1위 점수와 완전히 일치할 때만 본인으로 판정합니다",
+  },
+  "topRankers.help.notShown": {
+    ja: "アリーナモード未プレイ・上位6000名の圏外・同名で判定できない場合などは、表示されないことがあります",
+    en: "Records may not appear if you have not played Arena mode, are outside the top 6000, or cannot be told apart from a same-named player",
+    "zh-TW": "未遊玩競技場模式、不在前 6000 名、或無法與同名玩家區分時，可能不會顯示",
+    ko: "아레나 모드를 플레이하지 않았거나 상위 6000명 밖이거나 동명이인과 구분할 수 없는 경우에는 표시되지 않을 수 있습니다",
+  },
   "topRankers.summary.area": {
     ja: "エリア",
     en: "Area",

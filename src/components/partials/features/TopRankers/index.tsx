@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/router";
+import { HelpCircle } from "lucide-react";
 import { useMemo, useRef } from "react";
 import {
   Select,
@@ -14,6 +15,12 @@ import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 import { useTopRankersSummary } from "@/hooks/topRankers/useTopRankers";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
 import SummaryTable from "./SummaryTable";
 import TopRankersList from "./List";
@@ -64,8 +71,38 @@ const TopRankersContent = ({
   return (
     <div className="flex flex-col gap-4">
       <section className={sectionClass}>
-        <h2 className="mb-3 text-sm font-bold text-bpim-text">
+        <h2 className="mb-3 flex items-center gap-1.5 text-sm font-bold text-bpim-text">
           {t("topRankers.summary.title")}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  aria-label={t("topRankers.help.source")}
+                  className="text-bpim-muted transition-colors duration-200 hover:text-bpim-text"
+                >
+                  <HelpCircle className="h-4 w-4" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent
+                side="bottom"
+                className="max-w-72 flex-col items-start gap-1.5 text-left font-normal"
+              >
+                {(
+                  [
+                    "topRankers.help.source",
+                    "topRankers.help.matching",
+                    "topRankers.help.duplicate",
+                    "topRankers.help.notShown",
+                  ] as const
+                ).map((key) => (
+                  <span key={key} className="block">
+                    ・{t(key)}
+                  </span>
+                ))}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </h2>
         <SummaryTable
           rows={rows}
