@@ -58,7 +58,7 @@ const SidebarContent = ({
     "flex-1 text-left whitespace-nowrap overflow-hidden opacity-0 transition-opacity duration-150 group-hover/sidebar:opacity-100";
 
   const rivalMenuItems = getRivalMenuItems(t);
-  const analyticsMenuItems = getAnalyticsMenuItems(t);
+  const analyticsMenuItems = getAnalyticsMenuItems(t, user?.userId);
   const betaMenuItems = getBetaMenuItems(t);
   const infoMenuItems = getInfoMenuItems(t);
   const scoreSubItems = getScoreSubItems(t);
