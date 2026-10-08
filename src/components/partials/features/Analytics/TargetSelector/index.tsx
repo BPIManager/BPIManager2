@@ -16,6 +16,8 @@ import {
   RivalPickStep,
   ArenaRankStep,
   SelfVersionPickStep,
+  TopRankerVersionStep,
+  TopRankerAreaStep,
 } from "./ui";
 
 const BackButton = ({ onBack }: { onBack: () => void }) => {
@@ -51,12 +53,16 @@ const TargetSelectorModal = ({
     selectedArenaRank,
     setSelectedArenaRank,
     selectedSelfVersion,
+    selectedTopRankerVersion,
+    selectedTopRankerArea,
     kindOptions,
     stepTitle,
     handleKindClick,
     handleRivalPick,
     handleArenaConfirm,
     handleSelfVersionPick,
+    handleTopRankerVersionPick,
+    handleTopRankerAreaPick,
   } = useTargetSelector({ isOpen, current, onSelect, onClose });
 
   return (
@@ -123,6 +129,26 @@ const TargetSelectorModal = ({
                 <SelfVersionPickStep
                   selected={selectedSelfVersion}
                   onSelect={handleSelfVersionPick}
+                />
+              </>
+            )}
+
+            {step === "top-ranker-version" && (
+              <>
+                <BackButton onBack={() => setStep("kind")} />
+                <TopRankerVersionStep
+                  selected={selectedTopRankerVersion}
+                  onSelect={handleTopRankerVersionPick}
+                />
+              </>
+            )}
+
+            {step === "top-ranker-area" && (
+              <>
+                <BackButton onBack={() => setStep("top-ranker-version")} />
+                <TopRankerAreaStep
+                  selected={selectedTopRankerArea}
+                  onSelect={handleTopRankerAreaPick}
                 />
               </>
             )}
