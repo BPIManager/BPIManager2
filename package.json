@@ -17,7 +17,10 @@
     "test:integration": "vitest run test/integration",
     "test:ci": "vitest run test/unit",
     "test:ui": "vitest --ui",
-    "fetch-arena-metadata": "tsx scripts/fetchArenaMetadata.ts"
+    "fetch-arena-metadata": "tsx scripts/fetchArenaMetadata.ts",
+    "fetch-topranker": "tsx scripts/topranker/fetchTopRanker.ts",
+    "fetch-arena-ranking": "tsx scripts/topranker/fetchArenaRanking.ts",
+    "match-topranker": "tsx scripts/topranker/matchTopRanker.ts"
   },
   "dependencies": {
     "@bpim/bpicalc": "^0.3.0",
