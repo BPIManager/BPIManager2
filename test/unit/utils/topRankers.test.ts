@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { summarizeByArea } from "@/components/partials/features/TopRankers/summary";
+import {
+  areasInVersion,
+  summarizeByArea,
+} from "@/components/partials/features/TopRankers/summary";
 import { normalizeIidxId } from "@/lib/subhandlers/topRankers/iidxId";
 import { getTopRankerAreaName } from "@/constants/iidx/topRankerAreas";
 import { decodeTopRankerParam, encodeTopRankerParam } from "@/hooks/analytics/topRankerParam";
@@ -34,6 +37,24 @@ describe("summarizeByArea", () => {
 
   it("空配列は空配列を返す", () => {
     expect(summarizeByArea([])).toEqual([]);
+  });
+});
+
+describe("areasInVersion", () => {
+  it("指定バージョンのエリアだけを、件数の多い順（同数はエリアID順）に返す", () => {
+    const counts = [
+      { version: "33", areaId: 29, difficulty: "ANOTHER", difficultyLevel: 12, count: 3 },
+      { version: "33", areaId: 0, difficulty: "ANOTHER", difficultyLevel: 12, count: 2 },
+      { version: "33", areaId: 0, difficulty: "HYPER", difficultyLevel: 11, count: 1 },
+      { version: "33", areaId: 14, difficulty: "HYPER", difficultyLevel: 10, count: 3 },
+      { version: "32", areaId: 5, difficulty: "HYPER", difficultyLevel: 10, count: 9 },
+    ];
+    expect(areasInVersion(counts, "33")).toEqual([
+      { areaId: 0, count: 3 },
+      { areaId: 14, count: 3 },
+      { areaId: 29, count: 3 },
+    ]);
+    expect(areasInVersion(counts, "31")).toEqual([]);
   });
 });
 

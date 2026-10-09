@@ -957,6 +957,12 @@ export const pagesTranslations = {
     "zh-TW": "版本",
     ko: "버전",
   },
+  "topRankers.area.label": {
+    ja: "エリア",
+    en: "Area",
+    "zh-TW": "地區",
+    ko: "지역",
+  },
   "topRankers.list.empty": {
     ja: "このバージョンで1位を獲得した記録はありません",
     en: "No #1 records in this version",

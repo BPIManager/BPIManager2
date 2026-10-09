@@ -59,3 +59,24 @@ export function summarizeByArea(counts: TopRankerAreaCount[]): AreaSummaryRow[] 
   }
   return [...byArea.values()].sort((a, b) => b.total - a.total);
 }
+
+export interface VersionArea {
+  areaId: number;
+  count: number;
+}
+
+/** 指定バージョンで1位を獲得しているエリアと件数（件数の多い順、同数ならエリアIDの小さい順） */
+export function areasInVersion(
+  counts: TopRankerAreaCount[],
+  version: string,
+): VersionArea[] {
+  const byArea = new Map<number, number>();
+  for (const c of counts) {
+    if (c.version === version) {
+      byArea.set(c.areaId, (byArea.get(c.areaId) ?? 0) + c.count);
+    }
+  }
+  return [...byArea.entries()]
+    .map(([areaId, count]) => ({ areaId, count }))
+    .sort((a, b) => b.count - a.count || a.areaId - b.areaId);
+}
