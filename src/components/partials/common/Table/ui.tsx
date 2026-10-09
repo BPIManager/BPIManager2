@@ -99,10 +99,10 @@ const SongItem = ({
               {song.title}
             </h3>
 
-            <div className="grid grid-cols-[32px_12px_70px_70px] gap-2 items-center">
+            <div className="flex items-center gap-1.5 sm:grid sm:grid-cols-[32px_12px_70px_70px] sm:gap-2">
               <div
                 className={cn(
-                  "w-8 h-4.5 flex items-center justify-center rounded-sm",
+                  "w-8 h-4.5 shrink-0 flex items-center justify-center rounded-sm",
                   diffColors[song.difficulty] || "bg-bpim-surface-2",
                 )}
               >
@@ -111,7 +111,7 @@ const SongItem = ({
                 </span>
               </div>
 
-              <span className="text-xs font-bold text-bpim-muted text-center leading-none">
+              <span className="shrink-0 text-xs font-bold text-bpim-muted leading-none sm:text-center">
                 {song.difficulty.charAt(0)}
               </span>
 
@@ -120,7 +120,11 @@ const SongItem = ({
                   {(["current", "next"] as const).map((mode) => (
                     <span
                       key={mode}
-                      className="text-[10px] text-bpim-text whitespace-nowrap leading-none font-mono"
+                      className={cn(
+                        "text-[10px] text-bpim-text whitespace-nowrap leading-none font-mono max-[380px]:text-[9px]",
+                        // 極端に狭い画面では次のランクを省いて右側のEX/BPIとの重なりを避ける
+                        mode === "next" && "max-[340px]:hidden",
+                      )}
                     >
                       {getDJRank(Number(song.exScore), song.notes * 2, {
                         mode,
