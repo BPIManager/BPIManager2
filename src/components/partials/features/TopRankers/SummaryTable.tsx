@@ -22,9 +22,10 @@ import type { AreaSummaryRow, CountBreakdown } from "./summary";
 
 interface SummaryTableProps {
   rows: AreaSummaryRow[];
-  /** 下の一覧で選択中のバージョン */
+  /** 下の一覧で選択中のバージョン・エリア */
   currentVersion: string;
-  onSelectVersion: (version: string) => void;
+  currentAreaId: number | null;
+  onSelectVersion: (version: string, areaId: number) => void;
 }
 
 /** 内訳を色付きセグメントで積み上げたバー。全体の長さは`ratio`(0〜1)で決まり、ホバーで内訳を一覧表示する */
@@ -124,6 +125,7 @@ const Legend = ({
 const SummaryTable = ({
   rows,
   currentVersion,
+  currentAreaId,
   onSelectVersion,
 }: SummaryTableProps) => {
   const { t } = useTranslation();
@@ -231,14 +233,19 @@ const SummaryTable = ({
                           <div className="flex flex-col gap-2">
                             {TOP_RANKER_VERSIONS.map((v) => {
                               const count = row.byVersion[v] ?? 0;
+                              const isCurrent =
+                                v === currentVersion &&
+                                row.areaId === currentAreaId;
                               return (
                                 <div
                                   key={v}
-                                  {...clickableProps(() => onSelectVersion(v))}
-                                  aria-current={v === currentVersion}
+                                  {...clickableProps(() =>
+                                    onSelectVersion(v, row.areaId),
+                                  )}
+                                  aria-current={isCurrent}
                                   className={cn(
                                     "flex cursor-pointer items-center gap-3 rounded-lg border border-transparent px-2 py-1.5 font-mono transition-colors duration-200 hover:bg-bpim-overlay",
-                                    v === currentVersion &&
+                                    isCurrent &&
                                       "border-bpim-primary bg-bpim-bg/40",
                                   )}
                                 >

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import SongListSkeleton from "@/components/partials/common/Table/skeleton";
 import SongList from "@/components/partials/common/Table/ui";
 import CustomPagination from "@/components/partials/common/ListControls/Pagination/ui";
@@ -17,15 +17,26 @@ import type { SongWithScore } from "@/types/songs/score";
 const TopRankersList = ({
   userId,
   version,
+  areaId,
 }: {
   userId: string;
   version: string;
+  /** 表示するエリア（eagateのpref_id）。APIは全エリア分を返すため、ここで絞る */
+  areaId: number;
 }) => {
   const { t } = useTranslation();
   const [selected, setSelected] = useState<SongWithScore | null>(null);
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
 
-  const { songs, error, isLoading } = useTopRankers(userId, version);
+  const {
+    songs: allAreaSongs,
+    error,
+    isLoading,
+  } = useTopRankers(userId, version);
+  const songs = useMemo(
+    () => allAreaSongs?.filter((s) => s.areaId === areaId),
+    [allAreaSongs, areaId],
+  );
 
   const {
     params,
