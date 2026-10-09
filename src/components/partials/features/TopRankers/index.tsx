@@ -136,42 +136,46 @@ const TopRankersContent = ({
       </section>
 
       <section ref={listRef} className={`${sectionClass} flex flex-col gap-4`}>
-        <div className="flex flex-wrap items-center gap-3">
-          <span className="text-xs font-bold text-bpim-muted">
-            {t("topRankers.version.label")}
-          </span>
-          <Select value={version} onValueChange={handleVersionChange}>
-            <SelectTrigger className="w-56">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {[...TOP_RANKER_VERSIONS].reverse().map((v) => (
-                <SelectItem key={v} value={v}>
-                  {getVersionNameFromNumber(v)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <span className="text-xs font-bold text-bpim-muted">
-            {t("topRankers.area.label")}
-          </span>
-          <Select
-            value={areaId === null ? "" : String(areaId)}
-            onValueChange={handleAreaChange}
-            disabled={versionAreas.length === 0}
-          >
-            <SelectTrigger className="w-56">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {versionAreas.map((a) => (
-                <SelectItem key={a.areaId} value={String(a.areaId)}>
-                  {getTopRankerAreaName(a.areaId)} ({a.count}
-                  {t("topRankers.summary.unit")})
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="flex min-w-0 flex-col gap-1">
+            <label className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
+              {t("topRankers.version.label")}
+            </label>
+            <Select value={version} onValueChange={handleVersionChange}>
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {[...TOP_RANKER_VERSIONS].reverse().map((v) => (
+                  <SelectItem key={v} value={v}>
+                    {getVersionNameFromNumber(v)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex min-w-0 flex-col gap-1">
+            <label className="text-[10px] font-bold tracking-widest text-bpim-muted uppercase">
+              {t("topRankers.area.label")}
+            </label>
+            <Select
+              value={areaId === null ? "" : String(areaId)}
+              onValueChange={handleAreaChange}
+              disabled={versionAreas.length === 0}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {versionAreas.map((a) => (
+                  <SelectItem key={a.areaId} value={String(a.areaId)}>
+                    {getTopRankerAreaName(a.areaId)} ({a.count}
+                    {t("topRankers.summary.unit")})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         {areaId === null ? (
           <p className="py-6 text-center text-sm text-bpim-muted">
