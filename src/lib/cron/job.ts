@@ -82,6 +82,13 @@ async function printArenaStatus() {
  * サーバー起動時にCronジョブを登録する。日次（サイトマップ・arena・info）、1時間ごと（レーダー）、12時間ごと（曲ランキング）等。
  * アリーナ開催期間中（JST 07:00〜翌00:59）は公式アリーナ分布の取得を30分ごとに追加実行する。
  */
+/**
+ * 全ジョブの実行時刻はUTC基準（下記の式・コメントはUTCで書かれている）。
+ * ホストのTZに依存せず同じ時刻に動くよう、timezone を明示する。
+ */
+const schedule = (expression: string, task: () => void | Promise<void>) =>
+  cron.schedule(expression, task, { timezone: "UTC" });
+
 export async function setupArenaService() {
   // 起動時バックグラウンドタスク
   runCronJob("Daily task", generateUserSitemap);
@@ -96,27 +103,27 @@ export async function setupArenaService() {
 
   // ── Cron 登録 ──────────────────────────────────────────────
 
-  cron.schedule("0 2 * * *", () => {
+  schedule("0 2 * * *", () => {
     runCronJob("Daily task", generateUserSitemap);
   });
 
-  cron.schedule("0 4 * * *", () => {
+  schedule("0 4 * * *", () => {
     runCronJob("generateArenaJson", async () => {
       await generateArenaJson();
       invalidateArenaAveragesCache();
     });
   });
 
-  cron.schedule("0 16 * * *", () => {
+  schedule("0 16 * * *", () => {
     runCronJob("generateInfoJson", generateInfoJson);
   });
 
-  cron.schedule("30 16 * * *", () => {
+  schedule("30 16 * * *", () => {
     runCronJob("fetchOfficialArenaDistribution (daily)", fetchOfficialArenaDistribution);
   });
 
   // アリーナ開催期間中は JST 07:00〜翌00:59（UTC 22:00〜15:59）の間、30 分ごとに取得
-  cron.schedule("*/30 22-23,0-15 * * *", async () => {
+  schedule("*/30 22-23,0-15 * * *", async () => {
     try {
       const period = await getArenaEventPeriod();
       const now = new Date();
@@ -130,11 +137,11 @@ export async function setupArenaService() {
     }
   });
 
-  cron.schedule("0 * * * *", () => {
+  schedule("0 * * * *", () => {
     runCronJob("updateAllUserRadarCache", updateAllUserRadarCache);
   });
 
-  cron.schedule("0 6,18 * * *", () => {
+  schedule("0 6,18 * * *", () => {
     runCronJob("updateAllSongRankingCache", updateAllSongRankingCache);
   });
 

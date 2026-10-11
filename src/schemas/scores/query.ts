@@ -1,10 +1,11 @@
 import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
+import { asOfSchema } from "@/schemas/common/asOf";
 import { iidxVersionQuerySchema } from "@/schemas/common/version";
 import { z } from "zod";
 
 export const scoresQuerySchema = z.object({
   version: iidxVersionQuerySchema,
-  asOf: z.string().optional(),
+  asOf: asOfSchema.optional(),
   clearState: z.string().optional(),
   bpiMin: z.coerce.number().optional(),
   bpiMax: z.coerce.number().optional(),

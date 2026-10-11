@@ -1,5 +1,5 @@
 import type { NextApiRequest } from "next";
-import dayjs from "@/lib/dayjs";
+import { resolveAsOfTime } from "@/lib/dayjs";
 import { scoreDetailRepo } from "@/lib/db/domains/scores/detail";
 import { mapToFlatSong } from "@/utils/logs/getMapFlatten";
 import { filterSongsServerSide } from "@/utils/songs/filter";
@@ -32,10 +32,7 @@ export async function handleScoresList(
 
   const { version, asOf, ...filterParams } = parsed.data;
 
-  const time =
-    !asOf || asOf === "latest"
-      ? dayjs.tz().utc().toDate()
-      : dayjs.tz(asOf).utc().toDate();
+  const time = resolveAsOfTime(asOf);
 
   try {
     const results = await scoreDetailRepo.getScoresWithDetails(

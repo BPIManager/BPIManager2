@@ -1,4 +1,4 @@
-import dayjs from "@/lib/dayjs";
+import { resolveAsOfTime } from "@/lib/dayjs";
 import { BpiCalculator } from "@/lib/bpi";
 import { computeCanonicalTotalBpi } from "@/lib/bpi/canonicalTotalBpi";
 import { scoreDetailRepo } from "@/lib/db/domains/scores/detail";
@@ -14,10 +14,7 @@ import type { TotalBpiQuery } from "./_shared";
 export async function handleStatsTotalBpi(
   q: TotalBpiQuery,
 ): Promise<HandlerResult<unknown>> {
-  const targetTime =
-    !q.asOf || q.asOf === "latest"
-      ? dayjs.tz().utc().toDate()
-      : dayjs.tz(q.asOf).endOf("day").utc().toDate();
+  const targetTime = resolveAsOfTime(q.asOf);
 
   const [scores, songMaster, user] = await Promise.all([
     scoreDetailRepo.getScoresWithDetails(q.userId, q.version, {
