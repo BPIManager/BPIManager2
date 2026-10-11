@@ -42,7 +42,7 @@ const LogsCard = ({ log }: { log: UpdateLog }) => {
           <div className="flex flex-col gap-0">
             <div className="flex items-center gap-1 mb-1 text-bpim-muted">
               <Calendar className="w-3 h-3" />
-              <span className="text-[10px] font-medium md:text-xs">
+              <span className="text-[10px] font-bold md:text-xs">
                 {dayjs(log.createdAt).tz().format("YYYY/MM/DD HH:mm")}
               </span>
             </div>

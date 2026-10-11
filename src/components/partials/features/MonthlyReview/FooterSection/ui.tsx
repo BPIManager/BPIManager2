@@ -81,7 +81,7 @@ function RivalCard({
         </AvatarFallback>
       </Avatar>
       <span
-        className="w-full truncate text-center text-xs font-semibold"
+        className="w-full truncate text-center text-xs font-bold"
         style={{ color: "rgba(255,255,255,0.75)" }}
       >
         {rival.userName}
@@ -190,7 +190,7 @@ const FooterSectionUI = ({
             <div className="flex items-center gap-2 px-1">
               <Users className="h-3.5 w-3.5" style={{ color: "rgba(255,255,255,0.3)" }} />
               <span
-                className="text-xs font-semibold"
+                className="text-xs font-bold"
                 style={{ color: "rgba(255,255,255,0.3)" }}
               >
                 {t("monthlyReview.footer.checkRivals")}
@@ -225,7 +225,7 @@ const FooterSectionUI = ({
                 style={{ color: "rgba(255,255,255,0.3)" }}
               />
               <span
-                className="text-xs font-semibold"
+                className="text-xs font-bold"
                 style={{ color: "rgba(255,255,255,0.3)" }}
               >
                 {t("monthlyReview.footer.checkMonthly")}
@@ -244,7 +244,7 @@ const FooterSectionUI = ({
                     color: "rgba(255,255,255,0.55)",
                   }}
                 >
-                  <span className="font-semibold">
+                  <span className="font-bold">
                     {m.month.replace("-", "/")}
                   </span>
                   <span className="font-mono" style={{ color: "rgba(255,255,255,0.4)" }}>

@@ -68,7 +68,7 @@ function DashboardLayoutSettingsModal({
 
         <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-6 min-h-0">
           <section className="flex flex-col gap-3">
-            <h3 className="text-sm font-semibold text-bpim-text">
+            <h3 className="text-sm font-bold text-bpim-text">
               {t("dashLayout.columns")}
             </h3>
             <div className="flex gap-2">
@@ -79,7 +79,7 @@ function DashboardLayoutSettingsModal({
                   className={cn(
                     "flex flex-1 flex-col items-center gap-1.5 rounded-lg border p-3 text-sm transition-colors",
                     draft.mainCols === cols
-                      ? "border-bpim-primary bg-bpim-primary/10 text-bpim-primary font-semibold"
+                      ? "border-bpim-primary bg-bpim-primary/10 text-bpim-primary font-bold"
                       : "border-bpim-border bg-bpim-surface text-bpim-muted hover:border-bpim-primary/50",
                   )}
                 >

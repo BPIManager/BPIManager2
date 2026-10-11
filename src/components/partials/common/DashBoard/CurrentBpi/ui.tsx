@@ -88,7 +88,7 @@ const HistoricalComparison = ({
         >
           <div className="flex items-center gap-2 shrink-0">
             <HistoryIcon className="size-3 text-bpim-muted" />
-            <span className="font-mono text-[11px] font-medium text-bpim-muted">
+            <span className="font-mono text-[11px] font-bold text-bpim-muted">
               {dayjs(effectiveDate).format("YYYY-MM-DD")}
             </span>
           </div>
@@ -134,7 +134,7 @@ const HistoricalComparison = ({
         </div>
       ) : (
         <div className="flex h-full items-center justify-center rounded-lg border border-dashed border-bpim-border/50 py-2.5">
-          <span className="text-[10px] text-bpim-muted/40 font-medium">
+          <span className="text-[10px] text-bpim-muted/40 font-bold">
             {t("dashboard.currentBpi.setDateHint")}
           </span>
         </div>

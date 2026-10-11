@@ -104,7 +104,7 @@ export function PatternListRow({
         {index + 1}
       </span>
 
-      <span className="font-mono font-semibold tracking-widest w-14.5 shrink-0">
+      <span className="font-mono font-bold tracking-widest w-14.5 shrink-0">
         {item.pattern}
       </span>
 
@@ -225,11 +225,11 @@ export function PatternSearchBar({
           {result.score !== null ? (
             <>
               {t("songPattern.resultScore")}{" "}
-              <span className="text-bpim-text font-semibold tabular-nums">
+              <span className="text-bpim-text font-bold tabular-nums">
                 {result.score.toFixed(2)}
               </span>
               　{t("songPattern.resultRank")}{" "}
-              <span className="text-bpim-text font-semibold tabular-nums">
+              <span className="text-bpim-text font-bold tabular-nums">
                 {tFormat("songPattern.resultRankValue", { rank: result.rank ?? "" })}
               </span>
               　{tFormat("songPattern.resultTotal", { total: result.total ?? "" })}

@@ -168,7 +168,7 @@ const ArenaSectionUI = ({
                     style={{ background: "rgba(255,255,255,0.03)" }}
                   >
                     <span
-                      className="text-xs font-semibold"
+                      className="text-xs font-bold"
                       style={{ color: "rgba(255,255,255,0.55)" }}
                     >
                       {v.version === "INF" ? "INF" : `IIDX ${getVersionNameFromNumber(v.version)}`}

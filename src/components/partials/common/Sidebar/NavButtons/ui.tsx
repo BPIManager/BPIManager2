@@ -100,7 +100,7 @@ export const MenuItemButton = ({
           : "pl-3",
         isActive
           ? "bg-bpim-overlay/60 font-bold"
-          : "font-medium text-bpim-text",
+          : "font-bold text-bpim-text",
         item.isComingSoon && "opacity-50 cursor-not-allowed",
       )}
       onClick={item.isComingSoon ? undefined : onClose}
@@ -148,7 +148,7 @@ export const ScoreSubItemButton = ({
         expanded ? "pl-9" : "pl-3 group-hover/sidebar:pl-9",
         isActive
           ? "bg-bpim-overlay/60 font-bold"
-          : "font-medium text-bpim-text",
+          : "font-bold text-bpim-text",
       )}
       onClick={onClose}
     >

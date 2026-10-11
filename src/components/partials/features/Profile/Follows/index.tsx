@@ -118,7 +118,7 @@ export default function FollowPage({
               <FetchErrorState error={isError} />
             ) : users.length === 0 && !isLoading ? (
               <div className="flex flex-col items-center justify-center py-16 gap-2">
-                <p className="text-sm font-medium text-bpim-muted">
+                <p className="text-sm font-bold text-bpim-muted">
                   {t("profile.follow.noUsers")}
                 </p>
               </div>

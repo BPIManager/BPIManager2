@@ -73,7 +73,7 @@ const UserRecommendationList = () => {
               {o === "distance" && (
                 <button
                   onClick={handleShuffle}
-                  className="shrink-0 flex items-center gap-1.5 rounded-lg border border-bpim-border bg-bpim-bg px-3 py-1.5 text-sm font-medium transition-colors hover:bg-bpim-border"
+                  className="shrink-0 flex items-center gap-1.5 rounded-lg border border-bpim-border bg-bpim-bg px-3 py-1.5 text-sm font-bold transition-colors hover:bg-bpim-border"
                   title={t("rivals.search.shuffleTitle")}
                 >
                   <svg

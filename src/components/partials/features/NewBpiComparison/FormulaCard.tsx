@@ -30,7 +30,7 @@ export default function FormulaCard({ m, kaidenAvg, wrScore, coef, mu, sigma, z0
       </h3>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
-          <p className="mb-1 text-xs font-semibold text-bpim-primary">
+          <p className="mb-1 text-xs font-bold text-bpim-primary">
             {t("newBpi.formula.currentTitle")}
           </p>
           <pre className="overflow-x-auto rounded-md bg-bpim-surface-2 p-3 text-[11px] leading-relaxed whitespace-pre-wrap">
@@ -44,7 +44,7 @@ BPI(s) = sign(s−k) × 100 × |ln(PGF(s)/PGF(k)) / ln(PGF(z)/PGF(k))|^coef`}
           </pre>
         </div>
         <div>
-          <p className="mb-1 text-xs font-semibold text-amber-500">
+          <p className="mb-1 text-xs font-bold text-amber-500">
             {t("newBpi.formula.newTitle")}
           </p>
           {mu !== null &&

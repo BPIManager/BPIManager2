@@ -164,7 +164,7 @@ export default function OAuthAuthorizePage() {
       <Meta noIndex title="接続の許可" />
 
       <div className="w-full rounded-2xl border border-bpim-border p-6 text-center">
-        <h1 className="mb-2 text-lg font-semibold text-bpim-text">
+        <h1 className="mb-2 text-lg font-bold text-bpim-text">
           {clientIdentity.clientName ?? "名称未設定のアプリケーション"}
           からの接続
         </h1>
@@ -194,7 +194,7 @@ export default function OAuthAuthorizePage() {
                 <span className="text-xs text-bpim-muted">
                   ログイン中のアカウント
                 </span>
-                <span className="truncate text-sm font-semibold text-bpim-text">
+                <span className="truncate text-sm font-bold text-bpim-text">
                   {user?.userName ?? fbUser.uid}
                 </span>
               </div>

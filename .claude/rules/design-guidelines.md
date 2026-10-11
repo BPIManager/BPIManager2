@@ -73,6 +73,7 @@ paths:
 - 本文・メタ情報の大半は`text-xs`。カード内の主要な行・見出しは`text-sm`。`text-base`以上はページタイトル等ごく一部の見出しにのみ使う（多用しない）
 - 強調は`font-bold`を基本とする（このコードベースの標準的な強調ウェイト）。見出し・重要な数値・`uppercase tracking-widest`なラベル等、より強い強調が必要な箇所のみ`font-black`を使う
 - `font-medium`/`font-semibold`は新規のアプリ側コードでは基本使わない（shadcn/uiプリミティブ自体が内部で使っているものはそのままでよい）。独自に強調ウェイトを選ぶときは`font-bold`→`font-black`の2段階で足りるかをまず検討する
+- **許容例外**: 視覚的に軽い強調が適切な次の3用途のみ`font-medium`を使ってよい（`font-semibold`は例外なし）。(1) `hover:underline`を伴うリンクテキスト、(2) テーブルの`<th>`/`<TableCell>`、(3) クリック可能なフォームラベル（`<Label>`・`cursor-pointer`のチェックボックスラベル）
 
 ## 色: `bpim-*`セマンティックトークンを使う
 

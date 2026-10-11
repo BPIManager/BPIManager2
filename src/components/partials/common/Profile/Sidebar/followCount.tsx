@@ -23,7 +23,7 @@ const FollowStats = ({
         <span className="font-mono text-base font-bold text-bpim-text">
           {follows.following}
         </span>
-        <span className="text-xs font-medium text-bpim-muted group-hover:text-bpim-text transition-colors">
+        <span className="text-xs font-bold text-bpim-muted group-hover:text-bpim-text transition-colors">
           {t("profile.follow.following")}
         </span>
       </Link>
@@ -35,7 +35,7 @@ const FollowStats = ({
         <span className="font-mono text-base font-bold text-bpim-text">
           {follows.followers}
         </span>
-        <span className="text-xs font-medium text-bpim-muted group-hover:text-bpim-text transition-colors">
+        <span className="text-xs font-bold text-bpim-muted group-hover:text-bpim-text transition-colors">
           {t("profile.follow.followers")}
         </span>
       </Link>

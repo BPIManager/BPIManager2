@@ -33,7 +33,7 @@ const LoginPageBody = ({
         {requiredMessage && (
           <div className="mb-10 flex items-start gap-3 rounded-xl border border-bpim-primary/30 bg-bpim-primary/8 px-4 py-3 text-bpim-primary">
             <LockIcon className="mt-0.5 h-4 w-4 shrink-0" />
-            <span className="text-sm font-medium">{requiredMessage}</span>
+            <span className="text-sm font-bold">{requiredMessage}</span>
           </div>
         )}
         <div className="flex flex-col items-center gap-6 text-center">

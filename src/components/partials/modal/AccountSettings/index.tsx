@@ -86,7 +86,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                 <div className="flex items-start gap-3 rounded-xl border border-bpim-danger/30 bg-bpim-danger/8 px-4 py-3 text-bpim-danger">
                   <LogOut className="mt-0.5 h-4 w-4 shrink-0" />
                   <div className="flex flex-1 flex-wrap items-center justify-between gap-x-4 gap-y-1">
-                    <p className="text-sm font-medium">
+                    <p className="text-sm font-bold">
                       {t("settings.profile.wrongAccountAlert")}
                     </p>
                     <button

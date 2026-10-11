@@ -317,13 +317,13 @@ const TotalBpiHistoryChart = ({
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-1.5">
                 <div className="h-0.5 w-3 bg-bpim-primary" />
-                <span className="text-xs font-medium text-bpim-primary">
+                <span className="text-xs font-bold text-bpim-primary">
                   {effectiveMyName}
                 </span>
               </div>
               <div className="flex items-center gap-1.5">
                 <div className="h-0.5 w-3 border-t-2 border-dashed border-bpim-warning bg-transparent" />
-                <span className="text-xs font-medium text-bpim-warning">
+                <span className="text-xs font-bold text-bpim-warning">
                   {effectiveRivalName}
                 </span>
               </div>

@@ -82,7 +82,7 @@ export default function DataExportUi() {
           <div className="overflow-y-auto max-h-[65vh] p-6 flex flex-col gap-6">
             <section className="flex flex-col gap-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-bpim-text">
+                <span className="text-sm font-bold text-bpim-text">
                   {t("settings.export.version")}
                 </span>
                 <div className="flex gap-2">
@@ -130,7 +130,7 @@ export default function DataExportUi() {
 
             <section className="flex flex-col gap-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-bpim-text">
+                <span className="text-sm font-bold text-bpim-text">
                   {t("settings.export.fields")}
                 </span>
                 <div className="flex gap-2">

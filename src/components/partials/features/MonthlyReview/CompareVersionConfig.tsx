@@ -62,7 +62,7 @@ const CompareVersionConfig = ({
                 }
               />
               <span
-                className="text-xs font-semibold"
+                className="text-xs font-bold"
                 style={{ color: "rgba(255,255,255,0.7)" }}
               >
                 {t("monthlyReview.topSongs.excludeNewPlays")}

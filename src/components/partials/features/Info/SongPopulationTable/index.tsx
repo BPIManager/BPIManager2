@@ -41,7 +41,7 @@ function SongPopulationTable({
             {songs.map((s, i) => (
               <tr key={s.songId} className="border-b border-bpim-border/40">
                 <td className="py-1.5 text-bpim-muted">{i + 1}</td>
-                <td className="py-1.5 font-medium text-bpim-text max-w-40 truncate">
+                <td className="py-1.5 font-bold text-bpim-text max-w-40 truncate">
                   {s.title}
                 </td>
                 <td className="py-1.5 text-bpim-muted">{s.difficulty}</td>

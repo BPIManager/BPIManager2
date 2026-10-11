@@ -341,7 +341,7 @@ const ActivitySectionUI = ({
                           {formatDate(date)}
                         </span>
                         <span
-                          className="text-[10px] font-semibold"
+                          className="text-[10px] font-bold"
                           style={{ color: accent }}
                         >
                           {sub}

@@ -178,7 +178,7 @@ function LinkedAccountsList() {
   return (
     <>
       <div className="flex flex-col gap-3">
-        {errorMessage && <div role="alert" className="rounded-lg border border-bpim-danger/30 bg-bpim-danger/8 px-4 py-3 text-xs font-medium text-bpim-danger">{errorMessage}</div>}
+        {errorMessage && <div role="alert" className="rounded-lg border border-bpim-danger/30 bg-bpim-danger/8 px-4 py-3 text-xs font-bold text-bpim-danger">{errorMessage}</div>}
         <div className="flex items-center justify-between gap-4 rounded-lg border border-bpim-border bg-bpim-surface-2/40 px-4 py-3">
           <div className="flex min-w-0 flex-col">
             <span className="flex items-center gap-2 text-sm font-bold text-bpim-text">

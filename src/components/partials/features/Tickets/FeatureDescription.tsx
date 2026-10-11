@@ -66,7 +66,7 @@ function TicketFeatureDescription() {
               </span>
               <span className="text-[11px] leading-relaxed text-bpim-muted">
                 {t("tickets.feature.scoreRawDescPre")}
-                <span className="text-bpim-text font-semibold">
+                <span className="text-bpim-text font-bold">
                   {t("tickets.feature.scoreRawDescBold")}
                 </span>
                 {t("tickets.feature.scoreRawDescPost")}
@@ -78,7 +78,7 @@ function TicketFeatureDescription() {
               </span>
               <span className="text-[11px] leading-relaxed text-bpim-muted">
                 {t("tickets.feature.scoreRelativeDescPre")}
-                <span className="text-bpim-text font-semibold">
+                <span className="text-bpim-text font-bold">
                   {t("tickets.feature.scoreRelativeDescBold")}
                 </span>
                 {t("tickets.feature.scoreRelativeDescPost")}

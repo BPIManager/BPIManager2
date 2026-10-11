@@ -82,7 +82,7 @@ function PatternTab({ songId, song }: PatternTabProps) {
     <div className="flex flex-col gap-3 mt-3">
       <div className="rounded-md border border-blue-500/30 bg-blue-500/10 px-3 py-2.5 text-xs text-blue-300 leading-relaxed">
         譜面傾向を分析し、BPIM独自の指標を用いて譜面全体を通して押しやすい配置が来るパターンをスコアリングして表示しています。
-        <span className="font-semibold">本機能はベータ版のため、正確ではない可能性があります。</span>
+        <span className="font-bold">本機能はベータ版のため、正確ではない可能性があります。</span>
         当たり譜面への投票もできます。
       </div>
       <PatternSearchBar

@@ -104,7 +104,7 @@ export const LoginButtons = ({
                 `}
               >
                 <Icon className="h-5 w-5 shrink-0 transition-transform group-hover:scale-110" />
-                <span className="flex-1 text-left text-sm font-semibold text-bpim-text">
+                <span className="flex-1 text-left text-sm font-bold text-bpim-text">
                   {t(provider.labelKey)}
                 </span>
                 <div className="opacity-0 transition-opacity group-hover:opacity-100">
@@ -119,7 +119,7 @@ export const LoginButtons = ({
             className="group relative flex h-13 w-full items-center justify-start gap-4 rounded-b-xl rounded-t-none px-6 border-bpim-border bg-transparent transition-all duration-200 hover:z-10 hover:bg-bpim-overlay/40 active:scale-[0.98]"
           >
             <Mail className="h-5 w-5 shrink-0 transition-transform group-hover:scale-110" />
-            <span className="flex-1 text-left text-sm font-semibold text-bpim-text">
+            <span className="flex-1 text-left text-sm font-bold text-bpim-text">
               {t("login.btnEmail")}
             </span>
             <div className="opacity-0 transition-opacity group-hover:opacity-100">

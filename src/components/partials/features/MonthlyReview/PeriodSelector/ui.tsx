@@ -63,7 +63,7 @@ const PeriodSelectorUI = ({
   <Popover>
     <PopoverTrigger asChild>
       <button
-        className="fixed right-4 top-4 z-50 flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold backdrop-blur-sm transition-colors hover:bg-white/10"
+        className="fixed right-4 top-4 z-50 flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-bold backdrop-blur-sm transition-colors hover:bg-white/10"
         style={{
           background: "rgba(255,255,255,0.05)",
           border: "1px solid rgba(255,255,255,0.12)",

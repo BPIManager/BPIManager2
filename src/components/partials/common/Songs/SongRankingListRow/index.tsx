@@ -122,7 +122,7 @@ export function SongRankingListRow({
           <p
             className={cn(
               "truncate text-xs tracking-tight text-bpim-text",
-              isSelf ? "font-bold" : "font-medium",
+              isSelf ? "font-bold" : "font-bold",
             )}
           >
             {isPrivate ? t("common.privateUser") : row.userName}

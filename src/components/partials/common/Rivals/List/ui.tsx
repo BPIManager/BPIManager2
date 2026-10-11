@@ -118,7 +118,7 @@ const RivalSummaryCard = ({
             />
           </div>
 
-          <div className="flex justify-between text-[10px] font-medium text-bpim-muted">
+          <div className="flex justify-between text-[10px] font-bold text-bpim-muted">
             <span>{winRate.toFixed(1)}% Win</span>
             <span>{stats.totalCount} Songs</span>
           </div>

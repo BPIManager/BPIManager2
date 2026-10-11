@@ -78,13 +78,13 @@ const RadarSection = ({
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5">
               <div className="h-2.5 w-2.5 rounded-full bg-bpim-primary" />
-              <span className="text-xs text-bpim-primary font-medium">
+              <span className="text-xs text-bpim-primary font-bold">
                 {t("dashboard.radar.me")}
               </span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="h-2.5 w-2.5 rounded-full bg-orange-400" />
-              <span className="text-xs text-bpim-warning font-medium">
+              <span className="text-xs text-bpim-warning font-bold">
                 {effectiveRivalName}
               </span>
             </div>

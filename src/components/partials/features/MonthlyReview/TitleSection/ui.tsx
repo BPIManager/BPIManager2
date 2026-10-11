@@ -63,7 +63,7 @@ const TitleSectionUI = ({
             </AvatarFallback>
           </Avatar>
           <span
-            className="text-sm font-semibold"
+            className="text-sm font-bold"
             style={{ color: "rgba(255,255,255,0.65)" }}
           >
             {userName}
@@ -95,7 +95,7 @@ const TitleSectionUI = ({
       />
 
       <p
-        className="text-center font-semibold"
+        className="text-center font-bold"
         style={{
           fontSize: "clamp(0.9rem, 2.5vw, 1.4rem)",
           color: diffColor,

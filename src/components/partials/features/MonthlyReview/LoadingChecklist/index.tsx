@@ -48,7 +48,7 @@ const LoadingChecklist = ({ items }: Props) => (
           {iconFor(item.status)}
         </span>
         <span
-          className="text-xs font-semibold"
+          className="text-xs font-bold"
           style={{
             color:
               item.status === "loading"

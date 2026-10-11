@@ -69,7 +69,7 @@ function InfiniteScrollContainer<T>({
           <LoadingSpinner size="md" className="text-bpim-text" />
         )}
         {!isLoadingMore && isReachingEnd && items.length > 0 && (
-          <span className="text-[10px] font-medium text-bpim-subtle uppercase tracking-wider">
+          <span className="text-[10px] font-bold text-bpim-subtle uppercase tracking-wider">
             {t("common.allDataLoaded")}
           </span>
         )}

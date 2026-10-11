@@ -43,7 +43,7 @@ function TicketsSection() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-3 rounded-xl border border-bpim-border bg-bpim-surface p-5">
         <div className="flex flex-col gap-1">
-          <p className="text-sm font-semibold text-bpim-text">{t("tickets.pasteCsv")}</p>
+          <p className="text-sm font-bold text-bpim-text">{t("tickets.pasteCsv")}</p>
           <p className="text-xs text-bpim-muted">
             {t("tickets.pasteCsvDesc")}
           </p>
