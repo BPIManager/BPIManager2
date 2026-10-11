@@ -8,7 +8,7 @@ import { Meta } from "@/components/partials/common/PageChrome/Head";
 import DashboardLayout from "@/components/partials/shell/DashboardLayout";
 import ArenaAverageFilter, { type DetailFilter } from "@/components/partials/features/Metrics/ArenaAverageFilter/ui";
 import ArenaAverageFilterSkeleton from "@/components/partials/features/Metrics/ArenaAverageFilter/skeleton";
-import { latestVersion } from "@/constants/iidx/iidxVersions";
+import { arenaDataVersion } from "@/constants/iidx/iidxVersions";
 import { ALL_RADAR_CATEGORIES } from "@/constants/iidx/radars";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -51,8 +51,8 @@ export const ArenaMetricsView = ({
   };
 
   const v = router.isReady
-    ? (router.query.version as string) || initialVersion || latestVersion
-    : initialVersion || latestVersion;
+    ? (router.query.version as string) || initialVersion || arenaDataVersion
+    : initialVersion || arenaDataVersion;
   const level = (router.query.difficultyLevel as string) || "12";
 
   const { averages, isLoading } = useArenaAverages(v, parseInt(level));

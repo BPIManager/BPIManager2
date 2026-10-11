@@ -10,10 +10,16 @@ interface MetaProps {
   noIndex?: boolean;
 }
 
+/** OGPクローラーは相対URLを解決できないため、絶対URLで指定する。画像は public/icons/ogp.jpg */
+const DEFAULT_OG_IMAGE = `${SITE_URL}/icons/ogp.jpg`;
+
+const toAbsoluteUrl = (url: string) =>
+  /^https?:\/\//i.test(url) ? url : `${SITE_URL}${url.startsWith("/") ? "" : "/"}${url}`;
+
 export const Meta = ({
   title,
   description = "BPIM2はbeatmaniaIIDX上級者向けのスコア管理ツールです",
-  ogImage = "/ogp-default.png",
+  ogImage = DEFAULT_OG_IMAGE,
   ogType = "website",
   noIndex = false,
 }: MetaProps) => {
@@ -21,6 +27,7 @@ export const Meta = ({
   const siteName = "BPIM2";
   const fullTitle = title ? `${title} | ${siteName}` : siteName;
   const url = `${SITE_URL}${router.asPath}`;
+  const ogImageUrl = toAbsoluteUrl(ogImage);
 
   return (
     <Head>
@@ -36,12 +43,12 @@ export const Meta = ({
       <meta property="og:description" content={description} />
       <meta property="og:url" content={url} />
       <meta property="og:site_name" content={siteName} />
-      <meta property="og:image" content={ogImage} />
+      <meta property="og:image" content={ogImageUrl} />
 
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={ogImage} />
+      <meta name="twitter:image" content={ogImageUrl} />
     </Head>
   );
 };
