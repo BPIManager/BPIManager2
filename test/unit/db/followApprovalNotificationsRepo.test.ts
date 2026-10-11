@@ -62,3 +62,24 @@ describe("followApprovalNotificationsRepo.recordApproval", () => {
     ]);
   });
 });
+
+describe("followApprovalNotificationsRepo.deleteForPair", () => {
+  it("recipientId/actorIdの組に一致する承認記録を全行削除し、削除行数を返すこと", async () => {
+    const spy = createDbSpy({ numDeletedRows: BigInt(2) });
+    dbHolder.current = spy;
+
+    const deleted = await followApprovalNotificationsRepo.deleteForPair(
+      spy.db as never,
+      "recipient-1",
+      "actor-1",
+    );
+
+    expect(deleted).toBe(2);
+    expect(callsFor(spy.calls, "deleteFrom")[0].args).toEqual([
+      "followApprovalNotifications",
+    ]);
+    const whereCalls = callsFor(spy.calls, "where");
+    expect(whereCalls[0].args).toEqual(["recipientId", "=", "recipient-1"]);
+    expect(whereCalls[1].args).toEqual(["actorId", "=", "actor-1"]);
+  });
+});
