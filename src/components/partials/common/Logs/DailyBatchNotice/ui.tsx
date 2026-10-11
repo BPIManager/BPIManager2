@@ -64,7 +64,7 @@ const DailyBatchNotice = ({
           <Link
             href={`/users/${userId as string}/logs/${version}/summary/${dateStr}`}
           >
-            <LayoutGrid className="mr-2 h-4.5 w-4.5" />
+            <LayoutGrid className="mr-2 h-4 w-4" />
             一日のまとめを見る
           </Link>
         </Button>
