@@ -5,6 +5,7 @@ import { PageContainer, PageHeader } from "@/components/partials/common/PageChro
 import TransferUi from "@/components/partials/features/Settings/Transfer/ui";
 import AccountSettingsUi from "@/components/partials/features/Settings/AccountSettings/ui";
 import LinkedAccountsUi from "@/components/partials/features/Settings/LinkedAccounts";
+import ViewPermissionsSettingsUi from "@/components/partials/features/Settings/ViewPermissions";
 import AccountDeletionUi from "@/components/partials/features/Settings/AccountDeletion/ui";
 import ApiKeyUi from "@/components/partials/features/Settings/APIKey/ui";
 import OAuthClientUi from "@/components/partials/features/Settings/OAuthClient";
@@ -38,6 +39,7 @@ export default function SettingsPage() {
           <div className="flex flex-col gap-6">
             <AccountSettingsUi />
             <LinkedAccountsUi />
+            <ViewPermissionsSettingsUi />
             <LanguageSettingsUi />
             <TransferUi />
 

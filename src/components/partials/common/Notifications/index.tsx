@@ -6,7 +6,7 @@ import {
 import { Tabs } from "@/components/ui/tabs";
 import { useNotifications } from "@/hooks/users/useNotifications";
 import { useFollowRequests } from "@/hooks/users/useFollowRequests";
-import { Bell } from "lucide-react";
+import { Bell, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import InfiniteScrollContainer from "@/components/partials/common/ListControls/InfiniteScroll/ui";
 import NotificationItem from "./item";
@@ -14,12 +14,18 @@ import NotificationRequestItem from "./requestItem";
 import { Button } from "@/components/ui/button";
 import { AppTabsGroup } from "@/components/ui/complex/tabs";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import { useUser } from "@/contexts/users/UserContext";
+import ViewPermissionsModal from "@/components/partials/modal/ViewPermissions";
 
 type NotificationTab = "all" | "follow" | "overtaken" | "requests";
 
 const NotificationBell = () => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<NotificationTab>("all");
+  const [isPermissionsOpen, setIsPermissionsOpen] = useState(false);
+  const { user } = useUser();
+  // 閲覧権限の管理は非公開アカウントのときだけ意味を持つ
+  const canManagePermissions = user?.isPublic === 0;
 
   const notificationRes = useNotifications(
     activeTab === "requests" ? "all" : activeTab,
@@ -42,6 +48,7 @@ const NotificationBell = () => {
   } = useFollowRequests();
 
   return (
+    <>
     <Popover onOpenChange={(open) => open && markAsRead()}>
       <PopoverTrigger asChild>
         <Button
@@ -87,22 +94,40 @@ const NotificationBell = () => {
               },
             ]}
           />
-          <div className="max-h-100 p-2">
+          <div
+            className={`max-h-100 p-2 ${activeTab === "requests" ? "overflow-y-auto overscroll-contain" : ""}`}
+          >
             {activeTab === "requests" ? (
-              requests.length === 0 ? (
-                <p className="p-6 text-center text-sm text-bpim-muted">
-                  {isLoadingRequests ? "" : t("notifications.requests.empty")}
-                </p>
-              ) : (
-                requests.map((r) => (
-                  <NotificationRequestItem
-                    key={`${r.kind}-${r.kind === "request" ? r.id : r.requesterId}`}
-                    request={r}
-                    onApprove={approve}
-                    onReject={reject}
-                  />
-                ))
-              )
+              <>
+                {requests.length === 0 ? (
+                  <div className="flex flex-col items-center gap-3 p-6">
+                    <p className="text-center text-sm text-bpim-muted">
+                      {isLoadingRequests
+                        ? ""
+                        : t("notifications.requests.empty")}
+                    </p>
+                    {canManagePermissions && !isLoadingRequests && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-8 px-3 text-xs"
+                        onClick={() => setIsPermissionsOpen(true)}
+                      >
+                        {t("viewPermissions.inviteLink")}
+                      </Button>
+                    )}
+                  </div>
+                ) : (
+                  requests.map((r) => (
+                    <NotificationRequestItem
+                      key={`${r.kind}-${r.kind === "request" ? r.id : r.requesterId}`}
+                      request={r}
+                      onApprove={approve}
+                      onReject={reject}
+                    />
+                  ))
+                )}
+              </>
             ) : (
               <InfiniteScrollContainer
                 items={notifications}
@@ -118,9 +143,28 @@ const NotificationBell = () => {
               />
             )}
           </div>
+          {canManagePermissions &&
+            (activeTab === "requests" || activeTab === "follow") && (
+            <div className="border-t border-bpim-border bg-bpim-bg/50 p-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-full justify-start gap-1.5 px-3 text-xs text-bpim-muted hover:text-bpim-text"
+                onClick={() => setIsPermissionsOpen(true)}
+              >
+                <ShieldCheck className="h-3.5 w-3.5" />
+                {t("viewPermissions.open")}
+              </Button>
+            </div>
+          )}
         </Tabs>
       </PopoverContent>
     </Popover>
+    <ViewPermissionsModal
+      isOpen={isPermissionsOpen}
+      onClose={() => setIsPermissionsOpen(false)}
+    />
+    </>
   );
 };
 

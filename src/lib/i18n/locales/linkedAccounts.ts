@@ -155,12 +155,6 @@ export const linkedAccountsTranslations = {
     "zh-TW": "連結帳號",
     ko: "연결된 계정",
   },
-  "settings.linked.manage": {
-    ja: "管理",
-    en: "Manage",
-    "zh-TW": "管理",
-    ko: "관리",
-  },
   "settings.linked.desc": {
     ja: "1つ以上のログイン手段を用いてアカウントへのアクセス手段を確保できます。",
     en: "You can register multiple sign-in methods. At least one must remain.",

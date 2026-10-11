@@ -22,6 +22,7 @@ import ImageUploadModal from "../ImageCrop/ui";
 import { useEditProfile } from "@/hooks/users/useEditProfile";
 import AvatarSection from "./avatar";
 import FollowInviteSection from "./followInvite";
+import ViewPermissionsSection from "@/components/partials/common/ViewPermissionsSection";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
@@ -285,6 +286,9 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
               </div>
 
               {!formData.isPublic && <FollowInviteSection />}
+              {!formData.isPublic && (
+                <ViewPermissionsSection className="rounded-xl border border-bpim-border bg-bpim-surface-2/60 p-4" />
+              )}
             </div>
           </div>
 
