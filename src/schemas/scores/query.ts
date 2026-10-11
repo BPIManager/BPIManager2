@@ -17,7 +17,7 @@ export const scoresQuerySchema = z.object({
     .union([z.literal("true"), z.literal("1")])
     .transform(() => true)
     .optional(),
-  search: z.string().optional(),
+  search: z.string().max(100).optional(),
   sortKey: z
     .enum([
       "title",

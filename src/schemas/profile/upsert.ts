@@ -22,7 +22,12 @@ export const arenaPrivacySchema = z.object({
 
 export const profileUpsertSchema = z.object({
   userName: userNameSchema,
-  iidxId: z.string().max(12).nullable().default(null),
+  // 8桁（ハイフン有無どちらも可。DBは varchar(12)）。未設定は空文字またはnull
+  iidxId: z
+    .string()
+    .regex(/^(\d{4}-?\d{4})?$/, "IIDX IDは8桁の数字で入力してください")
+    .nullable()
+    .default(null),
   profileText: z.string().max(2000).nullable().default(null),
   profileImage: z
     .string()
