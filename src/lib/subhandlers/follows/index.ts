@@ -11,3 +11,4 @@ export * from "./followListsFollowing";
 export * from "./followRequestsList";
 export * from "./followRequestAction";
 export * from "./followers";
+export * from "./viewPermissions";
