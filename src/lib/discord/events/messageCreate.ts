@@ -1,4 +1,5 @@
 import { ChannelType, type Client, type Message } from "discord.js";
+import { SITE_URL } from "@/constants/site/url";
 import { discordLinksRepo } from "@/lib/db/domains/discord";
 import { getManagedRoleIds, resolveUserRoleFromMember } from "@/lib/discord/roleMap";
 
@@ -57,7 +58,9 @@ export async function handleMessageCreate(message: Message, client: Client) {
   if (!match) {
     console.log("[Discord Bot] URL pattern not matched");
     await message.reply(
-      "BPIM2 のプロフィール URL が見つかりませんでした。\n以下の形式で URL を送ってください。\n\n例: `https://bpi2.poyashi.me/users/xxxxxxxxxxxxxxxxxxxxxxxx`",
+      "BPIM2 のプロフィール URL が見つかりませんでした。\n以下の形式で URL を送ってください。\n\n例: `" +
+        SITE_URL +
+        "/users/xxxxxxxxxxxxxxxxxxxxxxxx`",
     );
     return;
   }
