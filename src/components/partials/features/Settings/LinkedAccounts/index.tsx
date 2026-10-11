@@ -23,7 +23,7 @@ export default function LinkedAccountsUi() {
         <p className="text-sm text-bpim-muted">{t("settings.linked.desc")}</p>
       </div>
       <Button className="h-9 shrink-0 rounded-lg px-6 font-bold" onClick={() => setIsOpen(true)}>
-        {t("settings.linked.manage")}
+        {t("common.manage")}
       </Button>
 
       <LinkedAccountsModal open={isOpen} onOpenChange={setIsOpen} />

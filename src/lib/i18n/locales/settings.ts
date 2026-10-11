@@ -323,6 +323,102 @@ export const settingsTranslations = {
     ko: "복사됨",
   },
 
+  "viewPermissions.section.desc": {
+    ja: "非公開アカウントの閲覧を許可しているユーザーを確認し、招待URLからのリクエストの承認や、承認済みユーザーの閲覧権限の取り消しができます。取り消してもフォロー関係は残ります。",
+    en: "Review who can view your private account, approve requests from your invite link, and revoke access for approved users. Revoking keeps the follow relationship.",
+    "zh-TW": "查看可檢視你的非公開帳號的使用者，可核准邀請連結的請求，或撤銷已核准使用者的檢視權限。撤銷後追蹤關係仍會保留。",
+    ko: "비공개 계정을 열람할 수 있는 사용자를 확인하고, 초대 URL의 요청을 승인하거나 승인된 사용자의 열람 권한을 취소할 수 있습니다. 취소해도 팔로우 관계는 유지됩니다.",
+  },
+  "viewPermissions.open": {
+    ja: "閲覧権限を管理",
+    en: "Manage view permissions",
+    "zh-TW": "管理檢視權限",
+    ko: "열람 권한 관리",
+  },
+  "viewPermissions.title": {
+    ja: "閲覧権限の管理",
+    en: "View permissions",
+    "zh-TW": "檢視權限管理",
+    ko: "열람 권한 관리",
+  },
+  "viewPermissions.desc": {
+    ja: "非公開アカウントの閲覧を許可しているユーザーを確認し、承認・取り消しができます。取り消してもフォロー関係は残り、承認待ちに戻ります。",
+    en: "Review who can view your private account, and approve or revoke access. Revoking keeps the follow relationship and moves the user back to pending.",
+    "zh-TW": "查看可檢視你的非公開帳號的使用者，並可核准或撤銷。撤銷後追蹤關係仍會保留，並回到待審核。",
+    ko: "비공개 계정을 열람할 수 있는 사용자를 확인하고 승인하거나 취소할 수 있습니다. 취소해도 팔로우 관계는 유지되며 승인 대기로 돌아갑니다.",
+  },
+  "viewPermissions.tab.pending": {
+    ja: "承認待ち",
+    en: "Pending",
+    "zh-TW": "待審核",
+    ko: "승인 대기",
+  },
+  "viewPermissions.tab.approved": {
+    ja: "承認済み",
+    en: "Approved",
+    "zh-TW": "已核准",
+    ko: "승인됨",
+  },
+  "viewPermissions.search": {
+    ja: "ユーザー名で検索",
+    en: "Search by name",
+    "zh-TW": "以使用者名稱搜尋",
+    ko: "사용자 이름으로 검색",
+  },
+  "viewPermissions.empty.pending": {
+    ja: "承認待ちのユーザーはいません",
+    en: "No pending users",
+    "zh-TW": "沒有待審核的使用者",
+    ko: "승인 대기 중인 사용자가 없습니다",
+  },
+  "viewPermissions.empty.pendingInvite": {
+    ja: "承認待ちのユーザーはいません。下の招待URLを共有すると、フォローリクエストを受け取れます。",
+    en: "No pending users. Share the invite link below to receive follow requests.",
+    "zh-TW": "沒有待審核的使用者。分享下方的邀請連結即可收到追蹤請求。",
+    ko: "승인 대기 중인 사용자가 없습니다. 아래 초대 URL을 공유하면 팔로우 요청을 받을 수 있습니다.",
+  },
+  "viewPermissions.inviteLink": {
+    ja: "招待URLを確認・発行する",
+    en: "View / issue invite link",
+    "zh-TW": "查看／發行邀請連結",
+    ko: "초대 URL 확인·발급",
+  },
+  "viewPermissions.empty.approved": {
+    ja: "承認済みのユーザーはいません",
+    en: "No approved users",
+    "zh-TW": "沒有已核准的使用者",
+    ko: "승인된 사용자가 없습니다",
+  },
+  "viewPermissions.revoke": {
+    ja: "取り消す",
+    en: "Revoke",
+    "zh-TW": "撤銷",
+    ko: "취소",
+  },
+  "viewPermissions.revokeConfirm.title": {
+    ja: "閲覧権限を取り消しますか？",
+    en: "Revoke view permission?",
+    "zh-TW": "要撤銷檢視權限嗎？",
+    ko: "열람 권한을 취소할까요?",
+  },
+  "viewPermissions.revokeConfirm.desc": {
+    ja: " さんの閲覧権限を取り消します。フォロー関係は残り、承認待ちに戻ります。再度承認すれば、閲覧できるようになります。",
+    en: "'s view permission will be revoked. The follow relationship stays and the user returns to pending; approve again to restore access.",
+    "zh-TW": " 的檢視權限將被撤銷。追蹤關係仍會保留並回到待審核，再次核准即可恢復檢視。",
+    ko: " 님의 열람 권한을 취소합니다. 팔로우 관계는 유지되며 승인 대기로 돌아갑니다. 다시 승인하면 열람할 수 있습니다.",
+  },
+  "viewPermissions.badge.pending": {
+    ja: "承認待ち",
+    en: "Pending",
+    "zh-TW": "待審核",
+    ko: "승인 대기",
+  },
+  "viewPermissions.badge.approved": {
+    ja: "承認済み",
+    en: "Approved",
+    "zh-TW": "已核准",
+    ko: "승인됨",
+  },
   "settings.followInvite.title": {
     ja: "フォロー招待URL",
     en: "Follow Invite Link",
@@ -397,12 +493,6 @@ export const settingsTranslations = {
     ko: "복사에 실패했습니다",
   },
 
-  "settings.oauthClient.manage": {
-    ja: "管理",
-    en: "Manage",
-    "zh-TW": "管理",
-    ko: "관리",
-  },
 
   "settings.oauthClient.title": {
     ja: "MCP接続 (OAuth)",

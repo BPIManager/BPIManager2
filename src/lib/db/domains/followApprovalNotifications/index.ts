@@ -84,6 +84,29 @@ class FollowApprovalNotificationsRepository {
   }
 
   /**
+   * 指定の組み合わせの承認記録をすべて削除する（再承認・事後承認で同じ組に複数行ある場合も全行）。
+   * フォロー解除時や閲覧権限の取り消しで、記録が残って閲覧許可が復活しないようにするために使う。
+   *
+   * @param trx - 呼び出し元が管理するトランザクション
+   * @param recipientId - リクエスト送信者（フォロワー）側のユーザー ID
+   * @param actorId - 承認した側のユーザー ID
+   * @returns 削除した行数
+   */
+  async deleteForPair(
+    trx: Transaction<Database>,
+    recipientId: string,
+    actorId: string,
+  ): Promise<number> {
+    const result = await trx
+      .deleteFrom("followApprovalNotifications")
+      .where("recipientId", "=", recipientId)
+      .where("actorId", "=", actorId)
+      .executeTakeFirst();
+
+    return Number(result.numDeletedRows);
+  }
+
+  /**
    * ユーザーが関わる全承認通知（受信・送信双方）を削除する。
    *
    * @param trx - 呼び出し元が管理するトランザクション

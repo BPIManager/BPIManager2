@@ -21,6 +21,7 @@ export const commonTranslations = {
   "common.close": { ja: "閉じる", en: "Close", "zh-TW": "關閉", ko: "닫기" },
   "common.back": { ja: "戻る", en: "Back", "zh-TW": "返回", ko: "뒤로" },
   "common.open": { ja: "開く", en: "Open", "zh-TW": "開啟", ko: "열기" },
+  "common.manage": { ja: "管理", en: "Manage", "zh-TW": "管理", ko: "관리" },
   "common.confirm": { ja: "確認", en: "Confirm", "zh-TW": "確認", ko: "확인" },
   "common.delete": {
     ja: "削除する",
