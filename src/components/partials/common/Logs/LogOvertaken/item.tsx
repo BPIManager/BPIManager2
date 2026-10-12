@@ -48,7 +48,7 @@ const OvertakeRankItem = ({ item, onClick }: RankItemProps) => {
 
         <div className="grid grid-cols-2 items-center gap-x-4 gap-y-0.5 shrink-0">
           <div className="flex items-center gap-1.5 text-xs text-bpim-muted font-mono justify-end">
-            <span className="font-medium">{previous?.exScore || 0}</span>
+            <span className="font-bold">{previous?.exScore || 0}</span>
             <ChevronRight className="w-3 h-3" />
             <span className="font-black text-bpim-text text-base">
               {current.exScore}
@@ -96,7 +96,7 @@ const OvertakeRankItem = ({ item, onClick }: RankItemProps) => {
                         {rival.rivalName.slice(0, 2)}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="text-xs font-medium text-bpim-text">
+                    <span className="text-xs font-bold text-bpim-text">
                       {rival.rivalName}
                     </span>
                   </div>

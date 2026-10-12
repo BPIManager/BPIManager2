@@ -56,7 +56,7 @@ export const MockArenaAverage = () => {
                       <span className="truncate text-[11px] font-bold text-bpim-text">
                         {row.title}
                       </span>
-                      <span className="text-[9px] font-medium uppercase tracking-tighter text-bpim-muted">
+                      <span className="text-[9px] font-bold uppercase tracking-tighter text-bpim-muted">
                         {row.difficulty}
                       </span>
                     </div>

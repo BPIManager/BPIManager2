@@ -69,7 +69,7 @@ const RivalListEditRows = ({ userId, lists }: Props) => {
       {isLoading ? (
         <SectionLoader className="py-10" />
       ) : following.length === 0 ? (
-        <p className="py-10 text-center text-sm font-medium text-bpim-muted">
+        <p className="py-10 text-center text-sm font-bold text-bpim-muted">
           {t("rivals.list.editRowsEmpty")}
         </p>
       ) : (

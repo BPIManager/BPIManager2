@@ -84,7 +84,7 @@ const CalendarPicker = ({
         >
           <ChevronLeftIcon className="size-4" />
         </Button>
-        <span className="text-xs font-semibold text-bpim-text">
+        <span className="text-xs font-bold text-bpim-text">
           {new Intl.DateTimeFormat(locale, {
             year: "numeric",
             month: "long",
@@ -105,7 +105,7 @@ const CalendarPicker = ({
         {weekdayLabels(locale).map((d, i) => (
           <div
             key={i}
-            className="flex h-6 items-center justify-center text-[10px] font-medium text-bpim-muted"
+            className="flex h-6 items-center justify-center text-[10px] font-bold text-bpim-muted"
           >
             {d}
           </div>

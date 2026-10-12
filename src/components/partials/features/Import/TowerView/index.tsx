@@ -92,7 +92,7 @@ const TowerImportView = ({
               <AlertCircle className="h-3.5 w-3.5 shrink-0 text-bpim-danger" />
             )}
             <span
-              className={`text-xs font-medium ${
+              className={`text-xs font-bold ${
                 isValid ? "text-bpim-success" : "text-bpim-danger"
               }`}
             >

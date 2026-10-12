@@ -53,7 +53,7 @@ const SongHistoryTab = ({ songId, notes }: SongHistoryTabProps) => {
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-20">
         <History className="h-10 w-10 text-bpim-subtle" />
-        <p className="text-sm font-medium text-bpim-muted">
+        <p className="text-sm font-bold text-bpim-muted">
           履歴データが見つかりません
         </p>
       </div>

@@ -1,4 +1,5 @@
 import { Wrench, BookOpen, ExternalLink } from "lucide-react";
+import { SITE_URL } from "@/constants/site/url";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 const ApiSection = () => {
@@ -31,7 +32,7 @@ const ApiSection = () => {
             <span className="shrink-0 select-none text-bpim-primary">$</span>
             <span className="text-bpim-text">
               curl <span className="text-bpim-success">GET</span>{" "}
-              {`"https://bpi2.poyashi.me/api/v1/users/abc123uid/scores?version=32"`}
+              {`"${SITE_URL}/api/v1/users/abc123uid/scores?version=32"`}
             </span>
           </div>
 

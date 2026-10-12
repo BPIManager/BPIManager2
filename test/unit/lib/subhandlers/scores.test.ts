@@ -339,7 +339,7 @@ describe("handleScoresBulk", () => {
             title: "t",
             difficulty: "ANOTHER",
             exScore: 1001, // notes*2=1000を超える
-            clearState: "HARD",
+            clearState: "HARD CLEAR",
             missCount: null,
             lastPlayed: null,
           },

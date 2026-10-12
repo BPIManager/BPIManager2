@@ -127,13 +127,13 @@ export const RatchetHistoryDialog = ({
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5">
               <div className="h-0.5 w-3 border-t-2 border-dashed border-bpim-warning bg-transparent" />
-              <span className="text-xs font-medium text-bpim-warning">
+              <span className="text-xs font-bold text-bpim-warning">
                 {rawLabel}
               </span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="h-0.5 w-3 bg-bpim-primary" />
-              <span className="text-xs font-medium text-bpim-primary">
+              <span className="text-xs font-bold text-bpim-primary">
                 {ratchetedLabel}
               </span>
             </div>
@@ -142,7 +142,7 @@ export const RatchetHistoryDialog = ({
                 <div className="h-full w-1 rounded-sm bg-bpim-success/60" />
                 <div className="h-1 w-1 rounded-sm bg-bpim-danger/60" />
               </div>
-              <span className="text-xs font-medium text-bpim-muted">
+              <span className="text-xs font-bold text-bpim-muted">
                 {rawDeltaLabel}
               </span>
             </div>
@@ -152,7 +152,7 @@ export const RatchetHistoryDialog = ({
                 style={{ borderColor: SKILL_COLOR }}
               />
               <span
-                className="text-xs font-medium"
+                className="text-xs font-bold"
                 style={{ color: SKILL_COLOR }}
               >
                 {skillLabel}
@@ -174,7 +174,7 @@ export const RatchetHistoryDialog = ({
           ) : (
             latestGap != null && (
               <div className="flex items-center justify-center rounded-lg border border-dashed border-bpim-border/50 px-3 py-2">
-                <span className="text-[10px] font-medium text-bpim-muted/70">
+                <span className="text-[10px] font-bold text-bpim-muted/70">
                   {t("dashboard.currentBpi.ratchetHistory.noGap")}
                 </span>
               </div>

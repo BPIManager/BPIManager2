@@ -18,5 +18,16 @@ dayjs.tz.setDefault("Asia/Tokyo");
 
 export default dayjs;
 
+/**
+ * クエリの`asOf`（`latest`/未指定、または`YYYY-MM-DD`）を、その時点までのスコアを取る基準時刻に変換する。
+ * 日付指定はJSTのその日の終わり（23:59:59.999）として解釈し、指定日当日のプレーを含める。
+ *
+ * @param asOf - `latest`・未指定、または`YYYY-MM-DD`
+ */
+export const resolveAsOfTime = (asOf?: string): Date =>
+  !asOf || asOf === "latest"
+    ? dayjs.tz().utc().toDate()
+    : dayjs.tz(asOf).endOf("day").utc().toDate();
+
 /** JST基準の今日の日付を YYYY-MM-DD 形式で返す */
 export const todayJst = (): string => dayjs().tz().format("YYYY-MM-DD");

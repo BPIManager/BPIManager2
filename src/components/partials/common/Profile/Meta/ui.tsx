@@ -17,7 +17,8 @@ const ProfileMeta = ({
   const { profile } = useStaticProfile();
   const { t } = useTranslation();
 
-  const ogImage = profile.profileImage || "/ogp-default.png";
+  // 画像が無いときは Meta の既定OGP画像を使う
+  const ogImage = profile.profileImage || undefined;
 
   const iidxId = formatIIDXId(profile.iidxId || "");
   const profileHeading = [profile.userName, iidxId ? `(${iidxId})` : ""]
@@ -26,14 +27,21 @@ const ProfileMeta = ({
 
   const defaultDescription =
     profile.profileText ||
-    `${profile.userName}${t("profile.meta.defaultDescSuffix")}`;
+    (profile.userName
+      ? `${profile.userName}${t("profile.meta.defaultDescSuffix")}`
+      : undefined);
 
   return (
     <Meta
-      title={`${profileHeading}${t("profile.meta.titleConnector")}${title}`}
+      // ユーザー名・IIDX IDが無いとき、先頭に連結語だけが残ったり "undefined" が入ったりしないようにする
+      title={
+        profileHeading
+          ? `${profileHeading}${t("profile.meta.titleConnector")}${title}`
+          : title
+      }
       description={
         (description || "")
-          ?.replace("$userName$", profile.userName)
+          ?.replace("$userName$", profile.userName ?? "")
           .replace("$profileText$", profile.profileText || "")
           .replace("$iidxid$", formatIIDXId(profile.iidxId || "")) ||
         defaultDescription

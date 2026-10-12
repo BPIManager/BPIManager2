@@ -52,5 +52,6 @@ export const useFollowRequests = () => {
     isLoading,
     approve,
     reject,
+    refresh: mutate,
   };
 };

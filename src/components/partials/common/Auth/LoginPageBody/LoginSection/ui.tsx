@@ -62,7 +62,7 @@ const LoginSection = () => {
 
       <div className="my-4 flex items-center gap-3">
         <div className="flex-1 border-t border-bpim-border" />
-        <span className="text-[11px] font-medium uppercase tracking-wider text-bpim-muted/50">
+        <span className="text-[11px] font-bold uppercase tracking-wider text-bpim-muted/50">
           {t("login.or")}
         </span>
         <div className="flex-1 border-t border-bpim-border" />
@@ -74,21 +74,21 @@ const LoginSection = () => {
           className="group flex h-12 items-center justify-center gap-2.5 rounded-xl border border-bpim-border bg-bpim-surface px-4 transition-all duration-200 hover:border-white/30 hover:bg-bpim-overlay active:scale-[0.98]"
         >
           <XProviderIcon className="h-4 w-4 text-bpim-text" />
-          <span className="text-sm font-semibold text-bpim-text">X</span>
+          <span className="text-sm font-bold text-bpim-text">X</span>
         </button>
         <button
           onClick={() => authActions.signInWithLINE()}
           className="group flex h-12 items-center justify-center gap-2.5 rounded-xl border border-[#00B900]/30 bg-[#00B900]/5 px-4 transition-all duration-200 hover:border-[#00B900]/50 hover:bg-[#00B900]/10 active:scale-[0.98]"
         >
           <LineProviderIcon className="h-4 w-4 text-[#4ade80]" />
-          <span className="text-sm font-semibold text-[#4ade80]">LINE</span>
+          <span className="text-sm font-bold text-[#4ade80]">LINE</span>
         </button>
         <button
           onClick={() => setIsEmailModalOpen(true)}
           className="group col-span-2 flex h-12 items-center justify-center gap-2.5 rounded-xl border border-bpim-border bg-bpim-surface px-4 transition-all duration-200 hover:border-white/30 hover:bg-bpim-overlay active:scale-[0.98]"
         >
           <Mail className="h-4 w-4 text-bpim-text" />
-          <span className="text-sm font-semibold text-bpim-text">{t("login.btnEmail")}</span>
+          <span className="text-sm font-bold text-bpim-text">{t("login.btnEmail")}</span>
         </button>
       </div>
 

@@ -38,7 +38,7 @@ function SectionSlotRow({
   return (
     <div className="flex flex-col gap-1.5">
       <span
-        className="text-[11px] font-semibold"
+        className="text-[11px] font-bold"
         style={{ color: "rgba(255,255,255,0.4)" }}
       >
         {label}
@@ -50,7 +50,7 @@ function SectionSlotRow({
             <button
               key={key}
               onClick={() => onSelect(key)}
-              className="rounded-full px-4 py-2 text-xs font-semibold transition-colors"
+              className="rounded-full px-4 py-2 text-xs font-bold transition-colors"
               style={
                 isSelected
                   ? {
@@ -222,7 +222,7 @@ const ShareFabUI = ({
             <button
               onClick={handleCopy}
               aria-label={t("monthlyReview.shareFab.copyUrl")}
-              className="flex shrink-0 items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors"
+              className="flex shrink-0 items-center gap-1 rounded-full px-3 py-1.5 text-xs font-bold transition-colors"
               style={{
                 background: "rgba(255,255,255,0.08)",
                 color: "rgba(255,255,255,0.75)",

@@ -39,7 +39,7 @@ function BpiSongRow({
           {DIFF_LABELS[song.difficulty] ?? song.difficulty}
         </span>
         <span
-          className="flex-1 text-sm font-semibold leading-snug"
+          className="flex-1 text-sm font-bold leading-snug"
           style={{ color: "rgba(255,255,255,0.92)", wordBreak: "break-all" }}
         >
           {song.title}

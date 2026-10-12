@@ -217,7 +217,7 @@ export const ContributionList = ({
                       </span>
                     </div>
                   ) : (
-                    <span className="text-[10px] font-medium text-bpim-muted">
+                    <span className="text-[10px] font-bold text-bpim-muted">
                       {t(
                         "dashboard.currentBpi.ratchetHistory.initialEntry",
                       )}

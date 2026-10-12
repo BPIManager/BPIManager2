@@ -46,7 +46,7 @@ const DailyBatchNotice = ({
               <span className="text-base font-bold tracking-tight text-bpim-text md:text-lg">
                 {dateStr}
               </span>
-              <Badge className="rounded-full bg-bpim-primary-dim px-3 py-0.5 text-xs font-semibold text-bpim-primary hover:bg-bpim-primary-dim">
+              <Badge className="rounded-full bg-bpim-primary-dim px-3 py-0.5 text-xs font-bold text-bpim-primary hover:bg-bpim-primary-dim">
                 {currentIndex} / {dailyBatchIds.length} 回目の更新
               </Badge>
             </div>
@@ -64,7 +64,7 @@ const DailyBatchNotice = ({
           <Link
             href={`/users/${userId as string}/logs/${version}/summary/${dateStr}`}
           >
-            <LayoutGrid className="mr-2 h-4.5 w-4.5" />
+            <LayoutGrid className="mr-2 h-4 w-4" />
             一日のまとめを見る
           </Link>
         </Button>

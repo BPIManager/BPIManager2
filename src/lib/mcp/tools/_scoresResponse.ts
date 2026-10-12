@@ -1,4 +1,4 @@
-import dayjs from "@/lib/dayjs";
+import { resolveAsOfTime } from "@/lib/dayjs";
 import { scoreDetailRepo } from "@/lib/db/domains/scores/detail";
 import { mapToFlatSong } from "@/utils/logs/getMapFlatten";
 import { filterSongsServerSide } from "@/utils/songs/filter";
@@ -18,10 +18,7 @@ export async function buildScoresResponse(
   targetUserId: string,
   { version, asOf, limit, ...filterParams }: ScoresQuery,
 ) {
-  const time =
-    !asOf || asOf === "latest"
-      ? dayjs.tz().utc().toDate()
-      : dayjs.tz(asOf).utc().toDate();
+  const time = resolveAsOfTime(asOf);
 
   const results = await scoreDetailRepo.getScoresWithDetails(
     targetUserId,

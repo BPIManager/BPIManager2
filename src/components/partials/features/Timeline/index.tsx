@@ -207,7 +207,7 @@ const MenuButton = ({
       "w-full justify-start gap-3 px-3 transition-all",
       isActive
         ? "font-bold shadow-sm"
-        : "font-medium text-bpim-muted hover:bg-bpim-overlay/50 hover:text-bpim-text",
+        : "font-bold text-bpim-muted hover:bg-bpim-overlay/50 hover:text-bpim-text",
     )}
   >
     <Icon className={cn("h-4 w-4", isActive ? "" : "opacity-70")} />

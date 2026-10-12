@@ -102,7 +102,7 @@ const FollowInviteContent = ({
           <AvatarImage src={preview.profileImage ?? ""} alt={preview.userName} />
           <AvatarFallback>{preview.userName.slice(0, 2)}</AvatarFallback>
         </Avatar>
-        <h1 className="mb-2 text-lg font-semibold text-bpim-text">
+        <h1 className="mb-2 text-lg font-bold text-bpim-text">
           {preview.userName}
         </h1>
         <p className="mb-6 text-sm text-bpim-muted">{t("invite.desc")}</p>

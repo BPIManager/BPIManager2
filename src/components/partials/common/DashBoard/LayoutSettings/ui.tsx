@@ -150,7 +150,7 @@ export function DropZone({
     <div className="flex flex-col gap-2">
       <h3
         className={cn(
-          "text-sm font-semibold text-bpim-text transition-colors",
+          "text-sm font-bold text-bpim-text transition-colors",
           isDragTarget && "text-bpim-primary",
         )}
       >

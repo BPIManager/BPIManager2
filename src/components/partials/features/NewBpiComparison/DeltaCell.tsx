@@ -10,7 +10,7 @@ export default function DeltaCell({ delta }: { delta: number | null }) {
   return (
     <span
       className={cn(
-        "font-medium",
+        "font-bold",
         delta > 0 && "text-emerald-600 dark:text-emerald-400",
         delta < 0 && "text-rose-600 dark:text-rose-400",
       )}

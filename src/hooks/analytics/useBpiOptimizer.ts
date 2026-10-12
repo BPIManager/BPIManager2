@@ -1,7 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
-import useSWR from "swr";
 import { useUser } from "@/contexts/users/UserContext";
-import { fetcherV2 } from "@/services/swr/fetchV2";
+import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
 import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import type {
@@ -53,7 +52,8 @@ export function useBpiOptimizer() {
 
   const userId = fbUser?.uid;
 
-  const swrKey = (() => {
+  // SWRのキーは useAuthedSWRV2 が [url, uid] で組み立てる（Userオブジェクト全体を含めない）
+  const swrUrl = (() => {
     if (!userId || !fbUser || committedTargetBpi === null) return null;
     const params = new URLSearchParams({
       targetBpi: String(committedTargetBpi),
@@ -66,10 +66,7 @@ export function useBpiOptimizer() {
       considerCurrentTotalBpi: String(considerCurrentTotalBpi),
       datasetVersion,
     });
-    return [
-      `${API_V2_PREFIX}/users/${userId}/analytics/bpi-optimizer?${params}`,
-      fbUser,
-    ];
+    return `${API_V2_PREFIX}/users/${userId}/analytics/bpi-optimizer?${params}`;
   })();
 
   useEffect(() => {
@@ -86,7 +83,7 @@ export function useBpiOptimizer() {
     error,
     isValidating,
     mutate,
-  } = useSWR<OptimizationResult>(swrKey, fetcherV2, {
+  } = useAuthedSWRV2<OptimizationResult>(swrUrl, {
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
     shouldRetryOnError: false,

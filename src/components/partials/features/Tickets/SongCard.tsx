@@ -91,7 +91,7 @@ function SongCard({ song, totalBpi, ticketId, scoreMode }: SongCardProps) {
               </Badge>
             )}
           </div>
-          <p className="font-semibold text-bpim-text text-sm leading-snug truncate">
+          <p className="font-bold text-bpim-text text-sm leading-snug truncate">
             {song.title}
           </p>
           <div className="flex items-center gap-1 flex-wrap">
@@ -144,7 +144,7 @@ function SongCard({ song, totalBpi, ticketId, scoreMode }: SongCardProps) {
         <div className="flex items-center gap-2">
           <span>
             {scoreMode === "relative" ? t("tickets.scoreRelativeShort") : t("tickets.scoreRawShort")}:{" "}
-            <span className="font-mono text-bpim-text font-semibold">
+            <span className="font-mono text-bpim-text font-bold">
               {scoreMode === "relative"
                 ? `${song.relativeScore.toFixed(1)}%`
                 : song.patternScore.toFixed(1)}
@@ -181,7 +181,7 @@ function SongCard({ song, totalBpi, ticketId, scoreMode }: SongCardProps) {
           <span>
             {t("tickets.singleBpi")}{" "}
             <span
-              className={`font-mono font-semibold ${bpiGapPositive ? "text-amber-400" : "text-bpim-text"}`}
+              className={`font-mono font-bold ${bpiGapPositive ? "text-amber-400" : "text-bpim-text"}`}
             >
               {song.bpi.toFixed(2)}
             </span>

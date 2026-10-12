@@ -162,11 +162,11 @@ const RivalComparisonModal = ({
               >
                 <Link href={`/users/${rivalId}`}>
                   <div className="flex items-center justify-center gap-2">
-                    <User className="h-4.5 w-4.5" />
+                    <User className="h-5 w-5" />
                     <span className="text-sm">
                       {t("rivalComparison.viewProfile")}
                     </span>
-                    <ChevronRight className="h-4.5 w-4.5" />
+                    <ChevronRight className="h-5 w-5" />
                   </div>
                 </Link>
               </Button>
@@ -193,11 +193,11 @@ const RivalComparisonModal = ({
               >
                 <Link href={`/users/${rivalId}`}>
                   <div className="flex items-center justify-center gap-2">
-                    <User className="h-4.5 w-4.5" />
+                    <User className="h-5 w-5" />
                     <span className="text-sm">
                       {t("rivalComparison.viewProfile")}
                     </span>
-                    <ChevronRight className="h-4.5 w-4.5" />
+                    <ChevronRight className="h-5 w-5" />
                   </div>
                 </Link>
               </Button>

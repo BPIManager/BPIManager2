@@ -17,7 +17,7 @@ const SupportersListSection = ({
   return (
     <section className="space-y-8">
       <div className="space-y-1 border-l-4 border-bpim-primary pl-4">
-        <p className="text-md text-bpim-muted font-medium">
+        <p className="text-md text-bpim-muted font-bold">
           {t("support.supportersTitle")}
         </p>
       </div>

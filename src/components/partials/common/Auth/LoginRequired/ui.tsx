@@ -60,7 +60,7 @@ export const LoginRequiredCard = ({
     >
       <div className="mb-5 flex items-start gap-3 rounded-xl border border-bpim-primary/30 bg-bpim-primary/8 px-4 py-3 text-bpim-primary">
         <LockIcon className="mt-0.5 h-4 w-4 shrink-0" />
-        <span className="text-sm font-medium">{t("auth.loginRequired")}</span>
+        <span className="text-sm font-bold">{t("auth.loginRequired")}</span>
       </div>
       <LoginPageBody />
     </div>

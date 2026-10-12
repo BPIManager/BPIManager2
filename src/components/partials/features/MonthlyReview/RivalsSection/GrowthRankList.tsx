@@ -43,7 +43,7 @@ function GrowthRankList({
               {i + 1}
             </span>
             <span
-              className="flex-1 truncate text-xs font-semibold"
+              className="flex-1 truncate text-xs font-bold"
               style={{
                 color: e.isViewer
                   ? "rgba(255,255,255,0.9)"

@@ -45,15 +45,19 @@ const ShareGoalModal = ({
   onClose: () => void;
 }) => {
   const { t } = useTranslation();
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<"id" | "link" | null>(null);
 
-  const handleCopy = async () => {
+  const handleCopy = async (kind: "id" | "link") => {
     if (!reportId) return;
     try {
-      await navigator.clipboard.writeText(reportId);
-      setCopied(true);
+      await navigator.clipboard.writeText(
+        kind === "id"
+          ? reportId
+          : `${window.location.origin}/optimizer?goal=${reportId}`,
+      );
+      setCopied(kind);
     } catch {
-      setCopied(false);
+      setCopied(null);
     }
   };
 
@@ -62,7 +66,7 @@ const ShareGoalModal = ({
       open={isOpen}
       onOpenChange={(open) => {
         if (!open) {
-          setCopied(false);
+          setCopied(null);
           onClose();
         }
       }}
@@ -83,16 +87,33 @@ const ShareGoalModal = ({
             size="sm"
             variant="outline"
             className="shrink-0 gap-1.5"
-            onClick={handleCopy}
+            onClick={() => handleCopy("id")}
           >
-            {copied ? (
+            {copied === "id" ? (
               <Check className="h-3.5 w-3.5" />
             ) : (
               <Copy className="h-3.5 w-3.5" />
             )}
-            {copied ? t("optimizer.memo.copied") : t("optimizer.memo.copy")}
+            {copied === "id"
+              ? t("optimizer.memo.copied")
+              : t("optimizer.memo.copy")}
           </Button>
         </div>
+        <Button
+          type="button"
+          variant="outline"
+          className="gap-1.5"
+          onClick={() => handleCopy("link")}
+        >
+          {copied === "link" ? (
+            <Check className="h-3.5 w-3.5" />
+          ) : (
+            <Copy className="h-3.5 w-3.5" />
+          )}
+          {copied === "link"
+            ? t("optimizer.memo.copied")
+            : t("optimizer.memo.copyLink")}
+        </Button>
         <DialogFooter>
           <Button variant="ghost" onClick={onClose}>
             {t("optimizer.customGoal.cancel")}

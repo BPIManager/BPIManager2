@@ -114,7 +114,7 @@ const UserMenu = () => {
                 <RoleBadge {...user.role} variant="full" size="small" />
               )}
             </div>
-            <p className="font-mono text-[11px] font-semibold text-bpim-warning">
+            <p className="font-mono text-[11px] font-bold text-bpim-warning">
               ☆12 BPI {user?.totalBpi ?? -15}
             </p>
           </div>

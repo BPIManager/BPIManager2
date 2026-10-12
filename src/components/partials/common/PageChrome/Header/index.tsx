@@ -38,7 +38,7 @@ export const PageHeader = ({
           {description && (
             <p
               className={cn(
-                "hidden text-base font-medium text-bpim-text/60 sm:block max-w-2xl",
+                "hidden text-base font-bold text-bpim-text/60 sm:block max-w-2xl",
                 Icon ? "sm:pl-13" : "pl-0",
               )}
             >

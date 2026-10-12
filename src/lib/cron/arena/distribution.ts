@@ -1,6 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
 import { usersRepo } from "@/lib/db/domains/users";
+import { todayJst } from "@/lib/dayjs";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { ARENA_RANK_ORDER } from "@/constants/iidx/arenaRanks";
 import { upsertOfficialArenaStats } from "@/lib/db/domains/arenaHistory";
@@ -100,7 +101,8 @@ export async function fetchOfficialArenaDistribution(
   const totalMatched = [...countMap.values()].reduce((s, c) => s + c, 0);
 
   const now = new Date();
-  const dateStr = now.toISOString().slice(0, 10);
+  // 日次ファイルの日付はJST基準にする（UTC日付だとJST 9時を境に別ファイルへ切り替わる）
+  const dateStr = todayJst();
   const metricsFile = path.join(metricsDir, `${dateStr}.json`);
 
   await fs.mkdir(metricsDir, { recursive: true });

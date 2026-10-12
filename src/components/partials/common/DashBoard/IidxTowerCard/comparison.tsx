@@ -140,7 +140,7 @@ function IidxTowerComparisonCard({
           <button
             key={g.value}
             onClick={() => setGranularity(g.value)}
-            className={`rounded-md border px-2 py-0.5 text-[10px] font-medium transition-all ${
+            className={`rounded-md border px-2 py-0.5 text-[10px] font-bold transition-all ${
               granularity === g.value
                 ? "border-bpim-primary/50 bg-bpim-primary/10 text-bpim-primary"
                 : "border-transparent bg-bpim-surface-3 text-bpim-subtle hover:text-bpim-text"

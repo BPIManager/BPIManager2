@@ -51,26 +51,26 @@ const ArenaHistoryHelpContent = () => {
   const { t } = useTranslation();
   return (
     <div className="space-y-3">
-      <section>
-        <p className="mb-1 border-b border-bpim-primary/30 font-bold text-bpim-primary">
+      <section className="flex flex-col gap-1">
+        <p className="border-b border-bpim-primary/30 font-bold text-bpim-primary">
           {t("dashboard.arenaHistory.help.overviewTitle")}
         </p>
         <p>{t("dashboard.arenaHistory.help.overviewDesc")}</p>
       </section>
-      <section>
-        <p className="mb-1 border-b border-bpim-primary/30 font-bold text-bpim-primary">
+      <section className="flex flex-col gap-1">
+        <p className="border-b border-bpim-primary/30 font-bold text-bpim-primary">
           {t("dashboard.arenaHistory.help.dataTitle")}
         </p>
         <p>{t("dashboard.arenaHistory.help.dataDesc")}</p>
       </section>
-      <section>
-        <p className="mb-1 border-b border-bpim-primary/30 font-bold text-bpim-primary">
+      <section className="flex flex-col gap-1">
+        <p className="border-b border-bpim-primary/30 font-bold text-bpim-primary">
           {t("dashboard.arenaHistory.help.chartTitle")}
         </p>
         <p>{t("dashboard.arenaHistory.help.chartDesc")}</p>
       </section>
-      <section>
-        <p className="mb-1 border-b border-bpim-primary/30 font-bold text-bpim-primary">
+      <section className="flex flex-col gap-1">
+        <p className="border-b border-bpim-primary/30 font-bold text-bpim-primary">
           {t("dashboard.arenaHistory.help.granularityTitle")}
         </p>
         <ul className="space-y-1">
@@ -79,8 +79,8 @@ const ArenaHistoryHelpContent = () => {
           <li>{t("dashboard.arenaHistory.help.granularitySeason")}</li>
         </ul>
       </section>
-      <section>
-        <p className="mb-1 border-b border-bpim-primary/30 font-bold text-bpim-primary">
+      <section className="flex flex-col gap-1">
+        <p className="border-b border-bpim-primary/30 font-bold text-bpim-primary">
           {t("dashboard.arenaHistory.help.aggregationTitle")}
         </p>
         <p>{t("dashboard.arenaHistory.help.aggregationDesc")}</p>

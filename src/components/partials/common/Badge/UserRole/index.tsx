@@ -50,7 +50,7 @@ const ROLE_CONFIG: Record<
     color: "text-violet-300",
     bg: "bg-violet-500/20 border-violet-400/50 hover:bg-violet-500/30",
     compactIconSize: "h-4 w-4",
-    fullIconSize: "h-4.5 w-4.5",
+    fullIconSize: "h-5 w-5",
   },
   developer: {
     icon: Code2,

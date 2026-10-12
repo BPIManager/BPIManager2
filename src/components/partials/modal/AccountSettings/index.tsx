@@ -22,6 +22,7 @@ import ImageUploadModal from "../ImageCrop/ui";
 import { useEditProfile } from "@/hooks/users/useEditProfile";
 import AvatarSection from "./avatar";
 import FollowInviteSection from "./followInvite";
+import ViewPermissionsSection from "@/components/partials/common/ViewPermissionsSection";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
@@ -85,7 +86,7 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                 <div className="flex items-start gap-3 rounded-xl border border-bpim-danger/30 bg-bpim-danger/8 px-4 py-3 text-bpim-danger">
                   <LogOut className="mt-0.5 h-4 w-4 shrink-0" />
                   <div className="flex flex-1 flex-wrap items-center justify-between gap-x-4 gap-y-1">
-                    <p className="text-sm font-medium">
+                    <p className="text-sm font-bold">
                       {t("settings.profile.wrongAccountAlert")}
                     </p>
                     <button
@@ -285,6 +286,9 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
               </div>
 
               {!formData.isPublic && <FollowInviteSection />}
+              {!formData.isPublic && (
+                <ViewPermissionsSection className="rounded-xl border border-bpim-border bg-bpim-surface-2/60 p-4" />
+              )}
             </div>
           </div>
 

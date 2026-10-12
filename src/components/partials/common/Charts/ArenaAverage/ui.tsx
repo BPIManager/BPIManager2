@@ -67,7 +67,7 @@ const ArenaRow = memo(function ArenaRow({
           <span className="truncate text-xs font-bold text-bpim-text">
             {item.title}
           </span>
-          <span className="text-[10px] font-medium text-bpim-muted uppercase tracking-tighter">
+          <span className="text-[10px] font-bold text-bpim-muted uppercase tracking-tighter">
             {item.difficulty}
           </span>
         </div>

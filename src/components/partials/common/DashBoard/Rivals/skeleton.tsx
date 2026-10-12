@@ -12,7 +12,7 @@ const RivalWinLossSummarySkeleton = () => {
             </div>
             <Skeleton className="h-2.5 w-10" />
           </div>
-          <Skeleton className="h-4.5 w-full rounded-sm" />
+          <Skeleton className="h-5 w-full rounded-sm" />
         </div>
       ))}
     </div>

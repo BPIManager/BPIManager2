@@ -60,7 +60,7 @@ const Group = ({
   children: ReactNode;
 }) => (
   <>
-    <p className={`mb-1 text-[11px] font-semibold ${titleClass}`}>{title}</p>
+    <p className={`mb-1 text-[11px] font-bold ${titleClass}`}>{title}</p>
     <div className="mb-3 grid grid-cols-2 gap-2 last:mb-0 sm:grid-cols-3">
       {children}
     </div>

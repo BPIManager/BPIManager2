@@ -77,7 +77,7 @@ function TicketCard({ state, scoreMode, onLoadMore, onSortChange }: TicketCardPr
           {result.totalBpi != null && (
             <span className="text-xs text-bpim-muted">
               {t("tickets.currentTotalBpi")}{" "}
-              <span className="font-mono font-semibold text-bpim-text">
+              <span className="font-mono font-bold text-bpim-text">
                 {result.totalBpi.toFixed(2)}
               </span>
             </span>

@@ -1,9 +1,9 @@
 import { db } from "@/lib/db";
 import { Database } from "@/types/db";
-import { Insertable, sql } from "kysely";
+import { Insertable } from "kysely";
 
-/** 1回のbulk UPSERTに含める最大行数。 */
-const UPSERT_CHUNK_SIZE = 2000;
+/** 1回のbulk INSERTに含める最大行数。 */
+const INSERT_CHUNK_SIZE = 2000;
 
 export type NewSongRankingCache = Insertable<Database["songRankingCache"]>;
 
@@ -69,23 +69,29 @@ class SongRankingCacheRepository {
   }
 
   /**
-   * ランキングキャッシュ行を`UPSERT_CHUNK_SIZE`件ずつのbulk UPSERTで書き込む。
+   * 指定バージョンのランキングキャッシュを、同一トランザクション内で全削除してから`INSERT_CHUNK_SIZE`件ずつ書き込み直す。
+   * スコアの削除（バッチ削除・再インポート等）で消えた (user, song) の古い順位・総人数が残らないようにするため、UPSERTではなく入れ替える。
+   * `rows`が空でも既存行は削除する（そのバージョンのスコアが全て無くなった場合）。
    *
-   * @param rows - 書き込み対象の行
+   * @param version - 入れ替え対象のバージョン番号
+   * @param rows - 書き込む行（全て同じバージョンの行）
    */
-  async bulkUpsert(rows: NewSongRankingCache[]): Promise<void> {
-    for (let i = 0; i < rows.length; i += UPSERT_CHUNK_SIZE) {
-      const chunk = rows.slice(i, i + UPSERT_CHUNK_SIZE);
-      await db
-        .insertInto("songRankingCache")
-        .values(chunk)
-        .onDuplicateKeyUpdate({
-          rank: sql`VALUES(\`rank\`)`,
-          totalPlayers: sql`VALUES(totalPlayers)`,
-          updatedAt: sql`NOW()`,
-        })
+  async replaceForVersion(
+    version: string,
+    rows: NewSongRankingCache[],
+  ): Promise<void> {
+    await db.transaction().execute(async (trx) => {
+      await trx
+        .deleteFrom("songRankingCache")
+        .where("version", "=", version)
         .execute();
-    }
+      for (let i = 0; i < rows.length; i += INSERT_CHUNK_SIZE) {
+        await trx
+          .insertInto("songRankingCache")
+          .values(rows.slice(i, i + INSERT_CHUNK_SIZE))
+          .execute();
+      }
+    });
   }
 
   /**

@@ -43,7 +43,7 @@ const ResultModalShell = ({
           <h2 className="text-xl font-black tracking-tight text-bpim-text uppercase">
             {title}
           </h2>
-          <p className="text-sm font-medium text-bpim-muted">{subtitle}</p>
+          <p className="text-sm font-bold text-bpim-muted">{subtitle}</p>
         </div>
 
         {children}

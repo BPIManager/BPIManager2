@@ -56,6 +56,39 @@ class FollowAccessAggregateRepository {
   }
 
   /**
+   * 承認済みのフォロワー（follows と承認記録の両方がある）を、直近の承認日時の新しい順で返す。
+   * 閲覧権限の管理画面の「承認済み」一覧に使う。承認記録が複数行ある場合は最新の承認日時を採る。
+   *
+   * @param targetUserId - 対象（承認した側）のユーザー ID
+   */
+  async listApprovedFollowers(targetUserId: string) {
+    return await db
+      .selectFrom("follows as f")
+      .innerJoin("users as u", "u.userId", "f.followerId")
+      .innerJoin("followApprovalNotifications as fan", (join) =>
+        join
+          .onRef("fan.recipientId", "=", "f.followerId")
+          .onRef("fan.actorId", "=", "f.followingId"),
+      )
+      .select([
+        "u.userId as followerId",
+        "u.userName as followerName",
+        "u.profileImage as followerImage",
+        "f.createdAt as followedAt",
+        (eb) => eb.fn.max("fan.createdAt").as("approvedAt"),
+      ])
+      .where("f.followingId", "=", targetUserId)
+      .groupBy([
+        "u.userId",
+        "u.userName",
+        "u.profileImage",
+        "f.createdAt",
+      ])
+      .orderBy("approvedAt", "desc")
+      .execute();
+  }
+
+  /**
    * {@link listUnapprovedFollowers}の件数版。通知バッジの「承認待ち件数」に使う。
    * 同様に対象ユーザーが現在非公開の場合のみカウントする。
    *

@@ -30,7 +30,7 @@ const HistoryRecordCard = ({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5 text-bpim-muted">
           <Calendar className="h-3 w-3" />
-          <span className="font-mono text-[10px] font-medium">
+          <span className="font-mono text-[10px] font-bold">
             {dayjs(record.lastPlayed).tz().format("YYYY/MM/DD HH:mm")}
           </span>
         </div>
@@ -63,7 +63,7 @@ const HistoryRecordCard = ({
             {record.exScore}
           </span>
           {notes != null ? (
-            <span className="font-mono text-[10px] font-medium text-bpim-muted mt-0.5">
+            <span className="font-mono text-[10px] font-bold text-bpim-muted mt-0.5">
               {((record.exScore / (notes * 2)) * 100).toFixed(1)}%{"  "}
               {record.clearState || "NO PLAY"}
             </span>

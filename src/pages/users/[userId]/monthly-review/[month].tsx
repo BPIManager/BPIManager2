@@ -130,7 +130,7 @@ export default function MonthlyReviewPage() {
     <div className="fixed left-4 top-4 z-50 flex items-center gap-2">
       <button
         onClick={() => router.back()}
-        className="flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold backdrop-blur-sm transition-colors hover:bg-white/10"
+        className="flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-bold backdrop-blur-sm transition-colors hover:bg-white/10"
         style={{
           background: "rgba(255,255,255,0.05)",
           border: "1px solid rgba(255,255,255,0.12)",
@@ -143,7 +143,7 @@ export default function MonthlyReviewPage() {
       {userIdStr && (
         <Link
           href={`/users/${userIdStr}`}
-          className="flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold backdrop-blur-sm transition-colors hover:bg-white/10"
+          className="flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-bold backdrop-blur-sm transition-colors hover:bg-white/10"
           style={{
             background: "rgba(255,255,255,0.05)",
             border: "1px solid rgba(255,255,255,0.12)",

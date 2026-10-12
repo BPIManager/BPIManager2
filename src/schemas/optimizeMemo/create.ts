@@ -9,8 +9,8 @@ const radarCategorySchema = z.enum(
 const optimizationStepSchema = z.object({
   rank: z.number(),
   songId: z.number(),
-  title: z.string(),
-  difficulty: z.string(),
+  title: z.string().max(255),
+  difficulty: z.string().max(32),
   difficultyLevel: z.number(),
   notes: z.number(),
   fromBpi: z.number(),
@@ -28,13 +28,15 @@ const optimizationStepSchema = z.object({
 const coldCategoryAdvisorySchema = z.object({
   category: radarCategorySchema,
   playedCount: z.number(),
-  suggestions: z.array(
-    z.object({
-      songId: z.number(),
-      title: z.string(),
-      difficulty: z.string(),
-    }),
-  ),
+  suggestions: z
+    .array(
+      z.object({
+        songId: z.number(),
+        title: z.string().max(255),
+        difficulty: z.string().max(32),
+      }),
+    )
+    .max(20),
 });
 
 const optimizationResultSchema = z.object({
@@ -51,7 +53,8 @@ const optimizationResultSchema = z.object({
 });
 
 export const createOptimizeMemoBodySchema = z.object({
-  targetBpi: z.number(),
+  // UIの入力範囲（-15〜100）に合わせる
+  targetBpi: z.number().min(-15).max(100),
   reportData: optimizationResultSchema,
   kind: z.enum(["auto", "custom"]).optional(),
 });

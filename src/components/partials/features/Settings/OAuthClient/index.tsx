@@ -23,7 +23,7 @@ export default function OAuthClientUi() {
         <p className="text-sm text-bpim-muted">{t("settings.oauthClient.desc")}</p>
       </div>
       <Button className="h-9 shrink-0 rounded-lg px-6 font-bold" onClick={() => setIsOpen(true)}>
-        {t("settings.oauthClient.manage")}
+        {t("common.manage")}
       </Button>
 
       <OAuthClientModal open={isOpen} onOpenChange={setIsOpen} />
