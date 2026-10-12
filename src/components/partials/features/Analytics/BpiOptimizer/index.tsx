@@ -15,12 +15,13 @@ import { useBpiOptimizerSection } from "./useBpiOptimizerSection";
 import { OptimizerCreateDrawer } from "./OptimizerCreateDrawer";
 
 const BpiOptimizerSection = () => {
-  const { closeDrawer, considerCurrentTotalBpi, creationMode, currentBpis, currentScores, currentTotalBpi, customFooterState, datasetVersion, deleteMemo, editingLoadingId, editingMemo, fbUser, guardNavigation, handleApplyDataset, handleApplySingleBpiTarget, handleEditMemo, handleKeyDown, handleSave, handleSubmit, importedTargets, inputError, isDatasetApplying, isDatasetPickerOpen, isDeleting, isDrawerOpen, isImportModalOpen, isLoading, isSaving, isSingleBpiTargetApplying, isSingleBpiTargetOpen, liveCurrentTotalBpi, maxStepsInput, memos, pendingNavigation, radarElements, resetCustomCreationState, result, resultRef, savedResult, searchMode, setConsiderCurrentTotalBpi, setCreationMode, setCustomFooterState, setDatasetVersion, setImportedTargets, setIsCustomDirty, setIsDatasetPickerOpen, setIsDrawerOpen, setIsImportModalOpen, setIsSingleBpiTargetOpen, setMaxStepsInput, setPendingNavigation, setSearchMode, setTargetBpiInput, strategies, strongRadarCategories, t, targetBpiInput, toggleRadarElement, toggleStrategy, user, weakRadarCategories } = useBpiOptimizerSection();
+  const { deepLinkMemoId, importInitialReportId, closeDrawer, considerCurrentTotalBpi, creationMode, currentBpis, currentScores, currentTotalBpi, customFooterState, datasetVersion, deleteMemo, editingLoadingId, editingMemo, fbUser, guardNavigation, handleApplyDataset, handleApplySingleBpiTarget, handleEditMemo, handleKeyDown, handleSave, handleSubmit, importedTargets, inputError, isDatasetApplying, isDatasetPickerOpen, isDeleting, isDrawerOpen, isImportModalOpen, isLoading, isSaving, isSingleBpiTargetApplying, isSingleBpiTargetOpen, liveCurrentTotalBpi, maxStepsInput, memos, pendingNavigation, radarElements, resetCustomCreationState, result, resultRef, savedResult, searchMode, setConsiderCurrentTotalBpi, setCreationMode, setCustomFooterState, setDatasetVersion, setImportedTargets, setIsCustomDirty, setIsDatasetPickerOpen, setIsDrawerOpen, setIsImportModalOpen, setIsSingleBpiTargetOpen, setMaxStepsInput, setPendingNavigation, setSearchMode, setTargetBpiInput, strategies, strongRadarCategories, t, targetBpiInput, toggleRadarElement, toggleStrategy, user, weakRadarCategories } = useBpiOptimizerSection();
   return (
     <div className="flex flex-col gap-6">
       {memos && (
         <SavedMemoList
           memos={memos}
+          initialOpenMemoId={deepLinkMemoId}
           currentScores={currentScores}
           currentBpis={currentBpis}
           liveCurrentTotalBpi={liveCurrentTotalBpi}
@@ -64,6 +65,7 @@ const BpiOptimizerSection = () => {
         onClose={() => setIsImportModalOpen(false)}
         userId={user?.userId}
         fbUser={fbUser}
+        initialReportId={importInitialReportId}
         onImported={(targets) => {
           setImportedTargets(targets);
           setIsImportModalOpen(false);
