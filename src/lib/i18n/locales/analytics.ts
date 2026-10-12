@@ -617,6 +617,12 @@ export const analyticsTranslations = {
     "zh-TW": "複製",
     ko: "복사",
   },
+  "optimizer.memo.copyLink": {
+    ja: "共有リンクをコピー",
+    en: "Copy share link",
+    "zh-TW": "複製分享連結",
+    ko: "공유 링크 복사",
+  },
   "optimizer.memo.copied": {
     ja: "コピーしました",
     en: "Copied",

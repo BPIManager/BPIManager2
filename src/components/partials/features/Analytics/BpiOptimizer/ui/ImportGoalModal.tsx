@@ -23,16 +23,24 @@ const ImportGoalModal = ({
   onClose,
   userId,
   fbUser,
+  initialReportId,
   onImported,
 }: {
   isOpen: boolean;
   onClose: () => void;
   userId?: string;
   fbUser?: FirebaseUser | null;
+  /** ディープリンクで渡されたreportId（入力欄の初期値） */
+  initialReportId?: string;
   onImported: (targets: ImportedGoalTarget[]) => void;
 }) => {
   const { t } = useTranslation();
-  const [reportId, setReportId] = useState("");
+  const [reportId, setReportId] = useState(initialReportId ?? "");
+  const [prevInitial, setPrevInitial] = useState(initialReportId);
+  if (initialReportId !== prevInitial) {
+    setPrevInitial(initialReportId);
+    setReportId(initialReportId ?? "");
+  }
   const [isLoading, setIsLoading] = useState(false);
 
   const handleImport = async () => {

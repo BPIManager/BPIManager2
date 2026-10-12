@@ -12,6 +12,7 @@ import { useUser } from "@/contexts/users/UserContext";
 import { useUserScores } from "@/hooks/table/useUserScores";
 import { useTotalBpiStats } from "@/hooks/stats/useCurrentTotalBpi";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/router";
 import type { OptimizationResult } from "@/types/bpi-optimizer";
 import type { RadarCategory } from "@/types/stats/radar";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
@@ -101,6 +102,8 @@ const [savedResult, setSavedResult] = useState<OptimizationResult | null>(
 const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 const [creationMode, setCreationMode] = useState<CreationMode>("select");
 const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+const [importInitialReportId, setImportInitialReportId] = useState("");
+const [deepLinkMemoId, setDeepLinkMemoId] = useState<string | null>(null);
 const [importedTargets, setImportedTargets] = useState<
   ImportedGoalTarget[] | undefined
 >(undefined);
@@ -262,6 +265,37 @@ const autoHasUnsavedChanges =
 const customHasUnsavedChanges = creationMode === "custom" && isCustomDirty;
 const hasUnsavedCreation = autoHasUnsavedChanges || customHasUnsavedChanges;
 
+// ブラウザタブを閉じる・URL直接遷移など、アプリ外への離脱でも未保存の作成内容を確認する
+useEffect(() => {
+  if (!hasUnsavedCreation) return;
+  const handler = (e: BeforeUnloadEvent) => {
+    e.preventDefault();
+    e.returnValue = "";
+  };
+  window.addEventListener("beforeunload", handler);
+  return () => window.removeEventListener("beforeunload", handler);
+}, [hasUnsavedCreation]);
+
+// ?goal=<reportId> は自分の目標なら詳細を開き、他ユーザーの目標ならインポートモーダルに案内する。処理後はクエリを外す
+const router = useRouter();
+const goalParam =
+  typeof router.query.goal === "string" ? router.query.goal : null;
+useEffect(() => {
+  if (!router.isReady || !goalParam || !memos) return;
+  if (memos.some((m) => m.reportId === goalParam)) {
+    setDeepLinkMemoId(goalParam);
+  } else {
+    setImportInitialReportId(goalParam);
+    setIsImportModalOpen(true);
+  }
+  const { goal: _goal, ...rest } = router.query;
+  void _goal;
+  router.replace({ pathname: router.pathname, query: rest }, undefined, {
+    shallow: true,
+  });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [router.isReady, goalParam, memos]);
+
 const guardNavigation = useCallback(
   (action: () => void) => {
     if (hasUnsavedCreation) {
@@ -299,6 +333,7 @@ useEffect(() => {
     currentTotalBpi,
     customFooterState,
     datasetVersion,
+    deepLinkMemoId,
     deleteMemo,
     editingLoadingId,
     editingMemo,
@@ -311,6 +346,7 @@ useEffect(() => {
     handleSave,
     handleSubmit,
     importedTargets,
+    importInitialReportId,
     inputError,
     isDatasetApplying,
     isDatasetPickerOpen,

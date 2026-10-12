@@ -61,6 +61,7 @@ const SavedMemoList = ({
   onEdit,
   isEditLoadingId,
   headerAction,
+  initialOpenMemoId,
 }: {
   memos: OptimizeMemoResponse[];
   currentScores: Map<number, number | null>;
@@ -74,10 +75,17 @@ const SavedMemoList = ({
   isEditLoadingId?: string | null;
   /** 一覧上部、ステータスタブの下に右寄せで表示するアクション（「新規作成」ボタン等） */
   headerAction?: ReactNode;
+  /** ディープリンク（?goal=）で開く目標のreportId */
+  initialOpenMemoId?: string | null;
 }) => {
   const { t, tFormat } = useTranslation();
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [openMemoId, setOpenMemoId] = useState<string | null>(null);
+  const [prevInitial, setPrevInitial] = useState<string | null>(null);
+  if (initialOpenMemoId && initialOpenMemoId !== prevInitial) {
+    setPrevInitial(initialOpenMemoId);
+    setOpenMemoId(initialOpenMemoId);
+  }
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
 
   const visibleMemos = memos.filter((memo) => {
