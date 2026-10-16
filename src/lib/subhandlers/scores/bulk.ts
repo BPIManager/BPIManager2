@@ -198,9 +198,7 @@ async function recordUnmatchedSongs(
   songs: { title: string; difficulty: string }[],
 ) {
   try {
-    await unmatchedImportSongsRepo.recordMany(
-      songs.slice(0, MAX_RECORDED_UNMATCHED),
-    );
+    await unmatchedImportSongsRepo.recordMany(songs, MAX_RECORDED_UNMATCHED);
   } catch (error: unknown) {
     console.error("Failed to record unmatched import songs:", error);
   }

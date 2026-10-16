@@ -13,18 +13,21 @@ export interface UnmatchedImportSong {
 class UnmatchedImportSongsRepository {
   /**
    * 該当曲が無かった行を記録する。既存の (title, difficulty) は hitCount を加算する。
-   * 同一キーはまとめて1回分とし、デッドロック回避のためキー順に挿入する。
+   * 同一キーはまとめて1回分とし、重複除去後の先頭 limit 件をデッドロック回避のためキー順に挿入する。
    *
    * @param songs - 該当曲が無かったタイトルと難易度
+   * @param limit - 1回で記録する件数の上限（重複除去後）
    */
-  async recordMany(songs: UnmatchedImportSong[]) {
+  async recordMany(songs: UnmatchedImportSong[], limit: number) {
+    const compare = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0);
     const unique = [
       ...new Map(songs.map((s) => [`${s.title}\u0000${s.difficulty}`, s])).values(),
-    ].sort(
-      (a, b) =>
-        a.title.localeCompare(b.title) ||
-        a.difficulty.localeCompare(b.difficulty),
-    );
+    ]
+      .slice(0, limit)
+      .sort(
+        (a, b) =>
+          compare(a.title, b.title) || compare(a.difficulty, b.difficulty),
+      );
     if (unique.length === 0) return;
 
     await db

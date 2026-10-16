@@ -467,7 +467,7 @@ CREATE TABLE IF NOT EXISTS `topRankers` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `unmatchedImportSongs` (
-  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'インポートCSV上の表記そのまま(表記ゆれを区別するため大文字小文字・全半角を区別する)',
+  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_nopad_bin NOT NULL COMMENT 'インポートCSV上の表記そのまま(大文字小文字・全半角・末尾の空白まで区別する)',
   `difficulty` varchar(24) NOT NULL,
   `hitCount` int(10) unsigned NOT NULL DEFAULT 1 COMMENT 'allSongsに該当が無かったインポートの回数',
   `firstSeenAt` timestamp NOT NULL DEFAULT current_timestamp(),
