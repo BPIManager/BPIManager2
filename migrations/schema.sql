@@ -466,6 +466,15 @@ CREATE TABLE IF NOT EXISTS `topRankers` (
   KEY `idx_topRankers_iidxId` (`iidxId`,`version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `unmatchedImportSongs` (
+  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_nopad_bin NOT NULL COMMENT 'インポートCSV上の表記そのまま(大文字小文字・全半角・末尾の空白まで区別する)',
+  `difficulty` varchar(24) NOT NULL,
+  `hitCount` int(10) unsigned NOT NULL DEFAULT 1 COMMENT 'allSongsに該当が無かったインポートの回数',
+  `firstSeenAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  `lastSeenAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`title`,`difficulty`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `userRadarCache` (
   `userId` varchar(128) NOT NULL,
   `version` varchar(20) NOT NULL,

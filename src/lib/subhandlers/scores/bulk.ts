@@ -5,6 +5,7 @@ import { allScoresRepo } from "@/lib/db/domains/allScores";
 import { logTotalBpiRepo } from "@/lib/db/domains/logs/totalBpi";
 import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { allSongsRepo } from "@/lib/db/domains/allSongs";
+import { unmatchedImportSongsRepo } from "@/lib/db/domains/unmatchedImportSongs";
 import { saveImportResults } from "@/lib/db/orchestrators/bpiImport";
 import { withUserWriteLock } from "@/lib/db/orchestrators/userWriteTransaction";
 import { BpiCalculator } from "@/lib/bpi";
@@ -36,11 +37,12 @@ export async function handleScoresBulk(
   const { version, csvRows } = parsed.data;
   const userId = viewerId;
   const batchId = uuidv4();
+  let unmatched: { title: string; difficulty: string }[] = [];
 
   try {
     // 読み取りから保存までを、ユーザーの書き込みロックを取った1つのトランザクションで行う。
     // ロック取得後に読むため、並行する保存（手動・MCP・インポート）の結果を必ず基準にできる
-    return await withUserWriteLock(userId, async (trx) => {
+    const outcome = await withUserWriteLock(userId, async (trx) => {
     const [
       bpiSongMaster,
       allLevelMaster,
@@ -70,6 +72,7 @@ export async function handleScoresBulk(
     const notFound: { title: string; difficulty: string }[] = [];
     const invalidScore: { title: string; difficulty: string; exScore: number }[] =
       [];
+    unmatched = notFound;
     const previousTotalBpi = lastLog?.totalBpi ?? -15;
 
     const lastPlayedDate = (dateStr: string | null) =>
@@ -180,8 +183,24 @@ export async function handleScoresBulk(
       ...base,
     };
     });
+
+    await recordUnmatchedSongs(unmatched);
+    return outcome;
   } catch (error: unknown) {
     return { result: err(500, toErrorMessage(error)), ...base };
+  }
+}
+
+const MAX_RECORDED_UNMATCHED = 500;
+
+// 集計用の付随処理のため、失敗してもインポート結果には影響させない
+async function recordUnmatchedSongs(
+  songs: { title: string; difficulty: string }[],
+) {
+  try {
+    await unmatchedImportSongsRepo.recordMany(songs, MAX_RECORDED_UNMATCHED);
+  } catch (error: unknown) {
+    console.error("Failed to record unmatched import songs:", error);
   }
 }
 

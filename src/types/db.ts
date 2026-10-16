@@ -24,6 +24,7 @@ export interface Database {
   allScores: AllScoresTable;
   discordLinks: DiscordLinks;
   userEmailHashes: UserEmailHashes;
+  unmatchedImportSongs: UnmatchedImportSongs;
   announcements: Announcements;
   announcementReads: AnnouncementReads;
   // 曲別データを正規化した新テーブル(#optimize-memo-normalized-tables)。
@@ -277,6 +278,14 @@ export interface UserEmailHashes {
   emailHash: string;
   linkedAt: Generated<Date>;
   userId: string;
+}
+
+export interface UnmatchedImportSongs {
+  difficulty: string;
+  firstSeenAt: Generated<Date>;
+  hitCount: Generated<number>;
+  lastSeenAt: Generated<Date>;
+  title: string;
 }
 
 export interface UserRoles {
