@@ -10,8 +10,8 @@ import { BpiDistributionSection } from "@/components/partials/common/DashBoard/B
 import BpmBpiDistributionSection from "@/components/partials/common/DashBoard/BpmBpiDistribution";
 import { FilterProvider } from "@/contexts/stats/FilterContext";
 import { PageContainer, PageHeader } from "@/components/partials/common/PageChrome/Header";
-import RankingTabsCard from "@/components/partials/common/DashBoard/RecommendedCard/ui";
-import RadarSection from "@/components/partials/common/DashBoard/Radar/ui";
+import RankingTabsCard from "@/components/partials/common/DashBoard/RecommendedCard";
+import RadarSection from "@/components/partials/common/DashBoard/Radar/RadarSection";
 import RivalWinLossSummary from "@/components/partials/common/DashBoard/Rivals";
 import BpiHistorySection from "@/components/partials/common/DashBoard/TotalBPIHistory";
 import BpiBoxStatsSection from "@/components/partials/common/DashBoard/BpiBoxStats";

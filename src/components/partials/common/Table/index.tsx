@@ -16,6 +16,8 @@ import SongListSkeleton from "./skeleton";
 import AdvancedFilterModal from "@/components/partials/common/Songs/AdvancedFilter/ui";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import { useUser } from "@/contexts/users/UserContext";
+import { useProfile } from "@/hooks/users/useProfile";
 
 const SongsTable = ({
   userId,
@@ -25,6 +27,9 @@ const SongsTable = ({
   version?: string;
 }) => {
   const { t } = useTranslation();
+  const { fbUser } = useUser();
+  const { profile } = useProfile(userId);
+  const isOtherUser = !!userId && !!fbUser && userId !== fbUser.uid;
   const [selectedSong, setSelectedSong] = useState<SongWithScore | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
@@ -133,6 +138,12 @@ const SongsTable = ({
           version={currentVersion}
           songDomain="bpi"
           onSaved={() => refresh()}
+          subjectUser={
+            isOtherUser
+              ? { userId, userName: profile?.userName ?? "" }
+              : undefined
+          }
+          scoreOwnerId={userId}
         />
       )}
 

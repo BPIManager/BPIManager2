@@ -18,6 +18,10 @@ export interface GlobalRankingResponse {
 }
 
 export interface SongRankingEntry {
+  /** 比較対象のラベル。指定時は「あなた」等の位置にこのラベルを出す */
+  tag?: { label: string; color: string };
+  /** ユーザーに紐づかない比較対象（アリーナ平均等）。タップで遷移しない */
+  isVirtual?: boolean;
   rank: number;
   userId: string;
   userName: string;

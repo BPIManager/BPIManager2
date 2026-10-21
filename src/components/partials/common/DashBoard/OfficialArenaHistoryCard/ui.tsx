@@ -5,7 +5,7 @@ import { useTranslation } from "@/hooks/common/useTranslation";
 import dayjs from "@/lib/dayjs";
 import ArenaChart from "./chart";
 import ActivePlayers from "./ActivePlayers";
-import { useActiveArenaPlayers } from "@/hooks/arena/useActiveArenaPlayers";
+import type { ComponentProps } from "react";
 import {
   type Granularity,
   type ArenaHistoryState,
@@ -96,6 +96,9 @@ export interface OfficialArenaHistoryCardUIProps {
   onSelectIndex: (i: number) => void;
   dataLoading: boolean;
   state: ArenaHistoryState;
+  /** 選択中のイベントが開催中か */
+  isLive: boolean;
+  activePlayers: ComponentProps<typeof ActivePlayers>;
   showActivePlayers?: boolean;
 }
 
@@ -106,6 +109,8 @@ const OfficialArenaHistoryCardUI = ({
   onSelectIndex,
   dataLoading,
   state,
+  isLive,
+  activePlayers,
   showActivePlayers = false,
 }: OfficialArenaHistoryCardUIProps) => {
   const { t } = useTranslation();
@@ -124,19 +129,6 @@ const OfficialArenaHistoryCardUI = ({
 
   const events = metadata?.events ?? [];
   const selectedEvent: ArenaEventEntry | undefined = events[selectedIndex];
-
-  // eslint-disable-next-line react-hooks/purity -- 現在時刻とイベント開催期間を比較してライブ判定するため意図的にDate.now()を都度評価している
-  const now = Date.now();
-  const isLive =
-    !!selectedEvent &&
-    now >= new Date(selectedEvent.start).getTime() &&
-    now <= new Date(selectedEvent.end).getTime();
-
-  const version = metadata?.version ?? "";
-  const { data: activeData, isLoading: activeLoading } = useActiveArenaPlayers(
-    version,
-    isLive,
-  );
 
   const GRANULARITY_OPTIONS: { id: Granularity; label: string }[] = [
     { id: "day", label: t("dashboard.arenaHistory.granularity.day") },
@@ -266,7 +258,7 @@ const OfficialArenaHistoryCardUI = ({
         />
       )}
 
-      {isLive && showActivePlayers && <ActivePlayers data={activeData} isLoading={activeLoading} />}
+      {isLive && showActivePlayers && <ActivePlayers {...activePlayers} />}
     </DashCard>
   );
 };

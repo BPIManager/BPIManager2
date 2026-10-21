@@ -1,15 +1,12 @@
 "use client";
 
-import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import ArenaClassBadge from "@/components/partials/common/Badge/ArenaClassBadge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { Search, ChevronRight, Check } from "lucide-react";
-import { useUser } from "@/contexts/users/UserContext";
-import { useRivalSummary } from "@/hooks/social/useRivalSummary";
-import { latestVersion } from "@/constants/iidx/iidxVersions";
+import type { RivalSummaryResult } from "@/types/social/rival";
 import { getBpiColorStyle } from "@/constants/theme/bpiColor";
 import { formatIIDXId } from "@/utils/common/formatIidxId";
 import { useTranslation } from "@/hooks/common/useTranslation";
@@ -18,12 +15,7 @@ import {
   PAST_VERSIONS,
   type KindOption,
 } from "@/hooks/analytics/useTargetSelector";
-import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
-import {
-  TOP_RANKER_AREA_NAMES,
-  TOP_RANKER_VERSIONS,
-} from "@/constants/iidx/topRankerAreas";
-import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
+import { TOP_RANKER_AREA_NAMES } from "@/constants/iidx/topRankerAreas";
 
 // KindCard: 目標種別を選ぶボタン
 
@@ -32,6 +24,8 @@ interface KindCardProps {
   label: string;
   description: string;
   selected: boolean;
+  /** 選択後にさらに次の選択肢が出る項目 */
+  hasNext?: boolean;
   onClick: () => void;
 }
 
@@ -40,6 +34,7 @@ export const KindCard = ({
   label,
   description,
   selected,
+  hasNext,
   onClick,
 }: KindCardProps) => (
   <button
@@ -70,7 +65,11 @@ export const KindCard = ({
       <p className="font-bold text-bpim-text text-sm">{label}</p>
       <p className="text-xs text-bpim-muted mt-0.5">{description}</p>
     </div>
-    {selected && <Check className="h-4 w-4 shrink-0 text-bpim-primary" />}
+    {hasNext ? (
+      <ChevronRight className="h-4 w-4 shrink-0 text-bpim-muted" />
+    ) : (
+      selected && <Check className="h-4 w-4 shrink-0 text-bpim-primary" />
+    )}
   </button>
 );
 
@@ -93,33 +92,29 @@ export const KindStep = ({
         label={opt.label}
         description={opt.description}
         selected={selectedKind === opt.kind}
+        hasNext={opt.nextStep !== "kind"}
         onClick={() => onKindClick(opt)}
       />
     ))}
   </>
 );
 
-// RivalPickStep: ライバル検索の一覧
+// RivalPickList: ライバル検索の一覧
 
-export const RivalPickStep = ({
+export const RivalPickList = ({
+  rivals,
+  isLoading,
+  search,
+  onSearchChange,
   onSelect,
 }: {
+  rivals: RivalSummaryResult[];
+  isLoading: boolean;
+  search: string;
+  onSearchChange: (value: string) => void;
   onSelect: (userId: string, name: string) => void;
 }) => {
-  const { user } = useUser();
   const { t } = useTranslation();
-  const [search, setSearch] = useState("");
-
-  const { rivals, isLoading } = useRivalSummary({
-    userId: user?.userId || false,
-    levels: ["11", "12"],
-    difficulties: IIDX_DIFFICULTIES,
-    version: latestVersion,
-  });
-
-  const filtered = rivals.filter((r) =>
-    r.userName.toLowerCase().includes(search.toLowerCase()),
-  );
 
   return (
     <div className="flex flex-col gap-3">
@@ -127,7 +122,7 @@ export const RivalPickStep = ({
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-bpim-muted" />
         <Input
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => onSearchChange(e.target.value)}
           placeholder={t("analytics.searchRivals")}
           className="pl-9 bg-bpim-bg border-bpim-border text-bpim-text placeholder:text-bpim-muted focus-visible:ring-bpim-primary"
         />
@@ -141,12 +136,12 @@ export const RivalPickStep = ({
               className="h-16 w-full rounded-xl bg-bpim-surface"
             />
           ))
-        ) : filtered.length === 0 ? (
+        ) : rivals.length === 0 ? (
           <div className="flex h-24 items-center justify-center text-sm text-bpim-muted">
             {t("analytics.noRivalsFound")}
           </div>
         ) : (
-          filtered.map((rival) => {
+          rivals.map((rival) => {
             const bpiStyle = getBpiColorStyle(rival.totalBpi ?? -15);
             return (
               <button
@@ -213,7 +208,7 @@ export const ArenaRankStep = ({
         )}
       >
         <span className="font-bold text-sm text-bpim-text">{r.label}</span>
-        {selected === r.id && <Check className="h-4 w-4 text-bpim-primary" />}
+        <ChevronRight className="h-4 w-4 text-bpim-muted" />
       </button>
     ))}
   </div>
@@ -268,17 +263,24 @@ const OptionButton = ({
   label,
   sub,
   selected,
+  hasNext,
+  disabled,
   onClick,
 }: {
   label: string;
   sub?: string;
   selected: boolean;
+  hasNext?: boolean;
+  disabled?: boolean;
   onClick: () => void;
 }) => (
   <button
     onClick={onClick}
+    disabled={disabled}
     className={cn(
       "flex items-center justify-between rounded-xl border-2 px-4 py-3 text-left transition-all hover:scale-[1.01]",
+      disabled &&
+        "pointer-events-none cursor-not-allowed border-bpim-border opacity-40 hover:scale-100",
       selected
         ? "border-bpim-primary bg-bpim-surface shadow-[0_0_0_3px] shadow-bpim-primary/20"
         : "border-bpim-border bg-bpim-surface hover:border-bpim-primary/50",
@@ -292,27 +294,12 @@ const OptionButton = ({
         </span>
       )}
     </div>
-    {selected && <Check className="h-4 w-4 text-bpim-primary shrink-0" />}
+    {hasNext ? (
+      <ChevronRight className="h-4 w-4 text-bpim-muted shrink-0" />
+    ) : (
+      selected && <Check className="h-4 w-4 text-bpim-primary shrink-0" />
+    )}
   </button>
-);
-
-export const TopRankerVersionStep = ({
-  selected,
-  onSelect,
-}: {
-  selected: string;
-  onSelect: (version: string) => void;
-}) => (
-  <div className="flex max-h-80 flex-col gap-2 overflow-y-auto pr-1">
-    {[...TOP_RANKER_VERSIONS].reverse().map((v) => (
-      <OptionButton
-        key={v}
-        label={getVersionNameFromNumber(v)}
-        selected={selected === v}
-        onClick={() => onSelect(v)}
-      />
-    ))}
-  </div>
 );
 
 export const TopRankerAreaStep = ({
@@ -328,8 +315,36 @@ export const TopRankerAreaStep = ({
         key={areaId}
         label={name}
         selected={selected === areaId}
+        hasNext
         onClick={() => onSelect(areaId)}
       />
     ))}
   </div>
 );
+
+// VersionPickStep: 比較先データのバージョン選択
+
+export const VersionPickStep = ({
+  versions,
+  availableVersions,
+  onSelect,
+}: {
+  versions: { num: string; title: string }[];
+  /** 指定時は、ここに含まれないバージョンをグレーアウトして選択不可にする（読み込み中は undefined） */
+  availableVersions?: string[];
+  onSelect: (version: string) => void;
+}) => {
+  return (
+    <div className="flex max-h-80 flex-col gap-2 overflow-y-auto pr-1">
+      {versions.map((v) => (
+        <OptionButton
+          key={v.num}
+          label={v.title}
+          selected={false}
+          disabled={!!availableVersions && !availableVersions.includes(v.num)}
+          onClick={() => onSelect(v.num)}
+        />
+      ))}
+    </div>
+  );
+};

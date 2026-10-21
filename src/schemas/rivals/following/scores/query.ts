@@ -7,6 +7,10 @@ export const rivalFollowingScoresQuerySchema = rivalScoresQuerySchema
   .omit({ rivalId: true })
   .extend({
     songId: z.coerce.number().int(),
+    /** フォロー外でも結果に含めるユーザー(ライバルページで表示中の相手・自分) */
+    includeUserIds: z
+      .preprocess(parseArray, z.array(z.string().min(1)).max(8))
+      .default([]),
   });
 
 export const scoreComparisonQuerySchema = z.object({

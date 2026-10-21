@@ -6,7 +6,7 @@ import { PageContainer } from "@/components/partials/common/PageChrome/Header";
 import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
 import { Lock, UserMinus } from "lucide-react";
 import ModeSwitchBanner from "@/components/partials/common/Rivals/ModeSwitch/ui";
-import ProfileSideBar from "@/components/partials/common/Profile/Sidebar/ui";
+import ProfileSideBar from "@/components/partials/common/Profile/Sidebar";
 import { ProfileProvider } from "@/contexts/profile/ProfileContext";
 import { FilterProvider } from "@/contexts/stats/FilterContext";
 import { PageLoader } from "@/components/ui/loading-spinner";

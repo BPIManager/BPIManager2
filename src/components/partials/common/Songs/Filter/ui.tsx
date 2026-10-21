@@ -116,6 +116,11 @@ const SongFilterBar = ({
      // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [withRivals, withScoreRate, hasCompare, excludeSortKeys, targetCount, t]);
 
+  // 比較系の選択肢に "bpi" は無く、並び順が同じ "myBpi" として表示する
+  const currentSortKey = params.sortKey || "bpi";
+  const sortSelectValue =
+    withRivals && currentSortKey === "bpi" ? "myBpi" : currentSortKey;
+
   return (
     <FilterBarContainer totalCount={totalCount}>
       <div className="flex w-full gap-2 mb-3 flex-wrap">
@@ -134,7 +139,7 @@ const SongFilterBar = ({
           />
         )}
         <FilterSelect
-          value={params.sortKey || "bpi"}
+          value={sortSelectValue}
           onValueChange={(val) =>
             onParamsChange({
               sortKey: val as FilterParamsFrontend["sortKey"],

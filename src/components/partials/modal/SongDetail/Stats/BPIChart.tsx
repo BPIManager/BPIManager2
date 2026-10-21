@@ -22,8 +22,13 @@ import { useChartColors } from "@/hooks/common/useChartColors";
 
 interface ChartDataItem {
   label: string;
+  name?: string;
   count: number;
   bpi: number;
+  kind?: "you" | "target";
+  color?: string;
+  /** X軸に出す短縮表記。未指定なら label をそのまま出す */
+  tick?: string;
 }
 
 interface BPIAnimatedChartProps {
@@ -63,17 +68,43 @@ interface CustomTooltipProps extends TooltipProps<number, string> {
   refLabel?: string;
 }
 
+interface AxisTickProps {
+  x?: string | number;
+  y?: string | number;
+  payload?: { value: string };
+  chartData: ChartDataItem[];
+  mutedColor: string;
+}
+
+const AxisTick = ({ x, y, payload, chartData, mutedColor }: AxisTickProps) => {
+  if (x === undefined || y === undefined || !payload) return null;
+  const item = chartData.find((d) => d.label === payload.value);
+  return (
+    <text
+      x={Number(x)}
+      y={Number(y) + 12}
+      textAnchor="middle"
+      fill={item?.color ?? mutedColor}
+      fontSize={10}
+      fontWeight="bold"
+    >
+      {item?.tick ?? payload.value}
+    </text>
+  );
+};
+
 const CustomBarShape = (props: CustomBarProps) => {
   const { x, y, index, payload, c, animate } = props;
   if (!payload || x === undefined || y === undefined) return null;
 
-  const isYou = payload.label === "YOU";
+  const isYou = payload.kind === "you";
+  const isTarget = payload.kind === "target";
 
   return (
     <Rectangle
       {...props}
-      fill={isYou ? c.warning : c.primary}
-      fillOpacity={isYou ? 1 : 0.5}
+      fill={isYou ? c.warning : isTarget ? payload.color : c.primary}
+      fillOpacity={isYou || isTarget ? 1 : 0.5}
       radius={[4, 4, 0, 0]}
       style={
         animate
@@ -102,7 +133,7 @@ const DataLabel = (props: CustomLabelProps) => {
 
   const item = chartData[index];
   const value = item.count;
-  const isYou = item.label === "YOU";
+  const isYou = item.kind === "you";
   const _x = Number(x);
   const _y = Number(y);
   const _width = Number(width);
@@ -115,7 +146,7 @@ const DataLabel = (props: CustomLabelProps) => {
       <text
         x={_x + _width / 2}
         y={_y - 18}
-        fill={isYou ? "#fbbf24" : "#3b82f6"}
+        fill={isYou ? "#fbbf24" : (item.color ?? "#3b82f6")}
         textAnchor="middle"
         className="text-[10px] font-bold font-mono"
       >
@@ -151,7 +182,8 @@ const ChartTooltip = ({
   if (!data) return null;
 
   const score = data.count;
-  const isYou = data.label === "YOU";
+  const isYou = data.kind === "you";
+  const isTarget = data.kind === "target";
   const rate = ((score / maxScore) * 100).toFixed(2);
   const diff = score - youScore;
   const refDiff = isYou && refScore != null ? score - refScore : null;
@@ -160,7 +192,11 @@ const ChartTooltip = ({
     <div className="rounded-lg border border-bpim-border bg-bpim-surface/90 p-3 shadow-2xl backdrop-blur-md">
       <div className="flex flex-col gap-1.5">
         <p className="text-[10px] tracking-widest text-bpim-primary">
-          {isYou ? `BPI: ${data.bpi.toFixed(2)}` : `TARGET BPI: ${data.label}`}
+          {isYou
+            ? `BPI: ${data.bpi.toFixed(2)}`
+            : isTarget
+              ? `${data.name ?? data.label} BPI: ${data.bpi.toFixed(2)}`
+              : `TARGET BPI: ${data.label}`}
         </p>
         <Separator className="bg-bpim-overlay/60" />
         <div className="flex flex-col gap-0.5">
@@ -216,13 +252,13 @@ export const BPIChart = ({
   const chartData = useMemo(() => {
     return [...data].sort((a, b) => {
       const getVal = (d: ChartDataItem) =>
-        d.label === "YOU" ? d.bpi : parseFloat(d.label);
+        d.kind ? d.bpi : parseFloat(d.label);
       return getVal(b) - getVal(a);
     });
   }, [data]);
 
   const youScore = useMemo(
-    () => data.find((d) => d.label === "YOU")?.count ?? 0,
+    () => data.find((d) => d.kind === "you")?.count ?? 0,
     [data],
   );
 
@@ -243,89 +279,114 @@ export const BPIChart = ({
       .filter((b) => b.score > yMin);
   }, [maxScore, yMin]);
 
+  const legend = chartData.filter(
+    (d) => d.kind === "target" && d.tick && d.tick !== d.label,
+  );
+
   return (
-    <div className="h-85 w-full">
-      <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={chartData} margin={{ top: 36, right: 16, left: 16 }}>
-          <XAxis
-            dataKey="label"
-            axisLine={false}
-            tickLine={false}
-            tick={{ fill: c.muted, fontSize: 10, fontWeight: "bold" }}
-            interval={0}
-          />
-          <YAxis domain={[yMin, maxScore]} hide />
-
-          <Tooltip
-            content={(props) => (
-              <ChartTooltip
-                active={props.active}
-                label={props.label}
-                chartData={chartData}
-                youScore={youScore}
-                maxScore={maxScore}
-                refScore={refScore}
-                refLabel={refLabel}
-              />
-            )}
-            cursor={{ fill: c.primaryRgba(0.04) }}
-            isAnimationActive={false}
-          />
-
-          {borders.map((b) => (
-            <ReferenceLine
-              key={b.label}
-              y={b.score}
-              stroke={c.warning}
-              strokeOpacity={0.2}
-              strokeDasharray="4 4"
-            >
-              <RechartsLabel
-                value={b.label}
-                position="insideBottomRight"
-                fill={c.warning}
-                fontSize={9}
-                fontWeight="black"
-                dx={20}
-              />
-            </ReferenceLine>
-          ))}
-
-          {refScore != null && refScore > yMin && (
-            <ReferenceLine
-              y={refScore}
-              stroke={c.success}
-              strokeOpacity={0.7}
-              strokeDasharray="4 4"
-            >
-              <RechartsLabel
-                value={refLabel ?? "Ref"}
-                position="insideTopLeft"
-                fill={c.success}
-                fontSize={9}
-                fontWeight="black"
-                dx={20}
-              />
-            </ReferenceLine>
-          )}
-
-          <Bar dataKey="count" shape={barShape} isAnimationActive={false}>
-            <LabelList
-              dataKey="count"
-              content={(props) => (
-                <DataLabel
-                  x={props.x}
-                  y={props.y}
-                  width={props.width}
-                  index={props.index}
+    <div className="flex w-full flex-col gap-2">
+      <div className="h-85 w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={chartData} margin={{ top: 36, right: 16, left: 16 }}>
+            <XAxis
+              dataKey="label"
+              axisLine={false}
+              tickLine={false}
+              tick={(props) => (
+                <AxisTick
+                  {...props}
                   chartData={chartData}
-                  youScore={youScore}
+                  mutedColor={c.muted}
                 />
               )}
+              interval={0}
             />
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
+            <YAxis domain={[yMin, maxScore]} hide />
+
+            <Tooltip
+              content={(props) => (
+                <ChartTooltip
+                  active={props.active}
+                  label={props.label}
+                  chartData={chartData}
+                  youScore={youScore}
+                  maxScore={maxScore}
+                  refScore={refScore}
+                  refLabel={refLabel}
+                />
+              )}
+              cursor={{ fill: c.primaryRgba(0.04) }}
+              isAnimationActive={false}
+            />
+
+            {borders.map((b) => (
+              <ReferenceLine
+                key={b.label}
+                y={b.score}
+                stroke={c.warning}
+                strokeOpacity={0.2}
+                strokeDasharray="4 4"
+              >
+                <RechartsLabel
+                  value={b.label}
+                  position="insideBottomRight"
+                  fill={c.warning}
+                  fontSize={9}
+                  fontWeight="black"
+                  dx={20}
+                />
+              </ReferenceLine>
+            ))}
+
+            {refScore != null && refScore > yMin && (
+              <ReferenceLine
+                y={refScore}
+                stroke={c.success}
+                strokeOpacity={0.7}
+                strokeDasharray="4 4"
+              >
+                <RechartsLabel
+                  value={refLabel ?? "Ref"}
+                  position="insideTopLeft"
+                  fill={c.success}
+                  fontSize={9}
+                  fontWeight="black"
+                  dx={20}
+                />
+              </ReferenceLine>
+            )}
+
+            <Bar dataKey="count" shape={barShape} isAnimationActive={false}>
+              <LabelList
+                dataKey="count"
+                content={(props) => (
+                  <DataLabel
+                    x={props.x}
+                    y={props.y}
+                    width={props.width}
+                    index={props.index}
+                    chartData={chartData}
+                    youScore={youScore}
+                  />
+                )}
+              />
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+      {legend.length > 0 && (
+        <div className="flex flex-wrap gap-x-3 gap-y-1 px-1">
+          {legend.map((d) => (
+            <span
+              key={d.label}
+              className="text-[10px] font-bold"
+              style={{ color: d.color }}
+            >
+              {d.tick} {d.name ?? d.label}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

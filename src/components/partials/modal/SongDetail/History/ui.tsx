@@ -1,54 +1,25 @@
-"use client";
-
-import { useMemo } from "react";
-import { useUser } from "@/contexts/users/UserContext";
-import { useScoreHistory } from "@/hooks/scores/useScoreLogs";
-import { useAllScoreHistory } from "@/hooks/allScores/useAllScoresHistory";
+import type { ComponentProps } from "react";
 import { versionTitles } from "@/constants/iidx/versionTitles";
 import { Separator } from "@/components/ui/separator";
 import { History } from "lucide-react";
-import { SectionLoader } from "@/components/ui/loading-spinner";
 import HistoryRecordCard from "@/components/partials/common/Songs/HistoryRecordCard";
-import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
 
-interface SongHistoryTabProps {
-  songId: number;
+type HistoryRecord = ComponentProps<typeof HistoryRecordCard>["record"];
+
+interface SongHistoryViewProps {
+  historyGroups: Record<string, HistoryRecord[]> | undefined;
+  globalMaxScore: number;
   /** 全難易度スコア(BPI未計算)の場合に notes を渡す。BPIの代わりにnotes基準の%を表示する */
   notes?: number;
+  maxScore: number;
 }
 
-const SongHistoryTab = ({ songId, notes }: SongHistoryTabProps) => {
-  const { fbUser } = useUser();
-  const isAllScores = notes != null;
-
-  const {
-    historyGroups: mainHistory,
-    isLoading: mainLoading,
-    isError: mainError,
-  } = useScoreHistory(isAllScores ? undefined : fbUser?.uid, songId);
-  const {
-    historyGroups: allHistory,
-    isLoading: allLoading,
-    isError: allError,
-  } = useAllScoreHistory(fbUser?.uid, songId, isAllScores);
-
-  const historyGroups = isAllScores ? allHistory : mainHistory;
-  const isLoading = isAllScores ? allLoading : mainLoading;
-  const isError = isAllScores ? allError : mainError;
-
-  const globalMaxScore = useMemo(() => {
-    if (!historyGroups) return 0;
-    return Math.max(
-      ...Object.values(historyGroups)
-        .flat()
-        .map((s) => s.exScore ?? 0),
-    );
-  }, [historyGroups]);
-
-  if (isLoading) return <SectionLoader className="h-64" />;
-
-  if (isError) return <FetchErrorState error={isError} className="min-h-64" />;
-
+const SongHistoryView = ({
+  historyGroups,
+  globalMaxScore,
+  notes,
+  maxScore,
+}: SongHistoryViewProps) => {
   if (!historyGroups || Object.keys(historyGroups).length === 0)
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-20">
@@ -92,6 +63,7 @@ const SongHistoryTab = ({ songId, notes }: SongHistoryTabProps) => {
                       globalMaxScore > 0 && record.exScore === globalMaxScore
                     }
                     notes={notes}
+                    maxScore={maxScore}
                   />
                 );
               })}
@@ -103,4 +75,4 @@ const SongHistoryTab = ({ songId, notes }: SongHistoryTabProps) => {
   );
 };
 
-export default SongHistoryTab;
+export default SongHistoryView;

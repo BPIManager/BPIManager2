@@ -5,7 +5,7 @@ import LogsDetailContent from "@/components/partials/common/Logs/LogsDetail/cont
 import LogsDetailView from "@/components/partials/common/Logs/LogsDetail";
 import DashboardLayout from "@/components/partials/shell/DashboardLayout";
 import UserProfileLayout from "@/components/partials/common/Profile/Layout/layout";
-import ProfileMeta from "@/components/partials/common/Profile/Meta/ui";
+import ProfileMeta from "@/components/partials/common/Profile/Meta";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 export default function BatchLogsPage() {

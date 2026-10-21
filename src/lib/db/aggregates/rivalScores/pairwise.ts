@@ -12,10 +12,13 @@ class RivalPairwiseRepository {
     viewerId: string;
     rivalId?: string | null;
     version: IIDXVersion;
+    /** ライバル側のバージョン（未指定は version と同じ） */
+    rivalVersion?: IIDXVersion;
     limit?: number;
     offset?: number;
   }) {
-    const { viewerId, rivalId, version, limit, offset } = params;
+    const { viewerId, rivalId, version, rivalVersion, limit, offset } = params;
+    const rVersion = rivalVersion ?? version;
     const isInf = version === "INF";
 
     let query = db
@@ -41,13 +44,13 @@ class RivalPairwiseRepository {
       .leftJoin("scores as r", (join) => {
         const base = join
           .onRef("r.songId", "=", "s.songId")
-          .on("r.version", "=", version)
+          .on("r.version", "=", rVersion)
           .on("r.logId", "=", (eb) =>
             correlatedLatestLogId(eb, {
               table: "scores",
               alias: "r2",
               songIdRef: "s.songId",
-              version,
+              version: rVersion,
               ...(rivalId ? { userId: rivalId } : { followersOf: viewerId }),
             }),
           );

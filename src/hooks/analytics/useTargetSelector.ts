@@ -12,8 +12,11 @@ import {
 import { useTranslation } from "@/hooks/common/useTranslation";
 import type { TranslationKey } from "@/lib/i18n/translations";
 import type { AnalyticsTarget, AnalyticsTargetKind } from "@/types/analytics";
-import { versionTitles } from "@/constants/iidx/versionTitles";
-import { latestVersion } from "@/constants/iidx/iidxVersions";
+import {
+  versionTitles,
+  getVersionNameFromNumber,
+} from "@/constants/iidx/versionTitles";
+import { latestVersion, arenaDataVersion } from "@/constants/iidx/iidxVersions";
 import { getTopRankerAreaName } from "@/constants/iidx/topRankerAreas";
 import { decodeTopRankerParam, encodeTopRankerParam } from "./topRankerParam";
 
@@ -22,8 +25,8 @@ export type Step =
   | "rival-pick"
   | "arena-rank"
   | "self-version-pick"
-  | "top-ranker-version"
-  | "top-ranker-area";
+  | "top-ranker-area"
+  | "version-pick";
 
 export type KindOption = {
   kind: AnalyticsTargetKind;
@@ -40,6 +43,11 @@ export const ARENA_RANKS = [
   { id: "A4", label: "A4" },
   { id: "A5", label: "A5" },
 ];
+
+/** アリーナ平均の静的集計データが存在するバージョン（26〜`arenaDataVersion`） */
+export const ARENA_DATA_VERSIONS = versionTitles
+  .map((v) => v.num)
+  .filter((num) => num !== "INF" && Number(num) <= Number(arenaDataVersion));
 
 export const PAST_VERSIONS = versionTitles
   .filter((v) => v.num !== latestVersion)
@@ -60,21 +68,21 @@ export const buildKindOptions = (
     icon: Users,
     label: t("analytics.kind.rivalAvg"),
     description: t("analytics.kind.rivalAvgDesc"),
-    nextStep: "kind",
+    nextStep: "version-pick",
   },
   {
     kind: "rival-top",
     icon: UserStar,
     label: t("analytics.kind.rivalTop"),
     description: t("analytics.kind.rivalTopDesc"),
-    nextStep: "kind",
+    nextStep: "version-pick",
   },
   {
     kind: "top-ranker",
     icon: Crown,
     label: t("analytics.kind.topRanker"),
     description: t("analytics.kind.topRankerDesc"),
-    nextStep: "top-ranker-version",
+    nextStep: "top-ranker-area",
   },
   {
     kind: "arena",
@@ -150,6 +158,11 @@ export function useTargetSelector({
   const [selectedArenaRank, setSelectedArenaRank] = useState<string>(
     current?.kind === "arena" ? (current.param ?? "A1") : "A1",
   );
+  // バージョン選択ステップに進む前に確定している比較対象（バージョン未確定）
+  const [pending, setPending] = useState<Omit<
+    AnalyticsTarget,
+    "version"
+  > | null>(null);
   const [selectedSelfVersion, setSelectedSelfVersion] = useState<string>(
     current?.kind === "self-version" ? (current.param ?? "") : "",
   );
@@ -158,8 +171,6 @@ export function useTargetSelector({
     current?.kind === "top-ranker"
       ? decodeTopRankerParam(current.param)
       : { version: "", areaId: null };
-  const [selectedTopRankerVersion, setSelectedTopRankerVersion] =
-    useState<string>(currentTopRanker.version);
   const [selectedTopRankerArea, setSelectedTopRankerArea] = useState<
     number | null
   >(currentTopRanker.areaId);
@@ -179,7 +190,6 @@ export function useTargetSelector({
     setSelectedSelfVersion(
       current?.kind === "self-version" ? (current.param ?? "") : "",
     );
-    setSelectedTopRankerVersion(currentTopRanker.version);
     setSelectedTopRankerArea(currentTopRanker.areaId);
   } else if (!isOpen && prevIsOpen) {
     setPrevIsOpen(false);
@@ -195,21 +205,49 @@ export function useTargetSelector({
     onClose();
   };
 
+  const goToVersionPick = (target: Omit<AnalyticsTarget, "version">) => {
+    setPending(target);
+    setStep("version-pick");
+  };
+
+  const handleKindClickWithVersion = (opt: KindOption) => {
+    if (opt.nextStep !== "version-pick") return handleKindClick(opt);
+    setSelectedKind(opt.kind);
+    goToVersionPick({ kind: opt.kind, label: opt.label });
+  };
+
   const handleRivalPick = (userId: string, name: string) => {
-    onSelect({ kind: "rival", param: userId, label: name });
+    goToVersionPick({ kind: "rival", param: userId, label: name });
+  };
+
+  const handleVersionPick = (version: string) => {
+    if (!pending) return;
+    if (pending.kind === "top-ranker") {
+      // 県別は version を param に含める既存形式で保存する
+      onSelect({
+        kind: "top-ranker",
+        param: encodeTopRankerParam(version, Number(pending.param)),
+        label: `${t("analytics.kind.topRanker")} ${getVersionNameFromNumber(version)} ${pending.label}`,
+      });
+      onClose();
+      return;
+    }
+    onSelect({
+      ...pending,
+      version,
+      label: `${pending.label} (${getVersionNameFromNumber(version)})`,
+    });
     onClose();
   };
 
-  const handleArenaConfirm = () => {
-    const rankLabel =
-      ARENA_RANKS.find((r) => r.id === selectedArenaRank)?.label ??
-      selectedArenaRank;
-    onSelect({
+  const handleArenaRankPick = (rankId: string) => {
+    setSelectedArenaRank(rankId);
+    const rankLabel = ARENA_RANKS.find((r) => r.id === rankId)?.label ?? rankId;
+    goToVersionPick({
       kind: "arena",
-      param: selectedArenaRank,
+      param: rankId,
       label: `${t("analytics.kind.arena")} ${rankLabel}`,
     });
-    onClose();
   };
 
   const handleSelfVersionPick = (versionNum: string, versionTitle: string) => {
@@ -222,22 +260,14 @@ export function useTargetSelector({
     onClose();
   };
 
-  const handleTopRankerVersionPick = (versionNum: string) => {
-    setSelectedTopRankerVersion(versionNum);
-    setStep("top-ranker-area");
-  };
-
+  // エリアを選んだあと、他の種別と同じくバージョン選択へ進む（label はエリア名のみ保持）
   const handleTopRankerAreaPick = (areaId: number) => {
     setSelectedTopRankerArea(areaId);
-    const versionTitle =
-      versionTitles.find((v) => v.num === selectedTopRankerVersion)?.title ??
-      selectedTopRankerVersion;
-    onSelect({
+    goToVersionPick({
       kind: "top-ranker",
-      param: encodeTopRankerParam(selectedTopRankerVersion, areaId),
-      label: `${t("analytics.kind.topRanker")} ${versionTitle} ${getTopRankerAreaName(areaId)}`,
+      param: String(areaId),
+      label: getTopRankerAreaName(areaId),
     });
-    onClose();
   };
 
   const stepTitle: Record<Step, string> = {
@@ -245,8 +275,25 @@ export function useTargetSelector({
     "rival-pick": t("analytics.selectRival"),
     "arena-rank": t("analytics.selectArenaRank"),
     "self-version-pick": t("analytics.selectVersion"),
-    "top-ranker-version": t("analytics.selectTopRankerVersion"),
     "top-ranker-area": t("analytics.selectTopRankerArea"),
+    "version-pick": t("analytics.selectTargetVersion"),
+  };
+
+  // 「戻る」で遷移する1つ前のステップ（kindは最上位なので無し）
+  const backStep: Record<Step, Step | null> = {
+    kind: null,
+    "rival-pick": "kind",
+    "arena-rank": "kind",
+    "self-version-pick": "kind",
+    "top-ranker-area": "kind",
+    "version-pick":
+      pending?.kind === "rival"
+        ? "rival-pick"
+        : pending?.kind === "arena"
+          ? "arena-rank"
+          : pending?.kind === "top-ranker"
+            ? "top-ranker-area"
+            : "kind",
   };
 
   return {
@@ -254,17 +301,18 @@ export function useTargetSelector({
     setStep,
     selectedKind,
     selectedArenaRank,
-    setSelectedArenaRank,
     selectedSelfVersion,
-    selectedTopRankerVersion,
     selectedTopRankerArea,
     kindOptions,
     stepTitle,
-    handleKindClick,
+    backStep,
+    pendingKind: pending?.kind ?? null,
+    pendingParam: pending?.param,
+    handleVersionPick,
+    handleKindClick: handleKindClickWithVersion,
     handleRivalPick,
-    handleArenaConfirm,
+    handleArenaRankPick,
     handleSelfVersionPick,
-    handleTopRankerVersionPick,
     handleTopRankerAreaPick,
   };
 }
