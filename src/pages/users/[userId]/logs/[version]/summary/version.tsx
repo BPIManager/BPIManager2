@@ -2,10 +2,10 @@ import LogsSummaryPageShell from "@/components/partials/shell/LogsSummaryPageShe
 import PublicLogsCard from "@/components/partials/common/Logs/PublicLogsCard";
 import DashboardLayout from "@/components/partials/shell/DashboardLayout";
 import UserProfileLayout from "@/components/partials/common/Profile/Layout/layout";
-import ProfileMeta from "@/components/partials/common/Profile/Meta/ui";
+import ProfileMeta from "@/components/partials/common/Profile/Meta";
 import { PageHeader, PageContainer } from "@/components/partials/common/PageChrome/Header";
 import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
-import VersionCompareContent from "@/components/partials/features/Logs/VersionCompare/ui";
+import VersionCompareContent from "@/components/partials/features/Logs/VersionCompare";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 export default function VersionSummaryPage() {

@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useRouter } from "next/router";
 import { useVersionSummary } from "@/hooks/batches/useVersionSummary";
-import BatchSongsTable from "@/components/partials/common/Logs/LogTable/ui";
+import BatchSongsTable from "@/components/partials/common/Logs/LogTable";
 import { NoDataAlert } from "@/components/partials/common/DashBoard/NoData";
 import LogsDetailContentSkeleton from "@/components/partials/common/Logs/LogsDetail/skeleton";
 import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";

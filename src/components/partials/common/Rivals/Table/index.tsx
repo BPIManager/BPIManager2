@@ -16,7 +16,7 @@ import AdvancedFilterModal from "@/components/partials/common/Songs/AdvancedFilt
 import SongDetailView from "@/components/partials/modal/SongDetail";
 import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
 import RivalSongItem from "./ui";
-import RivalAnalysis from "@/components/partials/common/Rivals/Analysis/ui";
+import RivalAnalysis from "@/components/partials/common/Rivals/Analysis";
 import { List, BarChart2 } from "lucide-react";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { cn } from "@/lib/utils";

@@ -2,18 +2,18 @@
 import { useTranslation } from "@/hooks/common/useTranslation";
 import DashboardLayout from "@/components/partials/shell/DashboardLayout";
 import { PageContainer, PageHeader } from "@/components/partials/common/PageChrome/Header";
-import TransferUi from "@/components/partials/features/Settings/Transfer/ui";
+import TransferUi from "@/components/partials/features/Settings/Transfer";
 import AccountSettingsUi from "@/components/partials/features/Settings/AccountSettings/ui";
 import LinkedAccountsUi from "@/components/partials/features/Settings/LinkedAccounts";
 import ViewPermissionsSettingsUi from "@/components/partials/features/Settings/ViewPermissions";
-import AccountDeletionUi from "@/components/partials/features/Settings/AccountDeletion/ui";
-import ApiKeyUi from "@/components/partials/features/Settings/APIKey/ui";
+import AccountDeletionUi from "@/components/partials/features/Settings/AccountDeletion";
+import ApiKeyUi from "@/components/partials/features/Settings/APIKey";
 import OAuthClientUi from "@/components/partials/features/Settings/OAuthClient";
 import { Meta } from "@/components/partials/common/PageChrome/Head";
 import { PageLoader } from "@/components/ui/loading-spinner";
-import ThemeSettingsUi from "@/components/partials/features/Settings/ThemeSettings/ui";
+import ThemeSettingsUi from "@/components/partials/features/Settings/ThemeSettings";
 import DataExportUi from "@/components/partials/features/Settings/DataExport";
-import LayoutSettingsUi from "@/components/partials/features/Settings/LayoutSettings/ui";
+import LayoutSettingsUi from "@/components/partials/features/Settings/LayoutSettings";
 import LanguageSettingsUi from "@/components/partials/features/Settings/LanguageSettings/ui";
 import RequireAuth from "@/components/partials/shell/RequireAuth";
 

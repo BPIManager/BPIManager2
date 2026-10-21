@@ -132,4 +132,4 @@ const DashBoardFilter = ({ withCompare }: { withCompare?: boolean }) => {
   );
 };
 
-export default DashBoardFilter;
+export { DashBoardFilter };

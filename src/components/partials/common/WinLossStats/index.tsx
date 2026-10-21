@@ -374,4 +374,4 @@ const WinLossStats = ({
   );
 };
 
-export default WinLossStats;
+export { WinLossStats };

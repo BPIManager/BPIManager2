@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { Activity, ListChecks, LucideIcon, Swords, UserCheck, Users } from "lucide-react";
 import { SectionLoader } from "@/components/ui/loading-spinner";
-import TimelineList from "./ui";
+import TimelineList from "./TimelineList";
 import {
   FilterCheckboxGroup,
   FilterSearchInput,

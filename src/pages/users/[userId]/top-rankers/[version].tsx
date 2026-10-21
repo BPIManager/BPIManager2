@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import UserProfileLayout from "@/components/partials/common/Profile/Layout/layout";
-import ProfileMeta from "@/components/partials/common/Profile/Meta/ui";
+import ProfileMeta from "@/components/partials/common/Profile/Meta";
 import TopRankersContent from "@/components/partials/features/TopRankers";
 import { TOP_RANKER_VERSIONS } from "@/constants/iidx/topRankerAreas";
 import { useTranslation } from "@/hooks/common/useTranslation";

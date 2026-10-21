@@ -1,6 +1,6 @@
 import { Meta } from "@/components/partials/common/PageChrome/Head";
 import { useTranslation } from "@/hooks/common/useTranslation";
-import ImportSuccessModal from "@/components/partials/features/Import/SuccessModal/ui";
+import ImportSuccessModal from "@/components/partials/features/Import/SuccessModal";
 import ImportView from "@/components/partials/features/Import/View";
 import { dummyCsv } from "@/constants/ui/dummyCsv";
 import {

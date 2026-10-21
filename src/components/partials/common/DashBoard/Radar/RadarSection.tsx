@@ -2,7 +2,7 @@ import { useRadar } from "@/hooks/stats/useRadar";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
 import RadarSkeleton from "./skeleton";
-import RadarSectionChart from ".";
+import RadarSectionChart from "./index";
 import { RadarCategory } from "@/types/stats/radar";
 import { useMemo, useState } from "react";
 import RadarCategorySongsDialog from "./dialog";
