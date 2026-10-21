@@ -1,15 +1,12 @@
 "use client";
 
-import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import ArenaClassBadge from "@/components/partials/common/Badge/ArenaClassBadge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { Search, ChevronRight, Check } from "lucide-react";
-import { useUser } from "@/contexts/users/UserContext";
-import { useRivalSummary } from "@/hooks/social/useRivalSummary";
-import { latestVersion } from "@/constants/iidx/iidxVersions";
+import type { RivalSummaryResult } from "@/types/social/rival";
 import { getBpiColorStyle } from "@/constants/theme/bpiColor";
 import { formatIIDXId } from "@/utils/common/formatIidxId";
 import { useTranslation } from "@/hooks/common/useTranslation";
@@ -18,7 +15,6 @@ import {
   PAST_VERSIONS,
   type KindOption,
 } from "@/hooks/analytics/useTargetSelector";
-import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 import { TOP_RANKER_AREA_NAMES } from "@/constants/iidx/topRankerAreas";
 
 // KindCard: 目標種別を選ぶボタン
@@ -103,27 +99,22 @@ export const KindStep = ({
   </>
 );
 
-// RivalPickStep: ライバル検索の一覧
+// RivalPickList: ライバル検索の一覧
 
-export const RivalPickStep = ({
+export const RivalPickList = ({
+  rivals,
+  isLoading,
+  search,
+  onSearchChange,
   onSelect,
 }: {
+  rivals: RivalSummaryResult[];
+  isLoading: boolean;
+  search: string;
+  onSearchChange: (value: string) => void;
   onSelect: (userId: string, name: string) => void;
 }) => {
-  const { user } = useUser();
   const { t } = useTranslation();
-  const [search, setSearch] = useState("");
-
-  const { rivals, isLoading } = useRivalSummary({
-    userId: user?.userId || false,
-    levels: ["11", "12"],
-    difficulties: IIDX_DIFFICULTIES,
-    version: latestVersion,
-  });
-
-  const filtered = rivals.filter((r) =>
-    r.userName.toLowerCase().includes(search.toLowerCase()),
-  );
 
   return (
     <div className="flex flex-col gap-3">
@@ -131,7 +122,7 @@ export const RivalPickStep = ({
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-bpim-muted" />
         <Input
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => onSearchChange(e.target.value)}
           placeholder={t("analytics.searchRivals")}
           className="pl-9 bg-bpim-bg border-bpim-border text-bpim-text placeholder:text-bpim-muted focus-visible:ring-bpim-primary"
         />
@@ -145,12 +136,12 @@ export const RivalPickStep = ({
               className="h-16 w-full rounded-xl bg-bpim-surface"
             />
           ))
-        ) : filtered.length === 0 ? (
+        ) : rivals.length === 0 ? (
           <div className="flex h-24 items-center justify-center text-sm text-bpim-muted">
             {t("analytics.noRivalsFound")}
           </div>
         ) : (
-          filtered.map((rival) => {
+          rivals.map((rival) => {
             const bpiStyle = getBpiColorStyle(rival.totalBpi ?? -15);
             return (
               <button

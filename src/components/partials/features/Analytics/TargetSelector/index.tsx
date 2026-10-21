@@ -13,12 +13,12 @@ import type { AnalyticsTarget } from "@/types/analytics";
 import { useTargetSelector } from "@/hooks/analytics/useTargetSelector";
 import {
   KindStep,
-  RivalPickStep,
   ArenaRankStep,
   SelfVersionPickStep,
   TopRankerAreaStep,
   VersionPickStep,
 } from "./ui";
+import RivalPickStep from "./RivalPickStep";
 import { useScoredVersions } from "@/hooks/scores/useScoredVersions";
 import { ARENA_DATA_VERSIONS } from "@/hooks/analytics/useTargetSelector";
 import { TOP_RANKER_VERSIONS } from "@/constants/iidx/topRankerAreas";

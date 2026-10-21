@@ -7,11 +7,11 @@ import { BpiDistributionSection } from "@/components/partials/common/DashBoard/B
 import BpmBpiDistributionSection from "@/components/partials/common/DashBoard/BpmBpiDistribution";
 import SongsTable from "@/components/partials/common/Table";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
-import LogsList from "@/components/partials/common/Logs/LogsList/ui";
+import LogsList from "@/components/partials/common/Logs/LogsList";
 import UserProfileLayout from "@/components/partials/common/Profile/Layout/layout";
-import ProfileMeta from "@/components/partials/common/Profile/Meta/ui";
+import ProfileMeta from "@/components/partials/common/Profile/Meta";
 import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
-import RadarSection from "@/components/partials/common/DashBoard/Radar/ui";
+import RadarSection from "@/components/partials/common/DashBoard/Radar/RadarSection";
 import BpiHistorySection from "@/components/partials/common/DashBoard/TotalBPIHistory";
 import IidxTowerSection from "@/components/partials/common/DashBoard/IidxTowerCard";
 import OfficialArenaHistorySection from "@/components/partials/common/DashBoard/OfficialArenaHistoryCard";

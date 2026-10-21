@@ -5,8 +5,8 @@ import { useTranslation } from "@/hooks/common/useTranslation";
 import { PageContainer, PageHeader } from "@/components/partials/common/PageChrome/Header";
 import WhySection from "./WhySection/ui";
 import DonationSection from "./DonationSection/ui";
-import SupportersListSection from "./SupportersListSection/ui";
-import OssSection from "./OssSection/ui";
+import SupportersListSection from "./SupportersListSection";
+import OssSection from "./OssSection";
 
 const SupportersPage = () => {
   const supporters = useSupporters();

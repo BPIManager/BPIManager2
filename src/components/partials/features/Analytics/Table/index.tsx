@@ -16,7 +16,7 @@ import FetchErrorState from "@/components/partials/common/ErrorStates/FetchError
 import RivalSongItem, {
   rivalRowMinWidth,
 } from "@/components/partials/common/Rivals/Table/ui";
-import RivalAnalysis from "@/components/partials/common/Rivals/Analysis/ui";
+import RivalAnalysis from "@/components/partials/common/Rivals/Analysis";
 import { useUser } from "@/contexts/users/UserContext";
 import { buildComparisonCsv } from "@/utils/analytics/comparisonCsv";
 import { downloadTextFile } from "@/utils/common/downloadTextFile";

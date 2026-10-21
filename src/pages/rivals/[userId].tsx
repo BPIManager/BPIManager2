@@ -7,7 +7,7 @@ import RivalProfileLayout from "@/components/partials/features/Rivals/Layout/lay
 import RivalSongsTable from "@/components/partials/common/Rivals/Table";
 import { Meta } from "@/components/partials/common/PageChrome/Head";
 import { DashBoardFilter } from "@/components/partials/common/DashBoard/Filter";
-import RadarSection from "@/components/partials/common/DashBoard/Radar/ui";
+import RadarSection from "@/components/partials/common/DashBoard/Radar/RadarSection";
 import { RankDistributionSection } from "@/components/partials/common/DashBoard/DJRankDistribution";
 import { BpiDistributionSection } from "@/components/partials/common/DashBoard/BPIDistribution";
 import BpmBpiDistributionSection from "@/components/partials/common/DashBoard/BpmBpiDistribution";

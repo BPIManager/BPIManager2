@@ -5,7 +5,7 @@ import { Meta } from "@/components/partials/common/PageChrome/Head";
 import UserProfileLayout from "@/components/partials/common/Profile/Layout/layout";
 import AAATableContent from "@/components/partials/common/Metrics/AAATable";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
-import ProfileMeta from "@/components/partials/common/Profile/Meta/ui";
+import ProfileMeta from "@/components/partials/common/Profile/Meta";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { useIsOwnProfile } from "@/hooks/users/useIsOwnProfile";
