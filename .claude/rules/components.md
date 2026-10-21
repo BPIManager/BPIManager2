@@ -35,6 +35,8 @@ common/FeatureName/         # 機能名フォルダ（必須）
     └── errors.tsx        # エラー表示（任意）
 ```
 
+- `ui.tsx` に置いてよいのは、翻訳・テーマ/チャート色などの表示専用フック、UI内ローカルのstate（開閉・hover・入力中の文字列）、イベントハンドラ内の `useRouter` による画面遷移、スクロール位置・リサイズ・仮想リストのセンチネルのような表示に閉じたDOM同期の `useEffect`。データ取得（SWR・`fetch`）、Context由来のデータ（`useUser`・`useStatsFilter`等）、localStorage等の外部状態の読み書きは `index.tsx`（または同フォルダのprivateな分割ファイル）に置き、`ui.tsx` へはpropsで渡す
+- ロジックを持つのに `index.tsx` が無い（`ui.tsx` だけの）コンポーネントは、`ui.tsx` に分離せず `index.tsx` に置く
 - 共通化可能な汎用ロジックは `/utils` または `/services`、型定義は `/types` に格納
 - UI のみのコンポーネントでも必ずフォルダを作り `index.tsx` に配置（`ui.tsx` に分離するかはロジックの有無で判断）
 - この規則は主に「他の機能から再利用される独立したコンポーネント」を対象とする。あるフォルダの `index.tsx`/`ui.tsx` を読みやすくするために内部でのみ使う分割ファイル（例: `AdvancedFilter/BpmSection.tsx` のような private なセクション分割）はそのフォルダ内に置いてよく、個別にフォルダ化する必要はない
