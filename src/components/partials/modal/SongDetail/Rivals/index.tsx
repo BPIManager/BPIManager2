@@ -3,7 +3,9 @@
 import { useState } from "react";
 import type { SongDetailSubject } from "@/utils/songs/songDetailMode";
 import { hasBpiData } from "@/utils/songs/songDetailMode";
-import { RivalRankingBody, GlobalRankingBody } from "./ui";
+import type { SongCompareTarget } from "@/types/songs/compareTarget";
+import RivalRankingBody from "./RivalRankingBody";
+import GlobalRankingBody from "./GlobalRankingBody";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { versionsNonDisabledCollection } from "@/constants/iidx/versionTitles";
 import {
@@ -20,7 +22,18 @@ import { useRadar } from "@/hooks/stats/useRadar";
 import { useUser } from "@/contexts/users/UserContext";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
-export default function RivalsRanking({ song }: { song: SongDetailSubject }) {
+export default function RivalsRanking({
+  song,
+  highlightUserId,
+  scoreOwnerId,
+  compareTargets,
+}: {
+  song: SongDetailSubject;
+  highlightUserId?: string;
+  scoreOwnerId?: string;
+  /** /analytics 等の比較対象。ランキングに差し込み、ラベルを付ける */
+  compareTargets?: SongCompareTarget[];
+}) {
   const { t } = useTranslation();
   const { fbUser } = useUser();
   const [version, setVersion] = useState<string>(latestVersion);
@@ -29,6 +42,9 @@ export default function RivalsRanking({ song }: { song: SongDetailSubject }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { radar: viewerRadar } = useRadar(fbUser?.uid, [], [], version);
   const notes = hasBpiData(song) ? undefined : song.notes;
+  // 他ユーザーのスコアを表示中の曲データは自分のスコアとして扱わない
+  const myScore =
+    !scoreOwnerId || scoreOwnerId === fbUser?.uid ? song : undefined;
 
   const handleNavigate = (userId: string) => {
     setSelectedUserId(userId);
@@ -70,9 +86,12 @@ export default function RivalsRanking({ song }: { song: SongDetailSubject }) {
           <RivalRankingBody
             songId={song.songId}
             version={version}
-            myScore={song}
+            myScore={myScore}
+            song={song}
             notes={notes}
             onNavigate={handleNavigate}
+            highlightUserId={highlightUserId}
+            compareTargets={compareTargets}
           />
         </TabsContent>
 
@@ -80,9 +99,11 @@ export default function RivalsRanking({ song }: { song: SongDetailSubject }) {
           <GlobalRankingBody
             songId={song.songId}
             version={version}
-            myScore={song}
             notes={notes}
             onNavigate={handleNavigate}
+            highlightUserId={highlightUserId}
+            compareTargets={compareTargets}
+            song={song}
           />
         </TabsContent>
       </Tabs>

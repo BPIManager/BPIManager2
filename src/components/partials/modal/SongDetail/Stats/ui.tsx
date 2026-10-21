@@ -15,10 +15,17 @@ import dayjs from "@/lib/dayjs";
 import type { ArenaAverages } from "@/types/songs/arenaAverages";
 import { BPIChart } from "./BPIChart";
 
-interface ChartDataPoint {
+export interface ChartDataPoint {
   label: string;
+  /** ツールチップ表示名（未指定なら label） */
+  name?: string;
   count: number;
   bpi: number;
+  /** 自分 / 比較対象のバー。未指定は目標BPIの基準バー */
+  kind?: "you" | "target";
+  color?: string;
+  /** X軸に出す短縮表記 */
+  tick?: string;
 }
 
 interface StatsTabViewProps {

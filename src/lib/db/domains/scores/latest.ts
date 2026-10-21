@@ -45,6 +45,21 @@ class LatestScoresRepository {
   }
 
   /**
+   * スコアが1件以上登録されているバージョン番号の一覧を取得する。
+   *
+   * @param userId - ユーザー ID
+   */
+  async getVersionsWithScores(userId: string): Promise<string[]> {
+    const rows = await db
+      .selectFrom("scores")
+      .select("version")
+      .where("userId", "=", userId)
+      .distinct()
+      .execute();
+    return rows.map((r) => r.version);
+  }
+
+  /**
    * 指定ユーザー・バージョンの `scores` テーブルから、曲ごとの最新スコアを取得する。
    *
    * @param userId - ユーザー ID

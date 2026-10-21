@@ -6,6 +6,7 @@ export type { HandleOutcome } from "./_shared";
 export * from "./scores";
 export * from "./history";
 export * from "./bestEver";
+export * from "./versions";
 export * from "./selfVersion";
 export * from "./unplayed";
 export * from "./bulk";

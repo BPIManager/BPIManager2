@@ -50,15 +50,16 @@ export const useTopRankerAreaScores = (
   return { data, error, isLoading };
 };
 
-export const useArenaJson = (levels: number[]) => {
+export const useArenaJson = (levels: number[], version?: string) => {
+  const dataVersion = version ?? arenaDataVersion;
   // 静的JSONは v2 エンベロープではなく素の配列のため v1 fetcher で取得する
   const { data: data11, error: e11, isLoading: l11 } = useSWR<ArenaAverageRow[]>(
-    levels.includes(11) ? `/data/metrics/arena/${arenaDataVersion}_11.json` : null,
+    levels.includes(11) ? `/data/metrics/arena/${dataVersion}_11.json` : null,
     fetcher,
     { revalidateOnFocus: false },
   );
   const { data: data12, error: e12, isLoading: l12 } = useSWR<ArenaAverageRow[]>(
-    levels.includes(12) ? `/data/metrics/arena/${arenaDataVersion}_12.json` : null,
+    levels.includes(12) ? `/data/metrics/arena/${dataVersion}_12.json` : null,
     fetcher,
     { revalidateOnFocus: false },
   );

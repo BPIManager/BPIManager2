@@ -162,6 +162,11 @@ const RivalSongsTable = ({
           version={currentVersion}
           songDomain="bpi"
           onSaved={() => refresh()}
+          subjectUser={
+            rivalUserId
+              ? { userId: rivalUserId, userName: rivalName ?? "" }
+              : undefined
+          }
         />
       )}
 

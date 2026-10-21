@@ -19,11 +19,7 @@ import {
   type KindOption,
 } from "@/hooks/analytics/useTargetSelector";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
-import {
-  TOP_RANKER_AREA_NAMES,
-  TOP_RANKER_VERSIONS,
-} from "@/constants/iidx/topRankerAreas";
-import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
+import { TOP_RANKER_AREA_NAMES } from "@/constants/iidx/topRankerAreas";
 
 // KindCard: 目標種別を選ぶボタン
 
@@ -32,6 +28,8 @@ interface KindCardProps {
   label: string;
   description: string;
   selected: boolean;
+  /** 選択後にさらに次の選択肢が出る項目 */
+  hasNext?: boolean;
   onClick: () => void;
 }
 
@@ -40,6 +38,7 @@ export const KindCard = ({
   label,
   description,
   selected,
+  hasNext,
   onClick,
 }: KindCardProps) => (
   <button
@@ -70,7 +69,11 @@ export const KindCard = ({
       <p className="font-bold text-bpim-text text-sm">{label}</p>
       <p className="text-xs text-bpim-muted mt-0.5">{description}</p>
     </div>
-    {selected && <Check className="h-4 w-4 shrink-0 text-bpim-primary" />}
+    {hasNext ? (
+      <ChevronRight className="h-4 w-4 shrink-0 text-bpim-muted" />
+    ) : (
+      selected && <Check className="h-4 w-4 shrink-0 text-bpim-primary" />
+    )}
   </button>
 );
 
@@ -93,6 +96,7 @@ export const KindStep = ({
         label={opt.label}
         description={opt.description}
         selected={selectedKind === opt.kind}
+        hasNext={opt.nextStep !== "kind"}
         onClick={() => onKindClick(opt)}
       />
     ))}
@@ -213,7 +217,7 @@ export const ArenaRankStep = ({
         )}
       >
         <span className="font-bold text-sm text-bpim-text">{r.label}</span>
-        {selected === r.id && <Check className="h-4 w-4 text-bpim-primary" />}
+        <ChevronRight className="h-4 w-4 text-bpim-muted" />
       </button>
     ))}
   </div>
@@ -268,17 +272,24 @@ const OptionButton = ({
   label,
   sub,
   selected,
+  hasNext,
+  disabled,
   onClick,
 }: {
   label: string;
   sub?: string;
   selected: boolean;
+  hasNext?: boolean;
+  disabled?: boolean;
   onClick: () => void;
 }) => (
   <button
     onClick={onClick}
+    disabled={disabled}
     className={cn(
       "flex items-center justify-between rounded-xl border-2 px-4 py-3 text-left transition-all hover:scale-[1.01]",
+      disabled &&
+        "pointer-events-none cursor-not-allowed border-bpim-border opacity-40 hover:scale-100",
       selected
         ? "border-bpim-primary bg-bpim-surface shadow-[0_0_0_3px] shadow-bpim-primary/20"
         : "border-bpim-border bg-bpim-surface hover:border-bpim-primary/50",
@@ -292,27 +303,12 @@ const OptionButton = ({
         </span>
       )}
     </div>
-    {selected && <Check className="h-4 w-4 text-bpim-primary shrink-0" />}
+    {hasNext ? (
+      <ChevronRight className="h-4 w-4 text-bpim-muted shrink-0" />
+    ) : (
+      selected && <Check className="h-4 w-4 text-bpim-primary shrink-0" />
+    )}
   </button>
-);
-
-export const TopRankerVersionStep = ({
-  selected,
-  onSelect,
-}: {
-  selected: string;
-  onSelect: (version: string) => void;
-}) => (
-  <div className="flex max-h-80 flex-col gap-2 overflow-y-auto pr-1">
-    {[...TOP_RANKER_VERSIONS].reverse().map((v) => (
-      <OptionButton
-        key={v}
-        label={getVersionNameFromNumber(v)}
-        selected={selected === v}
-        onClick={() => onSelect(v)}
-      />
-    ))}
-  </div>
 );
 
 export const TopRankerAreaStep = ({
@@ -328,8 +324,36 @@ export const TopRankerAreaStep = ({
         key={areaId}
         label={name}
         selected={selected === areaId}
+        hasNext
         onClick={() => onSelect(areaId)}
       />
     ))}
   </div>
 );
+
+// VersionPickStep: 比較先データのバージョン選択
+
+export const VersionPickStep = ({
+  versions,
+  availableVersions,
+  onSelect,
+}: {
+  versions: { num: string; title: string }[];
+  /** 指定時は、ここに含まれないバージョンをグレーアウトして選択不可にする（読み込み中は undefined） */
+  availableVersions?: string[];
+  onSelect: (version: string) => void;
+}) => {
+  return (
+    <div className="flex max-h-80 flex-col gap-2 overflow-y-auto pr-1">
+      {versions.map((v) => (
+        <OptionButton
+          key={v.num}
+          label={v.title}
+          selected={false}
+          disabled={!!availableVersions && !availableVersions.includes(v.num)}
+          onClick={() => onSelect(v.num)}
+        />
+      ))}
+    </div>
+  );
+};

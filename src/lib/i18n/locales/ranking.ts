@@ -114,5 +114,11 @@ export const rankingTranslations = {
     "zh-TW": "目前排名",
     ko: "현재 순위",
   },
+  "ranking.selfRank.userLabel": {
+    ja: "{name}の順位",
+    en: "{name}'s Rank",
+    "zh-TW": "{name}的排名",
+    ko: "{name}의 순위",
+  },
   "ranking.selfRank.suffix": { ja: "位", en: "", "zh-TW": "位", ko: "위" },
 } as const;

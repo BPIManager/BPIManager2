@@ -66,6 +66,12 @@ export const componentsTranslations = {
     "zh-TW": "編輯EX分數",
     ko: "EX 스코어 편집",
   },
+  "songDetail.compareTarget": {
+    ja: "比較対象",
+    en: "Compare target",
+    "zh-TW": "比較對象",
+    ko: "비교 대상",
+  },
   "songDetail.bpiToNext": {
     ja: "BPI{next}まで +{diff}",
     en: "+{diff} to BPI {next}",
@@ -107,6 +113,12 @@ export const componentsTranslations = {
     en: "{name} average",
     "zh-TW": "{name}平均",
     ko: "{name} 평균",
+  },
+  "songDetail.rivals.viewing": {
+    ja: "表示中のライバル",
+    en: "Viewing",
+    "zh-TW": "目前檢視",
+    ko: "보는 중",
   },
   "songDetail.rivals.tabRivals": {
     ja: "ライバル内",

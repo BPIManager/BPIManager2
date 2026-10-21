@@ -7,7 +7,8 @@ import { AnalyticsTargetKind, AnalyticsTarget } from "@/types/analytics";
  * @returns `encodeURIComponent` 済みの文字列
  */
 export function encodeTarget(t: AnalyticsTarget): string {
-  return encodeURIComponent(`${t.kind}:${t.param ?? ""}:${t.label}`);
+  const kind = t.version ? `${t.kind}@${t.version}` : t.kind;
+  return encodeURIComponent(`${kind}:${t.param ?? ""}:${t.label}`);
 }
 
 /**
@@ -19,12 +20,14 @@ export function encodeTarget(t: AnalyticsTarget): string {
 export function decodeTarget(raw: string): AnalyticsTarget | null {
   try {
     const decoded = decodeURIComponent(raw);
-    const [kind, param, ...labelParts] = decoded.split(":");
+    const [kindPart, param, ...labelParts] = decoded.split(":");
     const label = labelParts.join(":");
-    if (!kind) return null;
+    if (!kindPart) return null;
+    const [kind, version] = kindPart.split("@");
     return {
       kind: kind as AnalyticsTargetKind,
       param: param || undefined,
+      version: version || undefined,
       label,
     };
   } catch {

@@ -13,24 +13,27 @@ import FetchErrorState from "@/components/partials/common/ErrorStates/FetchError
 
 interface SongHistoryTabProps {
   songId: number;
+  /** 履歴を取得するユーザー。未指定ならログイン中の自分 */
+  userId?: string;
   /** 全難易度スコア(BPI未計算)の場合に notes を渡す。BPIの代わりにnotes基準の%を表示する */
   notes?: number;
 }
 
-const SongHistoryTab = ({ songId, notes }: SongHistoryTabProps) => {
+const SongHistoryTab = ({ songId, userId, notes }: SongHistoryTabProps) => {
   const { fbUser } = useUser();
+  const targetUserId = userId ?? fbUser?.uid;
   const isAllScores = notes != null;
 
   const {
     historyGroups: mainHistory,
     isLoading: mainLoading,
     isError: mainError,
-  } = useScoreHistory(isAllScores ? undefined : fbUser?.uid, songId);
+  } = useScoreHistory(isAllScores ? undefined : targetUserId, songId);
   const {
     historyGroups: allHistory,
     isLoading: allLoading,
     isError: allError,
-  } = useAllScoreHistory(fbUser?.uid, songId, isAllScores);
+  } = useAllScoreHistory(targetUserId, songId, isAllScores);
 
   const historyGroups = isAllScores ? allHistory : mainHistory;
   const isLoading = isAllScores ? allLoading : mainLoading;

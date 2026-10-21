@@ -14,6 +14,8 @@ export interface SongRankingRowProps {
   onNavigate: (userId: string) => void;
   /** 全難易度スコア(BPI未計算)の場合に渡す。渡された場合はBPIの代わりにnotes基準の%を表示する */
   notes?: number;
+  /** 閲覧中のユーザー(ライバルページで開いた相手等)。該当行を強調する */
+  highlightUserId?: string;
 }
 
 export function SongRankingTableHeader({
@@ -57,6 +59,7 @@ export function SongRankingListRow({
   selfExScore,
   onNavigate,
   notes,
+  highlightUserId,
 }: RowComponentProps<SongRankingRowProps>) {
   const { t } = useTranslation();
   const row = rankings[index];
@@ -66,7 +69,8 @@ export function SongRankingListRow({
   const isSelf = row.isSelf;
   const showDiff = selfExScore !== undefined;
   const diff = showDiff ? (row.exScore ?? 0) - (selfExScore ?? 0) : 0;
-  const isClickable = !isSelf && !isPrivate;
+  const isClickable = !isSelf && !isPrivate && !row.isVirtual;
+  const isHighlighted = !isSelf && !!highlightUserId && row.userId === highlightUserId;
 
   return (
     <div
@@ -93,7 +97,11 @@ export function SongRankingListRow({
           ? "bg-bpim-primary-dim/30 hover:bg-bpim-primary-dim/40"
           : isPrivate
             ? "opacity-50"
-            : "cursor-pointer hover:bg-bpim-overlay/50",
+            : row.isVirtual
+              ? "bg-bpim-overlay/30"
+              : isHighlighted
+                ? "cursor-pointer bg-bpim-info/15 hover:bg-bpim-info/25"
+                : "cursor-pointer hover:bg-bpim-overlay/50",
       )}
     >
       <span
@@ -102,7 +110,7 @@ export function SongRankingListRow({
           row.rank <= 3 ? "text-yellow-500" : "text-bpim-muted",
         )}
       >
-        #{row.rank}
+        {row.isVirtual ? "-" : `#${row.rank}`}
       </span>
 
       <div className="flex min-w-0 items-center gap-2">
@@ -127,9 +135,24 @@ export function SongRankingListRow({
           >
             {isPrivate ? t("common.privateUser") : row.userName}
           </p>
+          {row.tag ? (
+            <p
+              className="text-[9px] font-bold leading-none"
+              style={{ color: row.tag.color }}
+            >
+              {row.tag.label === row.userName
+                ? t("songDetail.compareTarget")
+                : row.tag.label}
+            </p>
+          ) : null}
           {isSelf && (
             <p className="text-[9px] font-bold leading-none text-bpim-primary">
               {t("common.you")}
+            </p>
+          )}
+          {isHighlighted && !row.tag && (
+            <p className="text-[9px] font-bold leading-none text-bpim-info">
+              {t("songDetail.rivals.viewing")}
             </p>
           )}
         </div>

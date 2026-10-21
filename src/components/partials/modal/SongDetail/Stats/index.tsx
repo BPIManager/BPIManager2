@@ -8,10 +8,20 @@ import { useRivalScoresForSong } from "@/hooks/metrics/useRivalScoresForSong";
 import { useScoreHistory } from "@/hooks/scores/useScoreLogs";
 import { BpiCalculator } from "@/lib/bpi";
 import type { SongWithScore } from "@/types/songs/score";
-import { StatsTabView } from "./ui";
+import type { SongCompareTarget } from "@/types/songs/compareTarget";
+import { StatsTabView, type ChartDataPoint } from "./ui";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
-const StatsTab = ({ song }: { song: SongWithScore }) => {
+interface StatsTabProps {
+  song: SongWithScore;
+  /** 比較対象がある場合の自分のEXスコアと比較対象。指定時は YOU と各比較対象を別色のバーで出す */
+  compare?: {
+    myEx: number | null;
+    targets: SongCompareTarget[];
+  };
+}
+
+const StatsTab = ({ song, compare }: StatsTabProps) => {
   const { t, tFormat } = useTranslation();
   const router = useRouter();
   const { user } = useUser();
@@ -93,7 +103,7 @@ const StatsTab = ({ song }: { song: SongWithScore }) => {
   }, [effectiveRef, personalBest, t, tFormat]);
 
   const chartData = useMemo(() => {
-    const data: { label: string; count: number; bpi: number }[] = [];
+    const data: ChartDataPoint[] = [];
     const bpiBasis = [100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 0];
 
     bpiBasis.forEach((bpiValue) => {
@@ -102,11 +112,32 @@ const StatsTab = ({ song }: { song: SongWithScore }) => {
       data.push({ label: String(bpiValue), count: targetScore, bpi: bpiValue });
     });
 
-    if (song.exScore !== null && song.exScore > 0) {
-      data.push({ label: "YOU", count: song.exScore, bpi: song.bpi ?? 0 });
+    const youEx = compare ? compare.myEx : song.exScore;
+    if (youEx != null && youEx > 0) {
+      const youBpi = compare
+        ? (BpiCalculator.calc(youEx, song) ?? 0)
+        : (song.bpi ?? 0);
+      data.push({ label: "YOU", count: youEx, bpi: youBpi, kind: "you" });
     }
+    const usedLabels = new Set(["YOU"]);
+    (compare?.targets ?? []).forEach((tg, i) => {
+      if (tg.exScore == null || tg.exScore <= 0) return;
+      let label = tg.label;
+      for (let n = 2; usedLabels.has(label); n++) label = `${tg.label} (${n})`;
+      usedLabels.add(label);
+      data.push({
+        label,
+        name: tg.name ?? tg.label,
+        count: tg.exScore,
+        bpi: BpiCalculator.calc(tg.exScore, song) ?? 0,
+        kind: "target",
+        color: tg.color,
+        // 長い名前はX軸で重なるため、番号に短縮して凡例で対応づける
+        tick: label.length <= 3 ? label : `#${i + 1}`,
+      });
+    });
     return data.sort((a, b) => b.count - a.count);
-  }, [song]);
+  }, [song, compare]);
 
   return (
     <StatsTabView

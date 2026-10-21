@@ -87,6 +87,18 @@ interface AnalyticsComparisonTableProps {
   onScoreSaved?: () => void;
 }
 
+/** 選択曲の各比較対象（単一ターゲット時は rival）をモーダル用の比較対象に変換する */
+const toCompareTargets = (
+  song: SongWithRival,
+  labels: string[] | undefined,
+  rivalLabel: string | undefined,
+) =>
+  (song.targets ?? [{ rival: song.rival }]).map((tg, i) => ({
+    label: labels?.[i] ?? rivalLabel ?? "RIVAL",
+    exScore: tg.rival?.exScore ?? null,
+    userId: tg.rival?.userId ?? undefined,
+  }));
+
 const AnalyticsComparisonTable = ({
   songs,
   isLoading,
@@ -232,6 +244,11 @@ const AnalyticsComparisonTable = ({
           version={version}
           songDomain="bpi"
           onSaved={onScoreSaved}
+          compareTargets={toCompareTargets(
+            selectedSong as SongWithRival,
+            labels,
+            rivalLabel,
+          )}
         />
       )}
 

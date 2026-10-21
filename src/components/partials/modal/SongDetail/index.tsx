@@ -8,6 +8,9 @@ import { BpiCalculator } from "@/lib/bpi";
 import { getRankDetail } from "@/constants/iidx/rankBorders";
 import { useUser } from "@/contexts/users/UserContext";
 import { useManualScoreUpdate } from "@/hooks/scores/useManualScoreUpdate";
+import { useSongCompareScores } from "@/hooks/scores/useSongCompareScores";
+import type { SongCompareTarget } from "@/types/songs/compareTarget";
+import { compareTargetColor } from "@/constants/theme/compareTargetColors";
 import SongDetailModalView from "./ui";
 
 interface SongDetailViewProps {
@@ -25,6 +28,12 @@ interface SongDetailViewProps {
   songDomain?: "bpi" | "allSongs";
   /** 手動保存が成功した際に呼ばれる（呼び出し元でのデータ再取得等に使う） */
   onSaved?: () => void;
+  /** 他ユーザー(ライバルページ・ユーザーページ)から開いた場合の表示対象。History・Statistics・Rivalsタブで自分と並べて扱う */
+  subjectUser?: { userId: string; userName: string };
+  /** song のスコアの持ち主。ログインユーザー以外のスコアを表示している場合に指定する（未指定は自分） */
+  scoreOwnerId?: string;
+  /** /analytics 等の複数比較対象。グラフに別色のバー、Rivalsタブにラベル付きの行として差し込む */
+  compareTargets?: Omit<SongCompareTarget, "color">[];
 }
 
 const SongDetailView = ({
@@ -36,6 +45,9 @@ const SongDetailView = ({
   version,
   songDomain,
   onSaved,
+  subjectUser,
+  scoreOwnerId,
+  compareTargets,
 }: SongDetailViewProps) => {
   // 全難易度スコア(BPI未計算)にはStatisticsタブを表示しない
   const fullSong = song && hasBpiData(song) ? song : null;
@@ -75,6 +87,34 @@ const SongDetailView = ({
   // 手動編集は、呼び出し元が songDomain を指定し、かつ自分のプロフィールを見ている場合のみ許可する（fullSong は問わない）。
   const canEdit =
     !!userId && !!version && !!songDomain && fbUser?.uid === userId;
+
+  const compare = useSongCompareScores(
+    song,
+    subjectUser?.userId,
+    scoreOwnerId,
+    version,
+  );
+
+  // ユーザーページ系は相手1人、/analytics系は複数対象。どちらも同じ形に揃えてグラフ・ランキングへ渡す
+  const resolvedTargets = useMemo<SongCompareTarget[]>(() => {
+    if (compareTargets) {
+      return compareTargets.map((tg, i) => ({
+        ...tg,
+        color: compareTargetColor(i),
+      }));
+    }
+    if (subjectUser && compare) {
+      return [
+        {
+          label: "RIVAL",
+          name: subjectUser.userName,
+          exScore: compare.subjectEx,
+          color: compareTargetColor(0),
+        },
+      ];
+    }
+    return [];
+  }, [compareTargets, subjectUser, compare]);
 
   const maxScore = song ? song.notes * 2 : 0;
   const currentEx = savedOverride?.exScore ?? (song ? song.exScore || 0 : 0);
@@ -185,6 +225,11 @@ const SongDetailView = ({
       tab={tab}
       onTabChange={setTab}
       tabs={tabs}
+      subjectUser={subjectUser}
+      compare={compare}
+      compareTargets={resolvedTargets}
+      rankingTargets={compareTargets ? resolvedTargets : undefined}
+      scoreOwnerId={scoreOwnerId}
       edit={{
         canEdit,
         isEditing,
