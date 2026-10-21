@@ -1955,6 +1955,82 @@
         ]
       }
     },
+    "/users/{userId}/scores/versions": {
+      "get": {
+        "summary": "スコアが存在するバージョン一覧取得",
+        "deprecated": false,
+        "description": "指定ユーザーがスコアを持つ IIDX バージョンの一覧を返します。比較対象に選べる旧バージョンの候補取得に使います。順序は保証されません。",
+        "tags": [
+          "Scores"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "スコアが存在するバージョンの配列",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/IIDXVersion"
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "description": "認証エラー",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
     "/users/{userId}/scores/unplayed": {
       "get": {
         "summary": "未プレイ楽曲一覧取得",
@@ -4796,6 +4872,15 @@
             }
           },
           {
+            "name": "rivalVersion",
+            "in": "query",
+            "description": "ライバル側だけ別バージョンのスコアと比較する場合に指定（未指定は version と同じ）",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
             "name": "level",
             "in": "query",
             "description": "難易度レベルでフィルタ（複数可）",
@@ -5295,6 +5380,19 @@
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "includeUserIds",
+            "in": "query",
+            "description": "フォロー外でも結果に含めるユーザーの UID（最大8件。配列で複数指定）。ライバルページで表示中の相手・自分の取得に使う",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 8
             }
           }
         ],
