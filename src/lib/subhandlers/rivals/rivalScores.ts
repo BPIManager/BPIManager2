@@ -23,7 +23,8 @@ export async function handleRivalScores(
       viewerId: null,
     };
   }
-  const { userId, rivalId, version, ...filterParams } = parsed.data;
+  const { userId, rivalId, version, rivalVersion, ...filterParams } =
+    parsed.data;
 
   try {
     const access = await checkProfileAccess(req, userId);
@@ -39,6 +40,7 @@ export async function handleRivalScores(
       viewerId: String(userId),
       rivalId,
       version,
+      rivalVersion,
     });
 
     const compared = rawResults

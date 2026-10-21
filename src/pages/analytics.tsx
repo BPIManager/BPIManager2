@@ -179,7 +179,7 @@ export default function AnalyticsPage() {
               <div className="flex flex-wrap items-center gap-2">
                 {targets.map((target, i) => (
                   <TargetBadge
-                    key={`${target.kind}-${target.param ?? ""}-${i}`}
+                    key={`${target.kind}-${target.param ?? ""}-${target.version ?? ""}-${i}`}
                     target={target}
                     indexLabel={targets.length > 1 ? `RIVAL${i + 1}` : undefined}
                     onClick={() => setEditing(i)}

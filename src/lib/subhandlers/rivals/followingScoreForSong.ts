@@ -17,13 +17,14 @@ export async function handleRivalFollowingScoresForSong(
       viewerId: null,
     };
   }
-  const { userId, songId, version } = parsed.data;
+  const { userId, songId, version, includeUserIds } = parsed.data;
 
   try {
     const rivalsScores = await rivalAggregateRepo.getFollowedScoresForSong({
       viewerId: String(userId),
       songId: Number(songId),
       version,
+      includeUserIds,
     });
     return {
       result: ok({

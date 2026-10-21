@@ -2,7 +2,6 @@ import { db } from "@/lib/db";
 
 import { latestLogIdPerUserSongSubquery, latestLogIdPerUserSongScalarSubquery } from "@/lib/db/shared/latestScore/perUser";
 import { userDisplayColumns } from "@/lib/db/shared/userDisplay";
-import { wherePublicOnly } from "@/lib/db/shared/visibility";
 
 /**
  * フォロー中ライバルのスコア集計（平均・最新・トップ）を担当するリポジトリクラス。
@@ -92,12 +91,12 @@ class RivalAggregateRepository {
     viewerId: string;
     songId: number;
     version: string;
+    includeUserIds?: string[];
   }) {
-    const { viewerId, songId, version } = params;
+    const { viewerId, songId, version, includeUserIds = [] } = params;
 
     return await db
-      .selectFrom("follows as f")
-      .innerJoin("users as u", "f.followingId", "u.userId")
+      .selectFrom("users as u")
       .innerJoin("scores as s", "u.userId", "s.userId")
       .innerJoin("songs as m", "s.songId", "m.songId")
       .innerJoin("songDef as d", (join) =>
@@ -116,10 +115,24 @@ class RivalAggregateRepository {
         "d.wrScore",
         "d.kaidenAvg",
       ])
-      .where("f.followerId", "=", viewerId)
+      .where((eb) =>
+        eb.or([
+          eb(
+            "u.userId",
+            "in",
+            eb
+              .selectFrom("follows as f")
+              .select("f.followingId")
+              .where("f.followerId", "=", viewerId),
+          ),
+          ...(includeUserIds.length > 0
+            ? [eb("u.userId", "in", includeUserIds)]
+            : []),
+        ]),
+      )
       .where("s.songId", "=", songId)
       .where("s.version", "=", version)
-      .$call((qb) => wherePublicOnly(qb, "u.isPublic"))
+      .where((eb) => eb.or([eb("u.isPublic", "=", 1), eb("u.userId", "=", viewerId)]))
       .where(
         "s.logId",
         "in",

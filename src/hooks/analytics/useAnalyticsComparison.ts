@@ -51,7 +51,11 @@ export const useAnalyticsComparison = (
     mutate: mutateRival,
   } = useAuthedSWRV2<SongWithRival[]>(
     target?.kind === "rival" && myUserId && target.param && fbUser
-      ? `${API_V2_PREFIX}/users/${myUserId}/rivals/${target.param}/scores?version=${targetVersion}`
+      ? `${API_V2_PREFIX}/users/${myUserId}/rivals/${target.param}/scores?version=${targetVersion}${
+          target.version && target.version !== targetVersion
+            ? `&rivalVersion=${target.version}`
+            : ""
+        }`
       : null,
     { revalidateOnFocus: false, dedupingInterval: 10000 },
   );
@@ -121,6 +125,7 @@ export const useAnalyticsComparison = (
     error: arenaError,
   } = useArenaJson(
     target?.kind === "arena" ? [11, 12] : [],
+    target?.version,
   );
 
   const {
@@ -129,7 +134,7 @@ export const useAnalyticsComparison = (
     isLoading: rivalAvgLoading,
   } = useRivalAvgScores(
     target?.kind === "rival-avg" ? myUserId : undefined,
-    targetVersion,
+    target?.version ?? targetVersion,
   );
 
   const {
@@ -138,7 +143,7 @@ export const useAnalyticsComparison = (
     isLoading: rivalTopLoading,
   } = useRivalTopScores(
     target?.kind === "rival-top" ? myUserId : undefined,
-    targetVersion,
+    target?.version ?? targetVersion,
   );
 
   const { version: topRankerVersion, areaId: topRankerAreaId } =

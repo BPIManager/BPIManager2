@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, ChevronLeft } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -16,21 +16,13 @@ import {
   RivalPickStep,
   ArenaRankStep,
   SelfVersionPickStep,
-  TopRankerVersionStep,
   TopRankerAreaStep,
+  VersionPickStep,
 } from "./ui";
-
-const BackButton = ({ onBack }: { onBack: () => void }) => {
-  const { t } = useTranslation();
-  return (
-    <button
-      onClick={onBack}
-      className="self-start text-xs text-bpim-muted hover:text-bpim-text flex items-center gap-1"
-    >
-      {t("common.back")}
-    </button>
-  );
-};
+import { useScoredVersions } from "@/hooks/scores/useScoredVersions";
+import { ARENA_DATA_VERSIONS } from "@/hooks/analytics/useTargetSelector";
+import { TOP_RANKER_VERSIONS } from "@/constants/iidx/topRankerAreas";
+import { versionTitles } from "@/constants/iidx/versionTitles";
 
 interface TargetSelectorModalProps {
   isOpen: boolean;
@@ -51,19 +43,23 @@ const TargetSelectorModal = ({
     setStep,
     selectedKind,
     selectedArenaRank,
-    setSelectedArenaRank,
     selectedSelfVersion,
-    selectedTopRankerVersion,
     selectedTopRankerArea,
     kindOptions,
     stepTitle,
+    backStep,
+    pendingKind,
+    handleVersionPick,
     handleKindClick,
     handleRivalPick,
-    handleArenaConfirm,
+    handleArenaRankPick,
+    pendingParam,
     handleSelfVersionPick,
-    handleTopRankerVersionPick,
     handleTopRankerAreaPick,
   } = useTargetSelector({ isOpen, current, onSelect, onClose });
+  const { versions: rivalVersions } = useScoredVersions(
+    pendingKind === "rival" ? pendingParam : undefined,
+  );
 
   return (
     <Dialog open={isOpen} onOpenChange={(o) => !o && onClose()}>
@@ -73,9 +69,22 @@ const TargetSelectorModal = ({
         className="flex flex-col p-0 overflow-hidden"
       >
         <DialogHeader className="border-b p-4 flex flex-row items-center justify-between space-y-0">
-          <DialogTitle className="flex items-center gap-2 text-bpim-text">
-            {stepTitle[step]}
-          </DialogTitle>
+          <div className="flex min-w-0 items-center gap-2">
+            {backStep[step] && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 shrink-0 text-bpim-muted hover:text-bpim-text"
+                aria-label={t("common.back")}
+                onClick={() => setStep(backStep[step]!)}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+            )}
+            <DialogTitle className="flex items-center gap-2 text-bpim-text">
+              {stepTitle[step]}
+            </DialogTitle>
+          </div>
         </DialogHeader>
 
         <div className="flex min-h-0 flex-col overflow-y-auto p-2 custom-scrollbar">
@@ -89,18 +98,14 @@ const TargetSelectorModal = ({
             )}
 
             {step === "rival-pick" && (
-              <>
-                <BackButton onBack={() => setStep("kind")} />
-                <RivalPickStep onSelect={handleRivalPick} />
-              </>
+              <RivalPickStep onSelect={handleRivalPick} />
             )}
 
             {step === "arena-rank" && (
               <>
-                <BackButton onBack={() => setStep("kind")} />
                 <ArenaRankStep
                   selected={selectedArenaRank}
-                  onSelect={setSelectedArenaRank}
+                  onSelect={handleArenaRankPick}
                 />
                 <div className="flex gap-3 rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-4">
                   <AlertCircle className="h-5 w-5 shrink-0 text-yellow-500/80" />
@@ -111,18 +116,11 @@ const TargetSelectorModal = ({
                     {t("analytics.arenaWarning")}
                   </p>
                 </div>
-                <Button
-                  onClick={handleArenaConfirm}
-                  className="mt-2 w-full bg-bpim-primary font-bold text-white hover:bg-bpim-primary/80"
-                >
-                  {t("analytics.compareWithSetting")}
-                </Button>
               </>
             )}
 
             {step === "self-version-pick" && (
               <>
-                <BackButton onBack={() => setStep("kind")} />
                 <p className="text-xs text-bpim-muted">
                   {t("analytics.selfVersionNote")}
                 </p>
@@ -133,19 +131,29 @@ const TargetSelectorModal = ({
               </>
             )}
 
-            {step === "top-ranker-version" && (
-              <>
-                <BackButton onBack={() => setStep("kind")} />
-                <TopRankerVersionStep
-                  selected={selectedTopRankerVersion}
-                  onSelect={handleTopRankerVersionPick}
-                />
-              </>
+            {step === "version-pick" && (
+              <VersionPickStep
+                versions={[...versionTitles]
+                  .sort(
+                    (a, b) =>
+                      (b.num === "INF" ? -1 : Number(b.num)) -
+                      (a.num === "INF" ? -1 : Number(a.num)),
+                  )}
+                availableVersions={
+                  pendingKind === "rival"
+                    ? rivalVersions
+                    : pendingKind === "arena"
+                      ? ARENA_DATA_VERSIONS
+                      : pendingKind === "top-ranker"
+                        ? [...TOP_RANKER_VERSIONS]
+                        : undefined
+                }
+                onSelect={handleVersionPick}
+              />
             )}
 
             {step === "top-ranker-area" && (
               <>
-                <BackButton onBack={() => setStep("top-ranker-version")} />
                 <TopRankerAreaStep
                   selected={selectedTopRankerArea}
                   onSelect={handleTopRankerAreaPick}

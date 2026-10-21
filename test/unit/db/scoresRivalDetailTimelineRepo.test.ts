@@ -140,7 +140,7 @@ describe("rivalAggregateRepo.getRivalLatestScoresBySong", () => {
 });
 
 describe("rivalAggregateRepo.getFollowedScoresForSong", () => {
-  it("followsとscoresを結合したクエリを実行し結果をそのまま返すこと", async () => {
+  it("usersとscoresを結合したクエリを実行し結果をそのまま返すこと", async () => {
     const rows = [{ userId: "rival-1", exScore: 1800 }];
     dbHolder.current = createDbSpy(rows);
 
@@ -152,7 +152,7 @@ describe("rivalAggregateRepo.getFollowedScoresForSong", () => {
 
     expect(result).toEqual(rows);
     expect(callsFor(dbHolder.current.calls, "selectFrom")[0].args).toEqual([
-      "follows as f",
+      "users as u",
     ]);
   });
 });

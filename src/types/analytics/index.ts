@@ -14,5 +14,7 @@ export type AnalyticsTargetKind =
 export interface AnalyticsTarget {
   kind: AnalyticsTargetKind;
   param?: string;
+  /** 比較先のIIDXバージョン。未指定なら画面で選択中のバージョン（アリーナは既定の集計バージョン） */
+  version?: string;
   label: string;
 }

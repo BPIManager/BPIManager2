@@ -23,6 +23,12 @@ export const analyticsTranslations = {
     "zh-TW": "選擇比較版本",
     ko: "비교할 버전 선택",
   },
+  "analytics.selectTargetVersion": {
+    ja: "比較するデータのバージョンを選択",
+    en: "Select the data version to compare",
+    "zh-TW": "選擇比較資料的版本",
+    ko: "비교할 데이터 버전 선택",
+  },
   "analytics.searchRivals": {
     ja: "ライバル名で検索...",
     en: "Search rivals...",
@@ -109,12 +115,6 @@ export const analyticsTranslations = {
     en: "Pick a version and area, then compare with the #1 score of each chart in that area.",
     "zh-TW": "選擇版本與地區，與該地區各譜面的第 1 名分數比較",
     ko: "버전과 지역을 선택하여 해당 지역 각 채보의 1위 점수와 비교합니다",
-  },
-  "analytics.selectTopRankerVersion": {
-    ja: "県別1位のバージョンを選択",
-    en: "Select a version",
-    "zh-TW": "選擇版本",
-    ko: "버전 선택",
   },
   "analytics.selectTopRankerArea": {
     ja: "エリアを選択",

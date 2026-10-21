@@ -13,9 +13,10 @@ import { Input } from "@/components/ui/input";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { cn } from "@/lib/utils";
 
+import type { SongCompareTarget } from "@/types/songs/compareTarget";
 import type { SongDetailSubject } from "@/utils/songs/songDetailMode";
 import type { SongWithScore } from "@/types/songs/score";
-import SongHistoryTab from "./History/ui";
+import SongHistoryPanel from "./History";
 import RivalsRanking from "./Rivals";
 import { AppTabsList, AppTabsTrigger } from "@/components/ui/complex/tabs";
 import StatsTab from "./Stats";
@@ -43,6 +44,14 @@ interface SongDetailModalViewProps {
   tab: string;
   onTabChange: (tab: string) => void;
   tabs: TabItem[];
+  subjectUser?: { userId: string; userName: string };
+  /** 自分/相手それぞれのEXスコア。subjectUser指定時のみ値を持つ */
+  compare: { myEx: number | null; subjectEx: number | null } | null;
+  scoreOwnerId?: string;
+  /** グラフに出す比較対象（空なら比較なし） */
+  compareTargets: SongCompareTarget[];
+  /** Rivalsタブのランキングへ差し込む比較対象 */
+  rankingTargets?: SongCompareTarget[];
   edit: {
     canEdit: boolean;
     isEditing: boolean;
@@ -72,6 +81,11 @@ const SongDetailModalView = ({
   tab,
   onTabChange,
   tabs,
+  subjectUser,
+  compare,
+  scoreOwnerId,
+  compareTargets,
+  rankingTargets,
   edit,
   display,
 }: SongDetailModalViewProps) => {
@@ -240,19 +254,35 @@ const SongDetailModalView = ({
 
             {displaySong && (
               <TabsContent value="stats" className="mt-0 outline-none">
-                <StatsTab song={displaySong} />
+                <StatsTab
+                  song={displaySong}
+                  compare={
+                    compareTargets.length > 0
+                      ? {
+                          myEx: compare ? compare.myEx : song.exScore,
+                          targets: compareTargets,
+                        }
+                      : undefined
+                  }
+                />
               </TabsContent>
             )}
 
             <TabsContent value="history" className="mt-0 outline-none">
-              <SongHistoryTab
+              <SongHistoryPanel
                 songId={song.songId}
                 notes={fullSong ? undefined : song.notes}
+                subjectUser={subjectUser}
               />
             </TabsContent>
 
             <TabsContent value="rivals" className="mt-0 outline-none">
-              <RivalsRanking song={song} />
+              <RivalsRanking
+                song={song}
+                highlightUserId={subjectUser?.userId}
+                scoreOwnerId={scoreOwnerId}
+                compareTargets={rankingTargets}
+              />
             </TabsContent>
           </Tabs>
         </div>
