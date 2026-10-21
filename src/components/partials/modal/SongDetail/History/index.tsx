@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { AppTabsGroup } from "@/components/ui/complex/tabs";
 import { useTranslation } from "@/hooks/common/useTranslation";
-import SongHistoryTab from "./ui";
+import SongHistoryTab from "./SongHistoryTab";
 
 interface SongHistoryPanelProps {
   songId: number;
