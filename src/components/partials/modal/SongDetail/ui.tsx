@@ -271,6 +271,7 @@ const SongDetailModalView = ({
             <TabsContent value="history" className="mt-0 outline-none">
               <SongHistoryPanel
                 songId={song.songId}
+                maxScore={song.notes * 2}
                 notes={fullSong ? undefined : song.notes}
                 subjectUser={subjectUser}
               />

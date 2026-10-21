@@ -3,16 +3,27 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Crown, TrendingUp, Calendar, AlertCircle } from "lucide-react";
 import type { Score } from "@/types/db";
+import { getDJRank } from "@/utils/songs/djRank";
+
+const djRankText = (
+  mode: "current" | "next",
+  exScore: number,
+  maxScore: number,
+) =>
+  `${getDJRank(exScore, maxScore, { mode, output: "label" })}${getDJRank(exScore, maxScore, { mode, output: "value" })}`;
 
 const HistoryRecordCard = ({
   record,
   scoreDiff,
   isGlobalBest,
   notes,
+  maxScore,
 }: {
   record: Score;
   scoreDiff: number | null;
   isGlobalBest: boolean;
+  /** 理論値(notes*2)。渡された場合のみDJランク表記(例: AAA+12 / MAX-34)を出す */
+  maxScore?: number;
   /** 全難易度スコア(BPI未計算)の場合に渡す。渡された場合はBPIの代わりにnotes基準の%を表示する */
   notes?: number;
 }) => {
@@ -70,6 +81,12 @@ const HistoryRecordCard = ({
           ) : (
             <span className="font-mono text-[10px] font-bold text-bpim-muted">
               BPI: {(record.bpi || -15).toFixed(2)}
+            </span>
+          )}
+          {maxScore != null && maxScore > 0 && (
+            <span className="font-mono text-[10px] font-bold text-bpim-muted">
+              {djRankText("current", record.exScore, maxScore)} /{" "}
+              {djRankText("next", record.exScore, maxScore)}
             </span>
           )}
         </div>

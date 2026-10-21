@@ -11,12 +11,14 @@ interface SongHistoryViewProps {
   globalMaxScore: number;
   /** 全難易度スコア(BPI未計算)の場合に notes を渡す。BPIの代わりにnotes基準の%を表示する */
   notes?: number;
+  maxScore: number;
 }
 
 const SongHistoryView = ({
   historyGroups,
   globalMaxScore,
   notes,
+  maxScore,
 }: SongHistoryViewProps) => {
   if (!historyGroups || Object.keys(historyGroups).length === 0)
     return (
@@ -61,6 +63,7 @@ const SongHistoryView = ({
                       globalMaxScore > 0 && record.exScore === globalMaxScore
                     }
                     notes={notes}
+                    maxScore={maxScore}
                   />
                 );
               })}

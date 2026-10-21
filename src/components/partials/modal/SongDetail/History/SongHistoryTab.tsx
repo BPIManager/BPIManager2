@@ -14,9 +14,15 @@ interface SongHistoryTabProps {
   userId?: string;
   /** 全難易度スコア(BPI未計算)の場合に notes を渡す。BPIの代わりにnotes基準の%を表示する */
   notes?: number;
+  maxScore: number;
 }
 
-const SongHistoryTab = ({ songId, userId, notes }: SongHistoryTabProps) => {
+const SongHistoryTab = ({
+  songId,
+  userId,
+  notes,
+  maxScore,
+}: SongHistoryTabProps) => {
   const { fbUser } = useUser();
   const targetUserId = userId ?? fbUser?.uid;
   const isAllScores = notes != null;
@@ -54,6 +60,7 @@ const SongHistoryTab = ({ songId, userId, notes }: SongHistoryTabProps) => {
       historyGroups={historyGroups}
       globalMaxScore={globalMaxScore}
       notes={notes}
+      maxScore={maxScore}
     />
   );
 };
