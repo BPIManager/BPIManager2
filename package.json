@@ -79,7 +79,7 @@
     "@types/react-dom": "^19",
     "@types/sharp": "^0.32.0",
     "eslint": "^9",
-    "eslint-config-next": "^16.4.2",
+    "eslint-config-next": "^16.2.1",
     "jsdom": "^29.0.1",
     "kysely-codegen": "^0.20.0",
     "sharp": "^0.35.5",
