@@ -80,7 +80,10 @@ export async function handleStatsPerformance(q: {
     date: q.date,
     plays,
     target: targetSummary ? toDay(targetSummary) : null,
-    past: summaries.filter((s) => s.playDate < q.date).map(toDay),
+    past: summaries
+      .filter((s) => s.playDate < q.date)
+      .slice(0, PAST_DAYS_LIMIT)
+      .map(toDay),
     hasTowerData: towerByDate.has(q.date),
   });
 }

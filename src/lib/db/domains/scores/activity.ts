@@ -161,9 +161,6 @@ class ScoreActivityRepository {
   }
 
   /**
-   * 指定ユーザー・バージョンでスコア登録のある年月一覧を新しい順で返す。
-   */
-  /**
    * `before` 以前の日別プレイサマリー(JST日付単位)を新しい日から最大 `limit` 日分返す。
    * プレイ時刻は `lastPlayed`、曲数は日内のユニーク曲数。
    */
@@ -197,6 +194,9 @@ class ScoreActivityRepository {
     }));
   }
 
+  /**
+   * 指定ユーザー・バージョンでスコア登録のある年月一覧を新しい順で返す。
+   */
   async getAvailableMonths(userId: string, version: string): Promise<string[]> {
     const rows = await db
       .selectFrom("scores")

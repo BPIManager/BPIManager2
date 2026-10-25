@@ -98,7 +98,8 @@ export const BatchSummaryCards = ({
   const versionIdx = version
     ? (IIDX_VERSIONS as readonly string[]).indexOf(version)
     : -1;
-  const previousVersion = versionIdx > 0 ? IIDX_VERSIONS[versionIdx - 1] : null;
+  const previousVersion =
+    version !== "INF" && versionIdx > 0 ? IIDX_VERSIONS[versionIdx - 1] : null;
   const recordStats = [
     {
       label: t("logs.summary.selfBestUpdates"),

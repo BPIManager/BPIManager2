@@ -113,7 +113,8 @@ export function computeRecordCounts(
   }[],
   version: string,
 ): BatchRecordCounts {
-  const prevVersion = previousVersionOf(version);
+  // INFINITASはナンバリングの系列外のため、34を前作として扱わない
+  const prevVersion = version === "INF" ? null : previousVersionOf(version);
   let selfBestUpdates = 0;
   let prevVersionOvertakes = 0;
   let hasPrevVersionScore = false;
