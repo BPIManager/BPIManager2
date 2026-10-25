@@ -17,7 +17,7 @@ import ManualEntryAccordion from "../ManualEntry";
 import McpEntryAccordion from "../McpEntry";
 import DeleteGuideAccordion from "../DeleteGuide";
 import InstructionSection from "../Instruction";
-import StepCard from "../StepCard";
+import StepCard from "@/components/partials/common/Import/StepCard";
 import {
   type CsvType,
   CSV_TYPE_LABELS,
