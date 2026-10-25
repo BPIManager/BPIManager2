@@ -30,6 +30,7 @@ import { AppTabsList, AppTabsTrigger } from "@/components/ui/complex/tabs";
 import { useBpiStep } from "@/hooks/common/useBpiStep";
 import MonthlyReviewBanner from "@/components/partials/common/MonthlyReviewBanner";
 import dayjs from "@/lib/dayjs";
+import PerformanceTab from "../Performance";
 
 const LogsDetailContent = ({
   userId,
@@ -70,17 +71,26 @@ const LogsDetailContent = ({
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const { share, isSharing } = useShareResult();
 
+  const showPerformanceTab = type === "daily";
   const activeTab =
-    router.query.levels || router.query.difficulties ? "songs" : "summary";
+    showPerformanceTab && router.query.view === "performance"
+      ? "performance"
+      : router.query.levels || router.query.difficulties
+        ? "songs"
+        : "summary";
 
   const handleTabChange = (nextTab: string) => {
     const nextQuery = { ...router.query };
 
-    if (nextTab === "songs") {
+    if (nextTab === "performance") {
+      nextQuery.view = "performance";
+    } else if (nextTab === "songs") {
+      delete nextQuery.view;
       nextQuery.levels = "11,12";
       nextQuery.difficulties = "ANOTHER,LEGGENDARIA,HYPER";
       nextQuery.page = "1";
     } else {
+      delete nextQuery.view;
       const filterKeys = [
         "levels",
         "difficulties",
@@ -95,11 +105,45 @@ const LogsDetailContent = ({
         "until",
         "versions",
         "clearStates",
+        "compareVersion",
+        "compareResult",
       ];
       filterKeys.forEach((key) => delete nextQuery[key]);
     }
 
     router.push({ query: nextQuery }, undefined, { shallow: true });
+  };
+
+  const handleOpenList = (compareVersion: string) => {
+    const nextQuery = {
+      ...router.query,
+      levels: "11,12",
+      difficulties: "ANOTHER,LEGGENDARIA,HYPER",
+      page: "1",
+      compareVersion,
+      compareResult: "plus",
+    };
+    router.push({ query: nextQuery }, undefined, { shallow: true });
+  };
+
+  // パフォーマンスタブはプレイ日(lastPlayed)基準のため、同じ集合になるよう groupedBy も合わせる
+  const handleOpenUpdatedSongs = () => {
+    const { view: _view, ...rest } = router.query;
+    router.push(
+      {
+        query: {
+          ...rest,
+          groupedBy: "lastPlayed",
+          levels: "11,12",
+          difficulties: "ANOTHER,LEGGENDARIA,HYPER",
+          page: "1",
+          sortKey: "updatedAt",
+          sortOrder: "desc",
+        },
+      },
+      undefined,
+      { shallow: true },
+    );
   };
 
   if (isLoading) return <LogsDetailContentSkeleton />;
@@ -166,13 +210,22 @@ const LogsDetailContent = ({
         className="w-full"
       >
         <div className="flex w-full items-center justify-between gap-4">
-          <AppTabsList visual="minimal" cols={2} className="max-w-md">
+          <AppTabsList
+            visual="minimal"
+            cols={showPerformanceTab ? 3 : 2}
+            className="max-w-md"
+          >
             <AppTabsTrigger visual="minimal" value="summary">
               {t("logs.detail.tab.summary")}
             </AppTabsTrigger>
             <AppTabsTrigger visual="minimal" value="songs">
               {tFormat("logs.detail.tab.songs", { count: details.songs.length })}
             </AppTabsTrigger>
+            {showPerformanceTab && (
+              <AppTabsTrigger visual="minimal" value="performance">
+                {t("logs.detail.tab.performance")}
+              </AppTabsTrigger>
+            )}
           </AppTabsList>
 
           {!isPublicPage && (
@@ -197,7 +250,13 @@ const LogsDetailContent = ({
           <div ref={summaryRef} className={cn(isModalOpen ? "p-4" : "p-0")}>
             <BatchTotalBpiCard pagination={details.pagination} />
             {summary && (
-              <BatchSummaryCards isSharing={isModalOpen} summary={summary} />
+              <BatchSummaryCards
+                isSharing={isModalOpen}
+                summary={summary}
+                recordCounts={details.recordCounts}
+                version={version}
+                onOpenList={handleOpenList}
+              />
             )}
             <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
               <DistributionChart
@@ -282,6 +341,22 @@ const LogsDetailContent = ({
             onScoreSaved={() => mutate()}
           />
         </TabsContent>
+
+        {showPerformanceTab && (
+          <TabsContent
+            value="performance"
+            className="mt-0 py-6 focus-visible:outline-none"
+          >
+            <PerformanceTab
+              userId={userId}
+              version={version}
+              date={date}
+              canImport={!isPublicPage}
+              active={activeTab === "performance"}
+              onOpenSongs={handleOpenUpdatedSongs}
+            />
+          </TabsContent>
+        )}
       </Tabs>
 
       {!isPublicPage && type === "batch" && (

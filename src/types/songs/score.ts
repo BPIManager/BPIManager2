@@ -126,6 +126,8 @@ export interface FilterParamsFrontend {
     | "scoreRate";
   sortOrder?: "asc" | "desc";
   compareVersion?: string;
+  /** 比較対象とのEX差で絞り込む(プラスのみ/マイナスのみ)。比較対象が有効なときのみ意味を持つ */
+  compareResult?: "plus" | "minus";
 
   scoreFilters?: ScoreFilterCondition[];
   missCountMin?: number;

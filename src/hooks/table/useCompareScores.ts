@@ -1,6 +1,7 @@
 import { SongWithScore } from "@/types/songs/score";
 import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
 import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
+import { SELF_BEST_COMPARE } from "@/constants/logic/compareTarget";
 
 /**
  * 異なる IIDX バージョン間のスコア比較データを取得する。
@@ -21,6 +22,7 @@ export const useCompareScores = (
     !!currentVersion &&
     !!compareVersion &&
     compareVersion !== "none" &&
+    compareVersion !== SELF_BEST_COMPARE &&
     compareVersion !== currentVersion;
 
   const { data, error, isLoading } = useAuthedSWRV2<SongWithScore[]>(

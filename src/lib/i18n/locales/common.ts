@@ -204,6 +204,30 @@ export const commonTranslations = {
     "zh-TW": "比較顯示",
     ko: "비교 표시",
   },
+  "filter.compareResult.all": {
+    ja: "差: 全て",
+    en: "Diff: All",
+    "zh-TW": "差異: 全部",
+    ko: "차이: 전체",
+  },
+  "filter.compareResult.plus": {
+    ja: "プラスのみ",
+    en: "Positive only",
+    "zh-TW": "僅正差",
+    ko: "플러스만",
+  },
+  "filter.compareResult.minus": {
+    ja: "マイナスのみ",
+    en: "Negative only",
+    "zh-TW": "僅負差",
+    ko: "마이너스만",
+  },
+  "filter.selfBest": {
+    ja: "自己歴代",
+    en: "All-time best",
+    "zh-TW": "歷代自我紀錄",
+    ko: "자기 역대",
+  },
   "filter.noCompare": {
     ja: "比較なし",
     en: "No compare",

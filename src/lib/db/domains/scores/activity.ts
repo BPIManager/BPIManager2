@@ -163,6 +163,40 @@ class ScoreActivityRepository {
   /**
    * 指定ユーザー・バージョンでスコア登録のある年月一覧を新しい順で返す。
    */
+  /**
+   * `before` 以前の日別プレイサマリー(JST日付単位)を新しい日から最大 `limit` 日分返す。
+   * プレイ時刻は `lastPlayed`、曲数は日内のユニーク曲数。
+   */
+  async getDailyPlaySummaries(
+    userId: string,
+    version: string,
+    before: Date,
+    limit: number,
+  ) {
+    const jstDate = sql`DATE_FORMAT(CONVERT_TZ(lastPlayed, '+00:00', '+09:00'), '%Y-%m-%d')`;
+    const rows = await db
+      .selectFrom("scores")
+      .select([
+        jstDate.as("playDate"),
+        sql<number>`COUNT(DISTINCT songId)`.as("songCount"),
+        sql<number>`UNIX_TIMESTAMP(MIN(lastPlayed)) * 1000`.as("firstPlayedAt"),
+        sql<number>`UNIX_TIMESTAMP(MAX(lastPlayed)) * 1000`.as("lastPlayedAt"),
+      ])
+      .where("userId", "=", userId)
+      .where("version", "=", version)
+      .where("lastPlayed", "<=", before)
+      .groupBy(jstDate)
+      .orderBy(sql`playDate`, "desc")
+      .limit(limit)
+      .execute();
+    return rows.map((r) => ({
+      playDate: String(r.playDate),
+      songCount: Number(r.songCount),
+      firstPlayedAt: Number(r.firstPlayedAt),
+      lastPlayedAt: Number(r.lastPlayedAt),
+    }));
+  }
+
   async getAvailableMonths(userId: string, version: string): Promise<string[]> {
     const rows = await db
       .selectFrom("scores")
