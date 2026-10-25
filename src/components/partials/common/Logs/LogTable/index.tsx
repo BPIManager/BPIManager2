@@ -1,9 +1,12 @@
 import { useMemo, useState, RefObject } from "react";
+import { useRouter } from "next/router";
 import { useSongFilter } from "@/hooks/table/useSongFilter";
 import { useCompareScores } from "@/hooks/table/useCompareScores";
 import { useMergedCompareSongs } from "@/hooks/table/useMergedCompareSongs";
 import { PAGE_SIZE } from "@/constants/logic/pagination";
 import { mapBatchToSongs } from "@/utils/logs/getSongTable";
+import { getPriorSelfBest } from "@/utils/logs/getSelfBestCompare";
+import { SELF_BEST_COMPARE } from "@/constants/logic/compareTarget";
 import SongDetailView from "@/components/partials/modal/SongDetail";
 import CustomPagination from "@/components/partials/common/ListControls/Pagination/ui";
 import AdvancedFilterModal from "@/components/partials/common/Songs/AdvancedFilter/ui";
@@ -32,27 +35,57 @@ const BatchSongsTable = ({
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
 
-  // デフォルトの比較対象は「比較しない」
-  const { params, updateParams, page, setPage, visibleSongs, totalCount } =
-    useSongFilter(mappedSongs);
+  // 比較差でのフィルタはページング前に行う必要があるため、比較先はURLから直接読む
+  const { query } = useRouter();
+  const compareVersion =
+    typeof query.compareVersion === "string" ? query.compareVersion : undefined;
+  const compareResult = query.compareResult;
 
-  const { compareData } = useCompareScores(
+  const { compareData: versionCompareData } = useCompareScores(
     userId,
     version,
-    params.compareVersion,
+    compareVersion,
   );
-  const { mergedVisible } = useMergedCompareSongs(
+  const compareData = useMemo(
+    () =>
+      compareVersion === SELF_BEST_COMPARE
+        ? mappedSongs.map((m, i) => ({
+            ...m,
+            rival: getPriorSelfBest(songs[i]),
+          }))
+        : versionCompareData,
+    [compareVersion, songs, mappedSongs, versionCompareData],
+  );
+  const { mergedSongs } = useMergedCompareSongs(
     mappedSongs,
-    visibleSongs,
+    [],
     compareData,
-    params.compareVersion,
+    compareVersion,
   );
+
+  // 比較データ取得前は差分が未確定のためフィルタしない
+  const comparedSongs = useMemo(() => {
+    if (!compareData || (compareResult !== "plus" && compareResult !== "minus"))
+      return mergedSongs;
+    return mergedSongs?.filter((s) =>
+      s.exDiff === undefined
+        ? false
+        : compareResult === "plus"
+          ? s.exDiff > 0
+          : s.exDiff < 0,
+    );
+  }, [mergedSongs, compareData, compareResult]);
+
+  const { params, updateParams, page, setPage, visibleSongs, totalCount } =
+    useSongFilter(comparedSongs);
 
   return (
     <div className="flex w-full flex-col gap-4">
       <SongFilterBar
         disableVersionSelect
         withSelfCompare
+        withSelfBestCompare
+        withCompareResultFilter
         currentVersion={version}
         params={params}
         onParamsChange={updateParams}
@@ -62,7 +95,7 @@ const BatchSongsTable = ({
 
       <div className="min-h-100">
         <SongList
-          songs={mergedVisible}
+          songs={visibleSongs}
           compareVersion={params.compareVersion}
           onSongSelect={(song) => {
             setSelectedSong(song);

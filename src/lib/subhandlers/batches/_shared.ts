@@ -3,7 +3,13 @@ import { rivalOvertakenRepo } from "@/lib/db/aggregates/rivalScores/overtaken";
 import { timelineRepo } from "@/lib/db/domains/scores/timeline";
 import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 import type { HandlerResult } from "@/types/api";
-import type { OvertakenMap, VersionOvertakenMap } from "@/types/logs/overtaken";
+import { previousVersionOf } from "@/lib/subhandlers/stats/monthlyReviewV2/period";
+import type { BatchRecordCounts } from "@/types/logs/batchDetail";
+import type {
+  OvertakenMap,
+  VersionOvertakenInfo,
+  VersionOvertakenMap,
+} from "@/types/logs/overtaken";
 
 /**
  * batches ドメインの subhandler 共通型・ヘルパー（追い抜きライバル関連を含む）。
@@ -96,18 +102,57 @@ function createVersionOvertakenMap(
 }
 
 /**
+ * 更新曲の versionOvertaken / previous から、自己歴代更新数と前作超え曲数(現在のスコアが前作を上回る更新曲数)を集計する。
+ * 自己歴代更新は過去のスコアが存在する曲のみ数える（初プレイは含めない）。
+ */
+export function computeRecordCounts(
+  songs: {
+    current: { exScore: number };
+    previous: { exScore: number } | null;
+    versionOvertaken: VersionOvertakenInfo[];
+  }[],
+  version: string,
+): BatchRecordCounts {
+  // INFINITASはナンバリングの系列外のため、34を前作として扱わない
+  const prevVersion = version === "INF" ? null : previousVersionOf(version);
+  let selfBestUpdates = 0;
+  let prevVersionOvertakes = 0;
+  let hasPrevVersionScore = false;
+
+  for (const s of songs) {
+    const pastScores = [
+      ...(s.previous ? [s.previous.exScore] : []),
+      ...s.versionOvertaken.map((v) => v.targetScore),
+    ];
+    if (pastScores.length > 0 && s.current.exScore > Math.max(...pastScores)) {
+      selfBestUpdates++;
+    }
+
+    const prevRow = prevVersion
+      ? s.versionOvertaken.find((v) => v.targetVersion === prevVersion)
+      : undefined;
+    if (prevRow) {
+      hasPrevVersionScore = true;
+      if (prevRow.diff > 0) prevVersionOvertakes++;
+    }
+  }
+
+  return {
+    selfBestUpdates,
+    prevVersionOvertakes: hasPrevVersionScore ? prevVersionOvertakes : null,
+  };
+}
+
+/**
  * バッチ（または期間）内で更新したスコアと、他バージョンの自分のスコアとの比較情報を全件返す（isNewOvertake で新規追い抜きを判定できる）。
- * 自分以外のログ閲覧時は空マップを返し、他人の非公開な比較情報を出さない。
  */
 export async function fetchVersionOvertakenMap(params: {
   userId: string;
   currentVersion: string;
-  isOwnLog: boolean;
   batchId?: string;
   range?: { start: Date; end: Date; basis: "lastPlayed" | "createdAt" };
 }): Promise<VersionOvertakenMap> {
-  const { userId, currentVersion, isOwnLog, batchId, range } = params;
-  if (!isOwnLog) return {};
+  const { userId, currentVersion, batchId, range } = params;
 
   const rows = await timelineRepo.getVersionComparisons({
     userId,

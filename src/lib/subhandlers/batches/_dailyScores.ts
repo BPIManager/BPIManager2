@@ -10,6 +10,7 @@ import { mapToLogNested } from "@/utils/logs/getMapNested";
 import {
   createOvertakenMap,
   computeRivalRankMap,
+  computeRecordCounts,
   fetchVersionOvertakenMap,
 } from "./_shared";
 import type { IIDXVersion } from "@/types/iidx/version";
@@ -63,7 +64,6 @@ export async function handleLastPlayedBase(
   const versionOvertakenMapPromise = fetchVersionOvertakenMap({
     userId: uid,
     currentVersion: ver,
-    isOwnLog,
     range: { ...range, basis: "lastPlayed" },
   });
 
@@ -107,16 +107,19 @@ export async function handleLastPlayedBase(
   const nextNavDate =
     (nav.nextDate as { lastPlayed?: Date } | null)?.lastPlayed ?? null;
 
+  const songs = dailyScores.map((s) => {
+    const mapped = mapToLogNested(s);
+    return {
+      ...mapped,
+      overtaken: overtakenMap[s.songId] || [],
+      versionOvertaken: versionOvertakenMap[s.songId] || [],
+      rivalRankInfo: rivalRankMap[s.songId] ?? null,
+    };
+  });
+
   return {
-    songs: dailyScores.map((s) => {
-      const mapped = mapToLogNested(s);
-      return {
-        ...mapped,
-        overtaken: overtakenMap[s.songId] || [],
-        versionOvertaken: versionOvertakenMap[s.songId] || [],
-        rivalRankInfo: rivalRankMap[s.songId] ?? null,
-      };
-    }),
+    songs,
+    recordCounts: computeRecordCounts(songs, ver),
     pagination: {
       prev: {
         batchId: prevNavDate
@@ -172,7 +175,6 @@ export async function handleCreatedAtBase(
   const versionOvertakenMapPromise = fetchVersionOvertakenMap({
     userId: uid,
     currentVersion: ver,
-    isOwnLog,
     range: { ...range, basis: "createdAt" },
   });
 
@@ -192,16 +194,19 @@ export async function handleCreatedAtBase(
   const overtakenMap = createOvertakenMap(overtaken);
   const rivalRankMap = computeRivalRankMap(overtakenMap, rivalScores);
 
+  const songs = scores.map((s) => {
+    const mapped = mapToLogNested(s);
+    return {
+      ...mapped,
+      overtaken: s.songId ? overtakenMap[s.songId] || [] : [],
+      versionOvertaken: s.songId ? versionOvertakenMap[s.songId] || [] : [],
+      rivalRankInfo: s.songId ? (rivalRankMap[s.songId] ?? null) : null,
+    };
+  });
+
   return {
-    songs: scores.map((s) => {
-      const mapped = mapToLogNested(s);
-      return {
-        ...mapped,
-        overtaken: s.songId ? overtakenMap[s.songId] || [] : [],
-        versionOvertaken: s.songId ? versionOvertakenMap[s.songId] || [] : [],
-        rivalRankInfo: s.songId ? (rivalRankMap[s.songId] ?? null) : null,
-      };
-    }),
+    songs,
+    recordCounts: computeRecordCounts(songs, ver),
     pagination: {
       prev: nav.prevDate,
       current: {

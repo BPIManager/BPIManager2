@@ -3,7 +3,7 @@ import DashboardLayout from "@/components/partials/shell/DashboardLayout";
 import { LoginRequiredCard } from "@/components/partials/common/Auth/LoginRequired/ui";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import ScoreImportView, { type ScoreImportProps } from "../ScoreView";
-import TowerImportView, { type TowerImportProps } from "../TowerView";
+import TowerImportView, { type TowerImportProps } from "@/components/partials/common/Import/TowerView";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface Props {

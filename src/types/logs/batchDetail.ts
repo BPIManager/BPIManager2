@@ -48,8 +48,14 @@ export interface BatchDetailItem {
   } | null;
 }
 
+export interface BatchRecordCounts {
+  selfBestUpdates: number | null;
+  prevVersionOvertakes: number | null;
+}
+
 export interface BatchDetailResponse {
   songs: BatchDetailItem[];
+  recordCounts?: BatchRecordCounts;
   pagination: {
     prev: BatchRef | null;
     next: BatchRef | null;

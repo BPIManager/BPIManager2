@@ -24,6 +24,7 @@ import {
 } from "@/components/partials/common/ListControls/FilterControls";
 import { SlidersHorizontal } from "lucide-react";
 import { toggleArrayItem } from "@/hooks/common/useToggleArray";
+import { SELF_BEST_COMPARE } from "@/constants/logic/compareTarget";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { type TranslationKey } from "@/lib/i18n/translations";
 
@@ -35,6 +36,10 @@ interface SongFilterBarProps {
   disableVersionSelect?: boolean;
   withRivals?: "full" | "score-only" | false;
   withSelfCompare?: boolean;
+  /** 比較対象に「自己歴代」(更新前時点の全バージョン自己ベスト)を追加する。更新ログ用 */
+  withSelfBestCompare?: boolean;
+  /** 比較対象とのEX差(プラス/マイナス)で絞り込むセレクトを出す。更新ログ用 */
+  withCompareResultFilter?: boolean;
   withScoreRate?: boolean;
   currentVersion?: string;
   /** LEVELチェックボックスの選択肢（既定: ☆11/12。全曲ページでは☆1〜12を渡す） */
@@ -55,6 +60,8 @@ const SongFilterBar = ({
   disableVersionSelect,
   withRivals,
   withSelfCompare = false,
+  withSelfBestCompare = false,
+  withCompareResultFilter = false,
   withScoreRate = false,
   currentVersion,
   levelItems = [11, 12],
@@ -75,8 +82,15 @@ const SongFilterBar = ({
         v.value !==
         (currentVersion ?? String(currentStoreVersion ?? latestVersion)),
     );
-    return [{ label: t("filter.noCompare"), value: "none" }, ...base];
-  }, [currentVersion, currentStoreVersion, t]);
+    const selfBest = withSelfBestCompare
+      ? [{ label: t("filter.selfBest"), value: SELF_BEST_COMPARE }]
+      : [];
+    return [
+      { label: t("filter.noCompare"), value: "none" },
+      ...selfBest,
+      ...base,
+    ];
+  }, [currentVersion, currentStoreVersion, withSelfBestCompare, t]);
 
   const hasCompare = params.compareVersion && params.compareVersion !== "none";
 
@@ -175,10 +189,30 @@ const SongFilterBar = ({
               onValueChange={(val) =>
                 onParamsChange({
                   compareVersion: val === "none" ? undefined : val,
+                  ...(val === "none" ? { compareResult: undefined } : {}),
                 })
               }
               options={compareVersionOptions}
               placeholder={t("filter.compareVersion")}
+              className="h-9"
+            />
+          </div>
+        )}
+        {withSelfCompare && withCompareResultFilter && hasCompare && (
+          <div className="relative flex-1 h-9">
+            <FilterSelect
+              value={params.compareResult || "all"}
+              onValueChange={(val) =>
+                onParamsChange({
+                  compareResult: val === "all" ? undefined : (val as "plus" | "minus"),
+                })
+              }
+              options={[
+                { label: t("filter.compareResult.all"), value: "all" },
+                { label: t("filter.compareResult.plus"), value: "plus" },
+                { label: t("filter.compareResult.minus"), value: "minus" },
+              ]}
+              placeholder={t("filter.compareResult.all")}
               className="h-9"
             />
           </div>

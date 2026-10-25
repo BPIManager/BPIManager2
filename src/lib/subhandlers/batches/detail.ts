@@ -18,6 +18,7 @@ import {
 import {
   createOvertakenMap,
   computeRivalRankMap,
+  computeRecordCounts,
   fetchVersionOvertakenMap,
   targetOf,
   type HandleOutcome,
@@ -77,7 +78,6 @@ export async function handleBatchDetail(
         fetchVersionOvertakenMap({
           userId: uid,
           currentVersion: v,
-          isOwnLog,
           batchId: bid,
         }),
       ]);
@@ -96,19 +96,20 @@ export async function handleBatchDetail(
         : [];
     const rivalRankMap = computeRivalRankMap(overtakenMap, rivalScores);
 
+    const songs = scores.map((s) => {
+      const mapped = mapToLogNested(s);
+      return {
+        ...mapped,
+        overtaken: s.songId ? overtakenMap[s.songId] || [] : [],
+        versionOvertaken: s.songId ? versionOvertakenMap[s.songId] || [] : [],
+        rivalRankInfo: s.songId ? (rivalRankMap[s.songId] ?? null) : null,
+      };
+    });
+
     return {
       result: ok({
-        songs: scores.map((s) => {
-          const mapped = mapToLogNested(s);
-          return {
-            ...mapped,
-            overtaken: s.songId ? overtakenMap[s.songId] || [] : [],
-            versionOvertaken: s.songId
-              ? versionOvertakenMap[s.songId] || []
-              : [],
-            rivalRankInfo: s.songId ? (rivalRankMap[s.songId] ?? null) : null,
-          };
-        }),
+        songs,
+        recordCounts: computeRecordCounts(songs, v),
         pagination: {
           ...nav,
           current: targetBatch,

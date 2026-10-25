@@ -2336,6 +2336,9 @@
                         "$ref": "#/components/schemas/BatchScoreEntry"
                       }
                     },
+                    "recordCounts": {
+                      "$ref": "#/components/schemas/BatchRecordCounts"
+                    },
                     "pagination": {
                       "$ref": "#/components/schemas/BatchPagination"
                     }
@@ -2477,6 +2480,9 @@
                       "items": {
                         "$ref": "#/components/schemas/LogEntry"
                       }
+                    },
+                    "recordCounts": {
+                      "$ref": "#/components/schemas/BatchRecordCounts"
                     },
                     "pagination": {
                       "$ref": "#/components/schemas/BatchPagination"
@@ -12496,6 +12502,238 @@
           }
         ]
       }
+    },
+    "/users/{userId}/stats/performance": {
+      "get": {
+        "summary": "日別パフォーマンス取得",
+        "deprecated": false,
+        "description": "指定日（JST、プレイ時刻基準）にスコアが更新された曲の時系列と、その日および過去30プレイ日の日別サマリーを返します。IIDXタワーの取込済み記録があれば鍵盤数・スクラッチ数も含みます。\n公開ユーザーは認証不要。非公開ユーザーは Bearer トークン（本人）が必要です。",
+        "tags": [
+          "Stats"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "IIDX バージョン番号 (26〜34, INF)。未指定・不正値は最新バージョンにフォールバック",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "description": "対象日 (YYYY-MM-DD, JST)",
+            "required": true,
+            "example": "2026-09-20",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "日別パフォーマンス",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "date": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "plays": {
+                      "type": "array",
+                      "description": "スコア更新のあった曲（更新時刻の昇順）",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "songId": {
+                            "type": "integer"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "difficulty": {
+                            "type": "string"
+                          },
+                          "level": {
+                            "type": "integer"
+                          },
+                          "exScore": {
+                            "type": "integer"
+                          },
+                          "bpi": {
+                            "type": "number",
+                            "nullable": true
+                          },
+                          "playedAt": {
+                            "type": "integer",
+                            "description": "UNIXミリ秒"
+                          }
+                        }
+                      }
+                    },
+                    "target": {
+                      "type": "object",
+                      "properties": {
+                        "date": {
+                          "type": "string",
+                          "format": "date"
+                        },
+                        "songCount": {
+                          "type": "integer",
+                          "description": "その日スコアが更新された曲数"
+                        },
+                        "firstPlayedAt": {
+                          "type": "integer",
+                          "description": "最初のスコア更新時刻（UNIXミリ秒）"
+                        },
+                        "lastPlayedAt": {
+                          "type": "integer",
+                          "description": "最後のスコア更新時刻（UNIXミリ秒）"
+                        },
+                        "playMinutes": {
+                          "type": "integer",
+                          "description": "推定プレイ時間（分）。最初と最後のスコア更新の間隔"
+                        },
+                        "sessionBpi": {
+                          "type": "number",
+                          "nullable": true,
+                          "description": "サマリーの「今日のBPI」と同じ指標（☆12更新曲のべき乗平均）。☆12の更新が無い日は null"
+                        },
+                        "keyCount": {
+                          "type": "integer",
+                          "nullable": true,
+                          "description": "IIDXタワーの鍵盤数。未取込の日は null"
+                        },
+                        "scratchCount": {
+                          "type": "integer",
+                          "nullable": true,
+                          "description": "IIDXタワーのスクラッチ数。未取込の日は null"
+                        }
+                      },
+                      "nullable": true,
+                      "description": "対象日のサマリー。対象日にスコア更新が無ければ null"
+                    },
+                    "past": {
+                      "type": "array",
+                      "description": "対象日より前のプレイ日（新しい順、最大30日）",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "date": {
+                            "type": "string",
+                            "format": "date"
+                          },
+                          "songCount": {
+                            "type": "integer",
+                            "description": "その日スコアが更新された曲数"
+                          },
+                          "firstPlayedAt": {
+                            "type": "integer",
+                            "description": "最初のスコア更新時刻（UNIXミリ秒）"
+                          },
+                          "lastPlayedAt": {
+                            "type": "integer",
+                            "description": "最後のスコア更新時刻（UNIXミリ秒）"
+                          },
+                          "playMinutes": {
+                            "type": "integer",
+                            "description": "推定プレイ時間（分）。最初と最後のスコア更新の間隔"
+                          },
+                          "sessionBpi": {
+                            "type": "number",
+                            "nullable": true,
+                            "description": "サマリーの「今日のBPI」と同じ指標（☆12更新曲のべき乗平均）。☆12の更新が無い日は null"
+                          },
+                          "keyCount": {
+                            "type": "integer",
+                            "nullable": true,
+                            "description": "IIDXタワーの鍵盤数。未取込の日は null"
+                          },
+                          "scratchCount": {
+                            "type": "integer",
+                            "nullable": true,
+                            "description": "IIDXタワーのスクラッチ数。未取込の日は null"
+                          }
+                        }
+                      }
+                    },
+                    "hasTowerData": {
+                      "type": "boolean",
+                      "description": "対象日のIIDXタワー記録があるか"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "description": "パラメータ不正",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "認証エラー",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -14542,6 +14780,21 @@
             "type": "string",
             "format": "date-time",
             "nullable": true
+          }
+        }
+      },
+      "BatchRecordCounts": {
+        "type": "object",
+        "description": "更新した曲に対する記録系の集計",
+        "properties": {
+          "selfBestUpdates": {
+            "type": "integer",
+            "description": "全バージョンを通した更新前の自己ベストを上回った曲数（過去スコアの無い初プレイは含まない）"
+          },
+          "prevVersionOvertakes": {
+            "type": "integer",
+            "nullable": true,
+            "description": "現在のスコアが前作（1つ前のバージョン）を上回っている更新曲数。前作のスコアを持つ更新曲が1曲も無ければ null"
           }
         }
       }

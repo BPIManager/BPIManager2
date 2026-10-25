@@ -60,6 +60,10 @@ export const useSongFilter = (
         defaults?.sortOrder ||
         "desc",
       compareVersion: q.compareVersion || defaults?.compareVersion,
+      compareResult:
+        q.compareResult === "plus" || q.compareResult === "minus"
+          ? q.compareResult
+          : undefined,
       levels: q.levels
         ? q.levels.split(",").map(Number)
         : defaults?.levels ?? [],
