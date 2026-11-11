@@ -511,7 +511,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `userId` varchar(128) NOT NULL,
   `userName` varchar(50) NOT NULL,
   `profileText` text DEFAULT NULL,
-  `profileImage` varchar(1024) DEFAULT NULL,
+  `profileImage` varchar(2048) DEFAULT NULL,
   `iidxId` varchar(12) DEFAULT NULL,
   `xId` varchar(20) DEFAULT NULL,
   `isPublic` int(11) NOT NULL,
@@ -520,7 +520,8 @@ CREATE TABLE IF NOT EXISTS `users` (
   PRIMARY KEY (`userId`),
   UNIQUE KEY `userName` (`userName`),
   KEY `isPublic` (`isPublic`),
-  KEY `idx_users_public_id` (`userId`,`isPublic`)
+  KEY `idx_users_public_id` (`userId`,`isPublic`),
+  KEY `idx_users_createdAt` (`createdAt`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `userStatusLogs` (
