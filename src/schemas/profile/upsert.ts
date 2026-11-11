@@ -31,7 +31,7 @@ export const profileUpsertSchema = z.object({
   profileText: z.string().max(2000).nullable().default(null),
   profileImage: z
     .string()
-    .max(1024)
+    .max(2048)
     .refine((v) => v === "" || /^https:\/\//.test(v), "https のURLのみ指定できます")
     .nullable()
     .default(null),

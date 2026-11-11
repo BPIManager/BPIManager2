@@ -62,5 +62,9 @@ export async function saveProfile(
     },
   );
 
-  if (!res.ok) throw new Error();
+  if (!res.ok) {
+    // 400 等のサーバー側の理由（errorMessage）を呼び出し元で表示できるようにする
+    const body = await res.json().catch(() => null);
+    throw new Error(body?.errorMessage ?? undefined);
+  }
 }
