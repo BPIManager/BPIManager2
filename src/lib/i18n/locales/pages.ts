@@ -649,12 +649,6 @@ export const pagesTranslations = {
     "zh-TW": "我的成績",
     ko: "내 점수",
   },
-  "page.unplayed.title": {
-    ja: "未プレイ曲",
-    en: "Unplayed",
-    "zh-TW": "未遊玩樂曲",
-    ko: "미플레이 곡",
-  },
 
   // ランキングページ
   "page.ranking.title": {

@@ -1,5 +1,6 @@
 import {
   FilterParamsFrontend,
+  SongWithRival,
   SongWithScore,
 } from "@/types/songs/score";
 import { RANK_TABLE } from "@/constants/iidx/rankBorders";
@@ -20,6 +21,9 @@ export const matchesBpmRange = (
   if (bpmMax && maxBpm > bpmMax) return false;
   return true;
 };
+
+/** BPIは小数第2位に丸めて保存されているため、境界の浮動小数誤差を吸収する許容幅 */
+const BPI_EPSILON = 1e-6;
 
 export const filterSongsServerSide = (
   songs: SongWithScore[],
@@ -92,7 +96,13 @@ export const filterSongsFrontend = (
         return false;
     }
 
+    if (params.bestVersion) {
+      const rivalVersion = (song as SongWithRival).rival?.version;
+      if (rivalVersion !== params.bestVersion) return false;
+    }
+
     if (params.isSofran && !isSoflanBpm(song.bpm ?? null)) return false;
+    if (params.excludeSofran && isSoflanBpm(song.bpm ?? null)) return false;
 
     if (!matchesBpmRange(song.bpm, params.bpmMin, params.bpmMax)) return false;
 
@@ -160,16 +170,23 @@ export const filterSongsFrontend = (
           if (isNaN(val)) continue;
           if (f.operator === ">=" && rate < val) return false;
           if (f.operator === "<=" && rate > val) return false;
+          if (f.operator === "=" && Math.abs(rate - val) >= 0.005) return false;
+        } else if (f.metric === "bpi") {
+          // 未プレイ譜面はBPI未算出のため条件に一致させない
+          if (song.exScore === null || song.exScore === undefined) return false;
+          const val = parseFloat(f.value);
+          if (isNaN(val)) continue;
+          const bpi = song.bpi ?? -15;
+          if (f.operator === ">=" && bpi < val - BPI_EPSILON) return false;
+          if (f.operator === "<=" && bpi > val + BPI_EPSILON) return false;
+          if (f.operator === "=" && Math.abs(bpi - val) >= 0.005) return false;
         } else if (f.metric === "djrank") {
           if (ratio === null) return false;
           const idx = RANK_TABLE.findIndex((t) => t.label === f.value);
           if (idx === -1) continue;
-          if (f.operator === ">=") {
-            if (ratio < RANK_TABLE[idx].ratio) return false;
-          } else {
-            const next = RANK_TABLE[idx + 1];
-            if (next && ratio >= next.ratio) return false;
-          }
+          const next = RANK_TABLE[idx + 1];
+          if (f.operator !== "<=" && ratio < RANK_TABLE[idx].ratio) return false;
+          if (f.operator !== ">=" && next && ratio >= next.ratio) return false;
         }
       }
     }

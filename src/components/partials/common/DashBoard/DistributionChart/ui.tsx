@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useChartColors } from "@/hooks/common/useChartColors";
+import { useSingleOpen } from "@/hooks/common/useSingleOpen";
 import type { ChartData } from "@/types/ui/chart";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { BarChart2, PieChartIcon, Percent, Medal } from "lucide-react";
@@ -42,6 +43,12 @@ interface DistributionChartProps {
   stepControl?: StepControl;
   displayMode?: DisplayModeControl;
   rivalComparison?: RivalComparison;
+  /** 内部ラベルを表示名へ変換する（ツールチップ・円グラフ用） */
+  formatLabel?: (label: string) => string;
+  /** 棒の下に出す短い表示名。指定時は全ての棒にラベルを出す */
+  formatAxisLabel?: (label: string) => string;
+  /** 棒・円のツールチップに出す操作ボタン（ラベルごとに生成。undefined ならボタン無し） */
+  getAction?: (label: string) => { label: string; onClick: () => void } | undefined;
 }
 
 const DistributionChart = ({
@@ -54,12 +61,16 @@ const DistributionChart = ({
   stepControl,
   displayMode,
   rivalComparison,
+  formatLabel,
+  formatAxisLabel,
+  getAction,
 }: DistributionChartProps) => {
   const c = useChartColors();
   const { t } = useTranslation();
   const effectiveMyName = myName ?? t("dashboard.me");
   const effectiveRivalName = rivalComparison?.rivalName ?? t("dashboard.rival");
   const rivalData = rivalComparison?.rivalData;
+  const { close: closeBars, getProps: getBarOpenProps } = useSingleOpen();
   const [chartType, setChartType] = useState<"bar" | "pie">("bar");
   const containerRef = useRef<HTMLDivElement>(null);
   const maxBarRef = useRef<HTMLDivElement>(null);
@@ -184,6 +195,7 @@ const DistributionChart = ({
         <TooltipProvider>
           <div
             ref={containerRef}
+            onMouseLeave={closeBars}
             className={cn(
               "overflow-x-auto px-1",
               myData.length > 30
@@ -196,6 +208,7 @@ const DistributionChart = ({
               const dense = myData.length > 30;
               const labelInterval = dense ? 20 : 10;
               const showLabel =
+                !!formatAxisLabel ||
                 isNaN(numVal) ||
                 item.label === "100+" ||
                 numVal % labelInterval === 0;
@@ -204,6 +217,10 @@ const DistributionChart = ({
                 <ChartBarUnit
                   key={item.label}
                   label={item.label}
+                  displayLabel={formatLabel?.(item.label)}
+                  axisLabel={formatAxisLabel?.(item.label)}
+                  action={getAction?.(item.label)}
+                  {...getBarOpenProps(item.label)}
                   myCount={item.count}
                   rivalCount={rivalMap?.get(item.label)}
                   maxCount={maxCount}
@@ -230,6 +247,8 @@ const DistributionChart = ({
           <DistributionPie
             data={myData}
             getColor={getColor}
+            formatLabel={formatLabel}
+            getAction={getAction}
             label={rivalData ? effectiveMyName : ""}
             labelColor={c.primary}
           />
@@ -237,6 +256,8 @@ const DistributionChart = ({
             <DistributionPie
               data={rivalData}
               getColor={getColor}
+              formatLabel={formatLabel}
+            getAction={getAction}
               label={effectiveRivalName}
               labelColor={c.warning}
             />

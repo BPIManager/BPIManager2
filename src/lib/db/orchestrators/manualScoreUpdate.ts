@@ -7,6 +7,7 @@ import { logBatchRepo } from "@/lib/db/domains/logs/batch";
 import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
 import { userStatusLogsWriteRepo } from "@/lib/db/domains/userStatusLogs/write";
 import { BpiCalculator } from "@/lib/bpi";
+import { saveRadarSnapshot } from "@/lib/db/orchestrators/logRadarSnapshot";
 import { getManualBatchPrefix, mintManualBatchId } from "@/lib/scores/manualBatchId";
 
 type ScoreRow = Awaited<ReturnType<typeof latestScoresRepo.getLatestScores>>[number];
@@ -114,6 +115,7 @@ export async function saveManualScoreUpdate(params: {
         missCount: score.missCount,
         lastPlayed,
       });
+      await saveRadarSnapshot(trx, { userId, version, batchId });
     }
 
     if (allScore) {

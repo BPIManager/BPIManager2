@@ -1,3 +1,5 @@
+import { useRouter } from "next/router";
+import { bpiListQuery, rankListQuery, scoreRateListQuery } from "@/utils/dashboard/scoreListLink";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { useDjRankDistribution } from "@/hooks/stats/useDJRankDistribution";
 import { useBPIDistribution } from "@/hooks/stats/useBPIDistribution";
@@ -26,7 +28,9 @@ const DistributionSection = ({
   rivalName,
   mode,
   onModeChange,
+  showListAction = false,
 }: DistributionSectionProps) => {
+  const router = useRouter();
   const { levels, diffs, version, compareVersion } = useStatsFilter();
   const { t } = useTranslation();
   const effectiveMyName = myName ?? t("dashboard.me");
@@ -153,6 +157,30 @@ const DistributionSection = ({
   const displayMode =
     mode && onModeChange ? { mode, onModeChange } : undefined;
 
+  // 分布の1区間に該当する譜面だけを絞り込んだスコア一覧(/my/[version])を開く
+  const getAction = showListAction
+    ? (label: string) => {
+        const filter = isBpi
+          ? bpiListQuery(label, bpiStep)
+          : isScoreRate
+            ? scoreRateListQuery(label, scoreRateStep)
+            : rankListQuery(label);
+        return {
+          label: t("dashboard.distribution.showList"),
+          onClick: () =>
+            router.push({
+              pathname: `/my/${version}`,
+              query: {
+                ...filter,
+                levels: levels.join(","),
+                difficulties: diffs.join(","),
+                page: "1",
+              },
+            }),
+        };
+      }
+    : undefined;
+
   const isLoading = myLoading || (!!effectiveRivalUserId && rivalLoading);
   if (isLoading) {
     return (
@@ -208,6 +236,7 @@ const DistributionSection = ({
       }
       stepControl={stepControl}
       displayMode={displayMode}
+      getAction={getAction}
     />
   );
 };

@@ -54,6 +54,34 @@ export interface BestEverRow {
   residualVar: number | null;
 }
 
+/**
+ * 今作で未プレイの曲を、歴代ベスト側の行から「自分は未プレイ」の行として組み立てる。
+ * 今作のスコア一覧には未プレイ曲が含まれないため、過去作でのみプレイした曲を比較に出すのに使う。
+ */
+export function bestEverRowToUnplayedSong(row: BestEverRow): SongWithScore {
+  return {
+    songId: row.songId,
+    title: row.title,
+    bpm: row.bpm,
+    difficulty: row.difficulty,
+    difficultyLevel: row.difficultyLevel,
+    releasedVersion: row.releasedVersion,
+    notes: row.notes,
+    kaidenAvg: row.kaidenAvg,
+    wrScore: row.wrScore,
+    coef: row.coef,
+    mu: row.mu,
+    sigma: row.sigma,
+    residualVar: row.residualVar,
+    logId: null,
+    exScore: null,
+    bpi: null,
+    clearState: null,
+    missCount: null,
+    scoreAt: null,
+  };
+}
+
 export function toBpiParams(s: SongWithScore): IBpiBasicSongData {
   return {
     notes: s.notes,
@@ -71,6 +99,7 @@ export function mergeFixedTarget(
   s: SongWithScore,
   targetEx: number | null,
   targetBpi: number | null,
+  targetVersion?: string | null,
 ): SongWithRival {
   const exDiff =
     s.exScore !== null && targetEx !== null ? s.exScore - targetEx : undefined;
@@ -85,6 +114,7 @@ export function mergeFixedTarget(
     clearState: null,
     missCount: null,
     lastPlayed: null,
+    ...(targetVersion !== undefined ? { version: targetVersion } : {}),
   };
 
   return { ...s, rival, exDiff, bpiDiff } as SongWithRival;

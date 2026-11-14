@@ -1,7 +1,7 @@
 import type { WidgetId } from "@/types/dashboard/layout";
 import { P, M, S, MiniPreview, ACTIVITY_GRID, ACT_OPACITY } from "./shared";
 
-export const basicPreviews: Pick<Record<WidgetId, React.ReactNode>, "currentBpi" | "activity" | "rankDistribution" | "bpiDistribution" | "bpmBpiDistribution"> = {
+export const basicPreviews: Pick<Record<WidgetId, React.ReactNode>, "currentBpi" | "activity" | "rankDistribution" | "bpiDistribution" | "versionCountDistribution" | "bpmBpiDistribution"> = {
   currentBpi: (
     <MiniPreview>
       <svg viewBox="0 0 56 36" className="w-full h-full">
@@ -113,6 +113,33 @@ export const basicPreviews: Pick<Record<WidgetId, React.ReactNode>, "currentBpi"
           x1="1.5"
           y1="31"
           x2="54.5"
+          y2="31"
+          stroke={M}
+          strokeOpacity={0.25}
+          strokeWidth="0.5"
+        />
+      </svg>
+    </MiniPreview>
+  ),
+  versionCountDistribution: (
+    <MiniPreview>
+      <svg viewBox="0 0 56 36" className="w-full h-full">
+        {[20, 17, 14, 12, 9, 7, 5, 3].map((h, i) => (
+          <rect
+            key={i}
+            x={3 + i * 6.25}
+            y={31 - h}
+            width={5.25}
+            height={h}
+            rx={0.5}
+            fill={P}
+            fillOpacity={0.9 - i * 0.08}
+          />
+        ))}
+        <line
+          x1="3"
+          y1="31"
+          x2="53"
           y2="31"
           stroke={M}
           strokeOpacity={0.25}

@@ -31,6 +31,7 @@ import { useBpiStep } from "@/hooks/common/useBpiStep";
 import MonthlyReviewBanner from "@/components/partials/common/MonthlyReviewBanner";
 import dayjs from "@/lib/dayjs";
 import PerformanceTab from "../Performance";
+import LogRadarGrowth from "../LogRadarGrowth";
 
 const LogsDetailContent = ({
   userId,
@@ -126,6 +127,24 @@ const LogsDetailContent = ({
     router.push({ query: nextQuery }, undefined, { shallow: true });
   };
 
+  // レーダーのカテゴリで絞り込んだ更新楽曲タブを開く（レーダーは☆12のみが対象）
+  const handleOpenRadarCategory = (category: string) => {
+    const { view: _view, ...rest } = router.query;
+    router.push(
+      {
+        query: {
+          ...rest,
+          levels: "12",
+          difficulties: "ANOTHER,LEGGENDARIA,HYPER",
+          page: "1",
+          radarCategories: category,
+        },
+      },
+      undefined,
+      { shallow: true },
+    );
+  };
+
   // パフォーマンスタブはプレイ日(lastPlayed)基準のため、同じ集合になるよう groupedBy も合わせる
   const handleOpenUpdatedSongs = () => {
     const { view: _view, ...rest } = router.query;
@@ -209,27 +228,34 @@ const LogsDetailContent = ({
         onValueChange={handleTabChange}
         className="w-full"
       >
-        <div className="flex w-full items-center justify-between gap-4">
+        <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+          {/* タブは文字幅に合わせて並べ、狭い画面で収まらない場合は横スクロールにして重なりを防ぐ */}
           <AppTabsList
             visual="minimal"
-            cols={showPerformanceTab ? 3 : 2}
-            className="max-w-md"
+            className="w-full justify-start overflow-x-auto sm:max-w-md"
+            style={{
+              gridTemplateColumns: `repeat(${showPerformanceTab ? 3 : 2}, max-content)`,
+            }}
           >
-            <AppTabsTrigger visual="minimal" value="summary">
+            <AppTabsTrigger visual="minimal" value="summary" className="whitespace-nowrap px-3">
               {t("logs.detail.tab.summary")}
             </AppTabsTrigger>
-            <AppTabsTrigger visual="minimal" value="songs">
+            <AppTabsTrigger visual="minimal" value="songs" className="whitespace-nowrap px-3">
               {tFormat("logs.detail.tab.songs", { count: details.songs.length })}
             </AppTabsTrigger>
             {showPerformanceTab && (
-              <AppTabsTrigger visual="minimal" value="performance">
+              <AppTabsTrigger
+                visual="minimal"
+                value="performance"
+                className="whitespace-nowrap px-3"
+              >
                 {t("logs.detail.tab.performance")}
               </AppTabsTrigger>
             )}
           </AppTabsList>
 
           {!isPublicPage && (
-            <div className="shrink-0">
+            <div className="shrink-0 self-end sm:self-auto">
               <Button
                 variant="outline"
                 size="sm"
@@ -277,6 +303,16 @@ const LogsDetailContent = ({
                 myData={rankData}
                 isLoading={isLoading}
                 getColor={(l) => RANK_COLORS[l]}
+              />
+            </div>
+            <div className="mt-4">
+              <LogRadarGrowth
+                userId={userId}
+                version={version}
+                periodKey={type === "batch" ? batchId : date}
+                type={type === "batch" ? "batch" : apiType}
+                groupedBy={groupedBy}
+                onOpenCategoryList={handleOpenRadarCategory}
               />
             </div>
           </div>

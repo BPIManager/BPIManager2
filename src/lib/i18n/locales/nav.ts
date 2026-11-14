@@ -11,17 +11,11 @@ export const navTranslations = {
     "zh-TW": "匯入",
     ko: "가져오기",
   },
-  "nav.scorePlayed": {
-    ja: "プレイ済み",
-    en: "Played",
-    "zh-TW": "已遊玩",
-    ko: "플레이함",
-  },
-  "nav.scoreUnplayed": {
-    ja: "未プレイ",
-    en: "Unplayed",
-    "zh-TW": "未遊玩",
-    ko: "미플레이",
+  "nav.songList": {
+    ja: "楽曲一覧",
+    en: "Song List",
+    "zh-TW": "曲目列表",
+    ko: "곡 목록",
   },
   "nav.scoreLog": {
     ja: "スコア更新ログ",
@@ -182,12 +176,6 @@ export const navTranslations = {
     ko: "계정 전환에 실패했습니다",
   },
   // Section headers
-  "nav.section.score": {
-    ja: "スコア一覧",
-    en: "Scores",
-    "zh-TW": "分數列表",
-    ko: "점수 목록",
-  },
   "nav.section.rivals": {
     ja: "ライバル",
     en: "Rivals",

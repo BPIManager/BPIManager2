@@ -6,12 +6,16 @@ import BpmBpiChart from "./ui";
 import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
 import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import { useRouter } from "next/router";
+import { bpmBandListQuery } from "@/utils/dashboard/scoreListLink";
 
 interface BpmBpiDistributionSectionProps {
   myUserId?: string;
   rivalUserId?: string;
   myName?: string;
   rivalName?: string;
+  /** 自分のダッシュボードのみ true。帯のツールチップに「対象曲一覧を表示」を出す */
+  showListAction?: boolean;
 }
 
 const BpmBpiDistributionSection = ({
@@ -19,7 +23,9 @@ const BpmBpiDistributionSection = ({
   rivalUserId,
   myName,
   rivalName,
+  showListAction = false,
 }: BpmBpiDistributionSectionProps) => {
+  const router = useRouter();
   const { levels, diffs, version, compareVersion } = useStatsFilter();
   const { t } = useTranslation();
   const effectiveMyName = myName ?? t("dashboard.me");
@@ -71,6 +77,21 @@ const BpmBpiDistributionSection = ({
       <BpmBpiChart
         myData={myDist}
         rivalData={effectiveRivalUserId ? rivalDist : undefined}
+        showListLabel={t("dashboard.distribution.showList")}
+        onShowList={
+          showListAction
+            ? (label) =>
+                router.push({
+                  pathname: `/my/${version}`,
+                  query: {
+                    ...bpmBandListQuery(label),
+                    levels: levels.join(","),
+                    difficulties: diffs.join(","),
+                    page: "1",
+                  },
+                })
+            : undefined
+        }
       />
     </DashCard>
   );
