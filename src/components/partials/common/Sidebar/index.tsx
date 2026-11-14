@@ -11,6 +11,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Target,
+  ListMusic,
 } from "lucide-react";
 
 import { useUser } from "@/contexts/users/UserContext";
@@ -20,13 +21,12 @@ import { useTranslation } from "@/hooks/common/useTranslation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import SidebarSection from "./Section/ui";
-import { MenuItemButton, ScoreSubItemButton } from "./NavButtons/ui";
+import { MenuItemButton } from "./NavButtons/ui";
 import {
   getRivalMenuItems,
   getAnalyticsMenuItems,
   getBetaMenuItems,
   getInfoMenuItems,
-  getScoreSubItems,
 } from "./menuConfig";
 
 // Separator — only shown in expanded mode
@@ -48,7 +48,6 @@ const SidebarContent = ({
   const { t } = useTranslation();
   const [isRivalOpen, setIsRivalOpen] = useState<boolean>(true);
   const [isInfoOpen, setIsInfoOpen] = useState<boolean>(true);
-  const [isScoreOpen, setIsScoreOpen] = useState<boolean>(true);
   const [isBetaOpen, setIsBetaOpen] = useState<boolean>(true);
   const [isAnalyticsOpen, setIsAnalyticsOpen] = useState<boolean>(true);
 
@@ -61,7 +60,6 @@ const SidebarContent = ({
   const analyticsMenuItems = getAnalyticsMenuItems(t, user?.userId);
   const betaMenuItems = getBetaMenuItems(t);
   const infoMenuItems = getInfoMenuItems(t);
-  const scoreSubItems = getScoreSubItems(t);
 
   return (
     <div className="flex h-full flex-col gap-1 overflow-y-auto scrollbar-hide py-2 px-2">
@@ -98,21 +96,15 @@ const SidebarContent = ({
 
         <Sep expanded={expanded} />
 
-        <SidebarSection
-          label={t("nav.section.score")}
-          isOpen={isScoreOpen}
-          onOpenChange={setIsScoreOpen}
+        <MenuItemButton
+          item={{
+            label: t("nav.songList"),
+            icon: ListMusic,
+            href: `/my/${latestVersion}?levels=12%2C11&difficulties=LEGGENDARIA%2CHYPER%2CANOTHER`,
+          }}
           expanded={expanded}
-        >
-          {scoreSubItems.map((item) => (
-            <ScoreSubItemButton
-              key={item.href}
-              item={item}
-              expanded={expanded}
-              onClose={onClose}
-            />
-          ))}
-        </SidebarSection>
+          onClose={onClose}
+        />
 
         <MenuItemButton
           item={{

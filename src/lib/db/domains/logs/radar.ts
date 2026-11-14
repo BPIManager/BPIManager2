@@ -4,6 +4,7 @@ import type { Database } from "@/types/db";
 import {
   radarValuesFromRow,
   radarValuesToColumns,
+  ratchetRadarValues,
   type RadarValues,
 } from "@/lib/radar/snapshot";
 
@@ -39,6 +40,13 @@ const toValues = (row: RadarRow | undefined): RadarValues | null =>
         scratch: row.radarScratch,
         soflan: row.radarSoflan,
       });
+
+export interface LogRadarSnapshot {
+  id: number;
+  batchId: string;
+  createdAt: Date;
+  values: RadarValues;
+}
 
 /**
  * ログ（logs）のバッチ時点のレーダー値（ラチェット後）の読み書きを担当するリポジトリクラス。
@@ -119,6 +127,103 @@ class LogRadarRepository {
       .orderBy("id", "asc")
       .execute();
     return rows.map((r) => ({ id: r.id, batchId: r.batchId, values: toValues(r) }));
+  }
+
+  private selectSnapshot() {
+    return db
+      .selectFrom("logs")
+      .select(["id", "batchId", "createdAt", ...RADAR_COLUMNS])
+      .where("radarNotes", "is not", null);
+  }
+
+  private toSnapshot(
+    row: ({ id: number; batchId: string; createdAt: Date } & RadarRow) | undefined,
+  ): LogRadarSnapshot | null {
+    const values = toValues(row);
+    return row && values
+      ? { id: row.id, batchId: row.batchId, createdAt: row.createdAt, values }
+      : null;
+  }
+
+  /** 指定バッチ自身のスナップショット */
+  async findByBatch(userId: string, batchId: string) {
+    const row = await this.selectSnapshot()
+      .where("userId", "=", userId)
+      .where("batchId", "=", batchId)
+      .executeTakeFirst();
+    return this.toSnapshot(row);
+  }
+
+  /**
+   * そのバッチに含まれるスコアのプレイ日時（lastPlayed）の最大値が基準時刻以前（または未満）のバッチについて、
+   * 保存済みレーダー値のカテゴリ別最大を返す。プレイ日基準の期間でラチェットの下限を引くのに使う。
+   * 該当するバッチ（算出済み）が無ければ null。
+   *
+   * @param inclusive - true なら基準時刻ちょうどを含める（`<=`）、false なら含めない（`<`）
+   */
+  async getMaxPlayedBy(
+    userId: string,
+    version: string,
+    cutoff: Date,
+    inclusive: boolean,
+  ): Promise<RadarValues | null> {
+    const rows = await db
+      .selectFrom("logs as l")
+      .innerJoin("scores as s", "s.batchId", "l.batchId")
+      .select(["l.id", ...RADAR_COLUMNS.map((c) => `l.${c}` as const)])
+      .where("l.userId", "=", userId)
+      .where("l.version", "=", version)
+      .where("l.radarNotes", "is not", null)
+      .groupBy("l.id")
+      .having((eb) => eb.fn.max("s.lastPlayed"), inclusive ? "<=" : "<", cutoff)
+      .execute();
+    const values = rows
+      .map((r) =>
+        toValues({
+          radarNotes: r.radarNotes,
+          radarChord: r.radarChord,
+          radarPeak: r.radarPeak,
+          radarCharge: r.radarCharge,
+          radarScratch: r.radarScratch,
+          radarSoflan: r.radarSoflan,
+        }),
+      )
+      .filter((v): v is RadarValues => v !== null);
+    if (values.length === 0) return null;
+    return values.reduce((acc, v) => ratchetRadarValues(acc, v));
+  }
+
+  /** 指定バッチより前（logs.id が小さい）で最新のスナップショット */
+  async findLatestBeforeBatch(userId: string, version: string, beforeId: number) {
+    const row = await this.selectSnapshot()
+      .where("userId", "=", userId)
+      .where("version", "=", version)
+      .where("id", "<", beforeId)
+      .orderBy("id", "desc")
+      .limit(1)
+      .executeTakeFirst();
+    return this.toSnapshot(row);
+  }
+
+  /**
+   * 指定時刻時点で最新のスナップショット。
+   *
+   * @param inclusive - true なら時刻ちょうどのバッチを含める（`<=`）、false なら含めない（`<`）
+   */
+  async findLatestAsOf(
+    userId: string,
+    version: string,
+    time: Date,
+    inclusive: boolean,
+  ) {
+    const row = await this.selectSnapshot()
+      .where("userId", "=", userId)
+      .where("version", "=", version)
+      .where("createdAt", inclusive ? "<=" : "<", time)
+      .orderBy("id", "desc")
+      .limit(1)
+      .executeTakeFirst();
+    return this.toSnapshot(row);
   }
 }
 

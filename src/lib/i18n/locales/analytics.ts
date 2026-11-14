@@ -1,4 +1,82 @@
 export const analyticsTranslations = {
+  "analytics.saved.saveTitle": {
+    ja: "比較条件を保存",
+    en: "Save comparison",
+    "zh-TW": "儲存比較條件",
+    ko: "비교 조건 저장",
+  },
+  "analytics.saved.namePlaceholder": {
+    ja: "名前（例: 次のライバル）",
+    en: "Name (e.g. Next rival)",
+    "zh-TW": "名稱（例：下一個對手）",
+    ko: "이름 (예: 다음 라이벌)",
+  },
+  "analytics.saved.conditionOnly": {
+    ja: "条件のみ保存されます。結果は呼び出すたびに最新のデータで計算されます。",
+    en: "Only the conditions are saved. Results are recalculated with the latest data each time.",
+    "zh-TW": "僅儲存條件，結果每次都會以最新資料重新計算。",
+    ko: "조건만 저장되며 결과는 불러올 때마다 최신 데이터로 계산됩니다.",
+  },
+  "analytics.saved.save": {
+    ja: "保存",
+    en: "Save",
+    "zh-TW": "儲存",
+    ko: "저장",
+  },
+  "analytics.saved.open": {
+    ja: "保存済み",
+    en: "Saved",
+    "zh-TW": "已儲存",
+    ko: "저장됨",
+  },
+  "analytics.saved.listTitle": {
+    ja: "保存済みの比較",
+    en: "Saved comparisons",
+    "zh-TW": "已儲存的比較",
+    ko: "저장된 비교",
+  },
+  "analytics.saved.empty": {
+    ja: "保存済みの比較はありません",
+    en: "No saved comparisons",
+    "zh-TW": "沒有已儲存的比較",
+    ko: "저장된 비교가 없습니다",
+  },
+  "analytics.saved.load": {
+    ja: "呼び出す",
+    en: "Load",
+    "zh-TW": "載入",
+    ko: "불러오기",
+  },
+  "analytics.saved.rename": {
+    ja: "名前を変更",
+    en: "Rename",
+    "zh-TW": "重新命名",
+    ko: "이름 변경",
+  },
+  "analytics.saved.delete": {
+    ja: "削除",
+    en: "Delete",
+    "zh-TW": "刪除",
+    ko: "삭제",
+  },
+  "analytics.saved.inaccessible": {
+    ja: "閲覧できません",
+    en: "Not viewable",
+    "zh-TW": "無法檢視",
+    ko: "볼 수 없음",
+  },
+  "analytics.saved.toastSaved": {
+    ja: "比較条件を保存しました",
+    en: "Comparison saved",
+    "zh-TW": "已儲存比較條件",
+    ko: "비교 조건을 저장했습니다",
+  },
+  "analytics.saved.toastError": {
+    ja: "保存済み比較の操作に失敗しました",
+    en: "Failed to update saved comparisons",
+    "zh-TW": "儲存的比較操作失敗",
+    ko: "저장된 비교 작업에 실패했습니다",
+  },
   "analytics.selectTarget": {
     ja: "比較対象を選択",
     en: "Select a target",

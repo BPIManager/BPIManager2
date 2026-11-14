@@ -13,6 +13,12 @@ import { AppTabsGroup } from "@/components/ui/complex/tabs";
 import { HelpTooltip } from "@/components/ui/tooltip";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { invalidateDashboardRankingCache } from "@/hooks/stats/dashboardRankingCache";
+import { Settings2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useRankingTabs } from "@/hooks/dashboard/useRankingTabs";
+import { isSavedTabKey } from "@/lib/dashboard/rankingTabs";
+import SavedComparisonPanel from "./SavedComparison";
+import TabSettingsDialog from "./TabSettings";
 
 const RankingCardHelpContent = () => {
   const { t } = useTranslation();
@@ -113,6 +119,25 @@ const RankingTabsCard = ({ userId }: { userId: string }) => {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [tab, setTab] = useState<string>("weapons");
   const [neighborN, setNeighborN] = useState<NeighborN>(20);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const { entries, isLoading: tabsLoading, save } = useRankingTabs();
+
+  const visibleTabs = entries.filter((e) => e.visible);
+  // 選択中のタブが非表示にされた・削除された場合は先頭の表示タブへ寄せる
+  const activeTab = visibleTabs.some((e) => e.key === tab)
+    ? tab
+    : (visibleTabs[0]?.key ?? "");
+  const tabLabel = (key: string) => {
+    const entry = entries.find((e) => e.key === key);
+    if (entry?.comparison) return entry.comparison.name;
+    return t(
+      key === "weapons"
+        ? "dashboard.ranking.weapons"
+        : key === "potential"
+          ? "dashboard.ranking.potential"
+          : "dashboard.ranking.nearLose",
+    );
+  };
 
   const handleSongSelect = (item: SongWithScore) => {
     setSelectedSong(item);
@@ -121,17 +146,34 @@ const RankingTabsCard = ({ userId }: { userId: string }) => {
 
   return (
     <DashCard className="flex flex-col p-0 overflow-hidden border border-bpim-border">
-      <Tabs value={tab} onValueChange={setTab} className="flex flex-col w-full">
-        <AppTabsGroup
-          visual="minimal"
-          tabs={[
-            { value: "weapons", label: t("dashboard.ranking.weapons") },
-            { value: "potential", label: t("dashboard.ranking.potential") },
-            { value: "nearLose", label: t("dashboard.ranking.nearLose") },
-          ]}
-        />
+      <Tabs value={activeTab} onValueChange={setTab} className="flex flex-col w-full">
+        <div className="flex items-stretch">
+          <div className="min-w-0 flex-1">
+            {visibleTabs.length > 0 && (
+              <AppTabsGroup
+                visual="minimal"
+                listClassName="overflow-x-auto"
+                tabs={visibleTabs.map((e) => ({
+                  value: e.key,
+                  label: tabLabel(e.key),
+                }))}
+              />
+            )}
+          </div>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="m-1 shrink-0 text-bpim-muted hover:text-bpim-text"
+            onClick={() => setIsSettingsOpen(true)}
+            disabled={tabsLoading}
+            aria-label={t("dashboard.ranking.settings.open")}
+            title={t("dashboard.ranking.settings.open")}
+          >
+            <Settings2 />
+          </Button>
+        </div>
 
-        {tab !== "nearLose" && (
+        {(activeTab === "weapons" || activeTab === "potential") && (
           <div className="flex items-center gap-1.5 px-3 py-1.5 border-b border-bpim-border bg-bpim-surface-1">
             <span className="text-[10px] font-bold text-bpim-subtle">
               {t("dashboard.ranking.neighbor")}
@@ -184,15 +226,41 @@ const RankingTabsCard = ({ userId }: { userId: string }) => {
           >
             <NearLoseList userId={userId} onSelect={handleSongSelect} />
           </TabsContent>
+          {visibleTabs.filter((e) => isSavedTabKey(e.key)).map((e) => (
+            <TabsContent
+              key={e.key}
+              value={e.key}
+              className="m-0 p-0 focus-visible:outline-none"
+            >
+              <SavedComparisonPanel
+                target={e.comparison?.targets[e.targetIndex]}
+                onSelect={handleSongSelect}
+              />
+            </TabsContent>
+          ))}
+          {visibleTabs.length === 0 && (
+            <p className="p-6 text-center text-sm text-bpim-muted">
+              {t("dashboard.ranking.noTabs")}
+            </p>
+          )}
         </div>
       </Tabs>
+
+      {isSettingsOpen && (
+        <TabSettingsDialog
+          isOpen
+          entries={entries}
+          onSave={save}
+          onClose={() => setIsSettingsOpen(false)}
+        />
+      )}
 
       {isDetailOpen && selectedSong && (
         <SongDetailView
           song={selectedSong}
           isOpen={isDetailOpen}
           onClose={() => setIsDetailOpen(false)}
-          defaultTab={tab === "nearLose" ? "rivals" : "stats"}
+          defaultTab={activeTab === "nearLose" ? "rivals" : "stats"}
           userId={userId}
           version={version}
           songDomain="bpi"

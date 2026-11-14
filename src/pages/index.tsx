@@ -7,6 +7,7 @@ import ActivitySection from "@/components/partials/common/DashBoard/ActivityCale
 import CurrentBpiSection from "@/components/partials/common/DashBoard/CurrentBpi";
 import { RankDistributionSection } from "@/components/partials/common/DashBoard/DJRankDistribution";
 import { BpiDistributionSection } from "@/components/partials/common/DashBoard/BPIDistribution";
+import VersionCountDistributionSection from "@/components/partials/common/DashBoard/VersionCountDistribution";
 import BpmBpiDistributionSection from "@/components/partials/common/DashBoard/BpmBpiDistribution";
 import { FilterProvider } from "@/contexts/stats/FilterContext";
 import { PageContainer, PageHeader } from "@/components/partials/common/PageChrome/Header";
@@ -48,11 +49,13 @@ function WidgetRenderer({
     case "activity":
       return <ActivitySection setNodata={setNodata} userId={userId} />;
     case "rankDistribution":
-      return <RankDistributionSection myUserId={userId} />;
+      return <RankDistributionSection myUserId={userId} showListAction />;
     case "bpiDistribution":
-      return <BpiDistributionSection myUserId={userId} />;
+      return <BpiDistributionSection myUserId={userId} showListAction />;
+    case "versionCountDistribution":
+      return <VersionCountDistributionSection myUserId={userId} showCompareAction />;
     case "bpmBpiDistribution":
-      return <BpmBpiDistributionSection myUserId={userId} />;
+      return <BpmBpiDistributionSection myUserId={userId} showListAction />;
     case "bpiHistory":
       return <BpiHistorySection myUserId={userId} />;
     case "bpiBoxStats":
@@ -60,7 +63,7 @@ function WidgetRenderer({
     case "rivalWinLoss":
       return <RivalWinLossSummary userId={userId} />;
     case "radar":
-      return <RadarSection userId={userId} />;
+      return <RadarSection userId={userId} showListAction />;
     case "iidxTower":
       return <IidxTowerSection userId={userId} />;
     case "rankingTabs":

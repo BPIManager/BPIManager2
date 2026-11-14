@@ -4,26 +4,31 @@ import FetchErrorState from "@/components/partials/common/ErrorStates/FetchError
 import RadarSkeleton from "./skeleton";
 import RadarSectionChart from "./index";
 import { RadarCategory } from "@/types/stats/radar";
-import { useMemo, useState } from "react";
-import RadarCategorySongsDialog from "./dialog";
+import { useMemo } from "react";
 import { getBpiColorStyle } from "@/constants/theme/bpiColor";
 import { DashCard } from "@/components/ui/dashcard";
 import { cn } from "@/lib/utils";
 import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import { useRouter } from "next/router";
+import { radarCategoryListQuery } from "@/utils/dashboard/scoreListLink";
 import { clickableProps } from "@/utils/common/clickableProps";
 
 interface RadarSectionProps {
   userId?: string;
   rivalUserId?: string;
   rivalName?: string;
+  /** 自分のダッシュボードのみ true。カテゴリのツールチップに「対象曲一覧を表示」を出す */
+  showListAction?: boolean;
 }
 
 const RadarSection = ({
   userId,
   rivalUserId,
   rivalName,
+  showListAction = false,
 }: RadarSectionProps) => {
+  const router = useRouter();
   const { version, levels, diffs, compareVersion } = useStatsFilter();
 
   const isCompareMode = !rivalUserId && !!compareVersion;
@@ -41,9 +46,19 @@ const RadarSection = ({
     isLoading: rivalLoading,
     isError: rivalError,
   } = useRadar(effectiveRivalUserId, levels, diffs, effectiveRivalVersion);
-  const [selectedCat, setSelectedCat] = useState<RadarCategory | null>(null);
 
   const isRivalMode = !!effectiveRivalUserId;
+
+  const goToList = (category: RadarCategory) =>
+    router.push({
+      pathname: `/my/${version}`,
+      query: {
+        ...radarCategoryListQuery(category),
+        levels: levels.join(","),
+        difficulties: diffs.join(","),
+        page: "1",
+      },
+    });
 
   const sortedData = useMemo(() => {
     if (!radar) return [];
@@ -104,11 +119,13 @@ const RadarSection = ({
             return (
               <div
                 key={key}
-                {...clickableProps(() => setSelectedCat(key))}
+                {...(showListAction ? clickableProps(() => goToList(key)) : {})}
+                title={showListAction ? t("dashboard.distribution.showList") : undefined}
                 className={cn(
                   "flex items-center justify-between p-2.5 rounded-md",
-                  "bg-bpim-surface-2/60 border border-bpim-border cursor-pointer transition-all duration-200",
-                  "hover:bg-bpim-overlay hover:translate-x-1 hover:border-bpim-border",
+                  "bg-bpim-surface-2/60 border border-bpim-border transition-all duration-200",
+                  showListAction &&
+                    "cursor-pointer hover:bg-bpim-overlay hover:translate-x-1 hover:border-bpim-border",
                 )}
               >
                 <span className="text-xs font-bold text-bpim-text">{key}</span>
@@ -134,15 +151,6 @@ const RadarSection = ({
           })}
         </div>
       </div>
-
-      {selectedCat && (
-        <RadarCategorySongsDialog
-          categoryName={selectedCat}
-          songs={radar[selectedCat].songs}
-          isOpen={!!selectedCat}
-          onClose={() => setSelectedCat(null)}
-        />
-      )}
     </DashCard>
   );
 };
