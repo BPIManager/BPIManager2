@@ -113,6 +113,35 @@ class ScoreTimelineRepository {
     return rows;
   }
 
+  /**
+   * ユーザーの全スコアログ（曲×バージョン×logId×EX）を、指定レベル・難易度の譜面に絞って返す。
+   * `idx_scores_with_winloss` だけで読めるカバリング走査で、集計は呼び出し側で行う。
+   */
+  async listScoreLogs(params: {
+    userId: string;
+    levels: number[];
+    difficulties: string[];
+  }) {
+    const { userId, levels, difficulties } = params;
+    return await db
+      .selectFrom("scores as sc")
+      .innerJoin("songs as sg", "sg.songId", "sc.songId")
+      .select([
+        "sc.songId",
+        "sc.version",
+        "sc.logId",
+        "sc.exScore",
+        "sg.difficulty",
+        "sg.difficultyLevel",
+      ])
+      .where("sc.userId", "=", userId)
+      .$if(levels.length > 0, (qb) => qb.where("sg.difficultyLevel", "in", levels))
+      .$if(difficulties.length > 0, (qb) =>
+        qb.where("sg.difficulty", "in", difficulties as never[]),
+      )
+      .execute();
+  }
+
   async getSelfVersionScores(params: {
     userId: string;
     currentVersion: IIDXVersion;

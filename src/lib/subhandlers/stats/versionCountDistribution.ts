@@ -2,26 +2,21 @@ import { timelineRepo } from "@/lib/db/domains/scores/timeline";
 import { ok } from "@/middlewares/api/apiResult";
 import type { StatsQuery } from "@/types/stats/query";
 import type { HandlerResult } from "@/types/api";
-import { aggregateBestVersionCounts } from "./_shared";
+import { aggregateBestVersionCounts, pickBestVersionPerSong } from "./_shared";
 
 /** 自己歴代ベストを出したバージョンごとの譜面件数。バージョン指定は使わず全バージョンを対象にする */
 export async function handleStatsVersionCountDistribution(
   q: StatsQuery,
 ): Promise<HandlerResult<unknown>> {
-  const rows = await timelineRepo.getBestEverScores({
+  const logs = await timelineRepo.listScoreLogs({
     userId: q.userId,
-    currentVersion: q.version,
-    excludeCurrent: false,
+    levels: q.levels.map(Number),
+    difficulties: q.difficulties,
   });
   return ok(
-    aggregateBestVersionCounts(
-      rows.map((r) => ({
-        bestExScore: r.bestExScore !== null ? Number(r.bestExScore) : null,
-        bestVersion: r.bestVersion ?? null,
-        difficultyLevel: Number(r.difficultyLevel),
-        difficulty: r.difficulty,
-      })),
-      { levels: q.levels, difficulties: q.difficulties },
-    ),
+    aggregateBestVersionCounts(pickBestVersionPerSong(logs), {
+      levels: q.levels,
+      difficulties: q.difficulties,
+    }),
   );
 }

@@ -42,6 +42,45 @@ const bestVersionRank = (label: string) => {
   return Number.isNaN(n) ? -1 : n;
 };
 
+interface ScoreLog {
+  songId: number;
+  version: string;
+  logId: number | string;
+  exScore: number;
+  difficulty: string;
+  difficultyLevel: number;
+}
+
+/**
+ * 曲ごとの自己歴代ベストEXと、それを出したバージョンを求める。
+ * ベストは各バージョンの最新ログのEXの最大。バージョンは、そのEXを持つログのうち最新のもの。
+ */
+export function pickBestVersionPerSong(logs: ScoreLog[]) {
+  const bySong = new Map<number, ScoreLog[]>();
+  for (const l of logs) {
+    const arr = bySong.get(l.songId);
+    if (arr) arr.push(l);
+    else bySong.set(l.songId, [l]);
+  }
+  return [...bySong.values()].map((songLogs) => {
+    const latestByVersion = new Map<string, ScoreLog>();
+    for (const l of songLogs) {
+      const cur = latestByVersion.get(l.version);
+      if (!cur || Number(l.logId) > Number(cur.logId)) latestByVersion.set(l.version, l);
+    }
+    const best = Math.max(...[...latestByVersion.values()].map((l) => l.exScore));
+    const bestLog = songLogs
+      .filter((l) => l.exScore === best)
+      .reduce((a, l) => (Number(l.logId) > Number(a.logId) ? l : a));
+    return {
+      bestExScore: best,
+      bestVersion: bestLog.version,
+      difficultyLevel: songLogs[0].difficultyLevel,
+      difficulty: songLogs[0].difficulty,
+    };
+  });
+}
+
 /**
  * 自己歴代ベストを出したバージョン（新しい順、INFINITASは数値バージョンの後ろ）ごとに譜面件数を集計する。
  * ベストEXスコアが 0 以下の譜面は除外する。

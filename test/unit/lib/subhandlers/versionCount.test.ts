@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { aggregateBestVersionCounts } from "@/lib/subhandlers/stats/_shared";
+import { aggregateBestVersionCounts, pickBestVersionPerSong } from "@/lib/subhandlers/stats/_shared";
 
 const row = (
   bestVersion: string | null,
@@ -36,5 +36,38 @@ describe("aggregateBestVersionCounts", () => {
       { levels: [12], difficulties: ["ANOTHER"] },
     );
     expect(result).toEqual([{ label: "34", count: 1 }]);
+  });
+});
+
+describe("pickBestVersionPerSong", () => {
+  const log = (songId: number, version: string, logId: number, exScore: number) => ({
+    songId,
+    version,
+    logId,
+    exScore,
+    difficulty: "ANOTHER",
+    difficultyLevel: 12,
+  });
+
+  it("各バージョンの最新ログのEXの最大を歴代ベストとし、そのEXを持つ最新ログのバージョンを返す", () => {
+    const result = pickBestVersionPerSong([
+      log(1, "33", 1, 1800),
+      log(1, "33", 2, 1900),
+      log(1, "34", 3, 1900),
+      log(1, "34", 4, 1700),
+    ]);
+    expect(result).toEqual([
+      { bestExScore: 1900, bestVersion: "34", difficultyLevel: 12, difficulty: "ANOTHER" },
+    ]);
+  });
+
+  it("バージョン内で一度出した高EXが後のログで下回っても、そのバージョンの最新EXだけが歴代候補になる", () => {
+    const [r] = pickBestVersionPerSong([
+      log(1, "34", 1, 2000),
+      log(1, "34", 2, 1500),
+      log(1, "33", 3, 1800),
+    ]);
+    expect(r.bestExScore).toBe(1800);
+    expect(r.bestVersion).toBe("33");
   });
 });
