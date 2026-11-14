@@ -49,9 +49,9 @@ function WidgetRenderer({
     case "activity":
       return <ActivitySection setNodata={setNodata} userId={userId} />;
     case "rankDistribution":
-      return <RankDistributionSection myUserId={userId} />;
+      return <RankDistributionSection myUserId={userId} showListAction />;
     case "bpiDistribution":
-      return <BpiDistributionSection myUserId={userId} />;
+      return <BpiDistributionSection myUserId={userId} showListAction />;
     case "versionCountDistribution":
       return <VersionCountDistributionSection myUserId={userId} showCompareAction />;
     case "bpmBpiDistribution":

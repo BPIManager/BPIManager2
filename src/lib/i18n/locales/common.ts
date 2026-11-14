@@ -309,6 +309,12 @@ export const commonTranslations = {
     "zh-TW": "雷達屬性",
     ko: "레이더 속성",
   },
+  "filter.equal": {
+    ja: "に等しい",
+    en: "equals",
+    "zh-TW": "等於",
+    ko: "같음",
+  },
   "filter.scoreCondition": {
     ja: "スコア条件",
     en: "Score Filter",

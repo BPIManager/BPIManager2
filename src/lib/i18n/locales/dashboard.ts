@@ -506,6 +506,12 @@ export const dashboardTranslations = {
     "zh-TW": "長條圖",
     ko: "막대 그래프",
   },
+  "dashboard.distribution.showList": {
+    ja: "対象曲一覧を表示",
+    en: "Show matching songs",
+    "zh-TW": "顯示符合的曲目列表",
+    ko: "해당 곡 목록 보기",
+  },
   "dashboard.distribution.chartPie": {
     ja: "円グラフ",
     en: "Pie chart",

@@ -92,6 +92,8 @@ const VersionCountDistributionSection = ({
                 bestVersion: label,
                 // 今作未プレイで過去作にだけ歴代がある曲も含めるため、自分側のプレイ状態は両方を対象にする
                 isMyPlayed: "any",
+                sortKey: "rivalBpi",
+                sortOrder: "desc",
                 levels: levels.join(","),
                 difficulties: diffs.join(","),
                 page: "1",

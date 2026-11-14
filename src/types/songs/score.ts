@@ -78,8 +78,9 @@ export type SongForSort = SongWithScore;
 
 export interface ScoreFilterCondition {
   id: string;
-  metric: "scoreRate" | "djrank";
-  operator: ">=" | "<=";
+  metric: "scoreRate" | "djrank" | "bpi";
+  /** "=" はDJRANKなら同ランク、スコアレート・BPIなら小数第2位までの一致 */
+  operator: ">=" | "<=" | "=";
   value: string;
 }
 
