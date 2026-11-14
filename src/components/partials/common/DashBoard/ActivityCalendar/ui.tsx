@@ -4,10 +4,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import dayjs from "@/lib/dayjs";
 import NextLink from "next/link";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { DashCard } from "@/components/ui/dashcard";
@@ -41,13 +42,67 @@ const getActivityColor = (count: number, isFuture: boolean): string => {
   return ACTIVITY_VARS[4];
 };
 
+interface ActivityCellProps {
+  day: { date: string; count: number; isFuture: boolean };
+  userId: string;
+  version: string;
+}
+
+/**
+ * 1日分のセル。ツールチップ内のボタンを押せるよう、Radix Tooltip の「内容へポインタを移せる」
+ * 挙動に任せ、ホバー外れでの手動クローズはしない（分布カードのツールチップと同じ方式）。
+ */
+const ActivityCell = ({ day, userId, version }: ActivityCellProps) => {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Tooltip open={open} onOpenChange={setOpen}>
+      <TooltipTrigger asChild>
+        <div
+          className={cn(
+            "h-2.75 w-2.75 rounded-xs transition-all duration-200",
+            !day.isFuture && "cursor-pointer hover:scale-125 hover:brightness-125",
+            day.isFuture && "cursor-default",
+          )}
+          style={{
+            backgroundColor: getActivityColor(day.count, day.isFuture),
+          }}
+          onMouseEnter={() => {
+            if (!day.isFuture) setOpen(true);
+          }}
+          onClick={() => {
+            if (!day.isFuture) setOpen(true);
+          }}
+          onTouchStart={(e) => {
+            if (day.isFuture) return;
+            e.preventDefault();
+            setOpen((o) => !o);
+          }}
+        />
+      </TooltipTrigger>
+      {!day.isFuture && (
+        <TooltipContent side="top" className="flex flex-col items-stretch gap-2 p-2">
+          <p className="whitespace-nowrap text-xs font-bold text-bpim-text">
+            {day.date}: {day.count}
+            {t("dashboard.activity.countUnit")}
+          </p>
+          <Button asChild size="sm" variant="secondary" className="h-6 text-[10px]">
+            <NextLink
+              href={`/users/${userId}/logs/${version}/summary/${day.date}?groupedBy=lastPlayed`}
+            >
+              {t("dashboard.activity.viewSummary")}
+            </NextLink>
+          </Button>
+        </TooltipContent>
+      )}
+    </Tooltip>
+  );
+};
+
 const ActivityCalendar = ({ data, userId, version }: Props) => {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [hoveredDate, setHoveredDate] = useState<string | null>(null);
   const { t } = useTranslation();
-  const isTouchDevice =
-    typeof window !== "undefined" &&
-    window.matchMedia("(pointer: coarse)").matches;
 
   const lastMonthStr = dayjs().tz().subtract(1, "month").format("YYYY-MM");
 
@@ -125,72 +180,16 @@ const ActivityCalendar = ({ data, userId, version }: Props) => {
               gap: "3px",
             }}
           >
-            {calendarDays.map((day) => {
-              const isOpen = hoveredDate === day.date;
-              return (
-                <Popover
+            <TooltipProvider>
+              {calendarDays.map((day) => (
+                <ActivityCell
                   key={day.date}
-                  open={isOpen}
-                  onOpenChange={(open) => {
-                    if (!open) setHoveredDate(null);
-                  }}
-                >
-                  <PopoverTrigger asChild>
-                    <div
-                      className={cn(
-                        "h-2.75 w-2.75 rounded-xs transition-all duration-200",
-                        !day.isFuture &&
-                          "cursor-pointer hover:scale-125 hover:brightness-125",
-                        day.isFuture && "cursor-default",
-                      )}
-                      style={{
-                        backgroundColor: getActivityColor(
-                          day.count,
-                          day.isFuture,
-                        ),
-                      }}
-                      onMouseEnter={() => {
-                        if (!isTouchDevice && !day.isFuture)
-                          setHoveredDate(day.date);
-                      }}
-                      onMouseLeave={() => {
-                        if (!isTouchDevice) setHoveredDate(null);
-                      }}
-                      onClick={(e) => {
-                        if (day.isFuture) return;
-                        e.stopPropagation();
-                        setHoveredDate(isOpen ? null : day.date);
-                      }}
-                    />
-                  </PopoverTrigger>
-                  <PopoverContent
-                    side="top"
-                    className="w-auto border-bpim-border bg-bpim-surface-2 p-2"
-                    onMouseEnter={() => setHoveredDate(day.date)}
-                    onMouseLeave={() => setHoveredDate(null)}
-                  >
-                    <div className="flex flex-col gap-2">
-                      <p className="whitespace-nowrap text-xs font-bold text-bpim-text">
-                        {day.date}: {day.count}
-                        {t("dashboard.activity.countUnit")}
-                      </p>
-                      <Button
-                        asChild
-                        size="sm"
-                        variant="secondary"
-                        className="h-6 text-[10px]"
-                      >
-                        <NextLink
-                          href={`/users/${userId}/logs/${version}/summary/${day.date}?groupedBy=lastPlayed`}
-                        >
-                          {t("dashboard.activity.viewSummary")}
-                        </NextLink>
-                      </Button>
-                    </div>
-                  </PopoverContent>
-                </Popover>
-              );
-            })}
+                  day={day}
+                  userId={userId}
+                  version={version}
+                />
+              ))}
+            </TooltipProvider>
           </div>
         </div>
       </div>
