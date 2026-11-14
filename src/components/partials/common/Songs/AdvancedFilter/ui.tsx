@@ -21,11 +21,13 @@ import VersionSection from "./VersionSection";
 import RadarSection from "./RadarSection";
 import ScoreFilterSection from "./ScoreFilterSection";
 import MissCountSection from "./MissCountSection";
+import PlayStateSection from "./PlayStateSection";
 
 const EMPTY_PARAMS: FilterParamsFrontend = {
   bpmMin: undefined,
   bpmMax: undefined,
   isSofran: undefined,
+  excludeSofran: undefined,
   since: undefined,
   until: undefined,
   versions: [],
@@ -41,16 +43,20 @@ interface Props {
   onClose: () => void;
   params: FilterParamsFrontend;
   onParamsChange: (params: Partial<FilterParamsFrontend>) => void;
+  /** 「プレイ状態」（プレイ済み/未プレイ/すべて）の選択を出す。スコア一覧用 */
+  withPlayState?: boolean;
 }
 
 interface AdvancedFilterModalBodyProps {
   initialParams: FilterParamsFrontend;
   onApply: (params: FilterParamsFrontend) => void;
+  withPlayState: boolean;
 }
 
 const AdvancedFilterModalBody = ({
   initialParams,
   onApply,
+  withPlayState,
 }: AdvancedFilterModalBodyProps) => {
   const { t } = useTranslation();
   const [localParams, setLocalParams] =
@@ -69,10 +75,21 @@ const AdvancedFilterModalBody = ({
       </DialogHeader>
 
       <div className="flex flex-col gap-6 py-4 overflow-y-auto max-h-[70vh] pr-2 scrollbar-thin">
+        {withPlayState && (
+          <>
+            <PlayStateSection
+              isMyPlayed={localParams.isMyPlayed}
+              onChange={updateLocal}
+            />
+            <Separator className="bg-bpim-surface-2/60" />
+          </>
+        )}
         <BpmSection
           bpmMin={localParams.bpmMin}
           bpmMax={localParams.bpmMax}
           isSofran={localParams.isSofran}
+          excludeSofran={localParams.excludeSofran}
+          withExcludeSofran
           onChange={updateLocal}
         />
         <Separator className="bg-bpim-surface-2/60" />
@@ -110,7 +127,11 @@ const AdvancedFilterModalBody = ({
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => setLocalParams(EMPTY_PARAMS)}
+          onClick={() =>
+            setLocalParams(
+              withPlayState ? { ...EMPTY_PARAMS, isMyPlayed: undefined } : EMPTY_PARAMS,
+            )
+          }
           className="text-bpim-muted"
         >
           {t("filter.reset")}
@@ -132,6 +153,7 @@ const AdvancedFilterModal = ({
   onClose,
   params,
   onParamsChange,
+  withPlayState = false,
 }: Props) => {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -139,6 +161,7 @@ const AdvancedFilterModal = ({
         <AdvancedFilterModalBody
           key={isOpen ? JSON.stringify(params) : "closed"}
           initialParams={params}
+          withPlayState={withPlayState}
           onApply={(next) => {
             onParamsChange(next);
             onClose();

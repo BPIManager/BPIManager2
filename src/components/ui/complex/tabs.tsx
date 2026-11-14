@@ -47,7 +47,7 @@ AppTabsList.displayName = "AppTabsList";
 
 export const appTabsTriggerVariants = cva(
   [
-    "flex h-full items-center justify-center gap-2",
+    "flex h-full min-w-0 items-center justify-center gap-2",
     "text-xs font-bold transition-all",
     "data-[state=active]:shadow-lg data-[state=active]:text-white",
   ],
@@ -92,7 +92,7 @@ export const AppTabsTrigger = React.forwardRef<
     const inner = (
       <>
         {Icon && <Icon className="h-4 w-4 shrink-0" />}
-        <span className={cn(iconOnly ? "hidden sm:inline" : undefined)}>
+        <span className={cn("min-w-0 truncate", iconOnly && "hidden sm:inline")}>
           {children}
         </span>
       </>

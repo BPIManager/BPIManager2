@@ -11,10 +11,13 @@ interface Props {
   bpmMin: number | undefined;
   bpmMax: number | undefined;
   isSofran: boolean | undefined;
+  /** 「ソフラン曲を除く」の指定。渡したときだけチェックボックスを出す（対応する一覧のみ） */
+  excludeSofran?: boolean;
+  withExcludeSofran?: boolean;
   onChange: (val: Partial<FilterParamsFrontend>) => void;
 }
 
-const BpmSection = ({ bpmMin, bpmMax, isSofran, onChange }: Props) => {
+const BpmSection = ({ bpmMin, bpmMax, isSofran, excludeSofran, withExcludeSofran = false, onChange }: Props) => {
   const { t } = useTranslation();
   return (
   <section className="flex flex-col gap-3">
@@ -46,6 +49,18 @@ const BpmSection = ({ bpmMin, bpmMax, isSofran, onChange }: Props) => {
         {t("filter.sofranOnly")}
       </Label>
     </div>
+    {withExcludeSofran && (
+    <div className="flex items-center gap-2">
+      <Checkbox
+        id="excludeSofran"
+        checked={!!excludeSofran}
+        onCheckedChange={(checked) => onChange({ excludeSofran: !!checked })}
+      />
+      <Label htmlFor="excludeSofran" className="text-sm font-medium">
+        {t("filter.sofranExclude")}
+      </Label>
+    </div>
+    )}
   </section>
   );
 };

@@ -10,13 +10,17 @@ const PieTooltipContent = ({
   active,
   payload,
   total,
+  getAction,
 }: {
   active?: boolean;
-  payload?: { name: string; value: number }[];
+  payload?: { name: string; value: number; payload?: { rawLabel?: string } }[];
   total: number;
+  getAction?: (label: string) => { label: string; onClick: () => void } | undefined;
 }) => {
   if (!active || !payload?.length) return null;
   const { name, value } = payload[0];
+  const rawLabel = payload[0].payload?.rawLabel;
+  const action = rawLabel !== undefined ? getAction?.(rawLabel) : undefined;
   const percent = total > 0 ? (value / total) * 100 : 0;
   return (
     <div className="rounded-md border border-bpim-border bg-bpim-surface px-2 py-1 text-xs shadow">
@@ -24,6 +28,15 @@ const PieTooltipContent = ({
       <span className="ml-2 text-bpim-muted">
         {value} ({percent.toFixed(1)}%)
       </span>
+      {action && (
+        <button
+          type="button"
+          onClick={action.onClick}
+          className="mt-1 block w-full rounded-md bg-bpim-primary px-2 py-1 text-xs font-bold text-white transition-colors hover:bg-bpim-primary/80"
+        >
+          {action.label}
+        </button>
+      )}
     </div>
   );
 };
@@ -33,17 +46,26 @@ const DistributionPie = ({
   getColor,
   label,
   labelColor,
+  formatLabel,
+  getAction,
 }: {
   data: ChartData[];
   getColor: (label: string) => string;
   label: string;
   labelColor: string;
+  formatLabel?: (label: string) => string;
+  getAction?: (label: string) => { label: string; onClick: () => void } | undefined;
 }) => {
   const total = data.reduce((sum, d) => sum + d.count, 0);
   const filtered = [...data]
     .reverse()
     .filter((d) => d.count > 0)
-    .map((d) => ({ ...d, fill: getColor(d.label) }));
+    .map((d) => ({
+      ...d,
+      fill: getColor(d.label),
+      label: formatLabel ? formatLabel(d.label) : d.label,
+      rawLabel: d.label,
+    }));
   return (
     <div className="flex flex-1 flex-col items-center gap-1">
       <ResponsiveContainer width="100%" height={150}>
@@ -60,7 +82,12 @@ const DistributionPie = ({
             startAngle={90}
             endAngle={-270}
           />
-          <RechartsTooltip content={<PieTooltipContent total={total} />} />
+          <RechartsTooltip
+            content={<PieTooltipContent total={total} getAction={getAction} />}
+            // 操作ボタンはクリックで押せるよう、ボタンがある場合はクリックで開く
+            trigger={getAction ? "click" : "hover"}
+            wrapperStyle={getAction ? { pointerEvents: "auto" } : undefined}
+          />
         </PieChart>
       </ResponsiveContainer>
       <span className="text-xs font-bold" style={{ color: labelColor }}>

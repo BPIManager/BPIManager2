@@ -147,3 +147,41 @@ export function calculateRadar(
 
   return result;
 }
+
+/**
+ * 1カテゴリ分だけの総合BPIを計算する（{@link calculateRadar} のカテゴリ単位版）。
+ * 曲ごとの更新インパクトのように、スコアを差し替えながら繰り返し計算する用途で、曲リストの組み立てを省く。
+ */
+export function calculateCategoryTotalBpi(
+  category: RadarCategory,
+  scores: RadarScoreInput[],
+  songMaster: RadarSongMaster,
+  validSongKeys: Set<string>,
+): number {
+  const keyOf = (s: { title: string; difficulty: string | null }) =>
+    `${s.title}___${s.difficulty}`;
+  const playedKeys = new Set(scores.map(keyOf));
+  const categoryScores = scores.filter((s) => topElementMap.get(keyOf(s)) === category);
+
+  const allObservations: IBpiScoreObservation[] = scores.flatMap((s) => {
+    const master = songMaster.get(keyOf(s));
+    return master
+      ? [{ songId: master.songId, notes: master.notes, exScore: s.exScore }]
+      : [];
+  });
+
+  const unplayedSongs = (topElementsByCategory.get(category) ?? []).filter(
+    (e) => !playedKeys.has(keyOf(e)) && validSongKeys.has(keyOf(e)),
+  );
+  const categoryMaster: (IBpiBasicSongData & { songId: number })[] = [
+    ...categoryScores,
+    ...unplayedSongs,
+  ].flatMap((s) => {
+    const master = songMaster.get(keyOf(s));
+    return master ? [master] : [];
+  });
+
+  return categoryMaster.length > 0
+    ? BpiCalculator.calculateTotalBPI(allObservations, categoryMaster)
+    : -15;
+}

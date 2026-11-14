@@ -133,8 +133,9 @@ export const useEditProfile = (onClose?: () => void) => {
       await refresh?.();
       toast.success("保存しました");
       onClose?.();
-    } catch {
-      toast.error("保存に失敗しました");
+    } catch (e) {
+      const reason = e instanceof Error && e.message ? `: ${e.message}` : "";
+      toast.error(`保存に失敗しました${reason}`);
     } finally {
       setIsSubmitting(false);
     }
