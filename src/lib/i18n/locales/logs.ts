@@ -275,7 +275,7 @@ export const logsTranslations = {
     ko: "랭크 분포",
   },
   "logs.detail.radarGrowth": {
-    ja: "レーダーの伸び",
+    ja: "レーダー項目別",
     en: "Radar Growth",
     "zh-TW": "雷達圖成長",
     ko: "레이더 성장",
