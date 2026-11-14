@@ -8,6 +8,7 @@ import { logBatchRepo } from "@/lib/db/domains/logs/batch";
 import { userStatusLogsWriteRepo } from "@/lib/db/domains/userStatusLogs/write";
 import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
 import { BpiCalculator } from "@/lib/bpi";
+import { saveRadarSnapshot } from "@/lib/db/orchestrators/logRadarSnapshot";
 
 /**
  * スコアインポート結果を1トランザクションで保存する（scores・logs・userStatusLogs の更新と allScores の追記）。
@@ -117,6 +118,13 @@ async function executeSaveBpiSystem(
   });
 
   await scoreWriteRepo.insert(trx, params.scoreUpdates);
+
+  // レーダーも総合BPIと同様にラチェットしたバッチ時点の値を保存する
+  await saveRadarSnapshot(trx, {
+    userId: params.userId,
+    version: params.version,
+    batchId: params.batchId,
+  });
 
   return totalBpi;
 }
