@@ -51,3 +51,38 @@ describe("radarValuesFromRow / radarValuesToColumns", () => {
     expect(radarValuesToColumns({ ...v, NOTES: 12.345 }).notes).toBe("12.35");
   });
 });
+
+describe("computeRadarValues", () => {
+  it("☆12かつ対象難易度のスコアだけをレーダー計算に渡す", async () => {
+    const { vi } = await import("vitest");
+    const captured: { title: string }[][] = [];
+    vi.resetModules();
+    vi.doMock("@/lib/radar/calculator", () => ({
+      buildRadarSongMaster: () => new Map(),
+      calculateRadar: (scores: { title: string }[]) => {
+        captured.push(scores);
+        return Object.fromEntries(
+          ["NOTES", "CHORD", "PEAK", "CHARGE", "SCRATCH", "SOFLAN"].map((c) => [c, { totalBpi: 0, songs: [] }]),
+        );
+      },
+    }));
+    const { computeRadarValues } = await import("@/lib/radar/snapshot");
+    const master = [
+      { songId: 1, title: "L12 another", difficulty: "ANOTHER", difficultyLevel: 12, notes: 1000 },
+      { songId: 2, title: "L11 another", difficulty: "ANOTHER", difficultyLevel: 11, notes: 1000 },
+      { songId: 3, title: "L12 normal", difficulty: "NORMAL", difficultyLevel: 12, notes: 1000 },
+    ] as unknown as Parameters<typeof computeRadarValues>[1];
+    computeRadarValues(
+      [
+        { songId: 1, exScore: 1800, bpi: 1 },
+        { songId: 2, exScore: 1800, bpi: 1 },
+        { songId: 3, exScore: 1800, bpi: 1 },
+        { songId: 99, exScore: 1800, bpi: 1 },
+      ],
+      master,
+      new Set(),
+    );
+    expect(captured[0].map((s) => s.title)).toEqual(["L12 another"]);
+    vi.doUnmock("@/lib/radar/calculator");
+  });
+});
