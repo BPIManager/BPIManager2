@@ -2,10 +2,12 @@ import { latestScoresRepo } from "@/lib/db/domains/scores/latest";
 import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { logRadarRepo } from "@/lib/db/domains/logs/radar";
 import {
+  RADAR_LEVEL,
   computeRadarValues,
   ratchetRadarValues,
   type RadarValues,
 } from "@/lib/radar/snapshot";
+import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 import type { IIDXVersion } from "@/types/iidx/version";
 
 const sameValues = (a: RadarValues | null, b: RadarValues) =>
@@ -30,7 +32,7 @@ export async function backfillUserVersionRadar(
     logRadarRepo.listBatches(userId, version),
     latestScoresRepo.getMaxLogIdByBatch(userId, version),
     songMasterRepo.getSongMasterWithDef(),
-    songMasterRepo.getFilteredTitleDifficultyPairs(version as IIDXVersion),
+    songMasterRepo.getFilteredTitleDifficultyPairs(version as IIDXVersion, [RADAR_LEVEL], [...IIDX_DIFFICULTIES]),
   ]);
   const validSongKeys = new Set(validPairs.map((r) => `${r.title}___${r.difficulty}`));
 

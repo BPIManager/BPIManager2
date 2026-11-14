@@ -12,8 +12,8 @@ export type RadarValues = Record<RadarCategory, number>;
 
 const FLOOR = -15;
 
-/** レーダーの入力にする譜面のレベル（ダッシュボードのレーダー既定の絞り込みと同じ☆12） */
-const RADAR_LEVEL = 12;
+/** レーダーの入力にする譜面のレベル（ダッシュボードのレーダー既定の絞り込みと同じ☆12）。有効な譜面キー（未プレイ曲の予測対象）の絞り込みにも使う */
+export const RADAR_LEVEL = 12;
 
 interface LatestScore {
   songId: number;
