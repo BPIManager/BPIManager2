@@ -33,6 +33,7 @@ const ChartBarUnit = ({
   action,
   open,
   onOpenChange,
+  onTap,
   myCount,
   rivalCount,
   maxCount,
@@ -60,6 +61,8 @@ const ChartBarUnit = ({
   /** 開閉状態は親が1つにまとめて持つ（複数が同時に開いたままになるのを防ぐ） */
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** タッチ操作でのタップ。開閉をトグルする */
+  onTap: () => void;
   myCount: number;
   rivalCount?: number;
   maxCount: number;
@@ -94,10 +97,10 @@ const ChartBarUnit = ({
           // 操作ボタンがある場合、ホバー外れの判定は Radix（ツールチップ内へ移動可能）に任せる
           onMouseEnter={() => onOpenChange(true)}
           onMouseLeave={action ? undefined : () => onOpenChange(false)}
-          onClick={action ? () => onOpenChange(true) : undefined}
-          onTouchStart={(e) => {
-            e.preventDefault();
-            onOpenChange(!open);
+          data-tooltip-trigger=""
+          onClick={() => {
+            onTap();
+            if (action) onOpenChange(true);
           }}
         >
           <div className="relative h-37.5 w-full">
