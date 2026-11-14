@@ -1,0 +1,93 @@
+import { latestScoresRepo } from "@/lib/db/domains/scores/latest";
+import { songMasterRepo } from "@/lib/db/domains/songs/master";
+import { logRadarRepo } from "@/lib/db/domains/logs/radar";
+import {
+  RADAR_LEVEL,
+  computeRadarValues,
+  ratchetRadarValues,
+  type RadarValues,
+} from "@/lib/radar/snapshot";
+import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
+import type { IIDXVersion } from "@/types/iidx/version";
+
+const sameValues = (a: RadarValues | null, b: RadarValues) =>
+  !!a &&
+  (Object.keys(b) as (keyof RadarValues)[]).every(
+    (k) => Math.round(a[k] * 100) === Math.round(b[k] * 100),
+  );
+
+/**
+ * 1ユーザー×バージョンの全バッチを古い順にたどり、logs のレーダー値（ラチェット後）を埋める・直す。
+ * 未算出のバッチはその時点のスコアから算出し、算出済みのバッチも含めて過去最高を下回らないよう単調に補正する
+ * （導入直後に履歴の無い状態でラチェットされた値の不連続を解消するため）。何度実行しても結果は同じ。
+ *
+ * @returns 書き込んだバッチ数
+ */
+export async function backfillUserVersionRadar(
+  userId: string,
+  version: string,
+  options: { dryRun?: boolean; recompute?: boolean } = {},
+): Promise<number> {
+  const [batches, maxLogIds, fullMaster, validPairs] = await Promise.all([
+    logRadarRepo.listBatches(userId, version),
+    latestScoresRepo.getMaxLogIdByBatch(userId, version),
+    songMasterRepo.getSongMasterWithDef(),
+    songMasterRepo.getFilteredTitleDifficultyPairs(version as IIDXVersion, [RADAR_LEVEL], [...IIDX_DIFFICULTIES]),
+  ]);
+  const validSongKeys = new Set(validPairs.map((r) => `${r.title}___${r.difficulty}`));
+
+  let running: RadarValues | null = null;
+  let written = 0;
+  for (const batch of batches) {
+    // recompute 時は保存済みの値を使わず、すべてスコアから算出し直す（算出定義を変えたときなど）
+    let fresh = options.recompute ? null : batch.values;
+    if (!fresh) {
+      const untilLogId = maxLogIds.get(batch.batchId);
+      // スコアを持たないバッチは直前の値を引き継ぐ
+      if (untilLogId === undefined) {
+        if (!running) continue;
+        fresh = running;
+      } else {
+        const scores = await latestScoresRepo.getLatestScoresUntilLogId(userId, version, untilLogId);
+        fresh = computeRadarValues(scores, fullMaster, validSongKeys);
+      }
+    }
+    running = ratchetRadarValues(running, fresh);
+    if (!sameValues(batch.values, running)) {
+      if (!options.dryRun) await logRadarRepo.setForBatch(userId, batch.batchId, running);
+      written++;
+    }
+  }
+  return written;
+}
+
+/**
+ * レーダー値が未算出のバッチがあるユーザー×バージョンをバックフィルする。
+ *
+ * @param options.versions - 対象バージョン（省略時は全バージョン）
+ * @param options.all - true なら算出済みのみのユーザー×バージョンも含めて単調性を再点検・補正する
+ * @param options.recompute - true なら保存済みの値も含めて全バッチを算出し直す（all を含む）
+ */
+export async function backfillLogRadar(
+  options: { versions?: string[]; dryRun?: boolean; all?: boolean; recompute?: boolean } = {},
+) {
+  const targets = await logRadarRepo.listUserVersionsForBackfill({
+    versions: options.versions,
+    all: options.all || options.recompute,
+  });
+  let total = 0;
+  let done = 0;
+  for (const { userId, version } of targets) {
+    try {
+      total += await backfillUserVersionRadar(userId, version, options);
+    } catch (e) {
+      console.error(`[LogRadar] Failed for ${userId}/${version}:`, e);
+    } finally {
+      done++;
+      if (done % 100 === 0 || done === targets.length) {
+        console.log(`[LogRadar] ${done}/${targets.length} (written ${total})`);
+      }
+    }
+  }
+  return { targets: targets.length, written: total };
+}

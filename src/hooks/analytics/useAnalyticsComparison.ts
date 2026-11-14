@@ -2,6 +2,7 @@ import { useUser } from "@/contexts/users/UserContext";
 import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
 import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
+import { IIDX_DIFFICULTIES, IIDX_LEVELS } from "@/constants/iidx/bpiDifficulties";
 import { SongWithRival, SongWithScore } from "@/types/songs/score";
 import { BpiCalculator } from "@/lib/bpi";
 import { AnalyticsTarget } from "@/types/analytics";
@@ -12,6 +13,7 @@ import {
   RivalAvgRow,
   RivalTopRow,
   SCORE_RATE,
+  bestEverRowToUnplayedSong,
   mergeFixedTarget,
   toBpiParams,
 } from "./comparisonRows";
@@ -204,12 +206,27 @@ export const useAnalyticsComparison = (
       bestMap.set(`${row.songId}__${row.difficulty}`, row);
     }
 
-    const songs = (myScores ?? []).map((s) => {
+    // 今作未プレイで過去作にだけ歴代がある曲も比較に出す（BPI対象のレベル・難易度のみ）
+    const playedKeys = new Set(
+      (myScores ?? []).map((s) => `${s.songId}__${s.difficulty}`),
+    );
+    const pastOnly = (bestEverData ?? [])
+      .filter(
+        (b) =>
+          b.bestExScore !== null &&
+          !playedKeys.has(`${b.songId}__${b.difficulty}`) &&
+          (IIDX_LEVELS as string[]).includes(String(b.difficultyLevel)) &&
+          (IIDX_DIFFICULTIES as readonly string[]).includes(b.difficulty),
+      )
+      .map(bestEverRowToUnplayedSong);
+
+    const songs = [...(myScores ?? []), ...pastOnly].map((s) => {
       const best = bestMap.get(`${s.songId}__${s.difficulty}`);
       return mergeFixedTarget(
         s,
         best?.bestExScore ?? null,
         best?.bestBpi ?? null,
+        best?.bestVersion ?? null,
       );
     });
 

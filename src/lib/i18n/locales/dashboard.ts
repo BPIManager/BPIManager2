@@ -506,6 +506,12 @@ export const dashboardTranslations = {
     "zh-TW": "長條圖",
     ko: "막대 그래프",
   },
+  "dashboard.distribution.showList": {
+    ja: "対象曲一覧を表示",
+    en: "Show matching songs",
+    "zh-TW": "顯示符合的曲目列表",
+    ko: "해당 곡 목록 보기",
+  },
   "dashboard.distribution.chartPie": {
     ja: "円グラフ",
     en: "Pie chart",
@@ -537,6 +543,24 @@ export const dashboardTranslations = {
     ko: "해상도 낮추기",
   },
 
+  "dashboard.versionCount.title": {
+    ja: "バージョン別自己歴代数",
+    en: "Personal bests by version",
+    "zh-TW": "各版本個人最佳數",
+    ko: "버전별 자기 최고 기록 수",
+  },
+  "dashboard.versionCount.showCompare": {
+    ja: "比較を表示",
+    en: "Show comparison",
+    "zh-TW": "顯示比較",
+    ko: "비교 보기",
+  },
+  "dashboard.versionCount.other": {
+    ja: "その他",
+    en: "Other",
+    "zh-TW": "其他",
+    ko: "기타",
+  },
   "dashboard.bpmBpi.title": {
     ja: "BPM帯別",
     en: "By BPM",
@@ -720,6 +744,42 @@ export const dashboardTranslations = {
     "zh-TW": "人",
     ko: "명",
   },
+  "dashboard.ranking.savedTarget": {
+    ja: "比較対象:",
+    en: "Target:",
+    "zh-TW": "比較對象：",
+    ko: "비교 대상:",
+  },
+  "dashboard.ranking.settings.title": {
+    ja: "ランキングタブの設定",
+    en: "Ranking tab settings",
+    "zh-TW": "排行榜分頁設定",
+    ko: "랭킹 탭 설정",
+  },
+  "dashboard.ranking.settings.open": {
+    ja: "タブの設定",
+    en: "Tab settings",
+    "zh-TW": "分頁設定",
+    ko: "탭 설정",
+  },
+  "dashboard.ranking.settings.visible": {
+    ja: "表示",
+    en: "Visible",
+    "zh-TW": "顯示",
+    ko: "표시",
+  },
+  "dashboard.ranking.settings.target": {
+    ja: "表示する比較対象",
+    en: "Target to show",
+    "zh-TW": "顯示的比較對象",
+    ko: "표시할 비교 대상",
+  },
+  "dashboard.ranking.noTabs": {
+    ja: "表示するタブがありません。右上の歯車から表示するタブを選べます。",
+    en: "No tabs to show. Choose tabs from the gear icon.",
+    "zh-TW": "沒有可顯示的分頁，請從齒輪圖示選擇。",
+    ko: "표시할 탭이 없습니다. 톱니바퀴에서 선택하세요.",
+  },
   "dashboard.ranking.noSongs": {
     ja: "対象の楽曲が見つかりませんでした",
     en: "No songs found.",
@@ -890,30 +950,6 @@ export const dashboardTranslations = {
     ko: "궁금할 때는 문서 확인",
   },
 
-  "dashboard.songList.highBpi": {
-    ja: "BPIが高い順",
-    en: "Highest BPI",
-    "zh-TW": "BPI高至低",
-    ko: "BPI 높은 순",
-  },
-  "dashboard.songList.lowBpi": {
-    ja: "BPIが低い順",
-    en: "Lowest BPI",
-    "zh-TW": "BPI低至高",
-    ko: "BPI 낮은 순",
-  },
-  "dashboard.songList.playedOnly": {
-    ja: "既プレイのみ",
-    en: "Played only",
-    "zh-TW": "僅已遊玩",
-    ko: "플레이한 곡만",
-  },
-  "dashboard.songList.songList": {
-    ja: "楽曲リスト",
-    en: "Song List",
-    "zh-TW": "樂曲列表",
-    ko: "곡 목록",
-  },
 
   "dashboard.layoutSettings.reorder": {
     ja: "ドラッグで並び替え・移動",

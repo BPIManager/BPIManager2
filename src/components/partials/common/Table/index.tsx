@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useRouter } from "next/router";
 import { SongWithScore } from "@/types/songs/score";
 import { useSongFilter } from "@/hooks/table/useSongFilter";
 import { useMergedCompareSongs } from "@/hooks/table/useMergedCompareSongs";
@@ -9,6 +10,11 @@ import SongList from "./ui";
 import CustomPagination from "@/components/partials/common/ListControls/Pagination/ui";
 import SongDetailView from "@/components/partials/modal/SongDetail";
 import { useUserScores } from "@/hooks/table/useUserScores";
+import { useUnplayedScores } from "@/hooks/table/useUnplayedScores";
+import {
+  SCORE_LIST_DEFAULT_PLAY_STATE,
+  needsUnplayedSongs,
+} from "@/utils/songs/playState";
 import { useCompareScores } from "@/hooks/table/useCompareScores";
 import { NoDataAlert } from "@/components/partials/common/DashBoard/NoData";
 import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
@@ -34,10 +40,32 @@ const SongsTable = ({
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
 
-  const { songs, error, isLoading, currentVersion, refresh } = useUserScores(
-    userId,
-    version,
+  const {
+    songs: playedSongs,
+    error,
+    isLoading: playedLoading,
+    currentVersion,
+    refresh,
+  } = useUserScores(userId, version);
+
+  // プレイ状態が「未プレイ」「すべて」（既定）のときだけ、未プレイ曲（EX・BPIなし）も取得して一覧に加える
+  const { query, isReady } = useRouter();
+  const includeUnplayed = isReady && needsUnplayedSongs(query.isMyPlayed);
+  const {
+    songs: unplayedSongs,
+    error: unplayedError,
+    isLoading: unplayedLoading,
+    refresh: refreshUnplayed,
+  } = useUnplayedScores(includeUnplayed ? userId : undefined, version);
+
+  const songs = useMemo(
+    () =>
+      playedSongs && includeUnplayed
+        ? [...playedSongs, ...(unplayedSongs ?? [])]
+        : playedSongs,
+    [playedSongs, unplayedSongs, includeUnplayed],
   );
+  const isLoading = playedLoading || (includeUnplayed && unplayedLoading);
 
   const {
     params,
@@ -47,7 +75,7 @@ const SongsTable = ({
     pageSize,
     totalCount,
     visibleSongs: rawVisible,
-  } = useSongFilter(songs);
+  } = useSongFilter(songs, { isMyPlayed: SCORE_LIST_DEFAULT_PLAY_STATE });
 
   const { compareData, compareError, isCompareLoading } = useCompareScores(
     userId,
@@ -62,8 +90,8 @@ const SongsTable = ({
     params.compareVersion,
   );
 
-  if (!isLoading && (error || !songs)) {
-    return <FetchErrorState error={error} />;
+  if (!isLoading && (error || (includeUnplayed && unplayedError) || !songs)) {
+    return <FetchErrorState error={error ?? unplayedError} />;
   }
 
   const showCompareLoading =
@@ -85,6 +113,7 @@ const SongsTable = ({
         onOpenAdvancedFilter={() => setIsAdvancedOpen(true)}
         withSelfCompare
         withScoreRate
+        withPlayStateFilter
         currentVersion={currentVersion}
       />
 
@@ -127,6 +156,7 @@ const SongsTable = ({
         onClose={() => setIsAdvancedOpen(false)}
         params={params}
         onParamsChange={updateParams}
+        withPlayState
       />
 
       {isDetailOpen && selectedSong && (
@@ -137,7 +167,10 @@ const SongsTable = ({
           userId={userId}
           version={currentVersion}
           songDomain="bpi"
-          onSaved={() => refresh()}
+          onSaved={() => {
+            void refresh();
+            if (includeUnplayed) void refreshUnplayed();
+          }}
           subjectUser={
             isOtherUser
               ? { userId, userName: profile?.userName ?? "" }

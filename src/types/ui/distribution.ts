@@ -8,4 +8,6 @@ export interface DistributionSectionProps {
   rivalName?: string;
   mode?: RankDisplayMode;
   onModeChange?: (mode: RankDisplayMode) => void;
+  /** 自分のダッシュボードのみ true。ツールチップに「スコア一覧を表示」ボタンを出す */
+  showListAction?: boolean;
 }

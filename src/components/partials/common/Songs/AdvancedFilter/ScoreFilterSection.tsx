@@ -70,6 +70,7 @@ const ScoreFilterSection = ({ scoreFilters, onChange }: Props) => {
                 <SelectContent className="border-bpim-border bg-bpim-bg">
                   <SelectItem value="scoreRate" className="text-xs">{t("filter.scoreRate")}</SelectItem>
                   <SelectItem value="djrank" className="text-xs">DJRANK</SelectItem>
+                  <SelectItem value="bpi" className="text-xs">BPI</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -90,11 +91,12 @@ const ScoreFilterSection = ({ scoreFilters, onChange }: Props) => {
                 <Input
                   value={f.value}
                   onChange={(e) => update(f.id, { value: e.target.value })}
-                  placeholder="0-100"
+                  placeholder={f.metric === "bpi" ? "-15〜" : "0-100"}
                   className="h-8 w-24 border-bpim-border bg-bpim-surface-2/60 text-xs text-bpim-text placeholder:text-bpim-muted"
                   type="number"
-                  min={0}
-                  max={100}
+                  step={f.metric === "bpi" ? 0.01 : undefined}
+                  min={f.metric === "bpi" ? -15 : 0}
+                  max={f.metric === "bpi" ? undefined : 100}
                 />
               )}
 
@@ -104,12 +106,13 @@ const ScoreFilterSection = ({ scoreFilters, onChange }: Props) => {
                   update(f.id, { operator: v as ScoreFilterCondition["operator"] })
                 }
               >
-                <SelectTrigger className="h-8 w-16 border-bpim-border bg-bpim-surface-2/60 text-xs text-bpim-text">
+                <SelectTrigger className="h-8 w-24 border-bpim-border bg-bpim-surface-2/60 text-xs text-bpim-text">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="border-bpim-border bg-bpim-bg">
                   <SelectItem value=">=" className="text-xs">{t("filter.orMore")}</SelectItem>
                   <SelectItem value="<=" className="text-xs">{t("filter.orLess")}</SelectItem>
+                  <SelectItem value="=" className="text-xs">{t("filter.equal")}</SelectItem>
                 </SelectContent>
               </Select>
 

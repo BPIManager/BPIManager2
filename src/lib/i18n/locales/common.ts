@@ -259,6 +259,24 @@ export const commonTranslations = {
     "zh-TW": "遊玩狀態",
     ko: "플레이 상태",
   },
+  "filter.playState.played": {
+    ja: "プレイ済み",
+    en: "Played",
+    "zh-TW": "已遊玩",
+    ko: "플레이함",
+  },
+  "filter.playState.unplayed": {
+    ja: "未プレイ",
+    en: "Unplayed",
+    "zh-TW": "未遊玩",
+    ko: "미플레이",
+  },
+  "filter.playState.all": {
+    ja: "すべて",
+    en: "All",
+    "zh-TW": "全部",
+    ko: "전체",
+  },
   "filter.myPlayed": {
     ja: "自分プレイ済",
     en: "Played by me",
@@ -278,6 +296,12 @@ export const commonTranslations = {
     en: "BPM Range",
     "zh-TW": "BPM範圍",
     ko: "BPM 범위",
+  },
+  "filter.sofranExclude": {
+    ja: "ソフラン曲を除く",
+    en: "Exclude sofran",
+    "zh-TW": "排除速度變化曲",
+    ko: "소프란 곡 제외",
   },
   "filter.sofranOnly": {
     ja: "ソフラン曲のみ表示",
@@ -308,6 +332,12 @@ export const commonTranslations = {
     en: "Radar Type",
     "zh-TW": "雷達屬性",
     ko: "레이더 속성",
+  },
+  "filter.equal": {
+    ja: "に等しい",
+    en: "equals",
+    "zh-TW": "等於",
+    ko: "같음",
   },
   "filter.scoreCondition": {
     ja: "スコア条件",

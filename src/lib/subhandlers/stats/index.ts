@@ -19,3 +19,4 @@ export * from "./scoreRateDistribution";
 export * from "./singleBPIDistribution";
 export * from "./totalBPIhistory";
 export * from "./totalBpi";
+export * from "./versionCountDistribution";

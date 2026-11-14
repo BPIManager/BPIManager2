@@ -16,11 +16,24 @@ function loadConfig(): DashboardLayoutConfig {
     if (parsed.version !== 2) return DEFAULT_LAYOUT_CONFIG;
     // 新ウィジェットが保存済みconfigに存在しない場合はデフォルト設定で末尾に追加
     const existingIds = new Set(parsed.widgets.map((w) => w.id));
-    const added = DEFAULT_LAYOUT_CONFIG.widgets.filter((w) => !existingIds.has(w.id));
-    if (added.length > 0) {
-      return { ...parsed, widgets: [...parsed.widgets, ...added] };
-    }
-    return parsed;
+    const defaults = DEFAULT_LAYOUT_CONFIG.widgets;
+    const widgets = [...parsed.widgets];
+    defaults.forEach((w, i) => {
+      if (existingIds.has(w.id)) return;
+      const prevId = defaults[i - 1]?.id;
+      const prevIdx = widgets.findIndex((x) => x.id === prevId);
+      widgets.splice(prevIdx >= 0 ? prevIdx + 1 : widgets.length, 0, w);
+    });
+    if (widgets.length === parsed.widgets.length) return parsed;
+    // バージョン別件数カードの追加に合わせ、旧既定(full)のままのBPM帯別を左右に並ぶ1/2幅へ移行する
+    return {
+      ...parsed,
+      widgets: widgets.map((w) =>
+        w.id === "bpmBpiDistribution" && !existingIds.has("versionCountDistribution") && w.width === "full"
+          ? { ...w, width: "half" }
+          : w,
+      ),
+    };
   } catch {
     return DEFAULT_LAYOUT_CONFIG;
   }

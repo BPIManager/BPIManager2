@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   Tooltip,
   TooltipContent,
@@ -29,6 +28,11 @@ function tooltipHeader(
 
 const ChartBarUnit = ({
   label,
+  displayLabel,
+  axisLabel,
+  action,
+  open,
+  onOpenChange,
   myCount,
   rivalCount,
   maxCount,
@@ -47,6 +51,15 @@ const ChartBarUnit = ({
   maxRef,
 }: {
   label: string;
+  /** ツールチップ見出し用の表示名（未指定ならlabelから生成） */
+  displayLabel?: string;
+  /** 軸（棒の下）に出す表示名（未指定ならlabel） */
+  axisLabel?: string;
+  /** ツールチップに出す操作ボタン。指定時はポインタをツールチップへ移せる */
+  action?: { label: string; onClick: () => void };
+  /** 開閉状態は親が1つにまとめて持つ（複数が同時に開いたままになるのを防ぐ） */
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   myCount: number;
   rivalCount?: number;
   maxCount: number;
@@ -64,14 +77,13 @@ const ChartBarUnit = ({
   dense?: boolean;
   maxRef?: React.RefObject<HTMLDivElement | null>;
 }) => {
-  const [open, setOpen] = useState(false);
   const hasRival = rivalCount !== undefined;
   const myHeight = `${(myCount / maxCount) * 100}%`;
   const rivalHeight = hasRival ? `${(rivalCount! / maxCount) * 100}%` : "0%";
   const animDelay = `${Math.min((index / totalCount) * 0.5, 0.5)}s`;
 
   return (
-    <Tooltip open={open} onOpenChange={setOpen}>
+    <Tooltip open={open} onOpenChange={onOpenChange}>
       <TooltipTrigger asChild>
         <div
           ref={maxRef}
@@ -79,11 +91,13 @@ const ChartBarUnit = ({
             "flex h-45 cursor-default flex-col items-stretch gap-0",
             dense ? "min-w-1 flex-1" : "min-w-0 max-w-15 flex-1",
           )}
-          onMouseEnter={() => setOpen(true)}
-          onMouseLeave={() => setOpen(false)}
+          // 操作ボタンがある場合、ホバー外れの判定は Radix（ツールチップ内へ移動可能）に任せる
+          onMouseEnter={() => onOpenChange(true)}
+          onMouseLeave={action ? undefined : () => onOpenChange(false)}
+          onClick={action ? () => onOpenChange(true) : undefined}
           onTouchStart={(e) => {
             e.preventDefault();
-            setOpen((o) => !o);
+            onOpenChange(!open);
           }}
         >
           <div className="relative h-37.5 w-full">
@@ -151,14 +165,14 @@ const ChartBarUnit = ({
           <div className="flex h-7.5 justify-center">
             {showLabel && (
               <span className="mt-2 whitespace-nowrap text-[10px] font-bold text-bpim-muted">
-                {label}
+                {axisLabel ?? label}
               </span>
             )}
           </div>
         </div>
       </TooltipTrigger>
       <TooltipContent side="top" className="flex flex-col gap-0.5">
-        <span className="font-bold">{tooltipHeader(label, step, unit)}</span>
+        <span className="font-bold">{displayLabel ?? tooltipHeader(label, step, unit)}</span>
         <span style={{ color: primaryColor }}>
           {myName}: {myCount}
         </span>
@@ -166,6 +180,15 @@ const ChartBarUnit = ({
           <span style={{ color: warningColor }}>
             {rivalName}: {rivalCount}
           </span>
+        )}
+        {action && (
+          <button
+            type="button"
+            onClick={action.onClick}
+            className="mt-1 rounded-md bg-bpim-primary px-2 py-1 text-xs font-bold text-white transition-colors hover:bg-bpim-primary/80"
+          >
+            {action.label}
+          </button>
         )}
       </TooltipContent>
     </Tooltip>

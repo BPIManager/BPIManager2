@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Checkbox as CheckboxPrimitive } from "radix-ui";
 import { cn } from "@/lib/utils";
-import { CheckIcon } from "lucide-react";
+import { CheckIcon, MinusIcon } from "lucide-react";
 
 function Checkbox({
   className,
@@ -22,6 +22,7 @@ function Checkbox({
         "after:absolute after:-inset-x-3 after:-inset-y-2",
         "aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20",
         "data-checked:border-primary data-checked:bg-primary data-checked:text-primary-foreground",
+        "data-[state=indeterminate]:border-primary data-[state=indeterminate]:bg-primary data-[state=indeterminate]:text-primary-foreground",
         className,
       )}
       {...props}
@@ -30,7 +31,7 @@ function Checkbox({
         data-slot="checkbox-indicator"
         className="grid place-content-center text-current transition-none [&>svg]:size-3.5"
       >
-        <CheckIcon />
+        {props.checked === "indeterminate" ? <MinusIcon /> : <CheckIcon />}
       </CheckboxPrimitive.Indicator>
     </CheckboxPrimitive.Root>
   );

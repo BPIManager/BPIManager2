@@ -1,15 +1,18 @@
 "use client";
 
-import { useState } from "react";
 import { getBpiColorStyle } from "@/constants/theme/bpiColor";
 import { BPM_CONST } from "@/constants/iidx/bpmBands";
 import type { BpmBandBpiItem } from "@/types/stats/distribution";
-import BpmBandSongsDialog from "./dialog";
 import { cn } from "@/lib/utils";
+import { clickableProps } from "@/utils/common/clickableProps";
 
 interface BpmBpiChartProps {
   myData: BpmBandBpiItem[];
   rivalData?: BpmBandBpiItem[];
+  /** 指定時のみ、帯の行をクリックで対象曲の一覧へ遷移できる（自分のダッシュボード用） */
+  onShowList?: (label: string) => void;
+  /** 行のホバー表示（title）に出す説明 */
+  showListLabel?: string;
 }
 
 const HorizontalBar = ({
@@ -43,13 +46,11 @@ const HorizontalBar = ({
   );
 };
 
-const BpmBpiChart = ({ myData, rivalData }: BpmBpiChartProps) => {
+const BpmBpiChart = ({ myData, rivalData, onShowList, showListLabel }: BpmBpiChartProps) => {
   const { BPI_MAX, BPI_MIN, BPM_BAND_ORDER } = BPM_CONST;
   const rivalMap = rivalData
     ? new Map(rivalData.map((d) => [d.label, d.totalBpi]))
     : null;
-
-  const [selectedLabel, setSelectedLabel] = useState<string | null>(null);
 
   const allBpiValues = [
     ...myData.map((d) => d.totalBpi),
@@ -61,11 +62,8 @@ const BpmBpiChart = ({ myData, rivalData }: BpmBpiChartProps) => {
   const ordered = BPM_BAND_ORDER.map((label) => ({
     label,
     myBpi: myData.find((d) => d.label === label)?.totalBpi ?? null,
-    songs: myData.find((d) => d.label === label)?.songs ?? [],
     rivalBpi: rivalMap?.get(label) ?? null,
   })).filter((row) => row.myBpi !== null || row.rivalBpi !== null);
-
-  const selectedRow = ordered.find((r) => r.label === selectedLabel);
 
   return (
     <>
@@ -82,11 +80,12 @@ const BpmBpiChart = ({ myData, rivalData }: BpmBpiChartProps) => {
           return (
             <div
               key={row.label}
+              {...(onShowList ? clickableProps(() => onShowList(row.label)) : {})}
+              title={onShowList ? showListLabel : undefined}
               className={cn(
-                "flex items-center gap-2 rounded-md px-1 py-0.5 cursor-pointer transition-colors duration-150",
-                "hover:bg-bpim-overlay",
+                "flex items-center gap-2 rounded-md px-1 py-0.5 transition-colors duration-150",
+                onShowList && "cursor-pointer hover:bg-bpim-overlay",
               )}
-              onClick={() => setSelectedLabel(row.label)}
             >
               <span className="w-16 shrink-0 text-right text-[11px] font-bold text-bpim-muted">
                 {row.label}
@@ -140,15 +139,6 @@ const BpmBpiChart = ({ myData, rivalData }: BpmBpiChartProps) => {
           <span className="text-[10px] text-bpim-muted">{scaleMax}</span>
         </div>
       </div>
-
-      {selectedRow && (
-        <BpmBandSongsDialog
-          bandLabel={selectedRow.label}
-          songs={selectedRow.songs}
-          isOpen={!!selectedLabel}
-          onClose={() => setSelectedLabel(null)}
-        />
-      )}
     </>
   );
 };

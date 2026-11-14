@@ -480,6 +480,24 @@ export const componentsTranslations = {
     "zh-TW": "此配置不在列表中",
     ko: "이 패턴은 목록에 없습니다",
   },
+  "analyticsTable.bestVersionFilter": {
+    ja: "自己歴代を出したバージョン: {version} のみ表示中",
+    en: "Showing only bests set in: {version}",
+    "zh-TW": "僅顯示個人最佳達成版本：{version}",
+    ko: "자기 최고 기록 달성 버전: {version}만 표시 중",
+  },
+  "filter.bestVersion": {
+    ja: "自己歴代を出したバージョン",
+    en: "Version of personal best",
+    "zh-TW": "個人最佳達成版本",
+    ko: "자기 최고 기록 달성 버전",
+  },
+  "filter.bestVersion.all": {
+    ja: "すべてのバージョン",
+    en: "All versions",
+    "zh-TW": "所有版本",
+    ko: "모든 버전",
+  },
   "analyticsTable.songList": {
     ja: "楽曲一覧",
     en: "Song list",

@@ -35,6 +35,7 @@ class LogScoreRepository {
    * @param version バージョン
    * @param options.batchIds 指定したバッチに含まれるスコアのみ取得する場合
    * @param options.targetTime 特定時点（スナップショット）のスコアを取得する場合
+   * @param options.untilLogId 指定した logId 以下のスコアだけを対象にしたスナップショットを取得する場合（`targetTime` と併用可）
    * @param options.comparisonTime 比較対象とする過去時点（この時刻より前の最新スコアを prev として取得）
    * @param options.onlyLastPlayedInRange 最終プレイ日時（lastPlayed）が指定範囲内のスコアを取得する場合
    * @param options.clearState クリア状況で絞り込む場合（`current.clearState`完全一致）
@@ -47,6 +48,7 @@ class LogScoreRepository {
     options: {
       batchIds?: string[];
       targetTime?: Date;
+      untilLogId?: number;
       comparisonTime?: Date;
       onlyLastPlayedInRange?: { start: Date; end: Date };
       clearState?: string;
@@ -59,6 +61,7 @@ class LogScoreRepository {
     const {
       batchIds,
       targetTime,
+      untilLogId,
       comparisonTime,
       onlyLastPlayedInRange,
       clearState,
@@ -108,6 +111,8 @@ class LogScoreRepository {
         "s.difficultyLevel",
         "s.difficulty",
         "s.releasedVersion",
+        "current.logId",
+        "current.batchId",
         "current.exScore",
         "current.bpi",
         "current.clearState",
@@ -156,14 +161,19 @@ class LogScoreRepository {
                 .where("lastPlayed", "<=", onlyLastPlayedInRange.end),
           }),
         );
-    } else if (targetTime) {
+    } else if (targetTime || untilLogId !== undefined) {
       query = query
         .innerJoin(
           latestLogIdPerSongSubquery({
             table: "scores",
             userId,
             version,
-            extra: (qb) => qb.where("createdAt", "<=", targetTime),
+            extra: (qb) => {
+              let q = qb;
+              if (targetTime) q = q.where("createdAt", "<=", targetTime);
+              if (untilLogId !== undefined) q = q.where("logId", "<=", untilLogId);
+              return q;
+            },
           }).as("latest_sc"),
           (join) => join.onRef("latest_sc.songId", "=", "s.songId"),
         )
@@ -196,6 +206,63 @@ class LogScoreRepository {
       .orderBy("s.difficultyLevel", "desc")
       .orderBy("s.title", "asc")
       .execute();
+  }
+
+  /**
+   * プレイ日時（lastPlayed）が基準時刻より前（または以前）のスコアのうち、曲ごとのベストEXスコアを取得する。
+   * 取り込み日と無関係に「その時点までにプレイされたスコア」の状態を作るのに使う（プレイ日基準の更新ログ用）。
+   * スコアは更新時にのみ記録されるため、基準時刻までの最大EXスコアがその時点のベスト。
+   *
+   * @param cutoff - 基準時刻
+   * @param inclusive - true なら基準時刻ちょうどを含める（`<=`）、false なら含めない（`<`）
+   */
+  async getBestScoresAsOfPlayed(
+    userId: string,
+    version: IIDXVersion,
+    cutoff: Date,
+    inclusive: boolean,
+  ) {
+    const op = inclusive ? "<=" : "<";
+    const best = db
+      .selectFrom("scores")
+      .select(["songId", (eb) => eb.fn.max("exScore").as("maxEx")])
+      .where("userId", "=", userId)
+      .where("version", "=", version)
+      .where("lastPlayed", op, cutoff)
+      .groupBy("songId")
+      .as("best");
+    const rows = await db
+      .selectFrom("scores as s")
+      .innerJoin(best, (join) =>
+        join.onRef("best.songId", "=", "s.songId").onRef("best.maxEx", "=", "s.exScore"),
+      )
+      .innerJoin("songs as m", "m.songId", "s.songId")
+      .select([
+        "s.songId",
+        "s.logId",
+        "s.exScore",
+        "s.bpi",
+        "m.title",
+        "m.notes",
+        "m.difficulty",
+        "m.difficultyLevel",
+      ])
+      .where("s.userId", "=", userId)
+      .where("s.version", "=", version)
+      .where("s.lastPlayed", op, cutoff)
+      .$if(version !== "INF", (qb) =>
+        qb.where((eb) =>
+          eb.or([eb("m.deletedAt", "is", null), eb("m.deletedAt", ">", version)]),
+        ),
+      )
+      .execute();
+    // 同点が複数行ある曲は最新(logId最大)の行を採る
+    const bySong = new Map<number, (typeof rows)[number]>();
+    for (const r of rows) {
+      const cur = bySong.get(r.songId);
+      if (!cur || r.logId > cur.logId) bySong.set(r.songId, r);
+    }
+    return [...bySong.values()];
   }
 }
 

@@ -4,6 +4,7 @@ import { DashBoardFilter } from "@/components/partials/common/DashBoard/Filter";
 import ActivitySection from "@/components/partials/common/DashBoard/ActivityCalendar";
 import { RankDistributionSection } from "@/components/partials/common/DashBoard/DJRankDistribution";
 import { BpiDistributionSection } from "@/components/partials/common/DashBoard/BPIDistribution";
+import VersionCountDistributionSection from "@/components/partials/common/DashBoard/VersionCountDistribution";
 import BpmBpiDistributionSection from "@/components/partials/common/DashBoard/BpmBpiDistribution";
 import SongsTable from "@/components/partials/common/Table";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
@@ -69,7 +70,8 @@ export default function UserPage({ defaultView = "overview" }: UserPageProps) {
               <RankDistributionSection myUserId={userId} />
               <BpiDistributionSection myUserId={userId} />
             </div>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-1">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <VersionCountDistributionSection myUserId={userId} />
               <BpmBpiDistributionSection myUserId={userId} />
             </div>
 

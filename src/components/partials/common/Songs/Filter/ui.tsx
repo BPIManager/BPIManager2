@@ -27,6 +27,14 @@ import { toggleArrayItem } from "@/hooks/common/useToggleArray";
 import { SELF_BEST_COMPARE } from "@/constants/logic/compareTarget";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { type TranslationKey } from "@/lib/i18n/translations";
+import { countAdvancedFilters } from "@/utils/songs/advancedFilterCount";
+
+/** プレイ状態: プレイ済のみ(true) → 未プレイのみ(false) → 両方(null、[-]表示) の順に切り替える */
+const nextPlayState = (v: boolean | null | undefined): boolean | null =>
+  v === true ? false : v === false ? null : true;
+
+const toCheckState = (v: boolean | null | undefined): boolean | "indeterminate" =>
+  v === true ? true : v === false ? false : "indeterminate";
 
 interface SongFilterBarProps {
   params: FilterParamsFrontend;
@@ -40,6 +48,10 @@ interface SongFilterBarProps {
   withSelfBestCompare?: boolean;
   /** 比較対象とのEX差(プラス/マイナス)で絞り込むセレクトを出す。更新ログ用 */
   withCompareResultFilter?: boolean;
+  /** 自己歴代を出したバージョンで絞り込むセレクトを出す（比較対象が自己歴代のときのみ意味を持つ）。比較ページ用 */
+  withBestVersionFilter?: boolean;
+  /** 詳細フィルターに「プレイ状態」がある一覧のとき true（バッジの件数に含める） */
+  withPlayStateFilter?: boolean;
   withScoreRate?: boolean;
   currentVersion?: string;
   /** LEVELチェックボックスの選択肢（既定: ☆11/12。全曲ページでは☆1〜12を渡す） */
@@ -62,6 +74,8 @@ const SongFilterBar = ({
   withSelfCompare = false,
   withSelfBestCompare = false,
   withCompareResultFilter = false,
+  withBestVersionFilter = false,
+  withPlayStateFilter = false,
   withScoreRate = false,
   currentVersion,
   levelItems = [11, 12],
@@ -91,6 +105,8 @@ const SongFilterBar = ({
       ...base,
     ];
   }, [currentVersion, currentStoreVersion, withSelfBestCompare, t]);
+
+  const advancedCount = countAdvancedFilters(params, { playState: withPlayStateFilter });
 
   const hasCompare = params.compareVersion && params.compareVersion !== "none";
 
@@ -198,6 +214,22 @@ const SongFilterBar = ({
             />
           </div>
         )}
+        {withBestVersionFilter && (
+          <div className="relative flex-1 h-9">
+            <FilterSelect
+              value={params.bestVersion || "all"}
+              onValueChange={(val) =>
+                onParamsChange({ bestVersion: val === "all" ? undefined : val })
+              }
+              options={[
+                { label: t("filter.bestVersion.all"), value: "all" },
+                ...versionsNonDisabledCollection,
+              ]}
+              placeholder={t("filter.bestVersion")}
+              className="h-9"
+            />
+          </div>
+        )}
         {withSelfCompare && withCompareResultFilter && hasCompare && (
           <div className="relative flex-1 h-9">
             <FilterSelect
@@ -220,11 +252,23 @@ const SongFilterBar = ({
         <Button
           variant="outline"
           size="icon"
-          className="h-9 w-9 shrink-0 border-bpim-border hover:bg-bpim-overlay"
+          className="relative h-9 w-9 shrink-0 border-bpim-border hover:bg-bpim-overlay"
           onClick={onOpenAdvancedFilter}
-          aria-label={t("filter.advancedFilter")}
+          aria-label={
+            advancedCount > 0
+              ? `${t("filter.advancedFilter")} (${advancedCount})`
+              : t("filter.advancedFilter")
+          }
         >
           <SlidersHorizontal size={18} />
+          {advancedCount > 0 && (
+            <span
+              aria-hidden="true"
+              className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-bpim-primary px-1 text-[10px] font-bold leading-none text-white"
+            >
+              {advancedCount}
+            </span>
+          )}
         </Button>
       </div>
 
@@ -260,9 +304,9 @@ const SongFilterBar = ({
             <div className="flex items-center gap-4">
               <label className="flex items-center gap-2 cursor-pointer group">
                 <Checkbox
-                  checked={params.isMyPlayed}
-                  onCheckedChange={(checked) =>
-                    onParamsChange({ isMyPlayed: !!checked })
+                  checked={toCheckState(params.isMyPlayed)}
+                  onCheckedChange={() =>
+                    onParamsChange({ isMyPlayed: nextPlayState(params.isMyPlayed) })
                   }
                 />
                 <span className="text-xs font-bold text-bpim-text group-hover:text-bpim-text transition-colors">
@@ -271,9 +315,11 @@ const SongFilterBar = ({
               </label>
               <label className="flex items-center gap-2 cursor-pointer group">
                 <Checkbox
-                  checked={params.isRivalPlayed}
-                  onCheckedChange={(checked) =>
-                    onParamsChange({ isRivalPlayed: !!checked })
+                  checked={toCheckState(params.isRivalPlayed)}
+                  onCheckedChange={() =>
+                    onParamsChange({
+                      isRivalPlayed: nextPlayState(params.isRivalPlayed),
+                    })
                   }
                 />
                 <span className="text-xs font-bold text-bpim-text group-hover:text-bpim-text transition-colors">

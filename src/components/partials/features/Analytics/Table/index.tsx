@@ -20,7 +20,8 @@ import RivalAnalysis from "@/components/partials/common/Rivals/Analysis";
 import { useUser } from "@/contexts/users/UserContext";
 import { buildComparisonCsv } from "@/utils/analytics/comparisonCsv";
 import { downloadTextFile } from "@/utils/common/downloadTextFile";
-import { List, BarChart2, Download } from "lucide-react";
+import { List, BarChart2, Download, X } from "lucide-react";
+import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
@@ -85,6 +86,8 @@ interface AnalyticsComparisonTableProps {
   version?: string;
   /** モーダル上でのEXスコア手動保存が成功した際に呼ばれる */
   onScoreSaved?: () => void;
+  /** 先頭の比較対象が自己歴代のとき true。「自己歴代を出したバージョン」で絞り込むセレクトを出す */
+  withBestVersionFilter?: boolean;
 }
 
 /** 選択曲の各比較対象（単一ターゲット時は rival）をモーダル用の比較対象に変換する */
@@ -107,8 +110,9 @@ const AnalyticsComparisonTable = ({
   labels,
   version,
   onScoreSaved,
+  withBestVersionFilter = false,
 }: AnalyticsComparisonTableProps) => {
-  const { t: translate } = useTranslation();
+  const { t: translate, tFormat } = useTranslation();
   const { fbUser } = useUser();
   const [selectedSong, setSelectedSong] = useState<SongWithScore | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -178,11 +182,30 @@ const AnalyticsComparisonTable = ({
       <SongFilterBar
         withRivals={"full"}
         rivalLabels={labels}
+        withBestVersionFilter={withBestVersionFilter}
         params={params}
         onParamsChange={updateParams}
         totalCount={totalCount}
         onOpenAdvancedFilter={() => setIsAdvancedOpen(true)}
       />
+
+      {withBestVersionFilter && params.bestVersion && (
+        <div className="flex items-center gap-2 border-b border-bpim-border px-3 py-2">
+          <span className="rounded-full border border-bpim-primary/40 bg-bpim-primary/10 px-3 py-1 text-xs font-bold text-bpim-primary">
+            {tFormat("analyticsTable.bestVersionFilter", {
+              version: getVersionNameFromNumber(params.bestVersion),
+            })}
+          </span>
+          <button
+            type="button"
+            onClick={() => updateParams({ bestVersion: undefined })}
+            aria-label={translate("common.cancel")}
+            className="flex h-5 w-5 items-center justify-center rounded-full text-bpim-muted transition-colors hover:bg-bpim-overlay hover:text-bpim-text"
+          >
+            <X className="h-3 w-3" />
+          </button>
+        </div>
+      )}
 
       {!isLoading && songs && songs.length === 0 && (
         <div className="p-4">

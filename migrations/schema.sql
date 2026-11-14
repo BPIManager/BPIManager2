@@ -206,6 +206,36 @@ CREATE TABLE IF NOT EXISTS `followListMembers` (
   CONSTRAINT `fk_followlistmembers_following` FOREIGN KEY (`followingId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- 比較(/analytics)で作った比較条件の保存。結果は保存せず、条件(AnalyticsTargetの配列, JSON文字列)のみを持つ。
+CREATE TABLE IF NOT EXISTS `savedComparisons` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `userId` varchar(128) NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `targets` text NOT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `idx_savedcomparisons_userId` (`userId`),
+  CONSTRAINT `fk_savedcomparisons_user` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ダッシュボードのランキングタブ(武器曲/伸びるかも/ライバル僅差/保存済み比較)の並び・表示設定。
+-- 組み込みタブは tabKey、保存済み比較は savedComparisonId(削除時にCASCADEで消える)で識別する。
+CREATE TABLE IF NOT EXISTS `dashboardRankingTabs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `userId` varchar(128) NOT NULL,
+  `tabKey` varchar(16) DEFAULT NULL,
+  `savedComparisonId` int(11) DEFAULT NULL,
+  `sortOrder` int(11) NOT NULL DEFAULT 0,
+  `visible` tinyint(1) NOT NULL DEFAULT 1,
+  `targetIndex` int(11) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_dashboardrankingtabs_user_key` (`userId`,`tabKey`),
+  UNIQUE KEY `idx_dashboardrankingtabs_saved` (`savedComparisonId`),
+  CONSTRAINT `fk_dashboardrankingtabs_user` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`) ON DELETE CASCADE,
+  CONSTRAINT `fk_dashboardrankingtabs_saved` FOREIGN KEY (`savedComparisonId`) REFERENCES `savedComparisons` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `follows` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `followerId` varchar(128) NOT NULL,
@@ -238,6 +268,13 @@ CREATE TABLE IF NOT EXISTS `logs` (
   `version` varchar(50) NOT NULL,
   `batchId` varchar(100) NOT NULL COMMENT '一括更新を識別するユニークなID',
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  -- バッチ時点のレーダー6カテゴリ値。総合BPIと同様に過去最高を下回らないようラチェット後の値を保存する（未算出は NULL）。
+  `radarNotes` decimal(5,2) DEFAULT NULL,
+  `radarChord` decimal(5,2) DEFAULT NULL,
+  `radarPeak` decimal(5,2) DEFAULT NULL,
+  `radarCharge` decimal(5,2) DEFAULT NULL,
+  `radarScratch` decimal(5,2) DEFAULT NULL,
+  `radarSoflan` decimal(5,2) DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `idx_batchId_unique` (`batchId`),
   KEY `idx_user_version` (`userId`,`version`) USING BTREE,
