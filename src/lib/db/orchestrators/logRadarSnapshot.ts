@@ -8,6 +8,8 @@ import {
   ratchetRadarValues,
   type RadarValues,
 } from "@/lib/radar/snapshot";
+import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
+import { RADAR_LEVEL } from "@/lib/radar/snapshot";
 import type { IIDXVersion } from "@/types/iidx/version";
 
 /**
@@ -28,7 +30,7 @@ export async function saveRadarSnapshot(
     const latestScores = await latestScoresRepo.getLatestScores(userId, version, trx);
     const [fullMaster, validPairs] = await Promise.all([
       songMasterRepo.getSongMasterWithDef(),
-      songMasterRepo.getFilteredTitleDifficultyPairs(version as IIDXVersion),
+      songMasterRepo.getFilteredTitleDifficultyPairs(version as IIDXVersion, [RADAR_LEVEL], [...IIDX_DIFFICULTIES]),
     ]);
     const validSongKeys = new Set(validPairs.map((r) => `${r.title}___${r.difficulty}`));
     fresh = computeRadarValues(latestScores, fullMaster, validSongKeys);
