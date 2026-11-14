@@ -24,7 +24,7 @@ const sameValues = (a: RadarValues | null, b: RadarValues) =>
 export async function backfillUserVersionRadar(
   userId: string,
   version: string,
-  options: { dryRun?: boolean } = {},
+  options: { dryRun?: boolean; recompute?: boolean } = {},
 ): Promise<number> {
   const [batches, maxLogIds, fullMaster, validPairs] = await Promise.all([
     logRadarRepo.listBatches(userId, version),
@@ -37,7 +37,8 @@ export async function backfillUserVersionRadar(
   let running: RadarValues | null = null;
   let written = 0;
   for (const batch of batches) {
-    let fresh = batch.values;
+    // recompute 時は保存済みの値を使わず、すべてスコアから算出し直す（算出定義を変えたときなど）
+    let fresh = options.recompute ? null : batch.values;
     if (!fresh) {
       const untilLogId = maxLogIds.get(batch.batchId);
       // スコアを持たないバッチは直前の値を引き継ぐ
@@ -63,11 +64,15 @@ export async function backfillUserVersionRadar(
  *
  * @param options.versions - 対象バージョン（省略時は全バージョン）
  * @param options.all - true なら算出済みのみのユーザー×バージョンも含めて単調性を再点検・補正する
+ * @param options.recompute - true なら保存済みの値も含めて全バッチを算出し直す（all を含む）
  */
 export async function backfillLogRadar(
-  options: { versions?: string[]; dryRun?: boolean; all?: boolean } = {},
+  options: { versions?: string[]; dryRun?: boolean; all?: boolean; recompute?: boolean } = {},
 ) {
-  const targets = await logRadarRepo.listUserVersionsForBackfill(options);
+  const targets = await logRadarRepo.listUserVersionsForBackfill({
+    versions: options.versions,
+    all: options.all || options.recompute,
+  });
   let total = 0;
   let done = 0;
   for (const { userId, version } of targets) {
