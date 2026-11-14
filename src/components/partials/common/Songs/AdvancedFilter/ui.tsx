@@ -26,6 +26,7 @@ const EMPTY_PARAMS: FilterParamsFrontend = {
   bpmMin: undefined,
   bpmMax: undefined,
   isSofran: undefined,
+  excludeSofran: undefined,
   since: undefined,
   until: undefined,
   versions: [],

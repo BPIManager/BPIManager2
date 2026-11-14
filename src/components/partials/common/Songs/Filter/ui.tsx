@@ -27,6 +27,7 @@ import { toggleArrayItem } from "@/hooks/common/useToggleArray";
 import { SELF_BEST_COMPARE } from "@/constants/logic/compareTarget";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { type TranslationKey } from "@/lib/i18n/translations";
+import { countAdvancedFilters } from "@/utils/songs/advancedFilterCount";
 
 /** プレイ状態: プレイ済のみ(true) → 未プレイのみ(false) → 両方(null、[-]表示) の順に切り替える */
 const nextPlayState = (v: boolean | null | undefined): boolean | null =>
@@ -101,6 +102,8 @@ const SongFilterBar = ({
       ...base,
     ];
   }, [currentVersion, currentStoreVersion, withSelfBestCompare, t]);
+
+  const advancedCount = countAdvancedFilters(params);
 
   const hasCompare = params.compareVersion && params.compareVersion !== "none";
 
@@ -246,11 +249,23 @@ const SongFilterBar = ({
         <Button
           variant="outline"
           size="icon"
-          className="h-9 w-9 shrink-0 border-bpim-border hover:bg-bpim-overlay"
+          className="relative h-9 w-9 shrink-0 border-bpim-border hover:bg-bpim-overlay"
           onClick={onOpenAdvancedFilter}
-          aria-label={t("filter.advancedFilter")}
+          aria-label={
+            advancedCount > 0
+              ? `${t("filter.advancedFilter")} (${advancedCount})`
+              : t("filter.advancedFilter")
+          }
         >
           <SlidersHorizontal size={18} />
+          {advancedCount > 0 && (
+            <span
+              aria-hidden="true"
+              className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-bpim-primary px-1 text-[10px] font-bold leading-none text-white"
+            >
+              {advancedCount}
+            </span>
+          )}
         </Button>
       </div>
 
