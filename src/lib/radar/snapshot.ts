@@ -1,5 +1,6 @@
 import { ALL_RADAR_CATEGORIES } from "@/constants/iidx/radars";
 import { BpiCalculator } from "@/lib/bpi";
+import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 import {
   buildRadarSongMaster,
   calculateRadar,
@@ -11,17 +12,23 @@ export type RadarValues = Record<RadarCategory, number>;
 
 const FLOOR = -15;
 
+/** レーダーの入力にする譜面のレベル（ダッシュボードのレーダー既定の絞り込みと同じ☆12） */
+const RADAR_LEVEL = 12;
+
 interface LatestScore {
   songId: number;
   exScore: number;
   bpi: number | string | null;
 }
 
-type SongMasterRows = Parameters<typeof buildRadarSongMaster>[0];
+type SongMasterRows = (Parameters<typeof buildRadarSongMaster>[0][number] & {
+  difficultyLevel?: number | null;
+})[];
 
 /**
  * ユーザーの最新スコアから、レーダー6カテゴリの総合BPI（ラチェット前）を算出する。
- * 曲マスタの songId でタイトル・難易度・ノーツ数を引くため、マスタに無い曲は無視される。
+ * ダッシュボードのレーダー既定（☆12・全難易度）と同じ定義で、潜在スキルの推定にも☆12のスコアだけを使う
+ * （ラチェット対象の値と表示値の定義を揃えるため）。曲マスタに無い曲は無視される。
  *
  * @param latestScores - 曲ごとの最新スコア
  * @param fullMaster - mu/sigma込みの曲マスタ
@@ -35,7 +42,11 @@ export function computeRadarValues(
   const masterById = new Map(fullMaster.map((m) => [m.songId, m]));
   const scores = latestScores.flatMap((s) => {
     const m = masterById.get(s.songId);
-    return m
+    const isRadarTarget =
+      !!m &&
+      m.difficultyLevel === RADAR_LEVEL &&
+      (IIDX_DIFFICULTIES as readonly string[]).includes(m.difficulty ?? "");
+    return m && isRadarTarget
       ? [{ title: m.title, difficulty: m.difficulty, exScore: s.exScore, notes: m.notes, bpi: s.bpi }]
       : [];
   });
