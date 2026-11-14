@@ -44,6 +44,10 @@ interface DistributionChartProps {
   rivalComparison?: RivalComparison;
   /** 内部ラベルを表示名へ変換する（ツールチップ・円グラフ用） */
   formatLabel?: (label: string) => string;
+  /** 棒の下に出す短い表示名。指定時は全ての棒にラベルを出す */
+  formatAxisLabel?: (label: string) => string;
+  /** 棒・円のツールチップに出す操作ボタン（ラベルごとに生成。undefined ならボタン無し） */
+  getAction?: (label: string) => { label: string; onClick: () => void } | undefined;
 }
 
 const DistributionChart = ({
@@ -57,6 +61,8 @@ const DistributionChart = ({
   displayMode,
   rivalComparison,
   formatLabel,
+  formatAxisLabel,
+  getAction,
 }: DistributionChartProps) => {
   const c = useChartColors();
   const { t } = useTranslation();
@@ -199,6 +205,7 @@ const DistributionChart = ({
               const dense = myData.length > 30;
               const labelInterval = dense ? 20 : 10;
               const showLabel =
+                !!formatAxisLabel ||
                 isNaN(numVal) ||
                 item.label === "100+" ||
                 numVal % labelInterval === 0;
@@ -208,6 +215,8 @@ const DistributionChart = ({
                   key={item.label}
                   label={item.label}
                   displayLabel={formatLabel?.(item.label)}
+                  axisLabel={formatAxisLabel?.(item.label)}
+                  action={getAction?.(item.label)}
                   myCount={item.count}
                   rivalCount={rivalMap?.get(item.label)}
                   maxCount={maxCount}
@@ -235,6 +244,7 @@ const DistributionChart = ({
             data={myData}
             getColor={getColor}
             formatLabel={formatLabel}
+            getAction={getAction}
             label={rivalData ? effectiveMyName : ""}
             labelColor={c.primary}
           />
@@ -243,6 +253,7 @@ const DistributionChart = ({
               data={rivalData}
               getColor={getColor}
               formatLabel={formatLabel}
+            getAction={getAction}
               label={effectiveRivalName}
               labelColor={c.warning}
             />

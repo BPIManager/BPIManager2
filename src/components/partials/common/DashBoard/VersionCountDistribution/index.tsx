@@ -1,3 +1,5 @@
+import { useRouter } from "next/router";
+import { encodeTarget } from "@/hooks/analytics/targetCodec";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { useVersionCountDistribution } from "@/hooks/stats/useVersionCountDistribution";
 import DistributionChart from "../DistributionChart/ui";
@@ -15,6 +17,8 @@ interface VersionCountDistributionSectionProps {
   rivalUserId?: string;
   myName?: string;
   rivalName?: string;
+  /** 自分のダッシュボードのみ true。ツールチップに「比較を表示」ボタンを出す */
+  showCompareAction?: boolean;
 }
 
 const UNKNOWN_LABEL = "other";
@@ -41,7 +45,9 @@ const VersionCountDistributionSection = ({
   rivalUserId,
   myName,
   rivalName,
+  showCompareAction = false,
 }: VersionCountDistributionSectionProps) => {
+  const router = useRouter();
   const { levels, diffs } = useStatsFilter();
   const { t } = useTranslation();
   const effectiveMyName = myName ?? t("dashboard.me");
@@ -62,6 +68,37 @@ const VersionCountDistributionSection = ({
     label === UNKNOWN_LABEL
       ? t("dashboard.versionCount.other")
       : (verNameArr[Number(label)] ?? getVersionNameFromNumber(label));
+
+  const formatAxisLabel = (label: string) =>
+    label === UNKNOWN_LABEL
+      ? t("dashboard.versionCount.other")
+      : Number.isNaN(Number(label))
+        ? label
+        : `IIDX${label}`;
+
+  // そのバージョンで自己歴代を出した譜面（今作で抜いたものは今作が歴代なので含まれない）の比較ページを開く
+  const getAction = (label: string) =>
+    showCompareAction && label !== UNKNOWN_LABEL
+      ? {
+          label: t("dashboard.versionCount.showCompare"),
+          onClick: () =>
+            router.push({
+              pathname: "/analytics",
+              query: {
+                target: encodeTarget({
+                  kind: "self-best",
+                  label: t("analytics.kind.selfBest"),
+                }),
+                bestVersion: label,
+                // 今作未プレイで過去作にだけ歴代がある曲も含めるため、自分側のプレイ状態は両方を対象にする
+                isMyPlayed: "any",
+                levels: levels.join(","),
+                difficulties: diffs.join(","),
+                page: "1",
+              },
+            }),
+        }
+      : undefined;
 
   const isLoading = myLoading || (!!effectiveRivalUserId && rivalLoading);
 
@@ -101,6 +138,8 @@ const VersionCountDistributionSection = ({
       myName={effectiveMyName}
       skeletonCount={8}
       formatLabel={formatLabel}
+      formatAxisLabel={formatAxisLabel}
+      getAction={showCompareAction ? getAction : undefined}
       rivalComparison={
         effectiveRivalUserId && rivalDist
           ? { rivalData: align(rivalDist), rivalName: effectiveRivalName }

@@ -9,6 +9,8 @@ export interface RivalScore {
   clearState: string | null;
   missCount: number | null;
   lastPlayed: Date | string | null;
+  /** 自己歴代ベスト比較のとき、そのベストを出したIIDXバージョン */
+  version?: string | null;
 }
 
 export interface SongWithScore
@@ -96,8 +98,9 @@ export interface FilterParamsFrontend {
   notesMin?: number;
   notesMax?: number;
 
-  isMyPlayed?: boolean;
-  isRivalPlayed?: boolean;
+  /** true: プレイ済のみ / false: 未プレイのみ / null: 両方 / undefined: 絞り込みなし */
+  isMyPlayed?: boolean | null;
+  isRivalPlayed?: boolean | null;
 
   search?: string;
   since?:
@@ -128,6 +131,8 @@ export interface FilterParamsFrontend {
   compareVersion?: string;
   /** 比較対象とのEX差で絞り込む(プラスのみ/マイナスのみ)。比較対象が有効なときのみ意味を持つ */
   compareResult?: "plus" | "minus";
+  /** 自己歴代ベスト比較で、ベストを出したバージョンが一致する譜面だけに絞り込む */
+  bestVersion?: string;
 
   scoreFilters?: ScoreFilterCondition[];
   missCountMin?: number;

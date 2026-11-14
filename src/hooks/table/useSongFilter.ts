@@ -12,6 +12,10 @@ import { sortSongs } from "@/utils/songs/sort";
 
 import { PAGE_SIZE } from "@/constants/logic/pagination";
 
+/** URL値 → プレイ状態。"any" は未プレイ・プレイ済の両方を含む（null） */
+const parsePlayState = (v: string): boolean | null =>
+  v === "any" ? null : v === "true";
+
 const toFilterKey = (q: ParsedUrlQuery) => {
   const { page: _page, ...rest } = q;
   return JSON.stringify(rest);
@@ -64,6 +68,7 @@ export const useSongFilter = (
         q.compareResult === "plus" || q.compareResult === "minus"
           ? q.compareResult
           : undefined,
+      bestVersion: q.bestVersion || undefined,
       levels: q.levels
         ? q.levels.split(",").map(Number)
         : defaults?.levels ?? [],
@@ -80,11 +85,11 @@ export const useSongFilter = (
       isMyPlayed:
         q.isMyPlayed === undefined
           ? defaults?.isMyPlayed
-          : q.isMyPlayed === "true",
+          : parsePlayState(q.isMyPlayed),
       isRivalPlayed:
         q.isRivalPlayed === undefined
           ? defaults?.isRivalPlayed
-          : q.isRivalPlayed === "true",
+          : parsePlayState(q.isRivalPlayed),
       scoreFilters: q.scoreFilters
         ? (JSON.parse(q.scoreFilters) as ScoreFilterCondition[])
         : undefined,
@@ -130,6 +135,7 @@ export const useSongFilter = (
       (params.levels?.length ?? 0) > 0 ||
       (params.difficulties?.length ?? 0) > 0 ||
       (params.versions?.length ?? 0) > 0 ||
+      params.bestVersion !== undefined ||
       params.bpmMin !== undefined ||
       params.bpmMax !== undefined ||
       params.isSofran ||
@@ -146,13 +152,13 @@ export const useSongFilter = (
       return [];
     }
     let filtered = filterSongsFrontend(data, params);
-    if (params.isMyPlayed !== undefined) {
+    if (typeof params.isMyPlayed === "boolean") {
       filtered = filtered.filter((s) =>
         params.isMyPlayed ? s.exScore !== null : s.exScore === null,
       );
     }
 
-    if (params.isRivalPlayed !== undefined) {
+    if (typeof params.isRivalPlayed === "boolean") {
       filtered = filtered.filter((s) => {
         // 複数ターゲット時は全ターゲットがプレー済みの譜面だけを「プレー済み」とみなす
         const targets = (s as SongWithRival).targets;
@@ -194,6 +200,11 @@ export const useSongFilter = (
       } else if (Array.isArray(value)) {
         if (value.length > 0) nextQuery[key] = value.join(",");
         else delete nextQuery[key];
+      } else if (
+        value === null &&
+        (key === "isMyPlayed" || key === "isRivalPlayed")
+      ) {
+        nextQuery[key] = "any";
       } else if (value === "" || value === undefined || value === null) {
         delete nextQuery[key];
       } else {

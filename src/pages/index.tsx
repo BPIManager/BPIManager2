@@ -53,7 +53,7 @@ function WidgetRenderer({
     case "bpiDistribution":
       return <BpiDistributionSection myUserId={userId} />;
     case "versionCountDistribution":
-      return <VersionCountDistributionSection myUserId={userId} />;
+      return <VersionCountDistributionSection myUserId={userId} showCompareAction />;
     case "bpmBpiDistribution":
       return <BpmBpiDistributionSection myUserId={userId} />;
     case "bpiHistory":

@@ -1,5 +1,6 @@
 import {
   FilterParamsFrontend,
+  SongWithRival,
   SongWithScore,
 } from "@/types/songs/score";
 import { RANK_TABLE } from "@/constants/iidx/rankBorders";
@@ -90,6 +91,11 @@ export const filterSongsFrontend = (
         !params.versions.includes(song.releasedVersion)
       )
         return false;
+    }
+
+    if (params.bestVersion) {
+      const rivalVersion = (song as SongWithRival).rival?.version;
+      if (rivalVersion !== params.bestVersion) return false;
     }
 
     if (params.isSofran && !isSoflanBpm(song.bpm ?? null)) return false;

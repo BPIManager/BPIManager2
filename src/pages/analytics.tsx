@@ -212,6 +212,10 @@ export default function AnalyticsPage() {
                   labels={labels}
                   version={version}
                   onScoreSaved={refresh}
+                  withBestVersionFilter={
+                    targets[0]?.kind === "self-best" ||
+                    targets[0]?.kind === "self-best-excl"
+                  }
                 />
               </div>
             </div>

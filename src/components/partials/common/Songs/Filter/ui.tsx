@@ -28,6 +28,13 @@ import { SELF_BEST_COMPARE } from "@/constants/logic/compareTarget";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { type TranslationKey } from "@/lib/i18n/translations";
 
+/** プレイ状態: プレイ済のみ(true) → 未プレイのみ(false) → 両方(null、[-]表示) の順に切り替える */
+const nextPlayState = (v: boolean | null | undefined): boolean | null =>
+  v === true ? false : v === false ? null : true;
+
+const toCheckState = (v: boolean | null | undefined): boolean | "indeterminate" =>
+  v === true ? true : v === false ? false : "indeterminate";
+
 interface SongFilterBarProps {
   params: FilterParamsFrontend;
   onParamsChange: (params: Partial<FilterParamsFrontend>) => void;
@@ -40,6 +47,8 @@ interface SongFilterBarProps {
   withSelfBestCompare?: boolean;
   /** 比較対象とのEX差(プラス/マイナス)で絞り込むセレクトを出す。更新ログ用 */
   withCompareResultFilter?: boolean;
+  /** 自己歴代を出したバージョンで絞り込むセレクトを出す（比較対象が自己歴代のときのみ意味を持つ）。比較ページ用 */
+  withBestVersionFilter?: boolean;
   withScoreRate?: boolean;
   currentVersion?: string;
   /** LEVELチェックボックスの選択肢（既定: ☆11/12。全曲ページでは☆1〜12を渡す） */
@@ -62,6 +71,7 @@ const SongFilterBar = ({
   withSelfCompare = false,
   withSelfBestCompare = false,
   withCompareResultFilter = false,
+  withBestVersionFilter = false,
   withScoreRate = false,
   currentVersion,
   levelItems = [11, 12],
@@ -198,6 +208,22 @@ const SongFilterBar = ({
             />
           </div>
         )}
+        {withBestVersionFilter && (
+          <div className="relative flex-1 h-9">
+            <FilterSelect
+              value={params.bestVersion || "all"}
+              onValueChange={(val) =>
+                onParamsChange({ bestVersion: val === "all" ? undefined : val })
+              }
+              options={[
+                { label: t("filter.bestVersion.all"), value: "all" },
+                ...versionsNonDisabledCollection,
+              ]}
+              placeholder={t("filter.bestVersion")}
+              className="h-9"
+            />
+          </div>
+        )}
         {withSelfCompare && withCompareResultFilter && hasCompare && (
           <div className="relative flex-1 h-9">
             <FilterSelect
@@ -260,9 +286,9 @@ const SongFilterBar = ({
             <div className="flex items-center gap-4">
               <label className="flex items-center gap-2 cursor-pointer group">
                 <Checkbox
-                  checked={params.isMyPlayed}
-                  onCheckedChange={(checked) =>
-                    onParamsChange({ isMyPlayed: !!checked })
+                  checked={toCheckState(params.isMyPlayed)}
+                  onCheckedChange={() =>
+                    onParamsChange({ isMyPlayed: nextPlayState(params.isMyPlayed) })
                   }
                 />
                 <span className="text-xs font-bold text-bpim-text group-hover:text-bpim-text transition-colors">
@@ -271,9 +297,11 @@ const SongFilterBar = ({
               </label>
               <label className="flex items-center gap-2 cursor-pointer group">
                 <Checkbox
-                  checked={params.isRivalPlayed}
-                  onCheckedChange={(checked) =>
-                    onParamsChange({ isRivalPlayed: !!checked })
+                  checked={toCheckState(params.isRivalPlayed)}
+                  onCheckedChange={() =>
+                    onParamsChange({
+                      isRivalPlayed: nextPlayState(params.isRivalPlayed),
+                    })
                   }
                 />
                 <span className="text-xs font-bold text-bpim-text group-hover:text-bpim-text transition-colors">

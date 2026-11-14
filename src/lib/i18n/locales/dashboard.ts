@@ -538,10 +538,16 @@ export const dashboardTranslations = {
   },
 
   "dashboard.versionCount.title": {
-    ja: "ベスト達成バージョン別",
-    en: "By best-score version",
-    "zh-TW": "各版本最佳成績數",
-    ko: "베스트 달성 버전별",
+    ja: "バージョン別自己歴代数",
+    en: "Personal bests by version",
+    "zh-TW": "各版本個人最佳數",
+    ko: "버전별 자기 최고 기록 수",
+  },
+  "dashboard.versionCount.showCompare": {
+    ja: "比較を表示",
+    en: "Show comparison",
+    "zh-TW": "顯示比較",
+    ko: "비교 보기",
   },
   "dashboard.versionCount.other": {
     ja: "その他",

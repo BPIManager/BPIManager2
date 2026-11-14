@@ -930,10 +930,10 @@ export const settingsTranslations = {
     ko: "BPI 분포",
   },
   "widget.versionCountDistribution": {
-    ja: "ベスト達成バージョン別件数",
-    en: "Songs by best-score version",
-    "zh-TW": "各版本最佳成績數",
-    ko: "베스트 달성 버전별 곡 수",
+    ja: "バージョン別自己歴代数",
+    en: "Personal bests by version",
+    "zh-TW": "各版本個人最佳數",
+    ko: "버전별 자기 최고 기록 수",
   },
   "widget.bpmBpiDistribution": {
     ja: "BPM別BPI分布",
