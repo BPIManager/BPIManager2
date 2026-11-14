@@ -537,6 +537,18 @@ export const dashboardTranslations = {
     ko: "해상도 낮추기",
   },
 
+  "dashboard.versionCount.title": {
+    ja: "ベスト達成バージョン別",
+    en: "By best-score version",
+    "zh-TW": "各版本最佳成績數",
+    ko: "베스트 달성 버전별",
+  },
+  "dashboard.versionCount.other": {
+    ja: "その他",
+    en: "Other",
+    "zh-TW": "其他",
+    ko: "기타",
+  },
   "dashboard.bpmBpi.title": {
     ja: "BPM帯別",
     en: "By BPM",

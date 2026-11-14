@@ -33,17 +33,23 @@ const DistributionPie = ({
   getColor,
   label,
   labelColor,
+  formatLabel,
 }: {
   data: ChartData[];
   getColor: (label: string) => string;
   label: string;
   labelColor: string;
+  formatLabel?: (label: string) => string;
 }) => {
   const total = data.reduce((sum, d) => sum + d.count, 0);
   const filtered = [...data]
     .reverse()
     .filter((d) => d.count > 0)
-    .map((d) => ({ ...d, fill: getColor(d.label) }));
+    .map((d) => ({
+      ...d,
+      fill: getColor(d.label),
+      label: formatLabel ? formatLabel(d.label) : d.label,
+    }));
   return (
     <div className="flex flex-1 flex-col items-center gap-1">
       <ResponsiveContainer width="100%" height={150}>

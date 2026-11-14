@@ -7,6 +7,7 @@ import ActivitySection from "@/components/partials/common/DashBoard/ActivityCale
 import CurrentBpiSection from "@/components/partials/common/DashBoard/CurrentBpi";
 import { RankDistributionSection } from "@/components/partials/common/DashBoard/DJRankDistribution";
 import { BpiDistributionSection } from "@/components/partials/common/DashBoard/BPIDistribution";
+import VersionCountDistributionSection from "@/components/partials/common/DashBoard/VersionCountDistribution";
 import BpmBpiDistributionSection from "@/components/partials/common/DashBoard/BpmBpiDistribution";
 import { FilterProvider } from "@/contexts/stats/FilterContext";
 import { PageContainer, PageHeader } from "@/components/partials/common/PageChrome/Header";
@@ -51,6 +52,8 @@ function WidgetRenderer({
       return <RankDistributionSection myUserId={userId} />;
     case "bpiDistribution":
       return <BpiDistributionSection myUserId={userId} />;
+    case "versionCountDistribution":
+      return <VersionCountDistributionSection myUserId={userId} />;
     case "bpmBpiDistribution":
       return <BpmBpiDistributionSection myUserId={userId} />;
     case "bpiHistory":

@@ -29,6 +29,7 @@ function tooltipHeader(
 
 const ChartBarUnit = ({
   label,
+  displayLabel,
   myCount,
   rivalCount,
   maxCount,
@@ -47,6 +48,8 @@ const ChartBarUnit = ({
   maxRef,
 }: {
   label: string;
+  /** ツールチップ見出し用の表示名（未指定ならlabelから生成） */
+  displayLabel?: string;
   myCount: number;
   rivalCount?: number;
   maxCount: number;
@@ -158,7 +161,7 @@ const ChartBarUnit = ({
         </div>
       </TooltipTrigger>
       <TooltipContent side="top" className="flex flex-col gap-0.5">
-        <span className="font-bold">{tooltipHeader(label, step, unit)}</span>
+        <span className="font-bold">{displayLabel ?? tooltipHeader(label, step, unit)}</span>
         <span style={{ color: primaryColor }}>
           {myName}: {myCount}
         </span>

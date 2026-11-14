@@ -5,6 +5,7 @@ export const ALL_WIDGET_IDS = [
   "activity",
   "rankDistribution",
   "bpiDistribution",
+  "versionCountDistribution",
   "bpmBpiDistribution",
   "bpiHistory",
   "bpiBoxStats",
@@ -46,9 +47,14 @@ export const WIDGET_META: Record<
     defaultWidth: "half",
     defaultSection: "main",
   },
+  versionCountDistribution: {
+    label: "widget.versionCountDistribution",
+    defaultWidth: "half",
+    defaultSection: "main",
+  },
   bpmBpiDistribution: {
     label: "widget.bpmBpiDistribution",
-    defaultWidth: "full",
+    defaultWidth: "half",
     defaultSection: "main",
   },
   bpiHistory: {

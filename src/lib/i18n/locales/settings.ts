@@ -929,6 +929,12 @@ export const settingsTranslations = {
     "zh-TW": "BPI分布",
     ko: "BPI 분포",
   },
+  "widget.versionCountDistribution": {
+    ja: "ベスト達成バージョン別件数",
+    en: "Songs by best-score version",
+    "zh-TW": "各版本最佳成績數",
+    ko: "베스트 달성 버전별 곡 수",
+  },
   "widget.bpmBpiDistribution": {
     ja: "BPM別BPI分布",
     en: "BPI by BPM",

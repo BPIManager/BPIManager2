@@ -42,6 +42,8 @@ interface DistributionChartProps {
   stepControl?: StepControl;
   displayMode?: DisplayModeControl;
   rivalComparison?: RivalComparison;
+  /** 内部ラベルを表示名へ変換する（ツールチップ・円グラフ用） */
+  formatLabel?: (label: string) => string;
 }
 
 const DistributionChart = ({
@@ -54,6 +56,7 @@ const DistributionChart = ({
   stepControl,
   displayMode,
   rivalComparison,
+  formatLabel,
 }: DistributionChartProps) => {
   const c = useChartColors();
   const { t } = useTranslation();
@@ -204,6 +207,7 @@ const DistributionChart = ({
                 <ChartBarUnit
                   key={item.label}
                   label={item.label}
+                  displayLabel={formatLabel?.(item.label)}
                   myCount={item.count}
                   rivalCount={rivalMap?.get(item.label)}
                   maxCount={maxCount}
@@ -230,6 +234,7 @@ const DistributionChart = ({
           <DistributionPie
             data={myData}
             getColor={getColor}
+            formatLabel={formatLabel}
             label={rivalData ? effectiveMyName : ""}
             labelColor={c.primary}
           />
@@ -237,6 +242,7 @@ const DistributionChart = ({
             <DistributionPie
               data={rivalData}
               getColor={getColor}
+              formatLabel={formatLabel}
               label={effectiveRivalName}
               labelColor={c.warning}
             />

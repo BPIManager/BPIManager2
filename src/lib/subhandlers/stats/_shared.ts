@@ -41,6 +41,49 @@ export function getBpmBand(bpm: string | null | undefined): string {
   return "Soflan";
 }
 
+/** ベストスコアのバージョンが不明な譜面をまとめるラベル */
+export const UNKNOWN_BEST_VERSION_LABEL = "other";
+
+const bestVersionRank = (label: string) => {
+  if (label === UNKNOWN_BEST_VERSION_LABEL) return -2;
+  const n = Number(label);
+  return Number.isNaN(n) ? -1 : n;
+};
+
+/**
+ * 自己歴代ベストを出したバージョン（新しい順、INFINITASは数値バージョンの後ろ）ごとに譜面件数を集計する。
+ * ベストEXスコアが 0 以下の譜面は除外する。
+ */
+export function aggregateBestVersionCounts(
+  rows: {
+    bestExScore: number | null;
+    bestVersion: string | null;
+    difficultyLevel: number | null;
+    difficulty: string | null;
+  }[],
+  filter: { levels: (number | string)[]; difficulties: string[] },
+): { label: string; count: number }[] {
+  const counts = new Map<string, number>();
+  for (const r of rows) {
+    if (!r.bestExScore || r.bestExScore <= 0) continue;
+    if (
+      filter.levels.length > 0 &&
+      !filter.levels.includes(r.difficultyLevel as number)
+    )
+      continue;
+    if (
+      filter.difficulties.length > 0 &&
+      !filter.difficulties.includes(r.difficulty as string)
+    )
+      continue;
+    const key = r.bestVersion || UNKNOWN_BEST_VERSION_LABEL;
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+  return [...counts.entries()]
+    .map(([label, count]) => ({ label, count }))
+    .sort((a, b) => bestVersionRank(b.label) - bestVersionRank(a.label));
+}
+
 export const DIFFICULTY_LABELS: Record<string, string> = {
   HYPER: "[H]",
   ANOTHER: "[A]",

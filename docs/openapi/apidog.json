@@ -3715,6 +3715,149 @@
         ]
       }
     },
+    "/users/{userId}/stats/versionCountDistribution": {
+      "get": {
+        "summary": "ベスト達成バージョン別譜面件数取得",
+        "deprecated": false,
+        "description": "自己歴代ベスト（同点は新しいバージョン）を出したバージョンごとの件数。version パラメータは使わず全バージョンが対象。level/difficulty でフィルタ可能",
+        "tags": [
+          "Stats"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ターゲットユーザーの Firebase UID",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string",
+              "example": "abc123uid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "description": "IIDX バージョン番号 (26〜34, INF)。未指定・不正値は最新バージョンにフォールバック",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/IIDXVersion"
+            }
+          },
+          {
+            "name": "level",
+            "in": "query",
+            "description": "難易度レベルでフィルタ（複数可）",
+            "required": false,
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "difficulty",
+            "in": "query",
+            "description": "難易度でフィルタ（複数可）",
+            "required": false,
+            "schema": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/Difficulty"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Difficulty"
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ベスト達成バージョン別件数（label はバージョン番号。新しい順、INFINITASは数値バージョンの後ろ、不明は \"other\"）",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "label": {
+                        "type": "string"
+                      },
+                      "count": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "403": {
+            "description": "アクセス権限なし",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "フィルタパラメータが不足",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
     "/users/{userId}/stats/radar": {
       "get": {
         "summary": "レーダーチャート用スタッツ取得",
