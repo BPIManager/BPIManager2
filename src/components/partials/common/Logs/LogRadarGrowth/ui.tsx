@@ -50,14 +50,17 @@ const LogRadarGrowthCard = ({
   return (
     <DashCard>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-        <h3 className="text-sm font-bold uppercase text-bpim-muted">
-          {t("logs.detail.radarGrowth")}
-        </h3>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-1.5">
+          <h3 className="text-sm font-bold uppercase text-bpim-muted">
+            {t("logs.detail.radarGrowth")}
+          </h3>
+          <HelpTooltip>{t("logs.detail.radarGrowth.mode.help")}</HelpTooltip>
+        </div>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
           <label className="flex cursor-pointer items-center gap-2">
             <span
               className={cn(
-                "text-xs font-bold",
+                "whitespace-nowrap text-xs font-bold",
                 !isRelative ? "text-bpim-text" : "text-bpim-subtle",
               )}
             >
@@ -66,16 +69,13 @@ const LogRadarGrowthCard = ({
             <Switch checked={isRelative} onCheckedChange={setIsRelative} />
             <span
               className={cn(
-                "text-xs font-bold",
+                "whitespace-nowrap text-xs font-bold",
                 isRelative ? "text-bpim-text" : "text-bpim-subtle",
               )}
             >
               {t("logs.detail.radarGrowth.mode.relative")}
             </span>
           </label>
-          <HelpTooltip align="right">
-            {t("logs.detail.radarGrowth.mode.help")}
-          </HelpTooltip>
           <div className="flex items-center gap-1.5">
             <div className="h-2.5 w-2.5 rounded-full bg-bpim-warning" />
             <span className="text-xs font-bold text-bpim-warning">
