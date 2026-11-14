@@ -85,6 +85,47 @@ class LatestScoresRepository {
   }
 
   /**
+   * 指定した logId 以下に限った、曲ごとの最新スコアを取得する（過去バッチ時点のスナップショット）。
+   *
+   * @param untilLogId - この logId 以下のスコアだけを対象にする
+   */
+  async getLatestScoresUntilLogId(
+    userId: string,
+    version: string,
+    untilLogId: number,
+  ) {
+    return await db
+      .selectFrom("scores")
+      .innerJoin(
+        latestLogIdPerSongSubquery({
+          table: "scores",
+          userId,
+          version,
+          extra: (qb) => qb.where("logId", "<=", untilLogId),
+        }).as("latest"),
+        (join) => join.onRef("latest.maxLogId", "=", "scores.logId"),
+      )
+      .select(["scores.songId", "scores.exScore", "scores.bpi"])
+      .execute();
+  }
+
+  /** バッチごとの最大 logId（そのバッチ完了時点のスナップショットの上限）を取得する */
+  async getMaxLogIdByBatch(
+    userId: string,
+    version: string,
+  ): Promise<Map<string, number>> {
+    const rows = await db
+      .selectFrom("scores")
+      .select(["batchId", (eb) => eb.fn.max("logId").as("maxLogId")])
+      .where("userId", "=", userId)
+      .where("version", "=", version)
+      .where("batchId", "is not", null)
+      .groupBy("batchId")
+      .execute();
+    return new Map(rows.map((r) => [r.batchId as string, Number(r.maxLogId)]));
+  }
+
+  /**
    * 複数ユーザー×複数楽曲の最新スコアをまとめて取得する
    * (BPI V2検証ツール(NewBpiComparison)の「全プレイヤー」一覧のページ単位バッチ取得用)。
    *

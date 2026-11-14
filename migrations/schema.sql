@@ -268,6 +268,13 @@ CREATE TABLE IF NOT EXISTS `logs` (
   `version` varchar(50) NOT NULL,
   `batchId` varchar(100) NOT NULL COMMENT '一括更新を識別するユニークなID',
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  -- バッチ時点のレーダー6カテゴリ値。総合BPIと同様に過去最高を下回らないようラチェット後の値を保存する（未算出は NULL）。
+  `radarNotes` decimal(5,2) DEFAULT NULL,
+  `radarChord` decimal(5,2) DEFAULT NULL,
+  `radarPeak` decimal(5,2) DEFAULT NULL,
+  `radarCharge` decimal(5,2) DEFAULT NULL,
+  `radarScratch` decimal(5,2) DEFAULT NULL,
+  `radarSoflan` decimal(5,2) DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `idx_batchId_unique` (`batchId`),
   KEY `idx_user_version` (`userId`,`version`) USING BTREE,

@@ -195,6 +195,13 @@ export interface Logs {
   batchId: string;
   createdAt: Generated<Date>;
   id: Generated<number>;
+  /** バッチ時点のレーダー値（ラチェット後）。未算出は null */
+  radarCharge: Generated<Decimal | null>;
+  radarChord: Generated<Decimal | null>;
+  radarNotes: Generated<Decimal | null>;
+  radarPeak: Generated<Decimal | null>;
+  radarScratch: Generated<Decimal | null>;
+  radarSoflan: Generated<Decimal | null>;
   totalBpi: number;
   userId: string;
   version: string;
