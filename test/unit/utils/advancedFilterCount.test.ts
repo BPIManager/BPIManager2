@@ -45,12 +45,12 @@ describe("countAdvancedFilters", () => {
 });
 
 describe("countAdvancedFilters プレイ状態", () => {
-  it("プレイ状態の項目がある一覧では、既定（プレイ済みのみ）以外を1件として数える", () => {
+  it("プレイ状態の項目がある一覧では、既定（すべて）以外を1件として数える", () => {
     const opts = { playState: true };
     expect(countAdvancedFilters({}, opts)).toBe(0);
-    expect(countAdvancedFilters({ isMyPlayed: true }, opts)).toBe(0);
+    expect(countAdvancedFilters({ isMyPlayed: null }, opts)).toBe(0);
+    expect(countAdvancedFilters({ isMyPlayed: true }, opts)).toBe(1);
     expect(countAdvancedFilters({ isMyPlayed: false }, opts)).toBe(1);
-    expect(countAdvancedFilters({ isMyPlayed: null }, opts)).toBe(1);
   });
 
   it("プレイ状態の項目が無い一覧（比較ページ等）では数えない", () => {

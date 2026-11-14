@@ -4,23 +4,25 @@ import { FilterParamsFrontend } from "@/types/songs/score";
 import { cn } from "@/lib/utils";
 import SectionTitle from "./SectionTitle";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import { SCORE_LIST_DEFAULT_PLAY_STATE } from "@/utils/songs/playState";
 import type { TranslationKey } from "@/lib/i18n/translations";
 
 interface Props {
-  /** true=プレイ済みのみ / false=未プレイのみ / null=すべて / undefined=既定（プレイ済みのみ） */
+  /** true=プレイ済みのみ / false=未プレイのみ / null=すべて / undefined=既定 */
   isMyPlayed: boolean | null | undefined;
   onChange: (val: Partial<FilterParamsFrontend>) => void;
 }
 
 const OPTIONS: { value: boolean | null; label: TranslationKey }[] = [
+  { value: null, label: "filter.playState.all" },
   { value: true, label: "filter.playState.played" },
   { value: false, label: "filter.playState.unplayed" },
-  { value: null, label: "filter.playState.all" },
 ];
 
 const PlayStateSection = ({ isMyPlayed, onChange }: Props) => {
   const { t } = useTranslation();
-  const current = isMyPlayed === undefined ? true : isMyPlayed;
+  const current =
+    isMyPlayed === undefined ? SCORE_LIST_DEFAULT_PLAY_STATE : isMyPlayed;
   return (
     <section className="flex flex-col gap-3">
       <SectionTitle>{t("filter.playState")}</SectionTitle>

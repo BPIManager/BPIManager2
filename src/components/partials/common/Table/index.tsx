@@ -11,6 +11,10 @@ import CustomPagination from "@/components/partials/common/ListControls/Paginati
 import SongDetailView from "@/components/partials/modal/SongDetail";
 import { useUserScores } from "@/hooks/table/useUserScores";
 import { useUnplayedScores } from "@/hooks/table/useUnplayedScores";
+import {
+  SCORE_LIST_DEFAULT_PLAY_STATE,
+  needsUnplayedSongs,
+} from "@/utils/songs/playState";
 import { useCompareScores } from "@/hooks/table/useCompareScores";
 import { NoDataAlert } from "@/components/partials/common/DashBoard/NoData";
 import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
@@ -44,10 +48,9 @@ const SongsTable = ({
     refresh,
   } = useUserScores(userId, version);
 
-  // プレイ状態が「未プレイ」「すべて」のときだけ、未プレイ曲（EX・BPIなし）も取得して一覧に加える
+  // プレイ状態が「未プレイ」「すべて」（既定）のときだけ、未プレイ曲（EX・BPIなし）も取得して一覧に加える
   const { query, isReady } = useRouter();
-  const includeUnplayed =
-    isReady && (query.isMyPlayed === "false" || query.isMyPlayed === "any");
+  const includeUnplayed = isReady && needsUnplayedSongs(query.isMyPlayed);
   const {
     songs: unplayedSongs,
     error: unplayedError,
@@ -72,7 +75,7 @@ const SongsTable = ({
     pageSize,
     totalCount,
     visibleSongs: rawVisible,
-  } = useSongFilter(songs, { isMyPlayed: true });
+  } = useSongFilter(songs, { isMyPlayed: SCORE_LIST_DEFAULT_PLAY_STATE });
 
   const { compareData, compareError, isCompareLoading } = useCompareScores(
     userId,

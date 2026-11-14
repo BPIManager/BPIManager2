@@ -1,4 +1,5 @@
 import type { FilterParamsFrontend } from "@/types/songs/score";
+import { SCORE_LIST_DEFAULT_PLAY_STATE } from "@/utils/songs/playState";
 
 /**
  * 詳細フィルターで適用中の条件の数を数える（フィルターバーのボタンのバッジ用）。
@@ -18,8 +19,10 @@ export function countAdvancedFilters(
     (params.versions?.length ?? 0) > 0,
     (params.radarCategories?.length ?? 0) > 0,
     params.missCountMin !== undefined || params.missCountMax !== undefined,
-    // プレイ状態の既定はプレイ済みのみ（未指定=true）。それ以外を選んでいるときに数える
-    !!options.playState && params.isMyPlayed !== undefined && params.isMyPlayed !== true,
+    // プレイ状態は既定（すべて）以外を選んでいるときに数える
+    !!options.playState &&
+      params.isMyPlayed !== undefined &&
+      params.isMyPlayed !== SCORE_LIST_DEFAULT_PLAY_STATE,
   ];
   const scoreConditions =
     params.scoreFilters?.filter((f) => f.value !== "").length ?? 0;

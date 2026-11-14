@@ -71,17 +71,18 @@ export function bpiListQuery(label: string, step: number): ListFilterQuery {
  * @param label - 分布のラベル（`BPM_BANDS` の帯名または `"Soflan"`）
  */
 export function bpmBandListQuery(label: string): ListFilterQuery {
-  if (label === SOFLAN_BAND_LABEL) return { isSofran: "true" };
+  if (label === SOFLAN_BAND_LABEL) return { isSofran: "true", isMyPlayed: "true" };
   const band = BPM_BANDS.find((b) => b.label === label);
   if (!band) return {};
   return {
     ...(band.min > 0 ? { bpmMin: String(band.min) } : {}),
     ...(Number.isFinite(band.max) ? { bpmMax: String(band.max - 1) } : {}),
     excludeSofran: "true",
+    isMyPlayed: "true",
   };
 }
 
 /** レーダーのカテゴリに分類された譜面だけを出すクエリを作る */
 export function radarCategoryListQuery(category: string): ListFilterQuery {
-  return { radarCategories: category };
+  return { radarCategories: category, isMyPlayed: "true" };
 }

@@ -8,8 +8,6 @@ import {
   HelpCircle,
   FileClock,
   Mail,
-  CircleCheck,
-  CircleDashed,
   Trophy,
   Music,
   Table,
@@ -129,18 +127,5 @@ export const getInfoMenuItems = (t: T) => [
     label: t("nav.statistics"),
     icon: BarChart2 as LucideIcon,
     href: "/info/stats",
-  },
-];
-
-export const getScoreSubItems = (t: T) => [
-  {
-    label: t("nav.scorePlayed"),
-    icon: CircleCheck,
-    href: `/my/${latestVersion}?levels=12%2C11&difficulties=LEGGENDARIA%2CHYPER%2CANOTHER`,
-  },
-  {
-    label: t("nav.scoreUnplayed"),
-    icon: CircleDashed,
-    href: `/my/${latestVersion}?levels=12%2C11&difficulties=LEGGENDARIA%2CHYPER%2CANOTHER&isMyPlayed=false`,
   },
 ];
