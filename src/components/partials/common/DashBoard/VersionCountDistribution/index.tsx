@@ -70,11 +70,7 @@ const VersionCountDistributionSection = ({
       : (verNameArr[Number(label)] ?? getVersionNameFromNumber(label));
 
   const formatAxisLabel = (label: string) =>
-    label === UNKNOWN_LABEL
-      ? t("dashboard.versionCount.other")
-      : Number.isNaN(Number(label))
-        ? label
-        : `IIDX${label}`;
+    label === UNKNOWN_LABEL ? t("dashboard.versionCount.other") : label;
 
   // そのバージョンで自己歴代を出した譜面（今作で抜いたものは今作が歴代なので含まれない）の比較ページを開く
   const getAction = (label: string) =>
