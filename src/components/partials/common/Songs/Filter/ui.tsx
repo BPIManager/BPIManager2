@@ -50,6 +50,8 @@ interface SongFilterBarProps {
   withCompareResultFilter?: boolean;
   /** 自己歴代を出したバージョンで絞り込むセレクトを出す（比較対象が自己歴代のときのみ意味を持つ）。比較ページ用 */
   withBestVersionFilter?: boolean;
+  /** 詳細フィルターに「プレイ状態」がある一覧のとき true（バッジの件数に含める） */
+  withPlayStateFilter?: boolean;
   withScoreRate?: boolean;
   currentVersion?: string;
   /** LEVELチェックボックスの選択肢（既定: ☆11/12。全曲ページでは☆1〜12を渡す） */
@@ -73,6 +75,7 @@ const SongFilterBar = ({
   withSelfBestCompare = false,
   withCompareResultFilter = false,
   withBestVersionFilter = false,
+  withPlayStateFilter = false,
   withScoreRate = false,
   currentVersion,
   levelItems = [11, 12],
@@ -103,7 +106,7 @@ const SongFilterBar = ({
     ];
   }, [currentVersion, currentStoreVersion, withSelfBestCompare, t]);
 
-  const advancedCount = countAdvancedFilters(params);
+  const advancedCount = countAdvancedFilters(params, { playState: withPlayStateFilter });
 
   const hasCompare = params.compareVersion && params.compareVersion !== "none";
 

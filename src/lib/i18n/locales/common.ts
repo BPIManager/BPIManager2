@@ -259,6 +259,24 @@ export const commonTranslations = {
     "zh-TW": "遊玩狀態",
     ko: "플레이 상태",
   },
+  "filter.playState.played": {
+    ja: "プレイ済み",
+    en: "Played",
+    "zh-TW": "已遊玩",
+    ko: "플레이함",
+  },
+  "filter.playState.unplayed": {
+    ja: "未プレイ",
+    en: "Unplayed",
+    "zh-TW": "未遊玩",
+    ko: "미플레이",
+  },
+  "filter.playState.all": {
+    ja: "すべて",
+    en: "All",
+    "zh-TW": "全部",
+    ko: "전체",
+  },
   "filter.myPlayed": {
     ja: "自分プレイ済",
     en: "Played by me",

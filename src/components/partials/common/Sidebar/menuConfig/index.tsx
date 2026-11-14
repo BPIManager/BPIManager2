@@ -141,6 +141,6 @@ export const getScoreSubItems = (t: T) => [
   {
     label: t("nav.scoreUnplayed"),
     icon: CircleDashed,
-    href: `/my/unplayed/${latestVersion}?levels=12%2C11&difficulties=LEGGENDARIA%2CHYPER%2CANOTHER`,
+    href: `/my/${latestVersion}?levels=12%2C11&difficulties=LEGGENDARIA%2CHYPER%2CANOTHER&isMyPlayed=false`,
   },
 ];
