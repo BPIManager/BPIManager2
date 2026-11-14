@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useChartColors } from "@/hooks/common/useChartColors";
+import { useSingleOpen } from "@/hooks/common/useSingleOpen";
 import type { ChartData } from "@/types/ui/chart";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { BarChart2, PieChartIcon, Percent, Medal } from "lucide-react";
@@ -69,6 +70,7 @@ const DistributionChart = ({
   const effectiveMyName = myName ?? t("dashboard.me");
   const effectiveRivalName = rivalComparison?.rivalName ?? t("dashboard.rival");
   const rivalData = rivalComparison?.rivalData;
+  const { close: closeBars, getProps: getBarOpenProps } = useSingleOpen();
   const [chartType, setChartType] = useState<"bar" | "pie">("bar");
   const containerRef = useRef<HTMLDivElement>(null);
   const maxBarRef = useRef<HTMLDivElement>(null);
@@ -193,6 +195,7 @@ const DistributionChart = ({
         <TooltipProvider>
           <div
             ref={containerRef}
+            onMouseLeave={closeBars}
             className={cn(
               "overflow-x-auto px-1",
               myData.length > 30
@@ -217,6 +220,7 @@ const DistributionChart = ({
                   displayLabel={formatLabel?.(item.label)}
                   axisLabel={formatAxisLabel?.(item.label)}
                   action={getAction?.(item.label)}
+                  {...getBarOpenProps(item.label)}
                   myCount={item.count}
                   rivalCount={rivalMap?.get(item.label)}
                   maxCount={maxCount}

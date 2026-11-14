@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import dayjs from "@/lib/dayjs";
 import NextLink from "next/link";
 import {
@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useSingleOpen } from "@/hooks/common/useSingleOpen";
 import { DashCard } from "@/components/ui/dashcard";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
@@ -46,18 +47,20 @@ interface ActivityCellProps {
   day: { date: string; count: number; isFuture: boolean };
   userId: string;
   version: string;
+  /** 開閉状態は親が1つにまとめて持つ（素早い移動で複数が開いたままになるのを防ぐ） */
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 /**
  * 1日分のセル。ツールチップ内のボタンを押せるよう、Radix Tooltip の「内容へポインタを移せる」
  * 挙動に任せ、ホバー外れでの手動クローズはしない（分布カードのツールチップと同じ方式）。
  */
-const ActivityCell = ({ day, userId, version }: ActivityCellProps) => {
+const ActivityCell = ({ day, userId, version, open, onOpenChange }: ActivityCellProps) => {
   const { t } = useTranslation();
-  const [open, setOpen] = useState(false);
 
   return (
-    <Tooltip open={open} onOpenChange={setOpen}>
+    <Tooltip open={open} onOpenChange={onOpenChange}>
       <TooltipTrigger asChild>
         <div
           className={cn(
@@ -69,15 +72,15 @@ const ActivityCell = ({ day, userId, version }: ActivityCellProps) => {
             backgroundColor: getActivityColor(day.count, day.isFuture),
           }}
           onMouseEnter={() => {
-            if (!day.isFuture) setOpen(true);
+            if (!day.isFuture) onOpenChange(true);
           }}
           onClick={() => {
-            if (!day.isFuture) setOpen(true);
+            if (!day.isFuture) onOpenChange(true);
           }}
           onTouchStart={(e) => {
             if (day.isFuture) return;
             e.preventDefault();
-            setOpen((o) => !o);
+            onOpenChange(!open);
           }}
         />
       </TooltipTrigger>
@@ -103,6 +106,7 @@ const ActivityCell = ({ day, userId, version }: ActivityCellProps) => {
 const ActivityCalendar = ({ data, userId, version }: Props) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const { t } = useTranslation();
+  const { close: closeCells, getProps: getCellOpenProps } = useSingleOpen();
 
   const lastMonthStr = dayjs().tz().subtract(1, "month").format("YYYY-MM");
 
@@ -172,6 +176,7 @@ const ActivityCalendar = ({ data, userId, version }: Props) => {
 
           <div
             className="flex-1"
+            onMouseLeave={closeCells}
             style={{
               display: "grid",
               gridTemplateRows: "repeat(7, 1fr)",
@@ -187,6 +192,7 @@ const ActivityCalendar = ({ data, userId, version }: Props) => {
                   day={day}
                   userId={userId}
                   version={version}
+                  {...getCellOpenProps(day.date)}
                 />
               ))}
             </TooltipProvider>

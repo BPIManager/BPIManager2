@@ -4,7 +4,7 @@ import FetchErrorState from "@/components/partials/common/ErrorStates/FetchError
 import RadarSkeleton from "./skeleton";
 import RadarSectionChart from "./index";
 import { RadarCategory } from "@/types/stats/radar";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { getBpiColorStyle } from "@/constants/theme/bpiColor";
 import { DashCard } from "@/components/ui/dashcard";
 import { cn } from "@/lib/utils";
@@ -12,12 +12,7 @@ import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { useRouter } from "next/router";
 import { radarCategoryListQuery } from "@/utils/dashboard/scoreListLink";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { clickableProps } from "@/utils/common/clickableProps";
 
 interface RadarSectionProps {
   userId?: string;
@@ -51,9 +46,19 @@ const RadarSection = ({
     isLoading: rivalLoading,
     isError: rivalError,
   } = useRadar(effectiveRivalUserId, levels, diffs, effectiveRivalVersion);
-  const [openCat, setOpenCat] = useState<RadarCategory | null>(null);
 
   const isRivalMode = !!effectiveRivalUserId;
+
+  const goToList = (category: RadarCategory) =>
+    router.push({
+      pathname: `/my/${version}`,
+      query: {
+        ...radarCategoryListQuery(category),
+        levels: levels.join(","),
+        difficulties: diffs.join(","),
+        page: "1",
+      },
+    });
 
   const sortedData = useMemo(() => {
     if (!radar) return [];
@@ -105,7 +110,6 @@ const RadarSection = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
         <RadarSectionChart data={radar} rivalData={rivalDataFlat} />
 
-        <TooltipProvider>
         <div className="flex flex-col gap-2">
           {sortedData.map((key) => {
             const bpi = radar[key].totalBpi;
@@ -113,70 +117,39 @@ const RadarSection = ({
             const style = getBpiColorStyle(bpi);
 
             return (
-              <Tooltip
+              <div
                 key={key}
-                open={showListAction && openCat === key}
-                onOpenChange={(open) => setOpenCat(open ? key : null)}
-              >
-                <TooltipTrigger asChild>
-                  <div
-                    className={cn(
-                      "flex items-center justify-between p-2.5 rounded-md",
-                      "bg-bpim-surface-2/60 border border-bpim-border transition-all duration-200",
-                      showListAction &&
-                        "cursor-pointer hover:bg-bpim-overlay hover:translate-x-1 hover:border-bpim-border",
-                    )}
-                    onMouseEnter={() => showListAction && setOpenCat(key)}
-                    onClick={() => showListAction && setOpenCat(key)}
-                  >
-                  <span className="text-xs font-bold text-bpim-text">{key}</span>
-
-                  <div className="flex items-center gap-2">
-                    {isRivalMode && rivalBpi !== undefined && (
-                      <div className="inline-flex min-w-16 items-center justify-center rounded-sm border border-orange-500/50 bg-orange-500/10 px-2 py-0.5 font-mono text-sm font-bold text-bpim-warning">
-                        {rivalBpi.toFixed(2)}
-                      </div>
-                    )}
-                    <div
-                      className="inline-flex min-w-16 items-center justify-center rounded-sm border px-2 py-0.5 font-mono text-sm font-bold text-bpim-text"
-                      style={{
-                        borderColor: style.bg,
-                        backgroundColor: `${style.bg}15`,
-                      }}
-                    >
-                      {bpi.toFixed(2)}
-                    </div>
-                  </div>
-                  </div>
-                </TooltipTrigger>
-                {showListAction && (
-                  <TooltipContent side="left" className="flex flex-col gap-0.5">
-                    <span className="font-bold">{key}</span>
-                    <span className="text-bpim-primary">{bpi.toFixed(2)}</span>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        router.push({
-                          pathname: `/my/${version}`,
-                          query: {
-                            ...radarCategoryListQuery(key),
-                            levels: levels.join(","),
-                            difficulties: diffs.join(","),
-                            page: "1",
-                          },
-                        })
-                      }
-                      className="mt-1 rounded-md bg-bpim-primary px-2 py-1 text-xs font-bold text-white transition-colors hover:bg-bpim-primary/80"
-                    >
-                      {t("dashboard.distribution.showList")}
-                    </button>
-                  </TooltipContent>
+                {...(showListAction ? clickableProps(() => goToList(key)) : {})}
+                title={showListAction ? t("dashboard.distribution.showList") : undefined}
+                className={cn(
+                  "flex items-center justify-between p-2.5 rounded-md",
+                  "bg-bpim-surface-2/60 border border-bpim-border transition-all duration-200",
+                  showListAction &&
+                    "cursor-pointer hover:bg-bpim-overlay hover:translate-x-1 hover:border-bpim-border",
                 )}
-              </Tooltip>
+              >
+                <span className="text-xs font-bold text-bpim-text">{key}</span>
+
+                <div className="flex items-center gap-2">
+                  {isRivalMode && rivalBpi !== undefined && (
+                    <div className="inline-flex min-w-16 items-center justify-center rounded-sm border border-orange-500/50 bg-orange-500/10 px-2 py-0.5 font-mono text-sm font-bold text-bpim-warning">
+                      {rivalBpi.toFixed(2)}
+                    </div>
+                  )}
+                  <div
+                    className="inline-flex min-w-16 items-center justify-center rounded-sm border px-2 py-0.5 font-mono text-sm font-bold text-bpim-text"
+                    style={{
+                      borderColor: style.bg,
+                      backgroundColor: `${style.bg}15`,
+                    }}
+                  >
+                    {bpi.toFixed(2)}
+                  </div>
+                </div>
+              </div>
             );
           })}
         </div>
-        </TooltipProvider>
       </div>
     </DashCard>
   );
