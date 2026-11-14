@@ -744,6 +744,42 @@ export const dashboardTranslations = {
     "zh-TW": "人",
     ko: "명",
   },
+  "dashboard.ranking.savedTarget": {
+    ja: "比較対象:",
+    en: "Target:",
+    "zh-TW": "比較對象：",
+    ko: "비교 대상:",
+  },
+  "dashboard.ranking.settings.title": {
+    ja: "ランキングタブの設定",
+    en: "Ranking tab settings",
+    "zh-TW": "排行榜分頁設定",
+    ko: "랭킹 탭 설정",
+  },
+  "dashboard.ranking.settings.open": {
+    ja: "タブの設定",
+    en: "Tab settings",
+    "zh-TW": "分頁設定",
+    ko: "탭 설정",
+  },
+  "dashboard.ranking.settings.visible": {
+    ja: "表示",
+    en: "Visible",
+    "zh-TW": "顯示",
+    ko: "표시",
+  },
+  "dashboard.ranking.settings.target": {
+    ja: "表示する比較対象",
+    en: "Target to show",
+    "zh-TW": "顯示的比較對象",
+    ko: "표시할 비교 대상",
+  },
+  "dashboard.ranking.noTabs": {
+    ja: "表示するタブがありません。右上の歯車から表示するタブを選べます。",
+    en: "No tabs to show. Choose tabs from the gear icon.",
+    "zh-TW": "沒有可顯示的分頁，請從齒輪圖示選擇。",
+    ko: "표시할 탭이 없습니다. 톱니바퀴에서 선택하세요.",
+  },
   "dashboard.ranking.noSongs": {
     ja: "対象の楽曲が見つかりませんでした",
     en: "No songs found.",
