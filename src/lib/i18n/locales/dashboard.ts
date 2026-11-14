@@ -750,6 +750,12 @@ export const dashboardTranslations = {
     "zh-TW": "比較對象：",
     ko: "비교 대상:",
   },
+  "dashboard.ranking.openCompare": {
+    ja: "比較ページ",
+    en: "Compare",
+    "zh-TW": "比較頁面",
+    ko: "비교 페이지",
+  },
   "dashboard.ranking.settings.title": {
     ja: "ランキングタブの設定",
     en: "Ranking tab settings",

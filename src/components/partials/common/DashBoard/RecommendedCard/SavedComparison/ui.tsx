@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import Link, { type LinkProps } from "next/link";
+import { ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DIFF_COLORS as diffColors } from "@/constants/theme/difficultyColors";
@@ -81,12 +83,14 @@ const SavedComparisonRow = ({
 
 export const SavedComparisonList = ({
   label,
+  href,
   rows,
   isLoading,
   isError,
   onSelect,
 }: {
   label: string;
+  href: LinkProps["href"];
   rows: Row[];
   isLoading: boolean;
   isError: boolean;
@@ -94,10 +98,19 @@ export const SavedComparisonList = ({
 }) => {
   const { t } = useTranslation();
   return (
-    <div className="flex flex-col">
-      <div className="border-b border-bpim-border bg-bpim-surface-1 px-3 py-1.5 text-[10px] font-bold text-bpim-subtle">
-        {t("dashboard.ranking.savedTarget")}
-        <span className="ml-1 text-bpim-text">{label}</span>
+    <div className="flex max-h-125 flex-col overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+      <div className="sticky top-0 z-20 border-b border-bpim-border bg-bpim-surface-1/60 backdrop-blur-sm px-3 py-1.5 text-[10px] font-bold text-bpim-subtle flex items-center justify-between gap-2">
+        <span className="min-w-0 truncate">
+          {t("dashboard.ranking.savedTarget")}
+          <span className="ml-1 text-bpim-text">{label}</span>
+        </span>
+        <Link
+          href={href}
+          className="flex shrink-0 items-center gap-0.5 text-bpim-primary hover:underline"
+        >
+          {t("dashboard.ranking.openCompare")}
+          <ChevronRight className="h-3.5 w-3.5" />
+        </Link>
       </div>
       {isLoading ? (
         <div className="flex flex-col gap-2 p-3">

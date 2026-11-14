@@ -3,6 +3,7 @@ import { Lock } from "lucide-react";
 import { useAnalyticsComparison } from "@/hooks/analytics/useAnalyticsComparison";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import { encodeTarget } from "@/hooks/analytics/targetCodec";
 import { pickBehindSongs } from "@/lib/dashboard/rankingTabs";
 import type { SavedTarget } from "@/types/analytics/saved";
 import type { SongWithScore } from "@/types/songs/score";
@@ -44,6 +45,15 @@ const SavedComparisonPanel = ({ target, onSelect }: SavedComparisonPanelProps) =
   return (
     <SavedComparisonList
       label={target.label}
+      href={{
+        pathname: "/analytics",
+        query: {
+          target: encodeTarget(target),
+          levels: "11,12",
+          difficulties: "ANOTHER,LEGGENDARIA,HYPER",
+          page: "1",
+        },
+      }}
       rows={rows}
       isLoading={isLoading}
       isError={!!error}
