@@ -90,12 +90,18 @@ class LogRadarRepository {
       .execute();
   }
 
-  /** レーダー値が未算出のバッチを持つユーザー×バージョンの一覧（バックフィル対象） */
-  async listUserVersionsWithPending(versions?: string[]) {
+  /**
+   * バックフィル対象のユーザー×バージョンの一覧。
+   *
+   * @param options.versions - 対象バージョン（省略時は全バージョン）
+   * @param options.all - true なら算出済みのみのものも含める（単調性の再点検用）。既定は未算出のバッチを持つものだけ
+   */
+  async listUserVersionsForBackfill(options: { versions?: string[]; all?: boolean } = {}) {
+    const { versions, all = false } = options;
     return await db
       .selectFrom("logs")
       .select(["userId", "version"])
-      .where("radarNotes", "is", null)
+      .$if(!all, (qb) => qb.where("radarNotes", "is", null))
       .$if(!!versions && versions.length > 0, (qb) => qb.where("version", "in", versions!))
       .distinct()
       .orderBy("userId")

@@ -59,14 +59,15 @@ export async function backfillUserVersionRadar(
 }
 
 /**
- * レーダー値が未算出のバッチがあるユーザー×バージョンすべてをバックフィルする。
+ * レーダー値が未算出のバッチがあるユーザー×バージョンをバックフィルする。
  *
  * @param options.versions - 対象バージョン（省略時は全バージョン）
+ * @param options.all - true なら算出済みのみのユーザー×バージョンも含めて単調性を再点検・補正する
  */
 export async function backfillLogRadar(
-  options: { versions?: string[]; dryRun?: boolean } = {},
+  options: { versions?: string[]; dryRun?: boolean; all?: boolean } = {},
 ) {
-  const targets = await logRadarRepo.listUserVersionsWithPending(options.versions);
+  const targets = await logRadarRepo.listUserVersionsForBackfill(options);
   let total = 0;
   let done = 0;
   for (const { userId, version } of targets) {
