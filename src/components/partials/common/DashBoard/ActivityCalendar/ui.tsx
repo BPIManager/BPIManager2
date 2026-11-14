@@ -50,13 +50,15 @@ interface ActivityCellProps {
   /** 開閉状態は親が1つにまとめて持つ（素早い移動で複数が開いたままになるのを防ぐ） */
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** タッチ操作でのタップ。開閉をトグルする */
+  onTap: () => void;
 }
 
 /**
  * 1日分のセル。ツールチップ内のボタンを押せるよう、Radix Tooltip の「内容へポインタを移せる」
  * 挙動に任せ、ホバー外れでの手動クローズはしない（分布カードのツールチップと同じ方式）。
  */
-const ActivityCell = ({ day, userId, version, open, onOpenChange }: ActivityCellProps) => {
+const ActivityCell = ({ day, userId, version, open, onOpenChange, onTap }: ActivityCellProps) => {
   const { t } = useTranslation();
 
   return (
@@ -74,13 +76,11 @@ const ActivityCell = ({ day, userId, version, open, onOpenChange }: ActivityCell
           onMouseEnter={() => {
             if (!day.isFuture) onOpenChange(true);
           }}
+          data-tooltip-trigger=""
           onClick={() => {
-            if (!day.isFuture) onOpenChange(true);
-          }}
-          onTouchStart={(e) => {
             if (day.isFuture) return;
-            e.preventDefault();
-            onOpenChange(!open);
+            onTap();
+            onOpenChange(true);
           }}
         />
       </TooltipTrigger>
