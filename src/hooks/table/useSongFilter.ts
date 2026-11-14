@@ -78,6 +78,7 @@ export const useSongFilter = (
       bpmMin: q.bpmMin ? Number(q.bpmMin) : undefined,
       bpmMax: q.bpmMax ? Number(q.bpmMax) : undefined,
       isSofran: q.isSofran === "true",
+      excludeSofran: q.excludeSofran === "true",
       since: q.since,
       until: q.until,
       versions: q.versions ? q.versions.split(",").map(Number) : [],
@@ -139,6 +140,7 @@ export const useSongFilter = (
       params.bpmMin !== undefined ||
       params.bpmMax !== undefined ||
       params.isSofran ||
+      params.excludeSofran ||
       params.since !== undefined ||
       params.until !== undefined ||
       params.isMyPlayed !== undefined ||

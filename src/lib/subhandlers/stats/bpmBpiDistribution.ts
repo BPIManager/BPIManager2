@@ -1,7 +1,8 @@
 import { BpiCalculator } from "@/lib/bpi";
 import { statsChartsRepo } from "@/lib/db/aggregates/stats/charts";
 import { ok } from "@/middlewares/api/apiResult";
-import { BPM_BANDS, getBpmBand } from "./_shared";
+import { BPM_BANDS } from "@/constants/iidx/bpmBands";
+import { getBpmBand } from "./_shared";
 import type { StatsQuery } from "@/types/stats/query";
 import type { HandlerResult } from "@/types/api";
 import type { IBpiBasicSongData, IBpiScoreObservation } from "@/types/songs/bpi";

@@ -950,30 +950,6 @@ export const dashboardTranslations = {
     ko: "궁금할 때는 문서 확인",
   },
 
-  "dashboard.songList.highBpi": {
-    ja: "BPIが高い順",
-    en: "Highest BPI",
-    "zh-TW": "BPI高至低",
-    ko: "BPI 높은 순",
-  },
-  "dashboard.songList.lowBpi": {
-    ja: "BPIが低い順",
-    en: "Lowest BPI",
-    "zh-TW": "BPI低至高",
-    ko: "BPI 낮은 순",
-  },
-  "dashboard.songList.playedOnly": {
-    ja: "既プレイのみ",
-    en: "Played only",
-    "zh-TW": "僅已遊玩",
-    ko: "플레이한 곡만",
-  },
-  "dashboard.songList.songList": {
-    ja: "楽曲リスト",
-    en: "Song List",
-    "zh-TW": "樂曲列表",
-    ko: "곡 목록",
-  },
 
   "dashboard.layoutSettings.reorder": {
     ja: "ドラッグで並び替え・移動",

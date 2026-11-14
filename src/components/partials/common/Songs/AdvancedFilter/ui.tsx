@@ -73,6 +73,8 @@ const AdvancedFilterModalBody = ({
           bpmMin={localParams.bpmMin}
           bpmMax={localParams.bpmMax}
           isSofran={localParams.isSofran}
+          excludeSofran={localParams.excludeSofran}
+          withExcludeSofran
           onChange={updateLocal}
         />
         <Separator className="bg-bpim-surface-2/60" />

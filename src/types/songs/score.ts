@@ -96,6 +96,8 @@ export interface FilterParamsFrontend {
   bpmMin?: number;
   bpmMax?: number;
   isSofran?: boolean;
+  /** ソフラン曲（BPMが範囲表記）を除く */
+  excludeSofran?: boolean;
   notesMin?: number;
   notesMax?: number;
 

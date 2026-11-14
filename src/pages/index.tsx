@@ -55,7 +55,7 @@ function WidgetRenderer({
     case "versionCountDistribution":
       return <VersionCountDistributionSection myUserId={userId} showCompareAction />;
     case "bpmBpiDistribution":
-      return <BpmBpiDistributionSection myUserId={userId} />;
+      return <BpmBpiDistributionSection myUserId={userId} showListAction />;
     case "bpiHistory":
       return <BpiHistorySection myUserId={userId} />;
     case "bpiBoxStats":
@@ -63,7 +63,7 @@ function WidgetRenderer({
     case "rivalWinLoss":
       return <RivalWinLossSummary userId={userId} />;
     case "radar":
-      return <RadarSection userId={userId} />;
+      return <RadarSection userId={userId} showListAction />;
     case "iidxTower":
       return <IidxTowerSection userId={userId} />;
     case "rankingTabs":

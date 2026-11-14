@@ -102,6 +102,7 @@ export const filterSongsFrontend = (
     }
 
     if (params.isSofran && !isSoflanBpm(song.bpm ?? null)) return false;
+    if (params.excludeSofran && isSoflanBpm(song.bpm ?? null)) return false;
 
     if (!matchesBpmRange(song.bpm, params.bpmMin, params.bpmMax)) return false;
 

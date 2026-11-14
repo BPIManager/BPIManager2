@@ -1,3 +1,4 @@
+import { BPM_BANDS, SOFLAN_BAND_LABEL } from "@/constants/iidx/bpmBands";
 import type { ScoreFilterCondition } from "@/types/songs/score";
 
 /** 分布の上端を含めない区間 [from, to) を、以下判定のフィルタで表すための微小値 */
@@ -61,4 +62,26 @@ export function bpiListQuery(label: string, step: number): ListFilterQuery {
       below(to),
     ]),
   };
+}
+
+/**
+ * BPM帯別の1区間に該当する譜面だけを出すクエリを作る。
+ * 数値の帯はソフラン曲を除き、上限は「未満」を整数BPMの「以下」で表す。ソフランの帯はソフラン曲のみ。
+ *
+ * @param label - 分布のラベル（`BPM_BANDS` の帯名または `"Soflan"`）
+ */
+export function bpmBandListQuery(label: string): ListFilterQuery {
+  if (label === SOFLAN_BAND_LABEL) return { isSofran: "true" };
+  const band = BPM_BANDS.find((b) => b.label === label);
+  if (!band) return {};
+  return {
+    ...(band.min > 0 ? { bpmMin: String(band.min) } : {}),
+    ...(Number.isFinite(band.max) ? { bpmMax: String(band.max - 1) } : {}),
+    excludeSofran: "true",
+  };
+}
+
+/** レーダーのカテゴリに分類された譜面だけを出すクエリを作る */
+export function radarCategoryListQuery(category: string): ListFilterQuery {
+  return { radarCategories: category };
 }

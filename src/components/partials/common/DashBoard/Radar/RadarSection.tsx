@@ -5,25 +5,35 @@ import RadarSkeleton from "./skeleton";
 import RadarSectionChart from "./index";
 import { RadarCategory } from "@/types/stats/radar";
 import { useMemo, useState } from "react";
-import RadarCategorySongsDialog from "./dialog";
 import { getBpiColorStyle } from "@/constants/theme/bpiColor";
 import { DashCard } from "@/components/ui/dashcard";
 import { cn } from "@/lib/utils";
 import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 import { useTranslation } from "@/hooks/common/useTranslation";
-import { clickableProps } from "@/utils/common/clickableProps";
+import { useRouter } from "next/router";
+import { radarCategoryListQuery } from "@/utils/dashboard/scoreListLink";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface RadarSectionProps {
   userId?: string;
   rivalUserId?: string;
   rivalName?: string;
+  /** 自分のダッシュボードのみ true。カテゴリのツールチップに「対象曲一覧を表示」を出す */
+  showListAction?: boolean;
 }
 
 const RadarSection = ({
   userId,
   rivalUserId,
   rivalName,
+  showListAction = false,
 }: RadarSectionProps) => {
+  const router = useRouter();
   const { version, levels, diffs, compareVersion } = useStatsFilter();
 
   const isCompareMode = !rivalUserId && !!compareVersion;
@@ -41,7 +51,7 @@ const RadarSection = ({
     isLoading: rivalLoading,
     isError: rivalError,
   } = useRadar(effectiveRivalUserId, levels, diffs, effectiveRivalVersion);
-  const [selectedCat, setSelectedCat] = useState<RadarCategory | null>(null);
+  const [openCat, setOpenCat] = useState<RadarCategory | null>(null);
 
   const isRivalMode = !!effectiveRivalUserId;
 
@@ -95,6 +105,7 @@ const RadarSection = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
         <RadarSectionChart data={radar} rivalData={rivalDataFlat} />
 
+        <TooltipProvider>
         <div className="flex flex-col gap-2">
           {sortedData.map((key) => {
             const bpi = radar[key].totalBpi;
@@ -102,47 +113,71 @@ const RadarSection = ({
             const style = getBpiColorStyle(bpi);
 
             return (
-              <div
+              <Tooltip
                 key={key}
-                {...clickableProps(() => setSelectedCat(key))}
-                className={cn(
-                  "flex items-center justify-between p-2.5 rounded-md",
-                  "bg-bpim-surface-2/60 border border-bpim-border cursor-pointer transition-all duration-200",
-                  "hover:bg-bpim-overlay hover:translate-x-1 hover:border-bpim-border",
-                )}
+                open={showListAction && openCat === key}
+                onOpenChange={(open) => setOpenCat(open ? key : null)}
               >
-                <span className="text-xs font-bold text-bpim-text">{key}</span>
-
-                <div className="flex items-center gap-2">
-                  {isRivalMode && rivalBpi !== undefined && (
-                    <div className="inline-flex min-w-16 items-center justify-center rounded-sm border border-orange-500/50 bg-orange-500/10 px-2 py-0.5 font-mono text-sm font-bold text-bpim-warning">
-                      {rivalBpi.toFixed(2)}
-                    </div>
-                  )}
+                <TooltipTrigger asChild>
                   <div
-                    className="inline-flex min-w-16 items-center justify-center rounded-sm border px-2 py-0.5 font-mono text-sm font-bold text-bpim-text"
-                    style={{
-                      borderColor: style.bg,
-                      backgroundColor: `${style.bg}15`,
-                    }}
+                    className={cn(
+                      "flex items-center justify-between p-2.5 rounded-md",
+                      "bg-bpim-surface-2/60 border border-bpim-border transition-all duration-200",
+                      showListAction &&
+                        "cursor-pointer hover:bg-bpim-overlay hover:translate-x-1 hover:border-bpim-border",
+                    )}
+                    onMouseEnter={() => showListAction && setOpenCat(key)}
+                    onClick={() => showListAction && setOpenCat(key)}
                   >
-                    {bpi.toFixed(2)}
+                  <span className="text-xs font-bold text-bpim-text">{key}</span>
+
+                  <div className="flex items-center gap-2">
+                    {isRivalMode && rivalBpi !== undefined && (
+                      <div className="inline-flex min-w-16 items-center justify-center rounded-sm border border-orange-500/50 bg-orange-500/10 px-2 py-0.5 font-mono text-sm font-bold text-bpim-warning">
+                        {rivalBpi.toFixed(2)}
+                      </div>
+                    )}
+                    <div
+                      className="inline-flex min-w-16 items-center justify-center rounded-sm border px-2 py-0.5 font-mono text-sm font-bold text-bpim-text"
+                      style={{
+                        borderColor: style.bg,
+                        backgroundColor: `${style.bg}15`,
+                      }}
+                    >
+                      {bpi.toFixed(2)}
+                    </div>
                   </div>
-                </div>
-              </div>
+                  </div>
+                </TooltipTrigger>
+                {showListAction && (
+                  <TooltipContent side="left" className="flex flex-col gap-0.5">
+                    <span className="font-bold">{key}</span>
+                    <span className="text-bpim-primary">{bpi.toFixed(2)}</span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        router.push({
+                          pathname: `/my/${version}`,
+                          query: {
+                            ...radarCategoryListQuery(key),
+                            levels: levels.join(","),
+                            difficulties: diffs.join(","),
+                            page: "1",
+                          },
+                        })
+                      }
+                      className="mt-1 rounded-md bg-bpim-primary px-2 py-1 text-xs font-bold text-white transition-colors hover:bg-bpim-primary/80"
+                    >
+                      {t("dashboard.distribution.showList")}
+                    </button>
+                  </TooltipContent>
+                )}
+              </Tooltip>
             );
           })}
         </div>
+        </TooltipProvider>
       </div>
-
-      {selectedCat && (
-        <RadarCategorySongsDialog
-          categoryName={selectedCat}
-          songs={radar[selectedCat].songs}
-          isOpen={!!selectedCat}
-          onClose={() => setSelectedCat(null)}
-        />
-      )}
     </DashCard>
   );
 };

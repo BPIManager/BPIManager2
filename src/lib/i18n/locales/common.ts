@@ -279,6 +279,12 @@ export const commonTranslations = {
     "zh-TW": "BPM範圍",
     ko: "BPM 범위",
   },
+  "filter.sofranExclude": {
+    ja: "ソフラン曲を除く",
+    en: "Exclude sofran",
+    "zh-TW": "排除速度變化曲",
+    ko: "소프란 곡 제외",
+  },
   "filter.sofranOnly": {
     ja: "ソフラン曲のみ表示",
     en: "Sofran only",

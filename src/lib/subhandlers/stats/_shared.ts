@@ -1,4 +1,5 @@
 import type { NextApiRequest } from "next";
+import { BPM_BANDS } from "@/constants/iidx/bpmBands";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 import type { StatsGroupBy } from "@/types/stats/bpiBoxStats";
 import type { StatsQuery } from "@/types/stats/query";
@@ -20,15 +21,6 @@ export function percentile(sorted: number[], p: number): number {
   if (lower === upper) return sorted[lower];
   return sorted[lower] + (sorted[upper] - sorted[lower]) * (index - lower);
 }
-
-export const BPM_BANDS = [
-  { label: "200~", min: 200, max: Infinity },
-  { label: "180~200", min: 180, max: 200 },
-  { label: "160~180", min: 160, max: 180 },
-  { label: "140~160", min: 140, max: 160 },
-  { label: "120~140", min: 120, max: 140 },
-  { label: "~120", min: 0, max: 120 },
-] as const;
 
 export function getBpmBand(bpm: string | null | undefined): string {
   if (!bpm) return "Soflan";

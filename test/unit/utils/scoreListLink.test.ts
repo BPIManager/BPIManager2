@@ -108,3 +108,50 @@ describe("スコア条件の「に等しい」", () => {
     expect(filterSongsFrontend([song(1900, 0)], cond("djrank", "AAA"))).toHaveLength(0);
   });
 });
+
+describe("bpmBandListQuery / radarCategoryListQuery", () => {
+  const withBpm = (bpm: string | null, radarTop: string | null = null) =>
+    ({ ...(song(1800, 0) as object), bpm, radarTop }) as unknown as SongWithScore;
+  const toParams2 = (q: Record<string, string>): FilterParamsFrontend => ({
+    bpmMin: q.bpmMin ? Number(q.bpmMin) : undefined,
+    bpmMax: q.bpmMax ? Number(q.bpmMax) : undefined,
+    isSofran: q.isSofran === "true",
+    excludeSofran: q.excludeSofran === "true",
+    radarCategories: q.radarCategories ? q.radarCategories.split(",") : undefined,
+  });
+  const match = (s: SongWithScore, q: Record<string, string>) =>
+    filterSongsFrontend([s], toParams2(q)).length === 1;
+
+  it("数値の帯は、帯の範囲内の固定BPM曲だけに一致し、ソフラン曲は含めない", async () => {
+    const { bpmBandListQuery } = await import("@/utils/dashboard/scoreListLink");
+    const q = bpmBandListQuery("160~180");
+    expect(match(withBpm("160"), q)).toBe(true);
+    expect(match(withBpm("179"), q)).toBe(true);
+    expect(match(withBpm("180"), q)).toBe(false);
+    expect(match(withBpm("159"), q)).toBe(false);
+    expect(match(withBpm("100-170"), q)).toBe(false);
+  });
+
+  it("両端の帯（200~ と ~120）", async () => {
+    const { bpmBandListQuery } = await import("@/utils/dashboard/scoreListLink");
+    expect(match(withBpm("200"), bpmBandListQuery("200~"))).toBe(true);
+    expect(match(withBpm("199"), bpmBandListQuery("200~"))).toBe(false);
+    expect(match(withBpm("119"), bpmBandListQuery("~120"))).toBe(true);
+    expect(match(withBpm("120"), bpmBandListQuery("~120"))).toBe(false);
+  });
+
+  it("Soflan の帯はソフラン曲だけに一致する", async () => {
+    const { bpmBandListQuery } = await import("@/utils/dashboard/scoreListLink");
+    const q = bpmBandListQuery("Soflan");
+    expect(match(withBpm("100-170"), q)).toBe(true);
+    expect(match(withBpm("150"), q)).toBe(false);
+  });
+
+  it("レーダーカテゴリはそのカテゴリの曲だけに一致する", async () => {
+    const { radarCategoryListQuery } = await import("@/utils/dashboard/scoreListLink");
+    const q = radarCategoryListQuery("SCRATCH");
+    expect(match(withBpm("150", "SCRATCH"), q)).toBe(true);
+    expect(match(withBpm("150", "NOTES"), q)).toBe(false);
+    expect(match(withBpm("150", null), q)).toBe(false);
+  });
+});
