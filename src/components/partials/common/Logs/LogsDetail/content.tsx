@@ -31,6 +31,7 @@ import { useBpiStep } from "@/hooks/common/useBpiStep";
 import MonthlyReviewBanner from "@/components/partials/common/MonthlyReviewBanner";
 import dayjs from "@/lib/dayjs";
 import PerformanceTab from "../Performance";
+import LogRadarGrowth from "../LogRadarGrowth";
 
 const LogsDetailContent = ({
   userId,
@@ -277,6 +278,15 @@ const LogsDetailContent = ({
                 myData={rankData}
                 isLoading={isLoading}
                 getColor={(l) => RANK_COLORS[l]}
+              />
+            </div>
+            <div className="mt-4">
+              <LogRadarGrowth
+                userId={userId}
+                version={version}
+                periodKey={type === "batch" ? batchId : date}
+                type={type === "batch" ? "batch" : apiType}
+                groupedBy={groupedBy}
               />
             </div>
           </div>

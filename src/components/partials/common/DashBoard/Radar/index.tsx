@@ -92,16 +92,31 @@ interface RadarTooltipPayloadEntry {
   };
 }
 
+/** 系列名の差し替え。growth 時は rival 系列を「比較元」とみなし勝敗ではなく差分を表示する */
+export interface RadarSeriesLabels {
+  me: string;
+  rival: string;
+  growth?: boolean;
+  /** ツールチップに出す数値の小数桁数（既定 2） */
+  digits?: number;
+}
+
 interface RadarCustomTooltipProps {
   active?: boolean;
   payload?: RadarTooltipPayloadEntry[];
+  labels?: RadarSeriesLabels;
 }
 
-const RadarCustomTooltip = ({ active, payload }: RadarCustomTooltipProps) => {
+const RadarCustomTooltip = ({
+  active,
+  payload,
+  labels,
+}: RadarCustomTooltipProps) => {
   if (!active || !payload?.length) return null;
   const data = payload[0].payload;
   const meVal = data.value;
   const rivalVal = data.rivalValue;
+  const digits = labels?.digits ?? 2;
   const hasRival = rivalVal !== undefined;
 
   return (
@@ -115,11 +130,13 @@ const RadarCustomTooltip = ({ active, payload }: RadarCustomTooltipProps) => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="h-2 w-2 rounded-full bg-bpim-primary" />
-            <span className="text-xs font-bold text-bpim-primary">YOU</span>
+            <span className="text-xs font-bold text-bpim-primary">
+              {labels?.me ?? "YOU"}
+            </span>
           </div>
           <div className="flex items-center gap-1">
             <span className="font-mono text-xs font-bold text-bpim-text">
-              {meVal.toFixed(2)}
+              {meVal.toFixed(digits)}
             </span>
             {data.isMeMax && (
               <span className="rounded bg-bpim-primary px-1 py-0.5 text-[8px] font-bold text-bpim-bg">
@@ -135,12 +152,12 @@ const RadarCustomTooltip = ({ active, payload }: RadarCustomTooltipProps) => {
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-bpim-warning" />
                 <span className="text-xs font-bold text-bpim-warning">
-                  RIVAL
+                  {labels?.rival ?? "RIVAL"}
                 </span>
               </div>
               <div className="flex items-center gap-1">
                 <span className="font-mono text-xs font-bold text-bpim-text">
-                  {rivalVal.toFixed(2)}
+                  {rivalVal.toFixed(digits)}
                 </span>
                 {data.isRivalMax && (
                   <span className="rounded bg-bpim-warning px-1 py-0.5 text-[8px] font-bold text-bpim-bg">
@@ -162,9 +179,11 @@ const RadarCustomTooltip = ({ active, payload }: RadarCustomTooltipProps) => {
                   meVal >= rivalVal ? "text-bpim-success" : "text-bpim-danger",
                 )}
               >
-                {meVal >= rivalVal
-                  ? `WIN (+${(meVal - rivalVal).toFixed(2)})`
-                  : `LOSE (${(meVal - rivalVal).toFixed(2)})`}
+                {labels?.growth
+                  ? `${meVal >= rivalVal ? "+" : ""}${(meVal - rivalVal).toFixed(digits)}`
+                  : meVal >= rivalVal
+                    ? `WIN (+${(meVal - rivalVal).toFixed(2)})`
+                    : `LOSE (${(meVal - rivalVal).toFixed(2)})`}
               </p>
             </div>
           </>
@@ -189,6 +208,10 @@ interface RadarChartProps {
   songAttr?: boolean;
   /** rivalData のみ黄色で表示し、自分のレーダー（青）を描画しない */
   rivalOnly?: boolean;
+  /** ツールチップ・系列の表示名（未指定は YOU / RIVAL） */
+  labels?: RadarSeriesLabels;
+  /** 表示範囲の上書き（未指定は値から自動算出） */
+  domain?: [number, number];
 }
 
 const RadarSectionChart = ({
@@ -199,6 +222,8 @@ const RadarSectionChart = ({
   showTooltip = false,
   songAttr = false,
   rivalOnly = false,
+  labels,
+  domain: domainOverride,
 }: RadarChartProps) => {
   const c = useChartColors();
 
@@ -247,6 +272,7 @@ const RadarSectionChart = ({
     );
 
   const domain = useMemo(() => {
+    if (domainOverride) return domainOverride;
     if (songAttr) return [0, 100] as [number, number];
     const allValues = chartData.flatMap((d) =>
       rivalOnly
@@ -258,7 +284,7 @@ const RadarSectionChart = ({
     const range = Math.max(max - min, 10);
     const padding = range * 0.2;
     return [Math.floor(min - padding), Math.ceil(max + padding)];
-  }, [chartData, songAttr, rivalOnly]);
+  }, [chartData, songAttr, rivalOnly, domainOverride]);
 
   const chartHeight = isMini ? miniHeight : 330;
 
@@ -280,12 +306,15 @@ const RadarSectionChart = ({
           <PolarRadiusAxis domain={domain} tick={false} axisLine={false} />
 
           {(!isMini || showTooltip) && (
-            <Tooltip content={<RadarCustomTooltip />} cursor={false} />
+            <Tooltip
+              content={<RadarCustomTooltip labels={labels} />}
+              cursor={false}
+            />
           )}
 
           {!rivalOnly && (
             <Radar
-              name="YOU"
+              name={labels?.me ?? "YOU"}
               dataKey={songAttr ? "valueCapped" : "value"}
               stroke={c.primary}
               strokeWidth={1.5}
@@ -314,7 +343,7 @@ const RadarSectionChart = ({
 
           {rivalData && (
             <Radar
-              name="RIVAL"
+              name={labels?.rival ?? "RIVAL"}
               dataKey="rivalValue"
               stroke={c.warning}
               strokeWidth={1.5}

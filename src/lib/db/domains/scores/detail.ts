@@ -35,6 +35,7 @@ class LogScoreRepository {
    * @param version バージョン
    * @param options.batchIds 指定したバッチに含まれるスコアのみ取得する場合
    * @param options.targetTime 特定時点（スナップショット）のスコアを取得する場合
+   * @param options.untilLogId 指定した logId 以下のスコアだけを対象にしたスナップショットを取得する場合（`targetTime` と併用可）
    * @param options.comparisonTime 比較対象とする過去時点（この時刻より前の最新スコアを prev として取得）
    * @param options.onlyLastPlayedInRange 最終プレイ日時（lastPlayed）が指定範囲内のスコアを取得する場合
    * @param options.clearState クリア状況で絞り込む場合（`current.clearState`完全一致）
@@ -47,6 +48,7 @@ class LogScoreRepository {
     options: {
       batchIds?: string[];
       targetTime?: Date;
+      untilLogId?: number;
       comparisonTime?: Date;
       onlyLastPlayedInRange?: { start: Date; end: Date };
       clearState?: string;
@@ -59,6 +61,7 @@ class LogScoreRepository {
     const {
       batchIds,
       targetTime,
+      untilLogId,
       comparisonTime,
       onlyLastPlayedInRange,
       clearState,
@@ -108,6 +111,7 @@ class LogScoreRepository {
         "s.difficultyLevel",
         "s.difficulty",
         "s.releasedVersion",
+        "current.logId",
         "current.exScore",
         "current.bpi",
         "current.clearState",
@@ -156,14 +160,19 @@ class LogScoreRepository {
                 .where("lastPlayed", "<=", onlyLastPlayedInRange.end),
           }),
         );
-    } else if (targetTime) {
+    } else if (targetTime || untilLogId !== undefined) {
       query = query
         .innerJoin(
           latestLogIdPerSongSubquery({
             table: "scores",
             userId,
             version,
-            extra: (qb) => qb.where("createdAt", "<=", targetTime),
+            extra: (qb) => {
+              let q = qb;
+              if (targetTime) q = q.where("createdAt", "<=", targetTime);
+              if (untilLogId !== undefined) q = q.where("logId", "<=", untilLogId);
+              return q;
+            },
           }).as("latest_sc"),
           (join) => join.onRef("latest_sc.songId", "=", "s.songId"),
         )

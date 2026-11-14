@@ -6,5 +6,7 @@ export type { HandleOutcome } from "./_shared";
 export { createOvertakenMap, computeRivalRankMap } from "./_shared";
 export * from "./list";
 export * from "./detail";
+export * from "./radarGrowth";
+export * from "./radarGrowthSongs";
 export * from "./scores";
 export * from "./versionSummary";
