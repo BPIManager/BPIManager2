@@ -14,6 +14,8 @@ interface LogRadarGrowthProps {
   periodKey?: string;
   type: "batch" | "day" | "week" | "month";
   groupedBy: string;
+  /** 指定時、カテゴリの行クリックで更新楽曲タブへ遷移する（未指定なら行クリックで曲モーダルを開く） */
+  onOpenCategoryList?: (category: RadarCategory) => void;
 }
 
 const LogRadarGrowth = ({
@@ -22,6 +24,7 @@ const LogRadarGrowth = ({
   periodKey,
   type,
   groupedBy,
+  onOpenCategoryList,
 }: LogRadarGrowthProps) => {
   const [selectedCategory, setSelectedCategory] = useState<RadarCategory | null>(null);
   const { data, isLoading, isError } = useBatchRadarGrowth(
@@ -44,7 +47,11 @@ const LogRadarGrowth = ({
 
   return (
     <>
-      <LogRadarGrowthCard data={data} onSelectCategory={setSelectedCategory} />
+      <LogRadarGrowthCard
+        data={data}
+        onOpenSongs={setSelectedCategory}
+        onOpenList={onOpenCategoryList}
+      />
       <RadarGrowthSongsDialog
         category={selectedCategory}
         userId={userId}

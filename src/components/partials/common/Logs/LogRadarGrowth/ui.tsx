@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { TrendingUp } from "lucide-react";
 import { DashCard } from "@/components/ui/dashcard";
 import { Switch } from "@/components/ui/switch";
 import { HelpTooltip } from "@/components/ui/tooltip";
@@ -16,10 +17,14 @@ const formatDiff = (diff: number, digits: number) =>
 
 const LogRadarGrowthCard = ({
   data,
-  onSelectCategory,
+  onOpenSongs,
+  onOpenList,
 }: {
   data: RadarGrowthSnapshot;
-  onSelectCategory: (category: RadarCategory) => void;
+  /** 更新曲と総合BPIへの影響のモーダルを開く */
+  onOpenSongs: (category: RadarCategory) => void;
+  /** 指定時、行クリックで更新楽曲タブ（カテゴリで絞り込み）へ遷移する */
+  onOpenList?: (category: RadarCategory) => void;
 }) => {
   const { t } = useTranslation();
   // 相対評価（更新前=1.00）はレーダーの描画だけに適用し、右側の数値は常に絶対値（BPI）を出す
@@ -109,8 +114,8 @@ const LogRadarGrowthCard = ({
             return (
               <div
                 key={c.category}
-                {...clickableProps(() => onSelectCategory(c.category))}
-                aria-label={t("logs.detail.radarGrowth.openSongs")}
+                {...clickableProps(() => (onOpenList ?? onOpenSongs)(c.category))}
+                title={onOpenList ? t("logs.detail.radarGrowth.openList") : undefined}
                 className={cn(
                   "flex cursor-pointer items-center justify-between rounded-md border border-bpim-border bg-bpim-surface-2/60 p-2.5 transition-all duration-200",
                   "hover:translate-x-1 hover:bg-bpim-overlay",
@@ -133,6 +138,21 @@ const LogRadarGrowthCard = ({
                   >
                     {c.after.toFixed(2)}
                   </div>
+                  {onOpenList && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onOpenSongs(c.category);
+                      }}
+                      onKeyDown={(e) => e.stopPropagation()}
+                      aria-label={t("logs.detail.radarGrowth.openSongs")}
+                      title={t("logs.detail.radarGrowth.openSongs")}
+                      className="order-last rounded-md p-1 text-bpim-muted transition-colors hover:bg-bpim-overlay hover:text-bpim-text"
+                    >
+                      <TrendingUp className="h-3.5 w-3.5" />
+                    </button>
+                  )}
                   <span
                     className={cn(
                       "min-w-14 text-right font-mono text-xs font-bold",

@@ -1,5 +1,6 @@
 import { getDJRank } from "../songs/djRank";
 import { BatchDetailItem } from "@/types/logs/batchDetail";
+import { getRadarTop } from "./getMapFlatten";
 
 export const mapBatchToSongs = (batchSongs: BatchDetailItem[]) => {
   return batchSongs.map((s) => {
@@ -9,6 +10,7 @@ export const mapBatchToSongs = (batchSongs: BatchDetailItem[]) => {
     return {
       ...s,
       logId: null,
+      radarTop: getRadarTop(s.title, s.difficulty),
       difficultyLevel: s.level,
       bpm: s.bpm ?? null,
       releasedVersion: s.releasedVersion ?? null,

@@ -7,6 +7,10 @@ const radarLookup = new Map<string, string>(
   ),
 );
 
+/** 譜面が分類されているレーダーカテゴリ（topElements）。☆12以外などで無ければ null */
+export const getRadarTop = (title: string, difficulty: string): string | null =>
+  radarLookup.get(`${title}__${difficulty}`) ?? null;
+
 interface RawSongScoreRow {
   songId: number;
   title: string;
@@ -50,6 +54,6 @@ export const mapToFlatSong = (row: RawSongScoreRow): SongWithScore => {
     mu: row.mu ?? null,
     sigma: row.sigma ?? null,
     residualVar: row.residualVar ?? null,
-    radarTop: radarLookup.get(`${row.title}__${row.difficulty}`) ?? null,
+    radarTop: getRadarTop(row.title, row.difficulty),
   };
 };

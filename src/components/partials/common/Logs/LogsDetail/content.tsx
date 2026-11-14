@@ -127,6 +127,24 @@ const LogsDetailContent = ({
     router.push({ query: nextQuery }, undefined, { shallow: true });
   };
 
+  // レーダーのカテゴリで絞り込んだ更新楽曲タブを開く（レーダーは☆12のみが対象）
+  const handleOpenRadarCategory = (category: string) => {
+    const { view: _view, ...rest } = router.query;
+    router.push(
+      {
+        query: {
+          ...rest,
+          levels: "12",
+          difficulties: "ANOTHER,LEGGENDARIA,HYPER",
+          page: "1",
+          radarCategories: category,
+        },
+      },
+      undefined,
+      { shallow: true },
+    );
+  };
+
   // パフォーマンスタブはプレイ日(lastPlayed)基準のため、同じ集合になるよう groupedBy も合わせる
   const handleOpenUpdatedSongs = () => {
     const { view: _view, ...rest } = router.query;
@@ -294,6 +312,7 @@ const LogsDetailContent = ({
                 periodKey={type === "batch" ? batchId : date}
                 type={type === "batch" ? "batch" : apiType}
                 groupedBy={groupedBy}
+                onOpenCategoryList={handleOpenRadarCategory}
               />
             </div>
           </div>

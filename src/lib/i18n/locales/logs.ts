@@ -346,11 +346,17 @@ export const logsTranslations = {
     "zh-TW": "NEW",
     ko: "NEW",
   },
+  "logs.detail.radarGrowth.openList": {
+    ja: "このカテゴリの更新楽曲を表示",
+    en: "Show updated songs in this category",
+    "zh-TW": "顯示此類別的更新曲目",
+    ko: "이 카테고리의 업데이트 곡 보기",
+  },
   "logs.detail.radarGrowth.openSongs": {
-    ja: "更新曲を表示",
-    en: "Show updated songs",
-    "zh-TW": "顯示更新曲目",
-    ko: "업데이트 곡 보기",
+    ja: "更新曲と総合BPIへの影響を見る",
+    en: "View updated songs and impact on total BPI",
+    "zh-TW": "查看更新曲目與對總合 BPI 的影響",
+    ko: "업데이트 곡과 종합 BPI 영향 보기",
   },
   "logs.detail.delete.button": {
     ja: "この更新を削除",
