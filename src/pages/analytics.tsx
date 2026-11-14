@@ -15,6 +15,7 @@ import { decodeTarget, encodeTarget } from "@/hooks/analytics/targetCodec";
 import type { AnalyticsTarget } from "@/types/analytics";
 import TargetSelectorModal from "@/components/partials/features/Analytics/TargetSelector";
 import AnalyticsComparisonTable from "@/components/partials/features/Analytics/Table";
+import SavedComparisonsActions from "@/components/partials/features/Analytics/SavedComparisons";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/hooks/common/useTranslation";
@@ -159,14 +160,17 @@ export default function AnalyticsPage() {
           description={t("page.analytics.desc")}
           rightElement={
             targets.length === 0 ? (
-              <Button
-                onClick={() => setEditing("new")}
-                variant="outline"
-                className="border-bpim-border bg-bpim-surface text-bpim-text hover:bg-bpim-overlay"
-              >
-                <Settings2 className="mr-2 h-4 w-4" />
-                {t("page.analytics.setTarget")}
-              </Button>
+              <div className="flex items-center gap-2">
+                <SavedComparisonsActions targets={targets} onLoad={pushTargets} />
+                <Button
+                  onClick={() => setEditing("new")}
+                  variant="outline"
+                  className="border-bpim-border bg-bpim-surface text-bpim-text hover:bg-bpim-overlay"
+                >
+                  <Settings2 className="mr-2 h-4 w-4" />
+                  {t("page.analytics.setTarget")}
+                </Button>
+              </div>
             ) : undefined
           }
         />
@@ -201,6 +205,7 @@ export default function AnalyticsPage() {
                   <Plus className="mr-1 h-4 w-4" />
                   {t("page.analytics.addTarget")}
                 </Button>
+                <SavedComparisonsActions targets={targets} onLoad={pushTargets} />
               </div>
 
               <div className="rounded-2xl border border-bpim-border bg-bpim-bg/40 p-1 shadow-xl backdrop-blur-md overflow-hidden">
