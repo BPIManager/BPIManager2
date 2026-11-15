@@ -19,6 +19,7 @@ import OfficialArenaHistorySection from "@/components/partials/common/DashBoard/
 import LogFilterSection from "@/components/partials/common/Logs/VersionSelector/ui";
 import { TabsContent } from "@/components/ui/tabs";
 import { useState } from "react";
+import type { ScoreListLink } from "@/utils/dashboard/scoreListLink";
 import BpiBoxStatsSection from "@/components/partials/common/DashBoard/BpiBoxStats";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
@@ -40,6 +41,10 @@ export default function UserPage({ defaultView = "overview" }: UserPageProps) {
   const { t } = useTranslation();
 
   if (!userId) return null;
+
+  const userScoreListLink: ScoreListLink = {
+    pathname: (v) => `/users/${userId}/scores/${v}`,
+  };
 
   return (
     <UserProfileLayout userId={userId} currentTab={defaultView}>
@@ -67,12 +72,24 @@ export default function UserPage({ defaultView = "overview" }: UserPageProps) {
             <ActivitySection setNodata={setNodata} userId={userId} />
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <RankDistributionSection myUserId={userId} />
-              <BpiDistributionSection myUserId={userId} />
+              <RankDistributionSection
+                myUserId={userId}
+                showListAction
+                listLink={userScoreListLink}
+              />
+              <BpiDistributionSection
+                myUserId={userId}
+                showListAction
+                listLink={userScoreListLink}
+              />
             </div>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <VersionCountDistributionSection myUserId={userId} />
-              <BpmBpiDistributionSection myUserId={userId} />
+              <BpmBpiDistributionSection
+                myUserId={userId}
+                showListAction
+                listLink={userScoreListLink}
+              />
             </div>
 
             <BpiHistorySection myUserId={userId} />
@@ -82,7 +99,11 @@ export default function UserPage({ defaultView = "overview" }: UserPageProps) {
               showImportAlert={false}
               defaultPeriod={0}
             />
-            <RadarSection userId={userId} />
+            <RadarSection
+              userId={userId}
+              showListAction
+              listLink={userScoreListLink}
+            />
             <OfficialArenaHistorySection userId={userId} />
           </div>
         )}

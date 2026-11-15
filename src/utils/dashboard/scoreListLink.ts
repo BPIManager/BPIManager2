@@ -86,3 +86,25 @@ export function bpmBandListQuery(label: string): ListFilterQuery {
 export function radarCategoryListQuery(category: string): ListFilterQuery {
   return { radarCategories: category, isMyPlayed: "true" };
 }
+
+/** ダッシュボードのグラフから開くスコア一覧の遷移先。未指定は自分の一覧（/my/[version]） */
+export interface ScoreListLink {
+  pathname: (version: string) => string;
+  /** ライバル比較: 自分またはライバルのどちらかが条件を満たす譜面を出す */
+  rivalEither?: boolean;
+}
+
+/**
+ * グラフの1区間の絞り込みクエリから、スコア一覧への遷移先（router.push の引数）を組み立てる。
+ * rivalEither のときは「自分がプレイ済み」条件を外し、スコア条件を「どちらか」で評価させる。
+ */
+export function scoreListTarget(
+  link: ScoreListLink | undefined,
+  version: string,
+  query: Record<string, string>,
+) {
+  const base = link?.pathname(version) ?? `/my/${version}`;
+  if (!link?.rivalEither) return { pathname: base, query };
+  const { isMyPlayed: _isMyPlayed, ...rest } = query;
+  return { pathname: base, query: { ...rest, scoreFilterScope: "either" } };
+}

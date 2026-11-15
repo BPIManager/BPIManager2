@@ -7,7 +7,11 @@ import FetchErrorState from "@/components/partials/common/ErrorStates/FetchError
 import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { useRouter } from "next/router";
-import { bpmBandListQuery } from "@/utils/dashboard/scoreListLink";
+import {
+  bpmBandListQuery,
+  scoreListTarget,
+  type ScoreListLink,
+} from "@/utils/dashboard/scoreListLink";
 
 interface BpmBpiDistributionSectionProps {
   myUserId?: string;
@@ -16,6 +20,8 @@ interface BpmBpiDistributionSectionProps {
   rivalName?: string;
   /** 自分のダッシュボードのみ true。帯のツールチップに「対象曲一覧を表示」を出す */
   showListAction?: boolean;
+  /** 一覧の遷移先。未指定は自分の一覧 */
+  listLink?: ScoreListLink;
 }
 
 const BpmBpiDistributionSection = ({
@@ -24,6 +30,7 @@ const BpmBpiDistributionSection = ({
   myName,
   rivalName,
   showListAction = false,
+  listLink,
 }: BpmBpiDistributionSectionProps) => {
   const router = useRouter();
   const { levels, diffs, version, compareVersion } = useStatsFilter();
@@ -81,15 +88,14 @@ const BpmBpiDistributionSection = ({
         onShowList={
           showListAction
             ? (label) =>
-                router.push({
-                  pathname: `/my/${version}`,
-                  query: {
+                router.push(
+                  scoreListTarget(listLink, version, {
                     ...bpmBandListQuery(label),
                     levels: levels.join(","),
                     difficulties: diffs.join(","),
                     page: "1",
-                  },
-                })
+                  }),
+                )
             : undefined
         }
       />

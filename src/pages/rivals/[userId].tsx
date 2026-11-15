@@ -19,6 +19,7 @@ import { useRivalComparison } from "@/hooks/social/useRivalComparison";
 import { WinLossStats } from "@/components/partials/common/WinLossStats";
 import { WinLossStatsSkeleton } from "@/components/partials/common/WinLossStats/skeleton";
 import { useTranslation } from "@/hooks/common/useTranslation";
+import type { ScoreListLink } from "@/utils/dashboard/scoreListLink";
 
 function RivalOverviewTab({
   myUserId,
@@ -34,6 +35,10 @@ function RivalOverviewTab({
   const { data, isLoading } = useRivalComparison(rivalUserId);
   const { t } = useTranslation();
   const winLoss = data?.compare?.winLoss;
+  const rivalScoreListLink: ScoreListLink = {
+    pathname: (v) => `/rivals/${rivalUserId}/scores/${v}`,
+    rivalEither: true,
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -61,12 +66,18 @@ function RivalOverviewTab({
           rivalUserId={rivalUserId}
           myName={t("page.rival.me")}
           rivalName={rivalName}
+        
+          showListAction
+          listLink={rivalScoreListLink}
         />
         <BpiDistributionSection
           myUserId={myUserId}
           rivalUserId={rivalUserId}
           myName={t("page.rival.me")}
           rivalName={rivalName}
+        
+          showListAction
+          listLink={rivalScoreListLink}
         />
       </div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -81,6 +92,9 @@ function RivalOverviewTab({
           rivalUserId={rivalUserId}
           myName={t("page.rival.me")}
           rivalName={rivalName}
+        
+          showListAction
+          listLink={rivalScoreListLink}
         />
       </div>
 
@@ -101,6 +115,8 @@ function RivalOverviewTab({
         userId={myUserId}
         rivalUserId={rivalUserId}
         rivalName={rivalName}
+        showListAction
+        listLink={rivalScoreListLink}
       />
     </div>
   );

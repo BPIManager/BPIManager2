@@ -1,5 +1,10 @@
 import { useRouter } from "next/router";
-import { bpiListQuery, rankListQuery, scoreRateListQuery } from "@/utils/dashboard/scoreListLink";
+import {
+  bpiListQuery,
+  rankListQuery,
+  scoreRateListQuery,
+  scoreListTarget,
+} from "@/utils/dashboard/scoreListLink";
 import { useStatsFilter } from "@/contexts/stats/FilterContext";
 import { useDjRankDistribution } from "@/hooks/stats/useDJRankDistribution";
 import { useBPIDistribution } from "@/hooks/stats/useBPIDistribution";
@@ -29,6 +34,7 @@ const DistributionSection = ({
   mode,
   onModeChange,
   showListAction = false,
+  listLink,
 }: DistributionSectionProps) => {
   const router = useRouter();
   const { levels, diffs, version, compareVersion } = useStatsFilter();
@@ -168,15 +174,14 @@ const DistributionSection = ({
         return {
           label: t("dashboard.distribution.showList"),
           onClick: () =>
-            router.push({
-              pathname: `/my/${version}`,
-              query: {
+            router.push(
+              scoreListTarget(listLink, version, {
                 ...filter,
                 levels: levels.join(","),
                 difficulties: diffs.join(","),
                 page: "1",
-              },
-            }),
+              }),
+            ),
         };
       }
     : undefined;

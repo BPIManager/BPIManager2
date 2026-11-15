@@ -1,5 +1,6 @@
 import {
   FilterParamsFrontend,
+  ScoreFilterCondition,
   SongWithRival,
   SongWithScore,
 } from "@/types/songs/score";
@@ -59,6 +60,47 @@ export const filterSongsServerSide = (
     }
     return true;
   });
+};
+
+/** スコア系の絞り込み条件(レート・BPI・DJ RANK)を、1人分のスコアが全て満たすか判定する */
+const matchesScoreFilters = (
+  filters: ScoreFilterCondition[],
+  notes: number,
+  exScore: number | null | undefined,
+  bpiValue: number | null | undefined,
+): boolean => {
+  const hasScore = exScore !== null && exScore !== undefined && notes > 0;
+  const rate = hasScore ? (exScore / (notes * 2)) * 100 : null;
+  const ratio = hasScore ? exScore / (notes * 2) : null;
+
+  for (const f of filters) {
+    if (!f.value) continue;
+    if (f.metric === "scoreRate") {
+      if (rate === null) return false;
+      const val = parseFloat(f.value);
+      if (isNaN(val)) continue;
+      if (f.operator === ">=" && rate < val) return false;
+      if (f.operator === "<=" && rate > val) return false;
+      if (f.operator === "=" && Math.abs(rate - val) >= 0.005) return false;
+    } else if (f.metric === "bpi") {
+      // 未プレイ譜面はBPI未算出のため条件に一致させない
+      if (exScore === null || exScore === undefined) return false;
+      const val = parseFloat(f.value);
+      if (isNaN(val)) continue;
+      const bpi = bpiValue ?? -15;
+      if (f.operator === ">=" && bpi < val - BPI_EPSILON) return false;
+      if (f.operator === "<=" && bpi > val + BPI_EPSILON) return false;
+      if (f.operator === "=" && Math.abs(bpi - val) >= 0.005) return false;
+    } else if (f.metric === "djrank") {
+      if (ratio === null) return false;
+      const idx = RANK_TABLE.findIndex((t) => t.label === f.value);
+      if (idx === -1) continue;
+      const next = RANK_TABLE[idx + 1];
+      if (f.operator !== "<=" && ratio < RANK_TABLE[idx].ratio) return false;
+      if (f.operator !== ">=" && next && ratio >= next.ratio) return false;
+    }
+  }
+  return true;
 };
 
 /**
@@ -153,41 +195,16 @@ export const filterSongsFrontend = (
     }
 
     if (params.scoreFilters && params.scoreFilters.length > 0) {
-      const rate =
-        song.exScore !== null && song.notes > 0
-          ? (song.exScore / (song.notes * 2)) * 100
-          : null;
-      const ratio =
-        song.exScore !== null && song.notes > 0
-          ? song.exScore / (song.notes * 2)
-          : null;
-
-      for (const f of params.scoreFilters) {
-        if (!f.value) continue;
-        if (f.metric === "scoreRate") {
-          if (rate === null) return false;
-          const val = parseFloat(f.value);
-          if (isNaN(val)) continue;
-          if (f.operator === ">=" && rate < val) return false;
-          if (f.operator === "<=" && rate > val) return false;
-          if (f.operator === "=" && Math.abs(rate - val) >= 0.005) return false;
-        } else if (f.metric === "bpi") {
-          // 未プレイ譜面はBPI未算出のため条件に一致させない
-          if (song.exScore === null || song.exScore === undefined) return false;
-          const val = parseFloat(f.value);
-          if (isNaN(val)) continue;
-          const bpi = song.bpi ?? -15;
-          if (f.operator === ">=" && bpi < val - BPI_EPSILON) return false;
-          if (f.operator === "<=" && bpi > val + BPI_EPSILON) return false;
-          if (f.operator === "=" && Math.abs(bpi - val) >= 0.005) return false;
-        } else if (f.metric === "djrank") {
-          if (ratio === null) return false;
-          const idx = RANK_TABLE.findIndex((t) => t.label === f.value);
-          if (idx === -1) continue;
-          const next = RANK_TABLE[idx + 1];
-          if (f.operator !== "<=" && ratio < RANK_TABLE[idx].ratio) return false;
-          if (f.operator !== ">=" && next && ratio >= next.ratio) return false;
-        }
+      const mine = matchesScoreFilters(params.scoreFilters, song.notes, song.exScore, song.bpi);
+      if (params.scoreFilterScope === "either") {
+        // ライバル比較: 自分またはライバルのどちらかが条件を満たす譜面を残す
+        const rival = song.rival;
+        const theirs =
+          !!rival &&
+          matchesScoreFilters(params.scoreFilters, song.notes, rival.exScore, rival.bpi);
+        if (!mine && !theirs) return false;
+      } else if (!mine) {
+        return false;
       }
     }
 

@@ -94,6 +94,7 @@ export const useSongFilter = (
       scoreFilters: q.scoreFilters
         ? (JSON.parse(q.scoreFilters) as ScoreFilterCondition[])
         : undefined,
+      scoreFilterScope: q.scoreFilterScope === "either" ? "either" : undefined,
       missCountMin: q.missCountMin ? Number(q.missCountMin) : undefined,
       missCountMax: q.missCountMax ? Number(q.missCountMax) : undefined,
       radarCategories: q.radarCategories
