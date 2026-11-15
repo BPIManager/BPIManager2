@@ -138,6 +138,8 @@ export interface FilterParamsFrontend {
   bestVersion?: string;
 
   scoreFilters?: ScoreFilterCondition[];
+  /** `either`: scoreFilters を自分またはライバルのどちらかが満たす譜面を出す（ライバル比較の一覧用） */
+  scoreFilterScope?: "either";
   missCountMin?: number;
   missCountMax?: number;
   radarCategories?: string[];
