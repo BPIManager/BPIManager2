@@ -147,18 +147,21 @@ export default function EmailLinkComplete() {
     if (startedRef.current) return;
     startedRef.current = true;
 
-    const currentIntent = readIntent(window.location.href);
-    if (currentIntent === "change") {
-      void complete(null);
-      return;
-    }
-    const pending = readPendingEmail();
-    if (pending) {
-      void complete(pending);
-    } else {
-      setIntent(currentIntent);
-      setPhase("needEmail");
-    }
+    // 認証状態の復元を待ってから、リンクの種別と保存済みメールに応じて続きを決める
+    void auth.authStateReady().then(() => {
+      const currentIntent = readIntent(window.location.href);
+      if (currentIntent === "change") {
+        void complete(null);
+        return;
+      }
+      const pending = readPendingEmail();
+      if (pending) {
+        void complete(pending);
+      } else {
+        setIntent(currentIntent);
+        setPhase("needEmail");
+      }
+    });
   }, [complete]);
 
   const handleSubmitEmail = (e: FormEvent<HTMLFormElement>) => {

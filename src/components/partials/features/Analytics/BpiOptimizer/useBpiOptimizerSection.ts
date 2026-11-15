@@ -280,21 +280,28 @@ useEffect(() => {
 const router = useRouter();
 const goalParam =
   typeof router.query.goal === "string" ? router.query.goal : null;
-useEffect(() => {
-  if (!router.isReady || !goalParam || !memos) return;
+// 状態への反映はレンダー中に1度だけ行い（処理済みの goal を覚える）、クエリの除去だけを effect で行う
+const [handledGoal, setHandledGoal] = useState<string | null>(null);
+if (!goalParam && handledGoal !== null) {
+  setHandledGoal(null);
+} else if (router.isReady && goalParam && memos && handledGoal !== goalParam) {
+  setHandledGoal(goalParam);
   if (memos.some((m) => m.reportId === goalParam)) {
     setDeepLinkMemoId(goalParam);
   } else {
     setImportInitialReportId(goalParam);
     setIsImportModalOpen(true);
   }
+}
+useEffect(() => {
+  if (!router.isReady || !goalParam || handledGoal !== goalParam) return;
   const { goal: _goal, ...rest } = router.query;
   void _goal;
   router.replace({ pathname: router.pathname, query: rest }, undefined, {
     shallow: true,
   });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [router.isReady, goalParam, memos]);
+}, [router.isReady, goalParam, handledGoal]);
 
 const guardNavigation = useCallback(
   (action: () => void) => {
