@@ -24,7 +24,6 @@ const SearchInput = ({
   // 入力中はURL由来の値で上書きしない（遷移待ちの間に打った文字を消さない）
   useEffect(() => {
     if (document.activeElement === inputRef.current) return;
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setValue(initialValue);
   }, [initialValue]);
 

@@ -24,10 +24,12 @@ export function useDebouncedSearch(
     onChangeRef.current = onChange;
   }, [onChange]);
 
-  // 外部からリセットされたときにローカル値を同期
-  useEffect(() => {
+  // 外部からリセットされたときにローカル値を同期（レンダー中に前回値と比べて更新する）
+  const [prevExternal, setPrevExternal] = useState(externalValue);
+  if (externalValue !== prevExternal) {
+    setPrevExternal(externalValue);
     setLocalSearch(externalValue);
-  }, [externalValue]);
+  }
 
   // デバウンス処理
   useEffect(() => {

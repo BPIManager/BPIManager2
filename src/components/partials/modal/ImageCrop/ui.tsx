@@ -21,7 +21,6 @@ import { storage } from "@/lib/firebase";
 import { toast } from "sonner";
 import { Upload } from "lucide-react";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
-import { clickableProps } from "@/utils/common/clickableProps";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 interface Props {
@@ -134,14 +133,17 @@ const ImageUploadModal = ({
 
         <div className="flex flex-col items-center justify-center gap-4 py-4">
           {!imgSrc ? (
-            <div
-              {...clickableProps(() => fileInputRef.current?.click())}
-              className="flex w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-bpim-border bg-bpim-surface-2/60 p-12 transition-colors hover:bg-bpim-overlay"
-            >
-              <Upload className="h-8 w-8 text-bpim-muted" />
-              <p className="text-sm text-bpim-muted font-bold">
-                {t("imageCrop.clickToSelect")}
-              </p>
+            <>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="flex w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-bpim-border bg-bpim-surface-2/60 p-12 transition-colors hover:bg-bpim-overlay"
+              >
+                <Upload className="h-8 w-8 text-bpim-muted" />
+                <span className="text-sm text-bpim-muted font-bold">
+                  {t("imageCrop.clickToSelect")}
+                </span>
+              </button>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -149,7 +151,7 @@ const ImageUploadModal = ({
                 onChange={onSelectFile}
                 className="hidden"
               />
-            </div>
+            </>
           ) : (
             <div className="relative max-h-100 w-full overflow-hidden rounded-lg bg-bpim-bg/50 border border-bpim-border">
               <ReactCrop

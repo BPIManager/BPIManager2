@@ -21,3 +21,14 @@ onlyBuiltDependencies:
   - protobufjs
   - sharp
   - unrs-resolver
+# 間接依存の脆弱性対策（Dependabot）。親が古い範囲を固定していて `pnpm update` では上がらないものだけ、
+# 修正済みの最低バージョンへ引き上げる。親側が追従したら外してよい。
+overrides:
+  "vite@>=8.0.0 <8.1.6": "^8.1.6"
+  "brace-expansion@>=3.0.0 <5.0.12": "^5.0.12"
+  "picomatch@>=4.0.0 <4.0.4": "^4.0.4"
+  "browserslist@<4.28.7": "^4.28.7"
+  "baseline-browser-mapping@<2.11.0": "^2.11.0"
+  "@grpc/grpc-js@<1.13.6": "^1.13.6"
+  "fflate@>=0.7.0 <0.7.5": "^0.7.5"
+  "postcss-selector-parser@<6.1.5": "^6.1.5"

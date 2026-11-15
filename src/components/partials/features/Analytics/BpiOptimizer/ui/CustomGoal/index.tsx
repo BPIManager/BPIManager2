@@ -49,41 +49,44 @@ const CustomGoalCreator = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
-  const [preview, setPreview] = useState<OptimizationResult | null>(null);
-  const [isPreviewLoading, setIsPreviewLoading] = useState(false);
-  const [previewError, setPreviewError] = useState(false);
-  const requestIdRef = useRef(0);
+  // 取得結果は非同期コールバックでのみ更新し、表示用の preview / loading / error は現在の入力(key)から導く
+  const [previewState, setPreviewState] = useState<{
+    key: string;
+    result: OptimizationResult | null;
+    error: boolean;
+  } | null>(null);
+  const previewKey =
+    user?.userId && targets.length > 0
+      ? JSON.stringify(targets.map((t) => [t.songId, t.toExScore]))
+      : null;
+  const preview = previewKey ? (previewState?.result ?? null) : null;
+  const previewError =
+    previewKey !== null && previewState?.key === previewKey && previewState.error;
+  const isPreviewLoading = previewKey !== null && previewState?.key !== previewKey;
 
   useEffect(() => {
-    if (!user?.userId || targets.length === 0) {
-      setPreview(null);
-      setPreviewError(false);
-      return;
-    }
-    const requestId = ++requestIdRef.current;
-    setIsPreviewLoading(true);
-    setPreviewError(false);
+    if (!previewKey || !user?.userId) return;
+    let cancelled = false;
     fetchCustomGoalPreview(
       user.userId,
       fbUser,
       targets.map((t) => ({ songId: t.songId, toExScore: t.toExScore })),
     )
       .then((result) => {
-        if (requestIdRef.current === requestId) setPreview(result);
+        if (!cancelled) setPreviewState({ key: previewKey, result, error: false });
       })
       .catch(() => {
-        if (requestIdRef.current === requestId) {
-          setPreview(null);
-          setPreviewError(true);
-          toast.error(t("optimizer.customGoal.previewFailed"));
-        }
-      })
-      .finally(() => {
-        if (requestIdRef.current === requestId) setIsPreviewLoading(false);
+        if (cancelled) return;
+        setPreviewState({ key: previewKey, result: null, error: true });
+        toast.error(t("optimizer.customGoal.previewFailed"));
       });
+    return () => {
+      cancelled = true;
+    };
     // t()はcatch内でのみ使う（依存に含めると毎レンダー新しい関数参照になり無限リクエストの原因になる）
+    // targets は previewKey から導かれるため、キーが変わったときだけ再取得する
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [targets, user?.userId, fbUser]);
+  }, [previewKey, user?.userId, fbUser]);
 
   useEffect(() => {
     onDirtyChange?.(targets.length > 0);
