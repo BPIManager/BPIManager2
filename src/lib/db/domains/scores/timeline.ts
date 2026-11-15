@@ -19,73 +19,50 @@ class ScoreTimelineRepository {
     difficultyLevel?: number;
   }) {
     const { userId, currentVersion, excludeCurrent, difficultyLevel } = params;
-    let latestPerVersionSub = db
+
+    // 派生テーブルを重ねた単一SQLは、MariaDBで scores 全走査の実行計画になり得るため、
+    // ユーザーの全ログを covering index で取得し、最良ログの選択はアプリ側で行う。
+    let logsQuery = db
       .selectFrom("scores as sc")
-      .select([
-        "sc.songId",
-        "sc.version",
-        (eb) => eb.fn.max("sc.logId").as("latestLogId"),
-      ])
+      .select(["sc.songId", "sc.version", "sc.logId", "sc.exScore"])
       .where("sc.userId", "=", userId);
-
     if (excludeCurrent) {
-      latestPerVersionSub = latestPerVersionSub.where(
-        "sc.version",
-        "!=",
-        currentVersion,
-      );
+      logsQuery = logsQuery.where("sc.version", "!=", currentVersion);
     }
-
     if (difficultyLevel !== undefined) {
-      latestPerVersionSub = latestPerVersionSub.where(
-        "sc.songId",
-        "in",
-        (eb) =>
-          eb
-            .selectFrom("songs")
-            .select("songId")
-            .where("difficultyLevel", "=", difficultyLevel),
+      logsQuery = logsQuery
+        .innerJoin("songs as sg", "sg.songId", "sc.songId")
+        .where("sg.difficultyLevel", "=", difficultyLevel);
+    }
+    const logs = await logsQuery.execute();
+    if (logs.length === 0) return [];
+
+    // 各譜面について、バージョンごとの最新ログのEXの最大値を求め、
+    // そのEXを持つログのうち最新(logId最大)を代表ログとする
+    const latestPerVersion = new Map<string, { logId: number; exScore: number }>();
+    for (const l of logs) {
+      const key = `${l.songId}:${l.version}`;
+      const cur = latestPerVersion.get(key);
+      if (!cur || l.logId > cur.logId) {
+        latestPerVersion.set(key, { logId: l.logId, exScore: l.exScore });
+      }
+    }
+    const bestEx = new Map<number, number>();
+    for (const [key, v] of latestPerVersion) {
+      const songId = Number(key.split(":")[0]);
+      bestEx.set(songId, Math.max(bestEx.get(songId) ?? -1, v.exScore));
+    }
+    const representative = new Map<number, number>();
+    for (const l of logs) {
+      if (l.exScore !== bestEx.get(l.songId)) continue;
+      representative.set(
+        l.songId,
+        Math.max(representative.get(l.songId) ?? -1, l.logId),
       );
     }
 
-    const latestPerVersion = latestPerVersionSub
-      .groupBy(["sc.songId", "sc.version"])
-      .as("lpv");
-    const bestLogSub = db
-      .selectFrom("scores as s2")
-      .innerJoin(latestPerVersion, (join) =>
-        join
-          .onRef("s2.logId", "=", "lpv.latestLogId")
-          .onRef("s2.songId", "=", "lpv.songId"),
-      )
-      .select([
-        "s2.songId as b_songId",
-        (eb) => eb.fn.max("s2.exScore").as("bestExScore"),
-      ])
-      .groupBy("s2.songId")
-      .as("best");
-    const bestScoreRow = db
-      .selectFrom("scores as bs")
-      .innerJoin(bestLogSub, (join) =>
-        join
-          .onRef("bs.songId", "=", "best.b_songId")
-          .onRef("bs.exScore", "=", "best.bestExScore"),
-      )
-      .where("bs.userId", "=", userId)
-      .select([
-        "bs.songId as r_songId",
-        (eb) => eb.fn.max("bs.logId").as("r_logId"),
-      ])
-      .groupBy("bs.songId")
-      .as("bestRow");
-
-    const rows = await db
+    return await db
       .selectFrom("scores as sc2")
-      .innerJoin(bestScoreRow, (join) =>
-        join
-          .onRef("sc2.logId", "=", "bestRow.r_logId")
-          .onRef("sc2.songId", "=", "bestRow.r_songId"),
-      )
       .innerJoin("songs as sg", "sg.songId", "sc2.songId")
       .leftJoin("songDef as sd", (join) =>
         join.onRef("sd.songId", "=", "sc2.songId").on("sd.isCurrent", "=", 1),
@@ -108,9 +85,8 @@ class ScoreTimelineRepository {
         "sd.sigma",
         "sd.residualVar",
       ])
+      .where("sc2.logId", "in", [...representative.values()])
       .execute();
-
-    return rows;
   }
 
   /**

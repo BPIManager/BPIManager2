@@ -316,6 +316,43 @@ describe("timelineRepo.getBestEverScores", () => {
       ),
     ).toBe(true);
   });
+
+  it("譜面ごとに、バージョン別の最新ログのEX最大値を持つ最新ログだけを詳細取得すること", async () => {
+    // 同じ行が全クエリの結果として返るスパイなので、1回目(ログ一覧)の入力だけを検証する
+    dbHolder.current = createDbSpy([
+      { songId: 1, version: "32", logId: 5, exScore: 2100 },
+      { songId: 1, version: "33", logId: 10, exScore: 2000 },
+      { songId: 1, version: "33", logId: 11, exScore: 2100 },
+      { songId: 1, version: "34", logId: 20, exScore: 2050 },
+      // 34の最新は1400。古い1500はバージョン内の最新ではないため最良に数えない
+      { songId: 2, version: "34", logId: 30, exScore: 1500 },
+      { songId: 2, version: "34", logId: 31, exScore: 1400 },
+    ]);
+    await timelineRepo.getBestEverScores({
+      userId: "user-1",
+      currentVersion: "34",
+      excludeCurrent: false,
+    });
+    const inCall = callsFor(dbHolder.current.calls, "where").find(
+      (c) => c.args[0] === "sc2.logId" && c.args[1] === "in",
+    );
+    expect(inCall?.args[2]).toEqual([11, 31]);
+  });
+
+  it("ログが1件も無い場合は詳細取得を行わず空配列を返すこと", async () => {
+    dbHolder.current = createDbSpy([]);
+    const result = await timelineRepo.getBestEverScores({
+      userId: "user-1",
+      currentVersion: "34",
+      excludeCurrent: false,
+    });
+    expect(result).toEqual([]);
+    expect(
+      callsFor(dbHolder.current.calls, "where").some(
+        (c) => c.args[0] === "sc2.logId",
+      ),
+    ).toBe(false);
+  });
 });
 
 describe("timelineRepo.getVersionComparisons", () => {
