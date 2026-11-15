@@ -155,3 +155,70 @@ describe("bpmBandListQuery / radarCategoryListQuery", () => {
     expect(match(withBpm("150", null), q)).toBe(false);
   });
 });
+
+describe("ライバル比較（scoreFilterScope=either）", () => {
+  const withRival = (
+    mine: [number | null, number | null],
+    rival: [number | null, number | null] | null,
+  ) =>
+    ({
+      ...song(mine[0], mine[1]),
+      rival: rival
+        ? { exScore: rival[0], bpi: rival[1], clearState: null, missCount: null, lastPlayed: null }
+        : null,
+    }) as unknown as SongWithScore;
+  const aaa = rankListQuery("AAA");
+  const params = (scope?: "either"): FilterParamsFrontend => ({
+    ...toParams(aaa),
+    scoreFilterScope: scope,
+  });
+  // notes=1000 → AAA は 1778〜1888 付近
+  const AAA = 1800;
+  const LOW = 1000;
+
+  it("either: 自分だけが条件を満たす譜面を残す", () => {
+    expect(filterSongsFrontend([withRival([AAA, 30], [LOW, 0])], params("either"))).toHaveLength(1);
+  });
+
+  it("either: ライバルだけが条件を満たす譜面も残す", () => {
+    expect(filterSongsFrontend([withRival([LOW, 0], [AAA, 30])], params("either"))).toHaveLength(1);
+  });
+
+  it("either: どちらも満たさない・ライバル未プレイで自分も満たさない譜面は除く", () => {
+    expect(filterSongsFrontend([withRival([LOW, 0], [LOW, 0])], params("either"))).toHaveLength(0);
+    expect(filterSongsFrontend([withRival([LOW, 0], null)], params("either"))).toHaveLength(0);
+  });
+
+  it("scope 未指定なら従来どおり自分のスコアだけで判定する", () => {
+    expect(filterSongsFrontend([withRival([LOW, 0], [AAA, 30])], params())).toHaveLength(0);
+    expect(filterSongsFrontend([withRival([AAA, 30], [LOW, 0])], params())).toHaveLength(1);
+  });
+});
+
+describe("scoreListTarget", () => {
+  it("リンク未指定は自分の一覧(/my/[version])へ、クエリはそのまま渡す", async () => {
+    const { scoreListTarget } = await import("@/utils/dashboard/scoreListLink");
+    expect(scoreListTarget(undefined, "34", { isMyPlayed: "true", page: "1" })).toEqual({
+      pathname: "/my/34",
+      query: { isMyPlayed: "true", page: "1" },
+    });
+  });
+
+  it("ユーザーページは指定のパスへ、クエリはそのまま渡す", async () => {
+    const { scoreListTarget } = await import("@/utils/dashboard/scoreListLink");
+    const link = { pathname: (v: string) => `/users/u1/scores/${v}` };
+    expect(scoreListTarget(link, "34", { isMyPlayed: "true" })).toEqual({
+      pathname: "/users/u1/scores/34",
+      query: { isMyPlayed: "true" },
+    });
+  });
+
+  it("rivalEither は自分がプレイ済みの条件を外し、scoreFilterScope=either を付ける", async () => {
+    const { scoreListTarget } = await import("@/utils/dashboard/scoreListLink");
+    const link = { pathname: (v: string) => `/rivals/r1/scores/${v}`, rivalEither: true };
+    expect(scoreListTarget(link, "34", { isMyPlayed: "true", radarCategories: "NOTES" })).toEqual({
+      pathname: "/rivals/r1/scores/34",
+      query: { radarCategories: "NOTES", scoreFilterScope: "either" },
+    });
+  });
+});

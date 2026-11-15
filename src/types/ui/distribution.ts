@@ -1,3 +1,4 @@
+import type { ScoreListLink } from "@/utils/dashboard/scoreListLink";
 export type RankDisplayMode = "rank" | "scoreRate";
 
 export interface DistributionSectionProps {
@@ -10,4 +11,6 @@ export interface DistributionSectionProps {
   onModeChange?: (mode: RankDisplayMode) => void;
   /** 自分のダッシュボードのみ true。ツールチップに「スコア一覧を表示」ボタンを出す */
   showListAction?: boolean;
+  /** 一覧の遷移先。未指定は自分の一覧 */
+  listLink?: ScoreListLink;
 }

@@ -11,7 +11,11 @@ import { cn } from "@/lib/utils";
 import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { useRouter } from "next/router";
-import { radarCategoryListQuery } from "@/utils/dashboard/scoreListLink";
+import {
+  radarCategoryListQuery,
+  scoreListTarget,
+  type ScoreListLink,
+} from "@/utils/dashboard/scoreListLink";
 import { clickableProps } from "@/utils/common/clickableProps";
 
 interface RadarSectionProps {
@@ -20,6 +24,8 @@ interface RadarSectionProps {
   rivalName?: string;
   /** 自分のダッシュボードのみ true。カテゴリのツールチップに「対象曲一覧を表示」を出す */
   showListAction?: boolean;
+  /** 一覧の遷移先。未指定は自分の一覧 */
+  listLink?: ScoreListLink;
 }
 
 const RadarSection = ({
@@ -27,6 +33,7 @@ const RadarSection = ({
   rivalUserId,
   rivalName,
   showListAction = false,
+  listLink,
 }: RadarSectionProps) => {
   const router = useRouter();
   const { version, levels, diffs, compareVersion } = useStatsFilter();
@@ -50,15 +57,14 @@ const RadarSection = ({
   const isRivalMode = !!effectiveRivalUserId;
 
   const goToList = (category: RadarCategory) =>
-    router.push({
-      pathname: `/my/${version}`,
-      query: {
+    router.push(
+      scoreListTarget(listLink, version, {
         ...radarCategoryListQuery(category),
         levels: levels.join(","),
         difficulties: diffs.join(","),
         page: "1",
-      },
-    });
+      }),
+    );
 
   const sortedData = useMemo(() => {
     if (!radar) return [];
