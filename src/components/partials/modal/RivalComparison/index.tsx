@@ -143,6 +143,7 @@ const RivalComparisonModal = ({
                 rivalId={rivalId ?? undefined}
                 myName={user?.userName}
                 rivalName={profile?.userName}
+                defaultExpanded={false}
               />
 
               <div className="flex flex-col gap-3">
