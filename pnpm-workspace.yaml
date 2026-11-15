@@ -32,5 +32,3 @@ overrides:
   "@grpc/grpc-js@<1.13.6": "^1.13.6"
   "fflate@>=0.7.0 <0.7.5": "^0.7.5"
   "postcss-selector-parser@<6.1.5": "^6.1.5"
-  # 7.1 で set-state-in-effect 等の検出が厳しくなり既存コードが lint エラーになるため、対応するまで固定
-  "eslint-plugin-react-hooks": "7.0.1"
