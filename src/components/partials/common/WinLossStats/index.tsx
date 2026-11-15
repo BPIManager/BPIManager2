@@ -264,7 +264,9 @@ const WinLossStats = ({
   rivalName,
 }: WinLossStatsProps) => {
   const { t } = useTranslation();
-  const [expandedLevels, setExpandedLevels] = useState<Set<number>>(new Set());
+  const [expandedLevels, setExpandedLevels] = useState<Set<number>>(
+    new Set([11, 12]),
+  );
 
   const toggleLevel = (lv: number) =>
     setExpandedLevels((prev) => {
