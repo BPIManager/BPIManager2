@@ -17,6 +17,7 @@ import IidxTowerComparisonSection from "@/components/partials/common/DashBoard/I
 import { TabsContent } from "@/components/ui/tabs";
 import { useRivalComparison } from "@/hooks/social/useRivalComparison";
 import { WinLossStats } from "@/components/partials/common/WinLossStats";
+import { WinLossStatsSkeleton } from "@/components/partials/common/WinLossStats/skeleton";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 function RivalOverviewTab({
@@ -30,7 +31,7 @@ function RivalOverviewTab({
   rivalUserId: string;
   rivalName?: string;
 }) {
-  const { data } = useRivalComparison(rivalUserId);
+  const { data, isLoading } = useRivalComparison(rivalUserId);
   const { t } = useTranslation();
   const winLoss = data?.compare?.winLoss;
 
@@ -38,7 +39,11 @@ function RivalOverviewTab({
     <div className="flex flex-col gap-6">
       <DashBoardFilter />
 
-      {winLoss && winLoss.length > 0 && (
+      {isLoading ? (
+        <div className="rounded-2xl border border-bpim-border bg-bpim-bg/40 p-4 shadow-xl backdrop-blur-md">
+          <WinLossStatsSkeleton />
+        </div>
+      ) : winLoss && winLoss.length > 0 ? (
         <div className="rounded-2xl border border-bpim-border bg-bpim-bg/40 p-4 shadow-xl backdrop-blur-md">
           <WinLossStats
             winLossData={winLoss}
@@ -48,7 +53,7 @@ function RivalOverviewTab({
             rivalName={rivalName}
           />
         </div>
-      )}
+      ) : null}
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <RankDistributionSection

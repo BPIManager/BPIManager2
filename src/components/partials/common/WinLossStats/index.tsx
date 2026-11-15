@@ -29,6 +29,8 @@ export interface WinLossStatsProps {
   rivalId?: string;
   myName?: string;
   rivalName?: string;
+  /** 勝敗推移グラフを初期表示で開くか（未指定は開く） */
+  defaultExpanded?: boolean;
 }
 
 interface StatBoxProps {
@@ -262,9 +264,12 @@ const WinLossStats = ({
   rivalId,
   myName,
   rivalName,
+  defaultExpanded = true,
 }: WinLossStatsProps) => {
   const { t } = useTranslation();
-  const [expandedLevels, setExpandedLevels] = useState<Set<number>>(new Set());
+  const [expandedLevels, setExpandedLevels] = useState<Set<number>>(
+    new Set(defaultExpanded ? [11, 12] : []),
+  );
 
   const toggleLevel = (lv: number) =>
     setExpandedLevels((prev) => {
