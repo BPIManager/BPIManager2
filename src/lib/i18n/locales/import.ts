@@ -172,11 +172,17 @@ export const importTranslations = {
     "zh-TW": "IIDX 官方網站",
     ko: "IIDX 공식 사이트",
   },
+  "import.instruction.infinitas.step1.official": {
+    ja: "INFINITAS公式サイトから出力したCSV、または",
+    en: "A CSV exported from the INFINITAS official site, or from ",
+    "zh-TW": "從 INFINITAS 官方網站匯出的 CSV，或從",
+    ko: "INFINITAS 공식 사이트에서 내보낸 CSV, 또는 ",
+  },
   "import.instruction.infinitas.step1.suffix": {
     ja: "から出力されるCSVまたはTSVを用意します。",
-    en: ": Prepare a CSV or TSV exported from one of these tools.",
-    "zh-TW": ": 準備從其中一個工具匯出的 CSV 或 TSV 檔案。",
-    ko: ": 해당 도구에서 내보낸 CSV 또는 TSV를 준비합니다.",
+    en: ": Prepare the CSV or TSV.",
+    "zh-TW": "匯出的 CSV 或 TSV 檔案。",
+    ko: "에서 내보낸 CSV 또는 TSV를 준비합니다.",
   },
   "import.instruction.infinitas.step2": {
     ja: "保存先バージョンを「INFINITAS」へ変更します。",

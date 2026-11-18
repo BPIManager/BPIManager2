@@ -46,7 +46,7 @@ export const detectCsvType = (text: string): CsvType => {
 };
 
 export const CSV_TYPE_LABELS: Record<CsvType, string> = {
-  official: "公式CSV",
+  official: "アーケード公式CSV",
   reflux: "Reflux TSV",
   result_techo: "リザルト手帳 CSV",
   daken_counter: "打鍵カウンタ CSV",
@@ -78,7 +78,7 @@ export const validateCsvTypeForVersion = (
   const isInf = version === INFINITAS_VERSION;
 
   if (isInf && !INF_ALLOWED.includes(type)) {
-    return "INFINITASバージョンには公式CSVは使用できません。INFINITAS CSV・Reflux TSV・リザルト手帳CSV・打鍵カウンタCSVを貼り付けてください。";
+    return "INFINITASバージョンにはアーケードの公式CSVは使用できません。INFINITAS CSV・Reflux TSV・リザルト手帳CSV・打鍵カウンタCSVを貼り付けてください。";
   }
   if (!isInf && !NORMAL_ALLOWED.includes(type)) {
     return "このバージョンには INFINITAS CSV / Reflux TSV / リザルト手帳CSV / 打鍵カウンタCSVは使用できません。公式CSVを貼り付けてください。";
