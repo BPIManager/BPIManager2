@@ -3,7 +3,8 @@ import useSWR from "swr";
 import { List, type ListImperativeAPI } from "react-window";
 import { useUser } from "@/contexts/users/UserContext";
 import { useSongPatterns } from "@/hooks/songs/useSongPatterns";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
+import { unwrapApiResponse } from "@/services/swr/fetchV2";
 import type { SongListItem } from "@/types/songs/songInfo";
 import {
   PATTERN_ROW_HEIGHT,
@@ -27,13 +28,12 @@ function usePatternSearch(songId: number, input: string): PatternSearchResult {
     { score: number; rank: number; total: number } | null
   >(
     isValid
-      ? `${API_PREFIX}/songs/${songId}/patterns/search?q=${input}`
+      ? `${API_V2_PREFIX}/songs/${songId}/patterns/search?q=${input}`
       : null,
     async (url: string) => {
       const res = await fetch(url);
       if (res.status === 404) return null;
-      if (!res.ok) throw new Error("Failed to search pattern");
-      return res.json();
+      return unwrapApiResponse<{ score: number; rank: number; total: number }>(res);
     },
     { revalidateOnFocus: false },
   );

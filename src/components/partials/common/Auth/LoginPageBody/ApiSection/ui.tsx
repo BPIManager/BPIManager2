@@ -32,40 +32,56 @@ const ApiSection = () => {
             <span className="shrink-0 select-none text-bpim-primary">$</span>
             <span className="text-bpim-text">
               curl <span className="text-bpim-success">GET</span>{" "}
-              {`"${SITE_URL}/api/v1/users/abc123uid/scores?version=32"`}
+              {`"${SITE_URL}/api/v2/users/abc123uid/scores?version=32"`}
             </span>
           </div>
 
           <pre className="mt-2 text-bpim-muted">
-            {`[`}
+            {`{`}
             <br />
-            {`  {`}
+            {`  `}
+            <span className="text-bpim-info">{`"error"`}</span>:{" "}
+            <span className="text-bpim-danger">false</span>,
             <br />
-            {`    `}
+            {`  `}
+            <span className="text-bpim-info">{`"errorMessage"`}</span>:{" "}
+            <span className="text-bpim-danger">null</span>,
+            <br />
+            {`  `}
+            <span className="text-bpim-info">{`"body"`}</span>: {`[`}
+            <br />
+            {`    {`}
+            <br />
+            {`      `}
             <span className="text-bpim-info">{`"songId"`}</span>:{" "}
             <span className="text-bpim-danger">1024</span>,
             <br />
-            {`    `}
+            {`      `}
             <span className="text-bpim-info">{`"title"`}</span>:{" "}
             <span className="text-bpim-warning">{`"V"`}</span>,
             <br />
-            {`    `}
+            {`      `}
             <span className="text-bpim-info">{`"difficulty"`}</span>:{" "}
             <span className="text-bpim-warning">{`"ANOTHER"`}</span>,
             <br />
-            {`    `}
+            {`      `}
             <span className="text-bpim-info">{`"exScore"`}</span>:{" "}
             <span className="text-bpim-danger">2805</span>,
             <br />
-            {`    `}
+            {`      `}
             <span className="text-bpim-info">{`"bpi"`}</span>:{" "}
             <span className="text-bpim-danger">52.45</span>,
             <br />
-            {`    ...`}
+            {`      ...`}
             <br />
-            {`  }, ...`}
+            {`    }, ...`}
             <br />
-            {`]`}
+            {`  ],`}
+            <br />
+            {`  `}
+            <span className="text-bpim-info">{`"meta"`}</span>: {`{ ... }`}
+            <br />
+            {`}`}
           </pre>
         </div>
 

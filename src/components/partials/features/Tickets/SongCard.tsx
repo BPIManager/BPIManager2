@@ -4,7 +4,7 @@ import { useUser } from "@/contexts/users/UserContext";
 import RadarSectionChart from "@/components/partials/common/DashBoard/Radar";
 import { SONG_ATTRIBUTES_GLOBAL } from "@/constants/iidx/songAttributes";
 import { Badge } from "@/components/ui/badge";
-import { API_PREFIX } from "@/constants/logic/apiEndpoints";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { buildTextageUrl, buildChartViewerUrl } from "@/utils/songs/links";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import type { TicketSongResult, ScoreMode } from "@/types/tickets";
@@ -58,7 +58,7 @@ function SongCard({ song, totalBpi, ticketId, scoreMode }: SongCardProps) {
 
       try {
         const token = await fbUser.getIdToken();
-        const url = `${API_PREFIX}/songs/${song.songId}/patterns/${ticketId}/vote`;
+        const url = `${API_V2_PREFIX}/songs/${song.songId}/patterns/${ticketId}/vote`;
         const res = await fetch(url, {
           method: isUndo ? "DELETE" : "POST",
           headers: {
