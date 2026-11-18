@@ -38,18 +38,26 @@ export function err(
  *
  * @param options.in - schema が指すパラメータの置き場所
  * @param options.message - 指定するとメッセージを固定する
+ * @param options.jsonSchema - 指定すると、zod スキーマから生成する代わりにこの JSON Schema を載せる（生成で落ちる列挙値を補った場合など）
  */
 export function invalidParams(
   error: z.ZodError,
   schema: z.ZodType,
-  options: { in?: "query" | "body"; message?: string; fallback?: string } = {},
+  options: {
+    in?: "query" | "body";
+    message?: string;
+    fallback?: string;
+    jsonSchema?: unknown;
+  } = {},
 ): HandlerResult<never> {
-  let jsonSchema: unknown;
-  try {
-    jsonSchema = z.toJSONSchema(schema, { io: "input", unrepresentable: "any" });
-  } catch {
-    // 変換できない型があっても、エラー応答そのものは必ず返す
-    jsonSchema = undefined;
+  let jsonSchema: unknown = options.jsonSchema;
+  if (jsonSchema === undefined) {
+    try {
+      jsonSchema = z.toJSONSchema(schema, { io: "input", unrepresentable: "any" });
+    } catch {
+      // 変換できない型があっても、エラー応答そのものは必ず返す
+      jsonSchema = undefined;
+    }
   }
   return err(
     400,
@@ -67,6 +75,31 @@ export function invalidParams(
       ...(jsonSchema ? { schema: jsonSchema } : {}),
     },
   );
+}
+
+/**
+ * 必須パラメータが無い（400）。どのパラメータが必要か（issues）と、受け付けるパラメータの JSON Schema を付ける。
+ *
+ * @param names - 不足しているパラメータ名（「いずれか」の場合は候補を並べる）
+ * @param schema - 受け付けるパラメータの JSON Schema
+ * @param options.hint - issues に載せる説明文
+ */
+export function missingParams(
+  names: string[],
+  schema: unknown,
+  options: { in?: "query" | "body"; message?: string; hint?: string } = {},
+): HandlerResult<never> {
+  return err(400, options.message ?? "Required parameters are missing", {
+    ...(options.in ? { in: options.in } : {}),
+    issues: [
+      {
+        path: names,
+        code: "missing_parameters",
+        message: options.hint ?? `${names.join(" / ")} is required`,
+      },
+    ],
+    schema,
+  });
 }
 
 /** クエリパラメータの検証エラー。メッセージは従来の "Invalid query parameters" 系と同じ */

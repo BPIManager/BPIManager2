@@ -1,11 +1,15 @@
 import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
-import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
+import {
+  parseStatsQueryV2,
+  statsQueryJsonSchema,
+} from "@/services/nextRequest/parseStatsQueries";
 import { handleStatsVersionCountDistribution } from "@/lib/subhandlers/stats";
 import {
   accessError,
   buildMeta,
   withMeta,
   writeV2Result,
+  missingParams,
 } from "@/middlewares/api/apiResult";
 
 export default withUserApiHandler(
@@ -14,10 +18,16 @@ export default withUserApiHandler(
       res.status(405).json({ message: "Method Not Allowed" });
       return null;
     }
-    const q = parseStatsQuery(req.query, res);
+    const q = parseStatsQueryV2(req.query, res);
     if (!q) return null;
     if (q.levels.length === 0 && q.difficulties.length === 0) {
-      res.status(400).json({ message: "Required parameters are missing" });
+      writeV2Result(
+        res,
+        missingParams(["level", "difficulty"], statsQueryJsonSchema(), {
+          in: "query",
+          hint: "level か difficulty の少なくとも一方を指定してください",
+        }),
+      );
       return null;
     }
     return q;

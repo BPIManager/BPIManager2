@@ -1,5 +1,5 @@
 import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
-import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
+import { parseStatsQueryV2 } from "@/services/nextRequest/parseStatsQueries";
 import { handleStatsRadar } from "@/lib/subhandlers/stats";
 import {
   accessError,
@@ -14,7 +14,7 @@ export default withUserApiHandler(
       res.status(405).end();
       return null;
     }
-    return parseStatsQuery(req.query, res);
+    return parseStatsQueryV2(req.query, res);
   },
   async (req, res, query, access) => {
     writeV2Result(

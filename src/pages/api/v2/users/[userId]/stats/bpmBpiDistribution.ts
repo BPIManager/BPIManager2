@@ -1,5 +1,5 @@
 import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
-import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
+import { parseStatsQueryV2 } from "@/services/nextRequest/parseStatsQueries";
 import { handleStatsBpmBpiDistribution } from "@/lib/subhandlers/stats";
 import {
   accessError,
@@ -10,7 +10,7 @@ import {
 
 export default withUserApiHandler(
   (req, res) => {
-    return parseStatsQuery(req.query, res);
+    return parseStatsQueryV2(req.query, res);
   },
   async (req, res, query, access) => {
     writeV2Result(
