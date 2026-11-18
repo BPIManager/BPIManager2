@@ -9,7 +9,7 @@ import { deleteBatch, BatchNotLatestError } from "@/lib/db/orchestrators/batchDe
 import { mapToLogNested } from "@/utils/logs/getMapNested";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 import { authenticateViewer } from "@/middlewares/api/withApi";
-import { accessError, err, ok } from "@/middlewares/api/apiResult";
+import { accessError, err, ok, invalidQuery } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import {
   batchDetailGetQuerySchema,
@@ -30,10 +30,7 @@ export async function handleBatchDetail(
   const parsed = batchDetailGetQuerySchema.safeParse(req.query);
   if (!parsed.success) {
     return {
-      result: err(
-        400,
-        parsed.error.issues[0]?.message ?? "Invalid query parameters",
-      ),
+      result: invalidQuery(parsed.error, batchDetailGetQuerySchema),
       targetUserId: targetOf(req),
       viewerId: null,
     };
@@ -135,10 +132,7 @@ export async function handleBatchDelete(
   const parsed = batchDetailDeleteQuerySchema.safeParse(req.query);
   if (!parsed.success) {
     return {
-      result: err(
-        400,
-        parsed.error.issues[0]?.message ?? "Invalid query parameters",
-      ),
+      result: invalidQuery(parsed.error, batchDetailDeleteQuerySchema),
       targetUserId: targetOf(req),
       viewerId: null,
     };

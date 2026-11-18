@@ -1,6 +1,6 @@
 import type { NextApiRequest } from "next";
 import { savedComparisonsRepo } from "@/lib/db/domains/savedComparisons";
-import { err, ok } from "@/middlewares/api/apiResult";
+import { err, ok, invalidBody } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { createSavedComparisonBodySchema } from "@/schemas/savedComparisons";
 import {
@@ -45,7 +45,7 @@ export async function handleCreateSavedComparison(
   const parsed = createSavedComparisonBodySchema.safeParse(req.body);
   if (!parsed.success) {
     return {
-      result: err(400, parsed.error.issues[0]?.message ?? "Invalid request body"),
+      result: invalidBody(parsed.error, createSavedComparisonBodySchema),
       targetUserId: uid,
       viewerId: uid,
     };

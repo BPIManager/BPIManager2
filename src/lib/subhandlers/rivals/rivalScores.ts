@@ -3,7 +3,7 @@ import { radarTopOf } from "@/constants/iidx/radars/topElements";
 import { rivalPairwiseRepo } from "@/lib/db/aggregates/rivalScores/pairwise";
 import { sortSongs } from "@/utils/songs/sort";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
-import { accessError, err, ok } from "@/middlewares/api/apiResult";
+import { accessError, err, ok, invalidQuery } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { rivalScoresQuerySchema } from "@/schemas/rivals/query";
 import { targetOf, type HandleOutcome } from "./_shared";
@@ -15,10 +15,7 @@ export async function handleRivalScores(
   const parsed = rivalScoresQuerySchema.safeParse(req.query);
   if (!parsed.success) {
     return {
-      result: err(
-        400,
-        parsed.error.issues[0]?.message ?? "Invalid query parameters",
-      ),
+      result: invalidQuery(parsed.error, rivalScoresQuerySchema),
       targetUserId,
       viewerId: null,
     };

@@ -7,7 +7,7 @@ import { BpiCalculator } from "@/lib/bpi";
 import { isScoreImproved } from "@/lib/scores/evaluateImprovement";
 import { scoresManualBodySchema } from "@/schemas/scores/manual";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
-import { err, ok } from "@/middlewares/api/apiResult";
+import { err, ok, invalidBody } from "@/middlewares/api/apiResult";
 import type { AuthenticatedNextApiRequest } from "@/middlewares/api/withAuth";
 import type { IBpiScoreObservation } from "@/types/songs/bpi";
 import { type HandleOutcome } from "./_shared";
@@ -39,10 +39,7 @@ export async function handleScoreManualUpdate(
   const parsed = scoresManualBodySchema.safeParse(req.body);
   if (!parsed.success) {
     return {
-      result: err(
-        400,
-        parsed.error.issues[0]?.message ?? "Invalid request body",
-      ),
+      result: invalidBody(parsed.error, scoresManualBodySchema),
       ...base,
     };
   }

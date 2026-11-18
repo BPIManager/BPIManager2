@@ -1,6 +1,6 @@
 import type { NextApiRequest } from "next";
 import { submitFollowRequest } from "@/lib/db/orchestrators/followRequestSubmission";
-import { err, ok } from "@/middlewares/api/apiResult";
+import { err, ok, invalidBody } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { followRequestSubmitSchema } from "@/schemas/followRequests/submit";
 import { authUidOf, type HandleOutcome } from "./_shared";
@@ -15,10 +15,7 @@ export async function handleSubmitFollowRequest(
   if (!parsed.success) {
     return {
       ...base,
-      result: err(
-        400,
-        parsed.error.issues[0]?.message ?? "Invalid request body",
-      ),
+      result: invalidBody(parsed.error, followRequestSubmitSchema),
     };
   }
   try {

@@ -4,7 +4,7 @@ import dayjs from "@/lib/dayjs";
 import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import { socialWinLossRepo } from "@/lib/db/aggregates/rivalScores/winLoss";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
-import { accessError, err, ok } from "@/middlewares/api/apiResult";
+import { accessError, err, ok, invalidQuery } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { targetOf, type HandleOutcome } from "./_shared";
 
@@ -38,10 +38,7 @@ export async function handleRivalWinLossHistory(
   const parsed = winLossHistoryQuerySchema.safeParse(req.query);
   if (!parsed.success) {
     return {
-      result: err(
-        400,
-        parsed.error.issues[0]?.message ?? "Invalid query parameters",
-      ),
+      result: invalidQuery(parsed.error, winLossHistoryQuerySchema),
       targetUserId,
       viewerId: null,
     };

@@ -2,7 +2,7 @@ import type { AccessResult } from "@/middlewares/api/withApi";
 import type { HandleOutcome, ProfileResponse } from "./_shared";
 import type { HandlerResult } from "@/types/api";
 import type { NextApiRequest } from "next";
-import { accessError } from "@/middlewares/api/apiResult";
+import { accessError, invalidBody } from "@/middlewares/api/apiResult";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { getUserAreaRank } from "@/lib/arena/prefectureRankings";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
@@ -72,7 +72,7 @@ async function upsertProfile(
 ): Promise<HandlerResult<unknown>> {
   const parsed = profileUpsertSchema.safeParse(req.body);
   if (!parsed.success) {
-    return err(400, parsed.error.issues[0]?.message ?? "Invalid request body");
+    return invalidBody(parsed.error, profileUpsertSchema);
   }
 
   const { arenaPrivacy, ...profileData } = parsed.data;

@@ -1,4 +1,4 @@
-import { BpiV2, type ChartV2, type PlayedScoreV2 } from "@bpim/bpicalc";
+import { BpiV1, BpiV2, type ChartV2, type PlayedScoreV2 } from "@bpim/bpicalc";
 import type {
   IBpiBasicSongData,
   IBpiScoreObservation,
@@ -30,6 +30,8 @@ export class BpiCalculator {
     arenaPopulationSize: NEW_BPI_ARENA_POPULATION_SIZE,
   });
 
+  private static readonly v1 = new BpiV1();
+
   private static toChart(song: IBpiBasicSongData): ChartV2 {
     return {
       notes: song.notes,
@@ -51,6 +53,24 @@ export class BpiCalculator {
    */
   public static calc(s: number, song: IBpiBasicSongData): number | null {
     return this.v2.chart(this.toChart(song)).bpi(s);
+  }
+
+  /**
+   * 旧モデル（V1: 皆伝平均とWRスコアの2アンカー）で単曲 BPI を計算する。比較・検証用で、アプリの表示値は {@link calc}（V2）を使う。
+   *
+   * @param s - プレイヤーの EX スコア
+   * @param song - 楽曲データ（`mu`/`sigma` は不要）
+   * @returns BPI 値。皆伝平均・WR が未設定なら `-15`、スコアが最大値を超えるなら `null`
+   */
+  public static calcV1(s: number, song: IBpiBasicSongData): number | null {
+    return this.v1
+      .chart({
+        notes: song.notes,
+        kaidenAvg: song.kaidenAvg,
+        wrScore: song.wrScore,
+        coef: song.coef ?? null,
+      })
+      .bpi(s);
   }
 
   /**

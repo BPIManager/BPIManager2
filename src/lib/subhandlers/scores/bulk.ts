@@ -12,7 +12,7 @@ import { BpiCalculator } from "@/lib/bpi";
 import { isScoreImproved } from "@/lib/scores/evaluateImprovement";
 import { scoresBulkBodySchema } from "@/schemas/scores/bulk";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
-import { err, ok } from "@/middlewares/api/apiResult";
+import { err, ok, invalidBody } from "@/middlewares/api/apiResult";
 import { type HandleOutcome } from "./_shared";
 import type { AuthenticatedNextApiRequest } from "@/middlewares/api/withAuth";
 import type { NewScore, NewAllScores } from "@/types/db";
@@ -26,10 +26,7 @@ export async function handleScoresBulk(
   const parsed = scoresBulkBodySchema.safeParse(req.body);
   if (!parsed.success) {
     return {
-      result: err(
-        400,
-        parsed.error.issues[0]?.message ?? "Invalid request body",
-      ),
+      result: invalidBody(parsed.error, scoresBulkBodySchema),
       ...base,
     };
   }

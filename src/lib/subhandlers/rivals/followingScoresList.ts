@@ -1,6 +1,6 @@
 import type { NextApiRequest } from "next";
 import { rivalPairwiseRepo } from "@/lib/db/aggregates/rivalScores/pairwise";
-import { err, ok } from "@/middlewares/api/apiResult";
+import { err, ok, invalidQuery } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { scoreComparisonQuerySchema } from "@/schemas/rivals/following/scores/query";
 import { authUidOf, normalizeArr, type HandleOutcome } from "./_shared";
@@ -15,10 +15,7 @@ export async function handleRivalFollowingScoresList(
   if (!parsed.success) {
     return {
       ...base,
-      result: err(
-        400,
-        parsed.error.issues[0]?.message ?? "Invalid query parameters",
-      ),
+      result: invalidQuery(parsed.error, scoreComparisonQuerySchema),
     };
   }
   const {

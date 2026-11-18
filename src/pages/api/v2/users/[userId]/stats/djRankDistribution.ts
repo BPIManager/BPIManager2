@@ -1,5 +1,5 @@
 import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
-import { parseStatsQuery } from "@/services/nextRequest/parseStatsQueries";
+import { parseStatsQueryV2RequiringFilter } from "@/services/nextRequest/parseStatsQueries";
 import { handleStatsDjRankDistribution } from "@/lib/subhandlers/stats";
 import {
   accessError,
@@ -14,13 +14,7 @@ export default withUserApiHandler(
       res.status(405).json({ message: "Method Not Allowed" });
       return null;
     }
-    const q = parseStatsQuery(req.query, res);
-    if (!q) return null;
-    if (q.levels.length === 0 && q.difficulties.length === 0) {
-      res.status(400).json({ message: "Required parameters are missing" });
-      return null;
-    }
-    return q;
+    return parseStatsQueryV2RequiringFilter(req.query, res);
   },
   async (req, res, query, access) => {
     writeV2Result(

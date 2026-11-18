@@ -1,14 +1,20 @@
 import { z } from "zod";
 import { BpiCalculator } from "@/lib/bpi";
 import { getArenaAverages } from "@/lib/cache/arenaAverages";
-import { getSongWithDefCached } from "@/lib/cache/songDefs";
+import {
+  findSongWithDefByCorrectedTitle,
+  getSongWithDefCached,
+} from "@/lib/cache/songDefs";
 import { scoreActivityRepo } from "@/lib/db/domains/scores/activity";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 import { IIDX_VERSIONS, latestVersion } from "@/constants/iidx/iidxVersions";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
-import { err, ok } from "@/middlewares/api/apiResult";
+import { err, invalidParams, ok } from "@/middlewares/api/apiResult";
 import type { HandlerResult } from "@/types/api";
 import type { NextApiRequest } from "next";
+
+/** BPI の計算モデル。v1=皆伝平均とWRの2アンカー、v2=分布ベース、both=両方 */
+const BPI_MODELS = ["v1", "v2", "both"] as const;
 
 const bpiCalcQuerySchema = z.object({
   title: z.string().min(1),
@@ -22,28 +28,52 @@ const bpiCalcQuerySchema = z.object({
     .string()
     .optional()
     .transform((v) => v === "true"),
+  model: z.enum(BPI_MODELS).optional().default("v2"),
 });
 
-/** GET /bpi/calc */
+/**
+ * GET /bpi/calc
+ *
+ * @param options.allowModel - true のときだけ `model` パラメータを受け付ける（v2 ルート）。false では常に v2 で計算し、v1 ルートのレスポンスを変えない
+ * @param options.correctTitle - true のとき、曲名が完全一致しなければ INFINITAS の固定対応表で直して探し直し、見つかれば警告つきで結果を返す（v2 ルート）
+ */
 export async function handleBpiCalc(
   req: NextApiRequest,
+  options: { allowModel?: boolean; correctTitle?: boolean } = {},
 ): Promise<HandlerResult<unknown>> {
   const parsed = bpiCalcQuerySchema.safeParse(req.query);
   if (!parsed.success) {
-    return err(400, "Invalid parameters");
+    // 詳細（issues・JSON Schema）は v2 のレスポンスだけに載せる。v1 ルートは従来どおり message のみ
+    return options.allowModel
+      ? invalidParams(parsed.error, bpiCalcQuerySchema, { in: "query", message: "Invalid parameters" })
+      : err(400, "Invalid parameters");
   }
 
   const { title, difficulty, exScore, version, includeRank } = parsed.data;
+  const model = options.allowModel ? parsed.data.model : "v2";
 
   try {
-    const song = await getSongWithDefCached(title, difficulty);
+    let song = await getSongWithDefCached(title, difficulty);
+    const warnings: { code: string; message: string; requestedTitle: string; resolvedTitle: string }[] = [];
+    if (!song && options.correctTitle) {
+      const corrected = await findSongWithDefByCorrectedTitle(title, difficulty);
+      if (corrected) {
+        song = corrected;
+        warnings.push({
+          code: "TITLE_CORRECTED",
+          message: `曲名「${title}」は完全一致しなかったため、INFINITAS の表記の対応表で「${corrected.title}」として計算しました。アーケード公式CSVの表記で指定してください。`,
+          requestedTitle: title,
+          resolvedTitle: corrected.title,
+        });
+      }
+    }
     if (!song) return err(404, "Song not found");
 
     if (exScore > song.notes * 2) {
       return err(400, `exScore exceeds maximum (${song.notes * 2})`);
     }
 
-    const bpi = BpiCalculator.calc(exScore, {
+    const songData = {
       notes: song.notes,
       kaidenAvg: song.kaidenAvg ?? null,
       wrScore: song.wrScore ?? null,
@@ -51,10 +81,14 @@ export async function handleBpiCalc(
       mu: song.mu ?? null,
       sigma: song.sigma ?? null,
       residualVar: song.residualVar ?? null,
-    });
+    };
+    const bpiV2 = BpiCalculator.calc(exScore, songData);
+    const bpiV1 = BpiCalculator.calcV1(exScore, songData);
+    const bpi = model === "v1" ? bpiV1 : bpiV2;
 
+    // 推定順位は V2 の順位カーブに基づくため、V1 の値からは出さない
     const estimatedRankByFormula =
-      bpi !== null ? BpiCalculator.estimateRank(bpi) : null;
+      model !== "v1" && bpiV2 !== null ? BpiCalculator.estimateRank(bpiV2) : null;
 
     const { rank: bpimRank, total: bpimTotal } = includeRank
       ? await scoreActivityRepo.getSongBpimRank(song.songId, exScore, version)
@@ -77,8 +111,10 @@ export async function handleBpiCalc(
         notes: song.notes,
       },
       bpi,
+      ...(model === "both" ? { models: { v1: bpiV1, v2: bpiV2 } } : {}),
+      ...(warnings.length > 0 ? { warnings } : {}),
       rank: { estimatedRank: estimatedRankByFormula, bpimRank, bpimTotal },
-      metadata: { version, arenaAverages },
+      metadata: { version, arenaAverages, ...(options.allowModel ? { model } : {}) },
     });
   } catch (error: unknown) {
     console.error("BPI calc error:", error);
