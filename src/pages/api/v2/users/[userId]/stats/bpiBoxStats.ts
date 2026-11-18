@@ -1,32 +1,16 @@
 import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
-import {
-  parseStatsQueryV2,
-  statsQueryJsonSchema,
-} from "@/services/nextRequest/parseStatsQueries";
+import { parseStatsQueryV2RequiringFilter } from "@/services/nextRequest/parseStatsQueries";
 import { handleStatsBpiBoxStats } from "@/lib/subhandlers/stats";
 import {
   accessError,
   buildMeta,
   withMeta,
   writeV2Result,
-  missingParams,
 } from "@/middlewares/api/apiResult";
 
 export default withUserApiHandler(
   (req, res) => {
-    const q = parseStatsQueryV2(req.query, res);
-    if (!q) return null;
-    if (q.levels.length === 0 && q.difficulties.length === 0) {
-      writeV2Result(
-        res,
-        missingParams(["level", "difficulty"], statsQueryJsonSchema(), {
-          in: "query",
-          hint: "level か difficulty の少なくとも一方を指定してください",
-        }),
-      );
-      return null;
-    }
-    return q;
+    return parseStatsQueryV2RequiringFilter(req.query, res);
   },
   async (req, res, query, access) => {
     writeV2Result(

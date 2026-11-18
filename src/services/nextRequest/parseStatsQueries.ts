@@ -4,7 +4,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
 import type { StatsQuery } from "@/types/stats/query";
 import { statsQuerySchema } from "@/schemas/stats/query";
-import { invalidParams, writeV2Result } from "@/middlewares/api/apiResult";
+import { invalidParams, missingParams, writeV2Result } from "@/middlewares/api/apiResult";
 
 function safeParseStatsQuery(query: NextApiRequest["query"]) {
   return statsQuerySchema.safeParse({
@@ -74,4 +74,42 @@ export function parseStatsQueryV2(
     return null;
   }
   return toStatsQuery(parsed.data);
+}
+
+/**
+ * level か difficulty の少なくとも一方（空でない配列）が必要な stats 系の制約。
+ * 検証（hasLevelOrDifficulty）と JSON Schema（anyOf）を、ここで一緒に定義する。
+ */
+const hasLevelOrDifficulty = (q: StatsQuery) =>
+  q.levels.length > 0 || q.difficulties.length > 0;
+
+/** statsQueryJsonSchema に「level か difficulty の少なくとも一方が必須」を加えたもの */
+export function statsQueryJsonSchemaRequiringFilter(): unknown {
+  return {
+    ...(statsQueryJsonSchema() as object),
+    anyOf: [
+      { required: ["level"], properties: { level: { minItems: 1 } } },
+      { required: ["difficulty"], properties: { difficulty: { minItems: 1 } } },
+    ],
+  };
+}
+
+/** parseStatsQueryV2 に、level か difficulty の少なくとも一方が必要という検証を加えたもの。メッセージは従来どおり */
+export function parseStatsQueryV2RequiringFilter(
+  query: NextApiRequest["query"],
+  res: NextApiResponse,
+): StatsQuery | null {
+  const q = parseStatsQueryV2(query, res);
+  if (!q) return null;
+  if (!hasLevelOrDifficulty(q)) {
+    writeV2Result(
+      res,
+      missingParams(["level", "difficulty"], statsQueryJsonSchemaRequiringFilter(), {
+        in: "query",
+        hint: "level か difficulty の少なくとも一方を指定してください",
+      }),
+    );
+    return null;
+  }
+  return q;
 }

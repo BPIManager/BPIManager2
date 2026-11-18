@@ -178,6 +178,9 @@ importers:
       '@types/sharp':
         specifier: ^0.32.0
         version: 0.32.0(@types/node@20.19.43)
+      ajv:
+        specifier: ^8.20.0
+        version: 8.20.0
       eslint:
         specifier: ^9.39.5
         version: 9.39.5(jiti@2.7.0)(supports-color@7.2.0)
