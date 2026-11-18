@@ -12,7 +12,7 @@ const InstructionSection = () => {
       step: 1,
       text: (
         <>
-          「
+          {t("import.instruction.infinitas.step1.official")}「
           <a
             href="https://github.com/kaktuswald/inf-notebook/wiki"
             target="_blank"
