@@ -76,6 +76,10 @@ export async function handleSelfVersion(
       wrScore: row.wrScore !== null ? Number(row.wrScore) : null,
       kaidenAvg: row.kaidenAvg !== null ? Number(row.kaidenAvg) : null,
       coef: row.coef !== null ? Number(row.coef) : null,
+      // V2 の BPI 計算は譜面ごとの ALS パラメータが無いと null を返すため、比較先のグラフにも必要
+      mu: row.mu !== null ? Number(row.mu) : null,
+      sigma: row.sigma !== null ? Number(row.sigma) : null,
+      residualVar: row.residualVar !== null ? Number(row.residualVar) : null,
       rival: {
         exScore: prevEx,
         bpi: prevBpi,
