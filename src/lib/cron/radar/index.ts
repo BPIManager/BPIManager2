@@ -1,10 +1,14 @@
 import { calculateRadar, buildRadarSongMaster } from "@/lib/radar/calculator";
 import { computeCanonicalTotalBpi } from "@/lib/bpi/canonicalTotalBpi";
-import { latestVersion } from "@/constants/iidx/iidxVersions";
+import {
+  INFINITAS_VERSION,
+  latestVersion,
+} from "@/constants/iidx/iidxVersions";
 import { statsLatestScoresRepo } from "@/lib/db/aggregates/stats/latestScores";
 import { statsSongTablesRepo } from "@/lib/db/aggregates/stats/songTables";
 import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { usersRepo } from "@/lib/db/domains/users";
+import type { IIDXVersion } from "@/types/iidx/version";
 import {
   radarCacheRepo,
   type NewUserRadarCache,
@@ -16,17 +20,32 @@ import {
  */
 const USER_PAGE_SIZE = 200;
 
+/** レーダーキャッシュを作るバージョン。ライバル検索はキャッシュとの結合で絞るため、検索対象にできるバージョンに限る */
+const CACHE_VERSIONS = [latestVersion, INFINITAS_VERSION];
+
 /**
- * 全ユーザーのレーダーキャッシュを最新スコアから算出し、bulk UPSERTでまとめて書き込む。
- * ユーザーを USER_PAGE_SIZE ごとのページに区切り、ページ単位でスコアを取得してDBラウンドトリップを抑える。
+ * 全ユーザーのレーダーキャッシュを、CACHE_VERSIONS の各バージョンについて算出して書き込む。
  */
 export async function updateAllUserRadarCache() {
-  const version = latestVersion;
-  const [users, fullMaster, validSongKeys] = await Promise.all([
+  const [users, fullMaster] = await Promise.all([
     usersRepo.getAllUserIds(),
     songMasterRepo.getSongMasterWithDef(),
-    statsSongTablesRepo.getFilteredSongKeys(version),
   ]);
+  for (const version of CACHE_VERSIONS) {
+    await updateRadarCacheForVersion(version, users, fullMaster);
+  }
+}
+
+/**
+ * 指定バージョンの全ユーザーのレーダーキャッシュを最新スコアから算出し、bulk UPSERTでまとめて書き込む。
+ * ユーザーを USER_PAGE_SIZE ごとのページに区切り、ページ単位でスコアを取得してDBラウンドトリップを抑える。
+ */
+async function updateRadarCacheForVersion(
+  version: IIDXVersion,
+  users: { userId: string }[],
+  fullMaster: Awaited<ReturnType<typeof songMasterRepo.getSongMasterWithDef>>,
+) {
+  const validSongKeys = await statsSongTablesRepo.getFilteredSongKeys(version);
   const radarSongMaster = buildRadarSongMaster(fullMaster);
   const total = users.length;
   let done = 0;
@@ -114,6 +133,6 @@ export async function updateAllUserRadarCache() {
   await radarCacheRepo.deleteForUsers(staleUserIds, version);
 
   console.log(
-    `[Radar] Cache update done: ${pendingRows.length}/${total} users updated`,
+    `[Radar] Cache update done (${version}): ${pendingRows.length}/${total} users updated`,
   );
 }
