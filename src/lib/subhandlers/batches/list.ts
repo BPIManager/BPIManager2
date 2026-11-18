@@ -3,7 +3,7 @@ import { scoreTimelineRepo } from "@/lib/db/aggregates/scoreTimeline";
 import { statsSongTablesRepo } from "@/lib/db/aggregates/stats/songTables";
 import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { calculateTotalBpi } from "@/services/logs/calculateTotalBpi";
-import { err, ok } from "@/middlewares/api/apiResult";
+import { err, ok, invalidQuery } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { batchesQuerySchema } from "@/schemas/batches/query";
 import { targetOf, type HandleOutcome } from "./_shared";
@@ -20,10 +20,7 @@ export async function handleBatchesList(
   const parsed = batchesQuerySchema.safeParse(req.query);
   if (!parsed.success) {
     return {
-      result: err(
-        400,
-        parsed.error.issues[0]?.message ?? "Invalid query parameters",
-      ),
+      result: invalidQuery(parsed.error, batchesQuerySchema),
       targetUserId,
       viewerId,
     };

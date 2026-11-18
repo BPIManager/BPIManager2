@@ -1,7 +1,7 @@
 import type { NextApiRequest } from "next";
 import { socialTimelineRepo } from "@/lib/db/aggregates/rivalScores/feed";
 import { followListsRepo } from "@/lib/db/domains/followLists";
-import { err, ok } from "@/middlewares/api/apiResult";
+import { err, ok, invalidQuery } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { timelineQuerySchema } from "@/schemas/timeline/query";
 import type { AuthenticatedNextApiRequest } from "@/middlewares/api/withAuth";
@@ -28,10 +28,7 @@ export async function handleTimeline(
   const parsed = timelineQuerySchema.safeParse(normalizedQuery);
   if (!parsed.success) {
     return {
-      result: err(
-        400,
-        parsed.error.issues[0]?.message ?? "Invalid query parameters",
-      ),
+      result: invalidQuery(parsed.error, timelineQuerySchema),
       ...base,
     };
   }

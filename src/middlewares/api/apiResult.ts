@@ -32,20 +32,56 @@ export function err(
 }
 
 /**
- * クエリパラメータの検証エラー（400）を、不正なパラメータ（issues）と受け付けるパラメータの JSON Schema 付きで組み立てる。
+ * zod の検証エラー（400）を、不正なパラメータ（issues）と受け付けるパラメータの JSON Schema 付きで組み立てる。
+ * メッセージは従来どおり「最初の issue のメッセージ、無ければ fallback」で、既存のクライアントには影響しない。
  * schema には検証に使ったものと同じ zod スキーマを渡す（定義とずれない）。
+ *
+ * @param options.in - schema が指すパラメータの置き場所
+ * @param options.message - 指定するとメッセージを固定する
  */
 export function invalidParams(
   error: z.ZodError,
   schema: z.ZodType,
+  options: { in?: "query" | "body"; message?: string; fallback?: string } = {},
 ): HandlerResult<never> {
-  return err(400, "Invalid parameters", {
-    issues: error.issues.map((i) => ({
-      path: i.path.filter((p): p is string | number => typeof p !== "symbol"),
-      code: i.code,
-      message: i.message,
-    })),
-    schema: z.toJSONSchema(schema, { io: "input" }),
+  let jsonSchema: unknown;
+  try {
+    jsonSchema = z.toJSONSchema(schema, { io: "input", unrepresentable: "any" });
+  } catch {
+    // 変換できない型があっても、エラー応答そのものは必ず返す
+    jsonSchema = undefined;
+  }
+  return err(
+    400,
+    options.message ??
+      error.issues[0]?.message ??
+      options.fallback ??
+      "Invalid parameters",
+    {
+      ...(options.in ? { in: options.in } : {}),
+      issues: error.issues.map((i) => ({
+        path: i.path.filter((p): p is string | number => typeof p !== "symbol"),
+        code: i.code,
+        message: i.message,
+      })),
+      ...(jsonSchema ? { schema: jsonSchema } : {}),
+    },
+  );
+}
+
+/** クエリパラメータの検証エラー。メッセージは従来の "Invalid query parameters" 系と同じ */
+export function invalidQuery(error: z.ZodError, schema: z.ZodType) {
+  return invalidParams(error, schema, {
+    in: "query",
+    fallback: "Invalid query parameters",
+  });
+}
+
+/** リクエストボディの検証エラー。メッセージは従来の "Invalid request body" 系と同じ */
+export function invalidBody(error: z.ZodError, schema: z.ZodType) {
+  return invalidParams(error, schema, {
+    in: "body",
+    fallback: "Invalid request body",
   });
 }
 

@@ -1,7 +1,7 @@
 import type { NextApiRequest } from "next";
 import { logRangeRepo } from "@/lib/db/domains/logs/range";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
-import { accessError, err, ok } from "@/middlewares/api/apiResult";
+import { accessError, err, ok, invalidQuery } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { batchScoresQuerySchema } from "@/schemas/batches/query";
 import { handleLastPlayedBase, handleCreatedAtBase } from "./_dailyScores";
@@ -13,10 +13,7 @@ export async function handleBatchScores(
   const parsed = batchScoresQuerySchema.safeParse(req.query);
   if (!parsed.success) {
     return {
-      result: err(
-        400,
-        parsed.error.issues[0]?.message ?? "Invalid query parameters",
-      ),
+      result: invalidQuery(parsed.error, batchScoresQuerySchema),
       targetUserId: targetOf(req),
       viewerId: null,
     };

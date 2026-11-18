@@ -1,7 +1,7 @@
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { notificationsRepo } from "@/lib/db/domains/notifications";
 import { notificationsAggregateRepo } from "@/lib/db/aggregates/notifications";
-import { err, ok } from "@/middlewares/api/apiResult";
+import { ok, invalidQuery } from "@/middlewares/api/apiResult";
 import { notificationsQuerySchema } from "@/schemas/notifications/query";
 import type { HandlerResult } from "@/types/api";
 
@@ -22,10 +22,7 @@ export async function getNotifications(
 ): Promise<HandlerResult<NotificationRows>> {
   const parsed = notificationsQuerySchema.safeParse(rawQuery);
   if (!parsed.success) {
-    return err(
-      400,
-      parsed.error.issues[0]?.message ?? "Invalid query parameters",
-    );
+    return invalidQuery(parsed.error, notificationsQuerySchema);
   }
 
   const { type, page, limit } = parsed.data;

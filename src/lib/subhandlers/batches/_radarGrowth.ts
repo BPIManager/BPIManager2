@@ -5,7 +5,7 @@ import { scoreDetailRepo } from "@/lib/db/domains/scores/detail";
 import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { statsSongTablesRepo } from "@/lib/db/aggregates/stats/songTables";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
-import { accessError, err } from "@/middlewares/api/apiResult";
+import { accessError, err, invalidQuery } from "@/middlewares/api/apiResult";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 import { buildRadarSongMaster } from "@/lib/radar/calculator";
 import { targetOf, type HandleOutcome } from "./_shared";
@@ -120,7 +120,7 @@ export async function loadRadarGrowthContext<Q extends RadarGrowthQuery>(
   if (!parsed.success) {
     return {
       outcome: {
-        result: err(400, parsed.error.issues[0]?.message ?? "Invalid query parameters"),
+        result: invalidQuery(parsed.error, schema),
         targetUserId: targetOf(req),
         viewerId: null,
       },

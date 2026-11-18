@@ -45,7 +45,7 @@ export async function handleBpiCalc(
   if (!parsed.success) {
     // 詳細（issues・JSON Schema）は v2 のレスポンスだけに載せる。v1 ルートは従来どおり message のみ
     return options.allowModel
-      ? invalidParams(parsed.error, bpiCalcQuerySchema)
+      ? invalidParams(parsed.error, bpiCalcQuerySchema, { in: "query", message: "Invalid parameters" })
       : err(400, "Invalid parameters");
   }
 

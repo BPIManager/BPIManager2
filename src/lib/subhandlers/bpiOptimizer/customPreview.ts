@@ -4,7 +4,7 @@ import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { topElementMap } from "@/constants/iidx/radars/topElements";
 import { BpiCalculator } from "@/lib/bpi";
-import { err, ok } from "@/middlewares/api/apiResult";
+import { err, ok, invalidBody } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { customGoalPreviewBodySchema } from "@/schemas/optimizeMemo/customPreview";
 import { targetOf, type HandleOutcome } from "./_shared";
@@ -30,10 +30,7 @@ export async function handleCustomGoalPreview(
   const parsed = customGoalPreviewBodySchema.safeParse(req.body);
   if (!parsed.success) {
     return {
-      result: err(
-        400,
-        parsed.error.issues[0]?.message ?? "Invalid request body",
-      ),
+      result: invalidBody(parsed.error, customGoalPreviewBodySchema),
       targetUserId: userId,
       viewerId,
     };

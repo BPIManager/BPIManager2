@@ -33,6 +33,8 @@ export interface ApiResponse<T> {
 
 /** パラメータ検証エラーの詳細 */
 export interface ApiErrorDetails {
+  /** schema が指すパラメータの置き場所（クエリ or リクエストボディ） */
+  in?: "query" | "body";
   /** どのパラメータがなぜ不正か */
   issues?: { path: (string | number)[]; code: string; message: string }[];
   /** このエンドポイントが受け付けるクエリパラメータの JSON Schema（検証に使うスキーマから生成） */

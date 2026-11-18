@@ -1,7 +1,7 @@
 import type { NextApiRequest } from "next";
 import { bpiOptimizerRepo } from "@/lib/db/domains/bpiOptimizer/memos";
 import { checkUserAccess } from "@/middlewares/api/withApi";
-import { accessError, err, ok } from "@/middlewares/api/apiResult";
+import { accessError, err, ok, invalidBody } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { createOptimizeMemoBodySchema } from "@/schemas/optimizeMemo/create";
 import { authUidOf, targetOf, type HandleOutcome } from "./_shared";
@@ -35,10 +35,7 @@ export async function handleCreateOptimizeMemo(
   const parsed = createOptimizeMemoBodySchema.safeParse(req.body);
   if (!parsed.success) {
     return {
-      result: err(
-        400,
-        parsed.error.issues[0]?.message ?? "Invalid request body",
-      ),
+      result: invalidBody(parsed.error, createOptimizeMemoBodySchema),
       targetUserId: uid,
       viewerId: uid,
     };

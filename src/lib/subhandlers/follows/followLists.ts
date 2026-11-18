@@ -1,7 +1,7 @@
 import type { NextApiRequest } from "next";
 import { followListsRepo } from "@/lib/db/domains/followLists";
 import { followListsAggregateRepo } from "@/lib/db/aggregates/followLists";
-import { err, ok } from "@/middlewares/api/apiResult";
+import { err, ok, invalidBody } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { createFollowListBodySchema } from "@/schemas/followLists/create";
 import { authUidOf, type HandleOutcome } from "./_shared";
@@ -31,10 +31,7 @@ export async function handleCreateFollowList(
   const parsed = createFollowListBodySchema.safeParse(req.body);
   if (!parsed.success) {
     return {
-      result: err(
-        400,
-        parsed.error.issues[0]?.message ?? "Invalid request body",
-      ),
+      result: invalidBody(parsed.error, createFollowListBodySchema),
       targetUserId: uid,
       viewerId: uid,
     };

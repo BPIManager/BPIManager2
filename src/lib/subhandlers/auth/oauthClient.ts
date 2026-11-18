@@ -1,7 +1,7 @@
 import type { NextApiRequest } from "next";
 import crypto from "crypto";
 import { oauthRepo } from "@/lib/db/domains/oauth";
-import { err, ok } from "@/middlewares/api/apiResult";
+import { err, ok, invalidBody } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { manageClientSchema } from "@/schemas/oauth";
 import { authUidOf, type HandleOutcome } from "./_shared";
@@ -41,10 +41,7 @@ export async function handleUpsertOauthClient(
   const parsed = manageClientSchema.safeParse(req.body);
   if (!parsed.success) {
     return {
-      result: err(
-        400,
-        parsed.error.issues[0]?.message ?? "Invalid request body",
-      ),
+      result: invalidBody(parsed.error, manageClientSchema),
       targetUserId: uid,
       viewerId: uid,
     };

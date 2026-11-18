@@ -4,7 +4,7 @@ import { followsRepo } from "@/lib/db/domains/follow";
 import { followListAggregateRepo } from "@/lib/db/aggregates/followList";
 import { unfollowAndCleanupLists } from "@/lib/db/orchestrators/unfollow";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
-import { accessError, err, ok } from "@/middlewares/api/apiResult";
+import { accessError, err, ok, invalidQuery } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { followsQuerySchema } from "@/schemas/follows/query";
 import type { HandleOutcome } from "./_shared";
@@ -32,10 +32,7 @@ export async function handleFollowsList(
     const parsed = followsQuerySchema.safeParse(req.query);
     if (!parsed.success) {
       return {
-        result: err(
-          400,
-          parsed.error.issues[0]?.message ?? "Invalid query parameters",
-        ),
+        result: invalidQuery(parsed.error, followsQuerySchema),
         targetUserId,
         viewerId,
       };

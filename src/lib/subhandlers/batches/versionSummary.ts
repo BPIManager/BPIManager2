@@ -5,7 +5,7 @@ import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 import { latestScoresRepo } from "@/lib/db/domains/scores/latest";
 import { timelineRepo } from "@/lib/db/domains/scores/timeline";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
-import { accessError, err, ok } from "@/middlewares/api/apiResult";
+import { accessError, err, ok, invalidQuery } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { targetOf, type HandleOutcome } from "./_shared";
 
@@ -21,10 +21,7 @@ export async function handleVersionSummary(
   const parsed = versionSummaryQuerySchema.safeParse(req.query);
   if (!parsed.success) {
     return {
-      result: err(
-        400,
-        parsed.error.issues[0]?.message ?? "Invalid query parameters",
-      ),
+      result: invalidQuery(parsed.error, versionSummaryQuerySchema),
       targetUserId: targetOf(req),
       viewerId: null,
     };

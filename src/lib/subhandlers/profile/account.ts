@@ -3,7 +3,7 @@ import type { NextApiRequest } from "next";
 import { accountDeletionSchema } from "@/schemas/account/deletion";
 import { adminAuth } from "@/lib/firebase/admin";
 import { backupAndDeleteUser } from "@/lib/db/orchestrators/userDeletion";
-import { err, ok } from "@/middlewares/api/apiResult";
+import { err, ok, invalidBody } from "@/middlewares/api/apiResult";
 import { usersRepo } from "@/lib/db/domains/users";
 export async function deleteAccount(
   req: NextApiRequest,
@@ -14,10 +14,7 @@ export async function deleteAccount(
   const parsed = accountDeletionSchema.safeParse(req.body);
   if (!parsed.success) {
     return {
-      result: err(
-        400,
-        parsed.error.issues[0]?.message ?? "Invalid request body",
-      ),
+      result: invalidBody(parsed.error, accountDeletionSchema),
       ...base,
     };
   }

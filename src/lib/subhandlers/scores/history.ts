@@ -2,7 +2,7 @@ import type { NextApiRequest } from "next";
 import { scoreHistoryRepo } from "@/lib/db/domains/scores/history";
 import { songHistoryQuerySchema } from "@/schemas/scores/query";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
-import { err, ok } from "@/middlewares/api/apiResult";
+import { err, ok, invalidQuery } from "@/middlewares/api/apiResult";
 import { targetOf, type HandleOutcome } from "./_shared";
 import type { AccessResult } from "@/middlewares/api/withApi";
 
@@ -16,10 +16,7 @@ export async function handleScoreHistory(
   const parsed = songHistoryQuerySchema.safeParse(req.query);
   if (!parsed.success) {
     return {
-      result: err(
-        400,
-        parsed.error.issues[0]?.message ?? "Invalid query parameters",
-      ),
+      result: invalidQuery(parsed.error, songHistoryQuerySchema),
       targetUserId,
       viewerId,
     };

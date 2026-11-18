@@ -3,7 +3,7 @@ import { radarTopOf } from "@/constants/iidx/radars/topElements";
 import { allScoresSelfRivalRepo } from "@/lib/db/aggregates/allScores/selfAndRivals";
 import { targetOf } from "@/lib/subhandlers/scores/_shared";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
-import { err, ok } from "@/middlewares/api/apiResult";
+import { err, ok, invalidQuery } from "@/middlewares/api/apiResult";
 import type { AccessResult } from "@/middlewares/api/withApi";
 import { selfVersionComparisonQuerySchema } from "@/schemas/scores/query";
 import type { HandleOutcome } from "./_shared";
@@ -19,10 +19,7 @@ export async function handleAllScoresSelfVersion(
   const parsed = selfVersionComparisonQuerySchema.safeParse(req.query);
   if (!parsed.success) {
     return {
-      result: err(
-        400,
-        parsed.error.issues[0]?.message ?? "Invalid query parameters",
-      ),
+      result: invalidQuery(parsed.error, selfVersionComparisonQuerySchema),
       targetUserId,
       viewerId,
     };
