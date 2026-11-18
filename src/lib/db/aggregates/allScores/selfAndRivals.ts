@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { INFINITAS_VERSION } from "@/constants/iidx/iidxVersions";
 import { AllDifficulties } from "@/types/songs/allSongs";
 import { SongWithScore } from "@/types/songs/score";
 import { correlatedLatestLogId } from "@/lib/db/shared/latestScore/correlated";
@@ -77,6 +78,9 @@ class AllScoresSelfRivalRepository {
         "prev.lastPlayed as prevLastPlayed",
       ])
       .where((eb) => eb.or([eb("s.deletedAt", "is", null)]))
+      .$if(currentVersion !== INFINITAS_VERSION, (qb) =>
+        qb.where("s.isInfinitasOnly", "=", 0),
+      )
       .where((eb) =>
         eb.or([
           eb("cur.exScore", "is not", null),

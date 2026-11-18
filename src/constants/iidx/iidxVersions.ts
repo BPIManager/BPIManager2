@@ -14,6 +14,9 @@ export const IIDX_VERSIONS = [
   "INF",
 ] as const;
 
+/** INFINITAS を表すバージョン値。INF限定曲（allSongs.isInfinitasOnly）はこのバージョンでのみ扱う */
+export const INFINITAS_VERSION: IIDXVersion = "INF";
+
 export const latestVersion: IIDXVersion = "34";
 
 /**

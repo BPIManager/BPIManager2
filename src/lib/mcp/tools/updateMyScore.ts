@@ -33,7 +33,7 @@ export function registerUpdateMyScore(server: McpServer, userId: string) {
       const [bpiSongMaster, allLevelMaster, currentScores, currentAllScores, lastLog] =
         await Promise.all([
           songMasterRepo.getSongMasterWithDef(trx),
-          allSongsRepo.getAllLevelMaster(trx),
+          allSongsRepo.getAllLevelMaster(trx, version),
           latestScoresRepo.getLatestScores(userId, version, trx),
           allScoresRepo.getLatestAllScores(userId, version, trx),
           logTotalBpiRepo.getLatestTotalBpi(userId, version, trx),
