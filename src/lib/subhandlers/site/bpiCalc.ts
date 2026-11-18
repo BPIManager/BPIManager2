@@ -61,7 +61,7 @@ export async function handleBpiCalc(
         song = corrected;
         warnings.push({
           code: "TITLE_CORRECTED",
-          message: `曲名「${title}」は完全一致しなかったため、INFINITAS の表記の対応表で「${corrected.title}」として計算しました。アーケード公式CSVの表記で指定してください。`,
+          message: `Title "${title}" did not match exactly; it was resolved to "${corrected.title}" using the INFINITAS title mapping. Please use the arcade title.`,
           requestedTitle: title,
           resolvedTitle: corrected.title,
         });

@@ -8,6 +8,7 @@ import {
   buildMeta,
   withMeta,
   writeV2Result,
+  err,
 } from "@/middlewares/api/apiResult";
 
 const postHandler = withAuth(async (req, res) => {
@@ -31,5 +32,5 @@ export default async function handler(
   if (req.method === "POST") {
     return postHandler(req, res);
   }
-  return res.status(405).end();
+  return writeV2Result(res, err(405, "Method Not Allowed"));
 }

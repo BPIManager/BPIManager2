@@ -1,5 +1,5 @@
 import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
-import { parseQuery } from "@/services/nextRequest/parseBody";
+import { parseQueryV2 } from "@/services/nextRequest/parseBody";
 import { z } from "zod";
 import { handleStatsAreaRank } from "@/lib/subhandlers/stats";
 import {
@@ -11,7 +11,7 @@ import {
 
 export default withUserApiHandler(
   (req, res) => {
-    return parseQuery(z.object({ userId: z.string() }), req.query, res);
+    return parseQueryV2(z.object({ userId: z.string() }), req.query, res);
   },
   async (req, res, query, access) => {
     writeV2Result(

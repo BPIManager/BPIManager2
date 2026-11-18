@@ -579,6 +579,9 @@ describe.skipIf(!CAN_RUN)("API v1 <-> v2 parity", () => {
         errorMessage: v1.status < 400 ? null : expect.any(String),
       });
       expect(v2.json).toHaveProperty("body");
+      // errorDetails は常に存在する（成功時・詳細が無いエラーは null）
+      expect(v2.json).toHaveProperty("errorDetails");
+      if (v1.status < 400) expect(v2.json.errorDetails).toBeNull();
 
       if (v1.status < 400) {
         expect(v2.json.error).toBe(false);

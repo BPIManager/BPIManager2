@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { isIP } from "net";
+import { writeMiddlewareError } from "./apiResult";
 
 interface RateLimitOptions {
   /** 制限をカウントする時間窓（ミリ秒） */
@@ -60,7 +61,7 @@ export const withRateLimit = (
       if (bucket.count > options.max) {
         const retryAfterSec = Math.ceil((bucket.resetAt - now) / 1000);
         res.setHeader("Retry-After", String(retryAfterSec));
-        return res.status(429).json({ message: "Too Many Requests" });
+        return writeMiddlewareError(req, res, 429, "Too Many Requests");
       }
     }
 

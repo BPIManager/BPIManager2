@@ -5,18 +5,19 @@ import {
   buildMeta,
   withMeta,
   writeV2Result,
+  err,
 } from "@/middlewares/api/apiResult";
 
 export default withUserApiHandler(
   (req, res) => {
     const { userId } = req.query;
     if (!userId || typeof userId !== "string") {
-      res.status(400).json({ message: "Invalid userId" });
+      writeV2Result(res, err(400, "Invalid userId"));
       return null;
     }
     if (req.method !== "GET") {
       res.setHeader("Allow", ["GET"]);
-      res.status(405).json({ message: `Method ${req.method} Not Allowed` });
+      writeV2Result(res, err(405, `Method ${req.method} Not Allowed`));
       return null;
     }
     return { userId };

@@ -27,8 +27,8 @@ export interface ApiResponse<T> {
   errorMessage: string | null;
   body: T | null;
   meta?: ApiMeta;
-  /** エラー時の詳細（パラメータ不正の issues・求められるパラメータの JSON Schema など）。該当するエラーのみ */
-  errorDetails?: ApiErrorDetails;
+  /** エラーの詳細（パラメータ不正の issues・求められるパラメータの JSON Schema など）。詳細が無いとき・成功時は null（常に存在する） */
+  errorDetails: ApiErrorDetails | null;
 }
 
 /** パラメータ検証エラーの詳細 */

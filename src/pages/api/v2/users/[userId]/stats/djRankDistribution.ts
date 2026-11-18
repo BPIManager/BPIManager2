@@ -6,12 +6,13 @@ import {
   buildMeta,
   withMeta,
   writeV2Result,
+  err,
 } from "@/middlewares/api/apiResult";
 
 export default withUserApiHandler(
   (req, res) => {
     if (req.method !== "GET") {
-      res.status(405).json({ message: "Method Not Allowed" });
+      writeV2Result(res, err(405, "Method Not Allowed"));
       return null;
     }
     return parseStatsQueryV2RequiringFilter(req.query, res);

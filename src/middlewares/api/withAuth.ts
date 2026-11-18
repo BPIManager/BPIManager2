@@ -1,5 +1,6 @@
 import { adminAuth } from "@/lib/firebase/admin";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { writeMiddlewareError } from "./apiResult";
 export interface AuthenticatedNextApiRequest extends NextApiRequest {
   authUid: string;
 }
@@ -27,7 +28,7 @@ export const withAuth = (
     const authHeader = req.headers.authorization;
 
     if (!authHeader?.startsWith("Bearer ")) {
-      return res.status(401).json({ message: "Missing or invalid token" });
+      return writeMiddlewareError(req, res, 401, "Missing or invalid token");
     }
 
     const idToken = authHeader.split("Bearer ")[1];
@@ -40,13 +41,16 @@ export const withAuth = (
       viaApiKey = decodedToken[API_KEY_SESSION_CLAIM] === true;
     } catch (error: unknown) {
       console.error("Auth Middleware Error:", error);
-      return res.status(401).json({ message: "Invalid or expired token" });
+      return writeMiddlewareError(req, res, 401, "Invalid or expired token");
     }
 
     if (options?.rejectApiKeySession && viaApiKey) {
-      return res
-        .status(403)
-        .json({ message: "Forbidden: not allowed with an API key session" });
+      return writeMiddlewareError(
+        req,
+        res,
+        403,
+        "Forbidden: not allowed with an API key session",
+      );
     }
 
     const userIdFromQuery = req.query.userId as string;
@@ -56,7 +60,7 @@ export const withAuth = (
       (userIdFromQuery && authUid !== userIdFromQuery) ||
       (userIdFromBody && authUid !== userIdFromBody)
     ) {
-      return res.status(403).json({ message: "Forbidden: User ID mismatch" });
+      return writeMiddlewareError(req, res, 403, "Forbidden: User ID mismatch");
     }
 
     (req as AuthenticatedNextApiRequest).authUid = authUid;
@@ -66,7 +70,7 @@ export const withAuth = (
     } catch (error: unknown) {
       console.error("Auth Middleware Error:", error);
       if (res.headersSent) return;
-      return res.status(500).json({ message: "Internal Server Error" });
+      return writeMiddlewareError(req, res, 500, "Internal Server Error");
     }
   };
 };

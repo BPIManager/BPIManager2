@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { checkUserAccess } from "@/middlewares/api/withApi";
 import { aaaDifficultySchema } from "@/schemas/stats/aaaDifficulty";
-import { parseQuery } from "@/services/nextRequest/parseBody";
+import { parseQueryV2 } from "@/services/nextRequest/parseBody";
 import { handleStatsAaaDifficulty } from "@/lib/subhandlers/stats";
 import {
   accessError,
@@ -14,7 +14,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const body = parseQuery(aaaDifficultySchema, req.query, res);
+  const body = parseQueryV2(aaaDifficultySchema, req.query, res);
   if (!body) return;
 
   let viewerId: string | null = null;

@@ -6,23 +6,24 @@ import {
   buildMeta,
   withMeta,
   writeV2Result,
+  err,
 } from "@/middlewares/api/apiResult";
 
 export default withUserApiHandler(
   (req, res) => {
     if (req.method !== "GET") {
-      res.status(405).end();
+      writeV2Result(res, err(405, "Method Not Allowed"));
       return null;
     }
     const userId = req.query.userId as string;
     const version = req.query.version as string;
     const isValidVersion = (IIDX_VERSIONS as readonly string[]).includes(version);
     if (!userId || typeof userId !== "string") {
-      res.status(400).json({ message: "Invalid userId" });
+      writeV2Result(res, err(400, "Invalid userId"));
       return null;
     }
     if (!version || !isValidVersion) {
-      res.status(400).json({ message: "Missing or invalid params: version" });
+      writeV2Result(res, err(400, "Missing or invalid params: version"));
       return null;
     }
     return { userId, version };

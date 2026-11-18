@@ -118,6 +118,28 @@ export function invalidBody(error: z.ZodError, schema: z.ZodType) {
   });
 }
 
+/** リクエストが API v2（/api/v2/...）か */
+export function isV2Request(req: { url?: string }): boolean {
+  return (req.url ?? "").startsWith("/api/v2/");
+}
+
+/**
+ * v1・v2 で共有するミドルウェア（認証・リクエスト数制限など）のエラー応答を書く。
+ * v2 は共通エンベロープ、v1 は従来どおり { message } で返す（v1 の形状は変えない）。
+ */
+export function writeMiddlewareError(
+  req: { url?: string },
+  res: NextApiResponse,
+  status: number,
+  message: string,
+): void {
+  if (isV2Request(req)) {
+    writeV2Result(res, err(status, message));
+    return;
+  }
+  res.status(status).json({ message });
+}
+
 /**
  * meta の共通欄（viewerId・isSelf）を組み立てる。isSelf は viewerId が対象 userId と一致するかで決まる。
  * extra で pagination 等を合成できる。未ログインの viewerId は null。
@@ -200,6 +222,7 @@ export function writeV2Result<T>(
       error: false,
       errorMessage: null,
       body: result.body,
+      errorDetails: null,
       ...(result.meta ? { meta: toEnvelopeMeta(result.meta) } : {}),
     };
     res.status(200).json(payload);
@@ -209,7 +232,7 @@ export function writeV2Result<T>(
     error: true,
     errorMessage: result.message,
     body: null,
-    ...(result.details ? { errorDetails: result.details } : {}),
+    errorDetails: result.details ?? null,
   };
   res.status(result.status).json(payload);
 }

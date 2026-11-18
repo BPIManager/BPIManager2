@@ -11,7 +11,7 @@ import {
 export default withUserApiHandler(
   (req, res) => {
     if (req.method !== "GET") {
-      res.status(405).end();
+      writeV2Result(res, err(405, "Method Not Allowed"));
       return null;
     }
 

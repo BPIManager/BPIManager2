@@ -1,14 +1,19 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { checkUserAccess, rejectAccess, type AccessResult } from "./withApi";
+import { writeMiddlewareError } from "./apiResult";
 
 type ApiHandler = (
   req: NextApiRequest,
   res: NextApiResponse,
 ) => unknown | Promise<unknown>;
 
-function defaultOnError(error: unknown, res: NextApiResponse) {
-  return res.status(500).json({ message: toErrorMessage(error) });
+function defaultOnError(
+  error: unknown,
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
+  return writeMiddlewareError(req, res, 500, toErrorMessage(error));
 }
 
 /**
@@ -28,7 +33,6 @@ export function withUserApiHandler<T extends { userId: string }>(
     onReject?: (res: NextApiResponse, access: AccessResult) => unknown;
   },
 ): ApiHandler {
-  const onError = options?.onError ?? defaultOnError;
   const onReject = options?.onReject ?? rejectAccess;
 
   return async function (req: NextApiRequest, res: NextApiResponse) {
@@ -41,7 +45,9 @@ export function withUserApiHandler<T extends { userId: string }>(
 
       return await handler(req, res, query, access);
     } catch (error: unknown) {
-      return onError(error, res);
+      return options?.onError
+        ? options.onError(error, res)
+        : defaultOnError(error, req, res);
     }
   };
 }

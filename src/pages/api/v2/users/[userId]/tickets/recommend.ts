@@ -9,6 +9,7 @@ import {
   buildMeta,
   withMeta,
   writeV2Result,
+  err,
 } from "@/middlewares/api/apiResult";
 
 export default withRateLimit(
@@ -19,7 +20,7 @@ export default withRateLimit(
     },
     async (req, res, _query, access) => {
       if (req.method !== "GET" && req.method !== "POST") {
-        res.status(405).end();
+        writeV2Result(res, err(405, "Method Not Allowed"));
         return;
       }
       const { result, targetUserId, viewerId } =

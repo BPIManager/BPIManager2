@@ -1,13 +1,18 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { handleSendMagicLink } from "@/lib/subhandlers/auth";
-import { buildMeta, withMeta, writeV2Result } from "@/middlewares/api/apiResult";
+import {
+  buildMeta,
+  withMeta,
+  writeV2Result,
+  err,
+} from "@/middlewares/api/apiResult";
 import { withRateLimit } from "@/middlewares/api/withRateLimit";
 
 /** POST /api/v2/auth/magic-link（未ログイン。Turnstile 検証必須） */
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
     res.setHeader("Allow", ["POST"]);
-    res.status(405).end();
+    writeV2Result(res, err(405, "Method Not Allowed"));
     return;
   }
   const { result, viewerId, targetUserId } = await handleSendMagicLink(req);

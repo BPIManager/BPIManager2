@@ -1,12 +1,15 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { handleTokenExchange } from "@/lib/subhandlers/auth";
-import { writeV2Result } from "@/middlewares/api/apiResult";
+import {
+  writeV2Result,
+  err,
+} from "@/middlewares/api/apiResult";
 import { withRateLimit } from "@/middlewares/api/withRateLimit";
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
     res.setHeader("Allow", ["POST"]);
-    res.status(405).end();
+    writeV2Result(res, err(405, "Method Not Allowed"));
     return;
   }
   const { result } = await handleTokenExchange(req);

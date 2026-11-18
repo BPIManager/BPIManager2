@@ -21,16 +21,16 @@ v2 のパス・リクエストパラメータ・リクエストボディ・認�
 |---|---|---|
 | パス | `/api/v1/...` | `/api/v2/...`（同じパス。v1 の全ルートに対応するルートがあります） |
 | 成功レスポンス | 本文そのもの | `body` に入れた共通の形式（エンベロープ） |
-| エラーレスポンス | `{ "message": "..." }` | `{ "error": true, "errorMessage": "...", "body": null }` |
+| エラーレスポンス | `{ "message": "..." }` | `{ "error": true, "errorMessage": "...", "body": null, "errorDetails": null }`（認証・405・429 のエラーも同じ形式） |
 | 成功時のステータスコード | エンドポイントにより 200 / 201 / 204 | 常に 200 |
-| 400 の詳細 | メッセージのみ | 一部のエンドポイントで、不正なパラメータとスキーマ（`errorDetails`）を返す |
+| 400 の詳細 | メッセージのみ | 一部のエンドポイントで、不正なパラメータとスキーマを `errorDetails` に返す（詳細が無いときは `null`） |
 | 認証 | 変更なし | 変更なし |
 
 ## 移行手順
 
 1. **パスを置き換える**: `/api/v1/` を `/api/v2/` に置き換えます。クエリパラメータとリクエストボディは、そのまま使えます。
 2. **成功レスポンスを `body` から読む**: これまでレスポンス本文を直接使っていた箇所を、`response.body` に変更します。`error` が `false` であることも確認してください。
-3. **エラーの判定を直す**: エラーの判定は、**HTTP ステータスコード**で行ってください。メッセージは、`errorMessage`（v2 のエンベロープ）か `message`（v1 形式）のどちらかに入ります（下記「エラーレスポンス」を参照）。
+3. **エラーの判定を直す**: エラーの判定は、**HTTP ステータスコード**（または `error` が `true`）で行ってください。メッセージは `errorMessage` に入ります（下記「エラーレスポンス」を参照）。
 4. **201 / 204 を前提にしていないか確認する**: v2 は成功時に常に 200 を返し、本文があります（下記「成功時のステータスコード」を参照）。
 5. **ヘッダーを確認する**: v1 のレスポンスに付く `Deprecation`・`Sunset`・`Link` ヘッダーで、非推奨の状態と、移行先を確認できます。
 6. **動作確認後に切り替える**: 開発環境で v2 を呼んで、期待どおりの値が取れることを確認してから、本番を切り替えてください。
@@ -46,12 +46,15 @@ v2 は、すべての成功レスポンスを次の形式にします。
   "error": false,
   "errorMessage": null,
   "body": { ... },
+  "errorDetails": null,
   "meta": { "viewerId": "...", "isSelf": false }
 }
 ```
 
 - `body`: v1 のレスポンス本文と同じ内容です（形は変わりません）。
+- `errorDetails`: 成功時は常に `null` です。
 - `meta`: 一部のエンドポイントだけに含まれます（`viewerId`: 閲覧者のユーザー ID、`isSelf`: 閲覧対象が閲覧者自身か）。
+- 画像を返すエンドポイント（OGP 画像など）は、成功時に画像そのものを返します。エラー時は、下記のエンベロープです。
 
 **例**: `GET /api/{v}/users/{userId}/scores?version=34`
 
@@ -72,6 +75,7 @@ v2:
   "body": [
     { "songId": 1024, "title": "V", "difficulty": "ANOTHER", "exScore": 2805, "bpi": 52.45 }
   ],
+  "errorDetails": null,
   "meta": { "viewerId": null, "isSelf": false }
 }
 ```
@@ -92,15 +96,12 @@ v2:
 {
   "error": true,
   "errorMessage": "Song not found",
-  "body": null
+  "body": null,
+  "errorDetails": null
 }
 ```
 
-**注意**: 次のエラーは、v2 でも `{ "message": "..." }` の形式で返ることがあります。エラーの判定は HTTP ステータスコードで行い、メッセージは `errorMessage` と `message` の両方を見るようにしてください。
-
-- 認証のエラー（401・403: トークンが無い・不正・期限切れなど）
-- メソッドが許可されていない（405）
-- リクエスト数の制限（429）
+認証のエラー（401・403）、メソッドが許可されていない（405）、リクエスト数の制限（429）、サーバー内部のエラー（500）も、同じ形式です。`errorDetails` は、詳細が無いとき `null` です（キーは常に存在します）。
 
 ### 400（パラメータ不正）の詳細
 
@@ -114,14 +115,14 @@ v2 では、一部のエンドポイントで、400 に `errorDetails` が付き
   "errorDetails": {
     "in": "query",
     "issues": [
-      { "path": ["level", "difficulty"], "code": "missing_parameters", "message": "level か difficulty の少なくとも一方を指定してください" }
+      { "path": ["level", "difficulty"], "code": "missing_parameters", "message": "At least one of level or difficulty is required" }
     ],
     "schema": { "type": "object", "properties": { "level": { ... }, "difficulty": { ... } }, "anyOf": [ ... ] }
   }
 }
 ```
 
-`errorDetails` が付くのは、パラメータの検証を行っているエンドポイントです。付かないエンドポイントもあります。
+`errorDetails` に内容が入るのは、パラメータの検証を行っているエンドポイントです。それ以外のエラーでは `null` です。`issues` と `schema` の内容は、英語です。
 
 ### 成功時のステータスコード
 
@@ -171,18 +172,18 @@ type ApiResponse<T> = {
   errorMessage: string | null;
   body: T | null;
   meta?: { viewerId: string | null; isSelf: boolean };
-  errorDetails?: unknown;
+  errorDetails: unknown | null;
 };
 
 async function getV2<T>(url: string, init?: RequestInit): Promise<T> {
   const res = await fetch(url, init);
   const json = (await res.json().catch(() => null)) as
-    | (Partial<ApiResponse<T>> & { message?: string })
+    | Partial<ApiResponse<T>>
     | null;
 
-  // エラーは HTTP ステータスで判定し、メッセージは errorMessage / message の両方を見る
+  // エラーは HTTP ステータスと error で判定する
   if (!res.ok || !json || json.error) {
-    throw new Error(json?.errorMessage ?? json?.message ?? `HTTP ${res.status}`);
+    throw new Error(json?.errorMessage ?? `HTTP ${res.status}`);
   }
   return json.body as T;
 }
