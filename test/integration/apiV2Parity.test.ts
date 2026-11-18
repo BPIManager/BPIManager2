@@ -144,6 +144,13 @@ const ROWS: Row[] = [
     userScoped: true,
   },
   {
+    name: "all-scores unplayed",
+    v1: "/api/v1/users/:self/all-scores/unplayed?version=33",
+    v2: "/api/v2/users/:self/all-scores/unplayed?version=33",
+    authed: true,
+    userScoped: true,
+  },
+  {
     name: "all-scores history",
     v1: "/api/v1/users/:self/all-scores/:song/history",
     v2: "/api/v2/users/:self/all-scores/:song/history",

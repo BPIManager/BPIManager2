@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useRouter } from "next/router";
 import SongListSkeleton from "@/components/partials/common/Table/skeleton";
 import CustomPagination from "@/components/partials/common/ListControls/Pagination/ui";
 import { SongWithScore } from "@/types/songs/score";
@@ -11,6 +12,11 @@ import SongDetailView from "@/components/partials/modal/SongDetail";
 import { NoDataAlert } from "@/components/partials/common/DashBoard/NoData";
 import FetchErrorState from "@/components/partials/common/ErrorStates/FetchErrorState";
 import { useAllScores } from "@/hooks/allScores/useAllScores";
+import { useAllUnplayedScores } from "@/hooks/allScores/useAllUnplayedScores";
+import {
+  SCORE_LIST_DEFAULT_PLAY_STATE,
+  needsUnplayedSongs,
+} from "@/utils/songs/playState";
 import { useAllScoresCompare } from "@/hooks/allScores/useAllScoresCompare";
 import { useSongFilter } from "@/hooks/table/useSongFilter";
 import { useMergedCompareSongs } from "@/hooks/table/useMergedCompareSongs";
@@ -30,10 +36,32 @@ const AllSongsTable = ({
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
 
-  const { songs, error, isLoading, currentVersion, refresh } = useAllScores(
-    userId,
-    version,
+  const {
+    songs: playedSongs,
+    error,
+    isLoading: playedLoading,
+    currentVersion,
+    refresh,
+  } = useAllScores(userId, version);
+
+  // プレイ状態が「未プレイ」「すべて」（既定）のときだけ、未プレイ曲も取得して一覧に加える
+  const { query, isReady } = useRouter();
+  const includeUnplayed = isReady && needsUnplayedSongs(query.isMyPlayed);
+  const {
+    songs: unplayedSongs,
+    error: unplayedError,
+    isLoading: unplayedLoading,
+    refresh: refreshUnplayed,
+  } = useAllUnplayedScores(includeUnplayed ? userId : undefined, version);
+
+  const songs = useMemo(
+    () =>
+      playedSongs && includeUnplayed
+        ? [...playedSongs, ...(unplayedSongs ?? [])]
+        : playedSongs,
+    [playedSongs, unplayedSongs, includeUnplayed],
   );
+  const isLoading = playedLoading || (includeUnplayed && unplayedLoading);
 
   const {
     params,
@@ -48,6 +76,7 @@ const AllSongsTable = ({
     levels: ALL_LEVELS,
     difficulties: ALL_DIFFICULTIES,
     sortKey: "level",
+    isMyPlayed: SCORE_LIST_DEFAULT_PLAY_STATE,
   });
 
   const { compareData, compareError, isCompareLoading } = useAllScoresCompare(
@@ -63,8 +92,8 @@ const AllSongsTable = ({
     params.compareVersion,
   );
 
-  if (!isLoading && (error || !songs)) {
-    return <FetchErrorState error={error} />;
+  if (!isLoading && (error || (includeUnplayed && unplayedError) || !songs)) {
+    return <FetchErrorState error={error ?? unplayedError} />;
   }
 
   const showCompareLoading =
@@ -83,6 +112,8 @@ const AllSongsTable = ({
         totalCount={totalCount}
         onOpenAdvancedFilter={() => setIsAdvancedOpen(true)}
         withSelfCompare
+        withPlayStateFilter
+        withScoreRate
         currentVersion={currentVersion}
         levelItems={ALL_LEVELS}
         difficultyItems={ALL_DIFFICULTIES}
@@ -128,6 +159,7 @@ const AllSongsTable = ({
         onClose={() => setIsAdvancedOpen(false)}
         params={params}
         onParamsChange={updateParams}
+        withPlayState
       />
 
       {isDetailOpen && selected && (
@@ -138,7 +170,10 @@ const AllSongsTable = ({
           userId={userId}
           version={currentVersion}
           songDomain="allSongs"
-          onSaved={() => refresh()}
+          onSaved={() => {
+            void refresh();
+            if (includeUnplayed) void refreshUnplayed();
+          }}
         />
       )}
 

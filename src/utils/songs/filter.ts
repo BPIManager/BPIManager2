@@ -132,7 +132,7 @@ export const filterSongsFrontend = (
 
     if (params.versions && params.versions.length > 0) {
       if (
-        !song.releasedVersion ||
+        song.releasedVersion == null ||
         !params.versions.includes(song.releasedVersion)
       )
         return false;

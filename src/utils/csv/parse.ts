@@ -4,6 +4,7 @@ import { detectCsvType } from "./detect";
 import { parseRefluxTsv } from "./adapters/reflux";
 import { parseRizaltoCsv } from "./adapters/result_techo";
 import { parseDakenCounterCsv } from "./adapters/daken_counter";
+import { parseInfinitasCsv } from "./adapters/infinitas_csv";
 import type { ParsedCsvRow } from "./types";
 
 /** 公式CSVのパース用関数 */
@@ -68,9 +69,11 @@ export const parseAnyCsv = (rawData: string): ParsedCsvRow[] => {
       return parseRizaltoCsv(rawData);
     case "daken_counter":
       return parseDakenCounterCsv(rawData);
+    case "infinitas_csv":
+      return parseInfinitasCsv(rawData);
     default:
       throw new Error(
-        "未対応のフォーマットです。公式CSV・Reflux TSV・リザルト手帳CSV・打鍵カウンタCSV を貼り付けてください。",
+        "未対応のフォーマットです。公式CSV・INFINITAS CSV・Reflux TSV・リザルト手帳CSV・打鍵カウンタCSV を貼り付けてください。",
       );
   }
 };

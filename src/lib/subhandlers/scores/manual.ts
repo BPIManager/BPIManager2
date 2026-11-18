@@ -53,7 +53,7 @@ export async function handleScoreManualUpdate(
     const [bpiSongMaster, allLevelMaster, currentScores, currentAllScores] =
       await Promise.all([
         songMasterRepo.getSongMasterWithDef(),
-        allSongsRepo.getAllLevelMaster(),
+        allSongsRepo.getAllLevelMaster(undefined, version),
         latestScoresRepo.getLatestScores(userId, version),
         allScoresRepo.getLatestAllScores(userId, version),
       ]);

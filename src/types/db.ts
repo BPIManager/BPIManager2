@@ -358,6 +358,8 @@ export interface AllSongsTable {
   createdAt: Generated<Date>;
   deletedAt: string | null;
   releasedVersion: number | null;
+  /** INFINITAS限定曲（INFバージョン以外の一覧・集計から除外する） */
+  isInfinitasOnly: Generated<number>;
 }
 
 export interface AllScoresTable {

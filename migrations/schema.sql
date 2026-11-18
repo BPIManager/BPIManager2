@@ -51,6 +51,7 @@ CREATE TABLE IF NOT EXISTS `allSongs` (
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp(),
   `deletedAt` varchar(50) DEFAULT NULL COMMENT '楽曲が削除されたバージョンを指定(このバージョン以降では投入しない)',
   `releasedVersion` varchar(3) DEFAULT NULL,
+  `isInfinitasOnly` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'INFINITAS限定曲。INFバージョン以外の集計・一覧からは除外する',
   PRIMARY KEY (`songId`) USING BTREE,
   KEY `releasedVersion` (`releasedVersion`) USING BTREE,
   KEY `difficulty` (`difficulty`) USING BTREE,

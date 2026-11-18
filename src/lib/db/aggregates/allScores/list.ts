@@ -1,5 +1,6 @@
 import { ALL_DIFFICULTIES } from "@/constants/iidx/songLevels";
 import { db } from "@/lib/db";
+import { INFINITAS_VERSION } from "@/constants/iidx/iidxVersions";
 import { AllDifficulties } from "@/types/songs/allSongs";
 import { SongWithScore } from "@/types/songs/score";
 import { latestLogIdPerSongSubquery } from "@/lib/db/shared/latestScore/perSong";
@@ -73,7 +74,10 @@ class AllScoresListRepository {
         "a.missCount",
         "a.lastPlayed",
       ])
-      .where((eb) => eb.or([eb("s.deletedAt", "is", null)]));
+      .where((eb) => eb.or([eb("s.deletedAt", "is", null)]))
+      .$if(version !== INFINITAS_VERSION, (qb) =>
+        qb.where("s.isInfinitasOnly", "=", 0),
+      );
 
     if (search && typeof search === "string" && search.trim()) {
       query = query.where("s.title", "like", `%${search.trim()}%`);
