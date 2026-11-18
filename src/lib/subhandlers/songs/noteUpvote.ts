@@ -2,15 +2,16 @@ import type { NextApiRequest } from "next";
 import { songNotesRepo } from "@/lib/db/domains/songNotes";
 import { resolveOptionalUid } from "@/middlewares/api/resolveOptionalUid";
 import { err, ok } from "@/middlewares/api/apiResult";
-import { num, type HandleOutcome } from "./_shared";
+import { type HandleOutcome } from "./_shared";
+import { invalidParam, parseIntParam } from "@/lib/validation/params";
 
 export async function handleSongNoteUpvote(
   req: NextApiRequest,
 ): Promise<HandleOutcome<unknown>> {
-  const noteId = num(req.query.noteId);
+  const noteId = parseIntParam("noteId", req.query.noteId);
   if (noteId === null) {
     return {
-      result: err(400, "Invalid noteId"),
+      result: invalidParam("noteId", req.query.noteId, "Invalid noteId"),
       targetUserId: "",
       viewerId: null,
     };

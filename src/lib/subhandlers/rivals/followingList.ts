@@ -4,6 +4,7 @@ import { checkUserAccess } from "@/middlewares/api/withApi";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { targetOf, type HandleOutcome } from "./_shared";
+import { invalidParam } from "@/lib/validation/params";
 
 export async function handleRivalFollowingList(
   req: NextApiRequest,
@@ -11,7 +12,7 @@ export async function handleRivalFollowingList(
   const targetUserId = targetOf(req);
   if (!targetUserId) {
     return {
-      result: err(400, "userId is required"),
+      result: invalidParam("userId", req.query.userId, "userId is required"),
       targetUserId,
       viewerId: null,
     };

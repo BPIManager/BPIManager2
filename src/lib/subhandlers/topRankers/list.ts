@@ -2,7 +2,7 @@ import type { NextApiRequest } from "next";
 import { topRankersListRepo } from "@/lib/db/aggregates/topRankers/list";
 import { usersRepo } from "@/lib/db/domains/users";
 import { BpiCalculator } from "@/lib/bpi";
-import { TOP_RANKER_VERSIONS } from "@/constants/iidx/topRankerAreas";
+
 import { IIDX_LEVELS } from "@/constants/iidx/bpiDifficulties";
 import { radarTopOf } from "@/constants/iidx/radars/topElements";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
@@ -11,6 +11,8 @@ import type { AccessResult } from "@/middlewares/api/withApi";
 import type { SongWithScore } from "@/types/songs/score";
 import { targetOf, type HandleOutcome } from "./_shared";
 import { normalizeIidxId } from "./iidxId";
+import { parseInput } from "@/lib/validation/parse";
+import { topRankersListQuerySchema } from "@/schemas/topRankers/query";
 
 /** GET /users/[userId]/top-rankers?version=33 */
 export async function handleTopRankersList(
@@ -20,13 +22,14 @@ export async function handleTopRankersList(
   const targetUserId = targetOf(req);
   const viewerId = access.viewerId ?? null;
 
-  const version = req.query.version;
-  if (
-    typeof version !== "string" ||
-    !(TOP_RANKER_VERSIONS as readonly string[]).includes(version)
-  ) {
-    return { result: err(400, "Invalid version"), targetUserId, viewerId };
+  const q = parseInput(topRankersListQuerySchema, req.query, {
+    in: "query",
+    message: "Invalid version",
+  });
+  if (!q.success) {
+    return { result: q.result, targetUserId, viewerId };
   }
+  const { version } = q.data;
 
   try {
     const iidxId = normalizeIidxId((await usersRepo.getIidxId(targetUserId))?.iidxId);

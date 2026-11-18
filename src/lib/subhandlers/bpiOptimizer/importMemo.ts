@@ -5,6 +5,7 @@ import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { targetOf, type HandleOutcome } from "./_shared";
+import { invalidParam } from "@/lib/validation/params";
 
 export interface ImportedGoalTarget {
   songId: number;
@@ -33,7 +34,7 @@ export async function handleImportOptimizeMemo(
     typeof req.query.reportId === "string" ? req.query.reportId : "";
   if (!reportId) {
     return {
-      result: err(400, "reportId is required"),
+      result: invalidParam("reportId", req.query.reportId, "reportId is required"),
       targetUserId: userId,
       viewerId: null,
     };

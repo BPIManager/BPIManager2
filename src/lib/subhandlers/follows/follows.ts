@@ -8,6 +8,7 @@ import { accessError, err, ok, invalidQuery } from "@/middlewares/api/apiResult"
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { followsQuerySchema } from "@/schemas/follows/query";
 import type { HandleOutcome } from "./_shared";
+import { invalidParam } from "@/lib/validation/params";
 
 /** GET /users/[userId]/follows */
 export async function handleFollowsList(
@@ -17,7 +18,7 @@ export async function handleFollowsList(
     typeof req.query.userId === "string" ? req.query.userId : "";
   if (!targetUserId) {
     return {
-      result: err(400, "Invalid or missing userId"),
+      result: invalidParam("userId", req.query.userId, "Invalid or missing userId"),
       targetUserId,
       viewerId: null,
     };
@@ -65,7 +66,7 @@ export async function handleFollow(
     typeof req.query.userId === "string" ? req.query.userId : "";
   if (!targetUserId) {
     return {
-      result: err(400, "Invalid or missing userId"),
+      result: invalidParam("userId", req.query.userId, "Invalid or missing userId"),
       targetUserId,
       viewerId: null,
     };
@@ -132,7 +133,7 @@ export async function handleUnfollow(
     typeof req.query.userId === "string" ? req.query.userId : "";
   if (!targetUserId) {
     return {
-      result: err(400, "Invalid or missing userId"),
+      result: invalidParam("userId", req.query.userId, "Invalid or missing userId"),
       targetUserId,
       viewerId: null,
     };

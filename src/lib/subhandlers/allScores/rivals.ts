@@ -1,9 +1,11 @@
 import { allScoresSelfRivalRepo } from "@/lib/db/aggregates/allScores/selfAndRivals";
 import { resolveVersion } from "@/lib/subhandlers/shared";
-import { err, ok } from "@/middlewares/api/apiResult";
+import { ok } from "@/middlewares/api/apiResult";
 import type { AccessResult } from "@/middlewares/api/withApi";
 import type { NextApiRequest } from "next";
 import type { HandleOutcome, AllSongRivalsBody } from "./_shared";
+import { parseInput } from "@/lib/validation/parse";
+import { pathParamsSchema } from "@/schemas/common/params";
 
 export async function handleAllSongRivals(
   req: NextApiRequest,
@@ -12,26 +14,26 @@ export async function handleAllSongRivals(
   const targetUserId =
     typeof req.query.userId === "string" ? req.query.userId : "";
   const viewerId = access.viewerId ?? null;
-  const { songId } = req.query;
 
-  if (!targetUserId || !songId) {
-    return {
-      result: err(400, "Missing required parameters"),
-      targetUserId,
-      viewerId,
-    };
+  const path = parseInput(pathParamsSchema("userId", "songId"), req.query, {
+    in: "path",
+    message: "Missing required parameters",
+  });
+  if (!path.success) {
+    return { result: path.result, targetUserId, viewerId };
   }
+  const { songId } = path.data;
 
   const version = resolveVersion(req.query.version);
   const rivalsScores = await allScoresSelfRivalRepo.getRivalScoresForAllSong({
     viewerId: targetUserId,
-    songId: Number(songId),
+    songId,
     version,
   });
 
   return {
     result: ok({
-      songId: Number(songId),
+      songId,
       version,
       rivals: rivalsScores.map((r) => ({
         userId: r.userId,

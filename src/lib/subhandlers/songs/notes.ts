@@ -3,15 +3,18 @@ import { songNotesRepo } from "@/lib/db/domains/songNotes";
 import { songNotesAggregateRepo } from "@/lib/db/aggregates/songNotes";
 import { resolveOptionalUid } from "@/middlewares/api/resolveOptionalUid";
 import { err, ok } from "@/middlewares/api/apiResult";
-import { num, type HandleOutcome } from "./_shared";
+import { type HandleOutcome } from "./_shared";
+import { invalidParam, parseIntParam } from "@/lib/validation/params";
+import { parseInput } from "@/lib/validation/parse";
+import { noteBodySchema } from "@/schemas/songs/input";
 
 export async function handleSongNotesList(
   req: NextApiRequest,
 ): Promise<HandleOutcome<unknown>> {
-  const songId = num(req.query.songId);
+  const songId = parseIntParam("songId", req.query.songId);
   if (songId === null) {
     return {
-      result: err(400, "Invalid songId"),
+      result: invalidParam("songId", req.query.songId, "Invalid songId"),
       targetUserId: "",
       viewerId: null,
     };
@@ -30,10 +33,10 @@ export async function handleSongNotesList(
 export async function handleCreateSongNote(
   req: NextApiRequest,
 ): Promise<HandleOutcome<unknown>> {
-  const songId = num(req.query.songId);
+  const songId = parseIntParam("songId", req.query.songId);
   if (songId === null) {
     return {
-      result: err(400, "Invalid songId"),
+      result: invalidParam("songId", req.query.songId, "Invalid songId"),
       targetUserId: "",
       viewerId: null,
     };
@@ -42,14 +45,12 @@ export async function handleCreateSongNote(
   const b = { targetUserId: uid ?? "", viewerId: uid };
   if (!uid) return { result: err(401, "Unauthorized"), ...b };
 
-  const { body } = req.body ?? {};
-  if (typeof body !== "string" || body.trim().length === 0) {
-    return { result: err(400, "body is required"), ...b };
+  const input = parseInput(noteBodySchema, req.body ?? {}, { in: "body" });
+  if (!input.success) {
+    return { result: input.result, ...b };
   }
-  if (body.trim().length > 2000) {
-    return { result: err(400, "body too long (max 2000)"), ...b };
-  }
-  const id = await songNotesRepo.createNote(songId, uid, body.trim());
+  const { body } = input.data;
+  const id = await songNotesRepo.createNote(songId, uid, body);
   return { result: ok({ id }), successStatus: 201, ...b };
 }
 

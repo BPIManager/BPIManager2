@@ -3,14 +3,15 @@ import { statsSongTablesRepo } from "@/lib/db/aggregates/stats/songTables";
 import { resolveOptionalUid } from "@/middlewares/api/resolveOptionalUid";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
-import { num, resolveVersion, type HandleOutcome } from "./_shared";
+import { resolveVersion, type HandleOutcome } from "./_shared";
+import { invalidParam, parseIntParam } from "@/lib/validation/params";
 export async function handleSongRanking(
   req: NextApiRequest,
 ): Promise<HandleOutcome<unknown>> {
-  const songIdNum = num(req.query.songId);
+  const songIdNum = parseIntParam("songId", req.query.songId);
   if (songIdNum === null) {
     return {
-      result: err(400, "Invalid songId"),
+      result: invalidParam("songId", req.query.songId, "Invalid songId"),
       targetUserId: "",
       viewerId: null,
     };

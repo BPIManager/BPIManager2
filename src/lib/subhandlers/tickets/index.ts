@@ -5,6 +5,8 @@ import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import type { TicketRecommendResult } from "@/types/tickets";
 import type { HandlerResult } from "@/types/api";
+import { parseInput } from "@/lib/validation/parse";
+import { ticketQuerySchema, ticketRecommendBodySchema } from "@/schemas/tickets/input";
 
 const VERSION = latestVersion;
 
@@ -26,18 +28,17 @@ export async function handleTicketRecommendGet(
   const userId = targetOf(req);
   const viewerId = access.viewerId ?? null;
 
-  const ticketId = req.query.ticketId as string;
+  const ticketQuery = parseInput(ticketQuerySchema, req.query, {
+    in: "query",
+    message: "ticketId is required",
+  });
+  if (!ticketQuery.success) {
+    return { result: ticketQuery.result, targetUserId: userId, viewerId };
+  }
+  const { ticketId } = ticketQuery.data;
   const expiresAt = (req.query.expiresAt as string) ?? "";
   const offset = parseInt((req.query.offset as string) ?? "0", 10);
   const scoreMode = req.query.scoreMode === "raw" ? "raw" : "relative";
-
-  if (!ticketId) {
-    return {
-      result: err(400, "ticketId is required"),
-      targetUserId: userId,
-      viewerId,
-    };
-  }
 
   try {
     const totalBpi = await ticketsRepo.getLatestTotalBpi(userId, VERSION);
@@ -74,26 +75,12 @@ export async function handleTicketRecommendPost(
   const userId = targetOf(req);
   const viewerId = access.viewerId ?? null;
 
-  const { ticketIds, scoreMode } = req.body as {
-    ticketIds: { ticketId: string; expiresAt: string }[];
-    scoreMode?: "relative" | "raw";
-  };
-  const resolvedMode = scoreMode === "raw" ? "raw" : "relative";
-
-  if (!Array.isArray(ticketIds) || ticketIds.length === 0) {
-    return {
-      result: err(400, "ticketIds is required"),
-      targetUserId: userId,
-      viewerId,
-    };
+  const input = parseInput(ticketRecommendBodySchema, req.body ?? {}, { in: "body" });
+  if (!input.success) {
+    return { result: input.result, targetUserId: userId, viewerId };
   }
-  if (ticketIds.length > 50) {
-    return {
-      result: err(400, "Too many ticketIds (max 50)"),
-      targetUserId: userId,
-      viewerId,
-    };
-  }
+  const { ticketIds } = input.data;
+  const resolvedMode = (req.body as { scoreMode?: string }).scoreMode === "raw" ? "raw" : "relative";
 
   try {
     const totalBpi = await ticketsRepo.getLatestTotalBpi(userId, VERSION);

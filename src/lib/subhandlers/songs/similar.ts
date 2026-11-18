@@ -2,16 +2,17 @@ import type { NextApiRequest } from "next";
 import { songSearchRepo } from "@/lib/db/domains/songs/search";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
-import { num, resolveVersion, type HandleOutcome } from "./_shared";
+import { resolveVersion, type HandleOutcome } from "./_shared";
 import type { IIDXVersion } from "@/types/iidx/version";
+import { invalidParam, parseIntParam } from "@/lib/validation/params";
 
 export async function handleSongSimilar(
   req: NextApiRequest,
 ): Promise<HandleOutcome<unknown>> {
   const base = { targetUserId: "", viewerId: null };
-  const songIdNum = num(req.query.songId);
+  const songIdNum = parseIntParam("songId", req.query.songId);
   if (songIdNum === null)
-    return { result: err(400, "Invalid songId"), ...base };
+    return { result: invalidParam("songId", req.query.songId, "Invalid songId"), ...base };
 
   const version = resolveVersion(req.query.version) as IIDXVersion;
   const rawLimit = parseInt(String(req.query.limit ?? "10"), 10);

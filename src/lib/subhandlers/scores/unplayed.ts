@@ -7,6 +7,8 @@ import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { targetOf, type HandleOutcome } from "./_shared";
 import type { AccessResult } from "@/middlewares/api/withApi";
+import { parseInput } from "@/lib/validation/parse";
+import { versionQuerySchema } from "@/schemas/common/query";
 
 export async function handleUnplayed(
   req: NextApiRequest,
@@ -15,14 +17,15 @@ export async function handleUnplayed(
   const targetUserId = targetOf(req);
   const viewerId = access.viewerId ?? null;
 
-  const { version, ...filterParams } = req.query;
-  if (!version || typeof version !== "string") {
-    return {
-      result: err(400, "Missing or invalid version parameter."),
-      targetUserId,
-      viewerId,
-    };
+  const { version: _version, ...filterParams } = req.query;
+  const q = parseInput(versionQuerySchema, req.query, {
+    in: "query",
+    message: "Missing or invalid version parameter.",
+  });
+  if (!q.success) {
+    return { result: q.result, targetUserId, viewerId };
   }
+  const { version } = q.data;
 
   let rows: Awaited<
     ReturnType<typeof unplayedSongsAggregateRepo.getUnplayedSongs>

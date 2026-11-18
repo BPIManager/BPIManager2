@@ -4,6 +4,7 @@ import { revokeViewPermission } from "@/lib/db/orchestrators/viewPermissionRevok
 import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { authUidOf, type HandleOutcome } from "./_shared";
+import { invalidParam, parseStringParam } from "@/lib/validation/params";
 
 /** GET /users/[userId]/view-permissions （承認済みのフォロワー一覧） */
 export async function handleViewPermissionsList(
@@ -39,10 +40,10 @@ export async function handleRevokeViewPermission(
   req: NextApiRequest,
 ): Promise<HandleOutcome<unknown>> {
   const uid = authUidOf(req);
-  const { followerId } = req.query;
-  if (!followerId || typeof followerId !== "string") {
+  const followerId = parseStringParam("followerId", req.query.followerId);
+  if (followerId === null) {
     return {
-      result: err(400, "Invalid followerId"),
+      result: invalidParam("followerId", req.query.followerId, "Invalid followerId"),
       targetUserId: uid,
       viewerId: uid,
     };

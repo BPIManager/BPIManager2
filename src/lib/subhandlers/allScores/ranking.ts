@@ -3,6 +3,7 @@ import { resolveVersion, toErrorMessage } from "@/lib/subhandlers/shared";
 import { err, ok } from "@/middlewares/api/apiResult";
 import type { AuthenticatedNextApiRequest } from "@/middlewares/api/withAuth";
 import type { HandleOutcome, AllSongRanking } from "./_shared";
+import { invalidParam, parseIntParam } from "@/lib/validation/params";
 
 export async function handleAllSongRanking(
   req: AuthenticatedNextApiRequest,
@@ -10,10 +11,10 @@ export async function handleAllSongRanking(
   const viewerId = req.authUid;
   const targetUserId =
     typeof req.query.userId === "string" ? req.query.userId : viewerId;
-  const songIdNum = parseInt(req.query.songId as string);
+  const songIdNum = parseIntParam("songId", req.query.songId);
 
-  if (isNaN(songIdNum)) {
-    return { result: err(400, "Invalid songId"), targetUserId, viewerId };
+  if (songIdNum === null) {
+    return { result: invalidParam("songId", req.query.songId, "Invalid songId"), targetUserId, viewerId };
   }
 
   try {

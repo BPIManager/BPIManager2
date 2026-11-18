@@ -5,16 +5,23 @@ import { followListsRepo } from "@/lib/db/domains/followLists";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { authUidOf, normalizeArr, type HandleOutcome } from "./_shared";
+import { parseInput } from "@/lib/validation/parse";
+import { versionQuerySchema } from "@/schemas/common/query";
 
 export async function handleRivalFollowingSummary(
   req: NextApiRequest,
 ): Promise<HandleOutcome<unknown>> {
   const viewerId = authUidOf(req);
   const base = { targetUserId: viewerId, viewerId };
-  const { version, levels, difficulties, listId } = req.query;
-  if (!version) {
-    return { result: err(400, "version is required"), ...base };
+  const { levels, difficulties, listId } = req.query;
+  const q = parseInput(versionQuerySchema, req.query, {
+    in: "query",
+    message: "version is required",
+  });
+  if (!q.success) {
+    return { result: q.result, ...base };
   }
+  const { version } = q.data;
 
   try {
     const levelArray = normalizeArr(
@@ -37,7 +44,7 @@ export async function handleRivalFollowingSummary(
     const [summary, viewerBpiRecord] = await Promise.all([
       socialFollowedWinLossRepo.getFollowedWinLossSummary({
         viewerId,
-        version: version as string,
+        version,
         levels: levelArray,
         difficulties: diffArray,
         listId: listIdFilter,

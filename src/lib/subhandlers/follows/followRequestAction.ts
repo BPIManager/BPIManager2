@@ -4,12 +4,10 @@ import { approveFollowRequest } from "@/lib/db/orchestrators/followRequestApprov
 import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { authUidOf, type HandleOutcome } from "./_shared";
+import { invalidParam, parseIntParam } from "@/lib/validation/params";
 
 function parseRequestId(req: NextApiRequest): number | null {
-  const { requestId } = req.query;
-  const id = Number(requestId);
-  if (!requestId || Number.isNaN(id)) return null;
-  return id;
+  return parseIntParam("requestId", req.query.requestId);
 }
 
 /** POST /users/[userId]/follow-requests/[requestId] */
@@ -20,7 +18,7 @@ export async function handleApproveFollowRequest(
   const id = parseRequestId(req);
   if (id === null) {
     return {
-      result: err(400, "Invalid requestId"),
+      result: invalidParam("requestId", req.query.requestId, "Invalid requestId"),
       targetUserId: uid,
       viewerId: uid,
     };
@@ -56,7 +54,7 @@ export async function handleRejectFollowRequest(
   const id = parseRequestId(req);
   if (id === null) {
     return {
-      result: err(400, "Invalid requestId"),
+      result: invalidParam("requestId", req.query.requestId, "Invalid requestId"),
       targetUserId: uid,
       viewerId: uid,
     };

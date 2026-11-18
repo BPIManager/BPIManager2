@@ -14,6 +14,8 @@ import type { RadarCategory } from "@/types/stats/radar";
 import type { IIDXVersion } from "@/types/iidx/version";
 import type { SongOptimizerInput, ExecuteOptions } from "@/types/bpi-optimizer";
 import type { IBpiBasicSongData } from "@/types/songs/bpi";
+import { parseInput } from "@/lib/validation/parse";
+import { maxStepsQuerySchema, targetBpiQuerySchema } from "@/schemas/bpiOptimizer/query";
 
 /** GET /users/[userId]/analytics/bpi-optimizer （withUserApiHandler） */
 export async function handleBpiOptimizer(
@@ -23,23 +25,22 @@ export async function handleBpiOptimizer(
   const userId = targetOf(req);
   const viewerId = access.viewerId ?? null;
 
-  const targetBpi = parseFloat(String(req.query.targetBpi));
-  const maxSteps = parseInt(String(req.query.maxSteps ?? "30"));
-
-  if (isNaN(targetBpi) || targetBpi < -15 || targetBpi > 100) {
-    return {
-      result: err(400, "targetBpi must be a number between -15 and 100"),
-      targetUserId: userId,
-      viewerId,
-    };
+  const target = parseInput(targetBpiQuerySchema, req.query, {
+    in: "query",
+    message: "targetBpi must be a number between -15 and 100",
+  });
+  if (!target.success) {
+    return { result: target.result, targetUserId: userId, viewerId };
   }
-  if (isNaN(maxSteps) || maxSteps < 1 || maxSteps > 400) {
-    return {
-      result: err(400, "maxSteps must be a number between 1 and 400"),
-      targetUserId: userId,
-      viewerId,
-    };
+  const steps = parseInput(maxStepsQuerySchema, req.query, {
+    in: "query",
+    message: "maxSteps must be a number between 1 and 400",
+  });
+  if (!steps.success) {
+    return { result: steps.result, targetUserId: userId, viewerId };
   }
+  const { targetBpi } = target.data;
+  const { maxSteps } = steps.data;
 
   const strategiesParam = String(req.query.strategies ?? "unplayed,played");
   const difficultiesParam = String(

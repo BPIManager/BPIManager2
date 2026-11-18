@@ -8,6 +8,8 @@ import {
   writeV2Result,
   err,
 } from "@/middlewares/api/apiResult";
+import { parseInput } from "@/lib/validation/parse";
+import { availablePeriodsQuerySchema } from "@/schemas/stats/routeQueries";
 
 export default withUserApiHandler(
   (req, res) => {
@@ -16,13 +18,15 @@ export default withUserApiHandler(
       writeV2Result(res, err(405, "Method Not Allowed"));
       return null;
     }
-    const userId = req.query.userId as string;
-    const version = req.query.version as string;
-    if (!version) {
-      writeV2Result(res, err(400, "Missing param: version"));
+    const q = parseInput(availablePeriodsQuerySchema, req.query, {
+      in: "query",
+      message: "Missing param: version",
+    });
+    if (!q.success) {
+      writeV2Result(res, q.result);
       return null;
     }
-    return { userId, version };
+    return q.data;
   },
   async (req, res, query, access) => {
     writeV2Result(

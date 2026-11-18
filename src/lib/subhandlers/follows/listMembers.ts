@@ -6,12 +6,8 @@ import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { authUidOf, type HandleOutcome } from "./_shared";
 
-function parseListId(req: NextApiRequest): number | null {
-  const { listId } = req.query;
-  const id = Number(listId);
-  if (!listId || Number.isNaN(id)) return null;
-  return id;
-}
+import { parseInput } from "@/lib/validation/parse";
+import { pathParamsSchema } from "@/schemas/common/params";
 
 /** PATCH /users/[userId]/follow-lists/[listId] */
 
@@ -20,15 +16,14 @@ export async function handleAddListMember(
   req: NextApiRequest,
 ): Promise<HandleOutcome<unknown>> {
   const uid = authUidOf(req);
-  const id = parseListId(req);
-  const { followingId } = req.query;
-  if (id === null || typeof followingId !== "string") {
-    return {
-      result: err(400, "Invalid parameters"),
-      targetUserId: uid,
-      viewerId: uid,
-    };
+  const path = parseInput(pathParamsSchema("listId", "followingId"), req.query, {
+    in: "path",
+    message: "Invalid parameters",
+  });
+  if (!path.success) {
+    return { result: path.result, targetUserId: uid, viewerId: uid };
   }
+  const { listId: id, followingId } = path.data;
   try {
     const list = await followListsRepo.getById(id);
     if (!list || list.userId !== uid) {
@@ -66,15 +61,14 @@ export async function handleRemoveListMember(
   req: NextApiRequest,
 ): Promise<HandleOutcome<unknown>> {
   const uid = authUidOf(req);
-  const id = parseListId(req);
-  const { followingId } = req.query;
-  if (id === null || typeof followingId !== "string") {
-    return {
-      result: err(400, "Invalid parameters"),
-      targetUserId: uid,
-      viewerId: uid,
-    };
+  const path = parseInput(pathParamsSchema("listId", "followingId"), req.query, {
+    in: "path",
+    message: "Invalid parameters",
+  });
+  if (!path.success) {
+    return { result: path.result, targetUserId: uid, viewerId: uid };
   }
+  const { listId: id, followingId } = path.data;
   try {
     const list = await followListsRepo.getById(id);
     if (!list || list.userId !== uid) {

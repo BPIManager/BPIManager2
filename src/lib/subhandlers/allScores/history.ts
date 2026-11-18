@@ -4,20 +4,23 @@ import { accessError, err, ok } from "@/middlewares/api/apiResult";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 import type { NextApiRequest } from "next";
 import type { HandleOutcome, ScoreHistory } from "./_shared";
+import { parseInput } from "@/lib/validation/parse";
+import { pathParamsSchema } from "@/schemas/common/params";
 
 export async function handleAllScoresHistory(
   req: NextApiRequest,
 ): Promise<HandleOutcome<ScoreHistory>> {
-  const { userId, songId } = req.query;
+  const { userId } = req.query;
   const targetUserId = typeof userId === "string" ? userId : "";
 
-  if (!userId || !songId) {
-    return {
-      result: err(400, "Parameters are missing."),
-      targetUserId,
-      viewerId: null,
-    };
+  const path = parseInput(pathParamsSchema("userId", "songId"), req.query, {
+    in: "path",
+    message: "Parameters are missing.",
+  });
+  if (!path.success) {
+    return { result: path.result, targetUserId, viewerId: null };
   }
+  const { songId } = path.data;
 
   try {
     const access = await checkProfileAccess(req, targetUserId);
@@ -32,7 +35,7 @@ export async function handleAllScoresHistory(
 
     const history = await allScoresRepo.getScoreHistory(
       targetUserId,
-      songId as string,
+      String(songId),
     );
 
     return {
