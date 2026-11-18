@@ -1,16 +1,23 @@
 import { z } from "zod";
 
+/** API のエラーに載せる英語のメッセージ。画面向けの日本語は nameValidation.ts で対応づける */
+export const USER_NAME_MESSAGES = {
+  length: "userName must be 2 to 20 characters",
+  forbiddenSymbols: "userName must not contain any of / \\ ? # % * : \" ' < > |",
+  invalidCharacters: "userName contains unsupported characters",
+} as const;
+
 export const userNameSchema = z
   .string()
-  .min(2, "ユーザー名は2文字以上20文字以内で入力してください")
-  .max(20, "ユーザー名は2文字以上20文字以内で入力してください")
+  .min(2, USER_NAME_MESSAGES.length)
+  .max(20, USER_NAME_MESSAGES.length)
   .refine(
     (v) => !/[/\\?#%*:"'<>|]/.test(v),
-    "使用できない記号（/ や \\ など）が含まれています",
+    USER_NAME_MESSAGES.forbiddenSymbols,
   )
   .refine(
     (v) => /^[a-zA-Z0-9\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF\s._-]+$/.test(v),
-    "名前に使用できない特殊な文字が含まれています",
+    USER_NAME_MESSAGES.invalidCharacters,
   );
 
 export const arenaPrivacySchema = z.object({
@@ -25,14 +32,14 @@ export const profileUpsertSchema = z.object({
   // 8桁（ハイフン有無どちらも可。DBは varchar(12)）。未設定は空文字またはnull
   iidxId: z
     .string()
-    .regex(/^(\d{4}-?\d{4})?$/, "IIDX IDは8桁の数字で入力してください")
+    .regex(/^(\d{4}-?\d{4})?$/, "iidxId must be 8 digits (hyphen optional)")
     .nullable()
     .default(null),
   profileText: z.string().max(2000).nullable().default(null),
   profileImage: z
     .string()
     .max(2048)
-    .refine((v) => v === "" || /^https:\/\//.test(v), "https のURLのみ指定できます")
+    .refine((v) => v === "" || /^https:\/\//.test(v), "profileImage must be an https URL")
     .nullable()
     .default(null),
   isPublic: z.number().int().min(0).max(1),

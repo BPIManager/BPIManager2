@@ -1,6 +1,6 @@
 import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
 import { parseStatsQueryV2 } from "@/services/nextRequest/parseStatsQueries";
-import { parseQuery } from "@/services/nextRequest/parseBody";
+import { parseQueryV2 } from "@/services/nextRequest/parseBody";
 import { recommendedParamsSchema } from "@/schemas/stats/recommended";
 import { handleStatsRecommended } from "@/lib/subhandlers/stats";
 import {
@@ -14,7 +14,7 @@ export default withUserApiHandler(
   (req, res) => {
     const q = parseStatsQueryV2(req.query, res);
     if (!q) return null;
-    const body = parseQuery(recommendedParamsSchema, req.query, res);
+    const body = parseQueryV2(recommendedParamsSchema, req.query, res);
     if (!body) return null;
     return { ...q, ...body };
   },

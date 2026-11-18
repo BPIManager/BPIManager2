@@ -2,7 +2,6 @@ import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
 
 import { handleStatsAvailablePeriods } from "@/lib/subhandlers/stats";
 import { writeV1Result } from "@/middlewares/api/apiResult";
-import type { AvailablePeriodsData } from "@/types/stats/availablePeriods";
 
 export default withUserApiHandler(
   (req, res) => {

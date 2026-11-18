@@ -4,13 +4,18 @@ import {
   withAuth,
 } from "@/middlewares/api/withAuth";
 import { handleListLinkedAccounts } from "@/lib/subhandlers/auth";
-import { buildMeta, withMeta, writeV2Result } from "@/middlewares/api/apiResult";
+import {
+  buildMeta,
+  withMeta,
+  writeV2Result,
+  err,
+} from "@/middlewares/api/apiResult";
 
 /** GET /api/v2/auth/linked-accounts */
 async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
   if (req.method !== "GET") {
     res.setHeader("Allow", ["GET"]);
-    res.status(405).end();
+    writeV2Result(res, err(405, "Method Not Allowed"));
     return;
   }
   const { result, targetUserId, viewerId } = await handleListLinkedAccounts(req);

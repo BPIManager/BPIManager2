@@ -106,7 +106,7 @@ export function parseStatsQueryV2RequiringFilter(
       res,
       missingParams(["level", "difficulty"], statsQueryJsonSchemaRequiringFilter(), {
         in: "query",
-        hint: "level か difficulty の少なくとも一方を指定してください",
+        hint: "At least one of level or difficulty is required",
       }),
     );
     return null;

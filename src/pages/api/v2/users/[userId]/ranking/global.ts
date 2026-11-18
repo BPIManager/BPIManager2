@@ -7,12 +7,13 @@ import {
   buildMeta,
   withMeta,
   writeV2Result,
+  err,
 } from "@/middlewares/api/apiResult";
 import type { NextApiResponse } from "next";
 
 async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
   if (req.method !== "GET") {
-    res.status(405).end();
+    writeV2Result(res, err(405, "Method Not Allowed"));
     return;
   }
 

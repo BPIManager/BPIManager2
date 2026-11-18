@@ -1,6 +1,10 @@
 import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
 import { generateMonthlyReviewOgpImage } from "@/lib/subhandlers/stats";
-import { accessError, writeV2Result } from "@/middlewares/api/apiResult";
+import {
+  accessError,
+  writeV2Result,
+  err,
+} from "@/middlewares/api/apiResult";
 import { parseMonthlyReviewQuery } from "@/lib/subhandlers/stats/monthlyReviewV2/routeQuery";
 
 export default withUserApiHandler(
@@ -26,7 +30,7 @@ export default withUserApiHandler(
     } catch (error) {
     console.error(error);
       const message = "Internal Server Error";
-      res.status(500).json({ message });
+      writeV2Result(res, err(500, message));
     }
   },
   {

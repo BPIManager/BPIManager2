@@ -8,6 +8,7 @@ import {
   buildMeta,
   withMeta,
   writeV2Result,
+  err,
 } from "@/middlewares/api/apiResult";
 
 async function handler(
@@ -16,7 +17,7 @@ async function handler(
 ) {
   if (req.method !== "GET" && req.method !== "POST") {
     res.setHeader("Allow", ["GET", "POST"]);
-    res.status(405).end();
+    writeV2Result(res, err(405, "Method Not Allowed"));
     return;
   }
 

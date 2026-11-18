@@ -32,13 +32,14 @@ describe("エラー詳細(details)の書き出し", () => {
     });
   });
 
-  it("v2: details が無いエラーは従来と同じ形状", () => {
+  it("v2: details が無いエラーは errorDetails: null（常に存在する）", () => {
     const res = mockRes();
     writeV2Result(res as never, err(404, "Song not found"));
     expect(res.json).toHaveBeenCalledWith({
       error: true,
       errorMessage: "Song not found",
       body: null,
+      errorDetails: null,
     });
   });
 

@@ -5,12 +5,13 @@ import {
   buildMeta,
   withMeta,
   writeV2Result,
+  err,
 } from "@/middlewares/api/apiResult";
 
 export default withUserApiHandler(
   (req, res) => {
     if (req.method !== "POST") {
-      res.status(405).end();
+      writeV2Result(res, err(405, "Method Not Allowed"));
       return null;
     }
     return { userId: String(req.query.userId) };

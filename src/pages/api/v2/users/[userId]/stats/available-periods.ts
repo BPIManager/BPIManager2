@@ -6,19 +6,20 @@ import {
   buildMeta,
   withMeta,
   writeV2Result,
+  err,
 } from "@/middlewares/api/apiResult";
 
 export default withUserApiHandler(
   (req, res) => {
     if (req.method !== "GET") {
       res.setHeader("Allow", ["GET"]);
-      res.status(405).json({ message: "Method Not Allowed" });
+      writeV2Result(res, err(405, "Method Not Allowed"));
       return null;
     }
     const userId = req.query.userId as string;
     const version = req.query.version as string;
     if (!version) {
-      res.status(400).json({ message: "Missing param: version" });
+      writeV2Result(res, err(400, "Missing param: version"));
       return null;
     }
     return { userId, version };

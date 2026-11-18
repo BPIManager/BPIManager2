@@ -149,6 +149,7 @@ describe("writeV2Result", () => {
       error: false,
       errorMessage: null,
       body: { score: 1234 },
+      errorDetails: null,
     });
   });
 
@@ -162,6 +163,7 @@ describe("writeV2Result", () => {
       error: false,
       errorMessage: null,
       body: [1],
+      errorDetails: null,
       meta: {
         viewerId: null,
         isSelf: false,
@@ -180,6 +182,7 @@ describe("writeV2Result", () => {
       error: false,
       errorMessage: null,
       body: null,
+      errorDetails: null,
       meta: { viewerId: "u1", isSelf: true },
     });
   });
@@ -192,6 +195,7 @@ describe("writeV2Result", () => {
       error: true,
       errorMessage: "boom",
       body: null,
+      errorDetails: null,
     });
   });
 });

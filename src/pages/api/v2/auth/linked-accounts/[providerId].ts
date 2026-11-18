@@ -4,13 +4,18 @@ import {
   withAuth,
 } from "@/middlewares/api/withAuth";
 import { handleUnlinkProvider } from "@/lib/subhandlers/auth";
-import { buildMeta, withMeta, writeV2Result } from "@/middlewares/api/apiResult";
+import {
+  buildMeta,
+  withMeta,
+  writeV2Result,
+  err,
+} from "@/middlewares/api/apiResult";
 
 /** DELETE /api/v2/auth/linked-accounts/[providerId]（ログイン手段の連携解除） */
 async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
   if (req.method !== "DELETE") {
     res.setHeader("Allow", ["DELETE"]);
-    res.status(405).end();
+    writeV2Result(res, err(405, "Method Not Allowed"));
     return;
   }
   const providerId = String(req.query.providerId);
