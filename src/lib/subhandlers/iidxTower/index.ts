@@ -6,6 +6,7 @@ import { accessError, err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import type { AuthenticatedNextApiRequest } from "@/middlewares/api/withAuth";
 import type { HandlerResult } from "@/types/api";
+import { parseInput } from "@/lib/validation/parse";
 
 export interface HandleOutcome<T> {
   result: HandlerResult<T>;
@@ -80,13 +81,12 @@ export async function handleIidxTowerPost(
   req: NextApiRequest,
 ): Promise<HandleOutcome<unknown>> {
   const uid = (req as AuthenticatedNextApiRequest).authUid;
-  const parsed = postBodySchema.safeParse(req.body);
+  const parsed = parseInput(postBodySchema, req.body, {
+    in: "body",
+    message: "Invalid request body",
+  });
   if (!parsed.success) {
-    return {
-      result: err(400, "Invalid request body"),
-      targetUserId: uid,
-      viewerId: uid,
-    };
+    return { result: parsed.result, targetUserId: uid, viewerId: uid };
   }
   try {
     const count = await iidxTowerRepo.upsertRows(

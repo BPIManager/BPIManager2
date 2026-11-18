@@ -4,10 +4,10 @@ import { err, ok, invalidBody } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { updateSavedComparisonBodySchema } from "@/schemas/savedComparisons";
 import { authUidOf, type HandleOutcome } from "./_shared";
+import { invalidParam, parseIntParam } from "@/lib/validation/params";
 
 function parseId(req: NextApiRequest): number | null {
-  const id = Number(req.query.id);
-  return Number.isInteger(id) && id > 0 ? id : null;
+  return parseIntParam("id", req.query.id);
 }
 
 /** PATCH /users/[userId]/saved-comparisons/[id] */
@@ -17,7 +17,7 @@ export async function handleUpdateSavedComparison(
   const uid = authUidOf(req);
   const id = parseId(req);
   if (id === null) {
-    return { result: err(400, "Invalid id"), targetUserId: uid, viewerId: uid };
+    return { result: invalidParam("id", req.query.id, "Invalid id"), targetUserId: uid, viewerId: uid };
   }
   const parsed = updateSavedComparisonBodySchema.safeParse(req.body);
   if (!parsed.success) {
@@ -48,7 +48,7 @@ export async function handleDeleteSavedComparison(
   const uid = authUidOf(req);
   const id = parseId(req);
   if (id === null) {
-    return { result: err(400, "Invalid id"), targetUserId: uid, viewerId: uid };
+    return { result: invalidParam("id", req.query.id, "Invalid id"), targetUserId: uid, viewerId: uid };
   }
   try {
     const deleted = await savedComparisonsRepo.delete(id, uid);

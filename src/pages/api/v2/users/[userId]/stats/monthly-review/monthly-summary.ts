@@ -1,5 +1,4 @@
 import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
-import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import { handleStatsMonthlyReviewMonthlySummary } from "@/lib/subhandlers/stats";
 import {
   accessError,
@@ -8,6 +7,8 @@ import {
   writeV2Result,
   err,
 } from "@/middlewares/api/apiResult";
+import { parseInput } from "@/lib/validation/parse";
+import { monthlySummaryQuerySchema } from "@/schemas/stats/routeQueries";
 
 export default withUserApiHandler(
   (req, res) => {
@@ -15,18 +16,15 @@ export default withUserApiHandler(
       writeV2Result(res, err(405, "Method Not Allowed"));
       return null;
     }
-    const userId = req.query.userId as string;
-    const version = req.query.version as string;
-    const isValidVersion = (IIDX_VERSIONS as readonly string[]).includes(version);
-    if (!userId || typeof userId !== "string") {
-      writeV2Result(res, err(400, "Invalid userId"));
+    const q = parseInput(monthlySummaryQuerySchema, req.query, {
+      in: "query",
+      message: "Missing or invalid params: version",
+    });
+    if (!q.success) {
+      writeV2Result(res, q.result);
       return null;
     }
-    if (!version || !isValidVersion) {
-      writeV2Result(res, err(400, "Missing or invalid params: version"));
-      return null;
-    }
-    return { userId, version };
+    return q.data;
   },
   async (req, res, query, access) => {
     writeV2Result(

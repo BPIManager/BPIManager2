@@ -5,6 +5,7 @@ import { accessError, err, ok } from "@/middlewares/api/apiResult";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 import type { NextApiRequest } from "next";
 import type { HandleOutcome, AllScoresList } from "./_shared";
+import { invalidParam } from "@/lib/validation/params";
 
 export async function handleAllScoresList(
   req: NextApiRequest,
@@ -14,7 +15,7 @@ export async function handleAllScoresList(
 
   if (!targetUserId) {
     return {
-      result: err(400, "Invalid userId"),
+      result: invalidParam("userId", req.query.userId, "Invalid userId"),
       targetUserId,
       viewerId: null,
     };

@@ -4,18 +4,18 @@ import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { rivalFollowingScoresQuerySchema } from "@/schemas/rivals/following/scores/query";
 import { targetOf, type HandleOutcome } from "./_shared";
+import { parseInput } from "@/lib/validation/parse";
 
 export async function handleRivalFollowingScoresForSong(
   req: NextApiRequest,
 ): Promise<HandleOutcome<unknown>> {
   const targetUserId = targetOf(req);
-  const parsed = rivalFollowingScoresQuerySchema.safeParse(req.query);
+  const parsed = parseInput(rivalFollowingScoresQuerySchema, req.query, {
+    in: "query",
+    message: "Missing required parameters",
+  });
   if (!parsed.success) {
-    return {
-      result: err(400, "Missing required parameters"),
-      targetUserId,
-      viewerId: null,
-    };
+    return { result: parsed.result, targetUserId, viewerId: null };
   }
   const { userId, songId, version, includeUserIds } = parsed.data;
 

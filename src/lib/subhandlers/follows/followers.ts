@@ -6,16 +6,17 @@ import { unfollowAndCleanupLists } from "@/lib/db/orchestrators/unfollow";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { authUidOf, type HandleOutcome } from "./_shared";
+import { invalidParam, parseStringParam } from "@/lib/validation/params";
 
 /** DELETE /users/[userId]/followers/[followerId] */
 export async function handleRemoveFollower(
   req: NextApiRequest,
 ): Promise<HandleOutcome<unknown>> {
   const uid = authUidOf(req);
-  const { followerId } = req.query;
-  if (!followerId || typeof followerId !== "string") {
+  const followerId = parseStringParam("followerId", req.query.followerId);
+  if (followerId === null) {
     return {
-      result: err(400, "Invalid followerId"),
+      result: invalidParam("followerId", req.query.followerId, "Invalid followerId"),
       targetUserId: uid,
       viewerId: uid,
     };
@@ -48,10 +49,10 @@ export async function handleApproveLegacyFollower(
   req: NextApiRequest,
 ): Promise<HandleOutcome<unknown>> {
   const uid = authUidOf(req);
-  const { followerId } = req.query;
-  if (!followerId || typeof followerId !== "string") {
+  const followerId = parseStringParam("followerId", req.query.followerId);
+  if (followerId === null) {
     return {
-      result: err(400, "Invalid followerId"),
+      result: invalidParam("followerId", req.query.followerId, "Invalid followerId"),
       targetUserId: uid,
       viewerId: uid,
     };

@@ -1,10 +1,11 @@
 import { songSearchRepo } from "@/lib/db/domains/songs/search";
 import { resolveVersion } from "@/lib/subhandlers/shared";
-import { err, ok } from "@/middlewares/api/apiResult";
+import { ok } from "@/middlewares/api/apiResult";
 import type { AccessResult } from "@/middlewares/api/withApi";
 import type { IIDXVersion } from "@/types/iidx/version";
 import type { NextApiRequest } from "next";
 import { targetOf, type HandleOutcome } from "./_shared";
+import { invalidParam, parseIntParam } from "@/lib/validation/params";
 
 /** GET /users/[userId]/songs/[songId]/similar */
 export async function handleUserSongSimilar(
@@ -14,9 +15,9 @@ export async function handleUserSongSimilar(
   const targetUserId = targetOf(req);
   const viewerId = access.viewerId ?? null;
 
-  const songIdNum = parseInt(String(req.query.songId), 10);
-  if (isNaN(songIdNum)) {
-    return { result: err(400, "Invalid songId"), targetUserId, viewerId };
+  const songIdNum = parseIntParam("songId", req.query.songId);
+  if (songIdNum === null) {
+    return { result: invalidParam("songId", req.query.songId, "Invalid songId"), targetUserId, viewerId };
   }
 
   const version = resolveVersion(req.query.version) as IIDXVersion;

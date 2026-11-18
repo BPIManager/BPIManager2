@@ -1,10 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
-import {
-  NATIONWIDE_AREA_ID,
-  TOP_RANKER_AREA_NAMES,
-  TOP_RANKER_VERSIONS,
-} from "@/constants/iidx/topRankerAreas";
 import { topRankersRankingRepo } from "@/lib/db/aggregates/topRankers/ranking";
 import { statsLatestScoresRepo } from "@/lib/db/aggregates/stats/latestScores";
 import { statsSongTablesRepo } from "@/lib/db/aggregates/stats/songTables";
@@ -16,17 +11,8 @@ import { err, ok } from "@/middlewares/api/apiResult";
 import type { AuthenticatedNextApiRequest } from "@/middlewares/api/withAuth";
 import type { AllDifficulties } from "@/types/songs/allSongs";
 import { targetOf, type HandleOutcome } from "./_shared";
-
-const DIFFICULTIES: readonly AllDifficulties[] = [
-  "BEGINNER",
-  "NORMAL",
-  "HYPER",
-  "ANOTHER",
-  "LEGGENDARIA",
-];
-
-const csv = (v: unknown): string[] =>
-  typeof v === "string" && v !== "" ? v.split(",") : [];
+import { parseInput } from "@/lib/validation/parse";
+import { topRankersRankingQuerySchema } from "@/schemas/topRankers/query";
 
 /** GET /users/[userId]/ranking/top-rankers?version=33&area=<areaId。省略時は全国(0)>&levels=11,12&difficulties=ANOTHER,HYPER */
 export async function handleTopRankersRanking(
@@ -35,22 +21,15 @@ export async function handleTopRankersRanking(
   const viewerId = req.authUid;
   const targetUserId = targetOf(req);
 
-  const { version, area = String(NATIONWIDE_AREA_ID) } = req.query;
-  const areaId = Number(area);
-  const levels = csv(req.query.levels).map(Number);
-  const difficulties = csv(req.query.difficulties) as AllDifficulties[];
-
-  if (
-    typeof version !== "string" ||
-    !(TOP_RANKER_VERSIONS as readonly string[]).includes(version) ||
-    !Number.isInteger(areaId) ||
-    areaId < 0 ||
-    areaId >= TOP_RANKER_AREA_NAMES.length ||
-    levels.some((lv) => !Number.isInteger(lv) || lv < 1 || lv > 12) ||
-    difficulties.some((d) => !DIFFICULTIES.includes(d))
-  ) {
-    return { result: err(400, "Invalid query"), targetUserId, viewerId };
+  const q = parseInput(topRankersRankingQuerySchema, req.query, {
+    in: "query",
+    message: "Invalid query",
+  });
+  if (!q.success) {
+    return { result: q.result, targetUserId, viewerId };
   }
+  const { version, area: areaId, levels } = q.data;
+  const difficulties = q.data.difficulties as AllDifficulties[];
 
   try {
     const [rows, viewerScores, fullMaster, validSongKeys] = await Promise.all([

@@ -3,16 +3,23 @@ import { rivalAggregateRepo } from "@/lib/db/aggregates/rivalScores/aggregate";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { authUidOf, type HandleOutcome } from "./_shared";
+import { parseInput } from "@/lib/validation/parse";
+import { versionQuerySchema } from "@/schemas/common/query";
 
 export async function handleRivalFollowingTopScores(
   req: NextApiRequest,
 ): Promise<HandleOutcome<unknown>> {
   const userId = authUidOf(req);
   const base = { targetUserId: userId, viewerId: userId };
-  const { version, songIds: songIdsRaw } = req.query;
-  if (!version || typeof version !== "string") {
-    return { result: err(400, "userId and version are required"), ...base };
+  const { songIds: songIdsRaw } = req.query;
+  const q = parseInput(versionQuerySchema, req.query, {
+    in: "query",
+    message: "userId and version are required",
+  });
+  if (!q.success) {
+    return { result: q.result, ...base };
   }
+  const { version } = q.data;
   const songIds =
     songIdsRaw && typeof songIdsRaw === "string"
       ? songIdsRaw

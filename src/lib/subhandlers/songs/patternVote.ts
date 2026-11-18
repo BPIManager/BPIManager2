@@ -2,16 +2,19 @@ import type { NextApiRequest } from "next";
 import { songPatternsRepo } from "@/lib/db/domains/songPatterns";
 import { resolveOptionalUid } from "@/middlewares/api/resolveOptionalUid";
 import { err, ok } from "@/middlewares/api/apiResult";
-import { num, type HandleOutcome } from "./_shared";
+import { type HandleOutcome } from "./_shared";
 import type { VoteType } from "@/types/db";
+import { invalidParam, parseIntParam } from "@/lib/validation/params";
+import { parseInput } from "@/lib/validation/parse";
+import { patternVoteBodySchema } from "@/schemas/songs/input";
 
 export async function handleSongPatternVote(
   req: NextApiRequest,
 ): Promise<HandleOutcome<unknown>> {
-  const songId = num(req.query.songId);
+  const songId = parseIntParam("songId", req.query.songId);
   if (songId === null) {
     return {
-      result: err(400, "Invalid songId"),
+      result: invalidParam("songId", req.query.songId, "Invalid songId"),
       targetUserId: "",
       viewerId: null,
     };
@@ -19,7 +22,7 @@ export async function handleSongPatternVote(
   const pattern = req.query.pattern;
   if (!pattern || Array.isArray(pattern)) {
     return {
-      result: err(400, "Invalid pattern"),
+      result: invalidParam("pattern", req.query.pattern, "Invalid pattern"),
       targetUserId: "",
       viewerId: null,
     };
@@ -29,13 +32,11 @@ export async function handleSongPatternVote(
   if (!uid) return { result: err(401, "Unauthorized"), ...b };
 
   if (req.method === "POST") {
-    const { voteType } = req.body ?? {};
-    if (voteType !== "upvote" && voteType !== "downvote") {
-      return {
-        result: err(400, "voteType must be upvote or downvote"),
-        ...b,
-      };
+    const input = parseInput(patternVoteBodySchema, req.body ?? {}, { in: "body" });
+    if (!input.success) {
+      return { result: input.result, ...b };
     }
+    const { voteType } = input.data;
     await songPatternsRepo.vote(songId, pattern, uid, voteType as VoteType);
     return { result: ok({ ok: true }), ...b };
   }

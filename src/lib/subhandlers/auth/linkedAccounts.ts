@@ -3,7 +3,7 @@ import type { UserRecord } from "firebase-admin/auth";
 import { adminAuth } from "@/lib/firebase/admin";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { hashEmail } from "@/lib/auth/emailHash";
-import { isValidEmail, normalizeEmail } from "@/utils/common/email";
+import { normalizeEmail } from "@/utils/common/email";
 import { verifyTurnstileToken } from "@/lib/turnstile/verify";
 import {
   sendEmailChangeLink,
@@ -21,6 +21,9 @@ import {
 import { authUidOf, type HandleOutcome } from "./_shared";
 import { mapIdentityToolkitError } from "./_errors";
 import { emailLinkContinueUrl } from "./emailLogin";
+import { parseInput } from "@/lib/validation/parse";
+import { emailBodySchema } from "@/schemas/auth/email";
+import { linkableProviderSchema } from "@/schemas/auth/email";
 
 function toLinkedAccounts(user: UserRecord): LinkedAccount[] {
   return user.providerData
@@ -89,14 +92,19 @@ export async function handleRequestEmailLink(
 ): Promise<HandleOutcome<{ sent: true }>> {
   const uid = authUidOf(req);
   const base = { targetUserId: uid, viewerId: uid };
-  const { email, turnstileToken } = (req.body ?? {}) as {
-    email?: unknown;
+  const { turnstileToken } = (req.body ?? {}) as {
     turnstileToken?: unknown;
   };
 
-  if (typeof email !== "string" || !isValidEmail(email)) {
-    return { result: err(400, "メールアドレスの形式が正しくありません"), ...base };
+  // 画面に表示される errorMessage は従来の日本語のまま、原因（errorDetails）は英語で返す
+  const emailInput = parseInput(emailBodySchema, req.body ?? {}, {
+    in: "body",
+    message: "メールアドレスの形式が正しくありません",
+  });
+  if (!emailInput.success) {
+    return { result: emailInput.result, ...base };
   }
+  const { email } = emailInput.data;
 
   const verified = await verifyTurnstileToken(
     typeof turnstileToken === "string" ? turnstileToken : "",
@@ -150,8 +158,12 @@ export async function handleUnlinkProvider(
   const uid = authUidOf(req);
   const base = { targetUserId: uid, viewerId: uid };
 
-  if (!(LINKABLE_PROVIDER_IDS as readonly string[]).includes(providerId)) {
-    return { result: err(400, "不明なログイン手段です"), ...base };
+  const provider = parseInput(linkableProviderSchema, { providerId }, {
+    in: "path",
+    message: "不明なログイン手段です",
+  });
+  if (!provider.success) {
+    return { result: provider.result, ...base };
   }
 
   try {

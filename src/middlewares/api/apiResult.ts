@@ -44,7 +44,7 @@ export function invalidParams(
   error: z.ZodError,
   schema: z.ZodType,
   options: {
-    in?: "query" | "body";
+    in?: "path" | "query" | "body";
     message?: string;
     fallback?: string;
     jsonSchema?: unknown;
@@ -87,7 +87,7 @@ export function invalidParams(
 export function missingParams(
   names: string[],
   schema: unknown,
-  options: { in?: "query" | "body"; message?: string; hint?: string } = {},
+  options: { in?: "path" | "query" | "body"; message?: string; hint?: string } = {},
 ): HandlerResult<never> {
   return err(400, options.message ?? "Required parameters are missing", {
     ...(options.in ? { in: options.in } : {}),

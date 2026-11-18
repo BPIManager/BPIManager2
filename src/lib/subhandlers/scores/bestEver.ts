@@ -4,6 +4,8 @@ import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { targetOf, type HandleOutcome } from "./_shared";
 import type { AccessResult } from "@/middlewares/api/withApi";
+import { parseInput } from "@/lib/validation/parse";
+import { currentVersionQuerySchema } from "@/schemas/common/query";
 
 /** GET /users/[userId]/scores/best-ever */
 export async function handleBestEver(
@@ -13,14 +15,15 @@ export async function handleBestEver(
   const targetUserId = targetOf(req);
   const viewerId = access.viewerId ?? null;
 
-  const { currentVersion, excludeCurrent, difficultyLevel } = req.query;
-  if (!currentVersion || typeof currentVersion !== "string") {
-    return {
-      result: err(400, "Missing or invalid currentVersion parameter."),
-      targetUserId,
-      viewerId,
-    };
+  const { excludeCurrent, difficultyLevel } = req.query;
+  const q = parseInput(currentVersionQuerySchema, req.query, {
+    in: "query",
+    message: "Missing or invalid currentVersion parameter.",
+  });
+  if (!q.success) {
+    return { result: q.result, targetUserId, viewerId };
   }
+  const { currentVersion } = q.data;
   const parsedDifficultyLevel =
     typeof difficultyLevel === "string" && difficultyLevel !== ""
       ? Number(difficultyLevel)

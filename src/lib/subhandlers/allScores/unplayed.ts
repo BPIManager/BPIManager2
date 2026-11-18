@@ -7,23 +7,27 @@ import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 import type { AllDifficulties } from "@/types/songs/allSongs";
 import type { SongWithScore } from "@/types/songs/score";
 import type { HandleOutcome } from "./_shared";
+import { invalidParam } from "@/lib/validation/params";
+import { parseInput } from "@/lib/validation/parse";
+import { versionQuerySchema } from "@/schemas/common/query";
 
 export async function handleAllScoresUnplayed(
   req: NextApiRequest,
 ): Promise<HandleOutcome<SongWithScore[]>> {
-  const { userId, version } = req.query;
+  const { userId } = req.query;
   const targetUserId = typeof userId === "string" ? userId : "";
 
   if (!targetUserId) {
-    return { result: err(400, "Invalid userId"), targetUserId, viewerId: null };
+    return { result: invalidParam("userId", req.query.userId, "Invalid userId"), targetUserId, viewerId: null };
   }
-  if (!version || typeof version !== "string") {
-    return {
-      result: err(400, "Missing or invalid version parameter."),
-      targetUserId,
-      viewerId: null,
-    };
+  const q = parseInput(versionQuerySchema, req.query, {
+    in: "query",
+    message: "Missing or invalid version parameter.",
+  });
+  if (!q.success) {
+    return { result: q.result, targetUserId, viewerId: null };
   }
+  const { version } = q.data;
 
   try {
     const access = await checkProfileAccess(req, targetUserId);

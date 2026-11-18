@@ -4,12 +4,10 @@ import { err, ok, invalidBody } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { updateFollowListBodySchema } from "@/schemas/followLists/update";
 import { authUidOf, type HandleOutcome } from "./_shared";
+import { invalidParam, parseIntParam } from "@/lib/validation/params";
 
 function parseListId(req: NextApiRequest): number | null {
-  const { listId } = req.query;
-  const id = Number(listId);
-  if (!listId || Number.isNaN(id)) return null;
-  return id;
+  return parseIntParam("listId", req.query.listId);
 }
 
 /** PATCH /users/[userId]/follow-lists/[listId] */
@@ -20,7 +18,7 @@ export async function handleUpdateFollowList(
   const id = parseListId(req);
   if (id === null) {
     return {
-      result: err(400, "Invalid listId"),
+      result: invalidParam("listId", req.query.listId, "Invalid listId"),
       targetUserId: uid,
       viewerId: uid,
     };
@@ -67,7 +65,7 @@ export async function handleDeleteFollowList(
   const id = parseListId(req);
   if (id === null) {
     return {
-      result: err(400, "Invalid listId"),
+      result: invalidParam("listId", req.query.listId, "Invalid listId"),
       targetUserId: uid,
       viewerId: uid,
     };

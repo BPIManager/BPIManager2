@@ -6,13 +6,14 @@ import { arenaDataVersion } from "@/constants/iidx/iidxVersions";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { type HandleOutcome } from "./_shared";
+import { invalidParam } from "@/lib/validation/params";
 export async function handleSongArenaAverages(
   req: NextApiRequest,
 ): Promise<HandleOutcome<unknown>> {
   const base = { targetUserId: "", viewerId: null };
   const { songId } = req.query;
   if (!songId || Array.isArray(songId)) {
-    return { result: err(400, "songId is required"), ...base };
+    return { result: invalidParam("songId", req.query.songId, "songId is required"), ...base };
   }
   try {
     const song = await songMasterRepo.getTitleDifficultyLevel(Number(songId));

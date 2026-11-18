@@ -2,15 +2,18 @@ import type { NextApiRequest } from "next";
 import { songNotesRepo } from "@/lib/db/domains/songNotes";
 import { resolveOptionalUid } from "@/middlewares/api/resolveOptionalUid";
 import { err, ok } from "@/middlewares/api/apiResult";
-import { num, type HandleOutcome } from "./_shared";
+import { type HandleOutcome } from "./_shared";
+import { invalidParam, parseIntParam } from "@/lib/validation/params";
+import { parseInput } from "@/lib/validation/parse";
+import { noteBodySchema } from "@/schemas/songs/input";
 
 export async function handleUpdateSongNote(
   req: NextApiRequest,
 ): Promise<HandleOutcome<unknown>> {
-  const noteId = num(req.query.noteId);
+  const noteId = parseIntParam("noteId", req.query.noteId);
   if (noteId === null) {
     return {
-      result: err(400, "Invalid noteId"),
+      result: invalidParam("noteId", req.query.noteId, "Invalid noteId"),
       targetUserId: "",
       viewerId: null,
     };
@@ -19,16 +22,14 @@ export async function handleUpdateSongNote(
   const b = { targetUserId: uid ?? "", viewerId: uid };
   if (!uid) return { result: err(401, "Unauthorized"), ...b };
 
-  const { body } = req.body ?? {};
-  if (typeof body !== "string" || body.trim().length === 0) {
-    return { result: err(400, "body is required"), ...b };
+  const input = parseInput(noteBodySchema, req.body ?? {}, { in: "body" });
+  if (!input.success) {
+    return { result: input.result, ...b };
   }
-  if (body.trim().length > 2000) {
-    return { result: err(400, "body too long (max 2000)"), ...b };
-  }
+  const { body } = input.data;
   const exists = await songNotesRepo.noteExists(noteId);
   if (!exists) return { result: err(404, "Note not found"), ...b };
-  const updated = await songNotesRepo.updateNote(noteId, uid, body.trim());
+  const updated = await songNotesRepo.updateNote(noteId, uid, body);
   if (!updated) return { result: err(403, "Forbidden"), ...b };
   return { result: ok({ id: noteId }), ...b };
 }
@@ -37,10 +38,10 @@ export async function handleUpdateSongNote(
 export async function handleDeleteSongNote(
   req: NextApiRequest,
 ): Promise<HandleOutcome<unknown>> {
-  const noteId = num(req.query.noteId);
+  const noteId = parseIntParam("noteId", req.query.noteId);
   if (noteId === null) {
     return {
-      result: err(400, "Invalid noteId"),
+      result: invalidParam("noteId", req.query.noteId, "Invalid noteId"),
       targetUserId: "",
       viewerId: null,
     };

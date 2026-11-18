@@ -5,14 +5,14 @@ import {
   buildMeta,
   withMeta,
   writeV2Result,
-  err,
 } from "@/middlewares/api/apiResult";
+import { invalidParam, parseStringParam } from "@/lib/validation/params";
 
 export default withUserApiHandler(
   (req, res) => {
-    const { userId } = req.query;
-    if (!userId || typeof userId !== "string") {
-      writeV2Result(res, err(400, "Invalid userId"));
+    const userId = parseStringParam("userId", req.query.userId);
+    if (userId === null) {
+      writeV2Result(res, invalidParam("userId", req.query.userId, "Invalid userId"));
       return null;
     }
     return { userId };

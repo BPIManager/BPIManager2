@@ -1,6 +1,6 @@
 import type { NextApiRequest } from "next";
 import dayjs from "@/lib/dayjs";
-import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
+
 import { followListAggregateRepo } from "@/lib/db/aggregates/followList";
 import { previousVersionOf } from "@/lib/subhandlers/stats/monthlyReviewV2/period";
 import { recomputeBpiTimelinesForUsers } from "@/lib/subhandlers/stats/monthlyReviewV2/timeline";
@@ -8,32 +8,30 @@ import { checkUserAccess } from "@/middlewares/api/withApi";
 import { accessError, err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { targetOf, type HandleOutcome } from "./_shared";
+import { parseInput } from "@/lib/validation/parse";
+import { monthlyReviewRequiredSchema, monthlyReviewValueSchema } from "@/schemas/rivals/monthlyReviewSummary";
 
 export async function handleRivalMonthlyReviewSummary(
   req: NextApiRequest,
 ): Promise<HandleOutcome<unknown>> {
   const targetUserId = targetOf(req);
-  const { userId, month, version } = req.query;
-  if (!userId || !month || !version) {
-    return {
-      result: err(400, "userId, month, version are required"),
-      targetUserId,
-      viewerId: null,
-    };
+  const required = parseInput(monthlyReviewRequiredSchema, req.query, {
+    in: "query",
+    message: "userId, month, version are required",
+  });
+  if (!required.success) {
+    return { result: required.result, targetUserId, viewerId: null };
+  }
+  const { userId, month, version } = required.data;
+  const values = parseInput(monthlyReviewValueSchema, required.data, {
+    in: "query",
+    message: "Invalid month or version",
+  });
+  if (!values.success) {
+    return { result: values.result, targetUserId, viewerId: null };
   }
   const isAllMode = month === "all";
-  const isYearMode = !isAllMode && /^\d{4}$/.test(month as string);
-  const isMonthMode = !isAllMode && /^\d{4}-\d{2}$/.test(month as string);
-  const isValidVersion = (IIDX_VERSIONS as readonly string[]).includes(
-    version as string,
-  );
-  if (!isValidVersion || (!isYearMode && !isMonthMode && !isAllMode)) {
-    return {
-      result: err(400, "Invalid month or version"),
-      targetUserId,
-      viewerId: null,
-    };
-  }
+  const isYearMode = !isAllMode && /^\d{4}$/.test(month);
 
   try {
     const access = await checkUserAccess(req, userId as string);

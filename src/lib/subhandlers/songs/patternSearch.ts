@@ -1,17 +1,18 @@
 import type { NextApiRequest } from "next";
 import { songPatternsRepo } from "@/lib/db/domains/songPatterns";
-import { err, ok } from "@/middlewares/api/apiResult";
-import { num, type HandleOutcome } from "./_shared";
+import { ok } from "@/middlewares/api/apiResult";
+import { type HandleOutcome } from "./_shared";
+import { invalidParam, parseIntParam } from "@/lib/validation/params";
 export async function handleSongPatternSearch(
   req: NextApiRequest,
 ): Promise<HandleOutcome<unknown>> {
   const base = { targetUserId: "", viewerId: null };
-  const songId = num(req.query.songId);
-  if (songId === null) return { result: err(400, "Invalid songId"), ...base };
+  const songId = parseIntParam("songId", req.query.songId);
+  if (songId === null) return { result: invalidParam("songId", req.query.songId, "Invalid songId"), ...base };
 
   const q = req.query.q;
   if (!q || Array.isArray(q) || !/^\d{7}$/.test(q)) {
-    return { result: err(400, "Invalid pattern"), ...base };
+    return { result: invalidParam("pattern", req.query.pattern, "Invalid pattern"), ...base };
   }
   const result = await songPatternsRepo.searchPattern(songId, q);
   if (!result) return { result: ok(null), ...base };

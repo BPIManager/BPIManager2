@@ -1,5 +1,4 @@
 import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
-import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import { handleStatsArenaHistory } from "@/lib/subhandlers/stats";
 import {
   accessError,
@@ -8,6 +7,8 @@ import {
   writeV2Result,
   err,
 } from "@/middlewares/api/apiResult";
+import { parseInput } from "@/lib/validation/parse";
+import { arenaHistoryRequiredSchema, arenaHistoryValueSchema } from "@/schemas/stats/routeQueries";
 
 export default withUserApiHandler(
   (req, res) => {
@@ -16,25 +17,25 @@ export default withUserApiHandler(
       writeV2Result(res, err(405, "Method Not Allowed"));
       return null;
     }
-    const userId = req.query.userId as string;
-    const version = req.query.version as string;
-    const start = req.query.start as string;
-    const end = req.query.end as string;
-    if (!version || !start || !end) {
-      writeV2Result(res, err(400, "Missing required params: version, start, end"));
+    const required = parseInput(arenaHistoryRequiredSchema, req.query, {
+      in: "query",
+      message: "Missing required params: version, start, end",
+    });
+    if (!required.success) {
+      writeV2Result(res, required.result);
       return null;
     }
-    if (!(IIDX_VERSIONS as readonly string[]).includes(version)) {
-      writeV2Result(res, err(400, "Invalid version param"));
+    const { userId, version, start, end } = required.data;
+    const values = parseInput(
+      arenaHistoryValueSchema,
+      { userId, version, startDate: start, endDate: end },
+      { in: "query" },
+    );
+    if (!values.success) {
+      writeV2Result(res, values.result);
       return null;
     }
-    const startDate = new Date(start);
-    const endDate = new Date(end);
-    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-      writeV2Result(res, err(400, "Invalid date params"));
-      return null;
-    }
-    return { userId, version, startDate, endDate };
+    return values.data;
   },
   async (req, res, query, access) => {
     writeV2Result(

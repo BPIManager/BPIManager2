@@ -8,6 +8,7 @@ import { authenticateViewer } from "@/middlewares/api/withApi";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { type HandleOutcome } from "./_shared";
+import { invalidParam } from "@/lib/validation/params";
 
 export async function handleResolveInvite(
   req: NextApiRequest,
@@ -15,7 +16,7 @@ export async function handleResolveInvite(
   const { token } = req.query;
   const base = { targetUserId: "", viewerId: null as string | null };
   if (!token || typeof token !== "string") {
-    return { result: err(400, "Invalid token"), ...base };
+    return { result: invalidParam("token", req.query.token, "Invalid token"), ...base };
   }
   try {
     const followInvite = await followInviteLinksRepo.getByToken(token);

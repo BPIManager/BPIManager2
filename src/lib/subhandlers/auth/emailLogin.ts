@@ -1,10 +1,12 @@
 import type { NextApiRequest } from "next";
 import { err, ok } from "@/middlewares/api/apiResult";
-import { isValidEmail, normalizeEmail } from "@/utils/common/email";
+import { normalizeEmail } from "@/utils/common/email";
 import { verifyTurnstileToken } from "@/lib/turnstile/verify";
 import { sendEmailSignInLink } from "@/lib/firebase/identityToolkit";
 import { mapIdentityToolkitError } from "./_errors";
 import type { HandleOutcome } from "./_shared";
+import { parseInput } from "@/lib/validation/parse";
+import { emailBodySchema } from "@/schemas/auth/email";
 
 /**
  * 確認メールのリンク先（BPIM 側の完了ページ）の絶対 URL を組み立てる。
@@ -31,14 +33,19 @@ export async function handleSendMagicLink(
   req: NextApiRequest,
 ): Promise<HandleOutcome<{ sent: true }>> {
   const base = { targetUserId: "", viewerId: null };
-  const { email, turnstileToken } = (req.body ?? {}) as {
-    email?: unknown;
+  const { turnstileToken } = (req.body ?? {}) as {
     turnstileToken?: unknown;
   };
 
-  if (typeof email !== "string" || !isValidEmail(email)) {
-    return { result: err(400, "メールアドレスの形式が正しくありません"), ...base };
+  // 画面に表示される errorMessage は従来の日本語のまま、原因（errorDetails）は英語で返す
+  const emailInput = parseInput(emailBodySchema, req.body ?? {}, {
+    in: "body",
+    message: "メールアドレスの形式が正しくありません",
+  });
+  if (!emailInput.success) {
+    return { result: emailInput.result, ...base };
   }
+  const { email } = emailInput.data;
 
   const verified = await verifyTurnstileToken(
     typeof turnstileToken === "string" ? turnstileToken : "",
