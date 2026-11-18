@@ -89,4 +89,22 @@ describe("handleBpiCalc の model パラメータ", () => {
     const b = bodyOf(await handleBpiCalc(req({}), { correctTitle: true }));
     expect(b.warnings).toBeUndefined();
   });
+
+  it("パラメータ不正のとき、どれが不正か(issues)と受け付けるパラメータの JSON Schema を返す", async () => {
+    const r = await handleBpiCalc(req({ difficulty: "NORMAL", model: "v3" }), {
+      allowModel: true,
+    });
+    expect(r).toMatchObject({ ok: false, status: 400, message: "Invalid parameters" });
+    const details = (r as { details: { issues: { path: unknown[] }[]; schema: Record<string, unknown> } }).details;
+    expect(details.issues.map((i) => i.path[0]).sort()).toEqual(["difficulty", "model"]);
+    const props = details.schema.properties as Record<string, { enum?: string[] }>;
+    expect(props.difficulty.enum).toContain("ANOTHER");
+    expect(props.model.enum).toEqual(["v1", "v2", "both"]);
+    expect(details.schema.required).toEqual(["title", "difficulty", "exScore"]);
+  });
+
+  it("v1 ルート（allowModel なし）のパラメータ不正は、従来どおり詳細を含めない", async () => {
+    const r = await handleBpiCalc(req({ difficulty: "NORMAL" }));
+    expect(r).toEqual({ ok: false, status: 400, message: "Invalid parameters" });
+  });
 });

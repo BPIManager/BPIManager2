@@ -27,6 +27,16 @@ export interface ApiResponse<T> {
   errorMessage: string | null;
   body: T | null;
   meta?: ApiMeta;
+  /** エラー時の詳細（パラメータ不正の issues・求められるパラメータの JSON Schema など）。該当するエラーのみ */
+  errorDetails?: ApiErrorDetails;
+}
+
+/** パラメータ検証エラーの詳細 */
+export interface ApiErrorDetails {
+  /** どのパラメータがなぜ不正か */
+  issues?: { path: (string | number)[]; code: string; message: string }[];
+  /** このエンドポイントが受け付けるクエリパラメータの JSON Schema（検証に使うスキーマから生成） */
+  schema?: unknown;
 }
 
 /**
@@ -34,4 +44,4 @@ export interface ApiResponse<T> {
  */
 export type HandlerResult<T> =
   | { ok: true; body: T; meta?: Partial<ApiMeta> }
-  | { ok: false; status: number; message: string };
+  | { ok: false; status: number; message: string; details?: ApiErrorDetails };

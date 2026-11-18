@@ -1,5 +1,7 @@
 import type { NextApiResponse } from "next";
+import { z } from "zod";
 import type {
+  ApiErrorDetails,
   ApiMeta,
   ApiResponse,
   HandlerResult,
@@ -19,8 +21,32 @@ export function ok<T>(
 }
 
 /** エラー結果を組み立てる（status は従来通りの HTTP ステータスコード） */
-export function err(status: number, message: string): HandlerResult<never> {
-  return { ok: false, status, message };
+export function err(
+  status: number,
+  message: string,
+  details?: ApiErrorDetails,
+): HandlerResult<never> {
+  return details
+    ? { ok: false, status, message, details }
+    : { ok: false, status, message };
+}
+
+/**
+ * クエリパラメータの検証エラー（400）を、不正なパラメータ（issues）と受け付けるパラメータの JSON Schema 付きで組み立てる。
+ * schema には検証に使ったものと同じ zod スキーマを渡す（定義とずれない）。
+ */
+export function invalidParams(
+  error: z.ZodError,
+  schema: z.ZodType,
+): HandlerResult<never> {
+  return err(400, "Invalid parameters", {
+    issues: error.issues.map((i) => ({
+      path: i.path.filter((p): p is string | number => typeof p !== "symbol"),
+      code: i.code,
+      message: i.message,
+    })),
+    schema: z.toJSONSchema(schema, { io: "input" }),
+  });
 }
 
 /**
@@ -114,6 +140,7 @@ export function writeV2Result<T>(
     error: true,
     errorMessage: result.message,
     body: null,
+    ...(result.details ? { errorDetails: result.details } : {}),
   };
   res.status(result.status).json(payload);
 }

@@ -9,7 +9,7 @@ import { scoreActivityRepo } from "@/lib/db/domains/scores/activity";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 import { IIDX_VERSIONS, latestVersion } from "@/constants/iidx/iidxVersions";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
-import { err, ok } from "@/middlewares/api/apiResult";
+import { err, invalidParams, ok } from "@/middlewares/api/apiResult";
 import type { HandlerResult } from "@/types/api";
 import type { NextApiRequest } from "next";
 
@@ -43,7 +43,10 @@ export async function handleBpiCalc(
 ): Promise<HandlerResult<unknown>> {
   const parsed = bpiCalcQuerySchema.safeParse(req.query);
   if (!parsed.success) {
-    return err(400, "Invalid parameters");
+    // 詳細（issues・JSON Schema）は v2 のレスポンスだけに載せる。v1 ルートは従来どおり message のみ
+    return options.allowModel
+      ? invalidParams(parsed.error, bpiCalcQuerySchema)
+      : err(400, "Invalid parameters");
   }
 
   const { title, difficulty, exScore, version, includeRank } = parsed.data;

@@ -196,7 +196,10 @@ paths:
               schema:
                 $ref: "#/components/schemas/BpiCalcResponse"
         "400":
-          description: パラメータ不正（model が不正な値、exScore が最大値超過など）
+          description: |
+            パラメータ不正（model が不正な値、exScore が最大値超過など）。
+            v2 エンベロープでは `errorDetails.issues`（どのパラメータがなぜ不正か）と
+            `errorDetails.schema`（受け付けるパラメータの JSON Schema）を返す。
         "404":
           description: 指定した楽曲が見つからない
 
