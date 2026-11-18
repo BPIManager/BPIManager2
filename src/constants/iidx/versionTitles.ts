@@ -69,6 +69,8 @@ const HISTORICAL_VERSION_TITLES: readonly string[] = [
 ];
 
 export const verNameArr: string[] = [...HISTORICAL_VERSION_TITLES];
+// 楽曲バージョン 0 は INFINITAS で初出の曲（Textage の 0 フォルダ）
+verNameArr[0] = "INFINITAS";
 for (const v of versionTitles) {
   if (v.num === "INF") continue;
   verNameArr[Number(v.num)] = v.title;
