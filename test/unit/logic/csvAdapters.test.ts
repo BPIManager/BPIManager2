@@ -2,6 +2,9 @@ import { describe, it, expect } from "vitest";
 import { parseDakenCounterCsv } from "@/utils/csv/adapters/daken_counter";
 import { parseRefluxTsv } from "@/utils/csv/adapters/reflux";
 import { parseRizaltoCsv } from "@/utils/csv/adapters/result_techo";
+import { parseInfinitasCsv } from "@/utils/csv/adapters/infinitas_csv";
+import { detectCsvType, validateCsvTypeForVersion } from "@/utils/csv/detect";
+import infinitasCorrections from "@/utils/csv/infinitas-title-corrections.json";
 import { correctTitle } from "@/utils/csv/correct-title";
 
 describe("parseDakenCounterCsv", () => {
@@ -155,5 +158,74 @@ describe("correctTitle", () => {
 
   it("補正マップに存在しない表記はそのまま返すこと", () => {
     expect(correctTitle("未知の曲名タイトル")).toBe("未知の曲名タイトル");
+  });
+});
+
+describe("parseInfinitasCsv / detectCsvType", () => {
+  const header =
+    "バージョン,タイトル,アーティスト,BEGINNER スコア,BEGINNER 最終スコア更新時刻,BEGINNER ミスカウント,BEGINNER クリアタイプ,BEGINNER プレー回数,BEGINNER 最終プレー日時,NORMAL スコア,NORMAL 最終スコア更新時刻,NORMAL ミスカウント,NORMAL クリアタイプ,NORMAL プレー回数,NORMAL 最終プレー日時,HYPER スコア,HYPER 最終スコア更新時刻,HYPER ミスカウント,HYPER クリアタイプ,HYPER プレー回数,HYPER 最終プレー日時,ANOTHER スコア,ANOTHER 最終スコア更新時刻,ANOTHER ミスカウント,ANOTHER クリアタイプ,ANOTHER プレー回数,ANOTHER 最終プレー日時,LEGGENDARIA スコア,LEGGENDARIA 最終スコア更新時刻,LEGGENDARIA ミスカウント,LEGGENDARIA クリアタイプ,LEGGENDARIA プレー回数,LEGGENDARIA 最終プレー日時,";
+  // 実データは行末カンマ無し（ヘッダより1列少ない）
+  const row =
+    "1st&substream,22DUNK,SLAKE,0,---,---,NO PLAY,0,---,0,---,---,NO PLAY,0,---,0,---,---,NO PLAY,0,---,646,2022-07-13 18:56,0,FULLCOMBO CLEAR,3,2022-07-13 18:56,0,---,---,NO PLAY,0,---";
+
+  it("公式CSVではなくINFINITAS CSVとして判別されること", () => {
+    expect(detectCsvType(`${header}\n${row}`)).toBe("infinitas_csv");
+  });
+
+  it("プレー済みの難易度のみ変換され、列数不一致でも失敗しないこと", () => {
+    expect(parseInfinitasCsv(`${header}\n${row}`)).toEqual([
+      {
+        title: "22DUNK",
+        difficulty: "ANOTHER",
+        exScore: 646,
+        clearState: "FULLCOMBO CLEAR",
+        missCount: 0,
+        lastPlayed: "2022-07-13 18:56",
+      },
+    ]);
+  });
+
+  it("INFINITASバージョンでのみ受け付けられること", () => {
+    expect(validateCsvTypeForVersion("infinitas_csv", "INF")).toBeNull();
+    expect(validateCsvTypeForVersion("infinitas_csv", "34")).not.toBeNull();
+  });
+});
+
+describe("parseInfinitasCsv の曲名補正", () => {
+  const header =
+    "バージョン,タイトル,アーティスト,BEGINNER スコア,BEGINNER 最終スコア更新時刻,BEGINNER ミスカウント,BEGINNER クリアタイプ,BEGINNER プレー回数,BEGINNER 最終プレー日時,NORMAL スコア,NORMAL 最終スコア更新時刻,NORMAL ミスカウント,NORMAL クリアタイプ,NORMAL プレー回数,NORMAL 最終プレー日時,HYPER スコア,HYPER 最終スコア更新時刻,HYPER ミスカウント,HYPER クリアタイプ,HYPER プレー回数,HYPER 最終プレー日時,ANOTHER スコア,ANOTHER 最終スコア更新時刻,ANOTHER ミスカウント,ANOTHER クリアタイプ,ANOTHER プレー回数,ANOTHER 最終プレー日時,LEGGENDARIA スコア,LEGGENDARIA 最終スコア更新時刻,LEGGENDARIA ミスカウント,LEGGENDARIA クリアタイプ,LEGGENDARIA プレー回数,LEGGENDARIA 最終プレー日時,";
+  const tail =
+    "0,---,---,NO PLAY,0,---,0,---,---,NO PLAY,0,---,1000,2024-01-01 00:00,1,CLEAR,1,2024-01-01 00:00,0,---,---,NO PLAY,0,---,0,---,---,NO PLAY,0,---";
+
+  it("allSongs の表記へ補正され、末尾の空白は除去されること", () => {
+    const csv = [
+      header,
+      `EMPRESS,You'll say Now!,X,${tail}`,
+      `PENDUAL,COLOSSEUM ,X,${tail}`,
+      `9th style,LOVE♡SHINE,X,${tail}`,
+    ].join("\n");
+    expect(parseInfinitasCsv(csv).map((r) => r.title)).toEqual([
+      `You'll say "Now!"`,
+      "COLOSSEUM",
+      "LOVE SHINE",
+    ]);
+  });
+});
+
+describe("infinitas-title-corrections.json", () => {
+  const entries = Object.entries(infinitasCorrections as Record<string, string>);
+
+  it("自己対応・連鎖・空文字を含まない1:1の固定対応であること", () => {
+    const keys = new Set(entries.map(([k]) => k));
+    for (const [from, to] of entries) {
+      expect(to).not.toBe("");
+      expect(from).not.toBe(to);
+      expect(keys.has(to)).toBe(false);
+    }
+  });
+
+  it("補正先が重複しないこと", () => {
+    const targets = entries.map(([, to]) => to);
+    expect(new Set(targets).size).toBe(targets.length);
   });
 });
