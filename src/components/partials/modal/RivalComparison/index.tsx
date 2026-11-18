@@ -15,8 +15,8 @@ import RadarSectionChart from "@/components/partials/common/DashBoard/Radar";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { fetcher } from "@/utils/common/fetch";
-import { API_PREFIX, API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
+import { fetcherV2 } from "@/services/swr/fetchV2";
+import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { toast } from "sonner";
 import { useTranslation } from "@/hooks/common/useTranslation";
@@ -98,11 +98,13 @@ const RivalComparisonModal = ({
 
   // 未ログイン時にライバルのレーダーを公開エンドポイントで取得
   const v = version ?? latestVersion;
-  const { data: rivalRadarData, isLoading: isRivalRadarLoading } = useSWR(
+  const { data: rivalRadarData, isLoading: isRivalRadarLoading } = useSWR<
+    Record<string, number | { totalBpi: number } | undefined>
+  >(
     !fbUser && rivalId && isOpen
-      ? `${API_PREFIX}/users/${rivalId}/stats/radar?version=${v}`
+      ? `${API_V2_PREFIX}/users/${rivalId}/stats/radar?version=${v}`
       : null,
-    fetcher,
+    fetcherV2,
     { revalidateOnFocus: false },
   );
 

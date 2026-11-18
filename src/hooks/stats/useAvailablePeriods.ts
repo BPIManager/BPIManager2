@@ -1,6 +1,6 @@
 ﻿import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
-import type { AvailablePeriodsData } from "@/pages/api/v1/users/[userId]/stats/available-periods";
+import type { AvailablePeriodsData } from "@/types/stats/availablePeriods";
 
 export const useAvailablePeriods = (
   userId: string | undefined,

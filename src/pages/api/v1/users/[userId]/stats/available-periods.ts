@@ -2,10 +2,7 @@ import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
 
 import { handleStatsAvailablePeriods } from "@/lib/subhandlers/stats";
 import { writeV1Result } from "@/middlewares/api/apiResult";
-
-export interface AvailablePeriodsData {
-  months: string[]; // YYYY-MM, desc order
-}
+import type { AvailablePeriodsData } from "@/types/stats/availablePeriods";
 
 export default withUserApiHandler(
   (req, res) => {
