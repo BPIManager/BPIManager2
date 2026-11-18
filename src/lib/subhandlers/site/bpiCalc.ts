@@ -10,6 +10,9 @@ import { err, ok } from "@/middlewares/api/apiResult";
 import type { HandlerResult } from "@/types/api";
 import type { NextApiRequest } from "next";
 
+/** BPI の計算モデル。v1=皆伝平均とWRの2アンカー、v2=分布ベース、both=両方 */
+const BPI_MODELS = ["v1", "v2", "both"] as const;
+
 const bpiCalcQuerySchema = z.object({
   title: z.string().min(1),
   difficulty: z.enum(IIDX_DIFFICULTIES),
@@ -22,11 +25,17 @@ const bpiCalcQuerySchema = z.object({
     .string()
     .optional()
     .transform((v) => v === "true"),
+  model: z.enum(BPI_MODELS).optional().default("v2"),
 });
 
-/** GET /bpi/calc */
+/**
+ * GET /bpi/calc
+ *
+ * @param options.allowModel - true のときだけ `model` パラメータを受け付ける（v2 ルート）。false では常に v2 で計算し、v1 ルートのレスポンスを変えない
+ */
 export async function handleBpiCalc(
   req: NextApiRequest,
+  options: { allowModel?: boolean } = {},
 ): Promise<HandlerResult<unknown>> {
   const parsed = bpiCalcQuerySchema.safeParse(req.query);
   if (!parsed.success) {
@@ -34,6 +43,7 @@ export async function handleBpiCalc(
   }
 
   const { title, difficulty, exScore, version, includeRank } = parsed.data;
+  const model = options.allowModel ? parsed.data.model : "v2";
 
   try {
     const song = await getSongWithDefCached(title, difficulty);
@@ -43,7 +53,7 @@ export async function handleBpiCalc(
       return err(400, `exScore exceeds maximum (${song.notes * 2})`);
     }
 
-    const bpi = BpiCalculator.calc(exScore, {
+    const songData = {
       notes: song.notes,
       kaidenAvg: song.kaidenAvg ?? null,
       wrScore: song.wrScore ?? null,
@@ -51,10 +61,14 @@ export async function handleBpiCalc(
       mu: song.mu ?? null,
       sigma: song.sigma ?? null,
       residualVar: song.residualVar ?? null,
-    });
+    };
+    const bpiV2 = BpiCalculator.calc(exScore, songData);
+    const bpiV1 = BpiCalculator.calcV1(exScore, songData);
+    const bpi = model === "v1" ? bpiV1 : bpiV2;
 
+    // 推定順位は V2 の順位カーブに基づくため、V1 の値からは出さない
     const estimatedRankByFormula =
-      bpi !== null ? BpiCalculator.estimateRank(bpi) : null;
+      model !== "v1" && bpiV2 !== null ? BpiCalculator.estimateRank(bpiV2) : null;
 
     const { rank: bpimRank, total: bpimTotal } = includeRank
       ? await scoreActivityRepo.getSongBpimRank(song.songId, exScore, version)
@@ -77,8 +91,9 @@ export async function handleBpiCalc(
         notes: song.notes,
       },
       bpi,
+      ...(model === "both" ? { models: { v1: bpiV1, v2: bpiV2 } } : {}),
       rank: { estimatedRank: estimatedRankByFormula, bpimRank, bpimTotal },
-      metadata: { version, arenaAverages },
+      metadata: { version, arenaAverages, ...(options.allowModel ? { model } : {}) },
     });
   } catch (error: unknown) {
     console.error("BPI calc error:", error);

@@ -133,6 +133,70 @@ paths:
               example:
                 message: Internal Server Error
 
+  /api/v2/bpi/calc:
+    get:
+      summary: 単曲 BPI 計算（モデル指定つき）
+      description: |
+        `/api/v1/bpi/calc` と同じ計算に、BPI の計算モデルを選ぶ `model` パラメータを加えたもの。
+        レスポンスは v2 共通エンベロープ（`docs/decisions/0009-api-v2-common-envelope.md`）に包まれ、
+        `body` が下記の BpiCalcResponse になる。v1 のパスは `model` を無視して常に V2 で計算する。
+        認証不要。
+      parameters:
+        - name: title
+          in: query
+          required: true
+          description: 楽曲タイトル（songs テーブルの title と完全一致）
+          schema:
+            type: string
+        - name: difficulty
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [HYPER, ANOTHER, LEGGENDARIA]
+        - name: exScore
+          in: query
+          required: true
+          description: EX スコア（0 〜 notes×2 の整数）
+          schema:
+            type: integer
+            minimum: 0
+        - name: includeRank
+          in: query
+          required: false
+          description: true のとき BPIM 内順位を計算する
+          schema:
+            type: boolean
+        - name: version
+          in: query
+          required: false
+          description: 集計対象バージョン。省略時は最新バージョン
+          schema:
+            type: string
+        - name: model
+          in: query
+          required: false
+          description: |
+            BPI の計算モデル。省略時は `v2`。
+            - `v2`: 分布ベース（アプリの表示値）。`bpi` は V2 の値
+            - `v1`: 旧モデル（皆伝平均と WR の 2 アンカー）。`bpi` は V1 の値で、`rank.estimatedRank` は null
+            - `both`: 両方を `models` に返す。`bpi` は V2 の値
+          schema:
+            type: string
+            enum: [v1, v2, both]
+            default: v2
+      responses:
+        "200":
+          description: BPI 計算結果（v2 エンベロープの body）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BpiCalcResponse"
+        "400":
+          description: パラメータ不正（model が不正な値、exScore が最大値超過など）
+        "404":
+          description: 指定した楽曲が見つからない
+
 components:
   schemas:
     BpiCalcResponse:
@@ -160,6 +224,16 @@ components:
           description: |
             単曲 BPI 値。-15 〜 理論上限。
             kaidenAvg / wrScore が未設定の場合は -15 固定。
+        models:
+          type: object
+          description: "`/api/v2/bpi/calc` で `model=both` を指定したときだけ含まれる、モデル別の単曲 BPI"
+          properties:
+            v1:
+              type: number
+              nullable: true
+            v2:
+              type: number
+              nullable: true
         rank:
           type: object
           required: [estimatedRank, bpimRank, bpimTotal]
@@ -181,6 +255,10 @@ components:
             version:
               type: string
               description: 集計対象バージョン
+            model:
+              type: string
+              enum: [v1, v2, both]
+              description: "`/api/v2/bpi/calc` のみ。計算に使ったモデル"
             arenaAverages:
               type: object
               nullable: true
