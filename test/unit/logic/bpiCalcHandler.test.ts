@@ -1,19 +1,23 @@
 import { describe, it, expect, vi } from "vitest";
 
+const song = {
+  songId: 1,
+  title: "T",
+  difficulty: "ANOTHER",
+  difficultyLevel: 10,
+  notes: 1000,
+  kaidenAvg: 1600,
+  wrScore: 1950,
+  coef: 1.2,
+  mu: 0.4,
+  sigma: 0.3,
+  residualVar: 0.04,
+};
+
 vi.mock("@/lib/cache/songDefs", () => ({
-  getSongWithDefCached: vi.fn(async () => ({
-    songId: 1,
-    title: "T",
-    difficulty: "ANOTHER",
-    difficultyLevel: 10,
-    notes: 1000,
-    kaidenAvg: 1600,
-    wrScore: 1950,
-    coef: 1.2,
-    mu: 0.4,
-    sigma: 0.3,
-    residualVar: 0.04,
-  })),
+  getSongWithDefCached: vi.fn(async (title: string) => (title === "T" ? song : null)),
+  // INFINITAS の表記 "T-inf" は固定対応表で "T" に直せる、という想定
+  findSongWithDefByCorrectedTitle: vi.fn(async (title: string) => (title === "T-inf" ? song : null)),
 }));
 vi.mock("@/lib/cache/arenaAverages", () => ({ getArenaAverages: vi.fn() }));
 vi.mock("@/lib/db/domains/scores/activity", () => ({
@@ -55,5 +59,34 @@ describe("handleBpiCalc の model パラメータ", () => {
   it("不正な model は 400", async () => {
     const r = await handleBpiCalc(req({ model: "v3" }), { allowModel: true });
     expect(r).toMatchObject({ ok: false, status: 400 });
+  });
+
+  it("v2 ルート: 完全一致しない INFINITAS 表記は、対応表で直せたとき警告つきで結果を返す", async () => {
+    const b = bodyOf(
+      await handleBpiCalc(req({ title: "T-inf" }), { correctTitle: true }),
+    );
+    expect(b.song).toMatchObject({ title: "T" });
+    expect(b.warnings).toEqual([
+      expect.objectContaining({
+        code: "TITLE_CORRECTED",
+        requestedTitle: "T-inf",
+        resolvedTitle: "T",
+      }),
+    ]);
+  });
+
+  it("対応表に無い曲名は、correctTitle を有効にしても 404", async () => {
+    const r = await handleBpiCalc(req({ title: "unknown" }), { correctTitle: true });
+    expect(r).toMatchObject({ ok: false, status: 404 });
+  });
+
+  it("v1 ルート（correctTitle なし）: 完全一致しなければ従来どおり 404", async () => {
+    const r = await handleBpiCalc(req({ title: "T-inf" }));
+    expect(r).toMatchObject({ ok: false, status: 404 });
+  });
+
+  it("完全一致したときは警告を含めない", async () => {
+    const b = bodyOf(await handleBpiCalc(req({}), { correctTitle: true }));
+    expect(b.warnings).toBeUndefined();
   });
 });

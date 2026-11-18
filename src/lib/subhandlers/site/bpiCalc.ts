@@ -1,7 +1,10 @@
 import { z } from "zod";
 import { BpiCalculator } from "@/lib/bpi";
 import { getArenaAverages } from "@/lib/cache/arenaAverages";
-import { getSongWithDefCached } from "@/lib/cache/songDefs";
+import {
+  findSongWithDefByCorrectedTitle,
+  getSongWithDefCached,
+} from "@/lib/cache/songDefs";
 import { scoreActivityRepo } from "@/lib/db/domains/scores/activity";
 import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
 import { IIDX_VERSIONS, latestVersion } from "@/constants/iidx/iidxVersions";
@@ -32,10 +35,11 @@ const bpiCalcQuerySchema = z.object({
  * GET /bpi/calc
  *
  * @param options.allowModel - true のときだけ `model` パラメータを受け付ける（v2 ルート）。false では常に v2 で計算し、v1 ルートのレスポンスを変えない
+ * @param options.correctTitle - true のとき、曲名が完全一致しなければ INFINITAS の固定対応表で直して探し直し、見つかれば警告つきで結果を返す（v2 ルート）
  */
 export async function handleBpiCalc(
   req: NextApiRequest,
-  options: { allowModel?: boolean } = {},
+  options: { allowModel?: boolean; correctTitle?: boolean } = {},
 ): Promise<HandlerResult<unknown>> {
   const parsed = bpiCalcQuerySchema.safeParse(req.query);
   if (!parsed.success) {
@@ -46,7 +50,20 @@ export async function handleBpiCalc(
   const model = options.allowModel ? parsed.data.model : "v2";
 
   try {
-    const song = await getSongWithDefCached(title, difficulty);
+    let song = await getSongWithDefCached(title, difficulty);
+    const warnings: { code: string; message: string; requestedTitle: string; resolvedTitle: string }[] = [];
+    if (!song && options.correctTitle) {
+      const corrected = await findSongWithDefByCorrectedTitle(title, difficulty);
+      if (corrected) {
+        song = corrected;
+        warnings.push({
+          code: "TITLE_CORRECTED",
+          message: `曲名「${title}」は完全一致しなかったため、INFINITAS の表記の対応表で「${corrected.title}」として計算しました。アーケード公式CSVの表記で指定してください。`,
+          requestedTitle: title,
+          resolvedTitle: corrected.title,
+        });
+      }
+    }
     if (!song) return err(404, "Song not found");
 
     if (exScore > song.notes * 2) {
@@ -92,6 +109,7 @@ export async function handleBpiCalc(
       },
       bpi,
       ...(model === "both" ? { models: { v1: bpiV1, v2: bpiV2 } } : {}),
+      ...(warnings.length > 0 ? { warnings } : {}),
       rank: { estimatedRank: estimatedRankByFormula, bpimRank, bpimTotal },
       metadata: { version, arenaAverages, ...(options.allowModel ? { model } : {}) },
     });
