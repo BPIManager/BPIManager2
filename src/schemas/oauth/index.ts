@@ -42,7 +42,8 @@ export const tokenRequestSchema = z.object({
   grant_type: z.string(),
   code: z.string().min(1),
   redirect_uri: redirectUriSchema,
-  client_id: z.string().min(1).max(255),
+  // client_secret_basic では body に含まれない（Authorization ヘッダーから取る）
+  client_id: z.string().min(1).max(255).optional(),
   code_verifier: z.string().min(43).max(128),
   client_secret: z.string().optional(),
 });

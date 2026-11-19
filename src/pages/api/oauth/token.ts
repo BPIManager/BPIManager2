@@ -15,9 +15,9 @@ const ACCESS_TOKEN_TTL_MS = 90 * 24 * 60 * 60 * 1000;
  */
 function extractClientCredentials(
   req: NextApiRequest,
-  bodyClientId: string,
+  bodyClientId: string | undefined,
   bodyClientSecret: string | undefined,
-): { clientId: string; clientSecret: string | undefined } {
+): { clientId: string | undefined; clientSecret: string | undefined } {
   const authHeader = req.headers.authorization;
 
   if (authHeader?.startsWith("Basic ")) {
@@ -59,6 +59,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   const { clientId: client_id, clientSecret: client_secret } =
     extractClientCredentials(req, parsed.data.client_id, parsed.data.client_secret);
+
+  if (!client_id) {
+    return res.status(401).json({ error: "invalid_client" });
+  }
 
   try {
     // 検証がすべて通るまで認可コードは消費しない（誤ったリクエストでコードが無効化されるのを防ぐ）
