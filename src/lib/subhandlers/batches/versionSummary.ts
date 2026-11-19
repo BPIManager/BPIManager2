@@ -1,6 +1,5 @@
 import type { NextApiRequest } from "next";
-import { z } from "zod";
-import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
+import { versionSummaryQuerySchema } from "@/schemas/batches/versionSummary";
 import { getVersionNameFromNumber } from "@/constants/iidx/versionTitles";
 import { latestScoresRepo } from "@/lib/db/domains/scores/latest";
 import { timelineRepo } from "@/lib/db/domains/scores/timeline";
@@ -8,11 +7,6 @@ import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 import { accessError, err, ok, invalidQuery } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { targetOf, type HandleOutcome } from "./_shared";
-
-const versionSummaryQuerySchema = z.object({
-  userId: z.string().min(1),
-  version: z.enum(IIDX_VERSIONS),
-});
 
 /** GET /users/[userId]/batches/version-summary */
 export async function handleVersionSummary(

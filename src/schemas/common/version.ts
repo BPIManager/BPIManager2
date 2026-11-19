@@ -14,3 +14,6 @@ export const iidxVersionQuerySchema = z
   )
   .catch(latestVersion)
   .default(latestVersion);
+
+/** IIDXバージョンの厳格な検証（無効値は 400）。フォールバックしたい場合は iidxVersionQuerySchema を使う */
+export const iidxVersionSchema = z.enum(IIDX_VERSIONS);

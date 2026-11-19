@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { bpiCalcQuerySchema } from "@/schemas/site/bpiCalc";
 import { BpiCalculator } from "@/lib/bpi";
 import { getArenaAverages } from "@/lib/cache/arenaAverages";
 import {
@@ -6,30 +6,10 @@ import {
   getSongWithDefCached,
 } from "@/lib/cache/songDefs";
 import { scoreActivityRepo } from "@/lib/db/domains/scores/activity";
-import { IIDX_DIFFICULTIES } from "@/constants/iidx/bpiDifficulties";
-import { IIDX_VERSIONS, latestVersion } from "@/constants/iidx/iidxVersions";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { err, invalidParams, ok } from "@/middlewares/api/apiResult";
 import type { HandlerResult } from "@/types/api";
 import type { NextApiRequest } from "next";
-
-/** BPI の計算モデル。v1=皆伝平均とWRの2アンカー、v2=分布ベース、both=両方 */
-const BPI_MODELS = ["v1", "v2", "both"] as const;
-
-const bpiCalcQuerySchema = z.object({
-  title: z.string().min(1),
-  difficulty: z.enum(IIDX_DIFFICULTIES),
-  exScore: z.coerce.number().int().min(0),
-  version: z
-    .enum(IIDX_VERSIONS)
-    .optional()
-    .transform((v) => v ?? latestVersion),
-  includeRank: z
-    .string()
-    .optional()
-    .transform((v) => v === "true"),
-  model: z.enum(BPI_MODELS).optional().default("v2"),
-});
 
 /**
  * GET /bpi/calc

@@ -1,22 +1,12 @@
 import type { NextApiRequest } from "next";
-import { z } from "zod";
 import dayjs from "@/lib/dayjs";
-import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
+import { winLossHistoryQuerySchema } from "@/schemas/rivals/winLossHistory";
 import { socialWinLossRepo } from "@/lib/db/aggregates/rivalScores/winLoss";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 import { accessError, err, ok, invalidQuery } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { targetOf, type HandleOutcome } from "./_shared";
 
-const winLossHistoryQuerySchema = z.object({
-  userId: z.string().min(1),
-  rivalId: z.string().min(1),
-  version: z.enum(IIDX_VERSIONS),
-  level: z.coerce
-    .number()
-    .int()
-    .refine((v) => v === 11 || v === 12),
-});
 type WlOutcome = "win" | "lose" | "draw" | null;
 function getOutcome(viewer: number | null, rival: number | null): WlOutcome {
   if (viewer === null || rival === null) return null;

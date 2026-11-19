@@ -1,4 +1,4 @@
-import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
+import { iidxVersionSchema } from "@/schemas/common/version";
 import { asOfSchema } from "@/schemas/common/asOf";
 import { iidxVersionQuerySchema } from "@/schemas/common/version";
 import { z } from "zod";
@@ -54,8 +54,8 @@ export type SongHistoryQueryOutput = z.output<typeof songHistoryQuerySchema>;
 export const selfVersionComparisonQuerySchema = z
   .object({
     userId: z.string().min(1),
-    currentVersion: z.enum(IIDX_VERSIONS),
-    targetVersion: z.enum(IIDX_VERSIONS),
+    currentVersion: iidxVersionSchema,
+    targetVersion: iidxVersionSchema,
   })
   .refine((data) => data.currentVersion !== data.targetVersion, {
     message: "currentVersion and targetVersion must differ.",

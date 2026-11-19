@@ -1,6 +1,6 @@
+import { iidxVersionSchema } from "@/schemas/common/version";
 import z from "zod";
 import { rivalScoresQuerySchema } from "../../query";
-import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import { parseArray } from "@/utils/common/parseArray";
 
 export const rivalFollowingScoresQuerySchema = rivalScoresQuerySchema
@@ -14,7 +14,7 @@ export const rivalFollowingScoresQuerySchema = rivalScoresQuerySchema
   });
 
 export const scoreComparisonQuerySchema = z.object({
-  version: z.enum(IIDX_VERSIONS),
+  version: iidxVersionSchema,
   limit: z.coerce.number().int().min(1).max(100).default(10),
   lastDiff: z.coerce.number().optional(),
   lastSongId: z.string().optional(),

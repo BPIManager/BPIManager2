@@ -1,13 +1,13 @@
-import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
+import { iidxVersionSchema } from "@/schemas/common/version";
 import { z } from "zod";
 import { scoresQuerySchema } from "@/schemas/scores/query";
 
 export const rivalScoresQuerySchema = scoresQuerySchema.extend({
   userId: z.string().min(1),
   rivalId: z.string().min(1),
-  version: z.enum(IIDX_VERSIONS),
+  version: iidxVersionSchema,
   /** ライバル側だけ別バージョンのスコアと比較する場合に指定（未指定は version と同じ） */
-  rivalVersion: z.enum(IIDX_VERSIONS).optional(),
+  rivalVersion: iidxVersionSchema.optional(),
 });
 
 export type RivalScoresQueryOutput = z.output<typeof rivalScoresQuerySchema>;

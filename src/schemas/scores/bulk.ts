@@ -1,4 +1,4 @@
-import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
+import { iidxVersionSchema } from "@/schemas/common/version";
 import { CLEAR_STATES } from "@/constants/iidx/clearLamps";
 import { ALL_DIFFICULTIES } from "@/constants/iidx/songLevels";
 import { z } from "zod";
@@ -16,7 +16,7 @@ const csvRowSchema = z.object({
 });
 
 export const scoresBulkBodySchema = z.object({
-  version: z.enum(IIDX_VERSIONS),
+  version: iidxVersionSchema,
   csvRows: z.array(csvRowSchema).max(10000),
 });
 

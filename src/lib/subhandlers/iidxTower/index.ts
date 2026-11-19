@@ -1,5 +1,5 @@
 import type { NextApiRequest } from "next";
-import { z } from "zod";
+import { iidxTowerPostBodySchema } from "@/schemas/iidxTower/input";
 import { iidxTowerRepo } from "@/lib/db/domains/iidxTower";
 import { checkProfileAccess } from "@/middlewares/api/withApiOnProfile";
 import { accessError, err, ok } from "@/middlewares/api/apiResult";
@@ -13,16 +13,6 @@ export interface HandleOutcome<T> {
   targetUserId: string;
   viewerId: string | null;
 }
-
-const towerRowSchema = z.object({
-  playDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  keyCount: z.number().int().nonnegative(),
-  scratchCount: z.number().int().nonnegative(),
-});
-const postBodySchema = z.object({
-  version: z.string().min(1).max(50),
-  rows: z.array(towerRowSchema).min(1).max(1000),
-});
 
 function targetOf(req: NextApiRequest): string {
   return typeof req.query.userId === "string" ? req.query.userId : "";
@@ -81,7 +71,7 @@ export async function handleIidxTowerPost(
   req: NextApiRequest,
 ): Promise<HandleOutcome<unknown>> {
   const uid = (req as AuthenticatedNextApiRequest).authUid;
-  const parsed = parseInput(postBodySchema, req.body, {
+  const parsed = parseInput(iidxTowerPostBodySchema, req.body, {
     in: "body",
     message: "Invalid request body",
   });

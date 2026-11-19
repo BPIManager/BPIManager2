@@ -50,7 +50,7 @@ function res() {
       return this;
     },
   };
-  return r as unknown as NextApiResponse & { statusCode: number; payload: any };
+  return r as unknown as NextApiResponse & { statusCode: number; payload: { token_type?: string } };
 }
 
 const baseBody = {

@@ -1,4 +1,4 @@
-import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
+import { iidxVersionSchema } from "@/schemas/common/version";
 import { iidxVersionQuerySchema } from "@/schemas/common/version";
 import { z } from "zod";
 
@@ -8,7 +8,7 @@ const batchPathSchema = z.object({
 });
 
 export const batchDetailGetQuerySchema = batchPathSchema.extend({
-  version: z.enum(IIDX_VERSIONS),
+  version: iidxVersionSchema,
 });
 
 export const batchDetailDeleteQuerySchema = batchPathSchema;
@@ -17,7 +17,7 @@ export type BatchDetailGetQueryOutput = z.output<typeof batchDetailGetQuerySchem
 export type BatchDetailDeleteQueryOutput = z.output<typeof batchDetailDeleteQuerySchema>;
 
 export const batchScoresQuerySchema = batchPathSchema.extend({
-  version: z.enum(IIDX_VERSIONS),
+  version: iidxVersionSchema,
   type: z.enum(["day", "week", "month"]).default("day"),
   groupedBy: z.enum(["lastPlayed", "createdAt"]).default("createdAt"),
 });

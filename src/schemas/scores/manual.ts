@@ -1,4 +1,4 @@
-import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
+import { iidxVersionSchema } from "@/schemas/common/version";
 import { z } from "zod";
 
 /**
@@ -8,7 +8,7 @@ import { z } from "zod";
 export const scoresManualBodySchema = z.object({
   songId: z.coerce.number().int().positive(),
   songDomain: z.enum(["bpi", "allSongs"]),
-  version: z.enum(IIDX_VERSIONS),
+  version: iidxVersionSchema,
   exScore: z.coerce.number().int().min(0),
 });
 
