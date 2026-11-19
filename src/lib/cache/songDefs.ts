@@ -16,13 +16,19 @@ export type CachedSongWithDef = {
   residualVar: number | null;
 };
 
+/** マスタ更新（songs / songDef の追加・再計算）が日中に反映されるまでの最大待ち時間 */
+const CACHE_TTL_MS = 60 * 60 * 1000;
+
 type CacheEntry = {
   data: Map<string, CachedSongWithDef>;
   date: string;
+  loadedAt: number;
 };
 
 let cache: CacheEntry | null = null;
 let loadingPromise: Promise<CacheEntry> | null = null;
+/** 無効化のたびに増やし、読み込み中に無効化されたときに古いデータで上書きしないために使う */
+let generation = 0;
 
 async function loadCache(): Promise<Map<string, CachedSongWithDef>> {
   const rows = await songMasterRepo.getAllSongsWithCurrentDef();
@@ -37,14 +43,18 @@ async function loadCache(): Promise<Map<string, CachedSongWithDef>> {
 
 async function getOrLoadCache(): Promise<CacheEntry> {
   const today = todayJst();
-  if (cache && cache.date === today) return cache;
+  if (cache && cache.date === today && Date.now() - cache.loadedAt < CACHE_TTL_MS) {
+    return cache;
+  }
 
   if (!loadingPromise) {
+    const startedGeneration = generation;
     loadingPromise = loadCache()
       .then((data) => {
-        cache = { data, date: today };
+        const entry = { data, date: today, loadedAt: Date.now() };
+        if (startedGeneration === generation) cache = entry;
         loadingPromise = null;
-        return cache;
+        return entry;
       })
       .catch((err) => {
         loadingPromise = null;
@@ -80,5 +90,7 @@ export async function findSongWithDefByCorrectedTitle(
 }
 
 export function invalidateSongDefsCache(): void {
+  generation += 1;
   cache = null;
+  loadingPromise = null;
 }
