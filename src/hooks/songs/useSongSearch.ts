@@ -1,3 +1,4 @@
+import type { BpmBand } from "@/types/songs/bpmBand";
 import { API_V2_PREFIX } from "@/constants/logic/apiEndpoints";
 import { useAuthedSWRV2 } from "@/hooks/common/useAuthedSWRV2";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
@@ -19,7 +20,6 @@ export interface SongSearchResult {
   residualVar: number | null;
 }
 
-export type BpmBand = "slow" | "mid" | "fast" | "soflan";
 
 /**
  * 楽曲を検索・一覧表示する。query が空文字でも常にフェッチし、difficultyLevel・radarCategory・bpmBand で絞り込める。enabled=false の間はフェッチしない。

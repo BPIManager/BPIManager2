@@ -3,7 +3,8 @@
 import { useBpiOptimizer } from "@/hooks/analytics/useBpiOptimizer";
 import { useBpiOptimizerMemos } from "@/hooks/analytics/useOptimizeMemo";
 import { useRadar } from "@/hooks/stats/useRadar";
-import { fetchImportOptimizeMemo, fetchBpiOptimizerDataset, type ImportedGoalTarget } from "@/services/swr/analytics";
+import { fetchImportOptimizeMemo, fetchBpiOptimizerDataset } from "@/services/swr/analytics";
+import type { ImportedGoalTarget } from "@/types/analytics/importedGoalTarget";
 import type { DatasetSource } from "./ui/DatasetPickerDrawer";
 import { BpiCalculator } from "@/lib/bpi";
 import type { OptimizeMemoResponse } from "@/hooks/analytics/useOptimizeMemo";

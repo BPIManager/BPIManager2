@@ -12,7 +12,8 @@ import type { RadarCategory } from "@/types/stats/radar";
 
 import { RADAR_LABELS } from "../../shared";
 import DifficultyBadge from "../../DifficultyBadge";
-import { type SongSearchResult, type BpmBand } from "@/hooks/songs/useSongSearch";
+import { type SongSearchResult } from "@/hooks/songs/useSongSearch";
+import type { BpmBand } from "@/types/songs/bpmBand";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { SearchMode, SEARCH_MODES, BPM_BANDS, SongSortOrder, SONG_SORT_ORDERS } from "@/components/partials/features/Analytics/BpiOptimizer/ui/CustomGoal/SongTargetModal/types";
 

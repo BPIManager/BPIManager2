@@ -1,6 +1,6 @@
 import type { RadarCategory } from "@/types/stats/radar";
 
-export interface RadarGrowthEntry {
+export interface RadarGrowthCategoryEntry {
   category: RadarCategory;
   before: number;
   after: number;
@@ -8,7 +8,7 @@ export interface RadarGrowthEntry {
 }
 
 export interface RadarGrowthSnapshot {
-  categories: RadarGrowthEntry[];
+  categories: RadarGrowthCategoryEntry[];
 }
 
 export interface RadarGrowthSongScore {

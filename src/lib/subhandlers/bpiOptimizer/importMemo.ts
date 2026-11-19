@@ -5,22 +5,9 @@ import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { targetOf, type HandleOutcome } from "./_shared";
+import type { ImportedGoalTarget } from "@/types/analytics/importedGoalTarget";
 import { invalidParam } from "@/lib/validation/params";
 
-export interface ImportedGoalTarget {
-  songId: number;
-  title: string;
-  difficulty: string;
-  difficultyLevel: number;
-  notes: number;
-  toExScore: number;
-  wrScore: number | null;
-  kaidenAvg: number | null;
-  coef: number | null;
-  mu: number | null;
-  sigma: number | null;
-  residualVar: number | null;
-}
 
 /**
  * 他ユーザーが共有した reportId の曲目（songId＋目標EXスコア）を、インポート先の視点で最新の曲データから引き直して返す。

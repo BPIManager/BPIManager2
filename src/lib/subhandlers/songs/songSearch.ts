@@ -1,3 +1,4 @@
+import type { BpmBand } from "@/types/songs/bpmBand";
 import type { NextApiRequest } from "next";
 import { songSearchRepo } from "@/lib/db/domains/songs/search";
 import { topElementMap } from "@/constants/iidx/radars/topElements";
@@ -16,7 +17,6 @@ const SEARCH_LIMIT = 20;
 /** 曲名指定なしで一覧表示する場合(楽曲一覧・レーダー項目/BPM帯)のDB取得上限。全件返す */
 const BROWSE_FETCH_LIMIT = 2000;
 
-export type BpmBand = "slow" | "mid" | "fast" | "soflan";
 const BPM_BANDS: BpmBand[] = ["slow", "mid", "fast", "soflan"];
 
 /**

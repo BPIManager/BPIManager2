@@ -11,10 +11,8 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  fetchImportOptimizeMemo,
-  type ImportedGoalTarget,
-} from "@/services/swr/analytics";
+import { fetchImportOptimizeMemo } from "@/services/swr/analytics";
+import type { ImportedGoalTarget } from "@/types/analytics/importedGoalTarget";
 import { useTranslation } from "@/hooks/common/useTranslation";
 
 /** 他ユーザーが共有したreportIdを入力させ、曲目をカスタム目標作成画面に取り込む。 */

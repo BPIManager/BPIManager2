@@ -1,4 +1,4 @@
-import type { BpmBand } from "@/hooks/songs/useSongSearch";
+import type { BpmBand } from "@/types/songs/bpmBand";
 import type { SongSearchResult } from "@/hooks/songs/useSongSearch";
 
 

@@ -13,7 +13,8 @@ import { BpiCalculator } from "@/lib/bpi";
 import type { RadarCategory } from "@/types/stats/radar";
 
 
-import { useSongSearch, type SongSearchResult, type BpmBand } from "@/hooks/songs/useSongSearch";
+import { useSongSearch, type SongSearchResult } from "@/hooks/songs/useSongSearch";
+import type { BpmBand } from "@/types/songs/bpmBand";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { SearchMode, SongSortOrder, CustomGoalTargetInput } from "@/components/partials/features/Analytics/BpiOptimizer/ui/CustomGoal/SongTargetModal/types";
 import { toBpiSongData, scoreRate } from "@/components/partials/features/Analytics/BpiOptimizer/ui/CustomGoal/SongTargetModal/quickOptions";
