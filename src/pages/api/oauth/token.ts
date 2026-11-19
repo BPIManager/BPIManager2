@@ -61,7 +61,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     extractClientCredentials(req, parsed.data.client_id, parsed.data.client_secret);
 
   try {
-    const authCode = await oauthRepo.consumeAuthorizationCode(code);
+    // 検証がすべて通るまで認可コードは消費しない（誤ったリクエストでコードが無効化されるのを防ぐ）
+    const authCode = await oauthRepo.findActiveAuthorizationCode(code);
 
     if (
       !authCode ||
@@ -86,6 +87,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       ) {
         return res.status(401).json({ error: "invalid_client" });
       }
+    }
+
+    // 同時使用はここで弾く（UPDATE 結果で 1 回だけ成功する）
+    if (!(await oauthRepo.consumeAuthorizationCode(code))) {
+      return res.status(400).json({ error: "invalid_grant" });
     }
 
     const accessToken = randomBytes(32).toString("hex");

@@ -125,6 +125,17 @@ class OAuthRepository {
       .execute();
   }
 
+  /** 未消費かつ期限内の認可コードを、消費せずに取得する（検証用） */
+  async findActiveAuthorizationCode(code: string) {
+    return await db
+      .selectFrom("oauthAuthorizationCodes")
+      .selectAll()
+      .where("code", "=", code)
+      .where("consumedAt", "is", null)
+      .where("expiresAt", ">", new Date())
+      .executeTakeFirst();
+  }
+
   /**
    * 認可コードを検証し、1回限りの使用として消費する。
    * `consumedAt`更新のUPDATE結果(numUpdatedRows)で同時多重使用を防ぐ。
@@ -132,13 +143,7 @@ class OAuthRepository {
   async consumeAuthorizationCode(code: string) {
     const now = new Date();
 
-    const row = await db
-      .selectFrom("oauthAuthorizationCodes")
-      .selectAll()
-      .where("code", "=", code)
-      .where("consumedAt", "is", null)
-      .where("expiresAt", ">", now)
-      .executeTakeFirst();
+    const row = await this.findActiveAuthorizationCode(code);
 
     if (!row) return null;
 
