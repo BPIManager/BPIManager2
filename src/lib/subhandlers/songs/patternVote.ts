@@ -1,5 +1,6 @@
 import type { NextApiRequest } from "next";
 import { songPatternsRepo } from "@/lib/db/domains/songPatterns";
+import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { resolveOptionalUid } from "@/middlewares/api/resolveOptionalUid";
 import { err, ok } from "@/middlewares/api/apiResult";
 import { type HandleOutcome } from "./_shared";
@@ -31,16 +32,20 @@ export async function handleSongPatternVote(
   const b = { targetUserId: uid ?? "", viewerId: uid };
   if (!uid) return { result: err(401, "Unauthorized"), ...b };
 
-  if (req.method === "POST") {
-    const input = parseInput(patternVoteBodySchema, req.body ?? {}, { in: "body" });
-    if (!input.success) {
-      return { result: input.result, ...b };
+  try {
+    if (req.method === "POST") {
+      const input = parseInput(patternVoteBodySchema, req.body ?? {}, { in: "body" });
+      if (!input.success) {
+        return { result: input.result, ...b };
+      }
+      const { voteType } = input.data;
+      await songPatternsRepo.vote(songId, pattern, uid, voteType as VoteType);
+      return { result: ok({ ok: true }), ...b };
     }
-    const { voteType } = input.data;
-    await songPatternsRepo.vote(songId, pattern, uid, voteType as VoteType);
-    return { result: ok({ ok: true }), ...b };
-  }
 
-  await songPatternsRepo.deleteVote(songId, pattern, uid);
-  return { result: ok({ ok: true }), ...b };
+    await songPatternsRepo.deleteVote(songId, pattern, uid);
+    return { result: ok({ ok: true }), ...b };
+  } catch (error: unknown) {
+    return { result: err(500, toErrorMessage(error)), ...b };
+  }
 }

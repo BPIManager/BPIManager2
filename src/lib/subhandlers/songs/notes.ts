@@ -1,5 +1,7 @@
 import type { NextApiRequest } from "next";
 import { songNotesRepo } from "@/lib/db/domains/songNotes";
+import { songMasterRepo } from "@/lib/db/domains/songs/master";
+import { toErrorMessage } from "@/lib/subhandlers/shared";
 import { songNotesAggregateRepo } from "@/lib/db/aggregates/songNotes";
 import { resolveOptionalUid } from "@/middlewares/api/resolveOptionalUid";
 import { err, ok } from "@/middlewares/api/apiResult";
@@ -50,8 +52,15 @@ export async function handleCreateSongNote(
     return { result: input.result, ...b };
   }
   const { body } = input.data;
-  const id = await songNotesRepo.createNote(songId, uid, body);
-  return { result: ok({ id }), successStatus: 201, ...b };
+  try {
+    if (!(await songMasterRepo.getSongById(songId))) {
+      return { result: err(404, "Song not found"), ...b };
+    }
+    const id = await songNotesRepo.createNote(songId, uid, body);
+    return { result: ok({ id }), successStatus: 201, ...b };
+  } catch (error: unknown) {
+    return { result: err(500, toErrorMessage(error)), ...b };
+  }
 }
 
 /** PATCH /songs/[songId]/notes/[noteId] */
