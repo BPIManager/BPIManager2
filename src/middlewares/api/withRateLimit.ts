@@ -7,7 +7,7 @@ interface RateLimitOptions {
   windowMs: number;
   /** 時間窓内に許可するリクエスト数 */
   max: number;
-  /** 指定するとルート単位の独立したカウンタになる（未指定は共有カウンタ） */
+  /** カウンタの識別名。未指定はリクエストのパス（クエリ除く）で、ルートごとに独立したカウンタになる */
   name?: string;
 }
 
@@ -20,6 +20,20 @@ interface Bucket {
 const MAX_TRACKED_CLIENTS = 5000;
 
 const buckets = new Map<string, Bucket>();
+
+/** 期限切れを先に掃除し、それでも多ければ古い順に半分まで捨てる（全消去すると制限をリセットできてしまうため） */
+function evictBuckets(now: number) {
+  for (const [key, b] of buckets) {
+    if (b.resetAt <= now) buckets.delete(key);
+  }
+  if (buckets.size <= MAX_TRACKED_CLIENTS) return;
+  const excess = buckets.size - Math.floor(MAX_TRACKED_CLIENTS / 2);
+  let removed = 0;
+  for (const key of buckets.keys()) {
+    if (removed++ >= excess) break;
+    buckets.delete(key);
+  }
+}
 
 function getClientIp(req: NextApiRequest): string {
   // CF-Connecting-IP と CF-Ray は両方揃い IP 形式として妥当な場合のみ信頼し、無ければソケットのアドレスを使う。
@@ -45,11 +59,12 @@ export const withRateLimit = (
   options: RateLimitOptions,
 ) => {
   return async (req: NextApiRequest, res: NextApiResponse) => {
-    const ip = `${options.name ?? ""}:${getClientIp(req)}`;
+    const routeKey = options.name ?? (req.url ?? "").split("?")[0];
+    const ip = `${routeKey}:${getClientIp(req)}`;
     const now = Date.now();
 
     if (buckets.size > MAX_TRACKED_CLIENTS) {
-      buckets.clear();
+      evictBuckets(now);
     }
 
     const bucket = buckets.get(ip);
