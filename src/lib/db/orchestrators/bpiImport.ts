@@ -50,6 +50,8 @@ export async function importFromBPIM(params: {
   statusLogs: NewTotalBPILog[];
 }) {
   return await db.transaction().execute(async (trx) => {
+    // 他の書き込み経路と同様に、同一ユーザーの書き込みを直列化する
+    await lockUserForWrite(trx, params.userId);
     await scoreWriteRepo.deleteByUser(trx, params.userId);
     await logBatchRepo.deleteByUser(trx, params.userId);
     await userStatusLogsWriteRepo.deleteByUser(trx, params.userId);
