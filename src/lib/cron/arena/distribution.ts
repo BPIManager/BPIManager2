@@ -39,6 +39,12 @@ export async function fetchOfficialArenaDistribution(
     }
   }
 
+  // 公式が空のランキングを返したとき（メンテ中など）は、既存のスナップショットを上書きしない
+  if (playerClassMap.size === 0) {
+    console.warn("[OfficialArena] Ranking is empty, keeping the previous snapshot.");
+    return;
+  }
+
   const users = await usersRepo.getUsersWithIidxId();
 
   const fetchedAt = roundTo15Min(new Date());
