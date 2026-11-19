@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { err, writeV2Result } from "@/middlewares/api/apiResult";
 import { IIDX_VERSIONS } from "@/constants/iidx/iidxVersions";
 import { parseOgpSections, type OgpSectionKey } from "@/lib/monthly-review/ogpSections";
 
@@ -21,7 +22,7 @@ export function parseMonthlyReviewQuery(
 ): MonthlyReviewRouteQuery | null {
   // OGPクローラー等がGETの前にHEADで疎通確認することがあるため許可する
   if (req.method !== "GET" && req.method !== "HEAD") {
-    res.status(405).end();
+    writeV2Result(res, err(405, "Method Not Allowed"));
     return null;
   }
   const userId = req.query.userId as string;

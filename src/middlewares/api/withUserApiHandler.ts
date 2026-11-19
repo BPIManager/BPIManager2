@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
-import { checkUserAccess, rejectAccess, type AccessResult } from "./withApi";
+import { checkUserAccess, type AccessResult } from "./withApi";
 import { writeMiddlewareError } from "./apiResult";
 
 type ApiHandler = (
@@ -33,9 +33,12 @@ export function withUserApiHandler<T extends { userId: string }>(
     onReject?: (res: NextApiResponse, access: AccessResult) => unknown;
   },
 ): ApiHandler {
-  const onReject = options?.onReject ?? rejectAccess;
-
   return async function (req: NextApiRequest, res: NextApiResponse) {
+    // 既定の拒否応答は v2 ならエンベロープ、v1 なら従来の { message }
+    const onReject =
+      options?.onReject ??
+      ((r: NextApiResponse, a: AccessResult) =>
+        writeMiddlewareError(req, r, a.error!.status, a.error!.message));
     const query = parseQuery(req, res);
     if (!query) return;
 
