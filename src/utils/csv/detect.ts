@@ -13,8 +13,12 @@ export type CsvType =
 const REFLUX_HEADER_MARKER = "title\tType\tLabel\t";
 const RESULT_TECHO_HEADER_MARKER_1 = "バージョン";
 const RESULT_TECHO_HEADER_MARKER_2 = "曲名";
-const INFINITAS_CSV_HEADER_MARKER = "BEGINNER 最終スコア更新時刻";
+const INFINITAS_CSV_HEADER_MARKERS = [
+  "BEGINNER 最終スコア更新時刻", // 日本語版
+  "BEGINNER 최종 스코어 갱신 일시", // 韓国語版
+];
 const OFFICIAL_HEADER_MARKER = "タイトル";
+const INFINITAS_KO_TITLE_MARKER = "타이틀";
 const DAKEN_COUNTER_HEADER_MARKER = "LV,Title,mode,";
 
 /**
@@ -35,8 +39,9 @@ export const detectCsvType = (text: string): CsvType => {
 
   // 公式CSVと同じ「タイトル」列を持つため、公式CSVより先に判定する
   if (
-    firstLine.includes(OFFICIAL_HEADER_MARKER) &&
-    firstLine.includes(INFINITAS_CSV_HEADER_MARKER)
+    INFINITAS_CSV_HEADER_MARKERS.some((m) => firstLine.includes(m)) &&
+    (firstLine.includes(OFFICIAL_HEADER_MARKER) ||
+      firstLine.includes(INFINITAS_KO_TITLE_MARKER))
   )
     return "infinitas_csv";
 

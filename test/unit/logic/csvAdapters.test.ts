@@ -191,6 +191,37 @@ describe("parseInfinitasCsv / detectCsvType", () => {
   });
 });
 
+describe("parseInfinitasCsv（韓国語版）", () => {
+  const diffs = ["BEGINNER", "NORMAL", "HYPER", "ANOTHER", "LEGGENDARIA"];
+  const header = `버전,타이틀,아티스트,${diffs
+    .map(
+      (d) =>
+        `${d} 스코어,${d} 최종 스코어 갱신 일시,${d} 미스 카운트,${d} 클리어 타입,${d} 플레이 횟수,${d} 최종 플레이 일자`,
+    )
+    .join(",")},`;
+  const row =
+    "1st&substream,22DUNK,SLAKE,0,---,---,NO PLAY,0,---,0,---,---,NO PLAY,0,---,0,---,---,NO PLAY,0,---,646,2022-07-13 18:56,0,FULLCOMBO CLEAR,3,2022-07-13 18:56,0,---,---,NO PLAY,0,---";
+
+  it("INFINITAS CSV として判別されること", () => {
+    expect(detectCsvType(`${header}
+${row}`)).toBe("infinitas_csv");
+  });
+
+  it("日本語版と同じ行へ変換されること", () => {
+    expect(parseInfinitasCsv(`${header}
+${row}`)).toEqual([
+      {
+        title: "22DUNK",
+        difficulty: "ANOTHER",
+        exScore: 646,
+        clearState: "FULLCOMBO CLEAR",
+        missCount: 0,
+        lastPlayed: "2022-07-13 18:56",
+      },
+    ]);
+  });
+});
+
 describe("parseInfinitasCsv の曲名補正", () => {
   const header =
     "バージョン,タイトル,アーティスト,BEGINNER スコア,BEGINNER 最終スコア更新時刻,BEGINNER ミスカウント,BEGINNER クリアタイプ,BEGINNER プレー回数,BEGINNER 最終プレー日時,NORMAL スコア,NORMAL 最終スコア更新時刻,NORMAL ミスカウント,NORMAL クリアタイプ,NORMAL プレー回数,NORMAL 最終プレー日時,HYPER スコア,HYPER 最終スコア更新時刻,HYPER ミスカウント,HYPER クリアタイプ,HYPER プレー回数,HYPER 最終プレー日時,ANOTHER スコア,ANOTHER 最終スコア更新時刻,ANOTHER ミスカウント,ANOTHER クリアタイプ,ANOTHER プレー回数,ANOTHER 最終プレー日時,LEGGENDARIA スコア,LEGGENDARIA 最終スコア更新時刻,LEGGENDARIA ミスカウント,LEGGENDARIA クリアタイプ,LEGGENDARIA プレー回数,LEGGENDARIA 最終プレー日時,";
