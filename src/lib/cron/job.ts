@@ -8,16 +8,33 @@ import { generateUserSitemap } from "./sitemaps";
 import { invalidateArenaAveragesCache } from "@/lib/cache/arenaAverages";
 import dayjs from "../dayjs";
 
+/** 実行中のジョブ（同じ処理を起動時と定期実行で重ねて走らせないためのキー集合） */
+const runningJobs = new Set<unknown>();
+
 /**
  * cronジョブ共通の実行ラッパー。開始ログを出し、失敗時はエラーをログに
  * 残した上で握りつぶす(cronの次回実行を妨げないため再throwはしない)。
+ * 同じ key のジョブが実行中なら、重ねて実行せずスキップする。
+ *
+ * @param key - 重複実行の判定キー（省略時は task 自身）
  */
-async function runCronJob(name: string, task: () => Promise<void>) {
+export async function runCronJob(
+  name: string,
+  task: () => Promise<void>,
+  key: unknown = task,
+) {
+  if (runningJobs.has(key)) {
+    console.warn(`[Cron] ${name} skipped: previous run is still in progress`);
+    return;
+  }
+  runningJobs.add(key);
   console.log(`[Cron] ${name}`);
   try {
     await task();
   } catch (err) {
     console.error(`[Cron] ${name} failed:`, err);
+  } finally {
+    runningJobs.delete(key);
   }
 }
 
@@ -108,10 +125,14 @@ export async function setupArenaService() {
   });
 
   schedule("0 4 * * *", () => {
-    runCronJob("generateArenaJson", async () => {
-      await generateArenaJson();
-      invalidateArenaAveragesCache();
-    });
+    runCronJob(
+      "generateArenaJson",
+      async () => {
+        await generateArenaJson();
+        invalidateArenaAveragesCache();
+      },
+      generateArenaJson,
+    );
   });
 
   schedule("0 16 * * *", () => {
