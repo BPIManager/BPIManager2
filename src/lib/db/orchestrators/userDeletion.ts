@@ -22,14 +22,24 @@ import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
 
+/** 削除処理の直列化用。バックアップの読み取り（プール接続16本）+ トランザクション1本を同時に何人分も使わないため */
+let deletionQueue: Promise<unknown> = Promise.resolve();
+
 /**
  * アカウント削除前に全ユーザーデータをJSONとしてバックアップし、
- * FK制約を考慮した順序で物理削除を行う。
+ * FK制約を考慮した順序で物理削除を行う。プロセス内では1件ずつ順に実行する。
  */
-export async function backupAndDeleteUser(userId: string): Promise<void> {
+export function backupAndDeleteUser(userId: string): Promise<void> {
+  const run = deletionQueue.then(() => backupAndDeleteUserNow(userId));
+  deletionQueue = run.catch(() => {});
+  return run;
+}
+
+async function backupAndDeleteUserNow(userId: string): Promise<void> {
   // バックアップ読み取り・書き出し・物理削除を、書き込みロックを取った1トランザクションで行う。書き出し失敗時は削除もロールバックされる。
   await db.transaction().execute(async (trx) => {
   await lockUserForWrite(trx, userId);
+  // 書き込みロック中は対象ユーザーへの他の書き込みが止まるため、プール接続での読み取りでもバックアップは一貫する
   const [
     user,
     follows,
