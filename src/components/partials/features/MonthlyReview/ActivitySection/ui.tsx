@@ -30,8 +30,7 @@ interface Props {
   tooltipStyle: React.CSSProperties;
   hasNoKeyScratchData: boolean;
   primaryColor: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  formatHourLabel: (...args: any[]) => React.ReactNode;
+  formatHourLabel: (label: React.ReactNode) => React.ReactNode;
 }
 
 const AnimatedStat = ({

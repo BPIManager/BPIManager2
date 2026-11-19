@@ -53,8 +53,7 @@ export const Meta = ({
   );
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const JsonLd = ({ data }: { data: Record<string, any> }) => (
+export const JsonLd = ({ data }: { data: Record<string, unknown> }) => (
   <Head>
     <script
       key="jsonld"
