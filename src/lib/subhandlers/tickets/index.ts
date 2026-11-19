@@ -67,6 +67,8 @@ export async function handleTicketRecommendGet(
   }
 }
 
+const TICKET_CONCURRENCY = 5;
+
 /** POST /users/[userId]/tickets/recommend （withUserApiHandler） */
 export async function handleTicketRecommendPost(
   req: NextApiRequest,
@@ -84,8 +86,7 @@ export async function handleTicketRecommendPost(
 
   try {
     const totalBpi = await ticketsRepo.getLatestTotalBpi(userId, VERSION);
-    const results = await Promise.all(
-      ticketIds.map(async ({ ticketId, expiresAt }) => {
+    const recommendOne = async ({ ticketId, expiresAt }: (typeof ticketIds)[number]) => {
         const { items, hasMore } = await ticketsRepo.getTopSongsForTicket(
           ticketId,
           userId,
@@ -101,8 +102,12 @@ export async function handleTicketRecommendPost(
           hasMore,
           totalBpi,
         } satisfies TicketRecommendResult;
-      }),
-    );
+      };
+    // 同時に走る重い JOIN の数を抑えるため、少数ずつ順に処理する
+    const results: TicketRecommendResult[] = [];
+    for (let i = 0; i < ticketIds.length; i += TICKET_CONCURRENCY) {
+      results.push(...(await Promise.all(ticketIds.slice(i, i + TICKET_CONCURRENCY).map(recommendOne))));
+    }
     return { result: ok(results), targetUserId: userId, viewerId };
   } catch (error: unknown) {
     return {

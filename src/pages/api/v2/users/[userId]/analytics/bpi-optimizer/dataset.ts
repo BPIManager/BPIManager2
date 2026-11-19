@@ -1,3 +1,4 @@
+import { withRateLimit } from "@/middlewares/api/withRateLimit";
 import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
 import { handleBpiOptimizerDataset } from "@/lib/subhandlers/bpiOptimizer";
 import {
@@ -8,7 +9,7 @@ import {
   err,
 } from "@/middlewares/api/apiResult";
 
-export default withUserApiHandler(
+const handler = withUserApiHandler(
   (req, res) => {
     if (req.method !== "GET") {
       writeV2Result(res, err(405, "Method Not Allowed"));
@@ -27,3 +28,5 @@ export default withUserApiHandler(
     onReject: (res, access) => writeV2Result(res, accessError(access)!),
   },
 );
+
+export default withRateLimit(handler, { windowMs: 60000, max: 30, name: "bpi-optimizer-dataset" });

@@ -1,3 +1,4 @@
+import { withRateLimit } from "@/middlewares/api/withRateLimit";
 import { withUserApiHandler } from "@/middlewares/api/withUserApiHandler";
 import { generateMonthlyReviewOgpImage } from "@/lib/subhandlers/stats";
 import {
@@ -7,7 +8,7 @@ import {
 } from "@/middlewares/api/apiResult";
 import { parseMonthlyReviewQuery } from "@/lib/subhandlers/stats/monthlyReviewV2/routeQuery";
 
-export default withUserApiHandler(
+const handler = withUserApiHandler(
   parseMonthlyReviewQuery,
   async (req, res, query) => {
     try {
@@ -37,3 +38,5 @@ export default withUserApiHandler(
     onReject: (res, access) => writeV2Result(res, accessError(access)!),
   },
 );
+
+export default withRateLimit(handler, { windowMs: 60000, max: 60, name: "monthly-review-ogp" });

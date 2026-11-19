@@ -1,3 +1,4 @@
+import { withRateLimit } from "@/middlewares/api/withRateLimit";
 import { generateSampleMonthlyReviewOgpImage } from "@/lib/subhandlers/stats";
 import type { NextApiRequest, NextApiResponse } from "next";
 import {
@@ -5,7 +6,7 @@ import {
   writeV2Result,
 } from "@/middlewares/api/apiResult";
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "GET" && req.method !== "HEAD") return writeV2Result(res, err(405, "Method Not Allowed"));
   try {
     res.setHeader("Content-Type", "image/png");
@@ -19,3 +20,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     writeV2Result(res, err(500, message));
   }
 }
+
+export default withRateLimit(handler, { windowMs: 60_000, max: 60, name: "ogp-sample" });
