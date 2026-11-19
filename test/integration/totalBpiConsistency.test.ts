@@ -19,6 +19,8 @@ const SERVER_UP = await fetch(BASE_URL, { signal: AbortSignal.timeout(2000) })
 /** 対象ユーザー・DB・devサーバーが揃っていない場合はスイート全体を skip する */
 const CAN_RUN = !!USER_ID && !!process.env.DB_HOST && SERVER_UP;
 
+if (!CAN_RUN) console.warn("[integration] totalBpiConsistency: 必要な環境変数または dev サーバーが無いため、このテストは skip されます");
+
 type DashboardHandler = (
   input: unknown,
 ) => Promise<{ content: { type: string; text: string }[] }>;

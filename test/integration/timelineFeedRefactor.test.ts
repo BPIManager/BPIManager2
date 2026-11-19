@@ -26,6 +26,8 @@ dayjs.extend(utc);
 const VIEWER_ID = process.env.TEST_PUBLIC_USER_ID || "";
 const CAN_RUN = !!process.env.DB_HOST && !!VIEWER_ID;
 
+if (!CAN_RUN) console.warn("[integration] timelineFeedRefactor: 必要な環境変数または dev サーバーが無いため、このテストは skip されます");
+
 /** 単一クエリによる参照実装（タイブレークを含む） */
 async function legacyGetFollowedTimeline(params: {
   viewerId: string;

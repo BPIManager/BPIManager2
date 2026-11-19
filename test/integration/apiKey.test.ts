@@ -20,6 +20,8 @@ const SERVER_UP = await fetch(BASE_URL, { signal: AbortSignal.timeout(2000) })
   .catch(() => false);
 const CAN_RUN = !!API_KEY && !!USER_ID && SERVER_UP;
 
+if (!CAN_RUN) console.warn("[integration] apiKey: 必要な環境変数または dev サーバーが無いため、このテストは skip されます");
+
 describe.skipIf(!CAN_RUN)("API Token Exchange Flow", () => {
   let customToken: string;
   let idToken: string;

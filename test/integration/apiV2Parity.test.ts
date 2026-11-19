@@ -38,6 +38,8 @@ const SERVER_UP = await fetch(BASE_URL, { signal: AbortSignal.timeout(2000) })
   .catch(() => false);
 const CAN_RUN = !!API_KEY && !!FIREBASE_API_KEY && SERVER_UP;
 
+if (!CAN_RUN) console.warn("[integration] apiV2Parity: 必要な環境変数または dev サーバーが無いため、このテストは skip されます");
+
 /** マスク等で毎回変わる値を吸収してから比較する */
 function normalize(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(normalize);

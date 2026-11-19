@@ -27,8 +27,6 @@ describe("relativeRadarDomain", () => {
     const [lo, hi] = relativeRadarDomain([1, 1.05, 0.98]);
     expect(lo).toBeLessThan(0.98);
     expect(hi).toBeGreaterThan(1.05);
-    expect(1).toBeGreaterThan(lo);
-    expect(1).toBeLessThan(hi);
   });
 
   it("全て 1.00 でも幅を持つ", () => {
