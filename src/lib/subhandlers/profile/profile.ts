@@ -7,6 +7,7 @@ import { err, ok } from "@/middlewares/api/apiResult";
 import { getUserAreaRank } from "@/lib/arena/prefectureRankings";
 import { latestVersion } from "@/constants/iidx/iidxVersions";
 import { profileUpsertSchema } from "@/schemas/profile/upsert";
+import { isBlockedIidxId } from "@/lib/auth/blockedIidxId";
 import { socialWinLossRepo } from "@/lib/db/aggregates/rivalScores/winLoss";
 import { upsertStatsPrivacy } from "@/lib/db/domains/arenaPrivacy";
 import { upsertUserProfile } from "@/lib/db/orchestrators/userProfileUpsert";
@@ -73,6 +74,10 @@ async function upsertProfile(
   const parsed = profileUpsertSchema.safeParse(req.body);
   if (!parsed.success) {
     return err(400, parsed.error.issues[0]?.message ?? "Invalid request body");
+  }
+
+  if (isBlockedIidxId(parsed.data.iidxId)) {
+    return err(400, "Invalid request body");
   }
 
   const { arenaPrivacy, ...profileData } = parsed.data;
