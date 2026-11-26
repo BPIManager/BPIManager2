@@ -1,13 +1,15 @@
 -- BPIM2 Camera リリースのお知らせ。
 -- 本番DBで実行すると、publishedAt を過ぎた時点から、全ユーザーのお知らせ（ベルのアイコン）に表示される。
 -- 同じお知らせを二重に登録しないよう、同一タイトルが無いときだけ追加する。
+-- 本文は表示のとき改行がそのまま使われる（whitespace-pre-line）。
 -- 公開を止めるときは、isPublished を 0 にする:
 --   UPDATE `announcements` SET `isPublished` = 0 WHERE `title` = 'BPIM2 Cameraをリリースしました';
 
 INSERT INTO `announcements` (`title`, `body`, `linkUrl`, `publishedAt`, `isPublished`)
 SELECT
   'BPIM2 Cameraをリリースしました',
-  'スマホのカメラでリザルト画面を撮影するだけで、曲とEXスコアを自動で読み取り、BPIM2に登録できる「BPIM2 Camera」を公開しました。インストールは不要で、ホーム画面に追加するとアプリとして使えます。登録は1曲ずつです。インポートページの「CSV以外のスコア登録方法」にも、使い方を追加しています。',
+  'スマホのカメラでリザルト画面を撮影するだけで、自動でスコアを読み取り、BPIM2に登録できます。
+BPIや推定順位などの情報を添えてリザルト画像をXにシェアすることもできます。',
   'https://bpi-cam.poyashi.me',
   NOW(),
   1
