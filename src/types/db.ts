@@ -360,6 +360,8 @@ export interface AllSongsTable {
   releasedVersion: number | null;
   /** INFINITAS限定曲（INFバージョン以外の一覧・集計から除外する） */
   isInfinitasOnly: Generated<number>;
+  /** アーティスト名。曲の全譜面で共通（公式CSV・textage由来）。未登録は null */
+  artist: Generated<string | null>;
 }
 
 export interface AllScoresTable {
