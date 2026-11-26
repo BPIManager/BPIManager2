@@ -325,10 +325,10 @@ export const importTranslations = {
 
   // Registration methods section header (Bookmarklet / Android app / Manual entry / MCP)
   "import.registrationMethods.title": {
-    ja: "スコアの登録方法",
-    en: "Ways to Register Scores",
-    "zh-TW": "成績登錄方法",
-    ko: "점수 등록 방법",
+    ja: "CSV以外のスコア登録方法",
+    en: "Ways to Register Scores Without CSV",
+    "zh-TW": "CSV 以外的成績登錄方法",
+    ko: "CSV 이외의 점수 등록 방법",
   },
 
   // MCP accordion
