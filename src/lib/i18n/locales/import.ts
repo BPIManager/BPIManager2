@@ -278,6 +278,51 @@ export const importTranslations = {
     ko: "앱 다운로드",
   },
 
+  // BPIM2 Camera accordion
+  "import.camera.accordionTitle": {
+    ja: "BPIM2 Cameraを使用（リザルト画面を撮影して登録）",
+    en: "Use BPIM2 Camera (Scan the Result Screen)",
+    "zh-TW": "使用 BPIM2 Camera（拍攝結果畫面登錄）",
+    ko: "BPIM2 Camera 사용 (결과 화면을 촬영해 등록)",
+  },
+  "import.camera.desc": {
+    ja: "スマホのカメラでリザルト画面を撮影（またはスクリーンショットを選択）するだけで、曲とEXスコアを自動で読み取り、BPIM2に登録できます。",
+    en: "Just photograph the result screen with your phone camera (or pick a screenshot) and the song and EX score are read automatically, ready to register to BPIM2.",
+    "zh-TW": "只要用手機相機拍攝結果畫面（或選擇截圖），就能自動讀取曲目與 EX 分數並登錄至 BPIM2。",
+    ko: "스마트폰 카메라로 결과 화면을 촬영(또는 스크린샷 선택)하기만 하면 곡과 EX 스코어를 자동으로 읽어 BPIM2에 등록할 수 있습니다.",
+  },
+  "import.camera.step1.linkText": { ja: "こちら", en: "here", "zh-TW": "此處", ko: "여기" },
+  "import.camera.step1.suffix": {
+    ja: "からBPIM2 Cameraを開きます。インストールは不要で、ホーム画面に追加するとアプリとして使えます。",
+    en: " to open BPIM2 Camera. No installation is needed; add it to your home screen to use it like an app.",
+    "zh-TW": "開啟 BPIM2 Camera。無需安裝，加入主畫面後即可當作應用程式使用。",
+    ko: "에서 BPIM2 Camera를 엽니다. 설치는 필요 없으며, 홈 화면에 추가하면 앱처럼 사용할 수 있습니다.",
+  },
+  "import.camera.step2": {
+    ja: "BPIM2アカウントでサインインします。",
+    en: "Sign in with your BPIM2 account.",
+    "zh-TW": "以 BPIM2 帳號登入。",
+    ko: "BPIM2 계정으로 로그인합니다.",
+  },
+  "import.camera.step3": {
+    ja: "リザルト画面を枠に合わせて撮影すると、曲とEXスコアを読み取ります。内容を確認し、「BPIM2同期」ボタンで登録します。",
+    en: "Align the result screen with the frame and shoot. The song and EX score are read; check them, then tap the \"BPIM2 Sync\" button to register.",
+    "zh-TW": "將結果畫面對準框線拍攝後，會讀取曲目與 EX 分數。確認內容後，按「BPIM2 同步」按鈕登錄。",
+    ko: "결과 화면을 프레임에 맞춰 촬영하면 곡과 EX 스코어를 읽어 들입니다. 내용을 확인한 뒤 \"BPIM2 동기화\" 버튼으로 등록합니다.",
+  },
+  "import.camera.note": {
+    ja: "登録は1曲ずつです。読み取り結果が違うときは、確認画面で修正できます。まとめて取り込みたいときは、他の方法をご利用ください。",
+    en: "Scores are registered one song at a time. If a reading is wrong, you can correct it on the confirmation screen. To import many scores at once, use one of the other methods.",
+    "zh-TW": "每次登錄一首曲目。若讀取結果有誤，可在確認畫面修正。若要一次匯入大量資料，請使用其他方法。",
+    ko: "등록은 한 곡씩 진행됩니다. 읽은 결과가 다르면 확인 화면에서 수정할 수 있습니다. 한꺼번에 가져오려면 다른 방법을 이용해 주세요.",
+  },
+  "import.camera.openButton": {
+    ja: "BPIM2 Cameraを開く",
+    en: "Open BPIM2 Camera",
+    "zh-TW": "開啟 BPIM2 Camera",
+    ko: "BPIM2 Camera 열기",
+  },
+
   // Registration methods section header (Bookmarklet / Android app / Manual entry / MCP)
   "import.registrationMethods.title": {
     ja: "スコアの登録方法",

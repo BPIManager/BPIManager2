@@ -13,6 +13,7 @@ import { versionsOptions } from "@/constants/iidx/versionTitles";
 import { iidxUrl } from "@/constants/iidx/eamusementUrls";
 import BookmarkletAccordion from "@/components/partials/common/Bookmarklet";
 import AndroidAppAccordion from "../AndroidApp";
+import CameraAppAccordion from "../CameraApp";
 import ManualEntryAccordion from "../ManualEntry";
 import McpEntryAccordion from "../McpEntry";
 import DeleteGuideAccordion from "../DeleteGuide";
@@ -161,6 +162,7 @@ const ScoreImportView = (props: ScoreImportProps) => {
 
       <StepCard title={t("import.registrationMethods.title")}>
         <BookmarkletAccordion />
+        <CameraAppAccordion />
         <AndroidAppAccordion />
         <ManualEntryAccordion />
         <McpEntryAccordion />
