@@ -7209,6 +7209,16 @@
             "schema": {
               "type": "boolean"
             }
+          },
+          {
+            "name": "includeCurve",
+            "in": "query",
+            "description": "省略された場合false. true にすると、BPI 100・90・…・0 に必要な EX スコアの一覧を `curve` として返します（曲の BPI チャートの描画用）。算出できない曲（分布パラメータ未計算）は空配列になります",
+            "required": false,
+            "example": "false",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "responses": {
@@ -14295,6 +14305,25 @@
             "type": "number",
             "description": "単曲 BPI 値。-15 〜 理論上限。kaidenAvg / wrScore が未設定の場合は -15 固定。",
             "nullable": true
+          },
+          "curve": {
+            "type": "array",
+            "description": "BPI 100〜0 に必要な EX スコア。includeCurve=true のときだけ含まれる",
+            "items": {
+              "type": "object",
+              "required": [
+                "bpi",
+                "score"
+              ],
+              "properties": {
+                "bpi": {
+                  "type": "integer"
+                },
+                "score": {
+                  "type": "integer"
+                }
+              }
+            }
           },
           "rank": {
             "type": "object",
