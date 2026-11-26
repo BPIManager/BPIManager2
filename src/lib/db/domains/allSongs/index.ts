@@ -46,6 +46,28 @@ class AllSongsRepository {
       ])
       .execute();
   }
+
+  /**
+   * 外部クライアント向けの楽曲マスタ（削除済みを除く全難易度）。INF 限定曲も含む。
+   *
+   * @returns 楽曲 ID・タイトル・ノーツ数・難易度・レベルの配列（songId 昇順）
+   */
+  async getPublicMaster(): Promise<
+    {
+      songId: number;
+      title: string;
+      notes: number;
+      difficulty: string;
+      difficultyLevel: number;
+    }[]
+  > {
+    return await db
+      .selectFrom("allSongs")
+      .where("deletedAt", "is", null)
+      .select(["songId", "title", "notes", "difficulty", "difficultyLevel"])
+      .orderBy("songId")
+      .execute();
+  }
 }
 
 export const allSongsRepo = new AllSongsRepository();
