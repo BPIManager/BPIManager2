@@ -20,6 +20,7 @@ import { PageLoader } from "@/components/ui/loading-spinner";
 import { useState } from "react";
 import { NoDataAlert } from "@/components/partials/common/DashBoard/NoData";
 import BpiChangeNotice from "@/components/partials/common/DashBoard/BpiChangeNotice";
+import CameraReleaseNotice from "@/components/partials/common/DashBoard/CameraReleaseNotice";
 import MonthlyReviewNotice from "@/components/partials/common/DashBoard/MonthlyReviewNotice";
 import IidxTowerSection from "@/components/partials/common/DashBoard/IidxTowerCard";
 import OfficialArenaHistorySection from "@/components/partials/common/DashBoard/OfficialArenaHistoryCard";
@@ -141,6 +142,7 @@ export default function DashboardPage() {
 
         <PageContainer>
           <div className="flex flex-col gap-6">
+            <CameraReleaseNotice />
             <MonthlyReviewNotice />
             <BpiChangeNotice />
             <DashBoardFilter withCompare />

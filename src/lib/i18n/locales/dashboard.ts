@@ -1296,6 +1296,37 @@ export const dashboardTranslations = {
     ko: "닫기",
   },
 
+  "dashboard.cameraReleaseNotice.title": {
+    ja: "BPIM2 Cameraをリリースしました",
+    en: "BPIM2 Camera is now available",
+    "zh-TW": "BPIM2 Camera 已推出",
+    ko: "BPIM2 Camera를 출시했습니다",
+  },
+  "dashboard.cameraReleaseNotice.desc": {
+    ja: "スマホのカメラでリザルト画面を撮影するだけで、曲とEXスコアを自動で読み取り、BPIM2に登録できます。",
+    en: "Just photograph the result screen with your phone camera to read the song and EX score automatically and register them to BPIM2.",
+    "zh-TW": "只要用手機相機拍攝結果畫面，就能自動讀取曲目與 EX 分數並登錄至 BPIM2。",
+    ko: "스마트폰 카메라로 결과 화면을 촬영하기만 하면 곡과 EX 스코어를 자동으로 읽어 BPIM2에 등록할 수 있습니다.",
+  },
+  "dashboard.cameraReleaseNotice.openLink": {
+    ja: "BPIM2 Cameraを開く",
+    en: "Open BPIM2 Camera",
+    "zh-TW": "開啟 BPIM2 Camera",
+    ko: "BPIM2 Camera 열기",
+  },
+  "dashboard.cameraReleaseNotice.importLink": {
+    ja: "取り込み方法を見る",
+    en: "How to use it",
+    "zh-TW": "查看使用方法",
+    ko: "사용 방법 보기",
+  },
+  "dashboard.cameraReleaseNotice.dismiss": {
+    ja: "閉じる",
+    en: "Dismiss",
+    "zh-TW": "關閉",
+    ko: "닫기",
+  },
+
   "dashboard.monthlyReviewNotice.title": {
     ja: "{year}年{month}月のプレーを振り返る",
     en: "Look back at your {year}/{month} plays",
