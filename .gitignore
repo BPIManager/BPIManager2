@@ -36,6 +36,9 @@ yarn-error.log*
 .env
 .env.local
 
+# お知らせ（announcements）に流す SQL。1 回きりの運用データなので、手元に置き、リポジトリには入れない
+migrations/announcements/
+
 # ssh tunnel scripts (contain server info)
 start_ssh_tunnel.bat
 
