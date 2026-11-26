@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { ArrowRight, Camera, ExternalLink, X } from "lucide-react";
+import { Camera, ExternalLink, X } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useTranslation } from "@/hooks/common/useTranslation";
 import { BPIM2_CAMERA_URL } from "@/constants/site/camera";
@@ -49,7 +48,9 @@ function CameraReleaseNotice() {
       <Camera />
       <AlertTitle>{t("dashboard.cameraReleaseNotice.title")}</AlertTitle>
       <AlertDescription>
-        <p>{t("dashboard.cameraReleaseNotice.desc")}</p>
+        <p className="whitespace-pre-line">
+          {t("dashboard.cameraReleaseNotice.desc")}
+        </p>
         <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1">
           <a
             href={BPIM2_CAMERA_URL}
@@ -60,13 +61,6 @@ function CameraReleaseNotice() {
             {t("dashboard.cameraReleaseNotice.openLink")}
             <ExternalLink className="h-3 w-3" />
           </a>
-          <Link
-            href="/import"
-            className="inline-flex items-center gap-1 font-medium text-bpim-primary hover:underline"
-          >
-            {t("dashboard.cameraReleaseNotice.importLink")}
-            <ArrowRight className="h-3 w-3" />
-          </Link>
         </div>
       </AlertDescription>
       <button

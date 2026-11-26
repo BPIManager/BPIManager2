@@ -1303,22 +1303,16 @@ export const dashboardTranslations = {
     ko: "BPIM2 Camera를 출시했습니다",
   },
   "dashboard.cameraReleaseNotice.desc": {
-    ja: "スマホのカメラでリザルト画面を撮影するだけで、曲とEXスコアを自動で読み取り、BPIM2に登録できます。",
-    en: "Just photograph the result screen with your phone camera to read the song and EX score automatically and register them to BPIM2.",
-    "zh-TW": "只要用手機相機拍攝結果畫面，就能自動讀取曲目與 EX 分數並登錄至 BPIM2。",
-    ko: "스마트폰 카메라로 결과 화면을 촬영하기만 하면 곡과 EX 스코어를 자동으로 읽어 BPIM2에 등록할 수 있습니다.",
+    ja: "スマホのカメラでリザルト画面を撮影するだけで、自動でスコアを読み取り、BPIM2に登録できます。\nBPIや推定順位などの情報を添えてリザルト画像をXにシェアすることもできます。",
+    en: "Just photograph the result screen with your phone camera to read your score automatically and register it to BPIM2.\nYou can also share the result image to X along with details such as your BPI and estimated rank.",
+    "zh-TW": "只要用手機相機拍攝結果畫面，就能自動讀取分數並登錄至 BPIM2。\n也可以附上 BPI 與推定排名等資訊，將結果圖片分享到 X。",
+    ko: "스마트폰 카메라로 결과 화면을 촬영하기만 하면 스코어를 자동으로 읽어 BPIM2에 등록할 수 있습니다.\nBPI와 추정 순위 등의 정보를 곁들여 결과 이미지를 X에 공유할 수도 있습니다.",
   },
   "dashboard.cameraReleaseNotice.openLink": {
     ja: "BPIM2 Cameraを開く",
     en: "Open BPIM2 Camera",
     "zh-TW": "開啟 BPIM2 Camera",
     ko: "BPIM2 Camera 열기",
-  },
-  "dashboard.cameraReleaseNotice.importLink": {
-    ja: "取り込み方法を見る",
-    en: "How to use it",
-    "zh-TW": "查看使用方法",
-    ko: "사용 방법 보기",
   },
   "dashboard.cameraReleaseNotice.dismiss": {
     ja: "閉じる",
