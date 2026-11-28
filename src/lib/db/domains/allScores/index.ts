@@ -171,6 +171,21 @@ class allScoresRepository {
   }
 
   /**
+   * CSV 取り込みで、同じプレーの手動登録の記録を、新しい記録を作らずに更新する（#711）。EX・使用オプションは変えない。
+   *
+   * @param trx - 呼び出し元が管理するトランザクション
+   * @param logId - 更新する記録
+   * @param values - CSV のミスカウント・ランプ・最終プレー日時
+   */
+  async updateFromSamePlay(
+    trx: Transaction<Database>,
+    logId: number,
+    values: { clearState: string | null; missCount: number | null; lastPlayed: Date },
+  ) {
+    await trx.updateTable("allScores").set(values).where("logId", "=", logId).execute();
+  }
+
+  /**
    * 指定バッチに紐づく全難易度スコアレコードを削除する。
    *
    * @param trx - 呼び出し元が管理するトランザクション

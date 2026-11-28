@@ -10,6 +10,14 @@ import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
 import { BpiCalculator } from "@/lib/bpi";
 import { saveRadarSnapshot } from "@/lib/db/orchestrators/logRadarSnapshot";
 
+/** 同じプレーの手動登録の記録を、CSV の値で更新する内容（#711） */
+export interface SamePlayMerge {
+  logId: number;
+  clearState: string | null;
+  missCount: number | null;
+  lastPlayed: Date;
+}
+
 /**
  * スコアインポート結果を1トランザクションで保存する（scores・logs・userStatusLogs の更新と allScores の追記）。
  *
@@ -19,6 +27,8 @@ import { saveRadarSnapshot } from "@/lib/db/orchestrators/logRadarSnapshot";
  * @param params.scoreUpdates - 保存する BPI スコアの配列
  * @param params.allScoreUpdates - 保存する全難易度スコアの配列
  * @param params.newTotalBpi - 今回算出した総合 BPI
+ * @param params.scoreMerges - 新しい記録を作らずに更新する、同じプレーの手動登録の記録（☆11/12）
+ * @param params.allScoreMerges - 同（全難易度）
  * @returns ラチェット適用後に実際に保存した総合BPI（応答にはこちらを使う。newTotalBpi と保存値がずれるため）
  */
 export async function saveImportResults(params: {
@@ -28,6 +38,8 @@ export async function saveImportResults(params: {
   scoreUpdates: NewScore[];
   allScoreUpdates: NewAllScores[];
   newTotalBpi: number;
+  scoreMerges?: SamePlayMerge[];
+  allScoreMerges?: SamePlayMerge[];
 }, existingTrx?: Transaction<Database>): Promise<{ totalBpi: number }> {
   const run = async (trx: Transaction<Database>) => {
     // 同一ユーザーの書き込みを直列化してから、ラチェット基準値などを読む
@@ -35,6 +47,9 @@ export async function saveImportResults(params: {
     await logBatchRepo.getLatestBatchIdForUpdate(trx, params.userId, params.version);
     const totalBpi = await executeSaveBpiSystem(trx, params);
     await executeSaveAllLevelHistory(trx, params);
+    // 同じプレーの手動登録の記録は、EX が同じなので総合 BPI に影響しない。記録を増やさず、その場で更新する
+    for (const { logId, ...values } of params.scoreMerges ?? []) await scoreWriteRepo.updateFromSamePlay(trx, logId, values);
+    for (const { logId, ...values } of params.allScoreMerges ?? []) await allScoresRepo.updateFromSamePlay(trx, logId, values);
     return { totalBpi };
   };
   // 呼び出し元が読み取りを同じトランザクションで行う場合は、そのトランザクションに参加する
