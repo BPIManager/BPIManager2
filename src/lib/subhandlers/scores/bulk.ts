@@ -6,7 +6,8 @@ import { logTotalBpiRepo } from "@/lib/db/domains/logs/totalBpi";
 import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { allSongsRepo } from "@/lib/db/domains/allSongs";
 import { unmatchedImportSongsRepo } from "@/lib/db/domains/unmatchedImportSongs";
-import { saveImportResults } from "@/lib/db/orchestrators/bpiImport";
+import { saveImportResults, type SamePlayMerge } from "@/lib/db/orchestrators/bpiImport";
+import { isSameManualPlay } from "@/lib/scores/sameManualPlay";
 import { withUserWriteLock } from "@/lib/db/orchestrators/userWriteTransaction";
 import { BpiCalculator } from "@/lib/bpi";
 import { isScoreImproved } from "@/lib/scores/evaluateImprovement";
@@ -69,6 +70,9 @@ export async function handleScoresBulk(
 
     const scoreUpdates: NewScore[] = [];
     const allScoreUpdates: NewAllScores[] = [];
+    // 同じプレーの手動登録（BPIM2 Camera を含む）の記録は、新しい記録を作らず、ミスカウント・ランプを CSV の値で更新する（#711）
+    const scoreMerges: SamePlayMerge[] = [];
+    const allScoreMerges: SamePlayMerge[] = [];
     const notFound: { title: string; difficulty: string }[] = [];
     const invalidScore: { title: string; difficulty: string; exScore: number }[] =
       [];
@@ -100,6 +104,10 @@ export async function handleScoresBulk(
 
       const current = allScoreMap.get(song.songId);
       if (isScoreImproved(row, current)) {
+        if (current && isSameManualPlay(current, row)) {
+          allScoreMerges.push({ logId: current.logId, clearState: row.clearState, missCount: row.missCount ?? null, lastPlayed: lastPlayedDate(row.lastPlayed) });
+          continue;
+        }
         const bpiTarget = bpiMasterMap.get(`${row.title}_${row.difficulty}`);
         const bpiValue = bpiTarget
           ? BpiCalculator.calc(row.exScore, bpiTarget)
@@ -128,6 +136,10 @@ export async function handleScoresBulk(
 
       const current = bpiScoreMap.get(song.songId);
       if (isScoreImproved(row, current)) {
+        if (current && isSameManualPlay(current, row)) {
+          scoreMerges.push({ logId: current.logId, clearState: row.clearState, missCount: row.missCount ?? null, lastPlayed: lastPlayedDate(row.lastPlayed) });
+          continue;
+        }
         scoreUpdates.push({
           userId,
           songId: song.songId,
@@ -168,6 +180,8 @@ export async function handleScoresBulk(
       scoreUpdates,
       allScoreUpdates,
       newTotalBpi,
+      scoreMerges,
+      allScoreMerges,
     }, trx);
 
     return {
@@ -176,6 +190,9 @@ export async function handleScoresBulk(
         batchId,
         updatedAllCount: allScoreUpdates.length,
         updatedBpiCount: scoreUpdates.length,
+        // 同じプレーの手動登録の記録を、その場で更新した件数
+        mergedAllCount: allScoreMerges.length,
+        mergedBpiCount: scoreMerges.length,
         previousTotalBpi,
         newTotalBpi: savedTotalBpi,
         details: { notFound, invalidScore },

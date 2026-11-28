@@ -24,6 +24,8 @@ export const useEditProfile = (onClose?: () => void) => {
     iidxId: "",
     bio: "",
     isPublic: true,
+    // オプション統計への参加。既定は「提供する」
+    optionStats: true,
     xId: "",
     profileImage: "",
   });
@@ -53,6 +55,8 @@ export const useEditProfile = (onClose?: () => void) => {
       iidxId: user.iidxId || "",
       bio: user.profileText || "",
       isPublic: !!user.isPublic,
+      // 列を足す前の応答（値がない）では「提供する」
+      optionStats: user.optionStats !== 0,
       xId: user.xId || "",
       profileImage: user.profileImage || "",
     });

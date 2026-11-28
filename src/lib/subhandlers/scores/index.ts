@@ -11,4 +11,5 @@ export * from "./selfVersion";
 export * from "./unplayed";
 export * from "./bulk";
 export * from "./manual";
+export * from "./useOption";
 export * from "./transfer";

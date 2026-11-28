@@ -19,6 +19,8 @@ interface ManualScoreInput {
   bpi: number | null;
   clearState: string | null;
   missCount: number | null;
+  /** 使用オプション。省略なら、同日の行を更新するときは今の値を残す */
+  useOption?: string | null;
 }
 
 interface ManualAllScoreInput {
@@ -27,6 +29,7 @@ interface ManualAllScoreInput {
   bpi: number | null;
   clearState: string | null;
   missCount: number | null;
+  useOption?: string | null;
 }
 
 /**
@@ -114,6 +117,7 @@ export async function saveManualScoreUpdate(params: {
         clearState: score.clearState,
         missCount: score.missCount,
         lastPlayed,
+        useOption: score.useOption,
       });
       await saveRadarSnapshot(trx, { userId, version, batchId });
     }
@@ -129,6 +133,7 @@ export async function saveManualScoreUpdate(params: {
         clearState: allScore.clearState,
         missCount: allScore.missCount,
         lastPlayed,
+        useOption: allScore.useOption,
       });
     }
 

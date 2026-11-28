@@ -357,6 +357,39 @@ describe("handleScoresBulk", () => {
       },
     });
   });
+
+  it("同じ日・同じ EX の手動登録の記録は、新しい記録を作らずに CSV の値で更新する(#711)", async () => {
+    const { saveImportResults } = await import("@/lib/db/orchestrators/bpiImport");
+    getAllLevelMasterMock.mockResolvedValueOnce([
+      { songId: 1, title: "same", difficulty: "ANOTHER", notes: 1000 },
+      { songId: 2, title: "other", difficulty: "ANOTHER", notes: 1000 },
+    ]);
+    getSongMasterWithDefMock.mockResolvedValueOnce([]);
+    // 2026-11-28 12:00 JST に手動登録した記録（ミスカウントは前の記録から引き継いだ 10）
+    const manual = { batchId: "m-0123456789abcdef-33-20261128-aaaaaa", exScore: 1500, clearState: "HARD CLEAR", missCount: 10, lastPlayed: new Date("2026-11-28T03:00:00Z") };
+    getLatestAllScoresMock.mockResolvedValueOnce([
+      { ...manual, logId: 42, songId: 1 },
+      { ...manual, logId: 43, songId: 2 },
+    ]);
+
+    const { result } = await handleScoresBulk(
+      authReq({
+        version: "33",
+        csvRows: [
+          // 同じ日・同じ EX → その場で更新
+          { title: "same", difficulty: "ANOTHER", exScore: 1500, clearState: "HARD CLEAR", missCount: 4, lastPlayed: "2026-11-28 20:00" },
+          // 日付が違う → 今までどおり新しい記録
+          { title: "other", difficulty: "ANOTHER", exScore: 1500, clearState: "HARD CLEAR", missCount: 4, lastPlayed: "2026-11-29 20:00" },
+        ],
+      }),
+    );
+
+    expect(result).toMatchObject({ ok: true, body: { updatedAllCount: 1, mergedAllCount: 1 } });
+    const args = vi.mocked(saveImportResults).mock.calls[0]![0];
+    expect(args.allScoreMerges).toEqual([{ logId: 42, clearState: "HARD CLEAR", missCount: 4, lastPlayed: expect.any(Date) }]);
+    expect(args.allScoreUpdates).toHaveLength(1);
+    expect(args.allScoreUpdates[0]).toMatchObject({ songId: 2, missCount: 4 });
+  });
 });
 
 describe("handleScoresTransfer", () => {

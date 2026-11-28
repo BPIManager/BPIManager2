@@ -1,4 +1,5 @@
 
+import { db } from "@/lib/db";
 import { Database, NewScore } from "@/types/db";
 import { Transaction } from "kysely";
 
@@ -35,6 +36,8 @@ class ScoreWriteRepository {
       clearState: string | null;
       missCount: number | null;
       lastPlayed: Date;
+      /** 使用オプション。省略（undefined）なら、同じ batchId の行を更新するときは今の値を残す */
+      useOption?: string | null;
     },
   ) {
     const latest = await trx
@@ -56,6 +59,7 @@ class ScoreWriteRepository {
           clearState: params.clearState,
           missCount: params.missCount,
           lastPlayed: params.lastPlayed,
+          ...(params.useOption !== undefined ? { useOption: params.useOption } : {}),
         })
         .where("logId", "=", latest.logId)
         .execute();
@@ -75,8 +79,34 @@ class ScoreWriteRepository {
         clearState: params.clearState,
         missCount: params.missCount,
         lastPlayed: params.lastPlayed,
+        useOption: params.useOption ?? null,
       })
       .execute();
+  }
+
+  /**
+   * 記録の使用オプションを更新する（履歴タブ、#708）。本人の記録だけを更新する
+   *
+   * @returns 更新できたか（logId が無い、または他人の記録なら false）
+   */
+  async updateUseOption(userId: string, logId: number, useOption: string | null): Promise<boolean> {
+    const r = await db.updateTable("scores").set({ useOption }).where("logId", "=", logId).where("userId", "=", userId).executeTakeFirst();
+    return Number(r.numUpdatedRows) > 0;
+  }
+
+  /**
+   * CSV 取り込みで、同じプレーの手動登録の記録を、新しい記録を作らずに更新する（#711）。EX・使用オプションは変えない。
+   *
+   * @param trx - 呼び出し元が管理するトランザクション
+   * @param logId - 更新する記録
+   * @param values - CSV のミスカウント・ランプ・最終プレー日時
+   */
+  async updateFromSamePlay(
+    trx: Transaction<Database>,
+    logId: number,
+    values: { clearState: string | null; missCount: number | null; lastPlayed: Date },
+  ) {
+    await trx.updateTable("scores").set(values).where("logId", "=", logId).execute();
   }
 
   /**

@@ -4,6 +4,61 @@ import { cn } from "@/lib/utils";
 import { Crown, TrendingUp, Calendar, AlertCircle } from "lucide-react";
 import type { Score } from "@/types/db";
 import { getDJRank } from "@/utils/songs/djRank";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { USE_OPTION_CHOICES } from "@/schemas/scores/useOption";
+
+/** 使用オプションが未設定のときの、選択肢の値 */
+const UNSET = "unset";
+
+/** 使用オプション。選べるとき（自分の記録）は選択、そうでなければ値があるときだけ出す（#708） */
+const UseOptionField = ({
+  value,
+  onChange,
+}: {
+  value: string | null | undefined;
+  onChange?: (v: string | null) => void;
+}) => {
+  if (!onChange)
+    return value ? (
+      <span className="font-mono text-[10px] font-bold text-bpim-muted">
+        {value}
+      </span>
+    ) : null;
+  // 読み取った値が選択肢に無い（DP の組など）ときは、その値も選べるようにする
+  const choices: readonly string[] =
+    value && !USE_OPTION_CHOICES.includes(value as never)
+      ? [...USE_OPTION_CHOICES, value]
+      : USE_OPTION_CHOICES;
+  return (
+    <Select
+      value={value ?? UNSET}
+      onValueChange={(v) => onChange(v === UNSET ? null : v)}
+    >
+      <SelectTrigger
+        aria-label="使用オプション"
+        className="h-5 w-24 px-1.5 py-0 text-[10px] font-bold"
+      >
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value={UNSET} className="text-xs text-bpim-muted">
+          オプション未設定
+        </SelectItem>
+        {choices.map((c) => (
+          <SelectItem key={c} value={c} className="text-xs">
+            {c}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+};
 
 const djRankText = (
   mode: "current" | "next",
@@ -18,8 +73,11 @@ const HistoryRecordCard = ({
   isGlobalBest,
   notes,
   maxScore,
+  onUseOptionChange,
 }: {
   record: Score;
+  /** 渡されたとき（自分の記録）だけ、使用オプションを選べる。選んだら呼ぶ */
+  onUseOptionChange?: (useOption: string | null) => void;
   scoreDiff: number | null;
   isGlobalBest: boolean;
   /** 理論値(notes*2)。渡された場合のみDJランク表記(例: AAA+12 / MAX-34)を出す */
@@ -44,6 +102,10 @@ const HistoryRecordCard = ({
           <span className="font-mono text-[10px] font-bold">
             {dayjs(record.lastPlayed).tz().format("YYYY/MM/DD HH:mm")}
           </span>
+          <UseOptionField
+            value={record.useOption}
+            onChange={onUseOptionChange}
+          />
         </div>
         <div className="flex items-center gap-2">
           {scoreDiff !== null && scoreDiff > 0 && (

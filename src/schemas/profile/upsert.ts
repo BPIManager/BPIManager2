@@ -36,6 +36,8 @@ export const profileUpsertSchema = z.object({
     .nullable()
     .default(null),
   isPublic: z.number().int().min(0).max(1),
+  // オプション統計への参加（1: 提供する、0: 提供しない）。省略時は今の値を変えない（新規作成なら 1）
+  optionStats: z.number().int().min(0).max(1).optional(),
   xId: z.string().max(20).nullable().default(null),
   arenaPrivacy: arenaPrivacySchema.optional(),
 });

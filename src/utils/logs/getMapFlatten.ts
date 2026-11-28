@@ -24,6 +24,7 @@ interface RawSongScoreRow {
   bpi: number | null;
   clearState: string | null;
   missCount: number | null;
+  useOption?: string | null;
   scoreAt: string | Date | null;
   wrScore: number | null;
   kaidenAvg: number | null;
@@ -47,6 +48,7 @@ export const mapToFlatSong = (row: RawSongScoreRow): SongWithScore => {
     bpi: row.bpi !== null ? Number(row.bpi) : null,
     clearState: row.clearState,
     missCount: row.missCount,
+    useOption: row.useOption ?? null,
     scoreAt: row.scoreAt,
     wrScore: row.wrScore,
     kaidenAvg: row.kaidenAvg,

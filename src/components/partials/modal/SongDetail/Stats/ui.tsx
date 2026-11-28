@@ -176,6 +176,14 @@ export const StatsTabView = ({
         <Separator className="my-1 bg-bpim-border" />
         <div className="flex items-center justify-between">
           <span className="text-xs font-bold text-bpim-muted uppercase">
+            使用オプション
+          </span>
+          <span className="font-mono text-sm font-black text-bpim-text">
+            {song.useOption ?? "-"}
+          </span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-bold text-bpim-muted uppercase">
             クリアランプ
           </span>
           <span className="font-mono text-sm font-black text-bpim-text">

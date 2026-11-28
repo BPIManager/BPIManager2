@@ -143,6 +143,7 @@ class UserProfileRepository {
         "u.iidxId",
         "u.xId",
         "u.isPublic",
+        "u.optionStats",
         "u.createdAt",
         "u.updatedAt",
         "latest.totalBpi",
