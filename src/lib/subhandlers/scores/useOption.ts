@@ -2,7 +2,7 @@ import { scoreWriteRepo } from "@/lib/db/domains/scores/write";
 import { allScoresRepo } from "@/lib/db/domains/allScores";
 import { scoresUseOptionBodySchema } from "@/schemas/scores/useOption";
 import { toErrorMessage } from "@/lib/subhandlers/shared";
-import { err, ok, invalidBody } from "@/middlewares/api/apiResult";
+import { err, ok } from "@/middlewares/api/apiResult";
 import type { AuthenticatedNextApiRequest } from "@/middlewares/api/withAuth";
 import { type HandleOutcome } from "./_shared";
 
@@ -14,7 +14,7 @@ export async function handleScoreUseOption(req: AuthenticatedNextApiRequest): Pr
   const base = { targetUserId: viewerId, viewerId };
 
   const parsed = scoresUseOptionBodySchema.safeParse(req.body);
-  if (!parsed.success) return { result: invalidBody(parsed.error, scoresUseOptionBodySchema), ...base };
+  if (!parsed.success) return { result: err(400, parsed.error.issues[0]?.message ?? "Invalid request body"), ...base };
   const { logId, songDomain, useOption } = parsed.data;
 
   try {
