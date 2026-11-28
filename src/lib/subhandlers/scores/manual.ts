@@ -18,13 +18,21 @@ interface ImprovementCurrent {
   missCount: number | null;
 }
 
-/** 現在値の`clearState`/`missCount`をそのまま引き継ぐ（手動編集はEXスコアのみ変更対象） */
-function currentClearMiss(current: ImprovementCurrent | undefined) {
+/**
+ * 現在値の`clearState`を引き継ぐ。`missCount`は送られていればその値、なければ現在値（同じバージョンの最新の記録）を引き継ぐ。
+ * 引き継いだミスカウントは、あとで同じ日・同じ EX の CSV を取り込んだときに、CSV の値で更新される（bulk.ts）
+ */
+function currentClearMiss(current: ImprovementCurrent | undefined, missCount?: number | null) {
+  const cur = current?.missCount ?? null;
   return {
     clearState: current?.clearState ?? "NO PLAY",
-    missCount: current?.missCount ?? null,
+    // ゲームのベストデータと同じく、少ないほうを残す
+    missCount: missCount != null && cur != null ? Math.min(missCount, cur) : (missCount ?? cur),
   };
 }
+
+/** 保存する EX。ミスカウントだけが良くなった（EX は下がった）プレーでも、ベストの EX を下げない */
+const bestEx = (exScore: number, current: ImprovementCurrent | undefined) => Math.max(exScore, current?.exScore ?? 0);
 
 /**
  * 画面からのEXスコア手動入力・保存。songId は songDomain で空間を明示し、もう一方のドメインは title+difficulty で解決する。
@@ -46,7 +54,7 @@ export async function handleScoreManualUpdate(
       ...base,
     };
   }
-  const { songId, songDomain, version, exScore } = parsed.data;
+  const { songId, songDomain, version, exScore, useOption, missCount } = parsed.data;
   const userId = viewerId;
 
   try {
@@ -97,7 +105,7 @@ export async function handleScoreManualUpdate(
         : currentAllScores.find((s) => s.songId === allSong!.songId);
 
     const improved = isScoreImproved(
-      { exScore, ...currentClearMiss(primaryCurrent) },
+      { exScore, clearState: currentClearMiss(primaryCurrent).clearState, missCount },
       primaryCurrent
         ? {
             exScore: primaryCurrent.exScore,
@@ -113,6 +121,9 @@ export async function handleScoreManualUpdate(
       };
     }
 
+    // 保存する EX は、編集元の記録と比べて決め、もう一方の表にも同じ値を揃える
+    const savedEx = bestEx(exScore, primaryCurrent);
+
     let scoreInput:
       | {
           songId: number;
@@ -121,6 +132,7 @@ export async function handleScoreManualUpdate(
           bpi: number | null;
           clearState: string | null;
           missCount: number | null;
+          useOption?: string | null;
         }
       | undefined;
     let allScoreInput:
@@ -130,17 +142,20 @@ export async function handleScoreManualUpdate(
           bpi: number | null;
           clearState: string | null;
           missCount: number | null;
+          useOption?: string | null;
         }
       | undefined;
 
     if (bpiSong) {
       const current = currentScores.find((s) => s.songId === bpiSong!.songId);
+      const ex = savedEx;
       scoreInput = {
         songId: bpiSong.songId,
         definitionId: bpiSong.defId,
-        exScore,
-        bpi: BpiCalculator.calc(exScore, bpiSong),
-        ...currentClearMiss(current),
+        exScore: ex,
+        bpi: BpiCalculator.calc(ex, bpiSong),
+        ...currentClearMiss(current, missCount),
+        useOption: useOption ?? undefined,
       };
     }
 
@@ -148,11 +163,13 @@ export async function handleScoreManualUpdate(
       const current = currentAllScores.find(
         (s) => s.songId === allSong!.songId,
       );
+      const ex = savedEx;
       allScoreInput = {
         songId: allSong.songId,
-        exScore,
-        bpi: bpiSong ? BpiCalculator.calc(exScore, bpiSong) : null,
-        ...currentClearMiss(current),
+        exScore: ex,
+        bpi: bpiSong ? BpiCalculator.calc(ex, bpiSong) : null,
+        ...currentClearMiss(current, missCount),
+        useOption: useOption ?? undefined,
       };
     }
 
@@ -166,7 +183,7 @@ export async function handleScoreManualUpdate(
         (s) => {
           const ex =
             s.songId === bpiSong!.songId
-              ? exScore
+              ? savedEx
               : currentExScoreMap.get(s.songId);
           return ex != null
             ? [{ songId: s.songId, notes: s.notes, exScore: ex }]
@@ -187,7 +204,7 @@ export async function handleScoreManualUpdate(
     return {
       result: ok({
         songId,
-        exScore,
+        exScore: scoreInput?.exScore ?? allScoreInput?.exScore ?? exScore,
         bpi: scoreInput?.bpi ?? allScoreInput?.bpi ?? null,
         totalBpi,
         batchId,

@@ -35,6 +35,8 @@ class ScoreWriteRepository {
       clearState: string | null;
       missCount: number | null;
       lastPlayed: Date;
+      /** 使用オプション。省略（undefined）なら、同じ batchId の行を更新するときは今の値を残す */
+      useOption?: string | null;
     },
   ) {
     const latest = await trx
@@ -56,6 +58,7 @@ class ScoreWriteRepository {
           clearState: params.clearState,
           missCount: params.missCount,
           lastPlayed: params.lastPlayed,
+          ...(params.useOption !== undefined ? { useOption: params.useOption } : {}),
         })
         .where("logId", "=", latest.logId)
         .execute();
@@ -75,6 +78,7 @@ class ScoreWriteRepository {
         clearState: params.clearState,
         missCount: params.missCount,
         lastPlayed: params.lastPlayed,
+        useOption: params.useOption ?? null,
       })
       .execute();
   }

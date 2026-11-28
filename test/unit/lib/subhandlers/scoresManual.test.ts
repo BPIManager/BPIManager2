@@ -226,6 +226,64 @@ describe("handleScoreManualUpdate", () => {
     }
   });
 
+  it("使用オプションとミスカウントを送ると、その値で保存する（#710）", async () => {
+    getSongMasterWithDefMock.mockResolvedValue([bpiSong]);
+    getAllLevelMasterMock.mockResolvedValue([allSongForBpiSong]);
+    getLatestScoresMock.mockResolvedValue([{ songId: 1, exScore: 800, clearState: "HARD", missCount: 10 }]);
+    getLatestAllScoresMock.mockResolvedValue([{ songId: 501, exScore: 800, clearState: "HARD", missCount: 10 }]);
+    saveManualScoreUpdateMock.mockResolvedValue({ totalBpi: 50, batchId: "m-x" });
+
+    const { result } = await handleScoreManualUpdate(
+      req({ songId: 1, songDomain: "bpi", version: "34", exScore: 900, useOption: "RANDOM", missCount: 4 }),
+    );
+
+    expect(result.ok).toBe(true);
+    const call = saveManualScoreUpdateMock.mock.calls[0][0];
+    expect(call.score).toMatchObject({ exScore: 900, missCount: 4, useOption: "RANDOM", clearState: "HARD" });
+    expect(call.allScore).toMatchObject({ exScore: 900, missCount: 4, useOption: "RANDOM" });
+  });
+
+  it("ミスカウントを送らなければ、最新の記録の値を引き継ぎ、使用オプションは触らない（#710）", async () => {
+    getSongMasterWithDefMock.mockResolvedValue([bpiSong]);
+    getAllLevelMasterMock.mockResolvedValue([allSongForBpiSong]);
+    getLatestScoresMock.mockResolvedValue([{ songId: 1, exScore: 800, clearState: "HARD", missCount: 10 }]);
+    getLatestAllScoresMock.mockResolvedValue([]);
+    saveManualScoreUpdateMock.mockResolvedValue({ totalBpi: 50, batchId: "m-x" });
+
+    await handleScoreManualUpdate(req({ songId: 1, songDomain: "bpi", version: "34", exScore: 900, missCount: null }));
+
+    const call = saveManualScoreUpdateMock.mock.calls[0][0];
+    expect(call.score).toMatchObject({ exScore: 900, missCount: 10 });
+    expect(call.score.useOption).toBeUndefined();
+  });
+
+  it("EX が下がってもミスカウントが良くなれば保存し、EX はベストのまま、ミスカウントは少ないほうにする（#710）", async () => {
+    getSongMasterWithDefMock.mockResolvedValue([bpiSong]);
+    getAllLevelMasterMock.mockResolvedValue([allSongForBpiSong]);
+    getLatestScoresMock.mockResolvedValue([{ songId: 1, exScore: 950, clearState: "HARD", missCount: 10 }]);
+    getLatestAllScoresMock.mockResolvedValue([{ songId: 501, exScore: 950, clearState: "HARD", missCount: 10 }]);
+    saveManualScoreUpdateMock.mockResolvedValue({ totalBpi: 50, batchId: "m-x" });
+
+    const { result } = await handleScoreManualUpdate(req({ songId: 1, songDomain: "bpi", version: "34", exScore: 900, missCount: 3 }));
+
+    expect(result.ok).toBe(true);
+    const call = saveManualScoreUpdateMock.mock.calls[0][0];
+    expect(call.score).toMatchObject({ exScore: 950, missCount: 3 });
+    expect(call.allScore).toMatchObject({ exScore: 950, missCount: 3 });
+  });
+
+  it("EX もミスカウントも良くなっていなければ保存しない（#710）", async () => {
+    getSongMasterWithDefMock.mockResolvedValue([bpiSong]);
+    getAllLevelMasterMock.mockResolvedValue([allSongForBpiSong]);
+    getLatestScoresMock.mockResolvedValue([{ songId: 1, exScore: 950, clearState: "HARD", missCount: 3 }]);
+    getLatestAllScoresMock.mockResolvedValue([]);
+
+    const { result } = await handleScoreManualUpdate(req({ songId: 1, songDomain: "bpi", version: "34", exScore: 900, missCount: 5 }));
+
+    expect(result).toMatchObject({ ok: false, status: 400 });
+    expect(saveManualScoreUpdateMock).not.toHaveBeenCalled();
+  });
+
   it("songDomain=allSongsで楽曲が見つからなければerr(404)", async () => {
     getSongMasterWithDefMock.mockResolvedValue([]);
     getAllLevelMasterMock.mockResolvedValue([]);
