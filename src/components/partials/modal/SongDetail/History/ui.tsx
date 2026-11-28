@@ -12,6 +12,8 @@ interface SongHistoryViewProps {
   /** 全難易度スコア(BPI未計算)の場合に notes を渡す。BPIの代わりにnotes基準の%を表示する */
   notes?: number;
   maxScore: number;
+  /** 渡されたとき（自分の記録）だけ、各記録の使用オプションを選べる */
+  onUseOptionChange?: (logId: number, useOption: string | null) => void;
 }
 
 const SongHistoryView = ({
@@ -19,6 +21,7 @@ const SongHistoryView = ({
   globalMaxScore,
   notes,
   maxScore,
+  onUseOptionChange,
 }: SongHistoryViewProps) => {
   if (!historyGroups || Object.keys(historyGroups).length === 0)
     return (
@@ -64,6 +67,11 @@ const SongHistoryView = ({
                     }
                     notes={notes}
                     maxScore={maxScore}
+                    onUseOptionChange={
+                      onUseOptionChange
+                        ? (v) => onUseOptionChange(record.logId, v)
+                        : undefined
+                    }
                   />
                 );
               })}

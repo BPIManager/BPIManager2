@@ -1,4 +1,5 @@
 
+import { db } from "@/lib/db";
 import { Database, NewScore } from "@/types/db";
 import { Transaction } from "kysely";
 
@@ -81,6 +82,16 @@ class ScoreWriteRepository {
         useOption: params.useOption ?? null,
       })
       .execute();
+  }
+
+  /**
+   * 記録の使用オプションを更新する（履歴タブ、#708）。本人の記録だけを更新する
+   *
+   * @returns 更新できたか（logId が無い、または他人の記録なら false）
+   */
+  async updateUseOption(userId: string, logId: number, useOption: string | null): Promise<boolean> {
+    const r = await db.updateTable("scores").set({ useOption }).where("logId", "=", logId).where("userId", "=", userId).executeTakeFirst();
+    return Number(r.numUpdatedRows) > 0;
   }
 
   /**

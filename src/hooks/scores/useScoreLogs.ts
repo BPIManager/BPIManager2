@@ -15,7 +15,7 @@ export const useScoreHistory = (
   songId: number,
   enabled = true,
 ) => {
-  const { data, error, isLoading } = useAuthedSWRV2<SongHistoryResponse>(
+  const { data, error, isLoading, mutate } = useAuthedSWRV2<SongHistoryResponse>(
     enabled && userId && songId
       ? `${API_V2_PREFIX}/users/${userId}/scores/${songId}/history`
       : null,
@@ -25,5 +25,7 @@ export const useScoreHistory = (
     historyGroups: data,
     isLoading,
     isError: error,
+    /** 履歴を取り直す（使用オプションを保存したあとなど） */
+    mutate,
   };
 };

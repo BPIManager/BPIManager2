@@ -171,6 +171,16 @@ class allScoresRepository {
   }
 
   /**
+   * 記録の使用オプションを更新する（履歴タブ、#708）。本人の記録だけを更新する
+   *
+   * @returns 更新できたか（logId が無い、または他人の記録なら false）
+   */
+  async updateUseOption(userId: string, logId: number, useOption: string | null): Promise<boolean> {
+    const r = await db.updateTable("allScores").set({ useOption }).where("logId", "=", logId).where("userId", "=", userId).executeTakeFirst();
+    return Number(r.numUpdatedRows) > 0;
+  }
+
+  /**
    * CSV 取り込みで、同じプレーの手動登録の記録を、新しい記録を作らずに更新する（#711）。EX・使用オプションは変えない。
    *
    * @param trx - 呼び出し元が管理するトランザクション

@@ -15,11 +15,11 @@ export const useAllScoreHistory = (
   songId: number | null,
   enabled = true,
 ) => {
-  const { data, error, isLoading } = useAuthedSWRV2<SongHistoryResponse>(
+  const { data, error, isLoading, mutate } = useAuthedSWRV2<SongHistoryResponse>(
     enabled && userId && songId
       ? `${API_V2_PREFIX}/users/${userId}/all-scores/${songId}/history`
       : null,
   );
 
-  return { historyGroups: data, isLoading, isError: error };
+  return { historyGroups: data, isLoading, isError: error, mutate };
 };
