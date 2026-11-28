@@ -10,6 +10,8 @@ export interface Session {
   iidxId: string | null;
   xId: string | null;
   isPublic: number;
+  /** オプション統計への参加（1: 提供する、0: 提供しない） */
+  optionStats: number;
   createdAt: Date;
   updatedAt: Date;
   followingCount: number;

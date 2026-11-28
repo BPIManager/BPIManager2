@@ -285,6 +285,24 @@ export default function AccountSettings({ isOpen, onClose }: Props) {
                 />
               </div>
 
+              <div className="flex items-center justify-between gap-4 rounded-xl border border-bpim-border bg-bpim-surface-2/60 p-4">
+                <div className="flex flex-col gap-1">
+                  <span className="text-sm font-bold text-bpim-text">
+                    {t("settings.profile.optionStats.title")}
+                  </span>
+                  <span className="text-[11px] text-bpim-muted">
+                    {t("settings.profile.optionStats.desc")}
+                  </span>
+                </div>
+                <Switch
+                  checked={formData.optionStats}
+                  onCheckedChange={(checked) =>
+                    setFormData({ ...formData, optionStats: checked })
+                  }
+                  className="shrink-0 data-[state=checked]:bg-bpim-primary"
+                />
+              </div>
+
               {!formData.isPublic && <FollowInviteSection />}
               {!formData.isPublic && (
                 <ViewPermissionsSection className="rounded-xl border border-bpim-border bg-bpim-surface-2/60 p-4" />

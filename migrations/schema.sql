@@ -555,6 +555,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `iidxId` varchar(12) DEFAULT NULL,
   `xId` varchar(20) DEFAULT NULL,
   `isPublic` int(11) NOT NULL,
+  `optionStats` tinyint(1) NOT NULL DEFAULT 1,
   `createdAt` timestamp NULL DEFAULT NULL,
   `updatedAt` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`userId`),

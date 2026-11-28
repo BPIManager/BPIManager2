@@ -146,6 +146,18 @@ export const settingsTranslations = {
     "zh-TW": "建議設為公開以充分使用所有功能",
     ko: "기능을 최대한 활용하기 위해 공개를 권장합니다",
   },
+  "settings.profile.optionStats.title": {
+    ja: "オプション統計への参加",
+    en: "Contribute to option statistics",
+    "zh-TW": "參與選項統計",
+    ko: "옵션 통계에 참여",
+  },
+  "settings.profile.optionStats.desc": {
+    ja: "記録した使用オプション（RANDOM など）を、誰のものか分からない形で、譜面ごとの統計に使います",
+    en: "Your recorded play options (RANDOM, etc.) are used anonymously in per-chart statistics.",
+    "zh-TW": "以匿名方式將您記錄的使用選項（RANDOM 等）用於各譜面的統計",
+    ko: "기록한 사용 옵션(RANDOM 등)을 익명으로 보면별 통계에 사용합니다",
+  },
   "settings.profile.avatar.useService": {
     ja: "連携サービスを使用",
     en: "Use service icon",

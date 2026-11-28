@@ -38,6 +38,8 @@ export interface EditProfileFormData {
   iidxId: string;
   bio: string;
   isPublic: boolean;
+  /** オプション統計への参加 */
+  optionStats: boolean;
   xId: string;
   profileImage: string;
 }
@@ -58,6 +60,7 @@ export async function saveProfile(
       iidxId: formData.iidxId.replace(/-/g, ""),
       profileText: formData.bio || null,
       isPublic: formData.isPublic ? 1 : 0,
+      optionStats: formData.optionStats ? 1 : 0,
       arenaPrivacy,
     },
   );

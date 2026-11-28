@@ -31,6 +31,7 @@ class UsersRepository {
    * @param params.profileText - プロフィールテキスト
    * @param params.profileImage - プロフィール画像 URL
    * @param params.isPublic - 公開設定（1: 公開、0: 非公開）
+   * @param params.optionStats - オプション統計への参加（1: 提供する、0: 提供しない）。省略時は、更新なら今の値を残し、新規なら 1
    * @throws ユーザー名が重複する場合は status: 409 を持つエラー
    */
   async upsertUserProfile(
@@ -43,10 +44,12 @@ class UsersRepository {
       profileImage: string | null;
       isPublic: number;
       xId: string | null;
+      optionStats?: number;
     },
   ) {
-    const { userId, userName, iidxId, profileText, profileImage, isPublic, xId } =
+    const { userId, userName, iidxId, profileText, profileImage, isPublic, xId, optionStats } =
       params;
+    const optionStatsField = optionStats !== undefined ? { optionStats } : {};
 
     const existingUser = await trx
       .selectFrom("users")
@@ -71,6 +74,7 @@ class UsersRepository {
         profileImage,
         isPublic,
         xId,
+        ...optionStatsField,
         updatedAt: new Date(),
       })
       .onDuplicateKeyUpdate({
@@ -80,6 +84,7 @@ class UsersRepository {
         profileImage,
         isPublic,
         xId,
+        ...optionStatsField,
         updatedAt: new Date(),
       })
       .execute();

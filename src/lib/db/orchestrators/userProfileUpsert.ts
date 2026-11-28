@@ -25,6 +25,8 @@ export async function upsertUserProfile(params: {
   profileImage: string | null;
   isPublic: number;
   xId: string | null;
+  /** オプション統計への参加（1: 提供する、0: 提供しない）。省略時は今の値を残す */
+  optionStats?: number;
   version: string;
   batchId: string;
 }) {

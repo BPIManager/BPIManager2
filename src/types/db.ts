@@ -330,6 +330,8 @@ export interface Users {
   createdAt: Generated<Date | null>;
   iidxId: Generated<string | null>;
   isPublic: number;
+  /** オプション統計への参加（1: 提供する、0: 提供しない）。既定は 1 */
+  optionStats: Generated<number>;
   profileImage: Generated<string | null>;
   profileText: Generated<string | null>;
   updatedAt: Generated<Date | null>;
