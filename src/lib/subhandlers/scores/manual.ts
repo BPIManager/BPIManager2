@@ -3,6 +3,7 @@ import { allScoresRepo } from "@/lib/db/domains/allScores";
 import { songMasterRepo } from "@/lib/db/domains/songs/master";
 import { allSongsRepo } from "@/lib/db/domains/allSongs";
 import { saveManualScoreUpdate } from "@/lib/db/orchestrators/manualScoreUpdate";
+import { userStatusLogsReadRepo } from "@/lib/db/domains/userStatusLogs/read";
 import { BpiCalculator } from "@/lib/bpi";
 import { isScoreImproved } from "@/lib/scores/evaluateImprovement";
 import { scoresManualBodySchema } from "@/schemas/scores/manual";
@@ -31,6 +32,38 @@ function currentClearMiss(current: ImprovementCurrent | undefined, missCount?: n
   };
 }
 
+/** 総合BPIの、保存前・保存後・差分（プレビュー用）。差分は小数第 2 位まで。保存前の記録がなければ before・delta は null */
+interface TotalBpiPreview {
+  before: number | null;
+  after: number | null;
+  delta: number | null;
+}
+
+/**
+ * 保存した場合の総合BPI（プレビュー用。保存・ロックはしない）。保存（saveManualScoreUpdate）と同じく、
+ * このバージョンでこれまでに記録した最高値でラチェットする。保存前は、その記録した値（画面に出ている総合BPI）。
+ * 自己ベストを上回らなければ保存されないので、保存後も保存前と同じ
+ */
+async function previewTotalBpi(
+  userId: string,
+  version: string,
+  improved: boolean,
+  compute: (withSaved: boolean) => number,
+): Promise<TotalBpiPreview> {
+  const previousBest = await userStatusLogsReadRepo.findMaxTotalBpi(userId, version);
+  const fresh = (withSaved: boolean) => {
+    const v = compute(withSaved);
+    return Number.isFinite(v) ? v : null;
+  };
+  const before = previousBest ?? fresh(false);
+  const after = improved ? BpiCalculator.ratchetTotalBpi(previousBest, fresh(true) ?? Number.NaN) : before;
+  return {
+    before,
+    after,
+    delta: before !== null && after !== null ? Math.round((after - before) * 100) / 100 : null,
+  };
+}
+
 /** 保存する EX。ミスカウントだけが良くなった（EX は下がった）プレーでも、ベストの EX を下げない */
 const bestEx = (exScore: number, current: ImprovementCurrent | undefined) => Math.max(exScore, current?.exScore ?? 0);
 
@@ -54,7 +87,7 @@ export async function handleScoreManualUpdate(
       ...base,
     };
   }
-  const { songId, songDomain, version, exScore, useOption, missCount } = parsed.data;
+  const { songId, songDomain, version, exScore, useOption, missCount, preview } = parsed.data;
   const userId = viewerId;
 
   try {
@@ -114,7 +147,8 @@ export async function handleScoreManualUpdate(
           }
         : undefined,
     );
-    if (!improved) {
+    // プレビューは、上回らなくても結果を返す（improved: false。総合BPIは変わらない）
+    if (!improved && !preview) {
       return {
         result: err(400, "現在の自己ベストを上回っていません。"),
         ...base,
@@ -173,16 +207,16 @@ export async function handleScoreManualUpdate(
       };
     }
 
-    // 総合BPIはロック取得後の最新スコアから算出する（同時書き込みの更新分を取りこぼさない）
-    const computeTotalBpi = (lockedScores: typeof currentScores) => {
+    /** スコアの一覧から総合BPIを算出する（ラチェット適用前）。withSaved なら、この譜面は保存する EX に置き換える */
+    const totalBpiOf = (scores: typeof currentScores, withSaved: boolean) => {
       const twelves = bpiSongMaster.filter((s) => s.difficultyLevel === 12);
       const currentExScoreMap = new Map(
-        lockedScores.map((s) => [s.songId, s.exScore]),
+        scores.map((s) => [s.songId, s.exScore]),
       );
       const observations: IBpiScoreObservation[] = bpiSongMaster.flatMap(
         (s) => {
           const ex =
-            s.songId === bpiSong!.songId
+            withSaved && s.songId === bpiSong!.songId
               ? savedEx
               : currentExScoreMap.get(s.songId);
           return ex != null
@@ -192,6 +226,28 @@ export async function handleScoreManualUpdate(
       );
       return BpiCalculator.calculateTotalBPI(observations, twelves);
     };
+
+    if (preview) {
+      return {
+        result: ok({
+          preview: true,
+          songId,
+          exScore: savedEx,
+          bpi: scoreInput?.bpi ?? allScoreInput?.bpi ?? null,
+          improved,
+          totalBpi: bpiSong
+            ? await previewTotalBpi(userId, version, improved, (withSaved) =>
+                totalBpiOf(currentScores, withSaved),
+              )
+            : null,
+        }),
+        ...base,
+      };
+    }
+
+    // 総合BPIはロック取得後の最新スコアから算出する（同時書き込みの更新分を取りこぼさない）
+    const computeTotalBpi = (lockedScores: typeof currentScores) =>
+      totalBpiOf(lockedScores, true);
 
     const { totalBpi, batchId } = await saveManualScoreUpdate({
       userId,
