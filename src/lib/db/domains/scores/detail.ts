@@ -117,6 +117,7 @@ class LogScoreRepository {
         "current.bpi",
         "current.clearState",
         "current.missCount",
+        "current.useOption",
         "current.lastPlayed as scoreAt",
         "prev.exScore as p_exScore",
         "prev.bpi as p_bpi",

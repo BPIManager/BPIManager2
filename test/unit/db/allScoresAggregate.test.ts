@@ -98,6 +98,7 @@ describe("allScoresListRepo.getAllScoresList", () => {
         exScore: 1800,
         clearState: "HARD CLEAR",
         missCount: 5,
+        useOption: null,
         scoreAt: "2025-01-01",
         kaidenAvg: null,
         wrScore: null,

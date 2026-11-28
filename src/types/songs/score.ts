@@ -34,6 +34,8 @@ export interface SongWithScore
   clearState: string | null;
   missCount: number | null;
   scoreAt: Date | string | null;
+  /** ベストスコアの記録の使用オプション（RANDOM など）。未設定や、取得しない一覧では null/省略 */
+  useOption?: string | null;
 
   radarTop?: string | null;
 

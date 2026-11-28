@@ -72,6 +72,7 @@ class AllScoresListRepository {
         "a.exScore",
         "a.clearState",
         "a.missCount",
+        "a.useOption",
         "a.lastPlayed",
       ])
       .where((eb) => eb.or([eb("s.deletedAt", "is", null)]))
@@ -145,6 +146,7 @@ class AllScoresListRepository {
       exScore: r.exScore ?? null,
       clearState: r.clearState ?? null,
       missCount: r.missCount ?? null,
+      useOption: r.useOption ?? null,
       scoreAt: r.lastPlayed ?? null,
       kaidenAvg: null,
       wrScore: null,
