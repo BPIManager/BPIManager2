@@ -224,6 +224,8 @@ export interface Scores {
   missCount: Generated<number | null>;
   scoreClass: Generated<number | null>;
   songId: number;
+  /** 使用オプション（RANDOM など）。BPIM2 Camera の読み取り、または履歴タブでの入力。未設定は NULL */
+  useOption: Generated<string | null>;
   userId: string;
   version: string;
 }
@@ -378,6 +380,8 @@ export interface AllScoresTable {
   lastPlayed: Generated<Date>;
   version: string;
   batchId: string | null;
+  /** 使用オプション（RANDOM など）。未設定は NULL */
+  useOption: Generated<string | null>;
 }
 
 export interface OptimizeMemoTable {
