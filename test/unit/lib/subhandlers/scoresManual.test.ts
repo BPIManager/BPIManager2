@@ -6,6 +6,7 @@ const getAllLevelMasterMock = vi.fn();
 const getLatestScoresMock = vi.fn();
 const getLatestAllScoresMock = vi.fn();
 const saveManualScoreUpdateMock = vi.fn();
+const findMaxTotalBpiMock = vi.fn();
 
 vi.mock("@/lib/db/domains/songs/master", () => ({
   songMasterRepo: { getSongMasterWithDef: (...a: unknown[]) => getSongMasterWithDefMock(...a) },
@@ -19,11 +20,15 @@ vi.mock("@/lib/db/domains/scores/latest", () => ({
 vi.mock("@/lib/db/domains/allScores", () => ({
   allScoresRepo: { getLatestAllScores: (...a: unknown[]) => getLatestAllScoresMock(...a) },
 }));
+vi.mock("@/lib/db/domains/userStatusLogs/read", () => ({
+  userStatusLogsReadRepo: { findMaxTotalBpi: (...a: unknown[]) => findMaxTotalBpiMock(...a) },
+}));
 vi.mock("@/lib/db/orchestrators/manualScoreUpdate", () => ({
   saveManualScoreUpdate: (...a: unknown[]) => saveManualScoreUpdateMock(...a),
 }));
 
 const { handleScoreManualUpdate } = await import("@/lib/subhandlers/scores/manual");
+const { BpiCalculator } = await import("@/lib/bpi");
 
 const bpiSong = {
   songId: 1,
@@ -293,5 +298,56 @@ describe("handleScoreManualUpdate", () => {
       req({ songId: 999, songDomain: "allSongs", version: "34", exScore: 900 }),
     );
     expect(result).toMatchObject({ ok: false, status: 404 });
+  });
+});
+
+describe("handleScoreManualUpdate（プレビュー、#714）", () => {
+  beforeEach(() => {
+    getSongMasterWithDefMock.mockResolvedValue([bpiSong]);
+    getAllLevelMasterMock.mockResolvedValue([allSongForBpiSong]);
+    getLatestScoresMock.mockResolvedValue([{ songId: 1, exScore: 800, clearState: "HARD", missCount: 3 }]);
+    getLatestAllScoresMock.mockResolvedValue([{ songId: 501, exScore: 800, clearState: "HARD", missCount: 3 }]);
+    // 総合BPIは、観測した EX の合計 / 100 とみなす（計算の中身ではなく、保存前・保存後の扱いを確かめる）
+    vi.spyOn(BpiCalculator, "calculateTotalBPI").mockImplementation((obs) => obs.reduce((a, o) => a + o.exScore, 0) / 100);
+  });
+
+  it("保存せず、保存した場合の EX・単曲BPI・総合BPIの保存前と保存後を返す。保存前は記録した最高値", async () => {
+    findMaxTotalBpiMock.mockResolvedValue(7.5);
+    const { result } = await handleScoreManualUpdate(req({ songId: 1, songDomain: "bpi", version: "34", exScore: 900, preview: true }));
+    expect(saveManualScoreUpdateMock).not.toHaveBeenCalled();
+    expect(findMaxTotalBpiMock).toHaveBeenCalledWith("user-1", "34");
+    expect(result).toMatchObject({ ok: true, body: { preview: true, songId: 1, exScore: 900, improved: true, totalBpi: { before: 7.5, after: 9, delta: 1.5 } } });
+  });
+
+  it("記録がなければ、保存前はいまのスコアから算出する", async () => {
+    findMaxTotalBpiMock.mockResolvedValue(null);
+    const { result } = await handleScoreManualUpdate(req({ songId: 1, songDomain: "bpi", version: "34", exScore: 900, preview: true }));
+    expect(result).toMatchObject({ ok: true, body: { totalBpi: { before: 8, after: 9, delta: 1 } } });
+  });
+
+  it("保存と同じく、これまでの最高値より下がらない（ラチェット）", async () => {
+    findMaxTotalBpiMock.mockResolvedValue(20);
+    const { result } = await handleScoreManualUpdate(req({ songId: 1, songDomain: "bpi", version: "34", exScore: 900, preview: true }));
+    expect(result).toMatchObject({ ok: true, body: { totalBpi: { before: 20, after: 20, delta: 0 } } });
+  });
+
+  it("自己ベストを上回らなくても 400 にせず、improved: false と変わらない総合BPIを返す", async () => {
+    findMaxTotalBpiMock.mockResolvedValue(8);
+    const { result } = await handleScoreManualUpdate(req({ songId: 1, songDomain: "bpi", version: "34", exScore: 700, preview: true }));
+    expect(saveManualScoreUpdateMock).not.toHaveBeenCalled();
+    expect(result).toMatchObject({ ok: true, body: { improved: false, exScore: 800, totalBpi: { before: 8, after: 8, delta: 0 } } });
+  });
+
+  it("☆10以下は総合BPIの対象外（null）", async () => {
+    getSongMasterWithDefMock.mockResolvedValue([]);
+    getAllLevelMasterMock.mockResolvedValue([nonBpiAllSong]);
+    const { result } = await handleScoreManualUpdate(req({ songId: 900, songDomain: "allSongs", version: "34", exScore: 200, preview: true }));
+    expect(findMaxTotalBpiMock).not.toHaveBeenCalled();
+    expect(result).toMatchObject({ ok: true, body: { improved: true, bpi: null, totalBpi: null } });
+  });
+
+  it("理論値を超える EX は、プレビューでも 400", async () => {
+    const { result } = await handleScoreManualUpdate(req({ songId: 1, songDomain: "bpi", version: "34", exScore: 2001, preview: true }));
+    expect(result).toMatchObject({ ok: false, status: 400 });
   });
 });

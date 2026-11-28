@@ -14,6 +14,8 @@ export const scoresManualBodySchema = z.object({
   useOption: z.string().trim().min(1).max(32).nullish(),
   /** ミスカウント。省略・null なら、同じバージョンの最新の記録の値を引き継ぐ */
   missCount: z.coerce.number().int().min(0).nullish(),
+  /** true なら保存せず、保存した場合の結果（総合BPIの変動など）だけを返す（#714） */
+  preview: z.boolean().optional(),
 });
 
 export type ScoresManualBodyInput = z.output<typeof scoresManualBodySchema>;
